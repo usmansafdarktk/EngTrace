@@ -1,6 +1,6 @@
 import random
 import numpy as np
-from constants import GENERAL_REACTANTS
+from data.templates.branches.chemical_engineering.constants import GENERAL_REACTANTS
 
 
 # Template 1 (Advanced)
@@ -259,7 +259,7 @@ def main():
     import json
     import os
 
-    # Define the output path
+    # Define the output path (Modify this path according to where you are running the code from)
     output_file = "../../../../../testset/reaction_kinetics/conversion_and_reactor_sizing.jsonl"
 
     # Create the directory if it doesn't exist
