@@ -366,7 +366,7 @@ def template_pfr_volume_changing_rate():
 
 def main():
     """
-    Generate numerous instances of each reaction kinetics template with different random seeds
+    Generate numerous instances of each mole balances template with different random seeds
     and write the results to a JSONL file.
     """
     import json

@@ -85,3 +85,65 @@ BIOCHEMICAL_SUBSTRATES = [
 ]
 
 GENERAL_REACTANTS = LIQUID_PHASE_REACTANTS + GAS_PHASE_REACTANTS + BIOCHEMICAL_SUBSTRATES
+
+
+PRODUCTS = [
+    "Product Alpha",
+    "Product Beta",
+    "Product Gamma",
+    "Product Delta",
+    "Product Sigma",
+    "Product Omega",
+    "Product Theta",
+    "Product Lambda",
+    "Product Zeta",
+    "Product Kappa",
+
+    "Compound P",
+    "Compound Q",
+    "Compound R",
+    "Compound S",
+    "Compound T",
+    "Compound V",
+    "Compound W",
+    "Compound X",
+    "Compound Y",
+    "Compound Z",
+
+    "Species I",
+    "Species II",
+    "Species III",
+    "Species IV",
+    "Species V",
+    "Species VI",
+    "Species VII",
+    "Species VIII",
+
+    "Material A",
+    "Material B",
+    "Material C",
+    "Material D",
+    "Material E",
+    "Material F",
+
+    "Substance One",
+    "Substance Two",
+    "Substance Three",
+    "Substance Four",
+    "Substance Five",
+    "Substance Six",
+
+    "Molecule M",
+    "Molecule N",
+    "Molecule O",
+    "Molecule P",
+    "Molecule Q",
+    "Molecule R",
+
+    "Entity 1",
+    "Entity 2",
+    "Entity 3",
+    "Entity 4",
+    "Entity 5",
+    "Entity 6"
+]
