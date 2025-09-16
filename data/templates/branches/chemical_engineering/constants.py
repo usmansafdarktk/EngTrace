@@ -217,3 +217,265 @@ CRITICAL_PROPERTIES = {
     "Sulfur dioxide": {"Tc": 430.8, "Pc": 78.84, "Vc": 122.0, "Zc": 0.269, "omega": 0.245},
     "Hydrogen sulfide": {"Tc": 373.5, "Pc": 89.63, "Vc": 98.6, "Zc": 0.284, "omega": 0.091}
 }
+
+
+# Common materials which undergo heating with their specific heat capacities in J/g·K
+SUBSTANCES_FOR_HEATING = [
+    # Metals & Solids
+    {"name": "Iron", "state": "solid", "Cp": 0.449},
+    {"name": "Copper", "state": "solid", "Cp": 0.385},
+    {"name": "Aluminum", "state": "solid", "Cp": 0.897},
+    {"name": "Gold", "state": "solid", "Cp": 0.129},
+    {"name": "Lead", "state": "solid", "Cp": 0.16},
+    {"name": "Silver", "state": "solid", "Cp": 0.235},
+    {"name": "Tungsten", "state": "solid", "Cp": 0.134},
+    {"name": "Silicon", "state": "solid", "Cp": 0.705},
+    {"name": "Graphite (Carbon)", "state": "solid", "Cp": 0.709},
+    {"name": "Glass (typical)", "state": "solid", "Cp": 0.84},
+    {"name": "Ice (at 0°C)", "state": "solid", "Cp": 2.09},
+    {"name": "Concrete", "state": "solid", "Cp": 0.88},
+    {"name": "Wood (typical)", "state": "solid", "Cp": 1.7},
+    {"name": "Polyethylene (plastic)", "state": "solid", "Cp": 2.3},
+
+    # Liquids
+    {"name": "Water", "state": "liquid", "Cp": 4.18},
+    {"name": "Ethanol", "state": "liquid", "Cp": 2.44},
+    {"name": "Methanol", "state": "liquid", "Cp": 2.53},
+    {"name": "Acetone", "state": "liquid", "Cp": 2.17},
+    {"name": "Mercury", "state": "liquid", "Cp": 0.14},
+    {"name": "Glycerol", "state": "liquid", "Cp": 2.43},
+    {"name": "Ethylene Glycol (Antifreeze)", "state": "liquid", "Cp": 2.36},
+    {"name": "Olive Oil", "state": "liquid", "Cp": 1.97},
+    {"name": "Engine Oil (typical)", "state": "liquid", "Cp": 1.9},
+    {"name": "Sulfuric Acid", "state": "liquid", "Cp": 1.42},
+
+    # Gases (at constant pressure, 25°C)
+    {"name": "Air (dry)", "state": "gas", "Cp": 1.005},
+    {"name": "Nitrogen", "state": "gas", "Cp": 1.04},
+    {"name": "Oxygen", "state": "gas", "Cp": 0.918},
+    {"name": "Hydrogen", "state": "gas", "Cp": 14.31},
+    {"name": "Helium", "state": "gas", "Cp": 5.193},
+    {"name": "Argon", "state": "gas", "Cp": 0.520},
+    {"name": "Carbon Dioxide", "state": "gas", "Cp": 0.839},
+    {"name": "Methane", "state": "gas", "Cp": 2.22},
+    {"name": "Ammonia", "state": "gas", "Cp": 2.06},
+    {"name": "Water Vapor (Steam, 100°C)", "state": "gas", "Cp": 2.01},
+    {"name": "Chlorine", "state": "gas", "Cp": 0.48}
+]
+
+
+# A list of common substances with their molar heats of vaporization (delta_H_vap)
+# at their normal boiling points. All values are in kJ/mol.
+SUBSTANCES_FOR_VAPORIZATION = [
+    # Alcohols & Water
+    {"name": "Water", "delta_H_vap": 40.66},
+    {"name": "Methanol", "delta_H_vap": 35.3},
+    {"name": "Ethanol", "delta_H_vap": 38.6},
+    {"name": "Isopropanol", "delta_H_vap": 39.85},
+
+    # Alkanes
+    {"name": "Propane", "delta_H_vap": 19.04},
+    {"name": "n-Butane", "delta_H_vap": 22.44},
+    {"name": "n-Hexane", "delta_H_vap": 28.85},
+
+    # Organic Solvents
+    {"name": "Acetone", "delta_H_vap": 29.1},
+    {"name": "Benzene", "delta_H_vap": 30.8},
+    {"name": "Toluene", "delta_H_vap": 33.48},
+    {"name": "Carbon Tetrachloride", "delta_H_vap": 29.82},
+
+    # Inorganic & Elemental Substances
+    {"name": "Ammonia", "delta_H_vap": 23.3},
+    {"name": "Mercury", "delta_H_vap": 59.11},
+    {"name": "Nitrogen", "delta_H_vap": 5.57},
+    {"name": "Oxygen", "delta_H_vap": 6.82},
+    {"name": "Argon", "delta_H_vap": 6.43},
+]
+
+
+# Database of standard heats of formation (ΔH_f°) at 298.15 K in kJ/mol.
+# A value of 0 indicates an element in its standard state.
+HEATS_OF_FORMATION = {
+    # Hydrocarbons
+    "CH4(g)": -74.8,      # Methane
+    "C2H6(g)": -84.7,     # Ethane
+    "C3H8(g)": -103.8,    # Propane
+    "C6H6(l)": 49.0,      # Benzene
+    # Alcohols
+    "CH3OH(l)": -238.6,   # Methanol
+    "C2H5OH(l)": -277.7,  # Ethanol
+    # Common Gases & Products
+    "O2(g)": 0,
+    "H2(g)": 0,
+    "N2(g)": 0,
+    "CO(g)": -110.5,
+    "CO2(g)": -393.5,
+    "H2O(g)": -241.8,
+    "H2O(l)": -285.8,
+    "NH3(g)": -46.1,      # Ammonia
+    "NO(g)": 90.3,
+    "NO2(g)": 33.2,
+}
+
+# A list of predefined, balanced chemical reactions.
+REACTIONS = [
+    {
+        "name": "Combustion of Methane",
+        "equation": "CH4(g) + 2O2(g) → CO2(g) + 2H2O(l)",
+        "reactants": {"CH4(g)": 1, "O2(g)": 2},
+        "products": {"CO2(g)": 1, "H2O(l)": 2}
+    },
+    {
+        "name": "Combustion of Propane",
+        "equation": "C3H8(g) + 5O2(g) → 3CO2(g) + 4H2O(l)",
+        "reactants": {"C3H8(g)": 1, "O2(g)": 5},
+        "products": {"CO2(g)": 3, "H2O(l)": 4}
+    },
+    {
+        "name": "Oxidation of Ammonia",
+        "equation": "4NH3(g) + 5O2(g) → 4NO(g) + 6H2O(g)",
+        "reactants": {"NH3(g)": 4, "O2(g)": 5},
+        "products": {"NO(g)": 4, "H2O(g)": 6}
+    },
+    {
+        "name": "Steam Reforming of Methane",
+        "equation": "CH4(g) + H2O(g) → CO(g) + 3H2(g)",
+        "reactants": {"CH4(g)": 1, "H2O(g)": 1},
+        "products": {"CO(g)": 1, "H2(g)": 3}
+    }
+]
+
+
+# A dictionary of substances with their heat capacity parameters for the
+# equation: Cp/R = A + B*T + C*T² + D*T⁻² where T is in Kelvin.
+# Parameters are typically valid for temperature ranges around 298-1200K
+CP_PARAMS = {
+    # Original entries
+    "CH4(g)": {"A": 1.702, "B": 9.081E-2, "C": -2.164E-5, "D": 0},
+    "CO2(g)": {"A": 5.457, "B": 1.045E-2, "C": 0, "D": -1.157E5},
+    "N2(g)": {"A": 3.280, "B": 0.593E-2, "C": 0, "D": 0.040E5},
+    "H2O(l)": {"A": 8.712, "B": 1.25E-2, "C": -0.18E-5, "D": 0},
+    "C2H5OH(g)": {"A": 3.518, "B": 20.001E-2, "C": -6.002E-5, "D": 0},
+    
+    # Common gases
+    "O2(g)": {"A": 3.630, "B": 1.794E-2, "C": -0.658E-5, "D": 0.061E5},
+    "H2(g)": {"A": 3.249, "B": 0.422E-2, "C": 0, "D": 0.083E5},
+    "NH3(g)": {"A": 3.578, "B": 3.020E-2, "C": 0, "D": -0.186E5},
+    "CO(g)": {"A": 3.376, "B": 0.557E-2, "C": 0, "D": -0.031E5},
+    "H2S(g)": {"A": 3.931, "B": 1.490E-2, "C": 0, "D": -0.232E5},
+    
+    # Hydrocarbons
+    "C2H6(g)": {"A": 1.131, "B": 19.225E-2, "C": -5.561E-5, "D": 0},
+    "C3H8(g)": {"A": 1.213, "B": 28.785E-2, "C": -8.824E-5, "D": 0},
+    "C4H10(g)": {"A": 1.935, "B": 36.915E-2, "C": -11.402E-5, "D": 0},
+    "C2H4(g)": {"A": 1.424, "B": 14.394E-2, "C": -4.392E-5, "D": 0},
+    "C2H2(g)": {"A": 6.132, "B": 8.914E-2, "C": -6.347E-5, "D": 0},
+    
+    # Common liquids
+    "C6H6(l)": {"A": -0.206, "B": 39.064E-2, "C": -13.301E-5, "D": 0},
+    "C7H8(l)": {"A": 0.290, "B": 47.052E-2, "C": -15.716E-5, "D": 0},
+    "C3H6O(l)": {"A": 1.506, "B": 30.476E-2, "C": -9.127E-5, "D": 0},
+    "CH3OH(l)": {"A": 5.052, "B": 16.561E-2, "C": -3.761E-5, "D": 0},
+    "C6H14(l)": {"A": 2.738, "B": 45.854E-2, "C": -14.518E-5, "D": 0},
+    
+    # Inorganic compounds
+    "SO2(g)": {"A": 5.699, "B": 0.801E-2, "C": 0, "D": -1.015E5},
+    "NO(g)": {"A": 3.387, "B": 0.669E-2, "C": 0, "D": 0.095E5},
+    "NO2(g)": {"A": 4.982, "B": 1.195E-2, "C": -0.792E-5, "D": -0.377E5},
+    "Cl2(g)": {"A": 4.442, "B": 0.089E-2, "C": 0, "D": -0.344E5},
+    "HCl(g)": {"A": 3.156, "B": 0.623E-2, "C": 0, "D": 0.151E5},
+    
+    # Noble gases
+    "He(g)": {"A": 2.500, "B": 0, "C": 0, "D": 0},
+    "Ar(g)": {"A": 2.500, "B": 0, "C": 0, "D": 0},
+    "Ne(g)": {"A": 2.500, "B": 0, "C": 0, "D": 0},
+    
+    # Additional common substances
+    "Air(g)": {"A": 3.355, "B": 0.575E-2, "C": 0, "D": -0.016E5},
+    "H2O(g)": {"A": 3.470, "B": 1.450E-2, "C": 0, "D": 0.121E5},
+    "H2SO4(l)": {"A": 2.850, "B": 13.400E-2, "C": 0, "D": 0},
+    "NaCl(s)": {"A": 5.526, "B": 1.963E-2, "C": 0, "D": -0.333E5},
+    "CaCO3(s)": {"A": 12.572, "B": 2.637E-2, "C": -3.120E-5, "D": -3.642E5}
+}
+
+
+# A list of predefined, balanced combustion reactions with theoretical air.
+COMBUSTION_REACTIONS = [
+    {
+        "name": "Combustion of Methane",
+        "fuel": "Methane",
+        "equation": "CH4(g) + 2O2(g) + 7.52N2(g) → CO2(g) + 2H2O(g) + 7.52N2(g)",
+        "reactants": {"CH4(g)": 1, "O2(g)": 2, "N2(g)": 7.52},
+        "products": {"CO2(g)": 1, "H2O(g)": 2, "N2(g)": 7.52}
+    },
+    {
+        "name": "Combustion of Propane",
+        "fuel": "Propane",
+        "equation": "C3H8(g) + 5O2(g) + 18.8N2(g) → 3CO2(g) + 4H2O(g) + 18.8N2(g)",
+        "reactants": {"C3H8(g)": 1, "O2(g)": 5, "N2(g)": 18.8},
+        "products": {"CO2(g)": 3, "H2O(g)": 4, "N2(g)": 18.8}
+    },
+    {
+        "name": "Combustion of Hydrogen",
+        "fuel": "Hydrogen",
+        "equation": "H2(g) + 0.5O2(g) + 1.88N2(g) → H2O(g) + 1.88N2(g)",
+        "reactants": {"H2(g)": 1, "O2(g)": 0.5, "N2(g)": 1.88},
+        "products": {"H2O(g)": 1, "N2(g)": 1.88}
+    },
+    {
+        "name": "Combustion of Carbon Monoxide",
+        "fuel": "Carbon Monoxide",
+        "equation": "CO(g) + 0.5O2(g) + 1.88N2(g) → CO2(g) + 1.88N2(g)",
+        "reactants": {"CO(g)": 1, "O2(g)": 0.5, "N2(g)": 1.88},
+        "products": {"CO2(g)": 1, "N2(g)": 1.88}
+    },
+    {
+        "name": "Combustion of Acetylene",
+        "fuel": "Acetylene",
+        "equation": "C2H2(g) + 2.5O2(g) + 9.4N2(g) → 2CO2(g) + H2O(g) + 9.4N2(g)",
+        "reactants": {"C2H2(g)": 1, "O2(g)": 2.5, "N2(g)": 9.4},
+        "products": {"CO2(g)": 2, "H2O(g)": 1, "N2(g)": 9.4}
+    },
+    {
+        "name": "Combustion of Ethane",
+        "fuel": "Ethane",
+        "equation": "C2H6(g) + 3.5O2(g) + 13.16N2(g) → 2CO2(g) + 3H2O(g) + 13.16N2(g)",
+        "reactants": {"C2H6(g)": 1, "O2(g)": 3.5, "N2(g)": 13.16},
+        "products": {"CO2(g)": 2, "H2O(g)": 3, "N2(g)": 13.16}
+    },
+    {
+        "name": "Combustion of Butane",
+        "fuel": "Butane",
+        "equation": "C4H10(g) + 6.5O2(g) + 24.44N2(g) → 4CO2(g) + 5H2O(g) + 24.44N2(g)",
+        "reactants": {"C4H10(g)": 1, "O2(g)": 6.5, "N2(g)": 24.44},
+        "products": {"CO2(g)": 4, "H2O(g)": 5, "N2(g)": 24.44}
+    },
+    {
+        "name": "Combustion of Octane",
+        "fuel": "Octane",
+        "equation": "C8H18(g) + 12.5O2(g) + 47.0N2(g) → 8CO2(g) + 9H2O(g) + 47.0N2(g)",
+        "reactants": {"C8H18(g)": 1, "O2(g)": 12.5, "N2(g)": 47.0},
+        "products": {"CO2(g)": 8, "H2O(g)": 9, "N2(g)": 47.0}
+    },
+    {
+        "name": "Combustion of Ammonia",
+        "fuel": "Ammonia", 
+        "equation": "4NH3(g) + 3O2(g) + 11.28N2(g) → 2N2(g) + 6H2O(g) + 11.28N2(g)",
+        "reactants": {"NH3(g)": 4, "O2(g)": 3, "N2(g)": 11.28},
+        "products": {"N2(g)": 13.28, "H2O(g)": 6}  # Total N2 = 2 + 11.28
+    },
+    {
+        "name": "Combustion of Methanol",
+        "fuel": "Methanol",
+        "equation": "CH3OH(g) + 1.5O2(g) + 5.64N2(g) → CO2(g) + 2H2O(g) + 5.64N2(g)",
+        "reactants": {"CH3OH(g)": 1, "O2(g)": 1.5, "N2(g)": 5.64},
+        "products": {"CO2(g)": 1, "H2O(g)": 2, "N2(g)": 5.64}
+    },
+    {
+        "name": "Combustion of Ethanol",
+        "fuel": "Ethanol",
+        "equation": "C2H5OH(g) + 3O2(g) + 11.28N2(g) → 2CO2(g) + 3H2O(g) + 11.28N2(g)",
+        "reactants": {"C2H5OH(g)": 1, "O2(g)": 3, "N2(g)": 11.28},
+        "products": {"CO2(g)": 2, "H2O(g)": 3, "N2(g)": 11.28}
+    }
+]
