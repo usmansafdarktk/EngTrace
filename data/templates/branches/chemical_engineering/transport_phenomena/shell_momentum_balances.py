@@ -24,7 +24,10 @@ def template_falling_film_max_velocity():
             - str: A step-by-step solution showing the calculation.
     """
     # 1. Parameterize the inputs with random values
-    fluid_name, fluid_density, fluid_viscosity = random.choice(COMMON_LIQUIDS)
+    # Choose a random fluid name (key) from the dictionary
+    fluid_name = random.choice(list(COMMON_LIQUIDS.keys()))
+    # Get the corresponding properties (the tuple of density and viscosity)
+    fluid_density, fluid_viscosity = COMMON_LIQUIDS[fluid_name]
     
     # Film thickness in mm
     film_thickness_mm = round(random.uniform(0.5, 5.0), 2)
@@ -108,7 +111,10 @@ def template_hagen_poiseuille_flowrate():
             - str: A step-by-step solution showing the calculation.
     """
     # 1. Parameterize the inputs with random values
-    fluid_name, _, fluid_viscosity_Pas = random.choice(COMMON_LIQUIDS)
+    # Choose a random fluid name (key) from the dictionary
+    fluid_name = random.choice(list(COMMON_LIQUIDS.keys()))
+    # Get the corresponding properties (the tuple of density and viscosity)
+    fluid_density, fluid_viscosity_Pas = COMMON_LIQUIDS[fluid_name]
 
     # Pipe radius in cm
     pipe_radius_cm = round(random.uniform(0.5, 5.0), 2)
@@ -190,7 +196,10 @@ def template_annulus_flowrate():
             - str: A step-by-step solution showing the calculation.
     """
     # 1. Parameterize the inputs with random values
-    fluid_name, _, fluid_viscosity_Pas = random.choice(COMMON_LIQUIDS)
+    # Choose a random fluid name (key) from the dictionary
+    fluid_name = random.choice(list(COMMON_LIQUIDS.keys()))
+    # Get the corresponding properties (the tuple of density and viscosity)
+    fluid_density, fluid_viscosity_Pas = COMMON_LIQUIDS[fluid_name]
 
     # Define radii and ensure inner radius is smaller than outer radius
     outer_radius_cm = round(random.uniform(2.0, 10.0), 2)
