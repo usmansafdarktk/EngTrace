@@ -32,3 +32,6 @@ MEDIA_VELOCITIES = {
     # Special Cases (Important for RF/Microwave Engineering)
     "Human Body Tissue (muscle, ~3 GHz)": C0 / 7.14, # Relative permittivity ε_r ~51, n=√ε_r
 }
+
+# Permittivity of free space in Farads per meter (F/m)
+EPSILON_0 = 8.854e-12
