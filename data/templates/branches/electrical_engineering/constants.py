@@ -1,3 +1,5 @@
+import math
+
 # Speed of light in vacuum (m/s)
 C0 = 299792458 
 
@@ -35,3 +37,31 @@ MEDIA_VELOCITIES = {
 
 # Permittivity of free space in Farads per meter (F/m)
 EPSILON_0 = 8.854e-12
+
+# Value ranges for random parameter generation to ensure diverse problems.
+# Frequencies are kept as integers for clarity in the problem statement.
+FREQUENCY_RANGE_HZ = (50, 2000)
+AMPLITUDE_RANGE = (1.0, 50.0)
+PHASE_RANGE_DEG = (-180, 180)
+PHASE_RANGE_RAD = (-math.pi, math.pi)
+
+# The continuous frequency Omega will be a multiple of pi. This range defines the multiplier.
+OMEGA_MULTIPLIER_RANGE = (100, 1000)
+
+SAMPLING_FREQ_RANGE_HZ = (1000, 8000)
+
+F0_RANGE_HZ = (500, 3000) 
+
+# The gain of the discrete-time system
+GAIN_K_RANGE = (0.5, 5.0)
+
+# The delay (in samples) of the discrete-time system
+DELAY_N0_RANGE = (1, 10)
+
+
+# The integer factor by which the signal is downsampled.
+DECIMATION_FACTOR_M_RANGE = (2, 5)
+
+# Define the pool for denominators of the omega_0 fraction.
+# Using larger numbers allows for more granularity in creating frequencies.
+OMEGA_DENOMINATOR_RANGE = (8, 20)
