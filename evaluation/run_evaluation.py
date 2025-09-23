@@ -15,8 +15,8 @@ MODEL_NAME = os.getenv("MODEL_NAME")
 
 # Define the input file (from inference) and the output file (for scores)
 # Assumes this script is in the 'evaluation' directory
-INPUT_FILE = f"inference_results/{MODEL_NAME}_results.jsonl"
-OUTPUT_FILE = f"evals_{MODEL_NAME}.jsonl"
+INPUT_FILE = f"inference_results/{MODEL_NAME}_inference_results.jsonl"
+OUTPUT_FILE = f"evaluation_results/{MODEL_NAME}_evals.jsonl"
 
 
 #  2. Main Evaluation Logic 

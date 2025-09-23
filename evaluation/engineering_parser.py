@@ -1,6 +1,5 @@
 import re
 from typing import List, Tuple, Optional
-from data.templates.branches.chemical_engineering.reaction_kinetics.conversion_and_reactor_sizing import template_levenspiel_plot_interpretation
 
 
 def convert_to_float_eng(text: str) -> Optional[float]:
@@ -117,20 +116,4 @@ if __name__ == '__main__':
 
     print("\n" + "="*50 + "\n") # Separator for clarity
 
-    # --- Test Case 2: Levenspiel Plot Interpretation ---
-    # NEW: Import and generate the more complex template
-    from data.templates.branches.chemical_engineering.reaction_kinetics.conversion_and_reactor_sizing import template_levenspiel_plot_interpretation
     
-    # Generate the question and solution from the template
-    _, sample_solution_levenspiel = template_levenspiel_plot_interpretation()
-
-    print("--- Test Case 2: Levenspiel Plot Problem ---")
-    steps, step_answers, final_answer = extract_steps(sample_solution_levenspiel)
-    
-    print(f"\nOverall Final Answer Extracted: {final_answer}\n")
-    
-    for i, (text, answer) in enumerate(zip(steps, step_answers)):
-        print(f"--- Step {i+1} ---")
-        print(f"Text: {text}")
-        print(f"Answer found in step: {answer}")
-        print("-" * 15)
