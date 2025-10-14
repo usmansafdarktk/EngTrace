@@ -1,14 +1,32 @@
-# aggregate_results.py
-
 import os
 import json
 import numpy as np
 import pickle
+import argparse  
 from tqdm import tqdm
 
-#  1. Configuration 
-EVALS_DIR = "evaluation_results" 
-OUTPUT_DIR = "summary_results"
+# Argument Parser Setup
+parser = argparse.ArgumentParser(
+    description="Summarize model evaluation results from .jsonl files."
+)
+# Add an argument for the input directory
+parser.add_argument(
+    "evals_dir",
+    type=str,
+    help="The source directory containing the evaluation .jsonl files."
+)
+# Add an argument for the output directory
+parser.add_argument(
+    "output_dir",
+    type=str,
+    help="The destination directory to save the summary .pkl and .txt files."
+)
+args = parser.parse_args()
+
+
+# Configuration
+EVALS_DIR = args.evals_dir
+OUTPUT_DIR = args.output_dir
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 
@@ -16,7 +34,7 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 mean_sdv_results_file = open(os.path.join(OUTPUT_DIR, 'mean_sdv_results.txt'), 'w')
 
 
-# MODIFIED: Create dictionaries for your specific categories
+# Create dictionaries for your specific categories
 branch_wise_results = {}
 domain_wise_results = {}
 area_wise_results = {}
@@ -25,7 +43,7 @@ level_wise_results = {}
 
 #  2. Data Collection 
 # Find all evaluation files in the directory
-eval_files = [f for f in os.listdir(EVALS_DIR) if f.endswith('_evals.jsonl')]
+eval_files = [f for f in os.listdir(EVALS_DIR) if f.endswith('_evals_2.jsonl')]
 
 for model_file in eval_files:
     # Initialize dictionaries for the current model
@@ -57,7 +75,7 @@ for model_file in eval_files:
             score_list = [final_answer_match, recall, precision, step_f1, bertscore, rouge2]
             all_metric_vals.append(score_list)
 
-            # MODIFIED: Collect results grouped by your categories
+            # Collect results grouped by your categories
             branch = json_line['branch']
             domain = json_line['domain']
             area = json_line['area']

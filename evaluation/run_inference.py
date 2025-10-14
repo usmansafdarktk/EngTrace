@@ -1,5 +1,3 @@
-# run_inference.py
-
 import os
 import json
 import time
@@ -70,7 +68,7 @@ def load_all_problems(directory: str) -> list:
     return all_problems
 
 
-#  3. Main Inference Logic 
+# 3. Main Inference Logic (with Smart Rate Limiter)
 if __name__ == "__main__":
     # Load all problems from the testset directory
     problems = load_all_problems(INPUT_DIR)
@@ -86,10 +84,28 @@ if __name__ == "__main__":
         with open(OUTPUT_FILE, "w", encoding='utf-8') as f_out:
             print(f"Starting inference... Results will be saved to '{OUTPUT_FILE}'")
             
-            # Create a tqdm iterator to get a handle on the progress bar
+            # Initialize variables for rate limiting
+            request_counter = 0
+            start_time = time.time()
+            REQUESTS_PER_MINUTE = 8 # Our safe target
+            
             progress_bar = tqdm(problems, desc="Initializing Inference")
 
             for problem in progress_bar:
+                
+                # Rate Limiting Logic
+                # Check if we have made 10 requests
+                if request_counter >= REQUESTS_PER_MINUTE:
+                    elapsed_time = time.time() - start_time
+                    # If 10 requests took less than a minute, wait for the remainder
+                    if elapsed_time < 60:
+                        wait_time = 60 - elapsed_time
+                        tqdm.write(f"Rate limit reached. Pausing for {wait_time:.2f} seconds...")
+                        time.sleep(wait_time)
+                    
+                    # Reset the counter and timer for the next batch of 10
+                    request_counter = 0
+                    start_time = time.time()
                 
                 # Update the progress bar's description 
                 branch = problem.get('branch', 'unknown_branch')
@@ -101,18 +117,19 @@ if __name__ == "__main__":
                 try:
                     # Call the Gemini API
                     response = model.generate_content(prompt)
-                    
-                    # Add the model's generation to the problem dictionary
                     problem['generation'] = response.text
                     
                 except Exception as e:
-                    # Handle potential API errors
-                    # Use tqdm.write to print errors without breaking the bar
                     tqdm.write(f"\nAn error occurred for problem ID {problem_id}: {e}")
                     problem['generation'] = f"ERROR: {e}"
-                    time.sleep(5)
+                    # Wait longer if an error occurs (e.g., server-side issues)
+                    time.sleep(60)
                 
                 # Write the result to the output file immediately
                 f_out.write(json.dumps(problem) + '\n')
+                
+                # Increment the request counter after a successful call
+                request_counter += 1
 
         print(f"\nInference complete. All {len(problems)} results saved to '{OUTPUT_FILE}'.")
+    

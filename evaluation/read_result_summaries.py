@@ -1,10 +1,25 @@
 import pickle
 import os
 import pandas as pd
+import argparse 
 
 
-#  1. Configuration 
-RESULTS_DIR = "summary_results"
+# Create a parser object to handle command-line arguments
+parser = argparse.ArgumentParser(
+    description="Load and display summary statistics from .pkl files in a specified directory."
+)
+# Add a required argument for the results directory
+parser.add_argument(
+    "results_dir", 
+    type=str,
+    help="The path to the directory containing the .pkl result files."
+)
+# Parse the arguments provided by the user
+args = parser.parse_args()
+
+
+# Configuration 
+RESULTS_DIR = args.results_dir
 COLUMN_NAMES = ['final_answer_match', 'recall', 'precision', 'step_f1', 'bertscore', 'rouge2']
 
 
@@ -12,13 +27,13 @@ COLUMN_NAMES = ['final_answer_match', 'recall', 'precision', 'step_f1', 'bertsco
 if not os.path.isdir(RESULTS_DIR):
     print(f"Error: The directory '{RESULTS_DIR}' was not found.")
 else:
-    # MODIFIED: Find all files ending with .pkl in the specified directory.
+    # Find all files ending with .pkl in the specified directory.
     pickle_files = [f for f in os.listdir(RESULTS_DIR) if f.endswith('.pkl')]
 
     if not pickle_files:
         print(f"No pickle (.pkl) files found in '{RESULTS_DIR}'.")
     else:
-        # MODIFIED: Loop through each found file.
+        # Loop through each found file.
         for file_name in pickle_files:
             file_path = os.path.join(RESULTS_DIR, file_name)
             
@@ -28,7 +43,7 @@ else:
                 
                 print(f" Summary for: {file_name} ")
                 
-                # NEW: Convert to pandas DataFrame for a clean summary.
+                # Convert to pandas DataFrame for a clean summary.
                 # Assumes data is a dictionary like {'model_name': {'category': [scores]}}
                 if isinstance(loaded_data, dict) and loaded_data:
                     model_name = list(loaded_data.keys())[0]
