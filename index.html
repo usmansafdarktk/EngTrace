@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="Deformable Neural Radiance Fields creates free-viewpoint portraits (nerfies) from casually captured videos.">
+  <meta name="keywords" content="Nerfies, D-NeRF, NeRF">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EngChain: A Symbolic Benchmark for Verifiable Multi-Step Reasoning in Engineering</title>
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-PYVRSFMDRL"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-PYVRSFMDRL');
+  </script>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" href="./static/images/favicon.svg">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+
+<!-- trigger deploy -->
+<section class="hero">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-1 publication-title">EngChain: A Symbolic Benchmark for Verifiable Multi-Step Reasoning in Engineering</h1>
+          <div class="is-size-5 publication-authors">
+
+            <span class="author-block">
+              Ayesha Gull,
+            </span>
+
+            <span class="author-block">
+              Muhammad Usman Safder,
+            </span>
+
+
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=W9mk-R4AAAAJ&hl=en" target="_blank">Zhuohan Xie</a>,
+            </span>
+          
+            <span class="author-block">
+              <a href="https://scholar.google.com/citations?user=DfXsKZ4AAAAJ&hl=en" target="_blank">Preslav Nakov</a>,
+            </span>
+
+            <span class="author-block">
+              Rania Elbadry
+            </span>
+
+          </div>
+
+          <!-- <div class="is-size-6 publication-authors">
+            <span class="author-block"><sup>1</sup></span>
+            <span class="author-block"><sup>2</sup></span>
+            <span class="author-block"><sup>3</sup>MBZUAI</span>
+          </div> -->
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <span class="link-block">
+                <a href="" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-rocket"></i>
+                  </span>
+                  <span>App</span>
+                  </a>
+              </span>
+              <!-- <span class="link-block">
+                <a href="leaderboard.html" class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <i class="fas fa-chart-line"></i>
+                  </span>
+                  <span>Leaderboard</span>
+                </a>
+              </span> -->
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section" style="background-color: #f5f5f5;">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            While current benchmarks assess language understanding, factual recall, mathematics or code generation, none capture the integrative reasoning central to engineering where scientific principles, quantitative modeling and practical constraints must converge. To address this gap, we introduce EngChain, a benchmark for verifiable multi-step engineering problem-solving. EngChain contains 90 problems spanning three engineering branches, organized into 9 domains and 20 distinct areas. Problems are generated from symbolic templates with a high degree of randomization to ensure diversity and eliminate the risk of contamination. The benchmark moves beyond final answer accuracy with a two-stage evaluation: it first quantitatively verifies the numerical and semantic validity of each reasoning step and then introduces LLM-as-Judge, an automated system to qualitatively categorize any identified reasoning errors.
+          </p>
+        </div>
+      </div>
+    </div>
+    </div>
+</section>
+
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <br>
+    <div class="hero-body">
+      <img src="./static/images/engchain-taxonomy.png" 
+          alt="EngChain's Taxonomy of 9 domains and 90 problem types."
+          style="width: 70%; height: auto; display: block; margin: 0 auto;" />
+      <br>
+      <h2 class="subtitle has-text-centered">
+        EngChain's comprehensive taxonomy covers 90 distinct problem types across 9 domains and 3 engineering branches.
+      </h2>
+    </div>
+</section>
+
+<hr>
+
+<section class="section">
+    <div class="container is-max-desktop">
+        <div class="columns is-centered">
+            <div class="column is-full-width">
+              <h2 class="title is-3 has-text-centered">Overview and Generation Pipeline</h2>
+              <div class="columns is-vcentered">
+                  <div class="column">
+                      <div class="content has-text-justified">
+                          <p>
+                              The benchmark is built upon a comprehensive taxonomy of <strong>90 distinct problem templates</strong> across <strong>9 core engineering domains</strong> and 3 engineering branches. This structure is designed to systematically evaluate reasoning by scaling difficulty across three axes: Conceptual Complexity, Mathematical Sophistication, and Procedural Depth. Problems are generated from symbolic templates with domain-aware parameterization to ensure physical realism (e.g., using real material properties for "6061-T6 Aluminum"). The benchmark features a <strong>Two-Stage Verifiable Evaluation</strong> that moves beyond final-answer accuracy to check the numerical and semantic validity of each reasoning step.
+                          </p>
+                          <p>
+                              To ensure correctness, every template underwent an <strong>AI-Assisted Quality Assurance (QA)</strong> workflow. This process employed an LLM as a 'Peer Reviewer' to evaluate each template's code and example outputs against a multi-axis rubric for physical plausibility and mathematical correctness. Any template failing to meet a high automated threshold (a score < 4/5) was automatically flagged for human review by the authors, who possess domain expertise. This efficient <strong>AI-first, human-in-the-loop</strong> process proved highly effective, with only 5.55% (5 out of 90) of templates requiring manual inspection and correction.
+                          </p>
+                      </div>
+                  </div>
+                  <div class="column has-text-centered">
+                      <img src="./static/images/template-example.png" 
+                          alt="Example of an ENGCHAIN symbolic template for a CSTR Volume Calculation." 
+                          style="max-width: 350px; width: 100%;">
+                      <p class="is-size-7" style="margin-top: 8px;">
+                        <i>Figure 2: EngChain example template (CSTR Volume Calculation).</i>
+                      </p>
+                  </div>
+              </div>
+          </div>
+        </div>
+    </div>
+</section>
+
+<hr>
+
+<section class="section">
+    <div class="container is-max-desktop">
+        <div class="columns is-centered">
+            <div class="column is-four-fifths">
+                <h2 class="title is-3 has-text-centered">A Two-Stage Verifiable Evaluation Framework</h2>
+                <div class="content has-text-justified">
+                    <p>
+                        To assess the entire reasoning process, we move beyond final-answer accuracy and propose a multi-faceted framework. The first stage is a quantitative verification that computes a <strong>Step F1-Score</strong> for procedural correctness. This process compares each predicted reasoning step against every ground-truth step. A step is only considered a "match" if it simultaneously satisfies two criteria: high <strong>semantic similarity</strong> (measured via a Cross-Encoder model) and <strong>numerical correctness</strong> (within a 2% relative error tolerance for intermediate values). This dual-criteria check ensures that a step with a plausible explanation but a flawed calculation is correctly identified as an error.
+                    </p>
+                    <p>
+                        This quantitative score, however, only identifies that a reasoning chain is flawed, not why. To diagnose failures, we introduce a second, qualitative stage: an automated error analysis system called <strong>LLM-AS-JUDGE</strong>. When a step is flagged as a mismatch, this system uses an expert-persona LLM to classify the failure into categories like <strong>Conceptual Error</strong>, <strong>Calculation Error</strong>, or <strong>Input Error</strong>. Critically, this analysis revealed that the vast majority (73.94%) of steps flagged as errors by the rigid F1-score were actually <strong>Alternative Correct</strong> solutions — valid reasoning paths that simply differed from the single ground-truth. This finding demonstrates that our two-stage evaluation is essential for fairly assessing model capabilities and avoiding penalizing valid, creative problem-solving.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<hr>
+
+<section class="section">
+    <div class="container is-max-desktop">
+        <h2 class="title is-3 has-text-centered">Results</h2>
+        <div class="columns is-centered">
+            <div class="column is-four-fifths">
+                <div class="content has-text-justified">
+                    <p>
+                        Our primary finding from evaluating 11 frontier models is a <strong>stark and universal divergence</strong> between final-answer accuracy and the correctness of the reasoning process. While top models like <strong>GPT-4.1 Mini</strong> and <strong>GPT-5 Mini</strong> achieve a modest Final Answer Accuracy of ~63.1%, their procedural reasoning is critically low. The best-performing model in reasoning, <strong>Gemini 2.5 Flash</strong>, only achieved a <strong>Step F1-Score of 19.32%</strong>. This confirms a widespread "right for the wrong reasons" phenomenon, where models excel at generating fluent, semantically appropriate text (averaging ~0.87 BERTScore) that effectively masks the flawed underlying logic.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <h3 class="title is-4 has-text-centered">Overall Model Performance</h3>
+        <div class="has-text-centered" style="margin-bottom: 2rem;">
+            <img src="./static/images/engchain-results-table.png" 
+                 alt="Table showing zero-shot performance of 11 frontier models on the ENGCHAIN benchmark." 
+                 style="width: 80%; height: auto; border: 1px solid #dbdbdb;">
+            <p class="is-size-7" style="margin-top: 8px;">
+              <i>Table 1: Overall Performance of Frontier Models on the ENGCHAIN benchmark (N=1350).</i>
+            </p>
+        </div>
+
+        <div class="columns is-vcentered" style="margin-top: 3rem;">
+            <div class="column has-text-centered">
+                <h4 class="title is-5">Branch-Level Performance</h4>
+                <img src="./static/images/engchain-branch-performance.png" 
+                     alt="Bar chart showing model reasoning performance across Chemical, Electrical, and Mechanical Engineering." 
+                     style="max-width: 90%;">
+                <p class="is-size-7" style="margin-top: 8px;">
+                  <i>Figure 3: Branch-Level Performance. Chemical Engineering is consistently the most challenging domain.</i>
+                </p>
+            </div>
+
+            <div class="column has-text-centered">
+                <h4 class="title is-5">Domain-Level Performance</h4>
+                <img src="./static/images/engchain-domain-performance.png" 
+                    alt="Radar plot showing 'spiky' performance across 9 engineering domains." 
+                    style="max-width: 100%;">
+                <p class="is-size-7" style="margin-top: 8px;">
+                  <i>Figure 4: The 'spiky' profile shows specialized, not generalized, reasoning.</i>
+                </p>
+            </div>
+        </div>
+
+
+        <div class="columns is-vcentered" style="margin-top: 3rem;">
+            <div class="column has-text-centered">
+                <h4 class="title is-5">Performance Across Difficulty Levels</h4>
+                <img src="./static/images/engchain-difficulty-performance.png" 
+                     alt="Line chart showing model reasoning performance across Easy, Intermediate, and Advanced difficulty levels."
+                     style="max-width: 60%;">
+                <p class="is-size-7" style="margin-top: 8px;">
+                  <i>Figure 5: Difficulty-Level Performance. Procedural reasoning remains critically low across all complexity levels.</i>
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<hr>
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="content has-text-centered">
+      <p>
+        Website template borrowed from the <a href="https://nerfies.github.io/">Nerfies</a> project page.
+      </p>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
