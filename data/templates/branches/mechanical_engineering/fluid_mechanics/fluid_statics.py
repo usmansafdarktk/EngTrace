@@ -11,11 +11,10 @@ def template_hydrostatic_pressure_at_depth():
     Scenario:
         This template generates a fundamental problem to calculate the absolute
         pressure at a specified depth within a fluid. It considers both the
-        pressure exerted by the fluid column and the pressure at the free surface,
-        applying the basic hydrostatic pressure equation.
+        pressure exerted by the fluid column and the pressure at the free surface.
 
     Core Equation:
-        p_absolute = p_surface + (rho * g * h)
+        p_absolute = p_surface_absolute + (rho * g * h)
 
     Returns:
         tuple: A tuple containing:
@@ -27,36 +26,51 @@ def template_hydrostatic_pressure_at_depth():
     # Randomly select a fluid and its properties
     fluid_name, density_rho = random.choice(list(FLUID_DENSITIES.items()))
 
-    # Randomize depth in meters
-    depth_h = round(random.uniform(5.0, 500.0), 2)
+    # Randomize depth in meters (Restricted to realistic tank depths)
+    depth_h = round(random.uniform(2.0, 25.0), 2)
 
     # Randomly decide if the surface pressure is atmospheric or a specified gauge pressure
     is_surface_atmospheric = random.choice([True, False])
+    
+    # Define Atmospheric Pressure
+    P_atm_kpa = 101.325
 
     if is_surface_atmospheric:
-        surface_pressure_kpa = ATMOSPHERIC_PRESSURE_KPA
-        pressure_type_desc = "is atmospheric pressure"
+        # Surface is open to atmosphere
+        surface_pressure_input_kpa = P_atm_kpa
+        surface_pressure_abs_kpa = P_atm_kpa
+        pressure_type_desc = "is exposed to the atmosphere"
+        surface_calc_note = "Since the surface is open to the atmosphere, the surface absolute pressure is just P_atm."
     else:
-        # Generate a random gauge pressure at the surface
-        surface_pressure_kpa = round(random.uniform(10.0, 200.0), 2)
-        pressure_type_desc = f"has a gauge pressure of {surface_pressure_kpa} kPa"
+        # Surface is pressurized (Gauge Pressure given)
+        surface_gauge_kpa = round(random.uniform(10.0, 200.0), 2)
+        surface_pressure_input_kpa = surface_gauge_kpa
+        
+        # FIX: Absolute Surface Pressure = Gauge + Atm
+        surface_pressure_abs_kpa = surface_gauge_kpa + P_atm_kpa
+        
+        pressure_type_desc = f"is maintained at a gauge pressure of {surface_gauge_kpa} kPa"
+        surface_calc_note = (
+            f"The problem gives gauge pressure. To get absolute pressure at the surface, we add atmospheric pressure:\n"
+            f"P_surface_abs = P_gauge + P_atm = {surface_gauge_kpa} + {P_atm_kpa} = {surface_pressure_abs_kpa:.3f} kPa"
+        )
 
     # Standardize precision for final outputs
     precision = 3
 
     # 2. Perform the core calculations for the solution
 
-    # Step A: Ensure all units are consistent (convert surface pressure to Pascals)
-    surface_pressure_pa = surface_pressure_kpa * 1000
+    # Step A: Convert absolute surface pressure to Pascals
+    surface_pressure_pa = surface_pressure_abs_kpa * 1000
 
-    # Step B: Calculate the pressure increase due to the fluid column (Gauge Pressure)
-    # This is the result of p_gauge = rho * g * h
+    # Step B: Calculate the pressure increase due to the fluid column (Hydrostatic Pressure)
+    # p_hydro = rho * g * h
     pressure_increase_pa = density_rho * GRAVITY * depth_h
 
     # Step C: Calculate the final absolute pressure in Pascals
     absolute_pressure_pa = surface_pressure_pa + pressure_increase_pa
 
-    # Step D: Convert the final answer back to kilopascals (kPa) for readability
+    # Step D: Convert the final answer back to kilopascals (kPa)
     absolute_pressure_kpa = absolute_pressure_pa / 1000
 
     # 3. Generate the question and solution strings
@@ -64,39 +78,39 @@ def template_hydrostatic_pressure_at_depth():
     question = (
         f"An object is located {depth_h} m below the surface of a tank containing "
         f"{fluid_name.lower()}. The pressure at the free surface {pressure_type_desc}. "
-        f"Assuming the density of {fluid_name.lower()} is {density_rho} kg/m^3, "
+        f"Assuming the density of {fluid_name.lower()} is {density_rho} kg/m^3 and standard atmospheric pressure is {P_atm_kpa} kPa, "
         f"what is the absolute pressure at this depth?"
     )
 
     solution = (
         f"**Given:**\n"
-        f"Fluid: {fluid_name}\n"
-        f"Density of Fluid (rho): {density_rho} kg/m^3\n"
+        f"Fluid: {fluid_name} (Density rho = {density_rho} kg/m^3)\n"
         f"Depth (h): {depth_h} m\n"
-        f"Surface Pressure (p_surface): {surface_pressure_kpa} kPa\n"
+        f"Surface Condition: {pressure_type_desc}\n"
+        f"Standard Atmospheric Pressure (P_atm): {P_atm_kpa} kPa\n"
         f"Acceleration due to Gravity (g): {GRAVITY} m/s^2\n\n"
 
-        f"**Step 1:** Ensure Consistent Units\n"
-        f"The calculations require pressure to be in Pascals (Pa) to be consistent with other SI units.\n"
-        f"p_surface = {surface_pressure_kpa} kPa * 1000 = {surface_pressure_pa:.2f} Pa\n\n"
+        f"**Step 1:** Determine the Absolute Pressure at the Surface\n"
+        f"{surface_calc_note}\n"
+        f"Convert to Pascals: P_surface_abs = {surface_pressure_abs_kpa:.3f} kPa * 1000 = {surface_pressure_pa:.1f} Pa\n\n"
 
-        f"**Step 2:** Calculate the Pressure Increase Due to the Fluid Column\n"
-        f"The pressure exerted by the fluid at a given depth is calculated using the formula: p_increase = rho * g * h.\n"
-        f"p_increase = {density_rho} kg/m^3 * {GRAVITY} m/s^2 * {depth_h} m\n"
-        f"p_increase = {pressure_increase_pa:.2f} Pa\n\n"
+        f"**Step 2:** Calculate the Hydrostatic Pressure Increase\n"
+        f"The pressure exerted by the fluid column is calculated using: P_hydro = rho * g * h.\n"
+        f"P_hydro = {density_rho} kg/m^3 * {GRAVITY} m/s^2 * {depth_h} m\n"
+        f"P_hydro = {pressure_increase_pa:.1f} Pa\n"
+        f"\n\n"
 
-        f"**Step 3:** Calculate the Absolute Pressure at the Specified Depth\n"
-        f"The absolute pressure is the sum of the surface pressure and the pressure increase due to the fluid column.\n"
-        f"Formula: p_absolute = p_surface + p_increase\n"
-        f"p_absolute = {surface_pressure_pa:.2f} Pa + {pressure_increase_pa:.2f} Pa\n"
-        f"p_absolute = {absolute_pressure_pa:.2f} Pa\n\n"
+        f"**Step 3:** Calculate Total Absolute Pressure at Depth\n"
+        f"The absolute pressure at depth is the sum of the absolute surface pressure and the hydrostatic pressure.\n"
+        f"P_absolute = P_surface_abs + P_hydro\n"
+        f"P_absolute = {surface_pressure_pa:.1f} Pa + {pressure_increase_pa:.1f} Pa\n"
+        f"P_absolute = {absolute_pressure_pa:.1f} Pa\n\n"
 
-        f"**Step 4:** Convert the Final Answer to Kilopascals (kPa)\n"
-        f"For convenience, we convert the final pressure from Pascals back to kilopascals.\n"
-        f"p_absolute = {absolute_pressure_pa:.2f} Pa / 1000 = {round(absolute_pressure_kpa, precision)} kPa\n\n"
+        f"**Step 4:** Convert Final Answer to kPa\n"
+        f"P_absolute = {absolute_pressure_pa:.1f} Pa / 1000 = {round(absolute_pressure_kpa, precision)} kPa\n\n"
 
         f"**Answer:**\n"
-        f"The absolute pressure at a depth of {depth_h} m is {round(absolute_pressure_kpa, precision)} kPa."
+        f"The absolute pressure at a depth of {depth_h} m is **{round(absolute_pressure_kpa, precision)} kPa**."
     )
 
     return question, solution
@@ -203,39 +217,46 @@ def template_utube_manometer():
             - str: A question asking for the gauge pressure in a pipe.
             - str: A step-by-step solution to the problem.
     """
-    # 1. Parameterize the inputs with random values
+    # 1. Parameterize the inputs with a loop to ensure positive gauge pressure
+    # This prevents physically confusing scenarios where the description says the open arm 
+    # level is "higher" but the math yields suction (negative pressure).
+    while True:
+        # Randomly select a fluid for the pipe
+        pipe_fluid_name, rho1 = random.choice(list(PIPE_FLUIDS.items()))
 
-    # Randomly select a fluid for the pipe
-    pipe_fluid_name, rho1 = random.choice(list(PIPE_FLUIDS.items()))
-
-    # Randomly select a fluid for the manometer
-    manometer_fluid_name, rho2 = random.choice(list(MANOMETER_FLUIDS.items()))
-
-    # --- Ensure physical realism: manometer fluid must be denser ---
-    # If the chosen pipe fluid is denser than the manometer fluid, re-select
-    # the manometer fluid until it is denser. This avoids nonsensical scenarios.
-    while rho2 <= rho1:
+        # Randomly select a fluid for the manometer
         manometer_fluid_name, rho2 = random.choice(list(MANOMETER_FLUIDS.items()))
 
-    # Randomize the vertical heights, in meters
-    # h1: distance from pipe centerline down to the fluid interface
-    h1 = round(random.uniform(0.1, 0.5), 2)
-    # h2: the height difference between the two manometer fluid columns
-    h2 = round(random.uniform(0.05, 0.75), 2)
+        #  Ensure physical realism: manometer fluid must be denser 
+        # If the chosen pipe fluid is denser than the manometer fluid, re-select
+        # the manometer fluid until it is denser.
+        if rho2 <= rho1:
+            continue
+
+        # Randomize the vertical heights, in meters
+        # h1: distance from pipe centerline down to the fluid interface
+        h1 = round(random.uniform(0.1, 0.5), 2)
+        # h2: the height difference between the two manometer fluid columns
+        h2 = round(random.uniform(0.05, 0.75), 2)
+
+        # 2. Perform the core calculations for verification
+        
+        # Step A: Calculate the pressure contribution from the pipe fluid column (rho1*g*h1)
+        pressure_term1_pa = rho1 * GRAVITY * h1
+
+        # Step B: Calculate the pressure contribution from the manometer fluid column (rho2*g*h2)
+        pressure_term2_pa = rho2 * GRAVITY * h2
+
+        # Step C: Calculate the gauge pressure in Pascals (Pa)
+        gauge_pressure_pa = pressure_term2_pa - pressure_term1_pa
+        
+        # Condition: Pressure must be positive to match the problem description
+        # (open arm level is "higher" implies P_pipe > P_atm)
+        if gauge_pressure_pa > 0:
+            break
 
     # Standardize precision for final outputs
     precision = 3
-
-    # 2. Perform the core calculations for the solution
-
-    # Step A: Calculate the pressure contribution from the pipe fluid column (rho1*g*h1)
-    pressure_term1_pa = rho1 * GRAVITY * h1
-
-    # Step B: Calculate the pressure contribution from the manometer fluid column (rho2*g*h2)
-    pressure_term2_pa = rho2 * GRAVITY * h2
-
-    # Step C: Calculate the gauge pressure in Pascals (Pa)
-    gauge_pressure_pa = pressure_term2_pa - pressure_term1_pa
 
     # Step D: Convert the final answer to kilopascals (kPa) for readability
     gauge_pressure_kpa = gauge_pressure_pa / 1000
@@ -319,7 +340,7 @@ def template_floating_object_submersion_depth():
     obj_material, rho_object = random.choice(list(MATERIAL_DENSITIES.items()))
     fluid_name, rho_fluid = random.choice(list(FLUID_DENSITIES.items()))
 
-    # CRITICAL: Ensure the object will actually float ---
+    # CRITICAL: Ensure the object will actually float 
     # Re-select until the object's density is less than the fluid's density.
     max_attempts = 20
     attempt = 0

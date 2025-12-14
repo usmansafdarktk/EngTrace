@@ -2,6 +2,7 @@ import random
 import math
 from data.templates.branches.mechanical_engineering.constants import SHEAR_MODULUS_VALUES
 
+
 # Template 1 (Easy)
 def template_shear_stress_torsion():
     """
@@ -10,8 +11,7 @@ def template_shear_stress_torsion():
     Scenario:
         This template generates a foundational problem testing the ability to calculate
         the polar moment of inertia (J) for a solid or hollow circular shaft.
-        It then uses this value to determine the maximum shearing stress (tau_max)
-        resulting from an applied torque.
+        It then uses this value to determine the maximum shearing stress (tau_max).
 
     Core Equations:
         tau_max = (T * c) / J
@@ -30,11 +30,11 @@ def template_shear_stress_torsion():
     # Ensure diameters are distinct and practical
     d_outer = random.randint(30, 150)  # Outer diameter in mm
     
-    # For hollow shafts, ensure the inner diameter is smaller than the outer
+    # For hollow shafts, ensure realistic wall thickness
     if shaft_type == 'hollow':
-        # Ensure inner diameter is at least 10mm smaller to be meaningful
-        max_inner_dia = max(20, d_outer - 10) 
-        d_inner = random.randint(20, max_inner_dia)
+        # Inner diameter is 50-80% of outer diameter (realistic proportions)
+        ratio = random.uniform(0.5, 0.8)
+        d_inner = round(d_outer * ratio)
     else:
         d_inner = 0
 
@@ -70,10 +70,10 @@ def template_shear_stress_torsion():
     
     # Construct the part of the question describing the geometry
     if shaft_type == 'solid':
-        geometry_desc = f"a solid circular shaft with an outer diameter of {d_outer} mm"
+        geometry_desc = f"solid circular shaft with an outer diameter of {d_outer} mm"
     else: # shaft_type == 'hollow'
         geometry_desc = (
-            f"a hollow circular shaft with an outer diameter of {d_outer} mm "
+            f"hollow circular shaft with an outer diameter of {d_outer} mm "
             f"and an inner diameter of {d_inner} mm"
         )
 
@@ -109,6 +109,7 @@ def template_shear_stress_torsion():
         
         f"**Step 3:** Apply the torsion formula to find the maximum shearing stress (tau_max).\n"
         f"The formula is: tau_max = (T * c) / J\n"
+        f"\n"
         f"T = {torque} N.m\n"
         f"c = {c_outer} m\n"
         f"J = {polar_moment_J:.3e} m^4\n"
@@ -349,37 +350,46 @@ def template_composite_shafts_series():
             - str: A question about a composite shaft in series.
             - str: A step-by-step solution.
     """
-    # 1. Parameterize the inputs with random values
-    torque = round(random.uniform(200.0, 7500.0), 1)
+    # 1. Parameterize the inputs with physically realistic values
+    
+    # Reduce max torque to prevent plastic deformation/failure
+    torque = round(random.uniform(200.0, 3000.0), 1)
+
+    # Filter for strong materials (Metals, G > 20 GPa) to ensure elastic behavior
+    STRONG_MATERIALS = {k: v for k, v in SHEAR_MODULUS_VALUES.items() if v > 20.0}
+    
+    # Fallback if dictionary is empty
+    if not STRONG_MATERIALS:
+        STRONG_MATERIALS = {"Structural Steel": 79.3, "Aluminum Alloy": 26.0}
 
     # Properties for Segment 1 (AB)
     l1 = round(random.uniform(0.5, 2.5), 2)
     d1 = random.randint(40, 120)
-    mat1_name, g1_gpa = random.choice(list(SHEAR_MODULUS_VALUES.items()))
+    mat1_name, g1_gpa = random.choice(list(STRONG_MATERIALS.items()))
 
     # Properties for Segment 2 (BC)
     l2 = round(random.uniform(0.5, 2.5), 2)
-    d2 = random.randint(30, d1) # Ensure d2 is not larger than d1 for a typical stepped shaft
-    mat2_name, g2_gpa = random.choice(list(SHEAR_MODULUS_VALUES.items()))
+    d2 = random.randint(30, d1) # Ensure d2 is not larger than d1
+    mat2_name, g2_gpa = random.choice(list(STRONG_MATERIALS.items()))
     
     # Standardize precision for final outputs
     precision = 4
 
     # 2. Perform the core calculations
     
-    # --- Calculations for Segment 1 (AB) ---
+    #  Calculations for Segment 1 (AB) 
     c1_m = d1 / 2000.0
     g1_pa = g1_gpa * 1e9
     j1 = (math.pi / 2) * (c1_m ** 4)
     phi1_rad = (torque * l1) / (j1 * g1_pa)
 
-    # --- Calculations for Segment 2 (BC) ---
+    #  Calculations for Segment 2 (BC) 
     c2_m = d2 / 2000.0
     g2_pa = g2_gpa * 1e9
     j2 = (math.pi / 2) * (c2_m ** 4)
     phi2_rad = (torque * l2) / (j2 * g2_pa)
     
-    # --- Total Angle of Twist ---
+    #  Total Angle of Twist 
     phi_total_rad = phi1_rad + phi2_rad
     phi_total_deg = math.degrees(phi_total_rad)
 
@@ -403,7 +413,8 @@ def template_composite_shafts_series():
         f"**Step 1:** Analyze the System\n"
         f"The shaft is fixed at A, so the torque T = {torque} N.m is transmitted through both segments AB and BC. "
         f"The total angle of twist at C is the sum of the twist in segment AB and the twist in segment BC.\n"
-        f"phi_total = phi_AB + phi_BC\n\n"
+        f"phi_total = phi_AB + phi_BC\n"
+        f"\n\n"
 
         f"**Step 2:** Calculate Angle of Twist for Segment AB (phi_AB)\n"
         f"Convert units: c1 = {d1}/2 mm = {c1_m} m; G1 = {g1_gpa} GPa = {g1_pa:.2e} Pa\n"
@@ -440,43 +451,43 @@ def template_statically_indeterminate_shaft():
         This problem deals with a shaft that is fixed at both ends and has a torque
         applied at an intermediate point. Since there are two unknown reaction torques
         but only one static equilibrium equation, the problem is statically
-        indeterminate. It must be solved by considering both static equilibrium and
-        the geometric compatibility of deformation (i.e., the total angle of twist is zero).
+        indeterminate.
 
     Core Equations:
         1. Statics: T_A + T_B = T_applied
-        2. Compatibility: phi_AC + phi_CB = 0  =>  (T_A * L_AC) / (JG) = (T_B * L_BC) / (JG)
-           This simplifies to: T_A * L_AC = T_B * L_BC
+        2. Compatibility: T_A * L_AC = T_B * L_BC
 
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the reaction torques.
             - str: A step-by-step solution using statics and compatibility.
     """
-    # 1. Parameterize the inputs with random values
-    total_length = round(random.uniform(2.0, 6.0), 2)
-    applied_torque = round(random.uniform(1000.0, 15000.0), -2)
-    diameter = random.randint(50, 150)
+    # 1. Parameterize the inputs with physically realistic values
+    
+    total_length = round(random.uniform(2.0, 5.0), 2)
+    # Reduce max torque to 5000 Nm to ensure elastic behavior for given diameters
+    applied_torque = round(random.uniform(500.0, 5000.0), -2) 
+    diameter = random.randint(50, 150) # mm
     
     # Ensure the torque is applied at a non-trivial location
     pos_L_AC = round(random.uniform(0.2 * total_length, 0.8 * total_length), 2)
     pos_L_BC = total_length - pos_L_AC
 
-    material_name, shear_modulus_gpa = random.choice(list(SHEAR_MODULUS_VALUES.items()))
+    # FILTER: Select only strong materials (Metals, G > 20 GPa) to avoid failure
+    # This prevents assigning 5000 Nm of torque to a Nylon shaft.
+    strong_materials = {k: v for k, v in SHEAR_MODULUS_VALUES.items() if v > 20.0}
+    if not strong_materials:
+        # Fallback if dictionary is empty or has no metals
+        material_name, shear_modulus_gpa = "Structural Steel", 79.3
+    else:
+        material_name, shear_modulus_gpa = random.choice(list(strong_materials.items()))
     
     # Standardize precision for final outputs
     precision = 2
 
     # 2. Perform the core calculations
-    # Based on the system of equations:
-    # (1) T_A + T_B = T_applied
-    # (2) T_A * L_AC = T_B * L_BC  =>  T_B = T_A * (L_AC / L_BC)
-    # Substitute (2) into (1):
-    # T_A + T_A * (L_AC / L_BC) = T_applied
-    # T_A * (1 + L_AC/L_BC) = T_applied
-    # T_A * ( (L_BC + L_AC) / L_BC ) = T_applied
-    # T_A * (L / L_BC) = T_applied
     # T_A = T_applied * (L_BC / L)
+    # T_B = T_applied * (L_AC / L)
     
     reaction_torque_A = applied_torque * (pos_L_BC / total_length)
     reaction_torque_B = applied_torque * (pos_L_AC / total_length)
@@ -499,39 +510,35 @@ def template_statically_indeterminate_shaft():
         
         f"**Analysis:**\n"
         f"This problem is statically indeterminate because there are two unknown reaction torques (T_A and T_B) "
-        f"and only one relevant equation from statics. We need an additional equation from the deformation of the shaft.\n\n"
+        f"and only one relevant equation from statics. We need an additional equation from the deformation of the shaft.\n"
+        f"\n\n"
 
         f"**Step 1:** Statics Equilibrium Equation\n"
-        f"For the shaft to be in rotational equilibrium, the sum of all torques must be zero. Let's assume T_A and T_B act in the opposite direction to T_applied.\n"
+        f"For the shaft to be in rotational equilibrium, the sum of all torques must be zero.\n"
         f"(1) T_A + T_B = T_applied = {int(applied_torque)} N.m\n\n"
 
         f"**Step 2:** Compatibility Equation\n"
-        f"Since the shaft is fixed at both ends, the total angle of twist from A to B must be zero. The twist from A to C and the twist from C to B must cancel each other out.\n"
-        f"phi_A_to_B = phi_AC + phi_CB = 0\n"
-        f"The torque in section AC is T_A. The torque in section CB is T_applied - T_A = T_B. For our compatibility equation, it is easier to think of the torque in CB as T_B acting from the other direction.\n"
-        f"phi_AC = (T_A * L_AC) / (J*G)\n"
-        f"phi_CB = -(T_B * L_BC) / (J*G)  (The negative sign indicates it twists in the opposite direction)\n"
-        f"(T_A * L_AC) / (J*G) - (T_B * L_BC) / (J*G) = 0\n"
-        f"The terms J and G are constant for the shaft and cancel out, leaving a relationship between the torques and lengths:\n"
+        f"Since the shaft is fixed at both ends, the total angle of twist from A to B must be zero. "
+        f"The twist caused by T_A acting on length AC must equal the twist caused by T_B acting on length BC.\n"
+        f"phi_AC = phi_CB\n"
+        f"(T_A * L_AC) / (J*G) = (T_B * L_BC) / (J*G)\n"
+        f"Since J and G are constant, they cancel out:\n"
         f"(2) T_A * L_AC = T_B * L_BC\n\n"
 
         f"**Step 3:** Solve the System of Two Equations\n"
-        f"We have two equations:\n"
-        f"(1) T_A + T_B = {int(applied_torque)}\n"
-        f"(2) T_A * {pos_L_AC} = T_B * {round(pos_L_BC, 2)}\n"
-        f"From equation (2), we can express T_B in terms of T_A:\n"
-        f"T_B = T_A * ({pos_L_AC} / {round(pos_L_BC, 2)})\n"
+        f"From equation (2), express T_B in terms of T_A:\n"
+        f"T_B = T_A * ({pos_L_AC} / {pos_L_BC:.2f})\n"
         f"Substitute this into equation (1):\n"
-        f"T_A + T_A * ({pos_L_AC} / {round(pos_L_BC, 2)}) = {int(applied_torque)}\n"
-        f"T_A * (1 + {round(pos_L_AC / pos_L_BC, 3)}) = {int(applied_torque)}\n"
-        f"T_A = {int(applied_torque)} / {round(1 + (pos_L_AC / pos_L_BC), 3)} = {round(reaction_torque_A, precision)} N.m\n"
-        f"Now find T_B using equation (1):\n"
-        f"T_B = {int(applied_torque)} - T_A = {int(applied_torque)} - {round(reaction_torque_A, precision)} = {round(reaction_torque_B, precision)} N.m\n\n"
+        f"T_A + T_A * ({pos_L_AC} / {pos_L_BC:.2f}) = {int(applied_torque)}\n"
+        f"T_A * (1 + {pos_L_AC/pos_L_BC:.3f}) = {int(applied_torque)}\n"
+        f"T_A = {int(applied_torque)} / {1 + (pos_L_AC / pos_L_BC):.3f} = {reaction_torque_A:.{precision}f} N.m\n"
+        f"Now find T_B:\n"
+        f"T_B = {int(applied_torque)} - {reaction_torque_A:.{precision}f} = {reaction_torque_B:.{precision}f} N.m\n\n"
 
         f"**Answer:**\n"
         f"The reaction torques at the supports are:\n"
-        f"T_A = {round(reaction_torque_A, precision)} N.m\n"
-        f"T_B = {round(reaction_torque_B, precision)} N.m"
+        f"T_A = {reaction_torque_A:.{precision}f} N.m\n"
+        f"T_B = {reaction_torque_B:.{precision}f} N.m"
     )
 
     return question, solution

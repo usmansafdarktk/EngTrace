@@ -272,37 +272,38 @@ def template_finite_convolution():
     Scenario:
         This template tests the direct application of the convolution sum, which is
         the fundamental operation for determining the output of a Linear
-        Time-Invariant (LTI) system. It requires convolving two finite-length
-        sequences, representing an input signal and a system's impulse response.
+        Time-Invariant (LTI) system.
 
     Core Equations:
         1. Convolution Sum: y[n] = sum(x[k] * h[n-k]) for all k
 
     Returns:
         tuple: A tuple containing:
-            - str: A question asking to find the output of an LTI system for a given input.
+            - str: A question asking to find the output of an LTI system.
             - str: A step-by-step solution demonstrating the convolution process.
     """
     # 1. Parameterize the inputs with random values
 
-    # Generate sequence x[n] as a dictionary {index: value}
+    # Generate sequence x[n]
     x_len = random.randint(3, 4)
     x_origin_pos = random.randint(0, x_len - 1)
     x_start_idx = -x_origin_pos
     x_n = {x_start_idx + i: random.randint(-3, 3) for i in range(x_len)}
+    
     # Ensure the sequence isn't all zeros
     if all(v == 0 for v in x_n.values()):
         x_n[random.choice(list(x_n.keys()))] = random.randint(1, 3)
 
-    # Generate sequence h[n] as a dictionary {index: value}
+    # Generate sequence h[n]
     h_len = random.randint(3, 4)
     h_origin_pos = random.randint(0, h_len - 1)
     h_start_idx = -h_origin_pos
     h_n = {h_start_idx + i: random.randint(-2, 2) for i in range(h_len)}
+    
     if all(v == 0 for v in h_n.values()):
         h_n[random.choice(list(h_n.keys()))] = random.randint(1, 2)
 
-    # Inlined logic to format x_n into a string
+    # Format x[n] string
     min_idx_x = min(x_n.keys())
     max_idx_x = max(x_n.keys())
     x_parts = []
@@ -311,7 +312,7 @@ def template_finite_convolution():
         x_parts.append(f"*{val}*" if i == 0 else str(val))
     x_n_str = f"{{{', '.join(x_parts)}}}"
 
-    # Inlined logic to format h_n into a string
+    # Format h[n] string
     min_idx_h = min(h_n.keys())
     max_idx_h = max(h_n.keys())
     h_parts = []
@@ -322,10 +323,9 @@ def template_finite_convolution():
 
 
     # 2. Perform the core calculation (Convolution)
-
     y_n = {}
-    y_start_idx = min(x_n.keys()) + min(h_n.keys())
-    y_end_idx = max(x_n.keys()) + max(h_n.keys())
+    y_start_idx = min_idx_x + min_idx_h
+    y_end_idx = max_idx_x + max_idx_h
 
     all_k_indices = sorted(list(x_n.keys()))
     
@@ -335,7 +335,7 @@ def template_finite_convolution():
             x_k = x_n.get(k, 0)
             h_nk = h_n.get(n - k, 0)
             current_sum += x_k * h_nk
-        # Only store non-zero values, but the final string will show zeros in the range
+        # Store non-zero values (or boundary zeros if needed, but dict sparse is fine)
         if current_sum != 0:
             y_n[n] = current_sum
     
@@ -350,9 +350,8 @@ def template_finite_convolution():
     calculation_steps = []
     y_indices_to_show = sorted(y_n.keys()) if y_n else [y_start_idx]
     
-    # To avoid too much output, only show a few sample calculations
+    # To avoid too much output, show first, middle, and last
     if len(y_indices_to_show) > 3:
-        # Show first, middle, and last non-zero points
         middle_index = y_indices_to_show[len(y_indices_to_show)//2]
         y_indices_to_show = [y_indices_to_show[0], middle_index, y_indices_to_show[-1]]
 
@@ -363,28 +362,27 @@ def template_finite_convolution():
         sum_expr_terms = []
         val_expr_terms = []
         
-        # Determine the range of k where overlap can occur for clarity
-        k_min = min(x_n.keys())
-        k_max = max(x_n.keys())
-
-        for k in range(k_min, k_max + 1):
-            x_val = x_n.get(k, 0)
-            # Only show terms where x[k] contributes to the expression
-            if x_val != 0:
-                h_val = h_n.get(n - k, 0)
-                sum_expr_terms.append(f"x[{k}]h[{n-k}]")
-                val_expr_terms.append(f"({x_val})({h_val})")
+        # Iterate over ALL valid k in x[n] to show full expansion, ensuring consistency
+        # Removed the "if x_val != 0" check to show all terms explicitly
+        for k in sorted(x_n.keys()):
+            x_val = x_n[k]
+            h_val = h_n.get(n - k, 0)
+            
+            # Identify h index for clarity
+            h_idx = n - k
+            
+            sum_expr_terms.append(f"x[{k}]h[{h_idx}]")
+            val_expr_terms.append(f"({x_val})({h_val})")
         
         step_str += f"y[{n}] = {' + '.join(sum_expr_terms)}\n"
         step_str += f"y[{n}] = {' + '.join(val_expr_terms)}\n"
         step_str += f"y[{n}] = {y_n.get(n, 0)}\n"
         calculation_steps.append(step_str)
 
-    # Inlined logic to format the final sequence y_n
+    # Format the final sequence y_n
     if not y_n:
         y_n_str = "{*0*}"
     else:
-        # The full range of y[n] must be shown, including zeros between start and end
         min_idx_y = y_start_idx
         max_idx_y = y_end_idx
         y_parts = []
@@ -408,12 +406,13 @@ def template_finite_convolution():
         f"y[n] = sum over all k of (x[k] * h[n-k])\n\n"
 
         f"**Step 2:** Apply the Flip-and-Slide Method\n"
-        f"We can visualize this process by flipping the impulse response h[k] to get h[-k], and then sliding it by 'n' positions. For each slide 'n', we calculate the sum of the products of the overlapping samples.\n\n"
-        f"Let's calculate a few points:\n\n"
+        f"We can visualize this process by flipping the impulse response h[k] to get h[-k], and then sliding it by 'n' positions. For each slide 'n', we calculate the sum of the products of the overlapping samples.\n"
+        f"\n\n"
+        f"Let's calculate a few points explicitly:\n\n"
         f"{calculation_steps_str}\n"
         
         f"**Step 3: Calculate All Output Values**\n"
-        f"By continuing this process for all values of 'n' where the sequences could overlap (from n={y_start_idx} to n={y_end_idx}), we get the following values for the output:\n"
+        f"By continuing this process for all values of 'n' where the sequences overlap (from n={y_start_idx} to n={y_end_idx}), we get the full output sequence:\n"
         f"{y_values_str}\n\n" 
 
         f"**Answer:**\n"
@@ -431,8 +430,7 @@ def template_system_property_linearity():
     Scenario:
         This template tests the ability to formally prove or disprove if a system
         is linear by checking the two defining properties: additivity and
-        homogeneity (also known as scaling). This is a fundamental concept in
-        characterizing systems.
+        homogeneity (scaling).
 
     Core Definitions:
         1. Additivity: T{x1[n] + x2[n]} = T{x1[n]} + T{x2[n]}
@@ -443,16 +441,19 @@ def template_system_property_linearity():
             - str: A question asking to determine if a system is linear.
             - str: A step-by-step solution showing the formal proof.
     """
-    # 1. Parameterize the inputs by generating a random system type and equation
+    # 1. Parameterize the inputs
     
     system_type = random.choice(['linear_gain', 'linear_delay', 'nonlinear_offset', 'nonlinear_power'])
     
-    # These variables will be populated based on the system type
     equation_str = ""
     is_linear = False
     
-    # Strings for each step of the proof
-    add_y1y2_sum_str = ""
+    # We will define these explicitly for each case to avoid "replace" bugs
+    y1_str = ""
+    y2_str = ""
+    
+    # Strings for the RHS of the proof steps (excluding "y = " prefix)
+    add_sum_str = ""
     add_y3_str = ""
     add_comparison_str = ""
     
@@ -460,35 +461,41 @@ def template_system_property_linearity():
     hom_ya_str = ""
     hom_comparison_str = ""
 
-
     if system_type == 'linear_gain':
         is_linear = True
         k = random.randint(1, 10)
         equation_str = f"{k} * x[n]"
         
-        # Additivity Proof Strings
-        add_y1y2_sum_str = f"y1[n] + y2[n] = ({k} * x1[n]) + ({k} * x2[n]) = {k} * (x1[n] + x2[n])"
-        add_y3_str = f"y3[n] = {k} * (x3[n]) = {k} * (x1[n] + x2[n])"
+        y1_str = f"{k} * x1[n]"
+        y2_str = f"{k} * x2[n]"
+        
+        # Additivity
+        add_sum_str = f"({k} * x1[n]) + ({k} * x2[n]) = {k} * (x1[n] + x2[n])"
+        add_y3_str = f"{k} * (x3[n]) = {k} * (x1[n] + x2[n])"
         add_comparison_str = "Since y3[n] is equal to y1[n] + y2[n], the system satisfies the additivity property."
         
-        # Homogeneity Proof Strings
-        hom_ay1_str = f"a * y1[n] = a * ({k} * x1[n])"
-        hom_ya_str = f"ya[n] = {k} * (xa[n]) = {k} * (a * x1[n])"
+        # Homogeneity
+        hom_ay1_str = f"a * ({k} * x1[n])"
+        hom_ya_str = f"{k} * (xa[n]) = {k} * (a * x1[n])"
         hom_comparison_str = "Since ya[n] is equal to a * y1[n], the system satisfies the homogeneity property."
         
     elif system_type == 'linear_delay':
         is_linear = True
         d = random.randint(1, 10)
         equation_str = f"x[n - {d}]"
+        
+        # Explicitly constructing strings handles the 'n-d' index correctly
+        y1_str = f"x1[n - {d}]"
+        y2_str = f"x2[n - {d}]"
 
-        # Additivity Proof Strings
-        add_y1y2_sum_str = f"y1[n] + y2[n] = x1[n - {d}] + x2[n - {d}]"
-        add_y3_str = f"y3[n] = x3[n - {d}] = x1[n - {d}] + x2[n - {d}]"
+        # Additivity
+        add_sum_str = f"x1[n - {d}] + x2[n - {d}]"
+        add_y3_str = f"x3[n - {d}] = x1[n - {d}] + x2[n - {d}]"
         add_comparison_str = "Since y3[n] is equal to y1[n] + y2[n], the system satisfies the additivity property."
 
-        # Homogeneity Proof Strings
-        hom_ay1_str = f"a * y1[n] = a * x1[n - {d}]"
-        hom_ya_str = f"ya[n] = xa[n - {d}] = a * x1[n - {d}]"
+        # Homogeneity
+        hom_ay1_str = f"a * x1[n - {d}]"
+        hom_ya_str = f"xa[n - {d}] = a * x1[n - {d}]"
         hom_comparison_str = "Since ya[n] is equal to a * y1[n], the system satisfies the homogeneity property."
         
     elif system_type == 'nonlinear_offset':
@@ -497,30 +504,36 @@ def template_system_property_linearity():
         C_str = f"+ {C}" if C > 0 else f"- {abs(C)}"
         equation_str = f"x[n] {C_str}"
         
-        # Additivity Proof Strings
-        add_y1y2_sum_str = f"y1[n] + y2[n] = (x1[n] {C_str}) + (x2[n] {C_str}) = x1[n] + x2[n] + {2*C}"
-        add_y3_str = f"y3[n] = (x3[n]) {C_str} = (x1[n] + x2[n]) {C_str}"
+        y1_str = f"x1[n] {C_str}"
+        y2_str = f"x2[n] {C_str}"
+        
+        # Additivity
+        add_sum_str = f"(x1[n] {C_str}) + (x2[n] {C_str}) = x1[n] + x2[n] + {2*C}"
+        add_y3_str = f"(x3[n]) {C_str} = (x1[n] + x2[n]) {C_str}"
         add_comparison_str = f"Since x1[n] + x2[n] + {2*C} is not equal to x1[n] + x2[n] {C_str}, the system fails the additivity test."
 
-        # Homogeneity Proof Strings
-        hom_ay1_str = f"a * y1[n] = a * (x1[n] {C_str}) = a*x1[n] + {C}*a"
-        hom_ya_str = f"ya[n] = (xa[n]) {C_str} = (a * x1[n]) {C_str}"
+        # Homogeneity
+        hom_ay1_str = f"a * (x1[n] {C_str}) = a*x1[n] + {C}*a"
+        hom_ya_str = f"(xa[n]) {C_str} = (a * x1[n]) {C_str}"
         hom_comparison_str = f"Since a*x1[n] + {C}*a is not equal to a*x1[n] {C_str} (for a != 1), the system fails the homogeneity test."
 
     elif system_type == 'nonlinear_power':
         is_linear = False
         p = random.randint(2, 3)
-        equation_str = f"(x[n])**{p}"
+        equation_str = f"(x[n])^{p}"
         
-        # Additivity Proof Strings
-        add_y1y2_sum_str = f"y1[n] + y2[n] = (x1[n])**{p} + (x2[n])**{p}"
-        add_y3_str = f"y3[n] = (x3[n])**{p} = (x1[n] + x2[n])**{p}"
-        add_comparison_str = f"In general, (x1[n] + x2[n])**{p} is not equal to (x1[n])**{p} + (x2[n])**{p}. Therefore, the system fails the additivity test."
+        y1_str = f"(x1[n])^{p}"
+        y2_str = f"(x2[n])^{p}"
+        
+        # Additivity
+        add_sum_str = f"(x1[n])^{p} + (x2[n])^{p}"
+        add_y3_str = f"(x3[n])^{p} = (x1[n] + x2[n])^{p}"
+        add_comparison_str = f"In general, (x1[n] + x2[n])^{p} is not equal to (x1[n])^{p} + (x2[n])^{p}. Therefore, the system fails the additivity test."
 
-        # Homogeneity Proof Strings
-        hom_ay1_str = f"a * y1[n] = a * (x1[n])**{p}"
-        hom_ya_str = f"ya[n] = (xa[n])**{p} = (a * x1[n])**{p} = (a**{p}) * (x1[n])**{p}"
-        hom_comparison_str = f"Since a * (x1[n])**{p} is not equal to (a**{p}) * (x1[n])**{p} (for a != 1), the system fails the homogeneity test."
+        # Homogeneity
+        hom_ay1_str = f"a * (x1[n])^{p}"
+        hom_ya_str = f"(xa[n])^{p} = (a * x1[n])^{p} = (a^{p}) * (x1[n])^{p}"
+        hom_comparison_str = f"Since a * (x1[n])^{p} is not equal to (a^{p}) * (x1[n])^{p} (for a != 1), the system fails the homogeneity test."
         
     # 2. Generate the question and solution strings
     
@@ -538,20 +551,21 @@ def template_system_property_linearity():
         f"For a system to be linear, it must satisfy two properties:\n"
         f"1. **Additivity:** T{{x1[n] + x2[n]}} = T{{x1[n]}} + T{{x2[n]}}\n"
         f"2. **Homogeneity (Scaling):** T{{a*x[n]}} = a*T{{x[n]}}\n"
-        f"We must test both properties.\n\n"
+        f"We must test both properties.\n"
+        f"\n\n"
 
         f"**Step 2:** Test for Additivity\n"
         f"Let's define two arbitrary inputs, x1[n] and x2[n]. The corresponding outputs are:\n"
-        f"y1[n] = {equation_str.replace('x[n]', 'x1[n]')}\n"
-        f"y2[n] = {equation_str.replace('x[n]', 'x2[n]')}\n\n"
+        f"y1[n] = {y1_str}\n"
+        f"y2[n] = {y2_str}\n\n"
         f"The sum of these outputs is:\n"
-        f"y1[n] + y2[n] = {add_y1y2_sum_str}\n\n"
+        f"y1[n] + y2[n] = {add_sum_str}\n\n"
         f"Now, let's define a third input x3[n] = x1[n] + x2[n]. The output y3[n] is:\n"
         f"y3[n] = {add_y3_str}\n\n"
         f"**Comparison:** {add_comparison_str}\n\n"
 
         f"**Step 3:** Test for Homogeneity (Scaling)\n"
-        f"Let's define an input x1[n] and a constant 'a'. The output is y1[n] = {equation_str.replace('x[n]', 'x1[n]')}.\n"
+        f"Let's define an input x1[n] and a constant 'a'. The output is y1[n] = {y1_str}.\n"
         f"The scaled output is:\n"
         f"a * y1[n] = {hom_ay1_str}\n\n"
         f"Now, let's define a new input xa[n] = a * x1[n]. The output ya[n] is:\n"
@@ -574,8 +588,7 @@ def template_impulse_response_from_lccde():
         This template tests the ability to find the impulse response h[n] for a
         system described by a Linear Constant-Coefficient Difference Equation
         (LCCDE). The process involves setting the input to the unit impulse,
-        delta[n], and solving the resulting recurrence relation for h[n] by finding
-        initial conditions and then solving the homogeneous equation.
+        delta[n], and solving the resulting recurrence relation for h[n].
 
     Core Definitions:
         1. Impulse Response: h[n] = T{delta[n]}
@@ -583,7 +596,7 @@ def template_impulse_response_from_lccde():
 
     Returns:
         tuple: A tuple containing:
-            - str: A question asking for the impulse response of a system given its LCCDE.
+            - str: A question asking for the impulse response.
             - str: A step-by-step solution detailing the recursive method.
     """
     # 1. Parameterize by randomly choosing system order and coefficients
@@ -622,7 +635,7 @@ def template_impulse_response_from_lccde():
         if h1 != 0:
             base = -a1
             # Use fmt helper to correctly sign the term
-            h_decay_expr = f" {fmt(h1, '')}({base})**(n-1) * u[n-1]"
+            h_decay_expr = f" {fmt(h1, '')}({base})^(n-1) * u[n-1]"
         
         final_h_n = f"{term1_str}{h_decay_expr}"
         
@@ -645,11 +658,11 @@ def template_impulse_response_from_lccde():
             f"For n >= 2, the input delta terms are zero. The equation becomes homogeneous:\n"
             f"h[n] {fmt(a1, 'h[n-1]')}h[n-1] = 0  =>  h[n] = {-a1}*h[n-1]\n\n"
             f"The solution to this recurrence for n >= 1 is a decaying exponential that starts at n=1 with value h[1].\n"
-            f"This part of the response can be written as h[1]*({-a1})**(n-1)*u[n-1].\n\n"
+            f"This part of the response can be written as h[1]*({-a1})^(n-1)*u[n-1].\n\n"
             
             f"**Step 5:** Combine Results for the Final Expression\n"
             f"The total impulse response is the sum of the value at n=0 and the response for n >= 1:\n"
-            f"h[n] = h[0]*delta[n] + h[1]*({-a1})**(n-1)*u[n-1]\n"
+            f"h[n] = h[0]*delta[n] + h[1]*({-a1})^(n-1)*u[n-1]\n"
         )
 
     else: # order == 'second'
@@ -660,14 +673,16 @@ def template_impulse_response_from_lccde():
             a1 = random.randint(-6, 6)
             if a1 == 0: a1 = 1
         
-        # Randomize RHS for increased diversity
+        # Randomize RHS
         b1 = random.randint(-3, 3) if random.random() > 0.4 else 0
-        b2 = random.randint(-2, 2) if random.random() > 0.3 else 0
+        # Force b2 = 0 to ensure the coefficient fitting method is valid
+        # If b2 != 0, there is an impulse at n=2 that breaks the homogeneous assumption for n>=2
+        b2 = 0 
 
         # Build equation strings
         x_terms = f"{b0}x[n]"
         if b1 != 0: x_terms += f" {fmt(b1, 'x[n-1]')}x[n-1]"
-        if b2 != 0: x_terms += f" {fmt(b2, 'x[n-2]')}x[n-2]"
+        # b2 term removed
         equation_str = f"y[n] {fmt(a1, 'y[n-1]')}y[n-1] {fmt(a2, 'y[n-2]')}y[n-2] = {x_terms}"
         
         # 2. Perform the core calculation for a second-order system
@@ -687,13 +702,12 @@ def template_impulse_response_from_lccde():
         C2 = (h0 * r1 - h1) / (r1 - r2)
         C1_str, C2_str = f"{C1:.2f}", f"{C2:.2f}"
         
-        final_h_n = f"({C1_str}({r1_str})**n {fmt(C2, C2_str)}({r2_str})**n) * u[n]"
+        final_h_n = f"({C1_str}({r1_str})^n {fmt(C2, C2_str)}({r2_str})^n) * u[n]"
         
         # 3. Generate the solution string for a second-order system
         h_eq = f"h[n] {fmt(a1, 'h[n-1]')}h[n-1] {fmt(a2, 'h[n-2]')}h[n-2]"
         d_eq = f"{b0}*delta[n]"
         if b1 != 0: d_eq += f" {fmt(b1, 'd[n-1]')}*delta[n-1]"
-        if b2 != 0: d_eq += f" {fmt(b2, 'd[n-2]')}*delta[n-2]"
 
         solution_steps = (
             f"**Step 3:** Solve Recursively for Initial Conditions\n"
@@ -704,16 +718,16 @@ def template_impulse_response_from_lccde():
             f"**h[0] = {h0}**\n\n"
             f"**For n = 1:**\n"
             f"h[1] {fmt(a1, 'h[0]')}h[0] {fmt(a2, 'h[-1]')}h[-1] = ... {fmt(b1, 'd[0]')}*delta[0] ...\n"
-            f"h[1] {fmt(a1, h0)}*({h0}) {fmt(a2, '0')}*(0) = {b0}*(0) + {b1}*(1) + {b2}*(0)\n"
+            f"h[1] {fmt(a1, h0)}*({h0}) {fmt(a2, '0')}*(0) = {b0}*(0) + {b1}*(1)\n"
             f"h[1] = {b1} - {a1*h0}\n"
             f"**h[1] = {h1}**\n\n"
 
             f"**Step 4:** Find the Homogeneous Solution\n"
-            f"For n >= 3, the input is zero, and the equation is homogeneous:\n"
+            f"For n >= 2, the input is zero (since b2=0), so the equation becomes homogeneous:\n"
             f"h[n] {fmt(a1, 'h[n-1]')}h[n-1] {fmt(a2, 'h[n-2]')}h[n-2] = 0\n\n"
-            f"We solve this by finding the roots of the characteristic equation: r**2 {fmt(a1, 'r')}r {fmt(a2, '')} = 0\n"
+            f"We solve this by finding the roots of the characteristic equation: r^2 {fmt(a1, 'r')}r {fmt(a2, '')} = 0\n"
             f"Using the quadratic formula, the roots are r1 = {r1_str}, r2 = {r2_str}.\n"
-            f"The general solution for n >= 0 is h[n] = C1*({r1_str})**n + C2*({r2_str})**n.\n\n"
+            f"The general solution for n >= 0 is h[n] = C1*({r1_str})^n + C2*({r2_str})^n.\n\n"
             
             f"**Step 5:** Use Initial Conditions to Find Coefficients\n"
             f"We use h[0] and h[1] to create a system of two equations:\n"
@@ -734,7 +748,8 @@ def template_impulse_response_from_lccde():
         f"The system equation is {equation_str}\n\n"
 
         f"**Step 1:** Set Input to the Unit Impulse\n"
-        f"By definition, the impulse response h[n] is the output y[n] when the input x[n] is the unit impulse, delta[n].\n\n"
+        f"By definition, the impulse response h[n] is the output y[n] when the input x[n] is the unit impulse, delta[n].\n"
+        f"\n\n"
 
         f"**Step 2:** Substitute h[n] and delta[n] into the Equation\n"
         f"Replacing y[n] with h[n] and x[n] with delta[n], we get:\n"

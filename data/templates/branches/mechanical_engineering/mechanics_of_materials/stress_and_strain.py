@@ -28,7 +28,7 @@ def template_basic_stress_strain():
     precision = 3  # Standardize precision for numerical stability and formatting
 
     if use_si_units:
-        # --- SI Unit System ---
+        #  SI Unit System 
         load = random.randint(10, 500)  # in kN
         length = round(random.uniform(0.5, 4.0), 2)  # in meters
         elongation = round(random.uniform(0.5, 5.0), 2)  # in mm
@@ -59,7 +59,7 @@ def template_basic_stress_strain():
         strain_unit_explanation = "mm/m or unitless"
 
     else:
-        # --- US Customary Unit System ---
+        #  US Customary Unit System 
         load = random.randint(5, 100)  # in kips
         length = round(random.uniform(24.0, 120.0), 1)  # in inches
         elongation = round(random.uniform(0.05, 0.25), 3)  # in inches
@@ -197,7 +197,7 @@ def template_axial_deformation():
     precision = 3
 
     if use_si_units:
-        # --- SI Unit System ---
+        #  SI Unit System 
         material_E = MATERIAL_PROPERTIES[material_name]['E_GPa'] # in GPa
         length = round(random.uniform(0.5, 5.0), 2) # in m
         
@@ -234,7 +234,7 @@ def template_axial_deformation():
             elongation_str = f"{round(elongation, precision)} mm"
 
     else:
-        # --- US Customary Unit System ---
+        #  US Customary Unit System 
         material_E = MATERIAL_PROPERTIES[material_name]['E_ksi'] # in ksi
         length = round(random.uniform(12.0, 150.0), 1) # in inches
         
@@ -392,71 +392,78 @@ def template_multi_segment_rod():
             - str: A question about the total deformation of a composite rod.
             - str: A step-by-step solution.
     """
-    # 1. Parameterize inputs
-    use_si_units = random.choice([True, False])
-    num_segments = random.choice([2, 3])
+    # 1. Parameterize inputs with validation loop
     precision = 4
     
-    segments = []
-    loads = {} # Loads applied at nodes {node_index: load_value}
+    # Define a safe list of structural materials (exclude rubber for this high-load problem)
+    structural_materials = [k for k in MATERIAL_PROPERTIES.keys() if 'Rubber' not in k]
 
-    # Generate properties for each segment
-    for i in range(num_segments):
-        material_name = random.choice(list(MATERIAL_PROPERTIES.keys()))
-        segment = {'material_name': material_name}
+    while True:
+        use_si_units = random.choice([True, False])
+        num_segments = random.choice([2, 3])
         
-        if use_si_units:
-            segment['length'] = round(random.uniform(0.2, 1.5), 2) # meters
-            # For simplicity, all segments are circular
-            diameter = round(random.uniform(20, 75), 1) # mm
-            segment['area'] = math.pi * (diameter / 2)**2
-            segment['E'] = MATERIAL_PROPERTIES[material_name]['E_GPa']
-            segment['dim_str'] = f"{diameter} mm diameter"
-            # Node i+1 is the right end of segment i
-            loads[i+1] = random.randint(-250, 250) # kN
-        else:
-            segment['length'] = round(random.uniform(10.0, 60.0), 1) # inches
-            diameter = round(random.uniform(0.75, 3.0), 1) # inches
-            segment['area'] = math.pi * (diameter / 2)**2
-            segment['E'] = MATERIAL_PROPERTIES[material_name]['E_ksi']
-            segment['dim_str'] = f"{diameter} in diameter"
-            loads[i+1] = random.randint(-60, 60) # kips
-
-        segments.append(segment)
-
-    # 2. Perform Core Calculations
-    # A. Calculate internal forces (P_i) in each segment
-    # We work from the free end (right) to the fixed end (left)
-    total_deformation = 0
-    cumulative_load = 0
-    # Iterate backwards from the last segment to the first
-    for i in range(num_segments - 1, -1, -1):
-        # The internal force in segment 'i' is the sum of all external loads to its right
-        node_index = i + 1
-        cumulative_load += loads[node_index]
-        segments[i]['internal_load'] = cumulative_load
-
-    # B. Calculate deformation (delta_i) for each segment and sum them
-    for i in range(num_segments):
-        P = segments[i]['internal_load']
-        L = segments[i]['length']
-        A = segments[i]['area']
-        E = segments[i]['E']
+        segments = []
+        loads = {} # Loads applied at nodes {node_index: load_value}
         
-        if use_si_units:
-            # Convert units for consistency: N, mm, MPa (N/mm^2)
-            # P: kN → N (multiply by 1000)
-            # L: m → mm (multiply by 1000)  
-            # A: already in mm²
-            # E: GPa → MPa (multiply by 1000)
-            # delta = (P_N * L_mm) / (A_mm2 * E_MPa)
-            delta = (P * 1000 * L * 1000) / (A * E * 1000) # mm
-        else:
-            # Units are already consistent: kips, inches, ksi (kip/in^2)
-            delta = (P * L) / (A * E) # inches
+        # Generate properties for each segment
+        for i in range(num_segments):
+            material_name = random.choice(structural_materials)
+            segment = {'material_name': material_name}
+            
+            if use_si_units:
+                segment['length'] = round(random.uniform(0.2, 1.5), 2) # meters
+                diameter = round(random.uniform(20, 75), 1) # mm
+                segment['area'] = math.pi * (diameter / 2)**2
+                segment['E'] = MATERIAL_PROPERTIES[material_name]['E_GPa']
+                segment['dim_str'] = f"{diameter} mm diameter"
+                loads[i+1] = random.randint(-250, 250) # kN
+            else:
+                segment['length'] = round(random.uniform(10.0, 60.0), 1) # inches
+                diameter = round(random.uniform(0.75, 3.0), 1) # inches
+                segment['area'] = math.pi * (diameter / 2)**2
+                segment['E'] = MATERIAL_PROPERTIES[material_name]['E_ksi']
+                segment['dim_str'] = f"{diameter} in diameter"
+                loads[i+1] = random.randint(-60, 60) # kips
+
+            segments.append(segment)
+
+        # 2. Perform Core Calculations
+        total_deformation = 0
+        cumulative_load = 0
+        max_strain = 0
         
-        segments[i]['deformation'] = delta
-        total_deformation += delta
+        # Calculate internal forces and deformations
+        # Iterate backwards from the last segment to the first
+        for i in range(num_segments - 1, -1, -1):
+            node_index = i + 1
+            cumulative_load += loads[node_index]
+            segments[i]['internal_load'] = cumulative_load
+
+        for i in range(num_segments):
+            P = segments[i]['internal_load']
+            L = segments[i]['length']
+            A = segments[i]['area']
+            E = segments[i]['E']
+            
+            if use_si_units:
+                # delta = (P_N * L_mm) / (A_mm2 * E_MPa)
+                # P in kN -> *1000 -> N
+                # L in m -> *1000 -> mm
+                # E in GPa -> *1000 -> MPa
+                delta = (P * 1000 * L * 1000) / (A * E * 1000) # mm
+                current_strain = abs(delta / (L * 1000))
+            else:
+                delta = (P * L) / (A * E) # inches
+                current_strain = abs(delta / L)
+            
+            segments[i]['deformation'] = delta
+            total_deformation += delta
+            if current_strain > max_strain:
+                max_strain = current_strain
+
+        # Validate: Ensure max strain is < 1% (0.01) for linear elasticity to hold
+        if max_strain < 0.01:
+            break # Valid problem generated
 
     # 3. Generate Question and Solution Strings
     question = (
@@ -527,15 +534,28 @@ def template_multi_segment_rod():
 
     for i, seg in enumerate(segments):
         solution += f"  - **Segment {i+1} ({seg['material_name']}):**\n"
-        solution += (
-            f"P{i+1} = {seg['internal_load']} {unit_P}\n"
-            f"L{i+1} = {seg['length']} {unit_L}\n"
-            f"A{i+1} = {round(seg['area'], precision)} {'mm²' if use_si_units else 'in²'}\n"
-            f"E{i+1} = {seg['E']} {unit_E}\n"
-            f"δ{i+1} = ({seg['internal_load']} × {seg['length']}) / ({round(seg['area'], precision)} × {seg['E']}) = {round(seg['deformation'], precision)} {unit_D}\n"
-        )
+        
         if use_si_units:
-            solution += f"*Note:* Calculation uses consistent units (N, mm, MPa).\n"
+            # Explicitly show unit conversions in the solution string
+            P_disp = f"{seg['internal_load']} kN ({seg['internal_load']*1000:.0f} N)"
+            L_disp = f"{seg['length']} m ({seg['length']*1000:.0f} mm)"
+            E_disp = f"{seg['E']} GPa ({seg['E']*1000:.0f} MPa)"
+            
+            solution += (
+                f"P{i+1} = {P_disp}\n"
+                f"L{i+1} = {L_disp}\n"
+                f"A{i+1} = {round(seg['area'], precision)} mm²\n"
+                f"E{i+1} = {E_disp}\n"
+                f"δ{i+1} = ({seg['internal_load']*1000:.0f} × {seg['length']*1000:.0f}) / ({round(seg['area'], precision)} × {seg['E']*1000:.0f}) = {round(seg['deformation'], precision)} mm\n"
+            )
+        else:
+            solution += (
+                f"P{i+1} = {seg['internal_load']} kips\n"
+                f"L{i+1} = {seg['length']} in\n"
+                f"A{i+1} = {round(seg['area'], precision)} in²\n"
+                f"E{i+1} = {seg['E']} ksi\n"
+                f"δ{i+1} = ({seg['internal_load']} × {seg['length']}) / ({round(seg['area'], precision)} × {seg['E']}) = {round(seg['deformation'], precision)} in\n"
+            )
 
     solution += (
         f"\n**Step 3:** Calculate the Total Deformation\n"
@@ -580,54 +600,76 @@ def template_poissons_ratio():
     use_si_units = random.choice([True, False])
     material_name = random.choice(list(MATERIAL_PROPERTIES.keys()))
     material = MATERIAL_PROPERTIES[material_name]
-    precision = 5 # Use higher precision for small strain values
+    precision = 5 
 
-    # For this problem, the cross-section is always circular
+    # Generate dimensions first
     if use_si_units:
-        # SI Unit System 
-        load_kN = random.randint(50, 950) * random.choice([-1, 1]) # in kN (tensile or compressive)
-        initial_length_m = round(random.uniform(0.5, 3.0), 2) # in meters
-        initial_diameter_mm = random.randint(25, 125) # in mm
-        
+        initial_length_m = round(random.uniform(0.5, 3.0), 2)
+        initial_diameter_mm = random.randint(25, 125)
         area_mm2 = math.pi * (initial_diameter_mm / 2)**2
         E_GPa = material['E_GPa']
         nu = material['nu']
-
-        # Core Calculations (Units: N, mm, MPa)
+        
+        # Ensure Elastic Behavior 
+        # Instead of random load, pick a safe target strain (0.1% to 0.4%)
+        target_strain = random.uniform(0.001, 0.004) * random.choice([-1, 1])
+        
+        # Calculate Load required to achieve this strain: P = E * A * epsilon
+        # E in MPa (GPa * 1000), A in mm2 -> P in Newtons
+        required_load_N = (E_GPa * 1000) * area_mm2 * target_strain
+        
+        # Convert to kN and round to look like a "given" problem value
+        load_kN = round(required_load_N / 1000.0)
+        # Ensure load is not zero
+        if load_kN == 0: load_kN = 1 if target_strain > 0 else -1
+            
+        # Now recalculate exact stress/strain from this rounded load
         stress_MPa = (load_kN * 1000) / area_mm2
         axial_strain = stress_MPa / (E_GPa * 1000)
-        lateral_strain = -nu * axial_strain
-        delta_diameter_mm = initial_diameter_mm * lateral_strain
-        final_diameter_mm = initial_diameter_mm + delta_diameter_mm
-
-        # Formatting for question and solution
-        load_str = f"{load_kN} kN"
+        
+        # Formatting
+        load_str = f"{abs(load_kN)} kN"
         load_type_str = "tension" if load_kN > 0 else "compression"
         dim_str = f"{initial_diameter_mm} mm"
         unit_d = "mm"
         
+        # Secondary calculations
+        lateral_strain = -nu * axial_strain
+        delta_diameter_mm = initial_diameter_mm * lateral_strain
+        final_diameter_mm = initial_diameter_mm + delta_diameter_mm
+        
     else:
         # US Customary Unit System
-        load_kips = random.randint(15, 250) * random.choice([-1, 1]) # in kips
-        initial_length_in = round(random.uniform(20.0, 100.0), 1) # in inches
-        initial_diameter_in = round(random.uniform(1.0, 5.0), 2) # in inches
-        
+        initial_length_in = round(random.uniform(20.0, 100.0), 1)
+        initial_diameter_in = round(random.uniform(1.0, 5.0), 2)
         area_in2 = math.pi * (initial_diameter_in / 2)**2
         E_ksi = material['E_ksi']
         nu = material['nu']
         
-        # Core Calculations (Units: kips, in, ksi)
+        # Ensure Elastic Behavior 
+        target_strain = random.uniform(0.001, 0.004) * random.choice([-1, 1])
+        
+        # Calculate Load: P = E * A * epsilon
+        required_load_kips = E_ksi * area_in2 * target_strain
+        
+        # Round to integer kips
+        load_kips = round(required_load_kips)
+        if load_kips == 0: load_kips = 1 if target_strain > 0 else -1
+            
+        # Recalculate exact values
         stress_ksi = load_kips / area_in2
         axial_strain = stress_ksi / E_ksi
-        lateral_strain = -nu * axial_strain
-        delta_diameter_in = initial_diameter_in * lateral_strain
-        final_diameter_in = initial_diameter_in + delta_diameter_in
         
-        # Formatting for question and solution
-        load_str = f"{load_kips} kips"
+        # Formatting
+        load_str = f"{abs(load_kips)} kips"
         load_type_str = "tension" if load_kips > 0 else "compression"
         dim_str = f"{initial_diameter_in} in"
         unit_d = "in"
+        
+        # Secondary calculations
+        lateral_strain = -nu * axial_strain
+        delta_diameter_in = initial_diameter_in * lateral_strain
+        final_diameter_in = initial_diameter_in + delta_diameter_in
 
     # 2. Generate Question and Solution Strings
     question = (
@@ -645,16 +687,17 @@ def template_poissons_ratio():
         f"**Given:**\n"
         f"Material: {material_name} (E = {material['E_GPa' if use_si_units else 'E_ksi']} {'GPa' if use_si_units else 'ksi'}, nu = {nu})\n"
         f"Initial Diameter (d_0): {dim_str}\n"
-        f"Axial Load (P): {load_str}\n\n"
+        f"Axial Load (P): {load_str} ({load_type_str})\n\n"
 
         f"**Step 1:** Calculate Axial Strain (epsilon_axial)\n"
         f"First, we need the cross-sectional area (A) and the axial stress (sigma).\n"
         f"A = pi * (d_0 / 2)^2 = pi * ({initial_diameter_mm if use_si_units else initial_diameter_in} / 2)^2 = {round(area_mm2 if use_si_units else area_in2, 4)} {'mm^2' if use_si_units else 'in^2'}\n"
+        f"\n"
     )
 
     if use_si_units:
         solution += (
-            f"sigma = P / A = ({load_kN} * 1000 N) / ({round(area_mm2, 4)} mm^2) = {round(stress_MPa, 3)} MPa\n"
+            f"sigma = P / A = ({load_kN * 1000} N) / ({round(area_mm2, 4)} mm^2) = {round(stress_MPa, 3)} MPa\n"
             f"Now, calculate axial strain using Hooke's Law: epsilon_axial = sigma / E.\n"
             f"E = {E_GPa} GPa = {E_GPa * 1000} MPa\n"
             f"epsilon_axial = {round(stress_MPa, 3)} MPa / {E_GPa * 1000} MPa = {axial_strain:.4e}\n\n"
@@ -720,7 +763,7 @@ def template_statically_indeterminate():
     precision = 3
 
     if use_si_units:
-        # --- SI Unit System ---
+        #  SI Unit System 
         total_length = round(random.uniform(1.0, 3.0), 2) # m
         len_AB = round(random.uniform(0.2 * total_length, 0.8 * total_length), 2) # m
         len_BC = total_length - len_AB
@@ -739,7 +782,7 @@ def template_statically_indeterminate():
         unit_L, unit_P, unit_S, unit_A, unit_E = "m", "kN", "MPa", "mm^2", "GPa"
 
     else:
-        # --- US Customary Unit System ---
+        #  US Customary Unit System 
         total_length = round(random.uniform(40.0, 120.0), 1) # inches
         len_AB = round(random.uniform(0.2 * total_length, 0.8 * total_length), 1) # inches
         len_BC = total_length - len_AB
@@ -802,7 +845,7 @@ def template_statically_indeterminate():
         f"**Step 1:** Equation of Equilibrium\n"
         f"Summing forces in the x-direction (assuming right is positive):\n"
         f"Sum(F_x) = 0  =>  -R_A + P - R_C = 0\n"
-        f"R_A + R_C = {load_P} {unit_P}  ----(Equation 1)\n\n"
+        f"R_A + R_C = {load_P} {unit_P}  -(Equation 1)\n\n"
 
         f"**Step 2:** Equation of Compatibility\n"
         f"Since the rod is fixed between unyielding supports, the total deformation must be zero.\n"
@@ -812,7 +855,7 @@ def template_statically_indeterminate():
         f"Using the deformation formula delta = PL/AE:\n"
         f"(R_A * L_AB) / (A * E) - (R_C * L_BC) / (A * E) = 0\n"
         f"Since A and E are constant, they cancel out:\n"
-        f"R_A * L_AB = R_C * L_BC  ----(Equation 2)\n\n"
+        f"R_A * L_AB = R_C * L_BC  -(Equation 2)\n\n"
 
         f"**Step 3:** Solve for the Reaction Forces\n"
         f"From Equation 1, we can express R_C as: R_C = {load_P} - R_A.\n"

@@ -1,7 +1,7 @@
 import random
 import numpy as np
 import math
-from data.templates.branches.chemical_engineering.constants import GAS_PHASE_REACTANTS, THERMO_SUBSTANCES, CRITICAL_PROPERTIES
+from data.templates.branches.chemical_engineering.constants import GAS_PHASE_REACTANTS, THERMO_SUBSTANCES, CRITICAL_PROPERTIES, REAL_FLUID_DATA
 
 
 # Template 1 (Easy)
@@ -417,107 +417,110 @@ def template_vdw_solve_for_volume():
     Scenario:
         Solving for molar volume (V) from a cubic equation of state, given
         temperature (T) and pressure (P), requires finding the roots of a
-        cubic polynomial, which is done with a numerical solver.
+        cubic polynomial.
 
-        When the state (T, P) is below the critical point, the equation can yield
-        three positive real roots, corresponding to the saturated liquid volume, the
-        saturated vapor volume, and an unstable intermediate root.
+        When the state (T, P) is within the two-phase region (subcritical), 
+        the equation yields three real roots:
+        1. Smallest root: Liquid-phase molar volume.
+        2. Largest root: Vapor-phase molar volume.
+        3. Intermediate root: Unstable state (physically meaningless).
 
         The governing equation is cast into a polynomial form for root-finding:
-            V**3 + c2*V**2 + c1*V + c0 = 0
-        Where:
-        - c2 = -(b + R*T/P)
-        - c1 = a/P
-        - c0 = -(a*b)/P
+            V^3 - (b + RT/P)V^2 + (a/P)V - (ab/P) = 0
 
     Returns:
         tuple: A tuple containing:
             - str: A question asking to compute the possible molar volumes.
             - str: A step-by-step solution showing the calculation and root analysis.
     """
-    # 1. Parameterize the inputs
+    # 1. Parameterize the inputs with a Validation Loop
+    # We want to ensure we generate a problem with 3 roots (the "Two-Phase" scenario)
+    # as this is the most pedagogically valuable case for cubic EOS problems.
+    
     R = 0.08314  # L·bar/(mol·K)
+    
+    # Loop until we find a set of inputs that produces 3 distinct real roots
+    while True:
+        try:
+            substance_name = random.choice(list(CRITICAL_PROPERTIES.keys()))
+            properties = CRITICAL_PROPERTIES[substance_name]
+            Tc = properties["Tc"]
+            Pc = properties["Pc"]
 
-    substance_name = random.choice(list(CRITICAL_PROPERTIES.keys()))
-    properties = CRITICAL_PROPERTIES[substance_name]
-    Tc = properties["Tc"]
-    Pc = properties["Pc"]
+            # Choose T well below critical point to ensure the "loop" is wide enough
+            Tr = random.uniform(0.65, 0.85)
+            T = round(Tr * Tc, 2)
+            
+            # Estimate VdW saturation pressure to hit the 3-root region
+            # Approx VdW vapor pressure: log10(Pr) ~ -3(1/Tr - 1)
+            approx_Pr_sat = 10**(-3.0 * (1.0/Tr - 1.0))
+            
+            # Pick P close to this saturation pressure
+            Pr = approx_Pr_sat * random.uniform(0.95, 1.05)
+            P = round(Pr * Pc, 3) # Use 3 decimals for precision
 
-    # Choose a T and P below the critical point
-    Tr = random.uniform(0.85, 0.95)
-    T = round(Tr * Tc, 2)
-    Pr = random.uniform(Tr * 0.8, Tr * 0.9) # Estimate a realistic saturation pressure
-    P = round(Pr * Pc, 2)
+            # 2. Perform the core calculation
+            a = (27 * (R**2) * (Tc**2)) / (64 * Pc)
+            b = (R * Tc) / (8 * Pc)
 
-    # 2. Perform the core calculation
-    a = (27 * (R**2) * (Tc**2)) / (64 * Pc)
-    b = (R * Tc) / (8 * Pc)
+            # Coefficients of the cubic polynomial: V³ + c₂V² + c₁V + c₀ = 0
+            c2 = -(b + R * T / P)
+            c1 = a / P
+            c0 = -(a * b) / P
+            coeffs = [1, c2, c1, c0]
 
-    # Coefficients of the cubic polynomial: V³ + c₂V² + c₁V + c₀ = 0
-    c2 = -(b + R * T / P)
-    c1 = a / P
-    c0 = -(a * b) / P
-    coeffs = [1, c2, c1, c0]
+            roots = np.roots(coeffs)
 
-    roots = np.roots(coeffs)
-
-    # Improved Root Handling: Filter for nearly-real, positive roots
-    tolerance = 1e-9
-    positive_real_roots = sorted([
-        root.real for root in roots if abs(root.imag) < tolerance and root.real > 0
-    ])
-
-    V_f, V_g = 0, 0
-    if len(positive_real_roots) >= 2: # Typically 3 for subcritical
-        V_f = positive_real_roots[0]
-        V_g = positive_real_roots[-1] # Safely choose the largest
-    elif len(positive_real_roots) == 1:
-        V_g = positive_real_roots[0]
+            # Filter for positive, real roots
+            tolerance = 1e-9
+            positive_real_roots = sorted([
+                root.real for root in roots if abs(root.imag) < tolerance and root.real > 0
+            ])
+            
+            # If we found 3 roots, we have a valid problem. Break the loop.
+            if len(positive_real_roots) == 3:
+                V_f = positive_real_roots[0]
+                V_g = positive_real_roots[-1]
+                break
+                
+        except Exception:
+            continue
 
     # 3. Generate the question and solution strings
     question = (
         f"A vessel of {substance_name} is held at a temperature of {T} K and a pressure of {P} bar. "
         f"Using the van der Waals equation of state, determine the possible molar volumes (L/mol) "
-        f"for the liquid and/or vapor phases. The critical properties for {substance_name} are:\n"
+        f"predicted for the liquid and vapor phases.\n\n"
+        f"The critical properties for {substance_name} are:\n"
         f"Tc = {Tc} K\nPc = {Pc} bar"
     )
 
     solution = (
         f"**Step 1:** Calculate the van der Waals parameters 'a' and 'b'.\n"
-        f"a = (27 * R² * Tc²) / (64 * Pc) = {round(a, 4)} L²·bar/mol²\n"
+        f"a = (27 * R^2 * Tc^2) / (64 * Pc) = {round(a, 4)} L^2·bar/mol^2\n"
         f"b = (R * Tc) / (8 * Pc) = {round(b, 5)} L/mol\n\n"
 
-        f"**Step 2:** Formulate the cubic equation: V³ + c₂V² + c₁V + c₀ = 0.\n"
-        f"The calculated coefficients, with their respective units, are:\n"
-        f"- c₂ = {round(c2, 4)} (L/mol)\n"
-        f"- c₁ = {round(c1, 4)} (L²/mol²)\n"
-        f"- c₀ = {round(c0, 6)} (L³/mol³)\n\n"
+        f"**Step 2:** Formulate the cubic equation: V^3 + c2*V^2 + c1*V + c0 = 0.\n"
+        f"The coefficients are derived from the VdW equation:\n"
+        f"c2 = -(b + RT/P) = {round(c2, 4)} L/mol\n"
+        f"c1 = a/P = {round(c1, 4)} L^2/mol^2\n"
+        f"c0 = -(ab)/P = {round(c0, 6)} L^3/mol^3\n\n"
 
-        f"**Step 3:** Solve the polynomial for its roots using a numerical solver.\n"
-        f"The physically meaningful (positive, real) roots found are: "
-        f"{', '.join([f'{r:.4f}' for r in positive_real_roots])} L/mol\n\n"
+        f"**Step 3:** Solve the polynomial for its roots.\n"
+        f"Using a numerical solver, we find three real, positive roots:\n"
+        f"Roots: {', '.join([f'{r:.4f}' for r in positive_real_roots])} L/mol\n\n"
+        f"\n\n"
 
         f"**Step 4:** Interpret the physical significance of the roots.\n"
-    )
+        f"For a state in the subcritical region, the EOS predicts three roots:\n"
+        f"- The **smallest root** corresponds to the molar volume of the **Liquid Phase**.\n"
+        f"- The **largest root** corresponds to the molar volume of the **Vapor Phase**.\n"
+        f"- The intermediate root is physically unstable and disregarded.\n\n"
 
-    if len(positive_real_roots) >= 2:
-        solution += (
-            f"For a subcritical state, we expect multiple positive real roots.\n"
-            f"- The smallest root corresponds to the molar volume of the **liquid phase (Vf)**.\n"
-            f"- The largest root corresponds to the molar volume of the **vapor phase (Vg)**.\n"
-            f"- Any intermediate root lies on the thermodynamically unstable branch of the isotherm (where pressure incorrectly increases with volume) and is disregarded.\n\n"
-            f"**Answer:**\n"
-            f"  - Saturated Liquid Volume (Vf) ≈ **{round(V_f, 4)} L/mol**\n"
-            f"  - Saturated Vapor Volume (Vg) ≈ **{round(V_g, 4)} L/mol**"
-        )
-    elif len(positive_real_roots) == 1:
-        solution += (
-            f"A single positive real root indicates the substance exists in a single phase (gas or supercritical fluid).\n\n"
-            f"**Answer:**\n"
-            f"  - Molar Volume (V) = **{round(V_g, 4)} L/mol**"
-        )
-    else:
-        solution += "No physically meaningful (positive, real) roots were found for these conditions, which may indicate an issue with the applicability of the model at this state."
+        f"**Answer:**\n"
+        f"1. Liquid-phase Volume (V_liq) ≈ **{round(V_f, 4)} L/mol**\n"
+        f"2. Vapor-phase Volume (V_vap) ≈ **{round(V_g, 4)} L/mol**"
+    )
 
     return question, solution
 

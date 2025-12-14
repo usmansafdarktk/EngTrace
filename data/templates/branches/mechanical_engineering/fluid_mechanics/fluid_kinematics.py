@@ -166,17 +166,17 @@ def template_volumetric_flow_rate():
 
     # 2. Perform calculations and generate strings based on the chosen geometry
     if geometry == 'pipe':
-        # --- Pipe-specific parameters ---
+        #  Pipe-specific parameters 
         diameter_mm = random.randint(20, 200)
         radius_m = diameter_mm / 2000.0
 
-        # --- Core calculations for the pipe ---
+        #  Core calculations for the pipe 
         area = math.pi * radius_m**2
         # For a parabolic profile in a pipe, the exact integral yields Q = (1/2) * U_max * A
         flow_rate = 0.5 * u_max * area
         avg_velocity = u_max / 2.0
 
-        # --- Generate question and solution strings for the pipe ---
+        #  Generate question and solution strings for the pipe 
         question = (
             f"The velocity profile for a fluid flowing through a circular pipe with a diameter of {diameter_mm} mm "
             f"is given by u(r) = U_max * (1 - (r/R)^2), where R is the radius of the pipe and the maximum "
@@ -221,19 +221,19 @@ def template_volumetric_flow_rate():
         )
 
     else: # geometry == 'channel'
-        # --- Channel-specific parameters ---
+        #  Channel-specific parameters 
         height_cm = random.randint(5, 50)
         width_cm = random.randint(10, 100)
         height_m = height_cm / 100.0
         width_m = width_cm / 100.0
 
-        # --- Core calculations for the channel ---
+        #  Core calculations for the channel 
         area = width_m * height_m
         # For a linear profile in a channel, the exact integral yields Q = (1/2) * U_max * A
         flow_rate = 0.5 * u_max * area
         avg_velocity = u_max / 2.0
 
-        # --- Generate question and solution strings for the channel ---
+        #  Generate question and solution strings for the channel 
         question = (
             f"A fluid flows through a rectangular channel that is {width_cm} cm wide and {height_cm} cm high. "
             f"The velocity profile is given by u(y) = U_max * (y/H), where H is the channel height and the "
@@ -319,18 +319,18 @@ def template_vorticity_check():
     
     # 2. Perform calculations and generate strings based on the flow type
     if flow_type == '2D':
-        # --- Define a more complex 2D velocity field ---
+        #  Define a more complex 2D velocity field 
         # u = A*x*y, v = B*x^2 + C*y^2
         # This makes derivatives dependent on the point (x, y).
 
-        # --- Core calculations for 2D flow ---
+        #  Core calculations for 2D flow 
         du_dy_val = A * x_point
         dv_dx_val = 2 * B * x_point
         
         zeta_z = dv_dx_val - du_dy_val
         is_irrotational = abs(zeta_z) < 1e-9 # Check for zero with floating point tolerance
 
-        # --- Generate question and solution strings for 2D flow ---
+        #  Generate question and solution strings for 2D flow 
         question = (
             f"A 2D fluid flow is described by the velocity field:\n"
             f"u = {A}xy\n"
@@ -377,11 +377,11 @@ def template_vorticity_check():
         F = random.randint(-4, 4)
         z_point = round(random.uniform(0.5, 3.0), 1)
 
-        # --- Define a more complex 3D velocity field ---
+        #  Define a more complex 3D velocity field 
         # u = A*y^2, v = B*z^2 + C*x, w = D*x^2 + E*y
         # This allows all components of vorticity to be non-zero and position-dependent.
 
-        # --- Core calculations for 3D flow ---
+        #  Core calculations for 3D flow 
         du_dy_val = 2 * A * y_point
         du_dz_val = 0
         
@@ -397,7 +397,7 @@ def template_vorticity_check():
         
         is_irrotational = (abs(zeta_x) < 1e-9 and abs(zeta_y) < 1e-9 and abs(zeta_z) < 1e-9)
 
-        # --- Generate question and solution strings for 3D flow ---
+        #  Generate question and solution strings for 3D flow 
         question = (
             f"A 3D fluid flow is described by the velocity field:\n"
             f"u = {A}y^2\n"
@@ -456,9 +456,7 @@ def template_particle_pathline():
     Scenario:
         This template distinguishes between the Eulerian description (velocity field)
         and the Lagrangian description (individual particle path). It requires solving
-        a system of ordinary differential equations (ODEs) to trace a particle's
-        movement from a starting point to its position at a later time. The velocity
-        field is steady and designed so the variables are separable.
+        a system of ordinary differential equations (ODEs).
 
     Core Equations:
         Pathline Definition: dx/dt = u(x, y) and dy/dt = v(x, y)
@@ -467,20 +465,22 @@ def template_particle_pathline():
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the particle's final coordinates.
-            - str: A step-by-step solution showing the derivation of the pathline equations.
+            - str: A step-by-step solution showing the derivation.
     """
-    # 1. Parameterize the inputs with random values
-    A = random.randint(1, 5)
-    B = random.randint(1, 5)
+    # 1. Parameterize the inputs with physically realistic values
+    # We reduce the magnitude of A and B to ensure the exponential growth doesn't
+    # produce physically absurd velocities (e.g. keeping v < 100 m/s).
+    # Units for A and B are 1/s.
+    A = round(random.uniform(0.1, 0.5), 1)
+    B = round(random.uniform(0.1, 0.5), 1)
 
-    x0 = round(random.uniform(0.5, 4.0), 1)
-    y0 = round(random.uniform(0.5, 4.0), 1)
-    tf = round(random.uniform(0.1, 2.0), 2)
+    x0 = round(random.uniform(0.5, 2.0), 1)
+    y0 = round(random.uniform(0.5, 2.0), 1)
+    tf = round(random.uniform(1.0, 4.0), 1)
 
-    precision = 4
+    precision = 3
 
     # 2. Perform the core calculations for the solution
-    # Solve for the final position by integrating the velocity components
     # x(t) = x0 * exp(A*t)
     # y(t) = y0 * exp(-B*t)
     xf = x0 * math.exp(A * tf)
@@ -488,8 +488,9 @@ def template_particle_pathline():
 
     # 3. Generate the question and solution strings
     question = (
-        f"A steady, 2D velocity field is given by u = {A}x and v = -{B}y. "
-        f"A fluid particle is located at the initial position (x0, y0) = ({x0}, {y0}) at time t=0.\n\n"
+        f"A steady, 2D velocity field is defined by the equations u = {A}x and v = -{B}y, "
+        f"where u and v are in m/s, x and y are in meters, and the constants have units of s^-1.\n\n"
+        f"A fluid particle is located at the initial position (x0, y0) = ({x0} m, {y0} m) at time t = 0 s.\n"
         f"Determine the particle's coordinates (x, y) at time t = {tf} s."
     )
 
@@ -500,8 +501,9 @@ def template_particle_pathline():
         f"Final time (tf) = {tf} s\n\n"
 
         f"**Step 1:** Set up the differential equation for the x-coordinate.\n"
-        f"The pathline is defined by dx/dt = u.\n"
-        f"  dx/dt = {A}x\n\n"
+        f"The pathline is defined by the rate of change of the particle's position: dx/dt = u.\n"
+        f"  dx/dt = {A}x\n"
+        f"\n\n"
 
         f"**Step 2:** Solve the ODE for x(t) by separating variables.\n"
         f"  (1/x) dx = {A} dt\n"
@@ -530,11 +532,11 @@ def template_particle_pathline():
 
         f"**Step 6:** Calculate the final position at t = {tf} s.\n"
         f"Substitute t = {tf} into the pathline equations:\n"
-        f"  x({tf}) = {x0} * exp({A} * {tf}) = {round(xf, precision)}\n"
-        f"  y({tf}) = {y0} * exp(-{B} * {tf}) = {round(yf, precision)}\n\n"
+        f"  x({tf}) = {x0} * exp({A} * {tf}) = {round(xf, precision)} m\n"
+        f"  y({tf}) = {y0} * exp(-{B} * {tf}) = {round(yf, precision)} m\n\n"
 
         f"**Answer:**\n"
-        f"At t = {tf} s, the particle's coordinates are ({round(xf, precision)}, {round(yf, precision)})."
+        f"At t = {tf} s, the particle's coordinates are ({round(xf, precision)} m, {round(yf, precision)} m)."
     )
 
     return question, solution
@@ -549,8 +551,7 @@ def template_incompressible_continuity():
         This problem uses the differential form of the conservation of mass
         (continuity equation) for a 2D, incompressible flow. Given one velocity
         component, the user must find the other by performing partial differentiation
-        and integration. The problem asks for the simplest possible expression,
-        which implies the constant of integration is zero.
+        and integration. The problem asks for the simplest possible expression.
 
     Core Equation:
         2D Incompressible Continuity: du/dx + dv/dy = 0
@@ -560,27 +561,63 @@ def template_incompressible_continuity():
             - str: A question asking for the unknown velocity component.
             - str: A step-by-step solution showing the derivation.
     """
-    # 1. Parameterize the inputs with random values
-    
-    # Randomly choose which velocity component is given
-    given_component = random.choice(['u', 'v'])
+    # Helper to format algebraic terms cleanly (e.g. handles + -3x -> - 3x)
+    def fmt_term(coeff, var, is_first=False):
+        if coeff == 0:
+            return ""
+        
+        # Determine sign prefix
+        if coeff < 0:
+            sign = "-" if is_first else "- "
+            val = -coeff
+        else:
+            sign = "" if is_first else "+ "
+            val = coeff
+            
+        # Format number (remove .0 if integer)
+        if isinstance(val, float) and val.is_integer():
+            val = int(val)
+        
+        # Construct string
+        # If coeff is 1 and there is a variable, omit the '1'
+        if var:
+            if val == 1:
+                return f"{sign}{var}"
+            else:
+                return f"{sign}{val}{var}"
+        else:
+            return f"{sign}{val}"
 
-    # Random non-zero coefficients for the polynomial terms
+    # Helper to join two terms into an expression
+    def build_poly(c1, v1, c2, v2):
+        t1 = fmt_term(c1, v1, is_first=True)
+        t2 = fmt_term(c2, v2, is_first=False)
+        return f"{t1} {t2}".strip()
+
+    # 1. Parameterize the inputs with random values
+    given_component = random.choice(['u', 'v'])
+    
+    # Random non-zero coefficients
     A = random.choice([i for i in range(-5, 6) if i != 0])
     B = random.choice([i for i in range(-5, 6) if i != 0])
 
     # 2. Perform calculations and generate strings based on the chosen component
     if given_component == 'u':
-        # --- The u-component is given, find v ---
-        u_expr = f"{A}x^2 + {B}xy"
+        #  The u-component is given, find v 
+        # u = Ax^2 + Bxy
+        u_expr = build_poly(A, "x^2", B, "xy")
         
-        # Core calculations
-        # du/dx = 2*A*x + B*y
-        du_dx_expr = f"{2*A}x + {B}y"
-        # dv/dy = -du/dx
-        dv_dy_expr = f"-({du_dx_expr})"
-        # v = integral(dv/dy) dy = integral(-(2*A*x + B*y)) dy
-        v_expr = f"{-2*A}xy - {B/2.0}y^2"
+        # du/dx = 2Ax + By
+        du_dx_c1, du_dx_c2 = 2*A, B
+        du_dx_expr = build_poly(du_dx_c1, "x", du_dx_c2, "y")
+        
+        # dv/dy = -du/dx = -2Ax - By
+        dv_dy_c1, dv_dy_c2 = -2*A, -B
+        dv_dy_expr = build_poly(dv_dy_c1, "x", dv_dy_c2, "y")
+        
+        # v = integral(-2Ax - By) dy = -2Axy - (B/2)y^2
+        v_c1, v_c2 = -2*A, -B/2.0
+        v_expr = build_poly(v_c1, "xy", v_c2, "y^2")
         
         question = (
             f"A 2D, steady, incompressible flow has a velocity component in the x-direction "
@@ -592,42 +629,49 @@ def template_incompressible_continuity():
             f"**Given:**\n"
             f"The flow is 2D, steady, and incompressible.\n"
             f"The u-component of velocity is u = {u_expr}\n\n"
-
+            
             f"**Step 1:** State the 2D incompressible continuity equation.\n"
             f"The equation is: du/dx + dv/dy = 0\n\n"
-
+            
+            
             f"**Step 2:** Calculate the partial derivative of the given u-component with respect to x.\n"
             f"  du/dx = d/dx({u_expr})\n"
             f"  du/dx = {du_dx_expr}\n\n"
-
+            
             f"**Step 3:** Rearrange the continuity equation to solve for dv/dy.\n"
             f"  dv/dy = -du/dx\n"
-            f"  dv/dy = -({du_dx_expr}) = {-2*A}x - {B}y\n\n"
+            f"  dv/dy = -({du_dx_expr}) = {dv_dy_expr}\n\n"
             
             f"**Step 4:** Integrate dv/dy with respect to y to find v(x, y).\n"
-            f"  v(x, y) = integral({-2*A}x - {B}y) dy\n"
-            f"  v(x, y) = {-2*A}xy - ({B}/2)y^2 + f(x)\n"
+            f"  v(x, y) = integral({dv_dy_expr}) dy\n"
+            f"  v(x, y) = {v_expr} + f(x)\n"
             f"The 'constant' of integration, f(x), is an arbitrary function of x.\n\n"
-
+            
             f"**Step 5:** Provide the simplest form for v(x, y).\n"
             f"To find the simplest expression, we set the integration constant f(x) to zero.\n"
             f"  v(x, y) = {v_expr}\n\n"
-
+            
             f"**Answer:**\n"
             f"The simplest expression for the y-component of velocity is v = {v_expr}."
         )
 
     else: # given_component == 'v'
-        # --- The v-component is given, find u ---
-        v_expr = f"{A}y^2 + {B}xy"
+        #  The v-component is given, find u 
+        # v = Ay^2 + Bxy
+        v_expr = build_poly(A, "y^2", B, "xy")
 
-        # Core calculations
-        # dv/dy = 2*A*y + B*x
-        dv_dy_expr = f"{2*A}y + {B}x"
-        # du/dx = -dv/dy
-        du_dx_expr = f"-({dv_dy_expr})"
-        # u = integral(du/dx) dx = integral(-(2*A*y + B*x)) dx
-        u_expr_sol = f"{-2*A}xy - {B/2.0}x^2"
+        # dv/dy = 2Ay + Bx
+        dv_dy_c1, dv_dy_c2 = 2*A, B
+        dv_dy_expr = build_poly(dv_dy_c1, "y", dv_dy_c2, "x")
+        
+        # du/dx = -dv/dy = -2Ay - Bx
+        # Usually written as x term first: -Bx - 2Ay
+        du_dx_c1, du_dx_c2 = -B, -2*A
+        du_dx_expr = build_poly(du_dx_c1, "x", du_dx_c2, "y")
+        
+        # u = integral(-Bx - 2Ay) dx = -(B/2)x^2 - 2Axy
+        u_c1, u_c2 = -B/2.0, -2*A
+        u_expr_sol = build_poly(u_c1, "x^2", u_c2, "xy")
 
         question = (
             f"A 2D, steady, incompressible flow has a velocity component in the y-direction "
@@ -639,27 +683,27 @@ def template_incompressible_continuity():
             f"**Given:**\n"
             f"The flow is 2D, steady, and incompressible.\n"
             f"The v-component of velocity is v = {v_expr}\n\n"
-
+            
             f"**Step 1:** State the 2D incompressible continuity equation.\n"
             f"The equation is: du/dx + dv/dy = 0\n\n"
-
+            
             f"**Step 2:** Calculate the partial derivative of the given v-component with respect to y.\n"
             f"  dv/dy = d/dy({v_expr})\n"
             f"  dv/dy = {dv_dy_expr}\n\n"
-
+            
             f"**Step 3:** Rearrange the continuity equation to solve for du/dx.\n"
             f"  du/dx = -dv/dy\n"
-            f"  du/dx = -({dv_dy_expr}) = {-B}x - {2*A}y\n\n"
+            f"  du/dx = -({dv_dy_expr}) = {du_dx_expr}\n\n"
             
             f"**Step 4:** Integrate du/dx with respect to x to find u(x, y).\n"
-            f"  u(x, y) = integral({-B}x - {2*A}y) dx\n"
-            f"  u(x, y) = -({B}/2)x^2 - {2*A}xy + g(y)\n"
+            f"  u(x, y) = integral({du_dx_expr}) dx\n"
+            f"  u(x, y) = {u_expr_sol} + g(y)\n"
             f"The 'constant' of integration, g(y), is an arbitrary function of y.\n\n"
-
+            
             f"**Step 5:** Provide the simplest form for u(x, y).\n"
             f"To find the simplest expression, we set the integration constant g(y) to zero.\n"
             f"  u(x, y) = {u_expr_sol}\n\n"
-
+            
             f"**Answer:**\n"
             f"The simplest expression for the x-component of velocity is u = {u_expr_sol}."
         )

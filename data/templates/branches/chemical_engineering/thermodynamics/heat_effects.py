@@ -16,11 +16,6 @@ def template_sensible_heat_constant_cp():
 
         The governing equation on a mass basis is:
             Q = m * Cp * (T2 - T1)
-        Where:
-        - Q: Total heat transferred
-        - m: Mass of the substance
-        - Cp: Constant pressure specific heat capacity
-        - T1, T2: Initial and final temperatures
 
     Returns:
         tuple: A tuple containing:
@@ -31,14 +26,23 @@ def template_sensible_heat_constant_cp():
     substance_data = random.choice(SUBSTANCES_FOR_HEATING)
     substance_name = substance_data["name"]
     substance_state = substance_data["state"]
-    Cp = substance_data["Cp"]  # J/(g·K) - Specific heat, not molar
+    Cp = substance_data["Cp"]  # J/(g·K)
+    
+    # Retrieve safe temperature limits from the constant data
+    # Defaults provided in case keys are missing in legacy data
+    min_temp = substance_data.get("min_temp", 20)
+    max_temp = substance_data.get("max_temp", 150)
 
     # Generate a random mass in grams
-    m = round(random.uniform(50.0, 1000.0), 1)  # grams
+    m = round(random.uniform(50.0, 1000.0), 1)
 
-    # Generate temperatures in Celsius
-    T1_C = round(random.uniform(10.0, 50.0), 1)
-    T2_C = round(random.uniform(T1_C + 30, 150.0), 1)
+    # Generate temperatures within the safe bounds for this specific substance
+    # Ensure there's at least a 10 degree window for T2
+    safe_max_T1 = max(min_temp, max_temp - 15) 
+    T1_C = round(random.uniform(min_temp, safe_max_T1), 1)
+    
+    # Ensure T2 is higher than T1 but within max limit
+    T2_C = round(random.uniform(T1_C + 10, max_temp), 1)
 
     # 2. Perform the core calculation
     delta_T = T2_C - T1_C
@@ -51,13 +55,15 @@ def template_sensible_heat_constant_cp():
     question = (
         f"Calculate the heat in kJ required to raise the temperature of {m} g "
         f"of {substance_state} {substance_name} from {T1_C}°C to {T2_C}°C. "
-        f"The specific heat capacity of {substance_name} is {Cp} J/g·K."
+        f"The specific heat capacity of {substance_name} is {Cp} J/g·K. "
+        f"Assume constant pressure and no phase change occurs."
     )
 
     solution = (
         f"**Step 1:** State the formula.\n"
         f"Q = m * Cp * ΔT\n\n"
-        f"**Note:** We assume the specific heat capacity (Cp) is constant over this temperature range."
+        f"**Note:** We assume the specific heat capacity (Cp) is constant over this temperature range.\n"
+        f"\n\n"
 
         f"**Step 2:** List the given values.\n"
         f"- Mass (m) = {m} g\n"
@@ -248,8 +254,16 @@ def template_sensible_heat_temp_dependent_cp():
     A, B, C, D = params["A"], params["B"], params["C"], params["D"]
 
     n = round(random.uniform(1.0, 10.0), 2)  # moles
-    T1 = round(random.uniform(298.15, 400.0), 2)  # Kelvin
-    T2 = round(random.uniform(T1 + 200, 900.0), 2)  # Kelvin
+
+    # Determine valid temperature ranges based on phase to ensure physical plausibility
+    if "(l)" in substance_name:
+        # Liquids: Keep range lower to avoid boiling (approximate general cap)
+        T1 = round(random.uniform(280.0, 300.0), 2)
+        T2 = round(random.uniform(T1 + 20, 350.0), 2) 
+    else:
+        # Gases/Solids: Can handle higher temperatures
+        T1 = round(random.uniform(298.15, 500.0), 2)
+        T2 = round(random.uniform(T1 + 100, 1200.0), 2)
 
     # 2. Perform the core calculation via analytical integration
     # integral(A + BT + CT² + DT⁻²)dT = AT + (B/2)T² + (C/3)T³ - D/T
@@ -261,17 +275,21 @@ def template_sensible_heat_temp_dependent_cp():
         return term_a + term_b + term_c + term_d
 
     # Calculate the definite integral per mole
-    integral_val = R * (integral_mean_cp_over_r(T2) - integral_mean_cp_over_r(T1))
+    val_T2 = integral_mean_cp_over_r(T2)
+    val_T1 = integral_mean_cp_over_r(T1)
+    integral_val = R * (val_T2 - val_T1)
     
     Q_J = n * integral_val  # Total heat in Joules
     Q_kJ = Q_J / 1000       # Convert to kilojoules
 
     # 3. Generate the question and solution strings
     # Dynamically create the Cp/R equation string for the question
-    cp_eq_str = f"A"
-    if B != 0: cp_eq_str += f" + B*T"
-    if C != 0: cp_eq_str += f" + C*T²"
-    if D != 0: cp_eq_str += f" + D*T⁻²"
+    cp_eq_parts = [str(A)]
+    if B != 0: cp_eq_parts.append(f"{B:.3e}*T")
+    if C != 0: cp_eq_parts.append(f"{C:.3e}*T^2")
+    if D != 0: cp_eq_parts.append(f"{D:.3e}*T^-2")
+    
+    cp_eq_str = " + ".join(cp_eq_parts).replace("+ -", "- ")
 
     question = (
         f"Calculate the heat in kJ required to raise the temperature of {n} moles of "
@@ -281,25 +299,34 @@ def template_sensible_heat_temp_dependent_cp():
         f"Where the constants are: A={A}, B={B:.3g}, C={C:.3g}, D={D:.3g}"
     )
 
+    # Helper to format the polynomial substitution string for the solution
+    def format_poly_sub(T_val):
+        terms = [f"{A}*({T_val})"]
+        if B != 0: terms.append(f"({B:.3e}/2)*({T_val})^2")
+        if C != 0: terms.append(f"({C:.3e}/3)*({T_val})^3")
+        if D != 0: terms.append(f"-({D:.3e}/{T_val})")
+        return " + ".join(terms).replace("+ -", "- ")
+
     solution = (
         f"**Step 1:** State the integral formula for total heat (Q).\n"
-        f"Q = n * ∫[from T1 to T2] Cp(T) dT\n"
-        f"Given Cp(T) = R * ({cp_eq_str}), the integral is:\n"
-        f"Q = n * R * ∫[from {T1} to {T2}] ({A} + {B:.3g}*T {'+ ' + str(C) + '*T²' if C != 0 else ''} {'+ ' + str(D) + '*T⁻²' if D != 0 else ''}) dT\n\n"
+        f"Q = n * R * ∫[from {T1} to {T2}] (Cp/R) dT\n\n"
 
         f"**Step 2:** Perform the analytical integration.\n"
-        f"The indefinite integral of Cp(T)/R is: A*T + (B/2)*T² + (C/3)*T³ - D/T\n\n"
+        f"The indefinite integral of Cp(T)/R is:\n"
+        f"I(T) = A*T + (B/2)*T^2 + (C/3)*T^3 - D/T\n\n"
 
-        f"**Step 3:** Evaluate the definite integral from T1 to T2.\n"
-        f"∫ Cp(T) dT = R * [ (A*T₂ + (B/2)*T₂² + ...) - (A*T₁ + (B/2)*T₁² + ...) ]\n"
-        f"∫ Cp(T) dT = {R} J/mol·K * [({integral_mean_cp_over_r(T2):.2f}) - ({integral_mean_cp_over_r(T1):.2f})]\n"
-        f"∫ Cp(T) dT = {R} J/mol·K * ({(integral_mean_cp_over_r(T2) - integral_mean_cp_over_r(T1)):.2f}) K = {integral_val:.2f} J/mol\n\n"
+        f"**Step 3:** Evaluate the definite integral.\n"
+        f"I({T2}) = {format_poly_sub(T2)} = {val_T2:.4f}\n"
+        f"I({T1}) = {format_poly_sub(T1)} = {val_T1:.4f}\n"
+        f"Integral Value = I({T2}) - I({T1}) = {val_T2:.4f} - {val_T1:.4f} = {val_T2 - val_T1:.4f} K\n\n"
 
-        f"**Step 4:** Calculate the total heat Q for {n} moles.\n"
-        f"Q = n * ({integral_val:.2f} J/mol) = {n} mol * {integral_val:.2f} J/mol = {Q_J:.2f} J\n\n"
+        f"**Step 4:** Calculate the total heat Q.\n"
+        f"Q = n * R * (Integral Value)\n"
+        f"Q = {n} mol * 8.314 J/(mol K) * {val_T2 - val_T1:.4f} K\n"
+        f"Q = {Q_J:.2f} J\n\n"
 
-        f"**Step 5:** Convert the result to kilojoules.\n"
-        f"Q = {Q_J:.2f} J * (1 kJ / 1000 J) = {Q_kJ:.2f} kJ\n\n"
+        f"**Step 5:** Convert to kilojoules.\n"
+        f"Q = {Q_J:.2f} J / 1000 = {Q_kJ:.2f} kJ\n\n"
 
         f"**Answer:** The heat required is **{Q_kJ:.2f} kJ**."
     )
@@ -319,9 +346,6 @@ def template_adiabatic_flame_temperature():
         reference temperature (298.15 K) must be completely absorbed by the
         product gases as sensible heat, raising their temperature from the
         reference temperature to the final adiabatic flame temperature (T_ad).
-        
-        Because the heat capacities of the products are temperature-dependent,
-        this problem requires an iterative, numerical solution.
 
     Returns:
         tuple: A tuple containing:
@@ -332,47 +356,54 @@ def template_adiabatic_flame_temperature():
     R = 8.314  # J/(mol·K)
     T_initial = 298.15 # K
     
-    reaction_data = random.choice(COMBUSTION_REACTIONS)
-    fuel = reaction_data["fuel"]
-    equation = reaction_data["equation"]
-    reactants = reaction_data["reactants"]
-    products = reaction_data["products"]
+    # Validation Loop for Physics Sanity Check
+    while True:
+        try:
+            reaction_data = random.choice(COMBUSTION_REACTIONS)
+            fuel = reaction_data["fuel"]
+            equation = reaction_data["equation"]
+            reactants = reaction_data["reactants"]
+            products = reaction_data["products"]
 
-    # 2. Perform the core calculation
-    # First, calculate the standard heat of reaction at 298.15 K
-    try:
-        products_enthalpy_298 = sum(nu * HEATS_OF_FORMATION[s] for s, nu in products.items())
-        reactants_enthalpy_298 = sum(nu * HEATS_OF_FORMATION[s] for s, nu in reactants.items())
-        delta_H_298 = products_enthalpy_298 - reactants_enthalpy_298  # result in kJ
-    except KeyError as e:
-        # Handle cases where data might be missing for a defined reaction
-        return (f"Data Error for {fuel} combustion.", f"Missing heat of formation for {e.args[0]}.")
+            # 2. Perform the core calculation
+            # Calculate the standard heat of reaction at 298.15 K
+            products_enthalpy_298 = sum(nu * HEATS_OF_FORMATION[s] for s, nu in products.items())
+            reactants_enthalpy_298 = sum(nu * HEATS_OF_FORMATION[s] for s, nu in reactants.items())
+            delta_H_298_kJ = products_enthalpy_298 - reactants_enthalpy_298
+            delta_H_298_J = delta_H_298_kJ * 1000 # Convert kJ to J
 
-    # Define a function for the integral of Cp/R for a single species
-    def integral_mean_cp_over_r(T, A, B, C, D):
-        return A*T + (B/2)*T**2 + (C/3)*T**3 - D/T
+            # Define integral of Cp/R
+            def integral_mean_cp_over_r(T, A, B, C, D):
+                return A*T + (B/2)*T**2 + (C/3)*T**3 - D/T
 
-    # Define the function that represents the energy balance equation
-    # We want to find T_final where this function equals zero.
-    def energy_balance(T_final):
-        # Calculate sensible heat absorbed by products from T_initial to T_final
-        # Units will be J
-        sensible_heat_products = 0
-        for species, nu in products.items():
-            params = CP_PARAMS[species]
-            A, B, C, D = params["A"], params["B"], params["C"], params["D"]
-            
-            # Integral from T_initial to T_final
-            integral_val = integral_mean_cp_over_r(T_final, A, B, C, D) - integral_mean_cp_over_r(T_initial, A, B, C, D)
-            sensible_heat_products += nu * R * integral_val
-            
-        # Energy Balance: Sensible Heat Absorbed + Heat of Reaction = 0
-        # Convert heat of reaction from kJ to J for consistency
-        return sensible_heat_products + (delta_H_298 * 1000)
+            # Define the energy balance equation (Sensible Heat + Heat of Rxn = 0)
+            def energy_balance(T_final):
+                sensible_heat_products = 0
+                for species, nu in products.items():
+                    params = CP_PARAMS[species]
+                    A, B, C, D = params["A"], params["B"], params["C"], params["D"]
+                    
+                    # Integral from T_initial to T_final
+                    val_T = integral_mean_cp_over_r(T_final, A, B, C, D)
+                    val_T0 = integral_mean_cp_over_r(T_initial, A, B, C, D)
+                    
+                    sensible_heat_products += nu * R * (val_T - val_T0)
+                    
+                return sensible_heat_products + delta_H_298_J
 
-    # Solve for the root of the energy_balance function
-    initial_guess = 2000  # A reasonable starting guess in Kelvin
-    adiabatic_temp_kelvin = fsolve(energy_balance, initial_guess)[0]
+            # Solve for the root
+            initial_guess = 2000 
+            adiabatic_temp_kelvin = fsolve(energy_balance, initial_guess)[0]
+
+            #  PHYSICS SANITY CHECK 
+            # Reject results that are physically implausible (< 1500 K or > 3500 K)
+            # This filters out bad data or unit mismatches that cause "broken" problems.
+            if 1500 < adiabatic_temp_kelvin < 3500:
+                break # Valid result found, exit loop
+
+        except (KeyError, ValueError, IndexError):
+            # If data is missing (KeyError) or solver fails, retry with a different reaction
+            continue
 
     # 3. Generate the question and solution strings
     question = (
@@ -387,20 +418,20 @@ def template_adiabatic_flame_temperature():
         f"  {equation}\n\n"
 
         f"**Step 2:** Calculate the standard heat of reaction at {T_initial} K (ΔH_rxn°).\n"
-        f"Using the provided heats of formation, the calculation is:\n"
-        f"ΔH_rxn° = Σ(ν·ΔH_f°)products - Σ(ν·ΔH_f°)reactants = {delta_H_298:.2f} kJ\n\n"
+        f"Using standard heats of formation:\n"
+        f"ΔH_rxn° = {delta_H_298_kJ:.2f} kJ\n\n"
 
         f"**Step 3:** Set up the energy balance equation.\n"
         f"For an adiabatic process, the heat released by the reaction must be absorbed as sensible heat by the products.\n"
         f"Heat Absorbed by Products + Heat of Reaction = 0\n"
-        f"  Σ[n_i * ∫[from {T_initial} to T_ad] Cp_i(T) dT]_products + ΔH_rxn° = 0\n\n"
+        f"  Σ [ n_i * ∫(Cp_i dT) from {T_initial} to T_ad ] + ΔH_rxn° = 0\n\n"
 
         f"**Step 4:** Solve the equation for the adiabatic flame temperature (T_ad).\n"
-        f"This equation is non-linear because Cp is a function of temperature. We must use a numerical root-finding algorithm to solve for T_ad where the energy balance function equals zero.\n"
-        f"An initial guess of {initial_guess} K is used for the solver.\n\n"
+        f"This equation is non-linear because Cp is a function of temperature. We use a numerical solver to find T_ad.\n"
+        f"Initial guess: {initial_guess} K\n\n"
 
-        f"**Step 5:** State the result from the numerical solver.\n"
-        f"The solver finds the temperature T_ad that satisfies the energy balance.\n"
+        f"**Step 5:** State the result.\n"
+        f"The calculated adiabatic flame temperature is:\n"
         f"T_ad = {adiabatic_temp_kelvin:.2f} K\n\n"
 
         f"**Answer:** The estimated adiabatic flame temperature is **{adiabatic_temp_kelvin:.2f} K**."

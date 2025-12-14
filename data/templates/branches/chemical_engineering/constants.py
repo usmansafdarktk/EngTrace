@@ -186,6 +186,46 @@ THERMO_SUBSTANCES = [
 ]
 
 
+# A dictionary of real-world saturation properties for common thermodynamic substances.
+# Each entry contains: temperature (°C), specific volume of saturated liquid (m³/kg),
+# and specific volume of saturated vapor (m³/kg)
+# Data sources: NIST WebBook, Engineering Toolbox, and standard thermodynamic tables.
+REAL_FLUID_DATA = {
+    #  Classic Working Fluids 
+    "Water": {"temp_C": 100, "v_f": 0.001043, "v_g": 1.6729},
+    "Ammonia": {"temp_C": 25, "v_f": 0.001658, "v_g": 0.1284},
+    "Carbon Dioxide": {"temp_C": 20, "v_f": 0.001286, "v_g": 0.0188},
+    "Sulfur Dioxide": {"temp_C": 25, "v_f": 0.000728, "v_g": 0.1165},
+    
+    #  Hydrocarbons 
+    "Methane": {"temp_C": -161, "v_f": 0.002367, "v_g": 1.8160},  # Boiling Point
+    "Ethane": {"temp_C": -89, "v_f": 0.001830, "v_g": 0.7090},  # Boiling Point
+    "Propane": {"temp_C": 25, "v_f": 0.002028, "v_g": 0.0461},
+    "Butane": {"temp_C": 25, "v_f": 0.001726, "v_g": 0.1632},
+    "Isobutane": {"temp_C": 25, "v_f": 0.001815, "v_g": 0.1118},
+    "Pentane": {"temp_C": 25, "v_f": 0.001598, "v_g": 0.5050},
+    "Iso-pentane": {"temp_C": 25, "v_f": 0.001614, "v_g": 0.4910},
+    
+    #  Refrigerants 
+    "Refrigerant-11 (R-11, Trichlorofluoromethane)": {"temp_C": 25, "v_f": 0.000675, "v_g": 0.1580},
+    "Refrigerant-12 (R-12, Dichlorodifluoromethane)": {"temp_C": 25, "v_f": 0.000763, "v_g": 0.0268},
+    "Refrigerant-22 (R-22, Chlorodifluoromethane)": {"temp_C": 25, "v_f": 0.000845, "v_g": 0.0226},
+    "Refrigerant-134a (R-134a, 1,1,1,2-Tetrafluoroethane)": {"temp_C": 25, "v_f": 0.000829, "v_g": 0.0323},
+    "Refrigerant-123 (R-123, Dichlorotrifluoroethane)": {"temp_C": 25, "v_f": 0.000680, "v_g": 0.1810},
+    "Refrigerant-410A (R-410A, blend of difluoromethane and pentafluoroethane)": {"temp_C": 25, "v_f": 0.000922, "v_g": 0.0151},
+    
+    #  Organic Solvents (Rankine Fluids) 
+    "Toluene": {"temp_C": 111, "v_f": 0.001308, "v_g": 0.3200},  # Boiling Point
+    "Benzene": {"temp_C": 80, "v_f": 0.001205, "v_g": 0.3660},  # Boiling Point
+    "Ethanol": {"temp_C": 78, "v_f": 0.001290, "v_g": 0.5770},  # Boiling Point
+    "Methanol": {"temp_C": 65, "v_f": 0.001375, "v_g": 0.8800},  # Boiling Point
+    "Acetone": {"temp_C": 56, "v_f": 0.001360, "v_g": 0.5370},  # Boiling Point
+    "n-Hexane": {"temp_C": 69, "v_f": 0.001660, "v_g": 0.3550},  # Boiling Point
+    "n-Octane": {"temp_C": 126, "v_f": 0.001690, "v_g": 0.2500},  # Boiling Point
+    "Cyclohexane": {"temp_C": 81, "v_f": 0.001420, "v_g": 0.3600}  # Boiling Point
+}
+
+
 # A dictionary with comprehensive critical properties for various substances.
 # Tc: Kelvin (K), Pc: bar, Vc: cm³/mol, Zc: dimensionless, omega: dimensionless.
 CRITICAL_PROPERTIES = {
@@ -220,47 +260,50 @@ CRITICAL_PROPERTIES = {
 
 
 # Common materials which undergo heating with their specific heat capacities in J/g·K
+# Added 'min_temp' and 'max_temp' (in °C) to ensure phase stability.
 SUBSTANCES_FOR_HEATING = [
-    # Metals & Solids
-    {"name": "Iron", "state": "solid", "Cp": 0.449},
-    {"name": "Copper", "state": "solid", "Cp": 0.385},
-    {"name": "Aluminum", "state": "solid", "Cp": 0.897},
-    {"name": "Gold", "state": "solid", "Cp": 0.129},
-    {"name": "Lead", "state": "solid", "Cp": 0.16},
-    {"name": "Silver", "state": "solid", "Cp": 0.235},
-    {"name": "Tungsten", "state": "solid", "Cp": 0.134},
-    {"name": "Silicon", "state": "solid", "Cp": 0.705},
-    {"name": "Graphite (Carbon)", "state": "solid", "Cp": 0.709},
-    {"name": "Glass (typical)", "state": "solid", "Cp": 0.84},
-    {"name": "Ice (at 0°C)", "state": "solid", "Cp": 2.09},
-    {"name": "Concrete", "state": "solid", "Cp": 0.88},
-    {"name": "Wood (typical)", "state": "solid", "Cp": 1.7},
-    {"name": "Polyethylene (plastic)", "state": "solid", "Cp": 2.3},
+    # Metals & Solids (Generally safe 20°C - 500°C)
+    {"name": "Iron", "state": "solid", "Cp": 0.449, "min_temp": 20, "max_temp": 500},
+    {"name": "Copper", "state": "solid", "Cp": 0.385, "min_temp": 20, "max_temp": 500},
+    {"name": "Aluminum", "state": "solid", "Cp": 0.897, "min_temp": 20, "max_temp": 500},
+    {"name": "Gold", "state": "solid", "Cp": 0.129, "min_temp": 20, "max_temp": 500},
+    {"name": "Lead", "state": "solid", "Cp": 0.16, "min_temp": 20, "max_temp": 300},
+    {"name": "Silver", "state": "solid", "Cp": 0.235, "min_temp": 20, "max_temp": 500},
+    {"name": "Tungsten", "state": "solid", "Cp": 0.134, "min_temp": 20, "max_temp": 1000},
+    {"name": "Silicon", "state": "solid", "Cp": 0.705, "min_temp": 20, "max_temp": 500},
+    {"name": "Graphite (Carbon)", "state": "solid", "Cp": 0.709, "min_temp": 20, "max_temp": 1000},
+    {"name": "Glass (typical)", "state": "solid", "Cp": 0.84, "min_temp": 20, "max_temp": 500},
+    {"name": "Concrete", "state": "solid", "Cp": 0.88, "min_temp": 20, "max_temp": 500},
+    {"name": "Wood (typical)", "state": "solid", "Cp": 1.7, "min_temp": 20, "max_temp": 150},
+    {"name": "Polyethylene (plastic)", "state": "solid", "Cp": 2.3, "min_temp": 20, "max_temp": 100}, # Melts ~115°C
 
-    # Liquids
-    {"name": "Water", "state": "liquid", "Cp": 4.18},
-    {"name": "Ethanol", "state": "liquid", "Cp": 2.44},
-    {"name": "Methanol", "state": "liquid", "Cp": 2.53},
-    {"name": "Acetone", "state": "liquid", "Cp": 2.17},
-    {"name": "Mercury", "state": "liquid", "Cp": 0.14},
-    {"name": "Glycerol", "state": "liquid", "Cp": 2.43},
-    {"name": "Ethylene Glycol (Antifreeze)", "state": "liquid", "Cp": 2.36},
-    {"name": "Olive Oil", "state": "liquid", "Cp": 1.97},
-    {"name": "Engine Oil (typical)", "state": "liquid", "Cp": 1.9},
-    {"name": "Sulfuric Acid", "state": "liquid", "Cp": 1.42},
+    # Phase-Sensitive Solids
+    {"name": "Ice (at 0°C)", "state": "solid", "Cp": 2.09, "min_temp": -50, "max_temp": -2}, # Must be < 0°C
 
-    # Gases (at constant pressure, 25°C)
-    {"name": "Air (dry)", "state": "gas", "Cp": 1.005},
-    {"name": "Nitrogen", "state": "gas", "Cp": 1.04},
-    {"name": "Oxygen", "state": "gas", "Cp": 0.918},
-    {"name": "Hydrogen", "state": "gas", "Cp": 14.31},
-    {"name": "Helium", "state": "gas", "Cp": 5.193},
-    {"name": "Argon", "state": "gas", "Cp": 0.520},
-    {"name": "Carbon Dioxide", "state": "gas", "Cp": 0.839},
-    {"name": "Methane", "state": "gas", "Cp": 2.22},
-    {"name": "Ammonia", "state": "gas", "Cp": 2.06},
-    {"name": "Water Vapor (Steam, 100°C)", "state": "gas", "Cp": 2.01},
-    {"name": "Chlorine", "state": "gas", "Cp": 0.48}
+    # Liquids (Must stay between Freezing and Boiling Points)
+    {"name": "Water", "state": "liquid", "Cp": 4.18, "min_temp": 5, "max_temp": 95},
+    {"name": "Ethanol", "state": "liquid", "Cp": 2.44, "min_temp": -50, "max_temp": 75}, # Boils at 78°C
+    {"name": "Methanol", "state": "liquid", "Cp": 2.53, "min_temp": -50, "max_temp": 60}, # Boils at 65°C
+    {"name": "Acetone", "state": "liquid", "Cp": 2.17, "min_temp": -50, "max_temp": 50}, # Boils at 56°C
+    {"name": "Mercury", "state": "liquid", "Cp": 0.14, "min_temp": -30, "max_temp": 300},
+    {"name": "Glycerol", "state": "liquid", "Cp": 2.43, "min_temp": 20, "max_temp": 250},
+    {"name": "Ethylene Glycol (Antifreeze)", "state": "liquid", "Cp": 2.36, "min_temp": -10, "max_temp": 190},
+    {"name": "Olive Oil", "state": "liquid", "Cp": 1.97, "min_temp": 20, "max_temp": 200},
+    {"name": "Engine Oil (typical)", "state": "liquid", "Cp": 1.9, "min_temp": 20, "max_temp": 250},
+    {"name": "Sulfuric Acid", "state": "liquid", "Cp": 1.42, "min_temp": 20, "max_temp": 300},
+
+    # Gases (Wide range, but avoid condensation for vapors)
+    {"name": "Air (dry)", "state": "gas", "Cp": 1.005, "min_temp": -50, "max_temp": 500},
+    {"name": "Nitrogen", "state": "gas", "Cp": 1.04, "min_temp": -100, "max_temp": 500},
+    {"name": "Oxygen", "state": "gas", "Cp": 0.918, "min_temp": -100, "max_temp": 500},
+    {"name": "Hydrogen", "state": "gas", "Cp": 14.31, "min_temp": -100, "max_temp": 500},
+    {"name": "Helium", "state": "gas", "Cp": 5.193, "min_temp": -200, "max_temp": 500},
+    {"name": "Argon", "state": "gas", "Cp": 0.520, "min_temp": -100, "max_temp": 500},
+    {"name": "Carbon Dioxide", "state": "gas", "Cp": 0.839, "min_temp": -50, "max_temp": 500},
+    {"name": "Methane", "state": "gas", "Cp": 2.22, "min_temp": -100, "max_temp": 500},
+    {"name": "Ammonia", "state": "gas", "Cp": 2.06, "min_temp": -20, "max_temp": 400},
+    {"name": "Water Vapor (Steam)", "state": "gas", "Cp": 2.01, "min_temp": 105, "max_temp": 400}, # Must be > 100°C
+    {"name": "Chlorine", "state": "gas", "Cp": 0.48, "min_temp": 20, "max_temp": 200}
 ]
 
 
@@ -294,16 +337,22 @@ SUBSTANCES_FOR_VAPORIZATION = [
 
 
 # Database of standard heats of formation (ΔH_f°) at 298.15 K in kJ/mol.
-# A value of 0 indicates an element in its standard state.
 HEATS_OF_FORMATION = {
-    # Hydrocarbons
+    # Hydrocarbons (Gases)
     "CH4(g)": -74.8,      # Methane
+    "C2H2(g)": 226.7,     # Acetylene (Added)
     "C2H6(g)": -84.7,     # Ethane
     "C3H8(g)": -103.8,    # Propane
+    "C4H10(g)": -125.7,   # Butane (Added)
+    "C8H18(g)": -208.4,   # Octane (Gas phase) (Added)
     "C6H6(l)": 49.0,      # Benzene
-    # Alcohols
-    "CH3OH(l)": -238.6,   # Methanol
-    "C2H5OH(l)": -277.7,  # Ethanol
+
+    # Alcohols (Liquids & Gases)
+    "CH3OH(l)": -238.6,   # Methanol (Liquid)
+    "CH3OH(g)": -200.7,   # Methanol (Gas) (Added - required for adiabatic flame temp)
+    "C2H5OH(l)": -277.7,  # Ethanol (Liquid)
+    "C2H5OH(g)": -235.1,  # Ethanol (Gas) (Added - required for adiabatic flame temp)
+
     # Common Gases & Products
     "O2(g)": 0,
     "H2(g)": 0,
@@ -312,7 +361,7 @@ HEATS_OF_FORMATION = {
     "CO2(g)": -393.5,
     "H2O(g)": -241.8,
     "H2O(l)": -285.8,
-    "NH3(g)": -46.1,      # Ammonia
+    "NH3(g)": -46.1,
     "NO(g)": 90.3,
     "NO2(g)": 33.2,
 }

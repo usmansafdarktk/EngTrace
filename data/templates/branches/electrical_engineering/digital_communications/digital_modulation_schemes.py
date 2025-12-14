@@ -39,20 +39,18 @@ def template_bpsk_energy_basis():
     k = random.randint(2, 20)
     carrier_freq_hz = k / bit_duration_s
 
-    # --- Start: Inline formatting for bit_duration_s ---
+    # Inline formatting for bit_duration_s 
     prefixes = {6: 'M', 3: 'k', 0: '', -3: 'm', -6: 'u', -9: 'n'}
     exponent_td = int(math.floor(math.log10(abs(bit_duration_s)) / 3.0) * 3)
     prefix_td = prefixes.get(exponent_td, '')
     scaled_td = bit_duration_s / (10**exponent_td)
     bit_duration_str = f"{round(scaled_td, precision)} {prefix_td}s"
-    # --- End: Inline formatting ---
 
-    # --- Start: Inline formatting for carrier_freq_hz ---
+    # Inline formatting for carrier_freq_hz 
     exponent_fc = int(math.floor(math.log10(abs(carrier_freq_hz)) / 3.0) * 3)
     prefix_fc = prefixes.get(exponent_fc, '')
     scaled_fc = carrier_freq_hz / (10**exponent_fc)
     carrier_freq_str = f"{round(scaled_fc, precision)} {prefix_fc}Hz"
-    # --- End: Inline formatting ---
 
     # 2. Perform the core calculation
     
@@ -62,12 +60,11 @@ def template_bpsk_energy_basis():
     # Calculate the amplitude of the basis function: sqrt(2 / Tb)
     basis_amplitude = math.sqrt(2 / bit_duration_s)
 
-    # --- Start: Inline formatting for energy_joules ---
+    # Inline formatting for energy_joules 
     exponent_e = int(math.floor(math.log10(abs(energy_joules)) / 3.0) * 3)
     prefix_e = prefixes.get(exponent_e, '')
     scaled_e = energy_joules / (10**exponent_e)
     energy_str = f"{round(scaled_e, precision)} {prefix_e}J"
-    # --- End: Inline formatting ---
     
     # 3. Generate the question and solution strings
 
@@ -126,21 +123,11 @@ def template_euclidean_distance_binary():
     Scenario:
         This template tests the ability to represent signals as vectors in a signal
         space and calculate the Euclidean distance between them. This distance is a
-        key factor in determining the noise immunity of a modulation scheme, as a
-        larger distance between signal points implies better performance in the
-        presence of noise. The problem covers two fundamental binary schemes:
-        antipodal (BPSK) and orthogonal (BFSK).
+        key factor in determining the noise immunity of a modulation scheme.
 
     Core Equations:
-        For BPSK (antipodal signals):
-            s1 = (sqrt(Eb))
-            s2 = (-sqrt(Eb))
-            d = 2 * sqrt(Eb)
-            
-        For Orthogonal BFSK:
-            s1 = (sqrt(Eb), 0)
-            s2 = (0, sqrt(Eb))
-            d = sqrt(2 * Eb)
+        For BPSK (antipodal): d = 2 * sqrt(Eb)
+        For BFSK (orthogonal): d = sqrt(2 * Eb)
 
     Returns:
         tuple: A tuple containing:
@@ -155,20 +142,22 @@ def template_euclidean_distance_binary():
     # Generate energy per bit, Eb, in a range from picojoules to nanojoules
     energy_joules = random.uniform(1e-12, 1e-9)
     
-    # --- Start: Inline formatting for energy_joules ---
+    # Inline formatting for energy_joules 
     prefixes = {0: '', -3: 'm', -6: 'u', -9: 'n', -12: 'p'}
     if energy_joules > 0:
         exponent_e = int(math.floor(math.log10(abs(energy_joules)) / 3.0) * 3)
         prefix_e = prefixes.get(exponent_e, '')
         scaled_e = energy_joules / (10**exponent_e)
-        energy_str = f"{round(scaled_e, precision)} {prefix_e}J"
+        energy_str = f"{scaled_e:.{precision}f} {prefix_e}J"
     else:
         energy_str = "0 J"
-    # --- End: Inline formatting ---
     
     # 2. Perform the core calculation based on modulation type
     
     sqrt_eb = math.sqrt(energy_joules)
+
+    # Use scientific notation formatting for small numbers instead of round()
+    sqrt_eb_fmt = f"{sqrt_eb:.{precision}e}"
 
     if modulation_type == 'BPSK':
         # BPSK signals are antipodal (180 degrees apart)
@@ -176,22 +165,24 @@ def template_euclidean_distance_binary():
         dimension = "one-dimensional"
         basis_count = "one basis function, psi_1(t)"
         
-        s1_str = f"({sqrt_eb:.{precision}e})"
-        s2_str = f"(-{sqrt_eb:.{precision}e})"
+        s1_str = f"({sqrt_eb_fmt})"
+        s2_str = f"(-{sqrt_eb_fmt})"
         
         distance = 2 * sqrt_eb
+        dist_fmt = f"{distance:.{precision}e}"
         
         derivation_steps = (
             f"The signal vectors are s1 = (sqrt(Eb)) and s2 = (-sqrt(Eb)).\n"
-            f"s1 = ({round(sqrt_eb, precision)})\n"
-            f"s2 = (-{round(sqrt_eb, precision)})\n\n"
+            f"s1 = ({sqrt_eb_fmt})\n"
+            f"s2 = (-{sqrt_eb_fmt})\n\n"
+            
 
             f"**Step 2:** Calculate Euclidean Distance (d)\n"
             f"The distance d is the magnitude of the difference vector (s1 - s2).\n"
             f"s1 - s2 = (sqrt(Eb) - (-sqrt(Eb))) = (2*sqrt(Eb))\n"
             f"d = ||s1 - s2|| = 2*sqrt(Eb)\n"
-            f"d = 2 * {round(sqrt_eb, precision)}\n"
-            f"d = {round(distance, precision)}"
+            f"d = 2 * {sqrt_eb_fmt}\n"
+            f"d = {dist_fmt}"
         )
 
     else: # Orthogonal BFSK
@@ -200,22 +191,24 @@ def template_euclidean_distance_binary():
         dimension = "two-dimensional"
         basis_count = "two basis functions, psi_1(t) and psi_2(t)"
 
-        s1_str = f"({sqrt_eb:.{precision}e}, 0)"
-        s2_str = f"(0, {sqrt_eb:.{precision}e})"
+        s1_str = f"({sqrt_eb_fmt}, 0)"
+        s2_str = f"(0, {sqrt_eb_fmt})"
 
         distance = math.sqrt(2 * energy_joules)
+        dist_fmt = f"{distance:.{precision}e}"
 
         derivation_steps = (
             f"The signal vectors are s1 = (sqrt(Eb), 0) and s2 = (0, sqrt(Eb)).\n"
-            f"s1 = ({round(sqrt_eb, precision)}, 0)\n"
-            f"s2 = (0, {round(sqrt_eb, precision)})\n\n"
+            f"s1 = ({sqrt_eb_fmt}, 0)\n"
+            f"s2 = (0, {sqrt_eb_fmt})\n\n"
+            
 
             f"**Step 2: ** Calculate Euclidean Distance (d)\n"
             f"The distance d is the magnitude of the difference vector (s1 - s2).\n"
             f"s1 - s2 = (sqrt(Eb) - 0, 0 - sqrt(Eb)) = (sqrt(Eb), -sqrt(Eb))\n"
             f"d = ||s1 - s2|| = sqrt( (sqrt(Eb))^2 + (-sqrt(Eb))^2 ) = sqrt(2*Eb)\n"
             f"d = sqrt(2 * {energy_joules:.{precision}e})\n"
-            f"d = {round(distance, precision)}"
+            f"d = {dist_fmt}"
         )
 
     # 3. Generate the question and solution strings
@@ -235,14 +228,14 @@ def template_euclidean_distance_binary():
         
         f"**Step 1:** Define Signal Vectors\n"
         f"For {modulation_type} modulation, the signals are {constellation_type}. This means we can represent them in a {dimension} signal space using {basis_count}.\n"
-        f"First, we calculate sqrt(Eb) = sqrt({energy_joules:.{precision}e}) = {round(sqrt_eb, precision)}.\n"
+        f"First, we calculate sqrt(Eb) = sqrt({energy_joules:.{precision}e}) = {sqrt_eb_fmt}.\n"
         f"{derivation_steps}\n\n"
         
         f"**Answer:**\n"
         f"a) The signal constellation points are:\n"
         f"s1 = {s1_str}\n"
         f"s2 = {s2_str}\n"
-        f"b) The Euclidean distance between the points is {round(distance, precision)}."
+        f"b) The Euclidean distance between the points is {dist_fmt}."
     )
 
     return question, solution
@@ -254,39 +247,31 @@ def template_average_energy_mqam():
     Average Energy of an M-QAM Constellation
 
     Scenario:
-        For designing power-efficient transmitters, understanding the average energy
-        per transmitted symbol is crucial. Unlike M-PSK where all symbols have the
-        same energy, square M-QAM constellations have symbols with varying energies.
         This template tests the ability to calculate the average symbol energy by
         analyzing the geometry of the constellation.
 
     Core Equations:
-        Coordinates: (xi, yj) where xi, yj are in {+/-A, +/-3A, ...}
-        Symbol Energy: Ei = xi^2 + yj^2
-        Average Energy: E_avg = (1/M) * Sum(Ei for all points)
         General Formula: E_avg = (2/3) * (M - 1) * A^2
 
     Returns:
         tuple: A tuple containing:
-            - str: A question asking for the average energy of an M-QAM constellation.
-            - str: A step-by-step solution showing the calculation.
+            - str: A question asking for the average energy.
+            - str: A step-by-step solution.
     """
     # 1. Parameterize the inputs with random values
     precision = 2
     # Add 256-QAM to the list of possible modulation orders
     M = random.choice([4, 16, 64, 256])
-    # Randomly decide whether A is an integer or a float for more variety
+    
+    # Randomly decide whether A is an integer or a float
     if random.choice([True, False]):
-        # Generate an integer A
         A = random.randint(1, 10)
     else:
-        # Generate a float A from a wider range
         A = round(random.uniform(0.2, 10.0), precision)
     
     # 2. Perform the core calculation based on M
     
     # The general formula for average energy in a square M-QAM is (2/3)(M-1)A^2
-    # We will calculate it directly for the solution steps.
     avg_energy_coeff = (2/3) * (M - 1)
     avg_energy = avg_energy_coeff * (A**2)
 
@@ -315,25 +300,37 @@ def template_average_energy_mqam():
 
             f"**Step 3:** Calculate Average Energy (E_avg)\n"
             f"We sum the energies of all points and divide by M.\n"
-            f"Total Energy = 4*(2A^2) + 8*(10A^2) + 4*(18A^2) = 8A^2 + 80A^2 + 72A^2 = 160A^2\n"
+            f"Total Energy = 4*(2A^2) + 8*(10A^2) + 4*(18A^2) = 160A^2\n"
             f"E_avg = (Total Energy) / M = (160 * A^2) / 16 = 10 * A^2\n"
         )
         
-    else: # M == 64
+    elif M == 64:
         coordinate_set = "{+/-A, +/-3A, +/-5A, +/-7A}"
-        total_energy_coeff = 64 * avg_energy_coeff
         solution_steps = (
             "**Step 2:** List Signal Point Energies\n"
             "For 64-QAM, there are many groups of points with the same energy. We list a few examples:\n"
-            "The 4 innermost points at (+/-A, +/-A) have energy E = A^2 + A^2 = 2A^2.\n"
-            "The 8 points at (+/-A, +/-3A) or (+/-3A, +/-A) have energy E = A^2 + (3A)^2 = 10A^2.\n"
-            "The 4 outermost points at (+/-7A, +/-7A) have energy E = (7A)^2 + (7A)^2 = 98A^2.\n"
+            "- The 4 innermost points at (+/-A, +/-A) have energy E = 2A^2.\n"
+            "- The 4 outermost points at (+/-7A, +/-7A) have energy E = (7A)^2 + (7A)^2 = 98A^2.\n"
             "This process is continued for all 64 points.\n\n"
 
             "**Step 3:** Calculate Average Energy (E_avg)\n"
-            "Summing the energies for all 64 points and dividing by M gives the average. We can also use the general formula for square M-QAM: E_avg = (2/3)*(M-1)*A^2.\n"
+            "Summing the energies for all 64 points and dividing by M gives the average. We use the general formula for square M-QAM: E_avg = (2/3)*(M-1)*A^2.\n"
             "E_avg = (2/3) * (64 - 1) * A^2\n"
             "E_avg = (2/3) * 63 * A^2 = 42 * A^2\n"
+        )
+
+    else: # M == 256 (Explicit handling for 256-QAM)
+        coordinate_set = "{+/-A, +/-3A, ..., +/-15A}"
+        solution_steps = (
+            "**Step 2:** List Signal Point Energies\n"
+            "For 256-QAM, the grid extends from -15A to +15A. Calculating individual point energies is tedious, so we rely on the general formula derived from the sum of squares.\n"
+            "- Innermost points: (+/-A, +/-A)\n"
+            "- Outermost points: (+/-15A, +/-15A)\n\n"
+
+            "**Step 3:** Calculate Average Energy (E_avg)\n"
+            "Using the general formula for square M-QAM: E_avg = (2/3)*(M-1)*A^2.\n"
+            "E_avg = (2/3) * (256 - 1) * A^2\n"
+            "E_avg = (2/3) * 255 * A^2 = 170 * A^2\n"
         )
 
     # 3. Generate the question and solution strings
@@ -347,7 +344,8 @@ def template_average_energy_mqam():
     solution = (
         f"**Given Information:**\n"
         f"Modulation Scheme: {M}-QAM\n"
-        f"Distance Parameter (A): {A}\n\n"
+        f"Distance Parameter (A): {A}\n"
+        f"\n\n"
         
         f"**Step 1:** Understand the Constellation Structure\n"
         f"The constellation is a square grid where coordinates are odd multiples of A. The energy of any point (x, y) is simply x^2 + y^2.\n\n"
@@ -540,7 +538,7 @@ def template_null_to_null_bandwidth():
     symbol_rate_rs = bit_rate_hz / k
     bandwidth_hz = 2 * symbol_rate_rs
 
-    # --- Start: Inline formatting for bandwidth_hz ---
+    #  Start: Inline formatting for bandwidth_hz 
     prefixes = {12: 'T', 9: 'G', 6: 'M', 3: 'k', 0: ''}
     if bandwidth_hz > 0:
         exponent_b = int(math.floor(math.log10(abs(bandwidth_hz)) / 3.0) * 3)
@@ -549,9 +547,9 @@ def template_null_to_null_bandwidth():
         bandwidth_str = f"{round(scaled_b, precision)} {prefix_b}Hz"
     else:
         bandwidth_str = "0 Hz"
-    # --- End: Inline formatting ---
+    #  End: Inline formatting 
 
-    # --- Start: Inline formatting for symbol_rate_rs ---
+    #  Start: Inline formatting for symbol_rate_rs 
     if symbol_rate_rs > 0:
         exponent_rs = int(math.floor(math.log10(abs(symbol_rate_rs)) / 3.0) * 3)
         prefix_rs = prefixes.get(exponent_rs, '')
@@ -559,7 +557,7 @@ def template_null_to_null_bandwidth():
         symbol_rate_str = f"{round(scaled_rs, precision)} {prefix_rs}symbols/s"
     else:
         symbol_rate_str = "0 symbols/s"
-    # --- End: Inline formatting ---
+    #  End: Inline formatting 
 
 
     # 3. Generate the question and solution strings

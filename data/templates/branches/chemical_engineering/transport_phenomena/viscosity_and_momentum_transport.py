@@ -97,7 +97,7 @@ def template_kinematic_viscosity():
     Returns:
         tuple: A tuple containing:
             - str: A question asking to compute the kinematic viscosity.
-            - str: A step-by-step solution showing the calculation and unit conversion.
+            - str: A step-by-step solution showing the calculation.
     """
     # 1. Parameterize the inputs with random values
     
@@ -135,6 +135,7 @@ def template_kinematic_viscosity():
         f"**Step 1:** State the formula for kinematic viscosity.\n"
         f"Kinematic viscosity (ν) is defined as the ratio of dynamic viscosity to density:\n"
         f"ν = μ / ρ\n\n"
+        f"\n\n"
         
         f"**Step 2:** Calculate the kinematic viscosity in SI units (m²/s).\n"
         f"Substitute the given values into the formula:\n"
@@ -144,16 +145,18 @@ def template_kinematic_viscosity():
     
     # Add the unit conversion step only if needed
     if "Stokes" in target_units:
+        # Fixed formatting here to avoid 0.0000 for small values
         solution += (
             f"**Step 3:** Convert the result to Stokes (St).\n"
             f"The conversion factor is 1 m²/s = 10,000 St.\n"
             f"ν = ({nu_si:.3e} m²/s) * (10,000 St / 1 m²/s)\n"
-            f"ν = {final_nu:.4f} St\n\n"
+            f"ν = {final_nu:.4e} St\n\n"
         )
         
     solution += (
         f"**Answer:**\n"
-        f"The kinematic viscosity of {fluid_name} is **{final_nu:.4f} {target_units}**."
+        # Fixed formatting here to avoid 0.0000 for small values
+        f"The kinematic viscosity of {fluid_name} is **{final_nu:.4e} {target_units}**."
     )
 
     return question, solution

@@ -1,5 +1,5 @@
 import random
-from data.templates.branches.chemical_engineering.constants import GENERAL_REACTANTS, LIQUID_PHASE_REACTANTS, GAS_PHASE_REACTANTS, PRODUCTS
+from data.templates.branches.chemical_engineering.constants import GENERAL_REACTANTS, LIQUID_PHASE_REACTANTS, GAS_PHASE_REACTANTS, PRODUCTS, REACTIONS
 
 
 # Template 1 (Easy)
@@ -23,25 +23,37 @@ def template_batch_moles_vs_conversion():
             - str: A question about calculating final moles in a batch reactor.
             - str: A detailed, step-by-step solution.
     """
-    # 1. Randomized Parameters
-    
-    # Select names for reactants and products
-    reactant_A_name, reactant_B_name = random.sample(LIQUID_PHASE_REACTANTS, 2)
-    product_C_name, product_D_name = random.sample(PRODUCTS, 2)
-    
-    # Generate stoichiometric coefficients
-    a = random.choice([1, 2])
-    b = random.randint(1, 3)
-    c = random.randint(1, 3)
-    d = random.randint(1, 3)
+    # 1. Parameterize Inputs using Valid Reactions
+    # Select a real, pre-balanced reaction to ensure chemical plausibility
+    reaction_data = random.choice(REACTIONS)
+    equation = reaction_data["equation"]
 
-    # Generate initial moles, ensuring A is the limiting reactant
+    # Extract reactants and products
+    reactant_items = list(reaction_data["reactants"].items())
+    product_items = list(reaction_data["products"].items())
+
+    # Map to A, B, C, D variables
+    # We assume the reaction has at least 2 reactants.
+    reactant_A_name, a = reactant_items[0]
+    reactant_B_name, b = reactant_items[1]
+    
+    product_C_name, c = product_items[0]
+    # Handle case where there might be only 1 product
+    has_product_D = len(product_items) > 1
+    if has_product_D:
+        product_D_name, d = product_items[1]
+    else:
+        product_D_name, d = "None", 0
+
+    # Generate initial moles
+    # Ensure A is the limiting reactant (N_A0/a < N_B0/b)
     N_A0 = round(random.uniform(10.0, 25.0), 2)
-    # Ensure B is in excess (at least 20% more than stoichiometrically required)
-    N_B0 = round((N_A0 * b / a) * random.uniform(1.2, 2.0), 2)
-    # Initial moles of products are often zero but can be non-zero
-    N_C0 = round(random.choice([0.0, random.uniform(1.0, 5.0)]), 2)
-    N_D0 = round(random.choice([0.0, random.uniform(1.0, 5.0)]), 2)
+    min_N_B0 = (N_A0 / a) * b
+    N_B0 = round(min_N_B0 * random.uniform(1.2, 2.0), 2)
+    
+    # Explicitly set initial product moles to zero for clarity
+    N_C0 = 0.0
+    N_D0 = 0.0
 
     # Generate a realistic conversion for the limiting reactant A
     X_A = round(random.uniform(0.40, 0.95), 2)
@@ -50,63 +62,63 @@ def template_batch_moles_vs_conversion():
     N_A = N_A0 * (1 - X_A)
     N_B = N_B0 - (b / a) * N_A0 * X_A
     N_C = N_C0 + (c / a) * N_A0 * X_A
-    N_D = N_D0 + (d / a) * N_A0 * X_A
+    N_D = N_D0 + (d / a) * N_A0 * X_A if has_product_D else 0.0
 
     # 3. Generate Question and Solution Strings
-    
-    # Helper function to format the reaction string cleanly (e.g., "A" instead of "1A")
-    def format_species(coeff, name):
-        return f"{coeff if coeff > 1 else ''}{name}"
-
-    reaction_string = (
-        f"{format_species(a, reactant_A_name)} + {format_species(b, reactant_B_name)} -> "
-        f"{format_species(c, product_C_name)} + {format_species(d, product_D_name)}"
-    )
-
     question = (
-        f"Consider the following elementary liquid-phase reaction carried out in a batch reactor:\n"
-        f"**Reaction:** ${reaction_string}$\n\n"
-        f"The reactor is initially charged with ${N_A0}$ moles of {reactant_A_name}, "
-        f"${N_B0}$ moles of {reactant_B_name}, and ${N_C0}$ moles of {product_C_name}. "
+        f"Consider the following reaction carried out in a batch reactor:\n"
+        f"**Reaction:** ${equation}$\n\n"
+        f"The reactor is initially charged with ${N_A0}$ moles of {reactant_A_name} and "
+        f"${N_B0}$ moles of {reactant_B_name}. Assume the initial amount of products is zero.\n"
         f"{reactant_A_name} is the limiting reactant.\n\n"
-        f"If the reaction is allowed to proceed until a conversion of ${X_A}$ ($_A$) is achieved, "
+        f"If the reaction is allowed to proceed until a conversion of ${X_A}$ ($X_A$) is achieved, "
         f"calculate the final number of moles of all species in the reactor."
     )
 
     solution = (
         f"**Step 1:** Identify Given Information\n"
-        f"- Reaction: ${reaction_string}$\n"
+        f"- Reaction: ${equation}$\n"
         f"- Initial Moles:\n"
         f"  - $N_{{{reactant_A_name},0}} = {N_A0}$ mol\n"
         f"  - $N_{{{reactant_B_name},0}} = {N_B0}$ mol\n"
-        f"  - $N_{{{product_C_name},0}} = {N_C0}$ mol\n"
-        f"  - $N_{{{product_D_name},0}} = {N_D0}$ mol\n"
+        f"  - Products = 0 mol\n"
         f"- Conversion of {reactant_A_name}: $X_A = {X_A}$\n\n"
         
         f"**Step 2:** Write Stoichiometric Relations in Terms of Conversion\n"
-        f"The number of moles of each species ($N_j$) at any conversion $X_A$ can be expressed using the following design equations for a batch system:\n"
+        f"The number of moles of each species ($N_j$) at any conversion $X_A$ is given by:\n"
         f"- $N_A = N_{{A,0}}(1 - X_A)$\n"
-        f"- $N_B = N_{{B,0}} - (b/a) N_{{A,0}} X_A$\n"
-        f"- $N_C = N_{{C,0}} + (c/a) N_{{A,0}} X_A$\n"
-        f"- $N_D = N_{{D,0}} + (d/a) N_{{A,0}} X_A$\n\n"
+        f"- $N_B = N_{{B,0}} - ({b}/{a}) N_{{A,0}} X_A$\n"
+        f"- $N_C = N_{{C,0}} + ({c}/{a}) N_{{A,0}} X_A$\n"
+    )
+    if has_product_D:
+        solution += f"- $N_D = N_{{D,0}} + ({d}/{a}) N_{{A,0}} X_A$\n"
+    solution += "\n"
         
+    solution += (
         f"**Step 3:** Calculate Final Moles for Each Species\n"
         f"For {reactant_A_name} (A):\n"
-        f"$N_A = {N_A0}(1 - {X_A}) = {N_A0}({1-X_A}) = {round(N_A, 3)}$ mol\n\n"
+        f"$N_A = {N_A0}(1 - {X_A}) = {N_A0}({1-X_A:.2f}) = {round(N_A, 3)}$ mol\n\n"
         f"For {reactant_B_name} (B):\n"
         f"$N_B = {N_B0} - ({b}/{a}) \\times {N_A0} \\times {X_A} = {N_B0} - {round((b/a)*N_A0*X_A, 3)} = {round(N_B, 3)}$ mol\n\n"
         f"For {product_C_name} (C):\n"
-        f"$N_C = {N_C0} + ({c}/{a}) \\times {N_A0} \\times {X_A} = {N_C0} + {round((c/a)*N_A0*X_A, 3)} = {round(N_C, 3)}$ mol\n\n"
-        f"For {product_D_name} (D):\n"
-        f"$N_D = {N_D0} + ({d}/{a}) \\times {N_A0} \\times {X_A} = {N_D0} + {round((d/a)*N_A0*X_A, 3)} = {round(N_D, 3)}$ mol\n\n"
+        f"$N_C = 0 + ({c}/{a}) \\times {N_A0} \\times {X_A} = {round((c/a)*N_A0*X_A, 3)} = {round(N_C, 3)}$ mol\n\n"
+    )
+    
+    if has_product_D:
+        solution += (
+            f"For {product_D_name} (D):\n"
+            f"$N_D = 0 + ({d}/{a}) \\times {N_A0} \\times {X_A} = {round((d/a)*N_A0*X_A, 3)} = {round(N_D, 3)}$ mol\n\n"
+        )
         
+    solution += (
         f"**Final Answer**\n"
         f"After reaching a conversion of ${X_A*100} \%$, the final number of moles in the reactor are:\n"
         f"- {reactant_A_name}: ${round(N_A, 3)}$ mol\n"
         f"- {reactant_B_name}: ${round(N_B, 3)}$ mol\n"
         f"- {product_C_name}: ${round(N_C, 3)}$ mol\n"
-        f"- {product_D_name}: ${round(N_D, 3)}$ mol"
     )
+    if has_product_D:
+        solution += f"- {product_D_name}: ${round(N_D, 3)}$ mol"
 
     return question, solution
 
@@ -122,31 +134,46 @@ def template_flow_system_molar_flow_rates():
         inlet flow rates and the conversion of a limiting reactant. The calculation
         is an application of stoichiometric principles to a flow system, using:
 
-            $F_A = F_{A0}(1 - X_A)$
-            $F_j = F_{j0} + \\nu_j F_{A0} X_A = F_{A0}(\\Theta_j + \\nu_j X_A)$
+            F_A = F_A0(1 - X_A)
+            F_j = F_j0 + nu_j * F_A0 * X_A = F_A0(Theta_j + nu_j * X_A)
 
-        where $\\nu_j$ is the stoichiometric coefficient and $\\Theta_j = F_{j0}/F_{A0}$.
+        where nu_j is the stoichiometric coefficient and Theta_j = F_j0/F_A0.
 
     Returns:
         tuple: A tuple containing:
             - str: A question about calculating outlet molar flow rates.
             - str: A detailed, step-by-step solution.
     """
-    # 1. Randomized Parameters
-    
-    # Select unique names for reactants and products
-    reactant_A_name, reactant_B_name = random.sample(GENERAL_REACTANTS, 2)
-    product_C_name, product_D_name = random.sample(PRODUCTS, 2)
-    
-    # Generate stoichiometric coefficients
-    a = random.choice([1, 2])
-    b = random.randint(1, 3)
-    c = random.randint(1, 3)
-    d = random.randint(1, 3)
+    # 1. Parameterize Inputs using Valid Reactions
+    # Select a real, pre-balanced reaction to ensure chemical plausibility
+    reaction_data = random.choice(REACTIONS)
+    equation = reaction_data["equation"]
 
-    # Generate inlet molar flow rates (mol/min), ensuring A is limiting
+    # Extract reactants and products
+    # The dictionaries are in the format {"Name": coefficient}
+    reactant_items = list(reaction_data["reactants"].items())
+    product_items = list(reaction_data["products"].items())
+
+    # Map to A, B, C, D variables
+    # We assume the reaction has at least 2 reactants.
+    reactant_A_name, a = reactant_items[0]
+    reactant_B_name, b = reactant_items[1]
+    
+    product_C_name, c = product_items[0]
+    # Handle case where there might be only 1 product
+    has_product_D = len(product_items) > 1
+    if has_product_D:
+        product_D_name, d = product_items[1]
+    else:
+        product_D_name, d = "None", 0
+
+    # Generate inlet molar flow rates (mol/min)
+    # Ensure A is the limiting reactant by providing excess B
     F_A0 = round(random.uniform(50.0, 150.0), 2)
-    F_B0 = round((F_A0 * b / a) * random.uniform(1.2, 2.5), 2)
+    min_F_B0 = (F_A0 / a) * b
+    F_B0 = round(min_F_B0 * random.uniform(1.2, 2.5), 2)
+    
+    # Inlet product flow is usually zero or small
     F_C0 = round(random.choice([0.0, random.uniform(5.0, 20.0)]), 2)
     F_D0 = 0.0
 
@@ -155,7 +182,7 @@ def template_flow_system_molar_flow_rates():
 
     # 2. Core Calculations
     
-    # Calculate Theta values for use in the solution string
+    # Calculate Theta values
     Theta_B = F_B0 / F_A0
     Theta_C = F_C0 / F_A0
 
@@ -163,75 +190,81 @@ def template_flow_system_molar_flow_rates():
     F_A = F_A0 * (1 - X_A)
     F_B = F_B0 - (b / a) * F_A0 * X_A
     F_C = F_C0 + (c / a) * F_A0 * X_A
-    F_D = F_D0 + (d / a) * F_A0 * X_A
+    F_D = F_D0 + (d / a) * F_A0 * X_A if has_product_D else 0.0
     
     # 3. Generate Question and Solution Strings
-    
-    def format_species(coeff, name):
-        return f"{coeff if coeff > 1 else ''}{' ' if coeff > 1 else ''}{name}"
-
-    reaction_string = (
-        f"{format_species(a, reactant_A_name)} + {format_species(b, reactant_B_name)} -> "
-        f"{format_species(c, product_C_name)} + {format_species(d, product_D_name)}"
-    )
-
     question = (
         f"A reaction is carried out in a steady-state Plug Flow Reactor (PFR):\n"
-        f"**Reaction:** ${reaction_string}$\n\n"
-        f"The reactor is fed with {reactant_A_name} at a rate of ${F_A0}$ mol/min, "
-        f"{reactant_B_name} at ${F_B0}$ mol/min, and {product_C_name} at ${F_C0}$ mol/min. "
+        f"**Reaction:** {equation}\n\n"
+        f"The reactor is fed with {reactant_A_name} at a rate of {F_A0} mol/min, "
+        f"{reactant_B_name} at {F_B0} mol/min, and {product_C_name} at {F_C0} mol/min. "
         f"{reactant_A_name} is the limiting reactant.\n\n"
-        f"The reactor is designed to achieve a conversion of ${X_A}$ ($X_A$) for the limiting reactant. "
+        f"The reactor is designed to achieve a conversion of {X_A} (X_A) for the limiting reactant. "
         f"Calculate the molar flow rates of all species exiting the reactor."
     )
 
     solution = (
         f"**Step 1:** Identify Given Information\n"
-        f"- Reaction: ${reaction_string}$\n"
+        f"- Reaction: {equation}\n"
         f"- Inlet Molar Flow Rates:\n"
-        f"  - $F_{{A,0}} = {F_A0}$ mol/min\n"
-        f"  - $F_{{B,0}} = {F_B0}$ mol/min\n"
-        f"  - $F_{{C,0}} = {F_C0}$ mol/min\n"
-        f"  - $F_{{D,0}} = {F_D0}$ mol/min\n"
-        f"- Conversion of {reactant_A_name}: $X_A = {X_A}$\n\n"
+        f"  - F_A0 = {F_A0} mol/min\n"
+        f"  - F_B0 = {F_B0} mol/min\n"
+        f"  - F_C0 = {F_C0} mol/min\n"
+    )
+    if has_product_D:
+        solution += f"  - F_D0 = {F_D0} mol/min\n"
+    
+    solution += (
+        f"- Conversion of {reactant_A_name}: X_A = {X_A}\n\n"
         
         f"**Step 2:** Stoichiometric Relations for a Flow System\n"
-        f"The outlet molar flow rate ($F_j$) of any species is given by:\n"
-        f"$F_j = F_{{j,0}} + \\nu_j F_{{A,0}} X_A$\n"
-        f"Alternatively, in terms of $\\Theta_j = F_{{j,0}} / F_{{A,0}}$:\n"
-        f"$F_j = F_{{A,0}}(\\Theta_j + \\nu_j X_A)$\n"
-        f"Here, the normalized stoichiometric coefficients ($\\nu_j$) are:\n"
-        f"$\\nu_A = -1$, $\\nu_B = -{b}/{a}$, $\\nu_C = +{c}/{a}$, $\\nu_D = +{d}/{a}$\n\n"
-        
+        f"The outlet molar flow rate (F_j) of any species is given by:\n"
+        f"F_j = F_j0 + nu_j * F_A0 * X_A\n"
+        f"Alternatively, in terms of Theta_j = F_j0 / F_A0:\n"
+        f"F_j = F_A0(Theta_j + nu_j * X_A)\n"
+        f"Here, the normalized stoichiometric coefficients (nu_j) relative to A are:\n"
+        f"nu_A = -1, nu_B = -{b}/{a}, nu_C = +{c}/{a}"
+    )
+    if has_product_D:
+        solution += f", nu_D = +{d}/{a}"
+    solution += "\n\n"
+
+    solution += (
         f"**Step 3:** Calculate Outlet Molar Flow Rates\n\n"
         f"**For {reactant_A_name} (A):**\n"
-        f"$F_A = F_{{A,0}}(1 - X_A) = {F_A0}(1 - {X_A}) = {round(F_A, 2)}$ mol/min\n\n"
+        f"F_A = F_A0(1 - X_A) = {F_A0}(1 - {X_A}) = {round(F_A, 2)} mol/min\n\n"
         
         f"**For {reactant_B_name} (B):**\n"
         f"*Using the Direct Method:*\n"
-        f"$F_B = F_{{B,0}} - ({b}/{a}) F_{{A,0}} X_A = {F_B0} - ({b}/{a}) \\times {F_A0} \\times {X_A} = {round(F_B, 2)}$ mol/min\n"
-        f"*Using the $\\Theta$ Method:*\n"
-        f"First, $\\Theta_B = F_{{B,0}} / F_{{A,0}} = {F_B0} / {F_A0} = {round(Theta_B, 3)}$\n"
-        f"$F_B = F_{{A,0}}(\\Theta_B - ({b}/{a})X_A) = {F_A0}({round(Theta_B, 3)} - ({b}/{a}) \\times {X_A}) = {round(F_B, 2)}$ mol/min\n\n"
+        f"F_B = F_B0 - ({b}/{a}) * F_A0 * X_A = {F_B0} - ({b}/{a}) * {F_A0} * {X_A} = {round(F_B, 2)} mol/min\n"
+        f"*Using the Theta Method:*\n"
+        f"Theta_B = F_B0 / F_A0 = {F_B0} / {F_A0} = {round(Theta_B, 3)}\n"
+        f"F_B = F_A0(Theta_B - ({b}/{a})X_A) = {F_A0}({round(Theta_B, 3)} - ({b}/{a}) * {X_A}) = {round(F_B, 2)} mol/min\n\n"
 
         f"**For {product_C_name} (C):**\n"
         f"*Using the Direct Method:*\n"
-        f"$F_C = F_{{C,0}} + ({c}/{a}) F_{{A,0}} X_A = {F_C0} + ({c}/{a}) \\times {F_A0} \\times {X_A} = {round(F_C, 2)}$ mol/min\n"
-        f"*Using the $\\Theta$ Method:*\n"
-        f"First, $\\Theta_C = F_{{C,0}} / F_{{A,0}} = {F_C0} / {F_A0} = {round(Theta_C, 3)}$\n"
-        f"$F_C = F_{{A,0}}(\\Theta_C + ({c}/{a})X_A) = {F_A0}({round(Theta_C, 3)} + ({c}/{a}) \\times {X_A}) = {round(F_C, 2)}$ mol/min\n\n"
+        f"F_C = F_C0 + ({c}/{a}) * F_A0 * X_A = {F_C0} + ({c}/{a}) * {F_A0} * {X_A} = {round(F_C, 2)} mol/min\n"
+        f"*Using the Theta Method:*\n"
+        f"Theta_C = F_C0 / F_A0 = {F_C0} / {F_A0} = {round(Theta_C, 3)}\n"
+        f"F_C = F_A0(Theta_C + ({c}/{a})X_A) = {F_A0}({round(Theta_C, 3)} + ({c}/{a}) * {X_A}) = {round(F_C, 2)} mol/min\n\n"
+    )
 
-        f"**For {product_D_name} (D):**\n"
-        f"Since $F_{{D,0}} = 0$, $\\Theta_D = 0$. The calculation is straightforward:\n"
-        f"$F_D = F_{{D,0}} + ({d}/{a}) F_{{A,0}} X_A = 0 + ({d}/{a}) \\times {F_A0} \\times {X_A} = {round(F_D, 2)}$ mol/min\n\n"
+    if has_product_D:
+        solution += (
+            f"**For {product_D_name} (D):**\n"
+            f"Since F_D0 = 0, the calculation is straightforward:\n"
+            f"F_D = F_D0 + ({d}/{a}) * F_A0 * X_A = 0 + ({d}/{a}) * {F_A0} * {X_A} = {round(F_D, 2)} mol/min\n\n"
+        )
 
+    solution += (
         f"**Final Answer**\n"
         f"The molar flow rates exiting the reactor are:\n"
-        f"- {reactant_A_name} ($F_A$): ${round(F_A, 2)}$ mol/min\n"
-        f"- {reactant_B_name} ($F_B$): ${round(F_B, 2)}$ mol/min\n"
-        f"- {product_C_name} ($F_C$): ${round(F_C, 2)}$ mol/min\n"
-        f"- {product_D_name} ($F_D$): ${round(F_D, 2)}$ mol/min"
+        f"- {reactant_A_name} (F_A): {round(F_A, 2)} mol/min\n"
+        f"- {reactant_B_name} (F_B): {round(F_B, 2)} mol/min\n"
+        f"- {product_C_name} (F_C): {round(F_C, 2)} mol/min\n"
     )
+    if has_product_D:
+        solution += f"- {product_D_name} (F_D): {round(F_D, 2)} mol/min"
 
     return question, solution
 
@@ -258,31 +291,44 @@ def template_limiting_reactant():
             - str: A question requiring identification of the limiting reactant.
             - str: A detailed solution showing the identification and calculation steps.
     """
-    # 1. Randomized Parameters
+    # 1. Parameterize Inputs using Valid Reactions
+    # Select a real, pre-balanced reaction to ensure chemical plausibility
+    reaction_data = random.choice(REACTIONS)
+    
+    # Extract reactants and products
+    # The dictionaries are in the format {"Name": coefficient}
+    reactant_items = list(reaction_data["reactants"].items())
+    product_items = list(reaction_data["products"].items())
 
-    # Select unique names for reactants and products
-    reactant_A_name, reactant_B_name = random.sample(GENERAL_REACTANTS, 2)
-    product_C_name, product_D_name = random.sample(PRODUCTS, 2)
+    # Map to A, B, C, D variables for the template logic
+    # We assume the reaction has at least 2 reactants and 1-2 products based on the constants file
+    reactant_A_name, a = reactant_items[0]
+    reactant_B_name, b = reactant_items[1]
+    
+    product_C_name, c = product_items[0]
+    # Handle case where there might be only 1 product or 2
+    if len(product_items) > 1:
+        product_D_name, d = product_items[1]
+    else:
+        # Create a dummy placeholder if only 1 product exists to prevent errors
+        product_D_name, d = "Heat/Other", 0
 
-    # Generate stoichiometric coefficients
-    a = random.randint(1, 3)
-    b = random.randint(1, 3)
-    c = random.randint(1, 3)
-    d = random.randint(1, 3)
-
-    # Randomly decide which reactant will be limiting
+    # Randomly decide which reactant will be limiting to vary the problem type
     is_A_limiting = random.choice([True, False])
 
     # Generate initial moles based on which reactant is limiting
     if is_A_limiting:
         N_A0 = round(random.uniform(20.0, 50.0), 2)
-        # Make B the excess reactant
-        N_B0 = round((N_A0 * b / a) * random.uniform(1.1, 2.0), 2)
+        # Make B the excess reactant (ratio N_B0/b > N_A0/a)
+        min_B = (N_A0 / a) * b
+        N_B0 = round(min_B * random.uniform(1.2, 2.0), 2)
     else: # B is limiting
         N_B0 = round(random.uniform(20.0, 50.0), 2)
-        # Make A the excess reactant
-        N_A0 = round((N_B0 * a / b) * random.uniform(1.1, 2.0), 2)
+        # Make A the excess reactant (ratio N_A0/a > N_B0/b)
+        min_A = (N_B0 / b) * a
+        N_A0 = round(min_A * random.uniform(1.2, 2.0), 2)
     
+    # Explicitly define initial product moles as zero
     N_C0 = 0.0
     N_D0 = 0.0
 
@@ -299,7 +345,6 @@ def template_limiting_reactant():
         # Case 1: A is the limiting reactant
         limiting_reactant_name = reactant_A_name
         limiting_reactant_sym = 'A'
-        excess_reactant_name = reactant_B_name
         
         # Calculate final moles based on X_A
         N_A = N_A0 * (1 - X)
@@ -310,7 +355,6 @@ def template_limiting_reactant():
         # Case 2: B is the limiting reactant
         limiting_reactant_name = reactant_B_name
         limiting_reactant_sym = 'B'
-        excess_reactant_name = reactant_A_name
 
         # Calculate final moles based on X_B
         N_A = N_A0 - (a / b) * N_B0 * X
@@ -319,20 +363,14 @@ def template_limiting_reactant():
         N_D = N_D0 + (d / b) * N_B0 * X
 
     # 3. Generate Question and Solution Strings
-    def format_species(coeff, name):
-        return f"{coeff if coeff > 1 else ''}{' ' if coeff > 1 else ''}{name}"
-
-    reaction_string = (
-        f"{format_species(a, reactant_A_name)} + {format_species(b, reactant_B_name)} -> "
-        f"{format_species(c, product_C_name)} + {format_species(d, product_D_name)}"
-    )
+    equation = reaction_data["equation"]
 
     question = (
         f"The following reaction occurs in a batch reactor:\n"
-        f"**Reaction:** ${reaction_string}$\n\n"
-        f"The reactor is initially charged with ${N_A0}$ moles of {reactant_A_name} and "
-        f"${N_B0}$ moles of {reactant_B_name}. The reaction is allowed to proceed until "
-        f"a ${X*100}\%$ conversion of the limiting reactant is achieved.\n\n"
+        f"**Reaction:** {equation}\n\n"
+        f"The reactor is initially charged with {N_A0} moles of {reactant_A_name} and "
+        f"{N_B0} moles of {reactant_B_name}. Assume the initial amount of products is zero.\n"
+        f"The reaction is allowed to proceed until a {X*100}% conversion of the limiting reactant is achieved.\n\n"
         f"First, identify the limiting reactant. Then, calculate the final number of moles for all species."
     )
 
@@ -340,55 +378,44 @@ def template_limiting_reactant():
         f"**Step 1:** Identify the Limiting Reactant\n"
         f"To find the limiting reactant, we compare the ratio of the initial moles to the "
         f"stoichiometric coefficient for each reactant.\n\n"
-        f"- For **{reactant_A_name} (A)**: $N_{{A0}}/a = {N_A0} / {a} = \\mathbf{{{round(ratio_A, 2)}}}$\n"
-        f"- For **{reactant_B_name} (B)**: $N_{{B0}}/b = {N_B0} / {b} = \\mathbf{{{round(ratio_B, 2)}}}$\n\n"
-        f"Since ${round(min(ratio_A, ratio_B), 2)} < {round(max(ratio_A, ratio_B), 2)}$, "
-        f"**{limiting_reactant_name} is the limiting reactant**. All further calculations will be based on "
-        f"a conversion of {limiting_reactant_name}, $X_{limiting_reactant_sym} = {X}$.\n\n"
+        f"- For **{reactant_A_name}**: N_A0/a = {N_A0} / {a} = **{round(ratio_A, 2)}**\n"
+        f"- For **{reactant_B_name}**: N_B0/b = {N_B0} / {b} = **{round(ratio_B, 2)}**\n\n"
+        f"Since {round(min(ratio_A, ratio_B), 2)} < {round(max(ratio_A, ratio_B), 2)}, "
+        f"**{limiting_reactant_name} is the limiting reactant**.\n"
     )
 
-    solution_step2_calculation = (
-        f"**Step 2:** Calculate Final Moles\n"
-        f"Using the stoichiometric relationships based on the limiting reactant ({limiting_reactant_name}):\n\n"
-        f"**For {reactant_A_name} (A):**\n"
-        f"$N_A = {round(N_A, 2)}$ mol\n\n"
-        f"**For {reactant_B_name} (B):**\n"
-        f"$N_B = {round(N_B, 2)}$ mol\n\n"
-        f"**For {product_C_name} (C):**\n"
-        f"$N_C = {round(N_C, 2)}$ mol\n\n"
-        f"**For {product_D_name} (D):**\n"
-        f"$N_D = {round(N_D, 2)}$ mol"
-    )
-
-    solution_final_answer = (
-        f"**Final Answer**\n"
-        f"The limiting reactant is **{limiting_reactant_name}**. The final number of moles are:\n"
-        f"- **{reactant_A_name}:** ${round(N_A, 2)}$ mol\n"
-        f"- **{reactant_B_name}:** ${round(N_B, 2)}$ mol\n"
-        f"- **{product_C_name}:** ${round(N_C, 2)}$ mol\n"
-        f"- **{product_D_name}:** ${round(N_D, 2)}$ mol"
-    )
-    
     if limiting_reactant_sym == 'A':
         solution_step2_calculation = (
-            f"\n\n**2. Calculate Final Moles**\n"
-            f"Using $X_A = {X}$ as the basis:\n\n"
-            f"$N_A = N_{{A0}}(1 - X_A) = {N_A0}(1 - {X}) = \\mathbf{{{round(N_A, 2)}}}$ mol\n"
-            f"$N_B = N_{{B0}} - (b/a)N_{{A0}}X_A = {N_B0} - ({b}/{a})({N_A0})({X}) = \\mathbf{{{round(N_B, 2)}}}$ mol\n"
-            f"$N_C = N_{{C0}} + (c/a)N_{{A0}}X_A = {N_C0} + ({c}/{a})({N_A0})({X}) = \\mathbf{{{round(N_C, 2)}}}$ mol\n"
-            f"$N_D = N_{{D0}} + (d/a)N_{{A0}}X_A = {N_D0} + ({d}/{a})({N_A0})({X}) = \\mathbf{{{round(N_D, 2)}}}$ mol"
+            f"\n**Step 2:** Calculate Final Moles\n"
+            f"Using conversion of {reactant_A_name} (X = {X}) as the basis:\n\n"
+            f"Moles {reactant_A_name} = {N_A0}(1 - {X}) = **{round(N_A, 2)}** mol\n"
+            f"Moles {reactant_B_name} = {N_B0} - ({b}/{a})({N_A0})({X}) = **{round(N_B, 2)}** mol\n"
+            f"Moles {product_C_name} = 0 + ({c}/{a})({N_A0})({X}) = **{round(N_C, 2)}** mol\n"
         )
+        if d > 0:
+            solution_step2_calculation += f"Moles {product_D_name} = 0 + ({d}/{a})({N_A0})({X}) = **{round(N_D, 2)}** mol\n"
     else: 
         solution_step2_calculation = (
-            f"\n\n**2. Calculate Final Moles**\n"
-            f"Using $X_B = {X}$ as the basis:\n\n"
-            f"$N_A = N_{{A0}} - (a/b)N_{{B0}}X_B = {N_A0} - ({a}/{b})({N_B0})({X}) = \\mathbf{{{round(N_A, 2)}}}$ mol\n"
-            f"$N_B = N_{{B0}}(1 - X_B) = {N_B0}(1 - {X}) = \\mathbf{{{round(N_B, 2)}}}$ mol\n"
-            f"$N_C = N_{{C0}} + (c/b)N_{{B0}}X_B = {N_C0} + ({c}/{b})({N_B0})({X}) = \\mathbf{{{round(N_C, 2)}}}$ mol\n"
-            f"$N_D = N_{{D0}} + (d/b)N_{{B0}}X_B = {N_D0} + ({d}/{b})({N_B0})({X}) = \\mathbf{{{round(N_D, 2)}}}$ mol"
+            f"\n**Step 2:** Calculate Final Moles\n"
+            f"Using conversion of {reactant_B_name} (X = {X}) as the basis:\n\n"
+            f"Moles {reactant_A_name} = {N_A0} - ({a}/{b})({N_B0})({X}) = **{round(N_A, 2)}** mol\n"
+            f"Moles {reactant_B_name} = {N_B0}(1 - {X}) = **{round(N_B, 2)}** mol\n"
+            f"Moles {product_C_name} = 0 + ({c}/{b})({N_B0})({X}) = **{round(N_C, 2)}** mol\n"
         )
+        if d > 0:
+            solution_step2_calculation += f"Moles {product_D_name} = 0 + ({d}/{b})({N_B0})({X}) = **{round(N_D, 2)}** mol\n"
 
-    solution = f"### **Solution**\n\n{solution_step1_identification}{solution_step2_calculation}{solution_final_answer}"
+    solution_final_answer = (
+        f"\n**Final Answer**\n"
+        f"The limiting reactant is **{limiting_reactant_name}**. The final number of moles are:\n"
+        f"- **{reactant_A_name}:** {round(N_A, 2)} mol\n"
+        f"- **{reactant_B_name}:** {round(N_B, 2)} mol\n"
+        f"- **{product_C_name}:** {round(N_C, 2)} mol\n"
+    )
+    if d > 0:
+        solution_final_answer += f"- **{product_D_name}:** {round(N_D, 2)} mol"
+
+    solution = f"{solution_step1_identification}{solution_step2_calculation}{solution_final_answer}"
 
     return question, solution
 
