@@ -5,3 +5,5 @@ inference_results/
 evaluation_results/
 summary_results/
 ai_assistance_data
+verify_fixes.py
+template_loader.py

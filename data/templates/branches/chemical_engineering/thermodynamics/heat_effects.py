@@ -338,35 +338,41 @@ def template_sensible_heat_temp_dependent_cp():
 def template_adiabatic_flame_temperature():
     """
     Adiabatic Flame Temperature
-
-    Scenario:
-        This template calculates the theoretical maximum temperature the products
-        of a combustion reaction can reach if it occurs adiabatically (no heat loss).
-        This requires an energy balance: the heat released by the reaction at a
-        reference temperature (298.15 K) must be completely absorbed by the
-        product gases as sensible heat, raising their temperature from the
-        reference temperature to the final adiabatic flame temperature (T_ad).
-
-    Returns:
-        tuple: A tuple containing:
-            - str: A question asking to compute the adiabatic flame temperature.
-            - str: A step-by-step solution showing the numerical method.
+    Scenario: Calculates the theoretical maximum temperature of combustion products.
     """
     # 1. Parameterize inputs
     R = 8.314  # J/(mol·K)
     T_initial = 298.15 # K
     
-    # Validation Loop for Physics Sanity Check
-    while True:
+    # SAFETY MECHANISM: Prevent infinite loops
+    max_retries = 20
+    attempts = 0
+    
+    while attempts < max_retries:
+        attempts += 1
         try:
+            # Pick a random reaction
             reaction_data = random.choice(COMBUSTION_REACTIONS)
             fuel = reaction_data["fuel"]
             equation = reaction_data["equation"]
             reactants = reaction_data["reactants"]
             products = reaction_data["products"]
 
+            #  PRE-FLIGHT CHECK 
+            # Before calculating, verify we actually have data for these species.
+            # This prevents the silent KeyError loop.
+            missing_heat_data = [s for s in list(reactants.keys()) + list(products.keys()) if s not in HEATS_OF_FORMATION]
+            if missing_heat_data:
+                # Skip this reaction if we lack enthalpy data
+                continue
+
+            missing_cp_data = [s for s in products.keys() if s not in CP_PARAMS]
+            if missing_cp_data:
+                # Skip this reaction if we lack heat capacity parameters
+                continue
+
             # 2. Perform the core calculation
-            # Calculate the standard heat of reaction at 298.15 K
+            # Calculate standard heat of reaction at 298.15 K
             products_enthalpy_298 = sum(nu * HEATS_OF_FORMATION[s] for s, nu in products.items())
             reactants_enthalpy_298 = sum(nu * HEATS_OF_FORMATION[s] for s, nu in reactants.items())
             delta_H_298_kJ = products_enthalpy_298 - reactants_enthalpy_298
@@ -393,19 +399,28 @@ def template_adiabatic_flame_temperature():
 
             # Solve for the root
             initial_guess = 2000 
-            adiabatic_temp_kelvin = fsolve(energy_balance, initial_guess)[0]
+            # fsolve returns a numpy array, we take the first element
+            result = fsolve(energy_balance, initial_guess)
+            adiabatic_temp_kelvin = result[0]
 
-            #  PHYSICS SANITY CHECK 
-            # Reject results that are physically implausible (< 1500 K or > 3500 K)
-            # This filters out bad data or unit mismatches that cause "broken" problems.
-            if 1500 < adiabatic_temp_kelvin < 3500:
-                break # Valid result found, exit loop
+            # PHYSICS SANITY CHECK 
+            # We slightly widen the range to avoid rejecting valid high-temp reactions
+            # but keep it sane (e.g. max 4500K for most hydrocarbons in air)
+            if 1000 < adiabatic_temp_kelvin < 4500:
+                break # Valid result found, exit loop (Success!)
 
-        except (KeyError, ValueError, IndexError):
-            # If data is missing (KeyError) or solver fails, retry with a different reaction
+        except (KeyError, ValueError, IndexError, Exception):
+            # If solver fails or unexpected error, try next reaction
             continue
+    
+    # FALLBACK: If we exhausted all retries (e.g., data is missing for ALL reactions)
+    else:
+        return (
+            "Error: Could not generate a valid Adiabatic Flame Temperature problem.",
+            "Possible causes: Missing thermochemical data in constants.py or solver convergence issues."
+        )
 
-    # 3. Generate the question and solution strings
+    # 3. Generate the question and solution strings (Only runs if 'break' was hit)
     question = (
         f"{fuel} gas enters a furnace at {T_initial} K and is burned completely with "
         f"the theoretical amount of dry air (also at {T_initial} K). Assuming the "
