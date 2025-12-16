@@ -33,7 +33,7 @@ anthropic_client = AsyncAnthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 # Output Directory
-RESULTS_DIR = Path("ai_assistance_data/qa_results")
+RESULTS_DIR = Path("ai_assistance_data_v2/qa_results")
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Files definitions
@@ -137,7 +137,7 @@ async def process_template(branch, area, file, func_name, func_obj, run_flags):
     if not any(run_flags.values()):
         return None
 
-    source_code = get_source_code(branch, area, file)
+    source_code = get_source_code(func_obj)
     
     # B. Generate 3 Instances locally
     instances = []

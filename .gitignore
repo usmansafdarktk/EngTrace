@@ -7,3 +7,7 @@ summary_results/
 ai_assistance_data
 verify_fixes.py
 template_loader.py
+locate_fixed_templates.py
+regenerate_testset.py
+verify_manual_map.py
+ai_assistance_data_v2
