@@ -6,3 +6,8 @@ google.generativeai
 dotenv
 huggingface_hub[hf_xet]
 seaborn
+pandas 
+numpy 
+simpledorff
+statsmodels 
+krippendorff
