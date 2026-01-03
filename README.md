@@ -20,7 +20,7 @@ Through domain-aware parameterization, these templates generate 1,350 unique, co
 * **Verifiable Reasoning:** Each problem includes a rigorous, step-by-step reasoning chain, allowing for the verification of the entire solution process rather than just the final numerical answer.
 * **AI Tribunal & Quality Assurance:** The benchmark utilizes a tiered verification protocol where frontier reasoning models and domain experts certify the admissibility and logical consistency of the templates.
 
-## Core Repository Modules
+## Modules
 
 * **data/templates/:** The core symbolic templates for Chemical, Electrical, and Mechanical engineering.
 * **ai_assisted_quality_assurance/:** Tools for the "AI Tribunal" process to filter and validate problem templates.
@@ -30,3 +30,4 @@ Through domain-aware parameterization, these templates generate 1,350 unique, co
 ## Purpose
 
 EngChain identifies "complexity cliffs" where models may succeed at simple mathematical tasks but fail when required to translate abstract training into practical, physically grounded engineering solutions.
+
