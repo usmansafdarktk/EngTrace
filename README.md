@@ -26,8 +26,3 @@ Through domain-aware parameterization, these templates generate 1,350 unique, co
 * **ai_assisted_quality_assurance/:** Tools for the "AI Tribunal" process to filter and validate problem templates.
 * **evaluation/:** Scripts for running model inference, parsing engineering-specific outputs, and calculating AI-human alignment.
 * **calculation_scripts:** Utilities for computing Inter-Annotator Agreement (IAA) and statistical alignment between model outputs and expert solutions.
-
-## Purpose
-
-EngChain identifies "complexity cliffs" where models may succeed at simple mathematical tasks but fail when required to translate abstract training into practical, physically grounded engineering solutions.
-
