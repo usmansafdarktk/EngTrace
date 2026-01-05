@@ -1,8 +1,8 @@
-# EngChain: A Symbolic Benchmark for Verifiable Multi-Step Reasoning in Engineering
+# EngTrace: A Symbolic Benchmark for Verifiable Multi-Step Reasoning in Engineering
 
 ## Overview
 
-EngChain is a symbolic benchmark designed to evaluate the multi-step reasoning capabilities of Large Language Models (LLMs) within specialized engineering domains. Unlike static benchmarks that rely on factual recall, EngChain requires models to synthesize scientific principles, mathematical modeling, and physical constraints to solve complex problems.
+EngTrace is a symbolic benchmark designed to evaluate the multi-step reasoning capabilities of Large Language Models (LLMs) within specialized engineering domains. Unlike static benchmarks that rely on factual recall, EngTrace requires models to synthesize scientific principles, mathematical modeling, and physical constraints to solve complex problems.
 
 ## Benchmark Structure
 
@@ -26,3 +26,4 @@ Through domain-aware parameterization, these templates generate 1,350 unique, co
 * **ai_assisted_quality_assurance/:** Tools for the "AI Tribunal" process to filter and validate problem templates.
 * **evaluation/:** Scripts for running model inference, parsing engineering-specific outputs, and calculating AI-human alignment.
 * **calculation_scripts:** Utilities for computing Inter-Annotator Agreement (IAA) and statistical alignment between model outputs and expert solutions.
+
