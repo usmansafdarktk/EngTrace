@@ -1,5 +1,5 @@
 import sys
-from template_loader import (
+from templates_annotation.annotation_app.src.template_loader import (
     get_areas,
     get_template_files,
     load_template_functions,

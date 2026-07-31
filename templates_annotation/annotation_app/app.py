@@ -1,14 +1,14 @@
 import streamlit as st
 import traceback
 import random
-from src.template_loader import (
+from templates_annotation.annotation_app.src.template_loader import (
     get_branches, 
     get_areas, 
     get_template_files, 
     load_template_functions, 
     get_source_code
 )
-from src.storage import save_review
+from templates_annotation.annotation_app.src.storage import save_review
 
 #  Page Configuration 
 st.set_page_config(layout="wide", page_title="EngChain Annotator")
