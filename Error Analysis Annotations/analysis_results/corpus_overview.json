@@ -1,0 +1,85 @@
+{
+  "meta": {
+    "description": "EngTrace error distribution analysis — majority-vote labels from 3 annotators",
+    "models": [
+      "claude-opus-4-7",
+      "deepseek-r1",
+      "deepseek-v4-pro",
+      "gemini-3.1-pro-preview",
+      "gemma-3-27b",
+      "gpt-5",
+      "gpt-5-mini",
+      "mathstral-7b",
+      "meta-llama-3.1-70b",
+      "qwen2.5-72b",
+      "wizardmath-7b"
+    ],
+    "main_text_models": [
+      "gemini-3.1-pro-preview",
+      "deepseek-r1",
+      "meta-llama-3.1-70b"
+    ],
+    "category_legend": {
+      "0": "No Error",
+      "1": "Hallucination",
+      "2": "Setup / Assumption Error",
+      "3": "Formula / Principle Error",
+      "4": "Unit / Dimensional Error",
+      "5": "Sign / Direction Error",
+      "6": "Calculation Error"
+    },
+    "severity_legend": {
+      "1": "Critical",
+      "2": "High",
+      "3": "High",
+      "4": "Medium",
+      "5": "Medium",
+      "6": "Low"
+    }
+  },
+  "corpus_stats": {
+    "total_traces": 2200,
+    "n_models": 11,
+    "n_annotators": 3,
+    "overall_category_dist": {
+      "1": {
+        "name": "Hallucination",
+        "severity": "Critical",
+        "count": 137,
+        "pct": 6.23
+      },
+      "2": {
+        "name": "Setup / Assumption Error",
+        "severity": "High",
+        "count": 334,
+        "pct": 15.18
+      },
+      "3": {
+        "name": "Formula / Principle Error",
+        "severity": "High",
+        "count": 248,
+        "pct": 11.27
+      },
+      "4": {
+        "name": "Unit / Dimensional Error",
+        "severity": "Medium",
+        "count": 67,
+        "pct": 3.05
+      },
+      "5": {
+        "name": "Sign / Direction Error",
+        "severity": "Medium",
+        "count": 29,
+        "pct": 1.32
+      },
+      "6": {
+        "name": "Calculation Error",
+        "severity": "Low",
+        "count": 1385,
+        "pct": 62.95
+      }
+    },
+    "overall_conceptual_error_rate_pct": 32.68,
+    "overall_high_severity_rate_pct": 21.41
+  }
+}

@@ -1,0 +1,277 @@
+[
+  {
+    "model": "gemini-3.1-pro-preview",
+    "role": "main",
+    "file": "New Frontier Models/gemini-3.1-pro-preview_evaluation_results_FINAL.jsonl",
+    "total_records": 1350,
+    "confirmed_failures": 337,
+    "traces_sampled": 200,
+    "tier_targets": {
+      "Advanced": 49,
+      "Intermediate": 76,
+      "Easy": 75
+    },
+    "tier_available": {
+      "Advanced": 127,
+      "Intermediate": 100,
+      "Easy": 110
+    },
+    "difficulty_proportions": {
+      "Advanced": 0.2444,
+      "Intermediate": 0.3778,
+      "Easy": 0.3778
+    },
+    "shortfalls": {},
+    "output_file": "c:\\Users\\ayesha.gull01\\OneDrive - Confiz Limited\\Desktop\\EngChain\\error_analysis_samples\\gemini-3.1-pro-preview_annotation_sample.jsonl"
+  },
+  {
+    "model": "deepseek-r1",
+    "role": "main",
+    "file": "Frontier Proprietary LLMs/deepseek-reasoner_evaluation_results_FINAL.jsonl",
+    "total_records": 1350,
+    "confirmed_failures": 359,
+    "traces_sampled": 200,
+    "tier_targets": {
+      "Advanced": 49,
+      "Intermediate": 76,
+      "Easy": 75
+    },
+    "tier_available": {
+      "Advanced": 127,
+      "Easy": 110,
+      "Intermediate": 122
+    },
+    "difficulty_proportions": {
+      "Advanced": 0.2444,
+      "Intermediate": 0.3778,
+      "Easy": 0.3778
+    },
+    "shortfalls": {},
+    "output_file": "c:\\Users\\ayesha.gull01\\OneDrive - Confiz Limited\\Desktop\\EngChain\\error_analysis_samples\\deepseek-r1_annotation_sample.jsonl"
+  },
+  {
+    "model": "meta-llama-3.1-70b",
+    "role": "main",
+    "file": "General Purpose Open LLMs/meta-llama-3.1-70b_evaluation_results_FINAL.jsonl",
+    "total_records": 1350,
+    "confirmed_failures": 587,
+    "traces_sampled": 200,
+    "tier_targets": {
+      "Easy": 76,
+      "Advanced": 49,
+      "Intermediate": 75
+    },
+    "tier_available": {
+      "Advanced": 184,
+      "Easy": 165,
+      "Intermediate": 238
+    },
+    "difficulty_proportions": {
+      "Easy": 0.3778,
+      "Advanced": 0.2444,
+      "Intermediate": 0.3778
+    },
+    "shortfalls": {},
+    "output_file": "c:\\Users\\ayesha.gull01\\OneDrive - Confiz Limited\\Desktop\\EngChain\\error_analysis_samples\\meta-llama-3.1-70b_annotation_sample.jsonl"
+  },
+  {
+    "model": "gpt-5-mini",
+    "role": "appendix",
+    "file": "Frontier Proprietary LLMs/gpt-5-mini_evaluation_results_FINAL.jsonl",
+    "total_records": 1350,
+    "confirmed_failures": 373,
+    "traces_sampled": 200,
+    "tier_targets": {
+      "Advanced": 49,
+      "Intermediate": 76,
+      "Easy": 75
+    },
+    "tier_available": {
+      "Advanced": 133,
+      "Intermediate": 109,
+      "Easy": 131
+    },
+    "difficulty_proportions": {
+      "Advanced": 0.2444,
+      "Intermediate": 0.3778,
+      "Easy": 0.3778
+    },
+    "shortfalls": {},
+    "output_file": "c:\\Users\\ayesha.gull01\\OneDrive - Confiz Limited\\Desktop\\EngChain\\error_analysis_samples\\gpt-5-mini_annotation_sample.jsonl"
+  },
+  {
+    "model": "gpt-5",
+    "role": "appendix",
+    "file": "Frontier Proprietary LLMs/gpt-5_evaluation_results_FINAL.jsonl",
+    "total_records": 1350,
+    "confirmed_failures": 388,
+    "traces_sampled": 200,
+    "tier_targets": {
+      "Easy": 77,
+      "Intermediate": 77,
+      "Advanced": 46
+    },
+    "tier_available": {
+      "Easy": 134,
+      "Advanced": 129,
+      "Intermediate": 125
+    },
+    "difficulty_proportions": {
+      "Easy": 0.383,
+      "Intermediate": 0.3859,
+      "Advanced": 0.2311
+    },
+    "shortfalls": {},
+    "output_file": "c:\\Users\\ayesha.gull01\\OneDrive - Confiz Limited\\Desktop\\EngChain\\error_analysis_samples\\gpt-5_annotation_sample.jsonl"
+  },
+  {
+    "model": "deepseek-v4-pro",
+    "role": "appendix",
+    "file": "New Frontier Models/deepseek-v4-pro_evaluation_results_FINAL.jsonl",
+    "total_records": 1350,
+    "confirmed_failures": 388,
+    "traces_sampled": 200,
+    "tier_targets": {
+      "Advanced": 49,
+      "Intermediate": 76,
+      "Easy": 75
+    },
+    "tier_available": {
+      "Advanced": 126,
+      "Easy": 145,
+      "Intermediate": 117
+    },
+    "difficulty_proportions": {
+      "Advanced": 0.2444,
+      "Intermediate": 0.3778,
+      "Easy": 0.3778
+    },
+    "shortfalls": {},
+    "output_file": "c:\\Users\\ayesha.gull01\\OneDrive - Confiz Limited\\Desktop\\EngChain\\error_analysis_samples\\deepseek-v4-pro_annotation_sample.jsonl"
+  },
+  {
+    "model": "claude-opus-4-7",
+    "role": "appendix",
+    "file": "New Frontier Models/claude-opus-4-7_evaluation_results_FINAL.jsonl",
+    "total_records": 1350,
+    "confirmed_failures": 380,
+    "traces_sampled": 200,
+    "tier_targets": {
+      "Advanced": 49,
+      "Intermediate": 76,
+      "Easy": 75
+    },
+    "tier_available": {
+      "Advanced": 124,
+      "Easy": 128,
+      "Intermediate": 128
+    },
+    "difficulty_proportions": {
+      "Advanced": 0.2444,
+      "Intermediate": 0.3778,
+      "Easy": 0.3778
+    },
+    "shortfalls": {},
+    "output_file": "c:\\Users\\ayesha.gull01\\OneDrive - Confiz Limited\\Desktop\\EngChain\\error_analysis_samples\\claude-opus-4-7_annotation_sample.jsonl"
+  },
+  {
+    "model": "qwen2.5-72b",
+    "role": "appendix",
+    "file": "General Purpose Open LLMs/qwen2.5-72b-instruct_evaluation_results_FINAL.jsonl",
+    "total_records": 1350,
+    "confirmed_failures": 526,
+    "traces_sampled": 200,
+    "tier_targets": {
+      "Intermediate": 76,
+      "Advanced": 49,
+      "Easy": 75
+    },
+    "tier_available": {
+      "Advanced": 169,
+      "Intermediate": 207,
+      "Easy": 150
+    },
+    "difficulty_proportions": {
+      "Intermediate": 0.3778,
+      "Advanced": 0.2444,
+      "Easy": 0.3778
+    },
+    "shortfalls": {},
+    "output_file": "c:\\Users\\ayesha.gull01\\OneDrive - Confiz Limited\\Desktop\\EngChain\\error_analysis_samples\\qwen2.5-72b_annotation_sample.jsonl"
+  },
+  {
+    "model": "gemma-3-27b",
+    "role": "appendix",
+    "file": "General Purpose Open LLMs/gemma-3-27b-it_evaluation_results_FINAL.jsonl",
+    "total_records": 1350,
+    "confirmed_failures": 571,
+    "traces_sampled": 200,
+    "tier_targets": {
+      "Intermediate": 76,
+      "Advanced": 49,
+      "Easy": 75
+    },
+    "tier_available": {
+      "Intermediate": 234,
+      "Advanced": 189,
+      "Easy": 148
+    },
+    "difficulty_proportions": {
+      "Intermediate": 0.3778,
+      "Advanced": 0.2444,
+      "Easy": 0.3778
+    },
+    "shortfalls": {},
+    "output_file": "c:\\Users\\ayesha.gull01\\OneDrive - Confiz Limited\\Desktop\\EngChain\\error_analysis_samples\\gemma-3-27b_annotation_sample.jsonl"
+  },
+  {
+    "model": "mathstral-7b",
+    "role": "appendix",
+    "file": "Math Enhanced LLMs/mathstral-7b_evaluation_results_FINAL.jsonl",
+    "total_records": 1350,
+    "confirmed_failures": 830,
+    "traces_sampled": 200,
+    "tier_targets": {
+      "Intermediate": 76,
+      "Advanced": 49,
+      "Easy": 75
+    },
+    "tier_available": {
+      "Intermediate": 343,
+      "Advanced": 208,
+      "Easy": 279
+    },
+    "difficulty_proportions": {
+      "Intermediate": 0.3778,
+      "Advanced": 0.2444,
+      "Easy": 0.3778
+    },
+    "shortfalls": {},
+    "output_file": "c:\\Users\\ayesha.gull01\\OneDrive - Confiz Limited\\Desktop\\EngChain\\error_analysis_samples\\mathstral-7b_annotation_sample.jsonl"
+  },
+  {
+    "model": "wizardmath-7b",
+    "role": "appendix",
+    "file": "Math Enhanced LLMs/wizardmath-7b_evaluation_results_FINAL.jsonl",
+    "total_records": 1350,
+    "confirmed_failures": 969,
+    "traces_sampled": 200,
+    "tier_targets": {
+      "Intermediate": 76,
+      "Easy": 75,
+      "Advanced": 49
+    },
+    "tier_available": {
+      "Intermediate": 388,
+      "Easy": 343,
+      "Advanced": 238
+    },
+    "difficulty_proportions": {
+      "Intermediate": 0.3778,
+      "Easy": 0.3778,
+      "Advanced": 0.2444
+    },
+    "shortfalls": {},
+    "output_file": "c:\\Users\\ayesha.gull01\\OneDrive - Confiz Limited\\Desktop\\EngChain\\error_analysis_samples\\wizardmath-7b_annotation_sample.jsonl"
+  }
+]

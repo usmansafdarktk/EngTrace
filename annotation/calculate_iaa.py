@@ -118,6 +118,43 @@ def calculate_fleiss_kappa(df):
     return pd.DataFrame(results).T
 
 
+def calculate_gwet_ac2(df, score_col):
+    try:
+        from irrCAC.raw import CAC
+    except ImportError:
+        print("WARNING: irrCAC not installed. Run: pip install irrCAC")
+        return {}
+
+    def run_ac2(pivot_templates_x_raters):
+        try:
+            if pivot_templates_x_raters.shape[1] < 2:
+                return None
+            # Zero-variance → perfect agreement by convention
+            if np.nanvar(pivot_templates_x_raters.values) == 0:
+                return 1.0
+            cac = CAC(pivot_templates_x_raters, weights='quadratic')
+            result = cac.gwet()
+            return round(float(result['est']['coefficient_value']), 3)
+        except Exception as e:
+            print(f"  AC2 error ({score_col}): {e}")
+            return None
+
+    results = {}
+
+    # Per-branch: rows=templates, cols=local raters
+    for branch, group in df.groupby('branch'):
+        pivot = group.pivot_table(
+            index='template', columns='local_rater', values=score_col, aggfunc='mean'
+        )
+        results[branch] = run_ac2(pivot)
+
+    # Global: mean of per-branch values (sparse 90×9 matrix is uncomputable by irrCAC)
+    branch_vals = [v for v in results.values() if v is not None]
+    results['GLOBAL (Unified)'] = round(float(np.mean(branch_vals)), 3) if branch_vals else None
+
+    return results
+
+
 def calculate_krippendorff(df, score_col):
     # Helper function to run alpha calculation
     def run_alpha(matrix_vals):
@@ -145,45 +182,117 @@ def calculate_krippendorff(df, score_col):
     return results
 
 
+def pairwise_difference_distribution(df, score_col, branch):
+    from itertools import combinations
+
+    group = df[df['branch'] == branch]
+    pivot = group.pivot_table(
+        index='template', columns='local_rater', values=score_col, aggfunc='mean'
+    ).dropna()
+
+    all_diffs = []
+    per_template = []
+
+    for template, row in pivot.iterrows():
+        scores = row.values
+        diffs = [abs(a - b) for a, b in combinations(scores, 2)]
+        all_diffs.extend(diffs)
+        per_template.append({
+            'template': template,
+            'scores': list(scores),
+            'max_diff': max(diffs),
+            'mean_diff': round(np.mean(diffs), 3),
+        })
+
+    all_diffs = np.array(all_diffs)
+    n = len(all_diffs)
+    buckets = {
+        '|diff| = 0': int((all_diffs == 0).sum()),
+        '|diff| = 1': int((all_diffs == 1).sum()),
+        '|diff| = 2': int((all_diffs == 2).sum()),
+        '|diff| >= 3': int((all_diffs >= 3).sum()),
+    }
+
+    lines = [f"\nTotal pairwise comparisons : {n}  ({pivot.shape[0]} templates × {len(list(combinations(range(pivot.shape[1]), 2)))} pairs each)"]
+    for label, count in buckets.items():
+        lines.append(f"  {label} : {count:3d}  ({100*count/n:.1f}%)")
+    lines.append(f"\n  Mean |diff| : {all_diffs.mean():.3f}")
+    lines.append(f"  Max  |diff| : {int(all_diffs.max())}")
+
+    return {
+        'summary': '\n'.join(lines),
+        'per_template': pd.DataFrame(per_template).set_index('template'),
+        'buckets': buckets,
+        'n': n,
+    }
+
+
 # ==========================================
 # Main Execution
 # ==========================================
 if __name__ == "__main__":
-    DATA_DIR = "reviews" 
-    
+    DATA_DIR = "../annotator-app/reviews"
+    OUTPUT_DIR = "../annotator-app/iaa_results"
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+
     try:
         # Load
         print("Loading data...")
         df = load_reviews(DATA_DIR)
-        
+
         # 1. Fleiss Kappa (Binary Decision)
         print("\n" + "="*60)
         print("METRIC 1: Binary Decision Agreement (Fleiss' Kappa)")
         print("="*60)
-        fleiss_df = calculate_fleiss_kappa(df) 
+        fleiss_df = calculate_fleiss_kappa(df)
         print(fleiss_df)
-        fleiss_df.to_csv("iaa_results/iaa_fleiss_kappa_results.csv") # Save to CSV
+        fleiss_df.to_csv(f"{OUTPUT_DIR}/iaa_fleiss_kappa_results.csv")
         print(">> Saved to 'iaa_fleiss_kappa_results.csv'")
-        
-        # 2. Krippendorff's Alpha (Quality Scores)
+
+        # 2. Krippendorff's Alpha + Gwet's AC2 (Quality Scores)
         print("\n" + "="*60)
-        print("METRIC 2: Quality Score Consistency (Krippendorff's Alpha)")
-        print("Note: Values > 0.67 are reliable; > 0.80 is good.")
+        print("METRIC 2: Quality Score Consistency (Krippendorff's α & Gwet's AC2)")
+        print("Note: α > 0.67 reliable; AC2 corrects for range restriction.")
         print("="*60)
-        
-        # Calculate for ALL 3 Metrics 
+
         alpha_phys = calculate_krippendorff(df, 'score_physical')
-        alpha_math = calculate_krippendorff(df, 'score_math') 
-        alpha_ped = calculate_krippendorff(df, 'score_pedagogical')
-        
+        alpha_math = calculate_krippendorff(df, 'score_math')
+        alpha_ped  = calculate_krippendorff(df, 'score_pedagogical')
+
+        ac2_phys = calculate_gwet_ac2(df, 'score_physical')
+        ac2_math = calculate_gwet_ac2(df, 'score_math')
+        ac2_ped  = calculate_gwet_ac2(df, 'score_pedagogical')
+
         summary = pd.DataFrame({
-            'Physical Plausibility': alpha_phys,
-            'Mathematical Correctness': alpha_math, 
-            'Pedagogical Clarity': alpha_ped
+            'Kripp. α — Physical':      alpha_phys,
+            'AC2 — Physical':           ac2_phys,
+            'Kripp. α — Math':          alpha_math,
+            'AC2 — Math':               ac2_math,
+            'Kripp. α — Pedagogical':   alpha_ped,
+            'AC2 — Pedagogical':        ac2_ped,
         })
-        print(summary)
-        summary.to_csv("iaa_results/iaa_krippendorff_results.csv") # Save to CSV
+        print(summary.to_string())
+        summary.to_csv(f"{OUTPUT_DIR}/iaa_krippendorff_gwet_results.csv")
+        print(">> Saved to 'iaa_krippendorff_gwet_results.csv'")
+
+        # Also keep the original Krippendorff-only CSV for backwards compatibility
+        kripp_only = pd.DataFrame({
+            'Physical Plausibility':    alpha_phys,
+            'Mathematical Correctness': alpha_math,
+            'Pedagogical Clarity':      alpha_ped,
+        })
+        kripp_only.to_csv(f"{OUTPUT_DIR}/iaa_krippendorff_results.csv")
         print(">> Saved to 'iaa_krippendorff_results.csv'")
-        
+
+        # 3. Pairwise Difference Distribution (Pedagogical Clarity — Mechanical Eng.)
+        print("\n" + "="*60)
+        print("DIAGNOSTIC: Pairwise |Difference| Distribution")
+        print("Pedagogical Clarity — Mechanical Engineering")
+        print("="*60)
+        diff_results = pairwise_difference_distribution(df, 'score_pedagogical', 'mechanical_engineering')
+        print(diff_results['summary'])
+        diff_results['per_template'].to_csv(f"{OUTPUT_DIR}/diag_ped_mech_differences.csv")
+        print(">> Per-template detail saved to 'diag_ped_mech_differences.csv'")
+
     except Exception as e:
         print(f"Pipeline Error: {e}")

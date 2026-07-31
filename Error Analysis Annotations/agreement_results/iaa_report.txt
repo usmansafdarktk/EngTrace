@@ -1,0 +1,442 @@
+==========================================================================
+INTER-ANNOTATOR AGREEMENT REPORT — EngTrace Error Analysis
+Annotators: A, B, C   |   Models: 11   |   Scale: 7 categories
+==========================================================================
+
+Metrics key
+  % Agree   : Raw pairwise percent agreement
+  Cohen's κ : Chance-corrected agreement (sensitive to prevalence imbalance)
+  PABAK     : Prevalence-Adjusted Bias-Adjusted Kappa = 2·p₀ − 1
+              Corrects for kappa paradox when one category dominates
+  Gwet AC1  : Prevalence-robust alternative to Cohen's κ (Gwet 2008)
+  Fleiss' κ : Multi-rater chance-corrected agreement (all 3 annotators)
+  Kripp. α  : Krippendorff's α, nominal scale (all 3 annotators)
+  NOTE: Fleiss' κ = Krippendorff's α is mathematically expected for 3
+        raters with complete nominal data — not a computational error.
+
+--------------------------------------------------------------------------
+  Scope : OVERALL (all 11 models pooled)
+  Items : 2200
+  Dominant category: 6:Calculation Error (60.5% of all labels)
+--------------------------------------------------------------------------
+  Percent Agreement
+    A vs B  : 77.64%
+    A vs C  : 66.68%
+    B vs C  : 71.59%
+    Overall : 71.97%
+  Cohen's κ (pairwise)
+    A vs B  : 0.5841
+    A vs C  : 0.4563
+    B vs C  : 0.5491
+  PABAK (pairwise, prevalence-adjusted)
+    A vs B  : 0.5527
+    A vs C  : 0.3336
+    B vs C  : 0.4318
+    Overall : 0.4394
+  Gwet's AC1 (pairwise, prevalence-robust)
+    A vs B  : 0.7495
+    A vs C  : 0.6214
+    B vs C  : 0.6755
+    Overall : 0.6821
+  Fleiss' κ  (all 3 annotators) : 0.5238
+  Kripp. α   (all 3 annotators) : 0.5238
+  Category distribution (pooled across all annotators):
+    6:Calculation Error               60.5%
+    2:Setup/Assumption Error          14.8%
+    3:Formula/Principle Error         13.3%
+    1:Hallucination                    5.6%
+    4:Unit/Dimensional Error           4.3%
+    5:Sign/Direction Error             1.5%
+
+--------------------------------------------------------------------------
+  Scope : claude-opus-4-7
+  Items : 200
+  Dominant category: 6:Calculation Error (81.7% of all labels)  ← high prevalence; Cohen's κ deflated, see PABAK / Gwet AC1
+--------------------------------------------------------------------------
+  Percent Agreement
+    A vs B  : 81.50%
+    A vs C  : 68.50%
+    B vs C  : 71.00%
+    Overall : 73.67%
+  Cohen's κ (pairwise)
+    A vs B  : 0.1600
+    A vs C  : 0.1382
+    B vs C  : 0.2858
+  PABAK (pairwise, prevalence-adjusted)
+    A vs B  : 0.6300
+    A vs C  : 0.3700
+    B vs C  : 0.4200
+    Overall : 0.4733
+  Gwet's AC1 (pairwise, prevalence-robust)
+    A vs B  : 0.8044
+    A vs C  : 0.6617
+    B vs C  : 0.6851
+    Overall : 0.7171
+  Fleiss' κ  (all 3 annotators) : 0.1844
+  Kripp. α   (all 3 annotators) : 0.1844
+  Category distribution (pooled across all annotators):
+    6:Calculation Error               81.7%
+    2:Setup/Assumption Error           8.0%
+    4:Unit/Dimensional Error           4.5%
+    3:Formula/Principle Error          3.8%
+    1:Hallucination                    1.7%
+    5:Sign/Direction Error             0.3%
+
+--------------------------------------------------------------------------
+  Scope : deepseek-r1
+  Items : 200
+  Dominant category: 6:Calculation Error (67.8% of all labels)
+--------------------------------------------------------------------------
+  Percent Agreement
+    A vs B  : 78.50%
+    A vs C  : 64.00%
+    B vs C  : 66.50%
+    Overall : 69.67%
+  Cohen's κ (pairwise)
+    A vs B  : 0.4848
+    A vs C  : 0.3327
+    B vs C  : 0.4077
+  PABAK (pairwise, prevalence-adjusted)
+    A vs B  : 0.5700
+    A vs C  : 0.2800
+    B vs C  : 0.3300
+    Overall : 0.3933
+  Gwet's AC1 (pairwise, prevalence-robust)
+    A vs B  : 0.7656
+    A vs C  : 0.5989
+    B vs C  : 0.6234
+    Overall : 0.6626
+  Fleiss' κ  (all 3 annotators) : 0.3904
+  Kripp. α   (all 3 annotators) : 0.3904
+  Category distribution (pooled across all annotators):
+    6:Calculation Error               67.8%
+    2:Setup/Assumption Error          19.3%
+    3:Formula/Principle Error          5.5%
+    5:Sign/Direction Error             2.8%
+    4:Unit/Dimensional Error           2.7%
+    1:Hallucination                    1.8%
+
+--------------------------------------------------------------------------
+  Scope : deepseek-v4-pro
+  Items : 200
+  Dominant category: 6:Calculation Error (79.2% of all labels)  ← high prevalence; Cohen's κ deflated, see PABAK / Gwet AC1
+--------------------------------------------------------------------------
+  Percent Agreement
+    A vs B  : 79.50%
+    A vs C  : 63.50%
+    B vs C  : 70.00%
+    Overall : 71.00%
+  Cohen's κ (pairwise)
+    A vs B  : 0.1832
+    A vs C  : 0.1252
+    B vs C  : 0.2987
+  PABAK (pairwise, prevalence-adjusted)
+    A vs B  : 0.5900
+    A vs C  : 0.2700
+    B vs C  : 0.4000
+    Overall : 0.4200
+  Gwet's AC1 (pairwise, prevalence-robust)
+    A vs B  : 0.7842
+    A vs C  : 0.5949
+    B vs C  : 0.6729
+    Overall : 0.6840
+  Fleiss' κ  (all 3 annotators) : 0.1879
+  Kripp. α   (all 3 annotators) : 0.1879
+  Category distribution (pooled across all annotators):
+    6:Calculation Error               79.2%
+    2:Setup/Assumption Error          11.5%
+    3:Formula/Principle Error          4.0%
+    4:Unit/Dimensional Error           2.8%
+    1:Hallucination                    2.3%
+    5:Sign/Direction Error             0.2%
+
+--------------------------------------------------------------------------
+  Scope : gemini-3.1-pro-preview
+  Items : 200
+  Dominant category: 6:Calculation Error (76.2% of all labels)  ← high prevalence; Cohen's κ deflated, see PABAK / Gwet AC1
+--------------------------------------------------------------------------
+  Percent Agreement
+    A vs B  : 68.50%
+    A vs C  : 66.00%
+    B vs C  : 67.00%
+    Overall : 67.17%
+  Cohen's κ (pairwise)
+    A vs B  : 0.0560
+    A vs C  : 0.2078
+    B vs C  : 0.2874
+  PABAK (pairwise, prevalence-adjusted)
+    A vs B  : 0.3700
+    A vs C  : 0.3200
+    B vs C  : 0.3400
+    Overall : 0.3433
+  Gwet's AC1 (pairwise, prevalence-robust)
+    A vs B  : 0.6628
+    A vs C  : 0.6296
+    B vs C  : 0.6370
+    Overall : 0.6431
+  Fleiss' κ  (all 3 annotators) : 0.1825
+  Kripp. α   (all 3 annotators) : 0.1825
+  Category distribution (pooled across all annotators):
+    6:Calculation Error               76.2%
+    2:Setup/Assumption Error          11.5%
+    4:Unit/Dimensional Error           5.0%
+    3:Formula/Principle Error          4.3%
+    1:Hallucination                    2.5%
+    5:Sign/Direction Error             0.5%
+
+--------------------------------------------------------------------------
+  Scope : gemma-3-27b
+  Items : 200
+  Dominant category: 6:Calculation Error (46.8% of all labels)
+--------------------------------------------------------------------------
+  Percent Agreement
+    A vs B  : 82.00%
+    A vs C  : 72.50%
+    B vs C  : 76.50%
+    Overall : 77.00%
+  Cohen's κ (pairwise)
+    A vs B  : 0.7387
+    A vs C  : 0.6086
+    B vs C  : 0.6716
+  PABAK (pairwise, prevalence-adjusted)
+    A vs B  : 0.6400
+    A vs C  : 0.4500
+    B vs C  : 0.5300
+    Overall : 0.5400
+  Gwet's AC1 (pairwise, prevalence-robust)
+    A vs B  : 0.7913
+    A vs C  : 0.6804
+    B vs C  : 0.7260
+    Overall : 0.7325
+  Fleiss' κ  (all 3 annotators) : 0.6717
+  Kripp. α   (all 3 annotators) : 0.6717
+  Category distribution (pooled across all annotators):
+    6:Calculation Error               46.8%
+    3:Formula/Principle Error         22.8%
+    2:Setup/Assumption Error          12.8%
+    1:Hallucination                    8.2%
+    4:Unit/Dimensional Error           6.3%
+    5:Sign/Direction Error             3.0%
+
+--------------------------------------------------------------------------
+  Scope : gpt-5
+  Items : 200
+  Dominant category: 6:Calculation Error (75.5% of all labels)  ← high prevalence; Cohen's κ deflated, see PABAK / Gwet AC1
+--------------------------------------------------------------------------
+  Percent Agreement
+    A vs B  : 85.00%
+    A vs C  : 64.50%
+    B vs C  : 68.50%
+    Overall : 72.67%
+  Cohen's κ (pairwise)
+    A vs B  : 0.4881
+    A vs C  : 0.2322
+    B vs C  : 0.3693
+  PABAK (pairwise, prevalence-adjusted)
+    A vs B  : 0.7000
+    A vs C  : 0.2900
+    B vs C  : 0.3700
+    Overall : 0.4533
+  Gwet's AC1 (pairwise, prevalence-robust)
+    A vs B  : 0.8408
+    A vs C  : 0.6116
+    B vs C  : 0.6512
+    Overall : 0.7012
+  Fleiss' κ  (all 3 annotators) : 0.3285
+  Kripp. α   (all 3 annotators) : 0.3285
+  Category distribution (pooled across all annotators):
+    6:Calculation Error               75.5%
+    2:Setup/Assumption Error          13.3%
+    3:Formula/Principle Error          6.2%
+    4:Unit/Dimensional Error           3.5%
+    1:Hallucination                    0.8%
+    5:Sign/Direction Error             0.7%
+
+--------------------------------------------------------------------------
+  Scope : gpt-5-mini
+  Items : 200
+  Dominant category: 6:Calculation Error (69.3% of all labels)
+--------------------------------------------------------------------------
+  Percent Agreement
+    A vs B  : 74.50%
+    A vs C  : 61.00%
+    B vs C  : 68.50%
+    Overall : 68.00%
+  Cohen's κ (pairwise)
+    A vs B  : 0.3839
+    A vs C  : 0.2589
+    B vs C  : 0.4286
+  PABAK (pairwise, prevalence-adjusted)
+    A vs B  : 0.4900
+    A vs C  : 0.2200
+    B vs C  : 0.3700
+    Overall : 0.3600
+  Gwet's AC1 (pairwise, prevalence-robust)
+    A vs B  : 0.7222
+    A vs C  : 0.5664
+    B vs C  : 0.6468
+    Overall : 0.6451
+  Fleiss' κ  (all 3 annotators) : 0.3453
+  Kripp. α   (all 3 annotators) : 0.3453
+  Category distribution (pooled across all annotators):
+    6:Calculation Error               69.3%
+    2:Setup/Assumption Error          13.2%
+    3:Formula/Principle Error         10.7%
+    1:Hallucination                    3.0%
+    4:Unit/Dimensional Error           2.8%
+    5:Sign/Direction Error             1.0%
+
+--------------------------------------------------------------------------
+  Scope : mathstral-7b
+  Items : 200
+  Dominant category: 6:Calculation Error (37.2% of all labels)
+--------------------------------------------------------------------------
+  Percent Agreement
+    A vs B  : 75.00%
+    A vs C  : 71.50%
+    B vs C  : 79.00%
+    Overall : 75.17%
+  Cohen's κ (pairwise)
+    A vs B  : 0.6523
+    A vs C  : 0.6135
+    B vs C  : 0.7199
+  PABAK (pairwise, prevalence-adjusted)
+    A vs B  : 0.5000
+    A vs C  : 0.4300
+    B vs C  : 0.5800
+    Overall : 0.5033
+  Gwet's AC1 (pairwise, prevalence-robust)
+    A vs B  : 0.7082
+    A vs C  : 0.6661
+    B vs C  : 0.7531
+    Overall : 0.7091
+  Fleiss' κ  (all 3 annotators) : 0.6612
+  Kripp. α   (all 3 annotators) : 0.6612
+  Category distribution (pooled across all annotators):
+    6:Calculation Error               37.2%
+    3:Formula/Principle Error         30.7%
+    2:Setup/Assumption Error          13.2%
+    1:Hallucination                   10.8%
+    4:Unit/Dimensional Error           7.5%
+    5:Sign/Direction Error             0.7%
+
+--------------------------------------------------------------------------
+  Scope : meta-llama-3.1-70b
+  Items : 200
+  Dominant category: 6:Calculation Error (51.3% of all labels)
+--------------------------------------------------------------------------
+  Percent Agreement
+    A vs B  : 79.50%
+    A vs C  : 72.50%
+    B vs C  : 80.50%
+    Overall : 77.50%
+  Cohen's κ (pairwise)
+    A vs B  : 0.6728
+    A vs C  : 0.5902
+    B vs C  : 0.7117
+  PABAK (pairwise, prevalence-adjusted)
+    A vs B  : 0.5900
+    A vs C  : 0.4500
+    B vs C  : 0.6100
+    Overall : 0.5500
+  Gwet's AC1 (pairwise, prevalence-robust)
+    A vs B  : 0.7657
+    A vs C  : 0.6829
+    B vs C  : 0.7747
+    Overall : 0.7411
+  Fleiss' κ  (all 3 annotators) : 0.6566
+  Kripp. α   (all 3 annotators) : 0.6566
+  Category distribution (pooled across all annotators):
+    6:Calculation Error               51.3%
+    3:Formula/Principle Error         25.2%
+    2:Setup/Assumption Error          11.0%
+    4:Unit/Dimensional Error           6.0%
+    1:Hallucination                    3.7%
+    5:Sign/Direction Error             2.8%
+
+--------------------------------------------------------------------------
+  Scope : qwen2.5-72b
+  Items : 200
+  Dominant category: 6:Calculation Error (54.3% of all labels)
+--------------------------------------------------------------------------
+  Percent Agreement
+    A vs B  : 81.00%
+    A vs C  : 71.50%
+    B vs C  : 73.00%
+    Overall : 75.17%
+  Cohen's κ (pairwise)
+    A vs B  : 0.6973
+    A vs C  : 0.5663
+    B vs C  : 0.5897
+  PABAK (pairwise, prevalence-adjusted)
+    A vs B  : 0.6200
+    A vs C  : 0.4300
+    B vs C  : 0.4600
+    Overall : 0.5033
+  Gwet's AC1 (pairwise, prevalence-robust)
+    A vs B  : 0.7827
+    A vs C  : 0.6724
+    B vs C  : 0.6895
+    Overall : 0.7149
+  Fleiss' κ  (all 3 annotators) : 0.6147
+  Kripp. α   (all 3 annotators) : 0.6147
+  Category distribution (pooled across all annotators):
+    6:Calculation Error               54.3%
+    3:Formula/Principle Error         17.7%
+    2:Setup/Assumption Error          15.3%
+    1:Hallucination                    5.2%
+    4:Unit/Dimensional Error           3.8%
+    5:Sign/Direction Error             3.7%
+
+--------------------------------------------------------------------------
+  Scope : wizardmath-7b
+  Items : 200
+  Dominant category: 2:Setup/Assumption Error (33.5% of all labels)
+--------------------------------------------------------------------------
+  Percent Agreement
+    A vs B  : 69.00%
+    A vs C  : 58.00%
+    B vs C  : 67.00%
+    Overall : 64.67%
+  Cohen's κ (pairwise)
+    A vs B  : 0.5886
+    A vs C  : 0.4524
+    B vs C  : 0.5577
+  PABAK (pairwise, prevalence-adjusted)
+    A vs B  : 0.3800
+    A vs C  : 0.1600
+    B vs C  : 0.3400
+    Overall : 0.2933
+  Gwet's AC1 (pairwise, prevalence-robust)
+    A vs B  : 0.6356
+    A vs C  : 0.5064
+    B vs C  : 0.6132
+    Overall : 0.5851
+  Fleiss' κ  (all 3 annotators) : 0.5267
+  Kripp. α   (all 3 annotators) : 0.5267
+  Category distribution (pooled across all annotators):
+    2:Setup/Assumption Error          33.5%
+    6:Calculation Error               26.7%
+    1:Hallucination                   21.2%
+    3:Formula/Principle Error         15.7%
+    4:Unit/Dimensional Error           2.7%
+    5:Sign/Direction Error             0.3%
+
+
+Category legend:
+  0: No Error
+  1: Hallucination
+  2: Setup/Assumption Error
+  3: Formula/Principle Error
+  4: Unit/Dimensional Error
+  5: Sign/Direction Error
+  6: Calculation Error
+
+Kappa / PABAK / AC1 interpretation:
+  < 0.00 : poor       0.01–0.20 : slight    0.21–0.40 : fair
+  0.41–0.60 : moderate   0.61–0.80 : substantial   0.81–1.00 : almost perfect
+
+References:
+  Landis & Koch (1977) — kappa benchmarks
+  Byrt et al. (1993)   — PABAK
+  Gwet (2008)          — AC1

@@ -23,38 +23,37 @@ display_names = {
 }
 
 data = {
-    "gpt-5-mini":             {"Easy": 67.84, "Intermediate": 70.00, "Advanced": 47.58},
-    "gemini-3.1-pro-preview": {"Easy": 67.45, "Intermediate": 73.53, "Advanced": 49.70},
-    "deepseek-reasoner":      {"Easy": 65.29, "Intermediate": 65.88, "Advanced": 46.97},
-    "meta-llama-3.1-70b":    {"Easy": 52.55, "Intermediate": 40.39, "Advanced": 23.33},
+    "gpt-5-mini":             {"Chemical": 60.00, "Electrical": 64.89, "Mechanical": 66.22},
+    "gemini-3.1-pro-preview": {"Chemical": 54.22, "Electrical": 70.67, "Mechanical": 71.33},
+    "deepseek-reasoner":      {"Chemical": 64.89, "Electrical": 57.33, "Mechanical": 60.89},
+    "meta-llama-3.1-70b":    {"Chemical": 38.00, "Electrical": 48.89, "Mechanical": 35.56},
 }
 
-level_order = ["Easy", "Intermediate", "Advanced"]
+branch_order = ["Chemical", "Electrical", "Mechanical"]
 
-# Model-specific color families (dark → mid → light across difficulty levels)
 color_palettes = {
-    "gpt-5-mini":             ["#6ab0e8", "#9ccbf0", "#c8e4f8"],   # blue
-    "gemini-3.1-pro-preview": ["#72c47a", "#a3d9a5", "#cceecf"],   # green
-    "deepseek-reasoner":      ["#b09cd6", "#ccc0e6", "#e3dcf3"],   # purple
-    "meta-llama-3.1-70b":    ["#e08060", "#eda888", "#f5cdb8"],   # orange
+    "gpt-5-mini":             ["#6ab0e8", "#9ccbf0", "#c8e4f8"],
+    "gemini-3.1-pro-preview": ["#72c47a", "#a3d9a5", "#cceecf"],
+    "deepseek-reasoner":      ["#b09cd6", "#ccc0e6", "#e3dcf3"],
+    "meta-llama-3.1-70b":    ["#e08060", "#eda888", "#f5cdb8"],
 }
 
-hatches = {"Easy": "", "Intermediate": "///", "Advanced": "..."}
+hatches = {"Chemical": "", "Electrical": "///", "Mechanical": "..."}
 
 fig, ax = plt.subplots(figsize=(14, 8))
 
 x = np.arange(len(selected_models))
 width = 0.22
-offsets = {"Easy": -width, "Intermediate": 0, "Advanced": width}
+offsets = {"Chemical": -width, "Electrical": 0, "Mechanical": width}
 
-for level in level_order:
-    bar_colors = [color_palettes[m][level_order.index(level)] for m in selected_models]
+for branch in branch_order:
+    bar_colors = [color_palettes[m][branch_order.index(branch)] for m in selected_models]
     bars = ax.bar(
-        x + offsets[level],
-        [data[m][level] for m in selected_models],
+        x + offsets[branch],
+        [data[m][branch] for m in selected_models],
         width,
         color=bar_colors,
-        hatch=hatches[level],
+        hatch=hatches[branch],
         edgecolor="#888888",
         linewidth=0.7,
         alpha=1.0,
@@ -87,19 +86,17 @@ ax.spines["right"].set_visible(False)
 ax.spines["left"].set_color("black");   ax.spines["left"].set_linewidth(1.2)
 ax.spines["bottom"].set_color("black"); ax.spines["bottom"].set_linewidth(1.2)
 
-# Legend uses neutral gray + hatch only — color varies per model so the legend
-# encodes difficulty purely through pattern, consistent across all groups.
 legend_elements = [
     mpatches.Patch(facecolor="#cccccc", edgecolor="black", linewidth=1.2,
-                   hatch=hatches["Easy"],         label="Easy"),
+                   hatch=hatches["Chemical"],   label="Chemical Eng."),
     mpatches.Patch(facecolor="#cccccc", edgecolor="black", linewidth=1.2,
-                   hatch=hatches["Intermediate"], label="Intermediate"),
+                   hatch=hatches["Electrical"], label="Electrical Eng."),
     mpatches.Patch(facecolor="#cccccc", edgecolor="black", linewidth=1.2,
-                   hatch=hatches["Advanced"],     label="Advanced"),
+                   hatch=hatches["Mechanical"], label="Mechanical Eng."),
 ]
 legend = ax.legend(
     handles=legend_elements,
-    title="Difficulty Level",
+    title="Engineering Branch",
     loc="upper right",
     frameon=True, fancybox=False, shadow=False,
     borderpad=1.0, edgecolor="black", framealpha=1, facecolor="white",
@@ -111,6 +108,6 @@ legend.get_title().set_fontname("Times New Roman")
 legend.get_frame().set_linewidth(1.5)
 
 plt.tight_layout()
-plt.savefig("Level_Performance_Bar.pdf", dpi=300, bbox_inches="tight")
-plt.savefig("Level_Performance_Bar.png", dpi=300, bbox_inches="tight")
+plt.savefig("Branch_Performance_Bar.pdf", dpi=300, bbox_inches="tight")
+plt.savefig("Branch_Performance_Bar.png", dpi=300, bbox_inches="tight")
 plt.show()

@@ -1,0 +1,43 @@
+=== Error Analysis Sampling Summary ===
+Seed: 42
+Target per model: 200
+
+Confirmed Failure Filter:
+  (1) scores.final_answer_acc == 0.0
+  (2) meta.tribunal_triggered == false
+  (3) scores.recovered_f1 < 0.3 OR scores.recall < 0.2
+
+Threshold Calibration Note:
+  Thresholds calibrated on gemini-3.1-pro-preview borderline cases (F1 0.2–0.4).
+  5 borderline records were manually spot-checked: all showed genuine reasoning
+  failures (wrong numerical values, misidentified reactants, incorrect formula
+  application). The original thresholds F1<0.30 / recall<0.20 were retained.
+
+Model                     Role         Total   Failures  Sampled  Proportions
+------------------------------------------------------------------------------------------
+gemini-3.1-pro-preview    main          1350        337      200  Advanced:0.24  Easy:0.38  Intermediate:0.38
+deepseek-r1               main          1350        359      200  Advanced:0.24  Easy:0.38  Intermediate:0.38
+meta-llama-3.1-70b        main          1350        587      200  Advanced:0.24  Easy:0.38  Intermediate:0.38
+gpt-5-mini                appendix      1350        373      200  Advanced:0.24  Easy:0.38  Intermediate:0.38
+gpt-5                     appendix      1350        388      200  Advanced:0.23  Easy:0.38  Intermediate:0.39
+deepseek-v4-pro           appendix      1350        388      200  Advanced:0.24  Easy:0.38  Intermediate:0.38
+claude-opus-4-7           appendix      1350        380      200  Advanced:0.24  Easy:0.38  Intermediate:0.38
+qwen2.5-72b               appendix      1350        526      200  Advanced:0.24  Easy:0.38  Intermediate:0.38
+gemma-3-27b               appendix      1350        571      200  Advanced:0.24  Easy:0.38  Intermediate:0.38
+mathstral-7b              appendix      1350        830      200  Advanced:0.24  Easy:0.38  Intermediate:0.38
+wizardmath-7b             appendix      1350        969      200  Advanced:0.24  Easy:0.38  Intermediate:0.38
+------------------------------------------------------------------------------------------
+Total traces: 2200
+
+Output files:
+  c:\Users\ayesha.gull01\OneDrive - Confiz Limited\Desktop\EngChain\error_analysis_samples\gemini-3.1-pro-preview_annotation_sample.jsonl
+  c:\Users\ayesha.gull01\OneDrive - Confiz Limited\Desktop\EngChain\error_analysis_samples\deepseek-r1_annotation_sample.jsonl
+  c:\Users\ayesha.gull01\OneDrive - Confiz Limited\Desktop\EngChain\error_analysis_samples\meta-llama-3.1-70b_annotation_sample.jsonl
+  c:\Users\ayesha.gull01\OneDrive - Confiz Limited\Desktop\EngChain\error_analysis_samples\gpt-5-mini_annotation_sample.jsonl
+  c:\Users\ayesha.gull01\OneDrive - Confiz Limited\Desktop\EngChain\error_analysis_samples\gpt-5_annotation_sample.jsonl
+  c:\Users\ayesha.gull01\OneDrive - Confiz Limited\Desktop\EngChain\error_analysis_samples\deepseek-v4-pro_annotation_sample.jsonl
+  c:\Users\ayesha.gull01\OneDrive - Confiz Limited\Desktop\EngChain\error_analysis_samples\claude-opus-4-7_annotation_sample.jsonl
+  c:\Users\ayesha.gull01\OneDrive - Confiz Limited\Desktop\EngChain\error_analysis_samples\qwen2.5-72b_annotation_sample.jsonl
+  c:\Users\ayesha.gull01\OneDrive - Confiz Limited\Desktop\EngChain\error_analysis_samples\gemma-3-27b_annotation_sample.jsonl
+  c:\Users\ayesha.gull01\OneDrive - Confiz Limited\Desktop\EngChain\error_analysis_samples\mathstral-7b_annotation_sample.jsonl
+  c:\Users\ayesha.gull01\OneDrive - Confiz Limited\Desktop\EngChain\error_analysis_samples\wizardmath-7b_annotation_sample.jsonl

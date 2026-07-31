@@ -1,0 +1,578 @@
+{
+  "meta": {
+    "description": "EngTrace error distribution analysis — majority-vote labels from 3 annotators",
+    "models": [
+      "claude-opus-4-7",
+      "deepseek-r1",
+      "deepseek-v4-pro",
+      "gemini-3.1-pro-preview",
+      "gemma-3-27b",
+      "gpt-5",
+      "gpt-5-mini",
+      "mathstral-7b",
+      "meta-llama-3.1-70b",
+      "qwen2.5-72b",
+      "wizardmath-7b"
+    ],
+    "main_text_models": [
+      "gemini-3.1-pro-preview",
+      "deepseek-r1",
+      "meta-llama-3.1-70b"
+    ],
+    "category_legend": {
+      "0": "No Error",
+      "1": "Hallucination",
+      "2": "Setup / Assumption Error",
+      "3": "Formula / Principle Error",
+      "4": "Unit / Dimensional Error",
+      "5": "Sign / Direction Error",
+      "6": "Calculation Error"
+    },
+    "severity_legend": {
+      "1": "Critical",
+      "2": "High",
+      "3": "High",
+      "4": "Medium",
+      "5": "Medium",
+      "6": "Low"
+    }
+  },
+  "profile": {
+    "model": "claude-opus-4-7",
+    "display_name": "claude-opus-4-7",
+    "n_traces": 200,
+    "overall_category_dist": {
+      "1": {
+        "name": "Hallucination",
+        "severity": "Critical",
+        "count": 3,
+        "pct": 1.5
+      },
+      "2": {
+        "name": "Setup / Assumption Error",
+        "severity": "High",
+        "count": 13,
+        "pct": 6.5
+      },
+      "3": {
+        "name": "Formula / Principle Error",
+        "severity": "High",
+        "count": 5,
+        "pct": 2.5
+      },
+      "4": {
+        "name": "Unit / Dimensional Error",
+        "severity": "Medium",
+        "count": 4,
+        "pct": 2.0
+      },
+      "6": {
+        "name": "Calculation Error",
+        "severity": "Low",
+        "count": 175,
+        "pct": 87.5
+      }
+    },
+    "high_severity_rate_pct": 8.0,
+    "conceptual_error_rate_pct": 10.5,
+    "by_difficulty": {
+      "Advanced": {
+        "n": 49,
+        "category_dist": {
+          "2": {
+            "name": "Setup / Assumption Error",
+            "severity": "High",
+            "count": 6,
+            "pct": 12.24
+          },
+          "3": {
+            "name": "Formula / Principle Error",
+            "severity": "High",
+            "count": 3,
+            "pct": 6.12
+          },
+          "6": {
+            "name": "Calculation Error",
+            "severity": "Low",
+            "count": 40,
+            "pct": 81.63
+          }
+        }
+      },
+      "Easy": {
+        "n": 75,
+        "category_dist": {
+          "1": {
+            "name": "Hallucination",
+            "severity": "Critical",
+            "count": 2,
+            "pct": 2.67
+          },
+          "2": {
+            "name": "Setup / Assumption Error",
+            "severity": "High",
+            "count": 2,
+            "pct": 2.67
+          },
+          "4": {
+            "name": "Unit / Dimensional Error",
+            "severity": "Medium",
+            "count": 1,
+            "pct": 1.33
+          },
+          "6": {
+            "name": "Calculation Error",
+            "severity": "Low",
+            "count": 70,
+            "pct": 93.33
+          }
+        }
+      },
+      "Intermediate": {
+        "n": 76,
+        "category_dist": {
+          "1": {
+            "name": "Hallucination",
+            "severity": "Critical",
+            "count": 1,
+            "pct": 1.32
+          },
+          "2": {
+            "name": "Setup / Assumption Error",
+            "severity": "High",
+            "count": 5,
+            "pct": 6.58
+          },
+          "3": {
+            "name": "Formula / Principle Error",
+            "severity": "High",
+            "count": 2,
+            "pct": 2.63
+          },
+          "4": {
+            "name": "Unit / Dimensional Error",
+            "severity": "Medium",
+            "count": 3,
+            "pct": 3.95
+          },
+          "6": {
+            "name": "Calculation Error",
+            "severity": "Low",
+            "count": 65,
+            "pct": 85.53
+          }
+        }
+      }
+    },
+    "complexity_cliff": {
+      "Easy": 5.33,
+      "Intermediate": 10.53,
+      "Advanced": 18.37,
+      "cliff_size_pp": 13.04,
+      "interpretation": "positive = more conceptual errors at Advanced (errors get harder)"
+    },
+    "by_branch": {
+      "chemical_engineering": {
+        "n": 79,
+        "category_dist": {
+          "1": {
+            "name": "Hallucination",
+            "severity": "Critical",
+            "count": 2,
+            "pct": 2.53
+          },
+          "2": {
+            "name": "Setup / Assumption Error",
+            "severity": "High",
+            "count": 5,
+            "pct": 6.33
+          },
+          "3": {
+            "name": "Formula / Principle Error",
+            "severity": "High",
+            "count": 3,
+            "pct": 3.8
+          },
+          "6": {
+            "name": "Calculation Error",
+            "severity": "Low",
+            "count": 69,
+            "pct": 87.34
+          }
+        }
+      },
+      "electrical_engineering": {
+        "n": 80,
+        "category_dist": {
+          "1": {
+            "name": "Hallucination",
+            "severity": "Critical",
+            "count": 1,
+            "pct": 1.25
+          },
+          "2": {
+            "name": "Setup / Assumption Error",
+            "severity": "High",
+            "count": 4,
+            "pct": 5.0
+          },
+          "3": {
+            "name": "Formula / Principle Error",
+            "severity": "High",
+            "count": 2,
+            "pct": 2.5
+          },
+          "4": {
+            "name": "Unit / Dimensional Error",
+            "severity": "Medium",
+            "count": 3,
+            "pct": 3.75
+          },
+          "6": {
+            "name": "Calculation Error",
+            "severity": "Low",
+            "count": 70,
+            "pct": 87.5
+          }
+        }
+      },
+      "mechanical_engineering": {
+        "n": 41,
+        "category_dist": {
+          "2": {
+            "name": "Setup / Assumption Error",
+            "severity": "High",
+            "count": 4,
+            "pct": 9.76
+          },
+          "4": {
+            "name": "Unit / Dimensional Error",
+            "severity": "Medium",
+            "count": 1,
+            "pct": 2.44
+          },
+          "6": {
+            "name": "Calculation Error",
+            "severity": "Low",
+            "count": 36,
+            "pct": 87.8
+          }
+        }
+      }
+    },
+    "top5_domains": {
+      "electromagnetics_and_waves": {
+        "n": 41,
+        "category_dist": {
+          "3": {
+            "name": "Formula / Principle Error",
+            "severity": "High",
+            "count": 1,
+            "pct": 2.44
+          },
+          "4": {
+            "name": "Unit / Dimensional Error",
+            "severity": "Medium",
+            "count": 1,
+            "pct": 2.44
+          },
+          "6": {
+            "name": "Calculation Error",
+            "severity": "Low",
+            "count": 39,
+            "pct": 95.12
+          }
+        }
+      },
+      "transport_phenomena": {
+        "n": 39,
+        "category_dist": {
+          "1": {
+            "name": "Hallucination",
+            "severity": "Critical",
+            "count": 2,
+            "pct": 5.13
+          },
+          "2": {
+            "name": "Setup / Assumption Error",
+            "severity": "High",
+            "count": 2,
+            "pct": 5.13
+          },
+          "6": {
+            "name": "Calculation Error",
+            "severity": "Low",
+            "count": 35,
+            "pct": 89.74
+          }
+        }
+      },
+      "fluid_mechanics": {
+        "n": 26,
+        "category_dist": {
+          "2": {
+            "name": "Setup / Assumption Error",
+            "severity": "High",
+            "count": 4,
+            "pct": 15.38
+          },
+          "4": {
+            "name": "Unit / Dimensional Error",
+            "severity": "Medium",
+            "count": 1,
+            "pct": 3.85
+          },
+          "6": {
+            "name": "Calculation Error",
+            "severity": "Low",
+            "count": 21,
+            "pct": 80.77
+          }
+        }
+      },
+      "reaction_kinetics": {
+        "n": 25,
+        "category_dist": {
+          "2": {
+            "name": "Setup / Assumption Error",
+            "severity": "High",
+            "count": 1,
+            "pct": 4.0
+          },
+          "3": {
+            "name": "Formula / Principle Error",
+            "severity": "High",
+            "count": 1,
+            "pct": 4.0
+          },
+          "6": {
+            "name": "Calculation Error",
+            "severity": "Low",
+            "count": 23,
+            "pct": 92.0
+          }
+        }
+      },
+      "digital_communications": {
+        "n": 23,
+        "category_dist": {
+          "2": {
+            "name": "Setup / Assumption Error",
+            "severity": "High",
+            "count": 3,
+            "pct": 13.04
+          },
+          "3": {
+            "name": "Formula / Principle Error",
+            "severity": "High",
+            "count": 1,
+            "pct": 4.35
+          },
+          "4": {
+            "name": "Unit / Dimensional Error",
+            "severity": "Medium",
+            "count": 2,
+            "pct": 8.7
+          },
+          "6": {
+            "name": "Calculation Error",
+            "severity": "Low",
+            "count": 17,
+            "pct": 73.91
+          }
+        }
+      }
+    },
+    "by_domain_full": {
+      "digital_communications": {
+        "n": 23,
+        "category_dist": {
+          "2": {
+            "name": "Setup / Assumption Error",
+            "severity": "High",
+            "count": 3,
+            "pct": 13.04
+          },
+          "3": {
+            "name": "Formula / Principle Error",
+            "severity": "High",
+            "count": 1,
+            "pct": 4.35
+          },
+          "4": {
+            "name": "Unit / Dimensional Error",
+            "severity": "Medium",
+            "count": 2,
+            "pct": 8.7
+          },
+          "6": {
+            "name": "Calculation Error",
+            "severity": "Low",
+            "count": 17,
+            "pct": 73.91
+          }
+        }
+      },
+      "electromagnetics_and_waves": {
+        "n": 41,
+        "category_dist": {
+          "3": {
+            "name": "Formula / Principle Error",
+            "severity": "High",
+            "count": 1,
+            "pct": 2.44
+          },
+          "4": {
+            "name": "Unit / Dimensional Error",
+            "severity": "Medium",
+            "count": 1,
+            "pct": 2.44
+          },
+          "6": {
+            "name": "Calculation Error",
+            "severity": "Low",
+            "count": 39,
+            "pct": 95.12
+          }
+        }
+      },
+      "fluid_mechanics": {
+        "n": 26,
+        "category_dist": {
+          "2": {
+            "name": "Setup / Assumption Error",
+            "severity": "High",
+            "count": 4,
+            "pct": 15.38
+          },
+          "4": {
+            "name": "Unit / Dimensional Error",
+            "severity": "Medium",
+            "count": 1,
+            "pct": 3.85
+          },
+          "6": {
+            "name": "Calculation Error",
+            "severity": "Low",
+            "count": 21,
+            "pct": 80.77
+          }
+        }
+      },
+      "mechanics_of_materials": {
+        "n": 8,
+        "category_dist": {
+          "6": {
+            "name": "Calculation Error",
+            "severity": "Low",
+            "count": 8,
+            "pct": 100.0
+          }
+        }
+      },
+      "reaction_kinetics": {
+        "n": 25,
+        "category_dist": {
+          "2": {
+            "name": "Setup / Assumption Error",
+            "severity": "High",
+            "count": 1,
+            "pct": 4.0
+          },
+          "3": {
+            "name": "Formula / Principle Error",
+            "severity": "High",
+            "count": 1,
+            "pct": 4.0
+          },
+          "6": {
+            "name": "Calculation Error",
+            "severity": "Low",
+            "count": 23,
+            "pct": 92.0
+          }
+        }
+      },
+      "signals_and_systems": {
+        "n": 16,
+        "category_dist": {
+          "1": {
+            "name": "Hallucination",
+            "severity": "Critical",
+            "count": 1,
+            "pct": 6.25
+          },
+          "2": {
+            "name": "Setup / Assumption Error",
+            "severity": "High",
+            "count": 1,
+            "pct": 6.25
+          },
+          "6": {
+            "name": "Calculation Error",
+            "severity": "Low",
+            "count": 14,
+            "pct": 87.5
+          }
+        }
+      },
+      "thermodynamics": {
+        "n": 15,
+        "category_dist": {
+          "2": {
+            "name": "Setup / Assumption Error",
+            "severity": "High",
+            "count": 2,
+            "pct": 13.33
+          },
+          "3": {
+            "name": "Formula / Principle Error",
+            "severity": "High",
+            "count": 2,
+            "pct": 13.33
+          },
+          "6": {
+            "name": "Calculation Error",
+            "severity": "Low",
+            "count": 11,
+            "pct": 73.33
+          }
+        }
+      },
+      "transport_phenomena": {
+        "n": 39,
+        "category_dist": {
+          "1": {
+            "name": "Hallucination",
+            "severity": "Critical",
+            "count": 2,
+            "pct": 5.13
+          },
+          "2": {
+            "name": "Setup / Assumption Error",
+            "severity": "High",
+            "count": 2,
+            "pct": 5.13
+          },
+          "6": {
+            "name": "Calculation Error",
+            "severity": "Low",
+            "count": 35,
+            "pct": 89.74
+          }
+        }
+      },
+      "vibrations_and_acoustics": {
+        "n": 7,
+        "category_dist": {
+          "6": {
+            "name": "Calculation Error",
+            "severity": "Low",
+            "count": 7,
+            "pct": 100.0
+          }
+        }
+      }
+    }
+  }
+}

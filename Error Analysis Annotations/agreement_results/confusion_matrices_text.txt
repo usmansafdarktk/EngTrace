@@ -1,0 +1,408 @@
+
+=================================================================
+  OVERALL
+=================================================================
+
+  Annotator A (rows) vs Annotator B (cols)
+              0   1    2    3   4   5     6
+0:No Error    0   0    0    0   0   0     0
+1:Hallucinat  0  55   21    2   1   0    40
+2:Setup/Assu  0  14  129   27   1   3    24
+3:Formula/Pr  0  50   20  175   4   5    14
+4:Unit/Dimen  0   1    4    6  42   0    25
+5:Sign/Direc  0   0    1    0   0  26     8
+6:Calculatio  0   6  108   35  64   8  1281
+
+  Annotator A (rows) vs Annotator C (cols)
+              0   1    2    3   4  5     6
+0:No Error    0   0    0    0   0  0     0
+1:Hallucinat  0  41   42   16   2  0    18
+2:Setup/Assu  0  11  163   16   1  2     5
+3:Formula/Pr  0  46   49  166   0  2     5
+4:Unit/Dimen  0   5   13    4  37  1    18
+5:Sign/Direc  0   0   16   11   0  6     2
+6:Calculatio  0  19  212  153  56  8  1054
+
+  Annotator B (rows) vs Annotator C (cols)
+              0   1    2    3   4  5     6
+0:No Error    0   0    0    0   0  0     0
+1:Hallucinat  0  83   21   22   0  0     0
+2:Setup/Assu  0   6  222   23   7  1    24
+3:Formula/Pr  0  11   55  174   0  0     5
+4:Unit/Dimen  0   3   19    8  49  2    31
+5:Sign/Direc  0   0   19   13   1  7     2
+6:Calculatio  0  19  159  126  39  9  1040
+
+=================================================================
+  claude-opus-4-7
+=================================================================
+
+  Annotator A (rows) vs Annotator B (cols)
+              0  1   2  3   4  5    6
+0:No Error    0  0   0  0   0  0    0
+1:Hallucinat  0  1   1  1   0  0    5
+2:Setup/Assu  0  0   1  0   0  0    2
+3:Formula/Pr  0  0   0  2   0  0    0
+4:Unit/Dimen  0  0   0  0   0  0    3
+5:Sign/Direc  0  0   0  0   0  0    0
+6:Calculatio  0  0  10  1  14  0  159
+
+  Annotator A (rows) vs Annotator C (cols)
+              0  1   2   3  4  5    6
+0:No Error    0  0   0   0  0  0    0
+1:Hallucinat  0  0   3   1  1  0    3
+2:Setup/Assu  0  0   3   0  0  0    0
+3:Formula/Pr  0  0   0   2  0  0    0
+4:Unit/Dimen  0  0   1   0  0  0    2
+5:Sign/Direc  0  0   0   0  0  0    0
+6:Calculatio  0  1  26  14  9  2  132
+
+  Annotator B (rows) vs Annotator C (cols)
+              0  1   2   3  4  5    6
+0:No Error    0  0   0   0  0  0    0
+1:Hallucinat  0  0   1   0  0  0    0
+2:Setup/Assu  0  0   8   0  1  0    3
+3:Formula/Pr  0  0   0   4  0  0    0
+4:Unit/Dimen  0  0   1   1  4  0    8
+5:Sign/Direc  0  0   0   0  0  0    0
+6:Calculatio  0  1  23  12  5  2  126
+
+=================================================================
+  deepseek-r1
+=================================================================
+
+  Annotator A (rows) vs Annotator B (cols)
+              0  1   2  3  4  5    6
+0:No Error    0  0   0  0  0  0    0
+1:Hallucinat  0  0   2  0  0  0    4
+2:Setup/Assu  0  1  16  0  1  1    2
+3:Formula/Pr  0  0   0  2  0  4    1
+4:Unit/Dimen  0  0   0  0  1  0    1
+5:Sign/Direc  0  0   0  0  0  5    0
+6:Calculatio  0  1  20  0  5  0  133
+
+  Annotator A (rows) vs Annotator C (cols)
+              0  1   2   3  4  5    6
+0:No Error    0  0   0   0  0  0    0
+1:Hallucinat  0  0   3   0  0  0    3
+2:Setup/Assu  0  1  20   0  0  0    0
+3:Formula/Pr  0  0   3   3  0  1    0
+4:Unit/Dimen  0  0   0   0  1  0    1
+5:Sign/Direc  0  0   2   2  0  1    0
+6:Calculatio  0  2  29  19  6  0  103
+
+  Annotator B (rows) vs Annotator C (cols)
+              0  1   2   3  4  5    6
+0:No Error    0  0   0   0  0  0    0
+1:Hallucinat  0  1   0   1  0  0    0
+2:Setup/Assu  0  0  27   5  2  0    4
+3:Formula/Pr  0  0   0   2  0  0    0
+4:Unit/Dimen  0  0   3   0  1  0    3
+5:Sign/Direc  0  0   5   3  0  2    0
+6:Calculatio  0  2  22  13  4  0  100
+
+=================================================================
+  deepseek-v4-pro
+=================================================================
+
+  Annotator A (rows) vs Annotator B (cols)
+              0  1   2  3  4  5    6
+0:No Error    0  0   0  0  0  0    0
+1:Hallucinat  0  1   1  0  0  0    7
+2:Setup/Assu  0  2   3  0  0  0    3
+3:Formula/Pr  0  0   2  0  0  0    1
+4:Unit/Dimen  0  0   1  0  0  0    3
+5:Sign/Direc  0  0   0  0  0  0    0
+6:Calculatio  0  0  14  2  4  1  155
+
+  Annotator A (rows) vs Annotator C (cols)
+              0  1   2   3  4  5    6
+0:No Error    0  0   0   0  0  0    0
+1:Hallucinat  0  0   5   1  0  0    3
+2:Setup/Assu  0  2   4   1  0  0    1
+3:Formula/Pr  0  0   3   0  0  0    0
+4:Unit/Dimen  0  0   1   0  0  0    3
+5:Sign/Direc  0  0   0   0  0  0    0
+6:Calculatio  0  0  27  17  9  0  123
+
+  Annotator B (rows) vs Annotator C (cols)
+              0  1   2   3  4  5    6
+0:No Error    0  0   0   0  0  0    0
+1:Hallucinat  0  2   1   0  0  0    0
+2:Setup/Assu  0  0  13   3  1  0    4
+3:Formula/Pr  0  0   2   0  0  0    0
+4:Unit/Dimen  0  0   0   0  2  0    2
+5:Sign/Direc  0  0   0   0  0  0    1
+6:Calculatio  0  0  24  16  6  0  123
+
+=================================================================
+  gemini-3.1-pro-preview
+=================================================================
+
+  Annotator A (rows) vs Annotator B (cols)
+              0  1   2  3   4  5    6
+0:No Error    0  0   0  0   0  0    0
+1:Hallucinat  0  0   6  0   1  0    7
+2:Setup/Assu  0  0   2  0   0  0    6
+3:Formula/Pr  0  0   1  0   0  0    1
+4:Unit/Dimen  0  0   0  0   0  0    6
+5:Sign/Direc  0  0   0  0   0  0    0
+6:Calculatio  0  0  14  2  18  1  135
+
+  Annotator A (rows) vs Annotator C (cols)
+              0  1   2   3  4  5    6
+0:No Error    0  0   0   0  0  0    0
+1:Hallucinat  0  1   8   3  0  0    2
+2:Setup/Assu  0  0   5   1  0  0    2
+3:Formula/Pr  0  0   1   0  0  0    1
+4:Unit/Dimen  0  0   1   0  2  0    3
+5:Sign/Direc  0  0   0   0  0  0    0
+6:Calculatio  0  0  23  18  3  2  124
+
+  Annotator B (rows) vs Annotator C (cols)
+              0  1   2   3  4  5    6
+0:No Error    0  0   0   0  0  0    0
+1:Hallucinat  0  0   0   0  0  0    0
+2:Setup/Assu  0  0  16   3  0  0    4
+3:Formula/Pr  0  0   0   0  0  0    2
+4:Unit/Dimen  0  0   3   2  2  2   10
+5:Sign/Direc  0  0   0   1  0  0    0
+6:Calculatio  0  1  19  16  3  0  116
+
+=================================================================
+  gemma-3-27b
+=================================================================
+
+  Annotator A (rows) vs Annotator B (cols)
+              0   1   2   3   4  5   6
+0:No Error    0   0   0   0   0  0   0
+1:Hallucinat  0  11   2   0   0  0   0
+2:Setup/Assu  0   1  11   9   0  0   0
+3:Formula/Pr  0   5   2  35   1  0   0
+4:Unit/Dimen  0   0   0   0  10  0   2
+5:Sign/Direc  0   0   0   0   0  7   2
+6:Calculatio  0   1   3   2   5  1  90
+
+  Annotator A (rows) vs Annotator C (cols)
+              0  1   2   3  4  5   6
+0:No Error    0  0   0   0  0  0   0
+1:Hallucinat  0  7   2   4  0  0   0
+2:Setup/Assu  0  2  15   4  0  0   0
+3:Formula/Pr  0  6   5  32  0  0   0
+4:Unit/Dimen  0  2   0   0  8  0   2
+5:Sign/Direc  0  0   5   2  0  1   1
+6:Calculatio  0  1  11   6  2  0  82
+
+  Annotator B (rows) vs Annotator C (cols)
+              0   1   2   3  4  5   6
+0:No Error    0   0   0   0  0  0   0
+1:Hallucinat  0  12   0   6  0  0   0
+2:Setup/Assu  0   1  15   1  0  0   1
+3:Formula/Pr  0   3  10  33  0  0   0
+4:Unit/Dimen  0   2   2   2  9  0   1
+5:Sign/Direc  0   0   4   3  0  1   0
+6:Calculatio  0   0   7   3  1  0  83
+
+=================================================================
+  gpt-5
+=================================================================
+
+  Annotator A (rows) vs Annotator B (cols)
+              0  1   2  3  4  5    6
+0:No Error    0  0   0  0  0  0    0
+1:Hallucinat  0  1   0  0  0  0    3
+2:Setup/Assu  0  0  10  0  0  0    0
+3:Formula/Pr  0  0   0  6  0  0    0
+4:Unit/Dimen  0  0   0  1  0  0    1
+5:Sign/Direc  0  0   0  0  0  0    1
+6:Calculatio  0  0  15  0  7  2  153
+
+  Annotator A (rows) vs Annotator C (cols)
+              0  1   2   3   4  5    6
+0:No Error    0  0   0   0   0  0    0
+1:Hallucinat  0  0   3   1   0  0    0
+2:Setup/Assu  0  0  10   0   0  0    0
+3:Formula/Pr  0  0   2   3   0  0    1
+4:Unit/Dimen  0  0   1   0   0  0    1
+5:Sign/Direc  0  0   1   0   0  0    0
+6:Calculatio  0  0  28  20  12  1  116
+
+  Annotator B (rows) vs Annotator C (cols)
+              0  1   2   3  4  5    6
+0:No Error    0  0   0   0  0  0    0
+1:Hallucinat  0  0   1   0  0  0    0
+2:Setup/Assu  0  0  19   3  1  0    2
+3:Formula/Pr  0  0   3   3  0  0    1
+4:Unit/Dimen  0  0   1   1  2  0    3
+5:Sign/Direc  0  0   1   0  0  1    0
+6:Calculatio  0  0  20  17  9  0  112
+
+=================================================================
+  gpt-5-mini
+=================================================================
+
+  Annotator A (rows) vs Annotator B (cols)
+              0  1   2  3  4  5    6
+0:No Error    0  0   0  0  0  0    0
+1:Hallucinat  0  2   1  0  0  0    7
+2:Setup/Assu  0  0   5  1  0  1    3
+3:Formula/Pr  0  3   2  8  0  0    1
+4:Unit/Dimen  0  0   0  1  2  0    1
+5:Sign/Direc  0  0   1  0  0  1    1
+6:Calculatio  0  0  17  4  6  1  131
+
+  Annotator A (rows) vs Annotator C (cols)
+              0  1   2   3  4  5    6
+0:No Error    0  0   0   0  0  0    0
+1:Hallucinat  0  0   5   2  0  0    3
+2:Setup/Assu  0  0   7   1  0  0    2
+3:Formula/Pr  0  2   4   7  0  0    1
+4:Unit/Dimen  0  0   1   0  2  0    1
+5:Sign/Direc  0  0   1   2  0  0    0
+6:Calculatio  0  1  25  24  3  0  106
+
+  Annotator B (rows) vs Annotator C (cols)
+              0  1   2   3  4  5    6
+0:No Error    0  0   0   0  0  0    0
+1:Hallucinat  0  1   2   2  0  0    0
+2:Setup/Assu  0  0  20   1  0  0    5
+3:Formula/Pr  0  2   5   7  0  0    0
+4:Unit/Dimen  0  0   1   0  4  0    3
+5:Sign/Direc  0  0   1   2  0  0    0
+6:Calculatio  0  0  14  24  1  0  105
+
+=================================================================
+  mathstral-7b
+=================================================================
+
+  Annotator A (rows) vs Annotator B (cols)
+              0   1   2   3   4  5   6
+0:No Error    0   0   0   0   0  0   0
+1:Hallucinat  0  10   2   0   0  0   0
+2:Setup/Assu  0   1  14   4   0  1   2
+3:Formula/Pr  0  17   1  45   1  0   3
+4:Unit/Dimen  0   1   0   2  11  0   1
+5:Sign/Direc  0   0   0   0   0  0   2
+6:Calculatio  0   0   4   6   2  0  70
+
+  Annotator A (rows) vs Annotator C (cols)
+              0   1   2   3   4  5   6
+0:No Error    0   0   0   0   0  0   0
+1:Hallucinat  0   8   1   2   1  0   0
+2:Setup/Assu  0   0  19   2   1  0   0
+3:Formula/Pr  0  15   8  43   0  1   0
+4:Unit/Dimen  0   1   0   2  11  0   1
+5:Sign/Direc  0   0   0   2   0  0   0
+6:Calculatio  0   0   8   9   3  0  62
+
+  Annotator B (rows) vs Annotator C (cols)
+              0   1   2   3   4  5   6
+0:No Error    0   0   0   0   0  0   0
+1:Hallucinat  0  21   2   6   0  0   0
+2:Setup/Assu  0   1  17   2   1  0   0
+3:Formula/Pr  0   2  11  44   0  0   0
+4:Unit/Dimen  0   0   1   0  13  0   0
+5:Sign/Direc  0   0   0   0   1  0   0
+6:Calculatio  0   0   5   8   1  1  63
+
+=================================================================
+  meta-llama-3.1-70b
+=================================================================
+
+  Annotator A (rows) vs Annotator B (cols)
+              0  1   2   3  4  5   6
+0:No Error    0  0   0   0  0  0   0
+1:Hallucinat  0  2   2   1  0  0   2
+2:Setup/Assu  0  2  10   2  0  0   2
+3:Formula/Pr  0  4   1  38  0  1   0
+4:Unit/Dimen  0  0   0   0  9  0   4
+5:Sign/Direc  0  0   0   0  0  4   2
+6:Calculatio  0  1   3  13  1  0  96
+
+  Annotator A (rows) vs Annotator C (cols)
+              0  1   2   3  4  5   6
+0:No Error    0  0   0   0  0  0   0
+1:Hallucinat  0  1   3   1  0  0   2
+2:Setup/Assu  0  1  13   2  0  0   0
+3:Formula/Pr  0  4   4  36  0  0   0
+4:Unit/Dimen  0  0   2   0  9  1   1
+5:Sign/Direc  0  0   2   1  0  2   1
+6:Calculatio  0  0  10  13  4  3  84
+
+  Annotator B (rows) vs Annotator C (cols)
+              0  1   2   3  4  5   6
+0:No Error    0  0   0   0  0  0   0
+1:Hallucinat  0  3   4   2  0  0   0
+2:Setup/Assu  0  0  15   0  1  0   0
+3:Formula/Pr  0  3   5  46  0  0   0
+4:Unit/Dimen  0  0   2   0  8  0   0
+5:Sign/Direc  0  0   2   2  0  1   0
+6:Calculatio  0  0   6   3  4  5  88
+
+=================================================================
+  qwen2.5-72b
+=================================================================
+
+  Annotator A (rows) vs Annotator B (cols)
+              0  1   2   3  4  5    6
+0:No Error    0  0   0   0  0  0    0
+1:Hallucinat  0  6   3   0  0  0    3
+2:Setup/Assu  0  2  13   5  0  0    1
+3:Formula/Pr  0  5   1  24  1  0    1
+4:Unit/Dimen  0  0   1   2  5  0    3
+5:Sign/Direc  0  0   0   0  0  9    0
+6:Calculatio  0  0   5   3  1  1  105
+
+  Annotator A (rows) vs Annotator C (cols)
+              0  1   2   3  4  5   6
+0:No Error    0  0   0   0  0  0   0
+1:Hallucinat  0  3   6   1  0  0   2
+2:Setup/Assu  0  0  19   1  0  1   0
+3:Formula/Pr  0  3   4  24  0  0   1
+4:Unit/Dimen  0  0   6   1  2  0   2
+5:Sign/Direc  0  0   5   2  0  2   0
+6:Calculatio  0  0   8  11  3  0  93
+
+  Annotator B (rows) vs Annotator C (cols)
+              0  1   2   3  4  5   6
+0:No Error    0  0   0   0  0  0   0
+1:Hallucinat  0  6   4   3  0  0   0
+2:Setup/Assu  0  0  20   3  0  0   0
+3:Formula/Pr  0  0  11  22  0  0   1
+4:Unit/Dimen  0  0   4   1  1  0   1
+5:Sign/Direc  0  0   5   2  0  2   1
+6:Calculatio  0  0   4   9  4  1  95
+
+=================================================================
+  wizardmath-7b
+=================================================================
+
+  Annotator A (rows) vs Annotator B (cols)
+              0   1   2   3  4  5   6
+0:No Error    0   0   0   0  0  0   0
+1:Hallucinat  0  21   1   0  0  0   2
+2:Setup/Assu  0   5  44   6  0  0   3
+3:Formula/Pr  0  16  10  15  1  0   6
+4:Unit/Dimen  0   0   2   0  4  0   0
+5:Sign/Direc  0   0   0   0  0  0   0
+6:Calculatio  0   3   3   2  1  1  54
+
+  Annotator A (rows) vs Annotator C (cols)
+              0   1   2   3  4  5   6
+0:No Error    0   0   0   0  0  0   0
+1:Hallucinat  0  21   3   0  0  0   0
+2:Setup/Assu  0   5  48   4  0  1   0
+3:Formula/Pr  0  16  15  16  0  0   1
+4:Unit/Dimen  0   2   0   1  2  0   1
+5:Sign/Direc  0   0   0   0  0  0   0
+6:Calculatio  0  14  17   2  2  0  29
+
+  Annotator B (rows) vs Annotator C (cols)
+              0   1   2   3  4  5   6
+0:No Error    0   0   0   0  0  0   0
+1:Hallucinat  0  37   6   2  0  0   0
+2:Setup/Assu  0   4  52   2  0  1   1
+3:Formula/Pr  0   1   8  13  0  0   1
+4:Unit/Dimen  0   1   1   1  3  0   0
+5:Sign/Direc  0   0   1   0  0  0   0
+6:Calculatio  0  15  15   5  1  0  29

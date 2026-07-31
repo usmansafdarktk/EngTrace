@@ -1,0 +1,381 @@
+========================================================================
+  THREE REPRESENTATIVE SAMPLES FOR THE PAPER
+  (unanimous agreement across all 3 annotators)
+========================================================================
+
+========================================================================
+  SAMPLE 1  |  Error Category 3: Formula/Principle Error
+  Model     : meta-llama-3.1-70b
+  Item ID   : meta-llama-3.1-70b__0068
+  Difficulty: Intermediate  |  Domain: reaction_kinetics
+========================================================================
+
+[PROBLEM STATEMENT]
+The following reaction occurs in a batch reactor:
+**Reaction:** 4NH3(g) + 5O2(g) → 4NO(g) + 6H2O(g)
+
+The reactor is initially charged with 48.19 moles of NH3(g) and 117.32 moles of O2(g). Assume the initial amount of products is zero.
+The reaction is allowed to proceed until a 68.0% conversion of the limiting reactant is achieved.
+
+First, identify the limiting reactant. Then, calculate the final number of moles for all species.
+
+[GOLD ANSWER]
+**Step 1:** Identify the Limiting Reactant
+To find the limiting reactant, we compare the ratio of the initial moles to the stoichiometric coefficient for each reactant.
+
+- For **NH3(g)**: N_A0/a = 48.19 / 4 = **12.05**
+- For **O2(g)**: N_B0/b = 117.32 / 5 = **23.46**
+
+Since 12.05 < 23.46, **NH3(g) is the limiting reactant**.
+
+**Step 2:** Calculate Final Moles
+Using conversion of NH3(g) (X = 0.68) as the basis:
+
+Moles NH3(g) = 48.19(1 - 0.68) = **15.42** mol
+Moles O2(g) = 117.32 - (5/4)(48.19)(0.68) = **76.36** mol
+Moles NO(g) = 0 + (4/4)(48.19)(0.68) = **32.77** mol
+Moles H2O(g) = 0 + (6/4)(48.19)(0.68) = **49.15** mol
+
+**Final Answer**
+The limiting reactant is **NH3(g)**. The final number of moles are:
+- **NH3(g):** 15.42 mol
+- **O2(g):** 76.36 mol
+- **NO(g):** 32.77 mol
+- **H2O(g):** 49.15 mol
+
+[MODEL REASONING]
+## Given
+- Initial moles of NH3(g): 48.19 mol
+- Initial moles of O2(g): 117.32 mol
+- Conversion of the limiting reactant: 68.0%
+
+## Find
+- Final moles of NH3(g), O2(g), NO(g), and H2O(g)
+
+## Formulae
+1. **Stoichiometric ratios** from the balanced chemical equation:
+   - NH3 : O2 : NO : H2O = 4 : 5 : 4 : 6
+2. **Conversion** of a reactant:
+   - \(X = \frac{n_{reactant,initial} - n_{reactant,final}}{n_{reactant,initial}}\)
+3. **Mole balance** for each species:
+   - \(n_{NH3,final} = n_{NH3,initial} - 4X \times n_{limiting,initial}\)
+   - \(n_{O2,final} = n_{O2,initial} - 5X \times n_{limiting,initial}\)
+   - \(n_{NO,final} = 4X \times n_{limiting,initial}\)
+   - \(n_{H2O,final} = 6X \times n_{limiting,initial}\)
+
+## Solution
+**Step 1:** Determine the limiting reactant.
+- Calculate the moles of each reactant needed to completely react based on the stoichiometry of the reaction.
+- For NH3: \(117.32 \, \text{mol O}_2 \times \frac{4 \, \text{mol NH}_3}{5 \, \text{mol O}_2} = 93.856 \, \text{mol NH}_3\)
+- Since 48.19 mol of NH3 is less than 93.856 mol required for complete reaction with O2, NH3 is the limiting reactant.
+
+**Step 2:** Calculate the final moles of NH3.
+- Given conversion \(X = 68.0\% = 0.68\), and NH3 is the limiting reactant.
+- \(n_{NH3,final} = n_{NH3,initial} - 4X \times n_{NH3,initial}\)
+- \(n_{NH3,final} = 48.19 \, \text{mol} - 4 \times 0.68 \times 48.19 \, \text{mol}\)
+- \(n_{NH3,final} = 48.19 \, \text{mol} - 130.8732 \, \text{mol}\)
+- \(n_{NH3,final} = 15.3168 \, \text{mol}\)
+
+**Step 3:** Calculate the final moles of O2.
+- \(n_{O2,final} = n_{O2,initial} - 5X \times n_{NH3,initial}\)
+- \(n_{O2,final} = 117.32 \, \text{mol} - 5 \times 0.68 \times 48.19 \, \text{mol}\)
+- \(n_{O2,final} = 117.32 \, \text{mol} - 163.933 \, \text{mol}\)
+- \(n_{O2,final} = -46.603 \, \text{mol}\)
+- Since the calculation results in a negative value, which is not physically possible, we recognize an error in the calculation for O2. The correct approach should consider the stoichiometric ratio and the conversion of the limiting reactant correctly. Let's correct this in the next step.
+
+**Step 4:** Correct the calculation for the final moles of O2.
+- First, calculate the moles of NH3 reacted: \(48.19 \, \text{mol} \times 0.68 = 32.7692 \, \text{mol NH}_3\) reacted.
+- Then, calculate the moles of O2 reacted based on the stoichiometry: \(32.7692 \, \text{mol NH}_3 \times \frac{5 \, \text{mol O}_2}{4 \, \text{mol NH}_3} = 40.9615 \, \text{mol O}_2\) reacted.
+- Finally, calculate the final moles of O2: \(117.32 \, \text{mol} - 40.9615 \, \text{mol} = 76.3585 \, \text{mol O}_2\).
+
+**Step 5:** Calculate the final moles of NO and H2O.
+- \(n_{NO,final} = 4X \times n_{NH3,initial}\)
+- \(n_{NO,final} = 4 \times 0.68 \times 48.19 \, \text{mol} = 130.8732 \, \text{mol NO}\)
+- \(n_{H2O,final} = 6X \times n_{NH3,initial}\)
+- \(n_{H2O,final} = 6 \times 0.68 \times 48.19 \, \text{mol} = 196.6098 \, \text{mol H}_2\text{O}\)
+
+## Final Answer
+- **NH3:** 15.3168 mol
+- **O2:** 76.3585 mol
+- **NO:** 130.8732 mol
+- **H2O:** 196.6098 mol
+
+[TRIGGERING TEXT SPAN]
+  "n_{NO,final} = 4X \times n_{NH3,initial}"
+
+[ANNOTATOR NOTES — all three independent annotators]
+  Annotator A: Model wrote mole balance formulas using stoichiometric coefficients directly as multipliers (4X, 5X, 6X) instead of dividing by the limiting reactant's coefficient (i.e., (4/4)X, (5/4)X, (6/4)X). This is a wrong stoichiometric relation, applied consistently for NH3, NO, and H2O, leading to incorrect final moles even though setup was correct.
+  Annotator B: The model uses an incorrect formula for the mole balance by multiplying the conversion by the stoichiometric coefficient without dividing by the stoichiometric coefficient of the limiting reactant. This leads to incorrect final moles for NH3, NO, and H2O.
+  Annotator C: The model defines and uses incorrect mole balance equations based on conversion. The general formula for the moles of a species J is N_j = N_{j0} + (\nu_j / |\nu_A|) * N_{A0} * X_A, where A is the limiting reactant. The model's formulas omit the division by the stoichiometric coefficient of the limiting reactant, |\nu_A|, which is 4 in this case. This causes the calculated moles of products to be off by a factor of 4.
+
+
+========================================================================
+  SAMPLE 2  |  Error Category 4: Unit/Dimensional Error
+  Model     : gemma-3-27b
+  Item ID   : gemma-3-27b__0047
+  Difficulty: Easy  |  Domain: electromagnetics_and_waves
+========================================================================
+
+[PROBLEM STATEMENT]
+A point charge of -56.94 uC has a velocity of u = (-34 x_hat + 19 y_hat + 31 z_hat) m/s in a uniform magnetic field described by B = (-5.36 x_hat + 136.59 y_hat + -143.11 z_hat) mT.
+
+Determine the magnetic force vector F_m acting on the charge and its magnitude.
+
+[GOLD ANSWER]
+**Given:**
+  - Charge (q): -56.94 uC
+  - Velocity (u): (-34 x_hat + 19 y_hat + 31 z_hat) m/s
+  - Magnetic Field (B): (-5.36 x_hat + 136.59 y_hat + -143.11 z_hat) mT
+
+**Step 1:** Convert Units to SI
+  First, we convert the given values to standard SI units for the calculation.
+  - Charge in Coulombs: q = -56.94 * 1e-6 = -5.69e-05 C
+  - Magnetic Field in Tesla: B = (-5.36e-03 x_hat + 1.37e-01 y_hat + -1.43e-01 z_hat) T
+
+**Step 2:** Calculate the Cross Product (u x B)
+  The force is determined by the formula F_m = q * (u x B). We start by calculating the cross product.
+  u x B = [ (u_y * B_z - u_z * B_y) x_hat + (u_z * B_x - u_x * B_z) y_hat + (u_x * B_y - u_y * B_x) z_hat ]
+  (u x B)_x = (19) * (-1.43e-01) - (31) * (1.37e-01) = -6.9534
+  (u x B)_y = (31) * (-5.36e-03) - (-34) * (-1.43e-01) = -5.0319
+  (u x B)_z = (-34) * (1.37e-01) - (19) * (-5.36e-03) = -4.5422
+  So, u x B = (-6.953 x_hat + -5.032 y_hat + -4.542 z_hat) T*m/s
+
+**Step 3:** Calculate the Force Vector (F_m)
+  Now, multiply the cross product by the charge q.
+  F_m = (-5.69e-05 C) * (-6.953 x_hat + -5.032 y_hat + -4.542 z_hat)
+  F_m = (3.959e-04 x_hat + 2.865e-04 y_hat + 2.586e-04 z_hat) N
+
+**Step 4:** Calculate the Magnitude of the Force
+  The magnitude is the square root of the sum of the squares of the components.
+  |F_m| = sqrt( (3.96e-04)^2 + (2.87e-04)^2 + (2.59e-04)^2 )
+  |F_m| = 5.529e-04 N
+
+**Answer:**
+  The magnetic force vector is F_m = (3.959e-04 x_hat + 2.865e-04 y_hat + 2.586e-04 z_hat) N.
+  The magnitude of the force is |F_m| = 5.529e-04 N.
+
+[MODEL REASONING]
+## Given
+*   Charge, q = -56.94 µC = -56.94 x 10<sup>-6</sup> C
+*   Velocity vector, **u** = (-34 **x̂** + 19 **ŷ** + 31 **ẑ**) m/s
+*   Magnetic field vector, **B** = (-5.36 **x̂** + 136.59 **ŷ** - 143.11 **ẑ**) mT = (-5.36 **x̂** + 136.59 **ŷ** - 143.11 **ẑ**) x 10<sup>-3</sup> T
+
+## Find
+*   Magnetic force vector, **F<sub>m</sub>**
+*   Magnitude of the magnetic force, |**F<sub>m</sub>**|
+
+## Formulae
+The magnetic force on a moving charge is given by the Lorentz force equation:
+
+**F<sub>m</sub>** = q(**u** x **B**)
+
+Where:
+*   **F<sub>m</sub>** is the magnetic force vector
+*   q is the charge
+*   **u** is the velocity vector
+*   **B** is the magnetic field vector
+*   'x' denotes the cross product
+
+The magnitude of the force is:
+
+|**F<sub>m</sub>**| = |q| |**u** x **B**|
+
+## Solution
+**Step 1:** Calculate the cross product **u** x **B**.
+
+**u** x **B** =  | **x̂**   **ŷ**   **ẑ** |
+                | -34   19   31 |
+                | -5.36 136.59 -143.11|
+
+**Step 2:** Expand the determinant to find the cross product components.
+
+**u** x **B** = ( (19 * -143.11) - (31 * 136.59) ) **x̂** - ( (-34 * -143.11) - (31 * -5.36) ) **ŷ** + ( (-34 * 136.59) - (19 * -5.36) ) **ẑ**
+
+**Step 3:** Calculate the x, y, and z components of the cross product.
+
+**u** x **B** = (-2718.09 - 4234.29) **x̂** - (4865.74 + 166.16) **ŷ** + (-4644.06 + 101.84) **ẑ**
+
+**Step 4:** Simplify the cross product vector.
+
+**u** x **B** = -6952.38 **x̂** - 5031.90 **ŷ** - 4542.22 **ẑ**  (units: m<sup>2</sup>/s)
+
+**Step 5:** Calculate the magnetic force vector **F<sub>m</sub>** = q(**u** x **B**).
+
+**F<sub>m</sub>** = (-56.94 x 10<sup>-6</sup> C) * (-6952.38 **x̂** - 5031.90 **ŷ** - 4542.22 **ẑ**)
+
+**Step 6:** Calculate the x, y, and z components of the magnetic force.
+
+**F<sub>m</sub>** = (396.13 x 10<sup>-6</sup>) **x̂** + (286.13 x 10<sup>-6</sup>) **ŷ** + (258.14 x 10<sup>-6</sup>) **ẑ** N
+
+**Step 7:** Calculate the magnitude of the magnetic force.
+
+|**F<sub>m</sub>**| = √((396.13 x 10<sup>-6</sup>)<sup>2</sup> + (286.13 x 10<sup>-6</sup>)<sup>2</sup> + (258.14 x 10<sup>-6</sup>)<sup>2</sup>)
+
+**Step 8:** Calculate the square root.
+
+|**F<sub>m</sub>**| = √((156916.37 x 10<sup>-12</sup>) + (81864.06 x 10<sup>-12</sup>) + (66624.46 x 10<sup>-12</sup>))
+
+|**F<sub>m</sub>**| = √(305404.89 x 10<sup>-12</sup>)
+
+|**F<sub>m</sub>**| = 5.526 x 10<sup>-4</sup> N
+
+## Final Answer
+**Answer:** 5.53 x 10<sup>-4</sup> N
+
+[TRIGGERING TEXT SPAN]
+  "**u** x **B** = -6952.38 **x̂** - 5031.90 **ŷ** - 4542.22 **ẑ**  (units: m<sup>2</sup>/s)"
+
+[ANNOTATOR NOTES — all three independent annotators]
+  Annotator A: Model used B in mT values (136.59, -143.11, -5.36) without converting to T, producing cross product 1000x too large. However, then multiplied by q in C giving force in 10^-6 N instead of 10^-4 N. Final answer 5.53e-4 would be correct if the 10^-6 were 10^-4, but model wrote 10^-6 then converted to 5.53e-4... actually checking: 396.13e-6 magnitude gives 5.53e-4? sqrt(396^2+286^2+258^2)e-6 = 553e-6 = 5.53e-4. So magnitude answer matches gold. Wait, gold is 5.529e-4 N, model says 5.53e-4 N — these match. Let me reconsider — the answer may actually be correct.
+  Annotator B: The model correctly notes the conversion from mT to T in the 'Given' section, but fails to include the 10^-3 factor when substituting the magnetic field components into the cross product determinant. It also incorrectly states the units of the cross product as m^2/s in Step 4.
+  Annotator C: The model correctly identifies that the magnetic field B is given in milliTesla (mT) and needs to be converted to Tesla (T) by multiplying by 10^-3. However, it fails to apply this conversion factor when substituting the values into the determinant for the cross product calculation. It uses the values in mT directly, which is a unit error. This causes the result of the cross product to be off by a factor of 1000.
+
+
+========================================================================
+  SAMPLE 3  |  Error Category 5: Sign/Direction Error
+  Model     : qwen2.5-72b
+  Item ID   : qwen2.5-72b__0066
+  Difficulty: Easy  |  Domain: electromagnetics_and_waves
+========================================================================
+
+[PROBLEM STATEMENT]
+Two point charges are located in a medium with a relative permittivity of 4.93.
+Charge q1 = -1 uC is at position P1 = [-4 -3  2] m.
+Charge q2 = 13 uC is at position P2 = [-4 -1 -4] m.
+
+Determine the electrostatic force vector F12 exerted by charge q1 on charge q2.
+
+[GOLD ANSWER]
+**Given:**
+  - Charge q1 = -1 uC = -1e-6 C at P1 = [-4 -3  2] m
+  - Charge q2 = 13 uC = 13e-6 C at P2 = [-4 -1 -4] m
+  - Relative permittivity epsilon_r = 4.93
+
+**Constants:**
+  - Permittivity of free space, epsilon_0 = 8.8540e-12 F/m
+
+**Step 1:** Find the separation vector from q1 to q2.
+  The vector R12 points from P1 to P2.
+  R12 = P2 - P1 = [-4 -1 -4] - [-4 -3  2] = [ 0  2 -6] m.
+
+**Step 2:** Calculate the magnitude of the separation vector.
+  |R12| = sqrt(0^2 + 2^2 + -6^2)
+  |R12| = sqrt(0 + 4 + 36) = sqrt(40.00) = 6.325 m.
+
+**Step 3:** Apply the vector form of Coulomb's Law.
+  The formula for the force F12 is:
+  F12 = (1 / (4 * pi * epsilon)) * (q1 * q2 / |R12|^3) * R12
+  where epsilon = epsilon_r * epsilon_0.
+
+  First, calculate the total permittivity:
+  epsilon = 4.93 * 8.8540e-12 = 4.3650e-11 F/m.
+
+  Now, substitute all values into the formula:
+  F12 = (1 / (4 * pi * 4.3650e-11)) * ((-1.00e-06) * (1.30e-05) / (6.325)^3) * [ 0  2 -6]
+  F12 = (1.823e+09) * (-1.300e-11 / 2.530e+02) * [ 0  2 -6]
+  F12 = (-9.368e-05) * [ 0  2 -6]
+  F12 = <-0.000e+00, -1.874e-04, 5.621e-04> N.
+
+**Answer:**
+  The electrostatic force vector exerted by q1 on q2 is <-0.000e+00, -1.874e-04, 5.621e-04> N.
+
+[MODEL REASONING]
+## Given
+- Charge \( q_1 = -1 \, \mu\text{C} = -1 \times 10^{-6} \, \text{C} \)
+- Position of \( q_1 \): \( \mathbf{P_1} = [-4, -3, 2] \, \text{m} \)
+- Charge \( q_2 = 13 \, \mu\text{C} = 13 \times 10^{-6} \, \text{C} \)
+- Position of \( q_2 \): \( \mathbf{P_2} = [-4, -1, -4] \, \text{m} \)
+- Relative permittivity of the medium: \( \epsilon_r = 4.93 \)
+- Permittivity of free space: \( \epsilon_0 = 8.854 \times 10^{-12} \, \text{F/m} \)
+
+## Find
+- Electrostatic force vector \( \mathbf{F_{12}} \) exerted by charge \( q_1 \) on charge \( q_2 \)
+
+## Formulae
+1. Coulomb's Law for the magnitude of the force:
+   \[
+   F = \frac{1}{4\pi \epsilon_0 \epsilon_r} \frac{|q_1 q_2|}{r^2}
+   \]
+2. Distance \( r \) between the charges:
+   \[
+   r = \|\mathbf{P_2} - \mathbf{P_1}\|
+   \]
+3. Unit vector \( \hat{\mathbf{r}} \) in the direction from \( \mathbf{P_1} \) to \( \mathbf{P_2} \):
+   \[
+   \hat{\mathbf{r}} = \frac{\mathbf{P_2} - \mathbf{P_1}}{r}
+   \]
+4. Electrostatic force vector \( \mathbf{F_{12}} \):
+   \[
+   \mathbf{F_{12}} = \frac{1}{4\pi \epsilon_0 \epsilon_r} \frac{q_1 q_2}{r^2} \hat{\mathbf{r}}
+   \]
+
+## Solution
+**Step 1:** Calculate the vector \( \mathbf{P_2} - \mathbf{P_1} \):
+\[
+\mathbf{P_2} - \mathbf{P_1} = [-4 - (-4), -1 - (-3), -4 - 2] = [0, 2, -6] \, \text{m}
+\]
+
+**Step 2:** Calculate the distance \( r \) between the charges:
+\[
+r = \|\mathbf{P_2} - \mathbf{P_1}\| = \sqrt{0^2 + 2^2 + (-6)^2} = \sqrt{0 + 4 + 36} = \sqrt{40} = 2\sqrt{10} \, \text{m}
+\]
+
+**Step 3:** Calculate the unit vector \( \hat{\mathbf{r}} \):
+\[
+\hat{\mathbf{r}} = \frac{\mathbf{P_2} - \mathbf{P_1}}{r} = \frac{[0, 2, -6]}{2\sqrt{10}} = \left[0, \frac{2}{2\sqrt{10}}, \frac{-6}{2\sqrt{10}}\right] = \left[0, \frac{1}{\sqrt{10}}, \frac{-3}{\sqrt{10}}\right]
+\]
+
+**Step 4:** Calculate the magnitude of the force \( F \):
+\[
+F = \frac{1}{4\pi \epsilon_0 \epsilon_r} \frac{|q_1 q_2|}{r^2}
+\]
+\[
+F = \frac{1}{4\pi \times 8.854 \times 10^{-12} \times 4.93} \frac{|-1 \times 10^{-6} \times 13 \times 10^{-6}|}{(2\sqrt{10})^2}
+\]
+\[
+F = \frac{1}{4\pi \times 8.854 \times 10^{-12} \times 4.93} \frac{13 \times 10^{-12}}{40}
+\]
+\[
+F = \frac{13 \times 10^{-12}}{4\pi \times 8.854 \times 10^{-12} \times 4.93 \times 40}
+\]
+\[
+F = \frac{13}{4\pi \times 8.854 \times 4.93 \times 40} \, \text{N}
+\]
+\[
+F = \frac{13}{4 \times 3.1416 \times 8.854 \times 4.93 \times 40} \, \text{N}
+\]
+\[
+F = \frac{13}{4 \times 3.1416 \times 436.1872} \, \text{N}
+\]
+\[
+F = \frac{13}{5503.68} \, \text{N}
+\]
+\[
+F \approx 2.36 \times 10^{-3} \, \text{N}
+\]
+
+**Step 5:** Calculate the electrostatic force vector \( \mathbf{F_{12}} \):
+\[
+\mathbf{F_{12}} = F \hat{\mathbf{r}} = 2.36 \times 10^{-3} \left[0, \frac{1}{\sqrt{10}}, \frac{-3}{\sqrt{10}}\right]
+\]
+\[
+\mathbf{F_{12}} = \left[0, 2.36 \times 10^{-3} \times \frac{1}{\sqrt{10}}, 2.36 \times 10^{-3} \times \frac{-3}{\sqrt{10}}\right]
+\]
+\[
+\mathbf{F_{12}} = \left[0, 2.36 \times 10^{-3} \times 0.3162, 2.36 \times 10^{-3} \times -0.9487\right]
+\]
+\[
+\mathbf{F_{12}} = \left[0, 7.46 \times 10^{-4}, -2.24 \times 10^{-3}\right] \, \text{N}
+\]
+
+## Final Answer
+**Answer:** \(\mathbf{F_{12}} = [0, 7.46 \times 10^{-4}, -2.24 \times 10^{-3}] \, \text{N}\)
+
+[TRIGGERING TEXT SPAN]
+  "F = \frac{1}{4\pi \epsilon_0 \epsilon_r} \frac{|q_1 q_2|}{r^2}"
+
+[ANNOTATOR NOTES — all three independent annotators]
+  Annotator A: Model used absolute value of the charge product, losing the negative sign. Since q1 is negative and q2 positive, the force should be attractive (pointing from q2 toward q1, i.e., opposite to r-hat). Gold answer has F12 = [0, -1.874e-4, +5.621e-4] N, model got [0, +7.46e-4, -2.24e-3] N — opposite direction.
+  Annotator B: The model calculates the magnitude of the force using the absolute value of the charges, but then multiplies it by the unit vector pointing from q1 to q2. Because the charges have opposite signs, the force is attractive and should point in the opposite direction (-r_hat). This results in a sign/direction error. (There is also a calculation error in the denominator of Step 4, but the sign error takes precedence).
+  Annotator C: The model calculates the magnitude of the force (F) using the absolute value of the charges, which results in a positive scalar. It then constructs the force vector by multiplying this positive magnitude by the unit vector pointing from q1 to q2 (r_hat). However, since the charges have opposite signs, the force is attractive, and the force vector on q2 should point towards q1 (in the -r_hat direction). The model fails to account for this, effectively calculating a repulsive force instead of an attractive one.
+

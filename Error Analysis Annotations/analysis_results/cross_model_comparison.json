@@ -1,0 +1,470 @@
+{
+  "meta": {
+    "description": "EngTrace error distribution analysis — majority-vote labels from 3 annotators",
+    "models": [
+      "claude-opus-4-7",
+      "deepseek-r1",
+      "deepseek-v4-pro",
+      "gemini-3.1-pro-preview",
+      "gemma-3-27b",
+      "gpt-5",
+      "gpt-5-mini",
+      "mathstral-7b",
+      "meta-llama-3.1-70b",
+      "qwen2.5-72b",
+      "wizardmath-7b"
+    ],
+    "main_text_models": [
+      "gemini-3.1-pro-preview",
+      "deepseek-r1",
+      "meta-llama-3.1-70b"
+    ],
+    "category_legend": {
+      "0": "No Error",
+      "1": "Hallucination",
+      "2": "Setup / Assumption Error",
+      "3": "Formula / Principle Error",
+      "4": "Unit / Dimensional Error",
+      "5": "Sign / Direction Error",
+      "6": "Calculation Error"
+    },
+    "severity_legend": {
+      "1": "Critical",
+      "2": "High",
+      "3": "High",
+      "4": "Medium",
+      "5": "Medium",
+      "6": "Low"
+    }
+  },
+  "summary_table": [
+    {
+      "model": "claude-opus-4-7",
+      "display_name": "claude-opus-4-7",
+      "n_traces": 200,
+      "is_main_text": false,
+      "calc_error_pct": 87.5,
+      "hallucination_pct": 1.5,
+      "setup_assumption_pct": 6.5,
+      "formula_principle_pct": 2.5,
+      "unit_dimensional_pct": 2.0,
+      "sign_direction_pct": 0,
+      "conceptual_error_rate_pct": 10.5,
+      "high_severity_rate_pct": 8.0,
+      "cliff_easy_pct": 5.33,
+      "cliff_intermediate_pct": 10.53,
+      "cliff_advanced_pct": 18.37,
+      "cliff_size_pp": 13.04
+    },
+    {
+      "model": "deepseek-r1",
+      "display_name": "DeepSeek R1",
+      "n_traces": 200,
+      "is_main_text": true,
+      "calc_error_pct": 72.0,
+      "hallucination_pct": 1.5,
+      "setup_assumption_pct": 21.5,
+      "formula_principle_pct": 1.5,
+      "unit_dimensional_pct": 0.5,
+      "sign_direction_pct": 3.0,
+      "conceptual_error_rate_pct": 24.5,
+      "high_severity_rate_pct": 23.0,
+      "cliff_easy_pct": 30.67,
+      "cliff_intermediate_pct": 17.11,
+      "cliff_advanced_pct": 26.53,
+      "cliff_size_pp": -4.14
+    },
+    {
+      "model": "deepseek-v4-pro",
+      "display_name": "deepseek-v4-pro",
+      "n_traces": 200,
+      "is_main_text": false,
+      "calc_error_pct": 84.5,
+      "hallucination_pct": 3.5,
+      "setup_assumption_pct": 11.0,
+      "formula_principle_pct": 0,
+      "unit_dimensional_pct": 1.0,
+      "sign_direction_pct": 0,
+      "conceptual_error_rate_pct": 14.5,
+      "high_severity_rate_pct": 14.5,
+      "cliff_easy_pct": 20.0,
+      "cliff_intermediate_pct": 6.58,
+      "cliff_advanced_pct": 18.37,
+      "cliff_size_pp": -1.63
+    },
+    {
+      "model": "gemini-3.1-pro-preview",
+      "display_name": "Gemini 3.1 Pro Preview",
+      "n_traces": 200,
+      "is_main_text": true,
+      "calc_error_pct": 79.5,
+      "hallucination_pct": 3.0,
+      "setup_assumption_pct": 13.5,
+      "formula_principle_pct": 1.0,
+      "unit_dimensional_pct": 3.0,
+      "sign_direction_pct": 0,
+      "conceptual_error_rate_pct": 17.5,
+      "high_severity_rate_pct": 16.5,
+      "cliff_easy_pct": 18.67,
+      "cliff_intermediate_pct": 10.53,
+      "cliff_advanced_pct": 26.53,
+      "cliff_size_pp": 7.86
+    },
+    {
+      "model": "gemma-3-27b",
+      "display_name": "gemma-3-27b",
+      "n_traces": 200,
+      "is_main_text": false,
+      "calc_error_pct": 47.5,
+      "hallucination_pct": 8.0,
+      "setup_assumption_pct": 13.5,
+      "formula_principle_pct": 22.0,
+      "unit_dimensional_pct": 5.5,
+      "sign_direction_pct": 3.5,
+      "conceptual_error_rate_pct": 43.5,
+      "high_severity_rate_pct": 21.5,
+      "cliff_easy_pct": 29.33,
+      "cliff_intermediate_pct": 40.79,
+      "cliff_advanced_pct": 69.39,
+      "cliff_size_pp": 40.06
+    },
+    {
+      "model": "gpt-5",
+      "display_name": "gpt-5",
+      "n_traces": 200,
+      "is_main_text": false,
+      "calc_error_pct": 79.5,
+      "hallucination_pct": 2.0,
+      "setup_assumption_pct": 13.5,
+      "formula_principle_pct": 3.5,
+      "unit_dimensional_pct": 1.0,
+      "sign_direction_pct": 0.5,
+      "conceptual_error_rate_pct": 19.0,
+      "high_severity_rate_pct": 15.5,
+      "cliff_easy_pct": 25.97,
+      "cliff_intermediate_pct": 10.39,
+      "cliff_advanced_pct": 21.74,
+      "cliff_size_pp": -4.23
+    },
+    {
+      "model": "gpt-5-mini",
+      "display_name": "gpt-5-mini",
+      "n_traces": 200,
+      "is_main_text": false,
+      "calc_error_pct": 73.0,
+      "hallucination_pct": 4.0,
+      "setup_assumption_pct": 13.5,
+      "formula_principle_pct": 7.0,
+      "unit_dimensional_pct": 2.0,
+      "sign_direction_pct": 0.5,
+      "conceptual_error_rate_pct": 24.5,
+      "high_severity_rate_pct": 17.5,
+      "cliff_easy_pct": 22.67,
+      "cliff_intermediate_pct": 15.79,
+      "cliff_advanced_pct": 40.82,
+      "cliff_size_pp": 18.15
+    },
+    {
+      "model": "mathstral-7b",
+      "display_name": "mathstral-7b",
+      "n_traces": 200,
+      "is_main_text": false,
+      "calc_error_pct": 35.5,
+      "hallucination_pct": 13.0,
+      "setup_assumption_pct": 14.5,
+      "formula_principle_pct": 30.5,
+      "unit_dimensional_pct": 6.5,
+      "sign_direction_pct": 0,
+      "conceptual_error_rate_pct": 58.0,
+      "high_severity_rate_pct": 27.5,
+      "cliff_easy_pct": 36.0,
+      "cliff_intermediate_pct": 61.84,
+      "cliff_advanced_pct": 85.71,
+      "cliff_size_pp": 49.71
+    },
+    {
+      "model": "meta-llama-3.1-70b",
+      "display_name": "Llama 3.1 70B",
+      "n_traces": 200,
+      "is_main_text": true,
+      "calc_error_pct": 50.0,
+      "hallucination_pct": 3.0,
+      "setup_assumption_pct": 11.0,
+      "formula_principle_pct": 27.0,
+      "unit_dimensional_pct": 6.5,
+      "sign_direction_pct": 2.5,
+      "conceptual_error_rate_pct": 41.0,
+      "high_severity_rate_pct": 14.0,
+      "cliff_easy_pct": 27.63,
+      "cliff_intermediate_pct": 36.0,
+      "cliff_advanced_pct": 69.39,
+      "cliff_size_pp": 41.76
+    },
+    {
+      "model": "qwen2.5-72b",
+      "display_name": "qwen2.5-72b",
+      "n_traces": 200,
+      "is_main_text": false,
+      "calc_error_pct": 55.5,
+      "hallucination_pct": 6.0,
+      "setup_assumption_pct": 15.0,
+      "formula_principle_pct": 16.0,
+      "unit_dimensional_pct": 3.0,
+      "sign_direction_pct": 4.5,
+      "conceptual_error_rate_pct": 37.0,
+      "high_severity_rate_pct": 21.0,
+      "cliff_easy_pct": 30.67,
+      "cliff_intermediate_pct": 32.89,
+      "cliff_advanced_pct": 53.06,
+      "cliff_size_pp": 22.39
+    },
+    {
+      "model": "wizardmath-7b",
+      "display_name": "wizardmath-7b",
+      "n_traces": 200,
+      "is_main_text": false,
+      "calc_error_pct": 28.0,
+      "hallucination_pct": 23.0,
+      "setup_assumption_pct": 33.5,
+      "formula_principle_pct": 13.0,
+      "unit_dimensional_pct": 2.5,
+      "sign_direction_pct": 0,
+      "conceptual_error_rate_pct": 69.5,
+      "high_severity_rate_pct": 56.5,
+      "cliff_easy_pct": 49.33,
+      "cliff_intermediate_pct": 77.63,
+      "cliff_advanced_pct": 87.76,
+      "cliff_size_pp": 38.43
+    }
+  ],
+  "ranked_tables": {
+    "ranked_by_calc_error_pct": [
+      {
+        "model": "claude-opus-4-7",
+        "display_name": "claude-opus-4-7",
+        "value": 87.5
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "display_name": "deepseek-v4-pro",
+        "value": 84.5
+      },
+      {
+        "model": "gemini-3.1-pro-preview",
+        "display_name": "Gemini 3.1 Pro Preview",
+        "value": 79.5
+      },
+      {
+        "model": "gpt-5",
+        "display_name": "gpt-5",
+        "value": 79.5
+      },
+      {
+        "model": "gpt-5-mini",
+        "display_name": "gpt-5-mini",
+        "value": 73.0
+      },
+      {
+        "model": "deepseek-r1",
+        "display_name": "DeepSeek R1",
+        "value": 72.0
+      },
+      {
+        "model": "qwen2.5-72b",
+        "display_name": "qwen2.5-72b",
+        "value": 55.5
+      },
+      {
+        "model": "meta-llama-3.1-70b",
+        "display_name": "Llama 3.1 70B",
+        "value": 50.0
+      },
+      {
+        "model": "gemma-3-27b",
+        "display_name": "gemma-3-27b",
+        "value": 47.5
+      },
+      {
+        "model": "mathstral-7b",
+        "display_name": "mathstral-7b",
+        "value": 35.5
+      },
+      {
+        "model": "wizardmath-7b",
+        "display_name": "wizardmath-7b",
+        "value": 28.0
+      }
+    ],
+    "ranked_by_conceptual_error_pct": [
+      {
+        "model": "wizardmath-7b",
+        "display_name": "wizardmath-7b",
+        "value": 69.5
+      },
+      {
+        "model": "mathstral-7b",
+        "display_name": "mathstral-7b",
+        "value": 58.0
+      },
+      {
+        "model": "gemma-3-27b",
+        "display_name": "gemma-3-27b",
+        "value": 43.5
+      },
+      {
+        "model": "meta-llama-3.1-70b",
+        "display_name": "Llama 3.1 70B",
+        "value": 41.0
+      },
+      {
+        "model": "qwen2.5-72b",
+        "display_name": "qwen2.5-72b",
+        "value": 37.0
+      },
+      {
+        "model": "deepseek-r1",
+        "display_name": "DeepSeek R1",
+        "value": 24.5
+      },
+      {
+        "model": "gpt-5-mini",
+        "display_name": "gpt-5-mini",
+        "value": 24.5
+      },
+      {
+        "model": "gpt-5",
+        "display_name": "gpt-5",
+        "value": 19.0
+      },
+      {
+        "model": "gemini-3.1-pro-preview",
+        "display_name": "Gemini 3.1 Pro Preview",
+        "value": 17.5
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "display_name": "deepseek-v4-pro",
+        "value": 14.5
+      },
+      {
+        "model": "claude-opus-4-7",
+        "display_name": "claude-opus-4-7",
+        "value": 10.5
+      }
+    ],
+    "ranked_by_hallucination_pct": [
+      {
+        "model": "wizardmath-7b",
+        "display_name": "wizardmath-7b",
+        "value": 23.0
+      },
+      {
+        "model": "mathstral-7b",
+        "display_name": "mathstral-7b",
+        "value": 13.0
+      },
+      {
+        "model": "gemma-3-27b",
+        "display_name": "gemma-3-27b",
+        "value": 8.0
+      },
+      {
+        "model": "qwen2.5-72b",
+        "display_name": "qwen2.5-72b",
+        "value": 6.0
+      },
+      {
+        "model": "gpt-5-mini",
+        "display_name": "gpt-5-mini",
+        "value": 4.0
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "display_name": "deepseek-v4-pro",
+        "value": 3.5
+      },
+      {
+        "model": "gemini-3.1-pro-preview",
+        "display_name": "Gemini 3.1 Pro Preview",
+        "value": 3.0
+      },
+      {
+        "model": "meta-llama-3.1-70b",
+        "display_name": "Llama 3.1 70B",
+        "value": 3.0
+      },
+      {
+        "model": "gpt-5",
+        "display_name": "gpt-5",
+        "value": 2.0
+      },
+      {
+        "model": "claude-opus-4-7",
+        "display_name": "claude-opus-4-7",
+        "value": 1.5
+      },
+      {
+        "model": "deepseek-r1",
+        "display_name": "DeepSeek R1",
+        "value": 1.5
+      }
+    ],
+    "ranked_by_complexity_cliff_pp": [
+      {
+        "model": "mathstral-7b",
+        "display_name": "mathstral-7b",
+        "value": 49.71
+      },
+      {
+        "model": "meta-llama-3.1-70b",
+        "display_name": "Llama 3.1 70B",
+        "value": 41.76
+      },
+      {
+        "model": "gemma-3-27b",
+        "display_name": "gemma-3-27b",
+        "value": 40.06
+      },
+      {
+        "model": "wizardmath-7b",
+        "display_name": "wizardmath-7b",
+        "value": 38.43
+      },
+      {
+        "model": "qwen2.5-72b",
+        "display_name": "qwen2.5-72b",
+        "value": 22.39
+      },
+      {
+        "model": "gpt-5-mini",
+        "display_name": "gpt-5-mini",
+        "value": 18.15
+      },
+      {
+        "model": "claude-opus-4-7",
+        "display_name": "claude-opus-4-7",
+        "value": 13.04
+      },
+      {
+        "model": "gemini-3.1-pro-preview",
+        "display_name": "Gemini 3.1 Pro Preview",
+        "value": 7.86
+      },
+      {
+        "model": "deepseek-v4-pro",
+        "display_name": "deepseek-v4-pro",
+        "value": -1.63
+      },
+      {
+        "model": "deepseek-r1",
+        "display_name": "DeepSeek R1",
+        "value": -4.14
+      },
+      {
+        "model": "gpt-5",
+        "display_name": "gpt-5",
+        "value": -4.23
+      }
+    ]
+  }
+}
