@@ -37,18 +37,22 @@ would agree with it whether it were right or wrong.
 
 The US uniform case and the stated intensity
 --------------------------------------------
-The question states the UDL in kip/ft; the governing formula needs kip/in. The
-trace performs that conversion in Step 2 and *states* the converted value at
-5 dp ("w = 1.48 kip/ft = 0.12333 kip/in"), then computes from the stated
-value - which is P3-compliant, since the operand a solver consumes is printed
-before it is used.
+The question states the UDL in kip/ft; the governing formula needs kip/in, and
+that division by 12 does not terminate in decimal.
 
-This oracle deliberately does **not** replicate that 5-dp intermediate: it
-divides the stated kip/ft intensity by 12 at full precision. The two paths
-differ by at most ~3e-5 relative, some 20x finer than one step of the answer's
-3-dp display, so on a sound instance they quantise to the same printed value.
-Keeping the oracle on the full-precision path is what lets it detect a genuine
-leak in that conversion rather than agreeing with one by construction.
+The trace performs the conversion in Step 2 and states its value to 6 dp
+("w = 1.48 kip/ft = 1.48/12 = 0.123333 kip/in"), but carries the EXACT ratio
+into the Step-3 substitution ("delta = 5 * (1.48/12) * ..."), so no rounded
+intermediate sits between the stated load and the answer. This oracle divides
+by 12 at full precision, which is therefore the same quantity the trace uses -
+and the measured agreement floor is exactly 0.0 over 2,000 seeds, which is the
+observable consequence.
+
+An earlier revision of the template computed from a 5-dp intermediate instead,
+and that put the answer one unit in the last place away from what the question
+implies on ~1.6% of US uniform instances (seeds 92, 314, 825, 869). This oracle
+found that defect precisely because it stayed on the full-precision path rather
+than replicating the template's rounding sequence.
 """
 from __future__ import annotations
 
@@ -77,6 +81,21 @@ TEMPLATE_ID = "template_beam_deflection_formula"
 # vs 1/48, a dropped 1e6/1e-12 in the I conversion, a missing ft->in span
 # conversion) all show up as tens of percent or more.
 TOLERANCE = 0.001
+
+# Measured, not argued (Phase 1 review A, F-4), over 2,000 seeds with
+#     python -m tests.template_integrity.oracle_floors 2000 template_beam_deflection_formula
+#
+# AGREEMENT_FLOOR - worst relative disagreement between this oracle and
+#   the trace on a CORRECT instance. TOLERANCE must exceed it, or the
+#   check fires on presentation alone.
+# DETECTION_FLOOR - smallest uniform relative error injected into the
+#   gold answer that this oracle catches on >=99% of instances. This is
+#   the number a downstream verifier can rely on, and it is set by the
+#   display quantisation, NOT by TOLERANCE: both sides are quantised to
+#   the printed precision before comparison, so an error smaller than
+#   about half a display step is invisible whatever TOLERANCE says.
+AGREEMENT_FLOOR = 0.00e+00
+DETECTION_FLOOR = 1.00e-2
 
 SOURCE = (
     "Simply supported elastic beam deflections (Hibbeler, Structural Analysis "

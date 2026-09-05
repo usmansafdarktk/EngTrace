@@ -304,8 +304,8 @@ def template_mean_variance():
     mean_terms = " + ".join(f"{v * q:.{precision}f}"
                             for v, q in zip(vals, probs))
 
-    var_subs = " + ".join(f"({v} - {mean_d:.{precision}f})^2*({q:.{precision}f})"
-                          for v, q in zip(values, probs))
+    dev_line = "; ".join(f"({v} - {mean_d:.{precision}f}) = {d:.{precision}f}"
+                         for v, d in zip(values, devs))
     var_devs = " + ".join(f"({d:.{precision}f})^2*({q:.{precision}f})"
                           for d, q in zip(devs, probs))
     var_terms = " + ".join(f"{t:.{_TERM_DP}f}" for t in shown_terms)
@@ -325,7 +325,7 @@ def template_mean_variance():
         f"The formula for variance is:\n"
         f"sigma_X^2 = sum((x_i - mu_X)^2 * P(x_i))\n\n"
         f"Using the calculated mean (mu_X = {mean_d:.{precision}f}):\n"
-        f"sigma_X^2 = {var_subs} = {variance_d:.{precision}f}\n"
+        f"Deviations from the mean: {dev_line}\n"
         f"sigma_X^2 = {var_devs} = {var_terms} = {variance_d:.{precision}f}\n\n"
 
         f"**Answer:**\n"

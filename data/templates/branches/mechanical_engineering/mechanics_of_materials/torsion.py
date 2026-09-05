@@ -18,10 +18,13 @@ TEMPLATE_TOLERANCES = {
     # in the 0.006-0.79 rad range. 2e-3 clears that and the ~5e-7 the stated
     # six-figure J values contribute, with two orders of magnitude to spare.
     "template_composite_shafts_series": 2e-3,
-    # The reaction torques are quoted to 2 dp on values of 300-3000 N.m, so the
-    # display floor is under 2e-5 relative. 1e-4 is well above it and two
-    # orders below the 0.03% error the unrounded-divisor chain produced.
-    "template_statically_indeterminate_shaft": 1e-4,
+    # Measured over 2,000 seeds: agreement floor 1.40e-3, detection floor 1%.
+    # The display floor really is under 2e-5, but display is not what binds
+    # here - the trace legitimately consumes a length ratio it states to 3 dp,
+    # and the oracle solves the system from the exact lengths instead, so the
+    # two differ by that stated rounding. The earlier 1e-4 declaration was 14x
+    # below the agreement floor and was argued from display alone.
+    "template_statically_indeterminate_shaft": 5e-3,
 }
 
 
@@ -356,6 +359,19 @@ def template_shaft_design_power():
         if _is_display_tie(d_diameter_m * 1000, precision):
             continue
         d_diameter_mm = _hu(d_diameter_m * 1000, precision)
+        # P1 in one line: the answer reachable from the stated GIVENS must be
+        # the answer reachable through the stated INTERMEDIATES. The trace
+        # legitimately carries a 2-dp torque and a 4-significant-figure c^3
+        # (both printed before use, so P3 holds), but on a value sitting near
+        # a 2-dp boundary those roundings can move the last digit: seed 11230
+        # gave 9.13 mm through the intermediates and 9.12 mm from the givens
+        # (Phase 1 review A, finding F-2). Resample rather than tolerate it -
+        # widening the verifier tolerance to cover this would have raised the
+        # smallest detectable reasoning error from 0.2% to 0.5%.
+        _d_from_givens = 2 * ((2 * (power_w / (2 * math.pi * frequency_hz)))
+                              / (math.pi * allowable_stress_pa)) ** (1 / 3) * 1000
+        if _hu(_d_from_givens, precision) != d_diameter_mm:
+            continue
         break
     else:
         raise RuntimeError("shaft_design_power: no closing sample in 200 draws")
@@ -501,10 +517,17 @@ def template_composite_shafts_series():
     assert phi_total_rad == _hu(phi1_rad + phi2_rad, PHI_DP), (
         f"total twist is not the sum of the segments: "
         f"{phi1_rad} + {phi2_rad} != {phi_total_rad}")
-    # The segment that twists more is the one with the larger L/(d^4*G).
-    assert (phi1_rad >= phi2_rad) == (
-        l1 / (d1 ** 4 * g1_gpa) >= l2 / (d2 ** 4 * g2_gpa)), (
-        "segment twist ordering contradicts L/(d^4*G)")
+    # The segment that twists more is the one with the larger L/(d^4*G) - but
+    # only assert it where the two are actually separable. At seed 14556 the
+    # segments differ by 5e-5 relative (0.06868014 vs 0.06868376 rad), so they
+    # round to the SAME 5-dp value while the exact proxy still orders them, and
+    # a strict correspondence fires on a tie rather than on a defect. Found at
+    # 20,000 seeds; invisible at 1,000.
+    _k1 = l1 / (d1 ** 4 * g1_gpa)
+    _k2 = l2 / (d2 ** 4 * g2_gpa)
+    if abs(phi1_exact - phi2_exact) > 1e-6 * max(phi1_exact, phi2_exact):
+        assert (phi1_exact > phi2_exact) == (_k1 > _k2), (
+            "segment twist ordering contradicts L/(d^4*G)")
     assert 0.0 < phi_total_rad < 2 * math.pi, (
         f"total angle of twist implausible: {phi_total_rad} rad")
 

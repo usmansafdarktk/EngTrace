@@ -40,6 +40,23 @@ def _as_printed(x, spec):
     return float(format(x, spec))
 
 
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where no rounding convention is defensible - a
+    decimal reader applying half-up and a binary reader applying `round()`
+    disagree, and the printed line closes for only one of them. Such instances
+    are resampled rather than resolved (D-016).
+
+    A narrow BAND is quarantined rather than a point, because two independent
+    evaluations of the same exact quantity differ by a few ulps and an exact
+    rational tie lands on opposite sides of them.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
+
+
 # Template 1 (Easy)
 def template_falling_film_max_velocity():
     """
@@ -274,15 +291,19 @@ def template_annulus_flowrate():
         kappa = round(random.uniform(0.3, 0.7), 2)
         inner_radius_cm = round(kappa * outer_radius_cm, 2)
 
-        # Convert to meters
-        outer_radius_m = outer_radius_cm / 100.0
-        inner_radius_m = inner_radius_cm / 100.0
+        # Convert to meters. Bound through the display: a 2-dp centimetre
+        # value is exactly 4 dp in metres, but the float is not - 0.9/100 is
+        # 0.009000000000000001, and the trace used to print that repr.
+        outer_radius_m = _as_printed(outer_radius_cm / 100.0, ".4f")
+        inner_radius_m = _as_printed(inner_radius_cm / 100.0, ".4f")
         # kappa is displayed and then consumed, so it is bound through its own
         # display. It was shown at 3 dp, which is NOT enough to carry the
         # answer: a shape factor computed from a 3-dp kappa differs from the
         # exact ratio by ~0.1%, ten times the round-trip tolerance. Raising the
         # display is the fix; degrading the answer to match a coarse display
         # would not be (D-016).
+        if _is_display_tie(inner_radius_m / outer_radius_m, 6):
+            continue                      # no defensible 6-dp kappa (D-016)
         kappa_val = _as_printed(inner_radius_m / outer_radius_m, ".6f")
 
         pipe_length_m = round(random.uniform(10.0, 50.0), 1)
@@ -302,9 +323,11 @@ def template_annulus_flowrate():
 
         # Back-calculate the Pressure Drop required to drive this Q
         # Inverted Annulus Equation: DeltaP = Q*(8*mu*L) / (pi*Ro^4*ShapeFactor)
-        shape_factor = _as_printed(
-            (1 - kappa_val ** 4)
-            - (((1 - kappa_val ** 2) ** 2) / math.log(1 / kappa_val)), ".6f")
+        _shape_exact = ((1 - kappa_val ** 4)
+                        - (((1 - kappa_val ** 2) ** 2) / math.log(1 / kappa_val)))
+        if _is_display_tie(_shape_exact, 6):
+            continue
+        shape_factor = _as_printed(_shape_exact, ".6f")
         denominator = (math.pi * (outer_radius_m ** 4)) * shape_factor
         numerator = Q_target * (8 * fluid_viscosity_Pas * pipe_length_m)
 
@@ -380,13 +403,13 @@ def template_annulus_flowrate():
 
         f"**Step 2:** Perform Unit Conversions\n"
         f"The equation requires all units to be in the SI base system.\n"
-        f"- Inner Radius: R_inner = {inner_radius_cm} cm / 100 = {inner_radius_m} m\n"
-        f"- Outer Radius: R_outer = {outer_radius_cm} cm / 100 = {outer_radius_m} m\n"
+        f"- Inner Radius: R_inner = {inner_radius_cm} cm / 100 = {inner_radius_m:.4f} m\n"
+        f"- Outer Radius: R_outer = {outer_radius_cm} cm / 100 = {outer_radius_m:.4f} m\n"
         f"- Pressure Drop: P0 - PL = {pressure_drop_kPa:.3f} kPa * 1000 = {pressure_drop_Pa} Pa\n\n"
         
         f"**Step 3:** Calculate the Dimensionless Ratio (kappa)\n"
         f"Kappa (k) is the ratio of the inner radius to the outer radius.\n"
-        f"kappa = R_inner / R_outer = {inner_radius_m} / {outer_radius_m} = {kappa_val:.6f}\n\n"
+        f"kappa = R_inner / R_outer = {inner_radius_m:.4f} / {outer_radius_m:.4f} = {kappa_val:.6f}\n\n"
 
         f"**Step 4:** State the Core Equation\n"
         f"The volumetric flow rate (Q) for laminar flow in an annulus is:\n"
@@ -394,7 +417,7 @@ def template_annulus_flowrate():
 
         f"**Step 5:** Substitute Values and Calculate\n"
         f"Calculate the main term:\n"
-        f"Main Term = (pi * {pressure_drop_Pa} * ({outer_radius_m})^4) / (8 * {fluid_viscosity_Pas} * {pipe_length_m})\n"
+        f"Main Term = (pi * {pressure_drop_Pa} * ({outer_radius_m:.4f})^4) / (8 * {fluid_viscosity_Pas} * {pipe_length_m})\n"
         f"Main Term = {term1:.6e}\n\n"
         f"Calculate the shape factor:\n"
         f"Shape Factor = [ (1 - {kappa_val:.6f}^4) - ((1 - {kappa_val:.6f}^2)^2 / ln(1/{kappa_val:.6f})) ] = {shape_factor:.6f}\n\n"

@@ -164,8 +164,8 @@ def template_beam_deflection_formula():
         # its own display, so the stored value IS the value a reader recovers
         # from the printed text (see _as_printed).
         Ix = _as_printed(props["si"]["Ix"] * 1e-6, ".4e")   # 10^6 mm^4 -> m^4
-        E = _as_printed(STEEL_E_GPA * 1e6, ".0f")           # GPa -> kN/m^2
-        L = _as_printed(ld_ratio * d_mm / 1000.0, ".1f")    # m
+        E = _hu(STEEL_E_GPA * 1e6, 0)           # GPa -> kN/m^2
+        L = _hu(ld_ratio * d_mm / 1000.0, 1)    # m
         shape_label = f"{shape} (SI designation {props['si_label']})"
         Ix_text = f"{props['si']['Ix']:.1f} x 10^6 mm^4"
         E_text = f"{STEEL_E_GPA} GPa"
@@ -175,10 +175,10 @@ def template_beam_deflection_formula():
         for _attempt in range(200):
             r = random.uniform(1.0 / 500.0, r_hi)
             if load_case == "uniform":
-                w = _as_printed(r * L * 384 * E * Ix / (5 * L ** 4), ".1f")
+                w = _hu(r * L * 384 * E * Ix / (5 * L ** 4), 1)
                 delta = 5 * w * L ** 4 / (384 * E * Ix)            # m
             else:
-                P = _as_printed(r * L * 48 * E * Ix / (L ** 3), ".1f")
+                P = _hu(r * L * 48 * E * Ix / (L ** 3), 1)
                 delta = P * L ** 3 / (48 * E * Ix)                 # m
             if not _is_display_tie(delta * 1000, 1):
                 break
@@ -219,32 +219,37 @@ def template_beam_deflection_formula():
         for _attempt in range(200):
             r = random.uniform(1.0 / 500.0, r_hi)
             if load_case == "uniform":
-                w_try = _as_printed(
-                    r * L_in * 384 * E * Ix / (5 * L_in ** 4) * 12, ".2f")
+                w_try = _hu(
+                    r * L_in * 384 * E * Ix / (5 * L_in ** 4) * 12, 2)
                 d_try = 5 * (w_try / 12) * L_in ** 4 / (384 * E * Ix)
             else:
-                P_try = _as_printed(r * L_in * 48 * E * Ix / (L_in ** 3), ".1f")
+                P_try = _hu(r * L_in * 48 * E * Ix / (L_in ** 3), 1)
                 d_try = P_try * L_in ** 3 / (48 * E * Ix)
             if not _is_display_tie(d_try, 3):
                 break
         else:
             raise RuntimeError("no tie-free load found in 200 draws")
         if load_case == "uniform":
-            w = _as_printed(
-                r * L_in * 384 * E * Ix / (5 * L_in ** 4) * 12, ".2f")  # kip/ft
+            w = _hu(
+                r * L_in * 384 * E * Ix / (5 * L_in ** 4) * 12, 2)  # kip/ft
             # kip/ft -> kip/in is a division by 12, which does not terminate
             # in decimal, so ANY finite intermediate display is a rounding.
             # Computing from a 5-dp intermediate put the answer one unit in
             # the last place away from what the question implies on ~1.6% of
-            # US uniform instances (T2 oracle, seeds 92/314/825/869). The
-            # exact ratio is stated and the exact ratio is used, so nothing
-            # rounded sits between the stated load and the answer (D-016).
+            # US uniform instances (T2 oracle, seeds 92/314/825/869).
+            #
+            # So Step 2 performs the conversion and states its value to 6 dp -
+            # the step exists to demonstrate exactly this, and dropping it made
+            # the step a no-op (Phase 1 review B, F-1) - while the SUBSTITUTION
+            # carries the exact ratio, so nothing rounded sits between the
+            # stated load and the answer (D-016).
+            w_kip_in = _hu(w / 12, 6)          # DISPLAY ONLY - never consumed
             delta = 5 * (w / 12) * L_in ** 4 / (384 * E * Ix)      # in
             load_text = (f"a uniformly distributed load of {w:.2f} kip/ft "
                          f"over the full span")
             assert 0.3 <= w <= 7.5, f"UDL implausible: {w}"
         else:
-            P = _as_printed(r * L_in * 48 * E * Ix / (L_in ** 3), ".1f")  # kips
+            P = _hu(r * L_in * 48 * E * Ix / (L_in ** 3), 1)  # kips
             delta = P * L_in ** 3 / (48 * E * Ix)                 # in
             load_text = f"a concentrated load of {P:.1f} kips at midspan"
             assert 4.0 <= P <= 200.0, f"point load implausible: {P}"
@@ -304,7 +309,7 @@ def template_beam_deflection_formula():
             f"E = {E_text}\n"
             f"I = {Ix_text}\n"
             f"Span L = {L_ft} ft = {L_in} in\n"
-            + (f"w = {w:.2f} kip/ft = {w:.2f}/12 kip/in\n\n"
+            + (f"w = {w:.2f} kip/ft = {w:.2f}/12 = {w_kip_in:.6f} kip/in\n\n"
                if load_case == "uniform" else "\n")
         )
         if load_case == "uniform":
@@ -506,8 +511,8 @@ def template_cantilever_double_integration():
     d_mm = props["si"]["d"]
     # Bound through their own displays - see _as_printed.
     Ix = _as_printed(props["si"]["Ix"] * 1e-6, ".4e")     # m^4
-    E = _as_printed(STEEL_E_GPA * 1e6, ".0f")             # kN/m^2
-    L = _as_printed(ld_ratio * d_mm / 1000.0, ".1f")
+    E = _hu(STEEL_E_GPA * 1e6, 0)             # kN/m^2
+    L = _hu(ld_ratio * d_mm / 1000.0, 1)
 
     # Per-sample feasibility (lesson 1): the ratio window is jointly
     # bounded by serviceability (1/350..1/90), the stress screen (r_cap),
@@ -522,10 +527,10 @@ def template_cantilever_double_integration():
     for _attempt in range(200):
         r = random.uniform(r_lo, r_hi)
         if load_case == "point":
-            P = _as_printed(r * L * 3 * E * Ix / (L ** 3), ".1f")
+            P = _hu(r * L * 3 * E * Ix / (L ** 3), 1)
             delta = P * L ** 3 / (3 * E * Ix)
         else:
-            w = _as_printed(r * L * 8 * E * Ix / (L ** 4), ".1f")
+            w = _hu(r * L * 8 * E * Ix / (L ** 4), 1)
             delta = w * L ** 4 / (8 * E * Ix)
         if not _is_display_tie(delta * 1000, 1):
             break
