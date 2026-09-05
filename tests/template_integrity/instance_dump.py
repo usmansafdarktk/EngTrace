@@ -1,7 +1,17 @@
-"""Dump (question, solution) for the Phase 1 templates to JSON, in-process.
+"""Dump (question, solution) pairs for the Phase 1 templates to JSON.
 
-Run once per tree, as a separate process, so the two trees cannot share
-imported modules. Compare with _impact.py.
+Run once per tree, each as its OWN process, then diff the two files - that is
+how the item-pool impact note (D1.6) is produced:
+
+    git worktree add /c/wt master
+    (cd /c/wt && python -m tests.template_integrity.instance_dump before.json 1000)
+    python -m tests.template_integrity.instance_dump after.json 1000
+
+Separate processes are not optional. An in-process module reload reported "120
+identical" for every template, because both sides resolved to the same already-
+imported `data.templates.*` modules.
+
+Not a check; gates nothing.
 """
 import importlib
 import json
