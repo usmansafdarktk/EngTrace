@@ -45,7 +45,7 @@ had to resolve.
 | Template | T1 closure failures | T2 round-trip failures | worst rel. error |
 |---|---|---|---|
 | `mean_variance` | — → **0** | 56.8% → **0** | 4.30e-4 |
-| `rotating_unbalance` | 597/200 seeds → **0** | 4.6% → **0** | 4.63e-4 |
+| `rotating_unbalance` | 597/200 seeds → **0** | 4.6% → **0** | 4.94e-4 |
 | `vibration_transmissibility` | 212/200 seeds → **0** | 4.5% → **0** | 1.89e-3 |
 | `damping_classification` | 0 → **0** | 0 → **0** | 6.05e-5 |
 | `beam_deflection_formula` | 5.89% of SI → **0** | (new oracle) **0** | **0.00e+00** |
@@ -59,6 +59,31 @@ had to resolve.
 names (see D-024 and D-026 for why that mattered). A 60,000-seed run resolves
 defect rates down to about 5e-5; the gate's own 1,000 seeds resolve nothing
 below 3e-3.
+
+Final verification run, on the merge candidate:
+
+```
+python -m tests.template_integrity.gate_report 60000
+
+template                          T1 fail   cov  T2 fail      worst   T4   T5   T7  err
+mean_variance                           0  0.38        0   4.30e-04   ok   ok   ok    0
+rotating_unbalance                      0  0.38        0   4.94e-04   ok   ok   ok    0
+vibration_transmissibility              0  0.44        0   1.89e-03   ok   ok   ok    0
+damping_classification                  0  0.32        0   6.05e-05   ok   ok   ok    0
+beam_deflection_formula                 0  0.22        0   0.00e+00   ok FAIL   ok    0
+cantilever_double_integration           0  0.18        0   0.00e+00   ok FAIL   ok    0
+annulus_flowrate                        0  0.50        0   5.90e-05   ok FAIL   ok    0
+statically_indeterminate_shaft          0  0.13        0   1.57e-03   ok   ok   ok    0
+shaft_design_power                      0  0.32        0   0.00e+00   ok FAIL   ok    0
+composite_shafts_series                 0  0.47        0   1.00e-04   ok FAIL   ok    0
+
+60000 seeds each. Templates with a hard failure: 0
+```
+
+The five `T5 FAIL` entries are the seven D-017 false positives itemised in §6;
+they are the only non-green cell in the phase. `err` is generation errors, shown
+separately because a template that RAISES produces nothing for T1 and T2 to fail
+on — an all-errors run would otherwise read as "0 failures".
 
 Corpus-wide, nothing outside scope regressed. At a matched 200 seeds on both
 sides: T1 56 → 48 failing templates, T2 3 → 0, T5 73 → 71, T7 95 → 87, T4
@@ -194,6 +219,29 @@ T5b flags them because its precision regex reads `.3e`/`.4e`/`.5e` as "N decimal
 places" when the digits are **mantissa** decimals: `{Ix:.4e}` on `8.49e-05`
 displays five significant figures and loses nothing, while T5b computes
 `round(8.49e-05, 4) = 0.0001` and reports a loss of 5e-05.
+
+**Tolerance headroom, measured at 60,000 seeds.** Every oracle clears its worst
+observed disagreement, but not by the same margin:
+
+| Oracle | TOLERANCE | worst @60k | headroom |
+|---|---:|---:|---:|
+| `beam_deflection_formula`, `cantilever_double_integration`, `shaft_design_power` | 1e-3 | 0.00e+00 | exact |
+| `damping_classification` | 5e-3 | 6.05e-5 | 83× |
+| `composite_shafts_series` | 2e-3 | 1.00e-4 | 20× |
+| `rotating_unbalance` | 5e-3 | 4.94e-4 | 10× |
+| `statically_indeterminate_shaft` | 5e-3 | 1.57e-3 | 3.2× |
+| `vibration_transmissibility` | 5e-3 | 1.89e-3 | 2.6× |
+| `mean_variance` | 1e-3 | 4.30e-4 | 2.3× |
+| **`annulus_flowrate`** | **1e-4** | **5.90e-5** | **1.7×** |
+
+`annulus_flowrate` is the thinnest and is a **pre-existing** oracle that has not
+had the D-026 treatment. 1.7× is roughly the margin `mean_variance` had before
+it failed at 60,000 — so this is the next one to go if the seed count rises
+again. It is flagged here rather than left to be discovered: **the answer is a
+4-decimal mantissa, so its hard display bound is 5e-5 and the declared 1e-4 is
+exactly 2× that** — the margin is real but it has no room for a second effect.
+Carried to Phase 2 with the other pre-existing oracles' floor measurements (§8,
+A-4).
 
 This is a **harness defect (D-017), raised and deliberately not fixed**: the
 spec forbids modifying the harness to make a fix pass, and Phase 0 found two
