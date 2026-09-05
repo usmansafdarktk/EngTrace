@@ -131,7 +131,7 @@ is. That saturation hid a real 29% regression (**D-021**).
 | `damping_classification` | 1,600 → 1,600 (+0.0%) | +0.00% | same | pass |
 | `beam_deflection_formula` | 1,828 → 1,827 (−0.1%) | +0.00% | same | pass |
 | `cantilever_double_integration` | 395 → 395 (+0.0%) | +0.00% | same | pass |
-| `annulus_flowrate` | 4,929 → 4,940 (+0.2%) | **−28.2%** | same | **BREACH — signed off, D-022** |
+| `annulus_flowrate` | 4,929 → 4,940 (+0.2%) | **−27.8%** | same | **BREACH — signed off, D-022** |
 | `statically_indeterminate_shaft` | 4,886 → 4,684 (−4.1%) | −0.02% | same | pass |
 | `shaft_design_power` | 3,243 → 3,234 (−0.3%) | −0.04% | same | pass |
 | `composite_shafts_series` | 2,730 → 4,899 (**+79.5%**) | +0.04% | same | pass |

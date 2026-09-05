@@ -1,6 +1,6 @@
 # Phase 1 — Item-pool impact note (D1.6)
 
-**Which published results does regenerating these 12 templates invalidate?**
+**Which published results does regenerating these 10 templates invalidate?**
 
 **Date:** 2026-09-06 · **Branch:** `redesign/phase1-round-trip`
 **Companion to:** [`phase1_summary.md`](phase1_summary.md), [`DECISIONS.md`](DECISIONS.md) D-008
@@ -12,14 +12,14 @@
 | | |
 |---|---|
 | Published item pool | **1,350 items** = 90 templates × 15 seeded instances, per model |
-| Templates this phase edits | **12** |
+| Templates this phase edits | **10** (see D-023 - the "12" in the phase title double-counts) |
 | …of which are **in** the published pool | **8** |
 | Published items affected | **120 of 1,350 = 8.9%** |
 | …needing only a **re-score** (question unchanged, gold trace corrected) | **~74 of 120** |
 | …needing **re-inference** (the item itself changed) | **~44 of 120** |
 | Model runs affected | all of them — the paper evaluates 27 LLMs |
 
-**Four of the 12 templates carry no published-results cost at all.** The paper's
+**Two of the ten templates carry no published-results cost at all.** The paper's
 90 templates span **three** branches — chemical, electrical and mechanical
 (§3.1, "Template Selection"; the domain-ranking prompt at line 1281 names them).
 Civil and industrial were authored later and are not in the 1,350. So
@@ -100,10 +100,12 @@ part of the defect:
   question was ambiguous; every archived generation against it was scored
   against an under-specified item.**
 - **`annulus_flowrate` (100%)** — the stated pressure drop moved from a 10 Pa
-  grid to a 1 Pa grid. On 284 of 1,000 instances the old grid rounded the
-  required drop to zero and the template silently substituted 10 Pa, discarding
-  its own Reynolds targeting. **Those items stated a pressure drop unrelated to
-  the flow they describe.**
+  grid to a 1 Pa grid. 284 of 1,000 instances stated exactly 0.010 kPa, of which
+  about 17 points were the silent substitution firing: the old grid rounded the
+  required drop to zero and the template put 10 Pa in its place, discarding its
+  own Reynolds targeting. **Those items stated a pressure drop unrelated to the
+  flow they describe**, and a further ~17% were non-laminar while asserting the
+  laminar solution (Reviewer B).
 - **`mean_variance` (43%)** — the stated probabilities are renormalised to sum
   to exactly 1.000. They previously summed to 0.999–1.002, so the question did
   not describe a probability distribution.
