@@ -4,6 +4,7 @@
 **Date:** 2026-09-05
 **Scope:** the 16 class-D templates, plus 3 class-B/C templates that share the class-D round-trip defect, plus 11 templates with output-contract defects (Phase 5, adjacent scope). 29 distinct templates in all.
 **Two tracks.** **Track A** (Phases 0–6) is template integrity. **Track B** (Phases C1–C3) is constants re-grounding, running in parallel with two hard sync points.
+**Document map.** [`template_audit_report.md`](template_audit_report.md) findings · [`template_inventory.csv`](template_inventory.csv) per-template classification · **this file** the plan · [`DECISIONS.md`](DECISIONS.md) decisions and pivots, append-only · [`phase0_summary.md`](phase0_summary.md) phase close-out and R4 triage · [`phase0_baseline.md`](phase0_baseline.md) measurements · [`reviews/`](reviews/) independent reviews.
 **Out of scope, referenced where it gates:** the parser fix and the value-extractor build. Those remain separate tracks in the action-item list; only their dependencies appear here.
 
 ---
@@ -14,7 +15,17 @@ Six rules. Every phase is judged against them.
 
 **P1 — The trace must reproduce its own answer.** A solver who reads only the question, follows only the printed steps, and uses only the printed operands must arrive at the printed answer within the stated tolerance. This is the property most class-D templates violate and it is the reason the class exists.
 
-**P2 — Round then recompute.** Any quantity that is displayed and then consumed downstream must be rounded to its display precision *before* it is consumed. The stored value and the printed value must be the same value. (Civil holds this in 29/30 templates; the convention and a worked fix already exist in `civil_engineering/structural_analysis/deflections.py`.)
+**P2 — Round then recompute, and break the tie in decimal.** Any quantity that is displayed and then consumed downstream must be rounded to its display precision *before* it is consumed, so the stored value and the printed value are the same value. **That is necessary but not sufficient** (D-012): rounding to display precision removes the *double* rounding but can leave an exact half-way tie, which `round()` then resolves on the **binary** value. The tie must also be broken deterministically in decimal:
+
+```python
+delta = round(delta, 5)                                    # necessary
+delta_mm = Decimal(f"{delta:.5f}") * 1000                  # and sufficient:
+delta_mm = float(delta_mm.quantize(Decimal("0.1"), rounding=ROUND_HALF_UP))
+#   NOT round(delta * 1000, 1) — `0.01185 * 1000` is 11.849999… in binary,
+#   so round() gives 11.8 where a decimal reader gets 11.9.
+```
+
+Phase 0 found that the template originally cited here as the worked exemplar, `template_beam_deflection_formula`, applies the first half correctly and **still fails closure on 5.89% of its SI instances** for exactly this reason. Applied as originally written, Phase 1 would have reproduced that residue eight more times. Fix that template first; it is the pattern the others copy.
 
 **P3 — Given values are stated first, then used.** If the question states a rounded value, the solution chain consumes the rounded value, never the unrounded pre-image it was derived from. Back-solving to construct a problem is permitted; back-solving and then *using the pre-image* is not.
 
@@ -33,7 +44,7 @@ Six rules. Every phase is judged against them.
 - Review reports live in `docs/re-implementation-sep/reviews/`. This spec is itself under review: reviewers may return `SPEC-CHANGE` items against it.
 - **Scope every review to R6 before dispatching it.** One mandatory gate task, a stated time box, no measurement commissioned twice, tooling supplied, and everything already settled named as out of scope. Over-scoping a review does not buy assurance — it stalls the review and leaves the gate unchecked. Run the R6 pre-dispatch checklist every time.
 
-> **Measurement caveat carried forward from the audit.** The defect rates quoted below (7.77%, 4.95%, 175/500, etc.) come from the per-branch audit sweeps and were not independently re-run. **Phase 0 re-measures all of them.** If a rate does not reproduce, the affected template's phase assignment is revisited before any edit.
+> **Measurement status — RESOLVED by Phase 0.** The defect rates quoted below came from the per-branch audit sweeps. Phase 0 re-measured all 22 testable claims independently; **20 reproduced**, several exactly. Two corrections stand: audit claim 4c is false as stated (the `damping_classification` flips are ~50/50 Overdamped/Underdamped, not all Overdamped), and the headline worst-case figures are extreme values of a 200-seed sample rather than template properties. Full reconciliation in [`phase0_baseline.md`](phase0_baseline.md); decisions in [`DECISIONS.md`](DECISIONS.md).
 
 ---
 
@@ -99,11 +110,26 @@ One reviewer, **Harness Adversary**. Given the spec and the harness, **not** the
 
 ---
 
-## Phase 1 — Round-trip integrity (9 templates)
+## Phase 1 — Round-trip integrity (12 templates)
 
 The highest-value phase. These are **defects producing incorrect gold traces in published results**, not design limitations.
 
-### 1.1 Scope
+> **Re-scoped by Phase 0.** The table in §1.1 is the *original* nine as commissioned. Phase 0's measurements changed both the size and the shape of this phase, and §1.1a below is authoritative. In short: three templates leave (not defective), three join (same defect shape, found by D0.5), and the remainder split into **chain breaks** and **display defects**, which need *different* fixes. See [`DECISIONS.md`](DECISIONS.md) D-011 and D-013, and [`phase0_summary.md`](phase0_summary.md) §8.
+
+### 1.1a Revised scope — authoritative
+
+| Category | Templates | Fix | Measured |
+|---|---|---|---|
+| **Chain break** — answer wrong from the stated givens | `mean_variance`, `rotating_unbalance`, `vibration_transmissibility` | **P3** (state, then recompute forward) | 56.8% / 33.7% / 39% of instances |
+| **Display defect** — answer round-trips, an intermediate line does not | `beam_deflection_formula` ← **fix first**, `cantilever_double_integration`, `annulus_flowrate`, `statically_indeterminate_shaft`, `shaft_design_power`, `composite_shafts_series` | **P2 as amended** (decimal tie-break) | 5.89% / 3.7% / 94% / 47% / 30% / 89.9% |
+| **Ill-posed, not wrong** | `damping_classification` | state `c` to more digits; drop `elif zeta == 1` (D-010) | 33.7% flips, all within stated precision |
+| **Leaving Phase 1 — not defective** | `poissons_ratio`, `logarithmic_decrement`, `system_properties` | none (record in D6.6) | 0% round-trip failure |
+
+**Verify fixes against T5b, not T1 alone** — T1's ±0.5-ulp rule structurally cannot see the half-way-tie class (adversary F3).
+
+Three defects found during Phase 0 that must be fixed alongside: `mean_variance` probabilities are never renormalised (sum 0.999–1.002); `rotating_unbalance` never states whether the unbalance mass is included in the stated total; and some `rotating_unbalance` answers print to one significant figure (`0.002 mm`), ungradeable regardless of the chain fix.
+
+### 1.1 Original scope (superseded by §1.1a — retained for provenance)
 
 | Template | Branch | Class | Defect | Claimed rate |
 |---|---|---|---|---|
@@ -727,6 +753,9 @@ Read the hours as effort. Wall-clock is a fraction of them, and the difference i
 | SPEC-CHANGE 1 | T5 extended from "value binding" to "value binding **and rounding discipline**" (T5a/T5b) | T1 cannot see the round-then-recompute (P2) defect class: in `template_cantilever_double_integration` every printed line closes within its display tolerance while the trace is still wrong. T5b catches it, and caught `template_impulse_response_from_lccde` too. |
 | SPEC-CHANGE 2 | T3 batched into two child processes for the whole corpus rather than two per template | 300 interpreter starts → 2. ~500s → ~8s on 150 templates, identical comparison. |
 | SPEC-CHANGE 3 | Execution model E1–E4 added above | The phase table was being read as a serial schedule. |
+| SPEC-CHANGE 5 | **P2 amended: break the rounding tie in decimal** (D-012) | P2's own worked exemplar applies it correctly and still fails closure on 5.89% of instances. Applied as written, Phase 1 would have reproduced the residue eight more times. |
+| SPEC-CHANGE 6 | **Phase 1 re-scoped 9 → 12 templates, split into chain breaks vs display defects** (D-011, D-013) | Phase 0 measurement: three templates are not defective, three more have the same defect shape, and the two categories need different fixes. |
+| SPEC-CHANGE 7 | Worst-case defect rates to be quoted as distributions, not sample maxima | "7.77%" and "0.87%" are extreme values of a 200-seed sample; at 20,000 seeds they are 14.27% and 1.21%. |
 | SPEC-CHANGE 4 | **R6 review-scoping rules added** | The first Phase 0 adversary brief bundled the gate task with work already assigned to the D0.5 agent. It stalled and produced nothing; D0.5 delivered the superset. Over-scoping a review does not make it more thorough — it makes it not happen. |
 
 ---
