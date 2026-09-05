@@ -459,5 +459,81 @@
   ],
   "dHf_gas_kJ_per_mol": 52.47,
   "cp_298_tabulated": 42.9
+ },
+ "C2H2(g)": {
+  "cas": "74-86-2",
+  "nist_id": "C74862",
+  "ranges": [
+   {
+    "T_min": 298,
+    "T_max": 1100,
+    "A": 40.68697,
+    "B": 40.73279,
+    "C": -16.1784,
+    "D": 3.669741,
+    "E": -0.658411
+   },
+   {
+    "T_min": 1100,
+    "T_max": 6000,
+    "A": 67.47244,
+    "B": 11.7511,
+    "C": -2.02147,
+    "D": 0.136195,
+    "E": -9.806418
+   }
+  ],
+  "dHf_gas_kJ_per_mol": 226.73,
+  "dHf_source": "Chase, 1998",
+  "cp_298_tabulated": 44.04
+ },
+ "C3H8(g)": {
+  "cas": "74-98-6",
+  "nist_id": "C74986",
+  "ranges": [],
+  "cp_298_tabulated": 73.6,
+  "dHf_gas_kJ_per_mol": -104.7,
+  "dHf_uncertainty": 0.5,
+  "dHf_source": "Pittam and Pilcher, 1972 (NIST recommended)",
+  "_note": "NIST has no Shomate fit for propane; verification uses the tabulated Cp at 298.15 K"
+ },
+ "C4H10(g)": {
+  "cas": "106-97-8",
+  "nist_id": "C106978",
+  "ranges": [],
+  "cp_298_tabulated": 98.49,
+  "dHf_gas_kJ_per_mol": -125.6,
+  "dHf_uncertainty": 0.67,
+  "_note": "NIST has no Shomate fit for n-butane; verification uses the tabulated Cp at 298.15 K"
+ },
+ "C2H5OH(g)": {
+  "cas": "64-17-5",
+  "nist_id": "C64175",
+  "ranges": [],
+  "cp_298_tabulated": 65.21,
+  "dHf_gas_kJ_per_mol": -234.0,
+  "dHf_uncertainty": 2.0,
+  "_note": "NIST has no Shomate fit for ethanol vapour; verification uses the tabulated Cp at 298.15 K"
+ },
+ "C2H6(g)": {
+  "cas": "74-84-0",
+  "nist_id": "C74840",
+  "ranges": [],
+  "dHf_gas_kJ_per_mol": -84.0,
+  "dHf_uncertainty": 0.4,
+  "dHf_alternatives": [
+   -83.8,
+   -84.67
+  ],
+  "_note": "NIST has no Shomate fit for ethane. Cp verification uses the Smith-Van Ness Cp298/R self-check column (6.369)."
+ },
+ "C6H6(l)": {
+  "cas": "71-43-2",
+  "nist_id": "C71432",
+  "ranges": [],
+  "cp_298_liquid_tabulated": 135.69,
+  "dHf_liquid_kJ_per_mol": 49.0,
+  "dHf_uncertainty": 0.9,
+  "_note": "condensed phase page (Mask=2). The repo's C6H6(l) row computes 85.3, which is the GAS-phase value - the row carries gas coefficients under a liquid key."
  }
 }
