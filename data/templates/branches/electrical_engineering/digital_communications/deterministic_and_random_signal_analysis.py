@@ -1,5 +1,43 @@
 import random
 import math
+from decimal import Decimal, ROUND_FLOOR, ROUND_HALF_UP
+
+
+# Verifier tolerances (D1.3), keyed by template id. Relative; the re-derived
+# value is compared against the gold at the precision the trace quotes it to.
+TEMPLATE_TOLERANCES = {
+    # Both answers are quoted to 3 dp. |mu_X| is typically 5-15 and sigma_X^2
+    # typically 10-90, so half a unit in the last printed place is at most
+    # ~1e-4 relative; 1e-3 is roughly ten times that display bound, so nothing
+    # fires on presentation, while the defect class this item exhibited - a
+    # moment computed from unrounded probabilities but stated from 3-dp ones -
+    # drifts by several times 1e-3 relative and much more for small means.
+    # After the Phase 1 fix the chain is exact in decimal, so the measured
+    # worst relative error is 0.
+    "template_mean_variance": 1e-3,
+}
+
+
+def _hu_dec(x, places):
+    """Round an exact Decimal half-up to `places` dp, staying in Decimal.
+
+    Half-up in DECIMAL, not `round()` on a binary float: `round()` resolves a
+    half-way tie on the binary value and disagrees with a reader doing decimal
+    arithmetic (spec P2 as amended, DECISIONS D-012).
+    """
+    return Decimal(x).quantize(Decimal(1).scaleb(-places), rounding=ROUND_HALF_UP)
+
+
+def _is_display_tie_dec(x, places):
+    """Does the exact Decimal `x` sit exactly on a half-way tie at `places` dp?
+
+    A tie is the one case where no rounding convention is defensible - a
+    decimal reader applying half-up and a binary reader applying `round()`
+    disagree, and the printed line closes for only one of them. Such instances
+    are resampled rather than resolved (D-016).
+    """
+    d = Decimal(x).scaleb(places)
+    return d == d.to_integral_value(rounding=ROUND_FLOOR) + Decimal("0.5")
 
 
 # Template 1 (Easy)
@@ -169,36 +207,87 @@ def template_mean_variance():
         Mean (Expected Value): mu_X = E[X] = sum(x_i * P(x_i))
         Variance: sigma_X^2 = E[(X - mu_X)^2] = sum((x_i - mu_X)^2 * P(x_i))
 
+    Trace integrity (Phase 1, P3):
+        The probabilities are stated to 3 decimal places, so the 3-dp values
+        are ALL a solver has. They are therefore the values the solution
+        consumes: the whole chain is evaluated in exact decimal arithmetic on
+        the stated probabilities, never on the unrounded part/total ratios
+        they were drawn from. Because the values x_i are integers and each
+        p_i is an exact 3-dp decimal, every printed intermediate is exact:
+        x_i*p_i has 3 dp, (x_i - mu)^2 has 6 dp, and (x_i - mu)^2*p_i has 9 dp.
+
+        The stated probabilities are also renormalised to sum to exactly
+        1.000 by the largest-remainder method. Previously they were rounded
+        independently and summed to 0.999-1.002, so the question did not
+        describe a probability distribution at all.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the mean and variance of a discrete random variable.
             - str: A step-by-step solution.
     """
-    # 1. Parameterize the inputs with random values
-    num_values = random.randint(3, 5)
     precision = 3
+    _TERM_DP = 6          # per-term display precision inside the variance sum
 
-    # Generate a set of unique, sorted integer values for the random variable
-    values = sorted(random.sample(range(-10, 21), num_values))
+    for _attempt in range(200):
+        num_values = random.randint(3, 5)
 
-    # Generate clean, rational probabilities that sum to 1
-    # Create random integer parts, sum them, and use that sum as the denominator
-    parts = [random.randint(1, 10) for _ in range(num_values)]
-    total_sum = sum(parts)
-    probabilities = [p / total_sum for p in parts]
+        # Unique, sorted integer values for the random variable.
+        values = sorted(random.sample(range(-10, 21), num_values))
 
-    # 2. Perform the core calculations
-    # Calculate the mean (expected value)
-    mean = sum(v * p for v, p in zip(values, probabilities))
+        # Rational probabilities, then RENORMALISED at the stated 3-dp
+        # precision by largest remainder, so the printed set sums to exactly
+        # 1.000 and the distribution a solver reads is the one the answer
+        # describes.
+        parts = [random.randint(1, 10) for _ in range(num_values)]
+        total_sum = sum(parts)
+        thousandths = [(part * 1000) // total_sum for part in parts]
+        shortfall = 1000 - sum(thousandths)
+        order = sorted(
+            range(num_values),
+            key=lambda i: (parts[i] * 1000 - thousandths[i] * total_sum),
+            reverse=True)
+        for i in order[:shortfall]:
+            thousandths[i] += 1
 
-    # Calculate the variance
-    variance = sum(((v - mean) ** 2) * p for v, p in zip(values, probabilities))
+        probs = [Decimal(t) / 1000 for t in thousandths]
+        vals = [Decimal(v) for v in values]
 
-    # 3. Generate the question and solution strings
-    
-    # Format values and probabilities for display
+        # Every quantity below is EXACT in decimal - no float anywhere in the
+        # chain, so the printed operands and the stored values are the same
+        # values by construction.
+        mean_d = sum(v * q for v, q in zip(vals, probs))          # exact, 3 dp
+        devs = [v - mean_d for v in vals]                          # exact, 3 dp
+        terms = [d * d * q for d, q in zip(devs, probs)]           # exact, 9 dp
+        var_exact = sum(terms)                                     # exact, 9 dp
+
+        variance_d = _hu_dec(var_exact, precision)
+        # The variance line prints its per-term contributions at _TERM_DP and
+        # then their sum. Require that the sum of the DISPLAYED terms rounds
+        # to the stated variance, and is not itself sitting on a rounding tie
+        # - otherwise the printed line does not reproduce its own result.
+        shown_terms = [_hu_dec(t, _TERM_DP) for t in terms]
+        shown_sum = sum(shown_terms)
+        if (_hu_dec(shown_sum, precision) == variance_d
+                and not _is_display_tie_dec(shown_sum, precision)
+                and not _is_display_tie_dec(var_exact, precision)):
+            break
+    else:
+        raise RuntimeError("mean_variance: no closing sample found in 200 draws")
+
+    # --- invariants (T7) ---------------------------------------------------
+    assert sum(probs) == 1, f"probabilities do not sum to 1: {sum(probs)}"
+    assert min(vals) <= mean_d <= max(vals), (
+        f"mean {mean_d} outside the support [{min(vals)}, {max(vals)}]")
+    assert variance_d > 0, f"variance not positive: {variance_d}"
+    # Popoviciu's inequality: sigma^2 <= (max - min)^2 / 4 for any distribution
+    # supported on [min, max].
+    assert variance_d <= (max(vals) - min(vals)) ** 2 / 4, (
+        f"variance {variance_d} exceeds Popoviciu bound for "
+        f"[{min(vals)}, {max(vals)}]")
+
     values_str = "{" + ", ".join(map(str, values)) + "}"
-    probs_str = "{" + ", ".join([f"{p:.{precision}f}" for p in probabilities]) + "}"
+    probs_str = "{" + ", ".join(f"{q:.{precision}f}" for q in probs) + "}"
 
     question = (
         f"A discrete random variable X can take the values {values_str} with "
@@ -206,50 +295,43 @@ def template_mean_variance():
         f"Calculate the mean (mu_X) and variance (sigma_X^2) of X."
     )
 
-    # --- Build the solution string step-by-step ---
+    # Explicit `*` between the operands, rather than juxtaposition, so the
+    # printed arithmetic is machine-checkable: `(-9)(0.172)` is not an
+    # expression any evaluator reads as a product, which left every one of
+    # this template's `=` lines invisible to the closure check.
+    mean_subs = " + ".join(f"({v})*({q:.{precision}f})"
+                           for v, q in zip(values, probs))
+    mean_terms = " + ".join(f"{v * q:.{precision}f}"
+                            for v, q in zip(vals, probs))
 
-    # Mean calculation steps
-    mean_calc_lhs = "mu_X = E[X]"
-    mean_calc_rhs = " + ".join([f"({v})({p:.{precision}f})" for v, p in zip(values, probabilities)])
-    mean_interm_vals = " + ".join([f"{v * p:.{precision}f}" for v, p in zip(values, probabilities)])
-    
-    # Variance calculation steps
-    var_calc_lhs = "sigma_X^2 = E[(X - mu_X)^2]"
-    var_calc_rhs = " + ".join(
-        [f"({v} - {mean:.{precision}f})^2({p:.{precision}f})" for v, p in zip(values, probabilities)]
-    )
-    var_interm_vals = " + ".join(
-        [f"({(v - mean):.{precision}f})^2({p:.{precision}f})" for v, p in zip(values, probabilities)]
-    )
-    var_final_vals = " + ".join(
-        [f"{((v - mean)**2 * p):.{precision}f}" for v, p in zip(values, probabilities)]
-    )
+    var_subs = " + ".join(f"({v} - {mean_d:.{precision}f})^2*({q:.{precision}f})"
+                          for v, q in zip(values, probs))
+    var_devs = " + ".join(f"({d:.{precision}f})^2*({q:.{precision}f})"
+                          for d, q in zip(devs, probs))
+    var_terms = " + ".join(f"{t:.{_TERM_DP}f}" for t in shown_terms)
 
     solution = (
         f"**Given:**\n"
         f"Values: X = {values_str}\n"
         f"Probabilities: P(X) = {probs_str}\n\n"
-        
+
         f"**Step 1:** Calculate the Mean (mu_X).\n"
         f"The formula for the mean (expected value) is:\n"
         f"mu_X = sum(x_i * P(x_i))\n\n"
         f"Plugging in the given values:\n"
-        f"{mean_calc_lhs} = {mean_calc_rhs}\n"
-        f"{mean_calc_lhs} = {mean_interm_vals}\n"
-        f"{mean_calc_lhs} = {mean:.{precision}f}\n\n"
+        f"mu_X = {mean_subs} = {mean_terms} = {mean_d:.{precision}f}\n\n"
 
         f"**Step 2:** Calculate the Variance (sigma_X^2).\n"
         f"The formula for variance is:\n"
         f"sigma_X^2 = sum((x_i - mu_X)^2 * P(x_i))\n\n"
-        f"Using the calculated mean (mu_X = {mean:.{precision}f}):\n"
-        f"{var_calc_lhs} = {var_calc_rhs}\n"
-        f"{var_calc_lhs} = {var_interm_vals}\n"
-        f"{var_calc_lhs} = {var_final_vals}\n"
-        f"{var_calc_lhs} = {variance:.{precision}f}\n\n"
+        f"Using the calculated mean (mu_X = {mean_d:.{precision}f}):\n"
+        f"sigma_X^2 = {var_subs} = {variance_d:.{precision}f}\n"
+        f"sigma_X^2 = {var_devs} = {var_terms} = {variance_d:.{precision}f}\n\n"
 
         f"**Answer:**\n"
-        f"The mean of the random variable X is **{mean:.{precision}f}**.\n"
-        f"The variance of the random variable X is **{variance:.{precision}f}**."
+        f"The mean of the random variable X is **{mean_d:.{precision}f}**.\n"
+        f"The variance of the random variable X is "
+        f"**{variance_d:.{precision}f}**."
     )
 
     return question, solution
