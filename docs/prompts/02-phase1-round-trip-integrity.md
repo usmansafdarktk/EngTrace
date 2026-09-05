@@ -12,6 +12,83 @@ I need you to implement **Phase 1** of the template redesign: fixing 12 template
 traces do not reproduce their own answers. This is an implementation task with a hard
 verification gate, not a design task — the design decisions were made and are recorded.
 
+## What EngTrace is, and why this matters
+
+EngTrace is a benchmark for evaluating LLM reasoning on engineering problems, built from
+**150 parameterized Python templates** under `data/templates/branches/`, across five branches
+(chemical, electrical, mechanical, civil, industrial — 30 each, in 47 files). Each template is
+a function `template_*()` that samples physically-grounded parameters, computes an answer, and
+returns a `(question, solution)` pair of natural-language strings. The solution is the **gold
+reasoning trace**.
+
+**The paper has been rejected twice from ACL ARR** (Jan 2026 and May 2026). The most damaging
+criticism, raised independently by five reviewers, is that the evaluation framework verifies
+model reasoning using an "AI Tribunal" of three frontier LLMs (GPT-5, Claude Opus 4.5, Gemini
+3) while simultaneously evaluating models from those same families — GPT-5 is both judge and
+evaluated model. The paper is titled *"Verifiable Process Supervision"*, but verification is a
+majority vote among LLMs.
+
+The long-term fix is deterministic verification: templates emit a structured trace, and
+checking a model's reasoning becomes a numeric and dimensional check with no LLM in the
+critical path. **Phase 1 is a prerequisite for that.** You cannot build a deterministic
+verifier against gold traces that contradict themselves — any tolerance tight enough to catch
+a real reasoning error would reject the gold. That is what these 12 templates do today.
+
+For the full picture (optional, but read it if a judgement call turns on what the benchmark is
+claiming):
+
+- `docs/_ARR_May__EngTrace.txt` — the current paper. **Section 4** is the evaluation
+  framework, **Appendix G** has three full template implementations, **Appendix M** is the
+  framework validation.
+- `docs/EngTrace_Rebuttal_Jul2026.txt` — the most recent reviewer objections and our
+  responses. These promises are the real to-do list behind this work.
+
+Two cautions so you do not waste time:
+
+- `error_analysis_annotation/error_annotation_results/` contains "Annotator A/B/C" — these are
+  an **LLM annotation pilot**, not the paper's human error analysis. Not a discrepancy; do not
+  flag it.
+- `evaluation/` is a **separate track** and out of scope here. Its parser has known defects
+  (it reads the gold answer `**4,921**` as `4.0`), recorded as D-003. Do not fix them in this
+  phase.
+
+## The current state of the templates
+
+**Structure.** Every template follows one shape: sample parameters (often inside a rejection
+loop) → compute into local variables → concatenate one large f-string → return. The solution
+string is a `**Given:**` block, then `**Step N:**` blocks, then a final `**Answer:**`. Step
+counts run 2–9, median 4.
+
+**Health, as measured by Phase 0** across all 150 (this is the baseline you are working
+against, not a to-do list):
+
+| Check | Failing | Note |
+|---|---:|---|
+| T1 printed-arithmetic closure | 38/150 | 95 more sit on the rounding boundary (marginals) |
+| T3 determinism | 1/150 | `levenspiel_plot_interpretation`, unseeded `np.random` |
+| T4 output contract | 4/150 | malformed step markers; 5 more use `**Final Answer**` |
+| T5 binding / rounding | 73/150 | 39 are confirmed P2 violations |
+| T7 invariant asserts | 95/150 | expected — see below |
+
+All 150 import and run cleanly: **zero exceptions across 30,000 generations.** The corpus is
+healthy; the defects are specific, not systemic.
+
+**Two authoring eras, and it matters.** Civil and industrial were written later under a
+spec-driven process: provenance-tagged constants, textbook citations, stated physical bounds,
+**60 templates carrying 142 `assert` statements between them, and a "round-then-recompute"
+convention**. Chemical, electrical and mechanical have **zero asserts** and no provenance.
+
+That is why T7 fails 95/150 — it is advisory corpus-wide and a gate only on templates a phase
+edits. It is also why the civil convention is the model P2 is built on. But note the trap
+Phase 0 found: civil holds round-then-recompute in 29/30 templates and its **exemplar still
+fails closure on 5.89% of instances**, because the convention as written is incomplete. Do not
+assume a civil template is correct because it looks disciplined.
+
+**Useful structural facts** (from the audit): 93% of f-string interpolations are already bound
+variables rather than inline computations; 48% of templates change their governing equation,
+step count or milestone set based on a sampled parameter, so **several of the 12 have multiple
+structural branches you must exercise** — generate enough seeds to hit each one.
+
 ## Read these first, in this order
 
 1. **[`docs/re-implementation-sep/phase0_summary.md`](../re-implementation-sep/phase0_summary.md)** —
