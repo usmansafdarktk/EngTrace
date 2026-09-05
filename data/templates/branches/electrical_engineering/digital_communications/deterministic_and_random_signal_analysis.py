@@ -28,6 +28,12 @@ def _hu_dec(x, places):
     return Decimal(x).quantize(Decimal(1).scaleb(-places), rounding=ROUND_HALF_UP)
 
 
+def _exponent(x):
+    """floor(log10(|x|)) for an exact Decimal, without going through a float."""
+    d = Decimal(x).copy_abs().normalize()
+    return d.adjusted()
+
+
 def _is_display_tie_dec(x, places):
     """Does the exact Decimal `x` sit exactly on a half-way tie at `places` dp?
 
@@ -261,16 +267,28 @@ def template_mean_variance():
         terms = [d * d * q for d, q in zip(devs, probs)]           # exact, 9 dp
         var_exact = sum(terms)                                     # exact, 9 dp
 
-        variance_d = _hu_dec(var_exact, precision)
+        # The variance spans 0.284 to 214 over 20,000 seeds. A fixed 3 dp
+        # therefore gives the smallest instances fewer than four significant
+        # figures - 0.284 is three - and one display step there is 1.8e-3
+        # relative, which is ABOVE the round-trip tolerance. Three instances
+        # per 60,000 then read as round-trip failures when the trace is in
+        # fact correctly rounded. Quote at least four significant figures
+        # instead, as the other Phase 1 answers do.
+        #
+        # The mean needs no such treatment: integer values times exact 3-dp
+        # probabilities sum to an exact 3-dp decimal, so it is stated exactly
+        # whatever its magnitude.
+        var_dp = max(precision, 3 - _exponent(var_exact))
+        variance_d = _hu_dec(var_exact, var_dp)
         # The variance line prints its per-term contributions at _TERM_DP and
         # then their sum. Require that the sum of the DISPLAYED terms rounds
         # to the stated variance, and is not itself sitting on a rounding tie
         # - otherwise the printed line does not reproduce its own result.
         shown_terms = [_hu_dec(t, _TERM_DP) for t in terms]
         shown_sum = sum(shown_terms)
-        if (_hu_dec(shown_sum, precision) == variance_d
-                and not _is_display_tie_dec(shown_sum, precision)
-                and not _is_display_tie_dec(var_exact, precision)):
+        if (_hu_dec(shown_sum, var_dp) == variance_d
+                and not _is_display_tie_dec(shown_sum, var_dp)
+                and not _is_display_tie_dec(var_exact, var_dp)):
             break
     else:
         raise RuntimeError("mean_variance: no closing sample found in 200 draws")
@@ -326,12 +344,12 @@ def template_mean_variance():
         f"sigma_X^2 = sum((x_i - mu_X)^2 * P(x_i))\n\n"
         f"Using the calculated mean (mu_X = {mean_d:.{precision}f}):\n"
         f"Deviations from the mean: {dev_line}\n"
-        f"sigma_X^2 = {var_devs} = {var_terms} = {variance_d:.{precision}f}\n\n"
+        f"sigma_X^2 = {var_devs} = {var_terms} = {variance_d:.{var_dp}f}\n\n"
 
         f"**Answer:**\n"
         f"The mean of the random variable X is **{mean_d:.{precision}f}**.\n"
         f"The variance of the random variable X is "
-        f"**{variance_d:.{precision}f}**."
+        f"**{variance_d:.{var_dp}f}**."
     )
 
     return question, solution

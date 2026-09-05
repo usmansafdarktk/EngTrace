@@ -752,6 +752,70 @@ value needs more digits than the question shows, the template's display
 precision must move with it.
 
 
+---
+
+## D-026 — A third acceptance run, a third defect the previous seed count could not see
+
+**Date:** 2026-09-06 · **Status:** DECIDED · **Source:** Phase 1 close-out, the
+60,000-seed verification D-016 mandates
+**Companion to D-024, which recorded the same failure mode one run earlier.**
+
+`template_mean_variance` passed T2 with zero failures at 1,000 seeds and at
+20,000. **At 60,000 it fails 3 times**, worst relative error 1.19e-3 against a
+declared `TOLERANCE` of 1e-3 (seeds 23265, 35279, 45463).
+
+**The trace is correct in all three.** Seed 23265: the exact variance is
+0.358624 and the trace prints 0.359, which is the correct 3-dp rounding. The
+failure is the *check's*, not the template's.
+
+**Root cause: the Phase 0 oracle's tolerance was argued from the wrong range.**
+Its comment reads *"sigma_X^2 is typically 10-90 … that is at most ~1e-4
+relative"*. Measured over 20,000 seeds the variance actually spans **0.284 to
+214**, and at the low end one 3-dp display step is **1.76e-3 relative** — above
+the declared tolerance. 15 instances in 20,000 fall below 0.5, where 3 dp is
+fewer than four significant figures.
+
+This is exactly Reviewer A's finding F-4 — *the declared tolerance is argued,
+and the number that actually binds is the display quantisation* — arriving on a
+template whose oracle predates the phase.
+
+**Fix: the template, not the oracle.** The spec forbids editing an oracle to
+make a fix pass, and the oracle is not wrong to complain: an answer quoted to
+three significant figures cannot be round-tripped to 1e-3. The variance is now
+quoted to **at least four significant figures** (`var_dp = max(3, 3 -
+exponent)`), the same significant-figure treatment already applied to
+`rotating_unbalance`, `vibration_transmissibility`, `composite_shafts_series`
+and `shaft_design_power` in this phase. Large variances are unchanged; 0.359
+becomes 0.3586.
+
+Result at 60,000 seeds: **T1 0, T2 0, worst relative error 4.30e-4** (was
+1.19e-3). T6 at 5,000 seeds: distinct answers 2,975 → 4,133 (+38.9%), median
+unchanged.
+
+**The mean needs no such treatment** and is left alone: integer values times
+exact 3-dp probabilities sum to an exact 3-dp decimal, so the mean is stated
+exactly whatever its magnitude, and its measured relative error is 0.
+
+### The lesson, now recorded three times
+
+| Run | Seeds | What it found that the previous run could not |
+|---|---:|---|
+| Pattern review (Reviewer A, F-2) | 55,000 | 4 non-closing instances after a fix verified at 1,000 |
+| Phase close-out (Reviewer A, F-1) | 20,000 | 6 non-closing `annulus_flowrate` instances after a fix verified at 1,000 |
+| This one | 60,000 | 3 `mean_variance` round-trip failures after a fix verified at 20,000 |
+
+Each time the acceptance evidence was smaller than the defect rate it had to
+resolve, and each time the gate reported green. **The rule that follows is not
+"use a bigger number" but "state the smallest rate the run can resolve, and
+check it against the rate you are trying to exclude."** A run of N seeds cannot
+resolve a defect rarer than about 3/N. The Phase 1 gate is therefore stated as
+**60,000 seeds, resolving rates down to ~5e-5**, and any phase quoting a
+different number must say what rate it resolves.
+
+`SPEC-CHANGE`: `run.py` should print the resolvable rate alongside its pass
+line, so a green result carries its own limit of detection.
+
+
 ## Open decisions
 
 | # | Decision | Needed before |

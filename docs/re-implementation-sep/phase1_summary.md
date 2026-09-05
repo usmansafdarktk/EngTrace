@@ -32,25 +32,33 @@ the exit gate at §1.6 and is stale.
 
 ## 2. Defect rate, before → after
 
-Measured at **20,000 seeds per template**, both checks, after the reviews. The
-"before" column is the like-for-like measurement on `master`, not the figure in
-`phase0_summary.md` — that one was taken at the runner's default 25 seeds.
+Measured at **60,000 seeds per template**, both checks, after the reviews and
+after the correction D-026 records. The "before" column is the like-for-like
+measurement on `master`, not the figure in `phase0_summary.md` — that one was
+taken at the runner's default 25 seeds.
+
+A 20,000-seed run of this same table read all-zero and was **wrong**:
+`mean_variance` fails T2 three times at 60,000. See D-026 — it is the third
+time in this phase that acceptance evidence was smaller than the defect rate it
+had to resolve.
 
 | Template | T1 closure failures | T2 round-trip failures | worst rel. error |
 |---|---|---|---|
-| `mean_variance` | — → **0** | 56.8% → **0** | 4.09e-4 |
+| `mean_variance` | — → **0** | 56.8% → **0** | 4.30e-4 |
 | `rotating_unbalance` | 597/200 seeds → **0** | 4.6% → **0** | 4.63e-4 |
-| `vibration_transmissibility` | 212/200 seeds → **0** | 4.5% → **0** | 1.81e-3 |
-| `damping_classification` | 0 → **0** | 0 → **0** | 2.53e-5 |
+| `vibration_transmissibility` | 212/200 seeds → **0** | 4.5% → **0** | 1.89e-3 |
+| `damping_classification` | 0 → **0** | 0 → **0** | 6.05e-5 |
 | `beam_deflection_formula` | 5.89% of SI → **0** | (new oracle) **0** | **0.00e+00** |
 | `cantilever_double_integration` | 5.20% → **0** | 0 → **0** | **0.00e+00** |
-| `annulus_flowrate` | 94% of Step-5 → **0** | 0 → **0** | 5.33e-5 |
-| `statically_indeterminate_shaft` | 47% of lines → **0** | (new oracle) **0** | 1.35e-3 |
+| `annulus_flowrate` | 94% of Step-5 → **0** | 0 → **0** | 5.90e-5 |
+| `statically_indeterminate_shaft` | 47% of lines → **0** | (new oracle) **0** | 1.57e-3 |
 | `shaft_design_power` | 30% of lines → **0** | (new oracle) **0** | **0.00e+00** |
-| `composite_shafts_series` | 89.9% verbatim → **0** | (new oracle) **0** | 9.93e-5 |
+| `composite_shafts_series` | 89.9% verbatim → **0** | (new oracle) **0** | 1.00e-4 |
 
-**Target was 0. Target met**, at a seed count 20× the one the written gate names
-(see D-024 for why that mattered).
+**Target was 0. Target met**, at a seed count 60× the one the written gate
+names (see D-024 and D-026 for why that mattered). A 60,000-seed run resolves
+defect rates down to about 5e-5; the gate's own 1,000 seeds resolve nothing
+below 3e-3.
 
 Corpus-wide, nothing outside scope regressed. At a matched 200 seeds on both
 sides: T1 56 → 48 failing templates, T2 3 → 0, T5 73 → 71, T7 95 → 87, T4
@@ -158,8 +166,8 @@ and −0.62% at N=5,000, and the *unmodified* template's own median differs by
 
 | Criterion | Status |
 |---|---|
-| T1 closure: no non-closing printed line, all in scope | ✅ **0 at 20,000 seeds each** (the gate says 1,000; D-024 restates it) |
-| T2 round-trip passes for every template with an oracle | ✅ 0 failures at 20,000 seeds; 10 of 10 now have oracles |
+| T1 closure: no non-closing printed line, all in scope | ✅ **0 at 60,000 seeds each** (the gate says 1,000; D-024 and D-026 restate it) |
+| T2 round-trip passes for every template with an oracle | ✅ 0 failures at 60,000 seeds; 10 of 10 now have oracles. Three failures **were** present at 60,000 before D-026 |
 | T5b: zero **confirmed** rounding violations | ⚠️ **see below** |
 | T3 determinism | ✅ |
 | T6 within tolerance, or breach signed off | ✅ one breach, signed off (D-022) |
@@ -168,16 +176,24 @@ and −0.62% at N=5,000, and the *unmodified* template's own median differs by
 | Every §5 suggestion triaged | ✅ §8 |
 | Item-pool impact note filed | ✅ |
 
-**T5b — the one criterion not cleanly green.** T5 reports one finding each
-against `Ix` (`beam_deflection_formula`, `cantilever_double_integration`),
-`c_cubed` (`shaft_design_power`), `j1`/`j2` (`composite_shafts_series`) and
-`term1`/`q_flow_rate` (`annulus_flowrate`). **None is a real violation.** Each
-value is bound through its own display with `_as_printed`, and is verified equal
-to it on 4,000 instances. T5b flags them because its precision regex reads
-`.3e`/`.4e`/`.5e` as "N decimal places" when the digits are **mantissa**
-decimals — `{Ix:.4e}` on `8.49e-05` displays five significant figures and loses
-nothing, while T5b computes `round(8.49e-05, 4) = 0.0001` and reports a loss of
-5e-05.
+**T5b — the one criterion not cleanly green.** Seven findings across five
+templates. **None is a real violation**, and each is the same mechanism:
+
+| Template | Flagged | Bound as | Printed as |
+|---|---|---|---|
+| `beam_deflection_formula`, `cantilever_double_integration` | `Ix` | `_as_printed(x, ".4e")` | `{Ix:.4e}` |
+| `annulus_flowrate` | `term1`, `q_flow_rate` | `.6e`, `.4e` | identical |
+| `shaft_design_power` | `c_cubed` | `.5e` | identical |
+| `composite_shafts_series` | `j1`, `j2` | `.5e` | identical |
+
+Every one is bound through its own display and printed with the **identical**
+format spec, so the stored value *is* the printed value by construction — and
+that equality was verified directly on 4,000 instances.
+
+T5b flags them because its precision regex reads `.3e`/`.4e`/`.5e` as "N decimal
+places" when the digits are **mantissa** decimals: `{Ix:.4e}` on `8.49e-05`
+displays five significant figures and loses nothing, while T5b computes
+`round(8.49e-05, 4) = 0.0001` and reports a loss of 5e-05.
 
 This is a **harness defect (D-017), raised and deliberately not fixed**: the
 spec forbids modifying the harness to make a fix pass, and Phase 0 found two
@@ -226,7 +242,7 @@ the separation independently, and recommended D-004 stay closed.
 
 | # | Suggestion | Disposition | Action |
 |---|---|---|---|
-| A-1 | Verify closure at the seed count D-016 mandates, not the gate's 1,000 | `ADOPT-NOW` | Done: all ten at 20,000 seeds. **D-024** restates the gate. |
+| A-1 | Verify closure at the seed count D-016 mandates, not the gate's 1,000 | `ADOPT-NOW` | Done: all ten at **60,000** seeds, the number D-016 actually names. The intermediate 20,000-seed run was itself insufficient — **D-026**. |
 | A-2 | Put a **floor** on T1 coverage; the spec's own 60% rule makes most of these findings today | `SPEC-CHANGE` | Measured: coverage is 0.13–0.50, but **0 unparseable lines in 39,314 `=` lines** — every skipped line is legitimately symbolic (givens restatements, `phi_AC = phi_CB`). The 60% rule conflates *unparseable* with *symbolic*. T1 should gate on `unparseable == 0`, and report coverage as `evaluated / (evaluated + unparseable)`. |
 | A-3 | Independently re-derive the T1 marginal-band density that D-016's tie argument rests on | `ADOPT-PHASE-2` | Named deliverable for Phase 2's review. |
 | A-4 | Declare a **measured** detection floor per oracle | `ADOPT-NOW` | Done for the four new oracles; `oracle_floors.py` committed. The nine pre-existing oracles are `ADOPT-PHASE-2`. |
@@ -260,7 +276,9 @@ the separation independently, and recommended D-004 stay closed.
 **D-022** three P6 scoping decisions, with Reviewer B's sign-off ·
 **D-023** the phase edits ten templates, not twelve ·
 **D-024** the exit gate's seed count is superseded ·
-**D-025** oracle sensitivity is coupled to Track B's constants tables.
+**D-025** oracle sensitivity is coupled to Track B's constants tables ·
+**D-026** a third acceptance run, a third defect the previous seed count could
+not see — and the rule that replaces "use a bigger number".
 
 ---
 
@@ -271,9 +289,12 @@ the separation independently, and recommended D-004 stay closed.
    operand bound *through* its display; and residual ties resampled, as a band
    not a point. Parts 2 and 3 exist only because reviewers found parts 1 and 2
    insufficient — assume the same of this pattern.
-2. **Size the acceptance run to the defect rate before running it.** This phase
-   wrote that lesson down in D-016 and then shipped a template verified at 1,000
-   seeds that failed at 20,000. Phase 2's gate should name 20,000.
+2. **State the smallest defect rate your run can resolve, and check it against
+   the rate you need to exclude.** A run of N seeds cannot resolve a defect
+   rarer than about 3/N. This phase wrote the lesson down in D-016, then shipped
+   a template verified at 1,000 seeds that failed at 20,000 (D-024), then a
+   table verified at 20,000 that failed at 60,000 (D-026). Three times.
+   **Phase 2's gate should name 60,000 and print its own limit of detection.**
 3. **Four harness `SPEC-CHANGE`s are open and none is fixed**: T5b's `%e`
    misparse (D-017), T1 coverage gating on `unparseable` rather than a
    percentage (A-2), T6's saturating distinct-answer count (D-021), and T6's
