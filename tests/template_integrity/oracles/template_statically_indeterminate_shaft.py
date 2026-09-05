@@ -65,6 +65,21 @@ TEMPLATE_ID = "template_statically_indeterminate_shaft"
 # percent.
 TOLERANCE = 5e-3
 
+# Measured, not argued (Phase 1 review A, F-4), over 2,000 seeds with
+#     python -m tests.template_integrity.oracle_floors 2000 template_statically_indeterminate_shaft
+#
+# AGREEMENT_FLOOR - worst relative disagreement between this oracle and
+#   the trace on a CORRECT instance. TOLERANCE must exceed it, or the
+#   check fires on presentation alone.
+# DETECTION_FLOOR - smallest uniform relative error injected into the
+#   gold answer that this oracle catches on >=99% of instances. This is
+#   the number a downstream verifier can rely on, and it is set by the
+#   display quantisation, NOT by TOLERANCE: both sides are quantised to
+#   the printed precision before comparison, so an error smaller than
+#   about half a display step is invisible whatever TOLERANCE says.
+AGREEMENT_FLOOR = 1.40e-03
+DETECTION_FLOOR = 1.00e-2
+
 SOURCE = (
     "Statically indeterminate shaft fixed at both ends (Beer & Johnston, "
     "Mechanics of Materials ch. 3): statics T_A + T_B = T, compatibility "

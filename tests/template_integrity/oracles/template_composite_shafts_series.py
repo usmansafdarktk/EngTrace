@@ -66,6 +66,21 @@ TEMPLATE_ID = "template_composite_shafts_series"
 # or using only one of them is tens of percent.
 TOLERANCE = 2e-3
 
+# Measured, not argued (Phase 1 review A, F-4), over 2,000 seeds with
+#     python -m tests.template_integrity.oracle_floors 2000 template_composite_shafts_series
+#
+# AGREEMENT_FLOOR - worst relative disagreement between this oracle and
+#   the trace on a CORRECT instance. TOLERANCE must exceed it, or the
+#   check fires on presentation alone.
+# DETECTION_FLOOR - smallest uniform relative error injected into the
+#   gold answer that this oracle catches on >=99% of instances. This is
+#   the number a downstream verifier can rely on, and it is set by the
+#   display quantisation, NOT by TOLERANCE: both sides are quantised to
+#   the printed precision before comparison, so an error smaller than
+#   about half a display step is invisible whatever TOLERANCE says.
+AGREEMENT_FLOOR = 9.93e-05
+DETECTION_FLOOR = 0.50e-2
+
 SOURCE = (
     "Angle of twist of a circular shaft in torsion (Beer & Johnston, Mechanics "
     "of Materials ch. 3): phi = T*L/(J*G) with J = (pi/2)*c^4 for a solid "

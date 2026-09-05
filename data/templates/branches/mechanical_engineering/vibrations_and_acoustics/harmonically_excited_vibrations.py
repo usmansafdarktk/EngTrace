@@ -14,11 +14,12 @@ TEMPLATE_TOLERANCES = {
     # orders of magnitude below the error the pre-fix chain injected by
     # re-deriving omega from an unrounded shaft speed (up to 8.4%).
     "template_rotating_unbalance": 1e-3,
-    # TR and the absolute amplitude are both quoted to 3 dp on values that can
-    # be as small as ~0.05, so one display step is ~1e-2 relative at the small
-    # end; recompute quantises to the printed precision, and this tolerance is
-    # headroom above that.
-    "template_vibration_transmissibility": 1e-3,
+    # Measured over 2,000 seeds: worst oracle-vs-trace disagreement on a
+    # correct instance ("agreement floor") is 1.81e-3, and the smallest
+    # injected answer error caught on >=99% of instances ("detection floor")
+    # is 1%. The declared value must sit between the two. 1e-3 was BELOW the
+    # agreement floor and would have fired on presentation alone.
+    "template_vibration_transmissibility": 3e-3,
 }
 
 

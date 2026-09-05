@@ -57,6 +57,21 @@ TEMPLATE_ID = "template_shaft_design_power"
 # diameter, ~1.26x from a dropped cube root of 2, 60x from reading RPM as Hz.
 TOLERANCE = 1e-3
 
+# Measured, not argued (Phase 1 review A, F-4), over 2,000 seeds with
+#     python -m tests.template_integrity.oracle_floors 2000 template_shaft_design_power
+#
+# AGREEMENT_FLOOR - worst relative disagreement between this oracle and
+#   the trace on a CORRECT instance. TOLERANCE must exceed it, or the
+#   check fires on presentation alone.
+# DETECTION_FLOOR - smallest uniform relative error injected into the
+#   gold answer that this oracle catches on >=99% of instances. This is
+#   the number a downstream verifier can rely on, and it is set by the
+#   display quantisation, NOT by TOLERANCE: both sides are quantised to
+#   the printed precision before comparison, so an error smaller than
+#   about half a display step is invisible whatever TOLERANCE says.
+AGREEMENT_FLOOR = 0.00e+00
+DETECTION_FLOOR = 0.20e-2
+
 SOURCE = (
     "Power transmission and solid-shaft design (Beer & Johnston, Mechanics of "
     "Materials ch. 3): P = 2*pi*f*T, tau = 2*T/(pi*c^3) for a solid circular "

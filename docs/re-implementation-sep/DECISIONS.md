@@ -578,6 +578,180 @@ green while measuring nothing is worse than no check. Here the check reported a
 *number*, and the number was an artefact of the instrument's range.
 
 
+---
+
+## D-022 — Three P6 scoping decisions Phase 1 made and had not written down
+
+**Date:** 2026-09-06 · **Status:** DECIDED · **Source:** Phase 1 Reviewer B
+(physics and pedagogy), finding F-2
+
+Reviewer B's finding is procedural and correct: three changes altered **what
+the item states or teaches**, which P6 requires be *recorded and approved*
+rather than absorbed into a correctness fix. Two were argued only in commit
+messages and one only in a review brief. They are recorded here, and Reviewer B
+— the P6 guard, working without sight of the implementer's reasoning — has
+signed off all three.
+
+### 1. `annulus_flowrate` — T6 distribution breach, median answer -28%
+
+The only genuine distributional relocation in the phase. Measured at 5,000
+seeds per side: p5 2.68e-5 -> 1.30e-5, **p50 2.40e-4 -> 1.72e-4 (-28.1%)**,
+p95 2.78e-1 -> 2.85e-1 (+2.7%), distinct answers 4,929 -> 4,940.
+
+**Signed off.** The cause is the removal of an artificial floor, not a change to
+the item. On `master`, `if pressure_drop_Pa == 0: pressure_drop_Pa = 10.0` fired
+on **17.2%** of instances (Reviewer B's independent replication of the sampler's
+draw sequence; the implementer measured 17.8% per draw and 28.4% of instances
+including legitimate 10 Pa values). On those instances the sampler's Reynolds
+targeting was discarded and the stated pressure drop bore no relation to the
+flow described. The shift is entirely a downward extension of the low-Q tail,
+which is the signature of un-pinning values the fallback had held at 10 Pa when
+the physics asked for 1-4 Pa. Steps, governing equation, answer format and
+answer-space size are all unchanged.
+
+Reviewer B additionally established, independently, that **17.1% of `master`'s
+instances had Re >= 2100 computed from their own printed answer** — the item
+asserted the laminar annulus solution over transitional flow on about one
+instance in six. The new guard removes that. Rejection cost: 2.4% of draws.
+
+### 2. `rotating_unbalance` — the question now states that the total mass includes the unbalance mass
+
+Added because the solution assumed it and the question never said so, and a
+solver who subtracted `m_e` was marked wrong (Phase 0 oracle finding).
+
+**Signed off, with the trade named:** this is physically correct for the Rao
+formulation the template uses, and it removes a genuine ambiguity — but it also
+removes a modelling judgement from the solver's task, so the item is
+**marginally easier**. That is a P6 trade, accepted because the alternative is
+an item whose gold answer depends on an assumption the question does not state.
+
+### 3. `beam_deflection_formula` — the US-customary unit conversion
+
+Reviewer B found (F-1, CONFIRMED, blocking) that the first version of this fix
+carried the exact ratio `1.48/12` into the substitution and **deleted the
+numeric conversion from Step 2 entirely**, leaving a step titled "Assemble
+consistent US customary units" that converted nothing. kip/ft -> kip/in is the
+most error-prone operation in that branch, and the SI branch still evaluated
+every conversion numerically, so the same item tested different things
+depending on which unit system it sampled.
+
+**Not signed off — fixed.** Step 2 now performs the conversion and states its
+value to 6 dp (`w = 1.48 kip/ft = 1.48/12 = 0.123333 kip/in`) while the
+substitution still carries the exact ratio, so the step demonstrates the
+operation and nothing rounded sits between the stated load and the answer.
+
+### The general point, which is worth more than the three entries
+
+**T6 cannot see any of this.** It profiles distinct answers, magnitude
+quantiles, step counts, branch proportions and the difficulty label — every one
+a property of the *solution*. P6 is about what the item **tests**, which lives
+in the **question**. `rotating_unbalance`'s wording change was invisible to
+every automated gate in this phase.
+
+`SPEC-CHANGE`, carried to Phase 2: T6 must profile a **question-text hash**
+alongside the answer distribution, and any diff that changes question text, a
+step's content, or a displayed precision must carry a named DECISIONS entry
+before its phase can close. Reviewer B's remark that "five of my findings came
+from the instance diff in under ten minutes; none is legible in the 4,000-line
+source diff" should also change how the P6 review is briefed: run it against
+**before/after instance pairs at matched seeds**, not against the source diff.
+
+
+---
+
+## D-023 — Phase 1 edits TEN templates, not twelve. The spec says 12, 10 and 9 in three places
+
+**Date:** 2026-09-06 · **Status:** DECIDED · **Source:** Phase 1 Reviewer A,
+spec finding
+
+Three different counts are in circulation for the same phase:
+
+| Where | Count | How it is reached |
+|---|---:|---|
+| Phase title, D-011, the Phase 1 brief | **12** | 9 original + 3 added by D-011 |
+| Spec §1.1a, the authoritative scope table | **10** | 3 chain break + 6 display defect + 1 ill-posed |
+| Spec §1.6, the exit gate | **9** | the original nine, never updated |
+
+**Ten is right.** D-011 says Phase 1 "grows from 9 to 12" by adding
+`beam_deflection_formula`, `statically_indeterminate_shaft` and
+`shaft_design_power` — but it adds them without subtracting the **three that
+left in the same table**: D-013 found `poissons_ratio`,
+`logarithmic_decrement` and `system_properties` not defective. 9 + 3 - 3 = 10,
+which is exactly what §1.1a enumerates and exactly what this phase edited.
+
+The "12" is therefore an arithmetic slip that propagated into the phase title,
+the effort estimate and the implementation brief. The "9" in §1.6 is simply
+stale.
+
+**Action:** §1.1a stands as authoritative and the phase reports **10 templates
+edited**. The deliverable "12 templates edited" is met by the 10 the scope table
+names; nothing in scope was skipped. §1.6's "all 9" is superseded.
+
+`SPEC-CHANGE`: amend the Phase 1 heading, §1.4 D1.1, §1.6 and D-011 to read 10,
+with a note that the 9 -> 12 arithmetic omitted the three departures.
+
+---
+
+## D-024 — The exit gate's seed count is superseded by D-016 and must be restated
+
+**Date:** 2026-09-06 · **Status:** DECIDED · **Source:** Phase 1 Reviewer A,
+finding F-1 and spec finding
+
+Spec §1.6 gate item 1 reads *"no non-closing printed line at any of 1,000
+seeds"*. D-016 supersedes it with 60,000, on the ground that a 1-in-14,000
+residual has roughly a 7% chance of appearing in a 1,000-seed run.
+
+**Phase 1 then shipped `annulus_flowrate` verified at 1,000 seeds, and Reviewer
+A found six T1 failures in 20,000** — an exact-display-tie on the `kappa` line,
+the same class D-016 exists to remove, at a rate of 3e-4. At the gate's own
+seed count it had roughly a 26% chance of being seen. It was not seen.
+
+This is the second time in one phase that the acceptance evidence was smaller
+than the defect rate it had to resolve (the first was Reviewer A of the pattern
+review, finding F-3), and the third time overall that a check reported green
+while not resolving the thing it was pointed at (D-015, D-018, D-021).
+
+**Action:** the gate is restated for this phase and carried forward — **closure
+is verified at 20,000 seeds minimum, and every template in scope is verified at
+that count, not a sample of them.** All ten Phase 1 templates now pass T1 and T2
+at 20,000 seeds with zero failures.
+
+`SPEC-CHANGE`: §1.6 gate item 1 must carry the amended number, or a phase can
+pass its own written gate while failing the decision that governs it — which is
+literally what happened here.
+
+---
+
+## D-025 — The Phase 1 oracles' sensitivity is coupled to the constants tables Track B is about to change
+
+**Date:** 2026-09-06 · **Status:** DECIDED (recorded; action assigned to Track B)
+**Source:** Phase 1 Reviewer A, finding F-5
+
+Reviewer A demonstrated two latent P3 leaks that today's constants happen to
+hide, by patching the tables in memory:
+
+| Template | If the constants gain one significant figure | Result |
+|---|---|---|
+| `composite_shafts_series` | `SHEAR_MODULUS_VALUES` at 4 s.f. (77.15 GPa) | worst relative error **1.977e-3** against a declared TOLERANCE of 2e-3 — passes with 1% margin, undetected |
+| `beam_deflection_formula` | AISC SI `Ix` at 2 dp | 1.8% of instances fail |
+
+Neither is a defect today: every `SHEAR_MODULUS_VALUES` entry above 20 GPa is
+at most 3 s.f., so the template's `_as_printed(G*1e9, ".2e")` is lossless, and
+all 14 AISC SI `Ix` values are exactly 1 dp, so the question's `.1f` is
+lossless. Both verified over the whole tables.
+
+**It is a coupling, not a bug** — and it is the D-015/D-018 failure mode
+arriving through the constants track rather than the harness: a green check
+that is green because of an accident of the input data.
+
+**Action, assigned to Track B (C1-C3):** before any constants table lands, add
+an assertion that **every constant consumed by a Phase 1 template is exactly
+representable at the precision its question states it to**. Track B's sync
+points S1 and S2 should carry this as an explicit gate item. If a re-grounded
+value needs more digits than the question shows, the template's display
+precision must move with it.
+
+
 ## Open decisions
 
 | # | Decision | Needed before |
