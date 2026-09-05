@@ -816,6 +816,48 @@ different number must say what rate it resolves.
 line, so a green result carries its own limit of detection.
 
 
+---
+
+## D-027 — Branching model: one branch PER PHASE, merged to `master` when the phase completes
+
+**Date:** 2026-09-06 · **Status:** DECIDED (repo owner) · **Source:** raised
+during Phase 1 close-out
+
+The spec's working conventions (§0) say:
+
+> All work on branch `redesign/template-integrity`, off `master`. One PR per
+> phase.
+
+**That convention was already broken by Phase 0's own merge, before Phase 1
+started, and it is not recoverable as written.** `redesign/template-integrity`
+sits at `9733a7e` and was merged into `master` at `23a520e`; `master` has since
+advanced to `f3688fb`. Branching Phase 1 from `redesign/template-integrity`
+would therefore have *discarded* the Phase 0 close-out (`4ccf8b9`) and both
+prompt commits. The single-branch model and "one PR per phase" were never
+compatible once a phase merged.
+
+The Phase 1 brief resolved this in practice by naming a phase-specific branch —
+`redesign/phase1-round-trip` off `master` — which is what Phase 1 used.
+
+**Decision, from the repo owner: merge to `master` after every phase
+completes.** The branching model is therefore:
+
+- one branch per phase, named `redesign/phase<N>-<topic>`, taken off `master`;
+- merged back to `master` with a `--no-ff` merge commit when the phase's exit
+  gate passes, matching how Phase 0 was merged;
+- `master` is the integration point every subsequent phase branches from, so
+  each phase inherits the last one's close-out.
+
+**Pushing remains a separate decision.** `master` is ahead of `origin/master`
+and Phase 1 does not push.
+
+`SPEC-CHANGE`: amend §0 Working conventions to describe the per-phase branch
+model. As written it names a branch that is behind `master` and would silently
+lose completed work — the third spec inconsistency this phase surfaced,
+alongside the template count (D-023) and the exit-gate seed count (D-024,
+D-026).
+
+
 ## Open decisions
 
 | # | Decision | Needed before |
