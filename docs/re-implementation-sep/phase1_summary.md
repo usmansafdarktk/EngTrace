@@ -326,7 +326,8 @@ the separation independently, and recommended D-004 stay closed.
 **D-024** the exit gate's seed count is superseded ·
 **D-025** oracle sensitivity is coupled to Track B's constants tables ·
 **D-026** a third acceptance run, a third defect the previous seed count could
-not see — and the rule that replaces "use a bigger number".
+not see — and the rule that replaces "use a bigger number" ·
+**D-027** branching model: one branch per phase, merged to `master` on completion.
 
 ---
 
