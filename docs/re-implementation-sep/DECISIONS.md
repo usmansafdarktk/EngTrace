@@ -291,6 +291,194 @@ has been shown to turn it red.
 
 ---
 
+---
+
+## D-016 — P2 amended again: remove the tie, do not resolve it (SUPERSEDES the fix half of D-012)
+
+**Date:** 2026-09-05 · **Status:** DECIDED · **Source:** Phase 1 implementation,
+confirmed independently by Phase 1 Reviewer A (pattern review, finding F-1)
+**Severity: this invalidated the amended Phase 1 recipe, as D-012 invalidated
+the original one**
+
+D-012 amended P2 to break the rounding tie in decimal:
+
+```python
+delta_mm = float((Decimal(f"{delta:.5f}") * 1000).quantize(Decimal("0.1"),
+                                                           rounding=ROUND_HALF_UP))
+```
+
+**Applied verbatim this is worse than the defect it replaces.** Measured on
+`template_beam_deflection_formula`:
+
+```
+line      : delta = 0.01185 * 1000 = 11.9 mm      <- D-012's output
+evaluated : 11.85                                  <- T1, in binary floats
+printed   : 11.9   (tol 0.05, delta 0.050000000000000711)   -> FAIL
+```
+
+The pre-D-012 `round()` gives 11.8 and lands at `delta 0.049999999999998934`
+-> MARGINAL. So the amendment converts a T1 MARGINAL into a T1 FAIL. Reviewer A
+reproduced this at scale — 359 T1 failures per 5,000 seeds on
+`beam_deflection_formula` and 301 on `cantilever_double_integration` under the
+D-012 recipe — and established the general statement:
+
+> At an exact display tie, `|evaluated - printed| == tol` exactly, and float
+> representation error alone decides FAIL versus MARGINAL, **in either rounding
+> direction**. No rounding convention can pass T1 on a tie.
+
+That is the point. A half-way tie is not a rounding-convention problem; it is
+an **ill-posed instance**. A reader doing decimal arithmetic and applying
+half-up reads 0.02325 m as 23.3 mm, a reader using binary floats and `round()`
+reads it as 23.2 mm, and the printed line closes for exactly one of them
+whichever the template picks. This is the same shape as D-010's finding about
+`damping_classification`: an instance sitting on a measure-zero boundary has no
+defensible gold answer.
+
+**Amendment — three parts, in order of how much they remove:**
+
+1. **One rounding, at the precision the answer is quoted to, with the upstream
+   display precision matched to it** so a decimal unit conversion is exact.
+   4 dp in metres IS 1 dp in mm, exactly; 5 dp in metres against 1 dp in mm is
+   a 10x precision drop that lands on a tie for ~10% of instances. This removes
+   the systematic tie class outright rather than resolving it.
+
+2. **Bind every displayed-and-consumed operand through its own display**
+   (`_as_printed(x, spec)` — `float(format(x, spec))`), so the stored value IS
+   the value a reader recovers from the printed text. Rounding alone does not
+   achieve this: `34.4 * 1e-6` is `3.4399999999999996e-05`, prints as
+   `3.4400e-05`, and reparses to `3.44e-05` — a different float. One ulp is
+   enough to put the template's value and the reader's value on opposite sides
+   of a tie. **This was Reviewer A's finding F-2**, and without it the fix left
+   a residual non-closure at roughly 1 instance in 14,000, concentrated on
+   particular (section, span) pairs rather than spread uniformly — so it would
+   have recurred systematically in any regenerated item pool.
+
+3. **Resample the residual instances that still land exactly on a tie**
+   (`_is_display_tie`). Measured rejection rate after (1) and (2): 0.02% on
+   `beam_deflection_formula`, 0.115% on `cantilever_double_integration`.
+   Reviewer A checked this is not hiding hard cases — the T1 marginal band is
+   at the density rounding alone predicts, the last-digit distribution of the
+   gold answer stays flat, and rejected values are scattered across the whole
+   deflection range. No attainable gold answer becomes unreachable; only the
+   ambiguous half-step boundary is removed.
+
+**What this does NOT change.** D-012's diagnosis stands and its `Decimal`
+machinery is still used — `_hu()` is decimal half-up throughout, because where
+a single rounding is genuinely required it must still not be resolved on the
+binary float. What is superseded is the claim that decimal tie-breaking is
+*sufficient*.
+
+**Carried forward:** the acceptance evidence for closure must be sized to the
+defect rate. A 1-in-14,000 residual has roughly a 7% chance of appearing in a
+1,000-seed run (Reviewer A, F-3), so Phase 1 verifies closure at 60,000 seeds,
+not the 1,000 the exit gate names.
+
+---
+
+## D-017 — T5b misreads an `%e` format spec as decimal places (harness finding, NOT fixed in Phase 1)
+
+**Date:** 2026-09-05 · **Status:** DECIDED (recorded, deferred) · **Source:**
+Phase 1 implementation
+
+`t5_binding.py`'s `_PRECISION_SPEC` is `\.(\d+)[feEg]`, so it reads `.4e` as
+"4 decimal places". In an `%e` format the digits are **mantissa** decimals:
+`{Ix:.4e}` on `8.49e-05` displays five significant figures, losing nothing,
+while T5b computes `round(8.49e-05, 4) = 0.0001` and reports that the display
+"discards up to 5e-05".
+
+This makes T5b report a rounding violation against
+`template_beam_deflection_formula` and `template_cantilever_double_integration`
+that does not exist: `.4e` is lossless in decimal for every `Ix` in
+`AISC_W_SHAPES` (verified over the whole table).
+
+**Not fixed here.** The spec forbids modifying the harness to make a fix pass,
+and Phase 0 found two checks that were green while measuring nothing (D-015), so
+harness edits during an implementation phase are treated with suspicion. Recorded
+as a `SPEC-CHANGE` for the harness owner: `_PRECISION_SPEC` must branch on the
+presentation type, taking `.Ne`/`.Ng` as significant figures and only `.Nf` as
+decimal places.
+
+**Caveat worth keeping.** Reviewer A's F-6 notes that `.4e` is lossless *in
+decimal* but not *in binary* — the reparsed float differs by an ulp — so the
+harness is complaining about the right operand for the wrong reason. D-016 part
+2 fixes the underlying hazard in the templates; the T5b misparse is a separate
+harness defect and both are real.
+
+---
+
+## D-018 — Two Phase 1 templates had zero T1 coverage; traces restructured so closure is checkable
+
+**Date:** 2026-09-05 · **Status:** DECIDED · **Source:** Phase 1 implementation
+
+`template_mean_variance` reported T1 **coverage 0.0 with 0 checks performed** —
+the check passed because it examined nothing. Two causes, both presentational:
+
+1. Each stage was split across lines, so no single line carried both an
+   expression and its result (`mu_X = <substitution>` on one line,
+   `mu_X = <value>` on the next). T1 cannot link across lines, by design.
+2. Operands were joined by juxtaposition, `(-9)(0.172)`, which no evaluator
+   reads as a product.
+
+Fixed by putting each stage on one line as a chained equation and using an
+explicit `*`. T1 now performs 5,000 checks over 1,000 seeds at coverage 0.375,
+all closing. `template_rotating_unbalance` gained the same treatment: 8,000
+checks at coverage 0.381.
+
+**This is the D-015 lesson recurring in a new place:** a green check is not
+evidence until something known-broken has been shown to turn it red. `run.py`
+already reports `coverage` per template; **it should fail, not pass, a template
+whose closure coverage is 0** — a template T1 cannot read is unverified, not
+verified. Raised as a `SPEC-CHANGE` against the harness for Phase 2.
+
+The remaining uncovered `=` lines in both templates are genuine prose and
+formula statements (`mu_X = sum(x_i * P(x_i))`, `Values: X = {...}`), which T1
+is correct to skip.
+
+---
+
+## D-019 — T6's median-answer gate is inside its own sampling noise at 1,000 seeds
+
+**Date:** 2026-09-05 · **Status:** DECIDED · **Source:** Phase 1, the only T6
+breach raised in the phase
+
+`template_vibration_transmissibility` tripped T6 after its P3 fix:
+
+```
+median answer moved 0.411 -> 0.40165 (2.3% > 2%)
+```
+
+**This is not a distributional change; it is noise in the statistic.** Measured
+on the **unmodified** template, the median of two disjoint halves of the same
+1,000-seed range differs by **3.14%** — larger than the "breach" itself. The
+true shift converges as the sample grows:
+
+| Seeds | old median | new median | shift |
+|---:|---:|---:|---:|
+| 1,000 | 0.41100 | 0.40165 | **-2.27%** |
+| 5,000 | 0.39400 | 0.39155 | -0.62% |
+| 20,000 | 0.38600 | 0.38495 | **-0.27%** |
+
+Per-seed, the fix moves the answer by a median of 6.8e-4 relative, p95 3.9e-3,
+with only 26 of 1,000 instances changing by more than 1% — consistent with the
+0.48% worst genuine magnitude the Phase 0 oracles measured for this defect. The
+distinct-answer count **rose**, 676 -> 928, because the answer is now quoted to
+four significant figures instead of three.
+
+**Disposition: not a breach; no sign-off required, and the tolerance is NOT
+widened.** The measurement is simply taken at a sample size where the statistic
+is stable.
+
+**`SPEC-CHANGE` for the harness.** Phase 0's NEW-7 already required T6's
+*distinct-answer* count to be taken at >= 1,000 seeds. The same argument applies
+with more force to the **median**, and 1,000 is not enough for it: a template
+whose answers span two orders of magnitude has an order statistic that moves
+several percent between samples. T6 should either take the median at >= 20,000
+seeds, or report a confidence interval and gate on that rather than on a point
+estimate. As written, T6's median gate will fire on noise and pass real
+regressions of the same size — the failure mode D-015 warns about, in a
+different check.
+
+
 ## Open decisions
 
 | # | Decision | Needed before |
