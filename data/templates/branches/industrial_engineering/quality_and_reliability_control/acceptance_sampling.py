@@ -2,7 +2,7 @@ import math
 import random
 from decimal import Decimal, ROUND_HALF_UP
 
-from pilot.templates.branches.industrial_engineering.constants import (
+from data.templates.branches.industrial_engineering.constants import (
     MIL_STD_105E_CODE_LETTERS_GII,
     MIL_STD_105E_SAMPLE_SIZE,
     MIL_STD_105E_SINGLE_NORMAL_AC,

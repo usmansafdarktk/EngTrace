@@ -2,7 +2,7 @@ import math
 import random
 from decimal import Decimal, ROUND_HALF_UP
 
-from pilot.templates.branches.industrial_engineering.constants import (
+from data.templates.branches.industrial_engineering.constants import (
     HOLDING_RATE_PER_YR,
     INVENTORY_ITEMS,
 )
