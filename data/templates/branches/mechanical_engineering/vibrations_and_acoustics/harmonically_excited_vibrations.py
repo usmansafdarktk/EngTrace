@@ -1,6 +1,6 @@
 import random
 import math
-from decimal import Decimal, ROUND_FLOOR, ROUND_HALF_UP
+from decimal import Decimal, ROUND_HALF_UP
 
 
 # Verifier tolerances (D1.3), keyed by template id. Relative.
@@ -34,16 +34,32 @@ def _hu(x, places):
     return int(v) if places == 0 else float(v)
 
 
-def _is_display_tie(x, places):
-    """Does `x` sit exactly on a half-way tie at `places` decimal places?
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
 
-    A tie is the one case where no rounding convention is defensible: a decimal
-    reader applying half-up and a binary reader applying `round()` disagree,
-    and the printed line closes for only one of them. Such instances are
-    resampled rather than resolved (D-016).
+    A tie is the one case where NO rounding convention is defensible. A reader
+    doing decimal arithmetic and applying half-up reads 0.02325 m as 23.3 mm; a
+    reader using binary floats and `round()` reads it as 23.2 mm; and the
+    printed line closes for exactly one of them whichever the template picks.
+    Breaking the tie in decimal (P2 as amended) does not remove the ambiguity,
+    it only moves it to the other reader - which is why such instances are
+    RESAMPLED rather than resolved (D-016).
+
+    Testing for an EXACT tie is not enough. Two independent evaluations of the
+    same exact quantity - this template's, in kN and kN/m^2, and a solver's, in
+    N and Pa - differ by a few ulps, so a rational tie such as 29.25 mm lands
+    as 29.249999999999996 on one side and 29.250000000000004 on the other.
+    Neither is exactly a tie, and the two then round in opposite directions:
+    that is how eight non-closing instances per 60,000 seeds survived the first
+    version of this guard (Phase 1 review A, finding F-2).
+
+    So a narrow BAND is quarantined rather than a point. The band is a few
+    thousand ulps wide where the tie lattice is 10^-places apart, so it removes
+    nothing that is not genuinely ambiguous.
     """
-    d = Decimal(repr(x)).scaleb(places)
-    return d == d.to_integral_value(rounding=ROUND_FLOOR) + Decimal("0.5")
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
 
 
 # Template 1 (Easy)
@@ -346,70 +362,95 @@ def template_vibration_transmissibility():
         r = omega / omega_n
         TR = X / Y = sqrt( (1 + (2*zeta*r)^2) / ( (1 - r^2)^2 + (2*zeta*r)^2 ) )
 
+    Trace integrity (Phase 1, P3):
+        The base excitation frequency is STATED to 2 dp, so omega is
+        recomputed forward from the stated frequency and the frequency ratio
+        is derived as omega/omega_n from the stated quantities. The sampler
+        still chooses a frequency ratio to place the instance below, near or
+        above resonance, but that choice no longer reaches the solution: the
+        solution previously printed the SAMPLED ratio at 3 dp (r = 3.099
+        where the stated givens imply 3.09930) and carried it into
+        (1 - r^2)^2, which made 39% of answers not the correct rounding of
+        what the question implies.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the transmissibility and absolute amplitude.
             - str: A step-by-step solution to the problem.
     """
-    # 1. Parameterize the inputs with random values
-    
-    # Mass of the sensitive instrument in kg
-    mass = round(random.uniform(5.0, 150.0), 1)
-    
-    # Stiffness of the isolation mount in N/m
-    stiffness = round(random.uniform(2e3, 5e5), 0)
-    
-    # Amplitude of the base vibration in mm
-    base_amplitude_Y_mm = round(random.uniform(0.1, 8.0), 2)
-    
-    # Use frequency ratio and damping ratio to control the problem's outcome
-    # This ensures we test conditions of amplification (r~1) and isolation (r > sqrt(2))
-    freq_ratio_r = round(random.uniform(0.2, 5.0), 3)
-    damping_ratio_zeta = round(random.uniform(0.05, 0.7), 3)
-    
-    # Standardize precision for final outputs
     precision = 4
 
-    # 2. Perform the core calculations for the solution
-    
-    # Handle potential edge cases
-    if mass <= 0 or stiffness <= 0:
-        return "Error: Mass and stiffness must be positive.", "Invalid input parameters."
+    for _attempt in range(200):
+        mass = round(random.uniform(5.0, 150.0), 1)                 # kg
+        stiffness = round(random.uniform(2e3, 5e5), 0)              # N/m
+        base_amplitude_Y_mm = round(random.uniform(0.1, 8.0), 2)    # mm
 
-    # Step A: Calculate fundamental system properties
-    omega_n = math.sqrt(stiffness / mass)
-    c_critical = 2 * math.sqrt(stiffness * mass)
-    damping_coeff = damping_ratio_zeta * c_critical
+        # Sampler-side choice only: spreads the instances across amplification
+        # (r ~ 1) and isolation (r > sqrt(2)). Never printed.
+        freq_ratio_r = round(random.uniform(0.2, 5.0), 3)
+        # zeta IS a stated given, at 3 dp, so the chain may use it directly.
+        damping_ratio_zeta = round(random.uniform(0.05, 0.7), 3)
 
-    # Step B: Determine the base excitation frequency from the chosen frequency ratio
-    omega = freq_ratio_r * omega_n
-    base_freq_hz = omega / (2 * math.pi)
+        omega_n_exact = math.sqrt(stiffness / mass)
+        # The base frequency is STATED to 2 dp; omega follows from it.
+        base_freq_hz = round(freq_ratio_r * omega_n_exact / (2 * math.pi), 2)
 
-    # Step C: Convert base amplitude to meters for calculation
-    base_amplitude_Y_m = base_amplitude_Y_mm / 1000.0
+        omega_n = _hu(omega_n_exact, precision)
+        omega = _hu(base_freq_hz * 2 * math.pi, precision)
+        r = _hu(omega / omega_n, precision)
 
-    # Step D: Calculate the displacement transmissibility ratio (TR)
-    tr_num = 1 + (2 * damping_ratio_zeta * freq_ratio_r)**2
-    tr_den = (1 - freq_ratio_r**2)**2 + (2 * damping_ratio_zeta * freq_ratio_r)**2
+        base_amplitude_Y_m = base_amplitude_Y_mm / 1000.0
 
-    # Avoid division by zero, although highly unlikely with these random ranges
-    if tr_den == 0:
-        transmissibility_ratio = float('inf')
+        two_zeta_r_sq = (2 * damping_ratio_zeta * r) ** 2
+        tr_num = _hu(1 + two_zeta_r_sq, precision)
+        tr_den = _hu((1 - r ** 2) ** 2 + two_zeta_r_sq, precision)
+        if tr_den <= 0:
+            continue
+        tr_exact = math.sqrt(tr_num / tr_den)
+
+        # A transmissibility of 0.056 printed to 3 dp is two significant
+        # figures - not gradeable. Quote both answers to at least four
+        # significant figures.
+        tr_dp = max(3, 3 - math.floor(math.log10(abs(tr_exact))))
+        if _is_display_tie(tr_exact, tr_dp):
+            continue
+        transmissibility_ratio = _hu(tr_exact, tr_dp)
+
+        x_exact = transmissibility_ratio * base_amplitude_Y_mm      # mm
+        x_dp = max(3, 3 - math.floor(math.log10(abs(x_exact))))
+        if (_is_display_tie(x_exact, x_dp)
+                or _is_display_tie(omega / omega_n, precision)):
+            continue
+        amplitude_X_mm = _hu(x_exact, x_dp)
+        break
     else:
-        transmissibility_ratio = math.sqrt(tr_num / tr_den)
-    
-    # Step E: Calculate the absolute amplitude of the instrument's vibration
-    amplitude_X_m = transmissibility_ratio * base_amplitude_Y_m
-    amplitude_X_mm = amplitude_X_m * 1000.0
+        raise RuntimeError(
+            "vibration_transmissibility: no closing sample in 200 draws")
 
-    # 3. Generate the question and solution strings
-    
+    # --- invariants (T7) ---------------------------------------------------
+    assert 0.0 < damping_ratio_zeta < 1.0, (
+        f"system not underdamped: zeta = {damping_ratio_zeta}")
+    assert transmissibility_ratio > 0.0, (
+        f"non-positive transmissibility: {transmissibility_ratio}")
+    # TR = 1 exactly at r = sqrt(2) for every zeta, and the isolation region
+    # r > sqrt(2) is precisely where TR < 1. Allow one display step of slack
+    # so an instance sitting on the crossover is not a false failure.
+    _step = 10.0 ** (-tr_dp)
+    if r > math.sqrt(2) + _step:
+        assert transmissibility_ratio < 1.0 + _step, (
+            f"r = {r} is in the isolation region but TR = "
+            f"{transmissibility_ratio}")
+    elif r < math.sqrt(2) - _step:
+        assert transmissibility_ratio > 1.0 - _step, (
+            f"r = {r} is below the crossover but TR = "
+            f"{transmissibility_ratio}")
+
     question = (
         f"A sensitive instrument of mass {mass} kg is supported by an isolation mount. "
         f"The mount has an effective stiffness of {stiffness:,.0f} N/m and provides a damping "
         f"ratio of {damping_ratio_zeta}.\n\n"
         f"The foundation on which the instrument is placed is vibrating harmonically at a frequency of "
-        f"{round(base_freq_hz, 2)} Hz with an amplitude of {base_amplitude_Y_mm} mm.\n\n"
+        f"{base_freq_hz} Hz with an amplitude of {base_amplitude_Y_mm} mm.\n\n"
         f"Determine:\n"
         f"1. The displacement transmissibility ratio.\n"
         f"2. The absolute amplitude of vibration of the instrument in millimeters."
@@ -420,33 +461,35 @@ def template_vibration_transmissibility():
         f"Mass (m) = {mass} kg\n"
         f"Stiffness (k) = {stiffness:,.0f} N/m\n"
         f"Damping Ratio (zeta) = {damping_ratio_zeta}\n"
-        f"Base Vibration Frequency (f) = {round(base_freq_hz, 2)} Hz\n"
+        f"Base Vibration Frequency (f) = {base_freq_hz} Hz\n"
         f"Base Vibration Amplitude (Y) = {base_amplitude_Y_mm} mm = {base_amplitude_Y_m} m\n\n"
 
         f"**Step 1:** Calculate the system's undamped natural frequency (omega_n).\n"
-        f"omega_n = sqrt(k / m) = sqrt({stiffness:,.0f} / {mass}) = {round(omega_n, precision)} rad/s\n\n"
+        f"omega_n = sqrt(k / m) = sqrt({stiffness:,.0f} / {mass}) = {omega_n} rad/s\n\n"
 
         f"**Step 2:** Convert the base vibration frequency to rad/s and find the frequency ratio (r).\n"
-        f"Base frequency (omega) = f * 2 * pi = {round(base_freq_hz, 2)} * 2 * pi = {round(omega, precision)} rad/s\n"
-        f"Frequency ratio (r) = omega / omega_n = {round(omega, precision)} / {round(omega_n, precision)} = {round(freq_ratio_r, precision)}\n\n"
+        f"Base frequency (omega) = f * 2 * pi = {base_freq_hz} * 2 * pi = {omega} rad/s\n"
+        f"Frequency ratio (r) = omega / omega_n = {omega} / {omega_n} = {r}\n\n"
 
         f"**Step 3:** Calculate the displacement transmissibility ratio (TR).\n"
         f"The formula is: TR = sqrt( (1 + (2*zeta*r)^2) / ( (1 - r^2)^2 + (2*zeta*r)^2 ) )\n"
         f"Let's calculate the terms:\n"
-        f"r = {round(freq_ratio_r, precision)}\n"
+        f"r = {r}\n"
         f"zeta = {damping_ratio_zeta}\n"
-        f"Numerator = 1 + (2 * {damping_ratio_zeta} * {round(freq_ratio_r, precision)})^2 = {round(tr_num, precision)}\n"
-        f"Denominator = (1 - ({round(freq_ratio_r, precision)})^2)^2 + (2 * {damping_ratio_zeta} * {round(freq_ratio_r, precision)})^2 = {round(tr_den, precision)}\n"
-        f"TR = sqrt({round(tr_num, precision)} / {round(tr_den, precision)}) = {round(transmissibility_ratio, precision)}\n\n"
+        f"Numerator = 1 + (2 * {damping_ratio_zeta} * {r})^2 = {tr_num}\n"
+        f"Denominator = (1 - ({r})^2)^2 + (2 * {damping_ratio_zeta} * {r})^2 = {tr_den}\n"
+        f"TR = sqrt({tr_num} / {tr_den}) = {transmissibility_ratio:.{tr_dp}f}\n\n"
 
         f"**Step 4:** Calculate the absolute amplitude of the instrument (X).\n"
         f"The relationship is X = TR * Y.\n"
-        f"X = {round(transmissibility_ratio, precision)} * {base_amplitude_Y_mm} mm\n"
-        f"X = {round(amplitude_X_mm, precision)} mm\n\n"
+        f"X = {transmissibility_ratio:.{tr_dp}f} * {base_amplitude_Y_mm} mm = "
+        f"{amplitude_X_mm:.{x_dp}f} mm\n\n"
 
         f"**Answer:**\n"
-        f"The displacement transmissibility ratio is **{round(transmissibility_ratio, 3)}**.\n"
-        f"The absolute amplitude of the instrument's vibration is **{round(amplitude_X_mm, 3)} mm**."
+        f"The displacement transmissibility ratio is "
+        f"**{transmissibility_ratio:.{tr_dp}f}**.\n"
+        f"The absolute amplitude of the instrument's vibration is "
+        f"**{amplitude_X_mm:.{x_dp}f} mm**."
     )
 
     return question, solution
