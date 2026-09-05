@@ -1,6 +1,43 @@
 import random
 import math
+from decimal import Decimal, ROUND_HALF_UP
+
 from data.templates.branches.chemical_engineering.constants import COMMON_LIQUIDS, GRAVITATIONAL_ACCELERATION
+
+
+# Verifier tolerances (D1.3), keyed by template id. Relative.
+TEMPLATE_TOLERANCES = {
+    # The answer is a 4-decimal mantissa in scientific notation, i.e. five
+    # significant figures, so half a unit in the last printed place is at most
+    # 5e-5 relative (worst case a mantissa just above 1.0). 1e-4 is twice that
+    # display bound - loose enough that last-digit rounding never fires, tight
+    # enough to catch a real break: using a 3-dp kappa instead of the stated
+    # 6-dp value moves Q by ~0.1%, a thousand times this tolerance.
+    "template_annulus_flowrate": 1e-4,
+}
+
+
+def _hu(x, places):
+    """Round half-up to `places` dp, resolving the tie in DECIMAL.
+
+    `round()` resolves a half-way tie on the binary value and disagrees with a
+    reader doing decimal arithmetic (spec P2 as amended, DECISIONS D-012).
+    """
+    q = Decimal(1).scaleb(-places)
+    d = x if isinstance(x, Decimal) else Decimal(repr(x))
+    v = d.quantize(q, rounding=ROUND_HALF_UP)
+    return int(v) if places == 0 else float(v)
+
+
+def _as_printed(x, spec):
+    """The value a reader recovers from `x` when it is printed with `spec`.
+
+    P2 asks that the stored value and the printed value be the SAME value.
+    Rounding alone does not achieve that: a float one ulp away from its own
+    printed form puts the template and the reader on opposite sides of a
+    display tie (D-016 part 2).
+    """
+    return float(format(x, spec))
 
 
 # Template 1 (Easy)
@@ -215,53 +252,110 @@ def template_annulus_flowrate():
             - str: A step-by-step solution showing the calculation.
     """
     # 1. Parameterize inputs with Physical Plausibility Check
-    # Choose a random fluid
-    fluid_name = random.choice(list(COMMON_LIQUIDS.keys()))
-    fluid_density, fluid_viscosity_Pas = COMMON_LIQUIDS[fluid_name]
+    #
+    # The draw is repeated when the instance would be unusable. Two conditions
+    # need it, and both were previously unhandled or hidden:
+    #
+    #  * The required pressure drop can round to zero on the 10 Pa grid the
+    #    question states it on. The template used to substitute 10 Pa silently
+    #    (P5), which quietly moved the given by more than 100%.
+    #  * Rounding the drop UP to that grid inflates Q, and with a target
+    #    Reynolds number as high as 1500 the result can leave the laminar
+    #    regime the governing equation assumes - measured up to Re = 2149.
+    #    Nothing checked this before; the item simply asserted a laminar
+    #    solution for a transitional flow.
+    for _attempt in range(200):
+        # Choose a random fluid
+        fluid_name = random.choice(list(COMMON_LIQUIDS.keys()))
+        fluid_density, fluid_viscosity_Pas = COMMON_LIQUIDS[fluid_name]
 
-    # Define radii
-    outer_radius_cm = round(random.uniform(2.0, 5.0), 2)
-    kappa = round(random.uniform(0.3, 0.7), 2) 
-    inner_radius_cm = round(kappa * outer_radius_cm, 2)
-    
-    # Convert to meters
-    outer_radius_m = outer_radius_cm / 100.0
-    inner_radius_m = inner_radius_cm / 100.0
-    kappa_val = inner_radius_m / outer_radius_m
-    
-    pipe_length_m = round(random.uniform(10.0, 50.0), 1)
+        # Define radii
+        outer_radius_cm = round(random.uniform(2.0, 5.0), 2)
+        kappa = round(random.uniform(0.3, 0.7), 2)
+        inner_radius_cm = round(kappa * outer_radius_cm, 2)
 
-    # Ensure Laminar Flow (Re < 2100) 
-    # Instead of random Pressure Drop, we pick a target Reynolds number
-    # Hydraulic Diameter Dh = 2 * (Ro - Ri)
-    Dh = 2 * (outer_radius_m - inner_radius_m)
-    
-    # Target Re between 500 and 1500 (safely laminar)
-    Re_target = random.uniform(500, 1500)
-    
-    # Calculate required velocity: v = (Re * mu) / (rho * Dh)
-    velocity_target = (Re_target * fluid_viscosity_Pas) / (fluid_density * Dh)
-    
-    # Calculate required Flow Rate: Q = v * Area
-    area = math.pi * (outer_radius_m**2 - inner_radius_m**2)
-    Q_target = velocity_target * area
+        # Convert to meters
+        outer_radius_m = outer_radius_cm / 100.0
+        inner_radius_m = inner_radius_cm / 100.0
+        # kappa is displayed and then consumed, so it is bound through its own
+        # display. It was shown at 3 dp, which is NOT enough to carry the
+        # answer: a shape factor computed from a 3-dp kappa differs from the
+        # exact ratio by ~0.1%, ten times the round-trip tolerance. Raising the
+        # display is the fix; degrading the answer to match a coarse display
+        # would not be (D-016).
+        kappa_val = _as_printed(inner_radius_m / outer_radius_m, ".6f")
 
-    # Back-calculate the Pressure Drop required to drive this Q
-    # Inverted Annulus Equation: DeltaP = Q * (8*mu*L) / (pi*Ro^4 * ShapeFactor)
-    shape_factor = (1 - kappa_val**4) - (((1 - kappa_val**2)**2) / math.log(1 / kappa_val))
-    denominator = (math.pi * (outer_radius_m**4)) * shape_factor
-    numerator = Q_target * (8 * fluid_viscosity_Pas * pipe_length_m)
-    
-    pressure_drop_Pa_exact = numerator / denominator
-    
-    # Round Pressure Drop to look "given" (e.g., nearest 10 Pa)
-    pressure_drop_Pa = round(pressure_drop_Pa_exact / 10.0) * 10.0
-    if pressure_drop_Pa == 0: pressure_drop_Pa = 10.0
-    pressure_drop_kPa = pressure_drop_Pa / 1000.0
+        pipe_length_m = round(random.uniform(10.0, 50.0), 1)
 
-    # 2. Perform the forward calculation with rounded inputs
-    term1 = (math.pi * pressure_drop_Pa * (outer_radius_m**4)) / (8 * fluid_viscosity_Pas * pipe_length_m)
-    q_flow_rate = term1 * shape_factor
+        # Hydraulic Diameter Dh = 2 * (Ro - Ri)
+        Dh = 2 * (outer_radius_m - inner_radius_m)
+
+        # Target Re between 500 and 1500 (safely laminar)
+        Re_target = random.uniform(500, 1500)
+
+        # Calculate required velocity: v = (Re * mu) / (rho * Dh)
+        velocity_target = (Re_target * fluid_viscosity_Pas) / (fluid_density * Dh)
+
+        # Calculate required Flow Rate: Q = v * Area
+        area = math.pi * (outer_radius_m ** 2 - inner_radius_m ** 2)
+        Q_target = velocity_target * area
+
+        # Back-calculate the Pressure Drop required to drive this Q
+        # Inverted Annulus Equation: DeltaP = Q*(8*mu*L) / (pi*Ro^4*ShapeFactor)
+        shape_factor = _as_printed(
+            (1 - kappa_val ** 4)
+            - (((1 - kappa_val ** 2) ** 2) / math.log(1 / kappa_val)), ".6f")
+        denominator = (math.pi * (outer_radius_m ** 4)) * shape_factor
+        numerator = Q_target * (8 * fluid_viscosity_Pas * pipe_length_m)
+
+        pressure_drop_Pa_exact = numerator / denominator
+
+        # Round the pressure drop to look "given". The grid is 1 Pa, which is
+        # exactly the resolution the question states it at ("{:.3f} kPa"), so
+        # the stated value is exact.
+        #
+        # It was 10 Pa, and that was too coarse to represent the drop this
+        # sampler asks for: the required value rounded to ZERO on 17.8% of
+        # draws, and the template then silently substituted 10 Pa. On nearly
+        # one instance in five the Reynolds targeting was therefore discarded
+        # and the stated pressure drop bore no relation to the flow the
+        # sampler had chosen. At 1 Pa that falls to 2.4%, and those draws are
+        # resampled rather than overridden (P5).
+        pressure_drop_Pa = _hu(pressure_drop_Pa_exact, 0)
+        if pressure_drop_Pa <= 0:
+            continue
+        pressure_drop_kPa = pressure_drop_Pa / 1000.0
+
+        # 2. Perform the forward calculation from the values the trace PRINTS.
+        # Step 5 previously printed "Q = <main term> * <shape factor to 4 dp>
+        # = <Q>" with Q taken from the unrounded shape factor, so 283 of 300
+        # seeds printed a product that did not reproduce. Both operands are now
+        # bound through their own displays, so the multiplication is exact.
+        term1 = _as_printed(
+            (math.pi * pressure_drop_Pa * (outer_radius_m ** 4))
+            / (8 * fluid_viscosity_Pas * pipe_length_m), ".6e")
+        # Bound through its own display too, so the answer a solver reads is
+        # the value every check below uses.
+        q_flow_rate = _as_printed(term1 * shape_factor, ".4e")
+
+        # The governing equation is the LAMINAR annulus solution, so the
+        # instance must actually be laminar. Re is formed from the ANSWER, not
+        # from the target the sampler chose.
+        reynolds = (fluid_density * (q_flow_rate / area) * Dh
+                    / fluid_viscosity_Pas)
+        if reynolds >= 2100.0:
+            continue
+        break
+    else:
+        raise RuntimeError("annulus_flowrate: no laminar sample in 200 draws")
+
+    # --- invariants (T7) ---------------------------------------------------
+    assert 0.0 < kappa_val < 1.0, f"annulus ratio out of range: {kappa_val}"
+    # The annulus shape factor [(1-k^4) - (1-k^2)^2/ln(1/k)] is strictly
+    # between 0 and 1 for every 0 < k < 1, and tends to 1 as k -> 0.
+    assert 0.0 < shape_factor < 1.0, f"shape factor unphysical: {shape_factor}"
+    assert reynolds < 2100.0, f"flow is not laminar: Re = {reynolds:.0f}"
+    assert q_flow_rate > 0.0, f"non-positive flow rate: {q_flow_rate}"
 
     # 3. Generate the question and solution strings
     question = (
@@ -269,7 +363,7 @@ def template_annulus_flowrate():
         f"The inner pipe has an outer radius of {inner_radius_cm} cm, and the outer pipe has an inner radius of {outer_radius_cm} cm. "
         f"The concentric pipes have a length of {pipe_length_m} m.\n\n"
         f"A pressure drop of {pressure_drop_kPa:.3f} kPa is maintained over the length of the pipes. "
-        f"The fluid viscosity is {fluid_viscosity_Pas} Pa·s.\n\n"
+        f"The fluid viscosity is {fluid_viscosity_Pas} Pa.s.\n\n"
         f"Calculate the volumetric flow rate (Q) through the annular space in m^3/s."
     )
 
@@ -281,7 +375,7 @@ def template_annulus_flowrate():
         f"- Outer Radius (R_outer): {outer_radius_cm} cm\n"
         f"- Pipe Length (L): {pipe_length_m} m\n"
         f"- Pressure Drop (P0 - PL): {pressure_drop_kPa:.3f} kPa\n"
-        f"- Fluid Viscosity (mu): {fluid_viscosity_Pas} Pa·s\n"
+        f"- Fluid Viscosity (mu): {fluid_viscosity_Pas} Pa.s\n"
         f"\n\n"
 
         f"**Step 2:** Perform Unit Conversions\n"
@@ -292,7 +386,7 @@ def template_annulus_flowrate():
         
         f"**Step 3:** Calculate the Dimensionless Ratio (kappa)\n"
         f"Kappa (k) is the ratio of the inner radius to the outer radius.\n"
-        f"kappa = R_inner / R_outer = {inner_radius_m} / {outer_radius_m} = {kappa_val:.3f}\n\n"
+        f"kappa = R_inner / R_outer = {inner_radius_m} / {outer_radius_m} = {kappa_val:.6f}\n\n"
 
         f"**Step 4:** State the Core Equation\n"
         f"The volumetric flow rate (Q) for laminar flow in an annulus is:\n"
@@ -303,9 +397,9 @@ def template_annulus_flowrate():
         f"Main Term = (pi * {pressure_drop_Pa} * ({outer_radius_m})^4) / (8 * {fluid_viscosity_Pas} * {pipe_length_m})\n"
         f"Main Term = {term1:.6e}\n\n"
         f"Calculate the shape factor:\n"
-        f"Shape Factor = [ (1 - {kappa_val:.3f}^4) - ((1 - {kappa_val:.3f}^2)^2 / ln(1/{kappa_val:.3f})) ] = {shape_factor:.4f}\n\n"
+        f"Shape Factor = [ (1 - {kappa_val:.6f}^4) - ((1 - {kappa_val:.6f}^2)^2 / ln(1/{kappa_val:.6f})) ] = {shape_factor:.6f}\n\n"
         f"Q = Main Term * Shape Factor\n"
-        f"Q = {term1:.6e} * {shape_factor:.4f} = {q_flow_rate:.4e} m^3/s\n\n"
+        f"Q = {term1:.6e} * {shape_factor:.6f} = {q_flow_rate:.4e} m^3/s\n\n"
 
         f"**Answer:** The volumetric flow rate is **{q_flow_rate:.4e} m^3/s**."
     )
