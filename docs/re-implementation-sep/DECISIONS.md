@@ -535,6 +535,49 @@ sample - which costs the natural-looking parameter values and needs its own
 sign-off.
 
 
+---
+
+## D-021 — T6's distinct-answer gate SATURATES at 1,000 seeds and hid a 29% regression
+
+**Date:** 2026-09-06 · **Status:** DECIDED · **Source:** Phase 1
+**Companion to D-019, which found the same check's median gate is noisy at the
+same sample size.**
+
+`template_shaft_design_power` was measured against the committed 1,000-seed
+baseline and read **913 -> 822 distinct answers, -10.0%** — passing the "must
+not fall by more than 10%" gate by a hair, and reported as a pass.
+
+Re-measured with **both sides at 5,000 seeds** it reads **3,243 -> 2,293,
+-29.3%**: a clear breach, and a real one. Rounding the shaft radius to 5 dp and
+then doubling it put the diameter on a 0.02 mm grid, so only EVEN hundredths of
+a millimetre were reachable and half the item's answer space disappeared.
+
+**A distinct-answer count cannot exceed the seed count.** At N=1,000 a template
+with ~3,200 reachable answers reads ~900 whatever its true answer space is, so
+the statistic is saturated and the gate measures the sample size rather than
+the item. Phase 0's NEW-7 already required this count to be taken at ">= 1,000
+seeds"; that floor is too low by a factor of at least five for the templates
+that matter.
+
+**Fixed in the template** by carrying the radius at 6 dp, which steps the
+diameter by 0.002 mm and makes every hundredth reachable again: 3,243 -> 3,169,
+**-2.3%**, comfortably inside the gate.
+
+**`SPEC-CHANGE` for the harness.** T6 must either
+1. take the distinct-answer count at a seed count well above the expected
+   answer-space size — 5,000 is enough for this corpus, and the committed
+   baseline should be regenerated at that N — or
+2. report saturation explicitly, e.g. flag any template whose distinct-answer
+   count exceeds 50% of the seed count as "count not resolved at this N".
+
+Option 2 is cheaper and safer: it makes the failure visible rather than
+relying on everyone remembering to raise N.
+
+**Lesson, and it is the same one as D-015 and D-018:** a check that reports
+green while measuring nothing is worse than no check. Here the check reported a
+*number*, and the number was an artefact of the instrument's range.
+
+
 ## Open decisions
 
 | # | Decision | Needed before |
