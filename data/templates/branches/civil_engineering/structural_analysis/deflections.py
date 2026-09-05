@@ -1,7 +1,7 @@
 import math
 import random
 
-from pilot.templates.branches.civil_engineering.constants import (
+from data.templates.branches.civil_engineering.constants import (
     AISC_W_SHAPES,
     STEEL_E_GPA,
     STEEL_E_KSI,

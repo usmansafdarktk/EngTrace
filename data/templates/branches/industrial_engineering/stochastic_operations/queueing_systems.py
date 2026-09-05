@@ -1,7 +1,7 @@
 import math
 import random
 
-from pilot.templates.branches.industrial_engineering.constants import (
+from data.templates.branches.industrial_engineering.constants import (
     QUEUE_SCENARIOS,
 )
 

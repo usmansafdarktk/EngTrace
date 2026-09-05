@@ -1,7 +1,7 @@
 import math
 import random
 
-from pilot.templates.branches.civil_engineering.constants import (
+from data.templates.branches.civil_engineering.constants import (
     FRICTION_ANGLE_RANGES_DEG,
     TERZAGHI_BEARING_FACTORS,
     TERZAGHI_MODIFIED_FACTORS,

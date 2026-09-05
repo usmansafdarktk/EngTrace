@@ -1,7 +1,7 @@
 import math
 import random
 
-from pilot.templates.branches.civil_engineering.constants import GRAVITY_M_S2
+from data.templates.branches.civil_engineering.constants import GRAVITY_M_S2
 
 
 # Template 25 (Easy) — Area C2: Energy Principles & Rapidly Varied Flow

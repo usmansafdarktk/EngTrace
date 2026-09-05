@@ -1,7 +1,7 @@
 import math
 import random
 
-from pilot.templates.branches.civil_engineering.constants import (
+from data.templates.branches.civil_engineering.constants import (
     GRAVITY_M_S2,
     MANNINGS_N_CHANNELS,
 )
