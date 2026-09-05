@@ -345,9 +345,15 @@ def template_shaft_design_power():
         # losslessly, so no display binding is needed here.
         allowable_stress_pa = allowable_stress_mpa * 1e6
 
-        torque = _hu(power_w / (2 * math.pi * frequency_hz), 2)
+        # The torque and c^3 are displayed and then consumed, so their display
+        # precision has to be fine enough not to move the answer. At 2 dp and
+        # four significant figures respectively they moved the last digit of
+        # the 2-dp diameter on 13.6% of draws - c ~ T^(1/3) and c ~ (c^3)^(1/3)
+        # so both feed straight through. 4 dp and six significant figures put
+        # the combined effect three orders below one display step.
+        torque = _hu(power_w / (2 * math.pi * frequency_hz), 4)
         c_cubed = _as_printed((2 * torque) / (math.pi * allowable_stress_pa),
-                              ".3e")
+                              ".5e")
         c_exact = c_cubed ** (1 / 3)
         if _is_display_tie(c_exact, C_DP):
             continue
@@ -414,14 +420,14 @@ def template_shaft_design_power():
         f"**Step 2:** Calculate the torque (T) exerted on the shaft.\n"
         f"The relationship between power, torque, and frequency is P = 2 * pi * f * T.\n"
         f"Rearranging for torque: T = P / (2 * pi * f)\n"
-        f"T = {power_w} / (2 * pi * {frequency_hz:.2f}) = {torque:.2f} N.m\n\n"
+        f"T = {power_w} / (2 * pi * {frequency_hz:.2f}) = {torque:.4f} N.m\n\n"
 
         f"**Step 3:** Determine the required shaft radius (c) using the torsion formula.\n"
         f"The formula for maximum stress in a solid shaft is tau = (T * c) / J, where J = (pi/2) * c^4.\n"
         f"This simplifies to tau = 2 * T / (pi * c^3).\n"
         f"Rearranging to solve for the radius: c^3 = (2 * T) / (pi * tau_allow)\n"
-        f"c^3 = (2 * {torque:.2f}) / (pi * {allowable_stress_pa:.1e}) = {c_cubed:.3e} m^3\n"
-        f"c = ({c_cubed:.3e})^(1/3) = {c_radius_m:.{C_DP}f} m\n\n"
+        f"c^3 = (2 * {torque:.4f}) / (pi * {allowable_stress_pa:.1e}) = {c_cubed:.5e} m^3\n"
+        f"c = ({c_cubed:.5e})^(1/3) = {c_radius_m:.{C_DP}f} m\n\n"
 
         f"**Step 4:** Calculate the minimum diameter from the radius.\n"
         f"Diameter (d) = 2 * c\n"
