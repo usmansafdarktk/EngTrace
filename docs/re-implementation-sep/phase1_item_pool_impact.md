@@ -83,7 +83,8 @@ robust version of the same measurement and are what to plan against.
 | `composite_shafts_series` | 0.0% | 100.0% | 0.0% |
 | **published-branch aggregate** | **0.9%** | **65.2%** | **34.0%** |
 
-Reproduce with `_dump.py` in a `master` worktree and in this tree, then diff.
+Reproduce with `python -m tests.template_integrity.instance_dump` in a
+`master` worktree and in this tree, then diff the two JSON files.
 
 ---
 
