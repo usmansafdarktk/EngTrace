@@ -133,7 +133,7 @@ is. That saturation hid a real 29% regression (**D-021**).
 | `cantilever_double_integration` | 395 → 395 (+0.0%) | +0.00% | same | pass |
 | `annulus_flowrate` | 4,929 → 4,940 (+0.2%) | **−28.2%** | same | **BREACH — signed off, D-022** |
 | `statically_indeterminate_shaft` | 4,886 → 4,684 (−4.1%) | −0.02% | same | pass |
-| `shaft_design_power` | 3,243 → 3,122 (−3.7%) | +0.00% | same | pass |
+| `shaft_design_power` | 3,243 → 3,234 (−0.3%) | −0.04% | same | pass |
 | `composite_shafts_series` | 2,730 → 4,899 (**+79.5%**) | +0.04% | same | pass |
 
 **Step-count distributions are identical before and after for all ten**
