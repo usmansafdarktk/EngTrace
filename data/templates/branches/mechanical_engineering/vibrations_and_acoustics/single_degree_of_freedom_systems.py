@@ -1,5 +1,30 @@
 import random
 import math
+from decimal import Decimal, ROUND_HALF_UP
+
+
+# Verifier tolerances (D1.3), keyed by template id. Relative, and applied to
+# the numeric parts only - the classification is a label and is compared
+# exactly.
+TEMPLATE_TOLERANCES = {
+    # zeta is quoted to 4 dp on values of 0.15-2.5 and omega_d to 4 dp on
+    # values of order 10-100, so the display floor is under 3e-4 relative in
+    # both cases. 5e-3 clears it with an order of magnitude to spare while
+    # still catching any real break in the chain.
+    "template_damping_classification": 5e-3,
+}
+
+
+def _hu(x, places):
+    """Round half-up to `places` dp, resolving the tie in DECIMAL.
+
+    `round()` resolves a half-way tie on the binary value and disagrees with a
+    reader doing decimal arithmetic (spec P2 as amended, DECISIONS D-012).
+    """
+    q = Decimal(1).scaleb(-places)
+    d = x if isinstance(x, Decimal) else Decimal(repr(x))
+    v = d.quantize(q, rounding=ROUND_HALF_UP)
+    return int(v) if places == 0 else float(v)
 
 
 # Template 1 (Easy)
@@ -311,56 +336,97 @@ def template_damping_classification():
         zeta = c / c_c
         omega_d = omega_n * sqrt(1 - zeta^2)  (for zeta < 1)
 
+    Trace integrity (Phase 1, D-010):
+        The item used to be ILL-POSED rather than wrong. Its gold labels were
+        correct, but c was stated to 2 dp while c_c was carried at full
+        precision, so a solver recomputing zeta from the stated values got
+        1.000000854 rather than 1 and a strict test classified a third of all
+        instances differently - about half of those as Overdamped and half as
+        Underdamped. The 2-dp rounding destroyed the digit that would settle
+        the question.
+
+        Fixed by stating c at the SAME precision as c_c and, for the
+        critically damped case, stating it as exactly equal to the critical
+        value. Classification is then an exact comparison of two decimals a
+        solver can read straight off the page, and zeta comes out at exactly
+        1.0000 when, and only when, the system is critically damped. The
+        fragile `elif zeta == 1` float-equality test is gone: zeta is computed
+        for display and never gates the classification.
+
+        Constraining the sampling so that c_c is exact (the earlier proposal,
+        D-004) is not needed and was superseded.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for system classification and key parameters.
             - str: A step-by-step solution.
     """
-    # 1. Parameterize the inputs to ensure all cases are generated
+    C_DP = 2               # both damping coefficients are stated to 2 dp
+    precision = 4          # zeta and the frequencies
+
     mass = round(random.uniform(2.0, 600.0), 2)       # in kg
     stiffness = random.randint(2000, 300000)          # in N/m
 
-    # To ensure a good distribution of outcomes, we first select a damping ratio
-    # and then calculate the corresponding damping coefficient 'c'.
-    
-    # Choose a scenario: 1 for underdamped, 2 for critically damped, 3 for overdamped
+    # Sampler-side choice only: a target damping ratio, so all three regimes
+    # are represented. It is NEVER printed - the zeta in the trace is
+    # recomputed from the stated c and c_c.
     scenario_choice = random.randint(1, 3)
+    if scenario_choice == 1:                          # Underdamped
+        zeta_target = round(random.uniform(0.15, 0.85), 3)
+    elif scenario_choice == 2:                        # Critically Damped
+        zeta_target = 1.0
+    else:                                             # Overdamped
+        zeta_target = round(random.uniform(1.2, 2.5), 3)
 
-    if scenario_choice == 1: # Underdamped
-        zeta = round(random.uniform(0.15, 0.85), 3)
-    elif scenario_choice == 2: # Critically Damped
-        zeta = 1.0
-    else: # Overdamped
-        zeta = round(random.uniform(1.2, 2.5), 3)
+    # Step A: the critical damping coefficient, stated to C_DP.
+    critical_damping_c = _hu(2 * math.sqrt(stiffness * mass), C_DP)
 
-    # Standardize precision for final outputs
-    precision = 4
-
-    # 2. Perform the core calculations for the solution
-    
-    # Step A: Calculate the critical damping coefficient (c_c)
-    critical_damping_c = 2 * math.sqrt(stiffness * mass)
-    
-    # Step B: Calculate the actual damping coefficient (c) based on the desired zeta
-    damping_coefficient_c = zeta * critical_damping_c
-    
-    # Step C: Determine the system classification based on zeta
-    if zeta < 1:
-        classification = "Underdamped"
-        # Also calculate natural and damped frequencies for the solution
-        omega_n = math.sqrt(stiffness / mass)
-        omega_d = omega_n * math.sqrt(1 - zeta**2)
-    elif zeta == 1:
-        classification = "Critically Damped"
+    # Step B: the actual damping coefficient, stated to the SAME precision.
+    # For the critically damped case it is the critical value itself, so the
+    # two printed decimals are identical and zeta is exactly 1.
+    if zeta_target == 1.0:
+        damping_coefficient_c = critical_damping_c
     else:
-        classification = "Overdamped"
+        damping_coefficient_c = _hu(zeta_target * critical_damping_c, C_DP)
 
-    # 3. Generate the question and solution strings
-    
+    # Step C: classification by an exact comparison of the two STATED
+    # decimals - scaled to integers so the test never touches a float
+    # equality. This is what replaces `elif zeta == 1`.
+    c_scaled = round(damping_coefficient_c * 10 ** C_DP)
+    cc_scaled = round(critical_damping_c * 10 ** C_DP)
+    if c_scaled < cc_scaled:
+        classification = "Underdamped"
+        relation = "<"
+    elif c_scaled > cc_scaled:
+        classification = "Overdamped"
+        relation = ">"
+    else:
+        classification = "Critically Damped"
+        relation = "="
+
+    # zeta is for DISPLAY, derived from the stated values. It gates nothing.
+    zeta = _hu(damping_coefficient_c / critical_damping_c, precision)
+    omega_n = _hu(math.sqrt(stiffness / mass), precision)
+    if classification == "Underdamped":
+        omega_d = _hu(omega_n * math.sqrt(1 - zeta ** 2), precision)
+
+    # --- invariants (T7) ---------------------------------------------------
+    assert critical_damping_c > 0, f"non-positive c_c: {critical_damping_c}"
+    # The integrity property this fix exists to establish: a solver who divides
+    # the two stated coefficients gets exactly 1 if and only if the gold label
+    # is Critically Damped.
+    assert (zeta == 1.0) == (classification == "Critically Damped"), (
+        f"zeta = {zeta} contradicts the label {classification!r}")
+    if classification == "Underdamped":
+        # The damped natural frequency is strictly below the undamped one, and
+        # positive, for every 0 < zeta < 1.
+        assert 0.0 < omega_d < omega_n, (
+            f"omega_d = {omega_d} not in (0, omega_n = {omega_n})")
+
     question = (
         f"A damped single-degree-of-freedom system has a mass of {mass} kg, "
         f"a spring stiffness of {stiffness} N/m, and a viscous damping coefficient of "
-        f"{round(damping_coefficient_c, 2)} N-s/m. "
+        f"{damping_coefficient_c:.{C_DP}f} N-s/m. "
         f"Calculate the damping ratio (zeta) and classify the system as underdamped, "
         f"critically damped, or overdamped. If the system is underdamped, also "
         f"calculate its damped natural frequency (omega_d)."
@@ -370,40 +436,39 @@ def template_damping_classification():
         f"**Given:**\n"
         f"Mass (m) = {mass} kg\n"
         f"Stiffness (k) = {stiffness} N/m\n"
-        f"Damping Coefficient (c) = {round(damping_coefficient_c, 2)} N-s/m\n\n"
+        f"Damping Coefficient (c) = {damping_coefficient_c:.{C_DP}f} N-s/m\n\n"
 
         f"**Step 1:** Calculate the critical damping coefficient (c_c).\n"
         f"The formula is: c_c = 2 * sqrt(k * m)\n"
-        f"c_c = 2 * sqrt({stiffness} * {mass})\n"
-        f"c_c = {round(critical_damping_c, precision)} N-s/m\n\n"
+        f"c_c = 2 * sqrt({stiffness} * {mass}) = "
+        f"{critical_damping_c:.{C_DP}f} N-s/m\n\n"
 
         f"**Step 2:** Calculate the damping ratio (zeta).\n"
         f"The formula is: zeta = c / c_c\n"
-        f"zeta = {round(damping_coefficient_c, 2)} / {round(critical_damping_c, precision)}\n"
-        f"zeta = {round(zeta, precision)}\n\n"
+        f"zeta = {damping_coefficient_c:.{C_DP}f} / "
+        f"{critical_damping_c:.{C_DP}f} = {zeta:.{precision}f}\n\n"
 
         f"**Step 3:** Classify the system based on the value of zeta.\n"
-        f"Since zeta {'>' if zeta > 1 else '<' if zeta < 1 else '='} 1, the system is **{classification}**.\n\n"
+        f"Since zeta {relation} 1, the system is **{classification}**.\n\n"
     )
 
-    # Add the final step only if the system is underdamped
     if classification == "Underdamped":
         solution += (
             f"**Step 4:** Since the system is underdamped, calculate the damped natural frequency (omega_d).\n"
             f"First, find the undamped natural frequency (omega_n):\n"
-            f"omega_n = sqrt(k / m) = sqrt({stiffness} / {mass}) = {round(omega_n, precision)} rad/s\n\n"
+            f"omega_n = sqrt(k / m) = sqrt({stiffness} / {mass}) = {omega_n:.{precision}f} rad/s\n\n"
             f"Now, use the formula: omega_d = omega_n * sqrt(1 - zeta^2)\n"
-            f"omega_d = {round(omega_n, precision)} * sqrt(1 - {round(zeta, precision)}^2)\n"
-            f"omega_d = {round(omega_d, precision)} rad/s\n\n"
-            
+            f"omega_d = {omega_n:.{precision}f} * sqrt(1 - {zeta:.{precision}f}^2) "
+            f"= {omega_d:.{precision}f} rad/s\n\n"
+
             f"**Answer:**\n"
-            f"The damping ratio is {round(zeta, precision)}. The system is **{classification}**.\n"
-            f"The damped natural frequency is {round(omega_d, precision)} rad/s."
+            f"The damping ratio is {zeta:.{precision}f}. The system is **{classification}**.\n"
+            f"The damped natural frequency is {omega_d:.{precision}f} rad/s."
         )
     else:
         solution += (
             f"**Answer:**\n"
-            f"The damping ratio is {round(zeta, precision)}. The system is **{classification}**."
+            f"The damping ratio is {zeta:.{precision}f}. The system is **{classification}**."
         )
 
     return question, solution

@@ -1,5 +1,66 @@
 import random
 import math
+from decimal import Decimal, ROUND_HALF_UP
+
+
+# Verifier tolerances (D1.3), keyed by template id. Relative.
+TEMPLATE_TOLERANCES = {
+    # The amplitude answer is quoted to four significant figures, so half a
+    # unit in the last printed place is at most 5e-4 relative - the worst case
+    # is a mantissa just above 1.000, e.g. 1.0744976 printed as "1.074", and
+    # the measured worst over 1,000 seeds is 4.63e-4 at seed 220, which IS
+    # that bound rather than any residual chain error. 1e-3 is twice that hard
+    # display bound, so nothing fires on presentation, and it is still two
+    # orders of magnitude below the error the pre-fix chain injected by
+    # re-deriving omega from an unrounded shaft speed (up to 8.4%).
+    "template_rotating_unbalance": 1e-3,
+    # Measured over 2,000 seeds: worst oracle-vs-trace disagreement on a
+    # correct instance ("agreement floor") is 1.81e-3, and the smallest
+    # injected answer error caught on >=99% of instances ("detection floor")
+    # is 1%. The declared value must sit between the two. 1e-3 was BELOW the
+    # agreement floor and would have fired on presentation alone.
+    "template_vibration_transmissibility": 3e-3,
+}
+
+
+def _hu(x, places):
+    """Round half-up to `places` dp, resolving the tie in DECIMAL.
+
+    `round()` resolves a half-way tie on the binary value and disagrees with a
+    reader doing decimal arithmetic (spec P2 as amended, DECISIONS D-012).
+    """
+    q = Decimal(1).scaleb(-places)
+    d = x if isinstance(x, Decimal) else Decimal(repr(x))
+    v = d.quantize(q, rounding=ROUND_HALF_UP)
+    return int(v) if places == 0 else float(v)
+
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where NO rounding convention is defensible. A reader
+    doing decimal arithmetic and applying half-up reads 0.02325 m as 23.3 mm; a
+    reader using binary floats and `round()` reads it as 23.2 mm; and the
+    printed line closes for exactly one of them whichever the template picks.
+    Breaking the tie in decimal (P2 as amended) does not remove the ambiguity,
+    it only moves it to the other reader - which is why such instances are
+    RESAMPLED rather than resolved (D-016).
+
+    Testing for an EXACT tie is not enough. Two independent evaluations of the
+    same exact quantity - this template's, in kN and kN/m^2, and a solver's, in
+    N and Pa - differ by a few ulps, so a rational tie such as 29.25 mm lands
+    as 29.249999999999996 on one side and 29.250000000000004 on the other.
+    Neither is exactly a tie, and the two then round in opposite directions:
+    that is how eight non-closing instances per 60,000 seeds survived the first
+    version of this guard (Phase 1 review A, finding F-2).
+
+    So a narrow BAND is quarantined rather than a point. The band is a few
+    thousand ulps wide where the tie lattice is 10^-places apart, so it removes
+    nothing that is not genuinely ambiguous.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
 
 
 # Template 1 (Easy)
@@ -140,117 +201,145 @@ def template_rotating_unbalance():
         F_0 = m_e * e * omega^2
         X = F_0 / sqrt((k - m * omega^2)^2 + (c * omega)^2)
 
+    Trace integrity (Phase 1, P3):
+        The sampler still CHOOSES a frequency ratio and a damping ratio to
+        place the instance in a useful regime, but neither leaks into the
+        solution. The shaft speed is stated as a whole number of RPM and
+        omega is then recomputed FORWARD from that stated speed; the damping
+        coefficient is stated to 2 dp and the chain consumes the stated
+        value; and zeta is derived from the stated c and the computed c_cr
+        rather than printed from the sampled pre-image. Every intermediate
+        that is displayed and then consumed is rounded to its display
+        precision first, with half-way ties resampled (D-016).
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the steady-state amplitude of vibration.
             - str: A step-by-step solution to the problem.
     """
-    # 1. Parameterize the inputs with random values
-    
-    # Total mass of the machine in kg
-    m_total = round(random.uniform(50.0, 500.0), 1)
-    
-    # Eccentric mass in kg (should be a small fraction of total mass)
-    m_eccentric = round(random.uniform(0.1, m_total * 0.05), 2)
-    
-    # Eccentricity in mm
-    eccentricity_mm = random.randint(10, 150)
-    
-    # Stiffness in N/m
-    stiffness = round(random.uniform(5e4, 2e6), 0)
-    
-    # Define system properties by choosing a damping ratio first for better control
-    # Lightly damped systems are common for this problem type.
-    damping_ratio_zeta = round(random.uniform(0.05, 0.6), 3)
-    
-    # Define operating speed by choosing a frequency ratio first
-    # This ensures we get a good spread of cases (below, near, and above resonance)
-    freq_ratio_r = round(random.uniform(0.3, 3.0), 3)
-
-    # Standardize precision for final outputs
     precision = 5
-    
-    # 2. Perform the core calculations for the solution
-    
-    # Handle potential edge cases from inputs
-    if m_total <= 0 or stiffness <= 0:
-        return "Error: Mass and stiffness must be positive.", "Invalid input parameters."
 
-    # Step A: Calculate fundamental system properties
-    omega_n = math.sqrt(stiffness / m_total)
-    c_critical = 2 * math.sqrt(stiffness * m_total)
-    damping_coeff = damping_ratio_zeta * c_critical
-    
-    # Step B: Determine the operating speed from the chosen frequency ratio
-    omega = freq_ratio_r * omega_n
-    operating_speed_rpm = omega * 60 / (2 * math.pi)
-    
-    # Step C: Convert units for calculation consistency
-    eccentricity_m = eccentricity_mm / 1000.0
-    
-    # Step D: Calculate the magnitude of the unbalanced force
-    force_magnitude_F0 = m_eccentric * eccentricity_m * (omega ** 2)
-    
-    # Step E: Calculate the steady-state amplitude (X) in meters
-    # Denominator components
-    term1 = stiffness - m_total * (omega ** 2)
-    term2 = damping_coeff * omega
-    denominator = math.sqrt(term1**2 + term2**2)
-    
-    amplitude_m = force_magnitude_F0 / denominator if denominator != 0 else float('inf')
-    
-    # Step F: Convert final amplitude to millimeters for a more intuitive answer
-    amplitude_mm = amplitude_m * 1000.0
+    for _attempt in range(200):
+        # Total mass of the machine in kg (INCLUDING the unbalanced mass -
+        # the question now says so explicitly; it previously did not, and a
+        # solver who subtracted m_e was marked wrong).
+        m_total = round(random.uniform(50.0, 500.0), 1)
 
-    # 3. Generate the question and solution strings
-    
+        # Eccentric mass in kg (a small fraction of the total mass)
+        m_eccentric = round(random.uniform(0.1, m_total * 0.05), 2)
+
+        # Eccentricity in mm
+        eccentricity_mm = random.randint(10, 150)
+
+        # Stiffness in N/m
+        stiffness = round(random.uniform(5e4, 2e6), 0)
+
+        # Sampler-side choices: a damping ratio and a frequency ratio, picked
+        # to spread the instances below, near and above resonance. NEITHER is
+        # printed - both are re-derived below from the stated quantities.
+        damping_ratio_zeta = round(random.uniform(0.05, 0.6), 3)
+        freq_ratio_r = round(random.uniform(0.3, 3.0), 3)
+
+        omega_n_exact = math.sqrt(stiffness / m_total)
+        c_critical = _hu(2 * math.sqrt(stiffness * m_total), precision)
+        # c is STATED to 2 dp, so 2 dp is what the chain consumes.
+        damping_coeff = _hu(damping_ratio_zeta * c_critical, 2)
+        zeta = _hu(damping_coeff / c_critical, precision)
+        omega_n = _hu(omega_n_exact, precision)
+
+        # The speed is STATED as a whole number of RPM; omega is recomputed
+        # forward from it. The sampled freq_ratio_r reaches no further.
+        operating_speed_rpm = round(freq_ratio_r * omega_n_exact * 60
+                                    / (2 * math.pi), 0)
+        omega_exact = operating_speed_rpm * 2 * math.pi / 60
+        omega = _hu(omega_exact, precision)
+
+        eccentricity_m = eccentricity_mm / 1000.0
+
+        force_magnitude_F0 = _hu(m_eccentric * eccentricity_m * omega ** 2,
+                                 precision)
+        term1 = _hu(stiffness - m_total * omega ** 2, precision)
+        term2 = _hu(damping_coeff * omega, precision)
+        denominator = _hu(math.sqrt(term1 ** 2 + term2 ** 2), precision)
+        if denominator <= 0:
+            continue
+        amplitude_exact = force_magnitude_F0 / denominator          # m
+
+        # A final answer carried to one significant figure ("0.002 mm") is not
+        # gradeable, and this item's amplitudes span four orders of magnitude.
+        # Quote the answer to FOUR significant figures wherever that needs more
+        # than 3 dp, and keep the metre display exactly 3 dp finer so the mm
+        # conversion is exact for every reader.
+        mm_dp = max(3, 3 - math.floor(math.log10(abs(amplitude_exact * 1000))))
+        m_dp = mm_dp + 3
+
+        if (_is_display_tie(omega_exact, precision)
+                or _is_display_tie(amplitude_exact, m_dp)):
+            continue                       # no defensible gold answer; redraw
+        amplitude_m = _hu(amplitude_exact, m_dp)
+        amplitude_mm = _hu(amplitude_m * 1000, mm_dp)
+        break
+    else:
+        raise RuntimeError("rotating_unbalance: no closing sample in 200 draws")
+
+    # --- invariants (T7) ---------------------------------------------------
+    assert 0.0 < zeta < 1.0, f"system not underdamped: zeta = {zeta}"
+    assert amplitude_mm > 0.0, f"non-positive amplitude: {amplitude_mm}"
+    # The rotating-unbalance response is bounded by its resonant peak,
+    # X_max = (m_e*e/M) / (2*zeta*sqrt(1 - zeta^2)), for every frequency ratio.
+    assert amplitude_m <= 1.001 * (m_eccentric * eccentricity_m / m_total) / (
+        2 * zeta * math.sqrt(1 - zeta ** 2)), (
+        f"amplitude {amplitude_m} exceeds the resonant bound")
+
     question = (
-        f"A machine with a total mass of {m_total} kg is supported by a spring and damper system. "
+        f"A machine with a total mass of {m_total} kg (this total includes the "
+        f"rotating unbalanced mass) is supported by a spring and damper system. "
         f"The system has an equivalent stiffness of {stiffness:,.0f} N/m and an equivalent damping "
-        f"coefficient of {round(damping_coeff, 2)} N.s/m.\n\n"
+        f"coefficient of {damping_coeff} N.s/m.\n\n"
         f"The machine contains a rotating component that has an unbalance equivalent to a mass of "
         f"{m_eccentric} kg located at an eccentricity of {eccentricity_mm} mm. "
-        f"If the machine operates at a speed of {round(operating_speed_rpm, 0):,.0f} RPM, "
+        f"If the machine operates at a speed of {operating_speed_rpm:,.0f} RPM, "
         f"determine the steady-state amplitude of vibration."
     )
 
     solution = (
         f"**Given:**\n"
-        f"Total Mass (m) = {m_total} kg\n"
+        f"Total Mass (m) = {m_total} kg (includes the unbalanced mass)\n"
         f"Stiffness (k) = {stiffness:,.0f} N/m\n"
-        f"Damping Coefficient (c) = {round(damping_coeff, 2)} N.s/m\n"
+        f"Damping Coefficient (c) = {damping_coeff} N.s/m\n"
         f"Eccentric Mass (m_e) = {m_eccentric} kg\n"
         f"Eccentricity (e) = {eccentricity_mm} mm = {eccentricity_m} m\n"
-        f"Operating Speed = {round(operating_speed_rpm, 0):,.0f} RPM\n\n"
+        f"Operating Speed = {operating_speed_rpm:,.0f} RPM\n\n"
 
         f"**Step 1:** Convert the operating speed from RPM to rad/s.\n"
         f"omega = (Speed in RPM) * (2 * pi / 60)\n"
-        f"omega = {round(operating_speed_rpm, 0):,.0f} * (2 * pi / 60) = {round(omega, precision)} rad/s\n\n"
+        f"omega = {operating_speed_rpm:,.0f} * (2 * pi / 60) = {omega} rad/s\n\n"
 
         f"**Step 2:** Calculate the system's natural frequency (omega_n) and damping ratio (zeta).\n"
-        f"omega_n = sqrt(k / m) = sqrt({stiffness:,.0f} / {m_total}) = {round(omega_n, precision)} rad/s\n"
-        f"c_cr = 2 * sqrt(k * m) = 2 * sqrt({stiffness:,.0f} * {m_total}) = {round(c_critical, precision)} N.s/m\n"
-        f"zeta = c / c_cr = {round(damping_coeff, 2)} / {round(c_critical, precision)} = {round(damping_ratio_zeta, precision)}\n\n"
+        f"omega_n = sqrt(k / m) = sqrt({stiffness:,.0f} / {m_total}) = {omega_n} rad/s\n"
+        f"c_cr = 2 * sqrt(k * m) = 2 * sqrt({stiffness:,.0f} * {m_total}) = {c_critical} N.s/m\n"
+        f"zeta = c / c_cr = {damping_coeff} / {c_critical} = {zeta}\n\n"
 
         f"**Step 3:** Calculate the magnitude of the unbalanced force (F_0).\n"
         f"The force from a rotating unbalance is given by F_0 = m_e * e * omega^2.\n"
-        f"F_0 = {m_eccentric} kg * {eccentricity_m} m * ({round(omega, precision)} rad/s)^2\n"
-        f"F_0 = {round(force_magnitude_F0, precision)} N\n\n"
-        
+        f"F_0 = {m_eccentric} kg * {eccentricity_m} m * ({omega} rad/s)^2\n"
+        f"F_0 = {force_magnitude_F0} N\n\n"
+
         f"**Step 4:** Calculate the steady-state amplitude of vibration (X).\n"
         f"The formula for amplitude is: X = F_0 / sqrt((k - m * omega^2)^2 + (c * omega)^2)\n"
-        f"Numerator = F_0 = {round(force_magnitude_F0, precision)} N\n"
-        f"Denominator Part 1: (k - m * omega^2) = ({stiffness:,.0f} - {m_total} * {round(omega, precision)}^2) = {round(term1, precision)}\n"
-        f"Denominator Part 2: (c * omega) = ({round(damping_coeff, 2)} * {round(omega, precision)}) = {round(term2, precision)}\n"
-        f"Denominator = sqrt(({round(term1, precision)})^2 + ({round(term2, precision)})^2) = {round(denominator, precision)}\n"
-        f"X = {round(force_magnitude_F0, precision)} / {round(denominator, precision)}\n"
-        f"X = {round(amplitude_m, precision + 2)} m\n\n"
-        
+        f"Numerator = F_0 = {force_magnitude_F0} N\n"
+        f"Denominator Part 1: (k - m * omega^2) = ({stiffness:,.0f} - {m_total} * {omega}^2) = {term1}\n"
+        f"Denominator Part 2: (c * omega) = ({damping_coeff} * {omega}) = {term2}\n"
+        f"Denominator = sqrt(({term1})^2 + ({term2})^2) = {denominator}\n"
+        f"X = {force_magnitude_F0} / {denominator} = {amplitude_m:.{m_dp}f} m\n\n"
+
         f"**Step 5:** Convert the amplitude to millimeters.\n"
-        f"Amplitude in mm = {round(amplitude_m, precision + 2)} m * 1000 mm/m = {round(amplitude_mm, precision)} mm\n\n"
-        
+        f"Amplitude in mm = {amplitude_m:.{m_dp}f} m * 1000 mm/m = "
+        f"{amplitude_mm:.{mm_dp}f} mm\n\n"
+
         f"**Answer:**\n"
-        f"The steady-state amplitude of vibration is **{round(amplitude_mm, 3)} mm**."
+        f"The steady-state amplitude of vibration is "
+        f"**{amplitude_mm:.{mm_dp}f} mm**."
     )
 
     return question, solution
@@ -274,70 +363,95 @@ def template_vibration_transmissibility():
         r = omega / omega_n
         TR = X / Y = sqrt( (1 + (2*zeta*r)^2) / ( (1 - r^2)^2 + (2*zeta*r)^2 ) )
 
+    Trace integrity (Phase 1, P3):
+        The base excitation frequency is STATED to 2 dp, so omega is
+        recomputed forward from the stated frequency and the frequency ratio
+        is derived as omega/omega_n from the stated quantities. The sampler
+        still chooses a frequency ratio to place the instance below, near or
+        above resonance, but that choice no longer reaches the solution: the
+        solution previously printed the SAMPLED ratio at 3 dp (r = 3.099
+        where the stated givens imply 3.09930) and carried it into
+        (1 - r^2)^2, which made 39% of answers not the correct rounding of
+        what the question implies.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the transmissibility and absolute amplitude.
             - str: A step-by-step solution to the problem.
     """
-    # 1. Parameterize the inputs with random values
-    
-    # Mass of the sensitive instrument in kg
-    mass = round(random.uniform(5.0, 150.0), 1)
-    
-    # Stiffness of the isolation mount in N/m
-    stiffness = round(random.uniform(2e3, 5e5), 0)
-    
-    # Amplitude of the base vibration in mm
-    base_amplitude_Y_mm = round(random.uniform(0.1, 8.0), 2)
-    
-    # Use frequency ratio and damping ratio to control the problem's outcome
-    # This ensures we test conditions of amplification (r~1) and isolation (r > sqrt(2))
-    freq_ratio_r = round(random.uniform(0.2, 5.0), 3)
-    damping_ratio_zeta = round(random.uniform(0.05, 0.7), 3)
-    
-    # Standardize precision for final outputs
     precision = 4
 
-    # 2. Perform the core calculations for the solution
-    
-    # Handle potential edge cases
-    if mass <= 0 or stiffness <= 0:
-        return "Error: Mass and stiffness must be positive.", "Invalid input parameters."
+    for _attempt in range(200):
+        mass = round(random.uniform(5.0, 150.0), 1)                 # kg
+        stiffness = round(random.uniform(2e3, 5e5), 0)              # N/m
+        base_amplitude_Y_mm = round(random.uniform(0.1, 8.0), 2)    # mm
 
-    # Step A: Calculate fundamental system properties
-    omega_n = math.sqrt(stiffness / mass)
-    c_critical = 2 * math.sqrt(stiffness * mass)
-    damping_coeff = damping_ratio_zeta * c_critical
+        # Sampler-side choice only: spreads the instances across amplification
+        # (r ~ 1) and isolation (r > sqrt(2)). Never printed.
+        freq_ratio_r = round(random.uniform(0.2, 5.0), 3)
+        # zeta IS a stated given, at 3 dp, so the chain may use it directly.
+        damping_ratio_zeta = round(random.uniform(0.05, 0.7), 3)
 
-    # Step B: Determine the base excitation frequency from the chosen frequency ratio
-    omega = freq_ratio_r * omega_n
-    base_freq_hz = omega / (2 * math.pi)
+        omega_n_exact = math.sqrt(stiffness / mass)
+        # The base frequency is STATED to 2 dp; omega follows from it.
+        base_freq_hz = round(freq_ratio_r * omega_n_exact / (2 * math.pi), 2)
 
-    # Step C: Convert base amplitude to meters for calculation
-    base_amplitude_Y_m = base_amplitude_Y_mm / 1000.0
+        omega_n = _hu(omega_n_exact, precision)
+        omega = _hu(base_freq_hz * 2 * math.pi, precision)
+        r = _hu(omega / omega_n, precision)
 
-    # Step D: Calculate the displacement transmissibility ratio (TR)
-    tr_num = 1 + (2 * damping_ratio_zeta * freq_ratio_r)**2
-    tr_den = (1 - freq_ratio_r**2)**2 + (2 * damping_ratio_zeta * freq_ratio_r)**2
+        base_amplitude_Y_m = base_amplitude_Y_mm / 1000.0
 
-    # Avoid division by zero, although highly unlikely with these random ranges
-    if tr_den == 0:
-        transmissibility_ratio = float('inf')
+        two_zeta_r_sq = (2 * damping_ratio_zeta * r) ** 2
+        tr_num = _hu(1 + two_zeta_r_sq, precision)
+        tr_den = _hu((1 - r ** 2) ** 2 + two_zeta_r_sq, precision)
+        if tr_den <= 0:
+            continue
+        tr_exact = math.sqrt(tr_num / tr_den)
+
+        # A transmissibility of 0.056 printed to 3 dp is two significant
+        # figures - not gradeable. Quote both answers to at least four
+        # significant figures.
+        tr_dp = max(3, 3 - math.floor(math.log10(abs(tr_exact))))
+        if _is_display_tie(tr_exact, tr_dp):
+            continue
+        transmissibility_ratio = _hu(tr_exact, tr_dp)
+
+        x_exact = transmissibility_ratio * base_amplitude_Y_mm      # mm
+        x_dp = max(3, 3 - math.floor(math.log10(abs(x_exact))))
+        if (_is_display_tie(x_exact, x_dp)
+                or _is_display_tie(omega / omega_n, precision)):
+            continue
+        amplitude_X_mm = _hu(x_exact, x_dp)
+        break
     else:
-        transmissibility_ratio = math.sqrt(tr_num / tr_den)
-    
-    # Step E: Calculate the absolute amplitude of the instrument's vibration
-    amplitude_X_m = transmissibility_ratio * base_amplitude_Y_m
-    amplitude_X_mm = amplitude_X_m * 1000.0
+        raise RuntimeError(
+            "vibration_transmissibility: no closing sample in 200 draws")
 
-    # 3. Generate the question and solution strings
-    
+    # --- invariants (T7) ---------------------------------------------------
+    assert 0.0 < damping_ratio_zeta < 1.0, (
+        f"system not underdamped: zeta = {damping_ratio_zeta}")
+    assert transmissibility_ratio > 0.0, (
+        f"non-positive transmissibility: {transmissibility_ratio}")
+    # TR = 1 exactly at r = sqrt(2) for every zeta, and the isolation region
+    # r > sqrt(2) is precisely where TR < 1. Allow one display step of slack
+    # so an instance sitting on the crossover is not a false failure.
+    _step = 10.0 ** (-tr_dp)
+    if r > math.sqrt(2) + _step:
+        assert transmissibility_ratio < 1.0 + _step, (
+            f"r = {r} is in the isolation region but TR = "
+            f"{transmissibility_ratio}")
+    elif r < math.sqrt(2) - _step:
+        assert transmissibility_ratio > 1.0 - _step, (
+            f"r = {r} is below the crossover but TR = "
+            f"{transmissibility_ratio}")
+
     question = (
         f"A sensitive instrument of mass {mass} kg is supported by an isolation mount. "
         f"The mount has an effective stiffness of {stiffness:,.0f} N/m and provides a damping "
         f"ratio of {damping_ratio_zeta}.\n\n"
         f"The foundation on which the instrument is placed is vibrating harmonically at a frequency of "
-        f"{round(base_freq_hz, 2)} Hz with an amplitude of {base_amplitude_Y_mm} mm.\n\n"
+        f"{base_freq_hz} Hz with an amplitude of {base_amplitude_Y_mm} mm.\n\n"
         f"Determine:\n"
         f"1. The displacement transmissibility ratio.\n"
         f"2. The absolute amplitude of vibration of the instrument in millimeters."
@@ -348,33 +462,35 @@ def template_vibration_transmissibility():
         f"Mass (m) = {mass} kg\n"
         f"Stiffness (k) = {stiffness:,.0f} N/m\n"
         f"Damping Ratio (zeta) = {damping_ratio_zeta}\n"
-        f"Base Vibration Frequency (f) = {round(base_freq_hz, 2)} Hz\n"
+        f"Base Vibration Frequency (f) = {base_freq_hz} Hz\n"
         f"Base Vibration Amplitude (Y) = {base_amplitude_Y_mm} mm = {base_amplitude_Y_m} m\n\n"
 
         f"**Step 1:** Calculate the system's undamped natural frequency (omega_n).\n"
-        f"omega_n = sqrt(k / m) = sqrt({stiffness:,.0f} / {mass}) = {round(omega_n, precision)} rad/s\n\n"
+        f"omega_n = sqrt(k / m) = sqrt({stiffness:,.0f} / {mass}) = {omega_n} rad/s\n\n"
 
         f"**Step 2:** Convert the base vibration frequency to rad/s and find the frequency ratio (r).\n"
-        f"Base frequency (omega) = f * 2 * pi = {round(base_freq_hz, 2)} * 2 * pi = {round(omega, precision)} rad/s\n"
-        f"Frequency ratio (r) = omega / omega_n = {round(omega, precision)} / {round(omega_n, precision)} = {round(freq_ratio_r, precision)}\n\n"
+        f"Base frequency (omega) = f * 2 * pi = {base_freq_hz} * 2 * pi = {omega} rad/s\n"
+        f"Frequency ratio (r) = omega / omega_n = {omega} / {omega_n} = {r}\n\n"
 
         f"**Step 3:** Calculate the displacement transmissibility ratio (TR).\n"
         f"The formula is: TR = sqrt( (1 + (2*zeta*r)^2) / ( (1 - r^2)^2 + (2*zeta*r)^2 ) )\n"
         f"Let's calculate the terms:\n"
-        f"r = {round(freq_ratio_r, precision)}\n"
+        f"r = {r}\n"
         f"zeta = {damping_ratio_zeta}\n"
-        f"Numerator = 1 + (2 * {damping_ratio_zeta} * {round(freq_ratio_r, precision)})^2 = {round(tr_num, precision)}\n"
-        f"Denominator = (1 - ({round(freq_ratio_r, precision)})^2)^2 + (2 * {damping_ratio_zeta} * {round(freq_ratio_r, precision)})^2 = {round(tr_den, precision)}\n"
-        f"TR = sqrt({round(tr_num, precision)} / {round(tr_den, precision)}) = {round(transmissibility_ratio, precision)}\n\n"
+        f"Numerator = 1 + (2 * {damping_ratio_zeta} * {r})^2 = {tr_num}\n"
+        f"Denominator = (1 - ({r})^2)^2 + (2 * {damping_ratio_zeta} * {r})^2 = {tr_den}\n"
+        f"TR = sqrt({tr_num} / {tr_den}) = {transmissibility_ratio:.{tr_dp}f}\n\n"
 
         f"**Step 4:** Calculate the absolute amplitude of the instrument (X).\n"
         f"The relationship is X = TR * Y.\n"
-        f"X = {round(transmissibility_ratio, precision)} * {base_amplitude_Y_mm} mm\n"
-        f"X = {round(amplitude_X_mm, precision)} mm\n\n"
+        f"X = {transmissibility_ratio:.{tr_dp}f} * {base_amplitude_Y_mm} mm = "
+        f"{amplitude_X_mm:.{x_dp}f} mm\n\n"
 
         f"**Answer:**\n"
-        f"The displacement transmissibility ratio is **{round(transmissibility_ratio, 3)}**.\n"
-        f"The absolute amplitude of the instrument's vibration is **{round(amplitude_X_mm, 3)} mm**."
+        f"The displacement transmissibility ratio is "
+        f"**{transmissibility_ratio:.{tr_dp}f}**.\n"
+        f"The absolute amplitude of the instrument's vibration is "
+        f"**{amplitude_X_mm:.{x_dp}f} mm**."
     )
 
     return question, solution

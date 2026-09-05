@@ -1,6 +1,71 @@
 import random
 import math
+from decimal import Decimal, ROUND_HALF_UP
+
 from data.templates.branches.mechanical_engineering.constants import SHEAR_MODULUS_VALUES
+
+
+# Verifier tolerances (D1.3), keyed by template id. Relative.
+TEMPLATE_TOLERANCES = {
+    # The diameter is quoted to 2 dp in mm over a 19-67 mm range, so half a
+    # unit in the last printed place is at most 2.6e-4 relative. 1e-3 sits
+    # above that display floor and far below the defect this item carried,
+    # where identical printed operands ("d = 2 * 0.0186") produced different
+    # printed answers across seeds.
+    "template_shaft_design_power": 1e-3,
+    # The angle of twist is quoted to five significant figures in radians, so
+    # half a unit in the last printed place is at most 5e-5 relative anywhere
+    # in the 0.006-0.79 rad range. 2e-3 clears that and the ~5e-7 the stated
+    # six-figure J values contribute, with two orders of magnitude to spare.
+    "template_composite_shafts_series": 2e-3,
+    # Measured over 2,000 seeds: agreement floor 1.40e-3, detection floor 1%.
+    # The display floor really is under 2e-5, but display is not what binds
+    # here - the trace legitimately consumes a length ratio it states to 3 dp,
+    # and the oracle solves the system from the exact lengths instead, so the
+    # two differ by that stated rounding. The earlier 1e-4 declaration was 14x
+    # below the agreement floor and was argued from display alone.
+    "template_statically_indeterminate_shaft": 5e-3,
+}
+
+
+def _hu(x, places):
+    """Round half-up to `places` dp, resolving the tie in DECIMAL.
+
+    `round()` resolves a half-way tie on the binary value and disagrees with a
+    reader doing decimal arithmetic (spec P2 as amended, DECISIONS D-012).
+    """
+    q = Decimal(1).scaleb(-places)
+    d = x if isinstance(x, Decimal) else Decimal(repr(x))
+    v = d.quantize(q, rounding=ROUND_HALF_UP)
+    return int(v) if places == 0 else float(v)
+
+
+def _as_printed(x, spec):
+    """The value a reader recovers from `x` when it is printed with `spec`.
+
+    P2 asks that the stored value and the printed value be the SAME value.
+    Rounding alone does not achieve that: a float one ulp away from its own
+    printed form puts the template and the reader on opposite sides of a
+    display tie (D-016 part 2).
+    """
+    return float(format(x, spec))
+
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where no rounding convention is defensible - a
+    decimal reader applying half-up and a binary reader applying `round()`
+    disagree, and the printed line closes for only one of them. Such instances
+    are resampled rather than resolved (D-016).
+
+    A narrow BAND is quarantined rather than a point, because two independent
+    evaluations of the same exact quantity differ by a few ulps and an exact
+    rational tie lands on opposite sides of them.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
 
 
 # Template 1 (Easy)
@@ -236,51 +301,97 @@ def template_shaft_design_power():
         tau_allow = (T * c) / J
         For a solid shaft, this simplifies to: c = ( (2 * T) / (pi * tau) )^(1/3)
 
+    Trace integrity (Phase 1, P2 as amended):
+        Every quantity that is displayed and then consumed is bound through its
+        own display, so the operand a solver reads IS the operand the chain
+        uses. Step 4 previously printed "d = 2 * <c to 4 dp> = <d from the
+        UNROUNDED c>", which made 30% of its probed lines non-closing and, more
+        damningly, let two seeds print the identical operand "d = 2 * 0.0186"
+        and different answers (0.0371 and 0.0373). The radius is now carried at
+        5 dp, so doubling it is exact and the metre-to-millimetre conversion is
+        exact as well: 5 dp in metres IS 2 dp in millimetres.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the minimum shaft diameter.
             - str: A step-by-step solution to the design problem.
     """
-    # 1. Parameterize the inputs with random values
-    power_kw = round(random.uniform(10.0, 500.0), 1)
-    allowable_stress_mpa = random.randint(40, 120)
-    
-    # Randomly choose to provide frequency in Hz or RPM to add variety
-    use_rpm = random.choice([True, False])
-    if use_rpm:
-        frequency_rpm = random.randint(500, 3000)
-        frequency_hz = frequency_rpm / 60.0
-        frequency_str = f"{frequency_rpm} RPM"
+    precision = 2          # mm, the answer's precision
+    # The radius is displayed at 6 dp, not 5. At 5 dp, doubling it put the
+    # diameter on a 0.02 mm grid, so only EVEN hundredths of a millimetre were
+    # reachable and the item's distinct-answer count fell 29% at 5,000 seeds -
+    # a P6 regression that a 1,000-seed measurement cannot see, because the
+    # count saturates. At 6 dp the diameter steps by 0.002 mm and every
+    # hundredth is reachable.
+    C_DP = 6
+
+    for _attempt in range(200):
+        power_kw = round(random.uniform(10.0, 500.0), 1)
+        allowable_stress_mpa = random.randint(40, 120)
+
+        use_rpm = random.choice([True, False])
+        if use_rpm:
+            frequency_rpm = random.randint(500, 3000)
+            # The frequency is STATED to 2 dp, so 2 dp is what the chain uses.
+            frequency_hz = _hu(frequency_rpm / 60.0, 2)
+            frequency_str = f"{frequency_rpm} RPM"
+        else:
+            frequency_hz = _hu(random.randint(10, 100), 2)
+            frequency_rpm = frequency_hz * 60
+            frequency_str = f"{frequency_hz:.0f} Hz"
+
+        power_w = _hu(power_kw * 1000, 0)
+        # An integer number of MPa scaled by 1e6 is exact and ".1e" displays it
+        # losslessly, so no display binding is needed here.
+        allowable_stress_pa = allowable_stress_mpa * 1e6
+
+        # The torque and c^3 are displayed and then consumed, so their display
+        # precision has to be fine enough not to move the answer. At 2 dp and
+        # four significant figures respectively they moved the last digit of
+        # the 2-dp diameter on 13.6% of draws - c ~ T^(1/3) and c ~ (c^3)^(1/3)
+        # so both feed straight through. 4 dp and six significant figures put
+        # the combined effect three orders below one display step.
+        torque = _hu(power_w / (2 * math.pi * frequency_hz), 4)
+        c_cubed = _as_printed((2 * torque) / (math.pi * allowable_stress_pa),
+                              ".5e")
+        c_exact = c_cubed ** (1 / 3)
+        if _is_display_tie(c_exact, C_DP):
+            continue
+        c_radius_m = _hu(c_exact, C_DP)
+        # Doubling a 6-dp value is exact at 6 dp. The millimetre conversion is
+        # then a genuine rounding (6 dp in metres is 3 dp in mm), so it carries
+        # its own tie guard.
+        d_diameter_m = _hu(c_radius_m * 2, C_DP)
+        if _is_display_tie(d_diameter_m * 1000, precision):
+            continue
+        d_diameter_mm = _hu(d_diameter_m * 1000, precision)
+        # P1 in one line: the answer reachable from the stated GIVENS must be
+        # the answer reachable through the stated INTERMEDIATES. The trace
+        # legitimately carries a 2-dp torque and a 4-significant-figure c^3
+        # (both printed before use, so P3 holds), but on a value sitting near
+        # a 2-dp boundary those roundings can move the last digit: seed 11230
+        # gave 9.13 mm through the intermediates and 9.12 mm from the givens
+        # (Phase 1 review A, finding F-2). Resample rather than tolerate it -
+        # widening the verifier tolerance to cover this would have raised the
+        # smallest detectable reasoning error from 0.2% to 0.5%.
+        _d_from_givens = 2 * ((2 * (power_w / (2 * math.pi * frequency_hz)))
+                              / (math.pi * allowable_stress_pa)) ** (1 / 3) * 1000
+        if _hu(_d_from_givens, precision) != d_diameter_mm:
+            continue
+        break
     else:
-        frequency_hz = random.randint(10, 100)
-        frequency_rpm = frequency_hz * 60
-        frequency_str = f"{frequency_hz} Hz"
+        raise RuntimeError("shaft_design_power: no closing sample in 200 draws")
 
-    # Standardize precision for final outputs
-    precision = 2
+    # --- invariants (T7) ---------------------------------------------------
+    assert torque > 0.0, f"non-positive torque: {torque}"
+    assert 0.003 <= c_radius_m <= 0.10, f"shaft radius implausible: {c_radius_m}"
+    # The designed shaft must actually meet the stress limit it was sized to:
+    # tau = 2*T/(pi*c^3) should return the allowable stress. Allow 1% for the
+    # display roundings the trace deliberately carries.
+    assert abs(2 * torque / (math.pi * c_radius_m ** 3)
+               - allowable_stress_pa) <= 0.01 * allowable_stress_pa, (
+        f"designed shaft does not meet the allowable stress: c={c_radius_m}")
 
-    # 2. Perform the core calculations for the solution
-    
-    # Step A: Convert primary units to base SI units (W, Pa, Hz)
-    power_w = power_kw * 1000
-    allowable_stress_pa = allowable_stress_mpa * 1e6
-    
-    # Step B: Calculate the torque (T) on the shaft using the power formula
-    # P = 2 * pi * f * T  =>  T = P / (2 * pi * f)
-    torque = power_w / (2 * math.pi * frequency_hz)
-    
-    # Step C: Calculate the required radius (c) using the rearranged torsion formula
-    # tau = (T*c) / J = (T*c) / (pi/2 * c^4) = 2*T / (pi*c^3)
-    # c^3 = (2 * T) / (pi * tau)
-    c_cubed = (2 * torque) / (math.pi * allowable_stress_pa)
-    c_radius_m = c_cubed ** (1/3)
-    
-    # Step D: Calculate the diameter in meters and then convert to millimeters
-    d_diameter_m = c_radius_m * 2
-    d_diameter_mm = d_diameter_m * 1000
-
-    # 3. Generate the question and solution strings
-    
     question = (
         f"A motor is required to transmit {power_kw} kW of power at a rotational speed of {frequency_str}. "
         f"If the solid circular shaft is to be made from a material with an allowable shearing stress of {allowable_stress_mpa} MPa, "
@@ -300,31 +411,31 @@ def template_shaft_design_power():
 
     if use_rpm:
         solution += (
-            f"  - Frequency (f) = {frequency_rpm} RPM = {frequency_rpm} / 60 = {round(frequency_hz, 2)} Hz\n\n"
+            f"  - Frequency (f) = {frequency_rpm} RPM = {frequency_rpm} / 60 = {frequency_hz:.2f} Hz\n\n"
         )
     else:
-        solution += f"  - Frequency (f) = {frequency_hz} Hz\n\n"
+        solution += f"  - Frequency (f) = {frequency_str}\n\n"
 
     solution += (
         f"**Step 2:** Calculate the torque (T) exerted on the shaft.\n"
         f"The relationship between power, torque, and frequency is P = 2 * pi * f * T.\n"
         f"Rearranging for torque: T = P / (2 * pi * f)\n"
-        f"T = {power_w} / (2 * pi * {round(frequency_hz, 2)}) = {round(torque, 2)} N.m\n\n"
-        
+        f"T = {power_w} / (2 * pi * {frequency_hz:.2f}) = {torque:.4f} N.m\n\n"
+
         f"**Step 3:** Determine the required shaft radius (c) using the torsion formula.\n"
         f"The formula for maximum stress in a solid shaft is tau = (T * c) / J, where J = (pi/2) * c^4.\n"
         f"This simplifies to tau = 2 * T / (pi * c^3).\n"
         f"Rearranging to solve for the radius: c^3 = (2 * T) / (pi * tau_allow)\n"
-        f"c^3 = (2 * {round(torque, 2)}) / (pi * {allowable_stress_pa:.1e}) = {c_cubed:.3e} m^3\n"
-        f"c = ({c_cubed:.3e})^(1/3) = {round(c_radius_m, 4)} m\n\n"
+        f"c^3 = (2 * {torque:.4f}) / (pi * {allowable_stress_pa:.1e}) = {c_cubed:.5e} m^3\n"
+        f"c = ({c_cubed:.5e})^(1/3) = {c_radius_m:.{C_DP}f} m\n\n"
 
         f"**Step 4:** Calculate the minimum diameter from the radius.\n"
         f"Diameter (d) = 2 * c\n"
-        f"d = 2 * {round(c_radius_m, 4)} = {round(d_diameter_m, 4)} m\n"
-        f"In millimeters, d = {round(d_diameter_mm, precision)} mm\n\n"
-        
+        f"d = 2 * {c_radius_m:.{C_DP}f} = {d_diameter_m:.{C_DP}f} m\n"
+        f"In millimeters, d = {d_diameter_m:.{C_DP}f} * 1000 = {d_diameter_mm:.{precision}f} mm\n\n"
+
         f"**Answer:**\n"
-        f"The minimum required diameter for the solid circular shaft is {round(d_diameter_mm, precision)} mm."
+        f"The minimum required diameter for the solid circular shaft is {d_diameter_mm:.{precision}f} mm."
     )
 
     return question, solution
@@ -358,9 +469,7 @@ def template_composite_shafts_series():
     # Filter for strong materials (Metals, G > 20 GPa) to ensure elastic behavior
     STRONG_MATERIALS = {k: v for k, v in SHEAR_MODULUS_VALUES.items() if v > 20.0}
     
-    # Fallback if dictionary is empty
-    if not STRONG_MATERIALS:
-        STRONG_MATERIALS = {"Structural Steel": 79.3, "Aluminum Alloy": 26.0}
+    assert STRONG_MATERIALS, "SHEAR_MODULUS_VALUES has no material above 20 GPa"
 
     # Properties for Segment 1 (AB)
     l1 = round(random.uniform(0.5, 2.5), 2)
@@ -372,26 +481,61 @@ def template_composite_shafts_series():
     d2 = random.randint(30, d1) # Ensure d2 is not larger than d1
     mat2_name, g2_gpa = random.choice(list(STRONG_MATERIALS.items()))
     
-    # Standardize precision for final outputs
-    precision = 4
+    # The segment angles are displayed at PHI_DP and then summed, so the
+    # sum is taken over the DISPLAYED values and is exact at PHI_DP. Step 4
+    # previously printed the two segments at 5 dp and their total at 4 dp,
+    # rounded from the unrounded sum - a double rounding whose printed line
+    # disagreed with its own operands verbatim on 89.9% of instances and
+    # failed closure on 4.85% (phase0_baseline.md claim 6).
+    #  Calculations for Segment 1 (AB)
+    c1_m = d1 / 2000.0                       # exact: an integer over 2000
+    g1_pa = _as_printed(g1_gpa * 1e9, ".2e")
+    # J is displayed and then consumed, so it is bound through its display.
+    # At ".3e" that display carried only four significant figures, and since
+    # phi ~ 1/J it put ~5e-4 of relative error into every segment angle -
+    # enough to move the last printed digit of the smallest totals. ".5e"
+    # costs nothing and drops it to ~5e-7.
+    j1 = _as_printed((math.pi / 2) * (c1_m ** 4), ".5e")
+    phi1_exact = (torque * l1) / (j1 * g1_pa)
 
-    # 2. Perform the core calculations
-    
-    #  Calculations for Segment 1 (AB) 
-    c1_m = d1 / 2000.0
-    g1_pa = g1_gpa * 1e9
-    j1 = (math.pi / 2) * (c1_m ** 4)
-    phi1_rad = (torque * l1) / (j1 * g1_pa)
-
-    #  Calculations for Segment 2 (BC) 
+    #  Calculations for Segment 2 (BC)
     c2_m = d2 / 2000.0
-    g2_pa = g2_gpa * 1e9
-    j2 = (math.pi / 2) * (c2_m ** 4)
-    phi2_rad = (torque * l2) / (j2 * g2_pa)
-    
-    #  Total Angle of Twist 
-    phi_total_rad = phi1_rad + phi2_rad
-    phi_total_deg = math.degrees(phi_total_rad)
+    g2_pa = _as_printed(g2_gpa * 1e9, ".2e")
+    j2 = _as_printed((math.pi / 2) * (c2_m ** 4), ".5e")
+    phi2_exact = (torque * l2) / (j2 * g2_pa)
+
+    #  Total Angle of Twist
+    #
+    # The total twist spans 0.006-0.8 rad, so a fixed 5 dp gave the smallest
+    # answers three significant figures and made one instance in a hundred
+    # unreachable from the question at that precision. Quote five significant
+    # figures instead, and give the segments the SAME precision so their
+    # printed sum is exact.
+    PHI_DP = max(5, 4 - math.floor(math.log10(phi1_exact + phi2_exact)))
+    phi1_rad = _hu(phi1_exact, PHI_DP)
+    phi2_rad = _hu(phi2_exact, PHI_DP)
+    phi_total_rad = _hu(phi1_rad + phi2_rad, PHI_DP)      # exact at PHI_DP
+    DEG_DP = max(4, 4 - math.floor(math.log10(math.degrees(phi_total_rad))))
+    phi_total_deg = _hu(math.degrees(phi_total_rad), DEG_DP)
+
+    # --- invariants (T7) ---------------------------------------------------
+    # The series total is the algebraic sum of the segment twists, exactly.
+    assert phi_total_rad == _hu(phi1_rad + phi2_rad, PHI_DP), (
+        f"total twist is not the sum of the segments: "
+        f"{phi1_rad} + {phi2_rad} != {phi_total_rad}")
+    # The segment that twists more is the one with the larger L/(d^4*G) - but
+    # only assert it where the two are actually separable. At seed 14556 the
+    # segments differ by 5e-5 relative (0.06868014 vs 0.06868376 rad), so they
+    # round to the SAME 5-dp value while the exact proxy still orders them, and
+    # a strict correspondence fires on a tie rather than on a defect. Found at
+    # 20,000 seeds; invisible at 1,000.
+    _k1 = l1 / (d1 ** 4 * g1_gpa)
+    _k2 = l2 / (d2 ** 4 * g2_gpa)
+    if abs(phi1_exact - phi2_exact) > 1e-6 * max(phi1_exact, phi2_exact):
+        assert (phi1_exact > phi2_exact) == (_k1 > _k2), (
+            "segment twist ordering contradicts L/(d^4*G)")
+    assert 0.0 < phi_total_rad < 2 * math.pi, (
+        f"total angle of twist implausible: {phi_total_rad} rad")
 
     # 3. Generate the question and solution strings
     
@@ -418,25 +562,25 @@ def template_composite_shafts_series():
 
         f"**Step 2:** Calculate Angle of Twist for Segment AB (phi_AB)\n"
         f"Convert units: c1 = {d1}/2 mm = {c1_m} m; G1 = {g1_gpa} GPa = {g1_pa:.2e} Pa\n"
-        f"Polar Moment of Inertia (J1) = (pi/2) * c1^4 = (pi/2) * ({c1_m})^4 = {j1:.3e} m^4\n"
+        f"Polar Moment of Inertia (J1) = (pi/2) * c1^4 = (pi/2) * ({c1_m})^4 = {j1:.5e} m^4\n"
         f"Angle of Twist (phi_AB) = (T * L1) / (J1 * G1)\n"
-        f"phi_AB = ({torque} * {l1}) / ({j1:.3e} * {g1_pa:.2e}) = {round(phi1_rad, precision + 1)} radians\n\n"
+        f"phi_AB = ({torque} * {l1}) / ({j1:.5e} * {g1_pa:.2e}) = {phi1_rad:.{PHI_DP}f} radians\n\n"
         
         f"**Step 3:** Calculate Angle of Twist for Segment BC (phi_BC)\n"
         f"Convert units: c2 = {d2}/2 mm = {c2_m} m; G2 = {g2_gpa} GPa = {g2_pa:.2e} Pa\n"
-        f"Polar Moment of Inertia (J2) = (pi/2) * c2^4 = (pi/2) * ({c2_m})^4 = {j2:.3e} m^4\n"
+        f"Polar Moment of Inertia (J2) = (pi/2) * c2^4 = (pi/2) * ({c2_m})^4 = {j2:.5e} m^4\n"
         f"Angle of Twist (phi_BC) = (T * L2) / (J2 * G2)\n"
-        f"phi_BC = ({torque} * {l2}) / ({j2:.3e} * {g2_pa:.2e}) = {round(phi2_rad, precision + 1)} radians\n\n"
+        f"phi_BC = ({torque} * {l2}) / ({j2:.5e} * {g2_pa:.2e}) = {phi2_rad:.{PHI_DP}f} radians\n\n"
         
         f"**Step 4:** Calculate Total Angle of Twist at End C\n"
         f"phi_total = phi_AB + phi_BC\n"
-        f"phi_total = {round(phi1_rad, precision + 1)} + {round(phi2_rad, precision + 1)} = {round(phi_total_rad, precision)} radians\n"
+        f"phi_total = {phi1_rad:.{PHI_DP}f} + {phi2_rad:.{PHI_DP}f} = {phi_total_rad:.{PHI_DP}f} radians\n"
         f"To convert to degrees: Angle_deg = Angle_rad * (180 / pi)\n"
-        f"phi_total = {round(phi_total_rad, precision)} * (180 / pi) = {round(phi_total_deg, precision)} degrees\n\n"
+        f"phi_total = {phi_total_rad:.{PHI_DP}f} * (180 / pi) = {phi_total_deg:.{DEG_DP}f} degrees\n\n"
         
         f"**Answer:**\n"
-        f"The total angle of twist at the free end C is {round(phi_total_rad, precision)} radians, "
-        f"or {round(phi_total_deg, precision)} degrees."
+        f"The total angle of twist at the free end C is {phi_total_rad:.{PHI_DP}f} radians, "
+        f"or {phi_total_deg:.{DEG_DP}f} degrees."
     )
 
     return question, solution
@@ -464,33 +608,63 @@ def template_statically_indeterminate_shaft():
     """
     # 1. Parameterize the inputs with physically realistic values
     
+    precision = 2          # N.m, the precision the reactions are stated to
     total_length = round(random.uniform(2.0, 5.0), 2)
     # Reduce max torque to 5000 Nm to ensure elastic behavior for given diameters
     applied_torque = round(random.uniform(500.0, 5000.0), -2) 
     diameter = random.randint(50, 150) # mm
     
-    # Ensure the torque is applied at a non-trivial location
-    pos_L_AC = round(random.uniform(0.2 * total_length, 0.8 * total_length), 2)
-    pos_L_BC = total_length - pos_L_AC
+    # Ensure the torque is applied at a non-trivial location. The draw is
+    # repeated if it puts T_A exactly on a display tie - see below.
+    for _attempt in range(200):
+        pos_L_AC = round(
+            random.uniform(0.2 * total_length, 0.8 * total_length), 2)
+        # Bound through its own 2-dp display: a float subtraction of two 2-dp
+        # values is not exactly 2 dp (3.5 - 1.71 gives 1.7899999999999998).
+        pos_L_BC = _hu(total_length - pos_L_AC, 2)
+        if pos_L_BC <= 0:
+            continue
+        _divisor = _hu(1 + _hu(pos_L_AC / pos_L_BC, 3), 3)
+        if not _is_display_tie(applied_torque / _divisor, 2):
+            break
+    else:
+        raise RuntimeError(
+            "statically_indeterminate_shaft: no closing position in 200 draws")
 
     # FILTER: Select only strong materials (Metals, G > 20 GPa) to avoid failure
     # This prevents assigning 5000 Nm of torque to a Nylon shaft.
     strong_materials = {k: v for k, v in SHEAR_MODULUS_VALUES.items() if v > 20.0}
-    if not strong_materials:
-        # Fallback if dictionary is empty or has no metals
-        material_name, shear_modulus_gpa = "Structural Steel", 79.3
-    else:
-        material_name, shear_modulus_gpa = random.choice(list(strong_materials.items()))
+    # P5: no silent fallback - an empty table is a bug, not a default.
+    assert strong_materials, "SHEAR_MODULUS_VALUES has no material above 20 GPa"
+    material_name, shear_modulus_gpa = random.choice(list(strong_materials.items()))
     
-    # Standardize precision for final outputs
-    precision = 2
-
     # 2. Perform the core calculations
-    # T_A = T_applied * (L_BC / L)
-    # T_B = T_applied * (L_AC / L)
-    
-    reaction_torque_A = applied_torque * (pos_L_BC / total_length)
-    reaction_torque_B = applied_torque * (pos_L_AC / total_length)
+    #
+    # Step 3 prints "T_A = T / <divisor> = <T_A>" with the divisor displayed at
+    # 3 dp while T_A was derived from the UNROUNDED ratio, which left 47% of
+    # probed lines non-closing (phase0_baseline.md NEW-2; seed 0 printed
+    # "3900 / 1.291 = 3021.85" against an exact 3020.91). The ratio is now
+    # bound to the 3 dp it is stated at and the chain consumes that value, so
+    # T_A is reachable from the printed operands; T_B then follows from
+    # statics on the stated T_A, exactly.
+    length_ratio = _hu(pos_L_AC / pos_L_BC, 3)
+    divisor = _hu(1 + length_ratio, 3)                  # exact at 3 dp
+    reaction_torque_A = _hu(applied_torque / divisor, precision)
+    reaction_torque_B = _hu(applied_torque - reaction_torque_A, precision)
+
+    # --- invariants (T7) ---------------------------------------------------
+    # Statics: the two reactions must carry the applied torque exactly, at the
+    # precision they are stated to.
+    assert reaction_torque_A + reaction_torque_B == applied_torque, (
+        f"statics violated: {reaction_torque_A} + {reaction_torque_B} "
+        f"!= {applied_torque}")
+    assert 0.0 < reaction_torque_A < applied_torque, (
+        f"reaction at A outside (0, T): {reaction_torque_A}")
+    # Compatibility: T_A * L_AC = T_B * L_BC, to within the 3-dp rounding of
+    # the length ratio that the trace deliberately carries.
+    assert abs(reaction_torque_A * pos_L_AC - reaction_torque_B * pos_L_BC) \
+        <= 0.002 * applied_torque * total_length, (
+        "compatibility violated: T_A*L_AC != T_B*L_BC")
 
     # 3. Generate the question and solution strings
     
@@ -530,8 +704,8 @@ def template_statically_indeterminate_shaft():
         f"T_B = T_A * ({pos_L_AC} / {pos_L_BC:.2f})\n"
         f"Substitute this into equation (1):\n"
         f"T_A + T_A * ({pos_L_AC} / {pos_L_BC:.2f}) = {int(applied_torque)}\n"
-        f"T_A * (1 + {pos_L_AC/pos_L_BC:.3f}) = {int(applied_torque)}\n"
-        f"T_A = {int(applied_torque)} / {1 + (pos_L_AC / pos_L_BC):.3f} = {reaction_torque_A:.{precision}f} N.m\n"
+        f"T_A * (1 + {length_ratio:.3f}) = {int(applied_torque)}\n"
+        f"T_A = {int(applied_torque)} / {divisor:.3f} = {reaction_torque_A:.{precision}f} N.m\n"
         f"Now find T_B:\n"
         f"T_B = {int(applied_torque)} - {reaction_torque_A:.{precision}f} = {reaction_torque_B:.{precision}f} N.m\n\n"
 
