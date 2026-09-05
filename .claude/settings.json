@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(python \"C:\\\\Users\\\\AYESHA~1.GUL\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-ayesha-gull01-OneDrive---Confiz-Limited-Desktop-EngTrace\\\\6dba27f8-9d13-4d19-835f-a3536458fb11\\\\scratchpad\\\\r3_verify_t23.py\")",
+      "PowerShell(python \"C:\\\\Users\\\\AYESHA~1.GUL\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-ayesha-gull01-OneDrive---Confiz-Limited-Desktop-EngTrace\\\\6dba27f8-9d13-4d19-835f-a3536458fb11\\\\scratchpad\\\\t23_review.py\")",
+      "Bash(python r1_factors.py)",
+      "PowerShell(python \"C:\\\\Users\\\\AYESHA~1.GUL\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-ayesha-gull01-OneDrive---Confiz-Limited-Desktop-EngTrace\\\\6dba27f8-9d13-4d19-835f-a3536458fb11\\\\scratchpad\\\\t23_derive.py\")",
+      "Bash(python r1_instances.py)",
+      "Bash(printf '\\\\n\\\\n')",
+      "Bash(cat \"C:/Users/AYESHA~1.GUL/AppData/Local/Temp/claude/c--Users-ayesha-gull01-OneDrive---Confiz-Limited-Desktop-EngTrace/6dba27f8-9d13-4d19-835f-a3536458fb11/scratchpad/t24_draft.py\")",
+      "Bash(python -c ' *)"
+    ]
+  }
+}
