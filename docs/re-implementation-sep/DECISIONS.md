@@ -479,6 +479,62 @@ regressions of the same size — the failure mode D-015 warns about, in a
 different check.
 
 
+---
+
+## D-020 — `damping_classification`: the strict flip rate is unchanged by design, and cannot be changed without D-004
+
+**Date:** 2026-09-05 · **Status:** DECIDED, but **flagged for Reviewer B**
+**Source:** Phase 1 implementation · **Refines D-010**
+
+D-010 prescribed: *state `c` to more digits (or state it as equal to the
+critical value) and drop the fragile `elif zeta == 1` float test.* Both were
+done. The float-equality test is gone - classification is now an exact
+comparison of two scaled integers, and `zeta` is computed for display only and
+gates nothing - and for a critically damped instance `c` **is** the critical
+value: both are stated to 2 dp and the trace prints
+`zeta = 3399.61 / 3399.61 = 1.0000`.
+
+**What did NOT change, and will not: the strict recomputation flip rate is
+still 1,676 in 5,000 (33.5%), identical to the pre-fix figure.**
+
+This is not a failed fix. It is a property of the item that no amount of stated
+precision can remove: `c_c = 2*sqrt(k*m)` is irrational for essentially every
+(k, m) the sampler draws, so **no finite decimal `c` can equal it exactly**.
+Stating `c` to 4 or 10 decimals shrinks the gap but never closes it, and a
+strict `c > c_c` test flips every critically damped instance regardless.
+
+The only construction that closes it is the one D-010 superseded: constrain the
+sample so `k*m` is a perfect square and `c_c` is exactly representable (D-004).
+The Phase 1 brief rules that out explicitly.
+
+**Why the item is nevertheless answerable — the measurement that settles it.**
+Over 5,000 seeds, computing `zeta` in 50-digit decimal from the stated `m`, `k`
+and `c`:
+
+| population | \|zeta - 1\| |
+|---|---|
+| critically damped (1,676 instances) | max **2.05e-5**, median 2.17e-7 |
+| everything else (3,324 instances) | min **0.150** |
+
+The two populations are separated by **more than four orders of magnitude**.
+Every critically damped instance has zeta = 1 to at least 4.7 decimal digits;
+no other instance comes within 0.15 of 1. Any solver applying any sane rule -
+"is zeta equal to 1 to the precision the data supports?" - lands on the gold
+label. Only exact float equality fails, and that rule is unanswerable in
+principle for this item, which is precisely what "ill-posed, not wrong" meant.
+
+**The 33.5% figure should therefore be retired as an acceptance metric for this
+template.** It measures the strictness of the comparison rule, not a property
+of the trace, and it will read 33.5% forever. The metric that means something
+is the separation above, and the T2 oracle's band test, which passes 1,000/1,000.
+
+**Flagged for Reviewer B (P6 guard).** The judgement that a 7,500x separation
+makes the item answerable is a pedagogical call, not a numerical one. If a
+domain reviewer disagrees, the remedy is to reopen D-004 and constrain the
+sample - which costs the natural-looking parameter values and needs its own
+sign-off.
+
+
 ## Open decisions
 
 | # | Decision | Needed before |
