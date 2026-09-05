@@ -314,7 +314,13 @@ def template_shaft_design_power():
             - str: A step-by-step solution to the design problem.
     """
     precision = 2          # mm, the answer's precision
-    C_DP = 5               # m, the radius display - exactly 3 finer than the mm
+    # The radius is displayed at 6 dp, not 5. At 5 dp, doubling it put the
+    # diameter on a 0.02 mm grid, so only EVEN hundredths of a millimetre were
+    # reachable and the item's distinct-answer count fell 29% at 5,000 seeds -
+    # a P6 regression that a 1,000-seed measurement cannot see, because the
+    # count saturates. At 6 dp the diameter steps by 0.002 mm and every
+    # hundredth is reachable.
+    C_DP = 6
 
     for _attempt in range(200):
         power_kw = round(random.uniform(10.0, 500.0), 1)
@@ -343,9 +349,12 @@ def template_shaft_design_power():
         if _is_display_tie(c_exact, C_DP):
             continue
         c_radius_m = _hu(c_exact, C_DP)
-        # Doubling a 5-dp value is exact at 5 dp, and 5 dp in metres is 2 dp in
-        # millimetres exactly, so neither of the next two lines can tie.
+        # Doubling a 6-dp value is exact at 6 dp. The millimetre conversion is
+        # then a genuine rounding (6 dp in metres is 3 dp in mm), so it carries
+        # its own tie guard.
         d_diameter_m = _hu(c_radius_m * 2, C_DP)
+        if _is_display_tie(d_diameter_m * 1000, precision):
+            continue
         d_diameter_mm = _hu(d_diameter_m * 1000, precision)
         break
     else:
