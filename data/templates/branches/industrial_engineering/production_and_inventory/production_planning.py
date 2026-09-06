@@ -173,14 +173,14 @@ def _t19_assign(times, CT):
                          "assigned": list(station),
                          "remaining_final": rem})
     return {
-        "schema_version": "1.2",
+        "schema_version": "1.3",
         "node_type": "decision",
         "node_id": "t19_greedy_station_assignment",
         "cardinality": "answer_bearing",
         "cardinality_symbol": "n",
         "termination": {"kind": "exhaustion",
                         "scope": "cumulative",
-                        "accumulator_symbol": "assigned",
+                        "accumulator_role": "committed",
                         "predicate_prose": ("every task in `universe` has been "
                                             "assigned to exactly one element"),
                         "universe": list(_T19_ORDER),
@@ -189,6 +189,13 @@ def _t19_assign(times, CT):
                         # withheld a task for the right reason (Reviewer D, F1).
                         "precedences": {x: list(_T19_PRED[x])
                                         for x in _T19_ORDER},
+                        # Each item's measure declared ONCE, so no trial can
+                        # restate it. Without this a trace can inflate a
+                        # duration in the trial where it wants the item
+                        # excluded and restore it where it wants it committed
+                        # -- every other invariant holds, and n, which is the
+                        # answer, comes out wrong (Reviewer D2, F3').
+                        "item_measures": {x: times[x] for x in _T19_ORDER},
                         "max_elements": len(_T19_ORDER),
                         "satisfied": True},
         # Type-level roles, so a verifier never reaches for a literal symbol
