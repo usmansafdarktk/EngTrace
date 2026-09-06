@@ -858,6 +858,101 @@ alongside the template count (D-023) and the exit-gate seed count (D-024,
 D-026).
 
 
+---
+
+## D-028 — `CP_PARAMS` had four defect classes, not one; and the fix introduced a fifth
+
+**Date:** 2026-09-06 · **Status:** DECIDED · **Source:** Phase C2
+
+The spec records one defect: B and C coefficients 10x too large. Correcting only
+it left seven rows still wrong.
+
+| Class | Mechanism | Rows |
+|---|---|---|
+| 1 | column heading (`10^3 B`, `10^6 C`) transcribed as part of the value | most |
+| 2 | coefficients matching no source | `O2`, `C2H2`, `C2H5OH`, `C3H6O`, `C6H14` |
+| 3 | column shift — `D`'s mantissa written into `C` | `NO2` |
+| 4 | gas-phase coefficients under a liquid key | `C6H6(l)`, `C7H8(l)`, `C6H14(l)`, `C3H6O(l)` |
+
+**And a fifth, mine.** Rewriting the table I transcribed `B`'s mantissa as 12.5
+where the original read 1.25, for `H2O(l)` and `H2SO4(l)` — the Class-1 defect
+committed by the person removing it. Caught by the C2.2 suite, not by review.
+An audit now compares every non-replaced row's mantissa against the original.
+
+**Method that worked, and should carry into C3:** two independent checks per
+row — NIST's Shomate fit (a *different* functional form, so agreement is
+evidence not tautology) and, where published, Smith-Van Ness's own `Cp298/R`
+self-check column. The second condemned `O2` outright: the row computes 4.175
+against a published 3.535.
+
+**Lesson:** a table that has just been corrected is exactly when a fresh
+transcription error is most likely and least likely to be looked for. The suite
+must refuse to pass an uncited row rather than skip it.
+
+---
+
+## D-029 — The C2.4 flame-temperature gate quotes the wrong reference
+
+**Date:** 2026-09-06 · **Status:** DECIDED · **Source:** Phase C2
+
+The spec's exit gate asks for methane/air "within the literature range" and
+quotes **~2200 K**. `template_adiabatic_flame_temperature` models a single
+balanced reaction with **no dissociation**, and for that model the published
+value is **2326.35 K**; 2224.25 K is the chemical-equilibrium value *with*
+dissociation (ETASR / arXiv:2503.11826, on disk).
+
+The template computes **2311 K** — within **0.6%** of the correct reference.
+Every fuel shows the same consistent positive offset against equilibrium
+figures, which is the signature of a modelling assumption, not a data defect.
+
+`SPEC-CHANGE`: the C2.4 gate should read 2326 K, or state that ~2200 K is the
+equilibrium value and not comparable to this item's model. Judging the item
+against 2200 K would have pushed someone to "fix" a correct template.
+
+---
+
+## D-030 — NIST replaces Smith-Van Ness as the primary on-disk source for C2
+
+**Date:** 2026-09-06 · **Status:** DECIDED (reversible) · **Source:** Phase C2
+
+The spec names Smith-Van Ness-Abbott primary with NIST as cross-check. **No
+fetchable, citable copy of SVN Table C.1 could be obtained** — accessible copies
+are Scribd and SlideShare, which cannot be downloaded and are not legitimate
+"edition + page" citations. Fabricating a page number would be the exact failure
+this project exists to prevent.
+
+**Decision: NIST Chemistry WebBook (SRD 69) is the primary on-disk source; the
+SVN functional form is retained.** 31 species are stored under
+`docs/references/nist_webbook/` so every citation resolves to a file.
+
+**Cost, accepted deliberately:** four rows are least-squares fits to NIST tables
+rather than transcriptions, and no longer match a textbook table a student might
+hold. Residuals 1.1-3.1%, each reported in the row's comment.
+
+**Reversible.** If a citable SVN copy is obtained, those four rows should be
+re-transcribed and the fits retired.
+
+---
+
+## D-031 — A dict's key ORDER can be part of the item pool's identity
+
+**Date:** 2026-09-06 · **Status:** DECIDED · **Source:** Phase C2
+
+`template_sensible_heat_temp_dependent_cp` draws its substance with
+`random.choice(list(CP_PARAMS.keys()))`. Regrouping `CP_PARAMS` by chemical
+family — purely cosmetic, and more readable — changed which substance **274 of
+300 seeds drew**.
+
+Order restored, with the reason recorded in the file so the next editor does not
+undo it.
+
+**Generalise before C3 and Phase 6:** any constants table consumed by
+`random.choice(list(...))` has its ORDER baked into the item pool. C3 touches
+~400 values across four branches and will be tempted to tidy exactly this way.
+Either freeze key order, or make the templates sample from an explicitly sorted
+list so order stops mattering — the second is better, and is a Phase 6 candidate.
+
+
 ## Open decisions
 
 | # | Decision | Needed before |
