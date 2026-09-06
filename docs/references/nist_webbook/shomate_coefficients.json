@@ -560,7 +560,14 @@
   "cp_298_liquid_tabulated": 135.69,
   "dHf_liquid_kJ_per_mol": 49.0,
   "dHf_uncertainty": 0.9,
-  "_note": "condensed phase page (Mask=2). The repo's C6H6(l) row computes 85.3, which is the GAS-phase value - the row carries gas coefficients under a liquid key."
+  "_note": "condensed phase page (Mask=2). The repo's C6H6(l) row computes 85.3, which is the GAS-phase value - the row carries gas coefficients under a liquid key.",
+  "cp_liquid_measurements": {
+   "293.15": 134.61,
+   "298.15": 135.69,
+   "303.15": 137.4,
+   "322.05": 139.9
+  },
+  "cp_liquid_sources": "Kalali 1987; Grolier, Roux-Desgranges 1993; Reddy 1986; Naziev, Bashirov 1986 - via NIST Chemistry WebBook condensed phase"
  },
  "C7H8(l)": {
   "cas": "108-88-3",
@@ -694,5 +701,22 @@
   "cp_298_liquid_tabulated": 75.3,
   "dHf_liquid_kJ_per_mol": -285.83,
   "_note": "liquid water Cp at 298.15 K; CODATA dHf -285.83 kJ/mol"
+ },
+ "Al2O3(s)": {
+  "cas": "1344-28-1",
+  "nist_id": "C1344281",
+  "ranges": [
+   {
+    "T_min": 298,
+    "T_max": 2327,
+    "A": 102.429,
+    "B": 38.7498,
+    "C": -15.9109,
+    "D": 2.628181,
+    "E": -3.007551
+   }
+  ],
+  "dHf_solid_kJ_per_mol": -1675.69,
+  "_note": "corundum, alpha phase, solid (Mask=2)"
  }
 }
