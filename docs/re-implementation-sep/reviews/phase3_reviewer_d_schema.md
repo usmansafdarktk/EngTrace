@@ -625,3 +625,256 @@ and most specs I could have been handed would not have survived this exercise.
 The qualification is that "implementable" here means implementable *for these
 two templates*; §4 does not yet specify a type, and the milestone model that §1
 says will be built on this document will discover that at the third template.
+
+---
+
+## 6. Round 2 — disposition of findings against schema 1.1
+
+**Frozen ref:** `9398ccc` on `redesign/phase3-trace-shape` · **Scope:** whether
+F1–F15 were actually addressed. Sections 1–5 above stand as the round 1 record
+and are not revised.
+
+**Round-1 contamination, for the permanent record.** My first command in round 1
+was `git show 953adc9 --stat`, which printed the full commit body before I could
+stop it, so I saw the Phase 3 commit message that the brief excluded. I did not
+read `phase3_summary.md`, `phase3_item_pool_impact.md`, either template source,
+or `tests/trace_schema/extract.py`. The message named the D-038 asymmetry and the
+two errors the author had caught; §2 and §9 of the spec state both independently,
+so I assess the leak as low-impact on the round-1 verdict — but the gate was
+weaker than designed, and the mitigation is to use `git show <sha>:<path>` with
+no `--stat`. In round 2 I read only the spec and the corpus at `9398ccc`.
+
+### Method
+
+I wrote a second verifier, `tests/trace_schema/reviewer_d_verifier_11.py`,
+**strictly roles-driven** — no literal template symbol name appears anywhere in
+its `iteration` logic — with `update_relation` evaluated through an AST walker
+restricted to §4.2's grammar (role identifiers, decimal literals, `+ - * /`,
+unary minus, parentheses; every other construct raises). `decimal-half-up` is
+implemented via `decimal.ROUND_HALF_UP`, explicitly not binary `round()`.
+
+```
+$ PYTHONIOENCODING=utf-8 python -m tests.trace_schema.reviewer_d_verifier_11 \
+      docs/re-implementation-sep/phase3_conformance/traces.json
+80 passed, 0 failed, 80 total
+  [CARRY_NOTE] x40 carry_notes['assigned'] UNCHECKED (s8.4)
+  [CARRY_NOTE] x40 carry_notes['remaining_initial'] UNCHECKED (s8.4)
+```
+
+— but only after exempting `decision` from the `roles` requirement. On a
+literal reading of §3.1 the first run was **40 passed, 40 failed**; see F16.
+
+### Disposition table
+
+| # | Finding (1.0) | Disposition |
+|---|---|---|
+| F1 | §8.6 precedence unverifiable | **ADDRESSED** |
+| F2 | empty-`elements` contradiction | **ADDRESSED** |
+| F3 | no `iteration` element table; type not reusable | **PARTIALLY ADDRESSED** |
+| F4 | display precision undeclared | **ADDRESSED** |
+| F5 | `predicate` normative but unevaluable | **ADDRESSED** |
+| F6 | no path/prose syntax in `carry` | **ADDRESSED** |
+| F7 | `quantity: "assigned"` collision | **ADDRESSED** |
+| F8 | container shape unspecified | **ADDRESSED** |
+| F9 | rounding mode unspecified | **ADDRESSED** |
+| F10 | §6.8 unimplementable | **ADDRESSED** |
+| F11 | `closes` specified twice | **ADDRESSED** |
+| F12 | `eligible` keys prose-only | **ADDRESSED** |
+| F13 | `node_id` rule untestable | **ADDRESSED** |
+| F14 | five open invariants | **ADDRESSED** (all five) |
+| F15 | 0.3% tolerance headroom unstated | **ADDRESSED** |
+
+Fourteen fully addressed, one partially, none unaddressed. One new defect (F16)
+found while testing the F3 fix.
+
+### Per-finding detail
+
+**F1 — ADDRESSED.** `termination.precedences` is carried as
+`{"a": [], "b": ["a"], "c": ["a"], "d": ["b","c"], "e": ["d"]}`, and §5.4.3b
+requires the bidirectional check. I verified sufficiency rather than accepting
+it: the relation keys exactly `universe` on all 40 traces, the recorded
+assignment order is a topological order of it on all 40, and **both** directions
+of 3b are computable and hold across all 342 trials in the corpus. Both
+directions are also *detectable*, which is the part that matters:
+
+```
+$ python -m tests.trace_schema.reviewer_d_verifier_11 <traces.json> --prec
+    distinct precedence relations across 40 traces: 1
+    traces whose precedences do not key the universe / violate order: 0 of 40
+    trials examined: 342
+    direction A (eligible entry with unmet precedences): 0
+    direction B (ready item absent from eligible)      : 0
+    control A (inject a not-yet-ready item into eligible): rejected ['DEC_PREC_IN']
+    control B (delete a ready item from eligible)       : rejected ['DEC_PREC_OUT', ...]
+```
+
+The fix does what round 1 asked and more: `eligible` is now independently
+derivable rather than trusted, which closes the round-1 observation that a
+wrongly-filtered `eligible` was indistinguishable from a correct one. **One
+caveat on evidence, not on the fix:** all 40 traces carry the *same* DAG, so 3b
+is exercised against exactly one precedence relation. The check is right; its
+coverage is one instance.
+
+**F2 — ADDRESSED.** §6.4 states `1 <= len(elements)` and the §3 "may be empty"
+sentence is gone; the only surviving occurrence of that phrase is the §6.4
+citation of the 1.0 defect. `grep -c "may be empty"` returns 1, at line 464,
+inside the change note.
+
+**F3 — PARTIALLY ADDRESSED.** The `iteration` half is genuinely fixed, and I
+confirmed it the way the coordinator asked — by hand-building an `iteration` node
+whose iterate is not called `y`. I renamed every symbol (`y_curr`→`S_cur`,
+`g_prev`→`phi_old`, `k`→`step`, `evaluation`→`probe`, frame `y`→`S`, `g`→`phi`),
+rebound `roles`, `evaluation_roles`, `symbol_precision` and `carry`, and left
+`update_relation` **untouched** — it is written over roles, so it needs no edit:
+
+```
+$ python -m tests.trace_schema.reviewer_d_verifier_11 <traces.json> --rename
+    element_symbols : ['step','S_old','phi_old','S_cur','phi_cur','S_new','delta','done','probe']
+    update_relation : iterate_curr - residual_curr * (iterate_curr - iterate_prev) / (...)
+    verdict         : PASSES (type is reusable)
+    control (broken update on the renamed node): rejected ['ITER_UPDATE', ...]
+```
+
+The control matters: the renamed node still *rejects* a corrupted update, so the
+pass is not vacuous. F3's `iteration` half is fixed, not relocated.
+
+**The `decision` half is not.** §5.1's element and trial tables still name
+literal symbols (`station_id`, `capacity`, `remaining_initial`, `trials`,
+`assigned`, `remaining_final`, `eligible`, `chosen`, `remaining_after`,
+`closes`), and §5.3/§5.4 are written against those names. No `decision` node in
+the corpus carries `roles` at all:
+
+```
+$ python -c "import json;rows=json.load(open('docs/re-implementation-sep/phase3_conformance/traces.json',encoding='utf-8'));lb=[r for r in rows if r['template_id']=='template_line_balancing_heuristic'];print('decision nodes with roles:',sum(1 for r in lb if 'roles' in r['trace_nodes']),'of',len(lb))"
+decision nodes with roles: 0 of 40
+```
+
+So my round-1 complaint has been **inverted rather than removed**: in 1.0
+`decision` had the normative element table and `iteration` did not; in 1.1
+`iteration` has roles and `decision` does not. A second bin-packing template that
+called its container a `bin` rather than a `station` still cannot bind to the
+type without editing a verifier — which is the exact defect F3 named. Since §10
+names two `iteration` candidates and no `decision` candidate, the practical cost
+is low today and the fix was correctly prioritised; but the type is still
+half-general and the document should say which half.
+
+**F4 — ADDRESSED.** `symbol_precision` is required and present on all 80 nodes;
+§7.1 says the place comes from it and is "**never** inferred from the data". My
+1.1 verifier derives every tolerance through `tol_of()`, which reads only that
+field — the round-1 hardcoded `DISPLAY_DP` map is gone. Coverage is correct
+rather than merely present: it carries the numeric element symbols and the
+evaluation-frame symbols, and omits only the non-numeric ones (`k`, `converged`,
+`evaluation`), which no tolerance depends on.
+
+**F5 — ADDRESSED.** `predicate` is gone as a field (`grep -c '"predicate"'` → 0);
+what remains is `predicate_prose`, and §3.2 declares the three prose fields
+never-normative with an explicit "a verifier must not parse any of them". The
+convergence test is now structured — `quantity_role` + `comparison` (`lt`/`le`)
++ `tolerance` — and my verifier evaluates §6.7 from those three fields with no
+string parsing anywhere. The `comparison` field is a genuine improvement I did
+not ask for: 1.0 hardcoded strict `<` in prose.
+
+**F6 — ADDRESSED.** `carry` and `carry_notes` are separate required fields, and
+§3.5 gives the path grammar normatively (identifiers joined by `.`, first
+segment a member of `element_symbols`, "no calls, no indices, no spaces"). The
+`decision` node now has `carry: {}` with both former prose entries in
+`carry_notes`, and they surface on the unchecked channel as shown above. The
+ambiguity is not resolved by a better heuristic — it is removed, which is the
+right kind of fix.
+
+**F7 — ADDRESSED.** `termination.scope: "cumulative"` plus
+`accumulator_symbol: "assigned"` on all 40 `decision` nodes, and §3.7 spells out
+that the per-element reading makes the node unsatisfiable. No guessing left.
+
+**F8 — ADDRESSED.** §3.0 states it explicitly, including the historical reason
+for the plural and — better than I asked — the forward rule that a multi-node
+template *must* raise `schema_version`. That converts my round-1 worry about a
+silent breaking change into a versioned one.
+
+**F9 — ADDRESSED.** `rounding: "decimal-half-up"` on all 80 nodes; §6 says a
+verifier "must not assume binary `round()`". I implemented it as
+`decimal.ROUND_HALF_UP` and all 80 pass. Still latent on gold (half-way
+instances are screened at generation) and still live for candidate scoring, as
+in round 1 — but now decided rather than ambiguous.
+
+**F10 — ADDRESSED.** §6 has exactly 8 numbered steps and none is prose
+agreement; it appears in §10 as a stated non-goal, with the "vacuous by
+construction because the prose is rendered from the node" argument preserved.
+§6 is now fully implementable end to end, which was the point.
+
+**F11 — ADDRESSED.** §5.1 states one rule, `closes == (chosen is null)`, with
+"One rule, no exceptions", and the §5.5 "except" clause is gone. The empty-
+`eligible` case is now explained rather than exempted (it is still
+`chosen: null`, so it still closes). My verifier implements the single rule and
+all 40 pass.
+
+**F12 — ADDRESSED.** `eligible_symbols` is a required `decision` field and §6.3
+extends homogeneity to `eligible` entries and to non-null `evaluation` frames.
+Homogeneity now reaches every nesting level in the schema; my verifier checks
+all four and all 80 pass.
+
+**F13 — ADDRESSED.** The rule is dropped, with §3.1 carrying an explicit
+"Removed in 1.1" note giving the `t04_*` false-positive as the reason.
+`grep -c "must not encode the element count"` → 0. Dropping an unenforceable
+normative rule is the right call over leaving it aspirational.
+
+**F14 — ADDRESSED, all five.** Verified against the regenerated corpus rather
+than against the spec text:
+
+```
+  iteration: index contiguous 1..n              : True   (s4.3.8, s8.5)
+  iteration: evaluation.iterate == iterate_next : True   (s4.3.6, s8.5)
+  decision:  max_elements >= len(universe)      : True   (s5.3)
+  decision:  capacity_constant true, and capacity actually constant : True (s5.4.8, s8.6)
+  preamble frame-internal geometry : declared a non-goal in s4.4 and s10
+```
+
+Four are now enforced invariants; the fifth (my H3, preamble `A`/`P`/`AR`) is
+handled the other way — promoted to an explicit non-goal in §4.4 and §10, with
+the reason that checking it would require an expression language for arbitrary
+engineering formulae. I accept that: an acknowledged limit is not the same
+defect as a silent gap, and it is the answer I would have given.
+
+**F15 — ADDRESSED.** §4.5 states the 4.985e-05 worst residual against the
+5.0e-05 tolerance, explains why (inputs already rounded to 3 dp), and warns that
+a verifier author tightening the tolerance "for safety" would fail gold traces —
+which was exactly the hazard I flagged. It also notes a future template with
+coarser intermediate rounding could exceed it, which is the generalisation I did
+not make.
+
+### New in round 2
+
+**F16 — `roles` is unconditionally required but absent from every `decision`
+node · CONFIRMED · blocks a literal §6.1 implementation.** §3.1 marks `roles`
+with a required tick (not conditional); §6.2 requires "every mandatory role of
+the type is a key of `roles`"; §8.8 makes a missing mandatory role a rejection
+case. But §5.1 defines `decision` by literal symbol names and no `decision` node
+carries the field. A verifier implementing §6.1's "required fields present"
+literally rejects all 40:
+
+```
+$ python -m tests.trace_schema.reviewer_d_verifier_11 <traces.json>   # before exempting decision
+40 passed, 40 failed, 80 total
+       [SHAPE] missing required field 'roles' (s3.1)
+```
+
+I only reached 80/80 by special-casing `decision` out of the `roles` check —
+i.e. by writing the type-specific hack that `roles` exists to abolish. **Should
+say:** either mark `roles` conditional (`iteration` only) and state that
+`decision`'s symbols are fixed by §5.1, or — better, and consistent with §3.3's
+own argument — give `decision` a role map too and rewrite §5.1/§5.3/§5.4 over
+roles. The first is a one-line fix that makes the document honest; the second is
+the one that makes the second half of the type reusable.
+
+### Assessment
+
+The revision is unusually responsive: fourteen of fifteen findings are fully
+addressed, several beyond what I asked (the `comparison` field, the
+`schema_version` bump rule for multi-node templates, the future-template warning
+in §4.5), and the two fixes the coordinator was least sure of both survive
+adversarial testing — the renamed-iterate node passes with a control proving the
+pass is not vacuous, and both directions of the precedence check are computable,
+correct on all 342 trials, and detectable when broken. The one gap, F16, is the
+mirror image of the finding it was fixing, and it is the kind a checklist
+question — *does every node type have a role map?* — would catch. That is the
+same process suggestion §5 made in round 1, and it would have caught this too.

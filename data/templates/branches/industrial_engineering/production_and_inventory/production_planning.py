@@ -173,7 +173,7 @@ def _t19_assign(times, CT):
                          "assigned": list(station),
                          "remaining_final": rem})
     return {
-        "schema_version": "1.1",
+        "schema_version": "1.2",
         "node_type": "decision",
         "node_id": "t19_greedy_station_assignment",
         "cardinality": "answer_bearing",
@@ -191,8 +191,25 @@ def _t19_assign(times, CT):
                                         for x in _T19_ORDER},
                         "max_elements": len(_T19_ORDER),
                         "satisfied": True},
-        # The selection rule as DATA, so §5.3 is checkable rather than trusted.
-        "selection": {"filter": "fits", "criterion": "duration",
+        # Type-level roles, so a verifier never reaches for a literal symbol
+        # name. `iteration` gained these in schema 1.1 and `decision` did not,
+        # which left the type defined by its reference template's vocabulary
+        # (Reviewer D round 2, F16; Reviewer D2, F1/F2).
+        "roles": {"index": "station_id", "budget_total": "capacity",
+                  "budget_initial": "remaining_initial", "trials": "trials",
+                  "committed": "assigned", "budget_final": "remaining_final"},
+        "trial_roles": {"candidates": "eligible", "chosen": "chosen",
+                        "budget_after": "remaining_after", "closes": "closes"},
+        "candidate_roles": {"item": "task", "measure": "duration",
+                            "admissible": "fits"},
+        # The selection rule as DATA, over roles, so §5.4 is checkable rather
+        # than trusted. `filter_relation` is what makes the admissibility flag
+        # itself checkable: without it a trace could LIE about what fits, forcing
+        # an extra station and changing n -- which is the answer -- while
+        # satisfying every other invariant (Reviewer D2, F3).
+        "selection": {"filter": "admissible",
+                      "filter_relation": "measure <= budget_before",
+                      "criterion": "measure",
                       "objective": "max", "tie_break": "universe_order"},
         "rule": ("among unassigned tasks whose predecessors are all "
                  "assigned AND whose duration fits the remaining time, "

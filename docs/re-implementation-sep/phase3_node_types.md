@@ -1,6 +1,6 @@
 # D3.3 — The `iteration` and `decision` trace node types
 
-**Schema version:** `1.1` · **Status:** normative for the milestone model ·
+**Schema version:** `1.2` · **Status:** normative for the milestone model ·
 **Phase:** 3 · **Revised:** 2026-09-06
 **Companion:** [`template_redesign_spec.md`](template_redesign_spec.md) §3.3 ·
 [`phase3_summary.md`](phase3_summary.md) · conformance corpus in
@@ -13,16 +13,35 @@ and the return value of `_t19_assign`, bound to `trace_nodes` in
 (`.../industrial_engineering/production_and_inventory/production_planning.py`).
 **Extractor:** `python -m tests.trace_schema.extract <out.json> <n_seeds>`.
 
-> **Revision note — 1.0 → 1.1.** Version 1.0 was reviewed by an independent
-> reviewer who implemented a verifier against it (Phase 3 Reviewer D). The
-> verifier passed all 80 gold traces and rejected all 33 mutated negative cases,
-> **but only by hardcoding one template's symbol names and its update formula**,
-> and the review returned fifteen findings, three of them merge-blocking. This
-> revision answers all fifteen. The substantive change is §4: `iteration` is now
-> written as a *type*, with a normative element table, a `roles` binding and a
-> declared `update_relation`, where 1.0 described one template. Everything a
-> verifier needs is now **declared on the node** rather than inferred from it.
-> The findings and their dispositions are tabulated in
+> **Revision note — 1.1 → 1.2.** Version 1.1 was reviewed twice: by the round-1
+> reviewer, checking whether its fifteen findings were addressed rather than
+> relocated (**14 addressed, 1 partially, 0 not addressed**), and by a **fresh**
+> reviewer who had not seen round 1 and implemented a verifier against 1.1 from
+> scratch. Both independently found the same defect, from opposite directions:
+> **1.1 fixed `iteration` by inverting the problem onto `decision`.** `roles` was
+> marked unconditionally required, yet no `decision` node carried it and §5 still
+> defined the type by its reference template's literal symbol names — so the
+> fresh verifier scored 40 pass / 40 fail, and reached 80/80 only by
+> special-casing `decision` out of the very check `roles` exists to abolish.
+> 1.2 gives `decision` the same treatment `iteration` got: role maps at all three
+> nesting levels, and §5 rewritten over roles.
+>
+> The fresh review also found a **soundness** defect that neither the corpus nor
+> round 1 exposed: §6 accepted a `decision` trace whose **answer was wrong**.
+> `selection.filter` was carried as data and never checked, and §5.4.4 optimised
+> only over the filtered set, so a trace could lie about what fits, force an extra
+> element, and change `n` — which §2 and §7.3 make *the answer* — while
+> satisfying every clause. 1.2 adds `selection.filter_relation`, making the
+> admissibility flag itself checkable.
+>
+> **The rename test now passes for `iteration` and is the standard 1.2 holds
+> both types to.** A reviewer built a synthetic `iteration` node with every
+> symbol renamed, a *different* recurrence and nine elements, and an unmodified
+> spec-faithful verifier accepted it — then failed it on four clauses when one
+> value was perturbed. That is what "a type, not a description" means
+> operationally, and it is the test to run on any node type added later.
+>
+> Full finding tables and dispositions in
 > [`phase3_summary.md`](phase3_summary.md) §11.
 
 ---
@@ -97,7 +116,8 @@ Both node types therefore share one base structure (§3) and differ in exactly
 three places: the **termination kind**, the **cardinality semantics**, and the
 **element comparison rule**. Recorded as **D-038**.
 
-*Independently corroborated:* Reviewer D reports that implementing §6.7 and §8.7
+*Independently corroborated:* Reviewer D reports that implementing the
+result-derivation and cardinality-symbol clauses
 "forced two distinct rules, so a merged node type would have had to pick one".
 
 ---
@@ -120,21 +140,24 @@ than one node will bind a list, and **must** raise `schema_version` when it does
 | `node_id` | string | ✔ | Stable within a template; the anchor a comparator reports against. |
 | `cardinality` | `"incidental"` \| `"answer_bearing"` | ✔ | §2. Fixed per `node_type` (§4, §5). Determines whether §7.2 or §7.3 applies. |
 | `cardinality_symbol` | string | cond. | Required **iff** `cardinality == "answer_bearing"`. Absent otherwise. |
-| `roles` | object | ✔ | Maps each **type-level role** of §4/§5 to this template's own symbol name. This is what makes the type reusable; see §3.3. |
+| `roles` | object | ✔ | Maps each **type-level element role** of §4.1/§5.1 to this template's own symbol name. This is what makes the type reusable; see §3.3. **Required on both types** — 1.1 required it and shipped `decision` nodes without it. |
 | `termination` | object | ✔ | §3.4. |
 | `rounding` | string | ✔ | The rounding mode every `round`-like step in §6 and §7 uses. `"decimal-half-up"` for both reference templates. A verifier must not assume binary `round()`. |
 | `symbol_precision` | object | ✔ | `{symbol: decimal_places}` for every symbol whose display precision any check depends on — element symbols, evaluation-frame symbols and trial symbols alike. §7.1's tolerance is derived from this and **never** inferred from the data. |
 | `element_symbols` | array of string | ✔ | The symbol set every element carries. **Stable across elements** — this is what replaces the flat model's per-step `{id, symbol}`. |
-| `elements` | array of object | ✔ | Ordered, homogeneous. Each has exactly the keys in `element_symbols`. **Length ≥ 1** (see §6.3). |
+| `elements` | array of object | ✔ | Ordered, homogeneous. Each has exactly the keys in `element_symbols`. **Length ≥ 1** (see §6 step 4). |
 | `carry` | object | ✔ | §3.5. **Machine-checked path expressions only.** `{}` when the elements are independent. |
 | `carry_notes` | object | ✔ | §3.5. Prose relations that are *not* checkable. **Never normative.** `{}` when there are none. |
-| `result` | object | ✔ | `{symbol, value, dp, from, unit?}`. `from` is a §3.6 derivation expression, so §6.7 is data rather than a per-type special case. |
+| `result` | object | ✔ | `{symbol, value, dp, from, unit?}`. `from` is a §3.6 derivation expression, so §6 step 8 is data rather than a per-type special case. |
 | `preamble` | array of object | ✖ | Fixed frames the question prescribes *before* the sequence starts. |
 | `preamble_symbols` | array of string | cond. | Required iff `preamble` is present. |
+| `preamble_binding` | object | cond. | `iteration` only; maps an element role to the index of the preamble frame it must equal. §4.4. |
 | `evaluation_symbols` | array of string | cond. | `iteration` only; the symbol set of a nested evaluation frame. |
 | `evaluation_roles` | object | cond. | `iteration` only; §4. |
 | `update_relation` | string | cond. | `iteration` only; §4.2. |
-| `trial_symbols` | array of string | cond. | `decision` only; §5. |
+| `trial_symbols` | array of string | cond. | `decision` only; §5.1. |
+| `trial_roles` | object | cond. | `decision` only; binds the trial roles of §5.1. |
+| `candidate_roles` | object | cond. | `decision` only; binds the candidate roles of §5.1. |
 | `eligible_symbols` | array of string | cond. | `decision` only; §5. |
 | `selection` | object | cond. | `decision` only; §5.2. The selection rule as data. |
 | `capacity_constant` | boolean | cond. | `decision` only; §5.4 invariant 8. |
@@ -166,6 +189,18 @@ A node's `element_symbols` are the template's own names (`y_curr`, `g_prev`,
  "converged": "converged", "evaluation": "evaluation"}
 ```
 
+`decision` binds three levels, because its structure nests:
+
+```json
+"roles":           {"index": "station_id", "budget_total": "capacity",
+                    "budget_initial": "remaining_initial", "trials": "trials",
+                    "committed": "assigned", "budget_final": "remaining_final"},
+"trial_roles":     {"candidates": "eligible", "chosen": "chosen",
+                    "budget_after": "remaining_after", "closes": "closes"},
+"candidate_roles": {"item": "task", "measure": "duration",
+                    "admissible": "fits"}
+```
+
 A verifier resolves a role to a value as `element[roles[role]]`. Every role its
 `node_type` declares mandatory must be present as a key of `roles`, and every
 value of `roles` must appear in `element_symbols`. **A verifier that reaches for
@@ -178,7 +213,7 @@ have failed a 1.0 verifier at shape-check for no reason (Reviewer D, F3).
 | Field | Type | Req. | Meaning |
 |---|---|:--:|---|
 | `kind` | `"convergence"` \| `"exhaustion"` | ✔ | Which of §4/§5 applies. |
-| `satisfied` | boolean | ✔ | Whether the emitted sequence terminated by the predicate. **A gold node with `satisfied: false` is malformed** (§8.1). |
+| `satisfied` | boolean | ✔ | Whether the emitted sequence terminated by the predicate. **A gold node with `satisfied: false` is malformed** (§8A.1). |
 | `max_elements` | integer | ✔ | The budget; `len(elements) <= max_elements` is an invariant, not a hope. |
 | `quantity_role` | string | cond. | `convergence` only: the role the tolerance test reads. |
 | `comparison` | `"lt"` \| `"le"` | cond. | `convergence` only: the sense of the test. |
@@ -217,7 +252,7 @@ Everything that is *not* a checkable projection goes in **`carry_notes`**, whose
 values are prose and are never parsed. Version 1.0 put both in one map with no
 syntax to tell them apart, so a verifier could not distinguish `"capacity"` (a
 valid path) from a description, and guessing wrong is precisely the silent
-failure §8.4 exists to prevent (Reviewer D, F6). The split removes the question.
+failure §8B.10 exists to prevent (Reviewer D, F6). The split removes the question.
 
 ### 3.6 `result.from` — derivation expressions
 
@@ -228,7 +263,7 @@ failure §8.4 exists to prevent (Reviewer D, F6). The split removes the question
 | `"last.<role>"` | The named role of the final element, rounded to `result.dp` under `rounding`. |
 | `"len(elements)"` | The element count. Valid only when `cardinality == "answer_bearing"`. |
 
-A verifier implements §6.7 by dispatching on this field, not on `node_type`.
+A verifier implements §6 step 8 by dispatching on this field, not on `node_type`.
 
 ### 3.7 `termination.scope` — which reading of the accumulator
 
@@ -309,7 +344,7 @@ For every element:
    this is enforced *in the generator* by an explicit raise, not an assert:
    0 occurrences in 20,000 seeds, smallest `|g_k − g_{k−1}|` observed 0.004.
 8. `index` values are `1..len(elements)` in order. *(New in 1.1 — §5 required
-   contiguity of `station_id` and §4 stated no analogue: Reviewer D, F14.)*
+   contiguity of the element index and §4 stated no analogue: Reviewer D, F14.)*
 
 ### 4.4 Preamble
 
@@ -319,10 +354,28 @@ not followed the stated scheme, and §7.2 marks that as a procedure failure even
 when the final answer agrees.
 
 Preamble frames are evaluation frames: their key set is `preamble_symbols`, which
-for an `iteration` node equals `evaluation_symbols`. The **internal consistency
-of a frame** — that `A`, `P`, `AR` are the right functions of `y` — is *not*
-checkable from the node, because the geometry functions are the item's content
-and are not carried. This is a stated non-goal (§10), not an oversight.
+for an `iteration` node equals `evaluation_symbols`.
+
+**`preamble_binding` (normative, new in 1.2).** The preamble must be *bound to
+the sequence*, not merely present beside it. It maps an element role to the index
+of the preamble frame that role must equal, and the binding is checked against
+`elements[0]`:
+
+```json
+{"iterate_prev": 0, "residual_prev": 0, "iterate_curr": 1, "residual_curr": 1}
+```
+
+reads: element 1's `iterate_prev` is preamble frame 0's `iterate` role, its
+`residual_prev` is frame 0's `residual` role, and likewise `iterate_curr` /
+`residual_curr` against frame 1. Through 1.1 the preamble was unconstrained, so
+**replacing it with nonsense passed** while §4.4 asserted it was "not free" —
+exactly the hole §4.3.6 had already closed one level down, missed one level up
+(Reviewer D2, F4).
+
+**What is still not checkable, deliberately:** the *internal* consistency of a
+frame — that `A`, `P`, `AR` are the right functions of `y` — because the geometry
+functions are the item's content and are not carried. A stated non-goal (§10),
+not an oversight.
 
 ### 4.5 Tolerance headroom, stated
 
@@ -346,92 +399,115 @@ cardinality      : "answer_bearing"  (fixed for this type)
 termination.kind : "exhaustion"      (fixed for this type)
 ```
 
-### 5.1 Element and trial tables (normative)
+### 5.1 Element, trial and candidate tables (normative)
 
-**Element** — one opened workstation:
+Roles, not symbol names — the same status §4.1 has. Bind them through `roles`,
+`trial_roles` and `candidate_roles` (§3.3). The third column shows the reference
+template's own symbols, and **a verifier must never use that column**.
 
-| Symbol | Type | Meaning |
-|---|---|---|
-| `station_id` | integer | 1-based, contiguous, ascending. |
-| `capacity` | number | The element's budget. |
-| `remaining_initial` | number | Budget at open. |
-| `trials` | array | The search log. **Never empty.** |
-| `assigned` | array | The committed items, **in commitment order**. |
-| `remaining_final` | number | Budget at close. |
+**Element** — one opened commitment:
 
-**Trial** — one application of the selection rule (`trial_symbols`):
+| Role | Type | Meaning | Reference symbol |
+|---|---|---|---|
+| `index` | integer | 1-based, contiguous, ascending. | `station_id` |
+| `budget_total` | number | The element's budget. | `capacity` |
+| `budget_initial` | number | Budget at open. | `remaining_initial` |
+| `trials` | array | The search log. **Never empty.** | `trials` |
+| `committed` | array | The committed items, **in commitment order**. | `assigned` |
+| `budget_final` | number | Budget at close. | `remaining_final` |
 
-| Symbol | Type | Meaning |
-|---|---|---|
-| `eligible` | array | Candidate snapshot *at the moment of choice*, in the deterministic scan order. Each entry has exactly the keys in `eligible_symbols`. |
-| `chosen` | string \| `null` | The committed candidate, or `null` when none fits. |
-| `remaining_after` | number | Budget after this trial. |
-| `closes` | boolean | **`closes == (chosen is null)`.** One rule, no exceptions. |
+**Trial** — one application of the selection rule:
 
-`eligible` entries carry `eligible_symbols` — for the reference template
-`["task", "duration", "fits"]`. *(New in 1.1: 1.0 described these in prose only,
-so §6.2's homogeneity check — §1's stated reason the flat model failed — stopped
-one level short of the deepest structure: Reviewer D, F12.)*
+| Role | Type | Meaning | Reference symbol |
+|---|---|---|---|
+| `candidates` | array | Candidate snapshot *at the moment of choice*, in the deterministic scan order. Each entry has exactly the keys in `eligible_symbols`. | `eligible` |
+| `chosen` | item \| `null` | The committed candidate, or `null` when none is admissible. | `chosen` |
+| `budget_after` | number | Budget after this trial. | `remaining_after` |
+| `closes` | boolean | **`closes == (chosen is null)`.** One rule, no exceptions. | `closes` |
+
+**Candidate** — one entry of `candidates`:
+
+| Role | Type | Meaning | Reference symbol |
+|---|---|---|---|
+| `item` | string | The candidate's identity; a member of `termination.universe`. | `task` |
+| `measure` | number | The quantity `selection.criterion` optimises and the budget is spent in. | `duration` |
+| `admissible` | boolean | Whether this candidate is selectable **at this budget**. Checked against `selection.filter_relation`, never trusted (§5.4.3c). | `fits` |
+
+> **`item` is a declared role in 1.2.** 1.1 left the candidate's identity symbol
+> undeclared, so a verifier had to derive it as *`eligible_symbols` minus the
+> filter and criterion names* — sound only at exactly three members, and silently
+> wrong at four (Reviewer D2, F5).
 
 > **`closes`, restated.** Version 1.0 gave the rule twice, once in the trial
 > table and once in §5.5 with an "except" clause whose scope read backwards
-> (Reviewer D, F11). There is now one rule: **a trial closes exactly when it
-> chose nothing.** The final element's last trial may have an *empty* `eligible`
-> — that is exhaustion, and it is still `chosen: null`, so it still closes. No
-> exception is needed and none is granted.
+> (Reviewer D round 1, F11). There is now one rule: **a trial closes exactly when
+> it chose nothing.** The final element's last trial may have an *empty*
+> `candidates` — that is exhaustion, and it is still `chosen: null`, so it still
+> closes. No exception is needed and none is granted. A closing trial is
+> necessarily the **last** trial of its element (§5.4.9).
 
 ### 5.2 `selection` — the rule as data
 
 ```json
-{"filter": "fits", "criterion": "duration",
- "objective": "max", "tie_break": "universe_order"}
+{"filter": "admissible", "filter_relation": "measure <= budget_before",
+ "criterion": "measure", "objective": "max", "tie_break": "universe_order"}
 ```
 
 | Field | Domain | Meaning |
 |---|---|---|
-| `filter` | an `eligible_symbols` name of boolean type | Only entries where this is `true` are selectable. |
-| `criterion` | an `eligible_symbols` name of numeric type | The quantity optimised. |
+| `filter` | a **candidate role** of boolean type | Only candidates where this is `true` are selectable. |
+| `filter_relation` | a comparison over candidate roles and `budget_before` | **What makes `filter` true.** The verifier recomputes the flag from this rather than believing it. Grammar: a §4.2 arithmetic expression, one of `<= < >= > ==`, a second §4.2 expression. `budget_before` is bound to the trial's incoming budget. |
+| `criterion` | a **candidate role** of numeric type | The quantity optimised, and the quantity the budget is spent in. |
 | `objective` | `"max"` \| `"min"` | Direction. |
 | `tie_break` | `"universe_order"` \| `"first"` | How equal `criterion` values are resolved. `universe_order` = earliest in `termination.universe`. |
 
-A verifier checks §5.4 invariant 4 from these fields. `rule` is the prose
-restatement and is advisory (§3.2).
+> **Why `filter_relation` exists, and it is the most important addition in 1.2.**
+> Through 1.1 the admissibility flag was **carried as data and never checked**,
+> while §5.4.4 optimised only over the filtered set. A trace could therefore
+> declare a candidate inadmissible when it was not, force the element to close,
+> open an extra element, and **change `n` — which §2 and §7.3 make the answer** —
+> while satisfying every clause of §5.3, §5.4, §6 and §8. Reviewer D2
+> demonstrated it with two minimal nodes, an honest `n = 1` and a corrupt
+> `n = 2`, both of which the 1.1 algorithm passed. A verifier that trusts a
+> boolean the trace supplies is not verifying the thing that boolean decides.
+
+`rule` is the prose restatement of all of this and is advisory (§3.2).
 
 ### 5.3 Global invariants (normative)
 
-Across elements: `station_id` is `1..len(elements)`; the `assigned` lists are
+Across elements: `index` runs `1..len(elements)`; the `committed` lists are
 pairwise disjoint; their union equals `termination.universe`; and
-`max_elements >= len(universe)` *(new in 1.1: 1.0 left the two unrelated, so a
-node could declare a budget smaller than the set it must exhaust — Reviewer D,
-F14)*.
+`max_elements >= len(universe)`.
 
 ### 5.4 Local invariants (normative)
 
 For every element:
 
-1. `remaining_initial == capacity`.
-2. Trials are consecutive: trial *j+1*'s budget in is trial *j*'s
-   `remaining_after`; trial 1's is `remaining_initial`.
-3. For a trial with `chosen == c`: `c` appears in `eligible`, its `filter` symbol
-   is `true`.
-   **3b.** Every entry of `eligible` has all its `termination.precedences`
-   already committed in an earlier element or earlier in this one, and every
-   uncommitted item whose precedences *are* all satisfied appears in `eligible`.
-   *(New in 1.1. 1.0 required §8.6 to reject a precedence violation while
-   carrying no precedence relation, making one of its seven mandatory rejection
-   clauses permanently unreachable — Reviewer D, F1. Carrying `precedences` also
-   makes `eligible` independently checkable rather than trusted, which was the
-   stated design intent of reporting `fits` separately.)*
-4. `chosen` optimises `criterion` over the filtered candidates under
+1. `budget_initial == budget_total`.
+2. Trials are consecutive: trial *j+1*'s incoming budget is trial *j*'s
+   `budget_after`; trial 1's is `budget_initial`.
+3. For a trial with a non-null `chosen`: `chosen` appears among `candidates` and
+   its `admissible` role is `true`.
+   **3b.** Every candidate has all its `termination.precedences` already
+   committed in an earlier element or earlier in this one, **and** every
+   uncommitted member of `universe` whose precedences *are* all satisfied appears
+   among `candidates`. Both directions are required: an omission and an
+   insertion are equally corrupting.
+   **3c.** For **every** candidate, `admissible` equals the truth of
+   `selection.filter_relation` evaluated with that candidate's roles and
+   `budget_before` bound to the trial's incoming budget. *(New in 1.2 — this is
+   the soundness fix of §5.2.)*
+4. `chosen` optimises `criterion` over the admissible candidates under
    `objective`, with `tie_break` applied to equals.
-5. `remaining_after == remaining_before − criterion(chosen)`, or
-   `== remaining_before` when `chosen is null`.
-6. `assigned` is exactly the ordered `chosen` values of the element's trials.
-7. `remaining_final == capacity − Σ criterion(assigned)`.
-8. When `capacity_constant` is `true`, every element's `capacity` is equal.
-   *(New in 1.1: 1.0 never constrained it, so a trace with a per-station cycle
-   time passed every invariant while contradicting §2's own
-   `(n·CT − Σt)/(n·CT)` argument — Reviewer D, F14.)*
+5. `budget_after == budget_before − criterion(chosen)`, or `== budget_before`
+   when `chosen` is `null`.
+6. `committed` is exactly the ordered non-null `chosen` values of the element's
+   trials.
+7. `budget_final == budget_total − Σ criterion(committed)`.
+8. When `capacity_constant` is `true`, every element's `budget_total` is equal.
+9. A trial with `closes: true` is the **last** trial of its element, and every
+   earlier trial has `closes: false`. *(New in 1.2: 1.1 defined `closes` but
+   never said a closing trial ends the element — Reviewer D2, F9b.)*
 
 ### 5.5 Determinism
 
@@ -446,8 +522,20 @@ a model might produce**, and a model may well emit a tie.
 
 ## 6. Verifying a gold trace — normative algorithm
 
-A conforming implementation, given a node and nothing else, performs in order.
-Every numeric comparison uses §7.1; every rounding uses `rounding`.
+### 6.0 Modes — gold and candidate
+
+**A node does not say whether it is gold or a candidate, and several clauses
+branch on exactly that** (§8A.1 versus §3.4, §6 step 4 versus §7.2). The distinction is
+therefore the **caller's**, passed in, not inferred: a conforming verifier takes a
+mode argument.
+
+| Mode | Meaning | Governing sections |
+|---|---|---|
+| `gold` | A node emitted by a template. Every §8 clause applies; `satisfied` must be `true`; the budget is an invariant. | §6, §8 |
+| `candidate` | A node derived from a model's trace. §7 governs; a budget overrun is *reported*, not failed; `satisfied: false` is a legitimate observation. | §7 |
+
+The algorithm below is the `gold` mode. Every numeric comparison uses §7.1; every
+rounding uses `rounding`.
 
 1. **Version and shape.** `schema_version` major version known; required fields
    present; `node_type` recognised; `cardinality` and `termination.kind` equal
@@ -461,14 +549,14 @@ Every numeric comparison uses §7.1; every rounding uses `rounding`.
    `trials`/`trial_symbols`, `eligible`/`eligible_symbols`, and every non-null
    `evaluation` against `evaluation_symbols`.
 4. **Budget.** `1 <= len(elements) <= termination.max_elements`. *(1.1 resolves
-   the 1.0 contradiction between §3's "may be empty" and §6.3's lower bound in
+   the 1.0 contradiction between §3's "may be empty" and its own lower bound in
    favour of **≥ 1**, and the §3 sentence is deleted: Reviewer D, F2. A
    zero-element sequence is not a trace of a computation, it is the absence of
    one; a candidate that emits one fails §7 rather than being verified.)*
 5. **Carry.** For each *k* and each entry of `carry`, the value the path selects
    from element *k* equals the named symbol of element *k+1*. `carry_notes` is
    **not** checked and every entry in it must be reported on an `unchecked`
-   channel that cannot contribute to a pass (§8.4).
+   channel that cannot contribute to a pass (§8B.10).
 6. **Local invariants.** §4.3 or §5.4, per element; then §5.3 for `decision`.
 7. **Termination.** The predicate holds on the last element and on no earlier
    one; `satisfied` agrees. For `convergence` the predicate is
@@ -494,7 +582,11 @@ compares the two element lists positionally without first applying §7.2/§7.3.
 ### 7.1 Numeric tolerance
 
 A candidate scalar matches gold when it agrees to **half a unit in the last place
-gold displays it**. That place comes from `symbol_precision[symbol]`, or
+gold displays it**, the boundary **inclusive**: the test is
+`|candidate − gold| <= 0.5 × 10^(−p)` with `p = symbol_precision[symbol]`.
+*(1.1 left inclusive-versus-exclusive unstated; it is latent on gold, where
+exact-boundary instances are screened out at generation, and live the moment a
+candidate is scored — Reviewer D2, F8.)* That place comes from `symbol_precision[symbol]`, or
 `result.dp` for the result — **never inferred from the data**. Version 1.0 cited
 "the display precision of `y`" in three clauses while declaring `dp` only on
 `result`, where it is `3` against a 4-dp `y_next` — actively the wrong number for
@@ -537,38 +629,80 @@ analysis can see it, and is excluded from the score.
 The asymmetry with §7.2 is the whole point of §2, and it is the one thing a
 verifier built from a merged node type gets wrong.
 
+### 7.4 When the question prescribes a method, the method's tolerance governs
+
+An item whose question prescribes *how* to solve it has two defensible answers:
+the value the prescribed scheme returns, and the value the underlying equation
+has. For `normal_depth_iteration` they differ on **3.7% of instances**, always by
+exactly 0.001 m — the scheme converges to ±0.002 m while the answer is quoted to
+3 dp, so a solver who solves Manning's equation directly and *correctly* lands one
+display unit away from gold.
+
+**The gold answer is the prescribed method's output, and the comparator's answer
+tolerance is the looser of §7.1's display tolerance and the method's own stated
+tolerance** (`termination.tolerance`, in the result's units where the two are
+commensurable). Marking a direct solver wrong for 0.001 m is the same error as
+marking a four-update solver wrong for taking four updates, and §7.2 already
+refuses the second.
+
+Measured on both trees: **3.70% on `master`, 3.65% on the branch** — so this is
+pre-existing, surfaced by Phase 3's Step 4 change rather than caused by it
+(Reviewer B, F-B3). No extractor enforces this yet; carried as **R3-9**.
+
 ---
 
 ## 8. What a conforming verifier must REJECT
 
-A verifier that accepts everything is not a verifier. A conforming
-implementation rejects each of these, with the cited reason. **Every clause here
-is reachable from the node alone** — 1.1 removed the one that was not.
+A verifier that accepts everything is not a verifier. **Every clause here is
+reachable from the node alone**, and §8A is testable by mutating a trace while
+§8B is not — §8B constrains the *verifier*, not the trace. 1.1 mixed the two, so
+an implementer reading §8 as a list of traces skipped the one clause that is a
+behavioural obligation (Reviewer D2).
 
-1. `termination.satisfied == false` on a **gold** node.
-2. An element, preamble frame, trial, `eligible` entry or evaluation frame whose
+### 8A — trace clauses (each constructible as a mutation)
+
+1. `termination.satisfied == false` on a node in `gold` mode.
+2. An element, preamble frame, trial, candidate entry or evaluation frame whose
    key set differs from its declared `*_symbols`, in either direction. *(This is
    the defect the flat milestone model had: symbols that appear and disappear
    between passes.)*
 3. A `carry` path that does not hold between consecutive elements, or that is not
    well-formed under §3.5's grammar.
-4. Silently passing a `carry_notes` entry. It must be reported as **unchecked**;
-   treating an unchecked relation as a satisfied one is how a green suite comes
-   to measure nothing (D-015, D-034).
-5. `iteration`: `converged: true` on any element other than the last;
+4. `iteration`: `converged: true` on any element other than the last;
    `evaluation` non-null on the terminating element; an evaluation frame whose
    `iterate` is not the element's `iterate_next`; a zero update denominator;
-   non-contiguous `index`.
-6. `decision`: overlapping `assigned` sets; a union that is not
+   non-contiguous `index`; a `preamble_binding` that does not hold against
+   `elements[0]`.
+5. `decision`: overlapping `committed` sets; a union that is not
    `termination.universe`; a `chosen` that does not optimise `selection`;
-   an `eligible` set that omits an item whose `precedences` are satisfied or
-   includes one whose are not; non-contiguous `station_id`; a varying `capacity`
-   under `capacity_constant`.
-7. `cardinality: "answer_bearing"` with no `cardinality_symbol`, or
+   **an `admissible` flag that disagrees with `selection.filter_relation`**;
+   a `candidates` set that omits an item whose `precedences` are satisfied or
+   includes one whose are not; non-contiguous `index`; a varying `budget_total`
+   under `capacity_constant`; a closing trial that is not last.
+6. `cardinality: "answer_bearing"` with no `cardinality_symbol`, or
    `"incidental"` with one.
-8. A role named in §4.1/§5.1 as mandatory but missing from `roles`, or a `roles`
-   value that is not in the corresponding `*_symbols`.
-9. `schema_version` with an unknown major version.
+7. A role named mandatory by §4.1 or §5.1 but missing from the corresponding role
+   map, or a role map value that is not in the corresponding `*_symbols`.
+8. `schema_version` with an unknown major version.
+9. A symbol used by any tolerance comparison that is absent from
+   `symbol_precision`. A verifier must fail rather than infer a precision from
+   the data.
+
+### 8B — verifier-behaviour clauses (not constructible as a mutation)
+
+10. **Silently passing a `carry_notes` entry.** Every entry must be reported on an
+    `unchecked` channel that cannot contribute to a pass, so a node carrying one
+    can never report a bare `PASS`. Treating an unchecked relation as a satisfied
+    one is how a green suite comes to measure nothing (D-015, D-034). This is a
+    statement about the verifier: all gold `decision` nodes carry `carry_notes`
+    legitimately, so there is no corrupt trace to construct — test it as a
+    behavioural assertion instead.
+11. **Resolving any element value by a literal symbol name rather than through a
+    role map.** Also untestable by mutation, and it is the clause the two
+    reference templates exist to make checkable: rename every symbol in a node,
+    rebind only its role maps, and a conforming verifier must still accept it —
+    and must still reject it when a value is perturbed. §10 names this the
+    **rename test**.
 
 ---
 
@@ -586,7 +720,7 @@ the corpus.)*
 
 ```json
 {
- "schema_version": "1.1",
+ "schema_version": "1.2",
  "node_type": "iteration",
  "node_id": "t24_secant_normal_depth",
  "cardinality": "incidental",
@@ -624,6 +758,12 @@ the corpus.)*
   "P": 3,
   "AR": 3,
   "g": 3
+ },
+ "preamble_binding": {
+  "iterate_prev": 0,
+  "residual_prev": 0,
+  "iterate_curr": 1,
+  "residual_curr": 1
  },
  "preamble_symbols": [
   "y",
@@ -748,7 +888,7 @@ within the 5.0e-05 tolerance `symbol_precision["y_next"] = 4` implies ✓.
 
 ```json
 {
- "schema_version": "1.1",
+ "schema_version": "1.2",
  "node_type": "decision",
  "node_id": "t19_greedy_station_assignment",
  "cardinality": "answer_bearing",
@@ -784,9 +924,29 @@ within the 5.0e-05 tolerance `symbol_precision["y_next"] = 4` implies ✓.
   "max_elements": 5,
   "satisfied": true
  },
+ "roles": {
+  "index": "station_id",
+  "budget_total": "capacity",
+  "budget_initial": "remaining_initial",
+  "trials": "trials",
+  "committed": "assigned",
+  "budget_final": "remaining_final"
+ },
+ "trial_roles": {
+  "candidates": "eligible",
+  "chosen": "chosen",
+  "budget_after": "remaining_after",
+  "closes": "closes"
+ },
+ "candidate_roles": {
+  "item": "task",
+  "measure": "duration",
+  "admissible": "fits"
+ },
  "selection": {
-  "filter": "fits",
-  "criterion": "duration",
+  "filter": "admissible",
+  "filter_relation": "measure <= budget_before",
+  "criterion": "measure",
   "objective": "max",
   "tie_break": "universe_order"
  },
@@ -966,10 +1126,13 @@ within the 5.0e-05 tolerance `symbol_precision["y_next"] = 4` implies ✓.
 }
 ```
 
-Element 1, trial 2 checks the rule rather than trusting it: eligible are `b` (70)
-and `c` (47), both `fits`, `selection` says `max` on `duration`, so `b` ✓;
-`88 − 70 = 18` ✓. Trial 3: `c` at 47 does not fit in 18, nothing is selectable,
-`chosen: null` so `closes: true`, budget unchanged ✓. `assigned = [a, b]`,
+Element 1, trial 2 checks the rule rather than trusting it: candidates are `b` (70)
+and `c` (47); `filter_relation` recomputes `admissible` as `measure <= budget_before`
+— `70 <= 88` ✓ and `47 <= 88` ✓, matching both flags — and `selection` says `max`
+on `measure`, so `b` ✓;
+`88 − 70 = 18` ✓. Trial 3: `filter_relation` gives `47 <= 18` = false,
+which is what `admissible` claims ✓, so nothing is selectable, `chosen: null`,
+`closes: true`, budget unchanged, and it is the element's last trial ✓. `assigned = [a, b]`,
 `139 − 51 − 70 = 18 = remaining_final` ✓. Precedences are now checkable: at
 trial 1 only `a` has no prerequisites, so `eligible` correctly holds `a` alone;
 at trial 2 `b` and `c` both have `a` committed, and `d` does not yet have both
@@ -1005,6 +1168,17 @@ middle of a verifier.
   It becomes a real requirement the day a template stops doing that.
 - **No dimensional checking.** Only `result` carries `unit`. A dimensional
   comparator needs units on every symbol; that is a milestone-model decision.
+- **The rename test is the conformance standard for a node type.** Take a node,
+  rename every symbol, rebind only its role maps, leave `update_relation` /
+  `selection` untouched, and a conforming verifier must accept it — and must
+  still reject it when one value is perturbed. `iteration` passes this
+  (independently, on a synthetic node with a *different* recurrence and nine
+  elements). `decision` is written to the same standard in 1.2 but **has not been
+  exercised against a second template**, because none exists.
+- **`precedences` is exercised against exactly one DAG.** All 40 `decision`
+  traces carry the same five-task network, so §5.4.3b is verified thoroughly
+  against one relation and not at all against a second shape. A second
+  `decision` template is the evidence that would settle it.
 - **Two node types are specified; two templates implement them.** The spec names
   `linear_reservoir_routing_step` (a repeated sub-chain unrolled into the trace)
   and `qr_policy_one_iteration` (iterative in principle, one iteration emitted)
