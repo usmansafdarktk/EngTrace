@@ -1,6 +1,6 @@
 # D3.3 — The `iteration` and `decision` trace node types
 
-**Schema version:** `1.3` · **Status:** normative for the milestone model ·
+**Schema version:** `1.4` · **Status:** normative for the milestone model ·
 **Phase:** 3 · **Revised:** 2026-09-06
 **Companion:** [`template_redesign_spec.md`](template_redesign_spec.md) §3.3 ·
 [`phase3_summary.md`](phase3_summary.md) · conformance corpus in
@@ -12,6 +12,38 @@ and the return value of `_t19_assign`, bound to `trace_nodes` in
 `template_line_balancing_heuristic`
 (`.../industrial_engineering/production_and_inventory/production_planning.py`).
 **Extractor:** `python -m tests.trace_schema.extract <out.json> <n_seeds>`.
+
+> **Revision note — 1.3 → 1.4.** §3.8 held: the reviewer could not break the
+> family it names, and with `universe`, `precedences`, `item_measures` and the
+> budget declared, exactly one `decision` trace conforms. But **§3.8's audit had
+> never been run against the two node types shipping in the same document**, and
+> running it — as the reviewer said, an implementer's job, not a fourth
+> reviewer's — finds two values it did not account for.
+>
+> **`budget_total` was restated in every element.** §3.8's own audit question
+> convicts it verbatim: *"where is the single place it is declared? If the answer
+> is 'in each element that mentions it', the check is not yet a check."* Declare
+> the budget too small and the greedy rule *honestly* opens an extra element, so
+> `n` — the answer — is wrong with every clause satisfied. `capacity_constant`
+> did not help: restating the same wrong budget everywhere is constant. 1.4
+> declares `termination.budget` once and deletes the flag.
+>
+> **An `iteration` node's answer was free.** §4.3.1 recomputes the update *from*
+> the residuals, and the residuals came from evaluation frames whose arithmetic
+> §10 had conceded was unchecked. That concession was load-bearing for an
+> attacker: a constructed trace **reported 3.501 m where the gold answer is
+> 1.380 m and passed with zero failures**, taking **full process credit** under
+> §7.2 — a model emitting arithmetically consistent nonsense rewarded by the
+> mechanism built to detect it. Note this involves no restatement at all, so
+> §3.8 as worded in 1.3 did not catch it: "declared once" is necessary and not
+> sufficient. §3.8 is amended to **declared once *and checked against something*,
+> or recomputed from something that is**, and `frame_relations` closes the hole:
+> the frame's arithmetic is now data (§4.6), verified to recompute exactly over
+> 12,735 frames.
+>
+> §10's "frame-internal physics is not checkable" is therefore **withdrawn**. It
+> was a limitation reported as a principle, and it cost the deliverable its
+> central claim for three revisions.
 
 > **Revision note — 1.2 → 1.3.** The fresh reviewer re-ran its exploit against
 > 1.2 and **routed around the fix**. `filter_relation` closed the attack it had
@@ -160,7 +192,7 @@ than one node will bind a list, and **must** raise `schema_version` when it does
 
 | Field | Type | Req. | Meaning |
 |---|---|:--:|---|
-| `schema_version` | string | ✔ | `"1.3"`. A verifier must refuse a major version it does not know. |
+| `schema_version` | string | ✔ | `"1.4"`. A verifier must refuse a major version it does not know. |
 | `node_type` | `"iteration"` \| `"decision"` | ✔ | Selects §4 or §5. |
 | `node_id` | string | ✔ | Stable within a template; the anchor a comparator reports against. |
 | `cardinality` | `"incidental"` \| `"answer_bearing"` | ✔ | §2. Fixed per `node_type` (§4, §5). Determines whether §7.2 or §7.3 applies. |
@@ -180,12 +212,13 @@ than one node will bind a list, and **must** raise `schema_version` when it does
 | `evaluation_symbols` | array of string | cond. | `iteration` only; the symbol set of a nested evaluation frame. |
 | `evaluation_roles` | object | cond. | `iteration` only; §4. |
 | `update_relation` | string | cond. | `iteration` only; §4.2. |
+| `constants` | object | cond. | `iteration` only; the item's fixed quantities, declared once. §4.6. |
+| `frame_relations` | array | cond. | `iteration` only; ordered `[symbol, expression]` pairs giving each frame symbol's arithmetic. §4.6. |
 | `trial_symbols` | array of string | cond. | `decision` only; §5.1. |
 | `trial_roles` | object | cond. | `decision` only; binds the trial roles of §5.1. |
 | `candidate_roles` | object | cond. | `decision` only; binds the candidate roles of §5.1. |
 | `eligible_symbols` | array of string | cond. | `decision` only; §5. |
 | `selection` | object | cond. | `decision` only; §5.2. The selection rule as data. |
-| `capacity_constant` | boolean | cond. | `decision` only; §5.4 invariant 8. |
 | `rule` | string | ✖ | `decision` only. Human-readable restatement of `selection`. **Advisory.** |
 
 > **Removed in 1.1.** Version 1.0 required *"`node_id` must not encode the
@@ -246,6 +279,7 @@ have failed a 1.0 verifier at shape-check for no reason (Reviewer D, F3).
 | `scope` | `"cumulative"` \| `"per_element"` | cond. | `exhaustion` only. §3.7; the cumulative reading is a **prefix**. |
 | `accumulator_role` | string | cond. | `exhaustion` only: the element **role** that accumulates. *(1.3: was `accumulator_symbol`, the last raw symbol in an otherwise all-roles §5 — Reviewer D2, F11.)* |
 | `item_measures` | object | cond. | `exhaustion` only: `{item: measure}` over `universe`, declared **once**. §3.8, §5.4.3d. |
+| `budget` | number | cond. | `exhaustion` only: the per-element budget, declared **once**. §3.8, §5.4.1. *(1.4: was restated per element as `budget_total`, which made `n` free — Reviewer D2, variant 4.)* |
 | `universe` | array | cond. | `exhaustion` only: the finite set being exhausted. |
 | `precedences` | object | cond. | `exhaustion` only: `{item: [prerequisite, …]}` over `universe`. §5.4 invariant 3b. |
 | `predicate_prose` | string | ✖ | Human-readable. **Advisory** (§3.2). |
@@ -311,9 +345,11 @@ station holds 3 items against a 5-item universe.
 
 ### 3.8 Declared once, or recomputed — the rule the other clauses are instances of
 
-> **Every value a check consumes is either declared once on the node, or
-> recomputed from something that is. A value a trace may restate freely is not
-> evidence, and a check that reads one is not a check.**
+> **Every value a check consumes is either declared once on the node *and
+> checked against something*, or recomputed from something that is. A value a
+> trace may restate freely is not evidence; a value declared once but checked
+> against nothing is not evidence either; and a check that reads one is not a
+> check.**
 
 This is the general form of a hole that was closed twice, one variant at a time,
 before being stated. In 1.1 the admissibility flag was carried per-candidate and
@@ -327,6 +363,8 @@ Applying §3.8 to the two node types gives:
 | Value | Declared once at | Recomputed by |
 |---|---|---|
 | item measures | `termination.item_measures` | §5.4.3d |
+| the budget | `termination.budget` | §5.4.1 |
+| frame arithmetic | `constants` + `frame_relations` | §4.3.9, §4.6 |
 | admissibility | — | `selection.filter_relation`, §5.4.3c |
 | eligibility | `termination.precedences` | §5.4.3b |
 | the update recurrence | `update_relation` | §4.3.1 |
@@ -334,10 +372,21 @@ Applying §3.8 to the two node types gives:
 | rounding mode | `rounding` | §6 |
 | symbol names | the role maps | §6 step 2 |
 
-**Audit any new node type against this table's shape before adding it**, and in
-particular against the question it asks: *for every value a check reads, where is
-the single place it is declared?* If the answer is "in each element that mentions
-it", the check is not yet a check.
+**Audit any new node type against this table before adding it**, and against
+both halves of the question:
+
+1. *For every value a check reads, where is the single place it is declared?* If
+   the answer is "in each element that mentions it", the check is not yet a
+   check. **`budget_total` failed this and shipped in 1.2 and 1.3.**
+2. *And what is that declaration checked against?* A value declared once and
+   verified against nothing is exactly as free as one restated freely — it is
+   simply free in one place instead of many. **Evaluation frames failed this and
+   shipped in 1.0 through 1.3**, which made an `iteration` node's answer
+   unconstrained.
+
+Running this audit is the implementer's job and it had not been done: both
+failures above were found by running it, after four review rounds had found
+everything else.
 
 ---
 
@@ -409,6 +458,8 @@ For every element:
    0 occurrences in 20,000 seeds, smallest `|g_k − g_{k−1}|` observed 0.004.
 8. `index` values are `1..len(elements)` in order. *(New in 1.1 — §5 required
    contiguity of the element index and §4 stated no analogue: Reviewer D, F14.)*
+9. Every frame — preamble and evaluation alike — satisfies `frame_relations`
+   (§4.6). *(New in 1.4: without it the node's answer is free.)*
 
 ### 4.4 Preamble
 
@@ -455,6 +506,49 @@ recomputed value legitimately differs from the printed one by up to half a unit
 in the last place. It is written down because a verifier author who tightened the
 tolerance "for safety" would fail gold traces, and because a future template with
 coarser intermediate rounding could exceed it (Reviewer D, F15).
+
+### 4.6 `constants` and `frame_relations` — the frame's own arithmetic
+
+An evaluation frame carries the quantities the update consumes. Through 1.3
+nothing checked them, and §10 recorded that as a non-goal. **It was a hole, not a
+non-goal:** §4.3.1 recomputes the update *from* the residuals, so an unchecked
+frame makes the node's answer free. A trace reporting 3.501 m against a gold
+1.380 m passed every clause and took full process credit.
+
+`constants` declares the item's fixed quantities once; `frame_relations` is an
+**ordered** list of `[symbol, expression]` giving each frame symbol's arithmetic:
+
+```json
+"constants": {"b": 4.6, "z": 2.0, "K": 6.619},
+"frame_relations": [["A",  "(b + z * y) * y"],
+                    ["P",  "b + 2 * y * sqrt(1 + z ** 2)"],
+                    ["AR", "A * (A / P) ** (2 / 3)"],
+                    ["g",  "round(AR, 3) - K"]]
+```
+
+**Grammar (normative).** §4.2's grammar, plus `**`, `sqrt(x)` and
+`round(x, n)`; names resolve to `constants`, to the frame's `iterate` role, or to
+an earlier symbol of `frame_relations`.
+
+**Evaluation (normative), and the distinction matters.** A bare symbol reference
+means **that symbol's unrounded value** — its relation substituted in full, down
+to the iterate and the constants. `round(sym, n)` means its **displayed** value.
+This is how P2's round-then-recompute is expressed, and the two readings are not
+interchangeable: `AR` recomputed from the frame's stored, *rounded* `A` and `P`
+misses its stored value on **6.7%** of frames, because the template computes it
+from the unrounded pair. A verifier that binds symbols to stored values will
+reject 6.7% of gold traces and conclude the spec is wrong.
+
+**Invariant §4.3.9.** For every frame — preamble and evaluation alike — each
+`frame_relations` symbol, evaluated as above and rounded to its
+`symbol_precision`, equals the frame's stored value. Verified: **12,735 frames
+over 3,000 seeds, zero mismatches**; and perturbing one `AR` by 2.0 is rejected.
+
+**What this does and does not buy.** It pins every frame to its iterate, so the
+residuals are no longer free and neither is the converged answer. It does *not*
+verify that the relations are the *right* physics — that `A = (b + zy)y` is
+genuinely a trapezoidal area is a claim about the item, not about the trace, and
+it is checked by the template's own grounding and by Reviewer B, not here.
 
 ---
 
@@ -552,7 +646,11 @@ pairwise disjoint; their union equals `termination.universe`; and
 
 For every element:
 
-1. `budget_initial == budget_total`.
+1. `budget_initial == budget_total == termination.budget`. *(1.4: `budget_total`
+   was previously restated per element and checked against nothing, so a trace
+   could understate it and the rule would honestly open an extra element —
+   Reviewer D2, variant 4. The `capacity_constant` flag it replaced was no
+   defence: the same wrong budget everywhere is constant.)*
 2. Trials are consecutive: trial *j+1*'s incoming budget is trial *j*'s
    `budget_after`; trial 1's is `budget_initial`.
 3. For a trial with a non-null `chosen`: `chosen` appears among `candidates` and
@@ -579,8 +677,7 @@ For every element:
 6. `committed` is exactly the ordered non-null `chosen` values of the element's
    trials.
 7. `budget_final == budget_total − Σ criterion(committed)`.
-8. When `capacity_constant` is `true`, every element's `budget_total` is equal.
-9. A trial with `closes: true` is the **last** trial of its element, and every
+8. A trial with `closes: true` is the **last** trial of its element, and every
    earlier trial has `closes: false`. *(New in 1.2: 1.1 defined `closes` but
    never said a closing trial ends the element — Reviewer D2, F9b.)*
 
@@ -682,7 +779,7 @@ See §4.5 for the headroom this leaves on the `iteration` update relation.
 |---|---|
 | `len(elements)` differs from gold | **Not a defect.** Not scored, not reported as an error. |
 | `result.value` matches gold within §7.1 | **Answer credit.** |
-| Every candidate element satisfies §4.3 | **Process credit,** independently of the count. |
+| Every candidate element satisfies §4.3, **including §4.3.9's frame check** | **Process credit,** independently of the count. Through 1.3 the frame check did not exist, so a candidate emitting arithmetically consistent nonsense took full process credit — the mechanism rewarding exactly what it was built to detect. |
 | Termination predicate holds on the candidate's last element | **Required for process credit.** A candidate that stopped early with a change above tolerance has not executed the stated scheme, even if its answer happens to match. |
 | `len(elements) > max_elements` | **Reported, not failed.** The budget is the *generator's* guard; a solver taking six updates to the same depth has not made an error. |
 | Preamble differs from the values the question prescribes | **Process failure.** The starting trials are part of the question. |
@@ -747,14 +844,13 @@ behavioural obligation (Reviewer D2).
    `evaluation` non-null on the terminating element; an evaluation frame whose
    `iterate` is not the element's `iterate_next`; a zero update denominator;
    non-contiguous `index`; a `preamble_binding` that does not hold against
-   `elements[0]`.
+   `elements[0]`; **a frame that does not satisfy `frame_relations` (§4.6)**.
 5. `decision`: overlapping `committed` sets; a union that is not
    `termination.universe`; a `chosen` that does not optimise `selection`;
    **an `admissible` flag that disagrees with `selection.filter_relation`**;
    **a candidate `measure` that disagrees with `termination.item_measures`**;
    a `candidates` set that omits an item whose `precedences` are satisfied or
-   includes one whose are not; non-contiguous `index`; a varying `budget_total`
-   under `capacity_constant`; a closing trial that is not last.
+   includes one whose are not; non-contiguous `index`; a `budget_total` that is not `termination.budget`; a closing trial that is not last.
 6. `cardinality: "answer_bearing"` with no `cardinality_symbol`, or
    `"incidental"` with one.
 7. A role named mandatory by §4.1 or §5.1 but missing from the corresponding role
@@ -796,7 +892,7 @@ the corpus.)*
 
 ```json
 {
- "schema_version": "1.3",
+ "schema_version": "1.4",
  "node_type": "iteration",
  "node_id": "t24_secant_normal_depth",
  "cardinality": "incidental",
@@ -822,6 +918,29 @@ the corpus.)*
   "satisfied": true
  },
  "rounding": "decimal-half-up",
+ "constants": {
+  "b": 2.1,
+  "z": 2.5,
+  "K": 6.619
+ },
+ "frame_relations": [
+  [
+   "A",
+   "(b + z * y) * y"
+  ],
+  [
+   "P",
+   "b + 2 * y * sqrt(1 + z ** 2)"
+  ],
+  [
+   "AR",
+   "A * (A / P) ** (2 / 3)"
+  ],
+  [
+   "g",
+   "round(AR, 3) - K"
+  ]
+ ],
  "symbol_precision": {
   "y_prev": 4,
   "y_curr": 4,
@@ -976,7 +1095,7 @@ within the 5.0e-05 tolerance `symbol_precision["y_next"] = 4` implies ✓.
 
 ```json
 {
- "schema_version": "1.3",
+ "schema_version": "1.4",
  "node_type": "decision",
  "node_id": "t19_greedy_station_assignment",
  "cardinality": "answer_bearing",
@@ -1016,6 +1135,7 @@ within the 5.0e-05 tolerance `symbol_precision["y_next"] = 4` implies ✓.
    "d": 87,
    "e": 22
   },
+  "budget": 139,
   "max_elements": 5,
   "satisfied": true
  },
@@ -1055,7 +1175,6 @@ within the 5.0e-05 tolerance `symbol_precision["y_next"] = 4` implies ✓.
   "duration": 0,
   "station_id": 0
  },
- "capacity_constant": true,
  "element_symbols": [
   "station_id",
   "capacity",
@@ -1247,13 +1366,17 @@ was chosen, so it closes.
 Stated as non-goals so an implementer meets the edge here rather than in the
 middle of a verifier.
 
-- **Frame-internal physics is not checkable.** An `iteration` evaluation frame
-  carries `A`, `P`, `AR`, `g`, but the geometry functions relating them are the
-  item's content and are not on the node. A verifier can check that a frame is
-  *bound to the right iterate* (§4.3.6) and that its residual feeds the update
-  (§3.5), not that `A = b·y`. Adding them would mean carrying an expression
-  language for arbitrary engineering formulae, which is the milestone model's
-  problem, not this node's.
+- **~~Frame-internal physics is not checkable.~~ WITHDRAWN in 1.4.** Versions
+  1.0–1.3 recorded this as a non-goal, reasoning that checking a frame would mean
+  "carrying an expression language for arbitrary engineering formulae, which is
+  the milestone model's problem, not this node's". **That was a limitation
+  reported as a principle, and it was load-bearing for an attacker**: because
+  §4.3.1 recomputes the update *from* the residuals, an unchecked frame left the
+  node's answer entirely free. The node already carried two expression languages
+  (§4.2, §5.2), so the stated cost was overstated by roughly one grammar rule.
+  §4.6 now carries the frame's arithmetic and §4.3.9 checks it. What remains out
+  of scope is narrower and genuinely is a non-goal: the node cannot verify that
+  the declared relations are the *right physics*, only that the frame obeys them.
 - **Prose/node agreement is out of scope.** 1.0 made "every numeric token the
   node carries appears in the prose" step 8 of the normative algorithm while
   giving no definition of "an arithmetic line" and no precision to compare at

@@ -486,7 +486,7 @@ def template_normal_depth_iteration():
     # without these a verifier can only be written by hardcoding this
     # template's symbol names and its secant formula (finding F3).
     trace_nodes = {
-        "schema_version": "1.3",
+        "schema_version": "1.4",
         "node_type": "iteration",
         "node_id": "t24_secant_normal_depth",
         "cardinality": "incidental",
@@ -507,6 +507,23 @@ def template_normal_depth_iteration():
                         "max_elements": _T24_MAX_UPDATES,
                         "satisfied": True},
         "rounding": "decimal-half-up",
+        # The frame's own arithmetic, as data. Without this an `iteration`
+        # node's ANSWER is free: 4.3.1 recomputes the update FROM the
+        # residuals, and the residuals came from frames nothing checked, so a
+        # trace could fabricate a converged depth and take full process credit
+        # (Reviewer D2, variant 5 -- it reported 3.501 m against a gold
+        # 1.380 m and passed with zero failures). A symbol inside a relation
+        # means that symbol's UNROUNDED value; `round(sym, n)` means its
+        # displayed value, which is how P2's round-then-recompute is expressed.
+        # Verified: 12,735 frames over 3,000 seeds recompute exactly.
+        "constants": {"b": b, "z": z, "K": K},
+        "frame_relations": [
+            ["A", "b * y" if shape == "rectangular" else "(b + z * y) * y"],
+            ["P", ("b + 2 * y" if shape == "rectangular"
+                   else "b + 2 * y * sqrt(1 + z ** 2)")],
+            ["AR", "A * (A / P) ** (2 / 3)"],
+            ["g", "round(AR, 3) - K"],
+        ],
         "symbol_precision": {"y_prev": 4, "y_curr": 4, "y_next": 4,
                              "change": 4, "g_prev": 3, "g_curr": 3,
                              "y": 4, "A": 3, "P": 3, "AR": 3, "g": 3},

@@ -173,7 +173,7 @@ def _t19_assign(times, CT):
                          "assigned": list(station),
                          "remaining_final": rem})
     return {
-        "schema_version": "1.3",
+        "schema_version": "1.4",
         "node_type": "decision",
         "node_id": "t19_greedy_station_assignment",
         "cardinality": "answer_bearing",
@@ -196,6 +196,14 @@ def _t19_assign(times, CT):
                         # -- every other invariant holds, and n, which is the
                         # answer, comes out wrong (Reviewer D2, F3').
                         "item_measures": {x: times[x] for x in _T19_ORDER},
+                        # The budget declared ONCE. Restated per element it is
+                        # free: declare it too small everywhere and the greedy
+                        # rule honestly opens an extra station, so n -- the
+                        # answer -- is wrong with every clause satisfied. A
+                        # `capacity_constant` flag did not help, because
+                        # restating the same WRONG budget everywhere is
+                        # constant (Reviewer D2, variant 4).
+                        "budget": CT,
                         "max_elements": len(_T19_ORDER),
                         "satisfied": True},
         # Type-level roles, so a verifier never reaches for a literal symbol
@@ -226,7 +234,6 @@ def _t19_assign(times, CT):
         "symbol_precision": {"capacity": 0, "remaining_initial": 0,
                              "remaining_final": 0, "remaining_after": 0,
                              "duration": 0, "station_id": 0},
-        "capacity_constant": True,
         "element_symbols": ["station_id", "capacity", "remaining_initial",
                             "trials", "assigned", "remaining_final"],
         "trial_symbols": ["eligible", "chosen", "remaining_after", "closes"],
