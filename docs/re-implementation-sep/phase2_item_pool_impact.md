@@ -14,11 +14,25 @@ which has already caught someone on this project.
 | Template | Question changes | Answer changes | Median shift | Max shift |
 |---|---:|---:|---:|---:|
 | `levenspiel_plot_interpretation` | **300/300** | **300/300** | — (whole pool) | — |
-| `pfr_volume_changing_rate` | 300/300 (wording) | 79/300 | 0.041% | 0.219% |
+| `pfr_volume_changing_rate` | 300/300 (wording) | **24/300** — all of them a *different draw*, not a moved answer | — | — |
 | `adiabatic_flame_temperature` | 0/300 | **300/300** | 0.845% | 2.256% |
 | `vibration_isolator_design` | 0/300 | **300/300** | 0.012% | 0.128% |
 
 Zero generation errors on either side, all four templates, 300 seeds.
+
+**The PFR row changed after review** and is worth reading carefully. It first
+measured 79 answers moved by a median 0.041% — that movement was the **4-decimal
+rounding error Reviewer C found in C-4**, not something intended. Switching to
+six significant figures removed it: of the 276 seeds that draw the same
+parameters as master, **the answer moved on none**. The remaining 24 (8.0%) draw
+*different parameters* entirely, because Reviewer A's A-1 tie guard resamples
+0.057 draws per instance and a rejected draw consumes randomness. Those are
+different items, not different answers to the same item.
+
+The lesson is worth keeping: **the first measurement was of my own defect, and
+it looked small enough to accept.** A 0.041% median reads as rounding noise. It
+was a 0.5% worst-case error in the answer key, and only an exhaustive grid over
+all 26,967,996 sampled points showed that 1.17% of the space exceeded 0.1%.
 
 ---
 
@@ -39,7 +53,7 @@ conversion grid construction, same rising-rate shape, same 74%-of-draws
 monotonicity enforcement, same distributions for `F_A0` and target conversion.
 What changed is which draw a given seed produces.
 
-### `pfr_volume_changing_rate` — every question, a quarter of the answers
+### `pfr_volume_changing_rate` — every question, and 8% a different draw
 
 The **question** changed on all 300 by wording alone: *"An {n}-order …"* became
 *"An order-{n} …"*, and the closing note claiming analytical solutions are
@@ -50,12 +64,18 @@ identical — `n` still draws from the same 11 values — which is the cheaper f
 under P6 (D-016's principle: change the claim, not the sample, when the claim is
 what is wrong).
 
-The **answer** moved on 79/300 by a median 0.041%. This is the round-then-
-recompute binding: intermediates are now bound through their display, so
-`V = (F_A0 / 0.215) × 1.3334` is computed from `0.215` and `1.3334` — the
-numbers the reader can see — rather than from unrounded values that print that
-way. The answer is now what the trace derives. The closed form itself moved
-nothing: it agrees with `quad` to 2.7e-15 over 3000 seeds.
+The **answer** is unchanged on every seed that draws the same parameters —
+276 of 300, moved on none. Intermediates are bound through their display, so
+`V = (F_A0 / 0.227294) × 2.46757` is computed from the numbers the reader can
+see; at six significant figures that binding costs at most 0.00123% of the
+answer, which is invisible at the 2 dp the answer is quoted to. The closed form
+moved nothing either: it agrees with `quad` to 2.7e-15 over 3000 seeds.
+
+The other **24 of 300 (8.0%) draw different parameters**, because the A-1 tie
+guard rejects 0.057 draws per instance and a rejected draw consumes randomness.
+Those seeds produce a different — equally valid — item, not a different answer
+to the same one. That is the cost of removing the display ties, and it is the
+same cost Phase 1 paid wherever it resampled.
 
 ### `adiabatic_flame_temperature` — every answer, and every one of them closer to reality
 
@@ -63,7 +83,7 @@ Questions are untouched. Every answer moves, by a median 0.845% and at most
 2.256%, for two compounding reasons:
 
 1. **`CP_PARAMS_COMBUSTION`** (D-036). The old answers were computed from a
-   polynomial fitted to 1500 K and evaluated to 2844 K. They were all low.
+   polynomial fitted to 1500 K and evaluated to 2908 K. They were all low.
 2. **The stated algorithm.** The answer is now the sixth iterate of a printed
    iteration rather than a root found by `fsolve` to its own tolerance, and it
    is quoted to the nearest kelvin rather than 2 dp — spurious precision on a
