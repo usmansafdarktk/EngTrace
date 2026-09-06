@@ -657,7 +657,7 @@ AIR_COMPOSITION = {"N2(g)": 0.78084, "O2(g)": 0.20946, "Ar(g)": 0.00934}
 # returns Cp/R. Valid 298-3000 K.
 #
 # WHY A SECOND TABLE (DECISIONS D-032, D-036). CP_PARAMS is fitted to 1500 K.
-# template_adiabatic_flame_temperature integrates to 2844 K, so it was
+# template_adiabatic_flame_temperature reaches 2908 K, so it was
 # extrapolating ~1300 K past validity and every flame temperature came out low
 # - methane 2311.2 K against a reference of 2326.35 K, acetylene 64.7 K below
 # the value NIST gives. Phase C2 measured this (Reviewer H, F-2) and handed the
@@ -675,9 +675,17 @@ AIR_COMPOSITION = {"N2(g)": 0.78084, "O2(g)": 0.20946, "Ar(g)": 0.00934}
 # unchanged and keeps its low-temperature accuracy; this table is read ONLY by
 # the flame template.
 #
-# RESULT: flame temperatures now agree with a direct NIST Shomate solve to
-# within 1.7 K on all eleven reactions (was 5-65 K low). Methane computes
-# 2327 K against the 2326.35 K complete-combustion reference - 0.03%.
+# RESULT: the flame temperatures this table produces agree with a direct NIST
+# Shomate solve to within 1.93 K on all eleven reactions - worst carbon
+# monoxide, 2662 against 2663.93 - where the 1500 K table was 5-65 K low.
+# Methane computes 2327 K against the 2326.35 K complete-combustion
+# reference: 0.03%.
+#
+# An earlier version of this note said 1.7 K. That was the refit-vs-NIST
+# residual, not the figure that matters, which is what the TEMPLATE finally
+# prints against NIST - a different and slightly larger number once the
+# iteration and the rounding to whole kelvin are included (Phase 2 Reviewer C,
+# finding C-1).
 CP_PARAMS_COMBUSTION = {
     # [DERIVED] least-squares refit of NIST 124-38-9 Shomate Cp over
     #   298-3000 K, 400 points. Worst residual -5.43% (at the
@@ -688,6 +696,11 @@ CP_PARAMS_COMBUSTION = {
     #   298-3000 K, 400 points. Worst residual +0.87% (at the
     #   298 K end), 0.51% above 1000 K where the flame integral
     #   has its mass.
+    #   CAVEAT: NIST's lowest gas-phase Shomate range for water starts at
+    #   500 K, so the 298-500 K part of that grid is Shomate EXTRAPOLATED,
+    #   not NIST data, and the +0.87% is measured against the extrapolation
+    #   (Phase 2 Reviewer C, C-7). Checked and immaterial: the extrapolated
+    #   Cp(298.15) is 33.590 against JANAF's 33.58 J/(mol K), 0.03%.
     "H2O(g)": {"A": 3.0520, "B": 2.2354E-3, "C": -0.3435E-6, "D": 0.3444E5},   # Water vapour
     # [DERIVED] least-squares refit of NIST 7727-37-9 Shomate Cp over
     #   298-3000 K, 400 points. Worst residual -1.05% (at the

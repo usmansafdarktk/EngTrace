@@ -374,9 +374,17 @@ def template_adiabatic_flame_temperature():
             <Cp>/R = A + (B/2)(T + T0) + (C/3)(T^2 + T*T0 + T0^2) + D/(T*T0)
 
         Six iterations from a 2000 K guess bring every one of the eleven
-        reactions within 0.06 K of its fixed point, so the answer is quoted to
-        the nearest kelvin and the iteration count needs no convergence test at
-        run time. Verified against a bisection solve of the same balance.
+        reactions within 0.035 K of its fixed point, so the answer is quoted to
+        the nearest kelvin. Reviewer C measured the tightest rounding-boundary
+        margin at 0.116 K (propane) - a 3.3x safety factor - and confirmed the
+        map is a local contraction, |g'| about 0.09-0.135, with the same
+        answer for any initial guess from 400 K to 10000 K.
+
+        There IS a convergence assert below, and it stays: the iteration count
+        being fixed is what makes the trace reproducible, while the assert is
+        what stops a silently unconverged answer if the reaction set ever
+        changes. Note it is stripped by `python -O`, so it guards development,
+        not production (Reviewer C, C-6).
 
         NO SILENT FALLBACKS. The retry loop caught `Exception` - including the
         solver's own failures - and silently tried a different reaction, so a
@@ -386,10 +394,23 @@ def template_adiabatic_flame_temperature():
         preconditions are checked explicitly and a violation raises (P5).
         Measured over 2000 seeds, the loop never retried once.
 
-        HIGH-TEMPERATURE HEAT CAPACITIES. This template integrates to 2844 K
-        while CP_PARAMS is fitted to 1500 K, so it was extrapolating ~1300 K
-        past validity and every flame temperature was low. It now reads
-        CP_PARAMS_COMBUSTION, fitted over 298-3000 K (DECISIONS D-032, D-036).
+        HIGH-TEMPERATURE HEAT CAPACITIES. This template reaches 2908 K
+        (acetylene) while CP_PARAMS is fitted to 1500 K, so it was
+        extrapolating ~1400 K past validity and every flame temperature was
+        low. It now reads CP_PARAMS_COMBUSTION, fitted over 298-3000 K
+        (DECISIONS D-032, D-036), which leaves 92 K of headroom under the
+        ceiling. The figure 2844 K appeared here before and was measured with
+        the OLD table - correcting the table raised the temperatures, so the
+        stale number understated the margin it was describing (Reviewer C,
+        C-5).
+
+        PRECISION OF THE ANSWER. Quoted to the nearest kelvin, but the model is
+        not good to a kelvin: against a direct NIST Shomate solve the answers
+        differ by up to 1.93 K, and on 6 of the 11 reactions the nearest-kelvin
+        value differs. The trace is internally exact - it reproduces its own
+        arithmetic - so this is a statement about the polynomial, not the
+        solver. Step 6 now says so, because a grader marking to +/-1 K would
+        otherwise fail a solver who used NIST data directly (Reviewer C, C-2).
     """
     R = 8.314           # J/(mol K)
     T_initial = 298.15  # K
@@ -502,7 +523,10 @@ def template_adiabatic_flame_temperature():
         f"Successive passes agree to within "
         f"{round(abs(iterations[-1][2] - iterations[-1][0]), dp)} K, so the "
         f"iteration has converged at this display precision.\n"
-        f"T_ad = {adiabatic_temp_kelvin} K\n\n"
+        f"T_ad = {adiabatic_temp_kelvin} K\n"
+        f"The iteration is exact for this heat-capacity model, but the model "
+        f"itself is good to about ±2 K against NIST reference data, so the "
+        f"answer should be read as {adiabatic_temp_kelvin} ± 2 K.\n\n"
 
         f"**Answer:** The estimated adiabatic flame temperature is **{adiabatic_temp_kelvin} K**."
     )

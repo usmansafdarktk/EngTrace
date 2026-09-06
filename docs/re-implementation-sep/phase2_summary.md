@@ -73,9 +73,12 @@ T_(k+1) = T0 + (−ΔH_rxn) / Σ_i n_i·<Cp>_i(T0, T_k)
 
 - **Initial guess:** 2000 K, stated in the trace.
 - **Iterations:** fixed at 6, stated in the trace. Six passes bring all eleven
-  reactions within **0.06 K** of their fixed point, so the answer is quoted to
-  the nearest kelvin and no run-time convergence test is needed — the count is
-  part of the stated method, not a search.
+  reactions within **0.035 K** of their fixed point (Reviewer C's independent
+  measurement; my 0.06 K was conservative), so the answer is quoted to the
+  nearest kelvin. The tightest rounding-boundary margin is **0.116 K** (propane)
+  — a 3.3x safety factor. There is also a convergence assert, and it stays: the
+  fixed count is what makes the trace reproducible, the assert is what stops a
+  silently unconverged answer if the reaction set ever changes.
 - **Every pass is printed**, with its divisor, as one division.
 - The divisor is bound through its display, so each printed line closes exactly.
 
@@ -106,7 +109,7 @@ accuracy, only opacity.
 Phase C2 handed on the Cp-extrapolation trade rather than deciding it. Decided
 as **D-036: split the table by consumer.**
 
-`CP_PARAMS` is fitted to 1500 K; this template integrates to 2844 K. Restricting
+`CP_PARAMS` is fitted to 1500 K; this template reaches 2908 K. Restricting
 the range is not available — the flame temperature is an **output**, not a
 sampled input. Refitting `CP_PARAMS` would fix this template and damage
 `sensible_heat_temp_dependent_cp`, which lives at 298–1000 K where a wide-range
@@ -115,8 +118,13 @@ fit is worse. So `CP_PARAMS` is untouched and a second table,
 species and read only here.
 
 **Result:** all eleven flame temperatures now agree with a direct NIST Shomate
-solve to within **1.9 K** (was 5–65 K low). Methane computes **2327 K** against
-the 2326.35 K complete-combustion reference — **0.03%**, from 0.65%.
+solve to within **1.93 K** — worst carbon monoxide — where the 1500 K table was
+5–65 K low. Methane computes **2327 K** against the 2326.35 K
+complete-combustion reference: **0.03%**, from 0.65%.
+
+Reviewer C reproduced this independently by fetching NIST live and parsing the
+raw HTML rather than reading the on-disk JSON, so its arbiter is independent of
+the transcription it was checking.
 
 **A near miss.** My first evidence script integrated a single Shomate range
 across a span covering several and reported methane at 2191 K — which would have
@@ -166,7 +174,7 @@ newly-failing templates anywhere in the corpus.**
 3.12.13**, 200 seeds, each run as its own process. Two versions on one machine —
 the second *machine* is Reviewer A's, and is not something I can supply.
 
-**Fallbacks (D2.3).** Ten removed, each measured over 5000 seeds before removal
+**Fallbacks (D2.3).** Ten fallback *branches* removed (four of them `except` statements — Reviewer A, A-2), each measured over 5000 seeds before removal
 (resolving to ~0.06%). Every one fired on 0.00%; two are provably unreachable
 with the argument recorded. Full table in
 [`phase2_item_pool_impact.md`](phase2_item_pool_impact.md) §4.
@@ -235,8 +243,85 @@ choosing one route for both.
 
 ## 11. R4 triage — Reviewer A (determinism)
 
-*Filed in [`reviews/phase2_reviewer_a_determinism.md`](reviews/phase2_reviewer_a_determinism.md).*
+[`reviews/phase2_reviewer_a_determinism.md`](reviews/phase2_reviewer_a_determinism.md).
+**PASS WITH FINDINGS.** Three findings, all closed.
+
+| # | Finding | Disposition | Action |
+|---|---|---|---|
+| A-1 | the PFR template was the only one of the four with no display-tie guard, and rounds an un-pre-rounded libm `pow()`; 1170/749,111 cells sit exactly on a 4-dp tie | **ACCEPTED** | reproduced A's count exactly, then fixed with a bounded resample loop and a new `_display_is_fragile` guard. Rejects 0.057 draws per instance |
+| A-2 | "eight fallbacks removed" does not reconcile — four `except` handlers | **ACCEPTED** | mine, and a real inconsistency: the commit said eight, the item-pool table lists **ten**. Ten is right; A counted `except` statements, the table counts fallback *branches*. Stated once now, with the accounting shown |
+| A-3 | libm exposure confined to the PFR; the other three provably portable | **RECORDED (favourable)** | it is what scopes A-1 to one template |
+
+**What the second reviewer bought.** A ran four conditions I did not: reversed
+seed order, omitting the numpy seeding my own dump script performs, a randomised
+hash seed, and seeds 500000–500999. My 200-seed claim was true but thin; A's
+1000 seeds × 9 process-isolated configurations is what actually establishes the
+gate. A also verified the isolator algebra **through the half-up rounding the
+code applies** — my argument was over exact values and did not transfer
+automatically. It survives, with the discriminant ~96 units in the last printed
+place from zero, but I had not shown that.
+
+**A corrected itself mid-review** and the correction is the useful part: it first
+flagged `integral_term`, then traced the chain and found pre-rounding
+`power_term` insulates it. `rate_coefficient` was the one place that
+pre-rounding was missing — which is exactly why A-1 is the finding.
+
+**Open, carried to Phase 3.** A's structural point: **two rounding conventions
+now coexist in the corpus** — `_hu` (Decimal `ROUND_HALF_UP`, D-012) in the
+vibrations file, `_as_printed`/`format` (binary `ROUND_HALF_EVEN`) in the three
+chemical-engineering files — and only the vibrations file carried a tie guard.
+A-1 is an instance of that unevenness. A corpus-wide sweep for templates
+combining a transcendental with a fixed-decimal print is recommended, and is not
+a Phase 2 fix.
+
+**Not fixed, recorded:** the "5000 seeds at 0.00%" fallback measurement lives in
+a scratch script, not the repo, so A could not check it. The rates are in
+`phase2_item_pool_impact.md` §4 but their evidence is not reproducible from the
+repository. A gap, honestly a real one.
+
+---
 
 ## 12. R4 triage — Reviewer C (numerical methods)
 
-*Filed in [`reviews/phase2_reviewer_c_numerical.md`](reviews/phase2_reviewer_c_numerical.md).*
+[`reviews/phase2_reviewer_c_numerical.md`](reviews/phase2_reviewer_c_numerical.md).
+**PASS WITH FINDINGS.** Seven findings, all closed.
+
+| # | Finding | Disposition | Action |
+|---|---|---|---|
+| C-1 | `constants.py` claimed agreement "within 1.7 K"; the commit said 1.9 K; CO is 1.93 K out | **ACCEPTED** | re-measured template-vs-NIST on all 11: worst **1.93 K**. The 1.7 K was the *refit*-vs-NIST residual — a different quantity. The file now says which is which |
+| C-2 | answer quoted to 1 K, model good to ~2 K; nearest-kelvin differs from NIST on 6/11 | **ACCEPTED** | Step 6 now declares the tolerance **in the trace**: "read as N ± 2 K". A gold trace that implies four significant figures it cannot support would fail a solver who used better data than it did |
+| C-3 | `{n-1}` interpolated raw → `L^0.6000000000000001` on 38.6% of instances | **ACCEPTED — was blocking** | bound as `n_minus_1`. Reproduced at 771/2000 seeds first |
+| C-4 | fixed **decimal** places on a quantity spanning 2.5 decades; exhaustive grid gives 0.5122% worst answer-key error, 1.17% of the space above 0.1% | **ACCEPTED** | switched to six **significant figures**. Worst error **0.00123%**, 417× better — and the answers now match the exact closed form on every seed drawing the same parameters |
+| C-5 | docstring said 2844 K; true maximum is 2908 K | **ACCEPTED** | 2844 was measured with the *old* table; correcting the table raised the temperatures, so the stale number understated the margin it described |
+| C-6 | docstring denied a runtime convergence test that exists | **ACCEPTED** | the assert stays and the docstring stopped denying it. C is right that `-O` strips it, so it guards development, not production. Both now stated |
+| C-7 | the `H2O(g)` tag claims a 298–3000 K refit, but NIST's lowest range starts at 500 K | **ACCEPTED** | caveat added. C checked the damage itself — extrapolated Cp(298.15) 33.590 vs JANAF 33.58, 0.03% — so the value stands and only the claim needed narrowing |
+
+**What C bought.** It fetched NIST live and parsed the raw HTML rather than
+reading the on-disk JSON, so its arbiter is independent of the transcription it
+was checking, and it validated that arbiter (zero sensible enthalpy at 298.15 K,
+range continuity ≤3.2e-3 kJ/mol) before using it. It then **could not break** any
+of the convergence claims — and improved three of them: 0.035 K rather than my
+0.06 K, and the observation that the map is **not** a global contraction (|g′|
+reaches 1.083 for CO) even though the basin comfortably contains the guess. It
+also confirmed the 2191 K error that nearly drove D-036 the wrong way did not
+survive into the committed numbers, which is the specific thing I asked it to
+look for.
+
+**C partly contradicts §10 of this document, and C is right.** My criterion for
+Phase 3 was *"fix the iteration count when the count is not part of what the item
+tests."* C points out this template is verifiable only because its parameter
+space is a **closed set of eleven discrete items** — the rounding-boundary
+question could be checked exhaustively. `normal_depth_iteration` samples channel
+geometry continuously, so a fixed count **cannot** be exhaustively validated and
+there will be a measure-zero-but-nonempty set of parameters landing on the wrong
+side of a display boundary; it needs a proven error bound over its sampled box,
+or a convergence assert **not stripped by `-O`**. And a heuristic has no fixed
+point at all, so the reasoning does not transfer to `line_balancing_heuristic`
+in any form. **§10's criterion is necessary but not sufficient: it also requires
+a parameter space you can verify over.** Phase 3 should treat its two templates
+as two different problems.
+
+**Open, carried to Phase 3.** C-3 and C-4 generalise corpus-wide: a regex for
+`\{[a-z_]+ *[-+*/] *[0-9.]+\}` inside f-strings finds every instance of C-3 in
+one pass, and any template applying fixed decimal places to a quantity spanning
+decades has C-4. Neither swept here.

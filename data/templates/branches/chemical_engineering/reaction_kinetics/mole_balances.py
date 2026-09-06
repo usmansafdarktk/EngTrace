@@ -3,8 +3,15 @@ import math
 from data.templates.branches.chemical_engineering.constants import LIQUID_PHASE_REACTANTS, GENERAL_REACTANTS
 
 
-# Display precision for the intermediates of template_pfr_volume_changing_rate.
-PFR_DP = 4
+# Display precision for the intermediates of template_pfr_volume_changing_rate,
+# in SIGNIFICANT FIGURES rather than decimal places. The rate coefficient
+# k*C_A0^n spans 0.0088 to 2.83 - two and a half decades - so a fixed 4 dp left
+# only two significant figures at the bottom of the range, and the answer key
+# was wrong by up to 0.51% there. Measured by Reviewer C over the complete
+# sampled space, 26,967,996 points: 1.17% of it carried more than 0.1% error
+# (finding C-4). Six significant figures bounds the display error at 5e-7
+# relative everywhere in the range.
+PFR_SIG = 6
 
 
 def _as_printed(x, spec):
@@ -15,6 +22,28 @@ def _as_printed(x, spec):
     Rounding alone does not achieve that (Phase 1, DECISIONS D-016).
     """
     return float(format(x, spec))
+
+
+def _display_is_fragile(x, spec, ulps=4):
+    """Would a few ulps of movement in `x` change what it prints as?
+
+    This asks the question a display tie actually poses, rather than testing
+    for a decimal half-way point: if the last bit of `x` changed, would the
+    reader see a different number? It matters here because `C_A0 ** n` is a
+    libm `pow()` call and C99 does not require `pow` to be correctly rounded,
+    so two platforms can legitimately differ in that last bit. Where the
+    printed form sits on a knife edge, that bit would change the gold answer.
+
+    Phrasing it in ulps rather than decimals also makes it work for any format
+    spec, including the significant-figure spec this template now uses, where
+    "half-way point" has no fixed decimal position (Phase 2 Reviewer A, A-1).
+    """
+    seen = format(x, spec)
+    up = down = x
+    for _ in range(ulps):
+        up = math.nextafter(up, math.inf)
+        down = math.nextafter(down, -math.inf)
+    return format(up, spec) != seen or format(down, spec) != seen
 
 
 # Template 1 (Easy)
@@ -323,19 +352,36 @@ def template_pfr_volume_changing_rate():
             - str: A step-by-step solution showing the setup and numerical result.
     """
     
-    reactant_name = random.choice(LIQUID_PHASE_REACTANTS)
-    F_A0 = round(random.uniform(1.0, 4.0), 2)
-    X_final = round(random.uniform(0.5, 0.85), 2)
-    
-    # Reaction order. n = 2.0 is drawn ~9.6% of the time and is a perfectly
-    # valid instance; what was wrong was the question calling every draw
-    # "non-integer". The wording was fixed rather than the sampling, so the
-    # item pool is unchanged (P6).
-    n = round(random.uniform(1.5, 2.5), 1)
-    
-    # Rate constant and initial concentration
-    k = round(random.uniform(0.05, 0.5), 3)
-    C_A0 = round(random.uniform(0.5, 2.0), 2)  # mol/L
+    spec = f'.{PFR_SIG}g'
+    for _ in range(200):
+        reactant_name = random.choice(LIQUID_PHASE_REACTANTS)
+        F_A0 = round(random.uniform(1.0, 4.0), 2)
+        X_final = round(random.uniform(0.5, 0.85), 2)
+
+        # Reaction order. n = 2.0 is drawn ~9.6% of the time and is a perfectly
+        # valid instance; what was wrong was the question calling every draw
+        # "non-integer". The wording was fixed rather than the sampling, so the
+        # item pool is unchanged (P6).
+        n = round(random.uniform(1.5, 2.5), 1)
+
+        # Rate constant and initial concentration
+        k = round(random.uniform(0.05, 0.5), 3)
+        C_A0 = round(random.uniform(0.5, 2.0), 2)  # mol/L
+
+        # Every quantity that is ROUNDED for display is checked first. The two
+        # that matter are the ones downstream of a pow(): a draw whose printed
+        # form would move under a one-ulp difference in the C library is
+        # resampled, not resolved (A-1, D-016).
+        if (_display_is_fragile(k * (C_A0 ** n), spec)
+                or _display_is_fragile((1 - X_final) ** (1 - n), spec)):
+            continue
+        power_term = _as_printed((1 - X_final) ** (1 - n), spec)
+        if _display_is_fragile((power_term - 1) / (n - 1), spec):
+            continue
+        break
+    else:
+        raise RuntimeError(
+            "pfr_volume_changing_rate: no display-stable sample in 200 draws")
     
     # Closed form. Separating the PFR design equation for -r_A = k*C_A^n with
     # C_A = C_A0*(1-X) gives
@@ -353,12 +399,15 @@ def template_pfr_volume_changing_rate():
     assert 0.0 < X_final < 1.0, f"conversion outside (0, 1): {X_final}"
     assert k > 0.0 and C_A0 > 0.0, f"non-physical rate data: k={k}, C_A0={C_A0}"
 
-    spec = f'.{PFR_DP}f'
     rate_coefficient = _as_printed(k * (C_A0 ** n), spec)
     one_minus_X = _as_printed(1 - X_final, spec)
-    power_term = _as_printed(one_minus_X ** (1 - n), spec)
     integral_term = _as_printed((power_term - 1) / (n - 1), spec)
     volume = F_A0 / rate_coefficient * integral_term
+
+    # C-3: bound, not interpolated raw. `n - 1` straight into an f-string
+    # printed L^0.6000000000000001 on 38.6% of instances.
+    n_minus_1 = round(n - 1, 4)
+    one_minus_n = round(1 - n, 4)
 
     assert rate_coefficient > 0.0, f"rate coefficient vanished: {rate_coefficient}"
     assert integral_term > 0.0, f"integral must be positive for X in (0,1): {integral_term}"
@@ -375,7 +424,7 @@ def template_pfr_volume_changing_rate():
         f"**Given:**\n"
         f"- Inlet molar flow rate: F_A0 = {F_A0} mol/s\n"
         f"- Initial concentration: C_A0 = {C_A0} mol/L\n"
-        f"- Rate constant: k = {k} L^{n-1}/(mol^{n-1}·s)\n"
+        f"- Rate constant: k = {k} L^{n_minus_1}/(mol^{n_minus_1}·s)\n"
         f"- Reaction order: n = {n}\n"
         f"- Desired conversion: X = {X_final}\n\n"
         
@@ -391,7 +440,7 @@ def template_pfr_volume_changing_rate():
 
         f"**Step 3:** Integrate. For n ≠ 1, ∫(1 - X)^(-n) dX = [(1 - X)^(1-n) - 1] / (n - 1).\n"
         f"1 - X = 1 - {X_final} = {one_minus_X}\n"
-        f"(1 - X)^(1-n) = {one_minus_X}^({round(1 - n, 4)}) = {power_term}\n"
+        f"(1 - X)^(1-n) = {one_minus_X}^({one_minus_n}) = {power_term}\n"
         f"Integral = ({power_term} - 1) / ({n} - 1) = {integral_term}\n\n"
 
         f"**Step 4:** Evaluate the volume.\n"
