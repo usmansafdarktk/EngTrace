@@ -1,0 +1,698 @@
+{
+ "_source": "NIST Chemistry WebBook, SRD 69 (https://webbook.nist.gov/chemistry/)",
+ "_retrieved": "2026-09-06",
+ "_equation": "Cp[J/mol/K] = A + B*t + C*t^2 + D*t^3 + E/t^2,  t = T[K]/1000",
+ "_note": "Shomate coefficients as published by NIST, transcribed verbatim. Used to cross-check the Smith-Van Ness-Abbott polynomial in CP_PARAMS (Phase C2). The two functional forms are independent fits to the same underlying thermochemistry, so agreement between them is real evidence, not a tautology.",
+ "_primary_reference": "Chase, M.W., Jr., NIST-JANAF Thermochemical Tables, Fourth Edition, J. Phys. Chem. Ref. Data, Monograph 9, 1998",
+ "N2(g)": {
+  "cas": "7727-37-9",
+  "nist_id": "C7727379",
+  "ranges": [
+   {
+    "T_min": 100,
+    "T_max": 500,
+    "A": 28.98641,
+    "B": 1.853978,
+    "C": -9.647459,
+    "D": 16.63537,
+    "E": 0.000117,
+    "F": -8.671914,
+    "G": 226.4168,
+    "H": 0.0
+   },
+   {
+    "T_min": 500,
+    "T_max": 2000,
+    "A": 19.50583,
+    "B": 19.88705,
+    "C": -8.598535,
+    "D": 1.369784,
+    "E": 0.527601,
+    "F": -4.935202,
+    "G": 212.39,
+    "H": 0.0
+   },
+   {
+    "T_min": 2000,
+    "T_max": 6000,
+    "A": 35.51872,
+    "B": 1.128728,
+    "C": -0.196103,
+    "D": 0.014662,
+    "E": -4.55376,
+    "F": -18.97091,
+    "G": 224.981,
+    "H": 0.0
+   }
+  ],
+  "dHf_gas_kJ_per_mol": 0.0,
+  "dHf_note": "element in its standard state, by definition zero"
+ },
+ "CO2(g)": {
+  "cas": "124-38-9",
+  "nist_id": "C124389",
+  "ranges": [
+   {
+    "T_min": 298,
+    "T_max": 1200,
+    "A": 24.99735,
+    "B": 55.18696,
+    "C": -33.69137,
+    "D": 7.948387,
+    "E": -0.136638,
+    "F": -403.6075,
+    "G": 228.2431,
+    "H": -393.5224
+   },
+   {
+    "T_min": 1200,
+    "T_max": 6000,
+    "A": 58.16639,
+    "B": 2.720074,
+    "C": -0.492289,
+    "D": 0.038844,
+    "E": -6.447293,
+    "F": -425.9186,
+    "G": 263.6125,
+    "H": -393.5224
+   }
+  ],
+  "dHf_gas_kJ_per_mol": -393.51,
+  "dHf_uncertainty": 0.13,
+  "dHf_source": "CODATA Review value, Cox, Wagman, et al., 1984"
+ },
+ "H2O(g)": {
+  "cas": "7732-18-5",
+  "nist_id": "C7732185",
+  "ranges": [
+   {
+    "T_min": 500,
+    "T_max": 1700,
+    "A": 30.092,
+    "B": 6.832514,
+    "C": 6.793435,
+    "D": -2.53448,
+    "E": 0.082139,
+    "F": -250.881,
+    "G": 223.3967,
+    "H": -241.8264
+   },
+   {
+    "T_min": 1700,
+    "T_max": 6000,
+    "A": 41.96426,
+    "B": 8.622053,
+    "C": -1.49978,
+    "D": 0.098119,
+    "E": -11.15764,
+    "F": -272.1797,
+    "G": 219.7809,
+    "H": -241.8264
+   }
+  ],
+  "dHf_gas_kJ_per_mol": -241.826,
+  "dHf_uncertainty": 0.04,
+  "dHf_source": "CODATA Review value, Cox, Wagman, et al., 1984",
+  "_caveat": "NIST's lowest Shomate range starts at 500 K, so 298.15 K Cp cannot be evaluated from it. Cross-check for H2O(g) is done at 500 K and above."
+ },
+ "O2(g)": {
+  "cas": "7782-44-7",
+  "nist_id": "C7782447",
+  "ranges": [
+   {
+    "T_min": 100,
+    "T_max": 700,
+    "A": 31.32234,
+    "B": -20.23531,
+    "C": 57.86644,
+    "D": -36.50624,
+    "E": -0.007374,
+    "F": -8.903471,
+    "G": 246.7945,
+    "H": 0.0
+   },
+   {
+    "T_min": 700,
+    "T_max": 2000,
+    "A": 30.03235,
+    "B": 8.772972,
+    "C": -3.988133,
+    "D": 0.788313,
+    "E": -0.741599,
+    "F": -11.32468,
+    "G": 236.1663,
+    "H": 0.0
+   },
+   {
+    "T_min": 2000,
+    "T_max": 6000,
+    "A": 20.91111,
+    "B": 10.72071,
+    "C": -2.020498,
+    "D": 0.146449,
+    "E": 9.245722,
+    "F": 5.337651,
+    "G": 237.6185,
+    "H": 0.0
+   }
+  ],
+  "dHf_gas_kJ_per_mol": 0.0,
+  "dHf_note": "element in its standard state, by definition zero"
+ },
+ "CH4(g)": {
+  "cas": "74-82-8",
+  "nist_id": "C74828",
+  "ranges": [
+   {
+    "T_min": 298,
+    "T_max": 1300,
+    "A": -0.703029,
+    "B": 108.4773,
+    "C": -42.52157,
+    "D": 5.862788,
+    "E": 0.678565,
+    "F": -76.84376,
+    "G": 158.7163,
+    "H": -74.8731
+   },
+   {
+    "T_min": 1300,
+    "T_max": 6000,
+    "A": 85.81217,
+    "B": 11.26467,
+    "C": -2.114146,
+    "D": 0.13819,
+    "E": -26.42221,
+    "F": -153.5327,
+    "G": 224.4143,
+    "H": -74.8731
+   }
+  ],
+  "dHf_gas_kJ_per_mol": -74.6,
+  "dHf_uncertainty": 0.3,
+  "dHf_source": "adopted recommendation of Gurvich, Veyts, et al., 1991",
+  "dHf_alternative": -74.87,
+  "dHf_alternative_source": "Chase, 1998"
+ },
+ "H2(g)": {
+  "cas": "1333-74-0",
+  "nist_id": "C1333740",
+  "ranges": [
+   {
+    "T_min": 298,
+    "T_max": 1000,
+    "A": 33.066178,
+    "B": -11.363417,
+    "C": 11.432816,
+    "D": -2.772874,
+    "E": -0.158558
+   },
+   {
+    "T_min": 1000,
+    "T_max": 2500,
+    "A": 18.563083,
+    "B": 12.257357,
+    "C": -2.859786,
+    "D": 0.268238,
+    "E": 1.97799
+   },
+   {
+    "T_min": 2500,
+    "T_max": 6000,
+    "A": 43.41356,
+    "B": -4.293079,
+    "C": 1.272428,
+    "D": -0.096876,
+    "E": -20.533862
+   }
+  ],
+  "dHf_gas_kJ_per_mol": 0.0,
+  "dHf_note": "element in its standard state"
+ },
+ "CO(g)": {
+  "cas": "630-08-0",
+  "nist_id": "C630080",
+  "ranges": [
+   {
+    "T_min": 298,
+    "T_max": 1300,
+    "A": 25.56759,
+    "B": 6.09613,
+    "C": 4.054656,
+    "D": -2.671301,
+    "E": 0.131021
+   },
+   {
+    "T_min": 1300,
+    "T_max": 6000,
+    "A": 35.1507,
+    "B": 1.300095,
+    "C": -0.205921,
+    "D": 0.01355,
+    "E": -3.28278
+   }
+  ],
+  "dHf_gas_kJ_per_mol": -110.53
+ },
+ "SO2(g)": {
+  "cas": "7446-09-5",
+  "nist_id": "C7446095",
+  "ranges": [
+   {
+    "T_min": 298,
+    "T_max": 1200,
+    "A": 21.43049,
+    "B": 74.35094,
+    "C": -57.75217,
+    "D": 16.35534,
+    "E": 0.086731
+   },
+   {
+    "T_min": 1200,
+    "T_max": 6000,
+    "A": 57.48188,
+    "B": 1.009328,
+    "C": -0.07629,
+    "D": 0.005174,
+    "E": -4.045401
+   }
+  ],
+  "dHf_gas_kJ_per_mol": -296.81,
+  "dHf_uncertainty": 0.2,
+  "dHf_source": "CODATA Review value"
+ },
+ "NH3(g)": {
+  "cas": "7664-41-7",
+  "nist_id": "C7664417",
+  "ranges": [
+   {
+    "T_min": 298,
+    "T_max": 1400,
+    "A": 19.99563,
+    "B": 49.77119,
+    "C": -15.37599,
+    "D": 1.921168,
+    "E": 0.189174
+   },
+   {
+    "T_min": 1400,
+    "T_max": 6000,
+    "A": 52.02427,
+    "B": 18.48801,
+    "C": -3.765128,
+    "D": 0.248541,
+    "E": -12.45799
+   }
+  ],
+  "dHf_gas_kJ_per_mol": -45.94,
+  "dHf_uncertainty": 0.35
+ },
+ "NO2(g)": {
+  "cas": "10102-44-0",
+  "nist_id": "C10102440",
+  "ranges": [
+   {
+    "T_min": 298,
+    "T_max": 1200,
+    "A": 16.10857,
+    "B": 75.89525,
+    "C": -54.3874,
+    "D": 14.30777,
+    "E": 0.239423
+   },
+   {
+    "T_min": 1200,
+    "T_max": 6000,
+    "A": 56.82541,
+    "B": 0.738053,
+    "C": -0.144721,
+    "D": 0.009777,
+    "E": -5.459911
+   }
+  ],
+  "dHf_gas_kJ_per_mol": 33.1
+ },
+ "Cl2(g)": {
+  "cas": "7782-50-5",
+  "nist_id": "C7782505",
+  "ranges": [
+   {
+    "T_min": 298,
+    "T_max": 1000,
+    "A": 33.0506,
+    "B": 12.2294,
+    "C": -12.0651,
+    "D": 4.38533,
+    "E": -0.159494
+   },
+   {
+    "T_min": 1000,
+    "T_max": 3000,
+    "A": 42.6773,
+    "B": -5.00957,
+    "C": 1.904621,
+    "D": -0.165641,
+    "E": -2.09848
+   }
+  ],
+  "dHf_gas_kJ_per_mol": 0.0,
+  "dHf_note": "element in its standard state"
+ },
+ "H2S(g)": {
+  "cas": "7783-06-4",
+  "nist_id": "C7783064",
+  "ranges": [
+   {
+    "T_min": 298,
+    "T_max": 1400,
+    "A": 26.88412,
+    "B": 18.67809,
+    "C": 3.434203,
+    "D": -3.378702,
+    "E": 0.135882
+   },
+   {
+    "T_min": 1400,
+    "T_max": 6000,
+    "A": 51.22136,
+    "B": 4.147486,
+    "C": -0.643566,
+    "D": 0.041621,
+    "E": -10.46385
+   }
+  ],
+  "dHf_gas_kJ_per_mol": -20.5,
+  "dHf_source": "CODATA Review -20.6 +/- 0.5"
+ },
+ "HCl(g)": {
+  "cas": "7647-01-0",
+  "nist_id": "C7647010",
+  "ranges": [
+   {
+    "T_min": 298,
+    "T_max": 1200,
+    "A": 32.12392,
+    "B": -13.45805,
+    "C": 19.86852,
+    "D": -6.853936,
+    "E": -0.049672
+   },
+   {
+    "T_min": 1200,
+    "T_max": 6000,
+    "A": 31.91923,
+    "B": 3.203184,
+    "C": -0.541539,
+    "D": 0.035925,
+    "E": -3.438525
+   }
+  ],
+  "dHf_gas_kJ_per_mol": -92.31
+ },
+ "NO(g)": {
+  "cas": "10102-43-9",
+  "nist_id": "C10102439",
+  "ranges": [
+   {
+    "T_min": 298,
+    "T_max": 1200,
+    "A": 23.83491,
+    "B": 12.58878,
+    "C": -1.139011,
+    "D": -1.497459,
+    "E": 0.214194
+   },
+   {
+    "T_min": 1200,
+    "T_max": 6000,
+    "A": 35.99169,
+    "B": 0.95717,
+    "C": -0.148032,
+    "D": 0.009974,
+    "E": -3.004088
+   }
+  ],
+  "dHf_gas_kJ_per_mol": 90.29
+ },
+ "C2H4(g)": {
+  "cas": "74-85-1",
+  "nist_id": "C74851",
+  "ranges": [
+   {
+    "T_min": 298,
+    "T_max": 1200,
+    "A": -6.38788,
+    "B": 184.4019,
+    "C": -112.9718,
+    "D": 28.49593,
+    "E": 0.31554
+   },
+   {
+    "T_min": 1200,
+    "T_max": 6000,
+    "A": 106.5104,
+    "B": 13.7326,
+    "C": -2.628481,
+    "D": 0.174595,
+    "E": -26.14469
+   }
+  ],
+  "dHf_gas_kJ_per_mol": 52.47,
+  "cp_298_tabulated": 42.9
+ },
+ "C2H2(g)": {
+  "cas": "74-86-2",
+  "nist_id": "C74862",
+  "ranges": [
+   {
+    "T_min": 298,
+    "T_max": 1100,
+    "A": 40.68697,
+    "B": 40.73279,
+    "C": -16.1784,
+    "D": 3.669741,
+    "E": -0.658411
+   },
+   {
+    "T_min": 1100,
+    "T_max": 6000,
+    "A": 67.47244,
+    "B": 11.7511,
+    "C": -2.02147,
+    "D": 0.136195,
+    "E": -9.806418
+   }
+  ],
+  "dHf_gas_kJ_per_mol": 226.73,
+  "dHf_source": "Chase, 1998",
+  "cp_298_tabulated": 44.04
+ },
+ "C3H8(g)": {
+  "cas": "74-98-6",
+  "nist_id": "C74986",
+  "ranges": [],
+  "cp_298_tabulated": 73.6,
+  "dHf_gas_kJ_per_mol": -104.7,
+  "dHf_uncertainty": 0.5,
+  "dHf_source": "Pittam and Pilcher, 1972 (NIST recommended)",
+  "_note": "NIST has no Shomate fit for propane; verification uses the tabulated Cp at 298.15 K"
+ },
+ "C4H10(g)": {
+  "cas": "106-97-8",
+  "nist_id": "C106978",
+  "ranges": [],
+  "cp_298_tabulated": 98.49,
+  "dHf_gas_kJ_per_mol": -125.6,
+  "dHf_uncertainty": 0.67,
+  "_note": "NIST has no Shomate fit for n-butane; verification uses the tabulated Cp at 298.15 K"
+ },
+ "C2H5OH(g)": {
+  "cas": "64-17-5",
+  "nist_id": "C64175",
+  "ranges": [],
+  "cp_298_tabulated": 65.21,
+  "dHf_gas_kJ_per_mol": -234.0,
+  "dHf_uncertainty": 2.0,
+  "_note": "NIST has no Shomate fit for ethanol vapour; verification uses the tabulated Cp at 298.15 K",
+  "cp_table_TRC1997": {
+   "298.15": 65.21,
+   "300": 65.49,
+   "400": 81.22,
+   "500": 95.78,
+   "600": 108.24,
+   "700": 118.83,
+   "800": 127.92,
+   "900": 135.81,
+   "1000": 142.68,
+   "1100": 148.68,
+   "1200": 153.92,
+   "1300": 158.49,
+   "1400": 162.5,
+   "1500": 166.01
+  },
+  "cp_table_source": "Thermodynamics Research Center, 1997, via NIST Chemistry WebBook gas phase thermochemistry"
+ },
+ "C2H6(g)": {
+  "cas": "74-84-0",
+  "nist_id": "C74840",
+  "ranges": [],
+  "dHf_gas_kJ_per_mol": -84.0,
+  "dHf_uncertainty": 0.4,
+  "dHf_alternatives": [
+   -83.8,
+   -84.67
+  ],
+  "_note": "NIST has no Shomate fit for ethane. Cp verification uses the Smith-Van Ness Cp298/R self-check column (6.369).",
+  "cp_table_Gurvich1989": {
+   "298.15": 52.49,
+   "300": 52.71,
+   "500": 77.94,
+   "1000": 122.55,
+   "1500": 148.98
+  },
+  "cp_298_tabulated": 52.49,
+  "cp_table_source": "Gurvich, Veyts, et al., 1989, via NIST Chemistry WebBook"
+ },
+ "C6H6(l)": {
+  "cas": "71-43-2",
+  "nist_id": "C71432",
+  "ranges": [],
+  "cp_298_liquid_tabulated": 135.69,
+  "dHf_liquid_kJ_per_mol": 49.0,
+  "dHf_uncertainty": 0.9,
+  "_note": "condensed phase page (Mask=2). The repo's C6H6(l) row computes 85.3, which is the GAS-phase value - the row carries gas coefficients under a liquid key."
+ },
+ "C7H8(l)": {
+  "cas": "108-88-3",
+  "nist_id": "C108883",
+  "ranges": [],
+  "cp_298_liquid_tabulated": 157.09,
+  "dHf_liquid_kJ_per_mol": 12.0,
+  "dHf_uncertainty": 0.6,
+  "_note": "condensed phase page (Mask=2)"
+ },
+ "C3H6O(l)": {
+  "cas": "67-64-1",
+  "nist_id": "C67641",
+  "ranges": [],
+  "cp_298_liquid_tabulated": 125.45,
+  "dHf_liquid_kJ_per_mol": -249.4,
+  "dHf_uncertainty": 0.63,
+  "dHf_source": "Wiberg, Crocker, et al., 1991"
+ },
+ "C6H14(l)": {
+  "cas": "110-54-3",
+  "nist_id": "C110543",
+  "ranges": [],
+  "cp_298_liquid_tabulated": 195.52,
+  "dHf_liquid_kJ_per_mol": -198.7,
+  "dHf_uncertainty": 0.67
+ },
+ "CH3OH(l)": {
+  "cas": "67-56-1",
+  "nist_id": "C67561",
+  "ranges": [],
+  "cp_298_liquid_tabulated": 79.5,
+  "dHf_liquid_kJ_per_mol": -239.5,
+  "dHf_uncertainty": 0.2
+ },
+ "NaCl(s)": {
+  "cas": "7647-14-5",
+  "nist_id": "C7647145",
+  "ranges": [
+   {
+    "T_min": 298,
+    "T_max": 1073,
+    "A": 50.72389,
+    "B": 6.672267,
+    "C": -2.517167,
+    "D": 10.15934,
+    "E": -0.200675
+   }
+  ],
+  "dHf_solid_kJ_per_mol": -411.12,
+  "_note": "solid phase Shomate (Mask=2)"
+ },
+ "C3H6O(g)": {
+  "cas": "67-64-1",
+  "nist_id": "C67641",
+  "ranges": [],
+  "cp_298_tabulated": 75.02,
+  "cp_table_Chao1986": {
+   "298.15": 75.02,
+   "300": 75.32,
+   "400": 92.06,
+   "500": 108.08,
+   "600": 122.2,
+   "700": 134.43,
+   "800": 145.0,
+   "900": 154.15,
+   "1000": 162.09,
+   "1100": 168.96,
+   "1200": 174.92,
+   "1300": 180.09,
+   "1400": 184.58,
+   "1500": 188.49
+  },
+  "cp_table_source": "Chao J., 1986, via NIST Chemistry WebBook gas phase thermochemistry"
+ },
+ "C6H6(g)": {
+  "cas": "71-43-2",
+  "nist_id": "C71432",
+  "ranges": [],
+  "cp_298_tabulated": 82.44,
+  "cp_table_TRC1997": {
+   "298.15": 82.44,
+   "400": 113.52,
+   "500": 139.35,
+   "600": 160.09,
+   "800": 190.45,
+   "1000": 211.41,
+   "1200": 226.52,
+   "1500": 242.11
+  },
+  "cp_table_source": "Thermodynamics Research Center, 1997, via NIST Chemistry WebBook (gas phase)"
+ },
+ "C7H8(g)": {
+  "cas": "108-88-3",
+  "nist_id": "C108883",
+  "ranges": [],
+  "cp_298_tabulated": 103.7,
+  "cp_table_NIST": {
+   "298.15": 103.7,
+   "400": 139.9,
+   "500": 170.8,
+   "600": 196.2,
+   "800": 234.3,
+   "1000": 261.2,
+   "1200": 280.8,
+   "1500": 301.0
+  },
+  "cp_table_source": "Scott 1962 / Draeger 1985, via NIST Chemistry WebBook (gas phase)"
+ },
+ "C6H14(g)": {
+  "cas": "110-54-3",
+  "nist_id": "C110543",
+  "ranges": [],
+  "cp_298_tabulated": 142.6,
+  "cp_table_Scott1974": {
+   "298.15": 142.6,
+   "400": 181.54,
+   "500": 217.28,
+   "600": 248.11,
+   "800": 296.23,
+   "1000": 331.37,
+   "1200": 357.31,
+   "1500": 389.11
+  },
+  "cp_table_source": "Scott D.W., 1974, via NIST Chemistry WebBook (gas phase)"
+ },
+ "H2O(l)": {
+  "cas": "7732-18-5",
+  "nist_id": "C7732185",
+  "ranges": [],
+  "cp_298_liquid_tabulated": 75.3,
+  "dHf_liquid_kJ_per_mol": -285.83,
+  "_note": "liquid water Cp at 298.15 K; CODATA dHf -285.83 kJ/mol"
+ }
+}
