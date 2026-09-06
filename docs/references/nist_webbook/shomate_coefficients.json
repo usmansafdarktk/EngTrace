@@ -513,7 +513,24 @@
   "cp_298_tabulated": 65.21,
   "dHf_gas_kJ_per_mol": -234.0,
   "dHf_uncertainty": 2.0,
-  "_note": "NIST has no Shomate fit for ethanol vapour; verification uses the tabulated Cp at 298.15 K"
+  "_note": "NIST has no Shomate fit for ethanol vapour; verification uses the tabulated Cp at 298.15 K",
+  "cp_table_TRC1997": {
+   "298.15": 65.21,
+   "300": 65.49,
+   "400": 81.22,
+   "500": 95.78,
+   "600": 108.24,
+   "700": 118.83,
+   "800": 127.92,
+   "900": 135.81,
+   "1000": 142.68,
+   "1100": 148.68,
+   "1200": 153.92,
+   "1300": 158.49,
+   "1400": 162.5,
+   "1500": 166.01
+  },
+  "cp_table_source": "Thermodynamics Research Center, 1997, via NIST Chemistry WebBook gas phase thermochemistry"
  },
  "C2H6(g)": {
   "cas": "74-84-0",
@@ -535,5 +552,79 @@
   "dHf_liquid_kJ_per_mol": 49.0,
   "dHf_uncertainty": 0.9,
   "_note": "condensed phase page (Mask=2). The repo's C6H6(l) row computes 85.3, which is the GAS-phase value - the row carries gas coefficients under a liquid key."
+ },
+ "C7H8(l)": {
+  "cas": "108-88-3",
+  "nist_id": "C108883",
+  "ranges": [],
+  "cp_298_liquid_tabulated": 157.09,
+  "dHf_liquid_kJ_per_mol": 12.0,
+  "dHf_uncertainty": 0.6,
+  "_note": "condensed phase page (Mask=2)"
+ },
+ "C3H6O(l)": {
+  "cas": "67-64-1",
+  "nist_id": "C67641",
+  "ranges": [],
+  "cp_298_liquid_tabulated": 125.45,
+  "dHf_liquid_kJ_per_mol": -249.4,
+  "dHf_uncertainty": 0.63,
+  "dHf_source": "Wiberg, Crocker, et al., 1991"
+ },
+ "C6H14(l)": {
+  "cas": "110-54-3",
+  "nist_id": "C110543",
+  "ranges": [],
+  "cp_298_liquid_tabulated": 195.52,
+  "dHf_liquid_kJ_per_mol": -198.7,
+  "dHf_uncertainty": 0.67
+ },
+ "CH3OH(l)": {
+  "cas": "67-56-1",
+  "nist_id": "C67561",
+  "ranges": [],
+  "cp_298_liquid_tabulated": 79.5,
+  "dHf_liquid_kJ_per_mol": -239.5,
+  "dHf_uncertainty": 0.2
+ },
+ "NaCl(s)": {
+  "cas": "7647-14-5",
+  "nist_id": "C7647145",
+  "ranges": [
+   {
+    "T_min": 298,
+    "T_max": 1073,
+    "A": 50.72389,
+    "B": 6.672267,
+    "C": -2.517167,
+    "D": 10.15934,
+    "E": -0.200675
+   }
+  ],
+  "dHf_solid_kJ_per_mol": -411.12,
+  "_note": "solid phase Shomate (Mask=2)"
+ },
+ "C3H6O(g)": {
+  "cas": "67-64-1",
+  "nist_id": "C67641",
+  "ranges": [],
+  "cp_298_tabulated": 75.02,
+  "cp_table_Chao1986": {
+   "298.15": 75.02,
+   "300": 75.32,
+   "400": 92.06,
+   "500": 108.08,
+   "600": 122.2,
+   "700": 134.43,
+   "800": 145.0,
+   "900": 154.15,
+   "1000": 162.09,
+   "1100": 168.96,
+   "1200": 174.92,
+   "1300": 180.09,
+   "1400": 184.58,
+   "1500": 188.49
+  },
+  "cp_table_source": "Chao J., 1986, via NIST Chemistry WebBook gas phase thermochemistry"
  }
 }
