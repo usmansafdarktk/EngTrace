@@ -263,10 +263,18 @@ def template_line_balancing_heuristic():
         # one decimal. When that rational lands EXACTLY on a half-way display
         # boundary the instance has no defensible gold reading -- a decimal
         # reader and a binary reader disagree and |evaluated - printed| == tol
-        # exactly -- so it is REMOVED rather than resolved (D-016). D-037's
-        # cheaper escape does not apply: 100*idle/(n*CT) does not terminate at
-        # any fixed number of places, since n*CT carries factors other than 2
-        # and 5. Measured rejection rate 0.65% over 4,000 seeds.
+        # exactly -- so it is REMOVED rather than resolved (D-016).
+        #
+        # D-037's cheaper escape -- lengthen the display until nothing rounds --
+        # was tested first and does not apply. It needs the quantity to be
+        # exactly representable at the longer display for EVERY instance;
+        # otherwise rounding persists and the ties merely relocate. Measured
+        # over 3,000 seeds, 100*idle/(n*CT) terminates at 2 dp on only 3.97% of
+        # instances and at 4 dp on 4.90%. (Any single 1-dp tie is of course a
+        # 2-dp value -- that is what a tie IS -- but that is circular and buys
+        # nothing.) Lengthening would also change the precision the QUESTION
+        # asks for, which is a P6 change, not a display choice.
+        # Measured rejection rate 0.65% over 4,000 seeds.
         if (Fraction(idle * 1000, capacity) % 1) == Fraction(1, 2):
             continue
         delay_exact = (Decimal(idle) / capacity) * 100
