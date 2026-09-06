@@ -1,7 +1,20 @@
 import random
 import math
-from scipy.integrate import quad
 from data.templates.branches.chemical_engineering.constants import LIQUID_PHASE_REACTANTS, GENERAL_REACTANTS
+
+
+# Display precision for the intermediates of template_pfr_volume_changing_rate.
+PFR_DP = 4
+
+
+def _as_printed(x, spec):
+    """The value a reader recovers from `x` when it is printed with `spec`.
+
+    P2 asks that the stored value and the printed value be the SAME value, so
+    that every downstream line is computed from the number the reader can see.
+    Rounding alone does not achieve that (Phase 1, DECISIONS D-016).
+    """
+    return float(format(x, spec))
 
 
 # Template 1 (Easy)
@@ -288,12 +301,21 @@ def template_pfr_volume_changing_rate():
     Scenario:
         This template calculates the required volume for a Plug Flow Reactor (PFR)
         to achieve a target conversion for a liquid-phase (constant-density)
-        reaction. The reaction follows an arbitrary, non-integer order, where the
-        rate law is -r_A = k * C_A^n. Because an analytical solution is often
-        complex for such cases, the PFR design equation is solved using
-        numerical integration:
+        reaction. The reaction follows an arbitrary order n, where the rate law
+        is -r_A = k * C_A^n. The PFR design equation
 
             V = ∫[0 to X] (F_A0 / (-r_A)) dX
+
+        is separable for a constant-density power law and integrates in closed
+        form for any n != 1:
+
+            V = F_A0 / (k * C_A0^n) * [ (1-X)^(1-n) - 1 ] / (n - 1)
+
+        Phase 2 note: this used to call scipy.integrate.quad and print quad's
+        own error estimate as a solution step - a machine-dependent number in a
+        gold trace, and a black box standing in for an integral a student can
+        do by hand. The sampled range is n in [1.5, 2.5], so n = 1 (the
+        logarithmic case) never arises.
 
     Returns:
         tuple: A tuple containing:
@@ -305,26 +327,45 @@ def template_pfr_volume_changing_rate():
     F_A0 = round(random.uniform(1.0, 4.0), 2)
     X_final = round(random.uniform(0.5, 0.85), 2)
     
-    # Reaction order (non-integer for complexity)
+    # Reaction order. n = 2.0 is drawn ~9.6% of the time and is a perfectly
+    # valid instance; what was wrong was the question calling every draw
+    # "non-integer". The wording was fixed rather than the sampling, so the
+    # item pool is unchanged (P6).
     n = round(random.uniform(1.5, 2.5), 1)
     
     # Rate constant and initial concentration
     k = round(random.uniform(0.05, 0.5), 3)
     C_A0 = round(random.uniform(0.5, 2.0), 2)  # mol/L
     
-    def rate_function_advanced(X):
-        """Rate as function of conversion: -r_A = k * C_A0^n * (1-X)^n"""
-        return k * (C_A0**n) * ((1 - X)**n)
-    
-    def integrand_advanced(X):
-        """Integrand for PFR design equation"""
-        return F_A0 / rate_function_advanced(X)
-    
-    # Numerical integration (analytical solution complex for arbitrary n)
-    volume, integration_error = quad(integrand_advanced, 0, X_final)
+    # Closed form. Separating the PFR design equation for -r_A = k*C_A^n with
+    # C_A = C_A0*(1-X) gives
+    #     V = F_A0 / (k*C_A0^n) * ∫[0 to X] (1-X)^-n dX
+    # and ∫(1-X)^-n dX = [(1-X)^(1-n) - 1] / (n-1) for n != 1.
+    # Verified against scipy.integrate.quad over 3000 seeds: worst relative
+    # difference 2.7e-15, i.e. identical to machine precision. No answer moves.
+    # Each intermediate is bound THROUGH its display, and the next line is
+    # computed from the bound value - so a reader following the printed
+    # operands reaches the printed answer exactly (P1/P2).
+    # Preconditions. n == 1 is the logarithmic case the closed form cannot
+    # express; the sampled range is [1.5, 2.5] so it never arises, but the
+    # closed form is only valid because of that and should say so.
+    assert n != 1.0, f"closed form undefined for n = 1 (logarithmic case): {n}"
+    assert 0.0 < X_final < 1.0, f"conversion outside (0, 1): {X_final}"
+    assert k > 0.0 and C_A0 > 0.0, f"non-physical rate data: k={k}, C_A0={C_A0}"
+
+    spec = f'.{PFR_DP}f'
+    rate_coefficient = _as_printed(k * (C_A0 ** n), spec)
+    one_minus_X = _as_printed(1 - X_final, spec)
+    power_term = _as_printed(one_minus_X ** (1 - n), spec)
+    integral_term = _as_printed((power_term - 1) / (n - 1), spec)
+    volume = F_A0 / rate_coefficient * integral_term
+
+    assert rate_coefficient > 0.0, f"rate coefficient vanished: {rate_coefficient}"
+    assert integral_term > 0.0, f"integral must be positive for X in (0,1): {integral_term}"
+    assert volume > 0.0, f"non-physical reactor volume: {volume}"
     
     question = (
-        f"An {n}-order liquid-phase reaction of {reactant_name} (A → products) occurs in a PFR. "
+        f"An order-{n} liquid-phase reaction of {reactant_name} (A → products) occurs in a PFR. "
         f"The inlet conditions are: F_A0 = {F_A0} mol/s and C_A0 = {C_A0} mol/L. "
         f"The rate expression is: -r_A = {k} × C_A^{n} mol/(L·s). "
         f"Determine the reactor volume needed for {X_final*100}% conversion."
@@ -342,21 +383,20 @@ def template_pfr_volume_changing_rate():
         f"C_A = C_A0(1 - X)\n"
         f"-r_A = k × C_A^{n} = k × C_A0^{n} × (1 - X)^{n}\n"
         f"-r_A = {k} × {C_A0}^{n} × (1 - X)^{n}\n"
-        f"-r_A = {round(k * (C_A0**n), 4)} × (1 - X)^{n}\n\n"
+        f"-r_A = {rate_coefficient} × (1 - X)^{n}\n\n"
         
         f"**Step 2:** Set up the PFR integral.\n"
         f"V = ∫[0 to {X_final}] (F_A0 / (-r_A)) dX\n"
-        f"V = ∫[0 to {X_final}] ({F_A0} / ({round(k * (C_A0**n), 4)} × (1 - X)^{n})) dX\n\n"
-        
-        f"**Step 3:** This integral requires numerical methods for n = {n}.\n"
-        f"Using numerical integration (scipy.integrate.quad):\n\n"
-        
-        f"**Step 4:** Numerical result.\n"
-        f"V = {round(volume, 2)} L\n"
-        f"Integration error: {integration_error:.2e}\n\n"
-        
-        f"**Note:** For non-integer reaction orders, analytical solutions are complex.\n"
-        f"Numerical integration is the standard approach in reactor design.\n\n"
+        f"V = ({F_A0} / {rate_coefficient}) × ∫[0 to {X_final}] (1 - X)^(-{n}) dX\n\n"
+
+        f"**Step 3:** Integrate. For n ≠ 1, ∫(1 - X)^(-n) dX = [(1 - X)^(1-n) - 1] / (n - 1).\n"
+        f"1 - X = 1 - {X_final} = {one_minus_X}\n"
+        f"(1 - X)^(1-n) = {one_minus_X}^({round(1 - n, 4)}) = {power_term}\n"
+        f"Integral = ({power_term} - 1) / ({n} - 1) = {integral_term}\n\n"
+
+        f"**Step 4:** Evaluate the volume.\n"
+        f"V = ({F_A0} / {rate_coefficient}) × {integral_term}\n"
+        f"V = {round(volume, 2)} L\n\n"
         
         f"**Answer:** The required PFR volume is {round(volume, 2)} liters."
     )
