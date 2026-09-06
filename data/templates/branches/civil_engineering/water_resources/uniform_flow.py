@@ -486,7 +486,7 @@ def template_normal_depth_iteration():
     # without these a verifier can only be written by hardcoding this
     # template's symbol names and its secant formula (finding F3).
     trace_nodes = {
-        "schema_version": "1.4",
+        "schema_version": "1.5",
         "node_type": "iteration",
         "node_id": "t24_secant_normal_depth",
         "cardinality": "incidental",
@@ -513,8 +513,15 @@ def template_normal_depth_iteration():
         # trace could fabricate a converged depth and take full process credit
         # (Reviewer D2, variant 5 -- it reported 3.501 m against a gold
         # 1.380 m and passed with zero failures). A symbol inside a relation
-        # means that symbol's UNROUNDED value; `round(sym, n)` means its
-        # displayed value, which is how P2's round-then-recompute is expressed.
+        # means that symbol's UNROUNDED value; `round(sym)` means its
+        # displayed value at `symbol_precision[sym]`, which is how P2's
+        # round-then-recompute is expressed. The digit is NOT restated here:
+        # `round(AR, 3)` would declare a precision `symbol_precision` already
+        # carries, and a trace could then disagree with itself -- a 3.8
+        # restatement violation inside the fix that enforces 3.8 (Reviewer D2,
+        # round 5). Every non-iterate frame symbol MUST have a relation:
+        # omitting one silently exempts it from 4.3.9, which is variant 5
+        # again by deleting a line.
         # Verified: 12,735 frames over 3,000 seeds recompute exactly.
         "constants": {"b": b, "z": z, "K": K},
         "frame_relations": [
@@ -522,7 +529,7 @@ def template_normal_depth_iteration():
             ["P", ("b + 2 * y" if shape == "rectangular"
                    else "b + 2 * y * sqrt(1 + z ** 2)")],
             ["AR", "A * (A / P) ** (2 / 3)"],
-            ["g", "round(AR, 3) - K"],
+            ["g", "round(AR) - K"],
         ],
         "symbol_precision": {"y_prev": 4, "y_curr": 4, "y_next": 4,
                              "change": 4, "g_prev": 3, "g_curr": 3,
