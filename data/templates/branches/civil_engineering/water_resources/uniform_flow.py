@@ -1,5 +1,6 @@
 import math
 import random
+from fractions import Fraction
 
 from data.templates.branches.civil_engineering.constants import (
     GRAVITY_M_S2,
@@ -19,6 +20,36 @@ _RIGID_LININGS = {
     "wood": MANNINGS_N_CHANNELS["wood"],
     "vitrified clay": MANNINGS_N_CHANNELS["vitrified clay"],
 }
+
+
+# --- Display-tie screening (D-016), used by template_normal_depth_iteration --
+#
+# A printed line closes for a decimal reader and for a binary reader alike only
+# when the exact value of its expression is NOT half-way between two displayable
+# values. At such a tie |evaluated - printed| == tol exactly and float
+# representation error alone decides which side it lands on, in either rounding
+# direction -- so the instance has no defensible gold reading and is REMOVED
+# rather than resolved (D-016). D-037's cheaper escape, lengthening the display
+# until the quantity is exact, does not apply to either quantity screened here:
+# both are quotients by a value that is not a power of ten.
+
+def _exact(x, spec):
+    """The exact rational value of `x` as the trace prints it under `spec`."""
+    return Fraction(format(x, spec))
+
+
+def _is_display_tie(value, places):
+    """Does an exact rational land exactly on a half-way display boundary?"""
+    return (value * 10 ** places) % 1 == Fraction(1, 2)
+
+
+# Iteration budget and convergence tolerance for the normal-depth secant
+# scheme. Both appear in the QUESTION text, so they are part of the item's
+# statement, not tuning knobs: _T24_TOL is what the solver is told to iterate
+# to, and _T24_MAX_UPDATES is a guard whose breach raises rather than
+# truncating the trace.
+_T24_TOL = 0.002
+_T24_MAX_UPDATES = 5
 
 
 def _lining_phrase(lining):
@@ -303,6 +334,19 @@ def template_normal_depth_iteration():
         The channel shape (rectangular or trapezoidal) changes the
         geometry functions inside every evaluation.
 
+    Trace shape (Phase 3, D3.1 — schema route):
+        The number of interpolation updates is DATA-DEPENDENT: measured
+        over 4,000 seeds it is {1: 29, 2: 312, 3: 2345, 4: 1261, 5: 53},
+        so 32.9% of instances need MORE than three updates, because the
+        question's termination condition is a tolerance on the depth
+        change, not a fixed pass count. The count is therefore INCIDENTAL
+        to the answer — a solver reaching the same converged depth in four
+        updates instead of three is correct. This template
+        builds an `iteration` trace node (the local `trace_nodes`,
+        specified in docs/re-implementation-sep/phase3_node_types.md) and
+        RENDERS the printed trace from it, so the structured trace and the
+        prose cannot disagree.
+
     Difficulty: Advanced
     Grounding: Sturm, Open Channel Hydraulics, 1st ed., Ch. 4 (normal
         depth computation; section factor A*R^(2/3)); n per constants
@@ -311,92 +355,151 @@ def template_normal_depth_iteration():
         discharge DERIVED from it; b in [2.0, 5.0] m; trapezoidal z in
         {1.5, 2.0, 2.5}; slope sampled inside a per-sample subcritical
         window (Fr at the normal depth asserted <= 0.92); convergence
-        within 5 interpolation updates (asserted via the tolerance);
-        final depth within 0.015 m of the sampled target.
+        within 5 interpolation updates — enforced by an explicit raise,
+        NOT an assert, because Step 4 tells the reader the tolerance was
+        met and `python -O` strips asserts (Phase 2 Reviewer C, C-6);
+        final depth within 0.015 m of the sampled target. Screens
+        (bounded resample loop, cap 200): an instance is rejected when
+        Step 1's K expression or any update expression lands EXACTLY on a
+        half-way display boundary, which is an ill-posed instance rather
+        than a rounding-convention choice (D-016). Measured rejection
+        rate 2.14% over 20,000 seeds (K line 1.14%, update lines 1.02%).
 
     Returns:
         tuple: (question, solution)
     """
-    shape = random.choice(["rectangular", "trapezoidal"])
-    lining = random.choice(list(_RIGID_LININGS.keys()))
-    n = _RIGID_LININGS[lining]
-    b = round(random.uniform(2.0, 5.0), 1)
-    z = random.choice([1.5, 2.0, 2.5]) if shape == "trapezoidal" else 0.0
-    yn_target = round(random.uniform(0.8, 2.0), 2)
+    for _attempt in range(200):
+        shape = random.choice(["rectangular", "trapezoidal"])
+        lining = random.choice(list(_RIGID_LININGS.keys()))
+        n = _RIGID_LININGS[lining]
+        b = round(random.uniform(2.0, 5.0), 1)
+        z = random.choice([1.5, 2.0, 2.5]) if shape == "trapezoidal" else 0.0
+        yn_target = round(random.uniform(0.8, 2.0), 2)
 
-    def geometry(depth):
-        if shape == "rectangular":
-            A = b * depth
-            P = b + 2 * depth
-            T = b
-        else:
-            A = (b + z * depth) * depth
-            P = b + 2 * depth * math.sqrt(1 + z ** 2)
-            T = b + 2 * z * depth
-        return A, P, T
+        def geometry(depth, _b=b, _z=z, _shape=shape):
+            if _shape == "rectangular":
+                A = _b * depth
+                P = _b + 2 * depth
+                T = _b
+            else:
+                A = (_b + _z * depth) * depth
+                P = _b + 2 * depth * math.sqrt(1 + _z ** 2)
+                T = _b + 2 * _z * depth
+            return A, P, T
 
-    A_n, P_n, T_n = geometry(yn_target)
-    S = _froude_capped_slope(n, A_n, P_n, T_n, 90.0,
-                             s_floor=0.0008, s_ceil=0.003)
+        A_n, P_n, T_n = geometry(yn_target)
+        S = _froude_capped_slope(n, A_n, P_n, T_n, 90.0,
+                                 s_floor=0.0008, s_ceil=0.003)
 
-    def section_factor(depth):
-        A, P, _ = geometry(depth)
-        return A * (A / P) ** (2.0 / 3.0)
+        def section_factor(depth, _geom=geometry):
+            A, P, _T = _geom(depth)
+            return A * (A / P) ** (2.0 / 3.0)
 
-    sqS = round(math.sqrt(S), 5)
-    Q = round(section_factor(yn_target) * sqS / n, 2)
-    K = round(Q * n / sqS, 3)
+        sqS = round(math.sqrt(S), 5)
+        Q = round(section_factor(yn_target) * sqS / n, 2)
+        K = round(Q * n / sqS, 3)
 
-    def fmt3(x):
-        s = f"{x:.3f}"
-        return "0.000" if s == "-0.000" else s
+        # Step 1's printed line, read exactly in decimal. A tie here is an
+        # ill-posed instance, not a rounding-convention choice (D-016), and
+        # K is a quotient by a 5-dp square root so no longer display makes
+        # it exact -- D-037's "lengthen the display" escape does not apply.
+        if _is_display_tie(
+                _exact(Q, ".2f") * Fraction(str(n)) / _exact(sqS, ".5f"), 3):
+            continue
 
-    def evaluate(depth):
-        A, P, _ = geometry(depth)
-        A_r = round(A, 3)
-        P_r = round(P, 3)
-        AR = round(section_factor(depth), 3)
-        g = round(AR - K, 3)
-        return A_r, P_r, AR, g
+        def evaluate(depth, _K=K, _geom=geometry):
+            """One g-evaluation frame: the `evaluation` sub-node of D3.3."""
+            A, P, _T = _geom(depth)
+            AR = round(A * (A / P) ** (2.0 / 3.0), 3)
+            g = round(AR - _K, 3)
+            if g == 0.0:
+                # Normalise -0.0. The removed fmt3() helper rewrote the
+                # STRING "-0.000" to "0.000", which let the printed operand
+                # differ in sign from the stored one (a P2 violation).
+                # Normalising the stored value keeps the two identical by
+                # construction instead of patching the display.
+                g = 0.0
+            return {"y": round(depth, 4), "A": round(A, 3),
+                    "P": round(P, 3), "AR": AR, "g": g}
 
-    eval_lines = []
-    y_prev, y_curr = 1.000, 1.500
-    A0, P0, AR0, g_prev = evaluate(y_prev)
-    eval_lines.append(
-        f"At y = {y_prev:.4f} m: A = {A0:.3f} m^2, P = {P0:.3f} m, "
-        f"A*R^(2/3) = {AR0:.3f}, so g = {AR0:.3f} - {K:.3f} = "
-        f"{fmt3(g_prev)}")
-    A1, P1, AR1, g_curr = evaluate(y_curr)
-    eval_lines.append(
-        f"At y = {y_curr:.4f} m: A = {A1:.3f} m^2, P = {P1:.3f} m, "
-        f"A*R^(2/3) = {AR1:.3f}, so g = {AR1:.3f} - {K:.3f} = "
-        f"{fmt3(g_curr)}")
-
-    updates = 0
-    for _ in range(5):
-        y_next = round(
-            y_curr - g_curr * (y_curr - y_prev) / (g_curr - g_prev), 4)
-        updates += 1
-        eval_lines.append(
-            f"Update {updates}: y_next = {y_curr:.4f} - ({fmt3(g_curr)}) "
-            f"* ({y_curr:.4f} - {y_prev:.4f}) / (({fmt3(g_curr)}) - "
-            f"({fmt3(g_prev)})) = {y_next:.4f} m")
-        if abs(y_next - y_curr) < 0.002:
+        # ---- build the `iteration` node; the prose is rendered from it ----
+        preamble = [evaluate(1.0000), evaluate(1.5000)]
+        elements = []
+        y_prev, y_curr = 1.0000, 1.5000
+        g_prev, g_curr = preamble[0]["g"], preamble[1]["g"]
+        converged = False
+        display_tie = False
+        for k in range(1, _T24_MAX_UPDATES + 1):
+            denom = g_curr - g_prev
+            if denom == 0.0:
+                # The secant step is undefined. Not observed in 20,000 seeds
+                # (smallest |g_k - g_(k-1)| seen is 0.004, four steps of the
+                # 3-dp residual grid), so this raises rather than resampling:
+                # if the sampling box ever moves it must not pass quietly.
+                raise ZeroDivisionError(
+                    f"secant denominator vanished at update {k}: "
+                    f"g_prev = g_curr = {g_curr:.3f}")
+            y_c, y_p = _exact(y_curr, ".4f"), _exact(y_prev, ".4f")
+            g_c, g_p = _exact(g_curr, ".3f"), _exact(g_prev, ".3f")
+            if _is_display_tie(y_c - g_c * (y_c - y_p) / (g_c - g_p), 4):
+                display_tie = True
+                break
+            y_next = round(y_curr - g_curr * (y_curr - y_prev) / denom, 4)
+            change = round(abs(y_next - y_curr), 4)
+            element = {"k": k,
+                       "y_prev": y_prev, "g_prev": g_prev,
+                       "y_curr": y_curr, "g_curr": g_curr,
+                       "y_next": y_next, "change": change,
+                       "converged": change < _T24_TOL,
+                       "evaluation": None}
+            elements.append(element)
+            if element["converged"]:
+                y_curr = y_next
+                converged = True
+                break
+            y_prev, g_prev = y_curr, g_curr
             y_curr = y_next
-            break
-        y_prev, g_prev = y_curr, g_curr
-        y_curr = y_next
-        A2, P2, AR2, g_curr = evaluate(y_curr)
-        eval_lines.append(
-            f"At y = {y_curr:.4f} m: A = {A2:.3f} m^2, P = {P2:.3f} m, "
-            f"A*R^(2/3) = {AR2:.3f}, so g = {AR2:.3f} - {K:.3f} = "
-            f"{fmt3(g_curr)}")
-    yn = round(y_curr, 3)
-    iter_text = "\n".join(eval_lines)
+            element["evaluation"] = evaluate(y_curr)
+            g_curr = element["evaluation"]["g"]
+        if display_tie:
+            continue
+        if not converged:
+            # NOT an assert: Step 4 tells the reader the tolerance was met,
+            # and `python -O` strips asserts (Phase 2 Reviewer C, C-6).
+            raise RuntimeError(
+                f"secant iteration did not converge within "
+                f"{_T24_MAX_UPDATES} updates: last change "
+                f"{elements[-1]['change']:.4f} m >= {_T24_TOL} m")
+        break
+    else:
+        raise AssertionError("resample loop exhausted")
 
-    A_f, _, _ = geometry(yn)
-    Fr = (Q / A_f) / math.sqrt(GRAVITY_M_S2 * (A_f / geometry(yn)[2]))
-    assert updates <= 5 and abs(yn - yn_target) <= 0.015, (
+    trace_nodes = {
+        "node_type": "iteration",
+        "node_id": "t24_secant_normal_depth",
+        "cardinality": "incidental",
+        "termination": {"kind": "convergence",
+                        "quantity": "y",
+                        "predicate": "abs(y_next - y_curr) < tol",
+                        "tolerance": _T24_TOL,
+                        "max_elements": _T24_MAX_UPDATES,
+                        "satisfied": True},
+        "preamble_symbols": ["y", "A", "P", "AR", "g"],
+        "element_symbols": ["k", "y_prev", "g_prev", "y_curr", "g_curr",
+                            "y_next", "change", "converged", "evaluation"],
+        "carry": {"y_prev": "y_curr", "g_prev": "g_curr",
+                  "y_curr": "y_next", "g_curr": "evaluation.g"},
+        "preamble": preamble,
+        "elements": elements,
+        "result": {"symbol": "yn", "value": round(y_curr, 3),
+                   "unit": "m", "dp": 3},
+    }
+
+    yn = trace_nodes["result"]["value"]
+    updates = len(elements)
+    A_f, _P_f, T_f = geometry(yn)
+    Fr = (Q / A_f) / math.sqrt(GRAVITY_M_S2 * (A_f / T_f))
+    assert updates <= _T24_MAX_UPDATES and abs(yn - yn_target) <= 0.015, (
         f"iteration failed: {updates} updates, yn = {yn} vs {yn_target}")
     assert abs(section_factor(yn) - K) / K <= 0.02, "residual too large"
     assert Fr <= 0.92, f"normal flow not subcritical: Fr = {Fr}"
@@ -410,6 +513,26 @@ def template_normal_depth_iteration():
         geom_note = (f"A = (b + {z}*y)*y and "
                      f"P = b + 2*y*sqrt(1 + {z}^2)")
 
+    # ---- render the printed trace FROM the node, never alongside it ----
+    def _eval_line(frame, _K=K):
+        return (f"At y = {frame['y']:.4f} m: A = {frame['A']:.3f} m^2, "
+                f"P = {frame['P']:.3f} m, A*R^(2/3) = {frame['AR']:.3f}, "
+                f"so g = {frame['AR']:.3f} - {_K:.3f} = {frame['g']:.3f}")
+
+    eval_lines = [_eval_line(frame) for frame in preamble]
+    for element in elements:
+        y_cur_s, y_prv_s = element["y_curr"], element["y_prev"]
+        g_cur_s, g_prv_s = element["g_curr"], element["g_prev"]
+        eval_lines.append(
+            f"Update {element['k']}: y_next = {y_cur_s:.4f} - "
+            f"({g_cur_s:.3f}) * ({y_cur_s:.4f} - {y_prv_s:.4f}) / "
+            f"(({g_cur_s:.3f}) - ({g_prv_s:.3f})) "
+            f"= {element['y_next']:.4f} m")
+        if element["evaluation"] is not None:
+            eval_lines.append(_eval_line(element["evaluation"]))
+    iter_text = "\n".join(eval_lines)
+    last_change = elements[-1]["change"]
+
     question = (
         f"Uniform flow of Q = {Q:.2f} m^3/s occurs in {geom_text}, with "
         f"{_lining_phrase(lining)} (Manning's n = {n}) on a slope of S = {S}. "
@@ -419,7 +542,7 @@ def template_normal_depth_iteration():
         f"R = A/P), evaluate g at trial depths of 1.000 m "
         f"and 1.500 m, and then update the depth by linear interpolation "
         f"(secant) between successive trials until the depth changes by "
-        f"less than 0.002 m."
+        f"less than {_T24_TOL} m."
     )
 
     solution = (
@@ -435,11 +558,14 @@ def template_normal_depth_iteration():
         f"monotonically with depth. Evaluate g(y) = A*R^(2/3) - K at the "
         f"trial depths 1.000 m and 1.500 m, then interpolate linearly "
         f"between successive trials until the depth change is below "
-        f"0.002 m.\n\n"
-        f"**Step 3:** Iterate.\n"
+        f"{_T24_TOL} m.\n\n"
+        f"**Step 3:** Iterate. The scheme runs until the tolerance is met, "
+        f"so the number of updates is not fixed in advance; here it takes "
+        f"{updates}.\n"
         f"{iter_text}\n\n"
         f"**Step 4:** State the converged normal depth.\n"
-        f"The last change is below the tolerance, so yn = {yn:.3f} m\n\n"
+        f"The last change is {last_change:.4f} m, below the tolerance of "
+        f"{_T24_TOL} m, so yn = {yn:.3f} m\n\n"
         f"**Answer:** The normal depth is {yn:.3f} m"
     )
 
