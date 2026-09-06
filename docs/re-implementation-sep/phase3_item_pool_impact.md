@@ -90,28 +90,53 @@ the important number: no solver who saw a `master` instance would now be graded
 against a different answer for the same problem. The 92 are resampled away
 entirely and replaced by fresh draws.
 
-### 2.4 Are the rejected instances a systematic slice?
+### 2.4 Are the rejected instances a systematic slice? — **yes, and this section was wrong**
 
-The screen rejects instances where an exact printed expression lands on a
-half-way display boundary. Those are arithmetic accidents of `Q·n/√S` and of the
-secant quotient, not a region of the physical parameter space, so the rejection
-should be scattered. It is — measured directly on the 92, not inferred from
-aggregates:
+**Corrected after Phase 3 Reviewer B, finding F-B1.** The original text below the
+table claimed the rejections were "scattered". They are not, and the way the
+error was made is worth keeping visible.
 
-| Parameter | Rejected 92, min / median / max | Full pool, min / median / max |
+The two screens must be **decomposed** before anything is said about scatter:
+
+| Screen | Rejections in 60,000 draws | Distinct slopes `S` |
+|---|---|---|
+| Step 1's `K = Q·n/√S` line, 3 dp | 709 | **1** — every one at `S = 0.0016` |
+| the secant update lines, 4 dp | 579 | 23, across the whole `[0.0008, 0.003]` window |
+
+`S = 0.0016` is the only value on the 4-dp slope grid whose square root is exact
+at 5 dp (`0.04`), so `K` reduces to `25·Q·n` and terminates; everywhere else a
+3-dp tie is unreachable. **The `K` screen removes 25.4% of the instances at that
+one slope and none anywhere else**, depleting it from 4.83% of the pool to 3.50%.
+The general mechanism — a tie screen selects exactly the pre-images that make the
+quotient terminating — is recorded as **D-045**.
+
+**How the original claim went wrong.** It measured the *combined* rejection set,
+where the update screen's genuine spread across 23 slopes masks the `K` screen's
+concentration on one, and reported min/median/max over `Q`, `b` and `S`:
+
+| Parameter | Rejected 92 (combined), min / median / max | Full pool, min / median / max |
 |---|---|---|
 | `Q` (m³/s) | 3.12 / 11.93 / 56.92 | 2.40 / 14.62 / 58.14 |
 | `b` (m) | 2.00 / 3.30 / 5.00 | 2.00 / 3.50 / 5.00 |
 | `S` | 0.0008 / 0.0016 / 0.0025 | 0.0008 / 0.0012 / 0.0030 |
 
-The rejected set spans essentially the whole sampled box in every parameter. Its
-shape split is **48 trapezoidal / 44 rectangular** against a 50.0/50.0 pool, and
-its update-count profile (`{2: 3, 3: 62, 4: 24, 5: 3}`) tracks the pool's
-proportions — so the screen is not preferentially removing slowly-converging
-channels, which was the failure mode to worry about. Corroborating aggregates:
-distinct answers 267/267, p5 and p50 identical to four decimals, step count
-constant at 4, branch mix 50.02/49.98 → 50.12/49.88 (0.10 pts) and lining mix
-stable within 0.4 pts on all five linings.
+Every number there is correct and the conclusion drawn from it was not.
+**Aggregate scatter statistics over a union of screens cannot see a
+single-valued component.**
+
+**Does it matter for the item pool? No, and that is measured, not assumed.**
+`S = 0.0016` is not an engineering-distinguished slope — not a steep/mild
+boundary, not a Froude threshold — so no class of channel disappears and the
+Sturm Ch. 4 content is untouched. The corroborating aggregates hold: distinct
+answers 267/267, p5 and p50 identical to four decimals, step count constant at 4,
+shape branch 50.02/49.98 → 50.12/49.88 (0.10 pts), lining mix stable within
+0.4 pts on all five, and the update-count profile of the rejected set
+(`{2: 3, 3: 62, 4: 24, 5: 3}`) tracks the pool's, so slowly-converging channels
+are not preferentially removed.
+
+What changed is the *record*, not the item: a screen that concentrates on one
+value of a parameter is a scoping fact, and on a template where that parameter
+were answer-bearing it would be a P6 breach dressed as an arithmetic clean-up.
 
 ### 2.5 Non-resampled instances are byte-identical in their arithmetic
 
