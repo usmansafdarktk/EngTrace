@@ -1270,6 +1270,217 @@ to print `0.09 × 4.25 = 0.383`. Marginally heavier to read; exactly right
 instead of approximately right, and a reader who checks the arithmetic now finds
 it closes.
 
+---
+
+## D-038 — `iteration` and `decision` share a structure but NOT a comparator; the spec's equivalence is wrong
+
+**Date:** 2026-09-06 · **Status:** DECIDED · **Source:** Phase 3, D3.3
+**This is a `SPEC-CHANGE` against `template_redesign_spec.md` §3.2.**
+
+The spec says the two node types "are the same shape (an ordered list of
+homogeneous sub-traces with stable within-element symbols and a termination
+predicate)" and recommends specifying them together because that "is cheaper than
+two bespoke redesigns".
+
+**The structural claim is right; the equivalence is wrong, and specifying them as
+one type yields a verifier that is wrong on one of the two templates.** They
+differ on the property that decides how a candidate trace is *scored*:
+
+> Is the cardinality of the sequence an observable of the answer?
+
+- `normal_depth_iteration` — the answer is the converged depth. The update count
+  does not enter it, and is not even **stable under the numerical slack the
+  comparator already tolerates**: the termination test is `|Δy| < 0.002 m` on
+  4-dp values, so a solver carrying more digits can converge in a different
+  number of updates to the same depth. Measured over 4,000 seeds the count is
+  `{1: 29, 2: 312, 3: 2345, 4: 1261, 5: 53}` — **32.9% of instances need more
+  than three updates**, so this is not a corner case.
+- `line_balancing_heuristic` — the answer is
+  `(n·CT − Σt)/(n·CT)·100` and `n` **is** the element count. It is also exactly
+  determined: every fit decision is an integer comparison, so no rounding slack
+  can move it.
+
+So D3.4's comparator must **tolerate** a count mismatch on the first and **fail**
+it on the second. One node type cannot express both dispositions.
+
+**The discriminating rule**, stated so it applies to a template this phase never
+saw:
+
+> Cardinality is `incidental` when it is sensitive to the numerical slack the
+> comparator already tolerates, and `answer_bearing` when it is invariant under
+> that slack and appears in the answer. A quantity that is both sensitive to
+> slack *and* present in the answer is an ill-posed item, not a node-type
+> question.
+
+**Amendment.** §3.2's "specify them together" stands — they share one base
+structure, one `carry` mechanism, one verification algorithm. What is struck is
+the implication that they share a comparator. The full specification is
+[`phase3_node_types.md`](phase3_node_types.md); its §2 carries this reasoning and
+its §7 the two comparator dispositions.
+
+**Carried forward.** The spec names `linear_reservoir_routing_step` and
+`qr_policy_one_iteration` as generalisation targets. Neither has been fitted, so
+the claim that this generalises is **argued, not measured**. Apply the
+`incidental`/`answer_bearing` test to them first.
+
+---
+
+## D-039 — The structured trace is a frame local, not a return value; deliberately, and provisionally
+
+**Date:** 2026-09-06 · **Status:** DECIDED (provisional; revisit in the milestone
+model) · **Source:** Phase 3, D3.2/D3.3
+
+Both Phase 3 templates now build their trace as a structured node and **render
+the printed prose from it**. The node is bound to a local named `trace_nodes`;
+the templates' public contract is still `(question, solution)`, and
+`tests/trace_schema/extract.py` lifts the node out with `sys.settrace`.
+
+**Why not return it.** Changing the return contract is a corpus-wide decision
+affecting all 150 templates and every consumer, not a two-template one. Phase 3's
+scope is two templates. Making the change here would have meant either a special
+case for two templates or an out-of-scope corpus edit.
+
+**Why render the prose from the node rather than beside it.** This is D-034's
+rule applied to traces. If the template built a node *and* formatted the prose
+independently, the two could disagree and nothing would notice — the same shape
+as a test carrying its own answer key. Rendering from the node makes divergence
+impossible by construction, and it is why `extract.py` holds no reference values
+of its own. Evidence that the refactor was behaviour-preserving: over 4,000 seeds,
+on every seed the screens did not resample, **every arithmetic line of both
+solutions is byte-identical** to `master`; the only prose changes are two
+deliberately added sentences in the civil item's Steps 3 and 4.
+
+**The cost, stated.** The node is not part of any interface, so nothing outside
+`extract.py` can consume it and no check gates its shape. **Promoting it to a
+return value belongs to the milestone-model work**, and until then D3.3 is a
+specification with two reference implementations rather than a live contract.
+
+---
+
+## D-040 — `normal_depth_iteration` had TWO display-tie populations, not the one the spec listed
+
+**Date:** 2026-09-06 · **Status:** DECIDED · **Source:** Phase 3, own measurement
+
+The Phase 3 brief and the spec list one T1 defect for this template: *"T1 has 1
+hard failure in 200 seeds (seed 11, the `K = Q*n/S^(1/2)` line)"*. That is
+accurate as far as it goes and it is not the whole defect.
+
+Measuring the **exact rational** value of every printed expression against its
+display precision over 20,000 seeds — rather than counting T1 hard failures —
+finds two tie populations of comparable size:
+
+| Line | Display | Exact ties per instance | T1 hard failures / 20,000 |
+|---|---|---|---|
+| Step 1, `K = Q*n/S^(1/2)` | 3 dp | **1.14%** | 22 |
+| Step 3, the secant update `y_next = …` | 4 dp | **1.02%** | 5 |
+
+**Why counting T1 failures understates it by roughly 10×.** D-016 established
+that at an exact tie `|evaluated − printed| == tol` and float representation error
+alone decides FAIL versus MARGINAL, *in either rounding direction*. So only a
+minority of ties surface as hard failures: 27 hard failures against 427 ties in
+the same 20,000 seeds. **A tie that currently reads MARGINAL is the same
+ill-posed instance as one that reads FAIL** — it has no defensible gold reading
+either way — so the screen removes both populations, and the acceptance evidence
+must be the tie census, not the failure count.
+
+**The lesson, generalisable.** T1's FAIL/MARGINAL split is a property of float
+representation, not of the defect. Any phase that sizes a display-tie fix by
+counting T1 hard failures will under-fix by about an order of magnitude. Measure
+the exact-rational tie rate.
+
+**Resolution.** D-037's cheap escape was tested first and does not apply: `K` is a
+quotient by a 5-dp square root and the secant update divides by a difference of
+3-dp residuals, so neither is exactly representable at any longer display.
+Removed by resampling (D-016 part 3). Measured rejection rate **2.30% of seeds**
+over 4,000. T1 hard failures over 20,000 seeds: **27 → 0**.
+
+---
+
+## D-041 — Convergence guards that the PROSE relies on must raise, not assert
+
+**Date:** 2026-09-06 · **Status:** DECIDED · **Source:** Phase 3, actioning Phase 2
+Reviewer C's C-6 and its `-O` observation
+
+Phase 2's Reviewer C observed that `python -O` strips `assert`, so the flame
+template's convergence assert "guards development, not production". Phase 2
+recorded that and left it, correctly — nothing in that template's prose depended
+on the assert holding.
+
+**Here it does.** `normal_depth_iteration` Step 4 told the reader *"The last
+change is below the tolerance, so yn = …"* unconditionally, while the only thing
+enforcing it was `assert updates <= 5 and …`. Under `-O` a non-converged
+iteration would have emitted a trace stating something false about itself. The
+budget loop `for _ in range(5)` would simply fall through with an unconverged
+depth.
+
+**The rule.** A guard whose failure would make the emitted prose *false* is part
+of the output contract and must be an explicit `raise`. A guard that only records
+a developer's expectation may stay an `assert`. In this template convergence is
+now a `raise`; the sampling-envelope checks (depth within 0.015 m of target,
+residual, Froude number) stay asserts.
+
+Step 4 also now **prints the last change** rather than asserting it is small, so
+the reader can check the claim rather than take it. That is the same move as
+Phase 2's C-2 fix, which put the model tolerance into the flame trace.
+
+**Measured:** 0 non-convergences in 20,000 seeds, so this was latent. The
+smallest rate a 20,000-seed run can resolve is ~0.015%; a defect rarer than that
+would not have shown, and the guard is what covers the difference.
+
+---
+
+## D-042 — Two Phase 3 defects were latent, not active, and are recorded as such
+
+**Date:** 2026-09-06 · **Status:** DECIDED · **Source:** Phase 3, own measurement
+
+The brief listed two `normal_depth_iteration` defects that turn out **not to
+fire in the sampled parameter space**. Both were fixed anyway; both are recorded
+with their measured rate so a later reader does not mistake a latent defect for a
+demonstrated one.
+
+| Defect | Brief's description | Measured | Resolution |
+|---|---|---|---|
+| `fmt3()` rewrote `"-0.000"` to `"0.000"`, letting the printed operand differ in sign from the stored value (P2) | "A direct P2 violation" | **0 occurrences in 4,000 seeds.** `g` is only near zero at convergence, and the loop exits on the depth change *before* re-evaluating, so `g ∈ (−0.0005, 0)` is essentially unreachable | Helper removed; the **stored** value is normalised instead of the string, so printed and stored agree by construction |
+| `g_curr - g_prev` unguarded division | "Reachable in principle; 0 occurrences in 6,000 seeds" | **0 in 20,000 seeds**; smallest `\|g_k − g_{k−1}\|` observed is **0.004**, four steps of the 3-dp residual grid on which `g` lives | Explicit `raise`, not a resample: a vanishing denominator means the sampling box moved, and that should surface rather than be redrawn around |
+
+**Why this is worth an entry.** The brief described the `fmt3` sign discrepancy
+as "a direct P2 violation… T5 flags it three times". T5's three flags are real —
+they are static findings about a *call in result position* — but they are not
+evidence the sign discrepancy ever occurred. It never did. Fixing it was right;
+claiming it was an active defect would not have been. The distinction matters
+because the phase's acceptance evidence is quoted in the item-pool impact note,
+and a latent defect changes no published result.
+
+**Resolution limit, stated per the standing rule (D-024, D-026):** 20,000 seeds
+cannot resolve a rate below ~0.015%. Both defects are excluded above that rate
+and above nothing below it.
+
+---
+
+## D-043 — Phase 3 does NOT regenerate the T6 baseline; the diff is delivered directly
+
+**Date:** 2026-09-06 · **Status:** DECIDED · **Source:** Phase 3, D3.5
+
+T6 fails 142/150 on `master` — re-measured this phase in a `git worktree` at
+`00bd0b0` rather than trusted from the brief, and the brief's table reproduced
+exactly (T1 30, T2 0, T3 0, T4 3, T5 68, T6 142, T7 83). The committed baseline
+is stale corpus-wide, so T6 cannot gate either Phase 3 template.
+
+**Two routes were available, and the cheap one was rejected.** Regenerating the
+baseline would turn T6 green, but *a baseline refreshed by the phase it is meant
+to gate is not a gate* — and the corpus-wide movement it would absorb has nothing
+to do with Phase 3 and would be examined by nobody. Phase 2 faced this and
+delivered a direct before/after instance dump instead; Phase 3 does the same.
+
+**What replaces it:** 4,000 seeds per template dumped from a `master` worktree
+and from the branch, **each in its own process** (`tests/template_integrity/
+phase3_instance_dump.py`, which refuses to run if the module resolves outside the
+tree root it was given — the in-process-reload trap has now caught three people).
+Full numbers in [`phase3_item_pool_impact.md`](phase3_item_pool_impact.md).
+
+**Regenerating the baseline remains the right corpus-wide action**, as its own
+deliberate change on `master` with the movement examined, and is left to Phase 6
+where the re-audit owns it. Recorded there rather than done here.
 
 ## Open decisions
 
