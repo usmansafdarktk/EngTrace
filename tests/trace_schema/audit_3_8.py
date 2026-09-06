@@ -13,6 +13,7 @@ This runs the audit mechanically instead, so it is cheap enough to run before.
 It is not a conformance verifier — the reviewers' verifiers do that — it answers
 only §3.8's questions:
 
+  Q0  can every value be resolved through a role map, or only by literal name?
   Q1  is any value a check reads restated per element rather than declared once?
   Q2  is any DERIVED value declared once but recomputed by nothing?
   Q3  does a recomputation cover every value it should, or only those present?
@@ -34,59 +35,98 @@ PROBLEM_DATA = {
 }
 
 
+def _r(node: dict, kind: str, role: str) -> str:
+    """Resolve a type-level role to this node's own symbol name (§3.3).
+
+    Reaching for a literal symbol name is non-conforming under §8B.11, and the
+    first version of this file did exactly that for `decision` -- it raised
+    KeyError on a renamed node, including a renamed node that was corrupt, so it
+    produced no finding for precisely the class of node the role machinery
+    exists to serve (Reviewer D2, round 6). It failed safe rather than green,
+    which is why it was not blocking, but silently inapplicable is not applicable.
+    """
+    return node[kind][role]
+
+
 def audit(node: dict) -> list[str]:
     out: list[str] = []
     t = node['node_type']
     term = node['termination']
 
-    # Q1 - restated per element
+    for kind in ('roles',) + (('trial_roles', 'candidate_roles') if t == 'decision'
+                              else ('evaluation_roles',)):
+        if kind not in node:
+            out.append(f'Q0 FAIL: no {kind}; values can only be resolved by '
+                       f'literal symbol name, which is non-conforming (§8B.11)')
+    if out:
+        return out
+
+    # Q1 - restated per element rather than declared once
     if t == 'decision':
-        budgets = {e['capacity'] for e in node['elements']}
+        budget_total = _r(node, 'roles', 'budget_total')
+        item = _r(node, 'candidate_roles', 'item')
+        measure = _r(node, 'candidate_roles', 'measure')
+        candidates = _r(node, 'trial_roles', 'candidates')
+        trials = _r(node, 'roles', 'trials')
+
+        budgets = {e[budget_total] for e in node['elements']}
         if 'budget' not in term:
             out.append('Q1 FAIL: no termination.budget; the budget is restated '
                        'per element and checked against nothing')
-        elif len(budgets) > 1 or budgets != {term['budget']}:
+        elif budgets != {term['budget']}:
             out.append(f'Q1 FAIL: element budgets {budgets} disagree with '
                        f'termination.budget {term["budget"]}')
-        measures = {}
+
+        measures: dict = {}
         for e in node['elements']:
-            for tr in e['trials']:
-                for c in tr['eligible']:
-                    measures.setdefault(c['task'], set()).add(c['duration'])
+            for tr in e[trials]:
+                for c in tr[candidates]:
+                    measures.setdefault(c[item], set()).add(c[measure])
         multi = {k: v for k, v in measures.items() if len(v) > 1}
         if multi:
             out.append(f'Q1 FAIL: measures restated inconsistently: {multi}')
         if 'item_measures' not in term:
             out.append('Q1 FAIL: no termination.item_measures')
+        else:
+            off = {k: v for k, v in measures.items()
+                   if term['item_measures'].get(k) not in v}
+            if off:
+                out.append(f'Q1 FAIL: candidate measures disagree with '
+                           f'item_measures: {sorted(off)}')
 
-    # Q2 - derived values with nothing recomputing them
+    # Q2 - derived values that nothing recomputes
     if t == 'iteration':
         if 'update_relation' not in node:
             out.append('Q2 FAIL: the update is derived and undeclared')
         if 'frame_relations' not in node:
             out.append('Q2 FAIL: frame symbols are derived and unchecked')
+        if 'preamble' in node and 'preamble_binding' not in node:
+            out.append('Q2 FAIL: a preamble is present but unbound to elements[0]')
     else:
-        sel = node.get('selection', {})
-        if 'filter_relation' not in sel:
+        if 'filter_relation' not in node.get('selection', {}):
             out.append('Q2 FAIL: admissibility is derived and only asserted')
     if 'from' not in node.get('result', {}):
         out.append('Q2 FAIL: result.value is derived with no stated derivation')
 
     # Q3 - coverage, not merely presence
     if t == 'iteration' and 'frame_relations' in node:
-        iterate = node['evaluation_roles']['iterate']
+        iterate = _r(node, 'evaluation_roles', 'iterate')
         need = {s for s in node['evaluation_symbols'] if s != iterate}
         have = [k for k, _ in node['frame_relations']]
         missing = need - set(have)
         dupes = {k for k in have if have.count(k) > 1}
+        extra = set(have) - need
         if missing:
             out.append(f'Q3 FAIL: frame symbols with no relation: {sorted(missing)} '
-                       f'-- they are exempt from 4.3.9, which is variant 5')
+                       f'-- they are exempt from §4.3.9, which is variant 5')
         if dupes:
             out.append(f'Q3 FAIL: symbols with more than one relation: {sorted(dupes)}')
-        extra = set(have) - need
         if extra:
             out.append(f'Q3 FAIL: relations for non-frame symbols: {sorted(extra)}')
+        for r in ('iterate', 'residual'):
+            if _r(node, 'evaluation_roles', r) not in node['evaluation_symbols']:
+                out.append(f'Q3 FAIL: evaluation role {r!r} names a symbol absent '
+                           f'from evaluation_symbols, so coverage cannot demand it')
     elif t == 'decision':
         universe = set(term['universe'])
         if set(term.get('item_measures', {})) != universe:

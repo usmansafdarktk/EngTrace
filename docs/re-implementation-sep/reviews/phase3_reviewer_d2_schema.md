@@ -1340,3 +1340,209 @@ Close the coverage gap and I think §4.6 is finished.
 
 *Round 5 filed by Reviewer D2. Written to disk, not committed. New artefact:
 `tests/trace_schema/reviewer_d2_verifier_14.py`.*
+
+---
+
+## 9. Round 6 — confirming v1.5
+
+**Ref:** `c8e28ce1708e070703a3a202223df6404d2e8c52`, schema 1.5. **Time box:** 30
+minutes. Artefact: `tests/trace_schema/reviewer_d2_verifier_15.py`.
+
+**Drift.** The branch moved to `ae05443253e8177410bc3f03f520b8b4f732e92c` during
+this round. The coordinator disclosed it unprompted, before I found it, and the
+disclosure is accurate — I verified it independently rather than accepting it:
+
+```
+git merge-base --is-ancestor c8e28ce ae05443            -> yes (fast-forward)
+git diff --name-status c8e28ce ae05443                  -> M docs/prompts/README.md
+                                                           M docs/re-implementation-sep/phase3_summary.md
+phase3_node_types.md            c8e28ce d403961c13836114 = ae05443 d403961c13836114
+phase3_conformance/traces.json  c8e28ce e77d652da8357f3e = ae05443 e77d652da8357f3e
+git diff --name-only c8e28ce ae05443 -- tests/ .../phase3_conformance/  -> (empty)
+```
+
+Both input files are byte-identical across the two commits, the quoted hashes
+match what I computed, neither moved file is in my scope, and `audit_3_8.py` and
+the corpus did not move — so §9.5's audit findings are against the shipped script.
+**Every result below stands at either SHA.** I opened neither moved file.
+
+For the record, since this is the third occurrence and I caught the second: the
+disclosure was the right call and it cost me about ninety seconds to check, versus
+the fifteen minutes it cost in round 2 to discover a move myself and prove it
+harmless. The proposed mechanical rule — do not run `git commit` between
+dispatching a review and receiving it — is the right one, and it is the only
+version of this that does not depend on remembering. This did not affect the
+review.
+
+### 9.1 Verdict
+
+**The schema is clean. I found no sixth variant. Merge it.**
+
+Two defects remain and neither is in the node semantics: **§4.6's own worked
+example does not parse under §4.6's own grammar**, and **`audit_3_8.py` violates
+§8B.11**. Nothing a conforming trace can claim is affected by either. I would fix
+the first before merging, because the spec is the deliverable and the example is
+normative-looking; the second can follow.
+
+All four 1.5 changes do what they claim, verified against an implementation
+written from the 1.5 text rather than from the changelog:
+
+```
+python -m tests.trace_schema.reviewer_d2_verifier_15 docs/re-implementation-sep/phase3_conformance/traces.json
+template_line_balancing_heuristic        pass 40  fail  0
+template_normal_depth_iteration          pass 40  fail  0
+TOTAL 80 rows: 80 pass, 0 fail; 40 carried unchecked notes
+```
+
+**80/80 with a strict one-argument `round` and coverage enforced at §6 step 1.**
+
+### 9.2 Variant 5 is dead, and the coverage clause holds under attack
+
+```
+residual relation deleted                     -> FAIL ['6.1/8A.4']
+AR relation deleted                           -> FAIL ['6.1/8A.4']
+```
+Rejected, at the right clause, before any frame is evaluated. I then attacked the
+coverage clause itself three ways and all three failed:
+
+```
+residual relation declared TWICE              -> FAIL ['6.1/8A.4']   ("exactly once")
+extra relation for a non-frame symbol         -> FAIL ['6.1/8A.4']
+residual dropped from evaluation_symbols      -> FAIL ['8A.7']
+```
+
+The third is the one I expected to work — if the residual is not an evaluation
+symbol, coverage no longer demands a relation for it. It fails anyway, because
+§6 step 2 requires every `evaluation_roles` value to be a member of
+`evaluation_symbols`, and the residual role points at it. **Two independent
+clauses have to be satisfied to keep the residual free, and they are wired to
+each other.** That is a real closure, not a patch.
+
+### 9.3 The sixth variant I looked for and did not find
+
+`symbol_precision` is now the only remaining knob that moves an `iteration`
+answer, and it moves it:
+
+```
+gold precisions               -> 1.380 m, PASS
+symbol_precision[AR] 3 -> 1   -> 1.383 m, PASS
+symbol_precision[g]  3 -> 1   -> 1.378 m, PASS
+```
+
+**I am not filing this**, and the reason is §3.8's new table, which is doing its
+job: `symbol_precision` is classified **problem data**, for which "declared once
+is the whole requirement" and the check lives in §7. That is the same ruling I
+gave `constants` in round 5 and `universe`/`tolerance` in round 4, and 1.5's
+table now states it rather than leaving me to argue it. Moving a precision makes
+the trace a correct solve of a *differently displayed* problem, which a comparator
+catches on the first declared-value comparison; it does not make it a correct
+solve of no problem. The severity gap §3.8 now spells out is exactly the right
+discriminator, and applying it here gave me a clean answer in one step where
+rounds 4 and 5 each cost me a paragraph of reasoning.
+
+One observation rather than a finding: **`symbol_precision` is the only entry in
+the problem-data list that a *derived* check also consumes** — §4.6's `round(sym)`
+reads it, and §7.1's tolerance reads it. That is not a hole, but it means the one
+place problem data touches derived data is a place worth watching, and it is worth
+§7.1 saying explicitly that the tolerance comes from the **gold** node's
+`symbol_precision`, not the candidate's. As written ("the last place gold displays
+it", "from `symbol_precision[symbol]`") the intent is clear and a careless
+implementer could still read it as the candidate's. One clarifying clause.
+
+I also re-checked the round-4 and round-5 closures under 1.5: budget restatement,
+measure restatement, and the admissibility lie all remain rejected.
+
+### 9.4 §4.6's printed example contradicts §4.6's normative grammar
+
+```
+4.6's printed JSON example, verbatim -> FAIL ['4.6']
+```
+
+Line 584 of the spec still reads `["g", "round(AR, 3) - K"]`, two arguments, while
+line 600 declares the grammar as `round(x)` and line 606 says "**`round` takes one
+argument** … **the digit is not restated**". §9.1's example (line 1040) and all 40
+corpus nodes correctly carry `round(AR) - K`.
+
+So the *only* place in the document still showing the defect 1.5 exists to remove
+is the example inside the section that removes it. This is precisely the failure
+1.1 fixed by machine-generating §9's worked examples — and §4.6's inline example is
+hand-written, so it was not regenerated when the arity changed. **A reader who
+copies the example gets a node my verifier rejects.** One-character-class fix:
+delete the `, 3`, or generate §4.6's snippet from the corpus the way §9's are.
+
+### 9.5 Is `audit_3_8.py` honest?
+
+**On its own terms, yes — it caught every defect I threw at it, including two I
+did not expect it to:**
+
+```
+coverage gap (variant 5)      -> Q3 FAIL: frame symbols with no relation: ['g']
+duplicate relation            -> Q3 FAIL: symbols with more than one relation: ['g']
+frame_relations absent        -> Q2 FAIL: frame symbols are derived and unchecked
+no termination.budget         -> Q1 FAIL: no termination.budget
+budget restated per element   -> Q1 FAIL: element budgets {6} disagree with termination.budget 147
+filter_relation absent        -> Q2 FAIL: admissibility is derived and only asserted
+```
+
+Q3 genuinely checks coverage rather than presence, which is the whole point of the
+third question, and Q1 catches the restatement rather than merely the missing
+field. No false cleans.
+
+**But it violates §8B.11, and that is a real gap.** It resolves `decision` values
+by literal symbol name — `e['capacity']`, `e['trials']`, `tr['eligible']`,
+`c['task']`, `c['duration']` — instead of through `roles`, `trial_roles` and
+`candidate_roles`:
+
+```
+verifier on the renamed decision            -> PASS+UNCHECKED
+audit_3_8 on the renamed decision           -> raised KeyError: 'capacity'
+audit_3_8 on renamed + budget restated      -> raised KeyError: 'capacity'
+```
+
+The failure mode is at least the safe one — it raises rather than reporting a false
+clean — but the audit is **silently inapplicable to exactly the class of node the
+role machinery exists to serve**, and the second line is the one that matters: a
+renamed node that *is* corrupt produces no finding either. Anyone who runs the
+audit across a corpus and wraps it in a `try/except`, or who adds the third node
+type §10 anticipates, gets a green audit that checked nothing. That is the
+"green suite comes to measure nothing" failure §8B.10 is written against, arriving
+through the tool rather than through the schema.
+
+Fix is mechanical and about ten lines: take the role maps as the audit already
+takes `evaluation_roles` for Q3 — where, notably, it is already correct. **The
+`iteration` half of the audit is role-clean; only the `decision` half is not.**
+
+I would also add: the audit hardcodes `PROBLEM_DATA` as a literal set. That is
+right for now, but it is a second copy of §3.8's table, and the two can drift. A
+comment pointing at §3.8 as the source of truth would be cheap insurance.
+
+### 9.6 Rename test, both types, 1.5
+
+```
+decision renamed                  -> PASS+UNCHECKED
+decision renamed + perturbed      -> FAIL ['5.4.7']
+iteration renamed                 -> PASS
+iteration renamed + AR perturbed  -> FAIL ['4.3.9/8A.4']
+```
+No regression. §4.6's note that renaming frame symbols means rewriting the relation
+strings is accurate and was exactly what my harness had to do.
+
+### 9.7 Closing
+
+Six rounds, and this is the first with nothing merge-blocking in the schema. The
+two remaining items are an example and a tool, and I want to be clear that I am not
+holding the merge on either — the first because it misleads a reader without
+misleading a verifier, the second because it fails safe.
+
+What I would carry into Phase 4, briefly: §3.8's problem/derived split is the
+single most reusable thing this phase produced, and its third question — *does the
+recomputation cover every value, or only those present?* — is the one that would
+have caught four of my six rounds' findings. It is now mechanised, and mechanising
+it is worth more than any individual clause here. The lesson I would write down is
+narrower than the rule, though: **five of six rounds found a defect in the layer
+added to fix the previous round's defect.** The fix was sound every time; the new
+surface it introduced was not reviewed. Whatever Phase 4 adds, the thing to review
+is not the fix but the mechanism the fix is built on.
+
+*Round 6 filed by Reviewer D2. Written to disk, not committed. New artefact:
+`tests/trace_schema/reviewer_d2_verifier_15.py`.*
