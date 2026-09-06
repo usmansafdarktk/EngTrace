@@ -856,3 +856,265 @@ F9c–h, F10–F13) is minor and could ride along with that clause in a single p
 
 *Round 3 filed by Reviewer D2. Written to disk, not committed. New artefact:
 `tests/trace_schema/reviewer_d2_verifier_12.py`.*
+
+---
+
+## 7. Round 4 — does §3.8 close the exploit family?
+
+**Ref:** `9c6b8ee9e9fb6eb2cfcea6af30e2d787694b1e9a`. `HEAD`, the branch tip and the
+commissioned SHA agreed at the start and at the end — the branch did not move.
+**Time box:** 30 minutes. Artefact: `tests/trace_schema/reviewer_d2_verifier_13.py`.
+
+### 7.1 Verdict
+
+**A fourth variant exists. In fact two do, and the second is worse than anything
+I have filed so far.** §3.8 is a real closure of the family it names — *values
+restated across occurrences of the same thing* — and within that family I could
+not break it. But it is not a closure of the question it is written to answer,
+because **its own table omits two values that checks read and traces choose
+freely**, and both change the answer.
+
+- **Variant 4 (`decision`): `budget_total` is restated in every element.** A
+  trace that declares a different budget reports `n = 2` where the truth is
+  `n = 1`, passing every clause. §3.8's table does not list it.
+- **Variant 5 (`iteration`): the residuals are fabricated.** A fully conforming
+  trace reports **3.501 m** where seed 0's gold answer is **1.380 m**. §10's
+  "frame-internal physics is not checkable" concession is not merely a limitation
+  — **it is load-bearing for an attacker**, and it makes `result.value` on an
+  `iteration` node entirely free.
+
+I would hold the merge. Not because §3.8 is wrong — it is the right rule, and
+adopting it was the right call — but because the audit it prescribes has not yet
+been *run* against the two node types it ships with.
+
+### 7.2 What 1.3 got right — confirmed, not assumed
+
+**Corrupt B is dead**, as expected, and for the right clause:
+```
+corrupt B (lie about measure) -> FAIL ['5.4.3d/8A.5']
+```
+`termination.item_measures` + §5.4.3d closes variant three exactly as designed.
+
+**80/80 gold traces pass, no waiver:**
+```
+python -m tests.trace_schema.reviewer_d2_verifier_13 docs/re-implementation-sep/phase3_conformance/traces.json
+template_line_balancing_heuristic        pass 40  fail  0
+template_normal_depth_iteration          pass 40  fail  0
+TOTAL 80 rows: 80 pass, 0 fail; 40 carried unchecked notes
+```
+
+**Rename test, both types, no regression from 1.2:**
+```
+decision:  renamed -> PASS+UNCHECKED    + perturbed budget_final -> FAIL ['5.4.7']
+                                        + perturbed measure      -> FAIL ['5.4.3d/8A.5']
+iteration: renamed -> PASS              + perturbed iterate_next -> FAIL ['8A.3','4.3.1']
+                                        + preamble nonsense      -> FAIL ['8A.4']
+```
+`accumulator_role` now survives the rename untouched (it is a role, not a symbol),
+which is F11's fix showing up as behaviour rather than as prose.
+
+**The five fixes you asked me to verify rather than accept — all five are real.**
+
+| # | Check | Result |
+|---|---|---|
+| F7 | §3.7 hashed at all three refs | `9398ccc` `6f7283ead30df88e` → `c9fd703` `6f7283ead30df88e` → `9c6b8ee` **`e6ce5f30f3045d06`**. The hash moved this time, and the text now reads "*the union of `accumulator_role` over elements 1..k*" with an explicit "**The reading is a prefix, not a total**". **Fixed.** |
+| F4 | §3.1 `preamble_binding` row | now "**required iff `preamble` is present**"; omitting it is rejected. **Fixed.** |
+| F10 | `preamble_binding` shape | now `{"frame": 0, "frame_role": "iterate"}` — the frame role is named, not prefix-inferred. My `ASSUMPTION[10]` is deleted. **Fixed.** |
+| F11 | `accumulator_symbol` | now `accumulator_role`, an element role. **Fixed** (one stale reference remains — see §7.5). |
+| F12 | §3.1 `schema_version` row | now `"1.3"`. **Fixed.** |
+
+### 7.3 Variant 4 — `budget_total` is restated in every element
+
+Working down the node as you asked: `index`, `closes`, `chosen`, `candidates`
+membership, `budget_after` and `budget_final` are all pinned. `index` is
+contiguous (§5.3), `closes == (chosen is null)` and must be last (§5.4.9),
+`chosen` is a replay of `selection` (§5.4.4), `candidates` is pinned in both
+directions by `precedences` (§5.4.3b), and the budget chain is arithmetic on
+`item_measures` (§5.4.2/5/7). Given `universe`, `precedences`, `item_measures` and
+the budget, the greedy is deterministic and exactly one trace conforms. That is a
+real result and it is what §3.8 bought.
+
+**But the budget itself is declared in each element, and nothing says what it is.**
+
+```
+honest, budget 11, n=1 (correct)                     -> PASS
+B1  capacity_constant=false, budgets 6 and 5, n=2    -> PASS []
+B2  capacity_constant=true,  budget 6 everywhere, n=2-> PASS []
+```
+
+Both report `n = 2` against a true `n = 1`. Universe `{p: 6, q: 5}`,
+`item_measures` honest and untouched, every candidate's `measure` agreeing with it,
+`filter_relation` honestly recomputed, precedences satisfied both ways, budget
+arithmetic exact, closing trials last, prefix-cumulative termination holding only
+at the last element. `n` is the answer (§2, §7.3), and it is wrong.
+
+**B2 is the important one.** B1 could be dismissed by saying `capacity_constant`
+is itself a free boolean — which is true, and is its own small finding. But B2
+leaves `capacity_constant: true` and simply restates the *same wrong budget* in
+every element. It is the `measure` attack with `budget_total` substituted for
+`measure`: a value read by §5.4.1, by §5.4.3c through `budget_before`, and by
+§5.4.7, declared once per element rather than once per node.
+
+**§3.8's own audit question convicts it verbatim.** §3.8 says: *"for every value a
+check reads, where is the single place it is declared? If the answer is 'in each
+element that mentions it', the check is not yet a check."* For `budget_total` the
+answer is, exactly, "in each element that mentions it".
+
+**Fix, in §3.8's own idiom:** declare `termination.budget` once beside
+`item_measures` and `precedences` — all three are properties of the problem, not
+of an element — and make §5.4.1 read `budget_total == termination.budget`.
+`capacity_constant` then becomes redundant and should be deleted rather than left
+as a free boolean that a trace can flip to unlock per-element budgets.
+
+### 7.4 Variant 5 — fabricated residuals make `iteration`'s answer free
+
+You asked whether §10's concession is load-bearing for an attacker. **It is, and
+this is the most serious thing in any of my four rounds.**
+
+§4.3.1 recomputes `iterate_next` from `update_relation` — but the inputs it
+recomputes *from* are `residual_prev` and `residual_curr`, which arrive from
+evaluation frames, and §10 states that frame-internal physics is not checkable.
+So the residuals are free data. The secant step is an interpolation between two
+residuals: **choose the residuals and you choose where it converges.**
+
+I built such a trace. At each element I picked the iterate I wanted next, solved
+the secant relation backwards for the `g` that produces it, rounded that `g` to its
+declared 3 dp, and recomputed `iterate_next` forward from the rounded values —
+exactly the arithmetic a real template does. The chosen `g` is then placed in the
+previous element's evaluation frame, so `carry`'s `g_curr <- evaluation.g` holds.
+
+```
+gold seed-0 answer is 1.380 m; this trace reports 3.501 m in 9 updates
+verdict -> PASS []
+```
+
+Everything holds: §4.3.1 (the update recomputes exactly), §4.3.2 (`change`),
+§4.3.3–5 (`converged`, nullity), §4.3.6 (each frame bound to the iterate that
+produced it), §4.3.8 (contiguous index), `carry` on all four paths,
+§4.4/`preamble_binding` against `elements[0]`, termination at the last element only,
+and §6 step 8 (`result.value` = `last.iterate_next` rounded to 3 dp). **The answer
+is off by 2.121 m and nothing objects.**
+
+Two things make this worse than variant 4:
+
+1. **It needs no restatement at all.** Every value appears once. It is not a §3.8
+   violation on §3.8's own terms — which is precisely why §3.8 does not catch it,
+   and why "declared once" is necessary but not sufficient. A value declared once
+   and *never checked against anything* is as free as one restated ten times.
+2. **It survives the comparator's process credit.** §7.2 grants process credit
+   when "every candidate element satisfies §4.3", independently of the count. A
+   fabricated trace satisfies §4.3 completely, so it takes **full process credit
+   while reaching an arbitrary answer**. Answer credit catches it by comparing
+   `result.value` to gold, but the milestone model's whole purpose is to score the
+   *work*, and here the work is unscored. A model that learns to emit
+   arithmetically-consistent nonsense is rewarded by exactly the mechanism built to
+   detect it.
+
+**§10 and §3.8 are in direct contradiction, and the document does not notice.**
+§10 says the geometry is the item's content and carrying it "would mean carrying an
+expression language for arbitrary engineering formulae". §3.8 says a check that
+reads a freely-restated value is not a check. §4.3.1 reads the residuals. Both
+cannot stand.
+
+**The fix is cheaper than §10 implies**, because the node already has the
+expression language §10 says it lacks: `update_relation` is one, and 1.2 added a
+second for `filter_relation`. A `residual_relation` over evaluation-frame roles
+plus item constants declared once (`termination.constants` or similar) would close
+it with no new machinery — `g = Q_target − K·AR^(2/3)` needs exponentiation added
+to §4.2's grammar and nothing else. If that is genuinely out of scope for Phase 3,
+then **§10 should say plainly that an `iteration` node's answer is not verifiable
+from the node**, and §7.2 should withhold process credit rather than grant it,
+because at the moment the spec implies a guarantee it does not provide.
+
+### 7.5 Does §3.8's table have a gap? — yes, two
+
+§3.8's table accounts for: item measures, admissibility, eligibility, the update
+recurrence, display precisions, rounding mode, symbol names. Checks also read:
+
+| Value read by a check | Declared once? | In the table? |
+|---|---|---|
+| `budget_total` | **no — once per element** | **no** (variant 4) |
+| evaluation-frame residuals | once, but checked against nothing | **no** (variant 5) |
+| `universe`, `precedences`, `item_measures` | yes, on `termination` | partly |
+| `capacity_constant` | free boolean, unconstrained | no |
+| `termination.tolerance`, `max_elements` | once, unconstrained | no |
+
+The last three are the **declaration family** and I want to be precise about scope,
+because it would be cheap to inflate the finding: a node-local verifier cannot know
+that a trace's `universe` or `tolerance` is the *item's* — nothing binds the node
+to the question, which §10 (D-039) already records. Those are the comparator's job
+under §7, where a candidate is scored against a gold node that carries the true
+values. I am **not** filing them as defects.
+
+Variants 4 and 5 are different, and that is why they are findings:
+
+- **Variant 4 is a restatement**, per element, of a value that has a single true
+  value — the exact shape §3.8 was written to forbid, missed by its own table.
+- **Variant 5 needs no restatement**: it exploits a value that is declared once and
+  checked against nothing. It shows **§3.8's rule is incomplete as written.** The
+  principle should read: *every value a check consumes is either declared once on
+  the node **and checked against something**, or recomputed from something that is.*
+  "Declared once" was the right fix for variants two and three because those values
+  were also recomputable; it is not sufficient in general.
+
+**One residual staleness:** §6 step 7 still names `accumulator_symbol` while §3.4,
+§3.7 and §9.2 all say `accumulator_role`. Harmless — it is the algorithm's prose,
+not the field table — but it is the same class of miss as F12, and it is the third
+time a rename has been applied everywhere except the normative algorithm.
+
+### 7.6 What I tried that did not work
+
+A clean verdict is worth what the failed attempts behind it are worth, so:
+
+1. **Padding `decision` with an extra empty element** (`committed: []`, budget
+   untouched, index contiguous, union still correct). This would have been the
+   cleanest possible `n` attack and it is **dead** — but *only because 1.3 fixed
+   F7*. Under 1.1/1.2's "union over all elements", the predicate is constant in `k`,
+   "and on no earlier one" is vacuous, and the padded trace passes. F7 was filed as
+   a cosmetic wording bug in rounds 2 and 3; it turns out to have been load-bearing
+   for soundness, and 1.3 closed a variant it did not know it was closing.
+2. **Restating `measure` under the new §5.4.3d** — dead, confirmed above.
+3. **Lying about `admissible` under §5.4.3c** — dead since 1.2.
+4. **Reordering `candidates`** to steer `tie_break: universe_order` — §5.4.4
+   resolves ties by position in `universe`, not by position in `candidates`, so the
+   scan order cannot be weaponised. `tie_break: "first"` *would* be steerable, but
+   no gold node uses it.
+5. **Omitting a candidate to dodge selection** — §5.4.3b's second direction
+   (every uncommitted precedence-satisfied item must appear) rejects it.
+6. **Splitting one element's trials to hide a commitment** — §5.4.6 (`committed`
+   is exactly the ordered non-null `chosen` values) and §5.4.9 (closing trial last)
+   between them leave no room.
+7. **`iteration`: adding or removing updates** — genuinely not an attack, and
+   correctly so: §7.2 makes the count incidental by design, and §4.3.4/4.3.5 pin
+   `converged` and the frame nullity to the last element regardless of count.
+8. **`iteration`: perturbing `result.dp` or the rounding mode** to shift the
+   answer — both are declared on the node and §6 step 8 recomputes from them, so
+   changing them changes the derivation too and the check still holds. This is
+   §3.8 working.
+
+### 7.7 Recommendation
+
+Two clauses, both in §3.8's own idiom, and I believe they finish it:
+
+1. **`termination.budget`, declared once**; §5.4.1 becomes
+   `budget_total == termination.budget`; delete `capacity_constant`.
+2. **Either** add `residual_relation` (plus exponentiation to §4.2's grammar and
+   item constants declared once), **or** state in §10 and §7.2 that an `iteration`
+   node's answer and process are not verifiable from the node alone, and withhold
+   process credit accordingly.
+
+And one to the rule itself: amend §3.8 to *"declared once **and checked against
+something**, or recomputed from something that is"*, then **run its own audit
+against both shipped node types** — that audit is what would have caught both
+variants, and it has not yet been performed on the two types the document defines.
+
+I said in round 3 that I would rather see the invariant stated generally than watch
+a third variant get patched. 1.3 stated it, and stating it was right — the
+restatement family really is closed, and `decision` is now deterministic given its
+declarations. What remains is that the rule was written down but not yet applied
+to the node types in the same document. That is a smaller gap than the one it
+closed, and I do not think it needs a fifth round of review — it needs the audit
+run once, by the implementer, against §3.8's own table.
+
+*Round 4 filed by Reviewer D2. Written to disk, not committed. New artefact:
+`tests/trace_schema/reviewer_d2_verifier_13.py`.*
