@@ -134,7 +134,7 @@ applies to a template this phase never saw:
 > comparator already tolerates, and `answer_bearing` when it is invariant under
 > that slack and appears in the answer.
 
-Filed as a `SPEC-CHANGE` against §3.2. What survives of §3.2 is "specify them
+Filed as **SPEC-CHANGE 8** against §3.2, and the spec is amended accordingly. What survives of §3.2 is "specify them
 together" — they share one base structure, one `carry` mechanism, one
 verification algorithm. What is struck is the implication that they share a
 comparator.
@@ -634,21 +634,21 @@ clean on all 80 shipped nodes and catches all five historical defects.
 
 | # | Suggestion | Disposition | Note |
 |---|---|---|---|
-| 1 | Fit a third template to `iteration` with an unmodified verifier | **ADOPT-PHASE-4** | Partly discharged early: round 2 built a *synthetic* alien node — renamed symbols, a different recurrence, 9 elements — and an unmodified verifier accepted it, then failed it on four clauses when perturbed. A **real** third template is still unfitted; named as a Phase 4 deliverable |
-| 2 | Run the comparator half — §7 is untested by anything | **ADOPT-PHASE-4** | The largest gap in the deliverable, named independently by both D reviewers. §7's dispositions have **no conformance corpus at all**. Needs candidate traces, which needs the extractor spike |
+| 1 | Fit a third template to `iteration` with an unmodified verifier | **ADOPT-PHASE-4 → D4.7** | Partly discharged early: round 2 built a *synthetic* alien node — renamed symbols, a different recurrence, 9 elements — and an unmodified verifier accepted it, then failed it on four clauses when perturbed. A **real** third template is still unfitted; named as a Phase 4 deliverable |
+| 2 | Run the comparator half — §7 is untested by anything | **ADOPT-PHASE-4 → D4.6** | The largest gap in the deliverable, named independently by both D reviewers. §7's dispositions have **no conformance corpus at all**. Needs candidate traces, which needs the extractor spike |
 | 3 | Fuzz the schema generatively rather than by hand | **BACKLOG** | Round 1's five guessed invariant holes all hit, so the density is high; but rounds 2–5 found the four that mattered by targeted attack, not fuzzing |
 | 4 | Check the corpus against a second extraction | **REJECT, with reason** | Structurally unnecessary: the prose is *rendered from* the node (D-039), so node/prose divergence is impossible by construction rather than merely unlikely |
 | 5 | A checklist — does every node type have an element table, a role binding, a declared update relation? | **ADOPT-NOW** | Exactly what would have caught F3, F16 and variants 4–5 at authoring time. Implemented as §3.8's three audit questions **and as executable code** |
-| 6 | Generate §8 from the verifier rather than writing it alongside | **ADOPT-PHASE-4** | Right diagnosis — §8 was "a list of remembered failure modes", which is always a floor. Deferred because it needs a reference verifier in-repo, which Phase 3 does not own |
+| 6 | Generate §8 from the verifier rather than writing it alongside | **ADOPT-PHASE-4 → D4.11** | Right diagnosis — §8 was "a list of remembered failure modes", which is always a floor. Deferred because it needs a reference verifier in-repo, which Phase 3 does not own |
 
 ### 11.5 R4 disposition — Reviewer D2, §5
 
 | # | Suggestion | Disposition | Note |
 |---|---|---|---|
-| 1 | Fit `linear_reservoir_routing_step` by declaring a binding only, no verifier edit | **ADOPT-PHASE-4** | Same deliverable as round 1's item 1; one, not two |
+| 1 | Fit `linear_reservoir_routing_step` by declaring a binding only, no verifier edit | **ADOPT-PHASE-4 → D4.7** | Same deliverable as round 1's item 1; one, not two |
 | 2 | Write the F3 fix | **ADOPT-NOW — done** | v1.2's `filter_relation`, then v1.3's `item_measures` when the exploit routed around it |
-| 3 | Give `decision` a role table; fit a second `decision`-shaped template | **ADOPT-NOW (role table) + ADOPT-PHASE-4 (second template)** | Role table shipped in v1.2 and the rename test passes on `decision` from v1.3. The second template is the evidence that would let `decision` be called a type on measurement rather than on argument |
-| 4 | Run against imperfect **model** traces, not mutations of gold | **ADOPT-PHASE-4** | Converges with round 1's item 2 |
+| 3 | Give `decision` a role table; fit a second `decision`-shaped template | **ADOPT-NOW (role table) + ADOPT-PHASE-4 → D4.8 (second template)** | Role table shipped in v1.2 and the rename test passes on `decision` from v1.3. The second template is the evidence that would let `decision` be called a type on measurement rather than on argument |
+| 4 | Run against imperfect **model** traces, not mutations of gold | **ADOPT-PHASE-4 → D4.6** | Converges with round 1's item 2 |
 | 5 | Property-test the two grammars | **BACKLOG** | Cheap and worth doing; no defect currently attributed to a parser |
 | 6 | "Grep the spec for any quantity a check consumes that is not a field" | **ADOPT-NOW — became §3.8** | Stated as a defect *predictor*, and it predicted correctly four more times, including one variant D2 itself had not filed. The single most valuable line in either report |
 | 7 | State the verifier's mode as data | **ADOPT-NOW — done** | §6.0 |
@@ -768,10 +768,10 @@ to prevent and which I reintroduced by hand.
 | 4 | Sweep `S` on a finer grid to confirm `S = 0.0016` is the sole tie-reachable slope | **ADOPT-NOW — done** | Within the sampled window it is the only one. `S = 0.0009` has an exact root (0.03) but `1/0.03` does not terminate, so no tie is reachable there — exact-square-root is necessary, not sufficient |
 | 5 | Check whether the 3.7% secant/true-root disagreement concentrates in low-update instances | **ADOPT-NOW — done** | It does **not** concentrate where B expected: 6.25% at 1 update, 10.83% at 2, 4.65% at 3, **0.08% at 4 and 0% at 5**. So it is a *stopping* artefact after all — but inverted from the guess. Fast convergence, not slow, is where the secant answer and the true root part company, because a large early step can land inside tolerance while still 0.001 m away |
 | 6 | **The `_froude_capped_slope` exactness pathology is a property of the helper, not of T24** | **ADOPT-NOW (recorded) + ADOPT-PHASE-5** | Confirmed: **three** templates in that file call the helper and divide by `round(sqrt(S), 5)` — `manning_rectangular_discharge`, `manning_trapezoidal_velocity` and `normal_depth_iteration`. A corpus-wide display-tie rollout would silently deplete `S = 0.0016` across the whole civil/water-resources branch. Recorded in **D-045**; the sweep itself is out of Phase 3's two-template scope |
-| 7 | Classify "is the trace length answer-bearing?" once, corpus-wide, rather than per template | **ADOPT-PHASE-4** | This is §2's `incidental`/`answer_bearing` test applied as a survey. Converges with Reviewer D's request for a third fitted template |
-| 8 | Make "does this screen cluster?" a **required recorded measurement**, not a reviewer's question | **SPEC-CHANGE** | Both screens cluster completely; both were described as removing ill-posed instances; both descriptions were true and incomplete. A "rejected slice profile" — the marginal of every sampled parameter over the rejected set — would have surfaced F-B1 and F-B2 with no reviewer. Added to the item-pool-impact deliverable |
-| 9 | Restate the lookup gate as a *lift over a floor*, with an explicit threshold | **SPEC-CHANGE** | B is right that 58.6% "sounds alarming until you see the floor is 53.1%". The gate is now "what does the best question-text-only shortcut buy over the best blind guess, and does it exceed 80%?" — which is also what makes §12.6 legible as a failure rather than a number |
-| 10 | Operationalise "difficulty unchanged" so a reviewer has something to measure | **ADOPT-PHASE-4** | F-B4 had no test it could fail, so B could only reason about it. A required-inference-count proxy is the candidate |
+| 7 | Classify "is the trace length answer-bearing?" once, corpus-wide, rather than per template | **ADOPT-PHASE-4 → D4.9** | This is §2's `incidental`/`answer_bearing` test applied as a survey. Converges with Reviewer D's request for a third fitted template |
+| 8 | Make "does this screen cluster?" a **required recorded measurement**, not a reviewer's question | **SPEC-CHANGE 9** | Both screens cluster completely; both were described as removing ill-posed instances; both descriptions were true and incomplete. A "rejected slice profile" — the marginal of every sampled parameter over the rejected set — would have surfaced F-B1 and F-B2 with no reviewer. Added to the item-pool-impact deliverable |
+| 9 | Restate the lookup gate as a *lift over a floor*, with an explicit threshold | **SPEC-CHANGE 10** | B is right that 58.6% "sounds alarming until you see the floor is 53.1%". The gate is now "what does the best question-text-only shortcut buy over the best blind guess, and does it exceed 80%?" — which is also what makes §12.6 legible as a failure rather than a number |
+| 10 | Operationalise "difficulty unchanged" so a reviewer has something to measure | **ADOPT-PHASE-4 → D4.10** | F-B4 had no test it could fail, so B could only reason about it. A required-inference-count proxy is the candidate |
 
 ### 12.6 B's gate answer is overturned — by B's own suggestion (D-046)
 
