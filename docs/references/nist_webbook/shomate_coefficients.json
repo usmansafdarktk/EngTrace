@@ -495,7 +495,23 @@
   "dHf_gas_kJ_per_mol": -104.7,
   "dHf_uncertainty": 0.5,
   "dHf_source": "Pittam and Pilcher, 1972 (NIST recommended)",
-  "_note": "NIST has no Shomate fit for propane; verification uses the tabulated Cp at 298.15 K"
+  "_note": "NIST has no Shomate fit for propane; verification uses the tabulated Cp at 298.15 K",
+  "dHf_gas_measurements": [
+   {
+    "value": -104.7,
+    "uncertainty": 0.5,
+    "method": "Ccb",
+    "source": "Pittam and Pilcher, 1972",
+    "note": "NIST recommended"
+   },
+   {
+    "value": -103.8,
+    "uncertainty": 0.59,
+    "method": "Ccb",
+    "source": "Prosen and Rossini, 1945",
+    "note": "Hf derived from heat of hydrogenation"
+   }
+  ]
  },
  "C4H10(g)": {
   "cas": "106-97-8",
@@ -538,10 +554,6 @@
   "ranges": [],
   "dHf_gas_kJ_per_mol": -84.0,
   "dHf_uncertainty": 0.4,
-  "dHf_alternatives": [
-   -83.8,
-   -84.67
-  ],
   "_note": "NIST has no Shomate fit for ethane. Cp verification uses the Smith-Van Ness Cp298/R self-check column (6.369).",
   "cp_table_Gurvich1989": {
    "298.15": 52.49,
@@ -551,7 +563,29 @@
    "1500": 148.98
   },
   "cp_298_tabulated": 52.49,
-  "cp_table_source": "Gurvich, Veyts, et al., 1989, via NIST Chemistry WebBook"
+  "cp_table_source": "Gurvich, Veyts, et al., 1989, via NIST Chemistry WebBook",
+  "dHf_gas_measurements": [
+   {
+    "value": -84.0,
+    "uncertainty": 0.4,
+    "method": "Review",
+    "source": "Manion, 2002",
+    "note": "adopted recommendation of Gurvich, Veyts, et al., 1991"
+   },
+   {
+    "value": -83.8,
+    "uncertainty": 0.3,
+    "method": "Ccb",
+    "source": "Pittam and Pilcher, 1972"
+   },
+   {
+    "value": -84.67,
+    "uncertainty": 0.49,
+    "method": "Ccb",
+    "source": "Prosen and Rossini, 1945",
+    "note": "Hf derived from heat of hydrogenation"
+   }
+  ]
  },
  "C6H6(l)": {
   "cas": "71-43-2",
@@ -560,7 +594,14 @@
   "cp_298_liquid_tabulated": 135.69,
   "dHf_liquid_kJ_per_mol": 49.0,
   "dHf_uncertainty": 0.9,
-  "_note": "condensed phase page (Mask=2). The repo's C6H6(l) row computes 85.3, which is the GAS-phase value - the row carries gas coefficients under a liquid key."
+  "_note": "condensed phase page (Mask=2). The repo's C6H6(l) row computes 85.3, which is the GAS-phase value - the row carries gas coefficients under a liquid key.",
+  "cp_liquid_measurements": {
+   "293.15": 134.61,
+   "298.15": 135.69,
+   "303.15": 137.4,
+   "322.05": 139.9
+  },
+  "cp_liquid_sources": "Kalali 1987; Grolier, Roux-Desgranges 1993; Reddy 1986; Naziev, Bashirov 1986 - via NIST Chemistry WebBook condensed phase"
  },
  "C7H8(l)": {
   "cas": "108-88-3",
@@ -594,7 +635,41 @@
   "ranges": [],
   "cp_298_liquid_tabulated": 79.5,
   "dHf_liquid_kJ_per_mol": -239.5,
-  "dHf_uncertainty": 0.2
+  "dHf_uncertainty": 0.2,
+  "dHf_liquid_measurements": [
+   {
+    "value": -239.5,
+    "uncertainty": 0.2,
+    "method": "Ccb",
+    "source": "Chao and Rossini, 1965",
+    "note": "most precise"
+   },
+   {
+    "value": -238.4,
+    "uncertainty": null,
+    "method": "Ccr",
+    "source": "Baroody and Carpenter, 1972"
+   },
+   {
+    "value": -238.9,
+    "uncertainty": 3.6,
+    "method": "Ccb",
+    "source": "Green, 1960",
+    "note": "reanalysed by Cox and Pilcher, 1970"
+   },
+   {
+    "value": -250.6,
+    "uncertainty": null,
+    "method": "Ccb",
+    "source": "Parks, 1925"
+   },
+   {
+    "value": -251.3,
+    "uncertainty": 5.0,
+    "method": "Ccb",
+    "source": "Richards and Davis, 1920"
+   }
+  ]
  },
  "NaCl(s)": {
   "cas": "7647-14-5",
@@ -694,5 +769,124 @@
   "cp_298_liquid_tabulated": 75.3,
   "dHf_liquid_kJ_per_mol": -285.83,
   "_note": "liquid water Cp at 298.15 K; CODATA dHf -285.83 kJ/mol"
- }
+ },
+ "Al2O3(s)": {
+  "cas": "1344-28-1",
+  "nist_id": "C1344281",
+  "ranges": [
+   {
+    "T_min": 298,
+    "T_max": 2327,
+    "A": 102.429,
+    "B": 38.7498,
+    "C": -15.9109,
+    "D": 2.628181,
+    "E": -3.007551
+   }
+  ],
+  "dHf_solid_kJ_per_mol": -1675.69,
+  "_note": "corundum, alpha phase, solid (Mask=2)"
+ },
+ "CH3OH(g)": {
+  "cas": "67-56-1",
+  "nist_id": "C67561",
+  "ranges": [],
+  "_note": "created to back the HEATS_OF_FORMATION citation; no Cp fit is transcribed for this phase",
+  "dHf_gas_kJ_per_mol": -205.0,
+  "dHf_uncertainty": 10.0,
+  "dHf_source": "NIST average of 9 values (AVG)",
+  "dHf_gas_measurements": [
+   {
+    "value": -205.0,
+    "uncertainty": 10.0,
+    "method": "AVG",
+    "source": "NIST average of 9 values"
+   },
+   {
+    "value": -201.49,
+    "uncertainty": 0.2,
+    "method": "Cm",
+    "source": "Rossini, 1932",
+    "note": "flame calorimetry; calculated by NIST without Washburn corrections"
+   }
+  ]
+ },
+ "C2H5OH(l)": {
+  "cas": "64-17-5",
+  "nist_id": "C64175",
+  "ranges": [],
+  "_note": "created to back the HEATS_OF_FORMATION citation; no Cp fit is transcribed for this phase",
+  "dHf_liquid_kJ_per_mol": -276.0,
+  "dHf_uncertainty": 2.0,
+  "dHf_source": "NIST average of 6 values (AVG)",
+  "dHf_liquid_measurements": [
+   {
+    "value": -276.0,
+    "uncertainty": 2.0,
+    "method": "AVG",
+    "source": "NIST average of 6 values"
+   },
+   {
+    "value": -276.9,
+    "uncertainty": null,
+    "method": "Ccb",
+    "source": "Chao and Rossini, 1965",
+    "note": "from dcH -1367.6 +/- 0.3"
+   },
+   {
+    "value": -277.6,
+    "uncertainty": null,
+    "method": "Ccb",
+    "source": "Green, 1960",
+    "note": "from dcH -1367.0 +/- 0.42"
+   },
+   {
+    "value": -276.17,
+    "uncertainty": null,
+    "method": "Ccb",
+    "source": "Richards and Davis, 1920",
+    "note": "from dcH -1368.34"
+   },
+   {
+    "value": -275.9,
+    "uncertainty": null,
+    "method": "Ccb",
+    "source": "Emery and Benedict, 1911",
+    "note": "from dcH -1368.6"
+   },
+   {
+    "value": -273.6,
+    "uncertainty": null,
+    "method": "Ccb",
+    "source": "Parks, 1925",
+    "note": "from dcH -1370.9"
+   }
+  ]
+ },
+ "C8H18(g)": {
+  "cas": "111-65-9",
+  "nist_id": "C111659",
+  "ranges": [],
+  "dHf_gas_kJ_per_mol": -208.4,
+  "dHf_uncertainty": 0.67,
+  "dHf_source": "Prosen and Rossini, 1945",
+  "dHf_gas_measurements": [
+   {
+    "value": -208.4,
+    "uncertainty": 0.67,
+    "method": "Ccb",
+    "source": "Prosen and Rossini, 1945",
+    "note": "see Prosen and Rossini, 1944"
+   },
+   {
+    "value": -208.7,
+    "uncertainty": null,
+    "method": "N/A",
+    "source": "Good, 1972",
+    "note": "computed from dfH(liquid) -250.3 +/- 1.8 (Good, 1972) and dvapH 41.6 (Prosen and Rossini, 1945)"
+   }
+  ],
+  "_note": "NIST publishes no gas-phase Shomate fit for n-octane; this entry exists to back the HEATS_OF_FORMATION citation only"
+ },
+ "_dHf_note": "Where NIST lists several measurements, `dHf_*_measurements` carries all of them verbatim with method and reference. A constants.py row must match one of these within its stated uncertainty and name that measurement's source in its citation. Retrieved live 2026-09-06."
 }
