@@ -288,6 +288,8 @@ Template-side changes are small: name the per-station accumulators stably rather
 
 **Note that §3.1 and §3.2 now share one solution family** — `iteration` and `decision` are the same shape (an ordered list of homogeneous sub-traces with stable within-element symbols and a termination predicate). Specify them together; that is cheaper than two bespoke redesigns and it generalises to `linear_reservoir_routing_step` (a repeated sub-chain unrolled into the trace) and `qr_policy_one_iteration` (iterative in principle, one iteration emitted).
 
+> **AMENDED by SPEC-CHANGE 8 (D-038).** The structural claim above is correct and the **equivalence is not**. The two types differ on whether the sequence's cardinality is an observable of the answer — an update count is incidental and is not even stable under the numerical slack the comparator tolerates, while the station count **is** the answer and is exact — so a comparator built from one merged type is wrong on one of the two templates. They share a base structure, a `carry` mechanism and a verification algorithm; they do **not** share a comparator. The specification delivered is [`phase3_node_types.md`](phase3_node_types.md), schema 1.5. The generalisation to `linear_reservoir_routing_step` and `qr_policy_one_iteration` remains **argued, not measured**, and is now a Phase 4 deliverable (D4.7).
+
 ### 3.3 Deliverables
 
 D3.1 decision record: schema route vs. redesign for each, with the P6 trade stated · D3.2 template edits · D3.3 `iteration` and `decision` node type specifications, with worked examples from both templates — **this is the primary deliverable and feeds directly into the milestone-model design** · D3.4 comparator semantics: how a model's iteration count differing from gold is scored (a correct answer reached in 4 iterations instead of 3 must not be marked wrong) · D3.5 T6 distribution diff
@@ -298,14 +300,18 @@ D3.1 decision record: schema route vs. redesign for each, with the P6 trade stat
 
 *Reviewer D — Schema.* Given only the D3.3 node specs and a set of generated traces: attempt to write a verifier against the spec. Report every ambiguity. **The spec passes only if a reviewer who did not design it can implement against it** — this is the real test of D3.3, and it is the deliverable most likely to fail its gate on first attempt.
 
-### 3.5 Exit gate
+### 3.5 Exit gate — **PASSED 2026-09-06**, merged `27054c9`
 
-- [ ] D3.1 decisions recorded and signed off
-- [ ] T1–T7 pass on both
-- [ ] `g_curr - g_prev` guarded; `fmt3()` sign discrepancy removed
-- [ ] Reviewer D implemented a working verifier from D3.3 alone
-- [ ] D3.4 comparator semantics cover the iteration-count-mismatch case
-- [ ] **Independent review filed (R2) and every §5 suggestion triaged (R4)**
+Close-out in [`phase3_summary.md`](phase3_summary.md); the gate table there is authoritative.
+
+- [x] D3.1 decisions recorded and signed off — schema route for both, argued separately
+- [~] T1–T7 pass on both — **T1–T5 and T7 pass; T6 does not and cannot**, the committed baseline being stale corpus-wide (142/150 on `master`). Not regenerated: a baseline refreshed by the phase it gates is not a gate (D-043). Replaced by a direct before/after distribution diff. Phase 6 owns the regeneration
+- [x] `g_curr - g_prev` guarded; `fmt3()` sign discrepancy removed — both were **latent**, and are recorded as latent rather than claimed as live fixes (D-042)
+- [x] Reviewer D implemented a working verifier from D3.3 alone — twice, independently: 80/80 + 33/33, then 80/80 + 32/32 from a reviewer that never saw the first
+- [x] D3.4 comparator semantics cover the iteration-count-mismatch case
+- [x] **Independent review filed (R2) and every §5 suggestion triaged (R4)** — 28 findings and 27 §5 suggestions across **six** rounds, all disposed
+
+**Carried out of scope, recorded not fixed:** `line_balancing_heuristic` is ~90% shortcuttable from its question text (D-046), pre-existing and measured identically on `master`.
 
 **Effort: 8–16 h implementation + 10–14 h review** (higher review share — the deliverable is a specification).
 
@@ -339,6 +345,15 @@ These four comparators also serve the 51 class-C templates. **Phase 4 is where m
 ### 4.3 Deliverables
 
 D4.1 comparator specification for all six `kind` values · D4.2 categorical label-normalisation vocabulary, derived from archived model outputs with frequency counts · D4.3 reference implementation + unit tests per comparator · D4.4 adversarial test set: ≥20 hand-written near-miss model answers per comparator (correct-but-phrased-differently, and wrong-but-similar) · D4.5 the one cosmetic fix
+
+**Added by Phase 3's R4 triage** (`phase3_summary.md` §11.4, §11.5, §12.5). Each was a reviewer suggestion dispositioned `ADOPT-PHASE-4`, so it is a named deliverable here rather than a note:
+
+- **D4.6 — a conformance corpus for D3.4 §7.** *The largest gap Phase 3 left*, raised independently by both schema reviewers. Every verifier built in Phase 3 implements §6 (gold checking); the comparator rules that actually decide a model's score are **unexercised, with no corpus at all**. Needs candidate traces: wrong count with right answer, right count with different packing, early stop, fabricated frames.
+- **D4.7 — fit a third template to the `iteration` node type by declaring a binding only**, no verifier edit permitted (`linear_reservoir_routing_step` or `qr_policy_one_iteration`). Turns §3.2's "argued, not measured" into measured. A *synthetic* renamed node already passes; a real one has never been tried.
+- **D4.8 — fit a second `decision`-shaped template.** Until then `decision` is a type by construction and by the rename test, but on one instance and one precedence DAG.
+- **D4.9 — classify trace-length semantics corpus-wide, once.** Apply D-038's `incidental` / `answer_bearing` test as a survey rather than rediscovering it per template.
+- **D4.10 — operationalise "difficulty unchanged"** so a pedagogy reviewer has something to measure rather than reason about (a required-inference-count or step-count proxy). Phase 3's Reviewer B could only argue this.
+- **D4.11 — generate §8-style reject lists from the verifier** rather than writing them alongside it. A hand-written reject list is a floor: Phase 3's was "a list of remembered failure modes" and five guessed invariant holes all hit.
 
 ### 4.4 Independent review
 
@@ -757,6 +772,9 @@ Read the hours as effort. Wall-clock is a fraction of them, and the difference i
 | SPEC-CHANGE 6 | **Phase 1 re-scoped 9 → 12 templates, split into chain breaks vs display defects** (D-011, D-013) | Phase 0 measurement: three templates are not defective, three more have the same defect shape, and the two categories need different fixes. |
 | SPEC-CHANGE 7 | Worst-case defect rates to be quoted as distributions, not sample maxima | "7.77%" and "0.87%" are extreme values of a 200-seed sample; at 20,000 seeds they are 14.27% and 1.21%. |
 | SPEC-CHANGE 4 | **R6 review-scoping rules added** | The first Phase 0 adversary brief bundled the gate task with work already assigned to the D0.5 agent. It stalled and produced nothing; D0.5 delivered the superset. Over-scoping a review does not make it more thorough — it makes it not happen. |
+| SPEC-CHANGE 8 | **§3.2's claim that `iteration` and `decision` "are the same shape" is amended** (D-038) | The structure is shared; the equivalence is not. They differ on whether the sequence's cardinality is an observable of the answer, so a comparator built from one merged type is wrong on one of the two templates. Delivered as two types over one base in [`phase3_node_types.md`](phase3_node_types.md). |
+| SPEC-CHANGE 9 | **A screen's *rejected slice profile* is now a required recorded measurement** in every item-pool-impact note — the marginal of every sampled parameter over the rejected set (Phase 3 Reviewer B, §5) | Both Phase 3 screens reject **clustered**, not scattered, instances — one at a single slope value, removing 25% of it. Both were described as removing "ill-posed instances"; both descriptions were true and incomplete. The profile would have surfaced it with no reviewer, and my own "scattered" claim was measured over a *union* of screens, which cannot see a single-valued component (D-045). |
+| SPEC-CHANGE 10 | **A pedagogy lookup-check must fit a model, not enumerate rules**, and must report *lift over a blind-guess floor* against a stated threshold (Phase 3 Reviewer B, §5) | B enumerated every shortcut it could construct and reached 64.97% against a 53.05% floor, concluding the item was a search. A depth-2 decision tree reaches 90.18% and reduces to one line. **"The best rule I could think of" is a floor on shortcuttability, never a ceiling** (D-046). A bare rate is also unreadable without its floor: 58.6% sounds alarming until the floor is 53.1%. |
 
 ---
 
