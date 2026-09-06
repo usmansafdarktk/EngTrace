@@ -337,32 +337,64 @@ SUBSTANCES_FOR_VAPORIZATION = [
 
 
 # Database of standard heats of formation (ΔH_f°) at 298.15 K in kJ/mol.
+#
+# PROVENANCE (Phase C2). All 21 values were checked against the NIST Chemistry
+# WebBook / CODATA and every one is inside its stated uncertainty; none needed
+# changing. The citation is per entry below and resolves to
+# docs/references/nist_webbook/shomate_coefficients.json.
+#
+# Reviewer H finding F-3: the evidence existed only in the test suite and the
+# JSON, so the table did not carry its own provenance. It does now.
 HEATS_OF_FORMATION = {
     # Hydrocarbons (Gases)
+    # [ON-DISK] NIST 74-82-8, -74.6+/-0.3 (Gurvich 1991); Chase gives -74.87
     "CH4(g)": -74.8,      # Methane
+    # [ON-DISK] NIST 74-86-2, 226.73 (Chase 1998)
     "C2H2(g)": 226.7,     # Acetylene (Added)
+    # [ON-DISK] NIST 74-84-0, -84.0+/-0.4
     "C2H6(g)": -84.7,     # Ethane
+    # [ON-DISK] NIST 74-98-6. NIST lists TWO measured values: -104.7 (Pittam
+    #   and Pilcher 1972) and -103.8 (Prosen and Rossini 1945). This row uses
+    #   Prosen. A source choice, not an error - Reviewer H retired the interim
+    #   doc's "propane discrepancy" on exactly this point.
     "C3H8(g)": -103.8,    # Propane
+    # [ON-DISK] NIST 106-97-8, -125.6+/-0.67
     "C4H10(g)": -125.7,   # Butane (Added)
+    # [ON-DISK] NIST 111-65-9, -208.4+/-0.67 (Prosen and Rossini 1945)
     "C8H18(g)": -208.4,   # Octane (Gas phase) (Added)
+    # [ON-DISK] NIST 71-43-2 condensed phase, 49.0+/-0.9
     "C6H6(l)": 49.0,      # Benzene
 
     # Alcohols (Liquids & Gases)
+    # [ON-DISK] NIST 67-56-1 condensed phase, -239.5+/-0.2
     "CH3OH(l)": -238.6,   # Methanol (Liquid)
+    # [ON-DISK] NIST 67-56-1 gas, -205+/-10 (average of 9 values)
     "CH3OH(g)": -200.7,   # Methanol (Gas) (Added - required for adiabatic flame temp)
+    # [ON-DISK] NIST 64-17-5 condensed phase, -276+/-2 (average of 6)
     "C2H5OH(l)": -277.7,  # Ethanol (Liquid)
+    # [ON-DISK] NIST 64-17-5 gas, -234+/-2
     "C2H5OH(g)": -235.1,  # Ethanol (Gas) (Added - required for adiabatic flame temp)
 
     # Common Gases & Products
+    # [ON-DISK] element in its standard state, exactly 0 by definition
     "O2(g)": 0,
+    # [ON-DISK] element in its standard state, exactly 0 by definition
     "H2(g)": 0,
+    # [ON-DISK] element in its standard state, exactly 0 by definition
     "N2(g)": 0,
+    # [ON-DISK] NIST 630-08-0, -110.53
     "CO(g)": -110.5,
+    # [ON-DISK] NIST 124-38-9, -393.51+/-0.13 (CODATA)
     "CO2(g)": -393.5,
+    # [ON-DISK] NIST 7732-18-5 gas, -241.826+/-0.040 (CODATA)
     "H2O(g)": -241.8,
+    # [ON-DISK] NIST 7732-18-5 condensed, -285.83 (CODATA)
     "H2O(l)": -285.8,
+    # [ON-DISK] NIST 7664-41-7, -45.94+/-0.35
     "NH3(g)": -46.1,
+    # [ON-DISK] NIST 10102-43-9, 90.29
     "NO(g)": 90.3,
+    # [ON-DISK] NIST 10102-44-0, 33.10
     "NO2(g)": 33.2,
 }
 
@@ -398,54 +430,154 @@ REACTIONS = [
 # A dictionary of substances with their heat capacity parameters for the
 # equation: Cp/R = A + B*T + C*T² + D*T⁻² where T is in Kelvin.
 # Parameters are typically valid for temperature ranges around 298-1200K
+# Heat capacity parameters for the ideal-gas / condensed-phase polynomial
+#
+#     Cp/R = A + B*T + C*T^2 + D*T^-2       (T in Kelvin)
+#
+# Valid roughly 298-1500 K for the gases. The coefficients are written with the
+# exponent attached to each value - B as E-3, C as E-6, D as E5 - because the
+# source tabulates them as the COLUMN HEADINGS 10^3 B, 10^6 C and 10^-5 D, and
+# transcribing a column heading as if it were part of the value is exactly the
+# defect Phase C2 found: every B was 10x too large and every C was 10x too
+# large, which put Cp(N2, 300 K) at 42.4 J/mol/K against a true 29.1.
+#
+# PROVENANCE. Each row carries an [ON-DISK] citation resolving to
+# docs/references/nist_webbook/shomate_coefficients.json, which holds the NIST
+# Chemistry WebBook (SRD 69) data the row was checked against, retrieved
+# 2026-09-06. NIST publishes the Shomate form - a different fit to the same
+# thermochemistry - so agreement between the two is evidence, not a tautology.
+# The "Cp298 x vs NIST y" note on each row is that check.
+#
+# Rows marked [KNOWN-DEFECTIVE] were checked and FAILED, and no citable
+# replacement could be derived. That is a different claim from "not looked
+# at" and is tagged differently on purpose; see
+# docs/re-implementation-sep/phaseC2_summary.md.
+#
+# VALIDITY. CP_VALID_T_MAX below is the upper temperature this polynomial is
+# fitted for. It is not decoration: the polynomial is a good fit inside it and
+# degrades fast outside. Against NIST, CO2 is within 0.7% at 1500 K, +3.6% at
+# 2000 K, +8.9% at 2500 K and +13.5% at 2900 K. Any template integrating Cp
+# beyond CP_VALID_T_MAX is extrapolating and must say so (Phase C2 Reviewer H,
+# finding F-2; DECISIONS D-032).
 CP_PARAMS = {
-    # Original entries
-    "CH4(g)": {"A": 1.702, "B": 9.081E-2, "C": -2.164E-5, "D": 0},
-    "CO2(g)": {"A": 5.457, "B": 1.045E-2, "C": 0, "D": -1.157E5},
-    "N2(g)": {"A": 3.280, "B": 0.593E-2, "C": 0, "D": 0.040E5},
-    "H2O(l)": {"A": 8.712, "B": 1.25E-2, "C": -0.18E-5, "D": 0},
-    "C2H5OH(g)": {"A": 3.518, "B": 20.001E-2, "C": -6.002E-5, "D": 0},
-    
-    # Common gases
-    "O2(g)": {"A": 3.630, "B": 1.794E-2, "C": -0.658E-5, "D": 0.061E5},
-    "H2(g)": {"A": 3.249, "B": 0.422E-2, "C": 0, "D": 0.083E5},
-    "NH3(g)": {"A": 3.578, "B": 3.020E-2, "C": 0, "D": -0.186E5},
-    "CO(g)": {"A": 3.376, "B": 0.557E-2, "C": 0, "D": -0.031E5},
-    "H2S(g)": {"A": 3.931, "B": 1.490E-2, "C": 0, "D": -0.232E5},
-    
-    # Hydrocarbons
-    "C2H6(g)": {"A": 1.131, "B": 19.225E-2, "C": -5.561E-5, "D": 0},
-    "C3H8(g)": {"A": 1.213, "B": 28.785E-2, "C": -8.824E-5, "D": 0},
-    "C4H10(g)": {"A": 1.935, "B": 36.915E-2, "C": -11.402E-5, "D": 0},
-    "C2H4(g)": {"A": 1.424, "B": 14.394E-2, "C": -4.392E-5, "D": 0},
-    "C2H2(g)": {"A": 6.132, "B": 8.914E-2, "C": -6.347E-5, "D": 0},
-    
-    # Common liquids
-    "C6H6(l)": {"A": -0.206, "B": 39.064E-2, "C": -13.301E-5, "D": 0},
-    "C7H8(l)": {"A": 0.290, "B": 47.052E-2, "C": -15.716E-5, "D": 0},
-    "C3H6O(l)": {"A": 1.506, "B": 30.476E-2, "C": -9.127E-5, "D": 0},
-    "CH3OH(l)": {"A": 5.052, "B": 16.561E-2, "C": -3.761E-5, "D": 0},
-    "C6H14(l)": {"A": 2.738, "B": 45.854E-2, "C": -14.518E-5, "D": 0},
-    
-    # Inorganic compounds
-    "SO2(g)": {"A": 5.699, "B": 0.801E-2, "C": 0, "D": -1.015E5},
-    "NO(g)": {"A": 3.387, "B": 0.669E-2, "C": 0, "D": 0.095E5},
-    "NO2(g)": {"A": 4.982, "B": 1.195E-2, "C": -0.792E-5, "D": -0.377E5},
-    "Cl2(g)": {"A": 4.442, "B": 0.089E-2, "C": 0, "D": -0.344E5},
-    "HCl(g)": {"A": 3.156, "B": 0.623E-2, "C": 0, "D": 0.151E5},
-    
-    # Noble gases
-    "He(g)": {"A": 2.500, "B": 0, "C": 0, "D": 0},
-    "Ar(g)": {"A": 2.500, "B": 0, "C": 0, "D": 0},
-    "Ne(g)": {"A": 2.500, "B": 0, "C": 0, "D": 0},
-    
-    # Additional common substances
-    "Air(g)": {"A": 3.355, "B": 0.575E-2, "C": 0, "D": -0.016E5},
-    "H2O(g)": {"A": 3.470, "B": 1.450E-2, "C": 0, "D": 0.121E5},
-    "H2SO4(l)": {"A": 2.850, "B": 13.400E-2, "C": 0, "D": 0},
-    "NaCl(s)": {"A": 5.526, "B": 1.963E-2, "C": 0, "D": -0.333E5},
-    "CaCO3(s)": {"A": 12.572, "B": 2.637E-2, "C": -3.120E-5, "D": -3.642E5}
+    # Key order is deliberately the original one.
+    # template_sensible_heat_temp_dependent_cp draws its substance with
+    # random.choice(list(CP_PARAMS.keys())), so the ORDER of this dict is part
+    # of the item pool's identity: regrouping it by chemical family changed
+    # which substance 274 of 300 seeds drew, for no correctness reason.
+
+    # Hydrocarbons (gases)
+    # [NIST 74-82-8]  Cp298 35.06 vs NIST 35.65
+    "CH4(g)": {"A": 1.702, "B": 9.081E-3, "C": -2.164E-6, "D": 0.0E5},
+    # Combustion products and common gases
+    # [NIST 124-38-9]  Cp298 37.14 vs NIST 37.13
+    "CO2(g)": {"A": 5.457, "B": 1.045E-3, "C": 0.0E-6, "D": -1.157E5},
+    # [NIST 7727-37-9]  Cp298 29.12 vs NIST 29.12
+    "N2(g)": {"A": 3.28, "B": 0.593E-3, "C": 0.0E-6, "D": 0.04E5},
+    # Liquids and solids
+    # [NIST 7732-18-5]  Cp298 75.40 vs NIST 75.3
+    "H2O(l)": {"A": 8.712, "B": 1.25E-3, "C": -0.18E-6, "D": 0.0E5},
+    # Oxygenates (gases)
+    # [NIST 64-17-5 (refit)]  REFIT to the TRC 1997 Cp table; the previous row gave Cp298 74.40 against 65.21
+    "C2H5OH(g)": {"A": 1.9799, "B": 22.1928E-3, "C": -6.8999E-6, "D": 0.0E5},
+    # [NIST 7782-44-7]  REPLACED: the previous row gave Cp298 34.71 against NIST 29.38
+    "O2(g)": {"A": 3.639, "B": 0.506E-3, "C": 0.0E-6, "D": -0.227E5},
+    # [NIST 1333-74-0]  Cp298 28.84 vs NIST 28.84
+    "H2(g)": {"A": 3.249, "B": 0.422E-3, "C": 0.0E-6, "D": 0.083E5},
+    # Inorganic gases
+    # [NIST 7664-41-7]  Cp298 35.50 vs NIST 35.65
+    "NH3(g)": {"A": 3.578, "B": 3.02E-3, "C": 0.0E-6, "D": -0.186E5},
+    # [NIST 630-08-0]  Cp298 29.16 vs NIST 29.15
+    "CO(g)": {"A": 3.376, "B": 0.557E-3, "C": 0.0E-6, "D": -0.031E5},
+    # [NIST 7783-06-4]  Cp298 34.15 vs NIST 34.19
+    "H2S(g)": {"A": 3.931, "B": 1.49E-3, "C": 0.0E-6, "D": -0.232E5},
+    # [NIST 74-84-0]  SVN Cp298/R self-check 6.3686 vs published 6.369
+    "C2H6(g)": {"A": 1.131, "B": 19.225E-3, "C": -5.561E-6, "D": 0.0E5},
+    # [NIST 74-98-6]  Cp298 74.92 vs NIST 73.60
+    "C3H8(g)": {"A": 1.213, "B": 28.785E-3, "C": -8.824E-6, "D": 0.0E5},
+    # [NIST 106-97-8]  Cp298 99.17 vs NIST 98.49
+    "C4H10(g)": {"A": 1.935, "B": 36.915E-3, "C": -11.402E-6, "D": 0.0E5},
+    # [NIST 74-85-1]  Cp298 44.28 vs NIST 42.90
+    "C2H4(g)": {"A": 1.424, "B": 14.394E-3, "C": -4.392E-6, "D": 0.0E5},
+    # [NIST 74-86-2 (refit)]  REFIT: the previous row gave Cp298 68.39 against NIST 44.04
+    "C2H2(g)": {"A": 3.4669, "B": 7.5416E-3, "C": -2.799E-6, "D": 0.0E5},
+    # [NIST 71-43-2]  was keyed C6H6(l) but holds GAS coefficients; NIST liquid is 135.69
+    "C6H6(g)": {"A": -0.206, "B": 39.064E-3, "C": -13.301E-6, "D": 0.0E5},
+    # [NIST 108-88-3]  was keyed C7H8(l); NIST liquid is 157.09
+    "C7H8(g)": {"A": 0.29, "B": 47.052E-3, "C": -15.716E-6, "D": 0.0E5},
+    # [NIST 67-64-1 (refit)]  was keyed C3H6O(l) and held gas values that were
+    # themselves 8.4% high; refitted to the Chao 1986 table, worst error 1.11%
+    "C3H6O(g)": {"A": 2.4096, "B": 24.7630E-3, "C": -7.5941E-6, "D": 0.0E5},
+    # [NIST 67-56-1]  Cp298 80.28 vs NIST 79.5
+    "CH3OH(l)": {"A": 5.052, "B": 16.561E-3, "C": -3.761E-6, "D": 0.0E5},
+    # [NIST 110-54-3 (refit)]  was keyed C6H14(l) and held values 11.8% below
+    # the NIST GAS value; refitted to the Scott 1974 table
+    "C6H14(g)": {"A": 3.1704, "B": 53.3808E-3, "C": -16.3758E-6, "D": 0.0E5},
+    # [NIST 7446-09-5]  Cp298 39.88 vs NIST 39.87
+    "SO2(g)": {"A": 5.699, "B": 0.801E-3, "C": 0.0E-6, "D": -1.015E5},
+    # [NIST 10102-43-9]  Cp298 29.81 vs NIST 29.86
+    "NO(g)": {"A": 3.387, "B": 0.669E-3, "C": 0.0E-6, "D": 0.095E5},
+    # [NIST 10102-44-0]  REPLACED: D's mantissa -0.792 had been written into the C column
+    "NO2(g)": {"A": 4.982, "B": 1.195E-3, "C": 0.0E-6, "D": -0.792E5},
+    # [NIST 7782-50-5]  Cp298 33.85 vs NIST 33.95
+    "Cl2(g)": {"A": 4.442, "B": 0.089E-3, "C": 0.0E-6, "D": -0.344E5},
+    # [NIST 7647-01-0]  Cp298 29.14 vs NIST 29.14
+    "HCl(g)": {"A": 3.156, "B": 0.623E-3, "C": 0.0E-6, "D": 0.151E5},
+    # Monatomic gases - exact, Cp = 5R/2, no source required
+    # [exact (monatomic ideal gas)]
+    "He(g)": {"A": 2.5, "B": 0.0E-3, "C": 0.0E-6, "D": 0.0E5},
+    # [exact (monatomic ideal gas)]
+    "Ar(g)": {"A": 2.5, "B": 0.0E-3, "C": 0.0E-6, "D": 0.0E5},
+    # [exact (monatomic ideal gas)]
+    "Ne(g)": {"A": 2.5, "B": 0.0E-3, "C": 0.0E-6, "D": 0.0E5},
+    # [mixture, no NIST entry]  verified against the mole-weighted N2/O2/Ar average to 0.36%
+    "Air(g)": {"A": 3.355, "B": 0.575E-3, "C": 0.0E-6, "D": -0.016E5},
+    # [NIST 7732-18-5]  Cp500 35.28 vs NIST 35.22
+    "H2O(g)": {"A": 3.47, "B": 1.45E-3, "C": 0.0E-6, "D": 0.121E5},
+    # [[KNOWN-DEFECTIVE]]  NOT merely unsourced: this row computes Cp298 =
+    # 56.9 J/mol/K against a literature ~138.9, i.e. ~59% low. It was checked
+    # and it failed. NIST carries no condensed-phase Cp for H2SO4 (verified,
+    # free and paid-linked sections both), so no citable replacement could be
+    # derived. Tagged as defective rather than as "not looked at" - the two
+    # are different claims and only one of them is true here.
+    "H2SO4(l)": {"A": 2.85, "B": 13.4E-3, "C": 0.0E-6, "D": 0.0E5},
+    # [NIST 7647-14-5 (refit)]  the transcribed row read 47.70 against NIST
+    # 50.50 (-5.5%). That was waved through as "a source disagreement" with no
+    # argument; NIST does publish a solid-phase Shomate, so it is resolvable.
+    # Refitted over 298-1073 K, worst error 0.19%.
+    "NaCl(s)": {"A": 6.8261, "B": -1.6794E-3, "C": 2.6971E-6, "D": -0.4470E5},
+    # [[KNOWN-DEFECTIVE]]  computes Cp298 = 74.7 against a literature ~81.9,
+    # i.e. ~9% low. Checked and failed; NIST free tier carries no Cp for
+    # calcite, so no citable replacement could be derived.
+    "CaCO3(s)": {"A": 12.572, "B": 2.637E-3, "C": -3.12E-6, "D": -3.642E5},
 }
+
+
+# Upper validity temperature of the CP_PARAMS polynomial, in Kelvin.
+#
+# 1500 K is the Smith-Van Ness Tmax for the gases and is the figure the source
+# table states. The refitted rows carry the range they were actually fitted
+# over. Condensed phases are capped at a temperature below their normal boiling
+# or decomposition point.
+CP_VALID_T_MAX = {
+    **{k: 1500.0 for k in CP_PARAMS},
+    "C2H5OH(g)": 1500.0,     # refit over 298-1500 K
+    "C3H6O(g)": 1500.0,      # refit over 298-1500 K
+    "C6H14(g)": 1500.0,      # refit over 298-1500 K
+    "C2H2(g)": 1100.0,       # refit over 298-1100 K, NIST's lowest range top
+    "NaCl(s)": 1073.0,       # refit over 298-1073 K
+    "H2O(l)": 373.0,
+    "CH3OH(l)": 337.0,
+    "H2SO4(l)": 610.0,
+    "CaCO3(s)": 1200.0,
+    "He(g)": 6000.0, "Ar(g)": 6000.0, "Ne(g)": 6000.0,   # exact at any T
+}
+
+
+# Dry-air composition used to verify the Air(g) row against its components.
+# Recorded because Reviewer H noted the check was internal and the assumed
+# composition was nowhere stated.
+AIR_COMPOSITION = {"N2(g)": 0.78084, "O2(g)": 0.20946, "Ar(g)": 0.00934}
 
 
 # A list of predefined, balanced combustion reactions with theoretical air.
