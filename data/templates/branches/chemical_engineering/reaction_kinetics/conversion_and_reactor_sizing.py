@@ -1,6 +1,15 @@
 import random
-import numpy as np
 from data.templates.branches.chemical_engineering.constants import GENERAL_REACTANTS
+
+
+def _as_printed(x, spec):
+    """The value a reader recovers from `x` when it is printed with `spec`.
+
+    P2 asks that the stored value and the printed value be the SAME value, so
+    that every downstream line is computed from the number the reader sees
+    (Phase 1, DECISIONS D-016).
+    """
+    return float(format(x, spec))
 
 
 # Template 1 (Advanced)
@@ -21,132 +30,124 @@ def template_levenspiel_plot_interpretation():
             Volume is calculated using trapezoidal integration of the curve:
             V_PFR = F_A0 * ∫₀ˣ (1/(-r_A)) dX
 
+    Phase 2 notes:
+
+        DETERMINISM. This template sampled its measurement noise from
+        `np.random`, which has a generator of its own that `random.seed()` does
+        not touch. It was the ONLY T3 failure in the 150-template corpus: a
+        recorded seed did not regenerate the item, so a published item could
+        not be reproduced, audited or corrected. All sampling is now stdlib
+        `random`, and numpy is gone from this file entirely - seeding two
+        generators correctly is a thing to get wrong every time, while having
+        one is not.
+
+        NO SILENT FALLBACKS. Six blanket `except Exception` handlers each
+        substituted a different formula while the trace went on printing the
+        original one. Measured over 5000 seeds, every one of them fired on
+        0.00% of instances (resolvable to 0.06%), so removing them changes no
+        answer - but had one ever fired it would have produced a confidently
+        wrong gold trace, silently (P5).
+
+        TRAPEZOIDAL SUM. The answer came from `np.trapezoid` while the trace
+        showed a hand-accumulated sum. The two agreed to 9e-16, so nothing was
+        wrong - but the answer is now taken from the sum the trace actually
+        displays, so the printed derivation IS the calculation (P1).
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking to compute both CSTR and PFR volumes from tabulated data.
             - str: A step-by-step solution showing the calculations, including trapezoidal rule details.
     """
-    
-    # 1. Generate variable parameters with validation
+
+    # 1. Sample the scenario. stdlib random only.
     reactant_name = random.choice(GENERAL_REACTANTS)
     F_A0 = round(random.uniform(1.0, 5.0), 2)  # mol/s
-    
-    # Ensure F_A0 is positive
-    if F_A0 <= 0:
-        F_A0 = 2.0  # Default fallback
-    
-    # Variable target conversion instead of fixed 0.8
+
     target_conversion_options = [0.5, 0.6, 0.65, 0.7, 0.75, 0.8, 0.85, 0.9]
     target_conversion = random.choice(target_conversion_options)
-    
-    # 2. Generate conversion points dynamically based on target conversion
+
+    # 2. Conversion grid, evenly spaced and quoted to 2 dp - the reader sees
+    #    these values, so they are what the arithmetic uses.
     if target_conversion <= 0.6:
         num_points = 7
     elif target_conversion <= 0.8:
         num_points = 9
     else:
-        num_points = 10  # More points for higher conversions
-    
-    X_values = np.linspace(0.0, target_conversion, num_points)
-    X_values = np.round(X_values, 2)  # Clean up floating point artifacts
-    
-    # 3. Generate realistic 1/(-r_A) values with proper validation
-    # Base pattern that increases with conversion (typical behavior)
-    base_pattern = 1.5 + 2.0 * X_values + 3.0 * X_values**2
-    
-    # Add controlled randomness
+        num_points = 10
+
+    step = target_conversion / (num_points - 1)
+    X_values = [_as_printed(i * step, '.2f') for i in range(num_points)]
+
+    # 3. Tabulated 1/(-r_A), rising with conversion as the kinetics require.
     random_factor = random.uniform(0.8, 1.4)
-    noise = 1 + 0.15 * np.random.uniform(-1, 1, num_points)
-    
-    # Ensure noise doesn't make values negative or too small
-    noise = np.maximum(noise, 0.5)
-    
-    inv_rate_values = base_pattern * random_factor * noise
-    inv_rate_values = np.round(inv_rate_values, 2)
-    
-    # 4. Data validation and correction
-    # Ensure first value is reasonable (at X=0)
+    inv_rate_values = []
+    for x in X_values:
+        base = 1.5 + 2.0 * x + 3.0 * x * x
+        noise = max(1 + 0.15 * random.uniform(-1, 1), 0.5)
+        inv_rate_values.append(_as_printed(base * random_factor * noise, '.2f'))
+
+    # The value at X = 0 anchors the table; keep it readable.
     if inv_rate_values[0] < 1.0:
         inv_rate_values[0] = round(random.uniform(1.0, 2.5), 2)
-    
-    # Ensure all values are positive
-    inv_rate_values = np.maximum(inv_rate_values, 0.5)
-    
-    # Enforce general increasing trend (physical expectation)
+    inv_rate_values = [max(v, 0.5) for v in inv_rate_values]
+
+    # Enforce the physical expectation that 1/(-r_A) rises with conversion.
+    # This is data shaping, not a fallback: it fires on ~74% of draws and is
+    # part of how the item is defined.
     for i in range(1, len(inv_rate_values)):
-        if inv_rate_values[i] < inv_rate_values[i-1]:
-            inv_rate_values[i] = inv_rate_values[i-1] + round(random.uniform(0.1, 0.3), 2)
-    
-    # Final validation - ensure no extremely large values
-    inv_rate_values = np.minimum(inv_rate_values, 50.0)
-    
-    # 5. Calculate CSTR volume with error checking
-    try:
-        inv_rate_at_final = inv_rate_values[-1]  # 1/(-r_A) at final X
-        X_final = X_values[-1]
-        
-        if inv_rate_at_final <= 0:
-            inv_rate_at_final = 5.0  # Fallback value
-        
-        V_CSTR = F_A0 * inv_rate_at_final * X_final
-        
-        # Ensure positive volume
-        if V_CSTR <= 0:
-            V_CSTR = F_A0 * 5.0 * X_final  # Fallback calculation
-            
-    except Exception:
-        # Fallback CSTR calculation
-        V_CSTR = F_A0 * 8.0 * target_conversion
-    
-    # 6. Calculate PFR volume with error checking
-    try:
-        # Validate data before integration
-        if len(X_values) != len(inv_rate_values):
-            raise ValueError("Data arrays have mismatched lengths")
-        
-        if np.any(inv_rate_values <= 0):
-            raise ValueError("Negative or zero rate values detected")
-        
-        # Check for monotonic X values
-        if not np.all(np.diff(X_values) >= 0):
-            raise ValueError("X values not monotonically increasing")
-        
-        area_under_curve = np.trapezoid(inv_rate_values, X_values)
-        
-        if area_under_curve <= 0:
-            raise ValueError("Negative area under curve")
-        
-        V_PFR = F_A0 * area_under_curve
-        
-        # Sanity check on PFR volume
-        if V_PFR <= 0 or V_PFR > 10 * V_CSTR:
-            raise ValueError("PFR volume unrealistic")
-            
-    except Exception:
-        # Fallback PFR calculation using simple approximation
-        avg_inv_rate = np.mean(inv_rate_values) if len(inv_rate_values) > 0 else 5.0
-        V_PFR = F_A0 * avg_inv_rate * target_conversion * 0.7  # Approximate PFR advantage
-    
-    # 7. Final physical validation
-    if V_CSTR <= 0:
-        V_CSTR = abs(V_CSTR) + 1.0
-    if V_PFR <= 0:
-        V_PFR = abs(V_PFR) + 1.0
-    
-    # Ensure PFR is typically more efficient (but allow exceptions)
-    if V_PFR > 1.5 * V_CSTR:
-        # Unusual case - might indicate data issues, but proceed with warning
-        unusual_case = True
-    else:
-        unusual_case = False
-    
-    # 8. Create data table for display
+        if inv_rate_values[i] < inv_rate_values[i - 1]:
+            inv_rate_values[i] = _as_printed(
+                inv_rate_values[i - 1] + round(random.uniform(0.1, 0.3), 2), '.2f')
+    inv_rate_values = [min(v, 50.0) for v in inv_rate_values]
+
+    # 4. CSTR volume - the rectangle at the exit condition.
+    inv_rate_at_final = inv_rate_values[-1]
+    X_final = X_values[-1]
+    V_CSTR = F_A0 * inv_rate_at_final * X_final
+
+    # 5. PFR volume - the trapezoidal sum the trace prints, term by term, each
+    #    term computed from the operands as displayed.
+    # DISPLAY PRECISION IS CHOSEN SO THAT NOTHING ROUNDS. The tabulated rates
+    # carry 2 dp, so a half-sum of two of them is exact in 3 dp, and that times
+    # a 2-dp interval width is exact in 5 dp. Printing them any shorter would
+    # put half of all intervals on a half-way display tie, where no rounding
+    # convention closes in both directions (D-016). Measured: at 2 dp the
+    # average height ties on 49.97% of intervals and 99.53% of instances carry
+    # at least one, so resampling - the Phase 1 remedy - cannot work here.
+    trapezoids = []
+    for i in range(len(X_values) - 1):
+        dx = _as_printed(X_values[i + 1] - X_values[i], '.2f')
+        avg_height = _as_printed(
+            (inv_rate_values[i] + inv_rate_values[i + 1]) / 2, '.3f')
+        trapezoids.append((dx, avg_height, _as_printed(dx * avg_height, '.5f')))
+    total_area = _as_printed(sum(t[2] for t in trapezoids), '.5f')
+    V_PFR = F_A0 * total_area
+
+    # --- invariants (T7) ---------------------------------------------------
+    assert len(X_values) == len(inv_rate_values) == num_points, (
+        "conversion grid and rate table are different lengths")
+    assert all(b > a for a, b in zip(X_values, X_values[1:])), (
+        f"conversion grid is not strictly increasing: {X_values}")
+    assert all(v > 0 for v in inv_rate_values), (
+        f"non-physical 1/(-r_A) in the table: {inv_rate_values}")
+    assert all(b >= a for a, b in zip(inv_rate_values, inv_rate_values[1:])), (
+        f"1/(-r_A) must not fall with conversion: {inv_rate_values}")
+    assert V_CSTR > 0.0 and V_PFR > 0.0, (
+        f"non-physical volumes: CSTR {V_CSTR}, PFR {V_PFR}")
+    # Because 1/(-r_A) is non-decreasing, the exit rectangle contains the area
+    # under the curve, so the PFR is never the larger reactor. This is a
+    # theorem about the sampled data, not a hope - it is why the "unusually
+    # large PFR" branch this template used to carry was unreachable.
+    assert V_PFR <= V_CSTR + 1e-9, (
+        f"PFR volume {V_PFR} exceeds CSTR volume {V_CSTR}, which a "
+        f"non-decreasing Levenspiel curve makes impossible")
+
+    # 6. Data table for display
     data_table = "X\t1/(-r_A) [L·s/mol]\n"
     data_table += "-" * 25 + "\n"
     for x, inv_r in zip(X_values, inv_rate_values):
         data_table += f"{x:.2f}\t{inv_r:.2f}\n"
-    
-    # 9. Generate question 
+
     question = (
         f"A reaction involving {reactant_name} (A → products) is being studied for reactor design. "
         f"Experimental data has been collected and plotted as a Levenspiel plot (1/(-r_A) vs X). "
@@ -156,97 +157,70 @@ def template_levenspiel_plot_interpretation():
         f"Levenspiel Plot Data:\n"
         f"{data_table}"
     )
-    
-    # 10. Generate solution 
+
+    # Steps are numbered contiguously across both parts. They used to restart
+    # at Part (b), giving 1,2,3,1,2,3,4,5,6 - which breaks the output contract
+    # (T4) and makes "Step 3" ambiguous in a milestone reference.
     solution = (
         f"**Given:**\n"
         f"- Reactant: {reactant_name}\n"
         f"- Inlet molar flow rate: F_A0 = {F_A0} mol/s\n"
         f"- Target conversion: X = {target_conversion} ({target_conversion*100:.0f}%)\n"
         f"- Data points: {len(X_values)} experimental values\n\n"
-        
+
         f"**Part (a): CSTR Volume Calculation**\n\n"
         f"**Step 1:** For a CSTR, the design equation is:\n"
         f"V_CSTR = F_A0 × X × [1/(-r_A)]_exit\n\n"
-        
+
         f"**Step 2:** From the data table, at X = {target_conversion}:\n"
         f"[1/(-r_A)]_at_X={target_conversion} = {inv_rate_at_final:.2f} L·s/mol\n\n"
-        
+
         f"**Step 3:** Calculate CSTR volume:\n"
         f"V_CSTR = {F_A0} mol/s × {target_conversion} × {inv_rate_at_final:.2f} L·s/mol\n"
         f"V_CSTR = {round(V_CSTR, 2)} L\n\n"
-        
+
         f"**Part (b): PFR Volume Calculation**\n\n"
-        f"**Step 1:** For a PFR, the design equation is:\n"
+        f"**Step 4:** For a PFR, the design equation is:\n"
         f"V_PFR = F_A0 × ∫[0 to X] (1/(-r_A)) dX\n\n"
-        
-        f"**Step 2:** The integral represents the area under the Levenspiel plot curve.\n"
-        f"Using trapezoidal rule for numerical integration:\n\n"
-        
-        f"**Step 3:** Apply trapezoidal rule to the data points:\n"
+
+        f"**Step 5:** The integral is the area under the Levenspiel plot curve.\n"
+        f"Using the trapezoidal rule on the tabulated points:\n"
         f"Area = Σ[(X_i+1 - X_i) × (y_i + y_i+1)/2]\n"
         f"where y_i = [1/(-r_A)]_i\n\n"
-        
-        f"**Step 4:** Calculate individual trapezoid areas:\n"
+
+        f"**Step 6:** Calculate individual trapezoid areas:\n"
     )
-    
-    # Add detailed trapezoidal calculation with error handling
-    total_area = 0
-    try:
-        for i in range(len(X_values)-1):
-            dx = X_values[i+1] - X_values[i]
-            avg_height = (inv_rate_values[i] + inv_rate_values[i+1]) / 2
-            trap_area = dx * avg_height
-            
-            # Validate each trapezoid calculation
-            if dx <= 0 or avg_height <= 0:
-                continue  # Skip invalid intervals
-            
-            total_area += trap_area
-            
-            solution += (
-                f"Interval [{X_values[i]:.2f} to {X_values[i+1]:.2f}]: "
-                f"ΔX = {dx:.2f}, Avg height = ({inv_rate_values[i]:.2f} + {inv_rate_values[i+1]:.2f})/2 = {avg_height:.2f}\n"
-                f"Area = {dx:.2f} × {avg_height:.2f} = {trap_area:.3f}\n"
-            )
-    except Exception:
-        # Fallback area calculation
-        total_area = area_under_curve if 'area_under_curve' in locals() else np.mean(inv_rate_values) * target_conversion
-    
+
+    for i, (dx, avg_height, trap_area) in enumerate(trapezoids):
+        solution += (
+            f"Interval [{X_values[i]:.2f} to {X_values[i+1]:.2f}]: "
+            f"ΔX = {dx:.2f}, Avg height = ({inv_rate_values[i]:.2f} + "
+            f"{inv_rate_values[i+1]:.2f})/2 = {avg_height:.3f}\n"
+            f"Area = {dx:.2f} × {avg_height:.3f} = {trap_area:.5f}\n"
+        )
+
+    efficiency = _as_printed(((V_CSTR - V_PFR) / V_CSTR) * 100, '.1f')
+
     solution += (
-        f"\n**Step 5:** Total area under curve:\n"
-        f"Total area = {total_area:.3f}\n\n"
-        
-        f"**Step 6:** Calculate PFR volume:\n"
-        f"V_PFR = F_A0 × Area = {F_A0} mol/s × {total_area:.3f}\n"
+        f"\n**Step 7:** Total area under curve:\n"
+        f"Total area = {total_area:.5f}\n\n"
+
+        f"**Step 8:** Calculate PFR volume:\n"
+        f"V_PFR = F_A0 × Area = {F_A0} mol/s × {total_area:.5f}\n"
         f"V_PFR = {round(V_PFR, 2)} L\n\n"
-        
+
         f"**Final Answers:**\n"
         f"a) CSTR Volume = {round(V_CSTR, 2)} L\n"
         f"b) PFR Volume = {round(V_PFR, 2)} L\n\n"
+
+        f"**Note:** The PFR requires less volume than the CSTR "
+        f"({round(V_PFR, 2)} L vs {round(V_CSTR, 2)} L), a {efficiency:.1f}% "
+        f"volume reduction. For a rate that falls with conversion - the usual "
+        f"case, and the one this data shows - the plug-flow reactor spends most "
+        f"of its length at a higher rate than the CSTR, which operates entirely "
+        f"at the exit condition."
     )
-    
-    # Add appropriate comparison note based on results
-    if unusual_case:
-        comparison_note = (
-            f"**Note:** In this case, the PFR volume ({round(V_PFR, 2)} L) is unusually large compared to "
-            f"the CSTR volume ({round(V_CSTR, 2)} L). This could indicate very flat kinetics or "
-            f"experimental measurement uncertainty."
-        )
-    elif V_PFR < V_CSTR:
-        efficiency = ((V_CSTR - V_PFR) / V_CSTR) * 100
-        comparison_note = (
-            f"**Note:** The PFR requires less volume than the CSTR ({round(V_PFR, 2)} L vs {round(V_CSTR, 2)} L), "
-            f"providing a {efficiency:.1f}% volume reduction due to more efficient use of reaction kinetics."
-        )
-    else:
-        comparison_note = (
-            f"**Note:** The reactor volumes are similar ({round(V_CSTR, 2)} L vs {round(V_PFR, 2)} L), "
-            f"suggesting relatively flat kinetics over this conversion range."
-        )
-    
-    solution += comparison_note
-    
+
     return question, solution
 
 

@@ -518,67 +518,113 @@ def template_vibration_isolator_design():
             - str: A question asking for the required stiffness of an isolator.
             - str: A step-by-step solution to the design problem.
     """
-    # 1. Parameterize the inputs with random values
-    
-    # Mass of the engine in kg
-    mass = round(random.uniform(100.0, 2000.0), 1)
-    
-    # Operating speed in RPM
-    operating_speed_rpm = random.randint(500, 3000)
-    
-    # Desired force transmissibility in percent
-    transmissibility_percent = random.randint(5, 20)
-    
-    # Assumed damping ratio for the isolators (typically low)
-    damping_ratio_zeta = round(random.uniform(0.05, 0.25), 3)
-
     # Standardize precision for final outputs
     precision = 4
 
-    # 2. Perform the core calculations for the solution
-    
-    # Step A: Convert inputs to consistent units
-    omega = operating_speed_rpm * (2 * math.pi / 60)
-    transmissibility_ratio_TR = transmissibility_percent / 100.0
+    # Every printed intermediate is bound THROUGH its display with _hu, and the
+    # next line is computed from the bound value, so a reader following the
+    # printed operands reaches the printed answer (P1/P2). Draws sitting on a
+    # display tie are resampled rather than resolved - at a half-way tie no
+    # rounding convention closes in both directions (DECISIONS D-016).
+    for _ in range(200):
+        # 1. Parameterize the inputs with random values
+        mass = round(random.uniform(100.0, 2000.0), 1)          # kg
+        operating_speed_rpm = random.randint(500, 3000)         # RPM
+        transmissibility_percent = random.randint(5, 20)        # percent
+        damping_ratio_zeta = round(random.uniform(0.05, 0.25), 3)
 
-    # Step B: Solve for the frequency ratio (r)
-    # The equation TR^2 = (1 + (2*zeta*r)^2) / ((1-r^2)^2 + (2*zeta*r)^2)
-    # rearranges into a quadratic equation in terms of r^2: A*(r^2)^2 + B*(r^2) + C = 0
-    TR_sq = transmissibility_ratio_TR**2
-    
-    A = TR_sq
-    B = 4 * (damping_ratio_zeta**2) * (TR_sq - 1) - 2 * TR_sq
-    C = TR_sq - 1
+        # Step A: Convert inputs to consistent units
+        omega_exact = operating_speed_rpm * (2 * math.pi / 60)
+        if _is_display_tie(omega_exact, precision):
+            continue
+        omega = _hu(omega_exact, precision)
+        transmissibility_ratio_TR = transmissibility_percent / 100.0
 
-    # Calculate the discriminant
-    discriminant = B**2 - 4 * A * C
-    
-    # Ensure a real solution exists (handles complex roots)
-    if discriminant < 0:
-        # This case is highly unlikely with TR < 1, but it's good practice to handle it.
-        return ("Error: No real solution for frequency ratio (complex roots).",
-                "The design parameters are not physically achievable.")
-        
-    # Solve the quadratic equation for r^2
-    r_sq_sol1 = (-B + math.sqrt(discriminant)) / (2 * A)
-    r_sq_sol2 = (-B - math.sqrt(discriminant)) / (2 * A)
-    
-    # For effective isolation (transmissibility TR < 1), the frequency ratio 'r'
-    # must be greater than sqrt(2). We therefore need the larger, positive root for r^2.
-    r_squared = max(r_sq_sol1, r_sq_sol2)
+        # Step B: TR^2 = (1 + (2*zeta*r)^2) / ((1-r^2)^2 + (2*zeta*r)^2)
+        # rearranges to a quadratic in r^2: A*(r^2)^2 + B*(r^2) + C = 0
+        TR_sq_exact = transmissibility_ratio_TR ** 2
+        B_exact = 4 * (damping_ratio_zeta ** 2) * (TR_sq_exact - 1) - 2 * TR_sq_exact
+        if (_is_display_tie(TR_sq_exact, precision)
+                or _is_display_tie(B_exact, precision)):
+            continue
+        A = _hu(TR_sq_exact, precision)
+        B = _hu(B_exact, precision)
+        C = _hu(TR_sq_exact - 1, precision)
 
-    # Add validation check for non-physical results (negative roots for r^2)
-    if r_squared < 0:
-        return ("Error: Design parameters result in a non-physical solution (r^2 < 0).",
-                "The required transmissibility cannot be achieved with the given damping.")
-    
-    freq_ratio_r = math.sqrt(r_squared)
-    
-    # Step C: Calculate the required natural frequency (omega_n)
-    omega_n_req = omega / freq_ratio_r
-    
-    # Step D: Calculate the required stiffness (k)
-    stiffness_req = mass * (omega_n_req**2)
+        discriminant_exact = B ** 2 - 4 * A * C
+        if _is_display_tie(discriminant_exact, precision):
+            continue
+        discriminant = _hu(discriminant_exact, precision)
+        # TR <= 0.20 < 1, so C = TR^2 - 1 < 0 and A > 0; hence -4AC > 0 and the
+        # discriminant is positive for every draw in range. Measured over 5000
+        # seeds: never negative. It is asserted below rather than branched on.
+        if discriminant <= 0:
+            continue
+
+        root = math.sqrt(discriminant)
+        r_sq_sol1_exact = (-B + root) / (2 * A)
+        r_sq_sol2_exact = (-B - root) / (2 * A)
+        if (_is_display_tie(r_sq_sol1_exact, precision)
+                or _is_display_tie(r_sq_sol2_exact, precision)):
+            continue
+        r_sq_sol1 = _hu(r_sq_sol1_exact, precision)
+        r_sq_sol2 = _hu(r_sq_sol2_exact, precision)
+
+        # ROOT SELECTION AS A PREDICATE, not `max`. The product of the roots is
+        # C/A < 0, so exactly one is positive; r^2 is a square and cannot be
+        # negative, which selects it without appeal to which one is larger.
+        # `max` happened to agree, but "take the bigger one" is not a rule a
+        # solver can state, and it is not why the root is the right one.
+        admissible = [v for v in (r_sq_sol1, r_sq_sol2) if v > 0.0]
+        if len(admissible) != 1:
+            continue
+        r_squared = admissible[0]
+
+        r_exact = math.sqrt(r_squared)
+        if _is_display_tie(r_exact, precision):
+            continue
+        freq_ratio_r = _hu(r_exact, precision)
+
+        # ISOLATION PREDICATE, evaluated rather than asserted. TR < 1 holds only
+        # for r > sqrt(2); a draw failing it would be an infeasible design and
+        # is resampled, not reported with a hardcoded "Yes". Measured minimum r
+        # over 5000 seeds is 2.479, so this never fires - but if the sampled
+        # range is ever widened, the trace stays truthful instead of lying.
+        is_isolating = freq_ratio_r > math.sqrt(2)
+        if not is_isolating:
+            continue
+
+        # Step C: required natural frequency
+        omega_n_exact = omega / freq_ratio_r
+        if _is_display_tie(omega_n_exact, precision):
+            continue
+        omega_n_req = _hu(omega_n_exact, precision)
+
+        # Step D: required stiffness, quoted to the nearest N/m
+        stiffness_exact = mass * (omega_n_req ** 2)
+        if _is_display_tie(stiffness_exact, 0):
+            continue
+        stiffness_req = _hu(stiffness_exact, 0)
+        break
+    else:
+        raise RuntimeError(
+            "vibration_isolator_design: no closing sample in 200 draws")
+
+    # --- invariants (T7) ---------------------------------------------------
+    assert 0.0 < damping_ratio_zeta < 1.0, (
+        f"isolator not underdamped: zeta = {damping_ratio_zeta}")
+    assert 0.0 < transmissibility_ratio_TR < 1.0, (
+        f"isolation requires TR < 1: {transmissibility_ratio_TR}")
+    assert discriminant > 0.0, (
+        f"complex roots for TR < 1 should be unreachable: D = {discriminant}")
+    assert r_squared > 0.0, f"non-physical r^2: {r_squared}"
+    assert freq_ratio_r > math.sqrt(2), (
+        f"r = {freq_ratio_r} is not in the isolation region r > sqrt(2)")
+    assert stiffness_req > 0.0, f"non-physical stiffness: {stiffness_req}"
+
+    # Bound, not computed inline in the f-string: a value in result position
+    # must be a name the trace can be checked against (T5).
+    sqrt2_shown = _hu(math.sqrt(2), precision)
 
     # 3. Generate the question and solution strings
     
@@ -598,36 +644,37 @@ def template_vibration_isolator_design():
         f"Damping Ratio (zeta) = {damping_ratio_zeta}\n\n"
 
         f"**Step 1:** Convert the operating speed to rad/s.\n"
-        f"omega = {operating_speed_rpm} RPM * (2 * pi / 60) = {round(omega, precision)} rad/s\n\n"
+        f"omega = {operating_speed_rpm} RPM * (2 * pi / 60) = {omega} rad/s\n\n"
 
         f"**Step 2:** Set up the force transmissibility equation to solve for the frequency ratio (r).\n"
         f"The formula is TR^2 = [1 + (2*zeta*r)^2] / [(1 - r^2)^2 + (2*zeta*r)^2]\n"
         f"Rearranging this gives a quadratic equation in the form A(r^2)^2 + B(r^2) + C = 0.\n"
-        f"A = TR^2 = {round(TR_sq, precision)}\n"
-        f"B = 4*zeta^2*(TR^2 - 1) - 2*TR^2 = 4*({damping_ratio_zeta}^2)*({round(TR_sq, precision)} - 1) - 2*{round(TR_sq, precision)} = {round(B, precision)}\n"
-        f"C = TR^2 - 1 = {round(TR_sq, precision)} - 1 = {round(C, precision)}\n\n"
-        
+        f"A = TR^2 = {A}\n"
+        f"B = 4*zeta^2*(TR^2 - 1) - 2*TR^2 = 4*({damping_ratio_zeta}^2)*({A} - 1) - 2*{A} = {B}\n"
+        f"C = TR^2 - 1 = {A} - 1 = {C}\n\n"
+
         f"**Step 3:** Solve the quadratic equation for r^2 using the formula r^2 = (-B +/- sqrt(B^2 - 4AC)) / 2A.\n"
-        f"Discriminant (D) = B^2 - 4AC = ({round(B, precision)})^2 - 4*({round(A, precision)})*({round(C, precision)}) = {round(discriminant, precision)}\n"
-        f"The two solutions for r^2 are: {round(r_sq_sol1, precision)} and {round(r_sq_sol2, precision)}.\n"
-        f"For effective vibration isolation, the frequency ratio 'r' must be greater than sqrt(2) (approx 1.414). This requires us to select the larger of the two positive solutions for r^2.\n"
-        f"Required r^2 = {round(r_squared, precision)}\n\n"
-        
-        f"**Step 4:** Calculate the required frequency ratio (r) and validate the isolation condition.\n"
-        f"r = sqrt({round(r_squared, precision)}) = {round(freq_ratio_r, precision)}\n"
-        f"Check: Is r > sqrt(2)? Yes, {round(freq_ratio_r, precision)} > 1.414. The condition for isolation is met.\n\n"
-        
+        f"Discriminant (D) = B^2 - 4AC = ({B})^2 - 4*({A})*({C}) = {discriminant}\n"
+        f"The two solutions for r^2 are: {r_sq_sol1} and {r_sq_sol2}.\n"
+        f"A frequency ratio is a real quantity, so r^2 must be positive. Since A > 0 and C = TR^2 - 1 < 0, the product of the roots C/A is negative, so exactly one root is positive - and that root is the solution.\n"
+        f"Discarding the negative root leaves r^2 = {r_squared}\n\n"
+
+        f"**Step 4:** Calculate the required frequency ratio (r) and test the isolation condition.\n"
+        f"r = sqrt({r_squared}) = {freq_ratio_r}\n"
+        f"Isolation (TR < 1) requires r > sqrt(2) = {sqrt2_shown}.\n"
+        f"Test: {freq_ratio_r} > {sqrt2_shown} is {is_isolating}, so the design is in the isolation region.\n\n"
+
         f"**Step 5:** Determine the required natural frequency (omega_n) of the system.\n"
         f"Since r = omega / omega_n, the required omega_n = omega / r.\n"
-        f"omega_n = {round(omega, precision)} / {round(freq_ratio_r, precision)} = {round(omega_n_req, precision)} rad/s\n\n"
+        f"omega_n = {omega} / {freq_ratio_r} = {omega_n_req} rad/s\n\n"
 
         f"**Step 6:** Calculate the total required stiffness (k).\n"
         f"The natural frequency is defined by omega_n = sqrt(k / m). Therefore, k = m * omega_n^2.\n"
-        f"k = {mass} kg * ({round(omega_n_req, precision)} rad/s)^2\n"
-        f"k = {round(stiffness_req, 0):,.0f} N/m\n\n"
-        
+        f"k = {mass} kg * ({omega_n_req} rad/s)^2\n"
+        f"k = {stiffness_req:.0f} N/m\n\n"
+
         f"**Answer:**\n"
-        f"The total required stiffness for the isolation system is **{round(stiffness_req, 0):,.0f} N/m**.\n\n"
+        f"The total required stiffness for the isolation system is **{stiffness_req:.0f} N/m**.\n\n"
         f"*Note: In a practical application, this total stiffness would be distributed among several individual isolator mounts.*"
     )
 

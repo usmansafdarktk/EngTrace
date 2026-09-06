@@ -1,6 +1,19 @@
 import random
-from scipy.optimize import fsolve
-from data.templates.branches.chemical_engineering.constants import SUBSTANCES_FOR_HEATING, SUBSTANCES_FOR_VAPORIZATION, HEATS_OF_FORMATION, REACTIONS, CP_PARAMS, COMBUSTION_REACTIONS
+from data.templates.branches.chemical_engineering.constants import (
+    SUBSTANCES_FOR_HEATING, SUBSTANCES_FOR_VAPORIZATION,
+    HEATS_OF_FORMATION, REACTIONS, CP_PARAMS, COMBUSTION_REACTIONS,
+    CP_PARAMS_COMBUSTION, CP_COMBUSTION_VALID_T_MAX,
+)
+
+
+def _as_printed(x, spec):
+    """The value a reader recovers from `x` when it is printed with `spec`.
+
+    P2 asks that the stored value and the printed value be the SAME value,
+    so every downstream line is computed from the number the reader sees
+    (Phase 1, DECISIONS D-016).
+    """
+    return float(format(x, spec))
 
 
 # Template 1 (Easy)
@@ -338,89 +351,115 @@ def template_sensible_heat_temp_dependent_cp():
 def template_adiabatic_flame_temperature():
     """
     Adiabatic Flame Temperature
-    Scenario: Calculates the theoretical maximum temperature of combustion products.
+
+    Scenario: Calculates the theoretical maximum temperature of combustion
+    products for complete combustion with the theoretical amount of dry air,
+    with no dissociation.
+
+    Phase 2 notes:
+
+        STATED ALGORITHM, NOT A SOLVER. This called `scipy.optimize.fsolve` and
+        printed "we use a numerical solver" as its Step 4. That is not a
+        reasoning trace: it is reproducible only to the solver's tolerance, it
+        depends on the SciPy build, and there is no arithmetic in it for a
+        reader to follow or a grader to check. It is replaced by the
+        mean-heat-capacity iteration from Smith-Van Ness-Abbott - the same
+        source CP_PARAMS follows - with a stated initial guess, a fixed
+        iteration count, and every intermediate printed:
+
+            T_(k+1) = T0 + (-dH_rxn) / SUM_i n_i <Cp>_i(T0, T_k)
+
+        where the mean heat capacity between T0 and T has the closed form
+
+            <Cp>/R = A + (B/2)(T + T0) + (C/3)(T^2 + T*T0 + T0^2) + D/(T*T0)
+
+        Six iterations from a 2000 K guess bring every one of the eleven
+        reactions within 0.06 K of its fixed point, so the answer is quoted to
+        the nearest kelvin and the iteration count needs no convergence test at
+        run time. Verified against a bisection solve of the same balance.
+
+        NO SILENT FALLBACKS. The retry loop caught `Exception` - including the
+        solver's own failures - and silently tried a different reaction, so a
+        broken calculation became a different question rather than an error.
+        Its `while/else` returned a tuple carrying neither steps nor an answer,
+        which is not a benchmark item at all. Both are gone: the data
+        preconditions are checked explicitly and a violation raises (P5).
+        Measured over 2000 seeds, the loop never retried once.
+
+        HIGH-TEMPERATURE HEAT CAPACITIES. This template integrates to 2844 K
+        while CP_PARAMS is fitted to 1500 K, so it was extrapolating ~1300 K
+        past validity and every flame temperature was low. It now reads
+        CP_PARAMS_COMBUSTION, fitted over 298-3000 K (DECISIONS D-032, D-036).
     """
-    # 1. Parameterize inputs
-    R = 8.314  # J/(mol·K)
-    T_initial = 298.15 # K
-    
-    # SAFETY MECHANISM: Prevent infinite loops
-    max_retries = 20
-    attempts = 0
-    
-    while attempts < max_retries:
-        attempts += 1
-        try:
-            # Pick a random reaction
-            reaction_data = random.choice(COMBUSTION_REACTIONS)
-            fuel = reaction_data["fuel"]
-            equation = reaction_data["equation"]
-            reactants = reaction_data["reactants"]
-            products = reaction_data["products"]
+    R = 8.314           # J/(mol K)
+    T_initial = 298.15  # K
+    initial_guess = 2000.0
+    n_iterations = 6
+    dp = 2              # display precision for the intermediates
 
-            #  PRE-FLIGHT CHECK 
-            # Before calculating, verify we actually have data for these species.
-            # This prevents the silent KeyError loop.
-            missing_heat_data = [s for s in list(reactants.keys()) + list(products.keys()) if s not in HEATS_OF_FORMATION]
-            if missing_heat_data:
-                # Skip this reaction if we lack enthalpy data
-                continue
+    reaction_data = random.choice(COMBUSTION_REACTIONS)
+    fuel = reaction_data["fuel"]
+    equation = reaction_data["equation"]
+    reactants = reaction_data["reactants"]
+    products = reaction_data["products"]
 
-            missing_cp_data = [s for s in products.keys() if s not in CP_PARAMS]
-            if missing_cp_data:
-                # Skip this reaction if we lack heat capacity parameters
-                continue
+    # Preconditions, checked and raised rather than caught and skipped. If a
+    # reaction names a species with no thermochemical data, that is a defect in
+    # constants.py and the benchmark should stop, not quietly ask a different
+    # question (P5).
+    missing_hf = [s for s in list(reactants) + list(products)
+                  if s not in HEATS_OF_FORMATION]
+    assert not missing_hf, (
+        f"{fuel}: no heat of formation for {missing_hf}")
+    missing_cp = [s for s in products if s not in CP_PARAMS_COMBUSTION]
+    assert not missing_cp, (
+        f"{fuel}: no high-temperature heat capacity for {missing_cp}")
 
-            # 2. Perform the core calculation
-            # Calculate standard heat of reaction at 298.15 K
-            products_enthalpy_298 = sum(nu * HEATS_OF_FORMATION[s] for s, nu in products.items())
-            reactants_enthalpy_298 = sum(nu * HEATS_OF_FORMATION[s] for s, nu in reactants.items())
-            delta_H_298_kJ = products_enthalpy_298 - reactants_enthalpy_298
-            delta_H_298_J = delta_H_298_kJ * 1000 # Convert kJ to J
+    # Standard heat of reaction at 298.15 K, bound through its display so the
+    # iteration below is computed from the number the reader sees.
+    products_enthalpy_298 = sum(nu * HEATS_OF_FORMATION[s]
+                                for s, nu in products.items())
+    reactants_enthalpy_298 = sum(nu * HEATS_OF_FORMATION[s]
+                                 for s, nu in reactants.items())
+    delta_H_298_kJ = _as_printed(products_enthalpy_298 - reactants_enthalpy_298,
+                                 f'.{dp}f')
+    delta_H_298_J = delta_H_298_kJ * 1000.0
 
-            # Define integral of Cp/R
-            def integral_mean_cp_over_r(T, A, B, C, D):
-                return A*T + (B/2)*T**2 + (C/3)*T**3 - D/T
+    assert delta_H_298_kJ < 0.0, (
+        f"{fuel}: combustion must be exothermic, got {delta_H_298_kJ} kJ")
 
-            # Define the energy balance equation (Sensible Heat + Heat of Rxn = 0)
-            def energy_balance(T_final):
-                sensible_heat_products = 0
-                for species, nu in products.items():
-                    params = CP_PARAMS[species]
-                    A, B, C, D = params["A"], params["B"], params["C"], params["D"]
-                    
-                    # Integral from T_initial to T_final
-                    val_T = integral_mean_cp_over_r(T_final, A, B, C, D)
-                    val_T0 = integral_mean_cp_over_r(T_initial, A, B, C, D)
-                    
-                    sensible_heat_products += nu * R * (val_T - val_T0)
-                    
-                return sensible_heat_products + delta_H_298_J
+    def mean_cp_over_R(params, T):
+        """<Cp>/R for one species, averaged over T_initial to T."""
+        return (params["A"]
+                + (params["B"] / 2) * (T + T_initial)
+                + (params["C"] / 3) * (T * T + T * T_initial + T_initial ** 2)
+                + (params["D"] / (T * T_initial) if params["D"] else 0.0))
 
-            # Solve for the root
-            initial_guess = 2000 
-            # fsolve returns a numpy array, we take the first element
-            result = fsolve(energy_balance, initial_guess)
-            adiabatic_temp_kelvin = result[0]
+    # The iteration. Each step's divisor is bound through its display, so the
+    # printed line closes exactly (P1/P2).
+    T_k = initial_guess
+    iterations = []
+    for _ in range(n_iterations):
+        cp_mixture = _as_printed(
+            sum(nu * R * mean_cp_over_R(CP_PARAMS_COMBUSTION[s], T_k)
+                for s, nu in products.items()), f'.{dp}f')
+        T_next = _as_printed(T_initial + (-delta_H_298_J) / cp_mixture,
+                             f'.{dp}f')
+        iterations.append((T_k, cp_mixture, T_next))
+        T_k = T_next
 
-            # PHYSICS SANITY CHECK 
-            # We slightly widen the range to avoid rejecting valid high-temp reactions
-            # but keep it sane (e.g. max 4500K for most hydrocarbons in air)
-            if 1000 < adiabatic_temp_kelvin < 4500:
-                break # Valid result found, exit loop (Success!)
+    adiabatic_temp_kelvin = round(T_k)
 
-        except (KeyError, ValueError, IndexError, Exception):
-            # If solver fails or unexpected error, try next reaction
-            continue
-    
-    # FALLBACK: If we exhausted all retries (e.g., data is missing for ALL reactions)
-    else:
-        return (
-            "Error: Could not generate a valid Adiabatic Flame Temperature problem.",
-            "Possible causes: Missing thermochemical data in constants.py or solver convergence issues."
-        )
+    # --- invariants (T7) ---------------------------------------------------
+    assert all(cp > 0.0 for _, cp, _ in iterations), (
+        f"{fuel}: non-physical mixture heat capacity in the iteration")
+    assert abs(iterations[-1][2] - iterations[-1][0]) < 0.5, (
+        f"{fuel}: iteration not converged after {n_iterations} passes: "
+        f"{iterations[-1][0]} -> {iterations[-1][2]}")
+    assert T_initial < adiabatic_temp_kelvin <= CP_COMBUSTION_VALID_T_MAX, (
+        f"{fuel}: flame temperature {adiabatic_temp_kelvin} K outside the "
+        f"{CP_COMBUSTION_VALID_T_MAX} K validity of CP_PARAMS_COMBUSTION")
 
-    # 3. Generate the question and solution strings (Only runs if 'break' was hit)
     question = (
         f"{fuel} gas enters a furnace at {T_initial} K and is burned completely with "
         f"the theoretical amount of dry air (also at {T_initial} K). Assuming the "
@@ -434,22 +473,38 @@ def template_adiabatic_flame_temperature():
 
         f"**Step 2:** Calculate the standard heat of reaction at {T_initial} K (ΔH_rxn°).\n"
         f"Using standard heats of formation:\n"
-        f"ΔH_rxn° = {delta_H_298_kJ:.2f} kJ\n\n"
+        f"ΔH_rxn° = Σ n·ΔHf°(products) − Σ n·ΔHf°(reactants)\n"
+        f"ΔH_rxn° = ({round(products_enthalpy_298, dp)}) − ({round(reactants_enthalpy_298, dp)}) = {delta_H_298_kJ} kJ\n\n"
 
-        f"**Step 3:** Set up the energy balance equation.\n"
-        f"For an adiabatic process, the heat released by the reaction must be absorbed as sensible heat by the products.\n"
-        f"Heat Absorbed by Products + Heat of Reaction = 0\n"
-        f"  Σ [ n_i * ∫(Cp_i dT) from {T_initial} to T_ad ] + ΔH_rxn° = 0\n\n"
+        f"**Step 3:** Set up the energy balance.\n"
+        f"For an adiabatic process the heat released by the reaction is absorbed as sensible heat by the products:\n"
+        f"  Σ n_i · <Cp>_i · (T_ad − {T_initial}) + ΔH_rxn° = 0\n"
+        f"so   T_ad = {T_initial} + ({-delta_H_298_J}) / Σ n_i·<Cp>_i\n\n"
 
-        f"**Step 4:** Solve the equation for the adiabatic flame temperature (T_ad).\n"
-        f"This equation is non-linear because Cp is a function of temperature. We use a numerical solver to find T_ad.\n"
-        f"Initial guess: {initial_guess} K\n\n"
+        f"**Step 4:** State the solution method.\n"
+        f"Σ n_i·<Cp>_i depends on T_ad, so the equation is solved by direct iteration:\n"
+        f"guess T, evaluate the mean heat capacities over [{T_initial}, T], and recompute T.\n"
+        f"The mean heat capacity of a species between {T_initial} and T is\n"
+        f"  <Cp>/R = A + (B/2)(T + T0) + (C/3)(T² + T·T0 + T0²) + D/(T·T0)\n"
+        f"Initial guess: T = {initial_guess} K. Iterations performed: {n_iterations}.\n\n"
 
-        f"**Step 5:** State the result.\n"
-        f"The calculated adiabatic flame temperature is:\n"
-        f"T_ad = {adiabatic_temp_kelvin:.2f} K\n\n"
+        f"**Step 5:** Iterate.\n"
+    )
 
-        f"**Answer:** The estimated adiabatic flame temperature is **{adiabatic_temp_kelvin:.2f} K**."
+    for i, (T_in, cp_mixture, T_out) in enumerate(iterations, start=1):
+        solution += (
+            f"Pass {i}: T = {T_in:.{dp}f} K → Σ n_i·<Cp>_i = {cp_mixture:.{dp}f} J/K\n"
+            f"  T = {T_initial} + {-delta_H_298_J} / {cp_mixture:.{dp}f} = {T_out:.{dp}f} K\n"
+        )
+
+    solution += (
+        f"\n**Step 6:** State the result.\n"
+        f"Successive passes agree to within "
+        f"{round(abs(iterations[-1][2] - iterations[-1][0]), dp)} K, so the "
+        f"iteration has converged at this display precision.\n"
+        f"T_ad = {adiabatic_temp_kelvin} K\n\n"
+
+        f"**Answer:** The estimated adiabatic flame temperature is **{adiabatic_temp_kelvin} K**."
     )
 
     return question, solution
