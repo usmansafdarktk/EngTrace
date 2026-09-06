@@ -1482,6 +1482,59 @@ Full numbers in [`phase3_item_pool_impact.md`](phase3_item_pool_impact.md).
 deliberate change on `master` with the movement examined, and is left to Phase 6
 where the re-audit owns it. Recorded there rather than done here.
 
+---
+
+## D-044 — D-037's test is "exact for EVERY instance", not "exact for the tie instances"
+
+**Date:** 2026-09-06 · **Status:** DECIDED · **Source:** Phase 3, caught while
+justifying two resample screens
+
+D-037 says: *before resampling a display tie, ask whether the quantity is exactly
+representable at a slightly longer display. If it is, lengthen the display.*
+
+**Applied naively that test always says yes, and is always wrong.** A value that
+lands exactly on a half-way boundary at *k* decimal places is, by definition,
+exactly representable at *k+1* places — that is what a tie **is**. So checking
+"are the tie instances representable one digit longer?" is circular: the answer
+is unconditionally yes, and acting on it relocates the tie population to *k+1*
+rather than removing it.
+
+**The test D-037 actually intends** is the one its own worked example satisfies.
+Levenspiel's half-sums are exact at 3 dp for **every** instance, so lengthening
+the display means **nothing rounds at all** and no tie can arise anywhere. The
+question is not about the ties; it is about the whole population.
+
+**Restated, unambiguously:**
+
+> Lengthen the display only if the quantity is exactly representable at that
+> display for **every instance the template can draw**, so that no rounding
+> occurs at all. If rounding still occurs for some instances, ties are still
+> possible and lengthening moves them rather than removing them — then resample.
+
+**Measured on Phase 3's two quantities**, which is what turned this up:
+
+| Quantity | Exactly representable at its display | one digit longer | three longer |
+|---|---|---|---|
+| `K = Q·n/√S` (normal depth, 3 dp) | 10.9% | 11.3% | 12.9% (6 dp) |
+| `100·idle/(n·CT)` (balance delay, 1 dp) | 3.97% (1 dp) | 3.97% (2 dp) | 4.90% (4 dp) |
+
+3,000 seeds each. Both are far from 100% at any reachable display, so both
+resample. Note the delay is no more representable at 2 dp than at 1 — lengthening
+buys literally nothing there.
+
+**A second reason, specific to answers.** The balance delay's precision is
+**stated in the question** ("in percent to one decimal, round half up").
+Lengthening an *answer's* display changes what the item asks for, which is a P6
+change requiring sign-off; lengthening an *intermediate* quantity's display, as
+D-037 did, does not. D-037's rule is safe for intermediates and needs this
+caveat for answers.
+
+**What was nearly shipped.** The first draft of both templates' screen comments
+justified resampling with "the quotient does not terminate at any fixed number of
+places" — true in general, false as stated (a denominator of the form 2^a·5^b
+does terminate), and it would not have survived a reviewer with a calculator. The
+justification is now the measured population figure above.
+
 ## Open decisions
 
 | # | Decision | Needed before |

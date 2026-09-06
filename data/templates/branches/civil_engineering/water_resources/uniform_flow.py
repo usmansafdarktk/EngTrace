@@ -400,9 +400,13 @@ def template_normal_depth_iteration():
         K = round(Q * n / sqS, 3)
 
         # Step 1's printed line, read exactly in decimal. A tie here is an
-        # ill-posed instance, not a rounding-convention choice (D-016), and
-        # K is a quotient by a 5-dp square root so no longer display makes
-        # it exact -- D-037's "lengthen the display" escape does not apply.
+        # ill-posed instance, not a rounding-convention choice (D-016).
+        # D-037's "lengthen the display" escape was tested first and does not
+        # apply: it needs the quantity exactly representable at the longer
+        # display for EVERY instance, and K = Q*n/sqrt(S) is a quotient by a
+        # 5-dp square root that terminates at 3 dp on only 10.9% of instances,
+        # at 4 dp on 11.3% and at 6 dp on 12.9% (3,000 seeds). Rounding
+        # persists at any length, so the ties would relocate, not vanish.
         if _is_display_tie(
                 _exact(Q, ".2f") * Fraction(str(n)) / _exact(sqS, ".5f"), 3):
             continue
