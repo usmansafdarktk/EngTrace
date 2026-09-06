@@ -143,16 +143,43 @@ comparator.
 
 ## 4. D3.3 — the node specification, and how it is made testable
 
-[`phase3_node_types.md`](phase3_node_types.md) specifies both types: a common
-`sequence` base (§3), the two types (§4, §5), a **normative verification
-algorithm** (§6), the **D3.4 comparator semantics** (§7), and — the section that
-makes it a specification rather than a description — **§8, the traces a
-conforming verifier must reject**.
+[`phase3_node_types.md`](phase3_node_types.md), **schema version 1.5 after five
+review rounds**, specifies both types: a common `sequence` base (§3), the two
+types (§4, §5), a **normative verification algorithm** (§6), the **D3.4
+comparator semantics** (§7), and — the sections that make it a specification
+rather than a description — **§8A, the traces a conforming verifier must reject**,
+and **§8B, the obligations on the verifier itself**.
 
-The mechanism that makes a variable-length sequence checkable is `carry`: a map
-from each symbol of element *k+1* to a path expression over element *k*. It lets
-a verifier check element *k* against *k−1* in isolation, without knowing the
-count in advance. That is what replaces the flat model's per-step `{id, symbol}`.
+Two mechanisms carry the weight.
+
+**`carry` makes a variable-length sequence checkable**: a map from each symbol of
+element *k+1* to a path expression over element *k*, so a verifier checks element
+*k* against *k−1* in isolation without knowing the count in advance. That is what
+replaces the flat model's per-step `{id, symbol}`, and both D reviewers called it
+the document's best contribution — it worked exactly as advertised from v1.0 and
+was never a source of a finding.
+
+**`roles` makes a node type a type rather than a description.** Element symbols
+are the template's own names; the roles in §4.1 and §5.1 are type-level, and
+`roles` binds them. §8B.11 makes reaching for a literal symbol name
+non-conforming. This is what four of the five review rounds were about, and the
+test that certifies it is the **rename test** (§10): rename every symbol, rebind
+only the role maps, and a conforming verifier must still accept the node — and
+still reject it when a value is perturbed. It passes on both types, verified
+adversarially on a synthetic node with a different recurrence.
+
+**§3.8 is the rule the rest are instances of**, and it arrived late — after three
+revisions had closed the same class of defect one variant at a time:
+
+> Every value a check consumes is either declared once on the node **and checked
+> against something**, or recomputed from something that is.
+
+It distinguishes **problem data** (the question's givens — declaring once is the
+whole requirement, since nothing on the node binds it to its question) from
+**derived data** (anything the trace computes — must be recomputed), and it now
+carries three audit questions, of which the third — *does the recomputation cover
+every value, or only those present?* — is the newest and has caught the most.
+The audit is executable: `tests/trace_schema/audit_3_8.py`.
 
 **One structure, two presentations (D-039).** Both templates now *build* their
 trace as a structured node and **render the printed prose from it**. This is
@@ -297,6 +324,45 @@ guarded by an explicit `raise`, which is what covers the remainder.
 
 ---
 
+### 6.5 The node specification, verified
+
+The templates' checks say nothing about whether D3.3 is implementable. That is
+verified separately, by artefacts committed under `tests/trace_schema/`:
+
+| Evidence | Result |
+|---|---|
+| Round-1 verifier, written from spec + corpus alone | 80/80 gold, 33/33 mutated negatives |
+| Fresh reviewer's verifier, v1.1, no sight of round 1 | 40/40 `iteration`; 40 `decision` rejected — the F16/F1 finding |
+| Same, v1.2 → v1.5 | 80/80 with **no waiver** from v1.3 onward |
+| **Rename test**, `iteration` | Passes on a synthetic node with every symbol renamed, a *different* recurrence and 9 elements; still fails on a perturbed value |
+| **Rename test**, `decision` | Passes from v1.2 — all 13 symbols renamed, only role maps rebound, `selection` byte-identical |
+| §3.8 audit (`audit_3_8.py`) | Clean on all 80 shipped nodes; catches all **five** defects this phase shipped and removed |
+| Frame relations (`frame_relations`, §4.6) | 12,735 frames over 3,000 seeds recompute exactly, 0 mismatches; 169 corpus frames clean |
+| `item_measures` consistency | 355 candidate cells across 40 traces, 0 disagreements |
+| Wrong-answer exploits | Variants 4 and 5 both rejected, at the intended clauses |
+
+Four verifiers written by two reviewers are committed alongside the corpus, so
+the claim "a reviewer who did not design it could implement against it" is
+checkable rather than reported.
+
+**A limitation on the table above, stated because it is easy to miss.** The
+independent verifiers were built against v1.1–v1.4. **v1.5 changed the spec after
+the last review**, so no reviewer-written verifier has run against the version
+being merged: all four now fail the corpus, and each failure traces to a
+deliberate change (`capacity_constant` deleted, `preamble_binding` reshaped,
+`round` reduced to one argument), verified case by case rather than assumed.
+v1.5's own rules were rechecked independently of the templates — 676 frame cells,
+0 mismatches, coverage satisfied on all 40 `iteration` nodes — but that is my
+check of my own change. v1.5 implements exactly what round 5 prescribed, which
+is weaker evidence than an implementation nobody prescribed. A confirmation round
+against v1.5 is the honest close-out and is recorded as such.
+
+**What is not verified, and it is the biggest gap:** D3.4 §7 — the comparator —
+has **no conformance corpus at all**. Everything above tests §6, gold checking.
+The rules that decide a model's score are unexercised. Carried as **R3-2**.
+
+---
+
 ## 7. Item-pool impact (D3.5)
 
 Full numbers in [`phase3_item_pool_impact.md`](phase3_item_pool_impact.md).
@@ -329,8 +395,7 @@ could be moved by the same mechanism.
 
 ## 8. Errors I made in this phase
 
-Every phase so far has recorded at least one. This one has five, and the
-fifth is a process error rather than a numerical one.
+Every phase so far has recorded at least one. This one has nine.
 
 1. **A 2× transcription slip in a docstring I wrote.** The civil template's new
    docstring cited the update-count distribution `{1: 16, 2: 163, 3: 1182, ...}`
@@ -372,8 +437,38 @@ fifth is a process error rather than a numerical one.
    Nothing was lost, and only because the reviewer was more careful than the
    implementer. The rule I had internalised was "hand out a SHA"; the rule that
    matters is **"do not commit to a branch a review is in flight against"** — a
-   frozen ref is a promise about the repository, not a string in a brief. Round 2
-   was dispatched against `9398ccc` with no commits made until it filed.
+   frozen ref is a promise about the repository, not a string in a brief.
+   **The sentence that stood here previously said round 2 was dispatched with no
+   commits made until it filed. That was false — see error 6.**
+
+6. **I did it again, in the same message where I claimed I had not.** After
+   recording error 5, I dispatched a fresh reviewer and then committed Reviewer
+   B's triage while it was working. It caught the drift, verified by SHA-256
+   that neither of its two input files had changed and that the only byte
+   difference was CRLF, and its numbers stood. Twice in one phase, the second
+   time immediately after writing down the lesson. What finally worked was not
+   resolving harder but changing the rule from *"hand out a SHA"* to *"do not
+   commit while a review is in flight"* — after which rounds 3, 4 and 5 each ran
+   against a genuinely frozen ref.
+7. **I asserted a fix I had not made.** I told a reviewer §3.7's
+   cumulative-versus-prefix reading was fixed in v1.2. It hashed the section:
+   `6f7283ead30df88e` at both v1.1 and v1.2 — byte-identical. It was fixed in
+   v1.3, after being reported twice. Filed as cosmetic both times, it turned out
+   to be load-bearing: padding a `decision` trace with an empty element is
+   rejected *only* because of that fix, so v1.3 closed a variant nobody knew it
+   was closing.
+8. **I shipped a field that violates the rule stated in the same document.**
+   §3.8 says *"if the answer is 'in each element that mentions it', the check is
+   not yet a check."* `budget_total` was declared in each element that mentions
+   it, in v1.2 and v1.3, in the document stating the rule. I also shipped
+   `round(AR, 3)` — restating a precision `symbol_precision` already carries —
+   *inside the section added to enforce §3.8*.
+9. **I quoted a number measured on one population as though it were about
+   another.** §4.6 cited a 6.7% bind-to-stored miss rate. That is the
+   preamble-only rate over 2,000 seeds; the corpus the document ships gives
+   **24.9%**. A reader checking my figure against my own artefact gets 3.7× it.
+   Error 1's exact shape: a real measurement, honestly taken, described as being
+   about something it was not.
 
 The pattern in 2 and 3: **a document that quotes a computed artefact must be
 checked against that artefact by machine.** Re-reading finds neither. That check
@@ -382,57 +477,177 @@ data. The pattern in 4 is different and worth separating: **a justification that
 is qualitatively right can be quantitatively false**, and the way to find out is
 to measure the thing you asserted rather than to re-read the sentence.
 
+**The pattern across 1, 8 and 9 is the one worth carrying.** Each is a claim
+about *my own work* that I verified by re-reading rather than by running
+something: the halved distribution figure, the field violating its own rule, the
+population mismatch. None would have survived thirty seconds of execution, and
+none survived a reviewer. That is why §3.8's audit is now
+`tests/trace_schema/audit_3_8.py` rather than a paragraph — **it had never once
+been run before the version it was meant to gate had already shipped**, and on
+its first run it found a bug in itself, crashing on the very defect it exists to
+catch.
+
 ---
 
 ## 9. Residual risk register
 
 | # | Risk | Severity | Disposition |
 |---|---|---|---|
-| R3-1 | The `iteration`/`decision` generalisation to `linear_reservoir_routing_step` and `qr_policy_one_iteration` is **argued, not measured**. Neither has been fitted. | medium | BACKLOG → apply the `incidental`/`answer_bearing` test to both before the milestone model freezes |
-| R3-2 | The structured node is a frame local with no interface and no check gating its shape. It can silently drift out of the spec. | medium | D-039; ADOPT in the milestone-model phase — promote to a return value and add a conformance check |
-| R3-3 | Three defects are excluded only above 0.015–0.075%. `fmt3` in particular was never observed firing. | low | Two are now guarded by an explicit `raise`; the third is removed by construction |
+| R3-1 | `iteration`'s generalisation is shown on a **synthetic** renamed node, not a real third template. `decision`'s is shown on neither. | medium | ADOPT-PHASE-4 — fit `linear_reservoir_routing_step` by declaring a binding only, no verifier edit. Both D reviewers named this first |
+| R3-2 | **D3.4 §7 has no conformance corpus at all.** Every verifier built this phase implements §6 (gold checking); the comparator that actually decides scores is unexercised. | **high** | ADOPT-PHASE-4, named deliverable. This is the largest gap in the deliverable and both D reviewers raised it independently |
+| R3-3 | The structured node is a frame local with no interface and no check gating its shape. | medium | D-039; promote to a return value in the milestone-model phase |
 | R3-4 | T6 cannot gate either template until the corpus baseline is regenerated. | medium | D-043; Phase 6 owns it |
-| R3-5 | The corpus-wide sweep Phase 2 Reviewer A recommended — templates combining a transcendental with a fixed-decimal print — was **not** run. `normal_depth` is exactly that shape and was fixed; the other candidates were not looked for. | medium | BACKLOG, carried from Phase 2 §11 |
-| R3-6 | Phase 2 Reviewer C's corpus-wide regex for `\{[a-z_]+ *[-+*/] *[0-9.]+\}` in f-strings was applied to these two templates only. | low–medium | BACKLOG, carried from Phase 2 §12 |
-| R3-7 | Two rounding conventions still coexist corpus-wide (`_hu` decimal half-up vs `_as_printed` binary). | medium | BACKLOG, carried from Phase 2 §11 |
-| R3-8 | Prose/node agreement is specified as a non-goal, not a check — vacuous by construction today because the prose is rendered from the node, and a real gap the day a template stops doing that. | low | Recorded in the spec's §10 |
-| R3-9 | A solver who solves the civil item **directly** rather than by the prescribed secant gets a different gold answer on ~3.7% of instances (always by 0.001 m). Pre-existing on `master`, surfaced by Phase 3's Step 4 change. D3.4 §7.4 now says the comparator must accept within the method's own tolerance, but no extractor enforces it yet. | medium | Reviewer B F-B3; ADOPT-NOW in the spec, enforcement deferred to the extractor spike |
-| R3-10 | Both display-tie screens reject **clustered**, not scattered, instances — the civil one at a single slope value. Immaterial here (0.10 and 0.22 pts of branch movement) but the mechanism is general. | low–medium | Reviewer B F-B1/F-B2; recorded as **D-045** |
-
----
+| R3-5 | The corpus-wide sweep for transcendental-plus-fixed-decimal templates was not run. | medium | BACKLOG, carried from Phase 2 §11 |
+| R3-6 | Phase 2 Reviewer C's f-string regex was applied to these two templates only. | low–medium | BACKLOG, carried from Phase 2 §12 |
+| R3-7 | Two rounding conventions still coexist corpus-wide. | medium | BACKLOG, carried from Phase 2 §11 |
+| R3-8 | Prose/node agreement is a non-goal, vacuous today because the prose is rendered from the node — and a real gap the day a template stops doing that. | low | Spec §10 |
+| R3-9 | A solver who solves the civil item **directly** rather than by the prescribed secant differs from gold on 3.7% of instances. D3.4 §7.4 says the comparator must accept within the method's tolerance; nothing enforces it yet. | medium | Reviewer B F-B3; enforcement deferred to the extractor spike |
+| R3-10 | Both display-tie screens reject **clustered**, not scattered, instances — the civil one at a single slope value. | low–medium | D-045; immaterial here, mechanism is general |
+| R3-11 | **`line_balancing` is ~90% shortcuttable from question text**, pre-existing on `master`. A two-line pair-counting rule predicts the station count, and predicting it *is* answering the item. | **high, and not Phase 3's to fix** | D-046. Item-design question owned by the item pool; fixing it means widening the `n` range or resampling durations, a P6 change. Partially mitigated by D3.4 §7.3, which fails such a solver on process |
+| R3-12 | `precedences` is exercised against exactly **one** DAG — all 40 `decision` traces carry the same five-task network. | low–medium | Reviewer D2; a second `decision` template is the evidence that would settle it |
+| R3-13 | `constants` and the other **problem data** are declared once and checked against nothing on the node, by design (§3.8). A trace with free constants is a correct solve of a *different* problem. | medium | Structural: nothing binds a node to its question (D-039). §7's job, and it has no corpus — folds into R3-2 |
+| R3-14 | The `_froude_capped_slope` exactness pathology affects **three** templates in `uniform_flow.py`, not one. A corpus-wide display-tie rollout would silently deplete `S = 0.0016` branch-wide. | medium | Reviewer B §5; recorded in D-045, sweep deferred to Phase 5 |
 
 ## 10. Exit gate
 
 | Gate item | Status |
 |---|---|
-| D3.1 decisions recorded, **argued separately per template**, P6 trade stated | ✅ §2 — schema route both, on unrelated arguments, no P6 trade taken on either |
-| T1–T7 pass on both templates | ⚠️ T1–T5 and T7 pass; **T6 blocked corpus-wide by a stale baseline** (D-043), replaced by a direct distribution diff |
-| `g_curr - g_prev` guarded; the `fmt3()` sign discrepancy removed | ✅ §5.1 |
-| **Reviewer D implemented a working verifier from D3.3 alone** | *see §11* |
-| D3.4 comparator semantics cover the iteration-count-mismatch case | ✅ `phase3_node_types.md` §7.2 |
-| No corpus regression against the master baseline, measured not assumed | ✅ §6.2 — 3 status changes across 150 templates, all improvements, all in scope |
-| Reviewers B and D filed, every finding and every §5 suggestion triaged | *see §11, §12* |
+| D3.1 decisions recorded, **argued separately per template**, P6 trade stated | ✅ §2 — schema route for both, on unrelated arguments; no P6 trade taken on either |
+| T1–T7 pass on both templates | ⚠️ **T1–T5 and T7 pass. T6 does not, and cannot** — the committed baseline is stale corpus-wide (142/150 fail on `master`). Replaced by a direct before/after distribution diff, per D-043. This item closes as *qualified*, not as met |
+| `g_curr - g_prev` guarded; the `fmt3()` sign discrepancy removed | ✅ §5.1 — both were latent, and both are recorded as latent (D-042) rather than claimed as live fixes |
+| **Reviewer D implemented a working verifier from D3.3 alone** | ✅ §11.1 — twice, independently: 80/80 + 33/33, and 80/80 + 32/32 from a fresh reviewer that never saw round 1 |
+| D3.4 comparator semantics cover the iteration-count-mismatch case | ✅ spec §7.2, plus §7.3's contrasting disposition and §7.4 for prescribed methods |
+| No corpus regression against the master baseline, measured not assumed | ✅ §6.2 — 3 check-status changes across 150 templates, all improvements, all in scope; `master` re-measured in a worktree rather than trusted |
+| Reviewers B and D filed, **every finding and every §5 suggestion triaged** | ✅ §11.4, §11.5, §12.2, §12.5 — 28 findings and 27 §5 suggestions, each with a disposition |
 | Item-pool impact note filed | ✅ [`phase3_item_pool_impact.md`](phase3_item_pool_impact.md) |
 
----
+**The gate passes, with one qualification and one thing it does not cover.**
+
+The qualification is T6, which is a corpus-wide instrument failure and not a
+property of these two templates (D-043).
+
+What the gate does not cover is **R3-11**: `line_balancing` is ~90%
+shortcuttable from its question text. That is pre-existing, measured identically
+on `master`, and outside a phase scoped to trace shape — but it is a more serious
+fact about the item than anything this phase fixed, and it would be dishonest to
+close a P6-guarded phase without saying so on the gate itself rather than only in
+the risk register.
 
 ## 11. R4 triage — Reviewer D (schema implementability)
 
-*Pending — the review is in flight. This section is completed before the phase
-closes; an untriaged suggestion blocks the gate exactly as a CONFIRMED finding
-does (R4).*
+Two reviewers, five rounds, on one deliverable. Reports:
+[`phase3_reviewer_d_schema.md`](reviews/phase3_reviewer_d_schema.md) (round 1,
+plus a round-2 disposition of its own findings) and
+[`phase3_reviewer_d2_schema.md`](reviews/phase3_reviewer_d2_schema.md) (rounds
+2–5, by a **fresh** reviewer that never saw round 1's verifier or report).
+**Both PASS WITH FINDINGS. All findings closed.**
 
----
+### 11.1 The gate item, and what it is worth
+
+> ☑ **Reviewer D implemented a working verifier from D3.3 alone.**
+
+**Met, twice, independently.** Round 1 built a verifier from the spec and corpus
+alone — no template source, no summary — and scored 80/80 gold and 33/33 mutated
+negative cases, in one sitting. Round 2's fresh reviewer did it again from the
+revised spec: 80/80 and 32/32.
+
+**But the gate's headline number was the least informative thing either
+produced.** Round 1 passed 80/80 *while hardcoding one template's symbol names
+and its secant formula* — the corpus could not tell the difference, because gold
+traces do not lie. Every finding that mattered came from the two things the gate
+does not ask for: **mutating the traces** and **renaming the symbols**. That is
+the transferable lesson, and it is now written into the spec as the rename test
+(§10) and the §8A / §8B split.
+
+### 11.2 Round by round
+
+| Round | Ref | Result | What it changed |
+|---|---|---|---|
+| 1 | `953adc9` | 80/80, 33/33; **15 findings, 3 blocking** | `iteration` was a description of one template, not a type → v1.1 |
+| 2 (fresh) | `9398ccc` | 40 pass / 40 fail; **13 findings, 3 blocking** | v1.1 fixed `iteration` by inverting the defect onto `decision`; and §6 accepted a `decision` trace with a **wrong answer** → v1.2 |
+| 2 (round-1 reviewer) | `9398ccc` | 14 addressed, 1 partial, 0 not addressed | confirmed the fixes were fixes, not relocations |
+| 3 | `c9fd703` | 80/80, no waiver; **F3 narrowed, not fixed** | the exploit routed around `filter_relation` by lying about its *input* → v1.3 stated the invariant rather than patching a third variant |
+| 4 | `9c6b8ee` | §3.8 held; **2 new variants** | §3.8's audit had never been run against the nodes shipping beside it; running it convicted `budget_total` and the evaluation frames → v1.4 |
+| 5 | `fe2040a` | **1 blocking** | §4.6's mechanism was sound and its applicability **optional** — one deleted line restored variant 5 → v1.5 |
+
+### 11.3 The four defects that mattered
+
+Everything else was an ambiguity. These four let a **wrong answer** pass:
+
+1. **`selection.filter` was believed, not checked** (round 2). Lie about what
+   fits, force an extra station, change `n` — which *is* the answer — with every
+   clause satisfied.
+2. **…and after `filter_relation`, lie about its input instead** (round 3).
+   Inflate an item's measure in the trial that excludes it and restore it where
+   it is committed: the flag is then honest about a dishonest number.
+3. **`budget_total` was restated in every element** (round 4). Declare it too
+   small and the greedy rule *honestly* opens an extra station.
+4. **Evaluation frames were unchecked, then optionally checked** (rounds 4, 5).
+   The update recomputes *from* the residuals, so unchecked frames made the
+   answer free: a trace reported **3.501 m against a gold 1.380 m, passed with
+   zero failures, and took full process credit**. v1.4 added the mechanism; v1.5
+   made it non-optional after one deleted line restored the exploit.
+
+All four are one defect wearing different clothes, which is why v1.3 stopped
+patching variants and stated **§3.8**, and why v1.5 gave that rule the
+**problem-data / derived-data** distinction and a **coverage** question. The rule
+is now executable:
+[`tests/trace_schema/audit_3_8.py`](../../tests/trace_schema/audit_3_8.py) is
+clean on all 80 shipped nodes and catches all five historical defects.
+
+### 11.4 R4 disposition — Reviewer D round 1, §5
+
+| # | Suggestion | Disposition | Note |
+|---|---|---|---|
+| 1 | Fit a third template to `iteration` with an unmodified verifier | **ADOPT-PHASE-4** | Partly discharged early: round 2 built a *synthetic* alien node — renamed symbols, a different recurrence, 9 elements — and an unmodified verifier accepted it, then failed it on four clauses when perturbed. A **real** third template is still unfitted; named as a Phase 4 deliverable |
+| 2 | Run the comparator half — §7 is untested by anything | **ADOPT-PHASE-4** | The largest gap in the deliverable, named independently by both D reviewers. §7's dispositions have **no conformance corpus at all**. Needs candidate traces, which needs the extractor spike |
+| 3 | Fuzz the schema generatively rather than by hand | **BACKLOG** | Round 1's five guessed invariant holes all hit, so the density is high; but rounds 2–5 found the four that mattered by targeted attack, not fuzzing |
+| 4 | Check the corpus against a second extraction | **REJECT, with reason** | Structurally unnecessary: the prose is *rendered from* the node (D-039), so node/prose divergence is impossible by construction rather than merely unlikely |
+| 5 | A checklist — does every node type have an element table, a role binding, a declared update relation? | **ADOPT-NOW** | Exactly what would have caught F3, F16 and variants 4–5 at authoring time. Implemented as §3.8's three audit questions **and as executable code** |
+| 6 | Generate §8 from the verifier rather than writing it alongside | **ADOPT-PHASE-4** | Right diagnosis — §8 was "a list of remembered failure modes", which is always a floor. Deferred because it needs a reference verifier in-repo, which Phase 3 does not own |
+
+### 11.5 R4 disposition — Reviewer D2, §5
+
+| # | Suggestion | Disposition | Note |
+|---|---|---|---|
+| 1 | Fit `linear_reservoir_routing_step` by declaring a binding only, no verifier edit | **ADOPT-PHASE-4** | Same deliverable as round 1's item 1; one, not two |
+| 2 | Write the F3 fix | **ADOPT-NOW — done** | v1.2's `filter_relation`, then v1.3's `item_measures` when the exploit routed around it |
+| 3 | Give `decision` a role table; fit a second `decision`-shaped template | **ADOPT-NOW (role table) + ADOPT-PHASE-4 (second template)** | Role table shipped in v1.2 and the rename test passes on `decision` from v1.3. The second template is the evidence that would let `decision` be called a type on measurement rather than on argument |
+| 4 | Run against imperfect **model** traces, not mutations of gold | **ADOPT-PHASE-4** | Converges with round 1's item 2 |
+| 5 | Property-test the two grammars | **BACKLOG** | Cheap and worth doing; no defect currently attributed to a parser |
+| 6 | "Grep the spec for any quantity a check consumes that is not a field" | **ADOPT-NOW — became §3.8** | Stated as a defect *predictor*, and it predicted correctly four more times, including one variant D2 itself had not filed. The single most valuable line in either report |
+| 7 | State the verifier's mode as data | **ADOPT-NOW — done** | §6.0 |
+| 8 | Head every normative table "Role", or say the type is single-template | **ADOPT-NOW — done** | §5.1 |
+| 9 | Make §8 a list of *traces*; put behavioural obligations elsewhere | **ADOPT-NOW — done** | The §8A / §8B split |
+| 10 | Never let a `_prose` field state a constraint no data field carries | **ADOPT-NOW — done** | The rule behind `preamble_binding`, `filter_relation` and `precedences` |
+| 11 | Write down tolerance headroom wherever a tolerance is nominally slack | **ADOPT-NOW — done** | §4.5; D2 reports it prevented a real error in its own implementation |
+
+### 11.6 What the reviews bought, and the one thing they cost
+
+**Bought:** four wrong-answer defects, none of which the 80-trace gold corpus
+could have surfaced, because every one requires a trace that *lies* and gold
+traces do not. Also the framing that made the fixes converge — D2's "grep for any
+quantity a check consumes that is not a field" became §3.8, which then predicted
+the next three defects.
+
+**Cost:** one contamination, disclosed rather than discovered. Round 1's first
+command was `git show 953adc9 --stat`, which printed the commit body the brief
+excluded, so it saw implementer reasoning it was meant to be blind to. It read no
+other excluded file, and §2 and §9 of the spec state that content independently,
+so the impact is low — but the round-1 gate was weaker than designed, and the
+mitigation (`git show <sha>:<path>`, never `--stat`) belongs in the next brief.
 
 ## 12. R4 triage — Reviewer B (pedagogy)
 
 [`reviews/phase3_reviewer_b_pedagogy.md`](reviews/phase3_reviewer_b_pedagogy.md).
 **PASS WITH FINDINGS.** Five findings, all closed.
 
-### 12.1 The gate question, answered
+### 12.1 The gate question, as B answered it — **superseded by §12.6**
 
-**Is `line_balancing_heuristic` a lookup?** No, and B settled it with a number I
-had not measured and deliberately did not commission from myself:
+**Is `line_balancing_heuristic` a lookup?** B answered **no**, with a number I
+had not measured and deliberately did not commission from myself. **That answer
+did not survive actioning B's own §5 suggestion — read §12.6 before relying on
+this section.**
 
 | Predictor of `n` from the question text alone | Accuracy, 8,000 seeds |
 |---|---|
@@ -496,6 +711,64 @@ concluding. It also **checked the ref for drift before trusting a single number*
 nothing was wasted; but a reviewer who had not checked would have been silently
 reviewing something else, which is the exact failure the frozen-ref rule exists
 to prevent and which I reintroduced by hand.
+
+---
+
+### 12.5 R4 disposition — Reviewer B, §5
+
+| # | Suggestion | Disposition | Outcome |
+|---|---|---|---|
+| 1 | Confirm the slope depletion at 20,000 seeds; 600 is thin | **ADOPT-NOW — done** | 3.405% at 20,000 seeds against B's 3.50% at 600, and 4.83% on master. Confirmed |
+| 2 | **Fit a learned upper bound on predicting `n` from question text** — "the number I would most want checked" | **ADOPT-NOW — done, and it overturns B's own gate answer.** See §12.6 | A depth-2 tree reaches **90.18%** held-out; the bare rule reaches **90.41%** |
+| 3 | Run a frontier model on ~200 instances to see what models *do*, not what a shortcut *can* | **BACKLOG** | Needs inference budget and belongs to the evaluation track, which is out of scope here (D-003) |
+| 4 | Sweep `S` on a finer grid to confirm `S = 0.0016` is the sole tie-reachable slope | **ADOPT-NOW — done** | Within the sampled window it is the only one. `S = 0.0009` has an exact root (0.03) but `1/0.03` does not terminate, so no tie is reachable there — exact-square-root is necessary, not sufficient |
+| 5 | Check whether the 3.7% secant/true-root disagreement concentrates in low-update instances | **ADOPT-NOW — done** | It does **not** concentrate where B expected: 6.25% at 1 update, 10.83% at 2, 4.65% at 3, **0.08% at 4 and 0% at 5**. So it is a *stopping* artefact after all — but inverted from the guess. Fast convergence, not slow, is where the secant answer and the true root part company, because a large early step can land inside tolerance while still 0.001 m away |
+| 6 | **The `_froude_capped_slope` exactness pathology is a property of the helper, not of T24** | **ADOPT-NOW (recorded) + ADOPT-PHASE-5** | Confirmed: **three** templates in that file call the helper and divide by `round(sqrt(S), 5)` — `manning_rectangular_discharge`, `manning_trapezoidal_velocity` and `normal_depth_iteration`. A corpus-wide display-tie rollout would silently deplete `S = 0.0016` across the whole civil/water-resources branch. Recorded in **D-045**; the sweep itself is out of Phase 3's two-template scope |
+| 7 | Classify "is the trace length answer-bearing?" once, corpus-wide, rather than per template | **ADOPT-PHASE-4** | This is §2's `incidental`/`answer_bearing` test applied as a survey. Converges with Reviewer D's request for a third fitted template |
+| 8 | Make "does this screen cluster?" a **required recorded measurement**, not a reviewer's question | **SPEC-CHANGE** | Both screens cluster completely; both were described as removing ill-posed instances; both descriptions were true and incomplete. A "rejected slice profile" — the marginal of every sampled parameter over the rejected set — would have surfaced F-B1 and F-B2 with no reviewer. Added to the item-pool-impact deliverable |
+| 9 | Restate the lookup gate as a *lift over a floor*, with an explicit threshold | **SPEC-CHANGE** | B is right that 58.6% "sounds alarming until you see the floor is 53.1%". The gate is now "what does the best question-text-only shortcut buy over the best blind guess, and does it exceed 80%?" — which is also what makes §12.6 legible as a failure rather than a number |
+| 10 | Operationalise "difficulty unchanged" so a reviewer has something to measure | **ADOPT-PHASE-4** | F-B4 had no test it could fail, so B could only reason about it. A required-inference-count proxy is the candidate |
+
+### 12.6 B's gate answer is overturned — by B's own suggestion (D-046)
+
+B's mandatory task was *has `line_balancing` become a lookup?* It answered **no**,
+on strong evidence: the best rule it could construct reached **64.97%** against a
+**53.05%** blind floor, and it proved no better `N_min`-based rule exists by
+computing the per-`N_min` majority ceiling (65.55%). It then said plainly that a
+**learned** bound was the one number it could not produce and most wanted
+checked, and set its own flip threshold at ~85%.
+
+**Actioning that suggestion flips the answer.** A depth-2 decision tree over
+question-text features scores **90.18%** on seeds disjoint from its training set.
+It is not opaque — it reduces to one line:
+
+> Count the pairs of tasks that cannot share a station (`t_i + t_j > CT`). Five
+> or fewer → three stations; six or more → four.
+
+That bare rule alone scores **90.41%**. Since the answer is
+`(n·CT − Σt)/(n·CT)·100` and both `CT` and `Σt` are given, **predicting `n` is
+answering the item** — so a solver can score ~90% without executing the greedy
+rule, touching the precedence network, or constructing a station.
+
+**Measured on both trees, which is what decides the disposition:** `master`
+**90.44%**, branch **90.41%**. **Pre-existing. Phase 3 neither caused it nor
+worsened it.** Full record in **D-046**.
+
+**What it does not overturn.** D3.1's route decision stands and is strengthened —
+`n` being *predictable* is a different property from `n` being *the answer*, and
+an item already 90% shortcuttable is the one that could least afford `n` being
+fixed to a constant. D-038's classification is driven by the second property, not
+the first. And **Phase 3's own deliverable is the partial mitigation**: D3.4 §7.3
+separates answer credit from process credit for exactly this node type, so a
+shortcutter takes the answer and *fails the process* rather than being
+indistinguishable from a solver.
+
+**Why this is in the summary rather than quietly filed.** It is the phase's
+clearest case of a reviewer being right twice in opposite directions — right that
+no hand-built rule clears 65%, right that a learned bound was the missing number.
+The rule for later phases: **"the best rule I could think of" is a floor on
+shortcuttability, never a ceiling.** Any future lookup-check should fit a model
+rather than enumerate rules.
 
 ---
 
