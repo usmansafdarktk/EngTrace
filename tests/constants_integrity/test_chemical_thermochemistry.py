@@ -58,12 +58,6 @@ CP_NO_REFERENCE = {
     'Ar(g)': 'monatomic ideal gas, Cp = 5R/2 exactly',
     'Ne(g)': 'monatomic ideal gas, Cp = 5R/2 exactly',
     'Air(g)': 'a mixture; checked against its own components instead',
-    # [KNOWN-DEFECTIVE], not [UNVERIFIED]: both were checked and FAILED, and no
-    # citable replacement could be derived. Excluded from the Cp comparison so
-    # the suite does not report a failure it cannot act on - but the defect is
-    # recorded in the constants file and in the residual register, not hidden.
-    'H2SO4(l)': '[KNOWN-DEFECTIVE] ~59% low; NIST has no condensed-phase Cp',
-    'CaCO3(s)': '[KNOWN-DEFECTIVE] ~9% low; NIST free tier has no Cp for calcite',
 }
 
 # NIST / CODATA standard enthalpies of formation, kJ/mol, with the stated

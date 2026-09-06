@@ -1008,6 +1008,52 @@ validity domain per table, and an assertion that consuming templates sample
 inside it.
 
 
+---
+
+## D-033 — Two unsourceable species REPLACED rather than shipped behind a tag
+
+**Date:** 2026-09-06 · **Status:** DECIDED (repo owner directed) · **Source:**
+Phase C2 completion, after Reviewer H finding F-1
+
+C2 closed with two rows tagged `[KNOWN-DEFECTIVE]`: `H2SO4(l)` (~59% low) and
+`CaCO3(s)` (~9% low). Both were measurably wrong and neither could be sourced —
+NIST carries no condensed-phase Cp for either, verified against the free and
+paid-linked sections of the sulfuric-acid page and both the calcite and
+calcium-carbonate pages.
+
+Tagging is honest, but it still ships two wrong numbers into a benchmark. The
+repo owner directed: find a replacement source, **or replace the species with
+one that has an authoritative citable source.**
+
+| Removed | Replaced by | Source | Fit |
+|---|---|---|---|
+| `H2SO4(l)` | **`C6H6(l)`** benzene, liquid | four NIST condensed-phase measurements over 293–322 K (Kalali 1987; Grolier & Roux-Desgranges 1993; Reddy 1986; Naziev & Bashirov 1986) | worst 0.49%; Cp₂₉₈ 135.83 vs NIST 135.69 |
+| `CaCO3(s)` | **`Al2O3(s)`** corundum, solid | NIST Shomate, α phase, 298–2327 K, CAS 1344-28-1 | worst 0.06% over 298–1200 K; Cp₂₉₈ 78.76 vs NIST 78.80 |
+
+**Result: every one of the 33 `CP_PARAMS` rows now carries a citation, and none
+is known-defective.** The C2.2 suite's exclusion list is empty — it went from
+209 checks with two rows excluded to **215 checks with none**, which is a
+strictly stronger gate.
+
+**Why these two.** Benzene liquid has genuine temperature dependence from real
+measurements (Cp rises 134.6 → 139.9 over 293–322 K), so the item stays a
+*temperature-dependent* heat-capacity problem rather than becoming a constant-Cp
+one; and benzene boils at 353 K, so the template's 280–350 K liquid window stays
+in phase. Corundum is a standard refractory with NIST coverage to 2327 K, so it
+is comfortably inside validity across the template's whole solid range.
+
+**P6 cost, accepted.** Two substances leave the item pool and two enter.
+Sulfuric acid and calcite are arguably more evocative than benzene and alumina —
+but a benchmark item built on a number that is 59% wrong tests nothing, and
+neither species could be rescued. This also partly answers Reviewer H's F-4: the
+liquid sensible-heat pool goes back from two substances to three.
+
+**Reversible.** If a citable source for either original is obtained — Robie &
+Hemingway (USGS Bulletin 2131) covers calcite and is freely available, but is
+461 pages and could not be resolved to a specific page here — the species can be
+restored.
+
+
 ## Open decisions
 
 | # | Decision | Needed before |
