@@ -66,8 +66,8 @@ condemned.
 | `C3H6O` | **refitted** to Chao 1986, re-keyed `(l)`→`(g)` | was 81.32 vs 75.02; worst 1.11% |
 | `C6H14` | **refitted** to Scott 1974, re-keyed `(l)`→`(g)` | was 125.70 vs 142.60; worst 2.79% |
 | `C6H6`, `C7H8` | re-keyed `(l)`→`(g)` | held gas values; benzene computed 85.3 where NIST *liquid* is 135.69 |
-| `NaCl(s)` | **kept** | its 5.5% gap to NIST is a genuine disagreement between two fits, not a transcription defect |
-| `H2SO4(l)`, `CaCO3(s)` | **tagged `[UNVERIFIED]`** | NIST's free tier paywalls both |
+| `NaCl(s)` | **refitted** to NIST (Reviewer H §5) | 47.70 → 50.40 vs NIST 50.50; worst error 0.19% |
+| `H2SO4(l)`, `CaCO3(s)` | **tagged `[KNOWN-DEFECTIVE]`** (Reviewer H F-1) | checked and failed, −59% and −9%; no citable replacement derivable |
 
 Coefficients are now written with the exponent attached to each value — `B` as
 `E-3`, `C` as `E-6`, `D` as `E5` — precisely because the source tabulates them
@@ -114,11 +114,11 @@ the equilibrium value and not comparable to this item's model.
 
 | # | Deliverable | Where | Status |
 |---|---|---|---|
-| C2.1 | Three tables re-derived with `[ON-DISK]` citations | `constants.py`, per row | ✅ 31 species on disk; 2 tagged `[UNVERIFIED]` |
-| C2.2 | Physical-plausibility test suite | `tests/constants_integrity/test_chemical_thermochemistry.py` | ✅ **208 checks, all passing** |
+| C2.1 | Three tables re-derived with `[ON-DISK]` citations | `constants.py`, per row | ✅ **54 cited values** (33 Cp + 21 ΔHf); 31 species on disk; 2 tagged `[KNOWN-DEFECTIVE]` |
+| C2.2 | Physical-plausibility test suite | `tests/constants_integrity/test_chemical_thermochemistry.py` | ✅ **209 checks, all passing** |
 | C2.3 | Before/after impact for the 5 affected templates | §6 | ✅ |
 | C2.4 | Methane/air near the literature value | §4 | ✅ 2311 K vs 2326 K |
-| C2.R | Independent review (Reviewer H) + R4 triage | `reviews/` | see §8 |
+| C2.R | Independent review (Reviewer H) + R4 triage | [`reviews/phaseC2_reviewer_h_thermochemistry.md`](reviews/phaseC2_reviewer_h_thermochemistry.md), §11 | ✅ |
 
 ---
 
@@ -197,15 +197,44 @@ confirming only the exponent moved: 3 mismatches found, 3 fixed, 0 remaining.
 
 | Item | Status |
 |---|---|
-| `H2SO4(l)`, `CaCO3(s)` | `[UNVERIFIED]` — NIST's free tier paywalls both. Tagged, not quietly accepted. |
-| `NaCl(s)` | 5.5% from NIST; a genuine fit disagreement, kept as the correct source row |
+| `H2SO4(l)`, `CaCO3(s)` | **`[KNOWN-DEFECTIVE]`**, not `[UNVERIFIED]` — Reviewer H F-1. They were checked and they failed (−59%, −9%); no citable replacement could be derived. "We could not check this" and "we checked this and it is wrong" are different claims. |
+| **validity range** | `CP_PARAMS` is fitted to 1500 K; `adiabatic_flame_temperature` integrates to 2844 K, where Cp errors reach +15%. Declared in `CP_VALID_T_MAX`, reported by the suite, handed to Phase 2 — **D-032** |
+| `NaCl(s)` | **resolved** — refitted to NIST, 50.40 vs 50.50 (was 47.70). Reviewer H was right that calling it "a genuine disagreement" was an assertion without an argument, and that NIST does publish a solid-phase Shomate. |
 | four refitted rows | no longer match a textbook table; residuals 1.1–3.1% |
 | SVN page citations | unobtainable; NIST used instead (§7) |
 | liquid branch | now only `H2O(l)` and `CH3OH(l)`, both verified as genuine liquids |
 
 ---
 
-## 10. What Phase 2 inherits
+## 11. R4 triage — Reviewer H
+
+| # | Finding | Disposition | Action |
+|---|---|---|---|
+| **F-1** | `[UNVERIFIED]` is the wrong tag for a row that was checked and failed | `ADOPT-NOW` | Retagged `[KNOWN-DEFECTIVE]` with the measured error |
+| **F-2** | Polynomials extrapolated ~90% past validity in the flame template; the suite never looked there | `ADOPT-NOW` + `ADOPT-PHASE-2` | `CP_VALID_T_MAX` declared; suite now reports the overshoot; the refit-vs-restrict trade handed to Phase 2 as **D-032** |
+| **F-3** | 32 of 65 values carried no citation on the face of the table | `ADOPT-NOW` | All 21 heats of formation now cited; 54 cited values total |
+| **F-4** | The re-key drops liquid sensible-heat items from 6 substances to 2 | `ADOPT-NOW` | Stated in §6 below |
+| §5 | `NaCl(s)` waved through as "a source disagreement" | `ADOPT-NOW` | Refitted: 47.70 → 50.40 vs NIST 50.50, worst 0.19% |
+| §5 | `Air(g)` composition not recorded | `ADOPT-NOW` | `AIR_COMPOSITION` declared and consumed by the suite |
+| §5 | Propane ΔHf "discrepancy" | `ADOPT-NOW` | Retired — NIST lists both −104.7 and −103.8; documented as a source choice |
+| §5 | `C2H2`/`C6H14` 298 K endpoints marginally exceed 3% | `BACKLOG` | 3.10%/2.79%, inside the 8% gate; residual register |
+| §5 | Check the other ten fuels' flame temperatures | `ADOPT-PHASE-2` | Acetylene at 2844 K sits deepest into the extrapolated region |
+| §5 | Grep C3 for `E-2`/`E-5` literals before anything else | `ADOPT-PHASE-C3` | The Class-1 mechanism generalises to any scaled-column table |
+| §5 | C3 needs declared validity domains, not just value checks | `ADOPT-PHASE-C3` | **D-032**; C3.2's consistency checks cannot catch this class |
+| §5 | The exit gate's "edition + page" is unsatisfiable | `SPEC-CHANGE` | Reword to "a retrievable on-disk artefact" before C3 inherits it |
+
+**No finding is untriaged.**
+
+**F-4, stated as the reviewer asked:** re-keying `C6H6`, `C7H8`, `C6H14` and
+`C3H6O` from `(l)` to `(g)` moves them onto `heat_effects.py`'s 298–1200 K gas
+branch. The liquid sensible-heat item now draws from **two** substances
+(`H2O(l)`, `CH3OH(l)`) rather than six. The alternative — leaving a "liquid"
+whose Cp is 37% low — is worse, and NIST liquid values are on disk as anchor
+points if a future phase wants to restore true liquid rows.
+
+---
+
+## 12. What Phase 2 inherits
 
 1. **S1 is satisfied.** `template_adiabatic_flame_temperature` can now be
    re-baselined; its flame temperatures are physically right.
