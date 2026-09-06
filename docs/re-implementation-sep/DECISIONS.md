@@ -1598,6 +1598,74 @@ template where it were — a screen that removed a quarter of one material, one
 support condition, or one flow regime — the same mechanism would be a P6 breach
 wearing the costume of an arithmetic clean-up.
 
+---
+
+## D-046 — `line_balancing_heuristic` is ~90% shortcuttable, pre-existing, and Reviewer B's own suggestion is what found it
+
+**Date:** 2026-09-06 · **Status:** DECIDED (recorded; the fix is not Phase 3's)
+**Source:** Phase 3, actioning Reviewer B's §5 item 1 — *"I scored shortcut rules
+I could think of, not a learned upper bound … that is the number I would most
+want checked."*
+
+Reviewer B's mandatory gate task was *does the `line_balancing` result still
+require the solver to run the heuristic, or has it become a lookup?* B answered
+**it is a search, not a lookup**, on strong evidence: the best rule it could
+construct from question text reached **64.97%** against a **53.05%**
+blind-constant floor, and it proved no better `N_min`-based rule exists by
+computing the per-`N_min` majority ceiling (65.55%). It then said explicitly that
+a *learned* bound was the one number it could not produce and most wanted
+checked, and set its own flip threshold at ~85%.
+
+**Actioning that suggestion flips the answer.** A depth-2 decision tree over
+question-text features reaches **90.18%** on seeds held out from training
+(8,000 train / 4,000 disjoint test). It is not an opaque model — it reduces to a
+rule anyone can state in one line:
+
+> **Count the pairs of tasks that cannot share a station (`t_i + t_j > CT`). If
+> five or fewer, answer three stations; if six or more, answer four.**
+
+That bare rule alone scores **90.41%**. Since the answer is
+`(n·CT − Σt)/(n·CT)·100` and both `CT` and `Σt` are given, predicting `n` *is*
+answering the item. **A solver can score ~90% without executing the greedy rule,
+without using the precedence network, and without constructing a single
+station.**
+
+**Measured on both trees, and this is what decides the disposition:** `master`
+**90.44%**, the Phase 3 branch **90.41%**. Statistically identical.
+**Pre-existing. Phase 3 neither caused it nor made it worse.**
+
+**Disposition: recorded, not fixed, and it does not block the Phase 3 gate.**
+Phase 3's scope is trace shape. The item's answer-space weakness is an
+item-design question owned by whoever owns the item pool, and fixing it means
+changing what the item samples — widening the `n` range beyond {3, 4}, or
+sampling durations so the pair-count feature stops separating — which is a P6
+change requiring sign-off and a regenerated pool.
+
+**Three things this does NOT overturn.**
+
+1. **D3.1's route decision stands, and is strengthened.** The argument for the
+   schema route was that `n` is answer-bearing, so fixing it to a constant
+   publishes part of the answer. Still true — and an item already 90%
+   shortcuttable is one that could least afford it.
+2. **D-038's `answer_bearing` classification stands.** `n` being *predictable*
+   is unrelated to `n` being *the answer*; the comparator disposition in
+   D3.4 §7.3 is driven by the second, not the first.
+3. **Phase 3's own deliverable is the partial mitigation.** D3.4 §7.3 separates
+   answer credit from process credit for exactly this node type: a candidate
+   whose element count matches but whose `committed` sets differ takes the
+   answer and **fails the process**. A model shortcutting to the right `n` is
+   therefore visible as a shortcut rather than indistinguishable from a solver.
+   That is the structured trace doing the job the flat answer cannot.
+
+**What this says about review scoping.** B's finding and B's §5 suggestion
+pointed in opposite directions, and B was right about both: right that no
+*hand-built* rule clears 65%, right that a learned bound was the missing number.
+A reviewer that reports a clean verdict *and* names the measurement that would
+overturn it is doing the job R3 exists for. **The lesson for later phases is that
+"the best rule I could think of" is a floor on shortcuttability, never a
+ceiling** — any future P6 lookup-check should fit a model, not enumerate rules.
+Recorded as a `SPEC-CHANGE` against the review protocol's pedagogy brief.
+
 ## Open decisions
 
 | # | Decision | Needed before |

@@ -1,6 +1,6 @@
 # D3.3 — The `iteration` and `decision` trace node types
 
-**Schema version:** `1.4` · **Status:** normative for the milestone model ·
+**Schema version:** `1.5` · **Status:** normative for the milestone model ·
 **Phase:** 3 · **Revised:** 2026-09-06
 **Companion:** [`template_redesign_spec.md`](template_redesign_spec.md) §3.3 ·
 [`phase3_summary.md`](phase3_summary.md) · conformance corpus in
@@ -12,6 +12,35 @@ and the return value of `_t19_assign`, bound to `trace_nodes` in
 `template_line_balancing_heuristic`
 (`.../industrial_engineering/production_and_inventory/production_planning.py`).
 **Extractor:** `python -m tests.trace_schema.extract <out.json> <n_seeds>`.
+
+> **Revision note — 1.4 → 1.5.** §4.6 — the frame-arithmetic mechanism 1.4 added
+> to close variant 5 — was reviewed and **is not sound as written**. The
+> mechanism works; its *applicability* was optional. §4.3.9 quantified over the
+> relations **present**, not over the frame's **symbols**, so deleting the one
+> relation defining the residual left `A`, `P` and `AR` vacuously checked and
+> `g` unconstrained. **Variant 5 returns unchanged, by removing one line** — the
+> reviewer drove a trace to 3.492 m and to exactly 2.000 m against a gold
+> 1.380 m, both passing clean. 1.5 adds the coverage requirement: every
+> `evaluation_symbols` member except the iterate must have exactly one relation.
+>
+> Two further defects of mine in the same section. `round(AR, 3)` **restated a
+> precision `symbol_precision` already declares**, and nothing required the two
+> to agree — `round(AR, 1)` yields a conforming 1.383 m. That is a §3.8
+> restatement violation *inside the fix that enforces §3.8*; the form is now
+> `round(sym)`, taking its digit from `symbol_precision`. And the **6.7%**
+> bind-to-stored miss rate §4.6 cited does not reproduce against the corpus the
+> document ships: it is the preamble-only rate over 2,000 seeds (re-measured:
+> 6.6%), while the shipped 40-seed corpus gives **24.9%**, because mid-iteration
+> frames carry larger `A` and `P` and so more absolute rounding error. Both
+> figures are now stated with their populations.
+>
+> **§3.8's amended rule, applied honestly, condemns its own table:** five of nine
+> rows are declared once and checked against nothing. 1.5 gives it the
+> distinction it lacked — **problem data** versus **derived data** — and states
+> the severity gap that makes the distinction load-bearing: a free constant makes
+> a trace a correct solve of a *different* problem, which §7 catches; a missing
+> relation makes it a correct solve of *no* problem, and §7.2 grants it full
+> process credit.
 
 > **Revision note — 1.3 → 1.4.** §3.8 held: the reviewer could not break the
 > family it names, and with `universe`, `precedences`, `item_measures` and the
@@ -192,7 +221,7 @@ than one node will bind a list, and **must** raise `schema_version` when it does
 
 | Field | Type | Req. | Meaning |
 |---|---|:--:|---|
-| `schema_version` | string | ✔ | `"1.4"`. A verifier must refuse a major version it does not know. |
+| `schema_version` | string | ✔ | `"1.5"`. A verifier must refuse a major version it does not know. |
 | `node_type` | `"iteration"` \| `"decision"` | ✔ | Selects §4 or §5. |
 | `node_id` | string | ✔ | Stable within a template; the anchor a comparator reports against. |
 | `cardinality` | `"incidental"` \| `"answer_bearing"` | ✔ | §2. Fixed per `node_type` (§4, §5). Determines whether §7.2 or §7.3 applies. |
@@ -358,35 +387,64 @@ then worked one level down, by restating the *measure* the relation reads. A
 candidate a trace intends to exclude had a free measure in the trial that
 excluded it, so `n` could be inflated with every invariant satisfied.
 
-Applying §3.8 to the two node types gives:
+**Two kinds of value, and the distinction is load-bearing.** Applying the rule
+honestly to this document's own table shows five of nine rows are declared once
+and checked against *nothing* — so the rule as first written condemns its own
+table. The resolution is not to weaken it but to separate two cases:
 
-| Value | Declared once at | Recomputed by |
-|---|---|---|
-| item measures | `termination.item_measures` | §5.4.3d |
-| the budget | `termination.budget` | §5.4.1 |
-| frame arithmetic | `constants` + `frame_relations` | §4.3.9, §4.6 |
-| admissibility | — | `selection.filter_relation`, §5.4.3c |
-| eligibility | `termination.precedences` | §5.4.3b |
-| the update recurrence | `update_relation` | §4.3.1 |
-| display precisions | `symbol_precision` | §7.1 |
-| rounding mode | `rounding` | §6 |
-| symbol names | the role maps | §6 step 2 |
+- **Problem data** — the question's own givens (`constants`, `universe`,
+  `precedences`, `item_measures`, `budget`, `tolerance`, `max_elements`).
+  Declaring these once **is** the whole requirement. Nothing on the node can
+  check them, because nothing on the node binds the node to its question; that
+  is §7's job and D-039's open item.
+- **Derived data** — anything the trace computes (`admissible`, the update, the
+  frame symbols, the result). These **must** be recomputed from problem data.
+  Declaring one once and checking it against nothing is exactly as free as
+  restating it.
 
-**Audit any new node type against this table before adding it**, and against
-both halves of the question:
+**The severity gap is why the distinction matters, not bookkeeping.** A free
+*problem* value makes a trace a correct solve of a **different** problem, which
+§7 catches when it compares against gold. A free *derived* value makes it a
+correct solve of **no** problem — and §7.2 grants it full process credit, because
+every element is internally consistent. That is variant 5, and it is the more
+dangerous of the two.
+
+| Value | Kind | Declared once at | Recomputed by |
+|---|---|---|---|
+| the item's constants | problem | `constants` | — (§7) |
+| the task universe | problem | `termination.universe` | — (§7) |
+| precedences | problem | `termination.precedences` | — (§7) |
+| item measures | problem | `termination.item_measures` | — (§7) |
+| the budget | problem | `termination.budget` | — (§7) |
+| convergence tolerance | problem | `termination.tolerance` | — (§7) |
+| admissibility | **derived** | — | `selection.filter_relation`, §5.4.3c |
+| eligibility | **derived** | — | §5.4.3b, against `precedences` |
+| the update | **derived** | `update_relation` | §4.3.1 |
+| frame arithmetic | **derived** | `constants` + `frame_relations` | §4.3.9, §4.6 |
+| the result | **derived** | `result.from` | §6 step 8 |
+| display precisions | problem | `symbol_precision` | — |
+| rounding mode | problem | `rounding` | — |
+| symbol names | problem | the role maps | §6 step 2 |
+
+**Audit any new node type against this table before adding it**, and against all
+three questions:
 
 1. *For every value a check reads, where is the single place it is declared?* If
    the answer is "in each element that mentions it", the check is not yet a
    check. **`budget_total` failed this and shipped in 1.2 and 1.3.**
-2. *And what is that declaration checked against?* A value declared once and
-   verified against nothing is exactly as free as one restated freely — it is
-   simply free in one place instead of many. **Evaluation frames failed this and
-   shipped in 1.0 through 1.3**, which made an `iteration` node's answer
-   unconstrained.
+2. *Is it problem data or derived data?* If derived, what recomputes it? A
+   derived value declared once and verified against nothing is free.
+   **Evaluation frames failed this and shipped in 1.0 through 1.3.**
+3. *Does the recomputation cover every value, or only the ones present?* A check
+   quantified over the relations a trace supplies is one a trace can opt out of
+   by supplying fewer. **`frame_relations` failed this and shipped in 1.4.**
 
-Running this audit is the implementer's job and it had not been done: both
-failures above were found by running it, after four review rounds had found
-everything else.
+Question 3 is the newest and the one that has caught the most: it is the general
+form of "the mechanism is sound, its applicability is optional".
+
+**This audit is the implementer's job and it has been run late every time.** Each
+of the three failures above was found by running it *after* shipping the version
+that introduced them — twice by a reviewer, once by me. Run it before.
 
 ---
 
@@ -526,23 +584,63 @@ frame makes the node's answer free. A trace reporting 3.501 m against a gold
                     ["g",  "round(AR, 3) - K"]]
 ```
 
-**Grammar (normative).** §4.2's grammar, plus `**`, `sqrt(x)` and
-`round(x, n)`; names resolve to `constants`, to the frame's `iterate` role, or to
-an earlier symbol of `frame_relations`.
+**Coverage (normative, and the clause the mechanism is worthless without).**
+`frame_relations` must name **every member of `evaluation_symbols` except the
+`iterate` role, exactly once**, in an order where each relation references only
+`constants`, the iterate, and *earlier* symbols. §4.3.9 quantifies over the
+frame's **symbols**, not over the relations present.
+
+> Without this clause the mechanism is optional and therefore absent. 1.4
+> quantified over the relations present, so **deleting the residual's relation
+> left the other three vacuously checked and the residual free** — variant 5
+> returns unchanged, by removing one line. A reviewer drove a trace to 3.492 m
+> and to exactly 2.000 m against a gold 1.380 m, both passing clean. A mechanism
+> a trace can opt out of is not a check.
+
+**Grammar (normative).** §4.2's grammar, plus `**`, `sqrt(x)` and `round(x)`;
+names resolve to `constants`, to the frame's `iterate` role, or to an *earlier*
+symbol of `frame_relations`. The "earlier" rule makes cycles and forward
+references structurally impossible rather than merely forbidden, and bounds
+substitution depth by the relation count.
+
+**`round` takes one argument.** `round(sym)` means `sym` at
+`symbol_precision[sym]`, under the node's `rounding` mode. **The digit is not
+restated.** 1.4 wrote `round(AR, 3)`, declaring a precision `symbol_precision`
+already carried, with nothing requiring the two to agree — `round(AR, 1)` yields
+a conforming but different answer. That is a §3.8 restatement violation inside
+the section that enforces §3.8.
+
+**Arithmetic errors are trace failures, not verifier crashes.** `sqrt` of a
+negative, division by zero, and a domain error in `**` each **fail the frame**.
+§6.0 makes hostile candidate traces first-class, so a verifier that raises on
+one is not conforming.
 
 **Evaluation (normative), and the distinction matters.** A bare symbol reference
 means **that symbol's unrounded value** — its relation substituted in full, down
-to the iterate and the constants. `round(sym, n)` means its **displayed** value.
+to the iterate and the constants. `round(sym)` means its **displayed** value.
 This is how P2's round-then-recompute is expressed, and the two readings are not
 interchangeable: `AR` recomputed from the frame's stored, *rounded* `A` and `P`
-misses its stored value on **6.7%** of frames, because the template computes it
-from the unrounded pair. A verifier that binds symbols to stored values will
-reject 6.7% of gold traces and conclude the spec is wrong.
+misses its stored value on **24.9% of the frames in the shipped conformance
+corpus** (42 of 169), and on **6.6%** of preamble frames over 3,000 seeds — the
+corpus rate is higher because mid-iteration frames carry larger `A` and `P` and
+so more absolute rounding error. *(1.4 cited only the second figure without its
+population, so a reader checking it against the shipped artefact got 3.7× the
+number — Reviewer D2, round 5. Both populations are now named.)* A verifier that
+binds symbols to stored values will reject a quarter of gold traces and conclude
+the spec is wrong.
 
-**Invariant §4.3.9.** For every frame — preamble and evaluation alike — each
-`frame_relations` symbol, evaluated as above and rounded to its
-`symbol_precision`, equals the frame's stored value. Verified: **12,735 frames
-over 3,000 seeds, zero mismatches**; and perturbing one `AR` by 2.0 is rejected.
+**Frame symbols carry no role indirection.** `roles` and `evaluation_roles` bind
+the element and the two frame roles the update consumes; the remaining frame
+symbols appear literally in `frame_relations`. Renaming them therefore means
+rewriting the expression strings, not just rebinding a map. That is a deliberate
+limit — the relations *are* expressions over those names — and it is the one
+place the rename test of §10 requires editing data rather than a binding.
+
+**Invariant §4.3.9.** For every frame — preamble and evaluation alike — and every
+non-iterate member of `evaluation_symbols`, the symbol's relation, evaluated as
+above and rounded to its `symbol_precision`, equals the frame's stored value.
+Verified: **12,735 frames over 3,000 seeds, zero mismatches**; perturbing one
+`AR` by 2.0 is rejected; and omitting a relation is now rejected at §6 step 1.
 
 **What this does and does not buy.** It pins every frame to its iterate, so the
 residuals are no longer free and neither is the converged answer. It does *not*
@@ -844,7 +942,8 @@ behavioural obligation (Reviewer D2).
    `evaluation` non-null on the terminating element; an evaluation frame whose
    `iterate` is not the element's `iterate_next`; a zero update denominator;
    non-contiguous `index`; a `preamble_binding` that does not hold against
-   `elements[0]`; **a frame that does not satisfy `frame_relations` (§4.6)**.
+   `elements[0]`; **a frame that does not satisfy `frame_relations` (§4.6)**; **`frame_relations` that does not cover every non-iterate
+   `evaluation_symbols` member exactly once**.
 5. `decision`: overlapping `committed` sets; a union that is not
    `termination.universe`; a `chosen` that does not optimise `selection`;
    **an `admissible` flag that disagrees with `selection.filter_relation`**;
@@ -892,7 +991,7 @@ the corpus.)*
 
 ```json
 {
- "schema_version": "1.4",
+ "schema_version": "1.5",
  "node_type": "iteration",
  "node_id": "t24_secant_normal_depth",
  "cardinality": "incidental",
@@ -938,7 +1037,7 @@ the corpus.)*
   ],
   [
    "g",
-   "round(AR, 3) - K"
+   "round(AR) - K"
   ]
  ],
  "symbol_precision": {

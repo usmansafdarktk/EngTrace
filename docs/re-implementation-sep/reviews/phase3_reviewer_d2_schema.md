@@ -1118,3 +1118,225 @@ run once, by the implementer, against §3.8's own table.
 
 *Round 4 filed by Reviewer D2. Written to disk, not committed. New artefact:
 `tests/trace_schema/reviewer_d2_verifier_13.py`.*
+
+---
+
+## 8. Round 5 — attacking §4.6 `constants` + `frame_relations`
+
+**Ref:** `fe2040a747f4af503774ea5909cc85746a22e8ab`, schema 1.4. `HEAD`, the branch
+tip and the commissioned SHA agreed at start and end. **Time box:** 40 minutes.
+Artefact: `tests/trace_schema/reviewer_d2_verifier_14.py`, including a from-scratch
+implementation of §4.6's grammar and evaluation rule.
+
+### 8.1 Verdict
+
+**§4.6 is not sound as written. One gap is merge-blocking, and it restores variant
+5 in full.**
+
+`frame_relations` **has no coverage requirement.** §4.3.9 quantifies over *the
+relations present*, not over *the frame's symbols*. Delete the one relation that
+defines the residual and every other clause still passes — including §4.3.9, which
+now vacuously checks `A`, `P` and `AR` and says nothing about `g`. The residual is
+free again, and so is the answer:
+
+```
+frame_relations covers ['A','P','AR'] -- 'g' omitted
+target 3.5 -> 9 updates, answer 3.492 m (gold 1.380 m) : PASS []
+target 2.0 -> 10 updates, answer 2.000 m (gold 1.380 m) : PASS []
+```
+
+**That is variant 5, unchanged, reached by deleting one line of the node.** The
+fix that closed it is real — I could not defeat it while it was present — but it is
+opt-in, and §8A.4 rejects "a frame that does not satisfy `frame_relations`" rather
+than "a frame symbol with no relation".
+
+The good news is that everything else in §4.6 held. I attacked the grammar, the
+rounding rule, the ordering discipline and the constants, and **only the coverage
+gap yields an arbitrary answer.** Three smaller findings and five stated
+ambiguities follow; none of them blocks.
+
+**One clause fixes the blocker:**
+
+> **§4.6, coverage (normative).** `frame_relations` **must** name every member of
+> `evaluation_symbols` except the `iterate` role, exactly once, and a node whose
+> relations do not cover them is rejected (§8A.4). A frame symbol with no relation
+> is a free value, and §3.8 forbids one.
+
+### 8.2 Confirmations
+
+**80/80 gold traces, no waiver**, with §4.6 implemented from the spec text alone:
+```
+python -m tests.trace_schema.reviewer_d2_verifier_14 docs/re-implementation-sep/phase3_conformance/traces.json
+template_line_balancing_heuristic        pass 40  fail  0
+template_normal_depth_iteration          pass 40  fail  0
+TOTAL 80 rows: 80 pass, 0 fail; 40 carried unchecked notes
+```
+
+**Variant 4 is dead.** `termination.budget` is present (147), `capacity_constant`
+is gone, and restating every `budget_total` as 6 is rejected:
+```
+every budget_total restated as 6 -> FAIL ['8A.5']
+```
+
+**Rename test, both types, no regression.** For `iteration` the rename now has to
+rewrite `frame_relations`' expression strings too, since they name frame symbols
+directly:
+```
+frame_relations: [["a_","(b + z * S) * S"], ["p_","b + 2 * S * sqrt(1 + z ** 2)"],
+                  ["ar_","a_ * (a_ / p_) ** (2 / 3)"], ["r","round(ar_, 3) - K"]]
+renamed                            -> PASS
+renamed + AR perturbed by 0.002    -> FAIL ['4.3.9/8A.4']
+renamed + residual perturbed 0.01  -> FAIL ['8A.3']
+```
+Frame symbols are the one part of an `iteration` node with **no role indirection**
+— `A`, `P`, `AR` have no roles, only names. That is defensible (they are item
+content, and the relations that name them are data), but it is worth one sentence
+in §4.6 saying so explicitly, because it is the only place a renamer must edit an
+expression rather than a map.
+
+**Your staleness note, verified cheaply.** I built the 1.4 verifier as a patch of
+the 1.3 one. The only semantic edits required were exactly the two you named —
+`capacity_constant` → `termination.budget`, and `preamble_binding`'s reshaping —
+plus the new §4.6 machinery. Nothing else in 1.3's logic needed changing, which
+corroborates your reading that the older verifiers' failures are version staleness
+and not semantics. I did not spend further box on it.
+
+**§10's withdrawal is right.** "Frame-internal physics is not checkable" was never
+a limitation of the node, only of what the node chose to carry; the moment §4.3.1
+recomputes the update *from* the residuals, the frames are inside the trust
+boundary whether the document admits it or not. Withdrawing it is the correct call
+and I would not restore it.
+
+### 8.3 Is variant 5 dead, or dead only for the shape I built?
+
+Dead for every shape I could build **while the residual relation is present** — I
+tried four routes and all four failed:
+
+1. **Fabricating residuals with the relations intact** — impossible by construction;
+   `g` is pinned to `y` through `AR`, and `y` is pinned to `iterate_next` by §4.3.6.
+2. **A relation self-consistent but detached from the iterate** — if `g` does not
+   reference `y` transitively it is constant across frames, so
+   `residual_curr − residual_prev = 0` and §4.3.7's zero-denominator clause fires.
+   The attack defeats itself.
+3. **Exploiting `**` / `sqrt` / `round`** — see §8.4 for the one real (small) finding;
+   none of them let me move the converged answer arbitrarily.
+4. **Steering through the preamble** — the starting trials are free, but with the
+   constants and relations fixed the secant converges to the same root regardless,
+   so a different start changes only the update count, which §7.2 already treats as
+   incidental. Correctly not an attack.
+
+Alive **only** through the coverage gap of §8.1. That is a real distinction and I
+want it on the record: §4.6's mechanism is sound; its applicability is optional.
+
+### 8.4 Three further findings
+
+**(a) `constants` is checked against nothing — and so is every other row of §3.8's
+table.** Choosing `K` freely and running the node's own declared physics to
+convergence gives a fully conforming trace with a different answer every time:
+```
+K=6.619 -> 1.380 m, 3 updates, PASS   <-- gold's own K
+K=8.2   -> 1.521 m, 3 updates, PASS
+K=4.9   -> 1.201 m, 4 updates, PASS
+```
+So the literal answer to your question 3 is: **no, §4.6 does not satisfy §3.8's
+amended form.** But I am not filing that as a defect, and I want to be consistent
+with round 4, where I explicitly declined to file `universe`, `precedences`,
+`tolerance` and `max_elements` for exactly this reason. **`constants` is problem
+data.** Nothing binds any node to its question — §10/D-039 records that — so a
+node-local verifier cannot know that `K` is *this item's* `K`. That is the
+comparator's job under §7, where a candidate is scored against a gold node
+carrying the true constants, and a divergent constant is caught immediately.
+
+The real finding is one level up: **§3.8's amended rule, applied honestly,
+condemns its own table.** `item_measures`, `budget`, `precedences` and `constants`
+are all declared once and checked against nothing — five of the nine rows. The
+rule needs the distinction it currently lacks:
+
+> *Problem data* (declared once, bound to the item by the comparator, not by the
+> node) versus *derived data* (must be recomputed from problem data). §3.8 governs
+> the second absolutely; for the first, "declared once" is the whole requirement,
+> and the check lives in §7.
+
+Add that distinction and a column to the table, and §3.8 becomes auditable instead
+of self-contradicting. The severity gap is worth stating plainly: with a free
+constant the trace is a **correct solve of a different problem**, and §7 catches it;
+with a missing relation (§8.1) the trace is a correct solve of **no** problem, and
+§7.2 grants it full process credit.
+
+**(b) `round(sym, n)` restates a precision that `symbol_precision` already
+declares.** The digit is a free literal inside the relation and nothing requires it
+to match. Changing the residual relation from `round(AR, 3)` to `round(AR, 1)`,
+with `symbol_precision["AR"]` left at 3, produces a conforming trace with a
+different answer:
+```
+residual relation round(AR, 1), symbol_precision[AR]=3 -> 1.383 m, PASS
+```
+Only 0.003 m here, but it is a free knob on the answer, and it is a §3.8
+restatement violation *inside the section that exists to enforce §3.8*. Fix:
+make it `round(sym)` with no second argument, taking the digit from
+`symbol_precision[sym]` — which also removes the question of what a non-integer or
+expression-valued second argument means.
+
+**(c) §4.6's 6.7% figure is not reproducible from the corpus it ships with.**
+Recomputing `AR` from each frame's *stored* (rounded) `A` and `P` — i.e. the
+bind-to-stored reading the section warns against — and comparing to the stored `AR`:
+```
+42 / 169 frames = 24.9%   (§4.6 claims 6.7% over 12,735 frames / 3,000 seeds)
+```
+**The claim's direction is confirmed and its number is not.** Binding to stored
+values genuinely does reject gold traces, so the unrounded-substitution rule is
+right, load-bearing, and well worth the paragraph §4.6 gives it — I implemented it
+from that paragraph and got 80/80 first time. But a reader who checks 6.7% against
+the shipped 40-seed corpus measures 24.9% and concludes the section is wrong. Either
+cite the population explicitly ("6.7% over the 3,000-seed sample; 24.9% on the
+committed 40") or re-measure. This is the same class as §4.5's headroom figure,
+which *did* reproduce exactly (I checked it in round 2) — the difference is that
+§4.5's number is derivable from the artefact and this one is not.
+
+### 8.5 Is the evaluation rule implementable as written?
+
+**Yes, and better than I expected — the ordering discipline is the strongest part
+of §4.6.** "Names resolve to `constants`, to the frame's `iterate` role, or to an
+**earlier** symbol of `frame_relations`" makes cycles and forward references
+*structurally* impossible rather than merely forbidden. I verified all three are
+rejected at parse time, before any evaluation:
+```
+forward reference (AR before A)   -> FAIL ['4.6']
+self reference (A defined via A)  -> FAIL ['4.6']
+undeclared name in a relation     -> FAIL ['4.6']
+```
+There is no recursion-depth question, because the ordering bounds the substitution
+depth by the number of relations. I did not need to guess.
+
+**Five things I did have to decide, none blocking, one sentence each:**
+
+| # | Undefined | What I did |
+|---|---|---|
+| 1 | `sqrt` of a negative | trace failure (§4.3.9) |
+| 2 | division by zero inside a relation | trace failure |
+| 3 | `0 ** -1` and other `**` domain errors | trace failure |
+| 4 | may `round`'s first argument be an *expression*? §4.6 writes `round(x, n)` but every example is a bare symbol | I allow expressions — `round((b + z*y)*y, 3)` parses and passes |
+| 5 | must `round`'s second argument be an integer literal? does `round` use the node's `rounding` mode? | integer required (2.5 fails); mode taken from `rounding`, per §6's blanket rule, which §4.6 does not repeat |
+
+Items 1–3 are the interesting ones: a verifier that let them raise instead of fail
+would crash on a hostile candidate trace, and §6.0 makes candidate traces a
+first-class mode. §4.6 should say they are trace failures.
+
+### 8.6 Recommendation
+
+**One blocking clause** (§8.1's coverage requirement) and **two one-liners**
+(`round(sym)` without the duplicated digit; the 6.7% provenance). Then, not
+blocking but worth doing before the phase closes because it is the thing that keeps
+generating rounds: **give §3.8 the problem-data / derived-data distinction** and
+re-run its audit against both node types. That audit — the one §3.8 prescribes and
+which has still not been run — is exactly what would have caught §8.1 in ten
+minutes, and it is what I would want in place before a third node type is added.
+
+I said after round 4 that a fifth round was not needed, and you were right to
+overrule me: I judged the schema as it stood, and adding a new expression language
+reset that judgement. The mechanism you built is sound — I attacked it four ways
+and it held — but it ships as optional, and optional is how variant 5 comes back.
+Close the coverage gap and I think §4.6 is finished.
+
+*Round 5 filed by Reviewer D2. Written to disk, not committed. New artefact:
+`tests/trace_schema/reviewer_d2_verifier_14.py`.*
