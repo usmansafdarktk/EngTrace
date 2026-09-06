@@ -173,27 +173,46 @@ def _t19_assign(times, CT):
                          "assigned": list(station),
                          "remaining_final": rem})
     return {
+        "schema_version": "1.1",
         "node_type": "decision",
         "node_id": "t19_greedy_station_assignment",
         "cardinality": "answer_bearing",
         "cardinality_symbol": "n",
         "termination": {"kind": "exhaustion",
-                        "quantity": "assigned",
-                        "predicate": "len(assigned) == len(tasks)",
+                        "scope": "cumulative",
+                        "accumulator_symbol": "assigned",
+                        "predicate_prose": ("every task in `universe` has been "
+                                            "assigned to exactly one element"),
                         "universe": list(_T19_ORDER),
+                        # Carried on the node, not left as prose in `rule`:
+                        # without it a verifier cannot check that `eligible`
+                        # withheld a task for the right reason (Reviewer D, F1).
+                        "precedences": {x: list(_T19_PRED[x])
+                                        for x in _T19_ORDER},
                         "max_elements": len(_T19_ORDER),
                         "satisfied": True},
+        # The selection rule as DATA, so §5.3 is checkable rather than trusted.
+        "selection": {"filter": "fits", "criterion": "duration",
+                      "objective": "max", "tie_break": "universe_order"},
         "rule": ("among unassigned tasks whose predecessors are all "
                  "assigned AND whose duration fits the remaining time, "
                  "take the longest; ties by _T19_ORDER position; when "
                  "none fits, close the station"),
+        "rounding": "decimal-half-up",
+        "symbol_precision": {"capacity": 0, "remaining_initial": 0,
+                             "remaining_final": 0, "remaining_after": 0,
+                             "duration": 0, "station_id": 0},
+        "capacity_constant": True,
         "element_symbols": ["station_id", "capacity", "remaining_initial",
                             "trials", "assigned", "remaining_final"],
         "trial_symbols": ["eligible", "chosen", "remaining_after", "closes"],
-        "carry": {"assigned": "union of every element's assigned",
-                  "remaining_initial": "capacity (reset each element)"},
+        "eligible_symbols": ["task", "duration", "fits"],
+        "carry": {},
+        "carry_notes": {"assigned": "union of every element's assigned",
+                        "remaining_initial": "capacity (reset each element)"},
         "elements": elements,
-        "result": {"symbol": "n", "value": len(elements)},
+        "result": {"symbol": "n", "value": len(elements),
+                   "dp": 0, "from": "len(elements)"},
     }
 
 

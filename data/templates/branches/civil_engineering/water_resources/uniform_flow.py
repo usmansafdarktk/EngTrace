@@ -478,25 +478,50 @@ def template_normal_depth_iteration():
     else:
         raise AssertionError("resample loop exhausted")
 
+    # The `iteration` node. Every name an external verifier needs is DECLARED
+    # here rather than inferred: `roles` binds this template's own symbols to
+    # the type-level roles of D3.3 §4, `update_relation` is the recurrence as
+    # data over those roles, and `symbol_precision` gives the display precision
+    # the comparator's tolerance is taken from. Phase 3 Reviewer D showed that
+    # without these a verifier can only be written by hardcoding this
+    # template's symbol names and its secant formula (finding F3).
     trace_nodes = {
+        "schema_version": "1.1",
         "node_type": "iteration",
         "node_id": "t24_secant_normal_depth",
         "cardinality": "incidental",
+        "roles": {"index": "k",
+                  "iterate_prev": "y_prev", "iterate_curr": "y_curr",
+                  "iterate_next": "y_next",
+                  "residual_prev": "g_prev", "residual_curr": "g_curr",
+                  "change": "change", "converged": "converged",
+                  "evaluation": "evaluation"},
+        "update_relation": ("iterate_curr - residual_curr "
+                            "* (iterate_curr - iterate_prev) "
+                            "/ (residual_curr - residual_prev)"),
         "termination": {"kind": "convergence",
-                        "quantity": "y",
-                        "predicate": "abs(y_next - y_curr) < tol",
+                        "quantity_role": "change",
+                        "comparison": "lt",
                         "tolerance": _T24_TOL,
+                        "predicate_prose": "abs(y_next - y_curr) < 0.002",
                         "max_elements": _T24_MAX_UPDATES,
                         "satisfied": True},
+        "rounding": "decimal-half-up",
+        "symbol_precision": {"y_prev": 4, "y_curr": 4, "y_next": 4,
+                             "change": 4, "g_prev": 3, "g_curr": 3,
+                             "y": 4, "A": 3, "P": 3, "AR": 3, "g": 3},
         "preamble_symbols": ["y", "A", "P", "AR", "g"],
+        "evaluation_symbols": ["y", "A", "P", "AR", "g"],
+        "evaluation_roles": {"iterate": "y", "residual": "g"},
         "element_symbols": ["k", "y_prev", "g_prev", "y_curr", "g_curr",
                             "y_next", "change", "converged", "evaluation"],
         "carry": {"y_prev": "y_curr", "g_prev": "g_curr",
                   "y_curr": "y_next", "g_curr": "evaluation.g"},
+        "carry_notes": {},
         "preamble": preamble,
         "elements": elements,
         "result": {"symbol": "yn", "value": round(y_curr, 3),
-                   "unit": "m", "dp": 3},
+                   "unit": "m", "dp": 3, "from": "last.iterate_next"},
     }
 
     yn = trace_nodes["result"]["value"]
