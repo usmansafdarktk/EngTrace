@@ -486,7 +486,7 @@ def template_normal_depth_iteration():
     # without these a verifier can only be written by hardcoding this
     # template's symbol names and its secant formula (finding F3).
     trace_nodes = {
-        "schema_version": "1.1",
+        "schema_version": "1.2",
         "node_type": "iteration",
         "node_id": "t24_secant_normal_depth",
         "cardinality": "incidental",
@@ -510,6 +510,8 @@ def template_normal_depth_iteration():
         "symbol_precision": {"y_prev": 4, "y_curr": 4, "y_next": 4,
                              "change": 4, "g_prev": 3, "g_curr": 3,
                              "y": 4, "A": 3, "P": 3, "AR": 3, "g": 3},
+        "preamble_binding": {"iterate_prev": 0, "residual_prev": 0,
+                             "iterate_curr": 1, "residual_curr": 1},
         "preamble_symbols": ["y", "A", "P", "AR", "g"],
         "evaluation_symbols": ["y", "A", "P", "AR", "g"],
         "evaluation_roles": {"iterate": "y", "residual": "g"},
