@@ -14,7 +14,7 @@ Background for the whole effort is in
 | 01 | **Template structure audit** — can the 150 templates emit structured traces at all, and at what cost? | [`01-template-structure-audit.md`](01-template-structure-audit.md) | ready |
 | 02 | **Phase 1: round-trip integrity** — fix 12 templates whose gold traces do not reproduce their own answers | [`02-phase1-round-trip-integrity.md`](02-phase1-round-trip-integrity.md) | ready |
 | 03 | **Phase 2: determinism and solver-in-the-loop** — 4 templates: seed every generator, delete silent fallbacks, replace `fsolve`/`quad` with stated algorithms | [`03-phase2-determinism.md`](03-phase2-determinism.md) | ready |
-| 04 | **Phase 3: trace shape, iteration and search** — 2 templates whose traces are shaped by iteration; the one phase where the *schema* may be what changes, and where the primary deliverable is a specification | [`04-phase3-trace-shape.md`](04-phase3-trace-shape.md) | ready |
+| 04 | **Phase 3: trace shape, iteration and search** — 2 templates whose traces are shaped by iteration; the one phase where the *schema* may be what changes, and where the primary deliverable is a specification | [`04-phase3-trace-shape.md`](04-phase3-trace-shape.md) | **done** — [`phase3_summary.md`](../re-implementation-sep/phase3_summary.md), spec at [`phase3_node_types.md`](../re-implementation-sep/phase3_node_types.md) v1.5 after five review rounds |
 | 05 | Phase 4: non-numeric verifiable templates (4 templates, no code edits) | not written yet | |
 | 06 | Value-extractor spike — the gate for the whole project (D-002) | not written yet | |
 
