@@ -67,7 +67,8 @@ condemned.
 | `C6H14` | **refitted** to Scott 1974, re-keyed `(l)`→`(g)` | was 125.70 vs 142.60; worst 2.79% |
 | `C6H6`, `C7H8` | re-keyed `(l)`→`(g)` | held gas values; benzene computed 85.3 where NIST *liquid* is 135.69 |
 | `NaCl(s)` | **refitted** to NIST (Reviewer H §5) | 47.70 → 50.40 vs NIST 50.50; worst error 0.19% |
-| `H2SO4(l)`, `CaCO3(s)` | **tagged `[KNOWN-DEFECTIVE]`** (Reviewer H F-1) | checked and failed, −59% and −9%; no citable replacement derivable |
+| `H2SO4(l)` | **species replaced** by `C6H6(l)` benzene (D-033) | was −59% and unsourceable; benzene fitted to four NIST liquid measurements over 293–322 K, worst 0.49% |
+| `CaCO3(s)` | **species replaced** by `Al2O3(s)` corundum (D-033) | was −9% and unsourceable; fitted to the NIST Shomate over 298–1200 K, worst 0.06% |
 
 Coefficients are now written with the exponent attached to each value — `B` as
 `E-3`, `C` as `E-6`, `D` as `E5` — precisely because the source tabulates them
@@ -114,8 +115,8 @@ the equilibrium value and not comparable to this item's model.
 
 | # | Deliverable | Where | Status |
 |---|---|---|---|
-| C2.1 | Three tables re-derived with `[ON-DISK]` citations | `constants.py`, per row | ✅ **54 cited values** (33 Cp + 21 ΔHf); 31 species on disk; 2 tagged `[KNOWN-DEFECTIVE]` |
-| C2.2 | Physical-plausibility test suite | `tests/constants_integrity/test_chemical_thermochemistry.py` | ✅ **209 checks, all passing** |
+| C2.1 | Three tables re-derived with `[ON-DISK]` citations | `constants.py`, per row | ✅ **54 tagged values** (33 Cp + 21 ΔHf) — 50 `[ON-DISK]`, 4 `[DERIVED]`. **No row is known-defective.** |
+| C2.2 | Physical-plausibility test suite | `tests/constants_integrity/test_chemical_thermochemistry.py` | ✅ **215 checks, all passing, zero exclusions** |
 | C2.3 | Before/after impact for the 5 affected templates | §6 | ✅ |
 | C2.4 | Methane/air near the literature value | §4 | ✅ 2311 K vs 2326 K |
 | C2.R | Independent review (Reviewer H) + R4 triage | [`reviews/phaseC2_reviewer_h_thermochemistry.md`](reviews/phaseC2_reviewer_h_thermochemistry.md), §11 | ✅ |
@@ -197,12 +198,24 @@ confirming only the exponent moved: 3 mismatches found, 3 fixed, 0 remaining.
 
 | Item | Status |
 |---|---|
-| `H2SO4(l)`, `CaCO3(s)` | **`[KNOWN-DEFECTIVE]`**, not `[UNVERIFIED]` — Reviewer H F-1. They were checked and they failed (−59%, −9%); no citable replacement could be derived. "We could not check this" and "we checked this and it is wrong" are different claims. |
+| `H2SO4(l)`, `CaCO3(s)` | **resolved by replacement** (D-033) — both were measurably wrong and unsourceable from NIST, so the species were swapped for `C6H6(l)` and `Al2O3(s)`, which NIST covers. Every row is now cited and none is defective. |
 | **validity range** | `CP_PARAMS` is fitted to 1500 K; `adiabatic_flame_temperature` integrates to 2844 K, where Cp errors reach +15%. Declared in `CP_VALID_T_MAX`, reported by the suite, handed to Phase 2 — **D-032** |
 | `NaCl(s)` | **resolved** — refitted to NIST, 50.40 vs 50.50 (was 47.70). Reviewer H was right that calling it "a genuine disagreement" was an assertion without an argument, and that NIST does publish a solid-phase Shomate. |
 | four refitted rows | no longer match a textbook table; residuals 1.1–3.1% |
 | SVN page citations | unobtainable; NIST used instead (§7) |
 | liquid branch | now only `H2O(l)` and `CH3OH(l)`, both verified as genuine liquids |
+
+---
+
+## 10a. Reviewer G — Provenance (second review)
+
+The C2 spec names **one** reviewer (H, domain). At the repo owner's direction a
+**second, differently scoped** review was run: **Reviewer G — Provenance**, from
+the spec's own roster, whose gate is *"is the provenance claim honest and
+complete?"* — not "are the values right", which is H's and which R6.2 forbids
+commissioning twice.
+
+Report: [`reviews/phaseC2_reviewer_g_provenance.md`](reviews/phaseC2_reviewer_g_provenance.md).
 
 ---
 
