@@ -1161,6 +1161,116 @@ licenses 1500 K. One point licensing a 1200 K extrapolation. The range is the
 every run rather than letting the ceiling pass as verified.
 
 
+## D-036 — D-032 resolved: split the heat-capacity table by consumer
+
+**Date:** 2026-09-06 · **Status:** DECIDED · **Source:** Phase 2, resolving the
+trade Phase C2 handed on (D-032, Reviewer H finding F-2)
+
+Phase C2 found that `CP_PARAMS` is fitted to 1500 K while
+`template_adiabatic_flame_temperature` integrates to **2844 K**, and declined to
+decide the fix: it is a trade between two consuming templates, and C2 did not
+own either of them. Phase 2 owns both. Decided here.
+
+**The cost of the extrapolation, measured.** Solving the same energy balance
+with the repo's polynomial against a direct NIST Shomate solve:
+
+| fuel | `CP_PARAMS` | NIST | error |
+|---|---:|---:|---:|
+| Methane | 2311.2 | 2327.2 | −16.0 |
+| Acetylene | 2843.8 | 2908.6 | **−64.7** |
+| Carbon monoxide | 2623.2 | 2663.9 | −40.7 |
+| Ammonia | 2101.5 | 2106.8 | −5.3 |
+
+Every flame temperature was low, by 0.2% to 2.2%. The reference for methane/air
+with no dissociation is **2326.35 K**; the repo computed 2311 K.
+
+**The three options, and why two fail.**
+
+1. **Restrict the sampled range** — *not available*. The flame temperature is an
+   **output**, not a sampled input. There is no knob to turn. This is worth
+   stating because "restrict the range" is the standard answer to an
+   extrapolation problem and it simply does not apply here.
+2. **Refit `CP_PARAMS` wide** — fixes this template and **damages the other
+   consumer**. `template_sensible_heat_temp_dependent_cp` lives at 298–1000 K,
+   where a 298–3000 K fit is materially worse: CO₂'s residual goes from −0.4%
+   to −5.4% at 298 K. Trading a correct template for a broken one is not a fix.
+3. **Split the table by consumer** — chosen.
+
+**What was added.** `CP_PARAMS_COMBUSTION`: the same Smith–Van Ness functional
+form, least-squares refitted to NIST Shomate Cp over 298–3000 K (400 points),
+for the four combustion products only — CO₂, H₂O, N₂, O₂. Read **only** by the
+flame template. `CP_PARAMS` is byte-identical to before, so
+`sensible_heat_temp_dependent_cp` is untouched and cannot regress.
+
+**Result.** All eleven reactions now agree with a direct NIST Shomate solve to
+within **1.9 K** (was 5–65 K low). Methane computes **2327 K** against the
+2326.35 K reference — **0.03%**.
+
+**The cost, stated.** The wide-range fit is worse at the low end: CO₂ −5.4% at
+298 K, O₂ −3.6%. That is the price of the wide range and it is why this is a
+*second* table rather than a replacement. It is acceptable here because the
+flame integral has almost none of its mass near 298 K — above 1000 K the worst
+residual is 1.3% — and the eleven flame temperatures landing within 1.9 K of
+NIST is the direct evidence that it does not matter.
+
+**Two tables for four species is a real cost.** A future editor can change one
+and not the other. `CP_PARAMS_COMBUSTION` carries a header saying exactly why it
+exists and who reads it, and the C2.2 suite checks the flame template stays
+inside `CP_COMBUSTION_VALID_T_MAX`. The alternative — one table serving two
+consumers with incompatible requirements — is what produced this defect.
+
+**A near miss worth recording.** My first attempt at the evidence above
+integrated a *single* Shomate range across a span covering several, and reported
+methane at **2191 K** — which would have said the extrapolation made the answer
+*better*, and that the honest fix was to leave it alone. The error surfaced only
+because Reviewer H had independently derived 2327.2 K in Phase C2 and the
+numbers disagreed. NIST publishes the sensible enthalpy in closed form
+(`H(T) − H(298.15) = A·t + B·t²/2 + C·t³/3 + D·t⁴/4 − E/t + F − H`, with `F` and
+`H` calibrated per range); using it removes the piecewise-continuity trap
+entirely. **A decision is only as good as the script behind it, and that script
+had no independent check until a prior phase's reviewer supplied one.**
+
+
+## D-037 — Display ties can be removed by construction, not only by resampling
+
+**Date:** 2026-09-06 · **Status:** DECIDED · **Source:** Phase 2,
+`template_levenspiel_plot_interpretation`
+
+D-016 established that a half-way display tie is **removed, not resolved** — at
+a tie no rounding convention closes in both directions, so the instance is
+rejected. Phase 1 implemented that as a bounded resample loop, and it worked
+there because ties were rare.
+
+It does not work here. Levenspiel's trapezoid terms are built from a table
+quoted to 2 dp, and the average height `(y_i + y_i+1)/2` of two 2-dp values
+lands on a **half-cent whenever the sum is odd in its last digit** — by
+construction, 50% of intervals. With 6–9 intervals per instance, **99.53% of
+instances carry at least one tie** (measured, 3000 seeds). There is nothing left
+to resample to.
+
+**The tie was an artefact of the display, not of the data.** A half-sum of two
+2-dp values is *exact* in 3 dp; that times a 2-dp interval width is *exact* in
+5 dp. Printing them at 2 dp and 3 dp was throwing away digits that existed, and
+then rounding what remained. Displaying at the precision the values actually
+have means **nothing rounds, so no tie can arise** — the tie is removed, as
+D-016 requires, but by construction rather than by rejection.
+
+Evidence: the template now reports **zero T1 marginals**, where it previously
+carried them on 38% of lines.
+
+**The general rule this adds to D-016.** Before resampling a display tie, ask
+whether the quantity is *exactly representable* at a slightly longer display. If
+it is, lengthen the display: it removes the tie with no rejection, no change to
+the sampled distribution, and no loss of information. Resampling is for
+quantities that are genuinely irrational at any finite precision — a square
+root, a logarithm, a ratio — where no display makes the rounding go away.
+
+**P6 cost, accepted.** The trace prints `0.09 × 4.250 = 0.38250` where it used
+to print `0.09 × 4.25 = 0.383`. Marginally heavier to read; exactly right
+instead of approximately right, and a reader who checks the arithmetic now finds
+it closes.
+
+
 ## Open decisions
 
 | # | Decision | Needed before |
