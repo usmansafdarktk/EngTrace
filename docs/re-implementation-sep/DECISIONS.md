@@ -1535,6 +1535,69 @@ places" — true in general, false as stated (a denominator of the form 2^a·5^b
 does terminate), and it would not have survived a reviewer with a calculator. The
 justification is now the measured population figure above.
 
+---
+
+## D-045 — A display-tie screen rejects the TERMINATING pre-images, so it clusters rather than scatters
+
+**Date:** 2026-09-06 · **Status:** DECIDED · **Source:** Phase 3 Reviewer B,
+findings F-B1 and F-B2 (F-B2 convergent with the implementer's own measurement)
+
+D-016 removes an instance that lands exactly on a half-way display boundary,
+because at such a tie no rounding convention closes in both directions. The
+natural mental picture is that such instances are *arithmetic accidents*,
+scattered thinly across the parameter space. **For a quantity built by division,
+that picture is wrong, and the error is systematic rather than random.**
+
+A value can land exactly on a half-way boundary at *k* decimal places only if it
+**terminates** at *k+1* places. So a tie screen does not sample the parameter
+space uniformly — it selects, with probability zero elsewhere, precisely those
+pre-images that make the quotient terminating.
+
+**Measured, and it is stark.** `template_normal_depth_iteration` screens
+`K = Q·n/√S`, with `S` on a 4-dp grid over `[0.0008, 0.003]`:
+
+| | rejections | distinct slopes |
+|---|---|---|
+| the `K` screen | 709 in 60,000 draws | **1** — every one at `S = 0.0016` |
+| the secant-update screen | 579 in 60,000 draws | 23, spread over the whole window |
+
+`S = 0.0016` is the only value on that grid whose square root is exactly
+representable at 5 dp (`0.04`), so `K` reduces to `25·Q·n`, which terminates;
+everywhere else `K` is a quotient by a non-terminating root and a tie is
+unreachable. The screen removes **25.4% of the instances at that one slope** and
+none anywhere else, depleting it from 4.83% of the pool to 3.50%.
+
+*(Note that `√0.0009 = 0.03` is also exact, yet produces no rejections: dividing
+by `0.03` multiplies by `100/3` and reintroduces a factor of three, so the
+quotient does not terminate. Exact-square-root is necessary, not sufficient.)*
+
+The industrial template shows the same mechanism from the other side: all 913
+rejections of its balance-delay screen have `n·CT` divisible by 8, and 85.5% have
+`n = 4`, because `n = 4` supplies two extra powers of two and so makes the
+percentage terminate more often.
+
+**Why this is worth a decision entry rather than a footnote.** The Phase 3
+item-pool note first described the civil rejections as "scattered", supported by
+min/median/max over `Q`, `b` and `S` that did span the full box. That measurement
+was taken on the **combined** rejection set, where the update screen's genuine
+spread across 23 slopes masks the `K` screen's concentration on one. Aggregate
+scatter statistics over a union of screens cannot see a single-valued component.
+**Decompose a rejection set by screen before claiming it is scattered.**
+
+**Disposition here: accepted, not fixed.** `S = 0.0016` is not an
+engineering-distinguished slope — not a steep/mild boundary, not a Froude
+threshold — so no class of channel disappears and nothing the item tests changes;
+branch movement is 0.10 points against a 5-point tolerance. The alternatives are
+worse: excluding `0.0016` from the grid removes a legitimate slope entirely
+rather than a quarter of it, and lengthening the display is ruled out by D-044.
+
+**The general rule.** When a display-tie screen guards a quotient, expect the
+rejections to concentrate on the divisors that make it terminate, and **check
+whether the concentrated parameter is answer-bearing**. Here it is not. On a
+template where it were — a screen that removed a quarter of one material, one
+support condition, or one flow regime — the same mechanism would be a P6 breach
+wearing the costume of an arithmetic clean-up.
+
 ## Open decisions
 
 | # | Decision | Needed before |

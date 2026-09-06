@@ -5,7 +5,7 @@
 **Date:** 2026-09-06
 **Companions:** [`phase3_node_types.md`](phase3_node_types.md) (D3.3, the primary
 deliverable) · [`phase3_item_pool_impact.md`](phase3_item_pool_impact.md) (D3.5)
-· [`DECISIONS.md`](DECISIONS.md) D-038 – D-043 ·
+· [`DECISIONS.md`](DECISIONS.md) D-038 – D-044 ·
 [`reviews/`](reviews/) phase3_reviewer_b_pedagogy, phase3_reviewer_d_schema
 
 ---
@@ -215,9 +215,12 @@ one reading FAIL. **Any phase that sizes a display-tie fix by counting T1
 failures will under-fix by an order of magnitude.** That generalises beyond these
 two templates and is the most transferable thing this phase found.
 
-D-037's cheap escape was tested before resampling and does not apply: `K` is a
-quotient by a 5-dp square root and the update divides by a difference of 3-dp
-residuals, so neither is exactly representable at any longer display.
+D-037's cheap escape was tested before resampling and does not apply — `K`
+terminates at its 3-dp display on only 10.9% of instances and at 6 dp on 12.9%,
+so rounding persists at any length and the ties would relocate rather than
+vanish. Establishing that properly produced **D-044**: D-037's test must be read
+as *exact for every instance*, never *exact for the tie instances*, since the
+latter is circular and always answers yes.
 
 ---
 
@@ -326,7 +329,8 @@ could be moved by the same mechanism.
 
 ## 8. Errors I made in this phase
 
-Every phase so far has recorded at least one. This one has three.
+Every phase so far has recorded at least one. This one has five, and the
+fifth is a process error rather than a numerical one.
 
 1. **A 2× transcription slip in a docstring I wrote.** The civil template's new
    docstring cited the update-count distribution `{1: 16, 2: 163, 3: 1182, ...}`
@@ -345,10 +349,38 @@ Every phase so far has recorded at least one. This one has three.
    the secant step gives `1.37855…`; it gives `1.378646…`. Same cause, same
    catch. Both corrected before the reviewers were dispatched.
 
+4. **A justification that was true in spirit and false as written.** Both
+   templates' resample-screen comments said the quantity "does not terminate at
+   any fixed number of places". A denominator of the form 2^a·5^b does terminate,
+   so the claim is false as stated and would not have survived a reviewer with a
+   calculator. Caught by going back to check it before the reviewers did.
+   Measuring it properly (D-044) turned up something better than a fix: the
+   *naive* reading of D-037 is itself a trap, because a value on a half-way
+   boundary at *k* places is by definition exact at *k+1* places, so "can I
+   lengthen the display?" always answers yes and always relocates the tie
+   population rather than removing it. The decision was right; only the reason
+   was wrong, and the corrected reason generalises.
+
+5. **I moved the branch under a reviewer, having been warned not to.** The brief
+   for this phase says explicitly: *"Give each reviewer a frozen ref — a commit
+   SHA, not a branch name"*, because in Phase C2 a branch moved under a reviewer
+   and roughly a quarter of that review was wasted on stale findings. I did give
+   both reviewers a SHA — and then committed D-044 to the same branch while they
+   were still working. Reviewer B caught it as its **first** action, diffed
+   `953adc9` against the working tree before trusting a single number, and
+   established that both drifts were comment-only so its measurements held.
+   Nothing was lost, and only because the reviewer was more careful than the
+   implementer. The rule I had internalised was "hand out a SHA"; the rule that
+   matters is **"do not commit to a branch a review is in flight against"** — a
+   frozen ref is a promise about the repository, not a string in a brief. Round 2
+   was dispatched against `9398ccc` with no commits made until it filed.
+
 The pattern in 2 and 3: **a document that quotes a computed artefact must be
 checked against that artefact by machine.** Re-reading finds neither. That check
 is four lines and should be standard for any deliverable that embeds generated
-data.
+data. The pattern in 4 is different and worth separating: **a justification that
+is qualitatively right can be quantitatively false**, and the way to find out is
+to measure the thing you asserted rather than to re-read the sentence.
 
 ---
 
@@ -363,7 +395,9 @@ data.
 | R3-5 | The corpus-wide sweep Phase 2 Reviewer A recommended — templates combining a transcendental with a fixed-decimal print — was **not** run. `normal_depth` is exactly that shape and was fixed; the other candidates were not looked for. | medium | BACKLOG, carried from Phase 2 §11 |
 | R3-6 | Phase 2 Reviewer C's corpus-wide regex for `\{[a-z_]+ *[-+*/] *[0-9.]+\}` in f-strings was applied to these two templates only. | low–medium | BACKLOG, carried from Phase 2 §12 |
 | R3-7 | Two rounding conventions still coexist corpus-wide (`_hu` decimal half-up vs `_as_printed` binary). | medium | BACKLOG, carried from Phase 2 §11 |
-| R3-8 | §6.8 of the node spec (prose/node agreement) is specified but not implemented — vacuous by construction today. | low | Recorded in the spec's §10 |
+| R3-8 | Prose/node agreement is specified as a non-goal, not a check — vacuous by construction today because the prose is rendered from the node, and a real gap the day a template stops doing that. | low | Recorded in the spec's §10 |
+| R3-9 | A solver who solves the civil item **directly** rather than by the prescribed secant gets a different gold answer on ~3.7% of instances (always by 0.001 m). Pre-existing on `master`, surfaced by Phase 3's Step 4 change. D3.4 §7.4 now says the comparator must accept within the method's own tolerance, but no extractor enforces it yet. | medium | Reviewer B F-B3; ADOPT-NOW in the spec, enforcement deferred to the extractor spike |
+| R3-10 | Both display-tie screens reject **clustered**, not scattered, instances — the civil one at a single slope value. Immaterial here (0.10 and 0.22 pts of branch movement) but the mechanism is general. | low–medium | Reviewer B F-B1/F-B2; recorded as **D-045** |
 
 ---
 
@@ -392,7 +426,76 @@ does (R4).*
 
 ## 12. R4 triage — Reviewer B (pedagogy)
 
-*Pending — see §11.*
+[`reviews/phase3_reviewer_b_pedagogy.md`](reviews/phase3_reviewer_b_pedagogy.md).
+**PASS WITH FINDINGS.** Five findings, all closed.
+
+### 12.1 The gate question, answered
+
+**Is `line_balancing_heuristic` a lookup?** No, and B settled it with a number I
+had not measured and deliberately did not commission from myself:
+
+| Predictor of `n` from the question text alone | Accuracy, 8,000 seeds |
+|---|---|
+| `n = N_min = ceil(Σt/CT)` — the trivially computable bound | 58.33% |
+| `n = 3` — best blind constant | 53.05% |
+| `n = max(N_min, 3)` — **best rule B could find** | **64.97%** |
+| per-`N_min` majority vote — the ceiling of any `N_min`-based rule | 65.55% |
+
+So the best shortcut buys **~12 points over guessing**, and the greedy rule must
+actually be executed on at least 35% of instances. The structure behind it is
+that `N_min` determines `n` only in its tails (`N_min = 2 → n = 3`, 277/277;
+`N_min = 4 → n = 4`, 497/497), while **81% of the pool sits at `N_min = 3`, where
+the split is 1848/1378 — a 57/43 coin.** B also searched exhaustively over
+`n = N_min + [cheap predicate]` for all 15 constructible predicates; nothing beat
+65.0%.
+
+Master measures 58.27% / 64.84% on the same seed span, against the branch's
+58.33% / 64.97%. **Phase 3 did not make this item more guessable.**
+
+This is the single most valuable thing either review produced, because it
+converts the D3.1 argument for `line_balancing` from a structural claim into a
+measured one.
+
+### 12.2 Findings
+
+| # | Finding | Disposition | Action |
+|---|---|---|---|
+| **F-B1** | **CONFIRMED.** The civil `K` display-tie screen is **single-valued in slope**: all 718 rejections in 60,000 draws sit at `S = 0.0016` exactly, because it is the only 4-dp grid value in the window whose square root is exact at 5 dp (`0.04`), making `K = 25·Q·n` terminating and a 3-dp tie reachable at all. It depletes that slope 4.83% → 3.50%, ~28% relative. | **ACCEPTED — and it corrects a claim of mine** | Reproduced exactly: 709 K-rejections in 60,000, **1 distinct slope**, 25.4% of that slope removed, against 23 distinct slopes for the update screen. My item-pool note §2.4 said the rejections were "scattered", measured on the **combined** rejection set where the update screen's spread masks the K screen's concentration. Corrected there, recorded in the docstring, and generalised as **D-045** |
+| **F-B2** | **CONFIRMED.** The industrial screen is also clustered: 913/913 rejections have `n·CT` divisible by 8, and 85.5% have `n = 4` against 46.6% in the pool. Net effect 0.23 pp. | **ACCEPTED (convergent)** | I had found this independently and recorded it in `phase3_item_pool_impact.md` §3.4 before the review landed — 22/26 = 84.6% against B's 85.5%. **Two different questions reaching the same number is the kind of convergence R6.2 exists to produce**; B derived it from `n·CT` divisibility, I from the tie census |
+| **F-B3** | **PLAUSIBLE.** The new Step 4 sentence makes a pre-existing precision mismatch legible: the item converges to ±2 mm but reports `yn` to 3 dp, so a solver who solves Manning's equation **directly** rather than by the prescribed secant gets a different gold answer on ~3% of instances, always by exactly 0.001 m. | **ACCEPTED as real; NOT a Phase 3 regression; comparator fix ADOPT-NOW, question-text fix BACKLOG** | Verified on **both trees**, which is the claim that decides the disposition: master **3.70%**, branch **3.65%** — statistically identical, so Phase 3 surfaced it and did not cause it. (B reports 3.08% from a differently-filtered probe; the divergence is in the accepted-instance filter, not the phenomenon.) The real fix belongs in D3.4, not the template: see §12.3 |
+| **F-B4** | **PLAUSIBLE.** Step 3 now discloses the update count before the trace, removing a little "have I finished?" work. | **ACCEPTED as a deliberate trade, recorded** | It is not an answer leak — the count is incidental (§3) — and the sentence exists to make exactly the point that the stopping rule is a tolerance and not a recipe. But B is right that it is the one change pointing toward "easier", and it was not recorded as a trade before B named it. Recorded now rather than argued away |
+| **F-B5** | No finding on engineering content: both items remain faithful to Sturm Ch. 4 and Nahmias §9.10, both correctly Advanced. | **RECORDED (favourable)** | This is the P6 gate itself, and it is the section that makes the verdict mean something |
+
+### 12.3 F-B3's disposition, in full
+
+B offers two fixes: state in the question that the answer is the depth *the
+scheme returns*, or tighten the convergence tolerance to 0.0005 m so the secant
+result and the true root agree at 3 dp.
+
+**Both are rejected for this phase, and a third is adopted.** The first rewrites
+the question text on 100% of instances to resolve a 3% grading ambiguity, in a
+phase scoped to trace shape; the second changes the item's stated tolerance,
+which is a P6 change to what the item asks for. Neither is a trace-shape fix.
+
+The defect is really in the **comparator**, which is this phase's own deliverable:
+when a question *prescribes a method*, the gold answer is that method's output,
+and the answer tolerance must be the looser of the display tolerance and the
+method's own convergence tolerance. Marking a direct solver wrong for 0.001 m is
+the same error as marking a four-update solver wrong for using four updates —
+§7.2 already refuses the second and should refuse the first. **Added to D3.4**
+(`phase3_node_types.md` §7.4) and carried on the risk register as **R3-9**, since
+the extractor that will enforce it does not exist yet.
+
+### 12.4 What B bought, and what it cost me
+
+B ran the one measurement I could not run for myself without answering my own
+gate question, and it ran it six ways plus an exhaustive predicate search before
+concluding. It also **checked the ref for drift before trusting a single number**
+— and found drift, because I committed D-044 while the review was in flight
+(§8.5). Both drifts were comment-only and B verified that before proceeding, so
+nothing was wasted; but a reviewer who had not checked would have been silently
+reviewing something else, which is the exact failure the frozen-ref rule exists
+to prevent and which I reintroduced by hand.
 
 ---
 
