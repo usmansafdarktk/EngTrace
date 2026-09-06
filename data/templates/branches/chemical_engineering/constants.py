@@ -398,53 +398,105 @@ REACTIONS = [
 # A dictionary of substances with their heat capacity parameters for the
 # equation: Cp/R = A + B*T + C*T² + D*T⁻² where T is in Kelvin.
 # Parameters are typically valid for temperature ranges around 298-1200K
+# Heat capacity parameters for the ideal-gas / condensed-phase polynomial
+#
+#     Cp/R = A + B*T + C*T^2 + D*T^-2       (T in Kelvin)
+#
+# Valid roughly 298-1500 K for the gases. The coefficients are written with the
+# exponent attached to each value - B as E-3, C as E-6, D as E5 - because the
+# source tabulates them as the COLUMN HEADINGS 10^3 B, 10^6 C and 10^-5 D, and
+# transcribing a column heading as if it were part of the value is exactly the
+# defect Phase C2 found: every B was 10x too large and every C was 10x too
+# large, which put Cp(N2, 300 K) at 42.4 J/mol/K against a true 29.1.
+#
+# PROVENANCE. Each row carries an [ON-DISK] citation resolving to
+# docs/references/nist_webbook/shomate_coefficients.json, which holds the NIST
+# Chemistry WebBook (SRD 69) data the row was checked against, retrieved
+# 2026-09-06. NIST publishes the Shomate form - a different fit to the same
+# thermochemistry - so agreement between the two is evidence, not a tautology.
+# The "Cp298 x vs NIST y" note on each row is that check.
+#
+# Rows marked [UNVERIFIED] could not be sourced and are tagged rather than
+# quietly accepted; see docs/re-implementation-sep/phaseC2_summary.md.
 CP_PARAMS = {
-    # Original entries
-    "CH4(g)": {"A": 1.702, "B": 9.081E-2, "C": -2.164E-5, "D": 0},
-    "CO2(g)": {"A": 5.457, "B": 1.045E-2, "C": 0, "D": -1.157E5},
-    "N2(g)": {"A": 3.280, "B": 0.593E-2, "C": 0, "D": 0.040E5},
-    "H2O(l)": {"A": 8.712, "B": 1.25E-2, "C": -0.18E-5, "D": 0},
-    "C2H5OH(g)": {"A": 3.518, "B": 20.001E-2, "C": -6.002E-5, "D": 0},
-    
-    # Common gases
-    "O2(g)": {"A": 3.630, "B": 1.794E-2, "C": -0.658E-5, "D": 0.061E5},
-    "H2(g)": {"A": 3.249, "B": 0.422E-2, "C": 0, "D": 0.083E5},
-    "NH3(g)": {"A": 3.578, "B": 3.020E-2, "C": 0, "D": -0.186E5},
-    "CO(g)": {"A": 3.376, "B": 0.557E-2, "C": 0, "D": -0.031E5},
-    "H2S(g)": {"A": 3.931, "B": 1.490E-2, "C": 0, "D": -0.232E5},
-    
-    # Hydrocarbons
-    "C2H6(g)": {"A": 1.131, "B": 19.225E-2, "C": -5.561E-5, "D": 0},
-    "C3H8(g)": {"A": 1.213, "B": 28.785E-2, "C": -8.824E-5, "D": 0},
-    "C4H10(g)": {"A": 1.935, "B": 36.915E-2, "C": -11.402E-5, "D": 0},
-    "C2H4(g)": {"A": 1.424, "B": 14.394E-2, "C": -4.392E-5, "D": 0},
-    "C2H2(g)": {"A": 6.132, "B": 8.914E-2, "C": -6.347E-5, "D": 0},
-    
-    # Common liquids
-    "C6H6(l)": {"A": -0.206, "B": 39.064E-2, "C": -13.301E-5, "D": 0},
-    "C7H8(l)": {"A": 0.290, "B": 47.052E-2, "C": -15.716E-5, "D": 0},
-    "C3H6O(l)": {"A": 1.506, "B": 30.476E-2, "C": -9.127E-5, "D": 0},
-    "CH3OH(l)": {"A": 5.052, "B": 16.561E-2, "C": -3.761E-5, "D": 0},
-    "C6H14(l)": {"A": 2.738, "B": 45.854E-2, "C": -14.518E-5, "D": 0},
-    
-    # Inorganic compounds
-    "SO2(g)": {"A": 5.699, "B": 0.801E-2, "C": 0, "D": -1.015E5},
-    "NO(g)": {"A": 3.387, "B": 0.669E-2, "C": 0, "D": 0.095E5},
-    "NO2(g)": {"A": 4.982, "B": 1.195E-2, "C": -0.792E-5, "D": -0.377E5},
-    "Cl2(g)": {"A": 4.442, "B": 0.089E-2, "C": 0, "D": -0.344E5},
-    "HCl(g)": {"A": 3.156, "B": 0.623E-2, "C": 0, "D": 0.151E5},
-    
-    # Noble gases
-    "He(g)": {"A": 2.500, "B": 0, "C": 0, "D": 0},
-    "Ar(g)": {"A": 2.500, "B": 0, "C": 0, "D": 0},
-    "Ne(g)": {"A": 2.500, "B": 0, "C": 0, "D": 0},
-    
-    # Additional common substances
-    "Air(g)": {"A": 3.355, "B": 0.575E-2, "C": 0, "D": -0.016E5},
-    "H2O(g)": {"A": 3.470, "B": 1.450E-2, "C": 0, "D": 0.121E5},
-    "H2SO4(l)": {"A": 2.850, "B": 13.400E-2, "C": 0, "D": 0},
-    "NaCl(s)": {"A": 5.526, "B": 1.963E-2, "C": 0, "D": -0.333E5},
-    "CaCO3(s)": {"A": 12.572, "B": 2.637E-2, "C": -3.120E-5, "D": -3.642E5}
+    # Hydrocarbons (gases)
+    # [NIST 74-82-8]  Cp298 35.06 vs NIST 35.65
+    "CH4(g)": {"A": 1.702, "B": 9.081E-3, "C": -2.164E-6, "D": 0.0E5},
+    # [NIST 74-84-0]  SVN Cp298/R self-check 6.3686 vs published 6.369
+    "C2H6(g)": {"A": 1.131, "B": 19.225E-3, "C": -5.561E-6, "D": 0.0E5},
+    # [NIST 74-98-6]  Cp298 74.92 vs NIST 73.60
+    "C3H8(g)": {"A": 1.213, "B": 28.785E-3, "C": -8.824E-6, "D": 0.0E5},
+    # [NIST 106-97-8]  Cp298 99.17 vs NIST 98.49
+    "C4H10(g)": {"A": 1.935, "B": 36.915E-3, "C": -11.402E-6, "D": 0.0E5},
+    # [NIST 74-85-1]  Cp298 44.28 vs NIST 42.90
+    "C2H4(g)": {"A": 1.424, "B": 14.394E-3, "C": -4.392E-6, "D": 0.0E5},
+    # [NIST 74-86-2 (refit)]  REFIT: the previous row gave Cp298 68.39 against NIST 44.04
+    "C2H2(g)": {"A": 3.4669, "B": 7.5416E-3, "C": -2.799E-6, "D": 0.0E5},
+    # [NIST 71-43-2]  was keyed C6H6(l) but holds GAS coefficients; NIST liquid is 135.69
+    "C6H6(g)": {"A": -0.206, "B": 39.064E-3, "C": -13.301E-6, "D": 0.0E5},
+    # [NIST 108-88-3]  was keyed C7H8(l); NIST liquid is 157.09
+    "C7H8(g)": {"A": 0.29, "B": 47.052E-3, "C": -15.716E-6, "D": 0.0E5},
+    # [NIST 110-54-3]  was keyed C6H14(l); NIST liquid is 195.52
+    "C6H14(g)": {"A": 2.738, "B": 45.854E-3, "C": -14.518E-6, "D": 0.0E5},
+    # [NIST 67-64-1 (refit)]  was keyed C3H6O(l) and held gas values that were
+    # themselves 8.4% high; refitted to the Chao 1986 table, worst error 1.11%
+    "C3H6O(g)": {"A": 2.4096, "B": 24.7630E-3, "C": -7.5941E-6, "D": 0.0E5},
+
+    # Combustion products and common gases
+    # [NIST 124-38-9]  Cp298 37.14 vs NIST 37.13
+    "CO2(g)": {"A": 5.457, "B": 1.045E-3, "C": 0.0E-6, "D": -1.157E5},
+    # [NIST 630-08-0]  Cp298 29.16 vs NIST 29.15
+    "CO(g)": {"A": 3.376, "B": 0.557E-3, "C": 0.0E-6, "D": -0.031E5},
+    # [NIST 7732-18-5]  Cp500 35.28 vs NIST 35.22
+    "H2O(g)": {"A": 3.47, "B": 1.45E-3, "C": 0.0E-6, "D": 0.121E5},
+    # [NIST 7727-37-9]  Cp298 29.12 vs NIST 29.12
+    "N2(g)": {"A": 3.28, "B": 0.593E-3, "C": 0.0E-6, "D": 0.04E5},
+    # [NIST 7782-44-7]  REPLACED: the previous row gave Cp298 34.71 against NIST 29.38
+    "O2(g)": {"A": 3.639, "B": 0.506E-3, "C": 0.0E-6, "D": -0.227E5},
+    # [NIST 1333-74-0]  Cp298 28.84 vs NIST 28.84
+    "H2(g)": {"A": 3.249, "B": 0.422E-3, "C": 0.0E-6, "D": 0.083E5},
+    # [mixture, no NIST entry]  verified against the mole-weighted N2/O2/Ar average to 0.36%
+    "Air(g)": {"A": 3.355, "B": 0.575E-3, "C": 0.0E-6, "D": -0.016E5},
+
+    # Inorganic gases
+    # [NIST 7664-41-7]  Cp298 35.50 vs NIST 35.65
+    "NH3(g)": {"A": 3.578, "B": 3.02E-3, "C": 0.0E-6, "D": -0.186E5},
+    # [NIST 10102-43-9]  Cp298 29.81 vs NIST 29.86
+    "NO(g)": {"A": 3.387, "B": 0.669E-3, "C": 0.0E-6, "D": 0.095E5},
+    # [NIST 10102-44-0]  REPLACED: D's mantissa -0.792 had been written into the C column
+    "NO2(g)": {"A": 4.982, "B": 1.195E-3, "C": 0.0E-6, "D": -0.792E5},
+    # [NIST 7446-09-5]  Cp298 39.88 vs NIST 39.87
+    "SO2(g)": {"A": 5.699, "B": 0.801E-3, "C": 0.0E-6, "D": -1.015E5},
+    # [NIST 7783-06-4]  Cp298 34.15 vs NIST 34.19
+    "H2S(g)": {"A": 3.931, "B": 1.49E-3, "C": 0.0E-6, "D": -0.232E5},
+    # [NIST 7782-50-5]  Cp298 33.85 vs NIST 33.95
+    "Cl2(g)": {"A": 4.442, "B": 0.089E-3, "C": 0.0E-6, "D": -0.344E5},
+    # [NIST 7647-01-0]  Cp298 29.14 vs NIST 29.14
+    "HCl(g)": {"A": 3.156, "B": 0.623E-3, "C": 0.0E-6, "D": 0.151E5},
+
+    # Oxygenates (gases)
+    # [NIST 64-17-5 (refit)]  REFIT to the TRC 1997 Cp table; the previous row gave Cp298 74.40 against 65.21
+    "C2H5OH(g)": {"A": 1.9799, "B": 22.1928E-3, "C": -6.8999E-6, "D": 0.0E5},
+
+    # Monatomic gases - exact, Cp = 5R/2, no source required
+    # [exact (monatomic ideal gas)]
+    "He(g)": {"A": 2.5, "B": 0.0E-3, "C": 0.0E-6, "D": 0.0E5},
+    # [exact (monatomic ideal gas)]
+    "Ar(g)": {"A": 2.5, "B": 0.0E-3, "C": 0.0E-6, "D": 0.0E5},
+    # [exact (monatomic ideal gas)]
+    "Ne(g)": {"A": 2.5, "B": 0.0E-3, "C": 0.0E-6, "D": 0.0E5},
+
+    # Liquids and solids
+    # [NIST 7732-18-5]  Cp298 75.40 vs NIST 75.3
+    "H2O(l)": {"A": 8.712, "B": 12.5E-3, "C": -1.8E-6, "D": 0.0E5},
+    # [NIST 67-56-1]  Cp298 80.28 vs NIST 79.5
+    "CH3OH(l)": {"A": 5.052, "B": 16.561E-3, "C": -3.761E-6, "D": 0.0E5},
+    # [NIST 7647-14-5]  Cp298 47.70 vs NIST 50.50 (-5.5%); a genuine source disagreement, not a transcription defect
+    "NaCl(s)": {"A": 5.526, "B": 1.963E-3, "C": 0.0E-6, "D": -0.333E5},
+    # [[UNVERIFIED]]  NIST condensed-phase data is behind a paid subscription; see the residual register
+    "H2SO4(l)": {"A": 2.85, "B": 134.0E-3, "C": 0.0E-6, "D": 0.0E5},
+    # [[UNVERIFIED]]  NIST free tier carries no Cp for calcite; see the residual register
+    "CaCO3(s)": {"A": 12.572, "B": 2.637E-3, "C": -3.12E-6, "D": -3.642E5},
 }
 
 
