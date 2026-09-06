@@ -776,28 +776,90 @@ rather than enumerate rules.
 
 Phase 4 is the four non-numeric verifiable templates, and the spec is explicit
 that they **must not be redesigned**: the schema adapts, not the items. Phase 3
-is the precedent for that, and hands over three things.
+is the precedent for that, and hands over five things.
 
-1. **The node model, and the axis it turns on.** Phase 4's templates have zero
-   numeric content and are verified by a non-arithmetic comparator. The question
-   to ask of each is the D-038 question in its general form: *what property of
-   the trace is answer-bearing, and what is incidental?* For an iteration it is
-   the count; for a classification item it will be something else. The
-   `incidental` / `answer_bearing` split is the reusable part, not the two
-   concrete node types.
-2. **A warning about the comparator.** D3.4 §7 specifies two dispositions for two
-   node types. Phase 4 adds a third kind of item, and the temptation will be to
-   reuse whichever existing disposition is closest. This phase's central finding
-   is that doing exactly that — merging two node types because they look alike —
-   produces a verifier that is wrong on one of them.
-3. **A measurement discipline that transfers.** Count the *ill-posed instances*,
-   not the check failures. T1's FAIL/MARGINAL split is decided by float
-   representation, not by the defect, so it understates a display-tie population
-   by about 10× (§5.3, D-040). Phase 4 has no arithmetic and so no display ties —
-   but the general form, *the check you have may be measuring a proxy for the
-   defect rather than the defect*, is the reason Phase 0 found two checks that
-   were green while measuring nothing.
+### 13.1 The node model, and the axis it turns on
+
+Phase 4's templates have zero numeric content and are verified by a
+non-arithmetic comparator. The question to ask of each is D-038's, in its general
+form: *what property of the trace is answer-bearing, and what is incidental?* For
+an iteration it is the count; for a classification item it will be something else.
+**The `incidental` / `answer_bearing` split is the reusable part, not the two
+concrete node types** — and both D reviewers confirmed §2 states it well enough to
+apply to an unseen template.
+
+### 13.2 §3.8, and the audit that is now code
+
+The single most transferable output of this phase:
+
+> Every value a check consumes is either declared once on the node **and checked
+> against something**, or recomputed from something that is.
+
+with the **problem-data / derived-data** distinction and three audit questions,
+the third of which — *does the recomputation cover every value, or only those
+present?* — is the general form of "the mechanism is sound, its applicability is
+optional".
+
+**Run `tests/trace_schema/audit_3_8.py` on any new node type before shipping it.**
+This phase's record is that the audit caught five defects and every one was found
+*after* the version introducing it had shipped, twice by a reviewer. The audit
+costs ten minutes. Phase 4 should extend it rather than rediscover it.
+
+### 13.3 A warning about the comparator, and the gap under it
+
+D3.4 §7 specifies three dispositions for two node types. Phase 4 adds a third
+kind of item and the temptation will be to reuse whichever existing disposition
+is closest. **This phase's central finding is that doing exactly that — merging
+two node types because they look alike — produces a verifier that is wrong on one
+of them.**
+
+More urgently: **§7 has no conformance corpus at all** (R3-2). Every verifier
+built this phase implements §6, gold checking. The rules that actually decide a
+model's score are unexercised, and both D reviewers named this independently as
+the largest gap. **Constructing candidate traces — wrong count with right answer,
+right count with different packing, early stop — is the highest-value next
+experiment**, and it is a Phase 4 deliverable, not a suggestion.
+
+### 13.4 Measurement discipline that transfers
+
+Three lessons, each bought expensively:
+
+- **Count the ill-posed instances, not the check failures.** T1's FAIL/MARGINAL
+  split is decided by float representation, not by the defect, so it understates
+  a display-tie population by about 10× (D-040).
+- **Decompose a rejection set before calling it scattered.** Aggregate statistics
+  over a *union* of screens cannot see a single-valued component (D-045).
+- **"The best rule I could think of" is a floor on shortcuttability, never a
+  ceiling.** Enumerating rules gave 65%; fitting a model gave 90% and overturned
+  a gate answer (D-046). Any future P6 lookup-check must fit a model.
+
+### 13.5 Two things Phase 4 should not inherit uncorrected
+
+- **`line_balancing` is ~90% shortcuttable** (R3-11, D-046), pre-existing and
+  outside this phase's scope. It is an item-design question and it needs an
+  owner. Phase 4 does not have to fix it, but nobody should build on the
+  assumption that the item tests what its difficulty label claims.
+- **v1.5 of the node spec is not independently verified** in the way v1.1–v1.4
+  were: it implements what round 5 prescribed, and no reviewer-written verifier
+  has run against it. The first thing Phase 4 does with D3.3 should be to
+  implement against it cold.
+
+### 13.6 Process, for whoever writes the next brief
+
+- **A frozen ref is a promise about the repository, not a string in a brief.** I
+  broke it twice, the second time in the message where I claimed I had not; both
+  times the reviewer caught it (§8, errors 5 and 6).
+- **`git show <sha>:<path>`, never `git show <sha> --stat`** — the latter prints
+  the commit body and contaminated a reviewer that was meant to be blind to it.
+- **Budget for more than one round on a specification.** The brief anticipated a
+  second; this took five, and each one found something the previous had left. The
+  rounds were cheap and every one changed the deliverable.
+- **A reviewer that returns a clean verdict *and* names the measurement that
+  would overturn it is doing R3's job.** Reviewer B did exactly that, and
+  actioning its own suggestion overturned its own answer. Read §5 sections as
+  seriously as §3 ones.
 
 **Still open and not Phase 4's to fix**, but carried on the register: the
-corpus-wide sweeps from Phase 2 (R3-5, R3-6, R3-7), and the T6 baseline
-regeneration (R3-4), which Phase 6 owns.
+corpus-wide sweeps from Phase 2 (R3-5, R3-6, R3-7), the `_froude_capped_slope`
+pathology across three templates (R3-14), and the T6 baseline regeneration
+(R3-4), which Phase 6 owns.
