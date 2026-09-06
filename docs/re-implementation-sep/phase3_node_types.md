@@ -1,6 +1,6 @@
 # D3.3 — The `iteration` and `decision` trace node types
 
-**Schema version:** `1.2` · **Status:** normative for the milestone model ·
+**Schema version:** `1.3` · **Status:** normative for the milestone model ·
 **Phase:** 3 · **Revised:** 2026-09-06
 **Companion:** [`template_redesign_spec.md`](template_redesign_spec.md) §3.3 ·
 [`phase3_summary.md`](phase3_summary.md) · conformance corpus in
@@ -12,6 +12,31 @@ and the return value of `_t19_assign`, bound to `trace_nodes` in
 `template_line_balancing_heuristic`
 (`.../industrial_engineering/production_and_inventory/production_planning.py`).
 **Extractor:** `python -m tests.trace_schema.extract <out.json> <n_seeds>`.
+
+> **Revision note — 1.2 → 1.3.** The fresh reviewer re-ran its exploit against
+> 1.2 and **routed around the fix**. `filter_relation` closed the attack it had
+> filed — lying about the admissibility *flag* is now rejected, at the right
+> clause — but lying about the flag's *input* works just as well: inflate an
+> item's `measure` in the trial where you want it excluded (so the flag is
+> honest about a dishonest number), restore it where you want it committed, and
+> every clause of §5.3, §5.4, §6 and §8A holds while `n` — the answer — comes out
+> wrong. **Two revisions had now closed the same hole one variant at a time.**
+>
+> 1.3 therefore adopts the reviewer's own recommendation and states the invariant
+> generally, as **§3.8**, rather than patching a third variant: *every value a
+> check consumes is either declared once on the node, or recomputed from
+> something that is.* `item_measures` is the instance of it that closes F3′ —
+> item measures are declared once beside `precedences`, so no trial can restate
+> one. §3.8 is the rule to audit any future node type against, and it is what
+> should have been written in 1.1.
+>
+> Also in 1.3: `preamble_binding` names the frame role explicitly instead of
+> relying on a name prefix; `accumulator_symbol` becomes `accumulator_role`, the
+> last raw symbol in an otherwise all-roles §5; §3.7's cumulative reading is
+> corrected to a **prefix** reading, which had been asserted fixed in 1.2 and was
+> not — the section was byte-identical between the two versions; and the
+> `schema_version` row of §3.1 said `"1.1"` while the corpus said `"1.2"`, which
+> taken literally rejects every trace at step 1.
 
 > **Revision note — 1.1 → 1.2.** Version 1.1 was reviewed twice: by the round-1
 > reviewer, checking whether its fifteen findings were addressed rather than
@@ -135,7 +160,7 @@ than one node will bind a list, and **must** raise `schema_version` when it does
 
 | Field | Type | Req. | Meaning |
 |---|---|:--:|---|
-| `schema_version` | string | ✔ | `"1.1"`. A verifier must refuse a major version it does not know. |
+| `schema_version` | string | ✔ | `"1.3"`. A verifier must refuse a major version it does not know. |
 | `node_type` | `"iteration"` \| `"decision"` | ✔ | Selects §4 or §5. |
 | `node_id` | string | ✔ | Stable within a template; the anchor a comparator reports against. |
 | `cardinality` | `"incidental"` \| `"answer_bearing"` | ✔ | §2. Fixed per `node_type` (§4, §5). Determines whether §7.2 or §7.3 applies. |
@@ -151,7 +176,7 @@ than one node will bind a list, and **must** raise `schema_version` when it does
 | `result` | object | ✔ | `{symbol, value, dp, from, unit?}`. `from` is a §3.6 derivation expression, so §6 step 8 is data rather than a per-type special case. |
 | `preamble` | array of object | ✖ | Fixed frames the question prescribes *before* the sequence starts. |
 | `preamble_symbols` | array of string | cond. | Required iff `preamble` is present. |
-| `preamble_binding` | object | cond. | `iteration` only; maps an element role to the index of the preamble frame it must equal. §4.4. |
+| `preamble_binding` | object | cond. | `iteration` only, and **required iff `preamble` is present**. Maps an element role to `{frame, frame_role}`. §4.4. *(1.3: 1.2 made it optional, so omitting it escaped the check entirely — Reviewer D2, F4.)* |
 | `evaluation_symbols` | array of string | cond. | `iteration` only; the symbol set of a nested evaluation frame. |
 | `evaluation_roles` | object | cond. | `iteration` only; §4. |
 | `update_relation` | string | cond. | `iteration` only; §4.2. |
@@ -218,8 +243,9 @@ have failed a 1.0 verifier at shape-check for no reason (Reviewer D, F3).
 | `quantity_role` | string | cond. | `convergence` only: the role the tolerance test reads. |
 | `comparison` | `"lt"` \| `"le"` | cond. | `convergence` only: the sense of the test. |
 | `tolerance` | number | cond. | `convergence` only. |
-| `scope` | `"cumulative"` \| `"per_element"` | cond. | `exhaustion` only. §3.7. |
-| `accumulator_symbol` | string | cond. | `exhaustion` only: the element symbol that accumulates. |
+| `scope` | `"cumulative"` \| `"per_element"` | cond. | `exhaustion` only. §3.7; the cumulative reading is a **prefix**. |
+| `accumulator_role` | string | cond. | `exhaustion` only: the element **role** that accumulates. *(1.3: was `accumulator_symbol`, the last raw symbol in an otherwise all-roles §5 — Reviewer D2, F11.)* |
+| `item_measures` | object | cond. | `exhaustion` only: `{item: measure}` over `universe`, declared **once**. §3.8, §5.4.3d. |
 | `universe` | array | cond. | `exhaustion` only: the finite set being exhausted. |
 | `precedences` | object | cond. | `exhaustion` only: `{item: [prerequisite, …]}` over `universe`. §5.4 invariant 3b. |
 | `predicate_prose` | string | ✖ | Human-readable. **Advisory** (§3.2). |
@@ -267,13 +293,51 @@ A verifier implements §6 step 8 by dispatching on this field, not on `node_type
 
 ### 3.7 `termination.scope` — which reading of the accumulator
 
-`exhaustion` nodes accumulate across elements, and 1.0 left this to be inferred.
-With `scope: "cumulative"` the predicate reads *the union over all elements of
-`accumulator_symbol` equals `universe`*; with `"per_element"` it would read
-element-locally. The distinction is not cosmetic: read per-element, the
-reference `decision` node is **unsatisfiable** — the largest single station holds
-3 tasks against a 5-task universe — and 1.0 hinted at the right reading only
-through a `carry` entry (Reviewer D, F7).
+`exhaustion` nodes accumulate across elements. With `scope: "cumulative"` the
+predicate reads *the union of `accumulator_role` over elements 1..k*; with
+`"per_element"` it reads element-locally.
+
+**The reading is a prefix, not a total.** §6 step 7 requires the predicate to
+hold on the last element **and on no earlier one**, which is only decidable if
+the predicate can be evaluated at each prefix. A reading over *all* elements is
+constant in `k` and makes that clause unsatisfiable. 1.1 wrote "union over all
+elements"; 1.2 claimed to have fixed it and left the section byte-identical; 1.3
+actually fixes it (Reviewer D2, F7 — twice reported, and the second report is why
+it is stated this precisely).
+
+The distinction is not cosmetic in the other direction either: read per-element,
+the reference `decision` node is **unsatisfiable**, because the largest single
+station holds 3 items against a 5-item universe.
+
+### 3.8 Declared once, or recomputed — the rule the other clauses are instances of
+
+> **Every value a check consumes is either declared once on the node, or
+> recomputed from something that is. A value a trace may restate freely is not
+> evidence, and a check that reads one is not a check.**
+
+This is the general form of a hole that was closed twice, one variant at a time,
+before being stated. In 1.1 the admissibility flag was carried per-candidate and
+believed; 1.2 made it recomputable from `filter_relation` — and the same attack
+then worked one level down, by restating the *measure* the relation reads. A
+candidate a trace intends to exclude had a free measure in the trial that
+excluded it, so `n` could be inflated with every invariant satisfied.
+
+Applying §3.8 to the two node types gives:
+
+| Value | Declared once at | Recomputed by |
+|---|---|---|
+| item measures | `termination.item_measures` | §5.4.3d |
+| admissibility | — | `selection.filter_relation`, §5.4.3c |
+| eligibility | `termination.precedences` | §5.4.3b |
+| the update recurrence | `update_relation` | §4.3.1 |
+| display precisions | `symbol_precision` | §7.1 |
+| rounding mode | `rounding` | §6 |
+| symbol names | the role maps | §6 step 2 |
+
+**Audit any new node type against this table's shape before adding it**, and in
+particular against the question it asks: *for every value a check reads, where is
+the single place it is declared?* If the answer is "in each element that mentions
+it", the check is not yet a check.
 
 ---
 
@@ -362,12 +426,17 @@ of the preamble frame that role must equal, and the binding is checked against
 `elements[0]`:
 
 ```json
-{"iterate_prev": 0, "residual_prev": 0, "iterate_curr": 1, "residual_curr": 1}
+{"iterate_prev":  {"frame": 0, "frame_role": "iterate"},
+ "residual_prev": {"frame": 0, "frame_role": "residual"},
+ "iterate_curr":  {"frame": 1, "frame_role": "iterate"},
+ "residual_curr": {"frame": 1, "frame_role": "residual"}}
 ```
 
-reads: element 1's `iterate_prev` is preamble frame 0's `iterate` role, its
-`residual_prev` is frame 0's `residual` role, and likewise `iterate_curr` /
-`residual_curr` against frame 1. Through 1.1 the preamble was unconstrained, so
+reads: element 1's `iterate_prev` is preamble frame 0's `iterate` role, and so
+on. **`frame_role` is named explicitly**, never inferred from the element role's
+name — 1.2 left it to a `iterate*`/`residual*` name prefix, which breaks for any
+node whose roles are not spelled that way (Reviewer D2, F10). The field is
+**required whenever `preamble` is present**. Through 1.1 the preamble was unconstrained, so
 **replacing it with nonsense passed** while §4.4 asserted it was "not free" —
 exactly the hole §4.3.6 had already closed one level down, missed one level up
 (Reviewer D2, F4).
@@ -497,6 +566,12 @@ For every element:
    `selection.filter_relation` evaluated with that candidate's roles and
    `budget_before` bound to the trial's incoming budget. *(New in 1.2 — this is
    the soundness fix of §5.2.)*
+   **3d.** Every candidate's `measure` equals `termination.item_measures[item]`.
+   *(New in 1.3, and it is §3.8's instance: without it a trace can inflate a
+   measure in the trial where it wants the item excluded — leaving §5.4.3c
+   honestly satisfied about a dishonest number — and restore it where it wants
+   it committed, changing `n`, which is the answer, with every other invariant
+   intact. Reviewer D2, F3′.)*
 4. `chosen` optimises `criterion` over the admissible candidates under
    `objective`, with `tie_break` applied to equals.
 5. `budget_after == budget_before − criterion(chosen)`, or `== budget_before`
@@ -676,6 +751,7 @@ behavioural obligation (Reviewer D2).
 5. `decision`: overlapping `committed` sets; a union that is not
    `termination.universe`; a `chosen` that does not optimise `selection`;
    **an `admissible` flag that disagrees with `selection.filter_relation`**;
+   **a candidate `measure` that disagrees with `termination.item_measures`**;
    a `candidates` set that omits an item whose `precedences` are satisfied or
    includes one whose are not; non-contiguous `index`; a varying `budget_total`
    under `capacity_constant`; a closing trial that is not last.
@@ -720,7 +796,7 @@ the corpus.)*
 
 ```json
 {
- "schema_version": "1.2",
+ "schema_version": "1.3",
  "node_type": "iteration",
  "node_id": "t24_secant_normal_depth",
  "cardinality": "incidental",
@@ -760,10 +836,22 @@ the corpus.)*
   "g": 3
  },
  "preamble_binding": {
-  "iterate_prev": 0,
-  "residual_prev": 0,
-  "iterate_curr": 1,
-  "residual_curr": 1
+  "iterate_prev": {
+   "frame": 0,
+   "frame_role": "iterate"
+  },
+  "residual_prev": {
+   "frame": 0,
+   "frame_role": "residual"
+  },
+  "iterate_curr": {
+   "frame": 1,
+   "frame_role": "iterate"
+  },
+  "residual_curr": {
+   "frame": 1,
+   "frame_role": "residual"
+  }
  },
  "preamble_symbols": [
   "y",
@@ -888,7 +976,7 @@ within the 5.0e-05 tolerance `symbol_precision["y_next"] = 4` implies ✓.
 
 ```json
 {
- "schema_version": "1.2",
+ "schema_version": "1.3",
  "node_type": "decision",
  "node_id": "t19_greedy_station_assignment",
  "cardinality": "answer_bearing",
@@ -896,7 +984,7 @@ within the 5.0e-05 tolerance `symbol_precision["y_next"] = 4` implies ✓.
  "termination": {
   "kind": "exhaustion",
   "scope": "cumulative",
-  "accumulator_symbol": "assigned",
+  "accumulator_role": "committed",
   "predicate_prose": "every task in `universe` has been assigned to exactly one element",
   "universe": [
    "a",
@@ -920,6 +1008,13 @@ within the 5.0e-05 tolerance `symbol_precision["y_next"] = 4` implies ✓.
    "e": [
     "d"
    ]
+  },
+  "item_measures": {
+   "a": 51,
+   "b": 70,
+   "c": 47,
+   "d": 87,
+   "e": 22
   },
   "max_elements": 5,
   "satisfied": true
@@ -1168,6 +1263,13 @@ middle of a verifier.
   It becomes a real requirement the day a template stops doing that.
 - **No dimensional checking.** Only `result` carries `unit`. A dimensional
   comparator needs units on every symbol; that is a milestone-model decision.
+- **§8B.11 cannot be audited statically, only by the rename test.** A verifier
+  that genuinely hardcoded `element["trials"]` would pass the entire reference
+  corpus and fail only on a renamed node, because for three roles (`trials`,
+  `chosen`, `closes`) the role name and the reference template's symbol name are
+  the *same string*. Grepping a verifier for reference symbols therefore returns
+  false positives and, worse, would return false negatives on a real violation.
+  Run the rename test; do not read the source (Reviewer D2, F13).
 - **The rename test is the conformance standard for a node type.** Take a node,
   rename every symbol, rebind only its role maps, leave `update_relation` /
   `selection` untouched, and a conforming verifier must accept it — and must

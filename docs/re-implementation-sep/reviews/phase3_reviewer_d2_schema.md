@@ -595,3 +595,264 @@ itself the finding. The gate's harder implicit question, *is this a type*, split
 *Filed by Reviewer D2. Written to disk, not committed — the implementer commits.
 Artefacts: `tests/trace_schema/reviewer_d2_verifier.py`,
 `tests/trace_schema/reviewer_d2_negatives.py`.*
+
+---
+
+## 6. Round 3 — disposition against schema 1.2
+
+**Ref:** `c9fd703e65ba32f10e78bfc6b6a2ef45ee178d34` on `redesign/phase3-trace-shape`.
+`HEAD`, the branch tip and the commissioned SHA agreed at the start of this round
+and still agreed at the end — **the branch did not move under me this time.**
+**Time box:** 30 minutes, re-verification only. Sections 1–5 above are the
+round-2 record against 1.1 and are unchanged.
+
+**What I built.** `tests/trace_schema/reviewer_d2_verifier_12.py` — the round-2
+verifier adapted to 1.2, reusing only its grammar and rounding helpers. Round 2's
+file is left untouched so the round-2 evidence stays reproducible. Every check is
+rewritten against 1.2's role maps.
+
+```
+python -m tests.trace_schema.reviewer_d2_verifier_12 docs/re-implementation-sep/phase3_conformance/traces.json
+```
+```
+template_line_balancing_heuristic        pass 40  fail  0
+template_normal_depth_iteration          pass 40  fail  0
+TOTAL 80 rows: 80 pass, 0 fail; 40 carried unchecked notes
+```
+
+**80/80 with no waiver.** Round 2 needed `--lenient-roles` to get past F1; 1.2
+needs nothing. That alone settles F1.
+
+### 6.1 Disposition table
+
+| # | Finding | Disposition |
+|---|---|---|
+| F1 | `roles` required but absent on all `decision` nodes | **ADDRESSED** |
+| F2 | `decision` is a description, not a type | **ADDRESSED** |
+| F3 | filter trusted, so a wrong answer passes | **PARTIALLY ADDRESSED — still merge-blocking** |
+| F4 | `preamble` unbound to `elements[0]` | **PARTIALLY ADDRESSED** |
+| F5 | candidate identity symbol undeclared | **ADDRESSED** |
+| F6 | no gold-vs-candidate mode | **ADDRESSED** |
+| F7 | §3.7 `cumulative` makes step 7 undecidable | **NOT ADDRESSED** |
+| F8 | tolerance boundary unstated | **ADDRESSED** |
+| F9a | `preamble_symbols == evaluation_symbols` stated as fact | **NOT ADDRESSED** |
+| F9b | closing trial not required to be last | **ADDRESSED** |
+| F9c | path traversing `null` undefined | **NOT ADDRESSED** |
+| F9d | `update_relation` admits non-numeric roles | **NOT ADDRESSED** |
+| F9e | "*the* denominator" presumes exactly one | **NOT ADDRESSED** |
+| F9f | `quantity_role` / `result.from` roles unconstrained | **NOT ADDRESSED** |
+| F9g | `cardinality_symbol` unrelated to `result.symbol` | **NOT ADDRESSED** |
+| F9h | stray conditional fields not rejected | **NOT ADDRESSED** |
+
+**Five of my eight F9 assumptions are still assumptions** — seven of eight
+ambiguities carried forward in all, but every one of them is minor and none blocks.
+
+### 6.2 The three things you asked me to break
+
+#### 1. The F3 exploit — the fix is real, and my exploit routes around it
+
+`selection.filter_relation` and §5.4.3c work exactly as advertised for the attack
+I filed. Rebuilding the round-2 pair against 1.2, plus one new variant:
+
+```
+honest  n=1 (correct)                n=1 -> PASS   []
+corrupt A: lie about `admissible`    n=2 -> FAIL   ['5.4.3c/8A.5', '5.4.3c/8A.5']
+corrupt B: lie about `measure`       n=2 -> PASS   []
+```
+
+**Corrupt A is dead** — rejected, and rejected for the *right* clause (§5.4.3c:
+`admissible: false` against `filter_relation` `measure <= budget_before`, which
+gives `true` at `6 <= 11`). That is a genuine soundness fix and it is not cosmetic.
+
+**Corrupt B is the variant you asked for, and it works.** Instead of lying about
+the flag, lie about its *input*:
+
+- Station 1, trial 1: candidates `p` with **`measure: 200`** and
+  `admissible: false`, `q` with `measure: 5` and `admissible: true`, budget 11.
+  §5.4.3c is *satisfied* — `200 <= 11` is genuinely false, so the flag is honest
+  about a dishonest number. Selection correctly takes `q`.
+- Station 1, trial 2: `p` at `measure: 200` again, inadmissible at budget 6, so
+  nothing is selectable and the station closes with `committed: ["q"]` and
+  `budget_final = 11 − 5 = 6`.
+- Station 2: `p` reappears with **`measure: 6`**, admissible, committed;
+  `budget_final = 11 − 6 = 5`.
+
+Every clause of §5.3, §5.4 (including 3b, 3c, 5, 7 and 9), §6 and §8A holds. The
+reported answer is `n = 2`; the truth is `n = 1`.
+
+**Root cause: nothing anywhere requires an item's `measure` to be the same in
+every trial it appears in.** I searched the whole of 1.2 for a `measure`
+invariance clause and there is none — §5.1 defines `measure` as "the quantity
+`selection.criterion` optimises and the budget is spent in", and §5.4.5 and
+§5.4.7 constrain it only for candidates that are actually *chosen* or
+*committed*. A candidate you intend to exclude has a free `measure`.
+
+1.2 moved the trust boundary from the flag to the flag's input without closing it.
+Filed as **F3'**, and I would keep the merge blocked on it: the primary defect —
+*a `decision` trace with a wrong `n` passes the normative algorithm* — is still
+reproducible, in a form that takes about six lines to construct.
+
+**The fix is one clause, and it is smaller than `filter_relation` was:**
+
+> **§5.4.3d.** For any item appearing as a candidate in more than one trial, its
+> `measure` role is identical in every occurrence. An item's measure is a
+> property of the item, not of the trial that considers it.
+
+Optionally stronger, and closing the class rather than the instance: declare the
+measures once on the node (`termination.measures`, alongside `precedences` — both
+are properties of `universe`) and require every candidate occurrence to agree with
+it. That also makes `budget_final` checkable without scavenging measures out of
+the trial log, which is what my §5.4.7 implementation currently has to do.
+
+#### 2. The rename test on `decision` — passes
+
+Renamed every symbol at all three nesting levels, rebound only `roles`,
+`trial_roles`, `candidate_roles` and the declared symbol lists, and left
+`selection` byte-identical:
+
+| Level | Renames |
+|---|---|
+| element | `station_id→s`, `capacity→cap0`, `remaining_initial→b0`, `trials→log`, `assigned→done`, `remaining_final→b1` |
+| trial | `eligible→opts`, `chosen→pick`, `remaining_after→b_after`, `closes→shut` |
+| candidate | `task→id`, `duration→w`, `fits→ok` |
+
+```
+selection untouched: {"filter": "admissible", "filter_relation": "measure <= budget_before",
+                      "criterion": "measure", "objective": "max", "tie_break": "universe_order"}
+renamed                            -> PASS+UNCHECKED []
+renamed + perturbed budget_final   -> FAIL ['5.4.7']
+renamed + admissible flipped       -> FAIL ['5.4.3c/8A.5']
+```
+
+**Accepted after the rename, and still rejected when a value is perturbed** — both
+halves of §8B.11's requirement. My verifier needs no literal symbol name anywhere
+for `decision`. **F2 is genuinely fixed**, and 1.2's `decision` is now a type in
+the same sense §4's `iteration` already was. This is the round's best result.
+
+One wart the rename surfaced: **`termination.accumulator_symbol` is a raw symbol**
+(`"assigned"`) in an otherwise all-roles §5, so I had to rename it too. It is
+declared data, so no verifier hardcodes it and §8B.11 is not violated — but it is
+the one place §5 still speaks symbols, and it should be
+`accumulator_role: "committed"` for consistency. Filed as **F11**.
+
+#### 3. §8B.11 self-audit — my verifier passes, and the grep is not what proves it
+
+Grepping `reviewer_d2_verifier_12.py` for the reference template's symbols returns
+hits on exactly three: `trials`, `chosen`, `closes`. **All three are false
+positives, and the reason matters.** §5.1's role column and its reference-symbol
+column are *identical strings* for those three roles (`trials`→`trials`,
+`chosen`→`chosen`, `closes`→`closes`). Every occurrence in my code is a role
+lookup — `E(el, "trials")`, `T(tr, "chosen")`, `T(tr, "closes")` — or a Python
+local variable name. No element, trial or candidate value is resolved by a literal
+symbol name.
+
+But the grep alone could not have told you that, and here is the finding: **because
+3 of `decision`'s 10 roles are spelled identically to their reference symbols, a
+verifier that genuinely hardcoded `el["trials"]` would pass the entire reference
+corpus and fail only on a renamed node.** Static audit of §8B.11 is therefore
+unsound by construction; the rename test is the only reliable check. §8B.11
+already says as much ("§10 names this the rename test") — I am confirming that the
+weaker method really is inadequate rather than merely inelegant, and suggesting the
+reference symbols be chosen to differ from the role names in a future revision so
+that both methods work.  Filed as **F13**.
+
+My evidence that I pass is therefore the rename test on **both** node types
+(§2.4 for `iteration` at 1.1, §6.2.2 for `decision` at 1.2), not the grep.
+
+### 6.3 Findings that survive, with reproduction
+
+**F3' — a `decision` trace with a wrong answer still passes · CONFIRMED · blocks merge.**
+Reproduction: the three-node script in §6.2.1; `corrupt B` returns `PASS` with
+`n = 2` against a true `n = 1`. Fix: §5.4.3d above.
+
+**F4 — `preamble_binding` closes the hole, but is escapable by omission · PARTIAL.**
+```
+preamble replaced with nonsense        -> FAIL ['8A.4', '8A.4']
+preamble_binding field simply omitted  -> PASS []
+```
+The check works. But §3.1 marks `preamble_binding` merely "cond. — `iteration`
+only" and nowhere says **required iff `preamble` is present**, so a trace that
+drops the field escapes §8A.4 entirely. §3.1 already has the right pattern two
+rows above (`preamble_symbols`: "Required iff `preamble` is present"); apply the
+same wording. One line, and F4 is then fully addressed.
+
+**F7 — not addressed, and I checked rather than accepted the claim · CONFIRMED (minor).**
+You asked whether step 7 is now decidable or whether it had only been asserted.
+It had only been asserted. §3.7 is **byte-identical** between 1.1 and 1.2:
+```
+git show 9398ccc:...phase3_node_types.md | sed -n '/^### 3.7/,/^---/p' | sha256sum   -> 6f7283ead30df88e
+git show c9fd703:...phase3_node_types.md | sed -n '/^### 3.7/,/^---/p' | sha256sum   -> 6f7283ead30df88e
+```
+§6 step 7 is likewise unchanged. `cumulative` still reads "the union over **all**
+elements", under which the predicate does not depend on which element you evaluate
+it at, so "and on no earlier one" remains unsatisfiable for any sequence longer
+than one. My 1.2 verifier still carries `ASSUMPTION[5]` and still reads it as the
+prefix union. Harmless in practice, wrong as written; one word ("prefix") fixes it.
+
+**F6, F8 — addressed, verified rather than assumed.**
+```
+satisfied:false, gold mode        -> FAIL ['8A.1']        budget overrun, gold      -> FAIL ['6.4']
+satisfied:false, candidate mode   -> PASS+UNCHECKED       budget overrun, candidate -> PASS+UNCHECKED
+change off by exactly 0.5e-4      -> PASS                 change off by 0.6e-4      -> FAIL ['4.3.2']
+```
+§6.0's mode argument does what it says, and §7.1's inclusive boundary is
+implementable exactly as written.
+
+**F9a, F9c–h — still assumptions.** §4.2 is byte-identical to 1.1; §3.5 and §4.3
+changed only in cross-references (`§8.4`→`§8B.10`, and §4.3.8's parenthetical),
+not in the clauses my assumptions attach to. Demonstrated by mutation:
+```
+preamble_symbols diverges from evaluation_symbols  -> PASS   (F9a: nothing forces it)
+iteration node carrying a `selection` key          -> PASS   (F9h: stray fields unrejected)
+iteration node carrying `capacity_constant`        -> PASS   (F9h)
+cardinality_symbol != result.symbol                -> PASS+UNCHECKED (F9g)
+quantity_role names a non-role                     -> FAIL   (F9f: my choice, no §8A clause)
+result.from names a non-role                       -> FAIL   (F9f: my choice, no §8A clause)
+```
+None blocks. F9f is worth one clause in §8A.7 ("…or a role named by
+`termination.quantity_role` or `result.from` that is not a key of `roles`"),
+since I currently reject those on my own authority and a different implementer
+would not.
+
+### 6.4 New in round 3
+
+- **F10 — `preamble_binding` does not declare which *frame* role each element role
+  binds to.** The map is `{"iterate_prev": 0, "residual_prev": 0, …}` — element
+  role to frame *index*. §4.4's prose pairs `iterate_prev` with the frame's
+  `iterate` role and `residual_prev` with `residual`, but that pairing is nowhere
+  data. I derive it by **name prefix** (`ASSUMPTION[10]`), which works only
+  because 1.2's element roles happen to begin with the frame role's name. A
+  template whose roles were `lower`/`upper` would break it. Make the value a pair,
+  `{"iterate_prev": [0, "iterate"]}`, or state the prefix rule normatively.
+- **F11 — `termination.accumulator_symbol` is the last raw symbol in §5.** Should
+  be `accumulator_role`. Cosmetic, but it is the one place the role doctrine leaks.
+- **F12 — §3.1's `schema_version` row still reads `"1.1"`** while the corpus and
+  the document's own header say `1.2`. A one-character staleness, but it is in the
+  **normative field table**, and an implementer who takes it literally rejects all
+  80 traces at step 1. I very nearly did.
+- **F13 — 3 of `decision`'s 10 role names are spelled identically to their
+  reference symbols**, which makes static §8B.11 auditing unsound. See §6.2.3.
+
+### 6.5 Round-3 verdict
+
+**The two claims I was asked to test hardest split.**
+
+**F2 is genuinely fixed** and the primary claim of the whole document — that these
+are types, not descriptions — now holds for **both** node types, demonstrated by
+the rename test rather than argued. That is a real result and 1.2 earns it.
+
+**F3 is not fixed, only narrowed.** `filter_relation` and §5.4.3c close the exact
+attack I filed, and close it properly, but the class is open: the algorithm still
+accepts a `decision` trace whose `n` — the answer — is wrong, now by lying about
+`measure` rather than about `admissible`. I would **not** merge on this. It is a
+one-clause fix (§5.4.3d, or `termination.measures`), and given that this is the
+second revision to close this hole one variant at a time, I would rather see the
+invariant stated generally — *every value a check consumes is either declared once
+on the node or recomputed from something that is* — and the node audited against
+it, than see a third round close a third variant.
+
+Everything else outstanding (F4's escapable optionality, F7's one word, F9a and
+F9c–h, F10–F13) is minor and could ride along with that clause in a single pass.
+
+*Round 3 filed by Reviewer D2. Written to disk, not committed. New artefact:
+`tests/trace_schema/reviewer_d2_verifier_12.py`.*
