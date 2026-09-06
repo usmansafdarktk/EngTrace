@@ -649,6 +649,76 @@ CP_VALID_T_MAX = {
 AIR_COMPOSITION = {"N2(g)": 0.78084, "O2(g)": 0.20946, "Ar(g)": 0.00934}
 
 
+# HIGH-TEMPERATURE HEAT CAPACITIES FOR COMBUSTION PRODUCTS
+#
+#     Cp/R = A + B*T + C*T^2 + D*T^-2       (T in Kelvin)
+#
+# UNITS. As CP_PARAMS above: A, B, C, D are dimensionless and the polynomial
+# returns Cp/R. Valid 298-3000 K.
+#
+# WHY A SECOND TABLE (DECISIONS D-032, D-036). CP_PARAMS is fitted to 1500 K.
+# template_adiabatic_flame_temperature reaches 2908 K, so it was
+# extrapolating ~1300 K past validity and every flame temperature came out low
+# - methane 2311.2 K against a reference of 2326.35 K, acetylene 64.7 K below
+# the value NIST gives. Phase C2 measured this (Reviewer H, F-2) and handed the
+# refit-vs-restrict trade to the template owner rather than deciding it inside
+# the constants track.
+#
+# Restricting the range is not available: the flame temperature is an OUTPUT,
+# not a sampled input, so there is no knob to turn. Refitting CP_PARAMS itself
+# would fix the flame template and damage template_sensible_heat_temp_dependent_cp,
+# which lives at 298-1000 K where a wide-range fit is worse - for CO2 the
+# wide-range residual reaches -5.4% at 298 K against -0.4% for the 1500 K fit.
+#
+# So the table is SPLIT BY CONSUMER. Two templates want different things from
+# the same four species and one polynomial cannot serve both. CP_PARAMS is
+# unchanged and keeps its low-temperature accuracy; this table is read ONLY by
+# the flame template.
+#
+# RESULT: the flame temperatures this table produces agree with a direct NIST
+# Shomate solve to within 1.93 K on all eleven reactions - worst carbon
+# monoxide, 2662 against 2663.93 - where the 1500 K table was 5-65 K low.
+# Methane computes 2327 K against the 2326.35 K complete-combustion
+# reference: 0.03%.
+#
+# An earlier version of this note said 1.7 K. That was the refit-vs-NIST
+# residual, not the figure that matters, which is what the TEMPLATE finally
+# prints against NIST - a different and slightly larger number once the
+# iteration and the rounding to whole kelvin are included (Phase 2 Reviewer C,
+# finding C-1).
+CP_PARAMS_COMBUSTION = {
+    # [DERIVED] least-squares refit of NIST 124-38-9 Shomate Cp over
+    #   298-3000 K, 400 points. Worst residual -5.43% (at the
+    #   298 K end), 1.30% above 1000 K where the flame integral
+    #   has its mass.
+    "CO2(g)": {"A": 5.2259, "B": 1.7079E-3, "C": -0.3275E-6, "D": -1.3180E5},   # Carbon dioxide
+    # [DERIVED] least-squares refit of NIST 7732-18-5 Shomate Cp over
+    #   298-3000 K, 400 points. Worst residual +0.87% (at the
+    #   298 K end), 0.51% above 1000 K where the flame integral
+    #   has its mass.
+    #   CAVEAT: NIST's lowest gas-phase Shomate range for water starts at
+    #   500 K, so the 298-500 K part of that grid is Shomate EXTRAPOLATED,
+    #   not NIST data, and the +0.87% is measured against the extrapolation
+    #   (Phase 2 Reviewer C, C-7). Checked and immaterial: the extrapolated
+    #   Cp(298.15) is 33.590 against JANAF's 33.58 J/(mol K), 0.03%.
+    "H2O(g)": {"A": 3.0520, "B": 2.2354E-3, "C": -0.3435E-6, "D": 0.3444E5},   # Water vapour
+    # [DERIVED] least-squares refit of NIST 7727-37-9 Shomate Cp over
+    #   298-3000 K, 400 points. Worst residual -1.05% (at the
+    #   298 K end), 1.00% above 1000 K where the flame integral
+    #   has its mass.
+    "N2(g)": {"A": 3.1129, "B": 0.9776E-3, "C": -0.1819E-6, "D": 0.0693E5},   # Nitrogen
+    # [DERIVED] least-squares refit of NIST 7782-44-7 Shomate Cp over
+    #   298-3000 K, 400 points. Worst residual -3.60% (at the
+    #   298 K end), 0.79% above 1000 K where the flame integral
+    #   has its mass.
+    "O2(g)": {"A": 3.6608, "B": 0.6232E-3, "C": -0.0847E-6, "D": -0.3842E5},   # Oxygen
+}
+
+# Validity ceiling for the table above, in Kelvin. Advisory, as CP_VALID_T_MAX
+# is: the C2.2 suite checks the flame template stays inside it.
+CP_COMBUSTION_VALID_T_MAX = 3000.0
+
+
 # A list of predefined, balanced combustion reactions with theoretical air.
 COMBUSTION_REACTIONS = [
     {

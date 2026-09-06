@@ -11,7 +11,11 @@ locate_fixed_templates.py
 regenerate_testset.py
 verify_manual_map.py
 ai_assistance_data_v2
-reviews
+# Annotation-app reviewer output (JSONL data). NOT the review reports in
+# docs/re-implementation-sep/reviews/ - a bare `reviews` pattern here silently
+# untracked every phase review report from Phase 0 onward, while the phase
+# summaries linked to them as though they were in the repository.
+templates_annotation/annotation_app/reviews/
 iaa_results
 ai_human_alignment_results
 Evaluation Results EngChain FINAL
