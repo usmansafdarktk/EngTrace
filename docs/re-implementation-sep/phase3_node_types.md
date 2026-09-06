@@ -581,7 +581,7 @@ frame makes the node's answer free. A trace reporting 3.501 m against a gold
 "frame_relations": [["A",  "(b + z * y) * y"],
                     ["P",  "b + 2 * y * sqrt(1 + z ** 2)"],
                     ["AR", "A * (A / P) ** (2 / 3)"],
-                    ["g",  "round(AR, 3) - K"]]
+                    ["g",  "round(AR) - K"]]
 ```
 
 **Coverage (normative, and the clause the mechanism is worthless without).**
@@ -857,7 +857,11 @@ gold displays it**, the boundary **inclusive**: the test is
 *(1.1 left inclusive-versus-exclusive unstated; it is latent on gold, where
 exact-boundary instances are screened out at generation, and live the moment a
 candidate is scored — Reviewer D2, F8.)* That place comes from `symbol_precision[symbol]`, or
-`result.dp` for the result — **never inferred from the data**. Version 1.0 cited
+`result.dp` for the result — **never inferred from the data, and always the
+GOLD node's `symbol_precision`, never the candidate's.** `symbol_precision` is
+the one problem-data entry that a *derived* check also consumes, so a candidate
+declaring coarser precisions must not thereby widen the tolerance it is judged
+against. Version 1.0 cited
 "the display precision of `y`" in three clauses while declaring `dp` only on
 `result`, where it is `3` against a 4-dp `y_next` — actively the wrong number for
 the checks that cited it (Reviewer D, F4).
