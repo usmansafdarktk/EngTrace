@@ -542,7 +542,16 @@
    -83.8,
    -84.67
   ],
-  "_note": "NIST has no Shomate fit for ethane. Cp verification uses the Smith-Van Ness Cp298/R self-check column (6.369)."
+  "_note": "NIST has no Shomate fit for ethane. Cp verification uses the Smith-Van Ness Cp298/R self-check column (6.369).",
+  "cp_table_Gurvich1989": {
+   "298.15": 52.49,
+   "300": 52.71,
+   "500": 77.94,
+   "1000": 122.55,
+   "1500": 148.98
+  },
+  "cp_298_tabulated": 52.49,
+  "cp_table_source": "Gurvich, Veyts, et al., 1989, via NIST Chemistry WebBook"
  },
  "C6H6(l)": {
   "cas": "71-43-2",
@@ -626,5 +635,64 @@
    "1500": 188.49
   },
   "cp_table_source": "Chao J., 1986, via NIST Chemistry WebBook gas phase thermochemistry"
+ },
+ "C6H6(g)": {
+  "cas": "71-43-2",
+  "nist_id": "C71432",
+  "ranges": [],
+  "cp_298_tabulated": 82.44,
+  "cp_table_TRC1997": {
+   "298.15": 82.44,
+   "400": 113.52,
+   "500": 139.35,
+   "600": 160.09,
+   "800": 190.45,
+   "1000": 211.41,
+   "1200": 226.52,
+   "1500": 242.11
+  },
+  "cp_table_source": "Thermodynamics Research Center, 1997, via NIST Chemistry WebBook (gas phase)"
+ },
+ "C7H8(g)": {
+  "cas": "108-88-3",
+  "nist_id": "C108883",
+  "ranges": [],
+  "cp_298_tabulated": 103.7,
+  "cp_table_NIST": {
+   "298.15": 103.7,
+   "400": 139.9,
+   "500": 170.8,
+   "600": 196.2,
+   "800": 234.3,
+   "1000": 261.2,
+   "1200": 280.8,
+   "1500": 301.0
+  },
+  "cp_table_source": "Scott 1962 / Draeger 1985, via NIST Chemistry WebBook (gas phase)"
+ },
+ "C6H14(g)": {
+  "cas": "110-54-3",
+  "nist_id": "C110543",
+  "ranges": [],
+  "cp_298_tabulated": 142.6,
+  "cp_table_Scott1974": {
+   "298.15": 142.6,
+   "400": 181.54,
+   "500": 217.28,
+   "600": 248.11,
+   "800": 296.23,
+   "1000": 331.37,
+   "1200": 357.31,
+   "1500": 389.11
+  },
+  "cp_table_source": "Scott D.W., 1974, via NIST Chemistry WebBook (gas phase)"
+ },
+ "H2O(l)": {
+  "cas": "7732-18-5",
+  "nist_id": "C7732185",
+  "ranges": [],
+  "cp_298_liquid_tabulated": 75.3,
+  "dHf_liquid_kJ_per_mol": -285.83,
+  "_note": "liquid water Cp at 298.15 K; CODATA dHf -285.83 kJ/mol"
  }
 }

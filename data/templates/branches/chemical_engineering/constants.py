@@ -436,8 +436,9 @@ CP_PARAMS = {
     "C6H6(g)": {"A": -0.206, "B": 39.064E-3, "C": -13.301E-6, "D": 0.0E5},
     # [NIST 108-88-3]  was keyed C7H8(l); NIST liquid is 157.09
     "C7H8(g)": {"A": 0.29, "B": 47.052E-3, "C": -15.716E-6, "D": 0.0E5},
-    # [NIST 110-54-3]  was keyed C6H14(l); NIST liquid is 195.52
-    "C6H14(g)": {"A": 2.738, "B": 45.854E-3, "C": -14.518E-6, "D": 0.0E5},
+    # [NIST 110-54-3 (refit)]  was keyed C6H14(l) and held values 11.8% below
+    # the NIST GAS value; refitted to the Scott 1974 table
+    "C6H14(g)": {"A": 3.1704, "B": 53.3808E-3, "C": -16.3758E-6, "D": 0.0E5},
     # [NIST 67-64-1 (refit)]  was keyed C3H6O(l) and held gas values that were
     # themselves 8.4% high; refitted to the Chao 1986 table, worst error 1.11%
     "C3H6O(g)": {"A": 2.4096, "B": 24.7630E-3, "C": -7.5941E-6, "D": 0.0E5},
@@ -488,13 +489,13 @@ CP_PARAMS = {
 
     # Liquids and solids
     # [NIST 7732-18-5]  Cp298 75.40 vs NIST 75.3
-    "H2O(l)": {"A": 8.712, "B": 12.5E-3, "C": -1.8E-6, "D": 0.0E5},
+    "H2O(l)": {"A": 8.712, "B": 1.25E-3, "C": -0.18E-6, "D": 0.0E5},
     # [NIST 67-56-1]  Cp298 80.28 vs NIST 79.5
     "CH3OH(l)": {"A": 5.052, "B": 16.561E-3, "C": -3.761E-6, "D": 0.0E5},
     # [NIST 7647-14-5]  Cp298 47.70 vs NIST 50.50 (-5.5%); a genuine source disagreement, not a transcription defect
     "NaCl(s)": {"A": 5.526, "B": 1.963E-3, "C": 0.0E-6, "D": -0.333E5},
     # [[UNVERIFIED]]  NIST condensed-phase data is behind a paid subscription; see the residual register
-    "H2SO4(l)": {"A": 2.85, "B": 134.0E-3, "C": 0.0E-6, "D": 0.0E5},
+    "H2SO4(l)": {"A": 2.85, "B": 13.4E-3, "C": 0.0E-6, "D": 0.0E5},
     # [[UNVERIFIED]]  NIST free tier carries no Cp for calcite; see the residual register
     "CaCO3(s)": {"A": 12.572, "B": 2.637E-3, "C": -3.12E-6, "D": -3.642E5},
 }
