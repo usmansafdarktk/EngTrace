@@ -3,7 +3,8 @@
 Paste everything below the line into a fresh Claude Code session started at the repository
 root, on the `master` branch.
 
-Phases 0, 1, C2, 2 and 3 are complete and merged (`1a71b70`). This stage depends on Phase 3
+Phases 0, 1, C2, 2 and 3 are complete and merged; Phase 3's last content commit is
+`1a71b70` and this prompt sits on top of it. This stage depends on Phase 3
 in particular: it inherits six named deliverables from Phase 3's review triage, and it
 inherits one gap Phase 3 could not close.
 
@@ -140,6 +141,22 @@ outputs. You have three honest routes and must pick one explicitly:
 
 Do not paper over this by counting the 2,200 and implying the coverage is uniform.
 
+Corpus health at `master` (`1a71b70`), for context — **this is the baseline you work against,
+not a to-do list.** Re-measure it yourself in a worktree rather than trusting the table:
+
+| Check | Failing | Note |
+|---|---:|---|
+| T1 printed-arithmetic closure | 29/150 | 97 more sit on the rounding boundary (marginals) |
+| T2 round-trip oracle | 0/150 | only templates with an oracle are checked |
+| T3 determinism | 0/150 | |
+| T4 output contract | 3/150 | malformed step markers |
+| T5 binding / rounding | 66/150 | |
+| T6 distribution | 142/150 | **the committed baseline is stale corpus-wide — see Verification** |
+| T7 invariant asserts | 83/150 | advisory corpus-wide; a gate on templates a phase edits — **including all four of yours** |
+
+Phase 3 moved exactly three of these cells and nothing else. **Your phase should move none of
+them except through D4.5**, and if it moves one you have edited something you should not have.
+
 ## The leverage, and the reason this phase is not small
 
 The four comparators do not serve four templates. `template_inventory.csv` records an
@@ -272,6 +289,22 @@ it holds the `master` branch and the merge will refuse.
 Set `PYTHONIOENCODING=utf-8` before printing template output — the console is cp1252 and will
 crash on `→`/`Σ`/`²`.
 
+**The one before/after you do owe** is the cosmetic fix's. The exit gate asks you to state
+that no item pool changed, and D4.5 changes emitted text, so you need a dump of the affected
+template from a `master` worktree and from your branch. **Run each tree as its own process.**
+An in-process reload resolves both sides to the same already-imported `data.templates.*`
+modules and reports every instance identical — documented in
+`tests/template_integrity/instance_dump.py`, and it has now caught three people.
+`tests/template_integrity/phase3_instance_dump.py` is the pattern to copy: it takes the tree
+root as an argument and refuses to run if a template resolves outside it, so the mistake fails
+loudly instead of producing a clean-looking null result.
+
+**T6 and your four templates.** T6 fails 142/150 corpus-wide because the committed baseline is
+stale, and `incompressible_continuity` is one of the 142. **Do not regenerate the baseline** to
+make it green — a baseline refreshed by the phase it gates is not a gate (D-043), and Phase 6
+owns the regeneration. Since you edit only one template's *formatting*, the honest statement is
+that T6 is uninformative here and the before/after dump replaces it, exactly as Phase 3 did.
+
 **State the smallest rate your run can resolve and check it against the rate you need to
 exclude.** N samples cannot resolve a defect rarer than ~3/N. This rule exists because
 acceptance evidence was smaller than the defect rate three separate times (D-024, D-026), and
@@ -301,7 +334,11 @@ other.**
 
 **Scope every review to R6 before dispatching it.** One mandatory gate task, a stated time box,
 tooling supplied as working code, everything already settled fenced off explicitly, and a
-measurement-ownership register with **no number commissioned twice**.
+measurement-ownership register with **no number commissioned twice**. A Phase 0 review stalled
+and produced nothing because its brief duplicated another agent's — the only mandatory task
+went unanswered because it was bundled with work already being done elsewhere. Do not ask a
+reviewer to re-measure something a prior phase established; say so explicitly in the brief, and
+run R6's pre-dispatch checklist every time.
 
 **Independence, concretely:**
 
@@ -331,6 +368,9 @@ requires, which Phase 3 recorded and initially failed to do: a `SPEC-CHANGE` **a
 `template_redesign_spec.md`**, and an `ADOPT-PHASE-<N>` **edits that phase's deliverable list**.
 Writing the disposition in your summary is not discharging it.
 
+**State honestly which findings you rejected and why.** A `REJECT` with a written reason is a
+legitimate outcome and a respected one; a finding quietly absent from the triage table is not.
+
 **Confirm your reports are actually committed, not merely written** — a bare `reviews` entry in
 `.gitignore` once silently untracked all eight prior reports.
 
@@ -338,7 +378,7 @@ Writing the disposition in your summary is not discharging it.
 
 - Branch **`redesign/phase4-comparators`** off `master`. Do not work directly on `master`.
 - Logical commits, not one lump.
-- **Do not push.** `master` is 67 commits ahead of `origin/master`; publishing is a separate
+- **Do not push.** `master` is ~70 commits ahead of `origin/master`; publishing is a separate
   decision.
 - End commit messages with:
   `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`
