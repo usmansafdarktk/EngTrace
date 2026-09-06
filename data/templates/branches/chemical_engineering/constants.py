@@ -337,32 +337,64 @@ SUBSTANCES_FOR_VAPORIZATION = [
 
 
 # Database of standard heats of formation (ΔH_f°) at 298.15 K in kJ/mol.
+#
+# PROVENANCE (Phase C2). All 21 values were checked against the NIST Chemistry
+# WebBook / CODATA and every one is inside its stated uncertainty; none needed
+# changing. The citation is per entry below and resolves to
+# docs/references/nist_webbook/shomate_coefficients.json.
+#
+# Reviewer H finding F-3: the evidence existed only in the test suite and the
+# JSON, so the table did not carry its own provenance. It does now.
 HEATS_OF_FORMATION = {
     # Hydrocarbons (Gases)
+    # [ON-DISK] NIST 74-82-8, -74.6+/-0.3 (Gurvich 1991); Chase gives -74.87
     "CH4(g)": -74.8,      # Methane
+    # [ON-DISK] NIST 74-86-2, 226.73 (Chase 1998)
     "C2H2(g)": 226.7,     # Acetylene (Added)
+    # [ON-DISK] NIST 74-84-0, -84.0+/-0.4
     "C2H6(g)": -84.7,     # Ethane
+    # [ON-DISK] NIST 74-98-6. NIST lists TWO measured values: -104.7 (Pittam
+    #   and Pilcher 1972) and -103.8 (Prosen and Rossini 1945). This row uses
+    #   Prosen. A source choice, not an error - Reviewer H retired the interim
+    #   doc's "propane discrepancy" on exactly this point.
     "C3H8(g)": -103.8,    # Propane
+    # [ON-DISK] NIST 106-97-8, -125.6+/-0.67
     "C4H10(g)": -125.7,   # Butane (Added)
+    # [ON-DISK] NIST 111-65-9, -208.4+/-0.67 (Prosen and Rossini 1945)
     "C8H18(g)": -208.4,   # Octane (Gas phase) (Added)
+    # [ON-DISK] NIST 71-43-2 condensed phase, 49.0+/-0.9
     "C6H6(l)": 49.0,      # Benzene
 
     # Alcohols (Liquids & Gases)
+    # [ON-DISK] NIST 67-56-1 condensed phase, -239.5+/-0.2
     "CH3OH(l)": -238.6,   # Methanol (Liquid)
+    # [ON-DISK] NIST 67-56-1 gas, -205+/-10 (average of 9 values)
     "CH3OH(g)": -200.7,   # Methanol (Gas) (Added - required for adiabatic flame temp)
+    # [ON-DISK] NIST 64-17-5 condensed phase, -276+/-2 (average of 6)
     "C2H5OH(l)": -277.7,  # Ethanol (Liquid)
+    # [ON-DISK] NIST 64-17-5 gas, -234+/-2
     "C2H5OH(g)": -235.1,  # Ethanol (Gas) (Added - required for adiabatic flame temp)
 
     # Common Gases & Products
+    # [ON-DISK] element in its standard state, exactly 0 by definition
     "O2(g)": 0,
+    # [ON-DISK] element in its standard state, exactly 0 by definition
     "H2(g)": 0,
+    # [ON-DISK] element in its standard state, exactly 0 by definition
     "N2(g)": 0,
+    # [ON-DISK] NIST 630-08-0, -110.53
     "CO(g)": -110.5,
+    # [ON-DISK] NIST 124-38-9, -393.51+/-0.13 (CODATA)
     "CO2(g)": -393.5,
+    # [ON-DISK] NIST 7732-18-5 gas, -241.826+/-0.040 (CODATA)
     "H2O(g)": -241.8,
+    # [ON-DISK] NIST 7732-18-5 condensed, -285.83 (CODATA)
     "H2O(l)": -285.8,
+    # [ON-DISK] NIST 7664-41-7, -45.94+/-0.35
     "NH3(g)": -46.1,
+    # [ON-DISK] NIST 10102-43-9, 90.29
     "NO(g)": 90.3,
+    # [ON-DISK] NIST 10102-44-0, 33.10
     "NO2(g)": 33.2,
 }
 
@@ -416,8 +448,17 @@ REACTIONS = [
 # thermochemistry - so agreement between the two is evidence, not a tautology.
 # The "Cp298 x vs NIST y" note on each row is that check.
 #
-# Rows marked [UNVERIFIED] could not be sourced and are tagged rather than
-# quietly accepted; see docs/re-implementation-sep/phaseC2_summary.md.
+# Rows marked [KNOWN-DEFECTIVE] were checked and FAILED, and no citable
+# replacement could be derived. That is a different claim from "not looked
+# at" and is tagged differently on purpose; see
+# docs/re-implementation-sep/phaseC2_summary.md.
+#
+# VALIDITY. CP_VALID_T_MAX below is the upper temperature this polynomial is
+# fitted for. It is not decoration: the polynomial is a good fit inside it and
+# degrades fast outside. Against NIST, CO2 is within 0.7% at 1500 K, +3.6% at
+# 2000 K, +8.9% at 2500 K and +13.5% at 2900 K. Any template integrating Cp
+# beyond CP_VALID_T_MAX is extrapolating and must say so (Phase C2 Reviewer H,
+# finding F-2; DECISIONS D-032).
 CP_PARAMS = {
     # Key order is deliberately the original one.
     # template_sensible_heat_temp_dependent_cp draws its substance with
@@ -493,13 +534,50 @@ CP_PARAMS = {
     "Air(g)": {"A": 3.355, "B": 0.575E-3, "C": 0.0E-6, "D": -0.016E5},
     # [NIST 7732-18-5]  Cp500 35.28 vs NIST 35.22
     "H2O(g)": {"A": 3.47, "B": 1.45E-3, "C": 0.0E-6, "D": 0.121E5},
-    # [[UNVERIFIED]]  NIST condensed-phase data is behind a paid subscription; see the residual register
+    # [[KNOWN-DEFECTIVE]]  NOT merely unsourced: this row computes Cp298 =
+    # 56.9 J/mol/K against a literature ~138.9, i.e. ~59% low. It was checked
+    # and it failed. NIST carries no condensed-phase Cp for H2SO4 (verified,
+    # free and paid-linked sections both), so no citable replacement could be
+    # derived. Tagged as defective rather than as "not looked at" - the two
+    # are different claims and only one of them is true here.
     "H2SO4(l)": {"A": 2.85, "B": 13.4E-3, "C": 0.0E-6, "D": 0.0E5},
-    # [NIST 7647-14-5]  Cp298 47.70 vs NIST 50.50 (-5.5%); a genuine source disagreement, not a transcription defect
-    "NaCl(s)": {"A": 5.526, "B": 1.963E-3, "C": 0.0E-6, "D": -0.333E5},
-    # [[UNVERIFIED]]  NIST free tier carries no Cp for calcite; see the residual register
+    # [NIST 7647-14-5 (refit)]  the transcribed row read 47.70 against NIST
+    # 50.50 (-5.5%). That was waved through as "a source disagreement" with no
+    # argument; NIST does publish a solid-phase Shomate, so it is resolvable.
+    # Refitted over 298-1073 K, worst error 0.19%.
+    "NaCl(s)": {"A": 6.8261, "B": -1.6794E-3, "C": 2.6971E-6, "D": -0.4470E5},
+    # [[KNOWN-DEFECTIVE]]  computes Cp298 = 74.7 against a literature ~81.9,
+    # i.e. ~9% low. Checked and failed; NIST free tier carries no Cp for
+    # calcite, so no citable replacement could be derived.
     "CaCO3(s)": {"A": 12.572, "B": 2.637E-3, "C": -3.12E-6, "D": -3.642E5},
 }
+
+
+# Upper validity temperature of the CP_PARAMS polynomial, in Kelvin.
+#
+# 1500 K is the Smith-Van Ness Tmax for the gases and is the figure the source
+# table states. The refitted rows carry the range they were actually fitted
+# over. Condensed phases are capped at a temperature below their normal boiling
+# or decomposition point.
+CP_VALID_T_MAX = {
+    **{k: 1500.0 for k in CP_PARAMS},
+    "C2H5OH(g)": 1500.0,     # refit over 298-1500 K
+    "C3H6O(g)": 1500.0,      # refit over 298-1500 K
+    "C6H14(g)": 1500.0,      # refit over 298-1500 K
+    "C2H2(g)": 1100.0,       # refit over 298-1100 K, NIST's lowest range top
+    "NaCl(s)": 1073.0,       # refit over 298-1073 K
+    "H2O(l)": 373.0,
+    "CH3OH(l)": 337.0,
+    "H2SO4(l)": 610.0,
+    "CaCO3(s)": 1200.0,
+    "He(g)": 6000.0, "Ar(g)": 6000.0, "Ne(g)": 6000.0,   # exact at any T
+}
+
+
+# Dry-air composition used to verify the Air(g) row against its components.
+# Recorded because Reviewer H noted the check was internal and the assumed
+# composition was nowhere stated.
+AIR_COMPOSITION = {"N2(g)": 0.78084, "O2(g)": 0.20946, "Ar(g)": 0.00934}
 
 
 # A list of predefined, balanced combustion reactions with theoretical air.

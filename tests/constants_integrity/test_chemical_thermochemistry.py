@@ -35,18 +35,21 @@ if REPO not in sys.path:
     sys.path.insert(0, REPO)
 
 from data.templates.branches.chemical_engineering.constants import (  # noqa: E402
-    COMBUSTION_REACTIONS, CP_PARAMS, HEATS_OF_FORMATION, REACTIONS,
+    AIR_COMPOSITION, COMBUSTION_REACTIONS, CP_PARAMS, CP_VALID_T_MAX,
+    HEATS_OF_FORMATION, REACTIONS,
 )
 
 R = 8.314462618          # CODATA 2018 molar gas constant, J/(mol K)
 REF_PATH = os.path.join(REPO, 'docs', 'references', 'nist_webbook',
                         'shomate_coefficients.json')
 
-# Two independent fits of the same thermochemistry agree to a few percent. The
-# gases sit inside 3.4%; the one row above that is NaCl(s) at 5.6%, a genuine
-# disagreement between the source fits rather than a transcription defect
-# (see the phase summary). 8% therefore passes everything correct and still
-# catches every defect found: the smallest was NO2 at 14.8%.
+# Two independent fits of the same thermochemistry agree to a few percent; every
+# row here now sits inside 3.4% at 298 K. 8% therefore passes everything correct
+# and still catches every defect found - the smallest was NO2 at 14.8%.
+#
+# Checked at 298-1200 K. That is NOT the full range the templates use; see the
+# validity note at the end of run(), which reports where a template integrates
+# past CP_VALID_T_MAX.
 CP_TOL_PCT = 8.0
 
 # Rows that cannot be checked against NIST, each for a stated reason.
@@ -55,8 +58,12 @@ CP_NO_REFERENCE = {
     'Ar(g)': 'monatomic ideal gas, Cp = 5R/2 exactly',
     'Ne(g)': 'monatomic ideal gas, Cp = 5R/2 exactly',
     'Air(g)': 'a mixture; checked against its own components instead',
-    'H2SO4(l)': '[UNVERIFIED] NIST condensed-phase data is paywalled',
-    'CaCO3(s)': '[UNVERIFIED] NIST free tier carries no Cp for calcite',
+    # [KNOWN-DEFECTIVE], not [UNVERIFIED]: both were checked and FAILED, and no
+    # citable replacement could be derived. Excluded from the Cp comparison so
+    # the suite does not report a failure it cannot act on - but the defect is
+    # recorded in the constants file and in the residual register, not hidden.
+    'H2SO4(l)': '[KNOWN-DEFECTIVE] ~59% low; NIST has no condensed-phase Cp',
+    'CaCO3(s)': '[KNOWN-DEFECTIVE] ~9% low; NIST free tier has no Cp for calcite',
 }
 
 # NIST / CODATA standard enthalpies of formation, kJ/mol, with the stated
@@ -76,8 +83,7 @@ DHF_REF = {
 }
 DHF_TOL_FLOOR = 2.0
 
-# Dry air, mole fractions.
-AIR = {'N2(g)': 0.78084, 'O2(g)': 0.20946, 'Ar(g)': 0.00934}
+AIR = AIR_COMPOSITION     # declared in constants.py, not duplicated here
 N2_PER_O2 = 3.76          # theoretical air
 
 
@@ -215,6 +221,41 @@ def run():
             if sp not in HEATS_OF_FORMATION:
                 failures.append(f'"{rx["name"]}" names {sp}, which has no heat '
                                 f'of formation')
+
+    # -- F-2: does any consuming template integrate Cp past its validity? --
+    #
+    # This check exists because the suite was previously green while never
+    # looking above 1200 K, and template_adiabatic_flame_temperature integrates
+    # to ~2900 K. A check that stops short of where the data is actually used
+    # reports on a range nobody consumes.
+    import random
+    import re as _re
+    import data.templates.branches.chemical_engineering.thermodynamics.heat_effects as _he
+
+    reached = 0.0
+    for s_ in range(200):
+        random.seed(s_)
+        try:
+            q, sol = _he.template_adiabatic_flame_temperature()
+        except Exception:
+            continue
+        i = sol.find('**Answer')
+        for tok in _re.findall(r'([\d,]+\.?\d*)\s*K', sol[i:] if i >= 0 else sol):
+            reached = max(reached, float(tok.replace(',', '')))
+    checks += 1
+    prod_max = max(CP_VALID_T_MAX[s_] for s_ in ('CO2(g)', 'H2O(g)', 'N2(g)', 'O2(g)'))
+    if reached > prod_max:
+        over = 100.0 * (reached - prod_max) / prod_max
+        worst = 0.0
+        for sp in ('CO2(g)', 'H2O(g)', 'N2(g)', 'O2(g)'):
+            e = ref.get(sp)
+            n = cp_nist(e, reached) if e else None
+            if n:
+                worst = max(worst, abs(100.0 * (cp_svn(CP_PARAMS[sp], reached) - n) / n))
+        print(f'  NOTE: adiabatic_flame_temperature reaches {reached:.0f} K, '
+              f'{over:.0f}% past the {prod_max:.0f} K validity of its product '
+              f'polynomials; worst Cp error there is {worst:.1f}% '
+              f'(known and accepted - DECISIONS D-032)')
 
     print(f'{checks} checks')
     if failures:

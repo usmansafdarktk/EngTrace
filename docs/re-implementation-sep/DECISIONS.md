@@ -953,6 +953,61 @@ Either freeze key order, or make the templates sample from an explicitly sorted
 list so order stops mattering — the second is better, and is a Phase 6 candidate.
 
 
+---
+
+## D-032 — The real C2 failure mode was an unrecorded validity range, not a bad value
+
+**Date:** 2026-09-06 · **Status:** DECIDED · **Source:** Phase C2 Reviewer H,
+finding F-2 · **Hands an item to Track A Phase 2**
+
+Reviewer H's sharpest finding is not about a wrong number. Every value now
+reproduces from live NIST. But `CP_PARAMS` is fitted to **1500 K**, and
+`template_adiabatic_flame_temperature` integrates Cp to **2844 K** — 90% past
+validity — while the C2.2 suite only checked to 1200 K. **The gate was green
+because it never looked where the data is actually used.**
+
+Measured against NIST:
+
+| | 1500 K | 2000 K | 2500 K | 2900 K |
+|---|---|---|---|---|
+| `N2(g)` | −0.5% | +3.2% | +8.2% | +12.5% |
+| `CO2(g)` | −0.7% | +3.6% | +8.9% | +13.5% |
+| `H2O(g)` | −0.3% | +3.5% | +9.5% | +15.2% |
+
+Reviewer H independently re-solved methane/air AFT twice — once with the
+committed table, once from live NIST Shomate alone — getting **2311.1 K** and
+**2327.2 K**. The 16 K residual is *entirely* this extrapolation: the table's
+Cp runs high at flame temperature, which depresses T.
+
+**Decisions.**
+
+1. **Declare the range.** `CP_VALID_T_MAX` is added to `constants.py`. It did
+   not exist before, in any form. A value without its domain is half a fact.
+2. **Make the suite look where the data is used.** C2.2 now measures the
+   temperature the flame template actually reaches and reports how far past
+   validity it runs, with the worst Cp error there.
+3. **Do NOT refit the products to 298-3000 K in C2.** A wide-range refit fixes
+   the high end (N2 12.5% → 0.7%) but costs low-temperature accuracy, where
+   `sensible_heat_temp_dependent_cp` lives (CO2 3.6% → 4.7% at 298 K). That is
+   a trade between two consuming templates and belongs with the template owner,
+   not the constants table.
+4. **Handed to Phase 2**, which owns `adiabatic_flame_temperature`. Its options:
+   accept the extrapolation and state it in the trace (textbooks do exactly
+   this with Smith-Van Ness tables); restrict the sampled flame temperature to
+   the validity range; or carry a separate high-temperature product table. This
+   is a real deliverable, not a note — **Phase 2's D2.6 should require it.**
+
+**Generalise before C3.** Reviewer H's words, and they are the most valuable
+thing in the review: *"the failure mode this phase actually exhibits is not bad
+values but unrecorded validity ranges."* `POWER_LAW_FLUIDS`, `REAL_FLUID_DATA`
+and the mechanical `MATERIAL_PROPERTIES` all carry implicit domains — shear
+rate, reduced temperature, temper — that a value-by-value check passes and a
+template then violates. **C3.2's "order-of-magnitude and cross-property
+consistency" checks cannot catch this class at all.** C3 needs a declared
+validity domain per table, and an assertion that consuming templates sample
+inside it.
+
+
 ## Open decisions
 
 | # | Decision | Needed before |
