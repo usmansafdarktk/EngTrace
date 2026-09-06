@@ -58,30 +58,28 @@ CP_NO_REFERENCE = {
     'Ar(g)': 'monatomic ideal gas, Cp = 5R/2 exactly',
     'Ne(g)': 'monatomic ideal gas, Cp = 5R/2 exactly',
     'Air(g)': 'a mixture; checked against its own components instead',
-    # [KNOWN-DEFECTIVE], not [UNVERIFIED]: both were checked and FAILED, and no
-    # citable replacement could be derived. Excluded from the Cp comparison so
-    # the suite does not report a failure it cannot act on - but the defect is
-    # recorded in the constants file and in the residual register, not hidden.
-    'H2SO4(l)': '[KNOWN-DEFECTIVE] ~59% low; NIST has no condensed-phase Cp',
-    'CaCO3(s)': '[KNOWN-DEFECTIVE] ~9% low; NIST free tier has no Cp for calcite',
 }
 
-# NIST / CODATA standard enthalpies of formation, kJ/mol, with the stated
-# uncertainty. Where sources differ by more than their uncertainty the tolerance
-# is floored at 2 kJ/mol - immaterial here, since a heat of reaction is
-# thousands of kJ/mol.
-DHF_REF = {
-    'CH4(g)': (-74.6, 0.3), 'C2H2(g)': (226.73, 0.8), 'C2H6(g)': (-84.0, 0.7),
-    'C3H8(g)': (-104.7, 0.5), 'C4H10(g)': (-125.6, 0.67),
-    'C8H18(g)': (-208.4, 0.67), 'C6H6(l)': (49.0, 0.9),
-    'CH3OH(l)': (-239.5, 0.2), 'CH3OH(g)': (-205.0, 10.0),
-    'C2H5OH(l)': (-276.0, 2.0), 'C2H5OH(g)': (-234.0, 2.0),
-    'O2(g)': (0.0, 0.0), 'H2(g)': (0.0, 0.0), 'N2(g)': (0.0, 0.0),
-    'CO(g)': (-110.53, 0.17), 'CO2(g)': (-393.51, 0.13),
-    'H2O(g)': (-241.826, 0.04), 'H2O(l)': (-285.83, 0.04),
-    'NH3(g)': (-45.94, 0.35), 'NO(g)': (90.29, 0.2), 'NO2(g)': (33.10, 0.2),
-}
-DHF_TOL_FLOOR = 2.0
+# Heats of formation are NOT tabulated here. They are read from the on-disk
+# NIST artefact at check time.
+#
+# Reviewer G traced three findings to the fact that this file used to carry its
+# own answer key: a hardcoded DHF_REF whose values, uncertainties and even the
+# set of species could drift from the artefact the citations point at. It did
+# drift - C8H18, CH3OH(g) and C2H5OH(l) had reference values here and NOWHERE
+# on disk, so the suite certified them against itself, and C2H6's uncertainty
+# had been widened from NIST's 0.4 to 0.7, exactly enough to cover its
+# deviation. A test that carries its own answers cannot fail the way it needs
+# to. See DECISIONS D-034.
+#
+# The old check also floored every tolerance at 2 kJ/mol, which let three rows
+# pass while sitting outside the uncertainty they themselves cited. There is no
+# floor now: a row must land inside the stated uncertainty of a specific
+# measurement NIST publishes.
+#
+# ROUNDING. The table is presented to 1 decimal place, so a row may sit up to
+# 0.05 from the value it transcribes for that reason alone.
+DHF_ROUNDING = 0.05
 
 AIR = AIR_COMPOSITION     # declared in constants.py, not duplicated here
 N2_PER_O2 = 3.76          # theoretical air
@@ -104,12 +102,37 @@ def cp_nist(entry, T):
         for k in ('cp_298_tabulated', 'cp_298_liquid_tabulated'):
             if k in entry:
                 return entry[k]
-    for k in ('cp_table_TRC1997', 'cp_table_Chao1986'):
-        if k in entry:
-            for tk, v in entry[k].items():
+    for k, tbl in entry.items():
+        if k.startswith('cp_table_') and isinstance(tbl, dict):
+            for tk, v in tbl.items():
                 if abs(float(tk) - T) < 0.5:
                     return v
     return None
+
+
+def dhf_measurements(entry):
+    """Every heat of formation the artefact records for this species.
+
+    Returns dicts of {value, uncertainty, source}. NIST lists several
+    independent determinations for most hydrocarbons and they differ by more
+    than any one of them claims, so "the NIST value" is not well defined - a
+    constants row is checked against the whole set and must match one.
+    """
+    for field, ms in entry.items():
+        if field.startswith('dHf_') and field.endswith('_measurements'):
+            return [m for m in ms if m.get('value') is not None]
+    out = []
+    for k in ('dHf_gas_kJ_per_mol', 'dHf_liquid_kJ_per_mol',
+              'dHf_solid_kJ_per_mol'):
+        if k in entry:
+            out.append({'value': entry[k],
+                        'uncertainty': entry.get('dHf_uncertainty'),
+                        'source': entry.get('dHf_source', '(sole listed)')})
+            break
+    if 'dHf_alternative' in entry:
+        out.append({'value': entry['dHf_alternative'], 'uncertainty': None,
+                    'source': entry.get('dHf_alternative_source', '(alt)')})
+    return out
 
 
 def _atoms(species):
@@ -179,17 +202,57 @@ def run():
                     f'{err:+.1f}% from the NIST LIQUID value - the row may hold '
                     f'gas-phase coefficients')
 
-    # -- HEATS_OF_FORMATION -------------------------------------------------
+    # -- how thin is the evidence behind each validity ceiling? -------------
+    # G-8: C3H8 and C4H10 are NIST-checked at one temperature (298.15 K, the
+    # only thing NIST publishes for them) yet CP_VALID_T_MAX licenses 1500 K.
+    # That is one point licensing a 1200 K extrapolation. Reported, not failed:
+    # the coefficients come from Smith-Van Ness, which states the range - but
+    # the range is the SOURCE's claim, not something this repo verified.
+    single_point = []
+    for sp, row in CP_PARAMS.items():
+        if sp in CP_NO_REFERENCE:
+            continue
+        entry = ref.get(sp) or {}
+        pts = set()
+        for r in entry.get('ranges', []):
+            pts.add((r['T_min'], r['T_max']))
+        for k, tbl in entry.items():
+            if k.startswith('cp_table_') and isinstance(tbl, dict):
+                pts.update(tbl)
+        if not pts and any(k.startswith('cp_298') for k in entry):
+            single_point.append((sp, CP_VALID_T_MAX.get(sp)))
+    if single_point:
+        print('  NOTE: verified at 298.15 K only, but CP_VALID_T_MAX licenses '
+              'far beyond it (source-stated range, not verified here): '
+              + ', '.join(f'{sp} to {t:.0f} K' for sp, t in single_point))
+
+    # -- HEATS_OF_FORMATION, against the on-disk artefact -------------------
     for sp, v in HEATS_OF_FORMATION.items():
-        if sp not in DHF_REF:
-            failures.append(f'HEATS_OF_FORMATION[{sp}] has no reference value')
+        entry = ref.get(sp)
+        if entry is None:
+            failures.append(f'HEATS_OF_FORMATION[{sp}] has no entry in '
+                            f'{os.path.basename(REF_PATH)} - its citation '
+                            f'resolves to nothing')
+            continue
+        cands = dhf_measurements(entry)
+        if not cands:
+            failures.append(f'HEATS_OF_FORMATION[{sp}] has a reference entry '
+                            f'but no heat of formation in it')
             continue
         checks += 1
-        r, u = DHF_REF[sp]
-        tol = max(u, DHF_TOL_FLOOR)
-        if abs(v - r) > tol:
-            failures.append(f'HEATS_OF_FORMATION[{sp}] = {v} vs NIST {r} '
-                            f'(diff {v - r:+.2f}, tol {tol})')
+        best = None
+        for m in cands:
+            tol = max(m.get('uncertainty') or 0.0, DHF_ROUNDING)
+            dev = abs(v - m['value'])
+            if dev <= tol and (best is None or dev < best[0]):
+                best = (dev, m)
+        if best is None:
+            listed = ', '.join(
+                f"{m['value']}+/-{m.get('uncertainty')} ({m.get('source', '?')})"
+                for m in cands)
+            failures.append(
+                f'HEATS_OF_FORMATION[{sp}] = {v} is outside the stated '
+                f'uncertainty of every measurement NIST lists: {listed}')
 
     # -- reaction stoichiometry --------------------------------------------
     for rxns, label in ((COMBUSTION_REACTIONS, 'COMBUSTION_REACTIONS'),

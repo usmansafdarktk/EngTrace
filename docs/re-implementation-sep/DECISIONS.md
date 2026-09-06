@@ -1008,6 +1008,159 @@ validity domain per table, and an assertion that consuming templates sample
 inside it.
 
 
+---
+
+## D-033 — Two unsourceable species REPLACED rather than shipped behind a tag
+
+**Date:** 2026-09-06 · **Status:** DECIDED (repo owner directed) · **Source:**
+Phase C2 completion, after Reviewer H finding F-1
+
+C2 closed with two rows tagged `[KNOWN-DEFECTIVE]`: `H2SO4(l)` (~59% low) and
+`CaCO3(s)` (~9% low). Both were measurably wrong and neither could be sourced —
+NIST carries no condensed-phase Cp for either, verified against the free and
+paid-linked sections of the sulfuric-acid page and both the calcite and
+calcium-carbonate pages.
+
+Tagging is honest, but it still ships two wrong numbers into a benchmark. The
+repo owner directed: find a replacement source, **or replace the species with
+one that has an authoritative citable source.**
+
+| Removed | Replaced by | Source | Fit |
+|---|---|---|---|
+| `H2SO4(l)` | **`C6H6(l)`** benzene, liquid | four NIST condensed-phase measurements over 293–322 K (Kalali 1987; Grolier & Roux-Desgranges 1993; Reddy 1986; Naziev & Bashirov 1986) | worst 0.49%; Cp₂₉₈ 135.83 vs NIST 135.69 |
+| `CaCO3(s)` | **`Al2O3(s)`** corundum, solid | NIST Shomate, α phase, 298–2327 K, CAS 1344-28-1 | worst 0.06% over 298–1200 K; Cp₂₉₈ 78.76 vs NIST 78.80 |
+
+**Result: every one of the 33 `CP_PARAMS` rows now carries a citation, and none
+is known-defective.** The C2.2 suite's exclusion list is empty — it went from
+209 checks with two rows excluded to **215 checks with none**, which is a
+strictly stronger gate.
+
+**Why these two.** Benzene liquid has genuine temperature dependence from real
+measurements (Cp rises 134.6 → 139.9 over 293–322 K), so the item stays a
+*temperature-dependent* heat-capacity problem rather than becoming a constant-Cp
+one; and benzene boils at 353 K, so the template's 280–350 K liquid window stays
+in phase. Corundum is a standard refractory with NIST coverage to 2327 K, so it
+is comfortably inside validity across the template's whole solid range.
+
+**P6 cost, accepted.** Two substances leave the item pool and two enter.
+Sulfuric acid and calcite are arguably more evocative than benzene and alumina —
+but a benchmark item built on a number that is 59% wrong tests nothing, and
+neither species could be rescued. This also partly answers Reviewer H's F-4: the
+liquid sensible-heat pool goes back from two substances to three.
+
+**Reversible.** If a citable source for either original is obtained — Robie &
+Hemingway (USGS Bulletin 2131) covers calcite and is freely available, but is
+461 pages and could not be resolved to a specific page here — the species can be
+restored.
+
+
+## D-034 — A test may not carry its own answer key
+
+**Date:** 2026-09-06 · **Status:** DECIDED · **Source:** Phase C2 Reviewer G,
+findings G-1, G-2, G-3, G-12 (and G's own revision, which found the root cause)
+
+C2 merged with a green 215-check suite that certified three heats of formation
+against **nothing on disk at all**. The mechanism, which Reviewer G found only
+on a second pass:
+
+`test_chemical_thermochemistry.py` held a hardcoded `DHF_REF` dict of reference
+values. `CP_PARAMS` was checked against the on-disk artefact; `HEATS_OF_FORMATION`
+was checked against this dict. For `C8H18(g)`, `CH3OH(g)` and `C2H5OH(l)` the
+reference value existed **only** in that dict — so the citation said `[ON-DISK]`,
+the row said −208.4, the test said −208.4, the deviation was 0.000, and no
+artefact anywhere backed either number. **The suite was measuring its own
+agreement with itself and reporting it as verification.**
+
+Two aggravating details in the same dict:
+
+- `DHF_TOL_FLOOR = 2.0` floored every tolerance, so three rows passed while
+  sitting outside the uncertainty they themselves cited.
+- `C2H6(g)`'s uncertainty had been widened from NIST's 0.4 to **0.7** — exactly
+  enough to cover its 0.7 deviation.
+
+Neither was deception; both are what happens when the reference values are
+editable in the same file as the assertion. That is the point.
+
+**The rule.** A test that verifies a constant against a source must read the
+source from the artefact the constant cites. Reference values may not be
+transcribed into the test file. `test_citations_resolve.py` property P4
+enforces this by refusing any `*REF`/`*_VALUES`/`*_TABLE` dict literal in the
+constants-integrity tests, so the failure cannot return quietly.
+
+**What the values turned out to be.** Nothing was actually wrong, which is the
+uncomfortable part — the *evidence* was wrong, not the numbers. Every disputed
+row matched a specific NIST measurement once all of them were on disk:
+
+| Row | value | matches | the row had cited |
+|---|---|---|---|
+| `C2H6(g)` | −84.7 | −84.67 ± 0.49 Prosen & Rossini 1945 | −84.0 ± 0.4 (Manion, recommended) → looked 1.75σ out |
+| `C3H8(g)` | −103.8 | −103.8 ± 0.59 Prosen & Rossini 1945 | Pittam & Pilcher only was on disk |
+| `C8H18(g)` | −208.4 | −208.4 ± 0.67 Prosen & Rossini 1945 | nothing on disk |
+| `CH3OH(g)` | −200.7 | −205 ± 10 NIST average of 9 | nothing on disk |
+| `C2H5OH(l)` | −277.7 | −276 ± 2 NIST average of 6 | nothing on disk |
+| `CH3OH(l)` | −238.6 | bracketed by Baroody −238.4 and Green −238.9 ± 3.6 | Chao & Rossini −239.5 ± 0.2 → 4.5σ out |
+
+The table follows **Prosen & Rossini (1945)** for hydrocarbons wherever NIST
+lists it — a self-consistent set from one laboratory. That was a real and
+defensible source choice that nobody had written down, so it read as three
+errors. It is now stated in the table header.
+
+**One value was genuinely wrong.** `NO2(g)` read 33.2 against the single value
+NIST lists, 33.10. Corrected to 33.1. It is consumed by no reaction and no
+template, so the item pool is unchanged — but it is the only defect in the
+table, and it was found by requiring each row to match a *measurement* rather
+than merely name a *species*.
+
+**Generalisation for C3.** "Does the value agree with the reference?" and "does
+the reference exist?" are different questions, and C2 shows a suite can answer
+the first convincingly while never asking the second. C3 carries ~400 values
+across four branches; `test_citations_resolve.py` is a hard entry condition for
+it, per Reviewer G, whose exact words were that this is "the only finding here
+I would call blocking for C3."
+
+
+## D-035 — Four provenance classes, because a value can be warranted four ways
+
+**Date:** 2026-09-06 · **Status:** DECIDED · **Source:** Phase C2 Reviewer G,
+findings G-5, G-6, G-8; spec C1.3
+
+Spec C1.3 defines two tags, `[ON-DISK]` and `[POLICY: sampling-only]`. Phase C2
+met at least four distinct evidential situations, and squeezing them into two
+tags is what let rows be tagged stronger than their evidence (G-8):
+
+| Class | Warrant | Enforced by |
+|---|---|---|
+| `[ON-DISK]` | an entry in the cited file whose CAS matches the tag | P2/P3 of `test_citations_resolve.py` |
+| `[DERIVED]` | fitted here from on-disk data; range stated | P3 |
+| `[BY-DEFINITION]` | true by construction of the scale | P3 |
+| `[KNOWN-DEFECTIVE]` | checked and failed; a record, not a claim | not a correctness claim |
+
+`[BY-DEFINITION]` was added when the new test flagged the three elements in
+their standard state as `[ON-DISK]` citations naming no CAS. They are 0 because
+the enthalpy scale is *defined* that way; pointing at a NIST page for them
+claims an artefact is the warrant when it cannot be. Small, but it is the same
+error class as the rest of this phase: a tag asserting more than it has.
+
+**The spec's vocabulary should be fixed before C3 tags 400 more values against
+it** (SPEC-CHANGE, raised not applied — the spec is not this phase's to edit).
+
+**Also closed here (G-8): three rows advertised weaker evidence than the
+artefact already held.** `C2H6(g)` recorded a Smith–Van Ness `Cp₂₉₈/R`
+self-check — a check against the source's own column, the exact tautology the
+table header disclaims — while a 5-point Gurvich 1989 table sat unused on disk.
+`C6H6(g)` and `C7H8(g)` cited *liquid* values on *gas* rows, which justifies the
+re-key but verifies nothing about the coefficients. The suite consulted only two
+of the six multi-point tables in the artefact; it now consults all of them.
+**215 checks → 222, all passing**, and the three rows now rest on real
+independent data (worst deviations −2.6%, −4.5%, +3.6%).
+
+**Left open, reported not fixed:** `C3H8(g)` and `C4H10(g)` are verified at
+298.15 K alone — the only Cp NIST publishes for them — yet `CP_VALID_T_MAX`
+licenses 1500 K. One point licensing a 1200 K extrapolation. The range is the
+*source's* claim, not this repo's verification, and the suite now says so on
+every run rather than letting the ceiling pass as verified.
+
+
 ## Open decisions
 
 | # | Decision | Needed before |

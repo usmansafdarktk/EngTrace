@@ -67,16 +67,29 @@ condemned.
 | `C6H14` | **refitted** to Scott 1974, re-keyed `(l)`→`(g)` | was 125.70 vs 142.60; worst 2.79% |
 | `C6H6`, `C7H8` | re-keyed `(l)`→`(g)` | held gas values; benzene computed 85.3 where NIST *liquid* is 135.69 |
 | `NaCl(s)` | **refitted** to NIST (Reviewer H §5) | 47.70 → 50.40 vs NIST 50.50; worst error 0.19% |
-| `H2SO4(l)`, `CaCO3(s)` | **tagged `[KNOWN-DEFECTIVE]`** (Reviewer H F-1) | checked and failed, −59% and −9%; no citable replacement derivable |
+| `H2SO4(l)` | **species replaced** by `C6H6(l)` benzene (D-033) | was −59% and unsourceable; benzene fitted to four NIST liquid measurements over 293–322 K, worst 0.49% |
+| `CaCO3(s)` | **species replaced** by `Al2O3(s)` corundum (D-033) | was −9% and unsourceable; fitted to the NIST Shomate over 298–1200 K, worst 0.06% |
 
 Coefficients are now written with the exponent attached to each value — `B` as
 `E-3`, `C` as `E-6`, `D` as `E5` — precisely because the source tabulates them
 as the column headings `10³B`, `10⁶C`, `10⁻⁵D`. Writing them this way makes
 Class 1 impossible to repeat silently.
 
-**`HEATS_OF_FORMATION`: all 21 verified, none outside its stated uncertainty.**
-The spec listed the table as "Unverified"; it is sound. Largest gap is methanol
-gas at 4.3 kJ/mol against a NIST value carrying ±10.
+**`HEATS_OF_FORMATION`: all 21 verified, each against a specific measurement
+NIST publishes.** The spec listed the table as "Unverified"; it is sound, with
+one 0.1 kJ/mol correction to `NO2(g)`.
+
+> **This paragraph used to read "none outside its stated uncertainty", and that
+> was false.** Reviewer G falsified it in one pass: `C2H6(g)` sat 1.75× and
+> `CH3OH(l)` 4.5× outside the uncertainty their own citations quoted (G-2). The
+> values were right and the citations were wrong — each row named NIST's
+> *recommended* measurement while using a different one, because the table
+> follows **Prosen & Rossini (1945)** for hydrocarbons and nobody had written
+> that down. Naming "methanol gas at 4.3 kJ/mol" as the largest gap made it
+> worse: that gap is 0.43σ against a ±10, and framing by absolute size hid the
+> two real breaches. Every citation now names the measurement it uses, and the
+> suite reads its reference values from disk instead of from a dict inside
+> itself — see [D-034](DECISIONS.md).
 
 **`COMBUSTION_REACTIONS`: all 11 balance element-by-element** and all carry the
 theoretical-air ratio N₂/O₂ = 3.760. `REACTIONS`: all 4 balance. Every species
@@ -114,11 +127,14 @@ the equilibrium value and not comparable to this item's model.
 
 | # | Deliverable | Where | Status |
 |---|---|---|---|
-| C2.1 | Three tables re-derived with `[ON-DISK]` citations | `constants.py`, per row | ✅ **54 cited values** (33 Cp + 21 ΔHf); 31 species on disk; 2 tagged `[KNOWN-DEFECTIVE]` |
-| C2.2 | Physical-plausibility test suite | `tests/constants_integrity/test_chemical_thermochemistry.py` | ✅ **209 checks, all passing** |
+| C2.1 | Three tables re-derived with `[ON-DISK]` citations | `constants.py`, per row | ✅ **54 tagged values** (33 Cp + 21 ΔHf) — 47 `[ON-DISK]`, 4 `[DERIVED]`, 3 `[BY-DEFINITION]`. **No row is known-defective.** Every citation resolves to a specific measurement on disk. |
+| C2.2 | Physical-plausibility test suite | `tests/constants_integrity/test_chemical_thermochemistry.py` | ✅ **222 checks, all passing, zero exclusions** (was 215; +7 from consulting the multi-point tables G-8 found unused) |
 | C2.3 | Before/after impact for the 5 affected templates | §6 | ✅ |
 | C2.4 | Methane/air near the literature value | §4 | ✅ 2311 K vs 2326 K |
-| C2.R | Independent review (Reviewer H) + R4 triage | [`reviews/phaseC2_reviewer_h_thermochemistry.md`](reviews/phaseC2_reviewer_h_thermochemistry.md), §11 | ✅ |
+| C2.5 | Citation-resolution suite (Reviewer G, G-12 — the one finding called *blocking for C3*) | `tests/constants_integrity/test_citations_resolve.py` | ✅ **55 checks**, four properties: every row tagged; the **CAS in the tag** resolves; the tag class matches the evidence; no test carries its own answer key |
+| C1.4 | Unit declaration per table | `constants.py`, per table header | ✅ — skipped in C1, raised by G-4, done here |
+| C2.R | Independent review (Reviewer H, domain) + R4 triage | [`reviews/phaseC2_reviewer_h_thermochemistry.md`](reviews/phaseC2_reviewer_h_thermochemistry.md), §11 | ✅ |
+| C2.R2 | Second independent review (Reviewer G, provenance) + R4 triage | [`reviews/phaseC2_reviewer_g_provenance.md`](reviews/phaseC2_reviewer_g_provenance.md), §10b | ✅ |
 
 ---
 
@@ -197,12 +213,64 @@ confirming only the exponent moved: 3 mismatches found, 3 fixed, 0 remaining.
 
 | Item | Status |
 |---|---|
-| `H2SO4(l)`, `CaCO3(s)` | **`[KNOWN-DEFECTIVE]`**, not `[UNVERIFIED]` — Reviewer H F-1. They were checked and they failed (−59%, −9%); no citable replacement could be derived. "We could not check this" and "we checked this and it is wrong" are different claims. |
+| `H2SO4(l)`, `CaCO3(s)` | **resolved by replacement** (D-033) — both were measurably wrong and unsourceable from NIST, so the species were swapped for `C6H6(l)` and `Al2O3(s)`, which NIST covers. Every row is now cited and none is defective. |
 | **validity range** | `CP_PARAMS` is fitted to 1500 K; `adiabatic_flame_temperature` integrates to 2844 K, where Cp errors reach +15%. Declared in `CP_VALID_T_MAX`, reported by the suite, handed to Phase 2 — **D-032** |
 | `NaCl(s)` | **resolved** — refitted to NIST, 50.40 vs 50.50 (was 47.70). Reviewer H was right that calling it "a genuine disagreement" was an assertion without an argument, and that NIST does publish a solid-phase Shomate. |
 | four refitted rows | no longer match a textbook table; residuals 1.1–3.1% |
 | SVN page citations | unobtainable; NIST used instead (§7) |
 | liquid branch | now only `H2O(l)` and `CH3OH(l)`, both verified as genuine liquids |
+| **origin vs verification** | the on-disk artefact is NIST, but the coefficients are Smith–Van Ness. Nothing on disk shows where a `CP_PARAMS` number was *typed from* — only that it agrees with an independent fit. Reviewer G's G-7; unfixable without a citable copy of SVN Table C.1 (D-030) |
+| **single-point validity** | `C3H8(g)` and `C4H10(g)` are verified at 298.15 K alone — all NIST publishes — yet `CP_VALID_T_MAX` licenses 1500 K. The range is the source's claim, not this repo's verification. Reported by the suite on every run (G-8, D-035) |
+| `CH3OH(l)` | the one heat of formation transcribing no single NIST measurement: −238.6 is bracketed by Baroody (−238.4) and Green (−238.9 ± 3.6) and inside Green's uncertainty. Kept, and the row says so |
+
+---
+
+## 10a. Reviewer G — Provenance (second review)
+
+The C2 spec names **one** reviewer (H, domain). At the repo owner's direction a
+**second, differently scoped** review was run: **Reviewer G — Provenance**, from
+the spec's own roster, whose gate is *"is the provenance claim honest and
+complete?"* — not "are the values right", which is H's and which R6.2 forbids
+commissioning twice.
+
+Report: [`reviews/phaseC2_reviewer_g_provenance.md`](reviews/phaseC2_reviewer_g_provenance.md).
+
+---
+
+## 10b. R4 triage — Reviewer G
+
+Twelve findings: **nine confirmed, three stale.** All nine are closed except
+G-7, which cannot be closed, and half of G-8, which is deliberately reported
+rather than fixed.
+
+| # | Finding | Disposition | Action |
+|---|---|---|---|
+| G-1 | three `[ON-DISK]` citations resolve to nothing | **ACCEPTED** | all three species fetched live from NIST and written to the artefact; 21/21 now resolve |
+| G-2 | "none outside its stated uncertainty" is false | **ACCEPTED** | claim corrected here and in `constants.py`; every row now cites the measurement it uses; `NO2(g)` corrected 33.2 → 33.1 |
+| G-3 | `C3H8(g)` asserts a fact the artefact contradicts | **ACCEPTED** | both NIST measurements on disk with method and reference |
+| G-4 | spec C1.4 unit declarations skipped | **ACCEPTED** | units declared for all four tables |
+| G-5 | `CP_PARAMS` carries no `[ON-DISK]` tag | **STALE** | fixed by the tag normalisation while G was running; 47 + 4 + 3 = 54 tags |
+| G-6 | README documents a layout that does not exist | **ACCEPTED** | README rewritten to describe the actual JSON, tags and test |
+| G-7 | primary source (Smith–Van Ness) not on disk | **RECORDED, NOT CLOSED** | already D-030; no citable copy of Table C.1 exists. The record documents *verification*, not *origin*, and now says so |
+| G-8 | four rows tagged stronger than their evidence | **PARTLY ACCEPTED** | suite now consults all six multi-point tables, not two (**215 → 222 checks**); `C3H8`/`C4H10` single-point ceilings **reported every run, not fixed** (D-035) |
+| G-9 | `CP_VALID_T_MAX`/`AIR_COMPOSITION` unsourced | **ACCEPTED** | both sourced; both declared advisory, with the test suite named as their only consumer |
+| G-10 | defective rows still live in the pool | **STALE** | both species removed under D-033 while G was running |
+| G-11 | the `H2SO4` note overclaims its scope | **MOOT** | the row no longer exists |
+| G-12 | no provenance test exists | **ACCEPTED — was blocking** | `tests/constants_integrity/test_citations_resolve.py`, 55 checks, four properties |
+
+**Three findings are stale because I changed the branch under the reviewer.**
+The species swap (D-033) and the tag normalisation both landed while G was
+running, so G-5, G-10 and G-11 were true when G started and false when G filed.
+That is my process error, not a reviewer error, and it cost real review time:
+roughly a quarter of G's findings were spent on ground that had already moved.
+**A review should be given a frozen ref.**
+
+**What the second review bought.** G was scoped away from values entirely and
+still found the phase's deepest defect — a suite that verified three constants
+against itself. Reviewer H, who *did* re-derive values, could not have found it:
+H checked whether the numbers were right, which they were. The finding only
+exists because someone was asked whether the *evidence* was real. That is the
+argument for scoping a second reviewer orthogonally rather than deeper.
 
 ---
 

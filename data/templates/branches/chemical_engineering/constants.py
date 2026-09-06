@@ -338,49 +338,82 @@ SUBSTANCES_FOR_VAPORIZATION = [
 
 # Database of standard heats of formation (ΔH_f°) at 298.15 K in kJ/mol.
 #
-# PROVENANCE (Phase C2). All 21 values were checked against the NIST Chemistry
-# WebBook / CODATA and every one is inside its stated uncertainty; none needed
-# changing. The citation is per entry below and resolves to
-# docs/references/nist_webbook/shomate_coefficients.json.
+# UNITS. Standard enthalpy of formation at 298.15 K and 1 bar, in kJ/mol, for
+# the species in the phase its key names. Elements in their standard state are
+# exactly 0 by definition, not by measurement.
+#
+# PROVENANCE (Phase C2). Every value resolves to a specific measurement in
+# docs/references/nist_webbook/shomate_coefficients.json, retrieved from the
+# NIST Chemistry WebBook. Each citation names the CAS number, the value, its
+# uncertainty and the MEASUREMENT the row uses.
+#
+# WHY THE MEASUREMENT AND NOT JUST THE SPECIES. NIST lists several independent
+# determinations for most hydrocarbons, differing by more than any one of them
+# claims. An earlier version of this header said all 21 were "inside their
+# stated uncertainty", while citing NIST's recommended value for each row and
+# using a different one - so three rows (C2H6, C3H8, CH3OH(l)) sat outside the
+# uncertainty they themselves quoted, and the suite passed only because its
+# tolerance was floored at 2 kJ/mol. The values were right; the citations named
+# the wrong measurement (Phase C2 Reviewer G, findings G-2 and G-3).
+#
+# This table follows PROSEN AND ROSSINI (1945) for the hydrocarbons wherever
+# NIST lists it - a self-consistent set from one laboratory - which is why
+# C2H6, C3H8 and C8H18 do not carry NIST's recommended value. That is a source
+# choice, and it is now written down instead of inferred.
 #
 # Reviewer H finding F-3: the evidence existed only in the test suite and the
 # JSON, so the table did not carry its own provenance. It does now.
 HEATS_OF_FORMATION = {
     # Hydrocarbons (Gases)
-    # [ON-DISK] NIST 74-82-8, -74.6+/-0.3 (Gurvich 1991); Chase gives -74.87
+    # [ON-DISK] NIST 74-82-8, -74.6+/-0.3 (Manion 2002, adopting Gurvich 1991)
     "CH4(g)": -74.8,      # Methane
     # [ON-DISK] NIST 74-86-2, 226.73 (Chase 1998)
     "C2H2(g)": 226.7,     # Acetylene (Added)
-    # [ON-DISK] NIST 74-84-0, -84.0+/-0.4
+    # [ON-DISK] NIST 74-84-0, -84.67+/-0.49 (Prosen and Rossini 1945).
+    #   NIST's recommended value is -84.0+/-0.4 (Manion 2002); this row uses
+    #   Prosen, which is where -84.7 comes from. Citing the recommendation
+    #   while using Prosen is what made this row look 1.75 sigma out (G-2).
     "C2H6(g)": -84.7,     # Ethane
-    # [ON-DISK] NIST 74-98-6. NIST lists TWO measured values: -104.7 (Pittam
-    #   and Pilcher 1972) and -103.8 (Prosen and Rossini 1945). This row uses
-    #   Prosen. A source choice, not an error - Reviewer H retired the interim
-    #   doc's "propane discrepancy" on exactly this point.
+    # [ON-DISK] NIST 74-98-6, -103.8+/-0.59 (Prosen and Rossini 1945).
+    #   NIST lists TWO measured values: -104.7+/-0.50 (Pittam and Pilcher 1972,
+    #   recommended) and -103.8 (Prosen). This row uses Prosen. A source
+    #   choice, not an error - Reviewer H retired the interim doc's "propane
+    #   discrepancy" on exactly this point. Both are now on disk (G-3).
     "C3H8(g)": -103.8,    # Propane
     # [ON-DISK] NIST 106-97-8, -125.6+/-0.67
     "C4H10(g)": -125.7,   # Butane (Added)
-    # [ON-DISK] NIST 111-65-9, -208.4+/-0.67 (Prosen and Rossini 1945)
+    # [ON-DISK] NIST 111-65-9, -208.4+/-0.67 (Prosen and Rossini 1945).
+    #   NIST also lists -208.7 (Good 1972, computed via the heat of
+    #   vaporisation). No Cp fit exists for octane; the entry backs this
+    #   citation only.
     "C8H18(g)": -208.4,   # Octane (Gas phase) (Added)
     # [ON-DISK] NIST 71-43-2 condensed phase, 49.0+/-0.9
     "C6H6(l)": 49.0,      # Benzene
 
     # Alcohols (Liquids & Gases)
-    # [ON-DISK] NIST 67-56-1 condensed phase, -239.5+/-0.2
+    # [ON-DISK] NIST 67-56-1 condensed phase. This row is the one value in the
+    #   table that transcribes NO single NIST measurement: -238.6 sits between
+    #   Baroody and Carpenter 1972 (-238.4, no uncertainty stated) and Green
+    #   1960 (-238.9+/-3.6), and is inside Green's uncertainty. It is NOT
+    #   inside Chao and Rossini's -239.5+/-0.2, which this row used to cite
+    #   (G-2). Kept, because two NIST-listed measurements bracket it.
     "CH3OH(l)": -238.6,   # Methanol (Liquid)
-    # [ON-DISK] NIST 67-56-1 gas, -205+/-10 (average of 9 values)
+    # [ON-DISK] NIST 67-56-1 gas, -205+/-10 (NIST average of 9 values).
+    #   NIST also lists -201.49+/-0.20 (Rossini 1932, flame calorimetry), which
+    #   is the nearer of the two to this row.
     "CH3OH(g)": -200.7,   # Methanol (Gas) (Added - required for adiabatic flame temp)
-    # [ON-DISK] NIST 64-17-5 condensed phase, -276+/-2 (average of 6)
+    # [ON-DISK] NIST 64-17-5 condensed phase, -276+/-2 (NIST average of 6).
+    #   The nearest itemised determination is Green 1960 at -277.6.
     "C2H5OH(l)": -277.7,  # Ethanol (Liquid)
     # [ON-DISK] NIST 64-17-5 gas, -234+/-2
     "C2H5OH(g)": -235.1,  # Ethanol (Gas) (Added - required for adiabatic flame temp)
 
     # Common Gases & Products
-    # [ON-DISK] element in its standard state, exactly 0 by definition
+    # [BY-DEFINITION] element in its standard state, exactly 0
     "O2(g)": 0,
-    # [ON-DISK] element in its standard state, exactly 0 by definition
+    # [BY-DEFINITION] element in its standard state, exactly 0
     "H2(g)": 0,
-    # [ON-DISK] element in its standard state, exactly 0 by definition
+    # [BY-DEFINITION] element in its standard state, exactly 0
     "N2(g)": 0,
     # [ON-DISK] NIST 630-08-0, -110.53
     "CO(g)": -110.5,
@@ -394,8 +427,11 @@ HEATS_OF_FORMATION = {
     "NH3(g)": -46.1,
     # [ON-DISK] NIST 10102-43-9, 90.29
     "NO(g)": 90.3,
-    # [ON-DISK] NIST 10102-44-0, 33.10
-    "NO2(g)": 33.2,
+    # [ON-DISK] NIST 10102-44-0, 33.10 (Chase 1998) - the ONLY value NIST
+    #   lists. This row read 33.2; corrected to 33.1. A 0.1 kJ/mol
+    #   transcription slip, found by requiring the row to match a measurement
+    #   on disk rather than merely to name a species (G-2).
+    "NO2(g)": 33.1,
 }
 
 # A list of predefined, balanced chemical reactions.
@@ -434,6 +470,12 @@ REACTIONS = [
 #
 #     Cp/R = A + B*T + C*T^2 + D*T^-2       (T in Kelvin)
 #
+# UNITS. A, B, C and D are DIMENSIONLESS as written: the polynomial returns
+# Cp/R, so a caller multiplies by R = 8.314 J/(mol K) to get Cp in J/(mol K).
+# B, C and D carry implied units of K^-1, K^-2 and K^2 respectively, which is
+# why each exponent is attached to its value rather than to a column heading -
+# see the paragraph below.
+#
 # Valid roughly 298-1500 K for the gases. The coefficients are written with the
 # exponent attached to each value - B as E-3, C as E-6, D as E5 - because the
 # source tabulates them as the COLUMN HEADINGS 10^3 B, 10^6 C and 10^-5 D, and
@@ -448,10 +490,10 @@ REACTIONS = [
 # thermochemistry - so agreement between the two is evidence, not a tautology.
 # The "Cp298 x vs NIST y" note on each row is that check.
 #
-# Rows marked [KNOWN-DEFECTIVE] were checked and FAILED, and no citable
-# replacement could be derived. That is a different claim from "not looked
-# at" and is tagged differently on purpose; see
-# docs/re-implementation-sep/phaseC2_summary.md.
+# Every row now carries an [ON-DISK] citation. Two species that could not be
+# sourced at all - H2SO4(l) and CaCO3(s), both measurably wrong and both absent
+# from NIST - were REPLACED by species NIST does cover, rather than shipped
+# behind a tag (D-033).
 #
 # VALIDITY. CP_VALID_T_MAX below is the upper temperature this polynomial is
 # fitted for. It is not decoration: the polynomial is a good fit inside it and
@@ -467,89 +509,104 @@ CP_PARAMS = {
     # which substance 274 of 300 seeds drew, for no correctness reason.
 
     # Hydrocarbons (gases)
-    # [NIST 74-82-8]  Cp298 35.06 vs NIST 35.65
+    # [ON-DISK] NIST 74-82-8  Cp298 35.06 vs NIST 35.65
     "CH4(g)": {"A": 1.702, "B": 9.081E-3, "C": -2.164E-6, "D": 0.0E5},
     # Combustion products and common gases
-    # [NIST 124-38-9]  Cp298 37.14 vs NIST 37.13
+    # [ON-DISK] NIST 124-38-9  Cp298 37.14 vs NIST 37.13
     "CO2(g)": {"A": 5.457, "B": 1.045E-3, "C": 0.0E-6, "D": -1.157E5},
-    # [NIST 7727-37-9]  Cp298 29.12 vs NIST 29.12
+    # [ON-DISK] NIST 7727-37-9  Cp298 29.12 vs NIST 29.12
     "N2(g)": {"A": 3.28, "B": 0.593E-3, "C": 0.0E-6, "D": 0.04E5},
     # Liquids and solids
-    # [NIST 7732-18-5]  Cp298 75.40 vs NIST 75.3
+    # [ON-DISK] NIST 7732-18-5  Cp298 75.40 vs NIST 75.3
     "H2O(l)": {"A": 8.712, "B": 1.25E-3, "C": -0.18E-6, "D": 0.0E5},
     # Oxygenates (gases)
-    # [NIST 64-17-5 (refit)]  REFIT to the TRC 1997 Cp table; the previous row gave Cp298 74.40 against 65.21
+    # [ON-DISK] NIST 64-17-5 (refit)  REFIT to the TRC 1997 Cp table; the previous row gave Cp298 74.40 against 65.21
     "C2H5OH(g)": {"A": 1.9799, "B": 22.1928E-3, "C": -6.8999E-6, "D": 0.0E5},
-    # [NIST 7782-44-7]  REPLACED: the previous row gave Cp298 34.71 against NIST 29.38
+    # [ON-DISK] NIST 7782-44-7  REPLACED: the previous row gave Cp298 34.71 against NIST 29.38
     "O2(g)": {"A": 3.639, "B": 0.506E-3, "C": 0.0E-6, "D": -0.227E5},
-    # [NIST 1333-74-0]  Cp298 28.84 vs NIST 28.84
+    # [ON-DISK] NIST 1333-74-0  Cp298 28.84 vs NIST 28.84
     "H2(g)": {"A": 3.249, "B": 0.422E-3, "C": 0.0E-6, "D": 0.083E5},
     # Inorganic gases
-    # [NIST 7664-41-7]  Cp298 35.50 vs NIST 35.65
+    # [ON-DISK] NIST 7664-41-7  Cp298 35.50 vs NIST 35.65
     "NH3(g)": {"A": 3.578, "B": 3.02E-3, "C": 0.0E-6, "D": -0.186E5},
-    # [NIST 630-08-0]  Cp298 29.16 vs NIST 29.15
+    # [ON-DISK] NIST 630-08-0  Cp298 29.16 vs NIST 29.15
     "CO(g)": {"A": 3.376, "B": 0.557E-3, "C": 0.0E-6, "D": -0.031E5},
-    # [NIST 7783-06-4]  Cp298 34.15 vs NIST 34.19
+    # [ON-DISK] NIST 7783-06-4  Cp298 34.15 vs NIST 34.19
     "H2S(g)": {"A": 3.931, "B": 1.49E-3, "C": 0.0E-6, "D": -0.232E5},
-    # [NIST 74-84-0]  SVN Cp298/R self-check 6.3686 vs published 6.369
+    # [ON-DISK] NIST 74-84-0  5-point Gurvich 1989 table, 298-1500 K, worst
+    #   -2.6% at 1500 K. This row used to record only the Smith-Van Ness
+    #   Cp298/R self-check - a check against the source's own column, which is
+    #   the tautology this table's header disclaims. The multi-point NIST data
+    #   was on disk and unconsulted (G-8).
     "C2H6(g)": {"A": 1.131, "B": 19.225E-3, "C": -5.561E-6, "D": 0.0E5},
-    # [NIST 74-98-6]  Cp298 74.92 vs NIST 73.60
+    # [ON-DISK] NIST 74-98-6  Cp298 74.92 vs NIST 73.60
     "C3H8(g)": {"A": 1.213, "B": 28.785E-3, "C": -8.824E-6, "D": 0.0E5},
-    # [NIST 106-97-8]  Cp298 99.17 vs NIST 98.49
+    # [ON-DISK] NIST 106-97-8  Cp298 99.17 vs NIST 98.49
     "C4H10(g)": {"A": 1.935, "B": 36.915E-3, "C": -11.402E-6, "D": 0.0E5},
-    # [NIST 74-85-1]  Cp298 44.28 vs NIST 42.90
+    # [ON-DISK] NIST 74-85-1  Cp298 44.28 vs NIST 42.90
     "C2H4(g)": {"A": 1.424, "B": 14.394E-3, "C": -4.392E-6, "D": 0.0E5},
-    # [NIST 74-86-2 (refit)]  REFIT: the previous row gave Cp298 68.39 against NIST 44.04
+    # [ON-DISK] NIST 74-86-2 (refit)  REFIT: the previous row gave Cp298 68.39 against NIST 44.04
     "C2H2(g)": {"A": 3.4669, "B": 7.5416E-3, "C": -2.799E-6, "D": 0.0E5},
-    # [NIST 71-43-2]  was keyed C6H6(l) but holds GAS coefficients; NIST liquid is 135.69
+    # [ON-DISK] NIST 71-43-2  8-point TRC 1997 GAS table, 298-1500 K, worst
+    #   -4.5% at 500 K. Was keyed C6H6(l) but holds gas coefficients; the
+    #   re-key was justified by the liquid value (135.69) alone, which is
+    #   evidence the row is misfiled, not evidence the row is right (G-8).
     "C6H6(g)": {"A": -0.206, "B": 39.064E-3, "C": -13.301E-6, "D": 0.0E5},
-    # [NIST 108-88-3]  was keyed C7H8(l); NIST liquid is 157.09
+    # [ON-DISK] NIST 108-88-3  8-point Scott 1962 / Draeger 1985 GAS table,
+    #   298-1500 K, worst +3.6% at 298 K. Was keyed C7H8(l); as for benzene,
+    #   the liquid value (157.09) justified the re-key but verified nothing
+    #   about the coefficients themselves (G-8).
     "C7H8(g)": {"A": 0.29, "B": 47.052E-3, "C": -15.716E-6, "D": 0.0E5},
-    # [NIST 67-64-1 (refit)]  was keyed C3H6O(l) and held gas values that were
+    # [ON-DISK] NIST 67-64-1 (refit)  was keyed C3H6O(l) and held gas values that were
     # themselves 8.4% high; refitted to the Chao 1986 table, worst error 1.11%
     "C3H6O(g)": {"A": 2.4096, "B": 24.7630E-3, "C": -7.5941E-6, "D": 0.0E5},
-    # [NIST 67-56-1]  Cp298 80.28 vs NIST 79.5
+    # [ON-DISK] NIST 67-56-1  Cp298 80.28 vs NIST 79.5
     "CH3OH(l)": {"A": 5.052, "B": 16.561E-3, "C": -3.761E-6, "D": 0.0E5},
-    # [NIST 110-54-3 (refit)]  was keyed C6H14(l) and held values 11.8% below
+    # [ON-DISK] NIST 110-54-3 (refit)  was keyed C6H14(l) and held values 11.8% below
     # the NIST GAS value; refitted to the Scott 1974 table
     "C6H14(g)": {"A": 3.1704, "B": 53.3808E-3, "C": -16.3758E-6, "D": 0.0E5},
-    # [NIST 7446-09-5]  Cp298 39.88 vs NIST 39.87
+    # [ON-DISK] NIST 7446-09-5  Cp298 39.88 vs NIST 39.87
     "SO2(g)": {"A": 5.699, "B": 0.801E-3, "C": 0.0E-6, "D": -1.015E5},
-    # [NIST 10102-43-9]  Cp298 29.81 vs NIST 29.86
+    # [ON-DISK] NIST 10102-43-9  Cp298 29.81 vs NIST 29.86
     "NO(g)": {"A": 3.387, "B": 0.669E-3, "C": 0.0E-6, "D": 0.095E5},
-    # [NIST 10102-44-0]  REPLACED: D's mantissa -0.792 had been written into the C column
+    # [ON-DISK] NIST 10102-44-0  REPLACED: D's mantissa -0.792 had been written into the C column
     "NO2(g)": {"A": 4.982, "B": 1.195E-3, "C": 0.0E-6, "D": -0.792E5},
-    # [NIST 7782-50-5]  Cp298 33.85 vs NIST 33.95
+    # [ON-DISK] NIST 7782-50-5  Cp298 33.85 vs NIST 33.95
     "Cl2(g)": {"A": 4.442, "B": 0.089E-3, "C": 0.0E-6, "D": -0.344E5},
-    # [NIST 7647-01-0]  Cp298 29.14 vs NIST 29.14
+    # [ON-DISK] NIST 7647-01-0  Cp298 29.14 vs NIST 29.14
     "HCl(g)": {"A": 3.156, "B": 0.623E-3, "C": 0.0E-6, "D": 0.151E5},
     # Monatomic gases - exact, Cp = 5R/2, no source required
-    # [exact (monatomic ideal gas)]
+    # [DERIVED] exact (monatomic ideal gas)
     "He(g)": {"A": 2.5, "B": 0.0E-3, "C": 0.0E-6, "D": 0.0E5},
-    # [exact (monatomic ideal gas)]
+    # [DERIVED] exact (monatomic ideal gas)
     "Ar(g)": {"A": 2.5, "B": 0.0E-3, "C": 0.0E-6, "D": 0.0E5},
-    # [exact (monatomic ideal gas)]
+    # [DERIVED] exact (monatomic ideal gas)
     "Ne(g)": {"A": 2.5, "B": 0.0E-3, "C": 0.0E-6, "D": 0.0E5},
-    # [mixture, no NIST entry]  verified against the mole-weighted N2/O2/Ar average to 0.36%
+    # [DERIVED] mixture, no NIST entry  verified against the mole-weighted N2/O2/Ar average to 0.36%
     "Air(g)": {"A": 3.355, "B": 0.575E-3, "C": 0.0E-6, "D": -0.016E5},
-    # [NIST 7732-18-5]  Cp500 35.28 vs NIST 35.22
+    # [ON-DISK] NIST 7732-18-5  Cp500 35.28 vs NIST 35.22
     "H2O(g)": {"A": 3.47, "B": 1.45E-3, "C": 0.0E-6, "D": 0.121E5},
-    # [[KNOWN-DEFECTIVE]]  NOT merely unsourced: this row computes Cp298 =
-    # 56.9 J/mol/K against a literature ~138.9, i.e. ~59% low. It was checked
-    # and it failed. NIST carries no condensed-phase Cp for H2SO4 (verified,
-    # free and paid-linked sections both), so no citable replacement could be
-    # derived. Tagged as defective rather than as "not looked at" - the two
-    # are different claims and only one of them is true here.
-    "H2SO4(l)": {"A": 2.85, "B": 13.4E-3, "C": 0.0E-6, "D": 0.0E5},
-    # [NIST 7647-14-5 (refit)]  the transcribed row read 47.70 against NIST
+    # [ON-DISK] NIST 71-43-2 condensed phase (fit)
+    # REPLACES H2SO4(l), which was ~59% low and which NIST carries no
+    # condensed-phase Cp for, in either its free or its paid-linked sections.
+    # Rather than ship a known-wrong row behind a tag, the species is swapped
+    # for one that IS citable (D-033). Fitted to four NIST liquid measurements
+    # spanning 293-322 K (Kalali 1987, Grolier 1993, Reddy 1986, Naziev 1986),
+    # worst error 0.49%. Cp298 = 135.83 against NIST 135.69. Benzene boils at
+    # 353 K, so the template's 280-350 K liquid window stays in phase.
+    "C6H6(l)": {"A": 9.9167, "B": 21.5325E-3, "C": 0.0E-6, "D": 0.0E5},
+    # [ON-DISK] NIST 7647-14-5 (refit)  the transcribed row read 47.70 against NIST
     # 50.50 (-5.5%). That was waved through as "a source disagreement" with no
     # argument; NIST does publish a solid-phase Shomate, so it is resolvable.
     # Refitted over 298-1073 K, worst error 0.19%.
     "NaCl(s)": {"A": 6.8261, "B": -1.6794E-3, "C": 2.6971E-6, "D": -0.4470E5},
-    # [[KNOWN-DEFECTIVE]]  computes Cp298 = 74.7 against a literature ~81.9,
-    # i.e. ~9% low. Checked and failed; NIST free tier carries no Cp for
-    # calcite, so no citable replacement could be derived.
-    "CaCO3(s)": {"A": 12.572, "B": 2.637E-3, "C": -3.12E-6, "D": -3.642E5},
+    # [ON-DISK] NIST 1344-28-1 solid phase, corundum (fit)
+    # REPLACES CaCO3(s), which was ~9% low and for which NIST's free tier
+    # carries no Cp (verified against the calcite and calcium-carbonate pages
+    # both). Swapped for a solid NIST covers with a full Shomate over
+    # 298-2327 K (D-033). Fitted over 298-1200 K, the template's solid window,
+    # worst error 0.06%. Cp298 = 78.76 against NIST 78.80.
+    "Al2O3(s)": {"A": 12.5528, "B": 3.9106E-3, "C": -1.0715E-6, "D": -3.6899E5},
 }
 
 
@@ -559,6 +616,12 @@ CP_PARAMS = {
 # table states. The refitted rows carry the range they were actually fitted
 # over. Condensed phases are capped at a temperature below their normal boiling
 # or decomposition point.
+# VALIDITY CEILING, in Kelvin, per species. ADVISORY, NOT ENFORCED: the only
+# consumer is tests/constants_integrity/test_chemical_thermochemistry.py, which
+# reports how far a template runs past it. No template reads this table, so
+# nothing stops an item generating outside the range - that is the open half of
+# Reviewer H's F-2, and the refit-vs-restrict decision is D-032 (Phase 2).
+# Values are this repo's own fit ranges, not NIST's; each row says which.
 CP_VALID_T_MAX = {
     **{k: 1500.0 for k in CP_PARAMS},
     "C2H5OH(g)": 1500.0,     # refit over 298-1500 K
@@ -568,8 +631,8 @@ CP_VALID_T_MAX = {
     "NaCl(s)": 1073.0,       # refit over 298-1073 K
     "H2O(l)": 373.0,
     "CH3OH(l)": 337.0,
-    "H2SO4(l)": 610.0,
-    "CaCO3(s)": 1200.0,
+    "C6H6(l)": 350.0,        # fitted 293-322 K; benzene boils at 353 K
+    "Al2O3(s)": 1200.0,      # fitted 298-1200 K; NIST Shomate runs to 2327 K
     "He(g)": 6000.0, "Ar(g)": 6000.0, "Ne(g)": 6000.0,   # exact at any T
 }
 
@@ -577,6 +640,12 @@ CP_VALID_T_MAX = {
 # Dry-air composition used to verify the Air(g) row against its components.
 # Recorded because Reviewer H noted the check was internal and the assumed
 # composition was nowhere stated.
+# Dry-air mole fractions, dimensionless. Standard dry-atmosphere values (US
+# Standard Atmosphere 1976); CO2 and the remaining trace gases (~0.00036 mole
+# fraction) are dropped, so these three sum to 0.99964 and a consumer must
+# normalise if it needs unity. Used to verify the Air(g) Cp row, which is a
+# mixture with no NIST entry of its own. ADVISORY like the table above: the
+# test suite is its only consumer.
 AIR_COMPOSITION = {"N2(g)": 0.78084, "O2(g)": 0.20946, "Ar(g)": 0.00934}
 
 
