@@ -242,6 +242,101 @@ CASES += [
      "control: a bare anaphoric comment still governs (B round-1 F2)"),
 ]
 
+# ==========================================================================
+# Round 3 -- the cases that broke the fixes for round 2.
+#
+# Third round, third set of relocations.  The pattern is Phase 3's exactly:
+# each round's fix is sound and the surface it introduces is not reviewed.
+# ==========================================================================
+
+CASES += [
+
+    # ---- E R3-F14: R2-F12 relocated -- the strip started CONCEALING --------
+    ("E-R3-F14", "categorical", G_LIN,
+     "**Answer:** The system is linear (or nonlinear, I am not sure).", "UNRESOLVED",
+     "**false accept**: stripping a label-parenthetical deleted its hedge too"),
+
+    # ---- E R3-F15: _MAX_COMMENT_WORDS = 6, escapable by one word -----------
+    ("E-R3-F15", "categorical", G_LIN,
+     "**Answer:** The system is linear. I am not entirely sure about that.",
+     "UNRESOLVED",
+     "**false accept**: a magic constant inside the fix that removed one"),
+    ("E-R3-F15", "categorical", G_LIN,
+     "**Answer:** The system is linear. I am not sure.", "UNRESOLVED",
+     "control: the 4-word form was already caught"),
+
+    # ---- E R3-F16: two modules contradicting each other about `Note` -------
+    ("E-R3-F16", "categorical", G_LIN,
+     "## Final Answer\n**Answer:** The system is linear.\n\n"
+     "Recall that a nonlinear map fails additivity.", "MATCH",
+     "**correct answer scored WRONG**: a trailing factive outranked the "
+     "commitment; DISCOURSE_MARKERS and FACTIVE disagreed about the same word"),
+
+    # ---- E R3-F13: is_bare_comment's subjectless test was a blocklist ------
+    ("E-R3-F13", "categorical", G_LIN,
+     "**Answer:** The system is linear. Superposition seems to hold.", "MATCH",
+     "**over-rejection**: a bare abstract noun read as a bare comment"),
+    ("E-R3-F13", "categorical", G_LIN,
+     "**Answer:** The system is linear. The margin seems comfortable.", "MATCH",
+     "control: R2-F9c passed before only because this sentence starts with 'The'"),
+
+    # ---- E R3-F17: the concessive fix was conditional on ORTHOGRAPHY -------
+    ("E-R3-F17", "categorical", G_LIN,
+     "**Answer:** Since both tests pass the system is linear.", "MATCH",
+     "**over-rejection**: a comma-less fronted concessive had no matrix"),
+
+    # ---- E R3-F19: the excision spliced a fragment into the matrix ---------
+    ("E-R3-F19", "categorical", G_LIN,
+     "**Answer:** The system is linear, since the check, a nonlinear probe, passed.",
+     "MATCH",
+     "**correct answer scored WRONG**: the interpolation's internal comma was "
+     "taken as its close"),
+
+    # ---- B R3-F2: segment() never cut at a COORDINATOR ---------------------
+    ("B-R3-F2", "categorical", G_LIN,
+     "**Answer:** The result may be described differently under another "
+     "convention, but the system is linear.", "MATCH",
+     "**over-rejection**: a caveat in another conjunct reached the commitment; "
+     "the verbatim reynolds_number_flow_regime construction B filed as R2-F2"),
+    ("B-R3-F2", "categorical", G_LIN,
+     "**Answer:** The delay term looks awkward, yet the system is linear.",
+     "MATCH", "**over-rejection**: coordinator `yet`"),
+    ("B-R3-F2", "categorical", G_LIN,
+     "**Answer:** The distinction is not entirely obvious, but the system is linear.",
+     "MATCH",
+     "the OTHER side of the same rule: a hedge about the REASONING does not "
+     "govern the answer, so this must still MATCH"),
+    ("B-R3-F2", "categorical", G_LIN,
+     "**Answer:** I am not 100% sure, but the system is linear.", "UNRESOLVED",
+     "and the discriminator: a hedge about the SPEAKER governs across the "
+     "coordinator (B round-1 F1)"),
+
+    # ---- B R3-F3: negation crossed a colon and scored a CORRECT answer wrong
+    ("B-R3-F3", "categorical", G_LIN,
+     "**Answer:** While the delay term is present, it does not break "
+     "superposition: the system is linear.", "MATCH",
+     "**correct answer scored WRONG** -- a MISMATCH, which D4.1 §1's bias rules out"),
+    ("B-R3-F3", "categorical", G_LIN,
+     "**Answer:** Although the offset looks odd, it does not break "
+     "superposition: the system is linear.", "MATCH",
+     "the same defect after it spread to `Although`"),
+
+    # ---- B R3-F1: the recall corpus's MISSING NEGATIVE CONTROL -------------
+    # B built the control I omitted.  These are the enumerated answers whose
+    # frame the enumerator split discarded, so a hypothetical wrapper had no
+    # effect at all -- my round-2 fix for the recall corpus, relocating a
+    # defect into the tuple path.
+    ("B-R3-F1", "categorical[tuple]", G_MC_YY,
+     "**Answer:** If the additivity test holds, a) Yes, b) Yes.", "UNRESOLVED",
+     "**false accept**: a hypothetical frame on an ENUMERATED answer was discarded"),
+    ("B-R3-F1", "categorical[tuple]", G_MC_YY,
+     "**Answer:** We must determine whether a) Yes, b) Yes.", "UNRESOLVED",
+     "**false accept**: a task restatement, same route"),
+    ("B-R3-F1", "categorical[tuple]", G_MC_YY,
+     "**Answer:** Although the algebra is fiddly, a) Yes, b) Yes.", "MATCH",
+     "control: a CONCESSIVE frame on the same answer must still MATCH"),
+]
+
 TEMPLATE_FOR = {
     "categorical": "template_system_property_linearity",
     "categorical[tuple]": "template_system_properties_memory_causality",

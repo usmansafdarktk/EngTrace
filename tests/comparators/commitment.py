@@ -213,8 +213,11 @@ def segment(clause: str) -> tuple[str | None, str]:
         return None, "the clause is empty"
     if c.rstrip().endswith("?"):
         return None, "the clause is a question"
-    if _TASK_RE.search(c):
-        m = _TASK_RE.search(c)
+    # Anchored to the clause opening (Reviewer E, R3-F22): unanchored, a
+    # trailing "... which is what we needed to determine whether to accept"
+    # would void a committed answer.
+    m = _TASK_RE.match(c)
+    if m:
         return None, f"the clause restates the task ({m.group(0)!r}), it does not answer it"
     if _BARE_QUAL_RE.match(c):
         return None, "the clause is a bare qualifier, not an answer"
@@ -231,14 +234,21 @@ def segment(clause: str) -> tuple[str | None, str]:
             return None, "the factive has no complement"
 
     # A fronted concessive: "Although X, Y" -> the matrix is Y.
-    if _CONC_RE.match(c):
+    #
+    # **The comma is optional.**  "Since both tests pass the system is linear"
+    # is the same sentence without it, and requiring one made B's R2-F1.1 fix
+    # conditional on ORTHOGRAPHY -- which the recall corpus could not see,
+    # because every frame it generates supplies the comma (Reviewer E, R3-F17).
+    # Without a comma the subordinate clause runs to the finite verb of the
+    # matrix, which is approximated by the last label-bearing span; falling
+    # back to "everything after the opener" is the conservative reading and it
+    # is what a reader does.
+    cm = _CONC_RE.match(c)
+    if cm:
         comma = c.find(",")
-        if comma == -1:
-            return None, ("the clause is a bare subordinate clause with no matrix "
-                          "to assert")
-        c = c[comma + 1:].strip()
+        c = (c[comma + 1:] if comma != -1 else c[cm.end():]).strip()
         if not c:
-            return None, "the clause is a bare subordinate clause"
+            return None, "the clause is a bare subordinate clause with no matrix"
         # The matrix may itself be hypothetical: "Although X, if Y then Z".
         if _HYPO_RE.match(c):
             return None, "the matrix clause is itself hypothetical"
@@ -258,9 +268,66 @@ def segment(clause: str) -> tuple[str | None, str]:
         m = _TRAILING_SUB_RE.search(c)
         if not m:
             break
-        close = c.find(",", m.end())
+        close = _closing_comma(c, m.end())
         c = (c[:m.start()] + c[close:]).strip() if close != -1 else c[:m.start()].strip()
     return (c, "") if c else (None, "the clause has no matrix part")
+
+
+#: Coordinators.  A coordinator joins two **independent** conjuncts, and a
+#: hedge in one does not govern a label in the other:
+#:
+#:     "The result may be described differently under another convention,
+#:      but the system is linear."
+#:
+#: Reviewer B listed these by name in round 2 (§5.1) and three of the four
+#: parts of that remedy shipped -- this one did not, so hedge scope went
+#: 45 characters -> clause -> segment and still never cut at a coordinator.
+#: Six of seven coordination constructions were refused (B, R3-F2), and it is
+#: the verbatim `reynolds_number_flow_regime` construction B filed from the
+#: real archive as R2-F2.
+COORDINATORS = ("but", "yet", "however", "nevertheless", "nonetheless",
+                "regardless", "still", "though", "whereas", "instead")
+
+_COORD_RE = re.compile(
+    r"(?:^|[,;]\s*|\s)(?:" + "|".join(re.escape(c) for c in COORDINATORS) + r")\s+",
+    re.IGNORECASE,
+)
+
+
+def conjuncts(matrix: str) -> list[str]:
+    """Split an asserting segment at its coordinators.
+
+    Each conjunct is scoped separately for hedges, so a caveat in one conjunct
+    cannot reach a commitment in another. Splitting rather than truncating
+    keeps both directions available: the label may be in either conjunct.
+    """
+    parts, pos = [], 0
+    for m in _COORD_RE.finditer(matrix):
+        if matrix[pos:m.start()].strip():
+            parts.append(matrix[pos:m.start()].strip())
+        pos = m.end()
+    if matrix[pos:].strip():
+        parts.append(matrix[pos:].strip())
+    return parts or [matrix]
+
+
+def _closing_comma(text: str, start: int) -> int:
+    """The comma that closes a subordinate interpolation, or -1.
+
+    A subordinate clause may carry commas of its own -- "since the check, a
+    nonlinear probe, passed" -- and taking the first one splices a fragment
+    into the matrix (Reviewer E, R3-F19). The closing comma is the last one
+    before the segment ends or before a coordinator resumes the matrix.
+    """
+    commas = [m.start() for m in re.finditer(r",", text[start:])]
+    if not commas:
+        return -1
+    stop = len(text)
+    cm = _COORD_RE.search(text, start)
+    if cm:
+        stop = cm.start()
+    inside = [start + c for c in commas if start + c < stop]
+    return inside[-1] if inside else -1
 
 
 # --------------------------------------------------------------------------
@@ -362,36 +429,44 @@ def hedge_markers(text: str, classes: frozenset[str] | None = None) -> list[str]
 # 4.  Bare epistemic comments -- what may govern from a distance
 # --------------------------------------------------------------------------
 
+#: A bare epistemic comment has an **anaphoric or absent** subject.  This is an
+#: allowlist by design: version 2 used a *determiner blocklist* ("the", "a",
+#: "both"...), so a clause whose subject was a bare abstract noun --
+#: "Superposition seems to hold" -- read as a bare comment and retracted a
+#: commitment it did not modify (Reviewer E, R3-F13).  A blocklist over English
+#: noun phrases has an unbounded complement; the pronouns do not.
 _ANAPHORIC_SUBJECT = re.compile(
     r"^\W*(?:it|this|that|these|those|i|we|there)\b", re.IGNORECASE)
-_MAX_COMMENT_WORDS = 6
+
+#: Subjectless openers: a predicate adjective or a bare negation standing alone.
+#: "Hard to say", "Not sure", "Difficult to tell", "Unclear".
+_SUBJECTLESS = re.compile(
+    r"^\W*(?:hard|difficult|impossible|unclear|uncertain|not|no|unsure|"
+    r"tough|tricky)\b", re.IGNORECASE)
 
 
 def is_bare_comment(clause: str, surfaces: Sequence[str]) -> bool:
     """Is this clause a bare epistemic remark rather than a claim of its own?
 
     ``It seems.`` / ``I am not sure.`` / ``Hard to say, though.`` qualify a
-    neighbouring commitment. ``The margin seems comfortable.`` and ``This should
-    be clear from the square.`` do not -- they are claims about something else
-    that happen to contain a marker.
+    neighbouring commitment. ``The margin seems comfortable.`` and
+    ``Superposition seems to hold.`` do not -- they are claims about something
+    else that happen to contain a marker.
 
-    The test is **grammatical, not positional**, which is how version 1's
-    ``for j in (i-1, i+1)`` magic constant leaves rather than shrinking: a bare
-    comment governs from any distance, and a full clause governs from none.
+    **No length bound.**  Version 2 carried ``_MAX_COMMENT_WORDS = 6``, which
+    Reviewer E escaped by one word: ``I am not sure`` was caught and ``I am not
+    entirely sure about that`` was not, though both phrases are declared
+    (R3-F15). That was a magic constant inside the fix that removed a magic
+    constant. The subject test alone does the work, and it does not have a
+    threshold to tune.
     """
     from .kinds import _label_hit  # noqa: PLC0415 - circular at import time
 
     if _label_hit(clause, surfaces):
         return False
-    if len(clause.split()) > _MAX_COMMENT_WORDS:
-        return False
-    stripped = re.sub(r"^\W*(?:but|and|however|though|although)\b", "", clause,
+    stripped = re.sub(r"^\W*(?:but|and|however|though|although|so)\b", "", clause,
                       flags=re.IGNORECASE).strip()
-    if _ANAPHORIC_SUBJECT.match(stripped):
-        return True
-    # Subjectless: "Hard to say", "Not sure", "Difficult to tell".
-    return not re.match(r"^\W*(?:the|a|an|both|each|every|all|its|his|her|their)\b",
-                        stripped, re.IGNORECASE)
+    return bool(_ANAPHORIC_SUBJECT.match(stripped) or _SUBJECTLESS.match(stripped))
 
 
 # --------------------------------------------------------------------------
@@ -409,16 +484,6 @@ class Commitment:
 
     def __bool__(self) -> bool:
         return self.clause is not None
-
-
-def label_segment(text: str, surfaces: Sequence[str]) -> str | None:
-    """The asserting segment of ``text`` that carries a label, or None."""
-    from .kinds import _label_hit  # noqa: PLC0415
-
-    matrix, _ = segment(text)
-    if matrix is None:
-        return None
-    return matrix if _label_hit(_strip_label_parens(matrix), surfaces) else None
 
 
 _PAREN_RE = re.compile(r"\(([^()]*)\)")
@@ -459,6 +524,21 @@ def find_commitment(text: str, surfaces: Sequence[str]) -> Commitment:
     if not labelled:
         return Commitment(None, -1, "no clause names a declared label")
 
+    # **A factive clause may supply a commitment but never override one.**
+    # `normalize.DISCOURSE_MARKERS` treats a trailing "Note ..." sentence as a
+    # qualification and `answer_span` refuses to peel into it; `FACTIVE` then
+    # declared the same sentence an assertion, and last-clause-wins handed it
+    # the answer -- so an answer of "The system is linear." followed by
+    # "Recall that a nonlinear map fails additivity." scored MISMATCH, marking a
+    # correct answer WRONG.  Two modules contradicting each other
+    # about the same construction (Reviewer E, R3-F16), which re-opened round-1
+    # F4.  Discourse position settles it: a factive that FOLLOWS a commitment is
+    # elaboration, not retraction.  FACTIVE's census support is 1 in 2,200, so
+    # it does not get to outrank anything.
+    committing = [(i, c) for i, c in labelled if not _FACTIVE_RE.match(c)]
+    if committing:
+        labelled = committing
+
     last_reason = ""
     for i, c in reversed(labelled):
         matrix, why = segment(c)
@@ -469,10 +549,14 @@ def find_commitment(text: str, surfaces: Sequence[str]) -> Commitment:
         if not _label_hit(bare, surfaces):
             last_reason = "the label is inside a backgrounded or parenthetical part"
             continue
-        # Governance is now local: the marker must be in the label's own
-        # asserting segment, for every probe class -- not merely somewhere in
-        # the clause (B, R2-F1.2).
-        marks = hedge_markers(bare)
+
+        # Governance is the label's own CONJUNCT, not its clause and not its
+        # whole segment.  A coordinator joins two independent conjuncts and a
+        # caveat in one does not reach a commitment in the other (B, R3-F2).
+        owning = next((cj for cj in reversed(conjuncts(bare))
+                       if _label_hit(cj, surfaces)), bare)
+
+        marks = _hedges_governing(cls, i, owning, matrix, surfaces)
         if marks:
             last_reason = f"hedged ({', '.join(marks)})"
             continue
@@ -480,8 +564,83 @@ def find_commitment(text: str, surfaces: Sequence[str]) -> Commitment:
         if neighbour:
             last_reason = f"qualified by a bare comment ({neighbour})"
             continue
-        return Commitment(bare, i)
+        return Commitment(owning, i)
     return Commitment(None, -1, last_reason or "no clause commits to a label")
+
+
+#: Classes a **bare epistemic comment** may carry when it governs a sibling.
+#: Modals and verbs of opinion are excluded: ``This should be clear from the
+#: square`` is confidence, and ``Imagine a scaled input`` opens a proof.
+_COMMENT_CLASSES = frozenset(
+    {"copula of appearance", "stated uncertainty", "evidential"})
+
+
+def _hedges_governing(
+    cls: list[str], i: int, owning: str, matrix: str, surfaces: Sequence[str]
+) -> list[str]:
+    """Which hedges actually govern the commitment in ``owning``?
+
+    Three findings collapse into **one distinction**, and it is the one
+    Reviewer B drew in round 2 when it split ``UNCERTAINTY`` into inability and
+    imprecision: *whose* confidence is being qualified.
+
+    ``I am not 100% sure, but the system is linear``   -- the speaker's, so it
+    governs the whole utterance across the coordinator (B, round-1 F1).
+    ``The distinction is not entirely obvious, but the system is linear``
+                                                       -- the *reasoning's*, so
+    it stays in its own conjunct and the commitment stands (B, round-2 §5).
+    ``The system is linear (the wrong answer would be nonlinear)``  -- a modal
+    about a hypothetical answer, local, and stripped with its parenthetical
+    (E, R2-F12).
+    ``The system is linear (or nonlinear, I am not sure)``  -- the speaker's
+    again, inside a parenthetical, and it must NOT be stripped away with it
+    (E, R3-F14).
+
+    The discriminator is not the class and not the position: it is whether the
+    hedge sits in a **bare epistemic comment** -- a unit with an anaphoric or
+    absent subject, which is therefore about the answer rather than about some
+    other proposition. A bare comment governs from anywhere; anything else is
+    local to the label's own conjunct.
+    """
+    from .kinds import _label_hit  # noqa: PLC0415 - circular at import time
+
+    # 1. Local hedges, in the label's own conjunct, with label-naming
+    #    parentheticals removed so a gloss about the *other* label cannot hedge
+    #    this one.
+    marks = list(hedge_markers(owning))
+
+    # 2. Bare epistemic comments anywhere: sibling conjuncts, parenthetical
+    #    asides, and other clauses of the span.
+    units: list[tuple[str, bool]] = []          # (text, follows_the_commitment)
+    for cj in conjuncts(matrix):
+        if cj.strip() != owning.strip():
+            units.append((cj, matrix.find(cj) > matrix.find(owning)))
+    for m in _PAREN_RE.finditer(matrix):
+        # A parenthetical often packs a label and a comment together --
+        # "(or nonlinear, I am not sure)" -- and the label makes the whole
+        # group fail the bare-comment test, hiding the comment inside it
+        # (Reviewer E, R3-F14). Split on commas so each piece is judged alone.
+        for piece in m.group(1).split(","):
+            units.append((piece, True))
+    for j, c in enumerate(cls):
+        if j != i:
+            units.append((c, j > i))
+
+    for text, follows in units:
+        # A label-free QUESTION following the answer withdraws it.  "The system
+        # is linear. Or is it?" is not a commitment, and nothing else here sees
+        # that: `segment` only rejects a question that carries the label itself.
+        # Found by the negative controls Reviewer B said the recall corpus
+        # needed (R3-F1) -- 30 of 39 answers were still credited under a
+        # trailing "Or is it?".
+        if follows and text.rstrip().endswith("?") and not _label_hit(text, surfaces):
+            marks.append("withdrawn by a following question")
+            continue
+        if not is_bare_comment(text, surfaces):
+            continue
+        classes = _COMMENT_CLASSES if follows else frozenset({"stated uncertainty"})
+        marks.extend(hedge_markers(text, classes))
+    return sorted(set(marks))
 
 
 def _governing_comment(cls: list[str], i: int, surfaces: Sequence[str]) -> str:
@@ -503,6 +662,57 @@ def _governing_comment(cls: list[str], i: int, surfaces: Sequence[str]) -> str:
         marks = hedge_markers(c, classes)
         if marks:
             return ", ".join(marks)
+    return ""
+
+
+def suspends_what_follows(lead: str) -> str:
+    """Does this preface suspend the answer that follows it? Reason, or ``""``.
+
+    Only the framings that leave nothing asserted count: a hypothetical, a
+    restatement of the task, a question, a bare qualifier. A **concessive or
+    factive** preface does *not* suspend -- its matrix clause is precisely the
+    answer that follows, which is why ``Although the algebra is fiddly, a) Yes,
+    b) Yes`` must still be credited while ``If the additivity test holds, a)
+    Yes, b) Yes`` must not.
+
+    This exists for the enumerated label-tuple path, where the answer's slots
+    are located positionally *after* the enumerators and any preface is
+    otherwise dropped unread (Reviewer B, R3-F1).
+    """
+    c = lead.strip()
+    if not c:
+        return ""
+    if c.rstrip().endswith("?"):
+        return "the answer is a question"
+    # **A preface closed by a sentence stop does not scope over what follows.**
+    # "Consider a scaled input a*x[n] and a shifted input x[n-k]. a) Yes, b) Yes"
+    # sets up a derivation and then answers; "If the additivity test holds,
+    # a) Yes, b) Yes" is one conditional sentence.  Without this, `consider`,
+    # `imagine` and `let` -- which are in HYPOTHETICAL because "Assume the
+    # system is linear" must not commit -- also suspended every answer that
+    # merely followed a worked setup, and Reviewer B's R2-F1.3 says those open
+    # the standard homogeneity proof.  The punctuation is what separates the
+    # two, and unlike R3-F17's comma it is not optional: a new sentence needs it.
+    if c.rstrip().endswith((".", "!")):
+        return ""
+    if _TASK_RE.match(c):
+        return f"the preface restates the task ({_TASK_RE.match(c).group(0)!r})"
+    if _BARE_QUAL_RE.match(c):
+        return "the preface is a bare qualifier"
+    m = _HYPO_RE.match(c)
+    if m:
+        return (f"the answer is conditional on a hypothesis "
+                f"({m.group(0).strip()!r}), not asserted")
+    # A speaker-level hedge in the preface governs the answer that follows it,
+    # for the same reason it governs across a coordinator: "I am not sure, but
+    # perhaps a) Yes, b) Yes" qualifies the answer, not some other proposition.
+    # Without this the enumerated answers took a hedged preface and dropped it
+    # unread, which the negative controls caught on 16 of 39.
+    for piece in re.split(r",|\bbut\b|\band\b", c):
+        if is_bare_comment(piece, ()) :
+            marks = hedge_markers(piece, _COMMENT_CLASSES)
+            if marks:
+                return f"the preface hedges the answer ({', '.join(marks)})"
     return ""
 
 
