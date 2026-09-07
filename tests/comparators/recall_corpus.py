@@ -147,8 +147,16 @@ def main() -> int:
     cases = build()
     print("Recall corpus -- real archived correct answers in ordinary prose frames")
     print("=" * 92)
-    print(f"{len(cases)} cases from {len(cases) // len(FRAMES)} archived correct answers "
-          f"x {len(FRAMES)} frames\n")
+    # Reviewer B, round 4: this divided by the POSITIVE frames only, so it
+    # reported "56 archived correct answers" when there are 39.  A count that
+    # misstates its own denominator is the smallest possible version of the
+    # mistake this file exists to prevent.
+    print(f"{len(cases)} cases from {len(cases) // (len(FRAMES) + len(NEGATIVE_FRAMES))}"
+          f" archived correct answers "
+          f"x {len(FRAMES)} positive + {len(NEGATIVE_FRAMES)} negative frames")
+    from . import commitment
+    print(f"hedge policy: {commitment.HEDGE_POLICY} -- negative frames resting on a "
+          f"hedge are demoted under `advisory` (D-056)\n")
 
     by_frame: dict[str, Counter] = {name: Counter()
                                     for name, _, _ in FRAMES + NEGATIVE_FRAMES}
