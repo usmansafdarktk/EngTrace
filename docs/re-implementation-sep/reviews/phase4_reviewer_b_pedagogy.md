@@ -460,3 +460,426 @@ Things I tried to break and could not:
   the quoted justification is gold's own phrasing (`fails at least one of the tests (additivity or
   homogeneity)`), which contains no `either` at all, while `cat-17` shows a candidate disjunction is
   a genuine non-commitment. The removal may still be right; the stated reason does not support it.
+
+---
+
+# Round 2 — Reviewer B (physics & pedagogy, the P6 guard)
+
+**Frozen ref:** `335ad7a3c2a7ec621db62180d74e286d2f59e0f1` · **Branch:** `redesign/phase4-comparators`
+**Mandate:** does the *new* mechanism reject answers a human grader would ACCEPT?
+**Time box:** 30 minutes, held.
+
+Run everything below from the repo root with `PYTHONIOENCODING=utf-8` set.
+
+---
+
+## 1. Verdict
+
+**BLOCKED — the defect has been relocated, not closed.** All four of my round-1 code findings are
+**addressed** and I could not reopen any of them. But the mechanism that closed them refuses **25 of
+38** constructed answers that a competent grader credits, and the refusals are not exotic: *"Note
+that the system is linear"*, *"Although the equation contains a delay, the system is linear"*, *"The
+distinction between additivity and homogeneity is not entirely obvious, but the system is linear"*.
+Two of the trigger classes fire on **real archived phrasing** — a `reynolds_number_flow_regime` trace
+that hedges a caveat and then commits to `turbulent`, and a `decimation_aliasing_analysis` trace
+whose committed conclusion opens with `Although`. The comparator now measures phrasing in the
+opposite direction, which is the equal-and-opposite failure D4.1 §1 names.
+
+The archive gate does not see this (§4), which is the round-1 blindness with the sign flipped: D4.4
+samples the inside of the hedge list, and the 61 traces sample four items whose committed answers
+happen to be terse.
+
+**What lifts the block** is narrow and is stated in §5.1: split the concessive subordinators out of
+`NON_ASSERTING_OPENERS`, give the non-modal hedge probes the governance test the module's own
+docstring already promises them, and make `_governing_neighbour` directional.
+
+---
+
+## 2. Disposition of the round-1 findings
+
+I re-ran my full round-1 battery against the frozen ref before writing anything new.
+
+| round-1 finding | disposition | evidence |
+|---|---|---|
+| **F1** — hedge list is a 27-string blocklist; 12/15 unlisted hedges scored `MATCH` | **addressed** | all 15 now `UNRESOLVED`. `MODALS` / `EVIDENTIALS` / `HEDGE_VERBS` / `APPEARANCE_COPULAS` / `UNCERTAINTY` are classes, and the `-ly` family that `Seemingly`/`Apparently`/`Plausibly` escaped through is closed as a family, not as three more strings. |
+| **F2** — hedge scope one-sided, every trailing hedge passed | **addressed** | all 7 now `UNRESOLVED`. Scope is the clause, bidirectional; `HEDGE_WINDOW = 45` and its undefended boundary are gone. |
+| **F3** — conditionals, assumptions, refusals and the item's own prompt wording scored `MATCH` | **addressed** | all 5 now `UNRESOLVED`. `is_assertion` is the guard the single-label path lacked, and `TASK_RESTATEMENTS` closes the prompt-paraphrase case specifically. |
+| **F4** — longest surface across the whole span beat the committed final clause | **addressed** | all 4 now behave as I argued, in both directions. `find_commitment` walks `reversed(labelled)` and longest-first is confined to within one offset, where it is about containment and is right. |
+| **F5** — both classification items 100% shortcuttable | **relocated to a scoping question** — see §5.4. The result is accepted and not in dispute; the items cannot change in this phase. |
+
+**The `_UNCERTAIN_RE` word-boundary note in the module docstring is correct and I verified it.** `\b`
+after `not 100%` demands a word character that never arrives, so the entry would never fire.
+`(?<!\w)…(?!\w)` is the right fix and `I am not 100% sure, but the system is linear` is now
+`UNRESOLVED`. That is a real bug caught during implementation and it is worth saying so.
+
+**No regression in the archive numbers.** `python -m tests.comparators.score` reports archive
+precision 100.0% / recall 97.8%, adversarial 98.6% / 98.6%, one archive false reject
+(`signal_operations[0]`, a `sequence` item that does not route through `commitment.py`) and one
+adversarial false accept (`num-16b`, D-052). **There is no new false reject among the 61.** §4
+explains why that is not reassurance.
+
+---
+
+## 3. Findings
+
+### R2-F1 — CONFIRMED (blocking). The commitment test refuses committed answers, at a rate of 25 in 38.
+
+I wrote 38 candidates that name the right label **and commit to it** — the mirror of my round-1
+battery. A competent grader credits every one. **25 are refused: 24 `UNRESOLVED` and 1 `MISMATCH`.**
+Grouped by the mechanism that refuses them:
+
+**(a) Concessive and discourse openers — 10 cases.** `NON_ASSERTING_OPENERS` treats every listed word
+as scoping over the whole clause. For a genuine hypothetical (`if`, `suppose`, `assume`) that is right
+and it is what closed F3. For a **concessive or contrastive** subordinator it is wrong in a specific,
+systematic way: *`although X, Y`* asserts `Y`. The subordinator's scope ends at the comma, and
+`_OPENER_RE.match(clause)` cannot see that because the clause splitter does not cut on commas — so
+the test asks about the clause's first word while the label sits in the matrix clause after it.
+
+| candidate | outcome |
+|---|---|
+| `Note that the system is linear.` | **UNRESOLVED** — *opens with 'Note that'* |
+| `Note: the system is linear.` | **UNRESOLVED** |
+| `Although the equation contains a delay, the system is linear.` | **UNRESOLVED** |
+| `Though it looks like a shift, the system is linear.` | **UNRESOLVED** |
+| `Whereas a scaling would preserve linearity, the square does not, so the system is not linear.` | **UNRESOLVED** |
+| `Except for the delay, nothing changes: the system is linear.` | **UNRESOLVED** |
+| `Recall that superposition holds here, so the system is linear.` | **UNRESOLVED** |
+| `Unlike a linear system, this one squares its input, so it is not linear.` | **UNRESOLVED** |
+| `Given that additivity and homogeneity both hold, the system is linear.` | **UNRESOLVED** |
+| `Provided that a and b are scalars, superposition holds and the system is linear.` | **UNRESOLVED** |
+
+`note that` and `recall that` are worse than a scope error — they are **factive**: their complement is
+asserted, not suspended. *"Note that the system is linear"* is a normal way for a solution to state a
+conclusion. Reviewer E's motivating case, `Note: Answer: not linear if the offset were nonzero`, is
+non-committal because of `if … were`, which `if` already catches; `note` does no work there that is
+not already done, and it over-rejects everywhere else.
+
+**(b) The non-modal hedge probes have no governance test — 9 cases.** The docstring says *"A modal or
+evidential **governing the copula** is a hedge"*. Only `_MODAL_RE` implements governance
+(`modal + up to two words + copula`). `_EVIDENTIAL_RE`, `_HEDGE_VERB_RE`, `_APPEARANCE_RE` and
+`_UNCERTAIN_RE` are bare `\b…\b` searches over the whole clause. A marker anywhere in the clause
+condemns a label anywhere else in it — which is **exactly the round-1 F2 error with a different
+window**. Character-window scope became clause scope; the missing thing, then and now, is a relation
+between the marker and the label.
+
+| candidate | outcome |
+|---|---|
+| `The output is roughly twice the input in every case, and the system is linear.` | **UNRESOLVED** — *evidential: roughly* |
+| `The distinction between additivity and homogeneity is not entirely obvious, but the system is linear.` | **UNRESOLVED** — *not entirely* |
+| `It is unclear which textbook convention applies, but the system is not linear.` | **UNRESOLVED** — *unclear* |
+| `The gain is not entirely constant across n but scaling still holds, so the system is linear.` | **UNRESOLVED** |
+| `Whatever the equation looks like, additivity and homogeneity both hold: the system is linear.` | **UNRESOLVED** — *copula of appearance: looks* |
+| `Look at the coefficient: it is constant, so the system is linear.` | **UNRESOLVED** — *copula of appearance: look* |
+| `The squaring term is nominally the only nonlinearity, so the system is not linear.` | **UNRESOLVED** — *evidential: nominally* |
+| `While the delay term is present, it does not break superposition: the system is linear.` | **MISMATCH** |
+
+Note the last row. It is not `UNRESOLVED`; the comparator scores a **correct answer as wrong**, reason
+`label 'not linear' != gold 'linear'` — negation scope reaching across the colon from *"does not break
+superposition"*. `MISMATCH` on a correct answer is strictly worse than `UNRESOLVED`, and D4.1 §1's
+stated bias toward `UNRESOLVED` is not honoured here. I did not attribute this to `commitment.py`; it
+is label selection and may predate round 2. It is listed because a reviewer hunting false rejects
+should see it.
+
+`roughly` and `nominally` deserve a sentence of their own. In engineering prose they are about
+**numeric precision and nominal sizing**, not epistemic commitment. *"The output is roughly 2x"* and
+*"a nominally 10 mm pipe"* are statements a grader reads as confident. Classing them with `perhaps`
+imports a category error into a physics benchmark, and `check` and `numeric` items are where it will
+bite hardest.
+
+**(c) `_governing_neighbour` is bidirectional and undirected — 6 cases.** A label-free hedge clause on
+*either* side governs. But a model that reasons hesitantly and then concludes firmly puts a hedge
+clause immediately before its answer, and that is the pattern good practice recommends.
+
+| candidate | outcome |
+|---|---|
+| `It is hard to say which test is more direct. The system is linear.` | **UNRESOLVED** — *hedged by an adjacent clause* |
+| `The wording of the question is uncertain; regardless, the system is linear.` | **UNRESOLVED** |
+| `The system is linear; most likely candidates for failure (additivity, homogeneity) both hold.` | **UNRESOLVED** — *evidential: likely* |
+| `The system is linear. It seems obvious in hindsight.` | **UNRESOLVED** |
+| `The system is not linear. This should be clear from the square.` | **UNRESOLVED** — *modal: should be* |
+| `Imagine a scaled input a*x[n]; the output is a*y[n], so the system is linear.` | **UNRESOLVED** — *verb of opinion: imagine* |
+
+The last two are the sharpest. *"This should be clear from the square"* is an expression of
+**confidence** and is read as a hedge. *"Imagine a scaled input"* is the standard way to open a
+homogeneity proof, and `imagine` is in `HEDGE_VERBS`.
+
+The round-1 cases that motivated the neighbour rule are all **following** hedges or explicit
+statements of **inability** (`Linear. It seems.`; `I cannot complete the test; the system is
+linear.`). Neither requires a preceding *difficulty-of-reasoning* clause to govern. The rule
+generalised further than its evidence.
+
+**Reproduction (~10 s):**
+
+```bash
+python - <<'PY'
+import sys; sys.path.insert(0, '.')
+from tests.comparators.answer import compare_template
+L = "## Final Answer\nThe system is **linear**."
+N = "## Final Answer\nThe system is **not linear**."
+for g, c in [
+  (L, "Note that the system is linear."),
+  (L, "Although the equation contains a delay, the system is linear."),
+  (N, "Unlike a linear system, this one squares its input, so it is not linear."),
+  (L, "Given that additivity and homogeneity both hold, the system is linear."),
+  (L, "Recall that superposition holds here, so the system is linear."),
+  (L, "The output is roughly twice the input in every case, and the system is linear."),
+  (L, "The distinction between additivity and homogeneity is not entirely obvious, but the system is linear."),
+  (N, "It is unclear which textbook convention applies, but the system is not linear."),
+  (L, "Look at the coefficient: it is constant, so the system is linear."),
+  (L, "Imagine a scaled input a*x[n]; the output is a*y[n], so the system is linear."),
+  (L, "It is hard to say which test is more direct. The system is linear."),
+  (N, "The system is not linear. This should be clear from the square."),
+  (L, "While the delay term is present, it does not break superposition: the system is linear."),
+]:
+    v = compare_template('template_system_property_linearity', g, "## Final Answer\n" + c)
+    print(f"{v.outcome:11s} | {c}")
+    if v.outcome != "MATCH":
+        print("            ->", v.reason)
+PY
+```
+
+**Impact:** every `categorical` item, and `check` through the same `find_commitment` call at
+`kinds.py:1194`. Not visible in today's numbers (§4), and unavoidable the moment the schema reaches
+items whose committed answers are prose rather than a two-word verdict.
+
+### R2-F2 — CONFIRMED (blocking as evidence, not as a separate defect). The triggers fire on real archived phrasing.
+
+My battery is constructed, so I went to the archive. **The 2,200 rows are error-analysis samples:
+`final_answer_acc == 0.0` for all 2,200**, so the archive cannot supply a *labelled-correct* answer
+that is rejected — that instrument does not exist and no amount of time would have produced it. What
+it can supply is proof that the constructions are real. Scanning every conclusion-bearing clause in
+all 2,200 `model_reasoning` fields (cue: `therefore|thus|hence|so the|we conclude|the system is|is
+(not) linear|causal|stable|laminar|turbulent`), 1,035 clauses tested:
+
+| trigger | hits | archived example |
+|---|---:|---|
+| `OPENER Although` | 1 | `decimation_aliasing_analysis__3490738110` — *"Although the strict no-aliasing inequality is not met, the decimated frequency Mω0 = 4·(π/4) = π maps to the edge frequency π and does not produce overlapping spectral copies"* — a committed conclusion, refused on its first word |
+| `HEDGE modal: may be` | 1 | `reynolds_number_flow_regime__3122400918` — *"…depending on disturbances the flow may be described as transitional up to a few ×10⁶, **but using the standard criterion it is turbulent**"* — hedges the caveat, **commits to the label**, refused |
+| `HEDGE modal: should be` | 2 | `kinematic_viscosity__3586477399`, `basic_buoyant_force__1845565441` — *"the result should be rounded to three significant figures"*: a modal about **rounding convention**, not about the answer |
+| `OPENER Alternatively` | 1 | `multi_segment_rod__3591646318` — *"Alternatively, sum of loads to the right of a cut … so the internal force in segment1 is −21,000 N"* — a committed second derivation, refused |
+| `OPENER otherwise` | 1 | `decimation_aliasing_analysis__2335660753` — *"otherwise, no aliasing occurs"* |
+| `HEDGE evidential: likely` | 2 | `signal_energy_power__2570931285`, `vibration_isolator_design__3831595160` |
+
+`reynolds_number_flow_regime` is the case to look at: a **two-way classification item**, structurally
+identical to `system_property_linearity`, whose model states a caveat with `may be` and then commits.
+This comparator refuses it. That is R2-F1 in the wild, on the item family Phase 5 extends to.
+
+**Reproduction:**
+
+```bash
+python - <<'PY'
+import sys, json, glob, collections, re
+sys.path.insert(0, '.')
+from tests.comparators.commitment import clauses, is_assertion, hedge_markers
+rows = [json.loads(l) for f in sorted(glob.glob('error_analysis_annotation/samples/*.jsonl'))
+        for l in open(f, encoding='utf-8')]
+print('rows', len(rows), 'graded correct',
+      sum(1 for r in rows if r['final_answer_acc'] == 1.0))     # -> 2200, 0
+CUE = re.compile(r'\b(therefore|thus|hence|so the|we conclude|the system is|'
+                 r'is (?:not )?(?:linear|causal|memoryless|stable|laminar|turbulent))', re.I)
+hits, ex = collections.Counter(), collections.defaultdict(list)
+for r in rows:
+    for c in clauses(r['model_reasoning']):
+        if not CUE.search(c):
+            continue
+        ok, why = is_assertion(c)
+        if not ok:
+            k = 'OPENER ' + (why.split("'")[1] if "'" in why else why)
+            hits[k] += 1
+            ex[k].append((r['question_id'], ' '.join(c.split())[:150]))
+            continue
+        for m in hedge_markers(c):
+            hits['HEDGE ' + m] += 1
+            ex['HEDGE ' + m].append((r['question_id'], ' '.join(c.split())[:150]))
+for k, v in hits.most_common(20):
+    print(f'{v:5d}  {k}')
+    for q, t in ex[k][:2]:
+        print('        ', q[:42], '|', t)
+PY
+```
+
+### R2-F3 — MINOR. The commitment policy is applied inconsistently between `categorical` and `categorical[tuple]`.
+
+The single-label path calls `find_commitment`, which includes `_governing_neighbour`. The tuple path
+(`kinds.py::_slot_verdict`) calls `is_assertion` and `hedge_markers` on the **slot clause only** and
+has no neighbour rule. The `_ENUM_RE` split usually amputates the hedge, so the same construction
+lands differently:
+
+| candidate | single-label analogue | tuple |
+|---|---|---|
+| `It is unclear how the textbook counts n=0, but a) Not memoryless b) Causal.` | **UNRESOLVED** | **MATCH** |
+| `Although the system uses a past sample, a) Not memoryless b) Causal.` | **UNRESOLVED** | **MATCH** |
+| `The shift would require storage, so a) Not memoryless / b) Causal.` | **UNRESOLVED** | **MATCH** |
+
+**The tuple path is the one that is right.** I record this as evidence for R2-F1's remedy rather than
+as a defect in the tuple path: one policy, stated once in D4.1 §4.2, produces opposite verdicts on
+the same English depending on which comparator reads it, and the more permissive of the two is the
+one a grader agrees with.
+
+---
+
+## 4. Falsification attempts that failed
+
+- **I could not reopen F1, F2, F3 or F4.** I spot-checked the round-1 battery rather than re-running
+  all 31 cases (the brief reports them all passing and `reviewer_battery.py` is green), and I probed
+  for three further escapes per finding — morphological variants outside `EVIDENTIALS`, hedges split
+  across an em-dash, a label restated after a retraction. I found none. The round-1 mechanism is
+  genuinely replaced, not patched.
+- **I could not find a new false reject among the 61.** `signal_operations[0]` is the only one and it
+  is a `sequence` item that never calls `find_commitment`. **This is the result I most wanted and it
+  is negative, so I say plainly why it is weak evidence:** 39 of the 61 traces are the two
+  classification items, whose archived answers are terse verdicts (`**Linear**`, `a) No b) Yes`) with
+  no subordinate clause to trip the opener test and no adverb to trip the hedge test. The gate cannot
+  detect over-rejection because the sample contains almost no prose. That is D-034's shape a third
+  time: round 1's corpus sampled the inside of the hedge list; round 2's archive samples the inside
+  of a phrasing style.
+- **`must` and `can` really are excluded, and that call is right.** *"The system must be linear"* and
+  *"we can conclude the system is linear"* are both `MATCH`. The docstring's stated reason — that
+  treating them as hedges would trade false accepts for false rejects — is exactly the principle
+  R2-F1 says was not applied consistently to the other classes.
+- **The clause splitter is doing real work and the `?` retention is correct.** `Linear?` is
+  `UNRESOLVED` on the question mark alone.
+- **`TASK_RESTATEMENTS` does not over-reject when the restatement is followed by an answer.**
+  *"To determine whether the system is linear I checked both properties; it is linear"* is `MATCH`,
+  because `;` splits and the last clause is clean. I expected this to fail and it did not. So are
+  *"I checked whether additivity holds. It does. The system is linear."* and *"Test whether a\*x
+  scales: it does. The system is linear."*
+- **Modals inside a derivation survive.** *"A scaled input would produce a scaled output, so the
+  system is linear"* is `MATCH` — `_MODAL_RE`'s governance requirement (`would … be/is`) is what
+  saves it, which is direct evidence that governance is the right mechanism and that the other four
+  probes are missing it.
+- **The 100% archive precision is not bought with `UNRESOLVED`.** `decided` is 93.4%, unchanged.
+
+---
+
+## 5. Further probing and improvements
+
+### 5.1 The remedy for R2-F1, in three bounded changes
+
+None needs new data, and all three are testable against the batteries already written.
+
+1. **Split `NON_ASSERTING_OPENERS` in two.** *Hypotheticals* (`if`, `unless`, `assume`, `assuming`,
+   `suppose`, `supposing`, `whether`, `in case`, `were`, `had`, `even if`) suspend the whole sentence
+   and must keep rejecting — they are what closed F3. *Concessives, contrastives and discourse
+   markers* (`although`, `though`, `whereas`, `while`, `unlike`, `except`, `given that`, `provided
+   that`, `note`, `note that`, `recall that`, `consider`, `let`, `alternatively`, `otherwise`, `in
+   contrast`, `aside`) scope over their own clause only; for these, **strip the subordinate clause up
+   to the comma and test the matrix clause that follows**. If there is no comma-separated matrix
+   clause, the current rejection stands. This closes all 10 cases in R2-F1(a) without reopening a
+   single F3 case.
+2. **Give the four non-modal probes the governance test `_MODAL_RE` already has.** The docstring
+   promises it; one probe in five implements it. The minimum version is positional: an evidential,
+   appearance copula or uncertainty phrase hedges the label only if it lies in the **same sub-clause**
+   as the label — no comma, colon, `but`, `so`, `and`, `regardless` or `still` between them. That
+   closes all of R2-F1(b) except the `MISMATCH` row, which is a separate negation-scope matter.
+   Additionally, move `roughly`, `nominally` and `likely` out of `EVIDENTIALS` unless they govern the
+   copula directly (`is likely linear`), because in engineering prose they quantify precision rather
+   than confidence.
+3. **Make `_governing_neighbour` directional and narrow it.** Only a **following** label-free hedge
+   clause governs (`Linear. It seems.`), plus a **preceding clause of stated inability**
+   (`cannot determine`, `cannot complete`, `unable to`, `no idea`) — which is what *"I cannot
+   complete the test; the system is linear"* actually is. A preceding clause expressing *difficulty
+   of reasoning*, or a *meta remark*, must not govern. This means splitting `UNCERTAINTY` into
+   `INABILITY` and `IMPRECISION`, which is worth doing anyway: they are different speech acts and
+   only the first is a non-answer.
+
+### 5.2 The measurement that would settle this, and it does not exist yet
+
+Round 1 I said: do not score the hedge list against cases written from the hedge list. The same
+applies now — **do not score the commitment test against an archive of terse verdicts.** The missing
+instrument is a set of archived answers that are *both* prose *and* labelled correct, and the 2,200
+rows cannot supply it (all are `final_answer_acc == 0.0`). Two ways to get one, in order of cost:
+
+- **Cheapest, and I would do it first:** take the 45 archived answers my own `ground_truth.py` labels
+  `true+` and **paraphrase each into three prose forms** that preserve the verdict (a concessive
+  opener; a hedged-reasoning-then-commit form; an alternative-derivation form). That is 135 cases
+  whose correct label is known by construction, and it is D4.4's missing half — **D4.4 contains only
+  near-misses that should be rejected and no correct answers phrased awkwardly. A recall corpus is as
+  necessary as a precision corpus, and Phase 4 has only one of them.** This is the single
+  highest-value artefact I can name for round 3.
+- Re-run the four templates against two or three of the archived models with a prompt that asks for
+  reasoning inline, and hand-label the outputs. More faithful; hours rather than minutes.
+
+### 5.3 Where round 2 leaves the D4.1 and vocabulary documents
+
+- **D4.1 §4.2 still states the policy as a principle and the artefact still narrows it**, only in the
+  other direction now. The missing clause is: *a hedge must **govern** the label, and a subordinator
+  scopes over its own clause only.* Without it the conformance problem stands — a reader cannot tell
+  whether `Although X, the system is linear` conforms.
+- **`commitment.py`'s docstring says "governing the copula" and the code implements it once in five.**
+  Either the docstring or the four probes should move. My recommendation is the probes.
+- **§9's conformance list still does not mention hedging**, which was a round-1 note and is
+  unaddressed. It now needs *two* entries, one per error direction.
+- **`phase4_vocabulary.md` §3's honesty about `SUPPORT["hedge"] = (0, 1)` should be carried forward
+  to `commitment.py`.** The new module has *less* archive support than the list it replaced, not
+  more: no rule in it is derived from an observation, because §5.2's instrument does not exist. That
+  is defensible — it implements my §5.3 prescription — but it should be recorded as such rather than
+  inheriting the old table's evidence.
+
+### 5.4 F5's disposition: what the comparator and the results table should do, given the items cannot change
+
+**Recommendation: record it; do not fix it in the comparator.**
+
+**(a) Do NOT extend `check`'s supporting-quantity pattern to `categorical` in Phase 4.** My round-1
+§5.5 proposed requiring a linearity answer to name *which* property failed. It is implementable
+without touching the item — the gold solution does state it — but I now think it is the wrong move
+here, and **I withdraw it as a Phase 4 requirement**, for three reasons:
+
+- **It fails the phase's own gate.** Of the 15 archived `system_property_linearity` traces, only
+  **4** name a property (`additiv|homogen|superposition|scal`) anywhere in their answer span.
+  Requiring it would turn 11 currently-correct answers into non-answers and drop recall on that item
+  from 100% to ~27%, breaching S4.5's ≥95%. A scoring change that fails the gate is not a comparator
+  change; it is an item change wearing a comparator's clothes.
+- **It is asymmetric, and the asymmetry is itself a cue.** On the `linear` branch nothing fails, so
+  only `not linear` answers could carry a named property. A requirement that applies to one label and
+  not the other tells the solver which label it is looking at — it would *add* a shortcut while
+  trying to remove one.
+- **It relocates a P6 change into the comparator.** Spec §4.1 forbids redesigning these items;
+  changing what counts as a correct answer to them from inside the comparator is the same change by
+  another route and with less scrutiny. That is precisely what P6 exists to prevent.
+
+**(b) DO record it as a P6 scoping decision.** My round-1 §5.6 stands and is the disposition I press.
+The register entry should say: *Phase 4 scores `system_property_linearity` and
+`system_properties_memory_causality` on their answer alone; those answers carry 1.0 and 1.6 bits
+against blind-guess floors of 50.02% and 34.02%, and a depth-2 tree on the question surface reaches
+100% held-out on both. The comparator's 100% precision and recall on these items are statements about
+the vocabulary and not about whether a scored model reasoned.* Two sentences, no code, and it stops
+the D4.1 §8 numbers from being read as more than they are.
+
+**(c) The results table should carry two extra columns per item, not a footnote:** `floor`
+(blind-guess) and `surface-model held-out accuracy`. Both are computable in minutes per template by
+the round-1 §2 script. A reader who sees `50.02% → 100.00%` beside `precision 100%` cannot misread
+the second number, and no prose caveat achieves that.
+
+**(d) The `check`-style supporting-quantity requirement is a Phase 5 recommendation**, where the items
+*can* change. The right fix is for the item to **ask** for the failing property, so question, gold and
+rubric change together and the archive is re-collected against the new question. Filed as a
+recommendation, not a requirement, and explicitly not actionable in Phase 4.
+
+**Reproduction of the 4-of-15 number:**
+
+```bash
+python - <<'PY'
+import sys, json, glob, re; sys.path.insert(0, '.')
+from tests.comparators.normalize import answer_span
+rows = [json.loads(l) for f in sorted(glob.glob('error_analysis_annotation/samples/*.jsonl'))
+        for l in open(f, encoding='utf-8')]
+rows = [r for r in rows if r['question_id'].startswith('system_property_linearity')]
+n = 0
+for r in rows:
+    s = answer_span(r['model_reasoning'])
+    s = s[0] if isinstance(s, tuple) else s
+    n += bool(re.search(r'additiv|homogen|superposition|scal', s, re.I))
+print('linearity traces', len(rows), '| answer span names a property', n)   # -> 15 | 4
+PY
+```
+
+### 5.5 What generalises
+
+Round 1 I said the F5 shortcut pattern generalises to the whole `classification` population. Round 2
+adds a second thing that generalises, and it is the more urgent: **`commitment.py` is written against
+four items whose answers are two words long, and it is specified to serve 146 items whose answers are
+paragraphs.** Every trigger in R2-F2 fired on a template *outside* the Phase 4 four. The
+over-rejection rate on those four is zero and on the archive at large it is not, and the gap is a
+property of the sample, not of the mechanism. Before Phase 5 adopts this module, §5.2's recall corpus
+should exist.

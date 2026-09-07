@@ -263,3 +263,402 @@ These are the attacks that did **not** break the comparators. They are what make
 * D4.2 §5's residual-risk section correctly places the symbolic rules on "route 3" — stated, adversarially exercised, not validated against real output. After F1, `require_origin` belongs in the same paragraph.
 
 **Process note.** The brief's framing — "the archive is also the corpus the vocabulary was derived from, so 100% on it may mean nothing at all" — is right, and F0 supplies the number: the archive holds 16 wrong answers, 15 of them decided, all in two of the six kinds. The cross-pairing instrument in §4 is the cheapest way I found to get more signal out of the same 61 traces without inventing text, and it should be run as a standing check rather than as a one-off review artefact.
+
+---
+---
+
+# Round 2 — comparator adversary
+
+**Verdict: BLOCKED — the unreviewed module the fixes are built on reproduces two of the defects it was written to close, one clause boundary to the left, and it does so with no archive support in either direction.**
+
+Frozen ref: `335ad7a3c2a7ec621db62180d74e286d2f59e0f1`.
+
+---
+
+## 1. Verdict
+
+`tests/comparators/commitment.py` is a sound idea implemented as three magic
+constants wearing the vocabulary of linguistics. It replaced a 45-character
+hedge window with a **±1-clause hedge window**, and a longest-surface rule with
+a last-clause rule that still resolves *within* the clause by last position —
+so both of the defects it names in its own docstring survive, reachable by
+changing one period to a comma (R2-F7) or by adding one clause of distance
+(R2-F8). Against that it now rejects ordinary correct engineering prose
+(R2-F9), most severely in `check`, the one gated kind with a numeric register.
+And the whole apparatus has **essentially zero exercise on real archived text**
+(R2-F10): across all 2,200 archived answer spans the hedge machinery fires
+**once**, and never in any of the three kinds it gates.
+
+Round-1 status: **F2 relocated. F3 addressed. F4 addressed. F5 addressed. F1
+not addressed, and now contradicted by the F3 fix as well as by the archive.
+F6 not addressed; the parser fix behind it is correct and settles F6 anyway.**
+
+---
+
+## 2. Independent re-derivation (round 2)
+
+| claim under test | as re-derived | agreement |
+|---|---|---|
+| archive: 100% precision, 0 false accepts | reproduced (`score`); recall now **97.8%**, decided **93.4%** | **agrees** |
+| D4.4: 98.6% / 98.6%, 1 false accept (`num-16b`), 1 false reject (`seq-08`) | reproduced | **agrees** |
+| reviewer battery 43/43 | reproduced | **agrees** — but 43/43 is a fixed set, and R2-F7/F8 live one edit outside it |
+| **F2 fix**: position first, length only at a tie | reproduced in `_label_hit`; **but resolution is still last-by-position *within* a clause, and the splitter does not cut on commas** | **DIVERGES**, R2-F7 |
+| **F3 fix**: silent gold + stated origin → UNRESOLVED / MISMATCH | reproduced; archived signal trace 0 and `seq-08` are now UNRESOLVED | **agrees** — what I asked for; the cost is visible, signal recall 100% → 50% |
+| **F4 fix**: peel refuses to cross a discourse marker | reproduced; F4 battery cases pass | **agrees** |
+| **F5 fix**: `neither…nor` scoped to the sentence | reproduced; my 60-char escape now correctly resolves (No, No) | **agrees** |
+| **F1 fix** | `kinds.py:732-737` and `phase4_comparators.md:251` are **unchanged from round 1** | **not addressed** |
+| `_BRACED_RE` subscript bug | real, and the fix is right — `y[4]` is not a one-element sequence | **agrees** |
+| **cross-pairing, re-run against the new clause machinery** | **762 real-text pairs, 0 false accepts, 0 false rejects, 0 UNRESOLVED** (210 linearity, 552 memory-causality) | **agrees — no regression**; the round's strongest positive result |
+| hedge markers fired across all 2,200 archived answer spans | **1** (`modal: would be`, once) | **new number**, R2-F10 |
+| clauses opening with a `NON_ASSERTING_OPENER`, all 2,200 spans | **20**, of which 9 are a span's final clause — **all 9 in numeric templates, none in a commitment-gated kind, none a committed answer** | **new number**, R2-F10 |
+
+The cross-pairing re-run answers the brief's worry that the clause machinery
+could break the instrument: it does not. Every real archived answer form still
+scores correctly against every real gold in its template. The failures below are
+all outside the shapes the archive contains — the same sentence I wrote in
+round 1, now the finding rather than a caveat.
+
+(762 rather than round 1's 782: the 20 continuity pairs are omitted here, since
+`symbolic` is not commitment-gated and was out of the round's scope.)
+
+---
+
+## 3. Findings
+
+### R2-F7 — CONFIRMED (blocking): **false accept.** F2 is *relocated*, not closed — the clause splitter does not cut on commas, and within a clause resolution is still last-by-position
+
+`_label_hit` was correctly changed to rank by position. But `find_commitment`
+only chooses *which clause*; `_resolve_label` is then run on that clause and
+still takes the **last** surface in it. `_CLAUSE_SPLIT` cuts on `.;!?`, dashes
+and enumerators — **not on commas**, and not on `unlike` — so a contrastive
+mention inside the committed clause outranks the commitment exactly as before.
+
+```bash
+python - <<'PY'
+import sys; sys.path.insert(0, '.')
+from tests.comparators.answer import compare_kind
+g = "**Answer:**\nThe system is **not linear**."
+for c in ["## Final Answer\n**Answer:** The system is linear, unlike a nonlinear system, since both tests pass.",
+          "**Answer:** The system is linear (a nonlinear system would fail additivity)."]:
+    print(compare_kind('categorical', g, c).outcome, '|', c[-60:])
+PY
+```
+
+→ `MATCH` twice. A candidate committing to **linear** — the wrong answer — is
+credited as `not linear`.
+
+This is my round-1 F2 case with **one period changed to a comma**. Battery case
+`E-F2` uses the period form and passes; the comma form is the more natural
+English of the two. `unlike` *is* in `NON_ASSERTING_OPENERS`, but `_OPENER_RE`
+anchors with `^`, so it fires only when the contrast is punctuated into a clause
+of its own. The fix is conditioned on punctuation the writer chooses freely.
+
+**Impact.** The defect the module was written to close is reachable in the kind
+with the largest archived trace count and zero archived negatives, by ordinary
+prose. Blocking for the same reason F2 was.
+
+---
+
+### R2-F8 — CONFIRMED (blocking): **false accept.** `_governing_neighbour` is a fixed-width window in clauses instead of characters — a hedge one clause further away escapes it
+
+The module's stated advance is *"scope is the clause, bidirectionally — not N
+characters backwards."* `_governing_neighbour` iterates `for j in (i - 1, i +
+1)`. That is not clause scope; it is **N = 1 clause** — a magic constant of the
+same shape as `_NEG_WINDOW = 40` and `HEDGE_WINDOW = 45`, chosen with no
+sensitivity analysis and unmeasured on real text.
+
+```bash
+python - <<'PY'
+import sys; sys.path.insert(0, '.')
+from tests.comparators.answer import compare_kind
+g = "**Answer:**\nThe system is **linear**."
+for c in ["**Answer:** I am not sure. Let me redo the algebra. The system is linear.",
+          "**Answer:** I cannot really tell. The two tests are in step 4. The system is linear.",
+          "**Answer:** It seems additive. The homogeneity check is in step 3. The system is linear.",
+          "**Answer:** The system is linear. Step 4 shows the algebra. But I am not sure."]:
+    print(compare_kind('categorical', g, c).outcome, '|', c[13:])
+PY
+```
+
+→ `MATCH` four times. `I am not sure` and `I cannot really tell` are Reviewer
+B's F1/F3 vocabulary; `UNCERTAINTY` lists both; `hedge_markers` detects both
+correctly. They escape because one intervening clause puts them at distance 2.
+The interposed clause is label-free and hedge-free, so nothing blocks the
+governance chain — it is simply never looked for. The fourth case shows the same
+escape in the trailing direction, which is the direction B's F2 was about.
+
+Interaction with R2-F11: `clauses()` splits on decimal points and abbreviations,
+so a hedge that *was* adjacent can be pushed to distance 2 by a number appearing
+between it and the label.
+
+**Impact.** B's F1/F3 are relocated rather than closed: the answer is still
+"unhedged" if the hedge is far enough away, and "far enough" is now one clause
+rather than 45 characters. This is exactly the Phase 3 lesson — the fix is
+sound, the surface it introduced was not reviewed.
+
+---
+
+### R2-F9 — CONFIRMED (blocking): **over-rejection.** `is_assertion` and the hedge classes refuse ordinary correct answers; `check` is worst affected
+
+Four of five naturally-phrased **correct** `check` answers are now UNRESOLVED:
+
+```bash
+python - <<'PY'
+import sys; sys.path.insert(0, '.')
+from tests.comparators.answer import compare_kind
+g = "**Answer:** The deflection is 18.0 mm, which is acceptable."
+for c in ["**Answer:** The deflection is 18.0 mm. Given that the limit is 25 mm, the design is acceptable.",
+          "**Answer:** The deflection is 18.0 mm, roughly 72% of the 25 mm limit, so the design is acceptable.",
+          "**Answer:** The deflection is 18.0 mm. Note that the limit is 25 mm, so it is acceptable.",
+          "**Answer:** The deflection is 18.0 mm, so the design is acceptable. The margin seems comfortable."]:
+    v = compare_kind('check', g, c); print(v.outcome, '|', v.reason[:72])
+PY
+```
+
+→ `UNRESOLVED` × 4. The same forms fail on `categorical`
+(`Given that both tests pass, the system is linear` /
+`Although the offset complicates matters, the system is linear` /
+`Note that both tests pass, so the system is linear`) and on
+`categorical[tuple]` (`a) Memoryless: Yes b) Causal: Yes. Both look immediate.`
+→ UNRESOLVED on the causal slot).
+
+Three distinct causes, each a design error rather than a coverage gap:
+
+1. **A fronted subordinate clause is not a non-assertion.** `_OPENER_RE` matches
+   the clause opener, but `Given that X, Y` and `Although X, Y` *assert Y*. The
+   rule confuses the opener of a subordinate clause with the mood of the
+   sentence. `note that` has the same problem when it *precedes* the answer
+   rather than following it: position, not vocabulary, distinguishes a caveat
+   from a preface, and `is_assertion` sees no position.
+2. **`roughly` is in `EVIDENTIALS` but is not epistemic in engineering
+   register.** It is a quantity approximator (`roughly 72%`, `roughly 3 mm`),
+   and `check` is the one gated kind whose answers carry quantities.
+   `nominally` has the same problem (`nominally 25 mm`).
+3. **`_governing_neighbour` is bidirectional over appearance copulas**, so a
+   trailing remark about *anything else* (`The margin seems comfortable`,
+   `Both conditions look satisfied`, `Roughly 3 lines of algebra confirm it`)
+   retracts a commitment it does not modify. The docstring's justification is
+   `Linear. It seems.` — an anaphoric hedge — but the rule cannot tell an
+   anaphoric hedge from an unrelated sentence containing `seems`.
+
+**Impact.** `check` already has the lowest decided rate on D4.4 (61.9%). These
+are false *rejects*, so they do not move precision and are invisible in the
+false-accept half of the gate — but the gate is precision **and** recall, and
+recall is measured on 137 hand-written cases whose phrasing was chosen by the
+same author. Ownership note: this is not the pedagogy question Reviewer B owns
+(whether the vocabulary is too generous to a bad answer); it is mechanism
+robustness, which is mine.
+
+---
+
+### R2-F10 — CONFIRMED (blocking, structural): the new mechanism has **no archive support at all** — this is F0 one layer up, and it is the module's own charge against its predecessor
+
+The module's docstring convicts the hedge blocklist of D-034: *"every hedged
+adversarial case used a phrase already in the list — the corpus samples the
+inside of the list it certifies."* The replacement is in the same position, and
+by a wider margin.
+
+```bash
+python - <<'PY'
+import sys, json, glob; sys.path.insert(0, '.')
+from collections import Counter
+from tests.comparators.normalize import answer_span, prepare
+from tests.comparators.commitment import clauses, hedge_markers, _OPENER_RE
+rows = []
+for p in sorted(glob.glob('error_analysis_annotation/samples/*.jsonl')):
+    for line in open(p, encoding='utf-8'): rows.append(json.loads(line))
+ev, op = Counter(), Counter()
+for r in rows:
+    for c in clauses(prepare(answer_span(r['model_reasoning'])[0])):
+        m = _OPENER_RE.match(c)
+        if m: op[m.group(0).strip().lower()] += 1
+        for h in hedge_markers(c): ev[h] += 1
+print('rows:', len(rows), '| hedge markers fired:', sum(ev.values()), ev)
+print('non-asserting openers:', sum(op.values()), op.most_common())
+PY
+```
+
+→ **2,200 answer spans. Hedge markers fired: 1** (`modal: would be`, once).
+**Non-asserting openers: 20**, of which 9 land on a span's final clause.
+
+The distribution is the finding, not the total. All 9 final-clause openers are
+in **numeric** templates (`flow_rates_vs_conversion`,
+`gauss_law_symmetric_charge`, `hagen_poiseuille_flowrate`,
+`finding_limiting_reactant`, `levenspiel_plot_interpretation`, …) — a kind
+`commitment.py` does not gate. In `categorical`, `categorical[tuple]` and
+`check` — the three kinds it *does* gate — the hedge probes and the opener rule
+fire **zero times across every archived trace**.
+
+So: ~250 lines of natural-language heuristics, gating three of six kinds,
+validated entirely against 43 battery cases and 137 D4.4 cases **hand-written by
+the two people whose findings it answers**. It cannot be falsified by the
+archive in either direction — the archive contains nothing it rejects and
+nothing it should reject. Every number in §2 that speaks well of it comes from
+text the module's author or its reviewers wrote.
+
+Reported as honestly as F0: I am not claiming the archive contradicts the
+module. I am claiming it says nothing about it, and the gate wording must not be
+read as though it did.
+
+---
+
+### R2-F11 — CONFIRMED (non-blocking alone; the enabler for R2-F8): `clauses()` splits inside decimals, abbreviations and initials
+
+```python
+clauses("The gain is 2.5 and the system is linear.")
+# ['The gain is 2', '5 and the system is linear']
+clauses("The system is linear i.e. additive and homogeneous")
+# ['The system is linear i', 'e', 'additive and homogeneous']
+clauses("By Prof. Smith's test the system is linear.")
+# ['By Prof', "Smith's test the system is linear"]
+clauses("Part b. The system is linear.")   # the enumerator rule
+# ['Part', 'The system is linear']
+```
+
+No false accept follows from the split *alone* — the label usually stays with
+its predicate, and `_governing_neighbour` covers the immediate spill. It matters
+because it is a **distance amplifier for R2-F8**: any decimal between a hedge
+and its label pushes the hedge from distance 1 to distance 2, outside the
+governing window. `check` answers contain decimals by construction. The fix is
+the standard guard (`(?<!\d)\.(?!\d)` plus an abbreviation exception list), and
+it should land before the window question is settled, because the two interact.
+
+---
+
+### R2-F12 — PLAUSIBLE (minor): `_POST_NEG_RE` fires inside a parenthetical
+
+`_POST_NEG_RE` opens `^\W*(?:is|was|would\s+be|seems)?\s*(?:the\s+)?` — `\W*`
+steps over an opening bracket and the optional `the` absorbs the article, so a
+parenthetical *about* wrongness negates the label it follows:
+
+`"The system is linear (the wrong answer would be nonlinear)."` → `UNRESOLVED`
+against a `not linear` gold.
+
+The rule itself is right and its intended cases work
+(`"linear is the wrong description here."` → `not linear`, correct;
+`"Calling it nonlinear is incorrect; the system is linear."` → `linear`,
+correct). PLAUSIBLE because the trigger phrasing is mine. The cheap tightening
+is to forbid `\W*` from crossing an unclosed bracket.
+
+---
+
+### F1 — **NOT ADDRESSED**, and now wrong in a second way
+
+`kinds.py:732-737` and `phase4_comparators.md:251` are unchanged from round 1
+and still assert that signal trace 8 "emits exactly gold's multiset of values in
+exactly gold's order" and that this is "1 of the 16 archived traces". Both
+halves remain false: the answer is a **rotation**, `ground_truth.py`'s own label
+says so, and 0 of 16 archived traces reach the origin-discriminating branch.
+
+The F3 fix has now made a *second* sentence in the same passage false.
+`phase4_comparators.md:273-277` still reads: *"a candidate that pins an origin
+gold does not is **checked for consistency rather than punished for saying
+more**."* That describes the branch as it was **before** F3 was actioned. The
+code now returns `UNRESOLVED` when the values agree and `MISMATCH` when they do
+not — archived signal trace 0 and `seq-08` are both demonstrations, and both
+appear in the `score` output as false rejects. The document describes behaviour
+the build no longer has, at the exact place a reader goes to understand what the
+gate measured.
+
+---
+
+### F6 — not addressed; the parser fix behind it is correct, and it settles F6 anyway
+
+`_BRACED_RE`'s bracket alternative was matching `y[4]` and `val_groups[-1]` was
+taking the subscript as the answer. The guard (*a bracket group is a sequence
+only if it contains a separator*) is right, and the resulting reclassification
+of archived signal trace 0 from `MATCH` to `UNRESOLVED` is **correct and is
+exactly what F3 asked for**: gold omits the origin, the candidate states one via
+the `*-1*` form, the item cannot discriminate, and `UNRESOLVED` is the only
+outcome the evidence supports.
+
+It also settles F6 in my favour without the label being touched. Of the
+archive's two `signal_operations` `MATCH`es, one is now gone *because it was
+never decidable* — which is what F6 said the justification text should record.
+Signal recall is 100% → **50%** and decided 100% → **75%**. That is the honest
+number and it should be reported beside the gate, not absorbed into a total.
+
+---
+
+## 4. Falsification attempts that failed
+
+1. **Cross-pairing, re-run against the clause machinery — 762 real-text pairs,
+   0 false accepts, 0 false rejects, 0 UNRESOLVED** (210 linearity, 552
+   memory-causality). The brief was right that this was the change most likely
+   to break it, and it did not: `clauses`, `is_assertion`, `hedge_markers` and
+   `find_commitment` are transparent on every real archived answer form, at
+   every real gold in its template. This is the strongest positive evidence in
+   either round, and R2-F10 is why it is not sufficient.
+2. **F5 (`neither…nor`) — genuinely closed.** My 60-char escape case now
+   resolves (No, No), and the sentence-scoped rule survived every longer
+   interposition I built.
+3. **F4 (peel into a caveat) — genuinely closed.** `answer_span` no longer peels
+   into `Note: Answer: …`, and `is_assertion` catches the residue that remains
+   inside the span, as the module's comment claims.
+4. **`must` / `can` excluded from `MODALS` — correct.** `The system must be
+   linear` and `The system can be shown to be linear` both commit, as they
+   should. I could not build a hedge needing `must` or `can` that is not already
+   caught by an evidential or an appearance copula.
+5. **`"no"` removed from `NEGATORS` — correct.** `No, the system is linear`
+   resolves to `linear` and `No, the system is not linear` to `not linear`; the
+   sentential `No` no longer inverts the label it precedes.
+6. **`_POST_NEG_RE` on its intended cases — correct** (see R2-F12 for the
+   residual).
+7. **`DISCOURSE_MARKERS` refusing a legitimate marker.** I could not find one.
+   The 9 real final-clause caveats in the corpus are all genuine trailing
+   commentary, correctly declined. `if` and `but` in the list worried me; both
+   behave.
+8. **Decimal / abbreviation splitting as a direct false accept.** R2-F11: I
+   could not turn the split into an accept on its own, only into extra distance
+   for R2-F8.
+9. **`TASK_RESTATEMENTS` misfiring on a real answer.** Zero hits across the
+   2,200 spans, and I could not construct a natural committed answer carrying
+   `determine whether` / `verify whether` in the *committed* clause.
+
+---
+
+## 5. Further probing and improvements
+
+**Ranked by what would change the verdict.**
+
+1. **Close R2-F7 at the resolution step, not the segmentation step.** Adding
+   commas to `_CLAUSE_SPLIT` would break `a) Memoryless: Yes, b) Causal: No`.
+   The right fix is that `_resolve_label`, applied to a committed clause, must
+   ignore surfaces inside a **contrastive or parenthetical constituent** — a
+   mention after `unlike`, `rather than`, `as opposed to`, `not`, or inside
+   brackets, is not the commitment. Small, testable, and it closes the
+   parenthetical half of R2-F12 too.
+2. **Replace the ±1-clause window with a real scope rule (R2-F8).** Either let
+   *any* preceding label-free clause in the span carrying `UNCERTAINTY` govern
+   (stated uncertainty is span-scoped, not clause-scoped — a model that says "I
+   am not sure" anywhere has not committed), or scan outward until a
+   label-bearing clause blocks. Whichever is chosen, **report the flip rate as a
+   function of the radius** — the sensitivity analysis round 1 asked for on
+   `_NEG_WINDOW`/`HEDGE_WINDOW`, which this change should not have been allowed
+   to skip.
+3. **Split `is_assertion` by position (R2-F9).** A `NON_ASSERTING_OPENER` at the
+   *start of the span* prefaces an answer; the same opener on the *last clause*
+   qualifies one. The corpus supports exactly this: all 9 real openers are final
+   clauses and all 9 are caveats. Restricting the opener rule to non-initial
+   clauses costs nothing on real text and recovers `Given that …, the system is
+   linear`. Separately, drop `roughly` and `nominally` from `EVIDENTIALS`, or
+   require them not to be adjacent to a numeral.
+4. **Correct the F1 prose — both sentences — before merge.** It has now survived
+   a round in which everything around it changed, and the F3 fix has made a
+   second sentence in the same passage describe behaviour the code no longer
+   has. It is the sentence a later reviewer will cite.
+5. **The gate needs a per-kind negative count *and* a per-kind
+   commitment-exercise count printed next to precision.** R2-F10 is F0 with a
+   new subject, and the reason both were findable is that the score table
+   reports a denominator including instances the mechanism never touched. One
+   extra column — "archived spans on which any commitment probe fired" — would
+   have made this visible without a reviewer.
+
+**Process note, and it is the whole round.** Every fix from round 1 is
+individually correct. Three of them are correct *and* the surface they were
+built on reproduces the defect one edit away. The module states the Phase 3
+lesson in its own docstring — "the corpus samples the inside of the list it
+certifies" — and was then certified against 43 cases written by the two people
+it was answering. A new mechanism introduced to fix review findings should carry
+its own evidence base, measured on text nobody in the review wrote, before it is
+allowed to gate three kinds.
