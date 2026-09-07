@@ -395,7 +395,7 @@ Counts below were verified against source, not inferred from the archive.
 |---|---:|---|---|
 | Malformed `**Step N:**` (`**Step 2: **`, `**Step 3: **…*`, colon inside the bold) | 3 | `cd_dc_system_analysis`, `euclidean_distance_binary`, `finite_convolution` | Normalise the marker |
 | No `**Answer:**` — uses `**Final Answer**` / `**Final Answers:**` | 5 | `batch_moles_vs_conversion`, `flow_system_molar_flow_rates`, `gas_phase_concentration`, `limiting_reactant`, `levenspiel_plot_interpretation` | Normalise, **or** widen the accepted marker set — decide once and apply corpus-wide |
-| `+ j-51.22` malformed complex | 2 | `time_to_phasor`, `phasor_addition` | Sign formatting |
+| `+ j-51.22` malformed complex | 2 | `time_to_phasor`, `phasor_addition` | Sign formatting. **Corpus-wide this class is 16 templates and 4 emit it in the answer span (D-061)**; Track A fixes its two completely, Phase 6 owns the rest. |
 | `omega_a = 0*pi` from an unreachable `elif` | 1 | `decimation_aliasing_analysis` | Reorder the guard |
 
 **11 distinct templates.** `levenspiel_plot_interpretation` is also in Phase 2 (step renumbering) — coordinate the two edits or sequence Phase 5 after Phase 2 for that file.
@@ -404,7 +404,26 @@ Counts below were verified against source, not inferred from the archive.
 
 **Deliverables:** D5.1 edits · D5.2 corpus-wide marker-conformance scan, all 150, proving zero remaining violations · D5.3 the marker-set decision record.
 **Review:** *Reviewer A* re-runs T4 across all 150 templates, not just the **11** touched — and independently checks the acceptance evidence for the defect classes T4 does not gate. Of the 11, T4 **fails** on 3, **reports but passes** 5 (`non-canonical marker `{'**Final Answer**': 25}`), and cannot see 3. A is also the owner of the `ANSWER_MARKERS`-agreement item, the one comparator file A may read.
-**Exit gate (Track A):** T4 passes on 150/150; T6 unchanged (these are formatting-only, so any distribution movement indicates an unintended change).
+**Exit gate (Track A)** — amended by SPEC-CHANGE 14, because T4 alone is not the gate:
+
+- [ ] **Acceptance evidence exists for all four defect classes**, and for the two
+      T4 cannot see. A green corpus is not that evidence: after the edits T4 is
+      150/150 whether or not the severity change was made. The evidence is a
+      **planted defect**, per Phase 0's rule —
+      `python -m tests.template_integrity.phase5_contract_scan --selftest`.
+- [ ] T4 passes **150/150**, with the five `**Final Answer**` templates no longer
+      merely *reported* (`non_canonical_answer` is now a failure)
+- [ ] D5.2 corpus-wide scan clean across all four classes at a seed count that can
+      **resolve the rarest of them** — class 4 fires on 1.95% of instances and a
+      25-seed scan cannot see it (D-024/D-026)
+- [ ] Marker-set decision recorded (D-059) and the candidate-side parser agrees,
+      stated as a predicate and checked: `--markers`. **Verified by Reviewer A.**
+- [ ] T6 movement explained by the before/after instance dump; **baseline not
+      regenerated**. T6 is not evidence about the item pool here — its baseline is
+      stale corpus-wide (D-043) and its answer extractor cannot see a non-scalar
+      answer (R4-5). The dump is the evidence.
+- [ ] Item-pool impact stated, separating a **marker rename** from a change to the
+      **answer body** — the second is the P6 number and the first is not.
 **Effort: 6–10 h + 3–4 h review.**
 
 ---
@@ -854,6 +873,8 @@ Read the hours as effort. Wall-clock is a fraction of them, and the difference i
 | SPEC-CHANGE 11 | **§4.2's hedge requirement is demoted from enforced to reported** (D-056) | Four review rounds and an ablation. The hedge layer fires on **2 of 2,200** archived answer spans and **0** in a kind it gates; ablating it changes no positive recall and no archive verdict, and it produced 13 of Reviewer E's 20 findings while repeatedly marking *correct* answers wrong. A hedge is now detected, annotated and counted, never scored. `ENGTRACE_HEDGE_POLICY=enforce` restores the old behaviour. Same treatment `narrative` gets (D-051). |
 | SPEC-CHANGE 12 | **`multipart` is not a seventh comparator `kind`** (D-047) | It is a property of the *answer*: an ordered list of `parts`, each carrying one of the six kinds, with a `mode` of `all` or `any`. `system_properties_memory_causality` is the proof inside Phase 4 — typed `classification`, described by §4.1 as a "label tuple", actually two categorical parts. A seventh kind would stop the six composing. Governs **24 of the 51 class-C templates**. |
 | SPEC-CHANGE 13 | **D3.4 §7 amended in four places** (D-054) | §7 shipped unexercised and both Phase 3 schema reviewers named the missing corpus as the largest gap. Building it (D4.6) found four defects in the *specification*: §7.2's headline disposition has no instances, §7 never says whether §6 step 8 binds a candidate, §7.4's direct solver cannot be an `iteration` node at all, and §7.3 row 3's set-versus-ordered distinction is vacuous. |
+| SPEC-CHANGE 14 | **T4's `non_canonical_answer` finding is a FAILURE, not a report** (D-060); Phase 5 Track A's exit gate gains a four-class acceptance-evidence item and the two new detectors that serve it | T4 *printed* `non-canonical marker {'**Final Answer**': 25}` on five templates and passed them, so the corpus could be reported 150/150 green with a known output-contract defect on five items - the third check in this project found green while measuring something it could see. The remedy for an *ungated* defect is one line of severity; the remedy for an *invisible* one is a new instrument. Five were ungated and three invisible, and an earlier draft of the Phase 5 brief treated the first group as the second. Verified by planted defect, because after the template edits T4 is green either way. |
+| SPEC-CHANGE 15 | **The doubled-sign defect is corpus-wide, 16 templates, and the spec's 2-template row understated it** (D-061) | The fault is a hard-coded `+` before an interpolated signed value; the `j` is incidental. 4 templates emit it inside the **answer span**, 2 of which are Track A's. Track A fixes its two completely - which uncovered a P1 violation, `sqrt(-41.2^2 + 86.45^2) = 95.77` evaluating to 76.00 - and the other 14 are named and assigned to Phase 6. |
 
 ---
 

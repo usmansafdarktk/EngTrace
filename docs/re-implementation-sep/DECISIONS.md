@@ -2218,6 +2218,159 @@ Gold×gold cannot test normalisation, because gold text lacks model surface
 variation; archive×gold cannot cover kinds the archive lacks. Neither replaces
 the other and Phase 5 lands both.
 
+## D-059 — One canonical answer marker in gold; the candidate-side list stays wide
+
+**Date:** 2026-09-07 · **Status:** DECIDED · **Source:** Phase 5 Track A, D5.3
+
+Five templates terminated with `**Final Answer**` (four) or `**Final Answers:**`
+(one) instead of the canonical `**Answer:**`. The brief offered two remedies —
+normalise the templates, or widen the accepted marker set corpus-wide — and
+required the decision to be made once and applied everywhere.
+
+**Decision: normalise the five templates. Gold emits exactly one answer marker.**
+
+**The two lists are different lists, and conflating them is the mistake this
+entry exists to prevent.** `tests/template_integrity/core.py::ANSWER_MARKERS` is
+what *gold* may emit; `tests/comparators/normalize.py::ANSWER_MARKERS` is what a
+*candidate* may emit. Gold is a corpus we control and can make uniform. Model
+output is not, and never will be: the archive shows `## Final Answer`,
+`Final Answer:`, `The answer is:` and a bare `Answer:` across 2,200 traces. So
+the candidate-side list stays wide and keeps its priority order; the gold-side
+one narrows to a single marker.
+
+**"Agree" is a predicate, not a sentiment, and it is now checked.** For every
+gold solution in the corpus the candidate-side parser must recover the canonical
+marker with no marker debris glued to the front of the span. Run:
+
+```
+python -m tests.template_integrity.phase5_contract_scan --markers
+```
+
+**Measured, before and after, over the eleven Track A templates × 200 seeds:**
+
+| | spans recovering `**Answer:**` | spans carrying debris |
+|---|---:|---:|
+| before | 1,200 / 2,200 | **1,000** |
+| after | 2,200 / 2,200 | **0** |
+
+Corpus-wide after the edit: **1,200 of 1,200** gold spans (150 templates × 8
+seeds) recover `**Answer:**`, none empty.
+
+**This was not cosmetic and the "widen the set" option would not have fixed it.**
+The candidate-side priority-2 pattern `Final\s+Answer:?` matched *inside*
+`**Final Answer**`, so the recovered marker was `Final Answer` and the answer
+span began `**\nAfter reaching a conversion of...`. On the plural
+`**Final Answers:**` it began **`s:**\na) CSTR Volume = 13...`**. A comparator
+reading those spans was reading `s:**` as part of the answer. Widening the
+accepted set would have licensed the collision permanently; the priority order
+is load-bearing (Reviewer E's Phase 4 F4 was this same mechanism firing inside a
+caveat) and every marker added to it is another way for `answer_span` to peel
+into the wrong place.
+
+**P6.** The five templates' answer *bodies* are byte-identical before and after
+on all 2,000 seeds each; only the marker line differs. Questions unchanged.
+Evidence in [`phase5_item_pool_impact.md`](phase5_item_pool_impact.md).
+
+**Reviewer A owns checking this**, and is asked to treat `--markers` as a claim
+under test rather than as supplied tooling.
+
+---
+
+## D-060 — T4's non-canonical-marker finding becomes a FAILURE (SPEC-CHANGE 14)
+
+**Date:** 2026-09-07 · **Status:** DECIDED · **Source:** Phase 5 Track A
+**This is a `SPEC-CHANGE` against `template_redesign_spec.md` Phase 5 Track A's
+exit gate.**
+
+T4 printed `non-canonical marker {'**Final Answer**': 25}` for five templates
+**and passed them**. The corpus could therefore be reported "T4 150/150 green"
+with a known output-contract defect standing on five items — the third instance
+in this project of a check that is green while measuring something it can see.
+
+**The distinction that decides the remedy, because an earlier draft of the
+Phase 5 brief got it wrong.** *Ungated* means the check sees the defect and does
+not fail on it: the fix is one line of severity. *Invisible* means the check
+cannot see it: only then is a new instrument warranted. Five templates were
+ungated and three were invisible; treating the first group as the second would
+have built a duplicate scanner.
+
+**Decision.** `ContractResult.passed` now includes `non_canonical_answer`.
+The *recognised* marker set stays wide deliberately, so a regression is reported
+as `non-canonical marker {'**Final Answer**': 25}` rather than as the far less
+useful `no answer marker on 25 seeds`. Narrowing the recognised set would gate
+the same defect with a worse diagnostic.
+
+**The severity change is verified by a planted defect, not by a green corpus.**
+After Track A's edits T4 is 150/150 green *whether or not this change was made* —
+the corpus is clean because the templates were fixed. A green suite is therefore
+no evidence at all for this line. `--selftest` plants each of the four defect
+classes into real generated output and requires detection:
+
+```
+python -m tests.template_integrity.phase5_contract_scan --selftest
+```
+
+| planted class | scan | T4 |
+|---|---|---|
+| `step_marker` | CAUGHT | **FAILS** |
+| `answer_marker` | CAUGHT | **FAILS** ← the line this entry adds |
+| `complex_sign` | CAUGHT | passes (expected: blind) |
+| `degenerate_product` | CAUGHT | passes (expected: blind) |
+| `degenerate_product` planted in a *derivation* step | silent (correct) | — |
+
+---
+
+## D-061 — The doubled-sign defect is 16 templates, not 2; Track A fixes its 2 and names the rest
+
+**Date:** 2026-09-07 · **Status:** DECIDED · **Source:** Phase 5 Track A,
+corpus-wide sweep
+
+The spec records the malformed-complex defect as `+ j-51.22` on two templates.
+The underlying fault is more general: **a hard-coded `+` in a format string
+followed by an interpolated signed value.** The `j` is incidental.
+
+Swept corpus-wide, 150 templates × 120 seeds, pattern
+`[-+]\s+[-+]\s*\d` or `[-+]\s*j\s*[-+]\s*\d`:
+
+| | templates |
+|---|---:|
+| emit a doubled sign anywhere in the solution | **16** |
+| emit one **inside the answer span** | **4** |
+| of those, in Track A's scope | **2** (`time_to_phasor`, `phasor_addition`) |
+
+The other two answer-span carriers are `lorentz_force` (118 answer-span hits per
+120 seeds) and `continuous_to_discrete_conversion` (66). The twelve
+derivation-only carriers are `multi_segment_rod`, `vorticity_check`,
+`nyquist_rate_determination`, `impulse_response_from_lccde`,
+`work_isothermal_virial`, `mean_variance`, `coulombs_law`,
+`wave_equation_interpretation`, `system_property_linearity`,
+`signal_operations`, `sensible_heat_constant_cp`, `pitzer_correlation_z`.
+
+**Decision: fix the two in scope, completely; record the other fourteen with the
+measurement and assign them.** Editing fourteen unassigned templates inside a
+phase whose named risk is *"changing an item pool by accident"* would trade the
+thing the phase is for. Disposition: **`ADOPT-PHASE-6`**, added to Phase 6's
+deliverable list.
+
+**"Completely" was larger than the spec's row.** Fixing only the `j` sites in
+the two templates would have left `cos(361*t + -146.39 deg)` standing in
+`phasor_addition`'s **answer**. The fix therefore covers every doubled sign in
+both templates, and a third defect found while doing it:
+
+> `A_total = sqrt(-41.2^2 + 86.45^2) = 95.77` — evaluated as printed this is
+> `sqrt(-1697.4 + 7473.6) = 76.00`, because `-41.2^2` is `-(41.2^2)` under
+> ordinary precedence. **A P1 violation**, printed on every instance with a
+> negative component. Parenthesising the operands cut `phasor_addition`'s T1
+> closure failures from **9 to 5** over 25 seeds and removed the large-delta
+> class entirely — the surviving five are ordinary rounding-boundary misses
+> (delta ≈ 0.006 against a 0.005 tolerance). T1 coverage on the template rose
+> 0.27 → 0.29 and lines checked 142 → 152.
+
+That P1 defect was *not* in the brief, the spec, or the audit. It was found
+because the doubled-sign sweep put the line in front of me.
+
+---
+
 ---
 
 ## Open decisions
