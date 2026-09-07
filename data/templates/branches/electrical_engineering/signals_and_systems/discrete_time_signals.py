@@ -417,7 +417,7 @@ def template_finite_convolution():
         f"Let's calculate a few points explicitly:\n\n"
         f"{calculation_steps_str}\n"
         
-        f"**Step 3: Calculate All Output Values**\n"
+        f"**Step 3:** Calculate All Output Values\n"
         f"By continuing this process for all values of 'n' where the sequences overlap (from n={y_start_idx} to n={y_end_idx}), we get the full output sequence:\n"
         f"{y_values_str}\n\n" 
 
