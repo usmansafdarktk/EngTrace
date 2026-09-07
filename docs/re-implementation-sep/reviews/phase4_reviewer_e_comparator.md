@@ -1099,3 +1099,313 @@ gating three answer kinds, validated on 415 sentences all written by its three
 critics, with three unjustified integers and five divergent opener lists. That
 is not a comparator; it is a parser, and it should either be scoped down to what
 the archive can falsify or moved to R4-10 in its entirety.
+
+---
+
+# Round 4 — is the mechanism converging?
+
+## 1. Verdict
+
+**UNBOUNDED — reduce the mechanism's scope. Do not spend a round 5 on these
+five findings.** I found both halves of the gate again (3 false rejects, 2
+false accepts, plus a cross-module contradiction), all five in 25 minutes, and
+**all five are one-word or one-clause mutations of cases already in the passing
+suite.** The defect *classes* are not closing; the *cost of finding an instance*
+is falling. That is the signature of an unbounded surface, not a converging one.
+
+The decisive number is not a finding. It is this: **deleting the hedge-governance
+layer costs 0 of 351 positive recall cases, 0 of 2,200 archived spans, and 30
+synthetic negative controls the reviewers wrote.** That layer is ~250 lines,
+5 probe classes, 5 word lists, and **13 of my 20 findings across four rounds.**
+
+## 2. Independent re-derivation (round 4)
+
+Working tree at the frozen ref. Baselines reproduce: `reviewer_battery` 81/81,
+`recall_corpus` 507/507 (351 positive + 156 negative), `score` gate PASS
+(archive precision 100.0% / recall 97.8%; adversarial 98.6% / 98.6%).
+
+Census, re-read rather than re-derived: **2 hedge markers in 2,200 spans**
+(1 modal, 1 stated uncertainty), **0 in a commitment-gated answer type**.
+One number I had not separated before, and it changes my recommendation:
+**subordinator openers fire 43 times** (concessive 31, hypothetical 11,
+factive 1). So the module is **two mechanisms with opposite evidence**:
+segmentation is observed 43 times in the archive and is falsifiable; hedge
+governance is observed **zero** times in the kinds it gates and is not.
+That asymmetry is the basis of §3's recommendation, and it was invisible while
+"the commitment machinery" was discussed as one object.
+
+**Ablation, the measurement this phase was missing.** I stubbed
+`_hedges_governing` and `_governing_comment` to return nothing, leaving
+segmentation untouched, and re-ran the corpus:
+
+| | full | hedge layer ablated |
+|---|---|---|
+| positive frames (9 x 39) | 351/351 | **351/351** |
+| `neg-hypothetical`, `neg-task-restatement` | 78/78 | **78/78** |
+| `neg-explicit-hedge` | 39/39 | 24/39 |
+| `neg-question` | 39/39 | 24/39 |
+| **total** | 507/507 | **477/507 (94.1%)** |
+
+Ablating costs **30 cases, all in two negative frames, all reviewer-authored,
+and none on the archive.** It costs **zero** false rejects. The two battery
+cases it loses are `E-R3-F15` and `B-R3-F2` — mine and B's, written to specify
+this layer. The layer is validated exclusively by the cases written to specify
+it, which is the circularity of D4.4 and of round-1 F1 for the third time.
+
+## 3. RECOMMENDATION — read this before the findings
+
+> ### The mechanism is **unbounded**. Reduce its scope; do not patch it again.
+>
+> Natural-language commitment detection is not finishable by a rule set at this
+> budget, and four rounds are enough evidence to stop. Concretely:
+>
+> **3a. Delete the hedge-governance layer from the gate.** Remove
+> `_hedges_governing`, `_governing_comment`, `is_bare_comment`,
+> `_ANAPHORIC_SUBJECT`, `_SUBJECTLESS`, `NEIGHBOUR_CLASSES`, `_COMMENT_CLASSES`
+> and the five `PROBES` **from the decision path**. Cost, measured, not
+> estimated: 0 archive verdicts, 0 positive recall, 30 synthetic negatives.
+> Benefit: 13 of my 20 findings and 4 of this round's 5 become unreachable,
+> because the code they live in is gone.
+>
+> **3b. Keep segmentation, which has 43 archive instances and does real work.**
+> `clauses()`, the hypothetical/concessive/factive distinction, `TASK_RESTATEMENTS`
+> and `conjuncts()` stay. They are falsifiable against the archive; the hedge
+> layer is not. **R4-F23 below is a live segmentation defect and it should be
+> fixed** — that is a two-line change, and it is the only fix I would spend a
+> round on.
+>
+> **3c. Make hedges advisory, not gating.** Keep `hedge_markers()` as a
+> reporting function. If a marker fires anywhere in an answer span, attach it to
+> the verdict as an annotation and let it route to human review. **It must never
+> convert a MATCH into UNRESOLVED.** Every one of my false rejects across four
+> rounds — R2-F9a/b/c, R3-F13, R3-F17, R4-F23, R4-F24, R4-F25, R4-F27 — is a
+> hedge or a segment silently overturning a correct verdict. Removing the
+> silence removes the harm without removing the signal. Given 2 markers in
+> 2,200 spans, the human-review queue this creates is **two items.**
+>
+> **3d. State the residual honestly and close the phase.** Spec §4.4 requires a
+> hedged answer to be non-committal. After 3a-3c that requirement is *reported*
+> rather than *enforced*, and the phase should say so on R4-10 in those words,
+> rather than claim an enforcement it has never once exercised on real output.
+>
+> **What I am explicitly NOT recommending.** Not "one or two more rounds"
+> (§4 says why), and not "ship it with the residual stated" — I would sign that
+> for segmentation alone, but not while a layer with zero observed instances can
+> silently mark a correct answer wrong. 3c is what makes "ship it" honest.
+
+### R4-F23 — CONFIRMED (blocking): **over-rejection.** R3-F17's comma fix takes the *first* comma unconditionally, so a comma-less fronted concessive with any later comma loses its matrix
+
+`segment()` does `comma = c.find(","); c = c[comma+1:] if comma != -1 else c[cm.end():]`.
+The R3-F17 fix made the comma *optional*, but it did not make it *the concessive's
+own* comma. Any later comma in the clause is taken as the boundary:
+
+```
+"Since both tests pass the system is linear."                  -> MATCH   (R3-F17 case, fixed)
+"Since both tests pass the system is linear, as expected."     -> UNRESOLVED
+"Although the algebra is fiddly the system is linear,
+                          which the definitions require."      -> UNRESOLVED
+"Since both tests pass, the system is linear, as expected."    -> MATCH   (control)
+```
+
+`segment()` returns `('as expected', '')` and `('which the definitions require', '')`.
+The label is gone; the reason given is "the label is inside a backgrounded or
+parenthetical part". **Two words — `, as expected` — flip a correct answer.**
+This is R3-F17 relocated: the orthographic condition moved from "a comma must
+exist" to "the first comma must be the right one". Note the second case combines
+two frames the corpus already ships (`fronted-concessive` and
+`appositive-relative`) — the corpus tests them **only separately**, and that is
+why 507/507 does not see it.
+
+**Fix (the one I would spend a round on):** when there is no comma before the
+matrix, the comma-less branch must be taken. Search for the boundary rather
+than `find(",")` — e.g. take the first comma **only if** the text before it
+contains no label surface, else fall back to `c[cm.end():]`.
+
+### R4-F24 — CONFIRMED (blocking): **over-rejection.** Existential `there` is in the anaphoric-subject allowlist, so a remark about the *algebra* retracts the verdict
+
+`_ANAPHORIC_SUBJECT` lists `it|this|that|these|those|i|we|there`. Existential
+`there` is an **expletive**, not an anaphor: in "there seems to be an issue with
+my algebra" the logical subject is *an issue with my algebra*, a full NP, and the
+clause is a claim about something else — exactly what `is_bare_comment` exists to
+exclude.
+
+```
+"There seems to be an issue with my algebra, but the system is linear."  -> MATCH
+"The system is linear, but there seems to be an issue with my algebra."  -> UNRESOLVED
+"The system is linear, but the algebra seems fiddly."                    -> MATCH   (control)
+```
+
+The **same proposition in the same sentence flips on clause order**, and the
+non-expletive paraphrase is credited while the expletive one is not. R3-F13
+relocated: the blocklist became an allowlist, and the allowlist admits one word
+it should not. Removing `there` fixes these three cases and nothing else; it does
+not fix R4-F25, which is why 3a is the real answer.
+
+### R4-F25 — CONFIRMED (blocking): **over-rejection.** The bare-comment test scopes by *subject*, never by the *proposition the hedge is about*
+
+This is the through-line, and it is why R4-F24 is not worth fixing on its own.
+`_hedges_governing`'s stated discriminator is "*whose* confidence is qualified".
+The implementation tests only the **syntactic subject of the hedge-bearing
+unit** — never what the hedge is predicated of. Any first-person or anaphoric
+clause carrying an INABILITY marker retracts the verdict, whatever it is about:
+
+```
+"The system is linear. We cannot determine the ROC without more information."    -> UNRESOLVED
+"The system is linear. I am not sure what the professor means by 'input space'." -> UNRESOLVED
+```
+
+Both commit to *linear* and disclaim something else — a region of convergence,
+a piece of the prompt's wording. A grader credits both. The docstring's own
+contrast pair ("the speaker's" vs "the reasoning's") is a distinction about
+**propositional content**, and subject-form cannot express it: *I am not sure*
+and *I am not sure what "input space" means* have the same subject and opposite
+scope. No allowlist over subjects closes this, because the distinguishing
+information is not in the subject. **This is R2-F9c and R3-F13 at their third
+location, and it is the finding that makes the surface unbounded.**
+
+Reviewer B reached the same layer independently this round (B's R4-F2: the hedge
+rule's proxy refuses committed answers at 0/39 on four ordinary frames). Two
+reviewers converging on *the same layer* from different directions, in the round
+that asked whether the mechanism converges, is itself evidence for 3a.
+
+### R4-F26 — CONFIRMED (blocking): **false accept.** The trailing-question withdrawal is guarded by `not _label_hit`, so the *more explicit* withdrawal is credited
+
+The new rule fires only when the trailing question is **label-free**:
+
+```python
+if follows and text.rstrip().endswith("?") and not _label_hit(text, surfaces):
+    marks.append("withdrawn by a following question")
+```
+
+So the shipped negative control is caught and its stronger form is not:
+
+```
+"The system is linear. Or is it?"                        -> UNRESOLVED  (neg-question, passing)
+"The system is linear. Or is it nonlinear?"              -> MATCH       false accept
+"The system is linear. But is the system really linear?" -> MATCH       false accept
+```
+
+Naming the alternative makes the retraction *less* ambiguous and the comparator
+*more* confident. `neg-question` is a shipped corpus frame and case 2 is that
+frame **plus one word**. The guard exists because `segment()` already refuses a
+label-bearing question — but that only stops the question from *committing*; it
+does nothing to stop the earlier clause committing, so the withdrawal is
+dropped on the floor. R3-F16's shape: one rule's precondition is another rule's
+blind spot.
+
+### R4-F27 — CONFIRMED (blocking): **over-rejection**, and a *new* cross-module contradiction in the function added this round
+
+`suspends_what_follows` returns `"the answer is a question"` for any preface
+ending in `?`. Restating the question before answering is among the most common
+things a model does:
+
+```
+"a) No, b) No"                                       -> MATCH
+"Is the system memoryless and causal? a) No, b) No"  -> UNRESOLVED  "the answer is a question"
+"So which is it? a) No, b) No"                       -> UNRESOLVED
+"The two tests are below. a) No, b) No"              -> MATCH       (control)
+```
+
+And the two paths **disagree about the same construction**: on the categorical
+path `"Is the system linear? Yes, it is linear."` is a **MATCH**, because
+`clauses()` splits at the `?` and the following clause commits. The enumerated
+path reads the same preface and refuses. This is R3-F16 exactly — two code paths
+contradicting each other about one construction — reproduced inside the function
+written **this round** to fix a different problem. `suspends_what_follows`
+already exempts a preface closed by `.`; a preface closed by `?` is the same
+case and needs the same exemption.
+
+## 4. Falsification attempts that failed — and the convergence measurement
+
+I tried to break segmentation in five further ways and could not: nested
+concessives (`"Although X, although Y, Z"`), the `neither … nor` excision with
+an interpolated comma (R3-F19's fix holds), `as opposed to` / `rather than`
+trailing subordinators, factive-after-commitment ordering (R3-F16's fix holds),
+and the abbreviation guard (`i.e.`, `2.5`, initials). **R3-F19, R3-F16 and
+R3-F20 are genuinely closed.** That is real progress and I want it on the record:
+segmentation minus R4-F23 is in good shape, which is why 3b keeps it.
+
+**Now the question the round was asked.** Are these findings (a) the same kind,
+one small edit from an existing case, or (b) new classes?
+
+| round-4 finding | layer | relocation of | distance from a **passing** shipped case |
+|---|---|---|---|
+| R4-F23 | segmentation | R3-F17 | battery case `E-R3-F17` **+ `, as expected`** (2 words) |
+| R4-F24 | hedge gov. | R3-F13 | frame `post-quantified`, trailing clause swapped |
+| R4-F25 | hedge gov. | R2-F9c, R3-F13 | frame `post-quantified`, trailing clause swapped |
+| R4-F26 | hedge gov. | R3-F16 | frame `neg-question` **+ one word** |
+| R4-F27 | hedge gov. / cross-module | R3-F16 | frame `neg-question`, moved to the preface |
+
+**Answer: (a), unanimously, and worse than in round 3.** Every finding is a
+relocation of a named earlier finding, and **5 of 5 are one-or-two-token
+mutations of cases the suite already contains and passes.** Not one is a new
+class.
+
+**Is the residual shrinking, holding, or growing?** The residual is *holding*;
+what has changed is the **cost of drawing from it**, and it has collapsed:
+
+| round | findings | how they were found |
+|---|---|---|
+| 2 | 6 | full session, reading the module cold |
+| 3 | 10 | full session, targeted constructions |
+| 4 | **5** | **25 minutes, mechanically mutating the suite's own cases by one word** |
+
+A surface where a fixed budget yields a roughly constant number of defects, and
+where the search that finds them gets *cheaper* each round because the previous
+round's fixes leave one-token neighbours exposed, is not converging. Three rounds
+of "every CONFIRMED finding actioned" produced a suite that is 100% green on 588
+cases and 0% robust to editing those cases. **The suite measures its cases, not
+the mechanism** — which is the R2-F10 charge, one level up, for the third time.
+
+The strongest single argument against a round 5 is R4-F25. R4-F23, F24, F26 and
+F27 all have two-line fixes and I could write them. R4-F25 does not: it needs to
+know *what a hedge is about*, which is propositional content, and no list of
+subjects, determiners, classes, positions or distances encodes that. Rounds 2, 3
+and 4 have each tried a different **syntactic proxy** for a **semantic**
+relation — character distance, clause distance, segment membership, conjunct
+membership, subject form — and each proxy has failed on a sentence one word from
+one it handles. That is not a sequence converging on an answer; it is a sequence
+of equivalent-cost approximations to something outside the method's reach.
+
+## 5. Further probing and improvements
+
+1. **Adopt 3a-3d.** Everything else in this list is subordinate to it.
+2. **If 3a is rejected, fix R4-F23 first and alone.** It is the only round-4
+   finding in the layer worth keeping, it is two lines, and it costs nothing
+   elsewhere. Leave F24-F27 unfixed and state them, rather than growing the
+   surface by four more patches.
+3. **Make the corpus a mutation harness, not a frame list.** My round-3 §5.6
+   asked for mechanical frame variation and it was not built; every round-4
+   finding is a case that harness would have generated. Minimum viable version:
+   for each of the 13 frames, emit variants with (i) the comma deleted, (ii)
+   `, as expected` appended, (iii) the trailing clause replaced by a first-person
+   disclaimer about a *different* object, (iv) label surfaces inserted into
+   label-free frames. That is ~50 lines and it would have found F23, F24, F25 and
+   F26 without me.
+4. **Publish the ablation table in the module docstring.** "This layer changes 0
+   of 2,200 archived verdicts and 30 of 507 corpus cases, all of them negative
+   controls we wrote" is the most useful sentence anyone can write about
+   `commitment.py`, and it belongs where the next reader will see it.
+5. **Retire the phrase "commitment machinery" from the spec.** It names two
+   mechanisms with opposite evidence (43 archive instances vs 0) and opposite
+   correct dispositions. Naming them separately — *clause segmentation* and
+   *hedge governance* — is what made this round's recommendation visible, and it
+   should have been visible in round 2.
+
+**Reproduction.** All figures above come from the working tree at the frozen ref
+with `PYTHONPATH` set to the repo root:
+`reviewer_battery`, `recall_corpus`, `score`, `derive_vocabulary` for the
+baselines and the census; for the ablation, stub
+`commitment._hedges_governing` to return `[]` and `commitment._governing_comment`
+to return `""` **before** importing `recall_corpus`, then re-run its `build()`
+through `answer.compare_template`. Segmentation is left untouched by the stub,
+which is what makes the 351/351 positive column meaningful.
+
+**Process note, and my last one.** Rounds 1-3 asked "is this defect fixed?" and
+the answer was always yes; the phase kept moving because each answer was true.
+Round 4 asked a different question and got a different kind of answer: the fixes
+were real and the trend they belong to is flat. I have filed 20 findings against
+this module and I would file a 21st in another 25 minutes, and that fact — not
+any one of the 20 — is the finding. The phase does not need a sixteenth patch.
+It needs to stop enforcing a policy it has never once observed being violated,
+report it instead, and close.
