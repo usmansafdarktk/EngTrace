@@ -26,12 +26,11 @@ from decimal import Decimal, InvalidOperation
 from fractions import Fraction
 from typing import Any, Sequence
 
+from .commitment import find_commitment, hedge_markers, is_assertion
 from .normalize import (
     NEGATORS,
     NEITHER_NOR_RE,
     answer_span,
-    has_hedge,
-    hedges_in,
     prepare,
 )
 from .verdict import MISMATCH, UNRESOLVED, Verdict, match, mismatch, unresolved
@@ -192,17 +191,29 @@ def _resolve_unit(text: str) -> str | None:
 def _label_hit(text: str, surfaces: Sequence[str]) -> tuple[int, str] | None:
     """Position and matched surface of the last occurrence of any surface.
 
-    Surfaces are matched longest-first so that ``nonlinear`` is preferred over
-    the ``linear`` inside it.  Matching the short one is how a comparator comes
-    to score all twelve archived ``not linear`` answers as ``linear``.
+    **Position first; length only to break a tie at the same offset.**
+
+    The first version sorted surfaces longest-first and stopped at the first
+    that matched *anywhere*, so a single ``nonlinear`` outranked a committed
+    ``linear`` no matter where each sat. Reviewer E (F2) and Reviewer B (F4)
+    found this independently, from opposite directions, and both are right:
+    D4.1 §4.2's longest-first rule is about **containment at one offset**
+    (``linear`` inside ``nonlinear``) and was being applied **across** offsets,
+    which is a different and false claim.
+
+    Note that containment between these two particular surfaces is already
+    impossible -- ``(?<![\\w-])`` stops ``linear`` matching inside
+    ``nonlinear`` -- so the length rule only ever fires on genuine ties, which
+    is what it was for.
+
+    This alone does not settle which clause the model committed to; see
+    ``commitment.find_commitment``, which does.
     """
     best: tuple[int, str] | None = None
-    for s in sorted(surfaces, key=len, reverse=True):
+    for s in surfaces:
         for m in re.finditer(r"(?<![\w-])" + re.escape(s) + r"(?![\w-])", text, re.I):
-            if best is None or m.start() > best[0]:
+            if best is None or (m.start(), len(s)) > (best[0], len(best[1])):
                 best = (m.start(), s)
-        if best is not None:
-            break
     return best
 
 
@@ -232,7 +243,27 @@ def _negated(text: str, at: int, surface: str) -> bool:
     window = re.split(r"[.;]|\bbut\b|\bhowever\b|\bwhereas\b|\bwhile\b", window)[-1]
     if re.search(r"\bnon-?\s*$", window):
         return True
-    return any(re.search(r"\b" + re.escape(n) + r"\b", window) for n in NEGATORS)
+    if any(re.search(r"\b" + re.escape(n) + r"\b", window) for n in NEGATORS):
+        return True
+    # **Negation can follow the label as well as precede it.**  "linear is the
+    # wrong description" asserts the opposite of the label it names.  Ranking
+    # hits by position rather than by surface length (Reviewer E F2 /
+    # Reviewer B F4) made this reachable: the later, post-modified mention now
+    # wins, where the longest-surface rule used to hide it behind an earlier
+    # `nonlinearity`.  Narrow by design -- a predicate that says the label is
+    # wrong, nothing more.
+    after = text[at + len(surface):at + len(surface) + _NEG_WINDOW].lower()
+    after = re.split(r"[.;]", after)[0]
+    return bool(_POST_NEG_RE.search(after))
+
+
+#: Predicates that negate the label immediately preceding them.
+_POST_NEG_RE = re.compile(
+    r"^\W*(?:is|was|would\s+be|seems)?\s*(?:the\s+)?"
+    r"(?:wrong|incorrect|mistaken|not\s+correct|not\s+right|not\s+the\s+case|"
+    r"inapplicable|does\s+not\s+apply|fails|is\s+ruled\s+out)\b",
+    re.IGNORECASE,
+)
 
 
 def compare_categorical(
@@ -260,17 +291,23 @@ def compare_categorical(
     if g is None:
         return unresolved(k, "gold answer names no declared label", gold_canonical=g_txt)
 
-    c = _resolve_label(c_txt, labels)
-    if c is None:
+    # Which clause did the candidate COMMIT to?  Not "does a label appear
+    # somewhere unhedged" -- that question let a conditional, an assumption, a
+    # refusal, the item's own prompt wording, a trailing hedge, an unlisted
+    # hedge and a contrastive mention all through (Reviewer B F1-F4, Reviewer E
+    # F2).  See commitment.py for the mechanism and why it replaced a blocklist.
+    surfaces = [x for ss in labels.values() for x in ss]
+    commit = find_commitment(c_txt, surfaces)
+    if not commit:
         return unresolved(
-            k, "candidate answer names no declared label",
+            k, f"candidate does not commit to a label: {commit.reason}",
             gold_canonical=g, cand_canonical=c_txt,
         )
-    hit = _label_hit(c_txt, [x for ss in labels.values() for x in ss])
-    if hit and has_hedge(c_txt, hit[0]):
+    c = _resolve_label(commit.clause, labels)
+    if c is None:
         return unresolved(
-            k, f"candidate hedges ({', '.join(hedges_in(c_txt, hit[0]))}) and never commits",
-            gold_canonical=g, cand_canonical=c_txt,
+            k, "candidate's committed clause names no declared label",
+            gold_canonical=g, cand_canonical=commit.clause,
         )
     if c == g:
         return match(k, gold_canonical=g, cand_canonical=c)
@@ -381,13 +418,15 @@ def _slot_verdict(
     if g is None:
         return unresolved(slot.name, "gold slot states no value")
     ctext = _slot_text(c_txt, slot, pos, c_clauses)
+    ok, why = is_assertion(ctext)
+    if not ok:
+        return unresolved(slot.name, why)
+    marks = hedge_markers(ctext)
+    if marks:
+        return unresolved(slot.name, f"hedged ({', '.join(marks)})")
     c = _resolve_property(ctext, slot)
     if c is None:
         return unresolved(slot.name, "candidate slot states no value")
-    hit = _label_hit(ctext, list(slot.positive) + list(slot.negative))
-    at = hit[0] if hit else len(ctext)
-    if has_hedge(ctext, at):
-        return unresolved(slot.name, f"hedged ({', '.join(hedges_in(ctext, at))})")
     if c == g:
         return match(slot.name, gold_canonical=g, cand_canonical=c)
     return mismatch(slot.name, f"{c!r} != {g!r}", gold_canonical=g, cand_canonical=c)
@@ -633,14 +672,25 @@ def _parse_braced(t: str) -> tuple[list[Decimal], int | None, list[int] | None] 
         except ValueError:
             idx_list = None
 
-    # Discard any brace group that *is* the index list.
+    # Discard any group that is not a value list.
+    #
+    # Two ways a group is not one, and the second was a live defect: the
+    # bracket alternative in `_BRACED_RE` also matches an **index subscript**,
+    # so `y[1] = -1, y[2] = 5, y[3] = -4, y[4] = 3` contributed four "groups"
+    # and `val_groups[-1]` picked `[4]` -- the parser read the last subscript as
+    # the whole answer.  It silently discarded the real brace group's origin,
+    # which is why archived signal trace 0 and the identical D4.4 case seq-08
+    # disagreed with each other.  A bracket group is a sequence only if it
+    # contains a separator; a brace group always is.
     val_groups = []
     for start, body in groups:
-        items = _split_items(body)
+        if not _split_items(body):
+            continue
         if idx_list is not None and fm is not None and fm.start() <= start <= fm.end():
             continue
-        if items:
-            val_groups.append(body)
+        if t[start] == "[" and "," not in body:
+            continue  # a subscript, not a one-element sequence
+        val_groups.append(body)
     if not val_groups:
         return None
     body = val_groups[-1]
@@ -741,14 +791,32 @@ def compare_sequence(
             gold_canonical=_fmt_map(gm), cand_canonical=str(cv), observations=obs,
         )
     if g.origin is None and c.origin is not None:
-        # Gold's support excludes n=0; a candidate that pins one has said more,
-        # and it is checked for consistency rather than credited or punished
-        # for the extra information.
-        if _trim(g.values) == _trim(c.values):
-            return match(k, gold_canonical=_trim(g.values), cand_canonical=_trim(c.values),
-                         observations=obs + ["candidate stated an origin gold does not"])
-        return mismatch(k, "values differ", gold_canonical=_trim(g.values),
-                        cand_canonical=_trim(c.values), observations=obs)
+        # **Gold cannot state an origin here and the candidate has stated one,
+        # so the comparison is undecidable -- not a match.**
+        #
+        # The first version compared trimmed values and returned MATCH with
+        # "candidate stated an origin gold does not" as an observation.
+        # Reviewer E (F3) showed what that accepts: on the 16.4% of instances
+        # where gold's support excludes n = 0 (D-050), `require_origin=True` was
+        # silently inert, and three candidate forms taken from real archived
+        # traces -- an asterisk at the wrong element, an index list four places
+        # off, an off-by-one per-element listing -- were all MATCHed against a
+        # real archived gold.  Those are wrong signals, not under-specified
+        # ones, and the observation string is no defence because it rides on a
+        # MATCH and is invisible in precision.
+        #
+        # UNRESOLVED is the honest outcome: the item cannot decide it.  The
+        # values are still compared first, because if they differ the case is
+        # decidable regardless of any origin.
+        if _trim(g.values) != _trim(c.values):
+            return mismatch(k, "values differ", gold_canonical=_trim(g.values),
+                            cand_canonical=_trim(c.values), observations=obs)
+        return unresolved(
+            k, "gold's support excludes n=0 so gold states no origin, and the "
+               "candidate pins one; the values agree but the placement cannot be checked",
+            gold_canonical=_trim(g.values), cand_canonical=_fmt_map(c.trimmed_map()),
+            observations=obs,
+        )
 
     gm, cm = g.trimmed_map(), c.trimmed_map()
     if gm == cm:
@@ -1123,14 +1191,14 @@ def compare_check(
     g_bool = _resolve_bool(g_txt)
     if g_bool is None:
         return unresolved(k, "gold states no verdict", gold_canonical=g_txt)
-    c_bool = _resolve_bool(c_txt)
+    commit = find_commitment(c_txt, _TRUE_SURFACES + _FALSE_SURFACES)
+    if not commit:
+        return unresolved(k, f"candidate does not commit to a verdict: {commit.reason}",
+                          gold_canonical=str(g_bool), cand_canonical=c_txt)
+    c_bool = _resolve_bool(commit.clause)
     if c_bool is None:
-        return unresolved(k, "candidate states no verdict",
-                          gold_canonical=str(g_bool), cand_canonical=c_txt)
-    hit = _label_hit(c_txt, _TRUE_SURFACES + _FALSE_SURFACES)
-    if hit and has_hedge(c_txt, hit[0]):
-        return unresolved(k, f"candidate hedges ({', '.join(hedges_in(c_txt, hit[0]))})",
-                          gold_canonical=str(g_bool), cand_canonical=c_txt)
+        return unresolved(k, "candidate's committed clause states no verdict",
+                          gold_canonical=str(g_bool), cand_canonical=commit.clause)
 
     obs: list[str] = []
     g_q, c_q = parse_number(g_txt), parse_number(c_txt)
