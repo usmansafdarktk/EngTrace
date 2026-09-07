@@ -215,9 +215,17 @@ def answer_span(text: str) -> tuple[str, str]:
     # line is the house style, and taking only the outer one leaves "Answer:"
     # glued to the answer, where the symbolic comparator reads it as a symbol.
     # Peel until stable.
+    #
+    # **But never peel across a discourse marker.**  Reviewer E (F4): the bare
+    # `Answer:?` marker is low-priority and matches inside a post-hoc remark, so
+    # "**Answer:** The system is linear.\n\nNote: Answer: not linear if the
+    # offset were nonzero." peeled into the caveat and scored *that* -- a false
+    # accept whose sign is arbitrary.  Peel-to-last is right for a restatement
+    # and wrong for a qualification, and the marker alone cannot tell them
+    # apart; the opener of the sentence carrying the marker can.
     for _ in range(4):
         for rx in _MARKER_RES:
-            hits = list(rx.finditer(text))
+            hits = [m for m in rx.finditer(text) if not _is_qualifying(text, m.start())]
             if hits:
                 last = hits[-1]
                 text, marker = text[last.end():].strip(), last.group(0).strip()
@@ -225,6 +233,26 @@ def answer_span(text: str) -> tuple[str, str]:
         else:
             break
     return text.strip(), marker
+
+
+#: Sentence openers that mark what follows as a qualification rather than the
+#: committed answer.  A marker inside such a sentence is not an answer marker.
+DISCOURSE_MARKERS = (
+    "note", "notes", "n.b.", "nb", "however", "unless", "if", "caveat",
+    "caution", "aside", "disclaimer", "but", "although", "though", "except",
+    "assuming", "provided", "otherwise", "alternatively", "in contrast",
+)
+
+_QUALIFIER_RE = re.compile(
+    r"(?:^|[.;!?\n])\s*(?:\*+\s*)?(?:" + "|".join(re.escape(d) for d in DISCOURSE_MARKERS)
+    + r")\b[^.;!?\n]{0,80}$",
+    re.IGNORECASE,
+)
+
+
+def _is_qualifying(text: str, at: int) -> bool:
+    """Does the marker at ``at`` sit inside a qualifying sentence?"""
+    return bool(_QUALIFIER_RE.search(text[:at]))
 
 
 #: Trailing annotations models append to an answer.  Observed on 8/24
@@ -284,16 +312,34 @@ def prepare(text: str, keep_asterisks: bool = False) -> str:
 #:   "nonlinear"  deepseek linearity 2,4; gpt-5 linearity 9  (fused, no space)
 #:   "neither"    gemma mc 15; meta-llama mc 23        ("neither A nor B")
 #:   "fails"      qwen linearity 12,13,14; claude linearity 0
-NEGATORS = ("not", "non", "no", "never", "fails", "fail", "violates", "isn't", "doesn't")
+#: ``"no"`` is deliberately NOT here.  As a bare interjection it precedes a
+#: clause it does not negate -- "The system is nonlinear -- no, wait, it is
+#: linear" -- and treating it as a negator flipped that committed *wrong*
+#: answer into the right one, a false accept Reviewer B found (F4).  The
+#: constructions that need it ("no memory") are declared as label surfaces in
+#: their own right, which is the same declaration-beats-inference rule the
+#: fused negatives follow.
+NEGATORS = ("not", "non", "never", "fails", "fail", "violates", "isn't", "doesn't")
 
 #: "neither X nor Y" negates *both* labels.  Two of 24 memory-causality traces
 #: use it and it is the single most dangerous construction in the archive: a
 #: matcher that looks for the substrings "memoryless" and "causal" without
 #: scoping the negation reads "neither memoryless nor causal" as (Yes, Yes) --
 #: the exact inversion of the answer, scored as a match.
+#: Scope is **structural, not a character count**.  The first version allowed at
+#: most 60 characters between ``neither`` and ``nor``; Reviewer E (F5) noted
+#: that both archived instances have a 12-character gap, so the bound was
+#: untested by a factor of five -- and showed that one ordinary interposed
+#: clause escapes it, at which point *both* labels read positive and the answer
+#: is inverted rather than merely missed.
+#:
+#: The correct scope is the sentence: ``neither`` binds to the next ``nor``
+#: before a sentence boundary, however much intervenes.  A character budget was
+#: standing in for that and could only ever be wrong in one direction or the
+#: other.
 NEITHER_NOR_RE = re.compile(
-    r"\bneither\b(?P<first>.{0,60}?)\bnor\b(?P<second>.{0,60}?)(?:[.;]|$)",
-    re.IGNORECASE | re.DOTALL,
+    r"\bneither\b(?P<first>[^.;!?\n]*?)\bnor\b(?P<second>[^.;!?\n]*)",
+    re.IGNORECASE,
 )
 
 #: Hedges.  A hedged answer has not committed, so it is UNRESOLVED -- never a
