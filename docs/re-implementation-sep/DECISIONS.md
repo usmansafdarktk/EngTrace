@@ -1666,6 +1666,472 @@ overturn it is doing the job R3 exists for. **The lesson for later phases is tha
 ceiling** — any future P6 lookup-check should fit a model, not enumerate rules.
 Recorded as a `SPEC-CHANGE` against the review protocol's pedagogy brief.
 
+## D-047 — `multipart` is NOT a seventh comparator `kind`; it is a property of the ANSWER
+
+**Date:** 2026-09-07 · **Status:** DECIDED · **Source:** Phase 4, Decision 1
+**This is a `SPEC-CHANGE` against `template_redesign_spec.md` §4.2/§4.3.**
+
+The spec defines `kind ∈ {numeric, categorical, sequence, symbolic, narrative,
+check}` and separately records `answer_type` for all 150 templates, where
+`multipart` is **32 of them — nearly a quarter of the corpus, and 24 of the 51
+class-C templates.** The six `kind` values do not obviously contain it, and the
+brief poses three readings: a seventh kind, a composition of kinds, or a property
+of a milestone rather than a kind.
+
+**Decision: the second.** An answer carries an ordered list of `parts`; each part
+carries exactly one of the six kinds. The six stand and the **answer schema**
+grows.
+
+**The evidence is inside this phase, which is why it is decidable rather than a
+preference.** `system_properties_memory_causality` is typed `classification` by
+the inventory, described by the spec's own §4.1 table as a *"canonical label
+tuple"*, and is in fact **a two-part answer whose parts are both categorical**.
+Under a seventh-kind reading it would have to be typed `multipart` — and its
+comparator would then have no way to say *"each part is categorical, normalise
+each against the categorical vocabulary"*. **The six kinds would stop composing
+at exactly the point they are most useful.** Under the composition reading it is
+`parts=[categorical, categorical]` and reuses the categorical vocabulary
+unchanged, which is what `tests/comparators/kinds.py::compare_label_tuple` does.
+
+**Two structures wear the word, and conflating them is a scoring error in both
+directions.** Sampled across the 32:
+
+| `mode` | meaning | example |
+|---|---|---|
+| `all` | every part required, every part must match | `volumetric_flow_rate` — flow rate **and** average velocity |
+| `any` | alternative renderings of one quantity | `undamped_natural_frequency_torsional` — "51.184 rad/s **or** 8.146 Hz" |
+
+Read `any` as `all` and a model answering in rad/s alone is marked wrong; read
+`all` as `any` and a model that gets the flow rate right and the velocity wrong
+takes full credit.
+
+**Partial credit is reported, never scored.** A partially correct `all` answer is
+not a correct answer. A comparator that says otherwise weakens 32 items silently,
+which is a larger P6 surface than any template edit this project has made. The
+per-part outcomes are always in `observations`.
+
+**Consequence for the class-C claim.** The spec says these comparators "also
+serve the 51 class-C templates". The 51 reproduces (the inventory *does* carry an
+`instrumentation_class` column, contrary to the brief), and **24 of the 51 are
+`multipart`** — so this decision governs nearly half of the class Phase 4 is
+supposed to be paying for.
+
+---
+
+## D-048 — Decision 2: route 1 taken for the vocabulary, and its argument FAILS the test
+
+**Date:** 2026-09-07 · **Status:** DECIDED · **Source:** Phase 4, Decision 2
+
+The archive holds 2,200 traces but **only 61 for the four Phase 4 templates**:
+`memory_causality` 24, `signal_operations` 16, `linearity` 15,
+**`incompressible_continuity` 6.** By D-024/D-026's rule — N samples cannot
+resolve a variant rarer than ~3/N — the four have resolution limits of 12%, 19%,
+20% and **50%**. Six traces are blind to anything occurring in under half of
+model outputs.
+
+**Route 1 is taken** (draw from all 2,200) **and the brief's requirement to
+*test* the argument rather than assert it was met — the test does not support the
+argument as stated.**
+
+**The test.** If these forms are *model habits*, a rule's rate should be driven
+more by which model wrote a trace than by which template it answers. Measured
+over 27 rules, comparing per-model spread with per-template spread:
+
+| verdict | rules |
+|---|---:|
+| model habit | **2** |
+| item-driven | **15** |
+| both / rare everywhere | 10 |
+
+Only `latex-boxed` and `The answer is` are cleanly habits. Every Unicode rule and
+most LaTeX rules are item-driven. **A model does not write a superscript because
+it is that model; it writes one because the item has an exponent.**
+
+**What that invalidates and what it does not.** It invalidates any *coverage*
+claim borrowed across templates, so every coverage number is stated per template
+at its own limit and none is averaged. It does **not** invalidate the *rules*: a
+normalisation rule is a claim about meaning, not frequency, and one occurrence
+anywhere fixes what `\frac{3x^2}{2}` denotes. That narrower claim is the part of
+route 1 that survives and the part the rules use.
+
+**A confound, named because it weakens my own test.** The statistic cannot
+separate "the model does not use this form" from "the item gave it no
+opportunity". Superscripts look item-driven partly because
+`incompressible_continuity` is the only Phase 4 template with an exponent.
+The 15 is an **upper bound**.
+
+**Residual risk, carried not solved.** The archive cannot say which forms are
+*missing* for `incompressible_continuity`. Route 2 needs D-003. For the symbolic
+comparator the honest position is close to **route 3**: specified, adversarially
+exercised against 22 cases, **not validated against a representative sample**.
+Five rules have zero Phase 4 support at all (`unicode-operator`, `latex-text`,
+`latex-exponent-brace`, `hedge`, `thousands-separator`) and are named in
+`phase4_vocabulary.md` §3.1. **`hedge` — the rule spec §4.4 asks Reviewer B to
+guard — rests on a single observation in 2,200.**
+
+---
+
+## D-049 — Decision 3: the comparator is three-valued, and the bias is toward refusing to decide
+
+**Date:** 2026-09-07 · **Status:** DECIDED · **Source:** Phase 4, Decision 3
+
+A comparator's failure modes are asymmetric. A **false accept** credits reasoning
+that did not happen — which is the AI Tribunal criticism in a new costume, and
+the criticism this whole effort exists to answer. A **false reject** penalises a
+correct solver and makes the benchmark measure phrasing rather than reasoning.
+
+**Decision: neither is acceptable, so the comparator stops guessing.** Verdicts
+are `MATCH` / `MISMATCH` / **`UNRESOLVED`**, and `UNRESOLVED` can never
+contribute to a pass. Modelled directly on D3.4 §8B.10's `unchecked` channel: an
+unchecked relation may never contribute to a pass, so a node carrying one cannot
+report a bare `PASS`.
+
+**Stated bias:** toward rejection over acceptance, and toward `UNRESOLVED` over
+both.
+
+**What stops `UNRESOLVED` being a free escape**, which is the obvious objection:
+
+| | definition | effect of `UNRESOLVED` |
+|---|---|---|
+| precision | `MATCH ∧ correct / MATCH` | none — not in the denominator |
+| recall | `MATCH ∧ correct / correct` | **costs recall**, exactly as a wrong `MISMATCH` does |
+| decided | `(MATCH + MISMATCH) / all` | reported alongside, never traded against the other two |
+
+A comparator that declines everything scores 100% precision, **0% recall**, 0%
+decided. The gate requires ≥95% on both, so the exit gate carries the decision
+rather than hiding it, which is what the brief asked for.
+
+**Quantified.** D4.4, 157 hand-written near misses: precision 98.6%, recall
+100%, decided 85.4%. Archive, 61 real traces: 100% / 100% / 95.1% — **and that
+number is weak evidence, because the archive is the corpus the vocabulary was
+derived from.**
+
+**The one accepted false accept is named and kept**: `num-16b`, `7.65 mL`
+against a `7.65 L` gold with no declared unit. See D-052.
+
+---
+
+## D-050 — `signal_operations`' gold answer omits the origin on 16.4% of instances
+
+**Date:** 2026-09-07 · **Status:** DECIDED (recorded; not fixed) · **Source:**
+Phase 4, D4.1 §4.3
+
+The template renders its answer sequence with an asterisk on the `n = 0` element
+— but **only when the result's support contains `n = 0`**. A shift that moves the
+support off the origin prints a bare value list, `y[n] = {-1, 5, -4, 3}`, from
+which the origin **cannot be recovered**.
+
+Measured over 4,000 seeds: gold states the origin on **3,344 (83.6%)** and is
+silent on **656 (16.4%)**.
+
+**This is not a defect being fixed.** The *item* is well posed: the question
+states `x[n]` with its origin marked and the transformation is given, so a
+solver can derive the indices. What is under-determined is the **printed gold
+answer string**, and only for a comparator that reads it in isolation.
+
+**How the comparator handles it**, stated because the handling is the interesting
+part: when gold states no origin the answer is the value list alone and is
+compared as such; a candidate that pins an origin gold does not is checked for
+consistency rather than punished for saying more. When gold *does* pin the origin
+and the candidate does not, the comparator first asks whether **any** placement
+would match — if none does, the values are wrong whatever the origin and the case
+is a decidable `MISMATCH`. That converts 3 of 16 archived traces from undecided
+to a defensible verdict and converts none the other way.
+
+**Carried forward.** If a later phase ever wants the answer string to be
+self-describing, the fix is to widen the printed support to include `n = 0`. That
+changes emitted text on 16.4% of instances and is a P6 event, so it is a Phase 5
+or 6 scoping decision, not a Phase 4 edit.
+
+---
+
+## D-051 — `narrative` is specified as undecidable, and its gate is a census
+
+**Date:** 2026-09-07 · **Status:** DECIDED · **Source:** Phase 4, D4.1 §4.5
+
+One of the six `kind` values names milestones whose content is prose: a
+justification, an interpretation, a physical explanation. There are two ways to
+specify a comparator for it and only one of them is compatible with this
+project's purpose.
+
+**Rejected: "compare with an LLM."** That puts the AI Tribunal back on the
+critical path for exactly the milestones where it is least accountable — the ones
+with no checkable answer. The thing five reviewers objected to would return,
+wearing a `kind` name.
+
+**Decision: `narrative` always returns `UNRESOLVED`.** Declaring a milestone
+`narrative` **removes it from the automatic score** and routes it to whatever
+human or model process the benchmark chooses, with that routing **visible in the
+results** rather than hidden inside an accuracy number.
+
+**Its gate is therefore not precision but census.** The fraction of milestones
+declared `narrative` is a reported quantity, and **a rising fraction is a
+benchmark quietly returning to LLM judging.** That number should appear in every
+results table.
+
+Conformance: 20 adversarial cases, including one where the candidate restates
+gold *verbatim*, and all 20 must return `UNRESOLVED`. A single `MATCH` would mean
+the kind had started deciding prose. Currently 20/20.
+
+---
+
+## D-052 — Right number, wrong unit is an accepted false accept; units are checked only when DECLARED
+
+**Date:** 2026-09-07 · **Status:** DECIDED (residual risk) · **Source:** Phase 4,
+D4.4 case `num-16b`
+
+D3.4 §10 records "no dimensional checking" as a non-goal: a dimensional
+comparator needs units on every symbol, and that is a milestone-model decision.
+The residue is a real false accept — **`7.65 mL` matches a `7.65 L` gold** on the
+number.
+
+**Two bad options, and the reason neither was taken.** Inferring gold's unit from
+its string and requiring the candidate to match it rejects `7.65 litres`, which is
+correct — a false reject bought with a false accept. Ignoring units entirely
+leaves the hole open with nothing recording it.
+
+**Decision: `compare_numeric` takes an optional declared `unit`.** When gold
+declares one, a mismatched unit is a `MISMATCH` and a missing one is
+`UNRESOLVED`; when gold declares none, the number alone decides. This closes the
+hole **per item, by declaration** — the same "declaration beats inference"
+principle that governs the label sets — and leaves it open, **visibly**, for
+every item that has not declared.
+
+**The open case is kept in the adversarial corpus as `num-16b` and it is the one
+false accept the exit gate carries.** Deleting it would raise D4.4 precision from
+98.6% to 100% and the gate would then be concealing a known hole rather than
+carrying it. `num-16` (the same answer, unit declared) and `num-16c`
+(`7.65 litres`, unit declared, correct) are its companions and show both sides of
+the trade.
+
+---
+
+## D-053 — `sympy` is a new dependency, and the symbolic comparator is designed not to need it
+
+**Date:** 2026-09-07 · **Status:** DECIDED · **Source:** Phase 4, D4.3
+
+Spec §4.1 names "symbolic equivalence (sympy)" and §4.2.4 asks for its
+"timeout/failure behaviour". **`sympy` was not installed and is not in
+`requirements.txt`.** It has been installed for this work; adding it to
+`requirements.txt` is a repository-level decision left to whoever owns that file.
+
+**The comparator is built so that the dependency does not gate this phase's
+template.** Every answer `incompressible_continuity` produces is a bivariate
+polynomial with rational coefficients and degree ≤ 2, and equality there is
+decidable by expanding to a coefficient map: exact, local, no timeout, and **no
+`UNRESOLVED` outcome**. That matters more than the convenience — this is the
+template with **six** archived traces, and a comparator whose verdict depended on
+whether an optional package happened to be installed would make the thinnest
+evidence in the phase thinner still.
+
+A CAS is genuinely needed for the general kind: the corpus's other eight
+`symbolic` templates carry sinc, exp and Q-functions. There, an import failure, a
+parse failure, a timeout, or a symbol outside the declared alphabet all return
+`UNRESOLVED` — **never `MATCH`**. Nothing about a comparator failing to parse an
+answer is evidence the answer is right.
+
+---
+
+## D-054 — D3.4 §7 has four defects, all found by exercising it for the first time
+
+**Date:** 2026-09-07 · **Status:** DECIDED · **Source:** Phase 4, D4.6
+**This is a `SPEC-CHANGE` against `phase3_node_types.md` §7.**
+
+Phase 3 shipped §7 unexercised and said so; both schema reviewers named the
+missing corpus as the largest gap. Building it (16 candidate traces + 9 tolerance
+assertions, all 15 dispositions covered) found four defects **in the
+specification**.
+
+**F7-1 — §7.2's headline disposition has no instances.** *"A correct answer
+reached in four iterations instead of three is correct"* cannot occur for
+`normal_depth_iteration`. §4.3.3 ties `converged` to the node's own tolerance,
+§8A.4 forbids `converged: true` before the last element, §4.3.1 recomputes every
+update, §4.6 recomputes every frame, and the preamble is fixed by the question.
+Together **these make the conforming node for a given question unique.** Verified
+both ways: clearing `converged` on the terminating element fails 4.3.3 and 8A.4;
+appending after it fails 8A.3 and 8A.4.
+
+D-038 measured the count varying 1..5 over 4,000 seeds and that measurement
+stands — **but the variation is between QUESTIONS, not between solvers of one
+question**, and §7.2 conflates the two.
+
+> **This is the six review rounds' bill arriving.** Each round closed a way for a
+> candidate to lie. Together they also closed every way for a candidate to be
+> *differently right*. Nobody recorded that trade, because §7 was never run.
+
+**F7-2 — §7 never says whether §6 step 8 binds a candidate.** It does in every
+verifier built, and it should: a model whose stated answer contradicts its own
+steps has failed the process. The consequence is that answer credit and process
+credit are **not independent** for `iteration`, so "wrong answer, clean process"
+is not constructible. §7 is written as though they vary freely.
+
+**F7-3 — §7.4's direct solver cannot be an `iteration` node at all**, because a
+direct solve has no iteration. Its tolerance is correct and testable only at the
+function level, where the corpus now tests it (9 assertions).
+
+**F7-4 — §7.3 row 3's set-versus-ordered distinction is vacuous.** §5.4.6 already
+requires `committed` to equal the ordered chosen values, so a candidate whose set
+matches but whose order differs is rejected before §7.3 runs.
+
+**D4.9 reaches F7-1 from the other direction and on most of the corpus:** 141 of
+150 templates emit a trace whose length is a **constant**, so `cardinality` has
+one possible value and both §7.2 and §7.3 dispositions are vacuous there too.
+
+---
+
+## D-055 — The Phase 3 node types are not under-applied; they fit the only two templates that have their shape
+
+**Date:** 2026-09-07 · **Status:** DECIDED · **Source:** Phase 4, D4.7 and D4.8
+
+Both deliverables were written on the assumption that `iteration` and `decision`
+generalise and simply had not been tried. **Measured, they do not.**
+
+**D4.7 — a third `iteration` template, binding only, no verifier edit.** Both
+templates the spec names were attempted against an unmodified
+`reviewer_d2_verifier_15`. Both **rejected**, for different reasons, which is what
+makes the pair informative:
+
+- `linear_reservoir_routing_step`: §4 fixes `termination.kind` to `"convergence"`
+  and routing **exhausts a two-interval hydrograph** instead. Its element count
+  is neither `incidental` (a third interval gives a different answer) nor
+  `answer_bearing` (the count is not the answer, `O3` is), so **D-038's
+  discriminating rule has no verdict for it**. And `FrameEval` admits only
+  constants, the iterate, and earlier frame symbols — there is nowhere to put the
+  per-element inflow pair. The verifier says so itself: *"'coeff' is not a role of
+  this node"*.
+- `qr_policy_one_iteration`: iterates on a **pair** coupled through `n(R)`, and
+  §4.1 declares exactly one iterate triple.
+
+**D4.8 — a second `decision` template.** All 150 scanned; 19 carry
+decision-shaped vocabulary and **none has the shape**. A `decision` node needs
+three things at once — an ordered list of commitments, a shared budget they
+consume, and a count that is part of the answer — and `line_balancing_heuristic`
+is the only template with all three.
+
+**Consequence.** D3.3 §10's two limitations **stand and cannot be closed by this
+corpus**: `decision` remains exercised on one instance and one precedence DAG.
+Closing them requires a **new item**, which is an item-design decision and not
+Phase 4's to take.
+
+**The reframing, which is the useful part.** `iteration` is not "a repeated
+sub-chain"; it is *"a convergence-terminated refinement of one quantity driven by
+its own residual"*. D3.3 §10 should say so, and should retire
+`linear_reservoir_routing_step` and `qr_policy_one_iteration` as named
+generalisation targets rather than leaving them as unfinished work.
+
+---
+
+## D-056 — The hedge policy is ADVISORY: detected, annotated, never scored
+
+**Date:** 2026-09-07 · **Status:** DECIDED · **Source:** Phase 4 Reviewer E,
+round 4, recommendation 3c
+**This is a `SPEC-CHANGE` against `template_redesign_spec.md` §4.2 and §4.4.**
+
+§4.2 requires label normalisation to handle *"hedging ('appears to be linear')"*
+and §4.4 names *"accepting a hedge that never commits"* as the specific case
+Reviewer B must guard. Versions 1–3 of `tests/comparators/commitment.py`
+implemented that literally: a hedge made the answer `UNRESOLVED`.
+
+**Four review rounds say the enforcement is not worth what it costs.**
+
+Reviewer E's round-4 census splits a number the phase had been treating as one:
+
+| | count over 2,200 archived answer spans |
+|---|---:|
+| hedge markers fired | **2** (and **0** in a commitment-gated answer type) |
+| subordinator openers | **43** (concessive 31, hypothetical 11) |
+
+Two mechanisms inside one module with **opposite evidence**. E then ablated the
+hedge layer, leaving segmentation untouched:
+
+| | full | ablated |
+|---|---|---|
+| recall-corpus positive frames | 351/351 | **351/351** |
+| recall-corpus total | 507/507 | 477/507 |
+
+**The entire hedge-governance layer buys 30 synthetic negative controls that the
+reviewers themselves wrote, and zero archive verdicts and zero positive recall.**
+It is ~250 lines and **13 of E's 20 findings across four rounds**, and it
+repeatedly marked *correct* answers wrong — which D4.1 §1 states is as
+unacceptable as a false accept.
+
+**Decision.** `HEDGE_POLICY = "advisory"`. A hedge is still detected, still
+named in `observations`, still counted by the census — and never converts a
+`MATCH` into an `UNRESOLVED`. `ENGTRACE_HEDGE_POLICY=enforce` restores the old
+behaviour, and flipping that constant is the whole change.
+
+**This is the same move D-051 makes for `narrative`**: a property the comparator
+cannot decide reliably becomes a *reported quantity* rather than a silent
+verdict. If the hedge rate ever becomes non-trivial, the census makes it visible
+and the evidence for enforcing will exist.
+
+**The cost, stated rather than absorbed.** `cat-16` — a hedge naming the right
+label — is a **false accept** under the shipped default, and it is exactly the
+case Reviewer B was commissioned to guard. It stays in the adversarial corpus
+beside `num-16b` so the exit gate carries the trade. D4.4 precision moves
+98.6% → 97.2% against a 95% gate.
+
+**Why this is a P6 decision and not an implementation detail.** It changes what
+counts as a correct answer, corpus-wide, for `categorical`, `categorical[tuple]`
+and `check`. Reviewer B's position (a non-committal answer earns no credit) and
+Reviewer E's measurement (the layer enforcing it has no observed instances and
+produces false rejects) are both right, and this resolves in E's favour **on the
+evidence**, not on preference. B did not object: its round-4 verdict is that the
+phase can close.
+
+---
+
+## D-057 — Both Phase 4 classification items are 100% shortcuttable; recorded as a P6 scoping decision, not fixed
+
+**Date:** 2026-09-07 · **Status:** DECIDED (recorded; item redesign out of
+scope) · **Source:** Phase 4 Reviewer B, rounds 1 and 4, under SPEC-CHANGE 10
+
+SPEC-CHANGE 10 requires a pedagogy lookup-check to **fit a model, not enumerate
+rules**, and to report lift over a blind-guess floor. Reviewer B did:
+
+| item | blind-guess floor | depth-2 held-out | lift |
+|---|---:|---:|---:|
+| `system_property_linearity` | 50.02% | **100.00%** | **+49.98** |
+| `system_properties_memory_causality` | 34.02% | **100.00%** | **+65.98** |
+
+Not overfitting: the generators emit **5** and **7** distinct right-hand-side
+shapes and **no shape ever carries two labels**, so the form→label map is a
+total function. 100% is the ceiling and the floor at once. The linearity rule
+reduces to *"is there a `*`, or an `x[n -`?"*, and the template's docstring
+claims it tests additivity and homogeneity.
+
+**Why this is Phase 4's to record and not Phase 4's to fix.** Spec §4.1 forbids
+redesigning these templates — *"the schema adapts, not the items"*. But Phase 4
+is the phase that decides they are scored **on their answer alone**, and P6
+requires a change to what an item tests to be recorded and approved rather than
+arrive as a side effect. So it is recorded.
+
+**Reviewer B withdrew its own proposed remedy, on measurement.** B had suggested
+extending `check`'s "score the supporting quantity too" pattern to `categorical`
+— require a linearity answer to name *which* property failed. B then measured
+that only **4 of 15** archived linearity answer spans name one, so requiring it
+would drop recall to ~27% and breach the §4.5 gate; it is also asymmetric, since
+only `not linear` can carry a failing property, which *adds* a cue. **Filed as a
+Phase 5 recommendation**, where the item can change with its gold.
+
+**Actioned now:** `blind_guess_floor` and `surface_model_heldout` are two new
+columns in [`template_inventory.csv`](template_inventory.csv), computed for
+every template whose answer space is small enough for the statistic to mean
+anything (5 of 150; the rest are numeric and have hundreds of distinct answers,
+which is the correct reason to leave them blank). B's threshold: flag at **lift
+≥ 40 points or held-out ≥ 95% regardless of lift**, because a high floor masks a
+total lookup. **Three templates are over it.** A flag means "this needs a P6
+register entry", not "block the template".
+
+**A first attempt at these columns was wrong and is worth recording.** It
+labelled each instance by its digit-masked answer *shape*, which collapses every
+scalar template to one class and reported **112 of 145** templates as fully
+shortcuttable. The unmasked answer is the right label, and a numeric template
+then drops out on its own. Caught by disbelieving the number, not by a check.
+
+
+---
+
 ## Open decisions
 
 | # | Decision | Needed before |

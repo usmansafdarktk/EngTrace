@@ -486,6 +486,19 @@ same shape as Phase 3's gold corpus passing 80/80 against a verifier that
 hardcoded one template's symbol names — gold traces do not lie, and neither does
 a training set.
 
+> **And a 100% here says nothing about whether the item measures reasoning.**
+> Two of these four templates are **fully predictable from the question surface**
+> — `system_property_linearity` at 100% held-out against a 50.02% blind-guess
+> floor, `system_properties_memory_causality` at 100% against 34.02%, with the
+> form→label map a total function over 5 and 7 distinct right-hand sides
+> (Reviewer B, D-057). The comparator scores those answers perfectly and a
+> solver who has never heard of homogeneity scores them perfectly too. The two
+> numbers now live per template as `blind_guess_floor` and
+> `surface_model_heldout` in [`template_inventory.csv`](template_inventory.csv);
+> flag at lift ≥ 40 points **or** held-out ≥ 95% regardless of lift, since a
+> high floor masks a total lookup. **Three of the 150 templates are over that
+> threshold.**
+
 **Against D4.4**, 157 hand-written near misses, ≥20 per comparator:
 
 | kind | n | correct | accepted | precision | recall | decided |

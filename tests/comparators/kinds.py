@@ -26,6 +26,7 @@ from decimal import Decimal, InvalidOperation
 from fractions import Fraction
 from typing import Any, Sequence
 
+from . import commitment
 from .commitment import (
     clauses as commitment_clauses,
     find_commitment,
@@ -467,8 +468,12 @@ def _slot_verdict(
     matrix, why = segment(ctext)
     if matrix is None:
         return unresolved(slot.name, why)
+    # Policy-aware, like every other hedge site (D-056): under the shipped
+    # advisory default a hedge is annotated, not scored.  Leaving this one
+    # enforcing made the tuple path disagree with the categorical path about
+    # the same sentence -- the shape of Reviewer E's R3-F16.
     marks = hedge_markers(matrix)
-    if marks:
+    if marks and commitment.HEDGE_POLICY == "enforce":
         return unresolved(slot.name, f"hedged ({', '.join(marks)})")
     c = _resolve_property(matrix, slot)
     if c is None:

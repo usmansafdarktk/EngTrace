@@ -199,7 +199,10 @@ TUPLE = [
        "hedged on both slots"),
     _c("tup-18", "categorical[tuple]", G_MC_NY,
        "**Answer:** a) The system is not memoryless. b) The system might be causal.", False,
-       "first slot right, second hedged -- composite must not pass on a partial"),
+       "first slot right, second hedged.  Under `enforce` this is UNRESOLVED; "
+       "under the shipped ADVISORY default (D-056) the hedge is annotated and "
+       "the slot resolves, so the composite matches -- the second **declared** "
+       "false accept the policy buys, alongside cat-16"),
     _c("tup-19", "categorical[tuple]", G_MC_YY,
        "**Answer:** a) Memoryless, b) Not causal", False,
        "second slot wrong; also physically impossible, which the comparator does not know and should not need to"),

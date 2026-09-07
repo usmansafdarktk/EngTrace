@@ -1,6 +1,6 @@
 # D3.3 — The `iteration` and `decision` trace node types
 
-**Schema version:** `1.5` · **Status:** normative for the milestone model ·
+**Schema version:** `1.5` (§7 amended by Phase 4, D-054) · **Status:** normative for the milestone model ·
 **Phase:** 3 · **Revised:** 2026-09-06
 **Companion:** [`template_redesign_spec.md`](template_redesign_spec.md) §3.3 ·
 [`phase3_summary.md`](phase3_summary.md) · conformance corpus in
@@ -846,6 +846,53 @@ rounding uses `rounding`.
 
 ## 7. D3.4 — Comparator semantics for a model's trace
 
+> **Revision note — amended by Phase 4 (D-054, SPEC-CHANGE 13).** This section
+> shipped **unexercised**, and both Phase 3 schema reviewers named the missing
+> corpus as the largest gap Phase 3 left. Phase 4 built it —
+> [`phase4_conformance/candidates.json`](phase4_conformance/candidates.json),
+> 16 candidate traces and 9 tolerance assertions, run by
+> `python -m tests.trace_schema.candidate_7`, with every disposition this
+> section states enumerated so coverage is *checked* rather than remembered.
+>
+> Running it found **four defects in this section**, not in a verifier:
+>
+> **F7-1 — §7.2's headline disposition has no instances.** *"A correct answer
+> reached in four iterations instead of three is correct"* cannot occur for
+> `normal_depth_iteration`. §4.3.3 ties `converged` to the node's own
+> `termination.tolerance`, §8A.4 forbids `converged: true` before the last
+> element, §4.3.1 recomputes every update, §4.6 recomputes every frame, and the
+> preamble is fixed by the question. Together **these make the conforming node
+> for a given question unique.** Verified both ways: clearing `converged` on the
+> terminating element fails 4.3.3 and 8A.4; appending after it fails 8A.3 and
+> 8A.4.
+>
+> D-038's measured spread of 1–5 updates over 4,000 seeds stands, but it is
+> **between questions**, not between solvers of one question, and §7.2 conflates
+> the two. *This is the six review rounds' bill arriving: each closed a way for
+> a candidate to lie, and together they closed every way for a candidate to be
+> differently right.* D4.9 reaches the same conclusion from the other direction
+> and on most of the corpus — **141 of 150 templates emit a trace whose length
+> is a constant**, so `cardinality` has one possible value there and both §7.2
+> and §7.3 are vacuous.
+>
+> **F7-2 — §7 does not say whether §6 step 8 binds a candidate.** It does in
+> every verifier built, and it should: a model whose stated answer contradicts
+> its own steps has failed the process. The consequence is that **answer credit
+> and process credit are not independent** for `iteration`, so "wrong answer,
+> clean process" is not constructible. §7 is written as though they vary freely.
+> **Read §7.2's rows as conditional on the trace being internally consistent.**
+>
+> **F7-3 — §7.4's direct solver cannot be an `iteration` node at all**, because
+> a direct solve has no iteration. The tolerance §7.4 specifies is correct and
+> testable, but only at the comparator's function level, where the conformance
+> corpus now tests it with 9 assertions.
+>
+> **F7-4 — §7.3 row 3's set-versus-ordered distinction is vacuous** for a
+> §6-conforming node: §5.4.6 already requires `committed` to equal the ordered
+> chosen values, so a candidate whose set matches but whose order differs is
+> rejected before §7.3 runs. The row describes a case the rest of the schema
+> forbids.
+
 The comparator scores a *candidate* trace against a *gold* node. It never
 compares the two element lists positionally without first applying §7.2/§7.3.
 
@@ -1503,17 +1550,30 @@ middle of a verifier.
   (independently, on a synthetic node with a *different* recurrence and nine
   elements). `decision` is written to the same standard in 1.2 but **has not been
   exercised against a second template**, because none exists.
+- **No second `decision` template exists in the corpus** (D-055). Phase 4's D4.8
+  scanned all 150; 19 carry decision-shaped vocabulary and none has the shape. A
+  `decision` node needs three things at once — an ordered list of commitments, a
+  shared budget they consume, and a count that is part of the answer — and
+  `line_balancing_heuristic` is the only template with all three. Closing this
+  limitation needs a **new item**, which is an item-design decision.
 - **`precedences` is exercised against exactly one DAG.** All 40 `decision`
   traces carry the same five-task network, so §5.4.3b is verified thoroughly
   against one relation and not at all against a second shape. A second
   `decision` template is the evidence that would settle it.
-- **Two node types are specified; two templates implement them.** The spec names
-  `linear_reservoir_routing_step` (a repeated sub-chain unrolled into the trace)
-  and `qr_policy_one_iteration` (iterative in principle, one iteration emitted)
-  as candidates for `iteration`. Neither has been fitted, so the claim that this
-  generalises is **argued, not measured** — though 1.1's `roles` and
-  `update_relation` exist precisely so that fitting them is a matter of declaring
-  a binding rather than editing a verifier. Recorded as **D-038**.
+- **~~Two node types are specified; two templates implement them.~~ MEASURED by
+  Phase 4, and the answer is negative (D-055).** Both named candidates were
+  fitted by declaring a binding only, against an unmodified verifier
+  (`python -m tests.trace_schema.d4_7_third_iteration`). Both were **rejected**,
+  for different reasons. `linear_reservoir_routing_step`: §4 fixes
+  `termination.kind` to `"convergence"` and routing *exhausts a two-interval
+  hydrograph* instead; its element count is neither `incidental` nor
+  `answer_bearing`, so D-038's rule has no verdict for it; and `frame_relations`
+  admits only constants, the iterate and earlier frame symbols, with nowhere to
+  put the per-element inflow pair. `qr_policy_one_iteration`: iterates on a
+  **pair** coupled through `n(R)`, and §4.1 declares exactly one iterate triple.
+  **Both are retired as generalisation targets.** `iteration` is not "a repeated
+  sub-chain" — it is *a convergence-terminated refinement of one quantity driven
+  by its own residual*, and that is its real scope.
 - **The node is a frame local, not a return value.** The templates' public
   contract is still `(question, solution)`, and
   `tests/trace_schema/extract.py` lifts `trace_nodes` via `sys.settrace`.
