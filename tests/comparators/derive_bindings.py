@@ -64,7 +64,7 @@ if REPO not in sys.path:
     sys.path.insert(0, REPO)
 
 from tests.comparators import bindings as B  # noqa: E402
-from tests.comparators.extract import NUM_RE, numbers  # noqa: E402
+from tests.comparators.extract import NUM_RE, numbers, same_answer  # noqa: E402
 from tests.comparators.normalize import answer_span, prepare  # noqa: E402
 from tests.template_integrity.core import discover, generate  # noqa: E402
 
@@ -306,7 +306,11 @@ def validate(tid, kind, opts, sols):
                     r["errors"] += 1
                     r["_err"] = r.get("_err") or f"{type(exc).__name__}: {exc}"
                     continue
-                same = sp[a] == sp[b]
+                # Truth is "the same ANSWER", not "the same STRING" (E, R2-F2).
+                # `5.0 seconds` and `4.99 seconds` are the same answer under
+                # S7.1's boundary-inclusive display tolerance, and calling the
+                # MATCH a false accept unbound 9 templates on a wrong predicate.
+                same = sp[a] == sp[b] or same_answer(sp[b], sp[a])
                 if v.outcome == "UNRESOLVED":
                     r["unresolved"] += 1
                 elif v.outcome == "MATCH" and not same:
@@ -445,11 +449,20 @@ def main(argv=None) -> int:
         print(f"         {k:10s} {readings[k]:3d}{mark}")
     print(f"       units DECLARED (always-present AND invariant): {len(units)}")
     print()
-    pairs = sum(v["pairs"] for v in validation.values())
+    # **The denominator must be the noun beside it** (Reviewer E, round 2).
+    # This line read "BOUND 118 / 150 over 340,550 validated pairs", and 340,550
+    # is every template that *reached* validation -- bound or not.  The tell was
+    # that it did not move when 14 templates left the bound set.  Same shape as
+    # E-7: a number printed next to a claim it is not about.
+    pairs_all = sum(v["pairs"] for v in validation.values())
+    pairs_bound = sum(validation[t]["pairs"] for t in binds if t in validation)
     print(f"D5.8   validated at N={N_VALIDATE} ({N_VALIDATE * (N_VALIDATE - 1)} ordered "
           f"pairs per template; smallest resolvable rate "
           f"~{3 / (N_VALIDATE * (N_VALIDATE - 1)):.3%})")
-    print(f"       BOUND   {len(binds):3d} / 150   over {pairs} validated pairs")
+    print(f"       BOUND   {len(binds):3d} / 150   over {pairs_bound} pairs "
+          f"cross-paired within the BOUND templates")
+    print(f"       (validation ran over {pairs_all} pairs in total, across the "
+          f"{len(validation)} templates that reached it)")
     ident_ok = sum(1 for t in binds if not validation.get(t, {}).get("identity_failures"))
     print(f"       identity: {ident_ok}/{len(binds)} bound templates MATCH a "
           f"verbatim copy of gold on every validation seed (E-1)")

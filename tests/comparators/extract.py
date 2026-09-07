@@ -185,3 +185,51 @@ def answer_decimals(text: str, kind: str = "numeric", unit: str | None = None) -
     """
     m = answer_match(text, kind, unit)
     return None if m is None else displayed_decimals(m.group(0))
+
+# --------------------------------------------------------------------------
+# The cross-pairing truth predicate (Reviewer E, R2-F2).
+# --------------------------------------------------------------------------
+
+def same_answer(gold_span: str, other_span: str) -> bool:
+    """Do two gold answer spans state the **same answer**?
+
+    Cross-pairing needs a truth it can compute without a label, and the first
+    version used **textual identity of the span**.  That is wrong in one
+    direction and it was costing real bindings: gold ``5.0 seconds`` against
+    gold ``4.99 seconds`` differs textually, and under |S|7.1's
+    boundary-inclusive display tolerance ``4.99`` **is** a correct answer to a
+    question whose gold shows ``5.0`` -- so a MATCH there was being counted as
+    a false accept, and **10 of 32 templates were unbound on that predicate,
+    9 of them on it alone**.
+
+    So the predicate is: the two spans state the same answer iff they have the
+    same non-numeric text, the same count of numbers, and every number agrees
+    with its counterpart **within the tolerance implied by the GOLD side's
+    displayed precision**.
+
+    **It does not call the answer rule**, deliberately.  Using
+    ``answer_match`` to decide the truth that ``answer_match`` is being scored
+    against is a test carrying its own answer key (D-034); this walks every
+    number in the span instead, so it is independent of which one the
+    comparator picks.
+    """
+    ga = [m.group(0) for m in NUM_RE.finditer(gold_span)]
+    ca = [m.group(0) for m in NUM_RE.finditer(other_span)]
+    if len(ga) != len(ca):
+        return False
+    if NUM_RE.sub("#", gold_span) != NUM_RE.sub("#", other_span):
+        return False
+    for g_tok, c_tok in zip(ga, ca):
+        if g_tok == c_tok:
+            continue
+        p = displayed_decimals(g_tok)
+        if p is None:
+            return False
+        try:
+            gv = Decimal(g_tok.replace(",", ""))
+            cv = Decimal(c_tok.replace(",", ""))
+        except InvalidOperation:
+            return False
+        if abs(cv - gv) > Decimal("0.5") * (Decimal(10) ** -p):
+            return False
+    return True

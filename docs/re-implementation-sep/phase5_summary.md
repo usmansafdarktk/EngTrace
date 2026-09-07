@@ -53,7 +53,7 @@ classes T4 cannot see are gated by something other than memory ·
 
 **Track B** — D5.4 gold×gold and D5.5 archive×gold as standing checks · D5.6 N1
 fixed by measurement with twelve rules' numbers committed · D5.7 N2 fixed at its
-root · D5.7b N4 fixed and errors counted separately from verdicts · D5.8 **118
+root · D5.7b N4 fixed and errors counted separately from verdicts · D5.8 **120
 of 150 bound and validated on four terms** · D5.9 per-kind negative counts ·
 D5.10 the unit census with a published predicate · D5.11 the four Phase 4
 residuals, each with a measurement (§8).
@@ -79,29 +79,41 @@ template against a `master` worktree under an order-insensitive comparison.
 
 | | Phase 4 | first Track B build | shipped |
 |---|---:|---:|---:|
-| templates bound | 4 / 150 | 132 / 150 | **118 / 150** |
+| templates bound | 4 / 150 | 132 / 150 | **120 / 150** |
 | gold×gold false accepts | 560 | 0 | **0** |
 | gold×gold **false rejects** | — | 56 | **0** |
-| gold×gold **identity failures** | — | **75 of 132** | **0 of 1,416** |
+| gold×gold **identity failures** | — | **75 of 132** | **0 of 1,440** |
 | gold×gold UNRESOLVED | — | 1,514 | **0** |
 | gold×gold errors | 132 | 0 | **0** |
-| archive decided rate | — | 56.8% | **67.8%** |
+| archive decided rate | — | 56.8% | **69.6%** |
 
 **The middle column is what an accept-only gate reports.** It was green on the
 one term anybody was looking at, and wrong on three that were not being counted
 — one of which the tool was *already printing*.
 
+Final instrument output: gold×gold **15,840 pairs / 120 scored / 30 skipped**,
+all four terms zero; archive×gold **18,343 pairs (1,295 positive + 17,048
+negative) / 59 scored / 25 skipped**, 0 cross-instance accepts, 0 errors.
+
 D4.4 precision/recall are **unchanged from Phase 4 at 95.8% / 98.6%**, archive
 100% / 97.8%, 0 archive false accepts, under both hedge policies.
 
-**The 32 unbound, by measured reason:**
+**The 30 unbound, by measured reason:**
 
 | reason | n |
 |---|---:|
 | the answer's shape varies across instances | 10 |
-| false accepts at N = 50 | 10 |
 | rejects a verbatim copy of its own gold | 9 |
+| false accepts at N = 50 | 8 |
 | a part reads a constant, so it compares nothing | 3 |
+
+**The bound count moved four times and every move was downward except the
+last:** 132 → 121 (a decided-rate floor) → 118 (Reviewer E's four gates) → 120
+(E's round-2 finding that my *truth predicate* was wrong, which re-bound two
+templates that had been failed by a mistake of mine rather than a defect of
+theirs). The one increase is the one to be most careful about — relaxing the
+definition of "false accept" is how a gate gets quietly weakened — so it is the
+change E specifically said deserved a fresh derivation, and it got one.
 
 ---
 
@@ -116,8 +128,10 @@ number turned out to matter less than expected, because **the census must not be
 wired into the comparator at all** (§7, E-2/E-3).
 
 **"22,982 / 23,292 archive×gold pairs"** — neither reproduces and neither had a
-recorded construction. Mine is **18,115** (1,273 positive + 16,842 negative),
-and the construction is in `cross_pair.py`'s docstring.
+recorded construction. Mine is **18,343** (1,295 positive + 17,048 negative),
+and the construction is in `cross_pair.py`'s docstring. It moves with the bound
+set, which is the point: a pair count is meaningless without the templates it
+ran over, and both prior figures were quoted without one.
 
 **"19,668 gold×gold pairs"** — arithmetically right and epistemically wrong: it
 is 19,800 minus the 132 pairs of the template that *crashed*. Reporting a crash
@@ -138,8 +152,10 @@ violation on every instance with a negative component.
 
 ## 7. Errors I made in this phase
 
-Fourteen. **Three shapes account for nine of them**, and two of the three are
-shapes `phase4_summary.md` §8 already records.
+Eighteen. **Three shapes account for eleven of them**, and two of the three are
+shapes `phase4_summary.md` §8 already records. Four arrived after the first
+draft of this section, during the second review round — which is itself the
+finding: the rate did not fall once I started fixing rather than building.
 
 ### Shape A — a mechanism that looked green because nothing measured the thing it got wrong (5)
 
@@ -174,15 +190,29 @@ shapes `phase4_summary.md` §8 already records.
 | 12 | **My first class-4 plant landed in a derivation step**, where the detector is designed not to fire, and I read the correct refusal as a miss. |
 | 13 | **I ran the corpus scan at 25 seeds and it reported this phase's own headline defect as absent** — class 4 fires at 1.95% and 25 seeds resolves ~12% (D-024/D-026). On the first run. |
 | 14 | **The identity check I added for E-1 called `compare_template` before the binding was installed**, so all 73 candidates failed with the same `KeyError` and the gate rejected them for the wrong reason. Caught because 73 identical error messages is not what a real finding looks like. |
+| 15 | **I measured a fix, saw no change, and concluded the diagnosis was wrong — when the fix was.** Masking function names in `_to_sympy` appeared to rescue nothing, so D-065 recorded it as a known-bad fix. My mask was broken: `_to_sympy`'s `x*(` rule re-inserted a `*` inside the placeholder. Repaired, it works on the probe and *still* rescues nothing, because there are five blockers and not one — so the conclusion survived, and the measurement that produced it had not earned it. **Reviewer E diagnosed the same cause from the error text and was right about the mechanism I had dismissed.** |
+| 16 | **My fix for E's R2-F1 was over-broad and bound ordinary templates as vectors.** Folding `x̂` to a bare `x` left "number, space, letter" as the vector pattern — which is also `9.83 mol`. Several templates matched everything: **2,450 false accepts in 2,450 pairs**, and the bound count fell to 100. The correct fold puts the hat *onto* a marker rather than stripping it. **This is the third over-broad detector in this phase**, after `degenerate_product` and this one's own predecessor. |
+| 17 | **I wrote to the working tree while Reviewer E was still filing**, and E saw the uncommitted edits. The brief says it in terms — stop *writing*, not merely committing, because a reviewer at a frozen SHA reads the tree. Phase 3 broke this three times and Phase 4 fixed it with a mechanical rule; I broke it in the phase that quotes the rule. E handled it correctly: left the edits alone, annotated its section with the ref its numbers were taken at, and said a change to the definition of "false accept" deserves a fresh derivation rather than an assumption. |
+| 18 | **`BOUND 118 / 150 over 340,550 validated pairs` — a denominator that is not the noun beside it.** 340,550 is every template that *reached* validation; the bound ones account for 289,100. E spotted it because the number did not move when 14 templates left the bound set. **E-7's shape, second occurrence, one round later.** |
 
-**What actually caught them.** Not one of these was found by reasoning about the
-code. #1–#5 were found by a reviewer or by an instrument reporting a number I
-had not asked for; #6–#8 by re-running with a different question; #9–#10 by a
-reviewer; #11–#14 by an assertion that ran. **The two errors I caught myself
-(#5, #14) were both caught by disbelieving a result, not by inspecting a
-diff.** Phase 4 §8's conclusion — *"writing the lesson down did not prevent it;
-building a check that runs did"* — reproduces here exactly, including for the
-lessons this project has already written down twice.
+**What actually caught them.** Not one was found by reasoning about the code.
+#1–#5, #9–#10, #17–#18 by a reviewer or by an instrument printing a number I had
+not asked for; #6–#8 and #15 by re-running with a different question; #11–#14
+and #16 by an assertion or a gate that ran. **The four I caught myself (#5, #14,
+#15, #16) were all caught by disbelieving a result, never by inspecting a
+diff.**
+
+**Two shapes recur across phases and both recurred *within* this one.** The
+over-broad detector appeared three times here (#4, #16, and `degenerate_product`
+before either). The number-printed-and-not-read appeared twice, one review round
+apart (#3, #18) — and the second time was in a line I had written *while fixing
+the first*.
+
+Phase 4 §8's conclusion — *"writing the lesson down did not prevent it; building
+a check that runs did"* — reproduces exactly, and this phase sharpens it: **the
+check has to run on the shape, not on the instance.** Both recurrences passed
+every check I had, because each check was built from the specific case that
+prompted it.
 
 ---
 
@@ -288,7 +318,8 @@ T1 29 · T2 0 · T3 0 · **T4 0** · T5 66 · T6 142 · T7 83 · **T8 0**.
 - [x] D5.4 and D5.5 are runnable standing checks reporting **pairs /
       templates-scored / templates-skipped**, every skip named, with the construction
 - [x] **All four terms zero on gold×gold**: 0 false accepts, 0 false rejects,
-      0 identity failures of 1,416, 0 errors
+      0 identity failures of 1,440, 0 errors — and the truth predicate for
+      "false accept" is §7.1's display tolerance, not textual identity
 - [x] N1 fixed on measured evidence over two axes, twelve rules' numbers
       committed, winner reported on a **held-out slice frozen first**
 - [x] The decided rate did not fall — and the incumbent's higher archive rate was
@@ -296,16 +327,29 @@ T1 29 · T2 0 · T3 0 · **T4 0** · T5 66 · T6 142 · T7 83 · **T8 0**.
 - [x] N2 and N4 fixed: no path returns `MATCH` from an unrecoverable parse, none raises,
       errors counted separately
 - [x] Per-kind negative counts beside every rate
-- [x] **118 bound and validated at N = 50 on four terms; 32 named unbound with a
+- [x] **120 bound and validated at N = 50 on four terms; 30 named unbound with a
       measured reason**
 - [x] No unit inferred from gold's string (SPEC-CHANGE 19)
 - [x] All suites green under both hedge policies; no corpus regression, measured
 - [x] Reviewer E filed; every finding and §5 suggestion triaged (D-067)
 
-**Two gate items are met and carry a stated trade.** `symbolic` is bound on
-**1 of 9** templates, and `vector`'s archive decided rate is **12.0%**. Both are
-reported rather than smoothed: the alternative was eight bindings that decide
-nothing, which is what the first build shipped.
+**Two gate items are met and carry a stated trade, and Reviewer E named one of
+them as laundering.** `symbolic` is bound on **1 of 9** templates. E's round-2
+R2-F3 is right that this measures the *comparator*, not the corpus:
+`derive_kind` routes to `symbolic` on a regex that matches exactly the construct
+the parser cannot read. "Bind fewer and name the rest" is the correct response
+to a comparator that cannot decide, and it is **not** a licence to leave one
+that could decide unfixed — the difference is whether the reason is written
+down, and D6.10 now carries five named blockers and one ruled-out fix.
+
+`vector` is the sharper lesson. Its archive decided rate was **12.0%**, printed
+in the D5.9 table on every run, and I did not read it — the same error as E-7,
+one round later. The cause was a missing surface declaration: gold writes
+`x_hat` and every archived model answer writes `x̂`, so the comparator accepted
+**0 of 83** real answers while matching gold against gold perfectly. **The
+identity gate cannot see that class by construction**, which is worth stating
+plainly one round after that gate was added: identity is necessary and not
+sufficient, and archive×gold's per-kind decided rate is what covers the rest.
 
 ---
 
@@ -313,13 +357,13 @@ nothing, which is what the first build shipped.
 
 | # | Risk | Severity | Owner |
 |---|---|---|---|
-| R5-1 | **`symbolic` is bound on 1 of 9 templates.** The comparator cannot represent a unit word inside an expression, a piecewise answer, or a two-equation answer. | high | Phase 6 (D6.10) |
+| R5-1 | **`symbolic` is bound on 1 of 9 templates, and that measures the comparator rather than the corpus** (Reviewer E, R2-F3). Five named blockers: function names split into free symbols, `pi` and scientific notation split, a unit word inside the expression, a trailing unit annotation, and an isolation that takes prose. One fix ruled out by measurement. | high | Phase 6 (D6.10) |
 | R5-2 | **113 templates carry a unit and none is declared to the comparator.** Right-number-wrong-unit is accepted corpus-wide — D-052's residue, now measured and larger than Phase 4 knew. | high | Phase 6 (D6.11) |
-| R5-3 | **The gold×gold truth predicate is textual identity of the answer span.** Two instances carrying the same answer written differently would read as a false accept. Zero observed, but the proxy is a proxy. | medium | Phase 6 |
+| R5-3 | ~~The gold×gold truth predicate is textual identity~~ — **fixed in round 2.** It is now §7.1's display tolerance over every number in the span (`extract.same_answer`), which re-bound two templates that a mistake of mine had failed. The residual is narrower: the predicate still requires the *non-numeric* text to be identical, so two instances phrasing the same answer differently would read as different. | low | Phase 6 |
 | R5-4 | **N = 50 resolves ~0.12% per template.** E found a 1-in-31,000 collision by sweeping 250 instances; the shipped gate cannot see one. | medium | Phase 6 |
 | R5-5 | **9.2% of archived gold no longer matches what the template emits** (9 templates), so D5.5 pairs some model answers against a retired gold. 126 of the 179 rows are Track A's own marker change. | medium | Phase 6 |
 | R5-6 | **14 templates still emit a doubled sign**, 2 in the answer span, 5 in a question. Censused and named. | medium | Phase 6 (D6.7) |
-| R5-7 | **`multipart` archive decided rate is 52.7%.** Models frequently state fewer parts than gold. Not a comparator defect; an open question about what partial answers should score. | medium | milestone model |
+| R5-7 | **`multipart` archive decided rate is well under 100%.** Models frequently state fewer parts than gold. Not a comparator defect; an open question about what a partial answer should score, and D4.1 §3 is explicit that partial credit is reported and never folded into the verdict. | medium | milestone model |
 | R5-8 | The two Phase 4 classification items remain **100% shortcuttable** (D-057/D-066). | stated | Phase 6 |
 | R5-9 | `sympy` is still not in `requirements.txt` (D-053). | low | repo owner |
 
@@ -346,6 +390,14 @@ shapes `phase4_summary.md` §8 already names, including one it explicitly says
 was "the fourth time". Writing a lesson down does not prevent it. **Only a check
 that runs does** — and this phase's evidence for that is that every error it
 caught itself was caught by disbelieving a number, never by reading a diff.
+
+**And the limit of the fix this phase's own review produced.** The identity
+term catches a comparator that will not credit gold — and it is blind, *by
+construction*, to a comparator that credits gold and refuses every real model
+answer, because gold always matches gold. `vector` sat at a **12.0%** archive
+decided rate through the round that added identity. The pair that covers it is
+**identity plus a per-kind archive decided rate**, and only the second half sees
+model surface forms at all.
 
 New deliverables filed against Phase 6: **D6.7–D6.11**.
 

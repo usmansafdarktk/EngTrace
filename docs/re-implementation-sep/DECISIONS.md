@@ -2699,6 +2699,84 @@ inconsistency, `ADOPT-PHASE-6`.
 
 ---
 
+## D-068 — Reviewer E round 2: the block lifts, and two of my own numbers were wrong
+
+**Date:** 2026-09-08 · **Status:** DECIDED · **Source:** Phase 5 Reviewer E,
+round 2, `reviews/phase5_reviewer_e_comparator.md`
+
+**`PASS WITH FINDINGS` — the block lifts.** E answered its own block question on
+its own terms rather than accepting mine:
+
+> Neither colliding pair is a false accept, and both `MISMATCH` **for the right
+> reason**. `hydrostatic_pressure_at_depth` part 1 now selects `13.29` — the
+> depth — instead of `101.347`, the pressure it had been comparing twice;
+> `rackett_equation_volume` part 1 selects the temperature instead of the
+> volume. *The masking is gone and nothing was traded for it.*
+
+And it closed the gap it had declined to claim in its first filing: gold×gold at
+**N = 100 over all 33 structural-kind templates — 326,700 pairs, 0 false
+accepts, 0 false rejects, 0 errors, 0 UNRESOLVED**, with round 1's N = 250
+collision search re-run byte-identical and returning **0** collisions on all
+five formerly mis-slicing templates. Identity, re-derived independently rather
+than read from my tool: **5,900 / 5,900**.
+
+### Findings
+
+| # | Finding | Disposition |
+|---|---|---|
+| **R2-F1** | `vector_components` reads ASCII `x_hat`, which is what **gold** writes; every archived model answer writes `x̂`. The comparator accepts **0 of 83** real answers across the 3 vector templates — and this is **structurally invisible to the identity gate**, because gold matches gold. | `ADOPT-NOW` |
+| **R2-F2** | The gold×gold truth predicate was **textual identity of the span**, so `5.0 seconds` against `4.99 seconds` read as a false accept when §7.1's boundary-inclusive tolerance makes the MATCH correct. **10 of the 32 unbound entries rested on that predicate, 9 on it alone.** | `ADOPT-NOW` |
+| **R2-F3** | For `symbolic`, "bind fewer and name the rest" *is* laundering: `derive_kind` routes to `symbolic` on a regex matching exactly the construct the comparator cannot read. "1 of 9" measures the comparator, not the corpus. | `ADOPT-NOW` (the characterisation) + `ADOPT-PHASE-6` (the fix, D6.10) |
+
+### R2-F1 is the sharper of the two mechanical findings
+
+A missing **surface declaration** — the mechanism D4.1 §4.2 already uses for
+categorical labels — and not undecidability. `x̂` is a combining circumflex
+(U+0302) or a precomposed `ŷ`/`ẑ` (U+0177, U+1E91); models also write the
+component list as `[a, b]` where gold writes `<a, b>`. Both are now folded.
+
+**And it names a real limitation of the identity gate, one round after that gate
+was added to catch exactly this class.** Identity compares gold to gold, so a
+defect that lives entirely in *model* surface forms passes it by construction.
+The identity term is necessary and it is not sufficient; archive×gold is what
+covers the other half, and its per-kind decided rate is what would have shown
+this — `vector` at **12.0%** was in the table and I did not read it. That is the
+same error as E-7 one round earlier: **the number was printed and not read.**
+
+### R2-F3, and a case where E and I were each right about different things
+
+E diagnosed the `symbolic` failures as the parser splitting function names into
+free symbols — `['c','o','s']` is `cos`. I had already implemented that fix and
+measured **no change at all** (11.1% decided, before and after), and recorded it
+in D-065 as a known-bad fix.
+
+Both are correct, and resolving it required a third measurement. My first mask
+was itself broken — `_to_sympy`'s `x*(` rule re-inserted a `*` inside the
+placeholder — so *that* measurement was worthless. Repaired, the mask works on
+the probe (`cos(361*t - 146.39)` survives intact) and **still rescues 0 of 8**,
+because function-name splitting is one of **five** independent blockers:
+
+| template | isolated expression | blocker |
+|---|---|---|
+| `phasor_addition` | `38.93 * cos(420*t + 7.48 deg)` | the unit word `deg` → symbols `d`,`e`,`g` |
+| `ft_esd_rect_pulse` | `2304.0 * sinc^2(4.0*f)` | `sinc^2(` — a function with an exponent, which the mask's `name(` pattern misses |
+| `cd_dc_system_analysis` | `27.35 * cos(657*pi*(t - 3.81e-03))` | `pi` → `p*i`, and `3.81e-03` → `3.81*e-03` |
+| `undamped_response_initial_conditions` | `-0.006*cos(34.6384*t) (m)` | a trailing unit annotation → symbol `m` |
+| `standing_wave_formation` | `0.0, 0.99, and 1.98` | the isolation takes the node list, not the equation |
+
+So E's characterisation stands — the routing regex selects for what the parser
+cannot read — and D-065's "the obvious fix is known not to work" also stands,
+with the correction that it is one of five and that my first attempt to measure
+it was broken. **Recorded as an error (§7 #15): I measured a fix, saw no change,
+and concluded the diagnosis was wrong, when the fix was.**
+
+Not fixed here. Five surface rules added at the close of a phase, to a parser
+whose *last* three positional rules were all wrong (D-064), is exactly the move
+the stopping rule forbids. **Phase 6 (D6.10) now has a specification instead of
+a symptom**, and one ruled-out fix.
+
+---
+
 ---
 
 ## Open decisions
