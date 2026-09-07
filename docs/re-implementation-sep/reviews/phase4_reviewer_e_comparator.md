@@ -662,3 +662,440 @@ certifies" — and was then certified against 43 cases written by the two people
 it was answering. A new mechanism introduced to fix review findings should carry
 its own evidence base, measured on text nobody in the review wrote, before it is
 allowed to gate three kinds.
+
+---
+
+# Round 3 — comparator adversary
+
+**Frozen ref `3a00875b5cc5c8baa440fdd55fa131d5a96abfe6`.**
+
+## 1. Verdict
+
+**BLOCKED.** `commitment.py` v2 is a better mechanism than v1 and I withdraw
+nothing I said about the direction of travel — but the round-2 pattern repeats a
+third time: **five of the six v2 mechanisms fail on their own first
+generalisation**, and four of my earlier findings are *relocated* rather than
+closed. I have both directions the round asked for: correct answers the module
+rejects (R3-F13, R3-F16, R3-F17, R3-F18, R3-F19) and non-commitments it accepts
+(R3-F14, R3-F15). The four worst take a *correct* answer to **MISMATCH**, not
+UNRESOLVED — a model error reported that did not occur, which is the failure
+mode F4 and `answer_span` exist to prevent.
+
+## 2. Independent re-derivation (round 3)
+
+Baseline reproduced at the frozen ref before attacking:
+
+```
+reviewer_battery   64/64   every case both reviewers used
+recall_corpus     351/351  9 frames x 39 archived answers, 0 false rejects
+derive_vocabulary  27/27 SUPPORT entries agree with the archive
+```
+
+The **commitment census** (R2-F10) is honest and I accept it as filed. It
+reports 2 hedge firings in 2,200 spans, **0 in a gated kind**, and states in its
+own output that "the archive cannot falsify the commitment machinery in either
+direction". That is the correct framing and it is what I asked for. One number
+in it is load-bearing and is not called out: `factive: 1`. The FACTIVE class is
+the *least*-supported of the three new subordinator classes — one occurrence in
+2,200 spans — and it is the class R3-F16 breaks.
+
+Both green suites are, again, closed sets. All 64 battery cases and all 351
+recall frames were written by the implementer or by B and me. §4 records what I
+could not break; everything in §3 was reachable from the frozen tree in under
+thirty minutes with no archive access.
+
+## 3. Findings
+
+### R3-F13 — CONFIRMED (blocking): **over-rejection.** `is_bare_comment`'s subjectless fallback classifies ordinary technical sentences as bare epistemic comments — R2-F9c relocated
+
+`is_bare_comment` ends with a *determiner* blocklist:
+
+```python
+return not re.match(r"^\W*(?:the|a|an|both|each|every|all|its|his|her|their)\b", stripped, re.I)
+```
+
+Anything <= 6 words that is label-free and does not open with one of those
+eleven determiners is a "bare comment". The subject vocabulary of the three
+gated kinds is overwhelmingly **bare abstract nouns**, which take no determiner:
+
+| candidate (gold `linear` / `not linear`) | verdict | should be |
+|---|---|---|
+| `The system is linear. Superposition seems to hold.` | UNRESOLVED | MATCH |
+| `The system is linear. Scaling appears satisfied.` | UNRESOLVED | MATCH |
+| `The system is linear. Additivity seems fine.` | UNRESOLVED | MATCH |
+| `The system is nonlinear. Homogeneity appears violated.` | UNRESOLVED | MATCH |
+
+`is_bare_comment("Superposition seems to hold", surfaces)` -> `True`.
+
+This is **exactly R2-F9c**, in the same register, one construction over. My
+round-2 case was `... so the design is acceptable. The margin seems comfortable.`
+— refused. That case now passes *only because "The margin" opens with `the`*.
+Swap the determiner-headed NP for the bare noun the domain actually uses
+(superposition, additivity, homogeneity, scaling, causality, stability) and the
+refusal is back. The fix distinguished the two sentences by the one feature that
+does not distinguish them.
+
+`recall_corpus`'s `post-quantified` frame is 39/39, so the corpus does not see
+this: its frame sentence evidently carries a determiner.
+
+### R3-F14 — CONFIRMED (blocking): **false accept.** `_strip_label_parens` runs *before* hedge detection, so a hedge inside a label-naming parenthetical is deleted along with it — R2-F12 relocated
+
+`find_commitment` computes `bare = _strip_label_parens(matrix, surfaces)` and
+then runs `hedge_markers(bare)`. Any parenthetical that names a label is removed
+**entirely**, including whatever epistemic material it carries:
+
+| candidate (gold `linear`) | verdict | should be |
+|---|---|---|
+| `The system is linear (or possibly nonlinear).` | **MATCH** | UNRESOLVED |
+| `The system is linear (or nonlinear, I am not sure).` | **MATCH** | UNRESOLVED |
+| `The system is linear (though it may be nonlinear).` | **MATCH** | UNRESOLVED |
+
+Row 2 contains a verbatim `INABILITY` marker and is scored a clean commitment.
+
+The R2-F12 fix is right for the case it was built on — `linear (a nonlinear
+system would fail additivity)` is a gloss whose `would` is about a hypothetical
+answer — and wrong for the case one word away: `linear (or possibly nonlinear)`
+offers an *alternative*, and the parenthetical is the whole hedge. The mechanism
+has no way to tell a gloss about the other label from an alternative between
+both, because it looks only at whether a label surface is present, which is true
+of both. The docstring's stated invariant — "a parenthetical naming **no** label
+is a genuine qualifier and stays" — is the wrong test: `(or possibly nonlinear)`
+names a label *and* is a genuine qualifier.
+
+Minimum fix: strip the parenthetical for **label resolution** only, and run
+`hedge_markers` over the *unstripped* matrix.
+
+### R3-F15 — CONFIRMED (blocking): `_MAX_COMMENT_WORDS = 6` is the magic constant `(i-1, i+1)` was, and one word escapes it
+
+The distance bound left `_governing_comment` and reappeared in
+`is_bare_comment` as a **word count**. It is escapable exactly the way the old
+one was — by making the qualification one word longer:
+
+| candidate (gold `linear`) | words | verdict |
+|---|---|---|
+| `The system is linear. I am not sure.` | 4 | UNRESOLVED (correct) |
+| `The system is linear. I am not entirely sure about that.` | 7 | **MATCH** (wrong) |
+| `The system is linear. Honestly I cannot really tell for certain.` | 8 | **MATCH** (wrong) |
+
+`not entirely sure` and `cannot really tell` are both **declared** in
+`INABILITY`; the module tokenises them, then discards the clause before it
+looks. The docstring says the magic constant "leaves rather than shrinking".
+It did not leave; it changed units, from clauses to words, and there are now
+**three** unjustified integers on this path — `_MAX_COMMENT_WORDS = 6`,
+`range(4)` in the excision loop, and `_NEG_WINDOW = 40` in `kinds.py`
+(untouched, still character-scoped, and now operating on text `segment()` has
+spliced — see R3-F19). None carries a sensitivity analysis. That is the same
+request round 1 made about `_NEG_WINDOW`/`HEDGE_WINDOW` and it has now been
+skipped three times.
+
+### R3-F16 — CONFIRMED (blocking): **MISMATCH on a correct answer.** The new FACTIVE class re-opens round-1 F4, from inside `segment()`, and contradicts `normalize.DISCOURSE_MARKERS`
+
+Two hand-built opener lists in two modules read the same opener in **opposite
+directions**:
+
+* `normalize.DISCOURSE_MARKERS` contains `note`, `notes` — a `Note ...` sentence
+  is a *qualification*, so `answer_span` must not peel into it. That list is the
+  round-1 F4 fix.
+* `commitment.FACTIVE` contains `note that`, `notes that`, `recall that` — a
+  `Note that X` clause **asserts X**, so `find_commitment` may select it.
+
+So `answer_span` correctly declines to peel into the caveat, and `segment()`
+then hands the caveat to the comparator as the asserting clause. Because
+`find_commitment` takes the **last** labelled clause, the caveat outranks the
+answer:
+
+```
+## Final Answer
+**Answer:** The system is linear.
+
+Recall that a nonlinear map fails additivity.
+```
+
+gold `linear` -> **MISMATCH `not linear`**. `segment("Recall that a nonlinear
+map fails additivity")` -> `'a nonlinear map fails additivity'`.
+
+Likewise `Note that the answer is nonlinear with an offset` after a committed
+`linear` -> **MISMATCH**.
+
+The battery's two `E-F4` cases both use `Note:` (colon), which `_BARE_QUAL_RE`
+catches. They cover precisely the form v2 suppresses and miss the form v2 newly
+*asserts*. The docstring claims the two are "distinguished by what follows,
+which is the distinction E's R2-F9a said version 1 could not make" — the
+distinction exists in `commitment.py` and does not exist in `normalize.py`, and
+the two modules are on the same path.
+
+The underlying error is scope: a factive asserts its complement **about the
+world**, but `Recall that a nonlinear map fails additivity` is a general remark
+about the *other label*, not a verdict on *this system*. FACTIVE has archive
+support of 1 (the census, §2). This class should not gate three kinds on one
+observation and a contradicted opener list.
+
+### R3-F17 — CONFIRMED (blocking): **over-rejection.** A fronted concessive without a comma has "no matrix to assert" — B's R2-F1.1 relocated to an orthographic condition
+
+`segment()` locates the matrix of a fronted concessive with `c.find(",")` and
+returns `None` when there is none. The comma is punctuation, not grammar:
+
+| candidate (gold `linear`) | verdict |
+|---|---|
+| `As expected the system is linear.` | UNRESOLVED |
+| `Since both tests pass the system is linear.` | UNRESOLVED |
+| `Given that additivity holds the system is linear.` | UNRESOLVED |
+| `Because superposition holds the system is linear.` | UNRESOLVED |
+| `Although the gain varies the system is linear.` | UNRESOLVED |
+
+All five refuse with `the clause is a bare subordinate clause with no matrix to
+assert` — v1's refusal message, on v1's construction, gated now by whether the
+model typed a comma. `recall_corpus`'s `fronted-concessive` and `fronted-given`
+frames are 39/39 each because both frames insert the comma; the corpus tests the
+punctuation it supplies.
+
+The first comma is also the wrong boundary whenever the subordinate clause
+contains one of its own, which is common in this register.
+
+### R3-F18 — CONFIRMED (blocking): **MISMATCH on a correct answer.** `answer_span`'s qualifier guard has both a short opener list *and* a live 80-character distance bound
+
+The `Answer\s*:` colon fix is correct and I confirm it (`The system is linear
+(the wrong answer would be nonlinear)` no longer peels). The guard *behind* it
+did not get the same attention. `_QUALIFIER_RE` is:
+
+```python
+r"(?:^|[.;!?\n])\s*(?:\*+\s*)?(?:" + DISCOURSE_MARKERS + r")\b[^.;!?\n]{0,80}$"
+```
+
+Two independent defects, both reachable:
+
+**(a) The opener list is missing openers `commitment.py` itself declares.**
+`given`, `when`, `for`, `strictly`, `whether` are absent from
+`DISCOURSE_MARKERS`, while `given` is in `commitment.CONCESSIVE` and `given
+that` is in `commitment.FACTIVE`. Two lists of the same linguistic object,
+maintained separately, diverging:
+
+```
+"**Answer:** The system is linear. Given a nonzero offset, the answer is nonlinear."
+  answer_span -> 'nonlinear.'   compare -> MISMATCH   (gold: linear)
+"**Answer:** The system is linear. When the gain varies, the answer is nonlinear."
+  answer_span -> 'nonlinear.'   compare -> MISMATCH
+"**Answer:** The system is linear. For a squaring element, the answer is nonlinear."
+  answer_span -> 'nonlinear.'   compare -> MISMATCH
+```
+
+Note the marker doing the peeling here is `The\s+answer\s+is:?\s*`, whose colon
+is **still optional** and which outranks the bare `Answer\s*:` in priority. The
+round's stated fix hardened the low-priority marker and left the higher-priority
+one matching the ordinary English phrase "the answer is".
+
+**(b) `{0,80}` is a character distance bound on the guard for my own F4.**
+Push the qualifying opener more than 80 characters from the marker and the guard
+silently stops applying, even with a listed opener:
+
+```
+"**Answer:** The system is linear. Note that for a system with a constant
+ additive offset term applied to the output, the answer is nonlinear."
+  answer_span -> peels to 'nonlinear.'   compare -> MISMATCH   (gold: linear)
+```
+
+R2-F8 said a fixed-width window is not scope. That claim was accepted and the
+window was removed from `commitment.py`. **The identical construct survives, in
+character units, in the module that runs first and decides what `commitment.py`
+ever sees.** Removing a distance bound from the consumer while leaving one on
+the producer does not close the finding.
+
+### R3-F19 — CONFIRMED (blocking): **MISMATCH on a correct answer.** `_TRAILING_SUB_RE`'s excision closes on the wrong comma and splices a fragment of the subordinate clause into the matrix
+
+```python
+close = c.find(",", m.end())
+c = (c[:m.start()] + c[close:]).strip() if close != -1 else c[:m.start()].strip()
+```
+
+`m.end()` is the end of the *subordinator*, so `close` is the first comma
+**anywhere after it** — which is the subordinate clause's own internal comma
+whenever it has one, not its closing comma. The excision then cuts mid-clause
+and splices the remainder into the matrix:
+
+```
+"The system is nonlinear, because the squaring term, which we verified, dominates"
+  -> "The system is nonlinear, which we verified, dominates"
+"The system is linear, since the map, a sum of scaled inputs, is additive"
+  -> "The system is linear, a sum of scaled inputs, is additive"
+```
+
+Both are ungrammatical splices. When the spliced-in fragment carries the other
+label, the splice **flips the verdict**, because `_resolve_label` is still
+last-by-position within the matrix:
+
+```
+"The system is linear, since the check, a nonlinear probe, passed."
+  segment -> "The system is linear, a nonlinear probe, passed"
+  gold linear -> MISMATCH 'not linear'
+```
+
+A correct answer scored wrong. Note the interaction with `_NEG_WINDOW = 40`
+(R3-F15): `_negated` now runs its 40-character window over text `segment()` has
+**cut and rejoined**, so the window's contents no longer correspond to anything
+the model wrote. Character-scoped negation over surgically spliced text is not a
+scope test at all.
+
+The loop bound is the third magic integer. Five comma-subordinators exhaust it
+and the fifth survives into the matrix:
+
+```
+"The system is linear, since additivity holds, because scaling holds, given that
+ both pass, as the map is a sum, unlike a nonlinear map, and that settles it"
+  segment -> "The system is linear, unlike a nonlinear map, and that settles it"
+  gold linear -> MISMATCH
+```
+
+Contrived as written, but `range(4)` is unjustified and the failure is silent —
+the loop exits, the caller cannot tell an exhausted excision from a completed
+one, and there is no `UNRESOLVED` on the path.
+
+### R3-F20 — CONFIRMED (non-blocking): three of the four lookbehinds added for R2-F11 are **no-ops**; the fix is carried entirely by `_ABBREV`
+
+```
+(?<!\d)\.(?!\d)(?<!\bi\.e)(?<!\be\.g)(?<!\bcf)(?<![A-Z])
+```
+
+The decimal guard is correct — `(?<!\d)` precedes the `\.`. The other four
+lookbehinds are placed **after** `\.` has been consumed, so each inspects text
+ending at the dot, one character past what it was written to test:
+
+* `(?<![A-Z])` examines the `.` itself, which is never `[A-Z]`. **Always true.**
+  Demonstrated: `clauses("The gain is set by R. The system is linear.")` ->
+  `['The gain is set by R', 'The system is linear']`. The docstring's comment
+  `# . but not an initial` describes behaviour the regex does not have.
+* `(?<!\bcf)` examines `f.`, never `cf`. **Always true.** Masked only because
+  `_ABBREV` stashes `cf.` first.
+* `(?<!\bi\.e)` / `(?<!\be\.g)` examine `.e.` / `.g.`. Same, same mask.
+
+R2-F11 is therefore **half not addressed**: the abbreviation half works and does
+so entirely through `_ABBREV`, a closed hand list of eleven items (missing at
+least `approx.`, `Sec.`, `Ref.`, `Tab.`, `resp.`, `Ch.`, `al.`, `w.r.t.`); the
+initials half does not exist. Either delete the three dead lookbehinds and say
+so, or move them before the `\.`.
+
+### R3-F21 — CONFIRMED (minor): `label_segment` is dead code whose `_strip_label_parens` call has different semantics from the live one
+
+`label_segment` (`commitment.py:414`) has no callers anywhere in `tests/` or
+`docs/`. It calls `_strip_label_parens(matrix)` with **no surfaces**, which
+takes the `if not surfaces` branch and strips *every* parenthetical — including
+the label-free ones that `find_commitment`'s call deliberately preserves to keep
+`Linear (unclear)` non-committal (B, round-1 F2). A dead function that
+contradicts a live invariant is a trap for the next editor. Delete it, or give
+it the same call.
+
+### R3-F22 — CONFIRMED (minor): `_TASK_RE` is an unanchored `search` over the whole clause
+
+`determine whether`, `check whether`, `test whether`, `verify whether` are
+matched anywhere in the clause, so a clause that *performs* the check is refused
+as a *restatement* of it:
+
+```
+"Both tests verify whether the system is linear and both pass."  -> UNRESOLVED
+"We check whether the system is linear: it is."                  -> UNRESOLVED
+```
+
+Damage is limited because `find_commitment` falls back to earlier labelled
+clauses, so this only kills single-clause answers — but it does kill them.
+Anchor it to the clause opener, as `_HYPO_RE`/`_CONC_RE`/`_FACTIVE_RE` are.
+
+## Status of every round-1 and round-2 finding
+
+| finding | claimed | my assessment |
+|---|---|---|
+| F0 | (open, structural) | **not addressed**; correctly carried as risk. Superseded by R2-F10 / R4-10. |
+| F1 | now addressed | **addressed — complete and correct.** Both false halves are retracted in `kinds.py:768-791`, the measured `0 of 16` replaces the fabricated `1 of 16`, and `require_origin` is relabelled a route-3 rule in the docstring *and* in `phase4_comparators.md:263-264` citing D4.2 §2.4. The second sentence I flagged in round 2 is gone. I close F1. |
+| F2 | closed r1 | **addressed** (position-first ranking holds). |
+| F3 | closed r1 | **addressed.** |
+| F4 | closed r1 | **RELOCATED — see R3-F16.** The `answer_span` guard holds; the caveat now reaches the comparator through `segment()`'s FACTIVE class instead, and through the omissions and the 80-char bound in `_QUALIFIER_RE` (R3-F18). |
+| F5 | closed r1 | **addressed** (`neither ... nor` survives the new excision; verified §4). |
+| F6 | settled by `_BRACED_RE` | **addressed**, as I argued. |
+| R2-F7 | closed | **addressed.** Comma-level segmentation genuinely closes it; my r2 case is 2/2 and I could not revive it. |
+| R2-F8 | closed | **RELOCATED.** The clause bound is gone from `_governing_comment` — that part is real. But the bound reappears as `_MAX_COMMENT_WORDS = 6` (R3-F15) and `range(4)` (R3-F19), and a *character* distance bound on the same path survives untouched in `normalize._QUALIFIER_RE` (R3-F18b). Three bounds where there was one; none has a sensitivity analysis. |
+| R2-F9a | closed | **addressed** for the comma'd form; **RELOCATED to the comma-less form** (R3-F17). |
+| R2-F9b | closed | **addressed.** `roughly 72% of the 25 mm limit` no longer hedges; `roughly speaking` still does. Verified. |
+| R2-F9c | closed | **RELOCATED — see R3-F13.** Directionality and the bare-comment gate fix my exact sentence; the same sentence with a bare-noun subject still fails. |
+| R2-F10 | not fixable, machine-reported | **addressed as far as it can be.** The census is honest, states its own limits in its own output, and is carried as R4-10. Accepted. One remark: `factive: 1` is the weakest support in the census and it gates R3-F16. |
+| R2-F11 | closed | **half not addressed — see R3-F20.** Three of four lookbehinds are no-ops; the abbreviation list is doing all the work. |
+| R2-F12 | closed | **RELOCATED — see R3-F14.** Stripping the parenthetical stops it *outranking*, and starts it *deleting a hedge*. |
+
+## 4. Falsification attempts that failed
+
+Recorded so the clean parts of the verdict mean something. Each of these I
+expected to break and could not:
+
+1. **`neither ... nor` under the new excision.** R2-F5's fix is the case the
+   excision loop was explicitly built not to break, and it holds:
+   `neither memoryless, because the output depends on past inputs, nor causal`
+   -> MATCH `(No, No)`. The excise-don't-truncate design is correct and the
+   docstring's account of why is accurate.
+2. **Defeating HYPOTHETICAL through a concessive wrapper.**
+   `Although X holds, if Y then the system is linear` -> refused, `the matrix
+   clause is itself hypothetical`. The re-check after the concessive branch is
+   there and works.
+3. **Reviving R2-F7.** Every comma variant of my round-1 F2 case I tried now
+   resolves correctly. Comma-level segmentation genuinely closed it.
+4. **Reviving R2-F9c's derivation opener.** `Imagine a scaled input a*x[n]; the
+   output scales, so the system is linear` -> MATCH. The direction rule and the
+   `NEIGHBOUR_CLASSES` exclusion of `verb of opinion` are both correct.
+5. **`must` / `can` as hedges.** Still correctly excluded.
+6. **Deleting a negator by excision.** I tried several shapes where excising a
+   comma'd subordinate should have stranded a label outside its negator's scope
+   (`The system is not, given the squaring, linear`; `The system is not linear,
+   unlike an LTI system, since it squares the input`). All resolved correctly —
+   in one case by an accidental double negation, which is luck, not design, and
+   is why R3-F19's interaction with `_NEG_WINDOW` still worries me.
+7. **The `Answer\s*:` colon fix itself.** `The system is linear (the wrong
+   answer would be nonlinear)` no longer peels. The fix is correct; my objection
+   in R3-F18 is to the *unchanged* `The\s+answer\s+is:?` beside it.
+8. **The `Note:` form of round-1 F4.** Still correctly suppressed by
+   `_BARE_QUAL_RE`. It is only `Note that` / `Recall that` that broke.
+9. **The census.** I tried to find a number in it that flattered the mechanism.
+   There isn't one; it is the most honest artefact in the module.
+
+## 5. Further probing and improvements
+
+1. **Stop hand-listing openers in two places.** `normalize.DISCOURSE_MARKERS`
+   and `commitment.{HYPOTHETICAL,CONCESSIVE,FACTIVE,BARE_QUALIFIERS}` are five
+   lists of one linguistic object, maintained independently, and R3-F16 and
+   R3-F18a are both *divergences between them*. Derive `DISCOURSE_MARKERS` from
+   the commitment classes, or make `answer_span` call `segment()`. One list, one
+   semantics.
+2. **A factive must assert about the *subject under test*.** `Note that the
+   system is linear` and `Recall that a nonlinear map fails additivity` are not
+   the same act. Requiring the factive complement to name the item's subject —
+   or, cheaper and defensible, refusing to let a factive clause **outrank** an
+   earlier unhedged commitment — closes R3-F16 without a new list.
+3. **Order the parenthetical strip after hedge detection** (R3-F14). Two lines,
+   and it is the only fix in this report that costs nothing elsewhere.
+4. **Replace the determiner blocklist with a positive test** (R3-F13). A bare
+   comment is one whose subject is anaphoric *or* absent; "has a subject that is
+   not a determiner-headed NP" is not that test. If a positive test is too
+   expensive, invert the burden: govern only from `_ANAPHORIC_SUBJECT` matches
+   and drop the subjectless fallback, which is where every false positive I
+   found came from.
+5. **Print the integers, or justify them.** `_MAX_COMMENT_WORDS = 6`,
+   `range(4)`, `_NEG_WINDOW = 40`, plus `{0,80}` in `normalize`. This is the
+   fourth time across three rounds that a magic bound has been replaced by
+   another magic bound and the sensitivity analysis has been skipped. **Report
+   the flip rate as a function of each**, on the 351-frame corpus, as a table in
+   the module. If a bound is flat over its range, say so and keep it; if it is
+   not, it is a tuning parameter fitted to reviewer-authored text and it belongs
+   on R4-10.
+6. **The recall corpus tests its own frames.** Nine frames, 39 answers, 351
+   cases, 100% — and R3-F13 and R3-F17 both live *inside* frames the corpus
+   already has, differing by a determiner and by a comma. Vary the frames
+   mechanically: for each frame, emit a comma-less variant, a bare-noun-subject
+   variant, and a parenthetical variant. That is a one-afternoon change and it
+   would have caught five of the ten findings above.
+
+**Process note.** Round 2's note said a new mechanism should carry its own
+evidence base before gating three kinds. Version 2 answered that by *measuring
+the absence* honestly (the census) rather than by building the evidence — which
+is the right thing to say and not the same as the right thing to do. The result
+is a third round in which every individual fix is defensible and the surface
+they are built on reproduces the defect one determiner, one comma, one word, or
+one module away. The module is now 512 lines of hand-built English grammar
+gating three answer kinds, validated on 415 sentences all written by its three
+critics, with three unjustified integers and five divergent opener lists. That
+is not a comparator; it is a parser, and it should either be scoped down to what
+the archive can falsify or moved to R4-10 in its entirety.
