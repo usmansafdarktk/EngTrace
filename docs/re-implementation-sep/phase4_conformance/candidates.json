@@ -1,0 +1,6882 @@
+[
+ {
+  "id": "C1-extra-update",
+  "gold": {
+   "schema_version": "1.5",
+   "node_type": "iteration",
+   "node_id": "t24_secant_normal_depth",
+   "cardinality": "incidental",
+   "roles": {
+    "index": "k",
+    "iterate_prev": "y_prev",
+    "iterate_curr": "y_curr",
+    "iterate_next": "y_next",
+    "residual_prev": "g_prev",
+    "residual_curr": "g_curr",
+    "change": "change",
+    "converged": "converged",
+    "evaluation": "evaluation"
+   },
+   "update_relation": "iterate_curr - residual_curr * (iterate_curr - iterate_prev) / (residual_curr - residual_prev)",
+   "termination": {
+    "kind": "convergence",
+    "quantity_role": "change",
+    "comparison": "lt",
+    "tolerance": 0.002,
+    "predicate_prose": "abs(y_next - y_curr) < 0.002",
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "rounding": "decimal-half-up",
+   "constants": {
+    "b": 2.1,
+    "z": 2.5,
+    "K": 6.619
+   },
+   "frame_relations": [
+    [
+     "A",
+     "(b + z * y) * y"
+    ],
+    [
+     "P",
+     "b + 2 * y * sqrt(1 + z ** 2)"
+    ],
+    [
+     "AR",
+     "A * (A / P) ** (2 / 3)"
+    ],
+    [
+     "g",
+     "round(AR) - K"
+    ]
+   ],
+   "symbol_precision": {
+    "y_prev": 4,
+    "y_curr": 4,
+    "y_next": 4,
+    "change": 4,
+    "g_prev": 3,
+    "g_curr": 3,
+    "y": 4,
+    "A": 3,
+    "P": 3,
+    "AR": 3,
+    "g": 3
+   },
+   "preamble_binding": {
+    "iterate_prev": {
+     "frame": 0,
+     "frame_role": "iterate"
+    },
+    "residual_prev": {
+     "frame": 0,
+     "frame_role": "residual"
+    },
+    "iterate_curr": {
+     "frame": 1,
+     "frame_role": "iterate"
+    },
+    "residual_curr": {
+     "frame": 1,
+     "frame_role": "residual"
+    }
+   },
+   "preamble_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_roles": {
+    "iterate": "y",
+    "residual": "g"
+   },
+   "element_symbols": [
+    "k",
+    "y_prev",
+    "g_prev",
+    "y_curr",
+    "g_curr",
+    "y_next",
+    "change",
+    "converged",
+    "evaluation"
+   ],
+   "carry": {
+    "y_prev": "y_curr",
+    "g_prev": "g_curr",
+    "y_curr": "y_next",
+    "g_curr": "evaluation.g"
+   },
+   "carry_notes": {},
+   "preamble": [
+    {
+     "y": 1.0,
+     "A": 4.6,
+     "P": 7.485,
+     "AR": 3.325,
+     "g": -3.294
+    },
+    {
+     "y": 1.5,
+     "A": 8.775,
+     "P": 10.178,
+     "AR": 7.949,
+     "g": 1.33
+    }
+   ],
+   "elements": [
+    {
+     "k": 1,
+     "y_prev": 1.0,
+     "g_prev": -3.294,
+     "y_curr": 1.5,
+     "g_curr": 1.33,
+     "y_next": 1.3562,
+     "change": 0.1438,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3562,
+      "A": 7.446,
+      "P": 9.403,
+      "AR": 6.373,
+      "g": -0.246
+     }
+    },
+    {
+     "k": 2,
+     "y_prev": 1.5,
+     "g_prev": 1.33,
+     "y_curr": 1.3562,
+     "g_curr": -0.246,
+     "y_next": 1.3786,
+     "change": 0.0224,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3786,
+      "A": 7.646,
+      "P": 9.524,
+      "AR": 6.605,
+      "g": -0.014
+     }
+    },
+    {
+     "k": 3,
+     "y_prev": 1.3562,
+     "g_prev": -0.246,
+     "y_curr": 1.3786,
+     "g_curr": -0.014,
+     "y_next": 1.38,
+     "change": 0.0014,
+     "converged": true,
+     "evaluation": null
+    }
+   ],
+   "result": {
+    "symbol": "yn",
+    "value": 1.38,
+    "unit": "m",
+    "dp": 3,
+    "from": "last.iterate_next"
+   }
+  },
+  "candidate": {
+   "schema_version": "1.5",
+   "node_type": "iteration",
+   "node_id": "t24_secant_normal_depth",
+   "cardinality": "incidental",
+   "roles": {
+    "index": "k",
+    "iterate_prev": "y_prev",
+    "iterate_curr": "y_curr",
+    "iterate_next": "y_next",
+    "residual_prev": "g_prev",
+    "residual_curr": "g_curr",
+    "change": "change",
+    "converged": "converged",
+    "evaluation": "evaluation"
+   },
+   "update_relation": "iterate_curr - residual_curr * (iterate_curr - iterate_prev) / (residual_curr - residual_prev)",
+   "termination": {
+    "kind": "convergence",
+    "quantity_role": "change",
+    "comparison": "lt",
+    "tolerance": 0.002,
+    "predicate_prose": "abs(y_next - y_curr) < 0.002",
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "rounding": "decimal-half-up",
+   "constants": {
+    "b": 2.1,
+    "z": 2.5,
+    "K": 6.619
+   },
+   "frame_relations": [
+    [
+     "A",
+     "(b + z * y) * y"
+    ],
+    [
+     "P",
+     "b + 2 * y * sqrt(1 + z ** 2)"
+    ],
+    [
+     "AR",
+     "A * (A / P) ** (2 / 3)"
+    ],
+    [
+     "g",
+     "round(AR) - K"
+    ]
+   ],
+   "symbol_precision": {
+    "y_prev": 4,
+    "y_curr": 4,
+    "y_next": 4,
+    "change": 4,
+    "g_prev": 3,
+    "g_curr": 3,
+    "y": 4,
+    "A": 3,
+    "P": 3,
+    "AR": 3,
+    "g": 3
+   },
+   "preamble_binding": {
+    "iterate_prev": {
+     "frame": 0,
+     "frame_role": "iterate"
+    },
+    "residual_prev": {
+     "frame": 0,
+     "frame_role": "residual"
+    },
+    "iterate_curr": {
+     "frame": 1,
+     "frame_role": "iterate"
+    },
+    "residual_curr": {
+     "frame": 1,
+     "frame_role": "residual"
+    }
+   },
+   "preamble_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_roles": {
+    "iterate": "y",
+    "residual": "g"
+   },
+   "element_symbols": [
+    "k",
+    "y_prev",
+    "g_prev",
+    "y_curr",
+    "g_curr",
+    "y_next",
+    "change",
+    "converged",
+    "evaluation"
+   ],
+   "carry": {
+    "y_prev": "y_curr",
+    "g_prev": "g_curr",
+    "y_curr": "y_next",
+    "g_curr": "evaluation.g"
+   },
+   "carry_notes": {},
+   "preamble": [
+    {
+     "y": 1.0,
+     "A": 4.6,
+     "P": 7.485,
+     "AR": 3.325,
+     "g": -3.294
+    },
+    {
+     "y": 1.5,
+     "A": 8.775,
+     "P": 10.178,
+     "AR": 7.949,
+     "g": 1.33
+    }
+   ],
+   "elements": [
+    {
+     "k": 1,
+     "y_prev": 1.0,
+     "g_prev": -3.294,
+     "y_curr": 1.5,
+     "g_curr": 1.33,
+     "y_next": 1.3562,
+     "change": 0.1438,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3562,
+      "A": 7.446,
+      "P": 9.403,
+      "AR": 6.373,
+      "g": -0.246
+     }
+    },
+    {
+     "k": 2,
+     "y_prev": 1.5,
+     "g_prev": 1.33,
+     "y_curr": 1.3562,
+     "g_curr": -0.246,
+     "y_next": 1.3786,
+     "change": 0.0224,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3786,
+      "A": 7.646,
+      "P": 9.524,
+      "AR": 6.605,
+      "g": -0.014
+     }
+    },
+    {
+     "k": 3,
+     "y_prev": 1.3562,
+     "g_prev": -0.246,
+     "y_curr": 1.3786,
+     "g_curr": -0.014,
+     "y_next": 1.38,
+     "change": 0.0014,
+     "converged": false,
+     "evaluation": {
+      "y": 1.38,
+      "A": 7.659,
+      "P": 9.532,
+      "AR": 6.62,
+      "g": 0.001
+     }
+    },
+    {
+     "k": 4,
+     "y_prev": 1.3786,
+     "g_prev": -0.014,
+     "y_curr": 1.38,
+     "g_curr": 0.001,
+     "y_next": 1.3799,
+     "change": 0.0001,
+     "converged": true,
+     "evaluation": null
+    }
+   ],
+   "result": {
+    "symbol": "yn",
+    "value": 1.38,
+    "unit": "m",
+    "dp": 3,
+    "from": "last.iterate_next"
+   }
+  },
+  "expect_answer": "MATCH",
+  "expect_process": "MISMATCH",
+  "exercises": [
+   "7.2-count-differs-not-scored",
+   "7.2-answer-credit",
+   "7.2-process-credit"
+  ],
+  "note": "four updates instead of three: REJECTED at 4.3.3, because gold's third element already satisfies the predicate and 8A.4 forbids continuing",
+  "finding": "F7-1"
+ },
+ {
+  "id": "C2-early-stop",
+  "gold": {
+   "schema_version": "1.5",
+   "node_type": "iteration",
+   "node_id": "t24_secant_normal_depth",
+   "cardinality": "incidental",
+   "roles": {
+    "index": "k",
+    "iterate_prev": "y_prev",
+    "iterate_curr": "y_curr",
+    "iterate_next": "y_next",
+    "residual_prev": "g_prev",
+    "residual_curr": "g_curr",
+    "change": "change",
+    "converged": "converged",
+    "evaluation": "evaluation"
+   },
+   "update_relation": "iterate_curr - residual_curr * (iterate_curr - iterate_prev) / (residual_curr - residual_prev)",
+   "termination": {
+    "kind": "convergence",
+    "quantity_role": "change",
+    "comparison": "lt",
+    "tolerance": 0.002,
+    "predicate_prose": "abs(y_next - y_curr) < 0.002",
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "rounding": "decimal-half-up",
+   "constants": {
+    "b": 2.1,
+    "z": 2.5,
+    "K": 6.619
+   },
+   "frame_relations": [
+    [
+     "A",
+     "(b + z * y) * y"
+    ],
+    [
+     "P",
+     "b + 2 * y * sqrt(1 + z ** 2)"
+    ],
+    [
+     "AR",
+     "A * (A / P) ** (2 / 3)"
+    ],
+    [
+     "g",
+     "round(AR) - K"
+    ]
+   ],
+   "symbol_precision": {
+    "y_prev": 4,
+    "y_curr": 4,
+    "y_next": 4,
+    "change": 4,
+    "g_prev": 3,
+    "g_curr": 3,
+    "y": 4,
+    "A": 3,
+    "P": 3,
+    "AR": 3,
+    "g": 3
+   },
+   "preamble_binding": {
+    "iterate_prev": {
+     "frame": 0,
+     "frame_role": "iterate"
+    },
+    "residual_prev": {
+     "frame": 0,
+     "frame_role": "residual"
+    },
+    "iterate_curr": {
+     "frame": 1,
+     "frame_role": "iterate"
+    },
+    "residual_curr": {
+     "frame": 1,
+     "frame_role": "residual"
+    }
+   },
+   "preamble_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_roles": {
+    "iterate": "y",
+    "residual": "g"
+   },
+   "element_symbols": [
+    "k",
+    "y_prev",
+    "g_prev",
+    "y_curr",
+    "g_curr",
+    "y_next",
+    "change",
+    "converged",
+    "evaluation"
+   ],
+   "carry": {
+    "y_prev": "y_curr",
+    "g_prev": "g_curr",
+    "y_curr": "y_next",
+    "g_curr": "evaluation.g"
+   },
+   "carry_notes": {},
+   "preamble": [
+    {
+     "y": 1.0,
+     "A": 4.6,
+     "P": 7.485,
+     "AR": 3.325,
+     "g": -3.294
+    },
+    {
+     "y": 1.5,
+     "A": 8.775,
+     "P": 10.178,
+     "AR": 7.949,
+     "g": 1.33
+    }
+   ],
+   "elements": [
+    {
+     "k": 1,
+     "y_prev": 1.0,
+     "g_prev": -3.294,
+     "y_curr": 1.5,
+     "g_curr": 1.33,
+     "y_next": 1.3562,
+     "change": 0.1438,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3562,
+      "A": 7.446,
+      "P": 9.403,
+      "AR": 6.373,
+      "g": -0.246
+     }
+    },
+    {
+     "k": 2,
+     "y_prev": 1.5,
+     "g_prev": 1.33,
+     "y_curr": 1.3562,
+     "g_curr": -0.246,
+     "y_next": 1.3786,
+     "change": 0.0224,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3786,
+      "A": 7.646,
+      "P": 9.524,
+      "AR": 6.605,
+      "g": -0.014
+     }
+    },
+    {
+     "k": 3,
+     "y_prev": 1.3562,
+     "g_prev": -0.246,
+     "y_curr": 1.3786,
+     "g_curr": -0.014,
+     "y_next": 1.38,
+     "change": 0.0014,
+     "converged": true,
+     "evaluation": null
+    }
+   ],
+   "result": {
+    "symbol": "yn",
+    "value": 1.38,
+    "unit": "m",
+    "dp": 3,
+    "from": "last.iterate_next"
+   }
+  },
+  "candidate": {
+   "schema_version": "1.5",
+   "node_type": "iteration",
+   "node_id": "t24_secant_normal_depth",
+   "cardinality": "incidental",
+   "roles": {
+    "index": "k",
+    "iterate_prev": "y_prev",
+    "iterate_curr": "y_curr",
+    "iterate_next": "y_next",
+    "residual_prev": "g_prev",
+    "residual_curr": "g_curr",
+    "change": "change",
+    "converged": "converged",
+    "evaluation": "evaluation"
+   },
+   "update_relation": "iterate_curr - residual_curr * (iterate_curr - iterate_prev) / (residual_curr - residual_prev)",
+   "termination": {
+    "kind": "convergence",
+    "quantity_role": "change",
+    "comparison": "lt",
+    "tolerance": 0.002,
+    "predicate_prose": "abs(y_next - y_curr) < 0.002",
+    "max_elements": 5,
+    "satisfied": false
+   },
+   "rounding": "decimal-half-up",
+   "constants": {
+    "b": 2.1,
+    "z": 2.5,
+    "K": 6.619
+   },
+   "frame_relations": [
+    [
+     "A",
+     "(b + z * y) * y"
+    ],
+    [
+     "P",
+     "b + 2 * y * sqrt(1 + z ** 2)"
+    ],
+    [
+     "AR",
+     "A * (A / P) ** (2 / 3)"
+    ],
+    [
+     "g",
+     "round(AR) - K"
+    ]
+   ],
+   "symbol_precision": {
+    "y_prev": 4,
+    "y_curr": 4,
+    "y_next": 4,
+    "change": 4,
+    "g_prev": 3,
+    "g_curr": 3,
+    "y": 4,
+    "A": 3,
+    "P": 3,
+    "AR": 3,
+    "g": 3
+   },
+   "preamble_binding": {
+    "iterate_prev": {
+     "frame": 0,
+     "frame_role": "iterate"
+    },
+    "residual_prev": {
+     "frame": 0,
+     "frame_role": "residual"
+    },
+    "iterate_curr": {
+     "frame": 1,
+     "frame_role": "iterate"
+    },
+    "residual_curr": {
+     "frame": 1,
+     "frame_role": "residual"
+    }
+   },
+   "preamble_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_roles": {
+    "iterate": "y",
+    "residual": "g"
+   },
+   "element_symbols": [
+    "k",
+    "y_prev",
+    "g_prev",
+    "y_curr",
+    "g_curr",
+    "y_next",
+    "change",
+    "converged",
+    "evaluation"
+   ],
+   "carry": {
+    "y_prev": "y_curr",
+    "g_prev": "g_curr",
+    "y_curr": "y_next",
+    "g_curr": "evaluation.g"
+   },
+   "carry_notes": {},
+   "preamble": [
+    {
+     "y": 1.0,
+     "A": 4.6,
+     "P": 7.485,
+     "AR": 3.325,
+     "g": -3.294
+    },
+    {
+     "y": 1.5,
+     "A": 8.775,
+     "P": 10.178,
+     "AR": 7.949,
+     "g": 1.33
+    }
+   ],
+   "elements": [
+    {
+     "k": 1,
+     "y_prev": 1.0,
+     "g_prev": -3.294,
+     "y_curr": 1.5,
+     "g_curr": 1.33,
+     "y_next": 1.3562,
+     "change": 0.1438,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3562,
+      "A": 7.446,
+      "P": 9.403,
+      "AR": 6.373,
+      "g": -0.246
+     }
+    }
+   ],
+   "result": {
+    "symbol": "yn",
+    "value": 1.38,
+    "unit": "m",
+    "dp": 3,
+    "from": "last.iterate_next"
+   }
+  },
+  "expect_answer": "MATCH",
+  "expect_process": "MISMATCH",
+  "exercises": [
+   "7.2-early-stop",
+   "7.2-count-differs-not-scored"
+  ],
+  "note": "stopped with the change above tolerance; result kept from gold",
+  "finding": null
+ },
+ {
+  "id": "C3-fabricated-frame",
+  "gold": {
+   "schema_version": "1.5",
+   "node_type": "iteration",
+   "node_id": "t24_secant_normal_depth",
+   "cardinality": "incidental",
+   "roles": {
+    "index": "k",
+    "iterate_prev": "y_prev",
+    "iterate_curr": "y_curr",
+    "iterate_next": "y_next",
+    "residual_prev": "g_prev",
+    "residual_curr": "g_curr",
+    "change": "change",
+    "converged": "converged",
+    "evaluation": "evaluation"
+   },
+   "update_relation": "iterate_curr - residual_curr * (iterate_curr - iterate_prev) / (residual_curr - residual_prev)",
+   "termination": {
+    "kind": "convergence",
+    "quantity_role": "change",
+    "comparison": "lt",
+    "tolerance": 0.002,
+    "predicate_prose": "abs(y_next - y_curr) < 0.002",
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "rounding": "decimal-half-up",
+   "constants": {
+    "b": 2.1,
+    "z": 2.5,
+    "K": 6.619
+   },
+   "frame_relations": [
+    [
+     "A",
+     "(b + z * y) * y"
+    ],
+    [
+     "P",
+     "b + 2 * y * sqrt(1 + z ** 2)"
+    ],
+    [
+     "AR",
+     "A * (A / P) ** (2 / 3)"
+    ],
+    [
+     "g",
+     "round(AR) - K"
+    ]
+   ],
+   "symbol_precision": {
+    "y_prev": 4,
+    "y_curr": 4,
+    "y_next": 4,
+    "change": 4,
+    "g_prev": 3,
+    "g_curr": 3,
+    "y": 4,
+    "A": 3,
+    "P": 3,
+    "AR": 3,
+    "g": 3
+   },
+   "preamble_binding": {
+    "iterate_prev": {
+     "frame": 0,
+     "frame_role": "iterate"
+    },
+    "residual_prev": {
+     "frame": 0,
+     "frame_role": "residual"
+    },
+    "iterate_curr": {
+     "frame": 1,
+     "frame_role": "iterate"
+    },
+    "residual_curr": {
+     "frame": 1,
+     "frame_role": "residual"
+    }
+   },
+   "preamble_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_roles": {
+    "iterate": "y",
+    "residual": "g"
+   },
+   "element_symbols": [
+    "k",
+    "y_prev",
+    "g_prev",
+    "y_curr",
+    "g_curr",
+    "y_next",
+    "change",
+    "converged",
+    "evaluation"
+   ],
+   "carry": {
+    "y_prev": "y_curr",
+    "g_prev": "g_curr",
+    "y_curr": "y_next",
+    "g_curr": "evaluation.g"
+   },
+   "carry_notes": {},
+   "preamble": [
+    {
+     "y": 1.0,
+     "A": 4.6,
+     "P": 7.485,
+     "AR": 3.325,
+     "g": -3.294
+    },
+    {
+     "y": 1.5,
+     "A": 8.775,
+     "P": 10.178,
+     "AR": 7.949,
+     "g": 1.33
+    }
+   ],
+   "elements": [
+    {
+     "k": 1,
+     "y_prev": 1.0,
+     "g_prev": -3.294,
+     "y_curr": 1.5,
+     "g_curr": 1.33,
+     "y_next": 1.3562,
+     "change": 0.1438,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3562,
+      "A": 7.446,
+      "P": 9.403,
+      "AR": 6.373,
+      "g": -0.246
+     }
+    },
+    {
+     "k": 2,
+     "y_prev": 1.5,
+     "g_prev": 1.33,
+     "y_curr": 1.3562,
+     "g_curr": -0.246,
+     "y_next": 1.3786,
+     "change": 0.0224,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3786,
+      "A": 7.646,
+      "P": 9.524,
+      "AR": 6.605,
+      "g": -0.014
+     }
+    },
+    {
+     "k": 3,
+     "y_prev": 1.3562,
+     "g_prev": -0.246,
+     "y_curr": 1.3786,
+     "g_curr": -0.014,
+     "y_next": 1.38,
+     "change": 0.0014,
+     "converged": true,
+     "evaluation": null
+    }
+   ],
+   "result": {
+    "symbol": "yn",
+    "value": 1.38,
+    "unit": "m",
+    "dp": 3,
+    "from": "last.iterate_next"
+   }
+  },
+  "candidate": {
+   "schema_version": "1.5",
+   "node_type": "iteration",
+   "node_id": "t24_secant_normal_depth",
+   "cardinality": "incidental",
+   "roles": {
+    "index": "k",
+    "iterate_prev": "y_prev",
+    "iterate_curr": "y_curr",
+    "iterate_next": "y_next",
+    "residual_prev": "g_prev",
+    "residual_curr": "g_curr",
+    "change": "change",
+    "converged": "converged",
+    "evaluation": "evaluation"
+   },
+   "update_relation": "iterate_curr - residual_curr * (iterate_curr - iterate_prev) / (residual_curr - residual_prev)",
+   "termination": {
+    "kind": "convergence",
+    "quantity_role": "change",
+    "comparison": "lt",
+    "tolerance": 0.002,
+    "predicate_prose": "abs(y_next - y_curr) < 0.002",
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "rounding": "decimal-half-up",
+   "constants": {
+    "b": 2.1,
+    "z": 2.5,
+    "K": 6.619
+   },
+   "frame_relations": [
+    [
+     "A",
+     "(b + z * y) * y"
+    ],
+    [
+     "P",
+     "b + 2 * y * sqrt(1 + z ** 2)"
+    ],
+    [
+     "AR",
+     "A * (A / P) ** (2 / 3)"
+    ],
+    [
+     "g",
+     "round(AR) - K"
+    ]
+   ],
+   "symbol_precision": {
+    "y_prev": 4,
+    "y_curr": 4,
+    "y_next": 4,
+    "change": 4,
+    "g_prev": 3,
+    "g_curr": 3,
+    "y": 4,
+    "A": 3,
+    "P": 3,
+    "AR": 3,
+    "g": 3
+   },
+   "preamble_binding": {
+    "iterate_prev": {
+     "frame": 0,
+     "frame_role": "iterate"
+    },
+    "residual_prev": {
+     "frame": 0,
+     "frame_role": "residual"
+    },
+    "iterate_curr": {
+     "frame": 1,
+     "frame_role": "iterate"
+    },
+    "residual_curr": {
+     "frame": 1,
+     "frame_role": "residual"
+    }
+   },
+   "preamble_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_roles": {
+    "iterate": "y",
+    "residual": "g"
+   },
+   "element_symbols": [
+    "k",
+    "y_prev",
+    "g_prev",
+    "y_curr",
+    "g_curr",
+    "y_next",
+    "change",
+    "converged",
+    "evaluation"
+   ],
+   "carry": {
+    "y_prev": "y_curr",
+    "g_prev": "g_curr",
+    "y_curr": "y_next",
+    "g_curr": "evaluation.g"
+   },
+   "carry_notes": {},
+   "preamble": [
+    {
+     "y": 1.0,
+     "A": 4.6,
+     "P": 7.485,
+     "AR": 3.325,
+     "g": -3.294
+    },
+    {
+     "y": 1.5,
+     "A": 8.775,
+     "P": 10.178,
+     "AR": 7.949,
+     "g": 1.33
+    }
+   ],
+   "elements": [
+    {
+     "k": 1,
+     "y_prev": 1.0,
+     "g_prev": -3.294,
+     "y_curr": 1.5,
+     "g_curr": 1.33,
+     "y_next": 1.3562,
+     "change": 0.1438,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3562,
+      "A": 7.446,
+      "P": 9.403,
+      "AR": 7.873,
+      "g": -0.246
+     }
+    },
+    {
+     "k": 2,
+     "y_prev": 1.5,
+     "g_prev": 1.33,
+     "y_curr": 1.3562,
+     "g_curr": -0.246,
+     "y_next": 1.3786,
+     "change": 0.0224,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3786,
+      "A": 7.646,
+      "P": 9.524,
+      "AR": 6.605,
+      "g": -0.014
+     }
+    },
+    {
+     "k": 3,
+     "y_prev": 1.3562,
+     "g_prev": -0.246,
+     "y_curr": 1.3786,
+     "g_curr": -0.014,
+     "y_next": 1.38,
+     "change": 0.0014,
+     "converged": true,
+     "evaluation": null
+    }
+   ],
+   "result": {
+    "symbol": "yn",
+    "value": 1.38,
+    "unit": "m",
+    "dp": 3,
+    "from": "last.iterate_next"
+   }
+  },
+  "expect_answer": "MATCH",
+  "expect_process": "MISMATCH",
+  "exercises": [
+   "7.2-fabricated-frame",
+   "7.2-process-credit"
+  ],
+  "note": "one evaluation frame no longer satisfies frame_relations",
+  "finding": null
+ },
+ {
+  "id": "C4-wrong-result",
+  "gold": {
+   "schema_version": "1.5",
+   "node_type": "iteration",
+   "node_id": "t24_secant_normal_depth",
+   "cardinality": "incidental",
+   "roles": {
+    "index": "k",
+    "iterate_prev": "y_prev",
+    "iterate_curr": "y_curr",
+    "iterate_next": "y_next",
+    "residual_prev": "g_prev",
+    "residual_curr": "g_curr",
+    "change": "change",
+    "converged": "converged",
+    "evaluation": "evaluation"
+   },
+   "update_relation": "iterate_curr - residual_curr * (iterate_curr - iterate_prev) / (residual_curr - residual_prev)",
+   "termination": {
+    "kind": "convergence",
+    "quantity_role": "change",
+    "comparison": "lt",
+    "tolerance": 0.002,
+    "predicate_prose": "abs(y_next - y_curr) < 0.002",
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "rounding": "decimal-half-up",
+   "constants": {
+    "b": 2.1,
+    "z": 2.5,
+    "K": 6.619
+   },
+   "frame_relations": [
+    [
+     "A",
+     "(b + z * y) * y"
+    ],
+    [
+     "P",
+     "b + 2 * y * sqrt(1 + z ** 2)"
+    ],
+    [
+     "AR",
+     "A * (A / P) ** (2 / 3)"
+    ],
+    [
+     "g",
+     "round(AR) - K"
+    ]
+   ],
+   "symbol_precision": {
+    "y_prev": 4,
+    "y_curr": 4,
+    "y_next": 4,
+    "change": 4,
+    "g_prev": 3,
+    "g_curr": 3,
+    "y": 4,
+    "A": 3,
+    "P": 3,
+    "AR": 3,
+    "g": 3
+   },
+   "preamble_binding": {
+    "iterate_prev": {
+     "frame": 0,
+     "frame_role": "iterate"
+    },
+    "residual_prev": {
+     "frame": 0,
+     "frame_role": "residual"
+    },
+    "iterate_curr": {
+     "frame": 1,
+     "frame_role": "iterate"
+    },
+    "residual_curr": {
+     "frame": 1,
+     "frame_role": "residual"
+    }
+   },
+   "preamble_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_roles": {
+    "iterate": "y",
+    "residual": "g"
+   },
+   "element_symbols": [
+    "k",
+    "y_prev",
+    "g_prev",
+    "y_curr",
+    "g_curr",
+    "y_next",
+    "change",
+    "converged",
+    "evaluation"
+   ],
+   "carry": {
+    "y_prev": "y_curr",
+    "g_prev": "g_curr",
+    "y_curr": "y_next",
+    "g_curr": "evaluation.g"
+   },
+   "carry_notes": {},
+   "preamble": [
+    {
+     "y": 1.0,
+     "A": 4.6,
+     "P": 7.485,
+     "AR": 3.325,
+     "g": -3.294
+    },
+    {
+     "y": 1.5,
+     "A": 8.775,
+     "P": 10.178,
+     "AR": 7.949,
+     "g": 1.33
+    }
+   ],
+   "elements": [
+    {
+     "k": 1,
+     "y_prev": 1.0,
+     "g_prev": -3.294,
+     "y_curr": 1.5,
+     "g_curr": 1.33,
+     "y_next": 1.3562,
+     "change": 0.1438,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3562,
+      "A": 7.446,
+      "P": 9.403,
+      "AR": 6.373,
+      "g": -0.246
+     }
+    },
+    {
+     "k": 2,
+     "y_prev": 1.5,
+     "g_prev": 1.33,
+     "y_curr": 1.3562,
+     "g_curr": -0.246,
+     "y_next": 1.3786,
+     "change": 0.0224,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3786,
+      "A": 7.646,
+      "P": 9.524,
+      "AR": 6.605,
+      "g": -0.014
+     }
+    },
+    {
+     "k": 3,
+     "y_prev": 1.3562,
+     "g_prev": -0.246,
+     "y_curr": 1.3786,
+     "g_curr": -0.014,
+     "y_next": 1.38,
+     "change": 0.0014,
+     "converged": true,
+     "evaluation": null
+    }
+   ],
+   "result": {
+    "symbol": "yn",
+    "value": 1.38,
+    "unit": "m",
+    "dp": 3,
+    "from": "last.iterate_next"
+   }
+  },
+  "candidate": {
+   "schema_version": "1.5",
+   "node_type": "iteration",
+   "node_id": "t24_secant_normal_depth",
+   "cardinality": "incidental",
+   "roles": {
+    "index": "k",
+    "iterate_prev": "y_prev",
+    "iterate_curr": "y_curr",
+    "iterate_next": "y_next",
+    "residual_prev": "g_prev",
+    "residual_curr": "g_curr",
+    "change": "change",
+    "converged": "converged",
+    "evaluation": "evaluation"
+   },
+   "update_relation": "iterate_curr - residual_curr * (iterate_curr - iterate_prev) / (residual_curr - residual_prev)",
+   "termination": {
+    "kind": "convergence",
+    "quantity_role": "change",
+    "comparison": "lt",
+    "tolerance": 0.002,
+    "predicate_prose": "abs(y_next - y_curr) < 0.002",
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "rounding": "decimal-half-up",
+   "constants": {
+    "b": 2.1,
+    "z": 2.5,
+    "K": 6.619
+   },
+   "frame_relations": [
+    [
+     "A",
+     "(b + z * y) * y"
+    ],
+    [
+     "P",
+     "b + 2 * y * sqrt(1 + z ** 2)"
+    ],
+    [
+     "AR",
+     "A * (A / P) ** (2 / 3)"
+    ],
+    [
+     "g",
+     "round(AR) - K"
+    ]
+   ],
+   "symbol_precision": {
+    "y_prev": 4,
+    "y_curr": 4,
+    "y_next": 4,
+    "change": 4,
+    "g_prev": 3,
+    "g_curr": 3,
+    "y": 4,
+    "A": 3,
+    "P": 3,
+    "AR": 3,
+    "g": 3
+   },
+   "preamble_binding": {
+    "iterate_prev": {
+     "frame": 0,
+     "frame_role": "iterate"
+    },
+    "residual_prev": {
+     "frame": 0,
+     "frame_role": "residual"
+    },
+    "iterate_curr": {
+     "frame": 1,
+     "frame_role": "iterate"
+    },
+    "residual_curr": {
+     "frame": 1,
+     "frame_role": "residual"
+    }
+   },
+   "preamble_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_roles": {
+    "iterate": "y",
+    "residual": "g"
+   },
+   "element_symbols": [
+    "k",
+    "y_prev",
+    "g_prev",
+    "y_curr",
+    "g_curr",
+    "y_next",
+    "change",
+    "converged",
+    "evaluation"
+   ],
+   "carry": {
+    "y_prev": "y_curr",
+    "g_prev": "g_curr",
+    "y_curr": "y_next",
+    "g_curr": "evaluation.g"
+   },
+   "carry_notes": {},
+   "preamble": [
+    {
+     "y": 1.0,
+     "A": 4.6,
+     "P": 7.485,
+     "AR": 3.325,
+     "g": -3.294
+    },
+    {
+     "y": 1.5,
+     "A": 8.775,
+     "P": 10.178,
+     "AR": 7.949,
+     "g": 1.33
+    }
+   ],
+   "elements": [
+    {
+     "k": 1,
+     "y_prev": 1.0,
+     "g_prev": -3.294,
+     "y_curr": 1.5,
+     "g_curr": 1.33,
+     "y_next": 1.3562,
+     "change": 0.1438,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3562,
+      "A": 7.446,
+      "P": 9.403,
+      "AR": 6.373,
+      "g": -0.246
+     }
+    },
+    {
+     "k": 2,
+     "y_prev": 1.5,
+     "g_prev": 1.33,
+     "y_curr": 1.3562,
+     "g_curr": -0.246,
+     "y_next": 1.3786,
+     "change": 0.0224,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3786,
+      "A": 7.646,
+      "P": 9.524,
+      "AR": 6.605,
+      "g": -0.014
+     }
+    },
+    {
+     "k": 3,
+     "y_prev": 1.3562,
+     "g_prev": -0.246,
+     "y_curr": 1.3786,
+     "g_curr": -0.014,
+     "y_next": 1.38,
+     "change": 0.0014,
+     "converged": true,
+     "evaluation": null
+    }
+   ],
+   "result": {
+    "symbol": "yn",
+    "value": 1.43,
+    "unit": "m",
+    "dp": 3,
+    "from": "last.iterate_next"
+   }
+  },
+  "expect_answer": "MISMATCH",
+  "expect_process": "MISMATCH",
+  "exercises": [
+   "7.1-tolerance-exceeded"
+  ],
+  "note": "states an answer 0.05 m from gold that its own trace does not support; S6 step 8 binds in candidate mode and catches it",
+  "finding": "F7-2"
+ },
+ {
+  "id": "C5-boundary-inclusive",
+  "gold": {
+   "schema_version": "1.5",
+   "node_type": "iteration",
+   "node_id": "t24_secant_normal_depth",
+   "cardinality": "incidental",
+   "roles": {
+    "index": "k",
+    "iterate_prev": "y_prev",
+    "iterate_curr": "y_curr",
+    "iterate_next": "y_next",
+    "residual_prev": "g_prev",
+    "residual_curr": "g_curr",
+    "change": "change",
+    "converged": "converged",
+    "evaluation": "evaluation"
+   },
+   "update_relation": "iterate_curr - residual_curr * (iterate_curr - iterate_prev) / (residual_curr - residual_prev)",
+   "termination": {
+    "kind": "convergence",
+    "quantity_role": "change",
+    "comparison": "lt",
+    "tolerance": 0.002,
+    "predicate_prose": "abs(y_next - y_curr) < 0.002",
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "rounding": "decimal-half-up",
+   "constants": {
+    "b": 2.1,
+    "z": 2.5,
+    "K": 6.619
+   },
+   "frame_relations": [
+    [
+     "A",
+     "(b + z * y) * y"
+    ],
+    [
+     "P",
+     "b + 2 * y * sqrt(1 + z ** 2)"
+    ],
+    [
+     "AR",
+     "A * (A / P) ** (2 / 3)"
+    ],
+    [
+     "g",
+     "round(AR) - K"
+    ]
+   ],
+   "symbol_precision": {
+    "y_prev": 4,
+    "y_curr": 4,
+    "y_next": 4,
+    "change": 4,
+    "g_prev": 3,
+    "g_curr": 3,
+    "y": 4,
+    "A": 3,
+    "P": 3,
+    "AR": 3,
+    "g": 3
+   },
+   "preamble_binding": {
+    "iterate_prev": {
+     "frame": 0,
+     "frame_role": "iterate"
+    },
+    "residual_prev": {
+     "frame": 0,
+     "frame_role": "residual"
+    },
+    "iterate_curr": {
+     "frame": 1,
+     "frame_role": "iterate"
+    },
+    "residual_curr": {
+     "frame": 1,
+     "frame_role": "residual"
+    }
+   },
+   "preamble_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_roles": {
+    "iterate": "y",
+    "residual": "g"
+   },
+   "element_symbols": [
+    "k",
+    "y_prev",
+    "g_prev",
+    "y_curr",
+    "g_curr",
+    "y_next",
+    "change",
+    "converged",
+    "evaluation"
+   ],
+   "carry": {
+    "y_prev": "y_curr",
+    "g_prev": "g_curr",
+    "y_curr": "y_next",
+    "g_curr": "evaluation.g"
+   },
+   "carry_notes": {},
+   "preamble": [
+    {
+     "y": 1.0,
+     "A": 4.6,
+     "P": 7.485,
+     "AR": 3.325,
+     "g": -3.294
+    },
+    {
+     "y": 1.5,
+     "A": 8.775,
+     "P": 10.178,
+     "AR": 7.949,
+     "g": 1.33
+    }
+   ],
+   "elements": [
+    {
+     "k": 1,
+     "y_prev": 1.0,
+     "g_prev": -3.294,
+     "y_curr": 1.5,
+     "g_curr": 1.33,
+     "y_next": 1.3562,
+     "change": 0.1438,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3562,
+      "A": 7.446,
+      "P": 9.403,
+      "AR": 6.373,
+      "g": -0.246
+     }
+    },
+    {
+     "k": 2,
+     "y_prev": 1.5,
+     "g_prev": 1.33,
+     "y_curr": 1.3562,
+     "g_curr": -0.246,
+     "y_next": 1.3786,
+     "change": 0.0224,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3786,
+      "A": 7.646,
+      "P": 9.524,
+      "AR": 6.605,
+      "g": -0.014
+     }
+    },
+    {
+     "k": 3,
+     "y_prev": 1.3562,
+     "g_prev": -0.246,
+     "y_curr": 1.3786,
+     "g_curr": -0.014,
+     "y_next": 1.38,
+     "change": 0.0014,
+     "converged": true,
+     "evaluation": null
+    }
+   ],
+   "result": {
+    "symbol": "yn",
+    "value": 1.38,
+    "unit": "m",
+    "dp": 3,
+    "from": "last.iterate_next"
+   }
+  },
+  "candidate": {
+   "schema_version": "1.5",
+   "node_type": "iteration",
+   "node_id": "t24_secant_normal_depth",
+   "cardinality": "incidental",
+   "roles": {
+    "index": "k",
+    "iterate_prev": "y_prev",
+    "iterate_curr": "y_curr",
+    "iterate_next": "y_next",
+    "residual_prev": "g_prev",
+    "residual_curr": "g_curr",
+    "change": "change",
+    "converged": "converged",
+    "evaluation": "evaluation"
+   },
+   "update_relation": "iterate_curr - residual_curr * (iterate_curr - iterate_prev) / (residual_curr - residual_prev)",
+   "termination": {
+    "kind": "convergence",
+    "quantity_role": "change",
+    "comparison": "lt",
+    "tolerance": 0.002,
+    "predicate_prose": "abs(y_next - y_curr) < 0.002",
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "rounding": "decimal-half-up",
+   "constants": {
+    "b": 2.1,
+    "z": 2.5,
+    "K": 6.619
+   },
+   "frame_relations": [
+    [
+     "A",
+     "(b + z * y) * y"
+    ],
+    [
+     "P",
+     "b + 2 * y * sqrt(1 + z ** 2)"
+    ],
+    [
+     "AR",
+     "A * (A / P) ** (2 / 3)"
+    ],
+    [
+     "g",
+     "round(AR) - K"
+    ]
+   ],
+   "symbol_precision": {
+    "y_prev": 4,
+    "y_curr": 4,
+    "y_next": 4,
+    "change": 4,
+    "g_prev": 3,
+    "g_curr": 3,
+    "y": 4,
+    "A": 3,
+    "P": 3,
+    "AR": 3,
+    "g": 3
+   },
+   "preamble_binding": {
+    "iterate_prev": {
+     "frame": 0,
+     "frame_role": "iterate"
+    },
+    "residual_prev": {
+     "frame": 0,
+     "frame_role": "residual"
+    },
+    "iterate_curr": {
+     "frame": 1,
+     "frame_role": "iterate"
+    },
+    "residual_curr": {
+     "frame": 1,
+     "frame_role": "residual"
+    }
+   },
+   "preamble_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_roles": {
+    "iterate": "y",
+    "residual": "g"
+   },
+   "element_symbols": [
+    "k",
+    "y_prev",
+    "g_prev",
+    "y_curr",
+    "g_curr",
+    "y_next",
+    "change",
+    "converged",
+    "evaluation"
+   ],
+   "carry": {
+    "y_prev": "y_curr",
+    "g_prev": "g_curr",
+    "y_curr": "y_next",
+    "g_curr": "evaluation.g"
+   },
+   "carry_notes": {},
+   "preamble": [
+    {
+     "y": 1.0,
+     "A": 4.6,
+     "P": 7.485,
+     "AR": 3.325,
+     "g": -3.294
+    },
+    {
+     "y": 1.5,
+     "A": 8.775,
+     "P": 10.178,
+     "AR": 7.949,
+     "g": 1.33
+    }
+   ],
+   "elements": [
+    {
+     "k": 1,
+     "y_prev": 1.0,
+     "g_prev": -3.294,
+     "y_curr": 1.5,
+     "g_curr": 1.33,
+     "y_next": 1.3562,
+     "change": 0.1438,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3562,
+      "A": 7.446,
+      "P": 9.403,
+      "AR": 6.373,
+      "g": -0.246
+     }
+    },
+    {
+     "k": 2,
+     "y_prev": 1.5,
+     "g_prev": 1.33,
+     "y_curr": 1.3562,
+     "g_curr": -0.246,
+     "y_next": 1.3786,
+     "change": 0.0224,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3786,
+      "A": 7.646,
+      "P": 9.524,
+      "AR": 6.605,
+      "g": -0.014
+     }
+    },
+    {
+     "k": 3,
+     "y_prev": 1.3562,
+     "g_prev": -0.246,
+     "y_curr": 1.3786,
+     "g_curr": -0.014,
+     "y_next": 1.38,
+     "change": 0.0014,
+     "converged": true,
+     "evaluation": null
+    }
+   ],
+   "result": {
+    "symbol": "yn",
+    "value": 1.3804999999999998,
+    "unit": "m",
+    "dp": 3,
+    "from": "last.iterate_next"
+   }
+  },
+  "expect_answer": "MATCH",
+  "expect_process": "MISMATCH",
+  "exercises": [
+   "7.1-tolerance-inclusive"
+  ],
+  "note": "answer credit granted at the inclusive boundary; process fails because the stated value is not the node's own derivation",
+  "finding": "F7-2"
+ },
+ {
+  "id": "C6-method-tolerance",
+  "gold": {
+   "schema_version": "1.5",
+   "node_type": "iteration",
+   "node_id": "t24_secant_normal_depth",
+   "cardinality": "incidental",
+   "roles": {
+    "index": "k",
+    "iterate_prev": "y_prev",
+    "iterate_curr": "y_curr",
+    "iterate_next": "y_next",
+    "residual_prev": "g_prev",
+    "residual_curr": "g_curr",
+    "change": "change",
+    "converged": "converged",
+    "evaluation": "evaluation"
+   },
+   "update_relation": "iterate_curr - residual_curr * (iterate_curr - iterate_prev) / (residual_curr - residual_prev)",
+   "termination": {
+    "kind": "convergence",
+    "quantity_role": "change",
+    "comparison": "lt",
+    "tolerance": 0.002,
+    "predicate_prose": "abs(y_next - y_curr) < 0.002",
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "rounding": "decimal-half-up",
+   "constants": {
+    "b": 2.1,
+    "z": 2.5,
+    "K": 6.619
+   },
+   "frame_relations": [
+    [
+     "A",
+     "(b + z * y) * y"
+    ],
+    [
+     "P",
+     "b + 2 * y * sqrt(1 + z ** 2)"
+    ],
+    [
+     "AR",
+     "A * (A / P) ** (2 / 3)"
+    ],
+    [
+     "g",
+     "round(AR) - K"
+    ]
+   ],
+   "symbol_precision": {
+    "y_prev": 4,
+    "y_curr": 4,
+    "y_next": 4,
+    "change": 4,
+    "g_prev": 3,
+    "g_curr": 3,
+    "y": 4,
+    "A": 3,
+    "P": 3,
+    "AR": 3,
+    "g": 3
+   },
+   "preamble_binding": {
+    "iterate_prev": {
+     "frame": 0,
+     "frame_role": "iterate"
+    },
+    "residual_prev": {
+     "frame": 0,
+     "frame_role": "residual"
+    },
+    "iterate_curr": {
+     "frame": 1,
+     "frame_role": "iterate"
+    },
+    "residual_curr": {
+     "frame": 1,
+     "frame_role": "residual"
+    }
+   },
+   "preamble_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_roles": {
+    "iterate": "y",
+    "residual": "g"
+   },
+   "element_symbols": [
+    "k",
+    "y_prev",
+    "g_prev",
+    "y_curr",
+    "g_curr",
+    "y_next",
+    "change",
+    "converged",
+    "evaluation"
+   ],
+   "carry": {
+    "y_prev": "y_curr",
+    "g_prev": "g_curr",
+    "y_curr": "y_next",
+    "g_curr": "evaluation.g"
+   },
+   "carry_notes": {},
+   "preamble": [
+    {
+     "y": 1.0,
+     "A": 4.6,
+     "P": 7.485,
+     "AR": 3.325,
+     "g": -3.294
+    },
+    {
+     "y": 1.5,
+     "A": 8.775,
+     "P": 10.178,
+     "AR": 7.949,
+     "g": 1.33
+    }
+   ],
+   "elements": [
+    {
+     "k": 1,
+     "y_prev": 1.0,
+     "g_prev": -3.294,
+     "y_curr": 1.5,
+     "g_curr": 1.33,
+     "y_next": 1.3562,
+     "change": 0.1438,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3562,
+      "A": 7.446,
+      "P": 9.403,
+      "AR": 6.373,
+      "g": -0.246
+     }
+    },
+    {
+     "k": 2,
+     "y_prev": 1.5,
+     "g_prev": 1.33,
+     "y_curr": 1.3562,
+     "g_curr": -0.246,
+     "y_next": 1.3786,
+     "change": 0.0224,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3786,
+      "A": 7.646,
+      "P": 9.524,
+      "AR": 6.605,
+      "g": -0.014
+     }
+    },
+    {
+     "k": 3,
+     "y_prev": 1.3562,
+     "g_prev": -0.246,
+     "y_curr": 1.3786,
+     "g_curr": -0.014,
+     "y_next": 1.38,
+     "change": 0.0014,
+     "converged": true,
+     "evaluation": null
+    }
+   ],
+   "result": {
+    "symbol": "yn",
+    "value": 1.38,
+    "unit": "m",
+    "dp": 3,
+    "from": "last.iterate_next"
+   }
+  },
+  "candidate": {
+   "schema_version": "1.5",
+   "node_type": "iteration",
+   "node_id": "t24_secant_normal_depth",
+   "cardinality": "incidental",
+   "roles": {
+    "index": "k",
+    "iterate_prev": "y_prev",
+    "iterate_curr": "y_curr",
+    "iterate_next": "y_next",
+    "residual_prev": "g_prev",
+    "residual_curr": "g_curr",
+    "change": "change",
+    "converged": "converged",
+    "evaluation": "evaluation"
+   },
+   "update_relation": "iterate_curr - residual_curr * (iterate_curr - iterate_prev) / (residual_curr - residual_prev)",
+   "termination": {
+    "kind": "convergence",
+    "quantity_role": "change",
+    "comparison": "lt",
+    "tolerance": 0.002,
+    "predicate_prose": "abs(y_next - y_curr) < 0.002",
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "rounding": "decimal-half-up",
+   "constants": {
+    "b": 2.1,
+    "z": 2.5,
+    "K": 6.619
+   },
+   "frame_relations": [
+    [
+     "A",
+     "(b + z * y) * y"
+    ],
+    [
+     "P",
+     "b + 2 * y * sqrt(1 + z ** 2)"
+    ],
+    [
+     "AR",
+     "A * (A / P) ** (2 / 3)"
+    ],
+    [
+     "g",
+     "round(AR) - K"
+    ]
+   ],
+   "symbol_precision": {
+    "y_prev": 4,
+    "y_curr": 4,
+    "y_next": 4,
+    "change": 4,
+    "g_prev": 3,
+    "g_curr": 3,
+    "y": 4,
+    "A": 3,
+    "P": 3,
+    "AR": 3,
+    "g": 3
+   },
+   "preamble_binding": {
+    "iterate_prev": {
+     "frame": 0,
+     "frame_role": "iterate"
+    },
+    "residual_prev": {
+     "frame": 0,
+     "frame_role": "residual"
+    },
+    "iterate_curr": {
+     "frame": 1,
+     "frame_role": "iterate"
+    },
+    "residual_curr": {
+     "frame": 1,
+     "frame_role": "residual"
+    }
+   },
+   "preamble_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_roles": {
+    "iterate": "y",
+    "residual": "g"
+   },
+   "element_symbols": [
+    "k",
+    "y_prev",
+    "g_prev",
+    "y_curr",
+    "g_curr",
+    "y_next",
+    "change",
+    "converged",
+    "evaluation"
+   ],
+   "carry": {
+    "y_prev": "y_curr",
+    "g_prev": "g_curr",
+    "y_curr": "y_next",
+    "g_curr": "evaluation.g"
+   },
+   "carry_notes": {},
+   "preamble": [
+    {
+     "y": 1.0,
+     "A": 4.6,
+     "P": 7.485,
+     "AR": 3.325,
+     "g": -3.294
+    },
+    {
+     "y": 1.5,
+     "A": 8.775,
+     "P": 10.178,
+     "AR": 7.949,
+     "g": 1.33
+    }
+   ],
+   "elements": [
+    {
+     "k": 1,
+     "y_prev": 1.0,
+     "g_prev": -3.294,
+     "y_curr": 1.5,
+     "g_curr": 1.33,
+     "y_next": 1.3562,
+     "change": 0.1438,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3562,
+      "A": 7.446,
+      "P": 9.403,
+      "AR": 6.373,
+      "g": -0.246
+     }
+    },
+    {
+     "k": 2,
+     "y_prev": 1.5,
+     "g_prev": 1.33,
+     "y_curr": 1.3562,
+     "g_curr": -0.246,
+     "y_next": 1.3786,
+     "change": 0.0224,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3786,
+      "A": 7.646,
+      "P": 9.524,
+      "AR": 6.605,
+      "g": -0.014
+     }
+    },
+    {
+     "k": 3,
+     "y_prev": 1.3562,
+     "g_prev": -0.246,
+     "y_curr": 1.3786,
+     "g_curr": -0.014,
+     "y_next": 1.38,
+     "change": 0.0014,
+     "converged": true,
+     "evaluation": null
+    }
+   ],
+   "result": {
+    "symbol": "yn",
+    "value": 1.381,
+    "unit": "m",
+    "dp": 3,
+    "from": "last.iterate_next"
+   }
+  },
+  "expect_answer": "MATCH",
+  "expect_process": "MISMATCH",
+  "exercises": [
+   "7.4-method-tolerance-governs"
+  ],
+  "note": "one display unit out, inside termination.tolerance, so S7.4 grants answer credit; a direct solver's trace is not an iteration node and a mutation cannot represent one",
+  "finding": "F7-3"
+ },
+ {
+  "id": "C7-preamble-differs",
+  "gold": {
+   "schema_version": "1.5",
+   "node_type": "iteration",
+   "node_id": "t24_secant_normal_depth",
+   "cardinality": "incidental",
+   "roles": {
+    "index": "k",
+    "iterate_prev": "y_prev",
+    "iterate_curr": "y_curr",
+    "iterate_next": "y_next",
+    "residual_prev": "g_prev",
+    "residual_curr": "g_curr",
+    "change": "change",
+    "converged": "converged",
+    "evaluation": "evaluation"
+   },
+   "update_relation": "iterate_curr - residual_curr * (iterate_curr - iterate_prev) / (residual_curr - residual_prev)",
+   "termination": {
+    "kind": "convergence",
+    "quantity_role": "change",
+    "comparison": "lt",
+    "tolerance": 0.002,
+    "predicate_prose": "abs(y_next - y_curr) < 0.002",
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "rounding": "decimal-half-up",
+   "constants": {
+    "b": 2.1,
+    "z": 2.5,
+    "K": 6.619
+   },
+   "frame_relations": [
+    [
+     "A",
+     "(b + z * y) * y"
+    ],
+    [
+     "P",
+     "b + 2 * y * sqrt(1 + z ** 2)"
+    ],
+    [
+     "AR",
+     "A * (A / P) ** (2 / 3)"
+    ],
+    [
+     "g",
+     "round(AR) - K"
+    ]
+   ],
+   "symbol_precision": {
+    "y_prev": 4,
+    "y_curr": 4,
+    "y_next": 4,
+    "change": 4,
+    "g_prev": 3,
+    "g_curr": 3,
+    "y": 4,
+    "A": 3,
+    "P": 3,
+    "AR": 3,
+    "g": 3
+   },
+   "preamble_binding": {
+    "iterate_prev": {
+     "frame": 0,
+     "frame_role": "iterate"
+    },
+    "residual_prev": {
+     "frame": 0,
+     "frame_role": "residual"
+    },
+    "iterate_curr": {
+     "frame": 1,
+     "frame_role": "iterate"
+    },
+    "residual_curr": {
+     "frame": 1,
+     "frame_role": "residual"
+    }
+   },
+   "preamble_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_roles": {
+    "iterate": "y",
+    "residual": "g"
+   },
+   "element_symbols": [
+    "k",
+    "y_prev",
+    "g_prev",
+    "y_curr",
+    "g_curr",
+    "y_next",
+    "change",
+    "converged",
+    "evaluation"
+   ],
+   "carry": {
+    "y_prev": "y_curr",
+    "g_prev": "g_curr",
+    "y_curr": "y_next",
+    "g_curr": "evaluation.g"
+   },
+   "carry_notes": {},
+   "preamble": [
+    {
+     "y": 1.0,
+     "A": 4.6,
+     "P": 7.485,
+     "AR": 3.325,
+     "g": -3.294
+    },
+    {
+     "y": 1.5,
+     "A": 8.775,
+     "P": 10.178,
+     "AR": 7.949,
+     "g": 1.33
+    }
+   ],
+   "elements": [
+    {
+     "k": 1,
+     "y_prev": 1.0,
+     "g_prev": -3.294,
+     "y_curr": 1.5,
+     "g_curr": 1.33,
+     "y_next": 1.3562,
+     "change": 0.1438,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3562,
+      "A": 7.446,
+      "P": 9.403,
+      "AR": 6.373,
+      "g": -0.246
+     }
+    },
+    {
+     "k": 2,
+     "y_prev": 1.5,
+     "g_prev": 1.33,
+     "y_curr": 1.3562,
+     "g_curr": -0.246,
+     "y_next": 1.3786,
+     "change": 0.0224,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3786,
+      "A": 7.646,
+      "P": 9.524,
+      "AR": 6.605,
+      "g": -0.014
+     }
+    },
+    {
+     "k": 3,
+     "y_prev": 1.3562,
+     "g_prev": -0.246,
+     "y_curr": 1.3786,
+     "g_curr": -0.014,
+     "y_next": 1.38,
+     "change": 0.0014,
+     "converged": true,
+     "evaluation": null
+    }
+   ],
+   "result": {
+    "symbol": "yn",
+    "value": 1.38,
+    "unit": "m",
+    "dp": 3,
+    "from": "last.iterate_next"
+   }
+  },
+  "candidate": {
+   "schema_version": "1.5",
+   "node_type": "iteration",
+   "node_id": "t24_secant_normal_depth",
+   "cardinality": "incidental",
+   "roles": {
+    "index": "k",
+    "iterate_prev": "y_prev",
+    "iterate_curr": "y_curr",
+    "iterate_next": "y_next",
+    "residual_prev": "g_prev",
+    "residual_curr": "g_curr",
+    "change": "change",
+    "converged": "converged",
+    "evaluation": "evaluation"
+   },
+   "update_relation": "iterate_curr - residual_curr * (iterate_curr - iterate_prev) / (residual_curr - residual_prev)",
+   "termination": {
+    "kind": "convergence",
+    "quantity_role": "change",
+    "comparison": "lt",
+    "tolerance": 0.002,
+    "predicate_prose": "abs(y_next - y_curr) < 0.002",
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "rounding": "decimal-half-up",
+   "constants": {
+    "b": 2.1,
+    "z": 2.5,
+    "K": 6.619
+   },
+   "frame_relations": [
+    [
+     "A",
+     "(b + z * y) * y"
+    ],
+    [
+     "P",
+     "b + 2 * y * sqrt(1 + z ** 2)"
+    ],
+    [
+     "AR",
+     "A * (A / P) ** (2 / 3)"
+    ],
+    [
+     "g",
+     "round(AR) - K"
+    ]
+   ],
+   "symbol_precision": {
+    "y_prev": 4,
+    "y_curr": 4,
+    "y_next": 4,
+    "change": 4,
+    "g_prev": 3,
+    "g_curr": 3,
+    "y": 4,
+    "A": 3,
+    "P": 3,
+    "AR": 3,
+    "g": 3
+   },
+   "preamble_binding": {
+    "iterate_prev": {
+     "frame": 0,
+     "frame_role": "iterate"
+    },
+    "residual_prev": {
+     "frame": 0,
+     "frame_role": "residual"
+    },
+    "iterate_curr": {
+     "frame": 1,
+     "frame_role": "iterate"
+    },
+    "residual_curr": {
+     "frame": 1,
+     "frame_role": "residual"
+    }
+   },
+   "preamble_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_roles": {
+    "iterate": "y",
+    "residual": "g"
+   },
+   "element_symbols": [
+    "k",
+    "y_prev",
+    "g_prev",
+    "y_curr",
+    "g_curr",
+    "y_next",
+    "change",
+    "converged",
+    "evaluation"
+   ],
+   "carry": {
+    "y_prev": "y_curr",
+    "g_prev": "g_curr",
+    "y_curr": "y_next",
+    "g_curr": "evaluation.g"
+   },
+   "carry_notes": {},
+   "preamble": [
+    {
+     "y": 1.25,
+     "A": 4.6,
+     "P": 7.485,
+     "AR": 3.325,
+     "g": -3.294
+    },
+    {
+     "y": 1.5,
+     "A": 8.775,
+     "P": 10.178,
+     "AR": 7.949,
+     "g": 1.33
+    }
+   ],
+   "elements": [
+    {
+     "k": 1,
+     "y_prev": 1.0,
+     "g_prev": -3.294,
+     "y_curr": 1.5,
+     "g_curr": 1.33,
+     "y_next": 1.3562,
+     "change": 0.1438,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3562,
+      "A": 7.446,
+      "P": 9.403,
+      "AR": 6.373,
+      "g": -0.246
+     }
+    },
+    {
+     "k": 2,
+     "y_prev": 1.5,
+     "g_prev": 1.33,
+     "y_curr": 1.3562,
+     "g_curr": -0.246,
+     "y_next": 1.3786,
+     "change": 0.0224,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3786,
+      "A": 7.646,
+      "P": 9.524,
+      "AR": 6.605,
+      "g": -0.014
+     }
+    },
+    {
+     "k": 3,
+     "y_prev": 1.3562,
+     "g_prev": -0.246,
+     "y_curr": 1.3786,
+     "g_curr": -0.014,
+     "y_next": 1.38,
+     "change": 0.0014,
+     "converged": true,
+     "evaluation": null
+    }
+   ],
+   "result": {
+    "symbol": "yn",
+    "value": 1.38,
+    "unit": "m",
+    "dp": 3,
+    "from": "last.iterate_next"
+   }
+  },
+  "expect_answer": "MATCH",
+  "expect_process": "MISMATCH",
+  "exercises": [
+   "7.2-preamble-differs"
+  ],
+  "note": "started from a different bracket; solved a different question",
+  "finding": null
+ },
+ {
+  "id": "C8-budget-overrun",
+  "gold": {
+   "schema_version": "1.5",
+   "node_type": "iteration",
+   "node_id": "t24_secant_normal_depth",
+   "cardinality": "incidental",
+   "roles": {
+    "index": "k",
+    "iterate_prev": "y_prev",
+    "iterate_curr": "y_curr",
+    "iterate_next": "y_next",
+    "residual_prev": "g_prev",
+    "residual_curr": "g_curr",
+    "change": "change",
+    "converged": "converged",
+    "evaluation": "evaluation"
+   },
+   "update_relation": "iterate_curr - residual_curr * (iterate_curr - iterate_prev) / (residual_curr - residual_prev)",
+   "termination": {
+    "kind": "convergence",
+    "quantity_role": "change",
+    "comparison": "lt",
+    "tolerance": 0.002,
+    "predicate_prose": "abs(y_next - y_curr) < 0.002",
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "rounding": "decimal-half-up",
+   "constants": {
+    "b": 2.1,
+    "z": 2.5,
+    "K": 6.619
+   },
+   "frame_relations": [
+    [
+     "A",
+     "(b + z * y) * y"
+    ],
+    [
+     "P",
+     "b + 2 * y * sqrt(1 + z ** 2)"
+    ],
+    [
+     "AR",
+     "A * (A / P) ** (2 / 3)"
+    ],
+    [
+     "g",
+     "round(AR) - K"
+    ]
+   ],
+   "symbol_precision": {
+    "y_prev": 4,
+    "y_curr": 4,
+    "y_next": 4,
+    "change": 4,
+    "g_prev": 3,
+    "g_curr": 3,
+    "y": 4,
+    "A": 3,
+    "P": 3,
+    "AR": 3,
+    "g": 3
+   },
+   "preamble_binding": {
+    "iterate_prev": {
+     "frame": 0,
+     "frame_role": "iterate"
+    },
+    "residual_prev": {
+     "frame": 0,
+     "frame_role": "residual"
+    },
+    "iterate_curr": {
+     "frame": 1,
+     "frame_role": "iterate"
+    },
+    "residual_curr": {
+     "frame": 1,
+     "frame_role": "residual"
+    }
+   },
+   "preamble_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_roles": {
+    "iterate": "y",
+    "residual": "g"
+   },
+   "element_symbols": [
+    "k",
+    "y_prev",
+    "g_prev",
+    "y_curr",
+    "g_curr",
+    "y_next",
+    "change",
+    "converged",
+    "evaluation"
+   ],
+   "carry": {
+    "y_prev": "y_curr",
+    "g_prev": "g_curr",
+    "y_curr": "y_next",
+    "g_curr": "evaluation.g"
+   },
+   "carry_notes": {},
+   "preamble": [
+    {
+     "y": 1.0,
+     "A": 4.6,
+     "P": 7.485,
+     "AR": 3.325,
+     "g": -3.294
+    },
+    {
+     "y": 1.5,
+     "A": 8.775,
+     "P": 10.178,
+     "AR": 7.949,
+     "g": 1.33
+    }
+   ],
+   "elements": [
+    {
+     "k": 1,
+     "y_prev": 1.0,
+     "g_prev": -3.294,
+     "y_curr": 1.5,
+     "g_curr": 1.33,
+     "y_next": 1.3562,
+     "change": 0.1438,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3562,
+      "A": 7.446,
+      "P": 9.403,
+      "AR": 6.373,
+      "g": -0.246
+     }
+    },
+    {
+     "k": 2,
+     "y_prev": 1.5,
+     "g_prev": 1.33,
+     "y_curr": 1.3562,
+     "g_curr": -0.246,
+     "y_next": 1.3786,
+     "change": 0.0224,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3786,
+      "A": 7.646,
+      "P": 9.524,
+      "AR": 6.605,
+      "g": -0.014
+     }
+    },
+    {
+     "k": 3,
+     "y_prev": 1.3562,
+     "g_prev": -0.246,
+     "y_curr": 1.3786,
+     "g_curr": -0.014,
+     "y_next": 1.38,
+     "change": 0.0014,
+     "converged": true,
+     "evaluation": null
+    }
+   ],
+   "result": {
+    "symbol": "yn",
+    "value": 1.38,
+    "unit": "m",
+    "dp": 3,
+    "from": "last.iterate_next"
+   }
+  },
+  "candidate": {
+   "schema_version": "1.5",
+   "node_type": "iteration",
+   "node_id": "t24_secant_normal_depth",
+   "cardinality": "incidental",
+   "roles": {
+    "index": "k",
+    "iterate_prev": "y_prev",
+    "iterate_curr": "y_curr",
+    "iterate_next": "y_next",
+    "residual_prev": "g_prev",
+    "residual_curr": "g_curr",
+    "change": "change",
+    "converged": "converged",
+    "evaluation": "evaluation"
+   },
+   "update_relation": "iterate_curr - residual_curr * (iterate_curr - iterate_prev) / (residual_curr - residual_prev)",
+   "termination": {
+    "kind": "convergence",
+    "quantity_role": "change",
+    "comparison": "lt",
+    "tolerance": 0.002,
+    "predicate_prose": "abs(y_next - y_curr) < 0.002",
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "rounding": "decimal-half-up",
+   "constants": {
+    "b": 2.1,
+    "z": 2.5,
+    "K": 6.619
+   },
+   "frame_relations": [
+    [
+     "A",
+     "(b + z * y) * y"
+    ],
+    [
+     "P",
+     "b + 2 * y * sqrt(1 + z ** 2)"
+    ],
+    [
+     "AR",
+     "A * (A / P) ** (2 / 3)"
+    ],
+    [
+     "g",
+     "round(AR) - K"
+    ]
+   ],
+   "symbol_precision": {
+    "y_prev": 4,
+    "y_curr": 4,
+    "y_next": 4,
+    "change": 4,
+    "g_prev": 3,
+    "g_curr": 3,
+    "y": 4,
+    "A": 3,
+    "P": 3,
+    "AR": 3,
+    "g": 3
+   },
+   "preamble_binding": {
+    "iterate_prev": {
+     "frame": 0,
+     "frame_role": "iterate"
+    },
+    "residual_prev": {
+     "frame": 0,
+     "frame_role": "residual"
+    },
+    "iterate_curr": {
+     "frame": 1,
+     "frame_role": "iterate"
+    },
+    "residual_curr": {
+     "frame": 1,
+     "frame_role": "residual"
+    }
+   },
+   "preamble_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_roles": {
+    "iterate": "y",
+    "residual": "g"
+   },
+   "element_symbols": [
+    "k",
+    "y_prev",
+    "g_prev",
+    "y_curr",
+    "g_curr",
+    "y_next",
+    "change",
+    "converged",
+    "evaluation"
+   ],
+   "carry": {
+    "y_prev": "y_curr",
+    "g_prev": "g_curr",
+    "y_curr": "y_next",
+    "g_curr": "evaluation.g"
+   },
+   "carry_notes": {},
+   "preamble": [
+    {
+     "y": 1.0,
+     "A": 4.6,
+     "P": 7.485,
+     "AR": 3.325,
+     "g": -3.294
+    },
+    {
+     "y": 1.5,
+     "A": 8.775,
+     "P": 10.178,
+     "AR": 7.949,
+     "g": 1.33
+    }
+   ],
+   "elements": [
+    {
+     "k": 1,
+     "y_prev": 1.0,
+     "g_prev": -3.294,
+     "y_curr": 1.5,
+     "g_curr": 1.33,
+     "y_next": 1.3562,
+     "change": 0.1438,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3562,
+      "A": 7.446,
+      "P": 9.403,
+      "AR": 6.373,
+      "g": -0.246
+     }
+    },
+    {
+     "k": 2,
+     "y_prev": 1.5,
+     "g_prev": 1.33,
+     "y_curr": 1.3562,
+     "g_curr": -0.246,
+     "y_next": 1.3786,
+     "change": 0.0224,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3786,
+      "A": 7.646,
+      "P": 9.524,
+      "AR": 6.605,
+      "g": -0.014
+     }
+    },
+    {
+     "k": 3,
+     "y_prev": 1.3562,
+     "g_prev": -0.246,
+     "y_curr": 1.3786,
+     "g_curr": -0.014,
+     "y_next": 1.38,
+     "change": 0.0014,
+     "converged": false,
+     "evaluation": {
+      "y": 1.38,
+      "A": 7.659,
+      "P": 9.532,
+      "AR": 6.62,
+      "g": 0.001
+     }
+    },
+    {
+     "k": 4,
+     "y_prev": 1.3786,
+     "g_prev": -0.014,
+     "y_curr": 1.38,
+     "g_curr": 0.001,
+     "y_next": 1.3799,
+     "change": 0.0001,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3799,
+      "A": 7.658,
+      "P": 9.531,
+      "AR": 6.619,
+      "g": 0.0
+     }
+    },
+    {
+     "k": 5,
+     "y_prev": 1.38,
+     "g_prev": 0.001,
+     "y_curr": 1.3799,
+     "g_curr": 0.0,
+     "y_next": 1.3799,
+     "change": 0.0,
+     "converged": true,
+     "evaluation": {
+      "y": 1.3799,
+      "A": 7.658,
+      "P": 9.531,
+      "AR": 6.619,
+      "g": 0.0
+     }
+    }
+   ],
+   "result": {
+    "symbol": "yn",
+    "value": 1.38,
+    "unit": "m",
+    "dp": 3,
+    "from": "last.iterate_next"
+   }
+  },
+  "expect_answer": "MATCH",
+  "expect_process": "MISMATCH",
+  "exercises": [
+   "7.2-budget-overrun-reported"
+  ],
+  "note": "the overrun itself is only observed, as 7.2 requires; the trace is still rejected at 4.3.3 for the same reason as C1",
+  "finding": "F7-1"
+ },
+ {
+  "id": "C9-candidate-widens-tolerance",
+  "gold": {
+   "schema_version": "1.5",
+   "node_type": "iteration",
+   "node_id": "t24_secant_normal_depth",
+   "cardinality": "incidental",
+   "roles": {
+    "index": "k",
+    "iterate_prev": "y_prev",
+    "iterate_curr": "y_curr",
+    "iterate_next": "y_next",
+    "residual_prev": "g_prev",
+    "residual_curr": "g_curr",
+    "change": "change",
+    "converged": "converged",
+    "evaluation": "evaluation"
+   },
+   "update_relation": "iterate_curr - residual_curr * (iterate_curr - iterate_prev) / (residual_curr - residual_prev)",
+   "termination": {
+    "kind": "convergence",
+    "quantity_role": "change",
+    "comparison": "lt",
+    "tolerance": 0.002,
+    "predicate_prose": "abs(y_next - y_curr) < 0.002",
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "rounding": "decimal-half-up",
+   "constants": {
+    "b": 2.1,
+    "z": 2.5,
+    "K": 6.619
+   },
+   "frame_relations": [
+    [
+     "A",
+     "(b + z * y) * y"
+    ],
+    [
+     "P",
+     "b + 2 * y * sqrt(1 + z ** 2)"
+    ],
+    [
+     "AR",
+     "A * (A / P) ** (2 / 3)"
+    ],
+    [
+     "g",
+     "round(AR) - K"
+    ]
+   ],
+   "symbol_precision": {
+    "y_prev": 4,
+    "y_curr": 4,
+    "y_next": 4,
+    "change": 4,
+    "g_prev": 3,
+    "g_curr": 3,
+    "y": 4,
+    "A": 3,
+    "P": 3,
+    "AR": 3,
+    "g": 3
+   },
+   "preamble_binding": {
+    "iterate_prev": {
+     "frame": 0,
+     "frame_role": "iterate"
+    },
+    "residual_prev": {
+     "frame": 0,
+     "frame_role": "residual"
+    },
+    "iterate_curr": {
+     "frame": 1,
+     "frame_role": "iterate"
+    },
+    "residual_curr": {
+     "frame": 1,
+     "frame_role": "residual"
+    }
+   },
+   "preamble_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_roles": {
+    "iterate": "y",
+    "residual": "g"
+   },
+   "element_symbols": [
+    "k",
+    "y_prev",
+    "g_prev",
+    "y_curr",
+    "g_curr",
+    "y_next",
+    "change",
+    "converged",
+    "evaluation"
+   ],
+   "carry": {
+    "y_prev": "y_curr",
+    "g_prev": "g_curr",
+    "y_curr": "y_next",
+    "g_curr": "evaluation.g"
+   },
+   "carry_notes": {},
+   "preamble": [
+    {
+     "y": 1.0,
+     "A": 4.6,
+     "P": 7.485,
+     "AR": 3.325,
+     "g": -3.294
+    },
+    {
+     "y": 1.5,
+     "A": 8.775,
+     "P": 10.178,
+     "AR": 7.949,
+     "g": 1.33
+    }
+   ],
+   "elements": [
+    {
+     "k": 1,
+     "y_prev": 1.0,
+     "g_prev": -3.294,
+     "y_curr": 1.5,
+     "g_curr": 1.33,
+     "y_next": 1.3562,
+     "change": 0.1438,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3562,
+      "A": 7.446,
+      "P": 9.403,
+      "AR": 6.373,
+      "g": -0.246
+     }
+    },
+    {
+     "k": 2,
+     "y_prev": 1.5,
+     "g_prev": 1.33,
+     "y_curr": 1.3562,
+     "g_curr": -0.246,
+     "y_next": 1.3786,
+     "change": 0.0224,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3786,
+      "A": 7.646,
+      "P": 9.524,
+      "AR": 6.605,
+      "g": -0.014
+     }
+    },
+    {
+     "k": 3,
+     "y_prev": 1.3562,
+     "g_prev": -0.246,
+     "y_curr": 1.3786,
+     "g_curr": -0.014,
+     "y_next": 1.38,
+     "change": 0.0014,
+     "converged": true,
+     "evaluation": null
+    }
+   ],
+   "result": {
+    "symbol": "yn",
+    "value": 1.38,
+    "unit": "m",
+    "dp": 3,
+    "from": "last.iterate_next"
+   }
+  },
+  "candidate": {
+   "schema_version": "1.5",
+   "node_type": "iteration",
+   "node_id": "t24_secant_normal_depth",
+   "cardinality": "incidental",
+   "roles": {
+    "index": "k",
+    "iterate_prev": "y_prev",
+    "iterate_curr": "y_curr",
+    "iterate_next": "y_next",
+    "residual_prev": "g_prev",
+    "residual_curr": "g_curr",
+    "change": "change",
+    "converged": "converged",
+    "evaluation": "evaluation"
+   },
+   "update_relation": "iterate_curr - residual_curr * (iterate_curr - iterate_prev) / (residual_curr - residual_prev)",
+   "termination": {
+    "kind": "convergence",
+    "quantity_role": "change",
+    "comparison": "lt",
+    "tolerance": 0.002,
+    "predicate_prose": "abs(y_next - y_curr) < 0.002",
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "rounding": "decimal-half-up",
+   "constants": {
+    "b": 2.1,
+    "z": 2.5,
+    "K": 6.619
+   },
+   "frame_relations": [
+    [
+     "A",
+     "(b + z * y) * y"
+    ],
+    [
+     "P",
+     "b + 2 * y * sqrt(1 + z ** 2)"
+    ],
+    [
+     "AR",
+     "A * (A / P) ** (2 / 3)"
+    ],
+    [
+     "g",
+     "round(AR) - K"
+    ]
+   ],
+   "symbol_precision": {
+    "y_prev": 4,
+    "y_curr": 4,
+    "y_next": 1,
+    "change": 4,
+    "g_prev": 3,
+    "g_curr": 3,
+    "y": 4,
+    "A": 3,
+    "P": 3,
+    "AR": 3,
+    "g": 3
+   },
+   "preamble_binding": {
+    "iterate_prev": {
+     "frame": 0,
+     "frame_role": "iterate"
+    },
+    "residual_prev": {
+     "frame": 0,
+     "frame_role": "residual"
+    },
+    "iterate_curr": {
+     "frame": 1,
+     "frame_role": "iterate"
+    },
+    "residual_curr": {
+     "frame": 1,
+     "frame_role": "residual"
+    }
+   },
+   "preamble_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_roles": {
+    "iterate": "y",
+    "residual": "g"
+   },
+   "element_symbols": [
+    "k",
+    "y_prev",
+    "g_prev",
+    "y_curr",
+    "g_curr",
+    "y_next",
+    "change",
+    "converged",
+    "evaluation"
+   ],
+   "carry": {
+    "y_prev": "y_curr",
+    "g_prev": "g_curr",
+    "y_curr": "y_next",
+    "g_curr": "evaluation.g"
+   },
+   "carry_notes": {},
+   "preamble": [
+    {
+     "y": 1.0,
+     "A": 4.6,
+     "P": 7.485,
+     "AR": 3.325,
+     "g": -3.294
+    },
+    {
+     "y": 1.5,
+     "A": 8.775,
+     "P": 10.178,
+     "AR": 7.949,
+     "g": 1.33
+    }
+   ],
+   "elements": [
+    {
+     "k": 1,
+     "y_prev": 1.0,
+     "g_prev": -3.294,
+     "y_curr": 1.5,
+     "g_curr": 1.33,
+     "y_next": 1.3562,
+     "change": 0.1438,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3562,
+      "A": 7.446,
+      "P": 9.403,
+      "AR": 6.373,
+      "g": -0.246
+     }
+    },
+    {
+     "k": 2,
+     "y_prev": 1.5,
+     "g_prev": 1.33,
+     "y_curr": 1.3562,
+     "g_curr": -0.246,
+     "y_next": 1.3786,
+     "change": 0.0224,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3786,
+      "A": 7.646,
+      "P": 9.524,
+      "AR": 6.605,
+      "g": -0.014
+     }
+    },
+    {
+     "k": 3,
+     "y_prev": 1.3562,
+     "g_prev": -0.246,
+     "y_curr": 1.3786,
+     "g_curr": -0.014,
+     "y_next": 1.38,
+     "change": 0.0014,
+     "converged": true,
+     "evaluation": null
+    }
+   ],
+   "result": {
+    "symbol": "yn",
+    "value": 1.42,
+    "unit": "m",
+    "dp": 1,
+    "from": "last.iterate_next"
+   }
+  },
+  "expect_answer": "MISMATCH",
+  "expect_process": "MISMATCH",
+  "exercises": [
+   "7.1-gold-precision-governs"
+  ],
+  "note": "candidate declares dp=1 and answers 0.04 out; GOLD's dp=3 governs, so the answer is rejected -- the clause Reviewer D2 asked to be stated explicitly, now exercised",
+  "finding": null
+ },
+ {
+  "id": "C10-cardinality-mismatch",
+  "gold": {
+   "schema_version": "1.4",
+   "node_type": "decision",
+   "node_id": "t19_greedy_station_assignment",
+   "cardinality": "answer_bearing",
+   "cardinality_symbol": "n",
+   "termination": {
+    "kind": "exhaustion",
+    "scope": "cumulative",
+    "accumulator_role": "committed",
+    "predicate_prose": "every task in `universe` has been assigned to exactly one element",
+    "universe": [
+     "a",
+     "b",
+     "c",
+     "d",
+     "e"
+    ],
+    "precedences": {
+     "a": [],
+     "b": [
+      "a"
+     ],
+     "c": [
+      "a"
+     ],
+     "d": [
+      "b",
+      "c"
+     ],
+     "e": [
+      "d"
+     ]
+    },
+    "item_measures": {
+     "a": 64,
+     "b": 68,
+     "c": 20,
+     "d": 48,
+     "e": 80
+    },
+    "budget": 147,
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "roles": {
+    "index": "station_id",
+    "budget_total": "capacity",
+    "budget_initial": "remaining_initial",
+    "trials": "trials",
+    "committed": "assigned",
+    "budget_final": "remaining_final"
+   },
+   "trial_roles": {
+    "candidates": "eligible",
+    "chosen": "chosen",
+    "budget_after": "remaining_after",
+    "closes": "closes"
+   },
+   "candidate_roles": {
+    "item": "task",
+    "measure": "duration",
+    "admissible": "fits"
+   },
+   "selection": {
+    "filter": "admissible",
+    "filter_relation": "measure <= budget_before",
+    "criterion": "measure",
+    "objective": "max",
+    "tie_break": "universe_order"
+   },
+   "rule": "among unassigned tasks whose predecessors are all assigned AND whose duration fits the remaining time, take the longest; ties by _T19_ORDER position; when none fits, close the station",
+   "rounding": "decimal-half-up",
+   "symbol_precision": {
+    "capacity": 0,
+    "remaining_initial": 0,
+    "remaining_final": 0,
+    "remaining_after": 0,
+    "duration": 0,
+    "station_id": 0
+   },
+   "element_symbols": [
+    "station_id",
+    "capacity",
+    "remaining_initial",
+    "trials",
+    "assigned",
+    "remaining_final"
+   ],
+   "trial_symbols": [
+    "eligible",
+    "chosen",
+    "remaining_after",
+    "closes"
+   ],
+   "eligible_symbols": [
+    "task",
+    "duration",
+    "fits"
+   ],
+   "carry": {},
+   "carry_notes": {
+    "assigned": "union of every element's assigned",
+    "remaining_initial": "capacity (reset each element)"
+   },
+   "elements": [
+    {
+     "station_id": 1,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "a",
+         "duration": 64,
+         "fits": true
+        }
+       ],
+       "chosen": "a",
+       "remaining_after": 83,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "b",
+         "duration": 68,
+         "fits": true
+        },
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": true
+        }
+       ],
+       "chosen": "b",
+       "remaining_after": 15,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": false
+        }
+       ],
+       "chosen": null,
+       "remaining_after": 15,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "a",
+      "b"
+     ],
+     "remaining_final": 15
+    },
+    {
+     "station_id": 2,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": true
+        }
+       ],
+       "chosen": "c",
+       "remaining_after": 127,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "d",
+         "duration": 48,
+         "fits": true
+        }
+       ],
+       "chosen": "d",
+       "remaining_after": 79,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "e",
+         "duration": 80,
+         "fits": false
+        }
+       ],
+       "chosen": null,
+       "remaining_after": 79,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "c",
+      "d"
+     ],
+     "remaining_final": 79
+    },
+    {
+     "station_id": 3,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "e",
+         "duration": 80,
+         "fits": true
+        }
+       ],
+       "chosen": "e",
+       "remaining_after": 67,
+       "closes": false
+      },
+      {
+       "eligible": [],
+       "chosen": null,
+       "remaining_after": 67,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "e"
+     ],
+     "remaining_final": 67
+    }
+   ],
+   "result": {
+    "symbol": "n",
+    "value": 3,
+    "dp": 0,
+    "from": "len(elements)"
+   }
+  },
+  "candidate": {
+   "schema_version": "1.4",
+   "node_type": "decision",
+   "node_id": "t19_greedy_station_assignment",
+   "cardinality": "answer_bearing",
+   "cardinality_symbol": "n",
+   "termination": {
+    "kind": "exhaustion",
+    "scope": "cumulative",
+    "accumulator_role": "committed",
+    "predicate_prose": "every task in `universe` has been assigned to exactly one element",
+    "universe": [
+     "a",
+     "b",
+     "c",
+     "d",
+     "e"
+    ],
+    "precedences": {
+     "a": [],
+     "b": [
+      "a"
+     ],
+     "c": [
+      "a"
+     ],
+     "d": [
+      "b",
+      "c"
+     ],
+     "e": [
+      "d"
+     ]
+    },
+    "item_measures": {
+     "a": 64,
+     "b": 68,
+     "c": 20,
+     "d": 48,
+     "e": 80
+    },
+    "budget": 147,
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "roles": {
+    "index": "station_id",
+    "budget_total": "capacity",
+    "budget_initial": "remaining_initial",
+    "trials": "trials",
+    "committed": "assigned",
+    "budget_final": "remaining_final"
+   },
+   "trial_roles": {
+    "candidates": "eligible",
+    "chosen": "chosen",
+    "budget_after": "remaining_after",
+    "closes": "closes"
+   },
+   "candidate_roles": {
+    "item": "task",
+    "measure": "duration",
+    "admissible": "fits"
+   },
+   "selection": {
+    "filter": "admissible",
+    "filter_relation": "measure <= budget_before",
+    "criterion": "measure",
+    "objective": "max",
+    "tie_break": "universe_order"
+   },
+   "rule": "among unassigned tasks whose predecessors are all assigned AND whose duration fits the remaining time, take the longest; ties by _T19_ORDER position; when none fits, close the station",
+   "rounding": "decimal-half-up",
+   "symbol_precision": {
+    "capacity": 0,
+    "remaining_initial": 0,
+    "remaining_final": 0,
+    "remaining_after": 0,
+    "duration": 0,
+    "station_id": 0
+   },
+   "element_symbols": [
+    "station_id",
+    "capacity",
+    "remaining_initial",
+    "trials",
+    "assigned",
+    "remaining_final"
+   ],
+   "trial_symbols": [
+    "eligible",
+    "chosen",
+    "remaining_after",
+    "closes"
+   ],
+   "eligible_symbols": [
+    "task",
+    "duration",
+    "fits"
+   ],
+   "carry": {},
+   "carry_notes": {
+    "assigned": "union of every element's assigned",
+    "remaining_initial": "capacity (reset each element)"
+   },
+   "elements": [
+    {
+     "station_id": 1,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "a",
+         "duration": 64,
+         "fits": true
+        }
+       ],
+       "chosen": "a",
+       "remaining_after": 83,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "b",
+         "duration": 68,
+         "fits": true
+        },
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": true
+        }
+       ],
+       "chosen": "b",
+       "remaining_after": 15,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": false
+        }
+       ],
+       "chosen": null,
+       "remaining_after": 15,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "a",
+      "b"
+     ],
+     "remaining_final": 15
+    },
+    {
+     "station_id": 2,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": true
+        }
+       ],
+       "chosen": "c",
+       "remaining_after": 127,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "d",
+         "duration": 48,
+         "fits": true
+        }
+       ],
+       "chosen": "d",
+       "remaining_after": 79,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "e",
+         "duration": 80,
+         "fits": false
+        }
+       ],
+       "chosen": null,
+       "remaining_after": 79,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "c",
+      "d"
+     ],
+     "remaining_final": 79
+    }
+   ],
+   "result": {
+    "symbol": "n",
+    "value": 3,
+    "dp": 0,
+    "from": "len(elements)"
+   }
+  },
+  "expect_answer": "MISMATCH",
+  "expect_process": "MISMATCH",
+  "exercises": [
+   "7.3-cardinality-mismatch"
+  ],
+  "note": "one fewer station; n is the answer, so the answer is wrong",
+  "finding": null
+ },
+ {
+  "id": "C11-same-n-different-packing",
+  "gold": {
+   "schema_version": "1.4",
+   "node_type": "decision",
+   "node_id": "t19_greedy_station_assignment",
+   "cardinality": "answer_bearing",
+   "cardinality_symbol": "n",
+   "termination": {
+    "kind": "exhaustion",
+    "scope": "cumulative",
+    "accumulator_role": "committed",
+    "predicate_prose": "every task in `universe` has been assigned to exactly one element",
+    "universe": [
+     "a",
+     "b",
+     "c",
+     "d",
+     "e"
+    ],
+    "precedences": {
+     "a": [],
+     "b": [
+      "a"
+     ],
+     "c": [
+      "a"
+     ],
+     "d": [
+      "b",
+      "c"
+     ],
+     "e": [
+      "d"
+     ]
+    },
+    "item_measures": {
+     "a": 64,
+     "b": 68,
+     "c": 20,
+     "d": 48,
+     "e": 80
+    },
+    "budget": 147,
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "roles": {
+    "index": "station_id",
+    "budget_total": "capacity",
+    "budget_initial": "remaining_initial",
+    "trials": "trials",
+    "committed": "assigned",
+    "budget_final": "remaining_final"
+   },
+   "trial_roles": {
+    "candidates": "eligible",
+    "chosen": "chosen",
+    "budget_after": "remaining_after",
+    "closes": "closes"
+   },
+   "candidate_roles": {
+    "item": "task",
+    "measure": "duration",
+    "admissible": "fits"
+   },
+   "selection": {
+    "filter": "admissible",
+    "filter_relation": "measure <= budget_before",
+    "criterion": "measure",
+    "objective": "max",
+    "tie_break": "universe_order"
+   },
+   "rule": "among unassigned tasks whose predecessors are all assigned AND whose duration fits the remaining time, take the longest; ties by _T19_ORDER position; when none fits, close the station",
+   "rounding": "decimal-half-up",
+   "symbol_precision": {
+    "capacity": 0,
+    "remaining_initial": 0,
+    "remaining_final": 0,
+    "remaining_after": 0,
+    "duration": 0,
+    "station_id": 0
+   },
+   "element_symbols": [
+    "station_id",
+    "capacity",
+    "remaining_initial",
+    "trials",
+    "assigned",
+    "remaining_final"
+   ],
+   "trial_symbols": [
+    "eligible",
+    "chosen",
+    "remaining_after",
+    "closes"
+   ],
+   "eligible_symbols": [
+    "task",
+    "duration",
+    "fits"
+   ],
+   "carry": {},
+   "carry_notes": {
+    "assigned": "union of every element's assigned",
+    "remaining_initial": "capacity (reset each element)"
+   },
+   "elements": [
+    {
+     "station_id": 1,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "a",
+         "duration": 64,
+         "fits": true
+        }
+       ],
+       "chosen": "a",
+       "remaining_after": 83,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "b",
+         "duration": 68,
+         "fits": true
+        },
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": true
+        }
+       ],
+       "chosen": "b",
+       "remaining_after": 15,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": false
+        }
+       ],
+       "chosen": null,
+       "remaining_after": 15,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "a",
+      "b"
+     ],
+     "remaining_final": 15
+    },
+    {
+     "station_id": 2,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": true
+        }
+       ],
+       "chosen": "c",
+       "remaining_after": 127,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "d",
+         "duration": 48,
+         "fits": true
+        }
+       ],
+       "chosen": "d",
+       "remaining_after": 79,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "e",
+         "duration": 80,
+         "fits": false
+        }
+       ],
+       "chosen": null,
+       "remaining_after": 79,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "c",
+      "d"
+     ],
+     "remaining_final": 79
+    },
+    {
+     "station_id": 3,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "e",
+         "duration": 80,
+         "fits": true
+        }
+       ],
+       "chosen": "e",
+       "remaining_after": 67,
+       "closes": false
+      },
+      {
+       "eligible": [],
+       "chosen": null,
+       "remaining_after": 67,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "e"
+     ],
+     "remaining_final": 67
+    }
+   ],
+   "result": {
+    "symbol": "n",
+    "value": 3,
+    "dp": 0,
+    "from": "len(elements)"
+   }
+  },
+  "candidate": {
+   "schema_version": "1.4",
+   "node_type": "decision",
+   "node_id": "t19_greedy_station_assignment",
+   "cardinality": "answer_bearing",
+   "cardinality_symbol": "n",
+   "termination": {
+    "kind": "exhaustion",
+    "scope": "cumulative",
+    "accumulator_role": "committed",
+    "predicate_prose": "every task in `universe` has been assigned to exactly one element",
+    "universe": [
+     "a",
+     "b",
+     "c",
+     "d",
+     "e"
+    ],
+    "precedences": {
+     "a": [],
+     "b": [
+      "a"
+     ],
+     "c": [
+      "a"
+     ],
+     "d": [
+      "b",
+      "c"
+     ],
+     "e": [
+      "d"
+     ]
+    },
+    "item_measures": {
+     "a": 64,
+     "b": 68,
+     "c": 20,
+     "d": 48,
+     "e": 80
+    },
+    "budget": 147,
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "roles": {
+    "index": "station_id",
+    "budget_total": "capacity",
+    "budget_initial": "remaining_initial",
+    "trials": "trials",
+    "committed": "assigned",
+    "budget_final": "remaining_final"
+   },
+   "trial_roles": {
+    "candidates": "eligible",
+    "chosen": "chosen",
+    "budget_after": "remaining_after",
+    "closes": "closes"
+   },
+   "candidate_roles": {
+    "item": "task",
+    "measure": "duration",
+    "admissible": "fits"
+   },
+   "selection": {
+    "filter": "admissible",
+    "filter_relation": "measure <= budget_before",
+    "criterion": "measure",
+    "objective": "max",
+    "tie_break": "universe_order"
+   },
+   "rule": "among unassigned tasks whose predecessors are all assigned AND whose duration fits the remaining time, take the longest; ties by _T19_ORDER position; when none fits, close the station",
+   "rounding": "decimal-half-up",
+   "symbol_precision": {
+    "capacity": 0,
+    "remaining_initial": 0,
+    "remaining_final": 0,
+    "remaining_after": 0,
+    "duration": 0,
+    "station_id": 0
+   },
+   "element_symbols": [
+    "station_id",
+    "capacity",
+    "remaining_initial",
+    "trials",
+    "assigned",
+    "remaining_final"
+   ],
+   "trial_symbols": [
+    "eligible",
+    "chosen",
+    "remaining_after",
+    "closes"
+   ],
+   "eligible_symbols": [
+    "task",
+    "duration",
+    "fits"
+   ],
+   "carry": {},
+   "carry_notes": {
+    "assigned": "union of every element's assigned",
+    "remaining_initial": "capacity (reset each element)"
+   },
+   "elements": [
+    {
+     "station_id": 1,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "a",
+         "duration": 64,
+         "fits": true
+        }
+       ],
+       "chosen": "a",
+       "remaining_after": 83,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "b",
+         "duration": 68,
+         "fits": true
+        },
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": true
+        }
+       ],
+       "chosen": "b",
+       "remaining_after": 15,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": false
+        }
+       ],
+       "chosen": null,
+       "remaining_after": 15,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "a",
+      "c"
+     ],
+     "remaining_final": 15
+    },
+    {
+     "station_id": 2,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": true
+        }
+       ],
+       "chosen": "c",
+       "remaining_after": 127,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "d",
+         "duration": 48,
+         "fits": true
+        }
+       ],
+       "chosen": "d",
+       "remaining_after": 79,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "e",
+         "duration": 80,
+         "fits": false
+        }
+       ],
+       "chosen": null,
+       "remaining_after": 79,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "b",
+      "d"
+     ],
+     "remaining_final": 79
+    },
+    {
+     "station_id": 3,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "e",
+         "duration": 80,
+         "fits": true
+        }
+       ],
+       "chosen": "e",
+       "remaining_after": 67,
+       "closes": false
+      },
+      {
+       "eligible": [],
+       "chosen": null,
+       "remaining_after": 67,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "e"
+     ],
+     "remaining_final": 67
+    }
+   ],
+   "result": {
+    "symbol": "n",
+    "value": 3,
+    "dp": 0,
+    "from": "len(elements)"
+   }
+  },
+  "expect_answer": "MATCH",
+  "expect_process": "MISMATCH",
+  "exercises": [
+   "7.3-same-n-different-packing"
+  ],
+  "note": "one task swapped between two stations; n unchanged",
+  "finding": null
+ },
+ {
+  "id": "C12-order-within-set",
+  "gold": {
+   "schema_version": "1.4",
+   "node_type": "decision",
+   "node_id": "t19_greedy_station_assignment",
+   "cardinality": "answer_bearing",
+   "cardinality_symbol": "n",
+   "termination": {
+    "kind": "exhaustion",
+    "scope": "cumulative",
+    "accumulator_role": "committed",
+    "predicate_prose": "every task in `universe` has been assigned to exactly one element",
+    "universe": [
+     "a",
+     "b",
+     "c",
+     "d",
+     "e"
+    ],
+    "precedences": {
+     "a": [],
+     "b": [
+      "a"
+     ],
+     "c": [
+      "a"
+     ],
+     "d": [
+      "b",
+      "c"
+     ],
+     "e": [
+      "d"
+     ]
+    },
+    "item_measures": {
+     "a": 64,
+     "b": 68,
+     "c": 20,
+     "d": 48,
+     "e": 80
+    },
+    "budget": 147,
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "roles": {
+    "index": "station_id",
+    "budget_total": "capacity",
+    "budget_initial": "remaining_initial",
+    "trials": "trials",
+    "committed": "assigned",
+    "budget_final": "remaining_final"
+   },
+   "trial_roles": {
+    "candidates": "eligible",
+    "chosen": "chosen",
+    "budget_after": "remaining_after",
+    "closes": "closes"
+   },
+   "candidate_roles": {
+    "item": "task",
+    "measure": "duration",
+    "admissible": "fits"
+   },
+   "selection": {
+    "filter": "admissible",
+    "filter_relation": "measure <= budget_before",
+    "criterion": "measure",
+    "objective": "max",
+    "tie_break": "universe_order"
+   },
+   "rule": "among unassigned tasks whose predecessors are all assigned AND whose duration fits the remaining time, take the longest; ties by _T19_ORDER position; when none fits, close the station",
+   "rounding": "decimal-half-up",
+   "symbol_precision": {
+    "capacity": 0,
+    "remaining_initial": 0,
+    "remaining_final": 0,
+    "remaining_after": 0,
+    "duration": 0,
+    "station_id": 0
+   },
+   "element_symbols": [
+    "station_id",
+    "capacity",
+    "remaining_initial",
+    "trials",
+    "assigned",
+    "remaining_final"
+   ],
+   "trial_symbols": [
+    "eligible",
+    "chosen",
+    "remaining_after",
+    "closes"
+   ],
+   "eligible_symbols": [
+    "task",
+    "duration",
+    "fits"
+   ],
+   "carry": {},
+   "carry_notes": {
+    "assigned": "union of every element's assigned",
+    "remaining_initial": "capacity (reset each element)"
+   },
+   "elements": [
+    {
+     "station_id": 1,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "a",
+         "duration": 64,
+         "fits": true
+        }
+       ],
+       "chosen": "a",
+       "remaining_after": 83,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "b",
+         "duration": 68,
+         "fits": true
+        },
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": true
+        }
+       ],
+       "chosen": "b",
+       "remaining_after": 15,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": false
+        }
+       ],
+       "chosen": null,
+       "remaining_after": 15,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "a",
+      "b"
+     ],
+     "remaining_final": 15
+    },
+    {
+     "station_id": 2,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": true
+        }
+       ],
+       "chosen": "c",
+       "remaining_after": 127,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "d",
+         "duration": 48,
+         "fits": true
+        }
+       ],
+       "chosen": "d",
+       "remaining_after": 79,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "e",
+         "duration": 80,
+         "fits": false
+        }
+       ],
+       "chosen": null,
+       "remaining_after": 79,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "c",
+      "d"
+     ],
+     "remaining_final": 79
+    },
+    {
+     "station_id": 3,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "e",
+         "duration": 80,
+         "fits": true
+        }
+       ],
+       "chosen": "e",
+       "remaining_after": 67,
+       "closes": false
+      },
+      {
+       "eligible": [],
+       "chosen": null,
+       "remaining_after": 67,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "e"
+     ],
+     "remaining_final": 67
+    }
+   ],
+   "result": {
+    "symbol": "n",
+    "value": 3,
+    "dp": 0,
+    "from": "len(elements)"
+   }
+  },
+  "candidate": {
+   "schema_version": "1.4",
+   "node_type": "decision",
+   "node_id": "t19_greedy_station_assignment",
+   "cardinality": "answer_bearing",
+   "cardinality_symbol": "n",
+   "termination": {
+    "kind": "exhaustion",
+    "scope": "cumulative",
+    "accumulator_role": "committed",
+    "predicate_prose": "every task in `universe` has been assigned to exactly one element",
+    "universe": [
+     "a",
+     "b",
+     "c",
+     "d",
+     "e"
+    ],
+    "precedences": {
+     "a": [],
+     "b": [
+      "a"
+     ],
+     "c": [
+      "a"
+     ],
+     "d": [
+      "b",
+      "c"
+     ],
+     "e": [
+      "d"
+     ]
+    },
+    "item_measures": {
+     "a": 64,
+     "b": 68,
+     "c": 20,
+     "d": 48,
+     "e": 80
+    },
+    "budget": 147,
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "roles": {
+    "index": "station_id",
+    "budget_total": "capacity",
+    "budget_initial": "remaining_initial",
+    "trials": "trials",
+    "committed": "assigned",
+    "budget_final": "remaining_final"
+   },
+   "trial_roles": {
+    "candidates": "eligible",
+    "chosen": "chosen",
+    "budget_after": "remaining_after",
+    "closes": "closes"
+   },
+   "candidate_roles": {
+    "item": "task",
+    "measure": "duration",
+    "admissible": "fits"
+   },
+   "selection": {
+    "filter": "admissible",
+    "filter_relation": "measure <= budget_before",
+    "criterion": "measure",
+    "objective": "max",
+    "tie_break": "universe_order"
+   },
+   "rule": "among unassigned tasks whose predecessors are all assigned AND whose duration fits the remaining time, take the longest; ties by _T19_ORDER position; when none fits, close the station",
+   "rounding": "decimal-half-up",
+   "symbol_precision": {
+    "capacity": 0,
+    "remaining_initial": 0,
+    "remaining_final": 0,
+    "remaining_after": 0,
+    "duration": 0,
+    "station_id": 0
+   },
+   "element_symbols": [
+    "station_id",
+    "capacity",
+    "remaining_initial",
+    "trials",
+    "assigned",
+    "remaining_final"
+   ],
+   "trial_symbols": [
+    "eligible",
+    "chosen",
+    "remaining_after",
+    "closes"
+   ],
+   "eligible_symbols": [
+    "task",
+    "duration",
+    "fits"
+   ],
+   "carry": {},
+   "carry_notes": {
+    "assigned": "union of every element's assigned",
+    "remaining_initial": "capacity (reset each element)"
+   },
+   "elements": [
+    {
+     "station_id": 1,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "a",
+         "duration": 64,
+         "fits": true
+        }
+       ],
+       "chosen": "a",
+       "remaining_after": 83,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "b",
+         "duration": 68,
+         "fits": true
+        },
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": true
+        }
+       ],
+       "chosen": "b",
+       "remaining_after": 15,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": false
+        }
+       ],
+       "chosen": null,
+       "remaining_after": 15,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "b",
+      "a"
+     ],
+     "remaining_final": 15
+    },
+    {
+     "station_id": 2,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": true
+        }
+       ],
+       "chosen": "c",
+       "remaining_after": 127,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "d",
+         "duration": 48,
+         "fits": true
+        }
+       ],
+       "chosen": "d",
+       "remaining_after": 79,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "e",
+         "duration": 80,
+         "fits": false
+        }
+       ],
+       "chosen": null,
+       "remaining_after": 79,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "c",
+      "d"
+     ],
+     "remaining_final": 79
+    },
+    {
+     "station_id": 3,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "e",
+         "duration": 80,
+         "fits": true
+        }
+       ],
+       "chosen": "e",
+       "remaining_after": 67,
+       "closes": false
+      },
+      {
+       "eligible": [],
+       "chosen": null,
+       "remaining_after": 67,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "e"
+     ],
+     "remaining_final": 67
+    }
+   ],
+   "result": {
+    "symbol": "n",
+    "value": 3,
+    "dp": 0,
+    "from": "len(elements)"
+   }
+  },
+  "expect_answer": "MATCH",
+  "expect_process": "MISMATCH",
+  "exercises": [
+   "7.3-order-within-set"
+  ],
+  "note": "gold's set in a different order: rejected at 5.4.6 before S7.3 can distinguish set credit from order credit",
+  "finding": "F7-4"
+ },
+ {
+  "id": "C13-selection-violated",
+  "gold": {
+   "schema_version": "1.4",
+   "node_type": "decision",
+   "node_id": "t19_greedy_station_assignment",
+   "cardinality": "answer_bearing",
+   "cardinality_symbol": "n",
+   "termination": {
+    "kind": "exhaustion",
+    "scope": "cumulative",
+    "accumulator_role": "committed",
+    "predicate_prose": "every task in `universe` has been assigned to exactly one element",
+    "universe": [
+     "a",
+     "b",
+     "c",
+     "d",
+     "e"
+    ],
+    "precedences": {
+     "a": [],
+     "b": [
+      "a"
+     ],
+     "c": [
+      "a"
+     ],
+     "d": [
+      "b",
+      "c"
+     ],
+     "e": [
+      "d"
+     ]
+    },
+    "item_measures": {
+     "a": 64,
+     "b": 68,
+     "c": 20,
+     "d": 48,
+     "e": 80
+    },
+    "budget": 147,
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "roles": {
+    "index": "station_id",
+    "budget_total": "capacity",
+    "budget_initial": "remaining_initial",
+    "trials": "trials",
+    "committed": "assigned",
+    "budget_final": "remaining_final"
+   },
+   "trial_roles": {
+    "candidates": "eligible",
+    "chosen": "chosen",
+    "budget_after": "remaining_after",
+    "closes": "closes"
+   },
+   "candidate_roles": {
+    "item": "task",
+    "measure": "duration",
+    "admissible": "fits"
+   },
+   "selection": {
+    "filter": "admissible",
+    "filter_relation": "measure <= budget_before",
+    "criterion": "measure",
+    "objective": "max",
+    "tie_break": "universe_order"
+   },
+   "rule": "among unassigned tasks whose predecessors are all assigned AND whose duration fits the remaining time, take the longest; ties by _T19_ORDER position; when none fits, close the station",
+   "rounding": "decimal-half-up",
+   "symbol_precision": {
+    "capacity": 0,
+    "remaining_initial": 0,
+    "remaining_final": 0,
+    "remaining_after": 0,
+    "duration": 0,
+    "station_id": 0
+   },
+   "element_symbols": [
+    "station_id",
+    "capacity",
+    "remaining_initial",
+    "trials",
+    "assigned",
+    "remaining_final"
+   ],
+   "trial_symbols": [
+    "eligible",
+    "chosen",
+    "remaining_after",
+    "closes"
+   ],
+   "eligible_symbols": [
+    "task",
+    "duration",
+    "fits"
+   ],
+   "carry": {},
+   "carry_notes": {
+    "assigned": "union of every element's assigned",
+    "remaining_initial": "capacity (reset each element)"
+   },
+   "elements": [
+    {
+     "station_id": 1,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "a",
+         "duration": 64,
+         "fits": true
+        }
+       ],
+       "chosen": "a",
+       "remaining_after": 83,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "b",
+         "duration": 68,
+         "fits": true
+        },
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": true
+        }
+       ],
+       "chosen": "b",
+       "remaining_after": 15,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": false
+        }
+       ],
+       "chosen": null,
+       "remaining_after": 15,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "a",
+      "b"
+     ],
+     "remaining_final": 15
+    },
+    {
+     "station_id": 2,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": true
+        }
+       ],
+       "chosen": "c",
+       "remaining_after": 127,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "d",
+         "duration": 48,
+         "fits": true
+        }
+       ],
+       "chosen": "d",
+       "remaining_after": 79,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "e",
+         "duration": 80,
+         "fits": false
+        }
+       ],
+       "chosen": null,
+       "remaining_after": 79,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "c",
+      "d"
+     ],
+     "remaining_final": 79
+    },
+    {
+     "station_id": 3,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "e",
+         "duration": 80,
+         "fits": true
+        }
+       ],
+       "chosen": "e",
+       "remaining_after": 67,
+       "closes": false
+      },
+      {
+       "eligible": [],
+       "chosen": null,
+       "remaining_after": 67,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "e"
+     ],
+     "remaining_final": 67
+    }
+   ],
+   "result": {
+    "symbol": "n",
+    "value": 3,
+    "dp": 0,
+    "from": "len(elements)"
+   }
+  },
+  "candidate": {
+   "schema_version": "1.4",
+   "node_type": "decision",
+   "node_id": "t19_greedy_station_assignment",
+   "cardinality": "answer_bearing",
+   "cardinality_symbol": "n",
+   "termination": {
+    "kind": "exhaustion",
+    "scope": "cumulative",
+    "accumulator_role": "committed",
+    "predicate_prose": "every task in `universe` has been assigned to exactly one element",
+    "universe": [
+     "a",
+     "b",
+     "c",
+     "d",
+     "e"
+    ],
+    "precedences": {
+     "a": [],
+     "b": [
+      "a"
+     ],
+     "c": [
+      "a"
+     ],
+     "d": [
+      "b",
+      "c"
+     ],
+     "e": [
+      "d"
+     ]
+    },
+    "item_measures": {
+     "a": 64,
+     "b": 68,
+     "c": 20,
+     "d": 48,
+     "e": 80
+    },
+    "budget": 147,
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "roles": {
+    "index": "station_id",
+    "budget_total": "capacity",
+    "budget_initial": "remaining_initial",
+    "trials": "trials",
+    "committed": "assigned",
+    "budget_final": "remaining_final"
+   },
+   "trial_roles": {
+    "candidates": "eligible",
+    "chosen": "chosen",
+    "budget_after": "remaining_after",
+    "closes": "closes"
+   },
+   "candidate_roles": {
+    "item": "task",
+    "measure": "duration",
+    "admissible": "fits"
+   },
+   "selection": {
+    "filter": "admissible",
+    "filter_relation": "measure <= budget_before",
+    "criterion": "measure",
+    "objective": "max",
+    "tie_break": "universe_order"
+   },
+   "rule": "among unassigned tasks whose predecessors are all assigned AND whose duration fits the remaining time, take the longest; ties by _T19_ORDER position; when none fits, close the station",
+   "rounding": "decimal-half-up",
+   "symbol_precision": {
+    "capacity": 0,
+    "remaining_initial": 0,
+    "remaining_final": 0,
+    "remaining_after": 0,
+    "duration": 0,
+    "station_id": 0
+   },
+   "element_symbols": [
+    "station_id",
+    "capacity",
+    "remaining_initial",
+    "trials",
+    "assigned",
+    "remaining_final"
+   ],
+   "trial_symbols": [
+    "eligible",
+    "chosen",
+    "remaining_after",
+    "closes"
+   ],
+   "eligible_symbols": [
+    "task",
+    "duration",
+    "fits"
+   ],
+   "carry": {},
+   "carry_notes": {
+    "assigned": "union of every element's assigned",
+    "remaining_initial": "capacity (reset each element)"
+   },
+   "elements": [
+    {
+     "station_id": 1,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "a",
+         "duration": 64,
+         "fits": true
+        }
+       ],
+       "chosen": "a",
+       "remaining_after": 83,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "b",
+         "duration": 68,
+         "fits": true
+        },
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": true
+        }
+       ],
+       "chosen": "c",
+       "remaining_after": 15,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": false
+        }
+       ],
+       "chosen": null,
+       "remaining_after": 15,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "a",
+      "b"
+     ],
+     "remaining_final": 15
+    },
+    {
+     "station_id": 2,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": true
+        }
+       ],
+       "chosen": "c",
+       "remaining_after": 127,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "d",
+         "duration": 48,
+         "fits": true
+        }
+       ],
+       "chosen": "d",
+       "remaining_after": 79,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "e",
+         "duration": 80,
+         "fits": false
+        }
+       ],
+       "chosen": null,
+       "remaining_after": 79,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "c",
+      "d"
+     ],
+     "remaining_final": 79
+    },
+    {
+     "station_id": 3,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "e",
+         "duration": 80,
+         "fits": true
+        }
+       ],
+       "chosen": "e",
+       "remaining_after": 67,
+       "closes": false
+      },
+      {
+       "eligible": [],
+       "chosen": null,
+       "remaining_after": 67,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "e"
+     ],
+     "remaining_final": 67
+    }
+   ],
+   "result": {
+    "symbol": "n",
+    "value": 3,
+    "dp": 0,
+    "from": "len(elements)"
+   }
+  },
+  "expect_answer": "MATCH",
+  "expect_process": "MISMATCH",
+  "exercises": [
+   "7.3-trial-violates-selection"
+  ],
+  "note": "chose an admissible candidate that is not the optimum",
+  "finding": null
+ },
+ {
+  "id": "C14-extra-element",
+  "gold": {
+   "schema_version": "1.4",
+   "node_type": "decision",
+   "node_id": "t19_greedy_station_assignment",
+   "cardinality": "answer_bearing",
+   "cardinality_symbol": "n",
+   "termination": {
+    "kind": "exhaustion",
+    "scope": "cumulative",
+    "accumulator_role": "committed",
+    "predicate_prose": "every task in `universe` has been assigned to exactly one element",
+    "universe": [
+     "a",
+     "b",
+     "c",
+     "d",
+     "e"
+    ],
+    "precedences": {
+     "a": [],
+     "b": [
+      "a"
+     ],
+     "c": [
+      "a"
+     ],
+     "d": [
+      "b",
+      "c"
+     ],
+     "e": [
+      "d"
+     ]
+    },
+    "item_measures": {
+     "a": 64,
+     "b": 68,
+     "c": 20,
+     "d": 48,
+     "e": 80
+    },
+    "budget": 147,
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "roles": {
+    "index": "station_id",
+    "budget_total": "capacity",
+    "budget_initial": "remaining_initial",
+    "trials": "trials",
+    "committed": "assigned",
+    "budget_final": "remaining_final"
+   },
+   "trial_roles": {
+    "candidates": "eligible",
+    "chosen": "chosen",
+    "budget_after": "remaining_after",
+    "closes": "closes"
+   },
+   "candidate_roles": {
+    "item": "task",
+    "measure": "duration",
+    "admissible": "fits"
+   },
+   "selection": {
+    "filter": "admissible",
+    "filter_relation": "measure <= budget_before",
+    "criterion": "measure",
+    "objective": "max",
+    "tie_break": "universe_order"
+   },
+   "rule": "among unassigned tasks whose predecessors are all assigned AND whose duration fits the remaining time, take the longest; ties by _T19_ORDER position; when none fits, close the station",
+   "rounding": "decimal-half-up",
+   "symbol_precision": {
+    "capacity": 0,
+    "remaining_initial": 0,
+    "remaining_final": 0,
+    "remaining_after": 0,
+    "duration": 0,
+    "station_id": 0
+   },
+   "element_symbols": [
+    "station_id",
+    "capacity",
+    "remaining_initial",
+    "trials",
+    "assigned",
+    "remaining_final"
+   ],
+   "trial_symbols": [
+    "eligible",
+    "chosen",
+    "remaining_after",
+    "closes"
+   ],
+   "eligible_symbols": [
+    "task",
+    "duration",
+    "fits"
+   ],
+   "carry": {},
+   "carry_notes": {
+    "assigned": "union of every element's assigned",
+    "remaining_initial": "capacity (reset each element)"
+   },
+   "elements": [
+    {
+     "station_id": 1,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "a",
+         "duration": 64,
+         "fits": true
+        }
+       ],
+       "chosen": "a",
+       "remaining_after": 83,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "b",
+         "duration": 68,
+         "fits": true
+        },
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": true
+        }
+       ],
+       "chosen": "b",
+       "remaining_after": 15,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": false
+        }
+       ],
+       "chosen": null,
+       "remaining_after": 15,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "a",
+      "b"
+     ],
+     "remaining_final": 15
+    },
+    {
+     "station_id": 2,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": true
+        }
+       ],
+       "chosen": "c",
+       "remaining_after": 127,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "d",
+         "duration": 48,
+         "fits": true
+        }
+       ],
+       "chosen": "d",
+       "remaining_after": 79,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "e",
+         "duration": 80,
+         "fits": false
+        }
+       ],
+       "chosen": null,
+       "remaining_after": 79,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "c",
+      "d"
+     ],
+     "remaining_final": 79
+    },
+    {
+     "station_id": 3,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "e",
+         "duration": 80,
+         "fits": true
+        }
+       ],
+       "chosen": "e",
+       "remaining_after": 67,
+       "closes": false
+      },
+      {
+       "eligible": [],
+       "chosen": null,
+       "remaining_after": 67,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "e"
+     ],
+     "remaining_final": 67
+    }
+   ],
+   "result": {
+    "symbol": "n",
+    "value": 3,
+    "dp": 0,
+    "from": "len(elements)"
+   }
+  },
+  "candidate": {
+   "schema_version": "1.4",
+   "node_type": "decision",
+   "node_id": "t19_greedy_station_assignment",
+   "cardinality": "answer_bearing",
+   "cardinality_symbol": "n",
+   "termination": {
+    "kind": "exhaustion",
+    "scope": "cumulative",
+    "accumulator_role": "committed",
+    "predicate_prose": "every task in `universe` has been assigned to exactly one element",
+    "universe": [
+     "a",
+     "b",
+     "c",
+     "d",
+     "e"
+    ],
+    "precedences": {
+     "a": [],
+     "b": [
+      "a"
+     ],
+     "c": [
+      "a"
+     ],
+     "d": [
+      "b",
+      "c"
+     ],
+     "e": [
+      "d"
+     ]
+    },
+    "item_measures": {
+     "a": 64,
+     "b": 68,
+     "c": 20,
+     "d": 48,
+     "e": 80
+    },
+    "budget": 147,
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "roles": {
+    "index": "station_id",
+    "budget_total": "capacity",
+    "budget_initial": "remaining_initial",
+    "trials": "trials",
+    "committed": "assigned",
+    "budget_final": "remaining_final"
+   },
+   "trial_roles": {
+    "candidates": "eligible",
+    "chosen": "chosen",
+    "budget_after": "remaining_after",
+    "closes": "closes"
+   },
+   "candidate_roles": {
+    "item": "task",
+    "measure": "duration",
+    "admissible": "fits"
+   },
+   "selection": {
+    "filter": "admissible",
+    "filter_relation": "measure <= budget_before",
+    "criterion": "measure",
+    "objective": "max",
+    "tie_break": "universe_order"
+   },
+   "rule": "among unassigned tasks whose predecessors are all assigned AND whose duration fits the remaining time, take the longest; ties by _T19_ORDER position; when none fits, close the station",
+   "rounding": "decimal-half-up",
+   "symbol_precision": {
+    "capacity": 0,
+    "remaining_initial": 0,
+    "remaining_final": 0,
+    "remaining_after": 0,
+    "duration": 0,
+    "station_id": 0
+   },
+   "element_symbols": [
+    "station_id",
+    "capacity",
+    "remaining_initial",
+    "trials",
+    "assigned",
+    "remaining_final"
+   ],
+   "trial_symbols": [
+    "eligible",
+    "chosen",
+    "remaining_after",
+    "closes"
+   ],
+   "eligible_symbols": [
+    "task",
+    "duration",
+    "fits"
+   ],
+   "carry": {},
+   "carry_notes": {
+    "assigned": "union of every element's assigned",
+    "remaining_initial": "capacity (reset each element)"
+   },
+   "elements": [
+    {
+     "station_id": 1,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "a",
+         "duration": 64,
+         "fits": true
+        }
+       ],
+       "chosen": "a",
+       "remaining_after": 83,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "b",
+         "duration": 68,
+         "fits": true
+        },
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": true
+        }
+       ],
+       "chosen": "b",
+       "remaining_after": 15,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": false
+        }
+       ],
+       "chosen": null,
+       "remaining_after": 15,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "a",
+      "b"
+     ],
+     "remaining_final": 15
+    },
+    {
+     "station_id": 2,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": true
+        }
+       ],
+       "chosen": "c",
+       "remaining_after": 127,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "d",
+         "duration": 48,
+         "fits": true
+        }
+       ],
+       "chosen": "d",
+       "remaining_after": 79,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "e",
+         "duration": 80,
+         "fits": false
+        }
+       ],
+       "chosen": null,
+       "remaining_after": 79,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "c",
+      "d"
+     ],
+     "remaining_final": 79
+    },
+    {
+     "station_id": 3,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "e",
+         "duration": 80,
+         "fits": true
+        }
+       ],
+       "chosen": "e",
+       "remaining_after": 67,
+       "closes": false
+      },
+      {
+       "eligible": [],
+       "chosen": null,
+       "remaining_after": 67,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "e"
+     ],
+     "remaining_final": 67
+    },
+    {
+     "station_id": 4,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "e",
+         "duration": 80,
+         "fits": true
+        }
+       ],
+       "chosen": "e",
+       "remaining_after": 67,
+       "closes": false
+      },
+      {
+       "eligible": [],
+       "chosen": null,
+       "remaining_after": 67,
+       "closes": true
+      }
+     ],
+     "assigned": [],
+     "remaining_final": 67
+    }
+   ],
+   "result": {
+    "symbol": "n",
+    "value": 3,
+    "dp": 0,
+    "from": "len(elements)"
+   }
+  },
+  "expect_answer": "MISMATCH",
+  "expect_process": "MISMATCH",
+  "exercises": [
+   "7.3-cardinality-mismatch"
+  ],
+  "note": "an extra empty station; n is the answer",
+  "finding": null
+ },
+ {
+  "id": "C15-identical",
+  "gold": {
+   "schema_version": "1.5",
+   "node_type": "iteration",
+   "node_id": "t24_secant_normal_depth",
+   "cardinality": "incidental",
+   "roles": {
+    "index": "k",
+    "iterate_prev": "y_prev",
+    "iterate_curr": "y_curr",
+    "iterate_next": "y_next",
+    "residual_prev": "g_prev",
+    "residual_curr": "g_curr",
+    "change": "change",
+    "converged": "converged",
+    "evaluation": "evaluation"
+   },
+   "update_relation": "iterate_curr - residual_curr * (iterate_curr - iterate_prev) / (residual_curr - residual_prev)",
+   "termination": {
+    "kind": "convergence",
+    "quantity_role": "change",
+    "comparison": "lt",
+    "tolerance": 0.002,
+    "predicate_prose": "abs(y_next - y_curr) < 0.002",
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "rounding": "decimal-half-up",
+   "constants": {
+    "b": 2.1,
+    "z": 2.5,
+    "K": 6.619
+   },
+   "frame_relations": [
+    [
+     "A",
+     "(b + z * y) * y"
+    ],
+    [
+     "P",
+     "b + 2 * y * sqrt(1 + z ** 2)"
+    ],
+    [
+     "AR",
+     "A * (A / P) ** (2 / 3)"
+    ],
+    [
+     "g",
+     "round(AR) - K"
+    ]
+   ],
+   "symbol_precision": {
+    "y_prev": 4,
+    "y_curr": 4,
+    "y_next": 4,
+    "change": 4,
+    "g_prev": 3,
+    "g_curr": 3,
+    "y": 4,
+    "A": 3,
+    "P": 3,
+    "AR": 3,
+    "g": 3
+   },
+   "preamble_binding": {
+    "iterate_prev": {
+     "frame": 0,
+     "frame_role": "iterate"
+    },
+    "residual_prev": {
+     "frame": 0,
+     "frame_role": "residual"
+    },
+    "iterate_curr": {
+     "frame": 1,
+     "frame_role": "iterate"
+    },
+    "residual_curr": {
+     "frame": 1,
+     "frame_role": "residual"
+    }
+   },
+   "preamble_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_roles": {
+    "iterate": "y",
+    "residual": "g"
+   },
+   "element_symbols": [
+    "k",
+    "y_prev",
+    "g_prev",
+    "y_curr",
+    "g_curr",
+    "y_next",
+    "change",
+    "converged",
+    "evaluation"
+   ],
+   "carry": {
+    "y_prev": "y_curr",
+    "g_prev": "g_curr",
+    "y_curr": "y_next",
+    "g_curr": "evaluation.g"
+   },
+   "carry_notes": {},
+   "preamble": [
+    {
+     "y": 1.0,
+     "A": 4.6,
+     "P": 7.485,
+     "AR": 3.325,
+     "g": -3.294
+    },
+    {
+     "y": 1.5,
+     "A": 8.775,
+     "P": 10.178,
+     "AR": 7.949,
+     "g": 1.33
+    }
+   ],
+   "elements": [
+    {
+     "k": 1,
+     "y_prev": 1.0,
+     "g_prev": -3.294,
+     "y_curr": 1.5,
+     "g_curr": 1.33,
+     "y_next": 1.3562,
+     "change": 0.1438,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3562,
+      "A": 7.446,
+      "P": 9.403,
+      "AR": 6.373,
+      "g": -0.246
+     }
+    },
+    {
+     "k": 2,
+     "y_prev": 1.5,
+     "g_prev": 1.33,
+     "y_curr": 1.3562,
+     "g_curr": -0.246,
+     "y_next": 1.3786,
+     "change": 0.0224,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3786,
+      "A": 7.646,
+      "P": 9.524,
+      "AR": 6.605,
+      "g": -0.014
+     }
+    },
+    {
+     "k": 3,
+     "y_prev": 1.3562,
+     "g_prev": -0.246,
+     "y_curr": 1.3786,
+     "g_curr": -0.014,
+     "y_next": 1.38,
+     "change": 0.0014,
+     "converged": true,
+     "evaluation": null
+    }
+   ],
+   "result": {
+    "symbol": "yn",
+    "value": 1.38,
+    "unit": "m",
+    "dp": 3,
+    "from": "last.iterate_next"
+   }
+  },
+  "candidate": {
+   "schema_version": "1.5",
+   "node_type": "iteration",
+   "node_id": "t24_secant_normal_depth",
+   "cardinality": "incidental",
+   "roles": {
+    "index": "k",
+    "iterate_prev": "y_prev",
+    "iterate_curr": "y_curr",
+    "iterate_next": "y_next",
+    "residual_prev": "g_prev",
+    "residual_curr": "g_curr",
+    "change": "change",
+    "converged": "converged",
+    "evaluation": "evaluation"
+   },
+   "update_relation": "iterate_curr - residual_curr * (iterate_curr - iterate_prev) / (residual_curr - residual_prev)",
+   "termination": {
+    "kind": "convergence",
+    "quantity_role": "change",
+    "comparison": "lt",
+    "tolerance": 0.002,
+    "predicate_prose": "abs(y_next - y_curr) < 0.002",
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "rounding": "decimal-half-up",
+   "constants": {
+    "b": 2.1,
+    "z": 2.5,
+    "K": 6.619
+   },
+   "frame_relations": [
+    [
+     "A",
+     "(b + z * y) * y"
+    ],
+    [
+     "P",
+     "b + 2 * y * sqrt(1 + z ** 2)"
+    ],
+    [
+     "AR",
+     "A * (A / P) ** (2 / 3)"
+    ],
+    [
+     "g",
+     "round(AR) - K"
+    ]
+   ],
+   "symbol_precision": {
+    "y_prev": 4,
+    "y_curr": 4,
+    "y_next": 4,
+    "change": 4,
+    "g_prev": 3,
+    "g_curr": 3,
+    "y": 4,
+    "A": 3,
+    "P": 3,
+    "AR": 3,
+    "g": 3
+   },
+   "preamble_binding": {
+    "iterate_prev": {
+     "frame": 0,
+     "frame_role": "iterate"
+    },
+    "residual_prev": {
+     "frame": 0,
+     "frame_role": "residual"
+    },
+    "iterate_curr": {
+     "frame": 1,
+     "frame_role": "iterate"
+    },
+    "residual_curr": {
+     "frame": 1,
+     "frame_role": "residual"
+    }
+   },
+   "preamble_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_symbols": [
+    "y",
+    "A",
+    "P",
+    "AR",
+    "g"
+   ],
+   "evaluation_roles": {
+    "iterate": "y",
+    "residual": "g"
+   },
+   "element_symbols": [
+    "k",
+    "y_prev",
+    "g_prev",
+    "y_curr",
+    "g_curr",
+    "y_next",
+    "change",
+    "converged",
+    "evaluation"
+   ],
+   "carry": {
+    "y_prev": "y_curr",
+    "g_prev": "g_curr",
+    "y_curr": "y_next",
+    "g_curr": "evaluation.g"
+   },
+   "carry_notes": {},
+   "preamble": [
+    {
+     "y": 1.0,
+     "A": 4.6,
+     "P": 7.485,
+     "AR": 3.325,
+     "g": -3.294
+    },
+    {
+     "y": 1.5,
+     "A": 8.775,
+     "P": 10.178,
+     "AR": 7.949,
+     "g": 1.33
+    }
+   ],
+   "elements": [
+    {
+     "k": 1,
+     "y_prev": 1.0,
+     "g_prev": -3.294,
+     "y_curr": 1.5,
+     "g_curr": 1.33,
+     "y_next": 1.3562,
+     "change": 0.1438,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3562,
+      "A": 7.446,
+      "P": 9.403,
+      "AR": 6.373,
+      "g": -0.246
+     }
+    },
+    {
+     "k": 2,
+     "y_prev": 1.5,
+     "g_prev": 1.33,
+     "y_curr": 1.3562,
+     "g_curr": -0.246,
+     "y_next": 1.3786,
+     "change": 0.0224,
+     "converged": false,
+     "evaluation": {
+      "y": 1.3786,
+      "A": 7.646,
+      "P": 9.524,
+      "AR": 6.605,
+      "g": -0.014
+     }
+    },
+    {
+     "k": 3,
+     "y_prev": 1.3562,
+     "g_prev": -0.246,
+     "y_curr": 1.3786,
+     "g_curr": -0.014,
+     "y_next": 1.38,
+     "change": 0.0014,
+     "converged": true,
+     "evaluation": null
+    }
+   ],
+   "result": {
+    "symbol": "yn",
+    "value": 1.38,
+    "unit": "m",
+    "dp": 3,
+    "from": "last.iterate_next"
+   }
+  },
+  "expect_answer": "MATCH",
+  "expect_process": "MATCH",
+  "exercises": [
+   "7.2-answer-credit",
+   "7.2-process-credit"
+  ],
+  "note": "gold compared against itself; must pass cleanly",
+  "finding": null
+ },
+ {
+  "id": "C16-identical-decision",
+  "gold": {
+   "schema_version": "1.4",
+   "node_type": "decision",
+   "node_id": "t19_greedy_station_assignment",
+   "cardinality": "answer_bearing",
+   "cardinality_symbol": "n",
+   "termination": {
+    "kind": "exhaustion",
+    "scope": "cumulative",
+    "accumulator_role": "committed",
+    "predicate_prose": "every task in `universe` has been assigned to exactly one element",
+    "universe": [
+     "a",
+     "b",
+     "c",
+     "d",
+     "e"
+    ],
+    "precedences": {
+     "a": [],
+     "b": [
+      "a"
+     ],
+     "c": [
+      "a"
+     ],
+     "d": [
+      "b",
+      "c"
+     ],
+     "e": [
+      "d"
+     ]
+    },
+    "item_measures": {
+     "a": 64,
+     "b": 68,
+     "c": 20,
+     "d": 48,
+     "e": 80
+    },
+    "budget": 147,
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "roles": {
+    "index": "station_id",
+    "budget_total": "capacity",
+    "budget_initial": "remaining_initial",
+    "trials": "trials",
+    "committed": "assigned",
+    "budget_final": "remaining_final"
+   },
+   "trial_roles": {
+    "candidates": "eligible",
+    "chosen": "chosen",
+    "budget_after": "remaining_after",
+    "closes": "closes"
+   },
+   "candidate_roles": {
+    "item": "task",
+    "measure": "duration",
+    "admissible": "fits"
+   },
+   "selection": {
+    "filter": "admissible",
+    "filter_relation": "measure <= budget_before",
+    "criterion": "measure",
+    "objective": "max",
+    "tie_break": "universe_order"
+   },
+   "rule": "among unassigned tasks whose predecessors are all assigned AND whose duration fits the remaining time, take the longest; ties by _T19_ORDER position; when none fits, close the station",
+   "rounding": "decimal-half-up",
+   "symbol_precision": {
+    "capacity": 0,
+    "remaining_initial": 0,
+    "remaining_final": 0,
+    "remaining_after": 0,
+    "duration": 0,
+    "station_id": 0
+   },
+   "element_symbols": [
+    "station_id",
+    "capacity",
+    "remaining_initial",
+    "trials",
+    "assigned",
+    "remaining_final"
+   ],
+   "trial_symbols": [
+    "eligible",
+    "chosen",
+    "remaining_after",
+    "closes"
+   ],
+   "eligible_symbols": [
+    "task",
+    "duration",
+    "fits"
+   ],
+   "carry": {},
+   "carry_notes": {
+    "assigned": "union of every element's assigned",
+    "remaining_initial": "capacity (reset each element)"
+   },
+   "elements": [
+    {
+     "station_id": 1,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "a",
+         "duration": 64,
+         "fits": true
+        }
+       ],
+       "chosen": "a",
+       "remaining_after": 83,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "b",
+         "duration": 68,
+         "fits": true
+        },
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": true
+        }
+       ],
+       "chosen": "b",
+       "remaining_after": 15,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": false
+        }
+       ],
+       "chosen": null,
+       "remaining_after": 15,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "a",
+      "b"
+     ],
+     "remaining_final": 15
+    },
+    {
+     "station_id": 2,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": true
+        }
+       ],
+       "chosen": "c",
+       "remaining_after": 127,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "d",
+         "duration": 48,
+         "fits": true
+        }
+       ],
+       "chosen": "d",
+       "remaining_after": 79,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "e",
+         "duration": 80,
+         "fits": false
+        }
+       ],
+       "chosen": null,
+       "remaining_after": 79,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "c",
+      "d"
+     ],
+     "remaining_final": 79
+    },
+    {
+     "station_id": 3,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "e",
+         "duration": 80,
+         "fits": true
+        }
+       ],
+       "chosen": "e",
+       "remaining_after": 67,
+       "closes": false
+      },
+      {
+       "eligible": [],
+       "chosen": null,
+       "remaining_after": 67,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "e"
+     ],
+     "remaining_final": 67
+    }
+   ],
+   "result": {
+    "symbol": "n",
+    "value": 3,
+    "dp": 0,
+    "from": "len(elements)"
+   }
+  },
+  "candidate": {
+   "schema_version": "1.4",
+   "node_type": "decision",
+   "node_id": "t19_greedy_station_assignment",
+   "cardinality": "answer_bearing",
+   "cardinality_symbol": "n",
+   "termination": {
+    "kind": "exhaustion",
+    "scope": "cumulative",
+    "accumulator_role": "committed",
+    "predicate_prose": "every task in `universe` has been assigned to exactly one element",
+    "universe": [
+     "a",
+     "b",
+     "c",
+     "d",
+     "e"
+    ],
+    "precedences": {
+     "a": [],
+     "b": [
+      "a"
+     ],
+     "c": [
+      "a"
+     ],
+     "d": [
+      "b",
+      "c"
+     ],
+     "e": [
+      "d"
+     ]
+    },
+    "item_measures": {
+     "a": 64,
+     "b": 68,
+     "c": 20,
+     "d": 48,
+     "e": 80
+    },
+    "budget": 147,
+    "max_elements": 5,
+    "satisfied": true
+   },
+   "roles": {
+    "index": "station_id",
+    "budget_total": "capacity",
+    "budget_initial": "remaining_initial",
+    "trials": "trials",
+    "committed": "assigned",
+    "budget_final": "remaining_final"
+   },
+   "trial_roles": {
+    "candidates": "eligible",
+    "chosen": "chosen",
+    "budget_after": "remaining_after",
+    "closes": "closes"
+   },
+   "candidate_roles": {
+    "item": "task",
+    "measure": "duration",
+    "admissible": "fits"
+   },
+   "selection": {
+    "filter": "admissible",
+    "filter_relation": "measure <= budget_before",
+    "criterion": "measure",
+    "objective": "max",
+    "tie_break": "universe_order"
+   },
+   "rule": "among unassigned tasks whose predecessors are all assigned AND whose duration fits the remaining time, take the longest; ties by _T19_ORDER position; when none fits, close the station",
+   "rounding": "decimal-half-up",
+   "symbol_precision": {
+    "capacity": 0,
+    "remaining_initial": 0,
+    "remaining_final": 0,
+    "remaining_after": 0,
+    "duration": 0,
+    "station_id": 0
+   },
+   "element_symbols": [
+    "station_id",
+    "capacity",
+    "remaining_initial",
+    "trials",
+    "assigned",
+    "remaining_final"
+   ],
+   "trial_symbols": [
+    "eligible",
+    "chosen",
+    "remaining_after",
+    "closes"
+   ],
+   "eligible_symbols": [
+    "task",
+    "duration",
+    "fits"
+   ],
+   "carry": {},
+   "carry_notes": {
+    "assigned": "union of every element's assigned",
+    "remaining_initial": "capacity (reset each element)"
+   },
+   "elements": [
+    {
+     "station_id": 1,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "a",
+         "duration": 64,
+         "fits": true
+        }
+       ],
+       "chosen": "a",
+       "remaining_after": 83,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "b",
+         "duration": 68,
+         "fits": true
+        },
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": true
+        }
+       ],
+       "chosen": "b",
+       "remaining_after": 15,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": false
+        }
+       ],
+       "chosen": null,
+       "remaining_after": 15,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "a",
+      "b"
+     ],
+     "remaining_final": 15
+    },
+    {
+     "station_id": 2,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "c",
+         "duration": 20,
+         "fits": true
+        }
+       ],
+       "chosen": "c",
+       "remaining_after": 127,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "d",
+         "duration": 48,
+         "fits": true
+        }
+       ],
+       "chosen": "d",
+       "remaining_after": 79,
+       "closes": false
+      },
+      {
+       "eligible": [
+        {
+         "task": "e",
+         "duration": 80,
+         "fits": false
+        }
+       ],
+       "chosen": null,
+       "remaining_after": 79,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "c",
+      "d"
+     ],
+     "remaining_final": 79
+    },
+    {
+     "station_id": 3,
+     "capacity": 147,
+     "remaining_initial": 147,
+     "trials": [
+      {
+       "eligible": [
+        {
+         "task": "e",
+         "duration": 80,
+         "fits": true
+        }
+       ],
+       "chosen": "e",
+       "remaining_after": 67,
+       "closes": false
+      },
+      {
+       "eligible": [],
+       "chosen": null,
+       "remaining_after": 67,
+       "closes": true
+      }
+     ],
+     "assigned": [
+      "e"
+     ],
+     "remaining_final": 67
+    }
+   ],
+   "result": {
+    "symbol": "n",
+    "value": 3,
+    "dp": 0,
+    "from": "len(elements)"
+   }
+  },
+  "expect_answer": "MATCH",
+  "expect_process": "MATCH",
+  "exercises": [
+   "7.3-same-n-different-packing"
+  ],
+  "note": "gold decision compared against itself; must pass cleanly",
+  "finding": null
+ }
+]

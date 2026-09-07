@@ -363,13 +363,23 @@ D4.1 comparator specification for all six `kind` values · D4.2 categorical labe
 
 ### 4.5 Exit gate
 
-- [ ] All six `kind` comparators specified and implemented
-- [ ] ≥95% precision and recall on D4.4
-- [ ] Reviewer E found no false accept on real archived traces
-- [ ] Normalisation vocabulary traced to observed outputs, not invented
-- [ ] **Independent review filed (R2) and every §5 suggestion triaged (R4)**
+- [x] All six `kind` comparators specified and implemented, and the `multipart`
+      question answered (SPEC-CHANGE 12 / D-047)
+- [x] ≥95% precision and recall on D4.4 — **97.2% / 98.6%**, with two declared
+      false accepts (`num-16b`, D-052; `cat-16`, D-056)
+- [x] Reviewer E found no false accept **on real archived traces** — 0 across
+      four rounds. **Read this with E's F0 and R2-F10**: the archive holds
+      16 wrong answers, 15 decided, all in two of the six kinds, and the
+      commitment machinery has no archive instances at all. The gate item is
+      met and it is uninformative for four kinds; that is stated, not hidden.
+- [x] Normalisation vocabulary traced to observed outputs, with **per-template**
+      coverage and resolution limits, never averaged (D-048)
+- [x] **Independent review filed (R2) and every §5 suggestion triaged (R4)** —
+      two reviewers, **four rounds each**, 34 findings, all dispositioned
 
 **Effort: 12–20 h + 8–10 h review.** No template redesign.
+
+> **Actual: four review rounds per reviewer, not one.** The comparator contract is a natural-language surface, and Reviewer E's round-4 characterisation is that it is *unbounded* — every round's findings were one- or two-token mutations of cases the suite already passed. The phase closed by **reducing the mechanism's scope** (SPEC-CHANGE 11), not by exhausting the findings. Budget later natural-language work the same way: the stopping rule has to be an evidence threshold, not a clean round.
 
 ---
 
@@ -775,6 +785,9 @@ Read the hours as effort. Wall-clock is a fraction of them, and the difference i
 | SPEC-CHANGE 8 | **§3.2's claim that `iteration` and `decision` "are the same shape" is amended** (D-038) | The structure is shared; the equivalence is not. They differ on whether the sequence's cardinality is an observable of the answer, so a comparator built from one merged type is wrong on one of the two templates. Delivered as two types over one base in [`phase3_node_types.md`](phase3_node_types.md). |
 | SPEC-CHANGE 9 | **A screen's *rejected slice profile* is now a required recorded measurement** in every item-pool-impact note — the marginal of every sampled parameter over the rejected set (Phase 3 Reviewer B, §5) | Both Phase 3 screens reject **clustered**, not scattered, instances — one at a single slope value, removing 25% of it. Both were described as removing "ill-posed instances"; both descriptions were true and incomplete. The profile would have surfaced it with no reviewer, and my own "scattered" claim was measured over a *union* of screens, which cannot see a single-valued component (D-045). |
 | SPEC-CHANGE 10 | **A pedagogy lookup-check must fit a model, not enumerate rules**, and must report *lift over a blind-guess floor* against a stated threshold (Phase 3 Reviewer B, §5) | B enumerated every shortcut it could construct and reached 64.97% against a 53.05% floor, concluding the item was a search. A depth-2 decision tree reaches 90.18% and reduces to one line. **"The best rule I could think of" is a floor on shortcuttability, never a ceiling** (D-046). A bare rate is also unreadable without its floor: 58.6% sounds alarming until the floor is 53.1%. |
+| SPEC-CHANGE 11 | **§4.2's hedge requirement is demoted from enforced to reported** (D-056) | Four review rounds and an ablation. The hedge layer fires on **2 of 2,200** archived answer spans and **0** in a kind it gates; ablating it changes no positive recall and no archive verdict, and it produced 13 of Reviewer E's 20 findings while repeatedly marking *correct* answers wrong. A hedge is now detected, annotated and counted, never scored. `ENGTRACE_HEDGE_POLICY=enforce` restores the old behaviour. Same treatment `narrative` gets (D-051). |
+| SPEC-CHANGE 12 | **`multipart` is not a seventh comparator `kind`** (D-047) | It is a property of the *answer*: an ordered list of `parts`, each carrying one of the six kinds, with a `mode` of `all` or `any`. `system_properties_memory_causality` is the proof inside Phase 4 — typed `classification`, described by §4.1 as a "label tuple", actually two categorical parts. A seventh kind would stop the six composing. Governs **24 of the 51 class-C templates**. |
+| SPEC-CHANGE 13 | **D3.4 §7 amended in four places** (D-054) | §7 shipped unexercised and both Phase 3 schema reviewers named the missing corpus as the largest gap. Building it (D4.6) found four defects in the *specification*: §7.2's headline disposition has no instances, §7 never says whether §6 step 8 binds a candidate, §7.4's direct solver cannot be an `iteration` node at all, and §7.3 row 3's set-versus-ordered distinction is vacuous. |
 
 ---
 
