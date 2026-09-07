@@ -502,3 +502,304 @@ the principle for errors ("a template that raises has not passed"); it needs one
 * **The brief's "26 bound multipart templates" is the inventory `answer_type` count.** The
   `multipart` *kind* is bound on **31** templates. Five more than the review scope assumed, and
   four of the six E-8 mis-slicers are in the gap.
+
+---
+---
+
+# Round 2 — re-review at `4fd06c3`
+
+## Verdict: PASS WITH FINDINGS — **the block lifts**
+
+All seven round-1 findings re-derive as fixed, both of my colliding gold pairs now `MISMATCH`
+*for the correct reason*, and I could not construct an over-acceptance anywhere at any depth I
+could reach. Two over-rejections remain — one new (`vector` notation), one inherited and still
+untriaged (**E-12**, which the unit ablation has now made bite) — and neither is a false accept,
+so neither blocks.
+
+Working tree is identical to `4fd06c3` (`git diff 4fd06c3 HEAD` is empty). `extract.py`,
+`kinds.py`, `answer.py` and `normalize.py` are unchanged from `7c04c95`; the fixes are in
+`bindings.py`, `derive_bindings.py` and `cross_pair.py` only.
+
+---
+
+## R2.1 — The block question, answered first
+
+### 1. Do the two colliding gold pairs now MATCH? **No — and the reason is now the right one.**
+
+```bash
+PYTHONIOENCODING=utf-8 python <scratchpad>/revE/p_final.py      # unchanged from round 1
+```
+
+```
+template_hydrostatic_pressure_at_depth   seeds 157 / 237
+  part1 slice was: 'The absolute pressure at a depth of 13.29 m is 101.347 kP'   -> selected 101.347
+  part1 slice now: 'The absolute pressure at a depth of 13.29'                   -> selects   13.29
+  verdict: MISMATCH | part(s) differ: q1:numeric      <- the DEPTH differs, and is now compared
+
+template_rackett_equation_volume         seeds 105 / 206
+  part1 slice was: '... liquid Carbon dioxide at 199.89 K is 36.22 cm^3'         -> selected  36.22
+  part1 slice now: '... liquid Carbon dioxide at 199.89'                         -> selects  199.89
+  verdict: MISMATCH | part(s) differ: q1:numeric      <- the TEMPERATURE differs, and is compared
+```
+
+In round 1 both returned `MISMATCH` because of the unit defect, while the quantity that actually
+distinguished them was compared by nothing. Both now return `MISMATCH` on the distinguishing
+quantity itself. **The masking is gone and nothing was traded for it.**
+
+### 2. Is the slicer fixed generally, not just on those two?
+
+`nth_quantity` now ends the slice at the number. Re-running my round-1 instrument — *does part `i`
+select the `i`-th asserted number, over 12 seeds, on every multipart binding*:
+
+```bash
+PYTHONIOENCODING=utf-8 python <scratchpad>/revE/p_slice.py      # unchanged from round 1
+# multipart bindings: 28
+# multipart templates where at least one part does NOT select its own number: 0 of 28
+```
+
+**0 of 28**, against 6 of 31 in round 1. `p_const.py` (E-9) prints nothing: **no part of any bound
+multipart binding reads a constant**, against 3 templates in round 1.
+
+### 3. The collision sweep, re-run and deepened
+
+`N=50` still cannot resolve a 1-in-31,000 collision, so I went past it: **gold×gold at `N=100`,
+9,900 ordered pairs per template, over all 33 templates of the three structural kinds
+(`multipart` 28, `vector` 3, `sequence` 2) — 326,700 ordered pairs.**
+
+```bash
+PYTHONIOENCODING=utf-8 python <scratchpad>/revE/r2_deep.py
+```
+
+**Incomplete at filing time, and recorded as incomplete rather than clean.** 33 templates x 100
+instances is 3,300 generations and the sweep had not reached its total inside the hour. It prints a
+line per template only on a false accept, a false reject or an error, and it has printed **nothing**
+— so no template completed so far has produced one — but I will not report a total I did not see. A
+targeted `N=100` re-run of the five formerly mis-slicing *bound* templates
+(`hydrostatic_pressure_at_depth`, `particle_pathline`, `rackett_equation_volume`,
+`statically_indeterminate`, `time_to_phasor`) was also still in flight.
+
+What **is** measured at this ref: the shipped gate at `N=50` (2,450 ordered pairs per template,
+340,550 in round 1's shape) and `cross_pair` at `n=12` (15,576 pairs) both return zero on all four
+terms, and the two specific collisions I found at `N=250` in round 1 — the only two that ever
+existed in my sweeps — are now decided correctly. **Nothing I ran contradicts R3. Beyond `N=50` the
+sweep is unfinished, and the coordinator's own caveat stands: `N=50` cannot resolve a 1-in-31,000
+collision, and I have not yet closed that gap at this ref.**
+
+### 4. The identity term, re-derived at full validation depth
+
+I did not read R2 off the tool that asserts it. 118 templates × all 50 validation seeds:
+
+```bash
+PYTHONIOENCODING=utf-8 python -c "
+import sys, collections; sys.path.insert(0,'.')
+from tests.template_integrity.core import discover, generate
+from tests.comparators.bindings import BINDINGS, compare_template
+refs={r.template_id:r for r in discover()}
+c=collections.Counter()
+for tid in sorted(BINDINGS):
+    for s in range(50):
+        g=generate(refs[tid],s,capture=False).solution
+        c[compare_template(tid,g,g).outcome]+=1
+print(c)"
+# Counter({'MATCH': 5900})
+```
+
+**5,900 of 5,900.** Round 1's figure was 57 of 132 templates matching themselves; it is now 118 of
+118 on every seed. E-1 is closed, and it closed E-2, E-3, E-4 and E-6 with it, exactly as the
+round-1 §5 predicted it would.
+
+---
+
+## R2.2 — Claims R1–R5, re-derived
+
+| # | claim | re-derived | agreement |
+|---|---|---|---|
+| **R1** | 118 of 150 bound, 32 named unbound, each with a measured reason | `len(BINDINGS)==118`, `len(UNBOUND)==32`, sum 150, disjoint; every `UNBOUND` value is a measurement; `cross_pair` prints `118 scored / 32 skipped` | **agrees** |
+| **R2** | 118/118 MATCH a verbatim copy of gold on all 50 validation seeds | my own sweep above → `Counter({'MATCH': 5900})`; no bound template has a non-zero `identity_failures` in `VALIDATION` | **agrees, independently derived** |
+| **R3** | gold×gold 15,576 / 118 / 32; all four terms zero; UNRESOLVED 0 | `python -m tests.comparators.cross_pair` → `pairs 15576 / templates-scored 118 / templates-skipped 32`; `MATCH 188 MISMATCH 15388 UNRESOLVED 0`; `ERRORS 0`; `FALSE ACCEPTS 0`; `FALSE REJECTS 0`; `IDENTITY 0 of 1416`; `GATE ... PASS`. Every kind now decides **100.0%** | **agrees, exactly** |
+| **R4** | archive×gold 18,115 (1,273 + 16,842) / 57 / 27; 0 XI; 0 errors; decided 67.8%, up from 56.8% | same run → `18115 (1273 positive + 16842 negative) / 57 / 27`; `cross-instance accepts 0 / 16842`; `ERRORS positive 0 negative 0`; `863/1273 (67.8%)` | **arithmetic agrees; "up from 56.8%" needs reading — R2-F2** |
+| **R5** | D4.4 95.8% / 98.6%; archive 100% / 97.8%; suites exit 0 | `python -m tests.comparators.score` → `adversarial precision 95.8% recall 98.6% PASS`; `archive precision 100.0% recall 97.8% PASS false accepts: 0`; `narrative 20/20 UNRESOLVED` | **agrees, exactly** |
+
+Two structural checks on the new gates, because a gate that never fires is not a gate:
+
+* **`MIN_DECIDED_RATE`** — no bound template has `decided == 0`, and the **minimum decided rate
+  across all 118 is 1.0**. The bimodality the docstring claims is real at this ref.
+* **The identity and constant-part gates fired, and their casualties are named in `UNBOUND`** —
+  9 templates carry `rejects a verbatim copy of gold on 50/50 seeds` (8 `symbolic` plus
+  `decimation_aliasing_analysis`), 3 carry
+  `part(s) [...] read a constant on every instance`. Not decorative.
+
+---
+
+## R2.3 — Findings
+
+### R2-F1 — CONFIRMED — over-rejection — the `vector` comparator accepts **0 of 83** archived answers, and at least 14 of the refusals are notation alone
+
+`vector`'s 12.0% archive decided rate is declared a stated trade. It is not a trade; it is a
+missing surface declaration, and it is the one place round 1's E-2 lesson was not applied.
+
+`vector_components` matches `_HAT_RE = [-+]?\s*[\d.eE+-]+\s*[a-z]_hat` — ASCII `x_hat`, which is
+what **gold** writes. Every archived model answer writes the Unicode hat:
+
+```
+GOLD: 'F_m = (1.791e-06 x_hat + -1.056e-05 y_hat + 7.810e-05 z_hat) N.'
+CAND: 'F_m = (1.79 x^ - 10.56 y^ + 78.10 z^) uN, |F_m| ~= 78.83 uN'      [x-hat etc. are U+0302]
+      -> UNRESOLVED | no vector in the candidate answer span
+
+GOLD: 'F_m = (-3.039e-04 x_hat + -2.831e-04 y_hat + 4.706e-04 z_hat) N.'
+CAND: 'F_m = (-3.039 * 10-^4 x^ - 2.831 * 10-^4 y^ + 4.706 * 10-^4 z^) N'
+      -> UNRESOLVED | no vector in the candidate answer span
+```
+
+The second candidate states gold's three components to gold's own precision and is refused for
+spelling the unit vector with a combining circumflex rather than `_hat`. Rewriting **only the
+notation** and touching no comparator logic:
+
+```bash
+PYTHONIOENCODING=utf-8 python <scratchpad>/revE/r2_vec2.py
+# as shipped          : {'UNRESOLVED': 73, 'MISMATCH': 10}
+# with x_hat notation : {'UNRESOLVED': 59, 'MISMATCH': 24}   <- notation only, no logic changed
+```
+
+14 refusals become decided verdicts from a character substitution. The residue — still **0 MATCH**
+— is a second layer: `uN` against `N`, and `10-^4` written with U+2212. So across all three
+`vector`-bound templates the comparator **accepts none of the 83 real model answers**, and those
+three templates contribute zero recall to the benchmark while counting as bound.
+
+Worth recording for the design: this is invisible to the new identity gate *by construction*, since
+gold matches gold because both sides use `x_hat`. **The identity term catches gold-side defects and
+structurally cannot catch candidate-side normalisation gaps.** Only archive text sees those.
+
+**Answering the coordinator's question directly: for `vector`, "declared as a stated trade" is the
+wrong call.** D4.1 §4.2 already solved exactly this problem for `categorical` by declaring the
+surfaces of a label. The unit-vector form needs the same declaration; it is a handful of
+characters, not a design decision, and calling it a trade puts a normalisation bug on the
+residual-risk register where it will be read as an item property.
+
+### R2-F2 — CONFIRMED — the E-12 truth predicate is now removing working templates from the bound set
+
+Round 1's **E-12** was filed CONFIRMED and is not on the actioned list. The unit ablation has made
+it bite. Three templates are *newly* unbound at this ref with the reason
+`N false accepts in 2450 pairs`, and all three are the display-tolerance artefacts E-12 named:
+
+```
+template_batch_reactor_second_order   5 "false accepts" in 2450 pairs
+    gold 'The required reaction time is 5.0 seconds.'       cand '... is 4.99 seconds.'
+template_pfr_volume_changing_rate     2 "false accepts" in 2450 pairs
+    gold 'The required PFR volume is 21.9 liters.'          cand '... is 21.92 liters.'
+template_vdw_solve_for_pressure       2 "false accepts" in 2450 pairs
+    gold 'The pressure exerted by the Oxygen is 14.9 bar.'  cand '... the Ethylene is 14.85 bar.'
+```
+
+Gold displays one decimal, so D4.1 §4.1's tolerance is `0.5 x 10^-1 = 0.05`, boundary inclusive.
+`|4.99 - 5.0| = 0.01` and `|21.92 - 21.9| = 0.02` are **correct MATCHes under the specification.**
+The truth predicate — *a MATCH is a false accept iff the two spans differ textually* — calls them
+false accepts, and three working bindings were discarded for obeying §4.1.
+
+Cost, measured, by differencing the per-kind archive tables at `7c04c95` and `4fd06c3`:
+
+| kind | round 1 (rows × decided) | round 2 (rows × decided) | decided rows |
+|---|---|---|---:|
+| `multipart` | 713 × 43.8% | 668 × 52.7% | 312 → **352**  (+40, the E-4 fix) |
+| `numeric` | 488 × 95.5% | 452 × 96.5% | 466 → **436**  (−30, these three templates) |
+| `symbolic` | 155 × 3.9% | 6 × 100% | 6 → 6 (unchanged) |
+| `vector` / `sequence` / `categorical`* | unchanged | unchanged | 84 → 84 |
+| **total** | **1,503 × 56.8%** | **1,273 × 67.8%** | **853 → 863** |
+
+So R4's `56.8% → 67.8%` is arithmetically right and is mostly a denominator: 230 archive rows left
+the corpus along with the templates that could not decide them, and only **+10 rows** actually
+became decided — `+40` won by the unit ablation, `−30` handed straight back to E-12. Archive
+coverage fell from 70 templates scored to 57, and bound coverage from 132 to 118. The comparator is
+now *honest*, which is the whole point of the round; but "decided rate up 11 points" and "the
+comparator decides more" are different claims and only the first is supported by this run.
+
+`vdw_solve_for_pressure` is the interesting one and should **not** simply be re-bound: gold really
+is Oxygen at 14.9 bar and Ethylene at 14.85 bar, and at one displayed decimal the *item* cannot
+distinguish two substances. That is D-050's shape — a property of the item, not of the comparator —
+and it belongs on the item-design list rather than in `UNBOUND` under a label that says the
+comparator did something wrong.
+
+Seven further `UNBOUND` entries carry the same untriaged reason, unchanged since round 1:
+`decimation_aliasing_analysis` 2, `floating_object_submersion_depth` 4, `gauss_law_symmetric` 4,
+`null_to_null_bandwidth` 24, `pitzer_correlation_z` 1, `signal_energy_power` 2,
+`truss_method_of_sections` 2. **10 of the 32 unbound templates now rest on a predicate known to be
+wrong in this direction, and not one has been audited against §4.1.**
+
+### R2-F3 — CONFIRMED — for `symbolic`, "bind fewer and name the rest" *is* laundering; but the gate is not what is at fault
+
+The coordinator asked. The answer is yes for `symbolic`, and no for the gate.
+
+All 8 unbound `symbolic` templates fail on gold against a verbatim copy of itself, and every cause
+is a comparator defect rather than a property of the item:
+
+```bash
+PYTHONIOENCODING=utf-8 python <scratchpad>/revE/r2_sym.py
+```
+
+```
+undamped_response_initial_conditions   'x(t) = -0.006*cos(34.6384*t) (m)'
+    UNRESOLVED | symbol(s) outside the declared alphabet: ['c', 'm', 'o', 's']
+phasor_addition    'v_total(t) = 38.93 * cos(420*t + 7.48 deg).'
+    UNRESOLVED | symbol(s) outside the declared alphabet: ['c', 'd', 'e', 'g', 'o', 's']
+ft_esd_rect_pulse  'G(f) = 48.0 * sinc(4.0*f)'
+    UNRESOLVED | symbol(s) outside the declared alphabet: ['c', 'i', 's']
+ber_estimation_mary / bpsk_energy_basis / cd_dc_system_analysis / standing_wave_formation
+    UNRESOLVED | could not parse an expression: SympifyError
+```
+
+`['c','o','s']` are the letters of `cos`; `['c','i','s']` the letters of `sinc` less the declared
+`n`; `['d','e','g']` the letters of `deg`. **The parser is splitting function names into free
+symbols, and the alphabet check is then rejecting gold's own answer.** D4.1 §4.4 says the eight
+non-fragment templates *"carry sinc, exp and Q-functions, so the fragment is not enough in general.
+`sympy` is used there"* — `sympy 1.14.0` is installed and the code does not in fact parse a
+function call. And `derive_kind` routes to `symbolic` on
+`_FUNC_RE = \b(?:sinc|cos|sin|exp|log|Q|tanh|sqrt)\s*[\^(]`: it selects for precisely the construct
+the comparator cannot read.
+
+So **`symbolic` at 1 of 9 is not a measurement of the corpus, it is a measurement of the
+comparator**, and the `UNBOUND` reason string says the symptom rather than the cause. Any later
+phase quoting "8 of 9 symbolic templates are not bindable" will be quoting a parser bug as a corpus
+property. It reads like an evening's work, not a Phase 6 design item.
+
+**The gate itself is doing exactly the right thing.** At `7c04c95` these same 8 templates were
+counted as *bound*, inside the "132" and the "340,550 validated pairs", at 0% decided. The new gate
+is what surfaced them, and the finding exists only because the fix worked.
+
+---
+
+## R2.4 — Falsification attempts that failed
+
+1. **The two colliding gold pairs** (the coordinator's question 1). Both MISMATCH, on the right
+   quantity. I could not turn either into a false accept.
+2. **Deep gold×gold at `N=100` on all 33 structural-kind templates**, 326,700 ordered pairs.
+   **Unfinished — reported as such.** It had printed no false accept, false reject or error on any
+template it completed, but it had not reached its total inside the time box, so I am not claiming
+the negative. The gap the coordinator named — collisions rarer than `N=50` resolves — is **not
+closed at this ref by me**; it is the one place round 2's evidence is thinner than round 1's, where
+I did reach `N=250` on the templates that mattered.
+3. **`nth_quantity` selection audit** — 28 multipart bindings × 12 seeds × every part: **0** parts
+   select another part's number, against 6 templates in round 1.
+4. **Constant-part audit** — **0**, against 3 in round 1 (`autocorrelation_rect_pulse`,
+   `coaxial_capacitance`, `vdw_solve_for_volume`), all three now correctly in `UNBOUND` naming that
+   reason.
+5. **Identity at full validation depth** — 5,900 of 5,900 MATCH, no exceptions, no errors.
+6. **archive×gold cross-instance accepts** — **0 of 16,842** here, and 0 of 19,362 in round 1
+   including with the unit check ablated by hand. Two different binding tables, two different unit
+   policies, no over-acceptance on real model text either time. This is now the best-evidenced
+   negative in the phase.
+7. **The decided-rate floor.** I looked for a bound template sitting just above `MIN_DECIDED_RATE`
+   and there is none — the minimum among the 118 is 1.0, so `<= 0.0` is loose but unexercised. Not
+   a finding at this ref. It becomes one the moment a partly-deciding binding appears, because
+   `<= 0.0` will admit a binding that decides two pairs in 2,450.
+8. **R1–R5 as arithmetic** — every number re-derived from the code; every one agrees.
+
+---
+
+## R2.5 — Further probing
+
+Ranked, one line as instructed: **(1)** declare the `x̂` / `μN` surfaces for `vector` — R2-F1, three
+templates and 83 archived answers for a few characters; **(2)** audit the 10 `UNBOUND` entries that
+rest on the textual-identity predicate against §4.1's display tolerance — R2-F2; most should
+probably be bound, and `vdw_solve_for_pressure` should go to item design rather than back to
+`UNBOUND`; **(3)** teach the `symbolic` parser to recognise a function call before any later phase
+quotes `symbolic 1 of 9` as a property of the corpus — R2-F3.
