@@ -403,7 +403,7 @@ Counts below were verified against source, not inferred from the archive.
 `cd_dc_system_analysis` is the urgent one: a strict marker parser drops **Step 3 in 100% of instances**, and Step 3 computes the answer.
 
 **Deliverables:** D5.1 edits · D5.2 corpus-wide marker-conformance scan, all 150, proving zero remaining violations · D5.3 the marker-set decision record.
-**Review:** *Reviewer A* re-runs T4 across all 150 templates, not just the 8 touched.
+**Review:** *Reviewer A* re-runs T4 across all 150 templates, not just the **11** touched — and independently checks the acceptance evidence for the defect classes T4 does not gate. Of the 11, T4 **fails** on 3, **reports but passes** 5 (`non-canonical marker `{'**Final Answer**': 25}`), and cannot see 3. A is also the owner of the `ANSWER_MARKERS`-agreement item, the one comparator file A may read.
 **Exit gate (Track A):** T4 passes on 150/150; T6 unchanged (these are formatting-only, so any distribution movement indicates an unintended change).
 **Effort: 6–10 h + 3–4 h review.**
 
