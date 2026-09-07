@@ -1176,3 +1176,377 @@ Narrow, and all three are already specified:
 
 R3-F4 is minor and can ride along: route `_slot_verdict` through `find_commitment` so the
 policy has a single implementation.
+
+---
+
+# Round 4 — Reviewer B (physics & pedagogy, the P6 guard)
+
+**Verdict: the phase can CLOSE, with three residuals stated — one of which is a
+required edit to D4.1 §8, not a recommendation.** I have blocked three times and
+each block was a defect that would have shipped. There is no fourth thing of that
+kind. What I found in round 4 is that the *instrument* still over-reports, in both
+directions, and the honest fix is to restate its number rather than to hold the
+gate.
+
+## 1. Verdict
+
+| Task | Question | Answer |
+|---|---|---|
+| 1 | Are the four negative frames the right four? | **Right in kind, wrong in coverage.** Each passes 39/39, and each one's nearest linguistic neighbour passes 0–59%. With six defensible additions the negative block is **182/390 = 46.7%**, not 100%. |
+| 2 | Is "whose confidence is qualified" the right pedagogical line? | **Yes — the line is right.** The *proxy* that implements it (anaphoric-or-absent subject) mis-identifies expletive `it` and topic-shifting `we`, and it errs on the false-reject side, which is my half of the gate. **0/39** on four ordinary frames. |
+| 3 | Is the F5 disposition sufficient? | **Sufficient in kind. One element of it is required, not recommended, and none of it is in the tree yet.** |
+
+**Headline for the record:** the recall corpus reports **507/507 (100%)**. Adding
+six positive frames a grader credits and six negative frames a grader refuses —
+all twelve constructed from the same generator, on the same 39 archived answers —
+takes it to **548/975 = 56.2%**. That is not a reason to block. It is a reason for
+the phase to publish the second number's *existence* alongside the first.
+
+## 2. Disposition of my earlier findings
+
+| Finding | Round | State in the frozen tree |
+|---|---|---|
+| R1-F1 hedge blocklist | 1 | Superseded by the class-based probes. **The blocklist shape survives**, see R4-F1. |
+| R1-F2 one-sided scope | 1 | Closed. `_hedges_governing` scopes bidirectionally. |
+| R1-F3 assert-nothing | 1 | Closed. `segment` returns `None` with a reason. |
+| R1-F4 longest-surface | 1 | Closed, and re-closed by discourse position for FACTIVE. |
+| R1-F5 shortcuttability | 1 | See §3, R4-F3. |
+| R2-F1 over-rejection 25/38 | 2 | Closed. All nine positive frames 39/39. |
+| R2-F3 `categorical` vs tuple | 2 | Closed on the paths I probed; `suspends_what_follows` still diverges from `segment` on one construction (R4-F2). |
+| R3-F1 corpus cannot see its frame | 3 | **Actioned.** Negative frames exist and found two real defects. Partially effective — §3, R4-F1. |
+| R3-F2 coordinator scope | 3 | Closed. `conjuncts()` exists and is used. |
+| R3-F3, R3-F4 | 3 | Closed on re-probe. |
+
+**The backslash-b-in-heredoc report checks out.** `is_bare_comment` now fires on
+every constructed case I put to it, including the ones I could not move in round 3.
+I tried to reproduce the masked behaviour and could not; the fix holds.
+
+## 3. Findings
+
+### R4-F1 — CONFIRMED (residual, not blocking). The negative frames are as position-locked as the positive frames were, and each one's nearest neighbour fails.
+
+The four negative frames were the right *classes* to pick. But every one of them
+puts its trigger at character 0 of the frame, and the three matchers that catch
+them — `_TASK_RE`, `_HYPO_RE`, `_BARE_QUAL_RE` — are `.match()`-anchored. So each
+frame certifies a matcher against the one string position the matcher can see.
+Move the trigger three words to the right and the frame inverts.
+
+Rates over the same 39 archived correct answers, same generator:
+
+| shipped frame | rate | nearest neighbour I added | rate |
+|---|---:|---|---:|
+| `neg-task-restatement` *"We must determine whether X"* | 39/39 | *"We will check below whether X"* | **0/39** |
+| `neg-hypothetical` *"If the additivity test holds, X"* | 39/39 | *"For now I will assume X"* | **0/39** |
+| `neg-explicit-hedge` *"I am not sure, but perhaps X"* | 39/39 | *"My best guess is that X"* | **23/39** |
+| `neg-question` *"X. Or is it?"* | 39/39 | *"X. Or possibly the opposite."* | **3/39** |
+| | | *"Either X. Or the opposite holds."* | **0/39** |
+| | | *"X. But I cannot verify this without more information."* | **0/39** |
+
+`check whether` and `assume` are **already in** `TASK_RESTATEMENTS` and
+`HYPOTHETICAL`. They do not fire because the anchoring, not the vocabulary, is
+what decides. `cannot verify` is not in `INABILITY` at all, next to
+`cannot determine` and `cannot tell` — that is my own round-1 F1 recurring: the
+policy is class-based at the top and a remembered list at the bottom.
+
+**Rate with mine added:** negative block **26/234 = 11.1%** on the six additions,
+**182/390 = 46.7%** combined. The four shipped frames therefore measure
+*non-inertness* — which is what I asked for in R3-F1, and they delivered it, twice
+over — but they do not measure coverage of non-answers, and the corpus's 156/156
+should not be read as if they did.
+
+**Why this is not a block.** The failures above are false *accepts*, which is
+Reviewer E's remit and explicitly out of mine. I report them only because task 1
+asked me to name absent frames and give the rate. The instrument correction is
+mine; the defects it exposes are E's to disposition.
+
+**Cosmetic, but in the artefact whose credibility is the question.**
+`recall_corpus.main()` prints `507 cases from 56 archived correct answers x 9
+frames`. It is 39 answers × 13 frames; `len(cases) // len(FRAMES)` was not updated
+when `NEGATIVE_FRAMES` was appended to the build loop. A corpus whose whole purpose
+is to stop a number being over-read prints a wrong denominator in its own header.
+One-line fix.
+
+### R4-F2 — CONFIRMED (residual, blocking-adjacent; the strongest thing I found). The hedge rule's *proxy* refuses committed answers at 0/39 on four ordinary frames.
+
+Task 2 asked whether "whose confidence is qualified" is the right line. **It is.**
+It is the correct distinction, it is the one I drew in round 2 when I split
+`UNCERTAINTY`, and it genuinely does resolve R1-F1, R2-§5 and E's R3-F14 under one
+rule rather than three patches. I confirmed my round-2 §5 case still works:
+*"The distinction is not entirely obvious, but the system is linear"* is correctly
+**not** a bare comment and is credited.
+
+The defect is in the operationalisation. `is_bare_comment` identifies "whose
+confidence" by **subject anaphoricity**, via
+`_ANAPHORIC_SUBJECT = ^(it|this|that|these|those|i|we|there)`. Two of those seven
+are not anaphoric when they carry a complement:
+
+- **Expletive `it`.** *"It is not certain which sign convention the textbook uses,
+  but the system is linear."* The `it` is a dummy subject; the uncertainty is
+  scoped to *the convention*, a different proposition entirely. The rule reads it
+  as the speaker's, and it governs from anywhere — including backwards across the
+  coordinator, since a preceding unit is checked with `classes={"stated
+  uncertainty"}`, exactly the class these fire in. **0/39.**
+- **Topic-shifting `we`.** *"We cannot determine the settling time from this alone,
+  but the system is linear."* The inability names the quantity it applies to, and
+  it is not the label. **0/39.**
+
+| frame (a grader credits every one) | MATCH |
+|---|---:|
+| *"It is not certain which sign convention the textbook uses, but {a}"* | **0/39** |
+| *"It is unclear what part (c) is asking, but {a}"* | **0/39** |
+| *"We cannot determine the settling time from this alone, but {a}"* | **0/39** |
+| *"{a} Why? Because both defining tests pass."* | **0/39** |
+| *"{a} Is that enough? Yes: both tests are satisfied."* | **0/39** |
+| *"Is the system linear? {a}"* | 15/39 |
+
+The last three are a separate root cause and it is a **regression introduced by
+the fix to my own R3-F1**. `_hedges_governing` now carries:
+
+```python
+if follows and text.rstrip().endswith("?") and not _label_hit(text, surfaces):
+    marks.append("withdrawn by a following question")
+```
+
+Any label-free trailing question withdraws the commitment. *"Or is it?"* does.
+*"Why?"* and *"Is that enough?"* do not — they are rhetorical self-questions
+immediately answered by the clause after them, and they are among the most common
+constructions in tutorial-register model output. The 15/39 row is the enumerated
+path: `suspends_what_follows` returns `"the answer is a question"` when the
+**preface** ends in `?`, which is R2-F3's divergence between the tuple path and
+`segment` surviving in one more place.
+
+**The discriminator that fixes all three, and it is already in the module's
+idiom:**
+
+1. *A trailing question withdraws only if nothing asserting follows it.* This is
+   the same discourse-position principle `find_commitment` already applies to
+   FACTIVE ("a factive that FOLLOWS a commitment is elaboration, not retraction").
+   `Or is it?` ends the span; `Why? Because…` does not.
+2. *A bare epistemic comment has no complement of its own.* `it`/`there` followed
+   by a marker and then a wh-/that-complement, or a PP naming a quantity, is a
+   claim about that quantity, not about the answer. This is the same move that
+   already removed the `_MAX_COMMENT_WORDS` constant: a structural test, not a
+   list.
+
+**Why this is not a fourth block, and I want the reasoning on the record because
+it cuts against me.** I measured the archive rather than asserting. Across all
+2,200 archived answer spans, label-free question clauses with an assertion after
+them occur **once**, and that one is a mis-split of the *question* text, not an
+answer. So the construction I am refusing at 100% has the *same* evidential
+standing — 1 in 2,200 — as the hedge machinery the module itself declares to be
+"a policy validated against constructed text." I cannot hold a gate on a
+constructed case while accepting the phase's own constructed cases as sufficient.
+Both directions of the false reject also land on `UNRESOLVED`, which the
+three-valued design exists to make safe: it withholds a score, it does not mark a
+correct answer wrong.
+
+Where it *will* bite is Phase 5. My round-2 §5.5 said `commitment.py` is written
+against four items whose answers are two words long and specified to serve 146
+whose answers are paragraphs. R4-F2 is what that sentence looks like when it comes
+due, and it should be on the register in those words.
+
+**Rate with my positive frames added:** **15/234 = 6.4%** on the six additions,
+**366/585 = 62.6%** combined. The corpus's 351/351 is a statement about nine
+frames.
+
+### R4-F3 — The F5 disposition. Sufficient in kind; one element is required, and none of it is in the tree.
+
+Taking the four parts as briefed:
+
+- **(a) §5.4 withdrawal accepted** — correct, and I reaffirm it. Requiring a named
+  failing property would drop `system_property_linearity` recall to ~27% and is an
+  item change wearing a comparator's clothes.
+- **(b) register entry** — correct disposition.
+- **(d) supporting-quantity requirement filed as a Phase 5 recommendation** —
+  correct. The items can change there; they cannot change here.
+- **(c) two columns, my thresholds** (flag at lift ≥ 40 pts **or** held-out ≥ 95%
+  regardless of lift) — the thresholds are mine and I stand behind them. **The
+  placement is a substitution, and it drops the part that did the work.**
+
+My round-2 §5.4(c) named **the results table**, and named it for one reason,
+stated there: *"A reader who sees `50.02% → 100.00%` beside `precision 100%`
+cannot misread the second number, and no prose caveat achieves that."*
+`template_inventory.csv` is a 150-row planning artefact read by whoever designs
+Phase 5's items. It is the right **durable** home and I endorse it as such. It is
+not where the misreading happens. The misreading happens at D4.1 §8, which in the
+frozen tree still prints, with nothing adjacent to qualify it:
+
+```
+| `system_properties_memory_causality` | 24 | 24 | 24 | 100% | 100% | 100% |
+| `system_property_linearity`          | 15 | 15 | 15 | 100% | 100% | 100% |
+```
+
+§8 already does exactly the right thing one paragraph below for a *different*
+number — "**This number is weak evidence and is reported as such.** The archive is
+where the vocabulary came from, so scoring 100% on it measures memorisation." The
+shortcuttability caveat is the same species and is absent.
+
+**State of the tree, verified:**
+
+- `docs/re-implementation-sep/template_inventory.csv` has **18 columns** and none
+  of them is a floor, a lift, or a held-out accuracy. All four Phase 4 templates
+  are present as rows (lines 89, 90, 91, 123); the columns are not.
+- `50.02` / `34.02` appear nowhere in `docs/re-implementation-sep/*.md` or in the
+  CSV — only in this review file.
+- `phase4_summary.md`, which D4.1 §8 cites twice ("All six are in
+  `phase4_summary.md` §8"), **does not exist** in the tree.
+
+**What P6 requires before the phase closes.** Not a comparator change — I withdrew
+that and the withdrawal stands. Not the shortcuttability fix — it is a Phase 5 item
+change. P6 requires that a scoping decision be *recorded and approved* (spec §36),
+and the decision here is: **Phase 4 scores two 100%-shortcuttable items on their
+answer alone.** One sentence in D4.1 §8, beside the two rows, is the whole of it:
+
+> `system_property_linearity` and `system_properties_memory_causality` are scored
+> on their answer alone. Their answers carry 1.0 and 1.6 bits against blind-guess
+> floors of 50.02% and 34.02%, and a depth-2 tree on the question surface reaches
+> 100% held-out on both. The 100% precision and recall above are statements about
+> the vocabulary, not about whether a scored model reasoned. Recorded per template
+> in `template_inventory.csv`; the item fix is a Phase 5 recommendation.
+
+Zero code, zero risk, and it is the only part of the disposition that a reader of
+Phase 4 will ever encounter. **That edit, plus the two columns actually existing,
+is my condition.** Everything else in the disposition is right as briefed.
+
+## 4. Falsification attempts that failed
+
+I tried to break the phase in six more places and could not:
+
+1. **My round-2 §5 case is genuinely fixed, not accidentally passing.** *"The
+   distinction is not entirely obvious, but the system is linear"* — the subject
+   is a full NP, `is_bare_comment` correctly returns `False`, the hedge stays in
+   its conjunct, the answer is credited. The discriminator does the work here, not
+   a list.
+2. **Precision terms survive.** *"{a} The margin is roughly 12% of the limit."* —
+   39/39. Removing bare `roughly` from `EVIDENTIALS` while keeping
+   `roughly speaking` was right and holds end-to-end.
+3. **Emphatic reinforcement is not read as a hedge.** *"{a} There is no doubt about
+   this."* — 39/39, despite `no` being a `_SUBJECTLESS` opener.
+4. **An inability scoped to an unlisted quantity does not retract.** *"{a} I cannot
+   give the exact transient response, but that was not asked."* — 39/39. (Passing
+   for the weaker reason, though: `cannot give` is simply not in `INABILITY`. Cf.
+   R4-F1's `cannot verify`.)
+5. **A hedge about a different part of the question does not retract.** *"{a} The
+   wording of part (c) is unclear."* — 39/39, because the subject is a full NP.
+   Note the contrast with R4-F2's *"It is unclear what part (c) is asking"* at
+   0/39: **the same proposition, phrased with an expletive subject, inverts the
+   verdict.** That is the cleanest statement of R4-F2 I have.
+6. **The backslash-b heredoc bug is fixed.** Every bare-comment probe I ran fires.
+   I could not reproduce any of round 3's masked behaviour.
+
+I also confirmed the two defects the negative controls found are genuinely closed:
+the hedged preface on enumerated answers (`suspends_what_follows` now splits on
+`,`/`but`/`and` and tests each piece) and the trailing `Or is it?` — the latter
+correctly, if over-broadly, per R4-F2.
+
+## 5. Further probing and improvements
+
+### 5.1 What the corpus should report instead of 100%
+
+Not "add my twelve frames and go green." The number 507/507 is not wrong; what is
+wrong is reading it as coverage. Two changes, both cheap:
+
+1. **Print the denominator that exists.** Fix the header count, and state the frame
+   count: *"507 cases = 39 archived correct answers × 13 frames."* A reader then
+   knows the shape of what was measured.
+2. **Split the frames by where the trigger sits.** Every current frame is
+   trigger-at-position-0 or trigger-at-end. One extra column — *anchored* vs
+   *embedded* — makes R4-F1 visible in the corpus's own output rather than in a
+   review, and it is the difference between an instrument that reports its
+   coverage and one that reports its score.
+
+### 5.2 The register entries I am filing
+
+Three, in priority order for whoever picks up Phase 5:
+
+- **RB4-1 (Phase 5, high).** `commitment.py`'s bare-comment proxy mis-identifies
+  expletive `it`/`there` and topic-shifting `we`; and any label-free trailing
+  question withdraws a commitment, including a rhetorical one that its own next
+  clause answers. **0/39 on four ordinary frames, reproduced above.** Both fixes
+  are structural and are given in R4-F2. Archive support for the constructions is
+  1 in 2,200 *on four items with two-word answers*, which is why it is Phase 5's
+  and not Phase 4's — and why it will bite there, on 146 items with prose answers.
+- **RB4-2 (Phase 4, required).** The D4.1 §8 sentence in R4-F3, plus the two
+  columns actually in `template_inventory.csv`.
+- **RB4-3 (housekeeping).** `phase4_summary.md` is cited twice by D4.1 §8 and does
+  not exist. Either write it or fix the citation; a contract that points at a
+  missing document is the kind of thing a conformance reader finds first.
+
+### 5.3 What generalises, for the fourth and last time
+
+Every one of my four rounds has found the same shape, at a different altitude:
+
+| round | the thing that was scoped too narrowly | the thing that certified it |
+|---|---|---|
+| 1 | a 45-character hedge window | D4.4, sampled from inside the hedge list |
+| 2 | a ±1-clause window, and a hedge list with no governance | 61 archived answers, almost none of them prose |
+| 3 | segment scope that never cut at a coordinator | 351 positive cases, 144 of them inert copies |
+| 4 | matchers anchored at position 0, and a subject allowlist | 13 frames, every trigger at position 0 or at the end |
+
+**The through-line is not the hedge policy. It is that at every altitude the
+instrument was built from the same construction the mechanism was built from, so
+it could only confirm.** The fix is never a longer list; it is a test whose frames
+are generated independently of the matcher's anchoring. Phase 5 should generate
+frames by *transformation* — take a passing frame and move its trigger, embed it,
+give it an expletive subject — rather than by enumeration. That is a half-day and
+it is the last recommendation I have.
+
+### 5.4 On closing
+
+I have blocked this phase three times and I would do it three times again. I am not
+blocking a fourth, and I want the reason stated plainly rather than buried: the two
+false rejects in R4-F2 are real and reproducible, but they land on `UNRESOLVED`
+rather than on a wrong score, they have 1-in-2,200 archive support, and holding the
+gate on constructed text while the phase honestly declares its own machinery to be
+validated on constructed text would be applying a standard to the implementation
+that I did not apply to the specification. The contract is sound, the discriminator
+in task 2 is the right pedagogical line, and the F5 withdrawal was correct.
+
+**The phase closes when RB4-2 is done.** That is one sentence and two CSV columns.
+RB4-1 goes to the register with its reproductions, where it belongs, and where the
+next reviewer of this module should start.
+
+### 5.5 Reproduction
+
+```bash
+export PYTHONIOENCODING=utf-8
+python - <<'PY'
+import sys; sys.path.insert(0, '.')
+from tests.comparators.recall_corpus import GATED, archived_answer
+from tests.comparators.answer import compare_template
+from tests.comparators.ground_truth import LABELS, load
+from tests.comparators.score import STEM_TO_TEMPLATE
+answers = []
+for stem in GATED:
+    rows, labels = load(stem), LABELS[stem]
+    for i, row in enumerate(rows):
+        if not labels[i][0]:
+            continue
+        a = archived_answer(row)
+        if a and len(a) <= 400:
+            answers.append((STEM_TO_TEMPLATE[stem], row["gold_answer"], a))
+FRAMES = [                                        # (name, frame, a grader credits it?)
+    ("neg-deferred",      "We will check below whether {a}",                      False),
+    ("neg-provisional",   "For now I will assume {a}",                            False),
+    ("neg-guess",         "My best guess is that {a}",                            False),
+    ("neg-alternation",   "{a} Or possibly the opposite.",                        False),
+    ("neg-disjunction",   "Either {a} Or the opposite holds.",                    False),
+    ("neg-refusal-after", "{a} But I cannot verify this without more information.", False),
+    ("pos-expletive-it",  "It is not certain which sign convention the textbook uses, but {a}", True),
+    ("pos-unclear-part-c","It is unclear what part (c) is asking, but {a}",        True),
+    ("pos-we-elsewhere",  "We cannot determine the settling time from this alone, but {a}", True),
+    ("pos-rhetorical-q",  "{a} Why? Because both defining tests pass.",            True),
+    ("pos-rhet-2",        "{a} Is that enough? Yes: both tests are satisfied.",     True),
+    ("pos-selfq-lead",    "Is the system linear? {a}",                             True),
+]
+for name, f, want in FRAMES:
+    ok = sum((compare_template(t, g, "## Final Answer\n**Answer:** " + f.format(a=a)).is_match) == want
+             for t, g, a in answers)
+    print(f"  {name:20s} {ok:3d}/{len(answers)}  {ok/len(answers):6.1%}")
+PY
+```
+
+Archive census for the trailing-question construction (1 in 2,200): iterate
+`error_analysis_annotation/samples/*.jsonl`, take `normalize.answer_span`, split
+with `commitment.clauses`, and count clauses ending in `?` that fail
+`kinds._label_hit` and are followed by a further clause.
