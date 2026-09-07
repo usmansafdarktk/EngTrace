@@ -883,3 +883,296 @@ paragraphs.** Every trigger in R2-F2 fired on a template *outside* the Phase 4 f
 over-rejection rate on those four is zero and on the archive at large it is not, and the gap is a
 property of the sample, not of the mechanism. Before Phase 5 adopts this module, §5.2's recall corpus
 should exist.
+
+---
+
+# Round 3 — Reviewer B (physics & pedagogy, the P6 guard)
+
+**Frozen ref:** `3a00875b5cc5c8baa440fdd55fa131d5a96abfe6` · **Branch:** `redesign/phase4-comparators`
+**Mandate:** audit `recall_corpus.py` — the artefact I named in round 2 §5.2. Does its 100% mean anything?
+**Time box:** 30 minutes, held.
+
+---
+
+## 1. Verdict
+
+**BLOCKED — the corpus is 41% inert, and the one frame I wrote from my own archived
+evidence scores 0%.**
+
+The artefact was built and it is the right artefact. But **144 of its 351 cases cannot
+observe the frame they are named for**: 16 of the 39 archived answers are `a) … b) …`
+enumerations, and the clause splitter cuts on the enumerator, so everything the frame
+prepends is discarded before the comparator reads it. I proved this with the negative
+control the corpus does not have — wrapping those 16 answers in `If the additivity test
+holds, {a}`, a canonical round-1 F3 rejection, still returns **MATCH**. A frame that
+cannot fail cannot pass either. The corpus's real denominator is 23 answers, not 39.
+
+On the 23 it does reach, **9 of my 12 new frames hold at 100% and three do not**. The one
+that matters is `B3-caveat-but` — **0 of 23** — and it is not a construction I invented:
+it is the `reynolds_number_flow_regime` phrasing I filed as R2-F2, *hedge the caveat, then
+commit to the label*. `The result may be described differently under another convention,
+but the system is linear` is `UNRESOLVED`. **R2-F1.2 is relocated, not closed**: hedge
+scope went from a 45-character window (round 1) to a clause (round 2) to a *segment*
+(round 3), and the segment boundary set still contains no coordinating conjunction. My
+round-2 §5.1(2) named the boundaries explicitly — *"no comma, colon, `but`, `so`, `and`,
+`regardless` or `still` between them"*. `but`, `and`, `yet`, `however` and `regardless`
+were not implemented. This is the third round in which the marker→label relation has been
+tightened by one syntactic level and stopped one level short of the construction that
+breaks it.
+
+Separately, the `While the delay term is present…` **MISMATCH is not addressed** — a
+correct answer still scored *wrong*, which is the outcome D4.1 §1's stated bias forbids.
+
+**Corpus rate with my frames added: 96.5% over 21 frames × 39 answers (790/819); 94.4%
+on the 483 cases where the frame is actually read.** The shipped nine remain 100% on both
+denominators.
+
+---
+
+## 2. Disposition of my earlier findings
+
+| finding | disposition | evidence |
+|---|---|---|
+| **R1-F1 / F2 / F3 / F4** | **addressed**, unchanged from round 2 | `reviewer_battery` 64/64; I re-probed and could not reopen any. |
+| **R2-F1.1** concessive/factive/hypothetical | **addressed** | `segment()` is a genuine three-way split. All 10 of my R2-F1(a) cases pass, `note that`/`recall that` are in `FACTIVE`, and the `Note:` vs `Note that` distinction via `BARE_QUALIFIERS` is a real one I did not ask for and that is correct. |
+| **R2-F1.2** four probes with no governance test | **RELOCATED — see R3-F2** | All five classes now fire only in the label's own segment, which closes every case I filed. But `segment()` never cuts at a coordinator, so the hedge in a `X, but Y` caveat is still "in the label's own segment". 6 of 7 coordination constructions refused; the archived reynolds case among them. `roughly`/`nominally` are correctly out of `EVIDENTIALS` and `B3-approximation` (100%) confirms it. |
+| **R2-F1.3** undirected neighbour rule | **addressed, with one residue** | `is_bare_comment()` is the grammatical test I asked for and the distance bound is gone rather than shrunk — that is the right shape of fix. All 6 of my cases pass. Residue: `UNCERTAINTY` was renamed `INABILITY` but `unclear`, `to be verified`, `it depends on how` and `one could argue` stayed in it. Those are *ambiguity of the question*, not *inability to answer*, and `Whether the offset matters is unclear; regardless, the system is linear` is still `UNRESOLVED`. My §5.1(3) asked for the bag to be **split**, not renamed. |
+| **`While the delay term is present…` MISMATCH** | **NOT ADDRESSED** — see R3-F3 | Still `MISMATCH`, reason `label 'not linear' != gold 'linear'`. The segmentation rewrite did not fix it incidentally, and `Although` now fails identically. |
+| **F5 / §5.4 withdrawal** | **addressed** | Accepted in full, as recorded. Not re-litigated; see §5.2 for where the two columns should live. |
+
+---
+
+## 3. Findings
+
+### R3-F1 — CONFIRMED (blocking). 144 of the 351 cases cannot observe their own frame.
+
+The corpus has no negative control. I supplied one: frames that **must** be refused — a
+hypothetical, a task restatement, an explicit hedge. If a case returns `MATCH` under those,
+the frame is not being tested; it is being discarded.
+
+| control frame | MATCH (of 39) | reading |
+|---|---:|---|
+| `If the additivity test holds, {a}` (round-1 F3) | **16** | 16 answers ignore the frame entirely |
+| `We must determine whether the following holds: {a}` (round-1 F3) | **16** | the same 16 |
+| `I suspect, though I am not sure, that {a}` (round-1 F1) | **16** | the same 16 |
+
+The 16 are **exactly** the answers matching `a) … b) …` (checked: 16 of 16 enumerated,
+0 non-enumerated inert). `_CLAUSE_SPLIT` cuts on `(?:^|[\s;])\(?[a-d][)]\s`, so the frame
+becomes a leading, label-free clause and the tuple slot path never reads it. Those 16
+answers × 9 frames = **144 cases that are 144 further copies of the `plain` control.**
+
+This is my round-2 R2-F3 arriving as a measurement error rather than as a policy
+inconsistency: the tuple path is more permissive than the single-label path, and the recall
+corpus inherits that permissiveness as unearned recall. The module docstring's honesty about
+the *frames* being synthetic is real and I credit it; it does not cover this, because this is
+not a limit of the frames — it is 41% of the corpus not running.
+
+**The fix is one frame and one number.** Add the must-reject frames to `FRAMES` with an
+expected outcome of `UNRESOLVED`, and report the rate over the answers the frame reaches. A
+recall corpus whose cases cannot fail reports its own sample size, not its subject's recall.
+
+**Reproduction (~15 s):**
+
+```bash
+python - <<'PY'
+import sys, re; sys.path.insert(0, '.')
+from tests.comparators.recall_corpus import archived_answer
+from tests.comparators.answer import compare_template
+from tests.comparators.ground_truth import LABELS, load
+from tests.comparators.score import STEM_TO_TEMPLATE
+rows = []
+for stem in ("system_property_linearity", "system_properties_memory_causality"):
+    rs, lb = load(stem), LABELS[stem]
+    for i, row in enumerate(rs):
+        if lb[i][0]:
+            a = archived_answer(row)
+            if a and len(a) <= 400:
+                rows.append((stem, row, a))
+enum = re.compile(r'(?:^|[\s;])\(?[a-d][)]\s')
+inert = [a for stem, row, a in rows
+         if compare_template(STEM_TO_TEMPLATE[stem], row["gold_answer"],
+              "## Final Answer\n**Answer:** If the additivity test holds, " + a).is_match]
+print(len(inert), 'of', len(rows), 'ignore the frame;',
+      sum(bool(enum.search(a)) for a in inert), 'of those are enumerated')
+PY
+```
+
+### R3-F2 — CONFIRMED (blocking). Hedge scope is now the *segment*, and a segment is not cut at a coordinator.
+
+`segment()` cuts at subordinators and at comma-delimited subordinate parts. It does not cut
+at `but`, `and`, `yet`, `however`, `so`, `still` or `regardless`. So a caveat coordinated
+with the commitment sits in the label's own segment, and every probe class fires on it:
+
+| candidate (gold `linear`) | outcome |
+|---|---|
+| `The result may be described differently under another convention, but the system is linear.` | **UNRESOLVED** — *modal: may be* |
+| `Homogeneity could be checked in two ways and the system is linear.` | **UNRESOLVED** — *modal: could be* |
+| `It seems ambiguous at first, yet the system is linear.` | **UNRESOLVED** — *appearance: seems* |
+| `The margin appears tight, however the system is linear.` | **UNRESOLVED** — *appearance: appears* |
+| `A different textbook would say otherwise, but the system is linear.` | **UNRESOLVED** — *opinion: would say* |
+| `Whether the offset matters is unclear; regardless, the system is linear.` | **UNRESOLVED** — *bare comment: unclear* |
+| `The boundary case might go either way, so the system is linear.` | MATCH |
+
+Only `so` survives, and by accident — `might go` fails `_MODAL_RE`'s copula requirement, not
+because the coordinator was seen. `segment()` returns the whole sentence unsplit; I checked
+directly:
+
+```
+segment("The result may be described differently under another convention, but the system is linear.")
+  -> ("The result may be described differently under another convention, but the system is linear.", "")
+hedge_markers(matrix) -> ['modal: may be']
+```
+
+**As a frame over the 23 reachable archived answers this scores 0 of 23.** It is the exact
+construction of `reynolds_number_flow_regime__3122400918`, which I filed in round 2 as the one
+archived two-way-classification trace that hedges a caveat and then commits. That trace is
+still refused.
+
+**The through-line, stated once more.** Round 1: scope was 45 characters, and the fix made it a
+clause. Round 2: scope was a clause, and the fix made it a segment. Round 3: scope is a segment,
+and a segment is the whole sentence whenever the contrast is coordinated rather than
+subordinated. Each fix moved the boundary one level up the syntax and stopped short of the same
+relation. My round-2 §5.1(2) listed the coordinators by name; three of that remedy's four parts
+were implemented and this one was not.
+
+### R3-F3 — CONFIRMED (blocking). The `MISMATCH` on a correct answer is unchanged, and has spread.
+
+```
+MISMATCH | While the delay term is present, it does not break superposition: the system is linear.
+         -> label 'not linear' != gold 'linear'
+MISMATCH | Although the delay term is present, it does not break superposition: the system is linear.
+         -> label 'not linear' != gold 'linear'
+MATCH    | While the delay term is present, superposition still holds, so the system is linear.
+```
+
+The brief asked whether the segmentation rewrite fixed this incidentally. **It did not**, and
+the second row is new: `Although` — the opener the rewrite was built to rehabilitate — now
+fails the same way. `while` and `although` are correctly classified as concessive and the
+matrix is correctly taken, but the matrix is `it does not break superposition: the system is
+linear`, and label selection reads the negation across the colon onto `linear`. This is
+`kinds.py` label selection, not `commitment.py`, and I said so in round 2; it is filed again
+because it is the **worst available outcome** — a correct answer scored wrong, not merely
+undecided — and because D4.1 §1 states a bias toward `UNRESOLVED` over `MISMATCH` that this
+violates. Negation scope needs the treatment commitment scope has now had three times: it
+should stop at a colon and at a coordinator.
+
+### R3-F4 — MINOR. Two trailing full sentences still hedge, but only on the tuple path.
+
+`{a} The result should be stated to three significant figures.` and `{a} That is how it
+appears from the two tests.` score **21 of 23**. Both failures are the `Memoryless: No;
+Causal: Yes.` answers, and the reason is `causal: hedged (modal: should be)` — the tuple slot
+path attaches the trailing sentence to the second slot. The single-label path handles both
+correctly, because `is_bare_comment` rejects a 9-word clause with a definite subject. This is
+R2-F3 with the sign flipped: in round 2 the tuple path was the more permissive one and I said
+it was the one that was right; here it is the stricter one and it is the one that is wrong.
+**One policy, two implementations, and which is correct now depends on the case.**
+`_slot_verdict` should call the same `find_commitment` machinery rather than a hand-rolled
+subset of it.
+
+`The result should be stated to three significant figures` is verbatim the
+`kinematic_viscosity__3586477399` phrasing from my R2-F2 table — a modal about **rounding
+convention**, which I flagged in round 2 and which is still read as a modal about the answer.
+
+---
+
+## 4. Falsification attempts that failed
+
+- **Nine of my twelve frames hold at 100%**, on both denominators: `Therefore, {a}`; `I am
+  confident that {a}`; `My first pass had this backwards. {a}` (self-correction); `Strictly on
+  the definitions given in the course text, {a}`; `{a} The algebra above is a little rough,
+  though.`; `By the standard textbook criterion, {a}`; `The coefficient is roughly 2 for every
+  n, so {a}`; `Conclusion: {a}`; `It would have been the other way had the square been absent,
+  but {a}`. The last is the one I most expected to fail — a counterfactual coordinated with a
+  commitment — and it passes, because `had` never reaches a clause-initial position. **The
+  concessive/factive rewrite is genuinely sound**; R3-F2 is about coordination, which that
+  rewrite never claimed to handle.
+- **`roughly` and `nominally` are properly out.** `The coefficient is roughly 2 for every n, so
+  {a}` is 100%, and `roughly speaking` still hedges. The multi-word retention is the right call
+  and the reasoning in the `EVIDENTIALS` comment is correct.
+- **`reviewer_battery` is 64/64 and I could not add a case to it that both rounds imply and
+  that fails.** Every case I filed in rounds 1 and 2 behaves as I argued. R3-F2 is not in the
+  battery because I did not write it as a case in round 2 — I wrote it as a *remedy*, and the
+  remedy was implemented in three parts of four.
+- **The gate is green and stays green.** archive 100.0% / 97.8%, adversarial 98.6% / 98.6%,
+  zero archived false accepts. **None of R3-F1 through R3-F4 moves any of those numbers**,
+  which is the point: three rounds in, the gate has never once been the instrument that found a
+  defect, and the recall corpus was built to change that. It can, once R3-F1 is fixed — the
+  `B3-caveat-but` frame turns R3-F2 into a 0-of-23 line in a table that runs on every commit.
+- **`is_bare_comment`'s no-distance-bound design survives probing.** I tried to make a bare
+  comment govern across four intervening clauses where it should not, and across zero where it
+  should, and it behaved correctly both times. Removing the magic constant rather than retuning
+  it was the right move and it is the strongest single change in this round's diff.
+- **The `Note:` / `Note that` split is right, and I checked both directions.**
+
+---
+
+## 5. Further probing and improvements
+
+### 5.1 What the recall corpus needs in order to be the instrument I asked for
+
+1. **A negative control, reported as a row.** Frames that must be refused (`If X, {a}`; `We
+   must determine whether {a}`; `I suspect … that {a}`). Any case that returns `MATCH` under
+   all of them is inert and must be excluded from the denominator or fixed. It costs nothing
+   and it is the difference between a measurement and a tautology.
+2. **Report the reachable denominator.** 39 answers, 23 reachable; 351 cases, 207 live. The
+   headline number should be the live one.
+3. **Frames must be able to wrap, not only prefix.** Every shipped frame but two is a prefix,
+   and `archived_answer` appends a full stop, so no frame can put anything inside the label's
+   own clause — which is precisely where R3-F2 lives. At least one frame should interpolate:
+   `{a_stem}, but {a}`.
+4. **The frames I would add**, in priority order: **coordinated caveat** (`X may be …, but
+   {a}` — 0% today); **modal about convention or rounding, trailing the answer** (`{a} The
+   result should be stated to three significant figures.` — the archived `kinematic_viscosity`
+   phrasing); **ambiguity-of-question then commit** (`Whether the offset matters is unclear;
+   regardless, {a}`); **colon-separated negated premise** (the R3-F3 construction). All four
+   come from archived text or from cases already in this report, not from the constructions
+   `commitment.py` enumerates — which is the circularity test the current nine do not pass.
+   Seven of the nine shipped frames name in their own comment the finding they were written
+   from, which is admirably honest and is also the diagnosis: they were selected from the
+   inside of the list they certify, for the third round running.
+
+### 5.2 Where the two accepted numbers should live (optional task)
+
+**`docs/re-implementation-sep/template_inventory.csv`**, as two new columns —
+`blind_guess_floor` and `surface_model_holdout` — beside the existing `difficulty` column.
+Not the item-pool-impact note, and not the D4.1 results table:
+
+- The inventory is **per template**, which is the grain both numbers have. It already carries
+  `difficulty`, `n_steps`, `answer_type` and `pct_answer_values_recoverable`, so a reader
+  comparing a *claimed* difficulty against a *measured* one has both in one row. The item-pool
+  note is per phase and would strand the numbers in whichever phase computed them; the results
+  table is per comparator run and would recompute them every time.
+- Both are cheap and deterministic: the round-1 §2 script, 2,000 seeds, minutes per template.
+  A `phase5_shortcuttability.py` that fills the two columns for all 146 is one batch job, and
+  my round-1 §5.4 argued it would have caught D-046 unaided.
+- A third `shortcut_lift` column is unnecessary — it is the difference — but it is the natural
+  **sort key**, so compute it in the report rather than storing it.
+
+**Threshold for concern.** Two, because there are two failure modes:
+
+- **`surface_model_holdout − blind_guess_floor ≥ 40 pts` → flag.** Both Phase 4 items are
+  +49.98 and +65.98 and both are pure lookups. 40 points is generous and still catches them.
+- **`surface_model_holdout ≥ 95%` → flag regardless of lift.** A high floor can mask a total
+  lookup: an item with an 85% majority class and 100% held-out has a lift of only 15 points and
+  is still a function of the question surface. The Phase 4 items trip both tests; no template
+  should carry an `Advanced` label while tripping either.
+
+A flag should mean **"the difficulty label and the answer-only scoring decision need a P6
+register entry"**, not "block the template". That is the disposition my §5.4 argued for F5, and
+it generalises: the number's job is to force the scoping decision to be *recorded*, which is
+what P6 exists for.
+
+### 5.3 What lifts the block
+
+Narrow, and all three are already specified:
+
+1. Add the negative control to `recall_corpus.py` and report the reachable denominator
+   (R3-F1). Without it the corpus's number is not interpretable in either direction.
+2. Cut `segment()` at coordinators — `but`, `and`, `yet`, `however`, `still`, `regardless`,
+   `nevertheless` — as round-2 §5.1(2) specified (R3-F2). This is the fourth part of a
+   four-part remedy of which three parts are done.
+3. Stop negation scope at a colon and at a coordinator (R3-F3). A correct answer scored
+   `MISMATCH` is the one outcome D4.1 §1 rules out, and it has now survived two rounds.
+
+R3-F4 is minor and can ride along: route `_slot_verdict` through `find_commitment` so the
+policy has a single implementation.
