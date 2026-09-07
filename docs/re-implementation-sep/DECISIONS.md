@@ -2434,6 +2434,349 @@ happens by habit. A gate nobody types is the thing F4 is about.
 
 ---
 
+## D-063 — N1's replacement is chosen by measurement, and the rule is PER-KIND
+
+**Date:** 2026-09-07 · **Status:** DECIDED · **Source:** Phase 5 Track B, D5.6
+
+`parse_number` read the **first** number in an answer span. The first number in
+an answer sentence is very often a fluid grade (`Engine Oil (SAE 50)`), a
+temperature (`at 541 K`) or a chemical-formula subscript (the 4 of C4H10).
+
+**Eleven candidate rules, two axes, four corpora, held-out slice frozen before
+any candidate was written.** `tests/comparators/n1_candidates.py` regenerates
+the whole table, losers included; the split is a pure function of the template
+id and a fixed salt, defined above the candidates in the file.
+
+Held-out slice, the one that counts:
+
+| rule | gold×gold FA | gold×gold decided | archive XI | archive decided |
+|---|---:|---:|---:|---:|
+| `first` (incumbent) | **16** | 100.0% | 144 | 99.1% |
+| `last` | **424** | 100.0% | 1,812 | 99.1% |
+| `unit_adjacent` | 0 | 70.6% | 1 | 70.0% |
+| `unique_or_unresolved` | 0 | 65.2% | 0 | 3.6% |
+| **shipped (per-kind)** | **0** | **100.0%** | 6 | **99.1%** |
+
+### Three findings, none of which a single example would have produced
+
+**1. "Last number" is far worse than "first", not better** — 424 held-out false
+accepts against 16. The brief warned this; the measurement quantifies it.
+
+**2. The tokeniser matters more than the choice of number.** A digit inside a
+unit exponent (`m^2`) or a formula subscript (`C4H10`) is not a quantity at all.
+Removing those two classes is orthogonal to *which* of the remaining numbers a
+rule picks, so it applies under every rule equally — and it is what turns "last
+number" from 424 false accepts into 0.
+
+**3. The rule must be per-`kind`, and this is the reframing.** `check` answers
+state the quantity first and the threshold second — *"the deflection is 18.4 mm,
+less than the 25 mm limit"* — so every last-ward rule picks the **limit**. On
+D4.4's 21 `check` cases:
+
+| | decided | correct | false rejects |
+|---|---:|---:|---:|
+| first-number | 13 | **13** | 0 |
+| every last-ward rule | 13 | **5** | 8 |
+
+So `check` keeps first-number and `numeric` does not. **The comparator did not
+need another rule; it needed the binding to say which rule applies.**
+
+### Two confounds separated before the table meant anything
+
+**A unit false accept is not an extraction error.** `400.0 MHz` against
+`400.0 kHz` is the same number and a different unit; no extraction rule can fix
+it and only a declared unit can (D-052). Counted together they would have
+credited and blamed every rule for something outside its reach, so they are
+separate columns.
+
+**The incumbent's higher decided rate WAS the defect.** It decided more often
+because it picked a non-exponent incidental number whose precision was
+computable, while the real answer was frequently in exponent form and
+`_decimals` returned `None` for those. It was deciding *by reading the wrong
+number*. Implementing §7.1's display tolerance for scientific notation
+(`extract.displayed_decimals`) lifted the archive decided rate under **every**
+rule including the incumbent — which is what shows it to be an independent fix
+and not a way of paying for this one.
+
+---
+
+## D-064 — N2's root cause was the isolation, and it is that function's THIRD wrong positional rule
+
+**Date:** 2026-09-07 · **Status:** DECIDED · **Source:** Phase 5 Track B, D5.7
+
+D-058 diagnosed N2 as *"an empty parse compares equal to an empty parse"* —
+`_as_polynomial` returning `{}` and `{} == {}` being a `MATCH`. That is true and
+it is not the root cause. Fixing only it left `autocorrelation_rect_pulse`
+matching across instances, because the CAS then received `"0"` from **both**
+sides and correctly agreed.
+
+**The actual defect is upstream.** `_isolate_expression` took the **last**
+`=`-bearing line, and that template's answer span ends with a sentence of prose:
+
+```
+R_g(tau) = 64*(8 - |tau|), for |tau| <= 8, and 0 otherwise.
+This triangle has a peak value of 512 at tau = 0.
+```
+
+The last `=`-bearing line is the prose, so the isolated "expression" was the
+string `0`, on every instance.
+
+**This is the third wrong positional rule in one function, and the first two are
+recorded as errors in `phase4_summary.md` §8** (#3: *"split on the **last** `=`
+…, then on `.split("\n")[0]`. Two wrong rules from two examples, in one
+function"*). So the fix is deliberately **not a different position**:
+
+- an answer line **assigns to a symbol** and prose does not, so lines whose
+  left-hand side is a bare identifier (optionally with arguments) are preferred;
+- `=` is split on only when bare, never inside `<=`, `>=`, `!=`;
+- and a **piecewise** answer — `…, for |tau| <= 8, and 0 otherwise` — is refused
+  outright rather than having one branch picked, because a single-expression
+  comparator cannot represent it. D4.1 §4.4: failure is `UNRESOLVED`, never
+  `MATCH`.
+
+`autocorrelation_rect_pulse` is now `UNRESOLVED` **in both directions**,
+including for a pair of identical instances. That is the honest outcome and it
+is why the template is named unbound rather than counted as fixed.
+
+---
+
+## D-065 — A binding that never decides is not a binding
+
+**Date:** 2026-09-07 · **Status:** DECIDED · **Source:** Phase 5 Track B, D5.8
+
+D5.8's criterion as written is *"zero false accepts over N ≥ 50 instances
+cross-paired within its own template"*. **Eleven bindings met it by producing
+zero verdicts** — 8 of the 9 `symbolic` templates and 3 `multipart` ones decide
+**0.0%** of their 2,450 pairs each.
+
+That is the degenerate pass the phase brief names in its own D5.6 section —
+*"the degenerate winner is candidate 3, which achieves zero false accepts by
+deciding nothing"* — committed one deliverable later, on the axis where the
+brief did not repeat the warning.
+
+**Decision: a binding counts as bound only if it also decides.**
+
+**The threshold is measured, not chosen.** The decided-rate distribution over
+the 132 candidate bindings is bimodal with an empty middle:
+
+| decided rate | bindings |
+|---|---:|
+| 0% | **11** |
+| 0–25% | 0 |
+| 25–50% | 0 |
+| 50–90% | 1 (87.4%) |
+| 90–100% | **120** |
+
+Nothing lies between 0% and 87.4%, so **every threshold in that range gives the
+same partition** and the result does not depend on where the line is drawn.
+
+**This floor alone took the count from 132 to 121.** Reviewer E then found
+four more reasons a binding can be wrong while passing an accept-only gate, and the
+final figure is **118 of 150 bound, 32 named unbound** (D-067). Each successive
+number is smaller and truer than the one before it, and that is Track B's version
+of the Phase 4 stopping rule — *bind fewer templates and name the rest*, rather
+than add rules.
+
+**Why the eight `symbolic` templates cannot be rescued cheaply, measured.** The
+first diagnosis was that `_to_sympy` splits function names (`cos` → `c*o*s`), so
+`c`, `o`, `s` read as symbols outside the declared alphabet. Masking the
+function names changed the decided rate by **nothing at all** — 11.1% before and
+after. The real blockers are several and none is small:
+
+| template | isolated expression | blocker |
+|---|---|---|
+| `phasor_addition` | `73.5 * cos(361*t - 146.39 deg)` | the unit word `deg` inside the expression |
+| `bpsk_energy_basis` | `b) The basis function (psi_1(t)) is 16.24 * cos(...)` | the isolation takes prose |
+| `standing_wave_formation` | `0.0, 0.69, and 1.38` | a two-equation answer; the isolation takes the node list |
+
+Diagnosing from an error message and shipping the fix would have added a
+mechanism that buys zero verdicts. **Assigned to Phase 6 (D6.10)** with these
+three shapes named.
+
+---
+
+## D-066 — D-057's supporting-quantity remedy is declined by this phase, with a reason
+
+**Date:** 2026-09-07 · **Status:** DECIDED · **Source:** Phase 5, D-057 /
+`phase4_summary.md` §12
+
+`phase4_summary.md` §12 assigns Phase 5 the supporting-quantity remedy for the
+two 100%-shortcuttable classification items. **Declined here and reassigned to
+Phase 6**, and the disposition is recorded in §12 itself as the brief requires,
+not only in this register.
+
+**Reason.** The remedy changes what the item *asks* and what its gold *answers*.
+That is item design. Track B's charter is `tests/comparators/` and
+`template_inventory.csv` **only** — the spec says so in the same paragraph that
+sets its effort box — and Track A's scope is the eleven output-contract
+templates. Taking it here would be scope creep on the two items where a mistake
+is least recoverable, in a phase whose named risk is *changing an item pool by
+accident*.
+
+**What this phase contributes instead, and it is not nothing.** Both items are
+now bound and cross-paired at N=50 with **zero false accepts** — and both remain
+**100% shortcuttable**:
+
+| template | blind-guess floor | held-out surface model | gold×gold false accepts |
+|---|---:|---:|---:|
+| `system_property_linearity` | 0.5008 | **1.0000** | 0 |
+| `system_properties_memory_causality` | 0.3450 | **1.0000** | 0 |
+
+Those two facts are independent and the point is to hold them side by side:
+**a comparator that scores an answer correctly cannot tell you whether the
+answer required the reasoning.** A bound template is not a hard one, and the
+binding work must not be read as evidence about difficulty.
+
+One further measurement worth recording: `levenspiel_plot_interpretation`'s
+blind-guess floor is **1.0000** — a blind guess scores 100%, so the statistic is
+degenerate on that item and its difficulty label is unsupported by it.
+
+---
+## D-067 — Reviewer E's triage: the two defect classes were masking each other
+
+**Date:** 2026-09-07 · **Status:** DECIDED · **Source:** Phase 5 Reviewer E
+(comparator adversary), `reviews/phase5_reviewer_e_comparator.md`
+
+**Verdict `BLOCKED`, and it was the right verdict.**
+
+> **75 of the 132 bound templates do not return `MATCH` when the candidate is a
+> verbatim copy of gold.** `gold_gold`'s loop skips `a == b`, so this case was
+> not merely unmeasured — it was **excluded by construction**, and no gate saw
+> it.
+
+```
+Counter({'MATCH': 57, 'UNRESOLVED': 45, 'MISMATCH': 30})
+```
+
+**And the load-bearing point, which is worth more than any single finding:**
+the reported *"zero false accepts over 340,550 pairs"* was **produced by** an
+over-rejection defect. E found a real over-acceptance mechanism — a part
+comparing a different part's number — and showed that both of its realised
+instances return `MISMATCH` **because of the unit defect**, not because the
+comparator noticed anything. Repairing one defect uncovers the other. An
+accept-only reading of that gate was measuring the interaction of two bugs.
+
+This is the Phase 4 lesson arriving on a new surface: *a layer that marks
+correct answers wrong is as unacceptable as a false accept* (D4.1 §1), and it
+hides false accepts while it does it.
+
+### Findings
+
+| # | Finding | Disposition |
+|---|---|---|
+| **E-1** | 75 of 132 bindings reject a verbatim copy of gold; the identity case is excluded by the loop's own `a == b` skip | `ADOPT-NOW` — identity is a first-class term in **both** the binding gate and `cross_pair`'s gate |
+| **E-2** | `_resolve_unit` knows 11 canonical units; **40 of the 48 declared values are outside it**, covering 72 of 103 templates — and it matches substrings, so `N` is found inside `N/m` → `MISMATCH` | `ADOPT-NOW` — the derived unit is no longer passed to the comparator |
+| **E-3** | `DECLARED_UNITS` is a trailing-token heuristic, not units: `otherwise`, `e-05`, `units`, `percent`, `dollars`, `subgroups`. It re-creates exactly the rejection D4.1 §4.1 says the opt-in design exists to prevent | `ADOPT-NOW` — same fix; the **census** stays, the comparator does not consume it |
+| **E-4** | `numeric_parts(n, unit)` applies one unit to all `n` parts of an answer whose parts carry different units by construction; 13 templates MISMATCH themselves | `ADOPT-NOW` — parts carry no unit; per-part units need a per-part declaration (`ADOPT-PHASE-6`, D6.11) |
+| **E-5** | The unit check costs **19 of the 82** matches on real archived model answers, and catches 2 | `ADOPT-NOW` — this is the ablation the brief prescribes, and it says delete rather than patch |
+| **E-6** | 11 templates are "bound" while deciding **nothing** — 2,450/2,450 UNRESOLVED | `ADOPT-NOW` — a decided-rate floor (D-065); found independently before the report arrived, which does not make it less E's finding |
+| **E-7** | The shipped tool **already printed** `false rejects 56` and it never reached the claim table | `ADOPT-NOW` — false rejects gate now, and the count is a headline |
+| **E-8** | `nth_quantity`'s 16-character tail makes part *i* select part *i+1*'s number on **6 of 31** multipart bindings; two real gold pairs are accepted for each other | `ADOPT-NOW` — the slice ends at the number |
+| **E-9** | Three multipart bindings contain parts that read a **constant**, so those parts compare nothing | `ADOPT-NOW` — a constant-part check in the binding gate |
+| **E-10** | `partial` cannot fire on a numeric or symbolic binding, and two symbolic bindings are narrower than their answers | `ADOPT-NOW` for the flag's scope; the two symbolic ones are unbound anyway under D-065 |
+
+### The three claims that did not survive
+
+**E8 diverged on all three of its parts and the divergence is instructive.**
+The commit claimed N1/N2/N4 were fixed and demonstrated it with
+`compare_kind(...)`, which uses *kind defaults*. Under the shipped **bindings**:
+
+- `hagen_poiseuille_flowrate` is **unbound**, so `compare_template` raises
+  `KeyError` rather than returning `MISMATCH`. The claim was true of the kind
+  and not of the template.
+- `autocorrelation_rect_pulse` stops matching partly because the pseudo-unit
+  `otherwise` suppressed it — a defect doing the work of a fix.
+- `continuous_to_discrete_conversion` traded crashing for refusing, which is
+  progress and is not the same as being fixed.
+
+**A demonstration must run through the shipped path.** Demonstrating a fix with
+the generic entry point while shipping a bound one is the same class of error as
+verifying a claim by re-reading it.
+
+**E also noted that `phase4_comparators.md` §8 at that ref still prints
+98.6%/100%** where the current measurement is 95.8%/98.6% — a Phase 4 document
+inconsistency, `ADOPT-PHASE-6`.
+
+---
+
+## D-068 — Reviewer E round 2: the block lifts, and two of my own numbers were wrong
+
+**Date:** 2026-09-08 · **Status:** DECIDED · **Source:** Phase 5 Reviewer E,
+round 2, `reviews/phase5_reviewer_e_comparator.md`
+
+**`PASS WITH FINDINGS` — the block lifts.** E answered its own block question on
+its own terms rather than accepting mine:
+
+> Neither colliding pair is a false accept, and both `MISMATCH` **for the right
+> reason**. `hydrostatic_pressure_at_depth` part 1 now selects `13.29` — the
+> depth — instead of `101.347`, the pressure it had been comparing twice;
+> `rackett_equation_volume` part 1 selects the temperature instead of the
+> volume. *The masking is gone and nothing was traded for it.*
+
+And it closed the gap it had declined to claim in its first filing: gold×gold at
+**N = 100 over all 33 structural-kind templates — 326,700 pairs, 0 false
+accepts, 0 false rejects, 0 errors, 0 UNRESOLVED**, with round 1's N = 250
+collision search re-run byte-identical and returning **0** collisions on all
+five formerly mis-slicing templates. Identity, re-derived independently rather
+than read from my tool: **5,900 / 5,900**.
+
+### Findings
+
+| # | Finding | Disposition |
+|---|---|---|
+| **R2-F1** | `vector_components` reads ASCII `x_hat`, which is what **gold** writes; every archived model answer writes `x̂`. The comparator accepts **0 of 83** real answers across the 3 vector templates — and this is **structurally invisible to the identity gate**, because gold matches gold. | `ADOPT-NOW` |
+| **R2-F2** | The gold×gold truth predicate was **textual identity of the span**, so `5.0 seconds` against `4.99 seconds` read as a false accept when §7.1's boundary-inclusive tolerance makes the MATCH correct. **10 of the 32 unbound entries rested on that predicate, 9 on it alone.** | `ADOPT-NOW` |
+| **R2-F3** | For `symbolic`, "bind fewer and name the rest" *is* laundering: `derive_kind` routes to `symbolic` on a regex matching exactly the construct the comparator cannot read. "1 of 9" measures the comparator, not the corpus. | `ADOPT-NOW` (the characterisation) + `ADOPT-PHASE-6` (the fix, D6.10) |
+
+### R2-F1 is the sharper of the two mechanical findings
+
+A missing **surface declaration** — the mechanism D4.1 §4.2 already uses for
+categorical labels — and not undecidability. `x̂` is a combining circumflex
+(U+0302) or a precomposed `ŷ`/`ẑ` (U+0177, U+1E91); models also write the
+component list as `[a, b]` where gold writes `<a, b>`. Both are now folded.
+
+**And it names a real limitation of the identity gate, one round after that gate
+was added to catch exactly this class.** Identity compares gold to gold, so a
+defect that lives entirely in *model* surface forms passes it by construction.
+The identity term is necessary and it is not sufficient; archive×gold is what
+covers the other half, and its per-kind decided rate is what would have shown
+this — `vector` at **12.0%** was in the table and I did not read it. That is the
+same error as E-7 one round earlier: **the number was printed and not read.**
+
+### R2-F3, and a case where E and I were each right about different things
+
+E diagnosed the `symbolic` failures as the parser splitting function names into
+free symbols — `['c','o','s']` is `cos`. I had already implemented that fix and
+measured **no change at all** (11.1% decided, before and after), and recorded it
+in D-065 as a known-bad fix.
+
+Both are correct, and resolving it required a third measurement. My first mask
+was itself broken — `_to_sympy`'s `x*(` rule re-inserted a `*` inside the
+placeholder — so *that* measurement was worthless. Repaired, the mask works on
+the probe (`cos(361*t - 146.39)` survives intact) and **still rescues 0 of 8**,
+because function-name splitting is one of **five** independent blockers:
+
+| template | isolated expression | blocker |
+|---|---|---|
+| `phasor_addition` | `38.93 * cos(420*t + 7.48 deg)` | the unit word `deg` → symbols `d`,`e`,`g` |
+| `ft_esd_rect_pulse` | `2304.0 * sinc^2(4.0*f)` | `sinc^2(` — a function with an exponent, which the mask's `name(` pattern misses |
+| `cd_dc_system_analysis` | `27.35 * cos(657*pi*(t - 3.81e-03))` | `pi` → `p*i`, and `3.81e-03` → `3.81*e-03` |
+| `undamped_response_initial_conditions` | `-0.006*cos(34.6384*t) (m)` | a trailing unit annotation → symbol `m` |
+| `standing_wave_formation` | `0.0, 0.99, and 1.98` | the isolation takes the node list, not the equation |
+
+So E's characterisation stands — the routing regex selects for what the parser
+cannot read — and D-065's "the obvious fix is known not to work" also stands,
+with the correction that it is one of five and that my first attempt to measure
+it was broken. **Recorded as an error (§7 #15): I measured a fix, saw no change,
+and concluded the diagnosis was wrong, when the fix was.**
+
+Not fixed here. Five surface rules added at the close of a phase, to a parser
+whose *last* three positional rules were all wrong (D-064), is exactly the move
+the stopping rule forbids. **Phase 6 (D6.10) now has a specification instead of
+a symptom**, and one ruled-out fix.
+
+---
+
 ---
 
 ## Open decisions

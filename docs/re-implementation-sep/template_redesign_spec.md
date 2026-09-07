@@ -484,14 +484,27 @@ a correct answer the N1 rule leaves `UNRESOLVED`. 13 of E's 20 Phase 4 findings
 were over-rejection, and an accept-only gate cannot see that half. **Do not
 re-commission Track A's T4 sweep from this reviewer.**
 
-**Exit gate (Track B):**
-- [ ] D5.4 and D5.5 land as runnable standing checks, with their pair counts reported
-- [ ] **Zero false accepts on gold×gold across all 150 templates**, or every remaining one named with a written reason
-- [ ] N1 fixed by a rule **chosen on measured evidence over two axes** (false accepts *and* decided rate on answers that ought to be decided), losing candidates' numbers recorded, winner reported on a **held-out slice**
-- [ ] **The decided rate for `numeric` did not fall against the Phase 4 baseline, measured** - an accept-only gate is passed by a comparator that decides nothing
-- [ ] N2 and N4 fixed: no code path returns `MATCH` from an unrecoverable parse, and none raises; **errors counted separately from verdicts**
+**Exit gate (Track B)** — amended by SPEC-CHANGE 18 and 19:
+- [ ] D5.4 and D5.5 land as runnable standing checks, reporting **pairs /
+      templates-scored / templates-skipped with every skip named**, and the
+      **construction** that produced the pair count
+- [ ] **All four terms zero on gold×gold**: false accepts, false rejects,
+      identity failures, errors. *Zero false accepts alone is passed by a
+      comparator that refuses everything, and the two failure classes mask each
+      other* (SPEC-CHANGE 18)
+- [ ] N1 fixed by a rule **chosen on measured evidence over two axes**, losing
+      candidates' numbers recorded, winner reported on a **held-out slice frozen
+      before any candidate was written**
+- [ ] **The decided rate did not fall against the Phase 4 baseline, measured** —
+      and a decided rate the incumbent achieved *by reading the wrong number* is
+      not a baseline to preserve
+- [ ] N2 and N4 fixed: no code path returns `MATCH` from an unrecoverable parse,
+      and none raises; **errors counted separately from verdicts**
 - [ ] Per-kind negative counts published beside every precision figure
-- [ ] Every `classification`, `symbolic`, `vector`, `array` and `multipart` template either **bound and validated at N ≥ 50**, or **named unbound with a written reason**
+- [ ] Every `classification`, `symbolic`, `vector`, `array` and `multipart`
+      template either **bound and validated at N ≥ 50 on all four terms**, or
+      **named unbound with a measured reason**
+- [ ] **No unit is inferred from gold's string** (SPEC-CHANGE 19)
 - [ ] **Independent review filed (R2) and every §5 suggestion triaged (R4)**
 
 **Effort: 15–25 h + 8–10 h review.** No template redesign; Track B edits
@@ -509,6 +522,12 @@ D6.1 **Full re-run of the original audit harness** across all 150 templates; reg
 
 **D6.8 — an answer-span shape assertion.** D5.3's predicate tests the *marker* and not the *span*, so it passed on a span carrying a whole extra section (Reviewer A, F7, |S|5.8ii). After that template was fixed the corpus's longest answer span is **199 characters**, so a bound can now be set from measurement rather than guessed.
 
+
+**D6.9 — a mixed `AnswerSpec`: numeric *and* categorical parts.** `damping_classification` states a damping ratio, a regime and a damped natural frequency; `reynolds_number_flow_regime` states a Reynolds number and a regime. A label-only binding on either is **not validatable by whole-span cross-pairing** -- two instances routinely share the class while differing in the quantity, and the pairing reads that as a false accept (measured: 544 and 1,650 in 2,450 pairs, none of them a comparator defect). Both are named unbound in Phase 5 for this reason.
+
+**D6.10 — the eight `symbolic` templates that decide nothing.** Bound at zero false accepts and **0.0% decided**, so unbound under SPEC-CHANGE 18. The blockers are measured and none is small: a unit word inside the expression (`cos(361*t - 146.39 deg)`), an isolation that takes prose, and two-equation answers. Masking the function names in `_to_sympy` was tried and changed the decided rate by **nothing** -- 11.1% before and after -- so the obvious fix is known not to work.
+
+**D6.11 — per-item and per-part unit declarations.** SPEC-CHANGE 19 removes the inferred unit; the *census* says 113 templates carry one. Declaring them is an editorial act per item, and a `multipart` answer needs one unit **per part** -- one unit applied to all `n` parts is wrong for at least `n-1` and made 13 templates reject their own gold.
 ### 6.2 Independent review
 
 *Reviewer F — Audit replication.* Given only the original audit report and the changed repo, **independently re-runs the audit** and compares. Must confirm: the class-D count fell as claimed, no new class-D templates were introduced elsewhere, and no metric regressed silently. Explicitly tasked with looking for **collateral damage** — a Phase-1 rounding change that broke a Phase-5 template's contract, or similar.
@@ -888,6 +907,8 @@ Read the hours as effort. Wall-clock is a fraction of them, and the difference i
 | SPEC-CHANGE 15 | **The doubled-sign defect is corpus-wide, 16 templates, and the spec's 2-template row understated it** (D-061) | The fault is a hard-coded `+` before an interpolated signed value; the `j` is incidental. 4 templates emit it inside the **answer span**, 2 of which are Track A's. Track A fixes its two completely - which uncovered a P1 violation, `sqrt(-41.2^2 + 86.45^2) = 95.77` evaluating to 76.00 - and the other 14 are named and assigned to Phase 6. |
 | SPEC-CHANGE 16 | **Phase 5 Track A's exit gate says what it means: "clean across all four classes *within Track A's eleven*, with the corpus-wide residual enumerated as a census and assigned to Phase 6"** (Reviewer A, |S|5.10) | Taken literally the old wording was false: the corpus is *not* clean across class 3 -- 14 templates emit a doubled sign -- and the gate passed only because the detector was narrower than the class it was named after. A scan reporting `0 templates` for a class present on 14 is worse than one reporting the 14. |
 | SPEC-CHANGE 17 | **Every detector a phase adds must carry at least two planted defects of materially different surface form, and the plants must be written from the class definition in the spec rather than from the detector** (Reviewer A, |S|5.9) | Phase 5 planted one defect per class and the plants passed while **four** of its detectors were narrower than their class (F1, F3, F5, F6). The plant and the regex were written by the same hand, so every plant was a shape the regex already matched. The reviewer found all four by writing detectors from the defect table instead. This is a fifteen-minute change to a plant list and it would have caught four of the five substantive findings in that review. |
+| SPEC-CHANGE 18 | **D5.8's binding criterion is four terms, not one: zero false accepts, zero errors, **the identity case**, and a non-zero decided rate** (D-065, D-067; Reviewer E, E-1/E-6) | *Zero false accepts* alone is passed by a comparator that refuses everything, and Phase 5 shipped both halves of that: 11 bindings decided **0.0%** of 2,450 pairs each, and **75 of 132 did not credit a verbatim copy of their own gold** -- a case the cross-pairing loop excluded by construction, since it skips `a == b`. Worse, the two defect classes **masked each other**: the reported "zero false accepts over 340,550 pairs" was *produced by* an over-rejection defect, and repairing it uncovered a real over-acceptance mechanism that had been returning MISMATCH for the wrong reason. An accept-only gate cannot see any of this. |
+| SPEC-CHANGE 19 | **A unit is DECLARED, never derived from gold's string** -- D5.10 delivers the census and the comparator does not consume it (D-067; Reviewer E, E-2/E-3/E-5) | D4.1 |S|4.1 already said why the unit check is opt-in: *"inferring the unit from gold's string instead would reject `7.65 litres`, which is correct. That trade is why it is opt-in."* D5.10 inferred it from gold's string and the predicted rejection arrived on real archived text -- `17.46 s` against a gold of `17.46 seconds`, marked WRONG. The trailing-token derivation also does not yield units at all: `otherwise`, `e-05`, `units`, `percent`, `dollars`, `subgroups`. Ablated per the phase's own stopping rule: it cost **19 of the 82** matches on real archived answers and caught 2, so it is deleted rather than patched. |
 
 ---
 
