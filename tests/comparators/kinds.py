@@ -41,6 +41,11 @@ from .normalize import (
     answer_span,
     prepare,
 )
+from .extract import (  # D5.6 -- the measured extraction rule
+    answer_decimals,
+    answer_number,
+    displayed_decimals,
+)
 from .verdict import MISMATCH, UNRESOLVED, Verdict, match, mismatch, unresolved
 
 # ==========================================================================
@@ -50,33 +55,20 @@ from .verdict import MISMATCH, UNRESOLVED, Verdict, match, mismatch, unresolved
 _NUM_RE = re.compile(r"[-+]?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?(?:[eE][-+]?\d+)?")
 
 
-def _decimals(text: str) -> int | None:
-    """Displayed decimal places of the first number in ``text``."""
-    m = _NUM_RE.search(text)
-    if not m:
-        return None
-    tok = m.group(0)
-    if "e" in tok.lower():
-        return None
-    return len(tok.split(".")[1]) if "." in tok else 0
+def _decimals(text: str, kind: str = "numeric", unit: str | None = None) -> int | None:
+    """Displayed decimal places of the number the ANSWER RULE chose (D5.6)."""
+    return answer_decimals(text, kind, unit)
 
 
-def parse_number(text: str) -> Decimal | None:
-    """Parse the first number, honouring thousands separators.
+def parse_number(text: str, kind: str = "numeric", unit: str | None = None) -> Decimal | None:
+    """The number this span asserts as its answer (D5.6).
 
-    ``4,921`` is four thousand nine hundred and twenty-one.  The deployed
-    parser reads it as ``4.0`` (D-003) because it applies its comma strip to a
-    different string from the one its regex matched.  Reproducing that would be
-    a test carrying its own answer key (D-034), so this is written from the
-    grammar rather than from the incumbent.
+    Was: the FIRST number, which is often a fluid grade, a temperature or a
+    chemical-formula subscript -- defect N1 in D-058.  The rule now applied was
+    chosen by measurement over four corpora with a frozen held-out slice; see
+    ``extract.py`` and ``n1_candidates.py``.
     """
-    m = _NUM_RE.search(text)
-    if not m:
-        return None
-    try:
-        return Decimal(m.group(0).replace(",", ""))
-    except InvalidOperation:
-        return None
+    return answer_number(text, kind, unit)
 
 
 #: Unit surfaces, keyed by the canonical unit.  Only the ones a caller
@@ -126,17 +118,17 @@ def compare_numeric(
     g_txt = prepare(answer_span(gold)[0] if extract else gold)
     c_txt = prepare(answer_span(candidate)[0] if extract else candidate)
 
-    g = parse_number(g_txt)
+    g = parse_number(g_txt, "numeric", unit)
     if g is None:
         return unresolved(k, "no number in the gold answer span", gold_canonical=g_txt)
-    c = parse_number(c_txt)
+    c = parse_number(c_txt, "numeric", unit)
     if c is None:
         return unresolved(
             k, "no number in the candidate answer span",
             gold_canonical=str(g), cand_canonical=c_txt,
         )
 
-    p = precision if precision is not None else _decimals(g_txt)
+    p = precision if precision is not None else _decimals(g_txt, "numeric", unit)
     if p is None:
         return unresolved(
             k, "gold is in exponent form and no precision was declared",
@@ -1038,6 +1030,18 @@ def compare_symbolic(
                           gold_canonical=g_expr_txt, cand_canonical=c_expr_txt,
                           observations=obs)
 
+    # **A parse that did not yield an expression is UNRESOLVED, not a crash**
+    # (D5.7b, N4).  `sympify` returns a *tuple* for a span containing a comma,
+    # and `continuous_to_discrete_conversion`'s answer has one -- so
+    # `.free_symbols` raised AttributeError on all 132 of its pairs, the
+    # template contributed zero verdicts, and it satisfied "zero false accepts"
+    # by crashing.  A template that raises has not passed.
+    if not isinstance(ge, sympy.Basic) or not isinstance(ce, sympy.Basic):
+        return unresolved(
+            k, "expression did not parse to a single expression "
+               f"(gold {type(ge).__name__}, candidate {type(ce).__name__})",
+            gold_canonical=str(ge)[:80], cand_canonical=str(ce)[:80], observations=obs)
+
     extra = (ge.free_symbols | ce.free_symbols) - set(local.values())
     if extra:
         return unresolved(
@@ -1118,7 +1122,16 @@ def _as_polynomial(expr: str, symbols: Sequence[str]) -> dict[tuple[int, ...], F
             exps[idx[name]] += int(vm.group(2) or 1)
         key = tuple(exps)
         out[key] = out.get(key, Fraction(0)) + sign * coeff
-    return {k: v for k, v in out.items() if v != 0}
+    nonzero = {k: v for k, v in out.items() if v != 0}
+    # **An empty map is not a polynomial; it is a failed parse** (D5.7, N2).
+    # Returning `{}` made `{} == {}` a MATCH, and on
+    # `autocorrelation_rect_pulse` -- where `_isolate_expression` returns the
+    # bare string "0" -- that was 128 of 132 gold-by-gold pairs matching each
+    # other.  Every expression the parser failed on matched every other one it
+    # failed on.  D4.1 S4.4's own rule is "failure is UNRESOLVED, never MATCH",
+    # violated by a path that never reaches the CAS.  Returning None sends the
+    # caller to the CAS, which decides it or says it cannot.
+    return nonzero or None
 
 
 def _fmt_poly(p: dict[tuple[int, ...], Fraction]) -> str:
@@ -1133,6 +1146,22 @@ def _poly_diff(a: dict, b: dict) -> str:
 
 
 _LHS_ONLY_RE = re.compile(r"^[A-Za-z](?:\s*\(\s*[a-z]\s*(?:,\s*[a-z]\s*)?\))?$")
+
+#: A left-hand side that looks like an ASSIGNMENT rather than prose:
+#: ``R_g(tau)``, ``u(x, y)``, ``y_c``.  Not ``This triangle has a peak value
+#: of 512 at tau``.
+_ASSIGN_LHS_RE = re.compile(
+    r"^[A-Za-z][A-Za-z0-9_]{0,14}"
+    r"(?:\s*\(\s*[a-z][a-z0-9_]*(?:\s*,\s*[a-z][a-z0-9_]*)*\s*\))?$")
+
+#: A conditional/piecewise construction.  An answer written
+#: ``64*(8 - |tau|), for |tau| <= 8, and 0 otherwise`` is a *piecewise*
+#: function, and a single-expression comparator cannot represent it.  It must
+#: say so rather than extract one branch.
+_PIECEWISE_RE = re.compile(r"\b(?:otherwise|elsewhere)\b|,\s*for\b", re.IGNORECASE)
+
+#: Split on a bare ``=`` only -- never inside ``<=``, ``>=``, ``!=``, ``==``.
+_BARE_EQ_RE = re.compile(r"(?<![<>!=])=(?!=)")
 
 
 def _isolate_expression(text: str) -> str | None:
@@ -1154,9 +1183,33 @@ def _isolate_expression(text: str) -> str | None:
     lines = [ln.strip() for ln in text.strip().split("\n") if ln.strip()]
     if not lines:
         return None
-    with_eq = [ln for ln in lines if "=" in ln]
-    text = (with_eq[-1] if with_eq else lines[-1]).rstrip(".").strip()
-    parts = [p.strip().rstrip(".").strip() for p in re.split(r"=", text)]
+
+    # **Prefer a line that ASSIGNS to a symbol** (D5.7, N2).  Taking the last
+    # `=`-bearing line picks up trailing prose: on
+    # `autocorrelation_rect_pulse` the span ends
+    # "This triangle has a peak value of 512 at tau = 0", so the isolated
+    # "expression" was the string `0` -- for every instance.  `_as_polynomial`
+    # then parsed `0` to an empty coefficient map on both sides and `{} == {}`
+    # was a MATCH: 128 of 132 gold-by-gold pairs.
+    #
+    # This is the THIRD positional rule this function has had, and the first two
+    # are recorded as errors in `phase4_summary.md` S8 ("split on the last `=`",
+    # then "`.split(chr(10))[0]`").  So the rule is not "a different position" --
+    # it is a structural property: an answer line assigns to a symbol, and prose
+    # does not.
+    eq_lines = [ln for ln in lines if _BARE_EQ_RE.search(ln)]
+    assigns = [ln for ln in eq_lines
+               if _ASSIGN_LHS_RE.fullmatch(_BARE_EQ_RE.split(ln, 1)[0].strip())]
+    text = (assigns[-1] if assigns else
+            (eq_lines[-1] if eq_lines else lines[-1])).rstrip(".").strip()
+
+    # A piecewise answer is not a single expression, and picking one branch of
+    # it is exactly the "unrecoverable parse presented as a recoverable one"
+    # D4.1 S4.4 forbids.  Refuse instead.
+    if _PIECEWISE_RE.search(text):
+        return None
+
+    parts = [p.strip().rstrip(".").strip() for p in _BARE_EQ_RE.split(text)]
     if len(parts) == 1:
         cand = parts[0]
     else:
@@ -1288,7 +1341,7 @@ def compare_check(
                           gold_canonical=str(g_bool), cand_canonical=commit.clause)
 
     obs: list[str] = []
-    g_q, c_q = parse_number(g_txt), parse_number(c_txt)
+    g_q, c_q = parse_number(g_txt, "check"), parse_number(c_txt, "check")
     if g_q is not None:
         if c_q is None:
             return unresolved(
@@ -1296,7 +1349,7 @@ def compare_check(
                 gold_canonical=f"{g_bool} @ {g_q}", cand_canonical=str(c_bool),
             )
         num = compare_numeric(str(g_q), str(c_q), precision=quantity_precision
-                              if quantity_precision is not None else _decimals(g_txt),
+                              if quantity_precision is not None else _decimals(g_txt, "check"),
                               extract=False)
         if not num.is_match:
             return mismatch(
