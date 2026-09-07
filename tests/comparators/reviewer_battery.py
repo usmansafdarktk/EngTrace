@@ -344,17 +344,43 @@ TEMPLATE_FOR = {
 }
 
 
+def _run(policy: str) -> list[str]:
+    """Every case under one hedge policy, in order."""
+    from . import commitment
+
+    saved, commitment.HEDGE_POLICY = commitment.HEDGE_POLICY, policy
+    try:
+        return [compare_kind(kind, gold, cand).outcome
+                for _, kind, gold, cand, _, _ in CASES]
+    finally:
+        commitment.HEDGE_POLICY = saved
+
+
 def main() -> int:
     print("Reviewer battery -- every case E and B used to break the comparators")
     print("=" * 92)
+    print("Run under BOTH hedge policies.  The reviewers argued their cases against")
+    print("`enforce`, which is what versions 1-3 implemented, so that is the column")
+    print("their arguments are checked in and the one that gates.  `advisory` is the")
+    print("shipped default (D-056), and the cases it changes are LISTED rather than")
+    print("silently re-expected: rewriting a reviewer's case to match a later")
+    print("decision would erase the argument the case was making.\n")
+
+    enforced = _run("enforce")
+    advised = _run("advisory")
+
     by_finding: dict[str, list[bool]] = {}
     failures = []
-    for finding, kind, gold, cand, expected, note in CASES:
-        v = compare_kind(kind, gold, cand)
-        ok = v.outcome == expected
+    demoted = []
+    for idx, (finding, kind, gold, cand, expected, note) in enumerate(CASES):
+        got = enforced[idx]
+        ok = got == expected
         by_finding.setdefault(finding, []).append(ok)
         if not ok:
-            failures.append((finding, kind, cand, expected, v.outcome, note, v.reason))
+            v = compare_kind(kind, gold, cand)
+            failures.append((finding, kind, cand, expected, got, note, v.reason))
+        elif advised[idx] != got:
+            demoted.append((finding, cand, got, advised[idx], note))
     for finding, results in sorted(by_finding.items()):
         n, good = len(results), sum(results)
         flag = "ok" if good == n else f"{n - good} STILL FAILING"
@@ -363,8 +389,19 @@ def main() -> int:
     passed = sum(sum(v) for v in by_finding.values())
     print(f"  {'TOTAL':6s} {passed:2d}/{total:2d}")
 
+    if demoted:
+        print(f"\n{len(demoted)} cases change under the ADVISORY default -- by design, "
+              f"not by regression.")
+        print("Each is a hedge the reviewers argued should refuse the answer and which")
+        print("the shipped policy annotates instead (D-056; Reviewer E round 4: the")
+        print("layer that refuses them buys 0 archive verdicts and 0 positive recall).")
+        for finding, cand, was, now, note in demoted[:6]:
+            print(f"    [{finding}] {was} -> {now}: {cand.splitlines()[-1][:66]}")
+        if len(demoted) > 6:
+            print(f"    ... and {len(demoted) - 6} more")
+
     if failures:
-        print("\nSTILL FAILING -- reported, not deleted:")
+        print("\nSTILL FAILING under `enforce` -- reported, not deleted:")
         for finding, kind, cand, exp, got, note, reason in failures:
             print(f"\n  [{finding}] {kind}: expected {exp}, got {got}")
             print(f"    candidate: {cand.splitlines()[-1][:90]}")

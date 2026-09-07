@@ -54,8 +54,48 @@ number cannot quietly be forgotten.
 
 from __future__ import annotations
 
+import os
 import re
 from typing import Sequence
+
+# --------------------------------------------------------------------------
+# 0.  The hedge policy -- ADVISORY by default (Reviewer E, round 4, rec. 3c)
+# --------------------------------------------------------------------------
+
+#: ``"advisory"`` (default) -- a detected hedge is **annotated and never
+#: scored**. ``"enforce"`` -- a hedge makes the answer ``UNRESOLVED``, which is
+#: what spec §4.2/§4.4 asks for and what versions 1-3 did.
+#:
+#: **Why the default changed, and it is a `SPEC-CHANGE`.**
+#:
+#: The commitment census splits one number the phase had been treating as two
+#: halves of the same thing:
+#:
+#:     hedge markers          2 in 2,200 archived spans, 0 in a gated kind
+#:     subordinator openers   43 (concessive 31, hypothetical 11)
+#:
+#: Two mechanisms in one module with **opposite evidence**. Reviewer E ablated
+#: the hedge layer, leaving segmentation untouched:
+#:
+#:     ==================  ========  =========
+#:                            full    ablated
+#:     positive frames      351/351   351/351
+#:     total                507/507   477/507
+#:     ==================  ========  =========
+#:
+#: The whole layer buys **30 synthetic negative controls the reviewers wrote,
+#: and zero archive verdicts and zero positive recall** -- for ~250 lines and
+#: 13 of E's 20 findings across four rounds. Meanwhile it can, and repeatedly
+#: did, silently mark a *correct* answer wrong. D4.1 §1 says a false reject is
+#: as unacceptable as a false accept; a layer with no observed instances that
+#: produces them is not paying for itself.
+#:
+#: **The policy is not abandoned, it is demoted to a reported quantity** -- the
+#: same treatment ``narrative`` gets (D-051). Hedges are still detected, still
+#: named in ``observations``, and the census still prints the rate. If that rate
+#: ever becomes non-trivial the evidence for enforcing exists, and flipping this
+#: constant is the whole change. Recorded as **D-056**.
+HEDGE_POLICY = os.environ.get("ENGTRACE_HEDGE_POLICY", "advisory")
 
 # --------------------------------------------------------------------------
 # 1.  Clause segmentation
@@ -172,8 +212,28 @@ TASK_RESTATEMENTS = (
 #: follows, which is the distinction E's R2-F9a said version 1 could not make.
 BARE_QUALIFIERS = ("note", "n.b.", "nb", "caveat", "caution", "disclaimer", "aside")
 
+#: Inversion hypotheticals -- ``Were the system linear, …``, ``Had the offset
+#: been zero, …``.  These are hypothetical **only clause-initially**: elsewhere
+#: ``were`` and ``had`` are ordinary past tense.
+_HYPO_INITIAL = ("were", "had", "should the")
+
+#: Up to four words of fronted adverbial may precede every *other* subordinator.
+#: "For now I will assume X" uses a word already in HYPOTHETICAL and escaped
+#: only because the pattern was anchored at position 0 -- Reviewer B's round-4
+#: point that *anchoring, not vocabulary*, is what decides, and ``_TASK_RE``
+#: already allowed three words for the same reason.
+#:
+#: Relaxing the anchor for **all** of them immediately over-reached: "Given that
+#: both defining conditions **were** checked above, …" matched on the ordinary
+#: past tense four words in, and refused a concessive the rewrite exists to
+#: credit.  That is the fix's own new surface, caught by the recall corpus one
+#: run later, and it is why the two classes are separated rather than merged.
 _HYPO_RE = re.compile(
-    r"^\W*(?:" + "|".join(re.escape(o) for o in HYPOTHETICAL) + r")\b", re.IGNORECASE)
+    r"^\W*(?:"
+    + "|".join(re.escape(o) for o in _HYPO_INITIAL)
+    + r"|(?:\w+\s+){0,4}?(?:"
+    + "|".join(re.escape(o) for o in HYPOTHETICAL if o not in _HYPO_INITIAL)
+    + r"))\b", re.IGNORECASE)
 _CONC_RE = re.compile(
     r"^\W*(?:" + "|".join(re.escape(o) for o in CONCESSIVE) + r")\b", re.IGNORECASE)
 _FACTIVE_RE = re.compile(
@@ -245,8 +305,19 @@ def segment(clause: str) -> tuple[str | None, str]:
     # is what a reader does.
     cm = _CONC_RE.match(c)
     if cm:
+        # Two readings of where the subordinate clause ends, and the first
+        # comma is not always it: "Since both tests pass the system is linear,
+        # as expected." has its comma AFTER the matrix, and splitting there
+        # returned "as expected" with the label gone (Reviewer E, R4-F23).
+        # Prefer the comma reading; fall back to "after the opener" when the
+        # comma reading leaves nothing recognisable behind.  Which is which is
+        # decided by the text, not by a rule about commas.
         comma = c.find(",")
-        c = (c[comma + 1:] if comma != -1 else c[cm.end():]).strip()
+        after_comma = c[comma + 1:].strip() if comma != -1 else ""
+        after_opener = c[cm.end():].strip()
+        c = after_comma or after_opener
+        if comma != -1 and len(after_comma.split()) < 3 <= len(after_opener.split()):
+            c = after_opener
         if not c:
             return None, "the clause is a bare subordinate clause with no matrix"
         # The matrix may itself be hypothetical: "Although X, if Y then Z".
@@ -475,12 +546,18 @@ def is_bare_comment(clause: str, surfaces: Sequence[str]) -> bool:
 
 
 class Commitment:
-    """Where a span commits to a label, or why it does not."""
+    """Where a span commits to a label, or why it does not.
 
-    __slots__ = ("clause", "index", "reason")
+    ``notes`` carries hedge markers detected but **not scored** under the
+    advisory policy.  They are reported, never decisive.
+    """
 
-    def __init__(self, clause: str | None, index: int, reason: str = ""):
+    __slots__ = ("clause", "index", "reason", "notes")
+
+    def __init__(self, clause: str | None, index: int, reason: str = "",
+                 notes: list[str] | None = None):
         self.clause, self.index, self.reason = clause, index, reason
+        self.notes = notes or []
 
     def __bool__(self) -> bool:
         return self.clause is not None
@@ -557,9 +634,20 @@ def find_commitment(text: str, surfaces: Sequence[str]) -> Commitment:
                        if _label_hit(cj, surfaces)), bare)
 
         marks = _hedges_governing(cls, i, owning, matrix, surfaces)
-        if marks:
+        # A WITHDRAWAL is not a hedge and stays decisive under either policy:
+        # "X. Or is it?" is a retraction of the assertion, not a statement of
+        # low confidence in it, so the advisory demotion does not reach it.
+        if any(m.startswith("withdrawn") for m in marks):
+            last_reason = f"withdrawn ({', '.join(marks)})"
+            continue
+        if marks and HEDGE_POLICY == "enforce":
             last_reason = f"hedged ({', '.join(marks)})"
             continue
+        if marks:
+            # Advisory: recorded on the Commitment and surfaced by the caller in
+            # `observations`, where it is visible in the results and scores
+            # nothing.  See HEDGE_POLICY for why, and D-056.
+            return Commitment(owning, i, notes=marks)
         neighbour = _governing_comment(cls, i, surfaces)
         if neighbour:
             last_reason = f"qualified by a bare comment ({neighbour})"
@@ -633,7 +721,12 @@ def _hedges_governing(
         # Found by the negative controls Reviewer B said the recall corpus
         # needed (R3-F1) -- 30 of 39 answers were still credited under a
         # trailing "Or is it?".
-        if follows and text.rstrip().endswith("?") and not _label_hit(text, surfaces):
+        # The `not _label_hit` guard this rule shipped with meant "Or is it?"
+        # was caught and "Or is it nonlinear?" was **credited** -- the *more
+        # explicit* withdrawal passing while the vaguer one was refused
+        # (Reviewer E, R4-F26).  A question is not an assertion whether or not
+        # it names a label, so the guard is gone.
+        if follows and text.rstrip().endswith("?"):
             marks.append("withdrawn by a following question")
             continue
         if not is_bare_comment(text, surfaces):
@@ -682,9 +775,14 @@ def suspends_what_follows(lead: str) -> str:
     c = lead.strip()
     if not c:
         return ""
-    if c.rstrip().endswith("?"):
-        return "the answer is a question"
-    # **A preface closed by a sentence stop does not scope over what follows.**
+    # **A preface closed by a sentence stop does not scope over what follows**,
+    # and `?` closes one just as `.` does.  Refusing every `?`-final preface
+    # meant "Is the system memoryless and causal? a) No, b) No" was UNRESOLVED
+    # while the categorical path credited the identical construction -- two
+    # paths disagreeing about one sentence, which is R3-F16's shape reproduced
+    # inside the function written to fix it (Reviewer E, R4-F27).  A trailing
+    # question is a withdrawal and is handled where it belongs, in
+    # `_hedges_governing`.
     # "Consider a scaled input a*x[n] and a shifted input x[n-k]. a) Yes, b) Yes"
     # sets up a derivation and then answers; "If the additivity test holds,
     # a) Yes, b) Yes" is one conditional sentence.  Without this, `consider`,
@@ -708,11 +806,12 @@ def suspends_what_follows(lead: str) -> str:
     # perhaps a) Yes, b) Yes" qualifies the answer, not some other proposition.
     # Without this the enumerated answers took a hedged preface and dropped it
     # unread, which the negative controls caught on 16 of 39.
-    for piece in re.split(r",|\bbut\b|\band\b", c):
-        if is_bare_comment(piece, ()) :
-            marks = hedge_markers(piece, _COMMENT_CLASSES)
-            if marks:
-                return f"the preface hedges the answer ({', '.join(marks)})"
+    if HEDGE_POLICY == "enforce":
+        for piece in re.split(r",|\bbut\b|\band\b", c):
+            if is_bare_comment(piece, ()):
+                marks = hedge_markers(piece, _COMMENT_CLASSES)
+                if marks:
+                    return f"the preface hedges the answer ({', '.join(marks)})"
     return ""
 
 

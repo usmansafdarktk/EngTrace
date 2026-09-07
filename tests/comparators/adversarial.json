@@ -155,7 +155,7 @@
   "gold": "**Answer:**\nThe system satisfies both additivity and homogeneity, therefore, the system is **linear**.",
   "candidate": "**Answer:** The system appears to be linear.",
   "correct": false,
-  "note": "hedged and naming the right label -- P6 says a non-committal answer earns no credit",
+  "note": "hedged and naming the right label.  Under `enforce` this is UNRESOLVED, which is what P6 asks for; under the shipped ADVISORY default (D-056) it is a MATCH and therefore a **declared false accept** -- the visible cost of demoting a layer that fires on 0 of 2,200 real spans.  Kept in the corpus, like num-16b, so the gate carries the trade rather than hiding it",
   "template": "template_system_property_linearity",
   "options": {}
  },

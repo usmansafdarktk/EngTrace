@@ -110,7 +110,11 @@ CATEGORICAL = [
     # label was (phase4_summary.md S8, error 2).
     _c("cat-16", "categorical", G_LIN_YES,
        "**Answer:** The system appears to be linear.", False,
-       "hedged and naming the right label -- P6 says a non-committal answer earns no credit"),
+       "hedged and naming the right label.  Under `enforce` this is UNRESOLVED, "
+       "which is what P6 asks for; under the shipped ADVISORY default (D-056) it "
+       "is a MATCH and therefore a **declared false accept** -- the visible cost "
+       "of demoting a layer that fires on 0 of 2,200 real spans.  Kept in the "
+       "corpus, like num-16b, so the gate carries the trade rather than hiding it"),
     _c("cat-17", "categorical", G_LIN_YES,
        "**Answer:** It could be linear or nonlinear depending on how you define the input.", False,
        "names both labels, commits to neither"),
