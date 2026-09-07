@@ -26,7 +26,13 @@ from decimal import Decimal, InvalidOperation
 from fractions import Fraction
 from typing import Any, Sequence
 
-from .commitment import find_commitment, hedge_markers, is_assertion
+from .commitment import (
+    clauses as commitment_clauses,
+    find_commitment,
+    hedge_markers,
+    is_assertion,
+    segment,
+)
 from .normalize import (
     NEGATORS,
     NEITHER_NOR_RE,
@@ -418,13 +424,20 @@ def _slot_verdict(
     if g is None:
         return unresolved(slot.name, "gold slot states no value")
     ctext = _slot_text(c_txt, slot, pos, c_clauses)
-    ok, why = is_assertion(ctext)
-    if not ok:
+    # Scope to the sentence that actually carries this slot.  `_slot_text`
+    # splits on `;`, newlines and enumerators but not on sentence stops, so
+    # "Causal: Yes. Both look immediate." arrived as one slot text and the
+    # trailing remark's `look` hedged a committed answer (Reviewer B, R2-F1.3).
+    surfaces = list(slot.positive) + list(slot.negative) + [slot.name]
+    owned = [x for x in commitment_clauses(ctext) if _label_hit(x, surfaces)]
+    ctext = owned[-1] if owned else ctext
+    matrix, why = segment(ctext)
+    if matrix is None:
         return unresolved(slot.name, why)
-    marks = hedge_markers(ctext)
+    marks = hedge_markers(matrix)
     if marks:
         return unresolved(slot.name, f"hedged ({', '.join(marks)})")
-    c = _resolve_property(ctext, slot)
+    c = _resolve_property(matrix, slot)
     if c is None:
         return unresolved(slot.name, "candidate slot states no value")
     if c == g:
@@ -443,10 +456,25 @@ def _clauses(text: str) -> list[str]:
     ``Causal`` -- the single most common answer form in the archive (11 of 24)
     and one a whole-span matcher inverts.
     """
-    parts = _ENUM_RE.split(text)
-    out: list[str] = []
-    for p in parts:
-        out.extend(x.strip() for x in re.split(r"[;\n]", p) if x.strip())
+    return [c for c, _ in _clauses_marked(text)]
+
+
+def _clauses_marked(text: str) -> list[tuple[str, bool]]:
+    """Clauses paired with whether each one *followed an enumerator*.
+
+    The flag exists for the positional fallback in ``_slot_text``; see the
+    comment there for the defect it closes.
+    """
+    out: list[tuple[str, bool]] = []
+    pos, enumerated = 0, False
+    for m in _ENUM_RE.finditer(text):
+        for x in re.split(r"[;\n]", text[pos:m.start()]):
+            if x.strip():
+                out.append((x.strip(), enumerated))
+        pos, enumerated = m.end(), True
+    for x in re.split(r"[;\n]", text[pos:]):
+        if x.strip():
+            out.append((x.strip(), enumerated))
     return out
 
 
@@ -466,8 +494,18 @@ def _slot_text(text: str, slot: PropertySlot, pos: int, clauses: list[str]) -> s
         # More than one clause mentions it (a restatement); the last is the
         # committed one, matching answer_span's rule.
         return owned[-1]
-    if pos < len(clauses):
-        return clauses[pos]
+    # Positional fallback: count only the clauses that FOLLOWED an enumerator,
+    # so a prose preface cannot occupy slot 0.  ``Although the algebra is
+    # fiddly, a) Yes, b) Yes`` otherwise puts "Although the algebra is fiddly"
+    # in the memoryless slot and the answer is refused -- 5 of the 351
+    # recall-corpus cases, all on the one archived answer that uses the
+    # unlabelled ``a) Yes, b) Yes`` form, and reached by any frame at all.
+    # When nothing is enumerated, count every clause: that is the unframed
+    # archive case and the flag must not change it.
+    enumerated = [c for c, was_enum in _clauses_marked(text) if was_enum]
+    pool = enumerated if len(enumerated) > pos else clauses
+    if pos < len(pool):
+        return pool[pos]
     return text
 
 
@@ -729,12 +767,23 @@ def compare_sequence(
 ) -> Verdict:
     """Sequence-with-origin equality: the values **and** the ``n = 0`` index.
 
-    The origin is part of the answer, and the archive says so.  Signal trace 8
-    emits exactly gold's multiset of values in exactly gold's order and is
-    wrong, because it indexes the reversal from ``n = 0`` instead of negating
-    the indices.  A values-only comparator scores it a match.  That is the
-    false accept this kind exists to prevent, and it is not hypothetical --
-    it is 1 of the 16 archived traces.
+    The origin is part of the answer.  **The archive does not prove it, and the
+    first version of this docstring said it did** (Reviewer E, F1).
+
+    That claim read: *"signal trace 8 emits exactly gold's multiset of values in
+    exactly gold's order and is wrong … it is 1 of the 16 archived traces."*
+    Both halves are false.  Trace 8's answer is a **rotation** of gold's value
+    list, not a reordering-preserving one -- ``ground_truth.py``'s own label for
+    that trace says "is a rotation of the truth" -- so a values-only comparator
+    rejects it too.  Measured: **0 of 16 archived traces reach the
+    origin-discriminating branch at all.**
+
+    So ``require_origin`` rests on the *item*, not on observed model error: the
+    question states ``x[n]`` with its origin marked, the transformation maps
+    indices, and a sequence at the wrong indices is a different signal.  That is
+    a sound argument and it is the only one there is.  Like the symbolic rules
+    it is a **route-3** rule -- specified and adversarially exercised, not
+    validated against real output -- and D4.2 §2.4 lists it there.
 
     Presentation is not part of the answer: braces or brackets, asterisk or an
     explicit index list, LaTeX-escaped or bare, zero-padded or trimmed all

@@ -142,7 +142,15 @@ ANSWER_MARKERS = [
     r"\*\*Answer:?\*\*\s*",         # usually nested inside the heading above
     r"Final\s+Answer:?\s*",         # wizardmath signal 14
     r"The\s+answer\s+is:?\s*",      # wizardmath signal 14,15; continuity 4
-    r"Answer:?\s*",
+    # **The colon is required.**  Written `Answer:?` the optional colon made
+    # this match the ordinary English word "answer", so
+    # "The system is linear (the wrong answer would be nonlinear)" peeled to
+    # "would be nonlinear)" and the comparator scored a fragment.  Reviewer E's
+    # F4 was this marker firing inside a *caveat*; this is the same marker
+    # firing inside a noun phrase, and the caveat guard cannot see it.
+    # Every archived use of a bare marker carries the colon (`**Answer:**`,
+    # `Answer:`), so requiring it costs nothing.
+    r"Answer\s*:\s*",
 ]
 
 #: Support for every normalisation rule, as
@@ -153,6 +161,14 @@ ANSWER_MARKERS = [
 #: table cannot drift away from the evidence.  Regenerate it from that module's
 #: output rather than editing it by hand.
 #:
+#: Four whole-archive counts moved by 1-8 when ``answer_span`` was tightened to
+#: require a colon on the bare ``Answer:`` marker (a marker written ``Answer:?``
+#: also matched the ordinary English word "answer").  A slightly different span
+#: is extracted from a handful of traces, so a probe over that span sees a
+#: slightly different count.  **The check caught it and this table was updated
+#: from the measurement**, which is the whole point of it being recomputed
+#: rather than remembered.
+#:
 #: Read the two columns together and the second is not reassurance.  Rates are
 #: **item-driven**, not model-driven (measured: 15 of 27 rules), so a large
 #: whole-archive count does NOT license a coverage claim about a template with
@@ -161,7 +177,7 @@ ANSWER_MARKERS = [
 SUPPORT: dict[str, tuple[int, int]] = {
     "unicode-minus": (4, 71),
     "unicode-superscript": (3, 236),
-    "unicode-operator": (0, 330),
+    "unicode-operator": (0, 338),
     "latex-inline-math": (5, 332),
     "latex-display-math": (1, 66),
     "latex-escaped-brace": (5, 6),
@@ -169,8 +185,8 @@ SUPPORT: dict[str, tuple[int, int]] = {
     "latex-boxed": (1, 104),
     "latex-text": (0, 274),
     "latex-exponent-brace": (0, 165),
-    "markdown-bold": (3, 239),
-    "trailing-annotation": (16, 86),
+    "markdown-bold": (3, 240),
+    "trailing-annotation": (16, 87),
     "marker-final-answer-heading": (57, 1824),
     "marker-bold-answer": (55, 1736),
     "marker-the-answer-is": (4, 202),
@@ -184,7 +200,7 @@ SUPPORT: dict[str, tuple[int, int]] = {
     "origin-asterisk": (1, 19),
     "explicit-index-list": (2, 6),
     "per-element-assignment": (2, 2),
-    "arbitrary-function": (2, 30),
+    "arbitrary-function": (2, 31),
     "thousands-separator": (0, 32),
 }
 

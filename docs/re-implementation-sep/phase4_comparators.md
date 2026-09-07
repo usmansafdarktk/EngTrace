@@ -248,12 +248,22 @@ names neither property and is a complete answer.
 Ordered values **and** the index of `n = 0`. Presentation is not part of the
 answer; the origin is.
 
-**The origin is answer-bearing and the archive proves it.** Signal trace 8 emits
-exactly gold's multiset of values in exactly gold's order and is wrong, because
-it indexes the reversal from `n = 0` instead of negating the indices. A
-values-only comparator scores it a match. That is not hypothetical — it is 1 of
-16 archived traces, and traces 1, 6, 10 and 13 are the same error in other
-guises.
+**The origin is answer-bearing — and the archive does NOT prove it.** Version
+1.0 of this section claimed signal trace 8 emitted "exactly gold's multiset of
+values in exactly gold's order" and called it "1 of 16 archived traces". Both
+halves were false, and Reviewer E filed it as F1: trace 8's answer is a
+**rotation**, which a values-only comparator also rejects, and
+`ground_truth.py`'s own label for that trace said so three files away.
+Measured: **0 of 16 archived traces reach the origin-discriminating branch.**
+
+What survives is an argument from the **item**, not from observed model error.
+The question states `x[n]` with its origin marked and the transformation maps
+indices, so a value list at the wrong indices is a different signal — and traces
+1, 6, 10 and 13 *are* labelled wrong for exactly that, they simply have wrong
+values too, so the values check catches them first. `require_origin` is
+therefore a **route-3** rule in D4.2 §2.4's sense: specified and adversarially
+exercised, **not validated against real output**. It is on the residual-risk
+register as R4-11.
 
 **Five packings are parsed and two archived traces use more than one at once**,
 so the parser produces a single index→value map and merges rather than
@@ -272,11 +282,24 @@ structural and are never trimmed**.
 
 **Gold itself omits the origin on 16.4% of instances** (measured, 4,000 seeds):
 the template marks `n = 0` only when the result's support contains it. When gold
-is silent the answer is the value list alone and is compared as such — and a
-candidate that pins an origin gold does not is checked for consistency rather
-than punished for saying more. Recorded as **D-050**, because a printed gold
-answer from which the origin cannot be recovered is a property of the item worth
-knowing.
+is silent the answer is the value list alone and is compared as such.
+
+**A candidate that pins an origin where gold cannot is `UNRESOLVED`, not a
+match.** Version 1.0 said such a candidate was "checked for consistency rather
+than punished for saying more", and Reviewer E's F3 showed what that accepted:
+three candidate forms taken from real archived traces, all pinning *wrong*
+origins, all scored `MATCH`. On these instances the item cannot decide, so the
+comparator does not either. The cost is visible and is reported rather than
+absorbed: archived `signal_operations` recall falls from 100% to 50% and its
+decided rate to 75%, because **one of its two matches was a match on an item
+that cannot discriminate** — which is Reviewer E's F6, settled by measurement.
+
+Recorded as **D-050**, because a printed gold answer from which the origin
+cannot be recovered is a property of the item worth knowing, and E's §5.2 notes
+the better fix is in the template — print the support explicitly, `y[n] = {…}
+for n = 1…4`, even when `n = 0` lies outside it. That changes emitted text on
+16.4% of instances, so it is a Phase 5/6 item-design decision, not a Phase 4
+edit.
 
 **When gold pins the origin and the candidate does not**, the comparator first
 asks whether *any* placement would match. If none does, the values are wrong
