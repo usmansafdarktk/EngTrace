@@ -72,12 +72,30 @@ def parse_number(text: str) -> Decimal | None:
         return None
 
 
+#: Unit surfaces, keyed by the canonical unit.  Only the ones a caller
+#: declares are ever consulted; there is no inferred unit anywhere.
+UNIT_SURFACES: dict[str, tuple[str, ...]] = {
+    "L": ("L", "l", "litre", "litres", "liter", "liters", "dm^3"),
+    "mL": ("mL", "ml", "millilitre", "millilitres", "milliliter", "milliliters", "cm^3"),
+    "m": ("m", "metre", "metres", "meter", "meters"),
+    "mm": ("mm", "millimetre", "millimetres", "millimeter", "millimeters"),
+    "Pa": ("Pa", "pascal", "pascals"),
+    "kPa": ("kPa", "kilopascal", "kilopascals"),
+    "N": ("N", "newton", "newtons"),
+    "kN": ("kN", "kilonewton", "kilonewtons"),
+    "rad/s": ("rad/s", "rad s^-1", "radians per second"),
+    "Hz": ("Hz", "hertz", "cycles per second"),
+    "s": ("s", "sec", "secs", "second", "seconds"),
+}
+
+
 def compare_numeric(
     gold: str,
     candidate: str,
     *,
     precision: int | None = None,
     method_tolerance: float | None = None,
+    unit: str | None = None,
     extract: bool = True,
 ) -> Verdict:
     """|S|7.1 display tolerance, boundary inclusive, widened by |S|7.4 if given.
@@ -86,6 +104,16 @@ def compare_numeric(
     from gold's own rendering*, never from the candidate's -- a candidate
     quoting more digits must not thereby tighten the test, and one quoting
     fewer must not loosen it.
+
+    **Units are checked only when declared.**  D3.4 |S|10 records "no dimensional
+    checking" as a non-goal, because a dimensional comparator needs units on
+    every symbol and that is a milestone-model decision.  The residue is a real
+    false accept: ``7.65 mL`` against a gold of ``7.65 L`` matches on the
+    number (D4.4 case num-16).  Passing ``unit`` closes it for that item by
+    *declaration* -- gold names its unit and the surfaces that spell it -- and
+    leaves it open, visibly, for every item that does not.  Inferring the unit
+    from gold's string instead would reject ``7.65 litres``, which is correct;
+    that is the trade, and it is why this is opt-in rather than default.
     """
     k = "numeric"
     g_txt = prepare(answer_span(gold)[0] if extract else gold)
@@ -117,12 +145,43 @@ def compare_numeric(
             tol = mt
 
     delta = abs(c - g)
-    if delta <= tol:  # boundary inclusive, per |S|7.1
-        return match(k, gold_canonical=str(g), cand_canonical=str(c), observations=obs)
-    return mismatch(
-        k, f"|{c} - {g}| = {delta} > {tol}",
-        gold_canonical=str(g), cand_canonical=str(c), observations=obs,
-    )
+    if delta > tol:  # boundary inclusive, per |S|7.1
+        return mismatch(
+            k, f"|{c} - {g}| = {delta} > {tol}",
+            gold_canonical=str(g), cand_canonical=str(c), observations=obs,
+        )
+
+    if unit is not None:
+        cu = _resolve_unit(c_txt)
+        if cu is None:
+            return unresolved(
+                k, f"gold declares the unit {unit!r} and the candidate states none",
+                gold_canonical=f"{g} {unit}", cand_canonical=str(c), observations=obs,
+            )
+        if cu != unit:
+            return mismatch(
+                k, f"unit {cu!r} != declared gold unit {unit!r}",
+                gold_canonical=f"{g} {unit}", cand_canonical=f"{c} {cu}", observations=obs,
+            )
+        obs.append(f"unit {cu} agrees with the declared gold unit")
+
+    return match(k, gold_canonical=str(g), cand_canonical=str(c), observations=obs)
+
+
+def _resolve_unit(text: str) -> str | None:
+    """The canonical unit named by ``text``, or None.
+
+    Longest surface wins, so ``mL`` is preferred over the ``L`` inside it --
+    the same rule, and the same reason, as ``nonlinear`` over ``linear``.
+    """
+    best: tuple[int, str] | None = None
+    for canon, surfaces in UNIT_SURFACES.items():
+        for s in surfaces:
+            for m in re.finditer(r"(?<![\w/])" + re.escape(s) + r"(?![\w])", text):
+                if best is None or len(s) > len(best[1]):
+                    best = (m.start(), s)
+                    best_canon = canon
+    return None if best is None else best_canon
 
 
 # ==========================================================================

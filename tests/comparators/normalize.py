@@ -113,6 +113,12 @@ def strip_latex(text: str) -> str:
     text = text.replace("$$", " ").replace("$", " ")
     # Escaped braces \{ \} -> { }.  qwen writes every sequence this way.
     text = text.replace(r"\{", "{").replace(r"\}", "}")
+    # ``x^{2}`` -> ``x^2``, after the braces are unescaped.  Without this the
+    # exponent survives as a brace group, the polynomial parser reads ``x`` to
+    # the first power, and a correctly typeset answer is rejected -- a false
+    # reject found by D4.4 case sym-04, not by the archive.
+    text = re.sub(r"\^\s*\{\s*(-?\d+)\s*\}", r"^\1", text)
+    text = re.sub(r"_\s*\{\s*([^{}]*)\s*\}", r"_\1", text)
     text = re.sub(r"\\([_^%&#])", r"\1", text)
     # A trailing bare backslash-word we did not recognise is dropped rather
     # than left to poison a token; it is recorded by the caller as an
