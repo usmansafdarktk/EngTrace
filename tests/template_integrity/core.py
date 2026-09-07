@@ -231,7 +231,14 @@ def generate_many(ref: TemplateRef, seeds: range | list[int],
 NUM_RE = re.compile(r'[-+]?\d[\d,]*\.?\d*(?:[eE][-+]?\d+)?')
 STEP_RE = re.compile(r'\*\*Step\s*(\d+)\s*:\*\*')
 STEP_LOOSE_RE = re.compile(r'\*\*Step\s*(\d+)\s*:')
-ANSWER_MARKERS = ('**Answer:**', '**Answer**', '**Final Answer**', '**Final Answers:**')
+#: Markers T4 can RECOGNISE.  `CANONICAL_ANSWER_MARKER` is the only one gold
+#: may EMIT (D-059).  The `##` heading form is here because it is priority 0
+#: on the candidate side (`normalize.ANSWER_MARKERS`) -- a solution carrying
+#: it beside the canonical marker would have its answer extracted from the
+#: heading, and until it was recognised here nothing could see that
+#: (Reviewer A, F6).
+ANSWER_MARKERS = ('**Answer:**', '**Answer**', '**Final Answer**',
+                  '**Final Answers:**', '## Final Answer')
 CANONICAL_ANSWER_MARKER = '**Answer:**'
 
 

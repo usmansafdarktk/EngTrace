@@ -203,7 +203,7 @@ def template_euclidean_distance_binary():
             f"s2 = (0, {sqrt_eb_fmt})\n\n"
             
 
-            f"**Step 2: ** Calculate Euclidean Distance (d)\n"
+            f"**Step 2:** Calculate Euclidean Distance (d)\n"
             f"The distance d is the magnitude of the difference vector (s1 - s2).\n"
             f"s1 - s2 = (sqrt(Eb) - 0, 0 - sqrt(Eb)) = (sqrt(Eb), -sqrt(Eb))\n"
             f"d = ||s1 - s2|| = sqrt( (sqrt(Eb))^2 + (-sqrt(Eb))^2 ) = sqrt(2*Eb)\n"

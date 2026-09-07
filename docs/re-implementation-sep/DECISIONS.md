@@ -2218,6 +2218,222 @@ Gold×gold cannot test normalisation, because gold text lacks model surface
 variation; archive×gold cannot cover kinds the archive lacks. Neither replaces
 the other and Phase 5 lands both.
 
+## D-059 — One canonical answer marker in gold; the candidate-side list stays wide
+
+**Date:** 2026-09-07 · **Status:** DECIDED · **Source:** Phase 5 Track A, D5.3
+
+Five templates terminated with `**Final Answer**` (four) or `**Final Answers:**`
+(one) instead of the canonical `**Answer:**`. The brief offered two remedies —
+normalise the templates, or widen the accepted marker set corpus-wide — and
+required the decision to be made once and applied everywhere.
+
+**Decision: normalise the five templates. Gold emits exactly one answer marker.**
+
+**The two lists are different lists, and conflating them is the mistake this
+entry exists to prevent.** `tests/template_integrity/core.py::ANSWER_MARKERS` is
+what *gold* may emit; `tests/comparators/normalize.py::ANSWER_MARKERS` is what a
+*candidate* may emit. Gold is a corpus we control and can make uniform. Model
+output is not, and never will be: the archive shows `## Final Answer`,
+`Final Answer:`, `The answer is:` and a bare `Answer:` across 2,200 traces. So
+the candidate-side list stays wide and keeps its priority order; the gold-side
+one narrows to a single marker.
+
+**"Agree" is a predicate, not a sentiment, and it is now checked.** For every
+gold solution in the corpus the candidate-side parser must recover the canonical
+marker with no marker debris glued to the front of the span. Run:
+
+```
+python -m tests.template_integrity.phase5_contract_scan --markers
+```
+
+**Measured, before and after, over the eleven Track A templates × 200 seeds:**
+
+| | spans recovering `**Answer:**` | spans carrying debris |
+|---|---:|---:|
+| before | 1,200 / 2,200 | **1,000** |
+| after | 2,200 / 2,200 | **0** |
+
+Corpus-wide after the edit: **1,200 of 1,200** gold spans (150 templates × 8
+seeds) recover `**Answer:**`, none empty.
+
+**This was not cosmetic and the "widen the set" option would not have fixed it.**
+The candidate-side priority-2 pattern `Final\s+Answer:?` matched *inside*
+`**Final Answer**`, so the recovered marker was `Final Answer` and the answer
+span began `**\nAfter reaching a conversion of...`. On the plural
+`**Final Answers:**` it began **`s:**\na) CSTR Volume = 13...`**. A comparator
+reading those spans was reading `s:**` as part of the answer. Widening the
+accepted set would have licensed the collision permanently; the priority order
+is load-bearing (Reviewer E's Phase 4 F4 was this same mechanism firing inside a
+caveat) and every marker added to it is another way for `answer_span` to peel
+into the wrong place.
+
+**P6.** The five templates' answer *bodies* are byte-identical before and after
+on all 2,000 seeds each; only the marker line differs. Questions unchanged.
+Evidence in [`phase5_item_pool_impact.md`](phase5_item_pool_impact.md).
+
+**Reviewer A owns checking this**, and is asked to treat `--markers` as a claim
+under test rather than as supplied tooling.
+
+---
+
+## D-060 — T4's non-canonical-marker finding becomes a FAILURE (SPEC-CHANGE 14)
+
+**Date:** 2026-09-07 · **Status:** DECIDED · **Source:** Phase 5 Track A
+**This is a `SPEC-CHANGE` against `template_redesign_spec.md` Phase 5 Track A's
+exit gate.**
+
+T4 printed `non-canonical marker {'**Final Answer**': 25}` for five templates
+**and passed them**. The corpus could therefore be reported "T4 150/150 green"
+with a known output-contract defect standing on five items — the third instance
+in this project of a check that is green while measuring something it can see.
+
+**The distinction that decides the remedy, because an earlier draft of the
+Phase 5 brief got it wrong.** *Ungated* means the check sees the defect and does
+not fail on it: the fix is one line of severity. *Invisible* means the check
+cannot see it: only then is a new instrument warranted. Five templates were
+ungated and three were invisible; treating the first group as the second would
+have built a duplicate scanner.
+
+**Decision.** `ContractResult.passed` now includes `non_canonical_answer`.
+The *recognised* marker set stays wide deliberately, so a regression is reported
+as `non-canonical marker {'**Final Answer**': 25}` rather than as the far less
+useful `no answer marker on 25 seeds`. Narrowing the recognised set would gate
+the same defect with a worse diagnostic.
+
+**The severity change is verified by a planted defect, not by a green corpus.**
+After Track A's edits T4 is 150/150 green *whether or not this change was made* —
+the corpus is clean because the templates were fixed. A green suite is therefore
+no evidence at all for this line. `--selftest` plants each of the four defect
+classes into real generated output and requires detection:
+
+```
+python -m tests.template_integrity.phase5_contract_scan --selftest
+```
+
+| planted class | scan | T4 |
+|---|---|---|
+| `step_marker` | CAUGHT | **FAILS** |
+| `answer_marker` | CAUGHT | **FAILS** ← the line this entry adds |
+| `complex_sign` | CAUGHT | passes (expected: blind) |
+| `degenerate_product` | CAUGHT | passes (expected: blind) |
+| `degenerate_product` planted in a *derivation* step | silent (correct) | — |
+
+---
+
+## D-061 — The doubled-sign defect is 16 templates, not 2; Track A fixes its 2 and names the rest
+
+**Date:** 2026-09-07 · **Status:** DECIDED · **Source:** Phase 5 Track A,
+corpus-wide sweep
+
+The spec records the malformed-complex defect as `+ j-51.22` on two templates.
+The underlying fault is more general: **a hard-coded `+` in a format string
+followed by an interpolated signed value.** The `j` is incidental.
+
+Swept corpus-wide, 150 templates × 120 seeds, pattern
+`[-+]\s+[-+]\s*\d` or `[-+]\s*j\s*[-+]\s*\d`:
+
+| | templates |
+|---|---:|
+| emit a doubled sign anywhere in the solution | **16** |
+| emit one **inside the answer span** | **4** |
+| of those, in Track A's scope | **2** (`time_to_phasor`, `phasor_addition`) |
+
+The other two answer-span carriers are `lorentz_force` (118 answer-span hits per
+120 seeds) and `continuous_to_discrete_conversion` (66). The twelve
+derivation-only carriers are `multi_segment_rod`, `vorticity_check`,
+`nyquist_rate_determination`, `impulse_response_from_lccde`,
+`work_isothermal_virial`, `mean_variance`, `coulombs_law`,
+`wave_equation_interpretation`, `system_property_linearity`,
+`signal_operations`, `sensible_heat_constant_cp`, `pitzer_correlation_z`.
+
+**Decision: fix the two in scope, completely; record the other fourteen with the
+measurement and assign them.** Editing fourteen unassigned templates inside a
+phase whose named risk is *"changing an item pool by accident"* would trade the
+thing the phase is for. Disposition: **`ADOPT-PHASE-6`**, added to Phase 6's
+deliverable list.
+
+**"Completely" was larger than the spec's row.** Fixing only the `j` sites in
+the two templates would have left `cos(361*t + -146.39 deg)` standing in
+`phasor_addition`'s **answer**. The fix therefore covers every doubled sign in
+both templates, and a third defect found while doing it:
+
+> `A_total = sqrt(-41.2^2 + 86.45^2) = 95.77` — evaluated as printed this is
+> `sqrt(-1697.4 + 7473.6) = 76.00`, because `-41.2^2` is `-(41.2^2)` under
+> ordinary precedence. **A P1 violation**, printed on every instance with a
+> negative component. Parenthesising the operands cut `phasor_addition`'s T1
+> closure failures from **9 to 5** over 25 seeds and removed the large-delta
+> class entirely — the surviving five are ordinary rounding-boundary misses
+> (delta ≈ 0.006 against a 0.005 tolerance). T1 coverage on the template rose
+> 0.27 → 0.29 and lines checked 142 → 152.
+
+That P1 defect was *not* in the brief, the spec, or the audit. It was found
+because the doubled-sign sweep put the line in front of me.
+
+---
+
+## D-062 — Reviewer A's triage: every detector was narrower than the class it was named after
+
+**Date:** 2026-09-07 · **Status:** DECIDED · **Source:** Phase 5 Reviewer A
+(correctness), `reviews/phase5_reviewer_a_correctness.md`
+
+**Verdict `PASS WITH FINDINGS`, and the shape of the findings is the result.**
+Nine findings, all CONFIRMED, and **not one is about the corpus.** The reviewer
+rewrote all four detectors from the spec's defect table, swept 150 × 400 before
+and after, and found the corpus genuinely clean. What it broke was the *gate*:
+
+> The pattern this review keeps finding is *the detector is narrower than the
+> class it is named after* — F1, F3, F5 and F6 are all instances.
+
+That is worth more than the individual fixes. The phase had the right instinct —
+`--selftest` plants a defect per class — and the instinct was defeated by
+**writing the plant and the regex with the same hand**, so every plant was a
+shape its regex already matched. All four narrow detectors passed the self-test.
+
+### Findings
+
+| # | Finding | Disposition | Where actioned |
+|---|---|---|---|
+| **F1** | `complex_sign` requires a literal `j`, so it gates only half the class D-061 defines — the half that did *not* change 2,560 question strings | `ADOPT-NOW` | `_DOUBLED_SIGN` added; gated on Track A's eleven, census corpus-wide (14 templates) |
+| **F2** | The scan never reads `inst.question`; nothing in T1–T7 does either except for emptiness | `ADOPT-NOW` | `scan_solution(sol, res, question)`; classes 3–4 read the question, classes 1–2 deliberately do not |
+| **F3** | `_DEGENERATE_PRODUCT` cannot match `0.0*pi`, and its census was short by one template | `ADOPT-NOW` | regex takes `0(?:\.0+)?`; census 2 → 3 templates |
+| **F4** | `phase5_contract_scan` is in no standing gate — not in `ALL_CHECKS`, not imported by `run.py`, no CI in the repo | `ADOPT-NOW` | **T8** (`checks/t8_emission.py`), in `ALL_CHECKS` *and* `DEFAULT_CHECKS`, at 400 seeds |
+| **F5** | A step heading that loses its bold entirely is invisible, and T4's contiguity check passes when the lost heading is the **last** one | `ADOPT-NOW` | `_STEP_ANY` is line-oriented, not marker-oriented |
+| **F6** | A non-canonical marker *added beside* the canonical one passes T4 and the scan — and is priority 0 on the candidate side | `ADOPT-NOW` | `## Final Answer` recognised; T4 counts every marker, not only when the canonical one is absent |
+| **F7** | `levenspiel_plot_interpretation`'s answer span swallows a 363-char `**Note:**` block whose last number is `31.8` | `ADOPT-NOW` | the Note moves **above** the answer marker; span 363 → 48 chars |
+| **F8** | "7 of 150 templates give a different T6 report" is not reproducible | `ADOPT-NOW` | corrected in the item-pool note; the claim now rests on the order-insensitive result alone |
+| **F9** | "T1–T7 unchanged per template" was a verdict claim; T5's `operand_restatements` moved 0→5 / 0→1, recorded nowhere | `ADOPT-NOW` | recorded in the item-pool note |
+
+### §5 suggestions
+
+| # | Suggestion | Disposition |
+|---|---|---|
+| 1 | Wire the detectors into `run.py` as T8 at 400 seeds | `ADOPT-NOW` — done; also added to `DEFAULT_CHECKS`, which the reviewer did not ask for and which is where it will actually run |
+| 2 | Widen `_COMPLEX_SIGN` to the class, census the residual | `ADOPT-NOW` — the reviewer's own regex, adopted verbatim in substance |
+| 3 | Scan the question; decide explicitly about classes 1–2 | `ADOPT-NOW` — decided: questions carry no steps and state no answer, so classes 1–2 are solution-only, and that is now a comment rather than an omission |
+| 4 | Fix `_DEGENERATE_PRODUCT` for the float-zero form | `ADOPT-NOW` |
+| 5 | Line-oriented step probe | `ADOPT-NOW` |
+| 6 | Phase 6 worklist of 14 doubled-sign templates; promote `_signed_term`/`_rect_str` to a shared emission helper before nine templates are fixed by hand | `ADOPT-PHASE-6` — added to Phase 6's deliverable list as **D6.7**; the census now prints the list on every run |
+| 7 | Decide what an answer span may contain, and gate it | `ADOPT-NOW` for option (a), the template edit. Option (b) — a `**Note:**` terminator in `normalize.answer_span` — is **REJECTED**: it adds a rule to the *candidate*-side parser to accommodate a shape only *gold* produced, which is the wrong side of the contract and the "add a rule to make one template pass" move the phase brief warns against |
+| 8 | Evidence is thinnest on question text; the marker predicate tests the marker, not the span | `ADOPT-NOW` for the question (F2/T8). The span-shape assertion is `ADOPT-PHASE-6` (**D6.8**): after F7 the corpus's longest span is 199 characters, so a bound can be set from measurement rather than guessed |
+| 9 | Two plants of materially different surface form per detector, written from the class definition | `ADOPT-NOW` — `PLANTS` now carries 10 plants over 4 classes, including one in the **question**, and every pair differs in surface form: malformed bold vs bold lost; marker swapped vs marker added; `+ j-5` vs `+ -5`; `0*pi` vs `0.0*pi`. `SPEC-CHANGE 17` carries the rule forward |
+| 10 | The gate says "clean across all four classes" and the corpus is not clean across class 3 | `SPEC-CHANGE 16` — the gate now says what it means |
+| — | `stoichiometry.py`'s `SyntaxWarning: invalid escape sequence '\%'` | `ADOPT-NOW` — one character, in a file this phase already edits |
+
+### What this changed about the phase's own claims
+
+**The scan's `complex_sign 0 templates` line was a corpus claim that D-061
+contradicted three paragraphs earlier**, and neither the implementer nor the
+self-test caught it. The class is present on 14 templates; the detector could
+see two of its shapes. Reporting `0` for that is worse than reporting `14`, and
+the census now does the second.
+
+**T8 is in `DEFAULT_CHECKS`, not only `ALL_CHECKS`.** The reviewer asked for
+`ALL_CHECKS`. `ALL_CHECKS` is the opt-in list; `DEFAULT_CHECKS` is what runs when
+someone types the command with no arguments, which is the only invocation that
+happens by habit. A gate nobody types is the thing F4 is about.
+
+---
+
 ---
 
 ## Open decisions

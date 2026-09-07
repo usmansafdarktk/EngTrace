@@ -7,11 +7,19 @@ Every emitted solution must be mechanically segmentable:
 * exactly one terminal answer marker, from the approved set;
 * a non-degenerate `(question, solution)` pair - no answer-less return path.
 
-Every one of these is violated somewhere in the corpus today. Three electrical
-templates emit `**Step 2: **` / `**Step 3: ...**` (colon or space inside the
-bold), which a strict marker regex drops silently; five chemical templates
-terminate with `**Final Answer**`; `template_levenspiel_plot_interpretation`
-restarts its numbering at 1,2,3,1,2,3,4,5,6 so the marker is not a unique id.
+Every one of these was violated somewhere in the corpus before Phase 5. Three
+electrical templates emitted `**Step 2: **` / `**Step 3: ...**` (colon or space
+inside the bold), which a strict marker regex drops silently; five chemical
+templates terminated with `**Final Answer**` / `**Final Answers:**`;
+`template_levenspiel_plot_interpretation` restarted its numbering at
+1,2,3,1,2,3,4,5,6 so the marker was not a unique id (fixed in Phase 2).
+
+**The approved set is not the canonical one, deliberately.** ANSWER_MARKERS is
+the set of markers this check can *recognise*; CANONICAL_ANSWER_MARKER is the
+only one gold may *emit* (D5.3). Keeping the recognised set wide is what lets a
+regression be reported as `non-canonical marker {'**Final Answer**': 25}`
+rather than as the far less useful `no answer marker on 25 seeds`. Narrowing
+the recognised set would gate the same defect with a worse diagnostic.
 """
 from __future__ import annotations
 
@@ -40,9 +48,18 @@ class ContractResult:
 
     @property
     def passed(self) -> bool:
+        # `non_canonical_answer` joined this list in Phase 5 (SPEC-CHANGE 14).
+        # Before then T4 *printed* `non-canonical marker {'**Final Answer**': 25}`
+        # for five templates and passed them anyway, so the corpus could be
+        # reported 150/150 green with a known output-contract defect standing on
+        # five items.  That is a severity gap, not a blind spot: the check already
+        # saw the defect.  The remedy is this one line, not a second scanner --
+        # an earlier draft of the Phase 5 brief proposed the scanner, which would
+        # have duplicated T4 rather than fixing it.
         return not (self.malformed_markers or self.non_contiguous
                     or self.duplicate_numbers or self.missing_answer
-                    or self.multiple_answers or self.empty_output)
+                    or self.multiple_answers or self.empty_output
+                    or self.non_canonical_answer)
 
     def summary(self) -> str:
         bits = []
@@ -86,14 +103,23 @@ def check_instance(inst: Instance, res: ContractResult) -> None:
         elif strict != list(range(1, len(strict) + 1)):
             res.non_contiguous.append(inst.seed)
 
+    # A marker is counted if it appears at all, NOT only when the canonical one
+    # is missing (Reviewer A, F6).  `**Final Answer**` contains `Final Answer`
+    # and `## Final Answer` does not overlap either, so the three are counted
+    # independently; the containment that does exist is handled by scoring the
+    # canonical marker's own count separately below.
     present = [mk for mk in ANSWER_MARKERS if mk in sol]
     if not present:
         res.missing_answer.append(inst.seed)
     else:
-        if CANONICAL_ANSWER_MARKER not in sol:
-            res.non_canonical_answer[present[0]] += 1
-        # count only the canonical/first marker's occurrences
-        if sol.count(present[0]) > 1:
+        for mk in present:
+            if mk != CANONICAL_ANSWER_MARKER:
+                res.non_canonical_answer[mk] += 1
+        # More than one answer marker of ANY spelling is a contract violation:
+        # the segmenter has to choose, and gold does not get to make it guess.
+        # Counting only `present[0]`'s occurrences missed a second marker with a
+        # different spelling entirely, which is F6's mechanism.
+        if sol.count(CANONICAL_ANSWER_MARKER) > 1 or len(present) > 1:
             res.multiple_answers.append(inst.seed)
     if not strict and not loose:
         res.empty_output.append(inst.seed)
