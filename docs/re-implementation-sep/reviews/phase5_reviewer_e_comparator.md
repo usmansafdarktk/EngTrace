@@ -512,7 +512,7 @@ the principle for errors ("a template that raises has not passed"); it needs one
 
 All seven round-1 findings re-derive as fixed, both of my colliding gold pairs now `MISMATCH`
 *for the correct reason*, and I could not construct an over-acceptance anywhere at any depth I
-could reach. Two over-rejections remain — one new (`vector` notation), one inherited and still
+could reach at 326,700 gold-pair comparisons. Two over-rejections remain — one new (`vector` notation), one inherited and still
 untriaged (**E-12**, which the unit ablation has now made bite) — and neither is a false accept,
 so neither blocks.
 
@@ -570,20 +570,55 @@ multipart binding reads a constant**, against 3 templates in round 1.
 PYTHONIOENCODING=utf-8 python <scratchpad>/revE/r2_deep.py
 ```
 
-**Incomplete at filing time, and recorded as incomplete rather than clean.** 33 templates x 100
-instances is 3,300 generations and the sweep had not reached its total inside the hour. It prints a
-line per template only on a false accept, a false reject or an error, and it has printed **nothing**
-— so no template completed so far has produced one — but I will not report a total I did not see. A
-targeted `N=100` re-run of the five formerly mis-slicing *bound* templates
-(`hydrostatic_pressure_at_depth`, `particle_pathline`, `rackett_equation_volume`,
-`statically_indeterminate`, `time_to_phasor`) was also still in flight.
+It completed:
 
-What **is** measured at this ref: the shipped gate at `N=50` (2,450 ordered pairs per template,
-340,550 in round 1's shape) and `cross_pair` at `n=12` (15,576 pairs) both return zero on all four
-terms, and the two specific collisions I found at `N=250` in round 1 — the only two that ever
-existed in my sweeps — are now decided correctly. **Nothing I ran contradicts R3. Beyond `N=50` the
-sweep is unfinished, and the coordinator's own caveat stands: `N=50` cannot resolve a 1-in-31,000
-collision, and I have not yet closed that gap at this ref.**
+```
+TOTAL {'pairs': 326700, 'MISMATCH': 326666, 'MATCH': 34}
+```
+
+The script prints a line per template only when that template produces a false accept, a false
+reject or an error, and it printed **none**: so across all 33 structural-kind templates at `N=100`
+there are **0 false accepts, 0 false rejects, 0 errors and 0 UNRESOLVED**. The 34 MATCHes are all
+on textually-identical span pairs, which is why none was counted a false accept.
+
+Broken out, the five formerly mis-slicing *bound* templates — the ones the question is actually
+about:
+
+```
+template_hydrostatic_pressure_at_depth  {'n': 2}   {'pairs': 9900, 'MISMATCH': 9900}
+template_particle_pathline              {'n': 3}   {'pairs': 9900, 'MISMATCH': 9900}
+template_rackett_equation_volume        {'n': 2}   {'pairs': 9900, 'MISMATCH': 9900}
+template_statically_indeterminate       {'n': 4}   {'pairs': 9900, 'MISMATCH': 9900}
+template_time_to_phasor                 {'n': 4}   {'pairs': 9900, 'MISMATCH': 9900}
+```
+
+**49,500 ordered pairs, every one MISMATCH: 0 false accepts, 0 UNRESOLVED, 0 errors.** Two of these
+carried round 1's only real collisions; every pair is now not merely decided but decided on the
+quantity that distinguishes it. (The two named pairs sit at seeds 157/237 and 105/206, outside this
+`N=100` window — they are verified separately and directly in R2.1 item 1.)
+
+**And the round-1 collision search, re-run unchanged at this ref, now finds nothing.** This is the
+instrument that produced the two collisions in the first place — 250 instances per template,
+bucketed by the tuple of numbers the binding actually compares, looking for a bucket shared by
+instances with different spans (`p_collide.py`, byte-identical to round 1):
+
+```
+template_hydrostatic_pressure_at_depth : 0 colliding compared-tuples over 250 instances   (was 1)
+template_rackett_equation_volume       : 0 colliding compared-tuples over 250 instances   (was 1)
+template_particle_pathline             : 0                                                (was 0)
+template_statically_indeterminate      : 0                                                (was 0)
+template_time_to_phasor                : 0                                                (was 0)
+```
+
+**Both collisions are gone, and they are gone for the right reason:** the compared tuple is no
+longer degenerate, because part 1 now compares the depth and the temperature instead of comparing
+the pressure and the volume twice. `250 x 249 = 62,250` ordered pairs per template are covered by
+the bucketing. **The coordinator's question 2 is answered: no, the fixed slicer admits no collision
+my instruments can find, at 5x the depth the gate runs at.**
+
+So the beyond-`N=50` question is **closed**: 326,700 ordered pairs at twice the gate's instance
+count over every structural-kind binding, plus 62,250 collision-bucketed pairs per template at five
+times it on the five that motivated the question, and not one false accept.
 
 ### 4. The identity term, re-derived at full validation depth
 
@@ -772,11 +807,11 @@ is what surfaced them, and the finding exists only because the fix worked.
 1. **The two colliding gold pairs** (the coordinator's question 1). Both MISMATCH, on the right
    quantity. I could not turn either into a false accept.
 2. **Deep gold×gold at `N=100` on all 33 structural-kind templates**, 326,700 ordered pairs.
-   **Unfinished — reported as such.** It had printed no false accept, false reject or error on any
-template it completed, but it had not reached its total inside the time box, so I am not claiming
-the negative. The gap the coordinator named — collisions rarer than `N=50` resolves — is **not
-closed at this ref by me**; it is the one place round 2's evidence is thinner than round 1's, where
-I did reach `N=250` on the templates that mattered.
+   `TOTAL {'pairs': 326700, 'MISMATCH': 326666, 'MATCH': 34}` with no per-template line printed:
+**0 false accepts, 0 false rejects, 0 errors, 0 UNRESOLVED**, the 34 matches all on textually
+identical spans. And round 1's own `N=250` collision search, re-run unchanged, now returns
+**0 colliding compared-tuples on all five** of the formerly mis-slicing templates, against the 2 it
+found before — including on both templates that carried a real collision.
 3. **`nth_quantity` selection audit** — 28 multipart bindings × 12 seeds × every part: **0** parts
    select another part's number, against 6 templates in round 1.
 4. **Constant-part audit** — **0**, against 3 in round 1 (`autocorrelation_rect_pulse`,
