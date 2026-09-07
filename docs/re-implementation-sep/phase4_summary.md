@@ -359,6 +359,35 @@ Both named generalisation targets are retired in `phase3_node_types.md` §10.
 for the statistic to mean anything. **Three are over B's threshold.** Phase 5
 owns the supporting-quantity remedy, where the item can change with its gold.
 
+> **Phase 5's disposition, recorded here rather than only in its own summary
+> (D-066): DECLINED, and reassigned to Phase 6.**
+>
+> The remedy changes what the item *asks* and what its gold *answers* — item
+> design, not comparator work. Track B's charter is `tests/comparators/` and
+> `template_inventory.csv` only, stated in the same spec paragraph that sets its
+> effort box, and Track A's scope is the eleven output-contract templates.
+> Taking it in Phase 5 would have been scope creep on the two items where a
+> mistake is least recoverable, in a phase whose named risk is *changing an item
+> pool by accident*.
+>
+> **What Phase 5 contributes instead.** Both items are now bound to the
+> comparator, cross-paired at N = 50, credit a verbatim copy of their own gold,
+> and produce **zero false accepts** — while remaining **100% shortcuttable**:
+>
+> | template | blind-guess floor | held-out surface model | gold×gold false accepts |
+> |---|---:|---:|---:|
+> | `system_property_linearity` | 0.5008 | **1.0000** | 0 |
+> | `system_properties_memory_causality` | 0.3450 | **1.0000** | 0 |
+>
+> Those two facts are independent, and the reason to hold them side by side is
+> that **a comparator which scores an answer correctly cannot tell you whether
+> the answer required the reasoning**. A bound template is not a hard one, and
+> the Phase 5 binding work must not be read as evidence about difficulty.
+>
+> One further measurement: `levenspiel_plot_interpretation`'s blind-guess floor
+> is **1.0000** — a blind guess scores 100%, so the statistic is degenerate on
+> that item and its difficulty label is unsupported by it.
+
 **The rule this phase adds to D-034:** *a number written beside the rule it
 describes is not evidence; a number a script recomputes from the artefact is.*
 Four of my nineteen errors were numbers typed from impression, and every one was
