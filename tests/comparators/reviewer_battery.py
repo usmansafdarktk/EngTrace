@@ -141,6 +141,107 @@ CASES: list[tuple[str, str, str, str, str, str]] = [
      "control: the archived short form must still work"),
 ]
 
+G_CHECK = "**Answer:** The deflection is 18.0 mm, which is acceptable."
+
+# ==========================================================================
+# Round 2 -- the cases that broke the fixes for round 1.
+#
+# Both reviewers were asked to attack the MECHANISM the round-1 fixes were
+# built on rather than the fixes, which is Phase 3's most expensive lesson.
+# They did, and `commitment.py` v1 reproduced two of the defects it was written
+# to close: a hedge window measured in characters had become a hedge window
+# measured in clauses, and a longest-surface rule had become a last-clause rule
+# that still resolved by last position *within* the clause.
+#
+# Four of these findings are CONVERGENT -- reached independently by two
+# reviewers working in isolation, which R1.7 names as the strong signal.
+# ==========================================================================
+
+CASES += [
+
+    # ---- E R2-F7: F2 relocated.  The round-1 case, one period -> one comma --
+    ("E-R2-F7", "categorical", G_NOT,
+     "## Final Answer\n**Answer:** The system is linear, unlike a nonlinear "
+     "system, since both tests pass.", "MISMATCH",
+     "**false accept**: a comma instead of a period defeated the round-1 fix"),
+    ("E-R2-F7", "categorical", G_NOT,
+     "**Answer:** The system is linear (a nonlinear system would fail additivity).",
+     "MISMATCH",
+     "**false accept**: a parenthetical gloss outranked the commitment"),
+
+    # ---- E R2-F8: the neighbour rule was N=1 clause, not clause scope ------
+    ("E-R2-F8", "categorical", G_LIN,
+     "**Answer:** I am not sure. Let me redo the algebra. The system is linear.",
+     "UNRESOLVED", "**false accept**: one intervening clause let the hedge escape"),
+    ("E-R2-F8", "categorical", G_LIN,
+     "**Answer:** I cannot really tell. The two tests are in step 4. The system "
+     "is linear.", "UNRESOLVED", "**false accept**: same, at distance 2"),
+    ("E-R2-F8", "categorical", G_LIN,
+     "**Answer:** The system is linear. Step 4 shows the algebra. But I am not sure.",
+     "UNRESOLVED", "**false accept**: same escape, trailing direction"),
+
+    # ---- E R2-F9 / B R2-F1.1 (CONVERGENT): concessive != hypothetical ------
+    ("E-R2-F9", "check", G_CHECK,
+     "**Answer:** The deflection is 18.0 mm. Given that the limit is 25 mm, the "
+     "design is acceptable.", "MATCH",
+     "**over-rejection**: a fronted concessive asserts its matrix clause"),
+    ("E-R2-F9", "check", G_CHECK,
+     "**Answer:** The deflection is 18.0 mm, roughly 72% of the 25 mm limit, so "
+     "the design is acceptable.", "MATCH",
+     "**over-rejection**: `roughly` is a precision term, not an epistemic hedge"),
+    ("E-R2-F9", "check", G_CHECK,
+     "**Answer:** The deflection is 18.0 mm. Note that the limit is 25 mm, so it "
+     "is acceptable.", "MATCH",
+     "**over-rejection**: `note that` is factive -- its complement is asserted"),
+    ("E-R2-F9", "check", G_CHECK,
+     "**Answer:** The deflection is 18.0 mm, so the design is acceptable. The "
+     "margin seems comfortable.", "MATCH",
+     "**over-rejection**: a trailing remark about something else retracted it"),
+    ("B-R2-F1", "categorical", G_LIN,
+     "**Answer:** Given that additivity and homogeneity both hold, the system is "
+     "linear.", "MATCH", "**over-rejection**: fronted concessive"),
+    ("B-R2-F1", "categorical", G_LIN,
+     "**Answer:** Although the equation contains a delay, the system is linear.",
+     "MATCH", "**over-rejection**: fronted concessive"),
+    ("B-R2-F1", "categorical", G_LIN,
+     "**Answer:** Note that the system is linear.", "MATCH",
+     "**over-rejection**: factive `note that`, a preface not a caveat"),
+    ("B-R2-F1", "categorical", G_NOT,
+     "**Answer:** The system is not linear. This should be clear from the square.",
+     "MATCH", "**over-rejection**: confidence read as a hedge"),
+    ("B-R2-F1", "categorical", G_LIN,
+     "**Answer:** Imagine a scaled input a*x[n]; the output scales identically, "
+     "so the system is linear.", "MATCH",
+     "**over-rejection**: `imagine` opens the standard homogeneity proof"),
+    ("B-R2-F1", "categorical[tuple]", G_MC_YY,
+     "**Answer:** a) Memoryless: Yes b) Causal: Yes. Both look immediate.",
+     "MATCH", "**over-rejection**: trailing remark about a different subject"),
+
+    # ---- E R2-F11: the splitter cut inside decimals and abbreviations ------
+    ("E-R2-F11", "categorical", G_LIN,
+     "**Answer:** The gain is 2.5 and the system is linear.", "MATCH",
+     "the splitter cut inside a decimal, a distance amplifier for R2-F8"),
+    ("E-R2-F11", "categorical", G_LIN,
+     "**Answer:** The system is linear i.e. additive and homogeneous.", "MATCH",
+     "the splitter cut inside an abbreviation"),
+
+    # ---- E R2-F12: _POST_NEG_RE stepped into a parenthetical ---------------
+    ("E-R2-F12", "categorical", G_NOT,
+     "**Answer:** The system is linear (the wrong answer would be nonlinear).",
+     "MISMATCH", "a parenthetical *about* wrongness negated the label it follows"),
+    ("E-R2-F12", "categorical", G_NOT,
+     "**Answer:** Calling it linear is the wrong description here.", "MATCH",
+     "control: post-label negation must still work"),
+
+    # ---- controls: the round-1 behaviour these fixes must not undo ---------
+    ("R2-ctl", "categorical", G_LIN,
+     "**Answer:** If additivity holds, the system is linear.", "UNRESOLVED",
+     "control: a HYPOTHETICAL still suspends its matrix (B round-1 F3)"),
+    ("R2-ctl", "categorical", G_LIN,
+     "**Answer:** Linear. It seems.", "UNRESOLVED",
+     "control: a bare anaphoric comment still governs (B round-1 F2)"),
+]
+
 TEMPLATE_FOR = {
     "categorical": "template_system_property_linearity",
     "categorical[tuple]": "template_system_properties_memory_causality",

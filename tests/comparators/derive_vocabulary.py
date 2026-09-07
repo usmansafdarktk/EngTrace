@@ -38,6 +38,7 @@ from .normalize import (
     NEITHER_NOR_RE,
     SUPERSCRIPT_MAP,
     answer_span,
+    prepare,
 )
 
 ARCHIVE = "error_analysis_annotation/samples/*.jsonl"
@@ -293,10 +294,70 @@ def check_annotations(rows: list[dict]) -> int:
     return bad
 
 
+def commitment_census(rows: list[dict]) -> None:
+    """How often does the commitment machinery fire on **real** output?
+
+    Reviewer E's R2-F10, mechanised so it cannot quietly be forgotten. The
+    answer is "almost never", and that is the number that belongs beside every
+    claim the module makes about itself: ~450 lines of natural-language
+    heuristics gating three of six kinds, with essentially no archive exercise
+    in either direction.
+
+    It is not an argument for deleting the module -- spec §4.4 *requires* a
+    hedge to be non-committal, so the policy has to exist. It is an argument
+    for filing the module on the residual-risk register beside the symbolic
+    rules, as a rule set validated against constructed text rather than
+    observed text.
+    """
+    import csv
+
+    from .commitment import PROBES, _CONC_RE, _FACTIVE_RE, _HYPO_RE, clauses
+
+    inv = {r["template_id"][len("template_"):]: r["answer_type"]
+           for r in csv.DictReader(open(
+               "docs/re-implementation-sep/template_inventory.csv", encoding="utf-8"))}
+    #: The answer types whose comparators `commitment.py` gates.
+    GATED_TYPES = {"classification"}
+
+    fired: Counter = Counter()
+    openers: Counter = Counter()
+    by_type: Counter = Counter()
+    for r in rows:
+        at = inv.get(stem(r), "?")
+        for c in clauses(prepare(answer_span(r["model_reasoning"])[0])):
+            for kind, rx in PROBES:
+                if rx.search(c):
+                    fired[kind] += 1
+                    by_type[at] += 1
+            for name, rx in (("hypothetical", _HYPO_RE), ("concessive", _CONC_RE),
+                             ("factive", _FACTIVE_RE)):
+                if rx.match(c):
+                    openers[name] += 1
+
+    print("COMMITMENT CENSUS -- how often the machinery fires on real output")
+    print("=" * 96)
+    print(f"  answer spans scanned                : {len(rows)}")
+    print(f"  hedge markers fired, all templates  : {sum(fired.values())}  {dict(fired)}")
+    print(f"  ... in a commitment-GATED answer type: "
+          f"{sum(v for k, v in by_type.items() if k in GATED_TYPES)}")
+    print(f"  subordinator openers                : {sum(openers.values())}  {dict(openers)}")
+    print()
+    print("  **This is Reviewer E's R2-F10 and it is the module's own charge against")
+    print("  the blocklist it replaced.** The archive cannot falsify the commitment")
+    print("  machinery in either direction: it contains nothing the module rejects and")
+    print("  nothing it should reject. Every number that speaks well of it comes from")
+    print("  text written by the implementer or by the two reviewers it answers --")
+    print("  64 battery cases, 137 D4.4 cases, 351 recall-corpus frames.")
+    print()
+    print("  Carried as residual risk R4-10, not treated as evidence.")
+    print()
+
+
 def main() -> int:
     rows = load_all()
     report_phase4(rows)
     habit_test(rows)
+    commitment_census(rows)
     return 1 if check_annotations(rows) else 0
 
 
