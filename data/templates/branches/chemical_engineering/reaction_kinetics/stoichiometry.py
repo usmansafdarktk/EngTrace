@@ -112,7 +112,7 @@ def template_batch_moles_vs_conversion():
         
     solution += (
         f"**Answer:**\n"
-        f"After reaching a conversion of ${X_A*100} \%$, the final number of moles in the reactor are:\n"
+        f"After reaching a conversion of ${X_A*100} \\%$, the final number of moles in the reactor are:\n"
         f"- {reactant_A_name}: ${round(N_A, 3)}$ mol\n"
         f"- {reactant_B_name}: ${round(N_B, 3)}$ mol\n"
         f"- {product_C_name}: ${round(N_C, 3)}$ mol\n"

@@ -87,35 +87,86 @@ from .core import Instance, discover, generate
 # The four detectors.  Each is independent of `t4_contract`, deliberately.
 # --------------------------------------------------------------------------
 
-#: Class 1 - a step heading a human reads as a step marker, however malformed.
-_STEP_ANY = re.compile(r'\*\*\s*Step\b[^\n]{0,60}')
+#: Class 1 - a line a human reads as a step heading, however malformed.
+#:
+#: **Line-oriented, not marker-oriented** (Reviewer A, F5).  Anchored on the
+#: bold marker it required the leading asterisks, so a heading that lost its
+#: bold *entirely* was invisible to the "however malformed" detector -- and T4
+#: then compares the surviving strict markers for contiguity, which succeeds
+#: whenever the lost heading is the LAST one (1,2,3 is contiguous whether or
+#: not a step 4 exists).  The final step is where the answer is computed,
+#: which is why cd_dc_system_analysis was the urgent one.
+_STEP_ANY = re.compile(r'^[ \t]*\*{0,2}[ \t]*Step[ \t]*\d+[ \t]*[:.][^\n]{0,60}',
+                       re.MULTILINE)
 #: ... and the one well-formed shape.  `**Step 12:**` and nothing else.
 _STEP_OK = re.compile(r'\*\*Step (\d+):\*\*')
 
-#: Class 2 - every answer marker shape the corpus is known to emit.
-_ANSWER_ANY = re.compile(r'\*\*\s*(?:Final\s+)?Answers?\s*:?\s*\*\*')
+#: Class 2 - every answer marker shape the corpus is known to emit, INCLUDING
+#: the ##-heading form (Reviewer A, F6).  Restricted to the bold shape it
+#: could not see `## Final Answer` at all, so a solution carrying that
+#: *beside* the canonical marker passed both this scan and T4 -- while on the
+#: candidate side `normalize.ANSWER_MARKERS` ranks the heading at **priority
+#: 0**, above the bold marker, and would extract from it.  That is exactly the
+#: gold/candidate disagreement D5.3 exists to prevent, passing the check that
+#: exists to prevent it.
+_ANSWER_ANY = re.compile(
+    r'\*\*\s*(?:Final\s+)?Answers?\s*:?\s*\*\*'
+    r'|^\#{1,6}\s*(?:Final\s+)?Answers?\s*:?\s*$',
+    re.MULTILINE)
 CANONICAL_ANSWER_MARKER = '**Answer:**'
 
-#: Class 3 - `+ j-51.22`.  A sign, `j`, then a second sign: the doubled sign is
-#: the defect.  `- j51.22` is well formed and does not match; `+ j-51.22` and
-#: `- j+51.22` both do.
+#: Class 3 - a DOUBLED SIGN: `+ j-51.22`, and equally `876*t + -86.8 deg`.
+#:
+#: The first version required a literal `j` and so gated only half of the
+#: class D-061 defines (Reviewer A, F1) -- the half that did *not* change
+#: 2,560 question strings.  `_signed_term`'s own docstring names
+#: `876*t + -86.8 deg` as the first of the two things it was written to fix,
+#: and the detector could not see it.
+#:
+#: **Gated on Track A's eleven; census corpus-wide.**  14 templates outside
+#: Track A still emit this and are assigned to Phase 6 (D-061), so gating it
+#: corpus-wide today would fail the corpus for work this phase is not
+#: chartered to do.  Reporting `0 templates` for a class present on 14 would
+#: be worse than reporting the 14.
+_DOUBLED_SIGN = re.compile(
+    r'(?<![\w.\-])[-+\u2212][ \t]*(?:j[ \t]*)?'
+    r'[-+\u2212][ \t]*(?=[.\d]|j[.\d])')
+#: The `j` sub-shape, kept separate so the corpus-wide claim stays honest:
+#: the `j` form is gone corpus-wide; the wider class is not.
 _COMPLEX_SIGN = re.compile(r'[-+]\s*j\s*[-+]\s*\d')
 
-#: Class 4 - a zero coefficient printed as a product: `0*pi`, `0 * x`.
+#: Class 4 - a zero coefficient printed as a product: `0*pi`, `0 * x`, and
+#: `0.0*pi` (Reviewer A, F3).  `round(x, n)` of a small float is the ordinary
+#: way a template arrives at a zero coefficient, so the float form is the
+#: LIKELIER regression shape, not the rarer one.
+#:
 #: Anchored on the left operand, so `2*pi*0` and `k = 0` do not match, and the
 #: lookbehind rejects a *word* character as well as a digit -- without that,
 #: `q0 * B`, `p_0 * rho`, `P0 * a^3` and `d_0 * epsilon` all match, and six of
 #: the detector's original eight hits were a variable's trailing subscript.
-_DEGENERATE_PRODUCT = re.compile(r'(?<![\w.])0\s*\*\s*(?=pi\b|[A-Za-z]_?\w*\b)')
+_DEGENERATE_PRODUCT = re.compile(
+    r'(?<![\w.])0(?:\.0+)?\s*\*\s*'
+    r'(?=pi\b|[A-Za-z]_?\w*\b)')
 
-#: Gating classes.  `degenerate_product` is measured on the answer span only;
-#: see the module docstring for the measurement that justifies the scoping.
+#: Gated corpus-wide.  The corpus is clean on all four.
 CLASSES = ('step_marker', 'answer_marker', 'complex_sign', 'degenerate_product')
 
-#: Reported, never gated: the same pattern in a derivation step, where a zero
-#: coefficient shown being substituted is legible working rather than a defect.
-#: Carried so that scoping the gate does not also delete the observation.
-CENSUS = ('degenerate_product_derivation',)
+#: Gated on Track A's eleven templates ONLY, and reported as a census
+#: everywhere else (Reviewer A, F1; D-061).  The wider doubled-sign class is
+#: present on 14 templates this phase is not chartered to edit, so gating it
+#: corpus-wide would fail the corpus for Phase 6's work.  Gating it on the
+#: eleven is what makes Track A's own class-3 fix -- including the 2,560
+#: question strings it changed -- defended by something.
+GATED_ON_TRACK_A = ('doubled_sign',)
+#: Reported, never gated.
+#:  - `degenerate_product_derivation`: the same pattern in a derivation step,
+#:    where a zero coefficient shown being substituted is legible working.
+#:  - `doubled_sign_corpus`: the wider class outside Track A's eleven, so that
+#:    scoping its gate does not also delete the observation.
+CENSUS = ('degenerate_product_derivation', 'doubled_sign_corpus')
+
+#: Every class, for iteration.
+ALL_CLASSES = CLASSES + GATED_ON_TRACK_A + CENSUS
 
 #: Every answer marker the corpus emits, longest first so `**Final Answers:**`
 #: is found before `**Answer**` could match inside it.
@@ -141,22 +192,25 @@ class ScanResult:
     errors: list[str] = field(default_factory=list)
     #: class -> Counter of the offending text fragment -> instance count
     hits: dict[str, Counter] = field(
-        default_factory=lambda: {c: Counter() for c in CLASSES + CENSUS})
+        default_factory=lambda: {c: Counter() for c in ALL_CLASSES})
+    #: Track A's templates are gated on `GATED_ON_TRACK_A` as well.
+    in_track_a: bool = False
 
     @property
     def clean(self) -> bool:
         """Gating classes only.  A census hit is an observation, not a failure."""
-        return not self.errors and not any(self.hits[c] for c in CLASSES)
+        gated = CLASSES + (GATED_ON_TRACK_A if self.in_track_a else ())
+        return not self.errors and not any(self.hits[c] for c in gated)
 
     def summary(self) -> str:
         bits = [f'{len(self.errors)} generation errors'] if self.errors else []
-        for c in CLASSES + CENSUS:
+        for c in ALL_CLASSES:
             if self.hits[c]:
                 bits.append(f'{c} {dict(self.hits[c])}')
         return '; '.join(bits) or 'clean'
 
 
-def scan_solution(sol: str, res: ScanResult) -> None:
+def scan_solution(sol: str, res: ScanResult, question: str = '') -> None:
     """Apply the four detectors to one emitted solution."""
     for m in _STEP_ANY.finditer(sol):
         frag = m.group(0)
@@ -172,28 +226,43 @@ def scan_solution(sol: str, res: ScanResult) -> None:
     elif markers.count(CANONICAL_ANSWER_MARKER) > 1:
         res.hits['answer_marker']['<duplicate **Answer:**>'] += 1
 
-    for m in _COMPLEX_SIGN.finditer(sol):
+    # Classes 3 and 4 are properties of the emitted ITEM, so they are read
+    # over the question as well as the solution (Reviewer A, F2).  Track A's
+    # class-3 fix changed 2,560 question strings and nothing read them.
+    #
+    # Classes 1 and 2 are deliberately NOT read over the question, and that is
+    # a decision rather than an oversight: a question has no steps and states
+    # no answer, so a step marker or an answer marker inside one is a
+    # different defect from the one this scan is named for.
+    emitted = sol + chr(10) + chr(10) + question if question else sol
+
+    for m in _COMPLEX_SIGN.finditer(emitted):
         res.hits['complex_sign'][m.group(0).strip()] += 1
+    for m in _DOUBLED_SIGN.finditer(emitted):
+        key = emitted[m.start():m.start() + 6].strip()
+        res.hits['doubled_sign' if res.in_track_a else 'doubled_sign_corpus'][key] += 1
 
     span = answer_span(sol)
     for m in _DEGENERATE_PRODUCT.finditer(span):
         res.hits['degenerate_product'][span[m.start():m.start() + 8].strip()] += 1
-    n_all = len(_DEGENERATE_PRODUCT.findall(sol))
+    n_all = len(_DEGENERATE_PRODUCT.findall(emitted))
     n_span = len(_DEGENERATE_PRODUCT.findall(span))
     if n_all > n_span:
-        m = next(_DEGENERATE_PRODUCT.finditer(sol))
-        res.hits['degenerate_product_derivation'][sol[m.start():m.start() + 8].strip()] += 1
+        m = next(_DEGENERATE_PRODUCT.finditer(emitted))
+        res.hits['degenerate_product_derivation'][
+            emitted[m.start():m.start() + 8].strip()] += 1
 
 
 def scan_template(ref, seeds: int) -> ScanResult:
-    res = ScanResult(template_id=ref.template_id)
+    res = ScanResult(template_id=ref.template_id,
+                     in_track_a=ref.template_id in TRACK_A)
     for seed in range(seeds):
         inst = generate(ref, seed, capture=False)
         if not inst.ok:
             res.errors.append(f'seed {seed}: {inst.error}')
             continue
         res.instances += 1
-        scan_solution(inst.solution, res)
+        scan_solution(inst.solution, res, inst.question)
     return res
 
 
@@ -302,11 +371,34 @@ def check_marker_agreement(seeds: int = 8) -> int:
 #: correctly refused to fire, which read as a miss and was not one.  Keeping the
 #: plant site explicit is what makes the answer-span scoping testable in both
 #: directions rather than merely asserted in the docstring.
+#: ``(class, find, replace, where)`` -- ``where`` is 'sol' or 'q'.
+#:
+#: **At least two plants per detector, of materially different surface form**
+#: (Reviewer A, |S|5.9).  The first version had one plant per class, and the
+#: plant was written by the same hand as the regex -- so every plant was a
+#: shape its regex already matched, and the suite passed while four of the
+#: detectors were narrower than the class they are named after.  Reviewer A
+#: found all four by writing detectors from the spec's defect table instead.
+#: The pairs below are the shapes that review produced:
+#:
+#:   step marker        malformed bold  /  bold lost entirely
+#:   answer marker      marker swapped  /  a second marker ADDED beside it
+#:   doubled sign       `+ j-5`         /  `+ -5` with no `j` at all
+#:   degenerate product `0*pi`          /  `0.0*pi`
+#:
+#: and one plant per class is placed in the QUESTION rather than the solution,
+#: because nothing read the question until F2.
 PLANTS = (
-    ('step_marker', '**Step 2:**', '**Step 2: **'),
-    ('answer_marker', '**Answer:**', '**Final Answer**'),
-    ('complex_sign', '= ', '= 30.5 + j-51.22 '),
-    ('degenerate_product', '**Answer:**', '**Answer:** omega_a = 0*pi and'),
+    ('step_marker', '**Step 2:**', '**Step 2: **', 'sol'),
+    ('step_marker', '**Step 2:**', 'Step 2:', 'sol'),
+    ('answer_marker', '**Answer:**', '**Final Answer**', 'sol'),
+    ('answer_marker', '**Answer:**', '## Final Answer\n**Answer:**', 'sol'),
+    ('complex_sign', '= ', '= 30.5 + j-51.22 ', 'sol'),
+    ('doubled_sign', '= ', '= 30.5 + j-51.22 ', 'sol'),
+    ('doubled_sign', '= ', '= cos(876*t + -86.8 deg) ', 'sol'),
+    ('doubled_sign', 'Calculate', 'cos(876*t + -86.8 deg). Calculate', 'q'),
+    ('degenerate_product', '**Answer:**', '**Answer:** omega_a = 0*pi and', 'sol'),
+    ('degenerate_product', '**Answer:**', '**Answer:** omega_a = 0.0*pi and', 'sol'),
 )
 
 #: The negative half of the same test: planted where it is NOT a defect, the
@@ -327,8 +419,8 @@ def selftest() -> int:
     inst = generate(host, 0, capture=False)
     assert inst.ok, inst.error
 
-    base = ScanResult(template_id='<clean-host>')
-    scan_solution(inst.solution, base)
+    base = ScanResult(template_id='<clean-host>', in_track_a=True)
+    scan_solution(inst.solution, base, inst.question)
     base_t4 = t4_contract.run([inst], host.template_id)
     ok = base.clean and base_t4.passed
     print(f'  host clean before planting: scan={base.clean} T4={base_t4.passed}')
@@ -336,25 +428,29 @@ def selftest() -> int:
         print(f'  !! host is not clean: {base.summary()} / {base_t4.summary()}')
         return 1
 
-    for cls, find, repl in PLANTS:
-        if find not in inst.solution:
-            print(f'  !! cannot plant {cls}: host has no {find!r}')
+    for cls, needle, repl, where in PLANTS:
+        src = inst.question if where == 'q' else inst.solution
+        if needle not in src:
+            print(f'  !! cannot plant {cls} in {where}: no {needle!r}')
             ok = False
             continue
-        planted = inst.solution.replace(find, repl, 1)
-        res = ScanResult(template_id=f'<planted:{cls}>')
-        scan_solution(planted, res)
+        planted = src.replace(needle, repl, 1)
+        sol = inst.solution if where == 'q' else planted
+        q = planted if where == 'q' else inst.question
+
+        res = ScanResult(template_id=f'<planted:{cls}>',
+                         in_track_a=True)
+        scan_solution(sol, res, q)
         caught_scan = bool(res.hits[cls])
 
-        mutant = Instance(host.template_id, 0, inst.question, planted)
+        mutant = Instance(host.template_id, 0, q, sol)
         t4 = t4_contract.run([mutant], host.template_id)
-        # T4 is expected to catch the two classes it can see, and only those.
-        t4_should_see = cls in ('step_marker', 'answer_marker')
+        t4_should_see = cls in ('step_marker', 'answer_marker') and where == 'sol'
         t4_ok = (not t4.passed) if t4_should_see else True
 
-        print(f'  plant {cls:20s} scan={"CAUGHT" if caught_scan else "MISSED"}  '
-              f'T4={"FAILS" if not t4.passed else "passes"}'
-              f'{" (expected: sees it)" if t4_should_see else " (expected: blind)"}')
+        print(f'  plant {cls:20s} in {where:3s} {repl[:22]!r:26s} '
+              f'scan={"CAUGHT" if caught_scan else "MISSED"}  '
+              f'T4={"FAILS" if not t4.passed else "passes"}')
         if not caught_scan or not t4_ok:
             ok = False
 
@@ -424,6 +520,11 @@ def main(argv=None) -> int:
               f'({len(out_of_scope[c])} outside Track A)')
     for c in CENSUS:
         print(f'  {c:32s} {len(per_class[c]):3d} templates   [census, not gated]')
+        # The names, not just the count.  A census whose members are not printed
+        # is a number nobody can act on, and D6.7 is the Phase 6 deliverable that
+        # has to act on this one.
+        for t in per_class[c]:
+            print(f'      {t}')
     print(f'  {"clean":32s} {sum(1 for r in results if r.clean):3d} / {len(results)}')
     n_err = sum(len(r.errors) for r in results)
     print(f'  {"generation errors":32s} {n_err:3d} instances '

@@ -103,14 +103,23 @@ def check_instance(inst: Instance, res: ContractResult) -> None:
         elif strict != list(range(1, len(strict) + 1)):
             res.non_contiguous.append(inst.seed)
 
+    # A marker is counted if it appears at all, NOT only when the canonical one
+    # is missing (Reviewer A, F6).  `**Final Answer**` contains `Final Answer`
+    # and `## Final Answer` does not overlap either, so the three are counted
+    # independently; the containment that does exist is handled by scoring the
+    # canonical marker's own count separately below.
     present = [mk for mk in ANSWER_MARKERS if mk in sol]
     if not present:
         res.missing_answer.append(inst.seed)
     else:
-        if CANONICAL_ANSWER_MARKER not in sol:
-            res.non_canonical_answer[present[0]] += 1
-        # count only the canonical/first marker's occurrences
-        if sol.count(present[0]) > 1:
+        for mk in present:
+            if mk != CANONICAL_ANSWER_MARKER:
+                res.non_canonical_answer[mk] += 1
+        # More than one answer marker of ANY spelling is a contract violation:
+        # the segmenter has to choose, and gold does not get to make it guess.
+        # Counting only `present[0]`'s occurrences missed a second marker with a
+        # different spelling entirely, which is F6's mechanism.
+        if sol.count(CANONICAL_ANSWER_MARKER) > 1 or len(present) > 1:
             res.multiple_answers.append(inst.seed)
     if not strict and not loose:
         res.empty_output.append(inst.seed)
