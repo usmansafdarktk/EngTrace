@@ -137,18 +137,59 @@ def numeric_parts(n: int, unit: str | None = None) -> AnswerSpec:
 # inside gold's prose so the right comparator sees the right substring.
 # --------------------------------------------------------------------------
 
-_ANGLE_RE = re.compile(r"<[^>]*\d[^>]*>")
-_HAT_RE = re.compile(r"[-+]?\s*[\d.eE+-]+\s*[a-z]_hat")
+#: The component list.  ``<...>`` is what gold writes; ``[...]`` is what models
+#: write, and both are the same answer (Reviewer E, R2-F1).
+#: A component list.  ``<...>`` is what gold writes and ``[...]`` is what
+#: models write -- but a bracket group is only a vector if it is a LIST of
+#: numbers, so a comma and numeric-only content are both required.  Without
+#: that, ordinary prose brackets read as vectors.
+_ANGLE_RE = re.compile(
+    r"<[^>]*\d[^>]*>"
+    r"|\[[^\]a-zA-Z]*\d[^\]a-zA-Z]*,[^\]a-zA-Z]*\d[^\]a-zA-Z]*\]")
+
+#: A unit-vector term.  **Gold writes ``x_hat``; every archived model answer
+#: writes ``x̂``** -- combining circumflex U+0302, or the precomposed ``ŷ``
+#: U+0177 and ``ẑ`` U+1E91.  Reading only the ASCII form meant the comparator
+#: accepted **0 of 83** real answers across the three vector templates while
+#: matching gold against gold perfectly, so the identity gate could not see it
+#: *by construction*.
+#:
+#: This is a missing **surface declaration**, which is the mechanism D4.1 |S|4.2
+#: already uses for categorical labels -- not a new rule and not undecidability.
+#: A unit-vector term.  The ``_hat`` marker is REQUIRED: without it the
+#: pattern also matches ``9.83 mol`` and every scalar answer with a unit
+#: becomes a vector.  Measured when it was optional: several templates bound
+#: as `vector` and matched everything, 2,450 false accepts in 2,450 pairs.
+_HAT_RE = re.compile(r"[-+]?\s*[\d.eE+-]+\s*[a-z]_hat\b")
+
+#: Observed unit-vector notations, folded ONTO the ``_hat`` marker rather than
+#: stripped.  Gold writes ``x_hat``; archived model answers write ``x̂`` -- a
+#: combining circumflex (U+0302) after NFD, or a precomposed ``ŷ`` / ``ẑ``.
+#: Folding the mark *away* would leave a bare letter, and a number followed by a
+#: bare letter is just a quantity with a unit.
+_HAT_FOLD = re.compile(r"([a-z])\u0302")
+_HAT_PRECOMPOSED = {"\u0177": "y_hat", "\u1e91": "z_hat"}
+
+
+def _fold_hats(text: str) -> str:
+    """Fold the observed unit-vector notations onto the ``_hat`` surface."""
+    import unicodedata  # noqa: PLC0415
+    for src, dst in _HAT_PRECOMPOSED.items():
+        text = text.replace(src, dst)
+    t = unicodedata.normalize("NFD", text)
+    return _HAT_FOLD.sub(r"\1_hat", t)
 
 
 def vector_components(text: str) -> list[str] | None:
     """The ordered components of a vector answer, or None."""
-    t = prepare(answer_span(text)[0])
+    t = _fold_hats(prepare(answer_span(text)[0]))
     m = _ANGLE_RE.search(t)
     if m:
         return [x.group(0) for x in NUM_RE.finditer(m.group(0))]
     hats = _HAT_RE.findall(t)
-    if hats:
+    if len(hats) >= 2:
+        # Two or more terms, so this is a component list rather than a stray
+        # "2 x" in ordinary algebra.  A one-term match is not a vector.
         return [x.group(0) for h in hats for x in NUM_RE.finditer(h)]
     return None
 
@@ -327,6 +368,7 @@ BINDINGS: dict[str, dict[str, Any]] = {
     'template_basic_eoq': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_basic_stress_strain': {'kind': 'multipart', 'options': {'n': 2}, 'note': '2 asserted numbers in every gold span', 'answer_type': 'multipart'},
     'template_batch_reactor_first_order': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
+    'template_batch_reactor_second_order': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_batch_reactor_zero_order': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_beam_deflection_formula': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_beam_internal_moment': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
@@ -380,6 +422,7 @@ BINDINGS: dict[str, dict[str, Any]] = {
     'template_nyquist_rate_determination': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_p_chart_limits_floor': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_particle_pathline': {'kind': 'multipart', 'options': {'n': 3}, 'note': '3 asserted numbers in every gold span', 'answer_type': 'vector'},
+    'template_pfr_volume_changing_rate': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_phase_relations_degree_of_saturation': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_poisson_event_count': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_poissons_ratio': {'kind': 'multipart', 'options': {'n': 2}, 'note': '2 asserted numbers in every gold span', 'answer_type': 'multipart'},
@@ -437,7 +480,6 @@ BINDINGS: dict[str, dict[str, Any]] = {
 UNBOUND: dict[str, str] = {
     'template_autocorrelation_rect_pulse': 'part(s) [4, 6] read a constant on every instance -- compared by nothing (E-9)',
     'template_batch_moles_vs_conversion': 'the asserted-number count varies across instances: [7, 8]',
-    'template_batch_reactor_second_order': '5 false accepts in 2450 pairs',
     'template_ber_estimation_mary': 'rejects a verbatim copy of gold on 50/50 seeds (UNRESOLVED: could not parse an expression: SympifyError)',
     'template_bpsk_energy_basis': 'rejects a verbatim copy of gold on 50/50 seeds (UNRESOLVED: could not parse an expression: SympifyError)',
     'template_cd_dc_system_analysis': 'rejects a verbatim copy of gold on 50/50 seeds (UNRESOLVED: could not parse an expression: SympifyError)',
@@ -447,7 +489,7 @@ UNBOUND: dict[str, str] = {
     'template_decimation_aliasing_analysis': "2 false accepts in 2450 pairs; rejects a verbatim copy of gold on 48/50 seeds (UNRESOLVED: symbol(s) outside the declared alphabet: ['i', 'p'])",
     'template_euclidean_distance_binary': 'the asserted-number count varies across instances: [5, 7]',
     'template_falling_film_max_velocity': 'the asserted-number count varies across instances: [1, 2]',
-    'template_floating_object_submersion_depth': '4 false accepts in 2450 pairs',
+    'template_floating_object_submersion_depth': '1 false accepts in 2450 pairs',
     'template_flow_system_molar_flow_rates': 'the asserted-number count varies across instances: [6, 7]',
     'template_ft_esd_rect_pulse': "rejects a verbatim copy of gold on 50/50 seeds (UNRESOLVED: symbol(s) outside the declared alphabet: ['c', 'i', 's'])",
     'template_gas_viscosity_kinetic_theory': 'the asserted-number count varies across instances: [2, 3]',
@@ -457,7 +499,6 @@ UNBOUND: dict[str, str] = {
     'template_kinematic_viscosity': 'the asserted-number count varies across instances: [1, 2]',
     'template_limiting_reactant': 'the asserted-number count varies across instances: [6, 7, 8]',
     'template_null_to_null_bandwidth': '24 false accepts in 2450 pairs',
-    'template_pfr_volume_changing_rate': '2 false accepts in 2450 pairs',
     'template_phasor_addition': "rejects a verbatim copy of gold on 50/50 seeds (UNRESOLVED: symbol(s) outside the declared alphabet: ['c', 'd', 'e', 'g', 'o', 's'])",
     'template_pitzer_correlation_z': '1 false accepts in 2450 pairs',
     'template_signal_energy_power': '2 false accepts in 2450 pairs',
@@ -484,7 +525,7 @@ VALIDATION: dict[str, dict[str, int]] = {
     'template_basic_eoq': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_basic_stress_strain': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_batch_reactor_first_order': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
-    'template_batch_reactor_second_order': {'pairs': 2450, 'false_accepts': 5, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
+    'template_batch_reactor_second_order': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_batch_reactor_zero_order': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_beam_deflection_formula': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_beam_internal_moment': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
@@ -512,7 +553,7 @@ VALIDATION: dict[str, dict[str, int]] = {
     'template_equivalent_stiffness_frequency': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_exponential_mttf_topology': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_finite_convolution': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
-    'template_floating_object_submersion_depth': {'pairs': 2450, 'false_accepts': 4, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
+    'template_floating_object_submersion_depth': {'pairs': 2450, 'false_accepts': 1, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_fluid_particle_acceleration': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_force_method_continuous_beam': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_ft_esd_rect_pulse': {'pairs': 2450, 'unresolved': 2450, 'decided': 0, 'identity_failures': 50, 'constant_parts': 0},
@@ -523,7 +564,7 @@ VALIDATION: dict[str, dict[str, int]] = {
     'template_hydrostatic_force_on_plane': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_hydrostatic_pressure_at_depth': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_ideal_gas_volume': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
-    'template_incompressible_continuity': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
+    'template_incompressible_continuity': {'pairs': 2450, 'false_rejects': 4, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_infinite_slope_factor_of_safety': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_influence_line_max_reaction': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_latent_heat_vaporization': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
@@ -548,7 +589,7 @@ VALIDATION: dict[str, dict[str, int]] = {
     'template_nyquist_rate_determination': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_p_chart_limits_floor': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_particle_pathline': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
-    'template_pfr_volume_changing_rate': {'pairs': 2450, 'false_accepts': 2, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
+    'template_pfr_volume_changing_rate': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_phase_relations_degree_of_saturation': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_phasor_addition': {'pairs': 2450, 'unresolved': 2450, 'decided': 0, 'identity_failures': 50, 'constant_parts': 0},
     'template_pitzer_correlation_z': {'pairs': 2450, 'false_accepts': 1, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},

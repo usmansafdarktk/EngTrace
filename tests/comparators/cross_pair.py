@@ -28,13 +28,20 @@ reach.
   template;
 * score ``compare_template(t, gold=b, candidate=a)`` under ``t``'s declared
   binding;
-* **truth**: the pair is expected to MATCH iff the two gold answer spans are the
-  same text, after whitespace normalisation. A MATCH on a pair whose spans
-  differ is a **false accept**.
+* **truth**: the pair is expected to MATCH iff the two gold spans state the
+  **same answer** -- same non-numeric text, same count of numbers, and every
+  number agreeing with its counterpart within the tolerance implied by the
+  *gold* side's displayed precision (``extract.same_answer``). A MATCH on a
+  pair that does not is a **false accept**.
 
-The textual-identity proxy can err in one direction -- two instances could carry
-the same answer written differently -- so **every false accept is reported with
-both spans**, and the proxy is audited rather than believed.
+**Textual identity was the first predicate and it was wrong in one direction.**
+Gold ``5.0 seconds`` against gold ``4.99 seconds`` differs as text, and under
+D4.1 |S|7.1's boundary-inclusive display tolerance ``4.99`` *is* a correct answer
+to a question whose gold shows ``5.0`` -- so the MATCH was scored a false accept
+and **9 templates were declared unbound on that basis alone** (Reviewer E,
+R2-F2). The predicate now walks every number in the span and **does not call the
+answer rule**, because using the rule under test to define the truth it is
+scored against is a test carrying its own answer key (D-034).
 
 ## D5.5 -- archive x gold
 
@@ -86,6 +93,7 @@ if REPO not in sys.path:
     sys.path.insert(0, REPO)
 
 from tests.comparators.bindings import BINDINGS, UNBOUND, compare_template  # noqa: E402
+from tests.comparators.extract import same_answer  # noqa: E402
 from tests.comparators.normalize import answer_span  # noqa: E402
 from tests.template_integrity.core import discover, generate  # noqa: E402
 
@@ -145,7 +153,8 @@ def gold_gold(n: int = DEFAULT_N) -> dict:
                 if a == b:
                     continue
                 r["pairs"] += 1
-                same = spans[a] == spans[b]
+                # Truth is "the same ANSWER", not "the same STRING" (E, R2-F2).
+                same = spans[a] == spans[b] or same_answer(spans[b], spans[a])
                 r["negatives"] += (not same)
                 try:
                     v = compare_template(tid, sols[b], sols[a])
