@@ -2132,6 +2132,94 @@ then drops out on its own. Caught by disbelieving the number, not by a check.
 
 ---
 
+## D-058 — Cross-pairing finds three comparator defects Phase 4's corpora could not, and one binding gap that is larger than all three
+
+**Date:** 2026-09-07 · **Status:** DECIDED (recorded; fixes assigned to Phase 5)
+**Source:** post-merge experiment answering Reviewer E's F0 and R2-F10
+
+Phase 4 closed with two gate items **met and uninformative**: the archive holds
+no wrong answer at all for `categorical` or `categorical[tuple]`, and no trace of
+any kind for `numeric`, `check` or `narrative`. Reviewer E said precision without
+a per-kind negative count is unreadable. This is the measurement that fills it.
+
+**The instrument.** Gold is by definition the correct answer to its own question,
+so pairing gold *A* as a **candidate** against gold *B* as the **gold** has a
+truth known with no label at all: match iff the two answers are identical. That
+manufactures negatives for every kind, at arbitrary scale, from the templates
+alone. Run over all 150 templates × 12 instances: **19,668 pairs.**
+
+### Three real defects
+
+**N1 — `parse_number` reads the first number in the answer span, which is often
+not the answer.** Confirmed false accept:
+
+```
+cand: The volumetric flow rate of Engine Oil (SAE 50) ... is 0.001183 m^3/s.
+gold: The volumetric flow rate of Engine Oil (SAE 50) ... is 0.002738 m^3/s.
+-> MATCH        both canonicalise to 50
+```
+
+The incidental number is a fluid grade. `gas_viscosity_kinetic_theory` shows the
+same defect reading a **temperature** (541) and a **subscript digit from a
+chemical formula** (the 4 of C₄H₁₀). **3 scalar templates produce a false accept
+in a 12-instance sample**; 58 of 150 carry a leading incidental number and are
+therefore exposed to it.
+
+**This is D-003's defect class reappearing inside the comparator built to replace
+it**, and no corpus Phase 4 shipped could see it, because `numeric` had zero
+archived negative instances.
+
+**N2 — an empty parse compares equal to an empty parse.** `_as_polynomial`
+returns an empty coefficient map when it recovers no polynomial content, and
+`{} == {}` is a `MATCH`. On `autocorrelation_rect_pulse` that is **128 of 132
+pairs**: every expression the parser fails on matches every other one it fails
+on. **An unrecoverable parse must be `UNRESOLVED`** — this is D4.1 §4.4's own
+stated rule ("failure is `UNRESOLVED`, never `MATCH`") violated by a code path
+that never reaches the CAS.
+
+**N3 — the comparator has bindings for 4 of 150 templates.** D4.1 specifies the
+contract and `PHASE4_BINDINGS` implements it for the four Phase 4 items only.
+Everything else has no declared label set, no declared unit, no declared answer
+shape. Scored with defaults, `euclidean_distance_binary` matches **132 of 132**
+pairs because a multipart answer read by a single-part comparator returns the
+`1` from `s1`.
+
+**N3 is larger than N1 and N2 together, and it reframes Phase 5.** The
+comparator does not need more rules; it needs **bindings**, and each binding
+needs evidence that it discriminates. Cross-pairing is that evidence.
+
+### What is NOT a defect, stated because the same run reports it
+
+The sweep's 68 `categorical` and 136 `sequence` false *rejects*, and most of its
+560 false accepts, are **artefacts of my harness**, not comparator defects: it
+scored every template with *default* options, so `damping_classification` was
+judged against the **linearity** label set and every `multipart` answer was
+judged by the `numeric` comparator. Those numbers say only that N3 is real. The
+three defects above are the ones that survive per-kind binding.
+
+**An earlier framing of mine was wrong and is corrected here.** I first reported
+"58 of 150 templates" as the size of N1. 58 is the count *exposed* to it — having
+a leading incidental number is necessary and not sufficient. The measured count
+that produces a false accept in a 12-instance sample is **3**. Both numbers are
+useful and they are not the same number.
+
+### Standing instruments, not one-off experiments
+
+Reviewer E said of its own cross-pairing that it *"should be run as a standing
+check rather than as a one-off review artefact"*. Two complementary corpora, both
+assigned to Phase 5:
+
+| instrument | scale | tests |
+|---|---:|---|
+| **gold × gold** | 19,668 pairs, all 150 templates, no archive needed | equality and discrimination, every kind |
+| **archive × gold** (E's) | **22,982** real-text pairs available — 11,384 `scalar`, 5,511 `multipart` | the same, in real model surface forms |
+
+Gold×gold cannot test normalisation, because gold text lacks model surface
+variation; archive×gold cannot cover kinds the archive lacks. Neither replaces
+the other and Phase 5 lands both.
+
+---
+
 ## Open decisions
 
 | # | Decision | Needed before |
