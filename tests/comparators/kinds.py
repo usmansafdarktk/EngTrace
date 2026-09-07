@@ -32,6 +32,7 @@ from .commitment import (
     hedge_markers,
     is_assertion,
     segment,
+    suspends_what_follows,
 )
 from .normalize import (
     NEGATORS,
@@ -246,7 +247,14 @@ def _negated(text: str, at: int, surface: str) -> bool:
     window = text[max(0, at - _NEG_WINDOW):at].lower()
     # A clause boundary ends a negator's scope: "is not memoryless. It is
     # causal" must not negate "causal".
-    window = re.split(r"[.;]|\bbut\b|\bhowever\b|\bwhereas\b|\bwhile\b", window)[-1]
+    # The colon is a clause boundary too, and so are the concessives.  Without
+    # them, "it does not break superposition: the system is linear" let the
+    # negation reach across and scored a CORRECT answer as WRONG -- a MISMATCH,
+    # not merely an UNRESOLVED, which D4.1 §1's stated bias rules out.
+    # Reviewer B filed it in round 2 and again as R3-F3 when it had spread to
+    # `Although`, the opener the segmentation rewrite existed to rehabilitate.
+    window = re.split(r"[.;:]|\bbut\b|\bhowever\b|\bwhereas\b|\bwhile\b|"
+                      r"\balthough\b|\bthough\b|\byet\b", window)[-1]
     if re.search(r"\bnon-?\s*$", window):
         return True
     if any(re.search(r"\b" + re.escape(n) + r"\b", window) for n in NEGATORS):
@@ -393,6 +401,31 @@ def compare_label_tuple(
     k = "categorical[tuple]"
     g_txt = prepare(answer_span(gold)[0] if extract else gold)
     c_txt = prepare(answer_span(candidate)[0] if extract else candidate)
+
+    # **A frame around an enumerated answer still frames it.**
+    # Slots are located positionally among the clauses that FOLLOW an
+    # enumerator, so any prose before the first `a)` is dropped -- and a
+    # hypothetical or task-restating preface was dropped with it, making
+    # "If the additivity test holds, a) Yes, b) Yes" a MATCH.  That is my
+    # round-2 fix for the recall corpus relocating a defect into the tuple
+    # path, and Reviewer B found it with the negative control the corpus
+    # itself lacked (R3-F1).  The preface is judged before the slots are.
+    preface = _clauses_marked(c_txt)
+    lead = " ".join(t for t, was_enum in preface if not was_enum).strip()
+    if lead:
+        why = suspends_what_follows(lead)
+        if why:
+            return unresolved(k, why)
+
+    # A label-free question after the slots withdraws them, the same way it
+    # withdraws a single label (see `_hedges_governing`).  The slot path
+    # resolves each slot in its own clause and so never sees a trailing
+    # sentence that belongs to neither.
+    for c in commitment_clauses(c_txt):
+        if c.rstrip().endswith("?") and not any(
+            _label_hit(c, list(s.positive) + list(s.negative)) for s in slots
+        ):
+            return unresolved(k, "the answer is withdrawn by a following question")
 
     g_clauses, c_clauses = _clauses(g_txt), _clauses(c_txt)
     parts = [

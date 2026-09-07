@@ -75,6 +75,34 @@ FRAMES: list[tuple[str, str, str]] = [
      "E R2-F9c: a following remark about a different subject"),
 ]
 
+#: **Negative controls, and the corpus was shipped without them.**
+#:
+#: Reviewer B (R3-F1) built these and they found a false accept immediately:
+#: wrapping an answer in a hypothetical must make it non-committal, and **16 of
+#: the 39 still MATCHed** -- exactly the enumerated ``a) … b) …`` answers, whose
+#: frame the enumerator split discarded before the comparator ever read it.
+#: 144 of the 351 positive cases were therefore further copies of the ``plain``
+#: control, and the corpus was **41% inert** while reporting 100%.
+#:
+#: A recall corpus with no negative control cannot tell "the comparator credits
+#: a correct answer" from "the comparator never saw the frame". That is the
+#: same shape as D4.4 sampling the inside of the hedge list it certified
+#: (B, round-1 F1), one level up, and I built it twice.
+NEGATIVE_FRAMES: list[tuple[str, str, str]] = [
+    ("neg-hypothetical",
+     "If the additivity test holds, {a}",
+     "a conditional states a rule, not a verdict"),
+    ("neg-task-restatement",
+     "We must determine whether {a}",
+     "the item's own prompt wording is not an answer"),
+    ("neg-explicit-hedge",
+     "I am not sure, but perhaps {a}",
+     "a speaker-level hedge governs the whole utterance"),
+    ("neg-question",
+     "{a} Or is it?",
+     "a trailing question withdraws the commitment"),
+]
+
 #: Only the kinds `commitment.py` gates are worth framing this way -- it is the
 #: module under test.  `sequence` and `symbolic` answers are formulae, and
 #: wrapping a formula in a concessive tests the frame rather than the answer.
@@ -101,7 +129,7 @@ def build() -> list[dict]:
             ans = archived_answer(row)
             if not ans or len(ans) > 400:
                 continue
-            for name, frame, why in FRAMES:
+            for name, frame, why in FRAMES + NEGATIVE_FRAMES:
                 body = frame.format(a=ans)
                 cases.append({
                     "id": f"{stem[:12]}-{i:02d}-{name}",
@@ -110,6 +138,7 @@ def build() -> list[dict]:
                     "candidate": "## Final Answer\n**Answer:** " + body,
                     "frame": name,
                     "why": why,
+                    "expect_match": not name.startswith("neg-"),
                 })
     return cases
 
@@ -121,25 +150,37 @@ def main() -> int:
     print(f"{len(cases)} cases from {len(cases) // len(FRAMES)} archived correct answers "
           f"x {len(FRAMES)} frames\n")
 
-    by_frame: dict[str, Counter] = {name: Counter() for name, _, _ in FRAMES}
+    by_frame: dict[str, Counter] = {name: Counter()
+                                    for name, _, _ in FRAMES + NEGATIVE_FRAMES}
     failures: list[dict] = []
     for c in cases:
         v = compare_template(c["template"], c["gold"], c["candidate"])
         by_frame[c["frame"]][v.outcome] += 1
-        if not v.is_match:
+        if v.is_match != c["expect_match"]:
             failures.append({**c, "outcome": v.outcome, "reason": v.reason})
 
-    print(f"{'frame':22s} {'MATCH':>6s} {'MISMATCH':>9s} {'UNRESOLVED':>11s}  {'recall':>7s}  exercises")
-    print("-" * 92)
-    for name, _, why in FRAMES:
-        c = by_frame[name]
-        n = sum(c.values())
-        print(f"{name:22s} {c['MATCH']:6d} {c['MISMATCH']:9d} {c['UNRESOLVED']:11d}  "
-              f"{c['MATCH'] / n if n else 0:7.1%}  {why[:34]}")
-    total = sum(sum(c.values()) for c in by_frame.values())
-    ok = sum(c["MATCH"] for c in by_frame.values())
-    print("-" * 92)
-    print(f"{'TOTAL':22s} {ok:6d} {total - ok:9d} {'':11s}  {ok / total:7.1%}")
+    def _block(title: str, frames: list, want_match: bool) -> tuple[int, int]:
+        print(f"\n{title}")
+        print(f"  {'frame':22s} {'MATCH':>6s} {'MISMATCH':>9s} {'UNRESOLVED':>11s}  "
+              f"{'correct':>8s}  exercises")
+        print("  " + "-" * 88)
+        tot = good = 0
+        for name, _, why in frames:
+            c = by_frame[name]
+            n = sum(c.values())
+            g = c["MATCH"] if want_match else n - c["MATCH"]
+            tot, good = tot + n, good + g
+            print(f"  {name:22s} {c['MATCH']:6d} {c['MISMATCH']:9d} {c['UNRESOLVED']:11d}  "
+                  f"{g / n if n else 0:8.1%}  {why[:32]}")
+        print("  " + "-" * 88)
+        print(f"  {'subtotal':22s} {'':6s} {'':9s} {'':11s}  {good / tot:8.1%}  ({good}/{tot})")
+        return good, tot
+
+    pg, pt = _block("POSITIVE -- a correct answer must be credited (expect MATCH)",
+                    FRAMES, True)
+    ng, nt = _block("NEGATIVE -- a framed answer must NOT be credited (expect not-MATCH)",
+                    NEGATIVE_FRAMES, False)
+    print(f"\n{'TOTAL':24s} {(pg + ng) / (pt + nt):8.1%}  ({pg + ng}/{pt + nt})")
 
     if failures:
         print(f"\n{len(failures)} FALSE REJECTS -- a correct archived answer refused:")
