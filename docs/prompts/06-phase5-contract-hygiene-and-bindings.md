@@ -3,8 +3,11 @@
 Paste everything below the line into a fresh Claude Code session started at the repository
 root, on the `master` branch.
 
-Phases 0, 1, C2, 2, 3 and 4 are complete and merged; Phase 4's merge commit is `9e288d9`
-and this prompt sits on top of it.
+Phases 0, 1, C2, 2, 3 and 4 are complete and merged. Phase 4's merge commit is `9e288d9`;
+`master` has since taken **documentation-only** commits (this brief, D-058, the spec
+amendments and two reviews of this brief). **Branch from `master`, not from `9e288d9`** — and
+re-derive the table below at whatever `master` is when you start, rather than trusting that
+those commits stayed documentation-only.
 
 **This phase has two tracks and they are SEQUENCED, not parallel.** Track A edits eleven
 templates. Track B binds the comparator to the corpus. **Track A lands and merges first**,
@@ -106,8 +109,8 @@ recorded defect was four, Phase 2 found a template failing T1 on 91% of instance
 found two display-tie populations where the brief listed one, Phase 4 found T6 failing on two
 of four where the brief said one.
 
-Corpus health at `master` (`9e288d9`), **re-measured and confirmed exact by an independent
-reviewer** — the first brief in this series whose corpus table needed no correction. Still
+Corpus health, **re-measured and confirmed exact by an independent reviewer** at `9e288d9`
+and unchanged at `c69a54d` — the first brief in this series whose corpus table needed no correction. Still
 re-derive it in a worktree:
 
 | Check | Failing | Note |
@@ -131,8 +134,15 @@ T4 **fails** on exactly `euclidean_distance_binary`, `cd_dc_system_analysis` and
   invisible to T4 and would have had you build a duplicate.
 - the two malformed complex numbers and the unreachable `elif` **are** invisible to T4.
 
-So "T4 passes 150/150" would be true with eight of the eleven edits unmade. **Fix the gate,
-then satisfy it** — extend T4's severity, add a check for the remaining three, or state
+So "T4 passes 150/150" would be true with eight of the eleven edits unmade.
+
+**Note the distinction, because it decides the remedy and this brief got it wrong once.**
+*Ungated* means the check sees the defect and does not fail on it — a **severity** change.
+*Invisible* means the check cannot see it — a **new instrument**. Five templates are ungated
+and three are invisible; treating the first group as the second builds a duplicate scanner.
+Apply the same care anywhere else you find a check that is green on a known defect.
+
+**Fix the gate, then satisfy it** — extend T4's severity, add a check for the remaining three, or state
 per-class acceptance evidence — and record it as a `SPEC-CHANGE` against Phase 5 Track A's
 exit gate. Phase 0 found two checks that were green while measuring nothing; this is a third,
 caught in advance.
@@ -162,6 +172,15 @@ caught in advance.
 - **Never quote an exposure count as a defect count.** 56–64 templates are *exposed* to N1;
   **3** are measured to fail. An earlier draft of this brief reported the exposure count as the
   defect size. Necessary is not sufficient.
+
+**And a rule for every count you produce, which this brief failed three times before you got
+it.** D-034 says a number a script recomputes from the artefact is evidence and a number typed
+beside it is not. **That applies to your prose as much as to your code.** Every count you state
+— in a summary, a decision record or a review brief — ships with either its predicate written
+out (*"87 = templates where all 12 gold spans contain a token from `<vocabulary>`"*) or a
+committed script that regenerates it. The three numbers in this brief that failed review
+(`58`, `87`, `22,982`) failed the same way: the number was recorded and the question it answers
+was not. The measured tables, which came from runs, were flawless.
 
 ## Track A — output-contract hygiene
 
@@ -247,7 +266,14 @@ proving zero remaining violations · D5.3 the marker-set decision record, agreed
 `ANSWER_MARKERS`.
 
 **Track B:** D5.4 gold×gold cross-pairing as a standing check · D5.5 archive×gold
-cross-pairing, Reviewer E's instrument promoted from review artefact · D5.6 N1 fixed by
+cross-pairing, Reviewer E's instrument promoted from review artefact ·
+
+> **Both instruments report `pairs / templates-scored / templates-skipped`, with every skip
+> named.** `19,668` reads as complete and is not — it is 149 of 150, and the missing one is
+> N4. A pair count without its denominator in *templates* hides a crash as a pass, which is
+> exactly how N4 survived the sweep that found N1–N3.
+
+ D5.6 N1 fixed by
 measurement, losing candidates' numbers recorded · D5.7 N2 fixed on every path · **D5.7b N4
 fixed, and errors counted separately from verdicts in every corpus you build** · D5.8 bindings
 declared and cross-pair-validated · D5.9 per-kind negative counts beside every precision
@@ -383,7 +409,7 @@ legitimate and respected outcome; a finding quietly absent from the triage table
 - End commit messages with:
   `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`
 - Merge Track A to `master` with `--no-ff` when its gate passes; **Track B branches from that
-  merge**, not from `9e288d9`.
+  merge**, not from the commit you started Track A at.
 
 ## Exit gate
 
