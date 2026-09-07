@@ -1,6 +1,6 @@
 """CI entry point for the template integrity suite (D0.4).
 
-    python -m tests.template_integrity.run                     # T1,T4,T5,T7 corpus-wide
+    python -m tests.template_integrity.run                     # T1,T2,T4,T5,T7,T8 corpus-wide
     python -m tests.template_integrity.run --checks all        # add T3 and T6
     python -m tests.template_integrity.run --templates a,b     # only these
     python -m tests.template_integrity.run --branch civil_engineering
@@ -25,13 +25,13 @@ import time
 
 from .core import REPO_ROOT, discover, generate
 from .checks import (t1_closure, t2_roundtrip, t3_determinism, t4_contract,
-                     t5_binding, t6_distribution, t7_asserts)
+                     t5_binding, t6_distribution, t7_asserts, t8_emission)
 
 BASELINE_DIR = os.path.join(os.path.dirname(__file__), 'baseline')
 PROFILE_PATH = os.path.join(BASELINE_DIR, 'profiles.json')
 
-DEFAULT_CHECKS = ('T1', 'T2', 'T4', 'T5', 'T7')
-ALL_CHECKS = ('T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7')
+DEFAULT_CHECKS = ('T1', 'T2', 'T4', 'T5', 'T7', 'T8')
+ALL_CHECKS = ('T1', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'T8')
 
 
 def _select(args):
@@ -54,6 +54,8 @@ def main(argv=None) -> int:
     ap.add_argument('--seeds', type=int, default=25,
                     help='instances per template for the output-based checks')
     ap.add_argument('--det-seeds', type=int, default=200, help='seeds for T3')
+    ap.add_argument('--t8-seeds', type=int, default=400,
+                    help='instances per template for T8 (see t8_emission)')
     ap.add_argument('--baseline', action='store_true',
                     help='write the T6 baseline profile instead of comparing')
     ap.add_argument('--json', default='', help='write a machine-readable report')
@@ -174,6 +176,19 @@ def main(argv=None) -> int:
                                    'notes': d.notes}
                     if not d.passed:
                         failed.add(ref.template_id)
+
+        if 'T8' in checks:
+            # T8 generates its OWN instances, at its own seed count: the
+            # degenerate-product class fires on 1.95% of one template's
+            # instances and 25 seeds resolves nothing rarer than ~12%
+            # (D-024/D-026).  It also reads `inst.question`, which nothing else
+            # in the suite does (Reviewer A, F2).
+            r8 = t8_emission.run(ref, seeds=args.t8_seeds)
+            entry['T8'] = {'pass': r8.passed, 'summary': r8.summary(),
+                           'instances': r8.instances,
+                           'gated_classes': list(r8.gated)}
+            if not r8.passed:
+                failed.add(ref.template_id)
 
         if 'T7' in checks:
             r7 = t7_asserts.run(ref)

@@ -377,7 +377,7 @@ def template_cd_dc_system_analysis():
         f"y[n] = {gain_k} * ({amplitude} * cos({omega_continuous_str} * (n - {delay_n0})T))\n"
         f"y[n] = {output_amplitude} * cos({omega_continuous_str}*T*(n - {delay_n0}))\n\n"
 
-        f"**Step 3: ** Discrete-to-Continuous (D/C) Conversion*\n"
+        f"**Step 3:** Discrete-to-Continuous (D/C) Conversion\n"
         f"An ideal D/C converter maps the discrete-time signal back to a continuous-time "
         f"sinusoid with the original frequency Omega_0 = {omega_continuous_str}. The discrete "
         f"time 'n' is mapped back to continuous time 't' via the relation t = nT.\n"
@@ -484,10 +484,16 @@ def template_decimation_aliasing_analysis():
         # --- In-line formatting for final_omega_str ---
         frac_final = Fraction(final_omega / math.pi).limit_denominator(100)
         nf, df = frac_final.numerator, frac_final.denominator
-        if df == 1:
-            final_omega_str = f"{nf}*pi" if nf != 1 else "pi"
-        elif nf == 0:
+        # `nf == 0` is tested FIRST.  Written after the `df == 1` branch it was
+        # unreachable: Fraction(0).limit_denominator(100) is 0/1, so df == 1
+        # already caught the zero case and printed `0*pi`.  The dead branch was
+        # the author's own intent and the guard order defeated it.  Measured:
+        # 39 of 2,000 instances (1.95%) reached it, all printing `omega_a = 0*pi`
+        # as the final answer.
+        if nf == 0:
             final_omega_str = "0"
+        elif df == 1:
+            final_omega_str = f"{nf}*pi" if nf != 1 else "pi"
         elif nf == 1:
             final_omega_str = f"pi/{df}"
         else:
