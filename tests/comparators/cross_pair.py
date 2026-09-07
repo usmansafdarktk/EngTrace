@@ -125,6 +125,21 @@ def gold_gold(n: int = DEFAULT_N) -> dict:
         spans = [nspan(x) for x in sols]
         kind = BINDINGS[tid]["kind"]
         r = Counter()
+
+        # **The identity term** (Reviewer E, E-1).  The loop below skips
+        # `a == b`, so the case where the candidate IS gold was not merely
+        # unmeasured -- it was excluded by construction, and 75 of 132 bindings
+        # failed it while the sweep reported zero false accepts.  A comparator
+        # that will not credit the correct answer for its own item will not
+        # credit whatever a model writes.
+        for i, g in enumerate(sols):
+            r["identity_pairs"] += 1
+            try:
+                if compare_template(tid, g, g).outcome != "MATCH":
+                    r["identity_failures"] += 1
+            except Exception:                                 # noqa: BLE001
+                r["identity_failures"] += 1
+
         for a in range(n):
             for b in range(n):
                 if a == b:
@@ -154,7 +169,8 @@ def gold_gold(n: int = DEFAULT_N) -> dict:
         if "_err" in r:
             scored[tid]["error_example"] = r["_err"]
         for k in ("pairs", "negatives", "MATCH", "MISMATCH", "UNRESOLVED",
-                  "errors", "false_accepts", "false_rejects"):
+                  "errors", "false_accepts", "false_rejects",
+                  "identity_pairs", "identity_failures"):
             tally[k] += r[k]
             per_kind[kind][k] += r[k]
     return {"n": n, "scored": scored, "skipped": skipped, "tally": dict(tally),
@@ -243,7 +259,11 @@ def _report_gg(res):
     print(f"  MATCH {t['MATCH']}   MISMATCH {t['MISMATCH']}   "
           f"UNRESOLVED {t['UNRESOLVED']}")
     print(f"  ERRORS {t['errors']}  <- counted separately from every verdict (D5.7b)")
-    print(f"  FALSE ACCEPTS {t['false_accepts']}    false rejects {t['false_rejects']}")
+    print(f"  FALSE ACCEPTS {t['false_accepts']}")
+    print(f"  FALSE REJECTS {t['false_rejects']}  <- a correct answer refused. "
+          f"This number was printed and not read (E-7)")
+    print(f"  IDENTITY      {t['identity_failures']} of {t['identity_pairs']} "
+          f"gold-against-itself comparisons are not MATCH (E-1)")
     print()
     print("  per kind, with the negative count beside the rate (D5.9):")
     print(f"    {'kind':14s} {'pairs':>8s} {'negatives':>10s} {'FA':>5s} "
@@ -313,7 +333,10 @@ def main(argv=None) -> int:
         gg = gold_gold(args.n)
         out["gold_gold"] = gg
         _report_gg(gg)
-        bad += gg["tally"]["false_accepts"] + gg["tally"]["errors"]
+        # All four terms gate.  False accepts alone are passed by a comparator
+        # that refuses everything, and that is what the first version shipped.
+        bad += (gg["tally"]["false_accepts"] + gg["tally"]["errors"]
+                + gg["tally"]["false_rejects"] + gg["tally"]["identity_failures"])
         print()
     if both or args.archive:
         ag = archive_gold()
@@ -324,7 +347,8 @@ def main(argv=None) -> int:
         with open(args.json, "w", encoding="utf-8") as fh:
             json.dump(out, fh, indent=1, default=str)
     print()
-    print("GATE: zero false accepts and zero errors on gold x gold ->",
+    print("GATE: zero false accepts, zero false rejects, zero identity "
+          "failures and zero errors on gold x gold ->",
           "PASS" if bad == 0 else f"FAIL ({bad})")
     return 1 if bad else 0
 

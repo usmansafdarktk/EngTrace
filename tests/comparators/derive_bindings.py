@@ -73,6 +73,28 @@ BINDINGS_PY = os.path.join(os.path.dirname(__file__), "bindings.py")
 
 #: Instances per template for validation. 2,450 ordered pairs; resolves ~0.12%.
 N_VALIDATE = 50
+
+#: **A binding must DECIDE** (Reviewer E, E-6; D-065).  Zero false accepts is
+#: trivially achieved by returning UNRESOLVED on every pair, and eleven bindings
+#: did exactly that -- 8 of the 9 `symbolic` templates and 3 `multipart` ones,
+#: at 0.0% of 2,450 pairs each, while being counted in the "132 bound" and the
+#: "340,550 validated pairs".
+#:
+#: The value is measured rather than chosen: the decided-rate distribution is
+#: bimodal with an empty middle -- 11 bindings at 0%, one at 87.4%, 120 at
+#: 90-100%, nothing between -- so every threshold in that range gives the same
+#: partition.
+MIN_DECIDED_RATE = 0.0
+
+#: **A binding must credit gold itself** (Reviewer E, E-1).  The sharpest
+#: available correct answer is a verbatim copy of gold, and **75 of the 132
+#: bindings did not MATCH it** -- because the cross-pairing loop skips `a == b`,
+#: so the identity case was not merely unmeasured, it was *excluded by
+#: construction*.  A comparator that refuses the correct answer for its own item
+#: will refuse whatever a model writes.
+#:
+#: This one line catches four of that review's seven findings.
+REQUIRE_IDENTITY = True
 #: Instances used to derive the declaration itself.
 N_DERIVE = 12
 
@@ -190,12 +212,80 @@ def derive_kind(sols, unit):
     if all(_FUNC_RE.search(x) for x in sp):
         return "symbolic", {"symbols": ("t", "f", "x", "n", "tau")}, \
             "a function call in every gold span"
+    # **The derived unit is NOT passed to the comparator** (Reviewer E, E-2/E-3).
+    #
+    # D4.1 S4.1 is explicit about why the unit check is opt-in and declared:
+    # *"Inferring the unit from gold's string instead would reject `7.65
+    # litres`, which is correct. That trade is why it is opt-in."*  D5.10 as
+    # first implemented inferred it from gold's string, and the rejection
+    # arrived exactly as S4.1 predicted -- on real archived model text:
+    #
+    #     gold '17.46 seconds' vs candidate '17.46 s'      -> MISMATCH
+    #     gold '1,256,557 N/m' vs candidate '1256556.55 [N/m]' -> MISMATCH
+    #
+    # the second because `_resolve_unit` finds the `N` inside `N/m` and stops.
+    # Measured cost: **19 of the 1,503 real archive positives** refused or
+    # actively marked wrong, against a baseline of 82 accepted in total; the
+    # check caught 2.  And the trailing-token derivation does not yield units at
+    # all -- `otherwise`, `e-05`, `units`, `percent`, `dollars`, `subgroups`.
+    #
+    # So the census stays (it is D5.10's measurement and it is sound) and the
+    # comparator does not consume it.  A real unit declaration is a per-item
+    # editorial act, not an inference, and it is Phase 6's (D6.11).
     if n_q == 1:
-        return "numeric", ({"unit": unit} if unit else {}), "exactly one asserted number"
+        return "numeric", {}, "exactly one asserted number"
     if n_q and n_q > 1:
-        return "multipart", {"n": n_q, **({"unit": unit} if unit else {})}, \
+        return "multipart", {"n": n_q}, \
             f"{n_q} asserted numbers in every gold span"
     return None, {}, f"the asserted-number count varies across instances: {sorted(counts)}"
+
+
+def identity_failures(tid, kind, opts, sols):
+    """Seeds where gold is not MATCHed against itself (Reviewer E, E-1).
+
+    Installs the candidate binding itself, because ``compare_template``
+    resolves the template through ``BINDINGS`` and during derivation the
+    binding is not there yet.  The first version did not, and every template
+    failed with the same ``KeyError`` -- 73 identical error messages, which is
+    not what a real finding looks like.
+    """
+    saved = B.BINDINGS.get(tid)
+    B.BINDINGS[tid] = {"kind": kind, "options": opts}
+    out = []
+    try:
+        for i, g in enumerate(sols):
+            try:
+                v = B.compare_template(tid, g, g)
+                if v.outcome != "MATCH":
+                    out.append((i, v.outcome, (v.reason or "")[:80]))
+            except Exception as exc:                          # noqa: BLE001
+                out.append((i, "ERROR", f"{type(exc).__name__}: {exc}"[:80]))
+    finally:
+        if saved is None:
+            B.BINDINGS.pop(tid, None)
+        else:
+            B.BINDINGS[tid] = saved
+    return out
+
+
+def constant_parts(tid, kind, opts, sols):
+    """Parts of a multipart binding whose selected number never varies (E-9).
+
+    A part that reads the same number on every instance contributes nothing to
+    any verdict, so the binding is narrower than it claims by that many parts.
+    `autocorrelation_rect_pulse` had three of six parts reading the constant 0 --
+    half the binding vacuous -- and it was invisible because the binding decided
+    nothing at all.
+    """
+    if kind != "multipart":
+        return []
+    n = opts.get("n", 0)
+    out = []
+    for i in range(n):
+        vals = {B.nth_quantity(g, i).strip() for g in sols}
+        if len(vals) == 1:
+            out.append(i + 1)
+    return out
 
 
 def validate(tid, kind, opts, sols):
@@ -264,12 +354,31 @@ def derive_all():
             continue
         r = validate(tid, kind, opts, sols)
         validation[tid] = {k: int(v) for k, v in r.items() if not k.startswith("_")}
-        if r["false_accepts"] or r["errors"]:
-            reason = []
-            if r["false_accepts"]:
-                reason.append(f"{r['false_accepts']} false accepts in {r['pairs']} pairs")
-            if r["errors"]:
-                reason.append(f"{r['errors']} errors ({r.get('_err', '')[:60]})")
+        ident = identity_failures(tid, kind, opts, sols) if REQUIRE_IDENTITY else []
+        consts = constant_parts(tid, kind, opts, sols)
+        validation[tid]["identity_failures"] = len(ident)
+        validation[tid]["constant_parts"] = len(consts)
+        rate = r["decided"] / r["pairs"] if r["pairs"] else 0.0
+        reason = []
+        if r["false_accepts"]:
+            reason.append(f"{r['false_accepts']} false accepts in {r['pairs']} pairs")
+        if r["errors"]:
+            reason.append(f"{r['errors']} errors ({r.get('_err', '')[:60]})")
+        if ident:
+            # The correct answer for this item is not credited.  Whatever else
+            # the binding does, it cannot be right.
+            reason.append(
+                f"rejects a verbatim copy of gold on {len(ident)}/{len(sols)} "
+                f"seeds ({ident[0][1]}: {ident[0][2]})")
+        if consts:
+            reason.append(
+                f"part(s) {consts} read a constant on every instance -- "
+                f"compared by nothing (E-9)")
+        if rate <= MIN_DECIDED_RATE and not reason:
+            reason.append(
+                f"decides {rate:.1%} of {r['pairs']} pairs -- zero false "
+                f"accepts by never accepting. Not a binding (D-065)")
+        if reason:
             unbound[tid] = "; ".join(reason)
             continue
         entry = {"kind": kind, "options": opts, "note": note,
@@ -341,6 +450,9 @@ def main(argv=None) -> int:
           f"pairs per template; smallest resolvable rate "
           f"~{3 / (N_VALIDATE * (N_VALIDATE - 1)):.3%})")
     print(f"       BOUND   {len(binds):3d} / 150   over {pairs} validated pairs")
+    ident_ok = sum(1 for t in binds if not validation.get(t, {}).get("identity_failures"))
+    print(f"       identity: {ident_ok}/{len(binds)} bound templates MATCH a "
+          f"verbatim copy of gold on every validation seed (E-1)")
     print(f"       UNBOUND {len(unbound):3d} / 150   every one named, with a measured reason")
     inv = {r["template_id"]: r["answer_type"]
            for r in csv.DictReader(open(INVENTORY, encoding="utf-8"))}
