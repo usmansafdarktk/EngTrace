@@ -131,13 +131,69 @@ def strip_latex(text: str) -> str:
 # --------------------------------------------------------------------------
 
 #: Ordered by priority.  Every marker observed in the 61 Phase 4 traces.
+#: Counts are in :data:`SUPPORT` and are checked against the archive by
+#: ``derive_vocabulary.py`` -- not written in prose beside the rule, which is
+#: how the first draft came to claim 44/61 and 47/61 for the two markers below
+#: when the measured counts are 57 and 55.  Numbers written from impression next
+#: to the thing they describe are D-034's failure mode in miniature, and this
+#: file argues for D-034, so it does not get to commit it.
 ANSWER_MARKERS = [
-    r"##\s*Final\s+Answer\s*",      # 44/61 -- the dominant house style
-    r"\*\*Answer:?\*\*\s*",         # 47/61 (often inside the block above)
+    r"##\s*Final\s+Answer\s*",      # the dominant house style
+    r"\*\*Answer:?\*\*\s*",         # usually nested inside the heading above
     r"Final\s+Answer:?\s*",         # wizardmath signal 14
     r"The\s+answer\s+is:?\s*",      # wizardmath signal 14,15; continuity 4
     r"Answer:?\s*",
 ]
+
+#: Support for every normalisation rule, as
+#: ``rule -> (count in the 61 Phase 4 traces, count in all 2,200)``.
+#:
+#: **Machine-checked, not transcribed.**  ``derive_vocabulary.py`` recomputes
+#: every pair from the archive on disk and fails on any disagreement, so this
+#: table cannot drift away from the evidence.  Regenerate it from that module's
+#: output rather than editing it by hand.
+#:
+#: Read the two columns together and the second is not reassurance.  Rates are
+#: **item-driven**, not model-driven (measured: 15 of 27 rules), so a large
+#: whole-archive count does NOT license a coverage claim about a template with
+#: six traces.  What the second column licenses is narrower and is what the
+#: rules actually need: that the form exists and that its meaning is fixed.
+SUPPORT: dict[str, tuple[int, int]] = {
+    "unicode-minus": (4, 71),
+    "unicode-superscript": (3, 236),
+    "unicode-operator": (0, 330),
+    "latex-inline-math": (5, 332),
+    "latex-display-math": (1, 66),
+    "latex-escaped-brace": (5, 6),
+    "latex-frac": (1, 53),
+    "latex-boxed": (1, 104),
+    "latex-text": (0, 274),
+    "latex-exponent-brace": (0, 165),
+    "markdown-bold": (3, 239),
+    "trailing-annotation": (16, 86),
+    "marker-final-answer-heading": (57, 1824),
+    "marker-bold-answer": (55, 1736),
+    "marker-the-answer-is": (4, 202),
+    "negator-not": (25, 34),
+    "negator-fused-non": (3, 3),
+    "negator-neither-nor": (2, 2),
+    "negator-fails": (3, 3),
+    "hedge": (0, 1),
+    "brace-sequence": (17, 447),
+    "bracket-sequence": (1, 64),
+    "origin-asterisk": (1, 19),
+    "explicit-index-list": (2, 6),
+    "per-element-assignment": (2, 2),
+    "arbitrary-function": (2, 30),
+    "thousands-separator": (0, 32),
+}
+
+#: Rules with **zero** Phase 4 support.  Each is carried on the strength of the
+#: wider archive alone, and each is therefore a place where the comparator is
+#: specified against forms these four templates have never been observed to
+#: produce.  Listed rather than buried: this is the concrete content of the
+#: residual risk D4.2 carries.
+NO_PHASE4_SUPPORT = tuple(k for k, (p4, _) in SUPPORT.items() if p4 == 0)
 
 _MARKER_RES = [re.compile(m, re.IGNORECASE) for m in ANSWER_MARKERS]
 
