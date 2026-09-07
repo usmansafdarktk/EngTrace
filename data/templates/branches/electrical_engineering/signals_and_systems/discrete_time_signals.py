@@ -110,7 +110,13 @@ def template_signal_operations():
     )
     
     # Inlined logic to build the transformation table for the solution
-    table_header = f"""| {'Original Index (k)':<20} | {'Original Value x[k]':<22} | {"New Index (k')":<18} | {"New Value y[k')":<20} |"""
+    # D4.5: the header read `New Value y[k')` -- it opened a bracket and closed
+    # a parenthesis, and it named `y` on the reversal branch, whose output
+    # variable is `z`.  The sibling columns fix both conventions: an index is
+    # parenthesised (`Original Index (k)`), a value is bracketed and carries its
+    # own variable (`Original Value x[k]`).
+    new_value_col = f"New Value {output_var}[k']"
+    table_header = f"""| {'Original Index (k)':<20} | {'Original Value x[k]':<22} | {"New Index (k')":<18} | {new_value_col:<20} |"""
     table_separator = "-" * len(table_header)
 
     table_rows_list = []
