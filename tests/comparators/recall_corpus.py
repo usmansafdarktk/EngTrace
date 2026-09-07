@@ -103,6 +103,17 @@ NEGATIVE_FRAMES: list[tuple[str, str, str]] = [
      "a trailing question withdraws the commitment"),
 ]
 
+#: Negative frames whose refusal depends on the HEDGE layer rather than on
+#: assertion structure.  Under the shipped advisory policy (D-056) these are
+#: credited, and that is the policy working, not the corpus failing.
+HEDGE_DEPENDENT = frozenset({"neg-explicit-hedge"})
+
+
+def _hedge_policy() -> str:
+    from . import commitment
+    return commitment.HEDGE_POLICY
+
+
 #: Only the kinds `commitment.py` gates are worth framing this way -- it is the
 #: module under test.  `sequence` and `symbolic` answers are formulae, and
 #: wrapping a formula in a concessive tests the frame rather than the answer.
@@ -138,7 +149,14 @@ def build() -> list[dict]:
                     "candidate": "## Final Answer\n**Answer:** " + body,
                     "frame": name,
                     "why": why,
-                    "expect_match": not name.startswith("neg-"),
+                    # A negative frame that rests on a HEDGE is expected to be
+                    # demoted under the shipped advisory policy (D-056): the
+                    # hedge is annotated, not scored, so the answer is credited.
+                    # Run with ENGTRACE_HEDGE_POLICY=enforce to check those
+                    # frames against the policy they were written for.
+                    "expect_match": (not name.startswith("neg-")
+                                     or (name in HEDGE_DEPENDENT
+                                         and _hedge_policy() != "enforce")),
                 })
     return cases
 
@@ -168,6 +186,7 @@ def main() -> int:
             failures.append({**c, "outcome": v.outcome, "reason": v.reason})
 
     def _block(title: str, frames: list, want_match: bool) -> tuple[int, int]:
+        enforced = _hedge_policy() == "enforce"
         print(f"\n{title}")
         print(f"  {'frame':22s} {'MATCH':>6s} {'MISMATCH':>9s} {'UNRESOLVED':>11s}  "
               f"{'correct':>8s}  exercises")
@@ -176,7 +195,8 @@ def main() -> int:
         for name, _, why in frames:
             c = by_frame[name]
             n = sum(c.values())
-            g = c["MATCH"] if want_match else n - c["MATCH"]
+            expect_match = want_match or (name in HEDGE_DEPENDENT and not enforced)
+            g = c["MATCH"] if expect_match else n - c["MATCH"]
             tot, good = tot + n, good + g
             print(f"  {name:22s} {c['MATCH']:6d} {c['MISMATCH']:9d} {c['UNRESOLVED']:11d}  "
                   f"{g / n if n else 0:8.1%}  {why[:32]}")

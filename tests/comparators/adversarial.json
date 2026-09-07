@@ -415,7 +415,7 @@
   "gold": "**Answer:**\na) Memoryless: **No**\nb) Causal: **Yes**",
   "candidate": "**Answer:** a) The system is not memoryless. b) The system might be causal.",
   "correct": false,
-  "note": "first slot right, second hedged -- composite must not pass on a partial",
+  "note": "first slot right, second hedged.  Under `enforce` this is UNRESOLVED; under the shipped ADVISORY default (D-056) the hedge is annotated and the slot resolves, so the composite matches -- the second **declared** false accept the policy buys, alongside cat-16",
   "template": "template_system_properties_memory_causality",
   "options": {}
  },
