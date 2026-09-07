@@ -2371,6 +2371,69 @@ because the doubled-sign sweep put the line in front of me.
 
 ---
 
+## D-062 — Reviewer A's triage: every detector was narrower than the class it was named after
+
+**Date:** 2026-09-07 · **Status:** DECIDED · **Source:** Phase 5 Reviewer A
+(correctness), `reviews/phase5_reviewer_a_correctness.md`
+
+**Verdict `PASS WITH FINDINGS`, and the shape of the findings is the result.**
+Nine findings, all CONFIRMED, and **not one is about the corpus.** The reviewer
+rewrote all four detectors from the spec's defect table, swept 150 × 400 before
+and after, and found the corpus genuinely clean. What it broke was the *gate*:
+
+> The pattern this review keeps finding is *the detector is narrower than the
+> class it is named after* — F1, F3, F5 and F6 are all instances.
+
+That is worth more than the individual fixes. The phase had the right instinct —
+`--selftest` plants a defect per class — and the instinct was defeated by
+**writing the plant and the regex with the same hand**, so every plant was a
+shape its regex already matched. All four narrow detectors passed the self-test.
+
+### Findings
+
+| # | Finding | Disposition | Where actioned |
+|---|---|---|---|
+| **F1** | `complex_sign` requires a literal `j`, so it gates only half the class D-061 defines — the half that did *not* change 2,560 question strings | `ADOPT-NOW` | `_DOUBLED_SIGN` added; gated on Track A's eleven, census corpus-wide (14 templates) |
+| **F2** | The scan never reads `inst.question`; nothing in T1–T7 does either except for emptiness | `ADOPT-NOW` | `scan_solution(sol, res, question)`; classes 3–4 read the question, classes 1–2 deliberately do not |
+| **F3** | `_DEGENERATE_PRODUCT` cannot match `0.0*pi`, and its census was short by one template | `ADOPT-NOW` | regex takes `0(?:\.0+)?`; census 2 → 3 templates |
+| **F4** | `phase5_contract_scan` is in no standing gate — not in `ALL_CHECKS`, not imported by `run.py`, no CI in the repo | `ADOPT-NOW` | **T8** (`checks/t8_emission.py`), in `ALL_CHECKS` *and* `DEFAULT_CHECKS`, at 400 seeds |
+| **F5** | A step heading that loses its bold entirely is invisible, and T4's contiguity check passes when the lost heading is the **last** one | `ADOPT-NOW` | `_STEP_ANY` is line-oriented, not marker-oriented |
+| **F6** | A non-canonical marker *added beside* the canonical one passes T4 and the scan — and is priority 0 on the candidate side | `ADOPT-NOW` | `## Final Answer` recognised; T4 counts every marker, not only when the canonical one is absent |
+| **F7** | `levenspiel_plot_interpretation`'s answer span swallows a 363-char `**Note:**` block whose last number is `31.8` | `ADOPT-NOW` | the Note moves **above** the answer marker; span 363 → 48 chars |
+| **F8** | "7 of 150 templates give a different T6 report" is not reproducible | `ADOPT-NOW` | corrected in the item-pool note; the claim now rests on the order-insensitive result alone |
+| **F9** | "T1–T7 unchanged per template" was a verdict claim; T5's `operand_restatements` moved 0→5 / 0→1, recorded nowhere | `ADOPT-NOW` | recorded in the item-pool note |
+
+### §5 suggestions
+
+| # | Suggestion | Disposition |
+|---|---|---|
+| 1 | Wire the detectors into `run.py` as T8 at 400 seeds | `ADOPT-NOW` — done; also added to `DEFAULT_CHECKS`, which the reviewer did not ask for and which is where it will actually run |
+| 2 | Widen `_COMPLEX_SIGN` to the class, census the residual | `ADOPT-NOW` — the reviewer's own regex, adopted verbatim in substance |
+| 3 | Scan the question; decide explicitly about classes 1–2 | `ADOPT-NOW` — decided: questions carry no steps and state no answer, so classes 1–2 are solution-only, and that is now a comment rather than an omission |
+| 4 | Fix `_DEGENERATE_PRODUCT` for the float-zero form | `ADOPT-NOW` |
+| 5 | Line-oriented step probe | `ADOPT-NOW` |
+| 6 | Phase 6 worklist of 14 doubled-sign templates; promote `_signed_term`/`_rect_str` to a shared emission helper before nine templates are fixed by hand | `ADOPT-PHASE-6` — added to Phase 6's deliverable list as **D6.7**; the census now prints the list on every run |
+| 7 | Decide what an answer span may contain, and gate it | `ADOPT-NOW` for option (a), the template edit. Option (b) — a `**Note:**` terminator in `normalize.answer_span` — is **REJECTED**: it adds a rule to the *candidate*-side parser to accommodate a shape only *gold* produced, which is the wrong side of the contract and the "add a rule to make one template pass" move the phase brief warns against |
+| 8 | Evidence is thinnest on question text; the marker predicate tests the marker, not the span | `ADOPT-NOW` for the question (F2/T8). The span-shape assertion is `ADOPT-PHASE-6` (**D6.8**): after F7 the corpus's longest span is 199 characters, so a bound can be set from measurement rather than guessed |
+| 9 | Two plants of materially different surface form per detector, written from the class definition | `ADOPT-NOW` — `PLANTS` now carries 10 plants over 4 classes, including one in the **question**, and every pair differs in surface form: malformed bold vs bold lost; marker swapped vs marker added; `+ j-5` vs `+ -5`; `0*pi` vs `0.0*pi`. `SPEC-CHANGE 17` carries the rule forward |
+| 10 | The gate says "clean across all four classes" and the corpus is not clean across class 3 | `SPEC-CHANGE 16` — the gate now says what it means |
+| — | `stoichiometry.py`'s `SyntaxWarning: invalid escape sequence '\%'` | `ADOPT-NOW` — one character, in a file this phase already edits |
+
+### What this changed about the phase's own claims
+
+**The scan's `complex_sign 0 templates` line was a corpus claim that D-061
+contradicted three paragraphs earlier**, and neither the implementer nor the
+self-test caught it. The class is present on 14 templates; the detector could
+see two of its shapes. Reporting `0` for that is worse than reporting `14`, and
+the census now does the second.
+
+**T8 is in `DEFAULT_CHECKS`, not only `ALL_CHECKS`.** The reviewer asked for
+`ALL_CHECKS`. `ALL_CHECKS` is the opt-in list; `DEFAULT_CHECKS` is what runs when
+someone types the command with no arguments, which is the only invocation that
+happens by habit. A gate nobody types is the thing F4 is about.
+
+---
+
 ---
 
 ## Open decisions

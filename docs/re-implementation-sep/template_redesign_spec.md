@@ -64,7 +64,7 @@ Phase 0 found that the template originally cited here as the worked exemplar, `t
 
 The audit's probe scripts (AST interpolation classifier, `sys.settrace` locals-capture harness, instance/skeleton differ) are working prototypes and should be promoted into `tests/template_integrity/` rather than rewritten.
 
-### 0.2 The seven checks
+### 0.2 The seven checks (T8 added by Phase 5, SPEC-CHANGE 16)
 
 **T1 — Printed-arithmetic closure (generic).**
 For every emitted line matching `<numeric expression> = <value>`, evaluate the expression from the *printed operands* and assert it equals the printed value within ±0.5 of the last displayed digit.
@@ -413,9 +413,16 @@ Counts below were verified against source, not inferred from the archive.
       `python -m tests.template_integrity.phase5_contract_scan --selftest`.
 - [ ] T4 passes **150/150**, with the five `**Final Answer**` templates no longer
       merely *reported* (`non_canonical_answer` is now a failure)
-- [ ] D5.2 corpus-wide scan clean across all four classes at a seed count that can
-      **resolve the rarest of them** — class 4 fires on 1.95% of instances and a
-      25-seed scan cannot see it (D-024/D-026)
+- [ ] D5.2 scan clean across all four classes **within Track A's eleven**, with the
+      corpus-wide residual **enumerated as a census and assigned to Phase 6** —
+      not reported as zero (SPEC-CHANGE 16). At a seed count that can **resolve
+      the rarest class**: class 4 fires on 1.95% of instances and a 25-seed scan
+      cannot see it (D-024/D-026)
+- [ ] The two classes T4 cannot see are in a **standing** gate, not only in a
+      phase-numbered report module — **T8** (`checks/t8_emission.py`), in
+      `DEFAULT_CHECKS`. Evidence is not a gate
+- [ ] Each detector carries **two plants of materially different surface form**,
+      one of them in the **question** (SPEC-CHANGE 17)
 - [ ] Marker-set decision recorded (D-059) and the candidate-side parser agrees,
       stated as a predicate and checked: `--markers`. **Verified by Reviewer A.**
 - [ ] T6 movement explained by the before/after instance dump; **baseline not
@@ -497,6 +504,10 @@ re-commission Track A's T4 sweep from this reviewer.**
 ### 6.1 Deliverables
 
 D6.1 **Full re-run of the original audit harness** across all 150 templates; regenerate `template_inventory.csv` with post-change classifications · D6.2 class-migration table (D → A/B/C, with the 4 Phase-4 templates recorded as *verifiable, non-numeric* rather than resolved-by-edit) · D6.3 updated `template_audit_report.md` with post-change figures · D6.4 **item-pool impact statement**: every published number invalidated by regeneration, consolidated across phases · D6.5 regression suite promoted to CI on `master` · D6.6 residual-risk register: everything knowingly not fixed, and why
+
+**D6.7 — the doubled-sign residual, and a shared emission helper.** 14 templates emit a doubled sign after Phase 5 (D-061); 2 in the answer span (`lorentz_force`, `continuous_to_discrete_conversion`), 5 in the question, the rest in derivation steps. `phase5_contract_scan`'s `doubled_sign_corpus` census prints the list on every run. **Promote `_signed_term` / `_rect_str` out of `waves_and_phasors.py` into a shared emission helper before fixing them** (Reviewer A, |S|5.6): nine hand-written sign fixes is nine chances to write `+ {value}` again.
+
+**D6.8 — an answer-span shape assertion.** D5.3's predicate tests the *marker* and not the *span*, so it passed on a span carrying a whole extra section (Reviewer A, F7, |S|5.8ii). After that template was fixed the corpus's longest answer span is **199 characters**, so a bound can now be set from measurement rather than guessed.
 
 ### 6.2 Independent review
 
@@ -875,6 +886,8 @@ Read the hours as effort. Wall-clock is a fraction of them, and the difference i
 | SPEC-CHANGE 13 | **D3.4 §7 amended in four places** (D-054) | §7 shipped unexercised and both Phase 3 schema reviewers named the missing corpus as the largest gap. Building it (D4.6) found four defects in the *specification*: §7.2's headline disposition has no instances, §7 never says whether §6 step 8 binds a candidate, §7.4's direct solver cannot be an `iteration` node at all, and §7.3 row 3's set-versus-ordered distinction is vacuous. |
 | SPEC-CHANGE 14 | **T4's `non_canonical_answer` finding is a FAILURE, not a report** (D-060); Phase 5 Track A's exit gate gains a four-class acceptance-evidence item and the two new detectors that serve it | T4 *printed* `non-canonical marker {'**Final Answer**': 25}` on five templates and passed them, so the corpus could be reported 150/150 green with a known output-contract defect on five items - the third check in this project found green while measuring something it could see. The remedy for an *ungated* defect is one line of severity; the remedy for an *invisible* one is a new instrument. Five were ungated and three invisible, and an earlier draft of the Phase 5 brief treated the first group as the second. Verified by planted defect, because after the template edits T4 is green either way. |
 | SPEC-CHANGE 15 | **The doubled-sign defect is corpus-wide, 16 templates, and the spec's 2-template row understated it** (D-061) | The fault is a hard-coded `+` before an interpolated signed value; the `j` is incidental. 4 templates emit it inside the **answer span**, 2 of which are Track A's. Track A fixes its two completely - which uncovered a P1 violation, `sqrt(-41.2^2 + 86.45^2) = 95.77` evaluating to 76.00 - and the other 14 are named and assigned to Phase 6. |
+| SPEC-CHANGE 16 | **Phase 5 Track A's exit gate says what it means: "clean across all four classes *within Track A's eleven*, with the corpus-wide residual enumerated as a census and assigned to Phase 6"** (Reviewer A, |S|5.10) | Taken literally the old wording was false: the corpus is *not* clean across class 3 -- 14 templates emit a doubled sign -- and the gate passed only because the detector was narrower than the class it was named after. A scan reporting `0 templates` for a class present on 14 is worse than one reporting the 14. |
+| SPEC-CHANGE 17 | **Every detector a phase adds must carry at least two planted defects of materially different surface form, and the plants must be written from the class definition in the spec rather than from the detector** (Reviewer A, |S|5.9) | Phase 5 planted one defect per class and the plants passed while **four** of its detectors were narrower than their class (F1, F3, F5, F6). The plant and the regex were written by the same hand, so every plant was a shape the regex already matched. The reviewer found all four by writing detectors from the defect table instead. This is a fifteen-minute change to a plant list and it would have caught four of the five substantive findings in that review. |
 
 ---
 

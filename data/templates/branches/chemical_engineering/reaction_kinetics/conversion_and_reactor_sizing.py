@@ -209,16 +209,22 @@ def template_levenspiel_plot_interpretation():
         f"V_PFR = F_A0 × Area = {F_A0} mol/s × {total_area:.5f}\n"
         f"V_PFR = {round(V_PFR, 2)} L\n\n"
 
-        f"**Answer:**\n"
-        f"a) CSTR Volume = {round(V_CSTR, 2)} L\n"
-        f"b) PFR Volume = {round(V_PFR, 2)} L\n\n"
-
+        # The Note sits BEFORE the answer marker, not after it.  It is the only
+        # trailing commentary in the corpus and it put a third number (the
+        # efficiency percentage) inside the answer span on 100% of instances --
+        # a number that is not an answer, in the region a comparator reads as
+        # the answer.  Same text, same solution, same pedagogy; it just stops
+        # being part of what the answer span means.
         f"**Note:** The PFR requires less volume than the CSTR "
         f"({round(V_PFR, 2)} L vs {round(V_CSTR, 2)} L), a {efficiency:.1f}% "
         f"volume reduction. For a rate that falls with conversion - the usual "
         f"case, and the one this data shows - the plug-flow reactor spends most "
         f"of its length at a higher rate than the CSTR, which operates entirely "
-        f"at the exit condition."
+        f"at the exit condition.\n\n"
+
+        f"**Answer:**\n"
+        f"a) CSTR Volume = {round(V_CSTR, 2)} L\n"
+        f"b) PFR Volume = {round(V_PFR, 2)} L"
     )
 
     return question, solution
