@@ -516,9 +516,18 @@ could reach at 326,700 gold-pair comparisons. Two over-rejections remain — one
 untriaged (**E-12**, which the unit ablation has now made bite) — and neither is a false accept,
 so neither blocks.
 
-Working tree is identical to `4fd06c3` (`git diff 4fd06c3 HEAD` is empty). `extract.py`,
-`kinds.py`, `answer.py` and `normalize.py` are unchanged from `7c04c95`; the fixes are in
-`bindings.py`, `derive_bindings.py` and `cross_pair.py` only.
+The working tree was identical to `4fd06c3` throughout this review (`git diff 4fd06c3 HEAD`
+empty, `git status` clean apart from this file), and **every number below was measured in that
+state**. `extract.py`, `kinds.py`, `answer.py` and `normalize.py` were unchanged from `7c04c95`;
+the round-2 fixes were in `bindings.py`, `derive_bindings.py` and `cross_pair.py` only.
+
+> **Note, added at filing.** While I was writing this section the working tree moved: uncommitted
+> edits appeared in `extract.py` (a new `same_answer`), `cross_pair.py`, `derive_bindings.py` and
+> a regenerated `bindings.py`, citing **R2-F2** — i.e. someone began actioning this round's
+> findings before it was filed. I have left them alone. **Nothing in this section describes that
+> state**; it describes `4fd06c3`, and R2-F2's counts (10 unbound on the truth predicate, 9 on it
+> alone; 118 bound) are as of that ref and will already be stale. Re-derive against whatever ref
+> that work lands on.
 
 ---
 
@@ -663,6 +672,15 @@ Two structural checks on the new gates, because a gate that never fires is not a
   9 templates carry `rejects a verbatim copy of gold on 50/50 seeds` (8 `symbolic` plus
   `decimation_aliasing_analysis`), 3 carry
   `part(s) [...] read a constant on every instance`. Not decorative.
+
+`derive_bindings` confirms both from its own side — `BOUND 118 / 150`, `identity: 118/118 bound
+templates MATCH a verbatim copy of gold on every validation seed`, `UNBOUND 32 / 150`, and
+`committed tables agree with a fresh derivation`. One reporting nit, the same shape as **E-7**:
+that line reads `BOUND 118 / 150 over 340550 validated pairs`, and 340,550 is `139 x 2,450` —
+every template that *reached* validation, bound or not. The bound templates account for
+`118 x 2,450 = 289,100`. The figure is unchanged from round 1 despite 14 templates leaving the
+bound set, which is the tell. Not a defect; a headline whose denominator is not the noun beside
+it.
 
 ---
 
