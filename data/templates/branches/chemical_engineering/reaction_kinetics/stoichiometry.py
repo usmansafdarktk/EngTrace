@@ -111,7 +111,7 @@ def template_batch_moles_vs_conversion():
         )
         
     solution += (
-        f"**Final Answer**\n"
+        f"**Answer:**\n"
         f"After reaching a conversion of ${X_A*100} \%$, the final number of moles in the reactor are:\n"
         f"- {reactant_A_name}: ${round(N_A, 3)}$ mol\n"
         f"- {reactant_B_name}: ${round(N_B, 3)}$ mol\n"
@@ -257,7 +257,7 @@ def template_flow_system_molar_flow_rates():
         )
 
     solution += (
-        f"**Final Answer**\n"
+        f"**Answer:**\n"
         f"The molar flow rates exiting the reactor are:\n"
         f"- {reactant_A_name} (F_A): {round(F_A, 2)} mol/min\n"
         f"- {reactant_B_name} (F_B): {round(F_B, 2)} mol/min\n"
@@ -406,7 +406,7 @@ def template_limiting_reactant():
             solution_step2_calculation += f"Moles {product_D_name} = 0 + ({d}/{b})({N_B0})({X}) = **{round(N_D, 2)}** mol\n"
 
     solution_final_answer = (
-        f"\n**Final Answer**\n"
+        f"\n**Answer:**\n"
         f"The limiting reactant is **{limiting_reactant_name}**. The final number of moles are:\n"
         f"- **{reactant_A_name}:** {round(N_A, 2)} mol\n"
         f"- **{reactant_B_name}:** {round(N_B, 2)} mol\n"
@@ -517,7 +517,7 @@ def template_gas_phase_concentration():
         f"Now, calculate the concentration:\n"
         f"$C_B = {C_A0} \\frac{{{round(Theta_B - (b/a)*X_A, 4)}}}{{{round(denominator, 4)}}} = \\mathbf{{{round(C_B, 4)}}}$ mol/dm³\n\n"
         
-        f"**Final Answer**\n"
+        f"**Answer:**\n"
         f"The outlet concentrations are:\n"
         f"- **$C_A$:** ${round(C_A, 4)}$ mol/dm³\n"
         f"- **$C_B$:** ${round(C_B, 4)}$ mol/dm³"
