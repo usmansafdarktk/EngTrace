@@ -147,7 +147,11 @@ def compare_answer(gold: str, candidate: str, spec: AnswerSpec) -> Verdict:
 
 MEMORYLESS_SLOT = PropertySlot(
     name="memoryless",
-    positive=("memoryless",),
+    # "no memory" and "without memory" assert the property, they do not deny
+    # it.  Before they were declared, the bare yes/no fallback read the "No" in
+    # "a) No memory" as the slot's *value* and credited a wrong answer -- a
+    # false accept found by D4.4 case tup-20, not by the archive.
+    positive=("memoryless", "no memory", "without memory", "memory-less"),
     negative=("has memory", "with memory", "have memory"),
 )
 CAUSAL_SLOT = PropertySlot(
@@ -157,7 +161,10 @@ CAUSAL_SLOT = PropertySlot(
 )
 LINEARITY_LABELS = {
     "linear": ["linear"],
-    "not linear": ["nonlinear", "non-linear"],
+    # The noun forms are declared, not inferred: "nonlinearity is present" is a
+    # commitment to "not linear", and without the declaration the word-boundary
+    # rule finds no label in it at all (D4.4 case cat-23).
+    "not linear": ["nonlinear", "non-linear", "nonlinearity", "non-linearity"],
 }
 
 PHASE4_BINDINGS: dict[str, dict[str, Any]] = {
@@ -187,3 +194,28 @@ def compare_template(template_id: str, gold: str, candidate: str) -> Verdict:
     b = PHASE4_BINDINGS[template_id]
     fn = compare_label_tuple if b["kind"] == "categorical[tuple]" else COMPARATORS[b["kind"]]
     return fn(gold, candidate, **b["options"])
+
+
+#: Default options for a kind exercised without a template binding.  These are
+#: the *generic* settings a class-C template would inherit before declaring
+#: anything of its own, so testing against them tests the defaults rather than
+#: a per-item tuning.
+KIND_DEFAULTS: dict[str, dict[str, Any]] = {
+    "numeric": {},
+    "categorical": {"labels": LINEARITY_LABELS},
+    "categorical[tuple]": {"slots": [MEMORYLESS_SLOT, CAUSAL_SLOT]},
+    "sequence": {"require_origin": True},
+    "symbolic": {"symbols": ("x", "y"), "allow_arbitrary": True},
+    "narrative": {},
+    "check": {},
+}
+
+
+def compare_kind(kind: str, gold: str, candidate: str, **options: Any) -> Verdict:
+    """Dispatch to a comparator by ``kind``, with that kind's default options."""
+    from .kinds import compare_label_tuple  # noqa: PLC0415
+
+    opts = dict(KIND_DEFAULTS.get(kind, {}))
+    opts.update(options)
+    fn = compare_label_tuple if kind == "categorical[tuple]" else COMPARATORS[kind]
+    return fn(gold, candidate, **opts)

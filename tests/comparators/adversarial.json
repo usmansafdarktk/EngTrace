@@ -1,0 +1,1576 @@
+[
+ {
+  "id": "cat-01",
+  "kind": "categorical",
+  "gold": "**Answer:**\nThe system fails at least one of the tests (additivity or homogeneity), therefore, the system is **not linear**.",
+  "candidate": "**Answer:** Nonlinear",
+  "correct": true,
+  "note": "fused negative, no space",
+  "template": "template_system_property_linearity",
+  "options": {}
+ },
+ {
+  "id": "cat-02",
+  "kind": "categorical",
+  "gold": "**Answer:**\nThe system fails at least one of the tests (additivity or homogeneity), therefore, the system is **not linear**.",
+  "candidate": "**Answer:** non-linear",
+  "correct": true,
+  "note": "fused negative, hyphenated",
+  "template": "template_system_property_linearity",
+  "options": {}
+ },
+ {
+  "id": "cat-03",
+  "kind": "categorical",
+  "gold": "**Answer:**\nThe system fails at least one of the tests (additivity or homogeneity), therefore, the system is **not linear**.",
+  "candidate": "**Answer:** NOT LINEAR",
+  "correct": true,
+  "note": "uppercase negated positive",
+  "template": "template_system_property_linearity",
+  "options": {}
+ },
+ {
+  "id": "cat-04",
+  "kind": "categorical",
+  "gold": "**Answer:**\nThe system fails at least one of the tests (additivity or homogeneity), therefore, the system is **not linear**.",
+  "candidate": "## Final Answer\n**Answer:** The system is not linear. [N/A]",
+  "correct": true,
+  "note": "trailing unit annotation",
+  "template": "template_system_property_linearity",
+  "options": {}
+ },
+ {
+  "id": "cat-05",
+  "kind": "categorical",
+  "gold": "**Answer:**\nThe system fails at least one of the tests (additivity or homogeneity), therefore, the system is **not linear**.",
+  "candidate": "**Answer:** The system fails the homogeneity test and is therefore not linear.",
+  "correct": true,
+  "note": "negator separated from the label by nine words",
+  "template": "template_system_property_linearity",
+  "options": {}
+ },
+ {
+  "id": "cat-06",
+  "kind": "categorical",
+  "gold": "**Answer:**\nThe system fails at least one of the tests (additivity or homogeneity), therefore, the system is **not linear**.",
+  "candidate": "**Answer:** \\(\\text{Non-linear}\\)",
+  "correct": true,
+  "note": "LaTeX \\text wrapper",
+  "template": "template_system_property_linearity",
+  "options": {}
+ },
+ {
+  "id": "cat-07",
+  "kind": "categorical",
+  "gold": "**Answer:**\nThe system satisfies both additivity and homogeneity, therefore, the system is **linear**.",
+  "candidate": "**Answer:** Linear [dimensionless]",
+  "correct": true,
+  "note": "positive with annotation",
+  "template": "template_system_property_linearity",
+  "options": {}
+ },
+ {
+  "id": "cat-08",
+  "kind": "categorical",
+  "gold": "**Answer:**\nThe system satisfies both additivity and homogeneity, therefore, the system is **linear**.",
+  "candidate": "**Answer:** The system satisfies superposition, so it is linear.",
+  "correct": true,
+  "note": "positive reached through a synonym clause",
+  "template": "template_system_property_linearity",
+  "options": {}
+ },
+ {
+  "id": "cat-09",
+  "kind": "categorical",
+  "gold": "**Answer:**\nThe system fails at least one of the tests (additivity or homogeneity), therefore, the system is **not linear**.",
+  "candidate": "The system is linear in its first term.\n## Final Answer\n**Answer:** Not linear",
+  "correct": true,
+  "note": "distractor 'linear' earlier in the trace; answer span must win",
+  "template": "template_system_property_linearity",
+  "options": {}
+ },
+ {
+  "id": "cat-10",
+  "kind": "categorical",
+  "gold": "**Answer:**\nThe system fails at least one of the tests (additivity or homogeneity), therefore, the system is **not linear**.",
+  "candidate": "**Answer:** This is an incrementally linear (affine) system, so it is **not linear**.",
+  "correct": true,
+  "note": "'incrementally linear' distractor inside the answer span itself",
+  "template": "template_system_property_linearity",
+  "options": {}
+ },
+ {
+  "id": "cat-11",
+  "kind": "categorical",
+  "gold": "**Answer:**\nThe system fails at least one of the tests (additivity or homogeneity), therefore, the system is **not linear**.",
+  "candidate": "**Answer:** Linear",
+  "correct": false,
+  "note": "the plain opposite",
+  "template": "template_system_property_linearity",
+  "options": {}
+ },
+ {
+  "id": "cat-12",
+  "kind": "categorical",
+  "gold": "**Answer:**\nThe system satisfies both additivity and homogeneity, therefore, the system is **linear**.",
+  "candidate": "**Answer:** Nonlinear",
+  "correct": false,
+  "note": "the plain opposite, fused",
+  "template": "template_system_property_linearity",
+  "options": {}
+ },
+ {
+  "id": "cat-13",
+  "kind": "categorical",
+  "gold": "**Answer:**\nThe system fails at least one of the tests (additivity or homogeneity), therefore, the system is **not linear**.",
+  "candidate": "**Answer:** The system is linear because it fails the additivity test.",
+  "correct": false,
+  "note": "wrong label with a negator nearby -- the negator must not rescue it",
+  "template": "template_system_property_linearity",
+  "options": {}
+ },
+ {
+  "id": "cat-14",
+  "kind": "categorical",
+  "gold": "**Answer:**\nThe system satisfies both additivity and homogeneity, therefore, the system is **linear**.",
+  "candidate": "**Answer:** The system is not non-linear.",
+  "correct": true,
+  "note": "double negative that resolves to linear",
+  "template": "template_system_property_linearity",
+  "options": {}
+ },
+ {
+  "id": "cat-15",
+  "kind": "categorical",
+  "gold": "**Answer:**\nThe system fails at least one of the tests (additivity or homogeneity), therefore, the system is **not linear**.",
+  "candidate": "**Answer:** The system appears to be linear.",
+  "correct": false,
+  "note": "hedged AND wrong -- must not be a MATCH",
+  "template": "template_system_property_linearity",
+  "options": {}
+ },
+ {
+  "id": "cat-16",
+  "kind": "categorical",
+  "gold": "**Answer:**\nThe system satisfies both additivity and homogeneity, therefore, the system is **linear**.",
+  "candidate": "**Answer:** The system appears to be linear.",
+  "correct": false,
+  "note": "hedged and naming the right label -- P6 says a non-committal answer earns no credit",
+  "template": "template_system_property_linearity",
+  "options": {}
+ },
+ {
+  "id": "cat-17",
+  "kind": "categorical",
+  "gold": "**Answer:**\nThe system satisfies both additivity and homogeneity, therefore, the system is **linear**.",
+  "candidate": "**Answer:** It could be linear or nonlinear depending on how you define the input.",
+  "correct": false,
+  "note": "names both labels, commits to neither",
+  "template": "template_system_property_linearity",
+  "options": {}
+ },
+ {
+  "id": "cat-18",
+  "kind": "categorical",
+  "gold": "**Answer:**\nThe system fails at least one of the tests (additivity or homogeneity), therefore, the system is **not linear**.",
+  "candidate": "**Answer:** The system is time-invariant.",
+  "correct": false,
+  "note": "answers a different question entirely",
+  "template": "template_system_property_linearity",
+  "options": {}
+ },
+ {
+  "id": "cat-19",
+  "kind": "categorical",
+  "gold": "**Answer:**\nThe system fails at least one of the tests (additivity or homogeneity), therefore, the system is **not linear**.",
+  "candidate": "**Answer:** 42",
+  "correct": false,
+  "note": "no label at all",
+  "template": "template_system_property_linearity",
+  "options": {}
+ },
+ {
+  "id": "cat-20",
+  "kind": "categorical",
+  "gold": "**Answer:**\nThe system fails at least one of the tests (additivity or homogeneity), therefore, the system is **not linear**.",
+  "candidate": "**Answer:**",
+  "correct": false,
+  "note": "empty answer span",
+  "template": "template_system_property_linearity",
+  "options": {}
+ },
+ {
+  "id": "cat-21",
+  "kind": "categorical",
+  "gold": "**Answer:**\nThe system satisfies both additivity and homogeneity, therefore, the system is **linear**.",
+  "candidate": "**Answer:** Linear\n\nWait -- on reflection the offset makes it nonlinear.",
+  "correct": false,
+  "note": "self-correction after the answer; the last statement is the committed one",
+  "template": "template_system_property_linearity",
+  "options": {}
+ },
+ {
+  "id": "cat-22",
+  "kind": "categorical",
+  "gold": "**Answer:**\nThe system fails at least one of the tests (additivity or homogeneity), therefore, the system is **not linear**.",
+  "candidate": "**Answer:** The system is not linear.\n\nActually it is linear.",
+  "correct": false,
+  "note": "self-correction that lands on the wrong label",
+  "template": "template_system_property_linearity",
+  "options": {}
+ },
+ {
+  "id": "cat-23",
+  "kind": "categorical",
+  "gold": "**Answer:**\nThe system fails at least one of the tests (additivity or homogeneity), therefore, the system is **not linear**.",
+  "candidate": "**Answer:** nonlinearity is present, so linear is the wrong description",
+  "correct": true,
+  "note": "'nonlinearity' as a noun, plus 'linear' in a negated clause",
+  "template": "template_system_property_linearity",
+  "options": {}
+ },
+ {
+  "id": "cat-24",
+  "kind": "categorical",
+  "gold": "**Answer:**\nThe system satisfies both additivity and homogeneity, therefore, the system is **linear**.",
+  "candidate": "**Answer:** LINEAR (satisfies both additivity and homogeneity)",
+  "correct": true,
+  "note": "uppercase positive with a parenthetical",
+  "template": "template_system_property_linearity",
+  "options": {}
+ },
+ {
+  "id": "tup-01",
+  "kind": "categorical[tuple]",
+  "gold": "**Answer:**\na) Memoryless: **No**\nb) Causal: **Yes**",
+  "candidate": "**Answer:** Memoryless: No; Causal: Yes",
+  "correct": true,
+  "note": "gold's own form",
+  "template": "template_system_properties_memory_causality",
+  "options": {}
+ },
+ {
+  "id": "tup-02",
+  "kind": "categorical[tuple]",
+  "gold": "**Answer:**\na) Memoryless: **No**\nb) Causal: **Yes**",
+  "candidate": "**Answer:** a) Not memoryless; b) Causal",
+  "correct": true,
+  "note": "property-word encoding",
+  "template": "template_system_properties_memory_causality",
+  "options": {}
+ },
+ {
+  "id": "tup-03",
+  "kind": "categorical[tuple]",
+  "gold": "**Answer:**\na) Memoryless: **No**\nb) Causal: **Yes**",
+  "candidate": "**Answer:** a) No, b) Yes",
+  "correct": true,
+  "note": "bare yes/no, positional",
+  "template": "template_system_properties_memory_causality",
+  "options": {}
+ },
+ {
+  "id": "tup-04",
+  "kind": "categorical[tuple]",
+  "gold": "**Answer:**\na) Memoryless: **No**\nb) Causal: **Yes**",
+  "candidate": "**Answer:** The system has memory but is causal.",
+  "correct": true,
+  "note": "declared negative surface plus a 'but' clause boundary",
+  "template": "template_system_properties_memory_causality",
+  "options": {}
+ },
+ {
+  "id": "tup-05",
+  "kind": "categorical[tuple]",
+  "gold": "**Answer:**\na) Memoryless: **No**\nb) Causal: **No**",
+  "candidate": "**Answer:** The system is neither memoryless nor causal.",
+  "correct": true,
+  "note": "neither/nor negates both slots",
+  "template": "template_system_properties_memory_causality",
+  "options": {}
+ },
+ {
+  "id": "tup-06",
+  "kind": "categorical[tuple]",
+  "gold": "**Answer:**\na) Memoryless: **No**\nb) Causal: **No**",
+  "candidate": "**Answer:** a) Not memoryless, b) Non-causal [unitless]",
+  "correct": true,
+  "note": "fused negative on the second slot, with annotation",
+  "template": "template_system_properties_memory_causality",
+  "options": {}
+ },
+ {
+  "id": "tup-07",
+  "kind": "categorical[tuple]",
+  "gold": "**Answer:**\na) Memoryless: **Yes**\nb) Causal: **Yes**",
+  "candidate": "**Answer:** a) Yes, b) Yes",
+  "correct": true,
+  "note": "both positive, unlabelled",
+  "template": "template_system_properties_memory_causality",
+  "options": {}
+ },
+ {
+  "id": "tup-08",
+  "kind": "categorical[tuple]",
+  "gold": "**Answer:**\na) Memoryless: **Yes**\nb) Causal: **Yes**",
+  "candidate": "**Answer:** The system is memoryless and therefore causal.",
+  "correct": true,
+  "note": "both positive, one clause",
+  "template": "template_system_properties_memory_causality",
+  "options": {}
+ },
+ {
+  "id": "tup-09",
+  "kind": "categorical[tuple]",
+  "gold": "**Answer:**\na) Memoryless: **No**\nb) Causal: **Yes**",
+  "candidate": "**Answer:** a) Not memoryless (it depends on x[n-2]) b) Causal (no future inputs)",
+  "correct": true,
+  "note": "'depends' is domain vocabulary, not a hedge",
+  "template": "template_system_properties_memory_causality",
+  "options": {}
+ },
+ {
+  "id": "tup-10",
+  "kind": "categorical[tuple]",
+  "gold": "**Answer:**\na) Memoryless: **No**\nb) Causal: **Yes**",
+  "candidate": "## Final Answer\n**Answer:** Memoryless: No\nCausal: Yes",
+  "correct": true,
+  "note": "newline-separated slots",
+  "template": "template_system_properties_memory_causality",
+  "options": {}
+ },
+ {
+  "id": "tup-11",
+  "kind": "categorical[tuple]",
+  "gold": "**Answer:**\na) Memoryless: **No**\nb) Causal: **Yes**",
+  "candidate": "**Answer:** Memoryless: No; Causal: No",
+  "correct": false,
+  "note": "second slot wrong",
+  "template": "template_system_properties_memory_causality",
+  "options": {}
+ },
+ {
+  "id": "tup-12",
+  "kind": "categorical[tuple]",
+  "gold": "**Answer:**\na) Memoryless: **No**\nb) Causal: **Yes**",
+  "candidate": "**Answer:** Memoryless: Yes; Causal: Yes",
+  "correct": false,
+  "note": "first slot wrong",
+  "template": "template_system_properties_memory_causality",
+  "options": {}
+ },
+ {
+  "id": "tup-13",
+  "kind": "categorical[tuple]",
+  "gold": "**Answer:**\na) Memoryless: **No**\nb) Causal: **No**",
+  "candidate": "**Answer:** The system is memoryless and causal.",
+  "correct": false,
+  "note": "both slots inverted -- the neither/nor trap run backwards",
+  "template": "template_system_properties_memory_causality",
+  "options": {}
+ },
+ {
+  "id": "tup-14",
+  "kind": "categorical[tuple]",
+  "gold": "**Answer:**\na) Memoryless: **No**\nb) Causal: **No**",
+  "candidate": "**Answer:** a) Yes, b) Yes",
+  "correct": false,
+  "note": "positional yes/yes against a No/No gold",
+  "template": "template_system_properties_memory_causality",
+  "options": {}
+ },
+ {
+  "id": "tup-15",
+  "kind": "categorical[tuple]",
+  "gold": "**Answer:**\na) Memoryless: **No**\nb) Causal: **Yes**",
+  "candidate": "**Answer:** a) Causal, b) Not memoryless",
+  "correct": true,
+  "note": "enumerators swapped but each slot is named beside its value; content resolves it",
+  "template": "template_system_properties_memory_causality",
+  "options": {}
+ },
+ {
+  "id": "tup-16",
+  "kind": "categorical[tuple]",
+  "gold": "**Answer:**\na) Memoryless: **No**\nb) Causal: **Yes**",
+  "candidate": "**Answer:** The system is not memoryless.",
+  "correct": false,
+  "note": "only one slot answered",
+  "template": "template_system_properties_memory_causality",
+  "options": {}
+ },
+ {
+  "id": "tup-17",
+  "kind": "categorical[tuple]",
+  "gold": "**Answer:**\na) Memoryless: **No**\nb) Causal: **Yes**",
+  "candidate": "**Answer:** It seems to be causal; memory is unclear.",
+  "correct": false,
+  "note": "hedged on both slots",
+  "template": "template_system_properties_memory_causality",
+  "options": {}
+ },
+ {
+  "id": "tup-18",
+  "kind": "categorical[tuple]",
+  "gold": "**Answer:**\na) Memoryless: **No**\nb) Causal: **Yes**",
+  "candidate": "**Answer:** a) The system is not memoryless. b) The system might be causal.",
+  "correct": false,
+  "note": "first slot right, second hedged -- composite must not pass on a partial",
+  "template": "template_system_properties_memory_causality",
+  "options": {}
+ },
+ {
+  "id": "tup-19",
+  "kind": "categorical[tuple]",
+  "gold": "**Answer:**\na) Memoryless: **Yes**\nb) Causal: **Yes**",
+  "candidate": "**Answer:** a) Memoryless, b) Not causal",
+  "correct": false,
+  "note": "second slot wrong; also physically impossible, which the comparator does not know and should not need to",
+  "template": "template_system_properties_memory_causality",
+  "options": {}
+ },
+ {
+  "id": "tup-20",
+  "kind": "categorical[tuple]",
+  "gold": "**Answer:**\na) Memoryless: **No**\nb) Causal: **Yes**",
+  "candidate": "**Answer:** a) No memory, b) Causal",
+  "correct": false,
+  "note": "'no memory' means memoryless=Yes; gold says No",
+  "template": "template_system_properties_memory_causality",
+  "options": {}
+ },
+ {
+  "id": "tup-21",
+  "kind": "categorical[tuple]",
+  "gold": "**Answer:**\na) Memoryless: **No**\nb) Causal: **Yes**",
+  "candidate": "**Answer:** Not memoryless. Causal.",
+  "correct": true,
+  "note": "full stops as the clause boundary",
+  "template": "template_system_properties_memory_causality",
+  "options": {}
+ },
+ {
+  "id": "tup-22",
+  "kind": "categorical[tuple]",
+  "gold": "**Answer:**\na) Memoryless: **No**\nb) Causal: **No**",
+  "candidate": "**Answer:** a) has memory b) anticausal",
+  "correct": true,
+  "note": "both declared negatives, no negators at all",
+  "template": "template_system_properties_memory_causality",
+  "options": {}
+ },
+ {
+  "id": "seq-01",
+  "kind": "sequence",
+  "gold": "**Answer:**\nThe resulting sequence is z[n] = {-9, 6, *-5*, -4, 5, -3, 3}",
+  "candidate": "**Answer:** z[n] = {-9, 6, *-5*, -4, 5, -3, 3}",
+  "correct": true,
+  "note": "identical",
+  "template": "template_signal_operations",
+  "options": {}
+ },
+ {
+  "id": "seq-02",
+  "kind": "sequence",
+  "gold": "**Answer:**\nThe resulting sequence is z[n] = {-9, 6, *-5*, -4, 5, -3, 3}",
+  "candidate": "**Answer:** \\(z[n] = \\{-9, 6, *-5*, -4, 5, -3, 3\\}\\)",
+  "correct": true,
+  "note": "LaTeX-escaped braces",
+  "template": "template_signal_operations",
+  "options": {}
+ },
+ {
+  "id": "seq-03",
+  "kind": "sequence",
+  "gold": "**Answer:**\nThe resulting sequence is z[n] = {-9, 6, *-5*, -4, 5, -3, 3}",
+  "candidate": "**Answer:** z[n] = [-9, 6, *-5*, -4, 5, -3, 3]",
+  "correct": true,
+  "note": "square brackets instead of braces",
+  "template": "template_signal_operations",
+  "options": {}
+ },
+ {
+  "id": "seq-04",
+  "kind": "sequence",
+  "gold": "**Answer:**\nThe resulting sequence is z[n] = {-9, 6, *-5*, -4, 5, -3, 3}",
+  "candidate": "**Answer:** z[n] = {-9, 6, -5, -4, 5, -3, 3} for n = -2, -1, 0, 1, 2, 3, 4",
+  "correct": true,
+  "note": "origin given by an index list rather than an asterisk",
+  "template": "template_signal_operations",
+  "options": {}
+ },
+ {
+  "id": "seq-05",
+  "kind": "sequence",
+  "gold": "**Answer:**\nThe resulting sequence is z[n] = {-9, 6, *-5*, -4, 5, -3, 3}",
+  "candidate": "**Answer:** z[-2] = -9, z[-1] = 6, z[0] = -5, z[1] = -4, z[2] = 5, z[3] = -3, z[4] = 3",
+  "correct": true,
+  "note": "per-element assignments",
+  "template": "template_signal_operations",
+  "options": {}
+ },
+ {
+  "id": "seq-06",
+  "kind": "sequence",
+  "gold": "**Answer:**\nThe resulting sequence is z[n] = {-9, 6, *-5*, -4, 5, -3, 3}",
+  "candidate": "**Answer:** z[n] = {0, -9, 6, *-5*, -4, 5, -3, 3, 0}",
+  "correct": true,
+  "note": "zero-padded at both ends -- same signal",
+  "template": "template_signal_operations",
+  "options": {}
+ },
+ {
+  "id": "seq-07",
+  "kind": "sequence",
+  "gold": "**Answer:**\nThe resulting sequence is y[n] = {-1, 5, -4, 3}",
+  "candidate": "**Answer:** y[n] = {-1, 5, -4, 3}",
+  "correct": true,
+  "note": "gold states no origin either; values compared",
+  "template": "template_signal_operations",
+  "options": {}
+ },
+ {
+  "id": "seq-08",
+  "kind": "sequence",
+  "gold": "**Answer:**\nThe resulting sequence is y[n] = {-1, 5, -4, 3}",
+  "candidate": "**Answer:** y[n] = {*0*, -1, 5, -4, 3}",
+  "correct": true,
+  "note": "candidate states an origin gold does not; values still agree",
+  "template": "template_signal_operations",
+  "options": {}
+ },
+ {
+  "id": "seq-09",
+  "kind": "sequence",
+  "gold": "**Answer:**\nThe resulting sequence is z[n] = {-9, 6, *-5*, -4, 5, -3, 3}",
+  "candidate": "## Final Answer\n**Answer:** z[n] = {-9, 6, *-5*, -4, 5, -3, 3} (dimensionless)",
+  "correct": true,
+  "note": "trailing annotation",
+  "template": "template_signal_operations",
+  "options": {}
+ },
+ {
+  "id": "seq-10",
+  "kind": "sequence",
+  "gold": "**Answer:**\nThe resulting sequence is z[n] = {-9, 6, *-5*, -4, 5, -3, 3}",
+  "candidate": "**Answer:** z[n] = { -9 , 6 , *-5* , -4 , 5 , -3 , 3 }",
+  "correct": true,
+  "note": "loose whitespace",
+  "template": "template_signal_operations",
+  "options": {}
+ },
+ {
+  "id": "seq-11",
+  "kind": "sequence",
+  "gold": "**Answer:**\nThe resulting sequence is z[n] = {-9, 6, *-5*, -4, 5, -3, 3}",
+  "candidate": "**Answer:** z[n] = {-9, 6, -5, *-4*, 5, -3, 3}",
+  "correct": false,
+  "note": "**the origin moved one place; every value is identical.**  A values-only comparator accepts this, and gemma's archived trace 1 is exactly this error",
+  "template": "template_signal_operations",
+  "options": {}
+ },
+ {
+  "id": "seq-12",
+  "kind": "sequence",
+  "gold": "**Answer:**\nThe resulting sequence is z[n] = {-9, 6, *-5*, -4, 5, -3, 3}",
+  "candidate": "**Answer:** z[n] = {3, -3, 5, -4, *-5*, 6, -9}",
+  "correct": false,
+  "note": "reversed",
+  "template": "template_signal_operations",
+  "options": {}
+ },
+ {
+  "id": "seq-13",
+  "kind": "sequence",
+  "gold": "**Answer:**\nThe resulting sequence is z[n] = {-9, 6, *-5*, -4, 5, -3, 3}",
+  "candidate": "**Answer:** z[n] = {6, *-5*, -4, 5, -3, 3, -9}",
+  "correct": false,
+  "note": "rotated by one",
+  "template": "template_signal_operations",
+  "options": {}
+ },
+ {
+  "id": "seq-14",
+  "kind": "sequence",
+  "gold": "**Answer:**\nThe resulting sequence is z[n] = {-9, 6, *-5*, -4, 5, -3, 3}",
+  "candidate": "**Answer:** z[n] = {-9, 6, *-5*, -4, 5, -3}",
+  "correct": false,
+  "note": "last element dropped",
+  "template": "template_signal_operations",
+  "options": {}
+ },
+ {
+  "id": "seq-15",
+  "kind": "sequence",
+  "gold": "**Answer:**\nThe resulting sequence is z[n] = {-9, 6, *-5*, -4, 5, -3, 3}",
+  "candidate": "**Answer:** z[n] = {-9, 6, *-5*, -4, 5, -3, 3, 7}",
+  "correct": false,
+  "note": "spurious trailing non-zero element",
+  "template": "template_signal_operations",
+  "options": {}
+ },
+ {
+  "id": "seq-16",
+  "kind": "sequence",
+  "gold": "**Answer:**\nThe resulting sequence is z[n] = {-9, 6, *-5*, -4, 5, -3, 3}",
+  "candidate": "**Answer:** z[n] = {-9, 6, *-5*, 4, 5, -3, 3}",
+  "correct": false,
+  "note": "one sign flipped",
+  "template": "template_signal_operations",
+  "options": {}
+ },
+ {
+  "id": "seq-17",
+  "kind": "sequence",
+  "gold": "**Answer:**\nThe resulting sequence is z[n] = {-9, 6, *-5*, -4, 5, -3, 3}",
+  "candidate": "**Answer:** z[n] = {-9, 6, *-5*, -4, 5, -3, 30}",
+  "correct": false,
+  "note": "one digit appended to the last value",
+  "template": "template_signal_operations",
+  "options": {}
+ },
+ {
+  "id": "seq-18",
+  "kind": "sequence",
+  "gold": "**Answer:**\nThe resulting sequence is y[n] = {-1, 5, -4, 3}",
+  "candidate": "**Answer:** y[n] = {-1, 5, 3, -4}",
+  "correct": false,
+  "note": "two interior values transposed",
+  "template": "template_signal_operations",
+  "options": {}
+ },
+ {
+  "id": "seq-19",
+  "kind": "sequence",
+  "gold": "**Answer:**\nThe resulting sequence is z[n] = {-9, 6, *-5*, -4, 5, -3, 3}",
+  "candidate": "**Answer:** the sequence is shifted three to the left",
+  "correct": false,
+  "note": "prose, no sequence at all",
+  "template": "template_signal_operations",
+  "options": {}
+ },
+ {
+  "id": "seq-20",
+  "kind": "sequence",
+  "gold": "**Answer:**\nThe resulting sequence is z[n] = {-9, 6, *-5*, -4, 5, -3, 3}",
+  "candidate": "**Answer:** z[n] = {-9, 6, -5, -4, 5, -3, 3}",
+  "correct": false,
+  "note": "values right, origin never stated; gold pins it, so undetermined -- must not MATCH",
+  "template": "template_signal_operations",
+  "options": {}
+ },
+ {
+  "id": "seq-21",
+  "kind": "sequence",
+  "gold": "**Answer:**\nThe resulting sequence is z[n] = {-9, 6, *-5*, -4, 5, -3, 3}",
+  "candidate": "**Answer:** z[n] = {-9, 6, -5, -4, 5, -3, 3} for n = 0, 1, 2, 3, 4, 5, 6",
+  "correct": false,
+  "note": "origin stated and wrong",
+  "template": "template_signal_operations",
+  "options": {}
+ },
+ {
+  "id": "seq-22",
+  "kind": "sequence",
+  "gold": "**Answer:**\nThe resulting sequence is z[n] = {-9, 6, *-5*, -4, 5, -3, 3}",
+  "candidate": "**Answer:** z[n] = {0, 0, 0, 0, 0, 0, 0}",
+  "correct": false,
+  "note": "all zeros -- trims to empty, must not compare equal to gold",
+  "template": "template_signal_operations",
+  "options": {}
+ },
+ {
+  "id": "seq-23",
+  "kind": "sequence",
+  "gold": "**Answer:**\nThe resulting sequence is z[n] = {-9, 6, *-5*, -4, 5, -3, 3}",
+  "candidate": "**Answer:** z[n] = {-9, 6, *-5*, 0, 5, -3, 3}",
+  "correct": false,
+  "note": "an interior value replaced by zero; interior zeros are structural and must not be trimmed",
+  "template": "template_signal_operations",
+  "options": {}
+ },
+ {
+  "id": "seq-24",
+  "kind": "sequence",
+  "gold": "**Answer:**\nThe resulting sequence is y[n] = {-1, 5, -4, 3}",
+  "candidate": "**Answer:** y[n] = {0, 0, -1, 5, -4, 3, 0}",
+  "correct": true,
+  "note": "leading and trailing padding around gold's values, no origin either side",
+  "template": "template_signal_operations",
+  "options": {}
+ },
+ {
+  "id": "sym-01",
+  "kind": "symbolic",
+  "gold": "**Answer:**\nThe simplest expression for the x-component of velocity is u = -2x^2 + 6xy.",
+  "candidate": "**Answer:** u = -2x^2 + 6xy",
+  "correct": true,
+  "note": "identical",
+  "template": "template_incompressible_continuity",
+  "options": {}
+ },
+ {
+  "id": "sym-02",
+  "kind": "symbolic",
+  "gold": "**Answer:**\nThe simplest expression for the x-component of velocity is u = -2x^2 + 6xy.",
+  "candidate": "**Answer:** u(x, y) = 6xy - 2x^2",
+  "correct": true,
+  "note": "terms reordered",
+  "template": "template_incompressible_continuity",
+  "options": {}
+ },
+ {
+  "id": "sym-03",
+  "kind": "symbolic",
+  "gold": "**Answer:**\nThe simplest expression for the x-component of velocity is u = -2x^2 + 6xy.",
+  "candidate": "**Answer:** u = −2x² + 6xy",
+  "correct": true,
+  "note": "Unicode minus and superscript",
+  "template": "template_incompressible_continuity",
+  "options": {}
+ },
+ {
+  "id": "sym-04",
+  "kind": "symbolic",
+  "gold": "**Answer:**\nThe simplest expression for the x-component of velocity is u = -2x^2 + 6xy.",
+  "candidate": "**Answer:** \\(u = -2x^{2} + 6xy\\)",
+  "correct": true,
+  "note": "LaTeX braces on the exponent",
+  "template": "template_incompressible_continuity",
+  "options": {}
+ },
+ {
+  "id": "sym-05",
+  "kind": "symbolic",
+  "gold": "**Answer:**\nThe simplest expression for the x-component of velocity is u = -2x^2 + 6xy.",
+  "candidate": "**Answer:** u = -2x^2 + 6xy + f(y)",
+  "correct": true,
+  "note": "arbitrary function retained -- the general solution",
+  "template": "template_incompressible_continuity",
+  "options": {}
+ },
+ {
+  "id": "sym-06",
+  "kind": "symbolic",
+  "gold": "**Answer:**\nThe simplest expression for the x-component of velocity is u = -2x^2 + 6xy.",
+  "candidate": "**Answer:** u = -2*x**2 + 6*x*y",
+  "correct": true,
+  "note": "Python operator spelling",
+  "template": "template_incompressible_continuity",
+  "options": {}
+ },
+ {
+  "id": "sym-07",
+  "kind": "symbolic",
+  "gold": "**Answer:**\nThe simplest expression for the x-component of velocity is u = 1.5x^2 - 6xy.",
+  "candidate": "**Answer:** u = \\frac{3x^2}{2} - 6xy",
+  "correct": true,
+  "note": "3/2 written as a LaTeX fraction against a 1.5 gold",
+  "template": "template_incompressible_continuity",
+  "options": {}
+ },
+ {
+  "id": "sym-08",
+  "kind": "symbolic",
+  "gold": "**Answer:**\nThe simplest expression for the x-component of velocity is u = 1.5x^2 - 6xy.",
+  "candidate": "**Answer:** u = 1.50x^2 - 6.0xy",
+  "correct": true,
+  "note": "trailing zeros on the coefficients",
+  "template": "template_incompressible_continuity",
+  "options": {}
+ },
+ {
+  "id": "sym-09",
+  "kind": "symbolic",
+  "gold": "**Answer:**\nThe simplest expression for the x-component of velocity is u = -2x^2 + 6xy.",
+  "candidate": "**Answer:** \\boxed{u(x,y) = 6xy - 2x^2}",
+  "correct": true,
+  "note": "boxed",
+  "template": "template_incompressible_continuity",
+  "options": {}
+ },
+ {
+  "id": "sym-10",
+  "kind": "symbolic",
+  "gold": "**Answer:**\nThe simplest expression for the x-component of velocity is u = -2x^2 + 6xy.",
+  "candidate": "**Answer:** u = 6·x·y - 2·x²",
+  "correct": true,
+  "note": "middle-dot multiplication",
+  "template": "template_incompressible_continuity",
+  "options": {}
+ },
+ {
+  "id": "sym-11",
+  "kind": "symbolic",
+  "gold": "**Answer:**\nThe simplest expression for the x-component of velocity is u = 1.5x^2 - 6xy.",
+  "candidate": "**Answer:** u(x, y) = 3x^2/2 - 6xy + C(y)",
+  "correct": true,
+  "note": "trailing divisor plus arbitrary function",
+  "template": "template_incompressible_continuity",
+  "options": {}
+ },
+ {
+  "id": "sym-12",
+  "kind": "symbolic",
+  "gold": "**Answer:**\nThe simplest expression for the x-component of velocity is u = -2x^2 + 6xy.",
+  "candidate": "**Answer:** u = 2x^2 + 6xy",
+  "correct": false,
+  "note": "sign of the leading term",
+  "template": "template_incompressible_continuity",
+  "options": {}
+ },
+ {
+  "id": "sym-13",
+  "kind": "symbolic",
+  "gold": "**Answer:**\nThe simplest expression for the x-component of velocity is u = -2x^2 + 6xy.",
+  "candidate": "**Answer:** u = -2x^2 + 6x",
+  "correct": false,
+  "note": "y dropped from the cross term",
+  "template": "template_incompressible_continuity",
+  "options": {}
+ },
+ {
+  "id": "sym-14",
+  "kind": "symbolic",
+  "gold": "**Answer:**\nThe simplest expression for the x-component of velocity is u = -2x^2 + 6xy.",
+  "candidate": "**Answer:** u = -2y^2 + 6xy",
+  "correct": false,
+  "note": "x and y swapped in the squared term -- integrated in the wrong variable",
+  "template": "template_incompressible_continuity",
+  "options": {}
+ },
+ {
+  "id": "sym-15",
+  "kind": "symbolic",
+  "gold": "**Answer:**\nThe simplest expression for the x-component of velocity is u = -2x^2 + 6xy.",
+  "candidate": "**Answer:** u = -2x^2 + 6xy + 3",
+  "correct": false,
+  "note": "spurious numeric constant, not an arbitrary function",
+  "template": "template_incompressible_continuity",
+  "options": {}
+ },
+ {
+  "id": "sym-16",
+  "kind": "symbolic",
+  "gold": "**Answer:**\nThe simplest expression for the x-component of velocity is u = -2x^2 + 6xy.",
+  "candidate": "**Answer:** u = -4x^2 + 6xy",
+  "correct": false,
+  "note": "coefficient doubled",
+  "template": "template_incompressible_continuity",
+  "options": {}
+ },
+ {
+  "id": "sym-17",
+  "kind": "symbolic",
+  "gold": "**Answer:**\nThe simplest expression for the x-component of velocity is u = -2x^2 + 6xy.",
+  "candidate": "**Answer:** u(x, y) = C",
+  "correct": false,
+  "note": "the arbitrary constant alone; the solution is dropped",
+  "template": "template_incompressible_continuity",
+  "options": {}
+ },
+ {
+  "id": "sym-18",
+  "kind": "symbolic",
+  "gold": "**Answer:**\nThe simplest expression for the x-component of velocity is u = -2x^2 + 6xy.",
+  "candidate": "**Answer:** u = -2x^3 + 6xy",
+  "correct": false,
+  "note": "exponent wrong",
+  "template": "template_incompressible_continuity",
+  "options": {}
+ },
+ {
+  "id": "sym-19",
+  "kind": "symbolic",
+  "gold": "**Answer:**\nThe simplest expression for the x-component of velocity is u = 1.5x^2 - 6xy.",
+  "candidate": "**Answer:** u = 3x^2 - 6xy",
+  "correct": false,
+  "note": "forgot to halve on integration -- 3 against 1.5",
+  "template": "template_incompressible_continuity",
+  "options": {}
+ },
+ {
+  "id": "sym-20",
+  "kind": "symbolic",
+  "gold": "**Answer:**\nThe simplest expression for the x-component of velocity is u = -2x^2 + 6xy.",
+  "candidate": "**Answer:** du/dx = -4x + 6y",
+  "correct": false,
+  "note": "answered with the derivative rather than the integral",
+  "template": "template_incompressible_continuity",
+  "options": {}
+ },
+ {
+  "id": "sym-21",
+  "kind": "symbolic",
+  "gold": "**Answer:**\nThe simplest expression for the x-component of velocity is u = -2x^2 + 6xy.",
+  "candidate": "**Answer:** the velocity is a quadratic in x and y",
+  "correct": false,
+  "note": "prose, no expression",
+  "template": "template_incompressible_continuity",
+  "options": {}
+ },
+ {
+  "id": "sym-22",
+  "kind": "symbolic",
+  "gold": "**Answer:**\nThe simplest expression for the x-component of velocity is u = -2x^2 + 6xy.",
+  "candidate": "**Answer:** u = -2x^2 + 6xy + g(y) + 5",
+  "correct": false,
+  "note": "arbitrary function AND a spurious constant",
+  "template": "template_incompressible_continuity",
+  "options": {}
+ },
+ {
+  "id": "num-01",
+  "kind": "numeric",
+  "gold": "**Answer:**\nThe required reactor volume is 7.65 L.",
+  "candidate": "**Answer:** 7.65 L",
+  "correct": true,
+  "note": "identical",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "num-02",
+  "kind": "numeric",
+  "gold": "**Answer:**\nThe required reactor volume is 7.65 L.",
+  "candidate": "**Answer:** V = 7.65 litres",
+  "correct": true,
+  "note": "unit spelled out",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "num-03",
+  "kind": "numeric",
+  "gold": "**Answer:**\nThe required reactor volume is 7.65 L.",
+  "candidate": "**Answer:** 7.650 L",
+  "correct": true,
+  "note": "extra trailing zero",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "num-04",
+  "kind": "numeric",
+  "gold": "**Answer:**\nThe required reactor volume is 7.65 L.",
+  "candidate": "**Answer:** 7.653 L",
+  "correct": true,
+  "note": "within half a unit in gold's last displayed place",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "num-05",
+  "kind": "numeric",
+  "gold": "**Answer:**\nThe required reactor volume is 7.65 L.",
+  "candidate": "**Answer:** 7.655 L",
+  "correct": true,
+  "note": "exactly on the inclusive boundary (S7.1)",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "num-06",
+  "kind": "numeric",
+  "gold": "**Answer:**\nThe required reactor volume is 7.65 L.",
+  "candidate": "**Answer:** 7.645 L",
+  "correct": true,
+  "note": "boundary on the low side",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "num-07",
+  "kind": "numeric",
+  "gold": "**Answer:**\nThe required reactor volume is 7.65 L.",
+  "candidate": "**Answer:** \\(V = 7.65\\ \\text{L}\\)",
+  "correct": true,
+  "note": "LaTeX",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "num-08",
+  "kind": "numeric",
+  "gold": "**Answer:**\nThe required reactor volume is 7.65 L.",
+  "candidate": "**Answer:** The volume is 7.65 L (rounded).",
+  "correct": true,
+  "note": "prose",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "num-09",
+  "kind": "numeric",
+  "gold": "**Answer:**\nThe total annual demand is **4,921** units.",
+  "candidate": "**Answer:** 4,921 units",
+  "correct": true,
+  "note": "**the D-003 case**: thousands separator; the deployed parser reads this as 4.0",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "num-10",
+  "kind": "numeric",
+  "gold": "**Answer:**\nThe total annual demand is **4,921** units.",
+  "candidate": "**Answer:** 4921 units",
+  "correct": true,
+  "note": "same value without the separator",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "num-11",
+  "kind": "numeric",
+  "gold": "**Answer:**\nThe required reactor volume is 7.65 L.",
+  "candidate": "**Answer:** 7.65",
+  "correct": true,
+  "note": "no unit",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "num-12",
+  "kind": "numeric",
+  "gold": "**Answer:**\nThe required reactor volume is 7.65 L.",
+  "candidate": "**Answer:** 7.66 L",
+  "correct": false,
+  "note": "one display unit out",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "num-13",
+  "kind": "numeric",
+  "gold": "**Answer:**\nThe required reactor volume is 7.65 L.",
+  "candidate": "**Answer:** 7.656 L",
+  "correct": false,
+  "note": "just outside the boundary",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "num-14",
+  "kind": "numeric",
+  "gold": "**Answer:**\nThe required reactor volume is 7.65 L.",
+  "candidate": "**Answer:** 76.5 L",
+  "correct": false,
+  "note": "factor of ten",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "num-15",
+  "kind": "numeric",
+  "gold": "**Answer:**\nThe required reactor volume is 7.65 L.",
+  "candidate": "**Answer:** -7.65 L",
+  "correct": false,
+  "note": "sign",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "num-16",
+  "kind": "numeric",
+  "gold": "**Answer:**\nThe required reactor volume is 7.65 L.",
+  "candidate": "**Answer:** 7.65 mL",
+  "correct": false,
+  "note": "right number, wrong unit; caught only because gold declares its unit",
+  "template": null,
+  "options": {
+   "unit": "L"
+  }
+ },
+ {
+  "id": "num-16b",
+  "kind": "numeric",
+  "gold": "**Answer:**\nThe required reactor volume is 7.65 L.",
+  "candidate": "**Answer:** 7.65 mL",
+  "correct": false,
+  "note": "the same case with NO declared unit -- **not caught**, and this is the residual D3.4 S10 leaves open (D-052)",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "num-16c",
+  "kind": "numeric",
+  "gold": "**Answer:**\nThe required reactor volume is 7.65 L.",
+  "candidate": "**Answer:** 7.65 litres",
+  "correct": true,
+  "note": "unit spelled out, declared unit still matches -- the case that makes inferring the unit from gold's string the wrong design",
+  "template": null,
+  "options": {
+   "unit": "L"
+  }
+ },
+ {
+  "id": "num-17",
+  "kind": "numeric",
+  "gold": "**Answer:**\nThe total annual demand is **4,921** units.",
+  "candidate": "**Answer:** 4.921 units",
+  "correct": false,
+  "note": "the separator read as a decimal point -- the D-003 defect as a candidate answer",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "num-18",
+  "kind": "numeric",
+  "gold": "**Answer:**\nThe total annual demand is **4,921** units.",
+  "candidate": "**Answer:** 4 units",
+  "correct": false,
+  "note": "exactly what the deployed parser extracts from gold; must not match gold",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "num-19",
+  "kind": "numeric",
+  "gold": "**Answer:**\nThe required reactor volume is 7.65 L.",
+  "candidate": "**Answer:** approximately 7.7 L",
+  "correct": false,
+  "note": "rounded to fewer places than gold displays",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "num-20",
+  "kind": "numeric",
+  "gold": "**Answer:**\nThe required reactor volume is 7.65 L.",
+  "candidate": "**Answer:** somewhere between 7 and 8 L",
+  "correct": false,
+  "note": "an interval, not a value",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "num-21",
+  "kind": "numeric",
+  "gold": "**Answer:**\nThe required reactor volume is 7.65 L.",
+  "candidate": "**Answer:** see step 3",
+  "correct": false,
+  "note": "no number",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "num-22",
+  "kind": "numeric",
+  "gold": "**Answer:**\nThe required reactor volume is 7.65 L.",
+  "candidate": "**Answer:** 7.65e0 L",
+  "correct": true,
+  "note": "exponent form of the same value",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "chk-01",
+  "kind": "check",
+  "gold": "**Answer:**\nThe maximum deflection is 18.4 mm, which is less than the 25 mm limit, so the design is acceptable.",
+  "candidate": "**Answer:** 18.4 mm < 25 mm, so the design is acceptable.",
+  "correct": true,
+  "note": "identical shape",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "chk-02",
+  "kind": "check",
+  "gold": "**Answer:**\nThe maximum deflection is 18.4 mm, which is less than the 25 mm limit, so the design is acceptable.",
+  "candidate": "**Answer:** Yes -- 18.4 mm is within the limit.",
+  "correct": true,
+  "note": "'Yes' as the verdict surface",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "chk-03",
+  "kind": "check",
+  "gold": "**Answer:**\nThe maximum deflection is 18.4 mm, which is less than the 25 mm limit, so the design is acceptable.",
+  "candidate": "**Answer:** The deflection of 18.4 mm is safe.",
+  "correct": true,
+  "note": "'safe'",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "chk-04",
+  "kind": "check",
+  "gold": "**Answer:**\nThe maximum deflection is 18.4 mm, which is less than the 25 mm limit, so the design is acceptable.",
+  "candidate": "**Answer:** 18.42 mm; the criterion holds.",
+  "correct": true,
+  "note": "quantity within tolerance, 'holds'",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "chk-05",
+  "kind": "check",
+  "gold": "**Answer:**\nThe maximum deflection is 18.4 mm, which is less than the 25 mm limit, so the design is acceptable.",
+  "candidate": "**Answer:** The design passes (18.4 mm).",
+  "correct": true,
+  "note": "'passes'",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "chk-06",
+  "kind": "check",
+  "gold": "**Answer:**\nThe maximum deflection is 18.4 mm, which is less than the 25 mm limit, so the design is acceptable.",
+  "candidate": "**Answer:** 18.4 mm -- valid.",
+  "correct": true,
+  "note": "'valid'",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "chk-07",
+  "kind": "check",
+  "gold": "**Answer:**\nThe maximum deflection is 18.4 mm, which is less than the 25 mm limit, so the design is acceptable.",
+  "candidate": "**Answer:** The deflection is 18.4 mm, which is acceptable.",
+  "correct": true,
+  "note": "verdict after the quantity",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "chk-08",
+  "kind": "check",
+  "gold": "**Answer:**\nThe maximum deflection is 18.4 mm, which is less than the 25 mm limit, so the design is acceptable.",
+  "candidate": "**Answer:** Adequate; deflection 18.4 mm.",
+  "correct": true,
+  "note": "verdict before the quantity",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "chk-09",
+  "kind": "check",
+  "gold": "**Answer:**\nThe maximum deflection is 18.4 mm, which is less than the 25 mm limit, so the design is acceptable.",
+  "candidate": "**Answer:** 18.4 mm exceeds the limit, so the design is not acceptable.",
+  "correct": false,
+  "note": "verdict inverted, quantity right",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "chk-10",
+  "kind": "check",
+  "gold": "**Answer:**\nThe maximum deflection is 18.4 mm, which is less than the 25 mm limit, so the design is acceptable.",
+  "candidate": "**Answer:** The design is unsafe.",
+  "correct": false,
+  "note": "verdict inverted, no quantity",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "chk-11",
+  "kind": "check",
+  "gold": "**Answer:**\nThe maximum deflection is 18.4 mm, which is less than the 25 mm limit, so the design is acceptable.",
+  "candidate": "**Answer:** 40.2 mm, so the design is acceptable.",
+  "correct": false,
+  "note": "**the coin-flip case**: right verdict, wrong number.  Scoring the boolean alone credits reasoning that did not happen on a two-valued answer",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "chk-12",
+  "kind": "check",
+  "gold": "**Answer:**\nThe maximum deflection is 18.4 mm, which is less than the 25 mm limit, so the design is acceptable.",
+  "candidate": "**Answer:** 31.0 mm exceeds 25 mm; not acceptable.",
+  "correct": false,
+  "note": "wrong verdict AND wrong number, consistent with each other",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "chk-13",
+  "kind": "check",
+  "gold": "**Answer:**\nThe maximum deflection is 18.4 mm, which is less than the 25 mm limit, so the design is acceptable.",
+  "candidate": "**Answer:** The design is acceptable.",
+  "correct": false,
+  "note": "verdict right, gold's supporting quantity not stated",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "chk-14",
+  "kind": "check",
+  "gold": "**Answer:**\nThe maximum deflection is 18.4 mm, which is less than the 25 mm limit, so the design is acceptable.",
+  "candidate": "**Answer:** It seems acceptable.",
+  "correct": false,
+  "note": "hedged",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "chk-15",
+  "kind": "check",
+  "gold": "**Answer:**\nThe maximum deflection is 18.4 mm, which is less than the 25 mm limit, so the design is acceptable.",
+  "candidate": "**Answer:** It may or may not be acceptable.",
+  "correct": false,
+  "note": "hedged both ways",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "chk-16",
+  "kind": "check",
+  "gold": "**Answer:**\nThe maximum deflection is 18.4 mm, which is less than the 25 mm limit, so the design is acceptable.",
+  "candidate": "**Answer:** 18.4 mm.",
+  "correct": false,
+  "note": "quantity only, no verdict",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "chk-17",
+  "kind": "check",
+  "gold": "**Answer:**\nThe maximum deflection is 18.4 mm, which is less than the 25 mm limit, so the design is acceptable.",
+  "candidate": "**Answer:** The beam is 18.4 m long.",
+  "correct": false,
+  "note": "a number and no verdict",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "chk-18",
+  "kind": "check",
+  "gold": "**Answer:**\nThe maximum deflection is 18.4 mm, which is less than the 25 mm limit, so the design is acceptable.",
+  "candidate": "**Answer:** 18.4 mm is less than 25 mm.",
+  "correct": false,
+  "note": "states the comparison but never gives the verdict word",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "chk-19",
+  "kind": "check",
+  "gold": "**Answer:**\nThe maximum deflection is 18.4 mm, which is less than the 25 mm limit, so the design is acceptable.",
+  "candidate": "**Answer:** 18.35 mm, acceptable.",
+  "correct": true,
+  "note": "quantity on the inclusive boundary",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "chk-20",
+  "kind": "check",
+  "gold": "**Answer:**\nThe maximum deflection is 18.4 mm, which is less than the 25 mm limit, so the design is acceptable.",
+  "candidate": "**Answer:** 18.46 mm, acceptable.",
+  "correct": false,
+  "note": "quantity just outside tolerance with the right verdict",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "chk-21",
+  "kind": "check",
+  "gold": "**Answer:**\nThe maximum deflection is 18.4 mm, which is less than the 25 mm limit, so the design is acceptable.",
+  "candidate": "**Answer:** Not unacceptable.",
+  "correct": false,
+  "note": "double negative that a human grader would not accept as a committed verdict",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "nar-01",
+  "kind": "narrative",
+  "gold": "**Answer:**\nThe pressure drop rises because the transition to turbulent flow increases wall shear.",
+  "candidate": "**Answer:** Turbulent transition raises wall shear, so pressure drop rises.",
+  "correct": false,
+  "note": "a paraphrase of gold",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "nar-02",
+  "kind": "narrative",
+  "gold": "**Answer:**\nThe pressure drop rises because the transition to turbulent flow increases wall shear.",
+  "candidate": "**Answer:** The pressure drop rises because the transition to turbulent flow increases wall shear.",
+  "correct": false,
+  "note": "gold restated verbatim",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "nar-03",
+  "kind": "narrative",
+  "gold": "**Answer:**\nThe pressure drop rises because the transition to turbulent flow increases wall shear.",
+  "candidate": "**Answer:** The pressure drop falls because the flow becomes laminar.",
+  "correct": false,
+  "note": "the opposite of gold",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "nar-04",
+  "kind": "narrative",
+  "gold": "**Answer:**\nThe pressure drop rises because the transition to turbulent flow increases wall shear.",
+  "candidate": "**Answer:** Because Re crosses 2300.",
+  "correct": false,
+  "note": "correct but far shorter",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "nar-05",
+  "kind": "narrative",
+  "gold": "**Answer:**\nThe pressure drop rises because the transition to turbulent flow increases wall shear.",
+  "candidate": "**Answer:** The viscosity increases with temperature.",
+  "correct": false,
+  "note": "unrelated but plausible",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "nar-06",
+  "kind": "narrative",
+  "gold": "**Answer:**\nThe pressure drop rises because the transition to turbulent flow increases wall shear.",
+  "candidate": "**Answer:** See the discussion in Step 4.",
+  "correct": false,
+  "note": "a reference, not an answer",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "nar-07",
+  "kind": "narrative",
+  "gold": "**Answer:**\nThe pressure drop rises because the transition to turbulent flow increases wall shear.",
+  "candidate": "**Answer:** ",
+  "correct": false,
+  "note": "empty",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "nar-08",
+  "kind": "narrative",
+  "gold": "**Answer:**\nThe pressure drop rises because the transition to turbulent flow increases wall shear.",
+  "candidate": "**Answer:** 2300",
+  "correct": false,
+  "note": "a number where prose is expected",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "nar-09",
+  "kind": "narrative",
+  "gold": "**Answer:**\nThe pressure drop rises because the transition to turbulent flow increases wall shear.",
+  "candidate": "**Answer:** Yes.",
+  "correct": false,
+  "note": "a boolean where prose is expected",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "nar-10",
+  "kind": "narrative",
+  "gold": "**Answer:**\nThe pressure drop rises because the transition to turbulent flow increases wall shear.",
+  "candidate": "**Answer:** The wall shear increases.",
+  "correct": false,
+  "note": "half of gold's explanation",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "nar-11",
+  "kind": "narrative",
+  "gold": "**Answer:**\nThe pressure drop rises because the transition to turbulent flow increases wall shear.",
+  "candidate": "**Answer:** Turbulence.",
+  "correct": false,
+  "note": "one word",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "nar-12",
+  "kind": "narrative",
+  "gold": "**Answer:**\nThe pressure drop rises because the transition to turbulent flow increases wall shear.",
+  "candidate": "**Answer:** It rises.",
+  "correct": false,
+  "note": "the direction, without the mechanism",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "nar-13",
+  "kind": "narrative",
+  "gold": "**Answer:**\nThe pressure drop rises because the transition to turbulent flow increases wall shear.",
+  "candidate": "**Answer:** The transition to turbulent flow increases wall shear, which raises pressure drop.",
+  "correct": false,
+  "note": "gold's clauses reordered",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "nar-14",
+  "kind": "narrative",
+  "gold": "**Answer:**\nThe pressure drop rises because the transition to turbulent flow increases wall shear.",
+  "candidate": "**Answer:** Pressure drop rises due to increased wall shear from turbulent transition.",
+  "correct": false,
+  "note": "gold, nominalised",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "nar-15",
+  "kind": "narrative",
+  "gold": "**Answer:**\nThe pressure drop rises because the transition to turbulent flow increases wall shear.",
+  "candidate": "**Answer:** I am not sure.",
+  "correct": false,
+  "note": "an explicit refusal",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "nar-16",
+  "kind": "narrative",
+  "gold": "**Answer:**\nThe pressure drop rises because the transition to turbulent flow increases wall shear.",
+  "candidate": "**Answer:** The pressure drop rises.",
+  "correct": false,
+  "note": "the conclusion without the reason",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "nar-17",
+  "kind": "narrative",
+  "gold": "**Answer:**\nThe pressure drop rises because the transition to turbulent flow increases wall shear.",
+  "candidate": "**Answer:** Because the Darcy friction factor increases.",
+  "correct": false,
+  "note": "a different but valid mechanism",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "nar-18",
+  "kind": "narrative",
+  "gold": "**Answer:**\nThe pressure drop rises because the transition to turbulent flow increases wall shear.",
+  "candidate": "**Answer:** Turbulent flow has a lower friction factor, so drop falls.",
+  "correct": false,
+  "note": "wrong physics, confident",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "nar-19",
+  "kind": "narrative",
+  "gold": "**Answer:**\nThe pressure drop rises because the transition to turbulent flow increases wall shear.",
+  "candidate": "**Answer:** The answer depends on the pipe roughness.",
+  "correct": false,
+  "note": "deflection to a parameter",
+  "template": null,
+  "options": {}
+ },
+ {
+  "id": "nar-20",
+  "kind": "narrative",
+  "gold": "**Answer:**\nThe pressure drop rises because the transition to turbulent flow increases wall shear.",
+  "candidate": "**Answer:** xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "correct": false,
+  "note": "very long noise",
+  "template": null,
+  "options": {}
+ }
+]
