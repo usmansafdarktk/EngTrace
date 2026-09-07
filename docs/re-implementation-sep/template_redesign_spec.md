@@ -383,7 +383,9 @@ D4.1 comparator specification for all six `kind` values · D4.2 categorical labe
 
 ---
 
-## Phase 5 — Output-contract hygiene (11 templates, adjacent scope)
+## Phase 5 — Output-contract hygiene, and comparator bindings (two tracks)
+
+### Phase 5, Track A — Output-contract hygiene (11 templates, adjacent scope)
 
 Not class-D, but cheap, and **every structural migration trips over these**. Fold in here or run in parallel with Phase 1.
 
@@ -402,8 +404,60 @@ Counts below were verified against source, not inferred from the archive.
 
 **Deliverables:** D5.1 edits · D5.2 corpus-wide marker-conformance scan, all 150, proving zero remaining violations · D5.3 the marker-set decision record.
 **Review:** *Reviewer A* re-runs T4 across all 150 templates, not just the 8 touched.
-**Exit gate:** T4 passes on 150/150; T6 unchanged (these are formatting-only, so any distribution movement indicates an unintended change). **Independent review filed (R2) and every §5 suggestion triaged (R4).**
+**Exit gate (Track A):** T4 passes on 150/150; T6 unchanged (these are formatting-only, so any distribution movement indicates an unintended change).
 **Effort: 6–10 h + 3–4 h review.**
+
+---
+
+### Phase 5, Track B — Comparator bindings and the instruments that validate them
+
+**Added after Phase 4 merged**, from D-058 and Phase 4's residual-risk register.
+**This is a separate track with a separate gate and a separate reviewer.** It
+shares a phase number with Track A and nothing else: Track A edits templates and
+is gated by T4; Track B edits no template at all and is gated by cross-pairing.
+Running them under one gate would be the R6 kitchen-sink anti-pattern, and the
+brief must not merge them.
+
+**The finding that creates the track.** Phase 4 delivered the comparator contract
+and bound **4 of 150 templates** to it. Gold×gold cross-pairing over all 150
+found three real defects the phase's own corpora could not see — because
+`numeric` and `check` had *zero* archived negative instances (Reviewer E, F0):
+
+| # | Defect | Evidence |
+|---|---|---|
+| **N1** | `parse_number` reads the **first** number in the answer span, which is often a grade, a temperature or a formula subscript | confirmed false accept on `hagen_poiseuille_flowrate`; 3 scalar templates in a 12-instance sample; **58 of 150 exposed** |
+| **N2** | an **empty parse compares equal to an empty parse** — `{} == {}` is a `MATCH` | 128 of 132 pairs on `autocorrelation_rect_pulse` |
+| **N3** | **no bindings exist for 146 templates** — no label set, no unit, no answer shape | `euclidean_distance_binary` matches 132/132 |
+
+**N3 is larger than N1 and N2 together.** The comparator does not need more
+rules; it needs bindings, and each binding needs evidence that it discriminates.
+
+| # | Deliverable |
+|---|---|
+| **D5.4** | **Gold×gold cross-pairing as a standing check.** Every kind, no archive needed, truth known without labels. 19,668 pairs over 150 templates today. |
+| **D5.5** | **Archive×gold cross-pairing**, Reviewer E's round-1 instrument promoted from review artefact to standing check. **22,982 real-text pairs** available. |
+| **D5.6** | **Fix N1 by measurement, not by example.** Implement ≥3 candidate extraction rules (last number; number adjacent to a declared unit; `UNRESOLVED` on ambiguity) and **score each against D5.4/D5.5**, then adopt the winner. Choosing on one example is the error shape Phase 4 committed six times. |
+| **D5.7** | **Fix N2**: an unrecoverable parse is `UNRESOLVED`, never `MATCH`, on every code path — including the ones that never reach the CAS. |
+| **D5.8** | **Bindings for the corpus, validated per binding.** Declare `kind`, label sets, units and answer shape per template, and require each to clear a cross-pairing threshold before it counts as bound. Start with the 5 `classification`, 9 `symbolic`, 15 `vector`/`array` and 32 `multipart`; the 89 `scalar` need only a unit. |
+| **D5.9** | **Per-kind negative-instance counts reported beside precision** (Reviewer E, §5: *"precision without it is unreadable"*). |
+| **D5.10** | **Declare units for the 87 templates whose gold answer carries one**, closing D-052 for the bulk of the corpus and leaving the residual named. |
+| **D5.11** | Phase 4 residuals: **R4-11** (`require_origin` is route-3, 0 of 16 archived traces reach its branch), **RB4-1** (the bare-comment proxy treats expletive `it`/`there` as anaphors), **R4-12** (the negative frames' nearest neighbours). |
+
+**Review (Track B):** *Reviewer E — comparator adversary*, whose single mandatory
+task is the gate property below. **Do not re-commission Track A's T4 sweep from
+this reviewer.**
+
+**Exit gate (Track B):**
+- [ ] D5.4 and D5.5 land as runnable standing checks, with their pair counts reported
+- [ ] **Zero false accepts on gold×gold across all 150 templates**, or every remaining one named with a written reason
+- [ ] N1 fixed by a rule **chosen on measured evidence**, with the losing candidates' numbers recorded
+- [ ] N2 fixed: no code path returns `MATCH` from an unrecoverable parse
+- [ ] Per-kind negative counts published beside every precision figure
+- [ ] Bindings declared and cross-pair-validated for every `classification`, `symbolic`, `vector`, `array` and `multipart` template
+- [ ] **Independent review filed (R2) and every §5 suggestion triaged (R4)**
+
+**Effort: 15–25 h + 8–10 h review.** No template redesign; Track B edits
+`tests/comparators/` and `template_inventory.csv` only.
 
 ---
 
