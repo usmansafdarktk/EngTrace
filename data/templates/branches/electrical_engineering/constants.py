@@ -142,39 +142,57 @@ EPSILON_0 = 8.854e-12
 # @kind: range
 # @units: Hz
 # @given: stated (tests/constants_integrity/given_evidence.py: every drawn frequency is printed in the question, 40/40 seeds)
+# @domain: none (a sampling window for generated problems, not a property measured at conditions)
+# [POLICY: sampling-only] a window the C1.3 census classifies PLAUSIBILITY; census --check holds the tag to that class
 FREQUENCY_RANGE_HZ = (50, 2000)
 # @kind: range
 # @units: 1
+# @domain: none (a sampling window for generated problems, not a property measured at conditions)
+# [POLICY: sampling-only] a window the C1.3 census classifies PLAUSIBILITY; census --check holds the tag to that class
 AMPLITUDE_RANGE = (1.0, 50.0)
 # @kind: range
 # @units: deg
 # @given: stated (tests/constants_integrity/given_evidence.py: each drawn phase is printed inside the signal expression the question states - 40/40 in the Nyquist template, and 24/24 of the seeds that draw a degree phase in the conversion template)
+# @domain: none (a sampling window for generated problems, not a property measured at conditions)
+# [POLICY: sampling-only] a window the C1.3 census classifies PLAUSIBILITY; census --check holds the tag to that class
 PHASE_RANGE_DEG = (-180, 180)
 # @kind: range
 # @units: rad
+# @domain: none (a sampling window for generated problems, not a property measured at conditions)
+# [POLICY: sampling-only] a window the C1.3 census classifies PLAUSIBILITY; census --check holds the tag to that class
 PHASE_RANGE_RAD = (-math.pi, math.pi)
 
 # The continuous frequency Omega will be a multiple of pi. This range defines the multiplier.
 # @kind: range
 # @units: 1
+# @domain: none (a sampling window for generated problems, not a property measured at conditions)
+# [POLICY: sampling-only] a window the C1.3 census classifies PLAUSIBILITY; census --check holds the tag to that class
 OMEGA_MULTIPLIER_RANGE = (100, 1000)
 
 # @kind: range
 # @units: Hz
+# @domain: none (a sampling window for generated problems, not a property measured at conditions)
+# [POLICY: sampling-only] a window the C1.3 census classifies PLAUSIBILITY; census --check holds the tag to that class
 SAMPLING_FREQ_RANGE_HZ = (1000, 8000)
 
 # @kind: range
 # @units: Hz
+# @domain: none (a sampling window for generated problems, not a property measured at conditions)
+# [POLICY: sampling-only] a window the C1.3 census classifies PLAUSIBILITY; census --check holds the tag to that class
 F0_RANGE_HZ = (500, 3000) 
 
 # The gain of the discrete-time system
 # @kind: range
 # @units: 1
+# @domain: none (a sampling window for generated problems, not a property measured at conditions)
+# [POLICY: sampling-only] a window the C1.3 census classifies PLAUSIBILITY; census --check holds the tag to that class
 GAIN_K_RANGE = (0.5, 5.0)
 
 # The delay (in samples) of the discrete-time system
 # @kind: range
 # @units: sample
+# @domain: none (a sampling window for generated problems, not a property measured at conditions)
+# [POLICY: sampling-only] a window the C1.3 census classifies PLAUSIBILITY; census --check holds the tag to that class
 DELAY_N0_RANGE = (1, 10)
 
 
@@ -182,6 +200,8 @@ DELAY_N0_RANGE = (1, 10)
 # @kind: range
 # @units: 1
 # @given: stated (tests/constants_integrity/given_evidence.py: M is printed in the question, 40/40)
+# @domain: none (a sampling window for generated problems, not a property measured at conditions)
+# [POLICY: sampling-only] a window the C1.3 census classifies PLAUSIBILITY; census --check holds the tag to that class
 DECIMATION_FACTOR_M_RANGE = (2, 5)
 
 # Define the pool for denominators of the omega_0 fraction.
@@ -189,4 +209,6 @@ DECIMATION_FACTOR_M_RANGE = (2, 5)
 # @kind: range
 # @units: 1
 # @given: stated (tests/constants_integrity/given_evidence.py: the draw shapes omega_0, which the question states exactly as a reduced fraction, 40/40; the denominator itself is not printed)
+# @domain: none (a sampling window for generated problems, not a property measured at conditions)
+# [POLICY: sampling-only] a window the C1.3 census classifies PLAUSIBILITY; census --check holds the tag to that class
 OMEGA_DENOMINATOR_RANGE = (8, 20)
