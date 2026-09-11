@@ -44,16 +44,18 @@ Each of those checks exists because the acquisition met the failure it catches:
 
 ## What is here
 
-Measured from `MANIFEST.json`: **120 files, 513.0 MB (489.3 MiB), `--verify` 0
-problems.** 13 of them (507.4 MB) are gitignored binaries — see §Git. Re-run
-`--verify` rather than trusting this line.
+Measured from `MANIFEST.json`: **150 files, 515.2 MB (491.3 MiB), `--verify` 0
+problems.** 14 of them (509.4 MB) are gitignored binaries — see §Git. Re-run
+`--verify` rather than trusting this line. (Phase C1 recorded 120 files and 13
+binaries; C3 added 25 targeted saturation files, NIST SP 811 and four WebBook pages.)
 
 | Directory | Source | Files | Grounds |
 |---|---|---:|---|
 | `nist_webbook/` | NIST Chemistry WebBook — Shomate coefficients and heats of formation (Phase C2) | 1 | `CP_PARAMS`, `HEATS_OF_FORMATION` |
 | `codata_2022/` | CODATA 2022 adjustment (`allascii.txt`) | 1 | electrical `C0`, `EPSILON_0` |
-| `nist_fluid_properties/` | NIST WebBook fluid properties: 36 pure fluids, each a full saturation curve and a 1-atm isobar through 20 °C | 72 | fluid densities and viscosities, saturated volumes, Tc, Pc, critical density |
-| `nist_webbook_species/` | WebBook phase-change and condensed-phase pages, 12 species the fluid database does not carry | 24 | critical constants, heats of vaporisation, liquid Cp |
+| `nist_sp811/` | NIST SP 811 (2008), *Guide for the Use of the International System of Units* — added at C3 | 1 | unit conversions for MIL-HDBK-5J values (ksi, lb/in³) |
+| `nist_fluid_properties/` | NIST WebBook fluid properties: 36 pure fluids, each a full saturation curve and a 1-atm isobar through 20 °C; plus 25 saturation files requested in temperature increments (`Type=SatP`) starting ON a temperature a table states (C3) | 97 | fluid densities and viscosities, saturated volumes, Tc, Pc, critical density |
+| `nist_webbook_species/` | WebBook phase-change and condensed-phase pages, 14 species the fluid database does not carry (tungsten hexafluoride and mercury telluride added at C3, for `MANOMETER_FLUIDS`) | 28 | critical constants, heats of vaporisation, liquid Cp |
 | `nist_janaf/` | NIST-JANAF, reference state: Al, C, Cu, Fe, Hg, Pb, Si, W | 8 | solid and liquid Cp |
 | `nasa_tr_r132/` | Svehla (1962), NASA Technical Report R-132 | 1 | Lennard-Jones σ and ε/k |
 | `mil_hdbk_5j/` | MIL-HDBK-5J (2003-01-31), Distribution Statement A — **archive.org's published SHA-1 verified** | 1 | metal E, G, ν, density |
@@ -113,7 +115,7 @@ from a fresh clone**; the tag should say so.
 ## Git — the large binaries are not committed
 
 **Repo owner's decision.** `.gitignore` excludes `docs/references/**/*.pdf`,
-`*.zip` and `*.xlsx` — 13 files, 507.4 MB. What is committed is this README,
+`*.zip` and `*.xlsx` — 14 files, 509.4 MB since C3 added NIST SP 811 (13 files, 507.4 MB at C1). What is committed is this README,
 `fetch_references.py`, `MANIFEST.json`, and the small text, TSV, HTML and JSON
 sources. Do not force-add a binary or move them to Git LFS.
 
