@@ -40,8 +40,16 @@ REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 if REPO not in sys.path:
     sys.path.insert(0, REPO)
 
+import re
+
 COLUMNS = ("A", "A2", "A3", "c4", "inv_c4", "B3", "B4", "B5",
            "B6", "d2", "inv_d2", "d3", "D1", "D2", "D3", "D4")
+
+
+def _row(n):
+    from data.templates.branches.industrial_engineering.constants import (
+        CONTROL_CHART_FACTORS)
+    return CONTROL_CHART_FACTORS[n]
 _N = NormalDist()
 L, STEPS = 8.0, 1600          # Simpson panels on [-8, 8]; the tails beyond carry < 1e-14
 
@@ -131,8 +139,40 @@ def compare(table=None, literal_tokens=None):
     return out
 
 
+def literal_tokens_from_source(path=None):
+    """{(n, column): "1.0510"} - the literal AS WRITTEN, not as the float reprs it.
+
+    repr(1.0510) is '1.051', so a cell written to 4 dp with a trailing zero is checked
+    at 3 dp unless the token is read from the source. 39 of 384 cells are written that
+    way, and both cells that survived the C3.7 correction were among them (Reviewer H,
+    industrial, F1/F2). `compare()` always had the parameter; nothing passed it.
+    """
+    if path is None:
+        path = os.path.join(REPO, 'data', 'templates', 'branches',
+                            'industrial_engineering', 'constants.py')
+    src = open(path, encoding='utf-8').read()
+    body = src[src.index('CONTROL_CHART_FACTORS = {'):]
+    body = body[:body.index('\n}')]
+    out = {}
+    for line in body.split('\n'):
+        m = re.match(r'\s*(\d+):\s*\((.*)\),\s*$', line)
+        if not m:
+            continue
+        toks = [t.strip() for t in m.group(2).split(',')]
+        if len(toks) != len(COLUMNS):
+            continue
+        for col, tok in zip(COLUMNS, toks):
+            out[(int(m.group(1)), col)] = tok
+    return out
+
+
 def run():
-    rows = compare()
+    tokens = literal_tokens_from_source()
+    rows = compare(literal_tokens=tokens)
+    reduced = sum(1 for (n, col), tok in tokens.items() if _places(tok) != _places(repr(
+        dict(zip(COLUMNS, _row(n)))[col])))
+    print(f'{len(tokens)} literals read from the source; {reduced} are written with a '
+          f'trailing zero and would be checked at reduced precision without them')
     bad = [r for r in rows if not r[5]]
     print(f'{len(rows)} cells derived; {len(rows) - len(bad)} agree with the table at its printed places, '
           f'{len(bad)} do not')
