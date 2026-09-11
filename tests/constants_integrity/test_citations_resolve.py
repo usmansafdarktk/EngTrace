@@ -37,7 +37,10 @@ and seven are added, one per clause of the C1.2 vocabulary (spec §C1.2):
       `page=` [+ `text=`] (PDF), `member=` (zip), `text=` (HTML / text), and
       `member=` + `wavelength=<x>nm|um` (the refractiveindex.info archive: the
       index EVALUATED at that wavelength, refused outside the dataset's range;
-      tests/constants_integrity/refractiveindex.py).
+      tests/constants_integrity/refractiveindex.py), and `sheet=` + `label_col=` +
+      `rows=all` + `blocks=` on an .xlsx: a WHOLE-TABLE relation, every leaf of a
+      nested table against its cell (tests/constants_integrity/xlsx_cells.py; the
+      AISC Shapes Database repeats its headers in a US and an SI block).
   R4  the RELATION holds. `precision=exact|<n>sf|<n>dp`: the constant equals the
       artefact value at that precision, exactly. `tol=<x>%`: it lies within.
       Neither: the value is not machine-compared, and the citation is counted
@@ -450,6 +453,45 @@ def _mil_value(path, page, key, col):
     return float(tok), None
 
 
+def _xlsx_whole_table(path, table, kv):
+    """(cells checked, [disagreements], error) - every leaf of a nested dict table
+    against its cell in an .xlsx, one header block per row sub-dict."""
+    from tests.constants_integrity.xlsx_cells import Workbook
+    if kv.get('rows') != 'all':
+        return 0, [], 'an .xlsx locator is a whole-table relation and needs rows=all'
+    if 'precision' not in kv:
+        return 0, [], 'an .xlsx whole-table relation needs precision='
+    if not isinstance(table, dict):
+        return 0, [], 'the table is not a dict of rows'
+    for need in ('sheet', 'label_col', 'blocks'):
+        if need not in kv:
+            return 0, [], f'an .xlsx locator needs {need}='
+    blocks = [tuple(b.split(':')) for b in kv['blocks'].split(',')]
+    if any(len(b) != 3 or not b[1].isdigit() for b in blocks):
+        return 0, [], f'blocks={kv["blocks"]!r} is not name:number:label-source[,...]'
+    wb = Workbook(path)
+    n, bad = 0, []
+    for key, row in table.items():
+        if not isinstance(row, dict):
+            return n, bad, f'row {key!r} is not a dict'
+        for name, num, src in blocks:
+            label = key if src == 'key' else row.get(src)
+            if label is None or not isinstance(row.get(name), dict):
+                return n, bad, f'row {key!r} has no {name!r} block or no {src!r} label'
+            for field, v in row[name].items():
+                n += 1
+                try:
+                    cell = wb.cell(kv['sheet'], kv['label_col'], label, field, block=int(num))
+                    target = _rounded(float(cell), kv['precision'])
+                except LookupError as exc:
+                    return n, bad, f'{key}[{name!r}][{field!r}]: {exc}'
+                except ValueError as exc:
+                    return n, bad, f'{key}[{name!r}][{field!r}]: {exc}'
+                if isinstance(v, bool) or not isinstance(v, (int, float)) or not _same(v, target):
+                    bad.append(f'{key}[{name!r}][{field!r}] = {v!r}, the sheet has {cell}')
+    return n, bad, None
+
+
 def _solve_via(ns, via, const):
     """The cited quantity x, from a table that stores NAME/x (or x itself)."""
     if via == 'x':
@@ -633,6 +675,16 @@ def check_source(branch, src, refs=REFS, manifest=None, kinds=None):
         # R3 - the locator resolves
         ext = rel.rsplit('.', 1)[-1].lower()
         value, err, brackets = None, None, None
+        if 'sheet' in kv and ext == 'xlsx':
+            n_cells, disagree, err = _xlsx_whole_table(full, ns.get(tag['table']), kv)
+            if err:
+                failures.append(f'R3 {where}: {err}')
+            elif disagree:
+                failures.append(f'R4 {where}: {len(disagree)} of {n_cells} cells disagree; '
+                                f'first: {disagree[0]}')
+            else:
+                counts['resolved'] += 1
+            continue
         if 'member' in kv and 'wavelength' in kv and ext == 'zip':
             value, brackets, err = _index_at(full, kv['member'], kv['wavelength'])
         elif 'page' in kv and 'mil' in kv and ext == 'pdf':
@@ -829,9 +881,26 @@ MIL_MODULI = {
     # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=841 mil="E" scale=1e3 precision=exact
     "AZ31B sheet, E": 6500,
 }
+
+# @kind: standard
+# @units: us.W=lb/ft
+# [ON-DISK] civil/aisc_shapes_database_v16.xlsx @ sheet="Database v16.0" label_col="AISC_Manual_Label" rows=all blocks="us:1:key,si:2:si_label" precision=exact
+AISC_ONE = {
+    "W8X24": {"us": {"W": 24, "A": 7.08, "d": 7.93, "Ix": 82.7, "Sx": 20.9, "Zx": 23.1, "rx": 3.42},
+              "si_label": "W200X35.9", "si": {"W": 35.9, "A": 4570, "d": 201, "Ix": 34.4, "Sx": 342, "Zx": 379, "rx": 86.9}},
+}
 '''
 
 _PLANTS = [
+    # An .xlsx whole-table relation (C3.7, AISC_W_SHAPES). Three different ways to be
+    # wrong about a sheet: a transposed value, the SI fields read from the US header
+    # block, and a row the sheet does not have.
+    ('R4', 'a transposed value in one leaf of a whole-table relation (Ix 82.7 -> 87.2)',
+     '"Ix": 82.7,', '"Ix": 87.2,'),
+    ('R3', 'the SI fields read from the US header block (si:1 for si:2)',
+     'blocks="us:1:key,si:2:si_label"', 'blocks="us:1:key,si:1:si_label"'),
+    ('R3', 'a shape the sheet does not carry',
+     '"W8X24": {"us"', '"W8X25": {"us"'),
     # Rounding convention (D-012): NIST prints 0.0010435, an exact decimal tie at 4 s.f.
     # and at 6 d.p. The clean rows carry the decimal half-up value; each plant carries
     # the value a BINARY rounding of the parsed float gives, which must fail - in both
