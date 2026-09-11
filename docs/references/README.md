@@ -179,7 +179,10 @@ or `image-only`] (PDF), `member=` (zip), `text=` (HTML/text).
 `# @kind:` (`property`, `standard`, `measured-constant`, `defined`,
 `mathematical`, `range`, `validity`), `# @units:` (one grammar, see
 `test_table_metadata.py`), `# @domain:` (a validity domain or `none (reason)`;
-C3 fills it).
+C3 fills it). Two more where they apply (SPEC-CHANGE 22): `# @given: stated|guard
+(evidence)` for a `range` the probe cannot settle, citing committed evidence; and
+`# @copied-in: <template_id> <literal>` for a template that copies a value instead
+of reading it, which the census verifies against the template's source.
 
 **What enforces it.**
 
@@ -187,7 +190,8 @@ C3 fills it).
 |---|---|
 | `test_citations_resolve.py` | C2's P1-P4, and R1-R7: every tag parses; an `[ON-DISK]` file exists, is vouched for by `MANIFEST.json` and matches its SHA-256; the locator resolves; the stated relation holds; local-only is counted; payload classes state their payload; the tag agrees with `@kind`. `--selftest` plants ten defects. |
 | `test_table_metadata.py` | every numeric table declares `@kind` and `@units`, every field has a unit, every unit parses; `@domain` is declared or on the ratcheted C3 worklist. `--selftest` plants eleven. |
-| `census.py` | the classification: which tables need a citation and which only a plausibility window, measured by perturbing each field and watching the question. `--selftest` plants the predicate's own defect shapes. |
+| `census.py` | the classification: which tables need a citation and which only a plausibility window, measured by perturbing each field and watching the question; `--check` fails on a table it cannot classify. `--selftest` plants the predicate's own defect shapes. |
+| `given_evidence.py` | every `@given: stated` backed by a run: each consumer's drawn value is printed in its question on every seed; a declaration citing no committed evidence fails. `--selftest` plants ten. |
 
 **Deprecated, and counted as `LEGACY` until C3.7 retags them:** `[VERIFY: X]`,
 `[REALISM]`, `[DERIVABLE]`, `[ON-DISK: xlsx]`, `[ON-DISK visual]`, and an

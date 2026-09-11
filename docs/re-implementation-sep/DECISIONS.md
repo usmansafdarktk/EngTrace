@@ -2923,6 +2923,94 @@ And one crash: `os.replace` on the manifest raised `PermissionError` on the 78th
 ~150 saves, a transient Windows file lock. Bounded retry. The handed-over
 `MANIFEST.json` was overwritten by that run before it crashed and was never
 committed, so whether it already carried the wrong URLs cannot be established.
+
+## D-073 — Reviewer G (C1): four of my census predicates were wrong, and fixing one exposed eleven tables whose class nobody had checked
+
+**Date:** 2026-09-12 · **Status:** DECIDED · **Source:** C1 Reviewer G,
+`reviews/phaseC1_reviewer_g_provenance.md` (filed at `0f4b8cf`, committed
+unmodified as `254c4da`) · **SPEC-CHANGE 22**
+
+**Verdict PASS WITH FINDINGS.** G checked 14 PLAUSIBILITY tables from template
+source and runs - all agreed - and 10 UNCONSUMED tables individually, with all 32
+swept by name, dynamic access and literal copy. Three findings are CONFIRMED and
+blocked the merge; all three are fixed, each with plants. **The fixes were not
+re-reviewed by G**; C3's Reviewer G reads the same census.
+
+### Findings
+
+| # | Finding | Disposition | Action |
+|---|---|---|---|
+| **G-1** | `SCS_IA_RATIO` is consumed through a copied literal `0.2` (and `0.8`, `0.4`, `0.04` derived from it) that name-based detection cannot see; the census called it UNCONSUMED; a correction to the table would never reach the item | `ADOPT-NOW` + `ADOPT-PHASE-C3` | P-COPY: a copy is declared in the table header (`@copied-in`) and the census VERIFIES the literal is in that template's source, counting it as a consumer - COPIED → CITATION. Making the template read the table is C3.8, a P6 event with a before/after dump; it is not byte-identical by construction (`0.2**2 != 0.04` in binary) |
+| **G-2** | An all-crash probe rolled up as NO-EFFECT, and `classify` then granted PLAUSIBILITY "as a guard" (`SERVICE_LEVELS`) | `ADOPT-NOW` + `SPEC-CHANGE` | ERROR is its own measurement; a `range` measured ERROR or INDETERMINATE is REVIEW until its header declares `@given: stated\|guard (evidence)`; `census --check` fails on REVIEW. **The first fix was incomplete one level down** - below |
+| **G-3** | A graded chart-selection rule (Montgomery's "n > 10 or 12") rests only on two UNCONSUMED tables; the question never states it | `PLAUSIBLE` → `ADOPT-PHASE-C3` | Written response: UNCONSUMED is right by the letter, and the rule is still an unsourced warrant for a hidden, answer-deciding choice. C3.9's inline-window register names it; C3 decides whether the template states the rule or reads and cites the table |
+| **G-4** | `PHASE_RANGE_RAD = (-math.pi, math.pi)` is read by a template but has no numeric literal, so it sat outside the census and the metadata check | `ADOPT-NOW` | P-TABLE-LIVE: a table whose *value* holds a number is classified and held to `@kind`/`@units`; the coverage predicate is unchanged, so the brief's figures still reproduce. Measured: the only such table in five branches |
+
+### §5 suggestions
+
+| Suggestion | Disposition | Reason / action |
+|---|---|---|
+| A mechanical literal-copy sweep over every table leaf | `ADOPT-PHASE-C3` (C3.8) | G-1 came from doing this by hand for ~12 values; it also catches CITATION values drifting into inline copies |
+| An inline-window register for named-entity facts that never reach a table | `ADOPT-PHASE-C3` (C3.9) | Includes G-3 and `two_phase_specific_volume` |
+| `SPECIFIC_GRAVITY_RANGES`' sand row is nearly a single mineral value | `ADOPT-PHASE-C3` (C3.2) | Stays `range` - stated in all five consumers - and C3.2 checks the window against Das |
+| No kind for a one-sided screening threshold | `SPEC-CHANGE` (22) | `range` includes a one-sided screening bound on drawn values |
+| Define "guard" statically rather than from a probe that cannot tell a guard from a crash | `SPEC-CHANGE` (22) + `ADOPT-PHASE-C3` (C3.10) | C1 requires a declared, evidenced verdict; the static detector is C3's |
+| Consumer counts look inflated (`QUEUE_SCENARIOS` 4 vs 2) | `ADOPT-NOW` | **Confirmed, and the class was wider than G saw.** P-CONSUMER was flow-insensitive: a helper name bound from a table in one module-level loop and rebound from unrelated data in the next "stood for" the table in both. Rewritten flow-sensitively with a name-reuse plant; `QUEUE_SCENARIOS` now has 2 consumers |
+| Look closer at `continuous_to_discrete_conversion`'s phase | `ADOPT-NOW` | `given_evidence.py` measures the degree phase printed on 24/24 of the seeds that draw it; `PHASE_RANGE_RAD` measures ALL-RESTATED |
+| The optional part was not attempted | - | Nothing to triage |
+
+### The first fix for G-2 was incomplete, and a plant found it
+
+The first repair added an ERROR rollup. The census self-test's new `WINDOW2` plant -
+a window restated on some seeds and rewording the question on others - still read
+ALL-RESTATED. `field_verdict` returned the FIRST of HIDDEN, RESTATED, STRUCTURAL,
+ERROR present, so a field restated on one seed and crashing on another reported
+RESTATED, and G-2's escape stayed open. Precedence now puts what the probe cannot
+settle above RESTATED.
+
+**That exposed eleven `range` tables classified PLAUSIBILITY at `0f4b8cf` on a
+RESTATED that masked a crash or a rewording.** Each now declares `@given: stated`
+with committed evidence:
+
+- five cite G's committed scripts, which measured exactly this (G §2 rows 1,
+  10-13): `SPECIFIC_GRAVITY_RANGES`, `QUEUE_SCENARIOS`, `NEWSVENDOR_ITEMS`,
+  `COMPONENT_RELIABILITY_CLASSES`, `SPC_CHARACTERISTICS`;
+- six cite `tests/constants_integrity/given_evidence.py`, which captures each
+  consumer's locals at return and requires every drawn value printed in the
+  question: `FREQUENCY_RANGE_HZ`, `PHASE_RANGE_DEG`, `DECIMATION_FACTOR_M_RANGE`,
+  `OMEGA_DENOMINATOR_RANGE`, `HOLDING_RATE_PER_YR`, `INVENTORY_ITEMS` - 19 checks,
+  all on every seed that draws the value. `OMEGA_DENOMINATOR_RANGE`'s draw is not
+  printed itself; the question states the reduced fraction it produces, exactly.
+
+Fifteen `@given` declarations in all (these eleven and the four G's report settled
+directly); the ratchet fails one that cites no committed evidence.
+
+### And my rewrite broke something G had not
+
+The flow-sensitive rewrite replaced a table's own entry with the tables it is built
+from, so `RESISTOR_SERIES_BY_TOLERANCE` (built from the IEC lists) lost its consumer
+and dropped to UNCONSUMED, and `MEDIA_VELOCITIES` (built from `C0`) lost its
+order-dependent draw; and it reported the scalar `SHEWHART_K_SIGMA` as drawn by
+order. All three were found by diffing every table's class, consumers and draws
+against the pre-review census - not by a plant, because there was none for a table
+that is both a table and an alias. There are two now.
+
+### Result
+
+**108 tables** (107 P-TABLE + 1 P-TABLE-LIVE): **CITATION 37 · PLAUSIBILITY 30 ·
+DERIVATION 4 · DEFINITION 5 · DOMAIN 1 · UNCONSUMED 31**, `census --check` clean.
+Against `0f4b8cf` the only class moves are `SCS_IA_RATIO` (UNCONSUMED → CITATION)
+and the new `PHASE_RANGE_RAD`. The eleven were right at `0f4b8cf` by accident: the
+measurement under them could not have said otherwise.
+
+### A correction to D-070
+
+D-070 says the literal given-values rule would have excused "`MATERIAL_DENSITIES`,
+`FLUID_DENSITIES`, `CRITICAL_PROPERTIES` and 20 other property tables" - 23, a
+number I did not count. **Counted from the census:** at `0f4b8cf`, **25** tables of
+kind `property`, `standard` or `measured-constant` measured ALL-RESTATED, **15** of
+them `property`; under the corrected precedence, **16** (10 `property`), the other
+nine restating on most seeds and rewording the question on some. The argument
+stands; the figure was wrong. DECISIONS is append-only, so it is corrected here.
 ## Open decisions
 
 | # | Decision | Needed before |

@@ -586,6 +586,9 @@ C1.3 is the deliverable that sizes the rest of the track, and it will shrink it 
 **Exit gate.** All 43 tables classified; pilot table complete; unit declarations specified. **Independent review filed (R2) and every §5 suggestion triaged (R4).**
 **Effort: 12–20 h.**
 
+> **C1 CLOSED 2026-09-12.** Close-out, gate table and R4 triage in
+> [`phaseC1_summary.md`](phaseC1_summary.md); Reviewer G's triage is D-073.
+
 > **AMENDED by SPEC-CHANGE 20 and 21 (D-069, D-070, D-071).** C1 ran *after* C2, and
 > C2 had already met evidential situations this section's two-tag scheme cannot
 > express - *checked and failed*, *exact by definition*, *computed here* (D-035) -
@@ -694,6 +697,34 @@ that (`phaseC2_summary.md` §6). So:
 **43 tables was a definition, not a count**: under the published predicate the
 three original branches hold 38, and all five hold 107.
 
+> **AMENDED by SPEC-CHANGE 22 (D-073), after C1 Reviewer G.** Three rules in §C1.3
+> were measured wrong or incomplete by the review, and one kind was missing.
+>
+> 1. **A crash under the nudge is not evidence of a guard.** When a perturbed
+>    table makes a consumer *raise*, the probe has learned that the table is read,
+>    not how. The census therefore records `ERROR` separately, and a `range`
+>    measured `ERROR` or `INDETERMINATE` is classed `REVIEW` - never PLAUSIBILITY -
+>    until its header declares **`# @given: stated (<evidence>)`** or
+>    **`# @given: guard (<evidence>)`**, naming where the verdict was established.
+>    `NO-EFFECT` (nothing changed and nothing raised) still reads as a guard (G-2).
+> 2. **A copied literal is consumption.** A template that writes a table's value
+>    as a number instead of reading it consumes the table, and a correction to the
+>    table will never reach the item. Name-based detection cannot see it. A copy
+>    found is declared in the table's header as **`# @copied-in: <template_id>
+>    <literal>`**; the census verifies the literal is in that template's source
+>    and counts it as a consumer, so the declaration fails the moment the copy is
+>    removed (G-1). Finding copies is C3's literal-copy sweep; C1 declares the one
+>    the review found.
+> 3. **A table built only from named constants is still a table.** A value like
+>    `(-math.pi, math.pi)` holds numbers and no numeric literal. The coverage
+>    predicate P-TABLE stays as the brief wrote it; classification and the
+>    `@kind`/`@units` check cover every UPPER_CASE name whose *value* holds a
+>    number (G-4).
+> 4. **`range` includes a one-sided screening bound** on values drawn for a
+>    hypothetical specimen or scenario (a metrology floor below which a draw is
+>    rejected) - it asserts nothing about a named entity, and the kind list had no
+>    home for it (G §5).
+
 ---
 
 ## Phase C2 — Chemical thermochemistry ← **critical path**
@@ -741,6 +772,15 @@ Everything else, in parallel with Track A Phases 1, 4 and 5.
 **Two known data-integrity defects to resolve here**, both found in the audit: `template_two_phase_specific_volume` names a real substance from `THERMO_SUBSTANCES` but **invents** V_l/V_v randomly, ignoring `REAL_FLUID_DATA` (Ammonia v_g 0.754 vs true 0.1284 m³/kg); and `template_floating_object_submersion_depth` has a hardcoded fallback injecting "Pine Wood" at 500 kg/m³, which is not a `MATERIAL_DENSITIES` entry.
 
 **Deliverables.** C3.1 re-derived tables with citations · C3.2 plausibility suite per table (order-of-magnitude and cross-property consistency checks) · C3.3 the two data-integrity fixes · C3.4 impact statement — which templates' answer distributions move, and by how much · C3.5 residual `[UNVERIFIED]` register for anything that could not be sourced, **left explicitly tagged rather than quietly accepted**
+
+> **ADDED by C1's R4 triage (D-070, D-071, D-073)** — each an `ADOPT-PHASE-C3` item, so each is a named deliverable here:
+>
+> - **C3.8 — a literal-copy sweep.** For every leaf of every table, search the templates outside `constants.py` for the value at the table's own precision, and triage every hit: a declared `@copied-in`, a template changed to read the table (a P6 event with a before/after dump), or a coincidence. `SCS_IA_RATIO` is the first found (C1 G-1); its template change is not byte-identical by construction (`0.2**2 != 0.04`).
+> - **C3.9 — an inline-window register.** Named-entity facts that enter items as inline literals instead of tables: `two_phase_specific_volume`'s volumes (C3.3), `e_ranges` "anchored to Das Table 3.1", Terzaghi's `phi = 35`, the permeability window [0.02, 0.09], and `chart_pair_selection`'s undeclared n > 10–12 rule (C1 G-3). Each moves into a tagged table or is registered with a reason.
+> - **C3.10 — a static guard detector** (a table read only inside an `assert` or an `if` test), replacing declared `@given: guard` verdicts where it can (C1 G §5).
+> - **C3.2 amended:** a plausibility check of `SPECIFIC_GRAVITY_RANGES` against Das (C1 G §5); and repair of the C2.2 suite's stale flame-temperature NOTE, which measures `CP_VALID_T_MAX` for a template that has read `CP_PARAMS_COMBUSTION` since D-036.
+> - **C3.6 context:** `EPSILON_0`'s 4-s.f. rounding sits 2.1e-5 relative from CODATA and is hidden in four templates that declare no `TOLERANCE` (D-071).
+> - **C3 starts from:** 47 LEGACY tags (C3.7's worklist), 106 tables on the `@domain` worklist, 15 `@given` declarations (6 backed by `given_evidence.py`, 9 by C1 Reviewer G's committed scripts) to re-verify whenever a consumer changes, and the saturation-row re-acquisition in `phaseC1_summary.md` §10.
 
 **Review.** *Reviewer H* (domain, per branch) on an independent sample per table; *Reviewer G* confirms every table now carries a tag and a unit declaration, and that C3.5 is honest.
 
@@ -1029,6 +1069,7 @@ Read the hours as effort. Wall-clock is a fraction of them, and the difference i
 | SPEC-CHANGE 19 | **A unit is DECLARED, never derived from gold's string** -- D5.10 delivers the census and the comparator does not consume it (D-067; Reviewer E, E-2/E-3/E-5) | D4.1 |S|4.1 already said why the unit check is opt-in: *"inferring the unit from gold's string instead would reject `7.65 litres`, which is correct. That trade is why it is opt-in."* D5.10 inferred it from gold's string and the predicted rejection arrived on real archived text -- `17.46 s` against a gold of `17.46 seconds`, marked WRONG. The trailing-token derivation also does not yield units at all: `otherwise`, `e-05`, `units`, `percent`, `dollars`, `subgroups`. Ablated per the phase's own stopping rule: it cost **19 of the 82** matches on real archived answers and caught 2, so it is deleted rather than patched. |
 | SPEC-CHANGE 20 | **Track B's provenance vocabulary is seven classes plus a local-only qualifier, with machine-readable `@kind` / `@units` / `@domain` table fields and a classification rule computed from a published census** (§C1.2–C1.5; D-069, D-070, D-071) | C1.3 defined two tags; C2 needed four and invented them off-spec (D-035); civil and industrial grew a second vocabulary; and nothing distinguished a citation a clone can check from one only a single machine can. Applied literally, the given-values rule would also have classed restated material densities as sampling policy - it excuses *correctness*, not *truth*, and C2 §6 shipped 274 items that were self-consistent and false. |
 | SPEC-CHANGE 21 | **Every citation gate reads "a retrievable on-disk artefact and a locator within it", never "edition + page"** (C2's and C3's exit gates) | Unsatisfiable by construction once the acquired artefact was a CAS-keyed JSON or a NIST TSV. Raised by both C2 reviewers, recorded as a SPEC-CHANGE, and never applied - so C3 was about to inherit an impossible gate. |
+| SPEC-CHANGE 22 | **§C1.3 amended after C1 Reviewer G: a crash under the nudge is not a guard; a declared, verified literal copy is consumption; a table built only from named constants is classified; `range` includes a one-sided screening bound** (D-073) | The census rolled an all-crash probe up as NO-EFFECT and granted it PLAUSIBILITY "as a guard" (G-2); it classified `SCS_IA_RATIO` unconsumed while a template copied its value into every question (G-1); and `PHASE_RANGE_RAD`, read by a template, had no numeric literal and so sat outside the census and the metadata check (G-4). A `range` the probe cannot settle now needs a declared `@given` with its evidence. |
 
 ---
 
