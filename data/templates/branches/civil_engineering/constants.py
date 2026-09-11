@@ -92,11 +92,16 @@ LIVE_LOADS_KPA = {
     "ordinary flat roof": 0.96,
 }
 
-# W-shape section properties — AISC Shapes Database v16.0  [ON-DISK: xlsx]
+# W-shape section properties — AISC Shapes Database v16.0
 # 'us': W lb/ft, A in^2, d in, Ix in^4, Sx in^3, Zx in^3, rx in
 # 'si': W kg/m,  A mm^2, d mm, Ix 10^6 mm^4, Sx 10^3 mm^3, Zx 10^3 mm^3, rx mm
 # @kind: standard
 # @units: us.W=lb/ft, us.A=in^2, us.d=in, us.Ix=in^4, us.Sx=in^3, us.Zx=in^3, us.rx=in, si.W=kg/m, si.A=mm^2, si.d=mm, si.Ix=1e6*mm^4, si.Sx=1e3*mm^3, si.Zx=1e3*mm^3, si.rx=mm
+# @domain: none (section geometry of rolled shapes; no temperature or condition applies)
+# [ON-DISK] civil/aisc_shapes_database_v16.xlsx @ sheet="Database v16.0" label_col="AISC_Manual_Label" rows=all blocks="us:1:key,si:2:si_label" precision=exact
+#   Every leaf - 14 shapes x 7 US and 7 SI fields, 196 - equals its cell: the US header
+#   block labelled by the row key, the SI block by the row's si_label
+#   (tests/constants_integrity/xlsx_cells.py). Checked on every resolver run.
 AISC_W_SHAPES = {
     "W8X24":   {"us": {"W": 24,  "A": 7.08, "d": 7.93, "Ix": 82.7, "Sx": 20.9, "Zx": 23.1, "rx": 3.42},
                 "si_label": "W200X35.9", "si": {"W": 35.9, "A": 4570, "d": 201, "Ix": 34.4, "Sx": 342, "Zx": 379, "rx": 86.9}},

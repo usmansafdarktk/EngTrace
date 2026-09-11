@@ -38,7 +38,6 @@ civil_engineering.CONCRETE_EC_COEFF_PSI
 civil_engineering.CONCRETE_EC_COEFF_MPA
 civil_engineering.LIVE_LOADS_PSF
 civil_engineering.LIVE_LOADS_KPA
-civil_engineering.AISC_W_SHAPES
 civil_engineering.SPECIFIC_GRAVITY_RANGES
 civil_engineering.PERMEABILITY_RANGES_CM_S
 civil_engineering.DAS_NATURAL_STATE_SOILS
