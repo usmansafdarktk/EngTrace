@@ -1,0 +1,2262 @@
+{
+ "generated_utc": "2026-09-11T17:13:46Z",
+ "generator": "docs/references/fetch_references.py",
+ "local_only_copyrighted": {
+  "files": [
+   {
+    "bytes": 988154,
+    "path": "pilot/references/public/full_books_civil_engineering/Chin \u2014 Water-Resources Engineering.pdf"
+   },
+   {
+    "bytes": 6903477,
+    "path": "pilot/references/public/full_books_civil_engineering/Chow, Maidment, Mays \u2014 Applied Hydrology.pdf"
+   },
+   {
+    "bytes": 15961381,
+    "path": "pilot/references/public/full_books_civil_engineering/Das, Sivakugan \u2014 Principles of Foundation Engineering.pdf"
+   },
+   {
+    "bytes": 35601014,
+    "path": "pilot/references/public/full_books_civil_engineering/Das, Sobhan \u2014 Principles of Geotechnical Engineering.pdf"
+   },
+   {
+    "bytes": 53511803,
+    "path": "pilot/references/public/full_books_civil_engineering/Hibbeler \u2014 Structural Analysis.pdf"
+   },
+   {
+    "bytes": 27551691,
+    "path": "pilot/references/public/full_books_civil_engineering/Holtz, Kovacs, Sheahan \u2014 An Introduction to Geotechnical Engineering.pdf"
+   },
+   {
+    "bytes": 17628622,
+    "path": "pilot/references/public/full_books_civil_engineering/Kassimali \u2014 Structural Analysis.pdf"
+   },
+   {
+    "bytes": 11281905,
+    "path": "pilot/references/public/full_books_civil_engineering/Knappett, Craig \u2014 Craig's Soil Mechanics.pdf"
+   },
+   {
+    "bytes": 32181761,
+    "path": "pilot/references/public/full_books_civil_engineering/Leet, Uang, Lanning \u2014 Fundamentals of Structural Analysis.pdf"
+   },
+   {
+    "bytes": 12645852,
+    "path": "pilot/references/public/full_books_civil_engineering/open-channel-hydraulics-by-terry-w-sturm-www-civilenggforall-com.pdf"
+   },
+   {
+    "bytes": 58031335,
+    "path": "pilot/references/public/full_books_industrial_engineering/Grant & Leavenworth, Statistical Quality Control.pdf"
+   },
+   {
+    "bytes": 12994666,
+    "path": "pilot/references/public/full_books_industrial_engineering/Hillier & Lieberman, Introduction to Operations Research.pdf"
+   },
+   {
+    "bytes": 12533672,
+    "path": "pilot/references/public/full_books_industrial_engineering/Mitra, Fundamentals of Quality Control and Improvement.pdf"
+   },
+   {
+    "bytes": 10076025,
+    "path": "pilot/references/public/full_books_industrial_engineering/Montgomery, Introduction to Statistical Quality Control.pdf"
+   },
+   {
+    "bytes": 85286636,
+    "path": "pilot/references/public/full_books_industrial_engineering/Nahmias & Olsen, Production and Operations Analytics.pdf"
+   },
+   {
+    "bytes": 6775021,
+    "path": "pilot/references/public/full_books_industrial_engineering/Ross, Introduction to Probability Models.pdf"
+   },
+   {
+    "bytes": 2982476,
+    "path": "pilot/references/public/full_books_industrial_engineering/Silver, Pyke & Thomas, Inventory and Production Management in Supply Chains.pdf"
+   },
+   {
+    "bytes": 8268567,
+    "path": "pilot/references/public/full_books_industrial_engineering/Taha, Operations Research An Introduction.pdf"
+   }
+  ],
+  "note": "Copyrighted textbooks present on ONE machine, under the gitignored pilot/references/. A citation to one of these cannot be resolved from a fresh clone. Never copy, commit or redistribute."
+ },
+ "sources": {
+  "aisc_shapes_v16": {
+   "bytes": 2028540,
+   "dest": "civil/aisc_shapes_database_v16.xlsx",
+   "grounds": [
+    "civil_engineering: AISC_W_SHAPES"
+   ],
+   "group": "civil",
+   "id": "aisc_shapes_v16",
+   "kind": "zip",
+   "licence": "Distributed free of charge by AISC",
+   "retrieved_utc_note": "acquired by a run that was stopped before its manifest was written; file mtime 2026-09-11T12:18:23Z is the best available retrieval time",
+   "sha256": "82d0ceb96a0d938ae1a6bd9637cb10a1e269225b5d668dce5b0bdc8d86013496",
+   "status": "present",
+   "url": "https://cloud.aisc.org/biggie_bin/aisc-shapes-database-v160-2.xlsx",
+   "url_verified": "2026-09-11: download byte-identical (SHA-256) to the recorded file"
+  },
+  "codata_2022": {
+   "bytes": 40801,
+   "dest": "codata_2022/allascii.txt",
+   "grounds": [
+    "electrical_engineering: C0, EPSILON_0"
+   ],
+   "group": "constants",
+   "id": "codata_2022",
+   "kind": "text",
+   "licence": "US Government work (NIST)",
+   "retrieved_utc_note": "acquired by a run that was stopped before its manifest was written; file mtime 2026-09-11T12:04:25Z is the best available retrieval time",
+   "sha256": "77fb90e66c40db3e6eb16630bc9c88e4c7c8beddbe5e71be406f2f26e3f67e67",
+   "status": "present",
+   "url": "https://physics.nist.gov/cuu/Constants/Table/allascii.txt"
+  },
+  "fhwa_hds4": {
+   "bytes": 4138821,
+   "dest": "civil/fhwa_hds4_highway_hydraulics.pdf",
+   "grounds": [
+    "civil_engineering: MANNINGS_N_CHANNELS, MANNINGS_N_CONDUITS"
+   ],
+   "group": "civil",
+   "id": "fhwa_hds4",
+   "kind": "pdf",
+   "licence": "US Government work (FHWA)",
+   "retrieved_utc_note": "acquired by a run that was stopped before its manifest was written; file mtime 2026-09-11T12:07:49Z is the best available retrieval time",
+   "sha256": "789e160eff85dcc08e147d25f95e49db9605495a8f64de30f3afed7ebd1fe3c3",
+   "status": "present",
+   "url": "https://www.fhwa.dot.gov/engineering/hydraulics/pubs/08090/HDS4_608.pdf"
+  },
+  "fhwa_hec22": {
+   "bytes": 9701919,
+   "dest": "civil/fhwa_hec22_urban_drainage.pdf",
+   "grounds": [
+    "civil_engineering: RATIONAL_C"
+   ],
+   "group": "civil",
+   "id": "fhwa_hec22",
+   "kind": "pdf",
+   "licence": "US Government work (FHWA)",
+   "retrieved_utc_note": "acquired by a run that was stopped before its manifest was written; file mtime 2026-09-11T12:08:14Z is the best available retrieval time",
+   "sha256": "9f7517dee40d7184690996afb7b48ab65cbfed4d7848b9e7dc7e5409bf8a8dce",
+   "status": "present",
+   "url": "https://www.fhwa.dot.gov/engineering/hydraulics/pubs/10009/10009.pdf"
+  },
+  "janaf:Ag": {
+   "dest": "nist_janaf/Ag_ref.txt",
+   "grounds": [
+    "chemical_engineering: SUBSTANCES_FOR_HEATING (solid Cp)"
+   ],
+   "group": "janaf",
+   "id": "janaf:Ag",
+   "kind": "text",
+   "licence": "US Government work (NIST-JANAF, NSRDS-NBS 37)",
+   "reason": "no table whose header names 'Silver (Ag)' in its reference state -- NIST-JANAF does not carry it",
+   "species": "Silver",
+   "status": "failed",
+   "url": "https://janaf.nist.gov/tables/Ag-NNN.txt"
+  },
+  "janaf:Al": {
+   "bytes": 2975,
+   "dest": "nist_janaf/Al_ref.txt",
+   "grounds": [
+    "chemical_engineering: SUBSTANCES_FOR_HEATING (solid Cp)"
+   ],
+   "group": "janaf",
+   "id": "janaf:Al",
+   "kind": "text",
+   "licence": "US Government work (NIST-JANAF, NSRDS-NBS 37)",
+   "retrieved_utc": "2026-09-11T12:22:48Z",
+   "sha256": "ce4bb740c061a75998b3b4262bbdabf76c010360a7eeb73188476005878a1e58",
+   "species": "Aluminum",
+   "status": "present",
+   "via": "header names element in ref state"
+  },
+  "janaf:Au": {
+   "dest": "nist_janaf/Au_ref.txt",
+   "grounds": [
+    "chemical_engineering: SUBSTANCES_FOR_HEATING (solid Cp)"
+   ],
+   "group": "janaf",
+   "id": "janaf:Au",
+   "kind": "text",
+   "licence": "US Government work (NIST-JANAF, NSRDS-NBS 37)",
+   "reason": "no table whose header names 'Gold (Au)' in its reference state -- NIST-JANAF does not carry it",
+   "species": "Gold",
+   "status": "failed",
+   "url": "https://janaf.nist.gov/tables/Au-NNN.txt"
+  },
+  "janaf:C": {
+   "bytes": 2769,
+   "dest": "nist_janaf/C_ref.txt",
+   "grounds": [
+    "chemical_engineering: SUBSTANCES_FOR_HEATING (solid Cp)"
+   ],
+   "group": "janaf",
+   "id": "janaf:C",
+   "kind": "text",
+   "licence": "US Government work (NIST-JANAF, NSRDS-NBS 37)",
+   "retrieved_utc": "2026-09-11T12:22:55Z",
+   "sha256": "d929a499d9e827487970b654058f81381a652a84d836ec378bff8521cc19a3bf",
+   "species": "Carbon",
+   "status": "present",
+   "via": "header names element in ref state"
+  },
+  "janaf:Cu": {
+   "bytes": 2976,
+   "dest": "nist_janaf/Cu_ref.txt",
+   "grounds": [
+    "chemical_engineering: SUBSTANCES_FOR_HEATING (solid Cp)"
+   ],
+   "group": "janaf",
+   "id": "janaf:Cu",
+   "kind": "text",
+   "licence": "US Government work (NIST-JANAF, NSRDS-NBS 37)",
+   "retrieved_utc": "2026-09-11T12:22:46Z",
+   "sha256": "13c8a21f7865456953e41b2c5824c1068776162940bc5b17ceccf66f7aeec54e",
+   "species": "Copper",
+   "status": "present",
+   "via": "header names element in ref state"
+  },
+  "janaf:Fe": {
+   "bytes": 2614,
+   "dest": "nist_janaf/Fe_ref.txt",
+   "grounds": [
+    "chemical_engineering: SUBSTANCES_FOR_HEATING (solid Cp)"
+   ],
+   "group": "janaf",
+   "id": "janaf:Fe",
+   "kind": "text",
+   "licence": "US Government work (NIST-JANAF, NSRDS-NBS 37)",
+   "retrieved_utc": "2026-09-11T12:22:45Z",
+   "sha256": "45f0482d04a071cfa335c65be80f248df47f9e217fab253f5bbd77bfb725cb93",
+   "species": "Iron",
+   "status": "present",
+   "via": "header names element in ref state"
+  },
+  "janaf:Hg": {
+   "bytes": 3021,
+   "dest": "nist_janaf/Hg_ref.txt",
+   "grounds": [
+    "chemical_engineering: SUBSTANCES_FOR_HEATING (solid Cp)"
+   ],
+   "group": "janaf",
+   "id": "janaf:Hg",
+   "kind": "text",
+   "licence": "US Government work (NIST-JANAF, NSRDS-NBS 37)",
+   "retrieved_utc": "2026-09-11T12:22:57Z",
+   "sha256": "30551a07c2bc14d488a0aea77ac5f63f1d457b72eadba99d9ebfea130837e30a",
+   "species": "Mercury",
+   "status": "present",
+   "via": "header names element in ref state"
+  },
+  "janaf:Pb": {
+   "bytes": 3011,
+   "dest": "nist_janaf/Pb_ref.txt",
+   "grounds": [
+    "chemical_engineering: SUBSTANCES_FOR_HEATING (solid Cp)"
+   ],
+   "group": "janaf",
+   "id": "janaf:Pb",
+   "kind": "text",
+   "licence": "US Government work (NIST-JANAF, NSRDS-NBS 37)",
+   "retrieved_utc": "2026-09-11T12:22:49Z",
+   "sha256": "faba9c8c7cd53793e3c52072623e283ead9db95c4ba96b80e96ed5a728d42b80",
+   "species": "Lead",
+   "status": "present",
+   "via": "header names element in ref state"
+  },
+  "janaf:Si": {
+   "bytes": 2974,
+   "dest": "nist_janaf/Si_ref.txt",
+   "grounds": [
+    "chemical_engineering: SUBSTANCES_FOR_HEATING (solid Cp)"
+   ],
+   "group": "janaf",
+   "id": "janaf:Si",
+   "kind": "text",
+   "licence": "US Government work (NIST-JANAF, NSRDS-NBS 37)",
+   "retrieved_utc": "2026-09-11T12:22:52Z",
+   "sha256": "c5caba9f1a7f0214fa95df04a69b69921aca114bd5c1a9d6a2a699fcf9dc2c83",
+   "species": "Silicon",
+   "status": "present",
+   "via": "header names element in ref state"
+  },
+  "janaf:W": {
+   "bytes": 2944,
+   "dest": "nist_janaf/W_ref.txt",
+   "grounds": [
+    "chemical_engineering: SUBSTANCES_FOR_HEATING (solid Cp)"
+   ],
+   "group": "janaf",
+   "id": "janaf:W",
+   "kind": "text",
+   "licence": "US Government work (NIST-JANAF, NSRDS-NBS 37)",
+   "retrieved_utc": "2026-09-11T12:22:51Z",
+   "sha256": "f1efe989e827c2c8844e26dd53ae84716652beae01a0fffff844d46e4b6a59de",
+   "species": "Tungsten",
+   "status": "present",
+   "via": "header names element in ref state"
+  },
+  "mil_hdbk_5j": {
+   "bytes": 69928300,
+   "dest": "mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf",
+   "grounds": [
+    "mechanical_engineering: MATERIAL_PROPERTIES, SHEAR_MODULUS_VALUES, MATERIAL_DENSITIES (metals)"
+   ],
+   "group": "materials",
+   "id": "mil_hdbk_5j",
+   "kind": "pdf",
+   "licence": "Distribution Statement A: approved for public release",
+   "published_sha1_verified": true,
+   "retrieved_utc_note": "acquired by a run that was stopped before its manifest was written; file mtime 2026-09-11T12:06:07Z is the best available retrieval time",
+   "sha256": "7f2450863566ff46091d233bdfc8b44a546034a91ac08008386375963198222c",
+   "status": "present",
+   "url": "https://archive.org/download/milhdbk-5-j/MILHDBK5J.pdf"
+  },
+  "mil_std_105e": {
+   "bytes": 16412258,
+   "content_type": "application/pdf",
+   "dest": "industrial/mil_std_105e_sampling.pdf",
+   "grounds": [
+    "industrial_engineering: MIL_STD_105E_*"
+   ],
+   "group": "industrial",
+   "http": 200,
+   "id": "mil_std_105e",
+   "kind": "pdf",
+   "licence": "Approved for public release; distribution unlimited",
+   "mirror_of": "MIL-STD-105E (1989); hosted by expresscorp.com",
+   "published_sha1_verified": false,
+   "retrieved_utc": "2026-09-11T16:32:48Z",
+   "sha256": "f0fcf8a63ea3e6784c1384d885edd582a153ea83a885dc73d584a6a978a27dd7",
+   "status": "present",
+   "url": "https://www.expresscorp.com/wp-content/uploads/2023/02/MIL-STD-105E.pdf",
+   "url_verified": "2026-09-11: download byte-identical (SHA-256) to the recorded file",
+   "via": "download"
+  },
+  "nasa_tr_r132": {
+   "bytes": 8764892,
+   "dest": "nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf",
+   "grounds": [
+    "chemical_engineering: GAS_MOLECULAR_PARAMS (Lennard-Jones sigma, eps/k)"
+   ],
+   "group": "transport",
+   "id": "nasa_tr_r132",
+   "kind": "pdf",
+   "licence": "US Government work (NASA)",
+   "retrieved_utc_note": "acquired by a run that was stopped before its manifest was written; file mtime 2026-09-11T12:04:37Z is the best available retrieval time",
+   "sha256": "f2800954e610767678bff9e66edea0fc301667f2c5e3a91b17d23958208fd8e2",
+   "status": "present",
+   "url": "https://ntrs.nasa.gov/api/citations/19630012982/downloads/19630012982.pdf"
+  },
+  "navfac_dm7_01": {
+   "bytes": 49489265,
+   "dest": "civil/navfac_dm7_01_soil_mechanics.pdf",
+   "grounds": [
+    "civil_engineering: SPECIFIC_GRAVITY_RANGES, PERMEABILITY_RANGES_CM_S"
+   ],
+   "group": "civil",
+   "id": "navfac_dm7_01",
+   "kind": "pdf",
+   "licence": "US Government work (US Navy)",
+   "mirror_of": "NAVFAC DM-7.01 Soil Mechanics; hosted by vulcanhammer.net",
+   "retrieved_utc_note": "acquired by a run that was stopped before its manifest was written; file mtime 2026-09-11T12:18:20Z is the best available retrieval time",
+   "sha256": "bacbf58162cc39f5c4d4d6c052b0691fc4d4c961012f5ca2923acb05d8a5e918",
+   "status": "present",
+   "url": "https://vulcanhammer.net/wp-content/uploads/2017/01/dm7_01.pdf",
+   "url_verified": "2026-09-11: download byte-identical (SHA-256) to the recorded file"
+  },
+  "navfac_dm7_02": {
+   "bytes": 42345313,
+   "dest": "civil/navfac_dm7_02_foundations.pdf",
+   "grounds": [
+    "civil_engineering: TERZAGHI_BEARING_FACTORS (cross-check)"
+   ],
+   "group": "civil",
+   "id": "navfac_dm7_02",
+   "kind": "pdf",
+   "licence": "US Government work (US Navy)",
+   "mirror_of": "NAVFAC DM-7.02 Foundations and Earth Structures; hosted by vulcanhammer.net",
+   "retrieved_utc_note": "acquired by a run that was stopped before its manifest was written; file mtime 2026-09-11T12:18:21Z is the best available retrieval time",
+   "sha256": "b080409ed0f1ff4835c3dc98da97835200dd798a2f48590902a977ffc654d457",
+   "status": "present",
+   "url": "https://vulcanhammer.net/wp-content/uploads/2017/01/dm7_02.pdf",
+   "url_verified": "2026-09-11: download byte-identical (SHA-256) to the recorded file"
+  },
+  "nist_fluid:2_methylbutane:isobar_1atm": {
+   "bytes": 2693,
+   "cas": "C78784",
+   "dest": "nist_fluid_properties/2_methylbutane_C78784_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:2_methylbutane:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:20:40Z",
+   "sha256": "64a1a38d0e86ebe16e9ee5d58318a8f5ce75a47293ec75f8e8b5019fb04274f3",
+   "species": "2-Methylbutane",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C78784&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "23 rows"
+  },
+  "nist_fluid:2_methylbutane:saturation": {
+   "bytes": 118481,
+   "cas": "C78784",
+   "dest": "nist_fluid_properties/2_methylbutane_C78784_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:2_methylbutane:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:20:38Z",
+   "sha256": "beed02d4a6dff56441f214db204ae2813178468c5a6187acb155e99f495c4f09",
+   "species": "2-Methylbutane",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C78784&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "600 rows"
+  },
+  "nist_fluid:ammonia:isobar_1atm": {
+   "bytes": 2437,
+   "cas": "C7664417",
+   "dest": "nist_fluid_properties/ammonia_C7664417_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:ammonia:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:16Z",
+   "sha256": "7a5dd17789d85fb66a27e61adbc8c64f591796fe11187a34e0e542bcd8e51549",
+   "species": "Ammonia",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C7664417&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "21 rows"
+  },
+  "nist_fluid:ammonia:saturation": {
+   "bytes": 117681,
+   "cas": "C7664417",
+   "dest": "nist_fluid_properties/ammonia_C7664417_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:ammonia:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:14Z",
+   "sha256": "d4896a2e0b7eb37a64c0f0878b8db0b7a74d9cb90513fc395ee01224c706b97d",
+   "species": "Ammonia",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C7664417&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "601 rows"
+  },
+  "nist_fluid:argon:isobar_1atm": {
+   "bytes": 2437,
+   "cas": "C7440371",
+   "dest": "nist_fluid_properties/argon_C7440371_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:argon:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:05Z",
+   "sha256": "3d2c9b2c60290660eedd57d557f1b38643395a1608aac50cc559661132d74d42",
+   "species": "Argon",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C7440371&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "21 rows"
+  },
+  "nist_fluid:argon:saturation": {
+   "bytes": 121161,
+   "cas": "C7440371",
+   "dest": "nist_fluid_properties/argon_C7440371_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:argon:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:03Z",
+   "sha256": "03b477eea23e2981a378a9540322726a201b51af3ac836d8bd569853a4fa2a54",
+   "species": "Argon",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C7440371&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "601 rows"
+  },
+  "nist_fluid:benzene:isobar_1atm": {
+   "bytes": 2295,
+   "cas": "C71432",
+   "dest": "nist_fluid_properties/benzene_C71432_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:benzene:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:24:01Z",
+   "sha256": "8f0b2519aa723529814d6b1fc92ce6297921520b145f26b09fcec9bfd25968f2",
+   "species": "Benzene",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C71432&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=293.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 293.15 K, the TLow of this request",
+   "via": "19 rows"
+  },
+  "nist_fluid:benzene:saturation": {
+   "bytes": 118554,
+   "cas": "C71432",
+   "dest": "nist_fluid_properties/benzene_C71432_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:benzene:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:36Z",
+   "sha256": "512d60a970f9cbf9c04093602af75c99a05e04e045c840399f32f91015169eee",
+   "species": "Benzene",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C71432&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "601 rows"
+  },
+  "nist_fluid:butane:isobar_1atm": {
+   "bytes": 2659,
+   "cas": "C106978",
+   "dest": "nist_fluid_properties/butane_C106978_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:butane:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:20:29Z",
+   "sha256": "012c411aa97b5920fc1ce75bea21d45c279d8115f547a4f365a8f2664b6576d6",
+   "species": "Butane",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C106978&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "23 rows"
+  },
+  "nist_fluid:butane:saturation": {
+   "bytes": 118538,
+   "cas": "C106978",
+   "dest": "nist_fluid_properties/butane_C106978_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:butane:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:20:27Z",
+   "sha256": "a34feacff1ff64fbcf2725db9ad6b076eeb6dd545329f0a59133d8d7f70f9d49",
+   "species": "Butane",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C106978&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "601 rows"
+  },
+  "nist_fluid:carbon_dioxide:isobar_1atm": {
+   "bytes": 2437,
+   "cas": "C124389",
+   "dest": "nist_fluid_properties/carbon_dioxide_C124389_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:carbon_dioxide:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc_note": "acquired by a run stopped before its manifest was written; file mtime 2026-09-11T12:18:54Z is the best available retrieval time",
+   "sha256": "fb5227a38f78fc991f4b8508ac668a6f902a5fbe0934ea7237d06b2bc5348cc0",
+   "species": "Carbon dioxide",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C124389&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request"
+  },
+  "nist_fluid:carbon_dioxide:saturation": {
+   "bytes": 118535,
+   "cas": "C124389",
+   "dest": "nist_fluid_properties/carbon_dioxide_C124389_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:carbon_dioxide:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc_note": "acquired by a run stopped before its manifest was written; file mtime 2026-09-11T12:18:53Z is the best available retrieval time",
+   "sha256": "9b19e39bfebced37145de4ad0ed16b66111440ad974d9b5d982dff93424dbb87",
+   "species": "Carbon dioxide",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C124389&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT"
+  },
+  "nist_fluid:carbon_monoxide:isobar_1atm": {
+   "bytes": 2440,
+   "cas": "C630080",
+   "dest": "nist_fluid_properties/carbon_monoxide_C630080_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:carbon_monoxide:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc_note": "acquired by a run stopped before its manifest was written; file mtime 2026-09-11T12:18:51Z is the best available retrieval time",
+   "sha256": "5ed2ce8808761e1f0a55e3075525b3c6deacc2f21a8e417c69f3a4021f72b53a",
+   "species": "Carbon monoxide",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C630080&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request"
+  },
+  "nist_fluid:carbon_monoxide:saturation": {
+   "bytes": 118885,
+   "cas": "C630080",
+   "dest": "nist_fluid_properties/carbon_monoxide_C630080_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:carbon_monoxide:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc_note": "acquired by a run stopped before its manifest was written; file mtime 2026-09-11T12:18:49Z is the best available retrieval time",
+   "sha256": "b96f71511a442f77443a37a9dabc40b9f88c409624d5be8e8dc966b4fa8e5ce2",
+   "species": "Carbon monoxide",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C630080&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT"
+  },
+  "nist_fluid:cyclohexane:isobar_1atm": {
+   "bytes": 2291,
+   "cas": "C110827",
+   "dest": "nist_fluid_properties/cyclohexane_C110827_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:cyclohexane:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:23:56Z",
+   "sha256": "2fa8b41aafb48b2bc332ecf956b6f03a0d65beea4c525b76d0fdb9669c504a6d",
+   "species": "Cyclohexane",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C110827&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=293.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 293.15 K, the TLow of this request",
+   "via": "19 rows"
+  },
+  "nist_fluid:cyclohexane:saturation": {
+   "bytes": 118646,
+   "cas": "C110827",
+   "dest": "nist_fluid_properties/cyclohexane_C110827_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:cyclohexane:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:20:45Z",
+   "sha256": "ae9cd725333939e413801c70af99088a5c9907f9bdadd83f0a302ec8df857f25",
+   "species": "Cyclohexane",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C110827&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "601 rows"
+  },
+  "nist_fluid:ethane:isobar_1atm": {
+   "bytes": 2437,
+   "cas": "C74840",
+   "dest": "nist_fluid_properties/ethane_C74840_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:ethane:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:20:15Z",
+   "sha256": "d54847e702468da59a9adbade759664a071f2d514feed8c89a2e98d6167351bb",
+   "species": "Ethane",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C74840&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "21 rows"
+  },
+  "nist_fluid:ethane:saturation": {
+   "bytes": 118421,
+   "cas": "C74840",
+   "dest": "nist_fluid_properties/ethane_C74840_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:ethane:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc_note": "acquired by a run stopped before its manifest was written; file mtime 2026-09-11T12:19:03Z is the best available retrieval time",
+   "sha256": "af2d3d1e36530cfc90da9e689da902596cafedec94392fc021aac2479cc3daa4",
+   "species": "Ethane",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C74840&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT"
+  },
+  "nist_fluid:ethene:isobar_1atm": {
+   "bytes": 2332,
+   "cas": "C74851",
+   "dest": "nist_fluid_properties/ethene_C74851_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:ethene:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:20:18Z",
+   "sha256": "a5d2ee3a4f2fb0e4f450d3e4bb254278678ff601306e10ca694f48c8559d341d",
+   "species": "Ethene",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C74851&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "20 rows"
+  },
+  "nist_fluid:ethene:saturation": {
+   "bytes": 118378,
+   "cas": "C74851",
+   "dest": "nist_fluid_properties/ethene_C74851_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:ethene:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:20:17Z",
+   "sha256": "6e6f841da64e2f1e9b514de4935831d4f653c2d5988d121ec978c979d56a9231",
+   "species": "Ethene",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C74851&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "601 rows"
+  },
+  "nist_fluid:helium:isobar_1atm": {
+   "bytes": 2458,
+   "cas": "C7440597",
+   "dest": "nist_fluid_properties/helium_C7440597_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:helium:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:20:58Z",
+   "sha256": "00c3e70ac84ace1f91abbbe8341e0e4016a648d43fe00d3bc619117d0ceea7fd",
+   "species": "Helium",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C7440597&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "21 rows"
+  },
+  "nist_fluid:helium:saturation": {
+   "bytes": 126677,
+   "cas": "C7440597",
+   "dest": "nist_fluid_properties/helium_C7440597_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:helium:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:20:56Z",
+   "sha256": "cd549e74e24fdbceece16ca633ee8671191443b80607cb6e806d407030778222",
+   "species": "Helium",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C7440597&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "601 rows"
+  },
+  "nist_fluid:heptane:isobar_1atm": {
+   "bytes": 2738,
+   "cas": "C142825",
+   "dest": "nist_fluid_properties/heptane_C142825_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:heptane:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:20:50Z",
+   "sha256": "1e3ac1b105e23db3b34b59f422812e8da4ef0f88dc0ce81b34ad5cb2c677dc64",
+   "species": "Heptane",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C142825&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "23 rows"
+  },
+  "nist_fluid:heptane:saturation": {
+   "bytes": 118719,
+   "cas": "C142825",
+   "dest": "nist_fluid_properties/heptane_C142825_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:heptane:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:20:49Z",
+   "sha256": "7ed9a9e02f94b028ba3d1f065a5a572774b9d32ba203f540c1a9608d5ca017c1",
+   "species": "Heptane",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C142825&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "601 rows"
+  },
+  "nist_fluid:hexane:isobar_1atm": {
+   "bytes": 2721,
+   "cas": "C110543",
+   "dest": "nist_fluid_properties/hexane_C110543_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:hexane:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:20:43Z",
+   "sha256": "7e781be430909f922cc3865fa8ef77cc06e5f89ed5365c1abf28e18a2d6e62c6",
+   "species": "Hexane",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C110543&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "23 rows"
+  },
+  "nist_fluid:hexane:saturation": {
+   "bytes": 118669,
+   "cas": "C110543",
+   "dest": "nist_fluid_properties/hexane_C110543_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:hexane:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:20:42Z",
+   "sha256": "cfb753bff3203000735806986c277aa05c87a1637de3839999130d081c70a4b2",
+   "species": "Hexane",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C110543&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "601 rows"
+  },
+  "nist_fluid:hydrogen:isobar_1atm": {
+   "bytes": 2479,
+   "cas": "C1333740",
+   "dest": "nist_fluid_properties/hydrogen_C1333740_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:hydrogen:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc_note": "acquired by a run stopped before its manifest was written; file mtime 2026-09-11T12:18:44Z is the best available retrieval time",
+   "sha256": "353f0a78cd926abdb1dedda0ee43feb13958b1a0d8b2c9d2b0236c5dc1bfb62d",
+   "species": "Hydrogen",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C1333740&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request"
+  },
+  "nist_fluid:hydrogen:saturation": {
+   "bytes": 121048,
+   "cas": "C1333740",
+   "dest": "nist_fluid_properties/hydrogen_C1333740_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:hydrogen:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc_note": "acquired by a run stopped before its manifest was written; file mtime 2026-09-11T12:18:42Z is the best available retrieval time",
+   "sha256": "3a5bc88165206777013c0afa0e5b15d42c2231d4b3ba98722ab5360b6684bdf6",
+   "species": "Hydrogen",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C1333740&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT"
+  },
+  "nist_fluid:hydrogen_sulfide:isobar_1atm": {
+   "bytes": 2437,
+   "cas": "C7783064",
+   "dest": "nist_fluid_properties/hydrogen_sulfide_C7783064_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:hydrogen_sulfide:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:48Z",
+   "sha256": "065a1f10816c054f4610b2e70766eb4989504ad90634e974e162060300c6f94d",
+   "species": "Hydrogen sulfide",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C7783064&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "21 rows"
+  },
+  "nist_fluid:hydrogen_sulfide:saturation": {
+   "bytes": 117920,
+   "cas": "C7783064",
+   "dest": "nist_fluid_properties/hydrogen_sulfide_C7783064_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:hydrogen_sulfide:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:46Z",
+   "sha256": "52480683b6215ccbdf5ff0a46f0edcb9de8d7120db7f5aa39008092c5358f949",
+   "species": "Hydrogen sulfide",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C7783064&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "600 rows"
+  },
+  "nist_fluid:isobutane:isobar_1atm": {
+   "bytes": 2655,
+   "cas": "C75285",
+   "dest": "nist_fluid_properties/isobutane_C75285_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:isobutane:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:20:33Z",
+   "sha256": "54992c3a69a695f868bc7c4f07f353ac371a7e5cdd800f3f1c452a048a14a6ce",
+   "species": "Isobutane",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C75285&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "23 rows"
+  },
+  "nist_fluid:isobutane:saturation": {
+   "bytes": 118598,
+   "cas": "C75285",
+   "dest": "nist_fluid_properties/isobutane_C75285_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:isobutane:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:20:31Z",
+   "sha256": "eddbcf5278321836985dffb29a0eadb317a4be7fcf29261b1433414382f8d80f",
+   "species": "Isobutane",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C75285&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "601 rows"
+  },
+  "nist_fluid:krypton:isobar_1atm": {
+   "bytes": 2444,
+   "cas": "C7439909",
+   "dest": "nist_fluid_properties/krypton_C7439909_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:krypton:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:09Z",
+   "sha256": "9af7d03e3cc6ec44d38634e389cc0a793cc61e36bb60d8f6d6fda0a55d252884",
+   "species": "Krypton",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C7439909&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "21 rows"
+  },
+  "nist_fluid:krypton:saturation": {
+   "bytes": 120033,
+   "cas": "C7439909",
+   "dest": "nist_fluid_properties/krypton_C7439909_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:krypton:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:07Z",
+   "sha256": "94bbf5e482d9bc02f11b27baa23f3f0291ecdf78138732336af7aad9b5d110b9",
+   "species": "Krypton",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C7439909&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "601 rows"
+  },
+  "nist_fluid:methane:isobar_1atm": {
+   "bytes": 2437,
+   "cas": "C74828",
+   "dest": "nist_fluid_properties/methane_C74828_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:methane:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc_note": "acquired by a run stopped before its manifest was written; file mtime 2026-09-11T12:19:02Z is the best available retrieval time",
+   "sha256": "26e902f63ab60d328ad3a83f72b86d902a8845ab51ae0f1cb949b9676ae41a8b",
+   "species": "Methane",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C74828&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request"
+  },
+  "nist_fluid:methane:saturation": {
+   "bytes": 118400,
+   "cas": "C74828",
+   "dest": "nist_fluid_properties/methane_C74828_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:methane:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc_note": "acquired by a run stopped before its manifest was written; file mtime 2026-09-11T12:19:00Z is the best available retrieval time",
+   "sha256": "1cea77aeba0f430f1b76eaa95f9c16592e7f37f30e2763791e5daf915d295a1e",
+   "species": "Methane",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C74828&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT"
+  },
+  "nist_fluid:methanol:isobar_1atm": {
+   "bytes": 2513,
+   "cas": "C67561",
+   "dest": "nist_fluid_properties/methanol_C67561_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:methanol:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc_note": "acquired by a run stopped before its manifest was written; file mtime 2026-09-11T12:18:58Z is the best available retrieval time",
+   "sha256": "e501469379ff0543348312814de3c4aa9680e4838d16f31830ac1e42d62a0bbc",
+   "species": "Methanol",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C67561&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request"
+  },
+  "nist_fluid:methanol:saturation": {
+   "bytes": 117554,
+   "cas": "C67561",
+   "dest": "nist_fluid_properties/methanol_C67561_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:methanol:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc_note": "acquired by a run stopped before its manifest was written; file mtime 2026-09-11T12:18:56Z is the best available retrieval time",
+   "sha256": "e89921ea189d1d3ab0472117743b4a7c83684e86b51eeb226435201b7e35d039",
+   "species": "Methanol",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C67561&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT"
+  },
+  "nist_fluid:neon:isobar_1atm": {
+   "bytes": 2479,
+   "cas": "C7440019",
+   "dest": "nist_fluid_properties/neon_C7440019_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:neon:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:02Z",
+   "sha256": "c930f08ad623f22f08ebe412526a175a718a6e67c4df99664c86df513a902866",
+   "species": "Neon",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C7440019&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "21 rows"
+  },
+  "nist_fluid:neon:saturation": {
+   "bytes": 121052,
+   "cas": "C7440019",
+   "dest": "nist_fluid_properties/neon_C7440019_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:neon:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:00Z",
+   "sha256": "8556acc8dbf784541b79a9657d166226383f96e055cff85c7443bd5b63ef5309",
+   "species": "Neon",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C7440019&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "601 rows"
+  },
+  "nist_fluid:nitrogen:isobar_1atm": {
+   "bytes": 2443,
+   "cas": "C7727379",
+   "dest": "nist_fluid_properties/nitrogen_C7727379_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:nitrogen:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc_note": "acquired by a run stopped before its manifest was written; file mtime 2026-09-11T12:18:40Z is the best available retrieval time",
+   "sha256": "4753bc2efde3df05471328d95634186ad22055cf1fbbbc772528473bf7bbde00",
+   "species": "Nitrogen",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C7727379&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request"
+  },
+  "nist_fluid:nitrogen:saturation": {
+   "bytes": 120620,
+   "cas": "C7727379",
+   "dest": "nist_fluid_properties/nitrogen_C7727379_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:nitrogen:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc_note": "acquired by a run stopped before its manifest was written; file mtime 2026-09-11T12:18:39Z is the best available retrieval time",
+   "sha256": "f92289035be352f90b030786ab92ac84096ae1d4d02c91fae72f8a83600ac2df",
+   "species": "Nitrogen",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C7727379&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT"
+  },
+  "nist_fluid:octane:isobar_1atm": {
+   "bytes": 2765,
+   "cas": "C111659",
+   "dest": "nist_fluid_properties/octane_C111659_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:octane:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:20:54Z",
+   "sha256": "de74826aeb7435e6790444d05b93e0e47964c39d5d36ca7be8e92a6100340286",
+   "species": "Octane",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C111659&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "23 rows"
+  },
+  "nist_fluid:octane:saturation": {
+   "bytes": 118780,
+   "cas": "C111659",
+   "dest": "nist_fluid_properties/octane_C111659_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:octane:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:20:53Z",
+   "sha256": "5e9f353b2db348bb453ef81a25d5cda9acc80fbee95579b43162c2937cf77309",
+   "species": "Octane",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C111659&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "601 rows"
+  },
+  "nist_fluid:oxygen:isobar_1atm": {
+   "bytes": 2437,
+   "cas": "C7782447",
+   "dest": "nist_fluid_properties/oxygen_C7782447_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:oxygen:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc_note": "acquired by a run stopped before its manifest was written; file mtime 2026-09-11T12:18:47Z is the best available retrieval time",
+   "sha256": "faf1a13be64c70025d72d51945e40c1bd9f97b1db096824470c374346c38a782",
+   "species": "Oxygen",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C7782447&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request"
+  },
+  "nist_fluid:oxygen:saturation": {
+   "bytes": 120546,
+   "cas": "C7782447",
+   "dest": "nist_fluid_properties/oxygen_C7782447_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:oxygen:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc_note": "acquired by a run stopped before its manifest was written; file mtime 2026-09-11T12:18:46Z is the best available retrieval time",
+   "sha256": "45d945e2dbceb622c527454c3820aa0b61926f4f583868949b8b7c4fe69a9e54",
+   "species": "Oxygen",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C7782447&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT"
+  },
+  "nist_fluid:pentane:isobar_1atm": {
+   "bytes": 2701,
+   "cas": "C109660",
+   "dest": "nist_fluid_properties/pentane_C109660_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:pentane:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:20:36Z",
+   "sha256": "cd5324ef0ace4640ae05214b0ffba9b06ca31163d043071983650e41309ef5c3",
+   "species": "Pentane",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C109660&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "23 rows"
+  },
+  "nist_fluid:pentane:saturation": {
+   "bytes": 118660,
+   "cas": "C109660",
+   "dest": "nist_fluid_properties/pentane_C109660_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:pentane:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:20:34Z",
+   "sha256": "7bb61fa7a7bb7d66bc56c78c85395e02171ff6ee45b336e0a603fae4b1e8facd",
+   "species": "Pentane",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C109660&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "601 rows"
+  },
+  "nist_fluid:propane:isobar_1atm": {
+   "bytes": 2437,
+   "cas": "C74986",
+   "dest": "nist_fluid_properties/propane_C74986_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:propane:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:20:22Z",
+   "sha256": "d5af15884cdb31449a19a28d958fd573b6b90066246a04694f97f3403b5b6e68",
+   "species": "Propane",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C74986&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "21 rows"
+  },
+  "nist_fluid:propane:saturation": {
+   "bytes": 118279,
+   "cas": "C74986",
+   "dest": "nist_fluid_properties/propane_C74986_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:propane:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:20:20Z",
+   "sha256": "d63113c03f046652749f5f53b71089597c96346b94fb75069ca7e8e716d1351b",
+   "species": "Propane",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C74986&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "600 rows"
+  },
+  "nist_fluid:propene:isobar_1atm": {
+   "bytes": 2437,
+   "cas": "C115071",
+   "dest": "nist_fluid_properties/propene_C115071_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:propene:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:20:25Z",
+   "sha256": "a257f4b33ba19d1142f97258249056347decacf81d7d2f5b4884ef2911b64924",
+   "species": "Propene",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C115071&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "21 rows"
+  },
+  "nist_fluid:propene:saturation": {
+   "bytes": 118144,
+   "cas": "C115071",
+   "dest": "nist_fluid_properties/propene_C115071_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:propene:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:20:24Z",
+   "sha256": "0f8679ab8c1f6dbb2b088b07d8e0bc76724aa33bcbacf30a746ecab98c7ed031",
+   "species": "Propene",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C115071&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "600 rows"
+  },
+  "nist_fluid:r11:isobar_1atm": {
+   "bytes": 2687,
+   "cas": "C75694",
+   "dest": "nist_fluid_properties/r11_C75694_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:r11:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:20Z",
+   "sha256": "9856c293c4239c5c90bf3768748de35b17bd788845cf4174a1667797361b869a",
+   "species": "R11",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C75694&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "23 rows"
+  },
+  "nist_fluid:r11:saturation": {
+   "bytes": 119209,
+   "cas": "C75694",
+   "dest": "nist_fluid_properties/r11_C75694_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:r11:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:18Z",
+   "sha256": "08abc7fdeddcc366e85d53f9c704b0b35e0d69c4f9e9197da9a2c8f1214e7aa0",
+   "species": "R11",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C75694&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "601 rows"
+  },
+  "nist_fluid:r123:isobar_1atm": {
+   "bytes": 2685,
+   "cas": "C306832",
+   "dest": "nist_fluid_properties/r123_C306832_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:r123:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:30Z",
+   "sha256": "6924849104c1edff1ada9a85e8ec94e73b8be248b6ff91ce9439a8f27591cc34",
+   "species": "R123",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C306832&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "23 rows"
+  },
+  "nist_fluid:r123:saturation": {
+   "bytes": 119248,
+   "cas": "C306832",
+   "dest": "nist_fluid_properties/r123_C306832_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:r123:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:29Z",
+   "sha256": "401fc1207c38159f0f4c7de9c8f8ef9328dfa1f83506b06f89a3545460dd0755",
+   "species": "R123",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C306832&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "601 rows"
+  },
+  "nist_fluid:r12:isobar_1atm": {
+   "bytes": 2442,
+   "cas": "C75718",
+   "dest": "nist_fluid_properties/r12_C75718_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:r12:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:23Z",
+   "sha256": "de32bd38719743c7df97d026064cadd80345a77153ed0594969e47390cc71b95",
+   "species": "R12",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C75718&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "21 rows"
+  },
+  "nist_fluid:r12:saturation": {
+   "bytes": 119330,
+   "cas": "C75718",
+   "dest": "nist_fluid_properties/r12_C75718_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:r12:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:21Z",
+   "sha256": "ce72375a795553f1b50fa9f76f483db1c8842115abc3d628f73de3a1702ca8f6",
+   "species": "R12",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C75718&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "601 rows"
+  },
+  "nist_fluid:r134a:isobar_1atm": {
+   "bytes": 2438,
+   "cas": "C811972",
+   "dest": "nist_fluid_properties/r134a_C811972_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:r134a:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:34Z",
+   "sha256": "5a5ef3b9742955b70519e97e93ee394d8d4cbde5b4199d29d06fbd8e092ecf09",
+   "species": "R134a",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C811972&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "21 rows"
+  },
+  "nist_fluid:r134a:saturation": {
+   "bytes": 119124,
+   "cas": "C811972",
+   "dest": "nist_fluid_properties/r134a_C811972_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:r134a:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:32Z",
+   "sha256": "e612b01a88119c772bbc5bcf28d521a8f735041af04a78c8d9bf5e10af275376",
+   "species": "R134a",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C811972&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "601 rows"
+  },
+  "nist_fluid:r22:isobar_1atm": {
+   "bytes": 2441,
+   "cas": "C75456",
+   "dest": "nist_fluid_properties/r22_C75456_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:r22:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:27Z",
+   "sha256": "6572ae9abc185258d3b0ad6456a328a1473cd21b3e8751f0c2253bf30c7af58d",
+   "species": "R22",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C75456&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "21 rows"
+  },
+  "nist_fluid:r22:saturation": {
+   "bytes": 118946,
+   "cas": "C75456",
+   "dest": "nist_fluid_properties/r22_C75456_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:r22:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:25Z",
+   "sha256": "0099fa6b25245523ad95a379bf11743c10341c47606b6c773574f7f69501c80f",
+   "species": "R22",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C75456&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "600 rows"
+  },
+  "nist_fluid:sulfur_dioxide:isobar_1atm": {
+   "bytes": 2677,
+   "cas": "C7446095",
+   "dest": "nist_fluid_properties/sulfur_dioxide_C7446095_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:sulfur_dioxide:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:44Z",
+   "sha256": "acd4fa71c7d876ef036f190f6ec83ee199e997fc0624ca9f157ab5bf80f52898",
+   "species": "Sulfur dioxide",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C7446095&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "23 rows"
+  },
+  "nist_fluid:sulfur_dioxide:saturation": {
+   "bytes": 118789,
+   "cas": "C7446095",
+   "dest": "nist_fluid_properties/sulfur_dioxide_C7446095_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:sulfur_dioxide:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:43Z",
+   "sha256": "f1eafdbb3085327ce4439f7248c58c471149a215263f9ad8c220fcb87850af4a",
+   "species": "Sulfur dioxide",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C7446095&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "601 rows"
+  },
+  "nist_fluid:sulfur_hexafluoride:isobar_1atm": {
+   "bytes": 2438,
+   "cas": "C2551624",
+   "dest": "nist_fluid_properties/sulfur_hexafluoride_C2551624_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:sulfur_hexafluoride:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:53Z",
+   "sha256": "f5ddbde0385656377f3ed850b81302440f034e7da8ae49b56584d9a2fe8e45a1",
+   "species": "Sulfur hexafluoride",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C2551624&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "21 rows"
+  },
+  "nist_fluid:sulfur_hexafluoride:saturation": {
+   "bytes": 119639,
+   "cas": "C2551624",
+   "dest": "nist_fluid_properties/sulfur_hexafluoride_C2551624_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:sulfur_hexafluoride:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:50Z",
+   "sha256": "dd8ee7c1ba96f59f8195379ba43ebca4ef9dd2ff509924f4fac479fbf855e502",
+   "species": "Sulfur hexafluoride",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C2551624&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "601 rows"
+  },
+  "nist_fluid:toluene:isobar_1atm": {
+   "bytes": 2758,
+   "cas": "C108883",
+   "dest": "nist_fluid_properties/toluene_C108883_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:toluene:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:41Z",
+   "sha256": "c9ccf514504a954cf939044c51b52534d7c162c3c018a4a2b736aa8c3be47124",
+   "species": "Toluene",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C108883&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "23 rows"
+  },
+  "nist_fluid:toluene:saturation": {
+   "bytes": 118654,
+   "cas": "C108883",
+   "dest": "nist_fluid_properties/toluene_C108883_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:toluene:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:39Z",
+   "sha256": "aaf98daadacb58a06bb526b4bbd803eb6853b9075e5e8b1d6a5930475fb4f367",
+   "species": "Toluene",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C108883&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "601 rows"
+  },
+  "nist_fluid:water:isobar_1atm": {
+   "bytes": 2262,
+   "cas": "C7732185",
+   "dest": "nist_fluid_properties/water_C7732185_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:water:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:23:50Z",
+   "sha256": "255b304e9b639dac124d0ddb6ddc7c93312fe55f0529b0133fbe03888df8d647",
+   "species": "Water",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C7732185&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=293.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 293.15 K, the TLow of this request",
+   "via": "19 rows"
+  },
+  "nist_fluid:water:saturation": {
+   "bytes": 117513,
+   "cas": "C7732185",
+   "dest": "nist_fluid_properties/water_C7732185_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:water:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc_note": "acquired by a run stopped before its manifest was written; file mtime 2026-09-11T12:18:34Z is the best available retrieval time",
+   "sha256": "b8c783177c5ed331dbcf312bb011c4e452b32103907b7b19cce784ef52ecdee9",
+   "species": "Water",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C7732185&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT"
+  },
+  "nist_fluid:xenon:isobar_1atm": {
+   "bytes": 2458,
+   "cas": "C7440633",
+   "dest": "nist_fluid_properties/xenon_C7440633_isobar_1atm.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:xenon:isobar_1atm",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:12Z",
+   "sha256": "6467e4dd3f8b00a63cd07ecf51a92f15f4ba73c2105d8dc0d1b76daf18c4a88e",
+   "species": "Xenon",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C7440633&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=IsoBar&P=0.101325&TLow=253.15&THigh=453.15&TInc=10",
+   "url_from_content": "the file's first row is 253.15 K, the TLow of this request",
+   "via": "21 rows"
+  },
+  "nist_fluid:xenon:saturation": {
+   "bytes": 120023,
+   "cas": "C7440633",
+   "dest": "nist_fluid_properties/xenon_C7440633_saturation.tsv",
+   "grounds": [
+    "chemical/mechanical fluid tables: density, viscosity, saturation volumes, Tc/Pc/rho_c"
+   ],
+   "group": "nist_fluid",
+   "id": "nist_fluid:xenon:saturation",
+   "kind": "tsv",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:11Z",
+   "sha256": "6e04817075cd907a2c5526293a76681bf9c1f869f6277c02117fc429c8f78844",
+   "species": "Xenon",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/fluid.cgi?Action=Data&Wide=on&ID=C7440633&Digits=5&RefState=DEF&TUnit=K&PUnit=MPa&DUnit=kg%2Fm3&HUnit=kJ%2Fmol&WUnit=m%2Fs&VisUnit=Pa%2As&STUnit=N%2Fm&Type=SatT",
+   "via": "601 rows"
+  },
+  "nist_sematech_ehandbook": {
+   "bytes": 174779605,
+   "canonical_url_broken": "https://www.itl.nist.gov/div898/handbook/handbook.zip",
+   "dest": "industrial/nist_sematech_ehandbook.zip",
+   "grounds": [
+    "industrial_engineering: CONTROL_CHART_FACTORS (secondary check only; factors are MathJax, not tables; local-only -- cite sematech_pmc32 and sematech_pmc321 instead)"
+   ],
+   "group": "industrial",
+   "id": "nist_sematech_ehandbook",
+   "kind": "zip",
+   "licence": "US Government work (NIST)",
+   "retrieved_utc_note": "acquired by a run that was stopped before its manifest was written; file mtime 2026-09-11T12:18:30Z is the best available retrieval time",
+   "sha256": "4b68f2431af3469787fcc7dd234c434c1647b7555c50e4f7184b57b1318372ee",
+   "status": "present",
+   "url": ""
+  },
+  "nrcs_tr55": {
+   "bytes": 5305417,
+   "canonical_url_broken": "https://www.nrcs.usda.gov/sites/default/files/2022-10/TR-55%20%281986%29.pdf",
+   "content_type": "application/pdf",
+   "dest": "civil/nrcs_tr55_urban_hydrology.pdf",
+   "grounds": [
+    "civil_engineering: SCS_CURVE_NUMBERS, SCS_IA_RATIO"
+   ],
+   "group": "civil",
+   "http": 200,
+   "id": "nrcs_tr55",
+   "kind": "pdf",
+   "licence": "US Government work (USDA NRCS)",
+   "mirror_of": "USDA NRCS TR-55 (1986); hosted by Oregon DOT in its Hydraulics Manual",
+   "published_sha1_verified": false,
+   "retrieved_utc": "2026-09-11T16:32:27Z",
+   "sha256": "39f064fe1d9b4d176fff84e39955d3b5c4f6034d6a351460759860033bb58dfc",
+   "status": "present",
+   "url": "https://www.oregon.gov/odot/hydraulics/Docs_Hydraulics_Manual/Hydraulics-07-G-Urban-Hydrology-Small-Watersheds.pdf",
+   "url_verified": "2026-09-11: download byte-identical (SHA-256) to the recorded file",
+   "via": "download"
+  },
+  "refractiveindex_info": {
+   "bytes": 15725654,
+   "content_type": "application/zip",
+   "dest": "refractiveindex_info/refractiveindex.info-database-main.zip",
+   "grounds": [
+    "electrical_engineering: MEDIA_VELOCITIES (refractive indices)"
+   ],
+   "group": "optics",
+   "http": 200,
+   "id": "refractiveindex_info",
+   "kind": "zip",
+   "licence": "CC0-1.0",
+   "published_sha1_verified": false,
+   "retrieved_utc": "2026-09-11T16:32:15Z",
+   "sha256": "2c27e8500324e44f86bba164114eb265ee99cdf6a16507d53016aafdec0fb787",
+   "status": "present",
+   "url": "https://github.com/polyanskiy/refractiveindex.info-database/archive/c5c2f188e848453def5970e347399d653df2ffc2.zip",
+   "via": "download",
+   "zip_commit": "c5c2f188e848453def5970e347399d653df2ffc2",
+   "zip_fingerprint": "cc8f4dccb6704634e7b9f39c2b0552a10fcfad1251fc99fe18c830568c465669"
+  },
+  "sematech_pmc32": {
+   "bytes": 19604,
+   "content_type": "text/html; charset=utf-8",
+   "dest": "industrial/nist_sematech_pmc32.htm",
+   "grounds": [
+    "industrial_engineering: CONTROL_CHART_FACTORS (c4, in closed form)"
+   ],
+   "group": "industrial",
+   "http": 200,
+   "id": "sematech_pmc32",
+   "kind": "html",
+   "licence": "US Government work (NIST)",
+   "published_sha1_verified": false,
+   "retrieved_utc": "2026-09-11T16:31:14Z",
+   "sha256": "cbb3e1b275bc40889ed286469b0c39a326db85e900fd0609af1ebb7dbd643f83",
+   "status": "present",
+   "url": "https://www.itl.nist.gov/div898/handbook/pmc/section3/pmc32.htm",
+   "via": "download"
+  },
+  "sematech_pmc321": {
+   "bytes": 20955,
+   "content_type": "text/html; charset=utf-8",
+   "dest": "industrial/nist_sematech_pmc321.htm",
+   "grounds": [
+    "industrial_engineering: CONTROL_CHART_FACTORS (A2, D3, D4 defined from d2 and d3; the page does NOT tabulate d2 or d3)"
+   ],
+   "group": "industrial",
+   "http": 200,
+   "id": "sematech_pmc321",
+   "kind": "html",
+   "licence": "US Government work (NIST)",
+   "published_sha1_verified": false,
+   "retrieved_utc": "2026-09-11T16:31:16Z",
+   "sha256": "19c5073bb7346e00530d1d24b0a92ea7d5be08b997a960c6a384ea1d0804c525",
+   "status": "present",
+   "url": "https://www.itl.nist.gov/div898/handbook/pmc/section3/pmc321.htm",
+   "via": "download"
+  },
+  "usda_wood_handbook": {
+   "bytes": 103951597,
+   "dest": "usda_wood_handbook/FPL-GTR-282_2021.pdf",
+   "grounds": [
+    "mechanical_engineering: MATERIAL_DENSITIES (woods)",
+    "chemical_engineering: SUBSTANCES_FOR_HEATING (wood)"
+   ],
+   "group": "materials",
+   "id": "usda_wood_handbook",
+   "kind": "pdf",
+   "licence": "US Government work (USDA Forest Service)",
+   "retrieved_utc_note": "acquired by a run that was stopped before its manifest was written; file mtime 2026-09-11T12:06:52Z is the best available retrieval time",
+   "sha256": "f0b488c5637614d8e69a07abf796f9e32d7a8df956ee75ab5cc5f64f3bd5ee6f",
+   "status": "present",
+   "url": "https://research.fs.usda.gov/treesearch/download/62200.pdf"
+  },
+  "usgs_wsp2339": {
+   "bytes": 4813334,
+   "dest": "civil/usgs_wsp2339_mannings_n.pdf",
+   "grounds": [
+    "civil_engineering: MANNINGS_N_CHANNELS"
+   ],
+   "group": "civil",
+   "id": "usgs_wsp2339",
+   "kind": "pdf",
+   "licence": "US Government work (USGS)",
+   "retrieved_utc_note": "acquired by a run that was stopped before its manifest was written; file mtime 2026-09-11T12:07:05Z is the best available retrieval time",
+   "sha256": "6ecd4c58f81268c8a9016d100d4483cb77e7da78fa4b8583e0d29005b4229eae",
+   "status": "present",
+   "url": "https://pubs.usgs.gov/wsp/2339/report.pdf"
+  },
+  "webbook:acetone:condensed_phase": {
+   "bytes": 54972,
+   "cas": "C67641",
+   "dest": "nist_webbook_species/acetone_C67641_condensed_phase.html",
+   "grounds": [
+    "CRITICAL_PROPERTIES, SUBSTANCES_FOR_VAPORIZATION, SUBSTANCES_FOR_HEATING (species the fluid database lacks)"
+   ],
+   "group": "webbook",
+   "id": "webbook:acetone:condensed_phase",
+   "kind": "html",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:22:01Z",
+   "sha256": "b22944897e86b9d304a451bc5be572e5fce92fba52be86eb733c783e2dc89ce3",
+   "species": "Acetone",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C67641&Units=SI&Mask=2",
+   "via": "title 'Acetone'"
+  },
+  "webbook:acetone:phase_change": {
+   "bytes": 72433,
+   "cas": "C67641",
+   "dest": "nist_webbook_species/acetone_C67641_phase_change.html",
+   "grounds": [
+    "CRITICAL_PROPERTIES, SUBSTANCES_FOR_VAPORIZATION, SUBSTANCES_FOR_HEATING (species the fluid database lacks)"
+   ],
+   "group": "webbook",
+   "id": "webbook:acetone:phase_change",
+   "kind": "html",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:22:00Z",
+   "sha256": "2c4a9bfaed7cdf8866cf9275a0921ac9de93922b773c2f45ba05080538ebeafe",
+   "species": "Acetone",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C67641&Units=SI&Mask=4",
+   "via": "title 'Acetone'"
+  },
+  "webbook:acetylene:condensed_phase": {
+   "bytes": 18891,
+   "cas": "C74862",
+   "dest": "nist_webbook_species/acetylene_C74862_condensed_phase.html",
+   "grounds": [
+    "CRITICAL_PROPERTIES, SUBSTANCES_FOR_VAPORIZATION, SUBSTANCES_FOR_HEATING (species the fluid database lacks)"
+   ],
+   "group": "webbook",
+   "id": "webbook:acetylene:condensed_phase",
+   "kind": "html",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:22:36Z",
+   "sha256": "7e392bd2ce1d18fc4ac4f71f899b6e1a23dce5957556ff5d381a0fd826988ebc",
+   "species": "Acetylene",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C74862&Units=SI&Mask=2",
+   "via": "title 'Acetylene'"
+  },
+  "webbook:acetylene:phase_change": {
+   "bytes": 56531,
+   "cas": "C74862",
+   "dest": "nist_webbook_species/acetylene_C74862_phase_change.html",
+   "grounds": [
+    "CRITICAL_PROPERTIES, SUBSTANCES_FOR_VAPORIZATION, SUBSTANCES_FOR_HEATING (species the fluid database lacks)"
+   ],
+   "group": "webbook",
+   "id": "webbook:acetylene:phase_change",
+   "kind": "html",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:22:34Z",
+   "sha256": "0c7b1effddea4e0e33e65bac52890c4db6410763288312c54af652edd3a5e6a4",
+   "species": "Acetylene",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C74862&Units=SI&Mask=4",
+   "via": "title 'Acetylene'"
+  },
+  "webbook:carbon_tetrachloride:condensed_phase": {
+   "bytes": 72078,
+   "cas": "C56235",
+   "dest": "nist_webbook_species/carbon_tetrachloride_C56235_condensed_phase.html",
+   "grounds": [
+    "CRITICAL_PROPERTIES, SUBSTANCES_FOR_VAPORIZATION, SUBSTANCES_FOR_HEATING (species the fluid database lacks)"
+   ],
+   "group": "webbook",
+   "id": "webbook:carbon_tetrachloride:condensed_phase",
+   "kind": "html",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:22:08Z",
+   "sha256": "13d78f6b69cbafdcdc80b54ded63ce861866890f7f8ca66da69bf0eda5bf9020",
+   "species": "Carbon tetrachloride",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C56235&Units=SI&Mask=2",
+   "via": "title 'Carbon Tetrachloride'"
+  },
+  "webbook:carbon_tetrachloride:phase_change": {
+   "bytes": 67905,
+   "cas": "C56235",
+   "dest": "nist_webbook_species/carbon_tetrachloride_C56235_phase_change.html",
+   "grounds": [
+    "CRITICAL_PROPERTIES, SUBSTANCES_FOR_VAPORIZATION, SUBSTANCES_FOR_HEATING (species the fluid database lacks)"
+   ],
+   "group": "webbook",
+   "id": "webbook:carbon_tetrachloride:phase_change",
+   "kind": "html",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:22:07Z",
+   "sha256": "445e17e70b722d58111957f8f97fe2202059939d9a16fefd3ba673db68a42c04",
+   "species": "Carbon tetrachloride",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C56235&Units=SI&Mask=4",
+   "via": "title 'Carbon Tetrachloride'"
+  },
+  "webbook:chlorine:condensed_phase": {
+   "bytes": 18391,
+   "cas": "C7782505",
+   "dest": "nist_webbook_species/chlorine_C7782505_condensed_phase.html",
+   "grounds": [
+    "CRITICAL_PROPERTIES, SUBSTANCES_FOR_VAPORIZATION, SUBSTANCES_FOR_HEATING (species the fluid database lacks)"
+   ],
+   "group": "webbook",
+   "id": "webbook:chlorine:condensed_phase",
+   "kind": "html",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:22:15Z",
+   "sha256": "682832d6c99a8670fb920694c312137d85b80fb2fd742b3dcbebadb7091105c2",
+   "species": "Chlorine",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C7782505&Units=SI&Mask=2",
+   "via": "title 'Chlorine'"
+  },
+  "webbook:chlorine:phase_change": {
+   "bytes": 31791,
+   "cas": "C7782505",
+   "dest": "nist_webbook_species/chlorine_C7782505_phase_change.html",
+   "grounds": [
+    "CRITICAL_PROPERTIES, SUBSTANCES_FOR_VAPORIZATION, SUBSTANCES_FOR_HEATING (species the fluid database lacks)"
+   ],
+   "group": "webbook",
+   "id": "webbook:chlorine:phase_change",
+   "kind": "html",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:22:14Z",
+   "sha256": "2ebd8f048165cc454b3b1004015fe6c3f098601c8f2b72fad7ec5f987275ef17",
+   "species": "Chlorine",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C7782505&Units=SI&Mask=4",
+   "via": "title 'Chlorine'"
+  },
+  "webbook:diethyl_ether:condensed_phase": {
+   "bytes": 35449,
+   "cas": "C60297",
+   "dest": "nist_webbook_species/diethyl_ether_C60297_condensed_phase.html",
+   "grounds": [
+    "CRITICAL_PROPERTIES, SUBSTANCES_FOR_VAPORIZATION, SUBSTANCES_FOR_HEATING (species the fluid database lacks)"
+   ],
+   "group": "webbook",
+   "id": "webbook:diethyl_ether:condensed_phase",
+   "kind": "html",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:22:32Z",
+   "sha256": "38060021500011d84129d0026fc094003624531c7472a20a4450ae597980eb5f",
+   "species": "Diethyl ether",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C60297&Units=SI&Mask=2",
+   "via": "title 'Ethyl ether'"
+  },
+  "webbook:diethyl_ether:phase_change": {
+   "bytes": 52794,
+   "cas": "C60297",
+   "dest": "nist_webbook_species/diethyl_ether_C60297_phase_change.html",
+   "grounds": [
+    "CRITICAL_PROPERTIES, SUBSTANCES_FOR_VAPORIZATION, SUBSTANCES_FOR_HEATING (species the fluid database lacks)"
+   ],
+   "group": "webbook",
+   "id": "webbook:diethyl_ether:phase_change",
+   "kind": "html",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:22:30Z",
+   "sha256": "9ff4c8182c5be035be613140234fae287e26f1869a0759116d5d1427604b963e",
+   "species": "Diethyl ether",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C60297&Units=SI&Mask=4",
+   "via": "title 'Ethyl ether'"
+  },
+  "webbook:ethanol:condensed_phase": {
+   "bytes": 71880,
+   "cas": "C64175",
+   "dest": "nist_webbook_species/ethanol_C64175_condensed_phase.html",
+   "grounds": [
+    "CRITICAL_PROPERTIES, SUBSTANCES_FOR_VAPORIZATION, SUBSTANCES_FOR_HEATING (species the fluid database lacks)"
+   ],
+   "group": "webbook",
+   "id": "webbook:ethanol:condensed_phase",
+   "kind": "html",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:57Z",
+   "sha256": "39674bd3aad694c681f2b13cc86c96875701f48e9ef754a1acc084883d5489a5",
+   "species": "Ethanol",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C64175&Units=SI&Mask=2",
+   "via": "title 'Ethanol'"
+  },
+  "webbook:ethanol:phase_change": {
+   "bytes": 77697,
+   "cas": "C64175",
+   "dest": "nist_webbook_species/ethanol_C64175_phase_change.html",
+   "grounds": [
+    "CRITICAL_PROPERTIES, SUBSTANCES_FOR_VAPORIZATION, SUBSTANCES_FOR_HEATING (species the fluid database lacks)"
+   ],
+   "group": "webbook",
+   "id": "webbook:ethanol:phase_change",
+   "kind": "html",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:21:55Z",
+   "sha256": "e12155020e6d6f6d23aff03dcd72048950f2e92ab01fd0449fea9916e6263970",
+   "species": "Ethanol",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C64175&Units=SI&Mask=4",
+   "via": "title 'Ethanol'"
+  },
+  "webbook:ethylene_glycol:condensed_phase": {
+   "bytes": 45002,
+   "cas": "C107211",
+   "dest": "nist_webbook_species/ethylene_glycol_C107211_condensed_phase.html",
+   "grounds": [
+    "CRITICAL_PROPERTIES, SUBSTANCES_FOR_VAPORIZATION, SUBSTANCES_FOR_HEATING (species the fluid database lacks)"
+   ],
+   "group": "webbook",
+   "id": "webbook:ethylene_glycol:condensed_phase",
+   "kind": "html",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:22:28Z",
+   "sha256": "0871a8d008b39af5f623e7c6c50f68087ea485fb568580d166f41368ec8a193e",
+   "species": "Ethylene glycol",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C107211&Units=SI&Mask=2",
+   "via": "title '1,2-Ethanediol'"
+  },
+  "webbook:ethylene_glycol:phase_change": {
+   "bytes": 56567,
+   "cas": "C107211",
+   "dest": "nist_webbook_species/ethylene_glycol_C107211_phase_change.html",
+   "grounds": [
+    "CRITICAL_PROPERTIES, SUBSTANCES_FOR_VAPORIZATION, SUBSTANCES_FOR_HEATING (species the fluid database lacks)"
+   ],
+   "group": "webbook",
+   "id": "webbook:ethylene_glycol:phase_change",
+   "kind": "html",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:22:26Z",
+   "sha256": "aeba27b6a83674bc321963bdb8524f227d33a210ed3614cc23c29fff7a85449b",
+   "species": "Ethylene glycol",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C107211&Units=SI&Mask=4",
+   "via": "title '1,2-Ethanediol'"
+  },
+  "webbook:glycerol:condensed_phase": {
+   "bytes": 45640,
+   "cas": "C56815",
+   "dest": "nist_webbook_species/glycerol_C56815_condensed_phase.html",
+   "grounds": [
+    "CRITICAL_PROPERTIES, SUBSTANCES_FOR_VAPORIZATION, SUBSTANCES_FOR_HEATING (species the fluid database lacks)"
+   ],
+   "group": "webbook",
+   "id": "webbook:glycerol:condensed_phase",
+   "kind": "html",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:22:25Z",
+   "sha256": "52cc40a6b0ff9bc0747e530bb1a62005c7a72d513f0e7199b8362984ae14ecc4",
+   "species": "Glycerol",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C56815&Units=SI&Mask=2",
+   "via": "title 'Glycerin'"
+  },
+  "webbook:glycerol:phase_change": {
+   "bytes": 50878,
+   "cas": "C56815",
+   "dest": "nist_webbook_species/glycerol_C56815_phase_change.html",
+   "grounds": [
+    "CRITICAL_PROPERTIES, SUBSTANCES_FOR_VAPORIZATION, SUBSTANCES_FOR_HEATING (species the fluid database lacks)"
+   ],
+   "group": "webbook",
+   "id": "webbook:glycerol:phase_change",
+   "kind": "html",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:22:21Z",
+   "sha256": "1dedcdcd0830ded8db09372b9ae154e6731cad4c5de940d4195dd9be7b8d1de3",
+   "species": "Glycerol",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C56815&Units=SI&Mask=4",
+   "via": "title 'Glycerin'"
+  },
+  "webbook:isopropanol:condensed_phase": {
+   "bytes": 48816,
+   "cas": "C67630",
+   "dest": "nist_webbook_species/isopropanol_C67630_condensed_phase.html",
+   "grounds": [
+    "CRITICAL_PROPERTIES, SUBSTANCES_FOR_VAPORIZATION, SUBSTANCES_FOR_HEATING (species the fluid database lacks)"
+   ],
+   "group": "webbook",
+   "id": "webbook:isopropanol:condensed_phase",
+   "kind": "html",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:22:05Z",
+   "sha256": "ba6414bddd05ae9baf37eb4b368ca575b30cb448a245c42f93d73f962f69b0ab",
+   "species": "Isopropanol",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C67630&Units=SI&Mask=2",
+   "via": "title 'Isopropyl Alcohol'"
+  },
+  "webbook:isopropanol:phase_change": {
+   "bytes": 74320,
+   "cas": "C67630",
+   "dest": "nist_webbook_species/isopropanol_C67630_phase_change.html",
+   "grounds": [
+    "CRITICAL_PROPERTIES, SUBSTANCES_FOR_VAPORIZATION, SUBSTANCES_FOR_HEATING (species the fluid database lacks)"
+   ],
+   "group": "webbook",
+   "id": "webbook:isopropanol:phase_change",
+   "kind": "html",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:22:03Z",
+   "sha256": "0cf9425ab3cfa6f9a6a0b3d4f0ac49ec0ca3980bbd676ee665083f52a1b7d095",
+   "species": "Isopropanol",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C67630&Units=SI&Mask=4",
+   "via": "title 'Isopropyl Alcohol'"
+  },
+  "webbook:mercury:condensed_phase": {
+   "bytes": 21034,
+   "cas": "C7439976",
+   "dest": "nist_webbook_species/mercury_C7439976_condensed_phase.html",
+   "grounds": [
+    "CRITICAL_PROPERTIES, SUBSTANCES_FOR_VAPORIZATION, SUBSTANCES_FOR_HEATING (species the fluid database lacks)"
+   ],
+   "group": "webbook",
+   "id": "webbook:mercury:condensed_phase",
+   "kind": "html",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:22:12Z",
+   "sha256": "156f8088e1d045022098e7f22c89d014e435425e3f9d81532524639f85fe4de6",
+   "species": "Mercury",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C7439976&Units=SI&Mask=2",
+   "via": "title 'Mercury'"
+  },
+  "webbook:mercury:phase_change": {
+   "bytes": 30388,
+   "cas": "C7439976",
+   "dest": "nist_webbook_species/mercury_C7439976_phase_change.html",
+   "grounds": [
+    "CRITICAL_PROPERTIES, SUBSTANCES_FOR_VAPORIZATION, SUBSTANCES_FOR_HEATING (species the fluid database lacks)"
+   ],
+   "group": "webbook",
+   "id": "webbook:mercury:phase_change",
+   "kind": "html",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:22:10Z",
+   "sha256": "fb29e511faff02df31b7b67583008ce3716604e05fb224c980a6cc42fd80c5ae",
+   "species": "Mercury",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C7439976&Units=SI&Mask=4",
+   "via": "title 'Mercury'"
+  },
+  "webbook:p_xylene:condensed_phase": {
+   "bytes": 46282,
+   "cas": "C106423",
+   "dest": "nist_webbook_species/p_xylene_C106423_condensed_phase.html",
+   "grounds": [
+    "CRITICAL_PROPERTIES, SUBSTANCES_FOR_VAPORIZATION, SUBSTANCES_FOR_HEATING (species the fluid database lacks)"
+   ],
+   "group": "webbook",
+   "id": "webbook:p_xylene:condensed_phase",
+   "kind": "html",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:22:19Z",
+   "sha256": "582c68b965e661ba26c4918cb017dc8bc65375b4389105627c3caf0ba1c73a18",
+   "species": "p-Xylene",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C106423&Units=SI&Mask=2",
+   "via": "title 'p-Xylene'"
+  },
+  "webbook:p_xylene:phase_change": {
+   "bytes": 64934,
+   "cas": "C106423",
+   "dest": "nist_webbook_species/p_xylene_C106423_phase_change.html",
+   "grounds": [
+    "CRITICAL_PROPERTIES, SUBSTANCES_FOR_VAPORIZATION, SUBSTANCES_FOR_HEATING (species the fluid database lacks)"
+   ],
+   "group": "webbook",
+   "id": "webbook:p_xylene:phase_change",
+   "kind": "html",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:22:17Z",
+   "sha256": "2d7466f7da448a011fc49ccd689bcfc514d82cd4525ca5bbc5dd8e53cc6bb823",
+   "species": "p-Xylene",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C106423&Units=SI&Mask=4",
+   "via": "title 'p-Xylene'"
+  },
+  "webbook:radon:condensed_phase": {
+   "bytes": 17132,
+   "cas": "C10043922",
+   "dest": "nist_webbook_species/radon_C10043922_condensed_phase.html",
+   "grounds": [
+    "CRITICAL_PROPERTIES, SUBSTANCES_FOR_VAPORIZATION, SUBSTANCES_FOR_HEATING (species the fluid database lacks)"
+   ],
+   "group": "webbook",
+   "id": "webbook:radon:condensed_phase",
+   "kind": "html",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:22:41Z",
+   "sha256": "896d318f4605c3cfb8e4f9b884c732bfb0a4d8fa0d6592acece36ae472e87046",
+   "species": "Radon",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C10043922&Units=SI&Mask=2",
+   "via": "title 'Radon'"
+  },
+  "webbook:radon:phase_change": {
+   "bytes": 19852,
+   "cas": "C10043922",
+   "dest": "nist_webbook_species/radon_C10043922_phase_change.html",
+   "grounds": [
+    "CRITICAL_PROPERTIES, SUBSTANCES_FOR_VAPORIZATION, SUBSTANCES_FOR_HEATING (species the fluid database lacks)"
+   ],
+   "group": "webbook",
+   "id": "webbook:radon:phase_change",
+   "kind": "html",
+   "licence": "US Government work (NIST SRD 69)",
+   "retrieved_utc": "2026-09-11T12:22:39Z",
+   "sha256": "a11592d841e9a7dbec0f9f994b487812d70d77cc167dca66b971583e17ebcb60",
+   "species": "Radon",
+   "status": "present",
+   "url": "https://webbook.nist.gov/cgi/cbook.cgi?ID=C10043922&Units=SI&Mask=4",
+   "via": "title 'Radon'"
+  }
+ }
+}
