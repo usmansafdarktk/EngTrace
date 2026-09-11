@@ -70,6 +70,7 @@ import os
 import re
 import sys
 import zipfile
+from decimal import ROUND_HALF_UP, Decimal
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 if REPO not in sys.path:
@@ -481,15 +482,28 @@ def _sha256(path):
 
 
 def _rounded(a, precision):
+    """The artefact value at a precision, rounded half-up IN DECIMAL (D-012).
+
+    The first version rounded the binary float (`round(a, n)`, `f'{a:.{n-1}e}'`),
+    which settles a half-way tie on the binary value: NIST prints water's saturated
+    liquid volume at 373.15 K as 0.0010435, and the binary float of that string
+    formats to 0.001043 at 4 s.f. where a reader doing decimal arithmetic - and every
+    template's `_hu` - gets 0.001044. Found at C3 by three REAL_FLUID_DATA fields
+    whose NIST strings are exact decimal ties. repr() recovers the shortest decimal
+    string of the float the reader parsed, so the tie is resolved on the digits the
+    artefact printed.
+    """
     if precision == 'exact':
         return a
     m = re.fullmatch(r'(\d+)(sf|dp)', precision)
     if not m:
         raise ValueError(f'precision={precision!r} is not exact, <n>sf or <n>dp')
     n = int(m.group(1))
-    if m.group(2) == 'dp':
-        return round(a, n)
-    return float(f'{a:.{n - 1}e}')
+    d = Decimal(repr(float(a)))
+    if d == 0:
+        return 0.0
+    place = Decimal(1).scaleb(-n if m.group(2) == 'dp' else d.adjusted() - n + 1)
+    return float(d.quantize(place, rounding=ROUND_HALF_UP))
 
 
 def _same(x, y):
@@ -799,6 +813,15 @@ MEDIA = {
 ATM_KPA = 101.325
 
 # @kind: property
+# @units: m^3/kg
+SAT = {
+    # [ON-DISK] nist_fluid_properties/water_C7732185_saturation_373.15K.tsv @ T=373.15 col="Volume (l, m3/kg)" precision=4sf
+    "Water v_f, 4 s.f. of a printed tie": 0.001044,
+    # [ON-DISK] nist_fluid_properties/water_C7732185_saturation_373.15K.tsv @ T=373.15 col="Volume (l, m3/kg)" precision=6dp
+    "Water v_f, 6 d.p. of the same tie": 0.001044,
+}
+
+# @kind: property
 # @units: ksi
 MIL_MODULI = {
     # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=277 text="Table 2.7.1.0(b)" mil="G" col=1 scale=1e3 precision=exact
@@ -809,6 +832,14 @@ MIL_MODULI = {
 '''
 
 _PLANTS = [
+    # Rounding convention (D-012): NIST prints 0.0010435, an exact decimal tie at 4 s.f.
+    # and at 6 d.p. The clean rows carry the decimal half-up value; each plant carries
+    # the value a BINARY rounding of the parsed float gives, which must fail - in both
+    # precision forms, since sf and dp were two separate code paths.
+    ('R4', 'a 4-s.f. decimal tie rounded on the binary float',
+     '"Water v_f, 4 s.f. of a printed tie": 0.001044', '"Water v_f, 4 s.f. of a printed tie": 0.001043'),
+    ('R4', 'a 6-d.p. decimal tie rounded on the binary float',
+     '"Water v_f, 6 d.p. of the same tie": 0.001044', '"Water v_f, 6 d.p. of the same tie": 0.001043'),
     # MIL-HDBK-5J design tables (C3.1 mechanical). The text layer prints them in two
     # layouts (tests/constants_integrity/milhdbk.py); a misreading of each, plus a
     # page whose layout fits neither and must be refused rather than guessed.
