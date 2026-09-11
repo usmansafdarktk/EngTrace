@@ -43,7 +43,10 @@ and seven are added, one per clause of the C1.2 vocabulary (spec §C1.2):
       Neither: the value is not machine-compared, and the citation is counted
       LOCATOR-ONLY rather than passed as if it had been. `via="NAME/x"` says the
       table stores NAME/x rather than x (MEDIA_VELOCITIES stores C0/n), and the
-      relation is checked on x = NAME/constant. A value interpolated between two
+      relation is checked on x = NAME/constant. `scale=<f>` says the table stores
+      the artefact's quantity times f (ATMOSPHERIC_PRESSURE_KPA: kPa against
+      CODATA's Pa, scale=1e-3), and the relation is checked in the artefact's
+      unit, so `precision=` counts the artefact's digits. A value interpolated between two
       tabulated rows must satisfy the relation at BOTH rows too, so a verdict
       never rests on the interpolation.
   R5  an [ON-DISK:LOCAL-ONLY] path is listed in MANIFEST.json's
@@ -611,6 +614,16 @@ def check_source(branch, src, refs=REFS, manifest=None, kinds=None):
         const, err = _constant(ns, tag['table'], tag.get('row'), kv)
         if not err and 'via' in kv:
             const, err = _solve_via(ns, kv['via'], const)
+        if not err and 'scale' in kv:
+            # the table stores the artefact's quantity in another unit: compare in
+            # the artefact's own unit, so precision= keeps counting ITS digits
+            try:
+                scale = float(kv['scale'])
+                if scale <= 0:
+                    raise ValueError
+                const = const / scale
+            except ValueError:
+                err = f'scale={kv["scale"]!r} is not a positive number'
         if err:
             failures.append(f'R4 {where}: {err}')
             continue
@@ -734,9 +747,19 @@ MEDIA = {
     # [ON-DISK] refractiveindex_info/refractiveindex.info-database-main.zip @ member="database/data/organic/C6H6 - benzene/nk/Chang.yml" wavelength=0.589um via="C0/x" tol=0.1%
     "Benzene": C0 / 1.501,
 }
+
+# @kind: defined
+# @units: kPa
+# [ON-DISK] codata_2022/allascii.txt @ quantity="standard atmosphere" scale=1e-3 precision=exact
+ATM_KPA = 101.325
 '''
 
 _PLANTS = [
+    # A unit scale (C3.1, ATMOSPHERIC_PRESSURE_KPA: kPa against CODATA's Pa). Two
+    # forms of a unit error: the factor inverted, and the factor left out.
+    ('R4', 'a unit scale in the wrong direction', 'scale=1e-3 precision=exact',
+     'scale=1e3 precision=exact'),
+    ('R4', 'a unit scale left out', 'scale=1e-3 precision=exact', 'precision=exact'),
     # Wavelength-evaluated indices (C3.1, MEDIA_VELOCITIES). Written from what the
     # locator means: an index is a function of wavelength, valid over a stated
     # range; `tabulated n2` is a different quantity; C0/n is not n; and a value
