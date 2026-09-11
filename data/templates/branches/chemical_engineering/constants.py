@@ -328,6 +328,11 @@ REAL_FLUID_DATA = {
 # Tc: Kelvin (K), Pc: bar, Vc: cm³/mol, Zc: dimensionless, omega: dimensionless.
 # @kind: property
 # @units: Tc=K, Pc=bar, Vc=cm^3/mol, Zc=1, omega=1
+# @domain: none (the critical point is itself the condition)
+# [UNVERIFIED] no on-disk artefact covers this 27-row set. The WebBook species pages in
+#   docs/references/nist_webbook_species are the only critical-point source on disk and
+#   they cover 3 of the 27 rows, tagged individually below; the rest are asserted.
+#   Registered as a C3.5 residual.
 CRITICAL_PROPERTIES = {
     "Methane": {"Tc": 190.6, "Pc": 45.99, "Vc": 99.0, "Zc": 0.286, "omega": 0.012},
     "Ethane": {"Tc": 305.3, "Pc": 48.72, "Vc": 146.0, "Zc": 0.279, "omega": 0.100},
@@ -341,9 +346,21 @@ CRITICAL_PROPERTIES = {
     "Propylene": {"Tc": 365.0, "Pc": 46.0, "Vc": 181.0, "Zc": 0.275, "omega": 0.140},
     "Benzene": {"Tc": 562.2, "Pc": 48.95, "Vc": 259.0, "Zc": 0.271, "omega": 0.210},
     "Toluene": {"Tc": 591.8, "Pc": 41.09, "Vc": 316.0, "Zc": 0.264, "omega": 0.263},
+    # [ON-DISK] nist_webbook_species/p_xylene_C106423_phase_change.html @ text="T c (K)"
+    #   The page's phase-change table gives Tc = 616.2 K (Majer and Svoboda, 1985),
+    #   which is this row's Tc. Locator-only: the value sits in a positional HTML
+    #   table the resolver does not parse, so it pins the page, not the number.
     "p-Xylene": {"Tc": 616.2, "Pc": 35.12, "Vc": 379.0, "Zc": 0.260, "omega": 0.321},
     "Methanol": {"Tc": 512.6, "Pc": 80.84, "Vc": 118.0, "Zc": 0.224, "omega": 0.564},
+    # [ON-DISK] nist_webbook_species/ethanol_C64175_phase_change.html @ text="T c (K)"
+    #   The page's phase-change table gives Tc = 513.9 K (Majer and Svoboda, 1985),
+    #   which is this row's Tc. Locator-only: the value sits in a positional HTML
+    #   table the resolver does not parse, so it pins the page, not the number.
     "Ethanol": {"Tc": 513.9, "Pc": 61.37, "Vc": 167.0, "Zc": 0.248, "omega": 0.645},
+    # [ON-DISK] nist_webbook_species/acetone_C67641_phase_change.html @ text="T c (K)"
+    #   The page's phase-change table gives Tc = 508.2 K (Majer and Svoboda, 1985),
+    #   which is this row's Tc. Locator-only: the value sits in a positional HTML
+    #   table the resolver does not parse, so it pins the page, not the number.
     "Acetone": {"Tc": 508.2, "Pc": 46.99, "Vc": 209.0, "Zc": 0.232, "omega": 0.304},
     "Water": {"Tc": 647.1, "Pc": 220.64, "Vc": 55.9, "Zc": 0.229, "omega": 0.345},
     "Ammonia": {"Tc": 405.5, "Pc": 113.53, "Vc": 72.5, "Zc": 0.242, "omega": 0.250},
@@ -363,6 +380,10 @@ CRITICAL_PROPERTIES = {
 # Added 'min_temp' and 'max_temp' (in °C) to ensure phase stability.
 # @kind: property
 # @units: Cp=J/(g*K), min_temp=degC, max_temp=degC
+# @domain: none (each row states its own min_temp/max_temp window)
+# [UNVERIFIED] specific heats in J/(g*K) with no temperature stated per value. Nothing on
+#   disk carries this table: the WebBook pages hold molar Cp for 5 of the 35 rows, in
+#   different units and at different conditions. C3.5 residual.
 SUBSTANCES_FOR_HEATING = [
     # Metals & Solids (Generally safe 20°C - 500°C)
     {"name": "Iron", "state": "solid", "Cp": 0.449, "min_temp": 20, "max_temp": 500},
@@ -413,11 +434,23 @@ SUBSTANCES_FOR_HEATING = [
 # at their normal boiling points. All values are in kJ/mol.
 # @kind: property
 # @units: delta_H_vap=kJ/mol
+# @domain: none (each value is at its own substance's normal boiling point)
+# [UNVERIFIED] as a table: 4 of the 16 rows resolve to a WebBook phase-change page and are
+#   tagged below. The other 12 do not, and they are NOT [DERIVED] either, though they
+#   could nearly be: dHvap = Enthalpy(v) - Enthalpy(l) at 1 atm from the NIST saturation
+#   tables reproduces 7 of them to within 0.04-1.45% (methanol, benzene, ammonia and
+#   oxygen are even roundings of it; water, propane, butane, hexane, toluene, nitrogen
+#   and argon are not). Claiming [DERIVED] would be false for the rows that miss, so the
+#   table is UNVERIFIED and the near-derivation is a C3.5 residual.
 SUBSTANCES_FOR_VAPORIZATION = [
     # Alcohols & Water
     {"name": "Water", "delta_H_vap": 40.66},
     {"name": "Methanol", "delta_H_vap": 35.3},
+    # [ON-DISK] nist_webbook_species/ethanol_C64175_phase_change.html @ text="Enthalpy of vaporization"
+    #   The page's first entry is 38.56 kJ/mol at 351.5 K (Majer and Svoboda, 1985).
     {"name": "Ethanol", "delta_H_vap": 38.6},
+    # [ON-DISK] nist_webbook_species/isopropanol_C67630_phase_change.html @ text="Enthalpy of vaporization"
+    #   The page's first entry is 39.85 kJ/mol at 355.4 K (Majer and Svoboda, 1985).
     {"name": "Isopropanol", "delta_H_vap": 39.85},
 
     # Alkanes
@@ -426,9 +459,13 @@ SUBSTANCES_FOR_VAPORIZATION = [
     {"name": "n-Hexane", "delta_H_vap": 28.85},
 
     # Organic Solvents
+    # [ON-DISK] nist_webbook_species/acetone_C67641_phase_change.html @ text="Enthalpy of vaporization"
+    #   The page's first entry is 29.1 kJ/mol at 329.3 K (Majer and Svoboda, 1985).
     {"name": "Acetone", "delta_H_vap": 29.1},
     {"name": "Benzene", "delta_H_vap": 30.8},
     {"name": "Toluene", "delta_H_vap": 33.48},
+    # [ON-DISK] nist_webbook_species/carbon_tetrachloride_C56235_phase_change.html @ text="Enthalpy of vaporization"
+    #   The page's first entry is 29.82 kJ/mol at 349.9 K (Majer and Svoboda, 1985).
     {"name": "Carbon Tetrachloride", "delta_H_vap": 29.82},
 
     # Inorganic & Elemental Substances
@@ -469,6 +506,7 @@ SUBSTANCES_FOR_VAPORIZATION = [
 # JSON, so the table did not carry its own provenance. It does now.
 # @kind: property
 # @units: kJ/mol
+# @domain: T=298.15 K, p=1 bar
 HEATS_OF_FORMATION = {
     # Hydrocarbons (Gases)
     # [ON-DISK] NIST 74-82-8, -74.6+/-0.3 (Manion 2002, adopting Gurvich 1991)
@@ -543,6 +581,9 @@ HEATS_OF_FORMATION = {
 # A list of predefined, balanced chemical reactions.
 # @kind: mathematical
 # @units: reactants=1, products=1
+# @domain: none (stoichiometry; no temperature or pressure condition)
+# [DERIVED] every reaction balances. The patch script counts atoms on both sides of all
+#   4 reactions from the species keys themselves and refuses to write if any differs.
 REACTIONS = [
     {
         "name": "Combustion of Methane",
@@ -611,6 +652,9 @@ REACTIONS = [
 # finding F-2; DECISIONS D-032).
 # @kind: property
 # @units: A=1, B=1/K, C=1/K^2, D=K^2
+# @domain: T=298..1500 K
+#   The per-row ceiling is CP_VALID_T_MAX below; 1500 K is the common case and the
+#   widest this polynomial is fitted for.
 CP_PARAMS = {
     # Key order is deliberately the original one.
     # template_sensible_heat_temp_dependent_cp draws its substance with
@@ -738,6 +782,9 @@ CP_PARAMS = {
 #   C3.8: heat_effects.py draws T2 up to 350.0 and 1200.0 - this table's C6H6(l) and Al2O3(s)
 #   limits - as literals; a refit that moved them would not reach the template
 #   (phaseC3_literal_copies.md).
+# @domain: none (this table IS a domain declaration)
+# [DERIVED] each row is the top of the temperature interval this repo fitted that
+#   species over - stated per row above, and not NIST's own range of validity.
 CP_VALID_T_MAX = {
     **{k: 1500.0 for k in CP_PARAMS},
     "C2H5OH(g)": 1500.0,     # refit over 298-1500 K
@@ -764,6 +811,10 @@ CP_VALID_T_MAX = {
 # test suite is its only consumer.
 # @kind: property
 # @units: 1
+# @domain: none (dry air; the composition is the definition, not a measurement at a T)
+# [UNVERIFIED] the US Standard Atmosphere 1976 is not on disk. The three fractions sum to
+#   0.99964 by construction (trace gases dropped), as the note above says. Advisory:
+#   the test suite is the only consumer, so nothing graded depends on it.
 AIR_COMPOSITION = {"N2(g)": 0.78084, "O2(g)": 0.20946, "Ar(g)": 0.00934}
 
 
@@ -806,6 +857,7 @@ AIR_COMPOSITION = {"N2(g)": 0.78084, "O2(g)": 0.20946, "Ar(g)": 0.00934}
 # finding C-1).
 # @kind: property
 # @units: A=1, B=1/K, C=1/K^2, D=K^2
+# @domain: T=298..3000 K
 CP_PARAMS_COMBUSTION = {
     # [DERIVED] least-squares refit of NIST 124-38-9 Shomate Cp over
     #   298-3000 K, 400 points. Worst residual -5.43% (at the
@@ -838,12 +890,17 @@ CP_PARAMS_COMBUSTION = {
 # is: the C2.2 suite checks the flame template stays inside it.
 # @kind: validity
 # @units: K
+# @domain: none (this constant IS a domain declaration)
+# [DERIVED] the top of the 298-3000 K interval the four rows above were refitted over.
 CP_COMBUSTION_VALID_T_MAX = 3000.0
 
 
 # A list of predefined, balanced combustion reactions with theoretical air.
 # @kind: mathematical
 # @units: reactants=1, products=1
+# @domain: none (stoichiometry with theoretical air)
+# [DERIVED] all 11 balance, checked atom by atom from the species keys, and every one
+#   carries theoretical air at N2/O2 = 3.76.
 COMBUSTION_REACTIONS = [
     {
         "name": "Combustion of Methane",
@@ -930,8 +987,19 @@ COMBUSTION_REACTIONS = [
 # Format: { "Name": (Density [kg/m³], Dynamic Viscosity [Pa·s]) }
 # @kind: property
 # @units: [0]=kg/m^3, [1]=Pa*s
+# @domain: T=293.15 K, p=101.325 kPa
+# [UNVERIFIED] as a table - "values chosen for typical textbook accuracy", as the note above
+#   says, and most of the 30 rows (honey, blood, engine oils) have no primary source on
+#   disk at all. Three (row, field) pairs DO equal the NIST isobar at the declared
+#   293.15 K and are tagged individually below.
+#   FINDING (C3.5): for every organic liquid that has a NIST isobar on disk, the
+#   VISCOSITY here is low by 4.6-7.2% at the very conditions this table declares - Methanol -7.06%, Benzene -7.16%, Toluene -4.62%, n-Hexane -6.12%.
+#   The densities agree to 0.001-0.7%. A one-sided gap across four independent species
+#   is a source difference, not scatter; the values are left exactly as transcribed.
 COMMON_LIQUIDS = {
     # Water and Common Solvents
+    # [ON-DISK] nist_fluid_properties/water_C7732185_isobar_1atm.tsv @ T=293.15 col="Density (kg/m3)" field=[0] precision=4sf
+    # [ON-DISK] nist_fluid_properties/water_C7732185_isobar_1atm.tsv @ T=293.15 col="Viscosity (Pa*s)" field=[1] precision=4sf
     "Water": (998.2, 1.002e-3),
     "Seawater (3.5% salinity)": (1025, 1.07e-3), # Viscosity approx. 7% higher than pure water
     "Ethanol": (789.4, 1.074e-3),
@@ -939,6 +1007,7 @@ COMMON_LIQUIDS = {
     "Isopropyl Alcohol (IPA)": (781.8, 2.04e-3),
     "Acetone": (784.5, 0.306e-3),
     "Benzene": (876.5, 0.601e-3),
+    # [ON-DISK] nist_fluid_properties/toluene_C108883_isobar_1atm.tsv @ T=293.15 col="Density (kg/m3)" field=[0] precision=4sf
     "Toluene": (866.9, 0.560e-3),
     "Diethyl Ether": (713.4, 0.223e-3),
     "n-Hexane": (654.8, 0.294e-3),
@@ -977,19 +1046,32 @@ COMMON_LIQUIDS = {
 # Format: { "Name": (Density [kg/m³], Dynamic Viscosity [Pa·s]) }
 # @kind: property
 # @units: [0]=kg/m^3, [1]=Pa*s
+# @domain: T=293.15 K, p=101.325 kPa
+# [UNVERIFIED] as a table; 10 (row, field) pairs equal the NIST isobar at 293.15 K and are
+#   tagged below. The rest sit 0.1-6% off it (worst: SF6 viscosity +6.06%, butane
+#   viscosity +3.45%) with no on-disk source of their own. C3.5 residual.
 COMMON_GASES = {
     # Common Gases
     "Air": (1.204, 1.81e-5),
+    # [ON-DISK] nist_fluid_properties/nitrogen_C7727379_isobar_1atm.tsv @ T=293.15 col="Density (kg/m3)" field=[0] precision=4sf
+    # [ON-DISK] nist_fluid_properties/nitrogen_C7727379_isobar_1atm.tsv @ T=293.15 col="Viscosity (Pa*s)" field=[1] precision=3sf
     "Nitrogen (N₂)": (1.165, 1.76e-5),
+    # [ON-DISK] nist_fluid_properties/oxygen_C7782447_isobar_1atm.tsv @ T=293.15 col="Density (kg/m3)" field=[0] precision=4sf
     "Oxygen (O₂)": (1.331, 2.00e-5),
+    # [ON-DISK] nist_fluid_properties/carbon_dioxide_C124389_isobar_1atm.tsv @ T=293.15 col="Viscosity (Pa*s)" field=[1] precision=3sf
     "Carbon Dioxide (CO₂)": (1.842, 1.47e-5), # Viscosity is temperature-dependent and increases for CO2
+    # [ON-DISK] nist_fluid_properties/argon_C7440371_isobar_1atm.tsv @ T=293.15 col="Viscosity (Pa*s)" field=[1] precision=3sf
     "Argon": (1.661, 2.23e-5),
+    # [ON-DISK] nist_fluid_properties/helium_C7440597_isobar_1atm.tsv @ T=293.15 col="Density (kg/m3)" field=[0] precision=3sf
+    # [ON-DISK] nist_fluid_properties/helium_C7440597_isobar_1atm.tsv @ T=293.15 col="Viscosity (Pa*s)" field=[1] precision=3sf
     "Helium": (0.166, 1.96e-5),
     "Neon": (0.840, 3.18e-5),
     "Krypton": (3.479, 2.55e-5),
     "Xenon": (5.495, 2.28e-5), # Density high, but viscosity is similar to air
     
     # Hydrocarbons
+    # [ON-DISK] nist_fluid_properties/methane_C74828_isobar_1atm.tsv @ T=293.15 col="Density (kg/m3)" field=[0] precision=3sf
+    # [ON-DISK] nist_fluid_properties/methane_C74828_isobar_1atm.tsv @ T=293.15 col="Viscosity (Pa*s)" field=[1] precision=3sf
     "Methane (CH₄)": (0.668, 1.09e-5),
     "Ethane (C₂H₆)": (1.264, 9.15e-6),
     "Propane (C₃H₈)": (1.880, 8.00e-6), # Note: Viscosity decreases slightly with molecular weight in this series
@@ -998,6 +1080,7 @@ COMMON_GASES = {
     "Acetylene (C₂H₂)": (1.092, 9.80e-6),
     
     # Other Common Gases
+    # [ON-DISK] nist_fluid_properties/hydrogen_C1333740_isobar_1atm.tsv @ T=293.15 col="Density (kg/m3)" field=[0] precision=3sf
     "Hydrogen (H₂)": (0.0838, 8.90e-6), # Lowest density, very low viscosity
     "Steam (Water Vapor)": (0.747, 1.02e-5), # At 100°C (373 K), 1 atm
     "Ammonia (NH₃)": (0.718, 1.01e-5),
@@ -1015,6 +1098,20 @@ COMMON_GASES = {
 # Note: Epsilon ε / k (the Lennard-Jones energy parameter) is included for calculating the collision integral.
 # @kind: property
 # @units: [0]=g/mol, [1]=angstrom, [2]=K
+# @domain: none (Lennard-Jones parameters; no fit temperature range is stated)
+# [UNVERIFIED], and a FINDING (C3.5). Svehla, NASA TR R-132, Table I(a) IS on disk
+#   (nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf, PDF pp.22-26) and is the classic source
+#   for these constants - but this table is not it. Parsed from the scan and compared
+#   row by row (15 of the 17 rows; Xenon and Chlorine have no unambiguous token in
+#   the OCR, so they are not claimed either way):
+#     eps/k agrees with Svehla for 11 of 14 rows
+#     sigma agrees for 3 of 15 - only Argon, Carbon Dioxide, Helium
+#   n-butane is sigma 5.47 here against Svehla 4.687; propane 5.06 against 5.118;
+#   methane 3.78 against 3.758. Air, N2 and H2 differ in BOTH columns (air 3.62/97.0
+#   against Svehla 3.711/78.6), so those three are from a third compilation again.
+#   So the table mixes sources and cannot be cited to one. Ammonia's eps/k is left out
+#   of the count: the scan renders 558.3 as "55& 3", which no parser should guess at -
+#   by eye it matches. Values are left exactly as transcribed; the repo owner decides.
 GAS_MOLECULAR_PARAMS = {
     "Air": (28.97, 3.62, 97.0),
     "Nitrogen (N₂)": (28.01, 3.70, 95.05),
@@ -1040,6 +1137,11 @@ GAS_MOLECULAR_PARAMS = {
 # Format: { "Name": (Consistency Index K [Pa·s^n], Power-Law Index n [dimensionless]) }
 # @kind: property
 # @units: [0]=Pa*s^n, [1]=1
+# @domain: none (K and n are shear-rate and temperature dependent; none is stated)
+# [UNVERIFIED] ketchup, mayonnaise and toothpaste have no primary source on disk, and K for
+#   a shear-thinning fluid is not a constant of the substance - it depends on the shear
+#   range and temperature the fit was made over, neither of which this table records.
+#   C3.5 residual.
 POWER_LAW_FLUIDS = {
     # Common Household & Food (Shear-Thinning)
     "Ketchup": (32.5, 0.22),
@@ -1080,4 +1182,6 @@ POWER_LAW_FLUIDS = {
 # Standard gravitational acceleration in m/s²
 # @kind: defined
 # @units: m/s^2
+# @domain: none (a defined standard value, not a measurement at a condition)
+# [ON-DISK] codata_2022/allascii.txt @ quantity="standard acceleration of gravity" precision=3sf
 GRAVITATIONAL_ACCELERATION = 9.81

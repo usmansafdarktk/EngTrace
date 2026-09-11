@@ -6,19 +6,3 @@
 # something that is not a numeric table fails. C3's exit gate is an empty list.
 #
 # Generated at Phase C1 from census P-TABLE (107 tables).
-chemical_engineering.CRITICAL_PROPERTIES
-chemical_engineering.SUBSTANCES_FOR_HEATING
-chemical_engineering.SUBSTANCES_FOR_VAPORIZATION
-chemical_engineering.HEATS_OF_FORMATION
-chemical_engineering.REACTIONS
-chemical_engineering.CP_PARAMS
-chemical_engineering.CP_VALID_T_MAX
-chemical_engineering.AIR_COMPOSITION
-chemical_engineering.CP_PARAMS_COMBUSTION
-chemical_engineering.CP_COMBUSTION_VALID_T_MAX
-chemical_engineering.COMBUSTION_REACTIONS
-chemical_engineering.COMMON_LIQUIDS
-chemical_engineering.COMMON_GASES
-chemical_engineering.GAS_MOLECULAR_PARAMS
-chemical_engineering.POWER_LAW_FLUIDS
-chemical_engineering.GRAVITATIONAL_ACCELERATION
