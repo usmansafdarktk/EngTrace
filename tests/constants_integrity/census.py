@@ -42,6 +42,13 @@ P-CONSUMER A template consumes a table if its `template_*` function - or any
                whose body reads it (`chart_factor` reads CONTROL_CHART_FACTORS);
              * a name bound at module level in the template's module whose value,
                at the END of the module's import, derives from it.
+           An expression derives from a table through the names it loads AND
+           through every call it makes to a module-level function that reads the
+           table (transitively). The first version stopped at the called name, so
+           `_T27_PLANS = _t27_admissible_plans()` derived from nothing and the
+           p-chart template's `random.choice(_T27_PLANS)` was an invisible draw
+           (found by the C3.10 guard detector calling two tables guard-only there;
+           a corpus-wide scan found that one site).
            Derivation is tracked FLOW-SENSITIVELY, statement by statement: an
            assignment replaces what a name stands for, a container fill
            (`X.append(...)`, `X[k] = ...`) adds to it, a loop is walked to a
@@ -302,8 +309,9 @@ class _Flow:
     the tables themselves, constants-level aliases, and module aliases.
     """
 
-    def __init__(self, sources):
+    def __init__(self, sources, calls=None):
         self.sources = sources
+        self.calls = calls or {}
         self.ever = {}
 
     def _look(self, env, name):
@@ -314,6 +322,12 @@ class _Flow:
         for n in ast.walk(node):
             if isinstance(n, ast.Name):
                 out |= self._look(env, n.id)
+            # A call to a module-level function yields what that function READS,
+            # not just its name. The first version stopped at the name, so
+            # `_T27_PLANS = _t27_admissible_plans()` derived from nothing and the
+            # p-chart template's random.choice(_T27_PLANS) was an invisible draw.
+            if isinstance(n, ast.Call) and isinstance(n.func, ast.Name):
+                out |= self.calls.get(n.func.id, set())
         return out
 
     def _bind(self, env, name, val):
@@ -404,8 +418,7 @@ class _Flow:
                         self._fill(env, base.id, val)
 
 
-def module_aliases(tree, tables, calias):
-    """Module-level names whose value, at the end of import, derives from a table."""
+def _base_sources(tables, calias):
     sources = {t: {t} for t in tables}
     for a, s in calias.items():
         # A name that is BOTH a table and built from tables stands for itself too.
@@ -413,10 +426,45 @@ def module_aliases(tree, tables, calias):
         # tables it is built from, so RESISTOR_SERIES_BY_TOLERANCE (built from the
         # IEC lists) lost its consumer and MEDIA_VELOCITIES (built from C0) its draw.
         sources[a] = set(s) | ({a} if a in sources else set())
-    flow = _Flow(sources)
-    env = {}
-    flow.walk(tree.body, env)
-    return {n: s for n, s in env.items() if s and n not in sources}
+    return sources
+
+
+def _call_tables(funcs, sources):
+    """{module function: tables its reach reads}, through any name in `sources`."""
+    out = {}
+    for name, f in funcs.items():
+        free = set().union(*(_free_loads(r) for r in _reach(f, funcs)))
+        got = set().union(*(sources[x] for x in free if x in sources)) if free else set()
+        if got:
+            out[name] = got
+    return out
+
+
+def module_calls_and_aliases(tree, tables, calias):
+    """(call map, module aliases) for one template module, to a fixpoint: a function
+    that reads a module alias reaches that alias's tables, and a module alias bound
+    from calling a function reaches the tables the function reads."""
+    funcs = _module_functions(tree)
+    base = _base_sources(tables, calias)
+    aliases = {}
+    for _ in range(8):
+        sources = dict(base)
+        for a, s in aliases.items():
+            sources[a] = sources.get(a, set()) | s
+        calls = _call_tables(funcs, sources)
+        flow = _Flow(base, calls)
+        env = {}
+        flow.walk(tree.body, env)
+        new = {n: s for n, s in env.items() if s and n not in base}
+        if new == aliases:
+            return calls, aliases
+        aliases = new
+    return calls, aliases
+
+
+def module_aliases(tree, tables, calias):
+    """Module-level names whose value, at the end of import, derives from a table."""
+    return module_calls_and_aliases(tree, tables, calias)[1]
 
 
 def _literals_in(fns):
@@ -429,14 +477,15 @@ def _literals_in(fns):
 
 
 def template_reaches(branch_dir, module_root, tables, calias):
-    """Yield (module name, template name, reach, sources, here) for every template_*
-    function under `branch_dir`.
+    """Yield (module name, template name, reach, sources, here, calls) for every
+    template_* function under `branch_dir`.
 
     The one walk P-CONSUMER, P-DRAW and the C3.10 guard detector share, so the
     detector reads tables through exactly the aliases the census does rather than
     a copy of them - C1's selftest once re-implemented a detector and agreed with
     itself. `here` maps an alias to the tables it stands for; `sources` adds each
-    table standing for itself.
+    table standing for itself; `calls` maps a module-level function to the
+    tables it reads, which a name bound from calling it inherits.
     """
     for dirpath, _d, files in os.walk(branch_dir):
         if '__pycache__' in dirpath:
@@ -448,15 +497,16 @@ def template_reaches(branch_dir, module_root, tables, calias):
             modname = os.path.relpath(path, module_root)[:-3].replace(os.sep, '.')
             tree = ast.parse(open(path, encoding='utf-8').read())
             funcs = _module_functions(tree)
+            calls, maliases = module_calls_and_aliases(tree, tables, calias)
             here = {a: set(s) | ({a} if a in tables else set()) for a, s in calias.items()}
-            for a, s in module_aliases(tree, tables, calias).items():
+            for a, s in maliases.items():
                 here.setdefault(a, set()).update(s)
             sources = {t: {t} for t in tables}
             for a, s in here.items():
                 sources[a] = sources.get(a, set()) | s
             for name, f in funcs.items():
                 if name.startswith('template_'):
-                    yield modname, name, _reach(f, funcs), sources, here
+                    yield modname, name, _reach(f, funcs), sources, here, calls
 
 
 def consumers_and_draws(branch_dir, module_root, tables, calias):
@@ -467,10 +517,10 @@ def consumers_and_draws(branch_dir, module_root, tables, calias):
     """
     use = {t: {} for t in tables}
     literals = {}
-    for modname, name, reach, sources, here in template_reaches(branch_dir, module_root, tables, calias):
+    for modname, name, reach, sources, here, calls in template_reaches(branch_dir, module_root, tables, calias):
         literals[name] = (modname, _literals_in(reach))
         free = set().union(*(_free_loads(r) for r in reach))
-        flow = _Flow(sources)
+        flow = _Flow(sources, calls)
         for r in reach:
             flow.walk(r.body, {})
         for t in tables:
@@ -965,6 +1015,8 @@ ANGLE = (-math.pi, math.pi)
 BASE = [1.0, 2.0]
 SERIES = {5: BASE}
 SCALE = 3.0
+PLAN_WIN = (20, 23)
+ROW_SET = {"a": 1.5, "b": 2.5}
 
 
 def density_of(name):
@@ -975,7 +1027,8 @@ _SELFTEST_TEMPLATES = '''
 import random
 from selftest_branch.constants import (DENSITY, PAIRS, WINDOW, ORPHAN, LEVELS,
                                        SPREAD, TABLE_A, HIDDEN_KEYS, DECLARED_KEYS,
-                                       WINDOW2, ANGLE, SERIES, SCALE, density_of)
+                                       WINDOW2, ANGLE, SERIES, SCALE, density_of,
+                                       PLAN_WIN, ROW_SET)
 
 _COPIED = {k: 2 * v for k, v in LEVELS.items()}
 _Z = {0.90: 1.28, 0.95: 1.64}
@@ -1054,6 +1107,31 @@ def template_reads_a():
 
 def template_reads_b_only():
     return "B", f"**Answer:** {random.choice(_FILLED_B)}"
+
+
+def _build_plans():
+    plans = []
+    for m in range(PLAN_WIN[0], PLAN_WIN[1] + 1):
+        plans.append(m)
+    return plans
+
+
+_PLANS = _build_plans()            # module level: the table enters only through the call
+
+
+def template_module_call_draw():
+    m = random.choice(_PLANS)
+    return f"m = {m}", f"**Answer:** {2 * m}"
+
+
+def _pick_rows():
+    return sorted(ROW_SET.values())
+
+
+def template_in_template_call_draw():
+    rows = _pick_rows()            # inside the template: the result is drawn from
+    v = random.choice(rows)
+    return f"v = {v}", f"**Answer:** {v}"
 '''
 
 
@@ -1114,7 +1192,11 @@ def selftest():
                      ('DENSITY', 'template_constants_accessor'): [],
                      ('TABLE_A', 'template_reads_a'): ['random.choice'],
                      ('SERIES', 'template_series'): ['random.choice'],
-                     ('BASE', 'template_series'): ['random.choice']}
+                     ('BASE', 'template_series'): ['random.choice'],
+                     # a table reaching a draw only through a function call - at
+                     # module level, and inside the template (census fix, C3.10)
+                     ('PLAN_WIN', 'template_module_call_draw'): ['random.choice'],
+                     ('ROW_SET', 'template_in_template_call_draw'): ['random.choice']}
         for (tbl, tid), want in want_draw.items():
             got = rep[tbl]['consumers'].get(tid, {}).get('draws')
             if got != want:
