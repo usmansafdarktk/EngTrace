@@ -351,8 +351,13 @@ def template_floating_object_submersion_depth():
     
     # Fallback in the rare case a valid pair isn't found quickly
     if rho_object >= rho_fluid:
-        obj_material, rho_object = "Pine Wood", 500
-        fluid_name, rho_fluid = "Fresh Water", 998
+        # C3.3: the fallback names two table rows and reads their values FROM
+        # the tables, so a corrected density reaches it. It hard-coded copies
+        # (500, 998) that a correction would have left behind.
+        obj_material = "Pine Wood"
+        rho_object = MATERIAL_DENSITIES[obj_material]
+        fluid_name = "Fresh Water"
+        rho_fluid = FLUID_DENSITIES[fluid_name]
 
     # Randomly choose the object's shape (uniform cross-section)
     shape = random.choice(["rectangular block", "cylinder"])
