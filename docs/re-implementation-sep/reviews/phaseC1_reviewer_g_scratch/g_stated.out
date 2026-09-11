@@ -1,0 +1,210 @@
+﻿== my own function-source consumer scan (call-time reads only) ==
+  SPECIFIC_GRAVITY_RANGES: ['template_borrow_pit_fill_volume', 'template_effective_stress_profile', 'template_phase_relations_degree_of_saturation', 'template_relative_density_of_sand', 'template_upward_seepage_quick_condition']
+  FRICTION_ANGLE_RANGES_DEG: ['template_infinite_slope_factor_of_safety']
+  PERMEABILITY_RANGES_CM_S: ['template_constant_head_permeability']
+  SERVICE_LEVELS: ['template_safety_stock_reorder_point']
+  P_CHART_PBAR: ['template_p_chart_limits_floor']
+  P_CHART_SUBGROUP_N: ['template_p_chart_limits_floor']
+  C_CHART_CBAR: ['template_c_chart_revision']
+  COATING_METROLOGY_FLOOR: ['template_sigma_reduction_for_cpk']
+  SPC_NUM_SUBGROUPS: ['template_c_chart_revision', 'template_p_chart_limits_floor']
+  QUEUE_SCENARIOS: ['template_mm1_time_in_system']
+  NEWSVENDOR_ITEMS: ['template_newsvendor_normal_demand']
+  COMPONENT_RELIABILITY_CLASSES: ['template_system_reliability_topology']
+  SPC_CHARACTERISTICS: ['template_chart_pair_selection', 'template_cp_cpk_from_specs', 'template_xbar_known_sigma_classification', 'template_xbar_r_control_limits']
+  AMPLITUDE_RANGE: ['template_cd_dc_system_analysis', 'template_continuous_to_discrete_conversion', 'template_nyquist_rate_determination']
+  PHASE_RANGE_RAD: ['template_continuous_to_discrete_conversion']
+[SG] template_phase_relations_degree_of_saturation: stated 40/40, in-window 40/40, errors 0; bad=[]
+[SG] template_relative_density_of_sand: stated 40/40, in-window 40/40, errors 0; bad=[]
+[SG] template_borrow_pit_fill_volume: stated 40/40, in-window 40/40, errors 0; bad=[]
+[SG] template_effective_stress_profile: stated 40/40, in-window 40/40, errors 0; bad=[]
+[SG] template_upward_seepage_quick_condition: stated 40/40, in-window 40/40, errors 0; bad=[]
+[FA] template_infinite_slope_factor_of_safety: stated 40/40, in-window 40/40, errors 0; bad=[]
+[PERM] template_constant_head_permeability: widened window -> identical items 40/40; window moved off the draws -> AssertionError 40/40
+[SL] template_safety_stock_reorder_point: stated 40/40, in-window 40/40, errors 0; bad=[]
+[SL] nudged levels -> errors 40/40; first: ERROR KeyError: 0.99099
+[PCHART] template_p_chart_limits_floor: stated 40/40, in-window 40/40, errors 0; bad=[]
+[REL] template_system_reliability_topology: stated 40/40, in-window 40/40, errors 0; bad=[]
+[QUEUE] template_mm1_time_in_system: stated 40/40, in-window 40/40, errors 0; bad=[]
+[QUEUE] template_mmc_waiting_time: stated 40/40, in-window 40/40, errors 0; bad=[]
+[NEWS] template_newsvendor_normal_demand: stated 40/40, in-window 40/40, errors 0; bad=[]
+
+--- template_chart_pair_selection seed=3
+Q: A quality engineer is designing control charts for the diameter of turned bushings. SPC software summarizing 28 preliminary subgroups of n = 5 measurements reports a grand mean of x-double-bar = 35.897 mm, an average range of R-bar = 0.2348 mm, and an average subgroup standard deviation of s-bar = 0.0949 mm. The tabulated three-sigma constants for n = 5 are: A2 = 0.577, D3 = 0.0, D4 = 2.114, d2 = 2.326; A3 = 1.427, B3 = 0.0, B4 = 2.089, c4 = 0.94. Select the appropriate Shewhart variables chart pair for this subgroup size, justify the choice, and determine the X-bar chart's upper control limit under that pair, in mm to 4 decimals (round half up). In your solution, also give the spread chart's limits to 4 decimals and the estimated process standard deviation to 4 decimals.
+S[:900]: **Given:**
+m = 28 subgroups of n = 5; x-double-bar = 35.897 mm; R-bar = 0.2348 mm; s-bar = 0.0949 mm; constants for n = 5 as listed in the question.
+
+**Step 1:** Select the chart pair. With n = 5, well below the n = 10-to-12 threshold, the range remains a statistically efficient spread estimator, so the standard choice is the X-bar/R pair (the s chart is reserved for larger subgroups, where the range loses efficiency).
+
+**Step 2:** R-chart limits from the average range.
+UCL_R = D4 * R-bar = 2.114 * 0.2348 = 0.4964 mm;  LCL_R = D3 * R-bar = 0.0 * 0.2348 = 0.0000 mm (D3 = 0 at this n: no positive lower limit)
+
+**Step 3:** X-bar chart limits from R-bar.
+UCL_x = x-double-bar + A2*R-bar = 35.897 + 0.577 * 0.2348 = 36.0325 mm;  LCL_x = 35.897 - 0.577 * 0.2348 = 35.7615 mm
+
+**Step 4:** Estimated process standard deviation.
+sigma-hat = R-bar / d2 = 0.2348 / 2.326 = 0.1009 mm
+
+**Answer:** The X-b
+
+--- template_cp_cpk_from_specs seed=3
+Q: An X-bar/R chart study of the fill volume of a beverage line shows the process in statistical control, with a grand mean of x-double-bar = 443.49 mL and an average range of R-bar = 11.075 mL from 23 subgroups of n = 5 measurements (d2 = 2.326 for n = 5). The specification limits are LSL = 418.31 mL and USL = 470.08 mL. Estimate the process standard deviation as sigma-hat = R-bar/d2 to 4 decimals, then compute Cp, both one-sided ratios Cpu and Cpl, and the process capability index Cpk, each to 2 decimals (round half up), and state whether the process meets the commonly used capability benchmark of 1.33.
+S[:900]: **Given:**
+x-double-bar = 443.49 mL; R-bar = 11.075 mL; n = 5, d2 = 2.326; LSL = 418.31 mL; USL = 470.08 mL; benchmark 1.33.
+
+**Step 1:** Estimate the process standard deviation from the average range.
+sigma-hat = R-bar / d2 = 11.075 / 2.326 = 4.7614 mL
+
+**Step 2:** Potential capability (centering ignored).
+Cp = (USL - LSL) / (6*sigma-hat) = (470.08 - 418.31) / (6 * 4.7614) = 1.81
+
+**Step 3:** One-sided capability ratios.
+Cpu = (USL - x-double-bar) / (3*sigma-hat) = (470.08 - 443.49) / (3 * 4.7614) = 1.86;  Cpl = (x-double-bar - LSL) / (3*sigma-hat) = (443.49 - 418.31) / (3 * 4.7614) = 1.76
+
+**Step 4:** Actual capability is the smaller one-sided ratio.
+Cpk = min(Cpu, Cpl) = min(1.86, 1.76) = 1.76. Since Cpk = 1.76 >= 1.33, the process meets the stated capability benchmark.
+
+**Answer:** The process capability index Cpk is 1.76
+
+--- template_xbar_known_sigma_classification seed=3
+Q: A process producing the fill volume of a canning line runs with a known in-control mean of mu0 = 658.17 mL and a known process standard deviation of sigma = 4.482 mL. Subgroup means of n = 25 measurements are plotted on a three-sigma X-bar chart. The last eight plotted subgroup means were: 660.480, 661.801, 661.142, 657.048, 661.199, 656.932, 659.743, 658.031 mL. Compute the control limits, state how many of the eight means plot outside them, and report the standardized value z = (xbar - mu0)/(sigma/sqrt(n)) of the MOST extreme mean (largest |z|; negative if below the center line), to two decimals (round half up, away from zero).
+S[:900]: **Given:**
+mu0 = 658.17 mL; sigma = 4.482 mL; n = 25; eight plotted means (listed in the question).
+
+**Step 1:** Standard error of the subgroup mean. Since sqrt(25) = 5,
+sigma_xbar = sigma / sqrt(n) = 4.482 / 5 = 0.8964 mL (exact)
+
+**Step 2:** Three-sigma control limits.
+UCL = mu0 + 3*sigma_xbar = 658.17 + 3 * 0.8964 = 660.8592 mL;  LCL = 658.17 - 3 * 0.8964 = 655.4808 mL
+
+**Step 3:** Classify the plotted means. Comparing each mean with the limits, 3 of the eight fall outside: 661.801, 661.142, 661.199 mL above UCL. The remaining 5 lie between LCL and UCL.
+
+**Step 4:** Standardize the most extreme mean.
+The mean farthest from the center line is 661.801 mL:  z = (661.801 - 658.17) / 0.8964 = 4.05
+
+**Answer:** The standardized value of the most extreme plotted mean is 4.05
+
+--- template_xbar_r_control_limits seed=3
+Q: A quality engineer is setting up X-bar and R charts for the fill volume of bottled juice. From 28 preliminary subgroups of n = 6 measurements each, the grand mean is x-double-bar = 347.82 mL and the average range is R-bar = 12.26 mL. Using the standard three-sigma control-chart constants for n = 6 (A2 = 0.483, D3 = 0.0, D4 = 2.004, d2 = 2.534), determine the upper control limit of the X-bar chart, in mL to 2 decimals (round half up). In your solution, also give both R-chart limits to 2 decimals and the estimated process standard deviation to 3 decimals.
+S[:900]: **Given:**
+m = 28 subgroups of n = 6; x-double-bar = 347.82 mL; R-bar = 12.26 mL; A2 = 0.483, D3 = 0.0, D4 = 2.004, d2 = 2.534.
+
+**Step 1:** R-chart limits — the range chart is checked first because the X-bar limits depend on R-bar being in control.
+UCL_R = D4 * R-bar = 2.004 * 12.26 = 24.57 mL;  LCL_R = D3 * R-bar = 0.0 * 12.26 = 0.00 mL (D3 = 0 for n = 6, so the R chart has no positive lower limit)
+
+**Step 2:** X-bar chart limits.
+UCL_x = x-double-bar + A2*R-bar = 347.82 + 0.483 * 12.26 = 353.74 mL;  LCL_x = 347.82 - 0.483 * 12.26 = 341.90 mL
+
+**Step 3:** Estimate the process standard deviation from the average range (requested deliverable).
+sigma-hat = R-bar / d2 = 12.26 / 2.534 = 4.838 mL
+
+**Answer:** The upper control limit of the X-bar chart is 353.74 mL
+
+--- template_c_chart_revision seed=3
+Q: A c chart is being established for nonconformities found in final inspection of pallets of 25 dishwasher door assemblies. Inspection of m = 25 consecutive units found T = 319 nonconformities in total. Across those units the largest count on any single pallet was 25, the second largest was 17, and the smallest was 5. Compute the trial center line c-bar = T/m, take sqrt(c-bar) to 3 decimals (round half up), and form the three-sigma trial limits from the rounded root. Then determine from those counts whether any unit plots outside the trial limits. Standard practice applies: a unit that plots outside is traced to a confirmed assignable cause and discarded, and the chart is revised from the units that remain — take the revised center line (T - L)/(m - 1), where L is that largest count, to 3 decimals (round half up), its square root to 3 decimals (round half up), and form the revised limits from those rounded values; if no unit plots outside, the trial limits stand as they are. Report the upper control limit that is adopted for ongoing monitoring, to 3 decimals.
+S[:900]: **Given:**
+m = 25 inspection units; T = 319 total nonconformities; largest count 25, second largest 17, smallest 5; three-sigma c chart.
+
+**Step 1:** Trial center line.
+c-bar = T/m = 319/25 = 12.76 (exact)
+
+**Step 2:** Trial three-sigma limits (Poisson model: variance equals the mean).
+sqrt(c-bar) = sqrt(12.76) = 3.572 (3 decimals);  UCL = 12.76 + 3 * 3.572 = 23.476;  LCL = 12.76 - 3 * 3.572 = 2.044
+
+**Step 3:** Assess the counts against the trial band 2.044 to 23.476. The largest, 25, is above UCL = 23.476, so this pallet is out of control. The second largest, 17, is below that UCL and the smallest, 5, is above LCL = 2.044, and every unnamed count lies between 5 and 17 — so exactly one pallet plots outside. Its cause is assignable and confirmed, so it is discarded and the chart revised.
+
+**Step 4:** Revised center line from the remaining 24 units.
+c-bar_rev = (T - 25)/(25 - 1) = 294/24 
+
+--- template_sigma_reduction_for_cpk seed=5
+Q: The thickness of a hard-anodized (Type III) layer on hydraulic cylinder bores is in statistical control at a mean of mu = 54.4 microns, with a process standard deviation of sigma = 2.28 microns, held to a specification of LSL = 47 microns and USL = 60 microns. Capability is measured by Cp = (USL - LSL)/(6*sigma), Cpu = (USL - mu)/(3*sigma), Cpl = (mu - LSL)/(3*sigma) and Cpk = min(Cpu, Cpl); quality planning has set a target of Cpk = 1.50. Moving the mean would mean re-qualifying the bath schedule, which is deferred to a later process revision, so for this analysis the mean stays where it is and the target must be met by reducing variation alone. Report Cp, Cpu, Cpl and Cpk, each to 2 decimals (round half up). Then explain from Cp whether re-centring alone could have reached the target. Then report the largest process standard deviation that would meet the target with the mean unchanged, to 3 decimals, rounded DOWN so that the value you state does meet the target. Finally, report the percentage by which the current standard deviation must be reduced to reach that value, to 1 decimal, rounded UP so that the reduction you state is sufficient.
+S[:900]: **Given:**
+mu = 54.4 microns; sigma = 2.28 microns; LSL = 47 microns; USL = 60 microns; target Cpk = 1.50; mean held at its current value.
+
+**Step 1:** Current capability ratios.
+Cp = (USL - LSL)/(6*sigma) = (60 - 47) / (6 * 2.28) = 0.95;  Cpu = (USL - mu)/(3*sigma) = (60 - 54.4) / (3 * 2.28) = 0.82;  Cpl = (mu - LSL)/(3*sigma) = (54.4 - 47) / (3 * 2.28) = 1.08;  Cpk = min(0.82, 1.08) = 0.82, short of the target 1.50.
+
+**Step 2:** Check whether re-centring alone could fix it. Cp is the capability a perfectly centred process would achieve at this spread, and Cp = 0.95 is itself below 1.50. So no amount of re-centring reaches the target at the current spread — the standard deviation must come down.
+
+**Step 3:** With the mean fixed, Cpk is set by the nearer specification limit, at distance
+d_min = min(USL - mu, mu - LSL) = min(60 - 54.4, 54.4 - 47) = 5.6 microns (the upper side), so Cpk = d
+
+--- template_cd_dc_system_analysis seed=3
+Q: A continuous-time signal is given by:
+x_c(t) = 12.66 * cos(657*pi*t)
+
+The signal is sampled with a period T = 3.81e-04 s to produce the discrete-time sequence x[n]. This sequence is then processed by a system defined by the equation:
+y[n] = 2.16 * x[n - 10]
+
+If the resulting output sequence, y[n], is converted back to a continuous-time signal, y_c(t), using an ideal D/C converter, what is the expression for y_c(t)?
+S[:900]: **Given:**
+Continuous-time signal: x_c(t) = 12.66 * cos(657*pi*t)
+Sampling period: T = 3.81e-04 s
+Discrete-time system: y[n] = 2.16 * x[n - 10]
+
+**Step 1:** Continuous-to-Discrete (C/D) Conversion
+We find the discrete-time signal x[n] by substituting t = nT into x_c(t).
+x[n] = x_c(nT) = 12.66 * cos(657*pi * nT)
+
+**Step 2:** Discrete-Time Processing
+Next, we apply the system's equation to x[n]. This involves replacing x[n] with the expression from Step 1 and shifting it by n0 = 10 samples.
+y[n] = 2.16 * x[n - 10]
+y[n] = 2.16 * (12.66 * cos(657*pi * (n - 10)T))
+y[n] = 27.35 * cos(657*pi*T*(n - 10))
+
+**Step 3:** Discrete-to-Continuous (D/C) Conversion
+An ideal D/C converter maps the discrete-time signal back to a continuous-time sinusoid with the original frequency Omega_0 = 657*pi. The discrete time 'n' is mapped back to continuous time 't' via the relation t = nT.
+y_c(t) = 27.35 * cos(657
+
+--- template_continuous_to_discrete_conversion seed=3
+Q: A continuous-time signal is given by the expression:
+x_c(t) = 12.66 * cos(657*pi*t + 9 deg)
+
+This signal is sampled at a frequency of 5947 Hz. Determine the resulting discrete-time signal, x[n], and identify its discrete-time angular frequency, omega.
+S[:900]: **Given:**
+Continuous-time signal: x_c(t) = 12.66 * cos(657*pi*t + 9 deg)
+Sampling frequency: Fs = 5947 Hz
+
+**Step 1:** State the Sampling Rule
+A discrete-time signal x[n] is obtained by replacing the continuous time variable 't' with its discrete counterpart 'nT', where T is the sampling period. The rule is:
+x[n] = x_c(nT)
+
+**Step 2:** Calculate Sampling Period (T)
+The sampling period is the reciprocal of the sampling frequency.
+T = 1 / Fs = 1 / 5947 seconds.
+
+**Step 3:** Substitute t = nT into the Equation
+We replace every 't' in the original expression with 'nT'.
+x[n] = 12.66 * cos(657*pi*(nT) + 9 deg)
+
+**Step 4:** Identify Discrete Frequency (omega)
+Rearrange the terms to match the standard form x[n] = A * cos(omega*n + phi). The discrete-time angular frequency, omega, is the coefficient of 'n'.
+omega = Omega * T
+omega = (657*pi) * (1 / 5947)
+
+**Step 5:** Calculate and Conclude
+Now, 
+
+--- template_nyquist_rate_determination seed=3
+Q: A continuous-time signal is defined as:
+  x_c(t) = 7.4 * sin(2*pi*1263*t + 129 deg) + 31.7 * cos(2*pi*1164*t + -147 deg)
+
+What is the minimum sampling rate (Fs), also known as the Nyquist rate, required to sample this signal without loss of information?
+S[:900]: **Given Signal:**
+x_c(t) = 7.4 * sin(2*pi*1263*t + 129 deg) + 31.7 * cos(2*pi*1164*t + -147 deg)
+
+**Step 1:** Identify Frequencies
+First, we identify all the unique frequency components in the signal's expression. By inspecting the '2*pi*F*t' part of each term, we find the frequencies are:
+Frequencies = 1263, 1164 Hz.
+
+**Step 2:** Find Maximum Frequency
+The Nyquist rate is determined by the highest frequency component in the signal. We find the maximum value from the list of frequencies.
+F_max = max(1263, 1164) = 1263 Hz.
+
+**Step 3:** Apply Nyquist Theorem
+The Nyquist-Shannon sampling theorem states that to avoid aliasing and be able to perfectly reconstruct a signal, the sampling rate (Fs) must be at least twice its highest frequency component (F_max).
+Fs_min = 2 * F_max.
+
+**Step 4:** Calculate the Nyquist Rate
+Using the maximum frequency found in Step 2, we calculate the Nyquist rate:
+
