@@ -192,39 +192,135 @@ THERMO_SUBSTANCES = [
 # Data sources: NIST WebBook, Engineering Toolbox, and standard thermodynamic tables.
 # @kind: property
 # @units: temp_C=degC, v_f=m^3/kg, v_g=m^3/kg
+# @domain: none (each row states its own saturation temperature in temp_C)
+# C3: v_f and v_g re-derived from NIST saturation rows requested ON each row's temp_C
+#   (fetch_references.py NIST_SATURATION_POINTS); each field's tag names its file and row.
 REAL_FLUID_DATA = {
     #  Classic Working Fluids 
-    "Water": {"temp_C": 100, "v_f": 0.001043, "v_g": 1.6729},
-    "Ammonia": {"temp_C": 25, "v_f": 0.001658, "v_g": 0.1284},
-    "Carbon Dioxide": {"temp_C": 20, "v_f": 0.001286, "v_g": 0.0188},
-    "Sulfur Dioxide": {"temp_C": 25, "v_f": 0.000728, "v_g": 0.1165},
+    # [ON-DISK] nist_fluid_properties/water_C7732185_saturation_373.15K.tsv @ T=373.15 col="Volume (l, m3/kg)" field=['v_f'] precision=4sf
+    #   NIST 0.0010435 at 373.15 K (0.10142 MPa). Corrected at C3 from 0.001043, which was -0.05% from it.
+    # [ON-DISK] nist_fluid_properties/water_C7732185_saturation_373.15K.tsv @ T=373.15 col="Volume (v, m3/kg)" field=['v_g'] precision=5sf
+    #   NIST 1.6718 at 373.15 K (0.10142 MPa). Corrected at C3 from 1.6729, which was +0.07% from it.
+    "Water": {"temp_C": 100, "v_f": 0.001044, "v_g": 1.6718},
+    # [ON-DISK] nist_fluid_properties/ammonia_C7664417_saturation_298.15K.tsv @ T=298.15 col="Volume (l, m3/kg)" field=['v_f'] precision=4sf
+    #   NIST 0.0016585 at 298.15 K (1.0027 MPa). Corrected at C3 from 0.001658, which was -0.03% from it.
+    # [ON-DISK] nist_fluid_properties/ammonia_C7664417_saturation_298.15K.tsv @ T=298.15 col="Volume (v, m3/kg)" field=['v_g'] precision=4sf
+    #   NIST 0.12819 at 298.15 K (1.0027 MPa). Corrected at C3 from 0.1284, which was +0.16% from it.
+    "Ammonia": {"temp_C": 25, "v_f": 0.001659, "v_g": 0.1282},
+    # [ON-DISK] nist_fluid_properties/carbon_dioxide_C124389_saturation_293.15K.tsv @ T=293.15 col="Volume (l, m3/kg)" field=['v_f'] precision=4sf
+    #   NIST 0.0012930 at 293.15 K (5.7291 MPa). Corrected at C3 from 0.001286, which was -0.54% from it.
+    # [ON-DISK] nist_fluid_properties/carbon_dioxide_C124389_saturation_293.15K.tsv @ T=293.15 col="Volume (v, m3/kg)" field=['v_g'] precision=3sf
+    #   NIST 0.0051493 at 293.15 K (5.7291 MPa). Corrected at C3 from 0.0188, which was +265.10% from it.
+    "Carbon Dioxide": {"temp_C": 20, "v_f": 0.001293, "v_g": 0.00515},
+    # [ON-DISK] nist_fluid_properties/sulfur_dioxide_C7446095_saturation_298.15K.tsv @ T=298.15 col="Volume (l, m3/kg)" field=['v_f'] precision=3sf
+    #   NIST 0.00073162 at 298.15 K (0.39215 MPa). Corrected at C3 from 0.000728, which was -0.49% from it.
+    # [ON-DISK] nist_fluid_properties/sulfur_dioxide_C7446095_saturation_298.15K.tsv @ T=298.15 col="Volume (v, m3/kg)" field=['v_g'] precision=4sf
+    #   NIST 0.091860 at 298.15 K (0.39215 MPa). Corrected at C3 from 0.1165, which was +26.82% from it.
+    "Sulfur Dioxide": {"temp_C": 25, "v_f": 0.000732, "v_g": 0.09186},
     
     #  Hydrocarbons 
-    "Methane": {"temp_C": -161, "v_f": 0.002367, "v_g": 1.8160},  # Boiling Point
-    "Ethane": {"temp_C": -89, "v_f": 0.001830, "v_g": 0.7090},  # Boiling Point
-    "Propane": {"temp_C": 25, "v_f": 0.002028, "v_g": 0.0461},
-    "Butane": {"temp_C": 25, "v_f": 0.001726, "v_g": 0.1632},
-    "Isobutane": {"temp_C": 25, "v_f": 0.001815, "v_g": 0.1118},
-    "Pentane": {"temp_C": 25, "v_f": 0.001598, "v_g": 0.5050},
-    "Iso-pentane": {"temp_C": 25, "v_f": 0.001614, "v_g": 0.4910},
+    # [ON-DISK] nist_fluid_properties/methane_C74828_saturation_112.15K.tsv @ T=112.15 col="Volume (l, m3/kg)" field=['v_f'] precision=4sf
+    #   NIST 0.0023716 at 112.15 K (0.10542 MPa). Corrected at C3 from 0.002367, which was -0.19% from it.
+    # [ON-DISK] nist_fluid_properties/methane_C74828_saturation_112.15K.tsv @ T=112.15 col="Volume (v, m3/kg)" field=['v_g'] precision=5sf
+    #   NIST 0.53089 at 112.15 K (0.10542 MPa). Corrected at C3 from 1.8160, which was +242.07% from it.
+    "Methane": {"temp_C": -161, "v_f": 0.002372, "v_g": 0.53089},  # Boiling Point
+    # [ON-DISK] nist_fluid_properties/ethane_C74840_saturation_184.15K.tsv @ T=184.15 col="Volume (l, m3/kg)" field=['v_f'] precision=4sf
+    #   NIST 0.0018370 at 184.15 K (0.099056 MPa). Corrected at C3 from 0.001830, which was -0.38% from it.
+    # [ON-DISK] nist_fluid_properties/ethane_C74840_saturation_184.15K.tsv @ T=184.15 col="Volume (v, m3/kg)" field=['v_g'] precision=4sf
+    #   NIST 0.49706 at 184.15 K (0.099056 MPa). Corrected at C3 from 0.7090, which was +42.64% from it.
+    "Ethane": {"temp_C": -89, "v_f": 0.001837, "v_g": 0.4971},  # Boiling Point
+    # [ON-DISK] nist_fluid_properties/propane_C74986_saturation_298.15K.tsv @ T=298.15 col="Volume (l, m3/kg)" field=['v_f'] precision=4sf
+    #   NIST 0.0020310 at 298.15 K (0.95207 MPa). Corrected at C3 from 0.002028, which was -0.15% from it.
+    # [ON-DISK] nist_fluid_properties/propane_C74986_saturation_298.15K.tsv @ T=298.15 col="Volume (v, m3/kg)" field=['v_g'] precision=3sf
+    #   NIST 0.048502 at 298.15 K (0.95207 MPa). Corrected at C3 from 0.0461, which was -4.95% from it.
+    "Propane": {"temp_C": 25, "v_f": 0.002031, "v_g": 0.0485},
+    # [ON-DISK] nist_fluid_properties/butane_C106978_saturation_298.15K.tsv @ T=298.15 col="Volume (l, m3/kg)" field=['v_f'] precision=4sf
+    #   NIST 0.0017457 at 298.15 K (0.24329 MPa). Corrected at C3 from 0.001726, which was -1.13% from it.
+    # [ON-DISK] nist_fluid_properties/butane_C106978_saturation_298.15K.tsv @ T=298.15 col="Volume (v, m3/kg)" field=['v_g'] precision=4sf
+    #   NIST 0.16202 at 298.15 K (0.24329 MPa). Corrected at C3 from 0.1632, which was +0.73% from it.
+    "Butane": {"temp_C": 25, "v_f": 0.001746, "v_g": 0.1620},
+    # [ON-DISK] nist_fluid_properties/isobutane_C75285_saturation_298.15K.tsv @ T=298.15 col="Volume (l, m3/kg)" field=['v_f'] precision=4sf
+    #   NIST 0.0018160 at 298.15 K (0.35067 MPa). Corrected at C3 from 0.001815, which was -0.06% from it.
+    # [ON-DISK] nist_fluid_properties/isobutane_C75285_saturation_298.15K.tsv @ T=298.15 col="Volume (v, m3/kg)" field=['v_g'] precision=4sf
+    #   NIST 0.10958 at 298.15 K (0.35067 MPa). Corrected at C3 from 0.1118, which was +2.03% from it.
+    "Isobutane": {"temp_C": 25, "v_f": 0.001816, "v_g": 0.1096},
+    # [ON-DISK] nist_fluid_properties/pentane_C109660_saturation_298.15K.tsv @ T=298.15 col="Volume (l, m3/kg)" field=['v_f'] precision=4sf
+    #   NIST 0.0016099 at 298.15 K (0.068355 MPa). Corrected at C3 from 0.001598, which was -0.74% from it.
+    # [ON-DISK] nist_fluid_properties/pentane_C109660_saturation_298.15K.tsv @ T=298.15 col="Volume (v, m3/kg)" field=['v_g'] precision=4sf
+    #   NIST 0.48595 at 298.15 K (0.068355 MPa). Corrected at C3 from 0.5050, which was +3.92% from it.
+    "Pentane": {"temp_C": 25, "v_f": 0.001610, "v_g": 0.4860},
+    # [ON-DISK] nist_fluid_properties/2_methylbutane_C78784_saturation_298.15K.tsv @ T=298.15 col="Volume (l, m3/kg)" field=['v_f'] precision=4sf
+    #   NIST 0.0016261 at 298.15 K (0.091795 MPa). Corrected at C3 from 0.001614, which was -0.74% from it.
+    # [ON-DISK] nist_fluid_properties/2_methylbutane_C78784_saturation_298.15K.tsv @ T=298.15 col="Volume (v, m3/kg)" field=['v_g'] precision=4sf
+    #   NIST 0.35890 at 298.15 K (0.091795 MPa). Corrected at C3 from 0.4910, which was +36.81% from it.
+    #   Iso-pentane is read as NIST's 2-methylbutane: the WebBook name search for "isopentane"
+    #   returns "Butane, 2-methyl-", CAS 78-78-4, which is this file's CAS (C78784).
+    "Iso-pentane": {"temp_C": 25, "v_f": 0.001626, "v_g": 0.3589},
     
     #  Refrigerants 
-    "Refrigerant-11 (R-11, Trichlorofluoromethane)": {"temp_C": 25, "v_f": 0.000675, "v_g": 0.1580},
-    "Refrigerant-12 (R-12, Dichlorodifluoromethane)": {"temp_C": 25, "v_f": 0.000763, "v_g": 0.0268},
-    "Refrigerant-22 (R-22, Chlorodifluoromethane)": {"temp_C": 25, "v_f": 0.000845, "v_g": 0.0226},
-    "Refrigerant-134a (R-134a, 1,1,1,2-Tetrafluoroethane)": {"temp_C": 25, "v_f": 0.000829, "v_g": 0.0323},
-    "Refrigerant-123 (R-123, Dichlorotrifluoroethane)": {"temp_C": 25, "v_f": 0.000680, "v_g": 0.1810},
+    # [ON-DISK] nist_fluid_properties/r11_C75694_saturation_298.15K.tsv @ T=298.15 col="Volume (l, m3/kg)" field=['v_f'] precision=3sf
+    #   NIST 0.00067738 at 298.15 K (0.10605 MPa). Corrected at C3 from 0.000675, which was -0.35% from it.
+    # [ON-DISK] nist_fluid_properties/r11_C75694_saturation_298.15K.tsv @ T=298.15 col="Volume (v, m3/kg)" field=['v_g'] precision=4sf
+    #   NIST 0.16377 at 298.15 K (0.10605 MPa). Corrected at C3 from 0.1580, which was -3.52% from it.
+    "Refrigerant-11 (R-11, Trichlorofluoromethane)": {"temp_C": 25, "v_f": 0.000677, "v_g": 0.1638},
+    # [ON-DISK] nist_fluid_properties/r12_C75718_saturation_298.15K.tsv @ T=298.15 col="Volume (l, m3/kg)" field=['v_f'] precision=3sf
+    #   NIST 0.00076276 at 298.15 K (0.65057 MPa).
+    # [ON-DISK] nist_fluid_properties/r12_C75718_saturation_298.15K.tsv @ T=298.15 col="Volume (v, m3/kg)" field=['v_g'] precision=3sf
+    #   NIST 0.027153 at 298.15 K (0.65057 MPa). Corrected at C3 from 0.0268, which was -1.30% from it.
+    "Refrigerant-12 (R-12, Dichlorodifluoromethane)": {"temp_C": 25, "v_f": 0.000763, "v_g": 0.0272},
+    # [ON-DISK] nist_fluid_properties/r22_C75456_saturation_298.15K.tsv @ T=298.15 col="Volume (l, m3/kg)" field=['v_f'] precision=3sf
+    #   NIST 0.00083987 at 298.15 K (1.0439 MPa). Corrected at C3 from 0.000845, which was +0.61% from it.
+    # [ON-DISK] nist_fluid_properties/r22_C75456_saturation_298.15K.tsv @ T=298.15 col="Volume (v, m3/kg)" field=['v_g'] precision=3sf
+    #   NIST 0.022608 at 298.15 K (1.0439 MPa).
+    "Refrigerant-22 (R-22, Chlorodifluoromethane)": {"temp_C": 25, "v_f": 0.000840, "v_g": 0.0226},
+    # [ON-DISK] nist_fluid_properties/r134a_C811972_saturation_298.15K.tsv @ T=298.15 col="Volume (l, m3/kg)" field=['v_f'] precision=3sf
+    #   NIST 0.00082870 at 298.15 K (0.66538 MPa).
+    # [ON-DISK] nist_fluid_properties/r134a_C811972_saturation_298.15K.tsv @ T=298.15 col="Volume (v, m3/kg)" field=['v_g'] precision=3sf
+    #   NIST 0.030912 at 298.15 K (0.66538 MPa). Corrected at C3 from 0.0323, which was +4.49% from it.
+    "Refrigerant-134a (R-134a, 1,1,1,2-Tetrafluoroethane)": {"temp_C": 25, "v_f": 0.000829, "v_g": 0.0309},
+    # [ON-DISK] nist_fluid_properties/r123_C306832_saturation_298.15K.tsv @ T=298.15 col="Volume (l, m3/kg)" field=['v_f'] precision=3sf
+    #   NIST 0.00068311 at 298.15 K (0.091354 MPa). Corrected at C3 from 0.000680, which was -0.46% from it.
+    # [ON-DISK] nist_fluid_properties/r123_C306832_saturation_298.15K.tsv @ T=298.15 col="Volume (v, m3/kg)" field=['v_g'] precision=4sf
+    #   NIST 0.17032 at 298.15 K (0.091354 MPa). Corrected at C3 from 0.1810, which was +6.27% from it.
+    "Refrigerant-123 (R-123, Dichlorotrifluoroethane)": {"temp_C": 25, "v_f": 0.000683, "v_g": 0.1703},
+    # [UNVERIFIED] a blend, and not in the NIST fluid database on disk (36 pure fluids); its saturation volumes need a mixture source or a replacement species - the repo owner's call (D-033, C3.5).
     "Refrigerant-410A (R-410A, blend of difluoromethane and pentafluoroethane)": {"temp_C": 25, "v_f": 0.000922, "v_g": 0.0151},
     
     #  Organic Solvents (Rankine Fluids) 
-    "Toluene": {"temp_C": 111, "v_f": 0.001308, "v_g": 0.3200},  # Boiling Point
-    "Benzene": {"temp_C": 80, "v_f": 0.001205, "v_g": 0.3660},  # Boiling Point
+    # [ON-DISK] nist_fluid_properties/toluene_C108883_saturation_384.15K.tsv @ T=384.15 col="Volume (l, m3/kg)" field=['v_f'] precision=4sf
+    #   NIST 0.0012841 at 384.15 K (0.10249 MPa). Corrected at C3 from 0.001308, which was +1.86% from it.
+    # [ON-DISK] nist_fluid_properties/toluene_C108883_saturation_384.15K.tsv @ T=384.15 col="Volume (v, m3/kg)" field=['v_g'] precision=4sf
+    #   NIST 0.32441 at 384.15 K (0.10249 MPa). Corrected at C3 from 0.3200, which was -1.36% from it.
+    "Toluene": {"temp_C": 111, "v_f": 0.001284, "v_g": 0.3244},  # Boiling Point
+    # [ON-DISK] nist_fluid_properties/benzene_C71432_saturation_353.15K.tsv @ T=353.15 col="Volume (l, m3/kg)" field=['v_f'] precision=4sf
+    #   NIST 0.0012285 at 353.15 K (0.10111 MPa). Corrected at C3 from 0.001205, which was -1.91% from it.
+    # [ON-DISK] nist_fluid_properties/benzene_C71432_saturation_353.15K.tsv @ T=353.15 col="Volume (v, m3/kg)" field=['v_g'] precision=4sf
+    #   NIST 0.35918 at 353.15 K (0.10111 MPa). Corrected at C3 from 0.3660, which was +1.90% from it.
+    "Benzene": {"temp_C": 80, "v_f": 0.001229, "v_g": 0.3592},  # Boiling Point
+    # [UNVERIFIED] not in the NIST fluid database on disk, and its WebBook species pages on disk carry no saturated volumes. Residual register (C3.5).
     "Ethanol": {"temp_C": 78, "v_f": 0.001290, "v_g": 0.5770},  # Boiling Point
-    "Methanol": {"temp_C": 65, "v_f": 0.001375, "v_g": 0.8800},  # Boiling Point
+    # [ON-DISK] nist_fluid_properties/methanol_C67561_saturation_338.15K.tsv @ T=338.15 col="Volume (l, m3/kg)" field=['v_f'] precision=4sf
+    #   NIST 0.0013372 at 338.15 K (0.10341 MPa). Corrected at C3 from 0.001375, which was +2.83% from it.
+    # [ON-DISK] nist_fluid_properties/methanol_C67561_saturation_338.15K.tsv @ T=338.15 col="Volume (v, m3/kg)" field=['v_g'] precision=4sf
+    #   NIST 0.80347 at 338.15 K (0.10341 MPa). Corrected at C3 from 0.8800, which was +9.52% from it.
+    "Methanol": {"temp_C": 65, "v_f": 0.001337, "v_g": 0.8035},  # Boiling Point
+    # [UNVERIFIED] not in the NIST fluid database on disk, and its WebBook species pages on disk carry no saturated volumes. Residual register (C3.5).
     "Acetone": {"temp_C": 56, "v_f": 0.001360, "v_g": 0.5370},  # Boiling Point
-    "n-Hexane": {"temp_C": 69, "v_f": 0.001660, "v_g": 0.3550},  # Boiling Point
-    "n-Octane": {"temp_C": 126, "v_f": 0.001690, "v_g": 0.2500},  # Boiling Point
-    "Cyclohexane": {"temp_C": 81, "v_f": 0.001420, "v_g": 0.3600}  # Boiling Point
+    # [ON-DISK] nist_fluid_properties/hexane_C110543_saturation_342.15K.tsv @ T=342.15 col="Volume (l, m3/kg)" field=['v_f'] precision=4sf
+    #   NIST 0.0016311 at 342.15 K (0.10223 MPa). Corrected at C3 from 0.001660, which was +1.77% from it.
+    # [ON-DISK] nist_fluid_properties/hexane_C110543_saturation_342.15K.tsv @ T=342.15 col="Volume (v, m3/kg)" field=['v_g'] precision=4sf
+    #   NIST 0.30704 at 342.15 K (0.10223 MPa). Corrected at C3 from 0.3550, which was +15.62% from it.
+    "n-Hexane": {"temp_C": 69, "v_f": 0.001631, "v_g": 0.3070},  # Boiling Point
+    # [ON-DISK] nist_fluid_properties/octane_C111659_saturation_399.15K.tsv @ T=399.15 col="Volume (l, m3/kg)" field=['v_f'] precision=4sf
+    #   NIST 0.0016370 at 399.15 K (0.10233 MPa). Corrected at C3 from 0.001690, which was +3.24% from it.
+    # [ON-DISK] nist_fluid_properties/octane_C111659_saturation_399.15K.tsv @ T=399.15 col="Volume (v, m3/kg)" field=['v_g'] precision=4sf
+    #   NIST 0.26783 at 399.15 K (0.10233 MPa). Corrected at C3 from 0.2500, which was -6.66% from it.
+    "n-Octane": {"temp_C": 126, "v_f": 0.001637, "v_g": 0.2678},  # Boiling Point
+    # [ON-DISK] nist_fluid_properties/cyclohexane_C110827_saturation_354.15K.tsv @ T=354.15 col="Volume (l, m3/kg)" field=['v_f'] precision=4sf
+    #   NIST 0.0013905 at 354.15 K (0.10220 MPa). Corrected at C3 from 0.001420, which was +2.12% from it.
+    # [ON-DISK] nist_fluid_properties/cyclohexane_C110827_saturation_354.15K.tsv @ T=354.15 col="Volume (v, m3/kg)" field=['v_g'] precision=4sf
+    #   NIST 0.32946 at 354.15 K (0.10220 MPa). Corrected at C3 from 0.3600, which was +9.27% from it.
+    "Cyclohexane": {"temp_C": 81, "v_f": 0.001391, "v_g": 0.3295}  # Boiling Point
 }
 
 
