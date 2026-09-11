@@ -428,14 +428,16 @@ def _literals_in(fns):
     return out
 
 
-def consumers_and_draws(branch_dir, module_root, tables, calias):
-    """Apply P-CONSUMER and P-DRAW to every template module under `branch_dir`.
+def template_reaches(branch_dir, module_root, tables, calias):
+    """Yield (module name, template name, reach, sources, here) for every template_*
+    function under `branch_dir`.
 
-    Also returns, per template, its function source's numeric literals, which
-    P-COPY checks a declaration against.
+    The one walk P-CONSUMER, P-DRAW and the C3.10 guard detector share, so the
+    detector reads tables through exactly the aliases the census does rather than
+    a copy of them - C1's selftest once re-implemented a detector and agreed with
+    itself. `here` maps an alias to the tables it stands for; `sources` adds each
+    table standing for itself.
     """
-    use = {t: {} for t in tables}
-    literals = {}
     for dirpath, _d, files in os.walk(branch_dir):
         if '__pycache__' in dirpath:
             continue
@@ -453,39 +455,49 @@ def consumers_and_draws(branch_dir, module_root, tables, calias):
             for a, s in here.items():
                 sources[a] = sources.get(a, set()) | s
             for name, f in funcs.items():
-                if not name.startswith('template_'):
-                    continue
-                reach = _reach(f, funcs)
-                literals[name] = (modname, _literals_in(reach))
-                free = set().union(*(_free_loads(r) for r in reach))
-                flow = _Flow(sources)
-                for r in reach:
-                    flow.walk(r.body, {})
-                for t in tables:
-                    stand_ins = {t} | {a for a, s in here.items() if t in s}
-                    present = stand_ins & free
-                    if not present:
+                if name.startswith('template_'):
+                    yield modname, name, _reach(f, funcs), sources, here
+
+
+def consumers_and_draws(branch_dir, module_root, tables, calias):
+    """Apply P-CONSUMER and P-DRAW to every template module under `branch_dir`.
+
+    Also returns, per template, its function source's numeric literals, which
+    P-COPY checks a declaration against.
+    """
+    use = {t: {} for t in tables}
+    literals = {}
+    for modname, name, reach, sources, here in template_reaches(branch_dir, module_root, tables, calias):
+        literals[name] = (modname, _literals_in(reach))
+        free = set().union(*(_free_loads(r) for r in reach))
+        flow = _Flow(sources)
+        for r in reach:
+            flow.walk(r.body, {})
+        for t in tables:
+            stand_ins = {t} | {a for a, s in here.items() if t in s}
+            present = stand_ins & free
+            if not present:
+                continue
+            via = sorted('direct' if x == t else f'alias {x}' for x in present)
+            draws = set()
+            for r in reach:
+                for n in ast.walk(r):
+                    if not (isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute)
+                            and isinstance(n.func.value, ast.Name)
+                            and n.func.value.id == 'random'
+                            and n.func.attr in ('choice', 'sample') and n.args):
                         continue
-                    via = sorted('direct' if x == t else f'alias {x}' for x in present)
-                    draws = set()
-                    for r in reach:
-                        for n in ast.walk(r):
-                            if not (isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute)
-                                    and isinstance(n.func.value, ast.Name)
-                                    and n.func.value.id == 'random'
-                                    and n.func.attr in ('choice', 'sample') and n.args):
-                                continue
-                            arg = n.args[0]
-                            arg_tables = set()
-                            for nm in _names_loaded(arg):
-                                arg_tables |= flow.ever.get(nm, set()) | sources.get(nm, set())
-                            if t not in arg_tables:
-                                continue
-                            is_sorted = any(isinstance(c, ast.Call)
-                                            and isinstance(c.func, ast.Name)
-                                            and c.func.id == 'sorted' for c in ast.walk(arg))
-                            draws.add('sorted' if is_sorted else f'random.{n.func.attr}')
-                    use[t][name] = dict(via=via, draws=sorted(draws), module=modname)
+                    arg = n.args[0]
+                    arg_tables = set()
+                    for nm in _names_loaded(arg):
+                        arg_tables |= flow.ever.get(nm, set()) | sources.get(nm, set())
+                    if t not in arg_tables:
+                        continue
+                    is_sorted = any(isinstance(c, ast.Call)
+                                    and isinstance(c.func, ast.Name)
+                                    and c.func.id == 'sorted' for c in ast.walk(arg))
+                    draws.add('sorted' if is_sorted else f'random.{n.func.attr}')
+            use[t][name] = dict(via=via, draws=sorted(draws), module=modname)
     return use, literals
 
 
