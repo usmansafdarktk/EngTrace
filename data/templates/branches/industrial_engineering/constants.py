@@ -62,6 +62,7 @@ SHEWHART_K_SIGMA = 3
 # (bank / tool crib / repair examples). Rates are per HOUR.
 # @kind: range
 # @units: lam_hr=1/h, mu_hr=1/h, servers=1
+# @given: stated (C1 Reviewer G, reviews/phaseC1_reviewer_g_provenance.md §2 row 10 and reviews/phaseC1_reviewer_g_scratch/g_stated.py: rates stated 40/40 for M/M/1, lambda and c stated 40/40 for M/M/c)
 QUEUE_SCENARIOS = {
     "bank teller line":        {"lam_hr": (8, 40),  "mu_hr": (12, 50),  "servers": (1, 4)},
     "call center":             {"lam_hr": (20, 90), "mu_hr": (10, 30),  "servers": (2, 6)},
@@ -99,6 +100,7 @@ FINITE_CAPACITY_K = (3, 10)
 # Logged for the human-expert escalation list.
 # @kind: range
 # @units: 1
+# @given: stated (C1 Reviewer G, reviews/phaseC1_reviewer_g_provenance.md §2 row 12 and reviews/phaseC1_reviewer_g_scratch/g_stated.py: every component reliability stated, 40/40)
 COMPONENT_RELIABILITY_CLASSES = {
     "commercial grade":  (0.90, 0.97),
     "industrial grade":  (0.95, 0.99),
@@ -143,6 +145,7 @@ MISSION_TIME_HR = (100, 5000)
 # spans both. Sampled i is always stated.
 # @kind: range
 # @units: 1/yr
+# @given: stated (tests/constants_integrity/given_evidence.py: i is printed at the 2 dp it is drawn at, 40/40, all three consumers)
 HOLDING_RATE_PER_YR = (0.15, 0.40)
 
 # Named inventory item classes for EOQ-family templates (P1): unit cost c,
@@ -151,6 +154,7 @@ HOLDING_RATE_PER_YR = (0.15, 0.40)
 # prototype examples (speaker/bicycle-class items). Never verbatim numbers.
 # @kind: range
 # @units: unit_cost_usd=USD, annual_demand=1/yr, order_cost_usd=USD
+# @given: stated (tests/constants_integrity/given_evidence.py: c, D and K - or the price schedule - are printed, 40/40, all three consumers)
 INVENTORY_ITEMS = {
     "electronic component": {"unit_cost_usd": (2, 40),    "annual_demand": (2000, 60000), "order_cost_usd": (40, 300)},
     "machine spare part":   {"unit_cost_usd": (20, 400),  "annual_demand": (100, 5000),   "order_cost_usd": (60, 500)},
@@ -189,6 +193,7 @@ LEAD_TIME_WEEKS = (1, 10)
 # H&L 7e Ch. 19 stochastic single-period model.
 # @kind: range
 # @units: cost_usd=USD, price_usd=USD, salvage_usd=USD
+# @given: stated (C1 Reviewer G, reviews/phaseC1_reviewer_g_provenance.md §2 row 11 and reviews/phaseC1_reviewer_g_scratch/g_stated.py: c, p and s stated, 40/40)
 NEWSVENDOR_ITEMS = {
     "daily newspaper stack": {"cost_usd": (0.2, 1.0),  "price_usd": (0.5, 2.5),  "salvage_usd": (0.0, 0.3)},
     "bakery batch":          {"cost_usd": (1.0, 6.0),  "price_usd": (3.0, 15.0), "salvage_usd": (0.2, 2.0)},
@@ -200,6 +205,7 @@ NEWSVENDOR_ITEMS = {
 # from Z_QUANTILES (Type 1 service per Nahmias 7e §5.5) [ON-DISK visual].
 # @kind: range
 # @units: 1
+# @given: stated (C1 Reviewer G, phaseC1_reviewer_g_provenance.md §2 row 4: the drawn level is stated in the question 40/40; the probe raises only because the level keys Z_QUANTILES)
 SERVICE_LEVELS = [0.90, 0.95, 0.98, 0.99]
 
 # Aggregate-planning cost windows (P3-#10), USD: hiring/firing per worker,
@@ -368,6 +374,7 @@ MIL_STD_105E_SINGLE_NORMAL_AC = {
 # verbatim from worked examples (spec §3 copyright rule).
 # @kind: range
 # @units: target=per-row(key), sigma_frac=1
+# @given: stated (C1 Reviewer G, reviews/phaseC1_reviewer_g_provenance.md §2 row 13 and reviews/phaseC1_reviewer_g_scratch/g_more.py: the grand mean or mu0 stated 40/40 in each of the 4 consumers)
 SPC_CHARACTERISTICS = {
     "shaft diameter (mm)":        {"target": (10, 80),    "sigma_frac": (0.001, 0.01)},
     "bottle fill volume (mL)":    {"target": (250, 1000), "sigma_frac": (0.002, 0.015)},
@@ -381,6 +388,7 @@ SPC_CHARACTERISTICS = {
 # conventions per Montgomery ISQC 7e Ch. 7 examples.
 # @kind: range
 # @units: 1
+# @given: stated (C1 Reviewer G, phaseC1_reviewer_g_provenance.md §2 row 5: D, m and n are stated 40/40 and p-bar = D/(mn) is derived from them)
 P_CHART_PBAR = (0.01, 0.15)
 # @kind: range
 # @units: 1
@@ -434,6 +442,7 @@ HARD_ANODIZE_THICKNESS = (20, 110)
 # is not measurable in practice, so draws under it are rejected.
 # @kind: range
 # @units: um
+# @given: guard (C1 Reviewer G, phaseC1_reviewer_g_provenance.md §2 row 8: a screen, if sigma < FLOOR then redraw; the drawn sigma is stated in the question)
 COATING_METROLOGY_FLOOR = 1.5
 
 # Subgroup-size windows for variables charts (Q1): the chart-type-selection
@@ -448,4 +457,5 @@ XBAR_R_SUBGROUP_N = (2, 10)
 XBAR_S_SUBGROUP_N = (11, 25)
 # @kind: range
 # @units: 1
+# @given: stated (C1 Reviewer G, phaseC1_reviewer_g_provenance.md §2 row 9: m is stated 40/40 in the p chart and in the c-chart question; the c chart reads the table only in an assert)
 SPC_NUM_SUBGROUPS = (20, 30)   # preliminary samples m for trial limits

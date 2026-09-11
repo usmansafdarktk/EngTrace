@@ -35,7 +35,7 @@ if REPO not in sys.path:
     sys.path.insert(0, REPO)
 
 from tests.constants_integrity.census import (  # noqa: E402
-    BRANCHES, BRANCHES_DIR, KINDS, fields, header_fields, static_tables)
+    BRANCHES, BRANCHES_DIR, KINDS, fields, header_fields, numeric_tables)
 
 WORKLIST = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'domain_worklist.txt')
 
@@ -263,7 +263,7 @@ def check_branch(branch, src, worklist):
     exec(compile(src, f'{branch}/constants.py', 'exec'), ns)     # noqa: S102
     failures, checks = [], 0
     names = set()
-    for t in static_tables(src):
+    for t in numeric_tables(src, ns):
         name = t['name']
         names.add(name)
         label = f'{branch}.{name}'
@@ -324,6 +324,12 @@ MAT = {"Steel": {"E_GPa": 200.0, "nu": 0.3}}
 # @domain: none (a sampling window)
 FREQ = (50, 2000)
 
+import math
+# @kind: range
+# @units: rad
+# @domain: none (exact)
+PHASE = (-math.pi, math.pi)
+
 # @kind: property
 # @units: target=per-row(key), frac=1
 SPC = {"diameter (mm)": {"target": (10, 80), "frac": (0.001, 0.01)}}
@@ -332,7 +338,7 @@ SPC = {"diameter (mm)": {"target": (10, 80), "frac": (0.001, 0.01)}}
 _PLANTS = {
     # M1 - absent, and present-but-not-a-kind
     'M1 no @kind': ('# @kind: property\n# @units: E_GPa', '# @units: E_GPa'),
-    'M1 unknown @kind': ('# @kind: range\n', '# @kind: sampling-window\n'),
+    'M1 unknown @kind': ('# @kind: range\n# @units: Hz', '# @kind: sampling-window\n# @units: Hz'),
     # M2 - absent, a key naming no field, an uncovered field, a unit that does
     #      not parse, and a per-row unit whose row names none
     'M2 no @units': ('# @units: Hz\n', ''),
@@ -341,6 +347,8 @@ _PLANTS = {
     'M2 unit does not parse': ('# @units: Hz', '# @units: kg/m3'),
     'M2 unknown symbol': ('E_GPa=GPa', 'E_GPa=furlong'),
     'M2 per-row key names no unit': ('"diameter (mm)"', '"diameter"'),
+    # M2 - a table of named constants only, no literal (C1 Reviewer G, G-4)
+    'M2 named-constant table without @units': ('# @units: rad' + chr(10), ''),
     # M3 - absent and not listed; malformed
     'M3 no @domain, not on worklist': ('# @domain: none (a sampling window)\n', ''),
     'M3 malformed @domain': ('T=293.15 K, form=wrought', 'at room temperature'),

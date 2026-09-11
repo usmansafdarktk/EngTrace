@@ -4,6 +4,8 @@
     python -m tests.constants_integrity.census --seeds 40         # probe depth
     python -m tests.constants_integrity.census --no-probe         # static part only (fast)
     python -m tests.constants_integrity.census --json out.json    # machine-readable
+    python -m tests.constants_integrity.census --markdown out.md  # the committed report
+    python -m tests.constants_integrity.census --check            # exit 1 on REVIEW/UNDECLARED
     python -m tests.constants_integrity.census --selftest         # planted defects
 
 Phase C1.3 classifies every constants table as *needs a citation* or *needs only a
@@ -18,71 +20,95 @@ PREDICATES
 P-TABLE    A *numeric table* is an UPPER_CASE top-level assignment in a branch's
            constants.py - `ast.Assign` with exactly one `ast.Name` target
            matching ^[A-Z][A-Z0-9_]*$, or `ast.AnnAssign` - whose value contains
-           at least one numeric literal.
+           at least one numeric literal. This is the Prompt 07 predicate, and the
+           COVERAGE table counts only these.
+P-TABLE-LIVE
+           Such an assignment whose value holds a number but no numeric literal
+           - `(-math.pi, math.pi)`. Not counted in coverage (so the brief's figures
+           still reproduce); CLASSIFIED and held to @kind/@units like any other.
+           Added after C1 Reviewer G, finding G-4.
 P-LITERAL  A *numeric literal* is an `ast.Constant` whose value is an int or a
            float, bool excluded. `-1.5` is one literal (the minus is a UnaryOp).
            Dict KEYS count: `{0.90: 1.2816}` holds two literals.
 P-TAGGED   A table is *tagged* if a provenance tag (TAG_RE: an opening bracket
            and a class word) appears on any source line of the assignment, or in
            the contiguous run of comment and blank lines immediately above it.
-           This is the Prompt 07 predicate. A tag is a CLAIM, not evidence:
-           resolution is test_citations_resolve's job, not this file's.
+           A tag is a CLAIM, not evidence: resolution is test_citations_resolve's
+           job, not this file's.
 P-CONSUMER A template consumes a table if its `template_*` function - or any
            module-level function it calls, transitively, inside its own module -
-           loads the table's name, or loads any of these ALIASES of it:
-             * a local assigned from an expression that loads it
-               (`all_fluids = {**COMMON_LIQUIDS, **COMMON_GASES}`);
-             * a name bound at module level, in the template's module, by a
-               statement that loads it (`_T26R_E24_5PCT = RESISTOR_SERIES_BY_
-               TOLERANCE[5]`, or a module-level loop filling a list);
+           reads, as a global, the table's name or a name that STANDS FOR it:
              * a name defined in constants.py - an assignment or a FUNCTION -
-               whose body loads it (`chart_factor` reads CONTROL_CHART_FACTORS).
-           Aliases chain to a fixpoint.
+               whose body reads it (`chart_factor` reads CONTROL_CHART_FACTORS);
+             * a name bound at module level in the template's module whose value,
+               at the END of the module's import, derives from it.
+           Derivation is tracked FLOW-SENSITIVELY, statement by statement: an
+           assignment replaces what a name stands for, a container fill
+           (`X.append(...)`, `X[k] = ...`) adds to it, a loop is walked to a
+           fixpoint and merged with the path that skips it, and an `if` merges
+           both branches. The first two versions were flow-insensitive, and a
+           helper name like `_lo` bound from a table in one module-level loop and
+           rebound from unrelated data in the next "stood for" the table in both
+           (C1 Reviewer G §5; `QUEUE_SCENARIOS` was credited with 4 consumers
+           where 2 read it).
+P-COPY     A template that writes a table's value as a number instead of reading
+           it consumes the table invisibly to P-CONSUMER. A copy found is DECLARED
+           in the table's header, `# @copied-in: <template_id> <literal>`, and the
+           census VERIFIES the literal is a constant in that template's source. A
+           declaration that no longer verifies is an error (G-1).
 P-DRAW     A consumer *draws by order* if it calls `random.choice` or
-           `random.sample` with an argument that loads the table (or an alias)
-           and contains no `sorted(` call. For a dict the order that matters is
-           KEY order; for a list or tuple, ELEMENT order (D-031).
+           `random.sample` with an argument that derives from the table and
+           contains no `sorted(` call. For a dict the order that matters is KEY
+           order; for a list or tuple, ELEMENT order (D-031).
 P-GIVEN    The given-values measurement, by PERTURBATION rather than by string
            matching. For one FIELD of a table (a column: every leaf reached by
            the same path, with row keys and list indices wildcarded) every leaf
-           is nudged - floats x1.0371 (a zero becomes 0.0371), ints +1 - the
-           consuming modules are RELOADED so import-time copies see the nudge,
-           and each consumer is re-run on the same seed. Per seed:
+           is nudged - floats x1.0371 (a zero becomes 0.0371), integers by the
+           same relative step, kept integral - the consuming modules are RELOADED
+           so import-time copies see the nudge, and each consumer is re-run on
+           the same seed. Per seed:
              RESTATED    the question changed, and it is identical to the
-                         original once every number in it is masked: the field's
-                         value is printed in the question, possibly rounded or
-                         converted.
-             HIDDEN      the question is byte-identical and the solution changed:
-                         the value moves the gold answer without appearing in the
-                         question. THIS is what needs a citation for correctness.
-             STRUCTURAL  the question changed in more than its numbers (a
-                         rejection loop took another path): indeterminate.
+                         original once every number in it is masked.
+             HIDDEN      the question is byte-identical and the solution changed.
+             STRUCTURAL  the question changed in more than its numbers.
+             ERROR       the consumer raised under the nudge (or its module no
+                         longer imports). The table is READ; how, the probe
+                         cannot say.
              UNUSED      neither changed.
-           A field is HIDDEN for a consumer if ANY seed was HIDDEN. Masking is
-           NUM_RE -> `#`. A module that fails to import under the nudge is
-           IMPORT-ERROR: the table is validated at import time.
+           Rolled up per table, in this order: SOME-HIDDEN if any HIDDEN;
+           ALL-RESTATED if only RESTATED/UNUSED; ERROR if any ERROR; INDETERMINATE
+           if any STRUCTURAL; COPIED if the only consumers are declared copies;
+           else NO-EFFECT. The first version had no ERROR case, so an all-crash
+           table rolled up as NO-EFFECT and was granted PLAUSIBILITY "as a guard"
+           (C1 Reviewer G, G-2).
 
 LIMITS, stated so that nobody reads more into a count than it holds
 ------------------------------------------------------------------
-* A value printed in the question at a rounding coarse enough that a 3.71 %
-  nudge does not move it reads HIDDEN. That is the conservative direction, and
-  it is also the D-025 representability hazard, which C3.6 reports separately.
-* Dict keys are never perturbed, so `CONTROL_CHART_FACTORS`' subgroup sizes and
-  `Z_QUANTILES`' probabilities are not probed; they are labels a template prints.
-* The probe sees one seed range. A field consumed only on a rare branch can read
-  UNUSED; `--seeds` raises the depth, and the seed count is printed with every
-  result.
-* Consumption through `getattr`, `globals()` or a string name is invisible to
-  the static part. None was found by grep when this was written.
+* A value printed at a rounding coarse enough that a 3.71 % nudge does not move
+  it reads HIDDEN - the conservative direction, and D-025's hazard (C3.6).
+* Dict keys are never perturbed; they are labels a template prints.
+* The probe sees one seed range; `--seeds` raises the depth.
+* Consumption through `getattr`, `globals()` or a string name is invisible. C1
+  Reviewer G's sweep found none.
+* An UNDECLARED literal copy is invisible. P-COPY checks the copies declared;
+  finding the rest is C3's literal-copy sweep, so the UNCONSUMED count is an
+  upper bound.
+* GUARD CONSUMPTION reads NO-EFFECT, and only NO-EFFECT - nothing changed and
+  nothing raised - is accepted as a guard without a human verdict.
+* PARALLEL STRINGS: REACTIONS restates its coefficients through an `equation`
+  string the probe does not nudge, so the coefficients read HIDDEN.
+* CONSTANTS-LEVEL COPIES (MEDIA_VELOCITIES["Vacuum"] from C0) are seen statically
+  and not dynamically: constants.py itself is not reloaded.
 
-CLASSIFICATION (C1.3) is computed from the measurement and the table's declared
-`@kind`, never from the measurement alone - see `classify()` and the provenance
-convention in docs/references/README.md.
+CLASSIFICATION (C1.3) is computed from the measurement, the table's declared
+`@kind`, and - for a `range` the probe cannot settle - a declared, evidenced
+`@given`; never from the measurement alone. See `classify()` and spec §C1.3.
 """
 from __future__ import annotations
 
 import argparse
 import ast
+import copy
 import importlib
 import json
 import os
@@ -114,6 +140,10 @@ NUM_RE = re.compile(r'[-+]?\d[\d,]*\.?\d*(?:[eE][-+]?\d+)?')
 
 PERTURB_FACTOR = 1.0371
 
+#: The declared kinds, one meaning each. See spec §C1.2 and §C1.3.
+KINDS = ('property', 'standard', 'measured-constant', 'defined', 'mathematical',
+         'range', 'validity')
+
 
 # ==========================================================================
 # Static part: tables, literals, tags
@@ -124,11 +154,7 @@ def _is_num(node):
             and isinstance(node.value, (int, float)))
 
 
-def static_tables(src):
-    """Apply P-TABLE, P-LITERAL and P-TAGGED to one constants.py source."""
-    tree = ast.parse(src)
-    lines = src.splitlines()
-    out = []
+def _assignments(tree):
     for node in tree.body:
         if isinstance(node, ast.Assign):
             if len(node.targets) != 1 or not isinstance(node.targets[0], ast.Name):
@@ -138,27 +164,61 @@ def static_tables(src):
             name, value = node.target.id, node.value
         else:
             continue
-        if not UPPER_RE.match(name) or value is None:
-            continue
+        if UPPER_RE.match(name) and value is not None:
+            yield node, name, value
+
+
+def _entry(node, name, literals, lines):
+    body = lines[node.lineno - 1:node.end_lineno]
+    above = []
+    i = node.lineno - 2
+    while i >= 0 and (not lines[i].strip() or lines[i].lstrip().startswith('#')):
+        above.append(lines[i])
+        i -= 1
+    above.reverse()
+    tags = sorted({m.group(1) for ln in body + above for m in TAG_RE.finditer(ln)})
+    return dict(name=name, lineno=node.lineno, end_lineno=node.end_lineno,
+                literals=literals, tagged=bool(tags), tags=tags,
+                header='\n'.join(above), live_only=False)
+
+
+def static_tables(src):
+    """Apply P-TABLE, P-LITERAL and P-TAGGED to one constants.py source."""
+    tree = ast.parse(src)
+    lines = src.splitlines()
+    out = []
+    for node, name, value in _assignments(tree):
         literals = sum(1 for n in ast.walk(value) if _is_num(n))
-        if literals == 0:
-            continue
-        body = lines[node.lineno - 1:node.end_lineno]
-        above = []
-        i = node.lineno - 2
-        while i >= 0 and (not lines[i].strip() or lines[i].lstrip().startswith('#')):
-            above.append(lines[i])
-            i -= 1
-        above.reverse()
-        tags = sorted({m.group(1) for ln in body + above for m in TAG_RE.finditer(ln)})
-        out.append(dict(name=name, lineno=node.lineno, end_lineno=node.end_lineno,
-                        literals=literals, tagged=bool(tags), tags=tags,
-                        header='\n'.join(above)))
+        if literals:
+            out.append(_entry(node, name, literals, lines))
     return out
 
 
+def numeric_tables(src, ns=None):
+    """P-TABLE plus P-TABLE-LIVE: every UPPER_CASE table whose VALUE holds a number.
+
+    `ns` is the executed namespace of `src`; it is built here when not given.
+    """
+    if ns is None:
+        ns = {}
+        exec(compile(src, '<constants>', 'exec'), ns)            # noqa: S102
+    tables = static_tables(src)
+    have = {t['name'] for t in tables}
+    lines = src.splitlines()
+    for node, name, _value in _assignments(ast.parse(src)):
+        obj = ns.get(name)
+        if name in have or obj is None or callable(obj):
+            continue
+        if any(True for _ in _leaves(obj)):
+            e = _entry(node, name, 0, lines)
+            e['live_only'] = True
+            tables.append(e)
+    tables.sort(key=lambda t: t['lineno'])
+    return tables
+
+
 # ==========================================================================
-# Static part: consumers and draws
+# Static part: consumers, copies and draws
 # ==========================================================================
 
 def _names_loaded(node):
@@ -168,28 +228,8 @@ def _names_loaded(node):
 _SCOPES = (ast.ListComp, ast.SetComp, ast.DictComp, ast.GeneratorExp, ast.Lambda)
 
 
-def _stores_outside_scopes(node):
-    """Names bound by `node` in ITS OWN scope - not inside a comprehension or lambda."""
-    out, stack = set(), [node]
-    while stack:
-        n = stack.pop()
-        if isinstance(n, _SCOPES) and n is not node:
-            continue
-        if isinstance(n, ast.Name) and isinstance(n.ctx, ast.Store):
-            out.add(n.id)
-        stack.extend(ast.iter_child_nodes(n))
-    return out
-
-
 def _free_loads(fn):
-    """Names a function loads that it does not bind itself - its GLOBALS.
-
-    The first version of P-CONSUMER matched module aliases against every name a
-    function loaded. A module-level `{k: 2 * v for k, v in LEVELS.items()}` then
-    made `k` and `v` "aliases of LEVELS", and any template with its own local `k`
-    became a consumer. The self-test's planted consumer set caught it: an
-    over-broad detector, the other half of the shape Phase 5 kept meeting.
-    """
+    """Names a function loads that it does not bind itself - its GLOBALS."""
     bound = {a.arg for a in ast.walk(fn) if isinstance(a, ast.arg)}
     bound |= {n.id for n in ast.walk(fn) if isinstance(n, ast.Name)
               and isinstance(n.ctx, ast.Store)}
@@ -229,7 +269,11 @@ def _fixpoint(alias):
 
 
 def constants_aliases(src, tables):
-    """Names in constants.py - assignments or functions - built from a table."""
+    """Names in constants.py - assignments or functions - built from a table.
+
+    Flow-insensitive is sound here: each name is bound once, by one top-level
+    statement (constants.py has no module-level loops).
+    """
     alias = {}
     for node in ast.parse(src).body:
         if isinstance(node, ast.Assign) and len(node.targets) == 1 \
@@ -246,45 +290,152 @@ def constants_aliases(src, tables):
     return {a: s & set(tables) for a, s in alias.items() if s & set(tables)}
 
 
-def _module_aliases(tree, tables, calias):
-    """Names bound at module level, in a template module, by a table-loading statement."""
-    skip = (ast.FunctionDef, ast.ClassDef, ast.Import, ast.ImportFrom)
-    stmts = [st for st in tree.body if not isinstance(st, skip)]
-    bound = set().union(*(_stores_outside_scopes(st) for st in stmts)) if stmts else set()
-    alias = {}
-    for st in stmts:
-        loaded = _names_loaded(st)
-        for nm in (loaded | _stores_outside_scopes(st)) & bound:
-            alias.setdefault(nm, set()).update(loaded - {nm})
-    alias = _fixpoint(alias)
-    known = set(tables) | set(calias)
-    out = {}
-    for a, srcs in alias.items():
-        hit = (srcs & set(tables)) | set().union(*(calias[c] for c in srcs & set(calias)))
-        if hit and a not in known:
-            out[a] = hit
+_FILLERS = ('append', 'extend', 'add', 'update', 'insert', 'setdefault', 'appendleft')
+
+
+class _Flow:
+    """Flow-sensitive table derivation over a statement list (P-CONSUMER).
+
+    `env` maps a name to the tables its CURRENT value derives from; `ever` is the
+    union over the whole walk, used where a call site's exact state is not
+    tracked (draw detection). Names absent from `env` fall back to `sources` -
+    the tables themselves, constants-level aliases, and module aliases.
+    """
+
+    def __init__(self, sources):
+        self.sources = sources
+        self.ever = {}
+
+    def _look(self, env, name):
+        return env[name] if name in env else self.sources.get(name, set())
+
+    def tables_in(self, node, env):
+        out = set()
+        for n in ast.walk(node):
+            if isinstance(n, ast.Name):
+                out |= self._look(env, n.id)
+        return out
+
+    def _bind(self, env, name, val):
+        env[name] = set(val)
+        self.ever.setdefault(name, set()).update(val)
+
+    def _fill(self, env, name, val):
+        env[name] = self._look(env, name) | set(val)
+        self.ever.setdefault(name, set()).update(val)
+
+    def assign(self, env, target, val):
+        if isinstance(target, ast.Name):
+            self._bind(env, target.id, val)
+        elif isinstance(target, (ast.Tuple, ast.List)):
+            for elt in target.elts:
+                self.assign(env, elt, val)
+        elif isinstance(target, ast.Starred):
+            self.assign(env, target.value, val)
+        elif isinstance(target, (ast.Subscript, ast.Attribute)):
+            base = target.value
+            while isinstance(base, (ast.Subscript, ast.Attribute)):
+                base = base.value
+            if isinstance(base, ast.Name):
+                extra = self.tables_in(target.slice, env) \
+                    if isinstance(target, ast.Subscript) else set()
+                self._fill(env, base.id, set(val) | extra)
+
+    @staticmethod
+    def _merge(a, b, keys_from):
+        out = {}
+        for k in set(a) | set(b):
+            out[k] = keys_from._look(a, k) | keys_from._look(b, k)
+        return out
+
+    def walk(self, stmts, env):
+        for st in stmts:
+            if isinstance(st, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef,
+                               ast.Import, ast.ImportFrom)):
+                continue
+            if isinstance(st, ast.Assign):
+                val = self.tables_in(st.value, env)
+                for t in st.targets:
+                    self.assign(env, t, val)
+            elif isinstance(st, ast.AnnAssign) and st.value is not None:
+                self.assign(env, st.target, self.tables_in(st.value, env))
+            elif isinstance(st, ast.AugAssign):
+                self.assign(env, st.target,
+                            self.tables_in(st.value, env) | self.tables_in(st.target, env))
+            elif isinstance(st, (ast.For, ast.AsyncFor, ast.While)):
+                before = dict(env)
+                for _ in range(2):
+                    if not isinstance(st, ast.While):
+                        self.assign(env, st.target, self.tables_in(st.iter, env))
+                    self.walk(st.body, env)
+                merged = self._merge(before, env, self)
+                self.walk(st.orelse, merged)
+                env.clear()
+                env.update(merged)
+            elif isinstance(st, ast.If):
+                a, b = dict(env), dict(env)
+                self.walk(st.body, a)
+                self.walk(st.orelse, b)
+                merged = self._merge(a, b, self)
+                env.clear()
+                env.update(merged)
+            elif isinstance(st, (ast.With, ast.AsyncWith)):
+                for item in st.items:
+                    if item.optional_vars is not None:
+                        self.assign(env, item.optional_vars,
+                                    self.tables_in(item.context_expr, env))
+                self.walk(st.body, env)
+            elif isinstance(st, ast.Try):
+                self.walk(st.body, env)
+                for h in st.handlers:
+                    self.walk(h.body, env)
+                self.walk(st.orelse, env)
+                self.walk(st.finalbody, env)
+            elif isinstance(st, ast.Expr) and isinstance(st.value, ast.Call):
+                f = st.value.func
+                if isinstance(f, ast.Attribute) and f.attr in _FILLERS:
+                    base = f.value
+                    while isinstance(base, (ast.Subscript, ast.Attribute)):
+                        base = base.value
+                    if isinstance(base, ast.Name):
+                        val = set()
+                        for arg in list(st.value.args) + [k.value for k in st.value.keywords]:
+                            val |= self.tables_in(arg, env)
+                        self._fill(env, base.id, val)
+
+
+def module_aliases(tree, tables, calias):
+    """Module-level names whose value, at the end of import, derives from a table."""
+    sources = {t: {t} for t in tables}
+    for a, s in calias.items():
+        # A name that is BOTH a table and built from tables stands for itself too.
+        # The first flow-sensitive version replaced a table's own entry with the
+        # tables it is built from, so RESISTOR_SERIES_BY_TOLERANCE (built from the
+        # IEC lists) lost its consumer and MEDIA_VELOCITIES (built from C0) its draw.
+        sources[a] = set(s) | ({a} if a in sources else set())
+    flow = _Flow(sources)
+    env = {}
+    flow.walk(tree.body, env)
+    return {n: s for n, s in env.items() if s and n not in sources}
+
+
+def _literals_in(fns):
+    out = set()
+    for f in fns:
+        for n in ast.walk(f):
+            if _is_num(n):
+                out.add(float(n.value))
     return out
 
 
-def _local_aliases(fns, names):
-    """Locals assigned from an expression that loads one of `names`."""
-    alias = {}
-    for f in fns:
-        for n in ast.walk(f):
-            if isinstance(n, (ast.Assign, ast.For, ast.comprehension)):
-                value = n.value if isinstance(n, ast.Assign) else n.iter
-                targets = n.targets if isinstance(n, ast.Assign) else [n.target]
-                src = _names_loaded(value)
-                for tgt in targets:
-                    for nm in _names_loaded(tgt):
-                        alias.setdefault(nm, set()).update(src - {nm})
-    alias = _fixpoint(alias)
-    return {a: s & set(names) for a, s in alias.items() if s & set(names)}
-
-
 def consumers_and_draws(branch_dir, module_root, tables, calias):
-    """Apply P-CONSUMER and P-DRAW to every template module under `branch_dir`."""
+    """Apply P-CONSUMER and P-DRAW to every template module under `branch_dir`.
+
+    Also returns, per template, its function source's numeric literals, which
+    P-COPY checks a declaration against.
+    """
     use = {t: {} for t in tables}
+    literals = {}
     for dirpath, _d, files in os.walk(branch_dir):
         if '__pycache__' in dirpath:
             continue
@@ -295,30 +446,27 @@ def consumers_and_draws(branch_dir, module_root, tables, calias):
             modname = os.path.relpath(path, module_root)[:-3].replace(os.sep, '.')
             tree = ast.parse(open(path, encoding='utf-8').read())
             funcs = _module_functions(tree)
-            # table -> every name that stands for it in this module
-            here = {a: set(s) for a, s in calias.items()}
-            for a, s in _module_aliases(tree, tables, calias).items():
+            here = {a: set(s) | ({a} if a in tables else set()) for a, s in calias.items()}
+            for a, s in module_aliases(tree, tables, calias).items():
                 here.setdefault(a, set()).update(s)
+            sources = {t: {t} for t in tables}
+            for a, s in here.items():
+                sources[a] = sources.get(a, set()) | s
             for name, f in funcs.items():
                 if not name.startswith('template_'):
                     continue
                 reach = _reach(f, funcs)
-                loaded = set().union(*(_names_loaded(r) for r in reach))
+                literals[name] = (modname, _literals_in(reach))
                 free = set().union(*(_free_loads(r) for r in reach))
-                local = _local_aliases(reach, (set(tables) | set(here)) & free)
-                for a, s in list(local.items()):
-                    local[a] = (s & set(tables)) | set().union(
-                        *(here[x] for x in s & set(here)))
+                flow = _Flow(sources)
+                for r in reach:
+                    flow.walk(r.body, {})
                 for t in tables:
-                    globals_for_t = {t} | {a for a, s in here.items() if t in s}
-                    locals_for_t = {a for a, s in local.items() if t in s}
-                    stand_ins = globals_for_t | locals_for_t
-                    # a table or a module/constants alias counts only as a
-                    # GLOBAL the function reads, never as a local it shadows
-                    present = (globals_for_t & free) | (locals_for_t & loaded)
-                    via = sorted(('direct' if x == t else f'alias {x}') for x in present)
-                    if not via:
+                    stand_ins = {t} | {a for a, s in here.items() if t in s}
+                    present = stand_ins & free
+                    if not present:
                         continue
+                    via = sorted('direct' if x == t else f'alias {x}' for x in present)
                     draws = set()
                     for r in reach:
                         for n in ast.walk(r):
@@ -328,14 +476,17 @@ def consumers_and_draws(branch_dir, module_root, tables, calias):
                                     and n.func.attr in ('choice', 'sample') and n.args):
                                 continue
                             arg = n.args[0]
-                            if not (_names_loaded(arg) & stand_ins):
+                            arg_tables = set()
+                            for nm in _names_loaded(arg):
+                                arg_tables |= flow.ever.get(nm, set()) | sources.get(nm, set())
+                            if t not in arg_tables:
                                 continue
                             is_sorted = any(isinstance(c, ast.Call)
                                             and isinstance(c.func, ast.Name)
                                             and c.func.id == 'sorted' for c in ast.walk(arg))
                             draws.add('sorted' if is_sorted else f'random.{n.func.attr}')
                     use[t][name] = dict(via=via, draws=sorted(draws), module=modname)
-    return use
+    return use, literals
 
 
 # ==========================================================================
@@ -493,17 +644,37 @@ def probe(cmod, table_name, field, consumers, seeds, baseline):
 
 
 def field_verdict(c):
-    for v in ('HIDDEN', 'RESTATED', 'STRUCTURAL', 'IMPORT_ERROR', 'ERROR'):
+    # Precedence: what the probe CANNOT settle outranks what it can. The first
+    # version checked RESTATED before STRUCTURAL and ERROR, so a field restated on
+    # some seeds and crashing or rewording the question on others reported
+    # RESTATED - and G-2's escape (a crash read as harmless) stayed open one level
+    # below the rollup that was fixed for it. Caught by the WINDOW2 plant.
+    for v in ('HIDDEN', 'IMPORT_ERROR', 'ERROR', 'STRUCTURAL', 'RESTATED'):
         if c.get(v):
             return v.replace('_', '-')
     return 'UNUSED'
+
+
+def rollup(verdicts, has_name_consumers, has_copies):
+    """Table-level measurement from field verdicts (see P-GIVEN)."""
+    if not has_name_consumers:
+        return 'COPIED' if has_copies else 'UNCONSUMED'
+    if 'HIDDEN' in verdicts:
+        return 'SOME-HIDDEN'
+    if verdicts and 'RESTATED' in verdicts and all(v in ('RESTATED', 'UNUSED') for v in verdicts):
+        return 'ALL-RESTATED'
+    if 'ERROR' in verdicts or 'IMPORT-ERROR' in verdicts:
+        return 'ERROR'
+    if 'STRUCTURAL' in verdicts:
+        return 'INDETERMINATE'
+    return 'NO-EFFECT'
 
 
 # ==========================================================================
 # The census
 # ==========================================================================
 
-HEADER_FIELD_RE = re.compile(r'#\s*@(units|domain|kind)\s*:\s*(.*)')
+HEADER_FIELD_RE = re.compile(r'#\s*@(units|domain|kind|given|copied-in)\s*:\s*(.*)')
 
 
 def header_fields(header):
@@ -515,17 +686,33 @@ def header_fields(header):
     return out
 
 
-def classify(kind, measured):
-    """C1.3's rule, from the declared @kind and the P-GIVEN measurement.
+def parse_copies(decl):
+    """`@copied-in: template_a 0.2; template_b 57000` -> [(template_a, 0.2), ...]."""
+    out = []
+    for part in (decl or '').split(';'):
+        bits = part.split()
+        if not bits:
+            continue
+        try:
+            out.append((bits[0], float(bits[1])))
+        except (IndexError, ValueError):
+            out.append((bits[0], None))
+    return out
+
+
+def classify(kind, measured, given=None):
+    """C1.3's rule, from the declared @kind, the P-GIVEN measurement and @given.
 
     The given-values rule excuses a value from CORRECTNESS-dependence: restated
     in the question, a wrong number cannot make the gold answer disagree with
-    the question. It does not excuse a value from being TRUE. A question that
-    says mercury has a density of 5000 kg/m^3 is self-consistent and false, and
-    Phase C2 shipped 274 items of exactly that (phaseC2_summary.md §6). So the
-    rule licenses a plausibility window only for a `range` - a sampling window
-    that asserts nothing about a named real entity - and only when every
-    consumer is measured to restate it.
+    the question. It does not excuse a value from being TRUE - C2 shipped 274
+    items that were self-consistent and false (phaseC2_summary.md §6). So only a
+    `range` can be a plausibility window, and only when every consumer is
+    measured to restate it, or reads it without anything changing or raising
+    (a guard). A crash, a structural change or a copy tells the probe the table
+    is read and not how, so it needs a human verdict, declared with its
+    evidence as @given (C1 Reviewer G, G-2). A declaration never overrides a
+    measured HIDDEN.
     """
     if kind is None:
         return 'UNDECLARED', 'no @kind declared'
@@ -533,20 +720,26 @@ def classify(kind, measured):
     if kind not in KINDS:
         return 'UNDECLARED', f'unknown @kind {kind!r}'
     if measured == 'UNCONSUMED':
-        return 'UNCONSUMED', 'no template consumes it'
+        return 'UNCONSUMED', 'no template consumes it (named or declared copy)'
     if kind == 'range':
+        if measured == 'SOME-HIDDEN':
+            return 'CITATION', ('declared a range but measured SOME-HIDDEN: the '
+                                'given-values rule does not apply'
+                                + (' - the @given declaration is contradicted' if given else ''))
         if measured == 'ALL-RESTATED':
             return 'PLAUSIBILITY', 'a sampling window every consumer restates'
-        if measured in ('NO-EFFECT', 'INDETERMINATE'):
-            # Consumed as a GUARD: an assert or a screen over values drawn
-            # elsewhere. A nudge cannot move an item through a guard, only
-            # reject it; the window shapes plausibility, not correctness.
-            return 'PLAUSIBILITY', f'{measured}: consumed as a guard or screen'
-        return 'CITATION', (f'declared a range but measured {measured}: the '
-                            f'given-values rule does not apply')
+        if measured == 'NO-EFFECT':
+            return 'PLAUSIBILITY', 'NO-EFFECT: read without changing or raising - a guard'
+        verdict = (given or '').split()[0] if given else ''
+        if verdict in ('stated', 'guard'):
+            return 'PLAUSIBILITY', f'{measured}; declared @given: {given}'
+        return 'REVIEW', (f'{measured}: the probe cannot tell a guard from a crash or a '
+                          f'copy - declare @given: stated|guard (evidence)')
     if kind in ('property', 'standard', 'measured-constant'):
-        return 'CITATION', ('consumed without being stated' if measured == 'SOME-HIDDEN'
-                            else f'{measured}: asserts a fact about a named real entity')
+        reasons = {'SOME-HIDDEN': 'consumed without being stated',
+                   'COPIED': 'consumed through a copied literal'}
+        return 'CITATION', reasons.get(measured,
+                                       f'{measured}: asserts a fact about a named real entity')
     if kind == 'mathematical':
         return 'DERIVATION', 'computable from its definition'
     if kind == 'defined':
@@ -554,86 +747,75 @@ def classify(kind, measured):
     return 'DOMAIN', 'a validity bound for another table; checked by its C3.2 suite'
 
 
-#: The declared kinds, one meaning each. See docs/references/README.md.
-KINDS = ('property', 'standard', 'measured-constant', 'defined', 'mathematical',
-         'range', 'validity')
-
-#: Probe limits found while measuring the real corpus, recorded where the
-#: numbers are produced rather than in a summary that can drift from them:
-#:
-#:  * GUARD CONSUMPTION. Many civil/industrial templates read a table only in an
-#:    assert or a screen, or enumerate candidates over it and then filter. A
-#:    nudge then reads ERROR (the assert fires), NO-EFFECT (the filter absorbs
-#:    it) or STRUCTURAL. `classify` treats that as a guard for a `range`; for a
-#:    `property` or `standard` it changes nothing, because a guard that asserts
-#:    a template-side COPY equals the table (hydrology.py's `_SCS_COMBOS`) makes
-#:    the table's truth the copy's truth.
-#:  * PARALLEL STRINGS. REACTIONS carries each reaction twice: numeric
-#:    coefficients, and an `equation` string the question prints. The probe
-#:    nudges only numbers, so the coefficients read HIDDEN while the question
-#:    does state them. Their warrant is element balance, which is why the table
-#:    is `mathematical`, not a measurement this probe could settle.
-#:  * CONSTANTS-LEVEL COPIES. MEDIA_VELOCITIES["Vacuum"] is C0 copied at import
-#:    of constants.py itself, which the probe does not reload. C0's consumption
-#:    through it is seen statically (P-CONSUMER) and not dynamically.
-
-
 def census(seeds=40, probe_on=True, branches=BRANCHES, root=BRANCHES_DIR,
            module_root=REPO, package='data.templates.branches'):
     report = []
     for branch in branches:
         src = open(os.path.join(root, branch, 'constants.py'), encoding='utf-8').read()
-        tables = static_tables(src)
-        names = sorted(t['name'] for t in tables)
-        calias = constants_aliases(src, names)
-        use = consumers_and_draws(os.path.join(root, branch), module_root, names, calias)
         cmod = importlib.import_module(f'{package}.{branch}.constants' if package
                                        else f'{branch}.constants')
+        tables = numeric_tables(src, dict(vars(cmod)))
+        names = sorted(t['name'] for t in tables)
+        calias = constants_aliases(src, names)
+        use, lits = consumers_and_draws(os.path.join(root, branch), module_root, names, calias)
         baseline = {}
         for t in tables:
             obj = getattr(cmod, t['name'])
+            declared = header_fields(t.pop('header'))
             t.update(branch=branch, type=type(obj).__name__, fields=fields(obj),
-                     consumers=use[t['name']], declared=header_fields(t.pop('header')),
-                     probe={}, seeds=seeds if probe_on else 0)
-            t['draws_by_order'] = sorted(tid for tid, u in t['consumers'].items()
-                                         if any(d.startswith('random.') for d in u['draws']))
-            if probe_on and t['consumers']:
-                cons = {tid: u['module'] for tid, u in t['consumers'].items()}
-                for tid, m in cons.items():
+                     consumers=dict(use[t['name']]), declared=declared,
+                     probe={}, seeds=seeds if probe_on else 0, copies=[], copy_errors=[])
+            for tid, lit in parse_copies(declared.get('copied-in')):
+                if lit is None:
+                    t['copy_errors'].append(f'@copied-in entry {tid!r} names no numeric literal')
+                elif tid not in lits:
+                    t['copy_errors'].append(f'@copied-in names {tid}, which is not a template here')
+                elif lit not in lits[tid][1]:
+                    t['copy_errors'].append(f'{tid} contains no literal {lit} - the declared '
+                                            f'copy is gone; remove the declaration')
+                else:
+                    t['copies'].append((tid, lit))
+            named = {tid: u['module'] for tid, u in t['consumers'].items()}
+            for tid, lit in t['copies']:
+                t['consumers'].setdefault(tid, dict(via=[f'copied literal {lit}'], draws=[],
+                                                    module=lits[tid][0]))
+            # Order is a property of a container; a scalar table has none to depend on.
+            t['draws_by_order'] = (sorted(tid for tid, u in t['consumers'].items()
+                                          if any(d.startswith('random.') for d in u['draws']))
+                                   if isinstance(obj, (dict, list, tuple)) else [])
+            if probe_on and named:
+                for tid, m in named.items():
                     if tid not in baseline:
                         fn = getattr(importlib.import_module(m), tid)
                         baseline[tid] = [_gen(fn, s) for s in range(seeds)]
                 for fld in t['fields']:
-                    res = probe(cmod, t['name'], fld, cons, seeds, baseline)
+                    res = probe(cmod, t['name'], fld, named, seeds, baseline)
                     t['probe'][fld] = {tid: dict(counts=c, verdict=field_verdict(c))
                                        for tid, c in res.items()}
             verdicts = [v['verdict'] for f in t['probe'].values() for v in f.values()]
-            if not t['consumers']:
-                t['measured'] = 'UNCONSUMED'
-            elif not probe_on:
+            if named and not probe_on:
                 t['measured'] = 'NOT-PROBED'
-            elif 'HIDDEN' in verdicts:
-                t['measured'] = 'SOME-HIDDEN'
-            elif 'RESTATED' in verdicts and all(v in ('RESTATED', 'UNUSED') for v in verdicts):
-                t['measured'] = 'ALL-RESTATED'
-            elif 'STRUCTURAL' in verdicts or 'IMPORT-ERROR' in verdicts:
-                t['measured'] = 'INDETERMINATE'
             else:
-                t['measured'] = 'NO-EFFECT'
-            t['class'], t['class_reason'] = classify(t['declared'].get('kind'), t['measured'])
+                t['measured'] = rollup(verdicts, bool(named), bool(t['copies']))
+            t['class'], t['class_reason'] = classify(declared.get('kind'), t['measured'],
+                                                     declared.get('given'))
+            if t['copy_errors']:
+                t['class'], t['class_reason'] = 'REVIEW', '; '.join(t['copy_errors'])
             report.append(t)
     return report
 
 
 def print_report(report):
-    print('PROVENANCE COVERAGE (P-TABLE, P-LITERAL, P-TAGGED)')
+    print('PROVENANCE COVERAGE (P-TABLE, P-LITERAL, P-TAGGED; P-TABLE-LIVE tables excluded)')
     print(f"{'branch':24s} {'tables':>6s} {'tagged':>6s} {'literals':>8s} {'in tagged':>9s}")
     for b in BRANCHES:
-        rows = [t for t in report if t['branch'] == b]
+        rows = [t for t in report if t['branch'] == b and not t['live_only']]
         if rows:
             print(f"{b:24s} {len(rows):6d} {sum(t['tagged'] for t in rows):6d} "
                   f"{sum(t['literals'] for t in rows):8d} "
                   f"{sum(t['literals'] for t in rows if t['tagged']):9d}")
+    live = [t['name'] for t in report if t['live_only']]
+    print(f"P-TABLE-LIVE (classified, not counted above): {', '.join(live) or 'none'}")
     print()
     print('PER TABLE - measured is P-GIVEN over every consumer and field, '
           f"at {report[0]['seeds'] if report else 0} seeds per template")
@@ -650,11 +832,75 @@ def print_report(report):
         for verdict in ('HIDDEN', 'STRUCTURAL', 'IMPORT-ERROR', 'ERROR'):
             if verdict in per:
                 print(f"       {verdict.lower()} in: {', '.join(sorted(per[verdict]))}")
+        for tid, lit in t['copies']:
+            print(f"       copied literal {lit} in: {tid}")
+        if t['declared'].get('given'):
+            print(f"       @given: {t['declared']['given'][:100]}")
+        for e in t['copy_errors']:
+            print(f"       COPY DECLARATION ERROR: {e}")
     print()
     counts = {}
     for t in report:
         counts[t['class']] = counts.get(t['class'], 0) + 1
     print('CLASSIFICATION', ', '.join(f'{k} {v}' for k, v in sorted(counts.items())))
+
+
+def write_markdown(report, path, seeds):
+    """The committed C1.3 report. Regenerated, never hand-edited."""
+    lit = [t for t in report if not t['live_only']]
+    out = [
+        '# Phase C1.3 — constants-table census and classification',
+        '',
+        '**Generated, not written.** Regenerate with',
+        '',
+        f'    python -m tests.constants_integrity.census --seeds {seeds} --markdown '
+        'docs/re-implementation-sep/phaseC1_census.md',
+        '',
+        'Every term below - *numeric table*, *literal*, *tagged*, *consumer*, *copy*,',
+        '*draws by order*, *restated*, *hidden* - is a predicate defined in the docstring',
+        'of `tests/constants_integrity/census.py`; the classification rule is spec §C1.3.',
+        '',
+        '## Coverage (P-TABLE)',
+        '',
+        '| branch | numeric tables | tagged | numeric literals | in tagged tables |',
+        '|---|---:|---:|---:|---:|',
+    ]
+    for b in BRANCHES:
+        rows = [t for t in lit if t['branch'] == b]
+        out.append(f"| {b} | {len(rows)} | {sum(t['tagged'] for t in rows)} | "
+                   f"{sum(t['literals'] for t in rows)} | "
+                   f"{sum(t['literals'] for t in rows if t['tagged'])} |")
+    out.append(f"| **all** | **{len(lit)}** | **{sum(t['tagged'] for t in lit)}** | "
+               f"**{sum(t['literals'] for t in lit)}** | "
+               f"**{sum(t['literals'] for t in lit if t['tagged'])}** |")
+    live = [f"`{t['branch'].split('_')[0]}.{t['name']}`" for t in report if t['live_only']]
+    out += ['', f"Plus **{len(live)}** P-TABLE-LIVE table(s), classified below and not "
+                f"counted above: {', '.join(live) or 'none'}.",
+            '', f'## Classification ({len(report)} tables)', '',
+            '| class | tables | literals |', '|---|---:|---:|']
+    for cls in ('CITATION', 'PLAUSIBILITY', 'DERIVATION', 'DEFINITION', 'DOMAIN',
+                'UNCONSUMED', 'REVIEW', 'UNDECLARED'):
+        rows = [t for t in report if t['class'] == cls]
+        if rows:
+            out.append(f"| {cls} | {len(rows)} | {sum(t['literals'] for t in rows)} |")
+    out += ['', f'## Per table ({seeds} seeds per consuming template)', '',
+            '| branch | table | literals | tags | consumers | draw by order | P-GIVEN | '
+            '@kind | class | why | hidden in |',
+            '|---|---|---:|---|---:|---:|---|---|---|---|---|']
+    for t in report:
+        hidden = sorted({tid.replace('template_', '') for f in t['probe'].values()
+                         for tid, v in f.items() if v['verdict'] == 'HIDDEN'})
+        why = t['class_reason'].replace('|', '/')
+        if t['copies']:
+            why += ' [copy: ' + ', '.join(f"{tid.replace('template_', '')} {lit}"
+                                          for tid, lit in t['copies']) + ']'
+        out.append(f"| {t['branch'].split('_')[0]} | `{t['name']}` | {t['literals']} | "
+                   f"{', '.join(t['tags']) or '-'} | {len(t['consumers'])} | "
+                   f"{len(t['draws_by_order'])} | {t['measured']} | "
+                   f"{t['declared'].get('kind', '-').split(' ')[0]} | **{t['class']}** | "
+                   f"{why} | {', '.join(hidden) or '-'} |")
+    with open(path, 'w', encoding='utf-8', newline='\n') as fh:
+        fh.write('\n'.join(out) + '\n')
 
 
 # ==========================================================================
@@ -663,6 +909,8 @@ def print_report(report):
 # ==========================================================================
 
 _SELFTEST_CONSTANTS = '''
+import math
+
 # [ON-DISK] somewhere
 DENSITY = {"Alpha": 1000.0, "Beta": 850.0, "Gamma": 13550.0}
 
@@ -679,6 +927,32 @@ ORPHAN = {"x": 5.0}
 NAMES = ["a", "b"]
 LEVELS = {"low": 1.5, "high": 2.5}
 SPREAD = {"x": 4.0, "y": 9.0}
+TABLE_A = {"x": 1.5, "y": 2.5}
+
+# @kind: range
+HIDDEN_KEYS = [0.90, 0.95]
+
+# @kind: range
+# @given: stated (planted: the drawn level is printed in the question)
+DECLARED_KEYS = [0.90, 0.95]
+
+# @kind: range
+WINDOW2 = (4.9, 5.1)
+
+# @kind: standard
+# @copied-in: template_copies_ratio 0.37
+RATIO = 0.37
+
+# @kind: standard
+# @copied-in: template_restates 0.41
+MISDECLARED = 0.41
+
+# @kind: range
+ANGLE = (-math.pi, math.pi)
+
+BASE = [1.0, 2.0]
+SERIES = {5: BASE}
+SCALE = 3.0
 
 
 def density_of(name):
@@ -688,9 +962,11 @@ def density_of(name):
 _SELFTEST_TEMPLATES = '''
 import random
 from selftest_branch.constants import (DENSITY, PAIRS, WINDOW, ORPHAN, LEVELS,
-                                       SPREAD, density_of)
+                                       SPREAD, TABLE_A, HIDDEN_KEYS, DECLARED_KEYS,
+                                       WINDOW2, ANGLE, SERIES, SCALE, density_of)
 
 _COPIED = {k: 2 * v for k, v in LEVELS.items()}
+_Z = {0.90: 1.28, 0.95: 1.64}
 
 def _helper(rows):
     return {k: v for k, v in rows.items()}
@@ -722,6 +998,50 @@ def template_loop_alias():
     for key in SPREAD:
         total += SPREAD[key]
     return "Sum the spread.", f"**Answer:** {total}"
+
+def template_hidden_lookup():
+    a = random.choice(HIDDEN_KEYS)
+    return "Find z.", f"**Answer:** {_Z[a]}"
+
+def template_declared_lookup():
+    a = random.choice(DECLARED_KEYS)
+    return f"Service level {a}. Find z.", f"**Answer:** {_Z[a]}"
+
+def template_structural():
+    x = random.uniform(*WINDOW2)
+    label = "high" if x > 5 else "low"
+    return f"A {label} case with x = {x:.3f}.", f"**Answer:** {x:.3f}"
+
+def template_copies_ratio():
+    s = round(random.uniform(1, 2), 2)
+    return f"s = {s}", f"**Answer:** {0.37 * s:.4f}"
+
+def template_angle():
+    ph = round(random.uniform(*ANGLE), 3)
+    return f"phase {ph}", f"**Answer:** {ph}"
+
+_S5 = SERIES[5]
+
+def template_series():
+    return "S", f"**Answer:** {random.choice(_S5)}"
+
+def template_scaled():
+    xs = [SCALE * 1, SCALE * 2]
+    return "X", f"**Answer:** {random.choice(xs)}"
+
+_FILLED_A = []
+for _k in TABLE_A:
+    _v = TABLE_A[_k]
+    _FILLED_A.append(_v)
+_FILLED_B = []
+for _v in (7.0, 8.0):
+    _FILLED_B.append(_v)
+
+def template_reads_a():
+    return "A", f"**Answer:** {random.choice(_FILLED_A)}"
+
+def template_reads_b_only():
+    return "B", f"**Answer:** {random.choice(_FILLED_B)}"
 '''
 
 
@@ -736,7 +1056,7 @@ def selftest():
     open(os.path.join(pkg, 'tmpl.py'), 'w', encoding='utf-8').write(_SELFTEST_TEMPLATES)
     sys.path.insert(0, tmp)
     try:
-        # -- P-TABLE / P-LITERAL / P-TAGGED ----------------------------------
+        # -- P-TABLE / P-TABLE-LIVE / P-LITERAL / P-TAGGED ---------------------
         st = {t['name']: t for t in static_tables(_SELFTEST_CONSTANTS)}
         for n, want in {'DENSITY': True, 'PAIRS': False, 'WINDOW': True,
                         'ORPHAN': False, 'UNRELATED': True}.items():
@@ -744,34 +1064,54 @@ def selftest():
                 failures.append(f'P-TAGGED {n}: got {st[n]["tagged"]}, planted {want}')
         if 'NAMES' in st:
             failures.append('P-TABLE counted a table with no numeric literal')
+        if 'ANGLE' in st:
+            failures.append('P-TABLE counted ANGLE, which has no literal')
         if st['PAIRS']['literals'] != 4:
             failures.append(f'P-LITERAL PAIRS: {st["PAIRS"]["literals"]} != 4')
+        live = {t['name']: t for t in numeric_tables(_SELFTEST_CONSTANTS)}
+        if 'ANGLE' not in live or not live['ANGLE']['live_only'] or 'NAMES' in live:
+            failures.append('P-TABLE-LIVE: ANGLE must be a live-only table and NAMES none')
 
-        # -- P-CONSUMER / P-DRAW, through the census's own code path ----------
+        # -- the census's own code path --------------------------------------
         rep = {t['name']: t for t in census(seeds=12, branches=('selftest_branch',),
                                             root=tmp, module_root=tmp, package='')}
+
+        # P-CONSUMER, including name reuse across two module-level loops
         want_cons = {
             'DENSITY': {'template_restates', 'template_constants_accessor'},
             'PAIRS': {'template_hides_other_field_of_restated_row'},
             'WINDOW': {'template_window'},
             'LEVELS': {'template_import_time_copy'},
             'SPREAD': {'template_loop_alias'},
+            'TABLE_A': {'template_reads_a'},
             'ORPHAN': set(),
+            'RATIO': {'template_copies_ratio'},
+            'ANGLE': {'template_angle'},
+            'SERIES': {'template_series'},       # a table read through a module alias
+            'BASE': {'template_series'},         # ... and the table it is built from
         }
         for tbl, want in want_cons.items():
             got = set(rep[tbl]['consumers'])
             if got != want:
                 failures.append(f'P-CONSUMER {tbl}: got {sorted(got)}, planted {sorted(want)}')
+
+        # P-DRAW
         want_draw = {('DENSITY', 'template_restates'): ['random.choice'],
                      ('PAIRS', 'template_hides_other_field_of_restated_row'): ['random.choice'],
                      ('LEVELS', 'template_import_time_copy'): ['sorted'],
-                     ('DENSITY', 'template_constants_accessor'): []}
+                     ('DENSITY', 'template_constants_accessor'): [],
+                     ('TABLE_A', 'template_reads_a'): ['random.choice'],
+                     ('SERIES', 'template_series'): ['random.choice'],
+                     ('BASE', 'template_series'): ['random.choice']}
         for (tbl, tid), want in want_draw.items():
             got = rep[tbl]['consumers'].get(tid, {}).get('draws')
             if got != want:
                 failures.append(f'P-DRAW {tbl} in {tid}: got {got}, planted {want}')
 
-        # -- P-GIVEN ----------------------------------------------------------
+        if rep['SCALE']['draws_by_order']:
+            failures.append(f"P-DRAW: scalar SCALE reported drawn by order: {rep['SCALE']['draws_by_order']}")
+
+        # P-GIVEN field verdicts
         want_given = {
             ('DENSITY', '[*]', 'template_restates'): 'RESTATED',
             ('DENSITY', '[*]', 'template_constants_accessor'): 'HIDDEN',
@@ -780,15 +1120,32 @@ def selftest():
             ('WINDOW', '[0]', 'template_window'): 'RESTATED',
             ('LEVELS', '[*]', 'template_import_time_copy'): 'HIDDEN',
             ('SPREAD', '[*]', 'template_loop_alias'): 'HIDDEN',
+            ('HIDDEN_KEYS', '[*]', 'template_hidden_lookup'): 'ERROR',
         }
         for (tbl, fld, tid), want in want_given.items():
             got = rep[tbl]['probe'].get(fld, {}).get(tid, {}).get('verdict')
             if got != want:
                 failures.append(f'P-GIVEN {tbl}{fld} in {tid}: got {got}, planted {want}')
-        if rep['DENSITY']['measured'] != 'SOME-HIDDEN':
-            failures.append(f"table verdict DENSITY: {rep['DENSITY']['measured']}")
 
-        # -- the probe must leave everything as it found it ------------------
+        # rollup + classify: a crash is not a guard; a structural change is not
+        # a guard; a declaration settles it; a copy is consumption
+        want_class = {
+            'DENSITY': ('SOME-HIDDEN', None),
+            'HIDDEN_KEYS': ('ERROR', 'REVIEW'),
+            'DECLARED_KEYS': ('ERROR', 'PLAUSIBILITY'),
+            'WINDOW2': ('INDETERMINATE', 'REVIEW'),
+            'RATIO': ('COPIED', 'CITATION'),
+            'MISDECLARED': ('UNCONSUMED', 'REVIEW'),
+            'ANGLE': ('ALL-RESTATED', 'PLAUSIBILITY'),
+        }
+        for tbl, (m, c) in want_class.items():
+            got = (rep[tbl]['measured'], rep[tbl]['class'])
+            if got[0] != m or (c is not None and got[1] != c):
+                failures.append(f'rollup/classify {tbl}: got {got}, planted ({m}, {c})')
+        if not rep['MISDECLARED']['copy_errors']:
+            failures.append('P-COPY: a declared copy absent from the template was not reported')
+
+        # the probe must leave everything as it found it
         import selftest_branch.constants as sc
         import selftest_branch.tmpl as stt
         if sc.DENSITY['Gamma'] != 13550.0 or stt._COPIED != {'low': 3.0, 'high': 5.0}:
@@ -804,56 +1161,6 @@ def selftest():
     return 1 if failures else 0
 
 
-def write_markdown(report, path, seeds):
-    """The committed C1.3 report. Regenerated, never hand-edited."""
-    out = [
-        '# Phase C1.3 — constants-table census and classification',
-        '',
-        '**Generated, not written.** Regenerate with',
-        '',
-        f'    python -m tests.constants_integrity.census --seeds {seeds} --markdown '
-        'docs/re-implementation-sep/phaseC1_census.md',
-        '',
-        'Every term below - *numeric table*, *literal*, *tagged*, *consumer*, *draws by',
-        'order*, *restated*, *hidden* - is a predicate defined in the docstring of',
-        '`tests/constants_integrity/census.py`; the classification rule is spec §C1.3.',
-        '',
-        '## Coverage',
-        '',
-        '| branch | numeric tables | tagged | numeric literals | in tagged tables |',
-        '|---|---:|---:|---:|---:|',
-    ]
-    for b in BRANCHES:
-        rows = [t for t in report if t['branch'] == b]
-        out.append(f"| {b} | {len(rows)} | {sum(t['tagged'] for t in rows)} | "
-                   f"{sum(t['literals'] for t in rows)} | "
-                   f"{sum(t['literals'] for t in rows if t['tagged'])} |")
-    out.append(f"| **all** | **{len(report)}** | **{sum(t['tagged'] for t in report)}** | "
-               f"**{sum(t['literals'] for t in report)}** | "
-               f"**{sum(t['literals'] for t in report if t['tagged'])}** |")
-    out += ['', '## Classification', '',
-            '| class | tables | literals |', '|---|---:|---:|']
-    for cls in ('CITATION', 'PLAUSIBILITY', 'DERIVATION', 'DEFINITION', 'DOMAIN',
-                'UNCONSUMED', 'UNDECLARED'):
-        rows = [t for t in report if t['class'] == cls]
-        if rows:
-            out.append(f"| {cls} | {len(rows)} | {sum(t['literals'] for t in rows)} |")
-    out += ['', f'## Per table ({seeds} seeds per consuming template)', '',
-            '| branch | table | literals | tags | consumers | draw by order | P-GIVEN | '
-            '@kind | class | why | hidden in |',
-            '|---|---|---:|---|---:|---:|---|---|---|---|---|']
-    for t in report:
-        hidden = sorted({tid.replace('template_', '') for f in t['probe'].values()
-                         for tid, v in f.items() if v['verdict'] == 'HIDDEN'})
-        out.append(f"| {t['branch'].split('_')[0]} | `{t['name']}` | {t['literals']} | "
-                   f"{', '.join(t['tags']) or '-'} | {len(t['consumers'])} | "
-                   f"{len(t['draws_by_order'])} | {t['measured']} | "
-                   f"{t['declared'].get('kind', '-').split(' ')[0]} | **{t['class']}** | "
-                   f"{t['class_reason']} | {', '.join(hidden) or '-'} |")
-    with open(path, 'w', encoding='utf-8', newline='\n') as fh:
-        fh.write('\n'.join(out) + '\n')
-
-
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument('--seeds', type=int, default=40)
@@ -861,6 +1168,8 @@ def main(argv=None):
     ap.add_argument('--json')
     ap.add_argument('--markdown')
     ap.add_argument('--branch', action='append')
+    ap.add_argument('--check', action='store_true',
+                    help='exit 1 if any table is REVIEW or UNDECLARED')
     ap.add_argument('--selftest', action='store_true')
     args = ap.parse_args(argv)
     if args.selftest:
@@ -872,6 +1181,13 @@ def main(argv=None):
             json.dump(report, fh, indent=1, default=str)
     if args.markdown:
         write_markdown(report, args.markdown, args.seeds)
+    if args.check:
+        bad = [f"{t['branch']}.{t['name']}: {t['class']} - {t['class_reason']}"
+               for t in report if t['class'] in ('REVIEW', 'UNDECLARED')]
+        for b in bad:
+            print('  - ' + b)
+        print('check: all classified' if not bad else f'check: {len(bad)} FAILURE(S)')
+        return 1 if bad else 0
     return 0
 
 

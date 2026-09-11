@@ -63,13 +63,17 @@ EPSILON_0 = 8.854e-12
 # Frequencies are kept as integers for clarity in the problem statement.
 # @kind: range
 # @units: Hz
+# @given: stated (tests/constants_integrity/given_evidence.py: every drawn frequency is printed in the question, 40/40 seeds)
 FREQUENCY_RANGE_HZ = (50, 2000)
 # @kind: range
 # @units: 1
 AMPLITUDE_RANGE = (1.0, 50.0)
 # @kind: range
 # @units: deg
+# @given: stated (tests/constants_integrity/given_evidence.py: each drawn phase is printed inside the signal expression the question states - 40/40 in the Nyquist template, and 24/24 of the seeds that draw a degree phase in the conversion template)
 PHASE_RANGE_DEG = (-180, 180)
+# @kind: range
+# @units: rad
 PHASE_RANGE_RAD = (-math.pi, math.pi)
 
 # The continuous frequency Omega will be a multiple of pi. This range defines the multiplier.
@@ -99,10 +103,12 @@ DELAY_N0_RANGE = (1, 10)
 # The integer factor by which the signal is downsampled.
 # @kind: range
 # @units: 1
+# @given: stated (tests/constants_integrity/given_evidence.py: M is printed in the question, 40/40)
 DECIMATION_FACTOR_M_RANGE = (2, 5)
 
 # Define the pool for denominators of the omega_0 fraction.
 # Using larger numbers allows for more granularity in creating frequencies.
 # @kind: range
 # @units: 1
+# @given: stated (tests/constants_integrity/given_evidence.py: the draw shapes omega_0, which the question states exactly as a reduced fraction, 40/40; the denominator itself is not printed)
 OMEGA_DENOMINATOR_RANGE = (8, 20)
