@@ -100,10 +100,16 @@ def template_two_phase_specific_volume():
     """
     # 1. Parameterize the inputs with random values
     substance = random.choice(THERMO_SUBSTANCES)
+    # C3.3: the substance's own saturated volumes, at the temperature
+    # REAL_FLUID_DATA states them for. They were invented with random.uniform,
+    # so a named fluid could be given any volumes at all. Removing those two
+    # draws moves the quality drawn next on every seed (P6).
+    sat = REAL_FLUID_DATA[substance]
+    T_C = sat["temp_C"]
     # Specific volume of saturated liquid in m³/kg
-    V_l = round(random.uniform(0.001, 0.002), 5)
+    V_l = sat["v_f"]
     # Specific volume of saturated vapor in m³/kg
-    V_v = round(random.uniform(0.05, 2.0), 3)
+    V_v = sat["v_g"]
     # Quality (mass fraction of vapor)
     x = round(random.uniform(0.1, 0.9), 2)
 
@@ -112,7 +118,7 @@ def template_two_phase_specific_volume():
 
     # 3. Generate the question and solution strings
     question = (
-        f"A closed vessel contains a saturated mixture of {substance} at a constant pressure. "
+        f"A closed vessel contains a saturated mixture of {substance} at {T_C} °C. "
         f"The specific volume of the saturated liquid is {V_l} m³/kg and the "
         f"specific volume of the saturated vapor is {V_v} m³/kg. If the quality "
         f"of the mixture is {x*100:.0f}%, what is the overall specific volume of the mixture?"
@@ -123,6 +129,7 @@ def template_two_phase_specific_volume():
         f"The formula is V = (1-x)V^l + xV^v, where V^l is the saturated liquid specific volume and V^v is the saturated vapor specific volume.\n\n"
 
         f"**Step 2:** List the given values.\n"
+        f"- Temperature = {T_C} °C (saturation)\n"
         f"- Quality (x) = {x}\n"
         f"- Saturated liquid specific volume (V^l) = {V_l} m³/kg\n"
         f"- Saturated vapor specific volume (V^v) = {V_v} m³/kg\n\n"
