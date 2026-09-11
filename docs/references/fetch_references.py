@@ -96,6 +96,29 @@ NIST_FLUIDS = {
     "C7783064": "Hydrogen sulfide", "C2551624": "Sulfur hexafluoride",
 }
 
+#: Saturation states the constants tables STATE at a temperature. An unbounded
+#: SatT request comes back on NIST's adaptive grid, which carries none of these
+#: rows (phaseC1_summary.md section 10: 100 C water's nearest row is 375.68 K), and
+#: reading one off it would be an interpolation. So each is requested on a 1-K
+#: grid that STARTS at the stated temperature, and the file is refused unless that
+#: row is present and two-phase. Each T is the table's own temperature + 273.15:
+#:   REAL_FLUID_DATA temp_C (chemical) - every row whose fluid NIST carries;
+#:     R-410A (a blend), ethanol and acetone are not in NIST_FLUIDS.
+#:   FLUID_DENSITIES (mechanical) - "Liquid Nitrogen (at -196 C)", "Liquid Oxygen
+#:     (at -183 C)", "Liquid Hydrogen (at -253 C)", "R-134a ... (Saturated Liquid
+#:     at 25 C)", and "Liquid Propane" (its comment: "At 25 C, under pressure").
+NIST_SATURATION_POINTS = {
+    "C7732185": [373.15], "C7664417": [298.15], "C124389": [293.15],
+    "C7446095": [298.15], "C74828": [112.15], "C74840": [184.15],
+    "C74986": [298.15], "C106978": [298.15], "C75285": [298.15],
+    "C109660": [298.15], "C78784": [298.15], "C75694": [298.15],
+    "C75718": [298.15], "C75456": [298.15], "C811972": [298.15],
+    "C306832": [298.15], "C108883": [384.15], "C71432": [353.15],
+    "C67561": [338.15], "C110543": [342.15], "C111659": [399.15],
+    "C110827": [354.15], "C7727379": [77.15], "C7782447": [90.15],
+    "C1333740": [20.15],
+}
+
 #: WebBook species pages for substances the fluid database does NOT carry.
 #: Mask=4 is phase-change data (Tc, Pc, Tboil, dHvap); Mask=2 is condensed-phase
 #: thermochemistry (liquid/solid Cp). Each CAS is paired with the words its page
@@ -113,6 +136,14 @@ WEBBOOK_SPECIES = {
     "C60297": ("Diethyl ether", ["ether"]),
     "C74862": ("Acetylene", ["acetylene"]),
     "C10043922": ("Radon", ["radon"]),
+    # Added at C3 for MANOMETER_FLUIDS (the brief: establish each one's phase at
+    # manometer conditions from a source). The CAS numbers were read off the
+    # WebBook's own name search, not recalled: "tungsten hexafluoride" -> 7783-82-6.
+    # "Tellurium Mercury" is Name Not Found; "mercury telluride" -> 12068-90-5 is
+    # fetched as the nearest named species, which is NOT a finding that the row
+    # means it.
+    "C7783826": ("Tungsten hexafluoride", ["hexafluoride"]),
+    "C12068905": ("Mercury telluride", ["telluride"]),
 }
 
 #: NIST-JANAF elements for solid heat capacities. File numbers are NOT
@@ -135,6 +166,15 @@ FILES = [
          must_contain="speed of light in vacuum",
          licence="US Government work (NIST)",
          grounds=["electrical_engineering: C0, EPSILON_0"]),
+    # Added at C3: MIL-HDBK-5J states moduli in 10^3 ksi and densities in lb/in^3,
+    # and the mechanical tables state GPa and kg/m^3. A conversion factor is a
+    # value like any other: read from an artefact, not typed from memory.
+    dict(id="nist_sp811_2008", group="constants",
+         url="https://nvlpubs.nist.gov/nistpubs/Legacy/SP/nistspecialpublication811e2008.pdf",
+         dest="nist_sp811/nistspecialpublication811e2008.pdf", kind="pdf",
+         licence="US Government work (NIST)",
+         grounds=["mechanical_engineering: unit conversions for MIL-HDBK-5J values "
+                  "(ksi to GPa, lb/in^3 to kg/m^3) in the C3.2 consistency checks"]),
     dict(id="nasa_tr_r132", group="transport",
          url="https://ntrs.nasa.gov/api/citations/19630012982/downloads/19630012982.pdf",
          dest="nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf", kind="pdf",
@@ -717,6 +757,82 @@ def fetch_nist_fluids(manifest):
             _record(manifest, base)
 
 
+def _sat_row_ok(data, T):
+    """A targeted saturation file must carry the row at T, and that row must be a
+    two-phase state. The row check is `_tsv_ok`'s (NIST clamps bounds silently).
+    The second is new: a request at or above the critical temperature returns the
+    critical point, where the liquid and vapour columns are the same state."""
+    ok, why = _tsv_ok(data, require_T=T)
+    if not ok:
+        return ok, why
+    lines = [ln for ln in data.decode("utf-8", "replace").splitlines() if ln.strip()]
+    head = lines[0].split("\t")
+    try:
+        jl, jv = head.index("Volume (l, m3/kg)"), head.index("Volume (v, m3/kg)")
+    except ValueError:
+        return False, "no liquid and vapour volume columns - not a saturation table"
+    for ln in lines[1:]:
+        cells = ln.split("\t")
+        try:
+            if abs(float(cells[0]) - T) < 0.005:
+                if float(cells[jl]) == float(cells[jv]):
+                    return False, (f"at {T} K the liquid and vapour volumes are equal "
+                                   f"({cells[jl]}) - the critical point, not two phases")
+                return True, why
+        except (ValueError, IndexError):
+            continue
+    return False, f"no parseable row at {T} K"
+
+
+def fetch_nist_saturation_points(manifest):
+    for cas, temps in NIST_SATURATION_POINTS.items():
+        name = NIST_FLUIDS[cas]
+        slug = re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
+        for T in temps:
+            tag = f"{T:.2f}K"
+            rel = f"nist_fluid_properties/{slug}_{cas}_saturation_{tag}.tsv"
+            eid = f"nist_fluid:{slug}:saturation_{tag}"
+            # NIST's `SatP` is the saturation table in TEMPERATURE increments and
+            # `SatT` the one in pressure increments - read off the two form pages
+            # (Action=Page: "Saturation Properties - Temperature Incremnts" carries
+            # TLow/THigh/TInc under Type=SatP; the SatT page carries PLow/PHigh/PInc).
+            # The first version sent TLow/THigh to SatT; NIST ignored them, returned
+            # its adaptive curve for all 25 requests, and _sat_row_ok refused every one.
+            url = _fluid_url(cas, Type="SatP", TLow=f"{T:.2f}", THigh=f"{T + 2:.2f}", TInc="1")
+            base = dict(id=eid, group="nist_fluid", dest=rel, url=url,
+                        licence="US Government work (NIST SRD 69)", kind="tsv",
+                        grounds=["chemical_engineering: REAL_FLUID_DATA; mechanical_engineering: "
+                                 "FLUID_DENSITIES saturated-liquid rows (a stated temperature)"],
+                        species=name, cas=cas, saturation_T_K=T)
+            p = os.path.join(HERE, rel)
+            if os.path.exists(p):
+                with open(p, "rb") as fh:
+                    data = fh.read()
+                ok_disk, why_disk = _sat_row_ok(data, T)
+                ok_url, why_url = _isobar_url_ok(base, data)
+                if ok_disk and ok_url:
+                    base.update(status="present", bytes=os.path.getsize(p), sha256=_hash(p))
+                    _record(manifest, base)
+                    continue
+                print(f"  [redo] {eid:44s} file on disk rejected: {why_disk if not ok_disk else why_url}",
+                      flush=True)
+            try:
+                _, _, data = _get(url)
+                ok, why = _sat_row_ok(data, T)
+                if ok:
+                    ok, why = _isobar_url_ok(base, data)
+            except (urllib.error.URLError, TimeoutError, OSError) as exc:
+                ok, why = False, f"{type(exc).__name__}: {exc}"
+            time.sleep(NIST_DELAY_S)
+            if ok:
+                path = _write(rel, data)
+                base.update(status="acquired", via=f"row at {T} K present and two-phase",
+                            bytes=len(data), sha256=_hash(path), retrieved_utc=_now())
+            else:
+                base.update(status="failed", reason=why)
+            _record(manifest, base)
+
+
 def fetch_webbook_species(manifest):
     for cas, (name, title_words) in WEBBOOK_SPECIES.items():
         slug = re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
@@ -828,6 +944,14 @@ def verify(manifest):
             if not ok:
                 print(f"  [URL-NOT-FILE] {sid:40s} {why}")
                 bad += 1
+        elif e.get("group") == "nist_fluid" and "saturation_T_K" in e:
+            with open(p, "rb") as fh:
+                data = fh.read()
+            for label, (ok, why) in (("URL-NOT-FILE", _isobar_url_ok(e, data)),
+                                     ("NO-ROW", _sat_row_ok(data, e["saturation_T_K"]))):
+                if not ok:
+                    print(f"  [{label}] {sid:40s} {why}")
+                    bad += 1
     print(f"verify: {bad} problem(s)")
     if bad:
         print("  The large PDFs, zips and .xlsx are gitignored. On a fresh checkout run this "
@@ -859,7 +983,8 @@ def main(argv=None):
     if args.list:
         for f in FILES:
             print(f"  {f['group']:10s} {f['id']:26s} {f['url'] or '(local fallback only)'}")
-        print(f"  nist_fluid {len(NIST_FLUIDS)} fluids x 2 tables")
+        print(f"  nist_fluid {len(NIST_FLUIDS)} fluids x 2 tables, plus "
+              f"{sum(len(v) for v in NIST_SATURATION_POINTS.values())} targeted saturation rows")
         print(f"  webbook    {len(WEBBOOK_SPECIES)} species x 2 pages")
         print(f"  janaf      {len(JANAF_ELEMENTS)} elements")
         return 0
@@ -870,6 +995,7 @@ def main(argv=None):
             fetch_file(spec, manifest)
     if not only or only == "nist_fluid":
         fetch_nist_fluids(manifest)
+        fetch_nist_saturation_points(manifest)
     if not only or only == "webbook":
         fetch_webbook_species(manifest)
     if not only or only == "janaf":
@@ -909,6 +1035,28 @@ def selftest():
     bad = 0
     for label, entry, data, want in cases:
         got, why = _isobar_url_ok(entry, data)
+        ok = got == want
+        bad += not ok
+        print(f"  [{'ok' if ok else 'FAIL'}] {label}: {'passes' if got else 'flagged'} ({why})")
+    # _sat_row_ok: a targeted saturation file (C3). Two defects of different form -
+    # a grid without the stated row (a clamp), and a row that is the critical point
+    # (a request at or above Tc) - plus a good file.
+    sat_head = (b"Temperature (K)\tPressure (MPa)\tDensity (l, kg/m3)\tVolume (l, m3/kg)"
+                b"\tDensity (v, kg/m3)\tVolume (v, m3/kg)\n")
+    good = sat_head + (b"298.15\t1.0\t1206.7\t0.00082871\t32.4\t0.030857\n"
+                       b"299.15\t1.0\t1203.0\t0.00083126\t33.4\t0.029940\n"
+                       b"300.15\t1.1\t1199.2\t0.00083389\t34.4\t0.029062\n")
+    clamped = sat_head + (b"299.15\t1.0\t1203.0\t0.00083126\t33.4\t0.029940\n"
+                          b"300.15\t1.1\t1199.2\t0.00083389\t34.4\t0.029062\n"
+                          b"301.15\t1.1\t1195.4\t0.00083655\t35.4\t0.028219\n")
+    critical = sat_head + (b"374.21\t4.06\t511.9\t0.0019535\t511.9\t0.0019535\n"
+                           b"375.21\t4.06\t511.9\t0.0019535\t511.9\t0.0019535\n"
+                           b"376.21\t4.06\t511.9\t0.0019535\t511.9\t0.0019535\n")
+    for label, data, T, want in (
+            ("saturation grid without the stated row (clamped)", clamped, 298.15, False),
+            ("saturation row at the critical point (equal volumes)", critical, 374.21, False),
+            ("saturation file with a two-phase row at T (negative control)", good, 298.15, True)):
+        got, why = _sat_row_ok(data, T)
         ok = got == want
         bad += not ok
         print(f"  [{'ok' if ok else 'FAIL'}] {label}: {'passes' if got else 'flagged'} ({why})")
