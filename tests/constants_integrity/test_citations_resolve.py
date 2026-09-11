@@ -34,11 +34,18 @@ and seven are added, one per clause of the C1.2 vocabulary (spec §C1.2):
   R3  the locator resolves inside the artefact, by type: `quantity=` (CODATA
       text), `T=` + `col=` (NIST fluid TSV - the row must be ON the grid, which
       is the clamp lesson of the acquisition), `cas=` (NIST WebBook JSON),
-      `page=` [+ `text=`] (PDF), `member=` (zip), `text=` (HTML / text).
+      `page=` [+ `text=`] (PDF), `member=` (zip), `text=` (HTML / text), and
+      `member=` + `wavelength=<x>nm|um` (the refractiveindex.info archive: the
+      index EVALUATED at that wavelength, refused outside the dataset's range;
+      tests/constants_integrity/refractiveindex.py).
   R4  the RELATION holds. `precision=exact|<n>sf|<n>dp`: the constant equals the
       artefact value at that precision, exactly. `tol=<x>%`: it lies within.
       Neither: the value is not machine-compared, and the citation is counted
-      LOCATOR-ONLY rather than passed as if it had been.
+      LOCATOR-ONLY rather than passed as if it had been. `via="NAME/x"` says the
+      table stores NAME/x rather than x (MEDIA_VELOCITIES stores C0/n), and the
+      relation is checked on x = NAME/constant. A value interpolated between two
+      tabulated rows must satisfy the relation at BOTH rows too, so a verdict
+      never rests on the interpolation.
   R5  an [ON-DISK:LOCAL-ONLY] path is listed in MANIFEST.json's
       local_only_copyrighted. Present on this machine: its page exists. Absent:
       UNRESOLVABLE-FROM-CLONE, counted - never passed silently, never failed.
@@ -386,6 +393,35 @@ def _zip_member(path, member):
     return 'member', None
 
 
+def _index_at(path, member, wavelength):
+    """(n, brackets or None, error) - a refractive index evaluated at a wavelength."""
+    from tests.constants_integrity.refractiveindex import index_at
+    m = re.fullmatch(r'(\d+(?:\.\d+)?)(nm|um)', wavelength)
+    if not m:
+        return None, None, f'wavelength={wavelength!r} is not <number>nm or <number>um'
+    lam = float(m.group(1)) * (1e-3 if m.group(2) == 'nm' else 1.0)
+    try:
+        value, _how, _cond, brackets = index_at(member, lam, archive=path)
+    except (KeyError, ValueError) as exc:
+        return None, None, f'{member}: {exc}'
+    return value, brackets, None
+
+
+def _solve_via(ns, via, const):
+    """The cited quantity x, from a table that stores NAME/x (or x itself)."""
+    if via == 'x':
+        return const, None
+    m = re.fullmatch(r'([A-Za-z_]\w*)/x', via)
+    if not m:
+        return None, f'via={via!r} is not a form this resolver solves ("x" or "NAME/x")'
+    num = ns.get(m.group(1))
+    if isinstance(num, bool) or not isinstance(num, (int, float)):
+        return None, f'via={via!r} names {m.group(1)!r}, which the module does not define as a number'
+    if const == 0:
+        return None, f'via={via!r} cannot be solved for a stored value of 0'
+    return num / const, None
+
+
 def _text_snippet(path, text):
     body = open(path, encoding='utf-8', errors='replace').read()
     body = re.sub(r'<[^>]+>', ' ', body)
@@ -540,8 +576,10 @@ def check_source(branch, src, refs=REFS, manifest=None, kinds=None):
 
         # R3 - the locator resolves
         ext = rel.rsplit('.', 1)[-1].lower()
-        value, err = None, None
-        if 'quantity' in kv:
+        value, err, brackets = None, None, None
+        if 'member' in kv and 'wavelength' in kv and ext == 'zip':
+            value, brackets, err = _index_at(full, kv['member'], kv['wavelength'])
+        elif 'quantity' in kv:
             value, err = _codata(full, kv['quantity'])
         elif 'T' in kv and 'col' in kv:
             value, err = _tsv(full, kv['T'], kv['col'])
@@ -571,9 +609,15 @@ def check_source(branch, src, refs=REFS, manifest=None, kinds=None):
                             f'machine-readable value to compare')
             continue
         const, err = _constant(ns, tag['table'], tag.get('row'), kv)
+        if not err and 'via' in kv:
+            const, err = _solve_via(ns, kv['via'], const)
         if err:
             failures.append(f'R4 {where}: {err}')
             continue
+        # A tabulated value between two rows: the relation must also hold at both
+        # rows, or the verdict is the interpolation's rather than the artefact's.
+        rows = [('the artefact', value)] + [(f'the tabulated row at {w}', v)
+                                            for w, v in (brackets or ())]
         if 'precision' in kv:
             try:
                 target = _rounded(value, kv['precision'])
@@ -585,12 +629,20 @@ def check_source(branch, src, refs=REFS, manifest=None, kinds=None):
                                 f'gives {value!r}, which at precision={kv["precision"]} is '
                                 f'{target!r}')
                 continue
+            split = [(lbl, v) for lbl, v in rows[1:] if not _same(_rounded(v, kv['precision']), target)]
+            if split:
+                failures.append(f'R4 {where}: the interpolated {value!r} is {target!r} at '
+                                f'precision={kv["precision"]}, but {split[0][0]} gives '
+                                f'{split[0][1]!r} - the rounding depends on the interpolation')
+                continue
         else:
             tol = float(kv['tol'].rstrip('%'))
-            if abs(const - value) > abs(value) * tol / 100:
+            out = [(lbl, v) for lbl, v in rows if abs(const - v) > abs(v) * tol / 100]
+            if out:
+                lbl, v = out[0]
                 failures.append(f'R4 {where}: the constant {const!r} is '
-                                f'{100 * (const - value) / value:+.3f}% from the artefact '
-                                f'{value!r}, outside tol={kv["tol"]}')
+                                f'{100 * (const - v) / v:+.3f}% from {lbl} '
+                                f'{v!r}, outside tol={kv["tol"]}')
                 continue
         counts['resolved'] += 1
     return counts, failures, legacy
@@ -671,9 +723,35 @@ LEGACY_ROW = 1.0
 # @units: 1
 # [UNVERIFIED] no source on disk; candidate NASA TR R-132 table 2
 GAP = 2.0
+
+# @kind: property
+# @units: m/s
+MEDIA = {
+    # [ON-DISK] refractiveindex_info/refractiveindex.info-database-main.zip @ member="database/data/main/H2O/nk/Daimon-20.0C.yml" wavelength=589nm via="C0/x" precision=4sf
+    "Water": C0 / 1.333,
+    # [ON-DISK] refractiveindex_info/refractiveindex.info-database-main.zip @ member="database/data/main/H2O/nk/Warren-2008.yml" wavelength=589nm via="C0/x" precision=3sf
+    "Ice": C0 / 1.31,
+    # [ON-DISK] refractiveindex_info/refractiveindex.info-database-main.zip @ member="database/data/organic/C6H6 - benzene/nk/Chang.yml" wavelength=0.589um via="C0/x" tol=0.1%
+    "Benzene": C0 / 1.501,
+}
 '''
 
 _PLANTS = [
+    # Wavelength-evaluated indices (C3.1, MEDIA_VELOCITIES). Written from what the
+    # locator means: an index is a function of wavelength, valid over a stated
+    # range; `tabulated n2` is a different quantity; C0/n is not n; and a value
+    # between two tabulated rows is the interpolation's unless both rows agree.
+    ('R3', 'wavelength outside the dataset\'s stated range',
+     'Daimon-20.0C.yml" wavelength=589nm', 'Daimon-20.0C.yml" wavelength=100nm'),
+    ('R3', 'a nonlinear-index (n2) dataset cited as the index',
+     '"database/data/main/H2O/nk/Warren-2008.yml"', '"database/data/other/mixed gases/air/n2/Geints.yml"'),
+    ('R4', 'stored C0/n disagrees with the index at its precision',
+     '"Water": C0 / 1.333', '"Water": C0 / 1.334'),
+    ('R4', 'a 3-s.f. rounding that rests on the interpolation (rows 1.48 and 1.47)',
+     'main/H2O/nk/Warren-2008.yml" wavelength=589nm via="C0/x" precision=3sf\n    "Ice": C0 / 1.31',
+     'organic/C3H8O3 - glycerol/nk/Birkhoff.yml" wavelength=589nm via="C0/x" precision=3sf\n    "Ice": C0 / 1.47'),
+    ('R4', 'via names a constant the module does not define',
+     'wavelength=0.589um via="C0/x"', 'wavelength=0.589um via="CO/x"'),
     # R2 - the file does not exist (the brief's first mandated plant)
     ('R2', 'cites a file that does not exist',
      'codata_2022/allascii.txt @ quantity="speed', 'codata_2018/allascii.txt @ quantity="speed'),
