@@ -17,11 +17,23 @@ Unit conventions:
 # UNIVERSAL CONSTANTS
 # ============================================================================
 
+# @kind: defined
+# @units: m/s^2
 GRAVITY_M_S2 = 9.81                  # standard gravity, m/s^2
+# @kind: defined
+# @units: ft/s^2
 GRAVITY_FT_S2 = 32.2                 # standard gravity, ft/s^2
+# @kind: property
+# @units: kN/m^3
 UNIT_WEIGHT_WATER_KN_M3 = 9.81       # gamma_w at ~15-20 C, kN/m^3
+# @kind: property
+# @units: lbf/ft^3
 UNIT_WEIGHT_WATER_PCF = 62.4         # gamma_w, lb/ft^3
+# @kind: property
+# @units: kg/m^3
 WATER_DENSITY_KG_M3 = 998.2          # rho at 20 C  [VERIFY: CRC Handbook]
+# @kind: property
+# @units: m^2/s
 WATER_KINEMATIC_VISCOSITY_M2_S = 1.004e-6   # nu at 20 C  [VERIFY: CRC Handbook]
 
 # ============================================================================
@@ -29,22 +41,40 @@ WATER_KINEMATIC_VISCOSITY_M2_S = 1.004e-6   # nu at 20 C  [VERIFY: CRC Handbook]
 # ============================================================================
 
 # Steel properties — AISC Steel Construction Manual, 16th ed.
+# @kind: standard
+# @units: ksi
 STEEL_E_KSI = 29000        # modulus of elasticity  [VERIFY: AISC Manual]
+# @kind: standard
+# @units: GPa
 STEEL_E_GPA = 200          # SI companion value      [VERIFY: AISC Manual]
+# @kind: standard
+# @units: ksi
 STEEL_FY_KSI = {           # yield stress by common grade  [VERIFY: AISC/ASTM]
     "ASTM A992": 50,       # wide-flange standard grade
     "ASTM A36": 36,        # plates, angles, legacy shapes
 }
+# @kind: standard
+# @units: MPa
 STEEL_FY_MPA = {"ASTM A992": 345, "ASTM A36": 250}
 
 # Normal-weight concrete — ACI 318-19 Section 19.2.2.1
 # Ec = 57000*sqrt(f'c) psi  |  Ec = 4700*sqrt(f'c) MPa   [VERIFY: ACI 318-19]
+# @kind: range
+# @units: psi
 CONCRETE_FC_PSI = [3000, 4000, 5000]
+# @kind: range
+# @units: MPa
 CONCRETE_FC_MPA = [21, 28, 35]
+# @kind: standard
+# @units: psi^(1/2)
 CONCRETE_EC_COEFF_PSI = 57000
+# @kind: standard
+# @units: MPa^(1/2)
 CONCRETE_EC_COEFF_MPA = 4700
 
 # Typical uniform floor live loads — ASCE 7-22 Table 4.3-1  [VERIFY: ASCE 7]
+# @kind: standard
+# @units: lbf/ft^2
 LIVE_LOADS_PSF = {
     "office": 50,
     "residential dwelling": 40,
@@ -52,6 +82,8 @@ LIVE_LOADS_PSF = {
     "corridor (first floor)": 100,
     "ordinary flat roof": 20,
 }
+# @kind: standard
+# @units: kPa
 LIVE_LOADS_KPA = {
     "office": 2.40,
     "residential dwelling": 1.92,
@@ -63,6 +95,8 @@ LIVE_LOADS_KPA = {
 # W-shape section properties — AISC Shapes Database v16.0  [ON-DISK: xlsx]
 # 'us': W lb/ft, A in^2, d in, Ix in^4, Sx in^3, Zx in^3, rx in
 # 'si': W kg/m,  A mm^2, d mm, Ix 10^6 mm^4, Sx 10^3 mm^3, Zx 10^3 mm^3, rx mm
+# @kind: standard
+# @units: us.W=lb/ft, us.A=in^2, us.d=in, us.Ix=in^4, us.Sx=in^3, us.Zx=in^3, us.rx=in, si.W=kg/m, si.A=mm^2, si.d=mm, si.Ix=1e6*mm^4, si.Sx=1e3*mm^3, si.Zx=1e3*mm^3, si.rx=mm
 AISC_W_SHAPES = {
     "W8X24":   {"us": {"W": 24,  "A": 7.08, "d": 7.93, "Ix": 82.7, "Sx": 20.9, "Zx": 23.1, "rx": 3.42},
                 "si_label": "W200X35.9", "si": {"W": 35.9, "A": 4570, "d": 201, "Ix": 34.4, "Sx": 342, "Zx": 379, "rx": 86.9}},
@@ -99,6 +133,9 @@ AISC_W_SHAPES = {
 # ============================================================================
 
 # Specific gravity of solids — Das PGE 10th ed., typical values  [VERIFY: Das]
+# @kind: range
+# @units: 1
+# @given: stated (C1 Reviewer G, reviews/phaseC1_reviewer_g_provenance.md §2 row 1 and reviews/phaseC1_reviewer_g_scratch/g_stated.py: Gs stated and inside its soil window 40/40 in each of the 5 consumers)
 SPECIFIC_GRAVITY_RANGES = {
     "sand": (2.65, 2.67),
     "silt": (2.67, 2.73),
@@ -107,6 +144,8 @@ SPECIFIC_GRAVITY_RANGES = {
 
 # Coefficient of permeability by soil type, cm/s — Das PGE Table 7.1;
 # cross-ref NAVFAC DM-7.01 Ch. 3 [ON-DISK]  [VERIFY: Das]
+# @kind: range
+# @units: cm/s
 PERMEABILITY_RANGES_CM_S = {
     "clean gravel": (1.0, 100.0),
     "coarse sand": (0.01, 1.0),
@@ -123,6 +162,8 @@ PERMEABILITY_RANGES_CM_S = {
 # Derived quantities are computed, never assumed:
 #   gamma_sat = gamma_d + (e/(1+e)) * gamma_w
 #   gamma_moist = gamma_d * (1 + w/100) for any assumed w <= w_sat
+# @kind: property
+# @units: e=1, w_sat_pct=%, gamma_d_kn_m3=kN/m^3, gamma_d_pcf=lbf/ft^3
 DAS_NATURAL_STATE_SOILS = {
     "loose uniform sand":          {"e": 0.8,        "w_sat_pct": 30,        "gamma_d_kn_m3": 14.5,         "gamma_d_pcf": 92},
     "dense uniform sand":          {"e": 0.45,       "w_sat_pct": 16,        "gamma_d_kn_m3": 18.0,         "gamma_d_pcf": 115},
@@ -137,6 +178,8 @@ DAS_NATURAL_STATE_SOILS = {
 
 # Drained friction angle ranges, degrees — Das PGE Ch. 12 typical values
 # [VERIFY: Das]
+# @kind: range
+# @units: deg
 FRICTION_ANGLE_RANGES_DEG = {
     "sand, rounded, loose": (27, 30),
     "sand, rounded, dense": (35, 38),
@@ -153,6 +196,8 @@ FRICTION_ANGLE_RANGES_DEG = {
 # Ngamma values at phi <= 25 and phi = 40 (mixed factor families) that
 # web-based Stage B review failed to catch; corrected 2026-08-02 against
 # the book text after an R2 finding (see data_review_log.md, Cycle 3).
+# @kind: standard
+# @units: 1
 TERZAGHI_BEARING_FACTORS = {
     0:  (5.70, 1.00, 0.00),
     5:  (7.34, 1.64, 0.14),
@@ -170,6 +215,8 @@ TERZAGHI_BEARING_FACTORS = {
 # transcribed verbatim from Das & Sivakugan, PFE 9th ed., Table 3.2 (text
 # p. 140 / PDF p. 160); local-shear strip equation per Eq. (3.9):
 # qu = (2/3)c'N'c + qN'q + 0.5*gamma*B*N'gamma.  [ON-DISK: full_books]
+# @kind: standard
+# @units: 1
 TERZAGHI_MODIFIED_FACTORS = {
     20: (11.85, 3.88, 1.12),
     25: (14.80, 5.60, 2.25),
@@ -179,7 +226,11 @@ TERZAGHI_MODIFIED_FACTORS = {
 
 # Compression index correlation: Cc = 0.009 * (LL - 10)  — Skempton (1944),
 # as given in Das PGE consolidation chapter  [VERIFY: Das]
+# @kind: standard
+# @units: 1/%
 SKEMPTON_CC_COEFF = 0.009
+# @kind: standard
+# @units: %
 SKEMPTON_CC_OFFSET = 10
 
 # Typical coefficient of consolidation, m^2/yr — order-of-magnitude ranges;
@@ -188,6 +239,8 @@ SKEMPTON_CC_OFFSET = 10
 # general cv table and the DM-7.01 cv-LL chart is image-only; any sampled cv
 # MUST appear verbatim as a given value in the question text, so template
 # correctness never depends on these endpoints.]
+# @kind: range
+# @units: m^2/yr
 CV_RANGES_M2_YR = {
     "high-plasticity clay": (0.3, 5.0),
     "low-plasticity clay": (2.0, 30.0),
@@ -199,6 +252,8 @@ CV_RANGES_M2_YR = {
 
 # Manning's n, open channels — FHWA HDS-4 Table B.2, p. B-2 (PDF p.199)
 # [ON-DISK]; canonical compilation: Chow (1959) Table 5-6, USGS WSP-2339
+# @kind: standard
+# @units: s/m^(1/3)
 MANNINGS_N_CHANNELS = {
     "very smooth concrete": 0.011,
     "smooth concrete": 0.012,
@@ -216,6 +271,8 @@ MANNINGS_N_CHANNELS = {
 
 # Manning's n, closed conduits — FHWA HDS-4 Table B.3, p. B-4 (PDF p.201)
 # [ON-DISK]
+# @kind: standard
+# @units: s/m^(1/3)
 MANNINGS_N_CONDUITS = {
     "concrete pipe": (0.011, 0.013),
     "CMP, 2-2/3 x 1/2 in corrugations": (0.022, 0.027),
@@ -226,6 +283,8 @@ MANNINGS_N_CONDUITS = {
 
 # Rational-method runoff coefficients — FHWA HEC-22 3rd ed., Table 3-1,
 # p. 3-6 (PDF p.56)  [ON-DISK]
+# @kind: standard
+# @units: 1
 RATIONAL_C = {
     "business: downtown": (0.70, 0.95),
     "business: neighborhood": (0.50, 0.70),
@@ -248,6 +307,8 @@ RATIONAL_C = {
 # SCS runoff curve numbers by hydrologic soil group (A, B, C, D) —
 # NRCS TR-55 (June 1986), Table 2-2a (urban, doc p.2-5) and Table 2-2b/c
 # (agricultural, doc p.2-6/2-7)  [ON-DISK]
+# @kind: standard
+# @units: 1
 SCS_CURVE_NUMBERS = {
     # Table 2-2a — urban
     "open space, poor condition (<50% grass)": (68, 79, 86, 89),
@@ -281,6 +342,14 @@ SCS_CURVE_NUMBERS = {
 
 # SCS runoff equation constants — TR-55 Ch. 2: Q = (P - 0.2S)^2 / (P + 0.8S),
 # S = 1000/CN - 10 (inches)  [ON-DISK]
+# @kind: standard
+# @units: 1
+# @copied-in: template_scs_curve_number_runoff 0.2
+#   C1 Reviewer G, G-1: the template writes this ratio as 0.2 (and 0.8, 0.4,
+#   0.04 derived from it) instead of reading the table, and states it in every
+#   question - so a correction here would not reach the item. Declared so the
+#   census counts the copy and fails when it is removed; making the template
+#   read the table is C3.7's, with a before/after dump (D-073).
 SCS_IA_RATIO = 0.2
 
 HYDROLOGIC_SOIL_GROUPS = ("A", "B", "C", "D")

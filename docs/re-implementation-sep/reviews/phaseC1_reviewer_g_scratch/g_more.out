@@ -1,0 +1,15 @@
+﻿SCS_CURVE_NUMBERS readers: ['template_scs_curve_number_runoff'] | SCS_IA_RATIO readers: []
+[SCS] template_scs_curve_number_runoff: 'Ia = 0.2S' in question 40/40; 'Ia = 0.2*S = 0.2 *' in solution 40/40
+[SCS] seed 0 Q: A catchment consists of open space in good condition (>75% grass cover) on hydrologic soil group B, for which TR-55 gives a curve number CN = 61. A design storm delivers P = 142 mm of rainfall. The SCS runoff equation is valid only with all depths in inches (1 in = 25.4 mm): S = 1000/CN - 10 and Q = (P - 0.2S)^2 / (P + 0.8S), applicable when P exceeds the initial abstraction Ia = 0.2S. Determine the direct runoff depth in millimeters.
+[SCS] SCS_IA_RATIO set to 0.3 and module reloaded -> identical items 40/40
+[PROBE] SERVICE_LEVELS field='[*]': {'RESTATED': 0, 'HIDDEN': 0, 'STRUCTURAL': 0, 'UNUSED': 0, 'ERROR': 10, 'IMPORT_ERROR': 0} -> field_verdict ERROR
+[PROBE] classify('range','NO-EFFECT') -> ('PLAUSIBILITY', 'NO-EFFECT: consumed as a guard or screen')
+[PROBE] classify('range','SOME-HIDDEN') -> ('CITATION', 'declared a range but measured SOME-HIDDEN: the given-values rule does not apply')
+[STATED] template_chart_pair_selection: stated 40/40, all in [10,5000] 40/40, errors 0
+[STATED] template_cp_cpk_from_specs: stated 40/40, all in [10,5000] 40/40, errors 0
+[STATED] template_xbar_known_sigma_classification: stated 40/40, all in [10,5000] 40/40, errors 0
+[STATED] template_xbar_r_control_limits: stated 40/40, all in [10,5000] 40/40, errors 0
+[STATED] template_cd_dc_system_analysis: stated 40/40, all in [1.0,50.0] 40/40, errors 0
+[STATED] template_continuous_to_discrete_conversion: stated 40/40, all in [1.0,50.0] 40/40, errors 0
+[STATED] template_nyquist_rate_determination: stated 40/40, all in [1.0,50.0] 40/40, errors 0
+[STATED] template_continuous_to_discrete_conversion: phase stated in deg 24, in rad 0, no phase/other 16 (of 40)

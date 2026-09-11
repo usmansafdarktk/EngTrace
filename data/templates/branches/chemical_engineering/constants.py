@@ -190,6 +190,8 @@ THERMO_SUBSTANCES = [
 # Each entry contains: temperature (°C), specific volume of saturated liquid (m³/kg),
 # and specific volume of saturated vapor (m³/kg)
 # Data sources: NIST WebBook, Engineering Toolbox, and standard thermodynamic tables.
+# @kind: property
+# @units: temp_C=degC, v_f=m^3/kg, v_g=m^3/kg
 REAL_FLUID_DATA = {
     #  Classic Working Fluids 
     "Water": {"temp_C": 100, "v_f": 0.001043, "v_g": 1.6729},
@@ -228,6 +230,8 @@ REAL_FLUID_DATA = {
 
 # A dictionary with comprehensive critical properties for various substances.
 # Tc: Kelvin (K), Pc: bar, Vc: cm³/mol, Zc: dimensionless, omega: dimensionless.
+# @kind: property
+# @units: Tc=K, Pc=bar, Vc=cm^3/mol, Zc=1, omega=1
 CRITICAL_PROPERTIES = {
     "Methane": {"Tc": 190.6, "Pc": 45.99, "Vc": 99.0, "Zc": 0.286, "omega": 0.012},
     "Ethane": {"Tc": 305.3, "Pc": 48.72, "Vc": 146.0, "Zc": 0.279, "omega": 0.100},
@@ -261,6 +265,8 @@ CRITICAL_PROPERTIES = {
 
 # Common materials which undergo heating with their specific heat capacities in J/g·K
 # Added 'min_temp' and 'max_temp' (in °C) to ensure phase stability.
+# @kind: property
+# @units: Cp=J/(g*K), min_temp=degC, max_temp=degC
 SUBSTANCES_FOR_HEATING = [
     # Metals & Solids (Generally safe 20°C - 500°C)
     {"name": "Iron", "state": "solid", "Cp": 0.449, "min_temp": 20, "max_temp": 500},
@@ -309,6 +315,8 @@ SUBSTANCES_FOR_HEATING = [
 
 # A list of common substances with their molar heats of vaporization (delta_H_vap)
 # at their normal boiling points. All values are in kJ/mol.
+# @kind: property
+# @units: delta_H_vap=kJ/mol
 SUBSTANCES_FOR_VAPORIZATION = [
     # Alcohols & Water
     {"name": "Water", "delta_H_vap": 40.66},
@@ -363,6 +371,8 @@ SUBSTANCES_FOR_VAPORIZATION = [
 #
 # Reviewer H finding F-3: the evidence existed only in the test suite and the
 # JSON, so the table did not carry its own provenance. It does now.
+# @kind: property
+# @units: kJ/mol
 HEATS_OF_FORMATION = {
     # Hydrocarbons (Gases)
     # [ON-DISK] NIST 74-82-8, -74.6+/-0.3 (Manion 2002, adopting Gurvich 1991)
@@ -435,6 +445,8 @@ HEATS_OF_FORMATION = {
 }
 
 # A list of predefined, balanced chemical reactions.
+# @kind: mathematical
+# @units: reactants=1, products=1
 REACTIONS = [
     {
         "name": "Combustion of Methane",
@@ -501,6 +513,8 @@ REACTIONS = [
 # 2000 K, +8.9% at 2500 K and +13.5% at 2900 K. Any template integrating Cp
 # beyond CP_VALID_T_MAX is extrapolating and must say so (Phase C2 Reviewer H,
 # finding F-2; DECISIONS D-032).
+# @kind: property
+# @units: A=1, B=1/K, C=1/K^2, D=K^2
 CP_PARAMS = {
     # Key order is deliberately the original one.
     # template_sensible_heat_temp_dependent_cp draws its substance with
@@ -622,6 +636,8 @@ CP_PARAMS = {
 # nothing stops an item generating outside the range - that is the open half of
 # Reviewer H's F-2, and the refit-vs-restrict decision is D-032 (Phase 2).
 # Values are this repo's own fit ranges, not NIST's; each row says which.
+# @kind: validity
+# @units: K
 CP_VALID_T_MAX = {
     **{k: 1500.0 for k in CP_PARAMS},
     "C2H5OH(g)": 1500.0,     # refit over 298-1500 K
@@ -646,6 +662,8 @@ CP_VALID_T_MAX = {
 # normalise if it needs unity. Used to verify the Air(g) Cp row, which is a
 # mixture with no NIST entry of its own. ADVISORY like the table above: the
 # test suite is its only consumer.
+# @kind: property
+# @units: 1
 AIR_COMPOSITION = {"N2(g)": 0.78084, "O2(g)": 0.20946, "Ar(g)": 0.00934}
 
 
@@ -686,6 +704,8 @@ AIR_COMPOSITION = {"N2(g)": 0.78084, "O2(g)": 0.20946, "Ar(g)": 0.00934}
 # prints against NIST - a different and slightly larger number once the
 # iteration and the rounding to whole kelvin are included (Phase 2 Reviewer C,
 # finding C-1).
+# @kind: property
+# @units: A=1, B=1/K, C=1/K^2, D=K^2
 CP_PARAMS_COMBUSTION = {
     # [DERIVED] least-squares refit of NIST 124-38-9 Shomate Cp over
     #   298-3000 K, 400 points. Worst residual -5.43% (at the
@@ -716,10 +736,14 @@ CP_PARAMS_COMBUSTION = {
 
 # Validity ceiling for the table above, in Kelvin. Advisory, as CP_VALID_T_MAX
 # is: the C2.2 suite checks the flame template stays inside it.
+# @kind: validity
+# @units: K
 CP_COMBUSTION_VALID_T_MAX = 3000.0
 
 
 # A list of predefined, balanced combustion reactions with theoretical air.
+# @kind: mathematical
+# @units: reactants=1, products=1
 COMBUSTION_REACTIONS = [
     {
         "name": "Combustion of Methane",
@@ -804,6 +828,8 @@ COMBUSTION_REACTIONS = [
 # Properties are given at 20°C (293.15 K) and standard pressure (101.325 kPa) unless otherwise noted.
 # Viscosity can vary between sources. Values chosen for typical textbook accuracy.
 # Format: { "Name": (Density [kg/m³], Dynamic Viscosity [Pa·s]) }
+# @kind: property
+# @units: [0]=kg/m^3, [1]=Pa*s
 COMMON_LIQUIDS = {
     # Water and Common Solvents
     "Water": (998.2, 1.002e-3),
@@ -849,6 +875,8 @@ COMMON_LIQUIDS = {
 
 # Properties are given at 20°C (293.15 K) and 1 atm (101.325 kPa) unless otherwise noted.
 # Format: { "Name": (Density [kg/m³], Dynamic Viscosity [Pa·s]) }
+# @kind: property
+# @units: [0]=kg/m^3, [1]=Pa*s
 COMMON_GASES = {
     # Common Gases
     "Air": (1.204, 1.81e-5),
@@ -885,6 +913,8 @@ COMMON_GASES = {
 # Sources: NIST, CRC Handbook, and standard chemical engineering texts.
 # Format: { "Name": (Molar Mass [g/mol], Sigma σ [Å], Epsilon ε / k [K]) }
 # Note: Epsilon ε / k (the Lennard-Jones energy parameter) is included for calculating the collision integral.
+# @kind: property
+# @units: [0]=g/mol, [1]=angstrom, [2]=K
 GAS_MOLECULAR_PARAMS = {
     "Air": (28.97, 3.62, 97.0),
     "Nitrogen (N₂)": (28.01, 3.70, 95.05),
@@ -908,6 +938,8 @@ GAS_MOLECULAR_PARAMS = {
 
 # Properties for non-Newtonian power-law fluids
 # Format: { "Name": (Consistency Index K [Pa·s^n], Power-Law Index n [dimensionless]) }
+# @kind: property
+# @units: [0]=Pa*s^n, [1]=1
 POWER_LAW_FLUIDS = {
     # Common Household & Food (Shear-Thinning)
     "Ketchup": (32.5, 0.22),
@@ -946,4 +978,6 @@ POWER_LAW_FLUIDS = {
 
 
 # Standard gravitational acceleration in m/s²
+# @kind: defined
+# @units: m/s^2
 GRAVITATIONAL_ACCELERATION = 9.81
