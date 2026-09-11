@@ -586,6 +586,114 @@ C1.3 is the deliverable that sizes the rest of the track, and it will shrink it 
 **Exit gate.** All 43 tables classified; pilot table complete; unit declarations specified. **Independent review filed (R2) and every §5 suggestion triaged (R4).**
 **Effort: 12–20 h.**
 
+> **AMENDED by SPEC-CHANGE 20 and 21 (D-069, D-070, D-071).** C1 ran *after* C2, and
+> C2 had already met evidential situations this section's two-tag scheme cannot
+> express - *checked and failed*, *exact by definition*, *computed here* (D-035) -
+> while civil and industrial had grown a second vocabulary of their own. What
+> follows is **normative for C1 and C3**. It supersedes the two-tag sentence in
+> C1.3 above, and the "edition + page" wording in C2's and C3's exit gates.
+
+### C1.2 — The provenance vocabulary (normative)
+
+**Seven classes, one meaning each.** A tag names *how a value is warranted*, never
+how confident its author feels. A table may carry one tag in its header (covering
+every row) and rows may carry their own, which then win.
+
+| Tag | Means | The tag must state | `test_citations_resolve` checks |
+|---|---|---|---|
+| `[ON-DISK]` | warranted by a located entry in an artefact under `docs/references/` that a fresh clone can re-acquire | artefact, locator, and the **relation**: `precision=` (the constant *is* the artefact's value, rounded) or `tol=` (the constant *agrees with* an independent artefact - verification, not origin, G-7) | the file exists and matches its `MANIFEST.json` SHA-256; the locator resolves; where the artefact is machine-readable, the value at the locator equals the constant at `precision=` **exactly**, or lies within `tol=` |
+| `[ON-DISK:LOCAL-ONLY]` | as `[ON-DISK]`, but the artefact is a **copyrighted book present on one machine** (`MANIFEST.json` → `local_only_copyrighted`). Honest, and **not resolvable from a clone** | book path under `pilot/references/public/`, locator | the path is listed as local-only; when present, the locator resolves; otherwise reported `UNRESOLVABLE-FROM-CLONE` - **counted, never passed silently, never failed** |
+| `[DERIVED]` | computed here - a fit, an identity, a conversion, a definition evaluated in code - from tagged inputs or on-disk data | the inputs and the method | recomputed wherever a derivation is registered with the resolver; otherwise counted `UNEXECUTED` |
+| `[BY-DEFINITION]` | exact by definition or convention; no artefact can be its warrant (an element's ΔHf° = 0) | the definition | the definition is stated |
+| `[POLICY: sampling-only]` | a sampling window or a guard: correctness-neutral under the given-values rule, **asserting nothing about a named real entity** | - | the table declares `@kind: range`, and the census does **not** measure it `SOME-HIDDEN` |
+| `[KNOWN-DEFECTIVE]` | checked and **failed**; kept only as a record | the measured error | the error is stated; the row is in the residual register |
+| `[UNVERIFIED]` | not checked, or no source could be obtained | the reason, and any candidate source | the reason is stated; the row is in the residual register |
+
+**The qualifier is part of the tag, not a comment**, because resolvability is a
+property of the evidence: two citations to the same page of Das are equally
+honest and only one of them can be checked from a clone.
+
+**Citation grammar.** `# [CLASS] <artefact> @ <locator> [precision=<n>sf|<n>dp | tol=<x>%] [; note]`
+
+| artefact type | locator |
+|---|---|
+| CODATA `allascii.txt` | `quantity="<name as printed>"` |
+| NIST fluid TSV | `T=<K> col="<column header>"` - the row must be **on the grid**, not near it |
+| NIST WebBook JSON (C2) | `cas=<CAS>`; C2's `NIST <CAS>` form is accepted as this |
+| PDF | `page=<physical page>` plus `text="<snippet>"`, or `image-only` where the text layer is not the document (NASA TR R-132, MIL-STD-105E) |
+| zip | `member="<path>"` |
+| xlsx | `sheet="<name>" row="<key>" col="<header>"` |
+| HTML / text | `text="<snippet>"` |
+
+**Deprecated tags**, retagged by C3.7: `[VERIFY: X]` → `[UNVERIFIED]` naming X as
+the candidate source · `[REALISM]` → `[POLICY: sampling-only]`, only where the
+census agrees · `[DERIVABLE]` → `[DERIVED]` once the derivation executes, else
+`[UNVERIFIED]` · `[ON-DISK: xlsx]`, `[ON-DISK visual]` → `[ON-DISK]` with a
+locator · `[ON-DISK: full_books]` → `[ON-DISK:LOCAL-ONLY]`. Until retagged the
+resolver reports them as `LEGACY`: counted and listed, the C3.7 worklist.
+
+### C1.4 / C1.5 — Machine-readable table fields
+
+Written as comment lines in the contiguous header above the table, where an
+editor sees them and where they cannot drift from it positionally.
+
+- **`# @kind:`** one of:
+  - `property` - a **single value** that a named substance or material has at
+    stated conditions, and that any sample of it shares: mercury's density at
+    20 °C, steel's modulus, methane's Tc. A question stating it asserts a fact.
+  - `range` - a **window a value is drawn from** for a hypothetical specimen or
+    scenario, even when the window is labelled by a material class: a clay's
+    coefficient of consolidation, a sand's specific gravity, a bank's arrival
+    rate. Specimens differ, and a question stating one drawn value asserts
+    nothing universal - which is why only a `range` can be sampling policy.
+  - `standard` - fixed by a named standard, code or design table.
+  - `measured-constant`, `defined` - a fundamental constant determined by
+    measurement, or exact by definition or convention.
+  - `mathematical` - computable from a mathematical definition.
+  - `validity` - a bound declared *for another table*.
+
+  The line between `property` and `range` is **single value vs. window**, not
+  "real material vs. abstract": the first C1 draft drew it as the second, declared
+  four soil-class windows `property`, and was caught by R7 against civil's own
+  `[POLICY]` tag (D-070).
+- **`# @units:`** a unit for the whole table, or `key=unit` per field - `E_GPa=GPa`
+  for a dict row's key, `[1]=Pa*s` for a tuple position, `us.Ix=in^4` for a nested
+  key, `target=per-row(key)` where the unit is written in each row's key. Grammar:
+  products `*`, quotients `/`, exponents `^2`, `^(1/3)` or `^n`, a scale factor
+  `1e6*`, parentheses, `%`, and `1` for dimensionless, over a closed symbol list
+  in `tests/constants_integrity/test_table_metadata.py`. **One grammar**, which
+  Phase 6's D6.11 answer-unit declarations should import rather than re-invent.
+- **`# @domain:`** `key=value unit` or `key=lo..hi unit` pairs - temperature,
+  pressure, phase, wavelength, temper, shear rate - or `none (<reason>)`. **C1
+  specifies it; C3 fills it** and asserts every consumer samples inside it (D-032).
+  Until then a table missing it must be on the committed C3 worklist, which the
+  check ratchets: a table that gains `@domain` must leave the list.
+
+The check fails when a numeric table lacks `@kind` or `@units`, when a declared
+key names no field, when a field has no unit, or when a unit does not parse.
+
+### C1.3 — The classification rule
+
+**The given-values rule excuses a value from *correctness*-dependence, not from
+being *true*.** Restated in the question, a wrong number cannot make the gold
+answer disagree with the question - but a question stating a false property of a
+named substance is self-consistent and false, and C2 found 274 items of exactly
+that (`phaseC2_summary.md` §6). So:
+
+| declared `@kind` | measured by the census (P-GIVEN) | class |
+|---|---|---|
+| `range` | every consumer restates it, or consumes it only as a guard | **plausibility window** |
+| `range` | some consumer uses it without stating it | **citation** - the rule does not apply |
+| `property`, `standard`, `measured-constant` | anything | **citation** |
+| `mathematical` | - | **derivation** |
+| `defined` | - | **definition** |
+| `validity` | - | checked by its table's C3.2 suite |
+
+"Numeric table", "consumer", "restated" and "hidden" are defined as predicates in
+`tests/constants_integrity/census.py`, which regenerates the classification.
+**43 tables was a definition, not a count**: under the published predicate the
+three original branches hold 38, and all five hold 107.
+
 ---
 
 ## Phase C2 — Chemical thermochemistry ← **critical path**
@@ -608,6 +716,10 @@ C1.3 is the deliverable that sizes the rest of the track, and it will shrink it 
 
 **Exit gate.**
 - [ ] All 65 values carry a citation to edition + page
+      > *Reworded by SPEC-CHANGE 21:* **all 65 values carry a citation to a
+      > retrievable on-disk artefact and a locator within it.** "Edition + page"
+      > was unsatisfiable by construction once C1.1 acquired a CAS-keyed JSON
+      > (C2 Reviewer H §5, Reviewer G §7), and C2 was in fact gated on this form.
 - [ ] C2.2 plausibility suite green
 - [ ] Methane/air flame temperature within the literature range
 - [ ] Reviewer H's independent sample matches
@@ -633,6 +745,12 @@ Everything else, in parallel with Track A Phases 1, 4 and 5.
 **Review.** *Reviewer H* (domain, per branch) on an independent sample per table; *Reviewer G* confirms every table now carries a tag and a unit declaration, and that C3.5 is honest.
 
 **Exit gate.** Every `[ON-DISK]` table cited to page; plausibility suites green; C3.5 filed; zero silently-unverified tables. **Independent review filed (R2) and every §5 suggestion triaged (R4).**
+
+> *Reworded by SPEC-CHANGE 21:* "cited to page" reads **"carries a citation that
+> resolves to a retrievable on-disk artefact and a locator within it (C1.2)"**, and
+> "zero silently-unverified tables" reads **"every numeric table carries a tag under
+> C1.2's vocabulary, and every `[ON-DISK:LOCAL-ONLY]` citation is counted as
+> unresolvable from a clone rather than passed"**.
 
 **Effort: 60–105 h.** → **Sync point S2: must land before Track A Phase 6**, so the item pool is regenerated exactly once.
 
@@ -909,6 +1027,8 @@ Read the hours as effort. Wall-clock is a fraction of them, and the difference i
 | SPEC-CHANGE 17 | **Every detector a phase adds must carry at least two planted defects of materially different surface form, and the plants must be written from the class definition in the spec rather than from the detector** (Reviewer A, |S|5.9) | Phase 5 planted one defect per class and the plants passed while **four** of its detectors were narrower than their class (F1, F3, F5, F6). The plant and the regex were written by the same hand, so every plant was a shape the regex already matched. The reviewer found all four by writing detectors from the defect table instead. This is a fifteen-minute change to a plant list and it would have caught four of the five substantive findings in that review. |
 | SPEC-CHANGE 18 | **D5.8's binding criterion is four terms, not one: zero false accepts, zero errors, **the identity case**, and a non-zero decided rate** (D-065, D-067; Reviewer E, E-1/E-6) | *Zero false accepts* alone is passed by a comparator that refuses everything, and Phase 5 shipped both halves of that: 11 bindings decided **0.0%** of 2,450 pairs each, and **75 of 132 did not credit a verbatim copy of their own gold** -- a case the cross-pairing loop excluded by construction, since it skips `a == b`. Worse, the two defect classes **masked each other**: the reported "zero false accepts over 340,550 pairs" was *produced by* an over-rejection defect, and repairing it uncovered a real over-acceptance mechanism that had been returning MISMATCH for the wrong reason. An accept-only gate cannot see any of this. |
 | SPEC-CHANGE 19 | **A unit is DECLARED, never derived from gold's string** -- D5.10 delivers the census and the comparator does not consume it (D-067; Reviewer E, E-2/E-3/E-5) | D4.1 |S|4.1 already said why the unit check is opt-in: *"inferring the unit from gold's string instead would reject `7.65 litres`, which is correct. That trade is why it is opt-in."* D5.10 inferred it from gold's string and the predicted rejection arrived on real archived text -- `17.46 s` against a gold of `17.46 seconds`, marked WRONG. The trailing-token derivation also does not yield units at all: `otherwise`, `e-05`, `units`, `percent`, `dollars`, `subgroups`. Ablated per the phase's own stopping rule: it cost **19 of the 82** matches on real archived answers and caught 2, so it is deleted rather than patched. |
+| SPEC-CHANGE 20 | **Track B's provenance vocabulary is seven classes plus a local-only qualifier, with machine-readable `@kind` / `@units` / `@domain` table fields and a classification rule computed from a published census** (§C1.2–C1.5; D-069, D-070, D-071) | C1.3 defined two tags; C2 needed four and invented them off-spec (D-035); civil and industrial grew a second vocabulary; and nothing distinguished a citation a clone can check from one only a single machine can. Applied literally, the given-values rule would also have classed restated material densities as sampling policy - it excuses *correctness*, not *truth*, and C2 §6 shipped 274 items that were self-consistent and false. |
+| SPEC-CHANGE 21 | **Every citation gate reads "a retrievable on-disk artefact and a locator within it", never "edition + page"** (C2's and C3's exit gates) | Unsatisfiable by construction once the acquired artefact was a CAS-keyed JSON or a NIST TSV. Raised by both C2 reviewers, recorded as a SPEC-CHANGE, and never applied - so C3 was about to inherit an impossible gate. |
 
 ---
 
