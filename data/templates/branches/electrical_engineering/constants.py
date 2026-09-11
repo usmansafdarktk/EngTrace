@@ -30,10 +30,12 @@ MEDIA_VELOCITIES = {
     #   The row's 1.000293 is +4.8e-06 on n but +1.7% on the
     #   refractivity n-1. Ciddor at 288.15 K, 101325 Pa gives 1.0002772.
     "Air (at sea level)": C0 / 1.000293, 
-    # [ON-DISK] refractiveindex_info/refractiveindex.info-database-main.zip @ member="database/data/main/He/nk/Ermolov.yml" wavelength=589nm via="C0/x" tol=0.0002%
-    #   n = 1.0000349 at 273.15 K, 101325 Pa, the group comment's own conditions (Mansfield,
-    #   273.15 K, 101325 Pa: 1.0000349). The row's 1.000036 is +1.1e-06 on n and
-    #   +3.2% on n-1.
+    # [KNOWN-DEFECTIVE] n = 1.000036 against 1.0000349 (Ermolov) and 1.0000349 (Mansfield), both at
+    #   273.15 K and 101325 Pa - the group comment's own conditions - and the row is not
+    #   a rounding of either at its own precision: +1.1e-06 on n, below every display in the
+    #   corpus, but +3.2% on the refractivity n-1. Not corrected: a P6 event,
+    #   referred (C3.5). First tagged tol=0.0002% (08d3c49); retagged under the C3 rule
+    #   that tol= is only for an artefact whose conditions differ from the table's.
     "Helium": C0 / 1.000036,          
     # [ON-DISK] refractiveindex_info/refractiveindex.info-database-main.zip @ member="database/data/main/CO2/nk/Bideau-Mehu.yml" wavelength=589nm via="C0/x" precision=6sf
     #   n = 1.0004489 at 273.15 K, 101325 Pa; Old (273.15 K, 101325 Pa) gives 1.0004491, also 1.00045.
