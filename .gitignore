@@ -26,3 +26,10 @@ pilot/*
 pilot/references
 
 scratch/
+
+# docs/references: large source binaries are NOT committed. MANIFEST.json records
+# each one's URL and SHA-256, and fetch_references.py re-acquires and verifies
+# them on any checkout. The small text/TSV/HTML/JSON sources ARE committed.
+docs/references/**/*.pdf
+docs/references/**/*.zip
+docs/references/**/*.xlsx
