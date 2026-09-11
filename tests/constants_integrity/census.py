@@ -1145,6 +1145,20 @@ def selftest():
         if not rep['MISDECLARED']['copy_errors']:
             failures.append('P-COPY: a declared copy absent from the template was not reported')
 
+        # tag vs class (C3.1): a POLICY tag on each measured route to a
+        # non-PLAUSIBILITY class, on the real rows; controls must stay silent.
+        unconsumed = dict(rep['ANGLE'], measured='UNCONSUMED',
+                          **dict(zip(('class', 'class_reason'), classify('range', 'UNCONSUMED'))))
+        for label, row, want in (
+                ('a copied literal (COPIED -> CITATION)', rep['RATIO'], 1),
+                ('a crash (ERROR -> REVIEW)', rep['HIDDEN_KEYS'], 1),
+                ('control: a restated window', rep['ANGLE'], 0),
+                ('control: a declared @given', rep['DECLARED_KEYS'], 0),
+                ('control: an unconsumed range', unconsumed, 0)):
+            got = len(tag_class_conflicts([dict(row, tags=['POLICY'])]))
+            if got != want:
+                failures.append(f'tag/class: POLICY on {label}: {got} conflict(s), planted {want}')
+
         # the probe must leave everything as it found it
         import selftest_branch.constants as sc
         import selftest_branch.tmpl as stt
@@ -1159,6 +1173,23 @@ def selftest():
         print('  - ' + f)
     print(f'selftest: {len(failures)} failure(s)')
     return 1 if failures else 0
+
+
+def tag_class_conflicts(report):
+    """A tag that contradicts the measured class (C3.1).
+
+    `[POLICY: sampling-only]` claims a table is a sampling window whose values
+    cannot make gold disagree with the question. The census MEASURES that claim:
+    only PLAUSIBILITY supports it. A POLICY tag on a CITATION or REVIEW table is
+    the record contradicting the evidence - the exact shape of C2's green suite -
+    and it stays silent unless something compares the two, because R7 in
+    test_citations_resolve.py compares the tag with the DECLARED @kind only.
+    UNCONSUMED is exempt: with no consumer there is nothing to contradict.
+    """
+    return [f"{t['branch']}.{t['name']}: tagged [POLICY: sampling-only] but classified "
+            f"{t['class']} - {t['class_reason']}"
+            for t in report
+            if 'POLICY' in t['tags'] and t['class'] not in ('PLAUSIBILITY', 'UNCONSUMED')]
 
 
 def main(argv=None):
@@ -1184,6 +1215,7 @@ def main(argv=None):
     if args.check:
         bad = [f"{t['branch']}.{t['name']}: {t['class']} - {t['class_reason']}"
                for t in report if t['class'] in ('REVIEW', 'UNDECLARED')]
+        bad += tag_class_conflicts(report)
         for b in bad:
             print('  - ' + b)
         print('check: all classified' if not bad else f'check: {len(bad)} FAILURE(S)')
