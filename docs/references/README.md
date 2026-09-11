@@ -66,8 +66,17 @@ binaries; C3 added 25 targeted saturation files, NIST SP 811 and four WebBook pa
 
 **Reading cautions, from inspecting the files:**
 
-- **NASA TR R-132's text layer is OCR noise** — transcribe from the page images.
-  `pilot/references/public/MANIFEST.md` records the same for MIL-STD-105E.
+- **NASA TR R-132's text layer is OCR noise** — but C3 found it is *parseable noise*,
+  and the distinction matters. Table I(a)'s force constants come out with molecules
+  spelled `N_`, `02` (a digit zero), `SF_`, `C3Hs`, `n-C4Hlo`, ε/k 558.3 rendered
+  `55& 3`, and **two column layouts** (pp.22/24/25 print the method inline, p.23
+  collects it elsewhere), so a parser that knows one layout silently calls the other
+  unparseable. With a per-page token map it reads 15 of 17 rows — enough to establish
+  that `GAS_MOLECULAR_PARAMS` is **not** Svehla's table (σ agrees for 3 rows, ε/k for
+  11). Xenon and chlorine have no unambiguous token and are claimed neither way.
+  **MIL-STD-105E's text layer is not parseable** — p.18 extracts as
+  `":: .... m n mO ::,i:,o Vtm Loi o, batcb ah:e ."` — so it is cited `page=` only,
+  with no `text=` anchor (D-075).
 - **A correct title is not correct content.** Radon's WebBook page was acquired
   under the right title and carries no critical-temperature data.
 - **The NIST/SEMATECH e-Handbook renders control-chart factors as MathJax, not
@@ -174,8 +183,16 @@ transcription, checked exactly); `tol=` says it **agrees with** an independent
 artefact (a verification, not an origin - Reviewer G, G-7). A citation with
 neither is counted `LOCATOR-ONLY`, never passed as if its value had been
 compared. Locators: `quantity=` (CODATA), `T=` + `col=` (NIST TSV, on the grid),
-`cas=` (WebBook JSON; C2's `NIST <CAS>` form still resolves), `page=` [+ `text=`
-or `image-only`] (PDF), `member=` (zip), `text=` (HTML/text).
+`cas=` (WebBook JSON; C2's `NIST <CAS>` form still resolves), `page=` [+ `text=`]
+(PDF; a bare `page=` is the locator-only form for a document whose text layer is
+not the document), `page=` + `text=` + `mil=` (a MIL-HDBK-5J design table),
+`member=` (zip), `member=` + `wavelength=` (refractiveindex.info, evaluated at the
+wavelength), `sheet=` + `label_col=` + `rows=all` + `blocks=` (an `.xlsx`
+**whole-table** relation: every leaf against its cell), `text=` (HTML/text).
+Relations beyond `precision=`/`tol=`: `field=[key]` names one value inside a row,
+`via="NAME/x"` solves for the cited quantity when the table stores a combination
+of it, and `scale=<f>` converts into the artefact's unit before comparing
+(SPEC-CHANGE 23).
 
 **Table fields**, in the comment header directly above every numeric table:
 `# @kind:` (`property`, `standard`, `measured-constant`, `defined`,
@@ -195,9 +212,16 @@ of reading it, which the census verifies against the template's source.
 | `census.py` | the classification: which tables need a citation and which only a plausibility window, measured by perturbing each field and watching the question; `--check` fails on a table it cannot classify. `--selftest` plants the predicate's own defect shapes. |
 | `given_evidence.py` | every `@given: stated` backed by a run: each consumer's drawn value is printed in its question on every seed; a declaration citing no committed evidence fails. `--selftest` plants ten. |
 
-**Deprecated, and counted as `LEGACY` until C3.7 retags them:** `[VERIFY: X]`,
-`[REALISM]`, `[DERIVABLE]`, `[ON-DISK: xlsx]`, `[ON-DISK visual]`, and an
-`[ON-DISK]` with no `artefact @ locator`.
+| `test_plausibility.py` | C3.2: a table's own columns agree with **each other** (`MATERIAL_PROPERTIES`' E_GPa against E_ksi through the SP 811 factor, to within the rounding slack their own precision implies); every `scale=` is a factor an artefact **prints** or a pure power of ten; `SPECIFIC_GRAVITY_RANGES` inside the bound Das states. `--selftest` plants seven defects and three controls. |
+
+**Deprecated, and counted as `LEGACY` until retagged:** `[VERIFY: X]`, `[REALISM]`,
+`[DERIVABLE]`, `[ON-DISK: xlsx]`, `[ON-DISK visual]`, and an `[ON-DISK]` with no
+`artefact @ locator`. **C3.7 completed this: zero LEGACY tags in all five branches**
+(450 tags — 152 resolved, 19 locator-only, 279 stating a class), and every numeric
+table declares `@domain`. What could not be resolved is tagged `[KNOWN-DEFECTIVE]`
+(19) or `[UNVERIFIED]` (200) and listed in
+[`phaseC3_residual_register.md`](../re-implementation-sep/phaseC3_residual_register.md),
+**never quietly accepted**.
 
 **Origin versus verification.** The `CP_PARAMS` coefficients are in the
 Smith–Van Ness functional form, and no fetchable, citable copy of Smith–Van Ness
