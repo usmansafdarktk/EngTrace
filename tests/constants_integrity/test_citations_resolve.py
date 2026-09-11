@@ -410,6 +410,38 @@ def _index_at(path, member, wavelength):
     return value, brackets, None
 
 
+_PDF_READERS = {}
+
+
+def _mil_value(path, page, key, col):
+    """(value, error) - an elastic constant or density from a MIL-HDBK-5J design table."""
+    from tests.constants_integrity.milhdbk import design_values
+    try:
+        from pypdf import PdfReader
+    except ImportError:
+        return None, 'pypdf unavailable: PDF locators cannot be checked on this machine'
+    reader = _PDF_READERS.get(path) or _PDF_READERS.setdefault(path, PdfReader(path))
+    if not 1 <= int(page) <= len(reader.pages):
+        return None, f'page {page} does not exist ({len(reader.pages)} pages)'
+    try:
+        d = design_values(reader.pages[int(page) - 1].extract_text() or '')
+    except ValueError as exc:
+        return None, f'page {page}: the design table does not parse ({exc})'
+    if key == 'density':
+        tok = d['density']
+    else:
+        row = d['elastic'].get(key)
+        if row is None:
+            return None, f'page {page} has no {key!r} row (rows: {sorted(d["elastic"])})'
+        c = int(col)
+        if not 1 <= c <= len(row):
+            return None, f'page {page}: {key!r} has {len(row)} column(s), not col={col}'
+        tok = row[c - 1]
+    if tok is None:
+        return None, f'page {page}: {key!r} is printed "..." (no value) in that column'
+    return float(tok), None
+
+
 def _solve_via(ns, via, const):
     """The cited quantity x, from a table that stores NAME/x (or x itself)."""
     if via == 'x':
@@ -582,6 +614,12 @@ def check_source(branch, src, refs=REFS, manifest=None, kinds=None):
         value, err, brackets = None, None, None
         if 'member' in kv and 'wavelength' in kv and ext == 'zip':
             value, brackets, err = _index_at(full, kv['member'], kv['wavelength'])
+        elif 'page' in kv and 'mil' in kv and ext == 'pdf':
+            # MIL-HDBK-5J design table: the text= anchor pins the table, mil= the row
+            if 'text' in kv:
+                _v, err = _pdf_page(full, kv['page'], kv['text'])
+            if not err:
+                value, err = _mil_value(full, kv['page'], kv['mil'], kv.get('col', 1))
         elif 'quantity' in kv:
             value, err = _codata(full, kv['quantity'])
         elif 'T' in kv and 'col' in kv:
@@ -752,9 +790,27 @@ MEDIA = {
 # @units: kPa
 # [ON-DISK] codata_2022/allascii.txt @ quantity="standard atmosphere" scale=1e-3 precision=exact
 ATM_KPA = 101.325
+
+# @kind: property
+# @units: ksi
+MIL_MODULI = {
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=277 text="Table 2.7.1.0(b)" mil="G" col=1 scale=1e3 precision=exact
+    "AISI 301 annealed, G": 11200,
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=841 mil="E" scale=1e3 precision=exact
+    "AZ31B sheet, E": 6500,
+}
 '''
 
 _PLANTS = [
+    # MIL-HDBK-5J design tables (C3.1 mechanical). The text layer prints them in two
+    # layouts (tests/constants_integrity/milhdbk.py); a misreading of each, plus a
+    # page whose layout fits neither and must be refused rather than guessed.
+    ('R4', 'a BLOCK-layout table read in the wrong column (5 tempers on one page)',
+     'mil="G" col=1', 'mil="G" col=2'),
+    ('R4', 'an INTERLEAVED-layout table read on the wrong row',
+     'page=841 mil="E"', 'page=841 mil="G"'),
+    ('R3', 'a design table whose layout fits neither form (p.375, "See Table")',
+     'page=841 mil="E"', 'page=375 mil="E"'),
     # A unit scale (C3.1, ATMOSPHERIC_PRESSURE_KPA: kPa against CODATA's Pa). Two
     # forms of a unit error: the factor inverted, and the factor left out.
     ('R4', 'a unit scale in the wrong direction', 'scale=1e-3 precision=exact',
