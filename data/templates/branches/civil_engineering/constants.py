@@ -180,6 +180,11 @@ DAS_NATURAL_STATE_SOILS = {
 # [VERIFY: Das]
 # @kind: range
 # @units: deg
+# @copied-in: template_terzaghi_strip_footing_bearing 35; template_terzaghi_strip_footing_bearing 30
+#   C3.8, found by reading, not by the sweep (integers are below its 3-s.f. rule):
+#   strength_and_stability.py sets phi = 35, the "sand, rounded, dense" lower bound,
+#   and phi = 30, the "sand, rounded, loose" upper bound, as literals; a change to
+#   either row would not reach the template (phaseC3_literal_copies.md).
 FRICTION_ANGLE_RANGES_DEG = {
     "sand, rounded, loose": (27, 30),
     "sand, rounded, dense": (35, 38),

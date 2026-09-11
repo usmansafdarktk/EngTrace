@@ -734,6 +734,10 @@ CP_PARAMS = {
 # Values are this repo's own fit ranges, not NIST's; each row says which.
 # @kind: validity
 # @units: K
+# @copied-in: template_sensible_heat_temp_dependent_cp 350.0; template_sensible_heat_temp_dependent_cp 1200.0
+#   C3.8: heat_effects.py draws T2 up to 350.0 and 1200.0 - this table's C6H6(l) and Al2O3(s)
+#   limits - as literals; a refit that moved them would not reach the template
+#   (phaseC3_literal_copies.md).
 CP_VALID_T_MAX = {
     **{k: 1500.0 for k in CP_PARAMS},
     "C2H5OH(g)": 1500.0,     # refit over 298-1500 K

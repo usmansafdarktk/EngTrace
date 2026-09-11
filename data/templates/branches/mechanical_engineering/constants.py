@@ -209,6 +209,9 @@ SHEAR_MODULUS_VALUES = {
 # @domain: none (a defined standard value)
 # [ON-DISK] codata_2022/allascii.txt @ quantity="standard atmosphere" scale=1e-3 precision=exact
 #   CODATA 2022 prints 101325 Pa (exact).
+# @copied-in: template_hydrostatic_pressure_at_depth 101.325
+#   C3.8: fluid_statics.py writes P_atm_kpa = 101.325 instead of reading this table;
+#   declared so the census counts the copy (phaseC3_literal_copies.md).
 ATMOSPHERIC_PRESSURE_KPA = 101.325
 
 # Standard acceleration due to gravity in m/s^2
