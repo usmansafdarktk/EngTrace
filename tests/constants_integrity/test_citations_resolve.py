@@ -89,7 +89,14 @@ REF_PATH = os.path.join(REFS, 'nist_webbook', 'shomate_coefficients.json')
 CITED_TABLES = ('CP_PARAMS', 'HEATS_OF_FORMATION')
 TAG_RE = re.compile(r'#\s*\[(ON-DISK|DERIVED|KNOWN-DEFECTIVE|BY-DEFINITION)\]\s*(.*)')
 CAS_RE = re.compile(r'\b(\d{2,7}-\d{2}-\d)\b')
-ROW_RE = re.compile(r'^\s*"([^"]+)"\s*:')
+# A row key is quoted either way: MATERIAL_PROPERTIES writes 'Steel': {...}. The
+# first version matched double quotes only, so a tag above a single-quoted row
+# would have attached to the TABLE and been compared against the whole dict.
+ROW_RE = re.compile(r'''^\s*(?:"([^"]+)"|'([^']+)')\s*:''')
+
+
+def _rowkey(m):
+    return m.group(1) if m.group(1) is not None else m.group(2)
 
 
 def parse_table(src, name):
@@ -110,7 +117,7 @@ def parse_table(src, name):
             continue
         row = ROW_RE.match(line)
         if row:
-            yield row.group(1), (pending[-1] if pending else (None, ''))
+            yield _rowkey(row), (pending[-1] if pending else (None, ''))
             pending = []
         if depth == 0 and line.startswith('}'):
             break
@@ -260,13 +267,13 @@ def extract_tags(src):
         pure_comment = line.lstrip().startswith('#')
         if row and body_line:
             for f in pending:
-                f['row'] = row.group(1)
+                f['row'] = _rowkey(row)
                 out.append(f)
             pending = []
         for f in found:
             f['table'] = name
             if row and body_line:
-                f['row'] = row.group(1)            # trails its own row
+                f['row'] = _rowkey(row)            # trails its own row
                 out.append(f)
             elif body_line and pure_comment:
                 pending.append(f)                  # sits above the next row
@@ -911,8 +918,9 @@ def selftest():
         ('ROWS', None, 'UNVERIFIED'),      # above the closing brace: the table
         ('MIDLINE', None, 'ON-DISK'),      # mid-line, table has nothing better: kept
         ('MIDLINE', None, 'VERIFY'),
+        ('SQ', 'k', 'ON-DISK'),            # above a SINGLE-quoted row key
     ], key=lambda x: (x[0], x[1] or '', x[2]))   # ROWS' header prose mention: dropped
-    print(f'  [{"ok" if got == want else "FAIL"}] attachment: six tags placed, one prose '
+    print(f'  [{"ok" if got == want else "FAIL"}] attachment: seven tags placed, one prose '
           f'mention dropped')
     if got != want:
         bad.append(f'attachment: got {got}, planted {want}')
@@ -937,6 +945,11 @@ ROWS = {
 
 # see NAVFAC Ch. 3 [ON-DISK]  [VERIFY: Das]
 MIDLINE = {"c": 3.0}
+
+SQ = {
+    # [ON-DISK] codata_2022/allascii.txt @ quantity="y"
+    'k': 4.0,
+}
 '''
 
 
