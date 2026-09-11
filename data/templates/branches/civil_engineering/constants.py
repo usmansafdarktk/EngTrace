@@ -19,22 +19,47 @@ Unit conventions:
 
 # @kind: defined
 # @units: m/s^2
+# @domain: none (a defined standard value, not a measurement at a condition)
+# [ON-DISK] codata_2022/allascii.txt @ quantity="standard acceleration of gravity" precision=3sf
 GRAVITY_M_S2 = 9.81                  # standard gravity, m/s^2
 # @kind: defined
 # @units: ft/s^2
+# @domain: none (a defined standard value, not a measurement at a condition)
+# [DERIVED] g_n / (m per ft) = 9.80665 / 0.3048 = 32.1740, which is 32.2 at 3 s.f.
+#   g_n: codata_2022/allascii.txt "standard acceleration of gravity" (exact); the foot:
+#   nist_sp811/nistspecialpublication811e2008.pdf p.61 ("foot (ft) ... meter (m) ... 3.048 E −01").
+#   Not an [ON-DISK] scale= relation: the rounding is taken AFTER the conversion, and scale=
+#   compares in the artefact's own unit, where 9.81456 m/s^2 is not 9.80665 at any precision.
 GRAVITY_FT_S2 = 32.2                 # standard gravity, ft/s^2
 # @kind: property
 # @units: kN/m^3
+# @domain: T=288.15..293.15 K, p=101.325 kPa
+# [KNOWN-DEFECTIVE] at the ~15-20 C this line claims, gamma_w = rho*g_n = 9.7891 kN/m^3
+#   (998.21 kg/m^3 at 293.15 K from nist_fluid_properties/water_C7732185_isobar_1atm.tsv,
+#   g_n = 9.80665), i.e. 9.79 at 3 s.f. The literal 9.81 is +0.21% and implies
+#   rho = 1000.3 kg/m^3 - water near 4 C, not at 15-20 C. Its consumers are C3.5.
 UNIT_WEIGHT_WATER_KN_M3 = 9.81       # gamma_w at ~15-20 C, kN/m^3
 # @kind: property
 # @units: lbf/ft^3
+# @domain: T=288.15..293.15 K, p=101.325 kPa
+# [KNOWN-DEFECTIVE] the same defect in US units: at 293.15 K rho = 62.316 lb/ft^3
+#   (998.21 / 16.01846, the SP 811 p.66 factor "1.601 846 E+01"), and under standard gravity a
+#   unit weight in lbf/ft^3 is numerically that density. The literal 62.4 is +0.13% and
+#   implies rho = 999.6 kg/m^3. Not a rounding: 3 s.f. of the artefact is 62.3.
 UNIT_WEIGHT_WATER_PCF = 62.4         # gamma_w, lb/ft^3
 # @kind: property
 # @units: kg/m^3
-WATER_DENSITY_KG_M3 = 998.2          # rho at 20 C  [VERIFY: CRC Handbook]
+# @domain: T=293.15 K, p=101.325 kPa
+# [ON-DISK] nist_fluid_properties/water_C7732185_isobar_1atm.tsv @ T=293.15 col="Density (kg/m3)" precision=4sf
+WATER_DENSITY_KG_M3 = 998.2          # rho at 20 C
 # @kind: property
 # @units: m^2/s
-WATER_KINEMATIC_VISCOSITY_M2_S = 1.004e-6   # nu at 20 C  [VERIFY: CRC Handbook]
+# @domain: T=293.15 K, p=101.325 kPa
+# [KNOWN-DEFECTIVE] nu = mu/rho at the same 20 C, 1 atm = 0.0010016 / 998.21 = 1.003396e-06 m^2/s
+#   (both from nist_fluid_properties/water_C7732185_isobar_1atm.tsv), i.e. 1.003000e-06 at
+#   4 s.f. The literal is +0.060%: it follows from a 4-digit mu of 1.002e-3 Pa*s
+#   (1.002e-3/998.2 = 1.0038e-6), not from the 5-digit mu NIST tabulates. C3.5 carries it.
+WATER_KINEMATIC_VISCOSITY_M2_S = 1.004e-6   # nu at 20 C
 
 # ============================================================================
 # DOMAIN 1 — STRUCTURAL ANALYSIS
@@ -43,38 +68,65 @@ WATER_KINEMATIC_VISCOSITY_M2_S = 1.004e-6   # nu at 20 C  [VERIFY: CRC Handbook]
 # Steel properties — AISC Steel Construction Manual, 16th ed.
 # @kind: standard
 # @units: ksi
-STEEL_E_KSI = 29000        # modulus of elasticity  [VERIFY: AISC Manual]
+# @domain: none (room-temperature design value for structural steel)
+# [UNVERIFIED] the AISC Steel Construction Manual is not on disk - docs/references holds
+#   only the Shapes Database (civil/aisc_shapes_database_v16.xlsx), which carries section
+#   geometry, not material properties. Nothing here re-derives E; escalated at C3.5.
+STEEL_E_KSI = 29000        # modulus of elasticity
 # @kind: standard
 # @units: GPa
-STEEL_E_GPA = 200          # SI companion value      [VERIFY: AISC Manual]
+# @domain: none (room-temperature design value for structural steel)
+# [UNVERIFIED] the SI companion of STEEL_E_KSI, and unverifiable for the same reason: the
+#   Manual is not on disk. C3.2 checks only that the pair is self-consistent through the
+#   SP 811 ksi->MPa factor, which is a consistency check, not a source.
+STEEL_E_GPA = 200          # SI companion value
 # @kind: standard
 # @units: ksi
-STEEL_FY_KSI = {           # yield stress by common grade  [VERIFY: AISC/ASTM]
+# @domain: none (specified minimum yield stress by ASTM grade)
+# [UNVERIFIED] ASTM A992/A36 are not on disk, and neither is the AISC Manual that tabulates
+#   them. Grade-keyed minima, not measurements; escalated at C3.5.
+STEEL_FY_KSI = {           # yield stress by common grade
     "ASTM A992": 50,       # wide-flange standard grade
     "ASTM A36": 36,        # plates, angles, legacy shapes
 }
 # @kind: standard
 # @units: MPa
+# @domain: none (specified minimum yield stress by ASTM grade)
+# [UNVERIFIED] the SI companion of STEEL_FY_KSI; same missing sources.
 STEEL_FY_MPA = {"ASTM A992": 345, "ASTM A36": 250}
 
 # Normal-weight concrete — ACI 318-19 Section 19.2.2.1
-# Ec = 57000*sqrt(f'c) psi  |  Ec = 4700*sqrt(f'c) MPa   [VERIFY: ACI 318-19]
+# Ec = 57000*sqrt(f'c) psi  |  Ec = 4700*sqrt(f'c) MPa
 # @kind: range
 # @units: psi
+# @domain: none (a menu of nominal design strengths, not a measurement)
+# [POLICY: sampling-only] ACI 318-19 is not on disk; these three are the strengths a
+#   question may be posed at, and f'c is stated verbatim in every question, so the menu
+#   changes which problem is asked, never whether the answer is right.
 CONCRETE_FC_PSI = [3000, 4000, 5000]
 # @kind: range
 # @units: MPa
+# @domain: none (a menu of nominal design strengths, not a measurement)
+# [POLICY: sampling-only] the SI companion of CONCRETE_FC_PSI, on the same footing.
 CONCRETE_FC_MPA = [21, 28, 35]
 # @kind: standard
 # @units: psi^(1/2)
+# @domain: none (normal-weight concrete, the ACI 318-19 19.2.2.1 form)
+# [UNVERIFIED] ACI 318-19 is not on disk, so the coefficient cannot be read from its
+#   source; it is the constant of the code equation named above. Escalated at C3.5.
 CONCRETE_EC_COEFF_PSI = 57000
 # @kind: standard
 # @units: MPa^(1/2)
+# @domain: none (normal-weight concrete, the ACI 318-19 19.2.2.1 form)
+# [UNVERIFIED] the SI companion of CONCRETE_EC_COEFF_PSI; same missing source.
 CONCRETE_EC_COEFF_MPA = 4700
 
-# Typical uniform floor live loads — ASCE 7-22 Table 4.3-1  [VERIFY: ASCE 7]
+# Typical uniform floor live loads — ASCE 7-22 Table 4.3-1
 # @kind: standard
 # @units: lbf/ft^2
+# @domain: none (uniformly distributed design live load by occupancy)
+# [UNVERIFIED] ASCE 7-22 is not on disk (docs/references has no ASCE document), so the
+#   occupancy rows cannot be resolved against their table. Escalated at C3.5.
 LIVE_LOADS_PSF = {
     "office": 50,
     "residential dwelling": 40,
@@ -84,6 +136,20 @@ LIVE_LOADS_PSF = {
 }
 # @kind: standard
 # @units: kPa
+# @domain: none (uniformly distributed design live load by occupancy)
+# [UNVERIFIED] ASCE 7-22 is not on disk. This is ASCE's own SI column, and it is NOT the
+#   SP 811 conversion of LIVE_LOADS_PSF ("4.788 026 E+01" Pa per lbf/ft^2): every row sits
+#   above it, 4 of the 5 by exactly +0.250%, because those 4 are the SOFT
+#   conversion 1 psf = 0.048 kPa exactly (50 -> 2.40, 40 -> 1.92, 20 -> 0.96). The
+#   'corridor (first floor)' row is neither: 100 psf is 4.788 kPa and the table says 4.79 (+0.041%),
+#   where the soft conversion would have given 4.80. So the column is a mix of the two,
+#   which is why it is not tagged [DERIVED] from the psf table:
+#   office                         50 psf -> 2.394013 kPa; the table says 2.4 (+0.250%)
+#   residential dwelling           40 psf -> 1.915210 kPa; the table says 1.92 (+0.250%)
+#   school classroom               40 psf -> 1.915210 kPa; the table says 1.92 (+0.250%)
+#   corridor (first floor)        100 psf -> 4.788026 kPa; the table says 4.79 (+0.041%)
+#   ordinary flat roof             20 psf -> 0.957605 kPa; the table says 0.96 (+0.250%)
+#   Registered as a C3.5 residual; the values are left exactly as transcribed.
 LIVE_LOADS_KPA = {
     "office": 2.40,
     "residential dwelling": 1.92,
@@ -137,9 +203,18 @@ AISC_W_SHAPES = {
 # DOMAIN 2 — GEOTECHNICAL ENGINEERING
 # ============================================================================
 
-# Specific gravity of solids — Das PGE 10th ed., typical values  [VERIFY: Das]
+# Specific gravity of solids — the windows a soil type is sampled in.
 # @kind: range
 # @units: 1
+# @domain: none (a property of the solids; no temperature or stress condition)
+# [POLICY: sampling-only] Das PGE §2.6 (LOCAL-ONLY, PDF pp. 63-64) bounds Gs but does not
+#   tabulate it by soil type: its Table 2.4 is "Specific Gravity of Common Minerals"
+#   (quartz 2.65, kaolinite 2.6, illite 2.8 ...), and the text gives only "most of the
+#   values fall within a range of 2.6 to 2.9" and "light-colored sand ... about 2.65; for
+#   clayey and silty soils, it may vary from 2.6 to 2.9". The three windows below are
+#   narrower than that and are nobody's table, so they are sampling policy: every drawn
+#   Gs is stated in the question (C1 Reviewer G, 40/40 in all 5 consumers) and the windows
+#   lie inside Das's 2.6-2.9.
 # @given: stated (C1 Reviewer G, reviews/phaseC1_reviewer_g_provenance.md §2 row 1 and reviews/phaseC1_reviewer_g_scratch/g_stated.py: Gs stated and inside its soil window 40/40 in each of the 5 consumers)
 SPECIFIC_GRAVITY_RANGES = {
     "sand": (2.65, 2.67),
@@ -147,10 +222,17 @@ SPECIFIC_GRAVITY_RANGES = {
     "inorganic clay": (2.70, 2.80),
 }
 
-# Coefficient of permeability by soil type, cm/s — Das PGE Table 7.1;
-# cross-ref NAVFAC DM-7.01 Ch. 3 [ON-DISK]  [VERIFY: Das]
+# Coefficient of permeability by soil type, cm/s — Das PGE Table 7.1, cross-referenced
+# against NAVFAC DM-7.01 Ch. 3 (civil/navfac_dm7_01_soil_mechanics.pdf).
 # @kind: range
 # @units: cm/s
+# @domain: none (saturated soil; the book states no temperature for the k ranges)
+# [ON-DISK:LOCAL-ONLY] pilot/references/public/full_books_civil_engineering/Das, Sobhan — Principles of Geotechnical Engineering.pdf @ page=242 text="Table 7.1"
+#   "Typical Values of Hydraulic Conductivity of Saturated Soils". Four of the five rows
+#   are the book's, endpoint for endpoint (clean gravel 100-1.0, coarse sand 1.0-0.01,
+#   fine sand 0.01-0.001, silty clay 0.001-0.00001). The fifth is not: Das gives clay as
+#   "<0.000001" - an upper bound with no floor - where this table writes (1e-8, 1e-6).
+#   The 1e-8 floor is the authoring round's, not the book's; C3.5 carries it.
 PERMEABILITY_RANGES_CM_S = {
     "clean gravel": (1.0, 100.0),
     "coarse sand": (0.01, 1.0),
@@ -161,7 +243,7 @@ PERMEABILITY_RANGES_CM_S = {
 
 # Natural-state soil properties — Das & Sobhan, PGE 9th ed., Table 3.1
 # ("Void Ratio, Moisture Content, and Dry Unit Weight for Some Typical Soils
-# in a Natural State", text p. 68 / PDF p. 93)  [ON-DISK: full_books]
+# in a Natural State", text p. 68 / PDF p. 93)
 # Fields: void ratio e (-), saturated-state moisture content w (%), dry unit
 # weight gamma_d (kN/m^3 and lb/ft^3). Tuples denote the table's own ranges.
 # Derived quantities are computed, never assumed:
@@ -169,6 +251,8 @@ PERMEABILITY_RANGES_CM_S = {
 #   gamma_moist = gamma_d * (1 + w/100) for any assumed w <= w_sat
 # @kind: property
 # @units: e=1, w_sat_pct=%, gamma_d_kn_m3=kN/m^3, gamma_d_pcf=lbf/ft^3
+# @domain: none (soils in their natural state; the table states no condition)
+# [ON-DISK:LOCAL-ONLY] pilot/references/public/full_books_civil_engineering/Das, Sobhan — Principles of Geotechnical Engineering.pdf @ page=93 text="Table 3.1"
 DAS_NATURAL_STATE_SOILS = {
     "loose uniform sand":          {"e": 0.8,        "w_sat_pct": 30,        "gamma_d_kn_m3": 14.5,         "gamma_d_pcf": 92},
     "dense uniform sand":          {"e": 0.45,       "w_sat_pct": 16,        "gamma_d_kn_m3": 18.0,         "gamma_d_pcf": 115},
@@ -181,10 +265,14 @@ DAS_NATURAL_STATE_SOILS = {
     "glacial till":                {"e": 0.3,        "w_sat_pct": 10,        "gamma_d_kn_m3": 21.0,         "gamma_d_pcf": 134},
 }
 
-# Drained friction angle ranges, degrees — Das PGE Ch. 12 typical values
-# [VERIFY: Das]
+# Drained friction angle ranges, degrees — Das PGE Table 12.1.
 # @kind: range
 # @units: deg
+# @domain: none (drained, effective-stress friction angle; no temperature applies)
+# [ON-DISK:LOCAL-ONLY] pilot/references/public/full_books_civil_engineering/Das, Sobhan — Principles of Geotechnical Engineering.pdf @ page=495 text="Table 12.1"
+#   "Typical Values of Drained Angle of Friction for Sands and Silts". All six rows below
+#   are the book's, endpoint for endpoint: rounded loose 27-30, rounded dense 35-38,
+#   angular loose 30-35, angular dense 40-45, gravel with some sand 34-48, silts 26-35.
 # @copied-in: template_terzaghi_strip_footing_bearing 35; template_terzaghi_strip_footing_bearing 30
 #   C3.8, found by reading, not by the sweep (integers are below its 3-s.f. rule):
 #   strength_and_stability.py sets phi = 35, the "sand, rounded, dense" lower bound,
@@ -201,13 +289,15 @@ FRICTION_ANGLE_RANGES_DEG = {
 
 # Terzaghi bearing-capacity factors (Nc, Nq, Ngamma) vs. friction angle —
 # transcribed verbatim from Das & Sobhan PGE 9th ed., Table 16.1 (text
-# p. 717 / PDF p. 742); Ngamma per Kumbhojkar (1993).  [ON-DISK: full_books]
+# p. 717 / PDF p. 742); Ngamma per Kumbhojkar (1993).
 # NOTE: an earlier memory-curated version of this table carried wrong
 # Ngamma values at phi <= 25 and phi = 40 (mixed factor families) that
 # web-based Stage B review failed to catch; corrected 2026-08-02 against
 # the book text after an R2 finding (see data_review_log.md, Cycle 3).
 # @kind: standard
 # @units: 1
+# @domain: none (dimensionless factors of phi; no temperature or stress condition)
+# [ON-DISK:LOCAL-ONLY] pilot/references/public/full_books_civil_engineering/Das, Sobhan — Principles of Geotechnical Engineering.pdf @ page=742 text="Table 16.1"
 TERZAGHI_BEARING_FACTORS = {
     0:  (5.70, 1.00, 0.00),
     5:  (7.34, 1.64, 0.14),
@@ -224,9 +314,14 @@ TERZAGHI_BEARING_FACTORS = {
 # LOCAL shear failure mode (phi' replaced by atan(2/3 tan phi')) —
 # transcribed verbatim from Das & Sivakugan, PFE 9th ed., Table 3.2 (text
 # p. 140 / PDF p. 160); local-shear strip equation per Eq. (3.9):
-# qu = (2/3)c'N'c + qN'q + 0.5*gamma*B*N'gamma.  [ON-DISK: full_books]
+# qu = (2/3)c'N'c + qN'q + 0.5*gamma*B*N'gamma.
 # @kind: standard
 # @units: 1
+# @domain: none (dimensionless factors of phi, local-shear mode)
+# [ON-DISK:LOCAL-ONLY] pilot/references/public/full_books_civil_engineering/Das, Sivakugan — Principles of Foundation Engineering.pdf @ page=160 text="Modified Bearing Capacity"
+#   The anchor is not "Table 3.2": that copy's text layer spaces the caption as
+#   "T able 3.2Terzaghi's Modified Bearing Capacity Factors", so the table number alone
+#   does not match, while the caption's words do.
 TERZAGHI_MODIFIED_FACTORS = {
     20: (11.85, 3.88, 1.12),
     25: (14.80, 5.60, 2.25),
@@ -235,12 +330,20 @@ TERZAGHI_MODIFIED_FACTORS = {
 }
 
 # Compression index correlation: Cc = 0.009 * (LL - 10)  — Skempton (1944),
-# as given in Das PGE consolidation chapter  [VERIFY: Das]
+# as given in Das PGE consolidation chapter
 # @kind: standard
 # @units: 1/%
+# @domain: none (a correlation in liquid limit; no temperature or stress condition)
+# [ON-DISK:LOCAL-ONLY] pilot/references/public/full_books_civil_engineering/Das, Sobhan — Principles of Geotechnical Engineering.pdf @ page=447 text="0.009(LL"
+#   The page carries the correlation as "Cc 5 0.009(LL 2 10)" - that copy's text layer
+#   renders the equals and minus signs as 5 and 2, so the anchor is the coefficient and
+#   the open parenthesis, which survive.
 SKEMPTON_CC_COEFF = 0.009
 # @kind: standard
 # @units: %
+# @domain: none (a correlation in liquid limit; no temperature or stress condition)
+# [ON-DISK:LOCAL-ONLY] pilot/references/public/full_books_civil_engineering/Das, Sobhan — Principles of Geotechnical Engineering.pdf @ page=447 text="0.009(LL"
+#   The 10 of the same equation, on the same page.
 SKEMPTON_CC_OFFSET = 10
 
 # Typical coefficient of consolidation, m^2/yr — order-of-magnitude ranges;
@@ -251,6 +354,7 @@ SKEMPTON_CC_OFFSET = 10
 # correctness never depends on these endpoints.]
 # @kind: range
 # @units: m^2/yr
+# @domain: none (order-of-magnitude windows by plasticity, not a condition)
 CV_RANGES_M2_YR = {
     "high-plasticity clay": (0.3, 5.0),
     "low-plasticity clay": (2.0, 30.0),
@@ -260,10 +364,12 @@ CV_RANGES_M2_YR = {
 # DOMAIN 3 — WATER RESOURCES & HYDRAULICS
 # ============================================================================
 
-# Manning's n, open channels — FHWA HDS-4 Table B.2, p. B-2 (PDF p.199)
-# [ON-DISK]; canonical compilation: Chow (1959) Table 5-6, USGS WSP-2339
+# Manning's n, open channels — FHWA HDS-4 Table B.2, p. B-2; canonical compilation:
+# Chow (1959) Table 5-6, USGS WSP-2339.
 # @kind: standard
 # @units: s/m^(1/3)
+# @domain: none (roughness coefficients by surface; no flow or temperature condition)
+# [ON-DISK] civil/fhwa_hds4_highway_hydraulics.pdf @ page=199 text="Table B.2"
 MANNINGS_N_CHANNELS = {
     "very smooth concrete": 0.011,
     "smooth concrete": 0.012,
@@ -279,10 +385,11 @@ MANNINGS_N_CHANNELS = {
     "floodplain, short grass pasture": (0.025, 0.035),
 }
 
-# Manning's n, closed conduits — FHWA HDS-4 Table B.3, p. B-4 (PDF p.201)
-# [ON-DISK]
+# Manning's n, closed conduits — FHWA HDS-4 Table B.3, p. B-4.
 # @kind: standard
 # @units: s/m^(1/3)
+# @domain: none (roughness coefficients by conduit material; no condition)
+# [ON-DISK] civil/fhwa_hds4_highway_hydraulics.pdf @ page=201 text="Table B.3"
 MANNINGS_N_CONDUITS = {
     "concrete pipe": (0.011, 0.013),
     "CMP, 2-2/3 x 1/2 in corrugations": (0.022, 0.027),
@@ -291,10 +398,11 @@ MANNINGS_N_CONDUITS = {
     "brick": (0.014, 0.017),
 }
 
-# Rational-method runoff coefficients — FHWA HEC-22 3rd ed., Table 3-1,
-# p. 3-6 (PDF p.56)  [ON-DISK]
+# Rational-method runoff coefficients — FHWA HEC-22 3rd ed., Table 3-1, p. 3-6.
 # @kind: standard
 # @units: 1
+# @domain: none (runoff coefficient by land use; the table states no return period)
+# [ON-DISK] civil/fhwa_hec22_urban_drainage.pdf @ page=56 text="Table 3-1"
 RATIONAL_C = {
     "business: downtown": (0.70, 0.95),
     "business: neighborhood": (0.50, 0.70),
@@ -316,9 +424,15 @@ RATIONAL_C = {
 
 # SCS runoff curve numbers by hydrologic soil group (A, B, C, D) —
 # NRCS TR-55 (June 1986), Table 2-2a (urban, doc p.2-5) and Table 2-2b/c
-# (agricultural, doc p.2-6/2-7)  [ON-DISK]
+# (agricultural, doc p.2-6/2-7).
 # @kind: standard
 # @units: 1
+# @domain: AMC=II, Ia_ratio=0.2
+#   TR-55 tabulates CN for average runoff condition (AMC II) and Ia = 0.2S; every page
+#   below repeats "Average runoff condition, and Ia = 0.2S" under the table.
+# [ON-DISK] civil/nrcs_tr55_urban_hydrology.pdf @ page=14 text="Table 2-2a"
+# [ON-DISK] civil/nrcs_tr55_urban_hydrology.pdf @ page=15 text="Table 2-2b"
+# [ON-DISK] civil/nrcs_tr55_urban_hydrology.pdf @ page=16 text="Table 2-2c"
 SCS_CURVE_NUMBERS = {
     # Table 2-2a — urban
     "open space, poor condition (<50% grass)": (68, 79, 86, 89),
@@ -343,7 +457,8 @@ SCS_CURVE_NUMBERS = {
     "row crops, straight row, poor condition": (72, 81, 88, 91),
     "row crops, straight row, good condition": (67, 78, 85, 89),
     "small grain, straight row, good condition": (63, 75, 83, 87),
-    # Table 2-2c — other agricultural  [VERIFY: TR-55 p.2-7]
+    # Table 2-2c — other agricultural
+    # [ON-DISK] civil/nrcs_tr55_urban_hydrology.pdf @ page=16 text="Pasture, grassland, or range"
     "pasture, good condition": (39, 61, 74, 80),
     "meadow, protected from grazing": (30, 58, 71, 78),
     "woods, good condition": (30, 55, 70, 77),
@@ -351,9 +466,12 @@ SCS_CURVE_NUMBERS = {
 }
 
 # SCS runoff equation constants — TR-55 Ch. 2: Q = (P - 0.2S)^2 / (P + 0.8S),
-# S = 1000/CN - 10 (inches)  [ON-DISK]
+# S = 1000/CN - 10 (inches).
 # @kind: standard
 # @units: 1
+# @domain: none (the initial-abstraction ratio of the TR-55 runoff equation)
+# [ON-DISK] civil/nrcs_tr55_urban_hydrology.pdf @ page=10 text="Ia = 0.2S"
+#   TR-55 p.2-2: "the following empirical equation: Ia = 0.2S. [Eq. 2-2]".
 # @copied-in: template_scs_curve_number_runoff 0.2
 #   C1 Reviewer G, G-1: the template writes this ratio as 0.2 (and 0.8, 0.4,
 #   0.04 derived from it) instead of reading the table, and states it in every
