@@ -23,7 +23,6 @@ chemical_engineering.COMMON_GASES
 chemical_engineering.GAS_MOLECULAR_PARAMS
 chemical_engineering.POWER_LAW_FLUIDS
 chemical_engineering.GRAVITATIONAL_ACCELERATION
-electrical_engineering.MEDIA_VELOCITIES
 electrical_engineering.FREQUENCY_RANGE_HZ
 electrical_engineering.AMPLITUDE_RANGE
 electrical_engineering.PHASE_RANGE_DEG
