@@ -32,6 +32,15 @@ triaging the lines above:
 `SPC_NUM_SUBGROUPS`'s bounds (20, 30), drawn inline as `randint(20, 30)` by two
 templates, are a window rather than a value and go to the C3.9 register.
 
+**Registered: a copy held by an assert** (found by the C3.10 guard detector, not by
+this sweep). `hydrology.py:25-35` hard-codes `_SCS_COMBOS`, ten
+`(land use, soil group, CN)` triples, and `template_scs_curve_number_runoff` draws its
+curve number from that list (`:180`). It reads `SCS_CURVE_NUMBERS` only in
+`assert SCS_CURVE_NUMBERS[use][...] == CN` (`:181`). All ten triples equal the table
+today. A correction to the table would make generation fail at the assert rather than
+reach items silently - safer than a silent copy, but still a copy: registered, with
+"read the triples from the table, filtered to CN >= 61" proposed for the phase owner.
+
 The two `CP_VALID_T_MAX` copies matter beyond bookkeeping: the table is the D-032
 validity record, and a template that hard-codes its limits would keep sampling to
 350 K and 1200 K if a refit moved them.
