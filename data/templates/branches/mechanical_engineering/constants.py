@@ -1,4 +1,6 @@
 # E is the Modulus of Elasticity.
+# @kind: property
+# @units: E_GPa=GPa, E_ksi=ksi, nu=1
 MATERIAL_PROPERTIES = {
     # Metals (Common)
     'Steel': {'E_GPa': 200, 'E_ksi': 29000, 'nu': 0.30},
@@ -37,6 +39,8 @@ MATERIAL_PROPERTIES = {
 
 # Typical Shear Modulus (G) Values for Engineering Materials (GPa)
 # Note: Values are representative and can vary with alloy composition and heat treatment.
+# @kind: property
+# @units: GPa
 SHEAR_MODULUS_VALUES = {
     # Metals (Common Alloys)
     "Steel (A36)": 77.2,
@@ -65,13 +69,19 @@ SHEAR_MODULUS_VALUES = {
 }
 
 # Standard atmospheric pressure in kPa
+# @kind: defined
+# @units: kPa
 ATMOSPHERIC_PRESSURE_KPA = 101.325
 
 # Standard acceleration due to gravity in m/s^2
+# @kind: defined
+# @units: m/s^2
 GRAVITY = 9.81
 
 
 # Densities of common fluids in kg/m^3 at 20°C and 1 atm, unless specified.
+# @kind: property
+# @units: kg/m^3
 FLUID_DENSITIES = {
     # Water-based
     "Fresh Water": 998,         # More precise value for 20°C
@@ -130,6 +140,8 @@ FLUID_DENSITIES = {
 }
 
 # Densities of various solid materials in kg/m^3
+# @kind: property
+# @units: kg/m^3
 MATERIAL_DENSITIES = {
     # Woods & Natural Materials (generally float in water)
     "Pine Wood": 500,
@@ -220,6 +232,8 @@ OBJECT_MATERIALS = [
 
 # Densities of common fluids in kg/m^3
 # Lighter fluids suitable for the pipe
+# @kind: property
+# @units: kg/m^3
 PIPE_FLUIDS = {
     # Gases (Very Light)
     "Air": 1.225,
@@ -267,6 +281,8 @@ PIPE_FLUIDS = {
 }
 
 # Denser fluids suitable for the manometer
+# @kind: property
+# @units: kg/m^3
 MANOMETER_FLUIDS = {
     # Standard Manometer Fluids
     "Mercury": 13550,
