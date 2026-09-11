@@ -66,7 +66,7 @@ if REPO not in sys.path:
     sys.path.insert(0, REPO)
 
 from tests.constants_integrity.census import (  # noqa: E402
-    BRANCHES, BRANCHES_DIR, header_fields, static_tables)
+    BRANCHES, BRANCHES_DIR, header_fields, numeric_tables)
 
 REFS = os.path.join(REPO, 'docs', 'references')
 CONSTANTS = os.path.join(BRANCHES_DIR, 'chemical_engineering', 'constants.py')
@@ -192,7 +192,7 @@ def extract_tags(src):
     and header - module docstrings describing the vocabulary - are ignored.
     """
     lines = src.split('\n')
-    tables = static_tables(src)
+    tables = numeric_tables(src)
     owner = {}                                  # line index -> table name
     for t in tables:
         i = t['lineno'] - 2
@@ -452,7 +452,7 @@ def check_source(branch, src, refs=REFS, manifest=None, kinds=None):
     exec(compile(src, f'{branch}/constants.py', 'exec'), ns)        # noqa: S102
     if kinds is None:
         kinds = {t['name']: header_fields(t['header']).get('kind', '').split(' ')[0]
-                 for t in static_tables(src)}
+                 for t in numeric_tables(src, ns)}
     counts = dict(tags=0, resolved=0, locator_only=0, unresolvable_from_clone=0,
                   legacy=0, stated=0)
     failures, legacy = [], []

@@ -135,6 +135,7 @@ AISC_W_SHAPES = {
 # Specific gravity of solids — Das PGE 10th ed., typical values  [VERIFY: Das]
 # @kind: range
 # @units: 1
+# @given: stated (C1 Reviewer G, reviews/phaseC1_reviewer_g_provenance.md §2 row 1 and reviews/phaseC1_reviewer_g_scratch/g_stated.py: Gs stated and inside its soil window 40/40 in each of the 5 consumers)
 SPECIFIC_GRAVITY_RANGES = {
     "sand": (2.65, 2.67),
     "silt": (2.67, 2.73),
@@ -343,6 +344,12 @@ SCS_CURVE_NUMBERS = {
 # S = 1000/CN - 10 (inches)  [ON-DISK]
 # @kind: standard
 # @units: 1
+# @copied-in: template_scs_curve_number_runoff 0.2
+#   C1 Reviewer G, G-1: the template writes this ratio as 0.2 (and 0.8, 0.4,
+#   0.04 derived from it) instead of reading the table, and states it in every
+#   question - so a correction here would not reach the item. Declared so the
+#   census counts the copy and fails when it is removed; making the template
+#   read the table is C3.7's, with a before/after dump (D-073).
 SCS_IA_RATIO = 0.2
 
 HYDROLOGIC_SOIL_GROUPS = ("A", "B", "C", "D")
