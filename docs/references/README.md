@@ -145,32 +145,53 @@ source. They are the **current** pages, not the
 zip's copies — the live `pmc321.htm` is 20 955 bytes, the zip's 19 656, and
 they differ after whitespace is normalised. Cite the pages.
 
-## Citation format (from Phase C2)
+## Provenance convention (Phase C1.2)
 
-    [<class>] NIST <CAS> <locator and the check that was run>
+The normative text is **`template_redesign_spec.md` §C1.2–C1.5** (SPEC-CHANGE 20).
+This is the working summary.
 
-    e.g.  # [ON-DISK] NIST 74-82-8  Cp298 35.06 vs NIST 35.65
+**Seven classes, one meaning each**, and a qualifier for evidence one machine holds:
 
-Four classes, because a value can be warranted in four different ways and
-collapsing them hides which (D-035):
+| Tag | Means |
+|---|---|
+| `[ON-DISK]` | a located entry in a file here that a clone can re-acquire |
+| `[ON-DISK:LOCAL-ONLY]` | the same, in a copyrighted book on one machine - honest, **not resolvable from a clone** |
+| `[DERIVED]` | computed here from tagged inputs or on-disk data |
+| `[BY-DEFINITION]` | exact by definition; no artefact can be its warrant |
+| `[POLICY: sampling-only]` | a sampling window or guard that asserts nothing about a named real entity |
+| `[KNOWN-DEFECTIVE]` | checked and failed; kept as a record |
+| `[UNVERIFIED]` | not checked, or no source obtainable |
 
-| Class | Means | Requires |
-|---|---|---|
-| `[ON-DISK]` | checked against retrieved data | an entry in the named file matching the tag |
-| `[DERIVED]` | fitted or computed here from on-disk data | a stated derivation and range |
-| `[BY-DEFINITION]` | true by how the scale is defined | a stated definition; no artefact can be its warrant |
-| `[KNOWN-DEFECTIVE]` | checked and *failed*; kept only as a record | the measured error |
+**Citation grammar** - `# [CLASS] <artefact> @ <locator> [precision=… | tol=…]`:
 
-Civil and industrial also use `[VERIFY: <source>]`, `[POLICY: sampling-only]`,
-`[REALISM]`, `[DERIVABLE]` and `[UNVERIFIED]`. Merging the two vocabularies into
-one is Phase C1's deliverable C1.2.
+    # [ON-DISK] codata_2022/allascii.txt @ quantity="vacuum electric permittivity" precision=4sf
+    # [ON-DISK] nist_fluid_properties/water_C7732185_isobar_1atm.tsv @ T=293.15 col="Density (kg/m3)" field=[0] precision=5sf
 
-`tests/constants_integrity/test_citations_resolve.py` enforces the Phase C2
-format for `CP_PARAMS` and `HEATS_OF_FORMATION`: it resolves the CAS **written
-in the tag** against `nist_webbook/`, fails on a tagless row or a mismatched
-species, and refuses to let a test file carry its own copy of the reference
-values (finding G-1). Generalising it to every branch and every artefact type
-here is Phase C1's deliverable C1.6.
+`precision=` says the constant **is** the artefact's value at that precision (a
+transcription, checked exactly); `tol=` says it **agrees with** an independent
+artefact (a verification, not an origin - Reviewer G, G-7). A citation with
+neither is counted `LOCATOR-ONLY`, never passed as if its value had been
+compared. Locators: `quantity=` (CODATA), `T=` + `col=` (NIST TSV, on the grid),
+`cas=` (WebBook JSON; C2's `NIST <CAS>` form still resolves), `page=` [+ `text=`
+or `image-only`] (PDF), `member=` (zip), `text=` (HTML/text).
+
+**Table fields**, in the comment header directly above every numeric table:
+`# @kind:` (`property`, `standard`, `measured-constant`, `defined`,
+`mathematical`, `range`, `validity`), `# @units:` (one grammar, see
+`test_table_metadata.py`), `# @domain:` (a validity domain or `none (reason)`;
+C3 fills it).
+
+**What enforces it.**
+
+| check | what it asserts |
+|---|---|
+| `test_citations_resolve.py` | C2's P1-P4, and R1-R7: every tag parses; an `[ON-DISK]` file exists, is vouched for by `MANIFEST.json` and matches its SHA-256; the locator resolves; the stated relation holds; local-only is counted; payload classes state their payload; the tag agrees with `@kind`. `--selftest` plants ten defects. |
+| `test_table_metadata.py` | every numeric table declares `@kind` and `@units`, every field has a unit, every unit parses; `@domain` is declared or on the ratcheted C3 worklist. `--selftest` plants eleven. |
+| `census.py` | the classification: which tables need a citation and which only a plausibility window, measured by perturbing each field and watching the question. `--selftest` plants the predicate's own defect shapes. |
+
+**Deprecated, and counted as `LEGACY` until C3.7 retags them:** `[VERIFY: X]`,
+`[REALISM]`, `[DERIVABLE]`, `[ON-DISK: xlsx]`, `[ON-DISK visual]`, and an
+`[ON-DISK]` with no `artefact @ locator`.
 
 **Origin versus verification.** The `CP_PARAMS` coefficients are in the
 Smith–Van Ness functional form, and no fetchable, citable copy of Smith–Van Ness
