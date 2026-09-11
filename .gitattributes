@@ -1,0 +1,6 @@
+# docs/references: every committed source is pinned by SHA-256 in MANIFEST.json,
+# and `fetch_references.py --verify` hashes the bytes on disk. With
+# core.autocrlf=true (this repository's Windows default) git would check the
+# LF-only TSV, HTML and TXT sources out with CRLF, and every hash would fail on a
+# fresh clone. Store and check out these files byte-for-byte.
+docs/references/** -text
