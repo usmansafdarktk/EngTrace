@@ -112,3 +112,52 @@ Identical to the recorded baseline on every gate:
 distributions did not move — 13 of them demonstrably did. The baseline was **not**
 regenerated; `run.py --baseline` was never invoked. The instance dump above is the
 measurement; T6 is only the statement that its own gate is where it was.
+
+---
+
+# Tranche 2 — Decision 7, and 23 tags that moved nothing
+
+**P6 event: YES, on 1 of 150 templates.** `before` is **7f63348**, the tranche-1 head;
+`after` is the working tree. Same instrument, same two-process discipline.
+
+Totals: `{'q': 31, 'ans': 31, 'sol': 31, 'err_before': 0, 'err_after': 0}`
+
+| template | question | answer | solution |
+|---|---:|---:|---:|
+| `sensible_heat_temp_dependent_cp` | 31/300 | 31/300 | 31/300 |
+
+```
+seed 2: 'The heat required is **3.74 kJ**.'  ->  'The heat required is **3.32 kJ**.'
+```
+
+`CP_PARAMS` declares `@domain T_lo=298..1500 K`, and the template's liquid branch drew
+`T1 = uniform(280.0, 300.0)`, reaching 281.67 K — the polynomial integrated 16 K below the
+interval it was fitted over, on 27 of 300 seeds. Raised to `uniform(298.15, 318.0)`:
+minimum T1 **280.75 → 298.49 K**, seeds below the floor **27 → 0**. Less heat on those
+seeds, because the interval no longer extends below 298 K.
+
+**Question, answer and solution move together here**, unlike tranche 1's
+`statically_indeterminate` pair where the question moved and the answer did not. A changed
+integration bound is used by the arithmetic; a restated modulus need not be. These 31
+instances need **both** re-inference and re-scoring.
+
+**The span was kept ~20 K wide** rather than clipped to [298.15, 300.0]. Distinct
+questions **300 → 300**. Collapsing a 20 K draw to 1.85 K would have shrunk the answer
+space, which `checks/t6_distribution` calls a downgrade rather than a fix — so the obvious
+minimal edit was the wrong one.
+
+## The 23 tags that moved nothing
+
+18 PubChem citations and 5 wood residuals were applied in the same tranche and appear
+**nowhere** in the diff. That is the evidence they are comment-only: had any of them
+disturbed a value, this dump is where it would show, across 45,000 instances.
+
+## Regression
+
+Identical to baseline on every gate: T1 29, T2 0, T4 0, T5 66, T7 83, T8 0, T6 142,
+`phase5_contract_scan` 150/150, `cross_pair` PASS, `audit_3_8` 80/80.
+
+The consumer-domain ratchet moved **2 excursions / 2 registered → 1 / 1**. It ratchets in
+both directions — a listed excursion that no longer occurs is a failure — so it was the
+suite, after the fix, that said to remove the `CP_PARAMS` line from `domain_findings.txt`.
+The removal followed the evidence rather than accompanying the change.
