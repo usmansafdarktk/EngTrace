@@ -36,7 +36,7 @@ Unit conventions:
 # @kind: mathematical
 # @units: 1
 # @domain: none (quantiles of the standard normal; no physical condition)
-# [DERIVED] z_p = statistics.NormalDist().inv_cdf(p), rounded to 4 dp. Re-derived, not
+# [DERIVED] z_p = statistics.NormalDist().inv_cdf(p), rounded to 4 dp. Re-derived, not recompute=normal_quantile
 #   looked up: all 6 entries are reproduced exactly by the stdlib at 4 dp (the patch
 #   script asserts it, and tests/constants_integrity does the same on every run). The
 #   Montgomery and H&L tables named below are a cross-reference, not the source.
@@ -293,7 +293,7 @@ LINE_DEMAND_PER_SHIFT = (100, 800)         # units per 8-hour shift
 
 # ----------------------------------------------------------------------------
 # Factors for Constructing Variables Control Charts
-# [DERIVED] every column from its definition by tests/constants_integrity/control_chart_factors.py:
+# [DERIVED] every column from its definition by tests/constants_integrity/control_chart_factors.py: by=control_chart_factors
 #   c4 in closed form and the A2/A3/B3/B4 limit formulas from docs/references/industrial/nist_sematech_pmc32.htm and pmc321.htm; d2, d3 as the mean and sd of the relative range.
 #   C3.7 corrected 29 last digits the transcription below carried (the table it was
 #   copied from computes from rounded intermediates); the module compares all 384 cells.

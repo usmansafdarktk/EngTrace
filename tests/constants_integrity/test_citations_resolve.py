@@ -555,6 +555,80 @@ def _artefact_token(full, kv, ext):
     return None
 
 
+def _rc_nu_from_tsv(ns, kv, refs):
+    """nu = mu/rho at one row of one NIST isobar."""
+    path = os.path.join(refs, kv['file'])
+    mu, e1 = _tsv(path, kv['T'], 'Viscosity (Pa*s)')
+    rho, e2 = _tsv(path, kv['T'], 'Density (kg/m3)')
+    if mu is None or rho is None:
+        return None, e1 or e2
+    return mu / rho, None
+
+
+def _rc_g_ft_from_codata(ns, kv, refs):
+    """g_n / (m per ft). The foot is exactly 0.3048 m by definition (SP 811 p.61)."""
+    g, err = _codata(os.path.join(refs, 'codata_2022', 'allascii.txt'),
+                     'standard acceleration of gravity')
+    if g is None:
+        return None, err
+    return g / 0.3048, None
+
+
+def _rc_normal_quantile(ns, kv, refs):
+    """z_p = NormalDist().inv_cdf(p) for every key of the table."""
+    from statistics import NormalDist
+    tbl = ns.get(kv['table'])
+    if not isinstance(tbl, dict):
+        return None, f'{kv["table"]} is not a dict'
+    bad = [f'{p}: {v} != {round(NormalDist().inv_cdf(p), 4)}'
+           for p, v in tbl.items() if round(NormalDist().inv_cdf(p), 4) != v]
+    return (None, '; '.join(bad)) if bad else (len(tbl), None)
+
+
+def _rc_atom_balance(ns, kv, refs):
+    """Every reaction balances, counted from the species keys themselves."""
+    def atoms(sp):
+        out = {}
+        for el, n in re.findall(r'([A-Z][a-z]?)(\d*)', sp.split('(')[0]):
+            if el:
+                out[el] = out.get(el, 0) + (int(n) if n else 1)
+        return out
+    rs = ns.get(kv['table'])
+    if not isinstance(rs, list):
+        return None, f'{kv["table"]} is not a list of reactions'
+    bad = []
+    for r in rs:
+        L, R = {}, {}
+        for side, acc in ((r.get('reactants', {}), L), (r.get('products', {}), R)):
+            for sp, coef in side.items():
+                for el, n in atoms(sp).items():
+                    acc[el] = acc.get(el, 0) + n * coef
+        for el in set(L) | set(R):
+            if abs(L.get(el, 0) - R.get(el, 0)) > 1e-9:
+                bad.append(f'{r.get("name", "?")}: {el} {L.get(el, 0)} vs {R.get(el, 0)}')
+    return (None, '; '.join(bad)) if bad else (len(rs), None)
+
+
+def _rc_monatomic_cp(ns, kv, refs):
+    """A monatomic ideal gas has Cp/R = 5/2 exactly, and no temperature terms."""
+    row = (ns.get(kv['table']) or {}).get(kv['row'])
+    if not isinstance(row, dict):
+        return None, f'{kv["table"]}[{kv.get("row")!r}] is not a row'
+    if row.get('A') != 2.5 or any(row.get(k) for k in ('B', 'C', 'D')):
+        return None, f'{row} is not 2.5 with B=C=D=0'
+    return row['A'], None
+
+
+#: [DERIVED] recomputations this resolver RUNS. A tag names one with recompute=.
+RECOMPUTE = {
+    'nu_from_tsv': _rc_nu_from_tsv,
+    'g_ft_from_codata': _rc_g_ft_from_codata,
+    'normal_quantile': _rc_normal_quantile,
+    'atom_balance': _rc_atom_balance,
+    'monatomic_cp': _rc_monatomic_cp,
+}
+
+
 def _xlsx_whole_table(path, table, kv):
     """(cells checked, [disagreements], error) - every leaf of a nested dict table
     against its cell in an .xlsx, one header block per row sub-dict."""
@@ -711,7 +785,7 @@ def check_source(branch, src, refs=REFS, manifest=None, kinds=None, register=Non
     # and a [DERIVED] tag is counted as stated and never recomputed.
     counts = dict(tags=0, resolved=0, locator_only=0, unresolvable_from_clone=0,
                   legacy=0, stated=0, resolved_cas=0, derived_unexecuted=0,
-                  tol_unsized=0)
+                  tol_unsized=0, derived_recomputed=0, derived_elsewhere=0)
     failures, legacy = [], []
     hashed = {}
     # §C1.2 requires both residual classes to be IN the residual register; R6 never
@@ -759,7 +833,33 @@ def check_source(branch, src, refs=REFS, manifest=None, kinds=None, register=Non
             else:
                 counts['stated'] += 1
                 if cls == 'DERIVED':
-                    counts['derived_unexecuted'] += 1
+                    dkv = {m.group(1): (m.group(3) if m.group(3) is not None else m.group(2))
+                           for m in KV_RE.finditer(payload)}
+                    dkv.setdefault('table', tag['table'])
+                    if tag.get('row') is not None:
+                        dkv.setdefault('row', tag['row'])
+                    name = dkv.get('recompute')
+                    if name and name not in RECOMPUTE:
+                        failures.append(f'R6 {where}: recompute={name!r} is not a '
+                                        f'derivation this resolver knows '
+                                        f'({sorted(RECOMPUTE)})')
+                    elif name:
+                        got, derr = RECOMPUTE[name](ns, dkv, refs)
+                        if derr:
+                            failures.append(f'R6 {where}: recompute={name} disagrees with '
+                                            f'the table: {derr}')
+                        else:
+                            counts['derived_recomputed'] += 1
+                    elif dkv.get('by'):
+                        mod = dkv['by']
+                        try:
+                            __import__(f'tests.constants_integrity.{mod}')
+                            counts['derived_elsewhere'] += 1
+                        except ImportError as exc:
+                            failures.append(f'R6 {where}: by={mod!r} names no importable '
+                                            f'checker ({exc})')
+                    else:
+                        counts['derived_unexecuted'] += 1
                 if cls in ('KNOWN-DEFECTIVE', 'UNVERIFIED') and tag['table'] not in reg:
                     failures.append(
                         f'R6 {where}: [{cls}] but {tag["table"]} is named nowhere in the '
@@ -950,7 +1050,7 @@ def run(verbose=False):
     failures += p4_check()
     total = dict(tags=0, resolved=0, locator_only=0, unresolvable_from_clone=0,
                  legacy=0, stated=0, resolved_cas=0, derived_unexecuted=0,
-                 tol_unsized=0)
+                 tol_unsized=0, derived_recomputed=0, derived_elsewhere=0)
     legacy_all = []
     for branch in BRANCHES:
         bsrc = open(os.path.join(BRANCHES_DIR, branch, 'constants.py'),
@@ -976,9 +1076,10 @@ def run(verbose=False):
     print(f"  of the {total['resolved']} resolved, {total['resolved_cas']} are C2-form CAS "
           f"tags whose check is the CAS number, not the value: "
           f"{total['resolved'] - total['resolved_cas']} value comparisons (Reviewer G F-3)")
-    print(f"  {total['derived_unexecuted']} [DERIVED] tags are counted as stated and NEVER "
-          f"RECOMPUTED by this resolver - the UNEXECUTED class §C1.2 promises does not "
-          f"exist yet (Reviewer G F-4)")
+    print(f"  [DERIVED]: {total['derived_recomputed']} RECOMPUTED here, "
+          f"{total['derived_elsewhere']} recomputed by a named checker, "
+          f"{total['derived_unexecuted']} UNEXECUTED - nothing recomputes them "
+          f"(Reviewer G F-4; C3.5 item 6)")
     print(f"  {total['tol_unsized']} tol= tags carry basis=condition, which this resolver "
           f"CANNOT size: it checks that the tag declares an offset, never that the "
           f"tolerance follows from one (D-074, C3.5 item 5)")

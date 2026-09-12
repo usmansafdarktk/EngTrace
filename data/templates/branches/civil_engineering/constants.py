@@ -25,7 +25,7 @@ GRAVITY_M_S2 = 9.81                  # standard gravity, m/s^2
 # @kind: defined
 # @units: ft/s^2
 # @domain: none (a defined standard value, not a measurement at a condition)
-# [DERIVED] g_n / (m per ft) = 9.80665 / 0.3048 = 32.1740, which is 32.2 at 3 s.f.
+# [DERIVED] g_n / (m per ft) = 9.80665 / 0.3048 = 32.1740, which is 32.2 at 3 s.f. recompute=g_ft_from_codata
 #   g_n: codata_2022/allascii.txt "standard acceleration of gravity" (exact); the foot:
 #   nist_sp811/nistspecialpublication811e2008.pdf p.61 ("foot (ft) ... meter (m) ... 3.048 E −01").
 #   Not an [ON-DISK] scale= relation: the rounding is taken AFTER the conversion, and scale=
@@ -59,7 +59,7 @@ WATER_DENSITY_KG_M3 = 998.2          # rho at 20 C
 # @kind: property
 # @units: m^2/s
 # @domain: T=293.15 K, p=101.325 kPa
-# [DERIVED] nu = mu/rho at the 293.15 K, 101.325 kPa this table declares:
+# [DERIVED] nu = mu/rho at the 293.15 K, 101.325 kPa this table declares: recompute=nu_from_tsv file=nist_fluid_properties/water_C7732185_isobar_1atm.tsv T=293.15
 #   0.0010016 Pa*s / 998.21 kg/m3 = 1.0033961e-06 m^2/s, i.e. 1.003e-6 at 4 s.f. Both operands are
 #   one row of nist_fluid_properties/water_C7732185_isobar_1atm.tsv at T=293.15,
 #   columns "Viscosity (Pa*s)" and "Density (kg/m3)". No artefact prints this quotient,

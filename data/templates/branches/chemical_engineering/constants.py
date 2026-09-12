@@ -592,7 +592,7 @@ HEATS_OF_FORMATION = {
 # @kind: mathematical
 # @units: reactants=1, products=1
 # @domain: none (stoichiometry; no temperature or pressure condition)
-# [DERIVED] every reaction balances. The patch script counts atoms on both sides of all
+# [DERIVED] every reaction balances. The patch script counts atoms on both sides of all recompute=atom_balance
 #   4 reactions from the species keys themselves and refuses to write if any differs.
 REACTIONS = [
     {
@@ -740,11 +740,11 @@ CP_PARAMS = {
     # [ON-DISK] NIST 7647-01-0  Cp298 29.14 vs NIST 29.14
     "HCl(g)": {"A": 3.156, "B": 0.623E-3, "C": 0.0E-6, "D": 0.151E5},
     # Monatomic gases - exact, Cp = 5R/2, no source required
-    # [DERIVED] exact (monatomic ideal gas)
+    # [DERIVED] exact (monatomic ideal gas) recompute=monatomic_cp
     "He(g)": {"A": 2.5, "B": 0.0E-3, "C": 0.0E-6, "D": 0.0E5},
-    # [DERIVED] exact (monatomic ideal gas)
+    # [DERIVED] exact (monatomic ideal gas) recompute=monatomic_cp
     "Ar(g)": {"A": 2.5, "B": 0.0E-3, "C": 0.0E-6, "D": 0.0E5},
-    # [DERIVED] exact (monatomic ideal gas)
+    # [DERIVED] exact (monatomic ideal gas) recompute=monatomic_cp
     "Ne(g)": {"A": 2.5, "B": 0.0E-3, "C": 0.0E-6, "D": 0.0E5},
     # [DERIVED] mixture, no NIST entry  verified against the mole-weighted N2/O2/Ar average to 0.36%
     "Air(g)": {"A": 3.355, "B": 0.575E-3, "C": 0.0E-6, "D": -0.016E5},
@@ -909,7 +909,7 @@ CP_COMBUSTION_VALID_T_MAX = 3000.0
 # @kind: mathematical
 # @units: reactants=1, products=1
 # @domain: none (stoichiometry with theoretical air)
-# [DERIVED] all 11 balance, checked atom by atom from the species keys, and every one
+# [DERIVED] all 11 balance, checked atom by atom from the species keys, and every one recompute=atom_balance
 #   carries theoretical air at N2/O2 = 3.76.
 COMBUSTION_REACTIONS = [
     {
