@@ -182,6 +182,55 @@ either way: if the method is new, **Reviewer F's gate has to be scoped to what i
 than *"does it replicate the original?"*. Commissioning a replication of an unrecoverable method
 produces a review that cannot file, which is what R6 exists to prevent.
 
+**Searched exhaustively. The harness never existed — and the method survives anyway.**
+
+The archaeology is done, so do not repeat it. Exactly **two commits** have ever touched
+`template_inventory.csv`: `9105317` added it, and `e8302c6` (Phase 4 close-out) inserted two
+columns. `git show --stat 9105317` contains **four documentation files and no `.py` at all**.
+Pickaxe searches on the distinctive column names (`pct_step_values_recoverable`,
+`blind_guess_floor`) return only prose. There is no deleted blob, no dangling object, no
+untracked script, and the bare filenames in `.gitignore` were **never tracked in any branch**.
+
+The cause is in the commissioning prompt: `01-template-structure-audit.md:146` says *"Stay on
+`master`. Do not create branches or commits."* The audit ran read-only, in session, and its
+measurement code was throwaway. **Nothing was lost; nothing was ever saved.**
+
+**The method, however, is written down twice**, and the second is far better than the first:
+
+1. `template_audit_report.md:507–514` — "Appendix — method": the AST sweep, the `sys.settrace`
+   capture, the EXACT/ROUNDED/SCALED/MISSING matcher, with sample sizes.
+2. **`phase0_baseline.md:289–348`** — the Phase 0 adversary **independently re-implemented** those
+   measurements with self-contained runnable snippets, and **matched the audit exactly** on
+   per-branch inline interpolations (chemical **65**, civil **37**, mechanical **89**) and to
+   **−1.0%** on step tokens (17,002 against 17,177).
+
+**So D6.1 is assembly, not invention, and it is cheaper than a rebuild rather than dearer.** Every
+piece already exists: `core.py:53 discover()`, `core.py:181 generate(capture=True)` with its
+tracer, `core.py:106 _walk_values`, `core.py:278 match_value()`, and
+`checks/t5_binding.py:43 _is_bound()`.
+
+**Calibrate against Phase 0 before publishing any number.** If the harness does not reproduce
+65/37/89 and ~17,002, the method is not continuous with the original, and divergence from the
+2026-09-05 CSV cannot be attributed to six phases of template change rather than to method drift.
+Calibration is the gate on the re-audit itself.
+
+**Split the CSV's provenance per column**, and say so in D6.3:
+
+| columns | treatment |
+|---|---|
+| `n_inline_computed`, `pct_*_recoverable`, `n_steps`, `has_instance_branching` | **regenerate** — mechanically measurable |
+| `n_milestone_candidates` | regenerate, but it is a **declared proxy** (report `:497`), not a count |
+| `difficulty`, `est_effort`, `notes` | **carry forward**, marked inherited-not-remeasured |
+| `answer_type`, `unit_system` | hybrid: hand-verified for ~90 rows, automated for the rest (`:499`) |
+| `instrumentation_class` | a **re-classification under a restated rule** (D > C > B > A, report `:30`) — *not* a re-measurement, because which rows the five human branch audits overrode **was never recorded** |
+
+**A defect in the existing CSV, found in passing and needing a decision.** Only **5 rows** carry
+`blind_guess_floor` / `surface_model_heldout`, and **3 of the 5 have no recorded derivation
+anywhere**. `template_levenspiel_plot_interpretation` carries **1.0000 / 1.0000** — a blind-guess
+floor of 1.0 for an `array`-answer template is not a coherent statistic. Reviewer B's report
+(`reviews/phase4_reviewer_b_pedagogy.md:37–61`) only ever derived the two `discrete_time_signals`
+rows. Decide whether the column is repaired, emptied, or kept with its provenance stated.
+
 ### Corpus baseline at `444b8bf`
 
 ```
