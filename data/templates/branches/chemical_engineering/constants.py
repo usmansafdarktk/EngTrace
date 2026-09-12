@@ -283,7 +283,21 @@ REAL_FLUID_DATA = {
     # [ON-DISK] nist_fluid_properties/r123_C306832_saturation_298.15K.tsv @ T=298.15 col="Volume (v, m3/kg)" field=['v_g'] precision=4sf
     #   NIST 0.17032 at 298.15 K (0.091354 MPa). Corrected at C3 from 0.1810, which was +6.27% from it.
     "Refrigerant-123 (R-123, Dichlorotrifluoroethane)": {"temp_C": 25, "v_f": 0.000683, "v_g": 0.1703},
-    # [UNVERIFIED] a blend, and not in the NIST fluid database on disk (36 pure fluids); its saturation volumes need a mixture source or a replacement species - the repo owner's call (D-033, C3.5).
+    # [UNVERIFIED] a BLEND, and neither it nor its components are on disk. The NIST fluid
+    #   database here holds 39 PURE fluids (it held 36 before this phase added nonane,
+    #   decane and dodecane), and R-410A is not among them - nor is R-32 (difluoromethane)
+    #   or R-125 (pentafluoroethane), so the blend cannot even be reconstructed from its
+    #   components. The only refrigerants on disk are R-11, R-12, R-22, R-123 and R-134a.
+    #   NOT SUBSTITUTED, for two independent reasons. R-22 is the nearest on-disk
+    #   refrigerant - at 298.15 K it is P=1.0439 MPa, v_f=0.00083987, v_g=0.022608
+    #   (nist_fluid_properties/r22_C75456_saturation_298.15K.tsv) - and this row is
+    #   +9.78% from its v_f and -33.21% from its v_g. Substituting would replace the
+    #   row's VALUES, not relabel it, which is changing what the row says rather than
+    #   sourcing it. And REAL_FLUID_DATA already carries an R-22 row, so it would put one
+    #   fluid in the table twice under two keys - the defect just recorded for
+    #   Tetrabromoethane / Acetylene Tetrabromide.
+    #   The committed saturation volumes are therefore unsourced: no artefact on disk
+    #   states them or contradicts them. C3.5 substance defect (D-033).
     "Refrigerant-410A (R-410A, blend of difluoromethane and pentafluoroethane)": {"temp_C": 25, "v_f": 0.000922, "v_g": 0.0151},
     
     #  Organic Solvents (Rankine Fluids) 
@@ -476,6 +490,16 @@ SUBSTANCES_FOR_VAPORIZATION = [
 
     # Inorganic & Elemental Substances
     {"name": "Ammonia", "delta_H_vap": 23.3},
+    # [UNVERIFIED] no artefact on disk states a dHvap for mercury, and none can be derived.
+    #   nist_webbook_species/mercury_C7439976_phase_change.html carries T boil (629.81 K,
+    #   Marsh 1987), T fus, T triple and one Antoine row - and the strings "Enthalpy",
+    #   "vaporization", "vapH" and "Hvap" do not occur anywhere in the file. Verified by
+    #   reading it, not inferred from the section headings.
+    #   The dHvap = H(v) - H(l) derivation that reaches the other eleven rows of this table
+    #   cannot reach this one either: there is no mercury file in nist_fluid_properties at
+    #   all, among 39 pure fluids. So 59.11 kJ/mol is neither supported nor
+    #   contradicted - it is unsourced, and no further WebBook fetch would change that.
+    #   C3.5 residual.
     {"name": "Mercury", "delta_H_vap": 59.11},
     {"name": "Nitrogen", "delta_H_vap": 5.57},
     {"name": "Oxygen", "delta_H_vap": 6.82},
