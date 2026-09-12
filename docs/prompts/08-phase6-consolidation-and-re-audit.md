@@ -7,6 +7,14 @@ Track A Phases 0–5 and Track B Phases C1–C3 are complete and merged. `master
 `444b8bf`. **Sync point S2 has landed**: the constants are re-grounded, so the item pool can
 now be regenerated exactly once. That is what this phase is for.
 
+**The repo owner has decided that the testset is rebuilt, inference re-run and evaluation
+re-run.** That closes D-003 — the open decision this series has carried since 2026-09-05 — and
+adds **D6.12**, a deliverable the spec does not have. It also makes one ordering rule binding
+rather than advisory: **regenerate the testset only after D6.7 and D6.11 merge.** Both change
+emitted text. Build the pool before them and 11 models are inferred against items that are stale
+on arrival. Read §"D-003 is closed by decision" before planning the phase — the generator is in
+worse shape than "absent", and two of its five branches have never had one.
+
 **Re-derive every number in this brief at whatever `master` is when you start.** Every prior
 brief in this series was corrected by what its own phase measured, and this one already
 contains two corrections to the spec it implements (§"Two spec numbers that do not survive
@@ -72,6 +80,7 @@ found claims that its own artefacts do not carry.
 | D6.8 | an answer-span **shape** assertion | rewriting spans |
 | D6.9–D6.10 | *decide and record* — a mixed `AnswerSpec`, and the 8 undecidable `symbolic` templates | forcing either binding green |
 | D6.11 | per-item and per-part unit declarations | a second unit scheme — C1.4 already built one |
+| **D6.12** (new) | rebuild the testset generator — seeded, uniform, all five branches — and regenerate **after** D6.7/D6.11 land | running inference or evaluation; those follow this phase |
 
 **D6.9 and D6.10 are decisions, not fixes.** Both are measured dead ends: the mixed-spec
 templates produce 544 and 1,650 false accepts in 2,450 pairs from *whole-span cross-pairing
@@ -233,7 +242,7 @@ dangerous one.
 **Do not assume these sum.** Templates appear in more than one tranche, and the union is not
 the total. Compute the union from the named templates, and publish the list.
 
-### D-003 is answerable now — and the answer closes it
+### D-003 is closed by decision — and what replaces it is D6.12
 
 D-003 has been carried open since 2026-09-05 across Prompts 05, 06 and 07: *do the raw
 `inference_results/` generations still exist?* It gates any corrected results table.
@@ -247,15 +256,81 @@ Measured at `444b8bf`:
 - The only `*results*.json` anywhere is `templates_annotation/annotation_app/src/llm_results.json`,
   which belongs to the annotation pilot.
 
-**So the free re-score is gone**, and with it the framing of D-003's second branch. But the
-conclusion is *better* than the spec's "budget decision", not worse: since the item pool must be
-regenerated anyway at S2, and the testset is absent, **there is no stale artefact to
-selectively correct**. Re-inference runs against a regenerated pool either way. **Close D-003
-with that finding as D-078**, and state in D6.4 that the 8.9%/re-score/re-inference split is a
-statement about the *published paper's* numbers, not about a recoverable local artefact.
+**The repo owner has decided: the testset is rebuilt, inference is re-run, and evaluation is
+re-run.** So D-003's question — can we recover the generations for a free re-score? — is
+**moot by decision, not by evidence**. Close it as **D-078** recording both: the artefacts are
+absent *and* recovery is not attempted, because everything downstream is being regenerated.
 
-Verify all four paths yourself before writing the decision. An absent directory is exactly the
-kind of thing a `.gitignore` and a fresh clone can disagree about, and I checked one machine.
+**D6.4 changes character accordingly.** The re-score / re-inference split stops being a budget
+question and becomes an *explanatory* one: it is the record of what the six phases did to the
+corpus, and it is how the paper explains why published numbers changed. Keep the distinction —
+especially the **hidden-constant** direction, where the question is byte-identical and only the
+gold answer moved — but state it as history, not as a recovery plan.
+
+**D6.12 — regenerate the testset (new; SPEC-CHANGE 24).** The spec has no deliverable for this
+because it assumed the pool already existed. It does not, and the machinery to rebuild it is in
+worse shape than "absent". Measured at `444b8bf`:
+
+**1. The generator covers three branches of five.** 20 template modules carry a
+`main()` writing `testset/<branch>/<domain>/<area>.jsonl`:
+
+| branch | modules with a generator | template functions |
+|---|---:|---:|
+| chemical | 7 | 30 |
+| electrical | 7 | 30 |
+| mechanical | 6 | 30 |
+| **civil** | **0** of 11 | 30 |
+| **industrial** | **0** of 11 | 30 |
+
+Those 20 modules hold **exactly 90 template functions** — which is precisely the published pool's
+*"1,350 items = 90 templates × 15 seeds"*. **Civil and industrial were never in the published
+testset.** They were authored later and have no generator at all. So "regenerate the testset"
+over 150 templates is a **67% scope expansion into two branches the published results have never
+covered**, not a like-for-like rebuild. That is a scoping decision with paper consequences and it
+belongs to the repo owner — surface it before building anything.
+
+**2. `regenerate_testset.py` is gitignored and absent.** `.gitignore` line 39 lists it, along
+with `template_loader.py`, `verify_fixes.py`, `locate_fixed_templates.py` and
+`verify_manual_map.py`. None is on disk. Whatever orchestrated the published build is not
+recoverable from this repository. **`testset` itself is gitignored (line 30)**, so the benchmark's
+actual items have never been in version control — worth a sentence in the paper's reproducibility
+statement regardless of what this phase builds.
+
+**3. The generator is not reproducible, in all 20 modules.** Every one draws its per-item seed
+from an **unseeded** global RNG and then shuffles:
+
+```python
+for _ in range(50):
+    seed = random.randint(1_000_000_000, 4_000_000_000)   # outer RNG never seeded
+    random.seed(seed)
+```
+
+Audited across all 20: `unseeded_draw` present in 20, outer `random.seed(<fixed>)` in **0**. An
+individual item is reproducible *after the fact* because the seed is stored in its record, but
+**the set is not** — every run emits a different testset. Phase 2's deliverable was *"seed every
+generator"*; it seeded the templates, and nothing ever seeded the thing that calls them.
+**Fix this before regenerating**, or the new testset is exactly as unreproducible as the one it
+replaces, and no later phase can diff against it.
+
+**4. The instance counts are incoherent.** `for _ in range(N)` is **50** in sixteen modules,
+**200** in `mole_balances` and `harmonically_excited_vibrations`, and **3** in `electrostatics`
+and `magnetostatics`. Total emitted: **5,615 records**, against a published pool of 1,350 — so
+**the committed generators are not what produced the published testset**. The per-template
+imbalance is 3 to 200, giving `mole_balances` 1,000 records and `magnetostatics` 3. Any aggregate
+over that set is dominated by two modules. **Choose one instances-per-template figure, state it,
+and apply it uniformly** — or state the stratification deliberately.
+
+**5. Build it on `discover()`, not on 22 new `main()` blocks.**
+[`tests/template_integrity/core.py:53`](../../tests/template_integrity/core.py#L53) already
+enumerates all 150 templates across all five branches deterministically; T1–T8 and both instance
+dumps use it. Writing 22 more hand-rolled `main()` blocks would reproduce defects 3 and 4 in the
+two branches that do not yet have them.
+
+**Ordering — this is the part that costs money if it is wrong.** D6.7 changes emitted text on 14
+templates and D6.11 changes per-part unit declarations. **Regenerate the testset only after those
+land.** A testset built before them is stale the moment they merge, and inference then runs twice
+across 11 models — the exact waste sync point S2 was created to prevent. Sequence: corpus changes
+→ audit → testset → inference → evaluation.
 
 ### D6.5 — "promote to CI" is a build task, and it collides with the binaries
 
@@ -381,6 +456,13 @@ the gate exactly as a CONFIRMED finding does.
 - [ ] D6.8 answer-span shape assertion, its bound **re-measured** rather than inherited
 - [ ] D6.9 and D6.10 **decided and recorded**, not forced green
 - [ ] D6.11 per-item and per-part units, importing C1.4's vocabulary, predicate published
+- [ ] **D6.12 testset generator rebuilt on `discover()`** — seeded reproducibly end to end, one
+      stated instances-per-template figure applied uniformly, all five branches; the same seed
+      reproduces the same set, **demonstrated by two runs diffed**
+- [ ] **D6.12 regenerated after D6.7 and D6.11 merged**, not before; item count and composition
+      stated against the published 1,350
+- [ ] The civil/industrial scope expansion (90 → 150 templates) **put to the repo owner as a
+      decision**, not assumed
 - [ ] T1–T8, contract scan, `derive_bindings`, `cross_pair`, `score`, `audit_3_8` — no
       regression, **measured**; **T6 baseline not regenerated**
 - [ ] T6's 142 given a decision with an owner, not carried forward again
