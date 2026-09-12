@@ -1,6 +1,7 @@
 import random
 import math
 from decimal import Decimal, ROUND_FLOOR, ROUND_HALF_UP
+from data.templates.branches._emission import signed_term, joined_terms, paren_neg
 
 
 # Verifier tolerances (D1.3), keyed by template id. Relative; the re-derived
@@ -319,14 +320,15 @@ def template_mean_variance():
     # this template's `=` lines invisible to the closure check.
     mean_subs = " + ".join(f"({v})*({q:.{precision}f})"
                            for v, q in zip(values, probs))
-    mean_terms = " + ".join(f"{v * q:.{precision}f}"
-                            for v, q in zip(vals, probs))
+    mean_terms = joined_terms([v * q for v, q in zip(vals, probs)],
+                              ("{:." + str(precision) + "f}").format)
 
-    dev_line = "; ".join(f"({v} - {mean_d:.{precision}f}) = {d:.{precision}f}"
+    dev_line = "; ".join(f"({v} - {paren_neg(mean_d, ('{:.' + str(precision) + 'f}').format)}) = {d:.{precision}f}"
                          for v, d in zip(values, devs))
     var_devs = " + ".join(f"({d:.{precision}f})^2*({q:.{precision}f})"
                           for d, q in zip(devs, probs))
-    var_terms = " + ".join(f"{t:.{_TERM_DP}f}" for t in shown_terms)
+    var_terms = joined_terms(list(shown_terms),
+                             ("{:." + str(_TERM_DP) + "f}").format)
 
     solution = (
         f"**Given:**\n"

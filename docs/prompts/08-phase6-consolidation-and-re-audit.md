@@ -421,6 +421,46 @@ Also printed, **not gated**: `degenerate_product_derivation` on 3 templates
 do not leave it printed-and-unread — *that* is Phase 5's named failure (`cross_pair` printed
 `false rejects 56` on every run and nobody put it in a claim).
 
+### D6.7 as executed — four fix shapes, not one, and a limit on the detector
+
+**The defect has one name and four shapes.** The spec reads as though promoting two helpers and
+fixing fourteen sites is a single mechanical substitution. It is not. Applying `signed_term`
+everywhere would have been wrong in two of the four:
+
+| shape | what it looks like | fix |
+|---|---|---|
+| **(a)** literal signed interpolation | `f"...*t + {phase_deg} deg)"` | `signed_term` |
+| **(b)** `" + ".join` over signed values | `" + ".join(f"{v*q:.2f}" ...)` | `joined_terms` |
+| **(c)** pre-rendered signed string | `phi_str = f"{phi_deg} deg"`, then `+ {phi_str}` | restructure at CONSTRUCTION, not at the emission site |
+| **(d)** operand under an operator | `sqrt({a}^2 + {b}^2)`, `{B0} + {omega} * {B1}` | `paren_neg` — the `+` is real addition |
+
+**THE DETECTOR CANNOT TELL YOU THE FIX IS CORRECT — only that the defect is gone.** Measured:
+on `coulombs_law`, `signed_term` turns `sqrt(1^2 + -5^2 + -6^2)` into `sqrt(1^2 - 5^2 - 6^2)`,
+which is a **different and false formula** — a sum of squares becomes a subtraction of them — and
+`phase5_contract_scan` reports that version **clean**. A green scan would have shipped falsified
+gold. Shape (d) exists because of this. Check the arithmetic by reading, then use the scan to
+confirm the sign is gone; never the reverse.
+
+**Every fix must be a no-op for positive values.** `signed_term(45, "deg")` is `"+ 45 deg"`, so
+`*t {phi_str}` renders byte-identically to `*t + 45 deg` and only negatives move. That property is
+what keeps the item-pool movement proportional to the defect, and it is worth asserting per site.
+
+**`paren_neg` also repairs something the detector structurally cannot see:** a negative FIRST
+operand prints `sqrt(-1^2 + ...)`, which reads as −(1²) rather than (−1)². No doubled sign, and
+still wrong.
+
+**Scope each site to its template before editing.** Two near-misses: `fluid_kinematics.py`'s
+`{A}xt + {B}y^2` lines belong to `fluid_particle_acceleration`, which is **not** among the 14;
+and changing `waves_and_phasors.py`'s `phi_str` would have corrupted `time_to_phasor`'s
+*"The initial phase is {phi_str}"* into *"is + 45 deg"*. Grep every use of a variable before
+changing what it renders.
+
+**Three more hand-rolled sign helpers are still in the corpus** — `discrete_time_signals.py`'s
+`C_str` (a `f"+ {C}" if C > 0 else f"- {abs(C)}"` inline) and `fmt` lambda, and
+`waves_and_phasors.py`'s own `_signed_term`/`_rect_str`, now redundant beside the shared module.
+They are exactly the "nine chances to write `+ {value}` again" the promotion exists to end.
+Retiring them is a follow-on, not part of the flagged defect.
+
 ### Two spec numbers that do not survive contact
 
 **D6.8's "199 characters" — re-measured, and the spec is right.** The figure does not appear in

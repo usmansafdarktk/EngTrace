@@ -1,5 +1,6 @@
 import random
 import math
+from data.templates.branches._emission import signed_term, joined_terms
 
 
 # Template 1 (Easy)
@@ -52,7 +53,7 @@ def template_signal_operations():
         explanation = (
             f"The operation is a time shift, {output_var}[n] = {op_str_symbolic}.\n"
             f"This corresponds to a shift of the sequence to the {direction} by {abs(n0)} sample(s).\n"
-            f"The value at any original index 'k' is moved to a new index 'k + {n0}'."
+            f"The value at any original index 'k' is moved to a new index 'k {signed_term(n0)}'."
         )
 
     else: # operation == 'reversal'
@@ -196,7 +197,7 @@ def template_system_properties_memory_causality():
         elif form == 'affine':
             gain = random.randint(2, 9)
             offset = random.randint(1, 10)
-            equation_str = f"{gain} * x[n] + {offset}"
+            equation_str = f"{gain} * x[n] {signed_term(offset)}"
             memory_reason = f"The output y[n] at time 'n' is a scaled and shifted version of the input x[n] at the exact same time 'n'. No past or future values of the input are needed."
         else: # scaled_by_n
             equation_str = f"n * x[n]"
@@ -514,14 +515,14 @@ def template_system_property_linearity():
         y2_str = f"x2[n] {C_str}"
         
         # Additivity
-        add_sum_str = f"(x1[n] {C_str}) + (x2[n] {C_str}) = x1[n] + x2[n] + {2*C}"
+        add_sum_str = f"(x1[n] {C_str}) + (x2[n] {C_str}) = x1[n] + x2[n] {signed_term(2*C)}"
         add_y3_str = f"(x3[n]) {C_str} = (x1[n] + x2[n]) {C_str}"
-        add_comparison_str = f"Since x1[n] + x2[n] + {2*C} is not equal to x1[n] + x2[n] {C_str}, the system fails the additivity test."
+        add_comparison_str = f"Since x1[n] + x2[n] {signed_term(2*C)} is not equal to x1[n] + x2[n] {C_str}, the system fails the additivity test."
 
         # Homogeneity
-        hom_ay1_str = f"a * (x1[n] {C_str}) = a*x1[n] + {C}*a"
+        hom_ay1_str = f"a * (x1[n] {C_str}) = a*x1[n] {signed_term(C)}*a"
         hom_ya_str = f"(xa[n]) {C_str} = (a * x1[n]) {C_str}"
-        hom_comparison_str = f"Since a*x1[n] + {C}*a is not equal to a*x1[n] {C_str} (for a != 1), the system fails the homogeneity test."
+        hom_comparison_str = f"Since a*x1[n] {signed_term(C)}*a is not equal to a*x1[n] {C_str} (for a != 1), the system fails the homogeneity test."
 
     elif system_type == 'nonlinear_power':
         is_linear = False
@@ -651,12 +652,12 @@ def template_impulse_response_from_lccde():
             f"We assume the system is causal, so **h[n] = 0 for n < 0**.\n\n"
             f"**For n = 0:**\n"
             f"h[0] {fmt(a1, 'h[-1]')}h[-1] = {b0}*delta[0] {'+ 0' if b1==0 else ' ' + fmt(b1, 'delta[-1]')+'*delta[-1]'}\n"
-            f"h[0] {fmt(a1, '0')}*(0) = {b0}*(1) + {b1}*(0)\n"
+            f"h[0] {fmt(a1, '0')}*(0) = {b0}*(1) {signed_term(b1)}*(0)\n"
             f"**h[0] = {h0}**\n\n"
             
             f"**For n = 1:**\n"
             f"h[1] {fmt(a1, 'h[0]')}h[0] = {b0}*delta[1] {fmt(b1, 'delta[0]')}*delta[0]\n"
-            f"h[1] {fmt(a1, h0)}*({h0}) = {b0}*(0) + {b1}*(1)\n"
+            f"h[1] {fmt(a1, h0)}*({h0}) = {b0}*(0) {signed_term(b1)}*(1)\n"
             f"h[1] = {b1} - ({a1*h0})\n"
             f"**h[1] = {h1}**\n\n"
             
@@ -724,8 +725,8 @@ def template_impulse_response_from_lccde():
             f"**h[0] = {h0}**\n\n"
             f"**For n = 1:**\n"
             f"h[1] {fmt(a1, 'h[0]')}h[0] {fmt(a2, 'h[-1]')}h[-1] = ... {fmt(b1, 'd[0]')}*delta[0] ...\n"
-            f"h[1] {fmt(a1, h0)}*({h0}) {fmt(a2, '0')}*(0) = {b0}*(0) + {b1}*(1)\n"
-            f"h[1] = {b1} - {a1*h0}\n"
+            f"h[1] {fmt(a1, h0)}*({h0}) {fmt(a2, '0')}*(0) = {b0}*(0) {signed_term(b1)}*(1)\n"
+            f"h[1] = {b1} {signed_term(-(a1*h0))}\n"
             f"**h[1] = {h1}**\n\n"
 
             f"**Step 4:** Find the Homogeneous Solution\n"
@@ -738,7 +739,7 @@ def template_impulse_response_from_lccde():
             f"**Step 5:** Use Initial Conditions to Find Coefficients\n"
             f"We use h[0] and h[1] to create a system of two equations:\n"
             f"1) For n=0: h[0] = C1 + C2  =>  {h0} = C1 + C2\n"
-            f"2) For n=1: h[1] = C1*({r1_str}) + C2*({r2_str})  =>  {h1} = {r1_str}*C1 + {r2_str}*C2\n\n"
+            f"2) For n=1: h[1] = C1*({r1_str}) + C2*({r2_str})  =>  {h1} = {r1_str}*C1 {signed_term(float(r2_str))}*C2\n\n"
             f"Solving this system yields:\n"
             f"**C1 = {C1_str}** and **C2 = {C2_str}**\n"
         )
