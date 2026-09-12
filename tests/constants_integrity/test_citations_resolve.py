@@ -587,8 +587,12 @@ def check_source(branch, src, refs=REFS, manifest=None, kinds=None):
     if kinds is None:
         kinds = {t['name']: header_fields(t['header']).get('kind', '').split(' ')[0]
                  for t in numeric_tables(src, ns)}
+    # resolved_cas and derived_unexecuted are DISCLOSURE counters (C3 review, Reviewer G
+    # F-3 and F-4). They do not gate anything; they stop two totals from claiming more
+    # than was checked - a C2-form tag is resolved by CAS IDENTITY and never by a value,
+    # and a [DERIVED] tag is counted as stated and never recomputed.
     counts = dict(tags=0, resolved=0, locator_only=0, unresolvable_from_clone=0,
-                  legacy=0, stated=0)
+                  legacy=0, stated=0, resolved_cas=0, derived_unexecuted=0)
     failures, legacy = [], []
     hashed = {}
 
@@ -622,6 +626,7 @@ def check_source(branch, src, refs=REFS, manifest=None, kinds=None):
             continue
         if cls == 'ON-DISK-C2':
             counts['resolved'] += 1         # resolved by c2_checks, P2
+            counts['resolved_cas'] += 1     # ... which checks the CAS, never the value
             continue
         if cls in ('DERIVED', 'BY-DEFINITION', 'KNOWN-DEFECTIVE', 'UNVERIFIED'):
             payload = tag['body'] or tag['bracket'].partition(':')[2].strip()
@@ -630,6 +635,8 @@ def check_source(branch, src, refs=REFS, manifest=None, kinds=None):
                                 f'{ {"DERIVED": "derivation", "BY-DEFINITION": "definition", "KNOWN-DEFECTIVE": "measured error", "UNVERIFIED": "reason"}[cls] }')
             else:
                 counts['stated'] += 1
+                if cls == 'DERIVED':
+                    counts['derived_unexecuted'] += 1
             continue
         if cls == 'POLICY':
             counts['stated'] += 1
@@ -780,7 +787,7 @@ def run(verbose=False):
     failures += c2_f
     failures += p4_check()
     total = dict(tags=0, resolved=0, locator_only=0, unresolvable_from_clone=0,
-                 legacy=0, stated=0)
+                 legacy=0, stated=0, resolved_cas=0, derived_unexecuted=0)
     legacy_all = []
     for branch in BRANCHES:
         bsrc = open(os.path.join(BRANCHES_DIR, branch, 'constants.py'),
@@ -803,6 +810,12 @@ def run(verbose=False):
           f"branches: {total['resolved']} resolved, {total['locator_only']} locator-only, "
           f"{total['stated']} stated, {total['unresolvable_from_clone']} unresolvable from a "
           f"clone, {total['legacy']} LEGACY (C3.7 worklist)")
+    print(f"  of the {total['resolved']} resolved, {total['resolved_cas']} are C2-form CAS "
+          f"tags whose check is the CAS number, not the value: "
+          f"{total['resolved'] - total['resolved_cas']} value comparisons (Reviewer G F-3)")
+    print(f"  {total['derived_unexecuted']} [DERIVED] tags are counted as stated and NEVER "
+          f"RECOMPUTED by this resolver - the UNEXECUTED class §C1.2 promises does not "
+          f"exist yet (Reviewer G F-4)")
     print('all pass' if not failures else f'{len(failures)} FAILURES')
     return 1 if failures else 0
 
