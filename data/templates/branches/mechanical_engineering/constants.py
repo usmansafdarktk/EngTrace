@@ -525,10 +525,20 @@ MATERIAL_DENSITIES = {
     #   Sugar. No claim is made here that any committed value lies outside FPL.
     #   C3.5 residual.
     "Oak Wood": 750,
-    # [UNVERIFIED] this row is NOT WOOD, so the wood reason it carried does not apply to
-    #   it: cork is a bark tissue and bamboo is a grass, and neither is indexed by the
-    #   USDA Wood Handbook's species tables. A different source is needed, not a better
-    #   reading of this one (C3 review, H (mechanical) F4; C3.5).
+    # [UNVERIFIED] this row is NOT WOOD, so the wood reason it once carried never applied:
+    #   cork is a bark tissue and bamboo is a grass, and neither is indexed by the USDA
+    #   Wood Handbook's species tables (C3 review, H (mechanical) F4).
+    #   SEARCHED EXHAUSTIVELY, AND ABSENT. FPL-GTR-282 scanned in full (546 pages) for
+    #   cork / bamboo / Bambusa / Quercus suber: three hits, every one a false positive and
+    #   none a density - "cork elm" (Ulmus thomasii) p.34, "Corkbark fir" p.378, and
+    #   "bamboo fiber" in a wood-plastic-composite passage p.302. Bambusa and Quercus
+    #   suber return zero. PubChem has no record: a tissue is not a compound with a CID,
+    #   the same reason the polymer rows fail. No other directory under docs/references
+    #   could hold it - they are metal design allowables, thermochemistry, pure-fluid
+    #   tables, gas Lennard-Jones constants, optical indices, steel shapes and sampling
+    #   statistics. The terms and pages are given so the search is re-runnable.
+    #   No substitute value was read from any artefact, so none is written. This row needs
+    #   a materials handbook. C3.5 residual.
     "Cork": 240,
     # [UNVERIFIED] the row names a material FPL indexes by SPECIES and states no
     #   moisture condition, and both are needed before a density can be cited.
@@ -566,10 +576,20 @@ MATERIAL_DENSITIES = {
     #   substitute was found - a different source is needed, not a better reading
     #   of this one. C3.5 residual.
     "Ebony Wood": 1200,  # Sinks in water
-    # [UNVERIFIED] this row is NOT WOOD, so the wood reason it carried does not apply to
-    #   it: cork is a bark tissue and bamboo is a grass, and neither is indexed by the
-    #   USDA Wood Handbook's species tables. A different source is needed, not a better
-    #   reading of this one (C3 review, H (mechanical) F4; C3.5).
+    # [UNVERIFIED] this row is NOT WOOD, so the wood reason it once carried never applied:
+    #   cork is a bark tissue and bamboo is a grass, and neither is indexed by the USDA
+    #   Wood Handbook's species tables (C3 review, H (mechanical) F4).
+    #   SEARCHED EXHAUSTIVELY, AND ABSENT. FPL-GTR-282 scanned in full (546 pages) for
+    #   cork / bamboo / Bambusa / Quercus suber: three hits, every one a false positive and
+    #   none a density - "cork elm" (Ulmus thomasii) p.34, "Corkbark fir" p.378, and
+    #   "bamboo fiber" in a wood-plastic-composite passage p.302. Bambusa and Quercus
+    #   suber return zero. PubChem has no record: a tissue is not a compound with a CID,
+    #   the same reason the polymer rows fail. No other directory under docs/references
+    #   could hold it - they are metal design allowables, thermochemistry, pure-fluid
+    #   tables, gas Lennard-Jones constants, optical indices, steel shapes and sampling
+    #   statistics. The terms and pages are given so the search is re-runnable.
+    #   No substitute value was read from any artefact, so none is written. This row needs
+    #   a materials handbook. C3.5 residual.
     "Bamboo": 300,
     # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
     "Rubber (Natural)": 950,
@@ -777,10 +797,20 @@ MATERIAL_DENSITIES = {
     "Sandstone": 2300,
     # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
     "Limestone": 2500,
-    # [UNVERIFIED] this row is NOT WOOD, so the wood reason it carried does not apply to
-    #   it: cork is a bark tissue and bamboo is a grass, and neither is indexed by the
-    #   USDA Wood Handbook's species tables. A different source is needed, not a better
-    #   reading of this one (C3 review, H (mechanical) F4; C3.5).
+    # [UNVERIFIED] this row is NOT WOOD, so the wood reason it once carried never applied:
+    #   cork is a bark tissue and bamboo is a grass, and neither is indexed by the USDA
+    #   Wood Handbook's species tables (C3 review, H (mechanical) F4).
+    #   SEARCHED EXHAUSTIVELY, AND ABSENT. FPL-GTR-282 scanned in full (546 pages) for
+    #   cork / bamboo / Bambusa / Quercus suber: three hits, every one a false positive and
+    #   none a density - "cork elm" (Ulmus thomasii) p.34, "Corkbark fir" p.378, and
+    #   "bamboo fiber" in a wood-plastic-composite passage p.302. Bambusa and Quercus
+    #   suber return zero. PubChem has no record: a tissue is not a compound with a CID,
+    #   the same reason the polymer rows fail. No other directory under docs/references
+    #   could hold it - they are metal design allowables, thermochemistry, pure-fluid
+    #   tables, gas Lennard-Jones constants, optical indices, steel shapes and sampling
+    #   statistics. The terms and pages are given so the search is re-runnable.
+    #   No substitute value was read from any artefact, so none is written. This row needs
+    #   a materials handbook. C3.5 residual.
     "Cork Board": 240,
     # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
     "Paper": 800,
@@ -1114,7 +1144,14 @@ MANOMETER_FLUIDS = {
     #   PubChem is an AGGREGATOR and this record carries several densities that
     #   disagree, so the citation names ONE ReferenceNumber rather than the CID alone.
     "Glycerin": 1260,
-    # [UNVERIFIED] no source on disk. Residual register (C3.5).
+    # [UNVERIFIED] a source IS on disk, and it disagrees - the previous tag said "no
+    #   source on disk", which was false once the PubChem records were acquired.
+    #   pubchem/diiodomethane_density.json (cid=6346) gives 3.33 g/cm3
+    #   = 3330 kg/m3 at 15 C, from PAC Chemical Database, U.S. Department of Energy,
+    #   against this row's 3325. That entry names no primary, and it is the only
+    #   unambiguous value in the record, so it is reported rather than cited: a single
+    #   aggregator entry with no primary is not enough to move a value on.
+    #   C3.5 residual - searched, and the search is recorded.
     "Diiodomethane": 3325,
     # [UNVERIFIED] ONE SUBSTANCE UNDER TWO NAMES. This table also carries
     #   "Tetrabromoethane" at the same 2960, and acetylene tetrabromide IS
@@ -1143,18 +1180,32 @@ MANOMETER_FLUIDS = {
     "Zinc": 6570,
     
     # Very Heavy Fluids
-    # [UNVERIFIED] the WebBook name search returns "Name Not Found" for "tellurium mercury";
-    #   whether the row means mercury telluride (a WebBook species) is not established. Referred to
-    #   the repo owner (C3.5).
+    # [UNVERIFIED] the species EXISTS on disk and carries no data - a stronger statement
+    #   than the earlier "Name Not Found", and it changes what can fix this row.
+    #   nist_webbook_species/mercury_telluride_C12068905_phase_change.html and
+    #   _condensed_phase.html are both present (HgTe, CAS 12068-90-5, MW 328.19). Their
+    #   entire contents index is "Notes": no density, no Antoine row, no temperature
+    #   table, no enthalpy - verified by reading both files. So fetching further WebBook
+    #   pages CANNOT source this row.
+    #   Whether the row even means HgTe is still unresolved by any artefact: "Tellurium
+    #   Mercury" is Name Not Found, and mercury telluride was fetched as the nearest
+    #   named species, which is not a finding that the row means it.
+    #   Nothing else on disk covers tellurium in any form, so 8100 is neither
+    #   supported nor contradicted - it is unsourced. C3.5 substance defect.
     "Tellurium Mercury": 8100,
-    # [UNVERIFIED] its phase at manometer conditions, which the brief asks, from a source: the
-    #   WebBook page on disk (tungsten_hexafluoride_C7783826_phase_change.html) gives Antoine
-    #   parameters for 201.5-290.4 K under its own form log10(P/bar) = A - B/(T + C), A = 4.55569,
-    #   B = 1021.208, C = -64.7. At 290.4 K, the top of that range, P = 1.074 bar, already above 1
-    #   atm = 1.01325 bar (CODATA 101325 Pa; SP 811: 1 bar = 1.0E+05 Pa). A vapour pressure above 1
-    #   atm at 290.4 K, and rising with T, makes it a GAS at 1 atm and room temperature, not a
-    #   manometer liquid - [DERIVED] from those two artefacts, not read as a stated boiling point
-    #   (the page states none). The row is a substance defect, not a value defect; replacing it is
-    #   the repo owner's call (D-033, C3.5).
+    # [UNVERIFIED] A GAS AT MANOMETER CONDITIONS, listed here as a manometer liquid.
+    #   nist_webbook_species/tungsten_hexafluoride_C7783826_phase_change.html states its own
+    #   form, log10(P/bar) = A - B/(T + C), and one Antoine row (Stull 1947, coefficients
+    #   calculated by NIST): A = 4.55569, B = 1021.208, C = -64.7, valid 201.5-290.4 K.
+    #   Re-derived from those: P(290.4 K) = 1.07415 bar, and P = 1 atm at
+    #   T = 289.14 K (16.0 C) - which is INSIDE the stated window, so the
+    #   verdict rests on no extrapolation. At 293.15 K the row is a gas.
+    #   The condensed-phase page does list liquid-phase quantities (S, Cp, dfH), but that
+    #   is the JANAF standard-state convention and not a claim about phase at 1 atm; that
+    #   page states no boiling point.
+    #   The value 12900 itself has NO on-disk support: no density artefact for WF6
+    #   exists in pubchem/, nist_fluid_properties/ or nist_janaf/, and nothing on disk is a
+    #   liquid near it. So this is a row to REMOVE or replace, not to re-point - and both
+    #   move the item pool, so it is the repo owner's call. C3.5 substance defect.
     "Tungsten Hexafluoride": 12900
 }
