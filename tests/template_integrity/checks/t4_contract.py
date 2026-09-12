@@ -27,10 +27,36 @@ import re
 from collections import Counter
 from dataclasses import dataclass, field
 
-from ..core import ANSWER_MARKERS, CANONICAL_ANSWER_MARKER, Instance, STEP_RE
+from ..core import (ANSWER_MARKERS, CANONICAL_ANSWER_MARKER, Instance, STEP_RE,
+                    answer_block)
 
 # Anything that looks like a step heading, however malformed.
 _STEP_ANY = re.compile(r'\*\*\s*Step\s*(\d+)\s*[:\.]?', re.IGNORECASE)
+
+#: D6.8 - the SHAPE of the answer span, not merely the presence of its marker.
+#:
+#: The span is everything after the marker, and it is the ONLY part the grader
+#: compares against a model's answer. D5.3 asserted the marker and never the
+#: span, so a 363-character `**Note:**` commentary block sat inside one and the
+#: check passed it (Reviewer A, F7) - the grader was comparing the model against
+#: the answer PLUS a paragraph of prose.
+#:
+#: Two terms, because a gate with one term is passed by the defect it misses
+#: (SPEC-CHANGE 18):
+#:
+#: * no foreign section marker inside the span. Measured across 150 templates x
+#:   15 instances: ZERO occurrences of any of these. So it is asserted at zero
+#:   tolerance because the corpus is actually clean, not fitted to whatever the
+#:   corpus happened to contain.
+#: * a length ceiling. The longest legitimate span is 199 characters
+#:   (`autocorrelation_rect_pulse`; p50 64, p95 165). 300 leaves ~50% headroom
+#:   over the measured maximum while still catching any intrusion of 101
+#:   characters or more - the historical one was 363.
+#:
+#: A second `**Answer` is deliberately NOT listed here: `multiple_answers`
+#: already reports it, and listing it too would report one defect twice.
+MAX_ANSWER_SPAN = 300
+_FOREIGN_IN_SPAN = ('**Note', '**Step', '##', '**Given', '**Find', '**Formulae')
 
 
 @dataclass
@@ -45,6 +71,9 @@ class ContractResult:
     multiple_answers: list[int] = field(default_factory=list)
     empty_output: list[int] = field(default_factory=list)
     step_counts: Counter = field(default_factory=Counter)
+    long_answer_span: list[int] = field(default_factory=list)
+    foreign_in_span: Counter = field(default_factory=Counter)
+    max_span: int = 0
 
     @property
     def passed(self) -> bool:
@@ -56,10 +85,12 @@ class ContractResult:
         # saw the defect.  The remedy is this one line, not a second scanner --
         # an earlier draft of the Phase 5 brief proposed the scanner, which would
         # have duplicated T4 rather than fixing it.
+        # `long_answer_span` and `foreign_in_span` joined in Phase 6 (D6.8).
         return not (self.malformed_markers or self.non_contiguous
                     or self.duplicate_numbers or self.missing_answer
                     or self.multiple_answers or self.empty_output
-                    or self.non_canonical_answer)
+                    or self.non_canonical_answer
+                    or self.long_answer_span or self.foreign_in_span)
 
     def summary(self) -> str:
         bits = []
@@ -77,6 +108,12 @@ class ContractResult:
             bits.append(f'degenerate output on {len(self.empty_output)} seeds')
         if self.non_canonical_answer:
             bits.append(f'non-canonical marker {dict(self.non_canonical_answer)}')
+        if self.long_answer_span:
+            bits.append(f'answer span over {MAX_ANSWER_SPAN} chars on '
+                        f'{len(self.long_answer_span)} seeds (max {self.max_span})')
+        if self.foreign_in_span:
+            bits.append(f'foreign section marker inside answer span '
+                        f'{dict(self.foreign_in_span)}')
         return '; '.join(bits) or 'ok'
 
 
@@ -121,6 +158,17 @@ def check_instance(inst: Instance, res: ContractResult) -> None:
         # different spelling entirely, which is F6's mechanism.
         if sol.count(CANONICAL_ANSWER_MARKER) > 1 or len(present) > 1:
             res.multiple_answers.append(inst.seed)
+
+        # D6.8 - the span, not just the marker.  Measured on the stripped span
+        # so a trailing newline is not counted as content.
+        block, marker = answer_block(sol)
+        span = block[len(marker):].strip() if marker else ''
+        res.max_span = max(res.max_span, len(span))
+        if len(span) > MAX_ANSWER_SPAN:
+            res.long_answer_span.append(inst.seed)
+        for pat in _FOREIGN_IN_SPAN:
+            if pat in span:
+                res.foreign_in_span[pat] += 1
     if not strict and not loose:
         res.empty_output.append(inst.seed)
 
