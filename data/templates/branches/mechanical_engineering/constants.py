@@ -273,26 +273,86 @@ FLUID_DENSITIES = {
     "Brine (20% NaCl)": 1150,   # Common industrial solution
     
     # Oils and Hydrocarbons
-    # [UNVERIFIED] a mixture, solution or commercial product with no single composition in the row;
-    #   no on-disk source, and none was searched for in C3. Residual register (C3.5).
+    # [UNVERIFIED] a mixture or commercial grade with no single composition, so no
+    #   pure substance on disk IS this row. The nearest pure n-alkanes are now on
+    #   disk and bracket it: nonane 718.03, decane 730.41, dodecane 749.44 kg/m3 at 293.15 K, 1 atm
+    #   (nist_fluid_properties/<name>_isobar_1atm.tsv). This row holds 870, which is
+    #   above that C9-C12 span.
+    #   They were fetched to re-point rows like this one, and reading them settled
+    #   that plan against itself: pointing kerosene at decane moves it 810 -> 730,
+    #   an 11% error, because a real cut carries aromatics and cycloalkanes a pure
+    #   n-alkane does not. Sourcing a row must not change what the row names.
+    #   C3.5 residual - searched for, and the search is recorded.
     "SAE 10W Oil": 870,
-    # [UNVERIFIED] a mixture, solution or commercial product with no single composition in the row;
-    #   no on-disk source, and none was searched for in C3. Residual register (C3.5).
+    # [UNVERIFIED] a mixture or commercial grade with no single composition, so no
+    #   pure substance on disk IS this row. The nearest pure n-alkanes are now on
+    #   disk and bracket it: nonane 718.03, decane 730.41, dodecane 749.44 kg/m3 at 293.15 K, 1 atm
+    #   (nist_fluid_properties/<name>_isobar_1atm.tsv). This row holds 917, which is
+    #   above that C9-C12 span.
+    #   They were fetched to re-point rows like this one, and reading them settled
+    #   that plan against itself: pointing kerosene at decane moves it 810 -> 730,
+    #   an 11% error, because a real cut carries aromatics and cycloalkanes a pure
+    #   n-alkane does not. Sourcing a row must not change what the row names.
+    #   C3.5 residual - searched for, and the search is recorded.
     "SAE 30 Oil": 917,
-    # [UNVERIFIED] a mixture, solution or commercial product with no single composition in the row;
-    #   no on-disk source, and none was searched for in C3. Residual register (C3.5).
+    # [UNVERIFIED] a mixture or commercial grade with no single composition, so no
+    #   pure substance on disk IS this row. The nearest pure n-alkanes are now on
+    #   disk and bracket it: nonane 718.03, decane 730.41, dodecane 749.44 kg/m3 at 293.15 K, 1 atm
+    #   (nist_fluid_properties/<name>_isobar_1atm.tsv). This row holds 870, which is
+    #   above that C9-C12 span.
+    #   They were fetched to re-point rows like this one, and reading them settled
+    #   that plan against itself: pointing kerosene at decane moves it 810 -> 730,
+    #   an 11% error, because a real cut carries aromatics and cycloalkanes a pure
+    #   n-alkane does not. Sourcing a row must not change what the row names.
+    #   C3.5 residual - searched for, and the search is recorded.
     "Crude Oil": 870,           # Typical average value
-    # [UNVERIFIED] a mixture, solution or commercial product with no single composition in the row;
-    #   no on-disk source, and none was searched for in C3. Residual register (C3.5).
+    # [UNVERIFIED] a mixture or commercial grade with no single composition, so no
+    #   pure substance on disk IS this row. The nearest pure n-alkanes are now on
+    #   disk and bracket it: nonane 718.03, decane 730.41, dodecane 749.44 kg/m3 at 293.15 K, 1 atm
+    #   (nist_fluid_properties/<name>_isobar_1atm.tsv). This row holds 810, which is
+    #   above that C9-C12 span.
+    #   They were fetched to re-point rows like this one, and reading them settled
+    #   that plan against itself: pointing kerosene at decane moves it 810 -> 730,
+    #   an 11% error, because a real cut carries aromatics and cycloalkanes a pure
+    #   n-alkane does not. Sourcing a row must not change what the row names.
+    #   C3.5 residual - searched for, and the search is recorded.
     "Kerosene": 810,
-    # [UNVERIFIED] a mixture, solution or commercial product with no single composition in the row;
-    #   no on-disk source, and none was searched for in C3. Residual register (C3.5).
+    # [UNVERIFIED] a mixture or commercial grade with no single composition, so no
+    #   pure substance on disk IS this row. The nearest pure n-alkanes are now on
+    #   disk and bracket it: nonane 718.03, decane 730.41, dodecane 749.44 kg/m3 at 293.15 K, 1 atm
+    #   (nist_fluid_properties/<name>_isobar_1atm.tsv). This row holds 850, which is
+    #   above that C9-C12 span.
+    #   They were fetched to re-point rows like this one, and reading them settled
+    #   that plan against itself: pointing kerosene at decane moves it 810 -> 730,
+    #   an 11% error, because a real cut carries aromatics and cycloalkanes a pure
+    #   n-alkane does not. Sourcing a row must not change what the row names.
+    #   C3.5 residual - searched for, and the search is recorded.
     "Diesel Fuel": 850,
-    # [UNVERIFIED] a mixture, solution or commercial product with no single composition in the row;
-    #   no on-disk source, and none was searched for in C3. Residual register (C3.5).
+    # [UNVERIFIED] a mixture or commercial grade with no single composition, so no
+    #   pure substance on disk IS this row. The nearest pure n-alkanes are now on
+    #   disk and bracket it: nonane 718.03, decane 730.41, dodecane 749.44 kg/m3 at 293.15 K, 1 atm
+    #   (nist_fluid_properties/<name>_isobar_1atm.tsv). This row holds 726, which is
+    #   inside that C9-C12 span - COINCIDENTALLY, and that is NOT support.
+    #   A petrol cut is C4-C12 with most of its mass in C5-C8, LIGHTER than every
+    #   alkane in this bracket. Falling between nonane and decane is one number
+    #   agreeing with a span of heavier pure substances; it says nothing about a
+    #   mixture whose composition sits below them.
+    #   They were fetched to re-point rows like this one, and reading them settled
+    #   that plan against itself: pointing kerosene at decane moves it 810 -> 730,
+    #   an 11% error, because a real cut carries aromatics and cycloalkanes a pure
+    #   n-alkane does not. Sourcing a row must not change what the row names.
+    #   C3.5 residual - searched for, and the search is recorded.
     "Gasoline": 726,
-    # [UNVERIFIED] a mixture, solution or commercial product with no single composition in the row;
-    #   no on-disk source, and none was searched for in C3. Residual register (C3.5).
+    # [UNVERIFIED] a mixture or commercial grade with no single composition, so no
+    #   pure substance on disk IS this row. The nearest pure n-alkanes are now on
+    #   disk and bracket it: nonane 718.03, decane 730.41, dodecane 749.44 kg/m3 at 293.15 K, 1 atm
+    #   (nist_fluid_properties/<name>_isobar_1atm.tsv). This row holds 888, which is
+    #   above that C9-C12 span.
+    #   They were fetched to re-point rows like this one, and reading them settled
+    #   that plan against itself: pointing kerosene at decane moves it 810 -> 730,
+    #   an 11% error, because a real cut carries aromatics and cycloalkanes a pure
+    #   n-alkane does not. Sourcing a row must not change what the row names.
+    #   C3.5 residual - searched for, and the search is recorded.
     "Engine Oil": 888,
     # [UNVERIFIED] a mixture, solution or commercial product with no single composition in the row;
     #   no on-disk source, and none was searched for in C3. Residual register (C3.5).
@@ -545,8 +605,14 @@ MATERIAL_DENSITIES = {
     "Concrete (avg.)": 2400,
     
     # Common Metals & Alloys (will sink in water, float in mercury)
-    # [UNVERIFIED] names no alloy: MIL-HDBK-5J prints 0.098 lb/in^3 for 6061 (p.566) = 2713 kg/m^3
-    #   and 0.100 for 2024 (p.373) = 2768. Choosing one is the repo owner's call (C3.5).
+    # [UNVERIFIED] the row names NO ALLOY, and the three readings available disagree by
+    #   more than any of them is precise. PubChem cid=5359268 prints 2.7 g/cm3
+    #   (pure aluminium, 2700); MIL-HDBK-5J prints 0.098 lb/in^3 for 6061 (p.566)
+    #   = 2713 kg/m^3 and 0.100 for 2024 (p.373) = 2768. The row holds 2710, between the
+    #   alloys and nearest 6061.
+    #   NOT corrected: replacing it with the pure-metal figure would be CHOOSING which
+    #   aluminium this row means and calling it sourcing. Naming the alloy in the key is
+    #   the fix, and that moves the item pool. C3.5 residual.
     "Aluminum": 2710,
     # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=899 text="Table 5.2.1.0(b)" mil="density" scale=27679.9 tol=0.31%
     #   MIL-HDBK-5J p.899, Table 5.2.1.0(b) (Commercially Pure Titanium): density 0.163 lb/in^3 = 4512 kg/m3. The row is -0.26% from it, inside
@@ -611,8 +677,16 @@ MATERIAL_DENSITIES = {
     #   PubChem is an AGGREGATOR and this record carries several densities that
     #   disagree, so the citation names ONE ReferenceNumber rather than the CID alone.
     "Gold": 19300,
-    # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
-    "Tungsten": 19600,
+    # [ON-DISK] pubchem/tungsten_density.json @ cid=23964 heading="Density" ref=46 scale=1000 precision=exact
+    #   19.3 @25 °C
+    #   Source: PAC Chemical Database, U.S. Department of Energy; conditions: 25 C.
+    #   Corrected from 19600 (+1.55%). The previous tag said "no source on
+    #   disk for this material"; the record is on disk and 5 independent entries in it
+    #   print 19.3 - CAMEO Chemicals, ILO-WHO International , Occupational Safety an, PAC Chemical Database,, The National Institute.
+    #   HSDB's entry is "18.7-19.3 @ 20 C/4 C; depends on extent of working" - a RANGE,
+    #   which pubchem.py refuses as a value. Reading its leading number instead would
+    #   make tungsten 18.7, which is how a range becomes a wrong value. P6 event.
+    "Tungsten": 19300,
     # [ON-DISK] pubchem/platinum_density.json @ cid=23939 heading="Density" ref=28 scale=1000 precision=4sf
     #   21.447 (calc)
     #   Source: Hazardous Substances Data Bank (HSDB); conditions: no temperature stated in the entry.
@@ -715,9 +789,31 @@ PIPE_FLUIDS = {
     "Carbon Dioxide": 1.98,
     
     # Light Hydrocarbons & Fuels
-    # [UNVERIFIED] no source on disk. Residual register (C3.5).
+    # [UNVERIFIED] a mixture or commercial grade with no single composition, so no
+    #   pure substance on disk IS this row. The nearest pure n-alkanes are now on
+    #   disk and bracket it: nonane 718.03, decane 730.41, dodecane 749.44 kg/m3 at 293.15 K, 1 atm
+    #   (nist_fluid_properties/<name>_isobar_1atm.tsv). This row holds 726, which is
+    #   inside that C9-C12 span - COINCIDENTALLY, and that is NOT support.
+    #   A petrol cut is C4-C12 with most of its mass in C5-C8, LIGHTER than every
+    #   alkane in this bracket. Falling between nonane and decane is one number
+    #   agreeing with a span of heavier pure substances; it says nothing about a
+    #   mixture whose composition sits below them.
+    #   They were fetched to re-point rows like this one, and reading them settled
+    #   that plan against itself: pointing kerosene at decane moves it 810 -> 730,
+    #   an 11% error, because a real cut carries aromatics and cycloalkanes a pure
+    #   n-alkane does not. Sourcing a row must not change what the row names.
+    #   C3.5 residual - searched for, and the search is recorded.
     "Gasoline": 726,
-    # [UNVERIFIED] no source on disk. Residual register (C3.5).
+    # [UNVERIFIED] a mixture or commercial grade with no single composition, so no
+    #   pure substance on disk IS this row. The nearest pure n-alkanes are now on
+    #   disk and bracket it: nonane 718.03, decane 730.41, dodecane 749.44 kg/m3 at 293.15 K, 1 atm
+    #   (nist_fluid_properties/<name>_isobar_1atm.tsv). This row holds 810, which is
+    #   above that C9-C12 span.
+    #   They were fetched to re-point rows like this one, and reading them settled
+    #   that plan against itself: pointing kerosene at decane moves it 810 -> 730,
+    #   an 11% error, because a real cut carries aromatics and cycloalkanes a pure
+    #   n-alkane does not. Sourcing a row must not change what the row names.
+    #   C3.5 residual - searched for, and the search is recorded.
     "Kerosene": 810,
     # [UNVERIFIED] no source on disk. Residual register (C3.5).
     "Diesel Fuel": 850,
@@ -733,21 +829,93 @@ PIPE_FLUIDS = {
     "Isopropyl Alcohol": 786,
     
     # Oils & Lubricants
-    # [UNVERIFIED] no source on disk. Residual register (C3.5).
+    # [UNVERIFIED] a mixture or commercial grade with no single composition, so no
+    #   pure substance on disk IS this row. The nearest pure n-alkanes are now on
+    #   disk and bracket it: nonane 718.03, decane 730.41, dodecane 749.44 kg/m3 at 293.15 K, 1 atm
+    #   (nist_fluid_properties/<name>_isobar_1atm.tsv). This row holds 870, which is
+    #   above that C9-C12 span.
+    #   They were fetched to re-point rows like this one, and reading them settled
+    #   that plan against itself: pointing kerosene at decane moves it 810 -> 730,
+    #   an 11% error, because a real cut carries aromatics and cycloalkanes a pure
+    #   n-alkane does not. Sourcing a row must not change what the row names.
+    #   C3.5 residual - searched for, and the search is recorded.
     "SAE 10 Oil": 870,
-    # [UNVERIFIED] no source on disk. Residual register (C3.5).
+    # [UNVERIFIED] a mixture or commercial grade with no single composition, so no
+    #   pure substance on disk IS this row. The nearest pure n-alkanes are now on
+    #   disk and bracket it: nonane 718.03, decane 730.41, dodecane 749.44 kg/m3 at 293.15 K, 1 atm
+    #   (nist_fluid_properties/<name>_isobar_1atm.tsv). This row holds 880, which is
+    #   above that C9-C12 span.
+    #   They were fetched to re-point rows like this one, and reading them settled
+    #   that plan against itself: pointing kerosene at decane moves it 810 -> 730,
+    #   an 11% error, because a real cut carries aromatics and cycloalkanes a pure
+    #   n-alkane does not. Sourcing a row must not change what the row names.
+    #   C3.5 residual - searched for, and the search is recorded.
     "SAE 20 Oil": 880,
-    # [UNVERIFIED] no source on disk. Residual register (C3.5).
+    # [UNVERIFIED] a mixture or commercial grade with no single composition, so no
+    #   pure substance on disk IS this row. The nearest pure n-alkanes are now on
+    #   disk and bracket it: nonane 718.03, decane 730.41, dodecane 749.44 kg/m3 at 293.15 K, 1 atm
+    #   (nist_fluid_properties/<name>_isobar_1atm.tsv). This row holds 917, which is
+    #   above that C9-C12 span.
+    #   They were fetched to re-point rows like this one, and reading them settled
+    #   that plan against itself: pointing kerosene at decane moves it 810 -> 730,
+    #   an 11% error, because a real cut carries aromatics and cycloalkanes a pure
+    #   n-alkane does not. Sourcing a row must not change what the row names.
+    #   C3.5 residual - searched for, and the search is recorded.
     "SAE 30 Oil": 917,
-    # [UNVERIFIED] no source on disk. Residual register (C3.5).
+    # [UNVERIFIED] a mixture or commercial grade with no single composition, so no
+    #   pure substance on disk IS this row. The nearest pure n-alkanes are now on
+    #   disk and bracket it: nonane 718.03, decane 730.41, dodecane 749.44 kg/m3 at 293.15 K, 1 atm
+    #   (nist_fluid_properties/<name>_isobar_1atm.tsv). This row holds 945, which is
+    #   above that C9-C12 span.
+    #   They were fetched to re-point rows like this one, and reading them settled
+    #   that plan against itself: pointing kerosene at decane moves it 810 -> 730,
+    #   an 11% error, because a real cut carries aromatics and cycloalkanes a pure
+    #   n-alkane does not. Sourcing a row must not change what the row names.
+    #   C3.5 residual - searched for, and the search is recorded.
     "SAE 40 Oil": 945,
-    # [UNVERIFIED] no source on disk. Residual register (C3.5).
+    # [UNVERIFIED] a mixture or commercial grade with no single composition, so no
+    #   pure substance on disk IS this row. The nearest pure n-alkanes are now on
+    #   disk and bracket it: nonane 718.03, decane 730.41, dodecane 749.44 kg/m3 at 293.15 K, 1 atm
+    #   (nist_fluid_properties/<name>_isobar_1atm.tsv). This row holds 960, which is
+    #   above that C9-C12 span.
+    #   They were fetched to re-point rows like this one, and reading them settled
+    #   that plan against itself: pointing kerosene at decane moves it 810 -> 730,
+    #   an 11% error, because a real cut carries aromatics and cycloalkanes a pure
+    #   n-alkane does not. Sourcing a row must not change what the row names.
+    #   C3.5 residual - searched for, and the search is recorded.
     "SAE 50 Oil": 960,
-    # [UNVERIFIED] no source on disk. Residual register (C3.5).
+    # [UNVERIFIED] a mixture or commercial grade with no single composition, so no
+    #   pure substance on disk IS this row. The nearest pure n-alkanes are now on
+    #   disk and bracket it: nonane 718.03, decane 730.41, dodecane 749.44 kg/m3 at 293.15 K, 1 atm
+    #   (nist_fluid_properties/<name>_isobar_1atm.tsv). This row holds 825, which is
+    #   above that C9-C12 span.
+    #   They were fetched to re-point rows like this one, and reading them settled
+    #   that plan against itself: pointing kerosene at decane moves it 810 -> 730,
+    #   an 11% error, because a real cut carries aromatics and cycloalkanes a pure
+    #   n-alkane does not. Sourcing a row must not change what the row names.
+    #   C3.5 residual - searched for, and the search is recorded.
     "Crude Oil (Light)": 825,
-    # [UNVERIFIED] no source on disk. Residual register (C3.5).
+    # [UNVERIFIED] a mixture or commercial grade with no single composition, so no
+    #   pure substance on disk IS this row. The nearest pure n-alkanes are now on
+    #   disk and bracket it: nonane 718.03, decane 730.41, dodecane 749.44 kg/m3 at 293.15 K, 1 atm
+    #   (nist_fluid_properties/<name>_isobar_1atm.tsv). This row holds 950, which is
+    #   above that C9-C12 span.
+    #   They were fetched to re-point rows like this one, and reading them settled
+    #   that plan against itself: pointing kerosene at decane moves it 810 -> 730,
+    #   an 11% error, because a real cut carries aromatics and cycloalkanes a pure
+    #   n-alkane does not. Sourcing a row must not change what the row names.
+    #   C3.5 residual - searched for, and the search is recorded.
     "Crude Oil (Heavy)": 950,
-    # [UNVERIFIED] no source on disk. Residual register (C3.5).
+    # [UNVERIFIED] a mixture or commercial grade with no single composition, so no
+    #   pure substance on disk IS this row. The nearest pure n-alkanes are now on
+    #   disk and bracket it: nonane 718.03, decane 730.41, dodecane 749.44 kg/m3 at 293.15 K, 1 atm
+    #   (nist_fluid_properties/<name>_isobar_1atm.tsv). This row holds 888, which is
+    #   above that C9-C12 span.
+    #   They were fetched to re-point rows like this one, and reading them settled
+    #   that plan against itself: pointing kerosene at decane moves it 810 -> 730,
+    #   an 11% error, because a real cut carries aromatics and cycloalkanes a pure
+    #   n-alkane does not. Sourcing a row must not change what the row names.
+    #   C3.5 residual - searched for, and the search is recorded.
     "Engine Oil": 888,
     # [UNVERIFIED] no source on disk. Residual register (C3.5).
     "Hydraulic Oil": 860,
@@ -812,9 +980,27 @@ MANOMETER_FLUIDS = {
     "Sea Water": 1025,
     
     # Heavy Oils & Lubricants
-    # [UNVERIFIED] no source on disk. Residual register (C3.5).
+    # [UNVERIFIED] a mixture or commercial grade with no single composition, so no
+    #   pure substance on disk IS this row. The nearest pure n-alkanes are now on
+    #   disk and bracket it: nonane 718.03, decane 730.41, dodecane 749.44 kg/m3 at 293.15 K, 1 atm
+    #   (nist_fluid_properties/<name>_isobar_1atm.tsv). This row holds 960, which is
+    #   above that C9-C12 span.
+    #   They were fetched to re-point rows like this one, and reading them settled
+    #   that plan against itself: pointing kerosene at decane moves it 810 -> 730,
+    #   an 11% error, because a real cut carries aromatics and cycloalkanes a pure
+    #   n-alkane does not. Sourcing a row must not change what the row names.
+    #   C3.5 residual - searched for, and the search is recorded.
     "SAE 50 Oil": 960,
-    # [UNVERIFIED] no source on disk. Residual register (C3.5).
+    # [UNVERIFIED] a mixture or commercial grade with no single composition, so no
+    #   pure substance on disk IS this row. The nearest pure n-alkanes are now on
+    #   disk and bracket it: nonane 718.03, decane 730.41, dodecane 749.44 kg/m3 at 293.15 K, 1 atm
+    #   (nist_fluid_properties/<name>_isobar_1atm.tsv). This row holds 920, which is
+    #   above that C9-C12 span.
+    #   They were fetched to re-point rows like this one, and reading them settled
+    #   that plan against itself: pointing kerosene at decane moves it 810 -> 730,
+    #   an 11% error, because a real cut carries aromatics and cycloalkanes a pure
+    #   n-alkane does not. Sourcing a row must not change what the row names.
+    #   C3.5 residual - searched for, and the search is recorded.
     "SAE 90 Gear Oil": 920,
     
     # Organic Liquids
