@@ -15,33 +15,34 @@ MATERIAL_PROPERTIES = {
     # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=62 text="Table 2.2.1.0(b)" mil="E" field=['E_GPa'] scale=6.894757 tol=0.17%
     #   29.0 x10^3 ksi = 199.95 GPa; the row's 200 is +0.03%, inside half a unit in
     #   the handbook's last printed digit (0.17%).
-    # [KNOWN-DEFECTIVE] ['nu'] 0.30 against MIL-HDBK-5J p.62, Table 2.2.1.0(b) (AISI 1025
-    #   Carbon Steel): mu 0.32, -6.25%. Larger than five of the fourteen errors this
-    #   branch reports as defective, in its most-used material. Not corrected: a P6 event,
-    #   referred to the repo owner (C3.5).
-    'Steel': {'E_GPa': 200, 'E_ksi': 29000, 'nu': 0.30},
-    # [KNOWN-DEFECTIVE] ['E_ksi'] 27500 against MIL-HDBK-5J p.277, Table 2.7.1.0(b) (AISI 301and Relateda,b,c Stainless Steels): E:L 29.0 x10^3 ksi, -5.2%.
-    #   The row names what the table covers, so the literal should be a rounding of it and is not. Annealed column; the table's footnote b applies it to AISI 304 (AMS 5513), the row comment's alloy.
-    #   Not corrected in this commit: a value change moves emitted items (P6); outcome in the C3.5 register.
-    # [KNOWN-DEFECTIVE] ['E_GPa'] 190 against MIL-HDBK-5J p.277, Table 2.7.1.0(b) (AISI 301and Relateda,b,c Stainless Steels): E:L 29.0 x10^3 ksi = 199.9 GPa
-    #   (SP 811 p.63: 1 ksi = 6.894757e+06 Pa, so 6.894757 GPa per 10^3 ksi); -5.0%, outside half a unit in the handbook's last digit (0.18%).
-    #   Not corrected in this commit: a value change moves emitted items (P6); outcome in the C3.5 register.
-    # [KNOWN-DEFECTIVE] ['nu'] 0.30 against MIL-HDBK-5J p.277, Table 2.7.1.0(b) (AISI 301and Relateda,b,c Stainless Steels): mu 0.27, +11.1%.
-    #   The row names what the table covers, so the literal should be a rounding of it and is not.
-    #   Not corrected in this commit: a value change moves emitted items (P6); outcome in the C3.5 register.
-    'Stainless Steel': {'E_GPa': 190, 'E_ksi': 27500, 'nu': 0.30}, # 304 Stainless
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=62 text="Table 2.2.1.0(b)" mil="mu" field=['nu'] precision=exact
+    #   AISI 1025 Carbon Steel: mu 0.32. Its text layer spaces every digit ("0 . 3 2").
+    #   Corrected from 0.30 (-6.25%) on the repo owner's instruction; P6 event, instance
+    #   dump recorded with the C3.5 outcome.
+    'Steel': {'E_GPa': 200, 'E_ksi': 29000, 'nu': 0.32},
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=277 text="Table 2.7.1.0(b)" mil="E:L" field=['E_ksi'] scale=1e3 precision=exact
+    #   AISI 301 and Related Stainless Steels, annealed: E:L 29.0 x10^3 ksi. The table's
+    #   footnote b applies it to AISI 304 (AMS 5513), the row comment's alloy.
+    #   Corrected from 27500 (-5.2%); P6 event.
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=277 text="Table 2.7.1.0(b)" mil="E:L" field=['E_GPa'] scale=6.894757 tol=0.17%
+    #   29.0 x10^3 ksi = 199.95 GPa (SP 811 p.63: 1 ksi = 6.894757e+06 Pa, so 6.894757 GPa per 10^3 ksi); the row is a 1-decimal
+    #   rounding of it, inside half a unit in the handbook's last printed digit.
+    #   Corrected from 190 (-5.0%); P6 event.
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=277 text="Table 2.7.1.0(b)" mil="mu" field=['nu'] precision=exact
+    #   AISI 301 and Related Stainless Steels, annealed: mu 0.27.
+    #   Corrected from 0.30 (+11.1%); P6 event.
+    'Stainless Steel': {'E_GPa': 199.9, 'E_ksi': 29000, 'nu': 0.27}, # 304 Stainless
     # [UNVERIFIED] the row comment names 1100 and 3003; MIL-HDBK-5J has no design table for either
     #   (its wrought aluminum tables are the 2xxx, 5xxx, 6xxx, 7xxx series). Referred (C3.5).
     'Aluminum': {'E_GPa': 69, 'E_ksi': 10000, 'nu': 0.33}, # General purpose 1100, 3003 Al
-    # [KNOWN-DEFECTIVE] ['E_ksi'] 10000 against MIL-HDBK-5J p.566, Table 3.6.2.0(b1) (6061 Aluminum Alloy Sheet): E 9.9 x10^3 ksi, +1.0%.
-    #   The row names what the table covers, so the literal should be a rounding of it and is not.
-    #   Not corrected in this commit: a value change moves emitted items (P6); outcome in the C3.5 register.
-    # [KNOWN-DEFECTIVE] ['E_GPa'] 68.9 against MIL-HDBK-5J p.566, Table 3.6.2.0(b1) (6061 Aluminum Alloy Sheet): E 9.9 x10^3 ksi = 68.26 GPa
-    #   (SP 811 p.63: 1 ksi = 6.894757e+06 Pa, so 6.894757 GPa per 10^3 ksi); +0.9%, outside half a unit in the handbook's last digit (0.51%).
-    #   Not corrected in this commit: a value change moves emitted items (P6); outcome in the C3.5 register.
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=566 text="Table 3.6.2.0(b1)" mil="E" field=['E_ksi'] scale=1e3 precision=exact
+    #   6061 Aluminum Alloy Sheet: E 9.9 x10^3 ksi. Corrected from 10000 (+1.0%); P6 event.
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=566 text="Table 3.6.2.0(b1)" mil="E" field=['E_GPa'] scale=6.894757 tol=0.51%
+    #   9.9 x10^3 ksi = 68.26 GPa (SP 811 p.63: 1 ksi = 6.894757e+06 Pa, so 6.894757 GPa per 10^3 ksi); the row is a 1-decimal
+    #   rounding of it. Corrected from 68.9 (+0.9%); P6 event.
     # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=566 text="Table 3.6.2.0(b1)" mil="mu" field=['nu'] precision=exact
     #   MIL-HDBK-5J p.566, Table 3.6.2.0(b1) (6061 Aluminum Alloy Sheet): mu 0.33.
-    'Aluminum 6061-T6': {'E_GPa': 68.9, 'E_ksi': 10000, 'nu': 0.33}, # A common specific alloy
+    'Aluminum 6061-T6': {'E_GPa': 68.3, 'E_ksi': 9900, 'nu': 0.33}, # A common specific alloy
     # [UNVERIFIED] no MIL-HDBK-5J design table is this material (its copper-base tables: C86500
     #   Manganese Bronze; C86300 Manganese Bronze; Copper Beryllium Strip; C17200 Copper Beryllium
     #   Rod and Bar; C17200 Copper Beryllium Mechanical Tubing), and no other source on disk.
@@ -57,34 +58,33 @@ MATERIAL_PROPERTIES = {
     #   Rod and Bar; C17200 Copper Beryllium Mechanical Tubing), and no other source on disk.
     #   Residual register (C3.5).
     'Bronze': {'E_GPa': 110, 'E_ksi': 16000, 'nu': 0.34}, # Phosphor Bronze
-    # [KNOWN-DEFECTIVE] ['E_ksi'] 16800 against MIL-HDBK-5J p.899, Table 5.2.1.0(b) (Commercially Pure Titanium): E 15.5 x10^3 ksi, +8.4%.
-    #   The row names what the table covers, so the literal should be a rounding of it and is not. The row comment's commercially pure titanium.
-    #   Not corrected in this commit: a value change moves emitted items (P6); outcome in the C3.5 register.
-    # [KNOWN-DEFECTIVE] ['E_GPa'] 116 against MIL-HDBK-5J p.899, Table 5.2.1.0(b) (Commercially Pure Titanium): E 15.5 x10^3 ksi = 106.9 GPa
-    #   (SP 811 p.63: 1 ksi = 6.894757e+06 Pa, so 6.894757 GPa per 10^3 ksi); +8.5%, outside half a unit in the handbook's last digit (0.33%).
-    #   Not corrected in this commit: a value change moves emitted items (P6); outcome in the C3.5 register.
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=899 text="Table 5.2.1.0(b)" mil="E" field=['E_ksi'] scale=1e3 precision=exact
+    #   Commercially Pure Titanium: E 15.5 x10^3 ksi, the row comment's material.
+    #   Corrected from 16800 (+8.4%); P6 event.
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=899 text="Table 5.2.1.0(b)" mil="E" field=['E_GPa'] scale=6.894757 tol=0.32%
+    #   15.5 x10^3 ksi = 106.87 GPa (SP 811 p.63: 1 ksi = 6.894757e+06 Pa, so 6.894757 GPa per 10^3 ksi); the row is a 1-decimal
+    #   rounding of it. Corrected from 116 (+8.5%); P6 event.
     # [UNVERIFIED] MIL-HDBK-5J p.899, Table 5.2.1.0(b) (Commercially Pure Titanium) prints no mu ("..."); no other source on disk
-    'Titanium': {'E_GPa': 116, 'E_ksi': 16800, 'nu': 0.34}, # Commercially Pure
-    # [KNOWN-DEFECTIVE] ['E_ksi'] 16500 against MIL-HDBK-5J p.945, Table 5.4.1.0(b) (Ti-6Al-4V Sheet, Strip, and Plate): E 16.0 x10^3 ksi, +3.1%.
-    #   The row names what the table covers, so the literal should be a rounding of it and is not. Sheet, strip and plate; the bar table (p.946) prints E 16.9.
-    #   Not corrected in this commit: a value change moves emitted items (P6); outcome in the C3.5 register.
-    # [KNOWN-DEFECTIVE] ['E_GPa'] 114 against MIL-HDBK-5J p.945, Table 5.4.1.0(b) (Ti-6Al-4V Sheet, Strip, and Plate): E 16.0 x10^3 ksi = 110.3 GPa
-    #   (SP 811 p.63: 1 ksi = 6.894757e+06 Pa, so 6.894757 GPa per 10^3 ksi); +3.3%, outside half a unit in the handbook's last digit (0.32%).
-    #   Not corrected in this commit: a value change moves emitted items (P6); outcome in the C3.5 register.
-    # [KNOWN-DEFECTIVE] ['nu'] 0.34 against MIL-HDBK-5J p.945, Table 5.4.1.0(b) (Ti-6Al-4V Sheet, Strip, and Plate): mu 0.31, +9.7%.
-    #   The row names what the table covers, so the literal should be a rounding of it and is not.
-    #   Not corrected in this commit: a value change moves emitted items (P6); outcome in the C3.5 register.
-    'Titanium Alloy (6Al-4V)': {'E_GPa': 114, 'E_ksi': 16500, 'nu': 0.34},
+    'Titanium': {'E_GPa': 106.9, 'E_ksi': 15500, 'nu': 0.34}, # Commercially Pure
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=945 text="Table 5.4.1.0(b)" mil="E" field=['E_ksi'] scale=1e3 precision=exact
+    #   Ti-6Al-4V Sheet, Strip, and Plate: E 16.0 x10^3 ksi. Sheet, strip and plate; the
+    #   bar table (p.946) prints E 16.9. Corrected from 16500 (+3.1%); P6 event.
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=945 text="Table 5.4.1.0(b)" mil="E" field=['E_GPa'] scale=6.894757 tol=0.31%
+    #   16.0 x10^3 ksi = 110.32 GPa (SP 811 p.63: 1 ksi = 6.894757e+06 Pa, so 6.894757 GPa per 10^3 ksi); the row is a 1-decimal
+    #   rounding of it. Corrected from 114 (+3.3%); P6 event.
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=945 text="Table 5.4.1.0(b)" mil="mu" field=['nu'] precision=exact
+    #   Ti-6Al-4V Sheet, Strip, and Plate: mu 0.31. Corrected from 0.34 (+9.7%); P6 event.
+    'Titanium Alloy (6Al-4V)': {'E_GPa': 110.3, 'E_ksi': 16000, 'nu': 0.31},
     # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=841 text="Table 4.2.1.0(b)" mil="E" field=['E_ksi'] scale=1e3 precision=exact
     #   MIL-HDBK-5J p.841, Table 4.2.1.0(b) (AZ31B Magnesium Alloy Sheet and Plate): E 6.5 x10^3 ksi. The row comment's AZ31B, sheet and plate.
     # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=841 text="Table 4.2.1.0(b)" mil="E" field=['E_GPa'] scale=6.894757 tol=0.77%
     #   MIL-HDBK-5J p.841, Table 4.2.1.0(b) (AZ31B Magnesium Alloy Sheet and Plate): E 6.5 x10^3 ksi = 44.82 GPa. The row is +0.41% from it, inside
     #   half a unit in the handbook's last digit (0.77%) - the bound a unit conversion of a
     #   2-s.f. value supports (SP 811 p.63: 1 ksi = 6.894757e+06 Pa, so 6.894757 GPa per 10^3 ksi).
-    # [KNOWN-DEFECTIVE] ['nu'] 0.29 against MIL-HDBK-5J p.841, Table 4.2.1.0(b) (AZ31B Magnesium Alloy Sheet and Plate): mu 0.35, -17.1%.
-    #   The row names what the table covers, so the literal should be a rounding of it and is not.
-    #   Not corrected in this commit: a value change moves emitted items (P6); outcome in the C3.5 register.
-    'Magnesium': {'E_GPa': 45, 'E_ksi': 6500, 'nu': 0.29}, # AZ31B alloy
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=841 text="Table 4.2.1.0(b)" mil="mu" field=['nu'] precision=exact
+    #   AZ31B Magnesium Alloy Sheet and Plate: mu 0.35, the row comment's alloy.
+    #   Corrected from 0.29 (-17.1%); P6 event.
+    'Magnesium': {'E_GPa': 45, 'E_ksi': 6500, 'nu': 0.35}, # AZ31B alloy
     # [UNVERIFIED] no MIL-HDBK-5J design table is this material under the names searched.
     #   C3 review, H (mechanical) F3: the reason here previously cited the handbook's
     #   COPPER-BASE tables as the search set. That is apt for Copper, Brass and Bronze
@@ -165,12 +165,23 @@ SHEAR_MODULUS_VALUES = {
     #   half a unit in the handbook's last digit (1.32%) - the bound a unit conversion of a
     #   2-s.f. value supports (SP 811 p.63: 1 ksi = 6.894757e+06 Pa, so 6.894757 GPa per 10^3 ksi).
     "Aluminum 6061-T6": 26.0,
-    # [UNVERIFIED] MIL-HDBK-5J's 2024 sheet table carrying T4 (p.374) does not parse from its text
-    #   layer (4 labels and values [0, 0, 0, 0] fit neither layout). The 2024 tables that do parse
-    #   print G 4.0 (p.373), 4.0 (p.382), 4.0 (p.384), 4.0 (p.385), 4.0 (p.386), 4.1 (p.387), 4.1
-    #   (p.388) x10^3 ksi, i.e. 27.58 GPa for 4.0; whether T4's G is the same is not read here.
-    #   Residual register (C3.5).
-    "Aluminum 2024-T4": 28.0,
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=373 text="Table 3.2.3.0(b1)" mil="G" scale=6.894757 tol=1.25%
+    #   Bare 2024 Aluminum Alloy Sheet and Plate: G 4.0 x10^3 ksi = 27.58 GPa
+    #   (SP 811 p.63: 1 ksi = 6.894757e+06 Pa), the same value in all 4 columns of p.373.
+    #   WHY THIS APPLIES TO T4. This row's previous tag said the 2024 table "carrying T4
+    #   (p.374) does not parse from its text layer". It does not parse because there is
+    #   nothing on it to parse: p.374 and p.375 print "See Table 3.2.3.0(d)" in all four
+    #   elastic cells. Following that deferral, p.376 carries "Table 3.2.3.0(d). Modulus
+    #   Values and Poisson's Ratio for Bare 2024 Aluminum Alloy Sheet and Plate, ALL
+    #   TEMPERS", printing E 10.5/10.7, Ec 10.7/10.9, G 4.0/4.0, mu 0.33/0.33 for the two
+    #   thickness bands. So G does not vary by temper here, which is what the old tag left
+    #   open ("whether T4's G is the same is not read here").
+    #   p.376 is cited in prose and not as the locator because it is a Property/Thickness
+    #   matrix with no "E, 10^3 ksi" leader-dot segment: milhdbk.design_values cannot read
+    #   it, and a precision= tag against it would be unverifiable. p.373 carries the same
+    #   G and IS machine-readable.
+    #   Corrected from 28.0 (+1.5%, outside the 1.25% half-unit bound); P6 event.
+    "Aluminum 2024-T4": 27.6,
     # [UNVERIFIED] no MIL-HDBK-5J design table is this material, and no other source on disk.
     #   Residual register (C3.5).
     "Brass (C36000)": 39.0,
@@ -180,10 +191,11 @@ SHEAR_MODULUS_VALUES = {
     # [UNVERIFIED] no MIL-HDBK-5J design table is this material, and no other source on disk.
     #   Residual register (C3.5).
     "Bronze (Phosphor 510)": 41.4,
-    # [KNOWN-DEFECTIVE] value 41.4 against MIL-HDBK-5J p.945, Table 5.4.1.0(b) (Ti-6Al-4V Sheet, Strip, and Plate): G 6.2 x10^3 ksi = 42.75 GPa
-    #   (SP 811 p.63: 1 ksi = 6.894757e+06 Pa, so 6.894757 GPa per 10^3 ksi); -3.2%, outside half a unit in the handbook's last digit (0.81%). Sheet, strip and plate; the bar table (p.946) prints G 6.2 too.
-    #   Not corrected in this commit: a value change moves emitted items (P6); outcome in the C3.5 register.
-    "Titanium Alloy (Ti-6Al-4V)": 41.4,
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=945 text="Table 5.4.1.0(b)" mil="G" scale=6.894757 tol=0.81%
+    #   Ti-6Al-4V Sheet, Strip, and Plate: G 6.2 x10^3 ksi = 42.75 GPa
+    #   (SP 811 p.63: 1 ksi = 6.894757e+06 Pa, so 6.894757 GPa per 10^3 ksi); the row is a 1-decimal rounding of it. Sheet, strip and plate; the bar
+    #   table (p.946) prints G 6.2 too. Corrected from 41.4 (-3.2%); P6 event.
+    "Titanium Alloy (Ti-6Al-4V)": 42.7,
     # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=841 text="Table 4.2.1.0(b)" mil="G" scale=6.894757 tol=2.09%
     #   MIL-HDBK-5J p.841, Table 4.2.1.0(b) (AZ31B Magnesium Alloy Sheet and Plate): G 2.4 x10^3 ksi = 16.55 GPa. The row is -0.29% from it, inside
     #   half a unit in the handbook's last digit (2.09%) - the bound a unit conversion of a
@@ -305,10 +317,10 @@ FLUID_DENSITIES = {
     # [UNVERIFIED] a mixture, solution or commercial product with no single composition in the row;
     #   no on-disk source, and none was searched for in C3. Residual register (C3.5).
     "Turpentine": 870,
-    # [KNOWN-DEFECTIVE] 876 against NIST 878.92 at 293.15 K (nist_fluid_properties/benzene_C71432_isobar_1atm.tsv), -0.33%: the table states
-    #   these conditions, and 876 is not a 3-s.f. rounding of 878.92.
-    #   Not corrected in this commit: a value change moves emitted items (P6); outcome in the C3.5 register.
-    "Benzene": 876,
+    # [ON-DISK] nist_fluid_properties/benzene_C71432_isobar_1atm.tsv @ T=293.15 col="Density (kg/m3)" precision=3sf
+    #   878.92 at 293.15 K, 1 atm - the conditions this table states.
+    #   Corrected from 876 (-0.33%, not a 3-s.f. rounding); P6 event.
+    "Benzene": 879,
     # [ON-DISK] nist_fluid_properties/toluene_C108883_isobar_1atm.tsv @ T=293.15 col="Density (kg/m3)" precision=3sf
     #   866.89 at 293.15 K.
     "Toluene": 867,
@@ -387,10 +399,10 @@ FLUID_DENSITIES = {
     # [UNVERIFIED] a mixture, solution or commercial product with no single composition in the row;
     #   no on-disk source, and none was searched for in C3. Residual register (C3.5).
     "Vegetable Oil": 920,
-    # [KNOWN-DEFECTIVE] 1206 against NIST 1206.7 at 298.15 K (nist_fluid_properties/r134a_C811972_saturation_298.15K.tsv), -0.06%: the table states
-    #   these conditions, and 1206 is not a 4-s.f. rounding of 1206.7. The row states saturated liquid at 25 C, which is what the file is. Pressure in that row: 0.66538 MPa.
-    #   Not corrected in this commit: a value change moves emitted items (P6); outcome in the C3.5 register.
-    "R-134a Refrigerant (Saturated Liquid at 25°C)": 1206,
+    # [ON-DISK] nist_fluid_properties/r134a_C811972_saturation_298.15K.tsv @ T=298.15 col="Density (l, kg/m3)" precision=4sf
+    #   1206.7 at 298.15 K, saturated liquid - what the row states and what the file is.
+    #   Pressure in that row: 0.66538 MPa. Corrected from 1206 (-0.06%); P6 event.
+    "R-134a Refrigerant (Saturated Liquid at 25°C)": 1207,
     
     # Gases (at 1 atm, for comparison - though not for hydrostatic problems!)
     # [UNVERIFIED] Air is not in the NIST fluid database on disk (MANIFEST: 36 fluids), and no
