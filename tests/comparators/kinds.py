@@ -1021,10 +1021,10 @@ def compare_symbolic(
             k, "expression is outside the polynomial fragment and sympy is not installed",
             gold_canonical=g_expr_txt, cand_canonical=c_expr_txt, observations=obs)
 
-    local = {s: sympy.Symbol(s) for s in symbols}
+    local = _sympy_locals(sympy, symbols)
     try:
-        ge = sympy.sympify(_to_sympy(g_expr_txt), locals=local)
-        ce = sympy.sympify(_to_sympy(c_expr_txt), locals=local)
+        ge = sympy.sympify(_to_sympy(g_expr_txt, symbols), locals=local)
+        ce = sympy.sympify(_to_sympy(c_expr_txt, symbols), locals=local)
     except Exception as exc:  # sympy raises a wide family
         return unresolved(k, f"could not parse an expression: {type(exc).__name__}",
                           gold_canonical=g_expr_txt, cand_canonical=c_expr_txt,
@@ -1042,7 +1042,11 @@ def compare_symbolic(
                f"(gold {type(ge).__name__}, candidate {type(ce).__name__})",
             gold_canonical=str(ge)[:80], cand_canonical=str(ce)[:80], observations=obs)
 
-    extra = (ge.free_symbols | ce.free_symbols) - set(local.values())
+    # Only the SYMBOLS in `local` are part of the declared alphabet; the
+    # constants and functions it also binds are not free symbols and must not be
+    # subtracted as though they were.
+    declared = {v for v in local.values() if isinstance(v, sympy.Symbol)}
+    extra = (ge.free_symbols | ce.free_symbols) - declared
     if extra:
         return unresolved(
             k, f"symbol(s) outside the declared alphabet: {sorted(str(s) for s in extra)}",
@@ -1163,6 +1167,14 @@ _PIECEWISE_RE = re.compile(r"\b(?:otherwise|elsewhere)\b|,\s*for\b", re.IGNORECA
 #: Split on a bare ``=`` only -- never inside ``<=``, ``>=``, ``!=``, ``==``.
 _BARE_EQ_RE = re.compile(r"(?<![<>!=])=(?!=)")
 
+#: The relation that ASSERTS the answer.  ``=`` is the common case, but
+#: ``ber_estimation_mary`` writes ``BER approx 0.750 * Q(2.888)`` on all 50
+#: instances -- an assignment whose operator is a **word**.  With ``=`` alone
+#: the line carries no relation at all, so `_isolate_expression` falls through
+#: to "the last line" and hands ``BER approx 0.750 * Q(2.888)`` to the parser
+#: whole, left-hand side included.  ``~=`` is what `prepare` renders U+2248 as.
+_REL_RE = re.compile(r"~=|(?<![<>!=])=(?!=)|\bapprox(?:imately)?\b")
+
 
 def _isolate_expression(text: str) -> str | None:
     """Take the expression stated by the span.
@@ -1197,9 +1209,9 @@ def _isolate_expression(text: str) -> str | None:
     # then "`.split(chr(10))[0]`").  So the rule is not "a different position" --
     # it is a structural property: an answer line assigns to a symbol, and prose
     # does not.
-    eq_lines = [ln for ln in lines if _BARE_EQ_RE.search(ln)]
+    eq_lines = [ln for ln in lines if _REL_RE.search(ln)]
     assigns = [ln for ln in eq_lines
-               if _ASSIGN_LHS_RE.fullmatch(_BARE_EQ_RE.split(ln, 1)[0].strip())]
+               if _ASSIGN_LHS_RE.fullmatch(_REL_RE.split(ln, 1)[0].strip())]
     text = (assigns[-1] if assigns else
             (eq_lines[-1] if eq_lines else lines[-1])).rstrip(".").strip()
 
@@ -1209,7 +1221,7 @@ def _isolate_expression(text: str) -> str | None:
     if _PIECEWISE_RE.search(text):
         return None
 
-    parts = [p.strip().rstrip(".").strip() for p in _BARE_EQ_RE.split(text)]
+    parts = [p.strip().rstrip(".").strip() for p in _REL_RE.split(text)]
     if len(parts) == 1:
         cand = parts[0]
     else:
@@ -1249,17 +1261,153 @@ def _drop_arbitrary(expr: str) -> tuple[str, str | None]:
     return expr.strip().rstrip("+- ").strip(), found
 
 
-def _to_sympy(expr: str) -> str:
-    """``3x^2 - 6xy`` -> ``3*x**2 - 6*x*y``."""
-    e = expr.replace("^", "**")
-    e = re.sub(r"(\d)\s*\(", r"\1*(", e)
-    e = re.sub(r"\)\s*\(", r")*(", e)
-    e = re.sub(r"(\d)\s*([a-zA-Z])", r"\1*\2", e)
-    e = re.sub(r"([a-zA-Z])\s*(?=[a-zA-Z])", r"\1*", e)
-    e = re.sub(r"\)\s*([a-zA-Z0-9])", r")*\1", e)
-    e = re.sub(r"([a-zA-Z0-9])\s*\(", r"\1*(", e)
-    e = re.sub(r"\*{3,}", "**", e)
+#: Functions a gold answer in this corpus calls.  **Declared**, by the same
+#: mechanism as the categorical label surfaces and ``UNIT_SURFACES``: a parser
+#: that does not know a function's name cannot read a function call, and
+#: ``derive_bindings._FUNC_RE`` routes a template to this kind *because* its gold
+#: says ``sinc``, ``cos`` or ``Q`` -- it selects for the one construct the
+#: comparator could not read (Reviewer E, R2-F3).
+#:
+#: ``Q`` must be bound explicitly: ``sympy.sympify("Q(2.888)")`` resolves the
+#: bare name ``Q`` to sympy's assumptions registry (``AssumptionKeys``) and
+#: raises ``TypeError``, which this kind would report as an unparseable answer.
+SYMBOLIC_FUNCTIONS = ("sinc", "cosh", "sinh", "tanh", "cos", "sin", "tan",
+                      "exp", "log", "ln", "sqrt", "erfc", "erf", "Q")
+
+#: Mathematical constants, bound to the real object so ``cos(876*pi*t)`` means it.
+SYMBOLIC_CONSTANTS = ("pi",)
+
+#: Unit and notation words that appear INSIDE a gold expression --
+#: ``cos(361*t - 146.39 deg)``, ``x(t) = -0.21*sin(21.7*t) (m)``,
+#: ``cos(2*pi*1.98 kHz*t)``.
+#:
+#: **They are declared as opaque symbols, never stripped, and the difference is
+#: a false accept.**  Measured over 50 seeds:
+#: ``continuous_to_discrete_conversion`` writes ``rad`` on 20 instances and
+#: ``deg`` on 30, and ``bpsk_energy_basis`` writes ``Hz`` on 12 and ``kHz`` on
+#: 38.  Stripping the unit word makes ``146.39 deg`` and ``146.39 rad`` the same
+#: expression -- two different answers fused -- which is the D-052 shape the
+#: numeric kind deliberately keeps opt-in.  Carried as a symbol, ``deg`` and
+#: ``rad`` are *different symbols*, so the pair is a MISMATCH, correctly, and
+#: the comparator decides it instead of declining.
+SYMBOLIC_UNIT_SYMBOLS = ("deg", "rad", "m", "s", "Hz", "kHz", "MHz",
+                         "mJ", "J", "V", "A")
+
+_SY_NUM = r"\d+(?:\.\d+)?(?:[eE][-+]?\d+)?"
+_SY_TOKEN_RE = re.compile(
+    rf"(?P<num>{_SY_NUM})|(?P<ident>[A-Za-z_][A-Za-z0-9_]*)"
+    r"|(?P<sp>\s+)|(?P<op>\*\*|.)")
+
+
+def _sympy_locals(sympy: Any, symbols: Sequence[str]) -> dict[str, Any]:
+    """The declared alphabet as ``sympify`` locals.
+
+    Symbols and unit words become ``Symbol``; constants and functions become the
+    real sympy objects, so they are **not** free symbols and cannot trip the
+    alphabet check.
+    """
+    local: dict[str, Any] = {s: sympy.Symbol(s) for s in symbols}
+    for u in SYMBOLIC_UNIT_SYMBOLS:
+        local.setdefault(u, sympy.Symbol(u))
+    for c in SYMBOLIC_CONSTANTS:
+        local.setdefault(c, getattr(sympy, c))
+    for fn in SYMBOLIC_FUNCTIONS:
+        local.setdefault(fn, sympy.Function(fn))
+    return local
+
+
+def _fix_func_power(e: str) -> str:
+    """``sinc^2(2.0*f)`` -> ``((sinc(2.0*f))**2)``.
+
+    ``f^k(x)`` is standard notation for ``(f(x))^k``.  The previous rendering was
+    ``sinc**2*(2.0*f)`` -- sinc squared *times* 2f -- which is not an
+    unparseable expression but a **different** one, and ``ft_esd_rect_pulse``
+    writes its gold this way on every instance.
+    """
+    names = "|".join(sorted(SYMBOLIC_FUNCTIONS, key=len, reverse=True))
+    pat = re.compile(
+        rf"\b(?P<fn>{names})\s*\^\s*(?P<k>-?\d+)\s*"
+        r"\((?P<arg>[^()]*(?:\([^()]*\)[^()]*)*)\)")
+    prev = None
+    while prev != e:
+        prev = e
+        e = pat.sub(
+            lambda m: f"(({m.group('fn')}({m.group('arg')}))**{m.group('k')})", e)
     return e
+
+
+#: A trailing ``(m)`` / ``(rad)`` annotates the WHOLE expression.
+_TRAILING_UNIT_RE = re.compile(
+    r"^(?P<body>.*\S)\s*\(\s*(?P<unit>"
+    + "|".join(sorted(SYMBOLIC_UNIT_SYMBOLS, key=len, reverse=True))
+    + r")\s*\)$")
+
+
+def _to_sympy(expr: str, symbols: Sequence[str] = ()) -> str:
+    """``3x^2 - 6xy`` -> ``3*x**2 - 6*x*y``; ``cos(361*t)`` -> ``cos(361*t)``.
+
+    **The rule is identifier-aware, and that is the whole fix.**  The previous
+    version inserted a ``*`` between every pair of adjacent letters::
+
+        re.sub(r"([a-zA-Z])\\s*(?=[a-zA-Z])", r"\\1*", e)
+
+    which shatters *every* multi-letter token in the expression -- not only the
+    function names (``cos`` -> ``c*o*s``, ``sinc`` -> ``s*i*n*c``) but the
+    constant ``pi`` -> ``p*i``, the unit words ``deg`` / ``rad`` / ``m``, and the
+    ``e`` of ``1.71e-03``.  The alphabet check downstream then rejects gold's own
+    answer for carrying symbols ``['c','o','s']``.
+
+    **Masking the function names alone was tried and bought nothing** -- 11.1%
+    decided before and after (D6.10, D-065) -- because it leaves ``p*i``,
+    ``d*e*g`` and ``1.71*e-03`` shattered in the very same expressions, so those
+    spans still fail to parse.  The defect was never "function names are
+    special"; it is that **a multi-letter token is a token**.
+
+    So a letter run is split into single letters **only when it is not a token
+    we know**.  That keeps the implicit-product reading ``xy`` -> ``x*y`` the
+    polynomial fragment relies on, while leaving ``cos``, ``pi``, ``sinc`` and
+    ``deg`` whole.
+    """
+    known = set(symbols)
+    known.update(SYMBOLIC_FUNCTIONS)
+    known.update(SYMBOLIC_CONSTANTS)
+    known.update(SYMBOLIC_UNIT_SYMBOLS)
+    funcs = set(SYMBOLIC_FUNCTIONS)
+
+    e = expr.strip()
+    # A trailing `(m)` annotates the whole expression, not its last term:
+    # `0.1*cos(w*t) + 0.2*sin(w*t) (m)` must not bind the unit to the sine
+    # alone.  Wrap rather than strip -- see SYMBOLIC_UNIT_SYMBOLS.
+    tu = _TRAILING_UNIT_RE.match(e)
+    if tu:
+        e = f"({tu.group('body')})*({tu.group('unit')})"
+    e = _fix_func_power(e)
+    e = e.replace("^", "**")
+
+    toks = [(m.lastgroup, m.group(0)) for m in _SY_TOKEN_RE.finditer(e)
+            if m.lastgroup != "sp"]
+    flat: list[tuple[str, str]] = []
+    for kind, tok in toks:
+        if kind == "ident" and tok not in known and "_" not in tok and len(tok) > 1:
+            flat.extend(("ident", ch) for ch in tok)
+        else:
+            flat.append((kind, tok))
+
+    out: list[str] = []
+    for i, (kind, tok) in enumerate(flat):
+        if i:
+            pk, pt = flat[i - 1]
+            need = False
+            if pk in ("num", "ident") and kind in ("num", "ident"):
+                need = True
+            elif pk in ("num", "ident") and tok == "(":
+                need = not (pk == "ident" and pt in funcs)   # `cos(` is a call
+            elif pt == ")" and (kind in ("num", "ident") or tok == "("):
+                need = True
+            if need:
+                out.append("*")
+        out.append(tok)
+    return "".join(out)
 
 
 # ==========================================================================
