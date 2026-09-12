@@ -206,7 +206,34 @@ quietly absorbs its corrections is worth no more than the claims it corrected.
    butane's viscosity moved 1.537e-05 → 2.094e-05, and (5.47/4.687)² = 1.362 predicts
    exactly that ratio from the constants alone.
 3. Six mechanical tables carry 172 unchecked rows — acquire sources, or accept.
-4. `COMMON_LIQUIDS`' conditions — fetch a 298.15 K grid and settle §5's open diagnosis.
+4. ~~`COMMON_LIQUIDS`' conditions — fetch a 298.15 K grid and settle §5's open diagnosis.~~
+   **Answered: the grid was fetched, and the answer is neither reading offered.**
+
+   The diagnosis could not be tested because the 1-atm isobar steps 10 K from 253.15 and
+   so carries no row at 298.15 K — a structural gap, not an oversight. Five grids landing
+   exactly on 298.15 K were acquired (the four organics plus **water as the control**).
+
+   | viscosity | at 20 °C | at 25 °C |
+   |---|---:|---:|
+   | methanol | −7.06% | **+0.05%** |
+   | benzene | −7.16% | **−0.33%** |
+   | n-hexane | −6.12% | **−1.33%** |
+   | toluene | −4.62% | **+1.41%** |
+   | **water (control)** | **+0.04%** | +12.58% |
+
+   The four organic **viscosities fit 25 °C**; **water does not**, and the **density
+   column fits 20 °C throughout**. So the column is **MIXED** — the organic viscosities
+   are at 25 °C while water and every density are at 20 °C.
+
+   The review was right about the organics and wrong about the table. My own reading
+   ("a source difference, not scatter") stays **withdrawn**: nothing here tests it, and it
+   is not revived by this outcome.
+
+   This is worse than either proposal and different in kind. It **cannot** be repaired by
+   editing `@domain`, because no single temperature is true of the table; `@domain` keeps
+   293.15 K, which is true of the densities and of water, and the rows now state what they
+   are. Re-sourcing the four organic viscosities at 293.15 K would fix it and is a **value
+   change** — registered here, not made.
 5. ~~**`tol=` has no rule for its SIZE.**~~ **Answered: the rule is built and enforced.**
    D-074 licensed *when* a tolerance may be used and never *how large*, so one could be
    fitted to its own residual and never fail — a check that cannot fail is not a check.
@@ -237,8 +264,40 @@ quietly absorbs its corrections is worth no more than the claims it corrected.
    absorbing a *composition* ambiguity (Gupta states no conditions; glycerol is
    hygroscopic), which its own note already calls the weakest warrant in the branch. The
    label makes it countable, not sound.
-6. **16 `[DERIVED]` tags are never recomputed** (G F-4) — the `UNEXECUTED` class is unbuilt.
+6. ~~**16 `[DERIVED]` tags are never recomputed** (G F-4) — the `UNEXECUTED` class is
+   unbuilt.~~ **Answered: built, and eight of them now run on every resolver pass.**
    (15 in the earlier note; the civil kinematic-viscosity reclass made it 16.)
+
+   The single number was folding together three different situations — the resolver
+   *could* recompute it and doesn't; something else recomputes it and the resolver doesn't
+   know; **nothing** recomputes it. Only the third is UNEXECUTED in any useful sense, and
+   it is the one a reader needs to find. `[DERIVED]` now takes `recompute=<name>`, naming
+   an entry in a registry the resolver **calls**, or `by=<module>`, naming a checker that
+   does it elsewhere:
+
+   > `[DERIVED]: 8 RECOMPUTED here, 1 recomputed by a named checker, 7 UNEXECUTED`
+
+   | recomputation | covers |
+   |---|---|
+   | `nu_from_tsv` | ν = μ/ρ, both operands one row of one NIST isobar |
+   | `g_ft_from_codata` | gₙ / 0.3048, CODATA and the SP 811 foot |
+   | `normal_quantile` | all 6 `Z_QUANTILES` against `NormalDist().inv_cdf` at 4 dp |
+   | `atom_balance` | all 15 reactions balanced from the species keys themselves |
+   | `monatomic_cp` | Cp/R = 2.5 exactly with B = C = D = 0, three rows |
+
+   These had been asserted since C1 and tested by nothing. A wrong one now **fails**.
+
+   `CONTROL_CHART_FACTORS` declares `by=control_chart_factors`, which the resolver imports
+   to prove the reference is live and does **not** re-run — that module already derives all
+   384 cells by quadrature every run, and doing it twice would cost the work to learn
+   nothing.
+
+   **Seven remain UNEXECUTED deliberately**, and that is the finding rather than an
+   omission: the four `CP_PARAMS_COMBUSTION` rows are least-squares refits of NIST Shomate
+   over 400 points, `CP_PARAMS['Air(g)']` is a mixture with no NIST entry, and the two
+   `VALID_T_MAX` constants declare the interval that was fitted. Re-running a fit inside
+   the resolver would **re-derive** the constant rather than check it — the fit would agree
+   with itself by construction, which is the same circularity item 5 was built to refuse.
 7. `CP_PARAMS` is integrated from **281.67 K**, below the 298 K floor its fit declares —
    registered in `domain_findings.txt`; raise the draw, refit, or restate the floor.
 

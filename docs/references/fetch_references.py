@@ -721,6 +721,14 @@ def fetch_nist_fluids(manifest):
              _fluid_url(cas, Type="IsoBar", P="0.101325",
                         TLow="293.15", THigh="453.15", TInc="10")),
         ]
+        if cas in NIST_ISOBAR_298:
+            # 298.15 K is not on the 10 K grid above; this one lands on it exactly.
+            # THigh spans several rows on purpose: _content_ok refuses a NIST table
+            # with fewer than three data rows, and TLow/THigh 10 K apart gives two.
+            jobs.append(("isobar_298K",
+                         _fluid_url(cas, Type="IsoBar", P="0.101325",
+                                    TLow="298.15", THigh="348.15", TInc="10"),
+                         None))
         for what, url, fallback in jobs:
             rel = f"nist_fluid_properties/{slug}_{cas}_{what}.tsv"
             eid = f"nist_fluid:{slug}:{what}"
@@ -915,6 +923,20 @@ PUBCHEM_DENSITY = {
     "osmium": "MATERIAL_DENSITIES: Osmium",
     "uranium": "MATERIAL_DENSITIES: Uranium",
     "graphite": "MATERIAL_DENSITIES: Graphite",
+}
+
+#: Fluids that also need a grid landing on 298.15 K. The 1-atm isobar steps 10 K
+#: from 253.15, so 25 degC is structurally absent from every file on disk - which is
+#: why the COMMON_LIQUIDS viscosity diagnosis could not be tested either way (C3.5
+#: register item 4). The four organics carry the 4.62-7.16% gap at the declared
+#: 293.15 K; WATER is the control, because it is water agreeing at 20 degC that makes
+#: the column non-uniform and so makes a 25 degC match meaningful.
+NIST_ISOBAR_298 = {
+    "C7732185": "Water",
+    "C67561": "Methanol",
+    "C71432": "Benzene",
+    "C108883": "Toluene",
+    "C110543": "Hexane",
 }
 
 PUBCHEM_NAME_URL = ("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/"
