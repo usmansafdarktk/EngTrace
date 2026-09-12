@@ -265,6 +265,61 @@ floor of 1.0 for an `array`-answer template is not a coherent statistic. Reviewe
 (`reviews/phase4_reviewer_b_pedagogy.md:37–61`) only ever derived the two `discrete_time_signals`
 rows. Decide whether the column is repaired, emptied, or kept with its provenance stated.
 
+### The harness is built and calibrated — and the exit gate does not survive it
+
+**Calibration passes exactly**, which is what licenses everything else. Run against the corpus
+**held at rev `9105317`** (the commit that added the CSV), the strict §2.9b predicate reproduces
+the audit on **all five branches**: population 6,166, chemical 65, civil 37, mechanical 89,
+electrical 127, industrial 131 — zero delta. Phase 0 matched on only three. Dynamic populations
+(HEAD only, since they require execution) land at 17,196 step tokens against Phase 0's 17,002
+(+1.1%) and 4,574 answer tokens against 4,619 (−1.0%) — the same order as Phase 0's own
+disagreement with the audit. **The method is continuous.**
+
+**Calibrate at the rev, not at HEAD.** Gating on HEAD would have failed (chemical 64, civil 34,
+mechanical 87) and the predicate would have been blamed: 23 template files have changed since the
+audit (+4,590/−1,157) and the interpolation population grew by 132.
+
+**A correction to this brief.** It said to build on `checks/t5_binding.py:43 _is_bound()`. That
+is **already the lenient variant** — it treats `format`/`replace`/`upper` as passthrough and tests
+*all* args rather than the first. Reusing it would have silently produced 375 where §2.9b needs
+449, failing calibration for reasons unrelated to the templates. The strict predicate is
+implemented separately and lenient kept as a labelled second column.
+
+**Class D did not move: 16 → 16, and the gate is not mechanically decidable.** The restated rule
+yields A 29 / B 54 / C 51 / D 16, and that distribution was **deliberately not written into
+`instrumentation_class`**, because it is an artefact of the detector: of the 34 rows newly flipped
+to branching, **34 fire on the prose-only limb and 0 on a hard step/line-count signal** — a
+sampled material name changes the blanked skeleton without any governing-equation branch. The
+audit resolved that by hand-confirmation against source, which a harness cannot do.
+
+Two of class D's three limbs (report `:28` — *"the trace's own chain does not reproduce its own
+answer"*, *"a search/iteration log with no stable symbols"*) are **judgement**. So this harness can
+**inherit** D and never **clear** a row out of it. Rewrite the gate accordingly; do not let a
+number that cannot be measured stand as a checkbox.
+
+**What can and cannot be diffed.** 96 cells differ, but **29 of the 96 sit in templates whose
+source never changed**, so they are harness residual, not drift. Consequently: per-**branch**
+totals for `n_inline_computed` are trustworthy and diffable; per-**row** values are not. Recovery
+sensitivity brackets at 95.6%/97.7% as-measured, 94.5%/96.0% globals-off, 90.7%/93.0% SCALED-off —
+Phase 0's 93.2% sits *inside* that bracket, so no aggregate recoverability change is detectable and
+per-row `pct_*` deltas under ~5 points are within harness noise.
+
+**`blind_guess_floor` is worse than recorded above: none of the 5 rows has a reproducible
+derivation.** Two are unmentioned anywhere outside the CSV. `levenspiel`'s degeneracy is noted but
+never derived. And for the two `discrete_time_signals` rows, Reviewer B's own snippet **reproduces
+exactly** — 0.5002 / 0.3402 — while the CSV says 0.5008 / 0.3450, matching at no N tried. **The
+CSV contradicts the only recorded derivation it has**, and `phase4_summary.md:379` propagates the
+unsourced pair. Worse, `heat_of_reaction_formation` has held-out **0.2567 below** its floor
+**0.2583** — a negative lift, meaningless under D-057's "lift ≥ 40 pts" — and it and
+`adiabatic_flame_temperature` are **scalar-answer** templates where a majority-class floor is as
+ill-defined as on an array. The column supports no gate decision: recompute it from a committed
+script or drop it.
+
+**One fidelity detail worth keeping:** `n_steps` counts **markers, not distinct numbers**. The
+audit's own worked example (`levenspiel` emits 1,2,3,1,2,3,4,5,6 and carries `n_steps=9`) proves
+it — deduplicating would make the one template singled out for restarting its numbering look like
+one that never did.
+
 ### Corpus baseline at `444b8bf`
 
 ```
@@ -586,8 +641,9 @@ the gate exactly as a CONFIRMED finding does.
 
 - [ ] `template_inventory.csv` regenerated, with the **method stated** and the predicate for
       each class published
-- [ ] Class D reduced from 16 to ≤ 4 (the Phase-4 four, **reclassified not fixed**), or the
-      shortfall named per template with a reason
+- [ ] ~~Class D reduced from 16 to ≤ 4~~ — **MEASURED: 16 → 16, and this gate cannot be
+      evaluated mechanically.** See §"The harness is built and calibrated". Replace it with:
+      the class rule restated, applied, and every row still in D named with which limb holds it
 - [ ] No template regressed in class; **measured**, not inferred from summaries
 - [ ] D6.2 class-migration table; D6.3 `template_audit_report.md` updated with post-change figures
 - [ ] D6.4 consolidated item-pool statement — **re-score and re-inference separated**, the
