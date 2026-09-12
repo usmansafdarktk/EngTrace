@@ -3011,6 +3011,92 @@ kind `property`, `standard` or `measured-constant` measured ALL-RESTATED, **15**
 them `property`; under the corrected precedence, **16** (10 `property`), the other
 nine restating on most seeds and rewording the question on some. The argument
 stands; the figure was wrong. DECISIONS is append-only, so it is corrected here.
+
+## D-074 — `precision=`, `tol=` and `[KNOWN-DEFECTIVE]`: when a disagreement is a tolerance and when it is a defect
+
+**Date:** 2026-09-12 · **Status:** DECIDED · **Source:** C3.1/C3.7 · **SPEC-CHANGE 23**
+
+C1.2 gave `[ON-DISK]` two relations and **no rule for choosing between them**. That is an
+open door: any constant that disagrees with its artefact can be made to pass by widening
+`tol=`, and the tag still reads as evidence. Electrical's Helium went in through it - first
+tagged `tol=0.0002%` (08d3c49), a tolerance wide enough to swallow a value that is **+3.2%
+on the refractivity** it actually determines.
+
+**The rule, now normative:**
+
+- **`precision=`** when the literal is a rounding of the artefact **at the table's own
+  declared conditions**. This is the default and the only one that says *this value came
+  from here*.
+- **`tol=`** only when the conditions differ, when none are stated, or when the value
+  crosses a non-decimal unit conversion - and then `tol` is **half a unit in the artefact's
+  last printed digit**, derived, never a number chosen so the row passes.
+- **`[KNOWN-DEFECTIVE]`** when the conditions match and the literal is **not** a rounding.
+
+**What it cost to apply, which is the point.** Helium became `[KNOWN-DEFECTIVE]`. So did
+three civil water constants that had read as ordinary: `UNIT_WEIGHT_WATER_KN_M3` (+0.21%),
+`_PCF` (+0.13%) and `WATER_KINEMATIC_VISCOSITY_M2_S` (+0.060%) - each small enough to hide
+under a tolerance and each, measured, describing water at a different temperature from the
+one its own comment claims. A rule that never reclassifies anything is not a rule.
+
+## D-075 — Six locator forms and three relations the spec did not have; and the `xlsx` form it did specify was never built
+
+**Date:** 2026-09-12 · **Status:** DECIDED · **Source:** C1.7, C3.7 · **SPEC-CHANGE 23**
+
+C1.2's locator table specified `xlsx` as `sheet="<name>" row="<key>" col="<header>"` - one
+tag per leaf. `AISC_W_SHAPES` has **196 leaves** (14 shapes x 7 US and 7 SI fields), so that
+form buries the table it documents. Built instead: a **whole-table** relation,
+`sheet= label_col= rows=all blocks="us:1:key,si:2:si_label" precision=exact`, where `blocks`
+names each row sub-dict's header block and where its label comes from; every leaf is
+compared with its cell, a missing header or label is R3, a disagreeing leaf is R4.
+
+Also added, none of them in the spec: `member=` + `wavelength=` (a refractiveindex.info
+dataset evaluated at a wavelength, refusing one outside its range), `page=` + `mil=`
+[+ `col=`] (a MIL-HDBK-5J design table, the caption pinning the table and `mil=` the row),
+and the relations `field=[key]`, `via="NAME/x"` and `scale=<f>`.
+
+**`image-only` was specified and never implemented.** A bare `page=` already resolves and
+counts `LOCATOR-ONLY`, which says the same thing without a second vocabulary. MIL-STD-105E
+is cited that way deliberately: its OCR text layer extracts as `":: .... m n mO ::,i:,o Vtm
+Loi o, batcb ah:e ."`, and **a text anchor that cannot be trusted is worse than none**.
+
+## D-076 — MIL-STD-105E was a public on-disk artefact, cited for two phases as if it were a copyrighted book
+
+**Date:** 2026-09-12 · **Status:** DECIDED · **Source:** C3.7 industrial
+
+Its header cited `pilot/references/public/mil_std_105e_sampling.pdf` - the gitignored
+copyrighted-books tree - and its three tables carried `[ON-DISK: PDF p. 18 (document
+p. 13)]`, a page number in prose. `MANIFEST.json` vouches for the same document at
+`docs/references/industrial/mil_std_105e_sampling.pdf`, hash and all. All three now cite it
+directly and resolve.
+
+**The general lesson is about what a checker cannot see.** The resolver validates a path
+only once a tag is in `artefact @ locator` form; a LEGACY bracket with the path in prose is
+counted but never resolved. So a document can sit in `docs/references/`, vouched for and
+hashed, while the tables that depend on it claim to be unresolvable from a clone. Every
+`[ON-DISK: …]` prose variant was a place this could hide, which is why C3.7's exit gate is
+**zero LEGACY tags**, not "fewer".
+
+## D-077 — A near-derivation is not a derivation
+
+**Date:** 2026-09-12 · **Status:** DECIDED · **Source:** C3.7 chemical and civil
+
+Three tables came within ~1% of a clean derivation and are **not** tagged `[DERIVED]`:
+
+- `SUBSTANCES_FOR_VAPORIZATION`: dHvap = Enthalpy(v) - Enthalpy(l) at 1 atm from the NIST
+  saturation tables reproduces 7 of the 12 unsourced rows to within 0.04-1.45%, but only
+  methanol, benzene, ammonia and oxygen are **roundings** of it.
+- `LIVE_LOADS_KPA`: 4 of 5 rows are the soft conversion 1 psf = 0.048 kPa exactly; the
+  corridor row is neither that nor the SP 811 factor.
+- `GRAVITY_FT_S2`: 32.2 is a rounding of g_n/0.3048 taken **after** the conversion, where
+  `scale=` compares in the artefact's own unit - so it is `[DERIVED]` with the arithmetic
+  stated, not an `[ON-DISK]` relation that would have to fail.
+
+`[DERIVED]` asserts that *this* value follows from *those* inputs. A derivation that
+reproduces most of a table is evidence about the table's provenance and is recorded as
+such - in the C3.5 register, where the owner can act on it - but tagging it `[DERIVED]`
+would make a claim that is false for the rows that miss, and those are exactly the rows a
+reader would most want flagged.
+
 ## Open decisions
 
 | # | Decision | Needed before |

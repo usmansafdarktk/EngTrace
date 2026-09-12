@@ -34,11 +34,24 @@ and seven are added, one per clause of the C1.2 vocabulary (spec §C1.2):
   R3  the locator resolves inside the artefact, by type: `quantity=` (CODATA
       text), `T=` + `col=` (NIST fluid TSV - the row must be ON the grid, which
       is the clamp lesson of the acquisition), `cas=` (NIST WebBook JSON),
-      `page=` [+ `text=`] (PDF), `member=` (zip), `text=` (HTML / text).
+      `page=` [+ `text=`] (PDF), `member=` (zip), `text=` (HTML / text), and
+      `member=` + `wavelength=<x>nm|um` (the refractiveindex.info archive: the
+      index EVALUATED at that wavelength, refused outside the dataset's range;
+      tests/constants_integrity/refractiveindex.py), and `sheet=` + `label_col=` +
+      `rows=all` + `blocks=` on an .xlsx: a WHOLE-TABLE relation, every leaf of a
+      nested table against its cell (tests/constants_integrity/xlsx_cells.py; the
+      AISC Shapes Database repeats its headers in a US and an SI block).
   R4  the RELATION holds. `precision=exact|<n>sf|<n>dp`: the constant equals the
       artefact value at that precision, exactly. `tol=<x>%`: it lies within.
       Neither: the value is not machine-compared, and the citation is counted
-      LOCATOR-ONLY rather than passed as if it had been.
+      LOCATOR-ONLY rather than passed as if it had been. `via="NAME/x"` says the
+      table stores NAME/x rather than x (MEDIA_VELOCITIES stores C0/n), and the
+      relation is checked on x = NAME/constant. `scale=<f>` says the table stores
+      the artefact's quantity times f (ATMOSPHERIC_PRESSURE_KPA: kPa against
+      CODATA's Pa, scale=1e-3), and the relation is checked in the artefact's
+      unit, so `precision=` counts the artefact's digits. A value interpolated between two
+      tabulated rows must satisfy the relation at BOTH rows too, so a verdict
+      never rests on the interpolation.
   R5  an [ON-DISK:LOCAL-ONLY] path is listed in MANIFEST.json's
       local_only_copyrighted. Present on this machine: its page exists. Absent:
       UNRESOLVABLE-FROM-CLONE, counted - never passed silently, never failed.
@@ -60,6 +73,7 @@ import os
 import re
 import sys
 import zipfile
+from decimal import ROUND_HALF_UP, Decimal
 
 REPO = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 if REPO not in sys.path:
@@ -79,7 +93,14 @@ REF_PATH = os.path.join(REFS, 'nist_webbook', 'shomate_coefficients.json')
 CITED_TABLES = ('CP_PARAMS', 'HEATS_OF_FORMATION')
 TAG_RE = re.compile(r'#\s*\[(ON-DISK|DERIVED|KNOWN-DEFECTIVE|BY-DEFINITION)\]\s*(.*)')
 CAS_RE = re.compile(r'\b(\d{2,7}-\d{2}-\d)\b')
-ROW_RE = re.compile(r'^\s*"([^"]+)"\s*:')
+# A row key is quoted either way: MATERIAL_PROPERTIES writes 'Steel': {...}. The
+# first version matched double quotes only, so a tag above a single-quoted row
+# would have attached to the TABLE and been compared against the whole dict.
+ROW_RE = re.compile(r'''^\s*(?:"([^"]+)"|'([^']+)')\s*:''')
+
+
+def _rowkey(m):
+    return m.group(1) if m.group(1) is not None else m.group(2)
 
 
 def parse_table(src, name):
@@ -100,7 +121,7 @@ def parse_table(src, name):
             continue
         row = ROW_RE.match(line)
         if row:
-            yield row.group(1), (pending[-1] if pending else (None, ''))
+            yield _rowkey(row), (pending[-1] if pending else (None, ''))
             pending = []
         if depth == 0 and line.startswith('}'):
             break
@@ -250,13 +271,13 @@ def extract_tags(src):
         pure_comment = line.lstrip().startswith('#')
         if row and body_line:
             for f in pending:
-                f['row'] = row.group(1)
+                f['row'] = _rowkey(row)
                 out.append(f)
             pending = []
         for f in found:
             f['table'] = name
             if row and body_line:
-                f['row'] = row.group(1)            # trails its own row
+                f['row'] = _rowkey(row)            # trails its own row
                 out.append(f)
             elif body_line and pure_comment:
                 pending.append(f)                  # sits above the next row
@@ -386,12 +407,128 @@ def _zip_member(path, member):
     return 'member', None
 
 
+def _index_at(path, member, wavelength):
+    """(n, brackets or None, error) - a refractive index evaluated at a wavelength."""
+    from tests.constants_integrity.refractiveindex import index_at
+    m = re.fullmatch(r'(\d+(?:\.\d+)?)(nm|um)', wavelength)
+    if not m:
+        return None, None, f'wavelength={wavelength!r} is not <number>nm or <number>um'
+    lam = float(m.group(1)) * (1e-3 if m.group(2) == 'nm' else 1.0)
+    try:
+        value, _how, _cond, brackets = index_at(member, lam, archive=path)
+    except (KeyError, ValueError) as exc:
+        return None, None, f'{member}: {exc}'
+    return value, brackets, None
+
+
+_PDF_READERS = {}
+
+
+def _mil_value(path, page, key, col):
+    """(value, error) - an elastic constant or density from a MIL-HDBK-5J design table."""
+    from tests.constants_integrity.milhdbk import design_values
+    try:
+        from pypdf import PdfReader
+    except ImportError:
+        return None, 'pypdf unavailable: PDF locators cannot be checked on this machine'
+    reader = _PDF_READERS.get(path) or _PDF_READERS.setdefault(path, PdfReader(path))
+    if not 1 <= int(page) <= len(reader.pages):
+        return None, f'page {page} does not exist ({len(reader.pages)} pages)'
+    try:
+        d = design_values(reader.pages[int(page) - 1].extract_text() or '')
+    except ValueError as exc:
+        return None, f'page {page}: the design table does not parse ({exc})'
+    if key == 'density':
+        tok = d['density']
+    else:
+        row = d['elastic'].get(key)
+        if row is None:
+            return None, f'page {page} has no {key!r} row (rows: {sorted(d["elastic"])})'
+        c = int(col)
+        if not 1 <= c <= len(row):
+            return None, f'page {page}: {key!r} has {len(row)} column(s), not col={col}'
+        tok = row[c - 1]
+    if tok is None:
+        return None, f'page {page}: {key!r} is printed "..." (no value) in that column'
+    return float(tok), None
+
+
+def _xlsx_whole_table(path, table, kv):
+    """(cells checked, [disagreements], error) - every leaf of a nested dict table
+    against its cell in an .xlsx, one header block per row sub-dict."""
+    from tests.constants_integrity.xlsx_cells import Workbook
+    if kv.get('rows') != 'all':
+        return 0, [], 'an .xlsx locator is a whole-table relation and needs rows=all'
+    if 'precision' not in kv:
+        return 0, [], 'an .xlsx whole-table relation needs precision='
+    if not isinstance(table, dict):
+        return 0, [], 'the table is not a dict of rows'
+    for need in ('sheet', 'label_col', 'blocks'):
+        if need not in kv:
+            return 0, [], f'an .xlsx locator needs {need}='
+    blocks = [tuple(b.split(':')) for b in kv['blocks'].split(',')]
+    if any(len(b) != 3 or not b[1].isdigit() for b in blocks):
+        return 0, [], f'blocks={kv["blocks"]!r} is not name:number:label-source[,...]'
+    wb = Workbook(path)
+    n, bad = 0, []
+    for key, row in table.items():
+        if not isinstance(row, dict):
+            return n, bad, f'row {key!r} is not a dict'
+        for name, num, src in blocks:
+            label = key if src == 'key' else row.get(src)
+            if label is None or not isinstance(row.get(name), dict):
+                return n, bad, f'row {key!r} has no {name!r} block or no {src!r} label'
+            for field, v in row[name].items():
+                n += 1
+                try:
+                    cell = wb.cell(kv['sheet'], kv['label_col'], label, field, block=int(num))
+                    target = _rounded(float(cell), kv['precision'])
+                except LookupError as exc:
+                    return n, bad, f'{key}[{name!r}][{field!r}]: {exc}'
+                except ValueError as exc:
+                    return n, bad, f'{key}[{name!r}][{field!r}]: {exc}'
+                if isinstance(v, bool) or not isinstance(v, (int, float)) or not _same(v, target):
+                    bad.append(f'{key}[{name!r}][{field!r}] = {v!r}, the sheet has {cell}')
+    return n, bad, None
+
+
+def _solve_via(ns, via, const):
+    """The cited quantity x, from a table that stores NAME/x (or x itself)."""
+    if via == 'x':
+        return const, None
+    m = re.fullmatch(r'([A-Za-z_]\w*)/x', via)
+    if not m:
+        return None, f'via={via!r} is not a form this resolver solves ("x" or "NAME/x")'
+    num = ns.get(m.group(1))
+    if isinstance(num, bool) or not isinstance(num, (int, float)):
+        return None, f'via={via!r} names {m.group(1)!r}, which the module does not define as a number'
+    if const == 0:
+        return None, f'via={via!r} cannot be solved for a stored value of 0'
+    return num / const, None
+
+
 def _text_snippet(path, text):
     body = open(path, encoding='utf-8', errors='replace').read()
     body = re.sub(r'<[^>]+>', ' ', body)
     if re.sub(r'\s+', ' ', text) not in re.sub(r'\s+', ' ', body):
         return None, f'text {text!r} is not in {os.path.basename(path)}'
     return 'text', None
+
+
+REGISTER = os.path.join(REPO, 'docs', 're-implementation-sep',
+                        'phaseC3_residual_register.md')
+_REGISTER_TEXT = None
+
+
+def _register_text():
+    """The residual register, read once. Missing file -> empty, and R6 says so."""
+    global _REGISTER_TEXT
+    if _REGISTER_TEXT is None:
+        try:
+            _REGISTER_TEXT = open(REGISTER, encoding='utf-8').read()
+        except OSError:
+            _REGISTER_TEXT = ''
+    return _REGISTER_TEXT
 
 
 def _sha256(path):
@@ -403,15 +540,28 @@ def _sha256(path):
 
 
 def _rounded(a, precision):
+    """The artefact value at a precision, rounded half-up IN DECIMAL (D-012).
+
+    The first version rounded the binary float (`round(a, n)`, `f'{a:.{n-1}e}'`),
+    which settles a half-way tie on the binary value: NIST prints water's saturated
+    liquid volume at 373.15 K as 0.0010435, and the binary float of that string
+    formats to 0.001043 at 4 s.f. where a reader doing decimal arithmetic - and every
+    template's `_hu` - gets 0.001044. Found at C3 by three REAL_FLUID_DATA fields
+    whose NIST strings are exact decimal ties. repr() recovers the shortest decimal
+    string of the float the reader parsed, so the tie is resolved on the digits the
+    artefact printed.
+    """
     if precision == 'exact':
         return a
     m = re.fullmatch(r'(\d+)(sf|dp)', precision)
     if not m:
         raise ValueError(f'precision={precision!r} is not exact, <n>sf or <n>dp')
     n = int(m.group(1))
-    if m.group(2) == 'dp':
-        return round(a, n)
-    return float(f'{a:.{n - 1}e}')
+    d = Decimal(repr(float(a)))
+    if d == 0:
+        return 0.0
+    place = Decimal(1).scaleb(-n if m.group(2) == 'dp' else d.adjusted() - n + 1)
+    return float(d.quantize(place, rounding=ROUND_HALF_UP))
 
 
 def _same(x, y):
@@ -441,7 +591,7 @@ def _constant(ns, table, row, kv):
 # The generalised check
 # ==========================================================================
 
-def check_source(branch, src, refs=REFS, manifest=None, kinds=None):
+def check_source(branch, src, refs=REFS, manifest=None, kinds=None, register=None):
     """R1-R7 over one constants.py source. Returns (counts, failures, legacy)."""
     manifest = manifest if manifest is not None else json.load(
         open(os.path.join(refs, 'MANIFEST.json'), encoding='utf-8'))
@@ -453,10 +603,18 @@ def check_source(branch, src, refs=REFS, manifest=None, kinds=None):
     if kinds is None:
         kinds = {t['name']: header_fields(t['header']).get('kind', '').split(' ')[0]
                  for t in numeric_tables(src, ns)}
+    # resolved_cas and derived_unexecuted are DISCLOSURE counters (C3 review, Reviewer G
+    # F-3 and F-4). They do not gate anything; they stop two totals from claiming more
+    # than was checked - a C2-form tag is resolved by CAS IDENTITY and never by a value,
+    # and a [DERIVED] tag is counted as stated and never recomputed.
     counts = dict(tags=0, resolved=0, locator_only=0, unresolvable_from_clone=0,
-                  legacy=0, stated=0)
+                  legacy=0, stated=0, resolved_cas=0, derived_unexecuted=0)
     failures, legacy = [], []
     hashed = {}
+    # §C1.2 requires both residual classes to be IN the residual register; R6 never
+    # checked it (C3 review, Reviewer G F-2). None = read the real file; the self-test
+    # supplies its own so its fixture's residual does not fail the clean control.
+    reg = _register_text() if register is None else register
 
     for tag in extract_tags(src):
         counts['tags'] += 1
@@ -488,6 +646,7 @@ def check_source(branch, src, refs=REFS, manifest=None, kinds=None):
             continue
         if cls == 'ON-DISK-C2':
             counts['resolved'] += 1         # resolved by c2_checks, P2
+            counts['resolved_cas'] += 1     # ... which checks the CAS, never the value
             continue
         if cls in ('DERIVED', 'BY-DEFINITION', 'KNOWN-DEFECTIVE', 'UNVERIFIED'):
             payload = tag['body'] or tag['bracket'].partition(':')[2].strip()
@@ -496,6 +655,12 @@ def check_source(branch, src, refs=REFS, manifest=None, kinds=None):
                                 f'{ {"DERIVED": "derivation", "BY-DEFINITION": "definition", "KNOWN-DEFECTIVE": "measured error", "UNVERIFIED": "reason"}[cls] }')
             else:
                 counts['stated'] += 1
+                if cls == 'DERIVED':
+                    counts['derived_unexecuted'] += 1
+                if cls in ('KNOWN-DEFECTIVE', 'UNVERIFIED') and tag['table'] not in reg:
+                    failures.append(
+                        f'R6 {where}: [{cls}] but {tag["table"]} is named nowhere in the '
+                        f'residual register - §C1.2 requires every residual to be in it')
             continue
         if cls == 'POLICY':
             counts['stated'] += 1
@@ -540,8 +705,26 @@ def check_source(branch, src, refs=REFS, manifest=None, kinds=None):
 
         # R3 - the locator resolves
         ext = rel.rsplit('.', 1)[-1].lower()
-        value, err = None, None
-        if 'quantity' in kv:
+        value, err, brackets = None, None, None
+        if 'sheet' in kv and ext == 'xlsx':
+            n_cells, disagree, err = _xlsx_whole_table(full, ns.get(tag['table']), kv)
+            if err:
+                failures.append(f'R3 {where}: {err}')
+            elif disagree:
+                failures.append(f'R4 {where}: {len(disagree)} of {n_cells} cells disagree; '
+                                f'first: {disagree[0]}')
+            else:
+                counts['resolved'] += 1
+            continue
+        if 'member' in kv and 'wavelength' in kv and ext == 'zip':
+            value, brackets, err = _index_at(full, kv['member'], kv['wavelength'])
+        elif 'page' in kv and 'mil' in kv and ext == 'pdf':
+            # MIL-HDBK-5J design table: the text= anchor pins the table, mil= the row
+            if 'text' in kv:
+                _v, err = _pdf_page(full, kv['page'], kv['text'])
+            if not err:
+                value, err = _mil_value(full, kv['page'], kv['mil'], kv.get('col', 1))
+        elif 'quantity' in kv:
             value, err = _codata(full, kv['quantity'])
         elif 'T' in kv and 'col' in kv:
             value, err = _tsv(full, kv['T'], kv['col'])
@@ -571,9 +754,25 @@ def check_source(branch, src, refs=REFS, manifest=None, kinds=None):
                             f'machine-readable value to compare')
             continue
         const, err = _constant(ns, tag['table'], tag.get('row'), kv)
+        if not err and 'via' in kv:
+            const, err = _solve_via(ns, kv['via'], const)
+        if not err and 'scale' in kv:
+            # the table stores the artefact's quantity in another unit: compare in
+            # the artefact's own unit, so precision= keeps counting ITS digits
+            try:
+                scale = float(kv['scale'])
+                if scale <= 0:
+                    raise ValueError
+                const = const / scale
+            except ValueError:
+                err = f'scale={kv["scale"]!r} is not a positive number'
         if err:
             failures.append(f'R4 {where}: {err}')
             continue
+        # A tabulated value between two rows: the relation must also hold at both
+        # rows, or the verdict is the interpolation's rather than the artefact's.
+        rows = [('the artefact', value)] + [(f'the tabulated row at {w}', v)
+                                            for w, v in (brackets or ())]
         if 'precision' in kv:
             try:
                 target = _rounded(value, kv['precision'])
@@ -585,12 +784,20 @@ def check_source(branch, src, refs=REFS, manifest=None, kinds=None):
                                 f'gives {value!r}, which at precision={kv["precision"]} is '
                                 f'{target!r}')
                 continue
+            split = [(lbl, v) for lbl, v in rows[1:] if not _same(_rounded(v, kv['precision']), target)]
+            if split:
+                failures.append(f'R4 {where}: the interpolated {value!r} is {target!r} at '
+                                f'precision={kv["precision"]}, but {split[0][0]} gives '
+                                f'{split[0][1]!r} - the rounding depends on the interpolation')
+                continue
         else:
             tol = float(kv['tol'].rstrip('%'))
-            if abs(const - value) > abs(value) * tol / 100:
+            out = [(lbl, v) for lbl, v in rows if abs(const - v) > abs(v) * tol / 100]
+            if out:
+                lbl, v = out[0]
                 failures.append(f'R4 {where}: the constant {const!r} is '
-                                f'{100 * (const - value) / value:+.3f}% from the artefact '
-                                f'{value!r}, outside tol={kv["tol"]}')
+                                f'{100 * (const - v) / v:+.3f}% from {lbl} '
+                                f'{v!r}, outside tol={kv["tol"]}')
                 continue
         counts['resolved'] += 1
     return counts, failures, legacy
@@ -604,7 +811,7 @@ def run(verbose=False):
     failures += c2_f
     failures += p4_check()
     total = dict(tags=0, resolved=0, locator_only=0, unresolvable_from_clone=0,
-                 legacy=0, stated=0)
+                 legacy=0, stated=0, resolved_cas=0, derived_unexecuted=0)
     legacy_all = []
     for branch in BRANCHES:
         bsrc = open(os.path.join(BRANCHES_DIR, branch, 'constants.py'),
@@ -627,6 +834,12 @@ def run(verbose=False):
           f"branches: {total['resolved']} resolved, {total['locator_only']} locator-only, "
           f"{total['stated']} stated, {total['unresolvable_from_clone']} unresolvable from a "
           f"clone, {total['legacy']} LEGACY (C3.7 worklist)")
+    print(f"  of the {total['resolved']} resolved, {total['resolved_cas']} are C2-form CAS "
+          f"tags whose check is the CAS number, not the value: "
+          f"{total['resolved'] - total['resolved_cas']} value comparisons (Reviewer G F-3)")
+    print(f"  {total['derived_unexecuted']} [DERIVED] tags are counted as stated and NEVER "
+          f"RECOMPUTED by this resolver - the UNEXECUTED class §C1.2 promises does not "
+          f"exist yet (Reviewer G F-4)")
     print('all pass' if not failures else f'{len(failures)} FAILURES')
     return 1 if failures else 0
 
@@ -671,9 +884,97 @@ LEGACY_ROW = 1.0
 # @units: 1
 # [UNVERIFIED] no source on disk; candidate NASA TR R-132 table 2
 GAP = 2.0
+
+# @kind: property
+# @units: m/s
+MEDIA = {
+    # [ON-DISK] refractiveindex_info/refractiveindex.info-database-main.zip @ member="database/data/main/H2O/nk/Daimon-20.0C.yml" wavelength=589nm via="C0/x" precision=4sf
+    "Water": C0 / 1.333,
+    # [ON-DISK] refractiveindex_info/refractiveindex.info-database-main.zip @ member="database/data/main/H2O/nk/Warren-2008.yml" wavelength=589nm via="C0/x" precision=3sf
+    "Ice": C0 / 1.31,
+    # [ON-DISK] refractiveindex_info/refractiveindex.info-database-main.zip @ member="database/data/organic/C6H6 - benzene/nk/Chang.yml" wavelength=0.589um via="C0/x" tol=0.1%
+    "Benzene": C0 / 1.501,
+}
+
+# @kind: defined
+# @units: kPa
+# [ON-DISK] codata_2022/allascii.txt @ quantity="standard atmosphere" scale=1e-3 precision=exact
+ATM_KPA = 101.325
+
+# @kind: property
+# @units: m^3/kg
+SAT = {
+    # [ON-DISK] nist_fluid_properties/water_C7732185_saturation_373.15K.tsv @ T=373.15 col="Volume (l, m3/kg)" precision=4sf
+    "Water v_f, 4 s.f. of a printed tie": 0.001044,
+    # [ON-DISK] nist_fluid_properties/water_C7732185_saturation_373.15K.tsv @ T=373.15 col="Volume (l, m3/kg)" precision=6dp
+    "Water v_f, 6 d.p. of the same tie": 0.001044,
+}
+
+# @kind: property
+# @units: ksi
+MIL_MODULI = {
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=277 text="Table 2.7.1.0(b)" mil="G" col=1 scale=1e3 precision=exact
+    "AISI 301 annealed, G": 11200,
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=841 mil="E" scale=1e3 precision=exact
+    "AZ31B sheet, E": 6500,
+}
+
+# @kind: standard
+# @units: us.W=lb/ft
+# [ON-DISK] civil/aisc_shapes_database_v16.xlsx @ sheet="Database v16.0" label_col="AISC_Manual_Label" rows=all blocks="us:1:key,si:2:si_label" precision=exact
+AISC_ONE = {
+    "W8X24": {"us": {"W": 24, "A": 7.08, "d": 7.93, "Ix": 82.7, "Sx": 20.9, "Zx": 23.1, "rx": 3.42},
+              "si_label": "W200X35.9", "si": {"W": 35.9, "A": 4570, "d": 201, "Ix": 34.4, "Sx": 342, "Zx": 379, "rx": 86.9}},
+}
 '''
 
 _PLANTS = [
+    # An .xlsx whole-table relation (C3.7, AISC_W_SHAPES). Three different ways to be
+    # wrong about a sheet: a transposed value, the SI fields read from the US header
+    # block, and a row the sheet does not have.
+    ('R4', 'a transposed value in one leaf of a whole-table relation (Ix 82.7 -> 87.2)',
+     '"Ix": 82.7,', '"Ix": 87.2,'),
+    ('R3', 'the SI fields read from the US header block (si:1 for si:2)',
+     'blocks="us:1:key,si:2:si_label"', 'blocks="us:1:key,si:1:si_label"'),
+    ('R3', 'a shape the sheet does not carry',
+     '"W8X24": {"us"', '"W8X25": {"us"'),
+    # Rounding convention (D-012): NIST prints 0.0010435, an exact decimal tie at 4 s.f.
+    # and at 6 d.p. The clean rows carry the decimal half-up value; each plant carries
+    # the value a BINARY rounding of the parsed float gives, which must fail - in both
+    # precision forms, since sf and dp were two separate code paths.
+    ('R4', 'a 4-s.f. decimal tie rounded on the binary float',
+     '"Water v_f, 4 s.f. of a printed tie": 0.001044', '"Water v_f, 4 s.f. of a printed tie": 0.001043'),
+    ('R4', 'a 6-d.p. decimal tie rounded on the binary float',
+     '"Water v_f, 6 d.p. of the same tie": 0.001044', '"Water v_f, 6 d.p. of the same tie": 0.001043'),
+    # MIL-HDBK-5J design tables (C3.1 mechanical). The text layer prints them in two
+    # layouts (tests/constants_integrity/milhdbk.py); a misreading of each, plus a
+    # page whose layout fits neither and must be refused rather than guessed.
+    ('R4', 'a BLOCK-layout table read in the wrong column (5 tempers on one page)',
+     'mil="G" col=1', 'mil="G" col=2'),
+    ('R4', 'an INTERLEAVED-layout table read on the wrong row',
+     'page=841 mil="E"', 'page=841 mil="G"'),
+    ('R3', 'a design table whose layout fits neither form (p.375, "See Table")',
+     'page=841 mil="E"', 'page=375 mil="E"'),
+    # A unit scale (C3.1, ATMOSPHERIC_PRESSURE_KPA: kPa against CODATA's Pa). Two
+    # forms of a unit error: the factor inverted, and the factor left out.
+    ('R4', 'a unit scale in the wrong direction', 'scale=1e-3 precision=exact',
+     'scale=1e3 precision=exact'),
+    ('R4', 'a unit scale left out', 'scale=1e-3 precision=exact', 'precision=exact'),
+    # Wavelength-evaluated indices (C3.1, MEDIA_VELOCITIES). Written from what the
+    # locator means: an index is a function of wavelength, valid over a stated
+    # range; `tabulated n2` is a different quantity; C0/n is not n; and a value
+    # between two tabulated rows is the interpolation's unless both rows agree.
+    ('R3', 'wavelength outside the dataset\'s stated range',
+     'Daimon-20.0C.yml" wavelength=589nm', 'Daimon-20.0C.yml" wavelength=100nm'),
+    ('R3', 'a nonlinear-index (n2) dataset cited as the index',
+     '"database/data/main/H2O/nk/Warren-2008.yml"', '"database/data/other/mixed gases/air/n2/Geints.yml"'),
+    ('R4', 'stored C0/n disagrees with the index at its precision',
+     '"Water": C0 / 1.333', '"Water": C0 / 1.334'),
+    ('R4', 'a 3-s.f. rounding that rests on the interpolation (rows 1.48 and 1.47)',
+     'main/H2O/nk/Warren-2008.yml" wavelength=589nm via="C0/x" precision=3sf\n    "Ice": C0 / 1.31',
+     'organic/C3H8O3 - glycerol/nk/Birkhoff.yml" wavelength=589nm via="C0/x" precision=3sf\n    "Ice": C0 / 1.47'),
+    ('R4', 'via names a constant the module does not define',
+     'wavelength=0.589um via="C0/x"', 'wavelength=0.589um via="CO/x"'),
     # R2 - the file does not exist (the brief's first mandated plant)
     ('R2', 'cites a file that does not exist',
      'codata_2022/allascii.txt @ quantity="speed', 'codata_2018/allascii.txt @ quantity="speed'),
@@ -702,7 +1003,7 @@ _PLANTS = [
 
 def selftest():
     bad = []
-    _c, clean_f, clean_legacy = check_source('plant', _CLEAN)
+    _c, clean_f, clean_legacy = check_source('plant', _CLEAN, register='GAP')
     if clean_f:
         print('  the clean fixture itself fails - no plant can be judged:')
         for x in clean_f:
@@ -714,7 +1015,7 @@ def selftest():
         if _CLEAN.count(old) != 1:
             bad.append(f'{code} {label}: plant anchor occurs {_CLEAN.count(old)} times')
             continue
-        _c, f, _l = check_source('plant', _CLEAN.replace(old, new))
+        _c, f, _l = check_source('plant', _CLEAN.replace(old, new), register='GAP')
         fresh = [x for x in f if x not in clean_f and x.startswith(code)]
         status = 'ok' if fresh else 'FAIL'
         print(f'  [{status}] {code} {label}' + (f' -> {fresh[0][:110]}' if fresh else f' (got {f})'))
@@ -733,13 +1034,22 @@ def selftest():
             fh.write('\n')
         man = json.load(open(os.path.join(REFS, 'MANIFEST.json'), encoding='utf-8'))
         _c, f, _l = check_source('plant', _CLEAN.split('# @kind: property')[0],
-                                 refs=tmp, manifest=man)
+                                 refs=tmp, manifest=man, register='GAP')
         fresh = [x for x in f if x.startswith('R2') and 'SHA-256' in x]
         print(f'  [{"ok" if fresh else "FAIL"}] R2 file present but altered after citation')
         if not fresh:
             bad.append(f'R2 altered file: not detected (got {f})')
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
+
+    # R6 - a residual tagged but absent from the register. The fixture's GAP is
+    #      [UNVERIFIED]; withhold it from the register and the membership check must fire.
+    _c, f, _l = check_source('plant', _CLEAN, register='(a register naming nothing)')
+    fresh = [x for x in f if x.startswith('R6') and 'residual register' in x]
+    print(f'  [{"ok" if fresh else "FAIL"}] R6 a residual named nowhere in the register'
+          + (f' -> {fresh[0][:100]}' if fresh else f' (got {f})'))
+    if not fresh:
+        bad.append('R6 register membership: not detected')
 
     # -- ATTACHMENT. Where a tag lands decides what it is checked against, and
     #    the first real run attached two wrongly while every failure plant above
@@ -754,8 +1064,9 @@ def selftest():
         ('ROWS', None, 'UNVERIFIED'),      # above the closing brace: the table
         ('MIDLINE', None, 'ON-DISK'),      # mid-line, table has nothing better: kept
         ('MIDLINE', None, 'VERIFY'),
+        ('SQ', 'k', 'ON-DISK'),            # above a SINGLE-quoted row key
     ], key=lambda x: (x[0], x[1] or '', x[2]))   # ROWS' header prose mention: dropped
-    print(f'  [{"ok" if got == want else "FAIL"}] attachment: six tags placed, one prose '
+    print(f'  [{"ok" if got == want else "FAIL"}] attachment: seven tags placed, one prose '
           f'mention dropped')
     if got != want:
         bad.append(f'attachment: got {got}, planted {want}')
@@ -780,6 +1091,11 @@ ROWS = {
 
 # see NAVFAC Ch. 3 [ON-DISK]  [VERIFY: Das]
 MIDLINE = {"c": 3.0}
+
+SQ = {
+    # [ON-DISK] codata_2022/allascii.txt @ quantity="y"
+    'k': 4.0,
+}
 '''
 
 

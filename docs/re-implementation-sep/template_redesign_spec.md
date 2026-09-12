@@ -623,10 +623,33 @@ honest and only one of them can be checked from a clone.
 | CODATA `allascii.txt` | `quantity="<name as printed>"` |
 | NIST fluid TSV | `T=<K> col="<column header>"` - the row must be **on the grid**, not near it |
 | NIST WebBook JSON (C2) | `cas=<CAS>`; C2's `NIST <CAS>` form is accepted as this |
-| PDF | `page=<physical page>` plus `text="<snippet>"`, or `image-only` where the text layer is not the document (NASA TR R-132, MIL-STD-105E) |
+| PDF | `page=<physical page>` plus `text="<snippet>"`; **a bare `page=` is the locator-only form** where the text layer is not the document (MIL-STD-105E) |
+| PDF, MIL-HDBK-5J design table | `page=` + `text="<table caption>"` + `mil="<row>"` [+ `col=<n>`] - the caption pins the table, `mil=` the property row |
 | zip | `member="<path>"` |
-| xlsx | `sheet="<name>" row="<key>" col="<header>"` |
+| zip, refractiveindex.info | `member="<path>" wavelength=<n>nm` - the dataset is evaluated at the wavelength, formula or tabulated, and a wavelength outside the dataset's range is refused |
+| xlsx | `sheet="<name>" label_col="<header>" rows=all blocks="<name>:<block>:<label source>,…" precision=` - a **whole-table** relation: every leaf compared with its cell |
 | HTML / text | `text="<snippet>"` |
+
+**Relations** (`precision=`/`tol=` above, and):  `field=[<key>]` names one value inside a
+row; `via="NAME/x"` solves for the cited quantity when the table stores a combination of
+it (`C0/n`); `scale=<f>` converts the constant into the artefact's own unit before
+comparison, so `precision=` keeps counting the artefact's digits.
+
+> **SPEC-CHANGE 23 (C3.7), amending the three rows above.** The `xlsx` row specified
+> `row="<key>" col="<header>"` - a per-leaf form that was never built, because
+> `AISC_W_SHAPES` holds 196 leaves and one tag per leaf buries the table; the whole-table
+> relation above replaces it. `image-only` was specified as a PDF locator and was never
+> implemented: a bare `page=` already resolves and counts `LOCATOR-ONLY`, which says the
+> same thing without a second vocabulary. `field=`, `via=`, `scale=`, `wavelength=`,
+> `mil=` and the xlsx `blocks=` form were built during C1.7 and C3 and were absent here.
+
+**When each relation applies (C3, normative).** `precision=` when the literal is a
+rounding of the artefact **at the table's own declared conditions**. `tol=` only when the
+conditions differ, when none are stated, or when the value crosses a non-decimal unit
+conversion - and then `tol` is half a unit in the artefact's last printed digit, not a
+number chosen to make the row pass. When the conditions match and the literal is **not** a
+rounding, the tag is `[KNOWN-DEFECTIVE]` with the measured error: a tolerance widened
+until a wrong value fits is the defect this vocabulary exists to prevent.
 
 **Deprecated tags**, retagged by C3.7: `[VERIFY: X]` → `[UNVERIFIED]` naming X as
 the candidate source · `[REALISM]` → `[POLICY: sampling-only]`, only where the
