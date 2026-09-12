@@ -42,10 +42,31 @@ declare `@kind`, `@units`, `@domain`. **15 `[DERIVED]` tags are never recomputed
 
 ---
 
-## 1. Measured wrong — all 19, itemised
+## 1. Measured wrong — all 19, itemised, and **all 19 now corrected**
 
-Each was compared with a named artefact at the table's own conditions and is not a
-rounding of it. **No value was changed**: correcting one moves the item pool (P6).
+Each was compared with a named artefact at the table's own conditions and was not a
+rounding of it. C3 left every one standing, because correcting a constant moves the item
+pool (P6) and that was the repo owner's call.
+
+**That call has been made, and all 19 are corrected.** The table below is kept as the
+record of what was wrong; the branch files now carry the artefact's value. `[KNOWN-DEFECTIVE]`
+is **zero corpus-wide**. The item-pool consequence is measured in
+`phaseC3_corrections_item_pool_impact.md`: 13 of 150 templates moved, 824 questions and 713
+answers, and **no template gained a generation error**.
+
+Row 1 is corrected in part, and says so. Its σ column re-sourced **16 of 17** rows to
+Svehla, which now carry 31 per-row `[ON-DISK]` citations the resolver re-reads from the
+scan. Two elements are deliberately not written:
+
+- **Xenon's σ** — it has no token in the OCR, and the positional read the C3 review
+  recorded is not reproducible: indexing p.26's 20th number tuple returns 2.608 / 10.22,
+  which is *helium's* second determination. Anchoring on its committed ε/k found no unique
+  tuple either. It keeps its value under a row-level `[UNVERIFIED]`.
+- **Ammonia's ε/k** — the scan prints it "55& 3" and the parser returns 55. By eye it is
+  558.3, but by eye is not a parse.
+
+A twentieth defect was found while closing these and is corrected with them:
+`SHEAR_MODULUS_VALUES['Aluminum 2024-T4']`, 28.0 GPa against 27.58 (see §3).
 
 | # | branch.table[row] | field | committed | artefact | error |
 |---|---|---|---|---|---|
@@ -82,9 +103,14 @@ citation problem.
 
 ---
 
-## 2. Unchecked — all 198, by the table that carries them
+## 2. Unchecked — all 200, by the table that carries them
 
-Not known to be wrong; known to be **unchecked**. 27 tables.
+Not known to be wrong; known to be **unchecked**. 28 tables.
+
+The count rose by two, and both are the corrections refusing to overstate themselves:
+`GAS_MOLECULAR_PARAMS` now appears here for Xenon's σ and Ammonia's ε/k (§1). A table that
+gains a residual by declining to write a value it cannot read is in better condition than
+one that quietly writes it.
 
 | branch.table | n | why |
 |---|---:|---|
@@ -125,7 +151,7 @@ hashed public copy already under `docs/references/` (D-076).
 | `R-410A` | chemical | a blend, absent from the 36 pure fluids; needs a mixture source or a replacement |
 | `Tellurium Mercury` | mechanical | WebBook returns "Name Not Found"; whether it means mercury telluride is not established |
 | `Tungsten Hexafluoride` | mechanical | listed as a manometer liquid; the on-disk Antoine parameters put P = 1.074 bar at 290.4 K, so it is a **gas** at room temperature |
-| `2024-T4` | mechanical | MIL-HDBK-5J **does** carry the table (p.374); its text layer does not parse |
+| `2024-T4` | mechanical | **CLOSED — and this entry was wrong on both counts.** p.374's text layer parses perfectly well; it prints "See Table 3.2.3.0(d)" in all four elastic cells, so there is no value on that page to read and the reader is right to refuse. p.373 (Table 3.2.3.0(b1)) parses cleanly and prints G 4.0 ×10³ ksi in all four columns, and following the deferral finds Table 3.2.3.0(d) on p.376, captioned "…Sheet and Plate, **All Tempers**" — which is what licenses applying it to T4, the question the row's own tag left open. `SHEAR_MODULUS_VALUES['Aluminum 2024-T4']` was 28.0 GPa against 27.58 (+1.5%, outside the 1.25% half-unit bound); corrected to 27.6 and cited to p.373, which is machine-readable where p.376 is not |
 | `Mercury` ΔHvap | chemical | the WebBook phase-change page has no vaporization section |
 | `Cork`, `Cork Board`, `Bamboo` | mechanical | **not wood** — a bark tissue and a grass; the wood reason never applied (H-mech F4) |
 
@@ -135,7 +161,7 @@ hashed public copy already under `docs/references/` (D-076).
 
 | table | finding |
 |---|---|
-| chemical `GAS_MOLECULAR_PARAMS` | §1 row 1 — now `[KNOWN-DEFECTIVE]` |
+| chemical `GAS_MOLECULAR_PARAMS` | §1 row 1 — **resolved.** 16 of 17 rows re-sourced to Svehla, carrying 31 per-row `[ON-DISK]` citations that the resolver re-reads from the 1962 scan through `tests/constants_integrity/svehla.py`. Xenon's σ and Ammonia's ε/k stay `[UNVERIFIED]`, each with its reason |
 | chemical `COMMON_LIQUIDS` | organic viscosities 4.62–7.16% low at the declared 20 °C; **diagnosis open**, §5 |
 | chemical `COMMON_GASES` | the steam row is **+25.00%** against NIST at the 373.15 K its own comment names, and within 0.25% of the ideal gas at 293.15 K — 20 °C vapour mislabelled as 100 °C steam |
 | chemical `HEATS_OF_FORMATION[CH4(g)]` | the tag cites −74.6 ± 0.3 and the row uses −74.8 (inside the uncertainty, but the tag names a measurement the value is not) |
@@ -173,8 +199,12 @@ quietly absorbs its corrections is worth no more than the claims it corrected.
 
 ## 6. Open questions for the repo owner
 
-1. The twelve mechanical alloy defects (§1 rows 4–15) — correct, or restate the grades.
-2. `GAS_MOLECULAR_PARAMS`' σ column — re-source from Svehla (moves items; μ ∝ σ⁻²).
+1. ~~The twelve mechanical alloy defects (§1 rows 4–15) — correct, or restate the grades.~~
+   **Answered: corrected**, to the MIL-HDBK-5J values this repo already ships. P6 measured.
+2. ~~`GAS_MOLECULAR_PARAMS`' σ column — re-source from Svehla (moves items; μ ∝ σ⁻²).~~
+   **Answered: re-sourced.** The emitted items then confirmed the argument independently —
+   butane's viscosity moved 1.537e-05 → 2.094e-05, and (5.47/4.687)² = 1.362 predicts
+   exactly that ratio from the constants alone.
 3. Six mechanical tables carry 172 unchecked rows — acquire sources, or accept.
 4. `COMMON_LIQUIDS`' conditions — fetch a 298.15 K grid and settle §5's open diagnosis.
 5. **`tol=` has no rule for its SIZE.** D-074 says when a tolerance may be used, never how
@@ -196,8 +226,15 @@ quietly absorbs its corrections is worth no more than the claims it corrected.
 
 ## 8. What C3 did not do
 
-Nothing in §1 was corrected. C3 changed comments, not values, with three exceptions, all
-recorded as P6 events and all measured: `REAL_FLUID_DATA` re-derived from NIST,
-`CONTROL_CHART_FACTORS`' 29 + 2 corrected last digits, and two template edits. The
+**As C3 shipped**, nothing in §1 was corrected. C3 changed comments, not values, with three
+exceptions, all recorded as P6 events and all measured: `REAL_FLUID_DATA` re-derived from
+NIST, `CONTROL_CHART_FACTORS`' 29 + 2 corrected last digits, and two template edits. The
 item-pool consequence is measured in `phaseC3_item_pool_impact.md`: **2 of 150 templates
 moved**.
+
+**That is no longer this file's final state**, and the sentence above is kept in the past
+tense rather than deleted, for the reason §5 gives: a register that quietly absorbs its own
+corrections is worth no more than the claims it corrected. All 19 of §1 are now corrected,
+plus a twentieth found in the process (§3, 2024-T4), and the consequence is measured
+separately in `phaseC3_corrections_item_pool_impact.md`: **13 of 150 templates moved**.
+What remains open is §2's 200 unchecked rows and §6's items 3–7.
