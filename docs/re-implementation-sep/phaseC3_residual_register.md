@@ -103,12 +103,12 @@ citation problem.
 
 ---
 
-## 2. Unchecked — **180**, by the table that carries them
+## 2. Unchecked — **176**, by the table that carries them
 
 Not known to be wrong; known to be **unchecked**.
 
-**Measured now** (tag-starting lines, per branch): mechanical 152, chemical 12, civil 8,
-electrical 4, industrial 4 — **180**. The per-table breakdown below is the **C3-era
+**Measured now** (tag-starting lines, per branch): mechanical 148, chemical 12, civil 8,
+electrical 4, industrial 4 — **176**. The per-table breakdown below is the **C3-era
 snapshot** and is kept as the record of what the phase inherited; it no longer sums to the
 current total.
 
@@ -217,7 +217,16 @@ quietly absorbs its corrections is worth no more than the claims it corrected.
    butane's viscosity moved 1.537e-05 → 2.094e-05, and (5.47/4.687)² = 1.362 predicts
    exactly that ratio from the constants alone.
 3. ~~Six mechanical tables carry 172 unchecked rows — acquire sources, or accept.~~
-   **Partly answered: 172 → 152, and the rest are measured rather than merely unchecked.**
+   **Partly answered: 172 → 148, and the rest are measured rather than merely unchecked.**
+
+   **The PubChem route is now exhausted, not merely paused.** A final sweep fetched the
+   remaining rows that are single named substances and tagged **none** of them. Quartz
+   returned the wrong *form* — PubChem's silicon dioxide record gives 2200/2300/2334/2600
+   (amorphous silica, fumed silica, silica gel), none of them crystalline α-quartz's 2650 —
+   and all six polymers returned `PUGREST.NotFound`, because a polymer is not a single
+   compound with a CID, which is the same reason its density depends on grade rather than
+   on a formula. Those rows need a **materials handbook**, and no further fetching will
+   reach them.
 
    | what | rows | |
    |---|---:|---|
@@ -226,7 +235,7 @@ quietly absorbs its corrections is worth no more than the claims it corrected.
    | fuel and oil rows given a measured n-alkane bracket | 19 | still `[UNVERIFIED]`, and now say why |
    | wood rows given FPL's actual species range | 5 | still `[UNVERIFIED]`, and now say why |
 
-   The remaining 152 are not one decision taken 152 times. They divide into:
+   The remaining 148 are not one decision taken 148 times. They divide into:
    **mixtures and commercial grades** (SAE oils, crude, gasoline, sea water, antifreeze) —
    no pure substance *is* the row, and the acquisition proved it: nonane/decane/dodecane
    bracket 718–749 kg/m³ against Kerosene 810, so re-pointing would change what the row
@@ -261,9 +270,20 @@ quietly absorbs its corrections is worth no more than the claims it corrected.
 
    This is worse than either proposal and different in kind. It **cannot** be repaired by
    editing `@domain`, because no single temperature is true of the table; `@domain` keeps
-   293.15 K, which is true of the densities and of water, and the rows now state what they
-   are. Re-sourcing the four organic viscosities at 293.15 K would fix it and is a **value
-   change** — registered here, not made.
+   293.15 K, which is true of the densities and of water.
+
+   **CORRECTED.** The four organic viscosities were re-sourced to the 293.15 K the table
+   declares — methanol 0.000544 → 0.000585, benzene 0.000601 → 0.000647, toluene 0.000560
+   → 0.000587, n-hexane 0.000294 → 0.000313 — each now carrying an `[ON-DISK]` tag the
+   resolver checks. The densities were not touched.
+
+   P6: **5 templates moved**, q 90 / ans 122 / sol 123, errors 0 → 0. One of them is the
+   first **hidden-constant** case of the whole phase: `newtons_law_shear_stress` moved
+   **0 questions and 32 answers** — the viscosity is used in the arithmetic and never
+   printed in the question, so those instances need **re-scoring but not re-inference**,
+   the exact inverse of tranche 1's `statically_indeterminate`. That is the more dangerous
+   direction: the question a model saw is byte-identical while the gold answer moved, and
+   nothing in the text signals it.
 5. ~~**`tol=` has no rule for its SIZE.**~~ **Answered: the rule is built and enforced.**
    D-074 licensed *when* a tolerance may be used and never *how large*, so one could be
    fitted to its own residual and never fail — a check that cannot fail is not a check.
