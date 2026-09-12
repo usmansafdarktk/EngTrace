@@ -1005,17 +1005,22 @@ COMBUSTION_REACTIONS = [
 #   FINDING (C3.5), DIAGNOSIS WITHDRAWN at the C3 review (Reviewer H, chemical, F-1):
 #   for every organic liquid that has a NIST isobar on disk, the
 #   VISCOSITY here is low by 4.6-7.2% at the very conditions this table declares - Methanol -7.06%, Benzene -7.16%, Toluene -4.62%, n-Hexane -6.12%.
-#   The densities agree to 0.001-0.7%. I recorded this as "a source difference, not
-#   scatter". The review proposes instead that the viscosity column is a 25 degC
-#   column. THAT CANNOT BE TESTED FROM THE ARTEFACTS HERE: no on-disk grid carries
-#   298.15 K - every 1-atm isobar has exactly one row in 290-302 K (293.15) and steps
-#   ~9-10 K, and the saturation grids are pressure-incremented and sparse at that end.
-#   The one species with a saturation row near 25 degC, n-hexane, moves -7.27%
-#   (291.84 K) to -1.10% (298.30 K), which supports the 25 degC reading without
-#   settling it. What is checkable is the control: WATER is +0.04% at 20 degC, so the
-#   column is not uniformly 25 degC either. The diagnosis is therefore OPEN, and the
-#   remedy it first prescribed - re-source the viscosity column - would discard rows
-#   that may be correct at a temperature this table does not state. Values untouched.
+#   The densities agree to 0.001-0.7%. SETTLED (C3.5 item 4): a 298.15 K grid was
+#   acquired for these five species, and the answer is NEITHER reading offered.
+#   The four organic VISCOSITIES fit 25 degC, and water - the control - does not:
+#     methanol -7.06% at 20 degC -> +0.05% at 25 degC
+#     benzene  -7.16% -> -0.33%
+#     toluene  -4.62% -> +1.41%
+#     n-hexane -6.12% -> -1.33%
+#     WATER    +0.04% -> +12.58%   (the control, and it is decisive)
+#   The DENSITY column fits 20 degC throughout. So the column is MIXED: the organic
+#   viscosities are at 25 degC while water and every density are at 20 degC.
+#   The review was right about the organics and wrong about the table. My own reading
+#   - "a source difference, not scatter" - stays WITHDRAWN: nothing here tests it.
+#   A mixed column cannot be repaired by editing @domain, because no single temperature
+#   is true of the table. @domain therefore keeps 293.15 K, which is true of the
+#   densities and of water. Re-sourcing the four organic viscosities at 293.15 K would
+#   fix it and is a VALUE change; registered (C3.5), not made here.
 COMMON_LIQUIDS = {
     # Water and Common Solvents
     # [ON-DISK] nist_fluid_properties/water_C7732185_isobar_1atm.tsv @ T=293.15 col="Density (kg/m3)" field=[0] precision=4sf
