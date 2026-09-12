@@ -1024,7 +1024,17 @@ MANOMETER_FLUIDS = {
     #   PubChem is an AGGREGATOR and this record carries several densities that
     #   disagree, so the citation names ONE ReferenceNumber rather than the CID alone.
     "Bromine": 3120,
-    # [UNVERIFIED] no source on disk. Residual register (C3.5).
+    # [UNVERIFIED] ONE SUBSTANCE UNDER TWO NAMES. This table also carries
+    #   "Acetylene Tetrabromide" at the same 2960, and acetylene tetrabromide IS
+    #   1,1,2,2-tetrabromoethane. Identical values under two names is strong evidence the
+    #   rows were meant as one substance.
+    #   NOT resolved here, and the limit is stated: no artefact on disk distinguishes
+    #   them - neither name was fetched - and "tetrabromoethane" could in principle name
+    #   the 1,1,1,2 isomer. Deleting a row moves the item pool and chooses which name the
+    #   table means, which is the repo owner's call.
+    #   Consequence while it stands: a template drawing random.choice over this table
+    #   draws this fluid twice under two labels, over-weighting it against every other
+    #   row. C3.5 residual (substance defects).
     "Tetrabromoethane": 2960,
     
     # Inorganic Solutions
@@ -1045,7 +1055,17 @@ MANOMETER_FLUIDS = {
     "Glycerin": 1260,
     # [UNVERIFIED] no source on disk. Residual register (C3.5).
     "Diiodomethane": 3325,
-    # [UNVERIFIED] no source on disk. Residual register (C3.5).
+    # [UNVERIFIED] ONE SUBSTANCE UNDER TWO NAMES. This table also carries
+    #   "Tetrabromoethane" at the same 2960, and acetylene tetrabromide IS
+    #   1,1,2,2-tetrabromoethane. Identical values under two names is strong evidence the
+    #   rows were meant as one substance.
+    #   NOT resolved here, and the limit is stated: no artefact on disk distinguishes
+    #   them - neither name was fetched - and "tetrabromoethane" could in principle name
+    #   the 1,1,1,2 isomer. Deleting a row moves the item pool and chooses which name the
+    #   table means, which is the repo owner's call.
+    #   Consequence while it stands: a template drawing random.choice over this table
+    #   draws this fluid twice under two labels, over-weighting it against every other
+    #   row. C3.5 residual (substance defects).
     "Acetylene Tetrabromide": 2960,
     
     # Molten Metals (for high-temperature applications)
