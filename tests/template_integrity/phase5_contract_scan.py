@@ -399,12 +399,40 @@ PLANTS = (
     ('doubled_sign', 'Calculate', 'cos(876*t + -86.8 deg). Calculate', 'q'),
     ('degenerate_product', '**Answer:**', '**Answer:** omega_a = 0*pi and', 'sol'),
     ('degenerate_product', '**Answer:**', '**Answer:** omega_a = 0.0*pi and', 'sol'),
+    # D6.8, and its two shapes are the two TERMS of the rule, not two spellings
+    # of one: an over-long span carrying no marker at all, and a foreign section
+    # marker inside a span of ordinary length.  Either term alone is passed by
+    # the defect the other catches (SPEC-CHANGE 18).
+    ('answer_span', '**Answer:**', '**Answer:** ' + 'padding ' * 45, 'sol'),
+    ('answer_span', '**Answer:**',
+     '**Answer:**\n**Note:** commentary that belongs above the marker.', 'sol'),
 )
+
+#: Classes T4 owns and `scan_solution` deliberately does NOT detect.
+#:
+#: Without this the self-test cannot express a T4-only detector: `caught_scan`
+#: is required for every class, so an answer-span plant would be scored as a
+#: MISS because the scanner has no such detector -- a harness limitation read as
+#: a detector failure.  The alternative was to add an answer-span detector to
+#: `scan_solution` as well, which is the duplicate scanner this module's own
+#: history warns against: Phase 5 nearly added one rather than fixing T4 with a
+#: single line.  Making the expectation explicit in BOTH directions is the
+#: cheaper and more honest fix.
+SCAN_BLIND = ('answer_span',)
 
 #: The negative half of the same test: planted where it is NOT a defect, the
 #: answer-span detector must stay silent.  Without this the scoping is untested.
+#: ``(class, find, replace, instrument)`` -- ``instrument`` is 'scan' or 't4',
+#: because the negative half has to be checked by whichever instrument owns the
+#: class.  D6.8's negative plant is the important one: a ``**Note:**`` block in a
+#: DERIVATION STEP is perfectly legitimate, and only becomes a defect once it
+#: sits after the answer marker.  Without this, the span scoping is asserted in
+#: a docstring rather than tested, which is exactly what let D5.3 pass a span
+#: carrying a whole extra section.
 NEGATIVE_PLANTS = (
-    ('degenerate_product', '**Step 2:**', '**Step 2:** h = 0*delta[0] and'),
+    ('degenerate_product', '**Step 2:**', '**Step 2:** h = 0*delta[0] and', 'scan'),
+    ('answer_span', '**Step 2:**',
+     '**Step 2:**\n**Note:** a note here is not a defect.', 't4'),
 )
 
 
@@ -441,27 +469,41 @@ def selftest() -> int:
         res = ScanResult(template_id=f'<planted:{cls}>',
                          in_track_a=True)
         scan_solution(sol, res, q)
-        caught_scan = bool(res.hits[cls])
+        # `hits` is keyed by the SCANNER's own classes, so indexing it with a
+        # T4-only class raises instead of returning nothing.  The expectation
+        # has to be computed BEFORE the lookup, and `.get` keeps a future
+        # T4-only class from turning a harness gap into a crash.
+        scan_should_see = cls not in SCAN_BLIND
+        caught_scan = bool(res.hits.get(cls)) if scan_should_see else False
+        scan_ok = caught_scan if scan_should_see else True
 
         mutant = Instance(host.template_id, 0, q, sol)
         t4 = t4_contract.run([mutant], host.template_id)
-        t4_should_see = cls in ('step_marker', 'answer_marker') and where == 'sol'
+        t4_should_see = (cls in ('step_marker', 'answer_marker', 'answer_span')
+                         and where == 'sol')
         t4_ok = (not t4.passed) if t4_should_see else True
 
+        scan_note = ('n/a' if not scan_should_see
+                     else ('CAUGHT' if caught_scan else 'MISSED'))
         print(f'  plant {cls:20s} in {where:3s} {repl[:22]!r:26s} '
-              f'scan={"CAUGHT" if caught_scan else "MISSED"}  '
+              f'scan={scan_note}  '
               f'T4={"FAILS" if not t4.passed else "passes"}')
-        if not caught_scan or not t4_ok:
+        if not scan_ok or not t4_ok:
             ok = False
 
-    for cls, find, repl in NEGATIVE_PLANTS:
+    for cls, find, repl, instrument in NEGATIVE_PLANTS:
         planted = inst.solution.replace(find, repl, 1)
-        res = ScanResult(template_id=f'<negative:{cls}>')
-        scan_solution(planted, res)
-        quiet = not res.hits[cls]
-        print(f'  negative plant {cls:13s} '
-              f'{"silent (correct)" if quiet else "FIRED -- over-broad"}'
-              f'  [census saw it: {bool(res.hits[cls + chr(95) + "derivation"])}]')
+        if instrument == 't4':
+            mutant = Instance(host.template_id, 0, inst.question, planted)
+            quiet = t4_contract.run([mutant], host.template_id).passed
+            census = ''
+        else:
+            res = ScanResult(template_id=f'<negative:{cls}>')
+            scan_solution(planted, res)
+            quiet = not res.hits[cls]
+            census = f'  [census saw it: {bool(res.hits[cls + chr(95) + "derivation"])}]'
+        print(f'  negative plant {cls:13s} ({instrument}) '
+              f'{"silent (correct)" if quiet else "FIRED -- over-broad"}{census}')
         if not quiet:
             ok = False
     return 0 if ok else 1
