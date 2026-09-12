@@ -1,5 +1,5 @@
 {
- "generated_utc": "2026-09-12T08:39:15Z",
+ "generated_utc": "2026-09-12T10:52:32Z",
  "generator": "docs/references/fetch_references.py",
  "local_only_copyrighted": {
   "files": [
@@ -2433,7 +2433,6 @@
   },
   "pubchem:2_propanol:density": {
    "bytes": 18295,
-   "cid": 3776,
    "dest": "pubchem/2_propanol_density.json",
    "grounds": [
     "FLUID_DENSITIES, PIPE_FLUIDS: Isopropyl alcohol"
@@ -2445,13 +2444,12 @@
    "retrieved_utc": "2026-09-12T06:39:23Z",
    "sha256": "14d8d5150396a0792229bf77717de483b06567133ced8ff66de26120aadaa432",
    "species": "2-propanol",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/3776/JSON?heading=Density",
    "via": "ok"
   },
   "pubchem:acetone:density": {
    "bytes": 12218,
-   "cid": 180,
    "dest": "pubchem/acetone_density.json",
    "grounds": [
     "FLUID_DENSITIES, PIPE_FLUIDS: Acetone"
@@ -2463,13 +2461,12 @@
    "retrieved_utc": "2026-09-12T06:39:20Z",
    "sha256": "2f774c426a4be923533945127d93da055a20dd387d03d16c461337587fa2c2a1",
    "species": "acetone",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/180/JSON?heading=Density",
    "via": "ok"
   },
   "pubchem:aluminum:density": {
    "bytes": 13321,
-   "cid": 5359268,
    "dest": "pubchem/aluminum_density.json",
    "grounds": [
     "MATERIAL_DENSITIES: Aluminum"
@@ -2481,13 +2478,12 @@
    "retrieved_utc": "2026-09-12T06:40:17Z",
    "sha256": "93e7c191be9442f7937180142e828f2e727536a5c7f23af4bff8744730d79c58",
    "species": "aluminum",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/5359268/JSON?heading=Density",
    "via": "ok"
   },
   "pubchem:bromine:density": {
    "bytes": 13544,
-   "cid": 24408,
    "dest": "pubchem/bromine_density.json",
    "grounds": [
     "FLUID_DENSITIES, MANOMETER_FLUIDS: Bromine"
@@ -2499,13 +2495,12 @@
    "retrieved_utc": "2026-09-12T06:39:38Z",
    "sha256": "fdd48648cf62ea80db6047885be4ebb5b441fa1f1fa9830ff5f62b90d1ed4c81",
    "species": "bromine",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/24408/JSON?heading=Density",
    "via": "ok"
   },
   "pubchem:carbon_tetrachloride:density": {
    "bytes": 14325,
-   "cid": 5943,
    "dest": "pubchem/carbon_tetrachloride_density.json",
    "grounds": [
     "FLUID_DENSITIES, MANOMETER_FLUIDS: Carbon tetrachloride"
@@ -2517,13 +2512,12 @@
    "retrieved_utc": "2026-09-12T06:39:33Z",
    "sha256": "839eac7acf50551f3add804798bc56c2c6b8ab19d70af14ed520fe76db3ac4ed",
    "species": "carbon tetrachloride",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/5943/JSON?heading=Density",
    "via": "ok"
   },
   "pubchem:chloroform:density": {
    "bytes": 15261,
-   "cid": 6212,
    "dest": "pubchem/chloroform_density.json",
    "grounds": [
     "FLUID_DENSITIES, MANOMETER_FLUIDS: Chloroform"
@@ -2535,13 +2529,12 @@
    "retrieved_utc": "2026-09-12T06:39:36Z",
    "sha256": "860ff8e5bc400e423c27b61d21128997897f4243244035a55cf9951af48b36b0",
    "species": "chloroform",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/6212/JSON?heading=Density",
    "via": "ok"
   },
   "pubchem:copper:density": {
    "bytes": 9025,
-   "cid": 23978,
    "dest": "pubchem/copper_density.json",
    "grounds": [
     "MATERIAL_DENSITIES: Copper"
@@ -2553,13 +2546,12 @@
    "retrieved_utc": "2026-09-12T06:39:56Z",
    "sha256": "caea2add7318169cea6abb4f4ece6e1b9596317020a5e993d436a666a03f873d",
    "species": "copper",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/23978/JSON?heading=Density",
    "via": "ok"
   },
   "pubchem:diiodomethane:density": {
    "bytes": 2437,
-   "cid": 6346,
    "dest": "pubchem/diiodomethane_density.json",
    "grounds": [
     "MANOMETER_FLUIDS: Diiodomethane"
@@ -2571,13 +2563,12 @@
    "retrieved_utc": "2026-09-12T06:39:46Z",
    "sha256": "1985a3051a5b0fb8fae5506721a0bc83828477c3314d2d85fc4c873c1c53ca62",
    "species": "diiodomethane",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/6346/JSON?heading=Density",
    "via": "ok"
   },
   "pubchem:ethanol:density": {
    "bytes": 12260,
-   "cid": 702,
    "dest": "pubchem/ethanol_density.json",
    "grounds": [
     "FLUID_DENSITIES, PIPE_FLUIDS: Ethanol"
@@ -2589,13 +2580,12 @@
    "retrieved_utc": "2026-09-12T06:39:18Z",
    "sha256": "c00c9e97991b0fdb3257d36b6feccc0674d968a8535deccda7eb403323c3e099",
    "species": "ethanol",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/702/JSON?heading=Density",
    "via": "ok"
   },
   "pubchem:ethylene_glycol:density": {
    "bytes": 12324,
-   "cid": 174,
    "dest": "pubchem/ethylene_glycol_density.json",
    "grounds": [
     "FLUID_DENSITIES, PIPE_FLUIDS: Ethylene glycol"
@@ -2607,13 +2597,12 @@
    "retrieved_utc": "2026-09-12T06:39:29Z",
    "sha256": "3f21b4a41a2b0ff15b140c9c3f925283852be9d5c3f5e31cf9cfc5d6cb8731ce",
    "species": "ethylene glycol",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/174/JSON?heading=Density",
    "via": "ok"
   },
   "pubchem:gallium:density": {
    "bytes": 4405,
-   "cid": 5360835,
    "dest": "pubchem/gallium_density.json",
    "grounds": [
     "MANOMETER_FLUIDS, MATERIAL_DENSITIES: Gallium"
@@ -2625,13 +2614,12 @@
    "retrieved_utc": "2026-09-12T06:39:48Z",
    "sha256": "f5b9036c04ee151033afae1217a8cc55199e8f4f10611136abca734de69ff83d",
    "species": "gallium",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/5360835/JSON?heading=Density",
    "via": "ok"
   },
   "pubchem:glycerol:density": {
    "bytes": 12478,
-   "cid": 753,
    "dest": "pubchem/glycerol_density.json",
    "grounds": [
     "FLUID_DENSITIES, MANOMETER_FLUIDS: Glycerin"
@@ -2643,13 +2631,12 @@
    "retrieved_utc": "2026-09-12T06:39:27Z",
    "sha256": "07dd784d0443ed022805cb9ed95f5bc576a1305672219049e6acc41ad0ee026d",
    "species": "glycerol",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/753/JSON?heading=Density",
    "via": "ok"
   },
   "pubchem:gold:density": {
    "bytes": 4408,
-   "cid": 23985,
    "dest": "pubchem/gold_density.json",
    "grounds": [
     "MATERIAL_DENSITIES: Gold"
@@ -2661,13 +2648,12 @@
    "retrieved_utc": "2026-09-12T06:39:58Z",
    "sha256": "e7b8f740a2edd0bfe411e8e11e1fc0181b7ba2644873a623b52a9a6952be3147",
    "species": "gold",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/23985/JSON?heading=Density",
    "via": "ok"
   },
   "pubchem:graphite:density": {
    "bytes": 9259,
-   "cid": 5462310,
    "dest": "pubchem/graphite_density.json",
    "grounds": [
     "MATERIAL_DENSITIES: Graphite"
@@ -2679,13 +2665,12 @@
    "retrieved_utc": "2026-09-12T06:40:25Z",
    "sha256": "2f92fe91917b9b33b35c4531919b5ec4d97289d0990973dd12ec85d4b72ede58",
    "species": "graphite",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/5462310/JSON?heading=Density",
    "via": "ok"
   },
   "pubchem:lead:density": {
    "bytes": 8914,
-   "cid": 5352425,
    "dest": "pubchem/lead_density.json",
    "grounds": [
     "MATERIAL_DENSITIES: Lead"
@@ -2697,13 +2682,12 @@
    "retrieved_utc": "2026-09-12T06:40:04Z",
    "sha256": "8aacb0d8717fa1622232acff5e96a843112da7d52488b4fc1c1dd53b07f2ad71",
    "species": "lead",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/5352425/JSON?heading=Density",
    "via": "ok"
   },
   "pubchem:mercury:density": {
    "bytes": 12546,
-   "cid": 23931,
    "dest": "pubchem/mercury_density.json",
    "grounds": [
     "FLUID_DENSITIES, MANOMETER_FLUIDS, MATERIAL_DENSITIES: Mercury"
@@ -2715,13 +2699,12 @@
    "retrieved_utc": "2026-09-12T06:39:41Z",
    "sha256": "751b7af99e6412ac8762a069f4df61da207f87d4416181882a4dccd430c21d1e",
    "species": "mercury",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/23931/JSON?heading=Density",
    "via": "ok"
   },
   "pubchem:nickel:density": {
    "bytes": 14156,
-   "cid": 935,
    "dest": "pubchem/nickel_density.json",
    "grounds": [
     "MATERIAL_DENSITIES: Nickel"
@@ -2733,13 +2716,12 @@
    "retrieved_utc": "2026-09-12T06:40:07Z",
    "sha256": "15f579d97567caed11b1ba562e8ab45d82b23493b51c1a8e6fe0d501007ba85d",
    "species": "nickel",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/935/JSON?heading=Density",
    "via": "ok"
   },
   "pubchem:osmium:density": {
    "bytes": 4256,
-   "cid": 23937,
    "dest": "pubchem/osmium_density.json",
    "grounds": [
     "MATERIAL_DENSITIES: Osmium"
@@ -2751,13 +2733,12 @@
    "retrieved_utc": "2026-09-12T06:40:20Z",
    "sha256": "ebd9a60c9f32dd75532f3be1dd9b69d18c23e061b395d7988a3fbd1f1b45a24b",
    "species": "osmium",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/23937/JSON?heading=Density",
    "via": "ok"
   },
   "pubchem:p_xylene:density": {
    "bytes": 10617,
-   "cid": 7809,
    "dest": "pubchem/p_xylene_density.json",
    "grounds": [
     "FLUID_DENSITIES: Xylene"
@@ -2769,13 +2750,12 @@
    "retrieved_utc": "2026-09-12T06:39:43Z",
    "sha256": "8fcb6d7a6919c2b36543d97ad80bc1874748000934a3ac4fece31345fa30cdf2",
    "species": "p-xylene",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/7809/JSON?heading=Density",
    "via": "ok"
   },
   "pubchem:platinum:density": {
    "bytes": 9848,
-   "cid": 23939,
    "dest": "pubchem/platinum_density.json",
    "grounds": [
     "MATERIAL_DENSITIES: Platinum"
@@ -2787,13 +2767,30 @@
    "retrieved_utc": "2026-09-12T06:40:10Z",
    "sha256": "914bcb4e6b9fa29e569e6d06fdad65f4547c308a289c7f3efc25c0bea0c07982",
    "species": "platinum",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/23939/JSON?heading=Density",
+   "via": "ok"
+  },
+  "pubchem:silicon_dioxide:density": {
+   "bytes": 22239,
+   "cid": 24261,
+   "dest": "pubchem/silicon_dioxide_density.json",
+   "grounds": [
+    "MATERIAL_DENSITIES: Quartz"
+   ],
+   "group": "pubchem",
+   "id": "pubchem:silicon_dioxide:density",
+   "kind": "json",
+   "licence": "US Government work (NIH/NLM PubChem); entries cite third-party primaries (CRC, Merck) named in each record",
+   "retrieved_utc": "2026-09-12T10:52:26Z",
+   "sha256": "ab14f92118d4633cfe2650c5f24b70249f4bdccfdaf3dbf5a1fce8f37d90232b",
+   "species": "silicon dioxide",
+   "status": "acquired",
+   "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/24261/JSON?heading=Density",
    "via": "ok"
   },
   "pubchem:silver:density": {
    "bytes": 11445,
-   "cid": 23954,
    "dest": "pubchem/silver_density.json",
    "grounds": [
     "MATERIAL_DENSITIES: Silver"
@@ -2805,13 +2802,12 @@
    "retrieved_utc": "2026-09-12T06:40:02Z",
    "sha256": "52690900c942f2fda869ba3b71914f84a5274f3bc8cc8c521b921cf35521f742",
    "species": "silver",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/23954/JSON?heading=Density",
    "via": "ok"
   },
   "pubchem:tin:density": {
    "bytes": 8452,
-   "cid": 5352426,
    "dest": "pubchem/tin_density.json",
    "grounds": [
     "MANOMETER_FLUIDS, MATERIAL_DENSITIES: Tin"
@@ -2823,13 +2819,12 @@
    "retrieved_utc": "2026-09-12T06:39:51Z",
    "sha256": "54c9b4730637dc201460de36b6399b12942dfc651d12138e9601d39cf05b9d6c",
    "species": "tin",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/5352426/JSON?heading=Density",
    "via": "ok"
   },
   "pubchem:titanium:density": {
    "bytes": 4249,
-   "cid": 23963,
    "dest": "pubchem/titanium_density.json",
    "grounds": [
     "MATERIAL_DENSITIES: Titanium"
@@ -2841,13 +2836,12 @@
    "retrieved_utc": "2026-09-12T06:40:15Z",
    "sha256": "e7f23d4d3ab56403488bb7026bd5bac6b2d539db3550cdd13ad561129b793728",
    "species": "titanium",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/23963/JSON?heading=Density",
    "via": "ok"
   },
   "pubchem:tungsten:density": {
    "bytes": 9928,
-   "cid": 23964,
    "dest": "pubchem/tungsten_density.json",
    "grounds": [
     "MATERIAL_DENSITIES: Tungsten"
@@ -2859,13 +2853,12 @@
    "retrieved_utc": "2026-09-12T06:40:12Z",
    "sha256": "32511edd31c73664d3d1cab1b9750f4c3b748389940c3d6f9ca7a02446376245",
    "species": "tungsten",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/23964/JSON?heading=Density",
    "via": "ok"
   },
   "pubchem:uranium:density": {
    "bytes": 8130,
-   "cid": 23989,
    "dest": "pubchem/uranium_density.json",
    "grounds": [
     "MATERIAL_DENSITIES: Uranium"
@@ -2877,13 +2870,12 @@
    "retrieved_utc": "2026-09-12T06:40:22Z",
    "sha256": "1ebf83232792d7b97ac95508e81af227d6a93c0324ff2fe7d14cb6d0251f5ab7",
    "species": "uranium",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/23989/JSON?heading=Density",
    "via": "ok"
   },
   "pubchem:zinc:density": {
    "bytes": 5492,
-   "cid": 23994,
    "dest": "pubchem/zinc_density.json",
    "grounds": [
     "MANOMETER_FLUIDS, MATERIAL_DENSITIES: Zinc"
@@ -2895,7 +2887,7 @@
    "retrieved_utc": "2026-09-12T06:39:53Z",
    "sha256": "cdd10062a85fa4fa0211085eb0ea3b91a8731083366a591a5d09e0ea5fc9b9d5",
    "species": "zinc",
-   "status": "acquired",
+   "status": "present",
    "url": "https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/23994/JSON?heading=Density",
    "via": "ok"
   },
