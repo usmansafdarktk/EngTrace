@@ -1,0 +1,8 @@
+# C3.2 register: consumers measured OUTSIDE a table's declared @domain (D-032).
+#
+# One line per excursion: `branch.TABLE template key | referral`.
+# test_consumer_domains.py RATCHETS this file: an excursion not listed fails, and a
+# listed one that no longer occurs fails. Listing is NOT acceptance - every line is
+# a defect referred to the repo owner (C3.5), recorded so it cannot be silent.
+electrical_engineering.MEDIA_VELOCITIES template_wave_parameters_basic wavelength | optical refractive indices (read at 0.589 um) used for 50-500 MHz radio waves; options for the repo owner: restrict the template to optical frequencies, split the table by consumer (D-036), or re-source the rows as radio-frequency permittivities (C3.5)
+chemical_engineering.CP_PARAMS template_sensible_heat_temp_dependent_cp T_lo | the sensible-heat template integrates the Cp polynomial from as low as 281.67 K over 60 seeds, below the 298 K floor the fit declares (the same class as C2 Reviewer H F-2, which was about the ceiling); options for the repo owner: raise the template's lower draw to 298 K, refit the polynomials below it, or restate the floor with evidence. Found by C3's own review fix, not by the review (D-032, C3.5)

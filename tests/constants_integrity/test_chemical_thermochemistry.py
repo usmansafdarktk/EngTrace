@@ -305,20 +305,33 @@ def run():
         i = sol.find('**Answer')
         for tok in _re.findall(r'([\d,]+\.?\d*)\s*K', sol[i:] if i >= 0 else sol):
             reached = max(reached, float(tok.replace(',', '')))
+    # C3.2 REPAIR. This NOTE measured the wrong table. It compared `reached` with
+    # CP_VALID_T_MAX (1500 K) and computed the error from CP_PARAMS - but since D-036
+    # split the table by consumer, this template reads CP_PARAMS_COMBUSTION, whose
+    # ceiling is CP_COMBUSTION_VALID_T_MAX (3000 K). So it reported a template as
+    # ~90% past a validity limit that has not applied to it since D-036, and quoted a
+    # Cp error from polynomials the template no longer uses. The check now measures the
+    # table the template actually reads, and fails rather than notes: being outside the
+    # range you were refitted for is a defect, not a footnote.
+    from data.templates.branches.chemical_engineering.constants import (
+        CP_COMBUSTION_VALID_T_MAX, CP_PARAMS_COMBUSTION)
     checks += 1
-    prod_max = max(CP_VALID_T_MAX[s_] for s_ in ('CO2(g)', 'H2O(g)', 'N2(g)', 'O2(g)'))
+    prod_max = CP_COMBUSTION_VALID_T_MAX
+    worst = 0.0
+    for sp in ('CO2(g)', 'H2O(g)', 'N2(g)', 'O2(g)'):
+        e = ref.get(sp)
+        n = cp_nist(e, reached) if e else None
+        if n:
+            worst = max(worst, abs(100.0 * (cp_svn(CP_PARAMS_COMBUSTION[sp], reached) - n) / n))
     if reached > prod_max:
         over = 100.0 * (reached - prod_max) / prod_max
-        worst = 0.0
-        for sp in ('CO2(g)', 'H2O(g)', 'N2(g)', 'O2(g)'):
-            e = ref.get(sp)
-            n = cp_nist(e, reached) if e else None
-            if n:
-                worst = max(worst, abs(100.0 * (cp_svn(CP_PARAMS[sp], reached) - n) / n))
-        print(f'  NOTE: adiabatic_flame_temperature reaches {reached:.0f} K, '
-              f'{over:.0f}% past the {prod_max:.0f} K validity of its product '
-              f'polynomials; worst Cp error there is {worst:.1f}% '
-              f'(known and accepted - DECISIONS D-032)')
+        failures.append(f'adiabatic_flame_temperature reaches {reached:.0f} K, '
+                        f'{over:.1f}% past the {prod_max:.0f} K validity of '
+                        f'CP_PARAMS_COMBUSTION, the table it reads (D-036)')
+    else:
+        print(f'  F-2: adiabatic_flame_temperature reaches {reached:.0f} K, inside the '
+              f'{prod_max:.0f} K validity of CP_PARAMS_COMBUSTION (D-036); worst Cp '
+              f'error against NIST there is {worst:.1f}%')
 
     print(f'{checks} checks')
     if failures:
