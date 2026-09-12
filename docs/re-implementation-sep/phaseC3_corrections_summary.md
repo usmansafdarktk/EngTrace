@@ -10,10 +10,10 @@ way.
 
 | | at the C3 merge (`4eb6488`) | now |
 |---|---|---|
-| tags | 452 | **485** |
-| resolved | 156 (109 value comparisons) | **224** (177 value comparisons) |
+| tags | 452 | **489** |
+| resolved | 156 (109 value comparisons) | **232** (185 value comparisons) |
 | `[KNOWN-DEFECTIVE]` | 19 | **0** |
-| `[UNVERIFIED]` | 198 | **180** |
+| `[UNVERIFIED]` | 198 | **176** |
 | LEGACY | 0 | 0 |
 | `[DERIVED]` recomputed | 0 of 15 | **8 run here, 1 elsewhere, 7 unexecuted** |
 | `tol=` with a declared basis | 0 of 10 | **17 of 17** |

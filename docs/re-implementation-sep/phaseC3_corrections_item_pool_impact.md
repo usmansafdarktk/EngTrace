@@ -218,3 +218,76 @@ and calling it sourcing.
 Unchanged on every gate: T1 29, T2 0, T4 0, T5 66, T7 83, T8 0, T6 142, contract scan
 150/150, `cross_pair` PASS, `audit_3_8` 80/80, resolver 224 resolved of 485 tags with
 0 LEGACY, plausibility 72 checks.
+
+---
+
+# Tranche 4 — the `COMMON_LIQUIDS` viscosities, and the first hidden-constant case
+
+**P6 event: YES, on 5 of 150 templates.** `before` is **ae45d8b**; `after` is the working
+tree. Totals: `{'q': 90, 'ans': 122, 'sol': 123, 'err_before': 0, 'err_after': 0}`.
+
+| template | question | answer | solution |
+|---|---:|---:|---:|
+| `annulus_flowrate` | 33/300 | 33/300 | 33/300 |
+| `newtons_law_shear_stress` | **0/300** | **32/300** | 33/300 |
+| `kinematic_viscosity` | 23/300 | 23/300 | 23/300 |
+| `reynolds_number_flow_regime` | 23/300 | 23/300 | 23/300 |
+| `falling_film_max_velocity` | 11/300 | 11/300 | 11/300 |
+
+## The hidden constant — the case this dump exists to catch
+
+`newtons_law_shear_stress` moved **0 questions and 32 answers**. The viscosity is **used in
+the arithmetic and never printed in the question**, so a model sees a byte-identical
+question while the correct answer has moved, with nothing in the text signalling it.
+
+These 32 instances need **re-scoring but not re-inference** — the exact inverse of tranche
+1's `statically_indeterminate` (41 questions, 0 answers), and the more dangerous direction
+of the two. It is also why `ans` (122) exceeds `q` (90) in the totals, which no earlier
+tranche did. `c3_instance_dump`'s docstring names both cases in terms — "a restated value
+changes the question (re-inference), a hidden one only the answer (re-score)" — and this is
+the first hidden one in the phase.
+
+## What was corrected
+
+The four organic viscosities re-sourced to the 293.15 K the table declares, each now
+carrying an `[ON-DISK]` tag the resolver checks:
+
+| | was | now | NIST at 293.15 K |
+|---|---:|---:|---|
+| Methanol | 0.000544 | **0.000585** | 0.0005853 (−7.06% before) |
+| Benzene | 0.000601 | **0.000647** | 0.00064738 (−7.16%) |
+| Toluene | 0.000560 | **0.000587** | 0.00058714 (−4.62%) |
+| n-Hexane | 0.000294 | **0.000313** | 0.00031317 (−6.12%) |
+
+The densities were **not** touched — the patch asserts it, and the diff confirms it. They
+were already at 20 °C; only the viscosity column was a 25 °C column.
+
+## The PubChem floor, reached
+
+A final sweep fetched every remaining row that is a single named substance and tagged
+**none** of them. **Quartz** returned the wrong *form* — silicon dioxide gives
+2200/2300/2334/2600 (amorphous silica, fumed silica, silica gel), not crystalline
+α-quartz's 2650 — and all six **polymers** returned `PUGREST.NotFound`, a polymer having no
+CID for the same reason its density depends on grade rather than formula. Those six dead
+manifest entries were removed rather than parked, so the failure list records only real
+gaps (`janaf:Ag`, `janaf:Au`).
+
+Four rows *were* closed from data already on disk that an earlier hand-written target list
+had simply omitted. `[UNVERIFIED]` **180 → 176**; `[KNOWN-DEFECTIVE]` remains **0**;
+resolver **489 tags, 232 resolved, 185 value comparisons**.
+
+## Regression
+
+Identical to baseline on every gate, with four values changed:
+
+| gate | baseline | now |
+|---|---|---|
+| T1 / T2 / T4 / T5 / T7 / T8 | 29 / 0 / 0 / 66 / 83 / 0 | 29 / 0 / 0 / 66 / 83 / 0 |
+| T6 | 142 failing | 142 failing |
+| `phase5_contract_scan` | 150/150 clean | 150/150 clean, 0 generation errors |
+| `cross_pair` | PASS | PASS |
+| `audit_3_8` | 80/80 clean | 80/80 clean |
+
+T6 is again recorded as **weak** evidence: it fails 142 regardless (D-043), so its being
+unmoved says nothing about whether distributions moved — five of them demonstrably did.
+The dump above is the measurement. `run.py --baseline` was never invoked.
