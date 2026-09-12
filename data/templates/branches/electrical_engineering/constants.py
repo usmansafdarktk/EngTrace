@@ -42,13 +42,14 @@ MEDIA_VELOCITIES = {
     #   cannot set a tolerance; what should set it is the P/T offset above. Unchanged
     #   here - re-sizing a tolerance on my own authority is the move F-2 is about.
     "Air (at sea level)": C0 / 1.000293, 
-    # [KNOWN-DEFECTIVE] n = 1.000036 against 1.0000349 (Ermolov) and 1.0000349 (Mansfield), both at
-    #   273.15 K and 101325 Pa - the group comment's own conditions - and the row is not
-    #   a rounding of either at its own precision: +1.1e-06 on n, below every display in the
-    #   corpus, but +3.2% on the refractivity n-1. Not corrected: a P6 event,
-    #   referred (C3.5). First tagged tol=0.0002% (08d3c49); retagged under the C3 rule
-    #   that tol= is only for an artefact whose conditions differ from the table's.
-    "Helium": C0 / 1.000036,          
+    # [ON-DISK] refractiveindex_info/refractiveindex.info-database-main.zip @ member="database/data/main/He/nk/Ermolov.yml" wavelength=589nm via="C0/x" precision=8sf
+    #   n = 1.00003488 at 273.15 K and 101325 Pa - the group comment's own
+    #   conditions - i.e. 1.0000349 at 8 s.f. Mansfield.yml, a different dispersion formula,
+    #   gives 1.00003491 at the same conditions and the same 8-s.f. value.
+    #   Borzsonyi.yml is NOT cited: it is at 100000 Pa and 273 K, and comparing across
+    #   conditions is the error the C3 review caught one row above (H electrical, F-1).
+    #   Corrected from 1.000036 (+3.2% on the refractivity n-1); P6 event.
+    "Helium": C0 / 1.0000349,          
     # [ON-DISK] refractiveindex_info/refractiveindex.info-database-main.zip @ member="database/data/main/CO2/nk/Bideau-Mehu.yml" wavelength=589nm via="C0/x" precision=6sf
     #   n = 1.0004489 at 273.15 K, 101325 Pa; Old (273.15 K, 101325 Pa) gives 1.0004491, also 1.00045.
     "Carbon Dioxide": C0 / 1.00045,   
@@ -131,12 +132,17 @@ MEDIA_VELOCITIES = {
     #   n = 2.4172982 (Peter; no temperature stated in the file); Phillip's tabulated 2.4166020, between rows
     #   2.4209 and 2.4114, also 2.42.
     "Diamond": C0 / 2.42,             
-    # [KNOWN-DEFECTIVE] 3.5, against 3.36-3.41 from all five on-disk datasets that
-    #   cover 589 nm (Adachi 3.4068, Aspnes 3.3774, Bond 3.3616, Jellison 3.3768, Khmelevskaia 3.3916):
-    #   the row is +2.7% to +4.1% high, and every dataset is 3.4 at
-    #   the row's own 1-dp precision. A correction moves emitted items (P6), so it is
-    #   referred to the repo owner (C3.5), not made here.
-    "Gallium Phosphide (GaP)": C0 / 3.5, 
+    # [ON-DISK] refractiveindex_info/refractiveindex.info-database-main.zip @ member="database/data/main/GaP/nk/Adachi.yml" wavelength=589nm via="C0/x" precision=2sf
+    #   n = 3.406845, interpolated between (0.58591, 3.411) and (0.59424, 3.3998); BOTH bracketing
+    #   rows are 3.4 at 2 s.f., so the rounding does not depend on the interpolation.
+    #   All five on-disk datasets that admit 589 nm agree at 2 s.f.: Adachi 3.4068,
+    #   Aspnes 3.3774, Bond 3.3616, Jellison 3.3768, Khmelevskaia 3.3916.
+    #   (Parsons.yml has no rows bracketing 589 nm and is not one of the five.)
+    #   Bond.yml is NOT cited despite agreeing: its brackets are 3.4595 at 0.5 um and
+    #   3.3495 at 0.6 um, which are 3.5 and 3.3 at 2 s.f., so its 3.4 is produced by
+    #   the interpolation rather than confirmed by the data either side of it.
+    #   Corrected from 3.5 (+2.7% to +4.1% against the five); P6 event.
+    "Gallium Phosphide (GaP)": C0 / 3.4, 
     
     # Special Cases (Important for RF/Microwave Engineering)
     # [UNVERIFIED] a microwave value, not an optical index: 7.14 is the square root of
