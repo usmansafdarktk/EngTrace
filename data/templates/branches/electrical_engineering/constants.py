@@ -29,6 +29,18 @@ MEDIA_VELOCITIES = {
     #   group comment's 0 degC and 1 atm (its pressure is 100000 Pa, not 101325).
     #   The row's 1.000293 is +4.8e-06 on n but +1.7% on the
     #   refractivity n-1. Ciddor at 288.15 K, 101325 Pa gives 1.0002772.
+    #   C3 review, H (electrical) F-1: that +1.7% is an UNCORRECTED cross-condition
+    #   comparison. Borzsonyi is at 100000 Pa; scaling the refractivity to 101325 Pa
+    #   and 273.15 K by Gladstone-Dale (n-1 proportional to density) gives n =
+    #   1.00029187, so the row is +0.388% on n-1, not +1.662% (both re-derived here).
+    #   The row is about four times better than its own tag said - which matters
+    #   because the identical framing one row below is what condemns Helium, and a
+    #   reader comparing them would infer a threshold that does not exist. Helium's
+    #   gap is the one that SURVIVES condition correction.
+    #   F-2: this tol= is the residual rounded up (0.000479% -> 0.0005%). The artefact
+    #   is a dispersion formula, so half a unit in its last printed digit is ~1e-15 and
+    #   cannot set a tolerance; what should set it is the P/T offset above. Unchanged
+    #   here - re-sizing a tolerance on my own authority is the move F-2 is about.
     "Air (at sea level)": C0 / 1.000293, 
     # [KNOWN-DEFECTIVE] n = 1.000036 against 1.0000349 (Ermolov) and 1.0000349 (Mansfield), both at
     #   273.15 K and 101325 Pa - the group comment's own conditions - and the row is not
@@ -54,10 +66,21 @@ MEDIA_VELOCITIES = {
     #   Birkhoff's tabulated 1.4714963 interpolates between rows 1.48 and 1.47,
     #   so its 3-s.f. rounding depends on the interpolation, and it is not cited.
     #   Rheims' formula starts at 0.5893 um and is refused at 0.589.
+    #   C3 review, H (electrical) F-2 and F-4: this tol= is the residual rounded up
+    #   (0.11713% -> 0.12%), and Gupta states NO conditions at all - not a differing
+    #   temperature, an unknown one. D-074 licenses tol= where conditions differ or are
+    #   unstated, but nothing here bounds its SIZE. Glycerol is strongly hygroscopic and
+    #   its index falls with water content, so a 0.12% tolerance is absorbing a
+    #   COMPOSITION ambiguity, which no tolerance on a pure-substance citation should
+    #   do. The weakest warrant in the branch; referred (C3.5).
     "Glycerine": C0 / 1.473,          
     # [ON-DISK] refractiveindex_info/refractiveindex.info-database-main.zip @ member="database/data/organic/C6H6 - benzene/nk/Chang.yml" wavelength=589nm via="C0/x" tol=0.1%
     #   n = 1.4995125 at 295 K (Chang). The row's 1.501 is +0.099%;
     #   Moutzouris at 300 K gives 1.4956337 (+0.36%).
+    #   C3 review, H (electrical) F-2: this tol= is the residual rounded up (0.099201%
+    #   -> 0.1%). Unlike glycerine there IS a stated condition offset - Chang is at
+    #   295 K against the row's implied 20 degC - which is a legitimate basis under
+    #   D-074; the size was simply not derived from it.
     "Benzene": C0 / 1.501,            
     # [ON-DISK] refractiveindex_info/refractiveindex.info-database-main.zip @ member="database/data/main/CS2/nk/Chemnitz.yml" wavelength=589nm via="C0/x" precision=4sf
     #   n = 1.6281390 at 293 K (Chemnitz); Kedenburg (no temperature stated in the file) 1.6275063 also

@@ -4,8 +4,21 @@
 # @domain: none (the table states no temperature, form or temper; each cited row names what its source covers)
 MATERIAL_PROPERTIES = {
     # Metals (Common)
-    # [UNVERIFIED] names no grade. MIL-HDBK-5J's carbon-steel table (p.62, AISI 1025) prints E
-    #   29.0, G 11.0 x10^3 ksi, mu 0.32; choosing a grade is the repo owner's call (C3.5).
+    # C3 review, Reviewer H (mechanical) F2: this row was tagged unverified, "names no
+    # grade",
+    # while its own tag quoted the page that grades it. The branch accepts an implementer
+    # grade choice when it RESOLVES the steel density row against this same table and when
+    # it CONDEMNS the stainless rows; declining only here is the inconsistency. Steel is now
+    # treated as Magnesium already is. p.62 prints E 29.0, G 11.0 x10^3 ksi, mu 0.32 (its
+    # text layer spaces every digit: "0 . 3 2").
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=62 text="Table 2.2.1.0(b)" mil="E" field=['E_ksi'] scale=1e3 precision=exact
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=62 text="Table 2.2.1.0(b)" mil="E" field=['E_GPa'] scale=6.894757 tol=0.17%
+    #   29.0 x10^3 ksi = 199.95 GPa; the row's 200 is +0.03%, inside half a unit in
+    #   the handbook's last printed digit (0.17%).
+    # [KNOWN-DEFECTIVE] ['nu'] 0.30 against MIL-HDBK-5J p.62, Table 2.2.1.0(b) (AISI 1025
+    #   Carbon Steel): mu 0.32, -6.25%. Larger than five of the fourteen errors this
+    #   branch reports as defective, in its most-used material. Not corrected: a P6 event,
+    #   referred to the repo owner (C3.5).
     'Steel': {'E_GPa': 200, 'E_ksi': 29000, 'nu': 0.30},
     # [KNOWN-DEFECTIVE] ['E_ksi'] 27500 against MIL-HDBK-5J p.277, Table 2.7.1.0(b) (AISI 301and Relateda,b,c Stainless Steels): E:L 29.0 x10^3 ksi, -5.2%.
     #   The row names what the table covers, so the literal should be a rounding of it and is not. Annealed column; the table's footnote b applies it to AISI 304 (AMS 5513), the row comment's alloy.
@@ -72,25 +85,32 @@ MATERIAL_PROPERTIES = {
     #   The row names what the table covers, so the literal should be a rounding of it and is not.
     #   Not corrected in this commit: a value change moves emitted items (P6); outcome in the C3.5 register.
     'Magnesium': {'E_GPa': 45, 'E_ksi': 6500, 'nu': 0.29}, # AZ31B alloy
-    # [UNVERIFIED] no MIL-HDBK-5J design table is this material (its copper-base tables: C86500
-    #   Manganese Bronze; C86300 Manganese Bronze; Copper Beryllium Strip; C17200 Copper Beryllium
-    #   Rod and Bar; C17200 Copper Beryllium Mechanical Tubing), and no other source on disk.
-    #   Residual register (C3.5).
+    # [UNVERIFIED] no MIL-HDBK-5J design table is this material under the names searched.
+    #   C3 review, H (mechanical) F3: the reason here previously cited the handbook's
+    #   COPPER-BASE tables as the search set. That is apt for Copper, Brass and Bronze
+    #   and is no evidence at all about this material; the conclusion may hold, the
+    #   evidence offered did not. Residual register (C3.5).
     'Tungsten': {'E_GPa': 411, 'E_ksi': 59600, 'nu': 0.28},
-    # [UNVERIFIED] no MIL-HDBK-5J design table is this material (its copper-base tables: C86500
-    #   Manganese Bronze; C86300 Manganese Bronze; Copper Beryllium Strip; C17200 Copper Beryllium
-    #   Rod and Bar; C17200 Copper Beryllium Mechanical Tubing), and no other source on disk.
-    #   Residual register (C3.5).
+    # [UNVERIFIED] no MIL-HDBK-5J design table is this material under the names searched.
+    #   C3 review, H (mechanical) F3: the reason here previously cited the handbook's
+    #   COPPER-BASE tables as the search set. That is apt for Copper, Brass and Bronze
+    #   and is no evidence at all about this material; the conclusion may hold, the
+    #   evidence offered did not. Residual register (C3.5).
     'Cast Iron': {'E_GPa': 170, 'E_ksi': 24600, 'nu': 0.26}, # Gray Cast Iron
-    # [UNVERIFIED] no MIL-HDBK-5J design table is this material (its copper-base tables: C86500
-    #   Manganese Bronze; C86300 Manganese Bronze; Copper Beryllium Strip; C17200 Copper Beryllium
-    #   Rod and Bar; C17200 Copper Beryllium Mechanical Tubing), and no other source on disk.
-    #   Residual register (C3.5).
+    # [UNVERIFIED] no MIL-HDBK-5J design table is this material under the names searched.
+    #   C3 review, H (mechanical) F3: the reason here previously cited the handbook's
+    #   COPPER-BASE tables as the search set. That is apt for Copper, Brass and Bronze
+    #   and is no evidence at all about this material; the conclusion may hold, the
+    #   evidence offered did not. Residual register (C3.5).
+    #   C3 review, H (mechanical) F3: for NICKEL the conclusion is OPEN, not settled -
+    #   the handbook carries 22 nickel-base design captions (A-286 p.1045, Hastelloy X
+    #   p.1061, Inconel 600 pp.1067-1070), none of them commercially pure nickel.
     'Nickel': {'E_GPa': 207, 'E_ksi': 30000, 'nu': 0.31},
-    # [UNVERIFIED] no MIL-HDBK-5J design table is this material (its copper-base tables: C86500
-    #   Manganese Bronze; C86300 Manganese Bronze; Copper Beryllium Strip; C17200 Copper Beryllium
-    #   Rod and Bar; C17200 Copper Beryllium Mechanical Tubing), and no other source on disk.
-    #   Residual register (C3.5).
+    # [UNVERIFIED] no MIL-HDBK-5J design table is this material under the names searched.
+    #   C3 review, H (mechanical) F3: the reason here previously cited the handbook's
+    #   COPPER-BASE tables as the search set. That is apt for Copper, Brass and Bronze
+    #   and is no evidence at all about this material; the conclusion may hold, the
+    #   evidence offered did not. Residual register (C3.5).
     'Lead': {'E_GPa': 16, 'E_ksi': 2300, 'nu': 0.44}, # Added a common soft metal
     
     # Polymers/Plastics
@@ -309,6 +329,12 @@ FLUID_DENSITIES = {
     "Liquid Hydrogen (at -253°C)": 71,
     # [ON-DISK] nist_fluid_properties/propane_C74986_saturation_298.15K.tsv @ T=298.15 col="Density (l, kg/m3)" tol=0.13%
     #   492.36 at 298.15 K; the row is +0.13%. The row says "At 25 C, under pressure" and names no pressure; the file is the saturated liquid. Pressure in that row: 0.95207 MPa.
+    #   C3 review, H (electrical) F-2 generalised: this tol= is the residual rounded up
+    #   (0.12999% -> 0.13%) and is the only one outside the electrical branch. The
+    #   artefact carries five significant figures, so half a unit in its last digit is
+    #   0.001% and cannot be the basis. Half a unit in the ROW's own last digit is
+    #   0.5/493 = 0.101%, which would NOT admit the value - so the warrant has to be
+    #   the unstated pressure, and nothing here bounds it. Referred (C3.5).
     "Liquid Propane": 493,      # At 25°C, under pressure
     
     # High-Density Liquids
@@ -384,33 +410,55 @@ FLUID_DENSITIES = {
 # @domain: none (the table states no temperature)
 MATERIAL_DENSITIES = {
     # Woods & Natural Materials (generally float in water)
-    # [UNVERIFIED] names no species and no moisture content, and a wood density is not one number
-    #   without both. The USDA Wood Handbook is on disk but was not read to row level in C3.
-    #   Residual register (C3.5).
+    # [UNVERIFIED] the row gives one number for a material whose density depends on
+    #   species and moisture content. C3 review, H (mechanical) F4: the reason here
+    #   previously said the row "names no species", which is false where it does -
+    #   Teak is on disk as Tectona grandis (FPL-GTR-282 PDF p.66) and the handbook
+    #   indexes properties by species in Table 5-3a (PDF pp.120-121, referenced for
+    #   density at p.106). What is missing is the MOISTURE CONDITION, which the row
+    #   does not state and which FPL tabulates separately (green vs 12%). C3.5.
     "Pine Wood": 500,
-    # [UNVERIFIED] names no species and no moisture content, and a wood density is not one number
-    #   without both. The USDA Wood Handbook is on disk but was not read to row level in C3.
-    #   Residual register (C3.5).
+    # [UNVERIFIED] the row gives one number for a material whose density depends on
+    #   species and moisture content. C3 review, H (mechanical) F4: the reason here
+    #   previously said the row "names no species", which is false where it does -
+    #   Teak is on disk as Tectona grandis (FPL-GTR-282 PDF p.66) and the handbook
+    #   indexes properties by species in Table 5-3a (PDF pp.120-121, referenced for
+    #   density at p.106). What is missing is the MOISTURE CONDITION, which the row
+    #   does not state and which FPL tabulates separately (green vs 12%). C3.5.
     "Oak Wood": 750,
-    # [UNVERIFIED] names no species and no moisture content, and a wood density is not one number
-    #   without both. The USDA Wood Handbook is on disk but was not read to row level in C3.
-    #   Residual register (C3.5).
+    # [UNVERIFIED] this row is NOT WOOD, so the wood reason it carried does not apply to
+    #   it: cork is a bark tissue and bamboo is a grass, and neither is indexed by the
+    #   USDA Wood Handbook's species tables. A different source is needed, not a better
+    #   reading of this one (C3 review, H (mechanical) F4; C3.5).
     "Cork": 240,
-    # [UNVERIFIED] names no species and no moisture content, and a wood density is not one number
-    #   without both. The USDA Wood Handbook is on disk but was not read to row level in C3.
-    #   Residual register (C3.5).
+    # [UNVERIFIED] the row gives one number for a material whose density depends on
+    #   species and moisture content. C3 review, H (mechanical) F4: the reason here
+    #   previously said the row "names no species", which is false where it does -
+    #   Teak is on disk as Tectona grandis (FPL-GTR-282 PDF p.66) and the handbook
+    #   indexes properties by species in Table 5-3a (PDF pp.120-121, referenced for
+    #   density at p.106). What is missing is the MOISTURE CONDITION, which the row
+    #   does not state and which FPL tabulates separately (green vs 12%). C3.5.
     "Teak Wood": 630,
-    # [UNVERIFIED] names no species and no moisture content, and a wood density is not one number
-    #   without both. The USDA Wood Handbook is on disk but was not read to row level in C3.
-    #   Residual register (C3.5).
+    # [UNVERIFIED] the row gives one number for a material whose density depends on
+    #   species and moisture content. C3 review, H (mechanical) F4: the reason here
+    #   previously said the row "names no species", which is false where it does -
+    #   Teak is on disk as Tectona grandis (FPL-GTR-282 PDF p.66) and the handbook
+    #   indexes properties by species in Table 5-3a (PDF pp.120-121, referenced for
+    #   density at p.106). What is missing is the MOISTURE CONDITION, which the row
+    #   does not state and which FPL tabulates separately (green vs 12%). C3.5.
     "Maple Wood": 740,
-    # [UNVERIFIED] names no species and no moisture content, and a wood density is not one number
-    #   without both. The USDA Wood Handbook is on disk but was not read to row level in C3.
-    #   Residual register (C3.5).
+    # [UNVERIFIED] the row gives one number for a material whose density depends on
+    #   species and moisture content. C3 review, H (mechanical) F4: the reason here
+    #   previously said the row "names no species", which is false where it does -
+    #   Teak is on disk as Tectona grandis (FPL-GTR-282 PDF p.66) and the handbook
+    #   indexes properties by species in Table 5-3a (PDF pp.120-121, referenced for
+    #   density at p.106). What is missing is the MOISTURE CONDITION, which the row
+    #   does not state and which FPL tabulates separately (green vs 12%). C3.5.
     "Ebony Wood": 1200,  # Sinks in water
-    # [UNVERIFIED] names no species and no moisture content, and a wood density is not one number
-    #   without both. The USDA Wood Handbook is on disk but was not read to row level in C3.
-    #   Residual register (C3.5).
+    # [UNVERIFIED] this row is NOT WOOD, so the wood reason it carried does not apply to
+    #   it: cork is a bark tissue and bamboo is a grass, and neither is indexed by the
+    #   USDA Wood Handbook's species tables. A different source is needed, not a better
+    #   reading of this one (C3 review, H (mechanical) F4; C3.5).
     "Bamboo": 300,
     # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
     "Rubber (Natural)": 950,
@@ -515,9 +563,10 @@ MATERIAL_DENSITIES = {
     "Sandstone": 2300,
     # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
     "Limestone": 2500,
-    # [UNVERIFIED] names no species and no moisture content, and a wood density is not one number
-    #   without both. The USDA Wood Handbook is on disk but was not read to row level in C3.
-    #   Residual register (C3.5).
+    # [UNVERIFIED] this row is NOT WOOD, so the wood reason it carried does not apply to
+    #   it: cork is a bark tissue and bamboo is a grass, and neither is indexed by the
+    #   USDA Wood Handbook's species tables. A different source is needed, not a better
+    #   reading of this one (C3 review, H (mechanical) F4; C3.5).
     "Cork Board": 240,
     # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
     "Paper": 800,

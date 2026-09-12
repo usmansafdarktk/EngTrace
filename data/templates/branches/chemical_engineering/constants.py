@@ -438,10 +438,16 @@ SUBSTANCES_FOR_HEATING = [
 # [UNVERIFIED] as a table: 4 of the 16 rows resolve to a WebBook phase-change page and are
 #   tagged below. The other 12 do not, and they are NOT [DERIVED] either, though they
 #   could nearly be: dHvap = Enthalpy(v) - Enthalpy(l) at 1 atm from the NIST saturation
-#   tables reproduces 7 of them to within 0.04-1.45% (methanol, benzene, ammonia and
-#   oxygen are even roundings of it; water, propane, butane, hexane, toluene, nitrogen
-#   and argon are not). Claiming [DERIVED] would be false for the rows that miss, so the
-#   table is UNVERIFIED and the near-derivation is a C3.5 residual.
+#   tables reproduces EVERY row that has a saturation file - 11 of 11 - to within
+#   1.454%, eight of them within 0.2% (water -0.014, methanol +0.048, propane +1.454,
+#   n-butane +0.095, n-hexane -0.108, benzene +0.153, toluene +0.737, ammonia -0.115,
+#   nitrogen -0.174, oxygen +0.036, argon -0.112 %). Four are roundings of it.
+#   CORRECTED at the C3 review (Reviewer H, chemical, F-2): this note previously said
+#   "7 of them" and justified the class by "the rows that miss". NO ROW MISSES.
+#   Mercury is the twelfth row and has no saturation file at all, so it is not a row
+#   that fails the derivation - it is one the derivation cannot reach. The class stays
+#   unverified because a ~1% agreement is evidence about provenance and not a
+#   derivation (D-077), but the reason that was written for it was false.
 SUBSTANCES_FOR_VAPORIZATION = [
     # Alcohols & Water
     {"name": "Water", "delta_H_vap": 40.66},
@@ -510,6 +516,10 @@ SUBSTANCES_FOR_VAPORIZATION = [
 HEATS_OF_FORMATION = {
     # Hydrocarbons (Gases)
     # [ON-DISK] NIST 74-82-8, -74.6+/-0.3 (Manion 2002, adopting Gurvich 1991)
+    #   C3 review, Reviewer H (chemical) F-5: the row uses -74.8, which is neither the
+    #   cited -74.6 nor the JSON's alternative -74.87 (Chase 1998). It lies inside the
+    #   cited +/-0.3, so this is not the C2 defect class, but the tag names a
+    #   measurement the value is not. Referred (C3.5).
     "CH4(g)": -74.8,      # Methane
     # [ON-DISK] NIST 74-86-2, 226.73 (Chase 1998)
     "C2H2(g)": 226.7,     # Acetylene (Added)
@@ -992,10 +1002,20 @@ COMBUSTION_REACTIONS = [
 #   says, and most of the 30 rows (honey, blood, engine oils) have no primary source on
 #   disk at all. Three (row, field) pairs DO equal the NIST isobar at the declared
 #   293.15 K and are tagged individually below.
-#   FINDING (C3.5): for every organic liquid that has a NIST isobar on disk, the
+#   FINDING (C3.5), DIAGNOSIS WITHDRAWN at the C3 review (Reviewer H, chemical, F-1):
+#   for every organic liquid that has a NIST isobar on disk, the
 #   VISCOSITY here is low by 4.6-7.2% at the very conditions this table declares - Methanol -7.06%, Benzene -7.16%, Toluene -4.62%, n-Hexane -6.12%.
-#   The densities agree to 0.001-0.7%. A one-sided gap across four independent species
-#   is a source difference, not scatter; the values are left exactly as transcribed.
+#   The densities agree to 0.001-0.7%. I recorded this as "a source difference, not
+#   scatter". The review proposes instead that the viscosity column is a 25 degC
+#   column. THAT CANNOT BE TESTED FROM THE ARTEFACTS HERE: no on-disk grid carries
+#   298.15 K - every 1-atm isobar has exactly one row in 290-302 K (293.15) and steps
+#   ~9-10 K, and the saturation grids are pressure-incremented and sparse at that end.
+#   The one species with a saturation row near 25 degC, n-hexane, moves -7.27%
+#   (291.84 K) to -1.10% (298.30 K), which supports the 25 degC reading without
+#   settling it. What is checkable is the control: WATER is +0.04% at 20 degC, so the
+#   column is not uniformly 25 degC either. The diagnosis is therefore OPEN, and the
+#   remedy it first prescribed - re-source the viscosity column - would discard rows
+#   that may be correct at a temperature this table does not state. Values untouched.
 COMMON_LIQUIDS = {
     # Water and Common Solvents
     # [ON-DISK] nist_fluid_properties/water_C7732185_isobar_1atm.tsv @ T=293.15 col="Density (kg/m3)" field=[0] precision=4sf
@@ -1048,7 +1068,12 @@ COMMON_LIQUIDS = {
 # @units: [0]=kg/m^3, [1]=Pa*s
 # @domain: T=293.15 K, p=101.325 kPa
 # [UNVERIFIED] as a table; 10 (row, field) pairs equal the NIST isobar at 293.15 K and are
-#   tagged below. The rest sit 0.1-6% off it (worst: SF6 viscosity +6.06%, butane
+#   tagged below. One row is worse than that band and was missed because an automated
+#   293.15 K sweep skips it (water is liquid there): "Steam (Water Vapor)" 0.747
+#   kg/m^3 is +25.00% against NIST 0.59761 at the 373.15 K its own comment names, and
+#   is within 0.25% of the ideal gas at 293.15 K (0.7489) - it is 20 degC vapour
+#   mislabelled as 100 degC steam (Reviewer H, chemical, F-4; C3.5).
+#   The rest sit 0.1-6% off it (worst: SF6 viscosity +6.06%, butane
 #   viscosity +3.45%) with no on-disk source of their own. C3.5 residual.
 COMMON_GASES = {
     # Common Gases
@@ -1099,13 +1124,24 @@ COMMON_GASES = {
 # @kind: property
 # @units: [0]=g/mol, [1]=angstrom, [2]=K
 # @domain: none (Lennard-Jones parameters; no fit temperature range is stated)
-# [UNVERIFIED], and a FINDING (C3.5). Svehla, NASA TR R-132, Table I(a) IS on disk
+# [KNOWN-DEFECTIVE] the sigma column is wrong at this table's own purpose. Chapman-
+#   Enskog with the Neufeld collision integral at 293.15 K, against the NIST isobars:
+#   n-butane -26.1%, SF6 -12.7%, propane +3.5%, methane -0.7%, ethane +2.9%. Substituting
+#   SVEHLA's sigma brings all five inside 2% (+0.6, +0.8, +1.2, +0.5, +1.9). Since
+#   mu ~ sigma^-2, a wrong sigma is not a citation problem but a wrong viscosity, and
+#   the template prints sigma into the question stem. Re-sourcing sigma from Svehla is a
+#   P6 event and the repo owner's call (C3.5). Raised from unverified at the C3 review
+#   (Reviewer H, chemical, F-3): a column checked and found wrong is not unchecked.
+#   Svehla, NASA TR R-132, Table I(a) IS on disk
 #   (nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf, PDF pp.22-26) and is the classic source
 #   for these constants - but this table is not it. Parsed from the scan and compared
-#   row by row (15 of the 17 rows; Xenon and Chlorine have no unambiguous token in
-#   the OCR, so they are not claimed either way):
-#     eps/k agrees with Svehla for 11 of 14 rows
-#     sigma agrees for 3 of 15 - only Argon, Carbon Dioxide, Helium
+#   row by row. Xenon and Chlorine ARE recoverable, contrary to what this note first
+#   said: Cl2 is the token "C_" on p.24 (sigma 4.217, eps/k 316.0) and Xe sits
+#   positionally in p.26's concluded block (4.047 / 231.0). Both extend the pattern.
+#     eps/k agrees with Svehla for 13 of 16 checked (NH3's is OCR-corrupt, "55& 3")
+#     sigma agrees for 3 of 17 - only Carbon Dioxide, Argon, Helium
+#   (Reviewer H reports eps/k 14 of 17, counting NH3; the predicate for mine is the
+#   parser in the C3.7 patch script, and the divergence is recorded rather than split.)
 #   n-butane is sigma 5.47 here against Svehla 4.687; propane 5.06 against 5.118;
 #   methane 3.78 against 3.758. Air, N2 and H2 differ in BOTH columns (air 3.62/97.0
 #   against Svehla 3.711/78.6), so those three are from a third compilation again.
