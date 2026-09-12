@@ -443,13 +443,26 @@ Re-measured here over the 2,250-item pool, reusing T6's own `_UNIT_AFTER_NUM` an
 **seed 0 121 / any 121 / always 121 / invariant 97**, with **24 templates whose unit changes
 with the seed** — not the 10 the earlier figures imply.
 
-**The census does not reproduce across seed sets, and that is the finding.** Neither set of
-numbers is wrong; they sample differently. So a fixed count quoted without its sample is not a
-size estimate at all. **Size D6.11 off the actual generated pool**, publish the seed set with the
-count, and treat the 24 seed-varying templates as the hard core: a per-item declaration for a
-template whose unit is seed-dependent cannot be written once at template level, and one unit
-applied to all `n` parts of a `multipart` answer is wrong for at least `n−1` — which is what made
-13 templates reject their own gold.
+**CORRECTION — an earlier version of this section was wrong, and the record should show it.** It
+said the census "does not reproduce" and that 113 is quoted "without its predicate". Both claims
+are false, and reading `derive_bindings.py` rather than only `phase5_summary.md` settles it:
+
+- **The predicate is written down, in code.** `derive_bindings.py:29–32` defines all four
+  readings; `:34–40` argues *why* `always` is adopted over `invariant` — *"a comparator can only
+  check a unit it can name"*; `:46` records the four counts.
+- **It reproduces exactly.** Run today the tool prints `seed0 115 | any 116 | always 113 |
+  invariant 103` over **150 × 12 seeds** (`N_DERIVE = 12`), matching `phase5_summary.md`.
+- **Units are ALREADY DECLARED for 103 templates** — "always-present AND invariant". A meaningful
+  part of D6.11 is therefore built, not outstanding. Establish what remains before scoping it.
+
+**What survives is narrower and still useful: the count is sample-sensitive.** The 121/121/121/97
+above came from 15 BLAKE2b-derived seeds, the repo's from 12 sequential ones. Neither is wrong.
+So a count is only meaningful **with its sample stated** — and D6.11's editorial scope should be
+sized off the sample the corpus actually ships, not off a number lifted bare into the spec.
+
+The hard core is unchanged: a template whose unit is **seed-dependent** cannot have that unit
+declared once at template level, and one unit applied to all `n` parts of a `multipart` answer is
+wrong for at least `n−1` — which is what made 13 templates reject their own gold.
 
 ### Units — D6.11 overlaps C1.4, deliberately
 
