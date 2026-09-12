@@ -359,9 +359,12 @@ FLUID_DENSITIES = {
     "Hydraulic Oil": 850,       # Typical average value
     
     # Alcohols and Solvents
-    # [UNVERIFIED] Ethanol is not in the NIST fluid database on disk; its WebBook species pages on
-    #   disk (ethanol_C64175_condensed_phase.html, ethanol_C64175_phase_change.html) say density
-    #   only as ['Critical density']. Residual register (C3.5).
+    # [ON-DISK] pubchem/ethanol_density.json @ cid=702 heading="Density" ref=79 scale=1000 precision=3sf
+    #   0.7893 g/cu cm at 20 °C
+    #   Source: Hazardous Substances Data Bank (HSDB); conditions: 20 C.
+    #   That entry cites: Haynes, W.M. (ed.). CRC Handbook of Chemistry and Physics. 95th Edition. CRC Press LLC, Boca Raton: 
+    #   PubChem is an AGGREGATOR carrying several disagreeing densities, so the
+    #   citation names ONE ReferenceNumber rather than the CID alone.
     "Ethyl Alcohol (Ethanol)": 789,
     # [ON-DISK] nist_fluid_properties/methanol_C67561_isobar_1atm.tsv @ T=293.15 col="Density (kg/m3)" precision=3sf
     #   791.01 at 293.15 K.
@@ -370,9 +373,12 @@ FLUID_DENSITIES = {
     #   on disk (isopropanol_C67630_condensed_phase.html, isopropanol_C67630_phase_change.html) say
     #   density only as ['Critical density']. Residual register (C3.5).
     "Isopropyl Alcohol (IPA)": 786,
-    # [UNVERIFIED] Acetone is not in the NIST fluid database on disk; its WebBook species pages on
-    #   disk (acetone_C67641_condensed_phase.html, acetone_C67641_phase_change.html) say density
-    #   only as ['Critical density']. Residual register (C3.5).
+    # [ON-DISK] pubchem/acetone_density.json @ cid=180 heading="Density" ref=50 scale=1000 precision=exact
+    #   0.791 at 68 °F (USCG, 1999) - Less dense than water; will float
+    #   Source: CAMEO Chemicals; conditions: 68 F.
+    #   That entry cites: U.S. Coast Guard. 1999. Chemical Hazard Response Information System (CHRIS) - Hazardous Chemical Dat
+    #   PubChem is an AGGREGATOR carrying several disagreeing densities, so the
+    #   citation names ONE ReferenceNumber rather than the CID alone.
     "Acetone": 791,
     # [UNVERIFIED] a mixture, solution or commercial product with no single composition in the row;
     #   no on-disk source, and none was searched for in C3. Residual register (C3.5).
@@ -569,21 +575,61 @@ MATERIAL_DENSITIES = {
     "Rubber (Natural)": 950,
     
     # Plastics & Synthetics (range from floating to sinking)
-    # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
+    # [UNVERIFIED] SEARCHED, and found unreachable by a chemical database. PubChem
+    #   returned PUGREST.NotFound for every polymer looked up (polyethylene,
+    #   polypropylene, polystyrene, PVC, PTFE, PMMA): a polymer is not a single
+    #   compound with a CID. That is the same reason its density depends on
+    #   crystallinity and grade rather than on a formula, so no synonym would fix it.
+    #   This row needs a materials handbook, not another fetch. C3.5.
     "Polypropylene (PP)": 900,
-    # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
+    # [UNVERIFIED] SEARCHED, and found unreachable by a chemical database. PubChem
+    #   returned PUGREST.NotFound for every polymer looked up (polyethylene,
+    #   polypropylene, polystyrene, PVC, PTFE, PMMA): a polymer is not a single
+    #   compound with a CID. That is the same reason its density depends on
+    #   crystallinity and grade rather than on a formula, so no synonym would fix it.
+    #   This row needs a materials handbook, not another fetch. C3.5.
     "Polyethylene (LDPE)": 920,
-    # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
+    # [UNVERIFIED] SEARCHED, and found unreachable by a chemical database. PubChem
+    #   returned PUGREST.NotFound for every polymer looked up (polyethylene,
+    #   polypropylene, polystyrene, PVC, PTFE, PMMA): a polymer is not a single
+    #   compound with a CID. That is the same reason its density depends on
+    #   crystallinity and grade rather than on a formula, so no synonym would fix it.
+    #   This row needs a materials handbook, not another fetch. C3.5.
     "Polyethylene (HDPE)": 950,
-    # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
+    # [UNVERIFIED] SEARCHED, and found unreachable by a chemical database. PubChem
+    #   returned PUGREST.NotFound for every polymer looked up (polyethylene,
+    #   polypropylene, polystyrene, PVC, PTFE, PMMA): a polymer is not a single
+    #   compound with a CID. That is the same reason its density depends on
+    #   crystallinity and grade rather than on a formula, so no synonym would fix it.
+    #   This row needs a materials handbook, not another fetch. C3.5.
     "Nylon": 1150,
-    # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
+    # [UNVERIFIED] SEARCHED, and found unreachable by a chemical database. PubChem
+    #   returned PUGREST.NotFound for every polymer looked up (polyethylene,
+    #   polypropylene, polystyrene, PVC, PTFE, PMMA): a polymer is not a single
+    #   compound with a CID. That is the same reason its density depends on
+    #   crystallinity and grade rather than on a formula, so no synonym would fix it.
+    #   This row needs a materials handbook, not another fetch. C3.5.
     "Polystyrene (PS)": 1050,
-    # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
+    # [UNVERIFIED] SEARCHED, and found unreachable by a chemical database. PubChem
+    #   returned PUGREST.NotFound for every polymer looked up (polyethylene,
+    #   polypropylene, polystyrene, PVC, PTFE, PMMA): a polymer is not a single
+    #   compound with a CID. That is the same reason its density depends on
+    #   crystallinity and grade rather than on a formula, so no synonym would fix it.
+    #   This row needs a materials handbook, not another fetch. C3.5.
     "PVC (Rigid)": 1380,
-    # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
+    # [UNVERIFIED] SEARCHED, and found unreachable by a chemical database. PubChem
+    #   returned PUGREST.NotFound for every polymer looked up (polyethylene,
+    #   polypropylene, polystyrene, PVC, PTFE, PMMA): a polymer is not a single
+    #   compound with a CID. That is the same reason its density depends on
+    #   crystallinity and grade rather than on a formula, so no synonym would fix it.
+    #   This row needs a materials handbook, not another fetch. C3.5.
     "PTFE (Teflon)": 2200,
-    # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
+    # [UNVERIFIED] SEARCHED, and found unreachable by a chemical database. PubChem
+    #   returned PUGREST.NotFound for every polymer looked up (polyethylene,
+    #   polypropylene, polystyrene, PVC, PTFE, PMMA): a polymer is not a single
+    #   compound with a CID. That is the same reason its density depends on
+    #   crystallinity and grade rather than on a formula, so no synonym would fix it.
+    #   This row needs a materials handbook, not another fetch. C3.5.
     "Acrylic (Plexiglas)": 1180,
     
     # Biological Materials
@@ -715,7 +761,13 @@ MATERIAL_DENSITIES = {
     "Graphite": 2100,
     # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
     "Diamond": 3500,
-    # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
+    # [UNVERIFIED] SEARCHED, and found unreachable by a chemical database.
+    #   pubchem/silicon_dioxide_density.json (cid=24261) is on disk and gives
+    #   2200, 2300, 2334, 2600 kg/m3 - amorphous silica, fumed silica and silica gel.
+    #   None of those is crystalline alpha-quartz, which is what this row names and
+    #   what 2650 is. The record is the wrong FORM of the right substance, so it
+    #   neither supports nor challenges the committed value.
+    #   A mineral density needs a materials or mineralogy source, not PubChem. C3.5.
     "Quartz": 2650,
     # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
     "Granite": 2700,
@@ -819,7 +871,12 @@ PIPE_FLUIDS = {
     "Diesel Fuel": 850,
     # [UNVERIFIED] no source on disk. Residual register (C3.5).
     "Jet Fuel (JP-4)": 770,
-    # [UNVERIFIED] no source on disk. Residual register (C3.5).
+    # [ON-DISK] pubchem/ethanol_density.json @ cid=702 heading="Density" ref=79 scale=1000 precision=3sf
+    #   0.7893 g/cu cm at 20 °C
+    #   Source: Hazardous Substances Data Bank (HSDB); conditions: 20 C.
+    #   That entry cites: Haynes, W.M. (ed.). CRC Handbook of Chemistry and Physics. 95th Edition. CRC Press LLC, Boca Raton: 
+    #   PubChem is an AGGREGATOR carrying several disagreeing densities, so the
+    #   citation names ONE ReferenceNumber rather than the CID alone.
     "Ethanol": 789,
     # [UNVERIFIED] the table states no temperature or pressure, so no row of an artefact is THE
     #   value. NIST at 1 atm: 809.73 (liquid) at 273.15 K; 791.01 (liquid) at 293.15 K
@@ -929,7 +986,11 @@ PIPE_FLUIDS = {
     "Sea Water": 1025,
     # [UNVERIFIED] no source on disk. Residual register (C3.5).
     "Milk": 1030,
-    # [UNVERIFIED] no source on disk. Residual register (C3.5).
+    # [ON-DISK] pubchem/ethylene_glycol_density.json @ cid=174 heading="Density" ref=124 scale=1000 precision=3sf
+    #   1.1135 @ 20°C
+    #   Source: PAC Chemical Database, U.S. Department of Energy; conditions: 20 C.
+    #   PubChem is an AGGREGATOR carrying several disagreeing densities, so the
+    #   citation names ONE ReferenceNumber rather than the CID alone.
     "Ethylene Glycol": 1110,
     # [UNVERIFIED] no source on disk. Residual register (C3.5).
     "Antifreeze (50/50)": 1065,

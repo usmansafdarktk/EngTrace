@@ -923,6 +923,17 @@ PUBCHEM_DENSITY = {
     "osmium": "MATERIAL_DENSITIES: Osmium",
     "uranium": "MATERIAL_DENSITIES: Uranium",
     "graphite": "MATERIAL_DENSITIES: Graphite",
+    # Added after the row-by-row census: the remaining MATERIAL_DENSITIES rows that
+    # are single SUBSTANCES rather than bulk materials. Whether any supports its
+    # committed literal is for the tagging pass to decide, not this one.
+    "silicon dioxide": "MATERIAL_DENSITIES: Quartz",
+    # The six polymers tried here - polyethylene, polypropylene, polystyrene, PVC,
+    # PTFE and PMMA - are REMOVED, not pending. Every one returned PUGREST.NotFound
+    # on the name -> CID lookup, because a polymer is not a single compound with a
+    # CID. That is the same reason its density depends on crystallinity and grade
+    # rather than on a formula, so no synonym will rescue it. Those rows need a
+    # materials handbook, not another fetch, and parking six permanent failures in
+    # the manifest would make its failure list stop meaning "gaps worth chasing".
 }
 
 #: Fluids that also need a grid landing on 298.15 K. The 1-atm isobar steps 10 K

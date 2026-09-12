@@ -1,0 +1,399 @@
+{
+  "Record": {
+    "RecordType": "CID",
+    "RecordNumber": 24261,
+    "RecordTitle": "Silica",
+    "Section": [
+      {
+        "TOCHeading": "Chemical and Physical Properties",
+        "Description": "Various chemical and physical properties that are experimentally determined for this compound.  See also the Safety and Hazard Properties section (if available), which has additional properties pertinent to chemical safety and hazards.",
+        "Section": [
+          {
+            "TOCHeading": "Experimental Properties",
+            "Description": "Various experimentally determined properties for this compound.  See also the Safety and Hazard Properties section (if available), which has additional properties pertinent to chemical safety and hazards.",
+            "Section": [
+              {
+                "TOCHeading": "Density",
+                "Description": "This section provides information on the density (with unit) and specific gravity (without unit) of a compound. Density is mass of a unit volume of a compound and commonly expressed in units of kg/m3 or g/cm3. Specific gravity, also known as relative density, is a unit-less quantity, defined as the ratio of the density of a compound to that of a standard reference material (typically, water at 4 °C for liquids and air at room temperature [20 °C or 68 °F] for gases).",
+                "URL": "https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Map%3A_Fundamentals_of_General_Organic_and_Biological_Chemistry_(McMurry_et_al.)/01%3A_Matter_and_Measurements/1.12%3A_Density_and_Specific_Gravity",
+                "Information": [
+                  {
+                    "ReferenceNumber": 17,
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "2.2 (NIOSH, 2024) - Denser than water; will sink",
+                          "Markup": [
+                            {
+                              "Start": 32,
+                              "Length": 5,
+                              "URL": "https://pubchem.ncbi.nlm.nih.gov/compound/water",
+                              "Type": "PubChem Internal Link",
+                              "Extra": "CID-962"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ReferenceNumber": 131,
+                    "Description": "PEER REVIEWED",
+                    "Reference": [
+                      "O'Neil, M.J. (ed.). The Merck Index - An Encyclopedia of  Chemicals, Drugs, and Biologicals. 13th Edition, Whitehouse  Station, NJ:  Merck and Co., Inc., 2001., p. 1523"
+                    ],
+                    "ExtendedReference": [
+                      {
+                        "Citation": "O'Neil, M.J. (ed.). The Merck Index - An Encyclopedia of  Chemicals, Drugs, and Biologicals. 13th Edition, Whitehouse  Station, NJ:  Merck and Co., Inc., 2001., p. 1523",
+                        "Matched": {
+                          "PCLID": 900001993,
+                          "Citation": "O'Neil, M.J. (ed.). The Merck Index - An Encyclopedia of  Chemicals, Drugs, and Biologicals. 13th Edition, Whitehouse  Station, NJ:  Merck and Co., Inc., 2001., p. 1523"
+                        }
+                      }
+                    ],
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "2.2 @ 25 °C"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ReferenceNumber": 132,
+                    "Description": "PEER REVIEWED",
+                    "Reference": [
+                      "Lewis, R.J. Sax's Dangerous Properties of Industrial  Materials. 10th ed. Volumes 1-3 New York, NY: John Wiley &  Sons Inc., 1999., p. V3 3205"
+                    ],
+                    "ExtendedReference": [
+                      {
+                        "Citation": "Lewis, R.J. Sax's Dangerous Properties of Industrial  Materials. 10th ed. Volumes 1-3 New York, NY: John Wiley &  Sons Inc., 1999., p. V3 3205",
+                        "Matched": {
+                          "PCLID": 900141246,
+                          "Citation": "Lewis, R.J. Sax's Dangerous Properties of Industrial  Materials. 10th ed. Volumes 1-3 New York, NY: John Wiley &  Sons Inc., 1999., p. V3 3205"
+                        }
+                      }
+                    ],
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "2.6"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ReferenceNumber": 132,
+                    "Description": "PEER REVIEWED",
+                    "Reference": [
+                      "Lewis, R.J., Sr (Ed.). Hawley's Condensed Chemical  Dictionary. 13th ed. New York, NY: John Wiley & Sons, Inc.  1997., p. 995"
+                    ],
+                    "ExtendedReference": [
+                      {
+                        "Citation": "Lewis, R.J., Sr (Ed.). Hawley's Condensed Chemical  Dictionary. 13th ed. New York, NY: John Wiley & Sons, Inc.  1997., p. 995",
+                        "Matched": {
+                          "PCLID": 900006772,
+                          "Citation": "Lewis, R.J., Sr (Ed.). Hawley's Condensed Chemical  Dictionary. 13th ed. New York, NY: John Wiley & Sons, Inc.  1997., p. 995"
+                        }
+                      }
+                    ],
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "Colorless crystals or white powder; odorless and tasteless; density: 2.2-2.6; soluble in molten alkai when finely divided and amorphous /Silicon dioxide/",
+                          "Markup": [
+                            {
+                              "Start": 137,
+                              "Length": 15,
+                              "URL": "https://pubchem.ncbi.nlm.nih.gov/compound/Silicon%20dioxide",
+                              "Type": "PubChem Internal Link",
+                              "Extra": "CID-24261"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ReferenceNumber": 132,
+                    "Description": "PEER REVIEWED",
+                    "Reference": [
+                      "Gerhartz, W. (exec ed.). Ullmann's Encyclopedia of Industrial Chemistry. 5th ed.Vol A1: Deerfield Beach, FL: VCH Publishers, 1985 to Present., p. VA12 (1989) 373"
+                    ],
+                    "ExtendedReference": [
+                      {
+                        "Citation": "Gerhartz, W. (exec ed.). Ullmann's Encyclopedia of Industrial Chemistry. 5th ed.Vol A1: Deerfield Beach, FL: VCH Publishers, 1985 to Present., p. VA12 (1989) 373",
+                        "Matched": {
+                          "PCLID": 900078330,
+                          "Citation": "Gerhartz, W. (exec ed.). Ullmann's Encyclopedia of Industrial Chemistry. 5th ed.Vol A1: Deerfield Beach, FL: VCH Publishers, 1985 to Present., p. VA12 (1989) 373"
+                        }
+                      }
+                    ],
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "Density = 2.20 g/cm; Refractive index = 1.459; Surface tension = 5.200 @ 298 K (calc); Thermal conductivity = 1.37 W/m-deg K at 298 deg K ; Heat of Formation = -903.2 kJ/mol at 298 deg K; Heat Capacity = 37.94 J/mol-deg K at 298 deg K; Dielectric Constant = 3.8 /Corning 7940 fused silica/"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ReferenceNumber": 132,
+                    "Description": "PEER REVIEWED",
+                    "Reference": [
+                      "IARC. Monographs on the Evaluation of the Carcinogenic Risk  of Chemicals to Humans. Geneva: World Health Organization,  International Agency for Research on Cancer, 1972-PRESENT.  (Multivolume work)."
+                    ],
+                    "ExtendedReference": [
+                      {
+                        "Citation": "IARC. Monographs on the Evaluation of the Carcinogenic Risk  of Chemicals to Humans. Geneva: World Health Organization,  International Agency for Research on Cancer, 1972-PRESENT.  (Multivolume work).",
+                        "Matched": {
+                          "PCLID": 906616361,
+                          "Citation": "IARC. Monographs on the Evaluation of the Carcinogenic Risk  of Chemicals to Humans. Geneva: World Health Organization,  International Agency for Research on Cancer, 1972-PRESENT.  (Multivolume work)."
+                        }
+                      }
+                    ],
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "Density = 2.648 /alpha-Quartz/ /from table/",
+                          "Markup": [
+                            {
+                              "Start": 17,
+                              "Length": 12,
+                              "URL": "https://pubchem.ncbi.nlm.nih.gov/compound/alpha-Quartz",
+                              "Type": "PubChem Internal Link",
+                              "Extra": "CID-24261"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ReferenceNumber": 132,
+                    "Description": "PEER REVIEWED",
+                    "Reference": [
+                      "IARC. Monographs on the Evaluation of the Carcinogenic Risk  of Chemicals to Humans. Geneva: World Health Organization,  International Agency for Research on Cancer, 1972-PRESENT.  (Multivolume work)."
+                    ],
+                    "ExtendedReference": [
+                      {
+                        "Citation": "IARC. Monographs on the Evaluation of the Carcinogenic Risk  of Chemicals to Humans. Geneva: World Health Organization,  International Agency for Research on Cancer, 1972-PRESENT.  (Multivolume work).",
+                        "Matched": {
+                          "PCLID": 906616361,
+                          "Citation": "IARC. Monographs on the Evaluation of the Carcinogenic Risk  of Chemicals to Humans. Geneva: World Health Organization,  International Agency for Research on Cancer, 1972-PRESENT.  (Multivolume work)."
+                        }
+                      }
+                    ],
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "Density = 2.269 /alpha-Tridymite/ /from table/"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ReferenceNumber": 132,
+                    "Description": "PEER REVIEWED",
+                    "Reference": [
+                      "IARC. Monographs on the Evaluation of the Carcinogenic Risk  of Chemicals to Humans. Geneva: World Health Organization,  International Agency for Research on Cancer, 1972-PRESENT.  (Multivolume work)."
+                    ],
+                    "ExtendedReference": [
+                      {
+                        "Citation": "IARC. Monographs on the Evaluation of the Carcinogenic Risk  of Chemicals to Humans. Geneva: World Health Organization,  International Agency for Research on Cancer, 1972-PRESENT.  (Multivolume work).",
+                        "Matched": {
+                          "PCLID": 906616361,
+                          "Citation": "IARC. Monographs on the Evaluation of the Carcinogenic Risk  of Chemicals to Humans. Geneva: World Health Organization,  International Agency for Research on Cancer, 1972-PRESENT.  (Multivolume work)."
+                        }
+                      }
+                    ],
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "Density = 2.318 /alpha-Cristobalite/ /from table/",
+                          "Markup": [
+                            {
+                              "Start": 17,
+                              "Length": 18,
+                              "URL": "https://pubchem.ncbi.nlm.nih.gov/compound/alpha-Cristobalite",
+                              "Type": "PubChem Internal Link",
+                              "Extra": "CID-24261"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ReferenceNumber": 132,
+                    "Description": "PEER REVIEWED",
+                    "Reference": [
+                      "IARC. Monographs on the Evaluation of the Carcinogenic Risk  of Chemicals to Humans. Geneva: World Health Organization,  International Agency for Research on Cancer, 1972-PRESENT.  (Multivolume work)."
+                    ],
+                    "ExtendedReference": [
+                      {
+                        "Citation": "IARC. Monographs on the Evaluation of the Carcinogenic Risk  of Chemicals to Humans. Geneva: World Health Organization,  International Agency for Research on Cancer, 1972-PRESENT.  (Multivolume work).",
+                        "Matched": {
+                          "PCLID": 906616361,
+                          "Citation": "IARC. Monographs on the Evaluation of the Carcinogenic Risk  of Chemicals to Humans. Geneva: World Health Organization,  International Agency for Research on Cancer, 1972-PRESENT.  (Multivolume work)."
+                        }
+                      }
+                    ],
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "Density = 2.909 /Coesite/ /from table/"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ReferenceNumber": 132,
+                    "Description": "PEER REVIEWED",
+                    "Reference": [
+                      "IARC. Monographs on the Evaluation of the Carcinogenic Risk  of Chemicals to Humans. Geneva: World Health Organization,  International Agency for Research on Cancer, 1972-PRESENT.  (Multivolume work)."
+                    ],
+                    "ExtendedReference": [
+                      {
+                        "Citation": "IARC. Monographs on the Evaluation of the Carcinogenic Risk  of Chemicals to Humans. Geneva: World Health Organization,  International Agency for Research on Cancer, 1972-PRESENT.  (Multivolume work).",
+                        "Matched": {
+                          "PCLID": 906616361,
+                          "Citation": "IARC. Monographs on the Evaluation of the Carcinogenic Risk  of Chemicals to Humans. Geneva: World Health Organization,  International Agency for Research on Cancer, 1972-PRESENT.  (Multivolume work)."
+                        }
+                      }
+                    ],
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "Density = 4.287 /Stishovite/ /from table/"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ReferenceNumber": 134,
+                    "Name": "",
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "2.3 g/cm³"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ReferenceNumber": 157,
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "2.334 @25 °C"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ReferenceNumber": 158,
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "2.2 @25 °C"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ReferenceNumber": 181,
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "2.20"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "Reference": [
+      {
+        "ReferenceNumber": 17,
+        "SourceName": "CAMEO Chemicals",
+        "SourceID": "25061",
+        "Name": "SILICA, AMORPHOUS",
+        "Description": "CAMEO Chemicals is a chemical database designed for people who are involved in hazardous material incident response and planning. CAMEO Chemicals contains a library with thousands of datasheets containing response-related information and recommendations for hazardous materials that are commonly transported, used, or stored in the United States. CAMEO Chemicals was developed by the National Oceanic and Atmospheric Administration's Office of Response and Restoration in partnership with the Environmental Protection Agency's Office of Emergency Management.",
+        "URL": "https://cameochemicals.noaa.gov/chemical/25061",
+        "LicenseNote": "CAMEO Chemicals and all other CAMEO products are available at no charge to those organizations and individuals (recipients) responsible for the safe handling of chemicals. However, some of the chemical data itself is subject to the copyright restrictions of the companies or organizations that provided the data.",
+        "LicenseURL": "https://cameochemicals.noaa.gov/help/reference/terms_and_conditions.htm?d_f=false",
+        "ANID": 760695
+      },
+      {
+        "ReferenceNumber": 131,
+        "SourceName": "Hazardous Substances Data Bank (HSDB)",
+        "SourceID": "682",
+        "Name": "AMORPHOUS SILICA",
+        "Description": "The Hazardous Substances Data Bank (HSDB) is a toxicology database that focuses on the toxicology of potentially hazardous chemicals. It provides information on human exposure, industrial hygiene, emergency handling procedures, environmental fate, regulatory requirements, nanomaterials, and related areas. The information in HSDB has been assessed by a Scientific Review Panel.",
+        "URL": "https://pubchem.ncbi.nlm.nih.gov/source/hsdb/682",
+        "LicenseURL": "https://www.nlm.nih.gov/web_policies.html",
+        "IsToxnet": true,
+        "ANID": 614
+      },
+      {
+        "ReferenceNumber": 132,
+        "SourceName": "Hazardous Substances Data Bank (HSDB)",
+        "SourceID": "7168",
+        "Name": "CRYSTALLINE SILICA",
+        "Description": "The Hazardous Substances Data Bank (HSDB) is a toxicology database that focuses on the toxicology of potentially hazardous chemicals. It provides information on human exposure, industrial hygiene, emergency handling procedures, environmental fate, regulatory requirements, nanomaterials, and related areas. The information in HSDB has been assessed by a Scientific Review Panel.",
+        "URL": "https://pubchem.ncbi.nlm.nih.gov/source/hsdb/7168",
+        "LicenseURL": "https://www.nlm.nih.gov/web_policies.html",
+        "IsToxnet": true,
+        "ANID": 4771
+      },
+      {
+        "ReferenceNumber": 134,
+        "SourceName": "ILO-WHO International Chemical Safety Cards (ICSCs)",
+        "SourceID": "0809",
+        "Name": "CRISTOBALITE",
+        "Description": "The International Chemical Safety Cards (ICSCs) are data sheets intended to provide essential safety and health information on chemicals in a clear and concise way. The primary aim of the Cards is to promote the safe use of chemicals in the workplace.",
+        "URL": "https://chemicalsafety.ilo.org/dyn/icsc/showcard.display?p_card_id=0809",
+        "LicenseNote": "Creative Commons CC BY 4.0",
+        "LicenseURL": "https://www.ilo.org/global/copyright/lang--en/index.htm",
+        "ANID": 2260689
+      },
+      {
+        "ReferenceNumber": 157,
+        "SourceName": "PAC Chemical Database, U.S. Department of Energy",
+        "SourceID": "14464-46-1",
+        "Name": "Cristobalite",
+        "Description": "",
+        "URL": "https://emhub1.energy.gov/pacteel/search#14464-46-1",
+        "LicenseURL": "https://www.energy.gov/web-policies",
+        "ANID": 56699241
+      },
+      {
+        "ReferenceNumber": 158,
+        "SourceName": "PAC Chemical Database, U.S. Department of Energy",
+        "SourceID": "7631-86-9",
+        "Name": "Silica amorphous hydrated",
+        "Description": "",
+        "URL": "https://emhub1.energy.gov/pacteel/search#7631-86-9",
+        "LicenseURL": "https://www.energy.gov/web-policies",
+        "ANID": 56700998
+      },
+      {
+        "ReferenceNumber": 181,
+        "SourceName": "The National Institute for Occupational Safety and Health (NIOSH)",
+        "SourceID": "npgd0552",
+        "Name": "Silica, amorphous",
+        "Description": "The NIOSH Pocket Guide to Chemical Hazards is intended as a source of general industrial hygiene information on several hundred chemicals/classes for workers, employers, and occupational health professionals. Read more: https://www.cdc.gov/niosh/npg/",
+        "URL": "https://www.cdc.gov/niosh/npg/npgd0552.html",
+        "LicenseNote": "The information provided using CDC Web site is only intended to be general summary information to the public. It is not intended to take the place of either the written law or regulations.",
+        "LicenseURL": "https://www.cdc.gov/Other/disclaimer.html",
+        "ANID": 2266847
+      }
+    ]
+  }
+}
