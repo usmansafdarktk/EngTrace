@@ -1124,48 +1124,93 @@ COMMON_GASES = {
 # @kind: property
 # @units: [0]=g/mol, [1]=angstrom, [2]=K
 # @domain: none (Lennard-Jones parameters; no fit temperature range is stated)
-# [KNOWN-DEFECTIVE] the sigma column is wrong at this table's own purpose. Chapman-
-#   Enskog with the Neufeld collision integral at 293.15 K, against the NIST isobars:
-#   n-butane -26.1%, SF6 -12.7%, propane +3.5%, methane -0.7%, ethane +2.9%. Substituting
-#   SVEHLA's sigma brings all five inside 2% (+0.6, +0.8, +1.2, +0.5, +1.9). Since
-#   mu ~ sigma^-2, a wrong sigma is not a citation problem but a wrong viscosity, and
-#   the template prints sigma into the question stem. Re-sourcing sigma from Svehla is a
-#   P6 event and the repo owner's call (C3.5). Raised from unverified at the C3 review
-#   (Reviewer H, chemical, F-3): a column checked and found wrong is not unchecked.
-#   Svehla, NASA TR R-132, Table I(a) IS on disk
-#   (nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf, PDF pp.22-26) and is the classic source
-#   for these constants - but this table is not it. Parsed from the scan and compared
-#   row by row. Xenon and Chlorine ARE recoverable, contrary to what this note first
-#   said: Cl2 is the token "C_" on p.24 (sigma 4.217, eps/k 316.0) and Xe sits
-#   positionally in p.26's concluded block (4.047 / 231.0). Both extend the pattern.
-#     eps/k agrees with Svehla for 13 of 16 checked (NH3's is OCR-corrupt, "55& 3")
-#     sigma agrees for 3 of 17 - only Carbon Dioxide, Argon, Helium
-#   (Reviewer H reports eps/k 14 of 17, counting NH3; the predicate for mine is the
-#   parser in the C3.7 patch script, and the divergence is recorded rather than split.)
-#   n-butane is sigma 5.47 here against Svehla 4.687; propane 5.06 against 5.118;
-#   methane 3.78 against 3.758. Air, N2 and H2 differ in BOTH columns (air 3.62/97.0
-#   against Svehla 3.711/78.6), so those three are from a third compilation again.
-#   So the table mixes sources and cannot be cited to one. Ammonia's eps/k is left out
-#   of the count: the scan renders 558.3 as "55& 3", which no parser should guess at -
-#   by eye it matches. Values are left exactly as transcribed; the repo owner decides.
+# [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=22 text="FORCE CONSTANTS AND METHODS OF DETERMINATION"
+#   Svehla, NASA TR R-132, Table I(a), which runs PDF pp.22-26. This tag pins the table's
+#   FIRST page only - a page= locator takes one page, and each row's own page is named on
+#   the row below. 16 of the 17 rows were re-sourced to it;
+#   P6 event. The table previously mixed at least three compilations: sigma agreed with
+#   Svehla for only 3 of 17 rows (Carbon Dioxide, Argon, Helium), and Air, N2 and H2
+#   differed in BOTH columns.
+#   This was classed known-defective rather than a citation nit because the sigma column is
+#   wrong at the table's own purpose: Chapman-Enskog with the Neufeld collision integral
+#   at 293.15 K, against the NIST isobars, gave n-butane -26.1%, SF6 -12.7%, propane
+#   +3.5%, methane -0.7%, ethane +2.9%; Svehla's sigma brings all five inside 2%
+#   (+0.6, +0.8, +1.2, +0.5, +1.9). Since mu ~ sigma^-2 a wrong sigma is a wrong
+#   viscosity, and the template prints sigma into the question stem.
+#   Literals carry Svehla's own printed digits (2.900, 3.711), not repr() of the float.
+#   Three rows are not ordinary reads:
+#     Cl2  the scan renders it "C_" (p.24). Accepted only because that token occurs
+#          exactly once on the page, sits in alphabetical order after ClO, and its
+#          eps/k 316.0 already equalled the committed value.
+#     Xe   is NOT re-sourced and keeps its committed sigma. It has no token, and the
+#          positional read the C3 review recorded is not reproducible: indexing p.26's
+#          20th number tuple returns 2.608 / 10.22 / page 114 - helium's second
+#          determination - because regex indices do not track the molecule list when
+#          OCR-broken entries fail to match a clean tuple. Anchoring instead on the
+#          committed eps/k 231.0 did not yield a unique tuple either. Left alone.
+#     NH3  eps/k is NOT re-sourced and keeps its committed 558.3: the scan renders it
+#          "55& 3", which the parser turns into 55.0. By eye it is 558.3, but by eye is
+#          not a parse, so only NH3's sigma (2.900, cleanly printed) is taken. Its eps/k
+#          is the one element of this table still carrying an unparsed value.
 GAS_MOLECULAR_PARAMS = {
-    "Air": (28.97, 3.62, 97.0),
-    "Nitrogen (N₂)": (28.01, 3.70, 95.05),
-    "Oxygen (O₂)": (32.00, 3.46, 106.7),
-    "Carbon Dioxide (CO₂)": (44.01, 3.94, 195.2),
-    "Argon": (39.95, 3.54, 93.3),
-    "Helium": (4.003, 2.55, 10.22),
-    "Neon": (20.18, 2.92, 32.8),
-    "Krypton": (83.80, 3.69, 178.9),
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=22 token="Air" col="sigma" field=[1] precision=exact
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=22 token="Air" col="eps_k" field=[2] precision=exact
+    "Air": (28.97, 3.711, 78.6),
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=25 token="N_" col="sigma" field=[1] precision=exact
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=25 token="N_" col="eps_k" field=[2] precision=exact
+    "Nitrogen (N₂)": (28.01, 3.798, 71.4),
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=25 token="02" col="sigma" field=[1] precision=exact
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=25 token="02" col="eps_k" field=[2] precision=exact
+    "Oxygen (O₂)": (32.00, 3.467, 106.7),
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=23 token="CO2" col="sigma" field=[1] precision=exact
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=23 token="CO2" col="eps_k" field=[2] precision=exact
+    "Carbon Dioxide (CO₂)": (44.01, 3.941, 195.2),
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=22 token="Ar" col="sigma" field=[1] precision=exact
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=22 token="Ar" col="eps_k" field=[2] precision=exact
+    "Argon": (39.95, 3.542, 93.3),
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=24 token="He" col="sigma" field=[1] precision=exact
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=24 token="He" col="eps_k" field=[2] precision=exact
+    "Helium": (4.003, 2.551, 10.22),
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=25 token="Ne" col="sigma" field=[1] precision=exact
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=25 token="Ne" col="eps_k" field=[2] precision=exact
+    "Neon": (20.18, 2.820, 32.8),
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=24 token="Kr" col="sigma" field=[1] precision=exact
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=24 token="Kr" col="eps_k" field=[2] precision=exact
+    "Krypton": (83.80, 3.655, 178.9),
+    # [UNVERIFIED] sigma 4.10 is the one value in this table not re-sourced to
+    #   Svehla. Xenon has no token on p.26, and the positional read the C3 review
+    #   recorded is not reproducible: indexing the 20th number tuple returns
+    #   2.608 / 10.22 / page 114, which is helium's second determination. Anchoring
+    #   instead on the committed eps/k 231.0 found no tuple at all - the
+    #   regex straddles OCR-broken entries, so p.26 cannot be read tuple-wise.
+    #   Its eps/k DOES match Svehla. C3.5 residual.
     "Xenon": (131.29, 4.10, 231.0),
-    "Methane (CH₄)": (16.04, 3.78, 148.6),
-    "Ethane (C₂H₆)": (30.07, 4.42, 215.7),
-    "Propane (C₃H₈)": (44.10, 5.06, 237.1),
-    "Butane (C₄H₁₀)": (58.12, 5.47, 531.4), # n-butane
-    "Hydrogen (H₂)": (2.016, 2.93, 33.3),
-    "Ammonia (NH₃)": (17.03, 2.92, 558.3), # Polar molecule, value is an effective fit.
-    "Chlorine (Cl₂)": (70.90, 4.40, 316.0),
-    "Sulfur Hexafluoride (SF₆)": (146.06, 5.51, 222.1),
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=23 token="CH4" col="sigma" field=[1] precision=exact
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=23 token="CH4" col="eps_k" field=[2] precision=exact
+    "Methane (CH₄)": (16.04, 3.758, 148.6),
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=23 token="C2H6" col="sigma" field=[1] precision=exact
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=23 token="C2H6" col="eps_k" field=[2] precision=exact
+    "Ethane (C₂H₆)": (30.07, 4.443, 215.7),
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=23 token="C3Hs" col="sigma" field=[1] precision=exact
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=23 token="C3Hs" col="eps_k" field=[2] precision=exact
+    "Propane (C₃H₈)": (44.10, 5.118, 237.1),
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=23 token="n-C4Hlo" col="sigma" field=[1] precision=exact
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=23 token="n-C4Hlo" col="eps_k" field=[2] precision=exact
+    "Butane (C₄H₁₀)": (58.12, 4.687, 531.4), # n-butane
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=24 token="H2" col="sigma" field=[1] precision=exact
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=24 token="H2" col="eps_k" field=[2] precision=exact
+    "Hydrogen (H₂)": (2.016, 2.827, 59.7),
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=25 token="NH3" col="sigma" field=[1] precision=exact
+    # [UNVERIFIED] eps/k is not re-sourced: the scan prints it "55& 3" and the
+    #   reader returns 55.0, so a tag claiming 558.3 would fail - and should.
+    #   By eye it is 558.3; by eye is not a parse. C3.5 residual.
+    "Ammonia (NH₃)": (17.03, 2.900, 558.3), # Polar molecule, value is an effective fit.
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=24 token="C_" col="sigma" field=[1] precision=exact
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=24 token="C_" col="eps_k" field=[2] precision=exact
+    "Chlorine (Cl₂)": (70.90, 4.217, 316.0),
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=25 token="SF_" col="sigma" field=[1] precision=exact
+    # [ON-DISK] nasa_tr_r132/svehla_1962_nasa_tr_r132.pdf @ page=25 token="SF_" col="eps_k" field=[2] precision=exact
+    "Sulfur Hexafluoride (SF₆)": (146.06, 5.128, 222.1),
 }
 
 
