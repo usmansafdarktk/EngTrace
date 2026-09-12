@@ -1,0 +1,173 @@
+{
+  "Record": {
+    "RecordType": "CID",
+    "RecordNumber": 5462310,
+    "RecordTitle": "Carbon",
+    "Section": [
+      {
+        "TOCHeading": "Chemical and Physical Properties",
+        "Description": "Various chemical and physical properties that are experimentally determined for this compound.  See also the Safety and Hazard Properties section (if available), which has additional properties pertinent to chemical safety and hazards.",
+        "Section": [
+          {
+            "TOCHeading": "Experimental Properties",
+            "Description": "Various experimentally determined properties for this compound.  See also the Safety and Hazard Properties section (if available), which has additional properties pertinent to chemical safety and hazards.",
+            "Section": [
+              {
+                "TOCHeading": "Density",
+                "Description": "This section provides information on the density (with unit) and specific gravity (without unit) of a compound. Density is mass of a unit volume of a compound and commonly expressed in units of kg/m3 or g/cm3. Specific gravity, also known as relative density, is a unit-less quantity, defined as the ratio of the density of a compound to that of a standard reference material (typically, water at 4 °C for liquids and air at room temperature [20 °C or 68 °F] for gases).",
+                "URL": "https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Map%3A_Fundamentals_of_General_Organic_and_Biological_Chemistry_(McMurry_et_al.)/01%3A_Matter_and_Measurements/1.12%3A_Density_and_Specific_Gravity",
+                "Information": [
+                  {
+                    "ReferenceNumber": 33,
+                    "Description": "PEER REVIEWED",
+                    "Reference": [
+                      "Brockspiepe HG; Ullmann's Encyclopedia of Industrial Chemistry. 7th ed. (2005). NY, NY: John Wiley & Sons; Charcoal. Online Posting Date: Jun 15, 2000."
+                    ],
+                    "ExtendedReference": [
+                      {
+                        "Citation": "Brockspiepe HG; Ullmann's Encyclopedia of Industrial Chemistry. 7th ed. (2005). NY, NY: John Wiley & Sons; Charcoal. Online Posting Date: Jun 15, 2000.",
+                        "Matched": {
+                          "PCLID": 900063493,
+                          "Citation": "Brockspiepe HG; Ullmann's Encyclopedia of Industrial Chemistry. 7th ed. (2005). NY, NY: John Wiley & Sons; Charcoal. Online Posting Date: Jun 15, 2000."
+                        }
+                      }
+                    ],
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "The apparent density of beech charcoal is 0.45 g/mL and that of pine charcoal is 0.28 g/mL; the density of pore-free charcoal ranges between 1.38 and 1.46 g/mL, depending on the kind of wood; the porosity of beech charcoal is ca 70%; the bulk density of charcoal, which depends on the kind of wood and the size of the pieces, ranges from 180 to 220 kg/cu m; the heating value ranges between 29 and 33 kJ/g",
+                          "Markup": [
+                            {
+                              "Start": 30,
+                              "Length": 8,
+                              "URL": "https://pubchem.ncbi.nlm.nih.gov/compound/charcoal",
+                              "Type": "PubChem Internal Link",
+                              "Extra": "CID-5462310"
+                            },
+                            {
+                              "Start": 69,
+                              "Length": 8,
+                              "URL": "https://pubchem.ncbi.nlm.nih.gov/compound/charcoal",
+                              "Type": "PubChem Internal Link",
+                              "Extra": "CID-5462310"
+                            },
+                            {
+                              "Start": 117,
+                              "Length": 8,
+                              "URL": "https://pubchem.ncbi.nlm.nih.gov/compound/charcoal",
+                              "Type": "PubChem Internal Link",
+                              "Extra": "CID-5462310"
+                            },
+                            {
+                              "Start": 214,
+                              "Length": 8,
+                              "URL": "https://pubchem.ncbi.nlm.nih.gov/compound/charcoal",
+                              "Type": "PubChem Internal Link",
+                              "Extra": "CID-5462310"
+                            },
+                            {
+                              "Start": 254,
+                              "Length": 8,
+                              "URL": "https://pubchem.ncbi.nlm.nih.gov/compound/charcoal",
+                              "Type": "PubChem Internal Link",
+                              "Extra": "CID-5462310"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ReferenceNumber": 34,
+                    "Name": "",
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "Relative density (water = 1): 1.8-3.51",
+                          "Markup": [
+                            {
+                              "Start": 18,
+                              "Length": 5,
+                              "URL": "https://pubchem.ncbi.nlm.nih.gov/compound/water",
+                              "Type": "PubChem Internal Link",
+                              "Extra": "CID-962"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ReferenceNumber": 44,
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "2.2 @25 °C"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ReferenceNumber": 50,
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "1.5-1.8"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "Reference": [
+      {
+        "ReferenceNumber": 33,
+        "SourceName": "Hazardous Substances Data Bank (HSDB)",
+        "SourceID": "5037",
+        "Name": "CARBON",
+        "Description": "The Hazardous Substances Data Bank (HSDB) is a toxicology database that focuses on the toxicology of potentially hazardous chemicals. It provides information on human exposure, industrial hygiene, emergency handling procedures, environmental fate, regulatory requirements, nanomaterials, and related areas. The information in HSDB has been assessed by a Scientific Review Panel.",
+        "URL": "https://pubchem.ncbi.nlm.nih.gov/source/hsdb/5037",
+        "LicenseURL": "https://www.nlm.nih.gov/web_policies.html",
+        "IsToxnet": true,
+        "ANID": 3127
+      },
+      {
+        "ReferenceNumber": 34,
+        "SourceName": "ILO-WHO International Chemical Safety Cards (ICSCs)",
+        "SourceID": "0702",
+        "Name": "CARBON",
+        "Description": "The International Chemical Safety Cards (ICSCs) are data sheets intended to provide essential safety and health information on chemicals in a clear and concise way. The primary aim of the Cards is to promote the safe use of chemicals in the workplace.",
+        "URL": "https://chemicalsafety.ilo.org/dyn/icsc/showcard.display?p_card_id=0702",
+        "LicenseNote": "Creative Commons CC BY 4.0",
+        "LicenseURL": "https://www.ilo.org/global/copyright/lang--en/index.htm",
+        "ANID": 2260583
+      },
+      {
+        "ReferenceNumber": 44,
+        "SourceName": "PAC Chemical Database, U.S. Department of Energy",
+        "SourceID": "7440-44-0",
+        "Name": "Carbon; (Graphite, synthetic)",
+        "Description": "",
+        "URL": "https://emhub1.energy.gov/pacteel/search#7440-44-0",
+        "LicenseURL": "https://www.energy.gov/web-policies",
+        "ANID": 56699051
+      },
+      {
+        "ReferenceNumber": 50,
+        "SourceName": "The National Institute for Occupational Safety and Health (NIOSH)",
+        "SourceID": "npgd0307",
+        "Name": "Graphite (synthetic)",
+        "Description": "The NIOSH Pocket Guide to Chemical Hazards is intended as a source of general industrial hygiene information on several hundred chemicals/classes for workers, employers, and occupational health professionals. Read more: https://www.cdc.gov/niosh/npg/",
+        "URL": "https://www.cdc.gov/niosh/npg/npgd0307.html",
+        "LicenseNote": "The information provided using CDC Web site is only intended to be general summary information to the public. It is not intended to take the place of either the written law or regulations.",
+        "LicenseURL": "https://www.cdc.gov/Other/disclaimer.html",
+        "ANID": 2266605
+      }
+    ]
+  }
+}

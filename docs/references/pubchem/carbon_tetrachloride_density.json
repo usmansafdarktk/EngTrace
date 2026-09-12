@@ -1,0 +1,245 @@
+{
+  "Record": {
+    "RecordType": "CID",
+    "RecordNumber": 5943,
+    "RecordTitle": "Carbon Tetrachloride",
+    "Section": [
+      {
+        "TOCHeading": "Chemical and Physical Properties",
+        "Description": "Various chemical and physical properties that are experimentally determined for this compound.  See also the Safety and Hazard Properties section (if available), which has additional properties pertinent to chemical safety and hazards.",
+        "Section": [
+          {
+            "TOCHeading": "Experimental Properties",
+            "Description": "Various experimentally determined properties for this compound.  See also the Safety and Hazard Properties section (if available), which has additional properties pertinent to chemical safety and hazards.",
+            "Section": [
+              {
+                "TOCHeading": "Density",
+                "Description": "This section provides information on the density (with unit) and specific gravity (without unit) of a compound. Density is mass of a unit volume of a compound and commonly expressed in units of kg/m3 or g/cm3. Specific gravity, also known as relative density, is a unit-less quantity, defined as the ratio of the density of a compound to that of a standard reference material (typically, water at 4 °C for liquids and air at room temperature [20 °C or 68 °F] for gases).",
+                "URL": "https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Map%3A_Fundamentals_of_General_Organic_and_Biological_Chemistry_(McMurry_et_al.)/01%3A_Matter_and_Measurements/1.12%3A_Density_and_Specific_Gravity",
+                "Information": [
+                  {
+                    "ReferenceNumber": 6,
+                    "Reference": [
+                      "U.S. Coast Guard. 1999. Chemical Hazard Response Information System (CHRIS) - Hazardous Chemical Data. Commandant Instruction 16465.12C. Washington, D.C.: U.S. Government Printing Office."
+                    ],
+                    "ExtendedReference": [
+                      {
+                        "Citation": "U.S. Coast Guard. 1999. Chemical Hazard Response Information System (CHRIS) - Hazardous Chemical Data. Commandant Instruction 16465.12C. Washington, D.C.: U.S. Government Printing Office.",
+                        "Matched": {
+                          "PCLID": 900163264,
+                          "Citation": "U.S. Coast Guard. 1999. Chemical Hazard Response Information System (CHRIS) - Hazardous Chemical Data. Commandant Instruction 16465.12C. Washington, D.C.: U.S. Government Printing Office."
+                        }
+                      }
+                    ],
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "1.59 at 68 °F (USCG, 1999) - Denser than water; will sink",
+                          "Markup": [
+                            {
+                              "Start": 41,
+                              "Length": 5,
+                              "URL": "https://pubchem.ncbi.nlm.nih.gov/compound/water",
+                              "Type": "PubChem Internal Link",
+                              "Extra": "CID-962"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ReferenceNumber": 41,
+                    "Description": "PEER REVIEWED",
+                    "Reference": [
+                      "Haynes, W.M. (ed.). CRC Handbook of Chemistry and Physics. 95th Edition. CRC Press LLC, Boca Raton: FL 2014-2015, p. 3-496"
+                    ],
+                    "ExtendedReference": [
+                      {
+                        "Citation": "Haynes, W.M. (ed.). CRC Handbook of Chemistry and Physics. 95th Edition. CRC Press LLC, Boca Raton: FL 2014-2015, p. 3-496",
+                        "Matched": {
+                          "PCLID": 900013853,
+                          "Citation": "Haynes, W.M. (ed.). CRC Handbook of Chemistry and Physics. 95th Edition. CRC Press LLC, Boca Raton: FL 2014-2015, p. 3-496"
+                        }
+                      }
+                    ],
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "1.5940 g/cu cm at 20 °C"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ReferenceNumber": 41,
+                    "Description": "PEER REVIEWED",
+                    "Reference": [
+                      "NOAA; CAMEO Chemicals. Database of Hazardous Materials. Carbon tetrachloride (56-23-5). Natl Ocean Atmos Admin, Off Resp Rest; NOAA Ocean Serv. Available from, as of Mar 16, 2018: https://cameochemicals.noaa.gov/"
+                    ],
+                    "ExtendedReference": [
+                      {
+                        "Citation": "NOAA; CAMEO Chemicals. Database of Hazardous Materials. Carbon tetrachloride (56-23-5). Natl Ocean Atmos Admin, Off Resp Rest; NOAA Ocean Serv. Available from, as of Mar 16, 2018: https://cameochemicals.noaa.gov/",
+                        "Matched": {
+                          "PCLID": 900017720,
+                          "Citation": "NOAA; CAMEO Chemicals. Database of Hazardous Materials. Carbon tetrachloride (56-23-5). Natl Ocean Atmos Admin, Off Resp Rest; NOAA Ocean Serv. Available from, as of Mar 16, 2018: https://cameochemicals.noaa.gov/"
+                        }
+                      }
+                    ],
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "Saturated liquid density: 99.080 lb/cu ft; liquid heat capacity: 0.219 Btu/lb °F; liquid viscosity: 0.922 centipoise; ideal gas heat capacity: 0.130 Btu/lb °F (all at 75 °F)"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ReferenceNumber": 41,
+                    "Description": "PEER REVIEWED",
+                    "Reference": [
+                      "NOAA; CAMEO Chemicals. Database of Hazardous Materials. Carbon tetrachloride (56-23-5). Natl Ocean Atmos Admin, Off Resp Rest; NOAA Ocean Serv. Available from, as of Mar 16, 2018: https://cameochemicals.noaa.gov/"
+                    ],
+                    "ExtendedReference": [
+                      {
+                        "Citation": "NOAA; CAMEO Chemicals. Database of Hazardous Materials. Carbon tetrachloride (56-23-5). Natl Ocean Atmos Admin, Off Resp Rest; NOAA Ocean Serv. Available from, as of Mar 16, 2018: https://cameochemicals.noaa.gov/",
+                        "Matched": {
+                          "PCLID": 900017720,
+                          "Citation": "NOAA; CAMEO Chemicals. Database of Hazardous Materials. Carbon tetrachloride (56-23-5). Natl Ocean Atmos Admin, Off Resp Rest; NOAA Ocean Serv. Available from, as of Mar 16, 2018: https://cameochemicals.noaa.gov/"
+                        }
+                      }
+                    ],
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "Liquid thermal conductivity: 0.690 Btu-inch/hr-sq ft °F; saturated vapor pressure: 1.874 lb/sq in; saturated vapor density: 0.05069 lb/cu ft (all at 70 °F)"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ReferenceNumber": 50,
+                    "Name": "",
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "Relative density (water = 1): 1.59 (20 °C)",
+                          "Markup": [
+                            {
+                              "Start": 18,
+                              "Length": 5,
+                              "URL": "https://pubchem.ncbi.nlm.nih.gov/compound/water",
+                              "Type": "PubChem Internal Link",
+                              "Extra": "CID-962"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ReferenceNumber": 75,
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "1.59"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ReferenceNumber": 76,
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "1.5940 @ 20°C"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ReferenceNumber": 91,
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "1.59"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "Reference": [
+      {
+        "ReferenceNumber": 6,
+        "SourceName": "CAMEO Chemicals",
+        "SourceID": "2828",
+        "Name": "CARBON TETRACHLORIDE",
+        "Description": "CAMEO Chemicals is a chemical database designed for people who are involved in hazardous material incident response and planning. CAMEO Chemicals contains a library with thousands of datasheets containing response-related information and recommendations for hazardous materials that are commonly transported, used, or stored in the United States. CAMEO Chemicals was developed by the National Oceanic and Atmospheric Administration's Office of Response and Restoration in partnership with the Environmental Protection Agency's Office of Emergency Management.",
+        "URL": "https://cameochemicals.noaa.gov/chemical/2828",
+        "LicenseNote": "CAMEO Chemicals and all other CAMEO products are available at no charge to those organizations and individuals (recipients) responsible for the safe handling of chemicals. However, some of the chemical data itself is subject to the copyright restrictions of the companies or organizations that provided the data.",
+        "LicenseURL": "https://cameochemicals.noaa.gov/help/reference/terms_and_conditions.htm?d_f=false",
+        "ANID": 757273
+      },
+      {
+        "ReferenceNumber": 41,
+        "SourceName": "Hazardous Substances Data Bank (HSDB)",
+        "SourceID": "53",
+        "Name": "Carbon tetrachloride",
+        "Description": "The Hazardous Substances Data Bank (HSDB) is a toxicology database that focuses on the toxicology of potentially hazardous chemicals. It provides information on human exposure, industrial hygiene, emergency handling procedures, environmental fate, regulatory requirements, nanomaterials, and related areas. The information in HSDB has been assessed by a Scientific Review Panel.",
+        "URL": "https://pubchem.ncbi.nlm.nih.gov/source/hsdb/53",
+        "LicenseURL": "https://www.nlm.nih.gov/web_policies.html",
+        "IsToxnet": true,
+        "ANID": 24
+      },
+      {
+        "ReferenceNumber": 50,
+        "SourceName": "ILO-WHO International Chemical Safety Cards (ICSCs)",
+        "SourceID": "0024",
+        "Name": "CARBON TETRACHLORIDE",
+        "Description": "The International Chemical Safety Cards (ICSCs) are data sheets intended to provide essential safety and health information on chemicals in a clear and concise way. The primary aim of the Cards is to promote the safe use of chemicals in the workplace.",
+        "URL": "https://chemicalsafety.ilo.org/dyn/icsc/showcard.display?p_card_id=0024",
+        "LicenseNote": "Creative Commons CC BY 4.0",
+        "LicenseURL": "https://www.ilo.org/global/copyright/lang--en/index.htm",
+        "ANID": 2259940
+      },
+      {
+        "ReferenceNumber": 75,
+        "SourceName": "Occupational Safety and Health Administration (OSHA)",
+        "SourceID": "844",
+        "Name": "CARBON TETRACHLORIDE (TETRACHLOROMETHANE)",
+        "Description": "The OSHA Occupational Chemical Database contains over 800 entries with information such as physical properties, exposure guidelines, etc.",
+        "URL": "https://www.osha.gov/chemicaldata/844",
+        "LicenseNote": "Materials created by the federal government are generally part of the public domain and may be used, reproduced and distributed without permission. Therefore, content on this website which is in the public domain may be used without the prior permission of the U.S. Department of Labor (DOL). Warning: Some content - including both images and text - may be the copyrighted property of others and used by the DOL under a license.",
+        "LicenseURL": "https://www.dol.gov/general/aboutdol/copyright",
+        "ANID": 3411320
+      },
+      {
+        "ReferenceNumber": 76,
+        "SourceName": "PAC Chemical Database, U.S. Department of Energy",
+        "SourceID": "56-23-5",
+        "Name": "Carbon tetrachloride",
+        "Description": "",
+        "URL": "https://emhub1.energy.gov/pacteel/search#56-23-5",
+        "LicenseURL": "https://www.energy.gov/web-policies",
+        "ANID": 56699048
+      },
+      {
+        "ReferenceNumber": 91,
+        "SourceName": "The National Institute for Occupational Safety and Health (NIOSH)",
+        "SourceID": "npgd0107",
+        "Name": "Carbon tetrachloride",
+        "Description": "The NIOSH Pocket Guide to Chemical Hazards is intended as a source of general industrial hygiene information on several hundred chemicals/classes for workers, employers, and occupational health professionals. Read more: https://www.cdc.gov/niosh/npg/",
+        "URL": "https://www.cdc.gov/niosh/npg/npgd0107.html",
+        "LicenseNote": "The information provided using CDC Web site is only intended to be general summary information to the public. It is not intended to take the place of either the written law or regulations.",
+        "LicenseURL": "https://www.cdc.gov/Other/disclaimer.html",
+        "ANID": 2266406
+      }
+    ]
+  }
+}
