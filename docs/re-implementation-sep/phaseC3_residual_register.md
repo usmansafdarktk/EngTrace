@@ -103,14 +103,20 @@ citation problem.
 
 ---
 
-## 2. Unchecked — **176**, by the table that carries them
+## 2. Unchecked — **177**, by the table that carries them
 
 Not known to be wrong; known to be **unchecked**.
 
-**Measured now** (tag-starting lines, per branch): mechanical 148, chemical 12, civil 8,
-electrical 4, industrial 4 — **176**. The per-table breakdown below is the **C3-era
+**Measured now** (tag-starting lines, per branch): mechanical 148, chemical 13, civil 8,
+electrical 4, industrial 4 — **177**. The per-table breakdown below is the **C3-era
 snapshot** and is kept as the record of what the phase inherited; it no longer sums to the
 current total.
+
+The last change was **176 → 177**, and it is an improvement rather than a regression:
+`SUBSTANCES_FOR_VAPORIZATION`'s Mercury row carried no tag of its own and was covered only
+by the table-level one. It now states its own reason — that no artefact on disk gives a
+ΔHvap for mercury and none can be derived, there being no mercury saturation file. A row
+that states why it is unverified is more specific than a row sheltering under a blanket.
 
 The count moved twice and in both directions, which is worth keeping visible:
 
@@ -158,12 +164,13 @@ hashed public copy already under `docs/references/` (D-076).
 
 | row | branch | finding |
 |---|---|---|
-| `R-410A` | chemical | a blend, absent from the 36 pure fluids; needs a mixture source or a replacement |
+| `R-410A` | chemical | a blend, absent from the **39** pure fluids on disk (36 before this phase added nonane, decane and dodecane) — **and so are both its components**, R-32 and R-125, so it cannot be reconstructed either. **NOT substituted, for two reasons:** R-22 is the nearest on-disk refrigerant (298.15 K: P 1.0439 MPa, v_f 0.00083987, v_g 0.022608) and this row is **+9.78%** from its v_f and **−33.21%** from its v_g, so substituting would replace the row's *values* rather than relabel it; and `REAL_FLUID_DATA` **already carries an R-22 row**, so it would put one fluid in the table twice under two keys — the very defect recorded one row below. The committed volumes are unsourced: nothing on disk states or contradicts them |
+| `REAL_FLUID_DATA`, the annotation copy | chemical | **NEW — a stale fork, flagged and deliberately not synced.** `templates_annotation/annotation_app/data/templates/branches/chemical_engineering/constants.py` carries the same table with **pre-C3 values**: R-12 `v_g 0.0268` where the main file has 0.0272, and R-22 `v_f 0.000845` where the main file has 0.000840 — both corrected during C3 against the NIST TSVs. Verified by reading that file directly. **Not synced on purpose:** that directory backs the annotation pilot, and a frozen snapshot may be intentional so annotations stay reproducible against what annotators actually saw. Syncing it silently could invalidate the pilot's provenance, so it is the repo owner's call. Only `constants.py` is forked — `fetch_references.py` is not duplicated, so `NIST_FLUIDS` has a single authoritative definition |
 | `Tellurium Mercury` | mechanical | WebBook returns "Name Not Found"; whether it means mercury telluride is not established |
 | `Tungsten Hexafluoride` | mechanical | listed as a manometer liquid; the on-disk Antoine parameters put P = 1.074 bar at 290.4 K, so it is a **gas** at room temperature |
 | `2024-T4` | mechanical | **CLOSED — and this entry was wrong on both counts.** p.374's text layer parses perfectly well; it prints "See Table 3.2.3.0(d)" in all four elastic cells, so there is no value on that page to read and the reader is right to refuse. p.373 (Table 3.2.3.0(b1)) parses cleanly and prints G 4.0 ×10³ ksi in all four columns, and following the deferral finds Table 3.2.3.0(d) on p.376, captioned "…Sheet and Plate, **All Tempers**" — which is what licenses applying it to T4, the question the row's own tag left open. `SHEAR_MODULUS_VALUES['Aluminum 2024-T4']` was 28.0 GPa against 27.58 (+1.5%, outside the 1.25% half-unit bound); corrected to 27.6 and cited to p.373, which is machine-readable where p.376 is not |
 | `Mercury` ΔHvap | chemical | the WebBook phase-change page has no vaporization section |
-| `Cork`, `Cork Board`, `Bamboo` | mechanical | **not wood** — a bark tissue and a grass; the wood reason never applied (H-mech F4) |
+| `Cork`, `Cork Board`, `Bamboo` | mechanical | **not wood** — a bark tissue and a grass; the wood reason never applied (H-mech F4). **Now searched exhaustively and confirmed absent:** a full 546-page scan of FPL-GTR-282 for *cork*, *bamboo*, *Bambusa*, *Quercus suber* returns three hits and all three are false positives — "cork elm" (*Ulmus thomasii*, p.34), "Corkbark fir" (*A. lasiocarpa*, p.378) and "bamboo fiber" in a wood-plastic-composite narrative with no property value (p.302); *Bambusa* and *Quercus suber* return zero. No PubChem record (a tissue is not a compound with a CID — the polymer failure mode again), and nothing under any of the 13 `docs/references/` directories, all of which are structurally unrelated to a bark tissue or a grass. **No substitute value was read, so none is proposed.** These rows need a materials handbook |
 | `Tetrabromoethane` **and** `Acetylene Tetrabromide` | mechanical | **NEW — one substance under two names.** `MANOMETER_FLUIDS` carries both, each at **2960**, and acetylene tetrabromide *is* 1,1,2,2-tetrabromoethane. The identical value is strong evidence the two rows were meant as one substance. Stated with its limit: **no artefact on disk distinguishes them**, and "tetrabromoethane" could in principle name the 1,1,1,2 isomer, so this is a duplicate row to resolve rather than an identification to act on. A template drawing `random.choice` over this table draws the same fluid twice under two labels |
 
 ---
@@ -235,13 +242,34 @@ quietly absorbs its corrections is worth no more than the claims it corrected.
    | fuel and oil rows given a measured n-alkane bracket | 19 | still `[UNVERIFIED]`, and now say why |
    | wood rows given FPL's actual species range | 5 | still `[UNVERIFIED]`, and now say why |
 
-   The remaining 148 are not one decision taken 148 times. They divide into:
-   **mixtures and commercial grades** (SAE oils, crude, gasoline, sea water, antifreeze) —
-   no pure substance *is* the row, and the acquisition proved it: nonane/decane/dodecane
-   bracket 718–749 kg/m³ against Kerosene 810, so re-pointing would change what the row
-   names; **genus-level woods** — FPL indexes by species and the rows name a genus with no
-   moisture condition; **named standards not on disk** — AISC, ASTM, ACI 318-19, ASCE 7-22,
-   IEC 60063, MIL-A-8625, US Standard Atmosphere 1976; and **substance defects** (§3).
+   The remaining 148 are not one decision taken 148 times. **Counted by the reason each
+   row states** (tag-starting lines, sums to 148):
+
+   | rows | reason |
+   |---:|---|
+   | 39 | no source on disk *for this material* — the bulk-material rows: granite, marble, brick, concrete, glass, pumice, asphalt, coal, paper, leather, bone |
+   | 19 | a mixture or commercial grade with no single composition |
+   | 16 | no source on disk |
+   | 12 | no MIL-HDBK-5J design table is this material, and no other source |
+   | 12 | a mixture, solution or commercial product with no single composition |
+   | 10 | the table states no temperature or pressure, so no row of an artefact *is* the value |
+   | 8 | **searched, and found unreachable by a chemical database** (PubChem: no CID for a polymer) |
+   | 5 | the row names a material FPL indexes by **species** and states no moisture condition |
+   | 4 | no MIL-HDBK-5J design table under the names searched |
+   | 3 | **not wood** — cork, cork board, bamboo; now searched exhaustively (§3) |
+   | 3 | no MIL-HDBK-5J design table (its copper-base tables listed) |
+   | 2 | no temperature or pressure stated, for a cryogen |
+   | 2 | **one substance under two names** (§3) |
+   | 13 | singletons, each naming its own specific miss (Xylene, Tellurium Mercury, the unnamed aluminium alloy, 1100/3003, quartz's wrong form, CP titanium's unprinted µ, WF₆'s phase, isopropanol, ethylene glycol, chloroform, bromine, ASTM A36, air) |
+
+   **The shape of that table is the answer to "why are so many still unverified".** Roughly
+   86 rows (39 + 19 + 16 + 12) are bulk materials and mixtures that no chemical database
+   indexes — no pure substance *is* the row, and the fuel acquisition proved it:
+   nonane/decane/dodecane bracket 718–749 kg/m³ against Kerosene 810, so re-pointing would
+   change what the row names. 19 more need a **mechanical-properties handbook**, which
+   PubChem cannot supply at any effort. And **17 rows now say "searched, and here is what
+   the search showed"** rather than "no source" — which is the difference between a row
+   nobody has looked at and a row that has been looked at and found genuinely unreachable.
 
    What changed is that "no on-disk source, and none was searched for" has become, for 43
    of them, a statement of what *was* searched and what it showed.

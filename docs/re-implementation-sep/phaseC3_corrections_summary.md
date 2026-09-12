@@ -13,7 +13,7 @@ way.
 | tags | 452 | **489** |
 | resolved | 156 (109 value comparisons) | **232** (185 value comparisons) |
 | `[KNOWN-DEFECTIVE]` | 19 | **0** |
-| `[UNVERIFIED]` | 198 | **176** |
+| `[UNVERIFIED]` | 198 | **177** |
 | LEGACY | 0 | 0 |
 | `[DERIVED]` recomputed | 0 of 15 | **8 run here, 1 elsewhere, 7 unexecuted** |
 | `tol=` with a declared basis | 0 of 10 | **17 of 17** |
@@ -79,10 +79,40 @@ Recorded because a summary that omits them is worth less than one that does.
 
 ## What is still open
 
-§6 item 3 (153 mechanical rows: mixtures, genus-level woods, and standards not on disk)
-and §3's substance defects, including one found here: **`Tetrabromoethane` and `Acetylene
-Tetrabromide` are one substance under two names**, both at 2960, which over-weights that
-fluid in every `random.choice` over the table.
+§6 item 3 — **148 mechanical rows**, counted by the reason each states. Roughly 86 are bulk
+materials and mixtures no chemical database indexes (granite, concrete, sea water, SAE
+oils), 19 need a mechanical-properties handbook, and 17 now record what a search actually
+showed rather than "no source".
+
+**§3's substance defects are now characterised rather than suspected**, each against the
+artefact:
+
+- **`Tungsten Hexafluoride`** — a **gas** at manometer conditions, listed as a liquid.
+  P = 1 atm at 289.14 K, re-derived from the page's own Antoine row and *inside* its stated
+  validity window, so the verdict needs no extrapolation. The value 12900 has no support on
+  disk and nothing on disk could replace it.
+- **`Tellurium Mercury`** — the WebBook *does* carry mercury telluride; both pages are
+  **data-free stubs**. So no further fetch can source this row, which is a stronger
+  statement than "not established".
+- **`R-410A`** — a blend whose **components are also absent**, so it cannot be
+  reconstructed. Not substituted: R-22 would change the row's *values* (+9.78% / −33.21%)
+  and would duplicate a fluid already in the table.
+- **`Mercury` ΔHvap** — the page has no vaporization section at all (verified by string
+  search, not by headings), and no saturation file exists, so the derivation reaching the
+  other eleven rows cannot reach it.
+- **`Cork` / `Cork Board` / `Bamboo`** — searched exhaustively across all 546 pages of FPL
+  and every reference directory; genuinely absent.
+- **`Tetrabromoethane` / `Acetylene Tetrabromide`** — one substance under two names, both
+  at 2960, over-weighting that fluid in every `random.choice` over the table.
+
+Each needs either a materials handbook or a decision that moves the item pool (removing a
+row, renaming a key). Both are the repo owner's call, and each is registered with the
+evidence rather than acted on.
+
+**Also flagged, not acted on:** `templates_annotation/annotation_app/` holds a **stale fork**
+of the chemical constants with pre-C3 values (R-12 `v_g 0.0268`, R-22 `v_f 0.000845`). It is
+deliberately not synced — that directory backs the annotation pilot, and a frozen snapshot
+may be intentional so annotations stay reproducible against what annotators saw.
 
 ## The item pool
 
