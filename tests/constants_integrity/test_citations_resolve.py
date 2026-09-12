@@ -515,6 +515,22 @@ def _text_snippet(path, text):
     return 'text', None
 
 
+REGISTER = os.path.join(REPO, 'docs', 're-implementation-sep',
+                        'phaseC3_residual_register.md')
+_REGISTER_TEXT = None
+
+
+def _register_text():
+    """The residual register, read once. Missing file -> empty, and R6 says so."""
+    global _REGISTER_TEXT
+    if _REGISTER_TEXT is None:
+        try:
+            _REGISTER_TEXT = open(REGISTER, encoding='utf-8').read()
+        except OSError:
+            _REGISTER_TEXT = ''
+    return _REGISTER_TEXT
+
+
 def _sha256(path):
     h = hashlib.sha256()
     with open(path, 'rb') as fh:
@@ -575,7 +591,7 @@ def _constant(ns, table, row, kv):
 # The generalised check
 # ==========================================================================
 
-def check_source(branch, src, refs=REFS, manifest=None, kinds=None):
+def check_source(branch, src, refs=REFS, manifest=None, kinds=None, register=None):
     """R1-R7 over one constants.py source. Returns (counts, failures, legacy)."""
     manifest = manifest if manifest is not None else json.load(
         open(os.path.join(refs, 'MANIFEST.json'), encoding='utf-8'))
@@ -595,6 +611,10 @@ def check_source(branch, src, refs=REFS, manifest=None, kinds=None):
                   legacy=0, stated=0, resolved_cas=0, derived_unexecuted=0)
     failures, legacy = [], []
     hashed = {}
+    # §C1.2 requires both residual classes to be IN the residual register; R6 never
+    # checked it (C3 review, Reviewer G F-2). None = read the real file; the self-test
+    # supplies its own so its fixture's residual does not fail the clean control.
+    reg = _register_text() if register is None else register
 
     for tag in extract_tags(src):
         counts['tags'] += 1
@@ -637,6 +657,10 @@ def check_source(branch, src, refs=REFS, manifest=None, kinds=None):
                 counts['stated'] += 1
                 if cls == 'DERIVED':
                     counts['derived_unexecuted'] += 1
+                if cls in ('KNOWN-DEFECTIVE', 'UNVERIFIED') and tag['table'] not in reg:
+                    failures.append(
+                        f'R6 {where}: [{cls}] but {tag["table"]} is named nowhere in the '
+                        f'residual register - §C1.2 requires every residual to be in it')
             continue
         if cls == 'POLICY':
             counts['stated'] += 1
@@ -979,7 +1003,7 @@ _PLANTS = [
 
 def selftest():
     bad = []
-    _c, clean_f, clean_legacy = check_source('plant', _CLEAN)
+    _c, clean_f, clean_legacy = check_source('plant', _CLEAN, register='GAP')
     if clean_f:
         print('  the clean fixture itself fails - no plant can be judged:')
         for x in clean_f:
@@ -991,7 +1015,7 @@ def selftest():
         if _CLEAN.count(old) != 1:
             bad.append(f'{code} {label}: plant anchor occurs {_CLEAN.count(old)} times')
             continue
-        _c, f, _l = check_source('plant', _CLEAN.replace(old, new))
+        _c, f, _l = check_source('plant', _CLEAN.replace(old, new), register='GAP')
         fresh = [x for x in f if x not in clean_f and x.startswith(code)]
         status = 'ok' if fresh else 'FAIL'
         print(f'  [{status}] {code} {label}' + (f' -> {fresh[0][:110]}' if fresh else f' (got {f})'))
@@ -1010,13 +1034,22 @@ def selftest():
             fh.write('\n')
         man = json.load(open(os.path.join(REFS, 'MANIFEST.json'), encoding='utf-8'))
         _c, f, _l = check_source('plant', _CLEAN.split('# @kind: property')[0],
-                                 refs=tmp, manifest=man)
+                                 refs=tmp, manifest=man, register='GAP')
         fresh = [x for x in f if x.startswith('R2') and 'SHA-256' in x]
         print(f'  [{"ok" if fresh else "FAIL"}] R2 file present but altered after citation')
         if not fresh:
             bad.append(f'R2 altered file: not detected (got {f})')
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
+
+    # R6 - a residual tagged but absent from the register. The fixture's GAP is
+    #      [UNVERIFIED]; withhold it from the register and the membership check must fire.
+    _c, f, _l = check_source('plant', _CLEAN, register='(a register naming nothing)')
+    fresh = [x for x in f if x.startswith('R6') and 'residual register' in x]
+    print(f'  [{"ok" if fresh else "FAIL"}] R6 a residual named nowhere in the register'
+          + (f' -> {fresh[0][:100]}' if fresh else f' (got {f})'))
+    if not fresh:
+        bad.append('R6 register membership: not detected')
 
     # -- ATTACHMENT. Where a tag lands decides what it is checked against, and
     #    the first real run attached two wrongly while every failure plant above
