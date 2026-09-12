@@ -59,11 +59,14 @@ WATER_DENSITY_KG_M3 = 998.2          # rho at 20 C
 # @kind: property
 # @units: m^2/s
 # @domain: T=293.15 K, p=101.325 kPa
-# [KNOWN-DEFECTIVE] nu = mu/rho at the same 20 C, 1 atm = 0.0010016 / 998.21 = 1.003396e-06 m^2/s
-#   (both from nist_fluid_properties/water_C7732185_isobar_1atm.tsv), i.e. 1.003000e-06 at
-#   4 s.f. The literal is +0.060%: it follows from a 4-digit mu of 1.002e-3 Pa*s
-#   (1.002e-3/998.2 = 1.0038e-6), not from the 5-digit mu NIST tabulates. C3.5 carries it.
-WATER_KINEMATIC_VISCOSITY_M2_S = 1.004e-6   # nu at 20 C
+# [DERIVED] nu = mu/rho at the 293.15 K, 101.325 kPa this table declares:
+#   0.0010016 Pa*s / 998.21 kg/m3 = 1.0033961e-06 m^2/s, i.e. 1.003e-6 at 4 s.f. Both operands are
+#   one row of nist_fluid_properties/water_C7732185_isobar_1atm.tsv at T=293.15,
+#   columns "Viscosity (Pa*s)" and "Density (kg/m3)". No artefact prints this quotient,
+#   so it is [DERIVED] and not [ON-DISK].
+#   Corrected from 1.004e-6 (+0.060%), which followed from a 4-digit mu of 1.002e-3 Pa*s
+#   rather than the 5-digit mu NIST tabulates; P6 event.
+WATER_KINEMATIC_VISCOSITY_M2_S = 1.003e-6   # nu at 20 C
 
 # ============================================================================
 # DOMAIN 1 — STRUCTURAL ANALYSIS
