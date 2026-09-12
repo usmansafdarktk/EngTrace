@@ -475,7 +475,11 @@ SCS_CURVE_NUMBERS = {
 # @units: 1
 # @domain: none (the initial-abstraction ratio of the TR-55 runoff equation)
 # [ON-DISK] civil/nrcs_tr55_urban_hydrology.pdf @ page=10 text="Ia = 0.2S"
-#   TR-55 p.2-2: "the following empirical equation: Ia = 0.2S. [Eq. 2-2]".
+#   TR-55 document p.2-1 - PDF p.10, whose footer reads "(210-VI-TR-55, Second Ed.,
+#   June 1986) 2-1": "the following empirical equation: Ia = 0.2S. [Eq. 2-2]".
+#   C3.7 wrote "p.2-2" here, confusing the EQUATION number with the page number; the
+#   machine locator page=10 was right and is checked on every run (C3 review,
+#   Reviewer H (civil) F-4).
 # @copied-in: template_scs_curve_number_runoff 0.2
 #   C1 Reviewer G, G-1: the template writes this ratio as 0.2 (and 0.8, 0.4,
 #   0.04 derived from it) instead of reading the table, and states it in every
