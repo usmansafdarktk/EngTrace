@@ -1028,14 +1028,38 @@ COMMON_LIQUIDS = {
     "Water": (998.2, 1.002e-3),
     "Seawater (3.5% salinity)": (1025, 1.07e-3), # Viscosity approx. 7% higher than pure water
     "Ethanol": (789.4, 1.074e-3),
-    "Methanol": (791.3, 0.544e-3),
+    # [ON-DISK] nist_fluid_properties/methanol_C67561_isobar_1atm.tsv @ T=293.15 col="Viscosity (Pa*s)" field=[1] precision=3sf
+    #   0.0005853 at the 293.15 K this table declares. Corrected from 0.000544
+    #   (-7.06%), which is the 25 degC value: the 298.15 K grid acquired
+    #   for C3.5 item 4 gives -7.06% at 20 degC against a few tenths at 25 degC.
+    #   Water and the whole density column are at 20 degC, so the table could not be
+    #   redeclared - these four rows had to come to the declared temperature. P6 event.
+    "Methanol": (791.3, 0.000585),
     "Isopropyl Alcohol (IPA)": (781.8, 2.04e-3),
     "Acetone": (784.5, 0.306e-3),
-    "Benzene": (876.5, 0.601e-3),
+    # [ON-DISK] nist_fluid_properties/benzene_C71432_isobar_1atm.tsv @ T=293.15 col="Viscosity (Pa*s)" field=[1] precision=3sf
+    #   0.00064738 at the 293.15 K this table declares. Corrected from 0.000601
+    #   (-7.16%), which is the 25 degC value: the 298.15 K grid acquired
+    #   for C3.5 item 4 gives -7.16% at 20 degC against a few tenths at 25 degC.
+    #   Water and the whole density column are at 20 degC, so the table could not be
+    #   redeclared - these four rows had to come to the declared temperature. P6 event.
+    "Benzene": (876.5, 0.000647),
     # [ON-DISK] nist_fluid_properties/toluene_C108883_isobar_1atm.tsv @ T=293.15 col="Density (kg/m3)" field=[0] precision=4sf
-    "Toluene": (866.9, 0.560e-3),
+    # [ON-DISK] nist_fluid_properties/toluene_C108883_isobar_1atm.tsv @ T=293.15 col="Viscosity (Pa*s)" field=[1] precision=3sf
+    #   0.00058714 at the 293.15 K this table declares. Corrected from 0.00056
+    #   (-4.62%), which is the 25 degC value: the 298.15 K grid acquired
+    #   for C3.5 item 4 gives -4.62% at 20 degC against a few tenths at 25 degC.
+    #   Water and the whole density column are at 20 degC, so the table could not be
+    #   redeclared - these four rows had to come to the declared temperature. P6 event.
+    "Toluene": (866.9, 0.000587),
     "Diethyl Ether": (713.4, 0.223e-3),
-    "n-Hexane": (654.8, 0.294e-3),
+    # [ON-DISK] nist_fluid_properties/hexane_C110543_isobar_1atm.tsv @ T=293.15 col="Viscosity (Pa*s)" field=[1] precision=3sf
+    #   0.00031317 at the 293.15 K this table declares. Corrected from 0.000294
+    #   (-6.12%), which is the 25 degC value: the 298.15 K grid acquired
+    #   for C3.5 item 4 gives -6.12% at 20 degC against a few tenths at 25 degC.
+    #   Water and the whole density column are at 20 degC, so the table could not be
+    #   redeclared - these four rows had to come to the declared temperature. P6 event.
+    "n-Hexane": (654.8, 0.000313),
     
     # Oils and Hydrocarbons
     "Engine Oil (SAE 10W)": (870, 0.065),
