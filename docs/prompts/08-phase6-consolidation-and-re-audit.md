@@ -1,0 +1,431 @@
+# Prompt 08 — Phase 6: consolidation and re-audit
+
+Paste everything below the line into a fresh Claude Code session started at the repository
+root, on the `master` branch.
+
+Track A Phases 0–5 and Track B Phases C1–C3 are complete and merged. `master` is at
+`444b8bf`. **Sync point S2 has landed**: the constants are re-grounded, so the item pool can
+now be regenerated exactly once. That is what this phase is for.
+
+**Re-derive every number in this brief at whatever `master` is when you start.** Every prior
+brief in this series was corrected by what its own phase measured, and this one already
+contains two corrections to the spec it implements (§"Two spec numbers that do not survive
+contact").
+
+---
+
+I need you to implement **Phase 6** (consolidation and re-audit) of the template redesign —
+the last phase of Track A.
+
+## What EngTrace is, and why this phase matters now
+
+EngTrace is a benchmark for evaluating LLM reasoning on engineering problems, built from **150
+parameterised Python templates** under `data/templates/branches/`, across five branches
+(chemical, electrical, mechanical, civil, industrial — 30 each). Each `template_*()` samples
+physically-grounded parameters, computes an answer, and returns a `(question, solution)` pair;
+the solution is the **gold reasoning trace**.
+
+**The paper has been rejected twice from ACL ARR** (January and May 2026). Six phases have
+changed the corpus underneath the published numbers: Phase 1 corrected gold traces that did not
+reproduce their own answers, Phase 2 seeded every generator, Phase 3 reshaped two iterative
+traces, Phase 4 specified the comparator, Phase 5 fixed the output contract and bound 120
+templates, and Track B re-grounded the constants and corrected 21 measured-wrong values.
+
+**Nothing has yet gone back and said what the corpus now is.** The audit report and the
+inventory that classified all 150 templates still describe the repository as it was before
+Phase 0. That is the gap this phase closes, and it is larger than "re-run and diff" — see the
+next section.
+
+Two cautions so you do not waste time:
+
+- `error_analysis_annotation/error_annotation_results/` contains "Annotator A/B/C" — an **LLM
+  annotation pilot**, not the paper's human error analysis. Not a discrepancy; do not flag it.
+- `evaluation/` is a **separate track** with known defects (D-003). **Do not fix them.** But do
+  read §"D-003 is answerable now" — this phase can finally close it, and the answer is not the
+  one the spec assumed.
+
+## The rule this phase runs on — re-measure, do not inherit
+
+Phase 6's deliverable is a **description of the corpus**. A description assembled from six
+phases' summaries is a description of what each phase *claimed*, and this series has repeatedly
+found claims that its own artefacts do not carry.
+
+- **Every figure in `template_audit_report.md` and `template_inventory.csv` is re-measured
+  here, not copied forward.** A class migration inferred from a summary is not a measurement.
+- **A prior phase's summary is a claim under test** (R1.1), including the ones I wrote. Two
+  numbers in the spec's own Phase 6 section do not survive being checked — see below.
+- **Every count ships with its predicate or a committed script.** Carried from Prompt 06 and
+  unchanged. The unit census below is the case in point: the "113 templates carry a unit"
+  figure is one of **four** defensible counts depending on the predicate, and the spec cites it
+  without one.
+- **Do not regenerate the T6 baseline to make a gate green** (D-043). T6 fails 142/150 on
+  `master` because the committed baseline profile is stale corpus-wide. `run.py --baseline`
+  must never be invoked in this phase. Fixing T6 properly is in scope *as a decision*; making
+  it green by overwriting the oracle is not.
+
+## What Phase 6 is, and what it is not
+
+| | in scope | out of scope |
+|---|---|---|
+| D6.1–D6.6 | re-audit, re-classify, consolidate the item-pool statement, stand up CI, file the residual register | re-opening any merged phase's fixes |
+| D6.7 | the doubled-sign residual on 14 templates, **behind a shared emission helper** | any other emission cleanup |
+| D6.8 | an answer-span **shape** assertion | rewriting spans |
+| D6.9–D6.10 | *decide and record* — a mixed `AnswerSpec`, and the 8 undecidable `symbolic` templates | forcing either binding green |
+| D6.11 | per-item and per-part unit declarations | a second unit scheme — C1.4 already built one |
+
+**D6.9 and D6.10 are decisions, not fixes.** Both are measured dead ends: the mixed-spec
+templates produce 544 and 1,650 false accepts in 2,450 pairs from *whole-span cross-pairing
+working correctly*, and masking function names in `_to_sympy` moved the symbolic decided rate
+by exactly nothing — 11.1% before and after. Re-attempting the known-failed fix is the failure
+mode here. Record what it would take and move on.
+
+## Read these first, in this order
+
+1. **[`template_redesign_spec.md`](../re-implementation-sep/template_redesign_spec.md)** §"Phase 6"
+   (D6.1–D6.11, the exit gate) and §"Track B" S2. The authority on scope — but read it against
+   §"Two spec numbers that do not survive contact" below.
+2. **[`template_audit_report.md`](../re-implementation-sep/template_audit_report.md)** and
+   **`template_inventory.csv`** — what you are replacing. Note the date.
+3. **[`phase5_summary.md`](../re-implementation-sep/phase5_summary.md)** §7 and §13 — the
+   nearest phase's errors, and §R5-2, the origin of the unit census.
+4. **[`phaseC3_summary.md`](../re-implementation-sep/phaseC3_summary.md)** and
+   **[`phaseC3_corrections_summary.md`](../re-implementation-sep/phaseC3_corrections_summary.md)**
+   — what S2 delivered, and what it deliberately left open.
+5. **The six item-pool impact notes** — `phase1_`, `phase2_`, `phase3_`, `phase5_`, `phaseC3_`
+   and `phaseC3_corrections_item_pool_impact.md`. D6.4 consolidates exactly these.
+6. **[`DECISIONS.md`](../re-implementation-sep/DECISIONS.md)** — 77 decisions. D-003, D-024,
+   D-026, D-031, D-043, D-052, D-053, D-061 all reach this phase. **Next free number: D-078.**
+
+## What is actually here, measured
+
+Measured at `444b8bf` on 2026-09-12. Re-derive in a worktree before acting.
+
+### The inventory is stale — this is D6.1, not a preliminary to it
+
+```
+python -c "import csv,collections; r=list(csv.DictReader(open('docs/re-implementation-sep/template_inventory.csv',encoding='utf-8-sig'))); print(collections.Counter(x['instrumentation_class'] for x in r))"
+```
+
+| `instrumentation_class` | count |
+|---|---:|
+| A | 49 |
+| B | 34 |
+| C | 51 |
+| **D** | **16** |
+
+150 rows. **This is byte-identical to the pre-Phase-0 audit.** Six phases have landed and not
+one row has been reclassified. So the exit-gate line *"Class D reduced from 16 to ≤4"* is not a
+diff against a moving figure — it is a claim that has never once been tested, and the 16 is the
+original 16.
+
+**Establish how those columns were produced before you reproduce them.** The inventory carries
+measured columns — `pct_step_values_recoverable`, `pct_answer_values_recoverable`,
+`n_inline_computed`, `n_milestone_candidates`. D6.1 says *"full re-run of the original audit
+harness"*. **I did not find that harness.** `tests/template_integrity/` holds T1–T8, the
+instance dumps, the contract scan and the gate report; none of them writes this CSV. If no
+harness exists, **D6.1 is a build task, not a re-run task, and its effort estimate is wrong** —
+say so in a decision rather than hand-reproducing 150 rows of judgement and calling it a
+re-audit. A reproduction whose method differs from the original cannot support "no template
+regressed in class", because a class change and a method change are indistinguishable in it.
+
+### Corpus baseline at `444b8bf`
+
+```
+python -m tests.template_integrity.run --checks all          # ~2-3 min
+python -m tests.template_integrity.phase5_contract_scan
+python -m tests.comparators.cross_pair
+python -m tests.trace_schema.audit_3_8
+```
+
+| check | result | note |
+|---|---|---|
+| T1 | 29 | pre-existing, stable across six phases |
+| T2 | 0 | |
+| T4 | 0 | |
+| T5 | 66 | |
+| T6 | **142** | **stale baseline, corpus-wide (D-043)** — not a Phase 6 regression |
+| T7 | 83 | |
+| T8 | 0 | |
+| contract scan | 150/150 clean | 0 generation errors on 60,000 instances |
+| `cross_pair` | PASS | |
+| `audit_3_8` | 80/80 | |
+
+**T6's 142 is the number this phase has to make a decision about.** It has been carried as "not
+mine" by Phase 3, Phase 5 and Track B, each correctly. Phase 6 is the consolidation phase and
+there is no later phase to carry it to. The decision is *whether the baseline is regenerated
+under owner authority, and against what*, not whether you may quietly regenerate it. You may
+not (D-043).
+
+### The doubled-sign census (D6.7), re-measured here
+
+`phase5_contract_scan` prints this on every run. **14 templates**, confirming D-061, and the
+list crosses four branches — which is the argument for the shared helper:
+
+```
+template_continuous_to_discrete_conversion   template_coulombs_law
+template_impulse_response_from_lccde          template_lorentz_force
+template_mean_variance                        template_multi_segment_rod
+template_nyquist_rate_determination           template_pitzer_correlation_z
+template_sensible_heat_constant_cp            template_signal_operations
+template_system_property_linearity            template_vorticity_check
+template_wave_equation_interpretation         template_work_isothermal_virial
+```
+
+`_signed_term` and `_rect_str` are at
+[`waves_and_phasors.py:20`](../../data/templates/branches/electrical_engineering/electromagnetics_and_waves/waves_and_phasors.py#L20)
+and [`:30`](../../data/templates/branches/electrical_engineering/electromagnetics_and_waves/waves_and_phasors.py#L30),
+used at 11 call sites in that one file. **Promote them before fixing anything** (Reviewer A,
+|S|5.6): nine hand-written sign fixes is nine chances to write `+ {value}` again. The helper
+lands in a shared module with its own planted-defect test — **two plants of materially
+different surface form, written from the class definition rather than from the detector**
+(SPEC-CHANGE 17).
+
+Also printed, **not gated**: `degenerate_product_derivation` on 3 templates
+(`impulse_response_from_lccde`, `standing_wave_formation`,
+`undamped_response_initial_conditions`). Decide whether it is in D6.7's scope or a residual;
+do not leave it printed-and-unread — *that* is Phase 5's named failure (`cross_pair` printed
+`false rejects 56` on every run and nobody put it in a claim).
+
+### Two spec numbers that do not survive contact
+
+**D6.8's "199 characters".** The spec states the corpus's longest answer span is 199 characters
+and that a bound can be set from it. **That figure does not appear in `phase5_summary.md`**,
+which is the source it cites. Re-measure it before writing any assertion; a bound copied from
+an unsourced number is exactly the defect class this series exists to remove. If it
+re-measures to 199, say so and cite the run.
+
+**D6.11's "113 templates carry a unit".** `phase5_summary.md:126` gives **four** counts, not
+one — *seed 0 115 / any 116 / always 113 / invariant 103*. The spec quotes 113 without its
+predicate. `always` and `invariant` differ by 10 templates whose unit **varies across seeds**,
+and those 10 are the whole difficulty of D6.11: a per-item declaration for a template whose
+unit is seed-dependent cannot be written once at template level. **Publish the predicate, and
+size the editorial work off `invariant` vs `always` deliberately.**
+
+### Units — D6.11 overlaps C1.4, deliberately
+
+C1's `@units` field already declares units **per constants table**, and C3 populated it corpus-wide.
+D6.11 declares units **per emitted answer part**. These are different objects and both are
+needed, but **import C1's vocabulary rather than inventing a second one** — the spec's own
+cross-reference at §"Phase 6's D6.11 should import rather than re-invent" says so, and Prompt 07
+carried it as a coordination item. A `multipart` answer needs one unit **per part**; one unit
+applied to all `n` parts is wrong for at least `n−1` and made 13 templates reject their own gold.
+
+### The item pool — what D6.4 consolidates
+
+Six measured events, every one from two worktrees in two separate processes:
+
+| phase | templates moved | measured scope |
+|---|---:|---|
+| 1 | 10 (8 in the published pool) | 120 of 1,350 items = 8.9%; ~74 re-score, ~44 re-inference |
+| 2 | 4 | `levenspiel_plot_interpretation` 300/300; two templates 300/300 answers |
+| 3 | 2 | 2.30% and 0.65% of instances; answer *space* unchanged |
+| 5 | 4 of 11 | emitted text only — **no question content and no answer value moved**, 22,000 instances |
+| C3 | 1 + 1 | 1 answer-body (re-score *and* re-inference), 1 question-only (re-inference only) |
+| C3 corrections | **13** | q 824, ans 713, sol 765; 0 generation errors |
+
+**Re-scoring and re-inference are not the same cost and this table is the only place the
+difference is recorded.** A question that changed with its answer unchanged needs re-inference
+only. A question byte-identical with a *moved gold answer* is a **hidden constant** — it needs
+re-scoring and nothing about the item looks different. The C3 corrections tranche contains
+both directions. D6.4 must state them separately or it understates the second, which is the
+dangerous one.
+
+**Do not assume these sum.** Templates appear in more than one tranche, and the union is not
+the total. Compute the union from the named templates, and publish the list.
+
+### D-003 is answerable now — and the answer closes it
+
+D-003 has been carried open since 2026-09-05 across Prompts 05, 06 and 07: *do the raw
+`inference_results/` generations still exist?* It gates any corrected results table.
+
+Measured at `444b8bf`:
+
+- `inference_results/` — **absent**. `evaluation/run_inference.py:23` writes to it; nothing does.
+- `evaluation_results/` — **absent**.
+- **`testset/` — absent.** `evaluation/run_inference.py:22` reads `../testset`. The input corpus
+  the published numbers were generated from is not in this working copy either.
+- The only `*results*.json` anywhere is `templates_annotation/annotation_app/src/llm_results.json`,
+  which belongs to the annotation pilot.
+
+**So the free re-score is gone**, and with it the framing of D-003's second branch. But the
+conclusion is *better* than the spec's "budget decision", not worse: since the item pool must be
+regenerated anyway at S2, and the testset is absent, **there is no stale artefact to
+selectively correct**. Re-inference runs against a regenerated pool either way. **Close D-003
+with that finding as D-078**, and state in D6.4 that the 8.9%/re-score/re-inference split is a
+statement about the *published paper's* numbers, not about a recoverable local artefact.
+
+Verify all four paths yourself before writing the decision. An absent directory is exactly the
+kind of thing a `.gitignore` and a fresh clone can disagree about, and I checked one machine.
+
+### D6.5 — "promote to CI" is a build task, and it collides with the binaries
+
+- **There is no CI.** No `.github/workflows`, no `tox.ini`, no `Makefile`, no `.gitlab-ci.yml`.
+  D6.5's verb is wrong; budget accordingly.
+- **`sympy` is not in `requirements.txt`** (D-053, still open) and
+  [`tests/comparators/kinds.py`](../../tests/comparators/kinds.py) imports it. **A clean clone
+  cannot run the comparator suite** — which is precisely what CI is. D-053 stops being
+  housekeeping the moment D6.5 starts. `scipy` and `matplotlib` are also absent from
+  `requirements.txt`; audit the whole file against actual imports rather than adding `sympy` alone.
+- **`constants_integrity` cannot run in CI as-is.** 13 reference binaries, **507.4 MB**, are
+  gitignored by the repo owner's decision and recovered by `fetch_references.py`. **Do not
+  commit them, do not set up Git LFS, do not loosen the rule** to make CI green. The honest
+  design is a **tiered** suite: the checks that need no binary run on every push; the
+  citation-resolution checks run where the artefacts can be fetched, and **skip loudly** —
+  never silently — elsewhere. A green CI that skipped the provenance suite without saying so
+  would be a worse artefact than no CI.
+
+## Rules carried forward
+
+- **A test may not carry its own answer key** (D-034). `test_citations_resolve.py` P4 enforces
+  this and must keep doing so.
+- **Do not reorder a dict's keys** (D-031). Regrouping `CP_PARAMS` changed which substance 274
+  of 300 seeds drew. If D6.7's helper promotion touches a module's import order, measure it.
+- **A gate needs more than one term** (SPEC-CHANGE 18). "Class D ≤ 4" is passed by a
+  reclassification that moves the boundary rather than the templates. State the predicate for
+  each class and hold it fixed across before and after.
+- **Every detector gets two planted defects of materially different surface form**
+  (SPEC-CHANGE 17), written from the class definition, not from the detector.
+- **Expect more than one defect class per unit of work** (D-028).
+- **A thing that has just been corrected is when a fresh error is most likely** (C2 §8).
+- **Write every patch as a file, never through a shell heredoc or a double-quoted `bash -c`.**
+  Phase 4 lost four fixes to heredoc escaping, Phase 5 four more, and Track B lost a commit to
+  an apostrophe. Several files in this repo are CRLF.
+- **Set `PYTHONIOENCODING=utf-8`** before printing template output — the console is cp1252 and
+  crashes on `→`/`Σ`/`²`/`·`.
+- **Never pipe a check through `tail` and read the exit code as the check's.** Track B reported
+  "exit code 0" twice for a battery that never ran; the pipe swallowed the status.
+
+## Verification
+
+```
+python -m tests.template_integrity.run --checks all          # T1-T8, ~2-3 min
+python -m tests.template_integrity.phase5_contract_scan
+python -m tests.comparators.derive_bindings
+python -m tests.comparators.cross_pair
+python -m tests.comparators.score
+python -m tests.trace_schema.audit_3_8
+python -m tests.constants_integrity.test_citations_resolve
+python -m tests.constants_integrity.test_chemical_thermochemistry
+python docs/references/fetch_references.py --verify
+```
+
+**`derive_bindings` and `cross_pair` are not decoration.** D6.7 changes emitted text on 14
+templates. A sign fix that alters an answer's shape can unbind a template bound in Phase 5.
+**Re-run both after every tranche** and treat a newly unbound template as a finding, not as
+noise.
+
+Every one of these must be green — or carry a written, pre-existing reason (T1 29, T5 66, T7 83,
+T6 142) — **before** you claim a class migration. An audit run over a corpus whose regressions
+you have not checked measures the wrong thing.
+
+## Reviews — read R0–R6 before dispatching any
+
+- **Reviewer F — audit replication.** *The gate.* Given only the original audit report and the
+  changed repository, **independently re-runs the audit** and compares. Must confirm: the
+  class-D count fell as claimed, no new class-D template was introduced elsewhere, and no
+  metric regressed silently. Explicitly tasked with **collateral damage** — a Phase-1 rounding
+  change that broke a Phase-5 template's contract, a Track-B constant that moved a Phase-3
+  trace.
+
+**Give F the method problem honestly.** If D6.1 turned out to be a build rather than a re-run,
+F cannot replicate an original method that was never recorded. Then F's gate becomes *"is the
+new method sound, and does it classify the unchanged templates the same way the old one did?"*
+— which is answerable. Commissioning a replication of an unrecoverable method produces a review
+that cannot file, and R6 exists to prevent exactly that.
+
+**Scope the review to R6**: one mandatory gate task, a time box stated as a number, tooling
+supplied as working code, everything settled fenced off, and a measurement-ownership register
+with **no number commissioned twice**.
+
+**Independence, concretely:**
+- Code comments, commit messages and summaries are **claims under test**, not background (R1.1).
+- Give the reviewer a **frozen SHA**, then **do not commit *or write to the working tree* until
+  it files.** A reviewer reading at a frozen SHA sees uncommitted edits too. Phase 5 broke this.
+- Tell the reviewer to read with `git show <sha>:<path>`, never `git show <sha> --stat`.
+- **Commit the report unmodified and before any fix.**
+
+**Every §5 suggestion is triaged (R4) before the phase closes**; an untriaged suggestion blocks
+the gate exactly as a CONFIRMED finding does.
+
+## Git
+
+- Branch **`redesign/phase6-consolidation`** off `master`. Merge `--no-ff` when the gate passes.
+- **Track B's work is already on `master` and was committed there directly** — 21 commits
+  between `4eb6488` and `444b8bf`, against this repo's convention of a `redesign/*` branch and
+  a merge commit. It is recorded here so you do not mistake it for a convention change. Do not
+  repeat it.
+- `master` is **185 commits ahead of `origin`**. Nothing has been pushed. **Do not push.**
+- **Large source binaries are NOT committed** — 13 files, 507.4 MB, the repo owner's decision.
+  **Do not force-add one, do not set up Git LFS, do not loosen the rule**, including for CI.
+- **Never commit anything from `pilot/references/`.** It is gitignored for a reason.
+- Logical commits, not one lump.
+- End commit messages with:
+  `Co-Authored-By: Claude Opus 5 (1M context) <noreply@anthropic.com>`
+
+## Exit gate
+
+- [ ] `template_inventory.csv` regenerated, with the **method stated** and the predicate for
+      each class published
+- [ ] Class D reduced from 16 to ≤ 4 (the Phase-4 four, **reclassified not fixed**), or the
+      shortfall named per template with a reason
+- [ ] No template regressed in class; **measured**, not inferred from summaries
+- [ ] D6.2 class-migration table; D6.3 `template_audit_report.md` updated with post-change figures
+- [ ] D6.4 consolidated item-pool statement — **re-score and re-inference separated**, the
+      union of affected templates listed, and D-003's closure stated
+- [ ] D6.5 CI standing up the regression suite, **tiered**, with binary-dependent checks
+      skipping **loudly**; `requirements.txt` audited against actual imports (D-053)
+- [ ] D6.6 residual-risk register: everything knowingly not fixed, and why — **including Track
+      B's 177 `[UNVERIFIED]` rows and its §3 substance defects**
+- [ ] D6.7 doubled sign cleared on 14 templates, **behind a promoted shared helper with
+      planted-defect tests**
+- [ ] D6.8 answer-span shape assertion, its bound **re-measured** rather than inherited
+- [ ] D6.9 and D6.10 **decided and recorded**, not forced green
+- [ ] D6.11 per-item and per-part units, importing C1.4's vocabulary, predicate published
+- [ ] T1–T8, contract scan, `derive_bindings`, `cross_pair`, `score`, `audit_3_8` — no
+      regression, **measured**; **T6 baseline not regenerated**
+- [ ] T6's 142 given a decision with an owner, not carried forward again
+- [ ] Reviewer F filed; every finding and §5 suggestion triaged; every `SPEC-CHANGE` actioned
+- [ ] `phase6_summary.md` in the shape of `phase5_summary.md`, including **your own errors**. A
+      summary recording none is not a clean phase; it is an unexamined one.
+
+## Constraints and cautions
+
+- **Do not modify a check or an oracle to make something pass.** A check that looks wrong is a
+  finding and a `SPEC-CHANGE`.
+- **Do not re-open a merged phase's fixes.** If one is wrong, that is a finding for the register
+  and a decision, not a silent revert.
+- **Do not replace a substance, material or fluid on your own authority**, and do not action
+  Track B's §3 defects (Tungsten Hexafluoride, Tellurium Mercury, R-410A, the
+  Tetrabromoethane/Acetylene Tetrabromide duplicate, Cork/Cork Board/Bamboo). Each moves the
+  item pool and each is the repo owner's call. **Carry them into D6.6 with their evidence.**
+- **P6 is a real constraint.** D6.7 changes emitted text on 14 templates: that is a P6 event and
+  needs a two-worktree, two-process measurement like every one before it.
+- **Where you are uncertain, say so and name the evidence that would settle it.**
+
+## Open items inherited — carry forward, fix only if they block your gate
+
+- **T6's corpus-wide stale baseline** (D-043) — 142/150. Yours to decide, per the exit gate.
+- **D-053** — `sympy` (and `scipy`, `matplotlib`) missing from `requirements.txt`. **Blocks
+  D6.5**, so it stops being optional here.
+- **Track B residuals**, all registered in
+  [`phaseC3_residual_register.md`](../re-implementation-sep/phaseC3_residual_register.md):
+  177 `[UNVERIFIED]` rows (mechanical 148, chemical 13, civil 8, electrical 4, industrial 4);
+  11 rows blocked on paywalled standards (AISC, ASTM A992/A36, ACI 318-19, ASCE 7-22, IEC 60063,
+  MIL-A-8625, US Standard Atmosphere 1976); ~19 needing a mechanical-properties handbook;
+  ~86 bulk materials and mixtures no chemical database indexes.
+- **7 `[DERIVED]` constants still UNEXECUTED** — 4 Shomate refits, `Air(g)`, 2 by-definition
+  ceilings. The resolver recomputes 8 of 15 and says so on every run.
+- **4 `tol=basis=condition` tolerances the resolver cannot size** — especially `Glycerine`,
+  whose tolerance absorbs a *composition* ambiguity. Named in `phaseC3_summary.md` as the
+  weakest warrant in the branch.
+- **The stale annotation fork** — `templates_annotation/annotation_app/.../constants.py` holds
+  pre-C3 chemical values (R-12 `v_g 0.0268`, R-22 `v_f 0.000845`). **Deliberately not synced**,
+  because that directory backs the annotation pilot and a frozen snapshot may be intentional so
+  annotations stay reproducible against what annotators saw. **A decision, not a bug** — but if
+  D6.4 claims a corpus-wide constant state, this fork is a counterexample and must be named.
+- **G F-5** (`@domain: none` vocabulary) and **G F-7** (NAVFAC manuals cited by zero tags).
+- **`CP_PARAMS` origin vs verification** (Reviewer G, G-7) — unfixable without a citable
+  Smith–Van Ness copy; recorded, not closed.
+- **The value-extractor spike (D-002)** — *"the gate for the whole project"*, and still unwritten.
+  It is **not** Phase 6's, but Phase 6 is the last Track A phase, so after this the sequence has
+  nothing queued. Say so in the summary.
