@@ -207,12 +207,38 @@ quietly absorbs its corrections is worth no more than the claims it corrected.
    exactly that ratio from the constants alone.
 3. Six mechanical tables carry 172 unchecked rows — acquire sources, or accept.
 4. `COMMON_LIQUIDS`' conditions — fetch a 298.15 K grid and settle §5's open diagnosis.
-5. **`tol=` has no rule for its SIZE.** D-074 says when a tolerance may be used, never how
-   large. 4 of the 10 `tol=` tags are their own residual rounded up (three electrical rows
-   and `FLUID_DENSITIES['Liquid Propane']`); the other six are half a unit in the
-   handbook's last digit, as intended. Each of the four now states what does and does not
-   set it; none was re-sized. A resolver rule requiring a stated basis is a SPEC-CHANGE.
-6. **15 `[DERIVED]` tags are never recomputed** (G F-4) — the `UNEXECUTED` class is unbuilt.
+5. ~~**`tol=` has no rule for its SIZE.**~~ **Answered: the rule is built and enforced.**
+   D-074 licensed *when* a tolerance may be used and never *how large*, so one could be
+   fitted to its own residual and never fail — a check that cannot fail is not a check.
+   Measured over **all 17** `tol=` tags (the count in the earlier note, 10, predated the
+   mechanical corrections), not only the four whose own prose confessed it:
+
+   | basis | n | |
+   |---|---:|---|
+   | half a unit in the artefact's last printed digit | **13** | recomputable, and every one matches |
+   | its own residual, rounded up | **4** | circular |
+
+   `tol=` now requires `basis=half-unit` — the resolver recomputes half a unit from the
+   artefact's printed digits and the stated value must match — or `basis=condition`, where
+   the resolver **cannot** size it, counts it, and says so in its disclosure line. A
+   `tol=` with no basis **fails**: all 17 failed until each declared one.
+
+   The four are not alike, and the rule respects that. Three cite **dispersion formulas**,
+   which print no last digit at all (half a unit of one is ~1e-15), so `half-unit` is
+   impossible for them by construction. **`FLUID_DENSITIES['Liquid Propane']` is the sharp
+   one**: its artefact *does* print digits, half a unit is **0.0010%**, and the tag states
+   **0.1300%**. It is *not* re-sized to 0.0010% and left to fail — half a unit of the
+   row's own last digit (0.5/493 = 0.101%) would not admit the value either, so the
+   warrant is a pressure the row never states ("At 25 °C, under pressure", while the file
+   is saturated liquid at 0.95207 MPa). **A tolerance cannot be sized from a condition that
+   is not named.**
+
+   `MEDIA_VELOCITIES['Glycerine']` is labelled and **not thereby fixed**: its 0.12% is
+   absorbing a *composition* ambiguity (Gupta states no conditions; glycerol is
+   hygroscopic), which its own note already calls the weakest warrant in the branch. The
+   label makes it countable, not sound.
+6. **16 `[DERIVED]` tags are never recomputed** (G F-4) — the `UNEXECUTED` class is unbuilt.
+   (15 in the earlier note; the civil kinematic-viscosity reclass made it 16.)
 7. `CP_PARAMS` is integrated from **281.67 K**, below the 298 K floor its fit declares —
    registered in `domain_findings.txt`; raise the draw, refit, or restate the floor.
 

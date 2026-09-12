@@ -49,7 +49,15 @@ and seven are added, one per clause of the C1.2 vocabulary (spec §C1.2):
       nested table against its cell (tests/constants_integrity/xlsx_cells.py; the
       AISC Shapes Database repeats its headers in a US and an SI block).
   R4  the RELATION holds. `precision=exact|<n>sf|<n>dp`: the constant equals the
-      artefact value at that precision, exactly. `tol=<x>%`: it lies within.
+      artefact value at that precision, exactly. `tol=<x>%`: it lies within,
+      AND the tag declares what SIZES the tolerance - D-074 licensed when a
+      tolerance may be used and never how large, so one could be fitted to its
+      own residual and never fail. `basis=half-unit`: the resolver recomputes
+      half a unit in the artefact's LAST PRINTED DIGIT and the stated tol must
+      match it. `basis=condition`: the artefact's conditions differ from the
+      table's and half-a-unit does not apply (a dispersion formula prints no
+      last digit), so the resolver cannot size it, counts it, and R6 requires
+      the tag to state the offset. A `tol=` with no `basis=` FAILS.
       Neither: the value is not machine-compared, and the citation is counted
       LOCATOR-ONLY rather than passed as if it had been. `via="NAME/x"` says the
       table stores NAME/x rather than x (MEDIA_VELOCITIES stores C0/n), and the
@@ -497,6 +505,56 @@ def _svehla_value(path, page, token, col):
     return float(got[col]), None
 
 
+def _printed_decimals(s):
+    """Decimal places in the string an artefact PRINTS, or None if it prints none."""
+    if s is None:
+        return None
+    s = str(s).strip()
+    return len(s.split('.', 1)[1]) if '.' in s else 0
+
+
+def _artefact_token(full, kv, ext):
+    """The artefact value AS PRINTED, for sizing a tolerance.
+
+    _mil_value and _tsv both return floats, and half a unit in the last printed digit
+    cannot be recovered from a float - 4.0 and 4.000 are the same number and not the
+    same precision. So the two readers that HAVE a printed form are re-read for it.
+    A dispersion formula has no printed form at all and returns None, which is the
+    whole reason basis=condition exists.
+    """
+    if 'page' in kv and 'mil' in kv and ext == 'pdf':
+        from tests.constants_integrity.milhdbk import design_values
+        try:
+            from pypdf import PdfReader
+        except ImportError:
+            return None
+        rd = _PDF_READERS.get(full) or _PDF_READERS.setdefault(full, PdfReader(full))
+        try:
+            d = design_values(rd.pages[int(kv['page']) - 1].extract_text() or '')
+        except ValueError:
+            return None
+        if kv['mil'] == 'density':
+            return d['density']
+        row = d['elastic'].get(kv['mil'])
+        if not row:
+            return None
+        c = int(kv.get('col', 1))
+        return row[c - 1] if 1 <= c <= len(row) else None
+    if 'T' in kv and 'col' in kv:
+        try:
+            with open(full, encoding='utf-8') as fh:
+                rows = [ln.rstrip('\n').split('\t') for ln in fh]
+        except OSError:
+            return None
+        if not rows or kv['col'] not in rows[0]:
+            return None
+        j = rows[0].index(kv['col'])
+        for r in rows[1:]:
+            if r and r[0].strip() == str(kv['T']) and j < len(r):
+                return r[j]
+    return None
+
+
 def _xlsx_whole_table(path, table, kv):
     """(cells checked, [disagreements], error) - every leaf of a nested dict table
     against its cell in an .xlsx, one header block per row sub-dict."""
@@ -652,7 +710,8 @@ def check_source(branch, src, refs=REFS, manifest=None, kinds=None, register=Non
     # than was checked - a C2-form tag is resolved by CAS IDENTITY and never by a value,
     # and a [DERIVED] tag is counted as stated and never recomputed.
     counts = dict(tags=0, resolved=0, locator_only=0, unresolvable_from_clone=0,
-                  legacy=0, stated=0, resolved_cas=0, derived_unexecuted=0)
+                  legacy=0, stated=0, resolved_cas=0, derived_unexecuted=0,
+                  tol_unsized=0)
     failures, legacy = [], []
     hashed = {}
     # §C1.2 requires both residual classes to be IN the residual register; R6 never
@@ -847,6 +906,30 @@ def check_source(branch, src, refs=REFS, manifest=None, kinds=None, register=Non
                 continue
         else:
             tol = float(kv['tol'].rstrip('%'))
+            basis = kv.get('basis')
+            if basis not in ('half-unit', 'condition'):
+                failures.append(
+                    f'R4 {where}: tol={kv["tol"]} states no basis= for its SIZE. '
+                    f'D-074 licenses when a tolerance may be used, not how large, so a '
+                    f'tolerance with no basis can be fitted to its own residual and never '
+                    f'fail. State basis=half-unit or basis=condition')
+                continue
+            if basis == 'half-unit':
+                tok = _artefact_token(full, kv, ext)
+                dp = _printed_decimals(tok)
+                if dp is None:
+                    failures.append(
+                        f'R4 {where}: basis=half-unit, but this artefact prints no last '
+                        f'digit to take half a unit of - use basis=condition')
+                    continue
+                want = 0.5 * 10 ** -dp / abs(value) * 100
+                if abs(tol - want) > max(0.01 * want, 0.005):
+                    failures.append(
+                        f'R4 {where}: basis=half-unit, but half a unit in the artefact\'s '
+                        f'last printed digit ({tok!r}) is {want:.4f}%, not tol={kv["tol"]}')
+                    continue
+            else:
+                counts['tol_unsized'] += 1
             out = [(lbl, v) for lbl, v in rows if abs(const - v) > abs(v) * tol / 100]
             if out:
                 lbl, v = out[0]
@@ -866,7 +949,8 @@ def run(verbose=False):
     failures += c2_f
     failures += p4_check()
     total = dict(tags=0, resolved=0, locator_only=0, unresolvable_from_clone=0,
-                 legacy=0, stated=0, resolved_cas=0, derived_unexecuted=0)
+                 legacy=0, stated=0, resolved_cas=0, derived_unexecuted=0,
+                 tol_unsized=0)
     legacy_all = []
     for branch in BRANCHES:
         bsrc = open(os.path.join(BRANCHES_DIR, branch, 'constants.py'),
@@ -895,6 +979,9 @@ def run(verbose=False):
     print(f"  {total['derived_unexecuted']} [DERIVED] tags are counted as stated and NEVER "
           f"RECOMPUTED by this resolver - the UNEXECUTED class §C1.2 promises does not "
           f"exist yet (Reviewer G F-4)")
+    print(f"  {total['tol_unsized']} tol= tags carry basis=condition, which this resolver "
+          f"CANNOT size: it checks that the tag declares an offset, never that the "
+          f"tolerance follows from one (D-074, C3.5 item 5)")
     print('all pass' if not failures else f'{len(failures)} FAILURES')
     return 1 if failures else 0
 

@@ -24,7 +24,7 @@ MEDIA_VELOCITIES = {
     # Gases (at 0°C and 1 atm, for visible light ~589 nm)
     # [BY-DEFINITION] n = 1 in vacuum, so the phase velocity is C0 itself
     "Vacuum": C0,                     
-    # [ON-DISK] refractiveindex_info/refractiveindex.info-database-main.zip @ member="database/data/other/mixed gases/air/nk/Borzsonyi.yml" wavelength=589nm via="C0/x" tol=0.0005%
+    # [ON-DISK] refractiveindex_info/refractiveindex.info-database-main.zip @ member="database/data/other/mixed gases/air/nk/Borzsonyi.yml" wavelength=589nm via="C0/x" tol=0.0005% basis=condition
     #   n = 1.0002882 at 273 K, 100000 Pa - of the datasets covering 589 nm, the one nearest the
     #   group comment's 0 degC and 1 atm (its pressure is 100000 Pa, not 101325).
     #   The row's 1.000293 is +4.8e-06 on n but +1.7% on the
@@ -62,7 +62,7 @@ MEDIA_VELOCITIES = {
     #   n = 1.3615137 at 293 K; Chang (295 K) 1.3613567 and Kozma (293 K)
     #   1.3607418 also round to 1.36.
     "Ethanol": C0 / 1.36,             
-    # [ON-DISK] refractiveindex_info/refractiveindex.info-database-main.zip @ member="database/data/organic/C3H8O3 - glycerol/nk/Gupta.yml" wavelength=589nm via="C0/x" tol=0.12%
+    # [ON-DISK] refractiveindex_info/refractiveindex.info-database-main.zip @ member="database/data/organic/C3H8O3 - glycerol/nk/Gupta.yml" wavelength=589nm via="C0/x" tol=0.12% basis=condition
     #   n = 1.4712766 (Gupta; no temperature stated in the file). The row's 1.473 is +0.117%.
     #   Birkhoff's tabulated 1.4714963 interpolates between rows 1.48 and 1.47,
     #   so its 3-s.f. rounding depends on the interpolation, and it is not cited.
@@ -75,7 +75,7 @@ MEDIA_VELOCITIES = {
     #   COMPOSITION ambiguity, which no tolerance on a pure-substance citation should
     #   do. The weakest warrant in the branch; referred (C3.5).
     "Glycerine": C0 / 1.473,          
-    # [ON-DISK] refractiveindex_info/refractiveindex.info-database-main.zip @ member="database/data/organic/C6H6 - benzene/nk/Chang.yml" wavelength=589nm via="C0/x" tol=0.1%
+    # [ON-DISK] refractiveindex_info/refractiveindex.info-database-main.zip @ member="database/data/organic/C6H6 - benzene/nk/Chang.yml" wavelength=589nm via="C0/x" tol=0.1% basis=condition
     #   n = 1.4995125 at 295 K (Chang). The row's 1.501 is +0.099%;
     #   Moutzouris at 300 K gives 1.4956337 (+0.36%).
     #   C3 review, H (electrical) F-2: this tol= is the residual rounded up (0.099201%

@@ -12,7 +12,7 @@ MATERIAL_PROPERTIES = {
     # treated as Magnesium already is. p.62 prints E 29.0, G 11.0 x10^3 ksi, mu 0.32 (its
     # text layer spaces every digit: "0 . 3 2").
     # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=62 text="Table 2.2.1.0(b)" mil="E" field=['E_ksi'] scale=1e3 precision=exact
-    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=62 text="Table 2.2.1.0(b)" mil="E" field=['E_GPa'] scale=6.894757 tol=0.17%
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=62 text="Table 2.2.1.0(b)" mil="E" field=['E_GPa'] scale=6.894757 tol=0.17% basis=half-unit
     #   29.0 x10^3 ksi = 199.95 GPa; the row's 200 is +0.03%, inside half a unit in
     #   the handbook's last printed digit (0.17%).
     # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=62 text="Table 2.2.1.0(b)" mil="mu" field=['nu'] precision=exact
@@ -24,7 +24,7 @@ MATERIAL_PROPERTIES = {
     #   AISI 301 and Related Stainless Steels, annealed: E:L 29.0 x10^3 ksi. The table's
     #   footnote b applies it to AISI 304 (AMS 5513), the row comment's alloy.
     #   Corrected from 27500 (-5.2%); P6 event.
-    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=277 text="Table 2.7.1.0(b)" mil="E:L" field=['E_GPa'] scale=6.894757 tol=0.17%
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=277 text="Table 2.7.1.0(b)" mil="E:L" field=['E_GPa'] scale=6.894757 tol=0.17% basis=half-unit
     #   29.0 x10^3 ksi = 199.95 GPa (SP 811 p.63: 1 ksi = 6.894757e+06 Pa, so 6.894757 GPa per 10^3 ksi); the row is a 1-decimal
     #   rounding of it, inside half a unit in the handbook's last printed digit.
     #   Corrected from 190 (-5.0%); P6 event.
@@ -37,7 +37,7 @@ MATERIAL_PROPERTIES = {
     'Aluminum': {'E_GPa': 69, 'E_ksi': 10000, 'nu': 0.33}, # General purpose 1100, 3003 Al
     # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=566 text="Table 3.6.2.0(b1)" mil="E" field=['E_ksi'] scale=1e3 precision=exact
     #   6061 Aluminum Alloy Sheet: E 9.9 x10^3 ksi. Corrected from 10000 (+1.0%); P6 event.
-    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=566 text="Table 3.6.2.0(b1)" mil="E" field=['E_GPa'] scale=6.894757 tol=0.51%
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=566 text="Table 3.6.2.0(b1)" mil="E" field=['E_GPa'] scale=6.894757 tol=0.51% basis=half-unit
     #   9.9 x10^3 ksi = 68.26 GPa (SP 811 p.63: 1 ksi = 6.894757e+06 Pa, so 6.894757 GPa per 10^3 ksi); the row is a 1-decimal
     #   rounding of it. Corrected from 68.9 (+0.9%); P6 event.
     # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=566 text="Table 3.6.2.0(b1)" mil="mu" field=['nu'] precision=exact
@@ -61,7 +61,7 @@ MATERIAL_PROPERTIES = {
     # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=899 text="Table 5.2.1.0(b)" mil="E" field=['E_ksi'] scale=1e3 precision=exact
     #   Commercially Pure Titanium: E 15.5 x10^3 ksi, the row comment's material.
     #   Corrected from 16800 (+8.4%); P6 event.
-    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=899 text="Table 5.2.1.0(b)" mil="E" field=['E_GPa'] scale=6.894757 tol=0.32%
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=899 text="Table 5.2.1.0(b)" mil="E" field=['E_GPa'] scale=6.894757 tol=0.32% basis=half-unit
     #   15.5 x10^3 ksi = 106.87 GPa (SP 811 p.63: 1 ksi = 6.894757e+06 Pa, so 6.894757 GPa per 10^3 ksi); the row is a 1-decimal
     #   rounding of it. Corrected from 116 (+8.5%); P6 event.
     # [UNVERIFIED] MIL-HDBK-5J p.899, Table 5.2.1.0(b) (Commercially Pure Titanium) prints no mu ("..."); no other source on disk
@@ -69,7 +69,7 @@ MATERIAL_PROPERTIES = {
     # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=945 text="Table 5.4.1.0(b)" mil="E" field=['E_ksi'] scale=1e3 precision=exact
     #   Ti-6Al-4V Sheet, Strip, and Plate: E 16.0 x10^3 ksi. Sheet, strip and plate; the
     #   bar table (p.946) prints E 16.9. Corrected from 16500 (+3.1%); P6 event.
-    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=945 text="Table 5.4.1.0(b)" mil="E" field=['E_GPa'] scale=6.894757 tol=0.31%
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=945 text="Table 5.4.1.0(b)" mil="E" field=['E_GPa'] scale=6.894757 tol=0.31% basis=half-unit
     #   16.0 x10^3 ksi = 110.32 GPa (SP 811 p.63: 1 ksi = 6.894757e+06 Pa, so 6.894757 GPa per 10^3 ksi); the row is a 1-decimal
     #   rounding of it. Corrected from 114 (+3.3%); P6 event.
     # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=945 text="Table 5.4.1.0(b)" mil="mu" field=['nu'] precision=exact
@@ -77,7 +77,7 @@ MATERIAL_PROPERTIES = {
     'Titanium Alloy (6Al-4V)': {'E_GPa': 110.3, 'E_ksi': 16000, 'nu': 0.31},
     # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=841 text="Table 4.2.1.0(b)" mil="E" field=['E_ksi'] scale=1e3 precision=exact
     #   MIL-HDBK-5J p.841, Table 4.2.1.0(b) (AZ31B Magnesium Alloy Sheet and Plate): E 6.5 x10^3 ksi. The row comment's AZ31B, sheet and plate.
-    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=841 text="Table 4.2.1.0(b)" mil="E" field=['E_GPa'] scale=6.894757 tol=0.77%
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=841 text="Table 4.2.1.0(b)" mil="E" field=['E_GPa'] scale=6.894757 tol=0.77% basis=half-unit
     #   MIL-HDBK-5J p.841, Table 4.2.1.0(b) (AZ31B Magnesium Alloy Sheet and Plate): E 6.5 x10^3 ksi = 44.82 GPa. The row is +0.41% from it, inside
     #   half a unit in the handbook's last digit (0.77%) - the bound a unit conversion of a
     #   2-s.f. value supports (SP 811 p.63: 1 ksi = 6.894757e+06 Pa, so 6.894757 GPa per 10^3 ksi).
@@ -155,17 +155,17 @@ SHEAR_MODULUS_VALUES = {
     # [UNVERIFIED] ASTM A36 has no MIL-HDBK-5J table; its carbon-steel table (p.62, AISI 1025)
     #   prints G 11.0 x10^3 ksi = 75.84 GPa. Residual register (C3.5).
     "Steel (A36)": 77.2,
-    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=277 text="Table 2.7.1.0(b)" mil="G" scale=6.894757 tol=0.45%
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=277 text="Table 2.7.1.0(b)" mil="G" scale=6.894757 tol=0.45% basis=half-unit
     #   MIL-HDBK-5J p.277, Table 2.7.1.0(b) (AISI 301and Relateda,b,c Stainless Steels): G 11.2 x10^3 ksi = 77.22 GPa. The row is -0.29% from it, inside
     #   half a unit in the handbook's last digit (0.45%) - the bound a unit conversion of a
     #   3-s.f. value supports (SP 811 p.63: 1 ksi = 6.894757e+06 Pa, so 6.894757 GPa per 10^3 ksi). Annealed column; footnote b applies the table to AISI 304 (AMS 5513).
     "Stainless Steel (304)": 77.0,
-    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=566 text="Table 3.6.2.0(b1)" mil="G" scale=6.894757 tol=1.32%
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=566 text="Table 3.6.2.0(b1)" mil="G" scale=6.894757 tol=1.32% basis=half-unit
     #   MIL-HDBK-5J p.566, Table 3.6.2.0(b1) (6061 Aluminum Alloy Sheet): G 3.8 x10^3 ksi = 26.2 GPa. The row is -0.76% from it, inside
     #   half a unit in the handbook's last digit (1.32%) - the bound a unit conversion of a
     #   2-s.f. value supports (SP 811 p.63: 1 ksi = 6.894757e+06 Pa, so 6.894757 GPa per 10^3 ksi).
     "Aluminum 6061-T6": 26.0,
-    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=373 text="Table 3.2.3.0(b1)" mil="G" scale=6.894757 tol=1.25%
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=373 text="Table 3.2.3.0(b1)" mil="G" scale=6.894757 tol=1.25% basis=half-unit
     #   Bare 2024 Aluminum Alloy Sheet and Plate: G 4.0 x10^3 ksi = 27.58 GPa
     #   (SP 811 p.63: 1 ksi = 6.894757e+06 Pa), the same value in all 4 columns of p.373.
     #   WHY THIS APPLIES TO T4. This row's previous tag said the 2024 table "carrying T4
@@ -191,12 +191,12 @@ SHEAR_MODULUS_VALUES = {
     # [UNVERIFIED] no MIL-HDBK-5J design table is this material, and no other source on disk.
     #   Residual register (C3.5).
     "Bronze (Phosphor 510)": 41.4,
-    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=945 text="Table 5.4.1.0(b)" mil="G" scale=6.894757 tol=0.81%
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=945 text="Table 5.4.1.0(b)" mil="G" scale=6.894757 tol=0.81% basis=half-unit
     #   Ti-6Al-4V Sheet, Strip, and Plate: G 6.2 x10^3 ksi = 42.75 GPa
     #   (SP 811 p.63: 1 ksi = 6.894757e+06 Pa, so 6.894757 GPa per 10^3 ksi); the row is a 1-decimal rounding of it. Sheet, strip and plate; the bar
     #   table (p.946) prints G 6.2 too. Corrected from 41.4 (-3.2%); P6 event.
     "Titanium Alloy (Ti-6Al-4V)": 42.7,
-    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=841 text="Table 4.2.1.0(b)" mil="G" scale=6.894757 tol=2.09%
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=841 text="Table 4.2.1.0(b)" mil="G" scale=6.894757 tol=2.09% basis=half-unit
     #   MIL-HDBK-5J p.841, Table 4.2.1.0(b) (AZ31B Magnesium Alloy Sheet and Plate): G 2.4 x10^3 ksi = 16.55 GPa. The row is -0.29% from it, inside
     #   half a unit in the handbook's last digit (2.09%) - the bound a unit conversion of a
     #   2-s.f. value supports (SP 811 p.63: 1 ksi = 6.894757e+06 Pa, so 6.894757 GPa per 10^3 ksi). Sheet and plate.
@@ -399,7 +399,7 @@ FLUID_DENSITIES = {
     # [ON-DISK] nist_fluid_properties/hydrogen_C1333740_saturation_20.15K.tsv @ T=20.15 col="Density (l, kg/m3)" precision=2sf
     #   71.096 at 20.15 K. The row states -253 C under the table's 1 atm; the file is the saturated liquid at 20.15 K. Pressure in that row: 0.094929 MPa.
     "Liquid Hydrogen (at -253°C)": 71,
-    # [ON-DISK] nist_fluid_properties/propane_C74986_saturation_298.15K.tsv @ T=298.15 col="Density (l, kg/m3)" tol=0.13%
+    # [ON-DISK] nist_fluid_properties/propane_C74986_saturation_298.15K.tsv @ T=298.15 col="Density (l, kg/m3)" tol=0.13% basis=condition
     #   492.36 at 298.15 K; the row is +0.13%. The row says "At 25 C, under pressure" and names no pressure; the file is the saturated liquid. Pressure in that row: 0.95207 MPa.
     #   C3 review, H (electrical) F-2 generalised: this tol= is the residual rounded up
     #   (0.12999% -> 0.13%) and is the only one outside the electrical branch. The
@@ -614,7 +614,7 @@ MATERIAL_DENSITIES = {
     #   aluminium this row means and calling it sourcing. Naming the alloy in the key is
     #   the fix, and that moves the item pool. C3.5 residual.
     "Aluminum": 2710,
-    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=899 text="Table 5.2.1.0(b)" mil="density" scale=27679.9 tol=0.31%
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=899 text="Table 5.2.1.0(b)" mil="density" scale=27679.9 tol=0.31% basis=half-unit
     #   MIL-HDBK-5J p.899, Table 5.2.1.0(b) (Commercially Pure Titanium): density 0.163 lb/in^3 = 4512 kg/m3. The row is -0.26% from it, inside
     #   half a unit in the handbook's last digit (0.31%) - the bound a unit conversion of a
     #   3-s.f. value supports (SP 811 p.66: 1 lb/in^3 = 27679.9 kg/m^3). Commercially pure; the row names no grade - the implementer's choice, referred (C3.5).
@@ -629,7 +629,7 @@ MATERIAL_DENSITIES = {
     "Tin": 7280,
     # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
     "Iron (Wrought)": 7750,
-    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=62 text="Table 2.2.1.0(b)" mil="density" scale=27679.9 tol=0.18%
+    # [ON-DISK] mil_hdbk_5j/MIL-HDBK-5J_2003-01-31.pdf @ page=62 text="Table 2.2.1.0(b)" mil="density" scale=27679.9 tol=0.18% basis=half-unit
     #   MIL-HDBK-5J p.62, Table 2.2.1.0(b) (AISI 1025 Carbon Steel): density 0.284 lb/in^3 = 7861 kg/m3. The row is -0.14% from it, inside
     #   half a unit in the handbook's last digit (0.18%) - the bound a unit conversion of a
     #   3-s.f. value supports (SP 811 p.66: 1 lb/in^3 = 27679.9 kg/m^3). AISI 1025, the handbook's carbon-steel table; the row names no grade, so the grade is the implementer's choice - referred (C3.5).
