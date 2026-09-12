@@ -350,21 +350,28 @@ FLUID_DENSITIES = {
     "Liquid Propane": 493,      # At 25°C, under pressure
     
     # High-Density Liquids
-    # [UNVERIFIED] Mercury is not in the NIST fluid database on disk; its WebBook species pages on
-    #   disk (mercury_C7439976_condensed_phase.html, mercury_C7439976_phase_change.html) carry no
-    #   density. Residual register (C3.5).
+    # [ON-DISK] pubchem/mercury_density.json @ cid=23931 heading="Density" ref=8 scale=1000 precision=exact
+    #   13.55 at 68 °F (USCG, 1999) - Denser than water; will sink
+    #   Source: CAMEO Chemicals; conditions: 68 F.
+    #   That entry cites: U.S. Coast Guard. 1999. Chemical Hazard Response Information System (CHRIS) - Hazardous Chemical Dat
+    #   PubChem is an AGGREGATOR and this record carries several densities that
+    #   disagree, so the citation names ONE ReferenceNumber rather than the CID alone.
     "Mercury": 13550,
-    # [UNVERIFIED] Glycerol is not in the NIST fluid database on disk; its WebBook species pages on
-    #   disk (glycerol_C56815_condensed_phase.html, glycerol_C56815_phase_change.html) carry no
-    #   density. Residual register (C3.5).
+    # [ON-DISK] pubchem/glycerol_density.json @ cid=753 heading="Density" ref=11 scale=1000 precision=3sf
+    #   1.261 at 68 °F (USCG, 1999) - Denser than water; will sink
+    #   Source: CAMEO Chemicals; conditions: 68 F.
+    #   That entry cites: U.S. Coast Guard. 1999. Chemical Hazard Response Information System (CHRIS) - Hazardous Chemical Dat
+    #   PubChem is an AGGREGATOR and this record carries several densities that
+    #   disagree, so the citation names ONE ReferenceNumber rather than the CID alone.
     "Glycerin": 1260,
     # [UNVERIFIED] Chloroform is not in the NIST fluid database on disk (MANIFEST: 36 fluids), and
     #   no WebBook species page for it is on disk. Residual register (C3.5).
     "Chloroform": 1489,
-    # [UNVERIFIED] Carbon tetrachloride is not in the NIST fluid database on disk; its WebBook
-    #   species pages on disk (carbon_tetrachloride_C56235_condensed_phase.html,
-    #   carbon_tetrachloride_C56235_phase_change.html) say density only as ['Critical density', 'of
-    #   density', 'the density']. Residual register (C3.5).
+    # [ON-DISK] pubchem/carbon_tetrachloride_density.json @ cid=5943 heading="Density" ref=76 scale=1000 precision=exact
+    #   1.5940 @ 20°C
+    #   Source: PAC Chemical Database, U.S. Department of Energy; conditions: 20 C.
+    #   PubChem is an AGGREGATOR and this record carries several densities that
+    #   disagree, so the citation names ONE ReferenceNumber rather than the CID alone.
     "Carbon Tetrachloride": 1594,
     # [UNVERIFIED] Bromine is not in the NIST fluid database on disk (MANIFEST: 36 fluids), and no
     #   WebBook species page for it is on disk. Residual register (C3.5).
@@ -422,50 +429,76 @@ FLUID_DENSITIES = {
 # @domain: none (the table states no temperature)
 MATERIAL_DENSITIES = {
     # Woods & Natural Materials (generally float in water)
-    # [UNVERIFIED] the row gives one number for a material whose density depends on
-    #   species and moisture content. C3 review, H (mechanical) F4: the reason here
-    #   previously said the row "names no species", which is false where it does -
-    #   Teak is on disk as Tectona grandis (FPL-GTR-282 PDF p.66) and the handbook
-    #   indexes properties by species in Table 5-3a (PDF pp.120-121, referenced for
-    #   density at p.106). What is missing is the MOISTURE CONDITION, which the row
-    #   does not state and which FPL tabulates separately (green vs 12%). C3.5.
+    # [UNVERIFIED] the row names a material FPL indexes by SPECIES and states no
+    #   moisture condition, and both are needed before a density can be cited.
+    #   FPL-GTR-282 pp.123-136 index several species under "Pine".
+    #   Specific gravities READ from the metric tables (5-3a / 5-5a; 5-3b and 5-5b
+    #   repeat the same species in inch-pound and are not counted twice):
+    #     green 0.34-0.72 over 14 row(s)
+    #     12%   0.35-0.56 over 4 row(s)
+    #   Table 4-6a (p.107) converts those at 12% MC to 381-627 kg/m3
+    #   (Gx 0.34-0.56); the row holds 500.
+    #   THAT SPAN IS A LOWER BOUND, not FPL's range. FPL prints the genus heading
+    #   once and then bare sub-names ("Bigleaf", "Black", "Red"), so a scan anchored
+    #   on the genus truncates the block - for Maple it stops before Silver and
+    #   Sugar. No claim is made here that any committed value lies outside FPL.
+    #   C3.5 residual.
     "Pine Wood": 500,
-    # [UNVERIFIED] the row gives one number for a material whose density depends on
-    #   species and moisture content. C3 review, H (mechanical) F4: the reason here
-    #   previously said the row "names no species", which is false where it does -
-    #   Teak is on disk as Tectona grandis (FPL-GTR-282 PDF p.66) and the handbook
-    #   indexes properties by species in Table 5-3a (PDF pp.120-121, referenced for
-    #   density at p.106). What is missing is the MOISTURE CONDITION, which the row
-    #   does not state and which FPL tabulates separately (green vs 12%). C3.5.
+    # [UNVERIFIED] the row names a material FPL indexes by SPECIES and states no
+    #   moisture condition, and both are needed before a density can be cited.
+    #   FPL-GTR-282 pp.121-135 index several species under "Oak".
+    #   Specific gravities READ from the metric tables (5-3a / 5-5a; 5-3b and 5-5b
+    #   repeat the same species in inch-pound and are not counted twice):
+    #     green 0.56-0.80 over 9 row(s)
+    #     12%   0.61-0.69 over 6 row(s)
+    #   Table 4-6a (p.107) converts those at 12% MC to 672-762 kg/m3
+    #   (Gx 0.60-0.68); the row holds 750.
+    #   THAT SPAN IS A LOWER BOUND, not FPL's range. FPL prints the genus heading
+    #   once and then bare sub-names ("Bigleaf", "Black", "Red"), so a scan anchored
+    #   on the genus truncates the block - for Maple it stops before Silver and
+    #   Sugar. No claim is made here that any committed value lies outside FPL.
+    #   C3.5 residual.
     "Oak Wood": 750,
     # [UNVERIFIED] this row is NOT WOOD, so the wood reason it carried does not apply to
     #   it: cork is a bark tissue and bamboo is a grass, and neither is indexed by the
     #   USDA Wood Handbook's species tables. A different source is needed, not a better
     #   reading of this one (C3 review, H (mechanical) F4; C3.5).
     "Cork": 240,
-    # [UNVERIFIED] the row gives one number for a material whose density depends on
-    #   species and moisture content. C3 review, H (mechanical) F4: the reason here
-    #   previously said the row "names no species", which is false where it does -
-    #   Teak is on disk as Tectona grandis (FPL-GTR-282 PDF p.66) and the handbook
-    #   indexes properties by species in Table 5-3a (PDF pp.120-121, referenced for
-    #   density at p.106). What is missing is the MOISTURE CONDITION, which the row
-    #   does not state and which FPL tabulates separately (green vs 12%). C3.5.
+    # [UNVERIFIED] the row names a material FPL indexes by SPECIES and states no
+    #   moisture condition, and both are needed before a density can be cited.
+    #   FPL-GTR-282 pp.137-137 index several species under "Teak".
+    #   Specific gravities READ from the metric tables (5-3a / 5-5a; 5-3b and 5-5b
+    #   repeat the same species in inch-pound and are not counted twice):
+    #     green 0.45-0.78 over 3 row(s)
+    #   Table 5-5a prints no 12% specific gravity for it, only green.
+    #   THAT SPAN IS A LOWER BOUND, not FPL's range. FPL prints the genus heading
+    #   once and then bare sub-names ("Bigleaf", "Black", "Red"), so a scan anchored
+    #   on the genus truncates the block - for Maple it stops before Silver and
+    #   Sugar. No claim is made here that any committed value lies outside FPL.
+    #   C3.5 residual.
     "Teak Wood": 630,
-    # [UNVERIFIED] the row gives one number for a material whose density depends on
-    #   species and moisture content. C3 review, H (mechanical) F4: the reason here
-    #   previously said the row "names no species", which is false where it does -
-    #   Teak is on disk as Tectona grandis (FPL-GTR-282 PDF p.66) and the handbook
-    #   indexes properties by species in Table 5-3a (PDF pp.120-121, referenced for
-    #   density at p.106). What is missing is the MOISTURE CONDITION, which the row
-    #   does not state and which FPL tabulates separately (green vs 12%). C3.5.
+    # [UNVERIFIED] the row names a material FPL indexes by SPECIES and states no
+    #   moisture condition, and both are needed before a density can be cited.
+    #   FPL-GTR-282 pp.121-121 index several species under "Maple".
+    #   Specific gravities READ from the metric tables (5-3a / 5-5a; 5-3b and 5-5b
+    #   repeat the same species in inch-pound and are not counted twice):
+    #     green 0.44-0.52 over 3 row(s)
+    #     12%   0.48-0.57 over 2 row(s)
+    #   Table 4-6a (p.107) converts those at 12% MC to 538-627 kg/m3
+    #   (Gx 0.48-0.56); the row holds 740.
+    #   THAT SPAN IS A LOWER BOUND, not FPL's range. FPL prints the genus heading
+    #   once and then bare sub-names ("Bigleaf", "Black", "Red"), so a scan anchored
+    #   on the genus truncates the block - for Maple it stops before Silver and
+    #   Sugar. No claim is made here that any committed value lies outside FPL.
+    #   C3.5 residual.
     "Maple Wood": 740,
-    # [UNVERIFIED] the row gives one number for a material whose density depends on
-    #   species and moisture content. C3 review, H (mechanical) F4: the reason here
-    #   previously said the row "names no species", which is false where it does -
-    #   Teak is on disk as Tectona grandis (FPL-GTR-282 PDF p.66) and the handbook
-    #   indexes properties by species in Table 5-3a (PDF pp.120-121, referenced for
-    #   density at p.106). What is missing is the MOISTURE CONDITION, which the row
-    #   does not state and which FPL tabulates separately (green vs 12%). C3.5.
+    # [UNVERIFIED] the row names a material FPL indexes by SPECIES and states no
+    #   moisture condition, and both are needed before a density can be cited.
+    #   FPL-GTR-282 prints NO specific gravity under the name "Ebony": it is not
+    #   indexed in Table 5-3a (US species, PDF pp.120-124) or Table 5-5a (imports,
+    #   pp.134-137). The committed 1200 kg/m3 has no support on disk and no
+    #   substitute was found - a different source is needed, not a better reading
+    #   of this one. C3.5 residual.
     "Ebony Wood": 1200,  # Sinks in water
     # [UNVERIFIED] this row is NOT WOOD, so the wood reason it carried does not apply to
     #   it: cork is a bark tissue and bamboo is a grass, and neither is indexed by the
@@ -522,7 +555,11 @@ MATERIAL_DENSITIES = {
     "Titanium": 4500,
     # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
     "Zinc": 7140,
-    # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
+    # [ON-DISK] pubchem/tin_density.json @ cid=5352426 heading="Density" ref=6 scale=1000 precision=exact
+    #   7.28 (NIOSH, 2024) - Denser than water; will sink
+    #   Source: CAMEO Chemicals; conditions: no temperature stated in the entry.
+    #   PubChem is an AGGREGATOR and this record carries several densities that
+    #   disagree, so the citation names ONE ReferenceNumber rather than the CID alone.
     "Tin": 7280,
     # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
     "Iron (Wrought)": 7750,
@@ -533,23 +570,62 @@ MATERIAL_DENSITIES = {
     "Steel (Carbon)": 7850,
     # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
     "Brass": 8600,
-    # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
+    # [ON-DISK] pubchem/copper_density.json @ cid=23978 heading="Density" ref=46 scale=1000 precision=exact
+    #   8.94
+    #   Source: Hazardous Substances Data Bank (HSDB); conditions: no temperature stated in the entry.
+    #   That entry cites: Budavari, S. (ed.). The Merck Index - An Encyclopedia of Chemicals, Drugs, and Biologicals. Whitehou
+    #   PubChem is an AGGREGATOR and this record carries several densities that
+    #   disagree, so the citation names ONE ReferenceNumber rather than the CID alone.
     "Copper": 8940,
-    # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
+    # [ON-DISK] pubchem/nickel_density.json @ cid=935 heading="Density" ref=50 scale=1000 precision=2sf
+    #   8.908
+    #   Source: Hazardous Substances Data Bank (HSDB); conditions: no temperature stated in the entry.
+    #   That entry cites: Lewis, R.J., Sr (Ed.). Hawley's Condensed Chemical  Dictionary. 13th ed. New York, NY: John Wiley & 
+    #   PubChem is an AGGREGATOR and this record carries several densities that
+    #   disagree, so the citation names ONE ReferenceNumber rather than the CID alone.
     "Nickel": 8900,
-    # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
+    # [ON-DISK] pubchem/silver_density.json @ cid=23954 heading="Density" ref=47 scale=1000 precision=3sf
+    #   10.49 @ 15 °C
+    #   Source: Hazardous Substances Data Bank (HSDB); conditions: 15 C.
+    #   That entry cites: O'Neil, M.J. (ed.). The Merck Index - An Encyclopedia of  Chemicals, Drugs, and Biologicals. 13th Ed
+    #   PubChem is an AGGREGATOR and this record carries several densities that
+    #   disagree, so the citation names ONE ReferenceNumber rather than the CID alone.
     "Silver": 10500,
-    # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
+    # [ON-DISK] pubchem/lead_density.json @ cid=5352425 heading="Density" ref=10 scale=1000 precision=4sf
+    #   11.3437 at 61 °F (NTP, 1992) - Denser than water; will sink
+    #   Source: CAMEO Chemicals; conditions: 61 F.
+    #   That entry cites: National Toxicology Program, Institute of Environmental Health Sciences, National Institutes of Heal
+    #   PubChem is an AGGREGATOR and this record carries several densities that
+    #   disagree, so the citation names ONE ReferenceNumber rather than the CID alone.
     "Lead": 11340,
-    # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
+    # [ON-DISK] pubchem/uranium_density.json @ cid=23989 heading="Density" ref=41 scale=1000 precision=exact
+    #   19.1 @25 °C
+    #   Source: PAC Chemical Database, U.S. Department of Energy; conditions: 25 C.
+    #   PubChem is an AGGREGATOR and this record carries several densities that
+    #   disagree, so the citation names ONE ReferenceNumber rather than the CID alone.
     "Uranium": 19100,
-    # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
+    # [ON-DISK] pubchem/gold_density.json @ cid=23985 heading="Density" ref=34 scale=1000 precision=exact
+    #   19.3
+    #   Source: Hazardous Substances Data Bank (HSDB); conditions: no temperature stated in the entry.
+    #   That entry cites: O'Neil, M.J. (ed.). The Merck Index - An Encyclopedia of  Chemicals, Drugs, and Biologicals. 13th Ed
+    #   PubChem is an AGGREGATOR and this record carries several densities that
+    #   disagree, so the citation names ONE ReferenceNumber rather than the CID alone.
     "Gold": 19300,
     # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
     "Tungsten": 19600,
-    # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
+    # [ON-DISK] pubchem/platinum_density.json @ cid=23939 heading="Density" ref=28 scale=1000 precision=4sf
+    #   21.447 (calc)
+    #   Source: Hazardous Substances Data Bank (HSDB); conditions: no temperature stated in the entry.
+    #   That entry cites: Budavari, S. (ed.). The Merck Index - An Encyclopedia of Chemicals, Drugs, and Biologicals. Whitehou
+    #   PubChem is an AGGREGATOR and this record carries several densities that
+    #   disagree, so the citation names ONE ReferenceNumber rather than the CID alone.
     "Platinum": 21450,
-    # [UNVERIFIED] no source on disk for this material. Residual register (C3.5).
+    # [ON-DISK] pubchem/osmium_density.json @ cid=23937 heading="Density" ref=22 scale=1000 precision=exact
+    #   22.59 g/cu cm
+    #   Source: Hazardous Substances Data Bank (HSDB); conditions: no temperature stated in the entry.
+    #   That entry cites: Lide, DR (ed.). CRC Handbook of Chemistry and Physics. 81st Edition. CRC Press LLC, Boca Raton: FL 2
+    #   PubChem is an AGGREGATOR and this record carries several densities that
+    #   disagree, so the citation names ONE ReferenceNumber rather than the CID alone.
     "Osmium": 22590,  # The densest naturally occurring element
     
     # Other Materials
@@ -721,9 +797,12 @@ PIPE_FLUIDS = {
 # @domain: none (the table states no conditions)
 MANOMETER_FLUIDS = {
     # Standard Manometer Fluids
-    # [UNVERIFIED] Mercury is not in the NIST fluid database on disk; its WebBook species pages on
-    #   disk (mercury_C7439976_condensed_phase.html, mercury_C7439976_phase_change.html) carry no
-    #   density. Residual register (C3.5).
+    # [ON-DISK] pubchem/mercury_density.json @ cid=23931 heading="Density" ref=8 scale=1000 precision=exact
+    #   13.55 at 68 °F (USCG, 1999) - Denser than water; will sink
+    #   Source: CAMEO Chemicals; conditions: 68 F.
+    #   That entry cites: U.S. Coast Guard. 1999. Chemical Hazard Response Information System (CHRIS) - Hazardous Chemical Dat
+    #   PubChem is an AGGREGATOR and this record carries several densities that
+    #   disagree, so the citation names ONE ReferenceNumber rather than the CID alone.
     "Mercury": 13550,
     # [UNVERIFIED] the table states no temperature or pressure, so no row of an artefact is THE
     #   value. NIST at 1 atm: no row at 273.15 K; 998.21 (liquid) at 293.15 K
@@ -739,11 +818,25 @@ MANOMETER_FLUIDS = {
     "SAE 90 Gear Oil": 920,
     
     # Organic Liquids
-    # [UNVERIFIED] no source on disk. Residual register (C3.5).
+    # [ON-DISK] pubchem/carbon_tetrachloride_density.json @ cid=5943 heading="Density" ref=6 scale=1000 precision=exact
+    #   1.59 at 68 °F (USCG, 1999) - Denser than water; will sink
+    #   Source: CAMEO Chemicals; conditions: 68 F.
+    #   That entry cites: U.S. Coast Guard. 1999. Chemical Hazard Response Information System (CHRIS) - Hazardous Chemical Dat
+    #   PubChem is an AGGREGATOR and this record carries several densities that
+    #   disagree, so the citation names ONE ReferenceNumber rather than the CID alone.
     "Carbon Tetrachloride": 1590,
-    # [UNVERIFIED] no source on disk. Residual register (C3.5).
+    # [ON-DISK] pubchem/chloroform_density.json @ cid=6212 heading="Density" ref=7 scale=1000 precision=3sf
+    #   1.4832 at 68 °F (EPA, 1998) - Denser than water; will sink
+    #   Source: CAMEO Chemicals; conditions: 68 F.
+    #   That entry cites: U.S. Environmental Protection Agency. 1998. Extremely Hazardous Substances (EHS) Chemical Profiles a
+    #   PubChem is an AGGREGATOR and this record carries several densities that
+    #   disagree, so the citation names ONE ReferenceNumber rather than the CID alone.
     "Chloroform": 1480,
-    # [UNVERIFIED] no source on disk. Residual register (C3.5).
+    # [ON-DISK] pubchem/bromine_density.json @ cid=24408 heading="Density" ref=55 scale=1000 precision=exact
+    #   3.12
+    #   Source: The National Institute for Occupational Safety and Health (NIOSH); conditions: no temperature stated in the entry.
+    #   PubChem is an AGGREGATOR and this record carries several densities that
+    #   disagree, so the citation names ONE ReferenceNumber rather than the CID alone.
     "Bromine": 3120,
     # [UNVERIFIED] no source on disk. Residual register (C3.5).
     "Tetrabromoethane": 2960,
@@ -757,7 +850,12 @@ MANOMETER_FLUIDS = {
     "Sodium Polysulfide": 1650,
     
     # Specialty Fluids
-    # [UNVERIFIED] no source on disk. Residual register (C3.5).
+    # [ON-DISK] pubchem/glycerol_density.json @ cid=753 heading="Density" ref=11 scale=1000 precision=3sf
+    #   1.261 at 68 °F (USCG, 1999) - Denser than water; will sink
+    #   Source: CAMEO Chemicals; conditions: 68 F.
+    #   That entry cites: U.S. Coast Guard. 1999. Chemical Hazard Response Information System (CHRIS) - Hazardous Chemical Dat
+    #   PubChem is an AGGREGATOR and this record carries several densities that
+    #   disagree, so the citation names ONE ReferenceNumber rather than the CID alone.
     "Glycerin": 1260,
     # [UNVERIFIED] no source on disk. Residual register (C3.5).
     "Diiodomethane": 3325,
@@ -765,7 +863,12 @@ MANOMETER_FLUIDS = {
     "Acetylene Tetrabromide": 2960,
     
     # Molten Metals (for high-temperature applications)
-    # [UNVERIFIED] no source on disk. Residual register (C3.5).
+    # [ON-DISK] pubchem/gallium_density.json @ cid=5360835 heading="Density" ref=23 scale=1000 precision=4sf
+    #   6.0947 @ 29.8 °C (liquid); 5.9037 @ 29.65 °C (solid)
+    #   Source: Hazardous Substances Data Bank (HSDB); conditions: 29.8 C.
+    #   That entry cites: Budavari, S. (ed.). The Merck Index - An Encyclopedia of Chemicals, Drugs, and Biologicals. Whitehou
+    #   PubChem is an AGGREGATOR and this record carries several densities that
+    #   disagree, so the citation names ONE ReferenceNumber rather than the CID alone.
     "Gallium": 6095,
     # [UNVERIFIED] no source on disk. Residual register (C3.5).
     "Tin": 6980,
