@@ -242,18 +242,33 @@ do not leave it printed-and-unread — *that* is Phase 5's named failure (`cross
 
 ### Two spec numbers that do not survive contact
 
-**D6.8's "199 characters".** The spec states the corpus's longest answer span is 199 characters
-and that a bound can be set from it. **That figure does not appear in `phase5_summary.md`**,
-which is the source it cites. Re-measure it before writing any assertion; a bound copied from
-an unsourced number is exactly the defect class this series exists to remove. If it
-re-measures to 199, say so and cite the run.
+**D6.8's "199 characters" — re-measured, and the spec is right.** The figure does not appear in
+`phase5_summary.md`, the document the spec cites, so it was flagged here as unsourced. Measured
+over 2,250 instances it is **correct**: the corpus's longest answer span is
+`template_autocorrelation_rect_pulse` at **199 characters** from the end of the `**Answer:**`
+marker (block length 210, marker 11; 198 if the leading newline is also stripped). Median **64**,
+p95 **165**, and **zero templates lack an answer marker**.
 
-**D6.11's "113 templates carry a unit".** `phase5_summary.md:126` gives **four** counts, not
-one — *seed 0 115 / any 116 / always 113 / invariant 103*. The spec quotes 113 without its
-predicate. `always` and `invariant` differ by 10 templates whose unit **varies across seeds**,
-and those 10 are the whole difficulty of D6.11: a per-item declaration for a template whose
-unit is seed-dependent cannot be written once at template level. **Publish the predicate, and
-size the editorial work off `invariant` vs `always` deliberately.**
+So the number was always right and only its provenance was missing — which is worth stating
+plainly rather than quietly dropping the objection. **Cite this run when you set the bound**, and
+**re-measure after D6.7 and D6.11**, both of which change emitted text.
+
+**D6.11's "113 templates carry a unit" — re-measured, and the count moves.**
+`phase5_summary.md:126` gives **four** counts, not one — *seed 0 115 / any 116 / always 113 /
+invariant 103* — and the spec quotes 113 without its predicate.
+
+Re-measured here over the 2,250-item pool, reusing T6's own `_UNIT_AFTER_NUM` and
+`answer_block` so the definition is the repo's rather than a rival one, the four counts are
+**seed 0 121 / any 121 / always 121 / invariant 97**, with **24 templates whose unit changes
+with the seed** — not the 10 the earlier figures imply.
+
+**The census does not reproduce across seed sets, and that is the finding.** Neither set of
+numbers is wrong; they sample differently. So a fixed count quoted without its sample is not a
+size estimate at all. **Size D6.11 off the actual generated pool**, publish the seed set with the
+count, and treat the 24 seed-varying templates as the hard core: a per-item declaration for a
+template whose unit is seed-dependent cannot be written once at template level, and one unit
+applied to all `n` parts of a `multipart` answer is wrong for at least `n−1` — which is what made
+13 templates reject their own gold.
 
 ### Units — D6.11 overlaps C1.4, deliberately
 
