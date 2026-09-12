@@ -270,8 +270,16 @@ def template_sensible_heat_temp_dependent_cp():
 
     # Determine valid temperature ranges based on phase to ensure physical plausibility
     if "(l)" in substance_name:
-        # Liquids: Keep range lower to avoid boiling (approximate general cap)
-        T1 = round(random.uniform(280.0, 300.0), 2)
+        # Liquids: keep the range lower to avoid boiling (approximate general cap), and
+        # START AT THE FIT'S OWN FLOOR. CP_PARAMS declares @domain T_lo=298..1500 K, but
+        # uniform(280.0, 300.0) put T1 as low as 281.67 K - the integral evaluated 16 K
+        # below the interval the polynomial was fitted over, on 60 of 300 seeds
+        # (domain_findings.txt; C3.5 register item 7). The gas branch below already starts
+        # at 298.15; this agrees with it.
+        # The span stays ~20 K wide rather than clipping to [298.15, 300.0]: collapsing a
+        # 20 K draw to 1.85 K would shrink the answer space, which t6_distribution calls a
+        # downgrade rather than a fix.
+        T1 = round(random.uniform(298.15, 318.0), 2)
         T2 = round(random.uniform(T1 + 20, 350.0), 2) 
     else:
         # Gases/Solids: Can handle higher temperatures
