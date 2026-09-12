@@ -34,7 +34,14 @@ and seven are added, one per clause of the C1.2 vocabulary (spec §C1.2):
   R3  the locator resolves inside the artefact, by type: `quantity=` (CODATA
       text), `T=` + `col=` (NIST fluid TSV - the row must be ON the grid, which
       is the clamp lesson of the acquisition), `cas=` (NIST WebBook JSON),
-      `page=` [+ `text=`] (PDF), `member=` (zip), `text=` (HTML / text), and
+      `cid=` + `heading=` + `ref=` (a PubChem PUG-View record: ONE cited
+      entry of an aggregator that carries several disagreeing values, so the
+      ReferenceNumber is part of the locator, not a detail;
+      tests/constants_integrity/pubchem.py),
+      `page=` [+ `text=`] (PDF), `page=` + `token=` + `col=sigma|eps_k`
+      (Svehla NASA TR R-132 Table I(a): the molecule AS THE 1962 SCAN PRINTS IT,
+      required to be UNIQUE on the page, never read positionally;
+      tests/constants_integrity/svehla.py), `member=` (zip), `text=` (HTML / text), and
       `member=` + `wavelength=<x>nm|um` (the refractiveindex.info archive: the
       index EVALUATED at that wavelength, refused outside the dataset's range;
       tests/constants_integrity/refractiveindex.py), and `sheet=` + `label_col=` +
@@ -453,6 +460,43 @@ def _mil_value(path, page, key, col):
     return float(tok), None
 
 
+def _pubchem_value(path, cid, heading, ref):
+    """(value, error) - ONE cited density entry of a PubChem PUG-View record."""
+    from tests.constants_integrity.pubchem import density_value
+    if ref is None:
+        return None, ('a pubchem locator needs ref=<ReferenceNumber>: the record carries '
+                      'several densities that disagree, and a citation must name one')
+    try:
+        with open(path, encoding='utf-8') as fh:
+            doc = json.load(fh)
+    except (OSError, ValueError) as exc:
+        return None, f'{os.path.basename(path)} is not readable JSON ({exc})'
+    try:
+        value, _meta = density_value(doc, ref, heading or 'Density', cid=cid)
+    except ValueError as exc:
+        return None, str(exc)
+    return value, None
+
+
+def _svehla_value(path, page, token, col):
+    """(value, error) - sigma or eps/k from Svehla NASA TR R-132 Table I(a)."""
+    from tests.constants_integrity.svehla import force_constants
+    try:
+        from pypdf import PdfReader
+    except ImportError:
+        return None, 'pypdf unavailable: PDF locators cannot be checked on this machine'
+    if col not in ('sigma', 'eps_k'):
+        return None, f'col={col!r} is not "sigma" or "eps_k"'
+    reader = _PDF_READERS.get(path) or _PDF_READERS.setdefault(path, PdfReader(path))
+    if not 1 <= int(page) <= len(reader.pages):
+        return None, f'page {page} does not exist ({len(reader.pages)} pages)'
+    try:
+        got = force_constants(reader.pages[int(page) - 1].extract_text() or '', token)
+    except ValueError as exc:
+        return None, f'page {page}: {exc}'
+    return float(got[col]), None
+
+
 def _xlsx_whole_table(path, table, kv):
     """(cells checked, [disagreements], error) - every leaf of a nested dict table
     against its cell in an .xlsx, one header block per row sub-dict."""
@@ -724,6 +768,17 @@ def check_source(branch, src, refs=REFS, manifest=None, kinds=None, register=Non
                 _v, err = _pdf_page(full, kv['page'], kv['text'])
             if not err:
                 value, err = _mil_value(full, kv['page'], kv['mil'], kv.get('col', 1))
+        elif 'cid' in kv and ext == 'json':
+            value, err = _pubchem_value(full, kv['cid'], kv.get('heading'), kv.get('ref'))
+        elif 'page' in kv and 'token' in kv and ext == 'pdf':
+            # Svehla Table I(a): token= names the molecule as the scan prints it
+            # ('C_' for Cl2, '02' for O2), col= which force constant. text= is
+            # optional here and unused by the per-row tags: p.23's text layer
+            # prints the caption unspaced, so one caption cannot pin all 5 pages.
+            if 'text' in kv:
+                _v, err = _pdf_page(full, kv['page'], kv['text'])
+            if not err:
+                value, err = _svehla_value(full, kv['page'], kv['token'], kv.get('col'))
         elif 'quantity' in kv:
             value, err = _codata(full, kv['quantity'])
         elif 'T' in kv and 'col' in kv:
