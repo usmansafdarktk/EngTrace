@@ -4,6 +4,7 @@ from data.templates.branches.chemical_engineering.constants import (
     HEATS_OF_FORMATION, REACTIONS, CP_PARAMS, COMBUSTION_REACTIONS,
     CP_PARAMS_COMBUSTION, CP_COMBUSTION_VALID_T_MAX,
 )
+from data.templates.branches._emission import signed_term, joined_terms
 
 
 def _as_printed(x, spec):
@@ -86,7 +87,7 @@ def template_sensible_heat_constant_cp():
 
         f"**Step 3:** Calculate the temperature difference (ΔT).\n"
         f"A change in temperature has the same magnitude in Celsius and Kelvin.\n"
-        f"ΔT = T2 - T1 = {T2_C}°C - {T1_C}°C = {round(delta_T, 1)} K\n\n"
+        f"ΔT = T2 - T1 = {T2_C}°C {signed_term(-T1_C)}°C = {round(delta_T, 1)} K\n\n"
 
         f"**Step 4:** Substitute the values into the formula to find the heat in Joules (J).\n"
         f"Q = {m} g * {Cp} J/g·K * {round(delta_T, 1)} K\n"

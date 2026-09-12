@@ -1,6 +1,7 @@
 import random
 import math
 from data.templates.branches.electrical_engineering.constants import C0, MEDIA_VELOCITIES 
+from data.templates.branches._emission import signed_term, joined_terms
 
 
 
@@ -336,7 +337,7 @@ def template_wave_equation_interpretation():
     # Format omega for better readability in the question
     omega_str = f"{omega_multiple}pi x 10^8"
     wave_equation = (
-        f"E(z, t) = {amplitude} * cos({omega_str}*t {direction_sign_str} {round(k, 2)}*z + {phi_deg} deg) V/m"
+        f"E(z, t) = {amplitude} * cos({omega_str}*t {direction_sign_str} {round(k, 2)}*z {signed_term(phi_deg, 'deg')}) V/m"
     )
 
     # 2. Perform the core calculations for the solution

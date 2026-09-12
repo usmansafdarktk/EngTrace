@@ -1,6 +1,7 @@
 import random
 import math
 from data.templates.branches.mechanical_engineering.constants import MATERIAL_PROPERTIES
+from data.templates.branches._emission import signed_term, joined_terms
 
 
 # Template 1 (Easy)
@@ -517,7 +518,7 @@ def template_multi_segment_rod():
              solution += f"  - **Segment {seg_num}:** P{seg_num} = {loads[seg_num]} {unit_P}{load_desc}\n"
         else:
             prev_load_desc = " (T)" if segments[i+1]['internal_load'] > 0 else " (C)" if segments[i+1]['internal_load'] < 0 else " (0)"
-            solution += f"  - **Segment {seg_num}:** P{seg_num} = P{seg_num+1} + {loads[seg_num]} = {segments[i+1]['internal_load']}{prev_load_desc} + {loads[seg_num]} = {internal_load} {unit_P}{load_desc}\n"
+            solution += f"  - **Segment {seg_num}:** P{seg_num} = P{seg_num+1} {signed_term(loads[seg_num])} = {segments[i+1]['internal_load']}{prev_load_desc} {signed_term(loads[seg_num])} = {internal_load} {unit_P}{load_desc}\n"
 
     solution += f"\nSummary of Internal Forces:\n"
     for i, seg in enumerate(segments):

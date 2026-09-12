@@ -1,5 +1,6 @@
 import random
 import math
+from data.templates.branches._emission import signed_term, joined_terms
 
 
 # Template 1 (Easy)
@@ -334,7 +335,7 @@ def template_vorticity_check():
         question = (
             f"A 2D fluid flow is described by the velocity field:\n"
             f"u = {A}xy\n"
-            f"v = {B}x^2 + {C}y^2\n"
+            f"v = {B}x^2 {signed_term(C)}y^2\n"
             f"where u and v are in m/s, and x and y are in meters.\n\n"
             f"Calculate the vorticity at the point ({x_point}, {y_point}) m and "
             f"determine if the flow is rotational or irrotational at that point."
@@ -343,7 +344,7 @@ def template_vorticity_check():
         solution = (
             f"**Given:**\n"
             f"Velocity component u = {A}xy\n"
-            f"Velocity component v = {B}x^2 + {C}y^2\n"
+            f"Velocity component v = {B}x^2 {signed_term(C)}y^2\n"
             f"Point of interest: (x, y) = ({x_point}, {y_point}) m\n\n"
 
             f"**Step 1:** State the formula for vorticity in a 2D flow.\n"
@@ -352,7 +353,7 @@ def template_vorticity_check():
 
             f"**Step 2:** Calculate the necessary partial derivatives.\n"
             f"  du/dy = d/dy({A}xy) = {A}x\n"
-            f"  dv/dx = d/dx({B}x^2 + {C}y^2) = {2*B}x\n\n"
+            f"  dv/dx = d/dx({B}x^2 {signed_term(C)}y^2) = {2*B}x\n\n"
 
             f"**Step 3:** Evaluate the partial derivatives at the point ({x_point}, {y_point}).\n"
             f"  du/dy at x={x_point} -> {A}({x_point}) = {round(du_dy_val, precision)}\n"
@@ -401,8 +402,8 @@ def template_vorticity_check():
         question = (
             f"A 3D fluid flow is described by the velocity field:\n"
             f"u = {A}y^2\n"
-            f"v = {B}z^2 + {C}x\n"
-            f"w = {D}x^2 + {E}y\n"
+            f"v = {B}z^2 {signed_term(C)}x\n"
+            f"w = {D}x^2 {signed_term(E)}y\n"
             f"where u, v, w are in m/s, and x, y, z are in meters.\n\n"
             f"Calculate the vorticity vector at the point ({x_point}, {y_point}, {z_point}) m and "
             f"determine if the flow is rotational or irrotational at that point."
@@ -410,7 +411,7 @@ def template_vorticity_check():
 
         solution = (
             f"**Given:**\n"
-            f"Velocity field: u={A}y^2, v={B}z^2 + {C}x, w={D}x^2 + {E}y\n"
+            f"Velocity field: u={A}y^2, v={B}z^2 {signed_term(C)}x, w={D}x^2 {signed_term(E)}y\n"
             f"Point of interest: ({x_point}, {y_point}, {z_point}) m\n\n"
 
             f"**Step 1:** State the formula for the 3D vorticity vector.\n"
@@ -418,8 +419,8 @@ def template_vorticity_check():
 
             f"**Step 2:** Calculate all necessary partial derivatives.\n"
             f"From u = {A}y^2: du/dy = {2*A}y, du/dz = 0\n"
-            f"From v = {B}z^2 + {C}x: dv/dx = {C}, dv/dz = {2*B}z\n"
-            f"From w = {D}x^2 + {E}y: dw/dx = {2*D}x, dw/dy = {E}\n\n"
+            f"From v = {B}z^2 {signed_term(C)}x: dv/dx = {C}, dv/dz = {2*B}z\n"
+            f"From w = {D}x^2 {signed_term(E)}y: dw/dx = {2*D}x, dw/dy = {E}\n\n"
             
             f"**Step 3:** Evaluate the derivatives at the point ({x_point}, {y_point}, {z_point}).\n"
             f"  du/dy = {2*A}({y_point}) = {round(du_dy_val, precision)}\n"
