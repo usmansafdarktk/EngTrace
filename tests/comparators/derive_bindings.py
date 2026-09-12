@@ -125,8 +125,11 @@ _UNIT_TOKEN_RE = re.compile(
 #: The four Phase 4 templates are carried forward from `answer.PHASE4_BINDINGS`
 #: rather than re-declared, so there is one definition of them and not two.
 def _predeclared():
-    from tests.comparators.answer import PHASE4_BINDINGS
+    from tests.comparators.answer import PHASE4_BINDINGS, PHASE6_BINDINGS
     out = {t: dict(b) for t, b in PHASE4_BINDINGS.items()}
+    # D6.9's two mixed numeric+categorical answers, carried forward the same
+    # way and validated by exactly the same N>=50 cross-pairing.
+    out.update({t: dict(b) for t, b in PHASE6_BINDINGS.items()})
     return out
 
 
@@ -143,19 +146,34 @@ def _predeclared():
 #:
 #: So a label-only binding on a mixed answer is **not validatable by this
 #: instrument**, and the honest response is to say so rather than to weaken the
-#: predicate until the binding passes.  `reynolds_number_flow_regime` binds as
-#: `numeric` instead and is flagged `partial`; `damping_classification` stays
-#: unbound.  A mixed numeric+categorical `AnswerSpec` is what both actually
-#: need, and that is Phase 6's (D6.9).
-_LABEL_ONLY_NOT_VALIDATABLE = {
-    "template_damping_classification":
-        "a label-only binding on a mixed answer is not validatable by whole-span "
-        "cross-pairing: it states a damping ratio, a regime and a damped natural "
-        "frequency, and two instances routinely share the regime while differing "
-        "in both quantities. Measured: 544 false accepts in 2,450 pairs, none of "
-        "them a comparator defect. Needs a mixed numeric+categorical AnswerSpec "
-        "(D6.9)",
-}
+#: predicate until the binding passes.  A mixed numeric+categorical
+#: `AnswerSpec` is what both actually need, and that is Phase 6's (D6.9).
+#:
+#: **Phase 6 built it, and this paragraph's conclusion no longer holds.**  Both
+#: items now bind as a `composite` AnswerSpec (`answer.PHASE6_BINDINGS`) and
+#: both validate at 0 false accepts in 2,450 pairs.  The Phase 5 dispositions
+#: this paragraph used to record -- `reynolds_number_flow_regime` bound
+#: `numeric` and flagged `partial`, `damping_classification` left unbound --
+#: are both superseded, and are stated here in the past tense rather than
+#: deleted, because the measurement that forced them is still the reason the
+#: composite has the shape it does.
+#: **Now empty, and the entry that was here is the reason it is empty.**
+#:
+#: The diagnosis above was right and the remedy it named is D6.9, which is now
+#: built: `answer.PHASE6_BINDINGS` declares both items as a `composite`
+#: AnswerSpec with a numeric part AND a categorical part, and both clear the
+#: same N>=50 bar as every other binding.  Re-measured with this module's own
+#: `validate()`, 2,450 ordered pairs each:
+#:
+#:     template                        label-only   composite
+#:     damping_classification            544 FA        0 FA
+#:     reynolds_number_flow_regime     1,650 FA        0 FA
+#:
+#: Nothing about the pairing instrument changed -- the truth predicate, the
+#: gate and the six comparators are untouched.  The binding stopped being
+#: narrower than the answer, which is what the false accepts were reporting all
+#: along.
+_LABEL_ONLY_NOT_VALIDATABLE: dict[str, str] = {}
 
 
 _BRACE_RE = re.compile(r"[{\[]\s*[-+*\d][^}\]]*[}\]]")
@@ -405,7 +423,13 @@ def derive_all():
             if n_num:
                 entry["partial"] = (f"checks the label only; gold also asserts "
                                     f"{n_num} quantit{'y' if n_num == 1 else 'ies'}")
-        elif inv[tid]["answer_type"] == "classification":
+        elif kind != "composite" and inv[tid]["answer_type"] == "classification":
+            # A `composite` binding is the one shape that is NOT partial on a
+            # classification item: it carries the quantity and the class as
+            # separate parts, so neither is unchecked.  Without this guard the
+            # flag would keep asserting "checks the quantity only" about a
+            # binding that checks both -- a note contradicting the binding
+            # beside it, which is the failure D-034 is on the register for.
             entry["partial"] = ("checks the quantity only; gold also states a class "
                                 "label, so a right number with a wrong class is "
                                 "credited (D6.9)")
