@@ -15,6 +15,43 @@ emitted text. Build the pool before them and 11 models are inferred against item
 on arrival. Read §"D-003 is closed by decision" before planning the phase — the generator is in
 worse shape than "absent", and two of its five branches have never had one.
 
+## Decisions the repo owner has settled
+
+These were open when the brief was first written. They are now closed, and the rest of this
+document is written as though they are.
+
+| question | decision |
+|---|---|
+| Does the regenerated benchmark include civil and industrial? | **Yes. 150 templates, not 90.** |
+| Instances per template | **15, as before.** So the pool is **150 × 15 = 2,250 items**, up from 1,350. |
+| Track B's five substance defects | **Resolve the easiest way: delete the rows.** See §"Track B — the seven deletions". |
+| The stale annotation fork | **Leave it.** Not relevant; do not sync it. Name it in D6.6 and move on. |
+| D6.1's missing audit harness | **Best effort.** Look for the production method; if it cannot be found, **document that briefly and state the method you used instead.** Do not spend the phase on archaeology. |
+| D6.9 and D6.10 | **Attempt the fixes.** Record as decided-not-fixed **only if proven infeasible**, with the measurement that proves it. |
+
+**Why deleting the Track B rows is cheap now, when it was not before.** Those five defects were
+deferred across two phases because removing a row changes which substance each seed draws, which
+invalidates the published item pool — a P6 event. **The pool is being rebuilt from scratch**, so
+that cost is now zero. The blocker was never the edit; it was the consequence, and the
+consequence has gone.
+
+### Track B — the seven deletions
+
+| table | delete | leaves |
+|---|---|---:|
+| `MANOMETER_FLUIDS` (mechanical) | `Tungsten Hexafluoride` (a **gas** at manometer conditions, value unsupported on disk), `Tellurium Mercury` (both WebBook pages are data-free stubs), and **one** of the `Tetrabromoethane` / `Acetylene Tetrabromide` pair (one substance under two names, both 2960) | 17 of 20 |
+| `MATERIAL_DENSITIES` (mechanical) | `Cork`, `Cork Board`, `Bamboo` — searched exhaustively across all 546 pages of FPL-GTR-282 and every reference directory; genuinely absent | 53 of 56 |
+| `THERMO_SUBSTANCES` **and** `REAL_FLUID_DATA` (chemical) | `Refrigerant-410A` — a blend whose components R-32 and R-125 are also absent, so it cannot be reconstructed | 24 of 25 each |
+
+**R-410A is the one with a catch.** It is a **list element** in `THERMO_SUBSTANCES` and a **dict
+key** in `REAL_FLUID_DATA`. Delete it from both, in the same commit — remove one and the list
+names a fluid nothing supplies data for.
+
+**Deleting is still a measured change.** D-031's rule holds: removing a key shifts the position
+of every key after it, so a seed draws a different substance. Under full regeneration that is
+intended rather than a defect, but **state it** — the P6 measurement for this tranche is part of
+D6.4, not something the regeneration excuses.
+
 **Re-derive every number in this brief at whatever `master` is when you start.** Every prior
 brief in this series was corrected by what its own phase measured, and this one already
 contains two corrections to the spec it implements (§"Two spec numbers that do not survive
@@ -78,7 +115,7 @@ found claims that its own artefacts do not carry.
 | D6.1–D6.6 | re-audit, re-classify, consolidate the item-pool statement, stand up CI, file the residual register | re-opening any merged phase's fixes |
 | D6.7 | the doubled-sign residual on 14 templates, **behind a shared emission helper** | any other emission cleanup |
 | D6.8 | an answer-span **shape** assertion | rewriting spans |
-| D6.9–D6.10 | *decide and record* — a mixed `AnswerSpec`, and the 8 undecidable `symbolic` templates | forcing either binding green |
+| D6.9–D6.10 | **attempt the fix** — a mixed `AnswerSpec`, and the 8 undecidable `symbolic` templates; record as unfixed only with the measurement that proves it | forcing either binding green, or weakening the comparator to raise a rate |
 | D6.11 | per-item and per-part unit declarations | a second unit scheme — C1.4 already built one |
 | **D6.12** (new) | rebuild the testset generator — seeded, uniform, all five branches — and regenerate **after** D6.7/D6.11 land | running inference or evaluation; those follow this phase |
 
@@ -136,6 +173,14 @@ harness exists, **D6.1 is a build task, not a re-run task, and its effort estima
 say so in a decision rather than hand-reproducing 150 rows of judgement and calling it a
 re-audit. A reproduction whose method differs from the original cannot support "no template
 regressed in class", because a class change and a method change are indistinguishable in it.
+
+**Owner decision: best effort, time-boxed.** Look for the production method. If you find it, use
+it. If you do not, **document that in two or three sentences, state the method you used instead,
+and move on** — do not spend the phase on archaeology. One thing must carry forward from this
+either way: if the method is new, **Reviewer F's gate has to be scoped to what is answerable** —
+*"is this method sound, and does it classify the unchanged templates as the old one did?"* rather
+than *"does it replicate the original?"*. Commissioning a replication of an unrecoverable method
+produces a review that cannot file, which is what R6 exists to prevent.
 
 ### Corpus baseline at `444b8bf`
 
@@ -286,8 +331,9 @@ Those 20 modules hold **exactly 90 template functions** — which is precisely t
 *"1,350 items = 90 templates × 15 seeds"*. **Civil and industrial were never in the published
 testset.** They were authored later and have no generator at all. So "regenerate the testset"
 over 150 templates is a **67% scope expansion into two branches the published results have never
-covered**, not a like-for-like rebuild. That is a scoping decision with paper consequences and it
-belongs to the repo owner — surface it before building anything.
+covered**, not a like-for-like rebuild. **The owner has decided to include them**: the new pool is
+150 templates × 15 instances = **2,250 items**, against a published 1,350. The generator for
+civil and industrial therefore has to be built, not merely re-run.
 
 **2. `regenerate_testset.py` is gitignored and absent.** `.gitignore` line 39 lists it, along
 with `template_loader.py`, `verify_fixes.py`, `locate_fixed_templates.py` and
@@ -317,8 +363,9 @@ replaces, and no later phase can diff against it.
 and `magnetostatics`. Total emitted: **5,615 records**, against a published pool of 1,350 — so
 **the committed generators are not what produced the published testset**. The per-template
 imbalance is 3 to 200, giving `mole_balances` 1,000 records and `magnetostatics` 3. Any aggregate
-over that set is dominated by two modules. **Choose one instances-per-template figure, state it,
-and apply it uniformly** — or state the stratification deliberately.
+over that set is dominated by two modules. **Settled: 15 instances per template, uniformly, all
+150 templates.** That matches the published pool's per-template depth and removes the 3-to-200
+imbalance entirely.
 
 **5. Build it on `discover()`, not on 22 new `main()` blocks.**
 [`tests/template_integrity/core.py:53`](../../tests/template_integrity/core.py#L53) already
@@ -454,15 +501,17 @@ the gate exactly as a CONFIRMED finding does.
 - [ ] D6.7 doubled sign cleared on 14 templates, **behind a promoted shared helper with
       planted-defect tests**
 - [ ] D6.8 answer-span shape assertion, its bound **re-measured** rather than inherited
-- [ ] D6.9 and D6.10 **decided and recorded**, not forced green
+- [ ] D6.9 and D6.10 **attempted**; fixed with measured before/after, or recorded as infeasible
+      with the measurement proving it. **Zero false accepts preserved either way** — a comparator
+      that decides more by deciding wrongly is worse than one that abstains
+- [ ] The seven Track B rows deleted, R-410A from **both** its tables, with the P6 measurement
 - [ ] D6.11 per-item and per-part units, importing C1.4's vocabulary, predicate published
 - [ ] **D6.12 testset generator rebuilt on `discover()`** — seeded reproducibly end to end, one
       stated instances-per-template figure applied uniformly, all five branches; the same seed
       reproduces the same set, **demonstrated by two runs diffed**
 - [ ] **D6.12 regenerated after D6.7 and D6.11 merged**, not before; item count and composition
       stated against the published 1,350
-- [ ] The civil/industrial scope expansion (90 → 150 templates) **put to the repo owner as a
-      decision**, not assumed
+- [ ] Pool is **2,250 items = 150 templates × 15 instances**, uniform, all five branches
 - [ ] T1–T8, contract scan, `derive_bindings`, `cross_pair`, `score`, `audit_3_8` — no
       regression, **measured**; **T6 baseline not regenerated**
 - [ ] T6's 142 given a decision with an owner, not carried forward again
@@ -476,10 +525,11 @@ the gate exactly as a CONFIRMED finding does.
   finding and a `SPEC-CHANGE`.
 - **Do not re-open a merged phase's fixes.** If one is wrong, that is a finding for the register
   and a decision, not a silent revert.
-- **Do not replace a substance, material or fluid on your own authority**, and do not action
-  Track B's §3 defects (Tungsten Hexafluoride, Tellurium Mercury, R-410A, the
-  Tetrabromoethane/Acetylene Tetrabromide duplicate, Cork/Cork Board/Bamboo). Each moves the
-  item pool and each is the repo owner's call. **Carry them into D6.6 with their evidence.**
+- **Do not replace a substance, material or fluid on your own authority.** The seven deletions in
+  §"Track B — the seven deletions" are owner-directed and are the *only* substance changes
+  authorised. A **replacement** — substituting a different substance for one of them — is not
+  authorised, and was refused during C3 for good reasons: R-22 for R-410A would change the row's
+  values by +9.78% / −33.21% *and* duplicate a fluid already in the table.
 - **P6 is a real constraint.** D6.7 changes emitted text on 14 templates: that is a P6 event and
   needs a two-worktree, two-process measurement like every one before it.
 - **Where you are uncertain, say so and name the evidence that would settle it.**
@@ -503,8 +553,10 @@ the gate exactly as a CONFIRMED finding does.
 - **The stale annotation fork** — `templates_annotation/annotation_app/.../constants.py` holds
   pre-C3 chemical values (R-12 `v_g 0.0268`, R-22 `v_f 0.000845`). **Deliberately not synced**,
   because that directory backs the annotation pilot and a frozen snapshot may be intentional so
-  annotations stay reproducible against what annotators saw. **A decision, not a bug** — but if
-  D6.4 claims a corpus-wide constant state, this fork is a counterexample and must be named.
+  annotations stay reproducible against what annotators saw. **Owner decision: leave it. Do not
+  sync it.** It is out of scope for this phase. Name it in one line in D6.6 — because D6.4
+  otherwise claims a corpus-wide constant state that this directory contradicts — and do nothing
+  else with it.
 - **G F-5** (`@domain: none` vocabulary) and **G F-7** (NAVFAC manuals cited by zero tags).
 - **`CP_PARAMS` origin vs verification** (Reviewer G, G-7) — unfixable without a citable
   Smith–Van Ness copy; recorded, not closed.
