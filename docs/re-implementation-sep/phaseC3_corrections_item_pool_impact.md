@@ -161,3 +161,60 @@ The consumer-domain ratchet moved **2 excursions / 2 registered → 1 / 1**. It 
 both directions — a listed excursion that no longer occurs is a failure — so it was the
 suite, after the fix, that said to remove the `CP_PARAMS` line from `domain_findings.txt`.
 The removal followed the evidence rather than accompanying the change.
+
+---
+
+# Tranche 3 — a correction that moved nothing, and why that is a result
+
+**P6 event: NO.** `before` is **8c90537**; `after` is the working tree.
+Totals: `{'q': 0, 'ans': 0, 'sol': 0, 'err_before': 0, 'err_after': 0}` — **0 templates
+moved**.
+
+`MATERIAL_DENSITIES['Tungsten']` 19600 → 19300 is a real correction: five independent
+PubChem entries print 19.3 g/cm³ (CAMEO, ILO-WHO, OSHA, PAC @25 °C, NIOSH) and the
+committed value was +1.55% against every one of them. Its tag had said "no source on disk
+for this material", which the acquisition had made false.
+
+**A value was wrong, and correcting it changed no item. Those are two different facts**,
+and collapsing them would misreport either the defect or the impact. The dump is the
+evidence; the reason is in the code:
+
+- `template_floating_object_submersion_depth` draws from `MATERIAL_DENSITIES` and then
+  **rejects any draw that does not float**, re-drawing up to 20 times. At 19300 kg/m³
+  tungsten sinks in every fluid in the table, so it is drawn and always discarded; the
+  fallback hard-names "Pine Wood".
+- `template_basic_buoyant_force` uses its material as a **word in the prose** ("A solid
+  tungsten cylinder…") and computes from `FLUID_DENSITIES`. The name can be emitted while
+  the density never is.
+
+A null result is reported here with its mechanism rather than as a bare zero, because
+"nothing moved" and "nothing was wrong" look identical in a totals line and are not.
+
+**A claim made earlier in this work and withdrawn:** that `OBJECT_MATERIALS` does not
+contain tungsten. It does — it is the last entry. The reason tungsten's density is
+unreachable is the float rejection and the prose-only use, not absence from that list.
+
+## The 20 tags that moved nothing
+
+19 fuel/oil rows and the aluminium row are comment-only and appear nowhere in the diff.
+Nonane, decane and dodecane were acquired to **re-point** those rows, and reading them
+settled that plan against itself: at 293.15 K they are 718.03, 730.41 and 749.44 kg/m³
+against Kerosene 810, Diesel 850, SAE 30 917. Pointing kerosene at decane would move it
+810 → 730 — an 11% error — because a real cut carries aromatics and cycloalkanes a pure
+n-alkane does not. **Sourcing a row must not change what the row names.** The tags now
+carry the measured bracket and record that the search was made.
+
+Gasoline (726) lands *inside* that span, and its tag says at length that this is
+coincidence and not support: a petrol cut is C4–C12 with most of its mass in C5–C8,
+lighter than every alkane in the bracket.
+
+**Aluminium is deliberately not corrected.** The row holds 2710 and names no alloy;
+PubChem prints 2.7 (pure, 2700), MIL-HDBK-5J prints 2713 for 6061 and 2768 for 2024.
+Replacing 2710 with the pure-metal figure would be choosing which aluminium the row means
+and calling it sourcing.
+
+## Regression
+
+Unchanged on every gate: T1 29, T2 0, T4 0, T5 66, T7 83, T8 0, T6 142, contract scan
+150/150, `cross_pair` PASS, `audit_3_8` 80/80, resolver 224 resolved of 485 tags with
+0 LEGACY, plausibility 72 checks.
