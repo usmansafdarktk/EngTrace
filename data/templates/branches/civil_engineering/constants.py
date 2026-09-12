@@ -33,20 +33,24 @@ GRAVITY_M_S2 = 9.81                  # standard gravity, m/s^2
 GRAVITY_FT_S2 = 32.2                 # standard gravity, ft/s^2
 # @kind: property
 # @units: kN/m^3
-# @domain: T=288.15..293.15 K, p=101.325 kPa
-# [KNOWN-DEFECTIVE] at the ~15-20 C this line claims, gamma_w = rho*g_n = 9.7891 kN/m^3
-#   (998.21 kg/m^3 at 293.15 K from nist_fluid_properties/water_C7732185_isobar_1atm.tsv,
-#   g_n = 9.80665), i.e. 9.79 at 3 s.f. The literal 9.81 is +0.21% and implies
-#   rho = 1000.3 kg/m^3 - water near 4 C, not at 15-20 C. Its consumers are C3.5.
-UNIT_WEIGHT_WATER_KN_M3 = 9.81       # gamma_w at ~15-20 C, kN/m^3
+# @domain: none (a convention, not a measurement at a temperature)
+# [ON-DISK:LOCAL-ONLY] pilot/references/public/full_books_civil_engineering/Das, Sobhan — Principles of Geotechnical Engineering.pdf @ page=92 text="62.4 lb/ft"
+#   Das states the trio outright - "unit weight of water is equal to 9.81 kN/m3 or
+#   62.4 lb/ft3 or 1000 kgf/m3" - on the page before the Table 3.1 this file already
+#   cites for DAS_NATURAL_STATE_SOILS. So 9.81 is rho = 1000 kg/m^3 exactly times g_n,
+#   the convention this branch's soil tables are built with, and not a measurement.
+#   C3.7 tagged it as a measured defect against NIST's 998.21 kg/m^3 at 293.15 K and wrote
+#   that 9.81 "implies rho = 1000.3 kg/m^3 - water near 4 C". That is impossible: liquid
+#   water at 1 atm peaks at 999.975 kg/m^3, at 3.98 C. Corrected after Reviewer H
+#   (civil) F-1; phaseC3_residual_register.md carried the same claim and is corrected too.
+UNIT_WEIGHT_WATER_KN_M3 = 9.81       # gamma_w, kN/m^3 (rho = 1000 kg/m^3 convention)
 # @kind: property
 # @units: lbf/ft^3
-# @domain: T=288.15..293.15 K, p=101.325 kPa
-# [KNOWN-DEFECTIVE] the same defect in US units: at 293.15 K rho = 62.316 lb/ft^3
-#   (998.21 / 16.01846, the SP 811 p.66 factor "1.601 846 E+01"), and under standard gravity a
-#   unit weight in lbf/ft^3 is numerically that density. The literal 62.4 is +0.13% and
-#   implies rho = 999.6 kg/m^3. Not a rounding: 3 s.f. of the artefact is 62.3.
-UNIT_WEIGHT_WATER_PCF = 62.4         # gamma_w, lb/ft^3
+# @domain: none (a convention, not a measurement at a temperature)
+# [ON-DISK:LOCAL-ONLY] pilot/references/public/full_books_civil_engineering/Das, Sobhan — Principles of Geotechnical Engineering.pdf @ page=92 text="62.4 lb/ft"
+#   The same sentence's US-customary member. 62.4 lbf/ft^3 is rho = 1000 kg/m^3 in
+#   lb/ft^3 (999.55 by the SP 811 factor, 62.428 the other way), not water at 20 C.
+UNIT_WEIGHT_WATER_PCF = 62.4         # gamma_w, lb/ft^3 (rho = 1000 kg/m^3 convention)
 # @kind: property
 # @units: kg/m^3
 # @domain: T=293.15 K, p=101.325 kPa

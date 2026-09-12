@@ -75,11 +75,68 @@ def _wave_parameters_basic(loc, cmod):
     return {'wavelength': cmod.C0 / f * 1e6} if f else {}
 
 
+def _sensible_heat_cp(loc, cmod):
+    """Both ends of the interval the Cp polynomial is integrated over, in K.
+
+    BOTH are domain keys. The first version reported the top as `T` and the bottom as
+    `T_min`, which the domain did not name - so a draw starting at 281.67 K, 16 K below
+    the fit's declared floor, was printed in the suite's own output and passed. A probe
+    that reports a value it does not check is worse than no probe.
+    """
+    t1, t2 = loc.get('T1'), loc.get('T2')
+    if t1 is None or t2 is None:
+        return {}
+    return {'T_lo': min(t1, t2), 'T_hi': max(t1, t2)}
+
+
+def _flame_temperature(loc, cmod):
+    """The adiabatic flame temperature the template solves for, in K."""
+    t = loc.get('adiabatic_temp_kelvin')
+    return {'T': float(t)} if t else {}
+
+
+def _formation_reference(loc, cmod):
+    """The reference temperature the enthalpy balance is taken at, in K."""
+    t = loc.get('T_initial')
+    return {'T': float(t)} if t else {}
+
+
+def _subgroup_n(loc, cmod):
+    """The subgroup size the chart factors are looked up at."""
+    n = loc.get('n')
+    return {'n': float(n)} if n else {}
+
+
+def _scs_ia_ratio(loc, cmod):
+    """Ia/S, the initial-abstraction ratio the runoff equation assumes.
+
+    The template computes Ia = round(0.2 * S, 3), so the recovered ratio carries that
+    rounding (0.20006 on one seed). It is reported at 2 dp - the precision the template
+    prints Ia to - which is what a declared point domain of 0.2 can be checked against.
+    """
+    ia, s = loc.get('Ia'), loc.get('S')
+    return {'Ia_ratio': round(ia / s, 2)} if ia and s else {}
+
+
 PROBES = {
     ('electrical_engineering', 'MEDIA_VELOCITIES', 'template_wave_parameters_basic'): _wave_parameters_basic,
+    ('chemical_engineering', 'CP_PARAMS', 'template_sensible_heat_temp_dependent_cp'): _sensible_heat_cp,
+    ('chemical_engineering', 'CP_PARAMS_COMBUSTION', 'template_adiabatic_flame_temperature'): _flame_temperature,
+    ('chemical_engineering', 'HEATS_OF_FORMATION', 'template_adiabatic_flame_temperature'): _formation_reference,
+    ('industrial_engineering', 'CONTROL_CHART_FACTORS', 'template_xbar_r_control_limits'): _subgroup_n,
+    ('industrial_engineering', 'CONTROL_CHART_FACTORS', 'template_cp_cpk_from_specs'): _subgroup_n,
+    ('industrial_engineering', 'CONTROL_CHART_FACTORS', 'template_chart_pair_selection'): _subgroup_n,
+    ('civil_engineering', 'SCS_CURVE_NUMBERS', 'template_scs_curve_number_runoff'): _scs_ia_ratio,
 }
 
 _TEMPERATURE = r'temperature|°C|\bdeg(?:rees)? ?C\b|kelvin|\d ?K\b'
+# MIL-STD-105E's tables are general inspection level II, single sampling, normal
+# inspection. A consumer naming any ALTERNATIVE plan would be outside that domain.
+_MIL_ALTERNATIVE = (r'tightened|reduced inspection|double sampling|multiple sampling'
+                    r'|[Ll]evel I\b|[Ll]evel III')
+# A temperature that is NOT the 298.15 K reference of the heats of formation: three
+# digits starting 3-9, or four digits; or any sign of a Cp integration.
+_OTHER_TEMPERATURE = r'heat capacit|\bCp\b|integrat|\b(?:[3-9]\d{2}|\d{4})(?:\.\d+)? ?K\b'
 IMPLICIT = {
     ('mechanical_engineering', 'FLUID_DENSITIES', tid): (
         _TEMPERATURE, 'states no fluid temperature, so the density is the table\'s 20 °C value; '
@@ -87,6 +144,37 @@ IMPLICIT = {
     for tid in ('template_hydrostatic_pressure_at_depth', 'template_basic_buoyant_force',
                 'template_floating_object_submersion_depth', 'template_hydrostatic_force_on_plane')
 }
+
+
+# C3 review, Reviewer G F-1: 28 declared domains were UNMEASURED. Fifteen of them are
+# consumers that state no such condition; each claim's pattern was verified NOT to match
+# the consumer's source before being written here.
+IMPLICIT.update({
+    (b, t, tid): (_TEMPERATURE,
+                  "states no fluid temperature, so the property is the table's 20 degC "
+                  "value; p is not asserted (the template computes pressures)")
+    for b, t, tids in (
+        ('chemical_engineering', 'COMMON_LIQUIDS',
+         ('template_falling_film_max_velocity', 'template_hagen_poiseuille_flowrate',
+          'template_annulus_flowrate', 'template_newtons_law_shear_stress',
+          'template_kinematic_viscosity', 'template_reynolds_number_flow_regime')),
+        ('chemical_engineering', 'COMMON_GASES',
+         ('template_kinematic_viscosity', 'template_reynolds_number_flow_regime')),
+    )
+    for tid in tids
+})
+IMPLICIT.update({
+    ('industrial_engineering', t, tid): (
+        _MIL_ALTERNATIVE, 'uses only general inspection level II and the single-normal '
+                          'master table; no alternative plan is named in its source')
+    for t in ('MIL_STD_105E_CODE_LETTERS_GII', 'MIL_STD_105E_SAMPLE_SIZE',
+              'MIL_STD_105E_SINGLE_NORMAL_AC')
+    for tid in ('template_single_sampling_oc_point', 'template_aoq_ati_rectifying')
+})
+IMPLICIT[('chemical_engineering', 'HEATS_OF_FORMATION',
+          'template_heat_of_reaction_formation')] = (
+    _OTHER_TEMPERATURE, 'takes the enthalpy balance at the 298.15 K reference of the heats '
+                        'of formation themselves and introduces no other temperature')
 
 
 def evaluate(branch, table, domain, fns, cmod, seeds=SEEDS, probes=PROBES, implicit=IMPLICIT):

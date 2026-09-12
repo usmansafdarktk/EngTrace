@@ -652,7 +652,7 @@ REACTIONS = [
 # finding F-2; DECISIONS D-032).
 # @kind: property
 # @units: A=1, B=1/K, C=1/K^2, D=K^2
-# @domain: T=298..1500 K
+# @domain: T_lo=298..1500 K, T_hi=298..1500 K
 #   The per-row ceiling is CP_VALID_T_MAX below; 1500 K is the common case and the
 #   widest this polynomial is fitted for.
 CP_PARAMS = {
