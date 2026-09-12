@@ -119,11 +119,45 @@ found claims that its own artefacts do not carry.
 | D6.11 | per-item and per-part unit declarations | a second unit scheme — C1.4 already built one |
 | **D6.12** (new) | rebuild the testset generator — seeded, uniform, all five branches — and regenerate **after** D6.7/D6.11 land | running inference or evaluation; those follow this phase |
 
-**D6.9 and D6.10 are decisions, not fixes.** Both are measured dead ends: the mixed-spec
-templates produce 544 and 1,650 false accepts in 2,450 pairs from *whole-span cross-pairing
-working correctly*, and masking function names in `_to_sympy` moved the symbolic decided rate
-by exactly nothing — 11.1% before and after. Re-attempting the known-failed fix is the failure
-mode here. Record what it would take and move on.
+**D6.9 is FIXED. D6.10 is still under investigation.**
+
+**D6.9 — done, and the spec's own framing of it was misleading.** The spec cites 544 and 1,650
+false accepts in 2,450 pairs. Those numbers are real and were reproduced exactly with the repo's
+`validate()` — but they describe a **label-only binding that was never shipped**. The shipped
+baseline was already **0 false accepts**: `reynolds_number_flow_regime` was bound `numeric` and
+flagged `partial`, and `damping_classification` was unbound entirely. **Do not report this fix as
+"544 → 0"** — that claims a repair for a defect the corpus never had.
+
+The real defect was narrower and worse: *right number, wrong class was credited*. The fix is a
+`composite` binding built **from the existing six kinds** (`numeric` + `categorical` parts) — no
+comparator was modified. What was missing was binding-level plumbing: `compare_template` could
+only build `numeric_parts(n)`. Note `damping_classification` could never have used `multipart`,
+because it emits **1 or 2 quantities depending on regime** ({1: 33, 2: 17} over 50 instances), so
+a fixed `n` cannot express it — which is why `derive_kind` refused it.
+
+| measured | before | after |
+|---|---|---|
+| `BINDINGS` / `UNBOUND` | 120 / 30 | **121 / 29**, no other template moved |
+| false accepts, false rejects (gold×gold) | 0 / 0 | **0 / 0**, GATE PASS |
+| wrong-class cases caught (hand-built, number held byte-identical) | **0 of 4** | **4 of 4** |
+| archive decided rate | 69.6% | 69.4% |
+| `score` | — | **byte-identical** |
+
+**The cost is stated because it is real:** on `reynolds` 4 traces moved from MISMATCH to
+UNRESOLVED — **no correct answer lost credit** (MATCH unchanged at 10). The wrong-class evidence
+is *hand-built and must be labelled as such*: whole-span cross-pairing cannot construct it,
+because every negative it manufactures pairs two golds, which differ in the number as well as the
+class.
+
+**Two items D6.9 leaves open.** The `derive_bindings` **drift check was never completed** — treat
+it as unverified, not green. And `template_critical_depth_froude_classification` carries the
+**identical `partial` flag and the same defect shape**, untouched. Same fix, one more template;
+decide whether it is in scope.
+
+**D6.10 remains the one to be careful with.** Masking function names in `_to_sympy` moved the
+symbolic decided rate by exactly nothing — 11.1% before and after. Re-attempting that known-failed
+fix is the failure mode. Zero false accepts is the invariant: a comparator that decides more by
+deciding wrongly is worse than one that abstains.
 
 ## Read these first, in this order
 
