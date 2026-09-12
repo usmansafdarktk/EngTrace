@@ -154,10 +154,53 @@ it as unverified, not green. And `template_critical_depth_froude_classification`
 **identical `partial` flag and the same defect shape**, untouched. Same fix, one more template;
 decide whether it is in scope.
 
-**D6.10 remains the one to be careful with.** Masking function names in `_to_sympy` moved the
-symbolic decided rate by exactly nothing — 11.1% before and after. Re-attempting that known-failed
-fix is the failure mode. Zero false accepts is the invariant: a comparator that decides more by
-deciding wrongly is worse than one that abstains.
+**D6.10 — 5 of the 8 fixed, and the spec's diagnosis of it was wrong.**
+
+The recorded cause is *"masking the function names in `_to_sympy` changed the decided rate by
+nothing — 11.1% before and after"*. That measurement is correct and was **re-run rather than
+re-attempted blindly**: 11.1% before, 11.1% after, per template identical. But the inference drawn
+from it was wrong. The defect was never that function names are special. **`_to_sympy` inserted
+`*` between every adjacent letter pair**, shattering every multi-letter token — `deg` → `d*e*g`,
+`pi` → `p*i`, `1.71e-03` → `1.71*e-03`, and `sinc^2(2f)` into a *different expression*. Masking
+`cos` could not help, because `cos` was never the problem. The fix splits a letter run only when
+it is not a known token, preserving `xy → x*y` for the polynomial fragment.
+
+| measured (N=50, 2,450 ordered pairs per template) | before | after |
+|---|---|---|
+| symbolic decided rate, 9 templates | 11.1% | **66.7%** |
+| symbolic `answer_type` bound | 1/9 | **6/9** |
+| total `BINDINGS` | 121 | **126** |
+| false accepts, 22,050 pairs | 0 | **0** |
+
+Five go 0.0% → 100.0%: `cd_dc_system_analysis`, `phasor_addition`,
+`undamped_response_initial_conditions`, `ft_esd_rect_pulse`, `ber_estimation_mary`.
+
+**A remedy this brief suggested would have caused a false accept.** "Strip a trailing unit word
+before parsing" — measured over 50 seeds, `continuous_to_discrete_conversion` writes `rad` on 20
+instances and `deg` on 30, and `bpsk_energy_basis` writes `Hz` on 12 and `kHz` on 38. Stripping
+**fuses two different answers**. Unit words are declared **opaque symbols** instead, so `deg ≠ rad`
+and the pair is a correct MISMATCH. A comparator that decides more by deciding wrongly is worse
+than one that abstains, and that is the direction a plausible-sounding fix was about to take it.
+
+**Two of the three remaining are NOT parser problems.** `standing_wave_formation` and
+`continuous_to_discrete_conversion` now decide **2,450/2,450 with 0 identity failures and 0 false
+accepts** on their expression halves. They have 3 and 2 assertions against a binding with one —
+they need a **composite `AnswerSpec`**, which is exactly the D6.9 machinery that landed in this
+same tree. Only `bpsk_energy_basis` is a true isolation-takes-prose case: `b) The basis function
+(psi_1(t)) is …` carries no relation token at all.
+
+**A defect this exposed, reported rather than shipped quietly.**
+`decimation_aliasing_analysis` — not one of the eight — goes from 2 to **34 false accepts**. All 34
+were diagnosed: every one has *identical* isolated expressions on both sides and **zero** are
+comparator over-acceptance. It is a **binding narrower than its answer** (Reviewer E, E-10),
+comparing only `omega_a` while ignoring the output signal and the aliasing verdict. It was masked
+while the binding decided nothing, and it remains UNBOUND before and after — only its reason
+becomes truer. Same composite treatment; decide whether it is in scope.
+
+**Landing D6.10 requires `derive_bindings --regenerate`.** Until the tables are regenerated they
+still list all eight as unbound, so `cross_pair` does not exercise the five newly-deciding
+templates. Both agents deliberately left that regeneration undone rather than clobber each
+other's uncommitted work in the same file.
 
 ## Read these first, in this order
 
