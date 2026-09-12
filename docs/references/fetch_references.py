@@ -94,6 +94,13 @@ NIST_FLUIDS = {
     "C75718": "R12", "C75456": "R22", "C306832": "R123", "C811972": "R134a",
     "C71432": "Benzene", "C108883": "Toluene", "C7446095": "Sulfur dioxide",
     "C7783064": "Hydrogen sulfide", "C2551624": "Sulfur hexafluoride",
+    # Added after the C3 review: the fuel and oil rows of FLUID_DENSITIES and
+    # PIPE_FLUIDS named products with no single composition (kerosene, diesel,
+    # jet fuel, SAE grades). These three ARE in the NIST fluid database and are
+    # the hydrocarbons those rows can honestly be re-pointed at. CAS numbers read
+    # off the WebBook name search: nonane 111-84-2, decane 124-18-5,
+    # dodecane 112-40-3.
+    "C111842": "Nonane", "C124185": "Decane", "C112403": "Dodecane",
 }
 
 #: Saturation states the constants tables STATE at a temperature. An unbounded
@@ -383,6 +390,16 @@ def _content_ok(kind, data, must_contain=None):
             return False, "served an HTML page instead of text"
         if must_contain and must_contain.lower() not in data.decode("utf-8", "replace").lower():
             return False, f"does not contain {must_contain!r}"
+    if kind == "json":
+        # Without this a JSON source is judged only by its length, and PubChem
+        # answers a bad request with a JSON *fault* object that is comfortably
+        # over the size floor. So it must parse AND name what was asked for.
+        try:
+            json.loads(data.decode("utf-8"))
+        except (UnicodeDecodeError, ValueError) as exc:
+            return False, f"not JSON ({exc})"
+        if must_contain and must_contain not in data.decode("utf-8", "replace"):
+            return False, f"JSON does not contain {must_contain!r}"
     if kind == "html":
         # An HTML page is exactly what a redirect to a home page also is, so the
         # title must name the page that was asked for.
@@ -866,6 +883,96 @@ def fetch_webbook_species(manifest):
             _record(manifest, base)
 
 
+#: Substances whose density no on-disk artefact carries: NIST's fluid database
+#: does not list them (checked against its own 74-fluid index) and the WebBook
+#: species pages hold no liquid density. PubChem does, with a temperature and a
+#: reference. The CID is resolved from the NAME by PubChem itself and recorded,
+#: so a wrong CID is a fetch failure rather than a silent wrong substance.
+PUBCHEM_DENSITY = {
+    "ethanol": "FLUID_DENSITIES, PIPE_FLUIDS: Ethanol",
+    "acetone": "FLUID_DENSITIES, PIPE_FLUIDS: Acetone",
+    "2-propanol": "FLUID_DENSITIES, PIPE_FLUIDS: Isopropyl alcohol",
+    "glycerol": "FLUID_DENSITIES, MANOMETER_FLUIDS: Glycerin",
+    "ethylene glycol": "FLUID_DENSITIES, PIPE_FLUIDS: Ethylene glycol",
+    "carbon tetrachloride": "FLUID_DENSITIES, MANOMETER_FLUIDS: Carbon tetrachloride",
+    "chloroform": "FLUID_DENSITIES, MANOMETER_FLUIDS: Chloroform",
+    "bromine": "FLUID_DENSITIES, MANOMETER_FLUIDS: Bromine",
+    "mercury": "FLUID_DENSITIES, MANOMETER_FLUIDS, MATERIAL_DENSITIES: Mercury",
+    "p-xylene": "FLUID_DENSITIES: Xylene",
+    "diiodomethane": "MANOMETER_FLUIDS: Diiodomethane",
+    "gallium": "MANOMETER_FLUIDS, MATERIAL_DENSITIES: Gallium",
+    "tin": "MANOMETER_FLUIDS, MATERIAL_DENSITIES: Tin",
+    "zinc": "MANOMETER_FLUIDS, MATERIAL_DENSITIES: Zinc",
+    "copper": "MATERIAL_DENSITIES: Copper",
+    "gold": "MATERIAL_DENSITIES: Gold",
+    "silver": "MATERIAL_DENSITIES: Silver",
+    "lead": "MATERIAL_DENSITIES: Lead",
+    "nickel": "MATERIAL_DENSITIES: Nickel",
+    "platinum": "MATERIAL_DENSITIES: Platinum",
+    "tungsten": "MATERIAL_DENSITIES: Tungsten",
+    "titanium": "MATERIAL_DENSITIES: Titanium",
+    "aluminum": "MATERIAL_DENSITIES: Aluminum",
+    "osmium": "MATERIAL_DENSITIES: Osmium",
+    "uranium": "MATERIAL_DENSITIES: Uranium",
+    "graphite": "MATERIAL_DENSITIES: Graphite",
+}
+
+PUBCHEM_NAME_URL = ("https://pubchem.ncbi.nlm.nih.gov/rest/pug/compound/name/"
+                    "{name}/cids/JSON")
+PUBCHEM_VIEW_URL = ("https://pubchem.ncbi.nlm.nih.gov/rest/pug_view/data/compound/"
+                    "{cid}/JSON?heading=Density")
+
+
+def fetch_pubchem_density(manifest):
+    """One JSON per substance: PubChem's Density section, with its references.
+
+    PubChem is an AGGREGATOR - its density entries cite CRC, Merck and USCG - so a
+    citation to it is weaker than a primary source and stronger than an untagged
+    value. The tags say so. The CID is resolved from the name by PubChem and
+    recorded in the manifest entry, so the substance a file describes is never a
+    guess (the same rule WEBBOOK_SPECIES follows for its CAS numbers).
+    """
+    for name, grounds in PUBCHEM_DENSITY.items():
+        slug = re.sub(r"[^a-z0-9]+", "_", name.lower()).strip("_")
+        rel = f"pubchem/{slug}_density.json"
+        eid = f"pubchem:{slug}:density"
+        base = dict(id=eid, group="pubchem", dest=rel, kind="json",
+                    licence="US Government work (NIH/NLM PubChem); entries cite "
+                            "third-party primaries (CRC, Merck) named in each record",
+                    grounds=[grounds], species=name)
+        p = os.path.join(HERE, rel)
+        if os.path.exists(p):
+            with open(p, "rb") as fh:
+                ok_disk, why_disk = _content_ok("json", fh.read())
+            if ok_disk:
+                base.update(status="present", bytes=os.path.getsize(p), sha256=_hash(p),
+                            url=base.get("url", ""))
+                _record(manifest, base)
+                continue
+        try:
+            _, _, cid_data = _get(PUBCHEM_NAME_URL.format(
+                name=urllib.parse.quote(name)), timeout=60)
+            cid = json.loads(cid_data.decode())["IdentifierList"]["CID"][0]
+        except Exception as exc:                                   # noqa: BLE001
+            base.update(status="failed", reason=f"name -> CID: {type(exc).__name__}: {exc}")
+            _record(manifest, base)
+            continue
+        url = PUBCHEM_VIEW_URL.format(cid=cid)
+        try:
+            _, _, data = _get(url, timeout=90)
+            ok, why = _content_ok("json", data, must_contain=str(cid))
+        except (urllib.error.URLError, TimeoutError, OSError) as exc:
+            ok, why = False, f"{type(exc).__name__}: {exc}"
+        time.sleep(NIST_DELAY_S)
+        if ok:
+            path = _write(rel, data)
+            base.update(status="acquired", via=why, url=url, cid=cid,
+                        bytes=len(data), sha256=_hash(path), retrieved_utc=_now())
+        else:
+            base.update(status="failed", reason=why, url=url, cid=cid)
+        _record(manifest, base)
+
+
 def fetch_janaf(manifest, max_id=90):
     for sym, name in JANAF_ELEMENTS.items():
         rel = f"nist_janaf/{sym}_ref.txt"
@@ -963,7 +1070,8 @@ def verify(manifest):
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--only", default="", help="group: constants, transport, materials, optics, "
-                                              "civil, industrial, nist_fluid, webbook, janaf")
+                                              "civil, industrial, nist_fluid, webbook, "
+                                              "pubchem, janaf")
     ap.add_argument("--verify", action="store_true")
     ap.add_argument("--list", action="store_true")
     ap.add_argument("--selftest", action="store_true",
@@ -986,6 +1094,7 @@ def main(argv=None):
         print(f"  nist_fluid {len(NIST_FLUIDS)} fluids x 2 tables, plus "
               f"{sum(len(v) for v in NIST_SATURATION_POINTS.values())} targeted saturation rows")
         print(f"  webbook    {len(WEBBOOK_SPECIES)} species x 2 pages")
+        print(f"  pubchem    {len(PUBCHEM_DENSITY)} substances x Density section")
         print(f"  janaf      {len(JANAF_ELEMENTS)} elements")
         return 0
 
@@ -998,6 +1107,8 @@ def main(argv=None):
         fetch_nist_saturation_points(manifest)
     if not only or only == "webbook":
         fetch_webbook_species(manifest)
+    if not only or only == "pubchem":
+        fetch_pubchem_density(manifest)
     if not only or only == "janaf":
         fetch_janaf(manifest)
     list_local_only(manifest)

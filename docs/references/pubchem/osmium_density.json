@@ -1,0 +1,84 @@
+{
+  "Record": {
+    "RecordType": "CID",
+    "RecordNumber": 23937,
+    "RecordTitle": "Osmium",
+    "Section": [
+      {
+        "TOCHeading": "Chemical and Physical Properties",
+        "Description": "Various chemical and physical properties that are experimentally determined for this compound.  See also the Safety and Hazard Properties section (if available), which has additional properties pertinent to chemical safety and hazards.",
+        "Section": [
+          {
+            "TOCHeading": "Experimental Properties",
+            "Description": "Various experimentally determined properties for this compound.  See also the Safety and Hazard Properties section (if available), which has additional properties pertinent to chemical safety and hazards.",
+            "Section": [
+              {
+                "TOCHeading": "Density",
+                "Description": "This section provides information on the density (with unit) and specific gravity (without unit) of a compound. Density is mass of a unit volume of a compound and commonly expressed in units of kg/m3 or g/cm3. Specific gravity, also known as relative density, is a unit-less quantity, defined as the ratio of the density of a compound to that of a standard reference material (typically, water at 4 °C for liquids and air at room temperature [20 °C or 68 °F] for gases).",
+                "URL": "https://chem.libretexts.org/Bookshelves/Introductory_Chemistry/Map%3A_Fundamentals_of_General_Organic_and_Biological_Chemistry_(McMurry_et_al.)/01%3A_Matter_and_Measurements/1.12%3A_Density_and_Specific_Gravity",
+                "Information": [
+                  {
+                    "ReferenceNumber": 22,
+                    "Description": "PEER REVIEWED",
+                    "Reference": [
+                      "Lide, DR (ed.). CRC Handbook of Chemistry and Physics. 81st Edition. CRC Press LLC, Boca Raton: FL 2000, p. 4-76"
+                    ],
+                    "ExtendedReference": [
+                      {
+                        "Citation": "Lide, DR (ed.). CRC Handbook of Chemistry and Physics. 81st Edition. CRC Press LLC, Boca Raton: FL 2000, p. 4-76",
+                        "Matched": {
+                          "PCLID": 900022240,
+                          "Citation": "Lide, DR (ed.). CRC Handbook of Chemistry and Physics. 81st Edition. CRC Press LLC, Boca Raton: FL 2000, p. 4-76"
+                        }
+                      }
+                    ],
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "22.59 g/cu cm"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "ReferenceNumber": 29,
+                    "Value": {
+                      "StringWithMarkup": [
+                        {
+                          "String": "22.59 @25 °C"
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "Reference": [
+      {
+        "ReferenceNumber": 22,
+        "SourceName": "Hazardous Substances Data Bank (HSDB)",
+        "SourceID": "7329",
+        "Name": "OSMIUM, ELEMENTAL",
+        "Description": "The Hazardous Substances Data Bank (HSDB) is a toxicology database that focuses on the toxicology of potentially hazardous chemicals. It provides information on human exposure, industrial hygiene, emergency handling procedures, environmental fate, regulatory requirements, nanomaterials, and related areas. The information in HSDB has been assessed by a Scientific Review Panel.",
+        "URL": "https://pubchem.ncbi.nlm.nih.gov/source/hsdb/7329",
+        "LicenseURL": "https://www.nlm.nih.gov/web_policies.html",
+        "IsToxnet": true,
+        "ANID": 4918
+      },
+      {
+        "ReferenceNumber": 29,
+        "SourceName": "PAC Chemical Database, U.S. Department of Energy",
+        "SourceID": "7440-04-2",
+        "Name": "Osmium",
+        "Description": "",
+        "URL": "https://emhub1.energy.gov/pacteel/search#7440-04-2",
+        "LicenseURL": "https://www.energy.gov/web-policies",
+        "ANID": 56700582
+      }
+    ]
+  }
+}
