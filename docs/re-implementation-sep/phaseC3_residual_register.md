@@ -103,14 +103,24 @@ citation problem.
 
 ---
 
-## 2. Unchecked — all 200, by the table that carries them
+## 2. Unchecked — **180**, by the table that carries them
 
-Not known to be wrong; known to be **unchecked**. 28 tables.
+Not known to be wrong; known to be **unchecked**.
 
-The count rose by two, and both are the corrections refusing to overstate themselves:
-`GAS_MOLECULAR_PARAMS` now appears here for Xenon's σ and Ammonia's ε/k (§1). A table that
-gains a residual by declining to write a value it cannot read is in better condition than
-one that quietly writes it.
+**Measured now** (tag-starting lines, per branch): mechanical 152, chemical 12, civil 8,
+electrical 4, industrial 4 — **180**. The per-table breakdown below is the **C3-era
+snapshot** and is kept as the record of what the phase inherited; it no longer sums to the
+current total.
+
+The count moved twice and in both directions, which is worth keeping visible:
+
+- **198 → 200.** `GAS_MOLECULAR_PARAMS` entered this section for Xenon's σ and Ammonia's
+  ε/k (§1). A table that *gains* a residual by declining to write a value it cannot read
+  is in better condition than one that quietly writes it.
+- **200 → 180.** 18 rows were sourced to PubChem and Tungsten was corrected, each moving
+  from `[UNVERIFIED]` to `[ON-DISK]`. A further 24 rows stay here but no longer say "no
+  on-disk source, and none was searched for": the fuel and oil rows carry a measured
+  n-alkane bracket, and the wood rows carry FPL's actual species range (§6 item 3).
 
 | branch.table | n | why |
 |---|---:|---|
@@ -154,6 +164,7 @@ hashed public copy already under `docs/references/` (D-076).
 | `2024-T4` | mechanical | **CLOSED — and this entry was wrong on both counts.** p.374's text layer parses perfectly well; it prints "See Table 3.2.3.0(d)" in all four elastic cells, so there is no value on that page to read and the reader is right to refuse. p.373 (Table 3.2.3.0(b1)) parses cleanly and prints G 4.0 ×10³ ksi in all four columns, and following the deferral finds Table 3.2.3.0(d) on p.376, captioned "…Sheet and Plate, **All Tempers**" — which is what licenses applying it to T4, the question the row's own tag left open. `SHEAR_MODULUS_VALUES['Aluminum 2024-T4']` was 28.0 GPa against 27.58 (+1.5%, outside the 1.25% half-unit bound); corrected to 27.6 and cited to p.373, which is machine-readable where p.376 is not |
 | `Mercury` ΔHvap | chemical | the WebBook phase-change page has no vaporization section |
 | `Cork`, `Cork Board`, `Bamboo` | mechanical | **not wood** — a bark tissue and a grass; the wood reason never applied (H-mech F4) |
+| `Tetrabromoethane` **and** `Acetylene Tetrabromide` | mechanical | **NEW — one substance under two names.** `MANOMETER_FLUIDS` carries both, each at **2960**, and acetylene tetrabromide *is* 1,1,2,2-tetrabromoethane. The identical value is strong evidence the two rows were meant as one substance. Stated with its limit: **no artefact on disk distinguishes them**, and "tetrabromoethane" could in principle name the 1,1,1,2 isomer, so this is a duplicate row to resolve rather than an identification to act on. A template drawing `random.choice` over this table draws the same fluid twice under two labels |
 
 ---
 
@@ -205,7 +216,26 @@ quietly absorbs its corrections is worth no more than the claims it corrected.
    **Answered: re-sourced.** The emitted items then confirmed the argument independently —
    butane's viscosity moved 1.537e-05 → 2.094e-05, and (5.47/4.687)² = 1.362 predicts
    exactly that ratio from the constants alone.
-3. Six mechanical tables carry 172 unchecked rows — acquire sources, or accept.
+3. ~~Six mechanical tables carry 172 unchecked rows — acquire sources, or accept.~~
+   **Partly answered: 172 → 152, and the rest are measured rather than merely unchecked.**
+
+   | what | rows | |
+   |---|---:|---|
+   | sourced to PubChem, cited to one named entry each | **18** | `[UNVERIFIED]` → `[ON-DISK]` |
+   | Tungsten corrected | 1 | 19600 → 19300, five sources at 19.3 |
+   | fuel and oil rows given a measured n-alkane bracket | 19 | still `[UNVERIFIED]`, and now say why |
+   | wood rows given FPL's actual species range | 5 | still `[UNVERIFIED]`, and now say why |
+
+   The remaining 152 are not one decision taken 152 times. They divide into:
+   **mixtures and commercial grades** (SAE oils, crude, gasoline, sea water, antifreeze) —
+   no pure substance *is* the row, and the acquisition proved it: nonane/decane/dodecane
+   bracket 718–749 kg/m³ against Kerosene 810, so re-pointing would change what the row
+   names; **genus-level woods** — FPL indexes by species and the rows name a genus with no
+   moisture condition; **named standards not on disk** — AISC, ASTM, ACI 318-19, ASCE 7-22,
+   IEC 60063, MIL-A-8625, US Standard Atmosphere 1976; and **substance defects** (§3).
+
+   What changed is that "no on-disk source, and none was searched for" has become, for 43
+   of them, a statement of what *was* searched and what it showed.
 4. ~~`COMMON_LIQUIDS`' conditions — fetch a 298.15 K grid and settle §5's open diagnosis.~~
    **Answered: the grid was fetched, and the answer is neither reading offered.**
 
