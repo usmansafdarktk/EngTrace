@@ -48,6 +48,7 @@ if REPO_ROOT not in sys.path:
     sys.path.insert(0, REPO_ROOT)
 
 from tests.template_integrity.core import TemplateRef, discover, generate  # noqa: E402
+from tests.comparators.derive_bindings import unit_token  # noqa: E402
 
 INVENTORY = os.path.join('docs', 're-implementation-sep', 'template_inventory.csv')
 
@@ -97,6 +98,11 @@ def record(ref: TemplateRef, seed: int, question: str, solution: str,
         'area': os.path.basename(ref.file_path)[:-3],
         'id': ref.template_id[len('template_'):],
         'level': level,
+        # D6.11 / SPEC-CHANGE 19: the unit is a property of the ITEM, not the
+        # template. Ten templates vary their unit by seed, so a template-level
+        # declaration cannot express them. unit_token is the SHIPPED predicate
+        # (derive_bindings), so this agrees with DECLARED_UNITS by construction.
+        'unit': unit_token(solution),
         'question': question,
         'solution': solution,
     }
