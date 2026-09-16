@@ -14,15 +14,31 @@ decision rather than a surprise.
 
 **`Class D reduced from 16 to ≤ 4` — measured 16 → 16, and no harness can settle it.**
 
-Two of class D's three defining limbs (`template_audit_report.md:28`) are judgements: *"the
-trace's own chain does not reproduce its own answer"* and *"a search/iteration log with no stable
-symbols"*. A mechanical re-audit can therefore **inherit** D and never **clear** a row out of it.
+**CORRECTED after Reviewer F (see [`phase6_reviewer_f_triage.md`](phase6_reviewer_f_triage.md)).**
+This section originally claimed *two* of class D's three limbs are judgement. That was wrong by
+one. Limb 2 — *"the trace's own chain does not reproduce its own answer"* — is exactly what
+`tests/template_integrity/checks/t1_closure.py` checks, by its own docstring, and it had never been
+applied to the D rows.
+
+**Applied: all 16 class-D rows PASS T1, 0 failures each.** So limb 2 holds none of them, and
+neither does the mechanical `D:no-numeric-content` limb (not one row carries it). The corrected
+statement is therefore **stronger** than the original: *both mechanically decidable limbs clear all
+16 rows, so every one sits in D on inherited judgement alone.*
+
+`classify_restated()` (`regen_inventory.py:498`) also opens `if inherited_class == 'D': return 'D'`
+— structurally incapable of removing a row — so the original `16 → 16` was a tautology of the
+function's design presented as a result. A mechanical re-audit can **inherit** D and never **clear**
+a row out of it.
 
 The restated rule yields A 27 / B 56 / C 51 / D 16 and would move 36 rows — but it is deliberately
 **not** written into `instrumentation_class`, because those moves are dominated by
-`B:instance-branching`, the prose-only limb the harness measured as firing on **34 of 34** rows
-with **zero** hard step or line-count signal. A sampled material name changes the blanked skeleton
-without any governing-equation branch.
+`B:instance-branching`, a prose-only limb. **CORRECTED after Reviewer F:** the figure originally
+quoted here — *"34 of 34 rows with zero hard signal"* — **does not reproduce from either artefact
+and is retracted**. The measured counts are: `--diagnose` reports **37** newly-"yes" rows (37
+prose-only), and the CSV's 36 moves carry **28** B-limb moves of which **26 are prose-only and 2
+fire on a hard step-count signal**. So "zero hard signal" is false; the honest figure is **26 of 28
+(93%)**. A sampled material name changes the blanked skeleton without any governing-equation
+branch, which is the point the wrong number was standing in for.
 
 **Decision needed:** restate the gate as something answerable — *"the rule restated and applied,
 every row still in D named with the limb that holds it"* — or accept that the original figure was
