@@ -400,4 +400,4 @@ tense rather than deleted, for the reason §5 gives: a register that quietly abs
 corrections is worth no more than the claims it corrected. All 19 of §1 are now corrected,
 plus a twentieth found in the process (§3, 2024-T4), and the consequence is measured
 separately in `phaseC3_corrections_item_pool_impact.md`: **13 of 150 templates moved**.
-What remains open is §2's 200 unchecked rows and §6's items 3–7.
+What remains open is §2's 177 unchecked rows and §6's items 3–7.
