@@ -157,5 +157,5 @@ def main(path: str) -> int:
 
 if __name__ == '__main__':
     p = (sys.argv[1] if len(sys.argv) > 1
-         else 'docs/re-implementation-sep/phase3_conformance/traces.json')
+         else 'docs/re-implementation-sep/track-a/phase3_conformance/traces.json')
     raise SystemExit(main(p))

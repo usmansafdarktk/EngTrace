@@ -89,7 +89,7 @@ one 0.1 kJ/mol correction to `NO2(g)`.
 > worse: that gap is 0.43σ against a ±10, and framing by absolute size hid the
 > two real breaches. Every citation now names the measurement it uses, and the
 > suite reads its reference values from disk instead of from a dict inside
-> itself — see [D-034](DECISIONS.md).
+> itself — see [D-034](../DECISIONS.md).
 
 **`COMBUSTION_REACTIONS`: all 11 balance element-by-element** and all carry the
 theoretical-air ratio N₂/O₂ = 3.760. `REACTIONS`: all 4 balance. Every species
@@ -133,8 +133,8 @@ the equilibrium value and not comparable to this item's model.
 | C2.4 | Methane/air near the literature value | §4 | ✅ 2311 K vs 2326 K |
 | C2.5 | Citation-resolution suite (Reviewer G, G-12 — the one finding called *blocking for C3*) | `tests/constants_integrity/test_citations_resolve.py` | ✅ **55 checks**, four properties: every row tagged; the **CAS in the tag** resolves; the tag class matches the evidence; no test carries its own answer key |
 | C1.4 | Unit declaration per table | `constants.py`, per table header | ✅ — skipped in C1, raised by G-4, done here |
-| C2.R | Independent review (Reviewer H, domain) + R4 triage | [`reviews/phaseC2_reviewer_h_thermochemistry.md`](reviews/phaseC2_reviewer_h_thermochemistry.md), §11 | ✅ |
-| C2.R2 | Second independent review (Reviewer G, provenance) + R4 triage | [`reviews/phaseC2_reviewer_g_provenance.md`](reviews/phaseC2_reviewer_g_provenance.md), §10b | ✅ |
+| C2.R | Independent review (Reviewer H, domain) + R4 triage | [`reviews/phaseC2_reviewer_h_thermochemistry.md`](../reviews/phaseC2_reviewer_h_thermochemistry.md), §11 | ✅ |
+| C2.R2 | Second independent review (Reviewer G, provenance) + R4 triage | [`reviews/phaseC2_reviewer_g_provenance.md`](../reviews/phaseC2_reviewer_g_provenance.md), §10b | ✅ |
 
 ---
 
@@ -233,7 +233,7 @@ the spec's own roster, whose gate is *"is the provenance claim honest and
 complete?"* — not "are the values right", which is H's and which R6.2 forbids
 commissioning twice.
 
-Report: [`reviews/phaseC2_reviewer_g_provenance.md`](reviews/phaseC2_reviewer_g_provenance.md).
+Report: [`reviews/phaseC2_reviewer_g_provenance.md`](../reviews/phaseC2_reviewer_g_provenance.md).
 
 ---
 

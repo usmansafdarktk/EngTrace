@@ -11,7 +11,7 @@ intermediate reproducible by hand?* 45-minute box, plus a post-box addendum.
 > implementer's on-disk JSON, so the verification is independent of the
 > transcription it is checking.
 
-**Remediation is triaged in [`../phase2_summary.md`](../phase2_summary.md) §12.
+**Remediation is triaged in [`../phase2_summary.md`](../track-a/phase2_summary.md) §12.
 All findings are closed.**
 
 ---

@@ -81,7 +81,7 @@ from tests.comparators.bindings import DECLARED_UNITS  # noqa: E402
 from tests.comparators.normalize import answer_span  # noqa: E402
 from tests.template_integrity.core import discover, generate  # noqa: E402
 
-INVENTORY = os.path.join(REPO, "docs", "re-implementation-sep", "template_inventory.csv")
+INVENTORY = os.path.join(REPO, "docs", "re-implementation-sep", "audit", "template_inventory.csv")
 ADVERSARIAL = os.path.join(os.path.dirname(__file__), "adversarial.json")
 RESULTS = os.path.join(os.path.dirname(__file__), "n1_candidates.json")
 

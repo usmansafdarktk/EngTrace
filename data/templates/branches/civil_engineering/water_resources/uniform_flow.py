@@ -343,7 +343,7 @@ def template_normal_depth_iteration():
         to the answer — a solver reaching the same converged depth in four
         updates instead of three is correct. This template
         builds an `iteration` trace node (the local `trace_nodes`,
-        specified in docs/re-implementation-sep/phase3_node_types.md) and
+        specified in docs/re-implementation-sep/track-a/phase3_node_types.md) and
         RENDERS the printed trace from it, so the structured trace and the
         prose cannot disagree.
 

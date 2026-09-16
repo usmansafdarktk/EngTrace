@@ -1,7 +1,7 @@
 """Phase 4 comparators — the machinery that turns a gold answer into a verdict.
 
-Specification: ``docs/re-implementation-sep/phase4_comparators.md`` (D4.1).
-Vocabulary:    ``docs/re-implementation-sep/phase4_vocabulary.md`` (D4.2).
+Specification: ``docs/re-implementation-sep/track-a/phase4_comparators.md`` (D4.1).
+Vocabulary:    ``docs/re-implementation-sep/track-a/phase4_vocabulary.md`` (D4.2).
 
 Six ``kind`` values, one comparator each; ``compare_answer`` composes them for a
 multipart answer (D-047).  Every comparator returns a :class:`Verdict` whose

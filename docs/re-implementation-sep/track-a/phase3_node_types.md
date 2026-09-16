@@ -2,7 +2,7 @@
 
 **Schema version:** `1.5` (§7 amended by Phase 4, D-054) · **Status:** normative for the milestone model ·
 **Phase:** 3 · **Revised:** 2026-09-06
-**Companion:** [`template_redesign_spec.md`](template_redesign_spec.md) §3.3 ·
+**Companion:** [`template_redesign_spec.md`](../template_redesign_spec.md) §3.3 ·
 [`phase3_summary.md`](phase3_summary.md) · conformance corpus in
 [`phase3_conformance/traces.json`](phase3_conformance/traces.json)
 **Reference implementations:** the `trace_nodes` local of

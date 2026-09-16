@@ -49,10 +49,10 @@ Two cautions so you do not waste time:
 1. **[`docs/re-implementation-sep/template_redesign_spec.md`](../re-implementation-sep/template_redesign_spec.md)** —
    §0 governing principles **P1–P6** (especially **P4 determinism** and **P5 no silent
    fallbacks**), all of **Phase 2**, and the review protocol **R0–R6**.
-2. **[`docs/re-implementation-sep/phase1_summary.md`](../re-implementation-sep/phase1_summary.md)** —
+2. **[`docs/re-implementation-sep/track-a/phase1_summary.md`](../re-implementation-sep/track-a/phase1_summary.md)** —
    how the previous implementation phase was run, gated and reviewed. §"What Phase 2
    inherits" is part of your brief.
-3. **[`docs/re-implementation-sep/phaseC2_summary.md`](../re-implementation-sep/phaseC2_summary.md)** —
+3. **[`docs/re-implementation-sep/track-b/phaseC2_summary.md`](../re-implementation-sep/track-b/phaseC2_summary.md)** —
    the constants this phase now depends on. **§12 "What Phase 2 inherits"** and **D-032** are
    a required deliverable of this phase, not background.
 4. **[`docs/re-implementation-sep/DECISIONS.md`](../re-implementation-sep/DECISIONS.md)** —
@@ -188,7 +188,7 @@ justification for each removed `try/except` — what it was masking, why removal
 hand-worked example · D2.5 T6 distribution diff with explanation · D2.6 confirmation that
 `CP_PARAMS` landed first · **D2.7 the D-032 decision, with its P6 trade stated**
 
-Write the phase summary to `docs/re-implementation-sep/phase2_summary.md` and the item-pool
+Write the phase summary to `docs/re-implementation-sep/track-a/phase2_summary.md` and the item-pool
 impact to `phase2_item_pool_impact.md`, following the Phase 1 and C2 documents' shape.
 
 ## Independent review — mandatory, two reviewers

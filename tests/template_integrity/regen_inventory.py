@@ -2,7 +2,7 @@
 
 WHY THIS FILE EXISTS
 ====================
-`docs/re-implementation-sep/template_inventory.csv` is scored by Phase 6's exit
+`docs/re-implementation-sep/audit/template_inventory.csv` is scored by Phase 6's exit
 gate, but it is byte-identical to the 2026-09-05 pre-Phase-0 audit and no row has
 ever been reclassified. D6.1 asked for a "full re-run of the original audit
 harness". **That harness does not exist and never did**: the commit that added the
@@ -13,13 +13,13 @@ read-only in-session.
 
 What survives is the *method*, in two places, and this file is an assembly of it:
 
-* `docs/re-implementation-sep/phase0_baseline.md` 2.9b/2.9c - the Phase 0
+* `docs/re-implementation-sep/track-a/phase0_baseline.md` 2.9b/2.9c - the Phase 0
   adversary independently re-implemented the audit's static and dynamic
   measurements and wrote the predicates out in full. Its AST classifier matched
   the audit EXACTLY on three of five branches (chemical 65, civil 37,
   mechanical 89) and its step-token population came to 17,002 against the
   audit's 17,177 (-1.0%).
-* `docs/re-implementation-sep/template_audit_report.md:507-514` - "Appendix -
+* `docs/re-implementation-sep/audit/template_audit_report.md:507-514` - "Appendix -
   method", plus the caveats at :497, :499, :501 and the class definitions
   at :25-30.
 
@@ -71,9 +71,9 @@ from .core import (REPO_ROOT, NUM_RE, TemplateRef, discover, generate,
                    match_value, _walk_values)
 
 INVENTORY = os.path.join(REPO_ROOT, 'docs', 're-implementation-sep',
-                         'template_inventory.csv')
+                         'audit', 'template_inventory.csv')
 OUT_CSV = os.path.join(REPO_ROOT, 'docs', 're-implementation-sep',
-                       'template_inventory_regen.csv')
+                       'audit', 'template_inventory_regen.csv')
 
 #: Phase 0 2.9c used 15 seeds/template; the audit appendix (:510) says the same.
 DYNAMIC_SEEDS = 15

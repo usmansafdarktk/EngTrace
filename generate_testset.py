@@ -50,7 +50,7 @@ if REPO_ROOT not in sys.path:
 from tests.template_integrity.core import TemplateRef, discover, generate  # noqa: E402
 from tests.comparators.derive_bindings import unit_token  # noqa: E402
 
-INVENTORY = os.path.join('docs', 're-implementation-sep', 'template_inventory.csv')
+INVENTORY = os.path.join('docs', 're-implementation-sep', 'audit', 'template_inventory.csv')
 
 #: Changing this changes every item.  It is recorded in the manifest so a pool
 #: can always be traced back to the seed that produced it.

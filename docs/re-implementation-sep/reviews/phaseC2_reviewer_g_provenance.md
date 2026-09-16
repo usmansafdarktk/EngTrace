@@ -13,7 +13,7 @@ provenance claim is honest and complete.* 40-minute box.
 > *numbers* are right — which is why G could find that three values had no
 > backing without ever needing to know they were correct.
 
-**Remediation is triaged in [`../phaseC2_summary.md`](../phaseC2_summary.md) §12
+**Remediation is triaged in [`../phaseC2_summary.md`](../track-b/phaseC2_summary.md) §12
 and recorded as [D-034](../DECISIONS.md) and [D-035](../DECISIONS.md).**
 
 ---

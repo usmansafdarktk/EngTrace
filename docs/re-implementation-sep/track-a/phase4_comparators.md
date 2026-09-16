@@ -2,10 +2,10 @@
 
 **Version:** 1.0 · **Status:** normative for the milestone model · **Phase:** 4
 **Date:** 2026-09-07
-**Companion:** [`template_redesign_spec.md`](template_redesign_spec.md) §4 ·
+**Companion:** [`template_redesign_spec.md`](../template_redesign_spec.md) §4 ·
 [`phase4_vocabulary.md`](phase4_vocabulary.md) (D4.2) ·
 [`phase3_node_types.md`](phase3_node_types.md) §7 (which this extends)
-**Reference implementation:** [`tests/comparators/`](../../tests/comparators/)
+**Reference implementation:** [`tests/comparators/`](../../../tests/comparators)
 **Conformance:** `python -m tests.comparators.score` ·
 `python -m tests.trace_schema.candidate_7 docs/re-implementation-sep/phase4_conformance/candidates.json`
 
@@ -494,7 +494,7 @@ a training set.
 > (Reviewer B, D-057). The comparator scores those answers perfectly and a
 > solver who has never heard of homogeneity scores them perfectly too. The two
 > numbers now live per template as `blind_guess_floor` and
-> `surface_model_heldout` in [`template_inventory.csv`](template_inventory.csv);
+> `surface_model_heldout` in [`template_inventory.csv`](../audit/template_inventory.csv);
 > flag at lift ≥ 40 points **or** held-out ≥ 95% regardless of lift, since a
 > high floor masks a total lookup. **Three of the 150 templates are over that
 > threshold.**

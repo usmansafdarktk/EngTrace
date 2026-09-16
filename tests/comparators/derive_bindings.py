@@ -68,7 +68,7 @@ from tests.comparators.extract import NUM_RE, numbers, same_answer  # noqa: E402
 from tests.comparators.normalize import answer_span, prepare  # noqa: E402
 from tests.template_integrity.core import discover, generate  # noqa: E402
 
-INVENTORY = os.path.join(REPO, "docs", "re-implementation-sep", "template_inventory.csv")
+INVENTORY = os.path.join(REPO, "docs", "re-implementation-sep", "audit", "template_inventory.csv")
 BINDINGS_PY = os.path.join(os.path.dirname(__file__), "bindings.py")
 
 #: Instances per template for validation. 2,450 ordered pairs; resolves ~0.12%.

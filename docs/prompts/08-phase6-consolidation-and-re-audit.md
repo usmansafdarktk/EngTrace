@@ -207,12 +207,12 @@ other's uncommitted work in the same file.
 1. **[`template_redesign_spec.md`](../re-implementation-sep/template_redesign_spec.md)** §"Phase 6"
    (D6.1–D6.11, the exit gate) and §"Track B" S2. The authority on scope — but read it against
    §"Two spec numbers that do not survive contact" below.
-2. **[`template_audit_report.md`](../re-implementation-sep/template_audit_report.md)** and
+2. **[`template_audit_report.md`](../re-implementation-sep/audit/template_audit_report.md)** and
    **`template_inventory.csv`** — what you are replacing. Note the date.
-3. **[`phase5_summary.md`](../re-implementation-sep/phase5_summary.md)** §7 and §13 — the
+3. **[`phase5_summary.md`](../re-implementation-sep/track-a/phase5_summary.md)** §7 and §13 — the
    nearest phase's errors, and §R5-2, the origin of the unit census.
-4. **[`phaseC3_summary.md`](../re-implementation-sep/phaseC3_summary.md)** and
-   **[`phaseC3_corrections_summary.md`](../re-implementation-sep/phaseC3_corrections_summary.md)**
+4. **[`phaseC3_summary.md`](../re-implementation-sep/track-b/phaseC3_summary.md)** and
+   **[`phaseC3_corrections_summary.md`](../re-implementation-sep/track-b/phaseC3_corrections_summary.md)**
    — what S2 delivered, and what it deliberately left open.
 5. **The six item-pool impact notes** — `phase1_`, `phase2_`, `phase3_`, `phase5_`, `phaseC3_`
    and `phaseC3_corrections_item_pool_impact.md`. D6.4 consolidates exactly these.
@@ -226,7 +226,7 @@ Measured at `444b8bf` on 2026-09-12. Re-derive in a worktree before acting.
 ### The inventory is stale — this is D6.1, not a preliminary to it
 
 ```
-python -c "import csv,collections; r=list(csv.DictReader(open('docs/re-implementation-sep/template_inventory.csv',encoding='utf-8-sig'))); print(collections.Counter(x['instrumentation_class'] for x in r))"
+python -c "import csv,collections; r=list(csv.DictReader(open('docs/re-implementation-sep/audit/template_inventory.csv',encoding='utf-8-sig'))); print(collections.Counter(x['instrumentation_class'] for x in r))"
 ```
 
 | `instrumentation_class` | count |
@@ -790,7 +790,7 @@ the gate exactly as a CONFIRMED finding does.
 - **D-053** — `sympy` (and `scipy`, `matplotlib`) missing from `requirements.txt`. **Blocks
   D6.5**, so it stops being optional here.
 - **Track B residuals**, all registered in
-  [`phaseC3_residual_register.md`](../re-implementation-sep/phaseC3_residual_register.md):
+  [`phaseC3_residual_register.md`](../re-implementation-sep/track-b/phaseC3_residual_register.md):
   177 `[UNVERIFIED]` rows (mechanical 148, chemical 13, civil 8, electrical 4, industrial 4);
   11 rows blocked on paywalled standards (AISC, ASTM A992/A36, ACI 318-19, ASCE 7-22, IEC 60063,
   MIL-A-8625, US Standard Atmosphere 1976); ~19 needing a mechanical-properties handbook;

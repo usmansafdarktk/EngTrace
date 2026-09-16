@@ -99,7 +99,7 @@ its evidence is a false claim in a benchmark.
 1. **[`template_redesign_spec.md`](../re-implementation-sep/template_redesign_spec.md)** — the
    **Track B** section (C1, C2, C3, sync points **S1/S2**), and the review protocol **R0–R6**. Read
    R6 before you dispatch anything.
-2. **[`phaseC2_summary.md`](../re-implementation-sep/phaseC2_summary.md)** — the model for this
+2. **[`phaseC2_summary.md`](../re-implementation-sep/track-b/phaseC2_summary.md)** — the model for this
    phase. §1 (the defect was four defects), §7 (source deviation, recorded not hidden), §8 (what
    the suite caught, *including the implementer's own transcription error*), §9 (residual
    register), §12.3–12.4 (what C3 inherits).
@@ -116,7 +116,7 @@ its evidence is a false claim in a benchmark.
    and **`docs/references/fetch_references.py`** — what is on disk, where it came from, its hash.
 6. **`pilot/references/public/MANIFEST.md`** — the civil and industrial source set, and the rules
    for the copyrighted books in it.
-7. **[`phase5_summary.md`](../re-implementation-sep/phase5_summary.md)** §7 and §13 — the most
+7. **[`phase5_summary.md`](../re-implementation-sep/track-a/phase5_summary.md)** §7 and §13 — the most
    recent phase's errors. Two of its three recurring shapes will reach you: *a detector narrower
    than the class it is named after*, and *a number printed and not read*.
 

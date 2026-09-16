@@ -5,8 +5,8 @@
 **Date:** 2026-09-13 · **Branch:** `redesign/phase6-consolidation`
 **Consolidates:** [`phase1_`](phase1_item_pool_impact.md), [`phase2_`](phase2_item_pool_impact.md),
 [`phase3_`](phase3_item_pool_impact.md), [`phase5_`](phase5_item_pool_impact.md),
-[`phaseC3_`](phaseC3_item_pool_impact.md),
-[`phaseC3_corrections_`](phaseC3_corrections_item_pool_impact.md), and the two tranches
+[`phaseC3_`](../track-b/phaseC3_item_pool_impact.md),
+[`phaseC3_corrections_`](../track-b/phaseC3_corrections_item_pool_impact.md), and the two tranches
 measured in this phase.
 
 ---

@@ -11,7 +11,7 @@ called `r`, whose index is called `n`, and whose `update_relation` is a
 
 Usage:
     python -m tests.trace_schema.reviewer_d2_negatives \\
-        docs/re-implementation-sep/phase3_conformance/traces.json
+        docs/re-implementation-sep/track-a/phase3_conformance/traces.json
 """
 
 from __future__ import annotations

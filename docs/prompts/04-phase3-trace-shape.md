@@ -97,7 +97,7 @@ list):
    §0 governing principles **P1–P6**, all of **Phase 3**, and the review protocol **R0–R6**.
    Read R0–R6 properly before you dispatch anything; it is short and it is the part most often
    skipped.
-2. **[`docs/re-implementation-sep/phase2_summary.md`](../re-implementation-sep/phase2_summary.md)** —
+2. **[`docs/re-implementation-sep/track-a/phase2_summary.md`](../re-implementation-sep/track-a/phase2_summary.md)** —
    **§10 is written for you, and §12 corrects it.** Read both, and believe §12.
 3. **[`docs/re-implementation-sep/reviews/phase2_reviewer_c_numerical.md`](../re-implementation-sep/reviews/phase2_reviewer_c_numerical.md)** —
    §5 is the sharpest statement of what makes these two templates hard, and it is not what the
@@ -107,8 +107,8 @@ list):
    removed, and the two ways to remove them), **D-024/D-026** (the evidence-rate rule),
    **D-031** (a dict's key order can be part of the item pool's identity), **D-034** (a test
    may not carry its own answer key).
-5. **[`docs/re-implementation-sep/phase1_summary.md`](../re-implementation-sep/phase1_summary.md)**
-   and **[`phaseC2_summary.md`](../re-implementation-sep/phaseC2_summary.md)** — the shape your
+5. **[`docs/re-implementation-sep/track-a/phase1_summary.md`](../re-implementation-sep/track-a/phase1_summary.md)**
+   and **[`phaseC2_summary.md`](../re-implementation-sep/track-b/phaseC2_summary.md)** — the shape your
    own close-out should take, and the R4 triage tables to model.
 
 ## Scope — two templates, and nothing else

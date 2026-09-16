@@ -5,10 +5,10 @@
 **Date:** 2026-09-07
 **Deliverables:** [`phase4_comparators.md`](phase4_comparators.md) (D4.1) ·
 [`phase4_vocabulary.md`](phase4_vocabulary.md) (D4.2) ·
-[`tests/comparators/`](../../tests/comparators/) (D4.3, D4.4) ·
+[`tests/comparators/`](../../../tests/comparators) (D4.3, D4.4) ·
 [`phase4_conformance/candidates.json`](phase4_conformance/candidates.json) (D4.6) ·
-[`reviews/phase4_reviewer_e_comparator.md`](reviews/phase4_reviewer_e_comparator.md) ·
-[`reviews/phase4_reviewer_b_pedagogy.md`](reviews/phase4_reviewer_b_pedagogy.md)
+[`reviews/phase4_reviewer_e_comparator.md`](../reviews/phase4_reviewer_e_comparator.md) ·
+[`reviews/phase4_reviewer_b_pedagogy.md`](../reviews/phase4_reviewer_b_pedagogy.md)
 
 ---
 

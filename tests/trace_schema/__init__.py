@@ -1,6 +1,6 @@
 """Structured trace nodes (Phase 3, D3.3).
 
-The specification lives in `docs/re-implementation-sep/phase3_node_types.md`.
+The specification lives in `docs/re-implementation-sep/track-a/phase3_node_types.md`.
 This package holds only the tooling: an extractor that lifts a template's
 `trace_nodes` local out of a generation call, and a corpus dumper that writes
 node/prose pairs for a verifier to be written against.

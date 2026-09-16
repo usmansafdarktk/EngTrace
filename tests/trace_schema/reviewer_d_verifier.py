@@ -1,6 +1,6 @@
 """Reviewer D's independent verifier for the D3.3 `iteration`/`decision` node types.
 
-Written from `docs/re-implementation-sep/phase3_node_types.md` alone, as the
+Written from `docs/re-implementation-sep/track-a/phase3_node_types.md` alone, as the
 Phase 3 exit gate requires ("Reviewer D implemented a working verifier from D3.3
 alone").  The template sources and `tests/trace_schema/extract.py` were NOT read.
 
@@ -875,7 +875,7 @@ def self_test(path):
 def main(argv):
     args = [a for a in argv[1:] if not a.startswith("--")]
     flags = {a for a in argv[1:] if a.startswith("--")}
-    path = args[0] if args else "docs/re-implementation-sep/phase3_conformance/traces.json"
+    path = args[0] if args else "docs/re-implementation-sep/track-a/phase3_conformance/traces.json"
     if "--self-test" in flags:
         return self_test(path)
     return run(path, verbose="--verbose" in flags)
