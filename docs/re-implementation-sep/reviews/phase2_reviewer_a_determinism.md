@@ -12,7 +12,7 @@ test?* 40-minute box.
 > footnote rather than a lost afternoon. That discipline exists because Phase C2
 > lost a quarter of a reviewer's findings to a moving branch.
 
-**Remediation is triaged in [`../phase2_summary.md`](../phase2_summary.md) §11.
+**Remediation is triaged in [`../phase2_summary.md`](../track-a/phase2_summary.md) §11.
 All findings are closed.**
 
 ---

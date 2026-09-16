@@ -23,7 +23,7 @@ import re
 import statistics
 from collections import Counter
 
-INVENTORY = "docs/re-implementation-sep/template_inventory.csv"
+INVENTORY = "docs/re-implementation-sep/audit/template_inventory.csv"
 
 
 def load_inventory() -> list[dict]:

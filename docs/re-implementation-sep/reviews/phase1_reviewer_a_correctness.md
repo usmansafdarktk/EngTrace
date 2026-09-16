@@ -11,7 +11,7 @@ arithmetic* — plus time-boxed secondary sampling. 35-minute box.
 > supplied as **claims under test**, not as evidence.
 
 **Implementer's remediation is recorded in the right-hand column of §3 and in
-[`../phase1_summary.md`](../phase1_summary.md) §7. All CONFIRMED findings are
+[`../phase1_summary.md`](../track-a/phase1_summary.md) §7. All CONFIRMED findings are
 closed.**
 
 ---
@@ -187,7 +187,7 @@ by regex and `recompute` never touches the solution string.
 ## 5. Further probing and improvements
 
 Ranked by what the reviewer would probe next. Triage in
-[`../phase1_summary.md`](../phase1_summary.md) §8.
+[`../phase1_summary.md`](../track-a/phase1_summary.md) §8.
 
 1. **Closure at the seed count D-016 mandates.** 20,000 was run; D-016 says
    60,000. F-1 surfaced only above 1,000.

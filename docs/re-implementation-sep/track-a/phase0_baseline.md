@@ -1,7 +1,7 @@
 # Phase 0 — Baseline Measurement Report (D0.3 / D0.5)
 
 **Deliverable:** D0.3 (baseline measurement report) and D0.5 (defect-rate reconciliation table)
-**Companion to:** [`template_audit_report.md`](template_audit_report.md), [`template_redesign_spec.md`](template_redesign_spec.md)
+**Companion to:** [`template_audit_report.md`](../audit/template_audit_report.md), [`template_redesign_spec.md`](../template_redesign_spec.md)
 **Branch:** `redesign/template-integrity` · **Date:** 2026-09-05
 **Scope:** every defect rate quoted in the audit report and in the spec's phase tables, re-measured independently.
 

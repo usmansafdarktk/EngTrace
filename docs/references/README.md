@@ -220,7 +220,7 @@ of reading it, which the census verifies against the template's source.
 (450 tags — 152 resolved, 19 locator-only, 279 stating a class), and every numeric
 table declares `@domain`. What could not be resolved is tagged `[KNOWN-DEFECTIVE]`
 (19) or `[UNVERIFIED]` (200) and listed in
-[`phaseC3_residual_register.md`](../re-implementation-sep/phaseC3_residual_register.md),
+[`phaseC3_residual_register.md`](../re-implementation-sep/track-b/phaseC3_residual_register.md),
 **never quietly accepted**.
 
 **Origin versus verification.** The `CP_PARAMS` coefficients are in the

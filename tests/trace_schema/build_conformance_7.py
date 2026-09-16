@@ -21,8 +21,8 @@ import copy
 import json
 import os
 
-GOLD = "docs/re-implementation-sep/phase3_conformance/traces.json"
-OUT_DIR = "docs/re-implementation-sep/phase4_conformance"
+GOLD = "docs/re-implementation-sep/track-a/phase3_conformance/traces.json"
+OUT_DIR = "docs/re-implementation-sep/track-a/phase4_conformance"
 OUT = os.path.join(OUT_DIR, "candidates.json")
 
 MATCH, MISMATCH, UNRESOLVED = "MATCH", "MISMATCH", "UNRESOLVED"

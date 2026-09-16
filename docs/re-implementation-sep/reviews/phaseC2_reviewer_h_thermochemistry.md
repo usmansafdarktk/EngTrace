@@ -11,7 +11,7 @@ transcription.* 35-minute box.
 > under test**.
 
 **Remediation is recorded in the right-hand column of §3 and triaged in
-[`../phaseC2_summary.md`](../phaseC2_summary.md) §11. All CONFIRMED findings are
+[`../phaseC2_summary.md`](../track-b/phaseC2_summary.md) §11. All CONFIRMED findings are
 closed.**
 
 ---
@@ -91,7 +91,7 @@ identical.** The transcription is faithful; I could not find a defect in it.
 
 ## 5. Further probing and improvements
 
-Triage in [`../phaseC2_summary.md`](../phaseC2_summary.md) §11.
+Triage in [`../phaseC2_summary.md`](../track-b/phaseC2_summary.md) §11.
 
 **Thinnest evidence.** (a) `Air(g)` is self-verified against a mole-weighted
 average — internal consistency, not an external source, and the assumed

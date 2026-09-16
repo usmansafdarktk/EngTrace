@@ -315,7 +315,7 @@ def commitment_census(rows: list[dict]) -> None:
 
     inv = {r["template_id"][len("template_"):]: r["answer_type"]
            for r in csv.DictReader(open(
-               "docs/re-implementation-sep/template_inventory.csv", encoding="utf-8"))}
+               "docs/re-implementation-sep/audit/template_inventory.csv", encoding="utf-8"))}
     #: The answer types whose comparators `commitment.py` gates.
     GATED_TYPES = {"classification"}
 

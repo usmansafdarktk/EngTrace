@@ -5,8 +5,8 @@
 **Date:** 2026-09-06
 **Companions:** [`phase3_node_types.md`](phase3_node_types.md) (D3.3, the primary
 deliverable) · [`phase3_item_pool_impact.md`](phase3_item_pool_impact.md) (D3.5)
-· [`DECISIONS.md`](DECISIONS.md) D-038 – D-044 ·
-[`reviews/`](reviews/) phase3_reviewer_b_pedagogy, phase3_reviewer_d_schema
+· [`DECISIONS.md`](../DECISIONS.md) D-038 – D-044 ·
+[`reviews/`](../reviews) phase3_reviewer_b_pedagogy, phase3_reviewer_d_schema
 
 ---
 
@@ -570,9 +570,9 @@ the risk register.
 ## 11. R4 triage — Reviewer D (schema implementability)
 
 Two reviewers, five rounds, on one deliverable. Reports:
-[`phase3_reviewer_d_schema.md`](reviews/phase3_reviewer_d_schema.md) (round 1,
+[`phase3_reviewer_d_schema.md`](../reviews/phase3_reviewer_d_schema.md) (round 1,
 plus a round-2 disposition of its own findings) and
-[`phase3_reviewer_d2_schema.md`](reviews/phase3_reviewer_d2_schema.md) (rounds
+[`phase3_reviewer_d2_schema.md`](../reviews/phase3_reviewer_d2_schema.md) (rounds
 2–5, by a **fresh** reviewer that never saw round 1's verifier or report).
 **Both PASS WITH FINDINGS. All findings closed.**
 
@@ -627,7 +627,7 @@ All four are one defect wearing different clothes, which is why v1.3 stopped
 patching variants and stated **§3.8**, and why v1.5 gave that rule the
 **problem-data / derived-data** distinction and a **coverage** question. The rule
 is now executable:
-[`tests/trace_schema/audit_3_8.py`](../../tests/trace_schema/audit_3_8.py) is
+[`tests/trace_schema/audit_3_8.py`](../../../tests/trace_schema/audit_3_8.py) is
 clean on all 80 shipped nodes and catches all five historical defects.
 
 ### 11.4 R4 disposition — Reviewer D round 1, §5
@@ -683,7 +683,7 @@ mitigation (`git show <sha>:<path>`, never `--stat`) belongs in the next brief.
 
 ## 12. R4 triage — Reviewer B (pedagogy)
 
-[`reviews/phase3_reviewer_b_pedagogy.md`](reviews/phase3_reviewer_b_pedagogy.md).
+[`reviews/phase3_reviewer_b_pedagogy.md`](../reviews/phase3_reviewer_b_pedagogy.md).
 **PASS WITH FINDINGS.** Five findings, all closed.
 
 ### 12.1 The gate question, as B answered it — **superseded by §12.6**

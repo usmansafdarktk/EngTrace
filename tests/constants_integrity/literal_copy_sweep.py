@@ -7,7 +7,7 @@ does not follow a correction to that table (C1 Reviewer G, G-1: SCS_IA_RATIO's 0
 This lists CANDIDATES for a human to triage into one of three outcomes (spec C3.8):
 a declared `@copied-in`, a template changed to read the table (a P6 event with a
 before/after dump), or a coincidence. It gates nothing; the triage record is
-docs/re-implementation-sep/phaseC3_literal_copies.md.
+docs/re-implementation-sep/track-b/phaseC3_literal_copies.md.
 
 THE PREDICATE, and how it got here. A leaf is a candidate against a template literal
 when all of these hold:

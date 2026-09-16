@@ -692,7 +692,7 @@ def _text_snippet(path, text):
 
 
 REGISTER = os.path.join(REPO, 'docs', 're-implementation-sep',
-                        'phaseC3_residual_register.md')
+                        'track-b', 'phaseC3_residual_register.md')
 _REGISTER_TEXT = None
 
 

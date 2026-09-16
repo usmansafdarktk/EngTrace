@@ -1,6 +1,6 @@
 """Reviewer D2 -- independent verifier for D3.3 schema version 1.1.
 
-Written from `docs/re-implementation-sep/phase3_node_types.md` and the
+Written from `docs/re-implementation-sep/track-a/phase3_node_types.md` and the
 conformance corpus ALONE. No template source, no extractor, and no round-1
 verifier was read. Every place the spec forced an assumption carries an
 `ASSUMPTION[n]` comment; the numbering matches the review report

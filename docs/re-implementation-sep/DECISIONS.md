@@ -6,9 +6,9 @@ entry `SUPERSEDED` and add a new one — never edit history, because the reason 
 decision changed is usually more useful later than the decision itself.
 
 Companion to [`template_redesign_spec.md`](template_redesign_spec.md) (the plan),
-[`template_audit_report.md`](template_audit_report.md) (the findings),
-[`phase0_baseline.md`](phase0_baseline.md) (the measurements) and
-[`reviews/`](reviews/) (independent reviews).
+[`template_audit_report.md`](audit/template_audit_report.md) (the findings),
+[`phase0_baseline.md`](track-a/phase0_baseline.md) (the measurements) and
+[`reviews/`](reviews) (independent reviews).
 
 **Status values:** `OPEN` (needs sign-off) · `DECIDED` · `SUPERSEDED` · `REVERSED`.
 
@@ -1315,7 +1315,7 @@ saw:
 **Amendment.** §3.2's "specify them together" stands — they share one base
 structure, one `carry` mechanism, one verification algorithm. What is struck is
 the implication that they share a comparator. The full specification is
-[`phase3_node_types.md`](phase3_node_types.md); its §2 carries this reasoning and
+[`phase3_node_types.md`](track-a/phase3_node_types.md); its §2 carries this reasoning and
 its §7 the two comparator dispositions.
 
 **Carried forward.** The spec names `linear_reservoir_routing_step` and
@@ -1476,7 +1476,7 @@ delivered a direct before/after instance dump instead; Phase 3 does the same.
 and from the branch, **each in its own process** (`tests/template_integrity/
 phase3_instance_dump.py`, which refuses to run if the module resolves outside the
 tree root it was given — the in-process-reload trap has now caught three people).
-Full numbers in [`phase3_item_pool_impact.md`](phase3_item_pool_impact.md).
+Full numbers in [`phase3_item_pool_impact.md`](track-a/phase3_item_pool_impact.md).
 
 **Regenerating the baseline remains the right corpus-wide action**, as its own
 deliberate change on `master` with the movement examined, and is left to Phase 6
@@ -2115,7 +2115,7 @@ only `not linear` can carry a failing property, which *adds* a cue. **Filed as a
 Phase 5 recommendation**, where the item can change with its gold.
 
 **Actioned now:** `blind_guess_floor` and `surface_model_heldout` are two new
-columns in [`template_inventory.csv`](template_inventory.csv), computed for
+columns in [`template_inventory.csv`](audit/template_inventory.csv), computed for
 every template whose answer space is small enough for the statistic to mean
 anything (5 of 150; the rest are numeric and have hundreds of distinct answers,
 which is the correct reason to leave them blank). B's threshold: flag at **lift
@@ -2269,7 +2269,7 @@ into the wrong place.
 
 **P6.** The five templates' answer *bodies* are byte-identical before and after
 on all 2,000 seeds each; only the marker line differs. Questions unchanged.
-Evidence in [`phase5_item_pool_impact.md`](phase5_item_pool_impact.md).
+Evidence in [`phase5_item_pool_impact.md`](track-a/phase5_item_pool_impact.md).
 
 **Reviewer A owns checking this**, and is asked to treat `--markers` as a claim
 under test rather than as supplied tooling.

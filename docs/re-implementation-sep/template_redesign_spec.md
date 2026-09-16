@@ -1,10 +1,10 @@
 # Template Redesign — Implementation Specification
 
-**Companion to:** [`template_audit_report.md`](template_audit_report.md), [`template_inventory.csv`](template_inventory.csv)
+**Companion to:** [`template_audit_report.md`](audit/template_audit_report.md), [`template_inventory.csv`](audit/template_inventory.csv)
 **Date:** 2026-09-05
 **Scope:** the 16 class-D templates, plus 3 class-B/C templates that share the class-D round-trip defect, plus 11 templates with output-contract defects (Phase 5, adjacent scope). 29 distinct templates in all.
 **Two tracks.** **Track A** (Phases 0–6) is template integrity. **Track B** (Phases C1–C3) is constants re-grounding, running in parallel with two hard sync points.
-**Document map.** [`template_audit_report.md`](template_audit_report.md) findings · [`template_inventory.csv`](template_inventory.csv) per-template classification · **this file** the plan · [`DECISIONS.md`](DECISIONS.md) decisions and pivots, append-only · [`phase0_summary.md`](phase0_summary.md) phase close-out and R4 triage · [`phase0_baseline.md`](phase0_baseline.md) measurements · [`reviews/`](reviews/) independent reviews.
+**Document map.** [`template_audit_report.md`](audit/template_audit_report.md) findings · [`template_inventory.csv`](audit/template_inventory.csv) per-template classification · **this file** the plan · [`DECISIONS.md`](DECISIONS.md) decisions and pivots, append-only · [`phase0_summary.md`](track-a/phase0_summary.md) phase close-out and R4 triage · [`phase0_baseline.md`](track-a/phase0_baseline.md) measurements · [`reviews/`](reviews) independent reviews.
 **Out of scope, referenced where it gates:** the parser fix and the value-extractor build. Those remain separate tracks in the action-item list; only their dependencies appear here.
 
 ---
@@ -44,7 +44,7 @@ Phase 0 found that the template originally cited here as the worked exemplar, `t
 - Review reports live in `docs/re-implementation-sep/reviews/`. This spec is itself under review: reviewers may return `SPEC-CHANGE` items against it.
 - **Scope every review to R6 before dispatching it.** One mandatory gate task, a stated time box, no measurement commissioned twice, tooling supplied, and everything already settled named as out of scope. Over-scoping a review does not buy assurance — it stalls the review and leaves the gate unchecked. Run the R6 pre-dispatch checklist every time.
 
-> **Measurement status — RESOLVED by Phase 0.** The defect rates quoted below came from the per-branch audit sweeps. Phase 0 re-measured all 22 testable claims independently; **20 reproduced**, several exactly. Two corrections stand: audit claim 4c is false as stated (the `damping_classification` flips are ~50/50 Overdamped/Underdamped, not all Overdamped), and the headline worst-case figures are extreme values of a 200-seed sample rather than template properties. Full reconciliation in [`phase0_baseline.md`](phase0_baseline.md); decisions in [`DECISIONS.md`](DECISIONS.md).
+> **Measurement status — RESOLVED by Phase 0.** The defect rates quoted below came from the per-branch audit sweeps. Phase 0 re-measured all 22 testable claims independently; **20 reproduced**, several exactly. Two corrections stand: audit claim 4c is false as stated (the `damping_classification` flips are ~50/50 Overdamped/Underdamped, not all Overdamped), and the headline worst-case figures are extreme values of a 200-seed sample rather than template properties. Full reconciliation in [`phase0_baseline.md`](track-a/phase0_baseline.md); decisions in [`DECISIONS.md`](DECISIONS.md).
 
 ---
 
@@ -114,7 +114,7 @@ One reviewer, **Harness Adversary**. Given the spec and the harness, **not** the
 
 The highest-value phase. These are **defects producing incorrect gold traces in published results**, not design limitations.
 
-> **Re-scoped by Phase 0.** The table in §1.1 is the *original* nine as commissioned. Phase 0's measurements changed both the size and the shape of this phase, and §1.1a below is authoritative. In short: three templates leave (not defective), three join (same defect shape, found by D0.5), and the remainder split into **chain breaks** and **display defects**, which need *different* fixes. See [`DECISIONS.md`](DECISIONS.md) D-011 and D-013, and [`phase0_summary.md`](phase0_summary.md) §8.
+> **Re-scoped by Phase 0.** The table in §1.1 is the *original* nine as commissioned. Phase 0's measurements changed both the size and the shape of this phase, and §1.1a below is authoritative. In short: three templates leave (not defective), three join (same defect shape, found by D0.5), and the remainder split into **chain breaks** and **display defects**, which need *different* fixes. See [`DECISIONS.md`](DECISIONS.md) D-011 and D-013, and [`phase0_summary.md`](track-a/phase0_summary.md) §8.
 
 ### 1.1a Revised scope — authoritative
 
@@ -288,7 +288,7 @@ Template-side changes are small: name the per-station accumulators stably rather
 
 **Note that §3.1 and §3.2 now share one solution family** — `iteration` and `decision` are the same shape (an ordered list of homogeneous sub-traces with stable within-element symbols and a termination predicate). Specify them together; that is cheaper than two bespoke redesigns and it generalises to `linear_reservoir_routing_step` (a repeated sub-chain unrolled into the trace) and `qr_policy_one_iteration` (iterative in principle, one iteration emitted).
 
-> **AMENDED by SPEC-CHANGE 8 (D-038).** The structural claim above is correct and the **equivalence is not**. The two types differ on whether the sequence's cardinality is an observable of the answer — an update count is incidental and is not even stable under the numerical slack the comparator tolerates, while the station count **is** the answer and is exact — so a comparator built from one merged type is wrong on one of the two templates. They share a base structure, a `carry` mechanism and a verification algorithm; they do **not** share a comparator. The specification delivered is [`phase3_node_types.md`](phase3_node_types.md), schema 1.5. The generalisation to `linear_reservoir_routing_step` and `qr_policy_one_iteration` remains **argued, not measured**, and is now a Phase 4 deliverable (D4.7).
+> **AMENDED by SPEC-CHANGE 8 (D-038).** The structural claim above is correct and the **equivalence is not**. The two types differ on whether the sequence's cardinality is an observable of the answer — an update count is incidental and is not even stable under the numerical slack the comparator tolerates, while the station count **is** the answer and is exact — so a comparator built from one merged type is wrong on one of the two templates. They share a base structure, a `carry` mechanism and a verification algorithm; they do **not** share a comparator. The specification delivered is [`phase3_node_types.md`](track-a/phase3_node_types.md), schema 1.5. The generalisation to `linear_reservoir_routing_step` and `qr_policy_one_iteration` remains **argued, not measured**, and is now a Phase 4 deliverable (D4.7).
 
 ### 3.3 Deliverables
 
@@ -302,7 +302,7 @@ D3.1 decision record: schema route vs. redesign for each, with the P6 trade stat
 
 ### 3.5 Exit gate — **PASSED 2026-09-06**, merged `27054c9`
 
-Close-out in [`phase3_summary.md`](phase3_summary.md); the gate table there is authoritative.
+Close-out in [`phase3_summary.md`](track-a/phase3_summary.md); the gate table there is authoritative.
 
 - [x] D3.1 decisions recorded and signed off — schema route for both, argued separately
 - [~] T1–T7 pass on both — **T1–T5 and T7 pass; T6 does not and cannot**, the committed baseline being stale corpus-wide (142/150 on `master`). Not regenerated: a baseline refreshed by the phase it gates is not a gate (D-043). Replaced by a direct before/after distribution diff. Phase 6 owns the regeneration
@@ -587,7 +587,7 @@ C1.3 is the deliverable that sizes the rest of the track, and it will shrink it 
 **Effort: 12–20 h.**
 
 > **C1 CLOSED 2026-09-12.** Close-out, gate table and R4 triage in
-> [`phaseC1_summary.md`](phaseC1_summary.md); Reviewer G's triage is D-073.
+> [`phaseC1_summary.md`](track-b/phaseC1_summary.md); Reviewer G's triage is D-073.
 
 > **AMENDED by SPEC-CHANGE 20 and 21 (D-069, D-070, D-071).** C1 ran *after* C2, and
 > C2 had already met evidential situations this section's two-tag scheme cannot
@@ -1078,7 +1078,7 @@ Read the hours as effort. Wall-clock is a fraction of them, and the difference i
 | SPEC-CHANGE 6 | **Phase 1 re-scoped 9 → 12 templates, split into chain breaks vs display defects** (D-011, D-013) | Phase 0 measurement: three templates are not defective, three more have the same defect shape, and the two categories need different fixes. |
 | SPEC-CHANGE 7 | Worst-case defect rates to be quoted as distributions, not sample maxima | "7.77%" and "0.87%" are extreme values of a 200-seed sample; at 20,000 seeds they are 14.27% and 1.21%. |
 | SPEC-CHANGE 4 | **R6 review-scoping rules added** | The first Phase 0 adversary brief bundled the gate task with work already assigned to the D0.5 agent. It stalled and produced nothing; D0.5 delivered the superset. Over-scoping a review does not make it more thorough — it makes it not happen. |
-| SPEC-CHANGE 8 | **§3.2's claim that `iteration` and `decision` "are the same shape" is amended** (D-038) | The structure is shared; the equivalence is not. They differ on whether the sequence's cardinality is an observable of the answer, so a comparator built from one merged type is wrong on one of the two templates. Delivered as two types over one base in [`phase3_node_types.md`](phase3_node_types.md). |
+| SPEC-CHANGE 8 | **§3.2's claim that `iteration` and `decision` "are the same shape" is amended** (D-038) | The structure is shared; the equivalence is not. They differ on whether the sequence's cardinality is an observable of the answer, so a comparator built from one merged type is wrong on one of the two templates. Delivered as two types over one base in [`phase3_node_types.md`](track-a/phase3_node_types.md). |
 | SPEC-CHANGE 9 | **A screen's *rejected slice profile* is now a required recorded measurement** in every item-pool-impact note — the marginal of every sampled parameter over the rejected set (Phase 3 Reviewer B, §5) | Both Phase 3 screens reject **clustered**, not scattered, instances — one at a single slope value, removing 25% of it. Both were described as removing "ill-posed instances"; both descriptions were true and incomplete. The profile would have surfaced it with no reviewer, and my own "scattered" claim was measured over a *union* of screens, which cannot see a single-valued component (D-045). |
 | SPEC-CHANGE 10 | **A pedagogy lookup-check must fit a model, not enumerate rules**, and must report *lift over a blind-guess floor* against a stated threshold (Phase 3 Reviewer B, §5) | B enumerated every shortcut it could construct and reached 64.97% against a 53.05% floor, concluding the item was a search. A depth-2 decision tree reaches 90.18% and reduces to one line. **"The best rule I could think of" is a floor on shortcuttability, never a ceiling** (D-046). A bare rate is also unreadable without its floor: 58.6% sounds alarming until the floor is 53.1%. |
 | SPEC-CHANGE 11 | **§4.2's hedge requirement is demoted from enforced to reported** (D-056) | Four review rounds and an ablation. The hedge layer fires on **2 of 2,200** archived answer spans and **0** in a kind it gates; ablating it changes no positive recall and no archive verdict, and it produced 13 of Reviewer E's 20 findings while repeatedly marking *correct* answers wrong. A hedge is now detected, annotated and counted, never scored. `ENGTRACE_HEDGE_POLICY=enforce` restores the old behaviour. Same treatment `narrative` gets (D-051). |

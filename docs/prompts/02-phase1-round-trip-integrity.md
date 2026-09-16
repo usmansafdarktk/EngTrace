@@ -91,7 +91,7 @@ structural branches you must exercise** — generate enough seeds to hit each on
 
 ## Read these first, in this order
 
-1. **[`docs/re-implementation-sep/phase0_summary.md`](../re-implementation-sep/phase0_summary.md)** —
+1. **[`docs/re-implementation-sep/track-a/phase0_summary.md`](../re-implementation-sep/track-a/phase0_summary.md)** —
    start here. §8 "What Phase 1 inherits" is your brief in five points. §3 explains why the
    original fix recipe was wrong.
 2. **[`docs/re-implementation-sep/template_redesign_spec.md`](../re-implementation-sep/template_redesign_spec.md)** —
@@ -104,11 +104,11 @@ structural branches you must exercise** — generate enough seeds to hit each on
 4. **[`docs/re-implementation-sep/reviews/phase0_oracle_findings.md`](../re-implementation-sep/reviews/phase0_oracle_findings.md)** —
    per-template measurements, the tolerance rationale, and §5's list of question-text
    fragilities you will run into.
-5. **[`docs/re-implementation-sep/phase0_baseline.md`](../re-implementation-sep/phase0_baseline.md)** —
+5. **[`docs/re-implementation-sep/track-a/phase0_baseline.md`](../re-implementation-sep/track-a/phase0_baseline.md)** —
    the independent re-measurement. Consult for specific numbers; **do not re-measure what is
    already in here.**
 
-Background on the whole effort: `docs/re-implementation-sep/template_audit_report.md`.
+Background on the whole effort: `docs/re-implementation-sep/audit/template_audit_report.md`.
 
 ## Why this phase exists
 
@@ -252,7 +252,7 @@ suggestion blocks the gate exactly as a CONFIRMED finding does.
 4. **T6 before/after distribution diff** for all 12.
 5. **Item-pool impact note** — which published results are invalidated by regenerating these
    templates.
-6. **`docs/re-implementation-sep/phase1_summary.md`** — close-out in the shape of
+6. **`docs/re-implementation-sep/track-a/phase1_summary.md`** — close-out in the shape of
    `phase0_summary.md`: defect rate before → after (target 0), R4 triage table, exit-gate
    status, and what Phase 2 inherits.
 7. **New entries in `DECISIONS.md`** for every decision or reversal you make.

@@ -3,7 +3,7 @@
 **Which published results does regenerating these 10 templates invalidate?**
 
 **Date:** 2026-09-06 · **Branch:** `redesign/phase1-round-trip`
-**Companion to:** [`phase1_summary.md`](phase1_summary.md), [`DECISIONS.md`](DECISIONS.md) D-008
+**Companion to:** [`phase1_summary.md`](phase1_summary.md), [`DECISIONS.md`](../DECISIONS.md) D-008
 
 ---
 

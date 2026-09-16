@@ -48,7 +48,7 @@ still fails printed-arithmetic closure on **5.89%** of its instances. Rounding t
 display precision removes the *double* rounding but leaves an exact half-way tie
 that Python resolves on the binary float (`0.01185 * 1000` → `11.8`, not `11.9`).
 Applied as originally specified, Phase 1 would have reproduced that residue eight
-more times. See [`DECISIONS.md`](DECISIONS.md) D-012.
+more times. See [`DECISIONS.md`](../DECISIONS.md) D-012.
 
 **Two checks that were green while measuring nothing.**
 

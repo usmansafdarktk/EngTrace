@@ -13,7 +13,7 @@ sensible?* 35-minute box.
 > out of scope — Reviewer A owned all of it, in parallel.
 
 **Implementer's remediation is recorded in the right-hand column of §3 and in
-[`../phase1_summary.md`](../phase1_summary.md) §7. All CONFIRMED findings are
+[`../phase1_summary.md`](../track-a/phase1_summary.md) §7. All CONFIRMED findings are
 closed.**
 
 ---
@@ -154,7 +154,7 @@ new 11686787.580 kPa). Pre-existing.
 
 ## 5. Further probing and improvements
 
-Triage in [`../phase1_summary.md`](../phase1_summary.md) §8.
+Triage in [`../phase1_summary.md`](../track-a/phase1_summary.md) §8.
 
 **Thinnest evidence, ranked.**
 1. Instances were read at ~8 seeds per template. **Systematic absurdity

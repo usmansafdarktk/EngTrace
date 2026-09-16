@@ -243,7 +243,7 @@ choosing one route for both.
 
 ## 11. R4 triage — Reviewer A (determinism)
 
-[`reviews/phase2_reviewer_a_determinism.md`](reviews/phase2_reviewer_a_determinism.md).
+[`reviews/phase2_reviewer_a_determinism.md`](../reviews/phase2_reviewer_a_determinism.md).
 **PASS WITH FINDINGS.** Three findings, all closed.
 
 | # | Finding | Disposition | Action |
@@ -283,7 +283,7 @@ repository. A gap, honestly a real one.
 
 ## 12. R4 triage — Reviewer C (numerical methods)
 
-[`reviews/phase2_reviewer_c_numerical.md`](reviews/phase2_reviewer_c_numerical.md).
+[`reviews/phase2_reviewer_c_numerical.md`](../reviews/phase2_reviewer_c_numerical.md).
 **PASS WITH FINDINGS.** Seven findings, all closed.
 
 | # | Finding | Disposition | Action |

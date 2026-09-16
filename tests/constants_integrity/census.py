@@ -916,7 +916,7 @@ def write_markdown(report, path, seeds):
         '**Generated, not written.** Regenerate with',
         '',
         f'    python -m tests.constants_integrity.census --seeds {seeds} --markdown '
-        'docs/re-implementation-sep/phaseC1_census.md',
+        'docs/re-implementation-sep/track-b/phaseC1_census.md',
         '',
         'Every term below - *numeric table*, *literal*, *tagged*, *consumer*, *copy*,',
         '*draws by order*, *restated*, *hidden* - is a predicate defined in the docstring',

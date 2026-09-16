@@ -87,11 +87,11 @@ the item states what it tests, and the machinery accommodates it.
    properly before you dispatch anything; it is short and it is the part most often skipped.
    Note **SPEC-CHANGE 8, 9 and 10** in the revision log — all three are Phase 3's, and 9 and 10
    change what your own reviews must do.
-2. **[`docs/re-implementation-sep/phase3_node_types.md`](../re-implementation-sep/phase3_node_types.md)** —
+2. **[`docs/re-implementation-sep/track-a/phase3_node_types.md`](../re-implementation-sep/track-a/phase3_node_types.md)** —
    the trace node specification, schema 1.5. **§7 is the part you are extending**, and §3.8 is
    the rule you will be judged against. Read §10's non-goals: two of them are now your
    deliverables.
-3. **[`docs/re-implementation-sep/phase3_summary.md`](../re-implementation-sep/phase3_summary.md)** —
+3. **[`docs/re-implementation-sep/track-a/phase3_summary.md`](../re-implementation-sep/track-a/phase3_summary.md)** —
    **§11.6, §12.6 and §13 are written for you.** §13.3 states the gap you are inheriting;
    §12.6 is a worked example of a reviewer overturning its own verdict; §11.6 carries the one
    sentence that predicts how this phase will fail if it fails.

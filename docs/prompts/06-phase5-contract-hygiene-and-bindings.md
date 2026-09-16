@@ -86,10 +86,10 @@ both, Track A ships and Track B re-scopes.
    §0 principles **P1–P6**, all of **Phase 5** (both tracks), and the review protocol
    **R0–R6**. Read R0–R6 properly before you dispatch anything. Note **SPEC-CHANGE 11, 12
    and 13** — all three are Phase 4's.
-2. **[`phase4_summary.md`](../re-implementation-sep/phase4_summary.md)** — **§8, §9 and §12
+2. **[`phase4_summary.md`](../re-implementation-sep/track-a/phase4_summary.md)** — **§8, §9 and §12
    are written for you.** §8 groups nineteen errors into three shapes and you are exposed to
    all three; §9 is what eight review rounds cost and bought; §12 states the stopping rule.
-3. **[`phase4_comparators.md`](../re-implementation-sep/phase4_comparators.md)** — D4.1, the
+3. **[`phase4_comparators.md`](../re-implementation-sep/track-a/phase4_comparators.md)** — D4.1, the
    contract you are binding to. **§2 is the pair of rules every binding must satisfy**, §3 is
    `multipart`, §5 is what it does not settle.
 4. **[`DECISIONS.md`](../re-implementation-sep/DECISIONS.md)** — append-only. **D-058** creates
@@ -300,7 +300,7 @@ python -m tests.comparators.score                            # archive + D4.4
 python -m tests.comparators.reviewer_battery                 # 81 reviewer cases
 python -m tests.comparators.recall_corpus                    # 507 cases
 python -m tests.comparators.derive_vocabulary                # SUPPORT + commitment census
-python -m tests.trace_schema.candidate_7 docs/re-implementation-sep/phase4_conformance/candidates.json
+python -m tests.trace_schema.candidate_7 docs/re-implementation-sep/track-a/phase4_conformance/candidates.json
 ```
 
 All eight exit 0 today, under both hedge policies. **`reviewer_battery` and `recall_corpus`
