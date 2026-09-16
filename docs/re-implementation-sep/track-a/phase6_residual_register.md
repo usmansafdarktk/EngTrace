@@ -8,6 +8,19 @@ A residual is not a failure. A residual that is *not written down* is. Each entr
 what is wrong, what it would take, and who has to decide — so that the next phase inherits a
 decision rather than a surprise.
 
+**Re-derive, don't trust these lines:**
+
+```
+python -m tests.constants_integrity.test_registers_reconcile
+python -m tests.constants_integrity.test_registers_reconcile --selftest
+```
+
+It parses the figures **this document states** — the `[UNVERIFIED]` table, the deleted rows,
+the sign-helper count, the binding counts and D-050's rate — and re-derives each from the
+tree, so a drift on either side fails and the message names which side moved. 18 planted
+defects, two per property in different surface forms. Every count here was right when
+written; several were wrong when read, which is what the check exists to catch.
+
 ---
 
 ## 1. The exit gate itself is not decidable by measurement
