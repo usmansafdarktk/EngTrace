@@ -56,20 +56,25 @@ catching regression. **`run.py --baseline` has not been invoked in this phase an
 **Decision needed, and it is the owner's:** regenerate under authority, against a stated corpus,
 with the movement examined — or leave it ratcheted.
 
-## 3. Three hand-rolled sign helpers remain
+## 3. One hand-rolled sign helper remains
+
+**Corrected 2026-09-16 against the tree; this section said three.** Two were retired inside
+Phase 6 itself (`phase6_summary.md` §4b) after this file was written, so the count here was stale
+rather than wrong when written. Measured now:
+
+| where | what | state |
+|---|---|---|
+| `waves_and_phasors.py` | its own `_signed_term` / `_rect_str`, 30 lines over 10 call sites | **retired** — the shared module is used |
+| `discrete_time_signals.py:511` | `C_str` | **retired** — now `C_str = signed_term(C)`; safe because `C = randint(1,5) * choice([-1,1])` is never zero |
+| `discrete_time_signals.py:618` | `fmt = lambda c, v: f"+ {c}" if c > 0 else f"- {abs(c)}"` | **kept, on a measurement** |
+
+`fmt` is kept deliberately, not overlooked: it renders zero as `"- 0"` where `signed_term` gives
+`"+ 0"`, and it is called with `C2`, a solved coefficient that *can* be zero. Retiring it is
+therefore a P6 event, not a refactor.
 
 D6.7 promoted `signed_term`/`rect_str` into `data/templates/branches/_emission.py` precisely
-because *nine hand-written sign fixes is nine chances to write `+ {value}` again*. Three
-reimplementations survive:
-
-| where | what |
-|---|---|
-| `waves_and_phasors.py` | its own `_signed_term` / `_rect_str`, now redundant beside the shared module |
-| `discrete_time_signals.py:511` | `C_str = f"+ {C}" if C > 0 else f"- {abs(C)}"` |
-| `discrete_time_signals.py:618` | `fmt = lambda c, v: f"+ {c}" if c > 0 else f"- {abs(c)}"` |
-
-Retiring them should be **behaviour-preserving**, but "should be" is not a measurement: it needs
-its own parity check, contract scan and P6 measurement. Left as a tranche, not folded into D6.7.
+because *nine hand-written sign fixes is nine chances to write `+ {value}` again*. Retiring the
+last one needs its own parity check, contract scan and P6 measurement.
 
 ## 4. `degenerate_product_derivation` — 3 templates, printed on every run
 
@@ -118,12 +123,30 @@ not the "113 templates" the spec implies. Six of the 38 are `multipart` and need
 part** — one unit applied to all `n` parts is wrong for at least `n−1`, and made 13 templates
 reject their own gold.
 
-## 7. Track B — 177 `[UNVERIFIED]` rows stand
+## 7. Track B — 170 `[UNVERIFIED]` rows stand
 
-Mechanical 148, chemical 13, civil 8, electrical 4, industrial 4. Of the mechanical bulk: ~86 are
-materials and mixtures no chemical database indexes, ~19 need a mechanical-properties handbook,
-11 are blocked on paywalled standards (AISC, ASTM A992/A36, ACI 318-19, ASCE 7-22, IEC 60063,
-MIL-A-8625, US Standard Atmosphere 1976).
+**Corrected 2026-09-16 against the tree; this section said 177 (mechanical 148, chemical 13).**
+Measured now, by the register's own predicate — a comment line whose first token is the tag:
+
+| branch | then | now |
+|---|---|---|
+| mechanical | 148 | **142** |
+| chemical | 13 | **12** |
+| civil | 8 | 8 |
+| electrical | 4 | 4 |
+| industrial | 4 | 4 |
+| **total** | **177** | **170** |
+
+The difference is not new sourcing: **`e7cf8c4` deleted seven substance-defect rows**,
+owner-directed — `Cork`, `Cork Board`, `Bamboo`, `Tellurium Mercury`, `Tungsten Hexafluoride` and
+`Tetrabromoethane` from mechanical, `R-410A` from chemical. Every one had been deferred across two
+phases because deleting a row shifts the keys after it and moves the item pool; the pool is being
+rebuilt, so that cost went to zero. 177 − 7 = 170 reconciles exactly, and
+`phaseC3_residual_register.md` §3 records what each row was.
+
+Of the mechanical bulk: ~86 are materials and mixtures no chemical database indexes, ~19 need a
+mechanical-properties handbook, 11 are blocked on paywalled standards (AISC, ASTM A992/A36,
+ACI 318-19, ASCE 7-22, IEC 60063, MIL-A-8625, US Standard Atmosphere 1976).
 
 Also open: **7 `[DERIVED]` constants still UNEXECUTED** (4 Shomate refits, `Air(g)`, 2
 by-definition ceilings), and **4 `tol=basis=condition`** tolerances the resolver cannot size —
@@ -139,7 +162,67 @@ It is also the source of the `SyntaxWarning: invalid escape sequence '\%'` seen 
 AST sweep: `stoichiometry.py:115` in the fork holds `\%` where the live template has the corrected
 `\\%`. Harmless today, a syntax error in a future Python, and **not** a live-corpus defect.
 
-## 9. Inherited, unclosed
+## 9. Carried by a decision or a review, and never registered until now
+
+**Added 2026-09-16.** Three items were decided or filed, assigned forward, and then reached no
+register that anyone still reads. Each is documented — in `DECISIONS.md` or in a review — and each
+stopped one step short of a list. They are stated here because the pilot freeze is cut against
+this register, and an item that moves emitted text after the freeze costs a re-run.
+
+### 9.1 `signal_operations` omits the `n = 0` origin on 16.4% of instances (D-050)
+
+The template marks the origin only when the result's support contains it, so on the rest the
+printed answer is a bare value list from which the origin cannot be recovered. The *item* is well
+posed; the printed gold answer is not self-describing.
+
+D-050 records the fix — widen the printed support, `y[n] = {…} for n = 1…4` — and calls it "a
+Phase 5 or 6 scoping decision". Phase 5 did not take it; Phase 6 did not take it; no register
+carried it. **Re-measured 2026-09-16: 329 of 2,000 seeds silent, 16.4%** — the rate D-050 quotes
+at 4,000 seeds, unchanged.
+
+**Decision needed:** widen the support (a P6 event on 16.4% of that template's instances), or
+accept a gold answer the comparator cannot fully check and say so.
+
+### 9.2 The supporting-quantity remedy for the two shortcuttable classification items (D-057 → D-066)
+
+`system_property_linearity` and `system_properties_memory_causality` are 100% predictable from the
+question surface against floors of 50.02% and 34.02%. Reviewer B proposed requiring the answer to
+name *which* property failed, then withdrew it as a Phase 4 requirement because it would drop
+recall to ~27%. `phase4_summary.md` §12 assigned it to Phase 5; **D-066 declined it** — correctly,
+Track B's charter was `tests/comparators/` and the inventory only — and reassigned it to Phase 6.
+Phase 6 mentions D-057 only under §5's column question, never the remedy.
+
+Both items are still bound and still fully shortcuttable. The remedy changes what the item *asks*
+and what its gold *answers*, so it needs the question, the gold and the rubric to move together.
+
+**Decision needed:** change the two items, or record in the results table that they are scored on
+an answer that carries 1.0 and 1.6 bits.
+
+### 9.3 Seven `UNBOUND` entries rest on a truth predicate known to be wrong in that direction
+
+Reviewer E's **E-12**, re-filed as **R2-F2** and never triaged. `gold_gold` calls a `MATCH` a false
+accept iff the two spans differ *textually*; at the display-tolerance boundary that is wrong, so a
+binding that obeys D4.1 §4.1 is recorded as over-accepting. Measured now — the binding table has
+moved since Phase 5 closed, **127 bound / 23 unbound** against that summary's 120/30, with
+`symbolic` at 6 of 9 rather than 1 after D6.10:
+
+| unbound with this reason | count |
+|---|---:|
+| `decimation_aliasing_analysis` | 34 |
+| `null_to_null_bandwidth` | 24 |
+| `gauss_law_symmetric` | 4 |
+| `signal_energy_power`, `truss_method_of_sections`, `vdw_solve_for_pressure` | 2 each |
+| `pitzer_correlation_z` | 1 |
+
+None has been audited against §4.1's tolerance, so "23 declined" is not yet a measurement.
+`vdw_solve_for_pressure` is the one E separated out: its gold at one displayed decimal cannot
+distinguish two substances, which is an item-design question (D-050's shape) and not a comparator
+defect — it should not simply be re-bound.
+
+**Decision needed:** re-audit the seven against the display tolerance, and send
+`vdw_solve_for_pressure` to item design rather than back to `UNBOUND`.
+
+## 10. Inherited, unclosed
 
 - **`CP_PARAMS` origin vs verification** (Reviewer G, G-7) — unfixable without a citable
   Smith–Van Ness copy.

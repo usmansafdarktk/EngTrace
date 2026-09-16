@@ -17,8 +17,8 @@ I got wrong.
 ```
 python -m tests.constants_integrity.test_citations_resolve
 python -m tests.constants_integrity.test_consumer_domains
-grep -c "^\s*# \[KNOWN-DEFECTIVE\]" data/templates/branches/*/constants.py   # 19
-grep -c "^\s*# \[UNVERIFIED\]"      data/templates/branches/*/constants.py   # 198
+grep -c "^\s*# \[KNOWN-DEFECTIVE\]" data/templates/branches/*/constants.py   # 0  (19 at the review)
+grep -c "^\s*# \[UNVERIFIED\]"      data/templates/branches/*/constants.py   # 170 (198 at the review)
 ```
 
 (The greps anchor on a line that STARTS a tag. An earlier version of this file counted
@@ -39,6 +39,24 @@ declare `@kind`, `@units`, `@domain`. **15 `[DERIVED]` tags are never recomputed
 | electrical | 34 | 16 | 2 | 4 |
 | industrial | 38 | 2 | 0 | 4 |
 | **total** | **452** | **156** | **19** | **198** |
+
+**Now** (2026-09-16, from the resolver and the greps above) — the corrections tranche and
+`e7cf8c4`'s seven deletions have moved every column:
+
+| branch | tags | resolved | KNOWN-DEFECTIVE | UNVERIFIED |
+|---|---|---|---|---|
+| mechanical | 202 | 60 | **0** | 142 |
+| chemical | 175 | 140 | **0** | 12 |
+| civil | 34 | 12 | **0** | 8 |
+| electrical | 34 | 18 | **0** | 4 |
+| industrial | 38 | 2 | **0** | 4 |
+| **total** | **483** | **232** | **0** | **170** |
+
+Of the 232 resolved, **47 are still C2-form CAS tags** whose check is the CAS number rather
+than a value, so **185 are value comparisons** — G F-3's distinction survives the corrections
+and is now printed by the resolver on every run. 20 locator-only, 231 stated, **0 LEGACY**,
+0 unresolvable from a clone. `[DERIVED]`: 8 recomputed here, 1 by a named checker,
+**7 UNEXECUTED** — the `UNEXECUTED` class G F-4 asked for now exists and reports itself.
 
 ---
 
@@ -103,14 +121,21 @@ citation problem.
 
 ---
 
-## 2. Unchecked — **177**, by the table that carries them
+## 2. Unchecked — **170**, by the table that carries them
 
 Not known to be wrong; known to be **unchecked**.
 
-**Measured now** (tag-starting lines, per branch): mechanical 148, chemical 13, civil 8,
-electrical 4, industrial 4 — **177**. The per-table breakdown below is the **C3-era
+**Measured now** (tag-starting lines, per branch): mechanical 142, chemical 12, civil 8,
+electrical 4, industrial 4 — **170**. The per-table breakdown below is the **C3-era
 snapshot** and is kept as the record of what the phase inherited; it no longer sums to the
 current total.
+
+**177 → 170, and the seven are deletions, not sourcing.** `e7cf8c4` removed the seven
+substance-defect rows of §3, owner-directed: `Cork`, `Cork Board`, `Bamboo`,
+`Tellurium Mercury`, `Tungsten Hexafluoride` and `Tetrabromoethane` from mechanical, and
+`R-410A` from chemical. Each had been deferred twice because deleting a row shifts every
+key after it and so moves the item pool; with the pool being rebuilt that cost went to
+zero. Mechanical 148 − 6 = 142, chemical 13 − 1 = 12.
 
 The last change was **176 → 177**, and it is an improvement rather than a regression:
 `SUBSTANCES_FOR_VAPORIZATION`'s Mercury row carried no tag of its own and was covered only
@@ -161,6 +186,17 @@ hashed public copy already under `docs/references/` (D-076).
 ---
 
 ## 3. Substance defects — the row names the wrong thing (D-033)
+
+> **Seven of these rows are gone.** `e7cf8c4` deleted them, owner-directed: `Cork`,
+> `Cork Board`, `Bamboo`, `Tellurium Mercury`, `Tungsten Hexafluoride` and
+> `Tetrabromoethane` from mechanical, and `R-410A` from chemical. The table below is kept
+> as the record of *why* each was a defect and what was tried before deleting it — that is
+> the evidence for the deletion, not a list of open questions. Each had been deferred
+> twice on the ground that removing a row shifts every key after it and so invalidates the
+> published pool; rebuilding the pool removed that cost. **The blocker was never the edit,
+> it was the consequence.** `Acetylene Tetrabromide` was kept over `Tetrabromoethane` as
+> the unambiguous name for the same substance. Two entries below are **not** deletions and
+> remain open: the annotation fork, and Mercury's ΔHvap.
 
 | row | branch | finding |
 |---|---|---|
@@ -242,25 +278,26 @@ quietly absorbs its corrections is worth no more than the claims it corrected.
    | fuel and oil rows given a measured n-alkane bracket | 19 | still `[UNVERIFIED]`, and now say why |
    | wood rows given FPL's actual species range | 5 | still `[UNVERIFIED]`, and now say why |
 
-   The remaining 148 are not one decision taken 148 times. **Counted by the reason each
-   row states** (tag-starting lines, sums to 148):
+   The remaining 142 are not one decision taken 142 times. **Counted by the reason each
+   row states** (tag-starting lines, sums to 142; the 148 column is the C3-era figure,
+   before `e7cf8c4` deleted five of these rows and closed one):
 
-   | rows | reason |
-   |---:|---|
-   | 39 | no source on disk *for this material* — the bulk-material rows: granite, marble, brick, concrete, glass, pumice, asphalt, coal, paper, leather, bone |
-   | 19 | a mixture or commercial grade with no single composition |
-   | 16 | no source on disk |
-   | 12 | no MIL-HDBK-5J design table is this material, and no other source |
-   | 12 | a mixture, solution or commercial product with no single composition |
-   | 10 | the table states no temperature or pressure, so no row of an artefact *is* the value |
-   | 8 | **searched, and found unreachable by a chemical database** (PubChem: no CID for a polymer) |
-   | 5 | the row names a material FPL indexes by **species** and states no moisture condition |
-   | 4 | no MIL-HDBK-5J design table under the names searched |
-   | 3 | **not wood** — cork, cork board, bamboo; now searched exhaustively (§3) |
-   | 3 | no MIL-HDBK-5J design table (its copper-base tables listed) |
-   | 2 | no temperature or pressure stated, for a cryogen |
-   | 2 | **one substance under two names** (§3) |
-   | 13 | singletons, each naming its own specific miss (Xylene, Tellurium Mercury, the unnamed aluminium alloy, 1100/3003, quartz's wrong form, CP titanium's unprinted µ, WF₆'s phase, isopropanol, ethylene glycol, chloroform, bromine, ASTM A36, air) |
+   | rows | then | reason |
+   |---:|---:|---|
+   | 39 | 39 | no source on disk *for this material* — the bulk-material rows: granite, marble, brick, concrete, glass, pumice, asphalt, coal, paper, leather, bone |
+   | 19 | 19 | a mixture or commercial grade with no single composition |
+   | 15 | 16 | no source on disk |
+   | 12 | 12 | no MIL-HDBK-5J design table is this material, and no other source |
+   | 12 | 12 | a mixture, solution or commercial product with no single composition |
+   | 10 | 10 | the table states no temperature or pressure, so no row of an artefact *is* the value |
+   | 8 | 8 | **searched, and found unreachable by a chemical database** (PubChem: no CID for a polymer) |
+   | 5 | 5 | the row names a material FPL indexes by **species** and states no moisture condition |
+   | 4 | 4 | no MIL-HDBK-5J design table under the names searched |
+   | — | 3 | ~~**not wood** — cork, cork board, bamboo~~ — **rows deleted** (§3) |
+   | 3 | 3 | no MIL-HDBK-5J design table (its copper-base tables listed) |
+   | 2 | 2 | no temperature or pressure stated, for a cryogen |
+   | — | 2 | ~~**one substance under two names**~~ — `Tetrabromoethane` **deleted**, `Acetylene Tetrabromide` kept as the unambiguous name (§3) |
+   | 13 | 13 | singletons, each naming its own specific miss. The membership changed with the deletions: `Tellurium Mercury` and WF₆'s phase left, and two rows that now state their own reason arrived — `Acetylene Tetrabromide`'s unsourced 2960, and the row whose tag reads *"a source IS on disk, and it disagrees"*. The rest stand: Xylene, the unnamed aluminium alloy, 1100/3003, quartz's wrong form, CP titanium's unprinted µ, isopropanol, ethylene glycol, chloroform, bromine, ASTM A36, air |
 
    **The shape of that table is the answer to "why are so many still unverified".** Roughly
    86 rows (39 + 19 + 16 + 12) are bulk materials and mixtures that no chemical database
@@ -383,7 +420,7 @@ quietly absorbs its corrections is worth no more than the claims it corrected.
 
 | register | holds |
 |---|---|
-| `tests/constants_integrity/domain_findings.txt` | 2 consumer-domain excursions: `MEDIA_VELOCITIES` optical indices used for 50–500 MHz radio, and `CP_PARAMS` integrated below its floor |
+| `tests/constants_integrity/domain_findings.txt` | **1** consumer-domain excursion: `MEDIA_VELOCITIES` optical indices used for 50–500 MHz radio. The second, `CP_PARAMS` integrated below its fit floor, was closed in corrections tranche 2 by raising the liquid branch's draw to `uniform(298.15, 318.0)`; the ratchet fails a listed excursion that no longer occurs, so the suite itself required the line's removal |
 | `phaseC3_literal_copies.md` | C3.8 — declared `@copied-in` copies and `_SCS_COMBOS` |
 | `phaseC3_inline_windows.md` | C3.9 — named-entity facts written as template literals |
 
@@ -400,4 +437,5 @@ tense rather than deleted, for the reason §5 gives: a register that quietly abs
 corrections is worth no more than the claims it corrected. All 19 of §1 are now corrected,
 plus a twentieth found in the process (§3, 2024-T4), and the consequence is measured
 separately in `phaseC3_corrections_item_pool_impact.md`: **13 of 150 templates moved**.
-What remains open is §2's 177 unchecked rows and §6's items 3–7.
+What remains open is §2's **170** unchecked rows and §6's items 3–7. (177 when that sentence
+was written; `e7cf8c4` then deleted the seven substance-defect rows of §3, owner-directed.)
