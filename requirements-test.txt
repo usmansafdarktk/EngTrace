@@ -1,0 +1,37 @@
+# What the test suite needs, and nothing more (Phase 6, D6.5).
+#
+# Derived by AST-scanning every import under tests/ and intersecting with the
+# third-party set.  The whole of tests/ needs exactly five packages - notably
+# NOT torch, transformers or sentence_transformers, which belong to
+# evaluation/.  That is what makes CI cheap enough to run on every push.
+#
+# Install with:  pip install -r requirements-test.txt
+
+numpy
+scipy
+sympy
+pypdf
+PyYAML
+scikit-learn
+
+# Notes on why each is here, because three of them are only reachable on some
+# code paths and a future reader will otherwise delete them:
+#
+#   numpy         seeded alongside `random` in core.seed_all; guarded, but a
+#                 template that calls np.random is NOT reproducible without it
+#   sympy         tests/comparators/kinds.py, the symbolic comparator. Guarded -
+#                 without it the comparator returns `unresolved` rather than
+#                 crashing, so CI would pass while deciding nothing
+#   pypdf         tests/constants_integrity/ - citation resolution against PDF
+#                 locators. Guarded in test_citations_resolve.py, UNGUARDED in
+#                 test_plausibility.py:78 and :167 (see below)
+#   PyYAML        tests/constants_integrity/refractiveindex.py:79, unguarded
+#   scikit-learn  tests/trace_schema/phase3_r4_actions.py:59, unguarded
+#
+# FINDING, recorded not fixed: the same dependency has two conventions in one
+# suite.  `pypdf` is imported under try/except in test_citations_resolve.py,
+# which degrades to the loud message "pypdf unavailable: PDF locators cannot be
+# checked on this machine", and imported bare in test_plausibility.py, which
+# raises.  The guarded form is the right one and is what the CI tiering relies
+# on; making them consistent is a small change that should be made
+# deliberately, with its own before/after, rather than folded into this audit.

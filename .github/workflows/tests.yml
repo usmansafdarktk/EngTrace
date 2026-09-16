@@ -1,0 +1,130 @@
+name: tests
+
+# D6.5 - the regression suite on every push.
+#
+# The spec says "promote the regression suite to CI". Two things had to be faced
+# before that could mean anything.
+#
+# THERE WAS NO CI. No workflows, no tox.ini, no Makefile. This is the first one.
+#
+# THERE IS NO GREEN SUITE TO PROMOTE. Measured: 78 of 150 templates fail the
+# default battery and run.py exits 1 - T1 29, T5 66, T7 83, and T6 142 on a
+# corpus-wide stale baseline (D-043). T2, T3, T4 and T8 are clean. None of that
+# is a regression; it is pre-existing debt carried across six phases.
+#
+# So the battery does NOT gate. A permanently red pipeline is useless, and worse,
+# it creates exactly one pressure: regenerate the T6 baseline until it goes
+# green. That is the single action D-043 forbids, because a baseline refreshed by
+# the phase it is meant to gate is not a gate. `run.py --baseline` is never
+# invoked here, and must not be.
+#
+# The RATCHET gates instead: each check has a recorded ceiling and the run fails
+# only if a check does worse than it. Debt does not block; regression does.
+#
+# TIERED, deliberately. 13 reference binaries totalling 507.4 MB are gitignored
+# by the repo owner's decision and recovered by docs/references/fetch_references.py.
+# They are NOT committed, NOT in LFS, and that rule is not loosened to make CI
+# green. The suites needing them do not run here and the last step says so aloud.
+#
+# A green run means: the 150 templates generate, hold their output contract and
+# trace schema, the comparator behaves, and nothing regressed against its
+# ceiling. It does NOT mean the constants resolve to their sources.
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  suite:
+    runs-on: ubuntu-latest
+    env:
+      # The dev console is cp1252 and dies on the arrows and Greek the
+      # templates emit. Set everywhere, always.
+      PYTHONIOENCODING: utf-8
+      REPORT: battery.json
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          # Matches the development interpreter (3.13.13).
+          python-version: '3.13'
+          cache: pip
+
+      - name: Install test dependencies
+        # requirements-test.txt, not requirements.txt: the whole of tests/ needs
+        # five packages. Installing torch to run template checks would make CI
+        # too slow to keep, and a CI nobody keeps is not a gate either.
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-test.txt
+
+      - name: Run the integrity battery (does not gate)
+        # Expected to exit 1 while the debt stands, so its status is not the
+        # gate. But a CRASH also exits 1, and the exit code cannot tell the two
+        # apart - the report can, so the next step checks the report exists and
+        # is complete before anything is allowed to judge it.
+        run: |
+          python -m tests.template_integrity.run --checks all --json "$REPORT" || true
+
+      - name: Assert the battery actually ran
+        run: |
+          python - <<'PY'
+          import json, os, sys
+          p = os.environ["REPORT"]
+          if not os.path.exists(p):
+              sys.exit(f"{p} was not written - the battery crashed rather than failed")
+          d = json.load(open(p, encoding="utf-8"))
+          if len(d) != 150:
+              sys.exit(f"{p} holds {len(d)} templates, expected 150 - partial run")
+          print(f"battery reported on {len(d)} templates")
+          PY
+
+      - name: Integrity ratchet (GATE)
+        run: python -m tests.template_integrity.ci_ratchet --report "$REPORT"
+
+      - name: Output-contract census
+        run: python -m tests.template_integrity.phase5_contract_scan
+
+      - name: Planted-defect self-test (GATE)
+        # The one that proves the detectors detect. A green corpus does not:
+        # it is green because the templates were fixed, and would look the same
+        # if a detector had quietly become a no-op.
+        run: python -m tests.template_integrity.phase5_contract_scan --selftest
+
+      - name: Trace schema audit
+        run: python -m tests.trace_schema.audit_3_8
+
+      - name: Comparator bindings
+        run: python -m tests.comparators.derive_bindings
+
+      - name: Comparator cross-pairing
+        run: python -m tests.comparators.cross_pair
+
+      - name: Comparator scoring
+        run: python -m tests.comparators.score
+
+      - name: Testset generator determinism
+        # Cheap proof that a master seed reproduces a pool: two runs, diffed.
+        # One branch keeps it fast; the full 150 x 15 belongs to a release job.
+        run: python generate_testset.py --verify --branch civil_engineering --instances 2
+
+      - name: What this run did NOT cover
+        # Never silent. A skipped suite that says nothing is worse than no CI,
+        # because the green tick implies it ran.
+        if: always()
+        run: |
+          echo "::warning title=Not covered by CI::constants_integrity and fetch_references do not run here."
+          echo "NOT RUN, and why:"
+          echo "  tests.constants_integrity.test_citations_resolve"
+          echo "  tests.constants_integrity.test_plausibility"
+          echo "      Both need 507.4 MB of gitignored reference binaries (PDF/zip/xlsx)."
+          echo "      Recover them locally:  python docs/references/fetch_references.py"
+          echo "      Without the artefacts these report 'pypdf unavailable / file missing'"
+          echo "      per tag rather than failing - a green run that resolved nothing."
+          echo "  docs/references/fetch_references.py --verify   downloads and hashes them."
+          echo ""
+          echo "T6 runs above but does NOT gate: its committed baseline profile is stale"
+          echo "corpus-wide (D-043) and must not be regenerated to turn a gate green."
+          echo "Phase 6 owns that decision; the ratchet holds it at its recorded ceiling."

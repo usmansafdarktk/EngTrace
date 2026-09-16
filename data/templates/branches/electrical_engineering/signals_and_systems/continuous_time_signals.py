@@ -2,6 +2,7 @@ import random
 import math
 from fractions import Fraction
 from data.templates.branches.electrical_engineering.constants import FREQUENCY_RANGE_HZ, AMPLITUDE_RANGE, PHASE_RANGE_DEG, PHASE_RANGE_RAD, OMEGA_MULTIPLIER_RANGE, SAMPLING_FREQ_RANGE_HZ, F0_RANGE_HZ, GAIN_K_RANGE, DELAY_N0_RANGE, DECIMATION_FACTOR_M_RANGE, OMEGA_DENOMINATOR_RANGE
+from data.templates.branches._emission import signed_term, joined_terms
 
 
 # Template 1 (Easy)
@@ -42,7 +43,7 @@ def template_nyquist_rate_determination():
 
         # Create the mathematical term as a string
         # Example: "15.5 * cos(2*pi*750*t + 45 deg)"
-        term_str = f"{amplitude} * {func_type}(2*pi*{freq}*t + {phase_deg} deg)"
+        term_str = f"{amplitude} * {func_type}(2*pi*{freq}*t {signed_term(phase_deg, 'deg')})"
         signal_terms.append(term_str)
 
     # Join the individual terms with a " + " to form the full signal equation
@@ -128,16 +129,16 @@ def template_continuous_to_discrete_conversion():
     use_degrees = random.choice([True, False])
     if use_degrees:
         phi_deg = random.randint(*PHASE_RANGE_DEG)
-        phi_str = f"{phi_deg} deg"
+        phi_str = signed_term(phi_deg, "deg")
     else:
         phi_rad = round(random.uniform(*PHASE_RANGE_RAD), 2)
-        phi_str = f"{phi_rad} rad"
+        phi_str = signed_term(phi_rad, "rad")
 
     # Generate a random sampling frequency
     sampling_freq_hz = random.randint(*SAMPLING_FREQ_RANGE_HZ)
 
     # Construct the full continuous-time signal expression for the question
-    signal_expression = f"{amplitude} * cos({omega_continuous_str}*t + {phi_str})"
+    signal_expression = f"{amplitude} * cos({omega_continuous_str}*t {phi_str})"
 
     # 2. Perform the core calculation for the solution
     sampling_period = 1 / sampling_freq_hz
@@ -183,7 +184,7 @@ def template_continuous_to_discrete_conversion():
 
         f"**Step 3:** Substitute t = nT into the Equation\n"
         f"We replace every 't' in the original expression with 'nT'.\n"
-        f"x[n] = {amplitude} * cos({omega_continuous_str}*(nT) + {phi_str})\n\n"
+        f"x[n] = {amplitude} * cos({omega_continuous_str}*(nT) {phi_str})\n\n"
 
         f"**Step 4:** Identify Discrete Frequency (omega)\n"
         f"Rearrange the terms to match the standard form x[n] = A * cos(omega*n + phi). "
@@ -195,10 +196,10 @@ def template_continuous_to_discrete_conversion():
         f"Now, we calculate the numerical value for omega and write the final expression.\n"
         f"omega = ({omega_multiplier} / {sampling_freq_hz}) * pi = {omega_discrete_str} rad/sample\n"
         f"The final discrete-time signal is:\n"
-        f"x[n] = {amplitude} * cos({omega_discrete_str}*n + {phi_str})\n\n"
+        f"x[n] = {amplitude} * cos({omega_discrete_str}*n {phi_str})\n\n"
 
         f"**Answer:**\n"
-        f"The resulting discrete-time signal is x[n] = {amplitude} * cos({omega_discrete_str}*n + {phi_str}), "
+        f"The resulting discrete-time signal is x[n] = {amplitude} * cos({omega_discrete_str}*n {phi_str}), "
         f"and its discrete-time angular frequency is omega = {omega_discrete_str} rad/sample."
     )
 

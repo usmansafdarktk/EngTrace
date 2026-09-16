@@ -186,6 +186,84 @@ PHASE4_BINDINGS: dict[str, dict[str, Any]] = {
     },
 }
 
+# --------------------------------------------------------------------------
+# D6.9 -- the mixed AnswerSpec: numeric *and* categorical parts.
+#
+# Two templates state a quantity AND a class in one answer.  Phase 5 bound
+# neither to both halves, for a reason that was measured rather than guessed:
+# a **label-only** binding says MATCH on any pair sharing the class, and
+# whole-span cross-pairing correctly reads that as a false accept -- 544 of
+# 2,450 pairs on `damping_classification`, 1,650 of 2,450 on
+# `reynolds_number_flow_regime`.  Neither is a comparator defect; the binding
+# was simply narrower than the answer.  `reynolds` fell back to a `numeric`
+# binding flagged `partial` (right number, class unchecked); `damping` stayed
+# unbound.
+#
+# The fix needs no seventh kind and no change to any of the six comparators.
+# It is D-047 applied exactly as written: **an answer has parts, and each part
+# carries one of the six kinds.**  Here the parts are of *different* kinds,
+# which `numeric_parts` could not express because it builds `n` numeric parts
+# and nothing else.
+#
+# The part selectors are declared as strings so the generated table in
+# `bindings.py` round-trips through `repr` -- a lambda in that table would not.
+# `bindings.composite_spec` turns them back into an `AnswerSpec`.
+#
+#: The three damping regimes.  Declared, not derived: `Underdamped` and
+#: `Overdamped` are the same shape, so no rule recovers the set from gold's
+#: structure (the same reason the linearity set is declared).
+DAMPING_REGIME_LABELS = {
+    "Underdamped": ["underdamped"],
+    "Critically Damped": ["critically damped"],
+    "Overdamped": ["overdamped"],
+}
+
+#: The flow regimes.  `transitional` is declared although **gold never emits it
+#: in the 50 validation instances** -- the pipe branch can produce it and the
+#: flat-plate branch cannot, so it is reachable by the item and unexercised by
+#: the sample.  Declaring it is what stops a candidate answering `transitional`
+#: from resolving to no label at all.
+FLOW_REGIME_LABELS = {
+    "laminar": ["laminar"],
+    "transitional": ["transitional"],
+    "turbulent": ["turbulent"],
+}
+
+PHASE6_BINDINGS: dict[str, dict[str, Any]] = {
+    # `damping_classification` states 1 or 2 quantities depending on the
+    # regime: the ratio always, and the damped natural frequency only when the
+    # system is underdamped ({1: 33, 2: 17} over 50 instances).  A fixed-`n`
+    # `multipart` binding therefore cannot express it -- which is why
+    # `derive_kind` refuses it -- and the three parts below do:
+    #   * `zeta`    the FIRST asserted quantity, present on every instance;
+    #   * `regime`  the class label;
+    #   * `omega_d` whatever the answer rule selects -- omega_d on the
+    #               2-quantity instances, and zeta again on the 1-quantity
+    #               ones, where it is redundant rather than wrong.
+    # Without the third part, two underdamped instances sharing a damping ratio
+    # but differing in omega_d would match; with it, every asserted quantity is
+    # compared by something.
+    "template_damping_classification": {
+        "kind": "composite",
+        "options": {"parts": [
+            {"name": "zeta", "kind": "numeric", "select": "quantity:0"},
+            {"name": "regime", "kind": "categorical",
+             "options": {"labels": DAMPING_REGIME_LABELS}},
+            {"name": "omega_d", "kind": "numeric", "select": "answer"},
+        ]},
+    },
+    # `reynolds_number_flow_regime` asserts exactly one quantity on every
+    # instance, so the numeric half is the plain answer rule.
+    "template_reynolds_number_flow_regime": {
+        "kind": "composite",
+        "options": {"parts": [
+            {"name": "Re", "kind": "numeric", "select": "answer"},
+            {"name": "regime", "kind": "categorical",
+             "options": {"labels": FLOW_REGIME_LABELS}},
+        ]},
+    },
+}
+
 
 def compare_template(template_id: str, gold: str, candidate: str) -> Verdict:
     """Score a candidate for one of the four Phase 4 templates."""
