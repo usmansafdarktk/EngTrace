@@ -15,11 +15,17 @@ I got wrong.
 **Re-derive, don't trust these lines:**
 
 ```
+python -m tests.constants_integrity.test_registers_reconcile            # this file vs the tree
 python -m tests.constants_integrity.test_citations_resolve
 python -m tests.constants_integrity.test_consumer_domains
 grep -c "^\s*# \[KNOWN-DEFECTIVE\]" data/templates/branches/*/constants.py   # 0  (19 at the review)
 grep -c "^\s*# \[UNVERIFIED\]"      data/templates/branches/*/constants.py   # 170 (198 at the review)
 ```
+
+The first command is the one that keeps the rest honest: it parses the figures **this
+document states** and re-derives each from the branch files, so a drift on either side
+fails and the message names which side moved. It exists because every count here was
+right when written and several were wrong when read.
 
 (The greps anchor on a line that STARTS a tag. An earlier version of this file counted
 bare occurrences, and my own explanatory prose — sentences saying a row was *no longer*
