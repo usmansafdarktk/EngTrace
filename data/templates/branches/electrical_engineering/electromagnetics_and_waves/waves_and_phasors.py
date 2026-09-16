@@ -1,39 +1,9 @@
 import random
 import math
 from data.templates.branches.electrical_engineering.constants import C0, MEDIA_VELOCITIES 
-from data.templates.branches._emission import signed_term, joined_terms
+from data.templates.branches._emission import signed_term, joined_terms, rect_str
 
 
-
-# --------------------------------------------------------------------------
-# Signed-term rendering (Phase 5 Track A, D5.1).
-#
-# A hard-coded "+" in front of an interpolated signed value prints
-# "876*t + -86.8 deg" and "30.5 + j-51.22".  Neither is a number in any
-# notation, and the second is the malformed-complex defect the audit recorded.
-# The sign belongs to the operator; the coefficient carries only its magnitude.
-#
-# The printed magnitude is abs() of the *same* rounded value the template
-# consumes, so P2's round-then-print property is unchanged by this: only the
-# position of the minus sign moves.
-# --------------------------------------------------------------------------
-
-def _signed_term(value, unit=""):
-    """Render ``value`` as an operator followed by its magnitude.
-
-    ``_signed_term(-86.8, "deg")`` -> ``"- 86.8 deg"``;
-    ``_signed_term(12.5)``         -> ``"+ 12.5"``.
-    """
-    op = "-" if value < 0 else "+"
-    return f"{op} {abs(value)} {unit}".rstrip()
-
-
-def _rect_str(real, imag, precision):
-    """Rectangular form ``x + jy`` with the sign outside the ``j``."""
-    re_v = round(real, precision)
-    im_v = round(imag, precision)
-    op = "-" if im_v < 0 else "+"
-    return f"{re_v} {op} j{abs(im_v)}"
 
 # Template 1 (Easy)
 def template_wave_parameters_basic():
@@ -211,7 +181,7 @@ def template_time_to_phasor():
         phi_str = f"{phi_rad} rad"
 
     # Construct the time-domain function string for the question
-    time_domain_expr = f"{amplitude} * {func_type}({omega}*t {_signed_term(phi_value, phi_unit)})"
+    time_domain_expr = f"{amplitude} * {func_type}({omega}*t {signed_term(phi_value, phi_unit)})"
 
     # 2. Perform the core calculation
     
@@ -249,7 +219,7 @@ def template_time_to_phasor():
     # Bound before the f-string, not computed inside it: a quantity in result
     # position must be a name, so the printed value and the stored value are
     # the same value (P2/P3, and T5a's static rule).
-    rect_form = _rect_str(real_part, imag_part, precision)
+    rect_form = rect_str(real_part, imag_part, precision)
 
     # 3. Generate the question and solution strings
     question = (
@@ -439,8 +409,8 @@ def template_phasor_addition():
     func_type2 = random.choice(['cos', 'sin'])
 
     # 2. Generate the question string
-    v1_str = f"{A1} * {func_type1}({omega}*t {_signed_term(phi1_deg, 'deg')})"
-    v2_str = f"{A2} * {func_type2}({omega}*t {_signed_term(phi2_deg, 'deg')})"
+    v1_str = f"{A1} * {func_type1}({omega}*t {signed_term(phi1_deg, 'deg')})"
+    v2_str = f"{A2} * {func_type2}({omega}*t {signed_term(phi2_deg, 'deg')})"
     
     question = (
         f"Two signals, v1(t) and v2(t), are defined as:\n"
@@ -474,11 +444,11 @@ def template_phasor_addition():
     phi_total_deg = math.degrees(phi_total_rad)
 
     # --- Final time-domain expression ---
-    v_total_str = f"{round(A_total, precision)} * cos({omega}*t {_signed_term(round(phi_total_deg, precision), 'deg')})"
+    v_total_str = f"{round(A_total, precision)} * cos({omega}*t {signed_term(round(phi_total_deg, precision), 'deg')})"
     # Bound before the f-string (T5a), as above.
-    v1_rect = _rect_str(x1, y1, precision)
-    v2_rect = _rect_str(x2, y2, precision)
-    vt_rect = _rect_str(x_total, y_total, precision)
+    v1_rect = rect_str(x1, y1, precision)
+    v2_rect = rect_str(x2, y2, precision)
+    vt_rect = rect_str(x_total, y_total, precision)
 
     # 4. Generate the solution string
     
@@ -509,7 +479,7 @@ def template_phasor_addition():
         
         f"**Step 3:** Add the phasors in rectangular form: V_total = V1 + V2.\n"
         f"   V_total = ({v1_rect}) + ({v2_rect})\n"
-        f"   V_total = ({round(x1, precision)} {_signed_term(round(x2, precision))}) + j({round(y1, precision)} {_signed_term(round(y2, precision))})\n"
+        f"   V_total = ({round(x1, precision)} {signed_term(round(x2, precision))}) + j({round(y1, precision)} {signed_term(round(y2, precision))})\n"
         f"   V_total = {vt_rect}.\n\n"
 
         f"**Step 4:** Convert the resultant phasor V_total back to polar form (A < phi).\n"

@@ -508,7 +508,7 @@ def template_system_property_linearity():
     elif system_type == 'nonlinear_offset':
         is_linear = False
         C = random.randint(1, 5) * random.choice([-1, 1])
-        C_str = f"+ {C}" if C > 0 else f"- {abs(C)}"
+        C_str = signed_term(C)   # C is never zero: randint(1,5) * choice([-1,1])
         equation_str = f"x[n] {C_str}"
         
         y1_str = f"x1[n] {C_str}"
