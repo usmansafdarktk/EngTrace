@@ -385,7 +385,7 @@ planted-defect suite that passed, for exactly that reason (SPEC-CHANGE 17), and
 E's decisive finding is a case the loop *excluded by construction* — the kind of
 blind spot only someone who did not write the loop will look for.
 
-**And the one that keeps recurring:** three of this phase's fourteen errors are
+**And the one that keeps recurring:** three of this phase's eighteen errors are
 shapes `phase4_summary.md` §8 already names, including one it explicitly says
 was "the fourth time". Writing a lesson down does not prevent it. **Only a check
 that runs does** — and this phase's evidence for that is that every error it
