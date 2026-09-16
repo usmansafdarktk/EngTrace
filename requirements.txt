@@ -1,13 +1,60 @@
+# EngTrace dependencies.
+#
+# Audited in Phase 6 (D6.5) by AST-scanning every .py in the repo for
+# third-party imports and diffing against this file.  Twelve packages were
+# imported and never declared - D-053 named only `sympy`, which was the visible
+# corner of a much larger gap.  A clean clone could not run the comparator
+# suite, the constants suite, or the plots.
+#
+# TIERING: `requirements-test.txt` holds the subset the test suite needs
+# (numpy, pypdf, PyYAML, sympy, scikit-learn).  CI installs that, not this file
+# - running the integrity suite does not need torch.
+#
+# Versions are deliberately unpinned, matching the file's existing convention.
+# Pinning is a separate decision and a real one; this audit did not take it.
+
+# --- model evaluation (evaluation/, engtrace_evaluation_framework.py) ---
 torch
+transformers
 sentence_transformers
 rouge_score
 bert_score
-google.generativeai
-dotenv
 huggingface_hub[hf_xet]
+tqdm
+
+# --- model APIs (evaluation/, ai_assisted_quality_assurance/) ---
+google.generativeai
+openai
+anthropic
+# NOTE: `dotenv` is declared here and `import dotenv` is satisfied by the
+# DIFFERENT PyPI package `python-dotenv`.  Left as-is rather than silently
+# changed, because this file presumably matches a working environment - but it
+# needs a decision, and a fresh `pip install -r` is where it will bite.
+dotenv
+
+# --- data and numerics ---
+numpy
+scipy
+pandas
+statsmodels
+scikit-learn
+
+# --- plots/ ---
+matplotlib
 seaborn
-pandas 
-numpy 
-simpledorff
-statsmodels 
+
+# --- annotation and agreement (templates_annotation/) ---
+streamlit
 krippendorff
+irrCAC
+simpledorff
+
+# --- test suite (see requirements-test.txt) ---
+sympy
+pypdf
+PyYAML
+
+# Declared here historically but imported nowhere in the repo as of this audit:
+# seaborn, simpledorff, huggingface_hub.  Retained rather than removed -
+# huggingface_hub is plausibly a transitive extra, and removing a dependency on
+# the evidence of a static scan alone is how a working environment gets broken.

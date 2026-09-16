@@ -15,6 +15,43 @@ emitted text. Build the pool before them and 11 models are inferred against item
 on arrival. Read §"D-003 is closed by decision" before planning the phase — the generator is in
 worse shape than "absent", and two of its five branches have never had one.
 
+## Decisions the repo owner has settled
+
+These were open when the brief was first written. They are now closed, and the rest of this
+document is written as though they are.
+
+| question | decision |
+|---|---|
+| Does the regenerated benchmark include civil and industrial? | **Yes. 150 templates, not 90.** |
+| Instances per template | **15, as before.** So the pool is **150 × 15 = 2,250 items**, up from 1,350. |
+| Track B's five substance defects | **Resolve the easiest way: delete the rows.** See §"Track B — the seven deletions". |
+| The stale annotation fork | **Leave it.** Not relevant; do not sync it. Name it in D6.6 and move on. |
+| D6.1's missing audit harness | **Best effort.** Look for the production method; if it cannot be found, **document that briefly and state the method you used instead.** Do not spend the phase on archaeology. |
+| D6.9 and D6.10 | **Attempt the fixes.** Record as decided-not-fixed **only if proven infeasible**, with the measurement that proves it. |
+
+**Why deleting the Track B rows is cheap now, when it was not before.** Those five defects were
+deferred across two phases because removing a row changes which substance each seed draws, which
+invalidates the published item pool — a P6 event. **The pool is being rebuilt from scratch**, so
+that cost is now zero. The blocker was never the edit; it was the consequence, and the
+consequence has gone.
+
+### Track B — the seven deletions
+
+| table | delete | leaves |
+|---|---|---:|
+| `MANOMETER_FLUIDS` (mechanical) | `Tungsten Hexafluoride` (a **gas** at manometer conditions, value unsupported on disk), `Tellurium Mercury` (both WebBook pages are data-free stubs), and **one** of the `Tetrabromoethane` / `Acetylene Tetrabromide` pair (one substance under two names, both 2960) | 17 of 20 |
+| `MATERIAL_DENSITIES` (mechanical) | `Cork`, `Cork Board`, `Bamboo` — searched exhaustively across all 546 pages of FPL-GTR-282 and every reference directory; genuinely absent | 53 of 56 |
+| `THERMO_SUBSTANCES` **and** `REAL_FLUID_DATA` (chemical) | `Refrigerant-410A` — a blend whose components R-32 and R-125 are also absent, so it cannot be reconstructed | 24 of 25 each |
+
+**R-410A is the one with a catch.** It is a **list element** in `THERMO_SUBSTANCES` and a **dict
+key** in `REAL_FLUID_DATA`. Delete it from both, in the same commit — remove one and the list
+names a fluid nothing supplies data for.
+
+**Deleting is still a measured change.** D-031's rule holds: removing a key shifts the position
+of every key after it, so a seed draws a different substance. Under full regeneration that is
+intended rather than a defect, but **state it** — the P6 measurement for this tranche is part of
+D6.4, not something the regeneration excuses.
+
 **Re-derive every number in this brief at whatever `master` is when you start.** Every prior
 brief in this series was corrected by what its own phase measured, and this one already
 contains two corrections to the spec it implements (§"Two spec numbers that do not survive
@@ -78,15 +115,92 @@ found claims that its own artefacts do not carry.
 | D6.1–D6.6 | re-audit, re-classify, consolidate the item-pool statement, stand up CI, file the residual register | re-opening any merged phase's fixes |
 | D6.7 | the doubled-sign residual on 14 templates, **behind a shared emission helper** | any other emission cleanup |
 | D6.8 | an answer-span **shape** assertion | rewriting spans |
-| D6.9–D6.10 | *decide and record* — a mixed `AnswerSpec`, and the 8 undecidable `symbolic` templates | forcing either binding green |
+| D6.9–D6.10 | **attempt the fix** — a mixed `AnswerSpec`, and the 8 undecidable `symbolic` templates; record as unfixed only with the measurement that proves it | forcing either binding green, or weakening the comparator to raise a rate |
 | D6.11 | per-item and per-part unit declarations | a second unit scheme — C1.4 already built one |
 | **D6.12** (new) | rebuild the testset generator — seeded, uniform, all five branches — and regenerate **after** D6.7/D6.11 land | running inference or evaluation; those follow this phase |
 
-**D6.9 and D6.10 are decisions, not fixes.** Both are measured dead ends: the mixed-spec
-templates produce 544 and 1,650 false accepts in 2,450 pairs from *whole-span cross-pairing
-working correctly*, and masking function names in `_to_sympy` moved the symbolic decided rate
-by exactly nothing — 11.1% before and after. Re-attempting the known-failed fix is the failure
-mode here. Record what it would take and move on.
+**D6.9 is FIXED. D6.10 is still under investigation.**
+
+**D6.9 — done, and the spec's own framing of it was misleading.** The spec cites 544 and 1,650
+false accepts in 2,450 pairs. Those numbers are real and were reproduced exactly with the repo's
+`validate()` — but they describe a **label-only binding that was never shipped**. The shipped
+baseline was already **0 false accepts**: `reynolds_number_flow_regime` was bound `numeric` and
+flagged `partial`, and `damping_classification` was unbound entirely. **Do not report this fix as
+"544 → 0"** — that claims a repair for a defect the corpus never had.
+
+The real defect was narrower and worse: *right number, wrong class was credited*. The fix is a
+`composite` binding built **from the existing six kinds** (`numeric` + `categorical` parts) — no
+comparator was modified. What was missing was binding-level plumbing: `compare_template` could
+only build `numeric_parts(n)`. Note `damping_classification` could never have used `multipart`,
+because it emits **1 or 2 quantities depending on regime** ({1: 33, 2: 17} over 50 instances), so
+a fixed `n` cannot express it — which is why `derive_kind` refused it.
+
+| measured | before | after |
+|---|---|---|
+| `BINDINGS` / `UNBOUND` | 120 / 30 | **121 / 29**, no other template moved |
+| false accepts, false rejects (gold×gold) | 0 / 0 | **0 / 0**, GATE PASS |
+| wrong-class cases caught (hand-built, number held byte-identical) | **0 of 4** | **4 of 4** |
+| archive decided rate | 69.6% | 69.4% |
+| `score` | — | **byte-identical** |
+
+**The cost is stated because it is real:** on `reynolds` 4 traces moved from MISMATCH to
+UNRESOLVED — **no correct answer lost credit** (MATCH unchanged at 10). The wrong-class evidence
+is *hand-built and must be labelled as such*: whole-span cross-pairing cannot construct it,
+because every negative it manufactures pairs two golds, which differ in the number as well as the
+class.
+
+**Two items D6.9 leaves open.** The `derive_bindings` **drift check was never completed** — treat
+it as unverified, not green. And `template_critical_depth_froude_classification` carries the
+**identical `partial` flag and the same defect shape**, untouched. Same fix, one more template;
+decide whether it is in scope.
+
+**D6.10 — 5 of the 8 fixed, and the spec's diagnosis of it was wrong.**
+
+The recorded cause is *"masking the function names in `_to_sympy` changed the decided rate by
+nothing — 11.1% before and after"*. That measurement is correct and was **re-run rather than
+re-attempted blindly**: 11.1% before, 11.1% after, per template identical. But the inference drawn
+from it was wrong. The defect was never that function names are special. **`_to_sympy` inserted
+`*` between every adjacent letter pair**, shattering every multi-letter token — `deg` → `d*e*g`,
+`pi` → `p*i`, `1.71e-03` → `1.71*e-03`, and `sinc^2(2f)` into a *different expression*. Masking
+`cos` could not help, because `cos` was never the problem. The fix splits a letter run only when
+it is not a known token, preserving `xy → x*y` for the polynomial fragment.
+
+| measured (N=50, 2,450 ordered pairs per template) | before | after |
+|---|---|---|
+| symbolic decided rate, 9 templates | 11.1% | **66.7%** |
+| symbolic `answer_type` bound | 1/9 | **6/9** |
+| total `BINDINGS` | 121 | **126** |
+| false accepts, 22,050 pairs | 0 | **0** |
+
+Five go 0.0% → 100.0%: `cd_dc_system_analysis`, `phasor_addition`,
+`undamped_response_initial_conditions`, `ft_esd_rect_pulse`, `ber_estimation_mary`.
+
+**A remedy this brief suggested would have caused a false accept.** "Strip a trailing unit word
+before parsing" — measured over 50 seeds, `continuous_to_discrete_conversion` writes `rad` on 20
+instances and `deg` on 30, and `bpsk_energy_basis` writes `Hz` on 12 and `kHz` on 38. Stripping
+**fuses two different answers**. Unit words are declared **opaque symbols** instead, so `deg ≠ rad`
+and the pair is a correct MISMATCH. A comparator that decides more by deciding wrongly is worse
+than one that abstains, and that is the direction a plausible-sounding fix was about to take it.
+
+**Two of the three remaining are NOT parser problems.** `standing_wave_formation` and
+`continuous_to_discrete_conversion` now decide **2,450/2,450 with 0 identity failures and 0 false
+accepts** on their expression halves. They have 3 and 2 assertions against a binding with one —
+they need a **composite `AnswerSpec`**, which is exactly the D6.9 machinery that landed in this
+same tree. Only `bpsk_energy_basis` is a true isolation-takes-prose case: `b) The basis function
+(psi_1(t)) is …` carries no relation token at all.
+
+**A defect this exposed, reported rather than shipped quietly.**
+`decimation_aliasing_analysis` — not one of the eight — goes from 2 to **34 false accepts**. All 34
+were diagnosed: every one has *identical* isolated expressions on both sides and **zero** are
+comparator over-acceptance. It is a **binding narrower than its answer** (Reviewer E, E-10),
+comparing only `omega_a` while ignoring the output signal and the aliasing verdict. It was masked
+while the binding decided nothing, and it remains UNBOUND before and after — only its reason
+becomes truer. Same composite treatment; decide whether it is in scope.
+
+**Landing D6.10 requires `derive_bindings --regenerate`.** Until the tables are regenerated they
+still list all eight as unbound, so `cross_pair` does not exercise the five newly-deciding
+templates. Both agents deliberately left that regeneration undone rather than clobber each
+other's uncommitted work in the same file.
 
 ## Read these first, in this order
 
@@ -136,6 +250,118 @@ harness exists, **D6.1 is a build task, not a re-run task, and its effort estima
 say so in a decision rather than hand-reproducing 150 rows of judgement and calling it a
 re-audit. A reproduction whose method differs from the original cannot support "no template
 regressed in class", because a class change and a method change are indistinguishable in it.
+
+**Owner decision: best effort, time-boxed.** Look for the production method. If you find it, use
+it. If you do not, **document that in two or three sentences, state the method you used instead,
+and move on** — do not spend the phase on archaeology. One thing must carry forward from this
+either way: if the method is new, **Reviewer F's gate has to be scoped to what is answerable** —
+*"is this method sound, and does it classify the unchanged templates as the old one did?"* rather
+than *"does it replicate the original?"*. Commissioning a replication of an unrecoverable method
+produces a review that cannot file, which is what R6 exists to prevent.
+
+**Searched exhaustively. The harness never existed — and the method survives anyway.**
+
+The archaeology is done, so do not repeat it. Exactly **two commits** have ever touched
+`template_inventory.csv`: `9105317` added it, and `e8302c6` (Phase 4 close-out) inserted two
+columns. `git show --stat 9105317` contains **four documentation files and no `.py` at all**.
+Pickaxe searches on the distinctive column names (`pct_step_values_recoverable`,
+`blind_guess_floor`) return only prose. There is no deleted blob, no dangling object, no
+untracked script, and the bare filenames in `.gitignore` were **never tracked in any branch**.
+
+The cause is in the commissioning prompt: `01-template-structure-audit.md:146` says *"Stay on
+`master`. Do not create branches or commits."* The audit ran read-only, in session, and its
+measurement code was throwaway. **Nothing was lost; nothing was ever saved.**
+
+**The method, however, is written down twice**, and the second is far better than the first:
+
+1. `template_audit_report.md:507–514` — "Appendix — method": the AST sweep, the `sys.settrace`
+   capture, the EXACT/ROUNDED/SCALED/MISSING matcher, with sample sizes.
+2. **`phase0_baseline.md:289–348`** — the Phase 0 adversary **independently re-implemented** those
+   measurements with self-contained runnable snippets, and **matched the audit exactly** on
+   per-branch inline interpolations (chemical **65**, civil **37**, mechanical **89**) and to
+   **−1.0%** on step tokens (17,002 against 17,177).
+
+**So D6.1 is assembly, not invention, and it is cheaper than a rebuild rather than dearer.** Every
+piece already exists: `core.py:53 discover()`, `core.py:181 generate(capture=True)` with its
+tracer, `core.py:106 _walk_values`, `core.py:278 match_value()`, and
+`checks/t5_binding.py:43 _is_bound()`.
+
+**Calibrate against Phase 0 before publishing any number.** If the harness does not reproduce
+65/37/89 and ~17,002, the method is not continuous with the original, and divergence from the
+2026-09-05 CSV cannot be attributed to six phases of template change rather than to method drift.
+Calibration is the gate on the re-audit itself.
+
+**Split the CSV's provenance per column**, and say so in D6.3:
+
+| columns | treatment |
+|---|---|
+| `n_inline_computed`, `pct_*_recoverable`, `n_steps`, `has_instance_branching` | **regenerate** — mechanically measurable |
+| `n_milestone_candidates` | regenerate, but it is a **declared proxy** (report `:497`), not a count |
+| `difficulty`, `est_effort`, `notes` | **carry forward**, marked inherited-not-remeasured |
+| `answer_type`, `unit_system` | hybrid: hand-verified for ~90 rows, automated for the rest (`:499`) |
+| `instrumentation_class` | a **re-classification under a restated rule** (D > C > B > A, report `:30`) — *not* a re-measurement, because which rows the five human branch audits overrode **was never recorded** |
+
+**A defect in the existing CSV, found in passing and needing a decision.** Only **5 rows** carry
+`blind_guess_floor` / `surface_model_heldout`, and **3 of the 5 have no recorded derivation
+anywhere**. `template_levenspiel_plot_interpretation` carries **1.0000 / 1.0000** — a blind-guess
+floor of 1.0 for an `array`-answer template is not a coherent statistic. Reviewer B's report
+(`reviews/phase4_reviewer_b_pedagogy.md:37–61`) only ever derived the two `discrete_time_signals`
+rows. Decide whether the column is repaired, emptied, or kept with its provenance stated.
+
+### The harness is built and calibrated — and the exit gate does not survive it
+
+**Calibration passes exactly**, which is what licenses everything else. Run against the corpus
+**held at rev `9105317`** (the commit that added the CSV), the strict §2.9b predicate reproduces
+the audit on **all five branches**: population 6,166, chemical 65, civil 37, mechanical 89,
+electrical 127, industrial 131 — zero delta. Phase 0 matched on only three. Dynamic populations
+(HEAD only, since they require execution) land at 17,196 step tokens against Phase 0's 17,002
+(+1.1%) and 4,574 answer tokens against 4,619 (−1.0%) — the same order as Phase 0's own
+disagreement with the audit. **The method is continuous.**
+
+**Calibrate at the rev, not at HEAD.** Gating on HEAD would have failed (chemical 64, civil 34,
+mechanical 87) and the predicate would have been blamed: 23 template files have changed since the
+audit (+4,590/−1,157) and the interpolation population grew by 132.
+
+**A correction to this brief.** It said to build on `checks/t5_binding.py:43 _is_bound()`. That
+is **already the lenient variant** — it treats `format`/`replace`/`upper` as passthrough and tests
+*all* args rather than the first. Reusing it would have silently produced 375 where §2.9b needs
+449, failing calibration for reasons unrelated to the templates. The strict predicate is
+implemented separately and lenient kept as a labelled second column.
+
+**Class D did not move: 16 → 16, and the gate is not mechanically decidable.** The restated rule
+yields A 29 / B 54 / C 51 / D 16, and that distribution was **deliberately not written into
+`instrumentation_class`**, because it is an artefact of the detector: of the 34 rows newly flipped
+to branching, **34 fire on the prose-only limb and 0 on a hard step/line-count signal** — a
+sampled material name changes the blanked skeleton without any governing-equation branch. The
+audit resolved that by hand-confirmation against source, which a harness cannot do.
+
+Two of class D's three limbs (report `:28` — *"the trace's own chain does not reproduce its own
+answer"*, *"a search/iteration log with no stable symbols"*) are **judgement**. So this harness can
+**inherit** D and never **clear** a row out of it. Rewrite the gate accordingly; do not let a
+number that cannot be measured stand as a checkbox.
+
+**What can and cannot be diffed.** 96 cells differ, but **29 of the 96 sit in templates whose
+source never changed**, so they are harness residual, not drift. Consequently: per-**branch**
+totals for `n_inline_computed` are trustworthy and diffable; per-**row** values are not. Recovery
+sensitivity brackets at 95.6%/97.7% as-measured, 94.5%/96.0% globals-off, 90.7%/93.0% SCALED-off —
+Phase 0's 93.2% sits *inside* that bracket, so no aggregate recoverability change is detectable and
+per-row `pct_*` deltas under ~5 points are within harness noise.
+
+**`blind_guess_floor` is worse than recorded above: none of the 5 rows has a reproducible
+derivation.** Two are unmentioned anywhere outside the CSV. `levenspiel`'s degeneracy is noted but
+never derived. And for the two `discrete_time_signals` rows, Reviewer B's own snippet **reproduces
+exactly** — 0.5002 / 0.3402 — while the CSV says 0.5008 / 0.3450, matching at no N tried. **The
+CSV contradicts the only recorded derivation it has**, and `phase4_summary.md:379` propagates the
+unsourced pair. Worse, `heat_of_reaction_formation` has held-out **0.2567 below** its floor
+**0.2583** — a negative lift, meaningless under D-057's "lift ≥ 40 pts" — and it and
+`adiabatic_flame_temperature` are **scalar-answer** templates where a majority-class floor is as
+ill-defined as on an array. The column supports no gate decision: recompute it from a committed
+script or drop it.
+
+**One fidelity detail worth keeping:** `n_steps` counts **markers, not distinct numbers**. The
+audit's own worked example (`levenspiel` emits 1,2,3,1,2,3,4,5,6 and carries `n_steps=9`) proves
+it — deduplicating would make the one template singled out for restarting its numbering look like
+one that never did.
 
 ### Corpus baseline at `444b8bf`
 
@@ -195,20 +421,88 @@ Also printed, **not gated**: `degenerate_product_derivation` on 3 templates
 do not leave it printed-and-unread — *that* is Phase 5's named failure (`cross_pair` printed
 `false rejects 56` on every run and nobody put it in a claim).
 
+### D6.7 as executed — four fix shapes, not one, and a limit on the detector
+
+**The defect has one name and four shapes.** The spec reads as though promoting two helpers and
+fixing fourteen sites is a single mechanical substitution. It is not. Applying `signed_term`
+everywhere would have been wrong in two of the four:
+
+| shape | what it looks like | fix |
+|---|---|---|
+| **(a)** literal signed interpolation | `f"...*t + {phase_deg} deg)"` | `signed_term` |
+| **(b)** `" + ".join` over signed values | `" + ".join(f"{v*q:.2f}" ...)` | `joined_terms` |
+| **(c)** pre-rendered signed string | `phi_str = f"{phi_deg} deg"`, then `+ {phi_str}` | restructure at CONSTRUCTION, not at the emission site |
+| **(d)** operand under an operator | `sqrt({a}^2 + {b}^2)`, `{B0} + {omega} * {B1}` | `paren_neg` — the `+` is real addition |
+
+**THE DETECTOR CANNOT TELL YOU THE FIX IS CORRECT — only that the defect is gone.** Measured:
+on `coulombs_law`, `signed_term` turns `sqrt(1^2 + -5^2 + -6^2)` into `sqrt(1^2 - 5^2 - 6^2)`,
+which is a **different and false formula** — a sum of squares becomes a subtraction of them — and
+`phase5_contract_scan` reports that version **clean**. A green scan would have shipped falsified
+gold. Shape (d) exists because of this. Check the arithmetic by reading, then use the scan to
+confirm the sign is gone; never the reverse.
+
+**Every fix must be a no-op for positive values.** `signed_term(45, "deg")` is `"+ 45 deg"`, so
+`*t {phi_str}` renders byte-identically to `*t + 45 deg` and only negatives move. That property is
+what keeps the item-pool movement proportional to the defect, and it is worth asserting per site.
+
+**`paren_neg` also repairs something the detector structurally cannot see:** a negative FIRST
+operand prints `sqrt(-1^2 + ...)`, which reads as −(1²) rather than (−1)². No doubled sign, and
+still wrong.
+
+**Scope each site to its template before editing.** Two near-misses: `fluid_kinematics.py`'s
+`{A}xt + {B}y^2` lines belong to `fluid_particle_acceleration`, which is **not** among the 14;
+and changing `waves_and_phasors.py`'s `phi_str` would have corrupted `time_to_phasor`'s
+*"The initial phase is {phi_str}"* into *"is + 45 deg"*. Grep every use of a variable before
+changing what it renders.
+
+**Three more hand-rolled sign helpers are still in the corpus** — `discrete_time_signals.py`'s
+`C_str` (a `f"+ {C}" if C > 0 else f"- {abs(C)}"` inline) and `fmt` lambda, and
+`waves_and_phasors.py`'s own `_signed_term`/`_rect_str`, now redundant beside the shared module.
+They are exactly the "nine chances to write `+ {value}` again" the promotion exists to end.
+Retiring them is a follow-on, not part of the flagged defect.
+
 ### Two spec numbers that do not survive contact
 
-**D6.8's "199 characters".** The spec states the corpus's longest answer span is 199 characters
-and that a bound can be set from it. **That figure does not appear in `phase5_summary.md`**,
-which is the source it cites. Re-measure it before writing any assertion; a bound copied from
-an unsourced number is exactly the defect class this series exists to remove. If it
-re-measures to 199, say so and cite the run.
+**D6.8's "199 characters" — re-measured, and the spec is right.** The figure does not appear in
+`phase5_summary.md`, the document the spec cites, so it was flagged here as unsourced. Measured
+over 2,250 instances it is **correct**: the corpus's longest answer span is
+`template_autocorrelation_rect_pulse` at **199 characters** from the end of the `**Answer:**`
+marker (block length 210, marker 11; 198 if the leading newline is also stripped). Median **64**,
+p95 **165**, and **zero templates lack an answer marker**.
 
-**D6.11's "113 templates carry a unit".** `phase5_summary.md:126` gives **four** counts, not
-one — *seed 0 115 / any 116 / always 113 / invariant 103*. The spec quotes 113 without its
-predicate. `always` and `invariant` differ by 10 templates whose unit **varies across seeds**,
-and those 10 are the whole difficulty of D6.11: a per-item declaration for a template whose
-unit is seed-dependent cannot be written once at template level. **Publish the predicate, and
-size the editorial work off `invariant` vs `always` deliberately.**
+So the number was always right and only its provenance was missing — which is worth stating
+plainly rather than quietly dropping the objection. **Cite this run when you set the bound**, and
+**re-measure after D6.7 and D6.11**, both of which change emitted text.
+
+**D6.11's "113 templates carry a unit" — re-measured, and the count moves.**
+`phase5_summary.md:126` gives **four** counts, not one — *seed 0 115 / any 116 / always 113 /
+invariant 103* — and the spec quotes 113 without its predicate.
+
+Re-measured here over the 2,250-item pool, reusing T6's own `_UNIT_AFTER_NUM` and
+`answer_block` so the definition is the repo's rather than a rival one, the four counts are
+**seed 0 121 / any 121 / always 121 / invariant 97**, with **24 templates whose unit changes
+with the seed** — not the 10 the earlier figures imply.
+
+**CORRECTION — an earlier version of this section was wrong, and the record should show it.** It
+said the census "does not reproduce" and that 113 is quoted "without its predicate". Both claims
+are false, and reading `derive_bindings.py` rather than only `phase5_summary.md` settles it:
+
+- **The predicate is written down, in code.** `derive_bindings.py:29–32` defines all four
+  readings; `:34–40` argues *why* `always` is adopted over `invariant` — *"a comparator can only
+  check a unit it can name"*; `:46` records the four counts.
+- **It reproduces exactly.** Run today the tool prints `seed0 115 | any 116 | always 113 |
+  invariant 103` over **150 × 12 seeds** (`N_DERIVE = 12`), matching `phase5_summary.md`.
+- **Units are ALREADY DECLARED for 103 templates** — "always-present AND invariant". A meaningful
+  part of D6.11 is therefore built, not outstanding. Establish what remains before scoping it.
+
+**What survives is narrower and still useful: the count is sample-sensitive.** The 121/121/121/97
+above came from 15 BLAKE2b-derived seeds, the repo's from 12 sequential ones. Neither is wrong.
+So a count is only meaningful **with its sample stated** — and D6.11's editorial scope should be
+sized off the sample the corpus actually ships, not off a number lifted bare into the spec.
+
+The hard core is unchanged: a template whose unit is **seed-dependent** cannot have that unit
+declared once at template level, and one unit applied to all `n` parts of a `multipart` answer is
+wrong for at least `n−1` — which is what made 13 templates reject their own gold.
 
 ### Units — D6.11 overlaps C1.4, deliberately
 
@@ -286,8 +580,9 @@ Those 20 modules hold **exactly 90 template functions** — which is precisely t
 *"1,350 items = 90 templates × 15 seeds"*. **Civil and industrial were never in the published
 testset.** They were authored later and have no generator at all. So "regenerate the testset"
 over 150 templates is a **67% scope expansion into two branches the published results have never
-covered**, not a like-for-like rebuild. That is a scoping decision with paper consequences and it
-belongs to the repo owner — surface it before building anything.
+covered**, not a like-for-like rebuild. **The owner has decided to include them**: the new pool is
+150 templates × 15 instances = **2,250 items**, against a published 1,350. The generator for
+civil and industrial therefore has to be built, not merely re-run.
 
 **2. `regenerate_testset.py` is gitignored and absent.** `.gitignore` line 39 lists it, along
 with `template_loader.py`, `verify_fixes.py`, `locate_fixed_templates.py` and
@@ -317,8 +612,9 @@ replaces, and no later phase can diff against it.
 and `magnetostatics`. Total emitted: **5,615 records**, against a published pool of 1,350 — so
 **the committed generators are not what produced the published testset**. The per-template
 imbalance is 3 to 200, giving `mole_balances` 1,000 records and `magnetostatics` 3. Any aggregate
-over that set is dominated by two modules. **Choose one instances-per-template figure, state it,
-and apply it uniformly** — or state the stratification deliberately.
+over that set is dominated by two modules. **Settled: 15 instances per template, uniformly, all
+150 templates.** That matches the published pool's per-template depth and removes the 3-to-200
+imbalance entirely.
 
 **5. Build it on `discover()`, not on 22 new `main()` blocks.**
 [`tests/template_integrity/core.py:53`](../../tests/template_integrity/core.py#L53) already
@@ -441,8 +737,9 @@ the gate exactly as a CONFIRMED finding does.
 
 - [ ] `template_inventory.csv` regenerated, with the **method stated** and the predicate for
       each class published
-- [ ] Class D reduced from 16 to ≤ 4 (the Phase-4 four, **reclassified not fixed**), or the
-      shortfall named per template with a reason
+- [ ] ~~Class D reduced from 16 to ≤ 4~~ — **MEASURED: 16 → 16, and this gate cannot be
+      evaluated mechanically.** See §"The harness is built and calibrated". Replace it with:
+      the class rule restated, applied, and every row still in D named with which limb holds it
 - [ ] No template regressed in class; **measured**, not inferred from summaries
 - [ ] D6.2 class-migration table; D6.3 `template_audit_report.md` updated with post-change figures
 - [ ] D6.4 consolidated item-pool statement — **re-score and re-inference separated**, the
@@ -454,15 +751,17 @@ the gate exactly as a CONFIRMED finding does.
 - [ ] D6.7 doubled sign cleared on 14 templates, **behind a promoted shared helper with
       planted-defect tests**
 - [ ] D6.8 answer-span shape assertion, its bound **re-measured** rather than inherited
-- [ ] D6.9 and D6.10 **decided and recorded**, not forced green
+- [ ] D6.9 and D6.10 **attempted**; fixed with measured before/after, or recorded as infeasible
+      with the measurement proving it. **Zero false accepts preserved either way** — a comparator
+      that decides more by deciding wrongly is worse than one that abstains
+- [ ] The seven Track B rows deleted, R-410A from **both** its tables, with the P6 measurement
 - [ ] D6.11 per-item and per-part units, importing C1.4's vocabulary, predicate published
 - [ ] **D6.12 testset generator rebuilt on `discover()`** — seeded reproducibly end to end, one
       stated instances-per-template figure applied uniformly, all five branches; the same seed
       reproduces the same set, **demonstrated by two runs diffed**
 - [ ] **D6.12 regenerated after D6.7 and D6.11 merged**, not before; item count and composition
       stated against the published 1,350
-- [ ] The civil/industrial scope expansion (90 → 150 templates) **put to the repo owner as a
-      decision**, not assumed
+- [ ] Pool is **2,250 items = 150 templates × 15 instances**, uniform, all five branches
 - [ ] T1–T8, contract scan, `derive_bindings`, `cross_pair`, `score`, `audit_3_8` — no
       regression, **measured**; **T6 baseline not regenerated**
 - [ ] T6's 142 given a decision with an owner, not carried forward again
@@ -476,10 +775,11 @@ the gate exactly as a CONFIRMED finding does.
   finding and a `SPEC-CHANGE`.
 - **Do not re-open a merged phase's fixes.** If one is wrong, that is a finding for the register
   and a decision, not a silent revert.
-- **Do not replace a substance, material or fluid on your own authority**, and do not action
-  Track B's §3 defects (Tungsten Hexafluoride, Tellurium Mercury, R-410A, the
-  Tetrabromoethane/Acetylene Tetrabromide duplicate, Cork/Cork Board/Bamboo). Each moves the
-  item pool and each is the repo owner's call. **Carry them into D6.6 with their evidence.**
+- **Do not replace a substance, material or fluid on your own authority.** The seven deletions in
+  §"Track B — the seven deletions" are owner-directed and are the *only* substance changes
+  authorised. A **replacement** — substituting a different substance for one of them — is not
+  authorised, and was refused during C3 for good reasons: R-22 for R-410A would change the row's
+  values by +9.78% / −33.21% *and* duplicate a fluid already in the table.
 - **P6 is a real constraint.** D6.7 changes emitted text on 14 templates: that is a P6 event and
   needs a two-worktree, two-process measurement like every one before it.
 - **Where you are uncertain, say so and name the evidence that would settle it.**
@@ -503,8 +803,10 @@ the gate exactly as a CONFIRMED finding does.
 - **The stale annotation fork** — `templates_annotation/annotation_app/.../constants.py` holds
   pre-C3 chemical values (R-12 `v_g 0.0268`, R-22 `v_f 0.000845`). **Deliberately not synced**,
   because that directory backs the annotation pilot and a frozen snapshot may be intentional so
-  annotations stay reproducible against what annotators saw. **A decision, not a bug** — but if
-  D6.4 claims a corpus-wide constant state, this fork is a counterexample and must be named.
+  annotations stay reproducible against what annotators saw. **Owner decision: leave it. Do not
+  sync it.** It is out of scope for this phase. Name it in one line in D6.6 — because D6.4
+  otherwise claims a corpus-wide constant state that this directory contradicts — and do nothing
+  else with it.
 - **G F-5** (`@domain: none` vocabulary) and **G F-7** (NAVFAC manuals cited by zero tags).
 - **`CP_PARAMS` origin vs verification** (Reviewer G, G-7) — unfixable without a citable
   Smith–Van Ness copy; recorded, not closed.

@@ -2,6 +2,7 @@ import random
 import numpy as np
 import math
 from data.templates.branches.chemical_engineering.constants import GAS_PHASE_REACTANTS, THERMO_SUBSTANCES, CRITICAL_PROPERTIES, REAL_FLUID_DATA
+from data.templates.branches._emission import signed_term, joined_terms, paren_neg
 
 
 # Template 1 (Easy)
@@ -403,7 +404,7 @@ def template_pitzer_correlation_z():
         f"B1 = 0.139 - (0.172 / {round(Tr, 4)}**4.2) = {round(B1, 4)}\n\n"
 
         f"**Step 4:** Substitute all values to calculate the compressibility factor (Z).\n"
-        f"Z = 1 + ({round(Pr, 4)} / {round(Tr, 4)}) * ({round(B0, 4)} + {omega} * {round(B1, 4)})\n"
+        f"Z = 1 + ({round(Pr, 4)} / {round(Tr, 4)}) * ({round(B0, 4)} + {paren_neg(omega)} * {round(B1, 4)})\n"
         f"Z = 1 + {round(Pr / Tr, 4)} * ({round(B0 + omega * B1, 4)})\n"
         f"Z = {round(Z, 4)}\n\n"
 
@@ -626,8 +627,8 @@ def template_work_isothermal_virial():
         f"V2 = Z2·R·T/P2 = {round(V2, 5)} L/mol\n\n"
 
         f"**Step 4:** Substitute V1 and V2 into the integrated work equation.\n"
-        f"W = -[{round(R*T, 2)}·ln({round(V2, 5)}/{round(V1, 5)}) - {round(B*R*T, 3)}(1/{round(V2, 5)} - 1/{round(V1, 5)})]\n"
-        f"W = -[{round(term1, 2)} + {round(term2, 2)}] = {round(W_virial_Lbar, 2)} L·bar/mol\n\n"
+        f"W = -[{round(R*T, 2)}·ln({round(V2, 5)}/{round(V1, 5)}) {signed_term(-round(B*R*T, 3))}(1/{round(V2, 5)} - 1/{round(V1, 5)})]\n"
+        f"W = -[{round(term1, 2)} {signed_term(round(term2, 2))}] = {round(W_virial_Lbar, 2)} L·bar/mol\n\n"
 
         f"**Step 5:** Convert the work to the required units (J/mol).\n"
         f"Since 1 L·bar = 100 J:\n"

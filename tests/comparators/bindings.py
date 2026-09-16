@@ -129,6 +129,43 @@ def numeric_parts(n: int, unit: str | None = None) -> AnswerSpec:
     )
 
 
+def composite_spec(parts_desc: list[dict[str, Any]], mode: str = "all") -> AnswerSpec:
+    """Build an ``AnswerSpec`` from a **declarative** part list (D6.9).
+
+    ``numeric_parts`` builds ``n`` parts that are all ``numeric``.  A mixed
+    answer -- a quantity *and* a class -- needs parts of different kinds, which
+    is D-047's composition read literally rather than a seventh ``kind``.  No
+    comparator changes: each part still dispatches to one of the six.
+
+    Each descriptor is ``{name, kind, options?, select?}`` and every value is a
+    plain string, dict or list, because this table is **generated** and is
+    written out through ``repr`` -- a lambda would not survive the round trip.
+    ``select`` names the slicer rather than being one:
+
+    ``"answer"`` (default)
+        the part sees the whole span and its own comparator locates the answer
+        -- the numeric answer rule (D5.6), or a categorical label set.
+    ``"quantity:i"``
+        the part sees the slice carrying the ``i``-th asserted quantity, via
+        ``nth_quantity``.  ``extract`` is forced off, exactly as
+        ``numeric_parts`` does, because the slice is already extracted.
+    """
+    parts: list[Part] = []
+    for d in parts_desc:
+        opts = dict(d.get("options") or {})
+        sel = d.get("select") or "answer"
+        if sel == "answer":
+            select = None
+        elif sel.startswith("quantity:"):
+            i = int(sel.split(":", 1)[1])
+            select = (lambda s, i=i: nth_quantity(s, i))
+            opts["extract"] = False
+        else:
+            raise ValueError(f"unknown part selector {sel!r}")
+        parts.append(Part(name=d["name"], kind=d["kind"], options=opts, select=select))
+    return AnswerSpec(parts=parts, mode=mode)
+
+
 # --------------------------------------------------------------------------
 # Structural comparators used by the derived bindings.
 #
@@ -235,6 +272,11 @@ def compare_template(template_id: str, gold: str, candidate: str) -> Verdict:
     if kind == "multipart":
         return compare_answer(gold, candidate,
                               numeric_parts(opts["n"], opts.get("unit")))
+    if kind == "composite":
+        # D6.9: parts of different kinds.  Still not a seventh `kind` -- every
+        # part below dispatches to one of the six through `compare_answer`.
+        return compare_answer(gold, candidate,
+                              composite_spec(opts["parts"], opts.get("mode", "all")))
     if kind in EXTRA_COMPARATORS:
         return EXTRA_COMPARATORS[kind](gold, candidate, **opts)
     if kind == "categorical[tuple]":
@@ -373,10 +415,12 @@ BINDINGS: dict[str, dict[str, Any]] = {
     'template_beam_deflection_formula': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_beam_internal_moment': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_beam_support_reactions': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
+    'template_ber_estimation_mary': {'kind': 'symbolic', 'options': {'symbols': ('t', 'f', 'x', 'n', 'tau')}, 'note': 'a function call in every gold span', 'answer_type': 'symbolic'},
     'template_best_hydraulic_rectangular_section': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_borrow_pit_fill_volume': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_c_chart_revision': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_cantilever_double_integration': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
+    'template_cd_dc_system_analysis': {'kind': 'symbolic', 'options': {'symbols': ('t', 'f', 'x', 'n', 'tau')}, 'note': 'a function call in every gold span', 'answer_type': 'symbolic'},
     'template_chart_pair_selection': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_chase_vs_level_aggregate': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'multipart'},
     'template_composite_shafts_series': {'kind': 'multipart', 'options': {'n': 2}, 'note': '2 asserted numbers in every gold span', 'answer_type': 'scalar'},
@@ -385,13 +429,16 @@ BINDINGS: dict[str, dict[str, Any]] = {
     'template_cp_cpk_from_specs': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_critical_depth_froude_classification': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'classification', 'partial': 'checks the quantity only; gold also states a class label, so a right number with a wrong class is credited (D6.9)'},
     'template_cstr_volume_basic': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
+    'template_damping_classification': {'kind': 'composite', 'options': {'parts': [{'name': 'zeta', 'kind': 'numeric', 'select': 'quantity:0'}, {'name': 'regime', 'kind': 'categorical', 'options': {'labels': {'Underdamped': ['underdamped'], 'Critically Damped': ['critically damped'], 'Overdamped': ['overdamped']}}}, {'name': 'omega_d', 'kind': 'numeric', 'select': 'answer'}]}, 'note': "declared: a label set is not derivable from gold's structure", 'answer_type': 'classification'},
     'template_effective_stress_profile': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_epq_finite_production': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_equivalent_stiffness_frequency': {'kind': 'multipart', 'options': {'n': 2}, 'note': '2 asserted numbers in every gold span', 'answer_type': 'multipart'},
     'template_exponential_mttf_topology': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_finite_convolution': {'kind': 'sequence', 'options': {}, 'note': 'a braced sequence in every gold span', 'answer_type': 'array'},
+    'template_floating_object_submersion_depth': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_fluid_particle_acceleration': {'kind': 'multipart', 'options': {'n': 3}, 'note': '3 asserted numbers in every gold span', 'answer_type': 'vector'},
     'template_force_method_continuous_beam': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
+    'template_ft_esd_rect_pulse': {'kind': 'symbolic', 'options': {'symbols': ('t', 'f', 'x', 'n', 'tau')}, 'note': 'a function call in every gold span', 'answer_type': 'symbolic'},
     'template_gas_phase_concentration': {'kind': 'multipart', 'options': {'n': 2}, 'note': '2 asserted numbers in every gold span', 'answer_type': 'multipart'},
     'template_heat_of_reaction_formation': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_hydraulic_jump_energy_loss': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
@@ -424,6 +471,7 @@ BINDINGS: dict[str, dict[str, Any]] = {
     'template_particle_pathline': {'kind': 'multipart', 'options': {'n': 3}, 'note': '3 asserted numbers in every gold span', 'answer_type': 'vector'},
     'template_pfr_volume_changing_rate': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_phase_relations_degree_of_saturation': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
+    'template_phasor_addition': {'kind': 'symbolic', 'options': {'symbols': ('t', 'f', 'x', 'n', 'tau')}, 'note': 'a function call in every gold span', 'answer_type': 'symbolic'},
     'template_poisson_event_count': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_poissons_ratio': {'kind': 'multipart', 'options': {'n': 2}, 'note': '2 asserted numbers in every gold span', 'answer_type': 'multipart'},
     'template_power_law_fluid_shear': {'kind': 'multipart', 'options': {'n': 2}, 'note': '2 asserted numbers in every gold span', 'answer_type': 'multipart'},
@@ -434,7 +482,7 @@ BINDINGS: dict[str, dict[str, Any]] = {
     'template_rational_method_peak_flow': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_relative_density_of_sand': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_reorder_point_lead_time': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
-    'template_reynolds_number_flow_regime': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'classification', 'partial': 'checks the quantity only; gold also states a class label, so a right number with a wrong class is credited (D6.9)'},
+    'template_reynolds_number_flow_regime': {'kind': 'composite', 'options': {'parts': [{'name': 'Re', 'kind': 'numeric', 'select': 'answer'}, {'name': 'regime', 'kind': 'categorical', 'options': {'labels': {'laminar': ['laminar'], 'transitional': ['transitional'], 'turbulent': ['turbulent']}}}]}, 'note': "declared: a label set is not derivable from gold's structure", 'answer_type': 'classification'},
     'template_rotating_unbalance': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_safety_stock_reorder_point': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_scs_curve_number_runoff': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
@@ -464,6 +512,7 @@ BINDINGS: dict[str, dict[str, Any]] = {
     'template_two_step_transition_probability': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_undamped_natural_frequency_torsional': {'kind': 'multipart', 'options': {'n': 3}, 'note': '3 asserted numbers in every gold span', 'answer_type': 'multipart'},
     'template_undamped_natural_frequency_translational': {'kind': 'multipart', 'options': {'n': 3}, 'note': '3 asserted numbers in every gold span', 'answer_type': 'multipart'},
+    'template_undamped_response_initial_conditions': {'kind': 'symbolic', 'options': {'symbols': ('t', 'f', 'x', 'n', 'tau')}, 'note': 'a function call in every gold span', 'answer_type': 'symbolic'},
     'template_upward_seepage_quick_condition': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_utube_manometer': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
     'template_vibration_isolator_design': {'kind': 'numeric', 'options': {}, 'note': 'exactly one asserted number', 'answer_type': 'scalar'},
@@ -480,18 +529,13 @@ BINDINGS: dict[str, dict[str, Any]] = {
 UNBOUND: dict[str, str] = {
     'template_autocorrelation_rect_pulse': 'part(s) [4, 6] read a constant on every instance -- compared by nothing (E-9)',
     'template_batch_moles_vs_conversion': 'the asserted-number count varies across instances: [7, 8]',
-    'template_ber_estimation_mary': 'rejects a verbatim copy of gold on 50/50 seeds (UNRESOLVED: could not parse an expression: SympifyError)',
     'template_bpsk_energy_basis': 'rejects a verbatim copy of gold on 50/50 seeds (UNRESOLVED: could not parse an expression: SympifyError)',
-    'template_cd_dc_system_analysis': 'rejects a verbatim copy of gold on 50/50 seeds (UNRESOLVED: could not parse an expression: SympifyError)',
     'template_coaxial_capacitance': 'part(s) [1] read a constant on every instance -- compared by nothing (E-9)',
     'template_continuous_to_discrete_conversion': 'rejects a verbatim copy of gold on 50/50 seeds (UNRESOLVED: expression did not parse to a single expression (gold tuple, candidate tuple))',
-    'template_damping_classification': 'a label-only binding on a mixed answer is not validatable by whole-span cross-pairing: it states a damping ratio, a regime and a damped natural frequency, and two instances routinely share the regime while differing in both quantities. Measured: 544 false accepts in 2,450 pairs, none of them a comparator defect. Needs a mixed numeric+categorical AnswerSpec (D6.9)',
-    'template_decimation_aliasing_analysis': "2 false accepts in 2450 pairs; rejects a verbatim copy of gold on 48/50 seeds (UNRESOLVED: symbol(s) outside the declared alphabet: ['i', 'p'])",
+    'template_decimation_aliasing_analysis': '34 false accepts in 2450 pairs',
     'template_euclidean_distance_binary': 'the asserted-number count varies across instances: [5, 7]',
     'template_falling_film_max_velocity': 'the asserted-number count varies across instances: [1, 2]',
-    'template_floating_object_submersion_depth': '1 false accepts in 2450 pairs',
     'template_flow_system_molar_flow_rates': 'the asserted-number count varies across instances: [6, 7]',
-    'template_ft_esd_rect_pulse': "rejects a verbatim copy of gold on 50/50 seeds (UNRESOLVED: symbol(s) outside the declared alphabet: ['c', 'i', 's'])",
     'template_gas_viscosity_kinetic_theory': 'the asserted-number count varies across instances: [2, 3]',
     'template_gauss_law_symmetric': '4 false accepts in 2450 pairs',
     'template_hagen_poiseuille_flowrate': 'the asserted-number count varies across instances: [1, 2]',
@@ -499,12 +543,10 @@ UNBOUND: dict[str, str] = {
     'template_kinematic_viscosity': 'the asserted-number count varies across instances: [1, 2]',
     'template_limiting_reactant': 'the asserted-number count varies across instances: [6, 7, 8]',
     'template_null_to_null_bandwidth': '24 false accepts in 2450 pairs',
-    'template_phasor_addition': "rejects a verbatim copy of gold on 50/50 seeds (UNRESOLVED: symbol(s) outside the declared alphabet: ['c', 'd', 'e', 'g', 'o', 's'])",
     'template_pitzer_correlation_z': '1 false accepts in 2450 pairs',
     'template_signal_energy_power': '2 false accepts in 2450 pairs',
-    'template_standing_wave_formation': 'rejects a verbatim copy of gold on 50/50 seeds (UNRESOLVED: could not parse an expression: SympifyError)',
+    'template_standing_wave_formation': 'rejects a verbatim copy of gold on 50/50 seeds (UNRESOLVED: expression did not parse to a single expression (gold tuple, candidate tuple))',
     'template_truss_method_of_sections': '2 false accepts in 2450 pairs',
-    'template_undamped_response_initial_conditions': "rejects a verbatim copy of gold on 50/50 seeds (UNRESOLVED: symbol(s) outside the declared alphabet: ['i', 'm', 's'])",
     'template_vdw_solve_for_pressure': '2 false accepts in 2450 pairs',
     'template_vdw_solve_for_volume': 'part(s) [1, 3] read a constant on every instance -- compared by nothing (E-9)',
     'template_vorticity_check': 'the asserted-number count varies across instances: [5, 6]',
@@ -530,13 +572,13 @@ VALIDATION: dict[str, dict[str, int]] = {
     'template_beam_deflection_formula': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_beam_internal_moment': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_beam_support_reactions': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
-    'template_ber_estimation_mary': {'pairs': 2450, 'unresolved': 2450, 'decided': 0, 'identity_failures': 50, 'constant_parts': 0},
+    'template_ber_estimation_mary': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_best_hydraulic_rectangular_section': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_borrow_pit_fill_volume': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_bpsk_energy_basis': {'pairs': 2450, 'unresolved': 2450, 'decided': 0, 'identity_failures': 50, 'constant_parts': 0},
     'template_c_chart_revision': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_cantilever_double_integration': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
-    'template_cd_dc_system_analysis': {'pairs': 2450, 'unresolved': 2450, 'decided': 0, 'identity_failures': 50, 'constant_parts': 0},
+    'template_cd_dc_system_analysis': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_chart_pair_selection': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_chase_vs_level_aggregate': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_coaxial_capacitance': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 1},
@@ -547,16 +589,17 @@ VALIDATION: dict[str, dict[str, int]] = {
     'template_cp_cpk_from_specs': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_critical_depth_froude_classification': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_cstr_volume_basic': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
-    'template_decimation_aliasing_analysis': {'pairs': 2450, 'unresolved': 2448, 'false_accepts': 2, 'decided': 2, 'identity_failures': 48, 'constant_parts': 0},
+    'template_damping_classification': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
+    'template_decimation_aliasing_analysis': {'pairs': 2450, 'false_accepts': 34, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_effective_stress_profile': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_epq_finite_production': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_equivalent_stiffness_frequency': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_exponential_mttf_topology': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_finite_convolution': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
-    'template_floating_object_submersion_depth': {'pairs': 2450, 'false_accepts': 1, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
+    'template_floating_object_submersion_depth': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_fluid_particle_acceleration': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_force_method_continuous_beam': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
-    'template_ft_esd_rect_pulse': {'pairs': 2450, 'unresolved': 2450, 'decided': 0, 'identity_failures': 50, 'constant_parts': 0},
+    'template_ft_esd_rect_pulse': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_gas_phase_concentration': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_gauss_law_symmetric': {'pairs': 2450, 'false_accepts': 4, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_heat_of_reaction_formation': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
@@ -591,7 +634,7 @@ VALIDATION: dict[str, dict[str, int]] = {
     'template_particle_pathline': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_pfr_volume_changing_rate': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_phase_relations_degree_of_saturation': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
-    'template_phasor_addition': {'pairs': 2450, 'unresolved': 2450, 'decided': 0, 'identity_failures': 50, 'constant_parts': 0},
+    'template_phasor_addition': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_pitzer_correlation_z': {'pairs': 2450, 'false_accepts': 1, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_poisson_event_count': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_poissons_ratio': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
@@ -636,7 +679,7 @@ VALIDATION: dict[str, dict[str, int]] = {
     'template_two_step_transition_probability': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_undamped_natural_frequency_torsional': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_undamped_natural_frequency_translational': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
-    'template_undamped_response_initial_conditions': {'pairs': 2450, 'unresolved': 2450, 'decided': 0, 'identity_failures': 50, 'constant_parts': 0},
+    'template_undamped_response_initial_conditions': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_upward_seepage_quick_condition': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_utube_manometer': {'pairs': 2450, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},
     'template_vdw_solve_for_pressure': {'pairs': 2450, 'false_accepts': 2, 'decided': 2450, 'identity_failures': 0, 'constant_parts': 0},

@@ -1,5 +1,6 @@
 import random
 import math
+from data.templates.branches._emission import signed_term, joined_terms
 
 
 # Template 1 (Easy)
@@ -60,7 +61,7 @@ def template_lorentz_force():
     
     # Helper function to format vectors for display
     def format_vector(v, units=""):
-        return f"({v[0]} x_hat + {v[1]} y_hat + {v[2]} z_hat) {units}".strip()
+        return f"({v[0]} x_hat {signed_term(v[1], 'y_hat')} {signed_term(v[2], 'z_hat')}) {units}".strip()
 
     question = (
         f"A point charge of {q_uC} uC has a velocity of u = {format_vector(u_vec, 'm/s')} "
@@ -77,7 +78,7 @@ def template_lorentz_force():
         f"**Step 1:** Convert Units to SI\n"
         f"  First, we convert the given values to standard SI units for the calculation.\n"
         f"  - Charge in Coulombs: q = {q_uC} * 1e-6 = {q_C:.2e} C\n"
-        f"  - Magnetic Field in Tesla: B = ({B_vec_T[0]:.2e} x_hat + {B_vec_T[1]:.2e} y_hat + {B_vec_T[2]:.2e} z_hat) T\n\n"
+        f"  - Magnetic Field in Tesla: B = ({B_vec_T[0]:.2e} x_hat {signed_term(B_vec_T[1], 'y_hat', '{:.2e}'.format)} {signed_term(B_vec_T[2], 'z_hat', '{:.2e}'.format)}) T\n\n"
         
         f"**Step 2:** Calculate the Cross Product (u x B)\n"
         f"  The force is determined by the formula F_m = q * (u x B). We start by calculating the cross product.\n"
@@ -85,12 +86,12 @@ def template_lorentz_force():
         f"  (u x B)_x = ({u_vec[1]}) * ({B_vec_T[2]:.2e}) - ({u_vec[2]}) * ({B_vec_T[1]:.2e}) = {cross_product_x:.4f}\n"
         f"  (u x B)_y = ({u_vec[2]}) * ({B_vec_T[0]:.2e}) - ({u_vec[0]}) * ({B_vec_T[2]:.2e}) = {cross_product_y:.4f}\n"
         f"  (u x B)_z = ({u_vec[0]}) * ({B_vec_T[1]:.2e}) - ({u_vec[1]}) * ({B_vec_T[0]:.2e}) = {cross_product_z:.4f}\n"
-        f"  So, u x B = ({round(cross_product_x, precision)} x_hat + {round(cross_product_y, precision)} y_hat + {round(cross_product_z, precision)} z_hat) T*m/s\n\n"
+        f"  So, u x B = ({round(cross_product_x, precision)} x_hat {signed_term(round(cross_product_y, precision), 'y_hat')} {signed_term(round(cross_product_z, precision), 'z_hat')}) T*m/s\n\n"
 
         f"**Step 3:** Calculate the Force Vector (F_m)\n"
         f"  Now, multiply the cross product by the charge q.\n"
-        f"  F_m = ({q_C:.2e} C) * ({round(cross_product_x, precision)} x_hat + {round(cross_product_y, precision)} y_hat + {round(cross_product_z, precision)} z_hat)\n"
-        f"  F_m = ({force_x:.{precision}e} x_hat + {force_y:.{precision}e} y_hat + {force_z:.{precision}e} z_hat) N\n\n"
+        f"  F_m = ({q_C:.2e} C) * ({round(cross_product_x, precision)} x_hat {signed_term(round(cross_product_y, precision), 'y_hat')} {signed_term(round(cross_product_z, precision), 'z_hat')})\n"
+        f"  F_m = ({force_x:.{precision}e} x_hat {signed_term(force_y, 'y_hat', ('{:.' + str(precision) + 'e}').format)} {signed_term(force_z, 'z_hat', ('{:.' + str(precision) + 'e}').format)}) N\n\n"
         
         f"**Step 4:** Calculate the Magnitude of the Force\n"
         f"  The magnitude is the square root of the sum of the squares of the components.\n"
@@ -98,7 +99,7 @@ def template_lorentz_force():
         f"  |F_m| = {force_magnitude:.{precision}e} N\n\n"
         
         f"**Answer:**\n"
-        f"  The magnetic force vector is F_m = ({force_x:.{precision}e} x_hat + {force_y:.{precision}e} y_hat + {force_z:.{precision}e} z_hat) N.\n"
+        f"  The magnetic force vector is F_m = ({force_x:.{precision}e} x_hat {signed_term(force_y, 'y_hat', ('{:.' + str(precision) + 'e}').format)} {signed_term(force_z, 'z_hat', ('{:.' + str(precision) + 'e}').format)}) N.\n"
         f"  The magnitude of the force is |F_m| = {force_magnitude:.{precision}e} N."
     )
 

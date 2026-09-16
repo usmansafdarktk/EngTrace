@@ -2,6 +2,7 @@ import random
 import math
 import numpy as np
 from data.templates.branches.electrical_engineering.constants import EPSILON_0
+from data.templates.branches._emission import signed_term, joined_terms, paren_neg
 
 
 # Template 1 (Easy)
@@ -83,7 +84,7 @@ def template_coulombs_law():
         f"  R12 = P2 - P1 = {p2} - {p1} = {R_vec} m.\n\n"
         
         f"**Step 2:** Calculate the magnitude of the separation vector.\n"
-        f"  |R12| = sqrt({R_vec[0]}^2 + {R_vec[1]}^2 + {R_vec[2]}^2)\n"
+        f"  |R12| = sqrt({paren_neg(R_vec[0])}^2 + {paren_neg(R_vec[1])}^2 + {paren_neg(R_vec[2])}^2)\n"
         f"  |R12| = sqrt({R_vec[0]**2} + {R_vec[1]**2} + {R_vec[2]**2}) = sqrt({R_mag**2:.2f}) = {R_mag:.{precision}f} m.\n\n"
         
         f"**Step 3:** Apply the vector form of Coulomb's Law.\n"
