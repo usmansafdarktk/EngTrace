@@ -322,7 +322,11 @@ def check(cfg) -> int:
     bad = 0
     for spec in cfg['models']:
         pin, pout = price_of(spec, prices)
-        probe = dict(spec, max_tokens=512)   # a reasoning model needs room to answer at all
+        # Probe at the model's OWN ceiling, not a token-saving 512. A reasoning
+        # model spends its budget thinking before it writes anything, so a small
+        # probe tests the ceiling rather than the endpoint - and the ceiling is
+        # what the real run would use anyway.
+        probe = dict(spec)
         try:
             cli = client_for(spec['route'], cfg)
         except SystemExit as exc:
