@@ -85,13 +85,31 @@ def libraries() -> dict:
     """
     from importlib.metadata import version, PackageNotFoundError
     out = {}
-    for pkg in ('torch', 'transformers', 'sentence-transformers', 'bert-score',
+    # torch is deliberately NOT here. The same scoring stack runs on a CUDA build
+    # on Kaggle and a CPU build locally, and a torch-in-the-key cache could never
+    # be shared between them. Device and torch build are recorded per row by
+    # compute() instead, and cross-device agreement is PROVED before a Kaggle
+    # number is used (run_evaluator --import-kaggle), not assumed.
+    for pkg in ('transformers', 'sentence-transformers', 'bert-score',
                 'rouge-score', 'tokenizers', 'scipy', 'numpy'):
         try:
             out[pkg] = version(pkg)
         except PackageNotFoundError:
             out[pkg] = None
     return out
+
+
+def compute() -> dict:
+    """Where a row's numbers were produced. Provenance, not config."""
+    import platform
+    try:
+        import torch
+        cuda = torch.cuda.is_available()
+        return {'torch': torch.__version__, 'cuda': cuda,
+                'device': torch.cuda.get_device_name(0) if cuda else platform.processor() or 'cpu',
+                'host': 'kaggle' if os.path.isdir('/kaggle') else platform.node()}
+    except Exception as exc:                                       # noqa: BLE001
+        return {'error': str(exc)[:200]}
 
 
 def config() -> dict:
@@ -299,10 +317,13 @@ def setup(dry_run: bool = False):
         # No keys handed to the constructor: the clients are injected below, so
         # it cannot build a direct client with a dead key by accident.
         framework = fw.EngTraceFramework({})
-    framework.client_openai, framework.client_anthropic = build_clients(log)
-    # The framework's configure() reads GOOGLE_API_KEY first when both are set;
-    # GEMINI_API_KEY is the one scoped for Gemini, so pass it explicitly.
-    genai.configure(api_key=os.environ['GEMINI_API_KEY'])
+    if not dry_run:
+        # A dry run never reaches a judge, so it needs no keys - which is what lets
+        # it run on a Kaggle kernel that has none and never should.
+        framework.client_openai, framework.client_anthropic = build_clients(log)
+        # The framework's configure() reads GOOGLE_API_KEY first when both are set;
+        # GEMINI_API_KEY is the one scoped for Gemini, so pass it explicitly.
+        genai.configure(api_key=os.environ['GEMINI_API_KEY'])
     wrap_google(log, genai)
 
     install_cache(fw, framework)
@@ -330,7 +351,8 @@ def setup(dry_run: bool = False):
             return {}, 'N/A', {}
         framework._tier2_tribunal_batch = recorder
 
-    return SimpleNamespace(fw=fw, framework=framework, log=log, genai=genai)
+    return SimpleNamespace(fw=fw, framework=framework, log=log, genai=genai,
+                           compute=dict(compute(), framework_device=str(fw.device)))
 
 
 # --------------------------------------------------------------------- score
@@ -370,6 +392,7 @@ def score(state, item: dict, trace: dict, seed: int) -> dict:
                      judge_failures=sorted(set(called) - set(parsed)),
                      judges_truncated=truncated,
                      scorer_failures=scorer_failures,
+                     compute=state.compute,
                      framework_stdout=stdout[-2000:] or None,
                      deviations=DEVIATIONS),
         'calls': log.calls,

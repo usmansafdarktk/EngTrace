@@ -71,11 +71,30 @@ def config_sha(cfg: dict) -> str:
     return _sha(json.dumps(cfg, sort_keys=True))
 
 
-def verified_traces():
-    """The traces verify_traces passes, or stop."""
-    import freeze as fz
-    if fz.verify(fz.DEFAULT_MASTER_SEED) != 0:
-        raise SystemExit('the frozen slice does not verify - refusing to score')
+def verified_traces(freeze_check: str = 'rebuild'):
+    """The traces verify_traces passes, or stop.
+
+    freeze_check='rebuild' regenerates the slice from the templates and compares
+    bytes - the full check, and the one to use wherever the repo is present.
+    'hash' only confirms the manifest's SHA-256 equals the one FREEZE.json
+    recorded. It is for a Kaggle kernel, which receives the manifest but not the
+    2,250-record testset or the template tree the rebuild needs; the bundle is
+    staged only after a full rebuild passes locally, so the hash then proves the
+    kernel is reading those same bytes. The mode used is written on every row.
+    """
+    if freeze_check == 'rebuild':
+        import freeze as fz
+        if fz.verify(fz.DEFAULT_MASTER_SEED) != 0:
+            raise SystemExit('the frozen slice does not verify - refusing to score')
+    else:
+        with open(rt.MANIFEST, 'rb') as fh:
+            got = hashlib.sha256(fh.read()).hexdigest()
+        with open(os.path.join(rt.SLICE, 'FREEZE.json'), encoding='utf-8') as fh:
+            want = json.load(fh)['manifest_sha256']
+        if got != want:
+            raise SystemExit('manifest sha256 %s != FREEZE.json %s - refusing to score'
+                             % (got[:16], want[:16]))
+        print('FREEZE HASH OK - manifest sha256 %s matches FREEZE.json' % got[:16])
     items, traces = vt.load()
     bad = vt.check(items, traces)
     if bad:
@@ -156,9 +175,9 @@ def dry_reached(evaluator: str) -> set:
     return out
 
 
-def run(evaluator: str, dry_run: bool, limit, models):
+def run(evaluator: str, dry_run: bool, limit, models, freeze_check='rebuild'):
     mod = importlib.import_module(EVALUATORS[evaluator])
-    items, traces = verified_traces()
+    items, traces = verified_traces(freeze_check)
     cfg = mod.config()
     csha = config_sha(cfg)
     work = plan(items, traces, evaluator if not dry_run else evaluator + '_dry', csha, limit, models)
@@ -187,6 +206,7 @@ def run(evaluator: str, dry_run: bool, limit, models):
                'branch': items[item_id]['branch'], 'answer_type': items[item_id]['answer_type'],
                'item_sha256': items[item_id]['sha256'], 'trace_sha256': tsha,
                'config_sha256': csha, 'seed': seed, 'dry_run': dry_run,
+               'freeze_check': freeze_check,
                'ts': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}
         t1 = time.time()
         try:
@@ -220,7 +240,13 @@ def run(evaluator: str, dry_run: bool, limit, models):
 
 def dry_estimate(tag: str):
     """From the dry run's recorded prompts, what the real Tribunal would cost."""
-    prices = rt.live_prices()
+    try:
+        prices = rt.live_prices()
+    except Exception:                                              # noqa: BLE001
+        # No key on a Kaggle kernel, by design. Snapshot prices from 2026-09-17;
+        # re-run the estimate locally for live ones.
+        prices = {'openai/gpt-5': (1.25, 10.0), 'anthropic/claude-opus-4.5': (5.0, 25.0)}
+        print('\n(no OpenRouter key here - estimate uses 2026-09-17 snapshot prices)')
     rows = []
     for fn in os.listdir(os.path.join(SCORES, tag)):
         rows += [json.loads(ln) for ln in open(os.path.join(SCORES, tag, fn), encoding='utf-8')]
@@ -267,6 +293,115 @@ def status(evaluator: str):
     return 0
 
 
+EXACT = ('recall', 'precision', 'recovered_f1', 'final_answer_acc', 'rouge2', 'rougeL', 'rougeLsum')
+BERT_TOL = 1e-4
+MIN_REFERENCE = 8
+
+
+def _rows(d: str) -> dict:
+    out = {}
+    if not os.path.isdir(d):
+        return out
+    for fn in os.listdir(d):
+        if fn.endswith('.jsonl'):
+            for ln in open(os.path.join(d, fn), encoding='utf-8'):
+                r = json.loads(ln)
+                if not r.get('error'):
+                    out[(r['model_key'], r['item_id'])] = r
+    return out
+
+
+def import_kaggle(evaluator: str, src: str) -> int:
+    """Take a kernel's dry run only after proving it matches this machine.
+
+    The GPU kernel and this CPU run the same pinned scoring stack on different
+    hardware and torch builds. Agreement is expected and is NOT assumed: every
+    (model, item) scored in both places is compared - Tier 1 metrics and ROUGE
+    exactly, BERTScore within 1e-4, the Tribunal trigger identically - and a
+    single disagreement refuses the import. Only then is the kernel's Tier 1
+    cache merged, so the paid run here reuses GPU work instead of repeating it.
+    """
+    mod = importlib.import_module(EVALUATORS[evaluator])
+    csha = config_sha(mod.config())
+    k_rows = _rows(os.path.join(src, 'scores', evaluator + '_dry'))
+    l_dir = os.path.join(SCORES, evaluator + '_dry')
+    l_rows = {k: r for k, r in _rows(l_dir).items() if not (r['meta'].get('compute') or {}).get('cuda')}
+    k_cache = os.path.join(src, 'scores', '_cache', 'e0_tier1.jsonl')
+
+    problems = []
+    if len(k_rows) != 300:
+        problems.append('kernel scored %d of 300' % len(k_rows))
+    wrong_cfg = sum(1 for r in k_rows.values() if r['config_sha256'] != csha)
+    if wrong_cfg:
+        problems.append('%d kernel rows carry a different config (library pins drifted?)' % wrong_cfg)
+    not_gpu = sum(1 for r in k_rows.values() if not (r['meta'].get('compute') or {}).get('cuda'))
+    if not_gpu:
+        problems.append('%d kernel rows were NOT scored on a GPU' % not_gpu)
+    sfail = sum(1 for r in k_rows.values() if r['meta'].get('scorer_failures'))
+    if sfail:
+        problems.append('%d kernel rows have a BERTScore failure' % sfail)
+
+    shared = sorted(set(k_rows) & set(l_rows))
+    worst_bert, worst_exact = 0.0, 0.0
+    for k in shared:
+        a, b = k_rows[k], l_rows[k]
+        for f in EXACT:
+            d = abs(a['scores'][f] - b['scores'][f])
+            worst_exact = max(worst_exact, d)
+            if d > 1e-9:
+                problems.append('%s/%s %s: kernel %.6f vs local %.6f' % (k[0], k[1], f, a['scores'][f], b['scores'][f]))
+        d = abs(a['scores']['bertscore'] - b['scores']['bertscore'])
+        worst_bert = max(worst_bert, d)
+        if d > BERT_TOL:
+            problems.append('%s/%s bertscore: kernel %.6f vs local %.6f' % (k[0], k[1], a['scores']['bertscore'], b['scores']['bertscore']))
+        for f in ('triggered',):
+            if a.get(f) != b.get(f):
+                problems.append('%s/%s %s differs' % (k[0], k[1], f))
+        if a['meta'].get('tribunal_reached_judges') != b['meta'].get('tribunal_reached_judges'):
+            problems.append('%s/%s tribunal_reached_judges differs' % k)
+    if len(shared) < MIN_REFERENCE:
+        problems.append('only %d rows scored in both places; need %d to vouch for the rest'
+                        % (len(shared), MIN_REFERENCE))
+
+    dev = Counter((r['meta'].get('compute') or {}).get('device') for r in k_rows.values())
+    print('kernel rows %d on %s' % (len(k_rows), dict(dev)))
+    print('reference rows scored on both GPU and this CPU: %d' % len(shared))
+    print('  worst |diff|: Tier 1 + ROUGE %.2e   BERTScore %.2e (tolerance %.0e)'
+          % (worst_exact, worst_bert, BERT_TOL))
+    if problems:
+        print('IMPORT REFUSED - %d problem(s):' % len(problems))
+        for p in problems[:20]:
+            print('  ' + p)
+        return 1
+
+    # Merge: the local rows become the reference record, the kernel rows the dry run.
+    ref = os.path.join(SCORES, evaluator + '_dry_cpu_reference')
+    if os.path.isdir(l_dir):
+        os.makedirs(ref, exist_ok=True)
+        for fn in os.listdir(l_dir):
+            os.replace(os.path.join(l_dir, fn), os.path.join(ref, fn))
+    os.makedirs(l_dir, exist_ok=True)
+    for fn in os.listdir(os.path.join(src, 'scores', evaluator + '_dry')):
+        with open(os.path.join(src, 'scores', evaluator + '_dry', fn), encoding='utf-8') as fi, \
+             open(os.path.join(l_dir, fn), 'w', encoding='utf-8', newline='\n') as fo:
+            fo.write(fi.read())
+    added = 0
+    local_cache = os.path.join(SCORES, '_cache', 'e0_tier1.jsonl')
+    os.makedirs(os.path.dirname(local_cache), exist_ok=True)
+    have = set()
+    if os.path.exists(local_cache):
+        have = {json.loads(ln)['k'] for ln in open(local_cache, encoding='utf-8') if ln.strip()}
+    with open(local_cache, 'a', encoding='utf-8', newline='\n') as fo:
+        for ln in open(k_cache, encoding='utf-8'):
+            if ln.strip() and json.loads(ln)['k'] not in have:
+                fo.write(ln if ln.endswith('\n') else ln + '\n')
+                added += 1
+    print('IMPORTED - %d kernel rows are now the dry run; %d Tier 1 cache entries merged; '
+          'the CPU rows are kept in %s' % (len(k_rows), added, os.path.relpath(ref, _HERE)))
+    dry_estimate(evaluator + '_dry')
+    return 0
+
+
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
     ap.add_argument('evaluator', choices=sorted(EVALUATORS))
@@ -274,10 +409,15 @@ def main():
     ap.add_argument('--smoke', type=int, metavar='N', help='score N entries for real, then stop')
     ap.add_argument('--model', action='append')
     ap.add_argument('--status', action='store_true')
+    ap.add_argument('--freeze-check', choices=('rebuild', 'hash'), default='rebuild')
+    ap.add_argument('--import-kaggle', metavar='DIR',
+                    help="a kernel's downloaded output; merged only if it matches local reference rows")
     args = ap.parse_args()
     if args.status:
         return status(args.evaluator)
-    return run(args.evaluator, args.dry_run, args.smoke, args.model)
+    if args.import_kaggle:
+        return import_kaggle(args.evaluator, args.import_kaggle)
+    return run(args.evaluator, args.dry_run, args.smoke, args.model, args.freeze_check)
 
 
 if __name__ == '__main__':
