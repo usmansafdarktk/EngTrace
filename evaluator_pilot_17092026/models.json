@@ -1,0 +1,102 @@
+{
+  "_comment": [
+    "The five pilot trace sources. Three judge families (openai, anthropic, google)",
+    "and two non-judge controls (deepseek, meta), which is the two-axis design the",
+    "suggested-actions document asks for: capability and judge-family.",
+    "",
+    "route: which base_url + key to use. All three go through the `openai` SDK -",
+    "OpenAI natively, Google via its OpenAI-compatible endpoint, and OpenRouter for",
+    "Anthropic and the open-weight models. One client class, three endpoints, three",
+    "keys, exactly as the keys in .env are scoped.",
+    "",
+    "anthropic/claude-sonnet-4.7 does not exist on OpenRouter (the Sonnet line is",
+    "4, 4.5, 4.6, 5). claude-opus-4.7 is used because it is the judge the published",
+    "framework runs, so E0 stays the published baseline.",
+    "",
+    "price_per_m is a SNAPSHOT taken from the OpenRouter catalogue on 2026-09-17,",
+    "used only to estimate and report spend. It is not authoritative: run",
+    "`python -m evaluator_pilot_17092026.run_traces --check` to re-read live prices.",
+    "",
+    "max_tokens is a per-model ceiling. The three reasoning models get 8192 because",
+    "their thinking is billed inside the completion budget: at 4096 a long derivation",
+    "returns finish_reason=length with empty content, which run_traces records as a",
+    "failure rather than as a trace. Llama is capped at 2048 because it does not",
+    "reason and its archive completions sit near 400 tokens."
+  ],
+  "prompt_sha256_prefix": "c2bcb87984c4e50b",
+  "models": [
+    {
+      "key": "gpt-5",
+      "route": "openai",
+      "model": "gpt-5",
+      "role": "judge family",
+      "price_per_m": {
+        "in": 1.25,
+        "out": 10.0
+      },
+      "max_tokens": 8192
+    },
+    {
+      "key": "claude-opus-4.7",
+      "route": "openrouter",
+      "model": "anthropic/claude-opus-4.7",
+      "role": "judge family",
+      "price_per_m": {
+        "in": 5.0,
+        "out": 25.0
+      },
+      "max_tokens": 4096
+    },
+    {
+      "key": "gemini-3.1-pro",
+      "route": "google",
+      "model": "gemini-3.1-pro-preview",
+      "fallback": {
+        "route": "openrouter",
+        "model": "google/gemini-3.1-pro-preview"
+      },
+      "role": "judge family",
+      "price_per_m": {
+        "in": 2.0,
+        "out": 12.0
+      },
+      "max_tokens": 8192
+    },
+    {
+      "key": "deepseek-r1",
+      "route": "openrouter",
+      "model": "deepseek/deepseek-r1",
+      "role": "non-judge control",
+      "price_per_m": {
+        "in": 0.7,
+        "out": 2.5
+      },
+      "max_tokens": 8192
+    },
+    {
+      "key": "llama-3.1-70b",
+      "route": "openrouter",
+      "model": "meta-llama/llama-3.1-70b-instruct",
+      "role": "non-judge control",
+      "price_per_m": {
+        "in": 0.4,
+        "out": 0.4
+      },
+      "max_tokens": 2048
+    }
+  ],
+  "routes": {
+    "openai": {
+      "base_url": null,
+      "key_env": "OPENAI_API_KEY"
+    },
+    "google": {
+      "base_url": "https://generativelanguage.googleapis.com/v1beta/openai/",
+      "key_env": "GEMINI_API_KEY"
+    },
+    "openrouter": {
+      "base_url": "https://openrouter.ai/api/v1",
+      "key_env": "OPENROUTER_API_KEY"
+    }
+  }
+}

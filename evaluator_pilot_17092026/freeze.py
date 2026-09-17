@@ -1,8 +1,8 @@
 """Cut the frozen pilot slice, and pin it so it cannot move under an annotator.
 
-    python -m pilot.freeze                 # write pilot/pilot_v1/
-    python -m pilot.freeze --verify        # rebuild and compare; write nothing
-    python -m pilot.freeze --selftest      # the selection rule's own plants
+    python -m evaluator_pilot_17092026.freeze                 # write pilot/pilot_v1/
+    python -m evaluator_pilot_17092026.freeze --verify        # rebuild and compare; write nothing
+    python -m evaluator_pilot_17092026.freeze --selftest      # the selection rule's own plants
 
 WHY A FREEZE.  Six evaluators get compared on this set, and human experts label
 every trace in it.  Both only mean something if the set does not move: a swapped
@@ -66,7 +66,7 @@ from generate_testset import DEFAULT_MASTER_SEED, item_seed  # noqa: E402
 TESTSET = os.path.join(_ROOT, 'testset')
 INVENTORY = os.path.join(_ROOT, 'docs', 're-implementation-sep', 'audit',
                          'template_inventory.csv')
-OUT_DIR = os.path.join(_HERE, 'pilot_v1')
+OUT_DIR = os.path.join(_HERE, 'slice')
 LEVELS = ('Easy', 'Intermediate', 'Advanced')
 INSTANCES = 4
 
@@ -195,7 +195,7 @@ def _git(*args):
 
 def freeze_doc(manifest, audit, master_seed, manifest_sha):
     return {
-        'pilot': 'pilot_v1',
+        'pilot': 'evaluator_pilot_17092026',
         'frozen_at_utc': __import__('datetime').datetime.now(
             __import__('datetime').timezone.utc).isoformat(timespec='seconds'),
         'commit': _git('rev-parse', 'HEAD'),
@@ -229,7 +229,7 @@ def write(manifest, audit, master_seed):
 
 
 def report(doc, manifest):
-    print('pilot_v1: %d templates x %d instances = %d items, %d traces at 5 models'
+    print('slice: %d templates x %d instances = %d items, %d traces at 5 models'
           % (doc['templates'], INSTANCES, doc['items'], doc['traces_at_5_models']))
     print('  by branch      %s' % doc['by_branch'])
     print('  by level       %s' % doc['by_level'])
