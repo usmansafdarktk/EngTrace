@@ -16,6 +16,7 @@ evaluator_pilot_17092026/
   README.md        this file
   freeze.py        cuts and pins the slice; --verify fails if anything drifts
   run_traces.py    the five models over the slice; resumable, --check first
+  verify_traces.py checks the produced traces against the slice; T1-T7 + plants
   models.json      the five models, their routes, keys, ceilings and prices
   slice/           FROZEN. Do not edit by hand.
     manifest.jsonl   60 items: question, gold solution, seed, SHA-256
@@ -35,7 +36,11 @@ python -m evaluator_pilot_17092026.run_traces --check   # ~$0.01. Keys, model id
 python -m evaluator_pilot_17092026.run_traces --dry-run # free. The plan and the estimated spend.
 python -m evaluator_pilot_17092026.run_traces           # the paid run. Resumable.
 python -m evaluator_pilot_17092026.run_traces --status  # what exists, and what it actually cost.
+python -m evaluator_pilot_17092026.verify_traces        # free. T1-T7 over the produced traces.
 ```
+
+`--status` counts rows; `verify_traces` is what says the rows mean anything. Add
+`--redo-truncated` to a run to re-call only the rows that ended mid-derivation.
 
 `--check` is not a formality. It is what settles whether OpenAI accepts `gpt-5`
 verbatim and whether Google's OpenAI-compatible endpoint accepts
@@ -108,10 +113,10 @@ unless `--verify` passes.
 
 | Key | Route | Model id | Role |
 |---|---|---|---|
-| `gpt-5` | OpenAI | `gpt-5` | judge family |
+| `gpt-5` | OpenRouter | `openai/gpt-5` | judge family |
 | `claude-opus-4.7` | OpenRouter | `anthropic/claude-opus-4.7` | judge family |
 | `gemini-3.1-pro` | Google | `gemini-3.1-pro-preview` | judge family |
-| `deepseek-r1` | OpenRouter | `deepseek/deepseek-r1` | non-judge control |
+| `deepseek-r1` | OpenRouter | `deepseek/deepseek-r1-0528` | non-judge control |
 | `llama-3.1-70b` | OpenRouter | `meta-llama/llama-3.1-70b-instruct` | non-judge control |
 
 Two axes on purpose: capability, and whether the model's family also sits on the
@@ -121,7 +126,11 @@ from a judge's preference for its own family's output.
 All five go through the one `openai` SDK at three base URLs, so the keys stay
 scoped exactly as they are in `.env`: `OPENAI_API_KEY` for OpenAI,
 `GEMINI_API_KEY` for Google's compatible endpoint, `OPENROUTER_API_KEY` for the
-rest. `ANTHROPIC_API_KEY` is not used — Claude is reached through OpenRouter.
+rest. `ANTHROPIC_API_KEY` is not used, and neither is `OPENAI_API_KEY`: both
+return 401, so Claude and GPT-5 are both reached through OpenRouter. `openai/gpt-5`
+is priced there exactly as the direct API is, so nothing is lost by it. The direct
+route stays in `models.json` under `fallback`, to switch back and confirm with
+`--check` when a working key exists.
 
 ## What the runner records, and why
 
@@ -154,13 +163,61 @@ reasoning models also reject `max_tokens` and want `max_completion_tokens`, whil
 the other two endpoints want `max_tokens`; the route picks, and a 400 naming the
 other one switches.
 
-## Cost
+## Stage 1 result, 2026-09-17
 
-`--check` re-reads the live OpenRouter catalogue, so the estimate is never a stale
-snapshot. At archive-mean lengths `--dry-run` puts the 300 traces at **$1.36**
-(gpt-5 $0.26, Claude $0.69, Gemini $0.32, DeepSeek $0.07, Llama $0.02), and the 300
-traces plus one clean E0 tribunal pass came to **$11.40**, $6.41 of it Claude.
-Reasoning tokens push the real figure above the mean-based estimate, which is why
-`--status` reports what was actually spent from returned usage. The pilot phase as
-a whole was quoted at $70-150, covering the other evaluator candidates, X2 and
-retries.
+**300 of 300 traces. `verify_traces.py` passes T1-T7, all eight plants fire.**
+
+| Model | served | traces | reported cost | median trace | median completion tokens |
+|---|---|---|---|---|---|
+| gpt-5 | `openai/gpt-5` | 60 | $2.96 | 1,449 chars | 4,491 |
+| claude-opus-4.7 | `anthropic/claude-opus-4.7` | 60 | $1.47 | 1,321 chars | 833 |
+| gemini-3.1-pro | `gemini-3.1-pro-preview` | 60 | $0.77 (floor) | 2,376 chars | 1,047 |
+| deepseek-r1 | `deepseek/deepseek-r1-0528` | 60 | $1.31 | 3,105 chars | 9,658 |
+| llama-3.1-70b | `meta-llama/llama-3.1-70b-instruct` | 60 | $0.02 | 1,406 chars | 583 |
+| **total** | | **300** | **$6.53** | 1,646 chars | |
+
+Getting there took three corrections, each one found by a check rather than by
+reading output.
+
+**DeepSeek could not fit its own answer.** `deepseek/deepseek-r1` has a single
+provider whose hard output cap is 16,000 tokens, and R1 writes 30,000-34,000
+characters of reasoning on the iterative items. 28 of 60 truncated mid-reasoning,
+and raising `max_tokens` did nothing because the number never reached the model.
+Moved to `deepseek/deepseek-r1-0528`: same model, updated checkpoint, four
+providers, none capped below 32,000, and cheaper. All 60 re-run rather than the 28
+that failed, because the 32 survivors were a different checkpoint and the items
+they failed on were the hard ones - topping them up would have left the column
+standing on its easy half. The old rows are in `traces/superseded/`.
+
+**19 answers stopped mid-derivation.** 15 Gemini, 4 GPT-5, at
+`finish_reason=length`. They had text, so the empty-completion guard passed them
+and `--status` counted them as answers; one ended mid-LaTeX-fraction. A quarter of
+the Gemini column. T7 exists because of this, and it is a failure now rather than
+a footnote.
+
+**Google does not report thinking tokens.** The 15 Gemini truncations reported
+323-1,455 completion tokens against an 8,192 ceiling, which cannot be that ceiling
+being hit. `reasoning_tokens` is `None` on every Gemini row: the OpenAI-compatible
+endpoint omits thinking from `usage`, so thinking was consuming the budget
+invisibly and cutting the visible answer. Hence the ceilings at 32,768 against
+provider maxima of 65,536 and 128,000 - ours was the binding constraint, not
+theirs.
+
+## Cost, and what the first pass corrected
+
+$6.53 against a $1.36 estimate, 4.8x. The whole gap is reasoning tokens, which the
+estimator does not model because it is calibrated on archive completions from
+non-reasoning models. GPT-5 alone is $2.96 against $0.26 predicted: its median
+completion is 4,491 tokens of which only about 362 are the visible answer.
+
+**Gemini's figure is a floor, not a bill.** Google bills thinking tokens that its
+OpenAI-compatible endpoint declines to report, so anything computed from returned
+usage understates it. It is the only model here with that gap, and any budget
+built on these numbers should carry it.
+
+**Stage 2 is not affected, and it is worth being precise about why.** Judges read
+the visible trace, not the reasoning. Median visible trace across all 300 is 411
+tokens, against the 401 the archive predicted - so the trace-length assumption was
+right all along, and only the billing assumption was wrong. E0 over these 300
+traces is three judges x 300 calls at about 2,170 input tokens each, roughly
+**$10.31**. The pilot phase envelope of $70-150 holds.

@@ -151,6 +151,22 @@ def trace_path(key: str) -> str:
     return os.path.join(TRACES, key.replace('/', '_') + '.jsonl')
 
 
+NATURAL_STOP = {'stop', 'end_turn', 'eos', None}
+REDO_TRUNCATED = False   # set by --redo-truncated
+
+
+def usable(row: dict) -> bool:
+    """An answer that stops mid-derivation is not an answer for this purpose.
+
+    The empty-completion guard catches a row with no text. It cannot catch a row
+    that has text and ends partway through, which is what finish_reason=length
+    means, so --redo-truncated treats those as unfinished and calls them again.
+    """
+    if not row.get('ok'):
+        return False
+    return not (REDO_TRUNCATED and row.get('finish_reason') not in NATURAL_STOP)
+
+
 def existing(key: str) -> dict[str, dict]:
     path = trace_path(key)
     if not os.path.exists(path):
@@ -162,7 +178,7 @@ def existing(key: str) -> dict[str, dict]:
                 row = json.loads(ln)
             except json.JSONDecodeError:
                 continue
-            if row.get('ok'):
+            if usable(row):
                 out[row['item_id']] = row
     return out
 
@@ -387,7 +403,12 @@ def main() -> int:
     ap.add_argument('--model', action='append', help='run only this model key')
     ap.add_argument('--limit', type=int, help='first N items only')
     ap.add_argument('--workers', type=int, default=4)
+    ap.add_argument('--redo-truncated', action='store_true',
+                    help='re-run rows that ended at finish_reason=length')
     args = ap.parse_args()
+
+    global REDO_TRUNCATED
+    REDO_TRUNCATED = args.redo_truncated
 
     cfg = config()
     if args.check:
