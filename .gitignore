@@ -36,6 +36,10 @@ pilot_new_branches/*
 # is the one thing a freeze is for. Only the model outputs are held back, matching
 # how inference_results/ is treated above.
 evaluator_pilot_17092026/traces/
+# Evaluator outputs, like traces, are produced data. The venv holds torch and the
+# scorer stack for E0, isolated so the pilot does not change the system Python.
+evaluator_pilot_17092026/scores/
+evaluator_pilot_17092026/.venv/
 
 scratch/
 
