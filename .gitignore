@@ -22,15 +22,20 @@ Evaluation Results EngChain FINAL
 error_analysis_samples
 ai_assisted_quality_assurance/ai_tribunal_results
 validation/
-pilot/*
-pilot/references
+# pilot_new_branches/ is the September staging area from BUILDING the civil and
+# industrial branches - large reference PDFs, draft templates, a testset preview.
+# It is not the evaluation pilot; it held only those two branches because those
+# were the two being built. Superseded by data/templates/branches/ (all five) and
+# docs/references/. Kept locally, not committed, except the README that says so.
+pilot_new_branches/*
+!pilot_new_branches/README.md
 
-# ...but the frozen pilot slice and its tooling ARE committed. The freeze is the
-# record that 300 annotated traces were labelled against a specific set of items:
-# untracked, it cannot be verified later, which is the one thing a freeze is for.
-!pilot/*.py
-!pilot/pilot_v1/
-!pilot/models.json
+# evaluator_pilot_17092026/ is the evaluation pilot, and its code and frozen slice ARE
+# committed. The freeze is the record that 300 annotated traces were labelled
+# against a specific set of items: untracked, it cannot be verified later, which
+# is the one thing a freeze is for. Only the model outputs are held back, matching
+# how inference_results/ is treated above.
+evaluator_pilot_17092026/traces/
 
 scratch/
 
