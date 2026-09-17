@@ -1,0 +1,210 @@
+{
+  "pilot": "pilot_v1",
+  "frozen_at_utc": "2026-09-17T07:14:22+00:00",
+  "commit": "0f86bc77176b64076bbec807ba2731fe37b309ff",
+  "tree_dirty": true,
+  "master_seed": 20260912,
+  "instances_per_template": 4,
+  "templates": 15,
+  "items": 60,
+  "traces_at_5_models": 300,
+  "selection_rule": [
+    ", which is the part a reader will want to audit:",
+    "1.  15 cells = 5 branches x 3 difficulty levels.  Every cell is populated",
+    "(the thinnest holds 6 templates), so the slice spans both axes by",
+    "construction rather than by luck.",
+    "2.  Within a cell, candidates exclude EXCLUSIONS below, each with a measured",
+    "reason.  They are all items whose answer is obtainable without doing the",
+    "reasoning, which is exactly what a step-level annotation cannot teach us",
+    "anything about.",
+    "3.  Among the rest, take the template whose ANSWER TYPE is least represented",
+    "in the slice so far.  This is what pulls symbolic, vector and multipart",
+    "answers in rather than leaving a slice of 15 scalars: the comparator's",
+    "known-weak kinds are the ones the pilot most needs to see.",
+    "4.  Ties break on BLAKE2b(master_seed, branch, level, template_id), so the",
+    "choice is deterministic and does not depend on dict or filesystem order.",
+    "5.  4 instances per template, taken in index order but skipping an instance",
+    "whose text a previous one already produced, seeds recomputed with the",
+    "generator's own item_seed - so the slice is a SUBSET of the full testset,",
+    "not a separate generation.  60 problems, and 5 models gives 300 traces.",
+    "The skip is not hypothetical: `incompressible_continuity` emits the same",
+    "question at indices 1 and 2, and the generator reports 38 duplicate",
+    "questions across the full pool.  A duplicate costs twice - an expert",
+    "annotates the same trace twice, and the item is double-weighted in every",
+    "aggregate.  Skipped indices are recorded per template in FREEZE.json."
+  ],
+  "exclusions": {
+    "system_property_linearity": "D-057: 100% predictable from the question surface (floor 50.02%)",
+    "system_properties_memory_causality": "D-057: 100% predictable from the question surface (floor 34.02%)",
+    "line_balancing_heuristic": "D-046: ~90% shortcuttable by counting task pairs, no heuristic needed",
+    "levenspiel_plot_interpretation": "D-066: blind-guess floor 1.0000, so the statistic is degenerate"
+  },
+  "cells": [
+    {
+      "branch": "chemical_engineering",
+      "level": "Easy",
+      "chosen": "rackett_equation_volume",
+      "answer_type": "scalar",
+      "candidates": 13,
+      "excluded": [],
+      "skipped_duplicate_indices": []
+    },
+    {
+      "branch": "chemical_engineering",
+      "level": "Intermediate",
+      "chosen": "reynolds_number_flow_regime",
+      "answer_type": "classification",
+      "candidates": 9,
+      "excluded": [],
+      "skipped_duplicate_indices": []
+    },
+    {
+      "branch": "chemical_engineering",
+      "level": "Advanced",
+      "chosen": "gas_phase_concentration",
+      "answer_type": "multipart",
+      "candidates": 8,
+      "excluded": [
+        "levenspiel_plot_interpretation"
+      ],
+      "skipped_duplicate_indices": []
+    },
+    {
+      "branch": "civil_engineering",
+      "level": "Easy",
+      "chosen": "manning_rectangular_discharge",
+      "answer_type": "scalar",
+      "candidates": 12,
+      "excluded": [],
+      "skipped_duplicate_indices": []
+    },
+    {
+      "branch": "civil_engineering",
+      "level": "Intermediate",
+      "chosen": "cantilever_double_integration",
+      "answer_type": "scalar",
+      "candidates": 12,
+      "excluded": [],
+      "skipped_duplicate_indices": []
+    },
+    {
+      "branch": "civil_engineering",
+      "level": "Advanced",
+      "chosen": "normal_depth_iteration",
+      "answer_type": "array",
+      "candidates": 6,
+      "excluded": [],
+      "skipped_duplicate_indices": []
+    },
+    {
+      "branch": "electrical_engineering",
+      "level": "Easy",
+      "chosen": "lorentz_force",
+      "answer_type": "vector",
+      "candidates": 11,
+      "excluded": [
+        "system_properties_memory_causality"
+      ],
+      "skipped_duplicate_indices": []
+    },
+    {
+      "branch": "electrical_engineering",
+      "level": "Intermediate",
+      "chosen": "phasor_addition",
+      "answer_type": "symbolic",
+      "candidates": 12,
+      "excluded": [
+        "system_property_linearity"
+      ],
+      "skipped_duplicate_indices": []
+    },
+    {
+      "branch": "electrical_engineering",
+      "level": "Advanced",
+      "chosen": "coaxial_capacitance",
+      "answer_type": "multipart",
+      "candidates": 7,
+      "excluded": [],
+      "skipped_duplicate_indices": []
+    },
+    {
+      "branch": "industrial_engineering",
+      "level": "Easy",
+      "chosen": "two_state_steady_state",
+      "answer_type": "vector",
+      "candidates": 12,
+      "excluded": [],
+      "skipped_duplicate_indices": []
+    },
+    {
+      "branch": "industrial_engineering",
+      "level": "Intermediate",
+      "chosen": "server_configuration_selection",
+      "answer_type": "multipart",
+      "candidates": 12,
+      "excluded": [],
+      "skipped_duplicate_indices": []
+    },
+    {
+      "branch": "industrial_engineering",
+      "level": "Advanced",
+      "chosen": "aoq_ati_rectifying",
+      "answer_type": "multipart",
+      "candidates": 6,
+      "excluded": [
+        "line_balancing_heuristic"
+      ],
+      "skipped_duplicate_indices": []
+    },
+    {
+      "branch": "mechanical_engineering",
+      "level": "Easy",
+      "chosen": "fluid_particle_acceleration",
+      "answer_type": "vector",
+      "candidates": 10,
+      "excluded": [],
+      "skipped_duplicate_indices": []
+    },
+    {
+      "branch": "mechanical_engineering",
+      "level": "Intermediate",
+      "chosen": "damping_classification",
+      "answer_type": "classification",
+      "candidates": 13,
+      "excluded": [],
+      "skipped_duplicate_indices": []
+    },
+    {
+      "branch": "mechanical_engineering",
+      "level": "Advanced",
+      "chosen": "incompressible_continuity",
+      "answer_type": "symbolic",
+      "candidates": 7,
+      "excluded": [],
+      "skipped_duplicate_indices": [
+        2
+      ]
+    }
+  ],
+  "by_branch": {
+    "chemical_engineering": 12,
+    "civil_engineering": 12,
+    "electrical_engineering": 12,
+    "industrial_engineering": 12,
+    "mechanical_engineering": 12
+  },
+  "by_level": {
+    "Easy": 20,
+    "Intermediate": 20,
+    "Advanced": 20
+  },
+  "by_answer_type": {
+    "scalar": 12,
+    "classification": 8,
+    "multipart": 16,
+    "array": 4,
+    "vector": 12,
+    "symbolic": 8
+  },
+  "manifest_sha256": "925b6da7d72c77f6d027c2568e6c79b42a27bfd6d63f90ada8122766f6c31727"
+}
