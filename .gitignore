@@ -25,6 +25,13 @@ validation/
 pilot/*
 pilot/references
 
+# ...but the frozen pilot slice and its tooling ARE committed. The freeze is the
+# record that 300 annotated traces were labelled against a specific set of items:
+# untracked, it cannot be verified later, which is the one thing a freeze is for.
+!pilot/*.py
+!pilot/pilot_v1/
+!pilot/models.json
+
 scratch/
 
 # docs/references: large source binaries are NOT committed. MANIFEST.json records
