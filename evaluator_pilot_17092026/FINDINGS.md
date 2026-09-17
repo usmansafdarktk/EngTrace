@@ -66,6 +66,44 @@ accepting the zero.
 `gemini-3-pro-preview` returns 404 from Google: "no longer available, use
 gemini-3.1-pro-preview" (probed 2026-09-17). It is also absent from OpenRouter's
 catalogue. The published E0 cannot be re-run exactly by anyone; the pilot uses
-Google's named successor and records the substitution on every scored row. Listing
-the model through the Models API still succeeds, which is why a listing check is
-not an availability check.
+Google's named successor and records the substitution on every scored row.
+Precisely: `models.get` on the id still returns its metadata, `models.list` no
+longer includes it, and `generateContent` returns 404. A get-by-name check is
+therefore not an availability check. Re-checked 2026-09-17 16:33 UTC: Gemini 3.1 Pro
+Preview is the only Gemini 3.x Pro text model Google lists.
+
+## E0-F5 · Tier 1 matches almost no steps, so E0's reasoning score is the Tribunal's
+
+From the full E0 dry run over all 300 traces (Tier 1 real, judges not called):
+
+| Trace model | final-answer acc | Tier 1 F1, before the Tribunal | correct answers sent to judges |
+|---|---|---|---|
+| claude-opus-4.7 | 0.70 | 0.102 | 42 of 42 |
+| gemini-3.1-pro | 0.63 | 0.175 | 34 of 38 |
+| deepseek-r1 | 0.63 | 0.147 | 36 of 38 |
+| gpt-5 | 0.62 | 0.170 | 34 of 37 |
+| llama-3.1-70b | 0.15 | 0.058 | 6 of 9 |
+
+Tier 1 accepts a step only if its number is within 2% **and** the cross-encoder
+scores it ≥ 0.70 against a gold step. On this corpus that conjunction almost never
+holds: Tier 1 F1 is 0.06-0.18. So 152 of 164 correct answers (93%) fall below the
+80% alignment trigger and go to the judges, and for those traces the reasoning
+score E0 reports is, in effect, the Tribunal's. Tier 1 is described as the
+automated backbone with the LLMs as a fallback; measured here, the fallback is the
+main path. That matters for every comparison against E0, and it is the strongest
+argument that E1 (judge-family removal) and E3 (deterministic milestones) are
+testing the part of E0 that actually decides scores.
+
+Also confirmed at scale: **E0-F1 holds for all five models** - `rackett_equation_volume`
+final-answer accuracy is 0 of 20 across every model, right or wrong. The
+wrong-answer Tribunal sample realised at 24 of 136 (17.6%) against the framework's
+20% rate, with the draw seeded per (item, model).
+
+## Provenance · GPU and CPU Tier 1 agree exactly
+
+The dry run was computed on a Kaggle Tesla T4 (torch 2.10.0+cu128, 769 s for all
+300) and imported only after comparison with 159 traces independently scored on
+the laptop CPU (torch 2.14.0+cpu), under identical pinned scoring libraries: Tier 1
+metrics and ROUGE identical (max difference 0.0), BERTScore max difference
+1.8 × 10⁻⁷, Tribunal trigger identical on all 159. The CPU rows are kept in
+`scores/e0_dry_cpu_reference/`.
