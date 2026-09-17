@@ -27,7 +27,19 @@
     "returns 401 (checked 2026-09-17), the same state ANTHROPIC_API_KEY was in.",
     "openai/gpt-5 on OpenRouter is $1.25 in / $10.00 out, identical to the direct",
     "API, so nothing about the estimate changes. The direct route is kept in",
-    "fallback: swap it back when a working key exists and --check will confirm it."
+    "fallback: swap it back when a working key exists and --check will confirm it.",
+    "",
+    "Ceilings raised after the first pass, from what it measured. At 8192, GPT-5",
+    "ran out of budget mid-reasoning on 5 of 60 items and DeepSeek R1 on 28 of 60;",
+    "R1 also returned three all-reasoning responses of about 6,500 tokens. Claude,",
+    "Gemini and Llama finished 60 of 60 and keep their ceilings. The ceiling is an",
+    "upper bound, not a reservation: a short answer still bills short.",
+    "",
+    "DeepSeek is r1-0528, not r1. Plain deepseek/deepseek-r1 has one provider whose",
+    "output cap is 16,000 tokens, and R1 writes 30,000+ characters of reasoning on the",
+    "iterative items, so it truncated before writing an answer on 28 of 60. All four",
+    "r1-0528 providers cap at 32,000 or above, so max_tokens 32768 is honoured whichever",
+    "one routing picks. SiliconFlow offers 147,456 if that ever needs pinning."
   ],
   "prompt_sha256_prefix": "c2bcb87984c4e50b",
   "models": [
@@ -40,7 +52,7 @@
         "in": 1.25,
         "out": 10.0
       },
-      "max_tokens": 8192,
+      "max_tokens": 16384,
       "fallback": {
         "route": "openai",
         "model": "gpt-5"
@@ -75,13 +87,17 @@
     {
       "key": "deepseek-r1",
       "route": "openrouter",
-      "model": "deepseek/deepseek-r1",
+      "model": "deepseek/deepseek-r1-0528",
       "role": "non-judge control",
       "price_per_m": {
-        "in": 0.7,
-        "out": 2.5
+        "in": 0.5,
+        "out": 2.15
       },
-      "max_tokens": 8192
+      "max_tokens": 32768,
+      "superseded": {
+        "model": "deepseek/deepseek-r1",
+        "reason": "single provider (Novita), hard 16,000-token output cap; 28 of 60 items truncated mid-reasoning"
+      }
     },
     {
       "key": "llama-3.1-70b",

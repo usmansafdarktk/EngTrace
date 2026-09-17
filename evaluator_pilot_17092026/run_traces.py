@@ -198,11 +198,19 @@ def call(cli, spec: dict, question: str, attempts: int = MAX_ATTEMPTS) -> dict:
                 **{param: budget})
             u = r.usage
             det = getattr(u, 'completion_tokens_details', None)
-            text = r.choices[0].message.content or ''
+            msg = r.choices[0].message
+            text = msg.content or ''
+            # OpenRouter hands R1's chain of thought back in `reasoning`, beside
+            # `content` rather than inside it. Unread, an all-reasoning response
+            # looks like an empty completion with thousands of tokens billed.
+            extra = getattr(msg, 'model_extra', None) or {}
+            reasoning = getattr(msg, 'reasoning', None) or extra.get('reasoning') or ''
             row = {
                 'ok': bool(text.strip()),
                 'text': text,
+                'reasoning': reasoning,
                 'served_model': getattr(r, 'model', None),
+                'provider': (getattr(r, 'model_extra', None) or {}).get('provider'),
                 'finish_reason': r.choices[0].finish_reason,
                 'prompt_tokens': getattr(u, 'prompt_tokens', None),
                 'completion_tokens': getattr(u, 'completion_tokens', None),
@@ -211,9 +219,12 @@ def call(cli, spec: dict, question: str, attempts: int = MAX_ATTEMPTS) -> dict:
                 'attempts': attempt,
             }
             if not row['ok']:
-                row['error'] = ('empty completion (finish_reason=%s, %s completion tokens) '
-                                '- raise max_tokens for this model'
-                                % (row['finish_reason'], row['completion_tokens']))
+                row['error'] = (
+                    'empty completion (finish_reason=%s, %s completion tokens, '
+                    '%d reasoning chars) - %s'
+                    % (row['finish_reason'], row['completion_tokens'], len(reasoning),
+                       'raise max_tokens' if row['finish_reason'] == 'length'
+                       else 'model stopped without writing an answer'))
             return row
         except Exception as exc:                                   # noqa: BLE001
             last = '%s: %s' % (type(exc).__name__, exc)
