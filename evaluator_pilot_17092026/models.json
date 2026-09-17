@@ -21,20 +21,30 @@
     "their thinking is billed inside the completion budget: at 4096 a long derivation",
     "returns finish_reason=length with empty content, which run_traces records as a",
     "failure rather than as a trace. Llama is capped at 2048 because it does not",
-    "reason and its archive completions sit near 400 tokens."
+    "reason and its archive completions sit near 400 tokens.",
+    "",
+    "GPT-5 goes through OpenRouter, not the OpenAI key. OPENAI_API_KEY in .env",
+    "returns 401 (checked 2026-09-17), the same state ANTHROPIC_API_KEY was in.",
+    "openai/gpt-5 on OpenRouter is $1.25 in / $10.00 out, identical to the direct",
+    "API, so nothing about the estimate changes. The direct route is kept in",
+    "fallback: swap it back when a working key exists and --check will confirm it."
   ],
   "prompt_sha256_prefix": "c2bcb87984c4e50b",
   "models": [
     {
       "key": "gpt-5",
-      "route": "openai",
-      "model": "gpt-5",
+      "route": "openrouter",
+      "model": "openai/gpt-5",
       "role": "judge family",
       "price_per_m": {
         "in": 1.25,
         "out": 10.0
       },
-      "max_tokens": 8192
+      "max_tokens": 8192,
+      "fallback": {
+        "route": "openai",
+        "model": "gpt-5"
+      }
     },
     {
       "key": "claude-opus-4.7",
