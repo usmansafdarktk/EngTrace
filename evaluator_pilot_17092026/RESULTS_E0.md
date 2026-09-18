@@ -77,3 +77,65 @@ a time - pairs its own Tier 1 had already scored in a batch, and that the Kaggle
 dry run had already computed. Both are addressed before the next candidate runs:
 cache `CROSS_ENCODER.predict` per pair (output-identical) and give the harness
 `--workers`.
+
+---
+
+# E0-3J: the same framework with the third judge connected
+
+Run 2026-09-18, 300 of 300 scored, **$7.82**, 0 failures. Every judged trace
+reports three judges. `evaluators/e0_3j_tribunal.py` restores Google by supplying
+the missing `get_model_info` the framework calls (E0-F6) - the framework's own
+check then passes and appends `'google'` by its own logic. Nothing else differs.
+
+## The third judge barely moves anything
+
+Compared on the **160 traces both panels judged**:
+
+| | |
+|---|---|
+| Traces whose Reasoning-F1 changed | **3 of 160** |
+| Direction | 3 up, 0 down |
+| Mean change on those 3 | +0.127 |
+
+So the defect in E0-F6 is serious as a mechanism - the paper describes a panel that
+never existed - but its effect on the scores is small. That is itself evidence for
+E0-F5: a panel voting "Alternative Correct" 93% of the time does not discriminate
+much, so a third vote of the same kind rarely changes the outcome.
+
+**Directionally it can only help, and did.** With two judges the majority test
+`count > total/2` demands unanimity, so any split falls to the conservative
+`min()`. With three, a 2-1 split carries. None of the 3 changes went down.
+
+## A caveat that matters more than the result
+
+The whole-column averages look bigger than the like-for-like comparison:
+
+| Model | e0 F1 | e0_3j F1 | delta |
+|---|---|---|---|
+| llama-3.1-70b | 0.145 | 0.176 | +0.030 |
+| deepseek-r1 | 0.398 | 0.417 | +0.019 |
+| gemini-3.1-pro | 0.418 | 0.432 | +0.014 |
+| gpt-5 | 0.430 | 0.434 | +0.004 |
+| claude-opus-4.7 | 0.465 | 0.461 | -0.004 |
+| **all 300** | **0.371** | **0.384** | **+0.013** |
+
+**Most of that +0.013 is not the third judge.** The harness seeds the framework's
+20% wrong-answer sample from `(evaluator, item, model)`, so changing the evaluator
+id changed which wrong answers were sampled: e0 judged 175 traces, e0_3j judged
+179, and only 160 are common. 19 traces were judged only by the three-judge panel
+and 15 only by the two-judge one. Reading the column deltas as the third judge's
+effect would attribute a sampling difference to a mechanism.
+
+**Fix for the remaining candidates:** seed the sample from `(item, model)` alone,
+so every evaluator that uses this trigger sees the same sampled traces. E1 and E5
+share E0's architecture and would otherwise each draw their own sample, making
+their comparisons against E0 partly a comparison of samples. E3 and E4 are
+deterministic and never sample, so they are unaffected.
+
+## One more judge behaviour worth recording
+
+Across e0_3j's 3,528 votes the Gemini judge returned a category the prompt never
+defines - `"Standard processing applied"`, 3 times. The framework's mapping is
+`"alternative" -> 1.0`, `"calculation" -> 0.5`, **everything else -> 0.0**, so an
+invented category scores identically to "Conceptual Error". A judge that fails to
+follow the label set is silently counted as judging the step wrong.

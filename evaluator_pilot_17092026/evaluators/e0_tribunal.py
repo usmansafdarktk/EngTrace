@@ -223,7 +223,8 @@ def wrap_google(log: CallLog, genai):
 
 # --------------------------------------------------------------------- cache
 
-CACHE = os.path.join(_PILOT, 'scores', '_cache', 'e0_tier1.jsonl')
+CACHE_DIR = os.path.join(_PILOT, 'scores', '_cache')
+CACHE = os.path.join(CACHE_DIR, 'e0_tier1.jsonl')       # legacy single file, still read
 
 
 def install_cache(fw, framework):
@@ -231,7 +232,10 @@ def install_cache(fw, framework):
 
     Both are pure functions of their arguments: the same step lists give the same
     matrix and the same texts give the same BERTScore (checked: 4 vs 8 torch
-    threads, max score difference 0.0). On this CPU the cross-encoder costs 0.5-2s
+    threads, and CPU vs Kaggle T4, max score difference 0.0). The cross-encoder is
+    cached per PAIR, which is what makes the framework's post-judgement recovery
+    free: line 485 rescores pairs Tier 1 already batched at line 164, one at a
+    time, and that was 47% of the first E0 run's wall clock. On this CPU the cross-encoder costs 0.5-2s
     per step pair, so Tier 1 over 300 traces is hours - and a dry run followed by
     the real run would pay it twice for identical numbers. The cache changes when
     work happens, never what comes out; the library versions are in the key, so a
@@ -239,17 +243,25 @@ def install_cache(fw, framework):
     """
     import numpy as np
     import torch
-    torch.set_num_threads(os.cpu_count() or 4)
+    # One process per model column is the parallelism here, so each process takes a
+    # share of the cores rather than all of them: five processes each claiming 8
+    # threads on an 8-core machine is slower than five claiming 2.
+    torch.set_num_threads(int(os.environ.get('ENGTRACE_TORCH_THREADS', os.cpu_count() or 4)))
 
-    os.makedirs(os.path.dirname(CACHE), exist_ok=True)
+    os.makedirs(CACHE_DIR, exist_ok=True)
     store = {}
-    if os.path.exists(CACHE):
-        for ln in open(CACHE, encoding='utf-8'):
+    for fn in sorted(os.listdir(CACHE_DIR)):
+        if not fn.endswith('.jsonl'):
+            continue
+        for ln in open(os.path.join(CACHE_DIR, fn), encoding='utf-8'):
             try:
                 rec = json.loads(ln)
                 store[rec['k']] = rec['v']
             except (json.JSONDecodeError, KeyError):
                 continue
+    # One part file per process: several model columns can run at once without
+    # two processes interleaving writes into a single file.
+    part = os.path.join(CACHE_DIR, 'part-%d.jsonl' % os.getpid())
     libs = json.dumps(libraries(), sort_keys=True)
 
     def key(kind, *args):
@@ -257,8 +269,23 @@ def install_cache(fw, framework):
 
     def put(k, v):
         store[k] = v
-        with open(CACHE, 'a', encoding='utf-8', newline='\n') as fh:
+        with open(part, 'a', encoding='utf-8', newline='\n') as fh:
             fh.write(json.dumps({'k': k, 'v': v}) + '\n')
+
+    # --- the cross-encoder itself, per PAIR ------------------------------------
+    real_predict = fw.CROSS_ENCODER.predict
+
+    def cached_predict(pairs, *a, **kw):
+        pairs = list(pairs)
+        keys = [key('pair', p[0], p[1]) for p in pairs]
+        missing = [i for i, k in enumerate(keys) if k not in store]
+        if missing:
+            fresh = real_predict([pairs[i] for i in missing], *a, **kw)
+            for i, v in zip(missing, fresh):
+                put(keys[i], float(v))
+        return np.array([store[k] for k in keys], dtype=float)
+
+    fw.CROSS_ENCODER.predict = cached_predict
 
     real_matrix = framework._tier1_verify_matrix
 
