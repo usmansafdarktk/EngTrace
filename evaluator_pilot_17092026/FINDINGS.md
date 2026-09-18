@@ -135,6 +135,40 @@ final-answer accuracy is 0 of 20 across every model, right or wrong. The
 wrong-answer Tribunal sample realised at 24 of 136 (17.6%) against the framework's
 20% rate, with the draw seeded per (item, model).
 
+## E0-F7 · A sampling step meant for the error taxonomy moves the headline score
+
+E0 was run twice over the same 300 traces with identical code and judges. The only
+configured difference was the seed of the framework's 20% wrong-answer sample.
+The model ranking changed:
+
+| | Run 1 | Run 2 |
+|---|---|---|
+| 1st | claude-opus-4.7 0.465 | **gpt-5 0.474** |
+| 2nd | gpt-5 0.430 | gemini-3.1-pro 0.454 |
+| 3rd | gemini-3.1-pro 0.418 | **claude-opus-4.7 0.449** |
+| 4th | deepseek-r1 0.398 | deepseek-r1 0.402 |
+
+The cause is measured, not guessed. Every trace falls into one of three groups:
+
+| Traces | n | Scored differently | Mean change |
+|---|---|---|---|
+| decided by Tier 1 alone in both runs | 104 | **0** | — |
+| judged in both runs | 157 | **2 (1%)** | 0.136 |
+| judged in one run only - the sample | 39 | **37** | **0.431** |
+
+Tier 1 is fully deterministic and the judges are close to it. The movement is the
+sample. A wrong answer is sent to the Tribunal with probability 0.20 "to populate
+the error taxonomy", but it does not stay in the taxonomy: once judged, its steps
+are recovered (93% "Alternative Correct", E0-F5) and its reasoning F1 rises by 0.43
+on average. An unsampled wrong answer keeps Tier 1's near-zero. So a model's
+reasoning score depends on which of its wrong answers the draw happened to pick.
+
+At 60 traces per model that is enough to reorder three frontier models. At the full
+benchmark's 2,250 per model the swing shrinks by roughly sqrt(2250/60), about 6x, so
+it is smaller in the published numbers - but it is irreducible noise built into the
+headline metric, and it was never reported. E3 has no sampling step and no judges;
+re-running it gives identical scores.
+
 ## Provenance · GPU and CPU Tier 1 agree exactly
 
 The dry run was computed on a Kaggle Tesla T4 (torch 2.10.0+cu128, 769 s for all
