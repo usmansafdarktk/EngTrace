@@ -72,6 +72,42 @@ longer includes it, and `generateContent` returns 404. A get-by-name check is
 therefore not an availability check. Re-checked 2026-09-17 16:33 UTC: Gemini 3.1 Pro
 Preview is the only Gemini 3.x Pro text model Google lists.
 
+## E0-F6 · The Tribunal is two judges, not three. Google is never called
+
+`_tier2_tribunal_batch` decides whether to include the Google judge like this:
+
+    try:
+         genai.get_model_info(MODEL_GOOGLE)
+         providers.append('google')
+    except: pass
+
+**`google.generativeai` has no `get_model_info`.** Its lookup functions are
+`get_model`, `get_base_model`, `get_tuned_model`, `get_file`, `get_operation`.
+So the call raises `AttributeError`, the bare `except` swallows it, and `'google'`
+is never appended. This is a wrong function name, not a version drift: 0.8.6 is the
+final release of that package and the name has never existed in it.
+
+Measured, not inferred: in the pilot smoke test every judged trace reports
+`judges_called = ['anthropic', 'openai']` - two, on all five models. Gemini answers
+perfectly well when called directly (`generate_content` returns valid JSON), so
+nothing is wrong with the model or the key. It is simply never reached.
+
+Two consequences.
+
+**The published framework's Tier 2 is a two-judge panel** while the paper describes
+three frontier judges. Every Tier 2 number in the published results was produced by
+GPT-5 and Claude alone.
+
+**The voting rule behaves differently with two votes.** The majority test is
+`count > total/2`, so with two judges a majority requires unanimity; any
+disagreement falls through to the conservative tie-break, `min(scalar_votes)`. A
+split vote therefore takes the harsher score, where with three judges a 2-1 split
+would have carried the majority. This is not a small effect on a panel that is
+deciding 93% of correct traces (E0-F5).
+
+It also makes the E0-F4 substitution largely moot in practice: the retired Gemini
+judge was not being called either way.
+
 ## E0-F5 · Tier 1 matches almost no steps, so E0's reasoning score is the Tribunal's
 
 From the full E0 dry run over all 300 traces (Tier 1 real, judges not called):
