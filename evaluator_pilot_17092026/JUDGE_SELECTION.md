@@ -120,12 +120,47 @@ E0 sends to judges.
 If reproducibility outranks lineage spread for you, swap it for **GLM-5.3** (0.86,
 open, $0.007) — but see the roster point below.
 
-### E5: MiniMax M3 alone, on the residuals
+### E5: MiMo-V2.5-Pro alone, on the residuals
+
+*Revised 2026-09-19. The first version recommended MiniMax M3 here, on cost and
+speed. On defensibility that was the wrong basis; see "How defensible" below.*
 
 E5 runs E3 first and asks a judge only about milestones E3 could not match, so volume
-is small and one judge suffices. MiniMax M3 is joint-best on discrimination, cheapest,
-fastest (5.5 s median) and parsed every reply. At most ~$0.75 for the whole pilot.
-Second choice: MiMo-V2.5-Pro (same discrimination, eight times slower).
+is small and one judge suffices. A single judge carries its exposure alone, so the
+deciding criterion is independence, not price: MiMo-V2.5-Pro matched MiniMax exactly
+on the probe (11/12, 0/9, 21/21 parsed), is open-weights, and has the **smallest**
+documented exposure of any candidate (0.4M Claude exchanges, against MiniMax's 13M+).
+MiniMax's advantages — $0.002 vs $0.003 a call, 5.5 s vs 46 s median — are irrelevant
+when all of E5 costs under a dollar and runs in parallel.
+
+## How defensible is this in the paper?
+
+**The probe cannot carry a claim, and should not be asked to.** 11/12 caught has a 95%
+Wilson interval of [0.65, 0.99]; GPT-5's 10/12 is [0.55, 0.95]. "0/9 false flags" is
+compatible with a true rate up to 0.30. And 10 of the 12 errors are Llama's — the
+obvious kind. On the one subtle frontier error (GPT-5's sign slip) nearly every judge,
+MiniMax included, missed it. The probe screened out two unusable judges; it did not
+validate the rest.
+
+**The most attackable point is MiniMax's independence.** Anthropic named it the
+largest distiller of Claude (13M+ of 16M exchanges) and as running a proxy to Anthropic
+and OpenAI models. The reply a reviewer raising judge/judged overlap (yAYU #1) will
+reach for is: *a Claude judge was replaced by a model trained on Claude's outputs,
+judging Claude's traces.* That is why MiniMax is one vote of three in E1 and is not
+E5's sole judge.
+
+**What makes the choice defensible — to do, not to argue:**
+
+1. **Panel, not single judge** (E1): exposure diluted, and a 2-1 vote means no single
+   judge decides.
+2. **Disclose the exposure table** in the paper.
+3. **Validate against the expert labels** (X1), with confidence intervals. That, not
+   the selection procedure, is what makes a judge defensible.
+4. **Measure the bias** (X2): whether each judge favours the family it is exposed to,
+   against the human labels. The pilot has traces from all five generator families;
+   a null result settles the objection as well as a positive one.
+5. **Show the conclusion survives a swap**: re-run E1 with a different judge in each
+   seat (~$3 each) and report whether the ranking of evaluators changes.
 
 ### Deliberately not recommended: Kimi K3 and GLM-5.3
 

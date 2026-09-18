@@ -3262,7 +3262,9 @@ top five.
 
 Recommended: E1 panel **MiniMax M3 + Xiaomi MiMo-V2.5-Pro + xAI Grok 4.6** (three
 families, residual exposure spread across Claude and OpenAI rather than stacked;
-~$3.50). E5: **MiniMax M3** alone. Kimi K3 and GLM-5.3 deliberately excluded to keep
+~$3.50). E5: **MiMo-V2.5-Pro** alone - revised from MiniMax M3 the same day: a
+single judge carries its exposure alone, and MiMo matched MiniMax on the probe with
+the smallest documented Claude exposure (0.4M vs 13M+ exchanges). Kimi K3 and GLM-5.3 deliberately excluded to keep
 the strongest open families available for the next roster. The prior decision is the
 roster's families: a family cannot be both judge and judged.
 
