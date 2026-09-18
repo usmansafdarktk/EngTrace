@@ -3097,10 +3097,146 @@ such - in the C3.5 register, where the owner can act on it - but tagging it `[DE
 would make a claim that is false for the rows that miss, and those are exactly the rows a
 reader would most want flagged.
 
+---
+
+# The evaluator pilot (`evaluator_pilot_17092026/`)
+
+The workstream-01/04/05 pilot from `EngTrace_Suggested_Actions.pdf`: compare
+evaluator candidates E0-E5 against human labels on one frozen slice. Its record is
+[`evaluator_pilot_17092026/`](../../evaluator_pilot_17092026/) — README (setup and
+stage 1), FINDINGS (defects in the published framework), RESULTS_E0 / RESULTS_E3,
+and `analysis/` (the script behind every reported number). The decisions below are
+the ones a later reader would otherwise have to reconstruct from commit messages.
+
+## D-078 — The pilot slice spans all five branches and is pinned by text
+
+**Date:** 2026-09-17 · **Status:** DECIDED · **Source:** Suggested Actions §01
+
+The Suggested Actions sketch stratified the slice across the three original
+branches. It spans all five: civil and industrial were built to be in the next
+revision, and a slice without them validates an evaluator on a corpus the paper
+will not report. 15 cells (5 branches x 3 levels), one template per cell, four
+instances each: 60 items, 300 traces at five models.
+
+Items are pinned by **question and gold text plus SHA-256**, not by seed. A seed
+does not pin an item across template versions — Phase 1 moved 34% of its
+instances and C3 moved 824 questions — so the freeze records the text the
+annotators will read, and `freeze.py --verify` fails the moment it moves.
+
+## D-079 — Trace sources, routing, and three substitutions forced by availability
+
+**Date:** 2026-09-17/18 · **Status:** DECIDED · **Source:** pilot stage 1
+
+The five trace sources are the Suggested Actions' own (GPT-5, Claude Opus 4.7,
+Gemini 3.1 Pro, DeepSeek R1, Llama 3.1 70B): three judge families, two controls.
+Three things had to change, each recorded in `models.json`:
+
+- **`OPENAI_API_KEY` and `ANTHROPIC_API_KEY` return 401.** GPT-5 and Claude go
+  through OpenRouter. `openai/gpt-5` is priced there identically to the direct API.
+- **`deepseek/deepseek-r1` has one provider with a hard 16,000-token output cap**,
+  and R1 truncated mid-reasoning on 28 of 60 items. Moved to `deepseek-r1-0528`
+  (same model, four providers, all >= 32,000) and re-ran all 60, not the 28:
+  the survivors were a different checkpoint, skewed to the easy items.
+- **E0's published Gemini judge, `gemini-3-pro-preview`, returns 404.** Replaced
+  by Google's named successor. (Largely moot — see D-080, E0-F6.)
+
+## D-080 — E0 is run unmodified; its defects are recorded, not fixed
+
+**Date:** 2026-09-17 · **Status:** DECIDED · **Source:** pilot stage 2
+
+E0 is the anchor every candidate is compared against, so it must be the framework
+the paper describes. `evaluators/e0_tribunal.py` imports the published file and
+calls its own `evaluate_entry`; the file's SHA-256 is in the config hash. Seven
+defects were found in it (FINDINGS E0-F1 to E0-F7), among them that the Tribunal
+is **two judges, not three** (`genai.get_model_info` does not exist and is
+swallowed) and that a random 20% sample meant for the error taxonomy moves the
+headline score. None is fixed in E0. `e0_3j` is the one counterfactual, and it
+restores the third judge by supplying the missing function, not by editing code.
+
+Deviations that could not be avoided are written on every scored row: D1 Gemini
+judge substituted, D2 OpenRouter transport, D3 seeded sampling.
+
+## D-081 — Scoring libraries are pinned, and their versions are config
+
+**Date:** 2026-09-17 · **Status:** DECIDED · **Source:** FINDINGS E0-F3
+
+Under transformers 5.x, BERTScore raises on every entry and the framework returns
+0.0 — a column of zeros that looks like data. `requirements.txt` is unpinned, so a
+fresh install reproduces it. The pilot venv pins transformers 4.57.3,
+sentence-transformers 5.1.x and bert-score 0.3.13 (the line current at the
+published run), and the versions are in the evaluator config hash so a cached score
+is never served across library stacks. torch is excluded from the hash and
+recorded per row instead, so GPU (Kaggle) and CPU results can share a cache —
+after `--import-kaggle` proves they agree (159 traces: Tier 1 identical, BERTScore
+within 1.8e-7).
+
+## D-082 — Every judged evaluator samples the same wrong answers
+
+**Date:** 2026-09-18 · **Status:** DECIDED · **Supersedes:** the original seed scheme
+
+The harness first seeded E0's 20% wrong-answer draw from (evaluator, item, model),
+so each candidate judged a different sample: e0 judged 175 traces, e0_3j 179, 160
+in common, and column deltas looked like mechanism differences. The seed is now
+(item, model) alone, and the scheme is hashed into the config so rows under the
+two schemes never mix. E0 was re-run on it ($6.53).
+
+## D-083 — Small open-weight roster models join as an unlabelled robustness cohort
+
+**Date:** 2026-09-18 · **Status:** DECIDED · **Source:** roster planning
+
+If the main benchmark moves to smaller open-weight models (the supervisor's budget
+steer), an evaluator validated on the pilot's five must still function there.
+Qwen3.8-27B and Gemma-4-31B-it were added as a `robustness` cohort over the same
+frozen items. They are **not** in the labelled 300: the question is mechanical
+(step markers, parseable answers, milestones reachable) and needs no human labels,
+while adding them would cost 40% more annotation. Result (FINDINGS R-F1, R-F2):
+structure does not degrade; runaway reasoning does.
+
+## D-084 — E3's milestones are derived per instance, by rule, from the template's own values
+
+**Date:** 2026-09-18 · **Status:** DECIDED · **Implements:** D-001
+
+Per D-001, milestones are emitted per instance. No template is edited: each frozen
+item is regenerated at its seed with the repo's frame-local capture, and must
+reproduce **byte-identically** (60 of 60 do) before a value is used. A milestone is
+a value the template **computed**, the gold **states**, and the question does
+**not** give. Iteration trajectories are excluded, because a correct trace from a
+different starting guess cannot reach them.
+
+Tolerance is 0.5%, the rule's own display tolerance. The first version used E0's
+2% and failed its null baseline: traces "reached" 23% of a sibling item's
+milestones. At 0.5% that coincidence rate is 4%, real coverage 0.749.
+
+## D-085 — E4 checks the arithmetic a trace states, not symbolic equivalence to the gold formula
+
+**Date:** 2026-09-19 · **Status:** DECIDED
+
+The Suggested Actions phrase E4 as algebraic equivalence against the gold formula.
+That needs aligning a trace's symbols with the gold's (`V_sat`, `V_{sat}`, `V_L`),
+which free text does not support reliably. E4 instead checks what catches a right
+number reached for the wrong reason: whether the arithmetic a trace **shows**
+produces the number it **states**. The checker (`evaluators/arith.py`) was
+validated on the 60 gold solutions before any trace — gold arithmetic is correct by
+construction, so every inconsistency there is a checker bug. It started at 61.5%
+consistent and reached 100% (232 of 232 claims) after ten parser fixes, each with a
+plant; they are listed in the module docstring.
+
+## D-086 — Compute goes to Kaggle; API keys never do
+
+**Date:** 2026-09-17 · **Status:** DECIDED
+
+The Tier 1 scorer stack runs on a Kaggle GPU (300 traces in 769 s on a T4, against
+hours on the laptop CPU). The paid judge calls stay local: a CLI-pushed kernel
+cannot attach Kaggle Secrets, and sending the keys to a third party is not a
+decision to take implicitly. The bundle is staged only after the full freeze
+rebuild and T1-T7 pass, and is scanned for every key value in `.env` before upload.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
+| — | Judge family for E1 and E5: must be outside every evaluated family, which rules out OpenAI, Anthropic, Google, and DeepSeek / Meta if they are among the 27 evaluated models | running E1 or E5 |
+| — | Expert annotation of the frozen 300 (stage 3): annotators, protocol, the ~100-trace triple-labelled overlap | any X1 agreement number |
 | D-003 | Do the raw `inference_results/` generations still exist? | promising any corrected results table |
 | — | Phase 5 scoping: fold into Phase 1 or run as a parallel PR | Phase 1 start |
 | — | Whether the 9 self-inconsistent templates are fixed or replaced | Phase 1 start (item-pool ownership call) |

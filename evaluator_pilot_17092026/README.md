@@ -9,24 +9,59 @@ Not to be confused with [`pilot_new_branches/`](../pilot_new_branches/), which w
 `pilot/` until today and is staging from *building* the civil and industrial
 branches.
 
+## Where things stand
+
+| Stage | State | Spend |
+|---|---|---|
+| 0 · freeze 60 items | done | — |
+| 1 · 300 traces, five models | done | $6.53 |
+| 1b · 120 traces, two open-weight roster models ([D-083](../docs/re-implementation-sep/DECISIONS.md)) | done | $2.15 |
+| 2 · E0, the published framework | done, twice ([E0-F7](FINDINGS.md)) | $12.81 |
+| 2 · E0-3J, E0 with its third judge connected | done | $7.82 |
+| 2 · E3, deterministic milestones | done | $0.00 |
+| 2 · E4, stated-arithmetic checking | checker validated; scoring in progress | $0.00 |
+| 2 · E1, E5 | waiting on the judge-family decision | — |
+| 2 · E2 | not started (needs a GPU host for a PRM) | — |
+| 3 · expert annotation of the 300 | not started; independent of stage 2 | — |
+
+**Read these first:** [FINDINGS.md](FINDINGS.md) (seven defects in the published
+framework, plus the robustness cohort), [RESULTS_E0.md](RESULTS_E0.md),
+[RESULTS_E3.md](RESULTS_E3.md), and the pilot's decisions D-078 to D-086 in
+[DECISIONS.md](../docs/re-implementation-sep/DECISIONS.md). Every number in them is
+reproduced by a script in [analysis/](analysis/README.md).
+
 ## Layout
 
 ```
 evaluator_pilot_17092026/
-  README.md        this file
-  freeze.py        cuts and pins the slice; --verify fails if anything drifts
-  run_traces.py    the five models over the slice; resumable, --check first
-  verify_traces.py checks the produced traces against the slice; T1-T7 + plants
-  models.json      the five models, their routes, keys, ceilings and prices
-  slice/           FROZEN. Do not edit by hand.
-    manifest.jsonl   60 items: question, gold solution, seed, SHA-256
-    FREEZE.json      the rule, the audit, the counts, the manifest hash
-  traces/          PRODUCED by run_traces.py, one JSONL per model. Not committed.
+  README.md          this file
+  FINDINGS.md        defects in the published framework; robustness cohort results
+  RESULTS_E0.md      E0 and E0-3J
+  RESULTS_E3.md      E3, its null baseline, where it disagrees with E0
+  freeze.py          cuts and pins the slice; --verify fails if anything drifts
+  run_traces.py      models over the slice; resumable, --check first
+  verify_traces.py   checks produced traces against the slice; T1-T7 + plants
+  run_evaluator.py   one harness for every evaluator: (evaluator, traces) -> scores
+  models.json        trace models, cohorts, routes, ceilings, prices - and why
+  evaluators/
+    e0_tribunal.py     E0: the published framework, imported unmodified
+    e0_3j_tribunal.py  E0 with the missing get_model_info supplied (third judge)
+    milestones.py      per-instance milestones, derived by rule (D-084)
+    e3_milestones.py   E3: milestone coverage, order-free, unit-aware
+    arith.py           sympy checker for stated arithmetic, validated on gold (D-085)
+  analysis/          the script behind every reported number
+  kaggle/            GPU offload for the scorer stack (D-086)
+  slice/             FROZEN. Do not edit by hand.
+    manifest.jsonl     60 items: question, gold solution, seed, SHA-256
+    FREEZE.json        the rule, the audit, the counts, the manifest hash
+  traces/            PRODUCED, one JSONL per model. Not committed.
+  scores/            PRODUCED, one directory per evaluator. Not committed.
+  .venv/             the pinned scorer stack for E0 (D-081). Not committed.
 ```
 
-`slice/` is committed, `traces/` is not. The freeze is the record that 300 paid
-annotations were made against a specific set of items; untracked, it cannot be
-verified later, which is the one thing a freeze is for.
+`slice/` is committed; `traces/` and `scores/` are not. The freeze is the record
+that the annotations were made against a specific set of items; untracked, it could
+not be verified later, which is the one thing a freeze is for.
 
 ## Order of operations
 
@@ -47,9 +82,32 @@ verbatim and whether Google's OpenAI-compatible endpoint accepts
 `gemini-3.1-pro-preview`; `models.json` carries an OpenRouter fallback for Gemini
 if it does not.
 
-After the traces exist: the evaluator candidates run over them (E0, the current
-three-LLM tribunal, is the baseline), and the experts annotate them. Those are
-separate steps. This directory only produces the material.
+### Stage 2 — the evaluators
+
+E0 and E0-3J need the pinned scorer stack; E3 and E4 run on the system Python.
+
+```bash
+PY=evaluator_pilot_17092026/.venv/Scripts/python
+$PY -m evaluator_pilot_17092026.run_evaluator e0 --dry-run    # free: Tier 1 real, judges recorded not called
+$PY -m evaluator_pilot_17092026.run_evaluator e0 --smoke 5    # a few real judged traces, pennies
+$PY -m evaluator_pilot_17092026.run_evaluator e0              # the paid run, resumable
+$PY -m evaluator_pilot_17092026.run_evaluator e0 --status
+python -m evaluator_pilot_17092026.run_evaluator e3           # deterministic, free
+python -m evaluator_pilot_17092026.run_evaluator e3 --cohort robustness --model gemma-4-31b
+```
+
+The harness refuses to score unless the freeze verifies and the requested columns
+pass T1-T7, seeds E0's wrong-answer sample from (item, model) so every judged
+evaluator samples the same traces (D-082), and resumes only when both the trace hash
+and the evaluator's config hash match.
+
+**Going faster.** The dry run's Tier 1 can go to a Kaggle GPU
+(`kaggle/stage_bundle.py`, then push `kaggle/e0-dryrun`, then
+`run_evaluator e0 --import-kaggle DIR`, which refuses unless GPU and CPU agree on
+reference rows). Paid runs parallelise by running one process per model column
+with `ENGTRACE_TORCH_THREADS=2`; the framework's globals make threads unsafe.
+
+The experts' annotation is a separate step and does not wait on any of this.
 
 ## The slice
 
