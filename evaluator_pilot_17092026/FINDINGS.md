@@ -107,3 +107,56 @@ the laptop CPU (torch 2.14.0+cpu), under identical pinned scoring libraries: Tie
 metrics and ROUGE identical (max difference 0.0), BERTScore max difference
 1.8 × 10⁻⁷, Tribunal trigger identical on all 159. The CPU rows are kept in
 `scores/e0_dry_cpu_reference/`.
+
+---
+
+# Roster robustness cohort (2026-09-18)
+
+Two open-weight models from the proposed main roster, run over the same 60 frozen
+items to ask one question: if the main benchmark moves to smaller open-weight
+models, does an evaluator validated on the pilot's five still work there? They are
+NOT in the labelled 300 - the question is mechanical, so it needs no human labels,
+and 420 traces would have been 40% more expert annotation.
+
+## R-F1 · Structure does not degrade. The formatting worry was unfounded
+
+| Model | Traces | Avg steps | No step marker | Has `**Answer:**` | Final unparseable | Numbers per step |
+|---|---|---|---|---|---|---|
+| gemma-4-31b-it | 60 | 6.8 | 0% | **100%** | 0% | **0.99** |
+| qwen3.8-27b | 46 clean | 7.3 | 0% | **100%** | 0% | 0.96 |
+| claude-opus-4.7 | 60 | 6.8 | 0% | 100% | 0% | 0.89 |
+| gemini-3.1-pro | 60 | 7.2 | 0% | 100% | 0% | 0.96 |
+| deepseek-r1 | 60 | 8.5 | 0% | 95% | 0% | 0.98 |
+| gpt-5 | 60 | 6.0 | 0% | 87% | 0% | 0.94 |
+| llama-3.1-70b | 60 | 6.3 | 0% | 70% | 0% | 0.94 |
+
+Not one trace in 416, from any model, lacks step markers, and every trace yields a
+parseable final answer. The two open-weight models hold the `**Answer:**` line in
+100% of traces - better than GPT-5 at 87% and Llama at 70% - and Gemma carries a
+number on 99% of its steps, the highest of any model here, which is the property
+E3's milestone extraction depends on.
+
+So the risk that motivated this cohort is not real: an evaluator that reads step
+structure will function on a small open-weight roster. The prompt does the work,
+and a 31B model follows it as well as a frontier one.
+
+## R-F2 · The real small-model failure is runaway reasoning, not formatting
+
+| Model | Usable | Unusable | Cost, 60 traces |
+|---|---|---|---|
+| gemma-4-31b-it (no reasoning) | **60 of 60** | 0 | **$0.02** |
+| qwen3.8-27b (reasoning) | 46 clean, 10 truncated | 14 of 60 | $2.13 |
+
+Qwen3.8-27B never answered 4 items even with a 32,768-token budget: on
+`normal_depth_iteration` it wrote 50,613 characters of reasoning and stopped. Ten
+more answers end mid-derivation. The same failure DeepSeek R1, GPT-5 and Gemini all
+showed, and the reason three ceilings were raised during this pilot.
+
+Two consequences for roster planning. A reasoning model's cost is not predictable
+from its price per token: Qwen is 100x cheaper than Gemma per token and cost 100x
+more here, because it thinks. And a small reasoning model can simply fail to answer
+the hardest items, which is a coverage hole in a benchmark table, not a low score -
+worth reporting as such rather than averaging away.
+
+Gemma-4-31B-it is the strongest anchor this cohort found: 60 of 60, the cleanest
+structure measured, $0.02 for the set.
