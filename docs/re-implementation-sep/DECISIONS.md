@@ -3231,6 +3231,23 @@ cannot attach Kaggle Secrets, and sending the keys to a third party is not a
 decision to take implicitly. The bundle is staged only after the full freeze
 rebuild and T1-T7 pass, and is scanned for every key value in `.env` before upload.
 
+## D-087 — A checker is validated on real output, not only on gold
+
+**Date:** 2026-09-19 · **Status:** DECIDED · **Extends:** D-085
+
+At 100% consistency on the 60 gold solutions, E4's arithmetic checker still flagged
+15 milestones in real traces as contradicted, and reading them showed 13 were
+checker bugs. Gold is formatted uniformly by the templates; model traces are not
+(glued variables like `16t`, Greek `μ`, `\mathrm{m}^2`, superscript runs, clause
+fragments). Gold validation catches the checker's bugs on gold-shaped text only.
+
+The rule, for E4 and for any later evaluator: validate on gold, **then read every
+flag the checker raises on real traces before reporting a number it produces**,
+and turn each genuine catch into a plant. Applied here it left 2 contradicted
+milestones in 1,494, both genuine, and measured the unread side metric
+(arithmetic consistency) at about two-thirds precision on a fixed-seed sample,
+which is reported with that caveat rather than as a validated per-model measure.
+
 ## Open decisions
 
 | # | Decision | Needed before |

@@ -54,7 +54,8 @@ import verify_traces as vt     # noqa: E402
 SCORES = os.path.join(_HERE, 'scores')
 EVALUATORS = {'e0': 'evaluators.e0_tribunal',
               'e0_3j': 'evaluators.e0_3j_tribunal',
-              'e3': 'evaluators.e3_milestones'}
+              'e3': 'evaluators.e3_milestones',
+              'e4': 'evaluators.e4_arith'}
 
 # Snapshot prices for routes without a live catalogue; OpenRouter is read live.
 GOOGLE_PRICES = {'gemini-3.1-pro-preview': (2.0, 12.0)}

@@ -32,6 +32,28 @@ That took gold to 94.9%. Five more, found the same way, took it to 100% (232/232
     chain belongs to every unit-less link before it
   - mm^4 -> m^4 is a factor of 1e-12, which the unit factors lacked
 
+GOLD IS NOT ENOUGH. At 100% on gold, the checker still flagged 15 milestones in
+traces as "contradicted", and reading them showed every inspected one was a checker
+bug, not a trace error. Gold is formatted uniformly by templates; traces are not. So
+the rule is: validate on gold, then READ every flag raised on real traces. That
+found four more:
+  - `16t = 16 * 2.9`: a letter glued to a number is a variable, not a unit; only
+    `%` and `°` may be glued. Nine of DeepSeek's flags were this one bug.
+  - `(0.965)¹³` became `0.965**1**3`; superscript digits are translated as a run
+  - `5.9%) = 0.4536`: a fragment with unbalanced parentheses is unparseable
+  - `arctan(0.23383) = 13.16°`: inverse trig is also read in degrees
+  - `64.834° - 180° = -115.166°`: the degree sign is removed as a unit mark, or the
+    unit-tail rule swallows `° - 180°`
+Sampling the NON-milestone inconsistent claims then found more, so per-claim
+consistency was not yet evidence of anything:
+  - `\\mathrm{m}^2` was deleted with its exponent left behind: `6.48 m^2` read as 41.99
+  - Greek `μ` (what traces write) was not the micro sign `µ` the rules knew
+  - `1% = 0.01` and `91.4 deg = 1.594 rad` are conversions, not contradictions
+After those, the only flags left on real traces were GENUINE: two traces state the
+right milestone while the arithmetic they show evaluates to something else (a sign
+written wrong; a coefficient written wrong). Both are kept as plants, so a checker
+change that stops catching them fails.
+
 WHAT IT CANNOT PARSE IT SAYS SO. Every segment is classified: evaluated, symbolic
 (skipped), or unparseable. A checker that silently parses 5% of lines and reports
 "100% consistent" would be this repo's recurring defect, so coverage is reported
@@ -54,7 +76,12 @@ FUNCS = {'sqrt': sympy.sqrt, 'log': sympy.log, 'ln': sympy.log, 'exp': sympy.exp
          'acos': sympy.acos, 'atan': sympy.atan, 'arctan': sympy.atan, 'pi': sympy.pi,
          'log10': lambda x: sympy.log(x, 10), 'abs': sympy.Abs}
 FUNC_WORDS = set(FUNCS)
-SUP = str.maketrans({'²': '**2', '³': '**3', '⁴': '**4', '⁻': '-', '¹': '**1', '⁰': '0'})
+SUPDIGITS = str.maketrans('⁰¹²³⁴⁵⁶⁷⁸⁹⁻', '0123456789-')
+
+
+def _superscripts(s: str) -> str:
+    """A run of superscript digits is ONE exponent: (0.965)¹³ is 0.965**13."""
+    return re.sub(r'[⁰¹²³⁴⁵⁶⁷⁸⁹⁻]+', lambda m: '**(' + m.group(0).translate(SUPDIGITS) + ')', s)
 
 
 def normalise(line: str) -> str:
@@ -66,11 +93,17 @@ def normalise(line: str) -> str:
         s = re.sub(r'\\[dt]?frac\s*\{([^{}]*)\}\s*\{([^{}]*)\}', r'((\1)/(\2))', s)
     s = re.sub(r'\\sqrt\s*\{([^{}]*)\}', r'sqrt(\1)', s)
     s = re.sub(r'\\(sin|cos|tan|ln|log|exp|pi|arctan)\b', r'\1', s)
-    s = re.sub(r'\\text\{[^{}]*\}|\\mathrm\{[^{}]*\}', ' ', s)
+    # \mathrm{m}^2 is a UNIT: keep the word so its exponent stays attached to it.
+    # Deleting it left `6.48 **2` and read an area of 6.48 as 41.99.
+    s = re.sub(r'\\(?:text|mathrm|rm|operatorname)\s*\{([^{}]*)\}', r' \1', s)
     s = (s.replace('\\cdot', '*').replace('\\times', '*').replace('×', '*').replace('·', '*')
           .replace('−', '-').replace('–', '-').replace('√', 'sqrt').replace('π', 'pi')
           .replace('≈', '=').replace('\\approx', '=').replace('{', '(').replace('}', ')'))
-    s = s.translate(SUP)
+    # A degree sign marks a unit, not an operator: `64.834° - 180° = -115.166°` is
+    # arithmetic on degrees. Left in, the unit-tail rule swallowed `° - 180°` whole.
+    s = s.replace('°C', ' degC').replace('°F', ' degF').replace('°', ' ')
+    s = s.replace('μ', 'u').replace('µ', 'u')        # Greek mu and micro sign alike
+    s = _superscripts(s)
     s = s.replace('^', '**')
     s = re.sub(r'(\d)\s*[eE]\s*([-+]?\d)', r'\1e\2', s)
     s = re.sub(r'(?<=\d)\s+x\s+(?=[\d(])', '*', s)                  # 121.0 x 10**6
@@ -90,10 +123,19 @@ def split_unit(seg: str):
     """(expression, unit tail). A tail is at most 4 short tokens - not prose - and
     never begins with an exponent: `8.24e-05 C` keeps its e-05."""
     s = seg.strip().rstrip('.;:')
-    m = re.match(r'^(.*?[\d\)])\s*(?![eE][-+]?\d)([A-Za-zµΩ°%][A-Za-z0-9µΩ°%/\*\-\s\(\)]*)$', s)
+    m = re.match(r'^(.*?[\d\)])(\s*)(?![eE][-+]?\d)([A-Za-zµΩ°%][A-Za-z0-9µΩ°%/\*\-\s\(\)]*)$', s)
+    if m and not m.group(2) and not m.group(3)[0] in '%°':
+        # `16t`, `2y`, `9x`: a letter glued to a number is a variable times the
+        # number, not a unit. Units are written apart (`16 m`), except % and °.
+        return s.strip(), ''
     if m:
+        m = re.match(r'^(.*?[\d\)])\s*(?![eE][-+]?\d)([A-Za-zµΩ°%][A-Za-z0-9µΩ°%/\*\-\s\(\)]*)$', s)
         toks = re.findall(r'[A-Za-zµΩ°%]+', m.group(2))
-        unitlike = all(len(t) <= 5 or t.lower() in UNIT_WORDS for t in toks) and len(toks) <= 4
+        # A unit carries digits only in an exponent (m**2, s**(-1)). Any other digit
+        # means the "tail" is arithmetic - `deg - 180 deg` - and must not be dropped.
+        stray_digit = re.search(r'\d', re.sub(r'\*\*\s*\(?\s*-?\d+\s*\)?', '', m.group(2)))
+        unitlike = (all(len(t) <= 5 or t.lower() in UNIT_WORDS for t in toks)
+                    and len(toks) <= 4 and not stray_digit)
         if toks and unitlike and not set(toks) <= FUNC_WORDS:
             return m.group(1).strip(), m.group(2).strip()
     return s.strip(), ''
@@ -105,16 +147,30 @@ def strip_units(seg: str) -> str:
 
 FUNCS_DEG = dict(FUNCS, sin=lambda x: sympy.sin(x * sympy.pi / 180),
                  cos=lambda x: sympy.cos(x * sympy.pi / 180),
-                 tan=lambda x: sympy.tan(x * sympy.pi / 180))
+                 tan=lambda x: sympy.tan(x * sympy.pi / 180),
+                 atan=lambda x: sympy.atan(x) * 180 / sympy.pi,
+                 arctan=lambda x: sympy.atan(x) * 180 / sympy.pi,
+                 asin=lambda x: sympy.asin(x) * 180 / sympy.pi,
+                 acos=lambda x: sympy.acos(x) * 180 / sympy.pi)
 
 
 def evaluate(seg: str):
     """(candidate values, kind, unit). Trig is evaluated in radians and in degrees,
     because traces write cos(30) meaning degrees as often as radians; a claim holds
     if either reading makes it hold."""
+    raw = seg.strip()
+    # Balance is checked BEFORE the unit tail is stripped: `3.5%)` loses its `)`
+    # with the `%` and would otherwise pass as the claim 3.5 = 0.6296.
+    if raw.count('(') != raw.count(')'):
+        return [], 'unparseable', ''
+    # `- 0.954**(49) = 0.0949/0.954`: a segment OPENING with a binary minus is the
+    # tail of a subtraction cut at a clause break, not a negative number. A unary
+    # minus is written against its operand (`-0.5`), so the space is the tell.
+    if re.match(r'^-\s+\S', raw):
+        return [], 'unparseable', ''
     s, unit = split_unit(seg)
     vals = []
-    for funcs in ((FUNCS, FUNCS_DEG) if re.search(r'\b(sin|cos|tan)\b', s) else (FUNCS,)):
+    for funcs in ((FUNCS, FUNCS_DEG) if re.search(r'\b(a?sin|a?cos|a?tan|arctan)\b', s) else (FUNCS,)):
         v, kind = _evaluate(s, funcs)
         if v is None:
             return [], kind, unit
@@ -123,6 +179,8 @@ def evaluate(seg: str):
 
 
 def _evaluate(s: str, funcs):
+    if s.count('(') != s.count(')'):
+        return None, 'unparseable'          # a clause fragment, not an expression
     if not s or len(s) > 200 or not re.search(r'\d', s):
         return None, 'symbolic' if re.search(r'[A-Za-z]', s or '') else 'unparseable'
     # An exponent is not a word: '1.21e8' must not read as the variable 'e8'.
@@ -155,8 +213,18 @@ def agree(a: float, b: float, tol: float = ARITH_TOL) -> bool:
 
 
 def agree_any(la, ra, lu: str, ru: str) -> bool:
-    """Any candidate pair agrees; under a unit factor only if the units differ."""
-    factors = UNIT_FACTORS if (lu and ru and lu != ru) else (1.0,)
+    """Any candidate pair agrees; under a unit factor only if the units differ.
+
+    `1% = 0.01` and `91.4 deg = 1.594 rad` are conversions: a percent sign or an
+    angle unit on EITHER side licenses the matching factor, because the bare side
+    is simply unit-less.
+    """
+    factors = set(UNIT_FACTORS) if (lu and ru and lu != ru) else {1.0}
+    units = (lu + ' ' + ru).lower()
+    if '%' in units:
+        factors |= {100.0, 0.01}
+    if 'deg' in units or 'rad' in units:
+        factors |= {math.pi / 180, 180 / math.pi}
     return any(agree(a * f, b) for a in la for b in ra for f in factors)
 
 
@@ -237,6 +305,28 @@ def selftest() -> int:
         ('pi1 * 0.73 = 0.35  =>  pi1 = 0.35 / 0.73 = 0.4795', True),   # => is not =
         ('W1 = 1 / (41 - 23) hours = 60 / 18 = 3.33 minutes', True),   # inherited unit
         ('W1 = 1 / (41 - 23) hours = 60 / 18 = 4.33 minutes', False),  # ...and still checked
+        ('dv/dt = 16t = 16 * (2.9) = 46.4', True),              # 16t is a variable
+        ('Pa = (0.965)¹³ = 0.6293', True),                      # superscript run
+        ('Pa = (0.965)¹³ = 0.9650', False),                     # ...and still checked
+        ('phi = arctan(0.23383) = 13.16°', True),               # inverse trig, degrees
+        ('p (at 5.9%) = 0.4536', None),                         # fragment, no claim
+        ('phi = 64.834° - 180° = -115.166°', True),             # degree sign is a unit
+        (r'$A = 2.7 \times 2.4 = 6.48 \mathrm{m}^2$', True),     # LaTeX unit keeps its exponent
+        ('q = -82.39 μC = -82.39 × 10^-6 C', True),             # Greek mu
+        ('theta = 91.4 deg = 1.594 rad', True),                 # deg -> rad
+        ('p = 1% = 0.01', True),                                # percent -> fraction
+        ('p = 1% = 0.02', False),                               # ...and still checked
+        ('Pa = (1 - Pd) (at 3.5%) = 0.6296', None),             # fragment `3.5%)`
+        ('- 0.954^49 = 0.0995', None),                          # clause-cut `- 0.954^49`...
+        ('P = 1 - 0.954^49 = 0.0949', False),                   # a whole expression IS checked
+        ('x = -0.5 * 2 = -1.0', True),                          # ...but unary minus is fine
+        # Real slips found by auditing a sample of claims (all llama-3.1-70b):
+        ('Pa = (1 - 0.059)^13 = 0.5786', False),
+        ('V = 0.276^1.1745 = 0.4439', False),
+        # Two slips found in real traces (llama, gpt-5 on normal_depth_iteration#1):
+        # the right milestone is stated, the arithmetic shown does not produce it.
+        ('A = (3.8 + 2*1.500*2)*1.500 = 14.100 m^2', False),
+        ('y = 1.853 - (0.2892*(-0.160))/(-2.8172) = 1.86921', False),
     ]
     bad = 0
     for text, want in cases:
