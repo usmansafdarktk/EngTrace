@@ -130,6 +130,15 @@ main path. That matters for every comparison against E0, and it is the strongest
 argument that E1 (judge-family removal) and E3 (deterministic milestones) are
 testing the part of E0 that actually decides scores.
 
+**Update, 2026-09-19 — the judges are not rubber stamps.** The 93% "Alternative
+Correct" invites the reading that E0's judges approve anything. A direct test says
+otherwise: given one step with a known, verified arithmetic error, GPT-5 and Opus 4.5
+each flagged 10 of 12 (JUDGE_SELECTION.md, `analysis/judge_probe.py`). The 93% is
+better explained by what Tier 1 sends them — nearly every step, correct ones
+included, because its number-AND-similarity test rarely passes. The judges mostly see
+correct steps and mostly say so. The finding above stands; that reading of it does
+not.
+
 Also confirmed at scale: **E0-F1 holds for all five models** - `rackett_equation_volume`
 final-answer accuracy is 0 of 20 across every model, right or wrong. The
 wrong-answer Tribunal sample realised at 24 of 136 (17.6%) against the framework's

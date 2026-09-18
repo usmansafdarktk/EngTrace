@@ -3248,11 +3248,29 @@ milestones in 1,494, both genuine, and measured the unread side metric
 (arithmetic consistency) at about two-thirds precision on a fixed-seed sample,
 which is reported with that caveat rather than as a validated per-model measure.
 
+## D-088 — Judges for E1 and E5 (recommended; awaiting sign-off)
+
+**Date:** 2026-09-19 · **Status:** OPEN · **Evidence:** `evaluator_pilot_17092026/JUDGE_SELECTION.md`
+
+Table 13's 27 models span seven families once backbones are counted (OpenAI,
+Anthropic, Google incl. Gemma, DeepSeek, Meta incl. MetaMath, Qwen, Mistral incl.
+WizardMath). Every capable remaining family has its own base but documented exposure
+to an evaluated family's outputs, so independence is a degree, not a yes/no. A
+21-step probe with known labels ruled out Nemotron 3 Ultra and Seed 2.1 (half their
+replies unparseable) and showed no candidate rubber-stamps; it cannot separate the
+top five.
+
+Recommended: E1 panel **MiniMax M3 + Xiaomi MiMo-V2.5-Pro + xAI Grok 4.6** (three
+families, residual exposure spread across Claude and OpenAI rather than stacked;
+~$3.50). E5: **MiniMax M3** alone. Kimi K3 and GLM-5.3 deliberately excluded to keep
+the strongest open families available for the next roster. The prior decision is the
+roster's families: a family cannot be both judge and judged.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
-| — | Judge family for E1 and E5: must be outside every evaluated family, which rules out OpenAI, Anthropic, Google, and DeepSeek / Meta if they are among the 27 evaluated models | running E1 or E5 |
+| D-088 | Sign off the E1/E5 judges; first, fix which families the next roster will evaluate | running E1 or E5 |
 | — | Expert annotation of the frozen 300 (stage 3): annotators, protocol, the ~100-trace triple-labelled overlap | any X1 agreement number |
 | D-003 | Do the raw `inference_results/` generations still exist? | promising any corrected results table |
 | — | Phase 5 scoping: fold into Phase 1 or run as a parallel PR | Phase 1 start |
