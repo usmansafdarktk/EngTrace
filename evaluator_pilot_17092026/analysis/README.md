@@ -22,6 +22,8 @@ so on a fresh clone these scripts need the runs regenerated first
 | `e3_analysis.py` | E3 per model and answer type, the `rackett` check, raw null | RESULTS_E3 |
 | `e3_null.py` | the null split into shared values (3.8%) and coincidence | RESULTS_E3 §The null baseline |
 | `e3_grid.py` | E3 real / null / separation across tolerance x unit scaling | RESULTS_E3 table, `e3_milestones.py` docstring |
+| `e4_analysis.py` | E4 vs E3 per model, milestone statuses, parse coverage, every contradicted milestone printed for reading | RESULTS_E4 §Results, §The finding |
+| `e4_claim_audit.py [N]` | a fixed-seed sample of E4's inconsistent claims, for hand classification | RESULTS_E4 §The side metric (19 real / 10 FP / 1 unclear of 30) |
 | `roster_cost.py` | per-model cost of the full 2,250-item benchmark under E0 | conversation with supervisor; roster planning |
 | `model_health.py` | every pilot model listed, un-deprecated, served, answering (makes live calls, ~$0.01) | README §The five models |
 

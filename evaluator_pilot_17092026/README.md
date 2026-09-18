@@ -19,14 +19,14 @@ branches.
 | 2 · E0, the published framework | done, twice ([E0-F7](FINDINGS.md)) | $12.81 |
 | 2 · E0-3J, E0 with its third judge connected | done | $7.82 |
 | 2 · E3, deterministic milestones | done | $0.00 |
-| 2 · E4, stated-arithmetic checking | checker validated; scoring in progress | $0.00 |
+| 2 · E4, E3 + stated-arithmetic checking | done ([RESULTS_E4](RESULTS_E4.md)) | $0.00 |
 | 2 · E1, E5 | waiting on the judge-family decision | — |
 | 2 · E2 | not started (needs a GPU host for a PRM) | — |
 | 3 · expert annotation of the 300 | not started; independent of stage 2 | — |
 
 **Read these first:** [FINDINGS.md](FINDINGS.md) (seven defects in the published
 framework, plus the robustness cohort), [RESULTS_E0.md](RESULTS_E0.md),
-[RESULTS_E3.md](RESULTS_E3.md), and the pilot's decisions D-078 to D-086 in
+[RESULTS_E3.md](RESULTS_E3.md), [RESULTS_E4.md](RESULTS_E4.md), and the pilot's decisions D-078 to D-087 in
 [DECISIONS.md](../docs/re-implementation-sep/DECISIONS.md). Every number in them is
 reproduced by a script in [analysis/](analysis/README.md).
 
@@ -48,7 +48,8 @@ evaluator_pilot_17092026/
     e0_3j_tribunal.py  E0 with the missing get_model_info supplied (third judge)
     milestones.py      per-instance milestones, derived by rule (D-084)
     e3_milestones.py   E3: milestone coverage, order-free, unit-aware
-    arith.py           sympy checker for stated arithmetic, validated on gold (D-085)
+    arith.py           sympy checker for stated arithmetic, validated on gold AND traces (D-085, D-087)
+    e4_arith.py        E4: E3 milestones classed verified / contradicted / stated
   analysis/          the script behind every reported number
   kaggle/            GPU offload for the scorer stack (D-086)
   slice/             FROZEN. Do not edit by hand.
