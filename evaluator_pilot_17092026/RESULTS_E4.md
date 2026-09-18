@@ -95,7 +95,8 @@ so the side metric is reported with its measured precision instead.
 
 This is the part worth reusing, because the first validation was not enough.
 
-1. **Plants.** 36 cases in `arith.py --selftest`, each true, false or no-claim.
+1. **Plants.** 38 cases in `arith.py`'s self-test (`python evaluators/arith.py`),
+   each expecting true, false or no-claim.
 2. **Gold.** Gold arithmetic is correct by construction, so every inconsistency on a
    gold solution is a checker bug. First cut: **61.5%** consistent (111 bugs).
    After ten fixes: **100%** (227 of 227 claims).
