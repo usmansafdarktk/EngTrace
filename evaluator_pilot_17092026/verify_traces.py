@@ -79,8 +79,16 @@ def load():
     return items, traces
 
 
-def check(items, traces):
+def check(items, traces, keys=None):
+    """T1-T7 over the trace columns in `keys` (default: all of them).
+
+    A caller scoring one cohort passes that cohort's keys. Otherwise an
+    incomplete robustness column - a model added to probe how evaluators behave
+    on smaller open-weight traces - would block scoring the gold five, which is
+    a different question and already verified.
+    """
     bad = []
+    traces = {k: v for k, v in traces.items() if keys is None or k in keys}
     for key, rows in traces.items():
         ok = [r for r in rows if r['ok']]
         ids = {r['item_id'] for r in ok}

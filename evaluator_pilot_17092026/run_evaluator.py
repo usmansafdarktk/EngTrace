@@ -71,7 +71,7 @@ def config_sha(cfg: dict) -> str:
     return _sha(json.dumps(cfg, sort_keys=True))
 
 
-def verified_traces(freeze_check: str = 'rebuild'):
+def verified_traces(freeze_check: str = 'rebuild', cohort: str = 'gold'):
     """The traces verify_traces passes, or stop.
 
     freeze_check='rebuild' regenerates the slice from the templates and compares
@@ -96,7 +96,12 @@ def verified_traces(freeze_check: str = 'rebuild'):
                              % (got[:16], want[:16]))
         print('FREEZE HASH OK - manifest sha256 %s matches FREEZE.json' % got[:16])
     items, traces = vt.load()
-    bad = vt.check(items, traces)
+    keys = cohort_keys(cohort)
+    bad = vt.check(items, traces, keys)
+    other = vt.check(items, traces, set(traces) - keys)
+    if other:
+        print('note: %d issue(s) in columns outside cohort %r, not gating this run'
+              % (len(other), cohort))
     if bad:
         raise SystemExit('verify_traces fails - refusing to score:\n  ' + '\n  '.join(bad))
     return items, {k: {r['item_id']: r for r in rows if r['ok']} for k, rows in traces.items()}
@@ -133,9 +138,24 @@ def call_cost(call: dict, prices: dict) -> float:
     return ((call.get('prompt_tokens') or 0) * pin + out * pout) / 1e6
 
 
-def plan(items, traces, evaluator, csha, limit=None, models=None):
+def cohort_keys(cohort: str) -> set:
+    """Which models a run scores. Default 'gold': the five the experts annotate.
+
+    The robustness cohort exists to be checked mechanically, not to be scored
+    into the comparison, and judging it would cost real money per model for
+    numbers no human label backs. Scoring it is therefore opt-in.
+    """
+    cfg = rt.config()
+    return {m['key'] for m in cfg['models']
+            if cohort == 'all' or m.get('cohort', 'gold') == cohort}
+
+
+def plan(items, traces, evaluator, csha, limit=None, models=None, cohort='gold'):
     work = []
+    allowed = cohort_keys(cohort)
     for key in sorted(traces):
+        if key not in allowed:
+            continue
         if models and key not in models:
             continue
         done = done_rows(evaluator, key, csha)
@@ -175,15 +195,16 @@ def dry_reached(evaluator: str) -> set:
     return out
 
 
-def run(evaluator: str, dry_run: bool, limit, models, freeze_check='rebuild'):
+def run(evaluator: str, dry_run: bool, limit, models, freeze_check='rebuild', cohort='gold'):
     mod = importlib.import_module(EVALUATORS[evaluator])
-    items, traces = verified_traces(freeze_check)
+    items, traces = verified_traces(freeze_check, cohort)
     cfg = mod.config()
     csha = config_sha(cfg)
-    work = plan(items, traces, evaluator if not dry_run else evaluator + '_dry', csha, limit, models)
+    work = plan(items, traces, evaluator if not dry_run else evaluator + '_dry',
+                csha, limit, models, cohort)
     print('%s: %s' % (mod.ID, mod.DESCRIPTION))
-    print('config %s   %d (item, model) pairs to score%s'
-          % (csha[:12], len(work), '  [DRY RUN - no judge is called]' if dry_run else ''))
+    print('config %s   cohort %s   %d (item, model) pairs to score%s'
+          % (csha[:12], cohort, len(work), '  [DRY RUN - no judge is called]' if dry_run else ''))
     for d in getattr(mod, 'DEVIATIONS', []):
         print('  deviation: ' + d)
     if not work:
@@ -206,7 +227,7 @@ def run(evaluator: str, dry_run: bool, limit, models, freeze_check='rebuild'):
                'branch': items[item_id]['branch'], 'answer_type': items[item_id]['answer_type'],
                'item_sha256': items[item_id]['sha256'], 'trace_sha256': tsha,
                'config_sha256': csha, 'seed': seed, 'dry_run': dry_run,
-               'freeze_check': freeze_check,
+               'freeze_check': freeze_check, 'cohort': cohort,
                'ts': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())}
         t1 = time.time()
         try:
@@ -410,6 +431,8 @@ def main():
     ap.add_argument('--model', action='append')
     ap.add_argument('--status', action='store_true')
     ap.add_argument('--freeze-check', choices=('rebuild', 'hash'), default='rebuild')
+    ap.add_argument('--cohort', choices=('gold', 'robustness', 'all'), default='gold',
+                    help='gold = the five the experts annotate (default)')
     ap.add_argument('--import-kaggle', metavar='DIR',
                     help="a kernel's downloaded output; merged only if it matches local reference rows")
     args = ap.parse_args()
@@ -417,7 +440,8 @@ def main():
         return status(args.evaluator)
     if args.import_kaggle:
         return import_kaggle(args.evaluator, args.import_kaggle)
-    return run(args.evaluator, args.dry_run, args.smoke, args.model, args.freeze_check)
+    return run(args.evaluator, args.dry_run, args.smoke, args.model, args.freeze_check,
+               args.cohort)
 
 
 if __name__ == '__main__':
