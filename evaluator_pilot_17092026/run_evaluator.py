@@ -88,7 +88,7 @@ def config_sha(cfg: dict) -> str:
     return _sha(json.dumps(cfg, sort_keys=True))
 
 
-def verified_traces(freeze_check: str = 'rebuild', cohort: str = 'gold'):
+def verified_traces(freeze_check: str = 'rebuild', cohort: str = 'gold', models=None):
     """The traces verify_traces passes, or stop.
 
     freeze_check='rebuild' regenerates the slice from the templates and compares
@@ -114,6 +114,11 @@ def verified_traces(freeze_check: str = 'rebuild', cohort: str = 'gold'):
         print('FREEZE HASH OK - manifest sha256 %s matches FREEZE.json' % got[:16])
     items, traces = vt.load()
     keys = cohort_keys(cohort)
+    if models:
+        # Gate on what is being scored. Asking for gemma alone must not be blocked
+        # by an incomplete qwen column in the same cohort - and must still be
+        # blocked if gemma itself fails.
+        keys &= set(models)
     bad = vt.check(items, traces, keys)
     other = vt.check(items, traces, set(traces) - keys)
     if other:
@@ -214,7 +219,7 @@ def dry_reached(evaluator: str) -> set:
 
 def run(evaluator: str, dry_run: bool, limit, models, freeze_check='rebuild', cohort='gold'):
     mod = importlib.import_module(EVALUATORS[evaluator])
-    items, traces = verified_traces(freeze_check, cohort)
+    items, traces = verified_traces(freeze_check, cohort, models)
     cfg = dict(mod.config(), sample_seed_scheme=SEED_SCHEME)
     csha = config_sha(cfg)
     work = plan(items, traces, evaluator if not dry_run else evaluator + '_dry',
