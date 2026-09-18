@@ -91,7 +91,8 @@ selected as clean — Llama computing √(124343 × 582.96) as √72,311,151 (th
 tolerance and E3's 0.5% milestone tolerance, so both passed it. **Every judge flagged
 it.** The label was corrected (`judge_probe.RELABEL`, with the arithmetic). In the
 other direction, GPT-5's sign slip — right value, wrong written formula — got past
-six of the seven judges that returned a verdict; only Nemotron flagged it, and E4 catches it
+seven of the eight judges that returned a verdict, both E0 judges included; only
+Nemotron flagged it, and E4 catches it
 deterministically. Each mechanism misses what the other catches. That is the case
 for E5.
 
