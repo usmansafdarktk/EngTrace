@@ -53,7 +53,8 @@ import verify_traces as vt     # noqa: E402
 
 SCORES = os.path.join(_HERE, 'scores')
 EVALUATORS = {'e0': 'evaluators.e0_tribunal',
-              'e0_3j': 'evaluators.e0_3j_tribunal'}
+              'e0_3j': 'evaluators.e0_3j_tribunal',
+              'e3': 'evaluators.e3_milestones'}
 
 # Snapshot prices for routes without a live catalogue; OpenRouter is read live.
 GOOGLE_PRICES = {'gemini-3.1-pro-preview': (2.0, 12.0)}
@@ -63,8 +64,23 @@ def _sha(text: str) -> str:
     return hashlib.sha256(text.encode('utf-8')).hexdigest()
 
 
+SEED_SCHEME = 'item+model'      # NOT evaluator+item+model - see below
+
+
 def seed_for(evaluator: str, item_id: str, model_key: str) -> int:
-    h = hashlib.blake2b(('%s|%s|%s' % (evaluator, item_id, model_key)).encode(), digest_size=4)
+    """The seed for a (trace, evaluator) pair. Deliberately ignores `evaluator`.
+
+    E0's framework sends a wrong answer to the Tribunal with probability 0.20, and
+    that draw comes from this seed. Including the evaluator id meant each candidate
+    drew its OWN sample: e0 judged 175 traces, e0_3j judged 179, 160 in common, and
+    the resulting column deltas looked like a mechanism difference when part of
+    them was a sampling difference. Every evaluator now samples the same traces, so
+    a difference between two candidates is a difference between candidates.
+
+    The scheme is hashed into the config, so changing it re-scores rather than
+    silently mixing rows drawn under two different samples.
+    """
+    h = hashlib.blake2b(('%s|%s' % (item_id, model_key)).encode(), digest_size=4)
     return int.from_bytes(h.digest(), 'big')
 
 
@@ -199,7 +215,7 @@ def dry_reached(evaluator: str) -> set:
 def run(evaluator: str, dry_run: bool, limit, models, freeze_check='rebuild', cohort='gold'):
     mod = importlib.import_module(EVALUATORS[evaluator])
     items, traces = verified_traces(freeze_check, cohort)
-    cfg = mod.config()
+    cfg = dict(mod.config(), sample_seed_scheme=SEED_SCHEME)
     csha = config_sha(cfg)
     work = plan(items, traces, evaluator if not dry_run else evaluator + '_dry',
                 csha, limit, models, cohort)
@@ -294,7 +310,7 @@ def dry_estimate(tag: str):
 
 def status(evaluator: str):
     mod = importlib.import_module(EVALUATORS[evaluator])
-    csha = config_sha(mod.config())
+    csha = config_sha(dict(mod.config(), sample_seed_scheme=SEED_SCHEME))
     d = os.path.join(SCORES, evaluator)
     print('%s config %s' % (evaluator, csha[:12]))
     if not os.path.isdir(d):
@@ -344,7 +360,7 @@ def import_kaggle(evaluator: str, src: str) -> int:
     cache merged, so the paid run here reuses GPU work instead of repeating it.
     """
     mod = importlib.import_module(EVALUATORS[evaluator])
-    csha = config_sha(mod.config())
+    csha = config_sha(dict(mod.config(), sample_seed_scheme=SEED_SCHEME))
     k_rows = _rows(os.path.join(src, 'scores', evaluator + '_dry'))
     l_dir = os.path.join(SCORES, evaluator + '_dry')
     l_rows = {k: r for k, r in _rows(l_dir).items() if not (r['meta'].get('compute') or {}).get('cuda')}
