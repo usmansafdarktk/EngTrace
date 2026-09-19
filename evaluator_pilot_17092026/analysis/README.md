@@ -26,6 +26,7 @@ so on a fresh clone these scripts need the runs regenerated first
 | `e4_claim_audit.py [N]` | a fixed-seed sample of E4's inconsistent claims, for hand classification | RESULTS_E4 §The side metric (19 real / 10 FP / 1 unclear of 30) |
 | `judge_candidates.py` | every OpenRouter family outside the 27-model suite, with price, openness and JSON support | JUDGE_SELECTION §The constraint |
 | `judge_probe.py build/run/report` | 21 known-label steps sent to 9 judges with the framework's own prompt (paid, ~$3) | JUDGE_SELECTION §The probe; FINDINGS E0-F5 update |
+| `e1_panel_check.py` | the E1 panel's availability on OpenRouter (listing, endpoints, live JSON call) and E1's cost from probe token usage | JUDGE_SELECTION; E1 cost estimate |
 | `roster_cost.py` | per-model cost of the full 2,250-item benchmark under E0 | conversation with supervisor; roster planning |
 | `model_health.py` | every pilot model listed, un-deprecated, served, answering (makes live calls, ~$0.01) | README §The five models |
 
