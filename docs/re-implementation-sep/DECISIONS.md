@@ -3250,8 +3250,8 @@ which is reported with that caveat rather than as a validated per-model measure.
 
 ## D-088 — Judges for E1 and E5
 
-**Date:** 2026-09-19 · **Status:** DECIDED for E1 (signed off and run the same day,
-RESULTS_E1); E5's judge as recommended below, pending its run · **Evidence:**
+**Date:** 2026-09-19 · **Status:** DECIDED (E1 and E5 both run the same day with these
+judges; RESULTS_E1, RESULTS_E5) · **Evidence:**
 `evaluator_pilot_17092026/JUDGE_SELECTION.md`
 
 Table 13's 27 models span seven families once backbones are counted (OpenAI,
