@@ -1,7 +1,7 @@
 #!/bin/bash
 # E2 diagnostic: why does Qwen2.5-Math-PRM-72B miss its card's example rewards?
 #
-#   sbatch -J e2-diag --gpus=2 e2_diag.sbatch
+#   sbatch -J e2_diag --gpus=2 e2_diag.sbatch
 #
 # Smoke runs 3 and 4 gave BIT-IDENTICAL self-check rewards under transformers 4.57.3 and
 # 4.46.3 ([0.993, 0.0037, 0.159, 0.561] vs the card's [0.992, 0.0048, 0.324, 0.820]),

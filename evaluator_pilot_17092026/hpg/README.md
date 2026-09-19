@@ -79,5 +79,8 @@ host, so a result file names the exact code that produced it.
 
 ## Job names
 
-All jobs are named `e2-<prm>-<smoke|full>` (plus `e2-diag`), with logs at
-`logs/<name>_<jobid>.out`, so they stand apart from other work on the shared account.
+Jobs carry no model names, since the account is shared: `e2_<n>_<smoke|full>`, where
+**1 = versa, 2 = qwen72, 3 = qwen7**, plus `e2_diag`. Logs are at
+`logs/<name>_<jobid>.out`. The smoke attempts before this scheme were named
+`e2-versa-smoke`, `e2-qwen72-smoke` and `e2-diag` (jobs 42698932-42701952); finished
+jobs cannot be renamed.

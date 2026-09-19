@@ -1,8 +1,10 @@
 #!/bin/bash
 # E2 on HiPerGator: one PRM over the E2 inputs, weights on node-local scratch.
 #
-#   sbatch -J e2-qwen7  --gpus=1 e2.sbatch qwen7  5    # smoke: self-check + 5 traces
-#   sbatch -J e2-qwen72 --gpus=2 e2.sbatch qwen72 all  # full run
+#   sbatch -J e2_1_smoke --gpus=1 e2.sbatch versa  5    # smoke: self-check + 5 traces
+#   sbatch -J e2_2_full  --gpus=2 e2.sbatch qwen72 all  # full run
+#
+# Job names carry no model names (shared account): 1 = versa, 2 = qwen72, 3 = qwen7.
 #
 # /blue/fire-finai was 99% full when this was written (163 GB free of 10 TB), so
 # NOTHING large goes there: model weights and the few pinned packages live in the
