@@ -38,16 +38,37 @@ FILES = [
      ('gpt-5', 'claude-opus-4.7', 'gemini-3.1-pro', 'deepseek-r1', 'llama-3.1-70b')]
 
 
+MODES = ('dry', 'capture', 'replay')
+
+
 def main():
-    if len(sys.argv) != 2:
+    """stage_bundle.py STAGE_DIR [MODE]. MODE is dry (E0 dry run, default), capture
+    or replay (the two Kaggle halves of E1). capture and replay also ship E1's code
+    and the scorer caches - 724 KB, and they spare the kernel recomputing Tier 1;
+    replay additionally ships the judge replies fetched on the laptop and the price
+    snapshot, so the kernel needs no key at any point."""
+    if len(sys.argv) not in (2, 3):
         raise SystemExit(__doc__)
     stage = os.path.abspath(sys.argv[1])
+    mode = sys.argv[2] if len(sys.argv) == 3 else 'dry'
+    if mode not in MODES:
+        raise SystemExit('mode must be one of %s' % (MODES,))
+    files = list(FILES)
+    if mode in ('capture', 'replay'):
+        files.append(P + '/evaluators/e1_panel.py')
+        cache = os.path.join(ROOT, P, 'scores', '_cache')
+        files += [P + '/scores/_cache/' + f for f in sorted(os.listdir(cache))
+                  if f.endswith('.jsonl') or f == 'openrouter_prices.json']
+        if mode == 'replay' and not os.path.exists(os.path.join(cache, 'e1_judge_replies.jsonl')):
+            raise SystemExit('replay needs the reply store: run --fetch-captured first')
     if stage.startswith(ROOT):
         raise SystemExit('stage outside the repo, not in it')
 
     py = sys.executable
     for mod in ('%s.freeze' % P, '%s.verify_traces' % P):
-        args = [py, '-m', mod] + (['--verify'] if mod.endswith('freeze') else [])
+        # Only the gold five are bundled and scored, so the gold five are what must
+        # verify; the robustness cohort is reported elsewhere and never shipped.
+        args = [py, '-m', mod] + (['--verify'] if mod.endswith('freeze') else ['--cohort', 'gold'])
         r = subprocess.run(args, cwd=ROOT, capture_output=True, text=True,
                            env={**os.environ, 'PYTHONIOENCODING': 'utf-8'})
         print(r.stdout.strip().splitlines()[-1] if r.stdout.strip() else r.stderr[-500:])
@@ -57,7 +78,7 @@ def main():
     if os.path.isdir(stage):
         shutil.rmtree(stage)
     manifest = {}
-    for rel in FILES:
+    for rel in files:
         src = os.path.join(ROOT, rel)
         dst = os.path.join(stage, rel)
         os.makedirs(os.path.dirname(dst), exist_ok=True)
@@ -74,8 +95,8 @@ def main():
     for bad in ('.env', 'testset', 'data'):
         if os.path.exists(os.path.join(stage, bad)):
             raise SystemExit('refusing: %s ended up in the stage' % bad)
-    for dirpath, _, files in os.walk(stage):
-        for f in files:
+    for dirpath, _, names in os.walk(stage):      # not `files`: that is the bundle list
+        for f in names:
             text = open(os.path.join(dirpath, f), 'rb').read()
             for name, v in keys.items():
                 if v.encode() in text:
@@ -84,11 +105,13 @@ def main():
 
     with open(os.path.join(stage, 'ENGTRACE_BUNDLE'), 'w', encoding='utf-8') as fh:
         json.dump(manifest, fh, indent=2)
+    with open(os.path.join(stage, 'KAGGLE_MODE'), 'w', encoding='utf-8') as fh:
+        fh.write(mode)
     with open(os.path.join(stage, 'dataset-metadata.json'), 'w', encoding='utf-8') as fh:
         json.dump({'title': 'engtrace-evaluator-pilot', 'id': 'ayeshaiq/engtrace-evaluator-pilot',
                    'licenses': [{'name': 'other'}]}, fh, indent=2)
     size = sum(os.path.getsize(os.path.join(d, f)) for d, _, fs in os.walk(stage) for f in fs)
-    print('staged %d files, %.1f MB -> %s' % (len(FILES), size / 1e6, stage))
+    print('staged %d files, %.1f MB, mode %s -> %s' % (len(files), size / 1e6, mode, stage))
 
 
 if __name__ == '__main__':

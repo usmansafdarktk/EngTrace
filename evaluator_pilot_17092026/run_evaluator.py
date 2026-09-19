@@ -55,7 +55,8 @@ SCORES = os.path.join(_HERE, 'scores')
 EVALUATORS = {'e0': 'evaluators.e0_tribunal',
               'e0_3j': 'evaluators.e0_3j_tribunal',
               'e3': 'evaluators.e3_milestones',
-              'e4': 'evaluators.e4_arith'}
+              'e4': 'evaluators.e4_arith',
+              'e1': 'evaluators.e1_panel'}
 
 # Snapshot prices for routes without a live catalogue; OpenRouter is read live.
 GOOGLE_PRICES = {'gemini-3.1-pro-preview': (2.0, 12.0)}
@@ -152,7 +153,9 @@ def done_rows(evaluator: str, model_key: str, csha: str) -> dict:
 def call_cost(call: dict, prices: dict) -> float:
     if not call.get('ok'):
         return 0.0
-    if call['provider'] == 'google':
+    # A judge in the Google SLOT may be served by OpenRouter (E1: MiMo). Price by
+    # where the call went, not by slot name: OpenRouter ids carry an org prefix.
+    if call['provider'] == 'google' and '/' not in str(call.get('model')):
         pin, pout = GOOGLE_PRICES.get(call['model'], (0.0, 0.0))
         out = (call.get('completion_tokens') or 0) + (call.get('thinking_tokens') or 0)
     else:
@@ -218,7 +221,41 @@ def dry_reached(evaluator: str) -> set:
     return out
 
 
-def run(evaluator: str, dry_run: bool, limit, models, freeze_check='rebuild', cohort='gold'):
+PRICES_SNAPSHOT = os.path.join(SCORES, '_cache', 'openrouter_prices.json')
+
+
+def prices_now() -> dict:
+    """Live OpenRouter prices, or the snapshot the key-holding laptop saved.
+
+    A Kaggle kernel has no key and cannot read the catalogue; without the snapshot
+    every call it scores would be costed at $0.
+    """
+    try:
+        live = rt.live_prices()
+        os.makedirs(os.path.dirname(PRICES_SNAPSHOT), exist_ok=True)
+        with open(PRICES_SNAPSHOT, 'w', encoding='utf-8') as fh:
+            json.dump({k: list(v) for k, v in live.items()}, fh)
+        return live
+    except Exception:                                              # noqa: BLE001
+        if os.path.exists(PRICES_SNAPSHOT):
+            print('  no key here: using the price snapshot saved where the key lives')
+            return {k: tuple(v) for k, v in json.load(open(PRICES_SNAPSHOT, encoding='utf-8')).items()}
+        print('  WARNING: no key and no price snapshot - costs will read $0')
+        return {}
+
+
+def fetch_captured(evaluator: str, path: str, workers: int) -> int:
+    """Laptop step of the Kaggle split: fetch every captured prompt. HTTP only."""
+    mod = importlib.import_module(EVALUATORS[evaluator])
+    caps = [json.loads(l) for l in open(path, encoding='utf-8')]
+    res = mod.fetch_captured(caps, workers)
+    prices_now()                                   # leave a snapshot for the key-less replay
+    print('fetch done: %s' % res)
+    return 1 if res['failed'] else 0
+
+
+def run(evaluator: str, dry_run: bool, limit, models, freeze_check='rebuild', cohort='gold',
+        workers: int = 48, capture_path=None, prefetch=True):
     mod = importlib.import_module(EVALUATORS[evaluator])
     items, traces = verified_traces(freeze_check, cohort, models)
     cfg = dict(mod.config(), sample_seed_scheme=SEED_SCHEME)
@@ -237,7 +274,25 @@ def run(evaluator: str, dry_run: bool, limit, models, freeze_check='rebuild', co
     t0 = time.time()
     state = mod.setup(dry_run=dry_run)
     print('  ready in %.0fs' % (time.time() - t0))
-    prices = {} if dry_run else rt.live_prices()
+    if capture_path:
+        caps = mod.capture(state, [(items[iid], tr, seed_for(evaluator, iid, key))
+                                   for key, iid, tr, tsha in work])
+        os.makedirs(os.path.dirname(os.path.abspath(capture_path)), exist_ok=True)
+        with open(capture_path, 'w', encoding='utf-8', newline='\n') as fh:
+            for c in caps:
+                fh.write(json.dumps(c, ensure_ascii=False) + '\n')
+        print('CAPTURED %d judge prompts from %d (item, model) pairs -> %s'
+              % (len(caps), len(work), capture_path))
+        return 0
+    prices = {} if dry_run else prices_now()
+
+    # An evaluator whose judges are slow can fetch every judge reply concurrently
+    # before scoring (E1). Scoring then reads them in the framework's own order.
+    if not dry_run and prefetch and hasattr(mod, 'prefetch'):
+        t1 = time.time()
+        pf = mod.prefetch(state, [(items[iid], tr, seed_for(evaluator, iid, key))
+                                  for key, iid, tr, tsha in work], workers=workers)
+        print('  prefetch done in %.0fs: %s' % (time.time() - t1, pf), flush=True)
 
     tag = evaluator + ('_dry' if dry_run else '')
     os.makedirs(os.path.join(SCORES, tag), exist_ok=True)
@@ -454,6 +509,11 @@ def main():
     ap.add_argument('--model', action='append')
     ap.add_argument('--status', action='store_true')
     ap.add_argument('--freeze-check', choices=('rebuild', 'hash'), default='rebuild')
+    ap.add_argument('--capture', metavar='FILE', help='write every judge prompt the run would send; score nothing')
+    ap.add_argument('--fetch-captured', metavar='FILE', help='fetch replies for captured prompts (HTTP only)')
+    ap.add_argument('--no-prefetch', action='store_true', help='score from the reply store as it is (Kaggle replay)')
+    ap.add_argument('--workers', type=int, default=48,
+                    help='concurrent judge calls, for evaluators that prefetch (E1)')
     ap.add_argument('--cohort', choices=('gold', 'robustness', 'all'), default='gold',
                     help='gold = the five the experts annotate (default)')
     ap.add_argument('--import-kaggle', metavar='DIR',
@@ -461,10 +521,12 @@ def main():
     args = ap.parse_args()
     if args.status:
         return status(args.evaluator)
+    if args.fetch_captured:
+        return fetch_captured(args.evaluator, args.fetch_captured, args.workers)
     if args.import_kaggle:
         return import_kaggle(args.evaluator, args.import_kaggle)
     return run(args.evaluator, args.dry_run, args.smoke, args.model, args.freeze_check,
-               args.cohort)
+               args.cohort, args.workers, args.capture, not args.no_prefetch)
 
 
 if __name__ == '__main__':
