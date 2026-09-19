@@ -22,12 +22,12 @@ branches.
 | 2 · E4, E3 + stated-arithmetic checking | done ([RESULTS_E4](RESULTS_E4.md)) | $0.00 |
 | 2 · E1, non-suite judge panel | done ([RESULTS_E1](RESULTS_E1.md)) | $4.38 (+ probe $3) |
 | 2 · E5, E3 first, a judge on the residuals | done ([RESULTS_E5](RESULTS_E5.md)) | $0.47 (+ $0.43 judge validation) |
-| 2 · E2 | not started (needs a GPU host for a PRM) | — |
+| 2 · E2, open process reward models on GPUs | done ([RESULTS_E2](RESULTS_E2.md)) | $0.00 (70 GPU-min, HiPerGator) |
 | 3 · expert annotation of the 300 | not started; independent of stage 2 | — |
 
 **Read these first:** [FINDINGS.md](FINDINGS.md) (seven defects in the published
 framework, plus the robustness cohort), [RESULTS_E0.md](RESULTS_E0.md),
-[RESULTS_E3.md](RESULTS_E3.md), [RESULTS_E4.md](RESULTS_E4.md), [RESULTS_E1.md](RESULTS_E1.md), [RESULTS_E5.md](RESULTS_E5.md), and the pilot's decisions D-078 to D-089 in
+[RESULTS_E3.md](RESULTS_E3.md), [RESULTS_E4.md](RESULTS_E4.md), [RESULTS_E1.md](RESULTS_E1.md), [RESULTS_E5.md](RESULTS_E5.md), [RESULTS_E2.md](RESULTS_E2.md), and the pilot's decisions D-078 to D-090 in
 [DECISIONS.md](../docs/re-implementation-sep/DECISIONS.md). Every number in them is
 reproduced by a script in [analysis/](analysis/README.md).
 
@@ -38,6 +38,7 @@ evaluator_pilot_17092026/
   README.md          this file
   FINDINGS.md        defects in the published framework; robustness cohort results
   RESULTS_E0.md      E0 and E0-3J
+  RESULTS_E2.md      E2, the three open PRMs (GPU runs and their smoke log: hpg/)
   RESULTS_E3.md      E3, its null baseline, where it disagrees with E0
   freeze.py          cuts and pins the slice; --verify fails if anything drifts
   run_traces.py      models over the slice; resumable, --check first

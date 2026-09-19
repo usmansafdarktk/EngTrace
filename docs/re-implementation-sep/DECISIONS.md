@@ -3313,6 +3313,12 @@ attention, which lands closest to the card. E2 is therefore reported primarily o
 thresholded verdicts and on ranking of the probe's known-label steps, and its
 continuous rewards are not compared with published numbers.
 
+**Outcome (RESULTS_E2).** All 360 traces scored. On the probe's known-label steps the
+72B separates slips from clean steps (AUROC 0.935), the 7B less well (0.824), and
+**VersaPRM fails validation**: it passed 11 of 12 known arithmetic slips and rates
+95-99% of every model's steps correct. E2's score is therefore the 72B's; VersaPRM is
+reported as a negative result, not as a score.
+
 ## Open decisions
 
 | # | Decision | Needed before |

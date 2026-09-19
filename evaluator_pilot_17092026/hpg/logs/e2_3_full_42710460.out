@@ -1,0 +1,37 @@
+job 42710460 on c0801a-s21.ufhpc, prm=qwen7 limit=all, start 2026-09-19T21:44:19Z
+node-local scratch /tmp/engtrace-e2-42710460:
+/dev/nvme1n1    3.5T   20G  3.3T   1% /tmp
+NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB
+packages: transformers==4.46.3 tokenizers==0.20.3 huggingface_hub==0.36.0
+INFO:    underlay of /usr/bin/nvidia-debugdump required more than 50 (478) bind mounts
+INFO:    underlay of /usr/share/nvidia/nvoptix.bin required more than 50 (80) bind mounts
+Fetching 17 files:   0%|          | 0/17 [00:00<?, ?it/s]Fetching 17 files:  76%|███████▋  | 13/17 [00:20<00:06,  1.54s/it]Fetching 17 files:  82%|████████▏ | 14/17 [00:29<00:06,  2.11s/it]Fetching 17 files:  88%|████████▊ | 15/17 [00:30<00:04,  2.06s/it]Fetching 17 files:  94%|█████████▍| 16/17 [00:31<00:01,  1.95s/it]Fetching 17 files: 100%|██████████| 17/17 [00:31<00:00,  1.85s/it]Fetching 17 files: 100%|██████████| 17/17 [00:31<00:00,  1.85s/it]
+The cache for model files in Transformers v4.22.0 has been updated. Migrating your old cache. This is a one-time only operation. You can interrupt this and resume the migration later on by calling `transformers.utils.move_cache()`.
+0it [00:00, ?it/s]0it [00:00, ?it/s]
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:00<00:01,  1.87it/s]Loading checkpoint shards:  50%|█████     | 2/4 [00:01<00:01,  1.99it/s]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:01<00:00,  2.02it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:01<00:00,  2.31it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:01<00:00,  2.18it/s]
+Some weights of the model checkpoint at Qwen/Qwen2.5-Math-PRM-7B were not used when initializing Qwen2ForProcessRewardModel: ['lm_head.weight']
+- This IS expected if you are initializing Qwen2ForProcessRewardModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing Qwen2ForProcessRewardModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+{"prm": "qwen7", "repo": "Qwen/Qwen2.5-Math-PRM-7B", "revision": "0610740060112df12585d00a1c5f4624d2f59051", "max_len": 4096, "attn_implementation": "eager", "base": null, "rotary_inv_freq_dtype": ["torch.float32"], "load_seconds": 38.5, "versions": {"python": "3.12.3", "torch": "2.13.0+cu130", "cuda": "13.0", "gpus": ["NVIDIA RTX PRO 6000 Blackwell Server Edition"], "transformers": "4.46.3", "peft": null, "accelerate": "1.14.0", "huggingface_hub": "0.36.0", "safetensors": "0.8.0", "tokenizers": "0.20.3"}, "scorer_md5": "7b5ae345175aefae2154af4e826f13d3", "slurm_job": "42710460", "host": "c0801a-s21.ufhpc"}
+We detected that you are passing `past_key_values` as a tuple and this is deprecated and will be removed in v4.43. Please use an appropriate `Cache` class (https://huggingface.co/docs/transformers/v4.41.3/en/internal/generation_utils#transformers.Cache)
+SELFCHECK {"prm": "qwen7", "got": [0.9997305274009705, 0.18713268637657166, 0.9793540239334106, 0.9998205304145813], "n_steps": 4, "n_tokens": 454, "got_bf16_softmax": [1.0, 0.1875, 0.98046875, 1.0], "expected": [1.0, 0.1904296875, 0.9765625, 1.0], "max_abs_diff": 0.0032970011234283447, "verdicts_match": true, "within_tol": true, "passed": true}
+  25/360 scored, 0 over length, 0 step mismatches
+  50/360 scored, 0 over length, 0 step mismatches
+  75/360 scored, 0 over length, 0 step mismatches
+  100/360 scored, 0 over length, 0 step mismatches
+  125/360 scored, 0 over length, 0 step mismatches
+  150/360 scored, 0 over length, 0 step mismatches
+  175/360 scored, 0 over length, 0 step mismatches
+  200/360 scored, 0 over length, 0 step mismatches
+  225/360 scored, 2 over length, 0 step mismatches
+  250/360 scored, 2 over length, 0 step mismatches
+  275/360 scored, 2 over length, 0 step mismatches
+  300/360 scored, 2 over length, 0 step mismatches
+  325/360 scored, 2 over length, 0 step mismatches
+  350/360 scored, 2 over length, 0 step mismatches
+  360/360 scored, 2 over length, 0 step mismatches
+DONE qwen7: 360 traces, 2 over length, 0 step mismatches, 59s
+rc=0 end=2026-09-19T21:45:27Z
+scratch used:
+15G	/tmp/engtrace-e2-42710460/hf
+cleaned /tmp/engtrace-e2-42710460

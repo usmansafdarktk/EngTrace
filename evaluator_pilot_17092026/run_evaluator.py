@@ -57,7 +57,8 @@ EVALUATORS = {'e0': 'evaluators.e0_tribunal',
               'e3': 'evaluators.e3_milestones',
               'e4': 'evaluators.e4_arith',
               'e1': 'evaluators.e1_panel',
-              'e5': 'evaluators.e5_hybrid'}
+              'e5': 'evaluators.e5_hybrid',
+              'e2': 'evaluators.e2_prm'}
 
 # Snapshot prices for routes without a live catalogue; OpenRouter is read live.
 GOOGLE_PRICES = {'gemini-3.1-pro-preview': (2.0, 12.0)}

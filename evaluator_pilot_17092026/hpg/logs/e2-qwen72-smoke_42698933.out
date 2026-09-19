@@ -1,0 +1,81 @@
+job 42698933 on c0801a-s21.ufhpc, prm=qwen72 limit=5, start 2026-09-19T19:09:35Z
+node-local scratch /tmp/engtrace-e2-42698933:
+/dev/nvme1n1    3.5T   20G  3.3T   1% /tmp
+NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB
+NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB
+INFO:    underlay of /usr/bin/nvidia-smi required more than 50 (478) bind mounts
+INFO:    underlay of /usr/share/nvidia/nvoptix.bin required more than 50 (80) bind mounts
+`torch_dtype` is deprecated! Use `dtype` instead!
+Fetching 37 files:   0%|          | 0/37 [00:00<?, ?it/s]Fetching 37 files:   0%|          | 0/37 [00:17<?, ?it/s]Fetching 37 files:   3%|▎         | 1/37 [00:42<25:14, 42.06s/it]Fetching 37 files:   8%|▊         | 3/37 [00:42<08:07, 14.33s/it]Fetching 37 files:  14%|█▎        | 5/37 [00:43<04:41,  8.79s/it]Fetching 37 files:  19%|█▉        | 7/37 [00:48<03:26,  6.87s/it]Fetching 37 files:  22%|██▏       | 8/37 [01:07<04:04,  8.42s/it]Fetching 37 files:  24%|██▍       | 9/37 [01:11<03:43,  7.97s/it]Fetching 37 files:  27%|██▋       | 10/37 [01:14<03:20,  7.42s/it]Fetching 37 files:  30%|██▉       | 11/37 [01:14<02:56,  6.77s/it]Fetching 37 files:  32%|███▏      | 12/37 [01:15<02:38,  6.33s/it]Fetching 37 files:  35%|███▌      | 13/37 [01:17<02:22,  5.95s/it]Fetching 37 files:  38%|███▊      | 14/37 [01:17<02:07,  5.54s/it]Fetching 37 files:  41%|████      | 15/37 [01:19<01:56,  5.27s/it]Fetching 37 files:  43%|████▎     | 16/37 [01:26<01:52,  5.38s/it]Fetching 37 files:  46%|████▌     | 17/37 [01:32<01:48,  5.44s/it]Fetching 37 files:  49%|████▊     | 18/37 [01:39<01:44,  5.50s/it]Fetching 37 files:  51%|█████▏    | 19/37 [01:40<01:35,  5.28s/it]Fetching 37 files:  54%|█████▍    | 20/37 [01:41<01:26,  5.09s/it]Fetching 37 files:  57%|█████▋    | 21/37 [01:44<01:19,  4.97s/it]Fetching 37 files:  59%|█████▉    | 22/37 [01:44<01:11,  4.75s/it]Fetching 37 files:  62%|██████▏   | 23/37 [01:46<01:04,  4.61s/it]Fetching 37 files:  65%|██████▍   | 24/37 [01:51<01:00,  4.63s/it]Fetching 37 files:  68%|██████▊   | 25/37 [01:54<00:55,  4.59s/it]Fetching 37 files:  70%|███████   | 26/37 [02:06<00:53,  4.85s/it]Fetching 37 files:  73%|███████▎  | 27/37 [02:06<00:46,  4.68s/it]Fetching 37 files:  76%|███████▌  | 28/37 [02:08<00:41,  4.59s/it]Fetching 37 files:  78%|███████▊  | 29/37 [02:10<00:35,  4.49s/it]Fetching 37 files:  81%|████████  | 30/37 [02:10<00:30,  4.36s/it]Fetching 37 files:  84%|████████▍ | 31/37 [02:11<00:25,  4.24s/it]Fetching 37 files:  86%|████████▋ | 32/37 [02:13<00:20,  4.18s/it]Fetching 37 files:  89%|████████▉ | 33/37 [02:18<00:16,  4.19s/it]Fetching 37 files:  92%|█████████▏| 34/37 [02:25<00:12,  4.29s/it]Fetching 37 files:  95%|█████████▍| 35/37 [02:26<00:08,  4.18s/it]Fetching 37 files:  97%|█████████▋| 36/37 [02:27<00:04,  4.09s/it]Fetching 37 files: 100%|██████████| 37/37 [02:29<00:00,  4.03s/it]Fetching 37 files: 100%|██████████| 37/37 [02:29<00:00,  4.03s/it]
+Loading checkpoint shards:   0%|          | 0/37 [00:00<?, ?it/s]Loading checkpoint shards:   3%|▎         | 1/37 [00:00<00:33,  1.09it/s]Loading checkpoint shards:   5%|▌         | 2/37 [00:01<00:33,  1.06it/s]Loading checkpoint shards:   8%|▊         | 3/37 [00:02<00:31,  1.07it/s]Loading checkpoint shards:  11%|█         | 4/37 [00:03<00:31,  1.06it/s]Loading checkpoint shards:  14%|█▎        | 5/37 [00:04<00:30,  1.06it/s]Loading checkpoint shards:  16%|█▌        | 6/37 [00:05<00:29,  1.06it/s]Loading checkpoint shards:  19%|█▉        | 7/37 [00:06<00:28,  1.04it/s]Loading checkpoint shards:  22%|██▏       | 8/37 [00:07<00:28,  1.03it/s]Loading checkpoint shards:  24%|██▍       | 9/37 [00:08<00:27,  1.01it/s]Loading checkpoint shards:  27%|██▋       | 10/37 [00:09<00:27,  1.01s/it]Loading checkpoint shards:  30%|██▉       | 11/37 [00:10<00:26,  1.01s/it]Loading checkpoint shards:  32%|███▏      | 12/37 [00:11<00:24,  1.01it/s]Loading checkpoint shards:  35%|███▌      | 13/37 [00:12<00:23,  1.01it/s]Loading checkpoint shards:  38%|███▊      | 14/37 [00:13<00:22,  1.02it/s]Loading checkpoint shards:  41%|████      | 15/37 [00:14<00:21,  1.04it/s]Loading checkpoint shards:  43%|████▎     | 16/37 [00:15<00:20,  1.04it/s]Loading checkpoint shards:  46%|████▌     | 17/37 [00:16<00:19,  1.03it/s]Loading checkpoint shards:  49%|████▊     | 18/37 [00:17<00:17,  1.08it/s]Loading checkpoint shards:  51%|█████▏    | 19/37 [00:18<00:15,  1.13it/s]Loading checkpoint shards:  54%|█████▍    | 20/37 [00:18<00:14,  1.16it/s]Loading checkpoint shards:  57%|█████▋    | 21/37 [00:19<00:13,  1.18it/s]Loading checkpoint shards:  59%|█████▉    | 22/37 [00:20<00:12,  1.19it/s]Loading checkpoint shards:  62%|██████▏   | 23/37 [00:21<00:11,  1.22it/s]Loading checkpoint shards:  65%|██████▍   | 24/37 [00:22<00:10,  1.22it/s]Loading checkpoint shards:  68%|██████▊   | 25/37 [00:22<00:09,  1.22it/s]Loading checkpoint shards:  70%|███████   | 26/37 [00:23<00:08,  1.22it/s]Loading checkpoint shards:  73%|███████▎  | 27/37 [00:24<00:08,  1.24it/s]Loading checkpoint shards:  76%|███████▌  | 28/37 [00:25<00:07,  1.24it/s]Loading checkpoint shards:  78%|███████▊  | 29/37 [00:26<00:06,  1.24it/s]Loading checkpoint shards:  81%|████████  | 30/37 [00:27<00:05,  1.23it/s]Loading checkpoint shards:  84%|████████▍ | 31/37 [00:27<00:04,  1.25it/s]Loading checkpoint shards:  86%|████████▋ | 32/37 [00:28<00:04,  1.23it/s]Loading checkpoint shards:  89%|████████▉ | 33/37 [00:29<00:03,  1.22it/s]Loading checkpoint shards:  92%|█████████▏| 34/37 [00:30<00:02,  1.21it/s]Loading checkpoint shards:  95%|█████████▍| 35/37 [00:31<00:01,  1.22it/s]Loading checkpoint shards:  97%|█████████▋| 36/37 [00:31<00:00,  1.22it/s]Loading checkpoint shards: 100%|██████████| 37/37 [00:32<00:00,  1.57it/s]Loading checkpoint shards: 100%|██████████| 37/37 [00:32<00:00,  1.15it/s]
+Some weights of the model checkpoint at Qwen/Qwen2.5-Math-PRM-72B were not used when initializing Qwen2ForProcessRewardModel: ['lm_head.weight']
+- This IS expected if you are initializing Qwen2ForProcessRewardModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing Qwen2ForProcessRewardModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+{"prm": "qwen72", "repo": "Qwen/Qwen2.5-Math-PRM-72B", "revision": "9df429b02adb5f764cd6e30e76a0cca16d501ae1", "max_len": 4096, "base": null, "load_seconds": 190.2, "versions": {"python": "3.12.3", "torch": "2.13.0+cu130", "cuda": "13.0", "gpus": ["NVIDIA RTX PRO 6000 Blackwell Server Edition", "NVIDIA RTX PRO 6000 Blackwell Server Edition"], "transformers": "4.57.3", "peft": "0.17.1", "accelerate": "1.14.0", "huggingface_hub": "0.36.0", "safetensors": "0.8.0", "tokenizers": "0.22.2"}}
+past_key_values should not be None in from_legacy_cache()
+We detected that you are passing `past_key_values` as a tuple and this is deprecated and will be removed in v4.43. Please use an appropriate `Cache` class (https://huggingface.co/docs/transformers/v4.41.3/en/internal/generation_utils#transformers.Cache)
+Traceback (most recent call last):
+  File "/blue/fire-finai/zhuohan.xie/engtrace-e2/e2_score.py", line 205, in <module>
+    main()
+  File "/blue/fire-finai/zhuohan.xie/engtrace-e2/e2_score.py", line 166, in main
+    sc = selfcheck(a.prm, runner)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/blue/fire-finai/zhuohan.xie/engtrace-e2/e2_score.py", line 136, in selfcheck
+    got = runner.score(runner.ids(CARD_EXAMPLE['query'], CARD_EXAMPLE['response']))
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/utils/_contextlib.py", line 124, in decorate_context
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/blue/fire-finai/zhuohan.xie/engtrace-e2/e2_score.py", line 82, in score
+    logits = self.model(input_ids=input_ids)[0]
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/accelerate/hooks.py", line 192, in new_forward
+    output = module._old_forward(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/engtrace-e2-42698933/hf/modules/transformers_modules/Qwen/Qwen2_dot_5_hyphen_Math_hyphen_PRM_hyphen_72B/9df429b02adb5f764cd6e30e76a0cca16d501ae1/modeling_qwen2_rm.py", line 1603, in forward
+    outputs = self.model(
+              ^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/engtrace-e2-42698933/hf/modules/transformers_modules/Qwen/Qwen2_dot_5_hyphen_Math_hyphen_PRM_hyphen_72B/9df429b02adb5f764cd6e30e76a0cca16d501ae1/modeling_qwen2_rm.py", line 916, in forward
+    layer_outputs = decoder_layer(
+                    ^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/accelerate/hooks.py", line 192, in new_forward
+    output = module._old_forward(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/engtrace-e2-42698933/hf/modules/transformers_modules/Qwen/Qwen2_dot_5_hyphen_Math_hyphen_PRM_hyphen_72B/9df429b02adb5f764cd6e30e76a0cca16d501ae1/modeling_qwen2_rm.py", line 655, in forward
+    hidden_states, self_attn_weights, present_key_value = self.self_attn(
+                                                          ^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py", line 1778, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/torch/nn/modules/module.py", line 1789, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/local/lib/python3.12/dist-packages/accelerate/hooks.py", line 192, in new_forward
+    output = module._old_forward(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/engtrace-e2-42698933/hf/modules/transformers_modules/Qwen/Qwen2_dot_5_hyphen_Math_hyphen_PRM_hyphen_72B/9df429b02adb5f764cd6e30e76a0cca16d501ae1/modeling_qwen2_rm.py", line 552, in forward
+    kv_seq_len += past_key_value.get_usable_length(kv_seq_len, self.layer_idx)
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'DynamicCache' object has no attribute 'get_usable_length'. Did you mean: 'get_seq_length'?
+rc=1 end=2026-09-19T19:12:55Z
+scratch used:
+136G	/tmp/engtrace-e2-42698933/hf
+cleaned /tmp/engtrace-e2-42698933

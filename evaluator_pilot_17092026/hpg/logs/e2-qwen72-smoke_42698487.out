@@ -1,0 +1,31 @@
+job 42698487 on c0801a-s21.ufhpc, prm=qwen72 limit=5, start 2026-09-19T19:05:16Z
+node-local scratch /tmp:
+/dev/nvme1n1    3.5T   20G  3.3T   1% /tmp
+NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB
+NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB
+INFO:    underlay of /usr/bin/nvidia-smi required more than 50 (478) bind mounts
+INFO:    underlay of /usr/share/nvidia/nvoptix.bin required more than 50 (80) bind mounts
+Traceback (most recent call last):
+  File "/blue/fire-finai/zhuohan.xie/engtrace-e2/e2_score.py", line 205, in <module>
+    main()
+  File "/blue/fire-finai/zhuohan.xie/engtrace-e2/e2_score.py", line 160, in main
+    runner = (Versa if a.prm == 'versa' else Qwen)(repo, rev)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/blue/fire-finai/zhuohan.xie/engtrace-e2/e2_score.py", line 65, in __init__
+    from transformers import AutoModel, AutoTokenizer
+  File "/tmp/pylib/transformers/__init__.py", line 27, in <module>
+    from . import dependency_versions_check
+  File "/tmp/pylib/transformers/dependency_versions_check.py", line 57, in <module>
+    require_version_core(deps[pkg])
+  File "/tmp/pylib/transformers/utils/versions.py", line 117, in require_version_core
+    return require_version(requirement, hint)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/tmp/pylib/transformers/utils/versions.py", line 111, in require_version
+    _compare_versions(op, got_ver, want_ver, requirement, pkg, hint)
+  File "/tmp/pylib/transformers/utils/versions.py", line 44, in _compare_versions
+    raise ImportError(
+ImportError: tokenizers>=0.22.0,<=0.23.0 is required for a normal functioning of this module, but found tokenizers==0.23.2.
+Try: `pip install transformers -U` or `pip install -e '.[dev]'` if you're working with git main
+rc=1 end=2026-09-19T19:05:29Z
+scratch used:
+4.0K	/tmp/hf

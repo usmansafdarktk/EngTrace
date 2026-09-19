@@ -1,0 +1,42 @@
+job 42710088 on c0800a-s5.ufhpc, prm=versa limit=all, start 2026-09-19T21:39:49Z
+node-local scratch /tmp/engtrace-e2-42710088:
+/dev/nvme1n1    3.5T   14G  3.3T   1% /tmp
+NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB
+packages: transformers==4.57.3 tokenizers==0.22.2 huggingface_hub==0.36.0 peft==0.17.1
+INFO:    underlay of /usr/bin/nvidia-smi required more than 50 (478) bind mounts
+INFO:    underlay of /usr/share/nvidia/nvoptix.bin required more than 50 (80) bind mounts
+Fetching 8 files:   0%|          | 0/8 [00:00<?, ?it/s]Fetching 8 files:  12%|█▎        | 1/8 [00:00<00:01,  4.89it/s]Fetching 8 files:  25%|██▌       | 2/8 [00:00<00:00,  9.74it/s]Fetching 8 files:  75%|███████▌  | 6/8 [00:00<00:00,  9.64it/s]Fetching 8 files: 100%|██████████| 8/8 [00:05<00:00,  1.35it/s]
+Fetching 13 files:   0%|          | 0/13 [00:00<?, ?it/s]Fetching 13 files:  23%|██▎       | 3/13 [00:00<00:00, 21.78it/s]Fetching 13 files:  46%|████▌     | 6/13 [00:00<00:00, 21.52it/s]Fetching 13 files:  69%|██████▉   | 9/13 [00:02<00:01,  3.05it/s]Fetching 13 files:  77%|███████▋  | 10/13 [00:14<00:04,  1.40s/it]Fetching 13 files:  85%|████████▍ | 11/13 [00:24<00:04,  2.22s/it]Fetching 13 files:  92%|█████████▏| 12/13 [00:26<00:02,  2.18s/it]Fetching 13 files: 100%|██████████| 13/13 [00:26<00:00,  2.04s/it]Fetching 13 files: 100%|██████████| 13/13 [00:26<00:00,  2.04s/it]
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:00<00:01,  2.47it/s]Loading checkpoint shards:  50%|█████     | 2/4 [00:00<00:00,  2.48it/s]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:01<00:00,  2.50it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:01<00:00,  3.08it/s]
+{"prm": "versa", "repo": "UW-Madison-Lee-Lab/VersaPRM", "revision": "cd537f770b8077e31b10c7dc6cfd27f582e5de51", "max_len": 131072, "attn_implementation": "sdpa", "base": {"repo": "UW-Madison-Lee-Lab/Llama-PRM800K", "revision": "1973a85d64b7a00e50a278b31a6558804bf952eb"}, "rotary_inv_freq_dtype": null, "load_seconds": 40.4, "versions": {"python": "3.12.3", "torch": "2.13.0+cu130", "cuda": "13.0", "gpus": ["NVIDIA RTX PRO 6000 Blackwell Server Edition"], "transformers": "4.57.3", "peft": "0.17.1", "accelerate": "1.14.0", "huggingface_hub": "0.36.0", "safetensors": "0.8.0", "tokenizers": "0.22.2"}, "scorer_md5": "7b5ae345175aefae2154af4e826f13d3", "slurm_job": "42710088", "host": "c0800a-s5.ufhpc"}
+SELFCHECK {"prm": "versa", "got": [0.9994966983795166, 0.9273632764816284, 0.980728805065155, 0.9734434485435486], "n_steps": 4, "n_tokens": 408, "base_only": [0.9738444089889526, 0.5888891220092773, 0.8652240633964539, 0.8856314420700073], "adapter_shift": 0.3384741544723511, "passed": true, "note": "no reference values on the card; checked one score per step in [0, 1] and that the adapter changes the scores"}
+  25/360 scored, 0 over length, 0 step mismatches
+  50/360 scored, 0 over length, 0 step mismatches
+  75/360 scored, 0 over length, 0 step mismatches
+  100/360 scored, 0 over length, 0 step mismatches
+  125/360 scored, 0 over length, 0 step mismatches
+  150/360 scored, 0 over length, 0 step mismatches
+  175/360 scored, 0 over length, 0 step mismatches
+  200/360 scored, 0 over length, 0 step mismatches
+  225/360 scored, 0 over length, 0 step mismatches
+  250/360 scored, 0 over length, 0 step mismatches
+  275/360 scored, 0 over length, 0 step mismatches
+  300/360 scored, 0 over length, 0 step mismatches
+  325/360 scored, 0 over length, 0 step mismatches
+  350/360 scored, 0 over length, 0 step mismatches
+  360/360 scored, 0 over length, 0 step mismatches
+OSError: [Errno 122] Disk quota exceeded
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/blue/fire-finai/zhuohan.xie/engtrace-e2/e2_score.py", line 245, in <module>
+    main()
+  File "/blue/fire-finai/zhuohan.xie/engtrace-e2/e2_score.py", line 221, in main
+    with open(a.out, 'w', encoding='utf-8') as fh:
+OSError: [Errno 122] Disk quota exceeded
+rc=1 end=2026-09-19T21:41:05Z
+scratch used:
+16G	/tmp/engtrace-e2-42710088/hf
+cleaned /tmp/engtrace-e2-42710088

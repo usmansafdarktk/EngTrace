@@ -1,0 +1,14 @@
+job 42698686 on c0801a-s21.ufhpc, prm=qwen72 limit=5, start 2026-09-19T19:07:23Z
+node-local scratch /tmp/engtrace-e2-42698686:
+/dev/nvme1n1    3.5T   20G  3.3T   1% /tmp
+NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB
+NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB
+INFO:    underlay of /usr/bin/nvidia-persistenced required more than 50 (478) bind mounts
+INFO:    underlay of /usr/share/nvidia/nvoptix.bin required more than 50 (80) bind mounts
+INFO:    Terminating squashfuse_ll after timeout
+INFO:    Timeouts can be caused by a running background process
+FATAL:   container creation failed: mount hook function failure: mount /var/lib/apptainer/mnt/session/rootfs/tmp/ep-kernels-wheels.sha256->/var/lib/apptainer/mnt/session/underlay/tmp/ep-kernels-wheels.sha256 error: while mounting /var/lib/apptainer/mnt/session/rootfs/tmp/ep-kernels-wheels.sha256: destination /var/lib/apptainer/mnt/session/underlay/tmp/ep-kernels-wheels.sha256 doesn't exist in container
+rc=255 end=2026-09-19T19:07:29Z
+scratch used:
+4.0K	/tmp/engtrace-e2-42698686/hf
+cleaned /tmp/engtrace-e2-42698686

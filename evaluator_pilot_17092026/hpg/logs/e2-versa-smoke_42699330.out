@@ -1,0 +1,17 @@
+job 42699330 on c0801a-s13.ufhpc, prm=versa limit=5, start 2026-09-19T19:30:39Z
+node-local scratch /tmp/engtrace-e2-42699330:
+/dev/nvme1n1    3.5T   13G  3.3T   1% /tmp
+NVIDIA RTX PRO 6000 Blackwell Server Edition, 97887 MiB
+INFO:    underlay of /usr/bin/nvidia-debugdump required more than 50 (478) bind mounts
+INFO:    underlay of /usr/share/nvidia/nvoptix.bin required more than 50 (80) bind mounts
+`torch_dtype` is deprecated! Use `dtype` instead!
+Fetching 4 files:   0%|          | 0/4 [00:00<?, ?it/s]Fetching 4 files:  25%|██▌       | 1/4 [00:12<00:36, 12.33s/it]Fetching 4 files:  50%|█████     | 2/4 [00:32<00:32, 16.46s/it]Fetching 4 files:  75%|███████▌  | 3/4 [00:34<00:11, 11.61s/it]Fetching 4 files: 100%|██████████| 4/4 [00:35<00:00,  8.88s/it]Fetching 4 files: 100%|██████████| 4/4 [00:35<00:00,  8.88s/it]
+Loading checkpoint shards:   0%|          | 0/4 [00:00<?, ?it/s]Loading checkpoint shards:  25%|██▌       | 1/4 [00:00<00:01,  2.27it/s]Loading checkpoint shards:  50%|█████     | 2/4 [00:00<00:00,  2.34it/s]Loading checkpoint shards:  75%|███████▌  | 3/4 [00:01<00:00,  2.35it/s]Loading checkpoint shards: 100%|██████████| 4/4 [00:01<00:00,  2.89it/s]
+{"prm": "versa", "repo": "UW-Madison-Lee-Lab/VersaPRM", "revision": "cd537f770b8077e31b10c7dc6cfd27f582e5de51", "max_len": 131072, "base": {"repo": "UW-Madison-Lee-Lab/Llama-PRM800K", "revision": "1973a85d64b7a00e50a278b31a6558804bf952eb"}, "load_seconds": 46.4, "versions": {"python": "3.12.3", "torch": "2.13.0+cu130", "cuda": "13.0", "gpus": ["NVIDIA RTX PRO 6000 Blackwell Server Edition"], "transformers": "4.57.3", "peft": "0.17.1", "accelerate": "1.14.0", "huggingface_hub": "0.36.0", "safetensors": "0.8.0", "tokenizers": "0.22.2"}}
+SELFCHECK {"prm": "versa", "got": [0.9994966983795166, 0.9273632764816284, 0.980728805065155, 0.9734434485435486], "n_steps": 4, "passed": true, "note": "no reference values on the card; checked one score per step, each in [0, 1]"}
+  5/5 scored, 0 over length, 0 step mismatches
+DONE versa: 5 traces, 0 over length, 0 step mismatches, 49s
+rc=0 end=2026-09-19T19:31:38Z
+scratch used:
+16G	/tmp/engtrace-e2-42699330/hf
+cleaned /tmp/engtrace-e2-42699330
