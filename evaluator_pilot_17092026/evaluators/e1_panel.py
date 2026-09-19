@@ -78,6 +78,10 @@ PANEL = {
 }
 CALL = {'response_format': {'type': 'json_object'}, 'temperature': 0.0, 'max_tokens': 16384}
 ATTEMPTS = 3
+# D8. OpenRouter serves MiniMax M3 from 13 providers. In the first full fetch, 11 of
+# the 17 replies served by ModelRun were malformed JSON ('{"results":":[{",...}',
+# '{".results":[]}'); the other providers served 161 with none malformed.
+PROVIDER_IGNORE = {'minimax/minimax-m3': ['ModelRun']}
 REPLIES = os.path.join(e0.CACHE_DIR, 'e1_judge_replies.jsonl')
 
 DEVIATIONS = [
@@ -86,7 +90,10 @@ DEVIATIONS = [
     'D4 genai.get_model_info supplied so the third slot is called (E0-F6)',
     'D6 uniform judge call settings in every slot: JSON mode, temperature 0, max_tokens 16384 '
     '(replacing per-slot settings tuned to E0\'s judges; the 2,048 cap would truncate reasoning judges)',
-    'D7 an empty judge reply is re-requested, up to 3 attempts, all recorded',
+    'D7 an empty or malformed judge reply (valid JSON without a "results" list of objects) is '
+    're-requested, up to 3 attempts, all recorded; a malformed one otherwise crashes the framework\'s whole trace',
+    'D8 provider ModelRun excluded for MiniMax M3: 11 of its 17 replies were malformed JSON, '
+    'against 0 of 161 from MiniMax\'s other providers; its 17 replies were re-fetched',
 ]
 
 libraries = e0.libraries
@@ -97,8 +104,31 @@ score = e0.score
 def config() -> dict:
     cfg = e0.config()
     cfg.update(evaluator=ID, judges={k: v['model'] for k, v in PANEL.items()},
-               judge_call=CALL, attempts=ATTEMPTS, deviations=DEVIATIONS)
+               judge_call=CALL, attempts=ATTEMPTS, provider_ignore=PROVIDER_IGNORE,
+               deviations=DEVIATIONS)
     return cfg
+
+
+def malformed(text: str) -> bool:
+    """Valid JSON whose "results" is not a list of objects.
+
+    The framework iterates `results` calling .get() on each item, so a string or a
+    list of strings raises AttributeError and takes the whole trace down with it -
+    not just that judge's vote. Text that is not JSON at all is left alone: the
+    framework's own anchor-search parser may still recover it, and if not it drops
+    the judge the way it always has.
+    """
+    t = (text or '').strip()
+    if t.startswith('```'):
+        t = t.strip('`').split('\n', 1)[-1] if '\n' in t else t
+    try:
+        data = json.loads(t)
+    except Exception:                                              # noqa: BLE001
+        return False
+    res = data.get('results', data.get('steps')) if isinstance(data, dict) else data
+    if isinstance(res, dict):
+        res = [res]
+    return not isinstance(res, list) or not res or any(not isinstance(x, dict) for x in res)
 
 
 # ------------------------------------------------------------ reply store
@@ -141,7 +171,9 @@ def fetch(model: str, prompt: str) -> dict:
     for attempt in range(1, ATTEMPTS + 1):
         t0 = time.time()
         try:
-            r = cli.chat.completions.create(model=model, messages=[{'role': 'user', 'content': prompt}], **CALL)
+            extra = {'provider': {'ignore': PROVIDER_IGNORE[model]}} if model in PROVIDER_IGNORE else None
+            r = cli.chat.completions.create(model=model, messages=[{'role': 'user', 'content': prompt}],
+                                            extra_body=extra, **CALL)
             ch = r.choices[0]
             out = {'ok': True, 'text': ch.message.content or '', 'served_model': r.model,
                    'serving_provider': (r.model_extra or {}).get('provider'),
@@ -151,8 +183,11 @@ def fetch(model: str, prompt: str) -> dict:
         except Exception as exc:                                   # noqa: BLE001
             out = {'ok': False, 'error': '%s: %s' % (type(exc).__name__, str(exc)[:300]),
                    'seconds': round(time.time() - t0, 2)}
-        tries.append({k: out.get(k) for k in ('ok', 'finish_reason', 'completion_tokens', 'seconds', 'error')})
-        if out['ok'] and out['text'].strip():
+        if out['ok'] and malformed(out['text']):
+            out['malformed'] = True
+        tries.append({k: out.get(k) for k in ('ok', 'finish_reason', 'completion_tokens', 'seconds',
+                                              'error', 'serving_provider', 'malformed')})
+        if out['ok'] and out['text'].strip() and not out.get('malformed'):
             break
     out['attempts'] = tries
     # Tokens of every attempt were billed, not just the last one's.
@@ -161,7 +196,28 @@ def fetch(model: str, prompt: str) -> dict:
     if out['ok'] and not out['text'].strip():
         out['ok'] = False
         out['error'] = 'empty reply after %d attempts' % ATTEMPTS
+    elif out['ok'] and out.get('malformed'):
+        out['ok'] = False
+        out['error'] = 'malformed reply after %d attempts' % ATTEMPTS
     return out
+
+
+def refetch(captured: list[dict], providers: set, workers: int = 16) -> dict:
+    """Re-fetch every stored reply that was served by one of `providers` (D8)."""
+    replies = Replies()
+    todo = [c for c in captured
+            if (replies.get(c['key']) or {}).get('serving_provider') in providers]
+    print('  re-fetching %d replies served by %s' % (len(todo), sorted(providers)), flush=True)
+    got = failed = 0
+    with cf.ThreadPoolExecutor(max_workers=workers) as pool:
+        for c, res in zip(todo, pool.map(lambda c: fetch(c['model'], c['prompt']), todo)):
+            if res['ok']:
+                replies.put(c['key'], res)
+                got += 1
+            else:
+                failed += 1
+                print('    FAILED %s: %s' % (c['model'], res.get('error')), flush=True)
+    return {'refetched': got, 'failed': failed}
 
 
 # ------------------------------------------------------------ the clients
@@ -292,7 +348,10 @@ def fetch_captured(captured: list[dict], workers: int = 48) -> dict:
                 done += 1
             else:
                 failed += 1
-                print('    FAILED %s: %s' % (todo[futs[fut]]['model'], res.get('error')), flush=True)
+                print('    FAILED %s: %s; attempts %s' % (
+                    todo[futs[fut]]['model'], res.get('error'),
+                    [(a.get('finish_reason'), a.get('completion_tokens')) for a in res.get('attempts', [])]),
+                    flush=True)
             n = done + failed
             if n % 50 == 0 or n == len(futs):
                 print('  %d/%d fetched, %d failed, %.0fs' % (n, len(futs), failed, time.time() - t1), flush=True)
