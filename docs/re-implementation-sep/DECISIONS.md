@@ -3282,6 +3282,37 @@ re-requested (D7). OpenRouter provider ModelRun is excluded for MiniMax M3 after
 its 17 replies came back as malformed JSON against 0 of 161 from its other providers
 (D8). All are written on every E1 row.
 
+## D-090 — E2's PRMs, and a self-check on verdicts rather than exact rewards
+
+**Date:** 2026-09-19 · **Status:** DECIDED (user's choice after the diagnostic) ·
+**Evidence:** `evaluator_pilot_17092026/hpg/README.md`
+
+E2 runs three open PRMs on HiPerGator (RTX PRO 6000 Blackwell):
+- **Qwen2.5-Math-PRM-72B** is the primary.
+- **VersaPRM** is the multi-domain PRM (a LoRA adapter on Llama-PRM800K).
+- **Qwen2.5-Math-PRM-7B** is a size cross-check.
+
+Every repo is pinned to a commit, VersaPRM's base included. Each job first scores its
+card's example and refuses to go on unless the check passes.
+
+The check was first designed as a 0.02 tolerance on every reward. On this hardware the
+72B misses on the card example's two borderline steps (0.16 / 0.56 against 0.32 / 0.82)
+while every step keeps the card's verdict at 0.5. A diagnostic ruled out each
+explanation in turn:
+- **The transformers version.** 4.46.3 and 4.57.3 gave bit-identical rewards.
+- **Softmax precision.** Taking it in bf16, as the card does, changed nothing.
+- **The pipeline.** The 7B lands within 0.033 of its own card with the same code.
+
+What remains is a sensitivity to the attention kernel: sdpa vs eager moves the 72B by
+about 0.05. flash-attn is not in the container, and no non-Blackwell GPU here can hold
+the 72B.
+
+The self-check now passes on per-step verdict agreement at 0.5. The continuous gap is
+recorded in every run's metadata (`max_abs_diff`, `within_tol`). Qwen runs with eager
+attention, which lands closest to the card. E2 is therefore reported primarily on
+thresholded verdicts and on ranking of the probe's known-label steps, and its
+continuous rewards are not compared with published numbers.
+
 ## Open decisions
 
 | # | Decision | Needed before |
