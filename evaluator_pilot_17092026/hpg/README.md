@@ -74,8 +74,21 @@ Qwen runs with eager attention, the closest to its card. The 7B joins as a size
 cross-check. E2 is reported on thresholded verdicts and on the probe's known-label
 steps, not by comparing continuous rewards with published numbers.
 
+**With eager attention the 7B passes even the original 0.02 check** (max gap 0.003,
+against 0.033 under sdpa). That confirms the attention kernel as the cause. The 72B
+under eager passes on verdicts, with its 0.21 gap recorded (smoke job 42710089).
+
 Every run's `.meta.json` also records the scorer's own md5, the Slurm job id and the
 host, so a result file names the exact code that produced it.
+
+## Storage
+
+On 2026-09-19 `/blue/fire-finai` hit 100% (10 TB of 10 TB, of which 9.3 TB is the
+group's data, not E2's). The first full VersaPRM run scored all 360 traces, then lost
+its output file to `Disk quota exceeded`. Results and logs (a few MB) now go to
+`/home/zhuohan.xie/engtrace-e2/{out,logs}`, and the batch scripts live there too.
+The scorer and the inputs stay on `/blue` and are only read. Weights stay on node-local
+`/tmp`.
 
 ## Job names
 

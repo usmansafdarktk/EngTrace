@@ -22,9 +22,13 @@
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=64gb
 #SBATCH --time=03:00:00
-#SBATCH --output=/blue/fire-finai/zhuohan.xie/engtrace-e2/logs/%x_%j.out
+#SBATCH --output=/home/zhuohan.xie/engtrace-e2/logs/%x_%j.out
 set -uo pipefail
 BASE=/blue/fire-finai/zhuohan.xie/engtrace-e2
+# Results and logs go to home: /blue/fire-finai hit 100% (10T/10T, other data) on
+# 2026-09-19 and the first full VersaPRM run lost its output file to 'Disk quota
+# exceeded'. Results are a few MB; home had 4.2 GB free. Inputs are only read.
+RES=/home/zhuohan.xie/engtrace-e2
 SIF=/blue/fire-finai/zhuohan.xie/finpersona/containers/vllm-openai.sif
 PRM=$1
 LIMIT=${2:-5}
@@ -61,12 +65,12 @@ apptainer exec $SIF python3 -m pip install -q --no-deps --target $SCR/pylib $PKG
 # 72B card's example rewards (max gap 0.21 vs 0.26 under sdpa; hpg/README.md).
 case $PRM in qwen*) ATTN="--attn eager" ;; *) ATTN="" ;; esac
 if [ "$LIMIT" = "all" ]; then LIM=""; TAG=full; else LIM="--limit $LIMIT"; TAG=smoke$LIMIT; fi
-OUT=$BASE/out/${PRM}_${TAG}.jsonl
+OUT=$RES/out/${PRM}_${TAG}.jsonl
 # No explicit bind for $SCR: Apptainer mounts the host's /tmp by default (the pip
 # step above writes there with no bind at all). Binding a SUBDIRECTORY of /tmp fails
 # on this image - it ships its own /tmp/ep-kernels-wheels.sha256, and the underlay
 # mount of the new path collides with it (FATAL: mount hook function failure).
-apptainer exec --nv --bind $BASE:$BASE \
+apptainer exec --nv --bind $BASE:$BASE --bind $RES:$RES \
     --env PYTHONPATH=$SCR/pylib --env HF_HOME=$SCR/hf --env HF_HUB_DISABLE_TELEMETRY=1 \
     --env PYTHONUNBUFFERED=1 $SIF \
     python3 $BASE/e2_score.py --prm $PRM --inputs $BASE/e2_inputs.jsonl --out $OUT $LIM $ATTN

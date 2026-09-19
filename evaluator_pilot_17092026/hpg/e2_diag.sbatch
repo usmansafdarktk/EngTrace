@@ -19,9 +19,13 @@
 #SBATCH --cpus-per-task=2
 #SBATCH --mem=64gb
 #SBATCH --time=01:00:00
-#SBATCH --output=/blue/fire-finai/zhuohan.xie/engtrace-e2/logs/%x_%j.out
+#SBATCH --output=/home/zhuohan.xie/engtrace-e2/logs/%x_%j.out
 set -uo pipefail
 BASE=/blue/fire-finai/zhuohan.xie/engtrace-e2
+# Results and logs go to home: /blue/fire-finai hit 100% (10T/10T, other data) on
+# 2026-09-19 and the first full VersaPRM run lost its output file to 'Disk quota
+# exceeded'. Results are a few MB; home had 4.2 GB free. Inputs are only read.
+RES=/home/zhuohan.xie/engtrace-e2
 SIF=/blue/fire-finai/zhuohan.xie/finpersona/containers/vllm-openai.sif
 SCR=${TMPDIR:-/tmp}/engtrace-e2-$SLURM_JOB_ID
 mkdir -p $SCR/hf $SCR/pylib
@@ -30,14 +34,14 @@ echo "job $SLURM_JOB_ID on $(hostname), start $(date -u +%FT%TZ)"
 nvidia-smi --query-gpu=name,memory.total --format=csv,noheader
 apptainer exec $SIF python3 -m pip install -q --no-deps --target $SCR/pylib \
     transformers==4.46.3 tokenizers==0.20.3 huggingface_hub==0.36.0 2>&1 | tail -3
-RUN="apptainer exec --nv --bind $BASE:$BASE --env PYTHONPATH=$SCR/pylib --env HF_HOME=$SCR/hf \
+RUN="apptainer exec --nv --bind $BASE:$BASE --bind $RES:$RES --env PYTHONPATH=$SCR/pylib --env HF_HOME=$SCR/hf \
      --env HF_HUB_DISABLE_TELEMETRY=1 --env PYTHONUNBUFFERED=1 $SIF"
 echo "flash_attn installed?"; $RUN python3 -c "import flash_attn; print(flash_attn.__version__)" 2>&1 | tail -1
 
 diag() {  # name prm [attn]
     echo "=== $1"
     $RUN python3 $BASE/e2_score.py --prm $2 --inputs $BASE/e2_inputs.jsonl \
-        --out $BASE/out/diag_$1.jsonl --selfcheck-only ${3:+--attn $3} 2>&1 | grep -E "SELFCHECK|Error|error:"
+        --out $RES/out/diag_$1.jsonl --selfcheck-only ${3:+--attn $3} 2>&1 | grep -E "SELFCHECK|Error|error:"
 }
 diag qwen7 qwen7
 rm -rf $SCR/hf/hub/models--Qwen--Qwen2.5-Math-PRM-7B
