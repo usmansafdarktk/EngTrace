@@ -317,7 +317,10 @@ def install_cache(fw, framework):
 
 # --------------------------------------------------------------------- setup
 
-def setup(dry_run: bool = False):
+def setup(dry_run: bool = False, keys: bool = True):
+    """keys=False builds the framework without any API client. E1 uses it on a
+    Kaggle kernel, which holds no key: its judges are served from a reply store
+    fetched on the laptop, where the key lives (D-086)."""
     # Both scorer models are in the local HF cache. Online, the Hub client retries
     # a HEAD request that fails at the SSL handshake on this network, which took
     # model loading from ~20s to ~390s while changing nothing that was loaded.
@@ -344,7 +347,7 @@ def setup(dry_run: bool = False):
         # No keys handed to the constructor: the clients are injected below, so
         # it cannot build a direct client with a dead key by accident.
         framework = fw.EngTraceFramework({})
-    if not dry_run:
+    if not dry_run and keys:
         # A dry run never reaches a judge, so it needs no keys - which is what lets
         # it run on a Kaggle kernel that has none and never should.
         framework.client_openai, framework.client_anthropic = build_clients(log)

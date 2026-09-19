@@ -208,10 +208,15 @@ def selftest():
 def main():
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
     ap.add_argument('--selftest', action='store_true')
+    ap.add_argument('--cohort', choices=('gold', 'robustness', 'all'), default='all',
+                    help='verify only this cohort (default: every model in models.json)')
     args = ap.parse_args()
     if args.selftest:
         return selftest()
     items, traces = load()
+    if args.cohort != 'all':
+        keep = {m['key'] for m in rt.config()['models'] if m.get('cohort', 'gold') == args.cohort}
+        traces = {k: v for k, v in traces.items() if k in keep}
     report(items, traces)
     bad = check(items, traces)
     print()
