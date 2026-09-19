@@ -16,7 +16,7 @@
 #SBATCH --account=fire-finai
 #SBATCH --qos=fire-finai
 #SBATCH --partition=hpg-rtx6000
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=2
 #SBATCH --mem=64gb
 #SBATCH --time=01:00:00
 #SBATCH --output=/blue/fire-finai/zhuohan.xie/engtrace-e2/logs/%x_%j.out

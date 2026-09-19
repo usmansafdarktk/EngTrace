@@ -11,12 +11,15 @@
 # job's node-local $TMPDIR, which Slurm deletes when the job ends. Only the inputs,
 # this script, the scorer and the result files (a few MB) sit in $BASE.
 #
+# 2 CPUs: the work is on the GPU, and the account's 96-CPU group cap is often full
+# (8-CPU jobs sat in QOSGrpCpuLimit while GPUs were free).
+#
 # No API key, token or credential is used or placed anywhere: every model is public
 # and ungated, and inference is local.
 #SBATCH --account=fire-finai
 #SBATCH --qos=fire-finai
 #SBATCH --partition=hpg-rtx6000
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=2
 #SBATCH --mem=64gb
 #SBATCH --time=03:00:00
 #SBATCH --output=/blue/fire-finai/zhuohan.xie/engtrace-e2/logs/%x_%j.out
