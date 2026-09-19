@@ -20,13 +20,14 @@ branches.
 | 2 · E0-3J, E0 with its third judge connected | done | $7.82 |
 | 2 · E3, deterministic milestones | done | $0.00 |
 | 2 · E4, E3 + stated-arithmetic checking | done ([RESULTS_E4](RESULTS_E4.md)) | $0.00 |
-| 2 · E1, E5 | judges recommended ([JUDGE_SELECTION](JUDGE_SELECTION.md)); awaiting sign-off (D-088) | probe $3 |
+| 2 · E1, non-suite judge panel | done ([RESULTS_E1](RESULTS_E1.md)) | $4.38 (+ probe $3) |
+| 2 · E5, E3 first, a judge on the residuals | not started; judge MiMo-V2.5-Pro (D-088) | — |
 | 2 · E2 | not started (needs a GPU host for a PRM) | — |
 | 3 · expert annotation of the 300 | not started; independent of stage 2 | — |
 
 **Read these first:** [FINDINGS.md](FINDINGS.md) (seven defects in the published
 framework, plus the robustness cohort), [RESULTS_E0.md](RESULTS_E0.md),
-[RESULTS_E3.md](RESULTS_E3.md), [RESULTS_E4.md](RESULTS_E4.md), and the pilot's decisions D-078 to D-088 in
+[RESULTS_E3.md](RESULTS_E3.md), [RESULTS_E4.md](RESULTS_E4.md), [RESULTS_E1.md](RESULTS_E1.md), and the pilot's decisions D-078 to D-089 in
 [DECISIONS.md](../docs/re-implementation-sep/DECISIONS.md). Every number in them is
 reproduced by a script in [analysis/](analysis/README.md).
 

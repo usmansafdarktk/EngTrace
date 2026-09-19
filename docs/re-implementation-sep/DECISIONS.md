@@ -3248,9 +3248,11 @@ milestones in 1,494, both genuine, and measured the unread side metric
 (arithmetic consistency) at about two-thirds precision on a fixed-seed sample,
 which is reported with that caveat rather than as a validated per-model measure.
 
-## D-088 — Judges for E1 and E5 (recommended; awaiting sign-off)
+## D-088 — Judges for E1 and E5
 
-**Date:** 2026-09-19 · **Status:** OPEN · **Evidence:** `evaluator_pilot_17092026/JUDGE_SELECTION.md`
+**Date:** 2026-09-19 · **Status:** DECIDED for E1 (signed off and run the same day,
+RESULTS_E1); E5's judge as recommended below, pending its run · **Evidence:**
+`evaluator_pilot_17092026/JUDGE_SELECTION.md`
 
 Table 13's 27 models span seven families once backbones are counted (OpenAI,
 Anthropic, Google incl. Gemma, DeepSeek, Meta incl. MetaMath, Qwen, Mistral incl.
@@ -3268,11 +3270,23 @@ the smallest documented Claude exposure (0.4M vs 13M+ exchanges). Kimi K3 and GL
 the strongest open families available for the next roster. The prior decision is the
 roster's families: a family cannot be both judge and judged.
 
+## D-089 — E1's judges get uniform call settings, and one provider is excluded
+
+**Date:** 2026-09-19 · **Status:** DECIDED · **Source:** E1 smoke test and first replay
+
+The framework gives each judge slot its own settings, tuned to E0's judges; the
+Anthropic slot's 2,048-token cap would have truncated all three E1 judges (4, 9 and 16
+of 21 probe replies over it), and a truncated reply is silently dropped. E1's judges
+all get JSON mode, temperature 0 and 16,384 tokens (D6). Empty or malformed replies are
+re-requested (D7). OpenRouter provider ModelRun is excluded for MiniMax M3 after 11 of
+its 17 replies came back as malformed JSON against 0 of 161 from its other providers
+(D8). All are written on every E1 row.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
-| D-088 | Sign off the E1/E5 judges; first, fix which families the next roster will evaluate | running E1 or E5 |
+| — | Which families the next roster will evaluate (Kimi, GLM stay available as long as they are not judges) | the next benchmark run |
 | — | Expert annotation of the frozen 300 (stage 3): annotators, protocol, the ~100-trace triple-labelled overlap | any X1 agreement number |
 | D-003 | Do the raw `inference_results/` generations still exist? | promising any corrected results table |
 | — | Phase 5 scoping: fold into Phase 1 or run as a parallel PR | Phase 1 start |

@@ -108,6 +108,26 @@ deciding 93% of correct traces (E0-F5).
 It also makes the E0-F4 substitution largely moot in practice: the retired Gemini
 judge was not being called either way.
 
+## E0-F8 · A malformed judge reply crashes the whole trace
+
+`_tier2_tribunal_batch` iterates each judge's `results` and calls `.get()` on every
+item. If a judge returns valid JSON of the wrong shape — `results` as a string, as in
+`{"results":":[{","step_index":0,...}` — the iteration yields characters, `.get`
+raises `AttributeError`, and the exception is not caught there: the **entire trace**
+fails, not just that judge's vote. By contrast, unparseable text is caught and the
+judge silently dropped (E0-F6's mechanism).
+
+E0's own judges never returned such replies, so the defect was invisible in the
+published runs. It surfaced with E1's panel, where one provider's corrupt output
+crashed 6 of 178 judged traces (RESULTS_E1). E1 now re-requests any reply that is
+valid JSON without a `results` list of objects (deviation D7); the framework is not
+changed.
+
+**Also first measured here: the published Tribunal's inter-judge agreement.** With
+all three original judges connected (E0-3J), Fleiss κ = **0.725** over four categories
+and **0.776** on correct-vs-error, across 1,174 steps — substantial. Reviewer 9W1B
+asked for this figure; it had never been reported. See RESULTS_E1.
+
 ## E0-F5 · Tier 1 matches almost no steps, so E0's reasoning score is the Tribunal's
 
 From the full E0 dry run over all 300 traces (Tier 1 real, judges not called):
