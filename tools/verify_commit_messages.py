@@ -11,6 +11,14 @@ Usage::
     python tools/verify_commit_messages.py [revisions...]   # default: --all
 
 Exits non-zero when a commit has a body, a trailer or an empty message.
+
+Name the branches explicitly rather than relying on the default when the
+pre-rewrite history is still around: ``--all`` reaches
+``backup/pre-commit-message-rewrite-20260920`` and the remote-tracking refs,
+whose commits are *meant* to keep their bodies.  To check the live history::
+
+    python tools/verify_commit_messages.py $(git for-each-ref refs/heads \\
+        --format='%(refname:short)' | grep -v '^backup/')
 """
 
 from __future__ import annotations
