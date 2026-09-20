@@ -55,3 +55,4 @@ docs/references/**/*.xlsx
 evaluator_pilot_17092026/annotation/tasks/
 evaluator_pilot_17092026/annotation/labels/
 evaluator_pilot_17092026/annotation/labels_simulated/
+evaluator_pilot_17092026/annotation/dist/

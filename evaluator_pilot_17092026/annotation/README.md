@@ -45,6 +45,11 @@ in the app.
    and an expert can switch between them: an export carries across whatever they have
    already submitted either way.
 
+`package.py` puts this together: one ~100 KB zip per annotator holding the guide,
+their workbook, the app with only their own solutions, and a two-command
+`HOW-TO-RUN.txt`. **Never send `tasks/keyfile.jsonl`** (the code → model map); the
+packager checks every file it adds and refuses if one would leak it.
+
 ## Files
 
 | File | What it does |
@@ -54,9 +59,10 @@ in the app.
 | `app.py` | The Streamlit annotation app. |
 | `workbooks.py` | The file route: `export` writes a workbook per expert (carrying across any work already submitted), `check` validates a returned one and names every problem, `import` loads the valid solutions and skips the rest. |
 | `guide.md`, `make_guide_pdf.py` | The annotator guide and its typesetter. |
+| `package.py` | Builds `dist/<id>.zip`, the bundle each annotator is sent: the guide, their workbook, and the app carrying **only their own 68 solutions**. It refuses to build a bundle containing the keyfile or anything naming the model or item behind a code. |
 | `score_against_labels.py` | Ground truth by majority, agreement (Fleiss κ), then scores every evaluator: **step level** (E2's PRMs), **milestone level** (E3/E4/E5), **trace level** (all of them, plus their final-answer checks). |
 
-`tasks/` (including `tasks/workbooks/`), `labels/` and `labels_simulated/` hold produced data and are not committed,
+`tasks/` (including `tasks/workbooks/`), `dist/`, `labels/` and `labels_simulated/` hold produced data and are not committed,
 like `traces/` and `scores/`.
 
 ## Running it
@@ -66,6 +72,7 @@ cd evaluator_pilot_17092026
 .venv/Scripts/python annotation/build_tasks.py          # after editing annotators.json
 .venv/Scripts/python annotation/make_guide_pdf.py       # after editing guide.md
 .venv/Scripts/python annotation/workbooks.py export     # workbooks for the file route
+.venv/Scripts/python annotation/package.py             # dist/<id>.zip, one per annotator
 .venv/Scripts/streamlit run annotation/app.py           # the app the experts use
 
 # a returned workbook: validate, then load (import skips anything still invalid)
