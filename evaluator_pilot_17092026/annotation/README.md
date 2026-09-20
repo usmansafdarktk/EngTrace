@@ -33,9 +33,17 @@ in the app.
 
 ## What the experts receive
 
-1. **The app** (below) — it contains the problems, the traces and the reference solutions.
-2. **[EngTrace-annotation-guide.pdf](EngTrace-annotation-guide.pdf)** — 3 pages,
-   generated from `guide.md`.
+1. **[EngTrace-annotation-guide.pdf](EngTrace-annotation-guide.pdf)** — 4 pages,
+   generated from `guide.md`. It describes the task and the labels, and is deliberately
+   **not written around the app**: it documents both ways of recording answers.
+2. **Either the app or a workbook**, whichever the expert prefers:
+   - the app shows one solution at a time and blocks incomplete submissions;
+   - the workbook `tasks/workbooks/<id>.json` holds all 68 solutions with empty fields
+     to fill in any editor, and is validated on return.
+
+   Both produce identical rows in `labels/<id>.jsonl` (with `source` recording which),
+   and an expert can switch between them: an export carries across whatever they have
+   already submitted either way.
 
 ## Files
 
@@ -44,6 +52,7 @@ in the app.
 | `build_tasks.py` | Builds `tasks/` from the frozen slice and traces: `pool.json` (what experts see), `assignment.json` (who labels what, in what order), `keyfile.jsonl` (code → item + model; **not** given to annotators). Steps are split with E0's own `extract_steps`, so a label on step k refers to the same step in every evaluator. |
 | `annotators.json` | The 15 experts and their branches. Edit as people are recruited, then rebuild. |
 | `app.py` | The Streamlit annotation app. |
+| `workbooks.py` | The file route: `export` writes a workbook per expert (carrying across any work already submitted), `check` validates a returned one and names every problem, `import` loads the valid solutions and skips the rest. |
 | `guide.md`, `make_guide_pdf.py` | The annotator guide and its typesetter. |
 | `score_against_labels.py` | Ground truth by majority, agreement (Fleiss κ), then scores every evaluator: **step level** (E2's PRMs), **milestone level** (E3/E4/E5), **trace level** (all of them, plus their final-answer checks). |
 

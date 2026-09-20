@@ -241,7 +241,7 @@ def main():
             'item_sha256': task['item_sha256'], 'trace_sha256': task['trace_sha256'],
             'n_steps': len(task['steps']), 'steps': step_rows, 'milestones': ms_rows,
             'final_answer': final, 'reasoning_sound': sound, 'confidence': conf,
-            'comment': comment.strip(), 'flagged': bool(flag),
+            'comment': comment.strip(), 'flagged': bool(flag), 'source': 'app',
             'seconds': round(time.time() - st.session_state.started, 1),
             'ts': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
         })

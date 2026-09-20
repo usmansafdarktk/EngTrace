@@ -3,7 +3,8 @@
     python evaluator_pilot_17092026/annotation/make_guide_pdf.py
 
 guide.md is the source of truth; this only typesets it. The markdown subset used
-there is headings (#, ##, ###), paragraphs, "-" bullets, **bold** and *italic*.
+there is headings (#, ##, ###), paragraphs, "-" bullets, ```code blocks```,
+**bold**, *italic* and `inline code`.
 """
 from __future__ import annotations
 
@@ -29,6 +30,10 @@ H2 = ParagraphStyle('h2', fontName='Helvetica-Bold', fontSize=13, leading=17,
 H3 = ParagraphStyle('h3', fontName='Helvetica-Bold', fontSize=11, leading=15,
                     spaceBefore=10, spaceAfter=5)
 BULLET = ParagraphStyle('bullet', parent=BODY, spaceAfter=4)
+CODE = ParagraphStyle('code', fontName='Courier', fontSize=8.4, leading=11.4,
+                      leftIndent=8, spaceBefore=4, spaceAfter=9,
+                      backColor='#f4f5f7', borderPadding=6, borderColor='#dfe3e8',
+                      borderWidth=0.5)
 
 
 def inline(text: str) -> str:
@@ -48,6 +53,13 @@ def blocks(md: str):
         line = lines[i]
         if not line.strip():
             i += 1
+        elif line.startswith('```'):
+            i += 1
+            code = []
+            while i < n and not lines[i].startswith('```'):
+                code.append(lines[i]); i += 1
+            i += 1
+            yield 'code', '\n'.join(code)
         elif line.startswith('### '):
             yield 'h3', line[4:]; i += 1
         elif line.startswith('## '):
@@ -67,7 +79,7 @@ def blocks(md: str):
             yield 'bullets', list(zip(items, indent))
         else:
             para = []
-            while i < n and lines[i].strip() and not lines[i].startswith(('#', '- ')):
+            while i < n and lines[i].strip() and not lines[i].startswith(('#', '- ', '```')):
                 para.append(lines[i].strip()); i += 1
             yield 'para', ' '.join(para)
 
@@ -81,6 +93,10 @@ def story(md: str):
             out.append(Paragraph(inline(payload), H2))
         elif kind == 'h3':
             out.append(Paragraph(inline(payload), H3))
+        elif kind == 'code':
+            body = (payload.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+                    .replace(' ', '&nbsp;').replace('\n', '<br/>'))
+            out.append(Paragraph(body, CODE))
         elif kind == 'para':
             out.append(Paragraph(inline(payload), BODY))
         else:
