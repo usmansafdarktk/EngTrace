@@ -4,7 +4,7 @@ Paste everything below the line into a fresh Claude Code session started at the 
 root, on the `master` branch.
 
 Phases 0, 1, C2, 2 and 3 are complete and merged; Phase 3's last content commit is
-`1a71b70` and this prompt sits on top of it. This stage depends on Phase 3
+`4c01d43` and this prompt sits on top of it. This stage depends on Phase 3
 in particular: it inherits six named deliverables from Phase 3's review triage, and it
 inherits one gap Phase 3 could not close.
 
@@ -141,7 +141,7 @@ outputs. You have three honest routes and must pick one explicitly:
 
 Do not paper over this by counting the 2,200 and implying the coverage is uniform.
 
-Corpus health at `master` (`1a71b70`), for context — **this is the baseline you work against,
+Corpus health at `master` (`4c01d43`), for context — **this is the baseline you work against,
 not a to-do list.** Re-measure it yourself in a worktree rather than trusting the table:
 
 | Check | Failing | Note |

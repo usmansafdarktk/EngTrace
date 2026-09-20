@@ -1,7 +1,7 @@
 # Phase 3 — Summary and close-out
 
 **Trace shape: iteration and search** · two templates · branch
-`redesign/phase3-trace-shape` off `master` at `00bd0b0`
+`redesign/phase3-trace-shape` off `master` at `1cacc59`
 **Date:** 2026-09-06
 **Companions:** [`phase3_node_types.md`](phase3_node_types.md) (D3.3, the primary
 deliverable) · [`phase3_item_pool_impact.md`](phase3_item_pool_impact.md) (D3.5)
@@ -257,7 +257,7 @@ All commands run with `PYTHONIOENCODING=utf-8`.
 
 ### 6.1 The two templates
 
-| Check | Before (`00bd0b0`) | After | Note |
+| Check | Before (`1cacc59`) | After | Note |
 |---|---|---|---|
 | T1 closure, 200 seeds | 2 failing | **0** | |
 | T1 closure, **20,000 seeds** | 27 + 204 hard failures | **0 + 0** | the acceptance run |
@@ -270,7 +270,7 @@ All commands run with `PYTHONIOENCODING=utf-8`.
 
 ### 6.2 Corpus non-regression, measured not assumed
 
-`master` was re-measured in a worktree at `00bd0b0` rather than trusted from the
+`master` was re-measured in a worktree at `1cacc59` rather than trusted from the
 brief; the brief's table reproduced exactly (T1 30, T2 0, T3 0, T4 3, T5 68,
 T6 142, T7 83). Comparing full `--checks all` runs per template across all 150:
 
@@ -453,7 +453,7 @@ Every phase so far has recorded at least one. This one has ten.
    and roughly a quarter of that review was wasted on stale findings. I did give
    both reviewers a SHA — and then committed D-044 to the same branch while they
    were still working. Reviewer B caught it as its **first** action, diffed
-   `953adc9` against the working tree before trusting a single number, and
+   `4474726` against the working tree before trusting a single number, and
    established that both drifts were comment-only so its measurements held.
    Nothing was lost, and only because the reviewer was more careful than the
    implementer. The rule I had internalised was "hand out a SHA"; the rule that
@@ -492,7 +492,7 @@ Every phase so far has recorded at least one. This one has ten.
    about something it was not.
 
 10. **A third time, after writing the lesson into this document.** I told round 6
-    "frozen ref `c8e28ce`, no commits until you file", then committed `ae05443`
+    "frozen ref `b88436f`, no commits until you file", then committed `18c99e4`
     while it was working — the section-13 rewrite and a one-line README change.
     I disclosed it to the reviewer rather than waiting for it to be found, and
     verified by SHA-256 that both of its input files were byte-identical across
@@ -597,13 +597,13 @@ the transferable lesson, and it is now written into the spec as the rename test
 
 | Round | Ref | Result | What it changed |
 |---|---|---|---|
-| 1 | `953adc9` | 80/80, 33/33; **15 findings, 3 blocking** | `iteration` was a description of one template, not a type → v1.1 |
-| 2 (fresh) | `9398ccc` | 40 pass / 40 fail; **13 findings, 3 blocking** | v1.1 fixed `iteration` by inverting the defect onto `decision`; and §6 accepted a `decision` trace with a **wrong answer** → v1.2 |
-| 2 (round-1 reviewer) | `9398ccc` | 14 addressed, 1 partial, 0 not addressed | confirmed the fixes were fixes, not relocations |
-| 3 | `c9fd703` | 80/80, no waiver; **F3 narrowed, not fixed** | the exploit routed around `filter_relation` by lying about its *input* → v1.3 stated the invariant rather than patching a third variant |
-| 4 | `9c6b8ee` | §3.8 held; **2 new variants** | §3.8's audit had never been run against the nodes shipping beside it; running it convicted `budget_total` and the evaluation frames → v1.4 |
-| 5 | `fe2040a` | **1 blocking** | §4.6's mechanism was sound and its applicability **optional** — one deleted line restored variant 5 → v1.5 |
-| 6 | `c8e28ce` | **80/80, no sixth variant** | schema clean; two non-blocking defects of mine — an example that did not parse under its own grammar, and an audit script that violated §8B.11 |
+| 1 | `4474726` | 80/80, 33/33; **15 findings, 3 blocking** | `iteration` was a description of one template, not a type → v1.1 |
+| 2 (fresh) | `974e267` | 40 pass / 40 fail; **13 findings, 3 blocking** | v1.1 fixed `iteration` by inverting the defect onto `decision`; and §6 accepted a `decision` trace with a **wrong answer** → v1.2 |
+| 2 (round-1 reviewer) | `974e267` | 14 addressed, 1 partial, 0 not addressed | confirmed the fixes were fixes, not relocations |
+| 3 | `08aedd1` | 80/80, no waiver; **F3 narrowed, not fixed** | the exploit routed around `filter_relation` by lying about its *input* → v1.3 stated the invariant rather than patching a third variant |
+| 4 | `ddfbc0f` | §3.8 held; **2 new variants** | §3.8's audit had never been run against the nodes shipping beside it; running it convicted `budget_total` and the evaluation frames → v1.4 |
+| 5 | `790c345` | **1 blocking** | §4.6's mechanism was sound and its applicability **optional** — one deleted line restored variant 5 → v1.5 |
+| 6 | `b88436f` | **80/80, no sixth variant** | schema clean; two non-blocking defects of mine — an example that did not parse under its own grammar, and an audit script that violated §8B.11 |
 
 ### 11.3 The four defects that mattered
 
@@ -675,7 +675,7 @@ That is the reason six rounds were not five too many, and it is the instruction
 for Phase 4: **review the mechanism a fix is built on, not the fix.**
 
 **Cost:** one contamination, disclosed rather than discovered. Round 1's first
-command was `git show 953adc9 --stat`, which printed the commit body the brief
+command was `git show 4474726 --stat`, which printed the commit body the brief
 excluded, so it saw implementer reasoning it was meant to be blind to. It read no
 other excluded file, and §2 and §9 of the spec state that content independently,
 so the impact is low — but the round-1 gate was weaker than designed, and the

@@ -4,7 +4,7 @@ Paste everything below the line into a fresh Claude Code session started at the 
 root, on the `master` branch.
 
 Track A Phases 0–5 and Track B Phases C1–C3 are complete and merged. `master` is at
-`444b8bf`. **Sync point S2 has landed**: the constants are re-grounded, so the item pool can
+`34e6ead`. **Sync point S2 has landed**: the constants are re-grounded, so the item pool can
 now be regenerated exactly once. That is what this phase is for.
 
 **The repo owner has decided that the testset is rebuilt, inference re-run and evaluation
@@ -221,7 +221,7 @@ other's uncommitted work in the same file.
 
 ## What is actually here, measured
 
-Measured at `444b8bf` on 2026-09-12. Re-derive in a worktree before acting.
+Measured at `34e6ead` on 2026-09-12. Re-derive in a worktree before acting.
 
 ### The inventory is stale — this is D6.1, not a preliminary to it
 
@@ -262,8 +262,8 @@ produces a review that cannot file, which is what R6 exists to prevent.
 **Searched exhaustively. The harness never existed — and the method survives anyway.**
 
 The archaeology is done, so do not repeat it. Exactly **two commits** have ever touched
-`template_inventory.csv`: `9105317` added it, and `e8302c6` (Phase 4 close-out) inserted two
-columns. `git show --stat 9105317` contains **four documentation files and no `.py` at all**.
+`template_inventory.csv`: `67d41f4` added it, and `81d8a6d` (Phase 4 close-out) inserted two
+columns. `git show --stat 67d41f4` contains **four documentation files and no `.py` at all**.
 Pickaxe searches on the distinctive column names (`pct_step_values_recoverable`,
 `blind_guess_floor`) return only prose. There is no deleted blob, no dangling object, no
 untracked script, and the bare filenames in `.gitignore` were **never tracked in any branch**.
@@ -311,7 +311,7 @@ rows. Decide whether the column is repaired, emptied, or kept with its provenanc
 ### The harness is built and calibrated — and the exit gate does not survive it
 
 **Calibration passes exactly**, which is what licenses everything else. Run against the corpus
-**held at rev `9105317`** (the commit that added the CSV), the strict §2.9b predicate reproduces
+**held at rev `67d41f4`** (the commit that added the CSV), the strict §2.9b predicate reproduces
 the audit on **all five branches**: population 6,166, chemical 65, civil 37, mechanical 89,
 electrical 127, industrial 131 — zero delta. Phase 0 matched on only three. Dynamic populations
 (HEAD only, since they require execution) land at 17,196 step tokens against Phase 0's 17,002
@@ -363,7 +363,7 @@ audit's own worked example (`levenspiel` emits 1,2,3,1,2,3,4,5,6 and carries `n_
 it — deduplicating would make the one template singled out for restarting its numbering look like
 one that never did.
 
-### Corpus baseline at `444b8bf`
+### Corpus baseline at `34e6ead`
 
 ```
 python -m tests.template_integrity.run --checks all          # ~2-3 min
@@ -541,7 +541,7 @@ the total. Compute the union from the named templates, and publish the list.
 D-003 has been carried open since 2026-09-05 across Prompts 05, 06 and 07: *do the raw
 `inference_results/` generations still exist?* It gates any corrected results table.
 
-Measured at `444b8bf`:
+Measured at `34e6ead`:
 
 - `inference_results/` — **absent**. `evaluation/run_inference.py:23` writes to it; nothing does.
 - `evaluation_results/` — **absent**.
@@ -563,7 +563,7 @@ gold answer moved — but state it as history, not as a recovery plan.
 
 **D6.12 — regenerate the testset (new; SPEC-CHANGE 24).** The spec has no deliverable for this
 because it assumed the pool already existed. It does not, and the machinery to rebuild it is in
-worse shape than "absent". Measured at `444b8bf`:
+worse shape than "absent". Measured at `34e6ead`:
 
 **1. The generator covers three branches of five.** 20 template modules carry a
 `main()` writing `testset/<branch>/<domain>/<area>.jsonl`:
@@ -722,7 +722,7 @@ the gate exactly as a CONFIRMED finding does.
 
 - Branch **`redesign/phase6-consolidation`** off `master`. Merge `--no-ff` when the gate passes.
 - **Track B's work is already on `master` and was committed there directly** — 21 commits
-  between `4eb6488` and `444b8bf`, against this repo's convention of a `redesign/*` branch and
+  between `2ea64cb` and `34e6ead`, against this repo's convention of a `redesign/*` branch and
   a merge commit. It is recorded here so you do not mistake it for a convention change. Do not
   repeat it.
 - `master` is **185 commits ahead of `origin`**. Nothing has been pushed. **Do not push.**

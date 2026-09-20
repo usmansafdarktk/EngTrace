@@ -1,7 +1,7 @@
 # Phase 4 — Summary and close-out
 
 **Phase:** 4 — non-numeric templates and the comparator contract
-**Branch:** `redesign/phase4-comparators`, off `master` at `51a4aef`
+**Branch:** `redesign/phase4-comparators`, off `master` at `ab73f68`
 **Date:** 2026-09-07
 **Deliverables:** [`phase4_comparators.md`](phase4_comparators.md) (D4.1) ·
 [`phase4_vocabulary.md`](phase4_vocabulary.md) (D4.2) ·

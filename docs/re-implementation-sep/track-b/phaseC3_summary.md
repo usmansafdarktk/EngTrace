@@ -1,7 +1,7 @@
 # Phase C3 — summary
 
-**Branch:** `redesign/phaseC3-remaining-tables`. **Review ref:** `f747fb6`, six reports
-filed against it and committed unmodified as `b91eadb` before any fix.
+**Branch:** `redesign/phaseC3-remaining-tables`. **Review ref:** `2fe50c7`, six reports
+filed against it and committed unmodified as `aa7bef1` before any fix.
 
 C3 set out to re-ground the tables C1 left untagged and to make civil and industrial
 citations resolvable off one machine. It did that. What it also did — and what this

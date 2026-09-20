@@ -36,7 +36,7 @@ runnable snippets. So D6.1 was **assembly, not invention**, and cheaper than a r
 dearer.
 
 `regen_inventory.py` is now committed and calibrates **exactly**: population 6166/6166 and all
-five branches at +0 against the corpus **held at rev `9105317`**. Calibrating at HEAD would have
+five branches at +0 against the corpus **held at rev `67d41f4`**. Calibrating at HEAD would have
 failed (chemical 64, civil 34, mechanical 87) and the predicate would have taken the blame for six
 phases of legitimate template change.
 

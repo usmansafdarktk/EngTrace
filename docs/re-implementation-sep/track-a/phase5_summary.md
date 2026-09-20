@@ -1,7 +1,7 @@
 # Phase 5 — Summary and close-out
 
 **Two tracks, sequenced.** Track A fixed eleven templates' output contract and
-merged (`4dcc829`); Track B branched from that merge and bound the corpus to the
+merged (`d6bb9e9`); Track B branched from that merge and bound the corpus to the
 Phase 4 comparator. They share a phase number and nothing else: Track A is gated
 by T4/T8 and Reviewer A, Track B by cross-pairing and Reviewer E.
 

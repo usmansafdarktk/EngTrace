@@ -6,7 +6,7 @@ WHY THIS FILE EXISTS
 gate, but it is byte-identical to the 2026-09-05 pre-Phase-0 audit and no row has
 ever been reclassified. D6.1 asked for a "full re-run of the original audit
 harness". **That harness does not exist and never did**: the commit that added the
-CSV (9105317) contains four documentation files and no `.py`; the commissioning
+CSV (67d41f4) contains four documentation files and no `.py`; the commissioning
 prompt (`docs/prompts/01-template-structure-audit.md:146`) says "Stay on `master`.
 Do not create branches or commits", so the measurement code was throwaway and ran
 read-only in-session.
@@ -171,7 +171,7 @@ def measure_static(ref: TemplateRef) -> StaticResult:
 # This is what makes the calibration meaningful. Running the classifier against
 # TODAY's templates and comparing to Phase 0 conflates two things: a difference
 # in METHOD and six phases of template CHANGE. Re-running it against rev
-# 9105317 (the commit that added the CSV, 2026-09-05) holds the corpus fixed and
+# 67d41f4 (the commit that added the CSV, 2026-09-05) holds the corpus fixed and
 # isolates the method. Only if the predicate reproduces 65/37/89 THERE is it
 # legitimate to attribute today's divergence to template change.
 #
@@ -518,7 +518,7 @@ PHASE0_ANSWER_TOKENS = 4619
 
 #: The commit that added template_inventory.csv (2026-09-05 19:37 +0500). The
 #: corpus as it stood when the audit ran.
-AUDIT_REV = '9105317'
+AUDIT_REV = '67d41f4'
 
 
 def calibrate(statics, dynamics, refs) -> tuple[bool, list[str]]:

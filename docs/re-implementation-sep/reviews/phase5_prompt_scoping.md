@@ -1,7 +1,7 @@
 # Phase 5 prompt — scoping and design review
 
 **Artefact:** `docs/prompts/06-phase5-contract-hygiene-and-bindings.md`
-**Frozen ref:** `ecff2d1622779e0d2467950d25ede3f5636c948c`
+**Frozen ref:** `bbccae510b8eac64f45c3e2b5e92a5be8b3f067b`
 **Scope:** scoping and design only. Every count, SHA, path and command in the brief is
 another reviewer's; where one is mentioned below it is because a *structure* depends on it,
 never because I re-derived it.

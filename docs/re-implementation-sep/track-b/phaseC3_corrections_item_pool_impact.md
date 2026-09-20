@@ -22,13 +22,13 @@ two git worktrees in **two separate processes** — the script refuses two dumps
 root, which is the in-process-reload trap that reports every instance identical:
 
 ```
-git -c core.longpaths=true worktree add --detach <wt_c3head> 4eb6488
+git -c core.longpaths=true worktree add --detach <wt_c3head> 2ea64cb
 python -m tests.constants_integrity.c3_instance_dump <wt_c3head> c3_before.json 300
 python -m tests.constants_integrity.c3_instance_dump .          c3_after.json  300
 python -m tests.constants_integrity.c3_instance_dump --diff c3_before.json c3_after.json
 ```
 
-`before` is **4eb6488**, the Phase C3 merge; `after` is the working tree.
+`before` is **2ea64cb**, the Phase C3 merge; `after` is the working tree.
 Totals from the diff: `{'q': 824, 'ans': 713, 'sol': 765, 'err_before': 0, 'err_after': 0}`.
 
 ## What moved
@@ -117,7 +117,7 @@ measurement; T6 is only the statement that its own gate is where it was.
 
 # Tranche 2 — Decision 7, and 23 tags that moved nothing
 
-**P6 event: YES, on 1 of 150 templates.** `before` is **7f63348**, the tranche-1 head;
+**P6 event: YES, on 1 of 150 templates.** `before` is **53401a8**, the tranche-1 head;
 `after` is the working tree. Same instrument, same two-process discipline.
 
 Totals: `{'q': 31, 'ans': 31, 'sol': 31, 'err_before': 0, 'err_after': 0}`
@@ -166,7 +166,7 @@ The removal followed the evidence rather than accompanying the change.
 
 # Tranche 3 — a correction that moved nothing, and why that is a result
 
-**P6 event: NO.** `before` is **8c90537**; `after` is the working tree.
+**P6 event: NO.** `before` is **32d31ae**; `after` is the working tree.
 Totals: `{'q': 0, 'ans': 0, 'sol': 0, 'err_before': 0, 'err_after': 0}` — **0 templates
 moved**.
 
@@ -223,7 +223,7 @@ Unchanged on every gate: T1 29, T2 0, T4 0, T5 66, T7 83, T8 0, T6 142, contract
 
 # Tranche 4 — the `COMMON_LIQUIDS` viscosities, and the first hidden-constant case
 
-**P6 event: YES, on 5 of 150 templates.** `before` is **ae45d8b**; `after` is the working
+**P6 event: YES, on 5 of 150 templates.** `before` is **c9760d6**; `after` is the working
 tree. Totals: `{'q': 90, 'ans': 122, 'sol': 123, 'err_before': 0, 'err_after': 0}`.
 
 | template | question | answer | solution |

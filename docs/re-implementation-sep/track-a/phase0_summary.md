@@ -1,7 +1,7 @@
 # Phase 0 — Summary and close-out
 
 **Status: COMPLETE WITH FINDINGS. Exit gate partially met — two items open (§5).**
-**Date:** 2026-09-05 · **Merged to `master`** at `23a520e`
+**Date:** 2026-09-05 · **Merged to `master`** at `d83c794`
 
 Phase 0 built the verification infrastructure and re-measured the audit's
 claims. **No template was edited**, by design.

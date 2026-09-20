@@ -1,7 +1,7 @@
 # Phase 5 prompt — factual audit
 
 **Artefact under review:** `docs/prompts/06-phase5-contract-hygiene-and-bindings.md`
-**Frozen ref:** `ecff2d1622779e0d2467950d25ede3f5636c948c` (branch `redesign/phase5-scoping`)
+**Frozen ref:** `bbccae510b8eac64f45c3e2b5e92a5be8b3f067b` (branch `redesign/phase5-scoping`)
 **Scope:** facts only. The plan, the two-track split, the deliverable set and the review
 protocol are a second reviewer's. Nothing was fixed; this is a report.
 **Time box:** 35 minutes, honoured. §4 lists what fell outside it.
@@ -90,7 +90,7 @@ KIND = {'scalar':'numeric','classification':'categorical','symbolic':'symbolic',
 
 | Claim | As measured | Verdict |
 |---|---|---|
-| Phase 4 merge commit is `9e288d9` | `9e288d97…` is a two-parent merge, `master` points at it, ancestor of the frozen ref | agree |
+| Phase 4 merge commit is `0dabd27` | `0dabd27f…` is a two-parent merge, `master` points at it, ancestor of the frozen ref | agree |
 | `phase4_summary.md` §8 / §9 / §12 exist and say what is cited | §8 "Errors I made", §9 "The reviews — four rounds each", §12 "What Phase 5 and 6 inherit" and it does state the stopping rule verbatim | agree |
 | "nineteen errors" | §8 opens "Nineteen." | agree |
 | "thirteen shared three shapes" | §8: "Three shapes account for thirteen of them" (6+4+3) | agree |
@@ -288,10 +288,10 @@ be followed literally, and a session that greps for it and finds nothing may ski
 
 ### F6 — CONFIRMED. "`origin/master` is not fetched in this working copy" is false
 
-`origin/master` exists at `1736447`. `master` (`9e288d9`) is **87 ahead, 0 behind**.
+`origin/master` exists at `65a7d58`. `master` (`0dabd27`) is **87 ahead, 0 behind**.
 
 ```
-git rev-parse origin/master           # 1736447f…
+git rev-parse origin/master           # 65a7d588…
 git rev-list --left-right --count origin/master...master   # 0  87
 ```
 

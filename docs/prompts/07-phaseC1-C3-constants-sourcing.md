@@ -4,7 +4,7 @@ Paste everything below the line into a fresh Claude Code session started at the 
 root, on the `master` branch.
 
 Template-integrity Phases 0–5 and constants Phase **C2** are complete and merged. `master` is at
-`788833d` (Phase 5's Track B merge) plus the reference acquisition described in §"Sources already
+`65d54cc` (Phase 5's Track B merge) plus the reference acquisition described in §"Sources already
 on disk" (uncommitted when this brief was written — check `git status`). **Re-derive every number in this brief at whatever `master` is when
 you start** — every prior brief in this series was corrected by what its own phase measured.
 
@@ -251,7 +251,7 @@ for per-book handling; **that file does not exist** in this checkout. Do not rel
    exactly representable at the precision its question states it to."* `grep -ri representab tests/`
    finds nothing. C3 changes constants; this is when it bites. Implement it as a gate item on S2.
 
-### Corpus baseline at `788833d`
+### Corpus baseline at `65d54cc`
 
 ```
 T1 29 · T2 0 · T3 0 · T4 0 · T5 66 · T6 142 · T7 83 · T8 0      (python -m tests.template_integrity.run --checks all)

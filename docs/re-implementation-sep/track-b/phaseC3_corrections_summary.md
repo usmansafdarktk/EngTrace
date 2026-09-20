@@ -8,7 +8,7 @@ way.
 
 ## The state at the end
 
-| | at the C3 merge (`4eb6488`) | now |
+| | at the C3 merge (`2ea64cb`) | now |
 |---|---|---|
 | tags | 452 | **489** |
 | resolved | 156 (109 value comparisons) | **232** (185 value comparisons) |

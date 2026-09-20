@@ -1,7 +1,7 @@
 {
   "pilot": "evaluator_pilot_17092026",
   "frozen_at_utc": "2026-09-17T07:14:22+00:00",
-  "commit": "0f86bc77176b64076bbec807ba2731fe37b309ff",
+  "commit": "d43024656e37c08520f7d86e9b5e5c8fca35e806",
   "tree_dirty": true,
   "master_seed": 20260912,
   "instances_per_template": 4,
@@ -207,5 +207,5 @@
     "symbolic": 8
   },
   "manifest_sha256": "925b6da7d72c77f6d027c2568e6c79b42a27bfd6d63f90ada8122766f6c31727",
-  "renamed_from": "pilot/pilot_v1, frozen at commit 0f86bc77176b. Only the directory moved; the manifest bytes and their hash are unchanged."
+  "renamed_from": "pilot/pilot_v1, frozen at commit d43024656e37. Only the directory moved; the manifest bytes and their hash are unchanged."
 }

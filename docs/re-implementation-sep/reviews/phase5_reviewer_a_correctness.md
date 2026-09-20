@@ -1,6 +1,6 @@
 # Phase 5, Track A — Reviewer A (correctness)
 
-**Ref reviewed:** `e3ee9ab` (frozen), against `1bd3e4f` (`master`, worktree `C:/wtm`).
+**Ref reviewed:** `2d733f4` (frozen), against `02c3e86` (`master`, worktree `C:/wtm`).
 **Reviewer:** A — correctness. Independent; the implementer's reasoning was not seen.
 **Protocol:** R1 (claims under test), R6 (one mandatory gate task, time-boxed).
 All numbers below were re-derived with the reviewer's own code unless a row says
@@ -32,8 +32,8 @@ python -m tests.template_integrity.run --checks T4                 # 0 failing
 python -m tests.template_integrity.run --checks T4 --seeds 400     # 0 failing
 python -m tests.template_integrity.run --checks all --json all_after.json
 ```
-`--checks all` at `e3ee9ab`: **T1 29, T2 0, T3 0, T4 0, T5 66, T6 142, T7 83**.
-At `1bd3e4f`: identical except **T4 3**. T4 is green at the default 25 seeds and
+`--checks all` at `2d733f4`: **T1 29, T2 0, T3 0, T4 0, T5 66, T6 142, T7 83**.
+At `02c3e86`: identical except **T4 3**. T4 is green at the default 25 seeds and
 still green at 400 (60,000 instances). The three T4 flips are exactly
 `cd_dc_system_analysis`, `euclidean_distance_binary`, `finite_convolution`.
 
@@ -42,7 +42,7 @@ still green at 400 (60,000 instances). The three T4 flips are exactly
 My own four detectors (written from the spec's defect table, not from
 `phase5_contract_scan`), swept over **150 templates × 400 seeds**:
 
-| class | my probe, before (`C:/wtm`) | my probe, after (`e3ee9ab`) |
+| class | my probe, before (`C:/wtm`) | my probe, after (`2d733f4`) |
 |---|---|---|
 | 1 malformed `**Step N:**` | 3 templates — exactly the three named | **0** |
 | 2 non-canonical answer marker | 5 templates — exactly the five named | **0** |
@@ -153,7 +153,7 @@ in f-strings, but "unchanged per template" is not what the measurement says.
 
 ### C9 — T6 `breaches` nondeterministic in **order** only — **AGREE on the substance; the census number does not reproduce**
 
-Five T6 runs at `e3ee9ab`:
+Five T6 runs at `2d733f4`:
 
 ```bash
 for i in 1 2 3 4 5; do python -m tests.template_integrity.run --checks T6 --json t6_$i.json --quiet; done
@@ -380,7 +380,7 @@ Things I tried in order to break this work, which held:
 5. **Tried to prove the T4 severity change is a no-op** — it is load-bearing. On
    `C:/wtm`'s T4 all three of `**Final Answer**`, `**Final Answers:**` and
    `**Answer**` planted into a clean host give `passed=True` with the defect
-   *printed*; on `e3ee9ab` all three give `passed=False`. This is the one thing a
+   *printed*; on `2d733f4` all three give `passed=False`. This is the one thing a
    green corpus genuinely cannot show, and it holds.
 6. **Tried to break `answer_span` corpus-wide**: 60,000 spans, zero empty, zero
    over-peeled, zero non-canonical markers, and exactly one `**Answer:**` per
@@ -444,7 +444,7 @@ heading, and it agrees with `t4_contract` on every one of the 150 templates toda
 
 **6. Named templates where a defect in this diff's classes probably still lives —
 the Phase 6 worklist, measured rather than guessed.** Doubled sign still emitted
-after `e3ee9ab`, 150 × 400 seeds, my probe:
+after `2d733f4`, 150 × 400 seeds, my probe:
 
 | in the **answer span** (2) | `lorentz_force`, `continuous_to_discrete_conversion` |
 |---|---|

@@ -1,7 +1,7 @@
 # Phase C3 — Reviewer G (Provenance)
 
-Frozen ref `f747fb6845b330958e0abfe7c2d7eac9849942bc`. Working tree clean at that commit.
-Source read with `git show f747fb6:<path>`; suites run in the working tree.
+Frozen ref `2fe50c72153892d0b1fa67e7ed486ebb36abca0f`. Working tree clean at that commit.
+Source read with `git show 2fe50c7:<path>`; suites run in the working tree.
 Mandatory task time-boxed to 45 minutes; §5 separately time-boxed to 15.
 
 Scope: tags, units, domains, register honesty. Per-branch VALUE correctness belongs to

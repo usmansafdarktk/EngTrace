@@ -1,6 +1,6 @@
 # Phase C3 — Reviewer H (domain: thermochemistry / materials / fluids), ELECTRICAL branch
 
-Frozen ref `f747fb6845b330958e0abfe7c2d7eac9849942bc`. Working tree clean at that commit.
+Frozen ref `2fe50c72153892d0b1fa67e7ed486ebb36abca0f`. Working tree clean at that commit.
 Scope: whether the NUMBERS in `data/templates/branches/electrical_engineering/constants.py`
 are right, and whether each row's provenance CLASS is the honest one. Tag syntax, `@domain`
 presence and register completeness are Reviewer G's; the other four branches are the other

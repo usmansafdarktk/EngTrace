@@ -4,7 +4,7 @@ Paste everything below the line into a fresh Claude Code session started at the 
 root, on the `master` branch.
 
 This stage was **blocked on the constants track** and is now unblocked: Phase C2 landed the
-corrected chemical thermochemistry constants (sync point S1, merge `9151d8c`). Phase 1
+corrected chemical thermochemistry constants (sync point S1, merge `2e9c8f2`). Phase 1
 (round-trip integrity) is complete and merged.
 
 ---

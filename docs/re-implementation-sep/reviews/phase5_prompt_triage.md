@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-07 · **Artefact reviewed:**
 [`docs/prompts/06-phase5-contract-hygiene-and-bindings.md`](../../prompts/06-phase5-contract-hygiene-and-bindings.md)
-at frozen ref `ecff2d1`
+at frozen ref `bbccae5`
 **Reports:** [`phase5_prompt_facts.md`](phase5_prompt_facts.md) ·
 [`phase5_prompt_scoping.md`](phase5_prompt_scoping.md)
 
@@ -61,7 +61,7 @@ Dispositions: `ADOPT-NOW` · `ADOPT-PHASE-<N>` · `SPEC-CHANGE` · `BACKLOG` · 
 The brief was **not** ready when it was first called done. Three things were outstanding and
 only a readiness check surfaced them:
 
-1. the SHA references had gone stale when `master` moved past `9e288d9`;
+1. the SHA references had gone stale when `master` moved past `0dabd27`;
 2. three §5 suggestions were partly actioned and none was dispositioned;
 3. **this table did not exist**, which is the same omission — an untriaged suggestion — that
    the project's own review protocol treats as blocking.

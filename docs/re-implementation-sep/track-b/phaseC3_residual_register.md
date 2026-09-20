@@ -47,7 +47,7 @@ declare `@kind`, `@units`, `@domain`. **15 `[DERIVED]` tags are never recomputed
 | **total** | **452** | **156** | **19** | **198** |
 
 **Now** (2026-09-16, from the resolver and the greps above) — the corrections tranche and
-`e7cf8c4`'s seven deletions have moved every column:
+`269fc76`'s seven deletions have moved every column:
 
 | branch | tags | resolved | KNOWN-DEFECTIVE | UNVERIFIED |
 |---|---|---|---|---|
@@ -136,7 +136,7 @@ electrical 4, industrial 4 — **170**. The per-table breakdown below is the **C
 snapshot** and is kept as the record of what the phase inherited; it no longer sums to the
 current total.
 
-**177 → 170, and the seven are deletions, not sourcing.** `e7cf8c4` removed the seven
+**177 → 170, and the seven are deletions, not sourcing.** `269fc76` removed the seven
 substance-defect rows of §3, owner-directed: `Cork`, `Cork Board`, `Bamboo`,
 `Tellurium Mercury`, `Tungsten Hexafluoride` and `Tetrabromoethane` from mechanical, and
 `R-410A` from chemical. Each had been deferred twice because deleting a row shifts every
@@ -193,7 +193,7 @@ hashed public copy already under `docs/references/` (D-076).
 
 ## 3. Substance defects — the row names the wrong thing (D-033)
 
-> **Seven of these rows are gone.** `e7cf8c4` deleted them, owner-directed: `Cork`,
+> **Seven of these rows are gone.** `269fc76` deleted them, owner-directed: `Cork`,
 > `Cork Board`, `Bamboo`, `Tellurium Mercury`, `Tungsten Hexafluoride` and
 > `Tetrabromoethane` from mechanical, and `R-410A` from chemical. The table below is kept
 > as the record of *why* each was a defect and what was tried before deleting it — that is
@@ -286,7 +286,7 @@ quietly absorbs its corrections is worth no more than the claims it corrected.
 
    The remaining 142 are not one decision taken 142 times. **Counted by the reason each
    row states** (tag-starting lines, sums to 142; the 148 column is the C3-era figure,
-   before `e7cf8c4` deleted five of these rows and closed one):
+   before `269fc76` deleted five of these rows and closed one):
 
    | rows | then | reason |
    |---:|---:|---|
@@ -444,4 +444,4 @@ corrections is worth no more than the claims it corrected. All 19 of §1 are now
 plus a twentieth found in the process (§3, 2024-T4), and the consequence is measured
 separately in `phaseC3_corrections_item_pool_impact.md`: **13 of 150 templates moved**.
 What remains open is §2's **170** unchecked rows and §6's items 3–7. (177 when that sentence
-was written; `e7cf8c4` then deleted the seven substance-defect rows of §3, owner-directed.)
+was written; `269fc76` then deleted the seven substance-defect rows of §3, owner-directed.)

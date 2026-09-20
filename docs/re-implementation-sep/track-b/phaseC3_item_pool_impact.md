@@ -14,13 +14,13 @@ solution and answer. No template gained a generation error.
 dumped from two git worktrees in **two separate processes**:
 
 ```
-git -c core.longpaths=true worktree add --detach <wt_master> 2e36b13
+git -c core.longpaths=true worktree add --detach <wt_master> c7f74dc
 python -m tests.constants_integrity.c3_instance_dump <wt_master> c3_before.json 300
 python -m tests.constants_integrity.c3_instance_dump .          c3_after.json  300
 python -m tests.constants_integrity.c3_instance_dump --diff c3_before.json c3_after.json
 ```
 
-`before` is **2e36b13**, this branch's merge-base (the Phase C1 merge); `after` is the
+`before` is **c7f74dc**, this branch's merge-base (the Phase C1 merge); `after` is the
 branch head. The script refuses to run if a template resolves outside the tree root it was
 given, and `--diff` refuses two dumps with the same root — the in-process-reload trap that
 reports every instance identical and has now caught four people.
@@ -31,10 +31,10 @@ Totals from the diff: `{'q': 333, 'ans': 300, 'sol': 300, 'err_before': 0, 'err_
 
 ## 1. `two_phase_specific_volume` — 300/300 questions, 300/300 answers
 
-The intended P6 event, from C3.3 (2/2) `1f14e5d`. The template invented its saturated
+The intended P6 event, from C3.3 (2/2) `d5c8aef`. The template invented its saturated
 volumes with `uniform(0.001, 0.002)` and `uniform(0.05, 2.0)` and named a real fluid in the
 question; it now reads `REAL_FLUID_DATA[substance]`, re-derived from the NIST saturation
-rows at each row's own stated temperature (C3.1, `39b19b2`).
+rows at each row's own stated temperature (C3.1, `5313f4d`).
 
 ```
 seed 0: 'The overall specific volume of the mixture is **0.27091 m³/kg**.'
@@ -51,8 +51,8 @@ about a named fluid using volumes that were not that fluid's.
 Not intended, and worth the space, because it is the distinction the two-process dump
 exists to make.
 
-C3.7 corrected **29 cells** of `CONTROL_CHART_FACTORS` (`9891428`), every column having
-been re-derived from its definition (`994c21c`). Of those 29, **7 sit in a column this
+C3.7 corrected **29 cells** of `CONTROL_CHART_FACTORS` (`b7f7613`), every column having
+been re-derived from its definition (`97a0d06`). Of those 29, **7 sit in a column this
 template prints**, at n ∈ {3, 18, 19, 22, 24}:
 
 | n | column | before → after |
@@ -90,7 +90,7 @@ in `1/d2` (2 cells), not in `d2` itself.
 
 ## 4. The two template edits that moved nothing, and why that is the result
 
-- **C3.3 (1/2), `f5271e7`** — `fluid_statics`' floating-object fallback now reads its
+- **C3.3 (1/2), `c4f49f1`** — `fluid_statics`' floating-object fallback now reads its
   density rows instead of copying them. **Zero instances moved**, which is the evidence
   that the copied literals equalled the table: had they differed anywhere, this diff is
   where it would have shown.

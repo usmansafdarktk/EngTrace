@@ -150,7 +150,7 @@ Measured now, by the register's own predicate — a comment line whose first tok
 | industrial | 4 | 4 |
 | **total** | **177** | **170** |
 
-The difference is not new sourcing: **`e7cf8c4` deleted seven substance-defect rows**,
+The difference is not new sourcing: **`269fc76` deleted seven substance-defect rows**,
 owner-directed — `Cork`, `Cork Board`, `Bamboo`, `Tellurium Mercury`, `Tungsten Hexafluoride` and
 `Tetrabromoethane` from mechanical, `R-410A` from chemical. Every one had been deferred across two
 phases because deleting a row shifts the keys after it and moves the item pool; the pool is being

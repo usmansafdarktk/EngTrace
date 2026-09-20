@@ -1,13 +1,13 @@
 # Phase 2 — Reviewer A: Determinism
 
-**Filed:** 2026-09-06 · **Frozen ref reviewed:** `76a66ff`
+**Filed:** 2026-09-06 · **Frozen ref reviewed:** `663d705`
 **Roster:** A — Determinism, phases 1 and 2
 **Brief:** one mandatory gate task — *can a recorded seed regenerate every one
 of these four items, byte for byte, under conditions the implementer did not
 test?* 40-minute box.
 
-> Worked read-only against a worktree pinned to `76a66ff`, never the live tree.
-> The branch advanced to `3be62e3` during the review window; the diff was
+> Worked read-only against a worktree pinned to `663d705`, never the live tree.
+> The branch advanced to `107865f` during the review window; the diff was
 > docs-only, and A noted that the frozen-ref discipline is what made that a
 > footnote rather than a lost afternoon. That discipline exists because Phase C2
 > lost a quarter of a reviewer's findings to a moving branch.

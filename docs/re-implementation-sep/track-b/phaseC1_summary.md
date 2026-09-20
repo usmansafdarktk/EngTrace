@@ -1,7 +1,7 @@
 # Phase C1 — Summary and close-out
 
 **Status: COMPLETE WITH FINDINGS.** · **Dates:** 2026-09-11 – 2026-09-12
-**Branch:** `redesign/phaseC1-sources-convention` · **Reviewed at** `0f4b8cf`
+**Branch:** `redesign/phaseC1-sources-convention` · **Reviewed at** `7fc5407`
 
 C1 fixed how a constant's provenance is written, declared what every numeric table
 is and what units it carries, and **measured** which tables need a citation. It is
@@ -203,7 +203,7 @@ fixes were not re-reviewed by G; C3's Reviewer G reads the same instruments.
 
 ## 9. Verification
 
-At the reviewed ref `0f4b8cf`, in a separate worktree, against the pre-phase
+At the reviewed ref `7fc5407`, in a separate worktree, against the pre-phase
 baseline — **identical on every gate**:
 
 | check | baseline | C1 |

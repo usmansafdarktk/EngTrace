@@ -1,6 +1,6 @@
 # Phase C3 — Reviewer H (Domain: thermochemistry / materials / fluids), INDUSTRIAL branch
 
-Frozen ref `f747fb6845b330958e0abfe7c2d7eac9849942bc`. Working tree clean at that commit;
+Frozen ref `2fe50c72153892d0b1fa67e7ed486ebb36abca0f`. Working tree clean at that commit;
 no tracked file modified. Scratch work in a session temp directory, not committed.
 
 Reviewed without access to the implementer's reasoning. Code comments, commit messages and
@@ -118,8 +118,8 @@ inherited a correct count of 31, fixed 29, and reported the remainder as zero.
 Reproduction:
 
 ```bash
-git -C <repo> show 9891428^:data/templates/branches/industrial_engineering/constants.py   # 31 bad
-git -C <repo> show f747fb6:data/templates/branches/industrial_engineering/constants.py    # 2 bad
+git -C <repo> show b7f7613^:data/templates/branches/industrial_engineering/constants.py   # 31 bad
+git -C <repo> show 2fe50c7:data/templates/branches/industrial_engineering/constants.py    # 2 bad
 # derive independently (Gauss-Legendre, mpmath c4), round half-up at each cell's PRINTED places
 ```
 

@@ -1,6 +1,6 @@
 # Phase C3 — Reviewer H: Domain (thermochemistry / materials / fluids), CIVIL branch
 
-**Filed:** 2026-09-12 · **Frozen ref:** `f747fb6845b330958e0abfe7c2d7eac9849942bc`
+**Filed:** 2026-09-12 · **Frozen ref:** `2fe50c72153892d0b1fa67e7ed486ebb36abca0f`
 **Roster:** H — Domain, phases C2 and C3 · **Scope:** civil branch only (34 tags)
 **Brief:** one mandatory gate task — *independently re-derive at least 8 civil values
 directly from the primary artefacts on disk, without reference to the implementer's
@@ -194,7 +194,7 @@ and never read.
 **Reproduction**
 
 ```bash
-git grep -n "WATER_KINEMATIC_VISCOSITY_M2_S\|WATER_DENSITY_KG_M3\|UNIT_WEIGHT_WATER_PCF" f747fb6 -- data/   # constants.py only
+git grep -n "WATER_KINEMATIC_VISCOSITY_M2_S\|WATER_DENSITY_KG_M3\|UNIT_WEIGHT_WATER_PCF" 2fe50c7 -- data/   # constants.py only
 ```
 
 **Assessed impact.** LOW on items (nil — unconsumed), MEDIUM on the register, which asks the

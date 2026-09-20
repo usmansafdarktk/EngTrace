@@ -1,6 +1,6 @@
 # Phase 4 — Reviewer E: comparator adversary
 
-Frozen ref: `f6bb653745785a2be164ce2756cd748f32fb4a51` (branch `redesign/phase4-comparators`).
+Frozen ref: `e865228b52f831339d320c9d1b920748cacf92d5` (branch `redesign/phase4-comparators`).
 All commands below are run from the repository root with `PYTHONIOENCODING=utf-8` set.
 
 ---
@@ -271,7 +271,7 @@ These are the attacks that did **not** break the comparators. They are what make
 
 **Verdict: BLOCKED — the unreviewed module the fixes are built on reproduces two of the defects it was written to close, one clause boundary to the left, and it does so with no archive support in either direction.**
 
-Frozen ref: `335ad7a3c2a7ec621db62180d74e286d2f59e0f1`.
+Frozen ref: `0cccf21a6bdfb7206d9a47e9fc4f2732051a0406`.
 
 ---
 
@@ -667,7 +667,7 @@ allowed to gate three kinds.
 
 # Round 3 — comparator adversary
 
-**Frozen ref `3a00875b5cc5c8baa440fdd55fa131d5a96abfe6`.**
+**Frozen ref `ba8f665a2cdb3931348d76a6c220ee7eafdde8d9`.**
 
 ## 1. Verdict
 

@@ -1,6 +1,6 @@
 # Phase C1 — Reviewer G (Provenance) report
 
-- **Frozen ref:** `0f4b8cfcbdeec81603a8a543690b684314058845`
+- **Frozen ref:** `7fc54076d6f5e1b1df430b8c021441eb5f770fa3`
 - **Time on the mandatory task:** 37 minutes, inside the 45-minute box. The optional part was not attempted.
 - **Method:**
   - Template and constants source was read with `git show <ref>:<path>`.
@@ -90,7 +90,7 @@ The name sweep also checked these, with no read found: `LEAD_TIME_WEEKS`, `LINE_
 - **Why the census missed it.** Its consumer detector works on names. A number copied into a template does not mention the name.
 - **Reproduction:**
   ```
-  git -C C:\Users\ayesha.gull01\EngTrace grep -n -E "0\.2 ?\* ?S|0\.8 ?\* ?S|SCS_IA_RATIO" 0f4b8cfcbdeec81603a8a543690b684314058845 -- data/templates
+  git -C C:\Users\ayesha.gull01\EngTrace grep -n -E "0\.2 ?\* ?S|0\.8 ?\* ?S|SCS_IA_RATIO" 7fc54076d6f5e1b1df430b8c021441eb5f770fa3 -- data/templates
   python "$G\g_more.py"
   ```
   The script output has three lines for this finding:
@@ -133,7 +133,7 @@ The name sweep also checked these, with no read found: `LEAD_TIME_WEEKS`, `LINE_
 - **Why only PLAUSIBLE.** The table *values* (2–10, 11–25) are not copied; the template deliberately avoids n = 11–12. So UNCONSUMED is correct by the letter of the rule. But the one table-level home of the warrant for a hidden, answer-deciding rule gets no sourcing.
 - **Reproduction:**
   ```
-  git -C C:\Users\ayesha.gull01\EngTrace show 0f4b8cfcbdeec81603a8a543690b684314058845:data/templates/branches/industrial_engineering/quality_and_reliability_control/variables_control_charts.py | sed -n 395,450p
+  git -C C:\Users\ayesha.gull01\EngTrace show 7fc54076d6f5e1b1df430b8c021441eb5f770fa3:data/templates/branches/industrial_engineering/quality_and_reliability_control/variables_control_charts.py | sed -n 395,450p
   ```
   The question text is printed by `python "$G\g_stated.py"` (block `--- template_chart_pair_selection seed=3`).
 - **Impact.** 2 tables, 4 literals, one Montgomery citation. Low, but it is the kind of rule C1.3 exists to source.
@@ -147,8 +147,8 @@ The name sweep also checked these, with no read found: `LEAD_TIME_WEEKS`, `LINE_
   - What it shows: a table built entirely from named constants silently leaves C1's universe.
 - **Reproduction:**
   ```
-  git -C C:\Users\ayesha.gull01\EngTrace grep -n -w PHASE_RANGE_RAD 0f4b8cfcbdeec81603a8a543690b684314058845 -- data/templates
-  git -C C:\Users\ayesha.gull01\EngTrace show 0f4b8cfcbdeec81603a8a543690b684314058845:tests/constants_integrity/census.py | sed -n 127,150p
+  git -C C:\Users\ayesha.gull01\EngTrace grep -n -w PHASE_RANGE_RAD 7fc54076d6f5e1b1df430b8c021441eb5f770fa3 -- data/templates
+  git -C C:\Users\ayesha.gull01\EngTrace show 7fc54076d6f5e1b1df430b8c021441eb5f770fa3:tests/constants_integrity/census.py | sed -n 127,150p
   ```
   The table is also absent from the census doc's electrical rows (13 tables).
 - **Caveat.** My regex matched the degree-phase branch in 24/40 items. It matched no radian phase in the other 16, so I did not confirm that the radian phase is stated.

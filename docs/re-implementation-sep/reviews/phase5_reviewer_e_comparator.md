@@ -1,6 +1,6 @@
 # Phase 5, Track B — Reviewer E (comparator adversary)
 
-**Ref reviewed:** `7c04c95` (working tree is identical to it; `git diff 7c04c95 HEAD` is empty)
+**Ref reviewed:** `15fdaab` (working tree is identical to it; `git diff 15fdaab HEAD` is empty)
 **Scope:** comparator bindings — over-acceptance and over-rejection. T4 / template-integrity,
 the corpus baseline, D-056, `narrative`, `evaluation/` and the annotation pilot are out of scope
 and were not re-derived.
@@ -506,7 +506,7 @@ the principle for errors ("a template that raises has not passed"); it needs one
 ---
 ---
 
-# Round 2 — re-review at `4fd06c3`
+# Round 2 — re-review at `f5a1921`
 
 ## Verdict: PASS WITH FINDINGS — **the block lifts**
 
@@ -516,16 +516,16 @@ could reach at 326,700 gold-pair comparisons. Two over-rejections remain — one
 untriaged (**E-12**, which the unit ablation has now made bite) — and neither is a false accept,
 so neither blocks.
 
-The working tree was identical to `4fd06c3` throughout this review (`git diff 4fd06c3 HEAD`
+The working tree was identical to `f5a1921` throughout this review (`git diff f5a1921 HEAD`
 empty, `git status` clean apart from this file), and **every number below was measured in that
-state**. `extract.py`, `kinds.py`, `answer.py` and `normalize.py` were unchanged from `7c04c95`;
+state**. `extract.py`, `kinds.py`, `answer.py` and `normalize.py` were unchanged from `15fdaab`;
 the round-2 fixes were in `bindings.py`, `derive_bindings.py` and `cross_pair.py` only.
 
 > **Note, added at filing.** While I was writing this section the working tree moved: uncommitted
 > edits appeared in `extract.py` (a new `same_answer`), `cross_pair.py`, `derive_bindings.py` and
 > a regenerated `bindings.py`, citing **R2-F2** — i.e. someone began actioning this round's
 > findings before it was filed. I have left them alone. **Nothing in this section describes that
-> state**; it describes `4fd06c3`, and R2-F2's counts (10 unbound on the truth predicate, 9 on it
+> state**; it describes `f5a1921`, and R2-F2's counts (10 unbound on the truth predicate, 9 on it
 > alone; 118 bound) are as of that ref and will already be stale. Re-derive against whatever ref
 > that work lands on.
 
@@ -749,7 +749,7 @@ Gold displays one decimal, so D4.1 §4.1's tolerance is `0.5 x 10^-1 = 0.05`, bo
 The truth predicate — *a MATCH is a false accept iff the two spans differ textually* — calls them
 false accepts, and three working bindings were discarded for obeying §4.1.
 
-Cost, measured, by differencing the per-kind archive tables at `7c04c95` and `4fd06c3`:
+Cost, measured, by differencing the per-kind archive tables at `15fdaab` and `f5a1921`:
 
 | kind | round 1 (rows × decided) | round 2 (rows × decided) | decided rows |
 |---|---|---|---:|
@@ -814,7 +814,7 @@ comparator**, and the `UNBOUND` reason string says the symptom rather than the c
 phase quoting "8 of 9 symbolic templates are not bindable" will be quoting a parser bug as a corpus
 property. It reads like an evening's work, not a Phase 6 design item.
 
-**The gate itself is doing exactly the right thing.** At `7c04c95` these same 8 templates were
+**The gate itself is doing exactly the right thing.** At `15fdaab` these same 8 templates were
 counted as *bound*, inside the "132" and the "340,550 validated pairs", at 0% decided. The new gate
 is what surfaced them, and the finding exists only because the fix worked.
 

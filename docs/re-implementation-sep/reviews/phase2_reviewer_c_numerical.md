@@ -1,6 +1,6 @@
 # Phase 2 — Reviewer C: Numerical methods
 
-**Filed:** 2026-09-06 · **Frozen ref reviewed:** `76a66ff`
+**Filed:** 2026-09-06 · **Frozen ref reviewed:** `663d705`
 **Roster:** C — Numerical methods, phases 2 and 3
 **Brief:** one mandatory gate task — *does the replaced solver converge to the
 right answer across the full sampled parameter range, and is every printed

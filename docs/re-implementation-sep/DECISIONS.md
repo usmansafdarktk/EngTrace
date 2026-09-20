@@ -830,9 +830,9 @@ The spec's working conventions (§0) say:
 
 **That convention was already broken by Phase 0's own merge, before Phase 1
 started, and it is not recoverable as written.** `redesign/template-integrity`
-sits at `9733a7e` and was merged into `master` at `23a520e`; `master` has since
-advanced to `f3688fb`. Branching Phase 1 from `redesign/template-integrity`
-would therefore have *discarded* the Phase 0 close-out (`4ccf8b9`) and both
+sits at `4feb9d3` and was merged into `master` at `d83c794`; `master` has since
+advanced to `7b2655c`. Branching Phase 1 from `redesign/template-integrity`
+would therefore have *discarded* the Phase 0 close-out (`115cdaf`) and both
 prompt commits. The single-branch model and "one PR per phase" were never
 compatible once a phase merged.
 
@@ -1462,7 +1462,7 @@ and above nothing below it.
 **Date:** 2026-09-06 · **Status:** DECIDED · **Source:** Phase 3, D3.5
 
 T6 fails 142/150 on `master` — re-measured this phase in a `git worktree` at
-`00bd0b0` rather than trusted from the brief, and the brief's table reproduced
+`1cacc59` rather than trusted from the brief, and the brief's table reproduced
 exactly (T1 30, T2 0, T3 0, T4 3, T5 68, T6 142, T7 83). The committed baseline
 is stale corpus-wide, so T6 cannot gate either Phase 3 template.
 
@@ -2900,7 +2900,7 @@ full CODATA value lands 2.1e-5 relative from gold. None of the four declares a
 
 **Date:** 2026-09-11 · **Status:** DECIDED · **Source:** Phase C1.1
 
-Both commits are `2705420` and `ef3c8f9`.
+Both commits are `9b45baf` and `fc1e501`.
 
 1. **The manifest recorded a request that did not produce its file.** A present
    file was re-recorded under the first-choice URL its caller rebuilds. For the
@@ -2927,8 +2927,8 @@ committed, so whether it already carried the wrong URLs cannot be established.
 ## D-073 — Reviewer G (C1): four of my census predicates were wrong, and fixing one exposed eleven tables whose class nobody had checked
 
 **Date:** 2026-09-12 · **Status:** DECIDED · **Source:** C1 Reviewer G,
-`reviews/phaseC1_reviewer_g_provenance.md` (filed at `0f4b8cf`, committed
-unmodified as `254c4da`) · **SPEC-CHANGE 22**
+`reviews/phaseC1_reviewer_g_provenance.md` (filed at `7fc5407`, committed
+unmodified as `75df94d`) · **SPEC-CHANGE 22**
 
 **Verdict PASS WITH FINDINGS.** G checked 14 PLAUSIBILITY tables from template
 source and runs - all agreed - and 10 UNCONSUMED tables individually, with all 32
@@ -2967,7 +2967,7 @@ ERROR present, so a field restated on one seed and crashing on another reported
 RESTATED, and G-2's escape stayed open. Precedence now puts what the probe cannot
 settle above RESTATED.
 
-**That exposed eleven `range` tables classified PLAUSIBILITY at `0f4b8cf` on a
+**That exposed eleven `range` tables classified PLAUSIBILITY at `7fc5407` on a
 RESTATED that masked a crash or a rewording.** Each now declares `@given: stated`
 with committed evidence:
 
@@ -2998,15 +2998,15 @@ that is both a table and an alias. There are two now.
 
 **108 tables** (107 P-TABLE + 1 P-TABLE-LIVE): **CITATION 37 · PLAUSIBILITY 30 ·
 DERIVATION 4 · DEFINITION 5 · DOMAIN 1 · UNCONSUMED 31**, `census --check` clean.
-Against `0f4b8cf` the only class moves are `SCS_IA_RATIO` (UNCONSUMED → CITATION)
-and the new `PHASE_RANGE_RAD`. The eleven were right at `0f4b8cf` by accident: the
+Against `7fc5407` the only class moves are `SCS_IA_RATIO` (UNCONSUMED → CITATION)
+and the new `PHASE_RANGE_RAD`. The eleven were right at `7fc5407` by accident: the
 measurement under them could not have said otherwise.
 
 ### A correction to D-070
 
 D-070 says the literal given-values rule would have excused "`MATERIAL_DENSITIES`,
 `FLUID_DENSITIES`, `CRITICAL_PROPERTIES` and 20 other property tables" - 23, a
-number I did not count. **Counted from the census:** at `0f4b8cf`, **25** tables of
+number I did not count. **Counted from the census:** at `7fc5407`, **25** tables of
 kind `property`, `standard` or `measured-constant` measured ALL-RESTATED, **15** of
 them `property`; under the corrected precedence, **16** (10 `property`), the other
 nine restating on most seeds and rewording the question on some. The argument
@@ -3019,7 +3019,7 @@ stands; the figure was wrong. DECISIONS is append-only, so it is corrected here.
 C1.2 gave `[ON-DISK]` two relations and **no rule for choosing between them**. That is an
 open door: any constant that disagrees with its artefact can be made to pass by widening
 `tol=`, and the tag still reads as evidence. Electrical's Helium went in through it - first
-tagged `tol=0.0002%` (08d3c49), a tolerance wide enough to swallow a value that is **+3.2%
+tagged `tol=0.0002%` (9380721), a tolerance wide enough to swallow a value that is **+3.2%
 on the refractivity** it actually determines.
 
 **The rule, now normative:**

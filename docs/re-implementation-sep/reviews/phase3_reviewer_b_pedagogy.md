@@ -1,7 +1,7 @@
 # Phase 3 — Reviewer B: Physics & Pedagogy (the P6 guard)
 
-**Ref under review:** `953adc9` on `redesign/phase3-trace-shape`
-**Baseline:** `master` @ `00bd0b0`, worktree `C:/wtm`
+**Ref under review:** `4474726` on `redesign/phase3-trace-shape`
+**Baseline:** `master` @ `1cacc59`, worktree `C:/wtm`
 **Scope:** `template_normal_depth_iteration` (T24, civil), `template_line_balancing_heuristic` (T19, industrial)
 **Date:** 2026-09-06
 
@@ -17,10 +17,10 @@
 
 All numbers below are mine, generated in a fresh process per tree (never an in-process reload). Probe scripts are in the session scratchpad; each is self-contained and replays the template's own accept loop.
 
-**Ref-drift check (done first, because it decides whether any of this counts).** The branch moved under me: the working tree I generated from does not hash-match `953adc9` for either template. I diffed both before trusting a single number —
+**Ref-drift check (done first, because it decides whether any of this counts).** The branch moved under me: the working tree I generated from does not hash-match `4474726` for either template. I diffed both before trusting a single number —
 
 ```
-git diff 953adc9 -- data/templates/
+git diff 4474726 -- data/templates/
 ```
 
 — and both drifts are **comment-only** (expanded D-037 justifications in the two screen comments; no change to any executable line, sampled parameter, or emitted string). Every measurement below therefore holds for the frozen ref. Flagging it because a reviewer who had not checked would have been silently reviewing something else.

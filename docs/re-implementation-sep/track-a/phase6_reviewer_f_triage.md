@@ -1,6 +1,6 @@
 # Reviewer F — triage (R4)
 
-**Date:** 2026-09-16 · Report filed unmodified at `b9c599d` **before** any of this.
+**Date:** 2026-09-16 · Report filed unmodified at `8a180dd` **before** any of this.
 
 Every finding and every §4 suggestion is dispositioned. An untriaged suggestion blocks the gate
 exactly as a CONFIRMED finding does.
@@ -12,7 +12,7 @@ its own honesty is the finding."* **Accepted in full.** Three of my claims are c
 
 ## F1 — calibration reproduces · ACCEPTED, no defect
 
-Confirmed independently: 6166/6166, all five branches +0 at `9105317`, `GATE: PASS`.
+Confirmed independently: 6166/6166, all five branches +0 at `67d41f4`, `GATE: PASS`.
 
 **Action taken:** record the reader-trap F found. The audit carries **two** per-branch inline
 tables. The gate matches `template_audit_report.md:85` (chemical 65 / civil 37 / electrical 116 /
@@ -25,7 +25,7 @@ table.** The strict total 449 vs the audit's 432 is the +3.9% more-inclusive pre
 
 ## F3 — the attribution was a category error, and D6.7 did not move that cell · **ACCEPTED, MY CLAIM RETRACTED**
 
-Commit `a142d27` said `template_system_property_linearity`'s `78 → 50` was a D6.7 predicate
+Commit `9c8622a` said `template_system_property_linearity`'s `78 → 50` was a D6.7 predicate
 artefact. **That is wrong twice over, and F measured both.**
 
 - **Category error.** `pct_step_values_recoverable` is computed *dynamically* — by generating

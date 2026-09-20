@@ -167,7 +167,7 @@ So the manifest carries the question and gold text plus a SHA-256 per item, and
 `--verify` reports `TEXT MOVED` per item rather than silently relabelling what the
 experts read.
 
-The slice was frozen at commit `0f86bc7` against master seed `20260912`; manifest
+The slice was frozen at commit `d430246` against master seed `20260912`; manifest
 SHA-256 begins `925b6da7d72c77f6`. `run_traces.py` refuses to make a single call
 unless `--verify` passes.
 

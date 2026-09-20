@@ -1,6 +1,6 @@
 # Phase C3 — Reviewer H (Domain: thermochemistry / materials / fluids), MECHANICAL branch
 
-Frozen ref `f747fb6845b330958e0abfe7c2d7eac9849942bc`. Working tree clean at that commit.
+Frozen ref `2fe50c72153892d0b1fa67e7ed486ebb36abca0f`. Working tree clean at that commit.
 Every number below was re-derived from the primary artefact by reading the PDF page text or
 the NIST TSV directly, before consulting the implementer's transcription.
 

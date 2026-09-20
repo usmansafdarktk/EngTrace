@@ -1,7 +1,7 @@
 # Phase 2 — determinism and solver-in-the-loop
 
 **Date:** 2026-09-06 · **Branch:** `redesign/phase2-determinism`
-**Gated on:** Phase C2 (sync point S1), merged as `9151d8c`
+**Gated on:** Phase C2 (sync point S1), merged as `2e9c8f2`
 **Scope:** four templates · **Decisions:** D-036, D-037
 
 ---
@@ -179,7 +179,7 @@ the second *machine* is Reviewer A's, and is not something I can supply.
 with the argument recorded. Full table in
 [`phase2_item_pool_impact.md`](phase2_item_pool_impact.md) §4.
 
-**Constants (D2.6).** C2 landed first (`9151d8c`). The C2.2 suite still passes
+**Constants (D2.6).** C2 landed first (`2e9c8f2`). The C2.2 suite still passes
 222 checks and C2.5 55 checks with `CP_PARAMS_COMBUSTION` added.
 
 ---

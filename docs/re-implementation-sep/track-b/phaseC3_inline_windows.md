@@ -16,7 +16,7 @@ copies found while reading those lines.
 
 | window | where | outcome |
 |---|---|---|
-| `two_phase_specific_volume`'s V_l, V_v - invented with `uniform(0.001, 0.002)`, `uniform(0.05, 2.0)` | `volumetric_properties_pure_fluids.py` | **moved**: the template reads `REAL_FLUID_DATA[substance]`, re-derived from NIST (39b19b2, 1f14e5d; P6 measured, 300/300 moved) |
+| `two_phase_specific_volume`'s V_l, V_v - invented with `uniform(0.001, 0.002)`, `uniform(0.05, 2.0)` | `volumetric_properties_pure_fluids.py` | **moved**: the template reads `REAL_FLUID_DATA[substance]`, re-derived from NIST (5313f4d, d5c8aef; P6 measured, 300/300 moved) |
 | Terzaghi's `phi = 35` and `phi = 30` | `strength_and_stability.py:139, 146` | **declared**: the endpoints of `FRICTION_ANGLE_RANGES_DEG` "sand, rounded, dense" (35-38) and "sand, rounded, loose" (27-30), written as literals - copies, not windows. `@copied-in` on the table, checked by census P-COPY |
 
 ## Registered - the spec's named entries

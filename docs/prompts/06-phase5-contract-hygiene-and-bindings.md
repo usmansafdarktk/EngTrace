@@ -3,9 +3,9 @@
 Paste everything below the line into a fresh Claude Code session started at the repository
 root, on the `master` branch.
 
-Phases 0, 1, C2, 2, 3 and 4 are complete and merged. Phase 4's merge commit is `9e288d9`;
+Phases 0, 1, C2, 2, 3 and 4 are complete and merged. Phase 4's merge commit is `0dabd27`;
 `master` has since taken **documentation-only** commits (this brief, D-058, the spec
-amendments and two reviews of this brief). **Branch from `master`, not from `9e288d9`** — and
+amendments and two reviews of this brief). **Branch from `master`, not from `0dabd27`** — and
 re-derive the table below at whatever `master` is when you start, rather than trusting that
 those commits stayed documentation-only.
 
@@ -109,8 +109,8 @@ recorded defect was four, Phase 2 found a template failing T1 on 91% of instance
 found two display-tie populations where the brief listed one, Phase 4 found T6 failing on two
 of four where the brief said one.
 
-Corpus health, **re-measured and confirmed exact by an independent reviewer** at `9e288d9`
-and unchanged at `c69a54d` — the first brief in this series whose corpus table needed no correction. Still
+Corpus health, **re-measured and confirmed exact by an independent reviewer** at `0dabd27`
+and unchanged at `60ce4ab` — the first brief in this series whose corpus table needed no correction. Still
 re-derive it in a worktree:
 
 | Check | Failing | Note |
@@ -404,7 +404,7 @@ legitimate and respected outcome; a finding quietly absent from the triage table
 - Branch **`redesign/phase5-hygiene-bindings`** off `master`. Do not work directly on `master`.
 - Logical commits, not one lump. **Commit each reviewer's report unmodified and before any
   fix**, so the record is what they wrote rather than what survived your response.
-- **Do not push.** `origin/master` is at `1736447` and `master` is **87 ahead, 0 behind**;
+- **Do not push.** `origin/master` is at `65a7d58` and `master` is **87 ahead, 0 behind**;
   publishing is a separate decision and not this phase's.
 - End commit messages with:
   `Co-Authored-By: Claude Opus 5 <noreply@anthropic.com>`

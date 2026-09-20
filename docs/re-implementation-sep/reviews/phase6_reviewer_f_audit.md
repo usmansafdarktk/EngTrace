@@ -1,6 +1,6 @@
 # Reviewer F — audit replication (Phase 6)
 
-**Filed:** 2026-09-16 · **Frozen SHA:** `381f178` · **Protocol:** R0–R6
+**Filed:** 2026-09-16 · **Frozen SHA:** `a8f351d` · **Protocol:** R0–R6
 **Committed unmodified and before any fix**, per the independence rule.
 
 **Gate as commissioned:** not *"does it replicate the original?"* — the original harness never
@@ -15,7 +15,7 @@ old one did?"*
 two of the three narrative claims that defend the moved cells are wrong in their stated mechanism,
 and one of those is the Phase 6 headline gate.** Calibration reproduces exactly (6166/6166
 FormattedValue, chemical 65 / civil 37 / mechanical 89 / electrical 127 / industrial 131, all +0
-against the corpus at 9105317, which I confirmed is the audit's own commit); holding the corpus at
+against the corpus at 67d41f4, which I confirmed is the audit's own commit); holding the corpus at
 the rev is the correct call and hides nothing, because Section B of the same output prints the HEAD
 drift beside it. Nothing regressed silently — a fresh `run --checks all` reproduces all eight
 ceilings and `ci_ratchet` exits 0. The 107-cell diff is real and correctly counted. However: the
@@ -38,7 +38,7 @@ PYTHONIOENCODING=utf-8 python -m tests.template_integrity.regen_inventory --cali
 ```
 
 All five branches +0, population 6166 vs 6166, `GATE: PASS`.
-`git log -1 --format='%H %ad %s' 9105317` → `Sat Sep 5 19:37:32 2026 … Add template structure
+`git log -1 --format='%H %ad %s' 67d41f4` → `Sat Sep 5 19:37:32 2026 … Add template structure
 audit: report and per-template inventory` — the rev *is* the audit. Holding the corpus there is the
 only way to separate method drift from six phases of template change, and Section B reports the HEAD
 drift in the same breath (+121 interpolations, electrical +34). No concealment.
@@ -68,7 +68,7 @@ classifying each through `match_value()`. The Call-node-vs-Name-node argument is
 AST fact that feeds only `n_inline_computed`. It cannot move the dynamic column at all, as stated.
 
 **(b) Measured refutation.** I executed the pre-D6.7 source
-(`git show f333f1a^:…/discrete_time_signals.py`) through the identical harness:
+(`git show 3441e24^:…/discrete_time_signals.py`) through the identical harness:
 
 ```
 PRE-D6.7  tokens= 157 recovery=50%  {'MISSING': 79, 'EXACT': 33, 'SCALED': 45}
@@ -92,7 +92,7 @@ described.
 ### F4 — CONFIRMED. The D6.7 attribution table is incomplete; "The correspondence is one-to-one" is unsupported.
 
 ```
-git show f333f1a --numstat
+git show 3441e24 --numstat
 ```
 
 D6.7 edited **ten** template modules. The commit's table lists **six**. Omitted:
@@ -135,7 +135,7 @@ Two counts from the committed artefacts, neither of which is 34/34:
   `step-count` signal** (the other 8 moves are `C:answer_type` 6, `A:residual` 2).
 
 So "zero hard signal" is **false** for the move set. The rhetorical point survives at 26/28 = 93%,
-but the specific figure quoted in both `a142d27` and `phase6_residual_register.md:23` cannot be
+but the specific figure quoted in both `9c8622a` and `phase6_residual_register.md:23` cannot be
 derived from either artefact. Also of note: the 28 B-moves come from original classes A (22) and
 C (6) — none from D.
 
@@ -181,7 +181,7 @@ way; flagging it as the largest unguarded surface in the suite.
 
 ## 4. FORWARD-LOOKING SUGGESTIONS (triage separately from findings)
 
-1. **Rewrite the attribution paragraph in `a142d27`'s successor doc.** List all ten edited files,
+1. **Rewrite the attribution paragraph in `9c8622a`'s successor doc.** List all ten edited files,
    and either drop the `78 -> 50` example or replace its explanation with the symbolic-token
    mechanism. The A/B that settles it is ~30 lines and now exists.
 2. **Add an `--at-rev` mode for the *dynamic* columns** (temp checkout + re-execute) so "did this

@@ -14,7 +14,7 @@ longer exist.
 This is the owner's standing preference for new commits too. See the memory
 `commit-message-style`: `git commit -m "<short subject>"`, no body, no trailer.
 
-## Facts measured on 2026-09-20 (HEAD `7c81a91`)
+## Facts measured on 2026-09-20 (HEAD `bdee611`)
 
 - `master` has **287 commits**. **240** carry the trailer, from 2026-09-05 onward.
   Almost all of those also have a multi-paragraph body.
@@ -34,11 +34,11 @@ This is the owner's standing preference for new commits too. See the memory
   each citation must be replaced by the new hash of the same commit, or it dangles.
   The files that are more than documentation:
   - `tests/template_integrity/regen_inventory.py`: **code** uses
-    `AUDIT_REV = '9105317'` (lines 9, 174, 521). If this is not remapped, the
+    `AUDIT_REV = '67d41f4'` (lines 9, 174, 521). If this is not remapped, the
     script breaks.
   - `evaluator_pilot_17092026/slice/FREEZE.json`: `"commit":
-    "0f86bc77176b64076bbec807ba2731fe37b309ff"` and a `renamed_from` note citing
-    `0f86bc77176b`. This is the provenance of the frozen evaluation slice. Remap
+    "d43024656e37c08520f7d86e9b5e5c8fca35e806"` and a `renamed_from` note citing
+    `d43024656e37`. This is the provenance of the frozen evaluation slice. Remap
     both. The per-item SHA-256 values in that file are **content hashes, not
     commits**: do not touch them.
   - The rest are docs: `docs/re-implementation-sep/DECISIONS.md` (10),

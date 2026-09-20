@@ -300,7 +300,7 @@ D3.1 decision record: schema route vs. redesign for each, with the P6 trade stat
 
 *Reviewer D — Schema.* Given only the D3.3 node specs and a set of generated traces: attempt to write a verifier against the spec. Report every ambiguity. **The spec passes only if a reviewer who did not design it can implement against it** — this is the real test of D3.3, and it is the deliverable most likely to fail its gate on first attempt.
 
-### 3.5 Exit gate — **PASSED 2026-09-06**, merged `27054c9`
+### 3.5 Exit gate — **PASSED 2026-09-06**, merged `74c50e1`
 
 Close-out in [`phase3_summary.md`](track-a/phase3_summary.md); the gate table there is authoritative.
 

@@ -2,12 +2,12 @@
 
 **Reviewer:** D (independent) · **Gate:** "Reviewer D implemented a working
 verifier from D3.3 alone" · **Date:** 2026-09-06
-**Frozen ref under review:** `953adc9` on `redesign/phase3-trace-shape`
+**Frozen ref under review:** `4474726` on `redesign/phase3-trace-shape`
 **Inputs used:** `docs/re-implementation-sep/phase3_node_types.md` (D3.3) and
 `docs/re-implementation-sep/phase3_conformance/traces.json` only.
 **Artefact:** `tests/trace_schema/reviewer_d_verifier.py`
 
-**Contamination disclosure.** My first command was `git show 953adc9 --stat`,
+**Contamination disclosure.** My first command was `git show 4474726 --stat`,
 which printed the full commit body before I could stop it. I therefore saw the
 Phase 3 commit message, which the brief excluded. I did **not** read
 `phase3_summary.md`, `phase3_item_pool_impact.md`, either template source, or
@@ -630,19 +630,19 @@ says will be built on this document will discover that at the third template.
 
 ## 6. Round 2 — disposition of findings against schema 1.1
 
-**Frozen ref:** `9398ccc` on `redesign/phase3-trace-shape` · **Scope:** whether
+**Frozen ref:** `974e267` on `redesign/phase3-trace-shape` · **Scope:** whether
 F1–F15 were actually addressed. Sections 1–5 above stand as the round 1 record
 and are not revised.
 
 **Round-1 contamination, for the permanent record.** My first command in round 1
-was `git show 953adc9 --stat`, which printed the full commit body before I could
+was `git show 4474726 --stat`, which printed the full commit body before I could
 stop it, so I saw the Phase 3 commit message that the brief excluded. I did not
 read `phase3_summary.md`, `phase3_item_pool_impact.md`, either template source,
 or `tests/trace_schema/extract.py`. The message named the D-038 asymmetry and the
 two errors the author had caught; §2 and §9 of the spec state both independently,
 so I assess the leak as low-impact on the round-1 verdict — but the gate was
 weaker than designed, and the mitigation is to use `git show <sha>:<path>` with
-no `--stat`. In round 2 I read only the spec and the corpus at `9398ccc`.
+no `--stat`. In round 2 I read only the spec and the corpus at `974e267`.
 
 ### Method
 

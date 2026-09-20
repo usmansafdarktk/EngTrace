@@ -3,7 +3,7 @@
 Paste everything below the line into a fresh Claude Code session started at the repository
 root, on the `master` branch.
 
-Phases 0, 1, C2 and 2 are complete and merged (`103fa8b`). This stage depends on all of
+Phases 0, 1, C2 and 2 are complete and merged (`3cb147c`). This stage depends on all of
 them, and on Phase 2 in particular — it inherits a criterion that Phase 2's own review
 corrected.
 

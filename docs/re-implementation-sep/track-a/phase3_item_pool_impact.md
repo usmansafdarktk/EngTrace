@@ -1,8 +1,8 @@
 # Phase 3 — item-pool impact and D3.5 distribution diff
 
 **Phase:** 3 (trace shape: iteration and search) · **Date:** 2026-09-06
-**Before:** `master` at `00bd0b0`, checked out as a worktree at `C:/wtm`
-**After:** `redesign/phase3-trace-shape` at `953adc9`
+**Before:** `master` at `1cacc59`, checked out as a worktree at `C:/wtm`
+**After:** `redesign/phase3-trace-shape` at `4474726`
 **Templates:** `template_normal_depth_iteration` (civil, uniform flow) ·
 `template_line_balancing_heuristic` (industrial, production planning)
 
@@ -20,7 +20,7 @@ outside them is affected at all.
 T6 fails **142/150 on `master`**: the committed baseline profile is stale
 corpus-wide, so T6 cannot gate anything this phase touches. That was re-measured
 here rather than taken from the brief — a full `--checks all` run in a worktree at
-`00bd0b0` gives T1 30, T2 0, T3 0, T4 3, T5 68, T6 142, T7 83, reproducing the
+`1cacc59` gives T1 30, T2 0, T3 0, T4 3, T5 68, T6 142, T7 83, reproducing the
 brief's table exactly.
 
 Regenerating the baseline would turn T6 green and is the wrong move: **a baseline

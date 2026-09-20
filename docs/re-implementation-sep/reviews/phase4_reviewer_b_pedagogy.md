@@ -1,6 +1,6 @@
 # Phase 4 — Reviewer B (physics & pedagogy, the P6 guard)
 
-**Frozen ref:** `f6bb653745785a2be164ce2756cd748f32fb4a51` · **Branch:** `redesign/phase4-comparators`
+**Frozen ref:** `e865228b52f831339d320c9d1b920748cacf92d5` · **Branch:** `redesign/phase4-comparators`
 **Mandate:** does the normalisation vocabulary accept answers a human grader would reject?
 **Binding constraint:** SPEC-CHANGE 10 — fit a model, report lift over a blind-guess floor.
 **Time box:** 35 minutes, held.
@@ -465,7 +465,7 @@ Things I tried to break and could not:
 
 # Round 2 — Reviewer B (physics & pedagogy, the P6 guard)
 
-**Frozen ref:** `335ad7a3c2a7ec621db62180d74e286d2f59e0f1` · **Branch:** `redesign/phase4-comparators`
+**Frozen ref:** `0cccf21a6bdfb7206d9a47e9fc4f2732051a0406` · **Branch:** `redesign/phase4-comparators`
 **Mandate:** does the *new* mechanism reject answers a human grader would ACCEPT?
 **Time box:** 30 minutes, held.
 
@@ -888,7 +888,7 @@ should exist.
 
 # Round 3 — Reviewer B (physics & pedagogy, the P6 guard)
 
-**Frozen ref:** `3a00875b5cc5c8baa440fdd55fa131d5a96abfe6` · **Branch:** `redesign/phase4-comparators`
+**Frozen ref:** `ba8f665a2cdb3931348d76a6c220ee7eafdde8d9` · **Branch:** `redesign/phase4-comparators`
 **Mandate:** audit `recall_corpus.py` — the artefact I named in round 2 §5.2. Does its 100% mean anything?
 **Time box:** 30 minutes, held.
 

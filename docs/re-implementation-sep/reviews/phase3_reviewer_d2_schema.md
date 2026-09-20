@@ -1,11 +1,11 @@
 # Phase 3 — Reviewer D2: schema implementability, round 2
 
 **Reviewer:** D2 (independent) · **Role:** implement a verifier from D3.3 alone
-**Ref under review:** `9398ccc` on `redesign/phase3-trace-shape`, schema version `1.1`
+**Ref under review:** `974e267` on `redesign/phase3-trace-shape`, schema version `1.1`
 **Date:** 2026-09-06 · **Time box:** 60 minutes, filed within it
 
 **Inputs I read.** `docs/re-implementation-sep/phase3_node_types.md` and
-`docs/re-implementation-sep/phase3_conformance/traces.json`, both at `9398ccc`.
+`docs/re-implementation-sep/phase3_conformance/traces.json`, both at `974e267`.
 Nothing else. I did **not** open `uniform_flow.py`, `production_planning.py`,
 `tests/trace_schema/extract.py`, `phase3_summary.md`,
 `phase3_item_pool_impact.md`, `DECISIONS.md`, any Phase 3 commit message, round
@@ -16,18 +16,18 @@ is all I know of it.
 
 **Drift check — the branch DID move under me, and it does not matter.** At the
 start of the review `HEAD` and `redesign/phase3-trace-shape` were both
-`9398ccc07546773c16f476c8a7fbacacf2068657`, with `phase3_summary.md` modified and
+`974e267e81d300d457c100a81857168d3f3c88a9`, with `phase3_summary.md` modified and
 three untracked round-1 artefacts in the tree. By the end both were
-`7d9fd01a394e1f4482b3fe69b65713b31ebda477` — a fast-forward (`git merge-base
---is-ancestor 9398ccc 7d9fd01` → yes) that landed those artefacts. Per the
-commission I ignored the movement and reviewed `9398ccc`, and I confirmed the
+`22657bf2ac1a4cf8fa7b92d1beec6c1ac22f7ecc` — a fast-forward (`git merge-base
+--is-ancestor 974e267 22657bf` → yes) that landed those artefacts. Per the
+commission I ignored the movement and reviewed `974e267`, and I confirmed the
 movement is immaterial rather than assuming it:
 
 - `docs/re-implementation-sep/phase3_node_types.md` — SHA-256 identical at
-  `9398ccc` and `7d9fd01` (`98d54988a382b1f0…`).
+  `974e267` and `22657bf` (`98d54988a382b1f0…`).
 - `docs/re-implementation-sep/phase3_conformance/traces.json` — SHA-256 identical
   at both (`02b0567dc954dbb2…`).
-- `git diff --name-status 9398ccc 7d9fd01` (names only; **no commit message was
+- `git diff --name-status 974e267 22657bf` (names only; **no commit message was
   printed, and I ran no `git log` or bare `git show` on a Phase 3 commit**) lists
   five paths, none of which is either of my two inputs. I opened none of them.
 
@@ -39,7 +39,7 @@ the worktree copy of `traces.json` is **not** byte-identical to the ref copy. Th
 difference is entirely CRLF-vs-LF from the Windows checkout — `git status` reports
 the path clean, and parsing both gives 80 rows with every `trace_nodes` object
 equal (`[r['trace_nodes'] for r in a] == [... for r in b]` → `True`). The verifier
-runs below therefore reflect the corpus at `9398ccc`.
+runs below therefore reflect the corpus at `974e267`.
 
 ---
 
@@ -600,7 +600,7 @@ Artefacts: `tests/trace_schema/reviewer_d2_verifier.py`,
 
 ## 6. Round 3 — disposition against schema 1.2
 
-**Ref:** `c9fd703e65ba32f10e78bfc6b6a2ef45ee178d34` on `redesign/phase3-trace-shape`.
+**Ref:** `08aedd19abe1efeb83eb9ac2df4d522770165dee` on `redesign/phase3-trace-shape`.
 `HEAD`, the branch tip and the commissioned SHA agreed at the start of this round
 and still agreed at the end — **the branch did not move under me this time.**
 **Time box:** 30 minutes, re-verification only. Sections 1–5 above are the
@@ -780,8 +780,8 @@ same wording. One line, and F4 is then fully addressed.
 You asked whether step 7 is now decidable or whether it had only been asserted.
 It had only been asserted. §3.7 is **byte-identical** between 1.1 and 1.2:
 ```
-git show 9398ccc:...phase3_node_types.md | sed -n '/^### 3.7/,/^---/p' | sha256sum   -> 6f7283ead30df88e
-git show c9fd703:...phase3_node_types.md | sed -n '/^### 3.7/,/^---/p' | sha256sum   -> 6f7283ead30df88e
+git show 974e267:...phase3_node_types.md | sed -n '/^### 3.7/,/^---/p' | sha256sum   -> 6f7283ead30df88e
+git show 08aedd1:...phase3_node_types.md | sed -n '/^### 3.7/,/^---/p' | sha256sum   -> 6f7283ead30df88e
 ```
 §6 step 7 is likewise unchanged. `cumulative` still reads "the union over **all**
 elements", under which the predicate does not depend on which element you evaluate
@@ -861,7 +861,7 @@ F9c–h, F10–F13) is minor and could ride along with that clause in a single p
 
 ## 7. Round 4 — does §3.8 close the exploit family?
 
-**Ref:** `9c6b8ee9e9fb6eb2cfcea6af30e2d787694b1e9a`. `HEAD`, the branch tip and the
+**Ref:** `ddfbc0fe460a4396c65120aac6d9b162a8de4a88`. `HEAD`, the branch tip and the
 commissioned SHA agreed at the start and at the end — the branch did not move.
 **Time box:** 30 minutes. Artefact: `tests/trace_schema/reviewer_d2_verifier_13.py`.
 
@@ -917,7 +917,7 @@ which is F11's fix showing up as behaviour rather than as prose.
 
 | # | Check | Result |
 |---|---|---|
-| F7 | §3.7 hashed at all three refs | `9398ccc` `6f7283ead30df88e` → `c9fd703` `6f7283ead30df88e` → `9c6b8ee` **`e6ce5f30f3045d06`**. The hash moved this time, and the text now reads "*the union of `accumulator_role` over elements 1..k*" with an explicit "**The reading is a prefix, not a total**". **Fixed.** |
+| F7 | §3.7 hashed at all three refs | `974e267` `6f7283ead30df88e` → `08aedd1` `6f7283ead30df88e` → `ddfbc0f` **`e6ce5f30f3045d06`**. The hash moved this time, and the text now reads "*the union of `accumulator_role` over elements 1..k*" with an explicit "**The reading is a prefix, not a total**". **Fixed.** |
 | F4 | §3.1 `preamble_binding` row | now "**required iff `preamble` is present**"; omitting it is rejected. **Fixed.** |
 | F10 | `preamble_binding` shape | now `{"frame": 0, "frame_role": "iterate"}` — the frame role is named, not prefix-inferred. My `ASSUMPTION[10]` is deleted. **Fixed.** |
 | F11 | `accumulator_symbol` | now `accumulator_role`, an element role. **Fixed** (one stale reference remains — see §7.5). |
@@ -1123,7 +1123,7 @@ run once, by the implementer, against §3.8's own table.
 
 ## 8. Round 5 — attacking §4.6 `constants` + `frame_relations`
 
-**Ref:** `fe2040a747f4af503774ea5909cc85746a22e8ab`, schema 1.4. `HEAD`, the branch
+**Ref:** `790c3454621d23657bcfe51c4ff26f5b453655ef`, schema 1.4. `HEAD`, the branch
 tip and the commissioned SHA agreed at start and end. **Time box:** 40 minutes.
 Artefact: `tests/trace_schema/reviewer_d2_verifier_14.py`, including a from-scratch
 implementation of §4.6's grammar and evaluation rule.
@@ -1345,20 +1345,20 @@ Close the coverage gap and I think §4.6 is finished.
 
 ## 9. Round 6 — confirming v1.5
 
-**Ref:** `c8e28ce1708e070703a3a202223df6404d2e8c52`, schema 1.5. **Time box:** 30
+**Ref:** `b88436f08f1b0fed10a3d9145ea2a1bbd2cd84e3`, schema 1.5. **Time box:** 30
 minutes. Artefact: `tests/trace_schema/reviewer_d2_verifier_15.py`.
 
-**Drift.** The branch moved to `ae05443253e8177410bc3f03f520b8b4f732e92c` during
+**Drift.** The branch moved to `18c99e4c351d68c96723b2f977b241fa8488a654` during
 this round. The coordinator disclosed it unprompted, before I found it, and the
 disclosure is accurate — I verified it independently rather than accepting it:
 
 ```
-git merge-base --is-ancestor c8e28ce ae05443            -> yes (fast-forward)
-git diff --name-status c8e28ce ae05443                  -> M docs/prompts/README.md
+git merge-base --is-ancestor b88436f 18c99e4            -> yes (fast-forward)
+git diff --name-status b88436f 18c99e4                  -> M docs/prompts/README.md
                                                            M docs/re-implementation-sep/phase3_summary.md
-phase3_node_types.md            c8e28ce d403961c13836114 = ae05443 d403961c13836114
-phase3_conformance/traces.json  c8e28ce e77d652da8357f3e = ae05443 e77d652da8357f3e
-git diff --name-only c8e28ce ae05443 -- tests/ .../phase3_conformance/  -> (empty)
+phase3_node_types.md            b88436f d403961c13836114 = 18c99e4 d403961c13836114
+phase3_conformance/traces.json  b88436f e77d652da8357f3e = 18c99e4 e77d652da8357f3e
+git diff --name-only b88436f 18c99e4 -- tests/ .../phase3_conformance/  -> (empty)
 ```
 
 Both input files are byte-identical across the two commits, the quoted hashes
