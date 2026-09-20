@@ -18,7 +18,7 @@ judged fraction becomes a reportable statistic."
 
 WHY TWO SCORES. A judge can excuse any missing quantity as "not needed". Keeping
 "the judge found it" apart from "the judge excused it" stops that from inflating the
-headline invisibly; the human labels' "correct-but-alternative-path" category is
+headline invisibly; the expert labels' "correct-but-alternative-path" category is
 what decides whether NOT_NEEDED deserves credit.
 
 WHAT THE JUDGE SEES. The question, the trace, and each missed milestone's name and

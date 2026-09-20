@@ -57,7 +57,7 @@
     "generated over the same 60 frozen items to check that an evaluator validated on",
     "the gold five still functions on smaller open-weight traces - step markers, a",
     "parseable answer, (value, unit) pairs for E3, judge output that parses. Those need",
-    "no human labels, which is why these models add traces without adding annotation.",
+    "no expert labels, which is why these models add traces without adding annotation.",
     "run_evaluator scores the gold cohort unless --cohort says otherwise.",
     "",
     "Qwen3.8-27B is a reasoning model as well: at 8192 it truncated mid-thought on 27",

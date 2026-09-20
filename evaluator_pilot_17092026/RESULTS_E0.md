@@ -5,7 +5,7 @@ called unmodified through `evaluators/e0_tribunal.py`. **$6.28, 300 of 300 score
 0 judge failures, 0 truncations, 0 errors.** Scores live in `scores/e0/`.
 
 This is the anchor, not a result about the models: it is what every other evaluator
-candidate is compared against once the human labels exist. Read it with the defects
+candidate is compared against once the expert labels exist. Read it with the defects
 in [FINDINGS.md](FINDINGS.md) in view - particularly E0-F6, that the Tribunal is two
 judges rather than three.
 
@@ -55,7 +55,7 @@ E0-F5 - that Tier 1 matches almost nothing and 93% of correct traces reach the
 judges - E0's reasoning score is close to: *Tier 1 rejects nearly every step, then
 the judges reinstate nearly every step.* Whether that is a sound mechanism or an
 expensive way to approximate "did it get the answer right" is precisely what the
-human labels will settle.
+expert labels will settle.
 
 **A hypothesis this data refutes.** If the judges reinstate nearly everything, F1
 should be driven by the ratio of trace steps to gold steps rather than by

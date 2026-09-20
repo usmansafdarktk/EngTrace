@@ -157,7 +157,7 @@ E5's sole judge.
 3. **Validate against the expert labels** (X1), with confidence intervals. That, not
    the selection procedure, is what makes a judge defensible.
 4. **Measure the bias** (X2): whether each judge favours the family it is exposed to,
-   against the human labels. The pilot has traces from all five generator families;
+   against the expert labels. The pilot has traces from all five generator families;
    a null result settles the objection as well as a positive one.
 5. **Show the conclusion survives a swap**: re-run E1 with a different judge in each
    seat (~$3 each) and report whether the ranking of evaluators changes.

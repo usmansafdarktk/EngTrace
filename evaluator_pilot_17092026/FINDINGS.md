@@ -214,7 +214,7 @@ metrics and ROUGE identical (max difference 0.0), BERTScore max difference
 Two open-weight models from the proposed main roster, run over the same 60 frozen
 items to ask one question: if the main benchmark moves to smaller open-weight
 models, does an evaluator validated on the pilot's five still work there? They are
-NOT in the labelled 300 - the question is mechanical, so it needs no human labels,
+NOT in the labelled 300 - the question is mechanical, so it needs no expert labels,
 and 420 traces would have been 40% more expert annotation.
 
 ## R-F1 · Structure does not degrade. The formatting worry was unfounded

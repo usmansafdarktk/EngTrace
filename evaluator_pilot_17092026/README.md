@@ -1,7 +1,7 @@
 # evaluator_pilot_17092026 — the evaluation pilot
 
 Frozen 2026-09-17. Five models answer the same 60 problems, giving **300 traces**
-that human experts then annotate step by step. Those annotations are the ground
+that domain experts then annotate step by step. Those annotations are the ground
 truth the six evaluator candidates get scored against, which is the whole point:
 until now the framework has been compared with itself.
 

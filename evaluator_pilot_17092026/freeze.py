@@ -4,7 +4,7 @@
     python -m evaluator_pilot_17092026.freeze --verify        # rebuild and compare; write nothing
     python -m evaluator_pilot_17092026.freeze --selftest      # the selection rule's own plants
 
-WHY A FREEZE.  Six evaluators get compared on this set, and human experts label
+WHY A FREEZE.  Six evaluators get compared on this set, and domain experts label
 every trace in it.  Both only mean something if the set does not move: a swapped
 item invalidates a comparison, and an edited item invalidates the labels that
 were paid for.  So the slice is chosen once, by a rule written down here, and

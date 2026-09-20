@@ -53,7 +53,7 @@ So the failure mode E4 targets — right number, wrong work — **exists but is 
 two cases in 1,141 reached milestones. That is a result, not a disappointment. It
 says E3 alone is not being fooled by copied or guessed values here, and that E4's
 extra machinery would change a score in 2 of 360 traces. Whether that stays true on
-weaker models or harder items is exactly what the robustness cohort and the human
+weaker models or harder items is exactly what the robustness cohort and the expert
 labels can test.
 
 ## The side metric, and how far to trust it
@@ -76,7 +76,7 @@ seed 7), classified by hand:
 `0.4525 × 0.089 × 80 / 100 = 0.32218` (10× too large), DeepSeek twice drops the
 factor 2 from a wetted perimeter, and GPT-5 has the sign slip above. These are
 exactly what a step-level annotator would mark "Calculation Error", so the positions
-of these flags are worth comparing with the human first-error labels in X1.
+of these flags are worth comparing with the expert first-error labels in X1.
 
 The false positives that remain, and why they were not "fixed":
 

@@ -4,7 +4,7 @@ Run 2026-09-18. **300 of 300 gold traces plus 60 Gemma-4-31B traces, $0.00, no
 model in the loop.** Scores in `scores/e3/`; the evaluator is
 `evaluators/e3_milestones.py`, the milestone rule `evaluators/milestones.py`.
 
-This is not yet a verdict on E3. That needs the human labels (X1). What it
+This is not yet a verdict on E3. That needs the expert labels (X1). What it
 establishes is that E3 is **measuring something, deterministically, at zero
 marginal cost**, and where it differs from E0.
 
@@ -105,7 +105,7 @@ adds 0.073 to real coverage for 0.021 of null.
 - **Few-milestone items are brittle.** Where the gold states only one intermediate,
   E3 reduces to a final-answer check.
 - **The alternative-path question is open.** E3 is order-free by design. Whether it
-  is *path*-free is exactly what the human labels' "correct-but-alternative-path"
+  is *path*-free is exactly what the expert labels' "correct-but-alternative-path"
   category will test.
 
 ## Why E3 is cheap to trust

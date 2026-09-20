@@ -3102,7 +3102,7 @@ reader would most want flagged.
 # The evaluator pilot (`evaluator_pilot_17092026/`)
 
 The workstream-01/04/05 pilot from `EngTrace_Suggested_Actions.pdf`: compare
-evaluator candidates E0-E5 against human labels on one frozen slice. Its record is
+evaluator candidates E0-E5 against expert labels on one frozen slice. Its record is
 [`evaluator_pilot_17092026/`](../../evaluator_pilot_17092026/) — README (setup and
 stage 1), FINDINGS (defects in the published framework), RESULTS_E0 / RESULTS_E3,
 and `analysis/` (the script behind every reported number). The decisions below are
@@ -3188,7 +3188,7 @@ If the main benchmark moves to smaller open-weight models (the supervisor's budg
 steer), an evaluator validated on the pilot's five must still function there.
 Qwen3.8-27B and Gemma-4-31B-it were added as a `robustness` cohort over the same
 frozen items. They are **not** in the labelled 300: the question is mechanical
-(step markers, parseable answers, milestones reachable) and needs no human labels,
+(step markers, parseable answers, milestones reachable) and needs no expert labels,
 while adding them would cost 40% more annotation. Result (FINDINGS R-F1, R-F2):
 structure does not degrade; runaway reasoning does.
 

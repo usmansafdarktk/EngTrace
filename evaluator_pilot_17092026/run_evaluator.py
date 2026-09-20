@@ -171,7 +171,7 @@ def cohort_keys(cohort: str) -> set:
 
     The robustness cohort exists to be checked mechanically, not to be scored
     into the comparison, and judging it would cost real money per model for
-    numbers no human label backs. Scoring it is therefore opt-in.
+    numbers no expert label backs. Scoring it is therefore opt-in.
     """
     cfg = rt.config()
     return {m['key'] for m in cfg['models']
