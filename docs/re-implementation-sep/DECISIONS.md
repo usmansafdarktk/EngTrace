@@ -3319,6 +3319,46 @@ continuous rewards are not compared with published numbers.
 95-99% of every model's steps correct. E2's score is therefore the 72B's; VersaPRM is
 reported as a negative result, not as a score.
 
+## D-091 — Commit messages are one line, and the history was rewritten to match
+
+**Date:** 2026-09-20 · **Status:** DECIDED (owner's standing preference) ·
+**Evidence:** `docs/tasks/rewrite-commit-messages.md`, `tools/remap_commit_hashes.py`,
+`tools/verify_commit_messages.py`
+
+A commit message is its subject line and nothing else: no body, no
+`Co-Authored-By` trailer. This is the convention for new commits, and the
+existing history was rewritten so the whole log reads the same way.
+
+`git filter-repo` rewrote all 17 local refs in one pass over 301 commits. The
+message callback keeps the *subject* in git's sense — the first paragraph,
+wrapped lines joined with a space — rather than the first physical line. Four
+commits had a subject that wrapped onto a second line, and taking the first
+line alone would have truncated them mid-sentence. Subjects of 100-135
+characters already existed in this history, so a joined subject is in keeping
+with it.
+
+Nothing else moved: trees, authors, committers and author dates are
+byte-identical through the commit map for all 301 commits, and the branch
+topology is unchanged (`pilot/llm-annotation-pilot` keeps its 1 own commit,
+`pilot/phase1-template-authoring` its 5, and the 14 `redesign/*` branches
+remain ancestors of `master`). 37 commits kept their hash; the rest changed.
+
+Changed hashes dangle wherever a file cites one, so `tools/remap_commit_hashes.py`
+rewrote **199 citations of 76 distinct commits across 49 tracked files** to the
+new hash of the same commit, at the same abbreviation length, as one follow-up
+commit rather than by rewriting blobs in history. Two of those citations are
+more than prose: `AUDIT_REV` in `tests/template_integrity/regen_inventory.py`
+(now `67d41f4`), which still reproduces the Phase 0 calibration 65/37/89 with
++0 deltas, and the frozen slice's provenance in
+`evaluator_pilot_17092026/slice/FREEZE.json` (now `d430246`). SHA-256 content
+digests are untouched: the scanner matches hex runs of 7-40 characters with
+hex-aware boundaries, so a 64-character digest can never match.
+
+The old history is preserved on the branch
+`backup/pre-commit-message-rewrite-20260920` (old `master` tip `2046e26`), on
+`origin` as well as locally, so every pre-rewrite hash still resolves.
+`origin/gh-pages` is separate history and was left alone.
+
 ## Open decisions
 
 | # | Decision | Needed before |
