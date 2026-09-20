@@ -2,7 +2,9 @@
 
 The PRMs run on HiPerGator GPUs (hpg/: e2_score.py, e2.sbatch; D-090). Their raw
 outputs - one probability per step per trace, from each PRM's card-specified usage
-- are downloaded to scores/e2_raw/<prm>_full.jsonl with their .meta.json. This
+- are downloaded to hpg/results/<prm>_full.jsonl with their .meta.json, beside the
+scripts that produced them. Unlike every other evaluator's output they are COMMITTED:
+regenerating them needs GPU hours on a cluster, not an API budget. This
 module turns them into harness rows, so E2 passes the same frozen-slice and
 verify_traces gates as every other evaluator and carries a config hash.
 
@@ -42,7 +44,7 @@ if os.path.join(_ROOT, 'evaluation') not in sys.path:
 
 ID = 'e2'
 DESCRIPTION = 'Open process reward models score every step (Qwen2.5-Math-PRM-72B primary; VersaPRM; 7B)'
-RAW = os.path.join(_PILOT, 'scores', 'e2_raw')
+RAW = os.path.join(_PILOT, 'hpg', 'results')
 PRMS = ('qwen72', 'versa', 'qwen7')
 PRIMARY = 'qwen72'
 VERDICT_AT = 0.5

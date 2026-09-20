@@ -10,6 +10,8 @@ and ungated, and inference happens on the node.
 | `e2_score.py` | Loads one PRM exactly as its model card specifies, runs the self-check, then scores. Records per trace: repo + pinned revision, step probabilities, token count vs context, `over_length`, `step_mismatch`, hashes. |
 | `e2.sbatch` | One PRM over the inputs (`5` = smoke, `all` = full). Weights go to node-local `/tmp` in a per-job directory that a trap deletes however the job ends (`/blue` is 99% full). |
 | `e2_diag.sbatch` | Self-check only, under each attention implementation; used to diagnose the Qwen-72B card mismatch below. |
+| `results/` | **The PRM outputs themselves**, one row per trace per PRM, with each run's `.meta.json`. Committed, unlike every other evaluator's output: regenerating them needs cluster GPU hours rather than an API budget. `evaluators/e2_prm.py` reads them. |
+| `logs/` | Every Slurm job log, including the failed smoke attempts, and the self-check metadata of the diagnostic runs. The smoke log below is read off these. |
 
 Files reach the cluster as base64 heredocs piped through the already-open SSH control
 connection (`ssh -O proxy hpg`), and are checked by md5 on both ends.

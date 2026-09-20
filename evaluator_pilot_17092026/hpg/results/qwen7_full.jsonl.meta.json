@@ -1,0 +1,56 @@
+{
+  "prm": "qwen7",
+  "repo": "Qwen/Qwen2.5-Math-PRM-7B",
+  "revision": "0610740060112df12585d00a1c5f4624d2f59051",
+  "max_len": 4096,
+  "attn_implementation": "eager",
+  "base": null,
+  "rotary_inv_freq_dtype": [
+    "torch.float32"
+  ],
+  "load_seconds": 38.5,
+  "versions": {
+    "python": "3.12.3",
+    "torch": "2.13.0+cu130",
+    "cuda": "13.0",
+    "gpus": [
+      "NVIDIA RTX PRO 6000 Blackwell Server Edition"
+    ],
+    "transformers": "4.46.3",
+    "peft": null,
+    "accelerate": "1.14.0",
+    "huggingface_hub": "0.36.0",
+    "safetensors": "0.8.0",
+    "tokenizers": "0.20.3"
+  },
+  "scorer_md5": "7b5ae345175aefae2154af4e826f13d3",
+  "slurm_job": "42710460",
+  "host": "c0801a-s21.ufhpc",
+  "selfcheck": {
+    "prm": "qwen7",
+    "got": [
+      0.9997305274009705,
+      0.18713268637657166,
+      0.9793540239334106,
+      0.9998205304145813
+    ],
+    "n_steps": 4,
+    "n_tokens": 454,
+    "got_bf16_softmax": [
+      1.0,
+      0.1875,
+      0.98046875,
+      1.0
+    ],
+    "expected": [
+      1.0,
+      0.1904296875,
+      0.9765625,
+      1.0
+    ],
+    "max_abs_diff": 0.0032970011234283447,
+    "verdicts_match": true,
+    "within_tol": true,
+    "passed": true
+  }
+}

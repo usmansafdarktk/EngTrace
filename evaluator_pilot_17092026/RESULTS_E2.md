@@ -5,7 +5,8 @@ PRMs**, **no API calls, $0**. Traces over a PRM's context limit are not scored:
 2 for each Qwen PRM, both DeepSeek-R1, and 0 for VersaPRM. There were 0 step-count
 mismatches. The GPU runs are `hpg/` (setup, smoke log, diagnosis: [hpg/README.md](hpg/README.md)).
 The harness evaluator is `evaluators/e2_prm.py`, and every figure is printed by
-`analysis/e2_analysis.py`.
+`analysis/e2_analysis.py`. The PRM outputs are committed in `hpg/results/` and the
+job logs in `hpg/logs/`.
 
 ## How it works
 
