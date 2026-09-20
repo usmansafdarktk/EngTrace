@@ -23,7 +23,7 @@ branches.
 | 2 · E1, non-suite judge panel | done ([RESULTS_E1](RESULTS_E1.md)) | $4.38 (+ probe $3) |
 | 2 · E5, E3 first, a judge on the residuals | done ([RESULTS_E5](RESULTS_E5.md)) | $0.47 (+ $0.43 judge validation) |
 | 2 · E2, open process reward models on GPUs | done ([RESULTS_E2](RESULTS_E2.md)) | $0.00 (70 GPU-min, HiPerGator) |
-| 3 · expert annotation of the 300 | not started; independent of stage 2 | — |
+| 3 · expert annotation of the 300 | package ready ([annotation/](annotation/README.md)): app, guide, scoring; awaiting 15 experts | — |
 
 **Read these first:** [FINDINGS.md](FINDINGS.md) (seven defects in the published
 framework, plus the robustness cohort), [RESULTS_E0.md](RESULTS_E0.md),
@@ -39,6 +39,7 @@ evaluator_pilot_17092026/
   FINDINGS.md        defects in the published framework; robustness cohort results
   RESULTS_E0.md      E0 and E0-3J
   RESULTS_E2.md      E2, the three open PRMs (GPU runs and their smoke log: hpg/)
+  annotation/        stage 3: the expert annotation app, guide and scoring
   RESULTS_E3.md      E3, its null baseline, where it disagrees with E0
   freeze.py          cuts and pins the slice; --verify fails if anything drifts
   run_traces.py      models over the slice; resumable, --check first

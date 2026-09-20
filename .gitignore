@@ -49,3 +49,9 @@ scratch/
 docs/references/**/*.pdf
 docs/references/**/*.zip
 docs/references/**/*.xlsx
+
+# Stage 3 annotation: tasks are rebuilt by build_tasks.py, labels are produced data
+# (and labels_simulated is synthetic). The scripts, the guide and its PDF are committed.
+evaluator_pilot_17092026/annotation/tasks/
+evaluator_pilot_17092026/annotation/labels/
+evaluator_pilot_17092026/annotation/labels_simulated/

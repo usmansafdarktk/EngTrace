@@ -1,0 +1,20 @@
+{
+  "_comment": "The 15 experts, 3 per branch. Replace name/email as people are recruited; ids are stable and appear in every label row. Rebuild tasks after editing: python build_tasks.py",
+  "annotators": [
+    {"id": "che-1", "name": "", "email": "", "branch": "chemical_engineering"},
+    {"id": "che-2", "name": "", "email": "", "branch": "chemical_engineering"},
+    {"id": "che-3", "name": "", "email": "", "branch": "chemical_engineering"},
+    {"id": "civ-1", "name": "", "email": "", "branch": "civil_engineering"},
+    {"id": "civ-2", "name": "", "email": "", "branch": "civil_engineering"},
+    {"id": "civ-3", "name": "", "email": "", "branch": "civil_engineering"},
+    {"id": "ele-1", "name": "", "email": "", "branch": "electrical_engineering"},
+    {"id": "ele-2", "name": "", "email": "", "branch": "electrical_engineering"},
+    {"id": "ele-3", "name": "", "email": "", "branch": "electrical_engineering"},
+    {"id": "ind-1", "name": "", "email": "", "branch": "industrial_engineering"},
+    {"id": "ind-2", "name": "", "email": "", "branch": "industrial_engineering"},
+    {"id": "ind-3", "name": "", "email": "", "branch": "industrial_engineering"},
+    {"id": "mec-1", "name": "", "email": "", "branch": "mechanical_engineering"},
+    {"id": "mec-2", "name": "", "email": "", "branch": "mechanical_engineering"},
+    {"id": "mec-3", "name": "", "email": "", "branch": "mechanical_engineering"}
+  ]
+}
