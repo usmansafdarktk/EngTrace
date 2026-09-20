@@ -56,7 +56,7 @@ in the app.
 | `guide.md`, `make_guide_pdf.py` | The annotator guide and its typesetter. |
 | `score_against_labels.py` | Ground truth by majority, agreement (Fleiss κ), then scores every evaluator: **step level** (E2's PRMs), **milestone level** (E3/E4/E5), **trace level** (all of them, plus their final-answer checks). |
 
-`tasks/`, `labels/` and `labels_simulated/` hold produced data and are not committed,
+`tasks/` (including `tasks/workbooks/`), `labels/` and `labels_simulated/` hold produced data and are not committed,
 like `traces/` and `scores/`.
 
 ## Running it
@@ -65,7 +65,13 @@ like `traces/` and `scores/`.
 cd evaluator_pilot_17092026
 .venv/Scripts/python annotation/build_tasks.py          # after editing annotators.json
 .venv/Scripts/python annotation/make_guide_pdf.py       # after editing guide.md
+.venv/Scripts/python annotation/workbooks.py export     # workbooks for the file route
 .venv/Scripts/streamlit run annotation/app.py           # the app the experts use
+
+# a returned workbook: validate, then load (import skips anything still invalid)
+.venv/Scripts/python annotation/workbooks.py check  annotation/tasks/workbooks/civ-2.json
+.venv/Scripts/python annotation/workbooks.py import annotation/tasks/workbooks/civ-2.json
+
 .venv/Scripts/python annotation/score_against_labels.py            # once labels exist
 .venv/Scripts/python annotation/score_against_labels.py --simulate # pipeline test
 ```
