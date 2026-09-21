@@ -29,6 +29,7 @@ so on a fresh clone these scripts need the runs regenerated first
 | `e1_panel_check.py` | the E1 panel's availability on OpenRouter (listing, endpoints, live JSON call) and E1's cost from probe token usage | JUDGE_SELECTION; E1 cost estimate |
 | `e1_analysis.py` | E1 run health, E1 vs E0 and E0-3J, inter-judge agreement (Cohen's and Fleiss' kappa) for both panels | RESULTS_E1; FINDINGS E0-F8 |
 | `e5_analysis.py validate / report` | the E5 judge's validity on known answers (paid, ~$0.43), then E5 against E3, E4 and E0 | RESULTS_E5 |
+| `x1_analysis.py` | every evaluator against the expert labels: trace-level AUROC with bootstrap intervals and baselines, the correct-answer hard case, step level, per model, without chemical engineering | RESULTS_X1 |
 | `e2_analysis.py` | the three PRMs on the probe's known-label steps, per model, their agreement, and against E0/E3/E5 | RESULTS_E2 |
 | `roster_cost.py` | per-model cost of the full 2,250-item benchmark under E0 | conversation with supervisor; roster planning |
 | `model_health.py` | every pilot model listed, un-deprecated, served, answering (makes live calls, ~$0.01) | README §The five models |

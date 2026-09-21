@@ -319,9 +319,10 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--simulate', action='store_true',
                     help='generate synthetic labels and run on them, to test the pipeline')
+    ap.add_argument('--labels', default=LABELS, help='directory of <annotator>.jsonl label files')
     a = ap.parse_args()
 
-    src = simulate() if a.simulate else LABELS
+    src = simulate() if a.simulate else a.labels
     labels = read_labels(src)
     if not labels:
         raise SystemExit('no labels in %s yet' % src)

@@ -23,11 +23,12 @@ branches.
 | 2 · E1, non-suite judge panel | done ([RESULTS_E1](RESULTS_E1.md)) | $4.38 (+ probe $3) |
 | 2 · E5, E3 first, a judge on the residuals | done ([RESULTS_E5](RESULTS_E5.md)) | $0.47 (+ $0.43 judge validation) |
 | 2 · E2, open process reward models on GPUs | done ([RESULTS_E2](RESULTS_E2.md)) | $0.00 (70 GPU-min, HiPerGator) |
-| 3 · expert annotation of the 300 | package ready ([annotation/](annotation/README.md)): app, guide, scoring; awaiting 15 experts | — |
+| 3 · expert annotation of the 300 | done: 15 experts, 3 per trace ([annotation/](annotation/README.md)) | — |
+| X1 · every evaluator against the expert labels | done ([RESULTS_X1](RESULTS_X1.md)) | $0.00 |
 
 **Read these first:** [FINDINGS.md](FINDINGS.md) (seven defects in the published
 framework, plus the robustness cohort), [RESULTS_E0.md](RESULTS_E0.md),
-[RESULTS_E3.md](RESULTS_E3.md), [RESULTS_E4.md](RESULTS_E4.md), [RESULTS_E1.md](RESULTS_E1.md), [RESULTS_E5.md](RESULTS_E5.md), [RESULTS_E2.md](RESULTS_E2.md), and the pilot's decisions D-078 to D-090 in
+[RESULTS_E3.md](RESULTS_E3.md), [RESULTS_E4.md](RESULTS_E4.md), [RESULTS_E1.md](RESULTS_E1.md), [RESULTS_E5.md](RESULTS_E5.md), [RESULTS_E2.md](RESULTS_E2.md), [RESULTS_X1.md](RESULTS_X1.md), and the pilot's decisions D-078 to D-090 in
 [DECISIONS.md](../docs/re-implementation-sep/DECISIONS.md). Every number in them is
 reproduced by a script in [analysis/](analysis/README.md).
 
