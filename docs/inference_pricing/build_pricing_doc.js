@@ -3,12 +3,10 @@
 //   npm install docx            (once, anywhere on NODE_PATH)
 //   node build_pricing_doc.js   -> EngTrace-inference-pricing.docx beside this script
 //
-// Prices are per million tokens, read on OpenRouter 19-21 September 2026. The two cost
-// columns use EngTrace's own token counts, measured on the evaluator pilot's traces
-// (evaluator_pilot_17092026/analysis/inference_cost.py):
-//   direct answer        318 input / 813 output tokens per item (pilot's non-reasoning models)
-//   reasons like GPT-5   270 input / 5,232 output tokens per item (GPT-5, reasoning included)
-// for the full benchmark of 150 templates x 15 instances = 2,250 items, no retries.
+// Prices are per million tokens, read on OpenRouter 19-21 September 2026. The cost column
+// assumes every model writes as much as GPT-5 did on the evaluator pilot - 270 input and
+// 5,232 output tokens per problem, reasoning included (evaluator_pilot_17092026/analysis/
+// inference_cost.py) - over 150 templates x 15 instances = 2,250 runs per model, no retries.
 
 const fs = require('fs');
 const path = require('path');
@@ -18,7 +16,6 @@ const {
 } = require('docx');
 
 const ITEMS = 2250;
-const DIRECT = { in: 318, out: 813 };
 const REASON = { in: 270, out: 5232 };
 
 const GROUPS = [
@@ -55,7 +52,7 @@ const MUTED = '5B6472';
 const ACCENT = '1B3A5C';
 const HEAD_FILL = 'E8EDF3';
 const ZEBRA = 'F7F9FB';
-const W = [3060, 1200, 1200, 1950, 1950];          // sums to 9360 = US Letter minus 1" margins
+const W = [4560, 1500, 1500, 1800];                 // sums to 9360 = US Letter minus 1" margins
 const border = { style: BorderStyle.SINGLE, size: 4, color: 'D5DBE3' };
 const borders = { top: border, bottom: border, left: border, right: border };
 
@@ -77,13 +74,13 @@ function cell(text, i, o = {}) {
 
 function table(rows, dp) {
   const head = new TableRow({ tableHeader: true, cantSplit: true, children: [
-    'Model', 'Input $/M', 'Output $/M', 'Direct answer', 'Reasons like GPT-5',
+    'Model', 'Input $/M', 'Output $/M', 'Est. cost',
   ].map((h, i) => cell(h, i, { bold: true, fill: HEAD_FILL, size: 18, color: ACCENT, keepNext: true })) });
   const body = rows.map((r, k) => {
     const o = { fill: k % 2 ? ZEBRA : undefined, keepNext: k < rows.length - 1 };
     return new TableRow({ cantSplit: true, children: [
       cell(r[0], 0, o), cell(price(r[1], dp), 1, o), cell(price(r[2], dp), 2, o),
-      cell(money(cost(r, DIRECT)), 3, o), cell(money(cost(r, REASON)), 4, { ...o, bold: true }),
+      cell(money(cost(r, REASON)), 3, { ...o, bold: true }),
     ] });
   });
   return new Table({ width: { size: 9360, type: WidthType.DXA }, columnWidths: W, rows: [head, ...body] });
@@ -95,25 +92,7 @@ const bullet = (children) => new Paragraph({ numbering: { reference: 'dots', lev
 const children = [
   new Paragraph({ heading: HeadingLevel.TITLE, spacing: { after: 60 },
     children: [new TextRun({ text: 'EngTrace inference pricing', font: FONT, size: 44, bold: true, color: INK })] }),
-  para([run('Model prices per million tokens and the estimated cost of one full benchmark run', { color: MUTED, size: 22 })], { after: 60 }),
-  para([run('Prices read on OpenRouter, 19–21 September 2026', { color: MUTED, size: 18, italics: true })], { after: 280 }),
-
-  para([run('The tables list each model’s input and output price. The last two columns estimate what '),
-    run('one full EngTrace run', { bold: true }),
-    run(' costs for that model: 150 templates × 15 instances = 2,250 items, inference only, no evaluation. '
-      + 'They use token counts measured on EngTrace’s own evaluator pilot, because a model’s cost '
-      + 'depends on how much it writes, and that is not known in advance for a new model:')]),
-  bullet([run('Direct answer: ', { bold: true }), run('about 318 input and 813 output tokens per item, the average of the pilot’s non-reasoning models.')]),
-  bullet([run('Reasons like GPT-5: ', { bold: true }), run('about 270 input and 5,232 output tokens per item, GPT-5’s measured average including its reasoning.')]),
-  para([run('A model’s real cost will usually fall between the two. The heaviest reasoner in the pilot, '
-    + 'DeepSeek-R1, wrote about 10,000 output tokens per item, roughly twice the second column.')], { before: 60 }),
-
-  new Paragraph({ heading: HeadingLevel.HEADING_2, spacing: { before: 240, after: 100 },
-    children: [new TextRun({ text: 'Two things to watch', font: FONT, size: 26, bold: true, color: ACCENT })] }),
-  bullet([run('Output is where the money goes for reasoning models. ', { bold: true }),
-    run('Output prices are four to eight times input, and engineering problems produce long reasoning, so the cost tracks how much each model writes.')]),
-  bullet([run('OpenRouter prices move between upstreams from day to day. ', { bold: true }),
-    run('These were read around 19 to 21 September 2026 and should be re-read before the run.')]),
+  para([run('Inference is each model solving every EngTrace problem once: 150 templates × 15 instances = 2,250 runs per model.', { color: MUTED, size: 21 })], { after: 200 }),
 ];
 
 for (const [title, note, rows] of GROUPS) {
@@ -128,10 +107,10 @@ children.push(
   para([run('† Retires before publication: gpt-5, gpt-5-mini and gpt-5-nano on 11 December 2026; the Gemini 2.5 models from 20 October 2026.', { size: 18, color: MUTED })], { before: 200 }),
   new Paragraph({ heading: HeadingLevel.HEADING_2, spacing: { before: 240, after: 100 },
     children: [new TextRun({ text: 'How the estimates are made', font: FONT, size: 26, bold: true, color: ACCENT })] }),
-  bullet([run('Cost = 2,250 × (input tokens × input price + output tokens × output price) ÷ 1,000,000.')]),
-  bullet([run('Token counts come from the pilot’s answers to 60 items covering all five branches and all three difficulty levels, under the benchmark’s own prompt.')]),
-  bullet([run('Re-runs after truncated or failed answers are not included; the pilot needed 0–15% extra for most models and up to 45% for a model whose reasoning ran away.')]),
-  bullet([run('Half-price batch endpoints, where a provider offers them, would roughly halve the frontier rows.')]),
+  bullet([run('Est. cost = 2,250 × (input tokens × input price + output tokens × output price) ÷ 1,000,000, the full cost of all 2,250 runs.')]),
+  bullet([run('It assumes each model writes as much as GPT-5 did in EngTrace’s evaluator pilot: about 270 input and 5,232 output tokens per problem, reasoning included. A model that answers without reasoning writes about 800 output tokens and would cost roughly a sixth of the figure shown.')]),
+  bullet([run('Not included: re-runs of truncated or failed answers (0–15% extra for most models in the pilot) and half-price batch endpoints.')]),
+  bullet([run('Prices as read on OpenRouter, 19–21 September 2026; they move between upstreams from day to day.')]),
 );
 
 const doc = new Document({
