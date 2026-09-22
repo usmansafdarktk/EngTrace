@@ -12,7 +12,7 @@ const fs = require('fs');
 const path = require('path');
 const {
   Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell, WidthType,
-  ShadingType, AlignmentType, HeadingLevel, BorderStyle, LevelFormat, Footer, PageNumber,
+  ShadingType, AlignmentType, HeadingLevel, BorderStyle, Footer, PageNumber,
 } = require('docx');
 
 const ITEMS = 2250;
@@ -36,8 +36,9 @@ const GROUPS = [
 ];
 
 const cost = (p, t) => ITEMS * (t.in * p[1] + t.out * p[2]) / 1e6;
-const money = (v) => '$' + (v < 10 ? v.toFixed(2) : v.toFixed(0));
-// Prices exactly as quoted: three decimals for the open-weight list, two elsewhere.
+// To the cent throughout, so each table's rows add up to its total exactly.
+const money = (v) => '$' + v.toFixed(2);
+// Prices exactly as quoted: three decimals for the open-source list, two for frontier.
 const price = (v, dp) => v.toFixed(dp);
 
 const FONT = 'Calibri';
@@ -56,7 +57,6 @@ const para = (children, o = {}) => new Paragraph({ children, spacing: { after: o
   alignment: o.align, keepNext: o.keepNext });
 
 function cell(text, i, o = {}) {
-  // keepNext on every row but the last keeps a table on one page (Word honours it per paragraph)
   return new TableCell({
     borders, width: { size: W[i], type: WidthType.DXA },
     shading: o.fill ? { fill: o.fill, type: ShadingType.CLEAR, color: 'auto' } : undefined,
@@ -66,6 +66,7 @@ function cell(text, i, o = {}) {
   });
 }
 
+// keepNext on the header and every model row keeps each table, total included, on one page.
 function table(rows, dp) {
   const head = new TableRow({ tableHeader: true, cantSplit: true, children: [
     'Model', 'Input $/M', 'Output $/M', 'Est. cost',
@@ -85,13 +86,16 @@ function table(rows, dp) {
   return new Table({ width: { size: 9360, type: WidthType.DXA }, columnWidths: W, rows: [head, ...body, foot] });
 }
 
-const bullet = (children) => new Paragraph({ numbering: { reference: 'dots', level: 0 }, children,
-  spacing: { after: 90 } });
-
 const children = [
   new Paragraph({ heading: HeadingLevel.TITLE, spacing: { after: 60 },
     children: [new TextRun({ text: 'EngTrace inference pricing', font: FONT, size: 44, bold: true, color: INK })] }),
-  para([run('Inference is each model solving every EngTrace problem once: 150 templates × 15 instances = 2,250 runs per model.', { color: MUTED, size: 21 })], { after: 200 }),
+  para([run('Inference is each model solving every EngTrace problem once; evaluating the answers is not included. '
+    + 'EngTrace covers five engineering branches (chemical, civil, electrical, industrial and mechanical), each with '
+    + '30 problem templates. Every template is instantiated 15 times with different sampled values, giving '
+    + '5 × 30 × 15 = 2,250 problems (870 easy, 870 intermediate, 510 advanced), so each model makes 2,250 runs. '
+    + 'The estimated cost is the total over those runs, assuming each model writes as much as GPT-5 did in '
+    + 'EngTrace’s evaluator pilot: about 270 input and 5,232 output tokens per problem, reasoning included.',
+    { color: MUTED, size: 21 })], { after: 200 }),
 ];
 
 for (const [title, note, dp, rows] of GROUPS) {
@@ -101,12 +105,9 @@ for (const [title, note, dp, rows] of GROUPS) {
   children.push(table(rows, dp));
 }
 
-
 const doc = new Document({
   creator: 'EngTrace', title: 'EngTrace inference pricing',
   styles: { default: { document: { run: { font: FONT, size: 20 } } } },
-  numbering: { config: [{ reference: 'dots', levels: [{ level: 0, format: LevelFormat.BULLET, text: '•',
-    alignment: AlignmentType.LEFT, style: { paragraph: { indent: { left: 460, hanging: 260 } } } }] }] },
   sections: [{
     properties: { page: { size: { width: 12240, height: 15840 }, margin: { top: 1300, bottom: 1300, left: 1440, right: 1440 } } },
     footers: { default: new Footer({ children: [new Paragraph({ alignment: AlignmentType.RIGHT, children: [
