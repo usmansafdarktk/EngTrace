@@ -59,3 +59,6 @@ evaluator_pilot_17092026/annotation/dist/
 
 # The experts' filled labels stay local only; they are never committed.
 evaluator_pilot_17092026/experts_filled_labels/
+
+# Mining output, rebuilt by hard_case_pool.py.
+evaluator_pilot_17092026/analysis/out/

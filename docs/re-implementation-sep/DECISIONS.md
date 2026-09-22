@@ -3359,6 +3359,39 @@ The old history is preserved on the branch
 `origin` as well as locally, so every pre-rewrite hash still resolves.
 `origin/gh-pages` is separate history and was left alone.
 
+## D-091 — The hard case is scored on the step labels, not on a second labelling round
+
+**Date:** 2026-09-23 · **Status:** DECIDED · **Evidence:**
+`evaluator_pilot_17092026/analysis/hard_case_pool.py`
+
+A reasoning evaluator earns its keep on traces whose final answer is right but whose
+reasoning is not. X1 could not run that comparison: of the 228 correct-answer traces
+the experts' holistic verdict calls only 3 unsound. The plan was a second round —
+generate traces from weaker models, mine them, have the experts label them.
+
+The labels already hold the set. The experts' own step labels mark at least one step
+incorrect in **56** of those 228 traces (102 steps), and call 53 of those same traces
+sound overall. The trace-level target, not the data, was hiding the hard case. So the
+hard case is scored as "does this trace contain an incorrect step, given the answer is
+correct", and no new traces are generated or labelled.
+
+The result on that target is negative and worth reporting as such: no evaluator beats
+E0 (best is E2's 72B minimum reward, 0.601 against 0.545, CI of the difference
+-0.041 to +0.166), and E3, E4 and E5 are significantly *worse* than E0 — they score a
+trace by milestones the answer already implies. Every AUROC sits near chance.
+
+A second round was also costed and rejected on its own terms. The signals that would
+select candidates barely enrich: the 72B's minimum reward under 0.20 yields 28%
+against a 25% base rate (1.16x), a failed arithmetic claim yields 33% at n=12. At
+those rates ~170 new traces must be labelled to add ~50 hard cases, and the resulting
+intervals (±0.06 instead of ±0.085) would not change the conclusion. 101 of the 102
+incorrect steps are calculation slips, one is conceptual, so the population being
+bought is mostly arithmetic noise that leaves the answer intact.
+
+The candidate miner stays in the script for the record: 87 unlabelled robustness-cohort
+traces (gemma-4-31b, qwen3.8-27b) pass a deterministic answer check, 36 of them fire at
+least one signal. Re-run it if a later round is ever funded.
+
 ## Open decisions
 
 | # | Decision | Needed before |
