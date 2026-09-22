@@ -1,5 +1,47 @@
 import random
+import math
+from decimal import Decimal, ROUND_HALF_UP
 from data.templates.branches.chemical_engineering.constants import GENERAL_REACTANTS, LIQUID_PHASE_REACTANTS, GAS_PHASE_REACTANTS, PRODUCTS, REACTIONS
+
+
+def _hu(x, places):
+    """Round half-up to `places` dp, resolving the tie in DECIMAL.
+
+    `round()` resolves a half-way tie on the binary value and disagrees with a
+    reader doing decimal arithmetic (spec P2 as amended, DECISIONS D-012).
+    """
+    q = Decimal(1).scaleb(-places)
+    d = x if isinstance(x, Decimal) else Decimal(repr(x))
+    v = d.quantize(q, rounding=ROUND_HALF_UP)
+    return int(v) if places == 0 else float(v)
+
+
+def _as_printed(x, spec):
+    """The value a reader recovers from `x` when it is printed with `spec`.
+
+    P2 asks that the stored value and the printed value be the SAME value.
+    Rounding alone does not achieve that: a float one ulp away from its own
+    printed form puts the template and the reader on opposite sides of a
+    display tie (D-016 part 2).
+    """
+    return float(format(x, spec))
+
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where no rounding convention is defensible - a
+    decimal reader applying half-up and a binary reader applying `round()`
+    disagree, and the printed line closes for only one of them. Such instances
+    are resampled rather than resolved (D-016).
+
+    A narrow BAND is quarantined rather than a point, because two independent
+    evaluations of the same exact quantity differ by a few ulps and an exact
+    rational tie lands on opposite sides of them.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
 
 
 # Template 1 (Easy)
@@ -17,6 +59,18 @@ def template_batch_moles_vs_conversion():
             $N_A = N_{A0}(1 - X_A)$
             $N_B = N_{B0} - (b/a)N_{A0}X_A$
             $N_C = N_{C0} + (c/a)N_{A0}X_A$
+
+    Trace integrity (Layer 0, 2026-09-23):
+        The consumed products (b/a)*N_A0*X_A are the products the solution
+        PRINTS: each is bound through its 3-dp display before N_B is formed
+        from it, so `N_B0 - <printed product> = <printed N_B>` closes for
+        every reader (D-016 part 2); before, N_B was computed from the
+        unrounded product and the line missed by 0.001 on 3.4% of draws. The
+        products themselves are exact at 4 dp (6 dp for the ammonia
+        reaction), so their 3-dp display, like the 3-dp display of every
+        answer, still sits on a half-way tie for a fixed fraction of draws;
+        removing that requires lengthening the ANSWER display, which is a
+        P6 change needing sign-off (D-044) and is recorded, not done, here.
 
     Returns:
         tuple: A tuple containing:
@@ -60,9 +114,17 @@ def template_batch_moles_vs_conversion():
 
     # 2. Core Calculations
     N_A = N_A0 * (1 - X_A)
-    N_B = N_B0 - (b / a) * N_A0 * X_A
-    N_C = N_C0 + (c / a) * N_A0 * X_A
-    N_D = N_D0 + (d / a) * N_A0 * X_A if has_product_D else 0.0
+    # The stoichiometric products are PRINTED at 3 dp and then consumed, so
+    # each is bound through that display first and N_B is formed from the
+    # printed product (D-016 part 2). Only prod_B is consumed downstream; C
+    # and D are bound the same way so every printed intermediate is the value
+    # the trace used.
+    prod_B = _as_printed((b / a) * N_A0 * X_A, '.3f')
+    prod_C = _as_printed((c / a) * N_A0 * X_A, '.3f')
+    prod_D = _as_printed((d / a) * N_A0 * X_A, '.3f') if has_product_D else 0.0
+    N_B = _as_printed(N_B0 - prod_B, '.3f')
+    N_C = _as_printed(N_C0 + prod_C, '.3f')
+    N_D = _as_printed(N_D0 + prod_D, '.3f') if has_product_D else 0.0
 
     # 3. Generate Question and Solution Strings
     question = (
@@ -99,26 +161,26 @@ def template_batch_moles_vs_conversion():
         f"For {reactant_A_name} (A):\n"
         f"$N_A = {N_A0}(1 - {X_A}) = {N_A0}({1-X_A:.2f}) = {round(N_A, 3)}$ mol\n\n"
         f"For {reactant_B_name} (B):\n"
-        f"$N_B = {N_B0} - ({b}/{a}) \\times {N_A0} \\times {X_A} = {N_B0} - {round((b/a)*N_A0*X_A, 3)} = {round(N_B, 3)}$ mol\n\n"
+        f"$N_B = {N_B0} - ({b}/{a}) \\times {N_A0} \\times {X_A} = {N_B0} - {prod_B} = {N_B}$ mol\n\n"
         f"For {product_C_name} (C):\n"
-        f"$N_C = 0 + ({c}/{a}) \\times {N_A0} \\times {X_A} = {round((c/a)*N_A0*X_A, 3)} = {round(N_C, 3)}$ mol\n\n"
+        f"$N_C = 0 + ({c}/{a}) \\times {N_A0} \\times {X_A} = {prod_C} = {N_C}$ mol\n\n"
     )
     
     if has_product_D:
         solution += (
             f"For {product_D_name} (D):\n"
-            f"$N_D = 0 + ({d}/{a}) \\times {N_A0} \\times {X_A} = {round((d/a)*N_A0*X_A, 3)} = {round(N_D, 3)}$ mol\n\n"
+            f"$N_D = 0 + ({d}/{a}) \\times {N_A0} \\times {X_A} = {prod_D} = {N_D}$ mol\n\n"
         )
         
     solution += (
         f"**Answer:**\n"
         f"After reaching a conversion of ${X_A*100} \\%$, the final number of moles in the reactor are:\n"
         f"- {reactant_A_name}: ${round(N_A, 3)}$ mol\n"
-        f"- {reactant_B_name}: ${round(N_B, 3)}$ mol\n"
-        f"- {product_C_name}: ${round(N_C, 3)}$ mol\n"
+        f"- {reactant_B_name}: ${N_B}$ mol\n"
+        f"- {product_C_name}: ${N_C}$ mol\n"
     )
     if has_product_D:
-        solution += f"- {product_D_name}: ${round(N_D, 3)}$ mol"
+        solution += f"- {product_D_name}: ${N_D}$ mol"
 
     return question, solution
 

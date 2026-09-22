@@ -1,8 +1,60 @@
 import random
 import numpy as np
 import math
+from decimal import Decimal, ROUND_HALF_UP
 from data.templates.branches.chemical_engineering.constants import GAS_PHASE_REACTANTS, THERMO_SUBSTANCES, CRITICAL_PROPERTIES, REAL_FLUID_DATA
 from data.templates.branches._emission import signed_term, joined_terms, paren_neg
+
+
+def _hu(x, places):
+    """Round half-up to `places` dp, resolving the tie in DECIMAL.
+
+    `round()` resolves a half-way tie on the binary value and disagrees with a
+    reader doing decimal arithmetic (spec P2 as amended, DECISIONS D-012).
+    """
+    q = Decimal(1).scaleb(-places)
+    d = x if isinstance(x, Decimal) else Decimal(repr(x))
+    v = d.quantize(q, rounding=ROUND_HALF_UP)
+    return int(v) if places == 0 else float(v)
+
+
+def _as_printed(x, spec):
+    """The value a reader recovers from `x` when it is printed with `spec`.
+
+    P2 asks that the stored value and the printed value be the SAME value.
+    Rounding alone does not achieve that: a float one ulp away from its own
+    printed form puts the template and the reader on opposite sides of a
+    display tie (D-016 part 2).
+    """
+    return float(format(x, spec))
+
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where no rounding convention is defensible - a
+    decimal reader applying half-up and a binary reader applying `round()`
+    disagree, and the printed line closes for only one of them. Such instances
+    are resampled rather than resolved (D-016).
+
+    A narrow BAND is quarantined rather than a point, because two independent
+    evaluations of the same exact quantity differ by a few ulps and an exact
+    rational tie lands on opposite sides of them.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
+
+
+def _decimals(x):
+    """Decimal places of the shortest decimal that round-trips `x`.
+
+    0.1 -> 1, 0.012 -> 3, 4.003 -> 3, 32.0 -> 0. Used to print a quantity
+    built from table values at the precision it actually has (D-037), never
+    coarser.
+    """
+    exponent = Decimal(repr(float(x))).normalize().as_tuple().exponent
+    return max(0, -exponent)
 
 
 # Template 1 (Easy)
@@ -350,6 +402,20 @@ def template_pitzer_correlation_z():
         - omega: Acentric factor
         - B0, B1: Second virial coefficients
 
+    Trace integrity (Layer 0, 2026-09-23):
+        The sampler still CHOOSES reduced conditions to place the instance in
+        the gas phase at low-moderate pressure, but the question states T and
+        P, so Tr and Pr are recomputed FORWARD from the stated values at the
+        4 dp the solution prints them with; the sampled pre-image used to be
+        printed (Tr = 1.986 where 10.33 K / 5.2 K gives 1.9865). Every
+        intermediate that is printed and then consumed - B0, B1, Pr/Tr and Z
+        at 4 dp - is bound through its display first, so the molar volume is
+        computed from the stated Z (D-016 part 2). B0 + omega*B1 is exact at
+        4 + dec(omega) dp for every draw and is printed at that length, so it
+        never rounds (D-037, D-044); Pr/Tr is a quotient whose 4-dp display
+        can sit exactly on a tie only for a terminating Tr, and such a draw is
+        redrawn (D-016, D-045).
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking to compute the compressibility factor.
@@ -358,26 +424,50 @@ def template_pitzer_correlation_z():
     # 1. Parameterize the inputs
     R = 0.08314  # L·bar/(mol·K)
 
-    substance_name = random.choice(list(CRITICAL_PROPERTIES.keys()))
-    properties = CRITICAL_PROPERTIES[substance_name]
-    Tc = properties["Tc"]
-    Pc = properties["Pc"]
-    omega = properties["omega"]
+    for _attempt in range(200):
+        substance_name = random.choice(list(CRITICAL_PROPERTIES.keys()))
+        properties = CRITICAL_PROPERTIES[substance_name]
+        Tc = properties["Tc"]
+        Pc = properties["Pc"]
+        omega = properties["omega"]
 
-    # Generate random T and P in the gas phase (Tr > 1) and at low-moderate pressure
-    Tr = round(random.uniform(1.1, 3.0), 3)
-    Pr = round(random.uniform(0.1, 2.0), 3)
-    T = round(Tr * Tc, 2)
-    P = round(Pr * Pc, 2)
+        # Generate random T and P in the gas phase (Tr > 1) and at low-moderate
+        # pressure. The question states T and P, so Tr and Pr are recomputed
+        # FORWARD from the stated values at the 4 dp the solution prints them
+        # with; the sampled pre-image no longer reaches the solution (it used
+        # to: `Tr = 1.986` was printed where 10.33 K / 5.2 K gives 1.9865).
+        Tr_sampled = round(random.uniform(1.1, 3.0), 3)
+        Pr_sampled = round(random.uniform(0.1, 2.0), 3)
+        T = round(Tr_sampled * Tc, 2)
+        P = round(Pr_sampled * Pc, 2)
+        Tr = _as_printed(T / Tc, '.4f')
+        Pr = _as_printed(P / Pc, '.4f')
 
-    # 2. Perform the core calculation
-    # Calculate virial coefficients
-    B0 = 0.083 - 0.422 / (Tr**1.6)
-    B1 = 0.139 - 0.172 / (Tr**4.2)
-    # Calculate compressibility factor
-    Z = 1 + (Pr / Tr) * (B0 + omega * B1)
-    # Optional extension: Calculate molar volume
-    V = (Z * R * T) / P
+        # 2. Perform the core calculation. Every intermediate that is printed
+        # and then consumed is bound through its own display first, so the
+        # next line is computed from the operands the reader sees (D-016).
+        B0 = _as_printed(0.083 - 0.422 / (Tr**1.6), '.4f')
+        B1 = _as_printed(0.139 - 0.172 / (Tr**4.2), '.4f')
+        # Pr/Tr is a quotient; its 4-dp display sits exactly on a half-way tie
+        # only when Tr terminates (T = 2.0000 Tc, say). Such a draw is repeated
+        # rather than resolved (D-016, D-045).
+        if _is_display_tie(Pr / Tr, 4):
+            continue
+        ratio = _as_printed(Pr / Tr, '.4f')
+        # B0 + omega*B1 is EXACT at 4 + dec(omega) dp for every draw (B0 and
+        # B1 are 4-dp values, omega a table value), so it is printed at that
+        # length and nothing rounds: at 4 dp it sat on a tie for 10% of ethane
+        # draws (omega = 0.100) and 25% of ammonia (0.250) (D-037, D-044).
+        bsum_dp = 4 + _decimals(omega)
+        bsum = _as_printed(B0 + omega * B1, f'.{bsum_dp}f')
+        # Calculate compressibility factor
+        Z = _as_printed(1 + ratio * bsum, '.4f')
+        # Optional extension: Calculate molar volume, from the STATED Z
+        V = (Z * R * T) / P
+        break
+    else:
+        raise RuntimeError(
+            "pitzer_correlation_z: no display-stable sample in 200 draws")
 
     # 3. Generate the question and solution strings
     question = (
@@ -396,22 +486,22 @@ def template_pitzer_correlation_z():
         f"B1 = 0.139 - (0.172 / Tr**4.2)\n\n"
 
         f"**Step 2:** Calculate the reduced temperature (Tr) and reduced pressure (Pr).\n"
-        f"Tr = T / Tc = {T} K / {Tc} K = {round(Tr, 4)}\n"
-        f"Pr = P / Pc = {P} bar / {Pc} bar = {round(Pr, 4)}\n\n"
+        f"Tr = T / Tc = {T} K / {Tc} K = {Tr}\n"
+        f"Pr = P / Pc = {P} bar / {Pc} bar = {Pr}\n\n"
 
         f"**Step 3:** Calculate the virial equation coefficients, B0 and B1.\n"
-        f"B0 = 0.083 - (0.422 / {round(Tr, 4)}**1.6) = {round(B0, 4)}\n"
-        f"B1 = 0.139 - (0.172 / {round(Tr, 4)}**4.2) = {round(B1, 4)}\n\n"
+        f"B0 = 0.083 - (0.422 / {Tr}**1.6) = {B0}\n"
+        f"B1 = 0.139 - (0.172 / {Tr}**4.2) = {B1}\n\n"
 
         f"**Step 4:** Substitute all values to calculate the compressibility factor (Z).\n"
-        f"Z = 1 + ({round(Pr, 4)} / {round(Tr, 4)}) * ({round(B0, 4)} + {paren_neg(omega)} * {round(B1, 4)})\n"
-        f"Z = 1 + {round(Pr / Tr, 4)} * ({round(B0 + omega * B1, 4)})\n"
-        f"Z = {round(Z, 4)}\n\n"
+        f"Z = 1 + ({Pr} / {Tr}) * ({B0} + {paren_neg(omega)} * {B1})\n"
+        f"Z = 1 + {ratio} * ({bsum:.{bsum_dp}f})\n"
+        f"Z = {Z}\n\n"
 
         f"(Optional) **Step 5:** Calculate the molar volume (V).\n"
-        f"V = Z * R * T / P = ({round(Z, 4)} * {R} * {T}) / {P} = {round(V, 4)} L/mol\n\n"
+        f"V = Z * R * T / P = ({Z} * {R} * {T}) / {P} = {round(V, 4)} L/mol\n\n"
 
-        f"**Answer:** The compressibility factor, Z, for {substance_name} at the given conditions is **{round(Z, 4)}**."
+        f"**Answer:** The compressibility factor, Z, for {substance_name} at the given conditions is **{Z}**."
     )
 
     return question, solution
@@ -554,6 +644,19 @@ def template_work_isothermal_virial():
             W = - integral(P dV) from V1 to V2
             W = -[R*T*ln(V2/V1) - B*R*T*(1/V2 - 1/V1)]
 
+    Trace integrity (Layer 0, 2026-09-23):
+        The question states T, P1 and P2, so Tr is recomputed FORWARD from
+        the stated T at the 3 dp the solution prints it with; the sampled
+        pre-image used to be printed (helium: 14.73/5.2 = 2.8327 was printed
+        as the sampled 2.832). Every intermediate that is printed and then
+        consumed is bound through its own display first - B0 and B1 at 4 dp,
+        B at 5 dp (Z1 = 1 + B*P1/(R*T) did not close from the printed 5-dp B),
+        Z1 and Z2 at 4 dp, V1 and V2 at 5 dp, R*T at 2 dp, B*R*T at 3 dp and
+        the two work terms at 2 dp - so W is the sum of the printed terms
+        (D-016 part 2). R*T and B*R*T are finite decimals whose displays can
+        sit exactly on a half-way tie (R*T = 20.785 at 250.00 K, nitrogen, is
+        the one such point on the input grid); such a draw is redrawn (D-016).
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking to compute the work of compression.
@@ -563,42 +666,62 @@ def template_work_isothermal_virial():
     # 1. Parameterize the inputs
     R = 0.08314  # L·bar/(mol·K)
 
-    substance_name = random.choice(list(CRITICAL_PROPERTIES.keys()))
-    properties = CRITICAL_PROPERTIES[substance_name]
-    Tc = properties["Tc"]
-    Pc = properties["Pc"]
-    omega = properties["omega"]
+    for _attempt in range(200):
+        substance_name = random.choice(list(CRITICAL_PROPERTIES.keys()))
+        properties = CRITICAL_PROPERTIES[substance_name]
+        Tc = properties["Tc"]
+        Pc = properties["Pc"]
+        omega = properties["omega"]
 
-    # Generate conditions in the gas phase (Tr > 1) at moderate pressures
-    Tr = round(random.uniform(1.2, 3.0), 3)
-    T = round(Tr * Tc, 2)
-    
-    P1_r = round(random.uniform(0.5, 2.0), 2)
-    P2_r = round(random.uniform(2.5, 5.0), 2)
-    P1 = round(P1_r * Pc, 2)
-    P2 = round(P2_r * Pc, 2)
+        # Generate conditions in the gas phase (Tr > 1) at moderate pressures.
+        # The question states T, so Tr is recomputed FORWARD from the stated T
+        # at the 3 dp the solution prints it with; the sampled pre-image no
+        # longer reaches the solution (helium: 14.73/5.2 = 2.8327 was printed
+        # as the sampled 2.832).
+        Tr_sampled = round(random.uniform(1.2, 3.0), 3)
+        T = round(Tr_sampled * Tc, 2)
 
-    # 2. Perform the core calculation
-    # Calculate B
-    B0 = 0.083 - 0.422 / (Tr**1.6)
-    B1 = 0.139 - 0.172 / (Tr**4.2)
-    B = (R * Tc / Pc) * (B0 + omega * B1) # Units: L/mol
+        P1_r = round(random.uniform(0.5, 2.0), 2)
+        P2_r = round(random.uniform(2.5, 5.0), 2)
+        P1 = round(P1_r * Pc, 2)
+        P2 = round(P2_r * Pc, 2)
+        Tr = _as_printed(T / Tc, '.3f')
 
-    # Calculate initial and final states
-    Z1 = 1 + (B * P1) / (R * T)
-    Z2 = 1 + (B * P2) / (R * T)
-    V1 = (Z1 * R * T) / P1
-    V2 = (Z2 * R * T) / P2
+        # 2. Perform the core calculation. Every intermediate that is printed
+        # and then consumed is bound through its own display first (D-016):
+        # the next line is computed from the operands the reader sees.
+        B0 = _as_printed(0.083 - 0.422 / (Tr**1.6), '.4f')
+        B1 = _as_printed(0.139 - 0.172 / (Tr**4.2), '.4f')
+        B = _as_printed((R * Tc / Pc) * (B0 + omega * B1), '.5f')  # Units: L/mol
 
-    # Calculate work using the integrated virial equation
-    term1 = R * T * math.log(V2 / V1)
-    term2 = -B * R * T * ((1/V2) - (1/V1))
-    W_virial_Lbar = -(term1 + term2)
-    W_virial_J = W_virial_Lbar * 100  # Convert L·bar to Joules
+        # Calculate initial and final states
+        Z1 = _as_printed(1 + (B * P1) / (R * T), '.4f')
+        Z2 = _as_printed(1 + (B * P2) / (R * T), '.4f')
+        V1 = _as_printed((Z1 * R * T) / P1, '.5f')
+        V2 = _as_printed((Z2 * R * T) / P2, '.5f')
 
-    # For comparison, calculate ideal gas work
-    W_ideal_Lbar = -R * T * math.log(P1 / P2)
-    W_ideal_J = W_ideal_Lbar * 100
+        # R*T (7 dp) and B*R*T (12 dp) are finite decimals, so their 2-dp and
+        # 3-dp displays CAN sit exactly on a half-way tie: R*T = 20.785 at
+        # T = 250.00 K (nitrogen) is the one such point on the input grid.
+        # Such a draw is repeated rather than resolved (D-016).
+        if _is_display_tie(R * T, 2) or _is_display_tie(B * R * T, 3):
+            continue
+        RT = _as_printed(R * T, '.2f')
+        BRT = _as_printed(B * R * T, '.3f')
+
+        # Calculate work using the integrated virial equation
+        term1 = _as_printed(RT * math.log(V2 / V1), '.2f')
+        term2 = _as_printed(-BRT * ((1/V2) - (1/V1)), '.2f')
+        W_virial_Lbar = _as_printed(-(term1 + term2), '.2f')
+        W_virial_J = W_virial_Lbar * 100  # Convert L·bar to Joules
+
+        # For comparison, calculate ideal gas work
+        W_ideal_Lbar = -R * T * math.log(P1 / P2)
+        W_ideal_J = W_ideal_Lbar * 100
+        break
+    else:
+        raise RuntimeError(
+            "work_isothermal_virial: no display-stable sample in 200 draws")
 
     # 3. Generate the question and solution strings
     question = (
@@ -616,23 +739,23 @@ def template_work_isothermal_virial():
 
         f"**Step 2:** Calculate the second virial coefficient (B) at T = {T} K.\n"
         f"Reduced Temperature, Tr = T/Tc = {T}/{Tc} = {Tr}\n"
-        f"B0 = 0.083 - 0.422 / ({Tr})**1.6 = {round(B0, 4)}\n"
-        f"B1 = 0.139 - 0.172 / ({Tr})**4.2 = {round(B1, 4)}\n"
-        f"B = (R·Tc/Pc) * (B0 + ω·B1) = {round(B, 5)} L/mol\n\n"
+        f"B0 = 0.083 - 0.422 / ({Tr})**1.6 = {B0}\n"
+        f"B1 = 0.139 - 0.172 / ({Tr})**4.2 = {B1}\n"
+        f"B = (R·Tc/Pc) * (B0 + ω·B1) = {B} L/mol\n\n"
 
         f"**Step 3:** Determine the initial (V1) and final (V2) molar volumes.\n"
-        f"Z1 = 1 + B·P1/(R·T) = 1 + ({round(B, 5)}*{P1})/({R}*{T}) = {round(Z1, 4)}\n"
-        f"V1 = Z1·R·T/P1 = {round(V1, 5)} L/mol\n"
-        f"Z2 = 1 + B·P2/(R·T) = 1 + ({round(B, 5)}*{P2})/({R}*{T}) = {round(Z2, 4)}\n"
-        f"V2 = Z2·R·T/P2 = {round(V2, 5)} L/mol\n\n"
+        f"Z1 = 1 + B·P1/(R·T) = 1 + ({B}*{P1})/({R}*{T}) = {Z1}\n"
+        f"V1 = Z1·R·T/P1 = {V1} L/mol\n"
+        f"Z2 = 1 + B·P2/(R·T) = 1 + ({B}*{P2})/({R}*{T}) = {Z2}\n"
+        f"V2 = Z2·R·T/P2 = {V2} L/mol\n\n"
 
         f"**Step 4:** Substitute V1 and V2 into the integrated work equation.\n"
-        f"W = -[{round(R*T, 2)}·ln({round(V2, 5)}/{round(V1, 5)}) {signed_term(-round(B*R*T, 3))}(1/{round(V2, 5)} - 1/{round(V1, 5)})]\n"
-        f"W = -[{round(term1, 2)} {signed_term(round(term2, 2))}] = {round(W_virial_Lbar, 2)} L·bar/mol\n\n"
+        f"W = -[{RT}·ln({V2}/{V1}) {signed_term(-BRT)}(1/{V2} - 1/{V1})]\n"
+        f"W = -[{term1} {signed_term(term2)}] = {W_virial_Lbar} L·bar/mol\n\n"
 
         f"**Step 5:** Convert the work to the required units (J/mol).\n"
         f"Since 1 L·bar = 100 J:\n"
-        f"W = {round(W_virial_Lbar, 2)} L·bar/mol * 100 J/(L·bar) = {round(W_virial_J, 0)} J/mol\n\n"
+        f"W = {W_virial_Lbar} L·bar/mol * 100 J/(L·bar) = {round(W_virial_J, 0)} J/mol\n\n"
 
         f"**For Comparison:** The work required for an ideal gas is W_ideal = -RT·ln(P1/P2) = {round(W_ideal_J, 0)} J/mol. "
         f"The deviation shows the effect of intermolecular forces accounted for by the virial equation.\n\n"

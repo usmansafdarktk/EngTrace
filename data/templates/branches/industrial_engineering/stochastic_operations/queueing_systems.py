@@ -1,9 +1,45 @@
 import math
 import random
+from decimal import Decimal, ROUND_HALF_UP
 
 from data.templates.branches.industrial_engineering.constants import (
     QUEUE_SCENARIOS,
 )
+
+
+def _hu(x, places):
+    """Half-up rounding of a float via its shortest decimal repr."""
+    q = Decimal("1") if places == 0 else Decimal("0." + "0" * (places - 1) + "1")
+    v = Decimal(repr(x)).quantize(q, rounding=ROUND_HALF_UP)
+    return int(v) if places == 0 else float(v)
+
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where NO rounding convention is defensible. A reader
+    doing decimal arithmetic and applying half-up reads 0.02325 m as 23.3 mm; a
+    reader using binary floats and `round()` reads it as 23.2 mm; and the
+    printed line closes for exactly one of them whichever the template picks.
+    Breaking the tie in decimal (P2 as amended) does not remove the ambiguity,
+    it only moves it to the other reader - which is why such instances are
+    RESAMPLED rather than resolved (D-016).
+
+    Testing for an EXACT tie is not enough. Two independent evaluations of the
+    same exact quantity - this template's, in kN and kN/m^2, and a solver's, in
+    N and Pa - differ by a few ulps, so a rational tie such as 29.25 mm lands
+    as 29.249999999999996 on one side and 29.250000000000004 on the other.
+    Neither is exactly a tie, and the two then round in opposite directions:
+    that is how eight non-closing instances per 60,000 seeds survived the first
+    version of this guard (Phase 1 review A, finding F-2).
+
+    So a narrow BAND is quarantined rather than a point. The band is a few
+    thousand ulps wide where the tie lattice is 10^-places apart, so it removes
+    nothing that is not genuinely ambiguous.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
 
 
 def _mmc_p0(a, rho, c):
@@ -55,31 +91,60 @@ def template_mm1_time_in_system():
         (analytic corners: min 60/(70-39) = 1.9 at the drive-through
         window extreme; max 60/(6-5) = 60.0 at the tool-crib extreme).
 
+    Trace integrity (Layer 0, 2026-09-23):
+        rho = lambda/mu (3 dp), L = lambda/(mu - lambda) (3 dp) and
+        W = L/lambda (4 dp) are quotients by arbitrary integers, exact at
+        no fixed display (13/16 = 0.8125 terminates, 13/21 does not), and
+        the minute answer W*60 (a 4-dp value times 60, exact at 3 dp) is
+        quoted at 1 dp, so lengthening it would change what the item asks
+        for (D-044). A draw on which any of the four sits on a half-way tie
+        at its display is therefore redrawn rather than rounded either way
+        (D-016). Enumerated over all 1,317 reachable (scenario, mu, lambda)
+        triples: 89 tie on at least one line, a sampling-weighted rejection
+        of 5.9% (rho 2.1%, W in hours 1.6%, W in minutes 2.2%, L 1.0%).
+        The minute-answer tie is invisible to T1, whose parser skips the
+        "* 60 minutes/hour" line.
+
     Returns:
         tuple(str, str): (question, solution)
     """
-    scenario_key = random.choice(sorted(_MM1_SETTINGS))
-    setting = _MM1_SETTINGS[scenario_key]
-    lam_lo, lam_hi = QUEUE_SCENARIOS[scenario_key]["lam_hr"]
-    mu_lo, mu_hi = QUEUE_SCENARIOS[scenario_key]["mu_hr"]
+    for _attempt in range(200):
+        scenario_key = random.choice(sorted(_MM1_SETTINGS))
+        setting = _MM1_SETTINGS[scenario_key]
+        lam_lo, lam_hi = QUEUE_SCENARIOS[scenario_key]["lam_hr"]
+        mu_lo, mu_hi = QUEUE_SCENARIOS[scenario_key]["mu_hr"]
 
-    # Sample the service rate first, then the arrival rate inside the
-    # per-sample window that guarantees 0.55 <= rho <= 0.92 exactly
-    # (Civil lesson 1: per-sample joint feasibility, no rejection loops).
-    # Non-emptiness holds for every integer mu in each scenario window:
-    #   bank (12..50), drive-through (20..70), tool crib (6..24) all give
-    #   ceil(0.55*mu) <= min(lam_hi, floor(0.92*mu)) — checked by hand.
-    mu = random.randint(mu_lo, mu_hi)
-    lam_min = max(lam_lo, math.ceil(0.55 * mu))
-    lam_max = min(lam_hi, math.floor(0.92 * mu))
-    lam = random.randint(lam_min, lam_max)
+        # Sample the service rate first, then the arrival rate inside the
+        # per-sample window that guarantees 0.55 <= rho <= 0.92 exactly
+        # (Civil lesson 1: per-sample joint feasibility, no feasibility
+        # rejection; the loop around this block only removes display ties).
+        # Non-emptiness holds for every integer mu in each scenario window:
+        #   bank (12..50), drive-through (20..70), tool crib (6..24) all give
+        #   ceil(0.55*mu) <= min(lam_hi, floor(0.92*mu)) — checked by hand.
+        mu = random.randint(mu_lo, mu_hi)
+        lam_min = max(lam_lo, math.ceil(0.55 * mu))
+        lam_max = min(lam_hi, math.floor(0.92 * mu))
+        lam = random.randint(lam_min, lam_max)
 
-    # Gold trace derives only from the presented integer rates
-    # (round-then-recompute).
-    rho = round(lam / mu, 3)
-    L = round(lam / (mu - lam), 3)
-    W_hr = round(L / lam, 4)
-    W_min = round(W_hr * 60, 1)
+        # Gold trace derives only from the presented integer rates
+        # (round-then-recompute).
+        rho = round(lam / mu, 3)
+        L = round(lam / (mu - lam), 3)
+        W_hr = round(L / lam, 4)
+        W_min = round(W_hr * 60, 1)
+        # D-016: rho, L and W in hours are quotients exact at no fixed
+        # display, and the 1-dp minute answer is the item's quoted precision
+        # (D-044); a draw on which any of them sits on a half-way tie at its
+        # display is redrawn rather than rounded either way. Screened last,
+        # after every draw, so only a tie draw is redrawn.
+        if (_is_display_tie(lam / mu, 3)
+                or _is_display_tie(lam / (mu - lam), 3)
+                or _is_display_tie(L / lam, 4)
+                or _is_display_tie(W_hr * 60, 1)):
+            continue
+        break
+    else:
+        raise AssertionError("resample loop exhausted")
 
     # Physical bounds (docstring, verbatim)
     assert 0.55 <= lam / mu <= 0.92, f"utilization out of bounds: {lam}/{mu}"
@@ -202,6 +267,18 @@ def template_mmc_waiting_time():
         asserts use P0 [0.045, 0.26], Lq [0.60, 3.40], Wq [1.9, 40.0]
         with margin for the rounding chain.
 
+    Trace integrity (Layer 0, 2026-09-23):
+        Wq in hours, Lq/lambda, is a 4-dp value over a small integer and
+        was printed at 5 dp; on the five reachable instances with
+        lambda = 4 or 20 the quotient is exact at 6 dp and sat on a
+        half-way tie (0.8891 / 4 = 0.222275). No 6- or 7-dp display is
+        tie-free either (the lambda = 32 and 16 quotients terminate at 7
+        and 8 dp), so Wq is bound half-up at 8 dp, the length of the
+        longest terminating quotient in the reachable set, and printed at
+        8 dp in Steps 5 and 6. Enumerated over all 82 (combo, lambda)
+        instances: no line ties at 8 dp, and the 2-dp minute answer is
+        unchanged everywhere (D-016/D-037).
+
     Returns:
         tuple(str, str): (question, solution)
     """
@@ -217,7 +294,12 @@ def template_mmc_waiting_time():
     rho = round(lam / (c * mu), 4)
     P0 = round(_mmc_p0(a, rho, c), 5)
     Lq = round(P0 * a ** c * rho / (math.factorial(c) * (1.0 - rho) ** 2), 4)
-    Wq_hr = round(Lq / lam, 5)
+    # Lq/lambda is displayed at 8 dp: over the 82 reachable (combo, lambda)
+    # instances every terminating quotient terminates within 8 dp (the
+    # longest are /16 and /32), so nothing rounds and no half-way tie can
+    # arise. At 5 dp the lambda = 4 and 20 instances (exact at 6 dp) tied;
+    # 6 dp would move the tie to lambda = 32, 7 dp to lambda = 16 and 32.
+    Wq_hr = _hu(Lq / lam, 8)
     Wq_min = round(Wq_hr * 60, 2)
 
     # Physical bounds (docstring, verbatim; margins cover displayed rounding)
@@ -279,9 +361,9 @@ def template_mmc_waiting_time():
         f"**Step 4:** Compute the average number waiting in the queue.\n"
         f"{lq_eq}\n\n"
         f"**Step 5:** Apply Little's formula to the queue.\n"
-        f"Wq = Lq / lambda = {Lq:.4f} / {lam} = {Wq_hr:.5f} hours\n\n"
+        f"Wq = Lq / lambda = {Lq:.4f} / {lam} = {Wq_hr:.8f} hours\n\n"
         f"**Step 6:** Convert the waiting time to minutes.\n"
-        f"Wq = {Wq_hr:.5f} hours * 60 minutes/hour = {Wq_min:.2f} minutes\n\n"
+        f"Wq = {Wq_hr:.8f} hours * 60 minutes/hour = {Wq_min:.2f} minutes\n\n"
         f"**Answer:** The average time a customer waits in the queue is "
         f"{Wq_min:.2f} minutes"
     )
@@ -547,24 +629,61 @@ def template_mm1k_finite_capacity():
         PK [0.037, 0.32], lam_e [13.0, 52.0], L [1.30, 4.05],
         W [1.95, 13.0] with rounding-chain margin.
 
+    Trace integrity (Layer 0, 2026-09-23):
+        lam_e = lambda*(1 - PK), an integer times a 5-dp probability, is
+        exact at 5 dp and was printed at 3 dp, where it sat on a half-way
+        tie on ~4% of draws (50 * (1 - 0.06047) = 46.9765); it is now bound
+        half-up and printed at 5 dp in Steps 5 and 7, so nothing rounds
+        (D-037); this moves the 2-dp minute answer by 0.01 on 8 of the
+        1,917 surviving combos. rho = lambda/mu is a quotient exact at no
+        fixed display: 550 of the 664 reachable (lambda, mu) pairs never
+        terminate, and although the terminating ones end within 6 dp (so a
+        6-dp display would carry no tie), rho anchors every later sum and a
+        6-dp rho moves the answer on 42 combos, which D-044 rules out. A
+        draw whose rho sits on a 4-dp half-way tie (32 of 1,949 combos, all
+        with mu = 32 or 64) is therefore redrawn. The weighted sum SL (4 dp;
+        a reader recomputes it from the printed rho) and the minute answer
+        W*60 (2 dp, the item's quoted precision) can tie as well (30 and 41
+        combos) and are screened the same way; both are invisible to T1.
+        Enumerated over all combos, no other printed value can tie; the
+        rejection is 5.9% (over) / 4.9% (under) of draws.
+
     Returns:
         tuple(str, str): (question, solution)
     """
     regime = random.choice(["under", "over"])
-    lam, mu, K = random.choice(_MM1K_OVER if regime == "over" else _MM1K_UNDER)
+    for _attempt in range(200):
+        lam, mu, K = random.choice(_MM1K_OVER if regime == "over" else _MM1K_UNDER)
 
-    # Round-then-recompute from the presented (lam, mu, K): rho displayed
-    # at 4 dp anchors the chain; the normalization sum S and weighted sum
-    # SL are computed from displayed rho and themselves displayed at 4 dp.
-    rho = round(lam / mu, 4)
-    S = round(sum(rho ** n for n in range(K + 1)), 4)
-    P0 = round(1.0 / S, 5)
-    PK = round(P0 * rho ** K, 5)
-    lam_e = round(lam * (1 - PK), 3)
-    SL = round(sum(n * rho ** n for n in range(1, K + 1)), 4)
-    L = round(P0 * SL, 4)
-    W_hr = round(L / lam_e, 5)
-    W_min = round(W_hr * 60, 2)
+        # Round-then-recompute from the presented (lam, mu, K): rho displayed
+        # at 4 dp anchors the chain; the normalization sum S and weighted sum
+        # SL are computed from displayed rho and themselves displayed at 4 dp.
+        rho = round(lam / mu, 4)
+        S = round(sum(rho ** n for n in range(K + 1)), 4)
+        P0 = round(1.0 / S, 5)
+        PK = round(P0 * rho ** K, 5)
+        # lambda*(1 - PK) is exact at 5 dp (an integer times a 5-dp value);
+        # its former 3-dp display sat on a half-way tie on ~4% of draws, so
+        # it is bound and printed at 5 dp and nothing rounds (D-037).
+        lam_e = _hu(lam * (1 - PK), 5)
+        SL_exact = sum(n * rho ** n for n in range(1, K + 1))
+        SL = round(SL_exact, 4)
+        L = round(P0 * SL, 4)
+        W_hr = round(L / lam_e, 5)
+        W_min = round(W_hr * 60, 2)
+        # D-016: rho (a quotient), SL (which a reader recomputes from the
+        # printed rho) and the 2-dp minute answer may not sit on a half-way
+        # tie at their display; the draw is repeated rather than rounded
+        # either way. Screened last, after the draw, so only a tie draw is
+        # redrawn. Enumerated over all 1,949 combos, no other printed value
+        # can tie (S, p_0, PK, lam_e at 5 dp, L, W in hours).
+        if (_is_display_tie(lam / mu, 4)
+                or _is_display_tie(SL_exact, 4)
+                or _is_display_tie(W_hr * 60, 2)):
+            continue
+        break
+    else:
+        raise AssertionError("resample loop exhausted")
 
     r_exact = lam / mu
     assert (0.70 <= r_exact <= 0.92) or (1.08 <= r_exact <= 1.30), \
@@ -638,7 +757,7 @@ def template_mm1k_finite_capacity():
         f"**Step 5:** Compute the effective arrival rate of cars that "
         f"join.\n"
         f"lam_e = lambda * (1 - PK) = {lam} * (1 - {PK:.5f}) "
-        f"= {lam_e:.3f} cars/hour\n\n"
+        f"= {lam_e:.5f} cars/hour\n\n"
         f"**Step 6:** Compute the expected number of cars in the lane "
         f"directly from the derived distribution.\n"
         f"L = p_0 * ({sl_terms})\n"
@@ -646,7 +765,7 @@ def template_mm1k_finite_capacity():
         f"L = {P0:.5f} * {SL:.4f} = {L:.4f} cars\n\n"
         f"**Step 7:** Apply Little's formula with the effective arrival "
         f"rate.\n"
-        f"W = L / lam_e = {L:.4f} / {lam_e:.3f} = {W_hr:.5f} hours\n\n"
+        f"W = L / lam_e = {L:.4f} / {lam_e:.5f} = {W_hr:.5f} hours\n\n"
         f"**Step 8:** Convert the time in system to minutes.\n"
         f"W = {W_hr:.5f} hours * 60 minutes/hour = {W_min:.2f} minutes\n\n"
         f"**Answer:** The average time in the system for cars that join "

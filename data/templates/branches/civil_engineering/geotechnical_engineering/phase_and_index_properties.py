@@ -1,9 +1,38 @@
+import math
 import random
 
 from data.templates.branches.civil_engineering.constants import (
     SPECIFIC_GRAVITY_RANGES,
     UNIT_WEIGHT_WATER_KN_M3,
 )
+
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where NO rounding convention is defensible. A reader
+    doing decimal arithmetic and applying half-up reads 0.02325 m as 23.3 mm; a
+    reader using binary floats and `round()` reads it as 23.2 mm; and the
+    printed line closes for exactly one of them whichever the template picks.
+    Breaking the tie in decimal (P2 as amended) does not remove the ambiguity,
+    it only moves it to the other reader - which is why such instances are
+    RESAMPLED rather than resolved (D-016).
+
+    Testing for an EXACT tie is not enough. Two independent evaluations of the
+    same exact quantity - this template's, in kN and kN/m^2, and a solver's, in
+    N and Pa - differ by a few ulps, so a rational tie such as 29.25 mm lands
+    as 29.249999999999996 on one side and 29.250000000000004 on the other.
+    Neither is exactly a tie, and the two then round in opposite directions:
+    that is how eight non-closing instances per 60,000 seeds survived the first
+    version of this guard (Phase 1 review A, finding F-2).
+
+    So a narrow BAND is quarantined rather than a point. The band is a few
+    thousand ulps wide where the tie lattice is 10^-places apart, so it removes
+    nothing that is not genuinely ambiguous.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
 
 
 # Template 1 (Easy) — Area B1: Phase Relationships & Index Properties
@@ -35,6 +64,15 @@ def template_phase_relations_degree_of_saturation():
         recomputed S in [15%, 100%]; presented moist unit weight in
         [14, 23] kN/m^3.
 
+    Trace integrity (Layer 0, 2026-09-23):
+        gamma_d = gamma/(1 + w), e = Gs*gamma_w/gamma_d - 1 and S = w*Gs/e
+        are quotients by arbitrary rounded divisors, exact at no fixed
+        display, and together land on a half-way tie at their display (2,
+        3 and 3 dp) on ~1.3% of draws ((0.084 * 2.69) / 0.560 = 0.4035).
+        Such a draw is resampled rather than rounded either way
+        (D-016/D-037); the answer S_pct = 100*S is exact at 1 dp and its
+        display is unchanged.
+
     Returns:
         tuple: (question, solution)
     """
@@ -48,33 +86,47 @@ def template_phase_relations_degree_of_saturation():
         "silt": (0.50, 0.90),
         "inorganic clay": (0.55, 0.95),
     }
-    soil_type = random.choice(list(SPECIFIC_GRAVITY_RANGES.keys()))
-    gs_lo, gs_hi = SPECIFIC_GRAVITY_RANGES[soil_type]
-    Gs = round(random.uniform(gs_lo, gs_hi), 2)
-    e_true = round(random.uniform(*e_ranges[soil_type]), 2)
+    # Bounded redraw: a draw whose dry unit weight, void ratio or degree
+    # of saturation lands on a half-way tie at its display has no
+    # defensible gold answer and is rejected (D-016).
+    for _attempt in range(200):
+        soil_type = random.choice(list(SPECIFIC_GRAVITY_RANGES.keys()))
+        gs_lo, gs_hi = SPECIFIC_GRAVITY_RANGES[soil_type]
+        Gs = round(random.uniform(gs_lo, gs_hi), 2)
+        e_true = round(random.uniform(*e_ranges[soil_type]), 2)
 
-    # Per-sample feasibility bounds on S so the presented w (= S*e/Gs) always
-    # lands inside [5%, 33%] after rounding (small pre-rounding margins).
-    s_lo = max(0.25, 0.051 * Gs / e_true)
-    s_hi = min(0.92, 0.328 * Gs / e_true)
-    S_true = random.uniform(s_lo, s_hi)
+        # Per-sample feasibility bounds on S so the presented w (= S*e/Gs) always
+        # lands inside [5%, 33%] after rounding (small pre-rounding margins).
+        s_lo = max(0.25, 0.051 * Gs / e_true)
+        s_hi = min(0.92, 0.328 * Gs / e_true)
+        S_true = random.uniform(s_lo, s_hi)
 
-    w_true = S_true * e_true / Gs                # from S*e = w*Gs
-    gamma_d_true = Gs * gamma_w / (1 + e_true)
-    gamma_true = gamma_d_true * (1 + w_true)
+        w_true = S_true * e_true / Gs                # from S*e = w*Gs
+        gamma_d_true = Gs * gamma_w / (1 + e_true)
+        gamma_true = gamma_d_true * (1 + w_true)
 
-    # Presented (rounded) given values — the question states exactly these.
-    w_pct = round(w_true * 100, 1)               # moisture content, %
-    gamma = round(gamma_true, 2)                 # moist unit weight, kN/m^3
+        # Presented (rounded) given values — the question states exactly these.
+        w_pct = round(w_true * 100, 1)               # moisture content, %
+        gamma = round(gamma_true, 2)                 # moist unit weight, kN/m^3
 
-    # 2. Core computation — round-then-recompute at EVERY step: each value in
-    # the chain derives from the previously displayed (rounded) value, so the
-    # printed arithmetic reproduces exactly.
-    w = round(w_pct / 100.0, 3)
-    gamma_d = round(gamma / (1 + w), 2)
-    e = round((Gs * gamma_w / gamma_d) - 1, 3)
-    S_frac = round(w * Gs / e, 3)
-    S_pct = round(S_frac * 100, 1)
+        # 2. Core computation — round-then-recompute at EVERY step: each value in
+        # the chain derives from the previously displayed (rounded) value, so the
+        # printed arithmetic reproduces exactly.
+        w = round(w_pct / 100.0, 3)
+        gamma_d_exact = gamma / (1 + w)
+        gamma_d = round(gamma_d_exact, 2)
+        e_exact = (Gs * gamma_w / gamma_d) - 1
+        e = round(e_exact, 3)
+        S_exact = w * Gs / e
+        if (_is_display_tie(gamma_d_exact, 2) or _is_display_tie(e_exact, 3)
+                or _is_display_tie(S_exact, 3)):
+            continue                    # no defensible gold answer; redraw
+        S_frac = round(S_exact, 3)
+        S_pct = round(S_frac * 100, 1)
+        break
+    else:
+        raise RuntimeError(
+            "phase_relations_degree_of_saturation: no closing sample in 200 draws")
 
     # Physical bounds (docstring) enforced on the presented/recomputed chain.
     assert 2.60 <= Gs <= 2.80, f"Gs out of bounds: {Gs}"

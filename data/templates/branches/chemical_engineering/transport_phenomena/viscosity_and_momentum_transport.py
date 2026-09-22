@@ -1,6 +1,58 @@
 import random
 import math
+from decimal import Decimal, ROUND_HALF_UP
 from data.templates.branches.chemical_engineering.constants import COMMON_LIQUIDS, COMMON_GASES, GAS_MOLECULAR_PARAMS, POWER_LAW_FLUIDS
+
+
+def _hu(x, places):
+    """Round half-up to `places` dp, resolving the tie in DECIMAL.
+
+    `round()` resolves a half-way tie on the binary value and disagrees with a
+    reader doing decimal arithmetic (spec P2 as amended, DECISIONS D-012).
+    """
+    q = Decimal(1).scaleb(-places)
+    d = x if isinstance(x, Decimal) else Decimal(repr(x))
+    v = d.quantize(q, rounding=ROUND_HALF_UP)
+    return int(v) if places == 0 else float(v)
+
+
+def _as_printed(x, spec):
+    """The value a reader recovers from `x` when it is printed with `spec`.
+
+    P2 asks that the stored value and the printed value be the SAME value.
+    Rounding alone does not achieve that: a float one ulp away from its own
+    printed form puts the template and the reader on opposite sides of a
+    display tie (D-016 part 2).
+    """
+    return float(format(x, spec))
+
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where no rounding convention is defensible - a
+    decimal reader applying half-up and a binary reader applying `round()`
+    disagree, and the printed line closes for only one of them. Such instances
+    are resampled rather than resolved (D-016).
+
+    A narrow BAND is quarantined rather than a point, because two independent
+    evaluations of the same exact quantity differ by a few ulps and an exact
+    rational tie lands on opposite sides of them.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
+
+
+def _decimals(x):
+    """Decimal places of the shortest decimal that round-trips `x`.
+
+    0.1 -> 1, 0.012 -> 3, 4.003 -> 3, 32.0 -> 0. Used to print a quantity
+    built from table values at the precision it actually has (D-037), never
+    coarser.
+    """
+    exponent = Decimal(repr(float(x))).normalize().as_tuple().exponent
+    return max(0, -exponent)
 
 
 # Template 1 (Easy)
@@ -183,30 +235,63 @@ def template_gas_viscosity_kinetic_theory():
             - σ = Lennard-Jones molecular diameter in Angstroms (Å)
             - Ω_μ = Collision integral (dimensionless)
 
+    Trace integrity (Layer 0, 2026-09-23):
+        sigma^2 and M*T derive from table values alone, so they are printed at
+        the precision they have and never coarser (D-037): sigma^2 at
+        2*dec(sigma) dp (13.771521, not 13.772 - the denominator line did not
+        close from the 3-dp value on 22% of draws) and M*T at dec(M) dp (M has
+        3 dp for helium and hydrogen). The numerator (4-sf) and denominator
+        (3 dp) are bound through their displays before the division, so the
+        printed viscosity is the quotient of the printed operands (D-016 part
+        2). sigma^2 * Omega is exact at 3 dp more than sigma^2, so its 3-dp
+        display sits exactly on a half-way tie for four (gas, Omega) pairs -
+        xenon and ammonia (2-dp sigma^2) at Omega = 0.950 and 1.050, found by
+        exhaustive search of the 17 x 101 input grid; such a draw is redrawn
+        rather than resolved (D-016), since the exact display would need 9 dp.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking to estimate the gas viscosity.
             - str: A step-by-step solution showing the calculation.
     """
     # 1. Parameterize the inputs with random values
-    gas_name, (molar_mass, sigma, epsilon) = random.choice(list(GAS_MOLECULAR_PARAMS.items()))
-    
-    # Temperature in Kelvin
-    temperature_K = random.randint(250, 600)
-    
-    # Collision integral (dimensionless), kept close to 1.0 for simplicity
-    omega_mu = round(random.uniform(0.95, 1.05), 3)
+    for _attempt in range(200):
+        gas_name, (molar_mass, sigma, epsilon) = random.choice(list(GAS_MOLECULAR_PARAMS.items()))
 
-    # 2. Perform the core calculation
-    
-    # Numerator of the Chapman-Enskog equation
-    numerator = 2.6693e-6 * math.sqrt(molar_mass * temperature_K)
-    
-    # Denominator of the Chapman-Enskog equation
-    denominator = (sigma**2) * omega_mu
-    
-    # Final viscosity calculation
-    viscosity = numerator / denominator
+        # Temperature in Kelvin
+        temperature_K = random.randint(250, 600)
+
+        # Collision integral (dimensionless), kept close to 1.0 for simplicity
+        omega_mu = round(random.uniform(0.95, 1.05), 3)
+
+        # 2. Perform the core calculation
+
+        # M*T and sigma^2 derive from table values alone, so they are printed
+        # at the precision they have and never coarser (D-037): M has 3 dp for
+        # helium and hydrogen, and sigma^2 has twice sigma's decimals.
+        mt_dp = max(2, _decimals(molar_mass))
+        MT = _as_printed(molar_mass * temperature_K, f'.{mt_dp}f')
+        s2_dp = max(3, 2 * _decimals(sigma))
+        sigma2 = _as_printed(sigma ** 2, f'.{s2_dp}f')
+
+        # Numerator of the Chapman-Enskog equation, bound through its 4-sf display
+        numerator = _as_printed(2.6693e-6 * math.sqrt(MT), '.4e')
+
+        # Denominator of the Chapman-Enskog equation. sigma^2 * Omega is exact
+        # at s2_dp + 3 dp and is displayed at 3 dp; that display sits exactly
+        # on a half-way tie for four (gas, Omega) pairs - xenon and ammonia
+        # (2-dp sigma^2) at Omega = 0.950 and 1.050 - and such a draw is
+        # repeated rather than resolved (D-016).
+        if _is_display_tie(sigma2 * omega_mu, 3):
+            continue
+        denominator = _as_printed(sigma2 * omega_mu, '.3f')
+
+        # Final viscosity calculation, from the printed operands
+        viscosity = numerator / denominator
+        break
+    else:
+        raise RuntimeError(
+            "gas_viscosity_kinetic_theory: no display-stable sample in 200 draws")
 
     # 3. Generate the question and solution strings
     
@@ -237,8 +322,8 @@ def template_gas_viscosity_kinetic_theory():
         f"μ = (2.6693e-6 * sqrt({molar_mass} * {temperature_K})) / (({sigma})^2 * {omega_mu})\n\n"
         
         f"**Step 3:** Calculate the numerator and denominator.\n"
-        f"- Numerator = 2.6693e-6 * sqrt({molar_mass * temperature_K:.2f}) = {numerator:.4e}\n"
-        f"- Denominator = {sigma**2:.3f} * {omega_mu} = {denominator:.3f}\n\n"
+        f"- Numerator = 2.6693e-6 * sqrt({MT:.{mt_dp}f}) = {numerator:.4e}\n"
+        f"- Denominator = {sigma2:.{s2_dp}f} * {omega_mu} = {denominator:.3f}\n\n"
         
         f"**Step 4:** Calculate the final viscosity.\n"
         f"μ = {numerator:.4e} / {denominator:.3f}\n"

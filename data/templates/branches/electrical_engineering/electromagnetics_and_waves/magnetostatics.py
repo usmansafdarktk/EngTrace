@@ -1,6 +1,47 @@
 import random
 import math
+from decimal import Decimal, ROUND_HALF_UP
 from data.templates.branches._emission import signed_term, joined_terms
+
+
+def _hu(x, places):
+    """Round half-up to `places` dp, resolving the tie in DECIMAL.
+
+    `round()` resolves a half-way tie on the binary value and disagrees with a
+    reader doing decimal arithmetic (spec P2 as amended, DECISIONS D-012).
+    """
+    q = Decimal(1).scaleb(-places)
+    d = x if isinstance(x, Decimal) else Decimal(repr(x))
+    v = d.quantize(q, rounding=ROUND_HALF_UP)
+    return int(v) if places == 0 else float(v)
+
+
+def _as_printed(x, spec):
+    """The value a reader recovers from `x` when it is printed with `spec`.
+
+    P2 asks that the stored value and the printed value be the SAME value.
+    Rounding alone does not achieve that: a float one ulp away from its own
+    printed form puts the template and the reader on opposite sides of a
+    display tie (D-016 part 2).
+    """
+    return float(format(x, spec))
+
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where no rounding convention is defensible - a
+    decimal reader applying half-up and a binary reader applying `round()`
+    disagree, and the printed line closes for only one of them. Such instances
+    are resampled rather than resolved (D-016).
+
+    A narrow BAND is quarantined rather than a point, because two independent
+    evaluations of the same exact quantity differ by a few ulps and an exact
+    rational tie lands on opposite sides of them.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
 
 
 # Template 1 (Easy)
@@ -16,6 +57,23 @@ def template_lorentz_force():
 
     Core Equation:
         F_m = q * (u x B)
+
+    Trace integrity (Layer 0, 2026-09-23):
+        B is stated in the question in mT to 2 dp, so in tesla it has at most
+        five significant figures. The trace displayed it at `.2e` (three) and
+        consumed the full value, so the three cross-product lines did not
+        close on their printed operands. Binding B through the `.2e` display
+        instead would move |F_m| by up to 7.8% (measured over 20,000 draws;
+        the cross product cancels), so the tesla display is lengthened to
+        `.4e`, which is exact for every sampled B, and B is bound through it
+        (D-016 part 2, D-037). An integer velocity times a 5-dp field is
+        exact at 5 dp; displayed at `.4f` it sat on a half-way tie for 22%
+        of instances, so the cross product is displayed at `.5f` everywhere
+        it appears and bound through that display. q is stated to 2 dp in
+        uC (four significant figures) and was displayed at `.2e`; it is
+        displayed at `.3e`, exact for every sampled q, and bound through it,
+        so Step 3 closes for a reader too. The question text and the gold
+        answer are unchanged.
 
     Returns:
         tuple: A tuple containing:
@@ -41,13 +99,22 @@ def template_lorentz_force():
     # 2. Perform the core calculation
     
     # Convert units for calculation
-    q_C = q_uC * 1e-6
-    B_vec_T = [b * 1e-3 for b in B_vec_mT]
+    # q is stated to 2 dp in uC (four significant figures); `.3e` is exact for
+    # every sampled q, so q is displayed at that precision and bound through
+    # it, and Step 3 closes for a reader (D-016 part 2, D-037).
+    q_C = _as_printed(q_uC * 1e-6, '.3e')
+    # B is stated in the question in mT to 2 dp, so in tesla it has at most
+    # five significant figures: display it at that precision (`.4e`) and bind
+    # it through the display, so the value a reader recovers from the text is
+    # the value the cross product consumes (D-016 part 2, D-037).
+    B_vec_T = [_as_printed(b * 1e-3, '.4e') for b in B_vec_mT]
     
     # Calculate the cross product: u x B
-    cross_product_x = u_vec[1] * B_vec_T[2] - u_vec[2] * B_vec_T[1]
-    cross_product_y = u_vec[2] * B_vec_T[0] - u_vec[0] * B_vec_T[2]
-    cross_product_z = u_vec[0] * B_vec_T[1] - u_vec[1] * B_vec_T[0]
+    # An integer velocity times a 5-dp field is exact at 5 dp, so the cross
+    # product is displayed at `.5f` everywhere it appears and bound through it.
+    cross_product_x = _as_printed(u_vec[1] * B_vec_T[2] - u_vec[2] * B_vec_T[1], '.5f')
+    cross_product_y = _as_printed(u_vec[2] * B_vec_T[0] - u_vec[0] * B_vec_T[2], '.5f')
+    cross_product_z = _as_printed(u_vec[0] * B_vec_T[1] - u_vec[1] * B_vec_T[0], '.5f')
     
     # Calculate the force vector: F = q * (u x B)
     force_x = q_C * cross_product_x
@@ -77,20 +144,20 @@ def template_lorentz_force():
         
         f"**Step 1:** Convert Units to SI\n"
         f"  First, we convert the given values to standard SI units for the calculation.\n"
-        f"  - Charge in Coulombs: q = {q_uC} * 1e-6 = {q_C:.2e} C\n"
-        f"  - Magnetic Field in Tesla: B = ({B_vec_T[0]:.2e} x_hat {signed_term(B_vec_T[1], 'y_hat', '{:.2e}'.format)} {signed_term(B_vec_T[2], 'z_hat', '{:.2e}'.format)}) T\n\n"
+        f"  - Charge in Coulombs: q = {q_uC} * 1e-6 = {q_C:.3e} C\n"
+        f"  - Magnetic Field in Tesla: B = ({B_vec_T[0]:.4e} x_hat {signed_term(B_vec_T[1], 'y_hat', '{:.4e}'.format)} {signed_term(B_vec_T[2], 'z_hat', '{:.4e}'.format)}) T\n\n"
         
         f"**Step 2:** Calculate the Cross Product (u x B)\n"
         f"  The force is determined by the formula F_m = q * (u x B). We start by calculating the cross product.\n"
         f"  u x B = [ (u_y * B_z - u_z * B_y) x_hat + (u_z * B_x - u_x * B_z) y_hat + (u_x * B_y - u_y * B_x) z_hat ]\n"
-        f"  (u x B)_x = ({u_vec[1]}) * ({B_vec_T[2]:.2e}) - ({u_vec[2]}) * ({B_vec_T[1]:.2e}) = {cross_product_x:.4f}\n"
-        f"  (u x B)_y = ({u_vec[2]}) * ({B_vec_T[0]:.2e}) - ({u_vec[0]}) * ({B_vec_T[2]:.2e}) = {cross_product_y:.4f}\n"
-        f"  (u x B)_z = ({u_vec[0]}) * ({B_vec_T[1]:.2e}) - ({u_vec[1]}) * ({B_vec_T[0]:.2e}) = {cross_product_z:.4f}\n"
-        f"  So, u x B = ({round(cross_product_x, precision)} x_hat {signed_term(round(cross_product_y, precision), 'y_hat')} {signed_term(round(cross_product_z, precision), 'z_hat')}) T*m/s\n\n"
+        f"  (u x B)_x = ({u_vec[1]}) * ({B_vec_T[2]:.4e}) - ({u_vec[2]}) * ({B_vec_T[1]:.4e}) = {cross_product_x:.5f}\n"
+        f"  (u x B)_y = ({u_vec[2]}) * ({B_vec_T[0]:.4e}) - ({u_vec[0]}) * ({B_vec_T[2]:.4e}) = {cross_product_y:.5f}\n"
+        f"  (u x B)_z = ({u_vec[0]}) * ({B_vec_T[1]:.4e}) - ({u_vec[1]}) * ({B_vec_T[0]:.4e}) = {cross_product_z:.5f}\n"
+        f"  So, u x B = ({cross_product_x:.5f} x_hat {signed_term(cross_product_y, 'y_hat', '{:.5f}'.format)} {signed_term(cross_product_z, 'z_hat', '{:.5f}'.format)}) T*m/s\n\n"
 
         f"**Step 3:** Calculate the Force Vector (F_m)\n"
         f"  Now, multiply the cross product by the charge q.\n"
-        f"  F_m = ({q_C:.2e} C) * ({round(cross_product_x, precision)} x_hat {signed_term(round(cross_product_y, precision), 'y_hat')} {signed_term(round(cross_product_z, precision), 'z_hat')})\n"
+        f"  F_m = ({q_C:.3e} C) * ({cross_product_x:.5f} x_hat {signed_term(cross_product_y, 'y_hat', '{:.5f}'.format)} {signed_term(cross_product_z, 'z_hat', '{:.5f}'.format)})\n"
         f"  F_m = ({force_x:.{precision}e} x_hat {signed_term(force_y, 'y_hat', ('{:.' + str(precision) + 'e}').format)} {signed_term(force_z, 'z_hat', ('{:.' + str(precision) + 'e}').format)}) N\n\n"
         
         f"**Step 4:** Calculate the Magnitude of the Force\n"

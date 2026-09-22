@@ -1,6 +1,47 @@
 import random
 import math
+from decimal import Decimal, ROUND_HALF_UP
 from data.templates.branches.mechanical_engineering.constants import GRAVITY, ATMOSPHERIC_PRESSURE_KPA, FLUID_DENSITIES, MATERIAL_DENSITIES, OBJECT_SHAPES, OBJECT_MATERIALS, PIPE_FLUIDS, MANOMETER_FLUIDS
+
+
+def _hu(x, places):
+    """Round half-up to `places` dp, resolving the tie in DECIMAL.
+
+    `round()` resolves a half-way tie on the binary value and disagrees with a
+    reader doing decimal arithmetic (spec P2 as amended, DECISIONS D-012).
+    """
+    q = Decimal(1).scaleb(-places)
+    d = x if isinstance(x, Decimal) else Decimal(repr(x))
+    v = d.quantize(q, rounding=ROUND_HALF_UP)
+    return int(v) if places == 0 else float(v)
+
+
+def _as_printed(x, spec):
+    """The value a reader recovers from `x` when it is printed with `spec`.
+
+    P2 asks that the stored value and the printed value be the SAME value.
+    Rounding alone does not achieve that: a float one ulp away from its own
+    printed form puts the template and the reader on opposite sides of a
+    display tie (D-016 part 2).
+    """
+    return float(format(x, spec))
+
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where no rounding convention is defensible - a
+    decimal reader applying half-up and a binary reader applying `round()`
+    disagree, and the printed line closes for only one of them. Such instances
+    are resampled rather than resolved (D-016).
+
+    A narrow BAND is quarantined rather than a point, because two independent
+    evaluations of the same exact quantity differ by a few ulps and an exact
+    rational tie lands on opposite sides of them.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
 
 
 # Template 1 (Easy)
@@ -16,6 +57,16 @@ def template_hydrostatic_pressure_at_depth():
     Core Equation:
         p_absolute = p_surface_absolute + (rho * g * h)
 
+    Trace integrity (Layer 0, 2026-09-23):
+        The pascal chain (surface pressure, rho*g*h, their sum) is displayed
+        at 1 dp and each value is bound through that display before it is
+        consumed (D-016 part 2). The answer is quoted at 4 dp in kPa, which is
+        exactly the 1-dp pascal value shifted three places: at 3 dp, Step 4
+        dropped a digit across the unit conversion and "359181.5 Pa / 1000 =
+        359.181 kPa" sat on a half-way tie on every instance whose pascal
+        value ended in .5 (D-016 part 1). A depth whose exact rho*g*h sits on
+        a 1-dp tie is redrawn (D-016 part 3).
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the absolute pressure at a certain depth.
@@ -26,8 +77,17 @@ def template_hydrostatic_pressure_at_depth():
     # Randomly select a fluid and its properties
     fluid_name, density_rho = random.choice(list(FLUID_DENSITIES.items()))
 
-    # Randomize depth in meters (Restricted to realistic tank depths)
-    depth_h = round(random.uniform(2.0, 25.0), 2)
+    # Randomize depth in meters (Restricted to realistic tank depths). The
+    # hydrostatic term rho*g*h is exact at 4 dp and is displayed at 1 dp; a
+    # depth whose exact term sits on a half-way 1-dp tie has no defensible
+    # rounding and is redrawn (D-016 part 3).
+    for _attempt in range(200):
+        depth_h = round(random.uniform(2.0, 25.0), 2)
+        pressure_increase_exact = density_rho * GRAVITY * depth_h
+        if not _is_display_tie(pressure_increase_exact, 1):
+            break
+    else:
+        raise RuntimeError("hydrostatic_pressure_at_depth: no closing sample in 200 draws")
 
     # Randomly decide if the surface pressure is atmospheric or a specified gauge pressure
     is_surface_atmospheric = random.choice([True, False])
@@ -55,23 +115,29 @@ def template_hydrostatic_pressure_at_depth():
             f"P_surface_abs = P_gauge + P_atm = {surface_gauge_kpa} + {P_atm_kpa} = {surface_pressure_abs_kpa:.3f} kPa"
         )
 
-    # Standardize precision for final outputs
-    precision = 3
+    # Standardize precision for final outputs. The pascal chain is carried and
+    # displayed at 1 dp, and 1 dp in Pa IS 4 dp in kPa, so the answer is quoted
+    # at 4 dp and the conversion in Step 4 is exact; at 3 dp it dropped a digit
+    # across the conversion and sat on a tie whenever the Pa value ended in .5
+    # (D-016 part 1).
+    precision = 4
 
-    # 2. Perform the core calculations for the solution
+    # 2. Perform the core calculations for the solution. Every value that is
+    # displayed and then consumed is bound through its display (D-016 part 2).
 
     # Step A: Convert absolute surface pressure to Pascals
-    surface_pressure_pa = surface_pressure_abs_kpa * 1000
+    surface_pressure_abs_kpa = _as_printed(surface_pressure_abs_kpa, '.3f')
+    surface_pressure_pa = _as_printed(surface_pressure_abs_kpa * 1000, '.1f')
 
     # Step B: Calculate the pressure increase due to the fluid column (Hydrostatic Pressure)
     # p_hydro = rho * g * h
-    pressure_increase_pa = density_rho * GRAVITY * depth_h
+    pressure_increase_pa = _as_printed(pressure_increase_exact, '.1f')
 
     # Step C: Calculate the final absolute pressure in Pascals
-    absolute_pressure_pa = surface_pressure_pa + pressure_increase_pa
+    absolute_pressure_pa = _as_printed(surface_pressure_pa + pressure_increase_pa, '.1f')
 
     # Step D: Convert the final answer back to kilopascals (kPa)
-    absolute_pressure_kpa = absolute_pressure_pa / 1000
+    absolute_pressure_kpa = _as_printed(absolute_pressure_pa / 1000, f'.{precision}f')
 
     # 3. Generate the question and solution strings
 
@@ -212,6 +278,16 @@ def template_utube_manometer():
     Core Equation:
         P_gauge = (rho_2 * g * h2) - (rho_1 * g * h1)
 
+    Trace integrity (Layer 0, 2026-09-23):
+        The two column terms and the gauge pressure in pascals are displayed
+        at 4 dp instead of 2: an integer density times g = 9.81 times a 2-dp
+        height is exact at 4 dp, so the tie that "1030 * 9.81 * 0.35 =
+        3536.51 Pa" sat on is removed by construction (D-037), and Step 5
+        subtracts the displayed terms rather than unrounded ones (D-016 part
+        2). A gas density carries more decimals; a draw whose exact term sits
+        on a 4-dp tie, or whose gauge pressure sits on the 3-dp kPa tie of
+        Step 6, is redrawn (D-016 part 3). The kPa answer keeps its 3 dp.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the gauge pressure in a pipe.
@@ -220,14 +296,17 @@ def template_utube_manometer():
     # 1. Parameterize the inputs with a loop to ensure positive gauge pressure
     # This prevents physically confusing scenarios where the description says the open arm 
     # level is "higher" but the math yields suction (negative pressure).
-    while True:
+    # Standardize precision for final outputs
+    precision = 3
+
+    for _attempt in range(200):
         # Randomly select a fluid for the pipe
         pipe_fluid_name, rho1 = random.choice(list(PIPE_FLUIDS.items()))
 
         # Randomly select a fluid for the manometer
         manometer_fluid_name, rho2 = random.choice(list(MANOMETER_FLUIDS.items()))
 
-        #  Ensure physical realism: manometer fluid must be denser 
+        #  Ensure physical realism: manometer fluid must be denser
         # If the chosen pipe fluid is denser than the manometer fluid, re-select
         # the manometer fluid until it is denser.
         if rho2 <= rho1:
@@ -239,27 +318,41 @@ def template_utube_manometer():
         # h2: the height difference between the two manometer fluid columns
         h2 = round(random.uniform(0.05, 0.75), 2)
 
-        # 2. Perform the core calculations for verification
-        
+        # 2. Perform the core calculations for verification. An integer
+        # density times g = 9.81 times a 2-dp height is exact at 4 dp, so the
+        # terms are displayed at 4 dp and nothing is rounded before Step 6
+        # (D-037); at 2 dp, "1030 * 9.81 * 0.35 = 3536.51" sat on a half-way
+        # tie. A gas density carries more decimals: a draw whose exact term
+        # sits on a 4-dp tie is redrawn, as is one whose gauge pressure sits on
+        # the 3-dp kPa tie of Step 6 (D-016 part 3).
+
         # Step A: Calculate the pressure contribution from the pipe fluid column (rho1*g*h1)
-        pressure_term1_pa = rho1 * GRAVITY * h1
+        pressure_term1_exact = rho1 * GRAVITY * h1
 
         # Step B: Calculate the pressure contribution from the manometer fluid column (rho2*g*h2)
-        pressure_term2_pa = rho2 * GRAVITY * h2
+        pressure_term2_exact = rho2 * GRAVITY * h2
 
-        # Step C: Calculate the gauge pressure in Pascals (Pa)
-        gauge_pressure_pa = pressure_term2_pa - pressure_term1_pa
-        
+        if _is_display_tie(pressure_term1_exact, 4) or _is_display_tie(pressure_term2_exact, 4):
+            continue
+        pressure_term1_pa = _as_printed(pressure_term1_exact, '.4f')
+        pressure_term2_pa = _as_printed(pressure_term2_exact, '.4f')
+
+        # Step C: Calculate the gauge pressure in Pascals (Pa) from the
+        # displayed terms (D-016 part 2)
+        gauge_pressure_pa = _as_printed(pressure_term2_pa - pressure_term1_pa, '.4f')
+
         # Condition: Pressure must be positive to match the problem description
         # (open arm level is "higher" implies P_pipe > P_atm)
-        if gauge_pressure_pa > 0:
-            break
-
-    # Standardize precision for final outputs
-    precision = 3
+        if gauge_pressure_pa <= 0:
+            continue
+        if _is_display_tie(gauge_pressure_pa / 1000, precision):
+            continue
+        break
+    else:
+        raise RuntimeError("utube_manometer: no closing sample in 200 draws")
 
     # Step D: Convert the final answer to kilopascals (kPa) for readability
-    gauge_pressure_kpa = gauge_pressure_pa / 1000
+    gauge_pressure_kpa = _as_printed(gauge_pressure_pa / 1000, f'.{precision}f')
 
     # 3. Generate the question and solution strings
 
@@ -296,14 +389,14 @@ def template_utube_manometer():
         f"P_gauge = (rho2 * g * h2) - (rho1 * g * h1)\n\n"
 
         f"**Step 4:** Calculate the Individual Pressure Terms\n"
-        f"Pressure from manometer fluid column = {rho2} * {GRAVITY} * {h2} = {pressure_term2_pa:.2f} Pa\n"
-        f"Pressure from pipe fluid column = {rho1} * {GRAVITY} * {h1} = {pressure_term1_pa:.2f} Pa\n\n"
+        f"Pressure from manometer fluid column = {rho2} * {GRAVITY} * {h2} = {pressure_term2_pa:.4f} Pa\n"
+        f"Pressure from pipe fluid column = {rho1} * {GRAVITY} * {h1} = {pressure_term1_pa:.4f} Pa\n\n"
 
         f"**Step 5:** Calculate the Final Gauge Pressure\n"
-        f"P_gauge = {pressure_term2_pa:.2f} Pa - {pressure_term1_pa:.2f} Pa = {gauge_pressure_pa:.2f} Pa\n\n"
+        f"P_gauge = {pressure_term2_pa:.4f} Pa - {pressure_term1_pa:.4f} Pa = {gauge_pressure_pa:.4f} Pa\n\n"
 
         f"**Step 6:** Convert the Answer to Kilopascals (kPa)\n"
-        f"P_gauge = {gauge_pressure_pa:.2f} Pa / 1000 = {round(gauge_pressure_kpa, precision)} kPa\n\n"
+        f"P_gauge = {gauge_pressure_pa:.4f} Pa / 1000 = {round(gauge_pressure_kpa, precision)} kPa\n\n"
 
         f"**Answer:**\n"
         f"The gauge pressure in the pipe is {round(gauge_pressure_kpa, precision)} kPa."

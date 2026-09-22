@@ -1,5 +1,46 @@
 import random
 import math
+from decimal import Decimal, ROUND_HALF_UP
+
+
+def _hu(x, places):
+    """Round half-up to `places` dp, resolving the tie in DECIMAL.
+
+    `round()` resolves a half-way tie on the binary value and disagrees with a
+    reader doing decimal arithmetic (spec P2 as amended, DECISIONS D-012).
+    """
+    q = Decimal(1).scaleb(-places)
+    d = x if isinstance(x, Decimal) else Decimal(repr(x))
+    v = d.quantize(q, rounding=ROUND_HALF_UP)
+    return int(v) if places == 0 else float(v)
+
+
+def _as_printed(x, spec):
+    """The value a reader recovers from `x` when it is printed with `spec`.
+
+    P2 asks that the stored value and the printed value be the SAME value.
+    Rounding alone does not achieve that: a float one ulp away from its own
+    printed form puts the template and the reader on opposite sides of a
+    display tie (D-016 part 2).
+    """
+    return float(format(x, spec))
+
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where no rounding convention is defensible - a
+    decimal reader applying half-up and a binary reader applying `round()`
+    disagree, and the printed line closes for only one of them. Such instances
+    are resampled rather than resolved (D-016).
+
+    A narrow BAND is quarantined rather than a point, because two independent
+    evaluations of the same exact quantity differ by a few ulps and an exact
+    rational tie lands on opposite sides of them.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
 
 
 # Template 1 (Easy)
@@ -20,6 +61,17 @@ def template_bpsk_energy_basis():
         Simplified Energy: Eb = (A^2 * Tb) / 2
         Basis Function: psi_1(t) = s(t) / sqrt(Eb) = sqrt(2 / Tb) * cos(2*pi*fc*t)
 
+    Trace integrity (Layer 0, 2026-09-23):
+        Tb was drawn at full precision, stated in the question to 2 dp of its
+        prefixed value, displayed at `.4e` in the solution and consumed
+        unrounded, so the basis-amplitude line did not close on its printed
+        operand. Tb is bound at sampling time through the value the question
+        states, which the `.4e` display then shows exactly, and Eb and
+        sqrt(2/Tb) derive from it (D-016 part 2). fc is display-only and is
+        kept from the raw draw so the question text is unchanged. With Tb a
+        finite decimal, the 2-dp prefixed display of Eb can sit exactly on a
+        half-way tie; such draws are rejected and redrawn (D-016).
+
     Returns:
         tuple: A tuple containing:
             - str: A question about BPSK signal properties.
@@ -30,41 +82,58 @@ def template_bpsk_energy_basis():
     # Set a standard precision for rounding in all calculations and outputs
     precision = 2
 
-    amplitude = round(random.uniform(1.0, 10.0), precision)
-    
-    # Generate bit duration in a range from 1 microsecond to 10 milliseconds
-    bit_duration_s = random.uniform(1e-6, 1e-2)
-    
-    # Choose a carrier frequency that is an integer multiple of the bit rate (1/Tb)
-    k = random.randint(2, 20)
-    carrier_freq_hz = k / bit_duration_s
+    for _attempt in range(200):
+        amplitude = round(random.uniform(1.0, 10.0), precision)
 
-    # Inline formatting for bit_duration_s 
-    prefixes = {6: 'M', 3: 'k', 0: '', -3: 'm', -6: 'u', -9: 'n'}
-    exponent_td = int(math.floor(math.log10(abs(bit_duration_s)) / 3.0) * 3)
-    prefix_td = prefixes.get(exponent_td, '')
-    scaled_td = bit_duration_s / (10**exponent_td)
-    bit_duration_str = f"{round(scaled_td, precision)} {prefix_td}s"
+        # Generate bit duration in a range from 1 microsecond to 10 milliseconds
+        bit_duration_s = random.uniform(1e-6, 1e-2)
 
-    # Inline formatting for carrier_freq_hz 
-    exponent_fc = int(math.floor(math.log10(abs(carrier_freq_hz)) / 3.0) * 3)
-    prefix_fc = prefixes.get(exponent_fc, '')
-    scaled_fc = carrier_freq_hz / (10**exponent_fc)
-    carrier_freq_str = f"{round(scaled_fc, precision)} {prefix_fc}Hz"
+        # Choose a carrier frequency that is an integer multiple of the bit rate (1/Tb)
+        k = random.randint(2, 20)
+        # fc is display-only (nothing downstream consumes it); it is taken from
+        # the raw draw so the question text is unchanged by the binding below.
+        carrier_freq_hz = k / bit_duration_s
 
-    # 2. Perform the core calculation
-    
-    # Calculate energy per bit: Eb = (A^2 * Tb) / 2
-    energy_joules = (amplitude**2 * bit_duration_s) / 2
-    
-    # Calculate the amplitude of the basis function: sqrt(2 / Tb)
-    basis_amplitude = math.sqrt(2 / bit_duration_s)
+        # Inline formatting for bit_duration_s
+        prefixes = {6: 'M', 3: 'k', 0: '', -3: 'm', -6: 'u', -9: 'n'}
+        exponent_td = int(math.floor(math.log10(abs(bit_duration_s)) / 3.0) * 3)
+        prefix_td = prefixes.get(exponent_td, '')
+        # The question states Tb to `precision` dp of its prefixed value. Bind
+        # Tb through that display at sampling time, so the stated value IS the
+        # value the chain consumes, and the `.4e` display of it in the solution
+        # is exact (D-016 part 2).
+        scaled_td = _as_printed(bit_duration_s / (10**exponent_td), f'.{precision}f')
+        bit_duration_s = _as_printed(scaled_td * 10**exponent_td, '.4e')
+        bit_duration_str = f"{round(scaled_td, precision)} {prefix_td}s"
 
-    # Inline formatting for energy_joules 
-    exponent_e = int(math.floor(math.log10(abs(energy_joules)) / 3.0) * 3)
-    prefix_e = prefixes.get(exponent_e, '')
-    scaled_e = energy_joules / (10**exponent_e)
-    energy_str = f"{round(scaled_e, precision)} {prefix_e}J"
+        # Inline formatting for carrier_freq_hz
+        exponent_fc = int(math.floor(math.log10(abs(carrier_freq_hz)) / 3.0) * 3)
+        prefix_fc = prefixes.get(exponent_fc, '')
+        scaled_fc = carrier_freq_hz / (10**exponent_fc)
+        carrier_freq_str = f"{round(scaled_fc, precision)} {prefix_fc}Hz"
+
+        # 2. Perform the core calculation
+
+        # Calculate energy per bit: Eb = (A^2 * Tb) / 2
+        energy_joules = (amplitude**2 * bit_duration_s) / 2
+
+        # Calculate the amplitude of the basis function: sqrt(2 / Tb)
+        basis_amplitude = math.sqrt(2 / bit_duration_s)
+
+        # Inline formatting for energy_joules
+        exponent_e = int(math.floor(math.log10(abs(energy_joules)) / 3.0) * 3)
+        prefix_e = prefixes.get(exponent_e, '')
+        scaled_e = energy_joules / (10**exponent_e)
+        # With Tb a finite decimal, Eb is one too, and its 2-dp prefixed
+        # display can sit exactly on a half-way tie; such draws are rejected
+        # rather than resolved by a rounding convention (D-016).
+        if (_is_display_tie(scaled_e, precision)
+                or _is_display_tie(basis_amplitude, precision)):
+            continue
+        energy_str = f"{round(scaled_e, precision)} {prefix_e}J"
+        break
+    else:
+        raise RuntimeError("bpsk_energy_basis: no closing sample in 200 draws")
     
     # 3. Generate the question and solution strings
 
@@ -385,6 +454,14 @@ def template_ber_estimation_mary():
         M-QAM SER: Ps approx 4 * (1 - 1/sqrt(M)) * Q(sqrt(3*k/(M-1) * Eb/N0))
         Gray Code BER: Pb approx Ps / k
 
+    Trace integrity (Layer 0, 2026-09-23):
+        Eb/N0 (linear) is displayed to `precision` dp in Step 1 and was
+        consumed at full precision, so the Es/N0 line did not close on its
+        printed operands. It is bound through that display, and Es/N0 (an
+        integer multiple of it, exact at the same precision) through its own
+        (D-016 part 2). The question text is unchanged; the Q-function
+        argument in the answer may move in its last displayed digit.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the BER estimation.
@@ -403,13 +480,17 @@ def template_ber_estimation_mary():
     eb_n0_db = round(random.uniform(5.0, 25.0), precision)
 
     # 2. Perform the core calculation
-    eb_n0_lin = 10**(eb_n0_db / 10)
+    # Eb/N0 (linear) is DISPLAYED to `precision` dp in Step 1 and consumed by
+    # every later step, so it is bound through that display (D-016 part 2).
+    eb_n0_lin = _as_printed(10**(eb_n0_db / 10), f'.{precision}f')
     k = math.log2(M)
 
     # Logic varies based on modulation scheme
     if modulation_scheme == 'M-PSK':
         # For M-PSK, the formula uses Es/N0
-        es_n0_lin = k * eb_n0_lin
+        # An integer times a `precision`-dp value is exact at `precision` dp;
+        # bound through the display to strip float noise.
+        es_n0_lin = _as_printed(k * eb_n0_lin, f'.{precision}f')
         q_arg = math.sqrt(2 * es_n0_lin) * math.sin(math.pi / M)
         ser_coeff = 2
         ber_coeff = ser_coeff / k

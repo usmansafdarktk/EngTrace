@@ -15,6 +15,34 @@ def _hu(x, places):
     return int(v) if places == 0 else float(v)
 
 
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where NO rounding convention is defensible. A reader
+    doing decimal arithmetic and applying half-up reads 0.02325 m as 23.3 mm; a
+    reader using binary floats and `round()` reads it as 23.2 mm; and the
+    printed line closes for exactly one of them whichever the template picks.
+    Breaking the tie in decimal (P2 as amended) does not remove the ambiguity,
+    it only moves it to the other reader - which is why such instances are
+    RESAMPLED rather than resolved (D-016).
+
+    Testing for an EXACT tie is not enough. Two independent evaluations of the
+    same exact quantity - this template's, in kN and kN/m^2, and a solver's, in
+    N and Pa - differ by a few ulps, so a rational tie such as 29.25 mm lands
+    as 29.249999999999996 on one side and 29.250000000000004 on the other.
+    Neither is exactly a tie, and the two then round in opposite directions:
+    that is how eight non-closing instances per 60,000 seeds survived the first
+    version of this guard (Phase 1 review A, finding F-2).
+
+    So a narrow BAND is quarantined rather than a point. The band is a few
+    thousand ulps wide where the tie lattice is 10^-places apart, so it removes
+    nothing that is not genuinely ambiguous.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
+
+
 # Item classes whose constants.py windows keep the per-sample K window
 # non-empty under the order-frequency screen (lesson 1 joint feasibility).
 # "machine spare part" is excluded because its low corner (c=20, i=0.15,
@@ -180,7 +208,8 @@ def template_epq_finite_production():
         and (b) the production-rate multiple m (1 dp, <= 6.0) is floored
         so h' = h*(1 - 1/m) >= 0.1 as well as satisfying the K-window
         feasibility floor(D*h'/8) >= K_lo. With r = D/P displayed at
-        6 dp and h' at 6 dp, the chain shifts the raw root by at most
+        6 dp and h' at 6 dp (10 dp, exact, since Layer 0), the chain
+        shifts the raw root by at most
         Q*(dr/(2(1-r)) + dh'/(2h')) <= Q*(7.5e-7 + 2.5e-6) <= 0.09
         units at the 24,495-unit envelope max — so the 0.8-unit
         ten-unit-grid midpoint screen dominates the wobble with ~9x
@@ -194,6 +223,19 @@ def template_epq_finite_production():
         m=6.0, K=40), max at (fastener, c=0.50, i=0.40, D=200000,
         m=2.0, K=150). Asserts: Q in [100, 24700]; r = D/P in
         [0.16, 0.67]; h' >= 0.0999.
+
+    Trace integrity (Layer 0, 2026-09-23):
+        h' = h*(1 - D/P), a 4-dp h times a 6-dp factor, is exact at 10 dp
+        for every draw; printed at 6 dp it sat on a half-way tie on ~0.7%
+        of draws (1.7500 * (1 - 0.270270) = 1.2770275), so it is now bound
+        half-up at 10 dp and printed at 10 dp in Steps 2 and 3, and nothing
+        rounds (D-037); the ten-unit answer is unchanged, being pinned to
+        the exact root by the 0.8-unit midpoint screen and the grid assert.
+        The 6-dp ratio D/P is a quotient exact at no fixed display, and
+        H = Q*(1 - D/P), stated in whole units, is exact at 5 dp and sat on
+        a half-integer on ~1.1% of draws (3720 * (1 - 0.312500) = 2557.5);
+        a draw on which either sits on a half-way tie at its display is
+        redrawn rather than rounded either way (D-016, D-044).
 
     Returns:
         tuple(str, str): (question, solution)
@@ -227,18 +269,24 @@ def template_epq_finite_production():
         K = random.randint(k_lo, k_hi)
         s_exact = math.sqrt(2 * K * D / hp_exact)
         if abs((s_exact % 10) - 5.0) > 0.8:
-            draw = (key, c, D, i, h, P, K, s_exact)
+            # Round-then-recompute: r at 6 dp, h' at 10 dp (a 4-dp h times
+            # a 6-dp factor is exact there, so nothing rounds: D-037), root
+            # at 2 dp, final on the ten-unit grid half-up (wobble bound
+            # derived in the docstring; its h' term is now zero).
+            r = round(D / P, 6)
+            hp = _hu(h * (1 - r), 10)
+            Q_raw = round(math.sqrt(2 * K * D / hp), 2)
+            Q = _hu(Q_raw / 10, 0) * 10
+            # D-016: the 6-dp quotient D/P and the whole-unit H = Q*(1 - D/P)
+            # may not sit on a half-way tie at their display; screened last,
+            # after every draw, so only a tie draw is redrawn.
+            if _is_display_tie(D / P, 6) or _is_display_tie(Q * (1 - r), 0):
+                continue
+            draw = (key, c, D, i, h, P, K, s_exact, r, hp, Q_raw, Q)
             break
     assert draw is not None, "resample loop exhausted"
-    key, c, D, i, h, P, K, s_exact = draw
+    key, c, D, i, h, P, K, s_exact, r, hp, Q_raw, Q = draw
     setting = _T12_SETTINGS[key]
-
-    # Round-then-recompute: r at 6 dp, h' at 6 dp, root at 2 dp, final on
-    # the ten-unit grid half-up (wobble bound derived in the docstring).
-    r = round(D / P, 6)
-    hp = round(h * (1 - r), 6)
-    Q_raw = round(math.sqrt(2 * K * D / hp), 2)
-    Q = _hu(Q_raw / 10, 0) * 10
     H_max = _hu(Q * (1 - r), 0)
 
     assert 0.16 <= r <= 0.67, f"r out of bounds: {r}"
@@ -273,11 +321,11 @@ def template_epq_finite_production():
         f"rather than Q/2, which is equivalent to charging the reduced "
         f"holding cost h' = h*(1 - D/P) against Q/2:\n"
         f"D/P = {D} / {P} = {r:.6f};  "
-        f"h' = h * (1 - D/P) = {h:.4f} * (1 - {r:.6f}) = {hp:.6f} "
+        f"h' = h * (1 - D/P) = {h:.4f} * (1 - {r:.6f}) = {hp:.10f} "
         f"$/unit/year\n\n"
         f"**Step 3:** Apply the EPQ formula and round to a practical "
         f"run size.\n"
-        f"Q* = sqrt(2*K*D / h') = sqrt(2 * {K} * {D} / {hp:.6f}) "
+        f"Q* = sqrt(2*K*D / h') = sqrt(2 * {K} * {D} / {hp:.10f}) "
         f"= {Q_raw:.2f}, so Q* = {Q} units (nearest ten units)\n\n"
         f"**Step 4:** State the maximum on-hand inventory.\n"
         f"H = Q* * (1 - D/P) = {Q} * (1 - {r:.6f}) = {H_max} units — the "
@@ -643,6 +691,17 @@ def template_reorder_point_lead_time():
         <= 300*0.88*4.6 ~ 1214 and R_over >= ~7. Asserts: R in
         [5, 1850]; 0 < R < Q in every instance.
 
+    Trace integrity (Layer 0, 2026-09-23):
+        R = lambda*tau_eff, an integer times a 3-dp value, is exact at 3 dp
+        and was printed at 1 dp, where it sat on a half-way tie on ~0.9% of
+        draws (275 * 0.982 = 270.05); it is now bound half-up and printed
+        at 3 dp, so nothing rounds (D-037). The cycle T = Q/lambda (3 dp)
+        and, in the over regime, tau/T (3 dp) are quotients exact at no
+        fixed display (Q/32 terminates within 4 dp, Q/96 in general does
+        not), so a draw whose quotient sits on a 3-dp half-way tie (~0.6%
+        of draws, e.g. 1730 / 160 = 10.8125) is redrawn rather than rounded
+        either way (D-016, D-044).
+
     Returns:
         tuple(str, str): (question, solution)
     """
@@ -674,6 +733,15 @@ def template_reorder_point_lead_time():
                 continue
             if not (0.12 <= ratio - k <= 0.88):
                 continue
+        # D-016: T = Q/lambda (3 dp) and, in the over regime, tau/T (3 dp)
+        # are quotients exact at no fixed display; a draw whose quotient
+        # sits on a half-way tie at that display is redrawn rather than
+        # rounded either way. Screened last, after every draw, so only a
+        # tie draw is redrawn.
+        if _is_display_tie(Q / lam, 3):
+            continue
+        if regime == "over" and _is_display_tie(tau / round(Q / lam, 3), 3):
+            continue
         break
     else:
         raise AssertionError("resample loop exhausted")
@@ -721,7 +789,10 @@ def template_reorder_point_lead_time():
         )
     else:
         cyc_word = "cycles fit" if k > 1 else "cycle fits"
-        r_disp = round(lam * tau_eff, 1)
+        # lambda*tau_eff is exact at 3 dp (an integer times a 3-dp value);
+        # its former 1-dp display sat on a half-way tie on ~0.9% of draws,
+        # so it is bound and printed at 3 dp (D-016/D-037).
+        r_disp = _hu(lam * tau_eff, 3)
         solution = (
             f"**Given:**\n"
             f"Demand rate lambda = {lam} units/week; lot size Q = {Q} "
@@ -741,7 +812,7 @@ def template_reorder_point_lead_time():
             f"**Step 4:** Compute the reorder point from the effective "
             f"lead time.\n"
             f"R = lambda * tau_eff = {lam} * {tau_eff:.3f} = "
-            f"{r_disp:.1f}, i.e. R = {R} units — exactly, since "
+            f"{r_disp:.3f}, i.e. R = {R} units — exactly, since "
             f"R = lambda*tau - k*Q = {lam}*{tau} - {k}*{Q} = {R}.\n\n"
             f"**Step 5:** Consistency check: 0 < R = {R} < Q = {Q}, as "
             f"required for a reorder point applied to on-hand "

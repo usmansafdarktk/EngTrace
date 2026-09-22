@@ -1,8 +1,49 @@
 import random
 import math
+from decimal import Decimal, ROUND_HALF_UP
 from fractions import Fraction
 from data.templates.branches.electrical_engineering.constants import FREQUENCY_RANGE_HZ, AMPLITUDE_RANGE, PHASE_RANGE_DEG, PHASE_RANGE_RAD, OMEGA_MULTIPLIER_RANGE, SAMPLING_FREQ_RANGE_HZ, F0_RANGE_HZ, GAIN_K_RANGE, DELAY_N0_RANGE, DECIMATION_FACTOR_M_RANGE, OMEGA_DENOMINATOR_RANGE
 from data.templates.branches._emission import signed_term, joined_terms
+
+
+def _hu(x, places):
+    """Round half-up to `places` dp, resolving the tie in DECIMAL.
+
+    `round()` resolves a half-way tie on the binary value and disagrees with a
+    reader doing decimal arithmetic (spec P2 as amended, DECISIONS D-012).
+    """
+    q = Decimal(1).scaleb(-places)
+    d = x if isinstance(x, Decimal) else Decimal(repr(x))
+    v = d.quantize(q, rounding=ROUND_HALF_UP)
+    return int(v) if places == 0 else float(v)
+
+
+def _as_printed(x, spec):
+    """The value a reader recovers from `x` when it is printed with `spec`.
+
+    P2 asks that the stored value and the printed value be the SAME value.
+    Rounding alone does not achieve that: a float one ulp away from its own
+    printed form puts the template and the reader on opposite sides of a
+    display tie (D-016 part 2).
+    """
+    return float(format(x, spec))
+
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where no rounding convention is defensible - a
+    decimal reader applying half-up and a binary reader applying `round()`
+    disagree, and the printed line closes for only one of them. Such instances
+    are resampled rather than resolved (D-016).
+
+    A narrow BAND is quarantined rather than a point, because two independent
+    evaluations of the same exact quantity differ by a few ulps and an exact
+    rational tie lands on opposite sides of them.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
 
 
 # Template 1 (Easy)
@@ -415,6 +456,15 @@ def template_decimation_aliasing_analysis():
         Aliasing is avoided if omega_0 < pi / M.
         omega_aliased = abs(omega_prime - 2*pi*k), where omega_prime = omega_0 * M.
 
+    Trace integrity (Layer 0, 2026-09-23):
+        The folding line prints omega' and 2*pi*k to 3 dp and printed a
+        difference taken at full precision, which is off by one unit in the
+        last place whenever the two roundings go opposite ways. Both
+        operands are bound through their 3-dp display and the printed
+        difference is the difference of the printed operands (D-016 part
+        2). The symbolic answer in terms of pi is still identified from the
+        exact value, so the question text and the gold answer are unchanged.
+
     Returns:
         tuple: A tuple containing:
             - str: A multi-part question about the downsampled signal.
@@ -539,15 +589,20 @@ def template_decimation_aliasing_analysis():
             f"omega_a = {final_omega_str}"
         )
     else:
-        # For clarity, re-calculate final_omega inside the solution string
-        final_omega_val = abs(omega_prime - 2 * math.pi * k_val)
+        # The two operands are DISPLAYED to 3 dp, so the printed difference
+        # must be the difference of the printed operands: bind both through
+        # that display (D-016 part 2). The symbolic answer above is still
+        # identified from the exact value.
+        omega_prime_3 = _as_printed(omega_prime, '.3f')
+        two_pi_k_3 = _as_printed(2 * math.pi * k_val, '.3f')
+        final_omega_val = _as_printed(abs(omega_prime_3 - two_pi_k_3), '.3f')
         solution += (
             f"Because aliasing occurred, the frequency omega' = {omega_prime_str} is outside the principal range [0, pi] and must be 'folded' back.\n"
             f"We find an integer 'k' such that omega_a = abs(omega' - 2*pi*k) is in the range [0, pi].\n"
             f"k = round(omega' / (2*pi)) = round({omega_prime/math.pi:.2f}*pi / (2*pi)) = round({omega_prime/(2*math.pi):.2f}) = {k_val}\n"
             f"Now we calculate omega_a:\n"
             f"omega_a = abs({omega_prime_str} - 2*pi*{k_val})\n"
-            f"omega_a = abs({round(omega_prime, 3)} - {round(2*math.pi*k_val, 3)}) = {round(final_omega_val, 3)}\n"
+            f"omega_a = abs({omega_prime_3} - {two_pi_k_3}) = {final_omega_val}\n"
             f"In terms of pi, this is omega_a = {final_omega_str}.\n\n"
         )
         

@@ -1,5 +1,49 @@
 import math
 import random
+from decimal import Decimal, ROUND_HALF_UP
+
+
+def _hu(x, places):
+    """Round half-up to `places` dp, resolving the tie in DECIMAL.
+
+    `round()` resolves a half-way tie on the binary value, so
+    `round(0.01185 * 1000, 1)` gives 11.8 where a reader doing decimal
+    arithmetic gets 11.9 (spec P2 as amended, DECISIONS D-012). Accepts a
+    Decimal so an exact decimal product can be quantised without a detour
+    through a float. Matches the industrial branch's `_hu` convention.
+    """
+    q = Decimal(1).scaleb(-places)
+    d = x if isinstance(x, Decimal) else Decimal(repr(x))
+    v = d.quantize(q, rounding=ROUND_HALF_UP)
+    return int(v) if places == 0 else float(v)
+
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where NO rounding convention is defensible. A reader
+    doing decimal arithmetic and applying half-up reads 0.02325 m as 23.3 mm; a
+    reader using binary floats and `round()` reads it as 23.2 mm; and the
+    printed line closes for exactly one of them whichever the template picks.
+    Breaking the tie in decimal (P2 as amended) does not remove the ambiguity,
+    it only moves it to the other reader - which is why such instances are
+    RESAMPLED rather than resolved (D-016).
+
+    Testing for an EXACT tie is not enough. Two independent evaluations of the
+    same exact quantity - this template's, in kN and kN/m^2, and a solver's, in
+    N and Pa - differ by a few ulps, so a rational tie such as 29.25 mm lands
+    as 29.249999999999996 on one side and 29.250000000000004 on the other.
+    Neither is exactly a tie, and the two then round in opposite directions:
+    that is how eight non-closing instances per 60,000 seeds survived the first
+    version of this guard (Phase 1 review A, finding F-2).
+
+    So a narrow BAND is quarantined rather than a point. The band is a few
+    thousand ulps wide where the tie lattice is 10^-places apart, so it removes
+    nothing that is not genuinely ambiguous.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
 
 
 # Template 11 (Easy) — Area A1: Analysis of Determinate Structures
@@ -29,43 +73,66 @@ def template_beam_support_reactions():
         strictly positive and their sum equals the total load within
         rounding.
 
+    Trace integrity (Layer 0, 2026-09-23):
+        The triangular resultant W = w_max*L/2 (an integer times a 1-dp
+        span, halved) is exact at 2 dp and was printed at 1 dp, where it
+        sat on a half-way tie on about a tenth of triangular draws
+        (5 * 9.7 / 2 = 24.25); it is now bound half-up at 2 dp and printed
+        at 2 dp everywhere it appears. The uniform resultant w*L is exact
+        at 1 dp and is unchanged. The right reaction By = (P*a + W*x_bar)/L
+        is a quotient by an arbitrary 1-dp span and exact at no fixed
+        display, so a draw whose By lands on a 2-dp half-way tie is
+        resampled rather than rounded either way (D-016/D-037).
+
     Returns:
         tuple: (question, solution)
     """
     # 1. Parameterize (load-type branch changes the resultant sub-chain).
-    L = round(random.uniform(4.0, 10.0), 1)
-    P = random.randint(10, 50)
-    a = round(random.uniform(0.2 * L, 0.8 * L), 1)
-    load_type = random.choice(["uniform", "triangular"])
-    if load_type == "uniform":
-        w = random.randint(2, 10)
-        W = round(w * L, 1)
-        x_bar = round(L / 2, 2)
-        load_text = (f"a uniformly distributed load of {w} kN/m over the "
-                     f"entire span")
-        step1 = (
-            f"**Step 1:** Replace the distributed load by its resultant.\n"
-            f"For a uniform load over the full span:\n"
-            f"W = w * L = {w} * {L:.1f} = {W:.1f} kN, acting at the "
-            f"midspan, x_bar = L/2 = {x_bar:.2f} m from A.\n\n"
-        )
-    else:
-        w = random.randint(3, 12)
-        W = round(0.5 * w * L, 1)
-        x_bar = round(2 * L / 3, 2)
-        load_text = (f"a triangularly distributed load that varies from "
-                     f"zero at A to {w} kN/m at B")
-        step1 = (
-            f"**Step 1:** Replace the distributed load by its resultant.\n"
-            f"For a triangular load (zero at A, peak at B):\n"
-            f"W = w_max * L / 2 = {w} * {L:.1f} / 2 = {W:.1f} kN, acting "
-            f"at two-thirds of the span from A, x_bar = 2L/3 = "
-            f"{x_bar:.2f} m.\n\n"
-        )
+    # Bounded redraw: a draw whose right reaction lands on a 2-dp half-way
+    # tie has no defensible gold answer and is rejected (D-016).
+    for _attempt in range(200):
+        L = round(random.uniform(4.0, 10.0), 1)
+        P = random.randint(10, 50)
+        a = round(random.uniform(0.2 * L, 0.8 * L), 1)
+        load_type = random.choice(["uniform", "triangular"])
+        if load_type == "uniform":
+            w = random.randint(2, 10)
+            W = round(w * L, 1)
+            W_dp = 1                    # integer w times a 1-dp span: exact
+            x_bar = round(L / 2, 2)
+            load_text = (f"a uniformly distributed load of {w} kN/m over the "
+                         f"entire span")
+            step1 = (
+                f"**Step 1:** Replace the distributed load by its resultant.\n"
+                f"For a uniform load over the full span:\n"
+                f"W = w * L = {w} * {L:.1f} = {W:.{W_dp}f} kN, acting at the "
+                f"midspan, x_bar = L/2 = {x_bar:.2f} m from A.\n\n"
+            )
+        else:
+            w = random.randint(3, 12)
+            # w_max*L/2 is exact at 2 dp; at 1 dp it tied on ~10% of draws.
+            W = _hu(w * L / 2, 2)
+            W_dp = 2
+            x_bar = round(2 * L / 3, 2)
+            load_text = (f"a triangularly distributed load that varies from "
+                         f"zero at A to {w} kN/m at B")
+            step1 = (
+                f"**Step 1:** Replace the distributed load by its resultant.\n"
+                f"For a triangular load (zero at A, peak at B):\n"
+                f"W = w_max * L / 2 = {w} * {L:.1f} / 2 = {W:.{W_dp}f} kN, "
+                f"acting at two-thirds of the span from A, x_bar = 2L/3 = "
+                f"{x_bar:.2f} m.\n\n"
+            )
 
-    # 2. Core computation — round-then-recompute at every step.
-    By = round((P * a + W * x_bar) / L, 2)
-    Ay = round(P + W - By, 2)
+        # 2. Core computation — round-then-recompute at every step.
+        By_exact = (P * a + W * x_bar) / L
+        if _is_display_tie(By_exact, 2):
+            continue                    # no defensible gold answer; redraw
+        By = round(By_exact, 2)
+        Ay = round(P + W - By, 2)
+        break
+    else:
+        raise RuntimeError("beam_support_reactions: no closing sample in 200 draws")
 
     assert Ay > 0 and By > 0, f"reaction not positive: {Ay}, {By}"
     assert abs((Ay + By) - (P + W)) < 0.02, "equilibrium check failed"
@@ -87,11 +154,11 @@ def template_beam_support_reactions():
         f"{step1}"
         f"**Step 2:** Take moments about A to find the reaction at B.\n"
         f"Sum(M_A) = 0: By * L = P * a + W * x_bar\n"
-        f"By = ({P} * {a:.1f} + {W:.1f} * {x_bar:.2f}) / {L:.1f} "
+        f"By = ({P} * {a:.1f} + {W:.{W_dp}f} * {x_bar:.2f}) / {L:.1f} "
         f"= {By:.2f} kN\n\n"
         f"**Step 3:** Apply vertical force equilibrium to find the "
         f"reaction at A.\n"
-        f"Sum(F_y) = 0: Ay = P + W - By = {P} + {W:.1f} - {By:.2f} "
+        f"Sum(F_y) = 0: Ay = P + W - By = {P} + {W:.{W_dp}f} - {By:.2f} "
         f"= {Ay:.2f} kN\n\n"
         f"**Answer:** The vertical reaction at support A is {Ay:.2f} kN"
     )
@@ -120,19 +187,39 @@ def template_truss_method_of_joints():
         h can nudge the nominal 25-60 window by ~1 degree); apex load P in
         [20, 80] kN; the diagonal is always in compression.
 
+    Trace integrity (Layer 0, 2026-09-23):
+        F_AB = Ay / sin(theta) is a quotient by a 4-dp sine, exact at no
+        fixed display; on the 3-4-5 geometries sin(theta) = 0.8000 exactly
+        and F_AB = 1.25 * Ay lands on a 2-dp half-way tie whenever P is odd
+        (32.5 / 0.8000 = 40.625). Such a draw, and the draw whose sine
+        h / L_AB itself lands on a 4-dp tie, is resampled rather than
+        rounded either way (D-016/D-037); the answer's 2-dp display is
+        unchanged.
+
     Returns:
         tuple: (question, solution)
     """
     # 1. Parameterize with the inclination kept in a sensible window.
-    b = round(random.uniform(2.0, 4.0), 1)
-    h = round(random.uniform(0.47 * b, 1.7 * b), 1)   # theta ~ 25-60 deg
-    P = random.randint(20, 80)
+    # Bounded redraw: a draw whose diagonal force (or its sine) lands on a
+    # half-way tie at its display has no defensible gold answer and is
+    # rejected (D-016).
+    for _attempt in range(200):
+        b = round(random.uniform(2.0, 4.0), 1)
+        h = round(random.uniform(0.47 * b, 1.7 * b), 1)   # theta ~ 25-60 deg
+        P = random.randint(20, 80)
 
-    # 2. Core computation — round-then-recompute at every step.
-    L_ab = round(math.sqrt(h ** 2 + b ** 2), 3)
-    sin_t = round(h / L_ab, 4)
-    Ay = round(P / 2, 1)
-    F_ab = round(Ay / sin_t, 2)
+        # 2. Core computation — round-then-recompute at every step.
+        L_ab = round(math.sqrt(h ** 2 + b ** 2), 3)
+        sin_exact = h / L_ab
+        sin_t = round(sin_exact, 4)
+        Ay = round(P / 2, 1)
+        F_exact = Ay / sin_t
+        if _is_display_tie(sin_exact, 4) or _is_display_tie(F_exact, 2):
+            continue                    # no defensible gold answer; redraw
+        F_ab = round(F_exact, 2)
+        break
+    else:
+        raise RuntimeError("truss_method_of_joints: no closing sample in 200 draws")
 
     theta_deg = math.degrees(math.asin(min(1.0, sin_t)))
     assert 24.0 <= theta_deg <= 61.0, f"inclination out of window: {theta_deg}"
@@ -198,25 +285,51 @@ def template_beam_internal_moment():
         a in [0.3L, 0.7L]; w in [2, 8] kN/m; section location kept at
         least 0.5 m from both supports and from the load point.
 
+    Trace integrity (Layer 0, 2026-09-23):
+        The moment M = Ay*x - w*x^2/2 [- P*(x - a)], with a 2-dp reaction
+        and a 1-dp section, is exact at 3 dp and is printed at 2 dp, where
+        it sits on a half-way tie on ~9% of draws (26.25 * 2.9 - 4 *
+        2.9^2 / 2 = 59.305). M is the answer, so its 2-dp display is kept
+        and such a draw is resampled rather than rounded either way; a
+        3-dp answer display would remove the tie by construction but needs
+        sign-off (D-044). By = (P*a + w*L^2/2)/L is a quotient by an
+        arbitrary 1-dp span, exact at no fixed display, so a draw whose By
+        lands on a 2-dp tie is resampled likewise (D-016/D-037).
+
     Returns:
         tuple: (question, solution)
     """
     # 1. Parameterize (section-side branch).
-    L = round(random.uniform(6.0, 12.0), 1)
-    P = random.randint(15, 60)
-    a = round(random.uniform(0.3 * L, 0.7 * L), 1)
-    w = random.randint(2, 8)
-    side = random.choice(["left", "right"])
-    if side == "left":
-        x = round(random.uniform(0.15 * L, a - 0.5), 1)
-    else:
-        x = round(random.uniform(a + 0.5, 0.85 * L), 1)
+    # Bounded redraw: a draw whose reaction By or whose moment M lands on a
+    # 2-dp half-way tie has no defensible gold answer and is rejected
+    # (D-016).
+    for _attempt in range(200):
+        L = round(random.uniform(6.0, 12.0), 1)
+        P = random.randint(15, 60)
+        a = round(random.uniform(0.3 * L, 0.7 * L), 1)
+        w = random.randint(2, 8)
+        side = random.choice(["left", "right"])
+        if side == "left":
+            x = round(random.uniform(0.15 * L, a - 0.5), 1)
+        else:
+            x = round(random.uniform(a + 0.5, 0.85 * L), 1)
 
-    # 2. Core computation — round-then-recompute at every step.
-    By = round((P * a + w * L * L / 2) / L, 2)
-    Ay = round(P + w * L - By, 2)
+        # 2. Core computation — round-then-recompute at every step.
+        By_exact = (P * a + w * L * L / 2) / L
+        By = round(By_exact, 2)
+        Ay = round(P + w * L - By, 2)
+        if x > a:
+            M_exact = Ay * x - w * x ** 2 / 2 - P * (x - a)
+        else:
+            M_exact = Ay * x - w * x ** 2 / 2
+        if _is_display_tie(By_exact, 2) or _is_display_tie(M_exact, 2):
+            continue                    # no defensible gold answer; redraw
+        M = round(M_exact, 2)
+        break
+    else:
+        raise RuntimeError("beam_internal_moment: no closing sample in 200 draws")
+
     if x > a:
-        M = round(Ay * x - w * x ** 2 / 2 - P * (x - a), 2)
         cut_terms = (
             f"the reaction Ay, the distributed load over the length x, "
             f"and the point load P (since x = {x:.1f} m > a = {a:.1f} m, "
@@ -226,7 +339,6 @@ def template_beam_internal_moment():
             f"M = {Ay:.2f} * {x:.1f} - {w} * ({x:.1f})^2 / 2 - {P} * "
             f"({x:.1f} - {a:.1f}) = {M:.2f} kN*m")
     else:
-        M = round(Ay * x - w * x ** 2 / 2, 2)
         cut_terms = (
             f"the reaction Ay and the distributed load over the length x "
             f"only (the point load acts beyond the section, since "
@@ -299,19 +411,44 @@ def template_truss_method_of_sections():
         [0.6d, 1.2d] (diagonal inclination ~31-50 deg); load P in
         [20, 80] kN; requested member sampled from {AC, BD, BC}.
 
+    Trace integrity (Layer 0, 2026-09-23):
+        Every member force is a quotient by the arbitrary 1-dp height h
+        (Ay*d/h, Ay*2d/h, Ay*L_BC/h), exact at no fixed display, and lands
+        on a 2-dp half-way tie on ~3% of draws, concentrated on the heights
+        whose 10*h has only the factors 2 and 5 (33.5 * 2.0 / 1.6 =
+        41.875). The force is the answer, so its 2-dp display is kept and
+        such a draw is resampled rather than rounded either way
+        (D-016/D-037).
+
     Returns:
         tuple: (question, solution)
     """
     # 1. Parameterize (member branch selects the equilibrium equation).
-    d = round(random.uniform(2.0, 4.0), 1)
-    h = round(random.uniform(0.6 * d, 1.2 * d), 1)
-    P = random.randint(20, 80)
-    member = random.choice(["AC", "BD", "BC"])
+    # Bounded redraw: a draw whose member force lands on a 2-dp half-way
+    # tie has no defensible gold answer and is rejected (D-016).
+    for _attempt in range(200):
+        d = round(random.uniform(2.0, 4.0), 1)
+        h = round(random.uniform(0.6 * d, 1.2 * d), 1)
+        P = random.randint(20, 80)
+        member = random.choice(["AC", "BD", "BC"])
 
-    # 2. Core computation — round-then-recompute at every step.
-    Ay = round(P / 2, 1)
+        # 2. Core computation — round-then-recompute at every step.
+        Ay = round(P / 2, 1)
+        if member == "AC":
+            F_exact = Ay * d / h
+        elif member == "BD":
+            F_exact = Ay * 2 * d / h
+        else:
+            L_bc = round(math.sqrt(d ** 2 + h ** 2), 3)
+            F_exact = Ay * L_bc / h
+        if _is_display_tie(F_exact, 2):
+            continue                    # no defensible gold answer; redraw
+        F = round(F_exact, 2)
+        break
+    else:
+        raise RuntimeError("truss_method_of_sections: no closing sample in 200 draws")
+
     if member == "AC":
-        F = round(Ay * d / h, 2)
         sense = "tension"
         method_step = (
             f"**Step 3:** Take moments about joint B (at x = d, height h) "
@@ -322,7 +459,6 @@ def template_truss_method_of_sections():
             f"F_AC = Ay * d / h = {Ay:.1f} * {d:.1f} / {h:.1f} = "
             f"{F:.2f} kN (tension)")
     elif member == "BD":
-        F = round(Ay * 2 * d / h, 2)
         sense = "compression"
         method_step = (
             f"**Step 3:** Take moments about joint C (at x = 2d on the "
@@ -333,8 +469,6 @@ def template_truss_method_of_sections():
             f"F_BD = Ay * 2d / h = {Ay:.1f} * {2 * d:.1f} / {h:.1f} = "
             f"{F:.2f} kN (compression)")
     else:
-        L_bc = round(math.sqrt(d ** 2 + h ** 2), 3)
-        F = round(Ay * L_bc / h, 2)
         sense = "tension"
         method_step = (
             f"**Step 3:** Sum vertical forces on the left free body.\n"

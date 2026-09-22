@@ -16,6 +16,34 @@ def _hu(x, places):
     return int(v) if places == 0 else float(v)
 
 
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where NO rounding convention is defensible. A reader
+    doing decimal arithmetic and applying half-up reads 0.02325 m as 23.3 mm; a
+    reader using binary floats and `round()` reads it as 23.2 mm; and the
+    printed line closes for exactly one of them whichever the template picks.
+    Breaking the tie in decimal (P2 as amended) does not remove the ambiguity,
+    it only moves it to the other reader - which is why such instances are
+    RESAMPLED rather than resolved (D-016).
+
+    Testing for an EXACT tie is not enough. Two independent evaluations of the
+    same exact quantity - this template's, in kN and kN/m^2, and a solver's, in
+    N and Pa - differ by a few ulps, so a rational tie such as 29.25 mm lands
+    as 29.249999999999996 on one side and 29.250000000000004 on the other.
+    Neither is exactly a tie, and the two then round in opposite directions:
+    that is how eight non-closing instances per 60,000 seeds survived the first
+    version of this guard (Phase 1 review A, finding F-2).
+
+    So a narrow BAND is quarantined rather than a point. The band is a few
+    thousand ulps wide where the tie lattice is 10^-places apart, so it removes
+    nothing that is not genuinely ambiguous.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
+
+
 # Measurable characteristics for X-bar/R charting with display units and
 # sensible decimal places for the sampled grand mean / average range
 # (prose anchored to the SPC_CHARACTERISTICS [REALISM] classes).
@@ -72,46 +100,69 @@ def template_xbar_r_control_limits():
         half-up at the class dp (the precision the question prescribes
         for the limits); sigma-hat = Rbar/d2 rounded half-up at dp + 1;
         a full-precision solve matches every displayed value by
-        construction (true decimal ties handled by Decimal half-up).
+        construction (a true decimal tie is removed by resampling; see
+        Trace integrity below).
         Asserts: LCL_x > 0;
         UCL_R > Rbar; sigma-hat > 0; UCL_x within 10% of the grand
         mean.
 
+    Trace integrity (Layer 0, 2026-09-23):
+        The question binds both chart limits to dp decimals and sigma-hat
+        to dp + 1, so no display can be lengthened here (D-044). Each of
+        A2*Rbar, D4*Rbar (3-dp factors times a dp-dp mean, exact at dp + 3)
+        and Rbar/d2 is instead screened for a half-way tie at its display,
+        from the exact Decimal operands a reader recovers from the printed
+        text, and a draw that lands on one (~0.3% of draws, e.g. 2.004 *
+        0.125 = 0.2505) is redrawn rather than rounded either way (D-016).
+
     Returns:
         tuple(str, str): (question, solution)
     """
-    key = random.choice(sorted(_T21_SETTINGS))
-    cfg = _T21_SETTINGS[key]
-    lo_t, hi_t = SPC_CHARACTERISTICS[key]["target"]
-    dp = cfg["dp"]
+    for _attempt in range(200):
+        key = random.choice(sorted(_T21_SETTINGS))
+        cfg = _T21_SETTINGS[key]
+        lo_t, hi_t = SPC_CHARACTERISTICS[key]["target"]
+        dp = cfg["dp"]
 
-    n = random.randint(4, 6)
-    m = random.randint(20, 30)
-    A2 = chart_factor(n, "A2")
-    D3 = chart_factor(n, "D3")
-    D4 = chart_factor(n, "D4")
-    d2 = chart_factor(n, "d2")
+        n = random.randint(4, 6)
+        m = random.randint(20, 30)
+        A2 = chart_factor(n, "A2")
+        D3 = chart_factor(n, "D3")
+        D4 = chart_factor(n, "D4")
+        d2 = chart_factor(n, "d2")
 
-    xbb = round(random.uniform(lo_t, hi_t), dp)
-    # COHERENT spread sampling (lesson 53; R1 c1 major): draw the true
-    # process sigma from the class sigma-fraction sub-window, then derive
-    # R-bar = d2*sigma — so sigma-hat = R-bar/d2 always lands back inside
-    # the class window (up to display rounding).
-    sf_lo, sf_hi = cfg["sf"]
-    sigma_true = xbb * random.uniform(sf_lo, sf_hi)
-    rbar = round(d2 * sigma_true, dp)
+        xbb = round(random.uniform(lo_t, hi_t), dp)
+        # COHERENT spread sampling (lesson 53; R1 c1 major): draw the true
+        # process sigma from the class sigma-fraction sub-window, then derive
+        # R-bar = d2*sigma — so sigma-hat = R-bar/d2 always lands back inside
+        # the class window (up to display rounding).
+        sf_lo, sf_hi = cfg["sf"]
+        sigma_true = xbb * random.uniform(sf_lo, sf_hi)
+        rbar = round(d2 * sigma_true, dp)
 
-    # Decimal-exact display chain (lessons 51/65/67): factors and the
-    # sampled values are exact decimals.
-    dA2, dD4, dD3 = (Decimal(str(A2)), Decimal(str(D4)), Decimal(str(D3)))
-    dx, dr = Decimal(f"{xbb:.{dp}f}"), Decimal(f"{rbar:.{dp}f}")
-    qq = Decimal(1).scaleb(-dp)          # exactly dp decimal places
-    ucl_x = float((dx + dA2 * dr).quantize(qq, rounding=ROUND_HALF_UP))
-    lcl_x = float((dx - dA2 * dr).quantize(qq, rounding=ROUND_HALF_UP))
-    ucl_r = float((dD4 * dr).quantize(qq, rounding=ROUND_HALF_UP))
-    lcl_r = float((dD3 * dr).quantize(qq, rounding=ROUND_HALF_UP))
-    qq2 = Decimal(1).scaleb(-(dp + 1))   # sigma-hat carries dp + 1
-    sig = float((dr / Decimal(str(d2))).quantize(qq2, rounding=ROUND_HALF_UP))
+        # Decimal-exact display chain (lessons 51/65/67): factors and the
+        # sampled values are exact decimals.
+        dA2, dD4, dD3 = (Decimal(str(A2)), Decimal(str(D4)), Decimal(str(D3)))
+        dx, dr = Decimal(f"{xbb:.{dp}f}"), Decimal(f"{rbar:.{dp}f}")
+        qq = Decimal(1).scaleb(-dp)          # exactly dp decimal places
+        qq2 = Decimal(1).scaleb(-(dp + 1))   # sigma-hat carries dp + 1
+        # Exact values before the single quantize. D-016: the question
+        # prescribes these displays, so a value that sits on a half-way tie
+        # at its display is not rounded either way; the draw is repeated.
+        # Screened last, after every draw, so only a tie draw is redrawn.
+        e_limits = (dx + dA2 * dr, dx - dA2 * dr, dD4 * dr, dD3 * dr)
+        e_sig = dr / Decimal(str(d2))
+        if (any(_is_display_tie(float(e), dp) for e in e_limits)
+                or _is_display_tie(float(e_sig), dp + 1)):
+            continue
+        ucl_x = float(e_limits[0].quantize(qq, rounding=ROUND_HALF_UP))
+        lcl_x = float(e_limits[1].quantize(qq, rounding=ROUND_HALF_UP))
+        ucl_r = float(e_limits[2].quantize(qq, rounding=ROUND_HALF_UP))
+        lcl_r = float(e_limits[3].quantize(qq, rounding=ROUND_HALF_UP))
+        sig = float(e_sig.quantize(qq2, rounding=ROUND_HALF_UP))
+        break
+    else:
+        raise AssertionError("resample loop exhausted")
 
     implied_sf = (rbar / d2) / xbb
     assert 0.85 * sf_lo <= implied_sf <= 1.15 * sf_hi, \
@@ -433,6 +484,17 @@ def template_chart_pair_selection():
         sigma-hat coherence with the class window (0.85-1.15
         tolerance); wrong-pair UCL distinct from the answer.
 
+    Trace integrity (Layer 0, 2026-09-23):
+        The question binds the X-bar limits, the spread-chart limits and
+        sigma-hat to dp + 1 decimals, so no display can be lengthened here
+        (D-044). The five values of the chosen pair are screened for a
+        half-way tie at that display, from the exact Decimal operands a
+        reader recovers from the printed text (the limits are 3-dp factors
+        times a (dp+1)-dp statistic, exact at dp + 4; sigma-hat is a
+        quotient), and a draw that lands on one (~0.7% of draws, e.g.
+        0.076 * 9.625 = 0.7315) is redrawn rather than rounded either way
+        (D-016). The branch is still drawn outside the loop.
+
     Returns:
         tuple(str, str): (question, solution)
     """
@@ -477,27 +539,30 @@ def template_chart_pair_selection():
             continue
 
         if branch == "small":
+            fA, f_hi, f_lo, f_div = A2, D4, D3, d2
+            d_stat, spread_stat = d_r, rbar
             ucl_x, ucl_alt = float(d_ucl_r), float(d_ucl_s)
-            lcl_x = float((d_x - Decimal(str(A2)) * d_r)
-                          .quantize(qq, rounding=ROUND_HALF_UP))
-            ucl_sp = float((Decimal(str(D4)) * d_r)
-                           .quantize(qq, rounding=ROUND_HALF_UP))
-            lcl_sp = float((Decimal(str(D3)) * d_r)
-                           .quantize(qq, rounding=ROUND_HALF_UP))
-            sig = float((d_r / Decimal(str(d2)))
-                        .quantize(qq, rounding=ROUND_HALF_UP))
-            spread_stat = rbar
         else:
+            fA, f_hi, f_lo, f_div = A3, B4, B3, c4
+            d_stat, spread_stat = d_s, sbar
             ucl_x, ucl_alt = float(d_ucl_s), float(d_ucl_r)
-            lcl_x = float((d_x - Decimal(str(A3)) * d_s)
-                          .quantize(qq, rounding=ROUND_HALF_UP))
-            ucl_sp = float((Decimal(str(B4)) * d_s)
-                           .quantize(qq, rounding=ROUND_HALF_UP))
-            lcl_sp = float((Decimal(str(B3)) * d_s)
-                           .quantize(qq, rounding=ROUND_HALF_UP))
-            sig = float((d_s / Decimal(str(c4)))
-                        .quantize(qq, rounding=ROUND_HALF_UP))
-            spread_stat = sbar
+        # Exact values of the pair's limits and sigma-hat before the single
+        # quantize. D-016: the question prescribes their display, so a value
+        # that sits on a half-way tie there is not rounded either way; the
+        # draw is repeated. Screened last, after every draw, so only a tie
+        # draw is redrawn.
+        e_ucl_x = d_x + Decimal(str(fA)) * d_stat
+        e_lcl_x = d_x - Decimal(str(fA)) * d_stat
+        e_ucl_sp = Decimal(str(f_hi)) * d_stat
+        e_lcl_sp = Decimal(str(f_lo)) * d_stat
+        e_sig = d_stat / Decimal(str(f_div))
+        if any(_is_display_tie(float(e), dp + 1)
+               for e in (e_ucl_x, e_lcl_x, e_ucl_sp, e_lcl_sp, e_sig)):
+            continue
+        lcl_x = float(e_lcl_x.quantize(qq, rounding=ROUND_HALF_UP))
+        ucl_sp = float(e_ucl_sp.quantize(qq, rounding=ROUND_HALF_UP))
+        lcl_sp = float(e_lcl_sp.quantize(qq, rounding=ROUND_HALF_UP))
+        sig = float(e_sig.quantize(qq, rounding=ROUND_HALF_UP))
         break
     else:
         raise AssertionError("resample loop exhausted")
