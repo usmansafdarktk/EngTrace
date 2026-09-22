@@ -22,7 +22,7 @@ const REASON = { in: 270, out: 5232 };
 // (gpt-5, claude-opus-4.7, gemini-3.1-pro, deepseek-r1, llama-3.1-70b, and the robustness
 // pair gemma-4-31b-it and qwen3.8-27b) and models used as judges (gpt-5, claude-opus-4.5,
 // gemini-3.1-pro, grok, minimax, mimo). deepseek-v4-flash dropped for v4.1-flash; the
-// frontier list trimmed to one or two models per provider.
+// frontier list trimmed to one or two models per provider, claude-haiku-4.5 dropped.
 const GROUPS = [
   ['Open-source models', 'Through OpenRouter, cheapest upstream serving fp8 or better.', 3, [
     ['openai/gpt-oss-20b', 0.018, 0.090], ['google/gemma-4-26b-a4b-it', 0.090, 0.300],
@@ -32,7 +32,7 @@ const GROUPS = [
   ['Frontier models', '', 2, [
     ['openai/gpt-5.4-nano', 0.20, 1.25], ['openai/gpt-5.4-mini', 0.75, 4.50],
     ['google/gemini-3.1-flash-lite', 0.25, 1.50],
-    ['anthropic/claude-haiku-4.5', 1.00, 5.00], ['anthropic/claude-sonnet-5', 2.00, 10.00]]],
+    ['anthropic/claude-sonnet-5', 2.00, 10.00]]],
 ];
 
 const cost = (p, t) => ITEMS * (t.in * p[1] + t.out * p[2]) / 1e6;
@@ -89,13 +89,12 @@ function table(rows, dp) {
 const children = [
   new Paragraph({ heading: HeadingLevel.TITLE, spacing: { after: 60 },
     children: [new TextRun({ text: 'EngTrace inference pricing', font: FONT, size: 44, bold: true, color: INK })] }),
-  para([run('Inference is each model solving every EngTrace problem once; evaluating the answers is not included. '
-    + 'EngTrace covers five engineering branches (chemical, civil, electrical, industrial and mechanical), each with '
-    + '30 problem templates. Every template is instantiated 15 times with different sampled values, giving '
-    + '5 × 30 × 15 = 2,250 problems (870 easy, 870 intermediate, 510 advanced), so each model makes 2,250 runs. '
-    + 'The estimated cost is the total over those runs, assuming each model writes as much as GPT-5 did in '
-    + 'EngTrace’s evaluator pilot: about 270 input and 5,232 output tokens per problem, reasoning included.',
-    { color: MUTED, size: 21 })], { after: 200 }),
+  para([run('Inference means each model solves every EngTrace problem once. It covers generating the answers '
+    + 'only, not evaluating them.', { color: MUTED, size: 21 })], { after: 100 }),
+  para([run('EngTrace has five engineering branches: chemical, civil, electrical, industrial and mechanical. '
+    + 'Each branch has 30 problem templates, and each template is used 15 times with different values. That gives '
+    + '5 × 30 × 15 = 2,250 problems (870 easy, 870 intermediate '
+    + 'and 510 advanced), so each model makes 2,250 runs.', { color: MUTED, size: 21 })], { after: 200 }),
 ];
 
 for (const [title, note, dp, rows] of GROUPS) {
