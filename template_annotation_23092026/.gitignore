@@ -1,0 +1,4 @@
+# produced by trials and intermediate runs, never results
+screen/_smoke/
+layer0/_suite.json
+__pycache__/

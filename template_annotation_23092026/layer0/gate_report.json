@@ -1,0 +1,6752 @@
+{
+ "generated": "2026-09-22T21:35:22+00:00",
+ "git_head": "adfb9130e60c7ebfac646e58e322d94f7a7df3ad",
+ "seeds": 500,
+ "gating": [
+  "T1",
+  "T3",
+  "T4",
+  "T8"
+ ],
+ "advisory": [
+  "T5",
+  "T7"
+ ],
+ "templates": 150,
+ "gate_pass": 150,
+ "gate_fail": 0,
+ "per_check": {
+  "T1": 0,
+  "T3": 0,
+  "T4": 0,
+  "T8": 0,
+  "generation error": 0
+ },
+ "advisory_failing": {
+  "T5": 62,
+  "T7": 83
+ },
+ "register_absorbed": {
+  "template_time_rate_of_consolidation::H_dr,field / H_dr,lab = .* m / .* mm = .* mm / .* mm =": 500,
+  "template_wave_parameters_basic::^omega = 2 \\* 3\\.14159 \\* \\([0-9.]+e\\+\\d+ Hz\\) = [0-9.]+e\\+\\d+ rad/s": 500,
+  "template_sigma_reduction_for_cpk::^sigma_max = [0-9.]+ / [0-9.]+ = [0-9.]+ \\S+ \\(rounded down": 206,
+  "template_sigma_reduction_for_cpk::^reduction = \\(1 - sigma_max/sigma\\) \\* 100 = .* percent \\(rounded up": 169,
+  "template_server_configuration_selection::^W\\d = 1 / \\(mu[A-Z] - lambda\\) = 1 / \\(\\d+ - \\d+\\) hours = 60 / \\d+ = [0-9.]+ minutes": 111,
+  "template_server_configuration_selection::^W\\d = L\\d / lambda = [0-9.]+ / \\d+ = [0-9.]+ hours = [0-9.]+ minutes": 8
+ },
+ "rows": {
+  "template_levenspiel_plot_interpretation": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 7818,
+    "unit_rescales": 0,
+    "coverage": 0.51,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "8": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product",
+     "doubled_sign"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_batch_reactor_first_order": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "6": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_batch_reactor_second_order": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "6": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_batch_reactor_zero_order": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 262,
+    "checks": 500,
+    "unit_rescales": 0,
+    "coverage": 0.077,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_cstr_volume_basic": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_pfr_volume_changing_rate": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 497,
+    "checks": 1500,
+    "unit_rescales": 0,
+    "coverage": 0.176,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_batch_moles_vs_conversion": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 500,
+    "unit_rescales": 0,
+    "coverage": 0.083,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product",
+     "doubled_sign"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_flow_system_molar_flow_rates": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 1164,
+    "checks": 2500,
+    "unit_rescales": 0,
+    "coverage": 0.278,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product",
+     "doubled_sign"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_gas_phase_concentration": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 500,
+    "unit_rescales": 0,
+    "coverage": 0.091,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product",
+     "doubled_sign"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_limiting_reactant": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "2": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product",
+     "doubled_sign"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_adiabatic_flame_temperature": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 1739,
+    "checks": 3500,
+    "unit_rescales": 0,
+    "coverage": 0.368,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "6": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_heat_of_reaction_formation": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_latent_heat_vaporization": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_sensible_heat_constant_cp": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 267,
+    "checks": 500,
+    "unit_rescales": 0,
+    "coverage": 0.111,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_sensible_heat_temp_dependent_cp": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 866,
+    "checks": 2000,
+    "unit_rescales": 0,
+    "coverage": 0.444,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_ideal_gas_volume": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_pitzer_correlation_z": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 930,
+    "checks": 2500,
+    "unit_rescales": 0,
+    "coverage": 0.455,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_rackett_equation_volume": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 288,
+    "checks": 500,
+    "unit_rescales": 0,
+    "coverage": 0.091,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_two_phase_specific_volume": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_vdw_solve_for_pressure": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 459,
+    "checks": 1000,
+    "unit_rescales": 0,
+    "coverage": 0.143,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "6": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_vdw_solve_for_volume": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_work_isothermal_virial": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 1121,
+    "checks": 2500,
+    "unit_rescales": 0,
+    "coverage": 0.312,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_annulus_flowrate": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 300,
+    "checks": 2500,
+    "unit_rescales": 0,
+    "coverage": 0.5,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "oracle": "tests.template_integrity.oracles.template_annulus_flowrate",
+    "checked": 500,
+    "unparsed": 0,
+    "failures": 0,
+    "failure_rate": 0.0,
+    "worst_rel_error": 4.555970964243888e-05,
+    "note": "",
+    "examples": []
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": true
+  },
+  "template_falling_film_max_velocity": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 500,
+    "unit_rescales": 0,
+    "coverage": 0.25,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_hagen_poiseuille_flowrate": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 1000,
+    "unit_rescales": 0,
+    "coverage": 0.333,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_gas_viscosity_kinetic_theory": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 319,
+    "checks": 1000,
+    "unit_rescales": 0,
+    "coverage": 0.333,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_kinematic_viscosity": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 263,
+     "2": 237
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_newtons_law_shear_stress": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_power_law_fluid_shear": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_reynolds_number_flow_regime": {
+   "branch": "chemical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_constant_head_permeability": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 582,
+    "checks": 1000,
+    "unit_rescales": 0,
+    "coverage": 0.5,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_effective_stress_profile": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 873,
+    "checks": 2500,
+    "unit_rescales": 0,
+    "coverage": 0.714,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_upward_seepage_quick_condition": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 1188,
+    "checks": 2000,
+    "unit_rescales": 0,
+    "coverage": 1.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_borrow_pit_fill_volume": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 899,
+    "checks": 2000,
+    "unit_rescales": 0,
+    "coverage": 0.889,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_phase_relations_degree_of_saturation": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 865,
+    "checks": 1500,
+    "unit_rescales": 0,
+    "coverage": 0.5,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_relative_density_of_sand": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 581,
+    "checks": 1500,
+    "unit_rescales": 0,
+    "coverage": 0.75,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_infinite_slope_factor_of_safety": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 774,
+    "checks": 1500,
+    "unit_rescales": 0,
+    "coverage": 0.6,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_terzaghi_strip_footing_bearing": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 1077,
+    "checks": 3257,
+    "unit_rescales": 0,
+    "coverage": 0.651,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "6": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_primary_consolidation_settlement": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 1469,
+    "checks": 5000,
+    "unit_rescales": 0,
+    "coverage": 0.714,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "9": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_time_rate_of_consolidation": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 500,
+    "excused": {
+     "H_dr,field / H_dr,lab = .* m / .* mm = .* mm / .* mm =": 500
+    },
+    "unexcused": 0,
+    "marginals": 1189,
+    "checks": 3064,
+    "unit_rescales": 0,
+    "coverage": 0.513,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "6": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": true
+  },
+  "template_beam_deflection_formula": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 376,
+    "checks": 865,
+    "unit_rescales": 0,
+    "coverage": 0.224,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "oracle": "tests.template_integrity.oracles.template_beam_deflection_formula",
+    "checked": 500,
+    "unparsed": 0,
+    "failures": 0,
+    "failure_rate": 0.0,
+    "worst_rel_error": 0.0,
+    "note": "",
+    "examples": []
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 259,
+     "4": 241
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": true
+  },
+  "template_cantilever_double_integration": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 289,
+    "checks": 1000,
+    "unit_rescales": 0,
+    "coverage": 0.182,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "oracle": "tests.template_integrity.oracles.template_cantilever_double_integration",
+    "checked": 500,
+    "unparsed": 0,
+    "failures": 0,
+    "failure_rate": 0.0,
+    "worst_rel_error": 0.0,
+    "note": "",
+    "examples": []
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "6": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": true
+  },
+  "template_virtual_work_truss_deflection": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 1630,
+    "checks": 3500,
+    "unit_rescales": 0,
+    "coverage": 0.7,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_beam_internal_moment": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 538,
+    "checks": 1500,
+    "unit_rescales": 0,
+    "coverage": 0.375,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_beam_support_reactions": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 293,
+    "checks": 1500,
+    "unit_rescales": 0,
+    "coverage": 0.6,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_truss_method_of_joints": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 892,
+    "checks": 2000,
+    "unit_rescales": 0,
+    "coverage": 1.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_truss_method_of_sections": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 347,
+    "checks": 1159,
+    "unit_rescales": 0,
+    "coverage": 0.386,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_force_method_continuous_beam": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 267,
+    "checks": 1000,
+    "unit_rescales": 0,
+    "coverage": 0.286,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": true
+  },
+  "template_slope_deflection_end_moment": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 1013,
+    "checks": 2000,
+    "unit_rescales": 0,
+    "coverage": 0.308,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_influence_line_max_reaction": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 577,
+    "checks": 1000,
+    "unit_rescales": 0,
+    "coverage": 0.333,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_critical_depth_froude_classification": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 880,
+    "checks": 1500,
+    "unit_rescales": 0,
+    "coverage": 0.6,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_hydraulic_jump_energy_loss": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 881,
+    "checks": 1500,
+    "unit_rescales": 0,
+    "coverage": 0.75,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": true
+  },
+  "template_max_hump_height_no_choking": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 313,
+    "checks": 2000,
+    "unit_rescales": 0,
+    "coverage": 0.8,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_linear_reservoir_routing_step": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 612,
+    "checks": 4000,
+    "unit_rescales": 0,
+    "coverage": 0.5,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "7": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_rational_method_peak_flow": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 298,
+    "checks": 492,
+    "unit_rescales": 0,
+    "coverage": 0.246,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_scs_curve_number_runoff": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 1601,
+    "checks": 2500,
+    "unit_rescales": 0,
+    "coverage": 0.833,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_best_hydraulic_rectangular_section": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 310,
+    "checks": 500,
+    "unit_rescales": 0,
+    "coverage": 0.143,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_manning_rectangular_discharge": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 1183,
+    "checks": 3000,
+    "unit_rescales": 0,
+    "coverage": 0.857,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_manning_trapezoidal_velocity": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 2244,
+    "checks": 4000,
+    "unit_rescales": 0,
+    "coverage": 0.778,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_normal_depth_iteration": {
+   "branch": "civil_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 1169,
+    "checks": 4234,
+    "unit_rescales": 0,
+    "coverage": 0.738,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_autocorrelation_rect_pulse": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_ft_esd_rect_pulse": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_lowpass_equivalent_bandpass": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 2000,
+    "unit_rescales": 0,
+    "coverage": 0.267,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_mean_variance": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 508,
+    "checks": 3970,
+    "unit_rescales": 0,
+    "coverage": 0.375,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "oracle": "tests.template_integrity.oracles.template_mean_variance",
+    "checked": 500,
+    "unparsed": 0,
+    "failures": 0,
+    "failure_rate": 0.0,
+    "worst_rel_error": 0.00023300970873787292,
+    "note": "",
+    "examples": []
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "2": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_signal_energy_power": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 682,
+    "unit_rescales": 0,
+    "coverage": 0.166,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_average_energy_mqam": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_ber_estimation_mary": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 255,
+    "checks": 1246,
+    "unit_rescales": 0,
+    "coverage": 0.555,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_bpsk_energy_basis": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 246,
+    "checks": 500,
+    "unit_rescales": 0,
+    "coverage": 0.1,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_euclidean_distance_binary": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 500,
+    "unit_rescales": 0,
+    "coverage": 0.1,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "2": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product",
+     "doubled_sign"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_null_to_null_bandwidth": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 500,
+    "unit_rescales": 0,
+    "coverage": 0.143,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_coaxial_capacitance": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 500,
+    "unit_rescales": 0,
+    "coverage": 0.043,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_coulombs_law": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 242,
+    "checks": 1000,
+    "unit_rescales": 0,
+    "coverage": 0.143,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_gauss_law_symmetric": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 754,
+    "unit_rescales": 0,
+    "coverage": 0.081,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_superposition_electric_field": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 686,
+    "checks": 1246,
+    "unit_rescales": 0,
+    "coverage": 0.119,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 246,
+     "3": 254
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_lorentz_force": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 2000,
+    "unit_rescales": 0,
+    "coverage": 0.286,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_phasor_addition": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 1376,
+    "checks": 3026,
+    "unit_rescales": 0,
+    "coverage": 0.288,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product",
+     "doubled_sign"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_standing_wave_formation": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 1387,
+    "checks": 3000,
+    "unit_rescales": 0,
+    "coverage": 0.261,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "[census] degenerate_product_derivation {'0 * pi)': 400}",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_time_to_phasor": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 551,
+    "checks": 1263,
+    "unit_rescales": 0,
+    "coverage": 0.417,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product",
+     "doubled_sign"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_wave_equation_interpretation": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_wave_parameters_basic": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 500,
+    "excused": {
+     "^omega = 2 \\* 3\\.14159 \\* \\([0-9.]+e\\+\\d+ Hz\\) = [0-9.]+e\\+\\d+ rad/s": 500
+    },
+    "unexcused": 0,
+    "marginals": 261,
+    "checks": 1500,
+    "unit_rescales": 0,
+    "coverage": 0.273,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_aliased_frequency_identification": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 500,
+    "unit_rescales": 0,
+    "coverage": 0.167,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_cd_dc_system_analysis": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 500,
+    "unit_rescales": 0,
+    "coverage": 0.067,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product",
+     "doubled_sign"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_continuous_to_discrete_conversion": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_decimation_aliasing_analysis": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 246,
+    "unit_rescales": 0,
+    "coverage": 0.038,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product",
+     "doubled_sign"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_nyquist_rate_determination": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 500,
+    "unit_rescales": 0,
+    "coverage": 0.2,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_finite_convolution": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product",
+     "doubled_sign"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_impulse_response_from_lccde": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "[census] degenerate_product_derivation {'0*delta[': 167}",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_signal_operations": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_system_properties_memory_causality": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "2": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_system_property_linearity": {
+   "branch": "electrical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_basic_eoq": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 609,
+    "checks": 1500,
+    "unit_rescales": 0,
+    "coverage": 0.75,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_epq_finite_production": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 873,
+    "checks": 2500,
+    "unit_rescales": 0,
+    "coverage": 0.667,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_quantity_discount_all_units": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 914,
+    "checks": 3000,
+    "unit_rescales": 0,
+    "coverage": 0.316,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "7": 126,
+     "4": 230,
+     "6": 144
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_reorder_point_lead_time": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 421,
+    "checks": 1744,
+    "unit_rescales": 0,
+    "coverage": 0.499,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 248,
+     "4": 252
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": true
+  },
+  "template_chase_vs_level_aggregate": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 3000,
+    "unit_rescales": 0,
+    "coverage": 0.2,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "6": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": true
+  },
+  "template_line_balancing_heuristic": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 590,
+    "checks": 1500,
+    "unit_rescales": 0,
+    "coverage": 0.5,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 273,
+     "6": 227
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_takt_time_line_efficiency": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 298,
+    "checks": 1500,
+    "unit_rescales": 0,
+    "coverage": 0.5,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": true
+  },
+  "template_newsvendor_normal_demand": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 296,
+    "checks": 2500,
+    "unit_rescales": 0,
+    "coverage": 0.6,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": true
+  },
+  "template_qr_policy_one_iteration": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 1791,
+    "checks": 3500,
+    "unit_rescales": 0,
+    "coverage": 0.875,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "7": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": true
+  },
+  "template_safety_stock_reorder_point": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 294,
+    "checks": 1000,
+    "unit_rescales": 0,
+    "coverage": 0.5,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": true
+  },
+  "template_aoq_ati_rectifying": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 1531,
+    "checks": 3704,
+    "unit_rescales": 0,
+    "coverage": 0.478,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": true
+  },
+  "template_single_sampling_oc_point": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 565,
+    "checks": 1403,
+    "unit_rescales": 0,
+    "coverage": 0.405,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": true
+  },
+  "template_c_chart_revision": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 59,
+    "checks": 3016,
+    "unit_rescales": 0,
+    "coverage": 0.501,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 246,
+     "5": 254
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": true
+  },
+  "template_p_chart_limits_floor": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 2500,
+    "unit_rescales": 0,
+    "coverage": 0.75,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": true
+  },
+  "template_cp_cpk_from_specs": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 748,
+    "checks": 2000,
+    "unit_rescales": 0,
+    "coverage": 0.6,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_sigma_reduction_for_cpk": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 375,
+    "excused": {
+     "^sigma_max = [0-9.]+ / [0-9.]+ = [0-9.]+ \\S+ \\(rounded down": 206,
+     "^reduction = \\(1 - sigma_max/sigma\\) \\* 100 = .* percent \\(rounded up": 169
+    },
+    "unexcused": 0,
+    "marginals": 912,
+    "checks": 2500,
+    "unit_rescales": 0,
+    "coverage": 0.429,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": true
+  },
+  "template_arl_beta_mean_shift": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 2163,
+    "checks": 6500,
+    "unit_rescales": 0,
+    "coverage": 0.375,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": true
+  },
+  "template_chart_pair_selection": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 1444,
+    "checks": 2500,
+    "unit_rescales": 0,
+    "coverage": 0.6,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_xbar_known_sigma_classification": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 172,
+    "checks": 2000,
+    "unit_rescales": 0,
+    "coverage": 0.6,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_xbar_r_control_limits": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 1210,
+    "checks": 2500,
+    "unit_rescales": 0,
+    "coverage": 0.75,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_absorbing_chain_time_to_failure": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 612,
+    "checks": 2500,
+    "unit_rescales": 0,
+    "coverage": 0.364,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "6": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_two_state_steady_state": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 500,
+    "unit_rescales": 0,
+    "coverage": 0.2,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_two_step_transition_probability": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 2500,
+    "unit_rescales": 0,
+    "coverage": 0.625,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_poisson_event_count": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 297,
+    "checks": 1000,
+    "unit_rescales": 0,
+    "coverage": 0.4,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_mm1_time_in_system": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 622,
+    "checks": 1500,
+    "unit_rescales": 0,
+    "coverage": 0.6,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_mm1k_finite_capacity": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 1451,
+    "checks": 3000,
+    "unit_rescales": 0,
+    "coverage": 0.462,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "8": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_mmc_waiting_time": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 1150,
+    "checks": 3000,
+    "unit_rescales": 0,
+    "coverage": 0.75,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "6": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_server_configuration_selection": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 119,
+    "excused": {
+     "^W\\d = 1 / \\(mu[A-Z] - lambda\\) = 1 / \\(\\d+ - \\d+\\) hours = 60 / \\d+ = [0-9.]+ minutes": 111,
+     "^W\\d = L\\d / lambda = [0-9.]+ / \\d+ = [0-9.]+ hours = [0-9.]+ minutes": 8
+    },
+    "unexcused": 0,
+    "marginals": 1261,
+    "checks": 3000,
+    "unit_rescales": 389,
+    "coverage": 0.571,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_exponential_mttf_topology": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 160,
+    "checks": 1000,
+    "unit_rescales": 0,
+    "coverage": 0.573,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 246,
+     "3": 254
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_system_reliability_topology": {
+   "branch": "industrial_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 394,
+    "checks": 1636,
+    "unit_rescales": 0,
+    "coverage": 0.5,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_fluid_particle_acceleration": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 4000,
+    "unit_rescales": 0,
+    "coverage": 0.333,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_incompressible_continuity": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_particle_pathline": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 522,
+    "checks": 1000,
+    "unit_rescales": 0,
+    "coverage": 0.077,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "6": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_volumetric_flow_rate": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 133,
+    "checks": 1254,
+    "unit_rescales": 0,
+    "coverage": 0.139,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_vorticity_check": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 992,
+    "unit_rescales": 0,
+    "coverage": 0.173,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_basic_buoyant_force": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 275,
+    "checks": 500,
+    "unit_rescales": 0,
+    "coverage": 0.25,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_floating_object_submersion_depth": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_hydrostatic_force_on_plane": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 500,
+    "unit_rescales": 0,
+    "coverage": 0.062,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_hydrostatic_pressure_at_depth": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 1265,
+    "unit_rescales": 0,
+    "coverage": 0.265,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_utube_manometer": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 326,
+    "checks": 2000,
+    "unit_rescales": 0,
+    "coverage": 0.444,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "6": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_axial_deformation": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 150,
+    "checks": 500,
+    "unit_rescales": 0,
+    "coverage": 0.095,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "2": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_basic_stress_strain": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 399,
+    "checks": 1500,
+    "unit_rescales": 0,
+    "coverage": 0.231,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_multi_segment_rod": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 652,
+    "checks": 1210,
+    "unit_rescales": 0,
+    "coverage": 0.121,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_poissons_ratio": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 789,
+    "checks": 3000,
+    "unit_rescales": 0,
+    "coverage": 0.521,
+    "examples": []
+   },
+   "T2": {
+    "pass": false,
+    "oracle": "tests.template_integrity.oracles.template_poissons_ratio",
+    "checked": 500,
+    "unparsed": 0,
+    "failures": 4,
+    "failure_rate": 0.008,
+    "worst_rel_error": 0.0076335877862595625,
+    "note": "",
+    "examples": [
+     "[roundtrip] template_poissons_ratio seed=93: question implies {'a_delta_d': 0.0018, 'b_d_final': 4.5318}, trace answers {'a_delta_d': 0.00179, 'b_d_final': 4.53179} (rel err 0.556%) - part 'a_delta_d'",
+     "[roundtrip] template_poissons_ratio seed=341: question implies {'a_delta_d': -0.0018, 'b_d_final': 4.5182}, trace answers {'a_delta_d': -0.00179, 'b_d_final': 4.51821} (rel err 0.556%) - part 'a_delta_d'"
+    ]
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_statically_indeterminate": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 777,
+    "checks": 2500,
+    "unit_rescales": 0,
+    "coverage": 0.217,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_angle_of_twist": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 268,
+    "checks": 1500,
+    "unit_rescales": 0,
+    "coverage": 0.214,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_composite_shafts_series": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 882,
+    "checks": 4000,
+    "unit_rescales": 1000,
+    "coverage": 0.471,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "oracle": "tests.template_integrity.oracles.template_composite_shafts_series",
+    "checked": 500,
+    "unparsed": 0,
+    "failures": 0,
+    "failure_rate": 0.0,
+    "worst_rel_error": 9.330969487726158e-05,
+    "note": "",
+    "examples": []
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": true
+  },
+  "template_shaft_design_power": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 1058,
+    "checks": 2738,
+    "unit_rescales": 0,
+    "coverage": 0.322,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "oracle": "tests.template_integrity.oracles.template_shaft_design_power",
+    "checked": 500,
+    "unparsed": 0,
+    "failures": 0,
+    "failure_rate": 0.0,
+    "worst_rel_error": 0.0,
+    "note": "",
+    "examples": []
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": true
+  },
+  "template_shear_stress_torsion": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 1746,
+    "unit_rescales": 0,
+    "coverage": 0.241,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": false,
+   "T7": false
+  },
+  "template_statically_indeterminate_shaft": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 285,
+    "checks": 1000,
+    "unit_rescales": 0,
+    "coverage": 0.133,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "oracle": "tests.template_integrity.oracles.template_statically_indeterminate_shaft",
+    "checked": 500,
+    "unparsed": 0,
+    "failures": 0,
+    "failure_rate": 0.0,
+    "worst_rel_error": 0.001348429262129806,
+    "note": "",
+    "examples": []
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_rotating_unbalance": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 866,
+    "checks": 4000,
+    "unit_rescales": 0,
+    "coverage": 0.381,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "oracle": "tests.template_integrity.oracles.template_rotating_unbalance",
+    "checked": 500,
+    "unparsed": 0,
+    "failures": 0,
+    "failure_rate": 0.0,
+    "worst_rel_error": 0.0004631414573475929,
+    "note": "",
+    "examples": []
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "5": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_system_properties": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "oracle": "tests.template_integrity.oracles.template_system_properties",
+    "checked": 500,
+    "unparsed": 0,
+    "failures": 0,
+    "failure_rate": 0.0,
+    "worst_rel_error": 2.494112479704457e-05,
+    "note": "",
+    "examples": []
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_vibration_isolator_design": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 1353,
+    "checks": 3000,
+    "unit_rescales": 0,
+    "coverage": 0.286,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "6": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_vibration_transmissibility": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 1954,
+    "checks": 3500,
+    "unit_rescales": 0,
+    "coverage": 0.438,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "oracle": "tests.template_integrity.oracles.template_vibration_transmissibility",
+    "checked": 500,
+    "unparsed": 0,
+    "failures": 0,
+    "failure_rate": 0.0,
+    "worst_rel_error": 0.0005285919565152539,
+    "note": "",
+    "examples": []
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_damping_classification": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 530,
+    "checks": 1322,
+    "unit_rescales": 0,
+    "coverage": 0.318,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "oracle": "tests.template_integrity.oracles.template_damping_classification",
+    "checked": 500,
+    "unparsed": 0,
+    "failures": 0,
+    "failure_rate": 0.0,
+    "worst_rel_error": 2.5318742245516447e-05,
+    "note": "",
+    "examples": []
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 161,
+     "3": 339
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": true
+  },
+  "template_equivalent_stiffness_frequency": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 130,
+    "checks": 500,
+    "unit_rescales": 0,
+    "coverage": 0.111,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "2": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_logarithmic_decrement": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "oracle": "tests.template_integrity.oracles.template_logarithmic_decrement",
+    "checked": 500,
+    "unparsed": 0,
+    "failures": 0,
+    "failure_rate": 0.0,
+    "worst_rel_error": 0.0009258414592692095,
+    "note": "",
+    "examples": []
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "2": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_undamped_natural_frequency_torsional": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_undamped_natural_frequency_translational": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 0,
+    "checks": 0,
+    "unit_rescales": 0,
+    "coverage": 0.0,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "3": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "ok",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  },
+  "template_undamped_response_initial_conditions": {
+   "branch": "mechanical_engineering",
+   "gate": "pass",
+   "failing": [],
+   "T1": {
+    "failures": 0,
+    "excused": {},
+    "unexcused": 0,
+    "marginals": 458,
+    "checks": 1000,
+    "unit_rescales": 0,
+    "coverage": 0.133,
+    "examples": []
+   },
+   "T2": {
+    "pass": true,
+    "note": "no oracle",
+    "checked": 0
+   },
+   "T3": {
+    "pass": true,
+    "mismatched": [],
+    "errored": [],
+    "note": ""
+   },
+   "T4": {
+    "pass": true,
+    "summary": "ok",
+    "step_counts": {
+     "4": 500
+    }
+   },
+   "T8": {
+    "pass": true,
+    "summary": "[census] degenerate_product_derivation {'0.0 * co': 142}",
+    "instances": 400,
+    "gated_classes": [
+     "complex_sign",
+     "degenerate_product"
+    ]
+   },
+   "T5": true,
+   "T7": false
+  }
+ },
+ "seconds": 91.9
+}
