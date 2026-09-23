@@ -55,3 +55,8 @@ without its module imports).
   the census reads a `%e` mantissa's digits as decimal places (D-017 class) and so reports false
   ties on lines such as `epsilon_lateral = ... = 5.355000e-04`.
 - **D-050 is closed** by the `signal_operations` fix (the deferred origin-marker change is applied).
+- **Found while writing the Layer 2 plants, not fixed:** `annulus_flowrate` back-computes the pressure drop
+  from a target Reynolds number, so for viscous fluids it states drops above 10^4 kPa on about 11 of 50
+  instances (222 MPa for SAE 50 oil at one seed). The December 2025 Tribunal flagged this template for an
+  implausible pressure drop; the refactor then did not remove the cause. The screen passed it in both
+  passes. Expect the experts to reject it; a fix would bound the stated drop and let Re follow.
