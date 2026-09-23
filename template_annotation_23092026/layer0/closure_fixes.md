@@ -74,14 +74,39 @@ line is registered (T1 cannot size a `%e` result; see D-092).
 | mech `multi_segment_rod` | area printed 4 dp consumed unrounded; δ_total summed unrounded deltas while the trace prints 4-dp ones | area, SI operands and each δ bound; total = sum of printed δ | 0.005% | **δ_total ±0.0001 on 28.5%** (the printed sum now equals the printed total; before it disagreed on 28.4%) | 0.005% |
 | mech `undamped_response_initial_conditions` | ω_n printed 4 dp, consumed unrounded by A2 | ω_n bound; ω_n, A2 ties redrawn | 0 | A2 ±0.0001 on 0.24% | < 5e-6 |
 
-## Decisions the owner must sign off (D-044)
+## Round 3 — the census ties at 3% and above, and the owner's answer-display decisions
 
-- **Answer display lengthened** in two templates: `hydrostatic_pressure_at_depth` (kPa 3 → 4 dp) and
-  `max_hump_height_no_choking` (m 3 → 4 dp). In both the longer display is exact and the tie was in the answer
-  itself; the alternative (redraw ~10% of instances) was judged worse. Reverting is a one-line change each.
-- **Gold answers move on unchanged questions** in `absorbing_chain_time_to_failure` (8.3% of instances,
-  ±0.01 week): the printed 4-dp operands used to feed the quotient; the exact ones now do. The alternative is a
-  4-dp tie screen at 4.6% rejection and no answer movement.
+Scoped by the owner on 2026-09-23: the eight templates the exact tie census put at 3% or above, plus the
+three answer-display lengthenings decided under D-044. Policy for this round, approved: a tied final answer
+that is exact at one or two more digits is lengthened; a quotient tie is redrawn; a displayed intermediate
+consumed at higher precision is lengthened to its exact display and bound, even where the answer moves.
+
+| Template | Cause | Fix | Question moved | Answer moved | Redraw |
+|---|---|---|---|---|---|
+| indu `mmc_waiting_time` | ρ printed as a/c at 4 dp but bound from λ/(cμ); a 4-dp a over 2 is exact at 5 dp | ρ at 5 dp, bound to the displayed a/c | 0 | 6 of 82 reachable instances (9% of seeds) | none |
+| indu `takt_time_line_efficiency` | efficiency a general integer quotient; question quotes one decimal | tie redrawn | 4.4% | 0 | 3.48% |
+| indu `server_configuration_selection` | ρ1, ρ2 quotients tie at 4 dp (92 of 1,844 combos) | ties redrawn; registered W1/W2 lines untouched | 4.4% | 0 | 4.99% |
+| chem `flow_system_molar_flow_rates` | flows are 2-dp × 2-dp products, exact at 4 dp (6 dp for ammonia), printed at 2 dp | exact Decimal chain; **answers at their exact precision** (4 or 6 dp) | 0 | 2-dp value differs on 4% (the former ties); display longer on all | none |
+| civil `primary_consolidation_settlement` | Sc in mm exact at 1 dp, printed as an integer (the answer); Sc in m a quotient | **answer at 1 dp**; quotient tie redrawn | 0.2% | value differs on 89% (one more digit) | 0.2% |
+| civil `upward_seepage_quick_condition` | i, γ′, FS quotients | ties redrawn | 5.0% | 0 | 5.0% |
+| civil `relative_density_of_sand` | e, Dr quotients | ties redrawn | 3.2% | 0 | 3.2% |
+| civil `influence_line_max_reaction` | R_max exact at 4 dp, printed 2 dp (the answer); y a quotient | **answer at 4 dp**; y tie redrawn | 0.4% | value differs on 90% (two more digits) | 0.4% |
+| civil `time_rate_of_consolidation` | t in years a quotient (1 tie in 500) | tie redrawn; registered lines untouched | 0.2% | 0 | 0.2% |
+| mech `rotating_unbalance` | c·ω exact at 7 dp, printed 5 dp | product at 7 dp and bound; k − mω² tie screened (not lengthenable within a float) | 0 | 0 in 500 seeds; 0.08% redraw over 5,000 | 0.08% |
+| civil `beam_internal_moment` (D-044) | — | **answer at 3 dp**, M screen removed, By screen kept | 11% (former redraws now kept) | value differs on 71% (one more digit) | 1.4% |
+| civil `terzaghi_strip_footing_bearing` (D-044) | — | **q_all at 2 dp** (a 2-dp qu over 3 cannot tie; proved), screen removed | 1.4% | value differs on 71% | 0.6% |
+| civil `effective_stress_profile` (D-044) | — | **σ′ at 3 dp**, screen removed | 1.2% | value differs on 99% (two more digits) | 0.8% |
+
+## Decisions signed off by the owner on 2026-09-23 (D-044)
+
+- **Answer displays lengthened, kept:** `hydrostatic_pressure_at_depth` (kPa 3 → 4 dp) and
+  `max_hump_height_no_choking` (m 3 → 4 dp); and lengthened in round 3 on the same decision:
+  `beam_internal_moment`, `terzaghi_strip_footing_bearing`, `effective_stress_profile`, plus the exact-answer
+  cases `primary_consolidation_settlement`, `influence_line_max_reaction`, `flow_system_molar_flow_rates`.
+- **Gold answers moving on unchanged questions, accepted:** `absorbing_chain_time_to_failure` (8.3%,
+  ±0.01 week), `effective_stress_profile` (24%, ±0.1 kPa), `mmc_waiting_time` (9%), and the smaller
+  movements listed per template above; in every case a double rounding or an unrounded intermediate was
+  replaced by the value the printed operands give.
 - **Question text moves** for `sensible_heat_temp_dependent_cp` on about half its instances, because the
   heat-capacity coefficients now print at the precision the table gives them. Any archived inference on that
   template is stale.
@@ -94,12 +119,11 @@ line is registered (T1 cannot size a `%e` result; see D-092).
   (D-016 part 2) while the oracle's 0.5% relative tolerance was sized when the chain ran at full precision.
   The oracle's own comment says it needs a display-unit tolerance to be meaningful; that restatement is the
   harness owner's (D-074), so it is recorded here rather than patched.
-- The exact tie census (`tie_census.md`) finds residual half-way ties, filed by T1 as marginal rather than
-  failing, in 22 templates at 500 seeds: about 0.5% of instances corpus-wide, above 3% in eight templates
-  (`mmc_waiting_time` 20%, `primary_consolidation_settlement` 10%, `flow_system_molar_flow_rates` 7%,
-  `upward_seepage_quick_condition` 5%, `takt_time_line_efficiency` 4%, `relative_density_of_sand` 3%,
-  `influence_line_max_reaction` 3%, `rotating_unbalance` 2%). Same defect class as this pass, same remedy;
-  a third round is the owner's call.
+- The exact tie census (`tie_census.md`) still finds residual half-way ties, filed by T1 as marginal, in the
+  templates below 2% that round 3 did not cover (see the current census for the list and rates). Decided:
+  the frozen item pool is censused before inference and only templates whose frozen items tie are fixed then.
+- `mmc_waiting_time`'s `rho` line is fixed (round 3); the `Wq × 60` minute line remains invisible to T1 and
+  ties with probability ~1e-5.
 
 - `work_isothermal_virial` raises `ValueError: math domain error` on about 1 seed in 10,000 (ln of a negative
   volume ratio when B is strongly negative); identical at HEAD. A physical guard in the redraw loop would remove
@@ -108,8 +132,6 @@ line is registered (T1 cannot size a `%e` result; see D-092).
   reaction; removing it needs a 4–6 dp answer display (D-044) or a 10–60% redraw. Left as is.
 - `force_method_continuous_beam`: `delta_BB` (3 dp) ties on 16.6% of instances and `delta_B0` on 0.6%; T1 cannot
   see those lines (a trailing `/EI` poisons the segment). A 4-dp `delta_BB` would move By on 17% of seeds.
-- `mmc_waiting_time`: `rho = a / c` prints a 4-dp tie on 18% of instances (always MARGINAL to T1); a 5-dp rho
-  would change P0, Lq and the answer on those instances.
 - `mm1k_finite_capacity` / `mm1_time_in_system` / `mmc_waiting_time`: every `X hours * 60 minutes/hour = Y`
   line is invisible to T1 (poisoned by `/hour`); the first two now screen the minute answer, `mmc_waiting_time`
   ties there with probability ~1e-5 and is unscreened.

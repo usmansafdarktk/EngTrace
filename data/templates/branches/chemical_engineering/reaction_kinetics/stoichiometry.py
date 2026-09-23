@@ -201,6 +201,21 @@ def template_flow_system_molar_flow_rates():
 
         where nu_j is the stoichiometric coefficient and Theta_j = F_j0/F_A0.
 
+    Trace integrity (Layer 0, 2026-09-23):
+        Each outlet flow is a 2-dp inlet flow plus a 2-dp flow times a
+        2-dp conversion times a small integer ratio nu_j = b/a: exact at
+        4 dp when a = 1 (three of the four reactions) and at 6 dp for the
+        ammonia reaction (a = 4, nu_B = 5/4, nu_D = 6/4). Printed at 2 dp,
+        F_B, F_C and F_D sat on a half-way tie on 7% of draws
+        (748.18 - 5 * 109.26 * 0.75 = 338.455). These are the answers, so
+        per the round-3 policy their display is LENGTHENED to the exact
+        precision of the instance (`_p` = 4 or 6 dp by the reaction's a)
+        and every result is bound half-up in exact decimal arithmetic
+        through that display (D-016 part 2, as the sibling batch template
+        does), so nothing rounds and no line can tie. Theta_B and Theta_C
+        remain 3-dp quotients shown as the cross-check; the direct-method
+        line is the one that closes exactly.
+
     Returns:
         tuple: A tuple containing:
             - str: A question about calculating outlet molar flow rates.
@@ -248,11 +263,16 @@ def template_flow_system_molar_flow_rates():
     Theta_B = F_B0 / F_A0
     Theta_C = F_C0 / F_A0
 
-    # Calculate outlet molar flow rates
-    F_A = F_A0 * (1 - X_A)
-    F_B = F_B0 - (b / a) * F_A0 * X_A
-    F_C = F_C0 + (c / a) * F_A0 * X_A
-    F_D = F_D0 + (d / a) * F_A0 * X_A if has_product_D else 0.0
+    # Calculate outlet molar flow rates, in exact decimal arithmetic and
+    # bound through their display (D-016 part 2). The display precision is
+    # the exact precision of the instance: F_A0 * X_A is exact at 4 dp, and
+    # dividing by a = 4 (ammonia oxidation) adds 2 dp; a = 1 otherwise.
+    _p = {1: 4, 2: 5, 4: 6, 5: 5}[a]
+    _dA0, _dX = Decimal(repr(F_A0)), Decimal(repr(X_A))
+    F_A = _hu(_dA0 * (1 - _dX), _p)
+    F_B = _hu(Decimal(repr(F_B0)) - _dA0 * _dX * b / a, _p)
+    F_C = _hu(Decimal(repr(F_C0)) + _dA0 * _dX * c / a, _p)
+    F_D = _hu(Decimal(repr(F_D0)) + _dA0 * _dX * d / a, _p) if has_product_D else 0.0
     
     # 3. Generate Question and Solution Strings
     question = (
@@ -294,39 +314,39 @@ def template_flow_system_molar_flow_rates():
     solution += (
         f"**Step 3:** Calculate Outlet Molar Flow Rates\n\n"
         f"**For {reactant_A_name} (A):**\n"
-        f"F_A = F_A0(1 - X_A) = {F_A0}(1 - {X_A}) = {round(F_A, 2)} mol/min\n\n"
+        f"F_A = F_A0(1 - X_A) = {F_A0}(1 - {X_A}) = {F_A:.{_p}f} mol/min\n\n"
         
         f"**For {reactant_B_name} (B):**\n"
         f"*Using the Direct Method:*\n"
-        f"F_B = F_B0 - ({b}/{a}) * F_A0 * X_A = {F_B0} - ({b}/{a}) * {F_A0} * {X_A} = {round(F_B, 2)} mol/min\n"
+        f"F_B = F_B0 - ({b}/{a}) * F_A0 * X_A = {F_B0} - ({b}/{a}) * {F_A0} * {X_A} = {F_B:.{_p}f} mol/min\n"
         f"*Using the Theta Method:*\n"
         f"Theta_B = F_B0 / F_A0 = {F_B0} / {F_A0} = {round(Theta_B, 3)}\n"
-        f"F_B = F_A0(Theta_B - ({b}/{a})X_A) = {F_A0}({round(Theta_B, 3)} - ({b}/{a}) * {X_A}) = {round(F_B, 2)} mol/min\n\n"
+        f"F_B = F_A0(Theta_B - ({b}/{a})X_A) = {F_A0}({round(Theta_B, 3)} - ({b}/{a}) * {X_A}) = {F_B:.{_p}f} mol/min\n\n"
 
         f"**For {product_C_name} (C):**\n"
         f"*Using the Direct Method:*\n"
-        f"F_C = F_C0 + ({c}/{a}) * F_A0 * X_A = {F_C0} + ({c}/{a}) * {F_A0} * {X_A} = {round(F_C, 2)} mol/min\n"
+        f"F_C = F_C0 + ({c}/{a}) * F_A0 * X_A = {F_C0} + ({c}/{a}) * {F_A0} * {X_A} = {F_C:.{_p}f} mol/min\n"
         f"*Using the Theta Method:*\n"
         f"Theta_C = F_C0 / F_A0 = {F_C0} / {F_A0} = {round(Theta_C, 3)}\n"
-        f"F_C = F_A0(Theta_C + ({c}/{a})X_A) = {F_A0}({round(Theta_C, 3)} + ({c}/{a}) * {X_A}) = {round(F_C, 2)} mol/min\n\n"
+        f"F_C = F_A0(Theta_C + ({c}/{a})X_A) = {F_A0}({round(Theta_C, 3)} + ({c}/{a}) * {X_A}) = {F_C:.{_p}f} mol/min\n\n"
     )
 
     if has_product_D:
         solution += (
             f"**For {product_D_name} (D):**\n"
             f"Since F_D0 = 0, the calculation is straightforward:\n"
-            f"F_D = F_D0 + ({d}/{a}) * F_A0 * X_A = 0 + ({d}/{a}) * {F_A0} * {X_A} = {round(F_D, 2)} mol/min\n\n"
+            f"F_D = F_D0 + ({d}/{a}) * F_A0 * X_A = 0 + ({d}/{a}) * {F_A0} * {X_A} = {F_D:.{_p}f} mol/min\n\n"
         )
 
     solution += (
         f"**Answer:**\n"
         f"The molar flow rates exiting the reactor are:\n"
-        f"- {reactant_A_name} (F_A): {round(F_A, 2)} mol/min\n"
-        f"- {reactant_B_name} (F_B): {round(F_B, 2)} mol/min\n"
-        f"- {product_C_name} (F_C): {round(F_C, 2)} mol/min\n"
+        f"- {reactant_A_name} (F_A): {F_A:.{_p}f} mol/min\n"
+        f"- {reactant_B_name} (F_B): {F_B:.{_p}f} mol/min\n"
+        f"- {product_C_name} (F_C): {F_C:.{_p}f} mol/min\n"
     )
     if has_product_D:
-        solution += f"- {product_D_name} (F_D): {round(F_D, 2)} mol/min"
+        solution += f"- {product_D_name} (F_D): {F_D:.{_p}f} mol/min"
 
     return question, solution
 

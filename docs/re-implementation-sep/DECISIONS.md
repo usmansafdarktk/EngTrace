@@ -3503,7 +3503,7 @@ API work without prior approval).
 
 | # | Decision | Needed before |
 |---|---|---|
-| D-092 | Answer-display lengthening in `beam_internal_moment`, `terzaghi_strip_footing_bearing`, `effective_stress_profile`; accept or revert the two already lengthened; accept the gold movement in `absorbing_chain_time_to_failure` and `effective_stress_profile` | the item pool is regenerated for the next inference run |
+| D-092 | ~~Answer-display lengthening and gold-movement sign-offs~~ **Decided by the owner 2026-09-23:** the two lengthened answers stay; `beam_internal_moment`, `terzaghi_strip_footing_bearing` and `effective_stress_profile` answers are lengthened too; the gold movements are accepted; and a scoped third round removes the census ties at 3% and above (eight templates), with the frozen pool to be censused before inference and stragglers fixed then | — |
 | D-093 | Approval to run screening pass 1 (~$4.60) once the Layer 0 branch is merged | Layer 2 (human certification) starts |
 | — | Which families the next roster will evaluate (Kimi, GLM stay available as long as they are not judges) | the next benchmark run |
 | — | Expert annotation of the frozen 300 (stage 3): annotators, protocol, the ~100-trace triple-labelled overlap | any X1 agreement number |

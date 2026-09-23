@@ -1,6 +1,6 @@
 {
- "generated": "2026-09-22T21:30:17+00:00",
- "git_head": "adfb9130e60c7ebfac646e58e322d94f7a7df3ad",
+ "generated": "2026-09-23T16:31:49+00:00",
+ "git_head": "9d79d0df8d554bffcb32f2e95c47f7baac354d10",
  "seeds": 500,
  "rows": {
   "template_levenspiel_plot_interpretation": {
@@ -70,17 +70,10 @@
    "branch": "chemical_engineering",
    "checks": 2500,
    "skipped": 0,
-   "instances_with_tie": 35,
-   "rate": 0.07,
-   "by_label": {
-    "F_C": 21,
-    "F_B": 17,
-    "F_D": 9
-   },
-   "examples": [
-    "seed 3: F_B = F_B0 - (5/1) * F_A0 * X_A = 748.18 - (5/1) * 109.26 * 0.75 = 338.45 mol/min  (exact 338.4550)",
-    "seed 3: F_C = F_C0 + (3/1) * F_A0 * X_A = 18.74 + (3/1) * 109.26 * 0.75 = 264.58 mol/min  (exact 264.5750)"
-   ]
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
   },
   "template_gas_phase_concentration": {
    "branch": "chemical_engineering",
@@ -302,16 +295,10 @@
    "branch": "civil_engineering",
    "checks": 2000,
    "skipped": 0,
-   "instances_with_tie": 25,
-   "rate": 0.05,
-   "by_label": {
-    "i": 22,
-    "FS": 3
-   },
-   "examples": [
-    "seed 22: i = h / L = 0.59 / 1.6 = 0.3687  (exact 0.36875)",
-    "seed 30: i = h / L = 0.71 / 1.6 = 0.4437  (exact 0.44375)"
-   ]
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
   },
   "template_borrow_pit_fill_volume": {
    "branch": "civil_engineering",
@@ -341,16 +328,10 @@
    "branch": "civil_engineering",
    "checks": 1500,
    "skipped": 0,
-   "instances_with_tie": 16,
-   "rate": 0.032,
-   "by_label": {
-    "Dr": 14,
-    "e": 2
-   },
-   "examples": [
-    "seed 23: Dr = (e_max - e) / (e_max - e_min) = (0.91 - 0.7891) / (0.91 - 0.51) = 0.3023  (exact 0.30225)",
-    "seed 34: Dr = (e_max - e) / (e_max - e_min) = (0.87 - 0.5431) / (0.87 - 0.47) = 0.8172  (exact 0.81725)"
-   ]
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
   },
   "template_infinite_slope_factor_of_safety": {
    "branch": "civil_engineering",
@@ -367,7 +348,7 @@
   },
   "template_terzaghi_strip_footing_bearing": {
    "branch": "civil_engineering",
-   "checks": 3257,
+   "checks": 3253,
    "skipped": 0,
    "instances_with_tie": 0,
    "rate": 0.0,
@@ -378,28 +359,19 @@
    "branch": "civil_engineering",
    "checks": 5000,
    "skipped": 500,
-   "instances_with_tie": 48,
-   "rate": 0.096,
-   "by_label": {
-    "Sc": 48
-   },
-   "examples": [
-    "seed 2: Sc = 0.0535 * 1000 = 54 mm  (exact 53.5000)",
-    "seed 23: Sc = 0.0965 * 1000 = 96 mm  (exact 96.5000)"
-   ]
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
   },
   "template_time_rate_of_consolidation": {
    "branch": "civil_engineering",
-   "checks": 3064,
+   "checks": 3065,
    "skipped": 810,
-   "instances_with_tie": 1,
-   "rate": 0.002,
-   "by_label": {
-    "t_field": 1
-   },
-   "examples": [
-    "seed 452: t_field = 1411236 / 525600 = 2.69 years  (exact 2.685)"
-   ]
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
   },
   "template_beam_deflection_formula": {
    "branch": "civil_engineering",
@@ -486,16 +458,10 @@
    "branch": "civil_engineering",
    "checks": 1000,
    "skipped": 0,
-   "instances_with_tie": 15,
-   "rate": 0.03,
-   "by_label": {
-    "R_A,max": 13,
-    "Under the light axle: y": 2
-   },
-   "examples": [
-    "seed 23: R_A,max = 77 * 1.0000 + 50 * 0.8701 = 120.50 kN  (exact 120.5050)",
-    "seed 24: R_A,max = 147 * 1.0000 + 114 * 0.8175 = 240.19 kN  (exact 240.1950)"
-   ]
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
   },
   "template_critical_depth_froude_classification": {
    "branch": "civil_engineering",
@@ -937,15 +903,10 @@
    "branch": "industrial_engineering",
    "checks": 1500,
    "skipped": 0,
-   "instances_with_tie": 22,
-   "rate": 0.044,
-   "by_label": {
-    "efficiency": 22
-   },
-   "examples": [
-    "seed 68: efficiency = W / (N_min * takt) * 100 = 316 / (8 * 40) * 100 = 98.8%  (exact 98.7500)",
-    "seed 89: efficiency = W / (N_min * takt) * 100 = 371 / (8 * 50) * 100 = 92.8%  (exact 92.7500)"
-   ]
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
   },
   "template_newsvendor_normal_demand": {
    "branch": "industrial_engineering",
@@ -1132,30 +1093,24 @@
    "branch": "industrial_engineering",
    "checks": 3000,
    "skipped": 0,
-   "instances_with_tie": 102,
-   "rate": 0.204,
-   "by_label": {
-    "rho": 102
-   },
-   "examples": [
-    "seed 4: rho = a / c = 1.4667 / 2 = 0.7333  (exact 0.73335)",
-    "seed 8: rho = a / c = 1.4667 / 2 = 0.7333  (exact 0.73335)"
-   ]
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
   },
   "template_server_configuration_selection": {
    "branch": "industrial_engineering",
    "checks": 3000,
    "skipped": 0,
-   "instances_with_tie": 97,
-   "rate": 0.194,
+   "instances_with_tie": 77,
+   "rate": 0.154,
    "by_label": {
-    "W1": 53,
-    "rho1": 27,
-    "W2": 23
+    "W1": 54,
+    "W2": 24
    },
    "examples": [
     "seed 0: W1 = 1 / (muA - lambda) = 1 / (44 - 36) hours = 60 / 8 = 7.50 minutes  (exact 0.125)",
-    "seed 6: rho1 = lambda / muA = 27 / 44 = 0.6136 < 1;  rho2 = lambda / (2*muB) = 27 / 32 = 0.8438 < 1  (exact 0.84375)"
+    "seed 13: W1 = 1 / (muA - lambda) = 1 / (30 - 22) hours = 60 / 8 = 7.50 minutes  (exact 0.125)"
    ]
   },
   "template_exponential_mttf_topology": {
@@ -1378,15 +1333,10 @@
    "branch": "mechanical_engineering",
    "checks": 4000,
    "skipped": 500,
-   "instances_with_tie": 11,
-   "rate": 0.022,
-   "by_label": {
-    "Denominator Part 2: (c * omega)": 11
-   },
-   "examples": [
-    "seed 79: Denominator Part 2: (c * omega) = (6939.35 * 109.7463) = 761567.98691  (exact 761567.986905)",
-    "seed 171: Denominator Part 2: (c * omega) = (7933.5 * 73.19911) = 580725.13919  (exact 580725.139185)"
-   ]
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
   },
   "template_system_properties": {
    "branch": "mechanical_engineering",
@@ -1470,5 +1420,5 @@
    "examples": []
   }
  },
- "seconds": 55.9
+ "seconds": 206.5
 }

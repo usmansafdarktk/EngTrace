@@ -287,22 +287,23 @@ def template_beam_internal_moment():
 
     Trace integrity (Layer 0, 2026-09-23):
         The moment M = Ay*x - w*x^2/2 [- P*(x - a)], with a 2-dp reaction
-        and a 1-dp section, is exact at 3 dp and is printed at 2 dp, where
-        it sits on a half-way tie on ~9% of draws (26.25 * 2.9 - 4 *
-        2.9^2 / 2 = 59.305). M is the answer, so its 2-dp display is kept
-        and such a draw is resampled rather than rounded either way; a
-        3-dp answer display would remove the tie by construction but needs
-        sign-off (D-044). By = (P*a + w*L^2/2)/L is a quotient by an
+        and a 1-dp section, is exact at 3 dp and was printed at 2 dp, where
+        it sat on a half-way tie on ~9% of draws (26.25 * 2.9 - 4 *
+        2.9^2 / 2 = 59.305). M is the answer, so on the owner's decision of
+        2026-09-23 (D-044) its display was lengthened to 3 dp rather than
+        the draw resampled: M is bound half-up at 3 dp and printed at 3 dp
+        in Step 3 and in the answer, which removes the tie by
+        construction. By = (P*a + w*L^2/2)/L is a quotient by an
         arbitrary 1-dp span, exact at no fixed display, so a draw whose By
-        lands on a 2-dp tie is resampled likewise (D-016/D-037).
+        lands on a 2-dp tie is resampled rather than rounded either way
+        (D-016/D-037).
 
     Returns:
         tuple: (question, solution)
     """
     # 1. Parameterize (section-side branch).
-    # Bounded redraw: a draw whose reaction By or whose moment M lands on a
-    # 2-dp half-way tie has no defensible gold answer and is rejected
-    # (D-016).
+    # Bounded redraw: a draw whose reaction By lands on a 2-dp half-way tie
+    # has no defensible gold answer and is rejected (D-016).
     for _attempt in range(200):
         L = round(random.uniform(6.0, 12.0), 1)
         P = random.randint(15, 60)
@@ -322,9 +323,11 @@ def template_beam_internal_moment():
             M_exact = Ay * x - w * x ** 2 / 2 - P * (x - a)
         else:
             M_exact = Ay * x - w * x ** 2 / 2
-        if _is_display_tie(By_exact, 2) or _is_display_tie(M_exact, 2):
+        if _is_display_tie(By_exact, 2):
             continue                    # no defensible gold answer; redraw
-        M = round(M_exact, 2)
+        # M is exact at 3 dp (2-dp reaction times 1-dp section, integer
+        # loads); bound half-up and printed at 3 dp (D-044).
+        M = _hu(M_exact, 3)
         break
     else:
         raise RuntimeError("beam_internal_moment: no closing sample in 200 draws")
@@ -337,7 +340,7 @@ def template_beam_internal_moment():
         moment_line = (
             f"M = Ay * x - w * x^2 / 2 - P * (x - a)\n"
             f"M = {Ay:.2f} * {x:.1f} - {w} * ({x:.1f})^2 / 2 - {P} * "
-            f"({x:.1f} - {a:.1f}) = {M:.2f} kN*m")
+            f"({x:.1f} - {a:.1f}) = {M:.3f} kN*m")
     else:
         cut_terms = (
             f"the reaction Ay and the distributed load over the length x "
@@ -347,7 +350,7 @@ def template_beam_internal_moment():
         moment_line = (
             f"M = Ay * x - w * x^2 / 2\n"
             f"M = {Ay:.2f} * {x:.1f} - {w} * ({x:.1f})^2 / 2 "
-            f"= {M:.2f} kN*m")
+            f"= {M:.3f} kN*m")
 
     assert 0.5 <= x <= L - 0.5 and abs(x - a) >= 0.45, (
         f"section location invalid: {x}")
@@ -382,7 +385,7 @@ def template_beam_internal_moment():
         f"moment (sagging positive).\n"
         f"{moment_line}\n\n"
         f"**Answer:** The internal bending moment at the section is "
-        f"{M:.2f} kN*m"
+        f"{M:.3f} kN*m"
     )
 
     return question, solution

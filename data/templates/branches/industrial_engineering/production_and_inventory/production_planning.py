@@ -18,6 +18,34 @@ def _hu(x, places):
     return int(v) if places == 0 else float(v)
 
 
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where NO rounding convention is defensible. A reader
+    doing decimal arithmetic and applying half-up reads 0.02325 m as 23.3 mm; a
+    reader using binary floats and `round()` reads it as 23.2 mm; and the
+    printed line closes for exactly one of them whichever the template picks.
+    Breaking the tie in decimal (P2 as amended) does not remove the ambiguity,
+    it only moves it to the other reader - which is why such instances are
+    RESAMPLED rather than resolved (D-016).
+
+    Testing for an EXACT tie is not enough. Two independent evaluations of the
+    same exact quantity - this template's, in kN and kN/m^2, and a solver's, in
+    N and Pa - differ by a few ulps, so a rational tie such as 29.25 mm lands
+    as 29.249999999999996 on one side and 29.250000000000004 on the other.
+    Neither is exactly a tie, and the two then round in opposite directions:
+    that is how eight non-closing instances per 60,000 seeds survived the first
+    version of this guard (Phase 1 review A, finding F-2).
+
+    So a narrow BAND is quarantined rather than a point. The band is a few
+    thousand ulps wide where the tie lattice is 10^-places apart, so it removes
+    nothing that is not genuinely ambiguous.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
+
+
 # Template 18 (Easy) — Area P3: Production Planning
 def template_takt_time_line_efficiency():
     """
@@ -56,21 +84,41 @@ def template_takt_time_line_efficiency():
         (divisor extremes: 28800/800 = 36 down to A*60/D floors; margin
         low 32), N_min in [3, 8], efficiency in [69.5, 99.0].
 
+    Trace integrity (Layer 0, 2026-09-23):
+        The efficiency 100*W/(N_min*takt) is a quotient of integers exact
+        at no fixed display (36,837 of the 43,788 reachable (b, D, N, W)
+        instances do not terminate at 2 dp), and at its 1-dp display -
+        the precision the question itself quotes - it sits on a half-way
+        tie on 1,403 instances (316 / (8 * 40) * 100 = 98.75). A tied
+        draw is REDRAWN rather than rounded either way (D-016), since
+        lengthening the display would change the quoted precision; the
+        rejection is 3.5% of draws (weighted by the sampling). Every
+        other printed value is an exact integer or the 4-dp W/takt ratio
+        inside a ceiling, which cannot tie.
+
     Returns:
         tuple(str, str): (question, solution)
     """
-    b = random.choice([0, 30, 60])
-    A = 480 - b
-    total_s = A * 60
-    divisors = [d for d in range(LINE_DEMAND_PER_SHIFT[0],
-                                 LINE_DEMAND_PER_SHIFT[1] + 1)
-                if total_s % d == 0]
-    D = random.choice(divisors)
-    takt = total_s // D                    # exact integer seconds
+    for _attempt in range(200):
+        b = random.choice([0, 30, 60])
+        A = 480 - b
+        total_s = A * 60
+        divisors = [d for d in range(LINE_DEMAND_PER_SHIFT[0],
+                                     LINE_DEMAND_PER_SHIFT[1] + 1)
+                    if total_s % d == 0]
+        D = random.choice(divisors)
+        takt = total_s // D                    # exact integer seconds
 
-    N = random.randint(3, 8)
-    m = math.ceil(0.1 * takt)
-    W = random.randint(takt * (N - 1) + m, takt * N - m)
+        N = random.randint(3, 8)
+        m = math.ceil(0.1 * takt)
+        W = random.randint(takt * (N - 1) + m, takt * N - m)
+        # D-016: an efficiency on a 1-dp half-way tie (3.5% of draws) is
+        # redrawn; the display precision is the one the question quotes.
+        if _is_display_tie(100 * W / (N * takt), 1):
+            continue
+        break
+    else:
+        raise AssertionError("resample loop exhausted")
 
     ratio = W / takt
     N_min = math.ceil(ratio)

@@ -195,6 +195,15 @@ def template_relative_density_of_sand():
         recomputed field void ratio always lies strictly between e_min and
         e_max; presented dry unit weight in [13, 19] kN/m^3.
 
+    Trace integrity (Layer 0, 2026-09-23):
+        The field void ratio e = Gs*gamma_w/gamma_d - 1 and the relative
+        density Dr = (e_max - e)/(e_max - e_min) are quotients exact at no
+        fixed display; Dr lands on a 4-dp half-way tie on ~3% of draws
+        ((0.91 - 0.7891) / (0.91 - 0.51) = 0.30225) and e on ~0.4%. Dr is
+        the answer (its percentage form Dr*100 is exact at 2 dp), so the
+        displays are kept and a draw that lands either quotient on a tie
+        is resampled rather than rounded either way (D-016/D-037).
+
     Returns:
         tuple: (question, solution)
     """
@@ -203,23 +212,38 @@ def template_relative_density_of_sand():
     # 1. Parameterize (sand only — relative density is defined for
     # cohesionless soils). e_min/e_max anchored to Das Table 3.1 (dense
     # uniform sand e = 0.45, loose e = 0.8).
-    gs_lo, gs_hi = SPECIFIC_GRAVITY_RANGES["sand"]
-    Gs = round(random.uniform(gs_lo, gs_hi), 2)
-    e_min = round(random.uniform(0.40, 0.52), 2)
-    e_max = round(e_min + random.uniform(0.28, 0.42), 2)
-    Dr_true = random.uniform(0.25, 0.88)
-    e_true = e_max - Dr_true * (e_max - e_min)
+    # Bounded redraw: a draw whose field void ratio or relative density
+    # lands on a 4-dp half-way tie has no defensible gold answer and is
+    # rejected (D-016).
+    for _attempt in range(200):
+        gs_lo, gs_hi = SPECIFIC_GRAVITY_RANGES["sand"]
+        Gs = round(random.uniform(gs_lo, gs_hi), 2)
+        e_min = round(random.uniform(0.40, 0.52), 2)
+        e_max = round(e_min + random.uniform(0.28, 0.42), 2)
+        Dr_true = random.uniform(0.25, 0.88)
+        e_true = e_max - Dr_true * (e_max - e_min)
 
-    gamma_d_true = Gs * gamma_w / (1 + e_true)
-    gamma_d = round(gamma_d_true, 2)     # presented field dry unit weight
+        gamma_d_true = Gs * gamma_w / (1 + e_true)
+        gamma_d = round(gamma_d_true, 2)     # presented field dry unit weight
 
-    # 2. Core computation — round-then-recompute at every step. e carries
-    # 4 decimals: the small (e_max - e_min) denominator amplifies e-rounding
-    # error by a factor of ~2.4-3.6, so 3 decimals would let the gold answer
-    # drift beyond recomputation tolerance (R2 finding, cycle 1).
-    e = round((Gs * gamma_w / gamma_d) - 1, 4)
-    Dr_frac = round((e_max - e) / (e_max - e_min), 4)
-    Dr_pct = round(Dr_frac * 100, 2)
+        # 2. Core computation — round-then-recompute at every step. e
+        # carries 4 decimals: the small (e_max - e_min) denominator
+        # amplifies e-rounding error by a factor of ~2.4-3.6, so 3 decimals
+        # would let the gold answer drift beyond recomputation tolerance
+        # (R2 finding, cycle 1).
+        e_exact = (Gs * gamma_w / gamma_d) - 1
+        if _is_display_tie(e_exact, 4):
+            continue                    # no defensible gold answer; redraw
+        e = round(e_exact, 4)
+        Dr_exact = (e_max - e) / (e_max - e_min)
+        if _is_display_tie(Dr_exact, 4):
+            continue                    # no defensible gold answer; redraw
+        Dr_frac = round(Dr_exact, 4)
+        Dr_pct = round(Dr_frac * 100, 2)
+        break
+    else:
+        raise RuntimeError(
+            "relative_density_of_sand: no closing sample in 200 draws")
 
     assert 0.40 <= e_min < e < e_max <= 0.94, (
         f"field void ratio outside (e_min, e_max): {e_min}, {e}, {e_max}")

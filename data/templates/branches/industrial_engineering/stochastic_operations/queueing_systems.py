@@ -278,6 +278,16 @@ def template_mmc_waiting_time():
         8 dp in Steps 5 and 6. Enumerated over all 82 (combo, lambda)
         instances: no line ties at 8 dp, and the 2-dp minute answer is
         unchanged everywhere (D-016/D-037).
+        rho was bound from lambda/(c*mu) and printed at 4 dp, while the
+        Step 2 line shows it as a / c with a already at 4 dp: a 4-dp a over
+        c = 2 is exact at 5 dp and sat on a 4-dp half-way tie on 16 of the
+        82 instances (1.4667 / 2 = 0.73335). rho is now bound half-up at
+        5 dp to the DISPLAYED a / c (D-016 part 2) and printed at 5 dp in
+        Steps 2-4, so the chain consumes what the reader sees; over c = 3
+        the quotient can never tie at any display (2*a*10^4 = 3*(2k+1)
+        has no integer solution). Enumerated over all 82 instances: no
+        rho tie at 5 dp, no P0/Lq/Wq tie, and the 2-dp minute answer
+        moves on 6 of the 82 instances (accepted, Layer 0 round 3).
 
     Returns:
         tuple(str, str): (question, solution)
@@ -288,10 +298,15 @@ def template_mmc_waiting_time():
 
     # Round-then-recompute: the gold chain derives only from the presented
     # (lam, ts, c); display precisions are sized to the (1-rho)^-2
-    # amplification (lessons 5/30/33): a, rho at 4 dp; P0 at 5 dp; Lq 4 dp.
+    # amplification (lessons 5/30/33): a at 4 dp; rho at 5 dp; P0 at 5 dp;
+    # Lq 4 dp.
     mu = 60 // ts                      # exact integer by construction
     a = round(lam / mu, 4)
-    rho = round(lam / (c * mu), 4)
+    # rho is bound to the DISPLAYED a / c (D-016 part 2): a 4-dp a over
+    # c = 2 is exact at 5 dp, and over c = 3 it can never sit on a half-way
+    # tie at any display, so rho is half-up at 5 dp and tie-free on all 82
+    # reachable instances (at 4 dp the a / c line tied on 16 of them).
+    rho = _hu(a / c, 5)
     P0 = round(_mmc_p0(a, rho, c), 5)
     Lq = round(P0 * a ** c * rho / (math.factorial(c) * (1.0 - rho) ** 2), 4)
     # Lq/lambda is displayed at 8 dp: over the 82 reachable (combo, lambda)
@@ -311,23 +326,23 @@ def template_mmc_waiting_time():
     if c == 2:
         p0_eq = (
             f"P0 = 1 / (1 + a + a^2/(2*(1-rho))) "
-            f"= 1 / (1 + {a:.4f} + ({a:.4f})^2/(2*(1 - {rho:.4f}))) "
+            f"= 1 / (1 + {a:.4f} + ({a:.4f})^2/(2*(1 - {rho:.5f}))) "
             f"= {P0:.5f}"
         )
         lq_eq = (
             f"Lq = P0 * a^2 * rho / (2! * (1-rho)^2) "
-            f"= {P0:.5f} * ({a:.4f})^2 * {rho:.4f} / (2 * (1 - {rho:.4f})^2) "
+            f"= {P0:.5f} * ({a:.4f})^2 * {rho:.5f} / (2 * (1 - {rho:.5f})^2) "
             f"= {Lq:.4f} customers"
         )
     else:
         p0_eq = (
             f"P0 = 1 / (1 + a + a^2/2 + a^3/(6*(1-rho))) "
             f"= 1 / (1 + {a:.4f} + ({a:.4f})^2/2 + "
-            f"({a:.4f})^3/(6*(1 - {rho:.4f}))) = {P0:.5f}"
+            f"({a:.4f})^3/(6*(1 - {rho:.5f}))) = {P0:.5f}"
         )
         lq_eq = (
             f"Lq = P0 * a^3 * rho / (3! * (1-rho)^2) "
-            f"= {P0:.5f} * ({a:.4f})^3 * {rho:.4f} / (6 * (1 - {rho:.4f})^2) "
+            f"= {P0:.5f} * ({a:.4f})^3 * {rho:.5f} / (6 * (1 - {rho:.5f})^2) "
             f"= {Lq:.4f} customers"
         )
 
@@ -354,8 +369,8 @@ def template_mmc_waiting_time():
         f"**Step 2:** Compute the offered load and the utilization, and "
         f"verify that a steady state exists.\n"
         f"a = lambda / mu = {lam} / {mu} = {a:.4f} (Erlangs)\n"
-        f"rho = a / c = {a:.4f} / {c} = {rho:.4f}\n"
-        f"Since rho = {rho:.4f} < 1, a steady state exists.\n\n"
+        f"rho = a / c = {a:.4f} / {c} = {rho:.5f}\n"
+        f"Since rho = {rho:.5f} < 1, a steady state exists.\n\n"
         f"**Step 3:** Compute the probability that the system is empty.\n"
         f"{p0_eq}\n\n"
         f"**Step 4:** Compute the average number waiting in the queue.\n"
@@ -470,10 +485,29 @@ def template_server_configuration_selection():
         put only 3 distinct questions in the 5-seed Stage E pack and
         shipped two duplicate question pairs; see the review log.
 
+    Trace integrity (Layer 0, 2026-09-23):
+        rho1 = lambda/muA and rho2 = lambda/(2*muB) are quotients of small
+        integers exact at no fixed display, and at their 4-dp display
+        they sit on a half-way tie on 92 of the 1,844 reachable triples
+        (33 on rho1, 63 on rho2; 27 / 32 = 0.84375). Such a draw is
+        REDRAWN rather than rounded either way (D-016); the rejection is
+        5.0% of draws and leaves the winner split at 889 single / 863
+        pair. L2 at 4 dp never ties. The W1 and W2 hours-to-minutes
+        lines are registered parser limits and are untouched.
+
     Returns:
         tuple(str, str): (question, solution)
     """
-    muA, muB, lam = random.choice(_SEL_COMBOS)
+    for _attempt in range(200):
+        muA, muB, lam = random.choice(_SEL_COMBOS)
+        # D-016: a utilization quotient on a 4-dp half-way tie is redrawn
+        # (92 of 1,844 triples); no other value in this chain can tie at
+        # its display except the registered W1/W2 lines.
+        if _is_display_tie(lam / muA, 4) or _is_display_tie(lam / (2 * muB), 4):
+            continue
+        break
+    else:
+        raise AssertionError("resample loop exhausted")
     cfg = random.choice(_SEL_SETTINGS)
 
     # Round-then-recompute from the presented (muA, muB, lam).

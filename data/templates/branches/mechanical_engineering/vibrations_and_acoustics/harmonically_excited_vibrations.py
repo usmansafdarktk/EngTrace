@@ -35,6 +35,17 @@ def _hu(x, places):
     return int(v) if places == 0 else float(v)
 
 
+def _as_printed(x, spec):
+    """The value a reader recovers from `x` when it is printed with `spec`.
+
+    P2 asks that the stored value and the printed value be the SAME value.
+    Rounding alone does not achieve that: a float one ulp away from its own
+    printed form puts the template and the reader on opposite sides of a
+    display tie (D-016 part 2).
+    """
+    return float(format(x, spec))
+
+
 def _is_display_tie(x, places, rel_band=1e-12):
     """Is `x` at, or within a hair of, a half-way tie at `places` dp?
 
@@ -212,6 +223,16 @@ def template_rotating_unbalance():
         that is displayed and then consumed is rounded to its display
         precision first, with half-way ties resampled (D-016).
 
+    Trace integrity (Layer 0, 2026-09-23):
+        The exact-decimal tie census found `c * omega` half-way at 5 dp on
+        2.2% of instances: a 2-dp c times a 5-dp omega is EXACT at 7 dp, so
+        printing it at 5 dp was rounding digits that exist. Per D-037 the
+        product is now displayed at 7 dp, where nothing rounds, and `term2`
+        is bound through that display (`_as_printed`). `k - m * omega^2` is
+        exact only at 11 dp (up to 19 significant digits, beyond a float),
+        so it keeps its 5-dp display and its tie is screened in the redraw
+        loop instead, on `m * omega^2` with a band a few ulps wide.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the steady-state amplitude of vibration.
@@ -258,8 +279,16 @@ def template_rotating_unbalance():
 
         force_magnitude_F0 = _hu(m_eccentric * eccentricity_m * omega ** 2,
                                  precision)
-        term1 = _hu(stiffness - m_total * omega ** 2, precision)
-        term2 = _hu(damping_coeff * omega, precision)
+        # k is a whole number and m * omega^2 is exact at 11 dp, so term1 is
+        # exact only at 11 dp - too long for a float (up to 19 significant
+        # digits). It keeps its 5-dp display, and a half-way tie at that
+        # display is screened below (D-016 part 3).
+        m_omega_sq = m_total * omega ** 2
+        term1 = _hu(stiffness - m_omega_sq, precision)
+        # c (2 dp) times omega (5 dp) is EXACT at 7 dp: display it there, so
+        # nothing rounds and no tie can arise (D-037), and bind the consumed
+        # value through the display (D-016 part 2).
+        term2 = _as_printed(damping_coeff * omega, ".7f")
         denominator = _hu(math.sqrt(term1 ** 2 + term2 ** 2), precision)
         if denominator <= 0:
             continue
@@ -273,7 +302,14 @@ def template_rotating_unbalance():
         mm_dp = max(3, 3 - math.floor(math.log10(abs(amplitude_exact * 1000))))
         m_dp = mm_dp + 3
 
+        # term1 = k - m*omega^2 with k whole, so term1 sits on a 5-dp tie
+        # exactly when m*omega^2 does; screen the latter, whose magnitude
+        # sets the float error, with a band a few ulps wide. The default
+        # 1e-12 band is a fraction 1e-7 * |m*omega^2| of the 5-dp lattice -
+        # wider than the lattice itself above 5e6 - and would flag every
+        # above-resonance instance.
         if (_is_display_tie(omega_exact, precision)
+                or _is_display_tie(m_omega_sq, precision, rel_band=1e-15)
                 or _is_display_tie(amplitude_exact, m_dp)):
             continue                       # no defensible gold answer; redraw
         amplitude_m = _hu(amplitude_exact, m_dp)
@@ -329,8 +365,8 @@ def template_rotating_unbalance():
         f"The formula for amplitude is: X = F_0 / sqrt((k - m * omega^2)^2 + (c * omega)^2)\n"
         f"Numerator = F_0 = {force_magnitude_F0} N\n"
         f"Denominator Part 1: (k - m * omega^2) = ({stiffness:,.0f} - {m_total} * {omega}^2) = {term1}\n"
-        f"Denominator Part 2: (c * omega) = ({damping_coeff} * {omega}) = {term2}\n"
-        f"Denominator = sqrt(({term1})^2 + ({term2})^2) = {denominator}\n"
+        f"Denominator Part 2: (c * omega) = ({damping_coeff} * {omega}) = {term2:.7f}\n"
+        f"Denominator = sqrt(({term1})^2 + ({term2:.7f})^2) = {denominator}\n"
         f"X = {force_magnitude_F0} / {denominator} = {amplitude_m:.{m_dp}f} m\n\n"
 
         f"**Step 5:** Convert the amplitude to millimeters.\n"

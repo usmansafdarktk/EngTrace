@@ -175,19 +175,21 @@ def template_terzaghi_strip_footing_bearing():
         terms, is bound and printed at 2 dp with it. The local-shear chain
         stays at 1 dp ((2/3)c'*N'c takes six values, none on a tie). The
         surcharge and width terms are 4- and 5-dp products printed at 1 dp,
-        and q_all = qu/3 is a quotient exact at no fixed display, so a draw
-        that lands any of them on a half-way tie at its display is
-        resampled rather than rounded either way (D-016/D-037). The
-        answer's 1-dp display is kept: the q_all tie, which a 2-dp qu puts
-        on a third of c' = 15 general-shear draws, is resampled rather than
-        lengthened away, pending sign-off (D-044).
+        so a draw that lands either on a 1-dp half-way tie is resampled
+        rather than rounded either way (D-016/D-037). q_all = qu/3 is a
+        quotient exact at no fixed display, and at 1 dp it tied on a third
+        of c' = 15 general-shear draws; on the owner's decision of
+        2026-09-23 (D-044) the answer display was lengthened to 2 dp
+        rather than those draws resampled. A 2-dp q_all cannot tie: with
+        qu = n/100, a 2-dp half-way point needs n/3 = k + 1/2, i.e.
+        2n = 3(2k + 1), which no integer n satisfies.
 
     Returns:
         tuple: (question, solution)
     """
-    # Bounded redraw: a draw whose surcharge or width term, or whose
-    # allowable pressure, lands on a half-way tie at its display has no
-    # defensible gold answer and is rejected (D-016).
+    # Bounded redraw: a draw whose cohesion, surcharge or width term lands
+    # on a half-way tie at its display has no defensible gold answer and is
+    # rejected (D-016).
     for _attempt in range(200):
         scenario = random.choice(["sand", "clayey"])
         mode = random.choice(["general", "local"])
@@ -273,12 +275,10 @@ def template_terzaghi_strip_footing_bearing():
         term_g = round(term_g_exact, 1)
         # The sum of the three displayed terms is exact at tc_dp.
         qu = _hu(term_c + term_q + term_g, tc_dp)
-        # qu / 3 is exact at no fixed display; a 2-dp qu ending in 5 (every
-        # c' = 15 general-shear draw) puts the answer on a 1-dp tie whenever
-        # 100 * qu is divisible by 3.
-        if _is_display_tie(qu / FS, 1):
-            continue                    # no defensible gold answer; redraw
-        q_all = round(qu / FS, 1)
+        # qu / 3 is exact at no fixed display, but with qu = n/100 a 2-dp
+        # half-way point needs 2n = 3(2k + 1), impossible for integer n; the
+        # answer is printed at 2 dp, where it cannot tie (D-044).
+        q_all = round(qu / FS, 2)
         break
     else:
         raise RuntimeError(
@@ -361,8 +361,8 @@ def template_terzaghi_strip_footing_bearing():
         f"qu = {term_c:.{tc_dp}f} + {term_q:.1f} + {term_g:.1f} = "
         f"{qu:.{tc_dp}f} kPa\n\n"
         f"**Step 6:** Apply the factor of safety.\n"
-        f"q_all = qu / FS = {qu:.{tc_dp}f} / {FS} = {q_all:.1f} kPa\n\n"
-        f"**Answer:** The allowable bearing capacity is {q_all:.1f} kPa"
+        f"q_all = qu / FS = {qu:.{tc_dp}f} / {FS} = {q_all:.2f} kPa\n\n"
+        f"**Answer:** The allowable bearing capacity is {q_all:.2f} kPa"
     )
 
     return question, solution

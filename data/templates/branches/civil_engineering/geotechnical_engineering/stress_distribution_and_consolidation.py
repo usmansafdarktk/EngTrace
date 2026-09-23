@@ -1,11 +1,55 @@
 import math
 import random
+from decimal import Decimal, ROUND_HALF_UP
 
 from data.templates.branches.civil_engineering.constants import (
     SKEMPTON_CC_COEFF,
     SKEMPTON_CC_OFFSET,
     UNIT_WEIGHT_WATER_KN_M3,
 )
+
+
+def _hu(x, places):
+    """Round half-up to `places` dp, resolving the tie in DECIMAL.
+
+    `round()` resolves a half-way tie on the binary value, so
+    `round(0.01185 * 1000, 1)` gives 11.8 where a reader doing decimal
+    arithmetic gets 11.9 (spec P2 as amended, DECISIONS D-012). Accepts a
+    Decimal so an exact decimal product can be quantised without a detour
+    through a float. Matches the industrial branch's `_hu` convention.
+    """
+    q = Decimal(1).scaleb(-places)
+    d = x if isinstance(x, Decimal) else Decimal(repr(x))
+    v = d.quantize(q, rounding=ROUND_HALF_UP)
+    return int(v) if places == 0 else float(v)
+
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where NO rounding convention is defensible. A reader
+    doing decimal arithmetic and applying half-up reads 0.02325 m as 23.3 mm; a
+    reader using binary floats and `round()` reads it as 23.2 mm; and the
+    printed line closes for exactly one of them whichever the template picks.
+    Breaking the tie in decimal (P2 as amended) does not remove the ambiguity,
+    it only moves it to the other reader - which is why such instances are
+    RESAMPLED rather than resolved (D-016).
+
+    Testing for an EXACT tie is not enough. Two independent evaluations of the
+    same exact quantity - this template's, in kN and kN/m^2, and a solver's, in
+    N and Pa - differ by a few ulps, so a rational tie such as 29.25 mm lands
+    as 29.249999999999996 on one side and 29.250000000000004 on the other.
+    Neither is exactly a tie, and the two then round in opposite directions:
+    that is how eight non-closing instances per 60,000 seeds survived the first
+    version of this guard (Phase 1 review A, finding F-2).
+
+    So a narrow BAND is quarantined rather than a point. The band is a few
+    thousand ulps wide where the tie lattice is 10^-places apart, so it removes
+    nothing that is not genuinely ambiguous.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
 
 
 # Template 7 (Advanced) — Area B3: Stress Distribution & Consolidation
@@ -42,68 +86,95 @@ def template_primary_consolidation_settlement():
         rounding margins; the w/LL band edges may drift ~0.005 from 2-dp
         rounding of e0).
 
+    Trace integrity (Layer 0, 2026-09-23):
+        The settlement in millimetres, Sc = Sc_m * 1000 with Sc_m a 4-dp
+        metre value, is exact at 1 dp and was printed at 0 dp, where it
+        sat on a half-way tie on ~10% of draws (0.0535 * 1000 = 53.5). Sc
+        is the answer, so on the owner's decision of 2026-09-23 (D-044) its
+        display is lengthened to 1 dp rather than the draw resampled: it is
+        bound half-up in decimal at 1 dp and printed at 1 dp in Step 9 and
+        in the answer. The metre value Sc_m = Cc*Hc/(1 + e0)*log_term is a
+        quotient by an arbitrary 2-dp void ratio, exact at no fixed
+        display, so a draw that lands it on a 4-dp half-way tie (~0.2% of
+        draws) is resampled rather than rounded either way (D-016/D-037).
+
     Returns:
         tuple: (question, solution)
     """
     gamma_w = UNIT_WEIGHT_WATER_KN_M3
 
-    # 1. Parameterize the profile.
-    z1 = round(random.uniform(1.5, 3.0), 1)        # moist sand above WT, m
-    z2 = round(random.uniform(2.0, 5.0), 1)        # saturated sand, m
-    Hc = round(random.uniform(2.0, 5.0), 1)        # clay thickness, m
-    gamma_m = round(random.uniform(16.5, 18.0), 1)     # moist sand, kN/m^3
-    gamma_sat_sand = round(random.uniform(19.0, 20.5), 1)
-    LL = random.randint(35, 65)                    # liquid limit, %
-    Gs_clay = round(random.uniform(2.70, 2.80), 2)
-    # Couple e0 to LL (R1, cycle 1): the saturated water content implied by
-    # e0 (w = e0/Gs) must sit inside [0.55*LL, 0.95*LL] so the clay is a
-    # plausible NC deposit (liquidity index < 1, not quick; not
-    # atypically stiff either). Window is non-empty across LL in [35, 65]
-    # and Gs in [2.70, 2.80].
-    e0_lo = max(0.80, 0.55 * (LL / 100.0) * Gs_clay)
-    e0_hi = min(1.20, 0.95 * (LL / 100.0) * Gs_clay)
-    e0 = round(random.uniform(e0_lo, e0_hi), 2)
-    # Clay saturated unit weight derived from its own phase state.
-    gamma_sat_clay = round((Gs_clay + e0) * gamma_w / (1 + e0), 2)
+    # Bounded redraw: a draw whose settlement in metres lands on a 4-dp
+    # half-way tie has no defensible gold answer and is rejected (D-016).
+    for _attempt in range(200):
+        # 1. Parameterize the profile.
+        z1 = round(random.uniform(1.5, 3.0), 1)        # moist sand above WT, m
+        z2 = round(random.uniform(2.0, 5.0), 1)        # saturated sand, m
+        Hc = round(random.uniform(2.0, 5.0), 1)        # clay thickness, m
+        gamma_m = round(random.uniform(16.5, 18.0), 1)     # moist sand, kN/m^3
+        gamma_sat_sand = round(random.uniform(19.0, 20.5), 1)
+        LL = random.randint(35, 65)                    # liquid limit, %
+        Gs_clay = round(random.uniform(2.70, 2.80), 2)
+        # Couple e0 to LL (R1, cycle 1): the saturated water content implied by
+        # e0 (w = e0/Gs) must sit inside [0.55*LL, 0.95*LL] so the clay is a
+        # plausible NC deposit (liquidity index < 1, not quick; not
+        # atypically stiff either). Window is non-empty across LL in [35, 65]
+        # and Gs in [2.70, 2.80].
+        e0_lo = max(0.80, 0.55 * (LL / 100.0) * Gs_clay)
+        e0_hi = min(1.20, 0.95 * (LL / 100.0) * Gs_clay)
+        e0 = round(random.uniform(e0_lo, e0_hi), 2)
+        # Clay saturated unit weight derived from its own phase state.
+        gamma_sat_clay = round((Gs_clay + e0) * gamma_w / (1 + e0), 2)
 
-    # Raft geometry.
-    B = round(random.uniform(6.0, 12.0), 1)
-    L = round(B + random.uniform(2.0, 6.0), 1)
+        # Raft geometry.
+        B = round(random.uniform(6.0, 12.0), 1)
+        L = round(B + random.uniform(2.0, 6.0), 1)
 
-    # Initial effective stress at clay mid-depth, from presented values.
-    gamma_sub_sand = round(gamma_sat_sand - gamma_w, 2)
-    gamma_sub_clay = round(gamma_sat_clay - gamma_w, 2)
-    sigma0 = round(
-        gamma_m * z1 + gamma_sub_sand * z2 + gamma_sub_clay * Hc / 2, 1)
-    z = round(z1 + z2 + Hc / 2, 2)
-    F = B * L / ((B + z) * (L + z))                # 2:1 attenuation factor
+        # Initial effective stress at clay mid-depth, from presented values.
+        gamma_sub_sand = round(gamma_sat_sand - gamma_w, 2)
+        gamma_sub_clay = round(gamma_sat_clay - gamma_w, 2)
+        sigma0 = round(
+            gamma_m * z1 + gamma_sub_sand * z2 + gamma_sub_clay * Hc / 2, 1)
+        z = round(z1 + z2 + Hc / 2, 2)
+        F = B * L / ((B + z) * (L + z))                # 2:1 attenuation factor
 
-    # Per-sample feasibility for the raft pressure (lessons 1, 9): sample
-    # log10(stress ratio) inside the window that jointly keeps the ratio in
-    # [1.30, 3.50], the settlement in [0.03, 0.40] m, and q0 in
-    # [80, 500] kPa.
-    Cc = round(SKEMPTON_CC_COEFF * (LL - SKEMPTON_CC_OFFSET), 3)
-    M = Cc * Hc / (1 + e0)
-    # Ratio capped at 2.00 (R1, cycle 2): delta_sigma <= 1.0*sigma'0 keeps
-    # the increment below the NC clay's undrained capacity screen
-    # (~(1.1-1.6)*sigma'0 with su ~= 0.22-0.25*sigma'v0), so the clay
-    # consolidates rather than failing in shear.
-    log_r_lo = max(math.log10(1.30), 0.03 / M,
-                   math.log10(1 + 80.0 * F / sigma0))
-    log_r_hi = min(math.log10(2.00), 0.40 / M,
-                   math.log10(1 + 500.0 * F / sigma0))
-    assert log_r_lo < log_r_hi, (
-        f"empty feasibility window: {log_r_lo}, {log_r_hi}")
-    log_r = random.uniform(log_r_lo, log_r_hi)
-    q0 = round(sigma0 * (10 ** log_r - 1) / F, 0)  # presented raft pressure
+        # Per-sample feasibility for the raft pressure (lessons 1, 9): sample
+        # log10(stress ratio) inside the window that jointly keeps the ratio in
+        # [1.30, 3.50], the settlement in [0.03, 0.40] m, and q0 in
+        # [80, 500] kPa.
+        Cc = round(SKEMPTON_CC_COEFF * (LL - SKEMPTON_CC_OFFSET), 3)
+        M = Cc * Hc / (1 + e0)
+        # Ratio capped at 2.00 (R1, cycle 2): delta_sigma <= 1.0*sigma'0 keeps
+        # the increment below the NC clay's undrained capacity screen
+        # (~(1.1-1.6)*sigma'0 with su ~= 0.22-0.25*sigma'v0), so the clay
+        # consolidates rather than failing in shear.
+        log_r_lo = max(math.log10(1.30), 0.03 / M,
+                       math.log10(1 + 80.0 * F / sigma0))
+        log_r_hi = min(math.log10(2.00), 0.40 / M,
+                       math.log10(1 + 500.0 * F / sigma0))
+        assert log_r_lo < log_r_hi, (
+            f"empty feasibility window: {log_r_lo}, {log_r_hi}")
+        log_r = random.uniform(log_r_lo, log_r_hi)
+        q0 = round(sigma0 * (10 ** log_r - 1) / F, 0)  # presented raft pressure
 
-    # 2. Core computation — round-then-recompute at every step.
-    delta_sigma = round(q0 * B * L / ((B + z) * (L + z)), 1)
-    sigma_f = round(sigma0 + delta_sigma, 1)
-    ratio = sigma_f / sigma0
-    log_term = round(math.log10(sigma_f / sigma0), 4)
-    Sc_m = round(Cc * Hc / (1 + e0) * log_term, 4)
-    Sc_mm = round(Sc_m * 1000, 0)
+        # 2. Core computation — round-then-recompute at every step.
+        delta_sigma = round(q0 * B * L / ((B + z) * (L + z)), 1)
+        sigma_f = round(sigma0 + delta_sigma, 1)
+        ratio = sigma_f / sigma0
+        log_term = round(math.log10(sigma_f / sigma0), 4)
+        # Sc_m = Cc*Hc/(1 + e0)*log_term is a quotient by an arbitrary 2-dp
+        # void ratio, exact at no fixed display; a draw that lands it on a
+        # 4-dp half-way tie is redrawn (0.270 * 2.1 / 1.89 * 0.2135 = 0.064050).
+        Sc_m_exact = Cc * Hc / (1 + e0) * log_term
+        if _is_display_tie(Sc_m_exact, 4):
+            continue                    # no defensible gold answer; redraw
+        Sc_m = round(Sc_m_exact, 4)
+        # A 4-dp metre value times 1000 is exact at 1 dp; at 0 dp it tied on
+        # ~10% of draws. Bound half-up in decimal and printed at 1 dp (D-044).
+        Sc_mm = _hu(Decimal(repr(Sc_m)) * 1000, 1)
+        break
+    else:
+        raise RuntimeError(
+            "primary_consolidation_settlement: no closing sample in 200 draws")
 
     assert 30.0 <= sigma0 <= 150.0, f"sigma'0 out of bounds: {sigma0}"
     assert 75.0 <= q0 <= 505.0, f"raft pressure out of bounds: {q0}"
@@ -175,9 +246,9 @@ def template_primary_consolidation_settlement():
         f"= {Cc:.3f} * {Hc:.1f} / (1 + {e0:.2f}) * {log_term:.4f} "
         f"= {Sc_m:.4f} m\n\n"
         f"**Step 9:** Convert to millimeters.\n"
-        f"Sc = {Sc_m:.4f} * 1000 = {Sc_mm:.0f} mm\n\n"
+        f"Sc = {Sc_m:.4f} * 1000 = {Sc_mm:.1f} mm\n\n"
         f"**Answer:** The primary consolidation settlement is "
-        f"{Sc_mm:.0f} mm"
+        f"{Sc_mm:.1f} mm"
     )
 
     return question, solution
@@ -216,44 +287,64 @@ def template_time_rate_of_consolidation():
         provably non-empty: the similitude factor R lies in [4096, 995328]
         and the t50 window closes only outside [1072, 1.42e6]).
 
+    Trace integrity (Layer 0, 2026-09-23):
+        The field time in years, t_field = t_min / 525600 with t_min an
+        integer number of minutes, is a quotient exact at no fixed display
+        and lands on a half-way tie at its 2- or 3-dp display on ~0.2% of
+        draws (1411236 / 525600 = 2.685). t_field is the answer, so its
+        display is kept and such a draw is resampled rather than rounded
+        either way (D-016/D-037). The drainage-path ratio and the time
+        factor are rounded quotients consumed only through their printed
+        values.
+
     Returns:
         tuple: (question, solution)
     """
     # 1. Parameterize; drainage condition and U each change the reasoning
     # path (drainage path AND which Tv relation applies).
-    Hc = round(random.uniform(2.0, 6.0), 1)
-    drainage = random.choice(["double", "single"])
-    # 50 is excluded: it equals the lab reference degree, making the
-    # time-factor ratio exactly 1 and bypassing the Tv-relation reasoning
-    # (R2+R3, cycle 2).
-    U = random.choice([40, 55, 65, 80, 90])
-    H_lab_mm = 12.5                                 # 25 mm specimen, doubly drained
-    T50 = round(math.pi / 4.0 * 0.25, 4)            # = 0.1963
+    # Bounded redraw: a draw whose field time lands on a half-way tie at
+    # its display has no defensible gold answer and is rejected (D-016).
+    for _attempt in range(200):
+        Hc = round(random.uniform(2.0, 6.0), 1)
+        drainage = random.choice(["double", "single"])
+        # 50 is excluded: it equals the lab reference degree, making the
+        # time-factor ratio exactly 1 and bypassing the Tv-relation reasoning
+        # (R2+R3, cycle 2).
+        U = random.choice([40, 55, 65, 80, 90])
+        H_lab_mm = 12.5                     # 25 mm specimen, doubly drained
+        T50 = round(math.pi / 4.0 * 0.25, 4)        # = 0.1963
 
-    H_dr_true = Hc / 2.0 if drainage == "double" else Hc
-    if U <= 60:
-        Tv_true = math.pi / 4.0 * (U / 100.0) ** 2
+        H_dr_true = Hc / 2.0 if drainage == "double" else Hc
+        if U <= 60:
+            Tv_true = math.pi / 4.0 * (U / 100.0) ** 2
+        else:
+            Tv_true = 1.781 - 0.933 * math.log10(100 - U)
+
+        # Per-sample feasibility for the lab t50 (lesson 1): keep the field
+        # time inside [0.08, 22] years given the similitude factor.
+        ratio_sq_true = (H_dr_true * 1000.0 / H_lab_mm) ** 2
+        R = (Tv_true / T50) * ratio_sq_true
+        minutes_per_year = 525600.0                 # 60 * 24 * 365
+        t50_lo = max(8.0, 1.02 * 0.08 * minutes_per_year / R)
+        t50_hi = min(40.0, 0.98 * 22.0 * minutes_per_year / R)
+        t50 = round(random.uniform(t50_lo, t50_hi), 0)
+
+        # 2. Core computation — round-then-recompute at every step.
+        H_dr = round(H_dr_true, 2)                  # field drainage path, m
+        Tv = round(Tv_true, 4)
+        ratio = round(H_dr * 1000.0 / H_lab_mm, 1)  # drainage-path ratio
+        t_min = round(t50 * (Tv / T50) * ratio ** 2, 0)
+        # 3 decimals below one year (Stage D audit: 2-dp quantization reached
+        # ~1-6% relative on the shortest times).
+        t_years_exact = t_min / minutes_per_year
+        t_prec = 3 if t_years_exact < 1.0 else 2
+        if _is_display_tie(t_years_exact, t_prec):
+            continue                    # no defensible gold answer; redraw
+        t_years = round(t_years_exact, t_prec)
+        break
     else:
-        Tv_true = 1.781 - 0.933 * math.log10(100 - U)
-
-    # Per-sample feasibility for the lab t50 (lesson 1): keep the field
-    # time inside [0.08, 22] years given the similitude factor.
-    ratio_sq_true = (H_dr_true * 1000.0 / H_lab_mm) ** 2
-    R = (Tv_true / T50) * ratio_sq_true
-    minutes_per_year = 525600.0                     # 60 * 24 * 365
-    t50_lo = max(8.0, 1.02 * 0.08 * minutes_per_year / R)
-    t50_hi = min(40.0, 0.98 * 22.0 * minutes_per_year / R)
-    t50 = round(random.uniform(t50_lo, t50_hi), 0)
-
-    # 2. Core computation — round-then-recompute at every step.
-    H_dr = round(H_dr_true, 2)                      # field drainage path, m
-    Tv = round(Tv_true, 4)
-    ratio = round(H_dr * 1000.0 / H_lab_mm, 1)      # drainage-path ratio
-    t_min = round(t50 * (Tv / T50) * ratio ** 2, 0)
-    # 3 decimals below one year (Stage D audit: 2-dp quantization reached
-    # ~1-6% relative on the shortest times).
-    t_prec = 3 if t_min / minutes_per_year < 1.0 else 2
-    t_years = round(t_min / minutes_per_year, t_prec)
+        raise RuntimeError(
+            "time_rate_of_consolidation: no closing sample in 200 draws")
 
     assert 0.12 <= Tv <= 0.90, f"time factor out of bounds: {Tv}"
     assert 0.05 <= t_years <= 23.0, f"field time out of bounds: {t_years}"
