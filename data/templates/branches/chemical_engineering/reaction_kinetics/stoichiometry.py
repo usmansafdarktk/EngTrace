@@ -1,5 +1,47 @@
 import random
+import math
+from decimal import Decimal, ROUND_HALF_UP
 from data.templates.branches.chemical_engineering.constants import GENERAL_REACTANTS, LIQUID_PHASE_REACTANTS, GAS_PHASE_REACTANTS, PRODUCTS, REACTIONS
+
+
+def _hu(x, places):
+    """Round half-up to `places` dp, resolving the tie in DECIMAL.
+
+    `round()` resolves a half-way tie on the binary value and disagrees with a
+    reader doing decimal arithmetic (spec P2 as amended, DECISIONS D-012).
+    """
+    q = Decimal(1).scaleb(-places)
+    d = x if isinstance(x, Decimal) else Decimal(repr(x))
+    v = d.quantize(q, rounding=ROUND_HALF_UP)
+    return int(v) if places == 0 else float(v)
+
+
+def _as_printed(x, spec):
+    """The value a reader recovers from `x` when it is printed with `spec`.
+
+    P2 asks that the stored value and the printed value be the SAME value.
+    Rounding alone does not achieve that: a float one ulp away from its own
+    printed form puts the template and the reader on opposite sides of a
+    display tie (D-016 part 2).
+    """
+    return float(format(x, spec))
+
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where no rounding convention is defensible - a
+    decimal reader applying half-up and a binary reader applying `round()`
+    disagree, and the printed line closes for only one of them. Such instances
+    are resampled rather than resolved (D-016).
+
+    A narrow BAND is quarantined rather than a point, because two independent
+    evaluations of the same exact quantity differ by a few ulps and an exact
+    rational tie lands on opposite sides of them.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
 
 
 # Template 1 (Easy)
@@ -17,6 +59,18 @@ def template_batch_moles_vs_conversion():
             $N_A = N_{A0}(1 - X_A)$
             $N_B = N_{B0} - (b/a)N_{A0}X_A$
             $N_C = N_{C0} + (c/a)N_{A0}X_A$
+
+    Trace integrity (Layer 0, 2026-09-23):
+        The consumed products (b/a)*N_A0*X_A are the products the solution
+        PRINTS: each is bound through its 3-dp display before N_B is formed
+        from it, so `N_B0 - <printed product> = <printed N_B>` closes for
+        every reader (D-016 part 2); before, N_B was computed from the
+        unrounded product and the line missed by 0.001 on 3.4% of draws. The
+        products themselves are exact at 4 dp (6 dp for the ammonia
+        reaction), so their 3-dp display, like the 3-dp display of every
+        answer, still sits on a half-way tie for a fixed fraction of draws;
+        removing that requires lengthening the ANSWER display, which is a
+        P6 change needing sign-off (D-044) and is recorded, not done, here.
 
     Returns:
         tuple: A tuple containing:
@@ -60,9 +114,17 @@ def template_batch_moles_vs_conversion():
 
     # 2. Core Calculations
     N_A = N_A0 * (1 - X_A)
-    N_B = N_B0 - (b / a) * N_A0 * X_A
-    N_C = N_C0 + (c / a) * N_A0 * X_A
-    N_D = N_D0 + (d / a) * N_A0 * X_A if has_product_D else 0.0
+    # The stoichiometric products are PRINTED at 3 dp and then consumed, so
+    # each is bound through that display first and N_B is formed from the
+    # printed product (D-016 part 2). Only prod_B is consumed downstream; C
+    # and D are bound the same way so every printed intermediate is the value
+    # the trace used.
+    prod_B = _as_printed((b / a) * N_A0 * X_A, '.3f')
+    prod_C = _as_printed((c / a) * N_A0 * X_A, '.3f')
+    prod_D = _as_printed((d / a) * N_A0 * X_A, '.3f') if has_product_D else 0.0
+    N_B = _as_printed(N_B0 - prod_B, '.3f')
+    N_C = _as_printed(N_C0 + prod_C, '.3f')
+    N_D = _as_printed(N_D0 + prod_D, '.3f') if has_product_D else 0.0
 
     # 3. Generate Question and Solution Strings
     question = (
@@ -99,26 +161,26 @@ def template_batch_moles_vs_conversion():
         f"For {reactant_A_name} (A):\n"
         f"$N_A = {N_A0}(1 - {X_A}) = {N_A0}({1-X_A:.2f}) = {round(N_A, 3)}$ mol\n\n"
         f"For {reactant_B_name} (B):\n"
-        f"$N_B = {N_B0} - ({b}/{a}) \\times {N_A0} \\times {X_A} = {N_B0} - {round((b/a)*N_A0*X_A, 3)} = {round(N_B, 3)}$ mol\n\n"
+        f"$N_B = {N_B0} - ({b}/{a}) \\times {N_A0} \\times {X_A} = {N_B0} - {prod_B} = {N_B}$ mol\n\n"
         f"For {product_C_name} (C):\n"
-        f"$N_C = 0 + ({c}/{a}) \\times {N_A0} \\times {X_A} = {round((c/a)*N_A0*X_A, 3)} = {round(N_C, 3)}$ mol\n\n"
+        f"$N_C = 0 + ({c}/{a}) \\times {N_A0} \\times {X_A} = {prod_C} = {N_C}$ mol\n\n"
     )
     
     if has_product_D:
         solution += (
             f"For {product_D_name} (D):\n"
-            f"$N_D = 0 + ({d}/{a}) \\times {N_A0} \\times {X_A} = {round((d/a)*N_A0*X_A, 3)} = {round(N_D, 3)}$ mol\n\n"
+            f"$N_D = 0 + ({d}/{a}) \\times {N_A0} \\times {X_A} = {prod_D} = {N_D}$ mol\n\n"
         )
         
     solution += (
         f"**Answer:**\n"
         f"After reaching a conversion of ${X_A*100} \\%$, the final number of moles in the reactor are:\n"
         f"- {reactant_A_name}: ${round(N_A, 3)}$ mol\n"
-        f"- {reactant_B_name}: ${round(N_B, 3)}$ mol\n"
-        f"- {product_C_name}: ${round(N_C, 3)}$ mol\n"
+        f"- {reactant_B_name}: ${N_B}$ mol\n"
+        f"- {product_C_name}: ${N_C}$ mol\n"
     )
     if has_product_D:
-        solution += f"- {product_D_name}: ${round(N_D, 3)}$ mol"
+        solution += f"- {product_D_name}: ${N_D}$ mol"
 
     return question, solution
 
@@ -138,6 +200,21 @@ def template_flow_system_molar_flow_rates():
             F_j = F_j0 + nu_j * F_A0 * X_A = F_A0(Theta_j + nu_j * X_A)
 
         where nu_j is the stoichiometric coefficient and Theta_j = F_j0/F_A0.
+
+    Trace integrity (Layer 0, 2026-09-23):
+        Each outlet flow is a 2-dp inlet flow plus a 2-dp flow times a
+        2-dp conversion times a small integer ratio nu_j = b/a: exact at
+        4 dp when a = 1 (three of the four reactions) and at 6 dp for the
+        ammonia reaction (a = 4, nu_B = 5/4, nu_D = 6/4). Printed at 2 dp,
+        F_B, F_C and F_D sat on a half-way tie on 7% of draws
+        (748.18 - 5 * 109.26 * 0.75 = 338.455). These are the answers, so
+        per the round-3 policy their display is LENGTHENED to the exact
+        precision of the instance (`_p` = 4 or 6 dp by the reaction's a)
+        and every result is bound half-up in exact decimal arithmetic
+        through that display (D-016 part 2, as the sibling batch template
+        does), so nothing rounds and no line can tie. Theta_B and Theta_C
+        remain 3-dp quotients shown as the cross-check; the direct-method
+        line is the one that closes exactly.
 
     Returns:
         tuple: A tuple containing:
@@ -186,11 +263,16 @@ def template_flow_system_molar_flow_rates():
     Theta_B = F_B0 / F_A0
     Theta_C = F_C0 / F_A0
 
-    # Calculate outlet molar flow rates
-    F_A = F_A0 * (1 - X_A)
-    F_B = F_B0 - (b / a) * F_A0 * X_A
-    F_C = F_C0 + (c / a) * F_A0 * X_A
-    F_D = F_D0 + (d / a) * F_A0 * X_A if has_product_D else 0.0
+    # Calculate outlet molar flow rates, in exact decimal arithmetic and
+    # bound through their display (D-016 part 2). The display precision is
+    # the exact precision of the instance: F_A0 * X_A is exact at 4 dp, and
+    # dividing by a = 4 (ammonia oxidation) adds 2 dp; a = 1 otherwise.
+    _p = {1: 4, 2: 5, 4: 6, 5: 5}[a]
+    _dA0, _dX = Decimal(repr(F_A0)), Decimal(repr(X_A))
+    F_A = _hu(_dA0 * (1 - _dX), _p)
+    F_B = _hu(Decimal(repr(F_B0)) - _dA0 * _dX * b / a, _p)
+    F_C = _hu(Decimal(repr(F_C0)) + _dA0 * _dX * c / a, _p)
+    F_D = _hu(Decimal(repr(F_D0)) + _dA0 * _dX * d / a, _p) if has_product_D else 0.0
     
     # 3. Generate Question and Solution Strings
     question = (
@@ -232,39 +314,39 @@ def template_flow_system_molar_flow_rates():
     solution += (
         f"**Step 3:** Calculate Outlet Molar Flow Rates\n\n"
         f"**For {reactant_A_name} (A):**\n"
-        f"F_A = F_A0(1 - X_A) = {F_A0}(1 - {X_A}) = {round(F_A, 2)} mol/min\n\n"
+        f"F_A = F_A0(1 - X_A) = {F_A0}(1 - {X_A}) = {F_A:.{_p}f} mol/min\n\n"
         
         f"**For {reactant_B_name} (B):**\n"
         f"*Using the Direct Method:*\n"
-        f"F_B = F_B0 - ({b}/{a}) * F_A0 * X_A = {F_B0} - ({b}/{a}) * {F_A0} * {X_A} = {round(F_B, 2)} mol/min\n"
+        f"F_B = F_B0 - ({b}/{a}) * F_A0 * X_A = {F_B0} - ({b}/{a}) * {F_A0} * {X_A} = {F_B:.{_p}f} mol/min\n"
         f"*Using the Theta Method:*\n"
         f"Theta_B = F_B0 / F_A0 = {F_B0} / {F_A0} = {round(Theta_B, 3)}\n"
-        f"F_B = F_A0(Theta_B - ({b}/{a})X_A) = {F_A0}({round(Theta_B, 3)} - ({b}/{a}) * {X_A}) = {round(F_B, 2)} mol/min\n\n"
+        f"F_B = F_A0(Theta_B - ({b}/{a})X_A) = {F_A0}({round(Theta_B, 3)} - ({b}/{a}) * {X_A}) = {F_B:.{_p}f} mol/min\n\n"
 
         f"**For {product_C_name} (C):**\n"
         f"*Using the Direct Method:*\n"
-        f"F_C = F_C0 + ({c}/{a}) * F_A0 * X_A = {F_C0} + ({c}/{a}) * {F_A0} * {X_A} = {round(F_C, 2)} mol/min\n"
+        f"F_C = F_C0 + ({c}/{a}) * F_A0 * X_A = {F_C0} + ({c}/{a}) * {F_A0} * {X_A} = {F_C:.{_p}f} mol/min\n"
         f"*Using the Theta Method:*\n"
         f"Theta_C = F_C0 / F_A0 = {F_C0} / {F_A0} = {round(Theta_C, 3)}\n"
-        f"F_C = F_A0(Theta_C + ({c}/{a})X_A) = {F_A0}({round(Theta_C, 3)} + ({c}/{a}) * {X_A}) = {round(F_C, 2)} mol/min\n\n"
+        f"F_C = F_A0(Theta_C + ({c}/{a})X_A) = {F_A0}({round(Theta_C, 3)} + ({c}/{a}) * {X_A}) = {F_C:.{_p}f} mol/min\n\n"
     )
 
     if has_product_D:
         solution += (
             f"**For {product_D_name} (D):**\n"
             f"Since F_D0 = 0, the calculation is straightforward:\n"
-            f"F_D = F_D0 + ({d}/{a}) * F_A0 * X_A = 0 + ({d}/{a}) * {F_A0} * {X_A} = {round(F_D, 2)} mol/min\n\n"
+            f"F_D = F_D0 + ({d}/{a}) * F_A0 * X_A = 0 + ({d}/{a}) * {F_A0} * {X_A} = {F_D:.{_p}f} mol/min\n\n"
         )
 
     solution += (
         f"**Answer:**\n"
         f"The molar flow rates exiting the reactor are:\n"
-        f"- {reactant_A_name} (F_A): {round(F_A, 2)} mol/min\n"
-        f"- {reactant_B_name} (F_B): {round(F_B, 2)} mol/min\n"
-        f"- {product_C_name} (F_C): {round(F_C, 2)} mol/min\n"
+        f"- {reactant_A_name} (F_A): {F_A:.{_p}f} mol/min\n"
+        f"- {reactant_B_name} (F_B): {F_B:.{_p}f} mol/min\n"
+        f"- {product_C_name} (F_C): {F_C:.{_p}f} mol/min\n"
     )
     if has_product_D:
-        solution += f"- {product_D_name} (F_D): {round(F_D, 2)} mol/min"
+        solution += f"- {product_D_name} (F_D): {F_D:.{_p}f} mol/min"
 
     return question, solution
 

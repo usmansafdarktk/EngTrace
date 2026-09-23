@@ -376,52 +376,84 @@ def template_virtual_work_truss_deflection():
         screen (<= ~180 MPa, lesson 14) AND close the deflection band by
         construction; deflection asserted in [0.5, 15] mm.
 
+    Trace integrity (Layer 0, 2026-09-23):
+        The real forces P*L_BC/h and -P*b/h, the virtual forces L_BC/h and
+        -b/h, and the two virtual-work terms n*N*L/(A*E) are all quotients
+        by an arbitrary 1-dp height or a sampled area, exact at no fixed
+        display; together they land on a half-way tie at their display on
+        ~7% of draws, concentrated on the heights whose 10*h has only the
+        factors 2 and 5 (-46 * 2.1 / 1.6 = -60.375). Such a draw is
+        resampled rather than rounded either way (D-016/D-037). The sum
+        delta = term_BC + term_AC of two 3-dp terms is exact at 3 dp and
+        is unchanged.
+
     Returns:
         tuple: (question, solution)
     """
     E_kn_mm2 = STEEL_E_GPA                      # 200 GPa = 200 kN/mm^2
-    b = round(random.uniform(2.0, 4.0), 1)
-    h = round(random.uniform(1.5, 3.0), 1)
-    P = random.randint(20, 60)
 
-    L_ac = b
-    L_bc = round(math.sqrt(b ** 2 + h ** 2), 3)
+    # Bounded redraw: a draw whose member force, virtual force or
+    # virtual-work term lands on a half-way tie at its display has no
+    # defensible gold answer and is rejected (D-016).
+    for _attempt in range(200):
+        b = round(random.uniform(2.0, 4.0), 1)
+        h = round(random.uniform(1.5, 3.0), 1)
+        P = random.randint(20, 60)
 
-    # Real forces (tension positive) at joint C.
-    N_bc = round(P * L_bc / h, 2)               # tension
-    N_ac = round(-P * b / h, 2)                 # compression
+        L_ac = b
+        L_bc = round(math.sqrt(b ** 2 + h ** 2), 3)
 
-    # Virtual forces under a unit vertical downward load at C.
-    n_bc = round(L_bc / h, 4)
-    n_ac = round(-b / h, 4)
+        # Real forces (tension positive) at joint C.
+        N_bc_exact = P * L_bc / h                   # tension
+        N_ac_exact = -P * b / h                     # compression
+        N_bc = round(N_bc_exact, 2)
+        N_ac = round(N_ac_exact, 2)
 
-    # Per-sample area windows close BOTH the stress screen and the
-    # deflection band by construction (R1, cycle 1: stress floors alone
-    # left a ~0.15% crash corner at delta ~ 19.6 mm). With
-    # c_i = n_i*N_i*(L_i in mm)/E, any A_i >= c_sum/14.0 guarantees
-    # delta <= ~14.5 mm and any A_i <= c_sum/0.55 guarantees
-    # delta >= ~0.52 mm; both windows are provably non-empty over the
-    # whole parameter space (worst case, member AC at b=2, h=3:
-    # c_sum/0.55 >= ~12.1*|N_AC| vs the 5.83*|N| stress floor; verified
-    # exhaustively by R1 over 13,776 parameter combos).
-    c_bc = n_bc * N_bc * (L_bc * 1000) / E_kn_mm2
-    c_ac = n_ac * N_ac * (L_ac * 1000) / E_kn_mm2
-    c_sum = c_bc + c_ac
+        # Virtual forces under a unit vertical downward load at C.
+        n_bc_exact = L_bc / h
+        n_ac_exact = -b / h
+        n_bc = round(n_bc_exact, 4)
+        n_ac = round(n_ac_exact, 4)
 
-    def _sample_area(force):
-        lo = max(500.0, 1.05 * abs(force) / 0.18, c_sum / 14.0)
-        hi = min(lo + 600.0, c_sum / 0.55, 3600.0)
-        assert lo < hi, f"empty area window: {lo}, {hi}"
-        return int(round(random.uniform(lo, hi) / 10) * 10)
+        # Per-sample area windows close BOTH the stress screen and the
+        # deflection band by construction (R1, cycle 1: stress floors alone
+        # left a ~0.15% crash corner at delta ~ 19.6 mm). With
+        # c_i = n_i*N_i*(L_i in mm)/E, any A_i >= c_sum/14.0 guarantees
+        # delta <= ~14.5 mm and any A_i <= c_sum/0.55 guarantees
+        # delta >= ~0.52 mm; both windows are provably non-empty over the
+        # whole parameter space (worst case, member AC at b=2, h=3:
+        # c_sum/0.55 >= ~12.1*|N_AC| vs the 5.83*|N| stress floor; verified
+        # exhaustively by R1 over 13,776 parameter combos).
+        c_bc = n_bc * N_bc * (L_bc * 1000) / E_kn_mm2
+        c_ac = n_ac * N_ac * (L_ac * 1000) / E_kn_mm2
+        c_sum = c_bc + c_ac
 
-    A_bc = _sample_area(N_bc)
-    A_ac = _sample_area(N_ac)
+        def _sample_area(force):
+            lo = max(500.0, 1.05 * abs(force) / 0.18, c_sum / 14.0)
+            hi = min(lo + 600.0, c_sum / 0.55, 3600.0)
+            assert lo < hi, f"empty area window: {lo}, {hi}"
+            return int(round(random.uniform(lo, hi) / 10) * 10)
 
-    # Terms of the virtual-work sum in consistent mm units: L in mm, A in
-    # mm^2, E in kN/mm^2, N in kN -> delta in mm.
-    term_bc = round(n_bc * N_bc * (L_bc * 1000) / (A_bc * E_kn_mm2), 3)
-    term_ac = round(n_ac * N_ac * (L_ac * 1000) / (A_ac * E_kn_mm2), 3)
-    delta = round(term_bc + term_ac, 3)
+        A_bc = _sample_area(N_bc)
+        A_ac = _sample_area(N_ac)
+
+        # Terms of the virtual-work sum in consistent mm units: L in mm, A in
+        # mm^2, E in kN/mm^2, N in kN -> delta in mm.
+        term_bc_exact = n_bc * N_bc * (L_bc * 1000) / (A_bc * E_kn_mm2)
+        term_ac_exact = n_ac * N_ac * (L_ac * 1000) / (A_ac * E_kn_mm2)
+        if (_is_display_tie(N_bc_exact, 2) or _is_display_tie(N_ac_exact, 2)
+                or _is_display_tie(n_bc_exact, 4)
+                or _is_display_tie(n_ac_exact, 4)
+                or _is_display_tie(term_bc_exact, 3)
+                or _is_display_tie(term_ac_exact, 3)):
+            continue                    # no defensible gold answer; redraw
+        term_bc = round(term_bc_exact, 3)
+        term_ac = round(term_ac_exact, 3)
+        delta = round(term_bc + term_ac, 3)
+        break
+    else:
+        raise RuntimeError(
+            "virtual_work_truss_deflection: no closing sample in 200 draws")
 
     assert abs(N_bc) / A_bc <= 0.185 and abs(N_ac) / A_ac <= 0.185, (
         "axial stress screen violated")

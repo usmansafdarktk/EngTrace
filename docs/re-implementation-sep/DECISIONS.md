@@ -3359,10 +3359,152 @@ The old history is preserved on the branch
 `origin` as well as locally, so every pre-rewrite hash still resolves.
 `origin/gh-pages` is separate history and was left alone.
 
+## D-091 — The hard case is scored on the step labels, not on a second labelling round
+
+**Date:** 2026-09-23 · **Status:** DECIDED · **Evidence:**
+`evaluator_pilot_17092026/analysis/hard_case_pool.py`
+
+A reasoning evaluator earns its keep on traces whose final answer is right but whose
+reasoning is not. X1 could not run that comparison: of the 228 correct-answer traces
+the experts' holistic verdict calls only 3 unsound. The plan was a second round —
+generate traces from weaker models, mine them, have the experts label them.
+
+The labels already hold the set. The experts' own step labels mark at least one step
+incorrect in **56** of those 228 traces (102 steps), and call 53 of those same traces
+sound overall. The trace-level target, not the data, was hiding the hard case. So the
+hard case is scored as "does this trace contain an incorrect step, given the answer is
+correct", and no new traces are generated or labelled.
+
+The result on that target is negative and worth reporting as such: no evaluator beats
+E0 (best is E2's 72B minimum reward, 0.601 against 0.545, CI of the difference
+-0.041 to +0.166), and E3, E4 and E5 are significantly *worse* than E0 — they score a
+trace by milestones the answer already implies. Every AUROC sits near chance.
+
+A second round was also costed and rejected on its own terms. The signals that would
+select candidates barely enrich: the 72B's minimum reward under 0.20 yields 28%
+against a 25% base rate (1.16x), a failed arithmetic claim yields 33% at n=12. At
+those rates ~170 new traces must be labelled to add ~50 hard cases, and the resulting
+intervals (±0.06 instead of ±0.085) would not change the conclusion. 101 of the 102
+incorrect steps are calculation slips, one is conceptual, so the population being
+bought is mostly arithmetic noise that leaves the answer intact.
+
+The candidate miner stays in the script for the record: 87 unlabelled robustness-cohort
+traces (gemma-4-31b, qwen3.8-27b) pass a deterministic answer check, 36 of them fire at
+least one signal. Re-run it if a later round is ever funded.
+
+## D-092 — Layer 0: a deterministic gate admits templates to certification, sized to the defect rate
+
+**Date:** 2026-09-23 · **Status:** DECIDED · **Source:** `template_annotation_23092026/layer0/`
+(`gate.py`, `check_limits.json`, `closure_fixes.md`, `tie_census.py`)
+
+The December 2025 certification pipeline was an AI Tribunal followed by human review,
+and neither stage saw the defects the September audit found in the same 90
+certified templates (chains that do not reproduce their own answers, unseeded
+generators, doubled signs, wrong constants). The deterministic integrity suite
+does see them, so it becomes **Layer 0**: no template reaches a judge or an
+expert until it passes T1 closure, T3 determinism, T4 contract and T8 emission
+with no generation error. T5 binding and T7 asserts stay advisory, as
+`phase6_residual_register.md` already classifies them; T2 is reported where an
+oracle exists.
+
+**The gate runs at 500 seeds.** A 25-seed snapshot showed 29 templates failing
+closure; 100 seeds exposed 6 more and 500 seeds 16 more, all the same
+product-of-short-decimals tie class at rates of 0.1–3% per instance. That is
+D-016's carried-forward point: acceptance evidence must be sized to the defect
+rate, and a gate that is green at 25 seeds and red at 500 is not green.
+
+**Resolution of the closure failures.** D-016 and D-037 applied unchanged: a
+displayed-and-consumed operand is bound through its display; a half-way tie is
+removed, by lengthening an exact display first and by a bounded redraw only where
+the quantity is a quotient exact at no display; a tie in a final answer is redrawn
+rather than lengthened (D-044). Every edit, its cause, and how much of the item
+pool it moved is in `closure_fixes.md`; the corpus-wide movement is measured by
+`c3_instance_dump.py --diff` against the pre-edit tree.
+
+**Four lines are excused, not fixed**, in `check_limits.json`, each keyed to its
+template and a line pattern so anything else in that template still fails: a
+mixed-unit ratio rewritten across `=` (consolidation), hours-to-minutes
+conversions across `=` (server selection), stated round-down and round-up lines
+(Cpk), and the omega line of `wave_parameters_basic`, where T1 sizes a `%e`
+result's tolerance from the mantissa alone — `core.printed_precision()` drops the
+exponent — which is the closure counterpart of D-017 and is deferred to the
+harness owner on the same reasoning.
+
+**Finding, recorded for the harness owner:** T1 files an exact tie as FAIL or
+MARGINAL by floating-point luck, so its failure count undercounts ties several-
+fold. An exact-decimal census (`tie_census.py`, adapted from the civil round-2
+agent's instrument) now reports residual ties per template beside the gate; it
+gates nothing. Also for the harness owner: for negative exponents the same
+`printed_precision()` defect makes T1 far too lenient (a `1.3200e-05` result gets
+a tolerance of 5e-5, not 5e-10), so closure failures in small scientific-notation
+results are invisible today.
+
+**Sign-offs this creates (D-044, the owner's):** the answer display was
+lengthened in `hydrostatic_pressure_at_depth` (kPa 3 → 4 dp) and
+`max_hump_height_no_choking` (m 3 → 4 dp); it is recommended but NOT done in
+`beam_internal_moment` (2 → 3 dp would replace a 10.5% redraw that halves every
+x = k.5 section), `terzaghi_strip_footing_bearing` (1 → 2 dp would replace a
+one-third depletion of c' = 15 general shear) and `effective_stress_profile`
+(1 → 3 dp would replace a 1.3% redraw). Gold answers move on unchanged questions
+in `absorbing_chain_time_to_failure` (8.3%, ±0.01 week) and
+`effective_stress_profile` (24%, ±0.1 kPa), in both cases because a double
+rounding was removed; the alternative in each is a tie screen with no movement.
+
+---
+
+## D-093 — Layer 1: the template screen keeps the published prompt, changes the judges, and is capped at two passes
+
+**Date:** 2026-09-23 · **Status:** DECIDED · **Source:** `template_annotation_23092026/screen/`
+(`run_screen.py`, `analyze_screen.py`); analysis of 2026-09-22 in the session record
+
+The AI Tribunal is kept as a **reader**, not a gate, for three reasons: it is
+the only exhaustive plausibility-and-prose read of all 150 templates and that is
+exactly what it caught in December (rubber loaded to 365 kN, a 55 MPa pipe
+pressure drop, a "titanium plastic container"); the July 2026 rebuttal promised
+the aggregate sigma-max and pairwise Gwet's AC1 among the template judges, and
+the December per-judge outputs are not in the repository (only the 91-row
+`tribunal_summary.csv` survives, without per-judge flags), so the statistic needs
+a re-run; and one method should cover all five branches.
+
+**Judges:** the pilot's non-suite panel (D-088) — xAI Grok 4.6, MiniMax M3,
+Xiaomi MiMo-V2.5-Pro — through OpenRouter with D-089's uniform settings (JSON
+mode, temperature 0, 16,384 output tokens, three attempts on an empty or
+malformed reply, provider ModelRun excluded for MiniMax). No judge shares a
+family with an evaluated model, which removes Reviewer yAYU's judge-overlap
+objection from certification; Kimi K3 and GLM-5.3 stay excluded so the strongest
+open families remain available for the roster (D-088). The served model id,
+serving provider, finish reason, tokens and OpenRouter's own reported cost are
+written on every row, because the published run recorded none of them and its
+Google judge has since been retired (E0-F4); the `.env` of the December run names
+a Flash model where the paper says Gemini 3, which a recorded id would have
+settled.
+
+**The prompt is Appendix H's, verbatim,** read by AST out of
+`ai_assisted_quality_assurance/run_ai_tribunal.py`, with three instances from
+fixed seeds through the integrity suite's generator, so a pass is reproducible.
+
+**Two passes, no more:** one before human certification and one after, so the
+report can state the panel's view of the certified corpus. Templates are never
+iterated against the judges — that made the Tribunal the oracle in December and
+hid that the human stage rejected nothing. Layer 0 is the gate. `--pass 3` is
+refused in code. Replies are committed (unlike December's), so the statistic
+can be recomputed later.
+
+**Cost:** about $4.60 per pass on measured reply sizes (each judge spends 1,000–
+3,000 billed reasoning tokens behind a 150-token JSON row; a flat 200-token
+assumption underestimated the pass threefold), so $9.20 for both passes. Spend
+so far: about $0.04 (a three-judge probe and a three-row smoke test). **Pass 1
+runs only on the user's explicit approval** (user rule of 2026-09-23: no paid
+API work without prior approval).
+
+---
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
+| D-092 | ~~Answer-display lengthening and gold-movement sign-offs~~ **Decided by the owner 2026-09-23:** the two lengthened answers stay; `beam_internal_moment`, `terzaghi_strip_footing_bearing` and `effective_stress_profile` answers are lengthened too; the gold movements are accepted; and a scoped third round removes the census ties at 3% and above (eight templates), with the frozen pool to be censused before inference and stragglers fixed then | — |
+| D-093 | Approval to run screening pass 1 (~$4.60) once the Layer 0 branch is merged | Layer 2 (human certification) starts |
 | — | Which families the next roster will evaluate (Kimi, GLM stay available as long as they are not judges) | the next benchmark run |
 | — | Expert annotation of the frozen 300 (stage 3): annotators, protocol, the ~100-trace triple-labelled overlap | any X1 agreement number |
 | D-003 | Do the raw `inference_results/` generations still exist? | promising any corrected results table |

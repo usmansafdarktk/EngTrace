@@ -47,6 +47,46 @@ def _is_display_tie_dec(x, places):
     return d == d.to_integral_value(rounding=ROUND_FLOOR) + Decimal("0.5")
 
 
+def _hu(x, places):
+    """Round half-up to `places` dp, resolving the tie in DECIMAL.
+
+    `round()` resolves a half-way tie on the binary value and disagrees with a
+    reader doing decimal arithmetic (spec P2 as amended, DECISIONS D-012).
+    """
+    q = Decimal(1).scaleb(-places)
+    d = x if isinstance(x, Decimal) else Decimal(repr(x))
+    v = d.quantize(q, rounding=ROUND_HALF_UP)
+    return int(v) if places == 0 else float(v)
+
+
+def _as_printed(x, spec):
+    """The value a reader recovers from `x` when it is printed with `spec`.
+
+    P2 asks that the stored value and the printed value be the SAME value.
+    Rounding alone does not achieve that: a float one ulp away from its own
+    printed form puts the template and the reader on opposite sides of a
+    display tie (D-016 part 2).
+    """
+    return float(format(x, spec))
+
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where no rounding convention is defensible - a
+    decimal reader applying half-up and a binary reader applying `round()`
+    disagree, and the printed line closes for only one of them. Such instances
+    are resampled rather than resolved (D-016).
+
+    A narrow BAND is quarantined rather than a point, because two independent
+    evaluations of the same exact quantity differ by a few ulps and an exact
+    rational tie lands on opposite sides of them.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
+
+
 # Template 1 (Easy)
 def template_signal_energy_power():
     """
@@ -534,30 +574,65 @@ def template_lowpass_equivalent_bandpass():
         Lowpass Equivalent Signal: g_tilde(t) = g_I(t) + j*g_Q(t)
         Trigonometric Identity: cos(a + b) = cos(a)*cos(b) - sin(a)*sin(b)
 
+    Trace integrity (Layer 0, 2026-09-23):
+        Step 3 chained the exact expression, its 3-dp substitution and the
+        result on one line (`g_Q(t) = 59 * sin(60 deg) = 59 * (0.866) =
+        51.095`), and no result closes both segments: A * (sin 60 deg -
+        0.866) is up to 100 half-units of the 3-dp result. The trig factor
+        is now stated on its own line, bound through its 3-dp display, and
+        the component is recomputed forward from the stated factor (spec
+        P3), so every line closes on its printed operands (D-016 part 2).
+        An integer amplitude times a 3-dp factor is exact at 3 dp; its 2-dp
+        display in Step 4 and the answer sits on a half-way tie for A = 15,
+        25, ..., 95 at 45 or 135 deg, and such draws are rejected and
+        redrawn (D-016 part 3). The question text is unchanged for every
+        draw that is not rejected; the gold components move by the rounding
+        of the trig factor.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the components of a bandpass signal.
             - str: A step-by-step solution showing the derivation.
     """
     # 1. Parameterize the inputs with random values
-    amplitude = random.randint(10, 100)
-    fc_exp = random.randint(6, 8)  # For MHz to hundreds of MHz
-    fc_mult = random.randint(1, 9)
-    phase_deg = random.choice([30, 45, 60, 90, 120, 135, 150])
     precision = 2
-    
-    # Create a readable string for the carrier frequency
-    fc_str = f"{fc_mult} x 10^{fc_exp}"
-    
-    # 2. Perform the core calculations
-    phase_rad = math.radians(phase_deg)
-    cos_phi = math.cos(phase_rad)
-    sin_phi = math.sin(phase_rad)
+    for _attempt in range(200):
+        amplitude = random.randint(10, 100)
+        fc_exp = random.randint(6, 8)  # For MHz to hundreds of MHz
+        fc_mult = random.randint(1, 9)
+        phase_deg = random.choice([30, 45, 60, 90, 120, 135, 150])
 
-    # From the identity, g(t) = A*cos(phi)*cos(w_c*t) - A*sin(phi)*sin(w_c*t)
-    # We can identify the in-phase and quadrature components
-    g_I = amplitude * cos_phi
-    g_Q = amplitude * sin_phi
+        # Create a readable string for the carrier frequency
+        fc_str = f"{fc_mult} x 10^{fc_exp}"
+
+        # 2. Perform the core calculations
+        phase_rad = math.radians(phase_deg)
+        # The trig factors are STATED to `precision+1` dp on their own lines
+        # and the components are recomputed forward from the stated values
+        # (P3), so each factor is bound through that display before it is
+        # consumed (D-016 part 2).
+        cos_phi = _as_printed(math.cos(phase_rad), f'.{precision+1}f')
+        sin_phi = _as_printed(math.sin(phase_rad), f'.{precision+1}f')
+
+        # From the identity, g(t) = A*cos(phi)*cos(w_c*t) - A*sin(phi)*sin(w_c*t)
+        # We can identify the in-phase and quadrature components. An integer
+        # amplitude times a 3-dp factor is exact at 3 dp; bound through the
+        # result display to strip float noise.
+        g_I = _as_printed(amplitude * cos_phi, f'.{precision+1}f')
+        g_Q = _as_printed(amplitude * sin_phi, f'.{precision+1}f')
+
+        # Step 4 and the answer quote g_I and g_Q to `precision` dp, where an
+        # exact 3-dp value such as 15 * 0.707 = 10.605 sits on a half-way
+        # tie. No rounding convention closes that for every reader, so the
+        # draw is rejected and redrawn (D-016 part 3).
+        if _is_display_tie(g_I, precision) or _is_display_tie(g_Q, precision):
+            continue
+        break
+    else:
+        raise RuntimeError("lowpass_equivalent_bandpass: no closing sample in 200 draws")
+
+    # A stated factor is an operand under `*`: a negative one is parenthesised.
+    trig_fmt = f"{{:.{precision+1}f}}".format
 
     # 3. Generate the question and solution strings
     signal_expr = f"g(t) = {amplitude} * cos(2*pi*({fc_str})*t + {phase_deg} deg)"
@@ -588,8 +663,10 @@ def template_lowpass_equivalent_bandpass():
         f"By comparing our expanded signal to the canonical form, we can identify g_I(t) and g_Q(t):\n"
         f"g_I(t) is the term multiplying cos(2*pi*fc*t).\n"
         f"g_Q(t) is the term multiplying sin(2*pi*fc*t) (note the minus sign is part of the formula).\n\n"
-        f"g_I(t) = {amplitude} * cos({phase_deg} deg) = {amplitude} * ({cos_phi:.{precision+1}f}) = {g_I:.{precision+1}f}\n"
-        f"g_Q(t) = {amplitude} * sin({phase_deg} deg) = {amplitude} * ({sin_phi:.{precision+1}f}) = {g_Q:.{precision+1}f}\n"
+        f"cos({phase_deg} deg) = {cos_phi:.{precision+1}f}\n"
+        f"g_I(t) = {amplitude} * {paren_neg(cos_phi, trig_fmt)} = {g_I:.{precision+1}f}\n"
+        f"sin({phase_deg} deg) = {sin_phi:.{precision+1}f}\n"
+        f"g_Q(t) = {amplitude} * {paren_neg(sin_phi, trig_fmt)} = {g_Q:.{precision+1}f}\n"
         f"Note that for this signal, g_I and g_Q are constants because the amplitude and phase are constant.\n\n"
         
         f"**Step 4:** Construct the Complex Lowpass Equivalent Signal (g_tilde(t)).\n"

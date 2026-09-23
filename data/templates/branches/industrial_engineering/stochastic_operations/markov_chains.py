@@ -1,5 +1,42 @@
 import math
 import random
+from decimal import Decimal, ROUND_HALF_UP
+
+
+def _hu(x, places):
+    """Half-up rounding of a float via its shortest decimal repr."""
+    q = Decimal("1") if places == 0 else Decimal("0." + "0" * (places - 1) + "1")
+    v = Decimal(repr(x)).quantize(q, rounding=ROUND_HALF_UP)
+    return int(v) if places == 0 else float(v)
+
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where NO rounding convention is defensible. A reader
+    doing decimal arithmetic and applying half-up reads 0.02325 m as 23.3 mm; a
+    reader using binary floats and `round()` reads it as 23.2 mm; and the
+    printed line closes for exactly one of them whichever the template picks.
+    Breaking the tie in decimal (P2 as amended) does not remove the ambiguity,
+    it only moves it to the other reader - which is why such instances are
+    RESAMPLED rather than resolved (D-016).
+
+    Testing for an EXACT tie is not enough. Two independent evaluations of the
+    same exact quantity - this template's, in kN and kN/m^2, and a solver's, in
+    N and Pa - differ by a few ulps, so a rational tie such as 29.25 mm lands
+    as 29.249999999999996 on one side and 29.250000000000004 on the other.
+    Neither is exactly a tie, and the two then round in opposite directions:
+    that is how eight non-closing instances per 60,000 seeds survived the first
+    version of this guard (Phase 1 review A, finding F-2).
+
+    So a narrow BAND is quarantined rather than a point. The band is a few
+    thousand ulps wide where the tie lattice is 10^-places apart, so it removes
+    nothing that is not genuinely ambiguous.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
+
 
 # Markov-chain templates carry no numeric constants from constants.py by
 # Stage B design: transition probabilities are sampled and fully stated in
@@ -313,30 +350,58 @@ def template_absorbing_chain_time_to_failure():
         [4.7, 15.4], muW [3.2, 13.8]; 2-dp display quantization cap
         documented at 0.15%.
 
+    Trace integrity (Layer 0, 2026-09-23):
+        The substitution's numerator 1 + w*c1 (a 2-dp probability times the
+        4-dp c1) is exact at 6 dp and its denominator 1 - g - w*m*c1 at
+        8 dp, for every reachable combo; printed at 4 dp they sat on a
+        half-way tie on ~3% and ~2% of draws (1 + 0.30*4.5455 = 2.36365).
+        Both are now bound half-up and printed at their exact length, so
+        nothing rounds before the division (D-037); over all 75,117 combos
+        this moves the 2-dp muG by 0.01 on 8.2% of them, toward the exact
+        solution, and the Step 6 check still matches muG within 0.06 on
+        every combo. muG = n1/d1 is a quotient and muW is a result quoted
+        at 2 dp, so a draw whose muG or muW sits on a 2-dp half-way tie
+        (0.7% of combos, nearly all muW) is redrawn rather than rounded
+        either way (D-016, D-044). c1 = 1/(1 - s) and the Step 6 check
+        cannot tie at their displays (enumerated over every combo).
+
     Returns:
         tuple(str, str): (question, solution)
     """
-    g_c = random.randint(*_ABS_G_RANGE)
-    m_c = random.randint(*_ABS_M_RANGE)
-    d_c = random.randint(*_ABS_D_RANGE)
-    g, m, d = g_c / 100, m_c / 100, d_c / 100
-    s = round(1 - m - d, 2)              # exact cents arithmetic
+    for _attempt in range(200):
+        g_c = random.randint(*_ABS_G_RANGE)
+        m_c = random.randint(*_ABS_M_RANGE)
+        d_c = random.randint(*_ABS_D_RANGE)
+        g, m, d = g_c / 100, m_c / 100, d_c / 100
+        s = round(1 - m - d, 2)              # exact cents arithmetic
 
-    # Per-sample f window keeping the exact denominator >= 0.15:
-    # w = 1 - g - f must satisfy w * m / (1 - s) <= (1 - g) - 0.15.
-    w_cap = ((1 - g) - 0.15) * (1 - s) / m
-    f_lo = max(2, math.ceil(round((1 - g - w_cap) * 100, 6)))
-    f_c = random.randint(f_lo, _ABS_F_MAX)
-    f = f_c / 100
-    w = round(1 - g - f, 2)              # exact cents arithmetic
+        # Per-sample f window keeping the exact denominator >= 0.15:
+        # w = 1 - g - f must satisfy w * m / (1 - s) <= (1 - g) - 0.15.
+        w_cap = ((1 - g) - 0.15) * (1 - s) / m
+        f_lo = max(2, math.ceil(round((1 - g - w_cap) * 100, 6)))
+        f_c = random.randint(f_lo, _ABS_F_MAX)
+        f = f_c / 100
+        w = round(1 - g - f, 2)              # exact cents arithmetic
 
-    # Round-then-recompute chain from the presented 2-dp probabilities:
-    # c1 (4 dp) anchors the substitution; n1, d1 (4 dp); muG, muW (2 dp).
-    c1 = round(1 / (1 - s), 4)
-    n1 = round(1 + w * c1, 4)
-    d1 = round(1 - g - w * m * c1, 4)
-    muG = round(n1 / d1, 2)
-    muW = round((1 + m * muG) * c1, 2)
+        # Round-then-recompute chain from the presented 2-dp probabilities:
+        # c1 (4 dp) anchors the substitution; n1 and d1 are bound at their
+        # EXACT lengths, 6 and 8 dp (a 2-dp w times the 4-dp c1; w*m*c1),
+        # so nothing rounds before the division (D-037); muG, muW (2 dp).
+        c1 = round(1 / (1 - s), 4)
+        n1 = _hu(1 + w * c1, 6)
+        d1 = _hu(1 - g - w * m * c1, 8)
+        # D-016: muG is a quotient and muW a 2-dp result; a draw whose value
+        # sits on a 2-dp half-way tie is redrawn rather than rounded either
+        # way. Screened last, after every draw, so only a tie draw is redrawn.
+        if _is_display_tie(n1 / d1, 2):
+            continue
+        muG = round(n1 / d1, 2)
+        if _is_display_tie((1 + m * muG) * c1, 2):
+            continue
+        muW = round((1 + m * muG) * c1, 2)
+        break
+    else:
+        raise AssertionError("resample loop exhausted")
     check = round(1 + g * muG + w * muW, 2)
 
     assert 0.55 <= g <= 0.70 and 0.02 <= f <= 0.10, f"(g,f) out of bounds: {g},{f}"
@@ -384,10 +449,10 @@ def template_absorbing_chain_time_to_failure():
         f"muG = 1 + {g:.2f}*muG + {w:.2f}*(1 + {m:.2f}*muG)*{c1:.4f}\n"
         f"muG * (1 - {g:.2f} - {w:.2f}*{m:.2f}*{c1:.4f}) "
         f"= 1 + {w:.2f}*{c1:.4f}\n"
-        f"Numerator: 1 + {w:.2f}*{c1:.4f} = {n1:.4f}; denominator: "
-        f"1 - {g:.2f} - {w:.2f}*{m:.2f}*{c1:.4f} = {d1:.4f}\n\n"
+        f"Numerator: 1 + {w:.2f}*{c1:.4f} = {n1:.6f}; denominator: "
+        f"1 - {g:.2f} - {w:.2f}*{m:.2f}*{c1:.4f} = {d1:.8f}\n\n"
         f"**Step 4:** Solve for muG.\n"
-        f"muG = {n1:.4f} / {d1:.4f} = {muG:.2f} weeks (rounded to two "
+        f"muG = {n1:.6f} / {d1:.8f} = {muG:.2f} weeks (rounded to two "
         f"decimals)\n\n"
         f"**Step 5:** Back-substitute to obtain muW.\n"
         f"muW = (1 + {m:.2f}*{muG:.2f}) * {c1:.4f} = {muW:.2f} weeks\n\n"

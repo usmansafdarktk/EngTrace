@@ -1,7 +1,51 @@
 import math
 import random
+from decimal import Decimal, ROUND_HALF_UP
 
 from data.templates.branches.civil_engineering.constants import GRAVITY_M_S2
+
+
+def _hu(x, places):
+    """Round half-up to `places` dp, resolving the tie in DECIMAL.
+
+    `round()` resolves a half-way tie on the binary value, so
+    `round(0.01185 * 1000, 1)` gives 11.8 where a reader doing decimal
+    arithmetic gets 11.9 (spec P2 as amended, DECISIONS D-012). Accepts a
+    Decimal so an exact decimal product can be quantised without a detour
+    through a float. Matches the industrial branch's `_hu` convention.
+    """
+    q = Decimal(1).scaleb(-places)
+    d = x if isinstance(x, Decimal) else Decimal(repr(x))
+    v = d.quantize(q, rounding=ROUND_HALF_UP)
+    return int(v) if places == 0 else float(v)
+
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where NO rounding convention is defensible. A reader
+    doing decimal arithmetic and applying half-up reads 0.02325 m as 23.3 mm; a
+    reader using binary floats and `round()` reads it as 23.2 mm; and the
+    printed line closes for exactly one of them whichever the template picks.
+    Breaking the tie in decimal (P2 as amended) does not remove the ambiguity,
+    it only moves it to the other reader - which is why such instances are
+    RESAMPLED rather than resolved (D-016).
+
+    Testing for an EXACT tie is not enough. Two independent evaluations of the
+    same exact quantity - this template's, in kN and kN/m^2, and a solver's, in
+    N and Pa - differ by a few ulps, so a rational tie such as 29.25 mm lands
+    as 29.249999999999996 on one side and 29.250000000000004 on the other.
+    Neither is exactly a tie, and the two then round in opposite directions:
+    that is how eight non-closing instances per 60,000 seeds survived the first
+    version of this guard (Phase 1 review A, finding F-2).
+
+    So a narrow BAND is quarantined rather than a point. The band is a few
+    thousand ulps wide where the tie lattice is 10^-places apart, so it removes
+    nothing that is not genuinely ambiguous.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
 
 
 # Template 25 (Easy) — Area C2: Energy Principles & Rapidly Varied Flow
@@ -224,12 +268,19 @@ def template_max_hump_height_no_choking():
         approach depth at [1.30, 2.00]*yc (firmly subcritical); q derived
         from yc; dz_max asserted in [0.05, 1.2] m.
 
+    Trace integrity (Layer 0, 2026-09-23):
+        dz_max = E1 - Ec, the difference of two 4-dp energies, is exact at
+        4 dp and was printed at 3 dp, where it sat on a half-way tie on
+        ~10% of draws (1.2660 - 0.9315 = 0.3345); it is now bound half-up
+        at 4 dp and printed at 4 dp in Step 4 and in the answer. E1 itself
+        is a quotient exact at no fixed display, so the rare draw (~1 in
+        20,000) whose E1 lands on a 4-dp half-way tie is resampled rather
+        than rounded either way (D-016/D-037).
+
     Returns:
         tuple: (question, solution)
     """
     g = GRAVITY_M_S2
-    yc_target = round(random.uniform(0.5, 1.4), 3)
-    q = round(math.sqrt(g * yc_target ** 3), 3)
 
     # Per-sample multiplier floor (R1, cycle 1: yc near 0.5 with the
     # multiplier near 1.30 gave dz below the 0.05 floor). dz = yc*f(m)
@@ -238,26 +289,39 @@ def template_max_hump_height_no_choking():
     def _f(m):
         return m + 1.0 / (2.0 * m ** 2) - 1.5
 
-    target = 0.058 / yc_target
-    m_lo, m_hi_b = 1.30, 2.00
-    if _f(m_lo) < target:
-        lo, hi = m_lo, m_hi_b
-        for _ in range(40):
-            mid = (lo + hi) / 2
-            if _f(mid) < target:
-                lo = mid
-            else:
-                hi = mid
-        m_lo = hi
-    y1 = round(yc_target * random.uniform(m_lo, 2.00), 2)
+    # Bounded redraw: a draw whose approach energy lands on a 4-dp half-way
+    # tie has no defensible gold answer and is rejected (D-016).
+    for _attempt in range(200):
+        yc_target = round(random.uniform(0.5, 1.4), 3)
+        q = round(math.sqrt(g * yc_target ** 3), 3)
 
-    # Energies carried at 4 dp: dz is a small difference of near-equal
-    # energies, and 3-dp rounding of E1/Ec flipped the final digit
-    # (R2, cycle 1).
-    E1 = round(y1 + q ** 2 / (2 * g * y1 ** 2), 4)
-    yc = round((q ** 2 / g) ** (1.0 / 3.0), 3)
-    Ec = round(1.5 * yc, 4)
-    dz_max = round(E1 - Ec, 3)
+        target = 0.058 / yc_target
+        m_lo, m_hi_b = 1.30, 2.00
+        if _f(m_lo) < target:
+            lo, hi = m_lo, m_hi_b
+            for _ in range(40):
+                mid = (lo + hi) / 2
+                if _f(mid) < target:
+                    lo = mid
+                else:
+                    hi = mid
+            m_lo = hi
+        y1 = round(yc_target * random.uniform(m_lo, 2.00), 2)
+
+        # Energies carried at 4 dp: dz is a small difference of near-equal
+        # energies, and 3-dp rounding of E1/Ec flipped the final digit
+        # (R2, cycle 1).
+        E1_exact = y1 + q ** 2 / (2 * g * y1 ** 2)
+        if _is_display_tie(E1_exact, 4):
+            continue                    # no defensible gold answer; redraw
+        E1 = round(E1_exact, 4)
+        yc = round((q ** 2 / g) ** (1.0 / 3.0), 3)
+        Ec = round(1.5 * yc, 4)
+        # E1 - Ec is exact at 4 dp; at 3 dp it tied on ~10% of draws.
+        dz_max = _hu(E1 - Ec, 4)
+        break
+    else:
+        raise RuntimeError("max_hump_height_no_choking: no closing sample in 200 draws")
 
     assert y1 > yc, f"approach flow not subcritical: {y1} vs {yc}"
     assert 0.05 <= dz_max <= 1.2, f"hump margin out of bounds: {dz_max}"
@@ -287,9 +351,9 @@ def template_max_hump_height_no_choking():
         f"**Step 4:** The flow chokes when the energy over the hump "
         f"drops to Ec, so the maximum bed rise equals the energy "
         f"margin.\n"
-        f"dz_max = E1 - Ec = {E1:.4f} - {Ec:.4f} = {dz_max:.3f} m\n\n"
+        f"dz_max = E1 - Ec = {E1:.4f} - {Ec:.4f} = {dz_max:.4f} m\n\n"
         f"**Answer:** The maximum hump height without choking is "
-        f"{dz_max:.3f} m"
+        f"{dz_max:.4f} m"
     )
 
     return question, solution

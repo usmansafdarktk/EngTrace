@@ -1,8 +1,49 @@
 import random
 import math
+from decimal import Decimal, ROUND_HALF_UP
 from data.templates.branches.electrical_engineering.constants import C0, MEDIA_VELOCITIES 
 from data.templates.branches._emission import signed_term, joined_terms, rect_str
 
+
+
+def _hu(x, places):
+    """Round half-up to `places` dp, resolving the tie in DECIMAL.
+
+    `round()` resolves a half-way tie on the binary value and disagrees with a
+    reader doing decimal arithmetic (spec P2 as amended, DECISIONS D-012).
+    """
+    q = Decimal(1).scaleb(-places)
+    d = x if isinstance(x, Decimal) else Decimal(repr(x))
+    v = d.quantize(q, rounding=ROUND_HALF_UP)
+    return int(v) if places == 0 else float(v)
+
+
+def _as_printed(x, spec):
+    """The value a reader recovers from `x` when it is printed with `spec`.
+
+    P2 asks that the stored value and the printed value be the SAME value.
+    Rounding alone does not achieve that: a float one ulp away from its own
+    printed form puts the template and the reader on opposite sides of a
+    display tie (D-016 part 2).
+    """
+    return float(format(x, spec))
+
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where no rounding convention is defensible - a
+    decimal reader applying half-up and a binary reader applying `round()`
+    disagree, and the printed line closes for only one of them. Such instances
+    are resampled rather than resolved (D-016).
+
+    A narrow BAND is quarantined rather than a point, because two independent
+    evaluations of the same exact quantity differ by a few ulps and an exact
+    rational tie lands on opposite sides of them.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
 
 
 # Template 1 (Easy)
@@ -24,6 +65,20 @@ def template_wave_parameters_basic():
         T = 1 / f          
         k = 2 * pi / lambda 
 
+    Trace integrity (Layer 0, 2026-09-23):
+        u_p is stated in the question at `.2e`, pi is printed to 5 dp, f is
+        displayed at `.2e` and lambda to 3 dp before each is consumed, so the
+        printed omega and k lines were computed from digits the reader never
+        saw. Each is bound through its own display (D-016 part 2); in the
+        wavelength-first scenario the MHz value of f is taken from the bound
+        u_p and lambda. The omega line still fails T1, as a check limit and
+        not a closure defect: core.printed_precision() drops the exponent of
+        a `%e` result, so a 3-s.f. omega near 1e9 is held to |omega| * 1e-9,
+        while the line closes within half a unit of the printed mantissa's
+        last digit on every seed (the T1 counterpart of D-017, recorded in
+        the register). The question text is unchanged; the gold f in MHz
+        moves to the value computed from the stated u_p.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking to compute various wave parameters.
@@ -33,16 +88,21 @@ def template_wave_parameters_basic():
     medium_name, u_p = random.choice(list(MEDIA_VELOCITIES.items()))
     start_with_frequency = random.choice([True, False])
 
+    # u_p is stated in the question at `.2e`, pi is printed to 5 dp, and f and
+    # lambda are displayed at `.2e` and 3 dp before they are consumed: each is
+    # bound through its own display (D-016 part 2).
+    u_p = _as_printed(u_p, '.2e')
+    pi_p = _as_printed(math.pi, '.5f')
     if start_with_frequency:
         # Scenario 1: Given frequency and medium
         f_mhz = round(random.uniform(50, 500), 1)
-        f = f_mhz * 1e6
+        f = _as_printed(f_mhz * 1e6, '.2e')
 
         # 2. Perform the core calculations
-        omega = 2 * math.pi * f
+        omega = 2 * pi_p * f
         T = 1 / f
-        lambda_ = u_p / f
-        k = 2 * math.pi / lambda_
+        lambda_ = _as_printed(u_p / f, '.3f')
+        k = 2 * pi_p / lambda_
 
         # 3. Generate the question and solution strings (Plain Text)
         question = (
@@ -89,10 +149,12 @@ def template_wave_parameters_basic():
         lambda_ = round(random.uniform(0.1, 2.0), 2)
 
         # 2. Perform the core calculations
-        f = u_p / lambda_
-        omega = 2 * math.pi * f
+        f_exact = u_p / lambda_
+        f_mhz_out = _as_printed(f_exact / 1e6, '.2f')   # the MHz display of f, from the bound u_p and lambda
+        f = _as_printed(f_exact, '.2e')                  # the value Steps 2-3 consume
+        omega = 2 * pi_p * f
         T = 1 / f
-        k = 2 * math.pi / lambda_
+        k = 2 * pi_p / lambda_
 
         # 3. Generate the question and solution strings (Plain Text)
         question = (
@@ -113,7 +175,7 @@ def template_wave_parameters_basic():
             
             f"**Step 1:** Calculate the Frequency (f)\n"
             f"Frequency is found using the relation u_p = f * lambda, so f = u_p / lambda.\n"
-            f"   f = ({u_p:.2e} m/s) / ({lambda_} m) = {f:.2e} Hz = {f/1e6:.2f} MHz\n\n"
+            f"   f = ({u_p:.2e} m/s) / ({lambda_} m) = {f:.2e} Hz = {f_mhz_out:.2f} MHz\n\n"
             
             f"**Step 2:** Calculate the Angular Frequency (omega)\n"
             f"The angular frequency is omega = 2 * pi * f.\n"
@@ -128,7 +190,7 @@ def template_wave_parameters_basic():
             f"   k = 2 * {math.pi:.5f} / {lambda_} m = {round(k, 2)} rad/m\n\n"
             
             f"**Answer:**\n"
-            f"- Frequency (f): {f/1e6:.2f} MHz\n"
+            f"- Frequency (f): {f_mhz_out:.2f} MHz\n"
             f"- Angular Frequency (omega): {omega:.2e} rad/s\n"
             f"- Period (T): {T:.2e} s\n"
             f"- Wavenumber (k): {round(k, 2)} rad/m"
@@ -154,67 +216,103 @@ def template_time_to_phasor():
         
         Identity: sin(theta) = cos(theta - 90 deg)
 
+    Trace integrity (Layer 0, 2026-09-23):
+        The phase in degrees is displayed to 2 dp in Steps 2 and 3 and was
+        consumed at full precision (a phase given in radians converts to an
+        unrounded angle), so the Step 4 component lines did not close on
+        their printed operands. The angle is bound through its 2-dp display
+        before and after normalisation, and each component through its own
+        2-dp display before the rectangular form uses it (D-016 part 2). At
+        a phase of exactly +-30, +-60, +-120 or +-150 deg a component is A/2,
+        which sits on a 2-dp tie whenever A's last digit is odd; such draws
+        are rejected and redrawn (D-016). The question text is unchanged for
+        every draw that is not rejected; the rectangular answer may move by
+        one unit in the last place.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the phasor form of a given time-domain signal.
             - str: A step-by-step solution showing the conversion.
     """
     # 1. Parameterize the inputs with random values
-    amplitude = round(random.uniform(5.0, 150.0), 2)
-    omega = random.randint(100, 1000)
-    func_type = random.choice(['cos', 'sin'])
-    use_degrees = random.choice([True, False])
-
     # Standardize precision for all calculations and outputs
     precision = 2
 
-    # Generate phase in either degrees or radians
-    if use_degrees:
-        phi_deg = round(random.uniform(-180.0, 180.0), 1)
-        phi_rad = math.radians(phi_deg)
-        phi_value, phi_unit = phi_deg, "deg"
-        phi_str = f"{phi_deg} deg"
-    else:
-        phi_rad = round(random.uniform(-math.pi, math.pi), precision)
-        phi_deg = math.degrees(phi_rad)
-        phi_value, phi_unit = phi_rad, "rad"
-        phi_str = f"{phi_rad} rad"
+    for _attempt in range(200):
+        amplitude = round(random.uniform(5.0, 150.0), 2)
+        omega = random.randint(100, 1000)
+        func_type = random.choice(['cos', 'sin'])
+        use_degrees = random.choice([True, False])
 
-    # Construct the time-domain function string for the question
-    time_domain_expr = f"{amplitude} * {func_type}({omega}*t {signed_term(phi_value, phi_unit)})"
+        # Generate phase in either degrees or radians
+        if use_degrees:
+            phi_deg = round(random.uniform(-180.0, 180.0), 1)
+            phi_rad = math.radians(phi_deg)
+            phi_value, phi_unit = phi_deg, "deg"
+            phi_str = f"{phi_deg} deg"
+        else:
+            phi_rad = round(random.uniform(-math.pi, math.pi), precision)
+            phi_deg = math.degrees(phi_rad)
+            phi_value, phi_unit = phi_rad, "rad"
+            phi_str = f"{phi_rad} rad"
 
-    # 2. Perform the core calculation
-    
-    # The final amplitude of the phasor is the amplitude of the signal
-    phasor_amplitude = amplitude
-    
-    # The final phase depends on whether the function is cos or sin
-    if func_type == 'cos':
-        phasor_phi_deg = phi_deg
-        phasor_phi_rad = phi_rad
-        conversion_step = (
-            "**Step 2:** Identify the function type.\n"
-            "   The function is a cosine, which is the standard reference for phasors. "
-            "No phase adjustment is needed.\n"
-            f"   The initial phase is {round(phi_deg, precision)} degrees.\n"
-        )
-    else: # func_type == 'sin'
-        phasor_phi_deg = phi_deg - 90
+        # The initial phase in degrees is DISPLAYED to `precision` dp (Step 2)
+        # and consumed by every later step; bind it through that display
+        # (D-016 part 2). A phase given in degrees has 1 dp and is unchanged.
+        phi_deg = _as_printed(phi_deg, f'.{precision}f')
+
+        # Construct the time-domain function string for the question
+        time_domain_expr = f"{amplitude} * {func_type}({omega}*t {signed_term(phi_value, phi_unit)})"
+
+        # 2. Perform the core calculation
+
+        # The final amplitude of the phasor is the amplitude of the signal
+        phasor_amplitude = amplitude
+
+        # The final phase depends on whether the function is cos or sin
+        if func_type == 'cos':
+            phasor_phi_deg = phi_deg
+            phasor_phi_rad = phi_rad
+            conversion_step = (
+                "**Step 2:** Identify the function type.\n"
+                "   The function is a cosine, which is the standard reference for phasors. "
+                "No phase adjustment is needed.\n"
+                f"   The initial phase is {round(phi_deg, precision)} degrees.\n"
+            )
+        else: # func_type == 'sin'
+            phasor_phi_deg = phi_deg - 90
+            phasor_phi_rad = math.radians(phasor_phi_deg)
+            conversion_step = (
+                "**Step 2:** Convert the sine function to cosine.\n"
+                "   The sine function leads the cosine function by 90 degrees. To convert, "
+                "we use the identity sin(theta) = cos(theta - 90 deg).\n"
+                f"   New phase = (Initial Phase) - 90 deg = {round(phi_deg, precision)} - 90 = {round(phasor_phi_deg, precision)} degrees.\n"
+            )
+
+        # Normalize the final phase angle to be between -180 and 180 degrees,
+        # and bind it through its Step 3 display: cos and sin consume the
+        # printed angle.
+        phasor_phi_deg = _as_printed((phasor_phi_deg + 180) % 360 - 180, f'.{precision}f')
         phasor_phi_rad = math.radians(phasor_phi_deg)
-        conversion_step = (
-            "**Step 2:** Convert the sine function to cosine.\n"
-            "   The sine function leads the cosine function by 90 degrees. To convert, "
-            "we use the identity sin(theta) = cos(theta - 90 deg).\n"
-            f"   New phase = (Initial Phase) - 90 deg = {round(phi_deg, precision)} - 90 = {round(phasor_phi_deg, precision)} degrees.\n"
-        )
-        
-    # Normalize the final phase angle to be between -180 and 180 degrees
-    phasor_phi_deg = (phasor_phi_deg + 180) % 360 - 180
-    phasor_phi_rad = math.radians(phasor_phi_deg)
-    
-    # Calculate rectangular components
-    real_part = phasor_amplitude * math.cos(phasor_phi_rad)
-    imag_part = phasor_amplitude * math.sin(phasor_phi_rad)
+
+        # Calculate rectangular components
+        real_exact = phasor_amplitude * math.cos(phasor_phi_rad)
+        imag_exact = phasor_amplitude * math.sin(phasor_phi_rad)
+
+        # At a phase of exactly +-60 or +-120 deg (cos = +-1/2) or +-30 or
+        # +-150 deg (sin = +-1/2) a component is A/2, which sits on a 2-dp
+        # half-way tie whenever A's last digit is odd. No rounding convention
+        # closes such a line for every reader, so the draw is rejected (D-016).
+        if (_is_display_tie(real_exact, precision)
+                or _is_display_tie(imag_exact, precision)):
+            continue
+        # The components are DISPLAYED to `precision` dp (Step 4) and consumed
+        # by the rectangular form; bind them through that display.
+        real_part = _as_printed(real_exact, f'.{precision}f')
+        imag_part = _as_printed(imag_exact, f'.{precision}f')
+        break
+    else:
+        raise RuntimeError("time_to_phasor: no closing sample in 200 draws")
 
     # Bound before the f-string, not computed inside it: a quantity in result
     # position must be a name, so the printed value and the stored value are
@@ -385,6 +483,19 @@ def template_phasor_addition():
         phi_total = atan2(y_total, x_total)
         v_total(t) = A_total * cos(omega*t + phi_total)
 
+    Trace integrity (Layer 0, 2026-09-23):
+        The four components x1, y1, x2, y2 are displayed to 2 dp and were
+        added at full precision, so the printed sum, and the polar magnitude
+        computed from it, did not close on the printed components. Each
+        component is bound through its 2-dp display before the addition, the
+        sums through theirs before the square root, and the adjusted phases
+        through their 1-dp display before cos/sin (D-016 part 2). At an
+        adjusted phase of exactly +-30, +-60, +-120 or +-150 deg a component
+        is A/2, which sits on a 2-dp tie whenever A's last digit is odd; such
+        draws are rejected and redrawn (D-016). The question text is
+        unchanged for every draw that is not rejected; the gold amplitude
+        and phase may move in the last displayed digit.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the sum of two time-domain signals.
@@ -393,25 +504,59 @@ def template_phasor_addition():
     # 1. Parameterize the inputs
     precision = 2
     
-    # Amplitudes
-    A1 = round(random.uniform(10.0, 50.0), precision)
-    A2 = round(random.uniform(10.0, 50.0), precision)
-    
-    # Phases in degrees
-    phi1_deg = round(random.uniform(-180.0, 180.0), 1)
-    phi2_deg = round(random.uniform(-180.0, 180.0), 1)
-    
-    # Shared angular frequency
-    omega = random.randint(100, 500)
-    
-    # Function types (cos or sin)
-    func_type1 = random.choice(['cos', 'sin'])
-    func_type2 = random.choice(['cos', 'sin'])
+    for _attempt in range(200):
+        # Amplitudes
+        A1 = round(random.uniform(10.0, 50.0), precision)
+        A2 = round(random.uniform(10.0, 50.0), precision)
+
+        # Phases in degrees
+        phi1_deg = round(random.uniform(-180.0, 180.0), 1)
+        phi2_deg = round(random.uniform(-180.0, 180.0), 1)
+
+        # Shared angular frequency
+        omega = random.randint(100, 500)
+
+        # Function types (cos or sin)
+        func_type1 = random.choice(['cos', 'sin'])
+        func_type2 = random.choice(['cos', 'sin'])
+
+        # --- Phasor 1 Conversion ---
+        # The adjusted phase is DISPLAYED to 1 dp and consumed by cos/sin;
+        # bound through that display (D-016 part 2). Exact for a 1-dp phase.
+        phi1_adj_deg = _as_printed(phi1_deg - 90 if func_type1 == 'sin' else phi1_deg, '.1f')
+        phi1_rad = math.radians(phi1_adj_deg)
+        x1_exact = A1 * math.cos(phi1_rad)
+        y1_exact = A1 * math.sin(phi1_rad)
+
+        # --- Phasor 2 Conversion ---
+        phi2_adj_deg = _as_printed(phi2_deg - 90 if func_type2 == 'sin' else phi2_deg, '.1f')
+        phi2_rad = math.radians(phi2_adj_deg)
+        x2_exact = A2 * math.cos(phi2_rad)
+        y2_exact = A2 * math.sin(phi2_rad)
+
+        # At an adjusted phase of exactly +-60/+-120 deg (cos = +-1/2) or
+        # +-30/+-150 deg (sin = +-1/2) a component is A/2, which sits on a
+        # 2-dp half-way tie whenever A's last digit is odd. No rounding
+        # convention closes such a line for every reader; the draw is
+        # rejected (D-016).
+        if any(_is_display_tie(v, precision)
+               for v in (x1_exact, y1_exact, x2_exact, y2_exact)):
+            continue
+        # The components are DISPLAYED to `precision` dp and then ADDED; the
+        # printed sum must be the sum of the printed components, so each is
+        # bound through its display before use.
+        x1 = _as_printed(x1_exact, f'.{precision}f')
+        y1 = _as_printed(y1_exact, f'.{precision}f')
+        x2 = _as_printed(x2_exact, f'.{precision}f')
+        y2 = _as_printed(y2_exact, f'.{precision}f')
+        break
+    else:
+        raise RuntimeError("phasor_addition: no closing sample in 200 draws")
 
     # 2. Generate the question string
     v1_str = f"{A1} * {func_type1}({omega}*t {signed_term(phi1_deg, 'deg')})"
     v2_str = f"{A2} * {func_type2}({omega}*t {signed_term(phi2_deg, 'deg')})"
-    
+
     question = (
         f"Two signals, v1(t) and v2(t), are defined as:\n"
         f"   v1(t) = {v1_str}\n"
@@ -421,23 +566,13 @@ def template_phasor_addition():
     )
 
     # 3. Perform the calculations for the solution
-    
-    # --- Phasor 1 Conversion ---
-    phi1_adj_deg = phi1_deg - 90 if func_type1 == 'sin' else phi1_deg
-    phi1_rad = math.radians(phi1_adj_deg)
-    x1 = A1 * math.cos(phi1_rad)
-    y1 = A1 * math.sin(phi1_rad)
-
-    # --- Phasor 2 Conversion ---
-    phi2_adj_deg = phi2_deg - 90 if func_type2 == 'sin' else phi2_deg
-    phi2_rad = math.radians(phi2_adj_deg)
-    x2 = A2 * math.cos(phi2_rad)
-    y2 = A2 * math.sin(phi2_rad)
 
     # --- Addition ---
-    x_total = x1 + x2
-    y_total = y1 + y2
-    
+    # A sum of two 2-dp values is exact at 2 dp; bound through the display to
+    # strip float noise, since it is printed and then squared.
+    x_total = _as_printed(x1 + x2, f'.{precision}f')
+    y_total = _as_printed(y1 + y2, f'.{precision}f')
+
     # --- Convert Sum back to Polar ---
     A_total = math.hypot(x_total, y_total) # sqrt(x^2 + y^2)
     phi_total_rad = math.atan2(y_total, x_total)

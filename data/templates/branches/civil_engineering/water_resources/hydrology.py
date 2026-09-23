@@ -6,6 +6,35 @@ from data.templates.branches.civil_engineering.constants import (
     SCS_CURVE_NUMBERS,
 )
 
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where NO rounding convention is defensible. A reader
+    doing decimal arithmetic and applying half-up reads 0.02325 m as 23.3 mm; a
+    reader using binary floats and `round()` reads it as 23.2 mm; and the
+    printed line closes for exactly one of them whichever the template picks.
+    Breaking the tie in decimal (P2 as amended) does not remove the ambiguity,
+    it only moves it to the other reader - which is why such instances are
+    RESAMPLED rather than resolved (D-016).
+
+    Testing for an EXACT tie is not enough. Two independent evaluations of the
+    same exact quantity - this template's, in kN and kN/m^2, and a solver's, in
+    N and Pa - differ by a few ulps, so a rational tie such as 29.25 mm lands
+    as 29.249999999999996 on one side and 29.250000000000004 on the other.
+    Neither is exactly a tie, and the two then round in opposite directions:
+    that is how eight non-closing instances per 60,000 seeds survived the first
+    version of this guard (Phase 1 review A, finding F-2).
+
+    So a narrow BAND is quarantined rather than a point. The band is a few
+    thousand ulps wide where the tie lattice is 10^-places apart, so it removes
+    nothing that is not genuinely ambiguous.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
+
+
 # Land uses whose HEC-22 C ranges suit small urban catchments, with
 # natural-language display phrases (R3, cycle 1: raw taxonomy labels with
 # internal colons read awkwardly in prose).
@@ -174,31 +203,56 @@ def template_scs_curve_number_runoff():
         ~[0.28, 5.3] inches; runoff asserted in [0.2, 5.5] in
         (equivalently [5, 140] mm).
 
+    Trace integrity (Layer 0, 2026-09-23):
+        Q_mm = Q_in * 25.4, a 3-dp runoff times the inch, is exact at 4 dp
+        and is printed at 1 dp, where it sits on a half-way tie whenever
+        Q_in ends in .250 or .750 (CN = 61 with P = 122 mm gives
+        1.250 * 25.4 = 31.75; ~0.4% of draws). Q_mm is the answer, so its
+        1-dp display is kept and such a draw is resampled rather than
+        rounded either way (D-016/D-037; a longer answer display needs
+        sign-off, D-044). Q_in itself is a quotient by an arbitrary divisor
+        and is screened at 3 dp the same way.
+
     Returns:
         tuple: (question, solution)
     """
-    use, hsg, CN = random.choice(_SCS_COMBOS)
-    assert SCS_CURVE_NUMBERS[use][{"A": 0, "B": 1, "C": 2, "D": 3}[hsg]] == CN, (
-        "combo out of sync with constants table")
-    phrase = _SCS_DISPLAY[use]
+    # Bounded redraw: a draw whose runoff depth lands on a half-way tie at
+    # its display, in inches or in millimetres, has no defensible gold
+    # answer and is rejected (D-016).
+    for _attempt in range(200):
+        use, hsg, CN = random.choice(_SCS_COMBOS)
+        assert SCS_CURVE_NUMBERS[use][{"A": 0, "B": 1, "C": 2, "D": 3}[hsg]] == CN, (
+            "combo out of sync with constants table")
+        phrase = _SCS_DISPLAY[use]
 
-    S = round(1000.0 / CN - 10.0, 3)
-    Ia = round(0.2 * S, 3)
+        S = round(1000.0 / CN - 10.0, 3)
+        Ia = round(0.2 * S, 3)
 
-    def _p_for(Qt):
-        bq = 0.4 * S + Qt
-        cq = 0.04 * S ** 2 - 0.8 * S * Qt
-        return (bq + math.sqrt(bq ** 2 - 4 * cq)) / 2.0
+        def _p_for(Qt):
+            bq = 0.4 * S + Qt
+            cq = 0.04 * S ** 2 - 0.8 * S * Qt
+            return (bq + math.sqrt(bq ** 2 - 4 * cq)) / 2.0
 
-    P_lo_in = max(2.0, _p_for(0.28))
-    P_hi_in = min(6.5, _p_for(5.3))
-    assert P_lo_in < P_hi_in, f"empty P window: {P_lo_in}, {P_hi_in}"
-    P_mm = int(round(random.uniform(P_lo_in, P_hi_in) * 25.4))
+        P_lo_in = max(2.0, _p_for(0.28))
+        P_hi_in = min(6.5, _p_for(5.3))
+        assert P_lo_in < P_hi_in, f"empty P window: {P_lo_in}, {P_hi_in}"
+        P_mm = int(round(random.uniform(P_lo_in, P_hi_in) * 25.4))
 
-    # Round-then-recompute from the presented storm depth in mm.
-    P_in = round(P_mm / 25.4, 2)
-    Q_in = round((P_in - Ia) ** 2 / (P_in + 0.8 * S), 3)
-    Q_mm = round(Q_in * 25.4, 1)
+        # Round-then-recompute from the presented storm depth in mm.
+        P_in = round(P_mm / 25.4, 2)
+        Q_in_exact = (P_in - Ia) ** 2 / (P_in + 0.8 * S)
+        Q_in = round(Q_in_exact, 3)
+        # Q_in * 25.4 is exact at 4 dp; the answer keeps its 1-dp display,
+        # so the draw that lands it on a 1-dp tie (CN = 61, P = 122 mm:
+        # 1.250 * 25.4 = 31.75) is redrawn.
+        Q_mm_exact = Q_in * 25.4
+        if _is_display_tie(Q_in_exact, 3) or _is_display_tie(Q_mm_exact, 1):
+            continue                    # no defensible gold answer; redraw
+        Q_mm = round(Q_mm_exact, 1)
+        break
+    else:
+        raise RuntimeError(
+            "scs_curve_number_runoff: no closing sample in 200 draws")
 
     assert P_in > Ia, f"storm below initial abstraction: {P_in} vs {Ia}"
     assert 0.2 <= Q_in <= 5.5, f"runoff depth out of bounds: {Q_in}"

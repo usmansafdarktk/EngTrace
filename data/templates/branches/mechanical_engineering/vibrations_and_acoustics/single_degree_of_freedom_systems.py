@@ -27,6 +27,34 @@ def _hu(x, places):
     return int(v) if places == 0 else float(v)
 
 
+def _as_printed(x, spec):
+    """The value a reader recovers from `x` when it is printed with `spec`.
+
+    P2 asks that the stored value and the printed value be the SAME value.
+    Rounding alone does not achieve that: a float one ulp away from its own
+    printed form puts the template and the reader on opposite sides of a
+    display tie (D-016 part 2).
+    """
+    return float(format(x, spec))
+
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where no rounding convention is defensible - a
+    decimal reader applying half-up and a binary reader applying `round()`
+    disagree, and the printed line closes for only one of them. Such instances
+    are resampled rather than resolved (D-016).
+
+    A narrow BAND is quarantined rather than a point, because two independent
+    evaluations of the same exact quantity differ by a few ulps and an exact
+    rational tie lands on opposite sides of them.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
+
+
 # Template 1 (Easy)
 def template_undamped_natural_frequency_translational():
     """
@@ -209,48 +237,75 @@ def template_undamped_response_initial_conditions():
         General Solution: x(t) = A1 * cos(omega_n * t) + A2 * sin(omega_n * t)
         From initial conditions: A1 = x(0) and A2 = v(0) / omega_n
 
+    Trace integrity (Layer 0, 2026-09-23):
+        omega_n is displayed at 4 dp and then consumed by A2, so it is bound
+        through its own display before A2 is derived from it (D-016 part 2).
+        The chain used to divide by the unrounded root, so "A2 = v(0) /
+        omega_n = -2.95 / 23.0379 = -0.1281 m" did not reproduce from its
+        printed operands (-2.95 / 23.0379 = -0.1280). A2 is a quotient by an
+        arbitrary 4-dp divisor, exact at no fixed display, and it is part of
+        the final answer, so a draw whose omega_n or A2 sits exactly on a
+        half-way 4-dp tie is redrawn rather than resolved or lengthened
+        (D-016 part 3, D-044); the screen runs after every draw of the
+        attempt, so only a tie draw is redrawn. No display precision changes.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the equation of motion.
             - str: A step-by-step solution deriving the equation.
     """
-    # 1. Parameterize the inputs with random values
-    mass = round(random.uniform(1.0, 500.0), 2)       # in kg
-    stiffness = random.randint(1000, 200000)          # in N/m
-
-    # Randomize initial conditions, including cases where one might be zero.
-    # Displacement is given in mm for the question, velocity in m/s.
-    initial_disp_mm = 0
-    initial_vel_ms = 0.0
-    
-    # Use a chooser to create varied scenarios
-    # 1: Only displacement, 2: Only velocity, 3: Both are non-zero
-    scenario_choice = random.randint(1, 3)
-    if scenario_choice == 1:
-        initial_disp_mm = random.randint(-100, 100)
-        while initial_disp_mm == 0: initial_disp_mm = random.randint(-100, 100)
-    elif scenario_choice == 2:
-        initial_vel_ms = round(random.uniform(-5.0, 5.0), 2)
-        while initial_vel_ms == 0.0: initial_vel_ms = round(random.uniform(-5.0, 5.0), 2)
-    else: # scenario_choice == 3
-        initial_disp_mm = random.randint(-100, 100)
-        initial_vel_ms = round(random.uniform(-5.0, 5.0), 2)
-        while initial_disp_mm == 0: initial_disp_mm = random.randint(-100, 100)
-        while initial_vel_ms == 0.0: initial_vel_ms = round(random.uniform(-5.0, 5.0), 2)
-    
-    # Convert initial displacement from mm to meters for calculations
-    initial_disp_m = initial_disp_mm / 1000.0
-    
     precision = 4
 
-    # 2. Perform the core calculations for the solution
-    
-    # Step A: Calculate the natural frequency
-    omega_n = math.sqrt(stiffness / mass)
-    
-    # Step B: Determine the constants A1 and A2 from initial conditions
-    A1 = initial_disp_m
-    A2 = initial_vel_ms / omega_n
+    for _attempt in range(200):
+        # 1. Parameterize the inputs with random values
+        mass = round(random.uniform(1.0, 500.0), 2)       # in kg
+        stiffness = random.randint(1000, 200000)          # in N/m
+
+        # Randomize initial conditions, including cases where one might be zero.
+        # Displacement is given in mm for the question, velocity in m/s.
+        initial_disp_mm = 0
+        initial_vel_ms = 0.0
+        
+        # Use a chooser to create varied scenarios
+        # 1: Only displacement, 2: Only velocity, 3: Both are non-zero
+        scenario_choice = random.randint(1, 3)
+        if scenario_choice == 1:
+            initial_disp_mm = random.randint(-100, 100)
+            while initial_disp_mm == 0: initial_disp_mm = random.randint(-100, 100)
+        elif scenario_choice == 2:
+            initial_vel_ms = round(random.uniform(-5.0, 5.0), 2)
+            while initial_vel_ms == 0.0: initial_vel_ms = round(random.uniform(-5.0, 5.0), 2)
+        else: # scenario_choice == 3
+            initial_disp_mm = random.randint(-100, 100)
+            initial_vel_ms = round(random.uniform(-5.0, 5.0), 2)
+            while initial_disp_mm == 0: initial_disp_mm = random.randint(-100, 100)
+            while initial_vel_ms == 0.0: initial_vel_ms = round(random.uniform(-5.0, 5.0), 2)
+        
+        # Convert initial displacement from mm to meters for calculations
+        initial_disp_m = initial_disp_mm / 1000.0
+
+        # 2. Perform the core calculations for the solution
+        
+        # Step A: Calculate the natural frequency. It is displayed at
+        # `precision` dp and then consumed by A2, so the chain consumes the
+        # displayed value (D-016 part 2).
+        omega_n_exact = math.sqrt(stiffness / mass)
+        omega_n = _as_printed(omega_n_exact, f'.{precision}f')
+        
+        # Step B: Determine the constants A1 and A2 from initial conditions
+        A1 = initial_disp_m
+        A2 = initial_vel_ms / omega_n
+
+        # A draw whose omega_n or A2 lands exactly on a half-way tie at
+        # `precision` dp has no defensible gold digit there and is redrawn
+        # rather than resolved (D-016 part 3, D-044).
+        if (_is_display_tie(omega_n_exact, precision)
+                or _is_display_tie(A2, precision)):
+            continue
+        break
+    else:
+        raise RuntimeError(
+            "undamped_response_initial_conditions: no closing sample in 200 draws")
 
     # 3. Generate the question and solution strings
     

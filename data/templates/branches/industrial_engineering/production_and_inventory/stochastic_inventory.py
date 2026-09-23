@@ -16,6 +16,34 @@ def _hu(x, places):
     return int(v) if places == 0 else float(v)
 
 
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where NO rounding convention is defensible. A reader
+    doing decimal arithmetic and applying half-up reads 0.02325 m as 23.3 mm; a
+    reader using binary floats and `round()` reads it as 23.2 mm; and the
+    printed line closes for exactly one of them whichever the template picks.
+    Breaking the tie in decimal (P2 as amended) does not remove the ambiguity,
+    it only moves it to the other reader - which is why such instances are
+    RESAMPLED rather than resolved (D-016).
+
+    Testing for an EXACT tie is not enough. Two independent evaluations of the
+    same exact quantity - this template's, in kN and kN/m^2, and a solver's, in
+    N and Pa - differ by a few ulps, so a rational tie such as 29.25 mm lands
+    as 29.249999999999996 on one side and 29.250000000000004 on the other.
+    Neither is exactly a tie, and the two then round in opposite directions:
+    that is how eight non-closing instances per 60,000 seeds survived the first
+    version of this guard (Phase 1 review A, finding F-2).
+
+    So a narrow BAND is quarantined rather than a point. The band is a few
+    thousand ulps wide where the tie lattice is 10^-places apart, so it removes
+    nothing that is not genuinely ambiguous.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
+
+
 # Template 15 (Easy) — Area P2: Stochastic Inventory
 def template_safety_stock_reorder_point():
     """
@@ -168,12 +196,23 @@ def template_newsvendor_normal_demand():
         |CR_raw - nearest .xx5| >= 0.002 (the 2-dp rounding is
         decisive); exact Q = mu + z*sigma at least 0.06 from a .5
         boundary (display chain and full-precision solve agree on the
-        whole unit — z*sigma is exact at 4 dp so the only wobble is the
-        2-dp sum display, <= 0.005). Author QA 2026-08-07 (20,000-seed
+        whole unit — z*sigma is exact at 4 dp and, since Layer 0, is
+        displayed at 4 dp, so the display chain carries no wobble at
+        all). Author QA 2026-08-07 (20,000-seed
         sweep): Q in [31, 3077], CR in [0.55, 0.95], class mix roughly
         uniform; analytic floor mu_min + z_min*sigma_min ~ 30 + 0.1257*5
         ~ 30.6. Asserts: Q in [28, 3200]; CR in [0.55, 0.95]; mu < Q
         (CR > 0.5 stocks above the mean).
+
+    Trace integrity (Layer 0, 2026-09-23):
+        z*sigma (a 4-dp quantile times an integer) is exact at 4 dp and was
+        printed at 2 dp, where it sat on a half-way tie on ~4% of draws
+        (1.1750 * 39 = 45.825); it and the sum mu + z*sigma are now bound
+        half-up at 4 dp and printed at 4 dp, so the whole-unit rounding is
+        the only rounding in Step 4. The raw critical ratio cu/(cu + co),
+        printed at 4 dp, is a quotient exact at no fixed display, so a draw
+        whose ratio lands on a 4-dp half-way tie (~0.08% of draws) is
+        resampled rather than rounded either way (D-016/D-037).
 
     Returns:
         tuple(str, str): (question, solution)
@@ -209,12 +248,17 @@ def template_newsvendor_normal_demand():
         sigma = random.randint(max(5, math.ceil(0.15 * mu)),
                                math.floor(0.35 * mu))
         q_exact = mu + z * sigma
-        if abs((q_exact % 1) - 0.5) > 0.06:
+        # The 4-dp display of the raw ratio must not sit on a half-way tie
+        # either (D-016); screened last so that only a tie draw is redrawn.
+        if (abs((q_exact % 1) - 0.5) > 0.06
+                and not _is_display_tie(cr_raw, 4)):
             break
     else:
         raise AssertionError("resample loop exhausted")
 
-    zs = round(z * sigma, 2)               # display; exact value has 4 dp
+    # z*sigma is exact at 4 dp (4-dp z times an integer); its former 2-dp
+    # display sat on a half-way tie on ~4% of draws (D-016/D-037).
+    zs = _hu(z * sigma, 4)
     Q = _hu(mu + zs, 0)
 
     assert 0.55 <= CR <= 0.95, f"CR out of bounds: {CR}"
@@ -254,7 +298,7 @@ def template_newsvendor_normal_demand():
         f"z = Phi^-1({CR:.2f}) = {z:.4f}\n\n"
         f"**Step 4:** Compute the optimal stocking quantity.\n"
         f"Q* = mu + z * sigma = {mu} + {z:.4f} * {sigma} = {mu} + "
-        f"{zs:.2f} = {mu + zs:.2f}, which rounds half-up to Q* = {Q} "
+        f"{zs:.4f} = {mu + zs:.4f}, which rounds half-up to Q* = {Q} "
         f"units.\n\n"
         f"**Answer:** The profit-maximizing stocking quantity is {Q} "
         f"units"
@@ -325,6 +369,18 @@ def template_qr_policy_one_iteration():
         coupling makes the tight envelope intractable in closed form):
         Q1 in [95, 23000]; Q1 >= 1.1*Q0; r0 in [0.019, 0.251].
 
+    Trace integrity (Layer 0, 2026-09-23):
+        The question prescribes every intermediate's precision, so no
+        display can be lengthened here. Instead the four exact-decimal
+        intermediates the question binds to a precision (r0 at 5 dp, L(z)
+        at 4 dp, R0 at 1 dp, n at 2 dp) are screened for a half-way tie at
+        that precision, from the same printed operands a reader recovers,
+        and a draw that lands on one is redrawn (n = sigma*L(z), exact at
+        4 dp, tied on ~4% of accepted draws, e.g. 658 * 0.0075 = 4.935;
+        R0 = mu + z*sigma on ~0.7%, e.g. 2537 + 2.0124 * 625 = 3794.75;
+        L(z) on ~0.01%). The decimal half-up rounding of each value is
+        kept; a tie is now removed rather than resolved (D-016/D-037).
+
     Returns:
         tuple(str, str): (question, solution)
     """
@@ -390,6 +446,15 @@ def template_qr_policy_one_iteration():
             continue
         q1_raw = math.sqrt(2 * lam * (K + p * n0) / h)
         if abs((q1_raw % 1) - 0.5) < 0.01:
+            continue
+        # D-016: a half-way tie at a prescribed display is removed, never
+        # resolved (decimal half-up only moves the ambiguity to the other
+        # reader). Screened last, from the float operands a reader recovers
+        # from the printed lines, so that only a tie draw is redrawn.
+        if (_is_display_tie(Q0 * h / (p * lam), 5)
+                or _is_display_tie(phi0 - z0 * (1 - Phi0), 4)
+                or _is_display_tie(mu + z0 * sigma, 1)
+                or _is_display_tie(sigma * L0, 2)):
             continue
         break
     else:

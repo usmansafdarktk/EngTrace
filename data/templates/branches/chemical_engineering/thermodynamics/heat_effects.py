@@ -1,4 +1,6 @@
 import random
+import math
+from decimal import Decimal, ROUND_HALF_UP
 from data.templates.branches.chemical_engineering.constants import (
     SUBSTANCES_FOR_HEATING, SUBSTANCES_FOR_VAPORIZATION,
     HEATS_OF_FORMATION, REACTIONS, CP_PARAMS, COMBUSTION_REACTIONS,
@@ -17,6 +19,51 @@ def _as_printed(x, spec):
     return float(format(x, spec))
 
 
+def _hu(x, places):
+    """Round half-up to `places` dp, resolving the tie in DECIMAL.
+
+    `round()` resolves a half-way tie on the binary value and disagrees with a
+    reader doing decimal arithmetic (spec P2 as amended, DECISIONS D-012).
+    """
+    q = Decimal(1).scaleb(-places)
+    d = x if isinstance(x, Decimal) else Decimal(repr(x))
+    v = d.quantize(q, rounding=ROUND_HALF_UP)
+    return int(v) if places == 0 else float(v)
+
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where no rounding convention is defensible - a
+    decimal reader applying half-up and a binary reader applying `round()`
+    disagree, and the printed line closes for only one of them. Such instances
+    are resampled rather than resolved (D-016).
+
+    A narrow BAND is quarantined rather than a point, because two independent
+    evaluations of the same exact quantity differ by a few ulps and an exact
+    rational tie lands on opposite sides of them.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
+
+
+def _exact_spec(x, kind, min_places=3, max_places=12):
+    """The shortest `.<p><kind>` spec, p >= min_places, that prints `x` EXACTLY.
+
+    A table coefficient is never coarsened to its display: the display is
+    lengthened until a reader who re-parses the printed digits recovers the
+    float the template consumed (D-037). Every CP_PARAMS row is reached by
+    p = 5; a value not reached by `max_places` is a data error, so this raises
+    rather than print a coefficient the solution did not use.
+    """
+    for places in range(min_places, max_places + 1):
+        spec = f'.{places}{kind}'
+        if float(format(x, spec)) == x:
+            return spec
+    raise ValueError(f'{x!r} has no exact {kind!r} display within {max_places} places')
+
+
 # Template 1 (Easy)
 def template_sensible_heat_constant_cp():
     """
@@ -31,39 +78,69 @@ def template_sensible_heat_constant_cp():
         The governing equation on a mass basis is:
             Q = m * Cp * (T2 - T1)
 
+    Trace integrity (Layer 0, 2026-09-23):
+        Q in J (m*Cp*dT, exact at 4-5 dp) is stated at 1 dp and the kJ
+        answer is that stated value / 1000, quoted at 2 dp, so the kJ
+        display drops one digit of the stated J value and sits exactly on
+        a half-way tie whenever the J value ends in 5.0 (625.0 J -> 0.625
+        kJ; ~0.8% of draws). The answer's precision is what the item
+        quotes, so the tie cannot be removed by lengthening (D-044): as in
+        template_sensible_heat_temp_dependent_cp, a draw whose J value or
+        whose J/1000 sits on a half-way tie at its display is redrawn, and
+        dT, Q in J and Q in kJ are bound through their displays so every
+        line is computed from the operands it shows (D-016 part 2).
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking to compute the sensible heat.
             - str: A step-by-step solution showing the calculation.
     """
-    # 1. Parameterize the inputs using the substance list
-    substance_data = random.choice(SUBSTANCES_FOR_HEATING)
-    substance_name = substance_data["name"]
-    substance_state = substance_data["state"]
-    Cp = substance_data["Cp"]  # J/(g·K)
-    
-    # Retrieve safe temperature limits from the constant data
-    # Defaults provided in case keys are missing in legacy data
-    min_temp = substance_data.get("min_temp", 20)
-    max_temp = substance_data.get("max_temp", 150)
+    for _attempt in range(200):
+        # 1. Parameterize the inputs using the substance list
+        substance_data = random.choice(SUBSTANCES_FOR_HEATING)
+        substance_name = substance_data["name"]
+        substance_state = substance_data["state"]
+        Cp = substance_data["Cp"]  # J/(g·K)
 
-    # Generate a random mass in grams
-    m = round(random.uniform(50.0, 1000.0), 1)
+        # Retrieve safe temperature limits from the constant data
+        # Defaults provided in case keys are missing in legacy data
+        min_temp = substance_data.get("min_temp", 20)
+        max_temp = substance_data.get("max_temp", 150)
 
-    # Generate temperatures within the safe bounds for this specific substance
-    # Ensure there's at least a 10 degree window for T2
-    safe_max_T1 = max(min_temp, max_temp - 15) 
-    T1_C = round(random.uniform(min_temp, safe_max_T1), 1)
-    
-    # Ensure T2 is higher than T1 but within max limit
-    T2_C = round(random.uniform(T1_C + 10, max_temp), 1)
+        # Generate a random mass in grams
+        m = round(random.uniform(50.0, 1000.0), 1)
 
-    # 2. Perform the core calculation
-    delta_T = T2_C - T1_C
-    # Q will be in Joules (g * J/g·K * K)
-    Q_J = m * Cp * delta_T
-    # Convert to kilojoules for the final answer
-    Q_kJ = Q_J / 1000
+        # Generate temperatures within the safe bounds for this specific substance
+        # Ensure there's at least a 10 degree window for T2
+        safe_max_T1 = max(min_temp, max_temp - 15)
+        T1_C = round(random.uniform(min_temp, safe_max_T1), 1)
+
+        # Ensure T2 is higher than T1 but within max limit
+        T2_C = round(random.uniform(T1_C + 10, max_temp), 1)
+
+        # 2. Perform the core calculation
+        # dT is stated at 1 dp, so the chain consumes the stated value.
+        delta_T = _as_printed(T2_C - T1_C, '.1f')
+        # Q will be in Joules (g * J/g·K * K)
+        Q_J = m * Cp * delta_T
+        # Q is stated in J at 1 dp and the kJ answer is that stated value /
+        # 1000 at 2 dp. Either display can sit EXACTLY on a half-way tie
+        # (Q_J/1000 does whenever the stated J value ends in 5.0: ~0.8% of
+        # draws). No rounding convention closes a tie for every reader, and
+        # the kJ answer's precision is what the item quotes, so the draw is
+        # repeated rather than resolved (D-016, D-044).
+        if _is_display_tie(Q_J, 1):
+            continue
+        Q_J = _as_printed(Q_J, '.1f')
+        if _is_display_tie(Q_J / 1000, 2):
+            continue
+        # Convert to kilojoules for the final answer: the stated J value /
+        # 1000, itself bound through its 2-dp display.
+        Q_kJ = _as_printed(Q_J / 1000, '.2f')
+        break
+    else:
+        raise RuntimeError(
+            "sensible_heat_constant_cp: no display-stable sample in 200 draws")
 
     # 3. Generate the question and solution strings
     question = (
@@ -256,6 +333,21 @@ def template_sensible_heat_temp_dependent_cp():
         The governing equation is:
             Q = n * integral(Cp(T) dT) from T1 to T2
 
+    Trace integrity (Layer 0, 2026-09-23):
+        The heat-capacity coefficients are printed at the precision the table
+        gives them, never coarser: `.3e` showed B = 39.064e-3 as 3.906e-02 and
+        C = -13.301e-6 as -1.330e-05, so a reader recomputing I(T) from the
+        printed digits missed the printed value by 2 K (D-037). The
+        temperature limits were not the cause: round(., 2) prints exactly, so
+        they were already consumed as printed. I(T2) and I(T1) are bound
+        through their 4-dp display before they are subtracted, and Q in J
+        through its 2-dp display before it is divided by 1000 (the kJ answer
+        is likewise bound through its 2-dp display), so every printed line is
+        computed from the operands it shows (D-016 part 2).
+        A draw whose stated Q in J, or Q/1000, sits exactly on a 2-dp half-way
+        tie is redrawn: the kJ answer's precision is what the item quotes, so
+        that tie cannot be removed by lengthening (D-044).
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking to compute the sensible heat via integration.
@@ -263,53 +355,83 @@ def template_sensible_heat_temp_dependent_cp():
     """
     # 1. Parameterize the inputs
     R = 8.314  # J/(mol·K)
-    substance_name = random.choice(list(CP_PARAMS.keys()))
-    params = CP_PARAMS[substance_name]
-    A, B, C, D = params["A"], params["B"], params["C"], params["D"]
 
-    n = round(random.uniform(1.0, 10.0), 2)  # moles
+    for _attempt in range(200):
+        substance_name = random.choice(list(CP_PARAMS.keys()))
+        params = CP_PARAMS[substance_name]
+        A, B, C, D = params["A"], params["B"], params["C"], params["D"]
 
-    # Determine valid temperature ranges based on phase to ensure physical plausibility
-    if "(l)" in substance_name:
-        # Liquids: keep the range lower to avoid boiling (approximate general cap), and
-        # START AT THE FIT'S OWN FLOOR. CP_PARAMS declares @domain T_lo=298..1500 K, but
-        # uniform(280.0, 300.0) put T1 as low as 281.67 K - the integral evaluated 16 K
-        # below the interval the polynomial was fitted over, on 60 of 300 seeds
-        # (domain_findings.txt; C3.5 register item 7). The gas branch below already starts
-        # at 298.15; this agrees with it.
-        # The span stays ~20 K wide rather than clipping to [298.15, 300.0]: collapsing a
-        # 20 K draw to 1.85 K would shrink the answer space, which t6_distribution calls a
-        # downgrade rather than a fix.
-        T1 = round(random.uniform(298.15, 318.0), 2)
-        T2 = round(random.uniform(T1 + 20, 350.0), 2) 
+        n = round(random.uniform(1.0, 10.0), 2)  # moles
+
+        # Determine valid temperature ranges based on phase to ensure physical plausibility
+        if "(l)" in substance_name:
+            # Liquids: keep the range lower to avoid boiling (approximate general cap), and
+            # START AT THE FIT'S OWN FLOOR. CP_PARAMS declares @domain T_lo=298..1500 K, but
+            # uniform(280.0, 300.0) put T1 as low as 281.67 K - the integral evaluated 16 K
+            # below the interval the polynomial was fitted over, on 60 of 300 seeds
+            # (domain_findings.txt; C3.5 register item 7). The gas branch below already starts
+            # at 298.15; this agrees with it.
+            # The span stays ~20 K wide rather than clipping to [298.15, 300.0]: collapsing a
+            # 20 K draw to 1.85 K would shrink the answer space, which t6_distribution calls a
+            # downgrade rather than a fix.
+            T1 = round(random.uniform(298.15, 318.0), 2)
+            T2 = round(random.uniform(T1 + 20, 350.0), 2)
+        else:
+            # Gases/Solids: Can handle higher temperatures
+            T1 = round(random.uniform(298.15, 500.0), 2)
+            T2 = round(random.uniform(T1 + 100, 1200.0), 2)
+
+        # 2. Perform the core calculation via analytical integration
+        # integral(A + BT + CT² + DT⁻²)dT = AT + (B/2)T² + (C/3)T³ - D/T
+        def integral_mean_cp_over_r(T):
+            term_a = A * T
+            term_b = (B / 2) * (T**2)
+            term_c = (C / 3) * (T**3)
+            term_d = -D / T if T != 0 else 0
+            return term_a + term_b + term_c + term_d
+
+        # T1 and T2 are stated to 2 dp and round(., 2) IS the stated value, so
+        # the limits are consumed as printed. I(T2) and I(T1) are printed at
+        # 4 dp and then subtracted, so each is bound through that display
+        # first; the difference of two 4-dp values is exact at 4 dp (D-016).
+        val_T2 = _as_printed(integral_mean_cp_over_r(T2), '.4f')
+        val_T1 = _as_printed(integral_mean_cp_over_r(T1), '.4f')
+        integral_K = _as_printed(val_T2 - val_T1, '.4f')
+        integral_val = R * integral_K
+
+        Q_J = n * integral_val  # Total heat in Joules
+        # Q is stated in J at 2 dp and the kJ answer is that stated value / 1000.
+        # Either 2-dp display can sit EXACTLY on a half-way tie (Q_J/1000 does
+        # whenever the stated J value ends in 5.00: 0.1% of draws). No rounding
+        # convention closes a tie for every reader, and the kJ answer's
+        # precision is what the item quotes, so the draw is repeated rather
+        # than resolved (D-016, D-044).
+        if _is_display_tie(Q_J, 2):
+            continue
+        Q_J = _as_printed(Q_J, '.2f')
+        if _is_display_tie(Q_J / 1000, 2):
+            continue
+        # The kJ answer is the stated J value / 1000, itself bound through its
+        # 2-dp display (no tie can reach it: screened above).
+        Q_kJ = _as_printed(Q_J / 1000, '.2f')   # Convert to kilojoules
+        break
     else:
-        # Gases/Solids: Can handle higher temperatures
-        T1 = round(random.uniform(298.15, 500.0), 2)
-        T2 = round(random.uniform(T1 + 100, 1200.0), 2)
-
-    # 2. Perform the core calculation via analytical integration
-    # integral(A + BT + CT² + DT⁻²)dT = AT + (B/2)T² + (C/3)T³ - D/T
-    def integral_mean_cp_over_r(T):
-        term_a = A * T
-        term_b = (B / 2) * (T**2)
-        term_c = (C / 3) * (T**3)
-        term_d = -D / T if T != 0 else 0
-        return term_a + term_b + term_c + term_d
-
-    # Calculate the definite integral per mole
-    val_T2 = integral_mean_cp_over_r(T2)
-    val_T1 = integral_mean_cp_over_r(T1)
-    integral_val = R * (val_T2 - val_T1)
-    
-    Q_J = n * integral_val  # Total heat in Joules
-    Q_kJ = Q_J / 1000       # Convert to kilojoules
+        raise RuntimeError(
+            "sensible_heat_temp_dependent_cp: no display-stable sample in 200 draws")
 
     # 3. Generate the question and solution strings
     # Dynamically create the Cp/R equation string for the question
+    # Table coefficients are printed at the precision they HAVE, never coarser
+    # (D-037): `.3e` showed B = 39.064e-3 as 3.906e-02, and a reader who
+    # recomputed I(T) from the printed digits missed the printed value by 2 K.
+    # The specs are the shortest that re-parse to the consumed float, and are
+    # never shorter than the original `.3e` / `.3g`.
+    B_e, C_e, D_e = (_exact_spec(x, 'e') for x in (B, C, D))
+    B_g, C_g, D_g = (_exact_spec(x, 'g') for x in (B, C, D))
     cp_eq_parts = [str(A)]
-    if B != 0: cp_eq_parts.append(f"{B:.3e}*T")
-    if C != 0: cp_eq_parts.append(f"{C:.3e}*T^2")
-    if D != 0: cp_eq_parts.append(f"{D:.3e}*T^-2")
+    if B != 0: cp_eq_parts.append(f"{B:{B_e}}*T")
+    if C != 0: cp_eq_parts.append(f"{C:{C_e}}*T^2")
+    if D != 0: cp_eq_parts.append(f"{D:{D_e}}*T^-2")
     
     cp_eq_str = " + ".join(cp_eq_parts).replace("+ -", "- ")
 
@@ -318,15 +440,15 @@ def template_sensible_heat_temp_dependent_cp():
         f"{substance_name} from {T1} K to {T2} K. The molar heat capacity for "
         f"{substance_name} is given by the equation:\n"
         f"  Cp/R = {cp_eq_str}\n"
-        f"Where the constants are: A={A}, B={B:.3g}, C={C:.3g}, D={D:.3g}"
+        f"Where the constants are: A={A}, B={B:{B_g}}, C={C:{C_g}}, D={D:{D_g}}"
     )
 
     # Helper to format the polynomial substitution string for the solution
     def format_poly_sub(T_val):
         terms = [f"{A}*({T_val})"]
-        if B != 0: terms.append(f"({B:.3e}/2)*({T_val})^2")
-        if C != 0: terms.append(f"({C:.3e}/3)*({T_val})^3")
-        if D != 0: terms.append(f"-({D:.3e}/{T_val})")
+        if B != 0: terms.append(f"({B:{B_e}}/2)*({T_val})^2")
+        if C != 0: terms.append(f"({C:{C_e}}/3)*({T_val})^3")
+        if D != 0: terms.append(f"-({D:{D_e}}/{T_val})")
         return " + ".join(terms).replace("+ -", "- ")
 
     solution = (
@@ -340,11 +462,11 @@ def template_sensible_heat_temp_dependent_cp():
         f"**Step 3:** Evaluate the definite integral.\n"
         f"I({T2}) = {format_poly_sub(T2)} = {val_T2:.4f}\n"
         f"I({T1}) = {format_poly_sub(T1)} = {val_T1:.4f}\n"
-        f"Integral Value = I({T2}) - I({T1}) = {val_T2:.4f} - {val_T1:.4f} = {val_T2 - val_T1:.4f} K\n\n"
+        f"Integral Value = I({T2}) - I({T1}) = {val_T2:.4f} - {val_T1:.4f} = {integral_K:.4f} K\n\n"
 
         f"**Step 4:** Calculate the total heat Q.\n"
         f"Q = n * R * (Integral Value)\n"
-        f"Q = {n} mol * 8.314 J/(mol K) * {val_T2 - val_T1:.4f} K\n"
+        f"Q = {n} mol * 8.314 J/(mol K) * {integral_K:.4f} K\n"
         f"Q = {Q_J:.2f} J\n\n"
 
         f"**Step 5:** Convert to kilojoules.\n"

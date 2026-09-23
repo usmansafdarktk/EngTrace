@@ -1,7 +1,48 @@
 import random
 import math
+from decimal import Decimal, ROUND_HALF_UP
 from data.templates.branches.mechanical_engineering.constants import MATERIAL_PROPERTIES
 from data.templates.branches._emission import signed_term, joined_terms
+
+
+def _hu(x, places):
+    """Round half-up to `places` dp, resolving the tie in DECIMAL.
+
+    `round()` resolves a half-way tie on the binary value and disagrees with a
+    reader doing decimal arithmetic (spec P2 as amended, DECISIONS D-012).
+    """
+    q = Decimal(1).scaleb(-places)
+    d = x if isinstance(x, Decimal) else Decimal(repr(x))
+    v = d.quantize(q, rounding=ROUND_HALF_UP)
+    return int(v) if places == 0 else float(v)
+
+
+def _as_printed(x, spec):
+    """The value a reader recovers from `x` when it is printed with `spec`.
+
+    P2 asks that the stored value and the printed value be the SAME value.
+    Rounding alone does not achieve that: a float one ulp away from its own
+    printed form puts the template and the reader on opposite sides of a
+    display tie (D-016 part 2).
+    """
+    return float(format(x, spec))
+
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where no rounding convention is defensible - a
+    decimal reader applying half-up and a binary reader applying `round()`
+    disagree, and the printed line closes for only one of them. Such instances
+    are resampled rather than resolved (D-016).
+
+    A narrow BAND is quarantined rather than a point, because two independent
+    evaluations of the same exact quantity differ by a few ulps and an exact
+    rational tie lands on opposite sides of them.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
 
 
 # Template 1 (Easy)
@@ -18,6 +59,21 @@ def template_basic_stress_strain():
         Normal Stress: sigma = P / A
         Normal Strain: epsilon = delta / L
 
+    Trace integrity (Layer 0, 2026-09-23):
+        The area is displayed at 4 dp and then consumed by the stress, so it
+        is bound through its own display before the stress is derived from
+        it (D-016 part 2). The chain used to divide by the unrounded area,
+        so "sigma = (60 kips) / (3.2365 in^2) = 18.538 ksi" did not
+        reproduce from its printed operands (60 / 3.2365 = 18.539). An
+        integer side squared is exact as displayed and is left alone. The
+        stress (3 dp) and the strain (four significant figures) are
+        quotients by arbitrary divisors, exact at no fixed display, and
+        both are final answers, so a draw whose stress or strain sits
+        exactly on a half-way display tie is redrawn rather than resolved
+        or lengthened (D-016 part 3, D-044); the screen runs after every
+        draw of the attempt, so only a tie draw is redrawn. No display
+        precision changes.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the normal stress and strain.
@@ -28,66 +84,91 @@ def template_basic_stress_strain():
     shape = random.choice(['circular', 'square'])
     precision = 3  # Standardize precision for numerical stability and formatting
 
-    if use_si_units:
-        #  SI Unit System 
-        load = random.randint(10, 500)  # in kN
-        length = round(random.uniform(0.5, 4.0), 2)  # in meters
-        elongation = round(random.uniform(0.5, 5.0), 2)  # in mm
+    for _attempt in range(200):
+        if use_si_units:
+            #  SI Unit System 
+            load = random.randint(10, 500)  # in kN
+            length = round(random.uniform(0.5, 4.0), 2)  # in meters
+            elongation = round(random.uniform(0.5, 5.0), 2)  # in mm
         
-        if shape == 'circular':
-            dimension_val = random.randint(20, 100)  # diameter in mm
-            dimension_name = "diameter"
-            area = math.pi * (dimension_val / 2)**2  # mm²
-            dim_str = f"{dimension_val} mm"
-        else:  # square
-            dimension_val = random.randint(20, 100)  # side length in mm
-            dimension_name = "side length"
-            area = dimension_val**2  # mm²
-            dim_str = f"{dimension_val} mm"
+            if shape == 'circular':
+                dimension_val = random.randint(20, 100)  # diameter in mm
+                dimension_name = "diameter"
+                area = math.pi * (dimension_val / 2)**2  # mm²
+                dim_str = f"{dimension_val} mm"
+            else:  # square
+                dimension_val = random.randint(20, 100)  # side length in mm
+                dimension_name = "side length"
+                area = dimension_val**2  # mm²
+                dim_str = f"{dimension_val} mm"
             
-        load_str = f"{load} kN"
-        length_str = f"{length} m"
-        elongation_str = f"{elongation} mm"
+            load_str = f"{load} kN"
+            length_str = f"{length} m"
+            elongation_str = f"{elongation} mm"
         
-        # Core Calculations (using units for clarity: N, mm, MPa)
-        # 1 MPa = 1 N/mm^2
-        stress = (load * 1000) / area  # Stress in MPa
-        # Strain (unitless, but convert units to be consistent)
-        # Elongation in mm, Length in m -> convert length to mm
-        strain = elongation / (length * 1000)
-        
-        stress_unit = "MPa"
-        strain_unit_explanation = "mm/m or unitless"
+            # The area is displayed at 4 dp and then consumed, so the stress
+            # is derived from the displayed value (D-016 part 2). An integer
+            # side squared is exact as displayed and needs no binding.
+            if shape == 'circular':
+                area = _as_printed(area, f'.{precision + 1}f')
 
-    else:
-        #  US Customary Unit System 
-        load = random.randint(5, 100)  # in kips
-        length = round(random.uniform(24.0, 120.0), 1)  # in inches
-        elongation = round(random.uniform(0.05, 0.25), 3)  # in inches
+            # Core Calculations (using units for clarity: N, mm, MPa)
+            # 1 MPa = 1 N/mm^2
+            stress = (load * 1000) / area  # Stress in MPa
+            # Strain (unitless, but convert units to be consistent)
+            # Elongation in mm, Length in m -> convert length to mm
+            strain = elongation / (length * 1000)
         
-        if shape == 'circular':
-            dimension_val = round(random.uniform(1.0, 5.0), 2)  # diameter in inches
-            dimension_name = "diameter"
-            area = math.pi * (dimension_val / 2)**2  # in²
-            dim_str = f"{dimension_val} in"
-        else:  # square
-            dimension_val = round(random.uniform(1.0, 5.0), 2)  # side length in inches
-            dimension_name = "side length"
-            area = dimension_val**2
-            dim_str = f"{dimension_val} in"
+            stress_unit = "MPa"
+            strain_unit_explanation = "mm/m or unitless"
+
+        else:
+            #  US Customary Unit System 
+            load = random.randint(5, 100)  # in kips
+            length = round(random.uniform(24.0, 120.0), 1)  # in inches
+            elongation = round(random.uniform(0.05, 0.25), 3)  # in inches
+        
+            if shape == 'circular':
+                dimension_val = round(random.uniform(1.0, 5.0), 2)  # diameter in inches
+                dimension_name = "diameter"
+                area = math.pi * (dimension_val / 2)**2  # in²
+                dim_str = f"{dimension_val} in"
+            else:  # square
+                dimension_val = round(random.uniform(1.0, 5.0), 2)  # side length in inches
+                dimension_name = "side length"
+                area = dimension_val**2
+                dim_str = f"{dimension_val} in"
             
-        load_str = f"{load} kips"
-        length_str = f"{length} in"
-        elongation_str = f"{elongation} in"
+            load_str = f"{load} kips"
+            length_str = f"{length} in"
+            elongation_str = f"{elongation} in"
         
-        # Core Calculations (using units for clarity: kips, in, ksi)
-        # 1 ksi = 1 kip/in^2
-        stress = load / area  # Stress in ksi
-        # Strain (unitless, since both length and elongation are in inches)
-        strain = elongation / length
+            # The area is displayed at 4 dp and then consumed, so the stress
+            # is derived from the displayed value (D-016 part 2); a 2-dp side
+            # squared is exact at 4 dp, but a float one ulp from its printed
+            # form is not the value a reader recovers.
+            area = _as_printed(area, f'.{precision + 1}f')
+
+            # Core Calculations (using units for clarity: kips, in, ksi)
+            # 1 ksi = 1 kip/in^2
+            stress = load / area  # Stress in ksi
+            # Strain (unitless, since both length and elongation are in inches)
+            strain = elongation / length
         
-        stress_unit = "ksi"
-        strain_unit_explanation = "in/in or unitless"
+            stress_unit = "ksi"
+            strain_unit_explanation = "in/in or unitless"
+
+        # The stress and the strain are the answers; a draw that lands exactly
+        # on a half-way tie of either display (3 dp, and the four significant
+        # figures of the strain's .3e form) has no defensible gold answer and
+        # is redrawn (D-016 part 3, D-044).
+        strain_places = precision - math.floor(math.log10(abs(strain)))
+        if (_is_display_tie(stress, precision)
+                or _is_display_tie(strain, strain_places)):
+            continue
+        break
+    else:
+        raise RuntimeError("basic_stress_strain: no closing sample in 200 draws")
 
     # 2. Generate the question and solution strings
     question = (
@@ -388,6 +469,23 @@ def template_multi_segment_rod():
     Core Equation:
         Total Deformation: delta_total = sum(delta_i) = sum( (P_i * L_i) / (A_i * E_i) )
 
+    Trace integrity (Layer 0, 2026-09-23):
+        Every operand a segment line prints is what that segment's
+        deformation is computed from (D-016 part 2): the area bound at 4 dp,
+        and in SI the whole millimetres and megapascals the line shows. The
+        chain used to divide by the unrounded area, so "δ3 = (-9 × 50.2) /
+        (1.3273 × 4350) = -0.0782 in" did not reproduce from its printed
+        operands (-451.8 / 5773.755 = -0.0783). Each deformation is
+        displayed at 4 dp and then summed, so the sum is taken over the
+        displayed values and δ_total is exactly the sum a reader forms from
+        the lines above it; T1 cannot see that line, because its result is
+        printed on the line after it. A segment deformation is a quotient by
+        an arbitrary product A × E, exact at no fixed display, so a draw with
+        a deformation exactly on a half-way 4-dp tie is redrawn rather than
+        resolved (D-016 part 3), after every draw of the attempt. The
+        linear-elasticity gate still decides on the exact area, so which
+        draw is accepted is unchanged. No display precision changes.
+
     Returns:
         tuple: A tuple containing:
             - str: A question about the total deformation of a composite rod.
@@ -399,7 +497,7 @@ def template_multi_segment_rod():
     # Define a safe list of structural materials (exclude rubber for this high-load problem)
     structural_materials = [k for k in MATERIAL_PROPERTIES.keys() if 'Rubber' not in k]
 
-    while True:
+    for _attempt in range(200):
         use_si_units = random.choice([True, False])
         num_segments = random.choice([2, 3])
         
@@ -414,18 +512,21 @@ def template_multi_segment_rod():
             if use_si_units:
                 segment['length'] = round(random.uniform(0.2, 1.5), 2) # meters
                 diameter = round(random.uniform(20, 75), 1) # mm
-                segment['area'] = math.pi * (diameter / 2)**2
+                segment['area_exact'] = math.pi * (diameter / 2)**2
                 segment['E'] = MATERIAL_PROPERTIES[material_name]['E_GPa']
                 segment['dim_str'] = f"{diameter} mm diameter"
                 loads[i+1] = random.randint(-250, 250) # kN
             else:
                 segment['length'] = round(random.uniform(10.0, 60.0), 1) # inches
                 diameter = round(random.uniform(0.75, 3.0), 1) # inches
-                segment['area'] = math.pi * (diameter / 2)**2
+                segment['area_exact'] = math.pi * (diameter / 2)**2
                 segment['E'] = MATERIAL_PROPERTIES[material_name]['E_ksi']
                 segment['dim_str'] = f"{diameter} in diameter"
                 loads[i+1] = random.randint(-60, 60) # kips
 
+            # The area is displayed at `precision` dp and then consumed, so
+            # the chain consumes the displayed value (D-016 part 2).
+            segment['area'] = _as_printed(segment['area_exact'], f'.{precision}f')
             segments.append(segment)
 
         # 2. Perform Core Calculations
@@ -440,6 +541,7 @@ def template_multi_segment_rod():
             cumulative_load += loads[node_index]
             segments[i]['internal_load'] = cumulative_load
 
+        deltas = []   # each segment's quotient of its printed operands
         for i in range(num_segments):
             P = segments[i]['internal_load']
             L = segments[i]['length']
@@ -451,20 +553,40 @@ def template_multi_segment_rod():
                 # P in kN -> *1000 -> N
                 # L in m -> *1000 -> mm
                 # E in GPa -> *1000 -> MPa
-                delta = (P * 1000 * L * 1000) / (A * E * 1000) # mm
-                current_strain = abs(delta / (L * 1000))
+                # The whole-number N, mm and MPa the line prints (.0f) are
+                # what it divides, so the reader's arithmetic is the chain's.
+                P_N = P * 1000
+                L_mm = _as_printed(L * 1000, '.0f')
+                E_MPa = _as_printed(E * 1000, '.0f')
+                delta = (P_N * L_mm) / (A * E_MPa) # mm
             else:
                 delta = (P * L) / (A * E) # inches
-                current_strain = abs(delta / L)
+            # The linear-elasticity gate is decided on the exact area, as it
+            # always was, so which draw is accepted does not depend on the
+            # display binding. |P| / (A * E) is the segment strain in both
+            # unit systems (kN / (mm^2 * GPa) and kips / (in^2 * ksi)).
+            current_strain = abs(P) / (segments[i]['area_exact'] * E)
             
-            segments[i]['deformation'] = delta
-            total_deformation += delta
+            deltas.append(delta)
+            # Each deformation is displayed at `precision` dp and then summed,
+            # so the sum runs over the displayed values (D-016 part 2).
+            segments[i]['deformation'] = _as_printed(delta, f'.{precision}f')
+            total_deformation += segments[i]['deformation']
             if current_strain > max_strain:
                 max_strain = current_strain
 
         # Validate: Ensure max strain is < 1% (0.01) for linear elasticity to hold
-        if max_strain < 0.01:
-            break # Valid problem generated
+        if max_strain >= 0.01:
+            continue
+        # A segment deformation is a quotient by an arbitrary product A * E,
+        # exact at no fixed display; a draw with one exactly on a half-way
+        # tie at `precision` dp has no defensible gold digit there and is
+        # redrawn rather than resolved (D-016 part 3).
+        if any(_is_display_tie(d, precision) for d in deltas):
+            continue
+        break # Valid problem generated
+    else:
+        raise RuntimeError("multi_segment_rod: no closing sample in 200 draws")
 
     # 3. Generate Question and Solution Strings
     question = (
@@ -592,6 +714,22 @@ def template_poissons_ratio():
         Lateral Strain: epsilon_lateral = -nu * epsilon_axial
         Change in Diameter: delta_d = d_initial * epsilon_lateral
 
+    Trace integrity (Layer 0, 2026-09-23):
+        The area (4 dp), the stress (3 dp) and both strains are each displayed
+        and then consumed, so each is bound through its own display before
+        the next quantity is derived from it (D-016 part 2). The chain used
+        to consume the unrounded values, so "sigma = 18 kips / 1.0568 in^2 =
+        17.032 ksi" and "delta_d = (46 mm) * (-1.0590e-03) = -0.04872 mm"
+        did not reproduce from their printed operands. The lateral strain is
+        displayed to seven significant figures instead of five: it is the
+        product of a 2-dp Poisson's ratio and a five-figure axial strain, so
+        seven figures hold it exactly, whereas at five it sat on a half-way
+        tie on 11% of draws (25% for nu = 0.25) and was removed by display
+        rather than by rejection (D-037). A draw whose stress, axial strain
+        or change in diameter sits exactly on a half-way display tie is
+        redrawn (D-016 part 3): those are quotients, or a product whose
+        display precision is the answer's, so no display makes them exact.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the change in diameter.
@@ -601,76 +739,106 @@ def template_poissons_ratio():
     use_si_units = random.choice([True, False])
     material_name = random.choice(list(MATERIAL_PROPERTIES.keys()))
     material = MATERIAL_PROPERTIES[material_name]
-    precision = 5 
+    precision = 5
 
-    # Generate dimensions first
-    if use_si_units:
-        initial_length_m = round(random.uniform(0.5, 3.0), 2)
-        initial_diameter_mm = random.randint(25, 125)
-        area_mm2 = math.pi * (initial_diameter_mm / 2)**2
-        E_GPa = material['E_GPa']
-        nu = material['nu']
-        
-        # Ensure Elastic Behavior 
-        # Instead of random load, pick a safe target strain (0.1% to 0.4%)
-        target_strain = random.uniform(0.001, 0.004) * random.choice([-1, 1])
-        
-        # Calculate Load required to achieve this strain: P = E * A * epsilon
-        # E in MPa (GPa * 1000), A in mm2 -> P in Newtons
-        required_load_N = (E_GPa * 1000) * area_mm2 * target_strain
-        
-        # Convert to kN and round to look like a "given" problem value
-        load_kN = round(required_load_N / 1000.0)
-        # Ensure load is not zero
-        if load_kN == 0: load_kN = 1 if target_strain > 0 else -1
-            
-        # Now recalculate exact stress/strain from this rounded load
-        stress_MPa = (load_kN * 1000) / area_mm2
-        axial_strain = stress_MPa / (E_GPa * 1000)
-        
-        # Formatting
-        load_str = f"{abs(load_kN)} kN"
-        load_type_str = "tension" if load_kN > 0 else "compression"
-        dim_str = f"{initial_diameter_mm} mm"
-        unit_d = "mm"
-        
-        # Secondary calculations
-        lateral_strain = -nu * axial_strain
-        delta_diameter_mm = initial_diameter_mm * lateral_strain
-        final_diameter_mm = initial_diameter_mm + delta_diameter_mm
-        
+    for _attempt in range(200):
+        # Generate dimensions first
+        if use_si_units:
+            initial_length_m = round(random.uniform(0.5, 3.0), 2)
+            initial_diameter_mm = random.randint(25, 125)
+            area_mm2_exact = math.pi * (initial_diameter_mm / 2)**2
+            E_GPa = material['E_GPa']
+            nu = material['nu']
+
+            # Ensure Elastic Behavior
+            # Instead of random load, pick a safe target strain (0.1% to 0.4%)
+            target_strain = random.uniform(0.001, 0.004) * random.choice([-1, 1])
+
+            # Calculate Load required to achieve this strain: P = E * A * epsilon
+            # E in MPa (GPa * 1000), A in mm2 -> P in Newtons
+            required_load_N = (E_GPa * 1000) * area_mm2_exact * target_strain
+
+            # Convert to kN and round to look like a "given" problem value
+            load_kN = round(required_load_N / 1000.0)
+            # Ensure load is not zero
+            if load_kN == 0: load_kN = 1 if target_strain > 0 else -1
+
+            # Now recalculate the trace's chain from this rounded load. Every
+            # value that is displayed and then consumed is bound through its
+            # own display first (D-016 part 2): the area at 4 dp, the stress
+            # at 3 dp, the axial strain at five significant figures and the
+            # lateral strain at seven, where nu * epsilon_axial is exact.
+            area_mm2 = _as_printed(area_mm2_exact, '.4f')
+            stress_exact = (load_kN * 1000) / area_mm2
+            stress_MPa = _as_printed(stress_exact, '.3f')
+            axial_exact = stress_MPa / (E_GPa * 1000)
+            axial_strain = _as_printed(axial_exact, '.4e')
+
+            # Formatting
+            load_str = f"{abs(load_kN)} kN"
+            load_type_str = "tension" if load_kN > 0 else "compression"
+            dim_str = f"{initial_diameter_mm} mm"
+            unit_d = "mm"
+
+            # Secondary calculations
+            lateral_exact = -nu * axial_strain
+            lateral_strain = _as_printed(lateral_exact, '.6e')
+            delta_exact = initial_diameter_mm * lateral_strain
+            delta_diameter_mm = _as_printed(delta_exact, f'.{precision}f')
+            final_diameter_mm = _as_printed(initial_diameter_mm + delta_diameter_mm, f'.{precision}f')
+
+        else:
+            # US Customary Unit System
+            initial_length_in = round(random.uniform(20.0, 100.0), 1)
+            initial_diameter_in = round(random.uniform(1.0, 5.0), 2)
+            area_in2_exact = math.pi * (initial_diameter_in / 2)**2
+            E_ksi = material['E_ksi']
+            nu = material['nu']
+
+            # Ensure Elastic Behavior
+            target_strain = random.uniform(0.001, 0.004) * random.choice([-1, 1])
+
+            # Calculate Load: P = E * A * epsilon
+            required_load_kips = E_ksi * area_in2_exact * target_strain
+
+            # Round to integer kips
+            load_kips = round(required_load_kips)
+            if load_kips == 0: load_kips = 1 if target_strain > 0 else -1
+
+            # Recalculate the trace's chain from the displayed values (D-016 part 2)
+            area_in2 = _as_printed(area_in2_exact, '.4f')
+            stress_exact = load_kips / area_in2
+            stress_ksi = _as_printed(stress_exact, '.3f')
+            axial_exact = stress_ksi / E_ksi
+            axial_strain = _as_printed(axial_exact, '.4e')
+
+            # Formatting
+            load_str = f"{abs(load_kips)} kips"
+            load_type_str = "tension" if load_kips > 0 else "compression"
+            dim_str = f"{initial_diameter_in} in"
+            unit_d = "in"
+
+            # Secondary calculations
+            lateral_exact = -nu * axial_strain
+            lateral_strain = _as_printed(lateral_exact, '.6e')
+            delta_exact = initial_diameter_in * lateral_strain
+            delta_diameter_in = _as_printed(delta_exact, f'.{precision}f')
+            final_diameter_in = _as_printed(initial_diameter_in + delta_diameter_in, f'.{precision}f')
+
+        # A quotient or product of short decimals can sit exactly on a
+        # half-way display tie, where no rounding closes the line for every
+        # reader; such draws are rejected (D-016 part 3). The strains are
+        # printed with `.4e` and `.6e`, so their tie tests run at the decimal
+        # place a five- or seven-figure display ends on (the lateral test can
+        # only fire for the one 4-dp Poisson's ratio, 0.4999).
+        if (_is_display_tie(stress_exact, 3)
+                or _is_display_tie(axial_exact, 4 - math.floor(math.log10(abs(axial_exact))))
+                or _is_display_tie(lateral_exact, 6 - math.floor(math.log10(abs(lateral_exact))))
+                or _is_display_tie(delta_exact, precision)):
+            continue
+        break
     else:
-        # US Customary Unit System
-        initial_length_in = round(random.uniform(20.0, 100.0), 1)
-        initial_diameter_in = round(random.uniform(1.0, 5.0), 2)
-        area_in2 = math.pi * (initial_diameter_in / 2)**2
-        E_ksi = material['E_ksi']
-        nu = material['nu']
-        
-        # Ensure Elastic Behavior 
-        target_strain = random.uniform(0.001, 0.004) * random.choice([-1, 1])
-        
-        # Calculate Load: P = E * A * epsilon
-        required_load_kips = E_ksi * area_in2 * target_strain
-        
-        # Round to integer kips
-        load_kips = round(required_load_kips)
-        if load_kips == 0: load_kips = 1 if target_strain > 0 else -1
-            
-        # Recalculate exact values
-        stress_ksi = load_kips / area_in2
-        axial_strain = stress_ksi / E_ksi
-        
-        # Formatting
-        load_str = f"{abs(load_kips)} kips"
-        load_type_str = "tension" if load_kips > 0 else "compression"
-        dim_str = f"{initial_diameter_in} in"
-        unit_d = "in"
-        
-        # Secondary calculations
-        lateral_strain = -nu * axial_strain
-        delta_diameter_in = initial_diameter_in * lateral_strain
-        final_diameter_in = initial_diameter_in + delta_diameter_in
+        raise RuntimeError("poissons_ratio: no closing sample in 200 draws")
 
     # 2. Generate Question and Solution Strings
     question = (
@@ -714,12 +882,12 @@ def template_poissons_ratio():
         f"**Step 2:** Calculate Lateral Strain (epsilon_lateral)\n"
         f"Lateral strain is related to axial strain by Poisson's ratio: epsilon_lateral = -nu * epsilon_axial.\n"
         f"The negative sign indicates that for positive axial strain (elongation), the lateral strain is negative (contraction), and vice-versa.\n"
-        f"epsilon_lateral = -({nu}) * ({axial_strain:.4e}) = {lateral_strain:.4e}\n\n"
+        f"epsilon_lateral = -({nu}) * ({axial_strain:.4e}) = {lateral_strain:.6e}\n\n"
         
         f"**Step 3:** Calculate the Change in Diameter (delta_d)\n"
         f"The change in diameter is the lateral strain multiplied by the initial diameter.\n"
         f"delta_d = d_0 * epsilon_lateral\n"
-        f"delta_d = ({initial_diameter_mm if use_si_units else initial_diameter_in} {unit_d}) * ({lateral_strain:.4e}) = {round(delta_diameter_mm if use_si_units else delta_diameter_in, precision)} {unit_d}\n\n"
+        f"delta_d = ({initial_diameter_mm if use_si_units else initial_diameter_in} {unit_d}) * ({lateral_strain:.6e}) = {round(delta_diameter_mm if use_si_units else delta_diameter_in, precision)} {unit_d}\n\n"
 
         f"**Step 4:** Calculate the Final Diameter (d_final)\n"
         f"The final diameter is the initial diameter plus the change.\n"
@@ -751,6 +919,16 @@ def template_statically_indeterminate():
         Compatibility: delta_total = 0 => delta_AB + delta_BC = 0
                        (P_AB * L_AB / AE) + (P_BC * L_BC / AE) = 0
 
+    Trace integrity (Layer 0, 2026-09-23):
+        Every quantity that is displayed and then consumed is bound through
+        its own display (D-016 part 2): the segment length L_BC and the
+        product P*L_BC at 2 dp, the area at 2 dp and the reactions at 3 dp,
+        so the stresses in Step 4 are computed from the operands the reader
+        sees. "sigma_BC = -135.736 kips / 13.1 in^2 = -10.358 ksi" used to
+        divide an unrounded force by an unrounded area. A draw whose reaction
+        or stress sits exactly on a half-way 3-dp tie (7308.0 / 64.0 =
+        114.1875) is redrawn (D-016 part 3); no display precision changes.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for reaction forces and stresses.
@@ -763,62 +941,83 @@ def template_statically_indeterminate():
     shape = random.choice(['circular', 'square'])
     precision = 3
 
-    if use_si_units:
-        #  SI Unit System 
-        total_length = round(random.uniform(1.0, 3.0), 2) # m
-        len_AB = round(random.uniform(0.2 * total_length, 0.8 * total_length), 2) # m
-        len_BC = total_length - len_AB
-        load_P = random.randint(100, 500) # kN
-        
-        if shape == 'circular':
-            diameter = random.randint(50, 150) # mm
-            area = math.pi * (diameter / 2)**2
-            dim_str = f"a diameter of {diameter} mm"
-        else: # square
-            side = random.randint(50, 150) # mm
-            area = side**2
-            dim_str = f"a side length of {side} mm"
-        
-        E_val = material['E_GPa']
-        unit_L, unit_P, unit_S, unit_A, unit_E = "m", "kN", "MPa", "mm^2", "GPa"
+    for _attempt in range(200):
+        if use_si_units:
+            #  SI Unit System
+            total_length = round(random.uniform(1.0, 3.0), 2) # m
+            len_AB = round(random.uniform(0.2 * total_length, 0.8 * total_length), 2) # m
+            load_P = random.randint(100, 500) # kN
 
+            if shape == 'circular':
+                diameter = random.randint(50, 150) # mm
+                area = math.pi * (diameter / 2)**2
+                dim_str = f"a diameter of {diameter} mm"
+            else: # square
+                side = random.randint(50, 150) # mm
+                area = side**2
+                dim_str = f"a side length of {side} mm"
+
+            E_val = material['E_GPa']
+            unit_L, unit_P, unit_S, unit_A, unit_E = "m", "kN", "MPa", "mm^2", "GPa"
+
+        else:
+            #  US Customary Unit System
+            total_length = round(random.uniform(40.0, 120.0), 1) # inches
+            len_AB = round(random.uniform(0.2 * total_length, 0.8 * total_length), 1) # inches
+            load_P = random.randint(50, 250) # kips
+
+            if shape == 'circular':
+                diameter = round(random.uniform(2.0, 6.0), 2) # inches
+                area = math.pi * (diameter / 2)**2
+                dim_str = f"a diameter of {diameter} in"
+            else: # square
+                side = round(random.uniform(2.0, 6.0), 2) # inches
+                area = side**2
+                dim_str = f"a side length of {side} in"
+
+            E_val = material['E_ksi']
+            unit_L, unit_P, unit_S, unit_A, unit_E = "in", "kips", "ksi", "in^2", "ksi"
+
+        # Every quantity that is displayed and then consumed is bound through
+        # its own display (D-016 part 2): L_BC and P*L_BC at 2 dp, the area
+        # at 2 dp, the reactions at 3 dp.
+        len_BC = _as_printed(total_length - len_AB, '.2f')
+        P_len_BC = _as_printed(load_P * len_BC, '.2f')
+        area = _as_printed(area, '.2f')
+
+        # 2. Core Calculations
+        # From compatibility: R_A = P * L_BC / L_AC
+        # From equilibrium: R_C = P - R_A
+        R_A_exact = P_len_BC / total_length
+        R_A = _as_printed(R_A_exact, f'.{precision}f')
+        R_C = _as_printed(load_P - R_A, f'.{precision}f')
+
+        # Internal forces
+        P_AB = R_A  # Tension
+        P_BC = -R_C # Compression
+
+        # Stresses
+        stress_AB = P_AB / area
+        stress_BC = P_BC / area
+
+        # Unit conversion for SI stress
+        if use_si_units:
+            stress_AB_MPa = stress_AB * 1000 # Convert kN/mm^2 to MPa
+            stress_BC_MPa = stress_BC * 1000 # Convert kN/mm^2 to MPa
+            sigma_AB_shown, sigma_BC_shown = stress_AB_MPa, stress_BC_MPa
+        else:
+            sigma_AB_shown, sigma_BC_shown = stress_AB, stress_BC
+
+        # A quotient of short decimals can sit exactly on a half-way display
+        # tie (7308.0 / 64.0 = 114.1875), where no rounding closes the line
+        # for every reader; such draws are rejected (D-016 part 3).
+        if (_is_display_tie(R_A_exact, precision)
+                or _is_display_tie(sigma_AB_shown, precision)
+                or _is_display_tie(sigma_BC_shown, precision)):
+            continue
+        break
     else:
-        #  US Customary Unit System 
-        total_length = round(random.uniform(40.0, 120.0), 1) # inches
-        len_AB = round(random.uniform(0.2 * total_length, 0.8 * total_length), 1) # inches
-        len_BC = total_length - len_AB
-        load_P = random.randint(50, 250) # kips
-        
-        if shape == 'circular':
-            diameter = round(random.uniform(2.0, 6.0), 2) # inches
-            area = math.pi * (diameter / 2)**2
-            dim_str = f"a diameter of {diameter} in"
-        else: # square
-            side = round(random.uniform(2.0, 6.0), 2) # inches
-            area = side**2
-            dim_str = f"a side length of {side} in"
-            
-        E_val = material['E_ksi']
-        unit_L, unit_P, unit_S, unit_A, unit_E = "in", "kips", "ksi", "in^2", "ksi"
-
-    # 2. Core Calculations
-    # From compatibility: R_A = P * L_BC / L_AC
-    # From equilibrium: R_C = P - R_A
-    R_A = load_P * (len_BC / total_length)
-    R_C = load_P - R_A
-
-    # Internal forces
-    P_AB = R_A  # Tension
-    P_BC = -R_C # Compression
-
-    # Stresses
-    stress_AB = P_AB / area
-    stress_BC = P_BC / area
-
-    # Unit conversion for SI stress
-    if use_si_units:
-        stress_AB_MPa = stress_AB * 1000 # Convert kN/mm^2 to MPa
-        stress_BC_MPa = stress_BC * 1000 # Convert kN/mm^2 to MPa
+        raise RuntimeError("statically_indeterminate: no closing sample in 200 draws")
 
     # 3. Generate Question and Solution Strings
     question = (
@@ -862,10 +1061,10 @@ def template_statically_indeterminate():
         f"From Equation 1, we can express R_C as: R_C = {load_P} - R_A.\n"
         f"Substitute this into the simplified Equation 2:\n"
         f"R_A * ({len_AB}) = ({load_P} - R_A) * ({round(len_BC, 2)})\n"
-        f"{round(len_AB, 2)}*R_A = {round(load_P * len_BC, 2)} - {round(len_BC, 2)}*R_A\n"
-        f"({round(len_AB, 2)} + {round(len_BC, 2)})*R_A = {round(load_P * len_BC, 2)}\n"
-        f"({total_length})*R_A = {round(load_P * len_BC, 2)}\n"
-        f"R_A = {round(load_P * len_BC, 2)} / {total_length} = {round(R_A, precision)} {unit_P}\n\n"
+        f"{round(len_AB, 2)}*R_A = {P_len_BC} - {round(len_BC, 2)}*R_A\n"
+        f"({round(len_AB, 2)} + {round(len_BC, 2)})*R_A = {P_len_BC}\n"
+        f"({total_length})*R_A = {P_len_BC}\n"
+        f"R_A = {P_len_BC} / {total_length} = {round(R_A, precision)} {unit_P}\n\n"
         f"Now, find R_C using Equation 1:\n"
         f"R_C = {load_P} - R_A = {load_P} - {round(R_A, precision)} = {round(R_C, precision)} {unit_P}\n\n"
 

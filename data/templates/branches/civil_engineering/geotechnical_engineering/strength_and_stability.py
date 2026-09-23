@@ -1,11 +1,55 @@
 import math
 import random
+from decimal import Decimal, ROUND_HALF_UP
 
 from data.templates.branches.civil_engineering.constants import (
     FRICTION_ANGLE_RANGES_DEG,
     TERZAGHI_BEARING_FACTORS,
     TERZAGHI_MODIFIED_FACTORS,
 )
+
+
+def _hu(x, places):
+    """Round half-up to `places` dp, resolving the tie in DECIMAL.
+
+    `round()` resolves a half-way tie on the binary value, so
+    `round(0.01185 * 1000, 1)` gives 11.8 where a reader doing decimal
+    arithmetic gets 11.9 (spec P2 as amended, DECISIONS D-012). Accepts a
+    Decimal so an exact decimal product can be quantised without a detour
+    through a float. Matches the industrial branch's `_hu` convention.
+    """
+    q = Decimal(1).scaleb(-places)
+    d = x if isinstance(x, Decimal) else Decimal(repr(x))
+    v = d.quantize(q, rounding=ROUND_HALF_UP)
+    return int(v) if places == 0 else float(v)
+
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where NO rounding convention is defensible. A reader
+    doing decimal arithmetic and applying half-up reads 0.02325 m as 23.3 mm; a
+    reader using binary floats and `round()` reads it as 23.2 mm; and the
+    printed line closes for exactly one of them whichever the template picks.
+    Breaking the tie in decimal (P2 as amended) does not remove the ambiguity,
+    it only moves it to the other reader - which is why such instances are
+    RESAMPLED rather than resolved (D-016).
+
+    Testing for an EXACT tie is not enough. Two independent evaluations of the
+    same exact quantity - this template's, in kN and kN/m^2, and a solver's, in
+    N and Pa - differ by a few ulps, so a rational tie such as 29.25 mm lands
+    as 29.249999999999996 on one side and 29.250000000000004 on the other.
+    Neither is exactly a tie, and the two then round in opposite directions:
+    that is how eight non-closing instances per 60,000 seeds survived the first
+    version of this guard (Phase 1 review A, finding F-2).
+
+    So a narrow BAND is quarantined rather than a point. The band is a few
+    thousand ulps wide where the tie lattice is 10^-places apart, so it removes
+    nothing that is not genuinely ambiguous.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
 
 
 # Template 9 (Easy) — Area B4: Shear Strength & Stability Applications
@@ -122,78 +166,123 @@ def template_terzaghi_strip_footing_bearing():
         B in [1.0, 2.5] m, Df in [0.5, 1.5] m; qu floors 250 kPa (general)
         / 95 kPa (local), ceiling 2600 kPa.
 
+    Trace integrity (Layer 0, 2026-09-23):
+        The general-shear cohesion term c'*Nc (an integer times a 2-dp
+        table factor) is exact at 2 dp and was printed at 1 dp, where it
+        sat on a half-way tie on every c' = 15 draw (15 * 25.13 = 376.95);
+        it is now bound half-up at 2 dp and printed at 2 dp in Step 4 and
+        in the Step 5 sum, and qu, the sum of that 2-dp term and two 1-dp
+        terms, is bound and printed at 2 dp with it. The local-shear chain
+        stays at 1 dp ((2/3)c'*N'c takes six values, none on a tie). The
+        surcharge and width terms are 4- and 5-dp products printed at 1 dp,
+        so a draw that lands either on a 1-dp half-way tie is resampled
+        rather than rounded either way (D-016/D-037). q_all = qu/3 is a
+        quotient exact at no fixed display, and at 1 dp it tied on a third
+        of c' = 15 general-shear draws; on the owner's decision of
+        2026-09-23 (D-044) the answer display was lengthened to 2 dp
+        rather than those draws resampled. A 2-dp q_all cannot tie: with
+        qu = n/100, a 2-dp half-way point needs n/3 = k + 1/2, i.e.
+        2n = 3(2k + 1), which no integer n satisfies.
+
     Returns:
         tuple: (question, solution)
     """
-    scenario = random.choice(["sand", "clayey"])
-    mode = random.choice(["general", "local"])
+    # Bounded redraw: a draw whose cohesion, surcharge or width term lands
+    # on a half-way tie at its display has no defensible gold answer and is
+    # rejected (D-016).
+    for _attempt in range(200):
+        scenario = random.choice(["sand", "clayey"])
+        mode = random.choice(["general", "local"])
 
-    if scenario == "sand":
-        c = 0
-        if mode == "general":
-            soil_desc = "a deep deposit of dense sand"
-            Dr = random.randint(72, 90)
-            # phi' = 35 only: Das dense rounded sand is 35-38 deg; pairing
-            # Dr 72-90% with phi' = 30 contradicted the constants table
-            # (R1, branching cycle).
-            phi = 35
-            gamma = round(random.uniform(18.0, 19.5), 1)
+        if scenario == "sand":
+            c = 0
+            if mode == "general":
+                soil_desc = "a deep deposit of dense sand"
+                Dr = random.randint(72, 90)
+                # phi' = 35 only: Das dense rounded sand is 35-38 deg; pairing
+                # Dr 72-90% with phi' = 30 contradicted the constants table
+                # (R1, branching cycle).
+                phi = 35
+                gamma = round(random.uniform(18.0, 19.5), 1)
+            else:
+                soil_desc = "a deep deposit of loose to medium sand"
+                Dr = random.randint(30, 60)
+                # phi' = 30 = top of Das loose rounded range (27-30), i.e. the
+                # loose/medium boundary — consistent with the descriptor.
+                phi = 30
+                gamma = round(random.uniform(16.5, 17.5), 1)
+            datum = f"Field tests indicate a relative density of {Dr}%."
+            rule = ("Assume general shear failure governs when the relative "
+                    "density exceeds 70%; otherwise local shear failure "
+                    "governs.")
+            decision_evidence = (
+                f"the relative density is {Dr}%, which is "
+                f"{'greater' if mode == 'general' else 'not greater'} than 70%")
         else:
-            soil_desc = "a deep deposit of loose to medium sand"
-            Dr = random.randint(30, 60)
-            # phi' = 30 = top of Das loose rounded range (27-30), i.e. the
-            # loose/medium boundary — consistent with the descriptor.
-            phi = 30
-            gamma = round(random.uniform(16.5, 17.5), 1)
-        datum = f"Field tests indicate a relative density of {Dr}%."
-        rule = ("Assume general shear failure governs when the relative "
-                "density exceeds 70%; otherwise local shear failure "
-                "governs.")
-        decision_evidence = (
-            f"the relative density is {Dr}%, which is "
-            f"{'greater' if mode == 'general' else 'not greater'} than 70%")
-    else:
-        c = random.choice([10, 15, 20])
-        phi = random.choice([20, 25])
+            c = random.choice([10, 15, 20])
+            phi = random.choice([20, 25])
+            if mode == "general":
+                soil_desc = "a well-compacted clayey fill"
+                proctor = random.randint(96, 99)
+                gamma = round(random.uniform(18.0, 19.0), 1)
+            else:
+                soil_desc = "a lightly compacted clayey fill"
+                proctor = random.randint(88, 93)
+                gamma = round(random.uniform(16.5, 17.5), 1)
+            datum = (f"The fill was placed at {proctor}% of its standard "
+                     f"Proctor maximum dry density.")
+            rule = ("Assume general shear failure governs when the fill is "
+                    "compacted to at least 95% of standard Proctor density; "
+                    "otherwise local shear failure governs.")
+            decision_evidence = (
+                f"the fill is at {proctor}% of standard Proctor density, "
+                f"{'at or above' if mode == 'general' else 'below'} the 95% "
+                f"threshold")
+
+        Nc, Nq, Ngamma = TERZAGHI_BEARING_FACTORS[phi]
+        Ncp, Nqp, Ngp = TERZAGHI_MODIFIED_FACTORS[phi]
+        B = round(random.uniform(1.0, 2.5), 1)
+        Df = round(random.uniform(0.5, 1.5), 1)
+        FS = 3
+
+        # Core computation — round-then-recompute at every step, along the
+        # branch selected by the failure-mode decision.
+        q_sur = round(gamma * Df, 2)
         if mode == "general":
-            soil_desc = "a well-compacted clayey fill"
-            proctor = random.randint(96, 99)
-            gamma = round(random.uniform(18.0, 19.0), 1)
+            c_used = c
+            # An integer c' times a 2-dp table factor is exact at 2 dp; at
+            # 1 dp it sat on a half-way tie on every c' = 15 draw
+            # (15 * 25.13 = 376.95), so it is carried and printed at 2 dp.
+            tc_dp = 2
+            term_c_exact = c_used * Nc
+            term_q_exact = q_sur * Nq
+            term_g_exact = 0.5 * gamma * B * Ngamma
         else:
-            soil_desc = "a lightly compacted clayey fill"
-            proctor = random.randint(88, 93)
-            gamma = round(random.uniform(16.5, 17.5), 1)
-        datum = (f"The fill was placed at {proctor}% of its standard "
-                 f"Proctor maximum dry density.")
-        rule = ("Assume general shear failure governs when the fill is "
-                "compacted to at least 95% of standard Proctor density; "
-                "otherwise local shear failure governs.")
-        decision_evidence = (
-            f"the fill is at {proctor}% of standard Proctor density, "
-            f"{'at or above' if mode == 'general' else 'below'} the 95% "
-            f"threshold")
-
-    Nc, Nq, Ngamma = TERZAGHI_BEARING_FACTORS[phi]
-    Ncp, Nqp, Ngp = TERZAGHI_MODIFIED_FACTORS[phi]
-    B = round(random.uniform(1.0, 2.5), 1)
-    Df = round(random.uniform(0.5, 1.5), 1)
-    FS = 3
-
-    # Core computation — round-then-recompute at every step, along the
-    # branch selected by the failure-mode decision.
-    q_sur = round(gamma * Df, 2)
-    if mode == "general":
-        c_used = c
-        term_c = round(c_used * Nc, 1)
-        term_q = round(q_sur * Nq, 1)
-        term_g = round(0.5 * gamma * B * Ngamma, 1)
+            c_used = round(2.0 / 3.0 * c, 2)
+            # (2/3)c' * N'c takes one of six values, none on a 1-dp tie.
+            tc_dp = 1
+            term_c_exact = c_used * Ncp
+            term_q_exact = q_sur * Nqp
+            term_g_exact = 0.5 * gamma * B * Ngp
+        # The surcharge and width terms are 4- and 5-dp products printed at
+        # 1 dp; the rare draw that lands on a half-way tie is redrawn.
+        if (_is_display_tie(term_c_exact, tc_dp)
+                or _is_display_tie(term_q_exact, 1)
+                or _is_display_tie(term_g_exact, 1)):
+            continue                    # no defensible gold answer; redraw
+        term_c = _hu(term_c_exact, tc_dp)
+        term_q = round(term_q_exact, 1)
+        term_g = round(term_g_exact, 1)
+        # The sum of the three displayed terms is exact at tc_dp.
+        qu = _hu(term_c + term_q + term_g, tc_dp)
+        # qu / 3 is exact at no fixed display, but with qu = n/100 a 2-dp
+        # half-way point needs 2n = 3(2k + 1), impossible for integer n; the
+        # answer is printed at 2 dp, where it cannot tie (D-044).
+        q_all = round(qu / FS, 2)
+        break
     else:
-        c_used = round(2.0 / 3.0 * c, 2)
-        term_c = round(c_used * Ncp, 1)
-        term_q = round(q_sur * Nqp, 1)
-        term_g = round(0.5 * gamma * B * Ngp, 1)
-    qu = round(term_c + term_q + term_g, 1)
-    q_all = round(qu / FS, 1)
+        raise RuntimeError(
+            "terzaghi_strip_footing_bearing: no closing sample in 200 draws")
 
     if mode == "general":
         assert 250.0 <= qu <= 2600.0, f"general-shear qu out of bounds: {qu}"
@@ -226,7 +315,7 @@ def template_terzaghi_strip_footing_bearing():
             f"cohesion c' = {c} kPa is mobilized.\n\n"
         )
         terms = (
-            f"Cohesion term: c' * Nc = {c} * {Nc:.2f} = {term_c:.1f} kPa\n"
+            f"Cohesion term: c' * Nc = {c} * {Nc:.2f} = {term_c:.{tc_dp}f} kPa\n"
             f"Surcharge term: q * Nq = {q_sur:.2f} * {Nq:.2f} = "
             f"{term_q:.1f} kPa\n"
             f"Width term: 0.5 * gamma * B * Ngamma = 0.5 * {gamma:.1f} * "
@@ -242,7 +331,7 @@ def template_terzaghi_strip_footing_bearing():
         )
         terms = (
             f"Cohesion term: (2/3)c' * N'c = {c_used:.2f} * {Ncp:.2f} = "
-            f"{term_c:.1f} kPa\n"
+            f"{term_c:.{tc_dp}f} kPa\n"
             f"Surcharge term: q * N'q = {q_sur:.2f} * {Nqp:.2f} = "
             f"{term_q:.1f} kPa\n"
             f"Width term: 0.5 * gamma * B * N'gamma = 0.5 * {gamma:.1f} * "
@@ -269,11 +358,11 @@ def template_terzaghi_strip_footing_bearing():
         f"{terms}"
         f"**Step 5:** Sum the terms to obtain the ultimate bearing "
         f"capacity.\n"
-        f"qu = {term_c:.1f} + {term_q:.1f} + {term_g:.1f} = {qu:.1f} "
-        f"kPa\n\n"
+        f"qu = {term_c:.{tc_dp}f} + {term_q:.1f} + {term_g:.1f} = "
+        f"{qu:.{tc_dp}f} kPa\n\n"
         f"**Step 6:** Apply the factor of safety.\n"
-        f"q_all = qu / FS = {qu:.1f} / {FS} = {q_all:.1f} kPa\n\n"
-        f"**Answer:** The allowable bearing capacity is {q_all:.1f} kPa"
+        f"q_all = qu / FS = {qu:.{tc_dp}f} / {FS} = {q_all:.2f} kPa\n\n"
+        f"**Answer:** The allowable bearing capacity is {q_all:.2f} kPa"
     )
 
     return question, solution

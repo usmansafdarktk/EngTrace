@@ -1,11 +1,55 @@
 import math
 import random
+from decimal import Decimal, ROUND_HALF_UP
 
 from data.templates.branches.civil_engineering.constants import (
     PERMEABILITY_RANGES_CM_S,
     SPECIFIC_GRAVITY_RANGES,
     UNIT_WEIGHT_WATER_KN_M3,
 )
+
+
+def _hu(x, places):
+    """Round half-up to `places` dp, resolving the tie in DECIMAL.
+
+    `round()` resolves a half-way tie on the binary value, so
+    `round(0.01185 * 1000, 1)` gives 11.8 where a reader doing decimal
+    arithmetic gets 11.9 (spec P2 as amended, DECISIONS D-012). Accepts a
+    Decimal so an exact decimal product can be quantised without a detour
+    through a float. Matches the industrial branch's `_hu` convention.
+    """
+    q = Decimal(1).scaleb(-places)
+    d = x if isinstance(x, Decimal) else Decimal(repr(x))
+    v = d.quantize(q, rounding=ROUND_HALF_UP)
+    return int(v) if places == 0 else float(v)
+
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where NO rounding convention is defensible. A reader
+    doing decimal arithmetic and applying half-up reads 0.02325 m as 23.3 mm; a
+    reader using binary floats and `round()` reads it as 23.2 mm; and the
+    printed line closes for exactly one of them whichever the template picks.
+    Breaking the tie in decimal (P2 as amended) does not remove the ambiguity,
+    it only moves it to the other reader - which is why such instances are
+    RESAMPLED rather than resolved (D-016).
+
+    Testing for an EXACT tie is not enough. Two independent evaluations of the
+    same exact quantity - this template's, in kN and kN/m^2, and a solver's, in
+    N and Pa - differ by a few ulps, so a rational tie such as 29.25 mm lands
+    as 29.249999999999996 on one side and 29.250000000000004 on the other.
+    Neither is exactly a tie, and the two then round in opposite directions:
+    that is how eight non-closing instances per 60,000 seeds survived the first
+    version of this guard (Phase 1 review A, finding F-2).
+
+    So a narrow BAND is quarantined rather than a point. The band is a few
+    thousand ulps wide where the tie lattice is 10^-places apart, so it removes
+    nothing that is not genuinely ambiguous.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
 
 
 # Template 4 (Easy) — Area B2: Permeability, Seepage & Effective Stress
@@ -126,6 +170,23 @@ def template_effective_stress_profile():
         z1 in [2.0, 5.0] m, z2 in [3.0, 8.0] m; effective stress asserted
         in [40, 220] kPa.
 
+    Trace integrity (Layer 0, 2026-09-23):
+        The total stress gamma_moist*z1 + gamma_sat*z2 (2-dp unit weights
+        times 1-dp depths) and the pore pressure gamma_w*z2 are exact at
+        3 dp and were printed at 1 dp, where sigma sat on a half-way tie on
+        ~1.5% of draws (16.95 * 3.0 + 20.25 * 7.6 = 204.750) and u on every
+        z2 = 5.0 m draw (9.81 * 5.0 = 49.050); both are now bound half-up
+        at 3 dp and printed at 3 dp in Steps 3-5. The answer sigma' =
+        sigma - u is the exact difference of those two 3-dp values, so on
+        the owner's decision of 2026-09-23 (D-044) its display was
+        lengthened from 1 dp to 3 dp rather than the 1-dp tie resampled:
+        it is bound half-up at 3 dp and printed at 3 dp in Step 5 and in
+        the answer, and nothing rounds after the unit weights.
+        gamma_moist = gamma_d*(1 + w) is a 5-dp product printed at 2 dp
+        and gamma_sat = (Gs + e)*gamma_w/(1 + e) a quotient exact at no
+        fixed display; a draw on a 2-dp tie of either is resampled rather
+        than rounded either way (D-016/D-037).
+
     Returns:
         tuple: (question, solution)
     """
@@ -133,25 +194,44 @@ def template_effective_stress_profile():
 
     # 1. Parameterize the two zones independently (ranges chosen so the
     # saturated zone is always at least as heavy as the moist zone).
-    gamma_d = round(random.uniform(14.5, 16.5), 2)   # above WT, kN/m^3
-    w_pct = round(random.uniform(6.0, 14.0), 1)      # above WT, %
-    gs_lo, gs_hi = SPECIFIC_GRAVITY_RANGES["sand"]
-    Gs = round(random.uniform(gs_lo, gs_hi), 2)      # deposit-wide
-    # Couple the zones (R1+R3, cycle 1): the saturated zone must be at
-    # least as dense as the moist zone above it, so its void ratio is capped
-    # by the void ratio implied by the moist zone's gamma_d.
-    e_above = Gs * gamma_w / gamma_d - 1
-    e = round(random.uniform(0.45, min(0.75, e_above - 0.02)), 2)
-    z1 = round(random.uniform(2.0, 5.0), 1)          # depth to WT, m
-    z2 = round(random.uniform(3.0, 8.0), 1)          # WT to point A, m
+    # Bounded redraw: a draw whose moist or saturated unit weight lands on
+    # a half-way tie at its display has no defensible gold answer and is
+    # rejected (D-016).
+    for _attempt in range(200):
+        gamma_d = round(random.uniform(14.5, 16.5), 2)   # above WT, kN/m^3
+        w_pct = round(random.uniform(6.0, 14.0), 1)      # above WT, %
+        gs_lo, gs_hi = SPECIFIC_GRAVITY_RANGES["sand"]
+        Gs = round(random.uniform(gs_lo, gs_hi), 2)      # deposit-wide
+        # Couple the zones (R1+R3, cycle 1): the saturated zone must be at
+        # least as dense as the moist zone above it, so its void ratio is
+        # capped by the void ratio implied by the moist zone's gamma_d.
+        e_above = Gs * gamma_w / gamma_d - 1
+        e = round(random.uniform(0.45, min(0.75, e_above - 0.02)), 2)
+        z1 = round(random.uniform(2.0, 5.0), 1)          # depth to WT, m
+        z2 = round(random.uniform(3.0, 8.0), 1)          # WT to point A, m
 
-    # 2. Core computation — round-then-recompute at every step.
-    w = round(w_pct / 100.0, 3)
-    gamma_moist = round(gamma_d * (1 + w), 2)
-    gamma_sat = round((Gs + e) * gamma_w / (1 + e), 2)
-    sigma = round(gamma_moist * z1 + gamma_sat * z2, 1)
-    u = round(gamma_w * z2, 1)
-    sigma_eff = round(sigma - u, 1)
+        # 2. Core computation — round-then-recompute at every step.
+        w = round(w_pct / 100.0, 3)
+        gamma_moist_exact = gamma_d * (1 + w)
+        gamma_moist = round(gamma_moist_exact, 2)
+        gamma_sat_exact = (Gs + e) * gamma_w / (1 + e)
+        gamma_sat = round(gamma_sat_exact, 2)
+        # A 2-dp unit weight times a 1-dp depth is exact at 3 dp, as is
+        # gamma_w * z2 (9.81 * 5.0 = 49.050 sat on a 1-dp tie); both
+        # stresses are bound half-up and printed at 3 dp, so nothing rounds
+        # before the answer.
+        sigma = _hu(gamma_moist * z1 + gamma_sat * z2, 3)
+        u = _hu(gamma_w * z2, 3)
+        if (_is_display_tie(gamma_moist_exact, 2)
+                or _is_display_tie(gamma_sat_exact, 2)):
+            continue                    # no defensible gold answer; redraw
+        # The difference of two 3-dp values is exact at 3 dp; the answer
+        # is bound and printed at 3 dp (D-044).
+        sigma_eff = _hu(sigma - u, 3)
+        break
+    else:
+        raise RuntimeError(
+            "effective_stress_profile: no closing sample in 200 draws")
 
     assert gamma_moist < gamma_sat, (
         f"moist zone heavier than saturated zone: {gamma_moist}, {gamma_sat}")
@@ -190,13 +270,13 @@ def template_effective_stress_profile():
         f"**Step 3:** Compute the total vertical stress at A.\n"
         f"sigma = gamma_moist * z1 + gamma_sat * z2 "
         f"= {gamma_moist:.2f} * {z1:.1f} + {gamma_sat:.2f} * {z2:.1f} "
-        f"= {sigma:.1f} kPa\n\n"
+        f"= {sigma:.3f} kPa\n\n"
         f"**Step 4:** Compute the pore water pressure at A.\n"
-        f"u = gamma_w * z2 = {gamma_w:.2f} * {z2:.1f} = {u:.1f} kPa\n\n"
+        f"u = gamma_w * z2 = {gamma_w:.2f} * {z2:.1f} = {u:.3f} kPa\n\n"
         f"**Step 5:** Apply the effective stress principle.\n"
-        f"sigma' = sigma - u = {sigma:.1f} - {u:.1f} = {sigma_eff:.1f} kPa\n\n"
+        f"sigma' = sigma - u = {sigma:.3f} - {u:.3f} = {sigma_eff:.3f} kPa\n\n"
         f"**Answer:** The vertical effective stress at point A is "
-        f"{sigma_eff:.1f} kPa"
+        f"{sigma_eff:.3f} kPa"
     )
 
     return question, solution
@@ -228,6 +308,17 @@ def template_upward_seepage_quick_condition():
         in [0.45, 3.69] m; i carried at 4 decimals (precision sized to
         downstream division).
 
+    Trace integrity (Layer 0, 2026-09-23):
+        The gradient i = h/L (a 2-dp head over a 1-dp thickness) and the
+        factor of safety FS = i_cr/i are quotients exact at no fixed
+        display; i lands on a 4-dp half-way tie on ~4% of draws
+        (0.59 / 1.6 = 0.36875) and FS on a 3-dp tie on ~0.6%. FS is the
+        answer and i feeds it, so their displays are kept and a draw that
+        lands either, or the submerged unit weight (Gs - 1)*gamma_w/(1 + e)
+        at 2 dp, on a tie is resampled rather than rounded either way
+        (D-016/D-037). i_cr = gamma'/9.81 cannot tie at 4 dp (2n*10^4 =
+        981*(2k + 1) has no integer solution).
+
     Returns:
         tuple: (question, solution)
     """
@@ -235,21 +326,38 @@ def template_upward_seepage_quick_condition():
 
     # 1. Parameterize: sample the soil state and a target FS, derive the
     # excess head so every instance is jointly consistent.
-    gs_lo, gs_hi = SPECIFIC_GRAVITY_RANGES["sand"]
-    Gs = round(random.uniform(gs_lo, gs_hi), 2)
-    e = round(random.uniform(0.45, 0.85), 2)
-    L = round(random.uniform(1.5, 4.0), 1)
-    FS_true = random.uniform(1.25, 3.0)
+    # Bounded redraw: a draw whose gradient, submerged unit weight or
+    # factor of safety lands on a half-way tie at its display has no
+    # defensible gold answer and is rejected (D-016).
+    for _attempt in range(200):
+        gs_lo, gs_hi = SPECIFIC_GRAVITY_RANGES["sand"]
+        Gs = round(random.uniform(gs_lo, gs_hi), 2)
+        e = round(random.uniform(0.45, 0.85), 2)
+        L = round(random.uniform(1.5, 4.0), 1)
+        FS_true = random.uniform(1.25, 3.0)
 
-    i_cr_true = (Gs - 1) / (1 + e)
-    h = round(i_cr_true / FS_true * L, 2)        # presented excess head, m
+        i_cr_true = (Gs - 1) / (1 + e)
+        h = round(i_cr_true / FS_true * L, 2)    # presented excess head, m
 
-    # 2. Core computation — round-then-recompute at every step; i and i_cr
-    # carry 4 decimals (they feed a division; see AUTHOR_NOTES lesson 5).
-    i = round(h / L, 4)
-    gamma_sub = round((Gs - 1) * gamma_w / (1 + e), 2)
-    i_cr = round(gamma_sub / gamma_w, 4)
-    FS = round(i_cr / i, 3)
+        # 2. Core computation — round-then-recompute at every step; i and
+        # i_cr carry 4 decimals (they feed a division; see AUTHOR_NOTES
+        # lesson 5).
+        i_exact = h / L
+        gamma_sub_exact = (Gs - 1) * gamma_w / (1 + e)
+        if (_is_display_tie(i_exact, 4)
+                or _is_display_tie(gamma_sub_exact, 2)):
+            continue                    # no defensible gold answer; redraw
+        i = round(i_exact, 4)
+        gamma_sub = round(gamma_sub_exact, 2)
+        i_cr = round(gamma_sub / gamma_w, 4)
+        FS_exact = i_cr / i
+        if _is_display_tie(FS_exact, 3):
+            continue                    # no defensible gold answer; redraw
+        FS = round(FS_exact, 3)
+        break
+    else:
+        raise RuntimeError(
+            "upward_seepage_quick_condition: no closing sample in 200 draws")
 
     assert 0.85 <= i_cr <= 1.16, f"critical gradient out of bounds: {i_cr}"
     assert 1.15 <= FS <= 3.15, f"factor of safety out of bounds: {FS}"

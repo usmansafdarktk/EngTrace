@@ -1,0 +1,1424 @@
+{
+ "generated": "2026-09-23T16:31:49+00:00",
+ "git_head": "9d79d0df8d554bffcb32f2e95c47f7baac354d10",
+ "seeds": 500,
+ "rows": {
+  "template_levenspiel_plot_interpretation": {
+   "branch": "chemical_engineering",
+   "checks": 7818,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_batch_reactor_first_order": {
+   "branch": "chemical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_batch_reactor_second_order": {
+   "branch": "chemical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_batch_reactor_zero_order": {
+   "branch": "chemical_engineering",
+   "checks": 500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_cstr_volume_basic": {
+   "branch": "chemical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_pfr_volume_changing_rate": {
+   "branch": "chemical_engineering",
+   "checks": 1500,
+   "skipped": 443,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_batch_moles_vs_conversion": {
+   "branch": "chemical_engineering",
+   "checks": 500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_flow_system_molar_flow_rates": {
+   "branch": "chemical_engineering",
+   "checks": 2500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_gas_phase_concentration": {
+   "branch": "chemical_engineering",
+   "checks": 500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_limiting_reactant": {
+   "branch": "chemical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_adiabatic_flame_temperature": {
+   "branch": "chemical_engineering",
+   "checks": 3500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_heat_of_reaction_formation": {
+   "branch": "chemical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_latent_heat_vaporization": {
+   "branch": "chemical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_sensible_heat_constant_cp": {
+   "branch": "chemical_engineering",
+   "checks": 500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_sensible_heat_temp_dependent_cp": {
+   "branch": "chemical_engineering",
+   "checks": 2000,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_ideal_gas_volume": {
+   "branch": "chemical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_pitzer_correlation_z": {
+   "branch": "chemical_engineering",
+   "checks": 2500,
+   "skipped": 1000,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_rackett_equation_volume": {
+   "branch": "chemical_engineering",
+   "checks": 500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_two_phase_specific_volume": {
+   "branch": "chemical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_vdw_solve_for_pressure": {
+   "branch": "chemical_engineering",
+   "checks": 1000,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_vdw_solve_for_volume": {
+   "branch": "chemical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_work_isothermal_virial": {
+   "branch": "chemical_engineering",
+   "checks": 2500,
+   "skipped": 1000,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_annulus_flowrate": {
+   "branch": "chemical_engineering",
+   "checks": 2500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_falling_film_max_velocity": {
+   "branch": "chemical_engineering",
+   "checks": 500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_hagen_poiseuille_flowrate": {
+   "branch": "chemical_engineering",
+   "checks": 1000,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_gas_viscosity_kinetic_theory": {
+   "branch": "chemical_engineering",
+   "checks": 1000,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_kinematic_viscosity": {
+   "branch": "chemical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_newtons_law_shear_stress": {
+   "branch": "chemical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_power_law_fluid_shear": {
+   "branch": "chemical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_reynolds_number_flow_regime": {
+   "branch": "chemical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_constant_head_permeability": {
+   "branch": "civil_engineering",
+   "checks": 1000,
+   "skipped": 500,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_effective_stress_profile": {
+   "branch": "civil_engineering",
+   "checks": 2500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_upward_seepage_quick_condition": {
+   "branch": "civil_engineering",
+   "checks": 2000,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_borrow_pit_fill_volume": {
+   "branch": "civil_engineering",
+   "checks": 2000,
+   "skipped": 0,
+   "instances_with_tie": 5,
+   "rate": 0.01,
+   "by_label": {
+    "gamma_d,borrow": 4,
+    "V_borrow": 1
+   },
+   "examples": [
+    "seed 169: gamma_d,borrow = Gs * gamma_w / (1 + e_borrow) = 2.70 * 9.81 / (1 + 0.80) = 14.71 kN/m^3  (exact 14.715)",
+    "seed 264: gamma_d,borrow = Gs * gamma_w / (1 + e_borrow) = 2.70 * 9.81 / (1 + 0.80) = 14.71 kN/m^3  (exact 14.715)"
+   ]
+  },
+  "template_phase_relations_degree_of_saturation": {
+   "branch": "civil_engineering",
+   "checks": 1500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_relative_density_of_sand": {
+   "branch": "civil_engineering",
+   "checks": 1500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_infinite_slope_factor_of_safety": {
+   "branch": "civil_engineering",
+   "checks": 1500,
+   "skipped": 1000,
+   "instances_with_tie": 1,
+   "rate": 0.002,
+   "by_label": {
+    "FS": 1
+   },
+   "examples": [
+    "seed 338: FS = 0.5774 / 0.4000 = 1.444  (exact 1.4435)"
+   ]
+  },
+  "template_terzaghi_strip_footing_bearing": {
+   "branch": "civil_engineering",
+   "checks": 3253,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_primary_consolidation_settlement": {
+   "branch": "civil_engineering",
+   "checks": 5000,
+   "skipped": 500,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_time_rate_of_consolidation": {
+   "branch": "civil_engineering",
+   "checks": 3065,
+   "skipped": 810,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_beam_deflection_formula": {
+   "branch": "civil_engineering",
+   "checks": 865,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_cantilever_double_integration": {
+   "branch": "civil_engineering",
+   "checks": 1000,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_virtual_work_truss_deflection": {
+   "branch": "civil_engineering",
+   "checks": 3500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_beam_internal_moment": {
+   "branch": "civil_engineering",
+   "checks": 1500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_beam_support_reactions": {
+   "branch": "civil_engineering",
+   "checks": 1500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_truss_method_of_joints": {
+   "branch": "civil_engineering",
+   "checks": 2000,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_truss_method_of_sections": {
+   "branch": "civil_engineering",
+   "checks": 1159,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_force_method_continuous_beam": {
+   "branch": "civil_engineering",
+   "checks": 1000,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_slope_deflection_end_moment": {
+   "branch": "civil_engineering",
+   "checks": 2000,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_influence_line_max_reaction": {
+   "branch": "civil_engineering",
+   "checks": 1000,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_critical_depth_froude_classification": {
+   "branch": "civil_engineering",
+   "checks": 1500,
+   "skipped": 500,
+   "instances_with_tie": 2,
+   "rate": 0.004,
+   "by_label": {
+    "q": 2
+   },
+   "examples": [
+    "seed 151: q = Q / b = 34.5 / 4.8 = 7.188 m^2/s  (exact 7.1875)",
+    "seed 318: q = Q / b = 5.7 / 4.8 = 1.188 m^2/s  (exact 1.1875)"
+   ]
+  },
+  "template_hydraulic_jump_energy_loss": {
+   "branch": "civil_engineering",
+   "checks": 1500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_max_hump_height_no_choking": {
+   "branch": "civil_engineering",
+   "checks": 2000,
+   "skipped": 500,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_linear_reservoir_routing_step": {
+   "branch": "civil_engineering",
+   "checks": 4000,
+   "skipped": 0,
+   "instances_with_tie": 7,
+   "rate": 0.014,
+   "by_label": {
+    "O2": 5,
+    "O3": 3
+   },
+   "examples": [
+    "seed 152: O2 = (9720.0 + 5760.0) / 4800.0 = 3.23 m^3/s  (exact 3.225)",
+    "seed 184: O2 = (10380.0 + 1920.0) / 2400.0 = 5.12 m^3/s  (exact 5.125)"
+   ]
+  },
+  "template_rational_method_peak_flow": {
+   "branch": "civil_engineering",
+   "checks": 492,
+   "skipped": 0,
+   "instances_with_tie": 4,
+   "rate": 0.008,
+   "by_label": {
+    "C_w": 4
+   },
+   "examples": [
+    "seed 23: C_w = (C1*A1 + C2*A2) / (A1 + A2) = (0.62 * 7.8 + 0.81 * 4.2) / 12.0 = 0.687  (exact 0.6865)",
+    "seed 182: C_w = (C1*A1 + C2*A2) / (A1 + A2) = (0.57 * 11.1 + 0.56 * 3.7) / 14.8 = 0.567  (exact 0.5675)"
+   ]
+  },
+  "template_scs_curve_number_runoff": {
+   "branch": "civil_engineering",
+   "checks": 2500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_best_hydraulic_rectangular_section": {
+   "branch": "civil_engineering",
+   "checks": 500,
+   "skipped": 500,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_manning_rectangular_discharge": {
+   "branch": "civil_engineering",
+   "checks": 3000,
+   "skipped": 1000,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_manning_trapezoidal_velocity": {
+   "branch": "civil_engineering",
+   "checks": 4000,
+   "skipped": 1000,
+   "instances_with_tie": 9,
+   "rate": 0.018,
+   "by_label": {
+    "V": 5,
+    "Q": 4
+   },
+   "examples": [
+    "seed 100: V = (1/n) * R^(2/3) * S^(1/2) = (1/0.012) * 1.1462 * 0.03000 = 2.865 m/s  (exact 2.86550000000000000000000000000000000000000000000000000000000)",
+    "seed 118: V = (1/n) * R^(2/3) * S^(1/2) = (1/0.012) * 1.0262 * 0.03000 = 2.565 m/s  (exact 2.56550000000000000000000000000000000000000000000000000000000)"
+   ]
+  },
+  "template_normal_depth_iteration": {
+   "branch": "civil_engineering",
+   "checks": 4234,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_autocorrelation_rect_pulse": {
+   "branch": "electrical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_ft_esd_rect_pulse": {
+   "branch": "electrical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_lowpass_equivalent_bandpass": {
+   "branch": "electrical_engineering",
+   "checks": 2000,
+   "skipped": 1000,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_mean_variance": {
+   "branch": "electrical_engineering",
+   "checks": 3970,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_signal_energy_power": {
+   "branch": "electrical_engineering",
+   "checks": 682,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_average_energy_mqam": {
+   "branch": "electrical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_ber_estimation_mary": {
+   "branch": "electrical_engineering",
+   "checks": 1246,
+   "skipped": 997,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_bpsk_energy_basis": {
+   "branch": "electrical_engineering",
+   "checks": 500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_euclidean_distance_binary": {
+   "branch": "electrical_engineering",
+   "checks": 500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_null_to_null_bandwidth": {
+   "branch": "electrical_engineering",
+   "checks": 500,
+   "skipped": 500,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_coaxial_capacitance": {
+   "branch": "electrical_engineering",
+   "checks": 500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_coulombs_law": {
+   "branch": "electrical_engineering",
+   "checks": 1000,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_gauss_law_symmetric": {
+   "branch": "electrical_engineering",
+   "checks": 754,
+   "skipped": 254,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_superposition_electric_field": {
+   "branch": "electrical_engineering",
+   "checks": 1246,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_lorentz_force": {
+   "branch": "electrical_engineering",
+   "checks": 2000,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_phasor_addition": {
+   "branch": "electrical_engineering",
+   "checks": 3026,
+   "skipped": 2000,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_standing_wave_formation": {
+   "branch": "electrical_engineering",
+   "checks": 3000,
+   "skipped": 3000,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_time_to_phasor": {
+   "branch": "electrical_engineering",
+   "checks": 1263,
+   "skipped": 1000,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_wave_equation_interpretation": {
+   "branch": "electrical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_wave_parameters_basic": {
+   "branch": "electrical_engineering",
+   "checks": 1500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_aliased_frequency_identification": {
+   "branch": "electrical_engineering",
+   "checks": 500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_cd_dc_system_analysis": {
+   "branch": "electrical_engineering",
+   "checks": 500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_continuous_to_discrete_conversion": {
+   "branch": "electrical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_decimation_aliasing_analysis": {
+   "branch": "electrical_engineering",
+   "checks": 246,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_nyquist_rate_determination": {
+   "branch": "electrical_engineering",
+   "checks": 500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_finite_convolution": {
+   "branch": "electrical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_impulse_response_from_lccde": {
+   "branch": "electrical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_signal_operations": {
+   "branch": "electrical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_system_properties_memory_causality": {
+   "branch": "electrical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_system_property_linearity": {
+   "branch": "electrical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_basic_eoq": {
+   "branch": "industrial_engineering",
+   "checks": 1500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_epq_finite_production": {
+   "branch": "industrial_engineering",
+   "checks": 2500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_quantity_discount_all_units": {
+   "branch": "industrial_engineering",
+   "checks": 3000,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_reorder_point_lead_time": {
+   "branch": "industrial_engineering",
+   "checks": 1744,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_chase_vs_level_aggregate": {
+   "branch": "industrial_engineering",
+   "checks": 3000,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_line_balancing_heuristic": {
+   "branch": "industrial_engineering",
+   "checks": 1500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_takt_time_line_efficiency": {
+   "branch": "industrial_engineering",
+   "checks": 1500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_newsvendor_normal_demand": {
+   "branch": "industrial_engineering",
+   "checks": 2500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_qr_policy_one_iteration": {
+   "branch": "industrial_engineering",
+   "checks": 3500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_safety_stock_reorder_point": {
+   "branch": "industrial_engineering",
+   "checks": 1000,
+   "skipped": 0,
+   "instances_with_tie": 2,
+   "rate": 0.004,
+   "by_label": {
+    "SS": 2
+   },
+   "examples": [
+    "seed 61: SS = z * sigma_L = 2.0537 * 250 = 513.43 units  (exact 513.4250)",
+    "seed 362: SS = z * sigma_L = 2.0537 * 350 = 718.80 units  (exact 718.7950)"
+   ]
+  },
+  "template_aoq_ati_rectifying": {
+   "branch": "industrial_engineering",
+   "checks": 3704,
+   "skipped": 1700,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_single_sampling_oc_point": {
+   "branch": "industrial_engineering",
+   "checks": 1403,
+   "skipped": 1012,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_c_chart_revision": {
+   "branch": "industrial_engineering",
+   "checks": 3016,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_p_chart_limits_floor": {
+   "branch": "industrial_engineering",
+   "checks": 2500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_cp_cpk_from_specs": {
+   "branch": "industrial_engineering",
+   "checks": 2000,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_sigma_reduction_for_cpk": {
+   "branch": "industrial_engineering",
+   "checks": 2500,
+   "skipped": 0,
+   "instances_with_tie": 7,
+   "rate": 0.014,
+   "by_label": {
+    "reduction": 7
+   },
+   "examples": [
+    "seed 8: reduction = (1 - sigma_max/sigma) * 100 = (1 - 1.197/1.68) * 100 = 28.8 percent (rounded up, so a reduction of this size  (exact 28.7500)",
+    "seed 13: reduction = (1 - sigma_max/sigma) * 100 = (1 - 1.503/2.00) * 100 = 24.9 percent (rounded up, so a reduction of this size  (exact 24.8500)"
+   ]
+  },
+  "template_arl_beta_mean_shift": {
+   "branch": "industrial_engineering",
+   "checks": 6500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_chart_pair_selection": {
+   "branch": "industrial_engineering",
+   "checks": 2500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_xbar_known_sigma_classification": {
+   "branch": "industrial_engineering",
+   "checks": 2000,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_xbar_r_control_limits": {
+   "branch": "industrial_engineering",
+   "checks": 2500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_absorbing_chain_time_to_failure": {
+   "branch": "industrial_engineering",
+   "checks": 2500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_two_state_steady_state": {
+   "branch": "industrial_engineering",
+   "checks": 500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_two_step_transition_probability": {
+   "branch": "industrial_engineering",
+   "checks": 2500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_poisson_event_count": {
+   "branch": "industrial_engineering",
+   "checks": 1000,
+   "skipped": 500,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_mm1_time_in_system": {
+   "branch": "industrial_engineering",
+   "checks": 1500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_mm1k_finite_capacity": {
+   "branch": "industrial_engineering",
+   "checks": 3000,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_mmc_waiting_time": {
+   "branch": "industrial_engineering",
+   "checks": 3000,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_server_configuration_selection": {
+   "branch": "industrial_engineering",
+   "checks": 3000,
+   "skipped": 0,
+   "instances_with_tie": 77,
+   "rate": 0.154,
+   "by_label": {
+    "W1": 54,
+    "W2": 24
+   },
+   "examples": [
+    "seed 0: W1 = 1 / (muA - lambda) = 1 / (44 - 36) hours = 60 / 8 = 7.50 minutes  (exact 0.125)",
+    "seed 13: W1 = 1 / (muA - lambda) = 1 / (30 - 22) hours = 60 / 8 = 7.50 minutes  (exact 0.125)"
+   ]
+  },
+  "template_exponential_mttf_topology": {
+   "branch": "industrial_engineering",
+   "checks": 1000,
+   "skipped": 0,
+   "instances_with_tie": 1,
+   "rate": 0.002,
+   "by_label": {
+    "MTTF": 1
+   },
+   "examples": [
+    "seed 411: MTTF = 1000 / 1.28 = 781.3 hours (rounded half up to one decimal)  (exact 781.25)"
+   ]
+  },
+  "template_system_reliability_topology": {
+   "branch": "industrial_engineering",
+   "checks": 1636,
+   "skipped": 0,
+   "instances_with_tie": 1,
+   "rate": 0.002,
+   "by_label": {
+    "Rs": 2
+   },
+   "examples": [
+    "seed 272: Rs = 1 - 0.075 * 0.054 = 1 - 0.004050 = 0.9960  (exact 0.995950)",
+    "seed 272: Rs = 1 - 0.075 * 0.054 = 1 - 0.004050 = 0.9960  (exact 0.995950)"
+   ]
+  },
+  "template_fluid_particle_acceleration": {
+   "branch": "mechanical_engineering",
+   "checks": 4000,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_incompressible_continuity": {
+   "branch": "mechanical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_particle_pathline": {
+   "branch": "mechanical_engineering",
+   "checks": 1000,
+   "skipped": 1000,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_volumetric_flow_rate": {
+   "branch": "mechanical_engineering",
+   "checks": 1254,
+   "skipped": 254,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_vorticity_check": {
+   "branch": "mechanical_engineering",
+   "checks": 992,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_basic_buoyant_force": {
+   "branch": "mechanical_engineering",
+   "checks": 500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_floating_object_submersion_depth": {
+   "branch": "mechanical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_hydrostatic_force_on_plane": {
+   "branch": "mechanical_engineering",
+   "checks": 500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_hydrostatic_pressure_at_depth": {
+   "branch": "mechanical_engineering",
+   "checks": 1265,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_utube_manometer": {
+   "branch": "mechanical_engineering",
+   "checks": 2000,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_axial_deformation": {
+   "branch": "mechanical_engineering",
+   "checks": 500,
+   "skipped": 246,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_basic_stress_strain": {
+   "branch": "mechanical_engineering",
+   "checks": 1500,
+   "skipped": 246,
+   "instances_with_tie": 1,
+   "rate": 0.002,
+   "by_label": {
+    "epsilon": 1
+   },
+   "examples": [
+    "seed 86: epsilon = (0.81 mm) / (540.0 mm) = 1.500e-03  (exact 0.0015)"
+   ]
+  },
+  "template_multi_segment_rod": {
+   "branch": "mechanical_engineering",
+   "checks": 1210,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_poissons_ratio": {
+   "branch": "mechanical_engineering",
+   "checks": 3000,
+   "skipped": 500,
+   "instances_with_tie": 4,
+   "rate": 0.008,
+   "by_label": {
+    "epsilon_lateral": 4
+   },
+   "examples": [
+    "seed 30: epsilon_lateral = -(0.42) * (-1.2750e-03) = 5.355000e-04  (exact 0.000535500)",
+    "seed 207: epsilon_lateral = -(0.25) * (-3.8580e-03) = 9.645000e-04  (exact 0.000964500)"
+   ]
+  },
+  "template_statically_indeterminate": {
+   "branch": "mechanical_engineering",
+   "checks": 2500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_angle_of_twist": {
+   "branch": "mechanical_engineering",
+   "checks": 1500,
+   "skipped": 1000,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_composite_shafts_series": {
+   "branch": "mechanical_engineering",
+   "checks": 4000,
+   "skipped": 1500,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_shaft_design_power": {
+   "branch": "mechanical_engineering",
+   "checks": 2738,
+   "skipped": 1500,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_shear_stress_torsion": {
+   "branch": "mechanical_engineering",
+   "checks": 1746,
+   "skipped": 500,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_statically_indeterminate_shaft": {
+   "branch": "mechanical_engineering",
+   "checks": 1000,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_rotating_unbalance": {
+   "branch": "mechanical_engineering",
+   "checks": 4000,
+   "skipped": 500,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_system_properties": {
+   "branch": "mechanical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_vibration_isolator_design": {
+   "branch": "mechanical_engineering",
+   "checks": 3000,
+   "skipped": 500,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_vibration_transmissibility": {
+   "branch": "mechanical_engineering",
+   "checks": 3500,
+   "skipped": 500,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_damping_classification": {
+   "branch": "mechanical_engineering",
+   "checks": 1322,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_equivalent_stiffness_frequency": {
+   "branch": "mechanical_engineering",
+   "checks": 500,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_logarithmic_decrement": {
+   "branch": "mechanical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_undamped_natural_frequency_torsional": {
+   "branch": "mechanical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_undamped_natural_frequency_translational": {
+   "branch": "mechanical_engineering",
+   "checks": 0,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  },
+  "template_undamped_response_initial_conditions": {
+   "branch": "mechanical_engineering",
+   "checks": 1000,
+   "skipped": 0,
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
+  }
+ },
+ "seconds": 206.5
+}

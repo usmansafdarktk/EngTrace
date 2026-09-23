@@ -83,6 +83,16 @@ def template_shear_stress_torsion():
         J_solid = (pi / 2) * c^4
         J_hollow = (pi / 2) * (c_outer^4 - c_inner^4)
 
+    Trace integrity (Layer 0, 2026-09-23):
+        J is displayed to four significant figures and then consumed, so it
+        is bound through that display before the stress is computed (D-016
+        part 2). The stress is rounded ONCE, at the precision the answer is
+        quoted to (3 dp in MPa), and the pascal value is displayed with
+        exactly the digits of that answer, so the Pa-to-MPa conversion in
+        Step 4 is a decimal shift and not a second rounding: Step 4 used to
+        print a 4-figure "5.635e+08 Pa / 1e6" against a 6-figure "563.453
+        MPa", which no reader can reproduce (D-016 part 1).
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the maximum shearing stress in a shaft.
@@ -113,23 +123,31 @@ def template_shear_stress_torsion():
     if shaft_type == 'hollow':
         c_inner = d_inner / 2000.0
     
-    # Step B: Calculate the polar moment of inertia (J)
+    # Step B: Calculate the polar moment of inertia (J). J is displayed to
+    # four significant figures and then consumed, so the chain uses the
+    # displayed value (D-016 part 2).
     if shaft_type == 'solid':
-        polar_moment_J = (math.pi / 2) * (c_outer ** 4)
+        polar_moment_J = _as_printed((math.pi / 2) * (c_outer ** 4), '.3e')
         j_calculation_str = f"J = (pi / 2) * c^4 = (pi / 2) * ({c_outer})^4 = {polar_moment_J:.3e} m^4"
     else: # shaft_type == 'hollow'
-        polar_moment_J = (math.pi / 2) * (c_outer ** 4 - c_inner ** 4)
+        polar_moment_J = _as_printed((math.pi / 2) * (c_outer ** 4 - c_inner ** 4), '.3e')
         j_calculation_str = (
             f"J = (pi / 2) * (c_outer^4 - c_inner^4)\n"
             f"   J = (pi / 2) * (({c_outer})^4 - ({c_inner})^4) = {polar_moment_J:.3e} m^4"
         )
-        
+
     # Step C: Apply the torsion formula to find the stress in Pascals
     # Note: 'c' in the formula refers to the outermost radius, c_outer.
-    tau_max_pascals = (torque * c_outer) / polar_moment_J
-    
-    # Step D: Convert the final answer to megapascals (MPa)
-    tau_max_mpa = tau_max_pascals / 1e6
+    tau_max_pascals_exact = (torque * c_outer) / polar_moment_J
+
+    # Step D: Convert the final answer to megapascals (MPa). ONE rounding, at
+    # the precision the answer is quoted to; the pascal value is then displayed
+    # with exactly the digits of that answer (563.453 MPa is 5.63453e+08 Pa),
+    # so the decimal conversion in Step 4 is exact (D-016 part 1).
+    tau_max_mpa = _as_printed(tau_max_pascals_exact / 1e6, f'.{precision}f')
+    tau_pa_spec = '.{}e'.format(
+        len(format(tau_max_mpa, f'.{precision}f').replace('.', '').lstrip('0')) - 1)
+    tau_max_pascals = _as_printed(tau_max_mpa * 1e6, tau_pa_spec)
 
     # 3. Generate the question and solution strings
     
@@ -179,14 +197,14 @@ def template_shear_stress_torsion():
         f"c = {c_outer} m\n"
         f"J = {polar_moment_J:.3e} m^4\n"
         f"tau_max = ({torque} * {c_outer}) / {polar_moment_J:.3e}\n"
-        f"tau_max = {tau_max_pascals:.3e} Pa\n\n"
+        f"tau_max = {tau_max_pascals:{tau_pa_spec}} Pa\n\n"
 
         f"**Step 4:** Convert the stress from Pascals (Pa) to Megapascals (MPa).\n"
         f"1 MPa = 1,000,000 Pa\n"
-        f"tau_max = {tau_max_pascals:.3e} Pa / 1e6 = {round(tau_max_mpa, precision)} MPa\n\n"
+        f"tau_max = {tau_max_pascals:{tau_pa_spec}} Pa / 1e6 = {tau_max_mpa} MPa\n\n"
 
         f"**Answer:**\n"
-        f"The maximum shearing stress in the shaft is {round(tau_max_mpa, precision)} MPa."
+        f"The maximum shearing stress in the shaft is {tau_max_mpa} MPa."
     )
 
     return question, solution
@@ -207,38 +225,62 @@ def template_angle_of_twist():
         phi = (T * L) / (J * G)
         J_solid = (pi / 2) * c^4
 
+    Trace integrity (Layer 0, 2026-09-23):
+        Every quantity that is displayed and then consumed is bound through
+        its own display (D-016 part 2): J at four significant figures, G at
+        three, and the angle in radians at 4 dp, so the degrees in Step 5 are
+        computed from the 4-dp radian value the reader sees. Step 5 used to
+        print "0.0579 * (180 / pi) = 3.3181" where the printed operand gives
+        3.3174 - the degrees came from an unrounded radian value. A draw whose
+        exact radian value sits on a half-way 4-dp tie is redrawn, because no
+        rounding closes such a line for every reader (D-016 part 3).
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the angle of twist in a shaft.
             - str: A step-by-step solution to the problem.
     """
-    # 1. Parameterize the inputs with random values
-    torque = round(random.uniform(500.0, 6000.0), 1)   # Torque in N.m
-    length = round(random.uniform(0.5, 4.0), 2)       # Length in m
-    diameter = random.randint(25, 100)                # Diameter in mm
-    
-    # Randomly select a material and its properties
-    material_name, shear_modulus_gpa = random.choice(list(SHEAR_MODULUS_VALUES.items()))
-    
     # Standardize precision for final outputs
     precision = 4
 
-    # 2. Perform the core calculations for the solution
-    
-    # Step A: Convert diameter (mm) to radius (m)
-    c_radius_m = diameter / 2000.0
-    
-    # Step B: Calculate the polar moment of inertia (J)
-    polar_moment_J = (math.pi / 2) * (c_radius_m ** 4)
-    
-    # Step C: Ensure all units are consistent (convert G from GPa to Pa)
-    shear_modulus_pa = shear_modulus_gpa * 1e9
-    
-    # Step D: Apply the angle of twist formula to find the angle in radians
-    angle_rad = (torque * length) / (polar_moment_J * shear_modulus_pa)
-    
-    # Step E: Convert the result from radians to degrees
-    angle_deg = math.degrees(angle_rad)
+    for _attempt in range(200):
+        # 1. Parameterize the inputs with random values
+        torque = round(random.uniform(500.0, 6000.0), 1)   # Torque in N.m
+        length = round(random.uniform(0.5, 4.0), 2)       # Length in m
+        diameter = random.randint(25, 100)                # Diameter in mm
+
+        # Randomly select a material and its properties
+        material_name, shear_modulus_gpa = random.choice(list(SHEAR_MODULUS_VALUES.items()))
+
+        # 2. Perform the core calculations for the solution
+
+        # Step A: Convert diameter (mm) to radius (m)
+        c_radius_m = diameter / 2000.0
+
+        # Step B: Calculate the polar moment of inertia (J). Displayed to four
+        # significant figures and then consumed, so bound through that display
+        # (D-016 part 2).
+        polar_moment_J = _as_printed((math.pi / 2) * (c_radius_m ** 4), '.4e')
+
+        # Step C: Ensure all units are consistent (convert G from GPa to Pa).
+        # Displayed to three significant figures, which is exact for every
+        # table value; bound so the stored float IS the displayed one.
+        shear_modulus_pa = _as_printed(shear_modulus_gpa * 1e9, '.2e')
+
+        # Step D: Apply the angle of twist formula to find the angle in radians.
+        # The radian value is displayed at 4 dp and then consumed by Step 5, so
+        # the chain continues from the displayed value. A half-way tie at that
+        # display has no defensible rounding; the draw is rejected (D-016).
+        angle_rad_exact = (torque * length) / (polar_moment_J * shear_modulus_pa)
+        if _is_display_tie(angle_rad_exact, precision):
+            continue
+        angle_rad = _as_printed(angle_rad_exact, f'.{precision}f')
+
+        # Step E: Convert the result from radians to degrees
+        angle_deg = math.degrees(angle_rad)
+        break
+    else:
+        raise RuntimeError("angle_of_twist: no closing sample in 200 draws")
 
     # 3. Generate the question and solution strings
     
@@ -271,14 +313,14 @@ def template_angle_of_twist():
         f"**Step 4:** Apply the angle of twist formula to find the angle in radians.\n"
         f"Formula: phi = (T * L) / (J * G)\n"
         f"phi = ({torque} * {length}) / ({polar_moment_J:.4e} * {shear_modulus_pa:.2e})\n"
-        f"phi = {round(angle_rad, precision)} radians\n\n"
+        f"phi = {angle_rad} radians\n\n"
 
         f"**Step 5:** Convert the angle from radians to degrees.\n"
         f"Angle in degrees = Angle in radians * (180 / pi)\n"
-        f"Angle = {round(angle_rad, precision)} * (180 / pi) = {round(angle_deg, precision)} degrees\n\n"
+        f"Angle = {angle_rad} * (180 / pi) = {round(angle_deg, precision)} degrees\n\n"
 
         f"**Answer:**\n"
-        f"The total angle of twist is {round(angle_rad, precision)} radians, which is equivalent to "
+        f"The total angle of twist is {angle_rad} radians, which is equivalent to "
         f"{round(angle_deg, precision)} degrees."
     )
 
