@@ -3550,10 +3550,59 @@ not iterated against the judges.
 
 ---
 
+## D-095 — Layer 2: certification that leaves evidence — hand checks, planted defects, timestamps
+
+**Date:** 2026-09-24 · **Status:** DECIDED (protocol; roster and dates open) · **Source:**
+`template_annotation_23092026/layer2/` (README, guide.md, build_tasks.py, app.py, plants/CONTRACT.md, score.py)
+
+The December 2025 certification (Appendix K) approved 270 of 270 rows with every
+mathematical-correctness score at 5, at 12–30 seconds per template, by the same
+three reviewers across all three branches. Reviewer gFWV called its perfect kappa
+unconvincing and the record could not rebut him: it held no dwell time, no hand
+check, no rejection and no negative to detect. Layer 2 is designed so that the
+record can.
+
+- **Own-branch experts, three per template**, the pilot's 15 by default (5 branches
+  × 3), 34 items each: the branch's 30 templates plus 4 planted defects.
+- **A hand check before the solution is shown.** The expert enters their own
+  answer to one instance; the app records it, compares within 1%, then reveals the
+  solution. The same instance for the three experts of a branch.
+- **Planted defects**, four per branch, one of each class — a wrong constant, a
+  wrong unit conversion, a flipped sign, a printed step that does not follow from
+  its operands — as mutations of real templates verified on every build
+  (`plants/CONTRACT.md`). Experts are told quality-control items exist. The
+  detection rate is the sensitivity figure a set of approvals cannot give; it is
+  reported per expert and overall.
+- **Opaque codes, shuffled order, no screen verdict shown, timestamps** on open,
+  hand check and submit; a rejection requires a defect type and a note that goes to
+  the author.
+- **Two routes**, app or workbook, producing identical label rows; no template code
+  ships to an expert (instances precomputed at build).
+- **Reported by `score.py`:** plant detection, hand-check agreement, Fleiss κ and
+  Gwet AC1 on Approve/Reject, AC2 on the scores, the screening panel's false-
+  positive rate against the experts and the MAD between their medians, dwell time,
+  and the fix list. Rejected templates are fixed and re-judged individually by the
+  screen (D-094), not in a new pass.
+
+**Why plants rather than a larger sample.** A perfect approval rate on 150
+templates says nothing about the reviewer; a perfect approval rate on 150
+templates *and* 16 of 20 planted defects rejected says the review was real. The
+plant set is small because each is a hand-written mutation with a measured,
+detectable defect, and four per branch is enough to distinguish a reviewer who
+reads from one who clicks.
+
+**Open:** the roster (names in `annotators.json` when confirmed), the dates, whether
+experts are compensated, and adjudication of split verdicts (proposal: the
+majority decides Approve/Reject; a 1-of-3 rejection with a substantive note is
+still fixed).
+
+---
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
+| D-095 | Layer 2 roster and dates; adjudication rule for split verdicts | bundles are sent |
 | D-094 | Whether to narrow the P2/Pc range in `work_isothermal_virial` (now 50% redraw) and accept the 41% stability redraw in `floating_object_submersion_depth`; the residuals in `pass1_fixes.md` | the item pool is regenerated |
 | D-092 | ~~Answer-display lengthening and gold-movement sign-offs~~ **Decided by the owner 2026-09-23:** the two lengthened answers stay; `beam_internal_moment`, `terzaghi_strip_footing_bearing` and `effective_stress_profile` answers are lengthened too; the gold movements are accepted; and a scoped third round removes the census ties at 3% and above (eight templates), with the frozen pool to be censused before inference and stragglers fixed then | — |
 | D-093 | ~~Approval to run screening pass 1~~ **Both passes run (2026-09-23/24, $4.85 total); the 24 flags resolved (D-094).** Open: the Layer 2 protocol (experts, hand-checks, planted defects) | Layer 2 (human certification) starts |

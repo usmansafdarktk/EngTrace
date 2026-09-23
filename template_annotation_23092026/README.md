@@ -10,7 +10,7 @@ described in the paper's section 3.3 and Appendix K.
 |---|---|---|---|
 | 0 · deterministic gate | T1 closure, T3 determinism, T4 contract, T8 emission at 500 seeds; T5, T7 advisory; a register of four line classes the check cannot read | free | **green: 150 of 150 pass** (`layer0/gate_report.md`); 54 templates edited over three closure rounds (`closure_fixes.md`) and 24 after the screen (`../screen/pass1_fixes.md`); 68 moved instances (`item_pool_impact.md`); residual ties only in 11 templates under 2% (`tie_census.md`), to be censused on the frozen pool |
 | 1 · LLM screen | Appendix H's prompt, verbatim; three non-suite judges; two passes, hard-capped | $4.15 pass 1, $0.70 pass 2 | **both passes done**: pass 1 (2026-09-23) 126 pass, 13 controversial, 11 critical failure, AC1 on the flag 0.84; the 24 flags verified and fixed (`screen/pass1_fixes.md`); pass 2 (2026-09-24, 24 templates re-judged, 378 rows carried on unchanged prompts) **147 pass, 3 controversial, 0 critical**, AC1 0.93 (`screen/pass2/stats.md`) |
-| 2 · human certification | own-branch experts, three per template, with hand-checks and planted defects | expert time | not started; protocol to be written |
+| 2 · human certification | own-branch experts, three per template, with a hand check, four planted defects per branch, timestamps (D-095) | expert time, about 4 h each | **kit built** (`layer2/`): guide, app, workbook route, task builder with verified plants, per-expert bundles, scorer; awaiting roster and dates |
 
 ## Pass 1 of the screen, read (as written before the fixes; the outcome is in `screen/pass1_fixes.md`)
 
@@ -79,6 +79,16 @@ template_annotation_23092026/
     analyze_screen.py    consensus (paper rule), sigma-max, Gwet AC1 / Fleiss kappa, cost, served ids
     pass1/, pass2/       config.json + replies.jsonl + summary.csv + flagged.md + stats.md (committed)
     pass1_fixes.md       every pass-1 judge claim: confirmed / rejected, the fix, what moved, residuals
+  layer2/
+    README.md            the protocol and the order of operations
+    guide.md, make_guide_pdf.py, EngTrace-certification-guide.pdf   what the experts read
+    plants/              CONTRACT.md and one <branch>.py of four planted defects each
+    build_tasks.py       verifies plants, precomputes instances, builds pool/assignment/keyfile (tasks/, ignored)
+    app.py               the reviewer's app: hand check, solution, scores, verdict, timestamps
+    workbooks.py         the file route: export, check, import
+    package.py           one zip per expert (dist/, ignored); refuses to ship the keyfile
+    simulate.py          synthetic labels to prove the pipeline; never results
+    score.py             RESULTS.md: plant detection, hand checks, agreement, panel FPR, dwell, fix list
 ```
 
 ## Order of operations
