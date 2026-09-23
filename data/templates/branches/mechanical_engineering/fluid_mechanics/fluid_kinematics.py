@@ -21,6 +21,18 @@ def template_fluid_particle_acceleration():
         Acceleration (ay) = dv/dt + u*(dv/dx) + v*(dv/dy)
         Total Acceleration (a) = sqrt(ax^2 + ay^2)
 
+    Screen pass 1 (2026-09-23):
+        One judge flagged "physically unrealistic" speeds (u of about
+        70 m/s); another noted that the field need not satisfy continuity.
+        Checked over 503 seeds and left unchanged: the question states the
+        velocity field of "a fluid" and claims neither incompressibility
+        nor a liquid, so continuity is not a condition of the exercise, and
+        the material derivative holds for any smooth field. The sampled
+        speeds |V| span 4.8-338 m/s (median 90), all below the speed of
+        sound in air, with accelerations of 35-31,756 m/s^2: large for a
+        liquid, routine for a gas, and outside nothing physical for the
+        stated context.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the acceleration components and magnitude.

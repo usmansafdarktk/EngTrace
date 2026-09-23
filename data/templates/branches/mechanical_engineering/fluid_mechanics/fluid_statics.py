@@ -196,6 +196,22 @@ def template_basic_buoyant_force():
     Core Equation:
         F_buoyant = rho_fluid * g * V_displaced
 
+    Screen pass 1 (2026-09-23):
+        All three judges flagged nonsensical objects from the independent
+        draw of a material and a shape ("solid bronze wooden block", a
+        "titanium boat hull" fully submerged), the flag the December 2025
+        Tribunal raised. Measured over 503 seeds: 31.8% of draws named a
+        shape that carries its own material word, 26.6% contradicted the
+        drawn material ("uranium concrete piling", "ice boulder", "balsa
+        wood metal cylinder"), and 25.0% named a hollow or floating body as
+        a solid, fully submerged one. The shape is now drawn from the eight
+        geometric solids in OBJECT_SHAPES (see the sampling comment); the
+        materials, fluids, volume range, physics and steps are unchanged.
+        Item-pool effect, accepted: the shorter choice list re-indexes the
+        draw, so the question, and with it the material, the volume and
+        the answer, moved on 96.2% of 501 seeds (0-500); the fluid is drawn
+        before the shape and is unchanged.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the buoyant force on an object.
@@ -206,8 +222,19 @@ def template_basic_buoyant_force():
     # Randomly select a fluid and its properties
     fluid_name, density_rho = random.choice(list(FLUID_DENSITIES.items()))
 
-    # Randomly select descriptive properties for the object
-    shape = random.choice(OBJECT_SHAPES)
+    # Randomly select descriptive properties for the object.
+    #
+    # Screen pass 1 (2026-09-23): only the geometric solids in OBJECT_SHAPES
+    # are drawn, in table order (D-031). The other entries either carry a
+    # material word of their own ("wooden block", "metal rod", "concrete
+    # piling", "stone") that contradicts the drawn material, or name a hollow
+    # or floating body ("boat hull", "buoy", "storage tank") that is neither
+    # solid nor fully submerged.
+    geometric_solids = ("sphere", "cube", "irregular block", "cylinder",
+                        "rectangular prism", "cone", "pyramid", "ball")
+    shapes = [s for s in OBJECT_SHAPES if s in geometric_solids]
+    assert len(shapes) == len(geometric_solids), "OBJECT_SHAPES lost a geometric solid"
+    shape = random.choice(shapes)
     material = random.choice(OBJECT_MATERIALS)
 
     # Randomize the object's volume in cubic meters
@@ -422,6 +449,23 @@ def template_floating_object_submersion_depth():
         - At equilibrium (floating): W = F_B
         - This simplifies to: rho_object * V_total = rho_fluid * V_submerged
 
+    Screen pass 1 (2026-09-23):
+        One judge flagged that "stable, upright" floating is assumed and
+        not checked, citing a wide, flat aerogel block (2.07 x 1.32 x
+        1.09 m) that "would tip over"; another noted that random aspect
+        ratios "can still be hydrostatically unstable". Checked with the
+        metacentric criterion GM = BM - BG, BM = I/V_sub (see the sampling
+        comment): the cited block is very stable, GM = +59.4 m, because a
+        nearly weightless block has a huge metacentric radius, so that
+        example is rejected; but 40.6% of first draws over 503 seeds,
+        blocks and cylinders alike, typically tall sections at a mid-range
+        density ratio, had GM <= 0 and would capsize. The stability
+        condition is now a sampling constraint: shape and dimensions are
+        redrawn until GM > 0 (smallest GM kept over 503 seeds: 1 mm).
+        Question wording, physics and step structure are unchanged; the
+        question and answer moved on 40.7% of 501 seeds (0-500), exactly
+        the redrawn ones.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the submersion depth of a floating object.
@@ -452,24 +496,46 @@ def template_floating_object_submersion_depth():
         fluid_name = "Fresh Water"
         rho_fluid = FLUID_DENSITIES[fluid_name]
 
-    # Randomly choose the object's shape (uniform cross-section)
-    shape = random.choice(["rectangular block", "cylinder"])
+    # Randomly choose the object's shape (uniform cross-section) and its
+    # dimensions, keeping only a draw that floats upright in stable
+    # equilibrium, as the question asserts.
+    #
+    # Screen pass 1 (2026-09-23): the metacentric criterion for a floating
+    # body, GM = BM - BG > 0 with BM = I / V_sub and, for a homogeneous body
+    # of uniform section, BG = (H - h_sub) / 2. For the block the weaker axis
+    # is the shorter horizontal side, I = L_long * W_short^3 / 12 over
+    # V_sub = L * W * h_sub, so BM = W_short^2 / (12 h_sub); for the cylinder
+    # I = pi r^4 / 4 over V_sub = pi r^2 h_sub, so BM = r^2 / (4 h_sub). A
+    # draw with GM <= 0 would capsize rather than float upright; it is
+    # redrawn (40.6% of first draws over 503 seeds).
+    for _attempt in range(200):
+        shape = random.choice(["rectangular block", "cylinder"])
 
-    # Randomize dimensions based on shape
-    if shape == "rectangular block":
-        length = round(random.uniform(0.5, 3.0), 2)
-        width = round(random.uniform(0.2, 2.0), 2)
-        height = round(random.uniform(0.1, 1.5), 2) # This is the total vertical height
-        shape_dims_str = f"dimensions {length} m (length) x {width} m (width) x {height} m (height)"
-        shape_dims_given_str = (f"  - Length (L): {length} m\n"
-                                f"  - Width (W): {width} m\n"
-                                f"  - Total Height (H): {height} m")
-    else:  # shape == "cylinder"
-        radius = round(random.uniform(0.1, 1.5), 2)
-        height = round(random.uniform(0.2, 2.5), 2) # This is the total vertical height
-        shape_dims_str = f"a radius of {radius} m and a total height of {height} m"
-        shape_dims_given_str = (f"  - Radius (r): {radius} m\n"
-                                f"  - Total Height (H): {height} m")
+        # Randomize dimensions based on shape
+        if shape == "rectangular block":
+            length = round(random.uniform(0.5, 3.0), 2)
+            width = round(random.uniform(0.2, 2.0), 2)
+            height = round(random.uniform(0.1, 1.5), 2) # This is the total vertical height
+            shape_dims_str = f"dimensions {length} m (length) x {width} m (width) x {height} m (height)"
+            shape_dims_given_str = (f"  - Length (L): {length} m\n"
+                                    f"  - Width (W): {width} m\n"
+                                    f"  - Total Height (H): {height} m")
+            bm_times_h_sub = min(length, width) ** 2 / 12.0
+        else:  # shape == "cylinder"
+            radius = round(random.uniform(0.1, 1.5), 2)
+            height = round(random.uniform(0.2, 2.5), 2) # This is the total vertical height
+            shape_dims_str = f"a radius of {radius} m and a total height of {height} m"
+            shape_dims_given_str = (f"  - Radius (r): {radius} m\n"
+                                    f"  - Total Height (H): {height} m")
+            bm_times_h_sub = radius ** 2 / 4.0
+
+        h_sub = (rho_object / rho_fluid) * height
+        metacentric_height = bm_times_h_sub / h_sub - (height - h_sub) / 2.0
+        if metacentric_height > 0.0:
+            break
+    else:
+        raise RuntimeError(
+            "floating_object_submersion_depth: no upright-stable draw in 200 attempts")
 
     # Standardize precision for final outputs
     precision = 4

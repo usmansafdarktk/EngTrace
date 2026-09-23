@@ -498,6 +498,23 @@ def template_composite_shafts_series():
         For this case: phi_total = phi_1 + phi_2
         J_solid = (pi / 2) * c^4
 
+    Screen pass 1 (2026-09-23):
+        One judge: G > 20 GPa "still admits glass shafts", and small-
+        diameter, high-torque draws "exceed typical yield". Verified over
+        503 seeds: Glass appears in 14.1% of instances and Concrete
+        (22.0 GPa, also above the filter) in 14.3%; the maximum shear
+        stress 16T/(pi d^3) in the thinner segment has median 50 MPa, 90th
+        percentile 234 MPa and maximum 544 MPa. SHEAR_MODULUS_VALUES
+        carries no yield or strength data, so the elastic assumption cannot
+        be checked against the table; the fix is limited to removing the
+        two materials that are not made into shafts, by redraw (see the
+        sampling comment). Question and answer moved on 27.9% of 501 seeds
+        (0-500), the seeds that had drawn one of them. Residual, recorded
+        and not acted on: against textbook shear-yield values, which are
+        not in the table, 8.3% of draws still exceed the yield of the drawn
+        alloy's common temper; a stress bound needs a strength column, an
+        owner decision.
+
     Returns:
         tuple: A tuple containing:
             - str: A question about a composite shaft in series.
@@ -513,15 +530,32 @@ def template_composite_shafts_series():
     
     assert STRONG_MATERIALS, "SHEAR_MODULUS_VALUES has no material above 20 GPa"
 
+    # Screen pass 1 (2026-09-23): G > 20 GPa is a proxy for "metal" that also
+    # admits Glass (26.2 GPa) and Concrete (22.0 GPa); neither is made into a
+    # solid transmission shaft. They are removed by redraw rather than by
+    # shortening the list, so the seeds that never drew them keep their draw
+    # (D-031). The table has no strength data, so no stress bound is applied.
+    NOT_SHAFT_MATERIALS = ("Glass", "Concrete")
+
     # Properties for Segment 1 (AB)
     l1 = round(random.uniform(0.5, 2.5), 2)
     d1 = random.randint(40, 120)
-    mat1_name, g1_gpa = random.choice(list(STRONG_MATERIALS.items()))
+    for _attempt in range(100):
+        mat1_name, g1_gpa = random.choice(list(STRONG_MATERIALS.items()))
+        if mat1_name not in NOT_SHAFT_MATERIALS:
+            break
+    else:
+        raise RuntimeError("composite_shafts_series: no shaft material in 100 draws")
 
     # Properties for Segment 2 (BC)
     l2 = round(random.uniform(0.5, 2.5), 2)
     d2 = random.randint(30, d1) # Ensure d2 is not larger than d1
-    mat2_name, g2_gpa = random.choice(list(STRONG_MATERIALS.items()))
+    for _attempt in range(100):
+        mat2_name, g2_gpa = random.choice(list(STRONG_MATERIALS.items()))
+        if mat2_name not in NOT_SHAFT_MATERIALS:
+            break
+    else:
+        raise RuntimeError("composite_shafts_series: no shaft material in 100 draws")
     
     # The segment angles are displayed at PHI_DP and then summed, so the
     # sum is taken over the DISPLAYED values and is exact at PHI_DP. Step 4

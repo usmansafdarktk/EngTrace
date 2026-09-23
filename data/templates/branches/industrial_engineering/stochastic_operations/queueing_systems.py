@@ -495,6 +495,14 @@ def template_server_configuration_selection():
         pair. L2 at 4 dp never ties. The W1 and W2 hours-to-minutes
         lines are registered parser limits and are untouched.
 
+    Screen pass 1 (2026-09-23):
+        All three judges flagged "a applicant" (passport-office setting):
+        the question composed "a" + the singular of cfg['arrival'] whatever
+        its initial sound. The article is now chosen per noun ("an" before
+        a vowel-initial noun; the reachable nouns are customer, patient and
+        applicant). Only that setting's question text changes; numbers,
+        sampling and the registered W1/W2 lines are untouched.
+
     Returns:
         tuple(str, str): (question, solution)
     """
@@ -541,6 +549,11 @@ def template_server_configuration_selection():
             f"the system."
         )
 
+    # Screen pass 1 (2026-09-23): the article follows the noun's initial
+    # sound -- "an applicant", "a customer", "a patient".
+    unit = cfg["arrival"][:-1]
+    article = "an" if unit[:1].lower() in "aeiou" else "a"
+
     question = (
         f"{cfg['place']} expects {cfg['arrival']} to arrive at "
         f"{cfg['arrive_at']} according to a Poisson process at {lam} "
@@ -551,8 +564,8 @@ def template_server_configuration_selection():
         f"of {muB} {cfg['arrival']} per hour. Service times are "
         f"exponentially distributed in both cases. Model the first option "
         f"as an M/M/1 queue and the second as an M/M/2 queue, verify that "
-        f"a steady state exists for both, and compare the average time a "
-        f"{cfg['arrival'][:-1]} spends in the system (waiting plus "
+        f"a steady state exists for both, and compare the average time "
+        f"{article} {unit} spends in the system (waiting plus "
         f"service) under each option. Report, in minutes, the average "
         f"time in the system achieved by the better option."
     )

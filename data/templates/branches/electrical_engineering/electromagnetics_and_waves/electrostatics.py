@@ -252,6 +252,19 @@ def template_gauss_law_symmetric():
         For an infinite sheet: D = rho_s / 2
         Relation: D = epsilon * E
 
+    Screen pass 1 (2026-09-23):
+        Three display defects the judges reported, none in the physics. The
+        line-charge magnitude step wrote a signed expression equal to a
+        positive |D| ("|D| = (-2.50e-08) / (2 * pi * r) = 1.834e-09") on every
+        negative rho_l (107/500 seeds); both magnitude lines now divide |rho|,
+        and a clause states that a negative charge's D points toward the line
+        or sheet. The observation point was printed as a numpy array
+        ("[2.17 0.   0.  ]") and is printed as a tuple. Components that are
+        exactly zero came out as "-0.000e+00" when the charge was negative
+        (0 * negative in numpy; 219/500 seeds) and print as zero. No sampled
+        value changes; the question text changes on every seed (the point's
+        format only) and the gold answer only where a negative zero sat in it.
+
     Returns:
         tuple: A tuple containing:
             - str: A question about the E and D fields from a charge distribution.
@@ -262,6 +275,10 @@ def template_gauss_law_symmetric():
     epsilon_r = round(random.uniform(1.0, 6.0), 2)
     epsilon = epsilon_r * EPSILON_0
     precision = 3
+
+    def _c(v):
+        """A vector component at `precision`; an exact zero prints as zero, never as -0.000e+00."""
+        return f"{(0.0 if v == 0 else v):.{precision}e}"
 
     # Initialize variables to be populated in the if/else block
     question = ""
@@ -274,25 +291,27 @@ def template_gauss_law_symmetric():
         
         r_dist = round(random.uniform(0.1, 2.5), 2)
         point = np.array([r_dist, 0, 0])
+        point_str = f"({r_dist}, 0, 0)"
 
         # Core Calculation
         D_mag = rho_l_calc / (2 * math.pi * r_dist)
         D_vec = D_mag * np.array([1, 0, 0]) # Direction is radial (a_r)
         E_vec = D_vec / epsilon
+        sign_note = "; since rho_l < 0, D points toward the line, i.e. along -a_x" if rho_l_val < 0 else ""
 
         # Generate Question and Solution Strings
         question = (
             f"An infinite line of charge with a uniform density rho_l = {rho_l_val} nC/m is located "
             f"on the z-axis in a medium with relative permittivity epsilon_r = {epsilon_r}.\n\n"
             f"Using Gauss's Law, find the electric flux density vector (D) and the electric field "
-            f"intensity vector (E) at the point P = {point} m."
+            f"intensity vector (E) at the point P = {point_str} m."
         )
 
         solution = (
             f"**Given:**\n"
             f"  - Infinite line charge with rho_l = {rho_l_val} nC/m = {rho_l_calc:.2e} C/m.\n"
             f"  - Relative permittivity epsilon_r = {epsilon_r}.\n"
-            f"  - Observation point P = {point} m.\n\n"
+            f"  - Observation point P = {point_str} m.\n\n"
 
             f"**Step 1:** Choose a Gaussian Surface.\n"
             f"  For an infinite line charge, the electric field is purely radial. We choose a closed "
@@ -309,15 +328,15 @@ def template_gauss_law_symmetric():
 
             f"**Step 3:** Calculate the Electric Flux Density (D).\n"
             f"  The magnitude of D at r = {r_dist} m is:\n"
-            f"  |D| = ({rho_l_calc:.2e}) / (2 * pi * {r_dist}) = {abs(D_mag):.{precision}e} C/m^2.\n"
-            f"  At point P = {point} m, the direction is radial, which corresponds to the x-direction (a_x).\n"
-            f"  Therefore, D = <{D_vec[0]:.{precision}e}, 0, 0> C/m^2.\n\n"
+            f"  |D| = |rho_l| / (2 * pi * r) = {abs(rho_l_calc):.2e} / (2 * pi * {r_dist}) = {abs(D_mag):.{precision}e} C/m^2.\n"
+            f"  At point P = {point_str} m, the direction is radial, which corresponds to the x-direction (a_x){sign_note}.\n"
+            f"  Therefore, D = <{_c(D_vec[0])}, 0, 0> C/m^2.\n\n"
 
             f"**Step 4:** Calculate the Electric Field Intensity (E).\n"
             f"  E = D / epsilon, where epsilon = epsilon_r * epsilon_0.\n"
             f"  epsilon = {epsilon_r} * {EPSILON_0:.3e} = {epsilon:.3e} F/m.\n"
-            f"  E = <{D_vec[0]:.{precision}e}, 0, 0> / {epsilon:.3e}\n"
-            f"  E = <{E_vec[0]:.{precision}e}, 0, 0> V/m.\n\n"
+            f"  E = <{_c(D_vec[0])}, 0, 0> / {epsilon:.3e}\n"
+            f"  E = <{_c(E_vec[0])}, 0, 0> V/m.\n\n"
         )
 
     # --- Logic for an Infinite Sheet of Charge ---
@@ -327,25 +346,27 @@ def template_gauss_law_symmetric():
         
         z_dist = round(random.uniform(0.1, 2.5), 2)
         point = np.array([0, 0, z_dist])
+        point_str = f"(0, 0, {z_dist})"
         
         # Core Calculation
         D_mag = rho_s_calc / 2.0
         D_vec = D_mag * np.array([0, 0, 1]) # Direction is normal (a_z)
         E_vec = D_vec / epsilon
+        sign_note = "; since rho_s < 0, D points toward the sheet, i.e. along -a_z" if rho_s_val < 0 else ""
 
         # Generate Question and Solution Strings
         question = (
             f"An infinite sheet of charge with a uniform surface density rho_s = {rho_s_val} nC/m^2 is "
             f"located on the x-y plane (z=0) in a medium with relative permittivity epsilon_r = {epsilon_r}.\n\n"
             f"Using Gauss's Law, find the electric flux density vector (D) and the electric field "
-            f"intensity vector (E) at the point P = {point} m."
+            f"intensity vector (E) at the point P = {point_str} m."
         )
 
         solution = (
             f"**Given:**\n"
             f"  - Infinite sheet charge with rho_s = {rho_s_val} nC/m^2 = {rho_s_calc:.2e} C/m^2.\n"
             f"  - Relative permittivity epsilon_r = {epsilon_r}.\n"
-            f"  - Observation point P = {point} m.\n\n"
+            f"  - Observation point P = {point_str} m.\n\n"
 
             f"**Step 1:** Choose a Gaussian Surface.\n"
             f"  For an infinite sheet, the electric field is purely normal to the sheet. We choose a "
@@ -361,22 +382,22 @@ def template_gauss_law_symmetric():
 
             f"**Step 3:** Calculate the Electric Flux Density (D).\n"
             f"  The magnitude of D is independent of the distance from the sheet:\n"
-            f"  |D| = |{rho_s_calc:.2e}| / 2 = {abs(D_mag):.{precision}e} C/m^2.\n"
-            f"  At P = {point} m (where z > 0), the direction is normal to the sheet (a_z).\n"
-            f"  Therefore, D = <0, 0, {D_vec[2]:.{precision}e}> C/m^2.\n\n"
+            f"  |D| = |rho_s| / 2 = {abs(rho_s_calc):.2e} / 2 = {abs(D_mag):.{precision}e} C/m^2.\n"
+            f"  At P = {point_str} m (where z > 0), the direction is normal to the sheet (a_z){sign_note}.\n"
+            f"  Therefore, D = <0, 0, {_c(D_vec[2])}> C/m^2.\n\n"
 
             f"**Step 4:** Calculate the Electric Field Intensity (E).\n"
             f"  E = D / epsilon, where epsilon = epsilon_r * epsilon_0.\n"
             f"  epsilon = {epsilon_r} * {EPSILON_0:.3e} = {epsilon:.3e} F/m.\n"
-            f"  E = <0, 0, {D_vec[2]:.{precision}e}> / {epsilon:.3e}\n"
-            f"  E = <0, 0, {E_vec[2]:.{precision}e}> V/m.\n\n"
+            f"  E = <0, 0, {_c(D_vec[2])}> / {epsilon:.3e}\n"
+            f"  E = <0, 0, {_c(E_vec[2])}> V/m.\n\n"
         )
 
     # Final Summary for both cases
     final_answer = (
         f"**Answer:**\n"
-        f"  The electric flux density is D = <{D_vec[0]:.{precision}e}, {D_vec[1]:.{precision}e}, {D_vec[2]:.{precision}e}> C/m^2.\n"
-        f"  The electric field intensity is E = <{E_vec[0]:.{precision}e}, {E_vec[1]:.{precision}e}, {E_vec[2]:.{precision}e}> V/m."
+        f"  The electric flux density is D = <{_c(D_vec[0])}, {_c(D_vec[1])}, {_c(D_vec[2])}> C/m^2.\n"
+        f"  The electric field intensity is E = <{_c(E_vec[0])}, {_c(E_vec[1])}, {_c(E_vec[2])}> V/m."
     )
     
     solution += final_answer

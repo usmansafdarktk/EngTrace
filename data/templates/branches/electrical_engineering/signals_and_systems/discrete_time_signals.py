@@ -1,6 +1,47 @@
 import random
 import math
+from decimal import Decimal, ROUND_HALF_UP
 from data.templates.branches._emission import signed_term, joined_terms
+
+
+def _hu(x, places):
+    """Round half-up to `places` dp, resolving the tie in DECIMAL.
+
+    `round()` resolves a half-way tie on the binary value and disagrees with a
+    reader doing decimal arithmetic (spec P2 as amended, DECISIONS D-012).
+    """
+    q = Decimal(1).scaleb(-places)
+    d = x if isinstance(x, Decimal) else Decimal(repr(x))
+    v = d.quantize(q, rounding=ROUND_HALF_UP)
+    return int(v) if places == 0 else float(v)
+
+
+def _as_printed(x, spec):
+    """The value a reader recovers from `x` when it is printed with `spec`.
+
+    P2 asks that the stored value and the printed value be the SAME value.
+    Rounding alone does not achieve that: a float one ulp away from its own
+    printed form puts the template and the reader on opposite sides of a
+    display tie (D-016 part 2).
+    """
+    return float(format(x, spec))
+
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where no rounding convention is defensible - a
+    decimal reader applying half-up and a binary reader applying `round()`
+    disagree, and the printed line closes for only one of them. Such instances
+    are resampled rather than resolved (D-016).
+
+    A narrow BAND is quarantined rather than a point, because two independent
+    evaluations of the same exact quantity differ by a few ulps and an exact
+    rational tie lands on opposite sides of them.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
 
 
 # Template 1 (Easy)
@@ -17,6 +58,18 @@ def template_signal_operations():
     Core Equations:
         1. Time-Shift: y[n] = x[n - n0]
         2. Time-Reversal: z[n] = x[-n]
+
+    Screen pass 1 (2026-09-23):
+        Two judges' findings, both about the printed sequences. The asterisk
+        that marks n = 0 was never defined in the question; the question now
+        says so. The answer dropped the marker whenever a shift moved the
+        support off the origin (D-050 measured 16.4%; 79/500 seeds here), so
+        the printed support is widened to include n = 0, the fix D-050 named,
+        and Step 3 says the origin is marked. The transformation, the table
+        and the sampled values are unchanged; the question text changes on
+        every seed (one added clause) and the gold answer on the seeds whose
+        support excluded n = 0. The "(D4.5)" the other judge saw is a source
+        comment, not emitted text (0/500 instances contain it).
 
     Returns:
         tuple: A tuple containing:
@@ -90,8 +143,10 @@ def template_signal_operations():
     if not result_n:
         result_n_str = "{}"
     else:
-        min_idx = min(result_n.keys())
-        max_idx = max(result_n.keys())
+        # The printed support always includes n = 0, so the origin marker is
+        # present even when a shift moves every sample off it (D-050).
+        min_idx = min(min(result_n.keys()), 0)
+        max_idx = max(max(result_n.keys()), 0)
         parts = []
         for i in range(min_idx, max_idx + 1):
             val = result_n.get(i, 0)
@@ -105,7 +160,8 @@ def template_signal_operations():
     
     question = (
         f"A discrete-time signal is defined by the sequence:\n"
-        f"x[n] = {x_n_str}\n\n"
+        f"x[n] = {x_n_str}\n"
+        f"where the value at the origin n = 0 is enclosed in asterisks and x[n] = 0 outside the listed indices.\n\n"
         f"Determine the resulting sequence, {output_var}[n], after applying the following transformation:\n"
         f"{output_var}[n] = {op_str_symbolic}"
     )
@@ -146,7 +202,7 @@ def template_signal_operations():
         
         f"**Step 3:** Construct the Final Sequence\n"
         f"By collecting the values at their new indices, we get the final sequence.\n"
-        f"Remember that any index not explicitly calculated has a value of 0.\n\n"
+        f"Remember that any index not explicitly calculated has a value of 0, and the origin n = 0 is marked with asterisks.\n\n"
         
         f"**Answer:**\n"
         f"The resulting sequence is {output_var}[n] = {result_n_str}"
@@ -601,149 +657,188 @@ def template_impulse_response_from_lccde():
         1. Impulse Response: h[n] = T{delta[n]}
         2. Causality: h[n] = 0 for n < 0
 
+    Screen pass 1 (2026-09-23):
+        Two judges reported the answer's formatting and one the stability
+        wording. The second-order answer printed C2 unrounded
+        ("0.06066017177982138(0.59)^n") because the local sign helper ignored
+        its rounded argument (242/246 second-order seeds in 500), and the 2x2
+        system was stated with roots at 2 dp but solved with the exact roots.
+        The helper is replaced by the shared signed_term; each root is bound
+        through its 2-dp display before the solve (D-016 part 2), so solving
+        the printed system gives the printed C1, C2, which are rounded
+        half-up at 2 dp (D-012); a draw whose C1 or C2 sits on a 2-dp tie is
+        redrawn (D-016 part 3; 0/246 second-order seeds in 500). Products are
+        written with an explicit "*" ("12*(-5)^(n-1)*u[n-1]"). The
+        first-order text called (-a1)^(n-1) "a decaying exponential" on every
+        seed although |a1| >= 1 always; the wording now follows |base|. The
+        judges' "undefined signed_term" is the module import they were not
+        shown. Question text is unchanged on every seed that is not redrawn;
+        the gold coefficients move in the last digit where the bound roots
+        round C1 or C2 differently (31/246 second-order seeds).
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the impulse response.
             - str: A step-by-step solution detailing the recursive method.
     """
     # 1. Parameterize by randomly choosing system order and coefficients
-    
+
     order = random.choice(['first', 'second'])
-    
+
     # Generate coefficients with small integer values for clarity
     b0 = random.randint(1, 4) * random.choice([-1, 1])
     a1 = random.randint(1, 5) * random.choice([-1, 1])
-    
-    # Helper lambda to format coefficients into strings like "+ 3" or "- 2"
-    fmt = lambda c, v: f"+ {c}" if c > 0 else f"- {abs(c)}"
-    
+
+    # A signed coefficient renders as an operator and a magnitude ("+ 3", "- 2")
+    # through the shared signed_term helper; _2f formats a 2-dp magnitude.
+    _2f = lambda v: f"{v:.2f}"
+
     if order == 'first':
         # For first order, we can have b0*x[n] and b1*x[n-1] terms
         b1 = random.randint(1, 4) * random.choice([-1, 1])
-        
+
         # Build equation strings
-        y_terms = f"y[n] {fmt(a1, 'y[n-1]')}y[n-1]"
+        y_terms = f"y[n] {signed_term(a1)}y[n-1]"
         # Randomly omit b1 term for variety
         if random.random() < 0.4:
             b1 = 0
         x_terms = f"{b0}x[n]"
         if b1 != 0:
-            x_terms += f" {fmt(b1, 'x[n-1]')}x[n-1]"
-        
+            x_terms += f" {signed_term(b1)}x[n-1]"
+
         equation_str = f"{y_terms} = {x_terms}"
-        
+
         # 2. Perform the core calculation for a first-order system
         h0 = b0
         h1 = b1 - a1 * h0
-        
+        base = -a1
+
         term1_str = f"{h0}*delta[n]"
-        
+
         h_decay_expr = ""
         if h1 != 0:
-            base = -a1
-            # Use fmt helper to correctly sign the term
-            h_decay_expr = f" {fmt(h1, '')}({base})^(n-1) * u[n-1]"
-        
+            h_decay_expr = f" {signed_term(h1)}*({base})^(n-1)*u[n-1]"
+
         final_h_n = f"{term1_str}{h_decay_expr}"
-        
+
+        # (base)^(n-1) decays only for |base| < 1; with |a1| >= 1 it never
+        # does, so the description follows the magnitude of the base.
+        if abs(base) < 1:
+            behaviour = "a decaying exponential"
+        elif abs(base) == 1:
+            behaviour = f"an exponential of constant magnitude (|{base}| = 1)"
+        else:
+            behaviour = f"a growing exponential (|{base}| > 1, so the system is unstable)"
+
         # 3. Generate the solution string for a first-order system
         solution_steps = (
             f"**Step 3:** Solve Recursively for Initial Conditions\n"
             f"We assume the system is causal, so **h[n] = 0 for n < 0**.\n\n"
             f"**For n = 0:**\n"
-            f"h[0] {fmt(a1, 'h[-1]')}h[-1] = {b0}*delta[0] {'+ 0' if b1==0 else ' ' + fmt(b1, 'delta[-1]')+'*delta[-1]'}\n"
-            f"h[0] {fmt(a1, '0')}*(0) = {b0}*(1) {signed_term(b1)}*(0)\n"
+            f"h[0] {signed_term(a1)}h[-1] = {b0}*delta[0] {'+ 0' if b1==0 else signed_term(b1)+'*delta[-1]'}\n"
+            f"h[0] {signed_term(a1)}*(0) = {b0}*(1) {signed_term(b1)}*(0)\n"
             f"**h[0] = {h0}**\n\n"
-            
+
             f"**For n = 1:**\n"
-            f"h[1] {fmt(a1, 'h[0]')}h[0] = {b0}*delta[1] {fmt(b1, 'delta[0]')}*delta[0]\n"
-            f"h[1] {fmt(a1, h0)}*({h0}) = {b0}*(0) {signed_term(b1)}*(1)\n"
+            f"h[1] {signed_term(a1)}h[0] = {b0}*delta[1] {signed_term(b1)}*delta[0]\n"
+            f"h[1] {signed_term(a1)}*({h0}) = {b0}*(0) {signed_term(b1)}*(1)\n"
             f"h[1] = {b1} - ({a1*h0})\n"
             f"**h[1] = {h1}**\n\n"
-            
+
             f"**Step 4:** Find the Homogeneous Solution\n"
             f"For n >= 2, the input delta terms are zero. The equation becomes homogeneous:\n"
-            f"h[n] {fmt(a1, 'h[n-1]')}h[n-1] = 0  =>  h[n] = {-a1}*h[n-1]\n\n"
-            f"The solution to this recurrence for n >= 1 is a decaying exponential that starts at n=1 with value h[1].\n"
-            f"This part of the response can be written as h[1]*({-a1})^(n-1)*u[n-1].\n\n"
-            
+            f"h[n] {signed_term(a1)}h[n-1] = 0  =>  h[n] = {base}*h[n-1]\n\n"
+            f"The solution to this recurrence for n >= 1 is {behaviour} that starts at n=1 with value h[1].\n"
+            f"This part of the response can be written as h[1]*({base})^(n-1)*u[n-1].\n\n"
+
             f"**Step 5:** Combine Results for the Final Expression\n"
             f"The total impulse response is the sum of the value at n=0 and the response for n >= 1:\n"
-            f"h[n] = h[0]*delta[n] + h[1]*({-a1})^(n-1)*u[n-1]\n"
+            f"h[n] = h[0]*delta[n] + h[1]*({base})^(n-1)*u[n-1]\n"
         )
 
     else: # order == 'second'
-        # To guarantee real, distinct roots: D = a1^2 - 4*a2 > 0
-        a2 = random.randint(-5, 5)
-        if a2 == 0: a2 = 1 # Avoid trivial case
-        while a1**2 - 4*a2 <= 0:
-            a1 = random.randint(-6, 6)
-            if a1 == 0: a1 = 1
-        
-        # Randomize RHS
-        b1 = random.randint(-3, 3) if random.random() > 0.4 else 0
-        # Force b2 = 0 to ensure the coefficient fitting method is valid
-        # If b2 != 0, there is an impulse at n=2 that breaks the homogeneous assumption for n>=2
-        b2 = 0 
+        # Draw, and redraw if a coefficient sits on a 2-dp display tie (D-016
+        # part 3). The first pass consumes the random stream exactly as it did
+        # before, so a seed that never ties is unchanged.
+        for _attempt in range(200):
+            # To guarantee real, distinct roots: D = a1^2 - 4*a2 > 0
+            a2 = random.randint(-5, 5)
+            if a2 == 0: a2 = 1 # Avoid trivial case
+            while a1**2 - 4*a2 <= 0:
+                a1 = random.randint(-6, 6)
+                if a1 == 0: a1 = 1
+
+            # Randomize RHS
+            b1 = random.randint(-3, 3) if random.random() > 0.4 else 0
+            # Force b2 = 0 to ensure the coefficient fitting method is valid
+            # If b2 != 0, there is an impulse at n=2 that breaks the homogeneous assumption for n>=2
+            b2 = 0
+
+            # 2. Perform the core calculation for a second-order system
+            h0 = b0
+            h1 = b1 - a1 * h0
+
+            # Correctly solve r^2 + a1*r + a2 = 0. The roots are stated to 2 dp
+            # and then consumed by the 2x2 solve for C1 and C2, so each is bound
+            # through that display (D-016 part 2): solving the printed system
+            # reproduces the printed coefficients.
+            discriminant = a1**2 - 4*a2
+            r1 = _as_printed((-a1 + math.sqrt(discriminant)) / 2, '.2f')
+            r2 = _as_printed((-a1 - math.sqrt(discriminant)) / 2, '.2f')
+
+            # Correctly solve for C1 and C2 with general h[0], h[1]
+            C1 = (h1 - h0 * r2) / (r1 - r2)
+            C2 = (h0 * r1 - h1) / (r1 - r2)
+            if not (_is_display_tie(C1, 2) or _is_display_tie(C2, 2)):
+                break
+
+        r1_str, r2_str = _2f(r1), _2f(r2)
+        # Decimal half-up at 2 dp (D-012); a value that rounds to zero prints as 0.00, not -0.00
+        C1_d = _hu(C1, 2) or 0.0
+        C2_d = _hu(C2, 2) or 0.0
+        C1_str, C2_str = _2f(C1_d), _2f(C2_d)
+
+        final_h_n = f"({C1_str}*({r1_str})^n {signed_term(C2_d, fmt=_2f)}*({r2_str})^n) * u[n]"
 
         # Build equation strings
         x_terms = f"{b0}x[n]"
-        if b1 != 0: x_terms += f" {fmt(b1, 'x[n-1]')}x[n-1]"
+        if b1 != 0: x_terms += f" {signed_term(b1)}x[n-1]"
         # b2 term removed
-        equation_str = f"y[n] {fmt(a1, 'y[n-1]')}y[n-1] {fmt(a2, 'y[n-2]')}y[n-2] = {x_terms}"
-        
-        # 2. Perform the core calculation for a second-order system
-        h0 = b0
-        h1 = b1 - a1 * h0
-        
-        # Correctly solve r^2 + a1*r + a2 = 0
-        discriminant = a1**2 - 4*a2
-        r1 = (-a1 + math.sqrt(discriminant)) / 2
-        r2 = (-a1 - math.sqrt(discriminant)) / 2
-        r1_str, r2_str = f"{r1:.2f}", f"{r2:.2f}"
-        
-        # Correctly solve for C1 and C2 with general h[0], h[1]
-        if abs(r1 - r2) < 1e-9: # Failsafe for very close roots
-            r1, r2 = round(r1, 2), round(r2, 2)
-        C1 = (h1 - h0 * r2) / (r1 - r2)
-        C2 = (h0 * r1 - h1) / (r1 - r2)
-        C1_str, C2_str = f"{C1:.2f}", f"{C2:.2f}"
-        
-        final_h_n = f"({C1_str}({r1_str})^n {fmt(C2, C2_str)}({r2_str})^n) * u[n]"
-        
+        equation_str = f"y[n] {signed_term(a1)}y[n-1] {signed_term(a2)}y[n-2] = {x_terms}"
+
         # 3. Generate the solution string for a second-order system
-        h_eq = f"h[n] {fmt(a1, 'h[n-1]')}h[n-1] {fmt(a2, 'h[n-2]')}h[n-2]"
+        h_eq = f"h[n] {signed_term(a1)}h[n-1] {signed_term(a2)}h[n-2]"
         d_eq = f"{b0}*delta[n]"
-        if b1 != 0: d_eq += f" {fmt(b1, 'd[n-1]')}*delta[n-1]"
+        if b1 != 0: d_eq += f" {signed_term(b1)}*delta[n-1]"
 
         solution_steps = (
             f"**Step 3:** Solve Recursively for Initial Conditions\n"
             f"We assume the system is causal, so **h[n] = 0 for n < 0**.\n\n"
             f"**For n = 0:**\n"
-            f"h[0] {fmt(a1, 'h[-1]')}h[-1] {fmt(a2, 'h[-2]')}h[-2] = {b0}*delta[0] ... (other delta terms are 0)\n"
-            f"h[0] {fmt(a1, '0')}*(0) {fmt(a2, '0')}*(0) = {b0}*(1)\n"
+            f"h[0] {signed_term(a1)}h[-1] {signed_term(a2)}h[-2] = {b0}*delta[0] ... (other delta terms are 0)\n"
+            f"h[0] {signed_term(a1)}*(0) {signed_term(a2)}*(0) = {b0}*(1)\n"
             f"**h[0] = {h0}**\n\n"
             f"**For n = 1:**\n"
-            f"h[1] {fmt(a1, 'h[0]')}h[0] {fmt(a2, 'h[-1]')}h[-1] = ... {fmt(b1, 'd[0]')}*delta[0] ...\n"
-            f"h[1] {fmt(a1, h0)}*({h0}) {fmt(a2, '0')}*(0) = {b0}*(0) {signed_term(b1)}*(1)\n"
+            f"h[1] {signed_term(a1)}h[0] {signed_term(a2)}h[-1] = ... {signed_term(b1)}*delta[0] ...\n"
+            f"h[1] {signed_term(a1)}*({h0}) {signed_term(a2)}*(0) = {b0}*(0) {signed_term(b1)}*(1)\n"
             f"h[1] = {b1} {signed_term(-(a1*h0))}\n"
             f"**h[1] = {h1}**\n\n"
 
             f"**Step 4:** Find the Homogeneous Solution\n"
             f"For n >= 2, the input is zero (since b2=0), so the equation becomes homogeneous:\n"
-            f"h[n] {fmt(a1, 'h[n-1]')}h[n-1] {fmt(a2, 'h[n-2]')}h[n-2] = 0\n\n"
-            f"We solve this by finding the roots of the characteristic equation: r^2 {fmt(a1, 'r')}r {fmt(a2, '')} = 0\n"
+            f"h[n] {signed_term(a1)}h[n-1] {signed_term(a2)}h[n-2] = 0\n\n"
+            f"We solve this by finding the roots of the characteristic equation: r^2 {signed_term(a1)}r {signed_term(a2)} = 0\n"
             f"Using the quadratic formula, the roots are r1 = {r1_str}, r2 = {r2_str}.\n"
             f"The general solution for n >= 0 is h[n] = C1*({r1_str})^n + C2*({r2_str})^n.\n\n"
-            
+
             f"**Step 5:** Use Initial Conditions to Find Coefficients\n"
             f"We use h[0] and h[1] to create a system of two equations:\n"
             f"1) For n=0: h[0] = C1 + C2  =>  {h0} = C1 + C2\n"
-            f"2) For n=1: h[1] = C1*({r1_str}) + C2*({r2_str})  =>  {h1} = {r1_str}*C1 {signed_term(float(r2_str))}*C2\n\n"
+            f"2) For n=1: h[1] = C1*({r1_str}) + C2*({r2_str})  =>  {h1} = {r1_str}*C1 {signed_term(r2, fmt=_2f)}*C2\n\n"
             f"Solving this system yields:\n"
             f"**C1 = {C1_str}** and **C2 = {C2_str}**\n"
         )
-        
+
     question = (
         f"A causal LTI system is described by the difference equation:\n"
         f"{equation_str}\n\n"

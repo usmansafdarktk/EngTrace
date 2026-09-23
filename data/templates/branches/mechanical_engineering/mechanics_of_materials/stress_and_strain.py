@@ -730,6 +730,31 @@ def template_poissons_ratio():
         redrawn (D-016 part 3): those are quotients, or a product whose
         display precision is the answer's, so no display makes them exact.
 
+    Screen pass 1 (2026-09-23):
+        One judge: Hooke's law is applied "at 0.1-0.4% strain to arbitrary
+        materials (including concrete in tension at ~80 MPa)". Confirmed:
+        seed 1001 loaded a concrete rod to 79.6 MPa in tension, and over
+        503 seeds the sampled stress reached 118 MPa in concrete, 267 MPa
+        in borosilicate glass, 1423 MPa in alumina and 63 MPa in lead, each
+        beyond what the material sustains in its linear range; natural
+        rubber, whose load rounds to the 1 kN / 1 kip floor, realised
+        strains above 100% on every draw. MATERIAL_PROPERTIES carries E and
+        nu only, no strength, so the check cannot be made per material;
+        the five materials that are not linear-elastic anywhere in the
+        window are excluded by name, and a draw whose integer load realises
+        a strain outside the window is redrawn (see the two sampling
+        comments). Measured: 5.8% of HEAD instances realised a strain
+        outside the window (4.0% above 1%); after the fix 0 of 500 do, and
+        the question and answer moved on 20.4% of 501 seeds (0-500). Round
+        trip (T2): 4 of 500 seeds failed at HEAD (93, 341, 493 in this
+        class), 1 does now (seed 381, delta_d = -0.0013 in, a two-figure
+        answer against the oracle's 5-dp quantisation, 0.76%), which is the
+        oracle's comparison rule, not the trace. Residual, recorded and not
+        acted on: the top of the window (0.4%) exceeds the yield of the mild
+        tempers of several ductile metals (800 MPa in steel), a grade
+        question the table does not answer; a lower ceiling would leave
+        part (a) with one significant figure at the 5-dp display.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the change in diameter.
@@ -737,7 +762,28 @@ def template_poissons_ratio():
     """
     # 1. Parameterize inputs
     use_si_units = random.choice([True, False])
-    material_name = random.choice(list(MATERIAL_PROPERTIES.keys()))
+
+    # Screen pass 1 (2026-09-23): the trace applies Hooke's law at 0.1-0.4 %
+    # strain. Four table materials are not linear-elastic anywhere in that
+    # window, whatever their grade: concrete (tensile cracking near 0.01 %,
+    # compressive linearity to about 0.05 %), borosilicate glass and alumina
+    # (brittle; tensile fracture below about 0.1 %), and lead (yields at a
+    # few MPa, about 0.05 %, and creeps at room temperature). Natural rubber
+    # (E = 1.5 MPa) cannot be sampled inside the window at all: the load
+    # that would realise it rounds to 0 kN or 0 kips on every rod in range,
+    # and the floor of 1 kN or 1 kip below then realises a strain above
+    # 100 % (a negative final diameter at seed 112). The table has no
+    # strength column, so the five are excluded by name, by redraw so that
+    # the other seeds keep their draw (D-031).
+    NOT_LINEAR_ELASTIC_IN_WINDOW = ("Concrete", "Glass (Borosilicate)",
+                                    "Ceramic (Alumina Al2O3)", "Lead",
+                                    "Natural Rubber")
+    for _attempt in range(100):
+        material_name = random.choice(list(MATERIAL_PROPERTIES.keys()))
+        if material_name not in NOT_LINEAR_ELASTIC_IN_WINDOW:
+            break
+    else:
+        raise RuntimeError("poissons_ratio: no linear-elastic material in 100 draws")
     material = MATERIAL_PROPERTIES[material_name]
     precision = 5
 
@@ -824,6 +870,14 @@ def template_poissons_ratio():
             delta_exact = initial_diameter_in * lateral_strain
             delta_diameter_in = _as_printed(delta_exact, f'.{precision}f')
             final_diameter_in = _as_printed(initial_diameter_in + delta_diameter_in, f'.{precision}f')
+
+        # Screen pass 1 (2026-09-23): the integer load is what the question
+        # states, so the strain it realises is the one Hooke's law is applied
+        # to. Rounding a small load up to 1 kN or 1 kip carries a soft polymer
+        # rod outside the 0.1-0.4 % window the draw targeted (PTFE at 1 kip
+        # on a 1 in rod is 1.8 % strain); such a draw is rejected like a tie.
+        if not (0.001 <= abs(axial_exact) <= 0.004):
+            continue
 
         # A quotient or product of short decimals can sit exactly on a
         # half-way display tie, where no rounding closes the line for every

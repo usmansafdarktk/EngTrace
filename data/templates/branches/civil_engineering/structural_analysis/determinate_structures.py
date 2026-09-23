@@ -196,6 +196,19 @@ def template_truss_method_of_joints():
         rounded either way (D-016/D-037); the answer's 2-dp display is
         unchanged.
 
+    Screen pass 1 (2026-09-23):
+        A judge read the gold as resting on an unstated L-to-3-dp /
+        sin-to-4-dp rounding path that can differ from the exact force.
+        The path is the stated round-then-recompute convention: every
+        consumed operand is the value printed, so each line closes from
+        the line above. Measured at 500 seeds, the 2-dp gold differs from
+        the 2-dp rounding of the exact force on 22.8% of draws, by one
+        unit in the last place (two on a single draw; worst relative gap
+        4.4e-4). Step 2 now states the path in one sentence; no number,
+        draw or step changes. The same judge's "3.0 / 4.243 = 0.7070" is
+        not a defect: the exact quotient is 0.7070469..., which rounds to
+        0.7070, and the line closes.
+
     Returns:
         tuple: (question, solution)
     """
@@ -247,6 +260,8 @@ def template_truss_method_of_joints():
         f"Ay = P / 2 = {P} / 2 = {Ay:.1f} kN\n\n"
         f"**Step 2:** Establish the geometry of diagonal AB.\n"
         f"Let theta be the inclination of AB to the horizontal chord AC.\n"
+        f"Lengths are rounded to 3 dp and sines to 4 dp; each later step "
+        f"uses the rounded value as printed.\n"
         f"Member length: L_AB = sqrt(h^2 + b^2) = sqrt({h:.1f}^2 + "
         f"{b:.1f}^2) = {L_ab:.3f} m\n"
         f"sin(theta) = h / L_AB = {h:.1f} / {L_ab:.3f} = {sin_t:.4f}\n\n"

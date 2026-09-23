@@ -1,6 +1,6 @@
 {
- "generated": "2026-09-23T16:31:49+00:00",
- "git_head": "9d79d0df8d554bffcb32f2e95c47f7baac354d10",
+ "generated": "2026-09-23T19:30:18+00:00",
+ "git_head": "8224d8baec3c958343fe58b995f7abd2fffdecbb",
  "seeds": 500,
  "rows": {
   "template_levenspiel_plot_interpretation": {
@@ -23,7 +23,7 @@
   },
   "template_batch_reactor_second_order": {
    "branch": "chemical_engineering",
-   "checks": 0,
+   "checks": 500,
    "skipped": 0,
    "instances_with_tie": 0,
    "rate": 0.0,
@@ -77,7 +77,7 @@
   },
   "template_gas_phase_concentration": {
    "branch": "chemical_engineering",
-   "checks": 500,
+   "checks": 1500,
    "skipped": 0,
    "instances_with_tie": 0,
    "rate": 0.0,
@@ -194,7 +194,7 @@
   },
   "template_work_isothermal_virial": {
    "branch": "chemical_engineering",
-   "checks": 2500,
+   "checks": 4000,
    "skipped": 1000,
    "instances_with_tie": 0,
    "rate": 0.0,
@@ -266,7 +266,7 @@
   },
   "template_reynolds_number_flow_regime": {
    "branch": "chemical_engineering",
-   "checks": 0,
+   "checks": 500,
    "skipped": 0,
    "instances_with_tie": 0,
    "rate": 0.0,
@@ -685,7 +685,7 @@
   },
   "template_gauss_law_symmetric": {
    "branch": "electrical_engineering",
-   "checks": 754,
+   "checks": 1000,
    "skipped": 254,
    "instances_with_tie": 0,
    "rate": 0.0,
@@ -1265,10 +1265,10 @@
    "branch": "mechanical_engineering",
    "checks": 3000,
    "skipped": 500,
-   "instances_with_tie": 4,
-   "rate": 0.008,
+   "instances_with_tie": 6,
+   "rate": 0.012,
    "by_label": {
-    "epsilon_lateral": 4
+    "epsilon_lateral": 6
    },
    "examples": [
     "seed 30: epsilon_lateral = -(0.42) * (-1.2750e-03) = 5.355000e-04  (exact 0.000535500)",
@@ -1420,5 +1420,5 @@
    "examples": []
   }
  },
- "seconds": 206.5
+ "seconds": 85.0
 }

@@ -265,8 +265,31 @@ def existing_rows(path: Path) -> dict:
     return rows
 
 
+def carry_rows(from_pass: int, prompts: list[dict]) -> list[dict]:
+    """Rows of an earlier pass whose prompt text is byte-identical to the current one.
+
+    A judge's row is a verdict on a specific prompt text. Where a template has not
+    changed since the earlier pass, that verdict is a verdict on the corpus that ships,
+    so it is carried forward (marked, cost zeroed) rather than bought again; only
+    templates whose prompt hash moved are re-judged.
+    """
+    src = pass_dir(from_pass) / 'replies.jsonl'
+    if not src.exists():
+        raise SystemExit(f'nothing to carry: {src} does not exist')
+    current = {p['template_id']: p['prompt_sha256'] for p in prompts}
+    out = []
+    for ln in src.open(encoding='utf8'):
+        if not ln.strip():
+            continue
+        r = json.loads(ln)
+        if r.get('ok') and current.get(r['template_id']) == r['prompt_sha256']:
+            out.append({**r, 'carried_from': from_pass, 'carried_cost_usd': r.get('cost_usd'),
+                        'cost_usd': 0.0})
+    return out
+
+
 def run_pass(n: int, dry_run: bool, only: str | None, judge: str | None = None,
-             max_usd: float | None = None) -> None:
+             max_usd: float | None = None, carry_from: int | None = None) -> None:
     if not 1 <= n <= MAX_PASSES:
         raise SystemExit(f'the screen is capped at {MAX_PASSES} passes (one before human '
                          f'certification, one after); pass {n} is refused')
@@ -284,12 +307,23 @@ def run_pass(n: int, dry_run: bool, only: str | None, judge: str | None = None,
     for e in errors:
         print('  generation error:', e['template_id'], e['error'])
 
+    carried = carry_rows(carry_from, prompts) if carry_from else []
+    carried_keys = {(r['template_id'], r['judge']) for r in carried}
+    if carry_from:
+        changed = sorted({p['template_id'] for p in prompts
+                          if any((p['template_id'], j['key']) not in carried_keys for j in panel)})
+        print(f'carry-forward from pass {carry_from}: {len(carried)} rows on unchanged prompts; '
+              f'{len(changed)} templates changed and will be judged: {", ".join(changed)}')
+    to_judge = [p for p in prompts if any((p['template_id'], j['key']) not in carried_keys for j in panel)]
+    tokens = [len(p['prompt']) / 3.6 for p in to_judge]
+
     prices = live_prices()
     print('judges (live OpenRouter $/M in, out):')
     est_total = 0.0
     for j in panel:
         pin, pout = prices.get(j['model'], (float('nan'), float('nan')))
-        est = sum(tokens) / 1e6 * pin + j['out_tokens'] * len(prompts) / 1e6 * pout
+        n_j = sum(1 for p in to_judge if (p['template_id'], j['key']) not in carried_keys)
+        est = sum(tokens) / 1e6 * pin + j['out_tokens'] * n_j / 1e6 * pout
         est_total += est
         print(f"  {j['key']:14s} {j['model']:24s} {pin:6.2f} {pout:6.2f}  est. ${est:.2f} "
               f"({j['out_tokens']} output tokens per reply, as measured)")
@@ -300,7 +334,8 @@ def run_pass(n: int, dry_run: bool, only: str | None, judge: str | None = None,
     d = pass_dir(n)
     d.mkdir(parents=True, exist_ok=True)
     cfg = {'pass': n, 'panel': PANEL, 'call': CALL, 'provider_ignore': PROVIDER_IGNORE,
-           'attempts': ATTEMPTS, 'seeds': list(SEEDS), 'prompt_source': str(PROMPT_SOURCE.relative_to(REPO)),
+           'attempts': ATTEMPTS, 'seeds': list(SEEDS), 'carried_from': carry_from,
+           'carried_rows': len(carried), 'prompt_source': str(PROMPT_SOURCE.relative_to(REPO)),
            'prompt_template_sha256': sha(prompt_template()), 'git_head': git_head(),
            'started': dt.datetime.now(dt.timezone.utc).isoformat(timespec='seconds'),
            'templates': {p['template_id']: {'source_sha256': p['source_sha256'],
@@ -318,6 +353,14 @@ def run_pass(n: int, dry_run: bool, only: str | None, judge: str | None = None,
 
     out_path = d / 'replies.jsonl'
     done = existing_rows(out_path)
+    if carried:
+        fresh = [r for r in carried if (r['template_id'], r['judge']) not in done]
+        with out_path.open('a', encoding='utf8') as fh:
+            for r in fresh:
+                fh.write(json.dumps(r, ensure_ascii=False) + '\n')
+        if fresh:
+            print(f'wrote {len(fresh)} carried rows into pass {n}')
+        done = existing_rows(out_path)
     todo = [(p, j) for p in prompts for j in panel if (p['template_id'], j['key']) not in done]
     already = sum(r.get('cost_usd') or 0.0 for r in done.values())
     print(f'{len(done)} rows already judged (${already:.2f}), {len(todo)} to go'
@@ -420,6 +463,8 @@ def main() -> None:
     ap.add_argument('--judge', default=None, help='run one judge only (panel key), e.g. minimax-m3')
     ap.add_argument('--max-usd', type=float, default=None,
                     help='stop this run once its reported spend reaches this many dollars')
+    ap.add_argument('--carry-from', type=int, default=None,
+                    help='carry an earlier pass\'s rows forward where the prompt is unchanged; judge only the rest')
     a = ap.parse_args()
     global SMOKE
     SMOKE = a.smoke
@@ -429,7 +474,7 @@ def main() -> None:
     elif a.status:
         status(a.n)
     else:
-        run_pass(a.n, a.dry_run, a.only, a.judge, a.max_usd)
+        run_pass(a.n, a.dry_run, a.only, a.judge, a.max_usd, a.carry_from)
 
 
 if __name__ == '__main__':

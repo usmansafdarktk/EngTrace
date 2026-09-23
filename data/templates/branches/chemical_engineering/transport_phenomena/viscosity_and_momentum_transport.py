@@ -356,6 +356,26 @@ def template_reynolds_number_flow_regime():
             - L = characteristic length (e.g., pipe diameter or plate length)
             - μ = dynamic viscosity
 
+    Screen pass 1 (2026-09-23):
+        One judge (of three) reported a calculation discrepancy in one
+        instance; on the three screened seeds and at 500 seeds Re follows
+        from the printed operands to the half-unit, so that claim is
+        rejected. Verification found a real defect T1 could not see, because
+        the substitution and the result sat on separate lines: the viscosity
+        is stated with a 3-significant-figure `.2e` display, but three table
+        values (water 1.002e-3, ethanol 1.074e-3, mercury 1.526e-3) carry
+        four figures and were consumed at full precision, so the printed Re
+        was 0.2-0.4% off the reader's on 4.8% of draws. Such a value is now
+        displayed with four figures and the value used is the displayed one
+        (D-016 part 2, D-037); Step 2 prints the substitution and the result
+        on one line so T1 and the census cover it; a draw whose Re sits on a
+        half-way tie at the integer is redrawn (D-016). For a kept draw no
+        gold value changes and the question text changes only for those
+        three fluids. The tie screen redraws 1.5% of draws, concentrated
+        (D-045) on the fluids whose rho/mu terminates: whole milk over a
+        plate loses 41% of its draws, kerosene over a plate 27%, propane,
+        whole blood and kerosene in a pipe 12-15%.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking to compute the Reynolds number and find the flow regime.
@@ -364,28 +384,45 @@ def template_reynolds_number_flow_regime():
     # 1. Parameterize the inputs with random values
     all_fluids = {**COMMON_LIQUIDS, **COMMON_GASES}
     fluid_name, (density, viscosity) = random.choice(list(all_fluids.items()))
-    
-    # Randomly choose a flow geometry
-    geometry = random.choice(['pipe', 'flat plate'])
-    
-    if geometry == 'pipe':
-        # Pipe flow parameters
-        characteristic_length = round(random.uniform(0.01, 0.5), 3) # Diameter in m
-        velocity = round(random.uniform(0.1, 5.0), 2)
-        length_symbol = "D"
-        length_name = "diameter"
-        scenario_description = f"{fluid_name} is flowing through a smooth circular pipe with an internal {length_name} of {characteristic_length} m."
-        
-    else: # flat plate
-        # Flat plate flow parameters
-        characteristic_length = round(random.uniform(0.1, 2.0), 2) # Length in m
-        velocity = round(random.uniform(1.0, 20.0), 1)
-        length_symbol = "L"
-        length_name = "length"
-        scenario_description = f"A flow of {fluid_name} moves over a smooth, thin flat plate with a {length_name} of {characteristic_length} m."
+    # The viscosity is STATED with a 3-significant-figure `.2e` display, but
+    # three table values (water 1.002e-3, ethanol 1.074e-3, mercury 1.526e-3)
+    # carry four figures and were consumed at full precision, so the printed
+    # Re did not follow from the printed operands (0.2-0.4% off on 4.8% of
+    # draws). A value the 3-figure display cannot hold is displayed with four
+    # figures, and the value used is the displayed one (D-016 part 2, D-037).
+    mu_spec = '.2e' if float(format(viscosity, '.2e')) == viscosity else '.3e'
+    viscosity = _as_printed(viscosity, mu_spec)
 
-    # 2. Perform the core calculation
-    reynolds_number = (density * velocity * characteristic_length) / viscosity
+    for _attempt in range(200):
+        # Randomly choose a flow geometry
+        geometry = random.choice(['pipe', 'flat plate'])
+
+        if geometry == 'pipe':
+            # Pipe flow parameters
+            characteristic_length = round(random.uniform(0.01, 0.5), 3) # Diameter in m
+            velocity = round(random.uniform(0.1, 5.0), 2)
+            length_symbol = "D"
+            length_name = "diameter"
+            scenario_description = f"{fluid_name} is flowing through a smooth circular pipe with an internal {length_name} of {characteristic_length} m."
+
+        else: # flat plate
+            # Flat plate flow parameters
+            characteristic_length = round(random.uniform(0.1, 2.0), 2) # Length in m
+            velocity = round(random.uniform(1.0, 20.0), 1)
+            length_symbol = "L"
+            length_name = "length"
+            scenario_description = f"A flow of {fluid_name} moves over a smooth, thin flat plate with a {length_name} of {characteristic_length} m."
+
+        # 2. Perform the core calculation. Re is printed at the integer; a draw
+        # whose value sits exactly on a half-way tie there (possible only for a
+        # terminating viscosity such as 8.00e-6) is redrawn (D-016).
+        reynolds_number = (density * velocity * characteristic_length) / viscosity
+        if _is_display_tie(reynolds_number, 0):
+            continue
+        break
+    else:
+        raise RuntimeError(
+            "reynolds_number_flow_regime: no display-stable sample in 200 draws")
 
     # Determine flow regime based on geometry
     if geometry == 'pipe':
@@ -411,7 +448,7 @@ def template_reynolds_number_flow_regime():
         f"{scenario_description} The average velocity of the flow is {velocity} m/s.\n\n"
         f"The properties of {fluid_name} are:\n"
         f"- Density (ρ) = {density} kg/m³\n"
-        f"- Dynamic Viscosity (μ) = {viscosity:.2e} Pa·s\n\n"
+        f"- Dynamic Viscosity (μ) = {viscosity:{mu_spec}} Pa·s\n\n"
         f"Based on this information:\n"
         f"a) Calculate the Reynolds number (Re).\n"
         f"b) Determine the flow regime (laminar, transitional, or turbulent)."
@@ -421,7 +458,7 @@ def template_reynolds_number_flow_regime():
         f"**Given Information:**\n"
         f"- Fluid: {fluid_name}\n"
         f"- Density (ρ): {density} kg/m³\n"
-        f"- Dynamic Viscosity (μ): {viscosity:.2e} Pa·s\n"
+        f"- Dynamic Viscosity (μ): {viscosity:{mu_spec}} Pa·s\n"
         f"- Average Velocity (v): {velocity} m/s\n"
         f"- Characteristic Length ({length_symbol}): {characteristic_length} m ({length_name} of the {geometry})\n\n"
         
@@ -430,8 +467,7 @@ def template_reynolds_number_flow_regime():
         f"Re = (ρ * v * {length_symbol}) / μ\n\n"
         
         f"**Step 2:** Substitute the values and calculate Re.\n"
-        f"Re = ({density} * {velocity} * {characteristic_length}) / {viscosity:.2e}\n"
-        f"Re = {reynolds_number:,.0f}\n\n"
+        f"Re = ({density} * {velocity} * {characteristic_length}) / {viscosity:{mu_spec}} = {reynolds_number:,.0f}\n\n"
         
         f"**Step 3:** Determine the flow regime.\n"
         f"For flow in a **{geometry}**, we compare the calculated Re to the standard critical values.\n"
@@ -460,6 +496,16 @@ def template_power_law_fluid_shear():
             - Shear Stress: τ_yx = K * (dvx/dy)^n
             - Apparent Viscosity: η = K * |dvx/dy|^(n-1)
 
+    Screen pass 1 (2026-09-23):
+        Two judges found every fluid called "non-Newtonian" in the question
+        and Step 1 claiming unconditionally that the apparent viscosity
+        changes with shear rate, although three fluids in the table (water,
+        glycerol, air; 13% of draws) have n = 1. The wording is now
+        conditional on n: the question calls the fluid Newtonian when n = 1
+        and notes that the power law reduces to Newton's law there, and
+        Step 1 says whether the apparent viscosity decreases, increases or
+        stays constant with shear rate. No number changes.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for shear stress and apparent viscosity.
@@ -480,20 +526,32 @@ def template_power_law_fluid_shear():
     shear_stress = K * (velocity_gradient ** n)
     apparent_viscosity = K * (velocity_gradient ** (n - 1))
     
-    # Determine the fluid behavior for the explanation
+    # Determine the fluid behavior for the explanation. The wording is
+    # conditional on n (screen pass 1): three fluids in the table are Newtonian
+    # (n = 1), and for them the apparent viscosity does NOT change with shear.
     if n < 1:
         behavior = f"shear-thinning (pseudoplastic), because its power-law index n ({n}) is less than 1."
+        consequence = "This means its apparent viscosity decreases as the rate of shear increases."
+        fluid_class = "non-Newtonian"
+        model_note = ""
     elif n > 1:
         behavior = f"shear-thickening (dilatant), because its power-law index n ({n}) is greater than 1."
+        consequence = "This means its apparent viscosity increases as the rate of shear increases."
+        fluid_class = "non-Newtonian"
+        model_note = ""
     else:
         behavior = "Newtonian, because its power-law index n is exactly 1."
+        consequence = ("This means its apparent viscosity does not change with the rate of shear: "
+                       "it equals the consistency index K, which is then simply the dynamic viscosity.")
+        fluid_class = "Newtonian"
+        model_note = " (for n = 1 the power law reduces to Newton's law of viscosity)"
 
     # 3. Generate the question and solution strings
     question = (
-        f"A non-Newtonian fluid, {fluid_name.lower()}, is placed between two parallel plates "
+        f"A {fluid_class} fluid, {fluid_name.lower()}, is placed between two parallel plates "
         f"separated by {Y_cm} cm. The top plate moves at a constant velocity of {V} m/s, "
         f"creating a linear velocity profile in the fluid.\n\n"
-        f"The fluid follows the power-law model with the following parameters:\n"
+        f"The fluid follows the power-law model{model_note} with the following parameters:\n"
         f"- Consistency Index (K) = {K} Pa·s^n\n"
         f"- Power-Law Index (n) = {n}\n\n"
         f"Calculate:\n"
@@ -510,7 +568,7 @@ def template_power_law_fluid_shear():
         f"- Plate Separation (Y): {Y_cm} cm = {Y_m} m\n\n"
         
         f"**Step 1:** Characterize the Fluid Behavior.\n"
-        f"The fluid is {behavior} This means its apparent viscosity will change with the rate of shear.\n\n"
+        f"The fluid is {behavior} {consequence}\n\n"
         
         f"**Step 2:** Calculate the Velocity Gradient (Shear Rate).\n"
         f"Assuming a linear velocity profile:\n"

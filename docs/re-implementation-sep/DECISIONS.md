@@ -3512,10 +3512,42 @@ design. Pass 2 runs after human certification.
 
 ---
 
+## D-094 — The screen's flags are verified claims, not verdicts; 34 of 45 were real
+
+**Date:** 2026-09-24 · **Status:** DECIDED (owner: "apply fixes properly based on the judges'
+reviews") · **Source:** `template_annotation_23092026/screen/pass1_fixes.md`
+
+Pass 1 flagged 24 templates. Each judge sentence was treated as a claim and verified
+against the code and generated instances before any edit: 34 claims confirmed and
+fixed, 9 rejected with the evidence (among them the one-judge claim that a wave's
+direction convention was inverted, and a "calculation discrepancy" that was a
+correctly rounded quotient), 2 artefacts of the published prompt showing a function
+without its imports. Two findings were physics, not presentation: the virial-work
+template mixed pressure-explicit and volume-explicit forms so its printed non-ideal
+deviation was an artefact, and the gas-phase concentration template sampled ε
+independently of the stoichiometry it stated. Fixes follow D-016/D-037 for any
+numeric change; validity conditions (Vr ≥ 2 for the two-term virial, GM > 0 for
+upright floating, the elastic range for Poisson's ratio) were added as sampling
+constraints with their rejection rates measured and recorded. D-050's deferred
+origin-marker fix is applied. The item-pool consequence is large for four templates
+and is in `pass1_fixes.md` for the owner.
+
+**Pass 2 is targeted, with carry-forward.** A judge's row is a verdict on a specific
+prompt text, and each row records the prompt's hash; where a template's prompt is
+byte-identical to pass 1, the pass-1 row is carried into pass 2 marked as carried,
+cost zeroed, and only templates whose prompt changed are re-judged. That gives a
+complete pass-2 table over all 150 on the shipped corpus for about a sixth of a
+full pass's cost, and it is what a false-positive rate against the experts needs:
+the panel's verdict on the same version the experts will see. A full third pass is
+not needed unless human certification reworks a broad share of the corpus.
+
+---
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
+| D-094 | Whether to narrow the P2/Pc range in `work_isothermal_virial` (now 50% redraw) and accept the 41% stability redraw in `floating_object_submersion_depth`; the residuals in `pass1_fixes.md` | the item pool is regenerated |
 | D-092 | ~~Answer-display lengthening and gold-movement sign-offs~~ **Decided by the owner 2026-09-23:** the two lengthened answers stay; `beam_internal_moment`, `terzaghi_strip_footing_bearing` and `effective_stress_profile` answers are lengthened too; the gold movements are accepted; and a scoped third round removes the census ties at 3% and above (eight templates), with the frozen pool to be censused before inference and stragglers fixed then | — |
 | D-093 | ~~Approval to run screening pass 1~~ **Run 2026-09-23, $4.15.** Open now: which of the 24 flagged templates are fixed before human certification (owner), and whether the six rounding-chain claims go to the closure register or a fourth round | Layer 2 (human certification) starts |
 | — | Which families the next roster will evaluate (Kimi, GLM stay available as long as they are not judges) | the next benchmark run |

@@ -71,36 +71,74 @@ def template_undamped_natural_frequency_translational():
         f_n = omega_n / (2 * pi)
         tau_n = 1 / f_n
 
+    Screen pass 1 (2026-09-23):
+        One judge: "sequential rounding of intermediates ... produces
+        inconsistent arithmetic (e.g. displaying 1/0.82 = 1.219)".
+        Confirmed: at seed 1001 the trace printed f_n = 0.82 Hz and
+        tau_n = 1.219 s, while 1/0.82 = 1.2195 reads as 1.220; over 503
+        seeds the f_n line (printed omega_n over 2 pi) missed its printed
+        result by more than half a unit in the last place on 4.2% of
+        instances and the tau_n line on 7.8%. T1 does not read these lines,
+        because each expression and its result are printed on separate
+        lines, so closure was checked by hand in exact decimal from the
+        printed operands: 0 misses and 0 ties on 503 seeds after the fix.
+        Each displayed quantity is now bound through its display before the
+        next is derived from it, and a draw on a half-way display tie is
+        redrawn (see the sampling comment); display precision is unchanged.
+        The question is unchanged on all 501 seeds (0-500; no tie was hit);
+        f_n or tau_n moved by one unit in the last place on 11.4%, the
+        instances that did not close.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the system's natural frequencies and period.
             - str: A step-by-step solution to the problem.
     """
-    # 1. Parameterize the inputs with random values for high diversity
-    
-    # Mass (m): Chosen from a wide range to represent different scales,
-    # from small mechanical parts to larger objects.
-    mass = round(random.uniform(0.5, 750.0), 2)  # in kg
-
-    # Stiffness (k): Integer values representing a typical range for mechanical springs.
-    stiffness = random.randint(500, 250000)      # in N/m
-    
     # Standardize precision for all calculations and final outputs
     precision = 3
 
-    # 2. Perform the core calculations for the solution
-    
-    # Step A: Calculate the undamped natural frequency in radians per second
-    omega_n = math.sqrt(stiffness / mass)
-    
-    # Step B: Convert the natural frequency from rad/s to Hertz (Hz)
-    f_n = omega_n / (2 * math.pi)
-    
-    # Step C: Calculate the natural period of oscillation
-    tau_n = 1 / f_n
+    # Screen pass 1 (2026-09-23): omega_n, f_n and tau_n are each displayed
+    # at `precision` dp and then consumed by the next line, so each is bound
+    # through its display before the next is derived from it (D-016 part 2):
+    # f_n from the printed omega_n, tau_n from the printed f_n. A draw whose
+    # exact value sits on a half-way display tie is redrawn (D-016 part 3);
+    # all three are a square root or a quotient, so no display makes them
+    # exact (D-037 does not apply).
+    for _attempt in range(200):
+        # 1. Parameterize the inputs with random values for high diversity
+
+        # Mass (m): Chosen from a wide range to represent different scales,
+        # from small mechanical parts to larger objects.
+        mass = round(random.uniform(0.5, 750.0), 2)  # in kg
+
+        # Stiffness (k): Integer values representing a typical range for mechanical springs.
+        stiffness = random.randint(500, 250000)      # in N/m
+
+        # 2. Perform the core calculations for the solution
+
+        # Step A: Calculate the undamped natural frequency in radians per second
+        omega_exact = math.sqrt(stiffness / mass)
+        omega_n = _as_printed(omega_exact, f'.{precision}f')
+
+        # Step B: Convert the natural frequency from rad/s to Hertz (Hz)
+        f_exact = omega_n / (2 * math.pi)
+        f_n = _as_printed(f_exact, f'.{precision}f')
+
+        # Step C: Calculate the natural period of oscillation
+        tau_exact = 1 / f_n
+        tau_n = _as_printed(tau_exact, f'.{precision}f')
+
+        if (_is_display_tie(omega_exact, precision)
+                or _is_display_tie(f_exact, precision)
+                or _is_display_tie(tau_exact, precision)):
+            continue
+        break
+    else:
+        raise RuntimeError(
+            "undamped_natural_frequency_translational: no closing sample in 200 draws")
 
     # 3. Generate the question and solution strings
-    
+
     question = (
         f"An undamped single-degree-of-freedom system consists of a mass of {mass} kg "
         f"and a spring with a stiffness of {stiffness} N/m. "

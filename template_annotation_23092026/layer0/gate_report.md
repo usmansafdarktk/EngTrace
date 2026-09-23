@@ -1,6 +1,6 @@
 # Layer 0 gate report
 
-Generated 2026-09-23T16:33:42+00:00 by `gate.py` at git `9d79d0df8d`, 500 seeds per template, 320.5 s. Gating: T1, T3, T4, T8 plus generation errors. Advisory: T5, T7.
+Generated 2026-09-23T19:31:26+00:00 by `gate.py` at git `8224d8baec`, 500 seeds per template, 154.5 s. Gating: T1, T3, T4, T8 plus generation errors. Advisory: T5, T7.
 
 | | Templates |
 |---|---:|
@@ -14,7 +14,7 @@ Generated 2026-09-23T16:33:42+00:00 by `gate.py` at git `9d79d0df8d`, 500 seeds 
 | failing generation error | 0 |
 | T1 closure lines excused by the register | 1494 |
 | T2 oracles run (informational) | 13 (12 pass) |
-| T5 advisory, not passing | 62 |
+| T5 advisory, not passing | 60 |
 | T7 advisory, not passing | 83 |
 
 | Branch | pass | fail |
@@ -40,4 +40,4 @@ Closure failures excused because the check cannot read the line, not because the
 
 ## Closure marginals (informational)
 
-96 templates carry at least one marginal line (within tolerance, on a rounding boundary). Highest rates: `template_scs_curve_number_runoff` 64%, `template_best_hydraulic_rectangular_section` 62%, `template_rational_method_peak_flow` 61%, `template_upward_seepage_quick_condition` 59%, `template_hydraulic_jump_energy_loss` 59%.
+99 templates carry at least one marginal line (within tolerance, on a rounding boundary). Highest rates: `template_scs_curve_number_runoff` 64%, `template_best_hydraulic_rectangular_section` 62%, `template_rational_method_peak_flow` 61%, `template_upward_seepage_quick_condition` 59%, `template_hydraulic_jump_energy_loss` 59%.

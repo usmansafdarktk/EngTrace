@@ -153,6 +153,15 @@ def template_continuous_to_discrete_conversion():
         T = 1 / Fs
         omega = Omega * T
 
+    Screen pass 1 (2026-09-23):
+        One judge reported "an unconverted degree-valued phase inside a radian
+        cosine argument". Rejected: the phase is drawn in degrees or in
+        radians and is printed with its unit on every seed ("- 134 deg",
+        "+ 1.23 rad") in the question, in every step and in the answer
+        (237/500 seeds draw degrees), which is the standard mixed notation
+        cos(omega*n + phi) with phi labelled; nothing is inserted
+        unconverted. No change to the code.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the discrete-time representation of a signal.
@@ -350,6 +359,20 @@ def template_cd_dc_system_analysis():
         x[n] = x_c(nT)
         y_c(t) is the ideal reconstruction of y[n].
 
+    Screen pass 1 (2026-09-23):
+        One judge reported that "Time Delay = 2 * T = 2 * 1.56e-03 = 3.13e-03 s"
+        is false as printed: T is stated to 3 s.f. in the question and the
+        delay was computed from the exact 1/Fs (118/500 seeds disagree in the
+        last digit). T is bound through its display (D-016 part 2) and the
+        delay is n0 times that value, printed in fixed point to 6 dp: T lies
+        in 1.25e-4..3.3e-3 s, so a 3-s.f. T has at most 6 decimals and an
+        integer multiple of it is exact at that display, and no display tie
+        can arise (D-037). Fixed point rather than a longer "e" display
+        because the tie census and T1 read a scientific token's precision
+        from its mantissa alone. The question text is unchanged on every
+        seed; the gold delay changes format on every seed and value where
+        the bound T rounds it differently.
+
     Returns:
         tuple: A tuple containing:
             - str: A question describing the system and asking for the final output.
@@ -371,7 +394,9 @@ def template_cd_dc_system_analysis():
     # Sample at 3 to 8 times the Nyquist rate to make it a clear "ideal" case.
     sampling_factor = random.randint(3, 8)
     sampling_freq_hz = f_nyquist * sampling_factor
-    sampling_period = 1 / sampling_freq_hz
+    # The question states T to 3 s.f.; T is bound through that display so the
+    # delay a student computes from the stated T is the gold's (D-016 part 2).
+    sampling_period = _as_printed(1 / sampling_freq_hz, '.2e')
 
     # --- System Parameters ---
     gain_k = round(random.uniform(*GAIN_K_RANGE), 2)
@@ -383,6 +408,8 @@ def template_cd_dc_system_analysis():
     output_amplitude = round(amplitude * gain_k, 2)
 
     # The total time delay is the discrete sample delay multiplied by the sampling period.
+    # T is in 1.25e-4..3.3e-3 s, so an integer times its 3-s.f. value has at
+    # most 6 decimals: the 6-dp fixed display below is exact (D-037).
     time_delay_sec = delay_n0 * sampling_period
 
     # 3. Generate the question and solution strings
@@ -425,17 +452,17 @@ def template_cd_dc_system_analysis():
         f"time 'n' is mapped back to continuous time 't' via the relation t = nT.\n"
         f"y_c(t) = {output_amplitude} * cos({omega_continuous_str} * (t - {delay_n0}T))\n"
         f"The term {delay_n0}*T represents a time delay. Let's calculate its value:\n"
-        f"Time Delay = {delay_n0} * T = {delay_n0} * {sampling_period:.2e} = {time_delay_sec:.2e} s\n"
+        f"Time Delay = {delay_n0} * T = {delay_n0} * {sampling_period:.2e} = {time_delay_sec:.6f} s\n"
         f"Substituting this back, we get the final expression:\n"
-        f"y_c(t) = {output_amplitude} * cos({omega_continuous_str}*(t - {time_delay_sec:.2e}))\n\n"
+        f"y_c(t) = {output_amplitude} * cos({omega_continuous_str}*(t - {time_delay_sec:.6f}))\n\n"
 
         f"**Step 4:** Interpret the Result\n"
         f"The output signal y_c(t) is a modified version of the input signal x_c(t). "
         f"Its amplitude has been scaled by a factor of K = {gain_k}, and it has been "
-        f"time-delayed by {time_delay_sec:.2e} seconds.\n\n"
+        f"time-delayed by {time_delay_sec:.6f} seconds.\n\n"
 
         f"**Answer:**\n"
-        f"The final continuous-time output signal is y_c(t) = {output_amplitude} * cos({omega_continuous_str}*(t - {time_delay_sec:.2e}))."
+        f"The final continuous-time output signal is y_c(t) = {output_amplitude} * cos({omega_continuous_str}*(t - {time_delay_sec:.6f}))."
     )
 
     return question, solution

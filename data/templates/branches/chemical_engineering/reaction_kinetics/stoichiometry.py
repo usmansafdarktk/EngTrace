@@ -72,6 +72,30 @@ def template_batch_moles_vs_conversion():
         removing that requires lengthening the ANSWER display, which is a
         P6 change needing sign-off (D-044) and is recorded, not done, here.
 
+    Screen pass 1 (2026-09-23):
+        Two judges flagged `55.00000000000001 %` in the answer sentence
+        (X_A*100 interpolated raw; 9% of draws) and N_A printed through
+        round() while the other species are bound through their 3-dp
+        display. The percentage is now formatted at 1 dp (X_A itself is
+        unchanged) and N_A is bound through its 3-dp display like N_B, N_C
+        and N_D, so the stored value is the printed one. N_A0*(1 - X_A) is
+        exact at 4 dp, so its 3-dp display sits on a half-way tie on 10% of
+        draws, exactly as the products' displays do (18.8% of instances
+        carry at least one such tie; the census cannot see these lines,
+        whose products are implicit or `\\times`). Removing them means
+        printing the answers at their exact length: the D-044 decision
+        recorded above, still pending. Done 2026-09-24 on the owner's
+        decision (the D-044 sign-off, the round-3 policy applied to the
+        sibling flow template): the answer display is LENGTHENED to the
+        exact precision of the instance, `_p` = 4 dp for a = 1 and 6 dp for
+        the ammonia reaction (a = 4, ratios 5/4 and 6/4), and N_A, the three
+        products, N_B, N_C and N_D are computed in exact decimal arithmetic
+        bound half-up through that display in Step 3 and the Answer block,
+        so nothing rounds and no line can tie. The question is unchanged on
+        every seed; every gold answer's text lengthens, and its value moves
+        on the 75.8% of instances whose 3-dp display had rounded a 4- or
+        6-dp exact quantity (500 seeds).
+
     Returns:
         tuple: A tuple containing:
             - str: A question about calculating final moles in a batch reactor.
@@ -112,19 +136,24 @@ def template_batch_moles_vs_conversion():
     # Generate a realistic conversion for the limiting reactant A
     X_A = round(random.uniform(0.40, 0.95), 2)
 
-    # 2. Core Calculations
-    N_A = N_A0 * (1 - X_A)
-    # The stoichiometric products are PRINTED at 3 dp and then consumed, so
-    # each is bound through that display first and N_B is formed from the
-    # printed product (D-016 part 2). Only prod_B is consumed downstream; C
-    # and D are bound the same way so every printed intermediate is the value
-    # the trace used.
-    prod_B = _as_printed((b / a) * N_A0 * X_A, '.3f')
-    prod_C = _as_printed((c / a) * N_A0 * X_A, '.3f')
-    prod_D = _as_printed((d / a) * N_A0 * X_A, '.3f') if has_product_D else 0.0
-    N_B = _as_printed(N_B0 - prod_B, '.3f')
-    N_C = _as_printed(N_C0 + prod_C, '.3f')
-    N_D = _as_printed(N_D0 + prod_D, '.3f') if has_product_D else 0.0
+    # 2. Core Calculations, in exact decimal arithmetic and bound half-up
+    # through the display (D-016 part 2), as the sibling flow template does.
+    # The display precision is the exact precision of the instance: N_A0 * X_A
+    # and N_A0 * (1 - X_A) are exact at 4 dp, and dividing by a = 4 (ammonia
+    # oxidation, ratios 5/4 and 6/4) adds 2 dp; a = 1 for the other three
+    # reactions. N_A, the three products and N_B, N_C, N_D are all exact at
+    # `_p`, so nothing rounds and no printed line can tie (D-044, the owner's
+    # sign-off). The products are PRINTED and then consumed, so N_B is formed
+    # from the printed product, which is the exact one.
+    _p = {1: 4, 2: 5, 4: 6, 5: 5}[a]
+    _dA0, _dB0, _dX = Decimal(repr(N_A0)), Decimal(repr(N_B0)), Decimal(repr(X_A))
+    N_A = _hu(_dA0 * (1 - _dX), _p)
+    prod_B = _hu(_dA0 * _dX * b / a, _p)
+    prod_C = _hu(_dA0 * _dX * c / a, _p)
+    prod_D = _hu(_dA0 * _dX * d / a, _p) if has_product_D else 0.0
+    N_B = _hu(_dB0 - _dA0 * _dX * b / a, _p)
+    N_C = _hu(Decimal(repr(N_C0)) + _dA0 * _dX * c / a, _p)
+    N_D = _hu(Decimal(repr(N_D0)) + _dA0 * _dX * d / a, _p) if has_product_D else 0.0
 
     # 3. Generate Question and Solution Strings
     question = (
@@ -159,28 +188,28 @@ def template_batch_moles_vs_conversion():
     solution += (
         f"**Step 3:** Calculate Final Moles for Each Species\n"
         f"For {reactant_A_name} (A):\n"
-        f"$N_A = {N_A0}(1 - {X_A}) = {N_A0}({1-X_A:.2f}) = {round(N_A, 3)}$ mol\n\n"
+        f"$N_A = {N_A0}(1 - {X_A}) = {N_A0}({1-X_A:.2f}) = {N_A:.{_p}f}$ mol\n\n"
         f"For {reactant_B_name} (B):\n"
-        f"$N_B = {N_B0} - ({b}/{a}) \\times {N_A0} \\times {X_A} = {N_B0} - {prod_B} = {N_B}$ mol\n\n"
+        f"$N_B = {N_B0} - ({b}/{a}) \\times {N_A0} \\times {X_A} = {N_B0} - {prod_B:.{_p}f} = {N_B:.{_p}f}$ mol\n\n"
         f"For {product_C_name} (C):\n"
-        f"$N_C = 0 + ({c}/{a}) \\times {N_A0} \\times {X_A} = {prod_C} = {N_C}$ mol\n\n"
+        f"$N_C = 0 + ({c}/{a}) \\times {N_A0} \\times {X_A} = {prod_C:.{_p}f} = {N_C:.{_p}f}$ mol\n\n"
     )
     
     if has_product_D:
         solution += (
             f"For {product_D_name} (D):\n"
-            f"$N_D = 0 + ({d}/{a}) \\times {N_A0} \\times {X_A} = {prod_D} = {N_D}$ mol\n\n"
+            f"$N_D = 0 + ({d}/{a}) \\times {N_A0} \\times {X_A} = {prod_D:.{_p}f} = {N_D:.{_p}f}$ mol\n\n"
         )
         
     solution += (
         f"**Answer:**\n"
-        f"After reaching a conversion of ${X_A*100} \\%$, the final number of moles in the reactor are:\n"
-        f"- {reactant_A_name}: ${round(N_A, 3)}$ mol\n"
-        f"- {reactant_B_name}: ${N_B}$ mol\n"
-        f"- {product_C_name}: ${N_C}$ mol\n"
+        f"After reaching a conversion of ${X_A*100:.1f} \\%$, the final number of moles in the reactor are:\n"
+        f"- {reactant_A_name}: ${N_A:.{_p}f}$ mol\n"
+        f"- {reactant_B_name}: ${N_B:.{_p}f}$ mol\n"
+        f"- {product_C_name}: ${N_C:.{_p}f}$ mol\n"
     )
     if has_product_D:
-        solution += f"- {product_D_name}: ${N_D}$ mol"
+        solution += f"- {product_D_name}: ${N_D:.{_p}f}$ mol"
 
     return question, solution
 
@@ -517,55 +546,122 @@ def template_gas_phase_concentration():
         $C_A = C_{A0} \\frac{1 - X_A}{1 + \\epsilon X_A}$
         $C_B = C_{A0} \\frac{\\Theta_B - (b/a)X_A}{1 + \\epsilon X_A}$
 
+    Screen pass 1 (2026-09-23):
+        All three judges flagged placeholder product names (`Entity 3`,
+        `Species VII`) under random coefficients, and one that epsilon was
+        drawn independently of the stoichiometry. Both confirmed. The
+        reaction is now drawn from 24 real gas-phase reactions with two
+        reactants and a change in total moles (19 contractions, 5
+        expansions), named and balanced, and epsilon = y_A0*delta with
+        delta = (c + d - a - b)/a and y_A0 = 1/(1 + Theta_B) for a feed of A
+        and B only, which the question now states; Step 1 shows the check.
+        y_A0 is bound through its 4-dp display, y_A0*delta is exact at 4 dp
+        (5 dp for a half-integer delta) and printed at that length (D-037),
+        epsilon is stated at 2 dp and bound through it, and a draw whose
+        y_A0, epsilon, C_A or C_B display sits on a half-way tie is redrawn
+        (D-016). Every question and gold answer changes (the reaction list
+        and the random stream differ); |epsilon| now spans 0.20-0.91 (500
+        seeds) instead of the drawn 0.10-0.50, with 17% of instances
+        expanding; the tie screens redraw 2.0% of draws (1.6% on the 2-dp
+        epsilon display, scattered over Theta_B).
+
     Returns:
         tuple: A tuple containing:
             - str: A question about calculating gas-phase outlet concentrations.
             - str: A detailed solution showing the application of the correct formulas.
     """
     # 1. Randomized Parameters
-    
-    # Select unique names
-    reactant_A_name, reactant_B_name = random.sample(GAS_PHASE_REACTANTS, 2)
-    product_C_name = random.choice(PRODUCTS)
-    
-    # Stoichiometric coefficients
-    a = random.choice([1, 2])
-    b = random.randint(1, 3)
-    c = random.randint(1, 2)
 
-    # Initial concentration (gases have lower concentrations, units are mol/dm^3)
-    C_A0 = round(random.uniform(0.05, 0.25), 3)
-    
-    # Conversion
-    X_A = round(random.uniform(0.50, 0.90), 2)
-    
-    # Theta_B must be in excess of the stoichiometric requirement
-    Theta_B = round((b / a) * random.uniform(1.2, 2.5), 2)
-    
-    # Epsilon (ε) can be positive (expansion) or negative (contraction)
-    # Ensure it's not too close to zero to make the problem meaningful
-    epsilon = 0
-    while abs(epsilon) < 0.1:
-        epsilon = round(random.uniform(-0.5, 0.5), 2)
+    # Real gas-phase reactions with two reactants and a change in the total
+    # number of moles (screen pass 1: the product used to be drawn from a
+    # placeholder list, `Acetaldehyde + Ethane -> 2Entity 3`, under random
+    # coefficients). Fields: A, B, a, b, products [(name, coeff)], equation.
+    reactions = [
+        ("Ethylene", "Hydrogen", 1, 1, [("Ethane", 1)], "C2H4(g) + H2(g) → C2H6(g)"),
+        ("Propylene", "Hydrogen", 1, 1, [("Propane", 1)], "C3H6(g) + H2(g) → C3H8(g)"),
+        ("Acetylene", "Hydrogen", 1, 1, [("Ethylene", 1)], "C2H2(g) + H2(g) → C2H4(g)"),
+        ("Ethylene", "Hydrogen Chloride", 1, 1, [("Ethyl Chloride", 1)], "C2H4(g) + HCl(g) → C2H5Cl(g)"),
+        ("Acetylene", "Hydrogen Chloride", 1, 1, [("Vinyl Chloride", 1)], "C2H2(g) + HCl(g) → C2H3Cl(g)"),
+        ("Ethylene", "Chlorine", 1, 1, [("1,2-Dichloroethane", 1)], "C2H4(g) + Cl2(g) → C2H4Cl2(g)"),
+        ("Carbon Monoxide", "Chlorine", 1, 1, [("Phosgene", 1)], "CO(g) + Cl2(g) → COCl2(g)"),
+        ("Ethylene", "Water", 1, 1, [("Ethanol", 1)], "C2H4(g) + H2O(g) → C2H5OH(g)"),
+        ("Formaldehyde", "Hydrogen", 1, 1, [("Methanol", 1)], "CH2O(g) + H2(g) → CH3OH(g)"),
+        ("Acetaldehyde", "Hydrogen", 1, 1, [("Ethanol", 1)], "CH3CHO(g) + H2(g) → C2H5OH(g)"),
+        ("Butadiene", "Ethylene", 1, 1, [("Cyclohexene", 1)], "C4H6(g) + C2H4(g) → C6H10(g)"),
+        ("Carbon Monoxide", "Hydrogen", 1, 2, [("Methanol", 1)], "CO(g) + 2H2(g) → CH3OH(g)"),
+        ("Carbon Monoxide", "Hydrogen", 1, 3, [("Methane", 1), ("Water", 1)], "CO(g) + 3H2(g) → CH4(g) + H2O(g)"),
+        ("Carbon Dioxide", "Hydrogen", 1, 3, [("Methanol", 1), ("Water", 1)], "CO2(g) + 3H2(g) → CH3OH(g) + H2O(g)"),
+        ("Carbon Dioxide", "Hydrogen", 1, 4, [("Methane", 1), ("Water", 2)], "CO2(g) + 4H2(g) → CH4(g) + 2H2O(g)"),
+        ("Nitrogen", "Hydrogen", 1, 3, [("Ammonia", 2)], "N2(g) + 3H2(g) → 2NH3(g)"),
+        ("Sulfur Dioxide", "Oxygen", 2, 1, [("Sulfur Trioxide", 2)], "2SO2(g) + O2(g) → 2SO3(g)"),
+        ("Nitric Oxide", "Oxygen", 2, 1, [("Nitrogen Dioxide", 2)], "2NO(g) + O2(g) → 2NO2(g)"),
+        ("Ethylene", "Oxygen", 2, 1, [("Ethylene Oxide", 2)], "2C2H4(g) + O2(g) → 2C2H4O(g)"),
+        ("Methane", "Water", 1, 1, [("Carbon Monoxide", 1), ("Hydrogen", 3)], "CH4(g) + H2O(g) → CO(g) + 3H2(g)"),
+        ("Methane", "Carbon Dioxide", 1, 1, [("Carbon Monoxide", 2), ("Hydrogen", 2)], "CH4(g) + CO2(g) → 2CO(g) + 2H2(g)"),
+        ("Methane", "Oxygen", 2, 1, [("Carbon Monoxide", 2), ("Hydrogen", 4)], "2CH4(g) + O2(g) → 2CO(g) + 4H2(g)"),
+        ("Ethane", "Oxygen", 2, 1, [("Ethylene", 2), ("Water", 2)], "2C2H6(g) + O2(g) → 2C2H4(g) + 2H2O(g)"),
+        ("Propane", "Oxygen", 2, 1, [("Propylene", 2), ("Water", 2)], "2C3H8(g) + O2(g) → 2C3H6(g) + 2H2O(g)"),
+    ]
 
-    # 2. Core Calculations
-    denominator = 1 + epsilon * X_A
-    C_A = C_A0 * (1 - X_A) / denominator
-    C_B = C_A0 * (Theta_B - (b / a) * X_A) / denominator
+    for _attempt in range(200):
+        reactant_A_name, reactant_B_name, a, b, products, equation = random.choice(reactions)
+        # delta: change in total moles per mole of A reacted, (c + d - a - b)/a.
+        # Exact, since a is 1 or 2.
+        n_products = sum(coeff for _name, coeff in products)
+        delta = (n_products - a - b) / a
+
+        # Initial concentration (gases have lower concentrations, units are mol/dm^3)
+        C_A0 = round(random.uniform(0.05, 0.25), 3)
+
+        # Conversion
+        X_A = round(random.uniform(0.50, 0.90), 2)
+
+        # Theta_B must be in excess of the stoichiometric requirement
+        Theta_B = round((b / a) * random.uniform(1.2, 2.5), 2)
+
+        # Epsilon follows from the stoichiometry and the feed (Fogler): the
+        # feed is A and B only, so y_A0 = 1/(1 + Theta_B) and epsilon =
+        # y_A0*delta. It used to be drawn independently of both. y_A0 is
+        # printed at 4 dp and consumed, so it is bound through that display;
+        # y_A0*delta is exact at 4 dp (5 dp when delta is a half-integer) and
+        # printed at that length (D-037); epsilon is STATED at 2 dp, bound
+        # through it, and consumed downstream as stated. A draw whose y_A0 or
+        # epsilon display sits on a half-way tie is redrawn (D-016).
+        if _is_display_tie(1 / (1 + Theta_B), 4):
+            continue
+        y_A0 = _as_printed(1 / (1 + Theta_B), '.4f')
+        eps_dp = 4 if delta == int(delta) else 5
+        eps_full = _as_printed(y_A0 * delta, f'.{eps_dp}f')
+        if _is_display_tie(eps_full, 2):
+            continue
+        epsilon = _as_printed(eps_full, '.2f')
+
+        # 2. Core Calculations. The denominator is exact at 4 dp and bound
+        # through that display; the answers are printed at 4 dp, and a
+        # quotient sitting on a half-way tie there is redrawn (D-016).
+        denominator = _as_printed(1 + epsilon * X_A, '.4f')
+        C_A = C_A0 * (1 - X_A) / denominator
+        C_B = C_A0 * (Theta_B - (b / a) * X_A) / denominator
+        if _is_display_tie(C_A, 4) or _is_display_tie(C_B, 4):
+            continue
+        break
+    else:
+        raise RuntimeError(
+            "gas_phase_concentration: no display-stable sample in 200 draws")
 
     # 3. Generate Question and Solution Strings
     def format_species(coeff, name):
-        return f"{coeff if coeff > 1 else ''}{name}"
+        return f"{coeff} {name}" if coeff > 1 else name
 
     reaction_string = (
-        f"{format_species(a, reactant_A_name)} + {format_species(b, reactant_B_name)} -> "
-        f"{format_species(c, product_C_name)}"
+        f"{format_species(a, reactant_A_name)} + {format_species(b, reactant_B_name)} → "
+        + " + ".join(format_species(coeff, name) for name, coeff in products)
     )
 
     question = (
-        f"The following elementary gas-phase reaction occurs in a steady-state PFR:\n"
-        f"**Reaction:** ${reaction_string}$\n\n"
-        f"The reaction is carried out **isothermally** and **isobarically**. The feed enters the reactor with an initial concentration of {reactant_A_name} of $C_{{A0}} = {C_A0}$ mol/dm³.\n\n"
+        f"The following gas-phase reaction occurs in a steady-state PFR:\n"
+        f"**Reaction:** ${equation}$, i.e. {reaction_string}\n\n"
+        f"The reaction is carried out **isothermally** and **isobarically**. The feed contains only {reactant_A_name} (A) and {reactant_B_name} (B), with no inerts, and enters the reactor with an initial concentration of {reactant_A_name} of $C_{{A0}} = {C_A0}$ mol/dm³.\n\n"
         f"The following parameters are known:\n"
         f"- Molar feed ratio: $\\Theta_B = F_{{B0}}/F_{{A0}} = {Theta_B}$\n"
         f"- Volumetric change parameter: $\\epsilon = {epsilon}$\n\n"
@@ -577,7 +673,10 @@ def template_gas_phase_concentration():
         f"- Initial Concentration: $C_{{A0}} = {C_A0}$ mol/dm³\n"
         f"- Conversion: $X_A = {X_A}$\n"
         f"- Molar Feed Ratio: $\\Theta_B = {Theta_B}$\n"
-        f"- Volumetric Change Parameter: $\\epsilon = {epsilon}$\n"
+        f"- Volumetric Change Parameter: $\\epsilon = {epsilon}$ (as stated; it follows from the stoichiometry and the feed: "
+        f"$\\delta = (c + d - a - b)/a = ({n_products} - {a} - {b})/{a} = {delta}$ mol of total change per mol of A reacted, "
+        f"$y_{{A0}} = 1/(1 + \\Theta_B) = 1/(1 + {Theta_B}) = {y_A0:.4f}$, "
+        f"$\\epsilon = y_{{A0}} \\, \\delta = {y_A0:.4f} \\times ({delta}) = {eps_full:.{eps_dp}f} \\approx {epsilon}$)\n"
         f"- Stoichiometric Ratio: $b/a = {b}/{a} = {round(b/a, 2)}$\n\n"
         
         f"**Step 2:** State the Governing Equations\n"

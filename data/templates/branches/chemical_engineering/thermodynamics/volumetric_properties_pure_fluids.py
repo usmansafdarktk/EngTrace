@@ -71,6 +71,16 @@ def template_ideal_gas_volume():
 
             V = nRT / P
 
+    Screen pass 1 (2026-09-23):
+        One judge found Step 2 equating the stated 1-dp kPa pressure to an
+        integer Pa value from an independent rounding (`179.2 kPa = 179214
+        Pa`; 99% of draws). The Pa value is now the stated kPa times 1000
+        exactly and the volume is computed from it (D-016 part 2); the
+        question text is unchanged and the gold volume moves in its last
+        digit on 32% of seeds. V in m^3 is bound through its 5-dp display
+        before the litre conversion, and a draw whose 5-dp display sits on
+        a half-way tie is redrawn rather than resolved (D-016).
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking to compute the gas volume.
@@ -78,23 +88,34 @@ def template_ideal_gas_volume():
     """
     # 1. Parameterize the inputs with random values
     gas_name = random.choice(GAS_PHASE_REACTANTS)
-    # Moles of gas
-    n = round(random.uniform(0.5, 5.0), 2)
-    # Temperature in Kelvin
-    T_k = round(random.uniform(273.15, 500.0), 2)
-    # Pressure in Pascals (for calculation)
-    P_pa = round(random.uniform(100000, 500000))
-    # Pressure in Kilopascals (for the question text)
-    P_kpa = round(P_pa / 1000, 1)
-
     # Define the ideal gas constant in SI units
     R = 8.314  # Pa·m³/(mol·K)
 
-    # 2. Perform the core calculation
-    # Volume will be in cubic meters (m³)
-    V_m3 = (n * R * T_k) / P_pa
-    # Convert volume to Liters for the final answer
-    V_L = V_m3 * 1000
+    for _attempt in range(200):
+        # Moles of gas
+        n = round(random.uniform(0.5, 5.0), 2)
+        # Temperature in Kelvin
+        T_k = round(random.uniform(273.15, 500.0), 2)
+        # Pressure: sampled in Pa, STATED in the question in kPa at 1 dp. The
+        # Pa value the solution computes with is the stated value times 1000
+        # exactly, not the sampled integer it was rounded from (D-016 part 2).
+        P_kpa = round(round(random.uniform(100000, 500000)) / 1000, 1)
+        P_pa = int(round(P_kpa * 1000))
+
+        # 2. Perform the core calculation
+        # Volume will be in cubic meters (m³); it is printed at 5 dp and then
+        # converted, so it is bound through that display, and a draw whose
+        # 5-dp display sits on a half-way tie is redrawn (D-016).
+        V_m3 = (n * R * T_k) / P_pa
+        if _is_display_tie(V_m3, 5):
+            continue
+        V_m3 = _as_printed(V_m3, '.5f')
+        # Convert volume to Liters for the final answer
+        V_L = V_m3 * 1000
+        break
+    else:
+        raise RuntimeError(
+            "ideal_gas_volume: no display-stable sample in 200 draws")
 
     # 3. Generate the question and solution strings
     question = (
@@ -416,6 +437,21 @@ def template_pitzer_correlation_z():
         can sit exactly on a tie only for a terminating Tr, and such a draw is
         redrawn (D-016, D-045).
 
+    Screen pass 1 (2026-09-23):
+        One judge flagged states outside the correlation's accepted range
+        (Pr up to 2 at Tr near 1.1). The validity criterion applied is Smith,
+        Van Ness & Abbott's (7th ed., sec. 3.6, Fig. 3.14): the two-term
+        virial equation with the generalized B-correlation is adequate where
+        Vr = V/Vc >= 2, the region below the line of that figure. A draw
+        outside it - 2.7% of draws over 5,000 seeds, all at Tr <= 1.52 and
+        high Pr (>= 1.4) - is redrawn; the sampling ranges are unchanged,
+        so only those seeds change (3.0% of 500). The high-T end of the
+        range is kept: thermal stability is
+        not a condition of the correlation. A second judge's claim that the
+        printed B0 + omega*B1 (0.0003192) differs from the value used is
+        rejected: -0.0399 + 0.304*0.1323 = 0.0003192 exactly, which is the
+        7-dp display the code binds.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking to compute the compressibility factor.
@@ -429,6 +465,7 @@ def template_pitzer_correlation_z():
         properties = CRITICAL_PROPERTIES[substance_name]
         Tc = properties["Tc"]
         Pc = properties["Pc"]
+        Vc = properties["Vc"]  # cm^3/mol
         omega = properties["omega"]
 
         # Generate random T and P in the gas phase (Tr > 1) and at low-moderate
@@ -464,6 +501,13 @@ def template_pitzer_correlation_z():
         Z = _as_printed(1 + ratio * bsum, '.4f')
         # Optional extension: Calculate molar volume, from the STATED Z
         V = (Z * R * T) / P
+        # Validity: the two-term virial equation with the Pitzer B-correlation
+        # is adequate only where Vr = V/Vc >= 2, the region below the line of
+        # SVA Fig. 3.14 (Smith, Van Ness & Abbott, 7th ed., sec. 3.6). A draw
+        # outside it (2.7% of draws: Tr <= 1.52 with high Pr) is redrawn; the
+        # sampling ranges are unchanged.
+        if V * 1000.0 / Vc < 2.0:
+            continue
         break
     else:
         raise RuntimeError(
@@ -657,6 +701,33 @@ def template_work_isothermal_virial():
         sit exactly on a half-way tie (R*T = 20.785 at 250.00 K, nitrogen, is
         the one such point on the input grid); such a draw is redrawn (D-016).
 
+    Screen pass 1 (2026-09-23):
+        One judge found the solution mixing virial forms: Z1 and Z2 came
+        from the pressure-explicit Z = 1 + B*P/(R*T), while the work
+        integral of Step 1 is that of the volume-explicit P = RT(1/V +
+        B/V^2). Confirmed. Under the pressure-explicit form V - RT/P = B is
+        constant, so the isothermal work between two pressures is
+        RT*ln(P2/P1) exactly (the ideal-gas value), and the printed
+        deviation from it was an artefact of the mix (mean -7 J/mol, down
+        to -104, over the valid states; down to -14,000 outside them). The
+        volume-explicit form is now used throughout: Z is the physical root
+        of Z^2 - Z - B*P/(R*T) = 0, V = Z*R*T/P, and Step 4 is unchanged.
+        The deviation is then second order in B and positive (mean +6
+        J/mol on the valid states). Every gold answer changes. The same
+        judge's point about states where the two-term equation is not valid
+        is taken with the SVA criterion Vr = V/Vc >= 2 at both states (7th
+        ed., sec. 3.6, Fig. 3.14): about half of all draws fail it at the
+        final state P2 (sampled up to 5 Pc) - over 5,000 seeds 31% by
+        Vr < 2 and 19% with no real root - and are redrawn; the sampling
+        ranges are unchanged. Item-pool effect: the kept pool sits at higher
+        Tr (mean 2.07 -> 2.47, 10th percentile 1.38 -> 2.00) and slightly
+        lower P2/Pc (mean 3.73 -> 3.52); all 27 substances remain, the light
+        gases (ethane, ethylene, CO2, N2, O2) depleted by about a third.
+        Another judge's claim that
+        Z1 = 1.022 and V1 = 0.81278 did not follow from the printed operands
+        is rejected: 0.01746*129.3/(0.08314*1236.83) = 0.021954, so
+        Z1 = 1.0220, and 1.022*0.08314*1236.83/129.3 = 0.81278.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking to compute the work of compression.
@@ -672,6 +743,7 @@ def template_work_isothermal_virial():
         Tc = properties["Tc"]
         Pc = properties["Pc"]
         omega = properties["omega"]
+        Vc = properties["Vc"]  # cm^3/mol
 
         # Generate conditions in the gas phase (Tr > 1) at moderate pressures.
         # The question states T, so Tr is recomputed FORWARD from the stated T
@@ -694,11 +766,38 @@ def template_work_isothermal_virial():
         B1 = _as_printed(0.139 - 0.172 / (Tr**4.2), '.4f')
         B = _as_printed((R * Tc / Pc) * (B0 + omega * B1), '.5f')  # Units: L/mol
 
-        # Calculate initial and final states
-        Z1 = _as_printed(1 + (B * P1) / (R * T), '.4f')
-        Z2 = _as_printed(1 + (B * P2) / (R * T), '.4f')
+        # Initial and final states from the SAME equation the work integral
+        # uses, the volume-explicit Z = 1 + B/V (screen pass 1): with
+        # V = Z*R*T/P it is Z^2 - Z - B*P/(R*T) = 0, whose physical root is
+        # Z = (1 + sqrt(1 + 4*B*P/(R*T)))/2. Before, Z came from the
+        # pressure-explicit Z = 1 + B*P/(R*T), under which V - R*T/P = B is
+        # constant and the isothermal work is R*T*ln(P2/P1) exactly, so the
+        # printed deviation from the ideal gas was an artefact of the mix.
+        # A state with no real root is outside the validity region below.
+        disc1 = 1 + 4 * B * P1 / (R * T)
+        disc2 = 1 + 4 * B * P2 / (R * T)
+        if disc1 <= 0 or disc2 <= 0:
+            continue
+        # Z is printed at 4 dp and V at 5 dp, then consumed; each is bound
+        # through its display, and a draw whose display sits on a half-way
+        # tie is redrawn (D-016).
+        Z1_raw = (1 + math.sqrt(disc1)) / 2
+        Z2_raw = (1 + math.sqrt(disc2)) / 2
+        if _is_display_tie(Z1_raw, 4) or _is_display_tie(Z2_raw, 4):
+            continue
+        Z1 = _as_printed(Z1_raw, '.4f')
+        Z2 = _as_printed(Z2_raw, '.4f')
+        if _is_display_tie(Z1 * R * T / P1, 5) or _is_display_tie(Z2 * R * T / P2, 5):
+            continue
         V1 = _as_printed((Z1 * R * T) / P1, '.5f')
         V2 = _as_printed((Z2 * R * T) / P2, '.5f')
+        # Validity: the two-term virial equation is adequate only where
+        # Vr = V/Vc >= 2, the region below the line of SVA Fig. 3.14 (Smith,
+        # Van Ness & Abbott, 7th ed., sec. 3.6), at BOTH states. About half of
+        # all draws fail it at P2 (sampled up to 5 Pc); they are redrawn and
+        # the sampling ranges are unchanged.
+        if V1 * 1000.0 / Vc < 2.0 or V2 * 1000.0 / Vc < 2.0:
+            continue
 
         # R*T (7 dp) and B*R*T (12 dp) are finite decimals, so their 2-dp and
         # 3-dp displays CAN sit exactly on a half-way tie: R*T = 20.785 at
@@ -735,7 +834,7 @@ def template_work_isothermal_virial():
     solution = (
         f"**Step 1:** Define the pressure from the virial equation and find the analytical integral for work.\n"
         f"P = RT(1/V + B/V²)\n"
-        f"The integrated form is: W = -[RT·ln(V2/V1) - BRT(1/V2 - 1/V1)]\n\n"
+        f"The integrated form is: W = -(RT·ln(V2/V1) - BRT·(1/V2 - 1/V1))\n\n"
 
         f"**Step 2:** Calculate the second virial coefficient (B) at T = {T} K.\n"
         f"Reduced Temperature, Tr = T/Tc = {T}/{Tc} = {Tr}\n"
@@ -743,22 +842,23 @@ def template_work_isothermal_virial():
         f"B1 = 0.139 - 0.172 / ({Tr})**4.2 = {B1}\n"
         f"B = (R·Tc/Pc) * (B0 + ω·B1) = {B} L/mol\n\n"
 
-        f"**Step 3:** Determine the initial (V1) and final (V2) molar volumes.\n"
-        f"Z1 = 1 + B·P1/(R·T) = 1 + ({B}*{P1})/({R}*{T}) = {Z1}\n"
-        f"V1 = Z1·R·T/P1 = {V1} L/mol\n"
-        f"Z2 = 1 + B·P2/(R·T) = 1 + ({B}*{P2})/({R}*{T}) = {Z2}\n"
-        f"V2 = Z2·R·T/P2 = {V2} L/mol\n\n"
+        f"**Step 3:** Determine the initial (V1) and final (V2) molar volumes from the same equation, Z = 1 + B/V. "
+        f"With V = Z·R·T/P it becomes Z² - Z - B·P/(R·T) = 0, whose physical root is Z = (1 + sqrt(1 + 4·B·P/(R·T)))/2.\n"
+        f"Z1 = (1 + sqrt(1 + 4·B·P1/(R·T)))/2 = (1 + sqrt(1 + 4*{paren_neg(B)}*{P1}/({R}*{T})))/2 = {Z1}\n"
+        f"V1 = Z1·R·T/P1 = {Z1}*{R}*{T}/{P1} = {V1} L/mol\n"
+        f"Z2 = (1 + sqrt(1 + 4·B·P2/(R·T)))/2 = (1 + sqrt(1 + 4*{paren_neg(B)}*{P2}/({R}*{T})))/2 = {Z2}\n"
+        f"V2 = Z2·R·T/P2 = {Z2}*{R}*{T}/{P2} = {V2} L/mol\n\n"
 
         f"**Step 4:** Substitute V1 and V2 into the integrated work equation.\n"
-        f"W = -[{RT}·ln({V2}/{V1}) {signed_term(-BRT)}(1/{V2} - 1/{V1})]\n"
-        f"W = -[{term1} {signed_term(term2)}] = {W_virial_Lbar} L·bar/mol\n\n"
+        f"W = -({RT}·ln({V2}/{V1}) {signed_term(-BRT)}*(1/{V2} - 1/{V1}))\n"
+        f"W = -({term1} {signed_term(term2)}) = {W_virial_Lbar} L·bar/mol\n\n"
 
         f"**Step 5:** Convert the work to the required units (J/mol).\n"
         f"Since 1 L·bar = 100 J:\n"
         f"W = {W_virial_Lbar} L·bar/mol * 100 J/(L·bar) = {round(W_virial_J, 0)} J/mol\n\n"
 
         f"**For Comparison:** The work required for an ideal gas is W_ideal = -RT·ln(P1/P2) = {round(W_ideal_J, 0)} J/mol. "
-        f"The deviation shows the effect of intermolecular forces accounted for by the virial equation.\n\n"
+        f"The two-term virial equation changes the work only at second order in B: to first order V - RT/P = B is a constant offset that does no work between fixed pressures, so the deviation is small.\n\n"
 
         f"**Answer:** The required work of compression is approximately **{round(W_virial_J, 0)} J/mol**."
     )

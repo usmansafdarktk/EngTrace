@@ -8,7 +8,7 @@ described in the paper's section 3.3 and Appendix K.
 
 | Layer | What | Cost | State |
 |---|---|---|---|
-| 0 · deterministic gate | T1 closure, T3 determinism, T4 contract, T8 emission at 500 seeds; T5, T7 advisory; a register of four line classes the check cannot read | free | **green: 150 of 150 pass** (`layer0/gate_report.md`); 54 templates edited over three rounds (`closure_fixes.md`), 52 moved instances (`item_pool_impact.md`); residual ties only in 11 templates under 2% (`tie_census.md`), to be censused on the frozen pool |
+| 0 · deterministic gate | T1 closure, T3 determinism, T4 contract, T8 emission at 500 seeds; T5, T7 advisory; a register of four line classes the check cannot read | free | **green: 150 of 150 pass** (`layer0/gate_report.md`); 54 templates edited over three closure rounds (`closure_fixes.md`) and 24 after the screen (`../screen/pass1_fixes.md`); 68 moved instances (`item_pool_impact.md`); residual ties only in 11 templates under 2% (`tie_census.md`), to be censused on the frozen pool |
 | 1 · LLM screen | Appendix H's prompt, verbatim; three non-suite judges; two passes, hard-capped | $4.15 for pass 1 | **pass 1 done 2026-09-23**: 450 of 450 rows parsed; 126 pass, 13 controversial, 11 critical failure; AC1 on the flag 0.84 (`screen/pass1/stats.md`, `flagged.md`); pass 2 after human certification |
 | 2 · human certification | own-branch experts, three per template, with hand-checks and planted defects | expert time | not started; protocol to be written |
 

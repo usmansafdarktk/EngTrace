@@ -322,6 +322,19 @@ def template_average_energy_mqam():
     Core Equations:
         General Formula: E_avg = (2/3) * (M - 1) * A^2
 
+    Screen pass 1 (2026-09-23):
+        Two judges reported the Step 4 chain: "E_avg = 170.0 * 5.62" followed
+        by "E_avg = 954.87", which is not what 170 * 5.62 gives, because A^2
+        was displayed at 2 dp and consumed at full precision (179/254
+        non-integer-A seeds in 500). A^2 of a 2-dp A is exact at 4 dp, so it
+        is printed at 4 dp and bound through that display (D-016 part 2,
+        D-037); the coefficient (2/3)(M-1) is an integer for every M offered
+        and prints as one. E_avg is rounded half-up once, at the 2 dp it is
+        quoted to (D-012); an A ending in 5 at the hundredths puts E_avg on an
+        exact half-way value there, and such draws are redrawn (D-016 part 3;
+        21/500 seeds). Question text and the gold answer are unchanged on
+        every seed that is not redrawn.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the average energy.
@@ -329,20 +342,34 @@ def template_average_energy_mqam():
     """
     # 1. Parameterize the inputs with random values
     precision = 2
-    # Add 256-QAM to the list of possible modulation orders
-    M = random.choice([4, 16, 64, 256])
-    
-    # Randomly decide whether A is an integer or a float
-    if random.choice([True, False]):
-        A = random.randint(1, 10)
-    else:
-        A = round(random.uniform(0.2, 10.0), precision)
-    
-    # 2. Perform the core calculation based on M
-    
-    # The general formula for average energy in a square M-QAM is (2/3)(M-1)A^2
-    avg_energy_coeff = (2/3) * (M - 1)
-    avg_energy = avg_energy_coeff * (A**2)
+    # Draw, and redraw if E_avg sits on a display tie at `precision` dp
+    # (D-016 part 3). The first pass consumes the random stream exactly as it
+    # did before, so a seed that never ties is unchanged.
+    for _attempt in range(200):
+        # Add 256-QAM to the list of possible modulation orders
+        M = random.choice([4, 16, 64, 256])
+
+        # Randomly decide whether A is an integer or a float
+        if random.choice([True, False]):
+            A = random.randint(1, 10)
+        else:
+            A = round(random.uniform(0.2, 10.0), precision)
+
+        # 2. Perform the core calculation based on M
+
+        # The general formula for average energy in a square M-QAM is (2/3)(M-1)A^2;
+        # M - 1 is a multiple of 3 for every M offered, so the coefficient is an integer.
+        avg_energy_coeff = 2 * (M - 1) // 3
+        # A^2 of a 2-dp A is exact at 4 dp: it is printed at that length and
+        # bound through it (D-016 part 2, D-037), so the product line closes.
+        A_sq = A**2 if isinstance(A, int) else _as_printed(A**2, '.4f')
+        avg_energy = avg_energy_coeff * A_sq
+        # E_avg is quoted to `precision` dp; an A ending in 5 at the hundredths
+        # puts it exactly half-way there, where no rounding is defensible.
+        if isinstance(A, int) or not _is_display_tie(avg_energy, precision):
+            break
+    A_sq_str = str(A_sq) if isinstance(A, int) else f"{A_sq:.4f}"
+    E_avg_str = f"{_hu(avg_energy, precision)}"   # one decimal half-up rounding (D-012)
 
     # Build the solution steps string based on the value of M
     if M == 4:
@@ -423,12 +450,12 @@ def template_average_energy_mqam():
         
         f"**Step 4:** Final Calculation\n"
         f"Now, we substitute the value of A = {A}.\n"
-        f"E_avg = {round(avg_energy_coeff, precision)} * ({A})^2\n"
-        f"E_avg = {round(avg_energy_coeff, precision)} * {round(A**2, precision)}\n"
-        f"E_avg = {round(avg_energy, precision)}\n\n"
+        f"E_avg = {avg_energy_coeff} * ({A})^2\n"
+        f"E_avg = {avg_energy_coeff} * {A_sq_str}\n"
+        f"E_avg = {E_avg_str}\n\n"
 
         f"**Answer:**\n"
-        f"The average energy per symbol is {round(avg_energy, precision)}."
+        f"The average energy per symbol is {E_avg_str}."
     )
     
     return question, solution

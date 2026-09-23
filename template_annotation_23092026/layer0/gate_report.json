@@ -1,6 +1,6 @@
 {
- "generated": "2026-09-23T16:33:42+00:00",
- "git_head": "9d79d0df8d554bffcb32f2e95c47f7baac354d10",
+ "generated": "2026-09-23T19:31:26+00:00",
+ "git_head": "8224d8baec3c958343fe58b995f7abd2fffdecbb",
  "seeds": 500,
  "gating": [
   "T1",
@@ -23,7 +23,7 @@
   "generation error": 0
  },
  "advisory_failing": {
-  "T5": 62,
+  "T5": 60,
   "T7": 83
  },
  "register_absorbed": {
@@ -132,10 +132,10 @@
     "failures": 0,
     "excused": {},
     "unexcused": 0,
-    "marginals": 0,
-    "checks": 0,
+    "marginals": 293,
+    "checks": 500,
     "unit_rescales": 0,
-    "coverage": 0.0,
+    "coverage": 0.062,
     "examples": []
    },
    "T2": {
@@ -165,7 +165,7 @@
      "degenerate_product"
     ]
    },
-   "T5": false,
+   "T5": true,
    "T7": false
   },
   "template_batch_reactor_zero_order": {
@@ -398,10 +398,10 @@
     "failures": 0,
     "excused": {},
     "unexcused": 0,
-    "marginals": 0,
-    "checks": 500,
+    "marginals": 297,
+    "checks": 1500,
     "unit_rescales": 0,
-    "coverage": 0.091,
+    "coverage": 0.182,
     "examples": []
    },
    "T2": {
@@ -972,10 +972,10 @@
     "failures": 0,
     "excused": {},
     "unexcused": 0,
-    "marginals": 1121,
-    "checks": 2500,
+    "marginals": 1639,
+    "checks": 4000,
     "unit_rescales": 0,
-    "coverage": 0.312,
+    "coverage": 0.471,
     "examples": []
    },
    "T2": {
@@ -1331,10 +1331,10 @@
     "failures": 0,
     "excused": {},
     "unexcused": 0,
-    "marginals": 0,
-    "checks": 0,
+    "marginals": 278,
+    "checks": 500,
     "unit_rescales": 0,
-    "coverage": 0.0,
+    "coverage": 0.333,
     "examples": []
    },
    "T2": {
@@ -3246,9 +3246,9 @@
     "excused": {},
     "unexcused": 0,
     "marginals": 0,
-    "checks": 754,
+    "checks": 1000,
     "unit_rescales": 0,
-    "coverage": 0.081,
+    "coverage": 0.108,
     "examples": []
    },
    "T2": {
@@ -3902,7 +3902,7 @@
      "degenerate_product"
     ]
    },
-   "T5": false,
+   "T5": true,
    "T7": false
   },
   "template_signal_operations": {
@@ -5597,7 +5597,7 @@
     "failures": 0,
     "excused": {},
     "unexcused": 0,
-    "marginals": 275,
+    "marginals": 279,
     "checks": 500,
     "unit_rescales": 0,
     "coverage": 0.25,
@@ -5949,7 +5949,7 @@
     "failures": 0,
     "excused": {},
     "unexcused": 0,
-    "marginals": 789,
+    "marginals": 783,
     "checks": 3000,
     "unit_rescales": 0,
     "coverage": 0.521,
@@ -5960,13 +5960,12 @@
     "oracle": "tests.template_integrity.oracles.template_poissons_ratio",
     "checked": 500,
     "unparsed": 0,
-    "failures": 4,
-    "failure_rate": 0.008,
+    "failures": 1,
+    "failure_rate": 0.002,
     "worst_rel_error": 0.0076335877862595625,
     "note": "",
     "examples": [
-     "[roundtrip] template_poissons_ratio seed=93: question implies {'a_delta_d': 0.0018, 'b_d_final': 4.5318}, trace answers {'a_delta_d': 0.00179, 'b_d_final': 4.53179} (rel err 0.556%) - part 'a_delta_d'",
-     "[roundtrip] template_poissons_ratio seed=341: question implies {'a_delta_d': -0.0018, 'b_d_final': 4.5182}, trace answers {'a_delta_d': -0.00179, 'b_d_final': 4.51821} (rel err 0.556%) - part 'a_delta_d'"
+     "[roundtrip] template_poissons_ratio seed=381: question implies {'a_delta_d': -0.00131, 'b_d_final': 1.10869}, trace answers {'a_delta_d': -0.0013, 'b_d_final': 1.1087} (rel err 0.763%) - part 'a_delta_d'"
     ]
    },
    "T3": {
@@ -6090,7 +6089,7 @@
     "failures": 0,
     "excused": {},
     "unexcused": 0,
-    "marginals": 882,
+    "marginals": 902,
     "checks": 4000,
     "unit_rescales": 1000,
     "coverage": 0.471,
@@ -6103,7 +6102,7 @@
     "unparsed": 0,
     "failures": 0,
     "failure_rate": 0.0,
-    "worst_rel_error": 9.330969487726158e-05,
+    "worst_rel_error": 9.727626459136823e-05,
     "note": "",
     "examples": []
    },
@@ -6748,5 +6747,5 @@
    "T7": false
   }
  },
- "seconds": 320.5
+ "seconds": 154.5
 }

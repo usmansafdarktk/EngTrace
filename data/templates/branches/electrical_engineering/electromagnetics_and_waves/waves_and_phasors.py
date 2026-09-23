@@ -371,6 +371,25 @@ def template_wave_equation_interpretation():
         lambda = 2 * pi / k
         u_p = omega / k
 
+    Screen pass 1 (2026-09-23):
+        All three judges flagged the solution. The Given line printed the
+        equation twice ("E(z, t) = E(z, t) = ..."); it is printed once. The
+        question states k to 2 dp while lambda and u_p were computed from the
+        unrounded k, so the printed lambda = 2*pi/k disagreed with the k the
+        student was given on 152/500 seeds and u_p on 267/500; k is bound
+        through its display (D-016 part 2) and lambda, u_p are derived from
+        it. The numeric omega in the f and u_p lines was its 4-s.f. display,
+        which gives 250.04 MHz on a line whose gold says 250.00 (375/500
+        seeds); both lines now use the exact symbolic omega the question
+        states, with f written as an exact multiple of 10^8 Hz. k,
+        lambda = 2*pi/k and u_p = omega/k are irrational, so no display tie
+        can arise and nothing is redrawn. The third judge's claim that the
+        propagation direction is inverted is rejected: cos(omega*t - k*z)
+        travels toward +z and the template says so on every seed (500/500).
+        Question text changes only where round(k, 2) printed one decimal
+        (46/500 seeds now show two); the gold lambda and u_p move in the last
+        digit where the bound k rounds them differently.
+
     Returns:
         tuple: A tuple containing:
             - str: A question presenting a wave equation and asking for its properties.
@@ -388,8 +407,10 @@ def template_wave_equation_interpretation():
     refractive_index = round(random.uniform(1.0, 2.5), 2)
     u_p = C0 / refractive_index
     
-    # Calculate wavenumber (k) based on omega and u_p
-    k = omega / u_p
+    # Calculate wavenumber (k) based on omega and u_p. The question states k
+    # to 2 dp, so k is bound through that display and lambda and u_p below
+    # are derived from the stated value (D-016 part 2).
+    k = _as_printed(omega / u_p, '.2f')
     
     # Randomly determine the direction of propagation and phase
     direction_sign_str = random.choice(['+', '-'])
@@ -405,12 +426,13 @@ def template_wave_equation_interpretation():
     # Format omega for better readability in the question
     omega_str = f"{omega_multiple}pi x 10^8"
     wave_equation = (
-        f"E(z, t) = {amplitude} * cos({omega_str}*t {direction_sign_str} {round(k, 2)}*z {signed_term(phi_deg, 'deg')}) V/m"
+        f"E(z, t) = {amplitude} * cos({omega_str}*t {direction_sign_str} {k:.2f}*z {signed_term(phi_deg, 'deg')}) V/m"
     )
 
-    # 2. Perform the core calculations for the solution
+    # 2. Perform the core calculations for the solution, from the stated values
     frequency = omega / (2 * math.pi)
     wavelength = (2 * math.pi) / k
+    u_p = omega / k   # the phase velocity the stated k implies
 
     # 3. Generate the question and solution strings
     question = (
@@ -426,14 +448,14 @@ def template_wave_equation_interpretation():
 
     solution = (
         f"**Given:**\n"
-        f"   The wave equation is E(z, t) = {wave_equation}.\n\n"
+        f"   The wave equation is {wave_equation}.\n\n"
         
         f"**Step 1:** Compare the equation to the standard form.\n"
         f"   The standard form for a traveling wave is A * cos(omega*t +/- k*z + phi).\n"
         f"   By matching the terms, we can extract the coefficients:\n"
         f"   - Amplitude (A) = {amplitude} V/m\n"
         f"   - Angular Frequency (omega) = {omega_str} rad/s = {omega:.3e} rad/s\n"
-        f"   - Wavenumber (k) = {round(k, 2)} rad/m\n"
+        f"   - Wavenumber (k) = {k:.2f} rad/m\n"
         f"   - The sign between the t and z terms is '{direction_sign_str}'.\n\n"
         
         f"**Step 2:** Determine the Amplitude and Direction of Propagation.\n"
@@ -443,21 +465,21 @@ def template_wave_equation_interpretation():
         
         f"**Step 3:** Calculate the Frequency (f).\n"
         f"   Frequency is related to angular frequency by f = omega / (2 * pi).\n"
-        f"   f = ({omega:.3e} rad/s) / (2 * pi) = {frequency:.3e} Hz = {frequency/1e6:.2f} MHz.\n\n"
+        f"   f = ({omega_str} rad/s) / (2 * pi) = {omega_multiple/2:g} x 10^8 Hz = {frequency:.3e} Hz = {frequency/1e6:.2f} MHz.\n\n"
         
         f"**Step 4:** Calculate the Wavelength (lambda).\n"
         f"   Wavelength is related to the wavenumber by lambda = 2 * pi / k.\n"
-        f"   lambda = (2 * pi) / ({round(k, 2)} rad/m) = {round(wavelength, 3)} m.\n\n"
+        f"   lambda = (2 * pi) / ({k:.2f} rad/m) = {wavelength:.3f} m.\n\n"
         
         f"**Step 5:** Calculate the Phase Velocity (u_p).\n"
         f"   Phase velocity is the speed of the wave, given by u_p = omega / k.\n"
-        f"   u_p = ({omega:.3e} rad/s) / ({round(k, 2)} rad/m) = {u_p:.3e} m/s.\n\n"
+        f"   u_p = ({omega_str} rad/s) / ({k:.2f} rad/m) = {u_p:.3e} m/s.\n\n"
         
         f"**Answer:**\n"
         f"   - Amplitude: {amplitude} V/m\n"
         f"   - Direction of Propagation: {direction_text}\n"
         f"   - Frequency: {frequency/1e6:.2f} MHz\n"
-        f"   - Wavelength: {round(wavelength, 3)} m\n"
+        f"   - Wavelength: {wavelength:.3f} m\n"
         f"   - Phase Velocity: {u_p:.3e} m/s"
     )
 

@@ -260,6 +260,24 @@ def template_batch_reactor_second_order():
 
             t = (1/k) * (1/C_A - 1/C_A0)
 
+    Screen pass 1 (2026-09-23):
+        One judge found independently rounded intermediates that do not
+        close (`t = 1.934 x (1.493 - 0.746)` followed by `t = 1.934 x
+        0.746`): 1/k, 1/C_A and 1/C_A0 were each rounded for display while
+        the difference and the product were formed from the unrounded
+        values, so the printed difference was off by 0.001 on 21% of draws.
+        Confirmed. Each reciprocal is now bound through its 3-dp display,
+        the difference is the exact difference of the printed reciprocals,
+        and t is the product of the printed factors (D-016 part 2); the
+        gold time moves by 0.01 on 9% of seeds. The Given block's conversion
+        was the sampled value, while C_A is rounded after sampling, so it
+        disagreed at 1 dp with the stated concentrations on 89% of draws; it
+        is now computed from them. A draw whose reciprocal, conversion or
+        time display sits on a half-way tie is redrawn rather than resolved
+        (D-016): 2.5% of draws, mostly the 3-dp conversion (0.9%) and every
+        draw with C_A or C_A0 = 0.64, whose reciprocal 1.5625 always ties
+        (D-045); 1/k ties at k = 0.128 and 0.64.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking to calculate the required reaction time.
@@ -267,16 +285,41 @@ def template_batch_reactor_second_order():
     """
     
     reactant_name = random.choice(LIQUID_PHASE_REACTANTS)
-    C_A0 = round(random.uniform(0.5, 2.0), 2)  # Lower values for second-order
-    
-    conversion = round(random.uniform(0.4, 0.85), 2)
-    C_A = round(C_A0 * (1 - conversion), 2)
-    
-    # Second-order rate constant (L/(mol·s))
-    k = round(random.uniform(0.1, 1.0), 3)
-    
-    # Calculate time
-    time = (1/C_A - 1/C_A0) / k
+    for _attempt in range(200):
+        C_A0 = round(random.uniform(0.5, 2.0), 2)  # Lower values for second-order
+
+        conversion = round(random.uniform(0.4, 0.85), 2)
+        C_A = round(C_A0 * (1 - conversion), 2)
+
+        # Second-order rate constant (L/(mol·s))
+        k = round(random.uniform(0.1, 1.0), 3)
+
+        # Every operand the trace prints and then consumes is bound through its
+        # display (D-016 part 2): 1/k, 1/C_A and 1/C_A0 at 3 dp, so the printed
+        # difference IS the difference of the printed reciprocals (before,
+        # `1.493 - 0.746` was followed by `0.746` on 21% of draws), and t is
+        # the product of the printed factors. The conversion in the Given
+        # block is the one the STATED concentrations imply (C_A is rounded
+        # after sampling, so the sampled value was off at 1 dp on 89% of
+        # draws). A draw whose display sits on a half-way tie - 1/k = 7.8125
+        # at k = 0.128, say - is redrawn rather than resolved (D-016).
+        conv = 1 - C_A / C_A0
+        if (_display_is_fragile(1 / k, '.3f') or _display_is_fragile(1 / C_A, '.3f')
+                or _display_is_fragile(1 / C_A0, '.3f') or _display_is_fragile(conv, '.3f')):
+            continue
+        conv = _as_printed(conv, '.3f')
+        inv_k = _as_printed(1 / k, '.3f')
+        inv_CA = _as_printed(1 / C_A, '.3f')
+        inv_CA0 = _as_printed(1 / C_A0, '.3f')
+        diff = _as_printed(inv_CA - inv_CA0, '.3f')   # exact at 3 dp: nothing rounds
+        if _display_is_fragile(inv_k * diff, '.2f'):
+            continue
+        # Calculate time
+        time = _as_printed(inv_k * diff, '.2f')
+        break
+    else:
+        raise RuntimeError(
+            "batch_reactor_second_order: no display-stable sample in 200 draws")
     
     question = (
         f"A second-order reaction of {reactant_name} takes place in a batch reactor. "
@@ -290,7 +333,7 @@ def template_batch_reactor_second_order():
         f"- Initial concentration (C_A0) = {C_A0} mol/L\n"
         f"- Final concentration (C_A) = {C_A} mol/L\n"
         f"- Second-order rate constant (k) = {k} L/(mol·s)\n"
-        f"- Conversion = {round(conversion * 100, 1)}%\n\n"
+        f"- Conversion = 1 - C_A/C_A0 = 1 - {C_A}/{C_A0} = {conv:.3f} ({conv*100:.1f}%)\n\n"
         
         f"**Step 1:** Write the rate law for second-order kinetics.\n"
         f"-r_A = k × C_A²\n\n"
@@ -312,11 +355,11 @@ def template_batch_reactor_second_order():
         
         f"**Step 6:** Substitute values.\n"
         f"t = (1/{k}) × (1/{C_A} - 1/{C_A0})\n"
-        f"t = {round(1/k, 3)} × ({round(1/C_A, 3)} - {round(1/C_A0, 3)})\n"
-        f"t = {round(1/k, 3)} × {round(1/C_A - 1/C_A0, 3)}\n"
-        f"t = {round(time, 2)} s\n\n"
-        
-        f"**Answer:** The required reaction time is {round(time, 2)} seconds."
+        f"t = {inv_k} × ({inv_CA} - {inv_CA0})\n"
+        f"t = {inv_k} × {diff}\n"
+        f"t = {time} s\n\n"
+
+        f"**Answer:** The required reaction time is {time} seconds."
     )
     
     return question, solution
@@ -345,6 +388,12 @@ def template_pfr_volume_changing_rate():
         gold trace, and a black box standing in for an integral a student can
         do by hand. The sampled range is n in [1.5, 2.5], so n = 1 (the
         logarithmic case) never arises.
+
+    Screen pass 1 (2026-09-23):
+        One judge found `57.99999999999999% conversion` in the question:
+        X_final*100 was interpolated raw, and 8.6% of the 2-dp conversions
+        do not multiply to an exact float. The percentage is now formatted
+        at 1 dp; the sampled X_final and every solution line are unchanged.
 
     Returns:
         tuple: A tuple containing:
@@ -417,7 +466,7 @@ def template_pfr_volume_changing_rate():
         f"An order-{n} liquid-phase reaction of {reactant_name} (A → products) occurs in a PFR. "
         f"The inlet conditions are: F_A0 = {F_A0} mol/s and C_A0 = {C_A0} mol/L. "
         f"The rate expression is: -r_A = {k} × C_A^{n} mol/(L·s). "
-        f"Determine the reactor volume needed for {X_final*100}% conversion."
+        f"Determine the reactor volume needed for {X_final*100:.1f}% conversion."
     )
     
     solution = (

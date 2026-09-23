@@ -57,7 +57,7 @@ Per judge: flag rate and mean scores.
 
 ## The run itself
 
-Cost: $4.147 for 450 rows (450 priced by OpenRouter's own usage.cost, the rest from the catalogue).
+Cost: $4.147 for 450 judged rows (450 priced by OpenRouter's own usage.cost, the rest from the catalogue).
 
 | Judge | Served model id | Rows |
 |---|---|---:|

@@ -230,9 +230,14 @@ def main() -> None:
         for dim in SCORE_DIMS:
             w(f'| {SHORT[dim]} | {dim_exact[dim]:.1%} | {dim_ac1[dim]:.3f} |\n')
         w('\n## The run itself\n\n')
-        w(f'Cost: ${cost:.3f} for {len(rows)} rows '
-          f'({sum(1 for r in rows if r.get("cost_source") == "openrouter")} priced by OpenRouter\'s own usage.cost, '
-          f'the rest from the catalogue).\n\n')
+        carried = [r for r in rows if r.get('carried_from')]
+        w(f'Cost: ${cost:.3f} for {len(rows) - len(carried)} judged rows '
+          f'({sum(1 for r in rows if r.get("cost_source") == "openrouter" and not r.get("carried_from"))} priced by '
+          f'OpenRouter\'s own usage.cost, the rest from the catalogue).'
+          + (f' {len(carried)} rows were carried forward from pass {carried[0]["carried_from"]} because the '
+             f'template\'s prompt text is byte-identical there; their original cost was '
+             f'${sum(r.get("carried_cost_usd") or 0 for r in carried):.3f}.' if carried else '')
+          + '\n\n')
         w('| Judge | Served model id | Rows |\n|---|---|---:|\n')
         for (j, m), c in sorted(served.items()):
             w(f'| {j} | {m} | {c} |\n')
