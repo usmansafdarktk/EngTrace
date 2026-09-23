@@ -12,11 +12,11 @@ described in the paper's section 3.3 and Appendix K.
 | 1 · LLM screen | Appendix H's prompt, verbatim; three non-suite judges; two passes, hard-capped | $4.15 pass 1, $0.70 pass 2 | **both passes done**: pass 1 (2026-09-23) 126 pass, 13 controversial, 11 critical failure, AC1 on the flag 0.84; the 24 flags verified and fixed (`screen/pass1_fixes.md`); pass 2 (2026-09-24, 24 templates re-judged, 378 rows carried on unchanged prompts) **147 pass, 3 controversial, 0 critical**, AC1 0.93 (`screen/pass2/stats.md`) |
 | 2 · human certification | own-branch experts, three per template, with hand-checks and planted defects | expert time | not started; protocol to be written |
 
-## Pass 1 of the screen, read
+## Pass 1 of the screen, read (as written before the fixes; the outcome is in `screen/pass1_fixes.md`)
 
 All numbers are in `screen/pass1/stats.md`; every judge's sentence per flagged template is in
-`screen/pass1/flagged.md`. What the 24 flags are about, grouped, so the owner can decide what is fixed
-before an expert sees a template:
+`screen/pass1/flagged.md`. What the 24 flags were about, grouped, as read on 2026-09-23 before any
+claim had been verified; the verification and the fixes followed on 2026-09-24:
 
 - **Presentation defects the gate does not read** (fix before Layer 2): float artefacts printed into
   text (`55.00000000000001 %`, `57.99999999999999%`, `-0.000e+00`) in `batch_moles_vs_conversion`,
@@ -78,6 +78,7 @@ template_annotation_23092026/
     run_screen.py        the screening runner (--check, --dry-run, --pass N, --status, --smoke)
     analyze_screen.py    consensus (paper rule), sigma-max, Gwet AC1 / Fleiss kappa, cost, served ids
     pass1/, pass2/       config.json + replies.jsonl + summary.csv + flagged.md + stats.md (committed)
+    pass1_fixes.md       every pass-1 judge claim: confirmed / rejected, the fix, what moved, residuals
 ```
 
 ## Order of operations
