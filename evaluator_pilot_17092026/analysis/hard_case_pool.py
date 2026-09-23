@@ -224,10 +224,10 @@ def check_answer_check(texts, golds, truth, keyfile):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--labels', default=_os.path.join(_PILOT, 'experts_filled_labels'))
+    ap.add_argument('--labels', default=_os.path.join(_PILOT, 'experts_filled_labels', 'version_2', 'labels'))
     ap.add_argument('--top', type=int, default=60)
     a = ap.parse_args()
-    truth, _ = S.build_truth(S.read_labels(a.labels))
+    truth, _ = S.build_truth(S.read_labels(a.labels), S.read_consensus(a.labels))
     keyfile = {r['code']: (r['model_key'], r['item_id'])
                for r in map(json.loads, open(_os.path.join(S.TASKS, 'keyfile.jsonl'), encoding='utf-8'))}
     rows_by_code = {d: S.current(d) for d in {d for _, d, _ in X.HEADS} | {'e0', 'e2', 'e3'}}

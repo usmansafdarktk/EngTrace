@@ -104,8 +104,29 @@ def majority(values):
     return top if n * 2 > len(values) else None
 
 
-def build_truth(labels):
-    """Majority ground truth per trace, from that trace's own-branch experts."""
+def read_consensus(labels_dir=LABELS):
+    """The adjudication pass, if the label directory carries one.
+
+    A consensus row settles one step the branch's experts split 2-1 on. It is the
+    experts' own second look at that step, so it replaces the majority for that step
+    and nothing else. Returns {(code, step index): {'label', 'error_type'}}.
+    """
+    out = {}
+    for f in sorted(glob.glob(os.path.join(labels_dir, 'adjudication', '*-consensus.jsonl'))):
+        for line in open(f, encoding='utf-8'):
+            if line.strip():
+                r = json.loads(line)
+                out[(r['code'], r['index'])] = r['consensus']
+    return out
+
+
+def build_truth(labels, consensus=None):
+    """Majority ground truth per trace, from that trace's own-branch experts.
+
+    Where the adjudication pass settled a split step, its consensus label is used
+    instead of the majority - including where the majority was a tie (no label).
+    """
+    consensus = consensus or {}
     by_code = defaultdict(list)
     for r in labels:
         if r.get('for_truth'):
@@ -115,8 +136,14 @@ def build_truth(labels):
         steps = []
         for i in range(rs[0]['n_steps']):
             lab = majority([r['steps'][i]['label'] for r in rs])
-            disputed['step'] += lab is None
             errs = [r['steps'][i].get('error_type') for r in rs if r['steps'][i]['label'] == 'incorrect']
+            adj = consensus.get((code, i))
+            if adj:
+                disputed['adjudicated'] += 1
+                steps.append({'label': adj['label'], 'error_type': adj.get('error_type'),
+                              'n_raters': len(rs), 'source': 'adjudicated'})
+                continue
+            disputed['step'] += lab is None
             steps.append({'label': lab, 'error_type': majority(errs) if errs else None,
                           'n_raters': len(rs)})
         ms = []
@@ -319,7 +346,8 @@ def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--simulate', action='store_true',
                     help='generate synthetic labels and run on them, to test the pipeline')
-    ap.add_argument('--labels', default=LABELS, help='directory of <annotator>.jsonl label files')
+    ap.add_argument('--labels', default=os.path.join(_PILOT, 'experts_filled_labels', 'version_2', 'labels'),
+                    help='directory of <annotator>.jsonl label files')
     a = ap.parse_args()
 
     src = simulate() if a.simulate else a.labels
@@ -337,7 +365,10 @@ def main():
         print('time per trace: median %.1f min, total %.1f hours'
               % (st.median(secs) / 60, sum(secs) / 3600))
 
-    truth, disputed = build_truth(labels)
+    cons = read_consensus(src)
+    if cons:
+        print('adjudication: %d split steps settled by the experts' % len(cons))
+    truth, disputed = build_truth(labels, cons)
     full = sum(1 for t in truth.values() if t['n_raters'] >= 3)
     print('ground truth: %d traces (%d with all three experts); disputed: %s'
           % (len(truth), full, dict(disputed)))
