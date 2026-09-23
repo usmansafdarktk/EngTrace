@@ -1,0 +1,652 @@
+{
+ "pass": 2,
+ "panel": [
+  {
+   "key": "grok-4.6",
+   "model": "x-ai/grok-4.6",
+   "family": "xAI",
+   "weights": "closed",
+   "out_tokens": 3200
+  },
+  {
+   "key": "minimax-m3",
+   "model": "minimax/minimax-m3",
+   "family": "MiniMax",
+   "weights": "open",
+   "out_tokens": 1100
+  },
+  {
+   "key": "mimo-v2.5-pro",
+   "model": "xiaomi/mimo-v2.5-pro",
+   "family": "Xiaomi",
+   "weights": "open",
+   "out_tokens": 1100
+  }
+ ],
+ "call": {
+  "response_format": {
+   "type": "json_object"
+  },
+  "temperature": 0.0,
+  "max_tokens": 16384
+ },
+ "provider_ignore": {
+  "minimax/minimax-m3": [
+   "ModelRun"
+  ]
+ },
+ "attempts": 3,
+ "seeds": [
+  1001,
+  1002,
+  1003
+ ],
+ "carried_from": 1,
+ "carried_rows": 378,
+ "prompt_source": "ai_assisted_quality_assurance\\run_ai_tribunal.py",
+ "prompt_template_sha256": "93a395de043cc32b82e73c8830af7fe37b9d1cf61d3531478b70f44329b0cb40",
+ "git_head": "fc1a6dcb35e7872ce450c2d11f07b4fd2c33f57c",
+ "started": "2026-09-23T19:32:47+00:00",
+ "templates": {
+  "template_levenspiel_plot_interpretation": {
+   "source_sha256": "27dc095e3064dc75ea00d318d0b7d5186be81b9642e0767909e3d5f76cb3f378",
+   "prompt_sha256": "8a9150990fab95007efe1814c1b8f827b5fd9eabfe7ac27b2a24f89a404f55f0"
+  },
+  "template_batch_reactor_first_order": {
+   "source_sha256": "ad0e1bb7a998d36793a104598b682b191b0415200e24f3e151a8bc12b6347828",
+   "prompt_sha256": "3f5ce31980c86f88ff79156eb1ff1b8bda97199d2de6065b48ba6c54234e3048"
+  },
+  "template_batch_reactor_second_order": {
+   "source_sha256": "d2f5a8679adf1ebbbe49900f0f6eed747898266d05ecafff244f54aee4b7cd1a",
+   "prompt_sha256": "d50c6f453d8f62ff14148cfca45cacd4582aae090b4da6cf901fe1952ba191b0"
+  },
+  "template_batch_reactor_zero_order": {
+   "source_sha256": "ab6fc24c972969a940479357aa9252cbf813dabbdca4ba735816aaa2057bba58",
+   "prompt_sha256": "ef34d17a6caacc8d196723f8405205ada56acc1b1cf2b839dbf0110a30f73317"
+  },
+  "template_cstr_volume_basic": {
+   "source_sha256": "c3bf002a45593264256077025bf97f5a8a002d602cf1150eac077c3260e99d8b",
+   "prompt_sha256": "116cc2285e1a16a389482b00e4dfb23224cd074e41334522f427e53786535d46"
+  },
+  "template_pfr_volume_changing_rate": {
+   "source_sha256": "ad65c0105a2c21b3d5f329b1bb6b00358e64fd19ac49dc035794f2b35678d72d",
+   "prompt_sha256": "594712211b4ca8cafa98c45534415421cb0a1d582e738ec37589d142fb5d3685"
+  },
+  "template_batch_moles_vs_conversion": {
+   "source_sha256": "4f3ef52fff109e8b09a06af756a6c3908c09f80ceea44dc6ee0bd0ec12347d2b",
+   "prompt_sha256": "49308453ce464a2534b727096d764e9c8949ad675c726704f964953a29ac8763"
+  },
+  "template_flow_system_molar_flow_rates": {
+   "source_sha256": "1459e517e1f05e8636728ef50d0dfa4e6c3fe9e41ab6729d100fb25be649ad77",
+   "prompt_sha256": "88de8223e0433d968ab0ac1f55a32b2e5db11bae41da317b596955578e2b68c4"
+  },
+  "template_gas_phase_concentration": {
+   "source_sha256": "9c77ecaf6f03311e2a5a3cc68d5954a84f43dd69b54c457ad0003e4b6ebf7f8b",
+   "prompt_sha256": "95e9f8cac6f409fca4fa2e81d870e7dbb2f76dcfc0bf21df0d42493c5cf8fdcc"
+  },
+  "template_limiting_reactant": {
+   "source_sha256": "12f4bc92f5d195ce360135829b7788f1404562cae60bda10e771e9eca62a2b0d",
+   "prompt_sha256": "69a853979d941840e106d3b42268c152ee2577e62afe1662b51d3792fecf3a23"
+  },
+  "template_adiabatic_flame_temperature": {
+   "source_sha256": "c9a2c18e1e5c69cd2743263fd2d0c5ea6e60555a2a0ee4760e9bfabeb277abaf",
+   "prompt_sha256": "2e48f41d276d605bca1fa7d4f053575d8656bbc9ec2a7f9d4c7309822a195848"
+  },
+  "template_heat_of_reaction_formation": {
+   "source_sha256": "bbf93d0b87af13db082296c70a6660e215d6f74f914f69168b8ccff7b923e325",
+   "prompt_sha256": "8d0b77cf4732e6552f22a67e7040d6e1f9a9070c6ce30f4b1f4e1410dffa788c"
+  },
+  "template_latent_heat_vaporization": {
+   "source_sha256": "c5c45ac35d23c6aba9edb19b6ee0ee9730e8da0e56e09caeb3e5a6ed2b4890ba",
+   "prompt_sha256": "437a580fb50766ba243ffa4726fc2143d7c5d78c7fd9a47a233e21cdc6cb68b6"
+  },
+  "template_sensible_heat_constant_cp": {
+   "source_sha256": "29d05665ee0a7d2eac5d13ccf82a3485c572d54bce4545665ad6085340b4c0f9",
+   "prompt_sha256": "712ae648354bfca85fcdf262fa46840355ed9dacd79227d03676a19b7b706c70"
+  },
+  "template_sensible_heat_temp_dependent_cp": {
+   "source_sha256": "53f0396f5e16447de07fd5547cb13ca4c2273243b47c76e61e1d5903890d509f",
+   "prompt_sha256": "1e1640c0d4d92eddc5a55beafd82a7580f17c00abd5ed53063eebb76819209bb"
+  },
+  "template_ideal_gas_volume": {
+   "source_sha256": "f0ead1e37be899eb0e13641b368c8cfcbe6807046939a7b2446ce85beff16979",
+   "prompt_sha256": "2fbbd9491bd71c8e770248cfa301b636afad6e94783c9fc810d6ca21389c1eeb"
+  },
+  "template_pitzer_correlation_z": {
+   "source_sha256": "b5c16a69672e3bfdfe9bfcbb750a537cdfe0ea33cb8bf83002586483e8ec8833",
+   "prompt_sha256": "c90af5e67460c89e40d4909c35a8f6dd8017b51d31ee463d1bf89097785d6ccd"
+  },
+  "template_rackett_equation_volume": {
+   "source_sha256": "54950ad9465eca8aaf1e267edbeccafa802b0a6c1ba279c3703a24af5a207658",
+   "prompt_sha256": "4015d7c65840b77499e182ed62413ae643fe8142d119e041e8dbbadeaa8b3c3b"
+  },
+  "template_two_phase_specific_volume": {
+   "source_sha256": "b8389623b2c1b25007b349d192f03bf36d031cb0ef537a138e67c12aee432f5c",
+   "prompt_sha256": "278ec5bc2480e1f6bffa7adf26c8ff11d45a7ae9cce826c6b530b9cdf894b425"
+  },
+  "template_vdw_solve_for_pressure": {
+   "source_sha256": "f9d162a8337430f9126e27ede3bd19e7392eb50d2569d9d95e781bd02ee65afe",
+   "prompt_sha256": "cb111039238668f1f1722028c8f0e25bffba164e0311272959a84f2b07d10787"
+  },
+  "template_vdw_solve_for_volume": {
+   "source_sha256": "ced27e4a6bba02359aecc85327b77e4d29c11cbd8a5d4c0260b9caab14938e18",
+   "prompt_sha256": "07b247f23aaeaeca7ab7e7154bc71a81eb34024ea36897d0534be3315b4081a8"
+  },
+  "template_work_isothermal_virial": {
+   "source_sha256": "03980e8107fdfa666057341f428ba60d926cc5f347cf889f74b2a6b027e1bf81",
+   "prompt_sha256": "adf82b8883c3ca1ef6656b9c163b49232a3bc282d34ecb3bff9c63a456347968"
+  },
+  "template_annulus_flowrate": {
+   "source_sha256": "f5314aea98d6098b2d68abac73717a5bef74524e809eae08c3222322bbf8aa4f",
+   "prompt_sha256": "6e90be23ac5ef226cbb79f39c52f843aeeb8cd8831ffcde98c688a6b668edd75"
+  },
+  "template_falling_film_max_velocity": {
+   "source_sha256": "e1fc250cd2fbf0043ace45915b5255fce297d2eb0e9c4ea065d960d5c19ae379",
+   "prompt_sha256": "17e84108d3b0acd729a440e3acbbc824aa2e22f52502d7f0edf0b6e14f1d4882"
+  },
+  "template_hagen_poiseuille_flowrate": {
+   "source_sha256": "ee8b33db5ffc8f01fae51934638604051c6e0f49e87b8491bba8e6e1ada491b5",
+   "prompt_sha256": "a21d04c8e1eb84d43d52f8d6545d9e0f15c4c4409bc65d1ceca8a7d52b3d1d94"
+  },
+  "template_gas_viscosity_kinetic_theory": {
+   "source_sha256": "2184838bf8722df313f525ebc2db668e91e7684842690934dfcbec1d1b4485f2",
+   "prompt_sha256": "f4ce911eb8aff73996f3c5646e94d02a811d8955edc50c50d36d9826ee18306c"
+  },
+  "template_kinematic_viscosity": {
+   "source_sha256": "c63f5e9653c8426d7dad1fcf027c6316fca8780cb7e9568f8b68d0fee3038f15",
+   "prompt_sha256": "78d58d5b2c8b286489fa1cd9db28cedb24f3a01bd9243a7a0a41ef7403adb0bc"
+  },
+  "template_newtons_law_shear_stress": {
+   "source_sha256": "d9d351d66d03680a00538f88e0cf93fada91e17fea0be61095d9af7cef559ac4",
+   "prompt_sha256": "753f7b0586d71e5d965b92432f98bfd4f946313b33df02b7eeff1a6b2a0cbee2"
+  },
+  "template_power_law_fluid_shear": {
+   "source_sha256": "32e5b9be8654a1c9c9db8af354d4a05678f7400d76280b34f6389a1c6ffc7df9",
+   "prompt_sha256": "76052fc342b6a9800d9498b67607ffbcaf5e3fa25e568adac1281e1c539a9245"
+  },
+  "template_reynolds_number_flow_regime": {
+   "source_sha256": "511041110ce07864e936708eaac1ef3107b391ea26a4afc66df7c16c54802696",
+   "prompt_sha256": "154a49f341074c0bf851088d859f363e5c0385bdf76ba9763c57f7316820c8fb"
+  },
+  "template_constant_head_permeability": {
+   "source_sha256": "5b6bc86afcad0afe6d79aee1af9004738b8741651b1c5ee1bb503b487ea5447f",
+   "prompt_sha256": "8ec24ac71c3f4e5091419c4bfb5a36d00fb394fbf24b91ae551af4bf3a7ffdb5"
+  },
+  "template_effective_stress_profile": {
+   "source_sha256": "462f3aa54318758659203807d892ffb15d1e4d7f304202dde652c1530b62c761",
+   "prompt_sha256": "6a5a95ddf6c41bfe9d34c24b1d1193b98104b27bbb1de46071c1ae77d3b4c40d"
+  },
+  "template_upward_seepage_quick_condition": {
+   "source_sha256": "13d453edc6c384f8abbfb460224fce63c66441227d1a900c85f888b1874e700f",
+   "prompt_sha256": "8d62be20c8267f2d83495c2b6580f7c09866956f0fca37593ce35021561e8aa4"
+  },
+  "template_borrow_pit_fill_volume": {
+   "source_sha256": "069d644fd5974cc60b8433804129c9a6a659286d82557066092c79de8975b154",
+   "prompt_sha256": "2d3e9de18f7907335cd22d328c0bed654a76e41a8855c4b13d7a2bd36a963ad3"
+  },
+  "template_phase_relations_degree_of_saturation": {
+   "source_sha256": "68db3b11042424859b00f5fe86d753ea5713f8c4ec9272a72bd4674c074510c2",
+   "prompt_sha256": "38275d77d20fb561e1df5ba9ee809202d9ff377731db499286b272d1177e97b5"
+  },
+  "template_relative_density_of_sand": {
+   "source_sha256": "3971beafbc388840f15654c5019954d894ee22fdf1065df82bf117e0b12d74b6",
+   "prompt_sha256": "e5e0d6ea85086f916d9d5f95a9fddd9cac5af6dd44acd1075855bcfff7144d52"
+  },
+  "template_infinite_slope_factor_of_safety": {
+   "source_sha256": "bee55cbe8932e5ec7ccf97e1e1c76f77cc0ac4af2d7d6c04ea29aafdc7a8a90c",
+   "prompt_sha256": "4c59584fcc8f260204ff3e86bb664b3984e4c4e66a4960c1727395647c3bba49"
+  },
+  "template_terzaghi_strip_footing_bearing": {
+   "source_sha256": "41bc4637ddd1c888f1a3a552bb313cf22989981bbcf351e0590245bf9efe75df",
+   "prompt_sha256": "7597e082ba455953e2482ba90157e0da791dc761abb9e004afc8b9083c29a702"
+  },
+  "template_primary_consolidation_settlement": {
+   "source_sha256": "fdb82d47b612d7d73619dbc75a0d3c2c324f5a7543c76e43a295b7465499086c",
+   "prompt_sha256": "5410bcb45935b2736e26249dcaf1f54fc4e39c17617b1dccd5e3d25d8fd38b8a"
+  },
+  "template_time_rate_of_consolidation": {
+   "source_sha256": "8838d7174f81266bbc685c3a3457950fad317b832ec2fd939b12325ff9355ee7",
+   "prompt_sha256": "d51acb4044763961b3be5e06e0b95880ee8d8eb442504f5981666d0e9f14c1dc"
+  },
+  "template_beam_deflection_formula": {
+   "source_sha256": "a954e919ef4585871671f37a500dc1cda8b771c1818685c15585ca8652593cb6",
+   "prompt_sha256": "7f60ef8ac1150f89e19efec7b9ff133656b4be446a10dbc0bacb59e09725cc87"
+  },
+  "template_cantilever_double_integration": {
+   "source_sha256": "6416a8f4f20f557a9b4928a2172882dc8a0166786a67da7a5c82e16ba3c906c7",
+   "prompt_sha256": "4c5b7ed28caf4f751fbf6af99d332004c34747e93fc0c71940356e603503421f"
+  },
+  "template_virtual_work_truss_deflection": {
+   "source_sha256": "db52fee9d6faec73a7571f36b8bcaa98d9ee7447272c308c31de43f7614f16f0",
+   "prompt_sha256": "c2ed99f9731df248d3d1cd93146566016dfb88f570f4dd4d7cc846ba57453090"
+  },
+  "template_beam_internal_moment": {
+   "source_sha256": "a5a35b4dddae037dc96c0e36c0541143956c8f79b4770cc7d8cae07087f6bd6f",
+   "prompt_sha256": "eebdab0d0bdd2b8323908c8682208fd4aa3582a11512d594f0497c952ba12b1c"
+  },
+  "template_beam_support_reactions": {
+   "source_sha256": "13b08f08cd56c66905c5df6b93f5bc4e0857be3f1bb333ae22648749bf1fa469",
+   "prompt_sha256": "11b2b3fd03caabd162f898c89023de19937a32015d77a7990541ccc73ec41aac"
+  },
+  "template_truss_method_of_joints": {
+   "source_sha256": "876328fcb372b296e2e56c6e2ac9ee4aa8f2c32b07034ac1d9525e0ed4105ecd",
+   "prompt_sha256": "f948bed53565cf6ab26cb4f28465645e1523e41aa3a755fa810c1d03bf514322"
+  },
+  "template_truss_method_of_sections": {
+   "source_sha256": "8240cbd6b9e1e0044e80157860a48571065f09c3e35cb47443128d4a8bd848f8",
+   "prompt_sha256": "1f8606648097ff8c183350040c42fd5ba50519123bf3ac936477a7fd79d02326"
+  },
+  "template_force_method_continuous_beam": {
+   "source_sha256": "7cabf08dff8293f059813e92099329606311b8fed45f22bc12008699992b411d",
+   "prompt_sha256": "ef9f82235c08542259c85de542955d99b7b6d021821b92897a18f6d87f1f8a3b"
+  },
+  "template_slope_deflection_end_moment": {
+   "source_sha256": "cd8093a46dbdfc96d8f34ec2bdc4adc7f728038d09b8e7ee7afca0d70290c7c7",
+   "prompt_sha256": "2b18966c3a26914c1870cf7a1cdbc8a77d944f95de6a8ff3a104ee2b7955e817"
+  },
+  "template_influence_line_max_reaction": {
+   "source_sha256": "c4d672cd310525b66dc1733ce12f887bc0c4dcdab4aa239a30a69d3310be43a8",
+   "prompt_sha256": "f421ddd98f0cbad9433bc3233ca0b4d8f66ff9574307211ae58a5598fcd25de9"
+  },
+  "template_critical_depth_froude_classification": {
+   "source_sha256": "4e86e4ee358babef8d1e0c72fcd18434dfa5e978aef20ef24ef20398523486b3",
+   "prompt_sha256": "00d731a6d7142a8507516643c1dc256a207dee8590448763e4b498d279cb7ff8"
+  },
+  "template_hydraulic_jump_energy_loss": {
+   "source_sha256": "409b6e3e928b333b50a22f35e1dd2b3ac6fe32a5fec2837d5d133885260b8ae9",
+   "prompt_sha256": "6be477fed30d2ea234a440e4622c8cef88c639973a4423b201d296fe23f0a099"
+  },
+  "template_max_hump_height_no_choking": {
+   "source_sha256": "5e2ba9502adbebd7c85c532b4dd2eb85223819c5158a1c085216754b04157960",
+   "prompt_sha256": "602222a5e7552476b34f5e23fc45ec8d20ef464ff2850645337516257c5e2775"
+  },
+  "template_linear_reservoir_routing_step": {
+   "source_sha256": "3ba61b80cdcff1495aeedfb3606239e32dcdf8311ac4c43c6f6ddf3527960232",
+   "prompt_sha256": "120dafdf8b99b7e905b31b3c90707e9ba1b5603ef8f13e4c79b00db8b8714e10"
+  },
+  "template_rational_method_peak_flow": {
+   "source_sha256": "6b437c12dc2e794d94836193f26eb1533bddbc3720d2bb076190ff1bc4cedcb7",
+   "prompt_sha256": "084a977e00b987ec64f1039e1e91568ed02e337795e5aa4d4f169460f55678ec"
+  },
+  "template_scs_curve_number_runoff": {
+   "source_sha256": "a2fed32385e60692bfa6fa91d073a199873cf9328424b57919dc4471c9ebb449",
+   "prompt_sha256": "33f370eb3347a40923c6ae06fd6207822c6b9eba2ca56644407a094faa076e27"
+  },
+  "template_best_hydraulic_rectangular_section": {
+   "source_sha256": "8de47e4ff4fec65f894dc4515d65be8e3f95cf91bb89acc64b0ae97a3d5be899",
+   "prompt_sha256": "c44582a1e969515dec4a2216079eb945cb07b2ab26e5bf159b6c9b6cf412b04f"
+  },
+  "template_manning_rectangular_discharge": {
+   "source_sha256": "6506e0c42b9efac5ff49d4f573915d124669ac390446629302a298a5f327ab7e",
+   "prompt_sha256": "f9dfa18b21e9a6130d6abc79ea20e3de73301608cbbb4e70138288d5af0f7720"
+  },
+  "template_manning_trapezoidal_velocity": {
+   "source_sha256": "f7125657cb8f72a3974d672d87d15ec446f94ee52f4f6dd0bbe55b84c0c87868",
+   "prompt_sha256": "c9846bff3f5d2b783ffd926c5f5b668be7516b72920f2615f9c84309cd362399"
+  },
+  "template_normal_depth_iteration": {
+   "source_sha256": "b32eb2229bc81b5d5aa1a8c8bf2c32b76f95de09d6a949c57cfdc9dfcca07d95",
+   "prompt_sha256": "a674f605ef2622aaa77033ad4dcacaa2333c1e6fc206b03c65a0da3ea47a9616"
+  },
+  "template_autocorrelation_rect_pulse": {
+   "source_sha256": "ddfa0728b01d9d48778f00c8ea42cf4d8756062da9c2b5fe3ed72da2bbffbe91",
+   "prompt_sha256": "7fc98c8e99aae3e15459b37d840a2a2493a96b405d3e4d720edda51d9bb92b0d"
+  },
+  "template_ft_esd_rect_pulse": {
+   "source_sha256": "00d055c314c52c59d181e50c40c7c32fa4c860cb22f96a1987a3f092ad443eca",
+   "prompt_sha256": "58f96c8071f071b2bb00dbccdf059251a8828cf79c11de89946d45d084b7a5eb"
+  },
+  "template_lowpass_equivalent_bandpass": {
+   "source_sha256": "d094da974fd7e88c43364de98aa040981a1728b8039f20948f7e624eec16f456",
+   "prompt_sha256": "9bd25d6a234c9715e7a2c9e03fbb06a831e26e528df67d65c4724638944ac44a"
+  },
+  "template_mean_variance": {
+   "source_sha256": "a3a4898425d78192d66003315a122ec2fe1a354614bd572e59b413e8c749f51a",
+   "prompt_sha256": "9ba931f8997c2fd4d048cd606a23ad59381cf6d034f244f2478cd606f7aa5365"
+  },
+  "template_signal_energy_power": {
+   "source_sha256": "b97749518eeb0ce0c5e790724ba0ecacf5fd185223e6b104077d310674f1a36d",
+   "prompt_sha256": "d20b55a251e0d4176414915e3e46a5c2b2618c389ffc92bc4dabb29d44718d25"
+  },
+  "template_average_energy_mqam": {
+   "source_sha256": "c9015da8c62cb6ae5ea77964db0170208929e178f137dd6bae5448654fd7a917",
+   "prompt_sha256": "4cbe3df522f5465262054e2e4a910048d7236c3fd003c0ecebb874405d474c7d"
+  },
+  "template_ber_estimation_mary": {
+   "source_sha256": "0a1e930ce801e3fd2d38127f4b58cddd5de5534adbdaee9e47a31ded269f49f0",
+   "prompt_sha256": "a4a4aa3b5664247a796bc1994e8c1b294f5ea4d6d629cadfb5e1b1cf59e6755b"
+  },
+  "template_bpsk_energy_basis": {
+   "source_sha256": "053e8433934fa3432b8301abbc5681b62eb1e858eef3d3a926849085f31d875b",
+   "prompt_sha256": "1a045a06bd5b0a638615f388a337cb2c0d46f7760f7d025641a066b54cd9fbe3"
+  },
+  "template_euclidean_distance_binary": {
+   "source_sha256": "96ed01b972cf8d2aa68d97b0e2544edd953375f48b01ed823d6ccbe5176286ee",
+   "prompt_sha256": "dbdec3c3f442f30396d17c4ef3dd0ebbda19e14e5506cbfc30f9ee0bb803025f"
+  },
+  "template_null_to_null_bandwidth": {
+   "source_sha256": "e01a73c561db7954827e96f15059bb150615bdcb0539876e10629248a460d41e",
+   "prompt_sha256": "9b562eb23e366262f1a524d98133138537285f66e425c7ed92302e86da7c2b1a"
+  },
+  "template_coaxial_capacitance": {
+   "source_sha256": "7c17c4d3bcbad32a9b9b4a4990e92588196f71adc5165553d3c67eceac7fc8d5",
+   "prompt_sha256": "7535600d271f8b1f5f2aa06ed3bc00e0c99781732843da3a97f5733e958e82cb"
+  },
+  "template_coulombs_law": {
+   "source_sha256": "14285d84b4e07617549333691da768388b2b893fe198b520204212986b2e52f7",
+   "prompt_sha256": "87feab368576b94dafd4789394aa93e2c76bb12d40f53a3498612ad545a3893a"
+  },
+  "template_gauss_law_symmetric": {
+   "source_sha256": "78016d5207ba57876e65a01857b63aca8cdb0fab01733db2f579d0ddc786522d",
+   "prompt_sha256": "0241357a41e397a06de934dcc91f9a5bded355f1c2e807b8a46a7b48cd9311a3"
+  },
+  "template_superposition_electric_field": {
+   "source_sha256": "4276252599f3f4d3de2198c1461d3bcfef208427d4f73788322357824dd336ba",
+   "prompt_sha256": "b94d0dbbb122ec16edcf81bbcebaa398a806ad108a769f4c91ef8e3d575f4c0c"
+  },
+  "template_lorentz_force": {
+   "source_sha256": "2f704ed9fb405c256465cfa9f4760c38e3a2b3ea0202ac8be54b506977ebd51c",
+   "prompt_sha256": "c8077fce9b59ca2f4a1e657f79c3564637f6e89eed9348913d6bfe0ca5ee6af7"
+  },
+  "template_phasor_addition": {
+   "source_sha256": "da3e9346a1bb7fa626111f4371a60d7e3b0821fdf2f09ef0be2ae1a0d1d126a3",
+   "prompt_sha256": "60da6f1d5c77a298580407d92cc479d67d8bd9bd57d59fee63a261b067434eee"
+  },
+  "template_standing_wave_formation": {
+   "source_sha256": "f7420ac6f3f04cc8ea1134e4c8bb306bce4d3621062b2c5874451df940b9bf4a",
+   "prompt_sha256": "31007fe72eb29e50597271768dfb6d214f5c45aa3e54eef43aebb0f90c3a5cd3"
+  },
+  "template_time_to_phasor": {
+   "source_sha256": "f6424c9cf92085525954c2a6587dd63053c0d32860764a9cd07256d40f0d70ec",
+   "prompt_sha256": "911c993f9630831f8061979778b66d1e3c7f642f764109c06360be9774bc71dc"
+  },
+  "template_wave_equation_interpretation": {
+   "source_sha256": "d533702262d432f53745de8f7d50aa6278bc0291116d5942aca7bc5abfa64f35",
+   "prompt_sha256": "0baa0ab603786516500971abd6bdfea72a1d063e59faad4ec3863e0662853fa7"
+  },
+  "template_wave_parameters_basic": {
+   "source_sha256": "c7f5ecf41745ccfcb4f8ca94c19a5007dbfec48e05b6880ee1b6a6cec2a59b3b",
+   "prompt_sha256": "f9b2bc7f19f4b00abc622c37b39ed68bab67d1637acff6c82f3d39cf3f5a9ea1"
+  },
+  "template_aliased_frequency_identification": {
+   "source_sha256": "a7eecfc754bfb3f83321c05e9890be119aca7503589f34364616bb81b1f982f7",
+   "prompt_sha256": "b3bf38a23b05b320ded5cd6b25eccc5a929cd3798a69b67cc4daf35b71149bf3"
+  },
+  "template_cd_dc_system_analysis": {
+   "source_sha256": "74236334d86f22176b38a3e082df6d80c566ea73feb7dc9524bd72a25f818928",
+   "prompt_sha256": "1d5575f4289fe6221182d5f29ef50933f87aabc584b892e1dc704555b2afa2f2"
+  },
+  "template_continuous_to_discrete_conversion": {
+   "source_sha256": "ba37727593cbe55ac83ed975dbc094dc17a08a2a352c488b3019c860dcac2ab9",
+   "prompt_sha256": "b33f085af385866ba8f5332d57f045838ceeee4cbcfd50352fcf3c2de8ca2411"
+  },
+  "template_decimation_aliasing_analysis": {
+   "source_sha256": "d8c371ebbe58f1d866e82d19ec504388c4b270c650bacaeccb3d12c895765bda",
+   "prompt_sha256": "1dd350263e85b2be2a3bef309215a8527ef6d95a09274b3466092761c9937656"
+  },
+  "template_nyquist_rate_determination": {
+   "source_sha256": "99d5929ad06bdb13b972919d84de94cee0aeacd651b5c377abfadc5db48fd90b",
+   "prompt_sha256": "5308d6c0e9e4b490f4fc7c140c11267e64a09275fa40849e202970ad95ad7a19"
+  },
+  "template_finite_convolution": {
+   "source_sha256": "30b7e0f25323db48e14132aaebc3c28d3a8eb69af9bdaab703cf1e66d4a6dfb7",
+   "prompt_sha256": "11197bbeac82708d0154916e854b14992abca921ee8b41aa7476b4b5ba0d9d4b"
+  },
+  "template_impulse_response_from_lccde": {
+   "source_sha256": "9ec20128ed085449f393574d481ca056f0b9ce51ec73694157f4c1fdd0aa7644",
+   "prompt_sha256": "926f7326c885d90ab60e2dc1a41a0bc6e0c61fb6df6e9da4440f0084cdfebc81"
+  },
+  "template_signal_operations": {
+   "source_sha256": "c965a7bf840d37318aa19722808291136a8b6ab9414ca24060d2f459411ab476",
+   "prompt_sha256": "2bbe486a9a60e24e39f3b20462b6b4a640f62f1eb7c16c28c14dfc66b8838e9a"
+  },
+  "template_system_properties_memory_causality": {
+   "source_sha256": "3ebb3cd77ab02c64a1c4e27f6c58c8053e45b30dece52f4eef3cfe7268c2d56a",
+   "prompt_sha256": "823c9a8fdf1fd11272761e16a3424472b0a0a7b7b891dc5b29b4a7ec0ba44644"
+  },
+  "template_system_property_linearity": {
+   "source_sha256": "33b62dfc0f6612e43bfeb4fef8bd70e756c481ecc876254d57c8d5a7f9908a4e",
+   "prompt_sha256": "7b3479c28514d5af2797f0181392e978764dd1f7ecc9d7aadac5d50422f219dd"
+  },
+  "template_basic_eoq": {
+   "source_sha256": "274ae4f480ee6b63a1649938e97124b871bceaa2b14e2e66dae3dad335996caf",
+   "prompt_sha256": "da6bbe08cf37f8c03b747732c6e87920ff3d4b7a3339d7e5c57c490e2093f6c7"
+  },
+  "template_epq_finite_production": {
+   "source_sha256": "d96db5ffb3fa25f7365fb51e65f52ada4c2b4b62ee9dbdf2483524dc5afa8301",
+   "prompt_sha256": "f19df5a59915a32b20e59b72e002a8c7b6d0347ad65f0f01024d94cdba8fdebf"
+  },
+  "template_quantity_discount_all_units": {
+   "source_sha256": "3d4146aba788b6b99acecff3460d1e7d5461a8fd011b4b77b6e29c80995fafac",
+   "prompt_sha256": "469933971b3dd9c5556641ebc4aac065e73195dc180efe824730e45dd1ef3189"
+  },
+  "template_reorder_point_lead_time": {
+   "source_sha256": "e4a8ed5d5a707780a4dfe43b52ac9a61df6a3c8d04432a27115c4b5b28c64ec7",
+   "prompt_sha256": "4211af3003c2dad801ba25e4daaf4db89fa192b524b58ee348843b59d9011fe6"
+  },
+  "template_chase_vs_level_aggregate": {
+   "source_sha256": "6ed971ebe63d212d994ae87f1ff3f8ae625982019061bb854f3f9c3320f0ff2c",
+   "prompt_sha256": "d1940d24a9cb091a8925b489673051b22cc21e53987f46f4eefcfff4d18448b4"
+  },
+  "template_line_balancing_heuristic": {
+   "source_sha256": "e8e1c2691b2fc33aa35f345dedb06ba4b92cfd043f2642d30faf2d8c2819d036",
+   "prompt_sha256": "75fc5167055fcea1ce9e3e20d8a7bf16e5c5fcdc82e3820e122845b99bc6d97c"
+  },
+  "template_takt_time_line_efficiency": {
+   "source_sha256": "2c1de40b97995ee64b190fffcbb3775a7fe0643031ccb789d9e436e567e28bb5",
+   "prompt_sha256": "67d504731d839b0e288cb2db2e30de8a4890c57668ba8312a5fee480e4d61167"
+  },
+  "template_newsvendor_normal_demand": {
+   "source_sha256": "8c9aa7ef6755468de1476154ce6c4789e07ccb973389c243a32d9c582ae0a7af",
+   "prompt_sha256": "6a9c2f1ab7170ded1fb7f3f954e149612e494209e931f4a95b83e4c5339c9d59"
+  },
+  "template_qr_policy_one_iteration": {
+   "source_sha256": "7bdba97275e3f3b6b88e8252a968aba5595af94e02d03ffe207c1b9e49461d03",
+   "prompt_sha256": "f7f0aa9b36ed5e84bc1db6d86439ff1896a8bbc81c5fabae789deb6f6390905d"
+  },
+  "template_safety_stock_reorder_point": {
+   "source_sha256": "359581ee66448e7720c9a87035d93b1fa4d4d1fa2ead5f2677496e5824e31704",
+   "prompt_sha256": "c035d8196853f4c8e0add5fffc0e64ffa8ea2e1b9da4eb54bba619a1f13357ea"
+  },
+  "template_aoq_ati_rectifying": {
+   "source_sha256": "426c2763c3a1cd347d745b13872ff77d86536f1e6b2b915fa406ab8010494965",
+   "prompt_sha256": "c856d2053a9a664d3242826cb8e049bfabaa66291fa4ec32bdaf5015195e1592"
+  },
+  "template_single_sampling_oc_point": {
+   "source_sha256": "67bf85ce5603bdf6dd6c9eee1f11afbbf17f2cba3c3bea2d42f8fdb85f79cbcf",
+   "prompt_sha256": "637c048eb5a24c0925e54020ef613e5c2b4079f47961668807c0d2ec3257a844"
+  },
+  "template_c_chart_revision": {
+   "source_sha256": "8bbb23cece14f1808237ef745c389657bd3d4d068435648b100eeaf0e14c9d65",
+   "prompt_sha256": "c9f927a9575217aa2dc6d360bd1c02ed5f684ff4c8156498cc72b7296c0e8593"
+  },
+  "template_p_chart_limits_floor": {
+   "source_sha256": "b7456f339a0006fff3e95afd78461d3d0afbf1a7354808a093b0fd991470c0d7",
+   "prompt_sha256": "5adf69edf8c3e7bcf72e564d9656d65cf20a4dc15f757c0f97fcc26e61fdc5cc"
+  },
+  "template_cp_cpk_from_specs": {
+   "source_sha256": "e9f294a1626d49fc177ba89348b7774aa15eeca2edb0de3469c276f4d9a8cd55",
+   "prompt_sha256": "f579dd1dffbd839994e8018546e03b6abb2e7c7dd93a2d7bd1e9586162663167"
+  },
+  "template_sigma_reduction_for_cpk": {
+   "source_sha256": "3a343bdf264fe18b725f1c7cee82cfc9a2d08be8d608efeda7e08ef16221910a",
+   "prompt_sha256": "3c846f7c31d6117fc8ddc0a53086b29c87f4f866dd7dde52506be22dcb319121"
+  },
+  "template_arl_beta_mean_shift": {
+   "source_sha256": "d960d5e658fe4f60e7849ecf82a02935ac4205aa0aa9157a13768507fe9b4278",
+   "prompt_sha256": "d3d7910a205b1615f9232ac00ffd2280025fd1b0325ee11f472d6e8d262da0fa"
+  },
+  "template_chart_pair_selection": {
+   "source_sha256": "ca9f9908e02546a03a79564fd743e68e7028b10af2334664d2d9c0d6bc3afdcc",
+   "prompt_sha256": "6a47f18a301f38715fd511890c2f26db26f80fd053b5a803dcdd01847ab5993e"
+  },
+  "template_xbar_known_sigma_classification": {
+   "source_sha256": "928d32fbe2ca0459e37a82870c8c815872fc7322a7fc93742f476215718b163e",
+   "prompt_sha256": "3a97c5aa807057729265f9dc14aad90ec59dbeb83103d8a8181360615297cdb6"
+  },
+  "template_xbar_r_control_limits": {
+   "source_sha256": "fca529fa15b348c5e7d3eff6a018d4695c1566fd906376290f8d8995be860643",
+   "prompt_sha256": "9e3881ede1f0a5ee2dcc5ce41d0d92a1f367dedef164198eaae65e5e33ee41d6"
+  },
+  "template_absorbing_chain_time_to_failure": {
+   "source_sha256": "59f50e2d93130dcd4e3a239e0d28d3ef74d2453bf725303b98cbf8aba3b6dbbb",
+   "prompt_sha256": "65c9bd3d0f09119439b8f1388a1f504f005a25a3af66eb909a1c2d72a69a426c"
+  },
+  "template_two_state_steady_state": {
+   "source_sha256": "a5360844ddb956a3d5bcf6daf080dc8f15b0498c312f9543b1f88a433d2ab627",
+   "prompt_sha256": "18cfd0b593fdbfd962ca0828ee3e340d16b9a7bc137b4c9075e2f8d6c96ce78c"
+  },
+  "template_two_step_transition_probability": {
+   "source_sha256": "bfa86bfb26d7a3fa268e20acf52c9a66cef21315c425fa0634396d1b5712a3b0",
+   "prompt_sha256": "5d6d8d7c6329a28f5f542c5ff29074d264bf9c8b62735e300890caace6a00f5b"
+  },
+  "template_poisson_event_count": {
+   "source_sha256": "4f2cef1ab572cf9d5c658a3deaafdb86928568f0d60383afaed7dd83274f351c",
+   "prompt_sha256": "fe3ca08bec7f45c35951a7285f3c4645a4d88467956cc37317de707e6e1a083d"
+  },
+  "template_mm1_time_in_system": {
+   "source_sha256": "31c50c1c5d0598f3f2dc89d5678b368690347b04185e7470f64d39bc030d156a",
+   "prompt_sha256": "062bfda27a8255ad749bd619f0616840b8199050a26982b946764c5d57f5e623"
+  },
+  "template_mm1k_finite_capacity": {
+   "source_sha256": "65131bf8fbb969878d90b7b10e449cf8649d6cd20e41a271f887104d1e911baf",
+   "prompt_sha256": "416dea70f360420feb0471e64d0df1b106de9aa9b767d2461822959f8b4b5e73"
+  },
+  "template_mmc_waiting_time": {
+   "source_sha256": "36d826d03a6917003dcecff52f45cc249479badbdfab629c0b745ffce4c317f0",
+   "prompt_sha256": "87fd161496e615177a6bf630a61dc69fbd9b9536194a7f27b1122b5fc1205305"
+  },
+  "template_server_configuration_selection": {
+   "source_sha256": "7b83095ab191f354c68d9a8d51943607a21c60baa92734a661871c2c2137c4b2",
+   "prompt_sha256": "284e0a91b78e904c15662f319ff7ec68beec28c5d141662924532d4895de213a"
+  },
+  "template_exponential_mttf_topology": {
+   "source_sha256": "d56b115c02c93f9ab82542442bfd63c9149bb44f5ffce9592772d41447f6fc50",
+   "prompt_sha256": "ab5652e3303175f2c877aafd27cda11003f950e6c4aec9fe9209b50cf4472fe1"
+  },
+  "template_system_reliability_topology": {
+   "source_sha256": "96a1886c676b0833a8dff70e0d943bb5da0b47c92f926d0c1c72eeaaa67d3c1f",
+   "prompt_sha256": "f2a4b6ac4ce28431c94de6d0beee22c255acdb152c476396b1451d2a36486318"
+  },
+  "template_fluid_particle_acceleration": {
+   "source_sha256": "44b24b40faed9f29dbf1696dab0de08991bae80c12636d3dffdf093f56e15fc7",
+   "prompt_sha256": "ad35a41345f82aa89ad860237e0e0249f745ecb76699997c6b80d311d6022127"
+  },
+  "template_incompressible_continuity": {
+   "source_sha256": "5754ca070c5df192c01c97a5d204eae470c14fbbabf726f70f4d1c72c04545f4",
+   "prompt_sha256": "eec5a4a266ca5f1251fa8a5e2469931d888e1013727cd8510ea3ad722f79ab00"
+  },
+  "template_particle_pathline": {
+   "source_sha256": "5c5d3c43ae92ae62541484f0d0dc4cf05b2aaa8712abbb6406d7e0c36c84a2aa",
+   "prompt_sha256": "476f42ed864765e96525b047f0568560fc7e0fe80a49dc9c1d4633fdbd287d12"
+  },
+  "template_volumetric_flow_rate": {
+   "source_sha256": "5a88be0052225b42ac76de0f5286115124ca90e28085d74baeb7a00867388b63",
+   "prompt_sha256": "6f3ffb8c11c75f9becbafd19ce0fbef76bb1b0d6399d850871cd453397ed5153"
+  },
+  "template_vorticity_check": {
+   "source_sha256": "813d67bd565e6e9e52000dde667f7483c5b497c8eb2c3379e35de9aa4b6eea8e",
+   "prompt_sha256": "4092363a4499ce21c5c647267e03f25f587722716cb6a36780cff323b5942712"
+  },
+  "template_basic_buoyant_force": {
+   "source_sha256": "3c3f48791e0e2df4affa63107e86bf1aa803e30a7146c3a690978b11809ad776",
+   "prompt_sha256": "3569ec1d453edd36ae42f86c0404e6e1089e3a9e5ff91648a68c0b84470ab7d1"
+  },
+  "template_floating_object_submersion_depth": {
+   "source_sha256": "3b5ed0ad990e27df0d0ec261c69fdce0271fd55c78b3c5c2ea6a53c9fd814209",
+   "prompt_sha256": "89779c56b1fa4caecd443c1169183b17b1a895ef40d300e96a9e47ba850f6fa3"
+  },
+  "template_hydrostatic_force_on_plane": {
+   "source_sha256": "9c837fd21ef6d8079c245e55b3de86d7bb98d1420405f5b3c91e8689ef084b7b",
+   "prompt_sha256": "a20018649fdb7b3d225d73471967280675b09b5d35342c758e75f24f70a9aee1"
+  },
+  "template_hydrostatic_pressure_at_depth": {
+   "source_sha256": "afa0c7d8de04d41f2d0d0bb49df894099657de8af70b42df549356f8300a7f56",
+   "prompt_sha256": "12405fe83a5b17940a899eb24e8723b476c6bd6ebf5e1cb8544d669a1f717565"
+  },
+  "template_utube_manometer": {
+   "source_sha256": "f818396b41d4227dbb25ec7a4a9c6d5561dc6ea1f22a686369373d7a5b9e75af",
+   "prompt_sha256": "4ed90ff62d0ec93027f52b0e8b15a35217bf153ae76fc9cad23e7d9207682627"
+  },
+  "template_axial_deformation": {
+   "source_sha256": "de1a6291424b7768d14476ea16c27a10d578f6b98ee28069ac8ae200d4588b93",
+   "prompt_sha256": "2f0292b1aa03b92e033be2389746d09f42d68b3a184fb58d643d2b25cd71033f"
+  },
+  "template_basic_stress_strain": {
+   "source_sha256": "a80b49ce44496bf7a5c9e20cabb510dee1fbbff5bc039783f7cde83dc48ac9f5",
+   "prompt_sha256": "ee897b6d1758f49db643b71ed933d864a1f5c60f2145782ed8f0a65e975b0d35"
+  },
+  "template_multi_segment_rod": {
+   "source_sha256": "b866c6fa4b5baf5e053fbd7803b5ff4199b1ac237e48f96ba6811155529e8165",
+   "prompt_sha256": "528e58f5814b5f91c86d6b6cb3051f5743416f993c9940d92865bafb17129253"
+  },
+  "template_poissons_ratio": {
+   "source_sha256": "49c92547256628c593106dd17f610869dcc96d65c2bbfae54924fdac73372ab6",
+   "prompt_sha256": "a3dcf200729ff05b7d1a98f6acbb4fccee8c3501f6e727c26abb29c997715377"
+  },
+  "template_statically_indeterminate": {
+   "source_sha256": "f6c4895fe1ab32d1d58847157b8c58b5539ca01415fee153b1313ff391ab24e6",
+   "prompt_sha256": "e340ec909043c7dbedc88e1770c2fc9d59eb9e898b05c7d95ec62d1d9e73576d"
+  },
+  "template_angle_of_twist": {
+   "source_sha256": "8c4604a4897452b6205834dd409411797612de5644cd0e193161161b83b5a3d4",
+   "prompt_sha256": "ff284a183be3ddc103393bde4f60a5e1784d788f426c6ce009f8eaa1fa9985ee"
+  },
+  "template_composite_shafts_series": {
+   "source_sha256": "6a899a45fc33e03f00d97001affdd46b009f4952f3c2342d410b2a5acee21d1f",
+   "prompt_sha256": "fda3e3adb6dac0fe233c10c4a2a8a7b57057741dba7c9ec3e65d0989bf7efd98"
+  },
+  "template_shaft_design_power": {
+   "source_sha256": "015d12e9ee8ce49fd254913e4a70b4e1b2800d149c802d13d8b9e9f2c4167668",
+   "prompt_sha256": "1487c2db38ec2c67ed718610eb91199c6234ea63ac86a41a3dfc372790502f5e"
+  },
+  "template_shear_stress_torsion": {
+   "source_sha256": "7ba355823801c39295ca7d07dbfa4430e239e575631336d4e02611f9785923ed",
+   "prompt_sha256": "7929e1c1fd4bacf46c73c72bec0870a4baeb178ed2782c6a8f3214d5ca5d1d5d"
+  },
+  "template_statically_indeterminate_shaft": {
+   "source_sha256": "a4c02a24018742179e03e240c494fda50a0b70e4ed15cff1d2e487e22f013699",
+   "prompt_sha256": "68ff1914be4b27116b8374160e408b116a36acceb65046284f72c8b3259f8234"
+  },
+  "template_rotating_unbalance": {
+   "source_sha256": "c8a428c57adc66a1c8f5298ff6c39c3e8982f64d397168a4289a033fd401f81c",
+   "prompt_sha256": "69264072f54f50a3ad472ecf34e817238a66749924fc6e8380b6d2e36d946251"
+  },
+  "template_system_properties": {
+   "source_sha256": "b4e26a8249c319241d36d2b83e1ac71165d47e559b501e2bb7fe8103b4a0f885",
+   "prompt_sha256": "50f19e9657a50302b940cd0f343ff63c2f0fe6fb1c289d42f1c6fd70539ed5c9"
+  },
+  "template_vibration_isolator_design": {
+   "source_sha256": "3762ca2d3b2e0f8ea1f7a6eaf2ed1abcd8c64d24572f487568f42cba97193fae",
+   "prompt_sha256": "0bcae6d1bf2422bc60ba385786dfdb51b1a1f4ac2a657b6e38ded1d8890d2f36"
+  },
+  "template_vibration_transmissibility": {
+   "source_sha256": "9adfb638a4e3345343f5607f2b10ee4563f8bbf2f6a6807db461aae76c422d07",
+   "prompt_sha256": "8990e82e177a33591ae710210a31d330295c1a9f65f50c5e17f5fe7dde93df4f"
+  },
+  "template_damping_classification": {
+   "source_sha256": "bc1cd3424494663bae2c4d2dac1be3471cc6801d2041c9720604564532466b59",
+   "prompt_sha256": "f60788e8568c827d60469522bf9e4f4d61b716aaafa5f571ebe41a8b1ce86e8c"
+  },
+  "template_equivalent_stiffness_frequency": {
+   "source_sha256": "2b8876ad090b6010badde5d6b2bf49f410ad2d3b65b00bae1b67de42847fa980",
+   "prompt_sha256": "1e4197350fd88a94912c11e9669ca4ff393589561480c52aebb7c05296503120"
+  },
+  "template_logarithmic_decrement": {
+   "source_sha256": "69239ccbc86f92f23df767a14bb98013e187389df85b3264e0f6906504686b80",
+   "prompt_sha256": "5a4bb67d639a49622ea02284d256fbf634433e335951deb49078d3e08de0935d"
+  },
+  "template_undamped_natural_frequency_torsional": {
+   "source_sha256": "e7cb02e14f9208f0373f6443b2df2161dec46d57b40e7667e26711ed361931b7",
+   "prompt_sha256": "ff7ebbfe15a0fcf486d47fb2bbb62709cb93283a5c9c08801570a863f4a3697c"
+  },
+  "template_undamped_natural_frequency_translational": {
+   "source_sha256": "63e89343461d094b8d53958ca48c9b23b739711761bb8b6898db949a26d2b677",
+   "prompt_sha256": "ea0c4c8342a7ebd82f434f5346136b46dfc63e2d0962e8d0b853c8881130a9b4"
+  },
+  "template_undamped_response_initial_conditions": {
+   "source_sha256": "94f175df72f7c33c93605e78de1afcba10dcb9ca2db5336094278d2690f17483",
+   "prompt_sha256": "ceffeaba7298b1b046128029b301839077ff9fb58a68d43fae6cdb0165dbe4f3"
+  }
+ }
+}

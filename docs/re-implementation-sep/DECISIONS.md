@@ -3541,6 +3541,13 @@ full pass's cost, and it is what a false-positive rate against the experts needs
 the panel's verdict on the same version the experts will see. A full third pass is
 not needed unless human certification reworks a broad share of the corpus.
 
+**Pass 2 ran 2026-09-24:** 24 templates re-judged (72 calls, $0.70, all parsed on the
+first attempt), 378 rows carried. Outcome on the shipped corpus: 147 pass, 3
+controversial, 0 critical failure; AC1 on the flag 0.929 (up from 0.836). The three
+controversial templates are single-judge flags, two of them repeating claims already
+rejected with evidence; they route to the experts as the paper's rule says, and are
+not iterated against the judges.
+
 ---
 
 ## Open decisions
@@ -3549,7 +3556,7 @@ not needed unless human certification reworks a broad share of the corpus.
 |---|---|---|
 | D-094 | Whether to narrow the P2/Pc range in `work_isothermal_virial` (now 50% redraw) and accept the 41% stability redraw in `floating_object_submersion_depth`; the residuals in `pass1_fixes.md` | the item pool is regenerated |
 | D-092 | ~~Answer-display lengthening and gold-movement sign-offs~~ **Decided by the owner 2026-09-23:** the two lengthened answers stay; `beam_internal_moment`, `terzaghi_strip_footing_bearing` and `effective_stress_profile` answers are lengthened too; the gold movements are accepted; and a scoped third round removes the census ties at 3% and above (eight templates), with the frozen pool to be censused before inference and stragglers fixed then | — |
-| D-093 | ~~Approval to run screening pass 1~~ **Run 2026-09-23, $4.15.** Open now: which of the 24 flagged templates are fixed before human certification (owner), and whether the six rounding-chain claims go to the closure register or a fourth round | Layer 2 (human certification) starts |
+| D-093 | ~~Approval to run screening pass 1~~ **Both passes run (2026-09-23/24, $4.85 total); the 24 flags resolved (D-094).** Open: the Layer 2 protocol (experts, hand-checks, planted defects) | Layer 2 (human certification) starts |
 | — | Which families the next roster will evaluate (Kimi, GLM stay available as long as they are not judges) | the next benchmark run |
 | — | Expert annotation of the frozen 300 (stage 3): annotators, protocol, the ~100-trace triple-labelled overlap | any X1 agreement number |
 | D-003 | Do the raw `inference_results/` generations still exist? | promising any corrected results table |
