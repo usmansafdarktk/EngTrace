@@ -265,10 +265,14 @@ def existing_rows(path: Path) -> dict:
     return rows
 
 
-def run_pass(n: int, dry_run: bool, only: str | None) -> None:
+def run_pass(n: int, dry_run: bool, only: str | None, judge: str | None = None,
+             max_usd: float | None = None) -> None:
     if not 1 <= n <= MAX_PASSES:
         raise SystemExit(f'the screen is capped at {MAX_PASSES} passes (one before human '
                          f'certification, one after); pass {n} is refused')
+    panel = [j for j in PANEL if judge is None or j['key'] == judge]
+    if not panel:
+        raise SystemExit(f'unknown judge {judge!r}; panel keys: {[j["key"] for j in PANEL]}')
     prompts = build_prompts()
     errors = [p for p in prompts if 'error' in p]
     prompts = [p for p in prompts if 'error' not in p]
@@ -283,7 +287,7 @@ def run_pass(n: int, dry_run: bool, only: str | None) -> None:
     prices = live_prices()
     print('judges (live OpenRouter $/M in, out):')
     est_total = 0.0
-    for j in PANEL:
+    for j in panel:
         pin, pout = prices.get(j['model'], (float('nan'), float('nan')))
         est = sum(tokens) / 1e6 * pin + j['out_tokens'] * len(prompts) / 1e6 * pout
         est_total += est
@@ -314,13 +318,14 @@ def run_pass(n: int, dry_run: bool, only: str | None) -> None:
 
     out_path = d / 'replies.jsonl'
     done = existing_rows(out_path)
-    todo = [(p, j) for p in prompts for j in PANEL if (p['template_id'], j['key']) not in done]
-    print(f'{len(done)} rows already judged, {len(todo)} to go')
+    todo = [(p, j) for p in prompts for j in panel if (p['template_id'], j['key']) not in done]
+    already = sum(r.get('cost_usd') or 0.0 for r in done.values())
+    print(f'{len(done)} rows already judged (${already:.2f}), {len(todo)} to go'
+          + (f'; this run stops once it has spent ${max_usd:.2f}' if max_usd else ''))
     if not todo:
         return
     cli = client()
-    lock = threading.Lock()
-    spent, ran, failed = 0.0, 0, 0
+    spent, ran, failed, dearest = 0.0, 0, 0, 0.0
 
     def work(p, j):
         res = judge_once(cli, j, p['prompt'], prices)
@@ -329,19 +334,33 @@ def run_pass(n: int, dry_run: bool, only: str | None) -> None:
                 'judge': j['key'], 'model': j['model'], 'family': j['family'],
                 'ts': dt.datetime.now(dt.timezone.utc).isoformat(timespec='seconds'), **res}
 
+    # Work goes out in batches of WORKERS so the spend is checked between batches: a
+    # cap can stop the run within one batch of the limit, never after the whole pass.
+    stopped = False
     with ThreadPoolExecutor(max_workers=WORKERS) as pool, out_path.open('a', encoding='utf8') as fh:
-        futs = {pool.submit(work, p, j): (p['template_id'], j['key']) for p, j in todo}
-        for i, fut in enumerate(as_completed(futs), 1):
-            row = fut.result()
-            with lock:
+        for start in range(0, len(todo), WORKERS):
+            batch = todo[start:start + WORKERS]
+            for fut in as_completed([pool.submit(work, p, j) for p, j in batch]):
+                row = fut.result()
                 fh.write(json.dumps(row, ensure_ascii=False) + '\n')
                 fh.flush()
-                spent += row.get('cost_usd') or 0.0
+                c = row.get('cost_usd') or 0.0
+                spent += c
+                dearest = max(dearest, c)
                 ran += row['ok']
                 failed += not row['ok']
-                if i % 25 == 0 or i == len(todo):
-                    print(f'  {i}/{len(todo)} done, {ran} ok, {failed} failed, ${spent:.2f}')
-    print(f'pass {n}: {ran} ok, {failed} failed, ${spent:.2f} this run')
+                if c > 0.15:
+                    print(f"  note: {row['judge']} on {row['template_id']} cost ${c:.3f} "
+                          f"({row.get('completion_tokens')} completion tokens)")
+            i = min(start + WORKERS, len(todo))
+            print(f'  {i}/{len(todo)} done, {ran} ok, {failed} failed, ${spent:.2f} this run, '
+                  f'dearest reply ${dearest:.3f}')
+            if max_usd is not None and spent >= max_usd:
+                stopped = True
+                print(f'  spend cap ${max_usd:.2f} reached after {i} rows; stopping (resumable)')
+                break
+    print(f'pass {n}: {ran} ok, {failed} failed, ${spent:.2f} this run'
+          + (' - STOPPED AT CAP' if stopped else ''))
 
 
 def status(n: int) -> None:
@@ -398,6 +417,9 @@ def main() -> None:
     ap.add_argument('--status', action='store_true')
     ap.add_argument('--only', default=None, help='substring of a template id, for a smoke test')
     ap.add_argument('--smoke', action='store_true', help='write under _smoke/, not a numbered pass')
+    ap.add_argument('--judge', default=None, help='run one judge only (panel key), e.g. minimax-m3')
+    ap.add_argument('--max-usd', type=float, default=None,
+                    help='stop this run once its reported spend reaches this many dollars')
     a = ap.parse_args()
     global SMOKE
     SMOKE = a.smoke
@@ -407,7 +429,7 @@ def main() -> None:
     elif a.status:
         status(a.n)
     else:
-        run_pass(a.n, a.dry_run, a.only)
+        run_pass(a.n, a.dry_run, a.only, a.judge, a.max_usd)
 
 
 if __name__ == '__main__':

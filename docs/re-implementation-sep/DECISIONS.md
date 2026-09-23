@@ -3493,9 +3493,22 @@ can be recomputed later.
 **Cost:** about $4.60 per pass on measured reply sizes (each judge spends 1,000–
 3,000 billed reasoning tokens behind a 150-token JSON row; a flat 200-token
 assumption underestimated the pass threefold), so $9.20 for both passes. Spend
-so far: about $0.04 (a three-judge probe and a three-row smoke test). **Pass 1
-runs only on the user's explicit approval** (user rule of 2026-09-23: no paid
-API work without prior approval).
+before the pass: about $0.04 (a three-judge probe and a three-row smoke test).
+**Pass 1 runs only on the user's explicit approval** (user rule of 2026-09-23: no
+paid API work without prior approval).
+
+**Pass 1 ran 2026-09-23 on the user's approval**, judge by judge under a spend
+cap (`--judge`, `--max-usd`, added for the purpose): 450 of 450 rows parsed on the
+first or second attempt, no failures, $4.15 in OpenRouter-reported cost (Grok
+$3.29, MiniMax $0.39, MiMo $0.47). Outcome under the paper's rule: 126 pass, 13
+controversial, 11 critical failure. Inter-judge agreement on the review flag:
+Gwet's AC1 0.836 across the three, 0.80–0.87 pairwise; Fleiss' kappa 0.287 beside
+it, the same prevalence artefact the paper's Appendix K discusses. Replies,
+config and analysis are committed under `template_annotation_23092026/screen/pass1/`.
+The 24 flags are read in the folder README: presentation defects the gate cannot
+see, physical-range concerns for an expert, six rounding-chain claims on lines T1
+cannot parse, one claimed logic error, and two judge artefacts of the prompt's
+design. Pass 2 runs after human certification.
 
 ---
 
@@ -3504,7 +3517,7 @@ API work without prior approval).
 | # | Decision | Needed before |
 |---|---|---|
 | D-092 | ~~Answer-display lengthening and gold-movement sign-offs~~ **Decided by the owner 2026-09-23:** the two lengthened answers stay; `beam_internal_moment`, `terzaghi_strip_footing_bearing` and `effective_stress_profile` answers are lengthened too; the gold movements are accepted; and a scoped third round removes the census ties at 3% and above (eight templates), with the frozen pool to be censused before inference and stragglers fixed then | — |
-| D-093 | Approval to run screening pass 1 (~$4.60) once the Layer 0 branch is merged | Layer 2 (human certification) starts |
+| D-093 | ~~Approval to run screening pass 1~~ **Run 2026-09-23, $4.15.** Open now: which of the 24 flagged templates are fixed before human certification (owner), and whether the six rounding-chain claims go to the closure register or a fourth round | Layer 2 (human certification) starts |
 | — | Which families the next roster will evaluate (Kimi, GLM stay available as long as they are not judges) | the next benchmark run |
 | — | Expert annotation of the frozen 300 (stage 3): annotators, protocol, the ~100-trace triple-labelled overlap | any X1 agreement number |
 | D-003 | Do the raw `inference_results/` generations still exist? | promising any corrected results table |
