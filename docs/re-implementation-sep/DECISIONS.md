@@ -3692,11 +3692,25 @@ This is worth reporting as a robustness property rather than a footnote: an enti
 set - a fifteenth of the annotation effort, and the least self-consistent one - was replaced,
 and the truth the evaluators are scored against did not move.
 
-Two loose ends, both small. `ele-3.1` has no blind second pass, because the verification
-round was run on the set it replaced, so electrical's intra-rater figure covers two of three
-experts (0.936, kappa 0.808). And twelve electrical steps became 2-1 splits only after the
-re-annotation and were never adjudicated; they fall to the majority rule and none is a
-three-way disagreement.
+**Both loose ends were then closed (2026-09-24, same day).** `ele-3.1` was verified on the
+same seven traces as the branch's other two experts - 0.945 step agreement, kappa 0.845,
+which lifts electrical's intra-rater figure above the pooled average and covers all fifteen
+sets. And electrical was re-adjudicated against `ele-3.1`: all 47 of its current splits were
+reviewed blind, 51 rows unanimous and 7 by majority, with the superseded round kept under
+`adjudication/superseded/`.
+
+That second round is what finally moved the truth, by 12 step labels, all correct ->
+incorrect: the 12 steps that became splits only once `ele-3.1` was labelled, which the
+reviewers judged real errors. The truth now holds **388 incorrect steps rather than 376**.
+Verdicts and final answers are unchanged, so every trace-level result stands - E0 0.850,
+E5 0.886, the expert answer verdict 0.974 - and only the step-level numbers move: the 72B
+PRM to precision 0.539 / recall 0.515, the hard-case pool from 87 to 93 traces, and the
+digit rule to precision 0.506 / recall 0.472 (trace AUROC 0.655, still the only result
+clearing chance on that target).
+
+So the honest form of the robustness claim is two-stage: replacing an entire expert's set
+changed no ground-truth label, and re-adjudicating the disputes it created changed 12 of
+2,091, none of them a verdict.
 
 ## Open decisions
 

@@ -63,7 +63,10 @@ def verification(labels_dir):
                                                   'kappa', 'verdict', 'answer', 'min/trace'))
     per_branch = defaultdict(list)
     rows = []
+    current = {a for a, _ in first}
     for (ann, code), r2 in sorted(again.items()):
+        if ann not in current:
+            continue          # a re-label belonging to a set that has since been superseded
         r1 = first.get((ann, code))
         if not r1:
             print('  %s %s: no first pass to compare' % (ann, code))

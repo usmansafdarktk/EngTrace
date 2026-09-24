@@ -22,13 +22,19 @@ diagnostics identified: "not a claim" fell from 6.1% of that expert's steps to 0
 steps marked incorrect rose from 10.3% to 22.2%, in line with the branch's other two
 experts.
 
-**The ground truth did not move.** Rebuilding it with `ele-3.1` in place of `ele-3` leaves
-all 2,091 step labels and all 300 verdicts identical (`annotation/rater_diagnostics.py`,
-`annotation/score_against_labels.py`). That is the adjudication round working as designed:
-every step where the replaced set could have swung a majority had already been settled by
-the branch's three experts reviewing it blind, so an entire expert's set can be replaced
-without a single ground-truth label changing. Every number in this document therefore
-stands unchanged; what improved is the reliability the labels are held to.
+**Replacing the set moved nothing; re-adjudicating it moved 12 steps.** Rebuilding the
+truth with `ele-3.1` in place of `ele-3`, holding the adjudication fixed, leaves all 2,091
+step labels and all 300 verdicts identical - every step where the replaced set could have
+swung a majority had already been settled by the branch's three experts reviewing it
+blind. What the re-annotation did change is which steps are *disputed*: electrical's 2-1
+splits fell from 77 to 47, 12 of them new. Those 12 went back through the same blind
+review, which called all 12 incorrect, so the truth now holds **388 incorrect steps rather
+than 376**. Verdicts and final answers are unchanged, so every trace-level result in this
+document stands; the step-level numbers are re-computed on the 388.
+
+That two-stage result is worth reporting as a robustness property: an entire expert's set -
+a fifteenth of the annotation effort, and the least self-consistent one - was replaced, and
+the ground truth moved by 12 of 2,091 labels, none of them a verdict.
 
 Scripts: `annotation/score_against_labels.py` (headline comparison),
 `annotation/verification_report.py` (the two new rounds), `analysis/x1_analysis.py`
@@ -48,23 +54,24 @@ Within raters, from the verification round (792 re-labelled steps):
 
 | | chemical | civil | electrical | industrial | mechanical | pooled |
 |---|---|---|---|---|---|---|
-| step agreement with their own first pass | 0.972 | 0.935 | 0.936 | 0.915 | 0.991 | **0.946** |
-| Cohen's κ | 0.913 | 0.519 | 0.808 | 0.820 | 0.947 | **0.819** |
+| step agreement with their own first pass | 0.972 | 0.935 | 0.945 | 0.915 | 0.991 | **0.947** |
+| Cohen's κ | 0.913 | 0.519 | 0.845 | 0.820 | 0.947 | **0.828** |
 
-An expert agrees with themselves on 95% of steps (κ 0.82), and three experts agree with
-each other at κ 0.78. The between-rater figure is therefore close to the ceiling their
-own consistency sets, which is the point of measuring both. Electrical covers two of its
-three experts: the verification round was run on the set `ele-3` later replaced, so
-`ele-3.1` has no blind second pass of its own.
+An expert agrees with themselves on 95% of steps (κ 0.83), and three experts agree with
+each other at κ 0.78. The between-rater figure is therefore close to the ceiling their own
+consistency sets, which is the point of measuring both. All fifteen sets are covered:
+`ele-3.1` was verified on the same seven traces as the branch's other two experts, and the
+round that had been run on the set it replaced is kept under `verification/ele/superseded/`.
 
-The adjudication settled **292 split steps across 137 traces**. The three reviewers came
-back unanimous on 273 of them and 2–1 on 34. Against the final label sets it **changes 73
-ground-truth step labels** and confirms the majority on 219, and every consensus row
-carries a written reason. After adjudication no step, milestone or verdict is left
-disputed, and the count of steps the experts call incorrect rises from 322 to **376** of
-2,091 — adjudication mostly resolved splits *towards* an error being real. Twelve
-electrical steps became 2–1 splits only after `ele-3.1` was labelled and were never
-adjudicated; they fall to the majority rule, and none is a three-way disagreement.
+The adjudication settled **272 split steps across 134 traces** (255 distinct steps; the
+shared calibration traces are reviewed by more than one branch). The three reviewers came
+back unanimous on 240 of them and 2–1 on 32. It **changes 85 ground-truth step labels** and
+confirms the majority on 170, and every consensus row carries a written reason. After
+adjudication no step, milestone or verdict is left disputed, and the count of steps the
+experts call incorrect rises from 322 to **388** of 2,091 — adjudication mostly resolved
+splits *towards* an error being real. Electrical was adjudicated twice: the round run
+against `ele-3` is kept under `adjudication/superseded/`, and the current round covers all
+47 of the splits that `ele-3.1` leaves.
 
 The experts judge **229 traces sound and 71 unsound**.
 
@@ -168,18 +175,18 @@ E3 at this level, as RESULTS_E4 found.
 
 | Steps, against the experts' "incorrect" | AUROC | 95% CI | precision | recall | F1 |
 |---|---|---|---|---|---|
-| Qwen2.5-Math-PRM-72B | **0.828** | 0.799–0.853 | 0.534 | 0.526 | 0.530 |
-| Qwen2.5-Math-PRM-7B | 0.765 | 0.732–0.798 | 0.432 | 0.421 | 0.427 |
-| VersaPRM | 0.628 | 0.591–0.666 | 0.385 | 0.066 | 0.113 |
-| *inside correct-answer traces only (167 incorrect steps):* | | | | | |
-| Qwen2.5-Math-PRM-72B | 0.753 | 0.718–0.788 | **0.240** | 0.266 | 0.252 |
+| Qwen2.5-Math-PRM-72B | **0.825** | 0.798–0.850 | 0.539 | 0.515 | 0.527 |
+| Qwen2.5-Math-PRM-7B | 0.767 | 0.735–0.799 | 0.441 | 0.416 | 0.428 |
+| VersaPRM | 0.629 | 0.593–0.666 | 0.385 | 0.064 | 0.110 |
+| *inside correct-answer traces only (178 incorrect steps):* | | | | | |
+| Qwen2.5-Math-PRM-72B | 0.752 | 0.718–0.785 | **0.246** | 0.255 | 0.250 |
 
-- **The 72B ranks steps well overall** (AUROC 0.83) and now flags about as many steps as
-  the experts do (358 flags against 376 incorrect steps), with just over half its flags
-  real. The richer labels moved its precision from 0.47 to 0.53 without moving its AUROC
+- **The 72B ranks steps well overall** (AUROC 0.83) and now flags slightly fewer steps than
+  the experts mark (358 flags against 388 incorrect steps), with just over half its flags
+  real. The richer labels moved its precision from 0.47 to 0.54 without moving its AUROC
   much: the model was partly being scored against missing labels, not failing.
-- **Inside correct-answer traces, where a step-level evaluator would add most, 76% of
-  its flags are false alarms** and it finds 27% of the real errors.
+- **Inside correct-answer traces, where a step-level evaluator would add most, 75% of
+  its flags are false alarms** and it finds 26% of the real errors.
 - **VersaPRM's failure is confirmed:** it finds 7% of the incorrect steps.
 
 ## Finding 4 — the experts contradict E2's reordering of the frontier
@@ -200,31 +207,31 @@ to rank the evaluators on them.
 
 ## Finding 5 — the hard case, scored on the step labels
 
-The experts' step labels mark at least one incorrect step in **87 of the 228
-correct-answer traces** (167 steps), while their holistic verdict calls 84 of those same
+The experts' step labels mark at least one incorrect step in **93 of the 228
+correct-answer traces** (178 steps), while their holistic verdict calls 90 of those same
 traces sound. Scoring the trace-level question as "does this trace contain an incorrect
-step, given the answer is correct" gives the hard-case comparison 87 positives instead
+step, given the answer is correct" gives the hard-case comparison 93 positives instead
 of 3 (`analysis/hard_case_pool.py`).
 
-| Hard case: 228 correct-answer traces, 87 flawed | AUROC | 95% CI | minus E0 |
+| Hard case: 228 correct-answer traces, 93 flawed | AUROC | 95% CI | minus E0 |
 |---|---|---|---|
-| E0 | 0.541 | 0.464–0.616 | — |
-| E0-3J | 0.549 | 0.469–0.625 | +0.008 |
-| E1 | 0.545 | 0.469–0.620 | +0.004 |
-| E2, 72B, fraction of steps ok | 0.555 | 0.478–0.626 | +0.017 |
-| E2, 72B, lowest step reward | **0.584** | 0.504–0.657 | +0.046 |
-| E3 | 0.394 | 0.337–0.455 | **−0.147** (significant) |
-| E4 | 0.399 | 0.341–0.459 | **−0.142** (significant) |
-| E5 | 0.434 | 0.391–0.480 | **−0.107** (significant) |
-| *baseline: E0's own answer check* | 0.510 | 0.451–0.572 | −0.031 |
+| E0 | 0.542 | 0.466–0.615 | — |
+| E0-3J | 0.561 | 0.482–0.635 | +0.019 |
+| E1 | 0.546 | 0.470–0.619 | +0.004 |
+| E2, 72B, fraction of steps ok | 0.549 | 0.475–0.620 | +0.010 |
+| E2, 72B, lowest step reward | **0.583** | 0.505–0.656 | +0.044 |
+| E3 | 0.392 | 0.335–0.453 | **−0.150** (significant) |
+| E4 | 0.397 | 0.339–0.457 | **−0.145** (significant) |
+| E5 | 0.426 | 0.382–0.472 | **−0.116** (significant) |
+| *baseline: E0's own answer check* | 0.521 | 0.462–0.580 | −0.021 |
 
 - **No *evaluator* detects flawed reasoning behind a correct answer.** Every AUROC sits
-  near chance; the best, E2's lowest step reward at 0.584, does not separate from E0. A
+  near chance; the best, E2's lowest step reward at 0.583, does not separate from E0. A
   deterministic digit check does - see below.
 - **E3, E4 and E5 are significantly worse than chance-level E0 here**, because they
   score a trace by milestones a correct answer already implies. Their strength at the
   milestone level (Finding 2) is not a strength at this question.
-- **164 of the 167 incorrect steps are calculation slips and 3 are conceptual**, so what
+- **175 of the 178 incorrect steps are calculation slips and 3 are conceptual**, so what
   this set mostly holds is arithmetic that does not change the answer. That is worth
   stating plainly in the paper rather than presenting the set as deep reasoning failure.
 
@@ -243,18 +250,18 @@ That is E4's checker with its 1% tolerance replaced by the displayed precision.
 
 | Hard case, 228 correct-answer traces | step precision | step recall | step F1 | trace AUROC |
 |---|---|---|---|---|
-| E4 as it ships (1% tolerance) | 0.154 | 0.036 | 0.058 | 0.478 |
-| tolerance 0.1% | 0.346 | 0.108 | 0.164 | 0.529 |
-| **the digit rule** | **0.488** | **0.485** | **0.486** | **0.669** (0.604–0.732) |
-| *E2, 72B, for comparison* | 0.240 | 0.266 | 0.252 | 0.584 |
+| E4 as it ships (1% tolerance) | 0.154 | 0.034 | 0.055 | 0.480 |
+| tolerance 0.1% | 0.346 | 0.101 | 0.157 | 0.527 |
+| **the digit rule** | **0.506** | **0.472** | **0.488** | **0.655** (0.594–0.717) |
+| *E2, 72B, for comparison* | 0.246 | 0.255 | 0.250 | 0.583 |
 
 The digit rule doubles the 72B PRM at step level and is the only thing in the pilot
 whose hard-case interval clears chance, at no API cost and with an auditable flag: it
 names the claim, the value shown and the value recomputed (`ln(0.17911) = -1.71918`,
 computes to -1.71976). E4's tolerance, not its design, was the problem.
 
-Two limits. Recall is 0.485, bounded by what the checker can parse, so extending parse
-coverage is the next gain. And 85 flagged steps in correct-answer traces are not marked
+Two limits. Recall is 0.472, bounded by what the checker can parse, so extending parse
+coverage is the next gain. And 82 flagged steps in correct-answer traces are not marked
 incorrect by the experts; a sample of those should go to one expert in the adjudication
 format already used, since each is either a rounding chain the rule should tolerate or a
 slip the experts missed - and both answers are worth having.
