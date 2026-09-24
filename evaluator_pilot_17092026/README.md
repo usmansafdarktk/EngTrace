@@ -46,13 +46,15 @@ evaluator_pilot_17092026/
   run_traces.py      models over the slice; resumable, --check first
   verify_traces.py   checks produced traces against the slice; T1-T7 + plants
   run_evaluator.py   one harness for every evaluator: (evaluator, traces) -> scores
+  pinned_templates.py  runs a pilot command against the templates as of the freeze
   models.json        trace models, cohorts, routes, ceilings, prices - and why
   evaluators/
     e0_tribunal.py     E0: the published framework, imported unmodified
     e0_3j_tribunal.py  E0 with the missing get_model_info supplied (third judge)
     milestones.py      per-instance milestones, derived by rule (D-084)
     e3_milestones.py   E3: milestone coverage, order-free, unit-aware
-    arith.py           sympy checker for stated arithmetic, validated on gold AND traces (D-085, D-087)
+    arith.py           sympy checker for stated arithmetic: 1% "is it fabricated" and
+                       the experts' digit rule, both validated on gold (D-085, D-087, D-097)
     e4_arith.py        E4: E3 milestones classed verified / contradicted / stated
   analysis/          the script behind every reported number
   kaggle/            GPU offload for the scorer stack (D-086)
@@ -105,6 +107,19 @@ The harness refuses to score unless the freeze verifies and the requested column
 pass T1-T7, seeds E0's wrong-answer sample from (item, model) so every judged
 evaluator samples the same traces (D-082), and resumes only when both the trace hash
 and the evaluator's config hash match.
+
+**E3, E4 and E5 need the templates the slice was frozen from.** They derive
+milestones by regenerating each item and checking it byte-identical to the manifest
+(`evaluators/milestones.py`). Template work in the main repo on 2026-09-23 and
+2026-09-24 (`3fad887`, `fc1a6dc`) rewrote how five of the pilot's templates display a
+derivation, so 17 of the 60 items no longer reproduce and the run stops. Front the
+command with the pin, which reads those five files back out of git and changes
+nothing in the working tree:
+
+```bash
+$PY -m evaluator_pilot_17092026.pinned_templates --check           # 60/60 reproduce, pinned
+$PY -m evaluator_pilot_17092026.pinned_templates run_evaluator e4  # as above, with the pin
+```
 
 **Going faster.** The dry run's Tier 1 can go to a Kaggle GPU
 (`kaggle/stage_bundle.py`, then push `kaggle/e0-dryrun`, then

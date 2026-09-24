@@ -228,7 +228,11 @@ def report_steps(truth, keyfile):
 
 def report_milestones(truth, keyfile):
     print('\nMILESTONE LEVEL - E3, E4 and E5 against the experts')
-    tables = {'e3': current('e3'), 'e4': current('e4'), 'e5': current('e5')}
+    e4 = current('e4')
+    # 'e4-ok' is E4 reading its own arithmetic check: a milestone whose shown work
+    # does not produce it is not credited. Plain 'e4' credits every value the trace
+    # states, which is E3's question and gives E3's numbers by construction.
+    tables = {'e3': current('e3'), 'e4': e4, 'e4-ok': e4, 'e5': current('e5')}
     print('  %-6s %6s %6s %6s %8s %8s %8s' % ('eval', 'TP', 'FP', 'FN', 'prec', 'rec', 'F1'))
     for name, rows in tables.items():
         if not rows:
@@ -243,6 +247,8 @@ def report_milestones(truth, keyfile):
                 if m['status'] is None or m['id'] not in got:
                     continue
                 said = bool(got[m['id']].get('reached'))
+                if name == 'e4-ok':
+                    said = got[m['id']].get('status') in ('verified', 'stated')
                 if name == 'e5':
                     # E5 rows carry source 'e3' (found deterministically) or the judge's
                     # verdict string; e5_strict credits E3's matches plus REACHED.

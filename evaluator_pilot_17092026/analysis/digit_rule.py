@@ -13,13 +13,22 @@ side is a correct rounding of it at the precision shown. `0.92979^(2/3) = 0.9530
 flagged because the value rounds to 0.95263 at five decimals; `= 0.9526` is not flagged,
 and neither is any legitimate rounding.
 
-This is E4's checker with its tolerance replaced by the displayed precision. E4 asks
+This is E4's checker with its tolerance replaced by the displayed precision. E4 asked
 whether a claim is within 1% - enough to catch a fabricated number, blind to every slip
-the experts actually marked. Three rules are compared so the difference is visible:
+the experts actually marked - and now scores on the rule this script measured (D-097).
+Four rules are compared so every difference between them stays visible:
 
-    tol1    relative tolerance 1%, what E4 ships with
+    tol1    relative tolerance 1%, what E4 shipped with
     tol01   relative tolerance 0.1%
     digit   the experts' rule: the last digit shown must be a correct rounding
+    e4      the same rule AS THE EVALUATOR NOW SHIPS IT (arith.Claim.ok_digit)
+
+`digit` is the rule as measured for D-097: the displayed precision alone, units
+ignored. `e4` is what `evaluators/arith.py` applies now, and differs in two ways,
+both found by re-running the gold validation (analysis/arith_gold_validation.py):
+a unit conversion is compared after its unit factor, and a result is not held to a
+precision its own displayed operands cannot pin down. Both loosen the rule, so `e4`
+flags fewer claims than `digit`; the two lines below say what that costs.
 
 Nothing here calls a model, so the cost is zero and the flag is auditable: it names the
 claim, the value shown and the value recomputed.
@@ -41,7 +50,7 @@ import score_against_labels as S  # noqa: E402
 import x1_analysis as X  # noqa: E402
 
 NUM = re.compile(r'[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?')
-RULES = ('tol1', 'tol01', 'digit')
+RULES = ('tol1', 'tol01', 'digit', 'e4')
 
 
 def ulp(lit):
@@ -56,6 +65,10 @@ def flagged(text, rule):
     """Claims in this text the rule rejects, with what they said and what they compute to."""
     out = []
     for c in arith.check(text).claims:
+        if rule == 'e4':                      # the evaluator's own verdict, unaltered
+            if not c.ok_digit:
+                out.append((c.left, c.right, c.left_value[0]))
+            continue
         lit = NUM.search(c.right.replace(',', ''))
         if not lit or not c.left_value or not c.right_value:
             continue

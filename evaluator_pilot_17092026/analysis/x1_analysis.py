@@ -38,7 +38,8 @@ import score_against_labels as S  # noqa: E402
 HEADS = [('E0', 'e0', 'recovered_f1'), ('E0-3J', 'e0_3j', 'recovered_f1'),
          ('E1', 'e1', 'recovered_f1'), ('E2 (72B frac)', 'e2', 'e2'),
          ('E2 (72B min)', 'e2', 'qwen72_min'), ('E3', 'e3', 'milestone_coverage'),
-         ('E4', 'e4', 'e4_coverage'), ('E5', 'e5', 'e5_strict')]
+         ('E4', 'e4', 'e4_coverage'), ('E4 (arith)', 'e4', 'arith_consistency'),
+         ('E4 (arith 1%)', 'e4', 'arith_consistency_tol1'), ('E5', 'e5', 'e5_strict')]
 MODELS = ('gpt-5', 'claude-opus-4.7', 'gemini-3.1-pro', 'deepseek-r1', 'llama-3.1-70b')
 B = 2000
 
@@ -88,7 +89,10 @@ def table(rows_by_code, truth, keyfile, title, codes=None):
     score['baseline: E0 answer check'] = {c: e0.get(keyfile[c], {}).get('scores', {}).get('final_answer_acc') for c in codes}
     score['baseline: expert answer verdict'] = {c: 1.0 if truth[c]['final_answer'] == 'correct' else
                                                 (0.5 if truth[c]['final_answer'] == 'partial' else 0.0) for c in codes}
-    print('  %-32s %7s  %-15s  %-22s' % ('evaluator', 'AUROC', '95% CI', 'minus E0 (95% CI)'))
+    # `n` is how many of these traces the score exists for: E4's arithmetic score is
+    # None where the checker found nothing to check, and a row scored on a subset must
+    # say so. The difference from E0 is always taken on the traces both cover.
+    print('  %-32s %7s  %-15s %5s  %-22s' % ('evaluator', 'AUROC', '95% CI', 'n', 'minus E0 (95% CI)'))
     for name in list(score):
         ok = [c for c in codes if score[name][c] is not None]
         a = auroc([(score[name][c], y[c]) for c in ok])
@@ -101,7 +105,7 @@ def table(rows_by_code, truth, keyfile, title, codes=None):
             dlo, dhi = boot(both, lambda ks: auroc([(score[name][c], y[c]) for c in ks])
                             - auroc([(score['E0'][c], y[c]) for c in ks]))
             d = '%+.3f (%+.3f, %+.3f)%s' % (dd, dlo, dhi, '' if dlo <= 0 <= dhi else ' *')
-        print('  %-32s %7.3f  (%.3f, %.3f)   %s' % (name, a, lo, hi, d))
+        print('  %-32s %7.3f  (%.3f, %.3f) %5d  %s' % (name, a, lo, hi, len(ok), d))
 
 
 def per_model(rows_by_code, truth, keyfile, codes):

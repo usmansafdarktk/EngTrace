@@ -9,9 +9,29 @@ segments, evaluates each with sympy, and reports which consecutive pairs agree.
 Symbolic segments (`Vc * Zc**(...)`) are skipped - they cannot be evaluated
 without binding symbols - so a chain is checked from its first numeric segment on.
 
-TOLERANCE. Traces round every displayed intermediate to 3-4 significant figures,
-and a chain of three roundings can drift ~1%. ARITH_TOL is 1%; a claim that is off
-by more than that did not come from the arithmetic shown.
+TWO RULES, TWO QUESTIONS (D-097). Every claim is judged twice and both verdicts are
+carried on it, because they answer different questions:
+
+  ok        relative tolerance ARITH_TOL = 1%. "Is this number FABRICATED?" Traces
+            round every displayed intermediate to 3-4 significant figures and a
+            chain of three roundings can drift ~1%, so 1% is the loosest reading of
+            the shown work that still rejects a value the work cannot produce.
+  ok_digit  the experts' own rule, from the annotation guide: *rounding is not an
+            error, a wrong digit is*. Recompute the left side from the numbers the
+            trace itself shows, and accept the right side only if it is a correct
+            rounding AT THE PRECISION IT DISPLAYS: `0.92979^(2/3) = 0.95300` is
+            rejected (it rounds to 0.95263 at five decimals), `= 0.9526` is not.
+
+1% catches a fabricated number and is blind to every slip the experts marked - at 1%
+the checker reaches recall 0.034 on the steps inside correct-answer traces, against
+precision ~0.5 / recall ~0.5 for the digit rule (analysis/digit_rule.py, D-097). So
+E4 scores its arithmetic on ok_digit and reports the 1% rate beside it; nothing that
+used the 1% rule has lost it.
+
+The digit rule keeps the unit handling: `91.4 deg = 1.594 rad` and `1% = 0.01` are
+conversions, and the displayed precision is compared AFTER the unit factor. Without
+that, unit conversions in the gold solutions are flagged as wrong digits - measured,
+not assumed: analysis/arith_gold_validation.py.
 
 VALIDATED ON GOLD FIRST. Gold arithmetic is correct by construction, so any claim
 the checker marks inconsistent on a gold solution is a checker bug. The first cut
@@ -212,20 +232,103 @@ def agree(a: float, b: float, tol: float = ARITH_TOL) -> bool:
     return abs(a - b) / abs(b) <= tol
 
 
-def agree_any(la, ra, lu: str, ru: str) -> bool:
-    """Any candidate pair agrees; under a unit factor only if the units differ.
-
-    `1% = 0.01` and `91.4 deg = 1.594 rad` are conversions: a percent sign or an
-    angle unit on EITHER side licenses the matching factor, because the bare side
-    is simply unit-less.
-    """
+def _unit_factors(lu: str, ru: str) -> set:
+    """`1% = 0.01` and `91.4 deg = 1.594 rad` are conversions: a percent sign or an
+    angle unit on EITHER side licenses the matching factor, because the bare side is
+    simply unit-less."""
     factors = set(UNIT_FACTORS) if (lu and ru and lu != ru) else {1.0}
     units = (lu + ' ' + ru).lower()
     if '%' in units:
         factors |= {100.0, 0.01}
     if 'deg' in units or 'rad' in units:
         factors |= {math.pi / 180, 180 / math.pi}
-    return any(agree(a * f, b) for a in la for b in ra for f in factors)
+    return factors
+
+
+def agree_any(la, ra, lu: str, ru: str) -> bool:
+    """Any candidate pair agrees within ARITH_TOL; under a unit factor only if the
+    units differ."""
+    return any(agree(a * f, b) for a in la for b in ra for f in _unit_factors(lu, ru))
+
+
+NUM_LITERAL = re.compile(r'[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?')
+# A literal written with a decimal point or an exponent carries a rounding: it is a
+# measured or displayed value, known only to its last digit. A bare integer (a count,
+# an exponent, a coefficient) is exact and does not move.
+ROUNDED_LITERAL = re.compile(r'(?<![A-Za-z0-9_.])[-+]?(?:\d+\.\d*|\.\d+|\d+)(?:[eE][-+]?\d+)?')
+
+
+def ulp(lit: str):
+    """Place value of the last digit shown: '0.95300' -> 1e-5, '1.2e3' -> 100."""
+    m = re.match(r'[-+]?(\d*)\.?(\d*)(?:[eE]([-+]?\d+))?$', lit.strip())
+    if not m:
+        return None
+    return 10.0 ** ((int(m.group(3)) if m.group(3) else 0) - len(m.group(2)))
+
+
+def displayed_ulp(seg: str):
+    """The precision a segment DISPLAYS - the place value of the last digit of the
+    first number it writes. None when no literal can be read, and a claim whose
+    precision cannot be read is left unjudged by the digit rule rather than guessed
+    at (the same choice the parser makes for a segment it cannot evaluate)."""
+    m = NUM_LITERAL.search(seg.replace(',', ''))
+    return ulp(m.group(0)) if m else None
+
+
+def shown_uncertainty(seg: str, vals: list) -> list:
+    """How far this segment's value can move if every ROUNDED number it shows is
+    anywhere inside its own last digit - one figure per candidate value.
+
+    Gold's `(-21) * (-5.06e-02) - (-27) * (-6.42e-02) = -0.6699` is why this exists.
+    The gold states B to three figures and computes with the unrounded value, so the
+    displayed operands reproduce -0.6708, not -0.6699. Judging the last digit of the
+    result against operands that are themselves rounded flagged 12 correct gold
+    claims (analysis/arith_gold_validation.py). The result can only be pinned as
+    tightly as the numbers shown allow, so each literal is moved by half its own last
+    digit and the resulting moves are added - first order, worst case, and correct
+    under cancellation, where a relative tolerance is not.
+    """
+    out = [0.0] * len(vals)
+    for m in ROUNDED_LITERAL.finditer(seg):
+        lit = m.group(0)
+        if '.' not in lit and 'e' not in lit and 'E' not in lit:
+            continue                                  # a bare integer is exact
+        h = ulp(lit)
+        if h is None:
+            continue
+        try:
+            x = float(lit)
+        except ValueError:
+            continue
+        moved = seg[:m.start()] + '(' + repr(x + 0.5 * h) + ')' + seg[m.end():]
+        vals2, kind, _ = evaluate(moved)
+        if kind != 'num' or len(vals2) != len(vals):
+            continue
+        for k, v in enumerate(vals):
+            out[k] += abs(vals2[k] - v)
+    return out
+
+
+def agree_any_digit(la, ra, lu: str, ru: str, u: float, ul=None, ur=None) -> bool:
+    """The experts' rule: the right side, as displayed, is a correct rounding of the
+    left side, computed from the numbers shown.
+
+    The tolerance is half the place value of the displayed last digit, widened to
+    whatever the shown operands leave undetermined (`shown_uncertainty`) on either
+    side. `ul`/`ur` default to zero, which is the rule as D-097 measured it; the
+    caller adds them only for a claim the bare rule rejects, since they can only
+    widen it. A relative slack of 1e-7 keeps a value that lands exactly on the
+    rounding boundary in binary floating point off the list.
+    """
+    ul = ul or [0.0] * len(la)
+    ur = ur or [0.0] * len(ra)
+    for f in _unit_factors(lu, ru):
+        for i, a in enumerate(la):
+            for j, b in enumerate(ra):
+                tol = max(0.5 * u, ur[j]) + ul[i] * abs(f)
+                if abs(a * f - b) <= tol * (1 + 1e-7):
+                    return True
+    return False
 
 
 @dataclass
@@ -235,7 +338,11 @@ class Claim:
     right: str
     left_value: list
     right_value: list
-    ok: bool
+    ok: bool                      # within ARITH_TOL (1%): the fabrication test
+    ok_digit: bool = True         # a correct rounding at the precision shown (D-097)
+    ulp: float = None             # the place value that judged it; None = unjudged
+    left_unit: str = ''           # the unit tails, as split_unit read them, so an
+    right_unit: str = ''          # audit can re-judge the claim under another rule
 
 
 @dataclass
@@ -254,6 +361,19 @@ class Report:
     @property
     def rate(self):
         return self.consistent / self.checked if self.checked else None
+
+    @property
+    def consistent_digit(self):
+        return sum(c.ok_digit for c in self.claims)
+
+    @property
+    def rate_digit(self):
+        return self.consistent_digit / self.checked if self.checked else None
+
+    @property
+    def digit_judged(self):
+        """Claims whose displayed precision could be read, so the digit rule applied."""
+        return sum(c.ulp is not None for c in self.claims)
 
 
 def check(text: str) -> Report:
@@ -279,12 +399,28 @@ def check(text: str) -> Report:
                 inherited.append((sg, v, u or nxt))
             nums = list(reversed(inherited))
             for (ls, lv, lu), (rs, rv, ru) in zip(nums, nums[1:]):
-                rep.claims.append(Claim(i, ls[:80], rs[:80], lv, rv, agree_any(lv, rv, lu, ru)))
+                u = displayed_ulp(rs)
+                if u is None:
+                    digit = True                      # no readable precision: unjudged
+                else:
+                    digit = agree_any_digit(lv, rv, lu, ru, u)
+                    if not digit:                     # only then pay for the propagation
+                        digit = agree_any_digit(lv, rv, lu, ru, u,
+                                                shown_uncertainty(ls, lv),
+                                                shown_uncertainty(rs, rv))
+                rep.claims.append(Claim(i, ls[:80], rs[:80], lv, rv,
+                                        agree_any(lv, rv, lu, ru), digit, u, lu, ru))
     return rep
 
 
 def selftest() -> int:
-    """Plants: a correct chain must pass, a corrupted one must fail."""
+    """Plants: a correct chain must pass, a corrupted one must fail.
+
+    Each case carries what the 1% rule must say and, where the two differ, what the
+    digit rule must say (a third element). The rules disagree by design: the digit
+    rule rejects a last digit that is not a correct rounding even when the number is
+    within 1%, and that is the whole point of it.
+    """
     cases = [
         ('Tr = 283.81 / 469.7 = 0.6042', True),
         ('V = (1.26 - 0.99) / 0.0353 = 7.6487 L', True),
@@ -313,7 +449,10 @@ def selftest() -> int:
         ('phi = 64.834° - 180° = -115.166°', True),             # degree sign is a unit
         (r'$A = 2.7 \times 2.4 = 6.48 \mathrm{m}^2$', True),     # LaTeX unit keeps its exponent
         ('q = -82.39 μC = -82.39 × 10^-6 C', True),             # Greek mu
-        ('theta = 91.4 deg = 1.594 rad', True),                 # deg -> rad
+        # deg -> rad is a conversion, not a contradiction. 91.4 deg is 1.59523 rad, but
+        # 91.4 is itself shown to a tenth: 91.35-91.45 deg covers 1.594, so it stands.
+        ('theta = 91.4 deg = 1.594 rad', True),
+        ('theta = 91.400 deg = 1.594 rad', True, False),        # shown to a thousandth: wrong digit
         ('p = 1% = 0.01', True),                                # percent -> fraction
         ('p = 1% = 0.02', False),                               # ...and still checked
         ('Pa = (1 - Pd) (at 3.5%) = 0.6296', None),             # fragment `3.5%)`
@@ -327,14 +466,33 @@ def selftest() -> int:
         # the right milestone is stated, the arithmetic shown does not produce it.
         ('A = (3.8 + 2*1.500*2)*1.500 = 14.100 m^2', False),
         ('y = 1.853 - (0.2892*(-0.160))/(-2.8172) = 1.86921', False),
+        # THE DIGIT RULE (D-097). A correct rounding passes at any precision; a last
+        # digit the shown numbers do not produce fails, even though 1% forgives it.
+        ('k = 0.92979^(2/3) = 0.9526', True, True),
+        ('k = 0.92979^(2/3) = 0.95300', True, False),     # rounds to 0.95263
+        ('A = 0.4525 * 0.089 * 80 / 100 = 0.032218', True, True),
+        # The same wrong sixth digit, twice: forgiven when the operands shown cannot
+        # pin it (0.089 is two figures), flagged when they can (0.0890 is three).
+        ('A = 0.4525 * 0.089 * 80 / 100 = 0.032318', True, True),
+        ('A = 0.4525 * 0.0890 * 80 / 100 = 0.032318', True, False),
+        ('r = 2/3 = 0.67', True, True),                   # rounding up is a rounding
+        ('r = 2/3 = 0.66', False, False),                 # truncation is a wrong digit
+        ('Re = 1000 * 2.5 * 0.05 / 0.00089 = 140449', True, True),
+        # `0.05` shown to two decimals is 0.045-0.055, so nothing past the second
+        # figure of Re is pinned at all; write the operands out and the digit is.
+        ('Re = 1000 * 2.500 * 0.0500 / 0.000890 = 141450', True, False),
     ]
     bad = 0
-    for text, want in cases:
+    for case in cases:
+        text, want = case[0], case[1]
+        want_digit = case[2] if len(case) > 2 else want
         r = check(text)
         got = None if not r.checked else (r.consistent == r.checked)
-        mark = 'ok' if got == want else 'FAIL'
-        bad += got != want
-        print('  [%s] %-70s expect %-5s got %s' % (mark, text[:70], want, got))
+        got_digit = None if not r.checked else (r.consistent_digit == r.checked)
+        miss = (got != want) + (got_digit != want_digit)
+        bad += bool(miss)
+        print('  [%s] %-62s 1%%: expect %-5s got %-5s | digit: expect %-5s got %s'
+              % ('ok' if not miss else 'FAIL', text[:62], want, got, want_digit, got_digit))
     print('selftest: %d failure(s)' % bad)
     return bad
 

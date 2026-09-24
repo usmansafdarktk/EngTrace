@@ -75,9 +75,11 @@ def answer_ok(text, gold):
 
 
 def arith_flags(text):
-    """Failed arithmetic claims, as E4's checker counts them."""
+    """Failed arithmetic claims, as E4's checker counts them, under both of its
+    rules: the digit rule E4 now scores on (D-097) and the 1% tolerance it shipped
+    with. The two are reported side by side because they select different traces."""
     rep = arith.check(text)
-    return rep.checked - rep.consistent, rep.checked
+    return rep.checked - rep.consistent_digit, rep.checked - rep.consistent, rep.checked
 
 
 def describe(truth, keyfile, codes):
@@ -115,7 +117,9 @@ def table(rows_by_code, truth, keyfile, codes, y, title):
         score[name] = {c: rows_by_code[d].get(keyfile[c], {}).get('scores', {}).get(f) for c in codes}
     score['baseline: E0 answer check'] = {
         c: rows_by_code['e0'].get(keyfile[c], {}).get('scores', {}).get('final_answer_acc') for c in codes}
-    print('  %-32s %7s  %-15s  %-22s' % ('evaluator', 'AUROC', '95% CI', 'minus E0 (95% CI)'))
+    # `n`: how many of these traces the score exists for (E4's arithmetic score is
+    # None where the checker found nothing to check). The E0 delta uses the overlap.
+    print('  %-32s %7s  %-15s %5s  %-22s' % ('evaluator', 'AUROC', '95% CI', 'n', 'minus E0 (95% CI)'))
     for name in list(score):
         ok = [c for c in codes if score[name][c] is not None]
         # a flawed trace should score LOW, so AUROC is computed on "clean" as the positive
@@ -130,7 +134,7 @@ def table(rows_by_code, truth, keyfile, codes, y, title):
             dlo, dhi = X.boot(both, lambda ks: X.auroc([(score[name][c], not y[c]) for c in ks])
                               - X.auroc([(score['E0'][c], not y[c]) for c in ks]))
             d = '%+.3f (%+.3f, %+.3f)%s' % (dd, dlo, dhi, '' if dlo <= 0 <= dhi else ' *')
-        print('  %-32s %7.3f  (%.3f, %.3f)   %s' % (name, a, lo, hi, d))
+        print('  %-32s %7.3f  (%.3f, %.3f) %5d  %s' % (name, a, lo, hi, len(ok), d))
     print('  * = the difference from E0 excludes zero at 95%')
 
 
@@ -143,21 +147,23 @@ def signals(rows_by_code, truth, keyfile, texts, codes, y):
     rows = []
     for c in codes:
         t = texts.get(keyfile[c])
-        bad, checked = arith_flags(t['text']) if t else (0, 0)
+        bad, bad1, checked = arith_flags(t['text']) if t else (0, 0, 0)
         e2 = rows_by_code['e2'].get(keyfile[c], {}).get('scores', {})
         e3 = rows_by_code['e3'].get(keyfile[c], {}).get('scores', {})
-        rows.append((c, {'arith_failed': bad, 'arith_checked': checked,
+        rows.append((c, {'arith_failed': bad, 'arith_failed_tol1': bad1, 'arith_checked': checked,
                          'prm_min': e2.get('qwen72_min'), 'prm_frac': e2.get('qwen72_frac_ok'),
                          'e3_cov': e3.get('milestone_coverage')}))
-    tests = [('arithmetic: >=1 failed claim', lambda s: s['arith_failed'] >= 1),
-             ('arithmetic: >=2 failed claims', lambda s: s['arith_failed'] >= 2),
+    tests = [('arithmetic 1%: >=1 failed claim', lambda s: s['arith_failed_tol1'] >= 1),
+             ('arithmetic 1%: >=2 failed claims', lambda s: s['arith_failed_tol1'] >= 2),
+             ('arithmetic digit: >=1 failed claim', lambda s: s['arith_failed'] >= 1),
+             ('arithmetic digit: >=2 failed claims', lambda s: s['arith_failed'] >= 2),
              ('PRM 72B: min reward < 0.20', lambda s: s['prm_min'] is not None and s['prm_min'] < 0.20),
              ('PRM 72B: min reward < 0.05', lambda s: s['prm_min'] is not None and s['prm_min'] < 0.05),
              ('PRM 72B: frac_ok < 0.90', lambda s: s['prm_frac'] is not None and s['prm_frac'] < 0.90),
              ('E3: milestone coverage < 1.0', lambda s: s['e3_cov'] is not None and s['e3_cov'] < 1.0),
-             ('arithmetic OR PRM min < 0.20', lambda s: s['arith_failed'] >= 1 or
+             ('arith digit OR PRM min < 0.20', lambda s: s['arith_failed'] >= 1 or
               (s['prm_min'] is not None and s['prm_min'] < 0.20)),
-             ('arithmetic AND PRM min < 0.20', lambda s: s['arith_failed'] >= 1 and
+             ('arith digit AND PRM min < 0.20', lambda s: s['arith_failed'] >= 1 and
               (s['prm_min'] is not None and s['prm_min'] < 0.20))]
     for name, fn in tests:
         sel = [c for c, s in rows if fn(s)]
@@ -178,14 +184,14 @@ def mine(texts, golds, rows_by_code, labelled, top):
             continue
         if not answer_ok(t['text'], golds[item]):
             continue
-        bad, checked = arith_flags(t['text'])
+        bad, bad1, checked = arith_flags(t['text'])
         e2 = rows_by_code['e2'].get((model, item), {}).get('scores', {})
         e3 = rows_by_code['e3'].get((model, item), {}).get('scores', {})
         prm, cov = e2.get('qwen72_min'), e3.get('milestone_coverage')
         rank = (bad > 0) * 2 + (prm is not None and prm < 0.20) + (cov is not None and cov < 1.0)
         cand.append({'model_key': model, 'item_id': item, 'branch': t['branch'], 'level': t['level'],
-                     'arith_failed': bad, 'arith_checked': checked, 'prm_min': prm,
-                     'milestone_coverage': cov, 'rank': rank})
+                     'arith_failed': bad, 'arith_failed_tol1': bad1, 'arith_checked': checked,
+                     'prm_min': prm, 'milestone_coverage': cov, 'rank': rank})
     cand.sort(key=lambda r: (-r['rank'], r['prm_min'] if r['prm_min'] is not None else 1.0))
     per = Counter(r['model_key'] for r in cand)
     print('  answer correct by the deterministic check: %s' % dict(per))

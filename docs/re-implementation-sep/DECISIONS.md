@@ -3741,6 +3741,49 @@ Two findings fall out of the same analysis:
   sharp peaks rather than a plateau. The over-flagging RESULTS_X1 Finding 5 reports is a
   property of the model, not of the cut-off.
 
+## D-101 - E4 scores its arithmetic on the digit rule; the 1% tolerance stays, as a second reading
+
+**Date:** 2026-09-24 - **Status:** DECIDED - **Evidence:**
+`evaluator_pilot_17092026/evaluators/arith.py`, `evaluators/e4_arith.py`,
+`analysis/arith_gold_validation.py`, `analysis/digit_rule.py`, RESULTS_E4 (re-run)
+
+D-097 measured the experts' rule and said E4's null result should be read as a defect in
+its tolerance. E4 has now been re-run with the rule in the evaluator (300 gold traces plus
+the Gemma column, $0.00, config `0b81b063cab8`; the old rows are kept). Every claim carries
+both verdicts - `ok` at 1% ("is this number fabricated") and `ok_digit` ("is this digit
+wrong") - and E4 scores on `ok_digit` while reporting the 1% rate beside it.
+
+**The gold validation had to be re-run, and it found two bugs in the rule, not in the gold.**
+At 1% the checker flags nothing on the 227 gold claims. The digit rule as D-097 measured it
+flags **36** (15.9%): 24 are unit conversions compared before their unit factor
+(`2.47 mm = 2.47e-03 m`), and 12 are `lorentz_force` cross products where the gold states an
+operand to three figures and computes with the unrounded value, so the numbers it *shows*
+cannot pin the result's last digit. Both were fixed rather than excluded - the comparison
+happens after the unit factor, and `arith.shown_uncertainty` widens the tolerance by what
+the displayed operands leave undetermined - and gold is back to **0 flagged, 227 of 227**.
+
+**What the fixes cost, measured.** Inside correct-answer traces: bare rule precision 0.506 /
+recall 0.472, shipped rule **0.750 / 0.320**; trace-level AUROC 0.655 (0.594, 0.717) against
+0.639 (0.587, 0.692) - indistinguishable. A rule that flags 16% of gold cannot ship, so the
+evaluator takes precision; `digit_rule.py` keeps both and prints the difference.
+
+**What it changes in E4.** Contradicted milestones 2 -> 10 of 1,494, `e4_coverage` down at
+most 0.016 per model, milestone precision/recall against the experts unchanged (0.926 /
+0.915 - the experts' milestone label asks E3's question). What moves is the arithmetic
+score: on the hard case `arith_consistency` goes from AUROC 0.494 (0.459, 0.532) to **0.661
+(0.599, 0.726)**, +0.149 over E0 with the difference excluding zero, and as a filter it
+selects 43 of 228 traces at precision **0.767** where the 1% rule selected 12 at 0.417.
+E3 is untouched: E4's `e3_coverage` equals E3's `milestone_coverage` on all 360 rows.
+
+So RESULTS_E4's "E4 adds nothing over E3" stands for E4's *milestone* arithmetic and fails
+for its *per-claim* arithmetic, which is the pilot's only signal on the hard case.
+
+**Re-running E3/E4 needs `pinned_templates.py`.** Template work on 2026-09-23/24 (`3fad887`,
+`fc1a6dc`) rewrote how five of the pilot's templates display a derivation, so 17 of the 60
+items no longer regenerate byte-identically and `milestones.py` refuses - correctly. The pin
+reads those five files back out of git at `26f9048` and installs them for the run; it
+relaxes no check, and `--check` reports 60 of 60 reproducing.
+
 ## Open decisions
 
 | # | Decision | Needed before |

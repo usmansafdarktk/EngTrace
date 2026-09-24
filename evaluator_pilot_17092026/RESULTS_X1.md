@@ -162,12 +162,15 @@ asks six quantities while its gold states one on the answer line, and 7 `lorentz
 
 | Milestones, against the experts' "obtained" | precision | recall | F1 |
 |---|---|---|---|
-| E3 — deterministic matching | 0.921 | 0.916 | 0.919 |
-| E4 — E3 plus stated-arithmetic checks | 0.921 | 0.916 | 0.919 |
-| **E5 — E3, then a judge on what E3 misses** | **0.925** | **0.991** | **0.957** |
+| E3 — deterministic matching | 0.926 | 0.915 | 0.921 |
+| E4 — E3 plus stated-arithmetic checks | 0.926 | 0.915 | 0.921 |
+| E4 — not crediting a milestone whose arithmetic fails | 0.929 | 0.909 | 0.919 |
+| **E5 — E3, then a judge on what E3 misses** | **0.930** | **0.989** | **0.958** |
 
-E5's judge recovers nearly every milestone E3's number-matching misses (recall 0.916 →
-0.991) at no cost in precision. That confirms, against experts, what the synthetic
+E5's judge recovers nearly every milestone E3's number-matching misses (recall 0.915 →
+0.989) at no cost in precision. Refusing to credit a milestone whose shown arithmetic does
+not check out buys nothing here either (0.919): milestones are mostly right in traces that
+state them, whatever the arithmetic around them does. That confirms, against experts, what the synthetic
 validation in RESULTS_E5 suggested: its REACHED credits are sound. E4 adds nothing over
 E3 at this level, as RESULTS_E4 found.
 
@@ -232,9 +235,15 @@ of 3 (`analysis/hard_case_pool.py`).
 | E5 | 0.426 | 0.382–0.472 | **−0.116** (significant) |
 | *baseline: E0's own answer check* | 0.521 | 0.462–0.580 | −0.021 |
 
-- **No *evaluator* detects flawed reasoning behind a correct answer.** Every AUROC sits
-  near chance; the best, E2's lowest step reward at 0.583, does not separate from E0. A
-  deterministic digit check does - see below.
+- **No *judge-based or reward-model* evaluator detects flawed reasoning behind a correct
+  answer.** Every AUROC sits near chance; the best, E2's lowest step reward at 0.583, does
+  not separate from E0.
+- **E4's arithmetic score does, once its tolerance is fixed** (D-101): 0.661 against E0's
+  0.542, +0.149 with a trace-level interval excluding zero. It is the only evaluator score
+  in the pilot that separates on this target. Under template clustering the interval is
+  (+0.000, +0.300) — it touches zero and sits below the 0.211 this design can detect
+  (Finding 6), so the direction is clear and the certification is not. At the 1% tolerance
+  E4 shipped with, the same score is 0.494: chance.
 - **E3, E4 and E5 score well below chance-level E0 here** (0.39–0.43 against 0.54),
   because they score a trace by milestones a correct answer already implies. Their strength
   at the milestone level (Finding 2) is not a strength at this question. The deficit is
@@ -259,19 +268,29 @@ That is E4's checker with its 1% tolerance replaced by the displayed precision.
 
 | Hard case, 228 correct-answer traces | step precision | step recall | step F1 | trace AUROC |
 |---|---|---|---|---|
-| E4 as it ships (1% tolerance) | 0.154 | 0.034 | 0.055 | 0.480 |
+| E4 at the 1% tolerance it shipped with | 0.154 | 0.034 | 0.055 | 0.480 |
 | tolerance 0.1% | 0.346 | 0.101 | 0.157 | 0.527 |
-| **the digit rule** | **0.506** | **0.472** | **0.488** | **0.655** (0.594–0.717) |
+| the digit rule, as D-097 measured it | 0.506 | 0.472 | 0.488 | 0.655 (0.594–0.717) |
+| **the digit rule as E4 now ships it** | **0.750** | 0.320 | 0.449 | 0.639 (0.587–0.692) |
 | *E2, 72B, for comparison* | 0.246 | 0.255 | 0.250 | 0.583 |
+
+The rule E4 ships (D-101) is the measured one with two corrections the gold validation
+forced: a unit conversion is compared after its unit factor (`0.09024 hours = 5.41 minutes`
+is not an arithmetic error), and a result is not held to a precision its own displayed
+operands cannot pin down. Both loosen it, trading recall for precision — **three flags in
+four are real errors, against one in four for the best PRM** — and both were required to
+get the false-flag rate on gold solutions, whose arithmetic is correct by construction,
+from 15.9% to zero.
 
 The digit rule doubles the 72B PRM at step level and is the only thing in the pilot
 whose hard-case interval clears chance, at no API cost and with an auditable flag: it
 names the claim, the value shown and the value recomputed (`ln(0.17911) = -1.71918`,
 computes to -1.71976). E4's tolerance, not its design, was the problem.
 
-Two limits. Recall is 0.472, bounded by what the checker can parse, so extending parse
-coverage is the next gain. And 82 flagged steps in correct-answer traces are not marked
-incorrect by the experts; a sample of those should go to one expert in the adjudication
+Two limits. Recall is 0.320 as E4 ships the rule (0.472 before the gold-validation
+corrections), bounded by what the checker can parse, so extending parse coverage is the
+next gain. And 19 flagged steps in correct-answer traces are not marked incorrect by the
+experts; a sample of those should go to one expert in the adjudication
 format already used, since each is either a rounding chain the rule should tolerate or a
 slip the experts missed - and both answers are worth having.
 
@@ -319,6 +338,10 @@ Three things follow, and they should be stated in the paper rather than left imp
   ones. E1's −0.002 is the exception that proves the point: E1 tracks E0 trace by trace, so
   its paired standard error is tiny and a difference of 0.002 is "significant" and
   meaningless.
+- **The one positive result on the hard case does not clear the bar either.** E4's
+  arithmetic score is +0.149 over E0 there, and clustered by template that interval runs
+  (+0.000, +0.300) against a detectable difference of 0.211. It is the largest evaluator
+  effect the pilot found and the design still cannot certify it.
 - **On the hard case, the deterministic evaluators' deficit is no longer significant.**
   E3, E4 and E5 score 0.39–0.43 against E0's 0.54, but with 15 clusters the difference
   (−0.150 for E3) carries an interval of −0.320 to +0.024. The point estimate is large and
@@ -337,10 +360,11 @@ claims, and which a future evaluator study would need for evaluator-level ones.
    strongest candidate:** F1 0.957 against experts, and cheap ($0.47 for 300 traces) —
    but Finding 5 bounds the claim: it tracks progress, it does not catch a flawed step
    behind a right answer.
-3. **Step-level error detection is not solved by an off-the-shelf process reward
-   model.** The 72B is the best available. Recalibrating its threshold against these
-   labels, on a split so the threshold is not fitted and reported on the same data, is
-   the obvious next experiment.
+3. **Step-level error detection is not solved by an off-the-shelf process reward model,
+   and does not need one.** The 72B is the best PRM available and flags one real error in
+   four inside correct-answer traces; its threshold is not the problem (D-100: calibrating
+   it on held-out halves gains −0.006). A deterministic digit check reaches three in four
+   on the same steps and costs nothing, and now ships inside E4 (D-101).
 4. **Report the hard case as a negative result.** It is honest, it is measured on 93
    traces, and it is the clearest open problem the pilot identifies.
 5. **Report the power, not just the intervals.** Clustered by template, this slice can
