@@ -6,17 +6,24 @@ Protocol in D-095; the reasoning in D-092.
 
 ## What each expert receives
 
-One zip, built by `package.py`:
+**The simplified kit** (`make_kits.py` → `dist/kit_<id>.zip`), nothing to install:
 
 | File | What |
 |---|---|
+| `<id>.html` | the whole review in one page, opened in any browser: their 34 items embedded, hand check → solution → verdict, progress saved in the browser, a **Download my answers** button that writes `<id>.jsonl` |
 | `EngTrace-certification-guide.pdf` | the guide (source: `guide.md`, typeset by `make_guide_pdf.py`) |
-| `HOW-TO-RUN.txt` | three commands |
-| `app/app.py` + `app/tasks/` | the app with ONLY their 34 items: the branch's 30 templates and 4 planted defects, shuffled |
-| `<id>.json` | the workbook, for anyone who prefers a file |
+| `README.txt` | four lines |
 
-No template code ships: five instances per item are precomputed. The keyfile that says which items
-are plants never leaves this directory; the packager refuses to build a bundle containing it.
+The page runs no code but its own script and reads and writes nothing but the browser's local
+storage; its rows are in exactly the shape the app writes (`source: "html"`), so `score.py` reads
+them unchanged. The expert must keep using the same browser on the same machine until they download.
+
+**The full bundle** (`package.py` → `dist/<id>.zip`) is the alternative for anyone who prefers the
+Streamlit app or the JSON workbook; both produce the same rows.
+
+No template code ships either way: five instances per item are precomputed. The keyfile that says
+which items are plants never leaves this directory; both packagers refuse to build a bundle that
+names a plant.
 
 ## The protocol
 
@@ -34,8 +41,9 @@ python -m template_annotation_23092026.layer2.build_tasks --check-plants   # ver
 python -m template_annotation_23092026.layer2.build_tasks                  # tasks/: pool, assignment, keyfile
 python -m template_annotation_23092026.layer2.make_guide_pdf               # the PDF
 python -m template_annotation_23092026.layer2.simulate                     # proves the pipeline; NOT results
-python -m template_annotation_23092026.layer2.package                      # dist/<id>.zip, one per expert
-# ... experts work; returned files go to labels/<id>.jsonl (app) or through
+python -m template_annotation_23092026.layer2.make_kits                    # dist/kit_<id>.zip: the one-page kit (send this)
+python -m template_annotation_23092026.layer2.package                      # dist/<id>.zip: app + workbook bundle (alternative)
+# ... experts work; returned <id>.jsonl files go to labels/, or workbooks through
 python -m template_annotation_23092026.layer2.workbooks import <file>      # (workbook route)
 python -m template_annotation_23092026.layer2.score                        # RESULTS.md
 ```

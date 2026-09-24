@@ -86,7 +86,8 @@ template_annotation_23092026/
     build_tasks.py       verifies plants, precomputes instances, builds pool/assignment/keyfile (tasks/, ignored)
     app.py               the reviewer's app: hand check, solution, scores, verdict, timestamps
     workbooks.py         the file route: export, check, import
-    package.py           one zip per expert (dist/, ignored); refuses to ship the keyfile
+    make_kits.py         the one-page kit per expert: <id>.html + guide + README (dist/kit_<id>.zip); send this
+    package.py           the app + workbook bundle per expert (dist/<id>.zip); the alternative
     simulate.py          synthetic labels to prove the pipeline; never results
     score.py             RESULTS.md: plant detection, hand checks, agreement, panel FPR, dwell, fix list
 ```
