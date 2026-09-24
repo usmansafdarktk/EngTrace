@@ -1,84 +1,42 @@
-"""X4 - what a corrected final-answer check is worth.
+"""X4 - the corrected final-answer check, measured against the expert verdicts.
 
     python evaluator_pilot_17092026/analysis/answer_check.py [--labels DIR]
 
 RESULTS_X1 Finding 1: the final answer decides the trace-level verdict almost entirely
 (the experts' own answer verdict predicts their soundness verdict at AUROC 0.974), and
-E0's answer check agrees with the experts on only 76% of traces. So the check is the
-largest single accuracy gain in the pilot, and it needs no model. This measures how much
-of that gap simple, deterministic fixes close, against the experts' verdict on 300
-traces.
+E0's check agrees with the experts on only 76% of traces - erring almost always in one
+direction, calling a correct answer wrong. E0_RERUN.md is the task; `evaluators/answer.py`
+is the replacement; this is its evidence.
 
-The two defects it has to fix (FINDINGS E0-F1, E0-F2):
-
-  E0-F1  the gold's answer line restates the inputs - "...at 283.81 K is 113.55 cm3/mol"
-         - and the first number on it is read as the gold answer.
-  E0-F2  8 of 15 templates put no number on the answer line at all, because the answer
-         is a word: turbulent, laminar, safe.
-
-Variants, each a strictly bigger fix than the last:
-
-  E0        what the published framework scores today
-  last      the trace's last numbers against the gold's last number
-  segment   read the trace's ANSWER SEGMENT (after its final Answer marker), and take
-            the gold value from the gold's last computed number, not its answer line
-  +words    segment, plus: when the gold's answer is qualitative, require the word
-  +parts    +words, plus: a multi-part answer (a)/(b) is correct only if every part is
+Reported here:
+  AGREEMENT   E0 against the new check, on the same 300 traces, binary (correct or not)
+              and three-way (correct / partial / incorrect - 19 traces are partial and a
+              binary check cannot represent them at all).
+  SPLIT-HALF  the relative tolerance is one fitted number, so it is chosen on one half of
+              the traces and reported on the other, both ways round.
+  PER MODEL   what the check does to the benchmark's headline accuracy and its ranking.
+  RESIDUAL    every remaining disagreement, by template, so what is left is visible
+              rather than summarised.
 """
 import os as _os
 _ANALYSIS = _os.path.dirname(_os.path.abspath(__file__))
 _PILOT = _os.path.dirname(_ANALYSIS)
 
 import argparse
+import hashlib
 import json
-import re
 import sys
 from collections import Counter, defaultdict
 
-sys.path[:0] = [_os.path.join(_PILOT, 'annotation'), _os.path.join(_PILOT, 'evaluators'), _ANALYSIS]
-import milestones  # noqa: E402
+sys.path[:0] = [_os.path.join(_PILOT, 'annotation'), _os.path.join(_PILOT, 'evaluators')]
+import answer as A  # noqa: E402
 import score_against_labels as S  # noqa: E402
 
-TOL = 0.02
-ANSWER = re.compile(r'(?i)(?:#+\s*final\s+answer|\*{0,2}answer\b)')
-PART = re.compile(r'(?i)\(?\b([ab])\)\s*[:.\-]?')
-WORDS = ('turbulent', 'laminar', 'transitional', 'safe', 'unsafe', 'yes', 'no', 'feasible',
-         'infeasible', 'stable', 'unstable', 'acceptable', 'adequate', 'inadequate',
-         'subsonic', 'supersonic', 'saturated', 'superheated', 'critical', 'subcritical')
+TOLS = (0.001, 0.0015, 0.002, 0.003, 0.005, 0.01, 0.02)
 
 
-def segment(text):
-    """Everything after the trace's last Answer marker - what a reader would call the answer."""
-    hits = list(ANSWER.finditer(text))
-    return text[hits[-1].end():] if hits else text[-200:]
-
-
-def gold_answer(item):
-    """The gold's final value, and any qualitative word its answer states."""
-    nums = milestones.numbers(item['solution'])
-    seg = segment(item['solution']).lower()
-    return (nums[-1] if nums else None), [w for w in WORDS if re.search(r'\b%s\b' % w, seg)]
-
-
-def check(text, gold_value, gold_words, mode):
-    seg = segment(text)
-    nums = milestones.numbers(seg if mode != 'last' else text)
-    nums = nums[-6:] if mode != 'last' else nums[-3:]
-    ok = gold_value is not None and bool(nums) and milestones.scaled_match(gold_value, nums, TOL) is not None
-    if mode in ('+words', '+parts') and gold_words:
-        ok = ok and all(re.search(r'\b%s\b' % w, seg.lower()) for w in gold_words)
-        if not [n for n in nums] and gold_words:      # purely qualitative answer
-            ok = all(re.search(r'\b%s\b' % w, seg.lower()) for w in gold_words)
-    if mode == '+parts' and len(set(m.group(1).lower() for m in PART.finditer(seg))) > 1:
-        ok = ok and (not gold_words or all(re.search(r'\b%s\b' % w, seg.lower()) for w in gold_words))
-    return ok
-
-
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument('--labels', default=_os.path.join(_PILOT, 'experts_filled_labels', 'version_2', 'labels'))
-    a = ap.parse_args()
-    truth, _ = S.build_truth(S.read_labels(a.labels), S.read_consensus(a.labels))
+def load(labels_dir):
+    truth, _ = S.build_truth(S.read_labels(labels_dir), S.read_consensus(labels_dir))
     keyfile = {r['code']: (r['model_key'], r['item_id'])
                for r in map(json.loads, open(_os.path.join(S.TASKS, 'keyfile.jsonl'), encoding='utf-8'))}
     items = {}
@@ -92,77 +50,93 @@ def main():
                 r = json.loads(line)
                 if r.get('ok'):
                     texts[(r['model_key'], r['item_id'])] = r['text']
+    return truth, keyfile, items, texts
+
+
+def verdicts(truth, keyfile, items, texts, tol=None):
+    """The new check's verdict per trace, with the milestones the labels already carry."""
+    out = {}
+    for code, t in truth.items():
+        key = keyfile[code]
+        if key[1] not in items or key not in texts:
+            continue
+        ms = tuple(m['value'] for m in t['milestones'])
+        out[code] = A.verdict(texts[key], items[key[1]], tol, ms)[0]
+    return out
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--labels', default=_os.path.join(_PILOT, 'experts_filled_labels', 'version_2', 'labels'))
+    a = ap.parse_args()
+    truth, keyfile, items, texts = load(a.labels)
     e0 = S.current('e0')
+    got = verdicts(truth, keyfile, items, texts)
+    codes = sorted(got)
+    exp = {c: truth[c]['final_answer'] for c in codes}
 
-    modes = ('E0', 'last', 'segment', '+words', '+parts')
-    res = {m: Counter() for m in modes}
-    per_template = defaultdict(Counter)
-    for code, t in truth.items():
-        key = keyfile[code]
-        item, text = items.get(key[1]), texts.get(key)
-        if not item or not text or t['final_answer'] is None:
-            continue
-        want = t['final_answer'] == 'correct'
-        gv, gw = gold_answer(item)
-        for m in modes:
-            if m == 'E0':
-                row = e0.get(key)
-                if not row:
-                    continue
-                got = row['scores']['final_answer_acc'] == 1.0
-            else:
-                got = check(text, gv, gw, m)
-            res[m]['ok' if got == want else ('false_correct' if got else 'false_wrong')] += 1
-            if m == '+parts' and got != want:
-                per_template[item['template_id']][key[0]] += 1
-    print('Against the experts\' final-answer verdict, %d traces\n' % len(truth))
-    print('  %-9s %8s %14s %14s   %s' % ('check', 'accuracy', 'says correct/', 'says wrong/', 'what it adds'))
-    print('  %-9s %8s %14s %14s' % ('', '', 'experts wrong', 'experts right'))
-    notes = {'E0': 'the published framework today', 'last': 'no answer-line parsing at all',
-             'segment': 'fixes E0-F1 on both sides', '+words': 'fixes E0-F2 (qualitative answers)',
-             '+parts': 'multi-part answers must be right in every part'}
-    for m in modes:
-        c = res[m]
-        n = sum(c.values())
-        print('  %-9s %8.3f %14d %14d   %s' % (m, c['ok'] / n, c['false_correct'], c['false_wrong'], notes[m]))
-    print('\n  ceiling: the experts\' own verdict predicts their soundness verdict at AUROC 0.974;')
-    print('  E0\'s check, used the same way, scores 0.812.')
-    print('\n  WHAT THE CHECK DECIDES: answer accuracy per model, the benchmark\'s headline number')
-    print('    %-16s %7s %10s %10s %10s' % ('model', 'traces', 'experts', 'E0', 'corrected'))
-    per_model = defaultdict(Counter)
-    for code, t in truth.items():
-        key = keyfile[code]
-        item, text = items.get(key[1]), texts.get(key)
-        if not item or not text or t['final_answer'] is None:
-            continue
-        gv, gw = gold_answer(item)
-        row = e0.get(key)
-        c = per_model[key[0]]
-        c['n'] += 1
-        c['expert'] += t['final_answer'] == 'correct'
-        c['fixed'] += check(text, gv, gw, '+words')
-        if row:
-            c['e0n'] += 1
-            c['e0'] += row['scores']['final_answer_acc'] == 1.0
-    order = {}
-    for m, c in sorted(per_model.items(), key=lambda kv: -kv[1]['expert'] / kv[1]['n']):
-        print('    %-16s %7d %10.3f %10.3f %10.3f'
-              % (m, c['n'], c['expert'] / c['n'], c['e0'] / c['e0n'] if c['e0n'] else float('nan'),
-                 c['fixed'] / c['n']))
-        order[m] = (c['expert'] / c['n'], c['e0'] / c['e0n'] if c['e0n'] else -1, c['fixed'] / c['n'])
+    three = sum(got[c] == exp[c] for c in codes)
+    binary = sum((got[c] == 'correct') == (exp[c] == 'correct') for c in codes)
+    e0ok = sum(1 for c in codes if e0.get(keyfile[c])
+               and (e0[keyfile[c]]['scores']['final_answer_acc'] == 1.0) == (exp[c] == 'correct'))
+    nonp = [c for c in codes if exp[c] != 'partial']
+    print('AGREEMENT with the experts, %d traces\n' % len(codes))
+    print('  %-34s %8s' % ('check', 'agrees'))
+    print('  %-34s %8.3f' % ('E0, the published framework', e0ok / len(codes)))
+    print('  %-34s %8.3f' % ('new check, correct-or-not', binary / len(codes)))
+    print('  %-34s %8.3f' % ('new check, three-way', three / len(codes)))
+    print('  %-34s %8.3f   (E0: %.3f)  <- E0_RERUN target 0.90'
+          % ('new check, non-partial traces only',
+             sum((got[c] == 'correct') == (exp[c] == 'correct') for c in nonp) / len(nonp),
+             sum(1 for c in nonp if e0.get(keyfile[c])
+                 and (e0[keyfile[c]]['scores']['final_answer_acc'] == 1.0) == (exp[c] == 'correct')) / len(nonp)))
+    print('\n  confusion, experts -> new check')
+    conf = Counter((exp[c], got[c]) for c in codes)
+    for (e, g), n in conf.most_common():
+        print('    %-10s -> %-10s %4d%s' % (e, g, n, '' if e == g else '   <- disagreement'))
+
+    print('\nSPLIT-HALF - the tolerance is fitted, so it is reported off the half it was not fitted on')
+    half = lambda c: int(hashlib.blake2b(c.encode(), digest_size=4).hexdigest(), 16) % 2
+    acc = {}
+    for tol in TOLS:
+        g = verdicts(truth, keyfile, items, texts, tol)
+        for h in (0, 1):
+            ks = [c for c in codes if half(c) == h]
+            acc[(tol, h)] = sum(g[c] == exp[c] for c in ks) / len(ks)
+    for h in (0, 1):
+        best = max(TOLS, key=lambda t: acc[(t, h)])
+        print('  fit on half %d -> %.4f; held out on half %d: %.3f'
+              % (h, best, 1 - h, acc[(best, 1 - h)]))
+    print('  (the module ships REL = %.4f)' % A.REL)
+
+    print('\nPER MODEL - answer accuracy, the benchmark\'s headline number')
+    per = defaultdict(Counter)
+    for c in codes:
+        k = keyfile[c]
+        per[k[0]]['n'] += 1
+        per[k[0]]['exp'] += exp[c] == 'correct'
+        per[k[0]]['new'] += got[c] == 'correct'
+        if e0.get(k):
+            per[k[0]]['e0'] += e0[k]['scores']['final_answer_acc'] == 1.0
+    print('  %-16s %8s %8s %8s' % ('model', 'experts', 'E0', 'new'))
     tot = Counter()
-    for c in per_model.values():
+    for m, c in sorted(per.items(), key=lambda kv: -kv[1]['exp'] / kv[1]['n']):
         tot.update(c)
-    print('    %-16s %7d %10.3f %10.3f %10.3f' % ('ALL', tot['n'], tot['expert'] / tot['n'],
-                                                  tot['e0'] / tot['e0n'], tot['fixed'] / tot['n']))
-    for j, name in ((0, 'experts'), (1, 'E0'), (2, 'corrected')):
-        print('    %-10s ranking: %s' % (name, ' > '.join(sorted(order, key=lambda m: -order[m][j]))))
+        print('  %-16s %8.3f %8.3f %8.3f' % (m, c['exp'] / c['n'], c['e0'] / c['n'], c['new'] / c['n']))
+    print('  %-16s %8.3f %8.3f %8.3f' % ('ALL', tot['exp'] / tot['n'], tot['e0'] / tot['n'],
+                                         tot['new'] / tot['n']))
+    for name, key in (('experts', 'exp'), ('E0', 'e0'), ('new', 'new')):
+        print('  %-8s ranking: %s' % (name, ' > '.join(sorted(per, key=lambda m: -per[m][key] / per[m]['n']))))
 
-    if per_template:
-        print('\n  where the best variant still disagrees, by template:')
-        for tid, c in sorted(per_template.items(), key=lambda kv: -sum(kv[1].values()))[:6]:
-            print('    %-38s %d  (%s)' % (tid[:38], sum(c.values()),
-                                          ', '.join('%s %d' % kv for kv in c.most_common(3))))
+    print('\nRESIDUAL disagreements, by template')
+    left = defaultdict(list)
+    for c in codes:
+        if got[c] != exp[c]:
+            left[items[keyfile[c][1]]['template_id']].append((keyfile[c][0], exp[c], got[c]))
+    for tid, rows in sorted(left.items(), key=lambda kv: -len(kv[1])):
+        kinds = Counter('%s->%s' % (e, g) for _, e, g in rows)
+        print('  %-40s %3d  %s' % (tid.replace('template_', '')[:40], len(rows), dict(kinds)))
+    print('  %d disagreements in total, of %d traces' % (sum(len(v) for v in left.values()), len(codes)))
 
 
 if __name__ == '__main__':

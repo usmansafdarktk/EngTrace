@@ -33,10 +33,17 @@ import sys
 sys.path[:0] = [os.path.dirname(os.path.abspath(__file__))]
 import milestones  # noqa: E402
 
-TOL = 0.02
+TOL = 0.02            # kept for callers that pass a relative tolerance explicitly
+REL = 0.002           # the window [0.0017, 0.0029] all agrees with the experts; see X4
+SCALES = milestones.SCALES + (1e12, 1e-12, 1e-2)   # pF/m against F/m, and percent
+NUM = re.compile(r'[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?')
+SUB = str.maketrans('₀₁₂₃₄₅₆₇₈₉', '0123456789')
 HEADING = re.compile(r'(?i)#+\s*final\s+answer')
 ANSWER = re.compile(r'(?i)(?:#+\s*final\s+answer|\*{0,2}answer\s*\(?[a-z]?\)?\s*\*{0,2}\s*[:\-])')
-WINDOW = 400          # how far an answer segment runs: a conclusion, not a second solution
+WINDOW = 700          # how far an answer segment runs: a conclusion, not a second solution
+# Questions that prescribe their own rounding ("to 4 decimals, round half up") are scored
+# on the digits: the experts hold a trace to the precision the question asked for.
+ROUNDING = re.compile(r'(?i)round half up|to \d+ decimals?|nearest whole|to \d+ significant')
 BOLD = re.compile(r'\*\*([^*]+)\*\*')
 WORD = re.compile(r'[A-Za-z][A-Za-z\-]{2,}')
 # Words that are an answer in themselves. Units and prose are not.
@@ -57,23 +64,76 @@ FRACTION = re.compile(r'(?<![\w.^])(\d+(?:\.\d+)?)\s*/\s*(\d+(?:\.\d+)?)(?![\w.]
 
 
 def values(seg):
-    """Every number an answer states, however it is written.
+    """Every number an answer states, with the precision it was displayed at.
 
-    Traces write the same value many ways - `5.52 × 10⁻⁵`, `5.52 \\times 10^{-5}`,
-    `\\frac{5}{2}`, `(5/2)x²` - and a checker that only reads plain decimals marks a
-    correct answer wrong. Superscripts, LaTeX and simple fractions are folded in first.
+    Returns (value, ulp) pairs, where ulp is one unit in the last digit shown: `11.8` is
+    (11.8, 0.1) and `114` is (114.0, 1.0). That precision is what makes a rounded answer
+    judgeable - see match().
+
+    Traces write the same value many ways - `5.52 x 10^-5` in unicode superscripts, LaTeX
+    `7.34 \times 10^{-11}`, `1.46 x 10^(-10)`, `\frac{5}{2}`, subscripted `P_a(p_1)` - and a
+    checker reading only plain decimals marks correct answers wrong. Unit exponents go
+    first, or `m^3/s` contributes a 3 and `m/s^2` a 2 that then masquerade as answers.
     """
-    t = re.sub(r'10\s*([⁻⁺]?[⁰¹²³⁴⁵⁶⁷⁸⁹]+)', lambda m: '10^' + m.group(1).translate(SUP), seg)
-    t = t.translate(SUP)
-    t = t.replace('\\times', '*').replace('\\cdot', '*').replace('\\,', ' ')
+    t = seg
+    t = re.sub(r'(\d)\s*[x*\u00d7]\s*10\s*\^\s*\(?\{?\s*([-+]?\d+)\s*\}?\)?', r'\1e\2', t)
+    t = re.sub(r'(\d)\s*[x*\u00d7]\s*10\s*([\u207b\u207a]?[\u2070\u00b9\u00b2\u00b3\u2074-\u2079]+)',
+               lambda m: m.group(1) + 'e' + m.group(2).translate(SUP), t)
+    t = t.replace('\\times', ' x ').replace('\\cdot', ' * ').replace('\\,', ' ')
     t = re.sub(r'\\d?frac\s*\{([^{}]*)\}\s*\{([^{}]*)\}', r' \1/\2 ', t)
+    t = re.sub(r'(?<=[A-Za-z])\s*\^\s*-?\d+', ' ', t)                    # m^3/s, m/s^2
+    t = re.sub(r'(?<=[A-Za-z])[\u2070\u00b9\u00b2\u00b3\u2074-\u2079]+', ' ', t)   # unicode units
+    t = t.translate(SUB).translate(SUP)
     t = re.sub(r'\\left|\\right|\\[()\[\]]|\$|\\mathrm|\\text\{[^{}]*\}', ' ', t)
-    nums = milestones.numbers(t)
+    if re.search(r'\d,\d{3}\b', t):
+        t = t.replace(',', '')
+    out = []
+    for m in NUM.finditer(t):
+        try:
+            v = float(m.group(0))
+        except ValueError:
+            continue
+        if v == v and abs(v) != float('inf'):
+            out.append((v, _ulp(m.group(0))))
     for m in FRACTION.finditer(t):
         b = float(m.group(2))
         if b:
-            nums.append(float(m.group(1)) / b)
-    return nums
+            out.append((float(m.group(1)) / b, 0.0))
+    return out
+
+
+def _ulp(lit):
+    """One unit in the last digit shown: '11.8' -> 0.1, '114' -> 1.0, '2.05e7' -> 1e5."""
+    m = re.match(r'[-+]?(\d*)\.?(\d*)(?:[eE]([-+]?\d+))?$', lit)
+    if not m:
+        return 0.0
+    return 10.0 ** ((int(m.group(3)) if m.group(3) else 0) - len(m.group(2)))
+
+
+def match(gold, have, rel=REL, exact=False, gold_ulp=0.0):
+    """Does any stated value equal `gold`?
+
+    Three ways to be right, because one relative tolerance cannot serve them all:
+
+      within `rel` of the gold                 `2.05e7` for 20,464,069 (0.18%)
+      within one unit of ITS last digit        `114` for 113.55 - a correct rounding at the
+                                               precision the trace chose to display
+      within one unit of the GOLD's last digit `7.326` for a gold written `7.3`
+
+    while `50.20` for 50.05 fails all three: it claims two decimals and gets them wrong.
+
+    `exact` is for items whose QUESTION prescribes the rounding ("to 4 decimals, round half
+    up"): there the experts require the digits, and a near miss is a miss.
+    """
+    for v, u in have:
+        for sc in SCALES:
+            t, tu = v * sc, u * sc
+            if exact:
+                if abs(t - gold) <= 1e-9 * max(1.0, abs(gold)):
+                    return True
+            elif abs(t - gold) <= max(rel * abs(gold), tu, gold_ulp):
+                return True
+    return False
 
 
 def segment(text):
@@ -141,61 +201,71 @@ def _computed(item, ms):
 def targets(item, ms=None):
     """What the trace has to reproduce: the gold's answer values, and its verdict words.
 
-    A number on the gold's answer line is a target only if the gold COMPUTED it - that is,
-    it is one of the item's milestones, the intermediate and final quantities the template
-    derives. That one rule removes both kinds of noise without any per-template knowledge:
+    A number is a target only if the gold COMPUTED it - if it is one of the item's
+    milestones, the quantities the template derives. That one rule, with no per-template
+    knowledge, removes both kinds of noise:
 
       restated inputs (E0-F1)   "...of n-Pentane at 283.81 K is 113.55 cm3/mol": 283.81 is
                                 given, never computed, so it is not a target.
       expression furniture      "C' = (2 * pi * epsilon) / ln(b/a). The value is 45.3":
-                                the 2 is part of the formula, not a computed quantity.
+                                the 2 belongs to the formula, not to the answer.
 
-    A multi-part answer keeps every computed value it states - two velocity components, a
-    value and a regime - which is what makes `partial` measurable.
+    Where the answer HAS parts - multipart and vector items ask for several quantities -
+    every computed quantity is a target, because the gold often states only one of them on
+    its answer line while the question asks for all six. That is what makes `partial` real:
+    a trace with five of six right is neither correct nor incorrect.
     """
     seg = segment(item['solution'])
     given = milestones.numbers(item['question'])
     ms = _computed(item, ms)
+    typ = item.get('answer_type')
     keep, seen = [], []
-    for v in values(seg):
+    for v, u in values(seg):
         hit = milestones.scaled_match(v, ms, milestones.DISPLAY_TOL) if ms else None
-        # A value the gold COMPUTED stays a target even when the question happens to state
-        # the same number - a normal depth of 1.500 m against a 1.5 m channel width is the
-        # answer, not a restated input. Only numbers the gold never computed are dropped.
+        # A computed value stays a target even when the question states the same number -
+        # a normal depth of 1.500 m in a 1.5 m channel is the answer, not a restated input.
         if hit is None and any(milestones.close(v, g, 1e-9) for g in given):
             continue
-        if hit is None or any(milestones.close(v, s, 1e-9) for s in seen):
+        if hit is None or any(milestones.close(v, x, 1e-9) for x, _ in seen):
             continue
-        seen.append(v)
-        keep.append(v)
+        seen.append((v, u))
+        keep.append((v, u))
     if not keep:
-        # Nothing matched a computed quantity - the item no longer reproduces, so there
-        # are none to match against. Fall back to the last value the gold's answer states,
-        # and do NOT drop it for appearing in the question: with no milestones to appeal
-        # to, dropping it would leave the answer with no target at all.
-        nums = [v for v in values(seg)
+        # The item no longer reproduces, so there are no computed values to appeal to.
+        # Fall back to the last value the gold's answer states.
+        nums = [(v, u) for v, u in values(seg)
                 if not any(milestones.close(v, g, 1e-9) for g in given)]
         keep = (nums or values(seg))[-1:]
-    if item.get('answer_type') in ('scalar', 'array') and keep:
+    if typ in ('scalar', 'array') and keep:
         keep = keep[-1:]                       # one value is asked for: the last stated
-    return {'numbers': keep, 'words': _words(seg, item.get('answer_type'))}
+    return {'numbers': keep, 'words': _words(seg, typ), 'exact': bool(ROUNDING.search(item.get('question') or ''))}
 
 
-def verdict(text, item, tol=TOL, ms=None):
-    """('correct' | 'partial' | 'incorrect', detail). Every target must match for correct."""
+def verdict(text, item, tol=None, ms=None):
+    """('correct' | 'partial' | 'incorrect', detail). Every part must match for correct.
+
+    `tol` overrides the relative tolerance for callers that want to sweep it; the ulp rule
+    in match() applies either way.
+    """
     want = targets(item, ms)
     seg = segment(text)
     have = values(seg)
+    absolute = [(abs(v), u) for v, u in have]
     low = seg.lower()
+    rel = REL if tol is None else tol
     hits = []
-    for v in want['numbers']:
-        # |v| as well as v: a deflection the gold states as 7.3 mm downward and the trace
-        # as -7.326 mm is the same answer under a different sign convention, and the
-        # experts marked those correct.
-        hits.append(milestones.scaled_match(v, have, tol) is not None
-                    or milestones.scaled_match(abs(v), [abs(x) for x in have], tol) is not None)
+    for v, gu in want['numbers']:
+        # |v| too: a deflection the gold states as 7.3 mm downward and the trace as
+        # -7.326 mm is the same answer under a different sign convention.
+        hits.append(match(v, have, rel, want['exact'], gu)
+                    or match(abs(v), absolute, rel, want['exact'], gu))
     for w in want['words']:
-        hits.append(re.search(r'\b%s' % re.escape(w), low) is not None)
+        # the LAST mention decides: an answer block that restates the criteria ("turbulent
+        # occurs for Re > 5e6 ... the flow is laminar") must not be credited for both.
+        last = None
+        for m in re.finditer(r'\b(%s)\b' % '|'.join(sorted(VERDICT_WORDS)), low):
+            last = m.group(1)
+        hits.append(last == w)
     if not hits:
         return 'incorrect', {'targets': want, 'matched': 0, 'of': 0}
     n = sum(hits)
@@ -203,7 +273,7 @@ def verdict(text, item, tol=TOL, ms=None):
     return label, {'targets': want, 'matched': n, 'of': len(hits), 'answer_type': item.get('answer_type')}
 
 
-def correct(text, item, tol=TOL, ms=None):
+def correct(text, item, tol=None, ms=None):
     """Binary form, for callers that score accuracy."""
     return verdict(text, item, tol, ms)[0] == 'correct'
 
