@@ -430,7 +430,10 @@ a plantable site must itself be a parseable claim; the unbiased half of that fam
    every arithmetic defect it can parse and none it cannot; the judges catch 87% of exactly
    those it cannot, and are the only thing with any conceptual signal. Sending what the
    checker cannot verify to a judge covers both, and costs a judge call only on the
-   residue — which is what E5 already does for milestones, applied to steps.
+   residue — which is what E5 already does for milestones, applied to steps. The measured
+   routing makes the case concrete: E0 currently shows a judge the corrupted step half the
+   time for conceptual defects, no more often than it shows the clean one, so its judge
+   spend buys a coin toss where a targeted router would buy a test.
 6. **Report the power, not just the intervals.** Clustered by template, this slice can
    detect AUROC differences of about 0.12–0.19 between evaluators and no smaller (Finding
    6). Every null result here should be read as "this design rules out a large difference",
@@ -476,11 +479,36 @@ The digit rule is perfect where it can parse and blind where it cannot; the judg
 strongest exactly where it is blind. A checker that routes what it cannot parse to a judge
 would cover both, and neither component is the one the framework currently spends on.
 
-**What this does not settle.** It asks "when a judge is shown this step, does it call it
-wrong", not "would E0 have shown it". Every planted trace has a correct final answer, and
-E0 samples wrong-answer traces to the Tribunal at 0.20, so in a real E0 run most of these
-steps would never reach a judge at all. The capability is established; the routing that
-would use it is not, and that is now the open question rather than the capability.
+### Would E0 show the judge that step? (`analysis/planted_routing.py`)
+
+Finding 8 asks what a judge does when shown a step. This asks whether E0 shows it — Tier 1
+run for real on all 120 planted defects and their unmodified originals, with the Tribunal
+replaced by a recorder, so the routing is measured and nothing is spent (163 minutes, $0).
+
+| | triggered | **planted step shown** | *same step, original* | end to end |
+|---|---|---|---|---|
+| conceptual | 0.650 | **0.500** | *0.500* | 0.500 × 0.350 = **0.175** |
+| arithmetic | 0.833 | 0.767 | *0.683* | 0.767 × 0.800 = **0.613** |
+
+**For a conceptual defect the routing carries no signal whatsoever.** The corrupted step is
+sent to a judge exactly as often as the untouched one — 0.500 against 0.500. Tier 1 forwards
+it because it cannot match the step to the gold at all, not because anything about it is
+wrong. Whether E0 catches a misstated rule is therefore decided by a coin it was already
+tossing, and the end-to-end rate is **0.175**: a judge that can catch a third of these is
+shown half of them.
+
+For an arithmetic defect the routing is mildly informative (0.767 against 0.683), since a
+corrupted number is a little harder for Tier 1 to match, and the end-to-end rate is 0.613.
+
+One more thing this exposed: E0's answer check calls the final answer **wrong on 32 of the
+120 planted traces**, though the plants never touch it and the originals were all correct.
+Those traces enter the wrong-answer sample (D3, probability 0.20), so part of E0's routing
+today is driven by its own broken answer check — the defect D-098 fixed for accuracy
+reporting but deliberately did not re-run E0 against.
+
+**What remains untested.** E1's panel and E5's judge were not probed, at about $3 and $0.20
+on this set. And the planted set is a diagnostic, so these rates describe what E0 does with
+defects of this shape, not how often such defects occur.
 
 ## Limitations, and what this pilot does not show
 
@@ -537,9 +565,11 @@ ones.
 **What the judges were and were not asked.** E0's two judges were asked directly about
 every planted step, matched against the same step unmodified (Finding 8, $4.67): they catch
 a third of the conceptual defects and four fifths of the arithmetic ones, with no false
-alarms. They were **not** run through E0's own routing, which decides whether a step reaches
-a judge at all — and with a correct final answer, most of these steps would not. E1's panel
-and E5's judge were not probed; E1 costs about $3 on this set, E5 about $0.20.
+alarms. E0's own routing was then measured separately (`analysis/planted_routing.py`, $0): it
+shows the judge the corrupted step half the time for conceptual defects — exactly as often
+as the untouched step, so the routing carries no signal — giving an end-to-end detection
+rate of 0.175, against 0.613 for arithmetic. E1's panel and E5's judge were not probed; E1
+costs about $3 on this set, E5 about $0.20.
 
 ### What the pilot supports, and what it does not
 
@@ -550,7 +580,8 @@ and E5's judge were not probed; E1 costs about $3 on this set, E5 about $0.20.
 | An off-the-shelf PRM over-flags inside correct-answer traces, and its threshold is not the cause | That a better-calibrated PRM could not do better |
 | A digit-level arithmetic check finds three real errors in four, deterministically and free | That it finds conceptual errors — it finds none |
 | No deterministic evaluator detects a conceptual defect behind a correct answer | That the judges cannot: asked directly they catch 35% of them |
-| E0's judges do not over-flag: 240 clean steps, 240 clean verdicts | That E0's routing would ever show them those steps |
+| E0's judges do not over-flag: 240 clean steps, 240 clean verdicts | That E0's routing is selective: for conceptual defects it shows the corrupted step no more often than the clean one |
+| End to end, E0 catches ~18% of conceptual and ~61% of arithmetic defects of this shape | That these rates transfer to defects models actually make |
 | The expert labels are reliable at kappa 0.78 between raters and 0.83 within | That 300 traces from 15 templates can separate evaluators finely |
 
 ## Follow-ups this turned up

@@ -3863,6 +3863,42 @@ has a correct final answer and E0 samples wrong-answer traces at 0.20, so in a r
 would never reach the Tribunal. The capability is measured; the routing is the open question,
 and it is now a design question rather than a research one.
 
+## D-104 - E0's routing is indifferent to a conceptual defect, so the judges rarely see one
+
+**Date:** 2026-09-25 - **Status:** DECIDED - **Evidence:**
+`evaluator_pilot_17092026/analysis/planted_routing.py`, RESULTS_X1 Finding 8
+
+D-103 established that E0's judges catch a third of planted conceptual defects and four
+fifths of the arithmetic ones when the step is put in front of them, with no false alarms.
+It could not say whether E0 puts it there. Tier 1 was therefore run for real on all 120
+planted defects and their unmodified originals, with the Tribunal replaced by a recorder:
+163 minutes of local compute, **$0**, no judge called.
+
+                    triggered   step shown   same step, original   end to end
+  conceptual          0.650        0.500          0.500              0.175
+  arithmetic          0.833        0.767          0.683              0.613
+
+**For a conceptual defect the routing carries no signal at all.** The corrupted step reaches
+a judge exactly as often as the untouched one. Tier 1 forwards it because it cannot match
+the step to the gold, not because anything about it is wrong, so whether E0 catches a
+misstated rule is decided by a draw it was already making. Multiplying through D-103's
+detection rates, E0 catches about **18%** of conceptual defects of this shape end to end and
+**61%** of arithmetic ones.
+
+This is the evidence for the router that RESULTS_X1's recommendation 5 argues for. E0 spends
+on judges without aiming them; a checker that verified what it can and sent only the residue
+to a judge would aim the same spend at the steps that need it.
+
+A second finding falls out. E0's answer check calls the final answer wrong on **32 of the
+120** planted traces, although the plants never touch the answer and every original was
+correct. Those traces enter the wrong-answer sample at probability 0.20, so part of E0's
+routing today is driven by the answer-check defect D-098 measured and deliberately did not
+re-run E0 against. It does not change any reported number; it does mean E0's judge spend is
+partly directed by a parser error.
+
+The measurement is a diagnostic: it describes what E0 does with defects of this shape, not
+how often models produce them.
+
 ## Open decisions
 
 | # | Decision | Needed before |
