@@ -8,8 +8,9 @@ Writes dist/kit_<id>/ with
     <id>.html                          the whole review in one page: their 34 items embedded,
                                        hand check -> solution -> verdict, progress kept in the
                                        browser, "Download my answers" -> <id>.jsonl
-    EngTrace-certification-guide.pdf   the guide
-    README.txt                         four lines
+    app/app.py + app/tasks/            the Streamlit app as a second route, same items
+    EngTrace-certification-guide.pdf   the guide, and guide.md, the same text
+    README.txt                         the two routes in a dozen lines
 
 and zips it to dist/kit_<id>.zip. The page runs no code but its own script, reads and
 writes nothing but the browser's local storage, and produces rows in exactly the shape
@@ -31,14 +32,23 @@ GUIDE = HERE / 'EngTrace-certification-guide.pdf'
 
 README = """EngTrace template certification - {id}
 
-1. Read EngTrace-certification-guide.pdf (three pages).
-2. Open {id}.html in Chrome, Edge or Firefox (double-click it).
-3. Work through your {n} items. The page saves after every item; to pause, just close it,
-   and reopen the same file in the same browser to continue.
-4. When the page says you are done, click "Download my answers" and send the file
-   {id}.jsonl to the coordinator.
+1. Read the guide: EngTrace-certification-guide.pdf (or guide.md, the same text).
 
-Nothing needs installing. The page works offline.
+2. Annotate. Two ways; pick one, both record the same thing.
+
+   A. THE PAGE (nothing to install)
+      Open {id}.html in Chrome, Edge or Firefox (double-click it). Work through your
+      {n} items. The page saves after every item; to pause, close it and reopen the
+      same file in the same browser to continue. When it says you are done, click
+      "Download my answers" and send the file {id}.jsonl to the coordinator.
+
+   B. THE APP (if you prefer a desktop app; needs Python 3.11 or newer)
+      pip install streamlit
+      streamlit run app/app.py
+      Pick your id in the sidebar. Your answers are written to app/labels/{id}.jsonl -
+      send that file back when you finish.
+
+Do not use both routes for the same item. Questions go to the coordinator.
 """
 
 DEFECTS = ['physics or scenario implausible', 'governing equation or formula', 'constant or table value',
@@ -195,11 +205,21 @@ def build_one(aid: str, pool: dict, assignment: dict) -> Path:
     kit.mkdir(parents=True)
     (kit / f'{aid}.html').write_text(html, encoding='utf8')
     shutil.copy(GUIDE, kit / 'EngTrace-certification-guide.pdf')
+    shutil.copy(HERE / 'guide.md', kit / 'guide.md')
     (kit / 'README.txt').write_text(README.format(id=aid, n=len(mine['codes'])), encoding='utf8')
+    # the Streamlit app as the second route, with only this expert's items
+    app = kit / 'app'
+    (app / 'tasks').mkdir(parents=True)
+    shutil.copy(HERE / 'app.py', app / 'app.py')
+    (app / 'tasks' / 'pool.json').write_text(json.dumps(sub, ensure_ascii=False), encoding='utf8')
+    (app / 'tasks' / 'assignment.json').write_text(json.dumps({aid: mine}, indent=1), encoding='utf8')
     out = DIST / f'kit_{aid}.zip'
     with zipfile.ZipFile(out, 'w', zipfile.ZIP_DEFLATED) as z:
-        for p in kit.iterdir():
-            z.write(p, f'kit_{aid}/{p.name}')
+        for p in sorted(kit.rglob('*')):
+            if p.is_file():
+                z.write(p, f'kit_{aid}/{p.relative_to(kit).as_posix()}')
+        if any('keyfile' in n for n in z.namelist()):
+            raise SystemExit('refusing: bundle contains a keyfile')
     return out
 
 

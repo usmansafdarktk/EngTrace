@@ -12,7 +12,9 @@ Protocol in D-095; the reasoning in D-092.
 |---|---|
 | `<id>.html` | the whole review in one page, opened in any browser: their 34 items embedded, hand check → solution → verdict, progress saved in the browser, a **Download my answers** button that writes `<id>.jsonl` |
 | `EngTrace-certification-guide.pdf` | the guide (source: `guide.md`, typeset by `make_guide_pdf.py`) |
-| `README.txt` | four lines |
+| `guide.md` | the same guide as Markdown |
+| `app/` | the Streamlit app with the same items, as a second route |
+| `README.txt` | the two routes |
 
 The page runs no code but its own script and reads and writes nothing but the browser's local
 storage; its rows are in exactly the shape the app writes (`source: "html"`), so `score.py` reads
