@@ -76,3 +76,34 @@ re-scoring with a half-finished check wastes the run.
 - The corrected check's residual disagreements are listed by template, not summarised.
 - The old E0 rows are kept; the re-run adds rows under a new config hash rather than
   replacing them, so both are reportable.
+
+## Status, 2026-09-24
+
+**Items 1-3 are done** (`cb84f32`, `2a7900d`, and the harness commit above).
+
+- The check is `evaluators/answer.py`, measured by `analysis/answer_check.py`:
+  **0.947 against the experts on the 281 non-partial traces, where E0 scores 0.747**;
+  0.893 three-way over all 300. The tolerance is chosen on one half of the traces and
+  reported on the other (0.876 / 0.905). A 10-case self-test pins every defect fixed.
+- 32 disagreements remain, 15 of them `aoq_ati_rectifying` (its question asks six
+  quantities and the gold states one on its answer line) and 7 `lorentz_force`.
+- The harness is faster and its cache is now correct: the old per-pair cache never fired,
+  because Tier 1's matrix cache sits above it, and three defects meant it was not
+  output-identical when it did. Judge calls are now fetched concurrently while scoring
+  stays serial, because the wrong-answer sample reads a process-wide seed. Verified
+  offline: 300/300 D3 draws identical, 21/21 rows identical at 1 and 16 workers, 14/14
+  traces identical with the pair cache on and off. **3.9 h becomes 12-50 min.**
+
+**Item 4 has not run, and its cost was understated.** Two things changed:
+
+1. `e0_tribunal.py` does not import the new check yet. Wiring it changes E0's config
+   hash, which is what makes the re-run score anything at all.
+2. The corrected check calls 75 more traces correct, and 288 of 300 traces have a Tier-1
+   match ratio below 0.80, so nearly every newly-correct trace now reaches the judges:
+   roughly **233 judged traces against today's 178, about +30%**, so the re-run is
+   **~$8.50, not $6.53**.
+
+**The open decision.** The corrected accuracy needs no paid run - `analysis/answer_check.py`
+computes it offline from the existing traces for $0. The $8.50 buys E0's *reasoning* score
+under the corrected gating, which differs on the traces whose judging changes. Report the
+corrected accuracy offline, or re-run E0 and have both under one configuration.
