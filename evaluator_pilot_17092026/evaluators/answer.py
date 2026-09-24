@@ -25,6 +25,7 @@ the unit alone. TOL is relative: the experts accept a rounded answer (56.27 for 
 this is the final answer, not a step, so it is not held to display precision - that rule
 belongs to analysis/digit_rule.py, which is about intermediate arithmetic.
 """
+import functools
 import os
 import re
 import sys
@@ -35,6 +36,7 @@ import milestones  # noqa: E402
 TOL = 0.02
 HEADING = re.compile(r'(?i)#+\s*final\s+answer')
 ANSWER = re.compile(r'(?i)(?:#+\s*final\s+answer|\*{0,2}answer\s*\(?[a-z]?\)?\s*\*{0,2}\s*[:\-])')
+WINDOW = 400          # how far an answer segment runs: a conclusion, not a second solution
 BOLD = re.compile(r'\*\*([^*]+)\*\*')
 WORD = re.compile(r'[A-Za-z][A-Za-z\-]{2,}')
 # Words that are an answer in themselves. Units and prose are not.
@@ -84,13 +86,14 @@ def segment(text):
     """
     heads = list(HEADING.finditer(text))
     if heads:
-        return text[heads[-1].start():]
+        return text[heads[-1].start():heads[-1].start() + WINDOW]
     hits = list(ANSWER.finditer(text))
     if hits:
-        return text[hits[0].start():] if len(hits) > 1 and hits[-1].start() - hits[0].start() < 400 \
-            else text[hits[-1].start():]
+        start = hits[0].start() if len(hits) > 1 and hits[-1].start() - hits[0].start() < WINDOW \
+            else hits[-1].start()
+        return text[start:start + WINDOW]
     hits = list(re.finditer(r'(?i)\banswer\b', text))
-    return text[hits[-1].start():] if hits else text[-300:]
+    return text[hits[-1].start():hits[-1].start() + WINDOW] if hits else text[-WINDOW:]
 
 
 def _words(seg, answer_type=None):
@@ -114,16 +117,25 @@ def _words(seg, answer_type=None):
     return out
 
 
+@functools.lru_cache(maxsize=None)
+def _derive(item_id, solution, question, template_id):
+    """milestones.build re-executes the template, so each item is derived once."""
+    try:
+        return tuple(m['value'] for m in milestones.build(
+            {'item_id': item_id, 'solution': solution, 'question': question,
+             'template_id': template_id})['milestones'])
+    except Exception:
+        return ()
+
+
 def _computed(item, ms):
     """The quantities the gold derives. Passed in where the caller has them (E3 holds a
     store), otherwise derived here; an item that no longer reproduces byte-identically
     gives none, and the fallback in targets() applies."""
     if ms is not None:
         return list(ms)
-    try:
-        return [m['value'] for m in milestones.build(item)['milestones']]
-    except Exception:
-        return []
+    return list(_derive(item['item_id'], item['solution'], item['question'],
+                        item.get('template_id')))
 
 
 def targets(item, ms=None):
@@ -194,3 +206,59 @@ def verdict(text, item, tol=TOL, ms=None):
 def correct(text, item, tol=TOL, ms=None):
     """Binary form, for callers that score accuracy."""
     return verdict(text, item, tol, ms)[0] == 'correct'
+
+
+def selftest():
+    """Every defect this module was written for, pinned as a case.
+
+        python evaluator_pilot_17092026/evaluators/answer.py
+
+    Each case is a real pattern from the pilot's 300 labelled traces, with the verdict the
+    experts gave. A failure here means a fix regressed.
+    """
+    item = lambda sol, q='', t='scalar', mid='x#0': (
+        {'item_id': mid, 'template_id': 'template_x', 'solution': sol, 'question': q, 'answer_type': t})
+    cases = [
+        # E0-F1: the gold restates an input on its answer line; the trace gives the value
+        ('**Answer:** The molar volume of saturated liquid n-Pentane at 283.81 K is **113.55 cm3/mol**.',
+         'Find the molar volume at 283.81 K.', 'scalar', (113.55,), '**Answer:** 113.55 cm3/mol', 'correct'),
+        # the same gold, a wrong value
+        ('**Answer:** The molar volume of saturated liquid n-Pentane at 283.81 K is **113.55 cm3/mol**.',
+         'Find the molar volume at 283.81 K.', 'scalar', (113.55,), '**Answer:** 98.20 cm3/mol', 'incorrect'),
+        # "saturated" describes the substance, it is not a verdict word to be matched
+        ('**Answer:** The molar volume of saturated liquid Chlorine is **56.29 cm3/mol**.',
+         '', 'scalar', (56.2858,), '**Answer:** 56.27 cm3/mol', 'correct'),
+        # multi-part: one marker per part, both must be right
+        ('**Answer:** a) The Reynolds number is **20,464,069**. b) The flow regime is **turbulent**.',
+         '', 'classification', (20464069.0,),
+         '## Final Answer\n**Answer (a):** 2.05e7\n**Answer (b):** Turbulent', 'correct'),
+        ('**Answer:** a) The Reynolds number is **20,464,069**. b) The flow regime is **turbulent**.',
+         '', 'classification', (20464069.0,),
+         '## Final Answer\n**Answer (a):** 2.05e7\n**Answer (b):** Laminar', 'partial'),
+        # notation: superscripts, LaTeX, fractions
+        ('**Answer:** The force is F = 5.520e-05 N.', '', 'scalar', (5.52e-05,),
+         '**Answer:** 5.52 × 10⁻⁵ N', 'correct'),
+        ('**Answer:** The velocity is u = 2.5x^2 + 4xy.', '', 'symbolic', (2.5, 4.0),
+         r'**Answer:** \( \frac{5}{2}x^2 + 4xy \)', 'correct'),
+        # sign convention: a downward deflection stated negative
+        ('**Answer:** The deflection at the free end is 7.3 mm', '', 'scalar', (7.3,),
+         '**Answer:** -7.326 [mm]', 'correct'),
+        # the answer value also appears in the question - it is still the answer
+        ('**Answer:** The normal depth is 1.500 m', 'A channel 1.5 m wide, depth 3.0 m.', 'array',
+         (1.5,), '**Answer:** 1.50 m', 'correct'),
+        # a unit factor apart is the same answer
+        ('**Answer:** The volume is 113.55 cm3/mol', '', 'scalar', (113.55,),
+         '**Answer:** 0.11355 dm3/mol', 'correct'),
+    ]
+    bad = 0
+    for sol, q, typ, ms, trace, want in cases:
+        got, _d = verdict(trace, item(sol, q, typ), ms=ms)
+        if got != want:
+            bad += 1
+            print('FAIL want %-9s got %-9s | %s' % (want, got, ' '.join(trace.split())[:60]))
+    print('%d/%d cases pass' % (len(cases) - bad, len(cases)))
+    return bad
+
+
+if __name__ == '__main__':
+    raise SystemExit(selftest())
