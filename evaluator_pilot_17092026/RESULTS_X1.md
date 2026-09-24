@@ -382,10 +382,10 @@ byte-identical. The build is seeded and reproduces byte-identically.
 | E4 milestone "contradicted" | 0.033 | **0.000** | 0.017 |
 | E3 milestone coverage falls | 0.017 | **0.000** | — |
 
-**Nothing detects a conceptual defect. 0 of 60, on every free evaluator.** A trace that
-computes correctly, states the wrong rule for what it is doing, and lands the right answer
-passes every deterministic evaluator the pilot has. That is the cleanest statement of the
-open problem, and it is now independent of the annotation guide.
+**No deterministic evaluator detects a conceptual defect. 0 of 60.** A trace that computes
+correctly, states the wrong rule for what it is doing, and lands the right answer passes
+every checker the pilot has - which is unsurprising, since none of them reads prose. The
+evaluators that could catch it are the judges, and they were asked directly (Finding 8).
 
 **The digit rule is perfect where it can parse and blind where it cannot.** Split by where
 the defect sits: **45 of 45** inside a claim `arith.py` parses, **0 of 15** on a stated
@@ -421,17 +421,66 @@ a plantable site must itself be a parseable claim; the unbiased half of that fam
    four inside correct-answer traces; its threshold is not the problem (D-100: calibrating
    it on held-out halves gains −0.006). A deterministic digit check reaches three in four
    on the same steps and costs nothing, and now ships inside E4 (D-101).
-4. **Report the hard case as a negative result, and scope it.** Arithmetic flaws behind a
+4. **Report the hard case with its two halves separated.** Arithmetic flaws behind a
    correct answer are deterministically detectable — three flags in four are real, at no
-   cost. Conceptual flaws behind a correct answer are detected by nothing the pilot has:
-   0 of 60 planted defects, and only 3 such steps exist in the labelled corpus to study
-   (Finding 7). That is the clearest open problem the pilot identifies, and it is now
-   stated independently of the annotation guide.
-5. **Report the power, not just the intervals.** Clustered by template, this slice can
+   cost, and perfect where the checker can parse. Conceptual flaws are detected by no
+   checker at all (0 of 60) and by a judge about a third of the time, with no false alarms
+   (Findings 7 and 8).
+5. **The evaluator this points to is a router, not a new judge.** The digit rule catches
+   every arithmetic defect it can parse and none it cannot; the judges catch 87% of exactly
+   those it cannot, and are the only thing with any conceptual signal. Sending what the
+   checker cannot verify to a judge covers both, and costs a judge call only on the
+   residue — which is what E5 already does for milestones, applied to steps.
+6. **Report the power, not just the intervals.** Clustered by template, this slice can
    detect AUROC differences of about 0.12–0.19 between evaluators and no smaller (Finding
    6). Every null result here should be read as "this design rules out a large difference",
    which is a claim the data supports, rather than "the evaluators are equivalent", which
    it does not.
+
+## Finding 8 — the judges, asked directly about a planted step
+
+Finding 7's checkers read numbers, not prose, so their failure on conceptual defects cannot
+carry a general claim. `analysis/planted_judges.py` asks the evaluators that do read the
+step: E0's own two judges, on the framework's own Tribunal prompt, built by its own code,
+with exactly one step under review.
+
+**The probe is matched.** Each of the 120 planted defects is judged twice — once in the
+planted trace, once in the *same step of the untouched original*. Same question, same gold,
+one character different. A judge that flags both is flagging the step, not detecting the
+defect, so only the difference counts. 480 calls, $4.67, no failures.
+
+| judge | conceptual (60) | arithmetic (60) | flags the original |
+|---|---|---|---|
+| GPT-5 | 0.333 | 0.717 | **0.000** |
+| Claude Opus 4.5 | 0.133 (0.483 counting *Other*) | 0.717 | **0.000** |
+| **either judge** | **0.350** | **0.800** | — |
+
+**The judges do detect conceptual defects, and the deterministic evaluators never will.**
+A third of them, against zero for every checker. That is the result the pilot was missing,
+and it changes the recommendation from "this is unsolved" to "only a judge can do this, and
+it does it a third of the time".
+
+**Neither judge produced a single false alarm.** 120 untouched steps each, 120 verdicts of
+*Alternative Correct*, both judges. Whatever E0's judges are criticised for — RESULTS_E0
+found they answer *Alternative Correct* to 93% of what they are sent — over-flagging a
+clean step is not it. The problem is sensitivity, not precision.
+
+**Judges and the digit rule are complementary, and the split is exact:**
+
+| arithmetic defect sits… | digit rule | GPT-5 | Opus 4.5 |
+|---|---|---|---|
+| inside a claim the checker parses (45) | **1.000** | 0.667 | 0.667 |
+| in a stated value with no parseable working (15) | **0.000** | **0.867** | **0.867** |
+
+The digit rule is perfect where it can parse and blind where it cannot; the judges are
+strongest exactly where it is blind. A checker that routes what it cannot parse to a judge
+would cover both, and neither component is the one the framework currently spends on.
+
+**What this does not settle.** It asks "when a judge is shown this step, does it call it
+wrong", not "would E0 have shown it". Every planted trace has a correct final answer, and
+E0 samples wrong-answer traces to the Tribunal at 0.20, so in a real E0 run most of these
+steps would never reach a judge at all. The capability is established; the routing that
+would use it is not, and that is now the open question rather than the capability.
 
 ## Limitations, and what this pilot does not show
 
@@ -485,10 +534,12 @@ label; re-adjudicating the disputes it created changed 12 of 2,091 (D-099). Both
 are kept under `superseded/`, and the reliability figures above are the post-replacement
 ones.
 
-**The judge-based evaluators were not run on the planted set.** E0, E0-3J, E1 and E5 would
-cost about $12.60 over its 180 traces at the pilot's measured rates. Whether an LLM judge
-catches a conceptual defect that every deterministic evaluator misses is therefore **an open
-question, not a negative result**, and it is the cheapest experiment the pilot leaves.
+**What the judges were and were not asked.** E0's two judges were asked directly about
+every planted step, matched against the same step unmodified (Finding 8, $4.67): they catch
+a third of the conceptual defects and four fifths of the arithmetic ones, with no false
+alarms. They were **not** run through E0's own routing, which decides whether a step reaches
+a judge at all — and with a correct final answer, most of these steps would not. E1's panel
+and E5's judge were not probed; E1 costs about $3 on this set, E5 about $0.20.
 
 ### What the pilot supports, and what it does not
 
@@ -498,7 +549,8 @@ question, not a negative result**, and it is the cheapest experiment the pilot l
 | E5 is the most accurate milestone evaluator, at 1/13th of E0's cost | That E5 beats E0 at the trace level |
 | An off-the-shelf PRM over-flags inside correct-answer traces, and its threshold is not the cause | That a better-calibrated PRM could not do better |
 | A digit-level arithmetic check finds three real errors in four, deterministically and free | That it finds conceptual errors — it finds none |
-| No deterministic evaluator detects a conceptual defect behind a correct answer | That no *judge* detects one; that was not tested |
+| No deterministic evaluator detects a conceptual defect behind a correct answer | That the judges cannot: asked directly they catch 35% of them |
+| E0's judges do not over-flag: 240 clean steps, 240 clean verdicts | That E0's routing would ever show them those steps |
 | The expert labels are reliable at kappa 0.78 between raters and 0.83 within | That 300 traces from 15 templates can separate evaluators finely |
 
 ## Follow-ups this turned up

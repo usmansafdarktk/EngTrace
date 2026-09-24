@@ -3826,6 +3826,43 @@ the experts both used, so no number here is affected. But the templates have dri
 the September freeze, and `pinned_templates.py` (added with D-101) exists to work around
 it. Fixing the drift, or pinning the templates properly, is unowned.
 
+## D-103 - The judges do catch conceptual defects; the framework does not ask them
+
+**Date:** 2026-09-24 - **Status:** DECIDED (user approved the spend) - **Evidence:**
+`evaluator_pilot_17092026/analysis/planted_judges.py`, RESULTS_X1 Finding 8
+
+D-102 reported that no free evaluator detects a planted conceptual defect, 0 of 60. Every
+evaluator it tested reads numbers rather than prose, so the claim could not be general, and
+the evaluators that might catch a misstated rule - the judges - had not been asked.
+
+They were, on the framework's own Tribunal prompt with one step under review, matched: each
+of the 120 planted defects judged both in the planted trace and in the same step of the
+untouched original. 480 calls, **$4.67**, no failures.
+
+  conceptual   GPT-5 0.333, Opus 4.5 0.133 (0.483 counting its `Other` verdicts),
+               either judge 0.350 - against 0.000 for every deterministic evaluator
+  arithmetic   0.717 each, 0.800 either
+  originals    120 of 120 `Alternative Correct`, both judges: no false alarm at all
+
+Two things follow.
+
+**The capability exists and only the judges have it.** A third of conceptual defects is not
+a solution, but it is the difference between "no evaluator can do this" and "only a judge
+can, a third of the time". The paper's claim changes accordingly.
+
+**Judges and the digit rule are complementary, exactly.** On arithmetic defects inside a
+claim `arith.py` parses the digit rule scores 1.000 and the judges 0.667; on defects in a
+stated value with no parseable working the digit rule scores 0.000 and both judges 0.867.
+The checker is perfect where it can parse and blind where it cannot; the judges are
+strongest where it is blind. **The evaluator this argues for is a router**: verify what can
+be verified deterministically, and spend a judge call only on the residue - which is what
+E5 already does for milestones, applied to steps.
+
+What is NOT established: whether E0 would ever show a judge these steps. Every planted trace
+has a correct final answer and E0 samples wrong-answer traces at 0.20, so in a real run most
+would never reach the Tribunal. The capability is measured; the routing is the open question,
+and it is now a design question rather than a research one.
+
 ## Open decisions
 
 | # | Decision | Needed before |
