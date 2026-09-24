@@ -84,10 +84,9 @@ template_annotation_23092026/
     guide.md, make_guide_pdf.py, EngTrace-certification-guide.pdf   what the experts read
     plants/              CONTRACT.md and one <branch>.py of four planted defects each
     build_tasks.py       verifies plants, precomputes instances, builds pool/assignment/keyfile (tasks/, ignored)
-    app.py               the reviewer's app: hand check, solution, scores, verdict, timestamps
+    app.py               the reviewer's app: hand check, solution, scores, verdict, timestamps; writes <id>.jsonl beside itself
     workbooks.py         the file route: export, check, import
-    make_kits.py         the one-page kit per expert: <id>.html + guide + README (dist/kit_<id>.zip); send this
-    package.py           the app + workbook bundle per expert (dist/<id>.zip); the alternative
+    make_kits.py         the kit per expert: app.py + their tasks + guide + README (dist/kit_<id>.zip); send these
     simulate.py          synthetic labels to prove the pipeline; never results
     score.py             RESULTS.md: plant detection, hand checks, agreement, panel FPR, dwell, fix list
 ```

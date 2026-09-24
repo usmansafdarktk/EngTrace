@@ -2,8 +2,9 @@
 
     streamlit run app.py
 
-Reads tasks/pool.json and tasks/assignment.json beside it, writes labels/<id>.jsonl,
-one row per submitted template. Runs no template code: instances are precomputed.
+Reads tasks/pool.json and tasks/assignment.json beside it, and writes <id>.jsonl in the
+same folder as this file, one row per submitted template: that file is what the expert
+sends back. Runs no template code: instances are precomputed.
 
 The flow per item: hand check (question only, enter your answer) -> show solution
 (match reported) -> scores, decision, note -> submit. Timestamps for each stage are
@@ -20,7 +21,7 @@ import streamlit as st
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 TASKS = os.path.join(HERE, 'tasks')
-LABELS = os.path.join(HERE, 'labels')
+LABELS = HERE                      # <id>.jsonl lands next to app.py, in the folder the expert runs it from
 NUM_RE = re.compile(r'[-+]?\d[\d,]*\.?\d*(?:[eE][-+]?\d+)?')
 DEFECTS = ['physics or scenario implausible', 'governing equation or formula', 'constant or table value',
            'unit or conversion', 'sign or direction', 'arithmetic: a step does not follow',
@@ -107,7 +108,7 @@ with st.sidebar:
 
 code = st.session_state['code']
 if code is None:
-    st.success(f'All {len(codes)} items submitted. Send back this file: `labels/{aid}.jsonl`. Thank you.')
+    st.success(f'All {len(codes)} items submitted. Send back the file `{aid}.jsonl` from the folder you ran the app in. Thank you.')
     st.stop()
 
 item = pool[code]

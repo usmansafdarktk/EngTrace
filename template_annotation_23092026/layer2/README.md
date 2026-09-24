@@ -6,26 +6,22 @@ Protocol in D-095; the reasoning in D-092.
 
 ## What each expert receives
 
-**The simplified kit** (`make_kits.py` → `dist/kit_<id>.zip`), nothing to install:
+One folder, `dist/kit_<id>.zip`, built by `make_kits.py`:
 
 | File | What |
 |---|---|
-| `<id>.html` | the whole review in one page, opened in any browser: their 34 items embedded, hand check → solution → verdict, progress saved in the browser, a **Download my answers** button that writes `<id>.jsonl` |
-| `EngTrace-certification-guide.pdf` | the guide (source: `guide.md`, typeset by `make_guide_pdf.py`) |
-| `guide.md` | the same guide as Markdown |
-| `app/` | the Streamlit app with the same items, as a second route |
-| `README.txt` | the two routes |
+| `app.py` | the review app; `streamlit run app.py` from this folder |
+| `tasks/` | ONLY their 34 items (the branch's 30 templates and 4 planted defects, shuffled), instances precomputed |
+| `EngTrace-certification-guide.pdf`, `guide.md` | the guide (typeset from `guide.md` by `make_guide_pdf.py`) |
+| `README.txt` | how to run, where the results go |
 
-The page runs no code but its own script and reads and writes nothing but the browser's local
-storage; its rows are in exactly the shape the app writes (`source: "html"`), so `score.py` reads
-them unchanged. The expert must keep using the same browser on the same machine until they download.
+**Where results go:** the app writes `<id>.jsonl` into the kit folder, one row per submitted item,
+saving after each submit; that file is what the expert sends back, and it is dropped into
+`layer2/labels/` for `score.py`. The workbook route (`workbooks.py`) exists for an expert who cannot
+run Python; its import produces the same rows.
 
-**The full bundle** (`package.py` → `dist/<id>.zip`) is the alternative for anyone who prefers the
-Streamlit app or the JSON workbook; both produce the same rows.
-
-No template code ships either way: five instances per item are precomputed. The keyfile that says
-which items are plants never leaves this directory; both packagers refuse to build a bundle that
-names a plant.
+No template code ships: five instances per item are precomputed. The keyfile that says which items
+are plants never leaves this directory; the builder refuses a kit whose payload names a plant.
 
 ## The protocol
 
@@ -43,9 +39,8 @@ python -m template_annotation_23092026.layer2.build_tasks --check-plants   # ver
 python -m template_annotation_23092026.layer2.build_tasks                  # tasks/: pool, assignment, keyfile
 python -m template_annotation_23092026.layer2.make_guide_pdf               # the PDF
 python -m template_annotation_23092026.layer2.simulate                     # proves the pipeline; NOT results
-python -m template_annotation_23092026.layer2.make_kits                    # dist/kit_<id>.zip: the one-page kit (send this)
-python -m template_annotation_23092026.layer2.package                      # dist/<id>.zip: app + workbook bundle (alternative)
-# ... experts work; returned <id>.jsonl files go to labels/, or workbooks through
+python -m template_annotation_23092026.layer2.make_kits                    # dist/kit_<id>.zip, one per expert: send these
+# ... experts work; returned <id>.jsonl files go to labels/; a filled workbook goes through
 python -m template_annotation_23092026.layer2.workbooks import <file>      # (workbook route)
 python -m template_annotation_23092026.layer2.score                        # RESULTS.md
 ```
