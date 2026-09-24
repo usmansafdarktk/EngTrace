@@ -2,9 +2,10 @@
 
     streamlit run app.py
 
-Reads tasks/pool.json and tasks/assignment.json beside it, and writes <id>.jsonl in the
-same folder as this file, one row per submitted template: that file is what the expert
-sends back. Runs no template code: instances are precomputed.
+Finds the queues next to it, either tasks/ (the whole roster, as built in the repository)
+or one kit_<id>/tasks/ folder per expert (as distributed), lets the expert pick their id,
+and writes <id>.jsonl in the same folder as this file, one row per submitted template:
+that file is what the expert sends back. Runs no template code: instances are precomputed.
 
 The flow per item: hand check (question only, enter your answer) -> show solution
 (match reported) -> scores, decision, note -> submit. Timestamps for each stage are
@@ -32,10 +33,19 @@ st.set_page_config(layout='wide', page_title='EngTrace template certification')
 
 @st.cache_data
 def load_tasks():
-    with open(os.path.join(TASKS, 'pool.json'), encoding='utf8') as fh:
-        pool = json.load(fh)
-    with open(os.path.join(TASKS, 'assignment.json'), encoding='utf8') as fh:
-        assignment = json.load(fh)
+    """{id: queue} and the pool, from tasks/ if present, else from every kit_<id>/tasks/ beside app.py."""
+    import glob
+    dirs = [TASKS] if os.path.exists(os.path.join(TASKS, 'assignment.json')) else \
+        sorted(os.path.dirname(p) for p in glob.glob(os.path.join(HERE, 'kit_*', 'tasks', 'assignment.json')))
+    pool, assignment = {}, {}
+    for d in dirs:
+        with open(os.path.join(d, 'pool.json'), encoding='utf8') as fh:
+            pool.update(json.load(fh))
+        with open(os.path.join(d, 'assignment.json'), encoding='utf8') as fh:
+            assignment.update(json.load(fh))
+    if not assignment:
+        st.error('No tasks found next to app.py: expected tasks/ or kit_<id>/tasks/.')
+        st.stop()
     return pool, assignment
 
 

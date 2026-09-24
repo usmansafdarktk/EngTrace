@@ -6,16 +6,20 @@ Protocol in D-095; the reasoning in D-092.
 
 ## What each expert receives
 
-One folder, `dist/kit_<id>.zip`, built by `make_kits.py`:
+`make_kits.py` writes `dist/` with the shared files once and one folder of items per expert, no zips:
 
-| File | What |
+| In `dist/` | What |
 |---|---|
-| `app.py` | the review app; `streamlit run app.py` from this folder |
-| `tasks/` | ONLY their 34 items (the branch's 30 templates and 4 planted defects, shuffled), instances precomputed |
-| `EngTrace-certification-guide.pdf`, `guide.md` | the guide (typeset from `guide.md` by `make_guide_pdf.py`) |
-| `README.txt` | how to run, where the results go |
+| `app.py` | the review app, shared; `streamlit run app.py` from the folder it sits in |
+| `README.txt` | how to run, where the results go, shared |
+| `EngTrace-certification-guide.pdf`, `guide.md` | the guide, shared (typeset from `guide.md` by `make_guide_pdf.py`) |
+| `kit_<id>/tasks/` | ONLY that expert's 34 items (the branch's 30 templates and 4 planted defects, shuffled), instances precomputed |
 
-**Where results go:** the app writes `<id>.jsonl` into the kit folder, one row per submitted item,
+An expert receives the four shared files and their own `kit_<id>/` folder side by side. The app
+finds every `kit_<id>/tasks/` next to it and offers those ids in the sidebar: one id when an expert
+has only their kit, all fifteen when run from `dist/` itself.
+
+**Where results go:** the app writes `<id>.jsonl` next to `app.py`, one row per submitted item,
 saving after each submit; that file is what the expert sends back, and it is dropped into
 `layer2/labels/` for `score.py`. The workbook route (`workbooks.py`) exists for an expert who cannot
 run Python; its import produces the same rows.
@@ -39,7 +43,7 @@ python -m template_annotation_23092026.layer2.build_tasks --check-plants   # ver
 python -m template_annotation_23092026.layer2.build_tasks                  # tasks/: pool, assignment, keyfile
 python -m template_annotation_23092026.layer2.make_guide_pdf               # the PDF
 python -m template_annotation_23092026.layer2.simulate                     # proves the pipeline; NOT results
-python -m template_annotation_23092026.layer2.make_kits                    # dist/kit_<id>.zip, one per expert: send these
+python -m template_annotation_23092026.layer2.make_kits                    # dist/: shared app + guide + README, and kit_<id>/ per expert
 # ... experts work; returned <id>.jsonl files go to labels/; a filled workbook goes through
 python -m template_annotation_23092026.layer2.workbooks import <file>      # (workbook route)
 python -m template_annotation_23092026.layer2.score                        # RESULTS.md
