@@ -3598,6 +3598,33 @@ still fixed).
 
 ---
 
+## D-092 - The hard case is answered by a digit-level arithmetic check, not by a model
+
+**Date:** 2026-09-24 · **Status:** DECIDED · **Evidence:**
+`evaluator_pilot_17092026/analysis/digit_rule.py`, RESULTS_X1 Finding 5
+
+D-091 recorded that no evaluator detects a flawed step behind a correct final answer,
+and that buying more labelled hard cases would not change that. It also recorded why
+the flaws are there: 164 of the 167 are calculation slips.
+
+The annotation guide's rule for a slip is mechanical - rounding is not an error, a wrong
+digit is - so it was implemented: recompute every arithmetic claim from the numbers the
+trace itself shows, and reject a displayed value that is not a correct rounding at the
+precision shown. On the 228 correct-answer traces it reaches step precision 0.488 and
+recall 0.485 (the 72B PRM: 0.240 / 0.266) and trace-level AUROC 0.669, CI 0.604-0.732 -
+the only result in the pilot whose hard-case interval clears chance. It calls no model,
+so it costs nothing, and every flag names the claim, the value shown and the value
+recomputed.
+
+This is E4's own checker with its tolerance changed. E4 ships at 1% relative tolerance,
+which is right for catching a fabricated number and blind to every slip the experts
+marked: at 1% it reaches recall 0.036 on the same steps. The defect was the tolerance,
+not the design, and E4's null result in RESULTS_E4 should be read that way.
+
+Scope of the claim, for the paper: arithmetic flaws behind a correct answer are
+deterministically detectable and need no judge. Conceptual flaws behind a correct answer
+remain unmeasured - the corpus holds 3 - and no method can be validated on 3 cases.
+
 ## Open decisions
 
 | # | Decision | Needed before |

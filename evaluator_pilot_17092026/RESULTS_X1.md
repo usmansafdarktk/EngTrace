@@ -151,8 +151,9 @@ of 3 (`analysis/hard_case_pool.py`).
 | E5 | 0.434 | 0.391–0.480 | **−0.107** (significant) |
 | *baseline: E0's own answer check* | 0.510 | 0.451–0.572 | −0.031 |
 
-- **No evaluator detects flawed reasoning behind a correct answer.** Every AUROC sits
-  near chance; the best, E2's lowest step reward at 0.584, does not separate from E0.
+- **No *evaluator* detects flawed reasoning behind a correct answer.** Every AUROC sits
+  near chance; the best, E2's lowest step reward at 0.584, does not separate from E0. A
+  deterministic digit check does - see below.
 - **E3, E4 and E5 are significantly worse than chance-level E0 here**, because they
   score a trace by milestones a correct answer already implies. Their strength at the
   milestone level (Finding 2) is not a strength at this question.
@@ -164,6 +165,32 @@ A second labelling round to enlarge this set was costed and rejected (D-091): th
 signals that would select candidates barely enrich (the 72B's minimum reward under 0.20
 yields 28% against a 25% base rate), so ~170 new traces would need labelling to add ~50
 hard cases, and the intervals would not tighten enough to change any conclusion.
+
+### The rule that does work (`analysis/digit_rule.py`)
+
+Since 164 of the 167 flaws are calculation slips, the guide's own rule for them can be
+applied by machine: *rounding is not an error, a wrong digit is*. For every arithmetic
+claim a trace writes, recompute the left side from the numbers the trace itself shows
+and ask whether the displayed right side is a correct rounding at the precision shown.
+That is E4's checker with its 1% tolerance replaced by the displayed precision.
+
+| Hard case, 228 correct-answer traces | step precision | step recall | step F1 | trace AUROC |
+|---|---|---|---|---|
+| E4 as it ships (1% tolerance) | 0.154 | 0.036 | 0.058 | 0.478 |
+| tolerance 0.1% | 0.346 | 0.108 | 0.164 | 0.529 |
+| **the digit rule** | **0.488** | **0.485** | **0.486** | **0.669** (0.604–0.732) |
+| *E2, 72B, for comparison* | 0.240 | 0.266 | 0.252 | 0.584 |
+
+The digit rule doubles the 72B PRM at step level and is the only thing in the pilot
+whose hard-case interval clears chance, at no API cost and with an auditable flag: it
+names the claim, the value shown and the value recomputed (`ln(0.17911) = -1.71918`,
+computes to -1.71976). E4's tolerance, not its design, was the problem.
+
+Two limits. Recall is 0.485, bounded by what the checker can parse, so extending parse
+coverage is the next gain. And 85 flagged steps in correct-answer traces are not marked
+incorrect by the experts; a sample of those should go to one expert in the adjudication
+format already used, since each is either a rounding chain the rule should tolerate or a
+slip the experts missed - and both answers are worth having.
 
 ## What this means
 
