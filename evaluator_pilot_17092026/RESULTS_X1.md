@@ -84,6 +84,17 @@ Three consequences:
   restated input read as the answer) and E0-F2 (no number on the Answer line). As a
   predictor of soundness it scores 0.812, where an accurate answer check scores 0.974.
 
+  How far a deterministic repair gets (`analysis/answer_check.py`): E0 errs almost
+  entirely in one direction - of its 72 disagreements with the experts, **68 are traces
+  the experts call correct and E0 calls wrong**, and in 45 of those the gold value is
+  sitting in the trace's own answer segment. Reading that segment, and taking the gold
+  value from the gold's last computed number instead of its answer line, lifts agreement
+  from 0.747 to 0.797 on the 281 traces whose answer is not partial. That is the honest
+  size of the quick fix: real, worth taking, and not the whole gap. The rest needs a
+  check that scores each part of a multi-part answer separately and returns
+  correct / partial / incorrect, because 19 traces are genuinely partial and a binary
+  check cannot represent them at all.
+
 ## Finding 2 — milestone coverage is accurate, and E5's judge earns its place
 
 | Milestones, against the experts' "obtained" | precision | recall | F1 |
