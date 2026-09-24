@@ -3664,6 +3664,40 @@ cross-encoder cache never fired (Tier 1's matrix cache sits above it) and was no
 output-identical when it did, and judge calls are now fetched concurrently while scoring
 stays serial, because the wrong-answer sample reads a process-wide seed.
 
+## D-099 - Electrical's third label set was re-annotated, and the ground truth did not move
+
+**Date:** 2026-09-24 - **Status:** DECIDED - **Evidence:**
+`evaluator_pilot_17092026/annotation/rater_diagnostics.py`, RESULTS_X1
+
+The verification round put one electrical expert's self-agreement at 0.433, the lowest of
+the fifteen, and the diagnostics showed the signature: "not a claim" used four times as
+often as by the branch's other two experts, fewer steps marked incorrect, the odd label in
+47 of 77 split steps, and the adjudication going against that set in 66 of 77. Electrical's
+between-rater step kappa was 0.584.
+
+That expert re-annotated their 60 solutions (`ele-3.1`; `ele-3` kept under `superseded/`).
+The request named the two patterns rather than the numbers. Both moved: "not a claim" 6.1%
+-> 0.4%, steps marked incorrect 10.3% -> 22.2%, every one carrying a written reason.
+Electrical's kappa is now **0.762** and the pooled figure **0.781** (was 0.750); the branch's
+split steps fell from 77 to 47, and the adjudication now goes against that set 4 times in 47.
+
+**The ground truth is byte-identical before and after.** All 2,091 step labels and all 300
+trace verdicts are unchanged. Every step where the replaced set could have swung a majority
+had already been settled by the blind three-way adjudication, and the new disagreements are
+cases where one expert differs from a unanimous pair, which the majority rule absorbs. So no
+result in RESULTS_X1, RESULTS_E2 or the hard-case analysis changes; what changed is the
+reliability the labels are held to.
+
+This is worth reporting as a robustness property rather than a footnote: an entire expert's
+set - a fifteenth of the annotation effort, and the least self-consistent one - was replaced,
+and the truth the evaluators are scored against did not move.
+
+Two loose ends, both small. `ele-3.1` has no blind second pass, because the verification
+round was run on the set it replaced, so electrical's intra-rater figure covers two of three
+experts (0.936, kappa 0.808). And twelve electrical steps became 2-1 splits only after the
+re-annotation and were never adjudicated; they fall to the majority rule and none is a
+three-way disagreement.
+
 ## Open decisions
 
 | # | Decision | Needed before |

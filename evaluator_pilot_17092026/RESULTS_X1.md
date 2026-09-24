@@ -14,8 +14,21 @@ Version 2 adds three things version 1 did not have:
   back to all three, blind and shuffled; the majority of that second pass is the
   consensus label and replaces the majority for that step alone.
 
-Chemical engineering's third set is `che-3.1`, the careful re-annotation; the original
-is kept under `superseded/`.
+Two sets were re-annotated after the verification round showed them least consistent,
+and both originals are kept under `superseded/`: chemical's `che-3.1`, and electrical's
+`ele-3.1` (2026-09-24). Electrical's between-rater step κ rose from 0.584 to **0.762** and
+the pooled figure from 0.750 to 0.781. The re-annotation moved the two patterns the
+diagnostics identified: "not a claim" fell from 6.1% of that expert's steps to 0.4%, and
+steps marked incorrect rose from 10.3% to 22.2%, in line with the branch's other two
+experts.
+
+**The ground truth did not move.** Rebuilding it with `ele-3.1` in place of `ele-3` leaves
+all 2,091 step labels and all 300 verdicts identical (`annotation/rater_diagnostics.py`,
+`annotation/score_against_labels.py`). That is the adjudication round working as designed:
+every step where the replaced set could have swung a majority had already been settled by
+the branch's three experts reviewing it blind, so an entire expert's set can be replaced
+without a single ground-truth label changing. Every number in this document therefore
+stands unchanged; what improved is the reliability the labels are held to.
 
 Scripts: `annotation/score_against_labels.py` (headline comparison),
 `annotation/verification_report.py` (the two new rounds), `analysis/x1_analysis.py`
@@ -27,27 +40,31 @@ Between raters, Fleiss κ over each trace's own three experts:
 
 | | steps | milestones | final answer |
 |---|---|---|---|
-| pooled over branches | **0.750** | 0.848 | 0.966 |
-| chemical / civil / electrical / industrial / mechanical | 0.772 / 0.645 / 0.584 / 0.867 / 0.810 | 0.931 / 0.989 / 0.775 / 0.874 / 0.659 | 0.974 / 0.968 / 0.964 / 0.980 / 0.904 |
-| calibration set, all 15 experts across branches | 0.774 | — | 0.823 |
+| pooled over branches | **0.781** | 0.880 | 0.966 |
+| chemical / civil / electrical / industrial / mechanical | 0.772 / 0.645 / 0.762 / 0.867 / 0.810 | 0.931 / 0.989 / 0.899 / 0.874 / 0.659 | 0.974 / 0.968 / 0.964 / 0.980 / 0.904 |
+| calibration set, all 15 experts across branches | 0.775 | — | 0.869 |
 
 Within raters, from the verification round (792 re-labelled steps):
 
 | | chemical | civil | electrical | industrial | mechanical | pooled |
 |---|---|---|---|---|---|---|
-| step agreement with their own first pass | 0.972 | 0.935 | 0.891 | 0.915 | 0.991 | **0.936** |
-| Cohen's κ | 0.913 | 0.519 | 0.678 | 0.820 | 0.947 | **0.788** |
+| step agreement with their own first pass | 0.972 | 0.935 | 0.936 | 0.915 | 0.991 | **0.946** |
+| Cohen's κ | 0.913 | 0.519 | 0.808 | 0.820 | 0.947 | **0.819** |
 
-An expert agrees with themselves on 94% of steps (κ 0.79), and three experts agree with
-each other at κ 0.75. The between-rater figure is therefore close to the ceiling their
-own consistency sets, which is the point of measuring both.
+An expert agrees with themselves on 95% of steps (κ 0.82), and three experts agree with
+each other at κ 0.78. The between-rater figure is therefore close to the ceiling their
+own consistency sets, which is the point of measuring both. Electrical covers two of its
+three experts: the verification round was run on the set `ele-3` later replaced, so
+`ele-3.1` has no blind second pass of its own.
 
 The adjudication settled **292 split steps across 137 traces**. The three reviewers came
-back unanimous on 273 of them and 2–1 on 34. It **changed 91 ground-truth step labels**
-and confirmed the majority on 201, and every consensus row carries a written reason.
-After adjudication no step, milestone or verdict is left disputed, and the count of
-steps the experts call incorrect rises from 303 to **376** of 2,091 — adjudication
-mostly resolved splits *towards* an error being real.
+back unanimous on 273 of them and 2–1 on 34. Against the final label sets it **changes 73
+ground-truth step labels** and confirms the majority on 219, and every consensus row
+carries a written reason. After adjudication no step, milestone or verdict is left
+disputed, and the count of steps the experts call incorrect rises from 322 to **376** of
+2,091 — adjudication mostly resolved splits *towards* an error being real. Twelve
+electrical steps became 2–1 splits only after `ele-3.1` was labelled and were never
+adjudicated; they fall to the majority rule, and none is a three-way disagreement.
 
 The experts judge **229 traces sound and 71 unsound**.
 
