@@ -84,16 +84,55 @@ Three consequences:
   restated input read as the answer) and E0-F2 (no number on the Answer line). As a
   predictor of soundness it scores 0.812, where an accurate answer check scores 0.974.
 
-  How far a deterministic repair gets (`analysis/answer_check.py`): E0 errs almost
-  entirely in one direction - of its 72 disagreements with the experts, **68 are traces
-  the experts call correct and E0 calls wrong**, and in 45 of those the gold value is
-  sitting in the trace's own answer segment. Reading that segment, and taking the gold
-  value from the gold's last computed number instead of its answer line, lifts agreement
-  from 0.747 to 0.797 on the 281 traces whose answer is not partial. That is the honest
-  size of the quick fix: real, worth taking, and not the whole gap. The rest needs a
-  check that scores each part of a multi-part answer separately and returns
-  correct / partial / incorrect, because 19 traces are genuinely partial and a binary
-  check cannot represent them at all.
+  **That gap is now closed** (`evaluators/answer.py`, measured by
+  `analysis/answer_check.py`). E0 errs almost entirely in one direction - of its 72
+  disagreements with the experts, 68 are traces the experts call **correct** and E0 calls
+  wrong. A deterministic check that reads the trace's answer segment, takes each target
+  from a quantity the gold **computed**, scores every part of a multi-part answer and
+  returns correct / partial / incorrect agrees with the experts on **0.947** of the 281
+  non-partial traces where E0 manages 0.747, and on 0.893 of all 300 three ways. See
+  Finding 1b. E0 itself has not been re-scored with it (D-098): the number it fixes is a
+  property of the traces, not of E0, and re-running E0 alone would put it on a different
+  check from E0-3J and E1.
+
+### Finding 1b — what a corrected answer check is worth
+
+| Answer check, against the experts' verdict on 300 traces | agrees |
+|---|---|
+| E0, the published framework | 0.747 |
+| **corrected check, non-partial traces** | **0.947** |
+| corrected check, three-way (correct / partial / incorrect) | 0.893 |
+
+| Answer accuracy per model | experts | E0 reports | corrected |
+|---|---|---|---|
+| gpt-5 | 0.950 | 0.617 | **0.950** |
+| claude-opus-4.7 | 0.917 | 0.700 | 0.950 |
+| deepseek-r1 | 0.917 | 0.633 | 0.817 |
+| gemini-3.1-pro | 0.867 | 0.633 | 0.867 |
+| llama-3.1-70b | 0.150 | 0.150 | 0.183 |
+| **all 300** | **0.760** | **0.547** | **0.753** |
+
+E0 understates every model by about 21 points and ranks **GPT-5 fourth**; the experts and
+the corrected check both put it first. Five defects account for it, each measured:
+
+1. **The gold value was the last number in the solution.** For `manning_rectangular_discharge`
+   that is the **3 in `m^3/s`**, so a trace scored correct if it wrote its unit in ASCII and
+   wrong if it wrote `m3/s` in unicode. This one defect explains every manning and
+   fluid-acceleration disagreement. Targets are now quantities the gold *computed*.
+2. **Restated inputs** were read as the answer (E0-F1).
+3. **Multi-part answers** write one marker per part, so reading after the *last* marker kept
+   only part (b) and discarded the value.
+4. **Notation**: `5.52 x 10^-5` in unicode superscripts, LaTeX `\times`, `\frac{5}{2}`,
+   subscripts and thousands separators all read as wrong numbers or none.
+5. **One relative tolerance cannot work**: `114` for 113.55 is a correct rounding at the
+   precision shown (0.40% out) while `50.20` for 50.05 is wrong (0.30% out). A value now
+   passes within a relative tolerance, or within one unit of its own last digit, or of the
+   gold's.
+
+The relative tolerance is the one fitted number, so it is chosen on one half of the traces
+and reported on the other: 0.876 and 0.905. A 10-case self-test in `evaluators/answer.py`
+pins each defect. 32 disagreements remain, 15 of them `aoq_ati_rectifying`, whose question
+asks six quantities while its gold states one on the answer line, and 7 `lorentz_force`.
 
 ## Finding 2 — milestone coverage is accurate, and E5's judge earns its place
 
@@ -172,7 +211,7 @@ of 3 (`analysis/hard_case_pool.py`).
   this set mostly holds is arithmetic that does not change the answer. That is worth
   stating plainly in the paper rather than presenting the set as deep reasoning failure.
 
-A second labelling round to enlarge this set was costed and rejected (D-091): the
+A second labelling round to enlarge this set was costed and rejected (D-096): the
 signals that would select candidates barely enrich (the 72B's minimum reward under 0.20
 yields 28% against a 25% base rate), so ~170 new traces would need labelling to add ~50
 hard cases, and the intervals would not tighten enough to change any conclusion.

@@ -28,7 +28,7 @@ branches.
 
 **Read these first:** [FINDINGS.md](FINDINGS.md) (seven defects in the published
 framework, plus the robustness cohort), [RESULTS_E0.md](RESULTS_E0.md),
-[RESULTS_E3.md](RESULTS_E3.md), [RESULTS_E4.md](RESULTS_E4.md), [RESULTS_E1.md](RESULTS_E1.md), [RESULTS_E5.md](RESULTS_E5.md), [RESULTS_E2.md](RESULTS_E2.md), [RESULTS_X1.md](RESULTS_X1.md), and the pilot's decisions D-078 to D-090 in
+[RESULTS_E3.md](RESULTS_E3.md), [RESULTS_E4.md](RESULTS_E4.md), [RESULTS_E1.md](RESULTS_E1.md), [RESULTS_E5.md](RESULTS_E5.md), [RESULTS_E2.md](RESULTS_E2.md), [RESULTS_X1.md](RESULTS_X1.md), and the pilot's decisions D-078 to D-098 in
 [DECISIONS.md](../docs/re-implementation-sep/DECISIONS.md). Every number in them is
 reproduced by a script in [analysis/](analysis/README.md).
 

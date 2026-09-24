@@ -139,3 +139,17 @@ defines - `"Standard processing applied"`, 3 times. The framework's mapping is
 `"alternative" -> 1.0`, `"calculation" -> 0.5`, **everything else -> 0.0**, so an
 invented category scores identically to "Conceptual Error". A judge that fails to
 follow the label set is silently counted as judging the step wrong.
+
+# The answer check, corrected (2026-09-24)
+
+Every number above comes from the published framework's own final-answer check, which the
+expert labels show is wrong on 72 of 300 traces - almost always calling a correct answer
+wrong (68 of the 72). Its accuracy column therefore understates every model by about 21
+points and ranks GPT-5 fourth of five.
+
+`evaluators/answer.py` replaces it and agrees with the experts on 0.947 of the non-partial
+traces against E0's 0.747; `analysis/answer_check.py` is the measurement, RESULTS_X1
+Finding 1b the result. **E0 has not been re-scored with it** (D-098), so the figures in this
+document stand as the published framework produces them, and the corrected accuracy is
+reported separately. Re-running E0 would cost about $8.50 rather than the $6.53 spent here,
+because a correct check sends roughly 233 traces to the judges instead of 178.

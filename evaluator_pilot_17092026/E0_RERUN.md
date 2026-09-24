@@ -34,7 +34,7 @@ mislabelled traces move the reasoning score and the bill too.
   score") is controlled — it needs both arms on the *same* check, not a correct one. It
   stays as measured, reported as "under the published framework's answer check". Revisit
   only if a reviewer asks, $12.20.
-- Not the digit rule (D-092), not the PRM threshold, not parse coverage. Separate tasks.
+- Not the digit rule (D-097), not the PRM threshold, not parse coverage. Separate tasks.
 
 ## How
 
@@ -61,7 +61,7 @@ Every change is measured against the 300 expert verdicts before it is kept.
 | 3 | Cache `CROSS_ENCODER.predict` per pair and add `--workers`, verified output-identical | $0 | a 5-trace re-score matches the current rows exactly |
 | 4 | **Re-score E0 over the 300 traces with the corrected check** | **$6.53** | new rows in `scores/e0/`, new `config_sha256` |
 | 5 | Regenerate the affected tables and documents | $0 | RESULTS_E0, RESULTS_X1 Finding 1, FINDINGS E0-F1/F2 |
-| 6 | Record the decision | $0 | a D-09x entry in DECISIONS.md |
+| 6 | Record the decision | $0 | D-098 in DECISIONS.md |
 
 Item 4 is the only paid step and needs explicit approval before it runs. Items 1–3 are
 independent and can run in parallel; item 4 waits on 1–2 being validated, because
@@ -107,3 +107,10 @@ re-scoring with a half-finished check wastes the run.
 computes it offline from the existing traces for $0. The $8.50 buys E0's *reasoning* score
 under the corrected gating, which differs on the traces whose judging changes. Report the
 corrected accuracy offline, or re-run E0 and have both under one configuration.
+
+**Decided 2026-09-24: offline only.** Items 5 and 6 are done - RESULTS_X1 Finding 1b,
+RESULTS_E0, FINDINGS E0-F1/F2 and D-098 carry the corrected numbers. Item 4 is not run and
+is not pending: E0, E0-3J and E1 all stay as measured under the published framework's own
+check, and the corrected accuracy is reported beside them from `analysis/answer_check.py`.
+Re-open only if a reviewer asks what the framework scores with the check fixed (~$8.50,
+12-50 min), in which case E0-3J and E1 should follow for the comparison to stay controlled.

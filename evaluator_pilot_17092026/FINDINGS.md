@@ -46,6 +46,13 @@ to a corpus where scalars are 12 of the 60 pilot items; this is the gap E3/E4 ar
 meant to be tested against, and it should be read into E0's column rather than
 discovered in it.
 
+
+**Fixed, 2026-09-24.** `evaluators/answer.py` reads the trace's answer segment and takes
+each target from a quantity the gold computed, so a restated input is never the answer and
+a qualitative answer is required only where the answer IS a word. Measured against the
+expert verdicts: 0.947 on the non-partial traces, where the published check scores 0.747
+(RESULTS_X1 Finding 1b). E0 itself was not re-scored - see D-098.
+
 ## E0-F3 · Under transformers 5.x, BERTScore is silently 0.0 on every entry
 
 `bert_score` raises `OverflowError: int too big to convert` because the Longformer

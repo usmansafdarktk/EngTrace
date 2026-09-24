@@ -3359,7 +3359,7 @@ The old history is preserved on the branch
 `origin` as well as locally, so every pre-rewrite hash still resolves.
 `origin/gh-pages` is separate history and was left alone.
 
-## D-091 — The hard case is scored on the step labels, not on a second labelling round
+## D-096 — The hard case is scored on the step labels, not on a second labelling round
 
 **Date:** 2026-09-23 · **Status:** DECIDED · **Evidence:**
 `evaluator_pilot_17092026/analysis/hard_case_pool.py`
@@ -3598,12 +3598,12 @@ still fixed).
 
 ---
 
-## D-092 - The hard case is answered by a digit-level arithmetic check, not by a model
+## D-097 - The hard case is answered by a digit-level arithmetic check, not by a model
 
 **Date:** 2026-09-24 · **Status:** DECIDED · **Evidence:**
 `evaluator_pilot_17092026/analysis/digit_rule.py`, RESULTS_X1 Finding 5
 
-D-091 recorded that no evaluator detects a flawed step behind a correct final answer,
+D-096 recorded that no evaluator detects a flawed step behind a correct final answer,
 and that buying more labelled hard cases would not change that. It also recorded why
 the flaws are there: 164 of the 167 are calculation slips.
 
@@ -3624,6 +3624,45 @@ not the design, and E4's null result in RESULTS_E4 should be read that way.
 Scope of the claim, for the paper: arithmetic flaws behind a correct answer are
 deterministically detectable and need no judge. Conceptual flaws behind a correct answer
 remain unmeasured - the corpus holds 3 - and no method can be validated on 3 cases.
+
+## D-098 - The final-answer check is corrected and reported offline; E0 is not re-scored
+
+**Date:** 2026-09-24 - **Status:** DECIDED (user's call) - **Evidence:**
+`evaluator_pilot_17092026/evaluators/answer.py`, `analysis/answer_check.py`,
+`evaluator_pilot_17092026/E0_RERUN.md`
+
+The published framework's final-answer check disagrees with the experts on 72 of 300
+traces, 68 of them traces the experts call correct. It understates every model's accuracy
+by about 21 points and ranks GPT-5 fourth where the experts rank it first.
+
+`evaluators/answer.py` replaces it: the answer segment is read whole, each target is a
+quantity the gold COMPUTED rather than any number it prints, every part of a multi-part
+answer is scored, and the verdict is correct / partial / incorrect because 19 traces are
+genuinely partial. It agrees with the experts on **0.947** of the 281 non-partial traces
+against E0's 0.747, and 0.893 three ways over all 300. The relative tolerance is the one
+fitted parameter, chosen on one half of the traces and reported on the other (0.876,
+0.905), and a self-test pins each fixed defect.
+
+The defect that mattered most was not either of the two on record: the gold value was read
+as the last number in the solution, which for `manning_rectangular_discharge` is the 3 in
+`m^3/s`. A trace scored correct if it wrote its unit in ASCII and wrong if it wrote the
+unicode exponent.
+
+**E0 is not re-scored with it.** The corrected accuracy is a property of the traces and is
+computed offline for nothing; the paid re-run would only change which traces reach the
+Tribunal, and no finding in the pilot turns on that. Re-running E0 alone would also put it
+on a different check from E0-3J and E1, breaking a controlled comparison: "swapping the
+judges barely moves the score" holds only while all three arms share one check. So the
+pilot reports the corrected accuracy from `analysis/answer_check.py`, and E0/E0-3J/E1 stay
+as measured, each labelled as scored under the published framework's own check.
+
+If it is ever wanted, the re-run now costs about **$8.50, not $6.53**: the corrected check
+calls 75 more traces correct, and with 288 of 300 traces below the Tier-1 match ratio
+threshold, nearly every newly-correct trace reaches the judges - about 233 judged traces
+against 178. The harness will run it in 12-50 minutes rather than 3.9 hours: the per-pair
+cross-encoder cache never fired (Tier 1's matrix cache sits above it) and was not
+output-identical when it did, and judge calls are now fetched concurrently while scoring
+stays serial, because the wrong-answer sample reads a process-wide seed.
 
 ## Open decisions
 
