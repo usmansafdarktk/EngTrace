@@ -1,9 +1,10 @@
 """One harness for every evaluator candidate: (evaluator, traces) -> scores.
 
     PY=evaluator_pilot_17092026/.venv/Scripts/python
-    $PY -m evaluator_pilot_17092026.run_evaluator e0 --dry-run    # free: Tier 1 for real, judges recorded not called
-    $PY -m evaluator_pilot_17092026.run_evaluator e0 --smoke 3    # a few real entries, all judges, pennies
-    $PY -m evaluator_pilot_17092026.run_evaluator e0              # the run, resumable
+    $PY -m evaluator_pilot_17092026.run_evaluator e0 --dry-run     # free: Tier 1 for real, judges recorded not called
+    $PY -m evaluator_pilot_17092026.run_evaluator e0 --warm-pairs  # free: the cross-encoder work the run would do inline
+    $PY -m evaluator_pilot_17092026.run_evaluator e0 --smoke 3     # a few real entries, all judges, pennies
+    $PY -m evaluator_pilot_17092026.run_evaluator e0 --workers 16  # the run, judges fetched concurrently, resumable
     $PY -m evaluator_pilot_17092026.run_evaluator e0 --status
 
 WHY ONE HARNESS.  The comparison between candidates is only fair if they are fed
@@ -30,6 +31,15 @@ WHAT THE HARNESS GUARANTEES.
 
   4.  Every judge call is on the row - raw text, finish reason, tokens, cost - so
       a judge that failed is never indistinguishable from a judge that said no.
+
+  5.  --workers buys time, never a different answer.  Scoring an entry is always
+      serial on one thread, because the framework's wrong-answer sample reads the
+      process-wide `random`, seeded per (item, model) immediately before the call;
+      two threads seeding it around each other's draws would change which traces
+      reach the Tribunal.  Only the judge HTTP calls are concurrent, and they are
+      keyed by the prompt, so the scoring pass receives the same reply for the
+      same prompt at any worker count.  --workers is therefore NOT in the config
+      hash: it cannot change a score.
 """
 from __future__ import annotations
 
@@ -256,6 +266,45 @@ def fetch_captured(evaluator: str, path: str, workers: int) -> int:
     return 1 if res['failed'] else 0
 
 
+def warm_pairs(evaluator: str, models, freeze_check='rebuild', cohort='gold') -> int:
+    """Free, offline: score every cross-encoder pair the paid run would score inline.
+
+    The published framework scores each (gold step, trace step) pair twice - once
+    inside Tier 1's batch, and again one pair to a call in the recovery path that
+    runs after the judges have answered. The second one was 47% of the first E0
+    run's wall clock, spent while the judge replies sat waiting. This does that
+    work first, into the same on-disk cache, in the same one-pair-to-a-call shape,
+    so the numbers are the ones the framework would have produced and the paid run
+    reads them instead of computing them.
+
+    No key and no network: the judges are stubbed, so it only finds out WHICH
+    traces reach the Tribunal and scores their pairs. Run it before asking for the
+    paid run to be approved.
+    """
+    mod = importlib.import_module(EVALUATORS[evaluator])
+    if not hasattr(mod, 'warm_pairs'):
+        raise SystemExit('%s has no cross-encoder cache to warm' % evaluator)
+    items, traces = verified_traces(freeze_check, cohort, models)
+    # Every trace in the cohort, not `plan`'s outstanding work: the point is to be
+    # ready for a re-score under a NEW config hash, where nothing is done yet.
+    allowed = cohort_keys(cohort) & (set(models) if models else set(traces))
+    work = [(key, iid, traces[key][iid], _sha(traces[key][iid]['text']))
+            for key in sorted(traces) if key in allowed
+            for iid in sorted(items) if iid in traces[key]]
+    print('%s: warming the cross-encoder cache for %d (item, model) pairs' % (mod.ID, len(work)))
+    if not work:
+        return 0
+    state = mod.setup(dry_run=False, keys=False)       # no client is built, so no key is read
+    t0 = time.time()
+    caps = mod.capture(state, [(items[iid], tr, seed_for(evaluator, iid, key))
+                               for key, iid, tr, tsha in work])
+    print('  %d of %d traces reach the Tribunal; %d judge prompts, none sent (%.0fs)'
+          % (len({c['prompt'] for c in caps}), len(work), len(caps), time.time() - t0), flush=True)
+    res = mod.warm_pairs(state, caps)
+    print('WARMED %s' % res)
+    return 0
+
+
 def run(evaluator: str, dry_run: bool, limit, models, freeze_check='rebuild', cohort='gold',
         workers: int = 48, capture_path=None, prefetch=True):
     mod = importlib.import_module(EVALUATORS[evaluator])
@@ -289,7 +338,9 @@ def run(evaluator: str, dry_run: bool, limit, models, freeze_check='rebuild', co
     prices = {} if dry_run else prices_now()
 
     # An evaluator whose judges are slow can fetch every judge reply concurrently
-    # before scoring (E1). Scoring then reads them in the framework's own order.
+    # before scoring (E0, E1). Scoring then reads them in the framework's own
+    # order, on this one thread, so --workers changes when a reply is fetched and
+    # nothing about which traces are judged or what any of them score.
     if not dry_run and prefetch and hasattr(mod, 'prefetch'):
         t1 = time.time()
         pf = mod.prefetch(state, [(items[iid], tr, seed_for(evaluator, iid, key))
@@ -427,7 +478,7 @@ def import_kaggle(evaluator: str, src: str) -> int:
     k_rows = _rows(os.path.join(src, 'scores', evaluator + '_dry'))
     l_dir = os.path.join(SCORES, evaluator + '_dry')
     l_rows = {k: r for k, r in _rows(l_dir).items() if not (r['meta'].get('compute') or {}).get('cuda')}
-    k_cache = os.path.join(src, 'scores', '_cache', 'e0_tier1.jsonl')
+    k_cache_dir = os.path.join(src, 'scores', '_cache')
 
     problems = []
     if len(k_rows) != 300:
@@ -489,14 +540,34 @@ def import_kaggle(evaluator: str, src: str) -> int:
     added = 0
     local_cache = os.path.join(SCORES, '_cache', 'e0_tier1.jsonl')
     os.makedirs(os.path.dirname(local_cache), exist_ok=True)
+    # Every cache file the kernel wrote, not just the legacy single one: a run
+    # writes part-<pid>.jsonl per process, so reading only e0_tier1.jsonl would
+    # merge nothing from a kernel and then crash on the missing file.
     have = set()
-    if os.path.exists(local_cache):
-        have = {json.loads(ln)['k'] for ln in open(local_cache, encoding='utf-8') if ln.strip()}
+    for fn in sorted(os.listdir(os.path.dirname(local_cache))):
+        if fn.endswith('.jsonl') and '_judge_replies' not in fn:
+            for ln in open(os.path.join(os.path.dirname(local_cache), fn), encoding='utf-8'):
+                if ln.strip():
+                    try:
+                        have.add(json.loads(ln)['k'])
+                    except (json.JSONDecodeError, KeyError):
+                        continue
+    k_files = sorted(os.listdir(k_cache_dir)) if os.path.isdir(k_cache_dir) else []
     with open(local_cache, 'a', encoding='utf-8', newline='\n') as fo:
-        for ln in open(k_cache, encoding='utf-8'):
-            if ln.strip() and json.loads(ln)['k'] not in have:
-                fo.write(ln if ln.endswith('\n') else ln + '\n')
-                added += 1
+        for fn in k_files:
+            if not fn.endswith('.jsonl') or '_judge_replies' in fn:
+                continue
+            for ln in open(os.path.join(k_cache_dir, fn), encoding='utf-8'):
+                if not ln.strip():
+                    continue
+                try:
+                    k = json.loads(ln)['k']
+                except (json.JSONDecodeError, KeyError):
+                    continue
+                if k not in have:
+                    have.add(k)
+                    fo.write(ln if ln.endswith('\n') else ln + '\n')
+                    added += 1
     print('IMPORTED - %d kernel rows are now the dry run; %d Tier 1 cache entries merged; '
           'the CPU rows are kept in %s' % (len(k_rows), added, os.path.relpath(ref, _HERE)))
     dry_estimate(evaluator + '_dry')
@@ -514,8 +585,11 @@ def main():
     ap.add_argument('--capture', metavar='FILE', help='write every judge prompt the run would send; score nothing')
     ap.add_argument('--fetch-captured', metavar='FILE', help='fetch replies for captured prompts (HTTP only)')
     ap.add_argument('--no-prefetch', action='store_true', help='score from the reply store as it is (Kaggle replay)')
+    ap.add_argument('--warm-pairs', action='store_true',
+                    help='free, offline: score the cross-encoder pairs the run would score inline (E0)')
     ap.add_argument('--workers', type=int, default=48,
-                    help='concurrent judge calls, for evaluators that prefetch (E1)')
+                    help='concurrent judge calls, for evaluators that prefetch (E0, E1). '
+                         'Scoring stays serial, so this changes only how long the judges take')
     ap.add_argument('--cohort', choices=('gold', 'robustness', 'all'), default='gold',
                     help='gold = the five the experts annotate (default)')
     ap.add_argument('--import-kaggle', metavar='DIR',
@@ -527,6 +601,8 @@ def main():
         return fetch_captured(args.evaluator, args.fetch_captured, args.workers)
     if args.import_kaggle:
         return import_kaggle(args.evaluator, args.import_kaggle)
+    if args.warm_pairs:
+        return warm_pairs(args.evaluator, args.model, args.freeze_check, args.cohort)
     return run(args.evaluator, args.dry_run, args.smoke, args.model, args.freeze_check,
                args.cohort, args.workers, args.capture, not args.no_prefetch)
 
