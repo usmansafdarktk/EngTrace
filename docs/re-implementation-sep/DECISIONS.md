@@ -3784,6 +3784,48 @@ items no longer regenerate byte-identically and `milestones.py` refuses - correc
 reads those five files back out of git at `26f9048` and installs them for the run; it
 relaxes no check, and `--check` reports 60 of 60 reproducing.
 
+## D-102 - Planted defects, so the hard case is measured against a truth we set
+
+**Date:** 2026-09-24 - **Status:** DECIDED - **Evidence:**
+`evaluator_pilot_17092026/analysis/planted.py`, RESULTS_X1 Finding 7
+
+Two objections sit on Findings 5 and 6. The digit rule implements the rule the annotation
+guide gave the experts, so their agreement is partly built in. And conceptual error behind
+a correct answer cannot be studied on this corpus: 3 such steps against 175 calculation
+slips.
+
+A planted set answers both. From the 129 traces the experts called clean, 60 get one digit
+of one displayed intermediate changed, 60 get the REASONING of one step corrupted with no
+digit anywhere in the trace moved, and 60 are left alone. Truth is by construction, every
+plant is verified without the checker under test, and the build is seeded and reproduces
+byte-identically.
+
+  arithmetic   digit rule 0.750 (as Finding 5 runs it), 0.683 as E4 ships it, 0.533 at 1%
+  conceptual   0.000, every evaluator, both readings
+  controls     false alarms 0.267 / 0.117 / 0.083
+
+**Nothing detects a conceptual defect.** A trace that computes correctly, misstates the
+rule it is applying and lands the right answer passes every deterministic evaluator the
+pilot has. That is the open problem, stated now without reference to the guide.
+
+Two things the split settles. The digit rule scores **45 of 45** inside a claim arith.py
+parses and **0 of 15** on a value with no parseable working, so Finding 5's recall of 0.472
+is a parse ceiling and extending coverage - not changing the rule - is the remaining gain.
+And E4's old tolerance is confirmed as the defect by construction: 1.000 on planted errors
+of 1% or more, 0.000 on the 14 below it.
+
+The set is a diagnostic, not evidence about model behaviour: it says what an evaluator
+catches when a defect of a given shape is present, not how often such defects occur. The
+conceptual rules vary in kind but not in phrasing, so it is not a held-out test.
+
+An unrelated defect surfaced while building it, and it should not be lost: **17 of the 60
+frozen items no longer reproduce byte-identically from the repo's templates**, so
+`milestones.build_all` now raises on the pilot manifest and the build fell back to the
+milestone values frozen into the annotation tasks - which is what the pilot's E3 run and
+the experts both used, so no number here is affected. But the templates have drifted from
+the September freeze, and `pinned_templates.py` (added with D-101) exists to work around
+it. Fixing the drift, or pinning the templates properly, is unowned.
+
 ## Open decisions
 
 | # | Decision | Needed before |
@@ -3792,6 +3834,7 @@ relaxes no check, and `--check` reports 60 of 60 reproducing.
 | D-094 | Whether to narrow the P2/Pc range in `work_isothermal_virial` (now 50% redraw) and accept the 41% stability redraw in `floating_object_submersion_depth`; the residuals in `pass1_fixes.md` | the item pool is regenerated |
 | D-092 | ~~Answer-display lengthening and gold-movement sign-offs~~ **Decided by the owner 2026-09-23:** the two lengthened answers stay; `beam_internal_moment`, `terzaghi_strip_footing_bearing` and `effective_stress_profile` answers are lengthened too; the gold movements are accepted; and a scoped third round removes the census ties at 3% and above (eight templates), with the frozen pool to be censused before inference and stragglers fixed then | — |
 | D-093 | ~~Approval to run screening pass 1~~ **Both passes run (2026-09-23/24, $4.85 total); the 24 flags resolved (D-094).** Open: the Layer 2 protocol (experts, hand-checks, planted defects) | Layer 2 (human certification) starts |
+| — | The repo's templates no longer reproduce 17 of the 60 frozen items byte-identically (D-102); `milestones.build_all` raises on the pilot manifest | any re-derivation of milestones from templates |
 | — | Which families the next roster will evaluate (Kimi, GLM stay available as long as they are not judges) | the next benchmark run |
 | — | Expert annotation of the frozen 300 (stage 3): annotators, protocol, the ~100-trace triple-labelled overlap | any X1 agreement number |
 | D-003 | Do the raw `inference_results/` generations still exist? | promising any corrected results table |

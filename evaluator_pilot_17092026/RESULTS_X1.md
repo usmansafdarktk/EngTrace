@@ -352,6 +352,62 @@ This is the limit that more analysis cannot fix. It is a property of 15 template
 only remedy is more templates — which the full benchmark run provides for model-level
 claims, and which a future evaluator study would need for evaluator-level ones.
 
+## Finding 7 — planted defects: what is caught when the answer is known in advance
+
+Findings 5 and 6 rest on the experts' labels, and two objections follow them. The digit
+rule implements the same rule the annotation guide gave the experts, so agreement between
+them is partly built in. And conceptual error behind a correct answer cannot be measured at
+all on this corpus: the experts found **3** such steps against 175 calculation slips.
+
+`analysis/planted.py` answers both by building a set whose ground truth is true **by
+construction**. It starts from the 129 traces the experts labelled clean under both their
+own verdict and the deterministic answer check, and plants exactly one defect in each:
+
+| | n | what is changed |
+|---|---|---|
+| **arithmetic** | 60 | one digit of one displayed intermediate, one character; later steps and the final answer keep their original values |
+| **conceptual** | 60 | the reasoning a step states — a criterion flipped, a rule misstated, a stated formula contradicting the one used — with **no digit anywhere in the trace changed** |
+| **control** | 60 | nothing |
+
+Every plant is verified: the answer is still correct, an arithmetic plant is proved wrong by
+recomputing the claim at full precision or against the gold's own milestone value — never by
+the checker under test — and a conceptual plant leaves the trace's digit string
+byte-identical. The build is seeded and reproduces byte-identically.
+
+| evaluator | arithmetic | conceptual | false alarm on controls |
+|---|---|---|---|
+| digit rule, as Finding 5 measures it | **0.750** | **0.000** | 0.267 |
+| digit rule, as E4 now ships it | 0.683 | **0.000** | **0.117** |
+| E4 arithmetic, the 1% reading | 0.533 | **0.000** | 0.083 |
+| E4 milestone "contradicted" | 0.033 | **0.000** | 0.017 |
+| E3 milestone coverage falls | 0.017 | **0.000** | — |
+
+**Nothing detects a conceptual defect. 0 of 60, on every free evaluator.** A trace that
+computes correctly, states the wrong rule for what it is doing, and lands the right answer
+passes every deterministic evaluator the pilot has. That is the cleanest statement of the
+open problem, and it is now independent of the annotation guide.
+
+**The digit rule is perfect where it can parse and blind where it cannot.** Split by where
+the defect sits: **45 of 45** inside a claim `arith.py` parses, **0 of 15** on a stated
+value with no parseable working behind it. So the recall of 0.472 in Finding 5 is a parse
+ceiling, not a rule failure — extending parse coverage is the remaining gain, and changing
+the rule is not.
+
+**E4's 1% tolerance is confirmed as the defect, by construction:** 1.000 on planted errors
+of 1% or more, **0.000** on the 14 below it, where the digit rule scores 1.000.
+
+**The gold-validation corrections cost 5 detections and remove 20 of 30 false flags.** The
+five are last-digit slips at 1e-7 to 1e-5 relative; the false-alarm rate on expert-clean
+traces falls from 26.7% to 11.7%. That trade now has a number on it.
+
+What this set cannot support: it says what an evaluator catches when a defect of a given
+shape is present, not how often models produce such defects or in what mix. The conceptual
+defects come from a 43-rule catalogue, varied in kind but not in phrasing, so a detector
+could in principle learn the catalogue — it is a diagnostic, not a held-out test. And the
+arithmetic row for the digit rule is close to an upper bound rather than an estimate, since
+a plantable site must itself be a parseable claim; the unbiased half of that family is the
+0.000 on values with no working.
+
 ## What this means
 
 1. **Fix the final-answer check first.** It is the dominant trace-level signal, and E0's
@@ -365,8 +421,12 @@ claims, and which a future evaluator study would need for evaluator-level ones.
    four inside correct-answer traces; its threshold is not the problem (D-100: calibrating
    it on held-out halves gains −0.006). A deterministic digit check reaches three in four
    on the same steps and costs nothing, and now ships inside E4 (D-101).
-4. **Report the hard case as a negative result.** It is honest, it is measured on 93
-   traces, and it is the clearest open problem the pilot identifies.
+4. **Report the hard case as a negative result, and scope it.** Arithmetic flaws behind a
+   correct answer are deterministically detectable — three flags in four are real, at no
+   cost. Conceptual flaws behind a correct answer are detected by nothing the pilot has:
+   0 of 60 planted defects, and only 3 such steps exist in the labelled corpus to study
+   (Finding 7). That is the clearest open problem the pilot identifies, and it is now
+   stated independently of the annotation guide.
 5. **Report the power, not just the intervals.** Clustered by template, this slice can
    detect AUROC differences of about 0.12–0.19 between evaluators and no smaller (Finding
    6). Every null result here should be read as "this design rules out a large difference",
