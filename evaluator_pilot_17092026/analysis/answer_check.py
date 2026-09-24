@@ -127,6 +127,37 @@ def main():
         print('  %-9s %8.3f %14d %14d   %s' % (m, c['ok'] / n, c['false_correct'], c['false_wrong'], notes[m]))
     print('\n  ceiling: the experts\' own verdict predicts their soundness verdict at AUROC 0.974;')
     print('  E0\'s check, used the same way, scores 0.812.')
+    print('\n  WHAT THE CHECK DECIDES: answer accuracy per model, the benchmark\'s headline number')
+    print('    %-16s %7s %10s %10s %10s' % ('model', 'traces', 'experts', 'E0', 'corrected'))
+    per_model = defaultdict(Counter)
+    for code, t in truth.items():
+        key = keyfile[code]
+        item, text = items.get(key[1]), texts.get(key)
+        if not item or not text or t['final_answer'] is None:
+            continue
+        gv, gw = gold_answer(item)
+        row = e0.get(key)
+        c = per_model[key[0]]
+        c['n'] += 1
+        c['expert'] += t['final_answer'] == 'correct'
+        c['fixed'] += check(text, gv, gw, '+words')
+        if row:
+            c['e0n'] += 1
+            c['e0'] += row['scores']['final_answer_acc'] == 1.0
+    order = {}
+    for m, c in sorted(per_model.items(), key=lambda kv: -kv[1]['expert'] / kv[1]['n']):
+        print('    %-16s %7d %10.3f %10.3f %10.3f'
+              % (m, c['n'], c['expert'] / c['n'], c['e0'] / c['e0n'] if c['e0n'] else float('nan'),
+                 c['fixed'] / c['n']))
+        order[m] = (c['expert'] / c['n'], c['e0'] / c['e0n'] if c['e0n'] else -1, c['fixed'] / c['n'])
+    tot = Counter()
+    for c in per_model.values():
+        tot.update(c)
+    print('    %-16s %7d %10.3f %10.3f %10.3f' % ('ALL', tot['n'], tot['expert'] / tot['n'],
+                                                  tot['e0'] / tot['e0n'], tot['fixed'] / tot['n']))
+    for j, name in ((0, 'experts'), (1, 'E0'), (2, 'corrected')):
+        print('    %-10s ranking: %s' % (name, ' > '.join(sorted(order, key=lambda m: -order[m][j]))))
+
     if per_template:
         print('\n  where the best variant still disagrees, by template:')
         for tid, c in sorted(per_template.items(), key=lambda kv: -sum(kv[1].values()))[:6]:
