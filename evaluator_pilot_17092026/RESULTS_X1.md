@@ -433,6 +433,74 @@ a plantable site must itself be a parseable claim; the unbiased half of that fam
    which is a claim the data supports, rather than "the evaluators are equivalent", which
    it does not.
 
+## Limitations, and what this pilot does not show
+
+Stated here so a reader does not have to derive them, and so the claims above can be read
+against them.
+
+**The design is 15 templates.** 300 traces is 15 templates x 4 instances x 5 models, and
+instances of a template are the same problem with different numbers. Clustered by template
+the slice is worth about **80 independent traces**, and it can detect AUROC differences of
+roughly **0.12 to 0.19** between evaluators and no smaller (Finding 6). Every null result
+here means "no difference this large", not "no difference". The one finding that clears the
+bar comfortably is the one that matters most: the final answer dominates the trace-level
+verdict, +0.124 over the best evaluator with a clustered interval of +0.043 to +0.218.
+
+**The hard-case result is about arithmetic.** 175 of the 178 flawed steps behind a correct
+answer are calculation slips. Three are conceptual, which is too few to study. The planted
+set (Finding 7) supplies conceptual defects by construction and **no evaluator detects any
+of them**, but planted defects say what is caught when a defect of a given shape is present,
+not how often models produce one. Nothing here measures how common conceptual error behind
+a correct answer is in the wild.
+
+**The digit rule shares its rule with the annotation guide.** The experts were told that
+rounding is not an error and a wrong digit is; the rule implements that. Their agreement is
+therefore partly by construction, which is why Finding 7 exists - on planted arithmetic
+defects, where truth does not come from the guide, it scores 45 of 45 inside a claim the
+checker can parse and 0 of 15 outside one.
+
+**The evaluators are not all scored under one configuration.** E0, E0-3J and E1 are scored
+with the published framework's own final-answer check, which the expert labels show is wrong
+on 72 of 300 traces. The corrected accuracy is reported beside them from
+`analysis/answer_check.py` rather than by re-running them, deliberately (D-098): re-running
+E0 alone would break the controlled comparison between the three, which requires one check
+and not a correct one. A reader comparing the accuracy column with the reasoning column is
+comparing two configurations, and the documents say so at each point.
+
+**Model coverage is five models plus a two-model robustness cohort.** Four are frontier
+models within 12 points of each other on expert soundness, and Llama 3.1 70B is the only
+weak model, at 0.117. The slice can separate frontier from weak; it cannot rank frontier
+models, and no evaluator claim here should be read as one.
+
+**The labels are not in the repository.** They are the experts' own annotations and are kept
+local by decision, so RESULTS_X1 cannot be reproduced from a clone alone: the scripts are
+committed and the numbers stated, but the label files must come from the authors. An
+anonymised truth file - codes and majority labels, no per-rater rows - would close that, and
+is not yet a decision.
+
+**One branch's labels were re-annotated twice.** Chemical's and electrical's third sets were
+replaced after the verification round identified them as least self-consistent, and
+electrical was then re-adjudicated. Replacing an entire expert's set changed no ground-truth
+label; re-adjudicating the disputes it created changed 12 of 2,091 (D-099). Both originals
+are kept under `superseded/`, and the reliability figures above are the post-replacement
+ones.
+
+**The judge-based evaluators were not run on the planted set.** E0, E0-3J, E1 and E5 would
+cost about $12.60 over its 180 traces at the pilot's measured rates. Whether an LLM judge
+catches a conceptual defect that every deterministic evaluator misses is therefore **an open
+question, not a negative result**, and it is the cheapest experiment the pilot leaves.
+
+### What the pilot supports, and what it does not
+
+| Supported | Not supported |
+|---|---|
+| The final answer nearly determines the trace-level verdict | Any ranking among the four frontier models |
+| E5 is the most accurate milestone evaluator, at 1/13th of E0's cost | That E5 beats E0 at the trace level |
+| An off-the-shelf PRM over-flags inside correct-answer traces, and its threshold is not the cause | That a better-calibrated PRM could not do better |
+| A digit-level arithmetic check finds three real errors in four, deterministically and free | That it finds conceptual errors — it finds none |
+| No deterministic evaluator detects a conceptual defect behind a correct answer | That no *judge* detects one; that was not tested |
+| The expert labels are reliable at kappa 0.78 between raters and 0.83 within | That 300 traces from 15 templates can separate evaluators finely |
+
 ## Follow-ups this turned up
 
 - The judge probe labelled Claude's `aoq_ati_rectifying#3` step as CLEAN. The experts
