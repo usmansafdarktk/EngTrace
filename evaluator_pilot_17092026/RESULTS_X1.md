@@ -228,9 +228,11 @@ of 3 (`analysis/hard_case_pool.py`).
 - **No *evaluator* detects flawed reasoning behind a correct answer.** Every AUROC sits
   near chance; the best, E2's lowest step reward at 0.583, does not separate from E0. A
   deterministic digit check does - see below.
-- **E3, E4 and E5 are significantly worse than chance-level E0 here**, because they
-  score a trace by milestones a correct answer already implies. Their strength at the
-  milestone level (Finding 2) is not a strength at this question.
+- **E3, E4 and E5 score well below chance-level E0 here** (0.39–0.43 against 0.54),
+  because they score a trace by milestones a correct answer already implies. Their strength
+  at the milestone level (Finding 2) is not a strength at this question. The deficit is
+  significant when traces are resampled, but **not** when templates are — see Finding 6.
+  The direction is consistent and the magnitude is large; the design cannot certify it.
 - **175 of the 178 incorrect steps are calculation slips and 3 are conceptual**, so what
   this set mostly holds is arithmetic that does not change the answer. That is worth
   stating plainly in the paper rather than presenting the set as deep reasoning failure.
@@ -266,6 +268,60 @@ incorrect by the experts; a sample of those should go to one expert in the adjud
 format already used, since each is either a rounding chain the rule should tolerate or a
 slip the experts missed - and both answers are worth having.
 
+## Finding 6 — what this slice can detect, once clustering is accounted for
+
+Every interval above comes from resampling traces. The 300 traces are not 300 independent
+observations: they are **15 templates × 4 instances × 5 models**, and two instances of the
+same template are the same problem with different numbers, sharing a gold solution, a
+milestone structure and whatever phrasing an evaluator reacts to. Re-running every
+comparison while resampling **templates** gives the honest precision
+(`analysis/cluster_bootstrap.py`).
+
+| Trace level | AUROC | resampling traces | resampling templates | design effect | effective n |
+|---|---|---|---|---|---|
+| E0 | 0.850 | 0.804–0.892 | 0.760–0.927 | 3.7 | 82 |
+| E2, 72B, lowest step reward | 0.878 | 0.833–0.916 | 0.789–0.956 | 4.2 | 72 |
+| E5 | 0.886 | 0.835–0.934 | 0.784–0.978 | 4.2 | 71 |
+| E3 / E4 | 0.834 | 0.773–0.888 | 0.726–0.941 | 3.9 | 78 |
+| *baseline: the experts' answer verdict* | 0.974 | 0.945–0.996 | **0.945–0.993** | **0.9** | 326 |
+
+**The slice is worth about 80 independent traces, not 300**, for separating evaluators.
+Clustering at the item rather than the template — the weaker assumption — gives a design
+effect of about 1.5–1.8 instead, so the true penalty sits between the two.
+
+The minimum difference this design could detect, at 80% power and 95% confidence, follows
+from the clustered standard error:
+
+| Comparison | difference from E0 | template-level 95% | smallest detectable |
+|---|---|---|---|
+| E5 | +0.036 | −0.093 to +0.173 | 0.192 |
+| E2, 72B, lowest step reward | +0.029 | −0.056 to +0.109 | 0.118 |
+| E0-3J | −0.040 | −0.084 to +0.003 | 0.062 |
+| E3 / E4 | −0.016 | −0.144 to +0.115 | 0.190 |
+| *the experts' answer verdict* | **+0.124** | **+0.043 to +0.218** | 0.127 |
+
+Three things follow, and they should be stated in the paper rather than left implied:
+
+- **The headline finding survives clustering.** The experts' answer verdict beats every
+  evaluator by +0.124 with a template-level interval that excludes zero. That the final
+  answer dominates the trace-level verdict is not an artifact of treating instances as
+  independent.
+- **"No evaluator beats E0" is a statement about power, not about equality.** Every
+  evaluator difference is smaller than what this design can detect (0.06–0.19 AUROC). The
+  pilot rules out large differences between evaluators; it never could have resolved small
+  ones. E1's −0.002 is the exception that proves the point: E1 tracks E0 trace by trace, so
+  its paired standard error is tiny and a difference of 0.002 is "significant" and
+  meaningless.
+- **On the hard case, the deterministic evaluators' deficit is no longer significant.**
+  E3, E4 and E5 score 0.39–0.43 against E0's 0.54, but with 15 clusters the difference
+  (−0.150 for E3) carries an interval of −0.320 to +0.024. The point estimate is large and
+  in the direction Finding 5 describes; the design cannot certify it. The hard case is the
+  thinnest part of the slice: effective n falls to 34–93 there.
+
+This is the limit that more analysis cannot fix. It is a property of 15 templates, and the
+only remedy is more templates — which the full benchmark run provides for model-level
+claims, and which a future evaluator study would need for evaluator-level ones.
+
 ## What this means
 
 1. **Fix the final-answer check first.** It is the dominant trace-level signal, and E0's
@@ -278,8 +334,13 @@ slip the experts missed - and both answers are worth having.
    model.** The 72B is the best available. Recalibrating its threshold against these
    labels, on a split so the threshold is not fitted and reported on the same data, is
    the obvious next experiment.
-4. **Report the hard case as a negative result.** It is honest, it is measured on 87
+4. **Report the hard case as a negative result.** It is honest, it is measured on 93
    traces, and it is the clearest open problem the pilot identifies.
+5. **Report the power, not just the intervals.** Clustered by template, this slice can
+   detect AUROC differences of about 0.12–0.19 between evaluators and no smaller (Finding
+   6). Every null result here should be read as "this design rules out a large difference",
+   which is a claim the data supports, rather than "the evaluators are equivalent", which
+   it does not.
 
 ## Follow-ups this turned up
 
