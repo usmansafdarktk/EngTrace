@@ -129,3 +129,34 @@ run whose output was lost to the full `/blue` disk took another 55, so 70
 GPU-minutes in all, measured from Slurm's accounting (`sacct`). Weights were
 fetched to node-local disk and deleted by each job's exit trap. Results were copied
 down with md5 checks, and no E2 job is left on the cluster.
+
+# The 0.5 threshold, calibrated (2026-09-24)
+
+A step is flagged when its reward falls below 0.5. That is the PRM cards' own default, and
+a reviewer is entitled to ask whether it was tuned on the data it is reported on. It was
+not, and it does not need to be (`analysis/prm_threshold.py`).
+
+Choosing the threshold that maximises step F1 against the expert labels on one
+deterministic half of the 300 traces and reporting it on the other, both ways round:
+
+| PRM | held-out F1, calibrated | held-out F1 at 0.5 | gain | thresholds chosen |
+|---|---|---|---|---|
+| Qwen2.5-Math-PRM-72B | 0.520 | **0.526** | −0.006 | 0.740 / 0.611 |
+| Qwen2.5-Math-PRM-7B | 0.459 | 0.428 | +0.031 | 0.751 / 0.802 |
+| VersaPRM | 0.345 | 0.109 | +0.235 | 0.880 / 0.985 |
+
+The 72B, the PRM E2 reports, **gains nothing**: both directions' intervals straddle zero
+(−0.018 and +0.006) and 0.5 sits just below a flat plateau — F1 moves 0.02–0.03 over ±0.10
+around the fitted value. In-sample optimism is small (+0.019), so nothing here is tuned on
+what it reports.
+
+VersaPRM is the one that moves, and it moves for an uninteresting reason: it rates almost
+everything above 0.9, so at 0.5 it flags almost nothing (recall 0.057–0.080). Raising the
+threshold to ~0.9 restores recall, and it still reaches only F1 0.345 against the 72B's
+0.520. Calibration fixes its scale, not its documented failure to discriminate.
+
+Two things the threshold cannot fix, both in the hard case (correct-answer traces):
+**no PRM reaches precision 0.80 on held-out data there**, and for the 72B the two halves
+choose very different thresholds (0.740 and 0.928) on sharp peaks rather than a plateau, so
+the apparent +0.103 on one direction is not bankable. Over-flagging inside correct-answer
+traces is a property of the model, not of the cut-off.

@@ -187,7 +187,14 @@ E3 at this level, as RESULTS_E4 found.
   much: the model was partly being scored against missing labels, not failing.
 - **Inside correct-answer traces, where a step-level evaluator would add most, 75% of
   its flags are false alarms** and it finds 26% of the real errors.
-- **VersaPRM's failure is confirmed:** it finds 7% of the incorrect steps.
+- **VersaPRM's failure is confirmed:** it finds 7% of the incorrect steps. Raising its
+  threshold to ~0.9 restores its recall and still leaves it at F1 0.345 against the 72B's
+  0.520, so the failure is discrimination, not scale.
+- **The 0.5 cut-off is not tuned.** Fitting it on half the traces and reporting on the
+  other, both ways round, moves the 72B's held-out F1 by −0.018 and +0.006, intervals
+  straddling zero: the stock threshold already sits on the flat top of the curve
+  (`analysis/prm_threshold.py`). Inside correct-answer traces no PRM reaches precision 0.80
+  at any threshold, so the over-flagging in Finding 5 cannot be tuned away.
 
 ## Finding 4 — the experts contradict E2's reordering of the frontier
 

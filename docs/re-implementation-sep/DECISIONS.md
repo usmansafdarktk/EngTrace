@@ -3712,6 +3712,35 @@ So the honest form of the robustness claim is two-stage: replacing an entire exp
 changed no ground-truth label, and re-adjudicating the disputes it created changed 12 of
 2,091, none of them a verdict.
 
+## D-100 - E2 keeps the stock 0.5 threshold, and that is measured rather than assumed
+
+**Date:** 2026-09-24 - **Status:** DECIDED - **Evidence:**
+`evaluator_pilot_17092026/analysis/prm_threshold.py`, RESULTS_E2
+
+E2 flags a step when its process reward falls below 0.5, the PRM cards' own default. Every
+precision and recall in RESULTS_E2 and RESULTS_X1 Finding 3 rests on it, so it had to be
+shown that the number was not fitted to the data it is reported on.
+
+The threshold was calibrated the only way that answers the question: maximise step F1
+against the expert labels on one deterministic half of the 300 traces, report on the other,
+both directions. For the 72B - the PRM E2 reports - the held-out gain is **-0.018 and
++0.006**, both intervals straddling zero, and F1 moves 0.02-0.03 over a +-0.10 band around
+the fitted value. 0.5 sits just below that plateau. In-sample optimism, fitting and
+reporting on all 300 at once, is +0.019.
+
+So E2 keeps 0.5, and the claim in the paper is not "we used the default" but "the default
+was tested against a calibrated alternative and lost nothing".
+
+Two findings fall out of the same analysis:
+
+- **VersaPRM's rewards are mis-scaled as well as undiscriminating.** It rates nearly
+  everything above 0.9, so at 0.5 it flags almost nothing (recall 0.057-0.080). Calibrated
+  to ~0.9 it recovers recall and still reaches only F1 0.345 against the 72B's 0.520.
+- **The hard case cannot be tuned.** Inside correct-answer traces no PRM reaches precision
+  0.80 on held-out data at any threshold, and the 72B's two halves choose 0.740 and 0.928 on
+  sharp peaks rather than a plateau. The over-flagging RESULTS_X1 Finding 5 reports is a
+  property of the model, not of the cut-off.
+
 ## Open decisions
 
 | # | Decision | Needed before |
