@@ -3899,6 +3899,59 @@ partly directed by a parser error.
 The measurement is a diagnostic: it describes what E0 does with defects of this shape, not
 how often models produce them.
 
+## D-105 - The full run's evaluator stack, and no E0 at scale
+
+**Date:** 2026-09-25 - **Status:** DECIDED (user's call) - **Evidence:** the evaluator
+pilot, RESULTS_X1 Findings 1-8, `evaluator_pilot_17092026/analysis/judge_cost.py`
+
+What the pilot was for. The full benchmark - 12 models x 2,250 problems = 27,000 traces -
+is scored with:
+
+  answer correctness   evaluators/answer.py, three-way correct / partial / incorrect.
+                       No model. 0.947 against the experts where E0 scores 0.747, and since
+                       the answer nearly determines the trace verdict (0.974) this is the
+                       headline metric rather than a component of one.
+  milestone coverage   E3, derived from the templates. No model.
+  arithmetic           E4 on the digit rule (D-101). No model. Three real flags in four
+                       inside correct-answer traces, and clean on gold.
+  residual judging     E5: MiMo-V2.5-Pro on the 23.6% of milestones E3 cannot settle.
+                       ~$79 over 27,000 traces (18,000 small-model traces at $0.00390,
+                       9,000 frontier at $0.00098).
+
+Total evaluation cost **~$79**. The optional step router would add $100-200 and is not
+budgeted until MiMo's conceptual detection rate is measured (below). E2's PRMs can run on
+HiPerGator for $0 as a secondary signal; they are not a headline number, because they
+over-flag inside correct-answer traces (precision 0.246) and their threshold is not the
+cause (D-100).
+
+**E0 is NOT run on the full benchmark.** It would cost ~$390 in judges (18,000 x $0.00919
+plus 9,000 x $0.02492) and produce numbers with no ground truth to validate them against.
+The evaluator comparison belongs to the labelled slice, where 300 traces carry three expert
+labels each: that is where "the new stack beats E0" is established, and RESULTS_X1 is the
+record. The full run is the benchmark measurement using the evaluator the pilot chose.
+
+Two consequences to carry into the paper, neither of them a cost:
+
+1. **Table 1 will move.** The published numbers came from E0's answer check, which
+   understates accuracy by about 21 points and ranked GPT-5 fourth of five where the experts
+   and the corrected check both rank it first (D-098). Regenerating the table with the
+   corrected check raises every model and reorders the top. A reader comparing versions will
+   see that jump, so the paper has to say why.
+2. **The design is 150 templates, not 15.** The pilot could detect AUROC differences above
+   0.12-0.19 once clustering by template was accounted for (Finding 6). The full benchmark
+   has ten times the clusters, so intervals should again be cluster-robust by template, and
+   the comparisons the design can support should be settled before the run rather than after.
+
+Open before generation starts:
+
+- **The template drift (D-102).** E3, E4 and E5 all derive milestones from the repo's
+  templates, and 17 of the 60 frozen items no longer reproduce byte-identically. At 2,250
+  items this has to be fixed or formally pinned.
+- **MiMo's conceptual rate.** Finding 8 measured GPT-5 and Claude Opus 4.5, which share
+  families with the evaluated roster - the objection E1 exists to answer. The judge that
+  survives it is MiMo, and its rate on the planted defects is unknown. ~$3.20 and an hour
+  to close, and it decides whether the step router is worth building at all.
+
 ## Open decisions
 
 | # | Decision | Needed before |
