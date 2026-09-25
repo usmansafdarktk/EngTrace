@@ -72,7 +72,11 @@ def build_one(aid: str, pool: dict, assignment: dict) -> Path:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument('--id', default=None)
+    ap.add_argument('--round', type=int, default=1, help='read tasks_round<N>/ and write dist_round<N>/')
     a = ap.parse_args()
+    global TASKS, DIST
+    if a.round > 1:
+        TASKS, DIST = HERE / f'tasks_round{a.round}', HERE / f'dist_round{a.round}'
     if not GUIDE.exists():
         raise SystemExit('typeset the guide first: python -m template_annotation_23092026.layer2.make_guide_pdf')
     pool = json.loads((TASKS / 'pool.json').read_text(encoding='utf8'))

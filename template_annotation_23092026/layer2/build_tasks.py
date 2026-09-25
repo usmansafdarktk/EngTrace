@@ -47,7 +47,7 @@ if str(REPO) not in sys.path:
 
 from tests.template_integrity.core import NUM_RE, answer_block, discover, generate, seed_all  # noqa: E402
 
-TASKS = HERE / 'tasks'
+TASKS = HERE / 'tasks'            # round 1; --round N writes tasks_round<N>/
 PLANTS_DIR = HERE / 'plants'
 ROSTER = HERE / 'annotators.json'
 PILOT_ROSTER = REPO / 'evaluator_pilot_17092026' / 'annotation' / 'annotators.json'
@@ -163,9 +163,15 @@ def check_plants(verbose: bool = True) -> dict[str, list[dict]]:
 
 # --------------------------------------------------------------------- build
 
-def build() -> None:
-    plants = check_plants(verbose=True)
-    missing = [b for b in PREFIX if b not in plants]
+def build(only: list[str] | None = None, round_no: int = 1) -> None:
+    """Round 1: every template plus the plants. A later round (--only ids --round N): only the
+    named templates, no plants (sensitivity was measured in round 1), for the branches they
+    belong to, written to tasks_round<N>/ so round 1 stays intact."""
+    global TASKS
+    if round_no > 1:
+        TASKS = HERE / f'tasks_round{round_no}'
+    plants = {} if only else check_plants(verbose=True)
+    missing = [] if only else [b for b in PREFIX if b not in plants]
     if missing:
         raise SystemExit(f'plants missing for: {missing}')
     secret = secrets.token_hex(8)
@@ -173,8 +179,11 @@ def build() -> None:
 
     pool, key = {}, []
     by_branch: dict[str, list[str]] = {b: [] for b in PREFIX}
+    seeds = tuple(x + 100 * (round_no - 1) for x in INSTANCE_SEEDS)   # a fresh hand-check instance per round
     for ref in discover():
-        inst = [generate(ref, s, capture=False) for s in INSTANCE_SEEDS]
+        if only and ref.template_id not in only:
+            continue
+        inst = [generate(ref, s, capture=False) for s in seeds]
         bad = [i for i in inst if not i.ok]
         if bad:
             raise SystemExit(f'{ref.template_id}: generation error {bad[0].error}')
@@ -204,6 +213,8 @@ def build() -> None:
     assignment = {}
     for a in roster():
         codes = list(by_branch[a['branch']])
+        if not codes:
+            continue
         rng = random.Random(hashlib.blake2b((secret + a['id']).encode(), digest_size=8).digest())
         rng.shuffle(codes)
         assignment[a['id']] = {'branch': a['branch'], 'codes': codes}
@@ -219,22 +230,27 @@ def build() -> None:
         'git_head': head, 'templates': sum(1 for k in key if k['kind'] == 'template'),
         'plants': sum(1 for k in key if k['kind'] == 'plant'), 'experts': len(assignment),
         'items_per_expert': {a: len(v['codes']) for a, v in assignment.items()},
-        'instance_seeds': INSTANCE_SEEDS, 'plant_seeds': PLANT_SEEDS}, indent=1), encoding='utf8')
+        'instance_seeds': seeds, 'plant_seeds': PLANT_SEEDS, 'round': round_no, 'only': only}, indent=1), encoding='utf8')
     n_t = sum(1 for k in key if k['kind'] == 'template')
     n_p = len(key) - n_t
-    print(f'built tasks/: {n_t} templates + {n_p} plants for {len(assignment)} experts, '
+    print(f'built {TASKS.name}/: {n_t} templates + {n_p} plants for {len(assignment)} experts, '
           f'{len(next(iter(assignment.values()))["codes"])} items each; keyfile has {len(key)} rows and is never shipped')
 
 
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument('--check-plants', action='store_true')
+    ap.add_argument('--only', default=None, help='comma-separated template ids for a re-certification round')
+    ap.add_argument('--round', type=int, default=1)
     a = ap.parse_args()
     if a.check_plants:
         found = check_plants()
         print(f'{sum(len(v) for v in found.values())} plants verified in {len(found)} branches')
     else:
-        build()
+        only = [t.strip() for t in a.only.split(',')] if a.only else None
+        if only and a.round < 2:
+            raise SystemExit('--only is for a later round: pass --round 2 (or higher)')
+        build(only, a.round)
 
 
 if __name__ == '__main__':
