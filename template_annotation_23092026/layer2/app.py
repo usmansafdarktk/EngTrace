@@ -70,8 +70,12 @@ def done_codes(aid: str) -> dict:
 
 
 def numbers(text: str) -> list[float]:
+    """Numbers in what the reviewer typed. A Unicode minus (U+2212), which a keyboard or a
+    copied symbol produces, is read as a minus: in round 1 it made a correct answer look
+    like a mismatch."""
     out = []
-    for tok in NUM_RE.findall(text or ''):
+    text = (text or '').replace('−', '-').replace('–', '-')
+    for tok in NUM_RE.findall(text):
         try:
             out.append(float(tok.replace(',', '')))
         except ValueError:
