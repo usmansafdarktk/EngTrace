@@ -87,6 +87,13 @@ def pct(ratings):
 # ------------------------------------------------------------------ main
 
 def main() -> None:
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--labels', default=None, help='folder of <id>.jsonl files (default: layer2/labels/)')
+    a, _ = ap.parse_known_args()
+    global LABELS
+    if a.labels:
+        LABELS = Path(a.labels)
     key = {}
     for ln in (TASKS / 'keyfile.jsonl').open(encoding='utf8'):
         if ln.strip():
