@@ -4007,12 +4007,55 @@ prescribes.
 **Open.** The virial P2/Pc range; a per-row provenance tag for the plasma row (it sits under
 the table-level UNVERIFIED tag because a new tag moves the register's chemical count).
 
+## D-107 — Layer 2 round 2: 17 of 22 approved by all three; five objections, each confirmed on the instance cited
+
+**Date:** 2026-09-26 · **Status:** RECORDED (results); the fixes and any round 3 are open · **Source:**
+`template_annotation_23092026/layer2/RESULTS_round2.md` (`score.py --round 2 --prev-labels`)
+
+Round 2 (2026-09-25) sent the 22 templates changed after round 1 (D-106) to the same nine experts
+of the three branches concerned: 66 reviews, no planted defects, and a hand-check instance none of
+them had seen. Seventeen templates are approved by all three experts, two by majority
+(`finite_convolution`, `newtons_law_shear_stress`, one rejection each), and three are rejected by
+majority (`basic_stress_strain` and `utube_manometer` 3 of 3, `multi_segment_rod` 2 of 3). Of the
+43 round-1 rejections of these templates, 36 became approvals and 7 stayed rejections, most of
+them for a new reason; 3 verdicts went from approve to reject. Every hand check matched (66 of
+66), and Gwet AC1 on the verdict is 0.88.
+
+What the rejections say, each checked against the instance the expert cited (the numbers reproduce):
+
+- **Round 1's objections are resolved, with one exception.** Every defect named in round 1 is gone
+  except `finite_convolution`'s origin. The app renders a question as Markdown, so the asterisks
+  that mark n = 0 show as italics, and the fallback "x[0] = v" does not locate the origin when v
+  repeats (instance 1, x = {2, *-2*, -2}). The models receive the raw text with its asterisks, so
+  the item is unambiguous to them; stating the start index removes the dependence on rendering,
+  and the app should show a question as typed.
+- **The two claims not adopted in round 1 are accepted.** The expert who asked for a
+  thermal-stability cap in `work_isothermal_virial` and `pitzer_correlation_z` approves both after
+  reading the docstring argument.
+- **Four objections are new.** `basic_stress_strain` draws load, diameter and elongation
+  independently with no material, so instance 2 implies E = σ/ε = 1423 GPa (439 kN on a 36 mm bar,
+  1.17 mm over 3.86 m). `utube_manometer` still pairs room-temperature manometer liquids with
+  cryogenic pipe fluids: `PIPE_FLUIDS` holds liquid oxygen and liquid nitrogen, and only this
+  template reads it. `newtons_law_shear_stress` has no laminar check, so water at 1.59 m/s across
+  1.96 cm is at Re ≈ 3.1e4, where the linear Couette profile does not hold. `multi_segment_rod`'s
+  objection was caused by the round-1 fix: scaling the loads to the allowable stress left US-unit
+  deformations near 1e-3 in, and the fixed 4-dp display then keeps one or two figures, so instance
+  3 sums 0.0036 + 0.0027 − 0.0054 = 0.0009 in where the exact sum is 0.000800 in.
+- **The reviews were fast.** Median 1.1 to 1.5 minutes per item and 64 of 66 under two minutes,
+  against 1.9 to 3.3 minutes for the same experts in round 1. They knew these templates and the
+  notes are specific, but round 1 is the stronger record of review time and the one to quote.
+
+**Open.** Whether a template approved 2 of 3 with a confirmed minority objection counts as
+certified (the D-095 adjudication rule, now with two concrete cases); fixing the five and a round
+3 for them; the screen re-judge (D-106). None of the five is fixed yet.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
-| D-106 | Whether the screen re-judges the 20 changed templates before round 2 (a few cents, targeted); the plasma row's per-row tag | round-2 kits are sent |
-| D-095 | ~~Layer 2 roster and dates~~ **Round 1 run 2026-09-24/25 with the pilot's 15 experts (D-106).** Open: adjudication rule for split verdicts (7 of the 22 rejections were 1 of 3) | round 2 is scored |
+| D-107 | Fix the five templates round 2 objected to (three rejected by majority) and re-certify them in a round 3, and whether the two 2-of-3 approvals stand as certified | the item pool is frozen |
+| D-106 | Whether the screen re-judges the changed templates (a few cents, targeted; not run before round 2); the plasma row's per-row tag | the item pool is frozen |
+| D-095 | ~~Layer 2 roster and dates~~ **Round 1 run 2026-09-24/25 with the pilot's 15 experts (D-106).** **Round 2 run 2026-09-25 (D-107).** Open: adjudication rule for split verdicts (7 of round 1's 22 rejections were 1 of 3; round 2 leaves two templates approved 2 of 3 over a confirmed objection) | a template is counted as certified |
 | D-094 | Whether to narrow the P2/Pc range in `work_isothermal_virial` (now 50% redraw; an expert's thermal-stability objection, D-106, turns on the same range) and accept the 41% stability redraw in `floating_object_submersion_depth`; the residuals in `pass1_fixes.md` | the item pool is regenerated |
 | D-092 | ~~Answer-display lengthening and gold-movement sign-offs~~ **Decided by the owner 2026-09-23:** the two lengthened answers stay; `beam_internal_moment`, `terzaghi_strip_footing_bearing` and `effective_stress_profile` answers are lengthened too; the gold movements are accepted; and a scoped third round removes the census ties at 3% and above (eight templates), with the frozen pool to be censused before inference and stragglers fixed then | — |
 | D-093 | ~~Approval to run screening pass 1~~ **Both passes run (2026-09-23/24, $4.85 total); the 24 flags resolved (D-094).** Open: the Layer 2 protocol (experts, hand-checks, planted defects) | Layer 2 (human certification) starts |

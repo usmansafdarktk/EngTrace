@@ -44,13 +44,14 @@ python -m template_annotation_23092026.layer2.build_tasks                  # tas
 python -m template_annotation_23092026.layer2.make_guide_pdf               # the PDF
 python -m template_annotation_23092026.layer2.simulate                     # proves the pipeline; NOT results
 python -m template_annotation_23092026.layer2.make_kits                    # dist/: shared app + guide + README, and kit_<id>/ per expert
-# ... experts work; returned <id>.jsonl files go to labels/; a filled workbook goes through
+# ... experts work; returned <id>.jsonl files go to one folder per round; a filled workbook goes through
 python -m template_annotation_23092026.layer2.workbooks import <file>      # (workbook route)
-python -m template_annotation_23092026.layer2.score                        # RESULTS.md
+python -m template_annotation_23092026.layer2.score --labels <round-1 folder>   # RESULTS.md
 ```
 
-`tasks/`, `labels/`, `labels_simulated/` and `dist/` are produced data and git-ignored; the scripts,
-the guide, the plants and `RESULTS.md` are committed.
+`tasks/`, `labels/`, `labels_simulated/`, `dist/` and the returned label folders
+(`experts_filled_annotations_round_<N>/`) are produced or expert data and git-ignored; the expert
+files are never committed. The scripts, the guide, the plants and the `RESULTS*.md` files are.
 
 ## What comes back
 
@@ -71,7 +72,13 @@ so round 1 stays intact:
 ```bash
 python -m template_annotation_23092026.layer2.build_tasks --only <id,id,...> --round 2
 python -m template_annotation_23092026.layer2.make_kits --round 2
-python -m template_annotation_23092026.layer2.score --labels labels_round2   # scores that round alone
+python -m template_annotation_23092026.layer2.score --round 2 --labels <round-2 folder> \
+    --prev-labels <round-1 folder>                                          # RESULTS_round2.md
 ```
 
-Only the branches with a changed template receive a kit; the same experts review them.
+Only the branches with a changed template receive a kit; the same experts review them. The scorer
+reads that round's keyfile, refuses codes it does not know, writes `RESULTS_round<N>.md` so round 1's
+record is untouched, and with `--prev-labels` sets each expert's verdict beside their previous one.
+
+Round 2 ran on 2026-09-25 (`RESULTS_round2.md`, D-107): 17 of the 22 approved by all three experts,
+2 by majority, 3 rejected by majority.

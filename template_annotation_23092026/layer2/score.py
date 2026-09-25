@@ -1,11 +1,19 @@
 """Layer 2 - read the experts' labels back: agreement, plant detection, hand checks, and the fix list.
 
-    python -m template_annotation_23092026.layer2.score
+    python -m template_annotation_23092026.layer2.score --labels <round-1 folder>
+    python -m template_annotation_23092026.layer2.score --round 2 --labels <round-2 folder> \
+        --prev-labels <round-1 folder>
 
-Reads labels/*.jsonl (app and workbook rows alike), tasks/keyfile.jsonl (which codes
-are plants) and screen/pass2/summary.csv (the panel's verdict on the same corpus).
-Writes layer2/RESULTS.md. Every number the paper will quote about human certification
-comes from here.
+Reads the experts' <id>.jsonl files (app and workbook rows alike; default layer2/labels/),
+tasks/keyfile.jsonl (which codes are plants) and screen/pass2/summary.csv (the panel's
+verdict on the same corpus). Writes layer2/RESULTS.md. Every number the paper will quote
+about human certification comes from here.
+
+A later round (--round N) reads tasks_round<N>/keyfile.jsonl and writes RESULTS_round<N>.md,
+so round 1's record is never overwritten. It has no plants (sensitivity was measured in
+round 1) and no panel comparison (the panel judged the templates before the fixes), and
+with --prev-labels it adds the round-over-round table: each template's verdicts in the
+previous round beside this one, expert by expert.
 
 What it reports, and why each exists:
   * plant detection per expert and overall - the sensitivity of the review, which a
@@ -84,32 +92,54 @@ def pct(ratings):
     return sum(1 for row in ratings if len(set(row)) == 1) / len(ratings)
 
 
+# ------------------------------------------------------------------ input
+
+def tasks_dir(n: int) -> Path:
+    return TASKS if n == 1 else HERE / f'tasks_round{n}'
+
+
+def read_key(n: int) -> dict:
+    key = {}
+    for ln in (tasks_dir(n) / 'keyfile.jsonl').open(encoding='utf8'):
+        if ln.strip():
+            k = json.loads(ln)
+            key[k['code']] = k
+    return key
+
+
+def read_rows(folder: Path) -> list[dict]:
+    rows = []
+    for p in sorted(folder.glob('*.jsonl')):
+        for ln in p.open(encoding='utf8'):
+            if ln.strip():
+                rows.append(json.loads(ln))
+    latest = {}
+    for r in rows:                                   # a resubmission replaces the earlier row
+        latest[(r['annotator_id'], r['code'])] = r
+    return list(latest.values())
+
+
 # ------------------------------------------------------------------ main
 
 def main() -> None:
     import argparse
     ap = argparse.ArgumentParser()
     ap.add_argument('--labels', default=None, help='folder of <id>.jsonl files (default: layer2/labels/)')
+    ap.add_argument('--round', type=int, default=1, help='read tasks_round<N>/, write RESULTS_round<N>.md')
+    ap.add_argument('--prev-labels', default=None,
+                    help="a later round: the previous round's label folder, for the round-over-round table")
     a, _ = ap.parse_known_args()
     global LABELS
     if a.labels:
         LABELS = Path(a.labels)
-    key = {}
-    for ln in (TASKS / 'keyfile.jsonl').open(encoding='utf8'):
-        if ln.strip():
-            k = json.loads(ln)
-            key[k['code']] = k
-    rows = []
-    for p in sorted(LABELS.glob('*.jsonl')):
-        for ln in p.open(encoding='utf8'):
-            if ln.strip():
-                rows.append(json.loads(ln))
+    key = read_key(a.round)
+    rows = read_rows(LABELS)
     if not rows:
         raise SystemExit('no labels yet')
-    latest = {}
-    for r in rows:                                   # a resubmission replaces the earlier row
-        latest[(r['annotator_id'], r['code'])] = r
-    rows = list(latest.values())
+    unknown = sorted({r['code'] for r in rows if r['code'] not in key})
+    if unknown:
+        raise SystemExit(f'{len(unknown)} label codes are not in {tasks_dir(a.round).name}/keyfile.jsonl '
+                         f'(wrong --round, or the tasks were rebuilt after the kits went out): {unknown[:5]}')
     by_code = collections.defaultdict(dict)
     for r in rows:
         by_code[r['code']][r['annotator_id']] = r
@@ -118,32 +148,81 @@ def main() -> None:
 
     out = []
     w = out.append
-    w('# Layer 2 - human certification results\n')
+    w('# Layer 2 - human certification results' + (f', round {a.round}' if a.round > 1 else '') + '\n')
     w(f'Generated {dt.datetime.now(dt.timezone.utc).isoformat(timespec="seconds")} by `score.py` from '
       f'{len(rows)} label rows by {len(experts)} experts.\n')
+    if a.round > 1:
+        build = json.loads((tasks_dir(a.round) / 'BUILD.json').read_text(encoding='utf8'))
+        w(f"Round {a.round} re-certifies the {build['templates']} templates changed after round {a.round - 1}, "
+          f"built at git `{build['git_head'][:7]}`: no planted defects, and a fresh hand-check instance "
+          f"(seed {build['instance_seeds'][0]}) that no expert saw before.\n")
 
     # ---- plants
-    w('## Plant detection (sensitivity)\n')
-    w('| Expert | Branch | Plants seen | Rejected | Detection | Real templates approved |\n|---|---|---:|---:|---:|---:|')
     tot_seen = tot_hit = 0
-    for e in experts:
-        mine = [r for r in rows if r['annotator_id'] == e]
-        plants = [r for r in mine if key[r['code']]['kind'] == 'plant']
-        hit = sum(1 for r in plants if r['decision'] == 'Reject')
-        real = [r for r in mine if key[r['code']]['kind'] == 'template']
-        appr = sum(1 for r in real if r['decision'] == 'Approve')
-        tot_seen += len(plants)
-        tot_hit += hit
-        w(f'| {e} | {branch_of[e].split("_")[0]} | {len(plants)} | {hit} | '
-          f'{(hit / len(plants)) if plants else float("nan"):.0%} | {appr} of {len(real)} |')
-    w(f'\nOverall: {tot_hit} of {tot_seen} planted defects rejected ({(tot_hit / tot_seen) if tot_seen else 0:.0%}).\n')
-    w('| Plant | Defect | Experts who saw it | Rejected by |\n|---|---|---:|---|')
-    for code, k in key.items():
-        if k['kind'] != 'plant' or code not in by_code:
-            continue
-        seen = by_code[code]
-        rej = [e for e, r in seen.items() if r['decision'] == 'Reject']
-        w(f"| {k['plant_id']} ({k['base']}) | {k['defect_class']}: {k['description']} | {len(seen)} | {', '.join(rej) or 'nobody'} |")
+    if any(k['kind'] == 'plant' for k in key.values()):
+        w('## Plant detection (sensitivity)\n')
+        w('| Expert | Branch | Plants seen | Rejected | Detection | Real templates approved |\n|---|---|---:|---:|---:|---:|')
+        for e in experts:
+            mine = [r for r in rows if r['annotator_id'] == e]
+            plants = [r for r in mine if key[r['code']]['kind'] == 'plant']
+            hit = sum(1 for r in plants if r['decision'] == 'Reject')
+            real = [r for r in mine if key[r['code']]['kind'] == 'template']
+            appr = sum(1 for r in real if r['decision'] == 'Approve')
+            tot_seen += len(plants)
+            tot_hit += hit
+            w(f'| {e} | {branch_of[e].split("_")[0]} | {len(plants)} | {hit} | '
+              f'{(hit / len(plants)) if plants else float("nan"):.0%} | {appr} of {len(real)} |')
+        w(f'\nOverall: {tot_hit} of {tot_seen} planted defects rejected ({(tot_hit / tot_seen) if tot_seen else 0:.0%}).\n')
+        w('| Plant | Defect | Experts who saw it | Rejected by |\n|---|---|---:|---|')
+        for code, k in key.items():
+            if k['kind'] != 'plant' or code not in by_code:
+                continue
+            seen = by_code[code]
+            rej = [e for e, r in seen.items() if r['decision'] == 'Reject']
+            w(f"| {k['plant_id']} ({k['base']}) | {k['defect_class']}: {k['description']} | {len(seen)} | {', '.join(rej) or 'nobody'} |")
+    else:
+        w('## Verdicts per expert\n')
+        w("No planted defects in this round; the review's sensitivity was measured in round 1 (`RESULTS.md`).\n")
+        w('| Expert | Branch | Items | Approved | Rejected |\n|---|---|---:|---:|---:|')
+        for e in experts:
+            mine = [r for r in rows if r['annotator_id'] == e]
+            appr = sum(1 for r in mine if r['decision'] == 'Approve')
+            w(f'| {e} | {branch_of[e].split("_")[0]} | {len(mine)} | {appr} | {len(mine) - appr} |')
+
+    # ---- round over round
+    prev = collections.defaultdict(dict)                 # template_id -> {expert: previous-round row}
+    if a.round > 1 and a.prev_labels:
+        prev_key = read_key(a.round - 1)
+        for r in read_rows(Path(a.prev_labels)):
+            k = prev_key.get(r['code'])
+            if k and k['kind'] == 'template':
+                prev[k['template_id']][r['annotator_id']] = r
+        w(f'\n## Round {a.round - 1} against round {a.round}\n')
+        w("Each expert's verdict on the same template in both rounds: A approve, R reject.\n")
+        w(f'| Template | Round {a.round - 1} | Round {a.round} | Outcome |\n|---|---|---|---|')
+        trans, outcomes = collections.Counter(), collections.Counter()
+        for code, seen in sorted(by_code.items(), key=lambda kv: key[kv[0]].get('template_id', '')):
+            k = key[code]
+            if k['kind'] != 'template':
+                continue
+            before = prev.get(k['template_id'], {})
+            ids = sorted(seen)
+            fmt = lambda d: ' '.join(f"{e} {d[e]['decision'][0] if e in d else '-'}" for e in ids)  # noqa: E731
+            n_rej = sum(1 for r in seen.values() if r['decision'] == 'Reject')
+            outcome = ('approved by all' if n_rej == 0 else
+                       f'approved by majority, rejected by {n_rej}' if 2 * n_rej < len(seen) else
+                       f'rejected by majority, {n_rej} of {len(seen)}')
+            outcomes[outcome.split(',')[0]] += 1
+            for e, r in seen.items():
+                if e in before:
+                    trans[(before[e]['decision'], r['decision'])] += 1
+            w(f"| {k['template_id']} | {fmt(before)} | {fmt(seen)} | {outcome} |")
+        n_prev_rej = trans[('Reject', 'Approve')] + trans[('Reject', 'Reject')]
+        w(f"\nTemplates: {outcomes['approved by all']} approved by all three, "
+          f"{outcomes['approved by majority']} approved by majority, {outcomes['rejected by majority']} rejected by majority.")
+        w(f"Of the {n_prev_rej} round-{a.round - 1} rejections of these templates, {trans[('Reject', 'Approve')]} became "
+          f"approvals and {trans[('Reject', 'Reject')]} stayed rejections; {trans[('Approve', 'Reject')]} verdicts went "
+          f"the other way, from approve to reject.")
 
     # ---- hand checks
     w('\n## Hand checks\n')
@@ -189,7 +268,9 @@ def main() -> None:
 
     # ---- against the screen
     w('\n## Against the screening panel (pass 2)\n')
-    if SCREEN.exists():
+    if a.round > 1:
+        w('Not computed for this round: the panel judged these templates before the fixes and has not re-judged them.')
+    elif SCREEN.exists():
         screen = {r['template_id']: r for r in csv.DictReader(SCREEN.open(encoding='utf8'))}
         fp, n_pass, mad = 0, 0, {d: [] for d in DIMS}
         smap = {'physical_plausibility': 'med_phys', 'mathematical_correctness': 'med_math', 'pedagogical_clarity': 'med_ped'}
@@ -225,9 +306,9 @@ def main() -> None:
     dw = []
     for r in rows:
         if r.get('opened_at') and r.get('submitted_at'):
-            a = dt.datetime.fromisoformat(r['opened_at'])
-            b = dt.datetime.fromisoformat(r['submitted_at'])
-            dw.append((r['annotator_id'], (b - a).total_seconds() / 60))
+            t_open = dt.datetime.fromisoformat(r['opened_at'])
+            t_sub = dt.datetime.fromisoformat(r['submitted_at'])
+            dw.append((r['annotator_id'], (t_sub - t_open).total_seconds() / 60))
     if dw:
         w('| Expert | Items | Median minutes | Under 2 min |\n|---|---:|---:|---:|')
         for e in experts:
@@ -249,12 +330,15 @@ def main() -> None:
             any_rej = True
             w(f"- **{k['template_id']}** rejected by {len(rej)} of {len(seen)}:")
             for e, r in rej.items():
-                w(f"  - {e} [{', '.join(r['defects'])}]: {r['feedback']}")
+                was = prev.get(k['template_id'], {}).get(e)
+                tag = f" (round {a.round - 1}: {was['decision'].lower()})" if was else ''
+                w(f"  - {e}{tag} [{', '.join(r['defects'])}]: {r['feedback']}")
     if not any_rej:
         w('none')
 
-    (HERE / 'RESULTS.md').write_text('\n'.join(out) + '\n', encoding='utf8')
-    print(f'wrote {HERE / "RESULTS.md"}: {len(rows)} rows, {len(experts)} experts, '
+    out_path = HERE / ('RESULTS.md' if a.round == 1 else f'RESULTS_round{a.round}.md')
+    out_path.write_text('\n'.join(out) + '\n', encoding='utf8')
+    print(f'wrote {out_path}: {len(rows)} rows, {len(experts)} experts, '
           f'{tot_hit}/{tot_seen} plants detected')
 
 
