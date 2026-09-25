@@ -51,8 +51,13 @@ REPLIES = _os.path.join(OUT, 'replies.jsonl')
 PLANTED = _os.path.join(_ANALYSIS, 'out', 'planted', 'planted.jsonl')
 
 # E0's own two judges. Prices per million tokens, as models.json records them.
+# E0's own two judges, and the judge E5 actually uses. MiMo is the one that survives the
+# judge/judged objection - GPT-5 and Opus share families with models on the evaluated
+# roster - so its rate is the one that decides whether a step router is worth building.
+# Prices per million tokens; MiMo's are derived from its recorded E5 calls.
 JUDGES = [('gpt-5', 'openai/gpt-5', (1.25, 10.0)),
-          ('opus-4.5', 'anthropic/claude-opus-4.5', (5.0, 25.0))]
+          ('opus-4.5', 'anthropic/claude-opus-4.5', (5.0, 25.0)),
+          ('mimo-v2.5-pro', 'xiaomi/mimo-v2.5-pro', (0.435, 0.870))]
 SEED = 20260924
 
 
@@ -138,7 +143,7 @@ def build(sample):
     print('calls if every judge runs: %d' % (len(probe) * len(JUDGES)))
 
 
-def run(budget):
+def run(budget, workers=4):
     """Call the judges. PAID. Stops as soon as the spend would pass --budget."""
     probe = json.load(open(PROBE, encoding='utf-8'))
     done = set()
@@ -161,7 +166,8 @@ def run(budget):
                     set_id=probe[i]['set_id'], arm=probe[i]['arm'])
 
     stopped = False
-    with cf.ThreadPoolExecutor(max_workers=8) as pool, open(REPLIES, 'a', encoding='utf-8') as fh:
+    # 4, not 8: at 8 the xiaomi endpoint refused 176 of 240 calls with transport errors.
+    with cf.ThreadPoolExecutor(max_workers=workers) as pool, open(REPLIES, 'a', encoding='utf-8') as fh:
         futures = {pool.submit(one, j): j for j in jobs}
         for fut in cf.as_completed(futures):
             res = fut.result()
@@ -288,11 +294,12 @@ def main():
     ap.add_argument('cmd', choices=('build', 'run', 'report'))
     ap.add_argument('--sample', default='20,10', help='conceptual,arithmetic defects to probe')
     ap.add_argument('--budget', type=float, default=4.0, help='stop the run at this spend')
+    ap.add_argument('--workers', type=int, default=4)
     a = ap.parse_args()
     if a.cmd == 'build':
         return build([int(x) for x in a.sample.split(',')])
     if a.cmd == 'run':
-        return run(a.budget)
+        return run(a.budget, a.workers)
     return report()
 
 

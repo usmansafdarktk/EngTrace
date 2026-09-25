@@ -452,11 +452,20 @@ planted trace, once in the *same step of the untouched original*. Same question,
 one character different. A judge that flags both is flagging the step, not detecting the
 defect, so only the difference counts. 480 calls, $4.67, no failures.
 
-| judge | conceptual (60) | arithmetic (60) | flags the original |
+| judge | conceptual | arithmetic | flags the original |
 |---|---|---|---|
-| GPT-5 | 0.333 | 0.717 | **0.000** |
-| Claude Opus 4.5 | 0.133 (0.483 counting *Other*) | 0.717 | **0.000** |
-| **either judge** | **0.350** | **0.800** | — |
+| GPT-5 | 0.333 (60) | 0.717 (60) | **0.000** |
+| Claude Opus 4.5 | 0.133 (60), 0.483 counting *Other* | 0.717 (60) | **0.000** |
+| **MiMo-V2.5-Pro** — the judge E5 uses | **0.314** (51) | **0.717** (60) | **0.000** |
+| *either of E0's two* | 0.350 | 0.800 | — |
+
+MiMo matters more than the other two. GPT-5 and Claude share families with models on the
+evaluated roster, which is the judge/judged objection E1 exists to answer; MiMo does not, and
+it performs like them — 0.314 against GPT-5's 0.333 on conceptual defects, the same 0.717 on
+arithmetic, and no false alarm in 223 calls. Its verdicts are also the most decisive: of 51
+planted steps it named 11 a Conceptual Error where Opus retreated to *Other* 22 times out of
+60. (17 of its 240 calls never returned, after retries, so its conceptual row rests on 51 of
+the 60 matched sets.)
 
 **The judges do detect conceptual defects, and the deterministic evaluators never will.**
 A third of them, against zero for every checker. That is the result the pilot was missing,
@@ -506,9 +515,30 @@ Those traces enter the wrong-answer sample (D3, probability 0.20), so part of E0
 today is driven by its own broken answer check — the defect D-098 fixed for accuracy
 reporting but deliberately did not re-run E0 against.
 
-**What remains untested.** E1's panel and E5's judge were not probed, at about $3 and $0.20
-on this set. And the planted set is a diagnostic, so these rates describe what E0 does with
-defects of this shape, not how often such defects occur.
+### What a router would cost and buy (`analysis/router_residue.py`)
+
+The routing above is E0's. A router would instead send a judge exactly what the checker
+cannot verify. That residue is measurable, and it is large:
+
+| | |
+|---|---|
+| steps with no claim the checker can recompute | **1,324 of 2,091 (63.3%)** |
+| traces with at least one | 282 of 300 (**94%**) |
+| residue steps per trace | median 4, mean 4.4, max 16 |
+| of that residue, steps the experts call incorrect | **14.0%** |
+| full run: one batched call per trace with residue | 25,380 calls, **$86** at MiMo's rate |
+
+So the router is not a small targeted sample: at trace level it forwards almost everything.
+Its selectivity is *within* the trace — 63% of steps instead of Tier 1's coin toss, and none
+of the 37% already settled deterministically. What it buys is the difference between showing
+a judge the corrupted step 0.500 of the time by accident and showing it every time: E0's
+end-to-end 0.175 on conceptual defects becomes about **0.31**, MiMo's own rate, for $86.
+
+**What remains untested.** The probe asks a judge about one step in isolation; a router would
+batch a trace's ~4.4 residue steps into one prompt, which is more context per call and also
+more steps competing for attention. E1's three-judge panel was not probed as a panel. And the
+planted set is a diagnostic: these rates describe what an evaluator does with defects of this
+shape, not how often models produce them.
 
 ## Limitations, and what this pilot does not show
 
