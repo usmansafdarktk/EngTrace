@@ -3952,12 +3952,68 @@ Open before generation starts:
   survives it is MiMo, and its rate on the planted defects is unknown. ~$3.20 and an hour
   to close, and it decides whether the step router is worth building at all.
 
+## D-106 — Layer 2 round 1: the experts' rejections are verified claims too; 20 templates change, 2 do not
+
+**Date:** 2026-09-25 · **Status:** DECIDED · **Source:**
+`template_annotation_23092026/layer2/RESULTS.md`, `layer2/fixes_round1.md`, `layer0/gate_report.md`,
+`layer0/item_pool_impact.md`
+
+Round 1 of Layer 2 (15 own-branch experts, 2026-09-24/25) caught all 60 planted defects,
+matched the template's answer on 459 of 504 hand checks, agreed at Gwet AC1 0.91, and rejected
+22 templates (15 by majority). The screening panel had passed all 22, so its false-positive
+rate against the experts is 10.2% (15 of 147). The rejections are the pipeline working: every
+one named a defect the gate cannot read and the judges did not see.
+
+**Decision.** Each rejection note was treated as the screen's flags were (D-094): verified
+against the source and the seeds the expert saw before any edit. The rule for the fix follows
+the kind of defect the experts found, and it is the same rule for all 22:
+
+- **Loads sampled independently of material strength** (five mechanical templates): the load
+  or torque is bounded by an allowable stress from two new sampling-only tables in
+  `mechanical_engineering/constants.py` (`[POLICY: sampling-only]`, never printed), and the
+  materials with no usable design strength are redrawn. Bounds act by redrawing the load
+  alone so the material and section shares stay flat (D-045); where a plain redraw would have
+  rejected 89% of draws (`multi_segment_rod`) the loads are scaled together instead.
+- **Absurd operating conditions** (three chemical transport templates, one vibration template):
+  a physical cap with a named source (3 m/s pumped-liquid velocity, Sinnott §5.4.3; 500 kPa;
+  base acceleration 1 g), applied as a bounded redraw; no fluid is deleted.
+- **Sampled values that should be computed** (`gas_viscosity_kinetic_theory`): Ω_μ from the
+  Neufeld–Janzen–Aziz correlation at the drawn T*, so the question's given value is right.
+- **Wrong table rows**: molten metals out of `MANOMETER_FLUIDS`; blood plasma corrected to a
+  Newtonian 1.2 mPa·s.
+- **Presentation** (fixed-decimal displays that lose figures, raw floats, an unstated
+  viscosity, an unstated origin convention, "leads" for "lags", "mm/m" for "mm/mm"): displays
+  lengthened to the exact value or to four significant figures and bound through the display
+  (D-016, D-037); the missing statements added.
+- **Two claims not adopted**, with the reason in the docstring: the thermal-stability cap on
+  `work_isothermal_virial` and `pitzer_correlation_z`. Both are confirmed as observations
+  (organics at 900–1188 K), but there is no on-disk stability source, and a 750 K cap would
+  remove 10 of 27 substances from the virial template because at Tr ≤ 1.5 no sampled P2
+  satisfies the Vr ≥ 2 validity filter. That is the P2/Pc sampling-range decision already open
+  under D-094, now with a second reason to take it.
+
+**Evidence after the edits.** Only the 22 assigned functions differ from HEAD. Gate green,
+150 of 150 at 500 seeds; the tie census is unchanged; the item pool moved in 20 templates
+(question 2,929 / answer 3,850 / solution 4,718 of 45,000), cumulatively 77 templates since
+`b1445ad`. Every number is in `fixes_round1.md` with the command that produced it.
+
+**What follows.** Round 2 re-certifies the 22 templates alone, without plants and with fresh
+hand-check instances, by the same experts (`build_tasks --only … --round 2`, `make_kits
+--round 2`). The unchanged pair go back with the docstring argument so the rejecting expert
+can answer it. Whether the screen re-judges the 20 changed templates first is a few cents and
+the owner's call; the runner refuses a third pass, so it would be the targeted re-judge D-094
+prescribes.
+
+**Open.** The virial P2/Pc range; a per-row provenance tag for the plasma row (it sits under
+the table-level UNVERIFIED tag because a new tag moves the register's chemical count).
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
-| D-095 | Layer 2 roster and dates; adjudication rule for split verdicts | bundles are sent |
-| D-094 | Whether to narrow the P2/Pc range in `work_isothermal_virial` (now 50% redraw) and accept the 41% stability redraw in `floating_object_submersion_depth`; the residuals in `pass1_fixes.md` | the item pool is regenerated |
+| D-106 | Whether the screen re-judges the 20 changed templates before round 2 (a few cents, targeted); the plasma row's per-row tag | round-2 kits are sent |
+| D-095 | ~~Layer 2 roster and dates~~ **Round 1 run 2026-09-24/25 with the pilot's 15 experts (D-106).** Open: adjudication rule for split verdicts (7 of the 22 rejections were 1 of 3) | round 2 is scored |
+| D-094 | Whether to narrow the P2/Pc range in `work_isothermal_virial` (now 50% redraw; an expert's thermal-stability objection, D-106, turns on the same range) and accept the 41% stability redraw in `floating_object_submersion_depth`; the residuals in `pass1_fixes.md` | the item pool is regenerated |
 | D-092 | ~~Answer-display lengthening and gold-movement sign-offs~~ **Decided by the owner 2026-09-23:** the two lengthened answers stay; `beam_internal_moment`, `terzaghi_strip_footing_bearing` and `effective_stress_profile` answers are lengthened too; the gold movements are accepted; and a scoped third round removes the census ties at 3% and above (eight templates), with the frozen pool to be censused before inference and stragglers fixed then | — |
 | D-093 | ~~Approval to run screening pass 1~~ **Both passes run (2026-09-23/24, $4.85 total); the 24 flags resolved (D-094).** Open: the Layer 2 protocol (experts, hand-checks, planted defects) | Layer 2 (human certification) starts |
 | — | The repo's templates no longer reproduce 17 of the 60 frozen items byte-identically (D-102); `milestones.build_all` raises on the pilot manifest | any re-derivation of milestones from templates |

@@ -8,9 +8,9 @@ described in the paper's section 3.3 and Appendix K.
 
 | Layer | What | Cost | State |
 |---|---|---|---|
-| 0 · deterministic gate | T1 closure, T3 determinism, T4 contract, T8 emission at 500 seeds; T5, T7 advisory; a register of four line classes the check cannot read | free | **green: 150 of 150 pass** (`layer0/gate_report.md`); 54 templates edited over three closure rounds (`closure_fixes.md`) and 24 after the screen (`../screen/pass1_fixes.md`); 68 moved instances (`item_pool_impact.md`); residual ties only in 11 templates under 2% (`tie_census.md`), to be censused on the frozen pool |
+| 0 · deterministic gate | T1 closure, T3 determinism, T4 contract, T8 emission at 500 seeds; T5, T7 advisory; a register of four line classes the check cannot read | free | **green: 150 of 150 pass** (`layer0/gate_report.md`, re-run 2026-09-25 after the Layer 2 fixes); 54 templates edited over three closure rounds (`closure_fixes.md`), 24 after the screen (`../screen/pass1_fixes.md`), 20 after the experts (`../layer2/fixes_round1.md`); 77 templates moved in the item pool (`item_pool_impact.md`); residual ties unchanged by the Layer 2 fixes (`tie_census.md`), to be censused on the frozen pool |
 | 1 · LLM screen | Appendix H's prompt, verbatim; three non-suite judges; two passes, hard-capped | $4.15 pass 1, $0.70 pass 2 | **both passes done**: pass 1 (2026-09-23) 126 pass, 13 controversial, 11 critical failure, AC1 on the flag 0.84; the 24 flags verified and fixed (`screen/pass1_fixes.md`); pass 2 (2026-09-24, 24 templates re-judged, 378 rows carried on unchanged prompts) **147 pass, 3 controversial, 0 critical**, AC1 0.93 (`screen/pass2/stats.md`) |
-| 2 · human certification | own-branch experts, three per template, with a hand check, four planted defects per branch, timestamps (D-095) | expert time, about 4 h each | **kit built** (`layer2/`): guide, app, workbook route, task builder with verified plants, per-expert bundles, scorer; awaiting roster and dates |
+| 2 · human certification | own-branch experts, three per template, with a hand check, four planted defects per branch, timestamps (D-095) | expert time, about 4 h each | **round 1 done** (2026-09-24/25, `layer2/RESULTS.md`): 15 experts, 60 of 60 plants caught, hand checks 459 of 504 matched, AC1 0.91, panel false-positive rate 10.2%; 22 templates rejected, every note verified, 20 fixed and 2 claims not adopted (`layer2/fixes_round1.md`, D-106); gate green again; **round 2** (the 22, no plants, fresh instances) to be built and sent |
 
 ## Pass 1 of the screen, read (as written before the fixes; the outcome is in `screen/pass1_fixes.md`)
 
@@ -89,6 +89,8 @@ template_annotation_23092026/
     make_kits.py         dist/: app.py, README, guide once; kit_<id>/tasks/ per expert (no zips); send an expert the shared files plus their kit
     simulate.py          synthetic labels to prove the pipeline; never results
     score.py             RESULTS.md: plant detection, hand checks, agreement, panel FPR, dwell, fix list
+    RESULTS.md           round 1 results (real labels; the labels themselves are never committed)
+    fixes_round1.md      every round-1 rejection: claim verified, fix, what moved; the two claims not adopted
 ```
 
 ## Order of operations

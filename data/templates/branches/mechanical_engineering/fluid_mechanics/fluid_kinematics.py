@@ -1,6 +1,47 @@
 import random
 import math
+from decimal import Decimal, ROUND_HALF_UP
 from data.templates.branches._emission import signed_term, joined_terms
+
+
+def _hu(x, places):
+    """Round half-up to `places` dp, resolving the tie in DECIMAL.
+
+    `round()` resolves a half-way tie on the binary value and disagrees with a
+    reader doing decimal arithmetic (spec P2 as amended, DECISIONS D-012).
+    """
+    q = Decimal(1).scaleb(-places)
+    d = x if isinstance(x, Decimal) else Decimal(repr(x))
+    v = d.quantize(q, rounding=ROUND_HALF_UP)
+    return int(v) if places == 0 else float(v)
+
+
+def _as_printed(x, spec):
+    """The value a reader recovers from `x` when it is printed with `spec`.
+
+    P2 asks that the stored value and the printed value be the SAME value.
+    Rounding alone does not achieve that: a float one ulp away from its own
+    printed form puts the template and the reader on opposite sides of a
+    display tie (D-016 part 2).
+    """
+    return float(format(x, spec))
+
+
+def _is_display_tie(x, places, rel_band=1e-12):
+    """Is `x` at, or within a hair of, a half-way tie at `places` dp?
+
+    A tie is the one case where no rounding convention is defensible - a
+    decimal reader applying half-up and a binary reader applying `round()`
+    disagree, and the printed line closes for only one of them. Such instances
+    are resampled rather than resolved (D-016).
+
+    A narrow BAND is quarantined rather than a point, because two independent
+    evaluations of the same exact quantity differ by a few ulps and an exact
+    rational tie lands on opposite sides of them.
+    """
+    scaled = abs(x) * 10.0 ** places
+    band = max(scaled * rel_band, 1e-9)
+    return abs((scaled - math.floor(scaled)) - 0.5) <= band
 
 
 # Template 1 (Easy)
@@ -167,29 +208,76 @@ def template_volumetric_flow_rate():
         Pipe Profile: u(r) = U_max * (1 - (r/R)^2), dA = 2*pi*r dr
         Channel Profile: u(y) = U_max * (y/H), dA = W dy
 
+    Layer 2 fix (2026-09-25):
+        Two experts of the branch rejected the template: Q and A were
+        printed at a fixed 4 dp in m^3/s and m^2, which destroys the
+        small-pipe answers. Seed 2103 (D = 35 mm) printed A = 0.001 m^2
+        for 9.621e-4 and Q = 0.0026 m^3/s for 2.569e-3 (1.2% off), and
+        Step 5 left "V_avg = Q / A = 0.0026 / 0.001" unfinished (it gives
+        2.6, not the 2.67 m/s stated); at D = 20 mm, U_max = 0.5 m/s the
+        printed Q would be 0.0001 against 7.85e-5 (27% off). Measured over
+        500 seeds: 10.6% of pipe draws printed Q more than 1% off. Q and A
+        are now quoted to at least four significant figures (never fewer
+        digits than the 4 dp before), both bound through their display, and
+        the Q / A line is finished with the quotient of the two printed
+        values, which agrees with the closed-form U_max / 2 to the
+        precision of the rounded operands; the gold answer stays the
+        exact U_max / 2. Q in the channel case is a product of short
+        decimals, so a draw whose Q, A or Q/A sits on a half-way display
+        tie is redrawn (D-016 part 3); the pipe case involves pi and
+        cannot tie.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the flow rate and average velocity.
             - str: A step-by-step solution to the problem.
     """
-    # 1. Parameterize the inputs with random values
-    geometry = random.choice(['pipe', 'channel'])
-    u_max = round(random.uniform(0.5, 10.0), 2)
     precision = 4
 
-    # 2. Perform calculations and generate strings based on the chosen geometry
-    if geometry == 'pipe':
-        #  Pipe-specific parameters 
-        diameter_mm = random.randint(20, 200)
-        radius_m = diameter_mm / 2000.0
+    def _sig_dp(x):
+        # At least `precision` dp and at least four significant figures.
+        return max(precision, (precision - 1) - math.floor(math.log10(abs(x))))
 
-        #  Core calculations for the pipe 
-        area = math.pi * radius_m**2
-        # For a parabolic profile in a pipe, the exact integral yields Q = (1/2) * U_max * A
-        flow_rate = 0.5 * u_max * area
+    for _attempt in range(200):
+        # 1. Parameterize the inputs with random values
+        geometry = random.choice(['pipe', 'channel'])
+        u_max = round(random.uniform(0.5, 10.0), 2)
+
+        if geometry == 'pipe':
+            diameter_mm = random.randint(20, 200)
+            radius_m = diameter_mm / 2000.0
+            area_exact = math.pi * radius_m**2
+        else:
+            height_cm = random.randint(5, 50)
+            width_cm = random.randint(10, 100)
+            height_m = height_cm / 100.0
+            width_m = width_cm / 100.0
+            area_exact = width_m * height_m
+        # For both profiles the exact integral yields Q = (1/2) * U_max * A
+        flow_rate_exact = 0.5 * u_max * area_exact
         avg_velocity = u_max / 2.0
 
-        #  Generate question and solution strings for the pipe 
+        # Layer 2 fix: Q and A at four significant figures or more, each
+        # bound through its display (D-016 part 2); the Q / A line is then
+        # the quotient of the two displayed values.
+        q_dp = _sig_dp(flow_rate_exact)
+        a_dp = _sig_dp(area_exact)
+        if _is_display_tie(flow_rate_exact, q_dp) or _is_display_tie(area_exact, a_dp):
+            continue
+        flow_rate = _as_printed(flow_rate_exact, f'.{q_dp}f')
+        area = _as_printed(area_exact, f'.{a_dp}f')
+        v_from_q_exact = flow_rate / area
+        v_dp = _sig_dp(v_from_q_exact)
+        if _is_display_tie(v_from_q_exact, v_dp):
+            continue
+        v_from_q = _hu(v_from_q_exact, v_dp)
+        break
+    else:
+        raise RuntimeError("volumetric_flow_rate: no closing sample in 200 draws")
+
+    # 2. Generate strings based on the chosen geometry
+    if geometry == 'pipe':
+        #  Generate question and solution strings for the pipe
         question = (
             f"The velocity profile for a fluid flowing through a circular pipe with a diameter of {diameter_mm} mm "
             f"is given by u(r) = U_max * (1 - (r/R)^2), where R is the radius of the pipe and the maximum "
@@ -220,32 +308,20 @@ def template_volumetric_flow_rate():
 
             f"**Step 4:** Substitute numerical values to find Q.\n"
             f"Q = (pi * ({radius_m})^2 * {u_max}) / 2\n"
-            f"Q = {round(flow_rate, precision)} m^3/s\n\n"
+            f"Q = {flow_rate:.{q_dp}f} m^3/s\n\n"
 
             f"**Step 5:** Calculate the average velocity (V_avg).\n"
             f"First, calculate the cross-sectional area (A) = pi*R^2\n"
-            f"A = pi * ({radius_m})^2 = {round(area, precision)} m^2\n"
-            f"V_avg = Q / A = {round(flow_rate, precision)} / {round(area, precision)}\n"
-            f"Alternatively, for this profile, V_avg is known to be U_max / 2.\n"
+            f"A = pi * ({radius_m})^2 = {area:.{a_dp}f} m^2\n"
+            f"V_avg = Q / A = {flow_rate:.{q_dp}f} / {area:.{a_dp}f} = {v_from_q:.{v_dp}f} m/s\n"
+            f"This agrees, to the precision of the rounded Q and A, with the closed-form result for this profile, V_avg = U_max / 2.\n"
             f"V_avg = {u_max} / 2 = {round(avg_velocity, precision)} m/s\n\n"
 
             f"**Answer:**\n"
-            f"The volumetric flow rate is {round(flow_rate, precision)} m^3/s, and the average velocity is {round(avg_velocity, precision)} m/s."
+            f"The volumetric flow rate is {flow_rate:.{q_dp}f} m^3/s, and the average velocity is {round(avg_velocity, precision)} m/s."
         )
 
     else: # geometry == 'channel'
-        #  Channel-specific parameters 
-        height_cm = random.randint(5, 50)
-        width_cm = random.randint(10, 100)
-        height_m = height_cm / 100.0
-        width_m = width_cm / 100.0
-
-        #  Core calculations for the channel 
-        area = width_m * height_m
-        # For a linear profile in a channel, the exact integral yields Q = (1/2) * U_max * A
-        flow_rate = 0.5 * u_max * area
-        avg_velocity = u_max / 2.0
-
         #  Generate question and solution strings for the channel 
         question = (
             f"A fluid flows through a rectangular channel that is {width_cm} cm wide and {height_cm} cm high. "
@@ -279,17 +355,17 @@ def template_volumetric_flow_rate():
 
             f"**Step 4:** Substitute numerical values to find Q.\n"
             f"Q = ({width_m} * {u_max} * {height_m}) / 2\n"
-            f"Q = {round(flow_rate, precision)} m^3/s\n\n"
+            f"Q = {flow_rate:.{q_dp}f} m^3/s\n\n"
 
             f"**Step 5:** Calculate the average velocity (V_avg).\n"
             f"First, calculate the cross-sectional area (A) = W * H\n"
-            f"A = {width_m} * {height_m} = {round(area, precision)} m^2\n"
-            f"V_avg = Q / A = {round(flow_rate, precision)} / {round(area, precision)}\n"
-            f"Alternatively, for this profile, V_avg is known to be U_max / 2.\n"
+            f"A = {width_m} * {height_m} = {area:.{a_dp}f} m^2\n"
+            f"V_avg = Q / A = {flow_rate:.{q_dp}f} / {area:.{a_dp}f} = {v_from_q:.{v_dp}f} m/s\n"
+            f"This agrees, to the precision of the rounded Q and A, with the closed-form result for this profile, V_avg = U_max / 2.\n"
             f"V_avg = {u_max} / 2 = {round(avg_velocity, precision)} m/s\n\n"
 
             f"**Answer:**\n"
-            f"The volumetric flow rate is {round(flow_rate, precision)} m^3/s, and the average velocity is {round(avg_velocity, precision)} m/s."
+            f"The volumetric flow rate is {flow_rate:.{q_dp}f} m^3/s, and the average velocity is {round(avg_velocity, precision)} m/s."
         )
 
     return question, solution

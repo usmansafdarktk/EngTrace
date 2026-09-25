@@ -79,24 +79,65 @@ def template_wave_parameters_basic():
         the register). The question text is unchanged; the gold f in MHz
         moves to the value computed from the stated u_p.
 
+    Layer 2 fix (2026-09-25):
+        Two of the three branch experts rejected the scenario, not the
+        arithmetic: MEDIA_VELOCITIES is built from OPTICAL refractive
+        indices (589 nm), but the wave here is at 50 MHz to 3 GHz, where the
+        RF permittivity governs. For a polar or strongly dispersive medium
+        the stated u_p is then wrong by a large factor (seed 2105: water at
+        133 MHz stated as 2.25e8 m/s, while eps_r ~ 80 gives ~3.4e7 m/s;
+        likewise ethanol, ice and fused silica). The medium is now drawn as
+        before and REDRAWN from the media whose RF permittivity equals the
+        square of the optical index to within about 1% - no orientational
+        polarisation, negligible dispersion between 589 nm and RF: Vacuum
+        (exact), Air (eps_r 1.00059), Helium (1.000065), Carbon Dioxide
+        (1.00092), Benzene (2.28), Carbon Disulfide (2.64), Polystyrene
+        (2.55) and Diamond (5.7). The optical u_p is a correct RF value for
+        each of these, so the table itself is untouched. One expert also
+        noted that in the frequency-first scenario the given f (4 s.f., e.g.
+        260.5 MHz) was displayed and consumed at `.2e` (2.60e+08 Hz), moving
+        k by 0.2% from what the question's own value gives; f is now bound
+        through a `.3e` display, exact for every 1-dp MHz value, and a draw
+        whose lambda = u_p / f sits on a 3-dp display tie is rejected and
+        redrawn (D-016). The wavelength-first scenario is unchanged. The
+        question and gold change on every seed whose medium is redrawn and,
+        in the frequency-first scenario, wherever the fourth digit of f
+        mattered.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking to compute various wave parameters.
             - str: A step-by-step solution showing the calculations.
     """
     # 1. Parameterize the inputs with random values
+    # The table's velocities are optical (589 nm). At the RF frequencies of
+    # this problem they hold only for media with no dipolar polarisation and
+    # negligible dispersion, so a draw outside that set is redrawn from it
+    # (Layer 2 fix, 2026-09-25; the eps_r values are in the docstring).
+    rf_valid_media = ("Vacuum", "Air (at sea level)", "Helium", "Carbon Dioxide",
+                      "Benzene", "Carbon Disulfide", "Polystyrene", "Diamond")
     medium_name, u_p = random.choice(list(MEDIA_VELOCITIES.items()))
+    if medium_name not in rf_valid_media:
+        medium_name, u_p = random.choice(
+            [(m, v) for m, v in MEDIA_VELOCITIES.items() if m in rf_valid_media])
     start_with_frequency = random.choice([True, False])
 
     # u_p is stated in the question at `.2e`, pi is printed to 5 dp, and f and
-    # lambda are displayed at `.2e` and 3 dp before they are consumed: each is
-    # bound through its own display (D-016 part 2).
+    # lambda are displayed at `.3e`/`.2e` and 3 dp before they are consumed:
+    # each is bound through its own display (D-016 part 2).
     u_p = _as_printed(u_p, '.2e')
     pi_p = _as_printed(math.pi, '.5f')
     if start_with_frequency:
         # Scenario 1: Given frequency and medium
-        f_mhz = round(random.uniform(50, 500), 1)
-        f = _as_printed(f_mhz * 1e6, '.2e')
+        # f in MHz has 1 dp (4 s.f. at most), so its `.3e` display is exact;
+        # a draw whose lambda sits on a 3-dp display tie is rejected (D-016).
+        for _attempt in range(200):
+            f_mhz = round(random.uniform(50, 500), 1)
+            f = _as_printed(f_mhz * 1e6, '.3e')
+            if not _is_display_tie(u_p / f, 3):
+                break
+        else:
+            raise RuntimeError("wave_parameters_basic: no closing sample in 200 draws")
 
         # 2. Perform the core calculations
         omega = 2 * pi_p * f
@@ -117,21 +158,21 @@ def template_wave_parameters_basic():
 
         solution = (
             f"**Given:**\n"
-            f"- Frequency (f) = {f_mhz} MHz = {f:.2e} Hz\n"
+            f"- Frequency (f) = {f_mhz} MHz = {f:.3e} Hz\n"
             f"- Medium = {medium_name}\n"
             f"- Phase Velocity (u_p) = {u_p:.2e} m/s\n\n"
-            
+
             f"**Step 1:** Calculate the Angular Frequency (omega)\n"
             f"The angular frequency is related to frequency by omega = 2 * pi * f.\n"
-            f"   omega = 2 * {math.pi:.5f} * ({f:.2e} Hz) = {omega:.2e} rad/s\n\n"
+            f"   omega = 2 * {math.pi:.5f} * ({f:.3e} Hz) = {omega:.2e} rad/s\n\n"
 
             f"**Step 2:** Calculate the Period (T)\n"
             f"The period is the inverse of the frequency, T = 1 / f.\n"
-            f"   T = 1 / ({f:.2e} Hz) = {T:.2e} s\n\n"
+            f"   T = 1 / ({f:.3e} Hz) = {T:.2e} s\n\n"
 
             f"**Step 3:** Calculate the Wavelength (lambda)\n"
             f"The wavelength is found using the phase velocity, lambda = u_p / f.\n"
-            f"   lambda = ({u_p:.2e} m/s) / ({f:.2e} Hz) = {round(lambda_, 3)} m\n\n"
+            f"   lambda = ({u_p:.2e} m/s) / ({f:.3e} Hz) = {round(lambda_, 3)} m\n\n"
 
             f"**Step 4:** Calculate the Wavenumber (k)\n"
             f"The wavenumber (or phase constant) is given by k = 2 * pi / lambda.\n"
@@ -229,6 +270,21 @@ def template_time_to_phasor():
         every draw that is not rejected; the rectangular answer may move by
         one unit in the last place.
 
+    Layer 2 fix (2026-09-25):
+        Two of the three branch experts rejected the template on the same
+        line: Step 2 of every sine instance said "the sine function LEADS
+        the cosine function by 90 degrees", which contradicts the identity
+        it then quotes - sin(theta) = cos(theta - 90 deg) means sine LAGS
+        cosine by 90 deg. The wording now says lags; the identity, the
+        phase arithmetic and every number were already correct. The same
+        experts noted that the 2-dp values were printed with `round()`,
+        which drops a trailing zero (seed 2103: "117.8" for 117.80, "-0.7"
+        for -0.70 degrees); the phase, the components and the rectangular
+        form are now printed with a fixed 2-dp format, so the digits shown
+        are the digits bound. No sampled value, formula or gold value
+        changes; the question text is unchanged on every seed, and the gold
+        answer's text changes only where a trailing zero was dropped.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the phasor form of a given time-domain signal.
@@ -277,16 +333,16 @@ def template_time_to_phasor():
                 "**Step 2:** Identify the function type.\n"
                 "   The function is a cosine, which is the standard reference for phasors. "
                 "No phase adjustment is needed.\n"
-                f"   The initial phase is {round(phi_deg, precision)} degrees.\n"
+                f"   The initial phase is {phi_deg:.{precision}f} degrees.\n"
             )
         else: # func_type == 'sin'
             phasor_phi_deg = phi_deg - 90
             phasor_phi_rad = math.radians(phasor_phi_deg)
             conversion_step = (
                 "**Step 2:** Convert the sine function to cosine.\n"
-                "   The sine function leads the cosine function by 90 degrees. To convert, "
+                "   The sine function lags the cosine function by 90 degrees. To convert, "
                 "we use the identity sin(theta) = cos(theta - 90 deg).\n"
-                f"   New phase = (Initial Phase) - 90 deg = {round(phi_deg, precision)} - 90 = {round(phasor_phi_deg, precision)} degrees.\n"
+                f"   New phase = (Initial Phase) - 90 deg = {phi_deg:.{precision}f} - 90 = {phasor_phi_deg:.{precision}f} degrees.\n"
             )
 
         # Normalize the final phase angle to be between -180 and 180 degrees,
@@ -316,8 +372,11 @@ def template_time_to_phasor():
 
     # Bound before the f-string, not computed inside it: a quantity in result
     # position must be a name, so the printed value and the stored value are
-    # the same value (P2/P3, and T5a's static rule).
-    rect_form = rect_str(real_part, imag_part, precision)
+    # the same value (P2/P3, and T5a's static rule). Built here rather than
+    # with rect_str, whose round() drops a trailing zero (Layer 2 fix): the
+    # sign sits on the operator and each magnitude keeps its 2 dp.
+    imag_op = "-" if imag_part < 0 else "+"
+    rect_form = f"{real_part:.{precision}f} {imag_op} j{abs(imag_part):.{precision}f}"
 
     # 3. Generate the question and solution strings
     question = (
@@ -340,15 +399,15 @@ def template_time_to_phasor():
         f"**Step 3:** Write the phasor in polar form.\n"
         f"   Phase angles are conventionally expressed in the range [-180°, 180°].\n"
         f"   The phasor has the signal's amplitude and the adjusted phase.\n"
-        f"   Phasor V = {round(phasor_amplitude, precision)} < {round(phasor_phi_deg, precision)} degrees.\n\n"
-        
+        f"   Phasor V = {round(phasor_amplitude, precision)} < {phasor_phi_deg:.{precision}f} degrees.\n\n"
+
         f"**Step 4:** Convert the polar form to rectangular form (x + jy).\n"
-        f"   x (real part) = A * cos(phi) = {round(phasor_amplitude, precision)} * cos({round(phasor_phi_deg, precision)} deg) = {round(real_part, precision)}\n"
-        f"   y (imaginary part) = A * sin(phi) = {round(phasor_amplitude, precision)} * sin({round(phasor_phi_deg, precision)} deg) = {round(imag_part, precision)}\n"
+        f"   x (real part) = A * cos(phi) = {round(phasor_amplitude, precision)} * cos({phasor_phi_deg:.{precision}f} deg) = {real_part:.{precision}f}\n"
+        f"   y (imaginary part) = A * sin(phi) = {round(phasor_amplitude, precision)} * sin({phasor_phi_deg:.{precision}f} deg) = {imag_part:.{precision}f}\n"
         f"   Phasor V = {rect_form}\n\n"
 
         f"**Answer:**\n"
-        f"   The phasor representation is {round(phasor_amplitude, precision)} < {round(phasor_phi_deg, precision)} degrees, "
+        f"   The phasor representation is {round(phasor_amplitude, precision)} < {phasor_phi_deg:.{precision}f} degrees, "
         f"which is equivalent to {rect_form}."
     )
 

@@ -1,6 +1,6 @@
 {
- "generated": "2026-09-23T19:31:26+00:00",
- "git_head": "8224d8baec3c958343fe58b995f7abd2fffdecbb",
+ "generated": "2026-09-25T11:16:28+00:00",
+ "git_head": "30e6988a37a301ff35206a71d3dbfa3b454b47a2",
  "seeds": 500,
  "gating": [
   "T1",
@@ -24,7 +24,7 @@
  },
  "advisory_failing": {
   "T5": 60,
-  "T7": 83
+  "T7": 81
  },
  "register_absorbed": {
   "template_time_rate_of_consolidation::H_dr,field / H_dr,lab = .* m / .* mm = .* mm / .* mm =": 500,
@@ -353,7 +353,7 @@
     "failures": 0,
     "excused": {},
     "unexcused": 0,
-    "marginals": 388,
+    "marginals": 475,
     "checks": 2500,
     "unit_rescales": 0,
     "coverage": 0.278,
@@ -1099,7 +1099,7 @@
      "degenerate_product"
     ]
    },
-   "T5": true,
+   "T5": false,
    "T7": false
   },
   "template_hagen_poiseuille_flowrate": {
@@ -1154,10 +1154,10 @@
     "failures": 0,
     "excused": {},
     "unexcused": 0,
-    "marginals": 319,
-    "checks": 1000,
+    "marginals": 580,
+    "checks": 1500,
     "unit_rescales": 0,
-    "coverage": 0.333,
+    "coverage": 0.429,
     "examples": []
    },
    "T2": {
@@ -1276,8 +1276,8 @@
      "degenerate_product"
     ]
    },
-   "T5": false,
-   "T7": false
+   "T5": true,
+   "T7": true
   },
   "template_power_law_fluid_shear": {
    "branch": "chemical_engineering",
@@ -3467,7 +3467,7 @@
     "failures": 0,
     "excused": {},
     "unexcused": 0,
-    "marginals": 551,
+    "marginals": 610,
     "checks": 1263,
     "unit_rescales": 0,
     "coverage": 0.417,
@@ -3558,7 +3558,7 @@
      "^omega = 2 \\* 3\\.14159 \\* \\([0-9.]+e\\+\\d+ Hz\\) = [0-9.]+e\\+\\d+ rad/s": 500
     },
     "unexcused": 0,
-    "marginals": 261,
+    "marginals": 260,
     "checks": 1500,
     "unit_rescales": 0,
     "coverage": 0.273,
@@ -5509,10 +5509,10 @@
     "failures": 0,
     "excused": {},
     "unexcused": 0,
-    "marginals": 133,
-    "checks": 1254,
+    "marginals": 434,
+    "checks": 1760,
     "unit_rescales": 0,
-    "coverage": 0.139,
+    "coverage": 0.186,
     "examples": []
    },
    "T2": {
@@ -5773,7 +5773,7 @@
     "failures": 0,
     "excused": {},
     "unexcused": 0,
-    "marginals": 326,
+    "marginals": 301,
     "checks": 2000,
     "unit_rescales": 0,
     "coverage": 0.444,
@@ -5817,7 +5817,7 @@
     "failures": 0,
     "excused": {},
     "unexcused": 0,
-    "marginals": 150,
+    "marginals": 153,
     "checks": 500,
     "unit_rescales": 0,
     "coverage": 0.095,
@@ -5851,7 +5851,7 @@
     ]
    },
    "T5": false,
-   "T7": false
+   "T7": true
   },
   "template_basic_stress_strain": {
    "branch": "mechanical_engineering",
@@ -5905,10 +5905,10 @@
     "failures": 0,
     "excused": {},
     "unexcused": 0,
-    "marginals": 652,
-    "checks": 1210,
+    "marginals": 619,
+    "checks": 1247,
     "unit_rescales": 0,
-    "coverage": 0.121,
+    "coverage": 0.122,
     "examples": []
    },
    "T2": {
@@ -6001,7 +6001,7 @@
     "failures": 0,
     "excused": {},
     "unexcused": 0,
-    "marginals": 777,
+    "marginals": 769,
     "checks": 2500,
     "unit_rescales": 0,
     "coverage": 0.217,
@@ -6045,7 +6045,7 @@
     "failures": 0,
     "excused": {},
     "unexcused": 0,
-    "marginals": 268,
+    "marginals": 302,
     "checks": 1500,
     "unit_rescales": 0,
     "coverage": 0.214,
@@ -6233,7 +6233,7 @@
     "failures": 0,
     "excused": {},
     "unexcused": 0,
-    "marginals": 285,
+    "marginals": 284,
     "checks": 1000,
     "unit_rescales": 0,
     "coverage": 0.133,
@@ -6427,7 +6427,7 @@
     "failures": 0,
     "excused": {},
     "unexcused": 0,
-    "marginals": 1954,
+    "marginals": 1968,
     "checks": 3500,
     "unit_rescales": 0,
     "coverage": 0.438,
@@ -6440,7 +6440,7 @@
     "unparsed": 0,
     "failures": 0,
     "failure_rate": 0.0,
-    "worst_rel_error": 0.0005285919565152539,
+    "worst_rel_error": 0.0007636688137782143,
     "note": "",
     "examples": []
    },
@@ -6747,5 +6747,5 @@
    "T7": false
   }
  },
- "seconds": 154.5
+ "seconds": 184.9
 }

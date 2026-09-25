@@ -145,3 +145,58 @@ template_xbar_r_control_limits                   question    1/300  answer    1/
 
 68 templates moved; totals {'q': 2203, 'ans': 6993, 'sol': 13692, 'err_before': 0, 'err_after': 0}
 ```
+
+
+# Layer 2, round 1 — the 22 expert-rejected templates
+
+Measured 2026-09-25 by the same script, 150 templates × 300 seeds: HEAD `30e6988` dumped from a detached worktree against the working tree after the Layer 2 fixes (`../layer2/fixes_round1.md`). Only templates that moved are listed.
+
+```
+before: C:\Users\ayesha.gull01\AppData\Local\Temp\claude\c--Users-ayesha-gull01-EngTrace\ee94e7a8-9f53-4f47-9626-9630fa10c39c\scratchpad\wt_l2head (n=300)
+after : C:\Users\ayesha.gull01\EngTrace (n=300)
+
+template_angle_of_twist                          question  185/300  answer  281/300  solution  281/300  errors 0->0
+    seed 0 answer: 'The total angle of twist is 0.0579 radians, which is equivalent to 3.3' -> 'The total angle of twist is 0.05791 radians, which is equivalent to 3.'
+template_annulus_flowrate                        question   68/300  answer   68/300  solution   68/300  errors 0->0
+    seed 5 answer: 'The volumetric flow rate is **7.4839e-03 m^3/s**.' -> 'The volumetric flow rate is **5.2129e-03 m^3/s**.'
+template_axial_deformation                       question  201/300  answer  252/300  solution  272/300  errors 0->0
+    seed 0 answer: 'The total elongation of the rod is **0.043 in**.' -> 'The total elongation of the rod is **0.04335 in**.'
+template_basic_buoyant_force                     question  300/300  answer    0/300  solution    0/300  errors 0->0
+    seed 0 answer: 'The buoyant force acting on the pyramid is 8454.65 N, which is equival' -> 'The buoyant force acting on the pyramid is 8454.65 N, which is equival'
+template_basic_stress_strain                     question    0/300  answer  153/300  solution  153/300  errors 0->0
+    seed 1 answer: 'a) Normal Stress (sigma) = **27.852 MPa**\nb) Normal Strain (epsilon) =' -> 'a) Normal Stress (sigma) = **27.852 MPa**\nb) Normal Strain (epsilon) ='
+template_falling_film_max_velocity               question    0/300  answer  300/300  solution  300/300  errors 0->0
+    seed 0 answer: 'The maximum velocity of the Seawater (3.5% salinity) film is 0.55942 m' -> 'The maximum velocity of the Seawater (3.5% salinity) film is 5.5942e-0'
+template_finite_convolution                      question  300/300  answer    0/300  solution  300/300  errors 0->0
+    seed 0 answer: 'The complete output sequence is y[n] = {-3, -1, -5, 1, 3, *-1*, 0}' -> 'The complete output sequence is y[n] = {-3, -1, -5, 1, 3, *-1*, 0}'
+template_flow_system_molar_flow_rates            question    0/300  answer    0/300  solution  300/300  errors 0->0
+    seed 0 answer: 'The molar flow rates exiting the reactor are:\n- CH4(g) (F_A): 42.7720 ' -> 'The molar flow rates exiting the reactor are:\n- CH4(g) (F_A): 42.7720 '
+template_gas_viscosity_kinetic_theory            question  300/300  answer  299/300  solution  300/300  errors 0->0
+    seed 0 answer: 'The estimated dynamic viscosity of Butane (C₄H₁₀) at 465 K is **2.094e' -> 'The estimated dynamic viscosity of Butane (C₄H₁₀) at 465 K is **1.170e'
+template_hagen_poiseuille_flowrate               question   29/300  answer  300/300  solution  300/300  errors 0->0
+    seed 0 answer: 'The volumetric flow rate of Ethylene Glycol through the pipe is 0.0000' -> 'The volumetric flow rate of Ethylene Glycol through the pipe is 8.3009'
+template_multi_segment_rod                       question  271/300  answer  271/300  solution  271/300  errors 0->0
+    seed 0 answer: 'The total deformation of the rod is **2.392 mm** (a net elongation).' -> 'The total deformation of the rod is **0.0419 in** (a net elongation).'
+template_newtons_law_shear_stress                question  300/300  answer  300/300  solution  300/300  errors 0->0
+    seed 0 answer: 'a) The shear stress in the fluid is **0.057 Pa**.\nb) The force require' -> 'a) The shear stress in the fluid is **5.65383e-02 Pa**.\nb) The force r'
+template_power_law_fluid_shear                   question   17/300  answer  300/300  solution  300/300  errors 0->0
+    seed 0 answer: 'a) The shear stress on the fluid is **80.272 Pa**.\nb) The apparent vis' -> 'a) The shear stress on the fluid is **8.0275e+01 Pa**.\nb) The apparent'
+template_statically_indeterminate                question  159/300  answer  155/300  solution  159/300  errors 0->0
+    seed 0 answer: 'a) Reaction Forces: R_A = **38.264 kips** and R_C = **135.736 kips**.\n' -> 'a) Reaction Forces: R_A = **127.133 kips** and R_C = **122.867 kips**.'
+template_statically_indeterminate_shaft          question   82/300  answer   39/300  solution   82/300  errors 0->0
+    seed 2 answer: 'The reaction torques at the supports are:\nT_A = 3576.75 N.m\nT_B = 1223' -> 'The reaction torques at the supports are:\nT_A = 447.09 N.m\nT_B = 152.9'
+template_time_to_phasor                          question    0/300  answer  201/300  solution  243/300  errors 0->0
+    seed 0 answer: 'The phasor representation is 127.44 < -176.8 degrees, which is equival' -> 'The phasor representation is 127.44 < -176.80 degrees, which is equiva'
+template_utube_manometer                         question  288/300  answer  288/300  solution  288/300  errors 0->0
+    seed 0 answer: 'The gauge pressure in the pipe is 19.891 kPa.' -> 'The gauge pressure in the pipe is 6.127 kPa.'
+template_vibration_transmissibility              question  238/300  answer  233/300  solution  253/300  errors 0->0
+    seed 0 answer: 'The displacement transmissibility ratio is **0.9639**.\nThe absolute am' -> 'The displacement transmissibility ratio is **0.9639**.\nThe absolute am'
+template_volumetric_flow_rate                    question   10/300  answer  190/300  solution  300/300  errors 0->0
+    seed 0 answer: 'The volumetric flow rate is 0.179 m^3/s, and the average velocity is 3' -> 'The volumetric flow rate is 0.1790 m^3/s, and the average velocity is '
+template_wave_parameters_basic                   question  181/300  answer  220/300  solution  248/300  errors 0->0
+    seed 0 answer: '- Frequency (f): 1094.44 MHz\n- Angular Frequency (omega): 6.85e+09 rad' -> '- Angular Frequency (omega): 1.05e+09 rad/s\n- Period (T): 6.01e-09 s\n-'
+
+20 templates moved; totals {'q': 2929, 'ans': 3850, 'sol': 4718, 'err_before': 0, 'err_after': 0}
+```
+
+Cumulative since `b1445ad` (the same script against the pre-edit dump): **77 templates moved; question 4,843 / answer 10,147 / solution 16,514 of 45,000; errors 0 → 0.**

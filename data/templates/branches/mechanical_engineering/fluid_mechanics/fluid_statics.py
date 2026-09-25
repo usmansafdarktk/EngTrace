@@ -212,6 +212,25 @@ def template_basic_buoyant_force():
         the answer, moved on 96.2% of 501 seeds (0-500); the fluid is drawn
         before the shape and is unchanged.
 
+    Layer 2 fix (2026-09-25):
+        One expert of the branch rejected the template: material and fluid
+        are drawn independently, so a body lighter than the fluid was
+        called "solid ... fully submerged" with nothing holding it there -
+        aluminum in mercury (seed 2101, which would float carrying its own
+        19 kN weight, not 96.5 kN), cork in ethanol (2104), balsa in engine
+        oil (2105). Of the two remedies the expert offered, the question
+        now states the restraint: the body "is held fully submerged ... by
+        a rigid clamp". Chosen over rejecting rho_object < rho_fluid draws
+        because (a) Archimedes' principle gives rho_fluid * g * V for any
+        body held fully under the surface, so the restraint makes every
+        drawn pair physically exact without touching the arithmetic, and
+        (b) the rejection would need a density for each of the 30
+        descriptive OBJECT_MATERIALS names ("foam", "plastic", "fiberglass"
+        and "ceramic" have no MATERIAL_DENSITIES row) and would remove
+        every light material in every fluid and every material in mercury,
+        a large and material-selective cut of the pool. Wording only: the
+        gold answer is unchanged on every seed.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the buoyant force on an object.
@@ -256,7 +275,7 @@ def template_basic_buoyant_force():
 
     question = (
         f"A solid {material} {shape} with a total volume of {object_volume} m^3 is "
-        f"fully submerged in a tank of {fluid_name.lower()}. "
+        f"held fully submerged in a tank of {fluid_name.lower()} by a rigid clamp. "
         f"Given that the density of {fluid_name.lower()} is {density_rho} kg/m^3, "
         f"calculate the buoyant force acting on the {shape}."
     )
@@ -314,6 +333,19 @@ def template_utube_manometer():
         2). A gas density carries more decimals; a draw whose exact term sits
         on a 4-dp tie, or whose gauge pressure sits on the 3-dp kPa tie of
         Step 6, is redrawn (D-016 part 3). The kPa answer keeps its 3 dp.
+
+    Layer 2 fix (2026-09-25):
+        All three experts of the branch rejected the template because
+        MANOMETER_FLUIDS carried zinc (6570 kg/m^3, the density of the
+        molten metal, solid below 420 C) and it was the manometer liquid in
+        seeds 2102-2104 against engine oil, gasoline and isopropyl alcohol
+        at ambient conditions (16.182, 35.099, 35.35 kPa). The table's
+        "Molten Metals" group - gallium, tin and zinc - is deleted in
+        constants.py (see the note there); nothing in this function
+        changes. The hydrostatic balance and arithmetic were confirmed
+        correct by all three experts. Deleting rows re-indexes
+        random.choice over the table (D-031), so the item-pool effect is
+        wholesale; it is measured in the Layer 2 fix report.
 
     Returns:
         tuple: A tuple containing:

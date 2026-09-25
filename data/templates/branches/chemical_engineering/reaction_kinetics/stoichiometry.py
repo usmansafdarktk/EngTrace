@@ -243,7 +243,25 @@ def template_flow_system_molar_flow_rates():
         through that display (D-016 part 2, as the sibling batch template
         does), so nothing rounds and no line can tie. Theta_B and Theta_C
         remain 3-dp quotients shown as the cross-check; the direct-method
-        line is the one that closes exactly.
+        line is the one that closes exactly. (The cross-check lines are
+        reworked in the Layer 2 fix below.)
+
+    Layer 2 fix (2026-09-25):
+        One expert found the Step 3 "Theta Method" lines substituting Theta
+        rounded to 3 dp but printing the exact direct-method result, so they
+        did not follow from their printed operands: instance 2,
+        120.26(1.665 - (5/4)(0.67)) = 99.515, printed 99.572250; instance 3,
+        100.93(0.151 + 0.52) = 67.724, printed 67.7736. Confirmed on seeds
+        2102 and 2103. Theta_B and Theta_C are now printed at 4 dp and bound
+        through that display, and each Theta-method line is computed from
+        the printed Theta in exact decimal arithmetic at the 6 dp the product
+        has (a 4-dp Theta minus a 2-dp conversion times a small ratio, times
+        a 2-dp flow), so the line closes and nothing rounds (D-037); a
+        following sentence says the small difference from the direct-method
+        value is the rounding of Theta. The direct method remains the answer
+        and no gold answer changes. A quotient F_j0/F_A0 whose 4-dp display
+        sits on a half-way tie (possible when 100*F_A0 has only the factors
+        2 and 5) is redrawn (D-016); no question text changes on a kept draw.
 
     Returns:
         tuple: A tuple containing:
@@ -273,24 +291,35 @@ def template_flow_system_molar_flow_rates():
     else:
         product_D_name, d = "None", 0
 
-    # Generate inlet molar flow rates (mol/min)
-    # Ensure A is the limiting reactant by providing excess B
-    F_A0 = round(random.uniform(50.0, 150.0), 2)
-    min_F_B0 = (F_A0 / a) * b
-    F_B0 = round(min_F_B0 * random.uniform(1.2, 2.5), 2)
-    
-    # Inlet product flow is usually zero or small
-    F_C0 = round(random.choice([0.0, random.uniform(5.0, 20.0)]), 2)
-    F_D0 = 0.0
+    for _attempt in range(200):
+        # Generate inlet molar flow rates (mol/min)
+        # Ensure A is the limiting reactant by providing excess B
+        F_A0 = round(random.uniform(50.0, 150.0), 2)
+        min_F_B0 = (F_A0 / a) * b
+        F_B0 = round(min_F_B0 * random.uniform(1.2, 2.5), 2)
 
-    # Generate a realistic conversion
-    X_A = round(random.uniform(0.50, 0.90), 2)
+        # Inlet product flow is usually zero or small
+        F_C0 = round(random.choice([0.0, random.uniform(5.0, 20.0)]), 2)
+        F_D0 = 0.0
+
+        # Generate a realistic conversion
+        X_A = round(random.uniform(0.50, 0.90), 2)
+
+        # Theta_B and Theta_C are printed at 4 dp and then consumed by the
+        # cross-check lines, so they are bound through that display (D-016
+        # part 2); a quotient whose display sits on a half-way tie is redrawn.
+        if _is_display_tie(F_B0 / F_A0, 4) or _is_display_tie(F_C0 / F_A0, 4):
+            continue
+        break
+    else:
+        raise RuntimeError(
+            "flow_system_molar_flow_rates: no display-stable sample in 200 draws")
 
     # 2. Core Calculations
-    
-    # Calculate Theta values
-    Theta_B = F_B0 / F_A0
-    Theta_C = F_C0 / F_A0
+
+    # Calculate Theta values, bound through their 4-dp display
+    Theta_B = _as_printed(F_B0 / F_A0, '.4f')
+    Theta_C = _as_printed(F_C0 / F_A0, '.4f')
 
     # Calculate outlet molar flow rates, in exact decimal arithmetic and
     # bound through their display (D-016 part 2). The display precision is
@@ -302,6 +331,23 @@ def template_flow_system_molar_flow_rates():
     F_B = _hu(Decimal(repr(F_B0)) - _dA0 * _dX * b / a, _p)
     F_C = _hu(Decimal(repr(F_C0)) + _dA0 * _dX * c / a, _p)
     F_D = _hu(Decimal(repr(F_D0)) + _dA0 * _dX * d / a, _p) if has_product_D else 0.0
+
+    # The Theta-method cross-check lines are computed from the PRINTED
+    # 4-dp Theta (Layer 2): a 4-dp Theta minus a 2-dp conversion times a
+    # ratio with a in {1, 2, 4, 5}, times a 2-dp flow, is exact at 6 dp, so
+    # the line is printed at that length and nothing rounds (D-037).
+    _dTB, _dTC = Decimal(repr(Theta_B)), Decimal(repr(Theta_C))
+    F_B_theta = _hu(_dA0 * (_dTB - _dX * b / a), 6)
+    F_C_theta = _hu(_dA0 * (_dTC + _dX * c / a), 6)
+
+    def _theta_note(sym, theta_val, direct_val):
+        if theta_val == direct_val:
+            return (f"(Theta_{sym} is exact at 4 dp here, so the two methods "
+                    f"agree exactly.)")
+        return (f"(The small difference from the direct-method value is the "
+                f"rounding of Theta_{sym} to 4 dp; the direct-method value is exact.)")
+    theta_note_B = _theta_note('B', F_B_theta, F_B)
+    theta_note_C = _theta_note('C', F_C_theta, F_C)
     
     # 3. Generate Question and Solution Strings
     question = (
@@ -348,16 +394,18 @@ def template_flow_system_molar_flow_rates():
         f"**For {reactant_B_name} (B):**\n"
         f"*Using the Direct Method:*\n"
         f"F_B = F_B0 - ({b}/{a}) * F_A0 * X_A = {F_B0} - ({b}/{a}) * {F_A0} * {X_A} = {F_B:.{_p}f} mol/min\n"
-        f"*Using the Theta Method:*\n"
-        f"Theta_B = F_B0 / F_A0 = {F_B0} / {F_A0} = {round(Theta_B, 3)}\n"
-        f"F_B = F_A0(Theta_B - ({b}/{a})X_A) = {F_A0}({round(Theta_B, 3)} - ({b}/{a}) * {X_A}) = {F_B:.{_p}f} mol/min\n\n"
+        f"*Using the Theta Method (cross-check):*\n"
+        f"Theta_B = F_B0 / F_A0 = {F_B0} / {F_A0} = {Theta_B:.4f}\n"
+        f"F_B = F_A0(Theta_B - ({b}/{a})X_A) = {F_A0}({Theta_B:.4f} - ({b}/{a}) * {X_A}) = {F_B_theta:.6f} mol/min\n"
+        f"{theta_note_B}\n\n"
 
         f"**For {product_C_name} (C):**\n"
         f"*Using the Direct Method:*\n"
         f"F_C = F_C0 + ({c}/{a}) * F_A0 * X_A = {F_C0} + ({c}/{a}) * {F_A0} * {X_A} = {F_C:.{_p}f} mol/min\n"
-        f"*Using the Theta Method:*\n"
-        f"Theta_C = F_C0 / F_A0 = {F_C0} / {F_A0} = {round(Theta_C, 3)}\n"
-        f"F_C = F_A0(Theta_C + ({c}/{a})X_A) = {F_A0}({round(Theta_C, 3)} + ({c}/{a}) * {X_A}) = {F_C:.{_p}f} mol/min\n\n"
+        f"*Using the Theta Method (cross-check):*\n"
+        f"Theta_C = F_C0 / F_A0 = {F_C0} / {F_A0} = {Theta_C:.4f}\n"
+        f"F_C = F_A0(Theta_C + ({c}/{a})X_A) = {F_A0}({Theta_C:.4f} + ({c}/{a}) * {X_A}) = {F_C_theta:.6f} mol/min\n"
+        f"{theta_note_C}\n\n"
     )
 
     if has_product_D:

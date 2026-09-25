@@ -1275,8 +1275,17 @@ POWER_LAW_FLUIDS = {
     "Latex Paint": (45.0, 0.45),
     "Printing Ink": (10.0, 0.7),
 
-    # Biological Fluids (Mostly Shear-Thinning)
-    "Blood (Plasma)": (0.012, 0.95), # Very low K, nearly Newtonian
+    # Biological Fluids
+    # Literature value, no primary source on disk: covered by the table-level UNVERIFIED
+    #   tag above (a per-row tag would move the register's chemical count from 12 to 13;
+    #   tests/constants_integrity/test_registers_reconcile). Layer 2 fix (2026-09-25):
+    #   was (0.012, 0.95), which two expert reviewers found about eight times too viscous
+    #   (eta = 0.0095 Pa*s at 115 1/s; K looked like a whole-blood value). Plasma is
+    #   Newtonian, so n = 1 and K is its dynamic viscosity: normal range 1.10-1.30 mPa*s
+    #   at 37 degC (Kesmarky, Kenyeres, Rabai & Toth, "Plasma viscosity: a forgotten
+    #   variable", Clin. Hemorheol. Microcirc. 39 (2008) 243-246; Merrill, "Rheology of
+    #   blood", Physiol. Rev. 49 (1969) 863-888 gives 1.2 cP at 37 degC). C3.5 residual.
+    "Blood (Plasma)": (0.0012, 1.0), # Newtonian; K is the dynamic viscosity at 37 degC
     "Mucus": (10.0, 0.5),
 
     # Polymer Solutions & Melts (Shear-Thinning)

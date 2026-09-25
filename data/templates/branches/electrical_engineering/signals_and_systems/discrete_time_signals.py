@@ -340,6 +340,20 @@ def template_finite_convolution():
     Core Equations:
         1. Convolution Sum: y[n] = sum(x[k] * h[n-k]) for all k
 
+    Layer 2 fix (2026-09-25):
+        A branch expert rejected the template as unsolvable as posed: the
+        origins of x[n] and h[n] are drawn at random, but the question
+        marked n = 0 only by wrapping one sample in asterisks, a convention
+        it never defined (and one that renders as italics in markdown). A
+        reader placing both sequences at n = 0 gets the right values at the
+        wrong indices (seed 2101: y[0]..y[5] for the gold y[-3]..y[2]). The
+        question now defines the convention in the words
+        template_signal_operations uses, states the two origin samples
+        explicitly (h[0] = ..., x[0] = ...), and asks for y[n] in the same
+        notation; Step 3 restates it before the answer. No sampled value,
+        formula or gold value changes; the question text changes on every
+        seed and the gold answer on none.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking to find the output of an LTI system.
@@ -404,9 +418,15 @@ def template_finite_convolution():
     
     # 3. Generate the question and solution strings
     
+    # Both sequences contain n = 0 by construction (the origin position is
+    # drawn inside each support), so the origin samples are always present.
     question = (
         f"An LTI system has an impulse response h[n] = {h_n_str}.\n\n"
-        f"Determine the system's output, y[n] = x[n] * h[n], for the input x[n] = {x_n_str}."
+        f"Determine the system's output, y[n] = x[n] * h[n] (the convolution of x[n] with h[n]), "
+        f"for the input x[n] = {x_n_str}.\n\n"
+        f"In each sequence the value at the origin n = 0 is enclosed in asterisks, "
+        f"so h[0] = {h_n[0]} and x[0] = {x_n[0]}, and the sequence is 0 outside the listed indices. "
+        f"Give y[n] in the same notation."
     )
 
     # Build the detailed calculation steps for the solution
@@ -476,7 +496,8 @@ def template_finite_convolution():
         
         f"**Step 3:** Calculate All Output Values\n"
         f"By continuing this process for all values of 'n' where the sequences overlap (from n={y_start_idx} to n={y_end_idx}), we get the full output sequence:\n"
-        f"{y_values_str}\n\n" 
+        f"{y_values_str}\n"
+        f"Collected into one sequence with the value at the origin n = 0 enclosed in asterisks, as in the question, this gives the answer.\n\n"
 
         f"**Answer:**\n"
         f"The complete output sequence is y[n] = {y_n_str}"

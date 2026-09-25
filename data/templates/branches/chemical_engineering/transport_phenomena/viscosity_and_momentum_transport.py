@@ -55,6 +55,18 @@ def _decimals(x):
     return max(0, -exponent)
 
 
+def _is_sci_display_tie(x, mant_dp):
+    """Is `x` on a half-way tie when printed with `.{mant_dp}e`?
+
+    The rounding position of a scientific display moves with the decade, so
+    the fixed-place test is applied at `mant_dp` places below the leading
+    digit (D-016).
+    """
+    if x == 0:
+        return False
+    return _is_display_tie(x, mant_dp - math.floor(math.log10(abs(x))))
+
+
 # Template 1 (Easy)
 def template_newtons_law_shear_stress():
     """
@@ -72,6 +84,31 @@ def template_newtons_law_shear_stress():
             - Shear Stress: tau_yx = mu * (dvx/dy)
             - Force: F = tau_yx * A
 
+    Layer 2 fix (2026-09-25):
+        All three experts found the question unsolvable as stated: the
+        viscosity the solution uses appeared only in the solution's "Given
+        Information", and literature values for the table's fluids differ by
+        20% or more (plasma 1.1-1.6 mPa.s), so a reader could not reach the
+        gold answer. Confirmed on seeds 2101-2105. The question now states
+        mu, with three significant figures as before, or four where the table
+        value has them (water 1.002e-3, ethanol 1.074e-3, mercury 1.526e-3)
+        and the value used is the displayed one (D-016 part 2, D-037). The
+        same experts found tau and F printed at a fixed 3 dp (instance 4:
+        tau = 0.0265 Pa printed as 0.027 Pa) and Y printed as a raw float
+        ("0.34 cm = 0.0034000000000000002 m"); Y is now bound through its
+        exact 4-dp metre display, and tau and F are printed in scientific
+        notation at their exact length (never shorter than a 4-dp mantissa):
+        with dvx/dy bound at 2 dp they are products of finite decimals, and a
+        fixed-width display sat on a half-way tie for half the draws of a
+        2-sf viscosity (measured 10.6% of seeds redrawn, 52% for diesel), so
+        the display is lengthened rather than the draw resampled (D-037).
+        Every displayed-and-consumed operand (Y, dvx/dy, tau) is bound
+        through its display, so each printed line is the product of the
+        printed operands; a draw whose dvx/dy (a 2-dp over 4-dp quotient)
+        sits on a half-way tie at 2 dp is redrawn (D-016; about 1% of
+        seeds, not concentrated by fluid). Every gold answer changes in
+        format; the question text changes on every seed (mu is added).
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking to compute shear stress and force.
@@ -79,21 +116,54 @@ def template_newtons_law_shear_stress():
     """
     # 1. Parameterize the inputs with random values
     fluid_name, (density, viscosity) = random.choice(list(COMMON_LIQUIDS.items()))
-    V = round(random.uniform(0.1, 2.0), 2)
-    Y_cm = round(random.uniform(0.1, 2.5), 2)
-    Y_m = Y_cm / 100
-    A = round(random.uniform(0.5, 5.0), 2)
+    # The viscosity is STATED (Layer 2: it was not, and the question could not
+    # be solved) with a 3-significant-figure display, or four where the table
+    # value has them; the value used is the displayed one (D-016 part 2).
+    mu_spec = '.2e' if float(format(viscosity, '.2e')) == viscosity else '.3e'
+    viscosity = _as_printed(viscosity, mu_spec)
 
-    # 2. Perform the core calculation
-    velocity_gradient = V / Y_m
-    shear_stress = viscosity * velocity_gradient
-    force = shear_stress * A
+    for _attempt in range(200):
+        V = round(random.uniform(0.1, 2.0), 2)
+        Y_cm = round(random.uniform(0.1, 2.5), 2)
+        # A 2-dp centimetre value is exactly 4 dp in metres; the float is not
+        # (0.34/100 = 0.0034000000000000002), so Y is bound through that display.
+        Y_m = _as_printed(Y_cm / 100, '.4f')
+        A = round(random.uniform(0.5, 5.0), 2)
+
+        # 2. Perform the core calculation. dvx/dy is printed at 2 dp and then
+        # consumed, so it is bound through that display. A quotient of a 2-dp
+        # by a 4-dp value can sit exactly on a half-way tie at 2 dp; such a
+        # draw is redrawn rather than resolved (D-016).
+        if _is_display_tie(V / Y_m, 2):
+            continue
+        velocity_gradient = _as_printed(V / Y_m, '.2f')
+        break
+    else:
+        raise RuntimeError(
+            "newtons_law_shear_stress: no display-stable sample in 200 draws")
+
+    # tau = mu * dvx/dy and F = tau * A are products of finite decimals (a
+    # 3-4 sf viscosity, a 2-dp gradient, a 2-dp area), so they are exact at a
+    # known length and are printed at that length in scientific notation,
+    # never shorter than a 4-dp mantissa: a fixed-width display would sit on
+    # a half-way tie for half the draws of a 2-sf viscosity (D-037: lengthen
+    # an exact display rather than resample). Both are at most 13 sf, so the
+    # float round-trips its own display exactly.
+    tau_dec = Decimal(repr(viscosity)) * Decimal(repr(velocity_gradient))
+    tau_dp = max(4, len(tau_dec.normalize().as_tuple().digits) - 1)
+    shear_stress = float(tau_dec)
+    assert _as_printed(shear_stress, f'.{tau_dp}e') == shear_stress
+    F_dec = tau_dec * Decimal(repr(A))
+    F_dp = max(4, len(F_dec.normalize().as_tuple().digits) - 1)
+    force = float(F_dec)
+    assert _as_printed(force, f'.{F_dp}e') == force
 
     # 3. Generate the question and solution strings
     question = (
         f"Two large parallel plates with an area of {A} m^2 each are separated by a "
         f"thin film of {fluid_name} that is {Y_cm} cm thick. The top plate is moved "
-        f"at a constant velocity of {V} m/s, while the bottom plate is held stationary.\n\n"
+        f"at a constant velocity of {V} m/s, while the bottom plate is held stationary. "
+        f"The dynamic viscosity of {fluid_name} is {viscosity:{mu_spec}} Pa·s.\n\n"
         f"Assuming the fluid exhibits Newtonian behavior and a linear velocity profile, calculate:\n"
         f"a) The shear stress (tau_yx) exerted on the fluid.\n"
         f"b) The total force (F) required to move the top plate at the given velocity."
@@ -102,31 +172,31 @@ def template_newtons_law_shear_stress():
     solution = (
         f"**Given Information:**\n"
         f"- Fluid: {fluid_name}\n"
-        f"- Dynamic Viscosity of {fluid_name} (mu): {viscosity:.2e} Pa·s\n"
+        f"- Dynamic Viscosity of {fluid_name} (mu): {viscosity:{mu_spec}} Pa·s\n"
         f"- Plate Area (A): {A} m^2\n"
         f"- Plate Velocity (V): {V} m/s\n"
-        f"- Distance between plates (Y): {Y_cm} cm = {Y_m} m\n\n"
-        
+        f"- Distance between plates (Y): {Y_cm} cm = {Y_m:.4f} m\n\n"
+
         f"**Step 1:** Calculate the velocity gradient (dvx/dy).\n"
         f"For a linear velocity profile between a stationary and a moving plate, the gradient is constant:\n"
         f"dvx/dy = V / Y\n"
-        f"dvx/dy = {V} m/s / {Y_m} m = {velocity_gradient:.2f} 1/s\n\n"
-        
+        f"dvx/dy = {V} m/s / {Y_m:.4f} m = {velocity_gradient:.2f} 1/s\n\n"
+
         f"**Step 2:** Calculate the shear stress (tau_yx).\n"
         f"Using Newton's Law of Viscosity:\n"
         f"tau_yx = mu * (dvx/dy)\n"
-        f"tau_yx = ({viscosity:.2e} Pa·s) * ({velocity_gradient:.2f} 1/s)\n"
-        f"tau_yx = {shear_stress:.3f} Pa\n\n"
-        
+        f"tau_yx = ({viscosity:{mu_spec}} Pa·s) * ({velocity_gradient:.2f} 1/s)\n"
+        f"tau_yx = {shear_stress:.{tau_dp}e} Pa\n\n"
+
         f"**Step 3:** Calculate the force (F).\n"
         f"Force is the shear stress acting over the entire area of the plate:\n"
         f"F = tau_yx * A\n"
-        f"F = ({shear_stress:.3f} Pa) * ({A} m^2)\n"
-        f"F = {force:.3f} N\n\n"
-        
+        f"F = ({shear_stress:.{tau_dp}e} Pa) * ({A} m^2)\n"
+        f"F = {force:.{F_dp}e} N\n\n"
+
         f"**Answer:**\n"
-        f"a) The shear stress in the fluid is **{shear_stress:.3f} Pa**.\n"
-        f"b) The force required to move the plate is **{force:.3f} N**."
+        f"a) The shear stress in the fluid is **{shear_stress:.{tau_dp}e} Pa**.\n"
+        f"b) The force required to move the plate is **{force:.{F_dp}e} N**."
     )
 
     return question, solution
@@ -248,6 +318,38 @@ def template_gas_viscosity_kinetic_theory():
         xenon and ammonia (2-dp sigma^2) at Omega = 0.950 and 1.050, found by
         exhaustive search of the 17 x 101 input grid; such a draw is redrawn
         rather than resolved (D-016), since the exact display would need 9 dp.
+        (Superseded in part by the Layer 2 fix below: Omega is no longer on a
+        101-point grid, and the same 3-dp tie screen on sigma^2 * Omega now
+        fires only where the 4-dp Omega happens to make the product a tie.)
+
+    Layer 2 fix (2026-09-25):
+        All three experts found the collision integral sampled uniformly in
+        0.95-1.05, independent of T and of the gas's epsilon/k (loaded from
+        the table but never used), although Omega_mu is a function of the
+        reduced temperature T* = kT/epsilon. Confirmed on the hand-check
+        instance: propane at 338 K has T* = 338/237.1 = 1.4256 and
+        Omega_mu = 1.3430, so mu = 9.26e-06 Pa.s, not the 1.303e-05 printed
+        from the sampled 0.955; helium at 518 K (T* = 50.7) has Omega_mu =
+        0.648, mu = 2.88e-05, not 1.926e-05; argon at 559 K has 0.895, not
+        1.042. Omega_mu is now evaluated from T* with the Neufeld-Janzen-Aziz
+        correlation for the Lennard-Jones (6-12) potential,
+            Omega_mu = 1.16145/T*^0.14874 + 0.52487 exp(-0.7732 T*)
+                       + 2.16178 exp(-2.43787 T*),
+        valid for 0.3 <= T* <= 100 (Neufeld, Janzen & Aziz, J. Chem. Phys.
+        57, 1100 (1972), eq. for Omega(2,2)*; also Bird, Stewart & Lightfoot,
+        Transport Phenomena 2nd ed., eq. 1.4-14 and Table E.2), and every
+        sampled T* (250-600 K over the table's epsilon/k of 10.22-558.3 K)
+        lies in that range. The question keeps its structure: it still GIVES
+        Omega_mu, now the computed value at 4 dp, which is the smaller change
+        (a reader is still asked to apply the Chapman-Enskog equation, not to
+        evaluate the correlation), and the solution's given-information line
+        states the provenance (T* from epsilon/k, the correlation). T* is
+        bound through its 4-dp display and Omega_mu is computed from the
+        bound T*, then bound through its own 4-dp display, so the printed
+        Omega follows from the printed T*; a T* whose 4-dp display sits on a
+        half-way tie (an integer over a 1-2 dp value) is redrawn (D-016).
+        Every gold answer and every question text changes (Omega_mu is a
+        different number on every seed).
 
     Returns:
         tuple: A tuple containing:
@@ -261,8 +363,20 @@ def template_gas_viscosity_kinetic_theory():
         # Temperature in Kelvin
         temperature_K = random.randint(250, 600)
 
-        # Collision integral (dimensionless), kept close to 1.0 for simplicity
-        omega_mu = round(random.uniform(0.95, 1.05), 3)
+        # Collision integral (dimensionless) from the reduced temperature
+        # T* = kT/epsilon with the Neufeld-Janzen-Aziz correlation (Layer 2:
+        # it used to be sampled uniformly in 0.95-1.05, independent of T and
+        # epsilon/k, so the given Omega contradicted the stated gas and T).
+        # T* is printed at 4 dp and consumed, so it is bound through that
+        # display; a draw whose display sits on a half-way tie is redrawn.
+        if _is_display_tie(temperature_K / epsilon, 4):
+            continue
+        T_star = _as_printed(temperature_K / epsilon, '.4f')
+        assert 0.3 <= T_star <= 100.0, f"T* outside the correlation's range: {T_star}"
+        omega_mu = _as_printed(
+            1.16145 / T_star ** 0.14874
+            + 0.52487 * math.exp(-0.7732 * T_star)
+            + 2.16178 * math.exp(-2.43787 * T_star), '.4f')
 
         # 2. Perform the core calculation
 
@@ -302,7 +416,7 @@ def template_gas_viscosity_kinetic_theory():
         f"You are given the following parameters for {gas_name}:\n"
         f"- Molar Mass (M) = {molar_mass} g/mol\n"
         f"- Lennard-Jones diameter (σ) = {sigma} Å\n"
-        f"- Collision Integral (Ω_μ) = {omega_mu}\n\n"
+        f"- Collision Integral (Ω_μ) = {omega_mu:.4f}\n\n"
         f"Provide your answer in units of Pascal-seconds (Pa·s)."
     )
 
@@ -312,18 +426,20 @@ def template_gas_viscosity_kinetic_theory():
         f"- Temperature (T): {temperature_K} K\n"
         f"- Molar Mass (M): {molar_mass} g/mol\n"
         f"- Lennard-Jones diameter (σ): {sigma} Å\n"
-        f"- Collision Integral (Ω_μ): {omega_mu}\n\n"
-        
+        f"- Collision Integral (Ω_μ): {omega_mu:.4f} "
+        f"(the Lennard-Jones value at the reduced temperature T* = kT/ε = {temperature_K}/{epsilon} = {T_star:.4f}, "
+        f"with ε/k = {epsilon} K, from the Neufeld-Janzen-Aziz correlation)\n\n"
+
         f"**Step 1:** State the Chapman-Enskog equation.\n"
         f"The formula for estimating the viscosity of a low-density gas is:\n"
         f"μ = (2.6693e-6 * sqrt(M*T)) / (σ^2 * Ω_μ)\n\n"
-        
+
         f"**Step 2:** Substitute the given values into the equation.\n"
-        f"μ = (2.6693e-6 * sqrt({molar_mass} * {temperature_K})) / (({sigma})^2 * {omega_mu})\n\n"
-        
+        f"μ = (2.6693e-6 * sqrt({molar_mass} * {temperature_K})) / (({sigma})^2 * {omega_mu:.4f})\n\n"
+
         f"**Step 3:** Calculate the numerator and denominator.\n"
         f"- Numerator = 2.6693e-6 * sqrt({MT:.{mt_dp}f}) = {numerator:.4e}\n"
-        f"- Denominator = {sigma2:.{s2_dp}f} * {omega_mu} = {denominator:.3f}\n\n"
+        f"- Denominator = {sigma2:.{s2_dp}f} * {omega_mu:.4f} = {denominator:.3f}\n\n"
         
         f"**Step 4:** Calculate the final viscosity.\n"
         f"μ = {numerator:.4e} / {denominator:.3f}\n"
@@ -506,6 +622,27 @@ def template_power_law_fluid_shear():
         Step 1 says whether the apparent viscosity decreases, increases or
         stays constant with shear rate. No number changes.
 
+    Layer 2 fix (2026-09-25):
+        Two experts found the table's blood-plasma entry (K = 0.012 Pa.s^n,
+        n = 0.95) about eight times too viscous: on the hand-check instance
+        it gives eta = 0.0095 Pa.s at 114.84 1/s, where plasma is essentially
+        Newtonian at about 1.2 mPa.s (K looked like a whole-blood value).
+        Confirmed. The row is now (0.0012, 1.0), Newtonian at the 1.10-1.30
+        mPa.s of normal plasma at 37 degC, sourced in constants.py. Both
+        experts also found the answers printed at fixed decimals (tau .3f,
+        eta .4f), so the air entry (K = 1.8e-5) always printed
+        eta = 0.0000 Pa.s and tau with 0-1 digits (measured: all 40 air
+        draws in 1,000); and raw floats printed ("(114.84)^(-0.0500000000
+        00000044)", "0.0078000000000000005 m"), on 37% of draws. tau and eta
+        are now printed with a 4-decimal-mantissa scientific display, Y is
+        bound through its exact 4-dp metre display, and the exponent n - 1
+        is formed in decimal at n's own precision. Every displayed-and-
+        consumed operand (Y, dvx/dy) is bound through its display, so each
+        printed line follows from the printed operands; a draw whose dvx/dy,
+        tau or eta sits on a half-way tie at its display is redrawn (D-016).
+        Every gold answer changes in format; the question text changes only
+        on the plasma draws (about 1 in 22).
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for shear stress and apparent viscosity.
@@ -513,19 +650,40 @@ def template_power_law_fluid_shear():
     """
     # 1. Parameterize the inputs with random values
     fluid_name, (K, n) = random.choice(list(POWER_LAW_FLUIDS.items()))
-    
-    # Velocity of the moving plate in m/s
-    V = round(random.uniform(0.1, 2.0), 2)
-    
-    # Distance between plates in cm, converted to meters for calculation
-    Y_cm = round(random.uniform(0.5, 5.0), 2)
-    Y_m = Y_cm / 100
+    # n - 1 is exact at n's own decimals; formed in decimal so that the
+    # exponent prints as -0.05, not -0.050000000000000044 (Layer 2).
+    n_dp = _decimals(n)
+    n_minus_1 = _hu(n - 1, n_dp)
 
-    # 2. Perform the core calculation
-    velocity_gradient = abs(V / Y_m)
-    shear_stress = K * (velocity_gradient ** n)
-    apparent_viscosity = K * (velocity_gradient ** (n - 1))
-    
+    for _attempt in range(200):
+        # Velocity of the moving plate in m/s
+        V = round(random.uniform(0.1, 2.0), 2)
+
+        # Distance between plates in cm, converted to meters for calculation.
+        # A 2-dp centimetre value is exactly 4 dp in metres; the float is not,
+        # so Y is bound through that display (D-016 part 2).
+        Y_cm = round(random.uniform(0.5, 5.0), 2)
+        Y_m = _as_printed(Y_cm / 100, '.4f')
+
+        # 2. Perform the core calculation. dvx/dy is printed at 2 dp and then
+        # consumed, so it is bound through that display; tau and eta through
+        # their 4-dp-mantissa displays. A 2-dp over 4-dp quotient, and (for
+        # n = 1) a product of K by that quotient, can sit exactly on a
+        # half-way tie at their displays; such a draw is redrawn (D-016).
+        if _is_display_tie(V / Y_m, 2):
+            continue
+        velocity_gradient = _as_printed(abs(V / Y_m), '.2f')
+        if _is_sci_display_tie(K * (velocity_gradient ** n), 4):
+            continue
+        shear_stress = _as_printed(K * (velocity_gradient ** n), '.4e')
+        if _is_sci_display_tie(K * (velocity_gradient ** (n - 1)), 4):
+            continue
+        apparent_viscosity = _as_printed(K * (velocity_gradient ** (n - 1)), '.4e')
+        break
+    else:
+        raise RuntimeError(
+            "power_law_fluid_shear: no display-stable sample in 200 draws")
+
     # Determine the fluid behavior for the explanation. The wording is
     # conditional on n (screen pass 1): three fluids in the table are Newtonian
     # (n = 1), and for them the apparent viscosity does NOT change with shear.
@@ -565,29 +723,29 @@ def template_power_law_fluid_shear():
         f"- Consistency Index (K): {K} Pa·s^n\n"
         f"- Power-Law Index (n): {n}\n"
         f"- Plate Velocity (V): {V} m/s\n"
-        f"- Plate Separation (Y): {Y_cm} cm = {Y_m} m\n\n"
-        
+        f"- Plate Separation (Y): {Y_cm} cm = {Y_m:.4f} m\n\n"
+
         f"**Step 1:** Characterize the Fluid Behavior.\n"
         f"The fluid is {behavior} {consequence}\n\n"
-        
+
         f"**Step 2:** Calculate the Velocity Gradient (Shear Rate).\n"
         f"Assuming a linear velocity profile:\n"
-        f"Shear Rate (dvx/dy) = V / Y = {V} m/s / {Y_m} m = {velocity_gradient:.2f} 1/s\n\n"
-        
+        f"Shear Rate (dvx/dy) = V / Y = {V} m/s / {Y_m:.4f} m = {velocity_gradient:.2f} 1/s\n\n"
+
         f"**Step 3:** Calculate the Shear Stress (τ_yx).\n"
         f"Using the power-law formula: τ_yx = K * (dvx/dy)^n\n"
         f"τ_yx = {K} * ({velocity_gradient:.2f})^{n}\n"
-        f"τ_yx = {shear_stress:.3f} Pa\n\n"
-        
+        f"τ_yx = {shear_stress:.4e} Pa\n\n"
+
         f"**Step 4:** Calculate the Apparent Viscosity (η).\n"
         f"Apparent viscosity is the effective viscosity at a specific shear rate.\n"
         f"η = K * |dvx/dy|^(n-1)\n"
-        f"η = {K} * ({velocity_gradient:.2f})^({n - 1})\n"
-        f"η = {apparent_viscosity:.4f} Pa·s\n\n"
-        
+        f"η = {K} * ({velocity_gradient:.2f})^({n_minus_1:.{n_dp}f})\n"
+        f"η = {apparent_viscosity:.4e} Pa·s\n\n"
+
         f"**Answer:**\n"
-        f"a) The shear stress on the fluid is **{shear_stress:.3f} Pa**.\n"
-        f"b) The apparent viscosity at this shear rate is **{apparent_viscosity:.4f} Pa·s**."
+        f"a) The shear stress on the fluid is **{shear_stress:.4e} Pa**.\n"
+        f"b) The apparent viscosity at this shear rate is **{apparent_viscosity:.4e} Pa·s**."
     )
 
     return question, solution

@@ -410,17 +410,44 @@ def template_vibration_transmissibility():
         (1 - r^2)^2, which made 39% of answers not the correct rounding of
         what the question implies.
 
+    Layer 2 fix (2026-09-25):
+        One expert of the branch rejected the template: the base amplitude
+        (0.1-8 mm) was drawn independently of the excitation frequency (up
+        to 5 omega_n), so the foundation under a "sensitive instrument"
+        shook at impossible accelerations - seed 2105 had Y = 6.7 mm at
+        84.07 Hz, a peak base acceleration Y omega^2 of 1870 m/s^2 (190 g),
+        seeds 2102 and 2104 about 17 g and 22 g; measured over 500 seeds,
+        38.6% of draws exceeded 10 g and 77.4% exceeded 1 g. The base
+        acceleration amplitude is now bounded at 1 g (9.81 m/s^2), the
+        level above which anything resting unfastened on the foundation
+        leaves it, so it is the physical ceiling of a "vibrating
+        foundation"; real floors are far below it. A drawn Y above
+        Y_cap = g / omega^2 is redrawn in [Y_cap/4, Y_cap] with enough
+        decimals for three significant figures (the 2-dp millimetre
+        display cannot show the tens of micrometres a high frequency
+        allows), floored so it stays under the cap. Only Y and X = TR * Y
+        move; the mass, stiffness, damping, frequency and TR of every seed
+        are unchanged. The expert's second finding, the raw float in the
+        Given line ("2.95 mm = 0.0029500000000000004 m"), is met by
+        formatting the metre value at the millimetre display's precision
+        plus three. Rejection and item-pool figures are in the Layer 2 fix
+        report.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the transmissibility and absolute amplitude.
             - str: A step-by-step solution to the problem.
     """
     precision = 4
+    # Layer 2 fix: the base acceleration amplitude Y * omega^2 is bounded at
+    # 1 g. Sampling policy only; never printed.
+    BASE_ACCEL_CAP = 9.81   # m/s^2
 
     for _attempt in range(200):
         mass = round(random.uniform(5.0, 150.0), 1)                 # kg
         stiffness = round(random.uniform(2e3, 5e5), 0)              # N/m
         base_amplitude_Y_mm = round(random.uniform(0.1, 8.0), 2)    # mm
+        y_dp = 2
 
         # Sampler-side choice only: spreads the instances across amplification
         # (r ~ 1) and isolation (r > sqrt(2)). Never printed.
@@ -435,6 +462,19 @@ def template_vibration_transmissibility():
         omega_n = _hu(omega_n_exact, precision)
         omega = _hu(base_freq_hz * 2 * math.pi, precision)
         r = _hu(omega / omega_n, precision)
+
+        # Layer 2 fix: Y * omega^2 <= 1 g. A base amplitude above the cap is
+        # redrawn in [cap/4, cap] at enough decimals for three significant
+        # figures, floored so it stays under the cap, and bound through its
+        # display (D-016 part 2).
+        y_cap_mm = BASE_ACCEL_CAP / (omega ** 2) * 1000.0
+        if base_amplitude_Y_mm > y_cap_mm:
+            y_dp = max(2, 2 - math.floor(math.log10(y_cap_mm)))
+            base_amplitude_Y_mm = (
+                math.floor(random.uniform(y_cap_mm / 4, y_cap_mm) * 10 ** y_dp) / 10 ** y_dp)
+        base_amplitude_Y_mm = _as_printed(base_amplitude_Y_mm, f'.{y_dp}f')
+        assert base_amplitude_Y_mm / 1000.0 * omega ** 2 <= BASE_ACCEL_CAP * (1 + 1e-9), (
+            "vibration_transmissibility: base acceleration above 1 g")
 
         base_amplitude_Y_m = base_amplitude_Y_mm / 1000.0
 
@@ -487,7 +527,7 @@ def template_vibration_transmissibility():
         f"The mount has an effective stiffness of {stiffness:,.0f} N/m and provides a damping "
         f"ratio of {damping_ratio_zeta}.\n\n"
         f"The foundation on which the instrument is placed is vibrating harmonically at a frequency of "
-        f"{base_freq_hz} Hz with an amplitude of {base_amplitude_Y_mm} mm.\n\n"
+        f"{base_freq_hz} Hz with an amplitude of {base_amplitude_Y_mm:.{y_dp}f} mm.\n\n"
         f"Determine:\n"
         f"1. The displacement transmissibility ratio.\n"
         f"2. The absolute amplitude of vibration of the instrument in millimeters."
@@ -499,7 +539,7 @@ def template_vibration_transmissibility():
         f"Stiffness (k) = {stiffness:,.0f} N/m\n"
         f"Damping Ratio (zeta) = {damping_ratio_zeta}\n"
         f"Base Vibration Frequency (f) = {base_freq_hz} Hz\n"
-        f"Base Vibration Amplitude (Y) = {base_amplitude_Y_mm} mm = {base_amplitude_Y_m} m\n\n"
+        f"Base Vibration Amplitude (Y) = {base_amplitude_Y_mm:.{y_dp}f} mm = {base_amplitude_Y_m:.{y_dp + 3}f} m\n\n"
 
         f"**Step 1:** Calculate the system's undamped natural frequency (omega_n).\n"
         f"omega_n = sqrt(k / m) = sqrt({stiffness:,.0f} / {mass}) = {omega_n} rad/s\n\n"
@@ -519,7 +559,7 @@ def template_vibration_transmissibility():
 
         f"**Step 4:** Calculate the absolute amplitude of the instrument (X).\n"
         f"The relationship is X = TR * Y.\n"
-        f"X = {transmissibility_ratio:.{tr_dp}f} * {base_amplitude_Y_mm} mm = "
+        f"X = {transmissibility_ratio:.{tr_dp}f} * {base_amplitude_Y_mm:.{y_dp}f} mm = "
         f"{amplitude_X_mm:.{x_dp}f} mm\n\n"
 
         f"**Answer:**\n"

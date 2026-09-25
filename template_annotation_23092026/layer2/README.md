@@ -60,3 +60,18 @@ Approve/Reject; AC2 on the scores), the false-positive rate of the screening pan
 experts and the MAD between their medians, dwell time, and the fix list of every rejected template
 with the experts' notes. Rejected templates are fixed and, per D-094, re-judged individually by the
 screen rather than in a new pass.
+
+## Round 2: re-certifying what was fixed
+
+Round 1 (2026-09-24/25) rejected 22 templates; every note was verified and 20 templates were changed
+(`fixes_round1.md`, D-106). A later round rebuilds only those templates, without plants and with
+fresh hand-check instances (seeds shifted by 100 per round), into `tasks_round2/` and `dist_round2/`,
+so round 1 stays intact:
+
+```bash
+python -m template_annotation_23092026.layer2.build_tasks --only <id,id,...> --round 2
+python -m template_annotation_23092026.layer2.make_kits --round 2
+python -m template_annotation_23092026.layer2.score --labels labels_round2   # scores that round alone
+```
+
+Only the branches with a changed template receive a kit; the same experts review them.

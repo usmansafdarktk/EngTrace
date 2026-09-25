@@ -1109,17 +1109,134 @@ MANOMETER_FLUIDS = {
     #   VALUE is right. The value itself remains unsourced. C3.5 residual.
     "Acetylene Tetrabromide": 2960,
     
-    # Molten Metals (for high-temperature applications)
-    # [ON-DISK] pubchem/gallium_density.json @ cid=5360835 heading="Density" ref=23 scale=1000 precision=4sf
-    #   6.0947 @ 29.8 °C (liquid); 5.9037 @ 29.65 °C (solid)
-    #   Source: Hazardous Substances Data Bank (HSDB); conditions: 29.8 C.
-    #   That entry cites: Budavari, S. (ed.). The Merck Index - An Encyclopedia of Chemicals, Drugs, and Biologicals. Whitehou
-    #   PubChem is an AGGREGATOR and this record carries several densities that
-    #   disagree, so the citation names ONE ReferenceNumber rather than the CID alone.
-    "Gallium": 6095,
-    # [UNVERIFIED] no source on disk. Residual register (C3.5).
-    "Tin": 6980,
-    # [UNVERIFIED] no source on disk. Residual register (C3.5).
-    "Zinc": 6570,
-    
+    # Layer 2 fix (2026-09-25): the "Molten Metals (for high-temperature
+    # applications)" group - Gallium 6095 (melts at 29.8 C), Tin 6980 (232 C)
+    # and Zinc 6570 (420 C) - is DELETED. All three experts of the branch
+    # rejected template_utube_manometer for it: the table is the menu of
+    # liquids a U-tube manometer is filled with, the question is posed at
+    # ambient conditions against gasoline, engine oil or isopropyl alcohol,
+    # and a metal that is solid below 420 C cannot be that liquid. Zinc alone
+    # was drawn in 3 of the 5 hand-checked instances (seeds 2102-2104). The
+    # densities were those of the MOLTEN metals, so the rows were not wrong
+    # values; they were the wrong substances for the table's purpose. Removed
+    # from the list rather than by redraw, on the fix brief's instruction; the
+    # item-pool effect is measured in the template's docstring.
 }
+
+
+# ============================================================================
+# SAMPLING-ONLY STRENGTH BOUNDS (Layer 2 fix, 2026-09-25)
+# ============================================================================
+# MATERIAL_PROPERTIES and SHEAR_MODULUS_VALUES carry a modulus and no strength,
+# and the templates that draw a material from them used to draw the load, the
+# section and the material independently. The three experts of the branch
+# rejected five templates for it: a 32 mm nylon shaft under 4779 N.m (743 MPa,
+# fifteen turns of "elastic" twist), 623 kN on a 70 mm polycarbonate rod
+# (162 MPa, 7% strain), a 57 mm concrete shaft in torsion at 50 MPa. The two
+# tables below give each material an allowable (design) stress that the
+# sampler keeps the drawn stress at or below, and name the entries that are
+# not drawn at all for that loading.
+#
+# @kind: range
+# @units: MPa
+# @domain: none (a design bound at room temperature for the sampler, not a measured property)
+# [POLICY: sampling-only] NEVER printed in a question or a trace, and no answer
+#   depends on it: it only decides which (load, section, material) triples are
+#   posed, so a different bound would change which problems are asked, never
+#   whether an answer is right. The values are conservative TYPICAL allowable
+#   stresses - roughly yield/2 for ductile metals, ultimate/3 to /4 for polymers,
+#   composites and brittle metals - taken from Hibbeler, Mechanics of Materials
+#   (10th ed.), Appendix B "Average Mechanical Properties of Typical Engineering
+#   Materials" (A36 sigma_y 250; 304 stainless 207; 6061-T6 255, tau_y 131;
+#   Ti-6Al-4V 924; magnesium AM1004-T61 152; red brass C83400 70; bronze C86100
+#   345; gray cast iron ASTM 20 sigma_ult 179 in tension; 30% glass-reinforced
+#   plastic sigma_ult 90) and, for the polymers, ceramics and the remaining
+#   metals, from Callister, Materials Science and Engineering, Appendix B
+#   (nylon 6,6 sigma_y 45-83; polycarbonate 62; ABS sigma_ult 41; rigid PVC
+#   sigma_y 41-45; HDPE 26-33; PTFE sigma_ult 21-35; epoxy 28-90; tungsten 760;
+#   nickel 200 148; C11000 copper annealed 69; CP titanium 170-480; lead has no
+#   yield point and creeps at room temperature). None of these sources is on
+#   disk; the bound is not a citation and it holds no value to a source. It
+#   exists only to keep every sampled stress inside the linear-elastic range
+#   the templates' formulas assume.
+ALLOWABLE_NORMAL_STRESS_MPA = {
+    # Ductile metals: about sigma_y / 2.
+    "Steel": 125,
+    "Stainless Steel": 100,
+    "Aluminum": 35,            # a generic annealed grade (E = 69 GPa), sigma_y ~ 35-100
+    "Aluminum 6061-T6": 125,
+    "Copper": 35,              # annealed C11000
+    "Brass": 40,
+    "Bronze": 100,
+    "Titanium": 100,           # commercially pure
+    "Titanium Alloy (6Al-4V)": 300,
+    "Magnesium": 60,
+    "Nickel": 70,
+    # Brittle or low-ductility metals: about sigma_ult / 4.
+    "Tungsten": 150,
+    "Cast Iron": 40,           # gray iron in TENSION, which governs a rod
+    # Polymers: about sigma_y / 3, which also keeps the strain near 1% or below.
+    "Nylon": 20,
+    "Polycarbonate": 20,
+    "ABS": 12,
+    "PVC (rigid)": 12,
+    "PTFE (Teflon)": 5,
+    "Polyethylene (HDPE)": 8,
+    "Epoxy": 12,
+    # Fibre composites, loaded along the fibres: about sigma_ult / 4 to / 5.
+    "Carbon Fiber Reinforced Polymer (CFRP)": 300,
+    "Fiberglass (GFRP)": 40,
+}
+# The MATERIAL_PROPERTIES rows a tension member (a rod, a bar, a segment of a
+# composite rod, a rod fixed between two walls) is NOT made of, with the
+# criterion: no usable tensile design strength, because the material is an
+# elastomer (not linear-elastic), a metal with no yield point that creeps at
+# room temperature, or a brittle non-metal whose tensile strength is a
+# fraction of its compressive one and is never relied on in design.
+NOT_TENSION_MEMBER_MATERIALS = (
+    "Natural Rubber",           # elastomer; E = 1.5 MPa, strains of 100%+
+    "Lead",                     # no yield point; creeps under sustained load
+    "Concrete",                 # no design tensile strength (cracks at ~3 MPa)
+    "Glass (Borosilicate)",     # brittle; tensile failure from surface flaws
+    "Ceramic (Alumina Al2O3)",  # brittle; used in compression only
+)
+assert set(ALLOWABLE_NORMAL_STRESS_MPA) | set(NOT_TENSION_MEMBER_MATERIALS) == set(MATERIAL_PROPERTIES), \
+    "every MATERIAL_PROPERTIES row needs an allowable stress or an exclusion"
+assert not set(ALLOWABLE_NORMAL_STRESS_MPA) & set(NOT_TENSION_MEMBER_MATERIALS)
+
+# @kind: range
+# @units: MPa
+# @domain: none (a design bound at room temperature for the sampler, not a measured property)
+# [POLICY: sampling-only] the torsion companion of ALLOWABLE_NORMAL_STRESS_MPA,
+#   on the same footing and from the same references: about tau_y / 2 for
+#   ductile metals with tau_y ~ 0.55-0.6 sigma_y (Hibbeler App. B: 6061-T6
+#   tau_y 131, A36 145, 304 stainless 120, Ti-6Al-4V 532), about a third of
+#   the shear strength for polymers and composites (nylon 6,6 and polycarbonate
+#   shear strength 40-70 MPa, MatWeb typical; unidirectional CFRP in-plane
+#   shear strength 60-90 MPa). Never printed; it only bounds the drawn torque.
+ALLOWABLE_SHEAR_STRESS_MPA = {
+    "Steel (A36)": 70,
+    "Stainless Steel (304)": 60,
+    "Aluminum 6061-T6": 65,
+    "Aluminum 2024-T4": 80,
+    "Brass (C36000)": 50,
+    "Copper (CDA 110)": 20,
+    "Bronze (Phosphor 510)": 60,
+    "Titanium Alloy (Ti-6Al-4V)": 170,
+    "Magnesium Alloy (AZ31B)": 40,
+    "Tungsten": 90,
+    "Molybdenum": 90,
+    "Lead": 2,                 # sigma_y ~ 5 MPa; a lead shaft carries a few N.m
+    "Gray Cast Iron": 45,
+    "Nylon 6/6": 15,
+    "Polycarbonate": 15,
+    "Carbon Fiber Epoxy (Unidirectional, in-plane)": 25,
+}
+# The SHEAR_MODULUS_VALUES rows a solid transmission shaft is NOT made of, the
+# same two template_composite_shafts_series already removes by redraw: brittle
+# non-metals that fail in diagonal tension at a few MPa and are never made
+# into a shaft.
+NOT_SHAFT_MATERIALS = ("Concrete", "Glass")
+assert set(ALLOWABLE_SHEAR_STRESS_MPA) | set(NOT_SHAFT_MATERIALS) == set(SHEAR_MODULUS_VALUES), \
+    "every SHEAR_MODULUS_VALUES row needs an allowable shear stress or an exclusion"
+assert not set(ALLOWABLE_SHEAR_STRESS_MPA) & set(NOT_SHAFT_MATERIALS)

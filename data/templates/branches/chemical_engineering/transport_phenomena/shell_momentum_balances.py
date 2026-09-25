@@ -57,6 +57,29 @@ def _is_display_tie(x, places, rel_band=1e-12):
     return abs((scaled - math.floor(scaled)) - 0.5) <= band
 
 
+def _decimals(x):
+    """Decimal places of the shortest decimal that round-trips `x`.
+
+    0.1 -> 1, 0.012 -> 3, 4.003 -> 3, 32.0 -> 0. Used to print a quantity
+    built from table values at the precision it actually has (D-037), never
+    coarser.
+    """
+    exponent = Decimal(repr(float(x))).normalize().as_tuple().exponent
+    return max(0, -exponent)
+
+
+def _is_sci_display_tie(x, mant_dp):
+    """Is `x` on a half-way tie when printed with `.{mant_dp}e`?
+
+    The rounding position of a scientific display moves with the decade, so
+    the fixed-place test is applied at `mant_dp` places below the leading
+    digit (D-016).
+    """
+    if x == 0:
+        return False
+    return _is_display_tie(x, mant_dp - math.floor(math.log10(abs(x))))
+
+
 # Template 1 (Easy)
 def template_falling_film_max_velocity():
     """
@@ -70,6 +93,27 @@ def template_falling_film_max_velocity():
         Core Equation:
             v_z_max = (rho * g * delta^2 * cos(beta)) / (2 * mu)
 
+    Layer 2 fix (2026-09-25):
+        Two experts found Step 5 and the Answer printing round(v_max, 5), so
+        that for the viscous liquids in the table (honey, corn syrup, the
+        oils, glycerol) and thin films the gold answer kept 1-2 significant
+        figures or none: instance 4 (gear oil) printed 0.00058 m/s for
+        5.758e-04 (0.7% off), and honey at delta = 0.10 mm, beta = 85 deg
+        gives 6.1e-07 m/s, printed as 0.0. Confirmed: over 1,000 seeds
+        v_max spans 2.8e-06 to 0.2 m/s, 12.5% of draws are below 1e-3 m/s
+        (at most two figures at 5 dp) and 0.1% print as zero. One expert
+        also found Step 2 printing a raw float ("0.12 mm =
+        0.00011999999999999999 m") on about a quarter of draws (measured
+        24.3%). v_max is now printed with a 4-decimal-mantissa scientific
+        display, bound through it, and delta is bound through its exact
+        5-dp metre display (a 2-dp millimetre value). No sampling change
+        was needed: the slow draws are physically right (a creeping honey
+        film) and the existing checks (v_max < 10 m/s, film Re < 1500)
+        stand. cos(60 deg) = 1/2 makes v_max a finite decimal, so its
+        display can sit exactly on a half-way tie; such a draw is redrawn
+        (D-016). Every gold answer changes in format; no question text
+        changes.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking to compute the maximum film velocity.
@@ -77,36 +121,47 @@ def template_falling_film_max_velocity():
     """
     # 1. Parameterize the inputs with Validation Loop for Physical Plausibility
     g = GRAVITATIONAL_ACCELERATION
-    
-    while True:
+
+    for _attempt in range(200):
         # Choose a random fluid
         fluid_name = random.choice(list(COMMON_LIQUIDS.keys()))
         fluid_density, fluid_viscosity = COMMON_LIQUIDS[fluid_name]
-        
+
         # Film thickness in mm (Reduced range for realistic laminar films)
         film_thickness_mm = round(random.uniform(0.1, 2.0), 2)
-        
+
         # Angle of inclination from the vertical in degrees
         inclination_angle_deg = random.randint(5, 85)
-        
-        # Perform check calculation
-        film_thickness_m = film_thickness_mm / 1000.0
+
+        # Perform check calculation. A 2-dp millimetre value is exactly 5 dp
+        # in metres; the float is not (0.12/1000 = 0.00011999999999999999),
+        # so delta is bound through that display (D-016 part 2).
+        film_thickness_m = _as_printed(film_thickness_mm / 1000.0, '.5f')
         inclination_angle_rad = math.radians(inclination_angle_deg)
-        
+
         v_max_check = (fluid_density * g * (film_thickness_m**2) * math.cos(inclination_angle_rad)) / (2 * fluid_viscosity)
-        
+
         # PHYSICS CHECK:
         # 1. Velocity should be reasonable (e.g., < 10 m/s)
         # 2. Reynolds number (Re = 4*rho*v_avg*delta / mu) should be laminar (< ~1000-2000)
         #    v_avg = (2/3) * v_max
         v_avg = (2/3) * v_max_check
         Re = (4 * fluid_density * v_avg * film_thickness_m) / fluid_viscosity
-        
-        if v_max_check < 10.0 and Re < 1500:
-            break # Scenario is valid
 
-    # 2. Perform the core calculation (already done in check, just finalize)
-    v_max = v_max_check
+        if not (v_max_check < 10.0 and Re < 1500):
+            continue
+        # v_max is printed with a 4-dp mantissa and is the answer; at beta =
+        # 60 deg (cos = 1/2) it is a finite decimal whose display can sit
+        # exactly on a half-way tie, and such a draw is redrawn (D-016).
+        if _is_sci_display_tie(v_max_check, 4):
+            continue
+        break # Scenario is valid
+    else:
+        raise RuntimeError(
+            "falling_film_max_velocity: no display-stable sample in 200 draws")
+
+    # 2. Perform the core calculation, bound through the answer's display
+    v_max = _as_printed(v_max_check, '.4e')
 
     # 3. Generate the question and solution strings
     question = (
@@ -131,22 +186,22 @@ def template_falling_film_max_velocity():
         
         f"**Step 2:** Perform Unit Conversions\n"
         f"The core equation requires all units to be in the SI base system. We must convert the film thickness from millimeters to meters.\n"
-        f"delta = {film_thickness_mm} mm * (1 m / 1000 mm) = {film_thickness_m} m\n\n"
-        
+        f"delta = {film_thickness_mm} mm * (1 m / 1000 mm) = {film_thickness_m:.5f} m\n\n"
+
         f"**Step 3:** State the Core Equation\n"
         f"For a laminar falling film, the maximum velocity (v_z_max) at the liquid-air interface is given by the equation derived from the shell momentum balance:\n"
         f"v_z_max = (rho * g * delta^2 * cos(beta)) / (2 * mu)\n"
         f"\n\n"
-        
+
         f"**Step 4:** Substitute Values into the Equation\n"
         f"Now, we substitute our known values (with correct units) into the equation.\n"
-        f"v_z_max = (({fluid_density} kg/m^3) * ({g} m/s^2) * ({film_thickness_m} m)^2 * cos({inclination_angle_deg} deg)) / (2 * ({fluid_viscosity} Pa·s))\n\n"
-        
+        f"v_z_max = (({fluid_density} kg/m^3) * ({g} m/s^2) * ({film_thickness_m:.5f} m)^2 * cos({inclination_angle_deg} deg)) / (2 * ({fluid_viscosity} Pa·s))\n\n"
+
         f"**Step 5:** Calculate the Final Velocity\n"
         f"Performing the calculation gives the maximum velocity.\n"
-        f"v_z_max = {round(v_max, 5)} m/s\n\n"
-        
-        f"**Answer:** The maximum velocity of the {fluid_name} film is {round(v_max, 5)} m/s."
+        f"v_z_max = {v_max:.4e} m/s\n\n"
+
+        f"**Answer:** The maximum velocity of the {fluid_name} film is {v_max:.4e} m/s."
     )
 
     return question, solution
@@ -166,13 +221,42 @@ def template_hagen_poiseuille_flowrate():
         Core Equation (Hagen-Poiseuille Equation):
             Q = (pi * (P0 - PL) * R^4) / (8 * mu * L)
 
+    Layer 2 fix (2026-09-25):
+        Two experts found Step 5 and the Answer printing Q with a fixed
+        6-decimal display although Q spans about 1e-8 to 1e-1 m^3/s over the
+        sampled ranges, so the viscous fluids in small pipes lost their
+        figures: honey (10 Pa.s) at R = 1.0 cm, dP = 50 kPa, L = 100 m gives
+        Q = 1.96e-07, printed as 0.000000; glycerol at R = 0.5 cm gives
+        1.65e-06, printed as 0.000002. Confirmed: over 1,000 seeds 1.0% of
+        answers printed as zero and a further 9.4% with one figure. Both
+        also found raw floats in Step 2/4 ("0.030299999999999997 m"),
+        measured on 27.1% of draws. Q is now printed with a 4-decimal-
+        mantissa scientific display and bound through it (pi makes it
+        irrational, so no display tie is possible), and R is bound through
+        its exact 4-dp metre display. Verification also found the stated
+        viscosity not closing for the four-figure table values: 1.002e-3
+        Pa.s was stated as "1.00 cP" and consumed at full precision, so the
+        Step 2 line "1.00 cP / 1000 = 0.001002 Pa.s" did not follow; the cP
+        value is now printed at the precision the table value has (1.002 cP;
+        D-037); in practice the three four-figure fluids (water, ethanol,
+        mercury) almost never pass the laminar check at 50-500 kPa, so no
+        kept seed in 500 changes its text for this reason. The
+        laminar check (Re < 2300) is kept, and a mean velocity above 3 m/s,
+        the customary upper design velocity for liquids in process piping
+        (Sinnott, Chemical Engineering Design, 4th ed., sec. 5.4.3, 1-3 m/s
+        for pumped liquids), is redrawn: the oils reached 20 m/s at Re < 2300
+        before. The redraw rate and its concentration are recorded in the
+        Layer 2 report. Every gold answer changes in format.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking to compute the volumetric flow rate.
             - str: A step-by-step solution showing the calculation.
     """
     # 1. Parameterize the inputs with a loop to ensure Laminar Flow (Re < 2300)
-    while True:
+    # and a realistic mean velocity (Layer 2: v_avg <= 3 m/s).
+    V_AVG_CAP = 3.0  # m/s
+    for _attempt in range(500):
         # Choose a random fluid name (key) from the dictionary
         fluid_name = random.choice(list(COMMON_LIQUIDS.keys()))
         # Get the corresponding properties (the tuple of density and viscosity)
@@ -184,12 +268,17 @@ def template_hagen_poiseuille_flowrate():
         pipe_length_m = round(random.uniform(5.0, 100.0), 1)
         # Pressure drop in kPa
         pressure_drop_kPa = random.randint(50, 500)
-        # Convert viscosity to cP for the problem statement (1 Pa·s = 1000 cP)
-        fluid_viscosity_cP = fluid_viscosity_Pas * 1000
+        # Convert viscosity to cP for the problem statement (1 Pa·s = 1000 cP),
+        # at the precision the table value has (1.002e-3 Pa.s is 1.002 cP, not
+        # "1.00 cP"; D-037) and never fewer than 2 dp.
+        cP_dp = max(2, _decimals(fluid_viscosity_Pas) - 3)
+        fluid_viscosity_cP = _as_printed(fluid_viscosity_Pas * 1000, f'.{cP_dp}f')
 
         # 2. Perform unit conversions and core calculation
-        # Convert radius from cm to m
-        pipe_radius_m = pipe_radius_cm / 100.0
+        # Convert radius from cm to m. A 2-dp centimetre value is exactly 4 dp
+        # in metres; the float is not (3.03/100 = 0.030299999999999997), so
+        # R is bound through that display (D-016 part 2).
+        pipe_radius_m = _as_printed(pipe_radius_cm / 100.0, '.4f')
         # Convert pressure drop from kPa to Pa
         pressure_drop_Pa = pressure_drop_kPa * 1000
 
@@ -205,16 +294,24 @@ def template_hagen_poiseuille_flowrate():
         # Re = (rho * V_avg * D) / mu
         reynolds_number = (fluid_density * v_avg * diameter_m) / fluid_viscosity_Pas
 
-        # Only accept if flow is laminar
-        if reynolds_number < 2300:
+        # Only accept if flow is laminar AND the mean velocity is realistic
+        if reynolds_number < 2300 and v_avg <= V_AVG_CAP:
             break
+    else:
+        raise RuntimeError(
+            "hagen_poiseuille_flowrate: no laminar sample below the velocity cap in 500 draws")
+
+    # Q is the answer; it is bound through its 4-dp-mantissa display so the
+    # printed value is the one every check uses. pi makes it irrational, so
+    # the display cannot sit on an exact tie.
+    q_flow_rate = _as_printed(q_flow_rate, '.4e')
 
     # 3. Generate the question and solution strings
     question = (
         f"A fluid, {fluid_name}, is flowing through a smooth circular pipe. "
         f"The pipe has an inner radius of {pipe_radius_cm} cm and a total length of {pipe_length_m} m. "
         f"The pressure drop across the length of the pipe is measured to be {pressure_drop_kPa} kPa.\n\n"
-        f"Given that the viscosity of {fluid_name} is approximately {fluid_viscosity_cP:.2f} cP, "
+        f"Given that the viscosity of {fluid_name} is approximately {fluid_viscosity_cP:.{cP_dp}f} cP, "
         f"calculate the volumetric flow rate (Q) in m^3/s. Assume the flow is laminar."
     )
 
@@ -225,13 +322,13 @@ def template_hagen_poiseuille_flowrate():
         f"- Pipe Radius (R): {pipe_radius_cm} cm\n"
         f"- Pipe Length (L): {pipe_length_m} m\n"
         f"- Pressure Drop (P0 - PL): {pressure_drop_kPa} kPa\n"
-        f"- Fluid Viscosity (mu): {fluid_viscosity_cP:.2f} cP\n\n"
+        f"- Fluid Viscosity (mu): {fluid_viscosity_cP:.{cP_dp}f} cP\n\n"
 
         f"**Step 2:** Perform Unit Conversions\n"
         f"The Hagen-Poiseuille equation requires all units to be in the SI base system. We must convert the radius, pressure drop, and viscosity.\n"
-        f"- Radius: R = {pipe_radius_cm} cm * (1 m / 100 cm) = {pipe_radius_m} m\n"
+        f"- Radius: R = {pipe_radius_cm} cm * (1 m / 100 cm) = {pipe_radius_m:.4f} m\n"
         f"- Pressure Drop: P0 - PL = {pressure_drop_kPa} kPa * (1000 Pa / 1 kPa) = {pressure_drop_Pa} Pa\n"
-        f"- Viscosity: mu = {fluid_viscosity_cP:.2f} cP * (1 Pa·s / 1000 cP) = {fluid_viscosity_Pas} Pa·s\n\n"
+        f"- Viscosity: mu = {fluid_viscosity_cP:.{cP_dp}f} cP * (1 Pa·s / 1000 cP) = {fluid_viscosity_Pas} Pa·s\n\n"
 
         f"**Step 3:** State the Core Equation\n"
         f"The volumetric flow rate (Q) for laminar flow in a circular pipe is given by the Hagen-Poiseuille equation:\n"
@@ -239,13 +336,13 @@ def template_hagen_poiseuille_flowrate():
 
         f"**Step 4:** Substitute Values into the Equation\n"
         f"Now, we substitute the converted SI values into the equation.\n"
-        f"Q = (pi * ({pressure_drop_Pa} Pa) * ({pipe_radius_m} m)^4) / (8 * ({fluid_viscosity_Pas} Pa·s) * ({pipe_length_m} m))\n\n"
+        f"Q = (pi * ({pressure_drop_Pa} Pa) * ({pipe_radius_m:.4f} m)^4) / (8 * ({fluid_viscosity_Pas} Pa·s) * ({pipe_length_m} m))\n\n"
 
         f"**Step 5:** Calculate the Final Flow Rate\n"
         f"Performing the calculation gives the volumetric flow rate.\n"
-        f"Q = {q_flow_rate:.6f} m^3/s\n\n"
+        f"Q = {q_flow_rate:.4e} m^3/s\n\n"
 
-        f"**Answer:** The volumetric flow rate of {fluid_name} through the pipe is {q_flow_rate:.6f} m^3/s."
+        f"**Answer:** The volumetric flow rate of {fluid_name} through the pipe is {q_flow_rate:.4e} m^3/s."
     )
 
     return question, solution
@@ -263,11 +360,37 @@ def template_annulus_flowrate():
         Core Equation:
             Q = (pi*(P0-PL)*R^4)/(8*mu*L) * [(1-k^4) - ((1-k^2)^2 / ln(1/k))]
 
+    Layer 2 fix (2026-09-25):
+        Two experts found the sampler forcing Re = 500-1500 for every fluid
+        in COMMON_LIQUIDS and back-calculating the pressure drop with no
+        bound on the drop or the velocity, so the viscous entries gave
+        impossible scenarios: honey (10 Pa.s) at R_outer = 3.5 cm, kappa =
+        0.5, L = 30 m needs about 200 m/s and 2.3e6 kPa; gear oil about 15
+        m/s and 9.5e3 kPa. Confirmed over 1,000 seeds: honey reached 526
+        m/s and 2.9e7 kPa, corn syrup 266 m/s, glycerol 64 m/s, gear oil 56
+        m/s and 1.6e5 kPa. The stated conditions are now bounded: the mean
+        velocity is at most 3 m/s, the customary upper design velocity for
+        pumped liquids in process piping (Sinnott, Chemical Engineering
+        Design, 4th ed., sec. 5.4.3, 1-3 m/s), and the pressure drop at
+        most 500 kPa (5 bar over the 10-50 m of annulus sampled). The
+        Reynolds target is retained where those bounds allow it (Re_target
+        in 500-1500 maps linearly onto the velocity window 0 to v_hi, where
+        v_hi is the least of the velocity at Re = 1500, 3 m/s and the
+        velocity at the 500 kPa drop), so for a fluid the bounds do not
+        touch the draw is unchanged seed for seed; for a bounded fluid the
+        flow is laminar at a lower Re, which is the physical case (honey
+        creeps). No fluid is deleted. Nothing is rejected by the bounds; the
+        share of draws they bind, by fluid, is recorded in the Layer 2
+        report. The formula, the step structure and every display are
+        unchanged.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking to compute the volumetric flow rate.
             - str: A step-by-step solution showing the calculation.
     """
+    V_AVG_CAP = 3.0          # m/s, upper design velocity for pumped liquids
+    DP_CAP_PA = 500_000.0    # Pa, 5 bar over the sampled 10-50 m
     # 1. Parameterize inputs with Physical Plausibility Check
     #
     # The draw is repeated when the instance would be unusable. Two conditions
@@ -314,20 +437,33 @@ def template_annulus_flowrate():
         # Target Re between 500 and 1500 (safely laminar)
         Re_target = random.uniform(500, 1500)
 
-        # Calculate required velocity: v = (Re * mu) / (rho * Dh)
-        velocity_target = (Re_target * fluid_viscosity_Pas) / (fluid_density * Dh)
-
-        # Calculate required Flow Rate: Q = v * Area
         area = math.pi * (outer_radius_m ** 2 - inner_radius_m ** 2)
-        Q_target = velocity_target * area
 
-        # Back-calculate the Pressure Drop required to drive this Q
-        # Inverted Annulus Equation: DeltaP = Q*(8*mu*L) / (pi*Ro^4*ShapeFactor)
+        # Annulus shape factor, needed both for the pressure drop and for the
+        # velocity bound below.
         _shape_exact = ((1 - kappa_val ** 4)
                         - (((1 - kappa_val ** 2) ** 2) / math.log(1 / kappa_val)))
         if _is_display_tie(_shape_exact, 6):
             continue
         shape_factor = _as_printed(_shape_exact, ".6f")
+
+        # Calculate required velocity. The Re target maps linearly onto the
+        # window 0..v_hi, where v_hi is the LEAST of the velocity at Re =
+        # 1500, the design-velocity cap and the velocity at the pressure-drop
+        # cap (Layer 2). For a fluid the caps do not touch, v_hi is the
+        # Re = 1500 velocity and this is v = (Re * mu) / (rho * Dh) as before;
+        # for a viscous fluid it keeps the drop and velocity realistic.
+        v_at_Re_hi = (1500.0 * fluid_viscosity_Pas) / (fluid_density * Dh)
+        v_at_dP_cap = (DP_CAP_PA * math.pi * (outer_radius_m ** 4) * shape_factor
+                       / (8 * fluid_viscosity_Pas * pipe_length_m * area))
+        v_hi = min(v_at_Re_hi, V_AVG_CAP, v_at_dP_cap)
+        velocity_target = (Re_target / 1500.0) * v_hi
+
+        # Calculate required Flow Rate: Q = v * Area
+        Q_target = velocity_target * area
+
+        # Back-calculate the Pressure Drop required to drive this Q
+        # Inverted Annulus Equation: DeltaP = Q*(8*mu*L) / (pi*Ro^4*ShapeFactor)
         denominator = (math.pi * (outer_radius_m ** 4)) * shape_factor
         numerator = Q_target * (8 * fluid_viscosity_Pas * pipe_length_m)
 

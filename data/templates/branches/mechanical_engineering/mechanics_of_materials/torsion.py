@@ -2,7 +2,8 @@ import random
 import math
 from decimal import Decimal, ROUND_HALF_UP
 
-from data.templates.branches.mechanical_engineering.constants import SHEAR_MODULUS_VALUES
+from data.templates.branches.mechanical_engineering.constants import (
+    SHEAR_MODULUS_VALUES, ALLOWABLE_SHEAR_STRESS_MPA, NOT_SHAFT_MATERIALS)
 
 
 # Verifier tolerances (D1.3), keyed by template id. Relative.
@@ -235,6 +236,33 @@ def template_angle_of_twist():
         exact radian value sits on a half-way 4-dp tie is redrawn, because no
         rounding closes such a line for every reader (D-016 part 3).
 
+    Layer 2 fix (2026-09-25):
+        All three experts of the branch rejected the template: torque
+        (500-6000 N.m), diameter (25-100 mm) and material were drawn
+        independently, so seed 2103 twisted a 32 mm nylon 6/6 shaft under
+        4779.2 N.m - a shear stress 16T/(pi d^3) of 743 MPa against a
+        nylon shear strength near 60 MPa - by 96.23 rad, fifteen full
+        turns; seed 2105 was nylon at 203 MPa (42.7 rad) and seed 2104 a
+        lead shaft at 17.5 MPa, above lead's yield. Over 500 seeds the
+        median stress was 57 MPa, the 90th percentile 466 MPa and the
+        maximum 1394 MPa. Two changes to the sampling only. Concrete and
+        Glass, which are not made into shafts, are removed by redraw
+        (NOT_SHAFT_MATERIALS, as template_composite_shafts_series already
+        does; D-031 keeps every other seed's draw). The torque is then
+        bounded by the material's allowable shear stress
+        (ALLOWABLE_SHEAR_STRESS_MPA, sampling-only, never printed): a
+        drawn torque above T_cap = tau_allow * pi * d^3 / 16 is redrawn
+        uniformly in [min(500, T_cap/4), min(6000, T_cap)] at 1 dp, so
+        every posed shaft is inside the elastic range its formula assumes.
+        The experts' second finding, that the 4-dp radian display leaves a
+        small twist at two significant figures (seed 2102: 0.0062 rad gives
+        0.3552 deg where the exact value is 0.3548 deg), is met by quoting
+        the radians and the degrees to at least four significant figures
+        (never fewer digits than before); the degrees are still computed
+        from the displayed radian value, and a draw on a display tie of
+        either is still redrawn. Rejection and item-pool figures are in the
+        Layer 2 fix report.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the angle of twist in a shaft.
@@ -249,8 +277,30 @@ def template_angle_of_twist():
         length = round(random.uniform(0.5, 4.0), 2)       # Length in m
         diameter = random.randint(25, 100)                # Diameter in mm
 
-        # Randomly select a material and its properties
-        material_name, shear_modulus_gpa = random.choice(list(SHEAR_MODULUS_VALUES.items()))
+        # Randomly select a material and its properties. Layer 2 fix: the
+        # two entries that are not shaft materials (Concrete, Glass) are
+        # removed by redraw rather than by shortening the list (D-031).
+        for _m in range(100):
+            material_name, shear_modulus_gpa = random.choice(list(SHEAR_MODULUS_VALUES.items()))
+            if material_name not in NOT_SHAFT_MATERIALS:
+                break
+        else:
+            raise RuntimeError("angle_of_twist: no shaft material in 100 draws")
+
+        # Layer 2 fix: the torque is bounded by the material's allowable
+        # shear stress, tau_max = 16 T / (pi d^3) <= tau_allow. A drawn
+        # torque above the cap is redrawn in [min(500, cap/4), min(6000, cap)]
+        # at 1 dp, floored so the redraw never lands above the cap. The bound
+        # is sampling policy and is never printed.
+        torque_cap = (ALLOWABLE_SHEAR_STRESS_MPA[material_name] * 1e6
+                      * math.pi * (diameter / 1000.0) ** 3 / 16.0)
+        if torque > torque_cap:
+            t_hi = min(6000.0, torque_cap)
+            t_lo = min(500.0, t_hi / 4.0)
+            torque = math.floor(random.uniform(t_lo, t_hi) * 10.0) / 10.0
+        assert 16.0 * torque / (math.pi * (diameter / 1000.0) ** 3) \
+            <= ALLOWABLE_SHEAR_STRESS_MPA[material_name] * 1e6 + 1e-6, \
+            "angle_of_twist: torque above the allowable shear stress"
 
         # 2. Perform the core calculations for the solution
 
@@ -272,12 +322,20 @@ def template_angle_of_twist():
         # the chain continues from the displayed value. A half-way tie at that
         # display has no defensible rounding; the draw is rejected (D-016).
         angle_rad_exact = (torque * length) / (polar_moment_J * shear_modulus_pa)
-        if _is_display_tie(angle_rad_exact, precision):
+        # Layer 2 fix: at least four significant figures, never fewer than
+        # the 4 dp quoted before (0.0062 rad was two figures).
+        rad_dp = max(precision, (precision - 1) - math.floor(math.log10(abs(angle_rad_exact))))
+        if _is_display_tie(angle_rad_exact, rad_dp):
             continue
-        angle_rad = _as_printed(angle_rad_exact, f'.{precision}f')
+        angle_rad = _as_printed(angle_rad_exact, f'.{rad_dp}f')
 
-        # Step E: Convert the result from radians to degrees
-        angle_deg = math.degrees(angle_rad)
+        # Step E: Convert the result from radians to degrees, from the
+        # displayed radian value, at the same significant-figure rule.
+        angle_deg_exact = math.degrees(angle_rad)
+        deg_dp = max(precision, (precision - 1) - math.floor(math.log10(abs(angle_deg_exact))))
+        if _is_display_tie(angle_deg_exact, deg_dp):
+            continue
+        angle_deg = _hu(angle_deg_exact, deg_dp)
         break
     else:
         raise RuntimeError("angle_of_twist: no closing sample in 200 draws")
@@ -313,15 +371,15 @@ def template_angle_of_twist():
         f"**Step 4:** Apply the angle of twist formula to find the angle in radians.\n"
         f"Formula: phi = (T * L) / (J * G)\n"
         f"phi = ({torque} * {length}) / ({polar_moment_J:.4e} * {shear_modulus_pa:.2e})\n"
-        f"phi = {angle_rad} radians\n\n"
+        f"phi = {angle_rad:.{rad_dp}f} radians\n\n"
 
         f"**Step 5:** Convert the angle from radians to degrees.\n"
         f"Angle in degrees = Angle in radians * (180 / pi)\n"
-        f"Angle = {angle_rad} * (180 / pi) = {round(angle_deg, precision)} degrees\n\n"
+        f"Angle = {angle_rad:.{rad_dp}f} * (180 / pi) = {angle_deg:.{deg_dp}f} degrees\n\n"
 
         f"**Answer:**\n"
-        f"The total angle of twist is {angle_rad} radians, which is equivalent to "
-        f"{round(angle_deg, precision)} degrees."
+        f"The total angle of twist is {angle_rad:.{rad_dp}f} radians, which is equivalent to "
+        f"{angle_deg:.{deg_dp}f} degrees."
     )
 
     return question, solution
@@ -677,6 +735,24 @@ def template_statically_indeterminate_shaft():
         1. Statics: T_A + T_B = T_applied
         2. Compatibility: T_A * L_AC = T_B * L_BC
 
+    Layer 2 fix (2026-09-25):
+        All three experts of the branch rejected the template because the
+        "strong materials" filter (G > 20 GPa) admits Concrete (22.0 GPa)
+        and Glass (26.2 GPa): seed 2103 was a 57 mm solid concrete shaft
+        whose segment CB carried T_B = 1817.2 N.m, a shear stress
+        16T/(pi d^3) of 50 MPa against a concrete cracking strength of
+        3-5 MPa, and seed 2104 was concrete as well. Both are now removed
+        by redraw (NOT_SHAFT_MATERIALS, the criterion the composite-shaft
+        template already applies; D-031 keeps every other seed's draw).
+        The applied torque is also bounded by the drawn metal's allowable
+        shear stress (ALLOWABLE_SHEAR_STRESS_MPA, sampling-only, never
+        printed): with 16 T_applied / (pi d^3) <= tau_allow both reactions,
+        each smaller than T_applied, are inside the elastic range the
+        compatibility equation assumes. A torque above the cap is redrawn
+        in hundreds of N.m below it, and the redraw is held to the same
+        display-tie screen on T_A. Rejection and item-pool figures are in
+        the Layer 2 fix report.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the reaction torques.
@@ -712,8 +788,40 @@ def template_statically_indeterminate_shaft():
     strong_materials = {k: v for k, v in SHEAR_MODULUS_VALUES.items() if v > 20.0}
     # P5: no silent fallback - an empty table is a bug, not a default.
     assert strong_materials, "SHEAR_MODULUS_VALUES has no material above 20 GPa"
-    material_name, shear_modulus_gpa = random.choice(list(strong_materials.items()))
-    
+    # Layer 2 fix: G > 20 GPa also admits Concrete and Glass, which are not
+    # shaft materials; they are removed by redraw, not by shortening the
+    # list (D-031).
+    for _m in range(100):
+        material_name, shear_modulus_gpa = random.choice(list(strong_materials.items()))
+        if material_name not in NOT_SHAFT_MATERIALS:
+            break
+    else:
+        raise RuntimeError("statically_indeterminate_shaft: no shaft material in 100 draws")
+
+    # Layer 2 fix: the applied torque is bounded by the material's allowable
+    # shear stress, 16 T / (pi d^3) <= tau_allow; both reactions are smaller
+    # than T, so the bound covers each segment. A torque above the cap is
+    # redrawn in whole hundreds of N.m at or below it, and the redraw must
+    # pass the same display-tie screen on T_A as the first draw. The bound
+    # is sampling policy and is never printed.
+    torque_cap = (ALLOWABLE_SHEAR_STRESS_MPA[material_name] * 1e6
+                  * math.pi * (diameter / 1000.0) ** 3 / 16.0)
+    if applied_torque > torque_cap:
+        t_hi = math.floor(min(5000.0, torque_cap) / 100.0) * 100.0
+        assert t_hi >= 100.0, (
+            "statically_indeterminate_shaft: no whole-hundred torque under the cap")
+        t_lo = min(500.0, max(100.0, math.floor(t_hi / 200.0) * 100.0))
+        for _t in range(200):
+            applied_torque = round(random.uniform(t_lo, t_hi), -2)
+            if not _is_display_tie(applied_torque / _divisor, 2):
+                break
+        else:
+            raise RuntimeError(
+                "statically_indeterminate_shaft: no closing torque in 200 draws")
+    assert 16.0 * applied_torque / (math.pi * (diameter / 1000.0) ** 3) \
+        <= ALLOWABLE_SHEAR_STRESS_MPA[material_name] * 1e6 + 1e-6, \
+        "statically_indeterminate_shaft: torque above the allowable shear stress"
+
     # 2. Perform the core calculations
     #
     # Step 3 prints "T_A = T / <divisor> = <T_A>" with the divisor displayed at

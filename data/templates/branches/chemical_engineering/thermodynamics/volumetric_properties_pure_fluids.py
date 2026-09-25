@@ -452,6 +452,24 @@ def template_pitzer_correlation_z():
         rejected: -0.0399 + 0.304*0.1323 = 0.0003192 exactly, which is the
         7-dp display the code binds.
 
+    Layer 2 review (2026-09-25):
+        One expert of three (the other two accepted) found hydrocarbons
+        sampled at 889-1064 K (propylene, n-hexane, n-pentane on three of
+        the five hand-check seeds), where the real substance would crack,
+        and asked for a per-substance temperature cap. The equations,
+        constants and arithmetic were confirmed correct. Not adopted, for
+        the reason the screen-pass paragraph above already gives: the item
+        is a corresponding-states correlation exercise at a stated (T, P),
+        and the correlation's validity condition (Vr >= 2) is enforced;
+        the chemical lifetime of the species at that state is not a
+        condition of the correlation. A cap was also simulated: with
+        organics capped at 750 K (an onset-of-cracking figure that has no
+        on-disk source) 42% of currently valid draws would be rejected and
+        nine organics (n-hexane to p-xylene, methanol, ethanol, acetone)
+        would fall below a fifth of their present share of the pool, since
+        the cap collides with the Vr >= 2 filter at high Pr; at 900 K, 30%
+        rejected. No number, text or sample changes.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking to compute the compressibility factor.
@@ -727,6 +745,28 @@ def template_work_isothermal_virial():
         Z1 = 1.022 and V1 = 0.81278 did not follow from the printed operands
         is rejected: 0.01746*129.3/(0.08314*1236.83) = 0.021954, so
         Z1 = 1.0220, and 1.022*0.08314*1236.83/129.3 = 0.81278.
+
+    Layer 2 review (2026-09-25):
+        One expert of three (the other two accepted) found the organic
+        substances compressed at 900-1188 K on all five hand-check seeds
+        (n-pentane 1045 K, acetone 1188 K, n-hexane 1088 K), where the
+        real species would crack during a sustained reversible process,
+        and asked for a per-substance temperature cap; the expert also
+        noted, correctly, that the Vr >= 2 filter skews the kept pool to
+        higher Tr (mean 2.47). Equations, constants and arithmetic were
+        confirmed correct. Not adopted: the item is an equation-of-state
+        exercise whose stated validity condition (Vr >= 2 at both states)
+        is enforced, and no per-substance thermal-stability limit exists
+        on disk to source a cap from. A cap was simulated: with organics
+        capped at 750 K, 57% of currently valid draws would be rejected
+        and ten of the 27 substances (n-pentane through p-xylene, the
+        aromatics, methanol, ethanol, acetone) would leave the pool
+        entirely, because at Tr <= 1.5 no P2 in the sampled 2.5-5 Pc
+        window satisfies Vr >= 2; at 900 K four substances would still be
+        lost. Removing a third of the substance table on one reviewer's
+        note is a sampling-range decision for the owner, not a fix; it is
+        recorded here and in the Layer 2 report. No number, text or sample
+        changes.
 
     Returns:
         tuple: A tuple containing:

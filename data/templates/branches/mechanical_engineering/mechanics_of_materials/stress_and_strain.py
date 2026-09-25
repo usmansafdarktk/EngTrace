@@ -1,8 +1,28 @@
 import random
 import math
 from decimal import Decimal, ROUND_HALF_UP
-from data.templates.branches.mechanical_engineering.constants import MATERIAL_PROPERTIES
+from data.templates.branches.mechanical_engineering.constants import (
+    MATERIAL_PROPERTIES, ALLOWABLE_NORMAL_STRESS_MPA, NOT_TENSION_MEMBER_MATERIALS)
 from data.templates.branches._emission import signed_term, joined_terms
+
+# SP 811: 1 ksi = 6.894757 MPa. Used only to express the sampling-only
+# allowable stresses in the US-customary branches; never printed.
+_MPA_PER_KSI = 6.894757
+
+
+def _tension_member_material(materials):
+    """Draw a material for a tension member, excluding by redraw (D-031).
+
+    Layer 2 fix (2026-09-25): the entries in NOT_TENSION_MEMBER_MATERIALS
+    (rubber, lead, concrete, glass, alumina) have no usable tensile design
+    strength. They are rejected and redrawn rather than removed from the
+    list, so every seed that never drew one keeps its draw.
+    """
+    for _m in range(100):
+        name = random.choice(materials)
+        if name not in NOT_TENSION_MEMBER_MATERIALS:
+            return name
+    raise RuntimeError("no tension-member material in 100 draws")
 
 
 def _hu(x, places):
@@ -74,6 +94,14 @@ def template_basic_stress_strain():
         draw of the attempt, so only a tie draw is redrawn. No display
         precision changes.
 
+    Layer 2 fix (2026-09-25):
+        Two experts of the branch rejected the SI branch's strain label:
+        epsilon is computed with both lengths in millimetres (seed 2105:
+        4.43 mm / 2950.0 mm = 1.502e-03), so it is mm/mm, but the Answer
+        line said "(mm/m or unitless)", a label a thousand times off (in
+        mm/m the strain is 1.502). The label now reads "mm/mm or unitless",
+        matching the US branch's "in/in". No number changes.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the normal stress and strain.
@@ -120,7 +148,7 @@ def template_basic_stress_strain():
             strain = elongation / (length * 1000)
         
             stress_unit = "MPa"
-            strain_unit_explanation = "mm/m or unitless"
+            strain_unit_explanation = "mm/mm or unitless"
 
         else:
             #  US Customary Unit System 
@@ -266,91 +294,187 @@ def template_axial_deformation():
     Core Equation:
         Deformation: delta = (P * L) / (A * E)
 
+    Layer 2 fix (2026-09-25):
+        All three experts of the branch rejected the template: load, size
+        and material were drawn independently of each other, so seed 2104
+        put 623 kN on a 70 mm polycarbonate rod (162 MPa, 2.5 times the
+        polymer's strength, a 7% strain reported as an elastic elongation of
+        239.306 mm), seed 2102 loaded nylon to 45.7 MPa (2.2% strain) and
+        seed 2105 asked a 2.45 m alumina rod to carry 1337.641 kN in
+        tension. Two changes to the sampling only. Rubber, lead, concrete,
+        glass and alumina are removed by redraw as materials with no usable
+        tensile design strength (NOT_TENSION_MEMBER_MATERIALS; D-031 keeps
+        every other seed's draw). The load is then bounded by the drawn
+        material's allowable stress (ALLOWABLE_NORMAL_STRESS_MPA,
+        sampling-only, never printed): in the deformation variant a load
+        above sigma_allow * A is redrawn as a whole number in
+        [cap/4, cap] (an attempt whose cap is under one unit is rejected);
+        in the allowable-load variant an elongation above
+        sigma_allow * L / E is redrawn in [cap/4, cap], so the strain the
+        question implies is inside the elastic range. The experts' second
+        finding, that the fixed 3-dp display leaves a stiff US-unit
+        elongation at two significant figures (seed 2101 printed 0.011 in
+        for 0.01085 in, 1.4% off), is met by quoting the elongation and the
+        allowable load to at least four significant figures, never fewer
+        digits than before. Closure: the area is now bound through its
+        4-dp display before it is consumed (it used to be printed rounded
+        and consumed exact), the load in N is bound through its 3-dp
+        display before the kN value is taken from it, and a draw whose
+        answer sits on a half-way display tie is redrawn (D-016). Rejection
+        and item-pool figures are in the Layer 2 fix report.
+
     Returns:
         tuple: A tuple containing:
             - str: A question about axial deformation or allowable load.
             - str: A step-by-step solution showing the calculations.
     """
-    # 1. Parameterize inputs with random values
-    use_si_units = random.choice([True, False])
-    shape = random.choice(['circular', 'square'])
-    material_name = random.choice(list(MATERIAL_PROPERTIES.keys()))
-    solve_for_load = random.choice([True, False])  # The variation
     precision = 3
 
-    if use_si_units:
-        #  SI Unit System 
-        material_E = MATERIAL_PROPERTIES[material_name]['E_GPa'] # in GPa
-        length = round(random.uniform(0.5, 5.0), 2) # in m
-        
-        if shape == 'circular':
-            dimension_val = random.randint(25, 120) # diameter in mm
-            dimension_name = "diameter"
-            area = math.pi * (dimension_val / 2)**2
-            dim_str = f"{dimension_val} mm"
-        else: # square
-            dimension_val = random.randint(25, 120) # side in mm
-            dimension_name = "side length"
-            area = dimension_val**2
-            dim_str = f"{dimension_val} mm"
-        
-        E_str = f"{material_E} GPa"
-        length_str = f"{length} m"
-        
-        if solve_for_load:
-            # We are solving for P given delta_max
-            max_elongation = round(random.uniform(1.0, 6.0), 2) # in mm
-            max_elongation_str = f"{max_elongation} mm"
-            # Core Calculation: P = (delta * A * E) / L
-            # Units: mm * mm^2 * (N/mm^2) / mm = N
-            load_N = (max_elongation * area * (material_E * 1000)) / (length * 1000)
-            load = load_N / 1000 # convert to kN
-            load_str = f"{round(load, precision)} kN"
-        else:
-            # We are solving for delta given P
-            load = random.randint(50, 800) # in kN
-            load_str = f"{load} kN"
-            # Core Calculation: delta = (P * L) / (A * E)
-            # Units: (N * mm) / (mm^2 * N/mm^2) = mm
-            elongation = ((load * 1000) * (length * 1000)) / (area * (material_E * 1000))
-            elongation_str = f"{round(elongation, precision)} mm"
+    def _sig_dp(x):
+        # At least `precision` dp and at least four significant figures.
+        return max(precision, precision - math.floor(math.log10(abs(x))))
 
+    for _attempt in range(200):
+        # 1. Parameterize inputs with random values
+        use_si_units = random.choice([True, False])
+        shape = random.choice(['circular', 'square'])
+        material_name = _tension_member_material(list(MATERIAL_PROPERTIES.keys()))
+        solve_for_load = random.choice([True, False])  # The variation
+        # Sampling-only bound (never printed): the drawn stress stays at or
+        # below the material's allowable stress.
+        sigma_allow_mpa = ALLOWABLE_NORMAL_STRESS_MPA[material_name]
+
+        if use_si_units:
+            #  SI Unit System
+            material_E = MATERIAL_PROPERTIES[material_name]['E_GPa'] # in GPa
+            length = round(random.uniform(0.5, 5.0), 2) # in m
+
+            if shape == 'circular':
+                dimension_val = random.randint(25, 120) # diameter in mm
+                dimension_name = "diameter"
+                area = math.pi * (dimension_val / 2)**2
+                dim_str = f"{dimension_val} mm"
+            else: # square
+                dimension_val = random.randint(25, 120) # side in mm
+                dimension_name = "side length"
+                area = dimension_val**2
+                dim_str = f"{dimension_val} mm"
+            # The area is displayed at 4 dp and then consumed (D-016 part 2).
+            area = _as_printed(area, f'.{precision + 1}f')
+
+            E_str = f"{material_E} GPa"
+            length_str = f"{length} m"
+
+            if solve_for_load:
+                # We are solving for P given delta_max
+                max_elongation = round(random.uniform(1.0, 6.0), 2) # in mm
+                # Bound: delta / L <= sigma_allow / E. A draw above the cap is
+                # redrawn in [cap/4, cap] at 2 dp, floored so it stays under.
+                delta_cap = sigma_allow_mpa / (material_E * 1000) * (length * 1000)
+                if max_elongation > delta_cap:
+                    max_elongation = math.floor(random.uniform(delta_cap / 4, delta_cap) * 100) / 100
+                max_elongation_str = f"{max_elongation} mm"
+                # Core Calculation: P = (delta * A * E) / L
+                # Units: mm * mm^2 * (N/mm^2) / mm = N
+                load_N = (max_elongation * area * (material_E * 1000)) / (length * 1000)
+                if _is_display_tie(load_N, precision):
+                    continue
+                # The load in N is displayed at 3 dp and the kN value is
+                # taken from it (D-016 part 2).
+                load_N = _as_printed(load_N, f'.{precision}f')
+                load = load_N / 1000 # convert to kN
+                load_dp = _sig_dp(load)
+                if _is_display_tie(load, load_dp):
+                    continue
+                load_str = f"{load:.{load_dp}f} kN"
+            else:
+                # We are solving for delta given P
+                load = random.randint(50, 800) # in kN
+                # Bound: P / A <= sigma_allow (MPa * mm^2 = N). A draw above
+                # the cap is redrawn as a whole number in [cap/4, cap].
+                load_cap = sigma_allow_mpa * area / 1000
+                if load > load_cap:
+                    if math.floor(load_cap) < 1:
+                        continue
+                    load = random.randint(max(1, math.ceil(load_cap / 4)), math.floor(load_cap))
+                load_str = f"{load} kN"
+                # Core Calculation: delta = (P * L) / (A * E)
+                # Units: (N * mm) / (mm^2 * N/mm^2) = mm
+                elongation = ((load * 1000) * (length * 1000)) / (area * (material_E * 1000))
+                delta_dp = _sig_dp(elongation)
+                if _is_display_tie(elongation, delta_dp):
+                    continue
+                elongation_str = f"{elongation:.{delta_dp}f} mm"
+
+        else:
+            #  US Customary Unit System
+            material_E = MATERIAL_PROPERTIES[material_name]['E_ksi'] # in ksi
+            length = round(random.uniform(12.0, 150.0), 1) # in inches
+
+            if shape == 'circular':
+                dimension_val = round(random.uniform(0.5, 6.0), 2) # diameter in inches
+                dimension_name = "diameter"
+                area = math.pi * (dimension_val / 2)**2
+                dim_str = f"{dimension_val} in"
+            else: # square
+                dimension_val = round(random.uniform(0.5, 6.0), 2) # side in inches
+                dimension_name = "side length"
+                area = dimension_val**2
+                dim_str = f"{dimension_val} in"
+            # The area is displayed at 4 dp and then consumed (D-016 part 2).
+            area = _as_printed(area, f'.{precision + 1}f')
+
+            E_str = f"{material_E} ksi"
+            length_str = f"{length} in"
+            sigma_allow_ksi = sigma_allow_mpa / _MPA_PER_KSI
+
+            if solve_for_load:
+                # Solving for P given delta_max
+                max_elongation = round(random.uniform(0.02, 0.2), 4) # in inches
+                # Bound: delta / L <= sigma_allow / E, redrawn in [cap/4, cap]
+                # at 4 dp, floored so it stays under.
+                delta_cap = sigma_allow_ksi / material_E * length
+                if max_elongation > delta_cap:
+                    max_elongation = math.floor(random.uniform(delta_cap / 4, delta_cap) * 1e4) / 1e4
+                max_elongation_str = f"{max_elongation} in"
+                # Core Calculation: P = (delta * A * E) / L
+                # Units: in * in^2 * (kips/in^2) / in = kips
+                load = (max_elongation * area * material_E) / length
+                load_dp = _sig_dp(load)
+                if _is_display_tie(load, load_dp):
+                    continue
+                load_str = f"{load:.{load_dp}f} kips"
+            else:
+                # Solving for delta given P
+                load = random.randint(10, 200) # in kips
+                # Bound: P / A <= sigma_allow, redrawn as a whole number in
+                # [cap/4, cap]; an attempt whose cap is under 1 kip is rejected.
+                load_cap = sigma_allow_ksi * area
+                if load > load_cap:
+                    if math.floor(load_cap) < 1:
+                        continue
+                    load = random.randint(max(1, math.ceil(load_cap / 4)), math.floor(load_cap))
+                load_str = f"{load} kips"
+                # Core Calculation: delta = (P * L) / (A * E)
+                # Units: (kips * in) / (in^2 * kips/in^2) = in
+                elongation = (load * length) / (area * material_E)
+                delta_dp = _sig_dp(elongation)
+                if _is_display_tie(elongation, delta_dp):
+                    continue
+                elongation_str = f"{elongation:.{delta_dp}f} in"
+        break
     else:
-        #  US Customary Unit System 
-        material_E = MATERIAL_PROPERTIES[material_name]['E_ksi'] # in ksi
-        length = round(random.uniform(12.0, 150.0), 1) # in inches
-        
-        if shape == 'circular':
-            dimension_val = round(random.uniform(0.5, 6.0), 2) # diameter in inches
-            dimension_name = "diameter"
-            area = math.pi * (dimension_val / 2)**2
-            dim_str = f"{dimension_val} in"
-        else: # square
-            dimension_val = round(random.uniform(0.5, 6.0), 2) # side in inches
-            dimension_name = "side length"
-            area = dimension_val**2
-            dim_str = f"{dimension_val} in"
-            
-        E_str = f"{material_E} ksi"
-        length_str = f"{length} in"
+        raise RuntimeError("axial_deformation: no closing sample in 200 draws")
 
-        if solve_for_load:
-            # Solving for P given delta_max
-            max_elongation = round(random.uniform(0.02, 0.2), 4) # in inches
-            max_elongation_str = f"{max_elongation} in"
-            # Core Calculation: P = (delta * A * E) / L
-            # Units: in * in^2 * (kips/in^2) / in = kips
-            load = (max_elongation * area * material_E) / length
-            load_str = f"{round(load, precision)} kips"
-        else:
-            # Solving for delta given P
-            load = random.randint(10, 200) # in kips
-            load_str = f"{load} kips"
-            # Core Calculation: delta = (P * L) / (A * E)
-            # Units: (kips * in) / (in^2 * kips/in^2) = in
-            elongation = (load * length) / (area * material_E)
-            elongation_str = f"{round(elongation, precision)} in"
-    
+    # --- invariant: the posed stress is inside the allowable (sampling bound)
+    if solve_for_load:
+        _strain = (max_elongation / (length * 1000)) if use_si_units else (max_elongation / length)
+        _E_mpa = material_E * 1000 if use_si_units else material_E * _MPA_PER_KSI
+        assert _strain * _E_mpa <= sigma_allow_mpa * (1 + 1e-9), "axial_deformation: strain above allowable"
+    else:
+        _sigma_mpa = (load * 1000 / area) if use_si_units else (load / area * _MPA_PER_KSI)
+        assert _sigma_mpa <= sigma_allow_mpa * (1 + 1e-9), "axial_deformation: stress above allowable"
+
     # 2. Generate the question and solution strings
     if solve_for_load:
         question = (
@@ -389,7 +513,7 @@ def template_axial_deformation():
                 f"E = {material_E} GPa = {material_E * 1000} MPa = {material_E * 1000} N/mm^2\n"
                 f"L = {length} m = {length * 1000} mm\n\n"
                 f"P = ({max_elongation} * {round(area, precision+1)} * {material_E * 1000}) / {length * 1000}\n"
-                f"P = {round(load_N, precision)} N = {round(load, precision)} kN\n\n"
+                f"P = {load_N:.{precision}f} N = {load:.{load_dp}f} kN\n\n"
             )
         else: # US units
             solution += (
@@ -399,7 +523,7 @@ def template_axial_deformation():
                 f"E = {material_E} ksi\n"
                 f"L = {length} in\n\n"
                 f"P = ({max_elongation} * {round(area, precision+1)} * {material_E}) / {length}\n"
-                f"P = {round(load, precision)} kips\n\n"
+                f"P = {load:.{load_dp}f} kips\n\n"
             )
         solution += f"**Answer:**\n  The maximum allowable load is **{load_str}**."
     else: # solve_for_deformation
@@ -437,7 +561,7 @@ def template_axial_deformation():
                 f"A = {round(area, precision+1)} mm^2\n"
                 f"E = {material_E} GPa = {material_E * 1000} MPa = {material_E * 1000} N/mm^2\n\n"
                 f"delta = (({load * 1000}) * ({length * 1000})) / (({round(area, precision+1)}) * ({material_E * 1000}))\n"
-                f"delta = {round(elongation, precision)} mm\n\n"
+                f"delta = {elongation:.{delta_dp}f} mm\n\n"
             )
         else: # US units
             solution += (
@@ -447,7 +571,7 @@ def template_axial_deformation():
                 f"A = {round(area, precision+1)} in^2\n"
                 f"E = {material_E} ksi\n\n"
                 f"delta = ({load} * {length}) / ({round(area, precision+1)} * {material_E})\n"
-                f"delta = {round(elongation, precision)} in\n\n"
+                f"delta = {elongation:.{delta_dp}f} in\n\n"
             )
         solution += f"**Answer:**\n  The total elongation of the rod is **{elongation_str}**."
 
@@ -486,6 +610,29 @@ def template_multi_segment_rod():
         linear-elasticity gate still decides on the exact area, so which
         draw is accepted is unchanged. No display precision changes.
 
+    Layer 2 fix (2026-09-25):
+        One expert of the branch rejected the template: the only validity
+        gate was strain < 1%, which for a metal allows stresses far above
+        yield (about 2000 MPa for steel). Seed 2104 loaded a 32.8 mm
+        aluminum segment to 243 kN (287.6 MPa, above 6061-T6 yield) and
+        seed 2105 put a 2.0 in concrete segment under -34 kips (10.8 ksi,
+        two to three times ordinary concrete strength); concrete could also
+        be drawn in tension. Two changes to the sampling only. Lead,
+        concrete, glass and alumina join rubber as materials a rod segment
+        is not made of, removed by redraw (NOT_TENSION_MEMBER_MATERIALS;
+        D-031 keeps every other seed's draw). Each segment's stress
+        |P_i| / A_i must then be at or below its material's allowable
+        stress (ALLOWABLE_NORMAL_STRESS_MPA, sampling-only, never printed).
+        A plain redraw would reject 89% of draws (measured) and concentrate
+        the pool on thick, strong, lightly loaded rods, so instead, when
+        the worst segment's ratio rho exceeds 1, every node load is scaled
+        by u / rho with u drawn in [0.5, 1] and truncated to whole units
+        (the internal loads are linear in the node loads), which leaves
+        the materials, lengths and diameters of the draw untouched. The
+        gate is then decided on the exact area like the 1% strain gate it
+        joins, which stays; only the rare rounding case is redrawn whole.
+        Rejection and item-pool figures are in the Layer 2 fix report.
+
     Returns:
         tuple: A tuple containing:
             - str: A question about the total deformation of a composite rod.
@@ -493,20 +640,22 @@ def template_multi_segment_rod():
     """
     # 1. Parameterize inputs with validation loop
     precision = 4
-    
+
     # Define a safe list of structural materials (exclude rubber for this high-load problem)
     structural_materials = [k for k in MATERIAL_PROPERTIES.keys() if 'Rubber' not in k]
 
     for _attempt in range(200):
         use_si_units = random.choice([True, False])
         num_segments = random.choice([2, 3])
-        
+
         segments = []
         loads = {} # Loads applied at nodes {node_index: load_value}
-        
+
         # Generate properties for each segment
         for i in range(num_segments):
-            material_name = random.choice(structural_materials)
+            # Layer 2 fix: the materials with no tensile design strength are
+            # excluded by redraw from the same list (D-031).
+            material_name = _tension_member_material(structural_materials)
             segment = {'material_name': material_name}
             
             if use_si_units:
@@ -541,6 +690,32 @@ def template_multi_segment_rod():
             cumulative_load += loads[node_index]
             segments[i]['internal_load'] = cumulative_load
 
+        # Layer 2 fix: bound every segment's stress by its material's
+        # allowable stress (sampling-only). The internal loads are linear in
+        # the node loads, so when the worst segment's ratio
+        # rho = max |P_i| / (A_i * sigma_allow_i) exceeds 1 the node loads
+        # are all scaled by u / rho with u drawn in [0.5, 1], truncated
+        # toward zero to whole kN or kips (a load that would vanish keeps
+        # its sign at one unit), and the internal loads are recomputed. The
+        # gate below then decides on the exact area; the scale is chosen so
+        # that it passes except in the rare rounding case, which is redrawn.
+        def _stress_ratio(P, seg):
+            allow = ALLOWABLE_NORMAL_STRESS_MPA[seg['material_name']]
+            allow = allow / 1000 if use_si_units else allow / _MPA_PER_KSI   # kN/mm^2 or ksi
+            return abs(P) / (seg['area_exact'] * allow)
+        rho = max(_stress_ratio(seg['internal_load'], seg) for seg in segments)
+        if rho > 1:
+            scale = random.uniform(0.5, 1.0) / rho
+            for node in loads:
+                scaled = int(loads[node] * scale)          # toward zero
+                if scaled == 0 and loads[node] != 0:
+                    scaled = 1 if loads[node] > 0 else -1
+                loads[node] = scaled
+            cumulative_load = 0
+            for i in range(num_segments - 1, -1, -1):
+                cumulative_load += loads[i + 1]
+                segments[i]['internal_load'] = cumulative_load
+
         deltas = []   # each segment's quotient of its printed operands
         for i in range(num_segments):
             P = segments[i]['internal_load']
@@ -566,7 +741,15 @@ def template_multi_segment_rod():
             # display binding. |P| / (A * E) is the segment strain in both
             # unit systems (kN / (mm^2 * GPa) and kips / (in^2 * ksi)).
             current_strain = abs(P) / (segments[i]['area_exact'] * E)
-            
+            # Layer 2 fix: the segment stress, in MPa, against the material's
+            # allowable stress (kN/mm^2 * 1000 = MPa; kips/in^2 * 6.894757 = MPa).
+            if use_si_units:
+                stress_mpa = abs(P) * 1000 / segments[i]['area_exact']
+            else:
+                stress_mpa = abs(P) / segments[i]['area_exact'] * _MPA_PER_KSI
+            segments[i]['over_allowable'] = (
+                stress_mpa > ALLOWABLE_NORMAL_STRESS_MPA[segments[i]['material_name']])
+
             deltas.append(delta)
             # Each deformation is displayed at `precision` dp and then summed,
             # so the sum runs over the displayed values (D-016 part 2).
@@ -577,6 +760,10 @@ def template_multi_segment_rod():
 
         # Validate: Ensure max strain is < 1% (0.01) for linear elasticity to hold
         if max_strain >= 0.01:
+            continue
+        # Layer 2 fix: every segment's stress at or below its material's
+        # allowable stress (sampling-only bound), else the draw is redrawn.
+        if any(s['over_allowable'] for s in segments):
             continue
         # A segment deformation is a quotient by an arbitrary product A * E,
         # exact at no fixed display; a draw with one exactly on a half-way
@@ -983,6 +1170,26 @@ def template_statically_indeterminate():
         or stress sits exactly on a half-way 3-dp tie (7308.0 / 64.0 =
         114.1875) is redrawn (D-016 part 3); no display precision changes.
 
+    Layer 2 fix (2026-09-25):
+        Two experts of the branch rejected the template: the load
+        (100-500 kN / 50-250 kips) and the section were drawn independently
+        of the material, and every MATERIAL_PROPERTIES row could be drawn,
+        so seed 2103 put 311 kN on a 56 mm ABS bar (sigma_AB = 38.96 MPa,
+        sigma_BC = -60.211 MPa, at or past ABS's ~40 MPa strength), and
+        rubber, concrete and lead could carry tens of MPa in the tension
+        segment. Two changes to the sampling only. Rubber, lead, concrete,
+        glass and alumina are removed by redraw as materials with no
+        tensile design strength (NOT_TENSION_MEMBER_MATERIALS; D-031 keeps
+        every other seed's draw). The load is then bounded so that the
+        larger reaction, P * max(L_AB, L_BC) / L_AC, divided by the area is
+        at or below the material's allowable stress
+        (ALLOWABLE_NORMAL_STRESS_MPA, sampling-only, never printed); a load
+        above the cap is redrawn as a whole number in [cap/4, cap], and an
+        attempt whose cap is under one unit is rejected. The redraw
+        happens before the display-tie screen, which still decides on the
+        load finally posed. Rejection and item-pool figures are in the
+        Layer 2 fix report.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for reaction forces and stresses.
@@ -990,10 +1197,15 @@ def template_statically_indeterminate():
     """
     # 1. Parameterize inputs
     use_si_units = random.choice([True, False])
-    material_name = random.choice(list(MATERIAL_PROPERTIES.keys()))
+    # Layer 2 fix: materials with no tensile design strength are excluded
+    # by redraw (D-031).
+    material_name = _tension_member_material(list(MATERIAL_PROPERTIES.keys()))
     material = MATERIAL_PROPERTIES[material_name]
     shape = random.choice(['circular', 'square'])
     precision = 3
+    # Sampling-only bound (never printed): the larger reaction's stress
+    # stays at or below the material's allowable stress.
+    sigma_allow_mpa = ALLOWABLE_NORMAL_STRESS_MPA[material_name]
 
     for _attempt in range(200):
         if use_si_units:
@@ -1031,6 +1243,18 @@ def template_statically_indeterminate():
 
             E_val = material['E_ksi']
             unit_L, unit_P, unit_S, unit_A, unit_E = "in", "kips", "ksi", "in^2", "ksi"
+
+        # Layer 2 fix: the larger reaction is P * max(L_AB, L_BC) / L_AC, so
+        # the load cap is sigma_allow * A * L_AC / max(L_AB, L_BC), in kN
+        # (MPa * mm^2 / 1000) or kips (ksi * in^2). A load above it is
+        # redrawn as a whole number in [cap/4, cap]; a cap under one unit
+        # rejects the attempt.
+        _sigma_allow = sigma_allow_mpa / 1000 if use_si_units else sigma_allow_mpa / _MPA_PER_KSI
+        load_cap = _sigma_allow * area * total_length / max(len_AB, total_length - len_AB)
+        if load_P > load_cap:
+            if math.floor(load_cap) < 1:
+                continue
+            load_P = random.randint(max(1, math.ceil(load_cap / 4)), math.floor(load_cap))
 
         # Every quantity that is displayed and then consumed is bound through
         # its own display (D-016 part 2): L_BC and P*L_BC at 2 dp, the area
@@ -1072,6 +1296,12 @@ def template_statically_indeterminate():
         break
     else:
         raise RuntimeError("statically_indeterminate: no closing sample in 200 draws")
+
+    # --- invariant: the larger reaction's stress is inside the allowable
+    _sigma_max_mpa = max(R_A, R_C) / area * (1000 if use_si_units else _MPA_PER_KSI)
+    assert _sigma_max_mpa <= sigma_allow_mpa * (1 + 1e-3), (   # displayed A and R_A
+        f"statically_indeterminate: {_sigma_max_mpa:.1f} MPa above the allowable "
+        f"{sigma_allow_mpa} MPa for {material_name}")
 
     # 3. Generate Question and Solution Strings
     question = (
