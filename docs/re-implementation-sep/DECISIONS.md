@@ -4049,11 +4049,54 @@ What the rejections say, each checked against the instance the expert cited (the
 certified (the D-095 adjudication rule, now with two concrete cases); fixing the five and a round
 3 for them; the screen re-judge (D-106). None of the five is fixed yet.
 
+## D-108 — Layer 2 round 2 fixes: five templates fixed; the review app's rendering is a finding for rounds 1 and 2
+
+**Date:** 2026-09-26 · **Status:** DECIDED (the five fixes); OPEN (the app, `signal_operations`) · **Source:**
+`template_annotation_23092026/layer2/fixes_round2.md`, `layer2/markdown_scan.md`, `layer0/gate_report.md`,
+`layer0/item_pool_impact.md`
+
+The owner asked for the five templates D-107 lists to be fixed (2026-09-26). Each objection was
+checked against the instance cited, then fixed by the rule its kind of defect calls for:
+
+- **A scenario that no material could produce** (`basic_stress_strain`): the material is drawn and
+  named, the load is bounded by its allowable stress, and the elongation follows from its modulus,
+  so σ/ε reproduces a real E.
+- **Physically impossible pairings** (`utube_manometer`): a stated rule, after Çengel & Cimbala,
+  that the manometer liquid is denser than and immiscible with the pipe fluid, applied by
+  redrawing the manometer liquid alone (D-031, D-045). Cryogenic pipe fluids and two rows that are
+  not manometer liquids (bromine, sodium polysulfide) are never drawn. At HEAD 55.2% of instances
+  used a pair the rule now excludes, so the manometer-liquid shares move (mercury 8.7% to 30.9%).
+- **A display that lost figures after round 1's fix** (`multi_segment_rod`): deformations at four
+  significant figures, the total as the exact sum of what is printed, and a 0.5% guard.
+- **An assumption outside its validity** (`newtons_law_shear_stress`): a laminar cap, Re ≤ 1000,
+  about 30% under the plane-Couette transition (Tillmark & Alfredsson 1992), applied by redrawing
+  the speed below the cap so no fluid is lost and no speed is pinned at the range floor.
+- **Meaning carried by rendering** (`finite_convolution`): every sequence states its index list.
+
+**Evidence.** Only the five template functions changed. Gate green, 150 of 150 at 500 seeds; the
+tie census drops to 12 templates, with none of the five among them; the item pool moved in exactly these five
+(question 1,053 / answer 1,327 / solution 1,355 of 45,000). Answer displays changed in all five;
+the owner's instruction to fix them is taken as the D-044 sign-off.
+
+**The finding.** The review app renders questions and solutions as Markdown, and the models read
+the raw text. `markdown_scan.py` finds constructs that remove characters in 31 questions and 63
+solutions, 65 templates in either. Nearly all are unspaced products such as `2*pi*f*t`, whose
+paired asterisks become italics, and dollar amounts, which become inline math. The experts judged
+those templates in rounds 1 and 2 from that view. No verdict is known to be wrong because of it,
+but none was made on the text the models read. `signal_operations` has `finite_convolution`'s
+defect exactly: its origin is marked only by asterisks, in the question and the answer. Round 3's
+five templates carry no lossy construct beyond the now-redundant convolution marker, so round 3
+can go out as built.
+
+**Open.** Whether the app shows questions and solutions as plain text from now on, and whether
+the templates judged through the rendered view get a plain-text look; fixing `signal_operations`.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
-| D-107 | Fix the five templates round 2 objected to (three rejected by majority) and re-certify them in a round 3, and whether the two 2-of-3 approvals stand as certified | the item pool is frozen |
+| D-108 | Whether the review app shows questions and solutions as plain text, as the models read them, and whether the 65 templates judged through its Markdown rendering get a plain-text look; fixing `signal_operations`'s origin marker | the paper states what the experts certified |
+| D-107 | ~~Fix the five templates round 2 objected to~~ **Fixed 2026-09-26 (D-108); round 3 built for the five.** Open: sending round 3 and scoring it | the item pool is frozen |
 | D-106 | Whether the screen re-judges the changed templates (a few cents, targeted; not run before round 2); the plasma row's per-row tag | the item pool is frozen |
 | D-095 | ~~Layer 2 roster and dates~~ **Round 1 run 2026-09-24/25 with the pilot's 15 experts (D-106).** **Round 2 run 2026-09-25 (D-107).** Open: adjudication rule for split verdicts (7 of round 1's 22 rejections were 1 of 3; round 2 leaves two templates approved 2 of 3 over a confirmed objection) | a template is counted as certified |
 | D-094 | Whether to narrow the P2/Pc range in `work_isothermal_virial` (now 50% redraw; an expert's thermal-stability objection, D-106, turns on the same range) and accept the 41% stability redraw in `floating_object_submersion_depth`; the residuals in `pass1_fixes.md` | the item pool is regenerated |

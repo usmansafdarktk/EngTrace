@@ -310,6 +310,91 @@ def template_basic_buoyant_force():
     return question, solution
 
 
+# Layer 2 fix (2026-09-26): which pipe fluids template_utube_manometer may
+# pair with which manometer liquids. Cengel & Cimbala, Fluid Mechanics:
+# Fundamentals and Applications (4th ed., McGraw-Hill, 2017), Sec. 3-2 "The
+# Manometer", on a manometer connected across a flow section: "The two fluids
+# must be immiscible, and rho2 must be greater than rho1." The template has
+# always redrawn a pair whose manometer liquid is not the denser; these tables
+# let it redraw a pair that would mix. Each fluid is classed by what it
+# dissolves in:
+#
+#   pipe fluids        gas; hydrocarbon (fuels, oils, toluene, benzene,
+#                      hexane); water-miscible organic (the three alcohols and
+#                      acetone, which mix with water AND with most organic
+#                      liquids); aqueous (water, sea water, milk, and the
+#                      water-miscible glycols)
+#   manometer liquids  liquid metal (mercury); water-based (water, sea water,
+#                      the two salt solutions, glycerin); organic (the two
+#                      oils and the four halogenated liquids)
+#
+# The rule. Mercury mixes with none of the pipe fluids, and a gas in the pipe
+# with none of the manometer liquids. A water-based manometer liquid mixes with
+# every aqueous or water-miscible pipe liquid; an organic one mixes with every
+# organic pipe liquid, hydrocarbon or water-miscible. So the alcohols and
+# acetone are measured with mercury only, the fuels and oils with mercury or a
+# water-based liquid, and the aqueous pipe liquids with mercury or a
+# halogenated liquid.
+#
+# Two MANOMETER_FLUIDS rows are not manometer liquids and are never drawn.
+# Bromine is a "dark reddish-brown, fuming liquid with suffocating, irritating
+# fumes" (NIOSH), "toxic by inhalation" and "very corrosive to tissue and to
+# metals" (CAMEO), with a vapour pressure of 23.3 kPa at 20 C (ILO-WHO ICSC;
+# NIOSH and CAMEO give 172 mmHg, 22.9 kPa), all as PubChem CID 24408 quotes
+# them (Physical Description and Vapor Pressure, read 2026-09-26, not on
+# disk): the open leg of a bromine U-tube would fume toxic vapour, which is no
+# instrument. Sodium Polysulfide names no concentration, and the salt is a
+# solid at room temperature ("reddish-brown solid"; its "25-30% aqueous
+# solution" is a "dark red viscous liquid", Haz-Map as PubChem CID 15361821,
+# CAS 1344-08-7, quotes it, read 2026-09-26, not on disk), the fault the zinc
+# row had in round 1. Liquid nitrogen and liquid oxygen are not drawn as pipe
+# fluids: every manometer liquid in the table freezes far above their -196 C
+# and -183 C (mercury at -38.8 C), so the interface cannot exist. Exclusion is
+# by redraw inside the template, never by deleting rows, so the key order
+# random.choice indexes is unchanged (D-031).
+_CRYOGENIC_PIPE_FLUIDS = ("Liquid Nitrogen", "Liquid Oxygen")
+_NOT_MANOMETER_LIQUIDS = ("Bromine", "Sodium Polysulfide")
+_PIPE_FLUID_CLASS = {
+    "Air": "gas", "Helium": "gas", "Hydrogen": "gas",
+    "Natural Gas (Methane)": "gas", "Carbon Dioxide": "gas",
+    "Gasoline": "hydrocarbon", "Kerosene": "hydrocarbon", "Diesel Fuel": "hydrocarbon",
+    "Jet Fuel (JP-4)": "hydrocarbon", "SAE 10 Oil": "hydrocarbon",
+    "SAE 20 Oil": "hydrocarbon", "SAE 30 Oil": "hydrocarbon", "SAE 40 Oil": "hydrocarbon",
+    "SAE 50 Oil": "hydrocarbon", "Crude Oil (Light)": "hydrocarbon",
+    "Crude Oil (Heavy)": "hydrocarbon", "Engine Oil": "hydrocarbon",
+    "Hydraulic Oil": "hydrocarbon", "Toluene": "hydrocarbon", "Benzene": "hydrocarbon",
+    "Hexane": "hydrocarbon",
+    "Ethanol": "water-miscible organic", "Methanol": "water-miscible organic",
+    "Isopropyl Alcohol": "water-miscible organic", "Acetone": "water-miscible organic",
+    "Water": "aqueous", "Sea Water": "aqueous", "Milk": "aqueous",
+    "Ethylene Glycol": "aqueous", "Antifreeze (50/50)": "aqueous",
+    "Liquid Nitrogen": "cryogen", "Liquid Oxygen": "cryogen",
+}
+_MANOMETER_FLUID_CLASS = {
+    "Mercury": "liquid metal",
+    "Water": "water-based", "Sea Water": "water-based",
+    "Calcium Chloride Solution (40%)": "water-based",
+    "Zinc Chloride Solution (50%)": "water-based",
+    "Glycerin": "water-based",
+    "SAE 50 Oil": "organic", "SAE 90 Gear Oil": "organic",
+    "Carbon Tetrachloride": "organic", "Chloroform": "organic",
+    "Diiodomethane": "organic", "Acetylene Tetrabromide": "organic",
+}
+_MIXING_CLASSES = {
+    ("water-based", "aqueous"), ("water-based", "water-miscible organic"),
+    ("organic", "hydrocarbon"), ("organic", "water-miscible organic"),
+}
+assert set(_PIPE_FLUID_CLASS) == set(PIPE_FLUIDS), "every PIPE_FLUIDS row needs a class"
+assert set(_MANOMETER_FLUID_CLASS) | set(_NOT_MANOMETER_LIQUIDS) == set(MANOMETER_FLUIDS), \
+    "every MANOMETER_FLUIDS row needs a class or an exclusion"
+assert not set(_MANOMETER_FLUID_CLASS) & set(_NOT_MANOMETER_LIQUIDS)
+
+
+def _fluids_mix(manometer_fluid, pipe_fluid):
+    """Do this manometer liquid and this pipe fluid mix (the rule above)?"""
+    return (_MANOMETER_FLUID_CLASS[manometer_fluid], _PIPE_FLUID_CLASS[pipe_fluid]) in _MIXING_CLASSES
+
+
 # Template 3 (Intermediate)
 def template_utube_manometer():
     """
@@ -347,6 +432,52 @@ def template_utube_manometer():
         random.choice over the table (D-031), so the item-pool effect is
         wholesale; it is measured in the Layer 2 fix report.
 
+    Layer 2 fix (2026-09-26):
+        All three experts of the branch rejected the template in round 2:
+        seed 2201 connected a mercury manometer to a pipe of liquid oxygen
+        (1141 kg/m^3, about -183 C), where mercury (freezing at -38.8 C) is
+        solid, so the 50.162 kPa balance describes a device that cannot
+        exist; PIPE_FLUIDS also carries liquid nitrogen. Verified on seed
+        2201; PIPE_FLUIDS is read by this template alone. The pairing
+        physics was checked too, against Cengel and Cimbala's condition
+        quoted with the rule above this function, and two table rows were
+        found not to be manometer liquids at all, bromine and sodium
+        polysulfide (reasons and sources with the rule). The manometer
+        liquid is always the denser, because a draw that is not is redrawn
+        whole (now asserted), but at HEAD 55.2% of 20,000 instances used a
+        pair the fix excludes: an organic manometer liquid on a hydrocarbon
+        pipe 21.3%, bromine 8.0%, sodium polysulfide 7.2%, a cryogenic pipe
+        fluid 5.7%, an organic liquid on an alcohol or acetone 5.4%, and a
+        water-based one on an alcohol or acetone 4.2% or on an aqueous
+        liquid 3.4%. Changes: a cryogenic pipe fluid redraws the whole
+        attempt; a manometer liquid that would mix with the pipe fluid, or
+        that is bromine or sodium polysulfide, is redrawn alone until it is
+        denser and usable, so the pipe-fluid shares stay put (redrawing both
+        fluids would have taken the gas pipes from 19% to 37% of the pool
+        and each alcohol to 0.5%); no table row is deleted (D-031). 185 of
+        the 421 density-admissible pairs remain, and every pipe fluid but
+        the two cryogens keeps at least mercury. Shares at 20,000 seeds,
+        HEAD to now: no pipe fluid moves by more than 0.95 points (the gases
+        19.3% to 20.2% together; the alcohols and acetone 12.9% to 15.9%
+        together, since with mercury they always pass the positive-pressure
+        screen); the manometer liquids move as the rule dictates, mercury
+        8.7% to 30.9% (the only partner of the alcohols and acetone), the
+        other water-based liquids 5.3-7.4% to 8.7-10.5% each, the four
+        halogenated liquids 7.2-8.5% to 3.9-4.7% each, the two oils 5.4%
+        and 4.8% to 1.7% each (gas pipes only), and bromine and sodium
+        polysulfide 8.5% and 7.8% to none in 20,000 seeds. Redraws: 22.6% of
+        attempts are redrawn whole (HEAD 19.2%; per 20,000 instances 1,555
+        for density, 1,418 for a cryogen, 2,852 for a tie or a gauge
+        pressure that is not positive), and the manometer liquid is redrawn
+        alone on 53.2% of instances.
+        Also changed, found while reading seed 2304: the kPa answer at a
+        fixed 3 dp kept one or two figures below 1 kPa (88.2900 Pa printed
+        0.088 kPa; seed 249, 17.6580 Pa, printed 0.018 kPa, 1.9% off), 12%
+        of instances at HEAD and 9% now. Below 1 kPa it is now quoted to four significant
+        figures, which rounds less, never more, because the pascal value is
+        exact at 4 dp; from 1 kPa up it prints as before. Against HEAD at
+        500 seeds: question changed 54.4%, answer 59.4%.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the gauge pressure in a pipe.
@@ -365,9 +496,9 @@ def template_utube_manometer():
         # Randomly select a fluid for the manometer
         manometer_fluid_name, rho2 = random.choice(list(MANOMETER_FLUIDS.items()))
 
-        #  Ensure physical realism: manometer fluid must be denser
-        # If the chosen pipe fluid is denser than the manometer fluid, re-select
-        # the manometer fluid until it is denser.
+        #  Ensure physical realism: manometer fluid must be denser, since it
+        # sits below the pipe fluid at the interface. A draw whose manometer
+        # fluid is not denser is redrawn whole (both fluids).
         if rho2 <= rho1:
             continue
 
@@ -376,6 +507,28 @@ def template_utube_manometer():
         h1 = round(random.uniform(0.1, 0.5), 2)
         # h2: the height difference between the two manometer fluid columns
         h2 = round(random.uniform(0.05, 0.75), 2)
+
+        # Layer 2 fix (2026-09-26): no cryogenic pipe fluid, and the two
+        # fluids must be immiscible (_fluids_mix states the rule). A cryogenic
+        # pipe fluid redraws the whole attempt. A manometer liquid that would
+        # mix with the pipe fluid is redrawn alone, from the same table, until
+        # it is both denser and immiscible, so the pipe-fluid shares stay as
+        # they were (D-045); redrawing both fluids instead would have doubled
+        # the share of gas pipes, the one class every liquid pairs with. Both
+        # screens sit after the height draws, so an attempt that meets neither
+        # consumes the same random numbers as before and every seed that never
+        # met an excluded pair keeps its draw (D-031).
+        if pipe_fluid_name in _CRYOGENIC_PIPE_FLUIDS:
+            continue
+        # The two rows that are not manometer liquids at all (bromine, sodium
+        # polysulfide) are redrawn the same way.
+        for _redraw in range(1000):
+            if (rho2 > rho1 and manometer_fluid_name not in _NOT_MANOMETER_LIQUIDS
+                    and not _fluids_mix(manometer_fluid_name, pipe_fluid_name)):
+                break
+            manometer_fluid_name, rho2 = random.choice(list(MANOMETER_FLUIDS.items()))
+        else:
+            continue
 
         # 2. Perform the core calculations for verification. An integer
         # density times g = 9.81 times a 2-dp height is exact at 4 dp, so the
@@ -404,14 +557,31 @@ def template_utube_manometer():
         # (open arm level is "higher" implies P_pipe > P_atm)
         if gauge_pressure_pa <= 0:
             continue
-        if _is_display_tie(gauge_pressure_pa / 1000, precision):
+        # Layer 2 fix (2026-09-26): the kPa answer keeps 3 dp from 1 kPa up
+        # and is quoted to four significant figures below it, where 3 dp kept
+        # one or two (88.2900 Pa printed 0.088 kPa). The pascal value is exact
+        # at 4 dp, so its kPa value is exact at 7 dp and the longer display
+        # rounds less, never more.
+        kpa_dp = max(precision, 3 - math.floor(math.log10(gauge_pressure_pa / 1000)))
+        if _is_display_tie(gauge_pressure_pa / 1000, kpa_dp):
             continue
         break
     else:
         raise RuntimeError("utube_manometer: no closing sample in 200 draws")
 
+    # --- invariants: the manometer fluid is the denser one, and the pipe is
+    # above atmospheric pressure as the question describes.
+    assert rho2 > rho1, "utube_manometer: manometer fluid not denser than the pipe fluid"
+    assert manometer_fluid_name not in _NOT_MANOMETER_LIQUIDS, "utube_manometer: not a manometer liquid"
+    assert not _fluids_mix(manometer_fluid_name, pipe_fluid_name), "utube_manometer: the two fluids mix"
+    assert gauge_pressure_pa > 0, "utube_manometer: gauge pressure not positive"
+
     # Step D: Convert the final answer to kilopascals (kPa) for readability
-    gauge_pressure_kpa = _as_printed(gauge_pressure_pa / 1000, f'.{precision}f')
+    gauge_pressure_kpa = _as_printed(gauge_pressure_pa / 1000, f'.{kpa_dp}f')
+    # From 1 kPa up the answer prints exactly as before; below it, at its
+    # four-significant-figure length with trailing zeros kept.
+    kpa_str = (f"{round(gauge_pressure_kpa, precision)}" if kpa_dp == precision
+               else f"{gauge_pressure_kpa:.{kpa_dp}f}")
 
     # 3. Generate the question and solution strings
 
@@ -455,10 +625,10 @@ def template_utube_manometer():
         f"P_gauge = {pressure_term2_pa:.4f} Pa - {pressure_term1_pa:.4f} Pa = {gauge_pressure_pa:.4f} Pa\n\n"
 
         f"**Step 6:** Convert the Answer to Kilopascals (kPa)\n"
-        f"P_gauge = {gauge_pressure_pa:.4f} Pa / 1000 = {round(gauge_pressure_kpa, precision)} kPa\n\n"
+        f"P_gauge = {gauge_pressure_pa:.4f} Pa / 1000 = {kpa_str} kPa\n\n"
 
         f"**Answer:**\n"
-        f"The gauge pressure in the pipe is {round(gauge_pressure_kpa, precision)} kPa."
+        f"The gauge pressure in the pipe is {kpa_str} kPa."
     )
 
     return question, solution

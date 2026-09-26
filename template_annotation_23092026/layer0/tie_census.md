@@ -1,12 +1,12 @@
 # Exact display-tie census
 
-Generated 2026-09-23T19:30:18+00:00 by `tie_census.py` at git `8224d8baec`, 500 seeds per template, 85.0 s. A tie is an emitted line whose exact value, recomputed in Decimal from the printed operands, sits exactly half-way at the printed precision; such an instance has no gold value a decimal reader and a binary reader agree on (D-016). Only lines T1 can parse are covered.
+Generated 2026-09-26T13:09:40+00:00 by `tie_census.py` at git `85ccf8d028`, 500 seeds per template, 45.6 s. A tie is an emitted line whose exact value, recomputed in Decimal from the printed operands, sits exactly half-way at the printed precision; such an instance has no gold value a decimal reader and a binary reader agree on (D-016). Only lines T1 can parse are covered.
 
 | | Templates |
 |---|---:|
 | censused | 150 |
-| no tie in 500 instances | 137 |
-| at least one tied instance | 13 |
+| no tie in 500 instances | 138 |
+| at least one tied instance | 12 |
 
 | Template | Branch | Tied instances | Rate | Where |
 |---|---|---:|---:|---|
@@ -22,7 +22,6 @@ Generated 2026-09-23T19:30:18+00:00 by `tie_census.py` at git `8224d8baec`, 500 
 | `template_infinite_slope_factor_of_safety` | civil | 1 | 0.2% | `FS` x1 |
 | `template_exponential_mttf_topology` | industrial | 1 | 0.2% | `MTTF` x1 |
 | `template_system_reliability_topology` | industrial | 1 | 0.2% | `Rs` x2 |
-| `template_basic_stress_strain` | mechanical | 1 | 0.2% | `epsilon` x1 |
 
 Examples:
 
@@ -38,6 +37,5 @@ Examples:
 - `template_infinite_slope_factor_of_safety`: seed 338: FS = 0.5774 / 0.4000 = 1.444  (exact 1.4435)
 - `template_exponential_mttf_topology`: seed 411: MTTF = 1000 / 1.28 = 781.3 hours (rounded half up to one decimal)  (exact 781.25)
 - `template_system_reliability_topology`: seed 272: Rs = 1 - 0.075 * 0.054 = 1 - 0.004050 = 0.9960  (exact 0.995950)
-- `template_basic_stress_strain`: seed 86: epsilon = (0.81 mm) / (540.0 mm) = 1.500e-03  (exact 0.0015)
 
-237,095 checks evaluated exactly; 28,962 skipped (functions or operators outside the exact evaluator, e.g. trigonometry and logarithms).
+239,638 checks evaluated exactly; 28,971 skipped (functions or operators outside the exact evaluator, e.g. trigonometry and logarithms).

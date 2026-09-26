@@ -1,6 +1,6 @@
 import random
 import math
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal, ROUND_FLOOR, ROUND_HALF_UP
 from data.templates.branches.chemical_engineering.constants import COMMON_LIQUIDS, COMMON_GASES, GAS_MOLECULAR_PARAMS, POWER_LAW_FLUIDS
 
 
@@ -67,6 +67,28 @@ def _is_sci_display_tie(x, mant_dp):
     return _is_display_tie(x, mant_dp - math.floor(math.log10(abs(x))))
 
 
+def _sig4_or_exact(d):
+    """A positive exact Decimal at four significant figures, or at its exact value.
+
+    Four figures, except where four would sit on a half-way tie. A tie at
+    four figures means the exact value ends in a 5 at the fifth, so there it
+    is printed at five figures, where it is exact and nothing rounds: the
+    tie is removed by construction, per instance, and nothing is redrawn
+    (D-016, D-037). A value of 10^4 or more keeps all its integer digits.
+    """
+    assert d > 0, d
+    places = max(0, 3 - d.adjusted())
+    if d.scaleb(places) % 1 == Decimal('0.5'):
+        places += 1
+        assert d.scaleb(places) % 1 == 0, d    # exact one figure longer
+    return d.quantize(Decimal(1).scaleb(-places), rounding=ROUND_HALF_UP)
+
+
+def _floor_sig(d, n):
+    """A positive Decimal rounded DOWN to `n` significant figures."""
+    return d.quantize(Decimal(1).scaleb(d.adjusted() - n + 1), rounding=ROUND_FLOOR)
+
+
 # Template 1 (Easy)
 def template_newtons_law_shear_stress():
     """
@@ -109,94 +131,196 @@ def template_newtons_law_shear_stress():
         seeds, not concentrated by fluid). Every gold answer changes in
         format; the question text changes on every seed (mu is added).
 
+    Layer 2 fix (2026-09-26):
+        One expert of three found no laminar check: tau = mu*V/Y is the laminar
+        Couette solution, but low-viscosity draws were far into turbulence (seed
+        2202, water at 1.59 m/s across 1.96 cm, Re about 3.1e4; seed 2203,
+        gasoline at 1.54 m/s across 2.22 cm, about 8.5e4), where the printed tau
+        and F underestimate the drag; and F printed to 10 significant figures
+        (3.470751648e-01 N). Confirmed: Re = rho*V*Y/mu on seeds 2201-2205 is
+        1,912 (whole blood), 31,046, 87,828, 36,049 (seawater) and 21
+        (glycerol), and at HEAD 65.2% of 500 seeds exceed Re = 1000 (62.4%
+        exceed 1440), from 21 of the 30 liquids. Turbulence cannot be sustained
+        in plane Couette flow below Re = 360 +- 10 on half the gap and half the
+        wall-speed difference (Tillmark & Alfredsson, J. Fluid Mech. 235,
+        89-102, 1992), which is 1440 +- 40 on the full gap and plate speed; the
+        cap is Re = 1000. The plate speed is bounded by v_hi = min(2.00 m/s, the
+        speed at Re = 1000 for the drawn fluid and gap). A faster draw is
+        redrawn uniformly in [v_hi/4, v_hi] at three significant figures, never
+        below 0.01 m/s (a few cm/s is an ordinary Couette-viscometer speed), so
+        a capped speed sits near the laminar limit instead of at the range
+        floor; the gap is redrawn only where v_hi is below 0.01 m/s, and the
+        fluid only if 2000 gaps fail. The draw order is unchanged, so a draw the
+        cap does not touch keeps its values seed for seed. The question does not
+        gain the density; the solution does not need it. dvx/dy is printed at 3
+        dp below 4 1/s (reached only by a capped speed), so its rounding stays
+        within the 0.125% of the 2-dp display at 4 1/s; V, Y and A are printed
+        at the precision of their grid, trailing zeros kept ("0.10 m/s", "1.30
+        cm", "2.50 m^2"). Measured at 500 seeds (20,000 in brackets): the cap
+        acts on 65.2% (64.1%) of seeds, by a speed redraw on all but two; the
+        gap is redrawn on 4.4% (4.0%), only for mercury, liquid oxygen and
+        liquid nitrogen (60%, 38% and 28% of their draws). The fluid is never
+        redrawn (0 in 20,000), so every seed draws the fluid it drew at HEAD and
+        no liquid's share moves (3.0-3.6% each). The cap never binds for the
+        eight viscous liquids (the three engine oils, gear oil, glycerol, olive
+        oil, corn syrup, honey) and acts on 36-100% of the draws of the other
+        22. V = 0.10 m/s on 0.4% (0.29%) of seeds, the range floor's own share
+        of the uncapped draw, and the redraw floor 0.0100 m/s on 0.4% (0.64%),
+        at most 6.2% of one liquid's draws (mercury; liquid nitrogen 5.2%,
+        liquid oxygen 4.7%). Mercury now spans gaps of 0.10-1.12 cm at
+        0.0100-0.10 m/s. V is below 0.10 m/s on 48.6% (45.9%) of seeds; the
+        dvx/dy tie redraw is 0.8% (1.1%). Display: tau and F are printed at four
+        significant figures in fixed point, F formed from the displayed tau
+        (D-016 part 2); where four figures would sit on a half-way tie the value
+        has exactly five and is printed at five (on 9.8% (8.6%) of seeds: tau
+        8.0% (6.5%), F 1.8% (2.1%), mostly 2-figure viscosities ending in 5), so
+        nothing rounds at a tie and nothing is redrawn for one. This replaces
+        the exact-length display of 2026-09-25. Because the gold follows the
+        printed chain, a solver who rounds neither dvx/dy nor tau differs from
+        it by at most 0.13%, in the last figure of tau on 40% and of F on 45% of
+        instances (500 seeds). Each substitution now shares a line with its
+        result, so T1 and the tie census read all three computations (they read
+        none before), in fixed point because both take a scientific result's
+        precision from its mantissa alone. Closure is exact on all three lines
+        at 20,000 seeds, and the census finds no tie at 500. Against HEAD at 500
+        seeds the question text changes on 371 seeds (74.2%): its values on the
+        326 (65.2%) that were above Re = 1000 and on no other, and on 45 (9.0%)
+        only by the trailing zeros. The answer text changes on every seed
+        (format) and its value on those 326; for an unchanged draw the answers
+        move by the four-figure rounding alone (under 0.1%).
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking to compute shear stress and force.
             - str: A step-by-step solution showing the calculations.
     """
-    # 1. Parameterize the inputs with random values
-    fluid_name, (density, viscosity) = random.choice(list(COMMON_LIQUIDS.items()))
-    # The viscosity is STATED (Layer 2: it was not, and the question could not
-    # be solved) with a 3-significant-figure display, or four where the table
-    # value has them; the value used is the displayed one (D-016 part 2).
-    mu_spec = '.2e' if float(format(viscosity, '.2e')) == viscosity else '.3e'
-    viscosity = _as_printed(viscosity, mu_spec)
+    # The linear profile tau = mu*V/Y is the LAMINAR Couette solution, so every
+    # instance must be laminar (Layer 2, round 2: 65% of draws were not).
+    # Turbulence cannot be sustained in plane Couette flow below Re = 360 +- 10
+    # on half the gap and half the wall-speed difference (Tillmark & Alfredsson,
+    # J. Fluid Mech. 235, 89-102, 1992), which is Re = rho*V*Y/mu = 1440 +- 40
+    # on the full gap and plate speed used here. The cap is 1000, for margin.
+    RE_MAX = 1000
+    V_HI = Decimal('2.00')        # m/s, top of the plate-speed range (0.10-2.00)
+    V_FLOOR = Decimal('0.01')     # m/s, the lowest speed a capped redraw may take
 
-    for _attempt in range(200):
-        V = round(random.uniform(0.1, 2.0), 2)
-        Y_cm = round(random.uniform(0.1, 2.5), 2)
-        # A 2-dp centimetre value is exactly 4 dp in metres; the float is not
-        # (0.34/100 = 0.0034000000000000002), so Y is bound through that display.
-        Y_m = _as_printed(Y_cm / 100, '.4f')
-        A = round(random.uniform(0.5, 5.0), 2)
+    for _fluid_attempt in range(20):
+        # 1. Parameterize the inputs with random values
+        fluid_name, (density, viscosity) = random.choice(list(COMMON_LIQUIDS.items()))
+        # The viscosity is STATED (Layer 2: it was not, and the question could not
+        # be solved) with a 3-significant-figure display, or four where the table
+        # value has them; the value used is the displayed one (D-016 part 2).
+        mu_spec = '.2e' if float(format(viscosity, '.2e')) == viscosity else '.3e'
+        viscosity = _as_printed(viscosity, mu_spec)
 
-        # 2. Perform the core calculation. dvx/dy is printed at 2 dp and then
-        # consumed, so it is bound through that display. A quotient of a 2-dp
-        # by a 4-dp value can sit exactly on a half-way tie at 2 dp; such a
-        # draw is redrawn rather than resolved (D-016).
-        if _is_display_tie(V / Y_m, 2):
-            continue
-        velocity_gradient = _as_printed(V / Y_m, '.2f')
+        for _attempt in range(2000):
+            V = round(random.uniform(0.1, 2.0), 2)
+            Y_cm = round(random.uniform(0.1, 2.5), 2)
+            # A 2-dp centimetre value is exactly 4 dp in metres; the float is not
+            # (0.34/100 = 0.0034000000000000002), so Y is bound through that display.
+            Y_m = _as_printed(Y_cm / 100, '.4f')
+            A = round(random.uniform(0.5, 5.0), 2)
+
+            # The plate speed may not exceed v_hi, the least of the top of its
+            # range and the speed at Re = RE_MAX for this fluid and gap (exact in
+            # Decimal, from the stated mu and Y). A draw the bound does not touch
+            # is unchanged. A faster one is redrawn uniformly in [v_hi/4, v_hi],
+            # at three significant figures and never below 0.01 m/s, so a capped
+            # speed sits near the laminar limit rather than at the range floor.
+            # Only where v_hi is below 0.01 m/s is the gap redrawn.
+            v_hi = min(V_HI, RE_MAX * Decimal(repr(viscosity))
+                       / (Decimal(repr(density)) * Decimal(repr(Y_m))))
+            if v_hi < V_FLOOR:
+                continue                  # no laminar speed of 0.01 m/s at this gap: redraw the gap
+            V_dec = Decimal(repr(V)).quantize(Decimal('0.01'))
+            if V_dec > v_hi:
+                u = random.uniform(float(max(V_FLOOR, v_hi / 4)), float(v_hi))   # capped: redraw the speed
+                V_dec = min(_floor_sig(Decimal(repr(u)), 3), _floor_sig(v_hi, 3))
+                V = float(V_dec)
+
+            # 2. Perform the core calculation. dvx/dy is printed and then consumed,
+            # so it is bound through its display: 2 dp as before, or 3 dp below
+            # 4 1/s (reachable only by a capped speed; dvx/dy >= 0.4 1/s), so its
+            # rounding never exceeds 0.125%, the worst case of the 2-dp display on
+            # the uncapped range. A quotient of finite decimals can sit exactly on
+            # a half-way tie at that display; such a draw is redrawn (D-016).
+            dv_dp = 2 if V / Y_m >= 4 else 3
+            if _is_display_tie(V / Y_m, dv_dp):
+                continue                  # display tie on dvx/dy: redraw
+            velocity_gradient = _as_printed(V / Y_m, f'.{dv_dp}f')
+            break
+        else:
+            continue                      # no laminar gap in 2000 draws: redraw the fluid
         break
     else:
         raise RuntimeError(
-            "newtons_law_shear_stress: no display-stable sample in 200 draws")
+            "newtons_law_shear_stress: no laminar, display-stable sample")
 
-    # tau = mu * dvx/dy and F = tau * A are products of finite decimals (a
-    # 3-4 sf viscosity, a 2-dp gradient, a 2-dp area), so they are exact at a
-    # known length and are printed at that length in scientific notation,
-    # never shorter than a 4-dp mantissa: a fixed-width display would sit on
-    # a half-way tie for half the draws of a 2-sf viscosity (D-037: lengthen
-    # an exact display rather than resample). Both are at most 13 sf, so the
-    # float round-trips its own display exactly.
-    tau_dec = Decimal(repr(viscosity)) * Decimal(repr(velocity_gradient))
-    tau_dp = max(4, len(tau_dec.normalize().as_tuple().digits) - 1)
+    # --- invariants (T7) ---------------------------------------------------
+    reynolds = density * V * Y_m / viscosity
+    assert reynolds <= RE_MAX * (1 + 1e-9), f"not laminar: Re = {reynolds:.0f}"
+
+    # tau = mu * dvx/dy and F = tau * A are products of finite decimals, so each
+    # is formed exactly in Decimal from the values the trace prints and shown at
+    # four significant figures, or at five where four would be a half-way tie
+    # (there it is exact; _sig4_or_exact, D-016, D-037). tau is displayed and
+    # consumed, so F is formed from the displayed tau (D-016 part 2).
+    tau_dec = _sig4_or_exact(Decimal(repr(viscosity)) * Decimal(repr(velocity_gradient)))
     shear_stress = float(tau_dec)
-    assert _as_printed(shear_stress, f'.{tau_dp}e') == shear_stress
-    F_dec = tau_dec * Decimal(repr(A))
-    F_dp = max(4, len(F_dec.normalize().as_tuple().digits) - 1)
+    F_dec = _sig4_or_exact(tau_dec * Decimal(repr(A)))
     force = float(F_dec)
-    assert _as_printed(force, f'.{F_dp}e') == force
+    # Each printed result is the product of its printed operands to within half
+    # a unit in its last figure, which at four or more figures is under 5e-4.
+    assert abs(shear_stress - viscosity * velocity_gradient) <= 5e-4 * shear_stress, "tau does not close"
+    assert abs(force - shear_stress * A) <= 5e-4 * force, "F does not close"
+
+    # The stated values are printed at the precision of the grid they are drawn
+    # on, trailing zeros kept ("0.10 m/s", "1.00 cm", "2.50 m^2"): V at 2 dp,
+    # or at three significant figures where the cap redrew it; Y and A at 2 dp.
+    V_txt = format(V_dec, 'f')
+    dv_txt = f"{velocity_gradient:.{dv_dp}f}"
 
     # 3. Generate the question and solution strings
     question = (
-        f"Two large parallel plates with an area of {A} m^2 each are separated by a "
-        f"thin film of {fluid_name} that is {Y_cm} cm thick. The top plate is moved "
-        f"at a constant velocity of {V} m/s, while the bottom plate is held stationary. "
+        f"Two large parallel plates with an area of {A:.2f} m^2 each are separated by a "
+        f"thin film of {fluid_name} that is {Y_cm:.2f} cm thick. The top plate is moved "
+        f"at a constant velocity of {V_txt} m/s, while the bottom plate is held stationary. "
         f"The dynamic viscosity of {fluid_name} is {viscosity:{mu_spec}} Pa·s.\n\n"
         f"Assuming the fluid exhibits Newtonian behavior and a linear velocity profile, calculate:\n"
         f"a) The shear stress (tau_yx) exerted on the fluid.\n"
         f"b) The total force (F) required to move the top plate at the given velocity."
     )
 
+    # Each substitution and its result are on one line, with the unit on the
+    # result, so that T1 and the tie census can read the arithmetic; they read
+    # none of it while the units sat inside the product and the result was on
+    # the next line.
     solution = (
         f"**Given Information:**\n"
         f"- Fluid: {fluid_name}\n"
         f"- Dynamic Viscosity of {fluid_name} (mu): {viscosity:{mu_spec}} Pa·s\n"
-        f"- Plate Area (A): {A} m^2\n"
-        f"- Plate Velocity (V): {V} m/s\n"
-        f"- Distance between plates (Y): {Y_cm} cm = {Y_m:.4f} m\n\n"
+        f"- Plate Area (A): {A:.2f} m^2\n"
+        f"- Plate Velocity (V): {V_txt} m/s\n"
+        f"- Distance between plates (Y): {Y_cm:.2f} cm = {Y_m:.4f} m\n\n"
 
         f"**Step 1:** Calculate the velocity gradient (dvx/dy).\n"
         f"For a linear velocity profile between a stationary and a moving plate, the gradient is constant:\n"
         f"dvx/dy = V / Y\n"
-        f"dvx/dy = {V} m/s / {Y_m:.4f} m = {velocity_gradient:.2f} 1/s\n\n"
+        f"dvx/dy = {V_txt} / {Y_m:.4f} = {dv_txt} 1/s\n\n"
 
         f"**Step 2:** Calculate the shear stress (tau_yx).\n"
         f"Using Newton's Law of Viscosity:\n"
         f"tau_yx = mu * (dvx/dy)\n"
-        f"tau_yx = ({viscosity:{mu_spec}} Pa·s) * ({velocity_gradient:.2f} 1/s)\n"
-        f"tau_yx = {shear_stress:.{tau_dp}e} Pa\n\n"
+        f"tau_yx = {viscosity:{mu_spec}} * {dv_txt} = {tau_dec:f} Pa\n\n"
 
         f"**Step 3:** Calculate the force (F).\n"
         f"Force is the shear stress acting over the entire area of the plate:\n"
         f"F = tau_yx * A\n"
-        f"F = ({shear_stress:.{tau_dp}e} Pa) * ({A} m^2)\n"
-        f"F = {force:.{F_dp}e} N\n\n"
+        f"F = {tau_dec:f} * {A:.2f} = {F_dec:f} N\n\n"
 
         f"**Answer:**\n"
-        f"a) The shear stress in the fluid is **{shear_stress:.{tau_dp}e} Pa**.\n"
-        f"b) The force required to move the plate is **{force:.{F_dp}e} N**."
+        f"a) The shear stress in the fluid is **{tau_dec:f} Pa**.\n"
+        f"b) The force required to move the plate is **{F_dec:f} N**."
     )
 
     return question, solution

@@ -72,8 +72,9 @@ def template_basic_stress_strain():
 
     Scenario:
         This template tests the fundamental definitions of normal stress (sigma) and
-        normal strain (epsilon). Given a simple prismatic bar with a known geometry
-        and an applied axial load, the user must calculate these two basic quantities.
+        normal strain (epsilon). Given a simple prismatic bar of a named material
+        with a known geometry, an applied axial load and the elongation it causes,
+        the user must calculate these two basic quantities.
 
     Core Equations:
         Normal Stress: sigma = P / A
@@ -102,6 +103,44 @@ def template_basic_stress_strain():
         mm/m the strain is 1.502). The label now reads "mm/mm or unitless",
         matching the US branch's "in/in". No number changes.
 
+    Layer 2 fix (2026-09-26):
+        All three experts of the branch rejected the template in round 2:
+        the load, the bar size and the elongation were drawn independently
+        and no material was named, so the posed data implied impossible
+        moduli. Verified on the instances they saw: seed 2202 put 439 kN on
+        a 36 mm bar that stretched 1.17 mm over 3.86 m, so sigma = 431.29
+        MPa, epsilon = 3.031e-04 and E = sigma / epsilon = 1423 GPa, seven
+        times steel's; seed 2204 implied 565 GPa at 525.99 MPa. Three
+        changes to the sampling. (1) The bar is made of a named material,
+        drawn once per instance from MATERIAL_PROPERTIES with rubber, lead,
+        concrete, glass and alumina redrawn (NOT_TENSION_MEMBER_MATERIALS,
+        D-031), and the question names it. (2) The load is bounded by the
+        material's allowable stress (ALLOWABLE_NORMAL_STRESS_MPA,
+        sampling-only, never printed): a load above sigma_allow * A is
+        redrawn alone as a whole number in [cap/4, cap], as in
+        template_axial_deformation; an attempt whose cap is under one unit
+        redraws the load, length and size, never the material. (3) The
+        elongation is no longer drawn: it is delta = sigma * L / E with the
+        material's E and the stress from the displayed area, quoted at
+        max(3 dp, 4 significant figures) and bound through that display,
+        so the strain a reader forms from it, and sigma / epsilon,
+        reproduce the material's E to the displays' rounding (within 0.08%
+        on all 500 seeds, 0.10% on 20,000; asserted at 0.2%). Displays: the
+        stress is quoted at max(3 dp, 4 significant figures), 3 dp as
+        before from 1 MPa or 1 ksi up (a polymer bar can now sit below
+        that, 44 of 500 answers); the area at a fixed 4 dp; the SI length
+        at 2 dp and in whole millimetres (seed 361 printed "L = 2.03 m =
+        2029.9999999999998 mm"); the US size at 2 dp; and one kip is
+        singular ("1 kip", 6 of 500 instances). Measured: the material
+        shares are flat, since no screen redraws the material (4.29% to
+        4.75% of 20,000 seeds against 4.55% uniform); the cap redraws the
+        load on 57.4% of 500 instances (55.5% of 20,000); 0.8% of attempts
+        are redrawn whole at 500 seeds and 0.95% at 20,000 (155 half-way
+        ties spread over all 22 materials, at most 12 on one; 37 caps under
+        one kip, 33 PTFE and 4 HDPE, which thins the smallest US bars of
+        those two polymers). Against HEAD every question and every answer
+        changes: the material is new and the elongation is computed.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking for the normal stress and strain.
@@ -110,15 +149,24 @@ def template_basic_stress_strain():
     # 1. Parameterize inputs with random values, choosing a unit system first.
     use_si_units = random.choice([True, False])
     shape = random.choice(['circular', 'square'])
+    # Layer 2 fix (2026-09-26): the bar is made of a named material, drawn
+    # once per instance so that no screen below moves the material shares.
+    material_name = _tension_member_material(list(MATERIAL_PROPERTIES.keys()))
+    # Sampling-only bound (never printed): the stress stays at or below the
+    # material's allowable stress.
+    sigma_allow_mpa = ALLOWABLE_NORMAL_STRESS_MPA[material_name]
     precision = 3  # Standardize precision for numerical stability and formatting
+
+    def _sig_dp(x):
+        # At least `precision` dp and at least four significant figures.
+        return max(precision, precision - math.floor(math.log10(abs(x))))
 
     for _attempt in range(200):
         if use_si_units:
-            #  SI Unit System 
+            #  SI Unit System
             load = random.randint(10, 500)  # in kN
             length = round(random.uniform(0.5, 4.0), 2)  # in meters
-            elongation = round(random.uniform(0.5, 5.0), 2)  # in mm
-        
+
             if shape == 'circular':
                 dimension_val = random.randint(20, 100)  # diameter in mm
                 dimension_name = "diameter"
@@ -129,80 +177,130 @@ def template_basic_stress_strain():
                 dimension_name = "side length"
                 area = dimension_val**2  # mm²
                 dim_str = f"{dimension_val} mm"
-            
-            load_str = f"{load} kN"
-            length_str = f"{length} m"
-            elongation_str = f"{elongation} mm"
-        
+
             # The area is displayed at 4 dp and then consumed, so the stress
             # is derived from the displayed value (D-016 part 2). An integer
             # side squared is exact as displayed and needs no binding.
             if shape == 'circular':
                 area = _as_printed(area, f'.{precision + 1}f')
 
+            # Bound: P / A <= sigma_allow (MPa * mm^2 = N). A load above the
+            # cap is redrawn alone as a whole number in [cap/4, cap]; an
+            # attempt whose cap is under 1 kN is redrawn.
+            load_cap = sigma_allow_mpa * area / 1000
+            if load > load_cap:
+                if math.floor(load_cap) < 1:
+                    continue
+                load = random.randint(max(1, math.ceil(load_cap / 4)), math.floor(load_cap))
+
+            # A 2-dp length in metres is a whole number of millimetres, and
+            # the strain line divides by the millimetres it prints.
+            length_mm = _as_printed(length * 1000, '.0f')
+            material_E = MATERIAL_PROPERTIES[material_name]['E_GPa'] * 1000  # in MPa
+
             # Core Calculations (using units for clarity: N, mm, MPa)
             # 1 MPa = 1 N/mm^2
             stress = (load * 1000) / area  # Stress in MPa
-            # Strain (unitless, but convert units to be consistent)
-            # Elongation in mm, Length in m -> convert length to mm
-            strain = elongation / (length * 1000)
-        
+            # Hooke's law with the material's modulus: delta = sigma * L / E, in mm
+            elongation_exact = stress * length_mm / material_E
+
+            length_str = f"{length:.2f} m"
+            load_str = f"{load} kN"
+            unit_len = "mm"
             stress_unit = "MPa"
             strain_unit_explanation = "mm/mm or unitless"
 
         else:
-            #  US Customary Unit System 
+            #  US Customary Unit System
             load = random.randint(5, 100)  # in kips
             length = round(random.uniform(24.0, 120.0), 1)  # in inches
-            elongation = round(random.uniform(0.05, 0.25), 3)  # in inches
-        
+
             if shape == 'circular':
                 dimension_val = round(random.uniform(1.0, 5.0), 2)  # diameter in inches
                 dimension_name = "diameter"
                 area = math.pi * (dimension_val / 2)**2  # in²
-                dim_str = f"{dimension_val} in"
+                dim_str = f"{dimension_val:.2f} in"
             else:  # square
                 dimension_val = round(random.uniform(1.0, 5.0), 2)  # side length in inches
                 dimension_name = "side length"
                 area = dimension_val**2
-                dim_str = f"{dimension_val} in"
-            
-            load_str = f"{load} kips"
-            length_str = f"{length} in"
-            elongation_str = f"{elongation} in"
-        
+                dim_str = f"{dimension_val:.2f} in"
+
             # The area is displayed at 4 dp and then consumed, so the stress
             # is derived from the displayed value (D-016 part 2); a 2-dp side
             # squared is exact at 4 dp, but a float one ulp from its printed
             # form is not the value a reader recovers.
             area = _as_printed(area, f'.{precision + 1}f')
 
+            # Bound: P / A <= sigma_allow in ksi, the load redrawn alone as a
+            # whole number in [cap/4, cap]; an attempt whose cap is under
+            # 1 kip is redrawn.
+            load_cap = sigma_allow_mpa / _MPA_PER_KSI * area
+            if load > load_cap:
+                if math.floor(load_cap) < 1:
+                    continue
+                load = random.randint(max(1, math.ceil(load_cap / 4)), math.floor(load_cap))
+
+            length_mm = None
+            material_E = MATERIAL_PROPERTIES[material_name]['E_ksi']  # in ksi
+
             # Core Calculations (using units for clarity: kips, in, ksi)
             # 1 ksi = 1 kip/in^2
             stress = load / area  # Stress in ksi
-            # Strain (unitless, since both length and elongation are in inches)
-            strain = elongation / length
-        
+            # Hooke's law with the material's modulus: delta = sigma * L / E, in inches
+            elongation_exact = stress * length / material_E
+
+            length_str = f"{length:.1f} in"
+            load_str = f"{load} {'kip' if load == 1 else 'kips'}"   # one kip is singular
+            unit_len = "in"
             stress_unit = "ksi"
             strain_unit_explanation = "in/in or unitless"
 
+        # The elongation is a given of the question and the numerator of the
+        # strain, so it is quoted at max(3 dp, 4 significant figures) and
+        # bound through that display (D-016 part 2); a draw on a half-way
+        # tie of it has no defensible display and is redrawn (part 3).
+        delta_dp = _sig_dp(elongation_exact)
+        if _is_display_tie(elongation_exact, delta_dp):
+            continue
+        elongation = _as_printed(elongation_exact, f'.{delta_dp}f')
+        elongation_str = f"{elongation:.{delta_dp}f} {unit_len}"
+        # Strain (unitless): both lengths in mm (SI) or in inches (US).
+        strain = elongation / (length_mm if use_si_units else length)
+
         # The stress and the strain are the answers; a draw that lands exactly
-        # on a half-way tie of either display (3 dp, and the four significant
-        # figures of the strain's .3e form) has no defensible gold answer and
-        # is redrawn (D-016 part 3, D-044).
+        # on a half-way tie of either display (max(3 dp, 4 s.f.), and the four
+        # significant figures of the strain's .3e form) has no defensible gold
+        # answer and is redrawn (D-016 part 3, D-044).
+        stress_dp = _sig_dp(stress)
         strain_places = precision - math.floor(math.log10(abs(strain)))
-        if (_is_display_tie(stress, precision)
+        if (_is_display_tie(stress, stress_dp)
                 or _is_display_tie(strain, strain_places)):
             continue
         break
     else:
         raise RuntimeError("basic_stress_strain: no closing sample in 200 draws")
 
+    # --- invariants: the posed stress is inside the allowable (sampling
+    # bound), and the two answers reproduce the named material's modulus.
+    _stress_mpa = stress if use_si_units else stress * _MPA_PER_KSI
+    assert _stress_mpa <= sigma_allow_mpa * (1 + 1e-9), "basic_stress_strain: stress above allowable"
+    _E_implied = float(f"{stress:.{stress_dp}f}") / float(f"{strain:.3e}")
+    assert abs(_E_implied / material_E - 1) < 2e-3, "basic_stress_strain: sigma / epsilon is not the material's E"
+
+    dim_num = f"{dimension_val}" if use_si_units else f"{dimension_val:.2f}"
+    # An SI square's area is an integer side squared, exact as it stands;
+    # every other area is bound at, and printed to, 4 dp.
+    area_str = (f"{area}" if (use_si_units and shape == 'square')
+                else f"{area:.{precision + 1}f}")
+    stress_str = f"{stress:.{stress_dp}f}"
+
     # 2. Generate the question and solution strings
     question = (
-        f"A prismatic bar with a length of {length_str} has a {shape} cross-section "
-        f"with a {dimension_name} of {dim_str}. The bar is subjected to an axial "
-        f"tensile load of {load_str}, causing it to elongate by {elongation_str}.\n\n"
+        f"A prismatic bar made of {material_name} has a length of {length_str} and a "
+        f"{shape} cross-section with a {dimension_name} of {dim_str}. The bar is "
+        f"subjected to an axial tensile load of {load_str}, causing it to elongate "
+        f"by {elongation_str}.\n\n"
         f"Determine the following:\n"
         f"a) The normal stress in the bar.\n"
         f"b) The normal strain in the bar."
@@ -210,44 +308,46 @@ def template_basic_stress_strain():
 
     solution = (
         f"**Given:**\n"
+        f"Material: {material_name}\n"
         f"Load (P): {load_str}\n"
         f"Length (L): {length_str}\n"
         f"Elongation (delta): {elongation_str}\n"
         f"Cross-Section: {shape.capitalize()} with {dimension_name} = {dim_str}\n\n"
-        
+
         f"**Step 1:** Calculate the Cross-Sectional Area (A)\n"
         f"The area of a {shape} cross-section is calculated as follows:\n"
     )
-    
+
     if shape == 'circular':
         solution += (
-            f"A = pi * (d/2)^2 = pi * ({dimension_val}/2)^2 = {round(area, precision+1)} "
+            f"A = pi * (d/2)^2 = pi * ({dim_num}/2)^2 = {area_str} "
             f"{'mm^2' if use_si_units else 'in^2'}\n\n"
         )
     else: # square
         solution += (
-            f"A = side^2 = ({dimension_val})^2 = {round(area, precision+1)} "
+            f"A = side^2 = ({dim_num})^2 = {area_str} "
             f"{'mm^2' if use_si_units else 'in^2'}\n\n"
         )
-        
+
     solution += (
         f"**Step 2:** Calculate the Normal Stress (sigma)\n"
         f"Normal stress is defined as the force per unit area: sigma = P / A.\n"
     )
-    
+
     if use_si_units:
+        load_N = load * 1000  # the load in newtons the stress line divides
         solution += (
             f"To get the result in Megapascals (MPa), we use the load in Newtons (N) and the area in mm^2 (1 MPa = 1 N/mm^2).\n"
-            f"P = {load} kN = {load * 1000} N\n"
-            f"A = {round(area, precision+1)} mm^2\n"
-            f"sigma = ({load * 1000} N) / ({round(area, precision+1)} mm^2) = {round(stress, precision)} MPa\n\n"
+            f"P = {load} kN = {load_N} N\n"
+            f"A = {area_str} mm^2\n"
+            f"sigma = ({load_N} N) / ({area_str} mm^2) = {stress_str} MPa\n\n"
         )
     else: # US units
         solution += (
             f"To get the result in kips per square inch (ksi), we use the load in kips and the area in in^2 (1 ksi = 1 kip/in^2).\n"
-            f"P = {load} kips\n"
-            f"A = {round(area, precision+1)} in^2\n"
-            f"sigma = ({load} kips) / ({round(area, precision+1)} in^2) = {round(stress, precision)} ksi\n\n"
+            f"P = {load_str}\n"
+            f"A = {area_str} in^2\n"
+            f"sigma = ({load_str}) / ({area_str} in^2) = {stress_str} ksi\n\n"
         )
 
     solution += (
@@ -259,21 +359,21 @@ def template_basic_stress_strain():
     if use_si_units:
         solution += (
             f"We convert the length from meters to millimeters to match the elongation units.\n"
-            f"delta = {elongation} mm\n"
-            f"L = {length} m = {length * 1000} mm\n"
-            f"epsilon = ({elongation} mm) / ({length * 1000} mm) = {strain:.3e}\n\n"
+            f"delta = {elongation_str}\n"
+            f"L = {length_str} = {length_mm:.0f} mm\n"
+            f"epsilon = ({elongation_str}) / ({length_mm:.0f} mm) = {strain:.3e}\n\n"
         )
     else: # US units
         solution += (
             f"Both elongation and length are already in inches, so we can divide directly.\n"
-            f"delta = {elongation} in\n"
-            f"L = {length} in\n"
-            f"epsilon = ({elongation} in) / ({length} in) = {strain:.3e}\n\n"
+            f"delta = {elongation_str}\n"
+            f"L = {length_str}\n"
+            f"epsilon = ({elongation_str}) / ({length_str}) = {strain:.3e}\n\n"
         )
 
     solution += (
         f"**Answer:**\n"
-        f"a) Normal Stress (sigma) = **{round(stress, precision)} {stress_unit}**\n"
+        f"a) Normal Stress (sigma) = **{stress_str} {stress_unit}**\n"
         f"b) Normal Strain (epsilon) = **{strain:.3e}** ({strain_unit_explanation})"
     )
 
@@ -633,6 +733,47 @@ def template_multi_segment_rod():
         joins, which stays; only the rare rounding case is redrawn whole.
         Rejection and item-pool figures are in the Layer 2 fix report.
 
+    Layer 2 fix (2026-09-26):
+        Two experts of the branch rejected the template in round 2, both of
+        whom approved it in round 1: the round-1 scaling of the loads to the
+        allowable stress left US-unit segment deformations near 1e-3 in,
+        and the fixed 4-dp display then kept one or two figures before
+        summing. Verified on seed 2203: 0.0036 + 0.0027 - 0.0054 = 0.0009
+        in, where the segment quotients of the printed operands are
+        0.0035673, 0.0026664 and -0.0054338 and sum to 0.00079986 in, 12.5%
+        off. At 500 seeds of HEAD, 197 of 230 US instances and 67 of 270 SI
+        ones printed a segment deformation with fewer than three
+        significant figures, and 16 US totals were more than 0.5% off the
+        exact sum (11 more than 1%, the worst 18.9%). The scaling stays.
+        Each segment deformation is now quoted at max(4 dp, 4 significant
+        figures) and bound through that display; the total is the exact
+        decimal sum of the displayed values, printed at the longest of
+        their lengths (seed 2203 now reads 0.003567 + 0.002666 - 0.005434 =
+        0.000799 in, 0.11% from the exact sum); and a draw whose displayed
+        total is more than 0.5% from the exact sum of the segment quotients
+        is redrawn whole, which only a near-cancelling mix of tension and
+        compression can trigger. Measured: the guard redraws 1 of 535
+        attempts at 500 seeds and 26 of 21,127 at 20,000 (0.12%), every one
+        a mixed-sign rod (26 of about 6,030 such draws; 14 US, 12 SI), and
+        no half-way tie is redrawn; the worst total at 500 seeds is now
+        0.16% off. The other fixed-decimal quantities keep their figures at
+        the smaller loads: the 4-dp areas are at least 0.4418 in^2 or 314
+        mm^2, so four or more figures, and are now printed with their
+        trailing zeros ("1.1310 in^2" where "1.131" was); the loads,
+        lengths, moduli and whole N, mm and MPa are exact. Three more
+        presentation faults are fixed. A question applied a zero node load
+        on 8 of 500 seeds (261 of 20,000): always the raw draw itself,
+        never the scaling, which keeps a scaled load at one unit; a zero
+        draw is now redrawn from the same range, so every seed that drew
+        no zero keeps its draw (277 of 52,834 node-load draws were zero at
+        20,000 seeds). One kip is singular ("1 kip", "-1 kip"). The summary
+        of internal forces labelled a zero force "(Compression)" (40 of 500
+        instances at HEAD); it now says "(No force)", as Step 1 does.
+        Against HEAD at 500 seeds: question changed 22.6% (104 by the "1
+        kip" wording alone; 9 by a different draw, the 8 zero-load seeds
+        and the one guard redraw), answer text 82.8%, answer value 74.8%
+        (digits added where a segment deformation is under 0.1).
+
     Returns:
         tuple: A tuple containing:
             - str: A question about the total deformation of a composite rod.
@@ -640,6 +781,13 @@ def template_multi_segment_rod():
     """
     # 1. Parameterize inputs with validation loop
     precision = 4
+
+    def _deformation_dp(x):
+        # Layer 2 fix (2026-09-26): at least `precision` dp and at least four
+        # significant figures, so a small deformation keeps its figures.
+        if x == 0:
+            return precision
+        return max(precision, 3 - math.floor(math.log10(abs(x))))
 
     # Define a safe list of structural materials (exclude rubber for this high-load problem)
     structural_materials = [k for k in MATERIAL_PROPERTIES.keys() if 'Rubber' not in k]
@@ -665,6 +813,11 @@ def template_multi_segment_rod():
                 segment['E'] = MATERIAL_PROPERTIES[material_name]['E_GPa']
                 segment['dim_str'] = f"{diameter} mm diameter"
                 loads[i+1] = random.randint(-250, 250) # kN
+                # Layer 2 fix (2026-09-26): a node load of zero is no load;
+                # a zero draw is redrawn from the same range, so every seed
+                # that never drew a zero keeps its draw.
+                while loads[i+1] == 0:
+                    loads[i+1] = random.randint(-250, 250)
             else:
                 segment['length'] = round(random.uniform(10.0, 60.0), 1) # inches
                 diameter = round(random.uniform(0.75, 3.0), 1) # inches
@@ -672,6 +825,8 @@ def template_multi_segment_rod():
                 segment['E'] = MATERIAL_PROPERTIES[material_name]['E_ksi']
                 segment['dim_str'] = f"{diameter} in diameter"
                 loads[i+1] = random.randint(-60, 60) # kips
+                while loads[i+1] == 0:   # no zero node load (as above)
+                    loads[i+1] = random.randint(-60, 60)
 
             # The area is displayed at `precision` dp and then consumed, so
             # the chain consumes the displayed value (D-016 part 2).
@@ -679,7 +834,6 @@ def template_multi_segment_rod():
             segments.append(segment)
 
         # 2. Perform Core Calculations
-        total_deformation = 0
         cumulative_load = 0
         max_strain = 0
         
@@ -751,12 +905,24 @@ def template_multi_segment_rod():
                 stress_mpa > ALLOWABLE_NORMAL_STRESS_MPA[segments[i]['material_name']])
 
             deltas.append(delta)
-            # Each deformation is displayed at `precision` dp and then summed,
-            # so the sum runs over the displayed values (D-016 part 2).
-            segments[i]['deformation'] = _as_printed(delta, f'.{precision}f')
-            total_deformation += segments[i]['deformation']
+            # Each deformation is displayed at max(4 dp, 4 significant
+            # figures) and then summed, so the sum runs over the displayed
+            # values (D-016 part 2). A fixed 4 dp kept one or two figures of
+            # the small US-unit deformations (Layer 2 fix, 2026-09-26).
+            segments[i]['deformation_dp'] = _deformation_dp(delta)
+            segments[i]['deformation'] = _as_printed(
+                delta, f".{segments[i]['deformation_dp']}f")
             if current_strain > max_strain:
                 max_strain = current_strain
+
+        # The total is the exact decimal sum of the displayed deformations,
+        # printed at the longest of their displays, so it carries every digit
+        # the lines above it hold and rounds nothing (D-037).
+        total_dp = max(s['deformation_dp'] for s in segments)
+        total_dec = sum(Decimal(f"{s['deformation']:.{s['deformation_dp']}f}") for s in segments)
+        total_str = f"{total_dec:.{total_dp}f}"
+        total_deformation = float(total_dec)
+        total_exact = math.fsum(deltas)
 
         # Validate: Ensure max strain is < 1% (0.01) for linear elasticity to hold
         if max_strain >= 0.01:
@@ -767,13 +933,29 @@ def template_multi_segment_rod():
             continue
         # A segment deformation is a quotient by an arbitrary product A * E,
         # exact at no fixed display; a draw with one exactly on a half-way
-        # tie at `precision` dp has no defensible gold digit there and is
+        # tie at its display has no defensible gold digit there and is
         # redrawn rather than resolved (D-016 part 3).
-        if any(_is_display_tie(d, precision) for d in deltas):
+        if any(_is_display_tie(d, s['deformation_dp']) for d, s in zip(deltas, segments)):
+            continue
+        # Layer 2 fix (2026-09-26): the displayed total, the sum of the
+        # rounded segment values, must be within 0.5% of the exact sum of the
+        # segment quotients. Where tension and compression nearly cancel, the
+        # rounding of the terms is a large share of their small sum; such a
+        # draw is redrawn whole.
+        if total_exact == 0 or abs(total_deformation - total_exact) > 0.005 * abs(total_exact):
             continue
         break # Valid problem generated
     else:
         raise RuntimeError("multi_segment_rod: no closing sample in 200 draws")
+
+    # --- invariants: the printed total is the stated sum within 0.5%, and
+    # no segment is stressed past its allowable (sampling bound).
+    assert abs(total_deformation - total_exact) <= 0.005 * abs(total_exact), "multi_segment_rod: total off the exact sum"
+    _worst = max(
+        (abs(s['internal_load']) * 1000 / s['area_exact'] if use_si_units
+         else abs(s['internal_load']) / s['area_exact'] * _MPA_PER_KSI)
+        / ALLOWABLE_NORMAL_STRESS_MPA[s['material_name']] for s in segments)
+    assert _worst <= 1 + 1e-9, "multi_segment_rod: segment stress above allowable"
 
     # 3. Generate Question and Solution Strings
     question = (
@@ -787,18 +969,21 @@ def template_multi_segment_rod():
             f"and a cross-section that is {seg['dim_str']}.\n"
         )
     
+    def _force(v):
+        # A force with its unit; one kip is singular (Layer 2 fix, 2026-09-26).
+        return f"{v} kN" if use_si_units else f"{v} {'kip' if abs(v) == 1 else 'kips'}"
+
     question += f"\nThe rod is subjected to the following external axial loads (positive = tension, negative = compression):\n"
     for i in range(num_segments):
         node_index = i + 1
         load_val = loads[node_index]
-        unit_P = "kN" if use_si_units else "kips"
-        
+
         if node_index < num_segments:
             location_desc = f"at the junction between Segment {node_index} and {node_index+1}"
         else:
             location_desc = "at the free end"
-            
-        question += f"  - A load of {load_val} {unit_P} is applied {location_desc}.\n"
+
+        question += f"  - A load of {_force(load_val)} is applied {location_desc}.\n"
 
     question += (
         f"\nGiven the Moduli of Elasticity:\n"
@@ -817,22 +1002,22 @@ def template_multi_segment_rod():
         f"**Step 1:** Calculate the Internal Force (P) in Each Segment\n"
         f"To find the internal force in any segment, we make a virtual 'cut' and sum all external forces acting on one side of the cut. We will work from the free end (right) to the fixed wall (left). A positive force indicates tension, and a negative force indicates compression.\n"
     )
-    unit_P = "kN" if use_si_units else "kips"
     for i in range(num_segments - 1, -1, -1):
         seg_num = i + 1
         internal_load = segments[i]['internal_load']
         load_desc = " (Tension)" if internal_load > 0 else " (Compression)" if internal_load < 0 else " (No force)"
-        
+
         if seg_num == num_segments: # Last segment
-             solution += f"  - **Segment {seg_num}:** P{seg_num} = {loads[seg_num]} {unit_P}{load_desc}\n"
+             solution += f"  - **Segment {seg_num}:** P{seg_num} = {_force(loads[seg_num])}{load_desc}\n"
         else:
             prev_load_desc = " (T)" if segments[i+1]['internal_load'] > 0 else " (C)" if segments[i+1]['internal_load'] < 0 else " (0)"
-            solution += f"  - **Segment {seg_num}:** P{seg_num} = P{seg_num+1} {signed_term(loads[seg_num])} = {segments[i+1]['internal_load']}{prev_load_desc} {signed_term(loads[seg_num])} = {internal_load} {unit_P}{load_desc}\n"
+            solution += f"  - **Segment {seg_num}:** P{seg_num} = P{seg_num+1} {signed_term(loads[seg_num])} = {segments[i+1]['internal_load']}{prev_load_desc} {signed_term(loads[seg_num])} = {_force(internal_load)}{load_desc}\n"
 
     solution += f"\nSummary of Internal Forces:\n"
     for i, seg in enumerate(segments):
-        load_desc = " (Tension)" if seg['internal_load'] > 0 else " (Compression)"
-        solution += f"  - P{i+1} = {seg['internal_load']} {unit_P}{load_desc}\n"
+        load_desc = (" (Tension)" if seg['internal_load'] > 0
+                     else " (Compression)" if seg['internal_load'] < 0 else " (No force)")
+        solution += f"  - P{i+1} = {_force(seg['internal_load'])}{load_desc}\n"
 
     solution += (
         f"\n**Step 2:** Calculate the Deformation (δ) of Each Segment\n"
@@ -844,27 +1029,30 @@ def template_multi_segment_rod():
 
     for i, seg in enumerate(segments):
         solution += f"  - **Segment {i+1} ({seg['material_name']}):**\n"
-        
+        delta_disp = f"{seg['deformation']:.{seg['deformation_dp']}f}"
+        area_disp = f"{seg['area']:.{precision}f}"   # the bound 4-dp area, trailing zeros kept
+
         if use_si_units:
             # Explicitly show unit conversions in the solution string
-            P_disp = f"{seg['internal_load']} kN ({seg['internal_load']*1000:.0f} N)"
+            P_N = seg['internal_load'] * 1000   # whole newtons, as the segment line divides
+            P_disp = f"{seg['internal_load']} kN ({P_N} N)"
             L_disp = f"{seg['length']} m ({seg['length']*1000:.0f} mm)"
             E_disp = f"{seg['E']} GPa ({seg['E']*1000:.0f} MPa)"
             
             solution += (
                 f"P{i+1} = {P_disp}\n"
                 f"L{i+1} = {L_disp}\n"
-                f"A{i+1} = {round(seg['area'], precision)} mm²\n"
+                f"A{i+1} = {area_disp} mm²\n"
                 f"E{i+1} = {E_disp}\n"
-                f"δ{i+1} = ({seg['internal_load']*1000:.0f} × {seg['length']*1000:.0f}) / ({round(seg['area'], precision)} × {seg['E']*1000:.0f}) = {round(seg['deformation'], precision)} mm\n"
+                f"δ{i+1} = ({P_N} × {seg['length']*1000:.0f}) / ({area_disp} × {seg['E']*1000:.0f}) = {delta_disp} mm\n"
             )
         else:
             solution += (
-                f"P{i+1} = {seg['internal_load']} kips\n"
+                f"P{i+1} = {_force(seg['internal_load'])}\n"
                 f"L{i+1} = {seg['length']} in\n"
-                f"A{i+1} = {round(seg['area'], precision)} in²\n"
+                f"A{i+1} = {area_disp} in²\n"
                 f"E{i+1} = {seg['E']} ksi\n"
-                f"δ{i+1} = ({seg['internal_load']} × {seg['length']}) / ({round(seg['area'], precision)} × {seg['E']}) = {round(seg['deformation'], precision)} in\n"
+                f"δ{i+1} = ({seg['internal_load']} × {seg['length']}) / ({area_disp} × {seg['E']}) = {delta_disp} in\n"
             )
 
     solution += (
@@ -872,14 +1060,14 @@ def template_multi_segment_rod():
         f"The total deformation is the algebraic sum of the individual segment deformations.\n"
         f"δ_total = "
     )
-    delta_sum_str = " + ".join([f"({round(s['deformation'], precision)})" for s in segments])
+    delta_sum_str = " + ".join([f"({s['deformation']:.{s['deformation_dp']}f})" for s in segments])
     solution += delta_sum_str + "\n"
-    solution += f"δ_total = {round(total_deformation, precision)} {unit_D}\n\n"
-    
+    solution += f"δ_total = {total_str} {unit_D}\n\n"
+
     final_desc = "elongation" if total_deformation > 0 else "contraction"
     solution += (
         f"**Answer:**\n"
-        f"The total deformation of the rod is **{round(total_deformation, precision)} {unit_D}** "
+        f"The total deformation of the rod is **{total_str} {unit_D}** "
         f"(a net {final_desc})."
     )
 

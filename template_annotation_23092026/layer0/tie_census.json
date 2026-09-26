@@ -1,6 +1,6 @@
 {
- "generated": "2026-09-23T19:30:18+00:00",
- "git_head": "8224d8baec3c958343fe58b995f7abd2fffdecbb",
+ "generated": "2026-09-26T13:09:40+00:00",
+ "git_head": "85ccf8d028cf27a884beb2aec84e3a82a50b6995",
  "seeds": 500,
  "rows": {
   "template_levenspiel_plot_interpretation": {
@@ -230,7 +230,7 @@
   },
   "template_gas_viscosity_kinetic_theory": {
    "branch": "chemical_engineering",
-   "checks": 1000,
+   "checks": 1500,
    "skipped": 0,
    "instances_with_tie": 0,
    "rate": 0.0,
@@ -248,7 +248,7 @@
   },
   "template_newtons_law_shear_stress": {
    "branch": "chemical_engineering",
-   "checks": 0,
+   "checks": 1500,
    "skipped": 0,
    "instances_with_tie": 0,
    "rate": 0.0,
@@ -1169,8 +1169,8 @@
   },
   "template_volumetric_flow_rate": {
    "branch": "mechanical_engineering",
-   "checks": 1254,
-   "skipped": 254,
+   "checks": 1760,
+   "skipped": 260,
    "instances_with_tie": 0,
    "rate": 0.0,
    "by_label": {},
@@ -1233,7 +1233,7 @@
   "template_axial_deformation": {
    "branch": "mechanical_engineering",
    "checks": 500,
-   "skipped": 246,
+   "skipped": 249,
    "instances_with_tie": 0,
    "rate": 0.0,
    "by_label": {},
@@ -1243,18 +1243,14 @@
    "branch": "mechanical_engineering",
    "checks": 1500,
    "skipped": 246,
-   "instances_with_tie": 1,
-   "rate": 0.002,
-   "by_label": {
-    "epsilon": 1
-   },
-   "examples": [
-    "seed 86: epsilon = (0.81 mm) / (540.0 mm) = 1.500e-03  (exact 0.0015)"
-   ]
+   "instances_with_tie": 0,
+   "rate": 0.0,
+   "by_label": {},
+   "examples": []
   },
   "template_multi_segment_rod": {
    "branch": "mechanical_engineering",
-   "checks": 1210,
+   "checks": 1247,
    "skipped": 0,
    "instances_with_tie": 0,
    "rate": 0.0,
@@ -1420,5 +1416,5 @@
    "examples": []
   }
  },
- "seconds": 85.0
+ "seconds": 45.6
 }

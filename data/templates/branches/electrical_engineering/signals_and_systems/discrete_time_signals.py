@@ -354,6 +354,25 @@ def template_finite_convolution():
         formula or gold value changes; the question text changes on every
         seed and the gold answer on none.
 
+    Layer 2 fix (2026-09-26):
+        The same expert rejected the round-1 wording (the other two
+        approved): the origin was still carried by asterisks, which the
+        review app's Markdown renders as italics, and the fallback "so h[0]
+        = v and x[0] = v" cannot locate n = 0 when v repeats. Verified on
+        the seeds the expert saw: 2201 has x = {2, *-2*, -2}, and a reader
+        taking the last -2 as x[0] gets y[0] = 2 for the gold 8; 2203 and
+        2204 repeat the origin value too. At HEAD it repeats within its own
+        sequence on 59.4% of 500 seeds. Models read the raw asterisks, so
+        only a human reader was misled; the convolution values were right.
+        Every sequence (question, Given, answer) is now followed by its
+        index list, "x[n] = {2, *-2*, -2} for n = -1, 0, 1"; the asterisk
+        stays as a redundant marker, called "also marked" so the sentence
+        is true rendered or not, and the h[0]/x[0] sentence is gone. Step 3
+        names the start index of y[n]. Sampling, arithmetic and gold values
+        are unchanged: the question and the answer block change on 100% of
+        500 seeds, the answer only by the appended index list, and the gold
+        index-to-value map is identical on 500 of 500.
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking to find the output of an LTI system.
@@ -398,6 +417,12 @@ def template_finite_convolution():
         h_parts.append(f"*{val}*" if i == 0 else str(val))
     h_n_str = f"{{{', '.join(h_parts)}}}"
 
+    # Each sequence is printed with its index list, which locates n = 0 in
+    # words: Markdown renders a starred value as italics and drops the
+    # asterisks, so the marker must never carry the origin alone.
+    x_idx_str = ", ".join(str(i) for i in range(min_idx_x, max_idx_x + 1))
+    h_idx_str = ", ".join(str(i) for i in range(min_idx_h, max_idx_h + 1))
+
 
     # 2. Perform the core calculation (Convolution)
     y_n = {}
@@ -421,12 +446,12 @@ def template_finite_convolution():
     # Both sequences contain n = 0 by construction (the origin position is
     # drawn inside each support), so the origin samples are always present.
     question = (
-        f"An LTI system has an impulse response h[n] = {h_n_str}.\n\n"
+        f"An LTI system has an impulse response h[n] = {h_n_str} for n = {h_idx_str}.\n\n"
         f"Determine the system's output, y[n] = x[n] * h[n] (the convolution of x[n] with h[n]), "
-        f"for the input x[n] = {x_n_str}.\n\n"
-        f"In each sequence the value at the origin n = 0 is enclosed in asterisks, "
-        f"so h[0] = {h_n[0]} and x[0] = {x_n[0]}, and the sequence is 0 outside the listed indices. "
-        f"Give y[n] in the same notation."
+        f"when the input is x[n] = {x_n_str} for n = {x_idx_str}.\n\n"
+        f"In each sequence the listed values belong, in order, to the listed indices n, "
+        f"and the sequence is 0 at every other n; the value at n = 0 is also marked. "
+        f"Give y[n] in the same form, with its indices."
     )
 
     # Build the detailed calculation steps for the solution
@@ -465,14 +490,17 @@ def template_finite_convolution():
     # Format the final sequence y_n
     if not y_n:
         y_n_str = "{*0*}"
+        y_list_idx = [0]
     else:
         min_idx_y = y_start_idx
         max_idx_y = y_end_idx
+        y_list_idx = list(range(min_idx_y, max_idx_y + 1))
         y_parts = []
-        for i in range(min_idx_y, max_idx_y + 1):
+        for i in y_list_idx:
             val = y_n.get(i, 0)
             y_parts.append(f"*{val}*" if i == 0 else str(val))
         y_n_str = f"{{{', '.join(y_parts)}}}"
+    y_idx_str = ", ".join(str(i) for i in y_list_idx)
 
     y_values_list = [f"    y[{n}] = {y_n.get(n, 0)}" for n in range(y_start_idx, y_end_idx + 1)]
     y_values_str = "\n".join(y_values_list)
@@ -481,8 +509,8 @@ def template_finite_convolution():
         
     solution = (
         f"**Given:**\n"
-        f"Input Signal: x[n] = {x_n_str}\n"
-        f"Impulse Response: h[n] = {h_n_str}\n\n"
+        f"Input Signal: x[n] = {x_n_str} for n = {x_idx_str}.\n"
+        f"Impulse Response: h[n] = {h_n_str} for n = {h_idx_str}.\n\n"
 
         f"**Step 1:** State the Convolution Formula\n"
         f"The output y[n] of an LTI system is the convolution of the input x[n] with the impulse response h[n]. The convolution sum is defined as:\n"
@@ -497,10 +525,10 @@ def template_finite_convolution():
         f"**Step 3:** Calculate All Output Values\n"
         f"By continuing this process for all values of 'n' where the sequences overlap (from n={y_start_idx} to n={y_end_idx}), we get the full output sequence:\n"
         f"{y_values_str}\n"
-        f"Collected into one sequence with the value at the origin n = 0 enclosed in asterisks, as in the question, this gives the answer.\n\n"
+        f"Collected in order of increasing n, starting at n = {y_list_idx[0]}, with the value at n = 0 also marked as in the question, this gives the answer.\n\n"
 
         f"**Answer:**\n"
-        f"The complete output sequence is y[n] = {y_n_str}"
+        f"The complete output sequence is y[n] = {y_n_str} for n = {y_idx_str}"
     )
 
     return question, solution

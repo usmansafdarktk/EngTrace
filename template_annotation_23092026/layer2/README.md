@@ -81,4 +81,9 @@ reads that round's keyfile, refuses codes it does not know, writes `RESULTS_roun
 record is untouched, and with `--prev-labels` sets each expert's verdict beside their previous one.
 
 Round 2 ran on 2026-09-25 (`RESULTS_round2.md`, D-107): 17 of the 22 approved by all three experts,
-2 by majority, 3 rejected by majority.
+2 by majority, 3 rejected by majority. The five objections were fixed on 2026-09-26
+(`fixes_round2.md`, D-108) and round 3 re-certifies those five, with the same commands at
+`--round 3` and `--prev-labels <round-2 folder>`.
+
+`markdown_scan.py` records what the app's Markdown rendering removes from each question and
+solution (`markdown_scan.md`); the models read the raw text, the experts read the rendered view.

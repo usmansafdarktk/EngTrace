@@ -1,6 +1,6 @@
 {
- "generated": "2026-09-25T11:16:28+00:00",
- "git_head": "30e6988a37a301ff35206a71d3dbfa3b454b47a2",
+ "generated": "2026-09-26T13:10:23+00:00",
+ "git_head": "85ccf8d028cf27a884beb2aec84e3a82a50b6995",
  "seeds": 500,
  "gating": [
   "T1",
@@ -24,7 +24,7 @@
  },
  "advisory_failing": {
   "T5": 60,
-  "T7": 81
+  "T7": 78
  },
  "register_absorbed": {
   "template_time_rate_of_consolidation::H_dr,field / H_dr,lab = .* m / .* mm = .* mm / .* mm =": 500,
@@ -1243,10 +1243,10 @@
     "failures": 0,
     "excused": {},
     "unexcused": 0,
-    "marginals": 0,
-    "checks": 0,
+    "marginals": 814,
+    "checks": 1500,
     "unit_rescales": 0,
-    "coverage": 0.0,
+    "coverage": 0.429,
     "examples": []
    },
    "T2": {
@@ -5773,7 +5773,7 @@
     "failures": 0,
     "excused": {},
     "unexcused": 0,
-    "marginals": 301,
+    "marginals": 307,
     "checks": 2000,
     "unit_rescales": 0,
     "coverage": 0.444,
@@ -5807,7 +5807,7 @@
     ]
    },
    "T5": true,
-   "T7": false
+   "T7": true
   },
   "template_axial_deformation": {
    "branch": "mechanical_engineering",
@@ -5861,7 +5861,7 @@
     "failures": 0,
     "excused": {},
     "unexcused": 0,
-    "marginals": 399,
+    "marginals": 436,
     "checks": 1500,
     "unit_rescales": 0,
     "coverage": 0.231,
@@ -5895,7 +5895,7 @@
     ]
    },
    "T5": false,
-   "T7": false
+   "T7": true
   },
   "template_multi_segment_rod": {
    "branch": "mechanical_engineering",
@@ -5905,7 +5905,7 @@
     "failures": 0,
     "excused": {},
     "unexcused": 0,
-    "marginals": 619,
+    "marginals": 709,
     "checks": 1247,
     "unit_rescales": 0,
     "coverage": 0.122,
@@ -5939,7 +5939,7 @@
     ]
    },
    "T5": false,
-   "T7": false
+   "T7": true
   },
   "template_poissons_ratio": {
    "branch": "mechanical_engineering",
@@ -6747,5 +6747,5 @@
    "T7": false
   }
  },
- "seconds": 184.9
+ "seconds": 92.5
 }

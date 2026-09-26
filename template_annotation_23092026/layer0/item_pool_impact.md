@@ -200,3 +200,28 @@ template_wave_parameters_basic                   question  181/300  answer  220/
 ```
 
 Cumulative since `b1445ad` (the same script against the pre-edit dump): **77 templates moved; question 4,843 / answer 10,147 / solution 16,514 of 45,000; errors 0 → 0.**
+
+
+# Layer 2, round 2 — the five templates the experts objected to
+
+Measured 2026-09-26 by the same script, 150 templates × 300 seeds: HEAD `85ccf8d` dumped from a detached worktree against the working tree after the round-2 fixes (`../layer2/fixes_round2.md`). Only these five templates moved.
+
+```
+before: C:\Users\ayesha.gull01\AppData\Local\Temp\claude\c--Users-ayesha-gull01-EngTrace\ee94e7a8-9f53-4f47-9626-9630fa10c39c\scratchpad\wt_r2head (n=300)
+after : C:\Users\ayesha.gull01\EngTrace (n=300)
+
+template_basic_stress_strain                     question  300/300  answer  300/300  solution  300/300  errors 0->0
+    seed 0 answer: 'a) Normal Stress (sigma) = **1.457 ksi**\nb) Normal Strain (epsilon) = ' -> 'a) Normal Stress (sigma) = **4.396 ksi**\nb) Normal Strain (epsilon) = '
+template_finite_convolution                      question  300/300  answer  300/300  solution  300/300  errors 0->0
+    seed 0 answer: 'The complete output sequence is y[n] = {-3, -1, -5, 1, 3, *-1*, 0}' -> 'The complete output sequence is y[n] = {-3, -1, -5, 1, 3, *-1*, 0} for'
+template_multi_segment_rod                       question   66/300  answer  250/300  solution  278/300  errors 0->0
+    seed 0 answer: 'The total deformation of the rod is **0.0419 in** (a net elongation).' -> 'The total deformation of the rod is **0.041987 in** (a net elongation)'
+template_newtons_law_shear_stress                question  225/300  answer  300/300  solution  300/300  errors 0->0
+    seed 0 answer: 'a) The shear stress in the fluid is **5.65383e-02 Pa**.\nb) The force r' -> 'a) The shear stress in the fluid is **0.002732 Pa**.\nb) The force requ'
+template_utube_manometer                         question  162/300  answer  177/300  solution  177/300  errors 0->0
+    seed 0 answer: 'The gauge pressure in the pipe is 6.127 kPa.' -> 'The gauge pressure in the pipe is 6.374 kPa.'
+
+5 templates moved; totals {'q': 1053, 'ans': 1327, 'sol': 1355, 'err_before': 0, 'err_after': 0}
+```
+
+Cumulative since `b1445ad` (the same script against the pre-edit dump): **77 templates moved; question 5,144 / answer 10,598 / solution 16,669 of 45,000; errors 0 → 0.**

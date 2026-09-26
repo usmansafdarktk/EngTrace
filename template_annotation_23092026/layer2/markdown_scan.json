@@ -1,0 +1,625 @@
+{
+ "generated": "2026-09-26T13:09:52+00:00",
+ "git_head": "85ccf8d028cf27a884beb2aec84e3a82a50b6995",
+ "seeds": 200,
+ "templates": 150,
+ "errors": {},
+ "findings": {
+  "template_absorbing_chain_time_to_failure": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *muG + 0.24*"
+   }
+  },
+  "template_aliased_frequency_identification": {
+   "question: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *pi*"
+   }
+  },
+  "template_aoq_ati_rectifying": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *p*"
+   }
+  },
+  "template_arl_beta_mean_shift": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *sqrt(n).n = 9: z = 3 - 0.64*"
+   }
+  },
+  "template_autocorrelation_rect_pulse": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: **R_g(tau) = 64*(8 - |tau|)*"
+   }
+  },
+  "template_basic_eoq": {
+   "question: dollar pair (inline math)": {
+    "seeds": 200,
+    "example": "seed 0: $148 to place and process, the item costs $6.18 per unit, and the annu"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *K*"
+   },
+   "solution: dollar pair (inline math)": {
+    "seeds": 200,
+    "example": "seed 0: $148; unit cost c = $6.18; holding rate i = 0.16 per year."
+   }
+  },
+  "template_batch_moles_vs_conversion": {
+   "question: strong (bold)": {
+    "seeds": 200,
+    "example": "seed 0: **Reaction:**"
+   },
+   "question: dollar pair (inline math)": {
+    "seeds": 200,
+    "example": "seed 0: $CH4(g) + H2O(g) → CO(g) + 3H2(g)$"
+   },
+   "solution: dollar pair (inline math)": {
+    "seeds": 200,
+    "example": "seed 0: $CH4(g) + H2O(g) → CO(g) + 3H2(g)$\n- Initial Moles:\n  - $N_{CH4(g),0} "
+   },
+   "solution: backslash escape (backslash dropped)": {
+    "seeds": 200,
+    "example": "seed 0: rsion of $54.0 \\%$, the final nu"
+   }
+  },
+  "template_beam_deflection_formula": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *L^3 / (48*"
+   }
+  },
+  "template_ber_estimation_mary": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *Q(sqrt(3*"
+   }
+  },
+  "template_bpsk_energy_basis": {
+   "question: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *pi*"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *pi*"
+   }
+  },
+  "template_cantilever_double_integration": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *I*"
+   }
+  },
+  "template_cd_dc_system_analysis": {
+   "question: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *pi*"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *pi*"
+   }
+  },
+  "template_chase_vs_level_aggregate": {
+   "question: dollar pair (inline math)": {
+    "seeds": 200,
+    "example": "seed 0: $1405 per worker, firing costs cF = $2347 per worker, and ending inven"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *2 + 2347*"
+   },
+   "solution: dollar pair (inline math)": {
+    "seeds": 200,
+    "example": "seed 0: $1405; cF = $2347; h = $4/unit-month."
+   }
+  },
+  "template_continuous_to_discrete_conversion": {
+   "question: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *pi*"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *pi*"
+   }
+  },
+  "template_cp_cpk_from_specs": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *sigma-hat) = (16.672 - 16.407) / (3 * 0.05746) = 1*"
+   }
+  },
+  "template_decimation_aliasing_analysis": {
+   "solution: emphasis (italic)": {
+    "seeds": 188,
+    "example": "seed 0: *pi)/8So, the expression is y[n] = cos((5*"
+   },
+   "question: emphasis (italic)": {
+    "seeds": 131,
+    "example": "seed 1: *pi)/12*"
+   }
+  },
+  "template_epq_finite_production": {
+   "question: dollar pair (inline math)": {
+    "seeds": 200,
+    "example": "seed 0: $87 to set up, the item is valued at $3.65 per unit, and the annual ho"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *K*"
+   },
+   "solution: dollar pair (inline math)": {
+    "seeds": 200,
+    "example": "seed 0: $87; unit cost c = $3.65; holding rate i = 0.34 per year."
+   }
+  },
+  "template_euclidean_distance_binary": {
+   "solution: emphasis (italic)": {
+    "seeds": 107,
+    "example": "seed 1: *sqrt(Eb))d = ||s1 - s2|| = 2*"
+   }
+  },
+  "template_finite_convolution": {
+   "question: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *2*"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *0*"
+   }
+  },
+  "template_flow_system_molar_flow_rates": {
+   "question: strong (bold)": {
+    "seeds": 200,
+    "example": "seed 0: **Reaction:**"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *Using the Direct Method:*"
+   }
+  },
+  "template_fluid_particle_acceleration": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *(19.6) + (52.16)*"
+   }
+  },
+  "template_force_method_continuous_beam": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *b*"
+   }
+  },
+  "template_ft_esd_rect_pulse": {
+   "question: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *x) / (pi*"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *x) / (pi*"
+   }
+  },
+  "template_gas_phase_concentration": {
+   "question: strong (bold)": {
+    "seeds": 200,
+    "example": "seed 0: **Reaction:**"
+   },
+   "question: bullet list": {
+    "seeds": 200,
+    "example": "seed 0: -"
+   },
+   "question: dollar pair (inline math)": {
+    "seeds": 200,
+    "example": "seed 0: $CO(g) + 3H2(g) → CH4(g) + H2O(g)$, i.e. Carbon Monoxide + 3 Hydrogen "
+   },
+   "solution: dollar pair (inline math)": {
+    "seeds": 200,
+    "example": "seed 0: $C_{A0} = 0.202$ mol/dm³\n- Conversion: $X_A = 0.67$\n- Molar Feed Ratio"
+   },
+   "solution: backslash escape (backslash dropped)": {
+    "seeds": 200,
+    "example": "seed 0: silon = y_{A0} \\, \\delta = 0.178"
+   }
+  },
+  "template_gas_viscosity_kinetic_theory": {
+   "question: bullet list": {
+    "seeds": 200,
+    "example": "seed 0: -"
+   }
+  },
+  "template_gauss_law_symmetric": {
+   "solution: emphasis (italic)": {
+    "seeds": 93,
+    "example": "seed 0: *A + D_z*"
+   }
+  },
+  "template_heat_of_reaction_formation": {
+   "question: bullet list": {
+    "seeds": 200,
+    "example": "seed 0: -"
+   }
+  },
+  "template_hydraulic_jump_energy_loss": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *y1*"
+   }
+  },
+  "template_impulse_response_from_lccde": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *delta[0] ... (other delta terms are 0)h[0] + 3*"
+   }
+  },
+  "template_kinematic_viscosity": {
+   "question: strong (bold)": {
+    "seeds": 200,
+    "example": "seed 0: **Stokes (St)**"
+   }
+  },
+  "template_levenspiel_plot_interpretation": {
+   "question: heading": {
+    "seeds": 200,
+    "example": "seed 0: -"
+   }
+  },
+  "template_limiting_reactant": {
+   "question: strong (bold)": {
+    "seeds": 200,
+    "example": "seed 0: **Reaction:**"
+   }
+  },
+  "template_line_balancing_heuristic": {
+   "question: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *CT - total work) / (n*"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *CT - sum(t)) / (n*"
+   }
+  },
+  "template_linear_reservoir_routing_step": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *dt/2 - O_j*"
+   }
+  },
+  "template_logarithmic_decrement": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *pi)^2 + delta^2)zeta = 0.3648 / sqrt((2*"
+   }
+  },
+  "template_lowpass_equivalent_bandpass": {
+   "question: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *pi*"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *pi*"
+   }
+  },
+  "template_manning_trapezoidal_velocity": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *y*"
+   }
+  },
+  "template_max_hump_height_no_choking": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *g*"
+   }
+  },
+  "template_mean_variance": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *(0.173) + (3)*"
+   }
+  },
+  "template_mm1k_finite_capacity": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *1.1463 + 2*"
+   }
+  },
+  "template_multi_segment_rod": {
+   "question: bullet list": {
+    "seeds": 200,
+    "example": "seed 0: -"
+   }
+  },
+  "template_newsvendor_normal_demand": {
+   "question: dollar pair (inline math)": {
+    "seeds": 200,
+    "example": "seed 0: $23.55, sells for $112.15 during the season, and any unsold unit is sa"
+   },
+   "solution: dollar pair (inline math)": {
+    "seeds": 200,
+    "example": "seed 0: $23.55; price p = $112.15; salvage s = $12.79; demand ~ Normal(mu = 11"
+   }
+  },
+  "template_normal_depth_iteration": {
+   "question: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *n/S^(1/2), define g(y) = A*"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *R^(2/3) = Q*"
+   }
+  },
+  "template_nyquist_rate_determination": {
+   "question: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *pi*"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *pi*"
+   }
+  },
+  "template_p_chart_limits_floor": {
+   "question: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *n), the standard error sqrt(p-bar*"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *se = 0.1168 + 3 * 0.0203 = 0.1777;  computed LCL =*"
+   }
+  },
+  "template_phasor_addition": {
+   "question: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *t - 28.6 deg)v2(t) = 40.32 * sin(361*"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *t - 28.6 deg)v2(t) = 40.32 * sin(361*"
+   }
+  },
+  "template_power_law_fluid_shear": {
+   "question: bullet list": {
+    "seeds": 200,
+    "example": "seed 0: -"
+   }
+  },
+  "template_qr_policy_one_iteration": {
+   "question: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *c. Each unit of unmet demand is backordered at a s*"
+   },
+   "question: dollar pair (inline math)": {
+    "seeds": 200,
+    "example": "seed 0: $172 to place, the item costs c = $30.80 per unit, and the annual hold"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *K*"
+   },
+   "solution: dollar pair (inline math)": {
+    "seeds": 200,
+    "example": "seed 0: $172; c = $30.80; i = 0.26; stockout penalty p = $15.87/unit; lead-tim"
+   }
+  },
+  "template_quantity_discount_all_units": {
+   "question: dollar pair (inline math)": {
+    "seeds": 200,
+    "example": "seed 0: $115 to place, and the annual holding-cost rate is 0.28 (a fraction of"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *c0 = 0.28*"
+   },
+   "solution: dollar pair (inline math)": {
+    "seeds": 200,
+    "example": "seed 0: $115; holding rate i = 0.28 per year; all-units prices c0 = $17.02 (1 "
+   }
+  },
+  "template_rational_method_peak_flow": {
+   "question: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *i*"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 93,
+    "example": "seed 0: *A1 + C2*"
+   }
+  },
+  "template_reorder_point_lead_time": {
+   "question: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *T for the largest integer k with k*"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 86,
+    "example": "seed 0: *tau - k*"
+   }
+  },
+  "template_reynolds_number_flow_regime": {
+   "question: bullet list": {
+    "seeds": 200,
+    "example": "seed 0: -"
+   }
+  },
+  "template_sensible_heat_temp_dependent_cp": {
+   "question: emphasis (italic)": {
+    "seeds": 177,
+    "example": "seed 0: *T + 1.510e+04*"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 184,
+    "example": "seed 0: *(668.67)^2 - (1.510e+04/668.67) = 2227.0181I(383.0*"
+   }
+  },
+  "template_sigma_reduction_for_cpk": {
+   "question: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *sigma), Cpu = (USL - mu)/(3*"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *sigma) = (85 - 54) / (6 * 3.71) = 1.39;  Cpu = (US*"
+   }
+  },
+  "template_signal_energy_power": {
+   "solution: emphasis (italic)": {
+    "seeds": 126,
+    "example": "seed 0: *t))^2 dtEg = 225 * integral from 0 to inf of exp(-*"
+   }
+  },
+  "template_signal_operations": {
+   "question: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *2*"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *2*"
+   }
+  },
+  "template_slope_deflection_end_moment": {
+   "question: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *L^2/12 (near end) and +w*"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *L1^2/12 = -18 * (5.1)^2 / 12 = -39.0150 kN*"
+   }
+  },
+  "template_standing_wave_formation": {
+   "question: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *t - 4.56*"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *t - 4.56*"
+   }
+  },
+  "template_statically_indeterminate": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *R_A = 14900.0 - 59.6*"
+   }
+  },
+  "template_statically_indeterminate_shaft": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *G) = (T_B * L_BC) / (J*"
+   }
+  },
+  "template_superposition_electric_field": {
+   "question: bullet list": {
+    "seeds": 200,
+    "example": "seed 0: -"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *pi*"
+   }
+  },
+  "template_system_properties": {
+   "question: ordered list": {
+    "seeds": 200,
+    "example": "seed 0: ."
+   }
+  },
+  "template_system_properties_memory_causality": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *only*"
+   }
+  },
+  "template_system_property_linearity": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *x[n]} = a*"
+   }
+  },
+  "template_terzaghi_strip_footing_bearing": {
+   "question: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *Nc + q*"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *N'c + q*"
+   }
+  },
+  "template_time_rate_of_consolidation": {
+   "question: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *t / H_dr^2, where the specimen and the field layer*"
+   }
+  },
+  "template_undamped_response_initial_conditions": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *sin(21.7438*"
+   }
+  },
+  "template_vdw_solve_for_volume": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *V^2 + c1*"
+   }
+  },
+  "template_vibration_isolator_design": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *zeta*"
+   }
+  },
+  "template_vibration_transmissibility": {
+   "question: ordered list": {
+    "seeds": 200,
+    "example": "seed 0: ."
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *zeta*"
+   }
+  },
+  "template_virtual_work_truss_deflection": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *N*"
+   }
+  },
+  "template_volumetric_flow_rate": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *U_max/H) * [y^2/2] from 0 to HQ = (W*"
+   }
+  },
+  "template_wave_equation_interpretation": {
+   "question: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *t - 8.89*"
+   },
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *t - 8.89*"
+   }
+  },
+  "template_work_isothermal_virial": {
+   "solution: emphasis (italic)": {
+    "seeds": 200,
+    "example": "seed 0: *0.04823*"
+   }
+  }
+ }
+}
