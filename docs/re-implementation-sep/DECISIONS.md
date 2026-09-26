@@ -4091,14 +4091,43 @@ can go out as built.
 **Open.** Whether the app shows questions and solutions as plain text from now on, and whether
 the templates judged through the rendered view get a plain-text look; fixing `signal_operations`.
 
+## D-109 — Layer 2 complete: 150 of 150 templates certified, each by a unanimous latest round on the code as it stands
+
+**Date:** 2026-09-26 · **Status:** RECORDED · **Source:** `template_annotation_23092026/layer2/RESULTS_round3.md`,
+`layer2/CERTIFICATION.md` (`certification.py`)
+
+Round 3 (2026-09-26) sent the five templates fixed under D-108 to the nine experts of their
+branches: 15 reviews, no planted defects, and a hand-check instance none of them had seen. All five
+are approved by all three experts, and the ten round-2 rejections of these templates all became
+approvals. Two hand checks were scored as mismatches; both answered the manometer in pascals
+(6831 Pa) where the template answers in kilopascals (6.831 kPa). That is the same value, and the
+app compares the numbers without their units.
+
+`certification.py` combines the three rounds. A template counts as certified when the latest round
+that reviewed it is a unanimous approval by its three own-branch experts and the current code
+regenerates, byte for byte, the five instances they were shown. A later edit to a template, or to a
+table it reads, therefore voids its certification until it is reviewed again. All 150 are
+certified: 128 last reviewed in round 1, 17 in round 2 and 5 in round 3. No split verdict is in
+force, so the pool needs no adjudication rule (D-095).
+
+**What the certification rests on.** Fifteen own-branch experts gave 531 verdicts on real templates
+over three rounds, plus 60 on planted defects, of which they caught 60 in round 1. A hand check came
+before every solution. The rounds produced 53 rejections of real templates, 43 in round 1 and 10 in
+round 2; each was verified against its instance, then fixed or, in two cases, answered with an
+argument the expert accepted.
+
+**What it does not yet rest on.** The experts judged 65 templates through the app's Markdown
+rendering, which dropped multiplication and dollar signs from what they saw, and
+`signal_operations` still marks its origin only by asterisks. Both stay open under D-108.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
 | D-108 | Whether the review app shows questions and solutions as plain text, as the models read them, and whether the 65 templates judged through its Markdown rendering get a plain-text look; fixing `signal_operations`'s origin marker | the paper states what the experts certified |
-| D-107 | ~~Fix the five templates round 2 objected to~~ **Fixed 2026-09-26 (D-108); round 3 built for the five.** Open: sending round 3 and scoring it | the item pool is frozen |
+| D-107 | ~~Fix the five templates round 2 objected to~~ **Fixed 2026-09-26 (D-108) and re-certified in round 3 (D-109): all five approved by all three** | — |
 | D-106 | Whether the screen re-judges the changed templates (a few cents, targeted; not run before round 2); the plasma row's per-row tag | the item pool is frozen |
-| D-095 | ~~Layer 2 roster and dates~~ **Round 1 run 2026-09-24/25 with the pilot's 15 experts (D-106).** **Round 2 run 2026-09-25 (D-107).** Open: adjudication rule for split verdicts (7 of round 1's 22 rejections were 1 of 3; round 2 leaves two templates approved 2 of 3 over a confirmed objection) | a template is counted as certified |
+| D-095 | ~~Layer 2 roster and dates~~ **Round 1 run 2026-09-24/25 with the pilot's 15 experts (D-106).** **Round 2 run 2026-09-25 (D-107).** **Round 3 run 2026-09-26 (D-109).** ~~Adjudication rule for split verdicts~~ **Not needed for this pool: after round 3 no split verdict is in force; all 150 templates are certified unanimously (D-109)** | — |
 | D-094 | Whether to narrow the P2/Pc range in `work_isothermal_virial` (now 50% redraw; an expert's thermal-stability objection, D-106, turns on the same range) and accept the 41% stability redraw in `floating_object_submersion_depth`; the residuals in `pass1_fixes.md` | the item pool is regenerated |
 | D-092 | ~~Answer-display lengthening and gold-movement sign-offs~~ **Decided by the owner 2026-09-23:** the two lengthened answers stay; `beam_internal_moment`, `terzaghi_strip_footing_bearing` and `effective_stress_profile` answers are lengthened too; the gold movements are accepted; and a scoped third round removes the census ties at 3% and above (eight templates), with the frozen pool to be censused before inference and stragglers fixed then | — |
 | D-093 | ~~Approval to run screening pass 1~~ **Both passes run (2026-09-23/24, $4.85 total); the 24 flags resolved (D-094).** Open: the Layer 2 protocol (experts, hand-checks, planted defects) | Layer 2 (human certification) starts |

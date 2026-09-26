@@ -83,7 +83,18 @@ record is untouched, and with `--prev-labels` sets each expert's verdict beside 
 Round 2 ran on 2026-09-25 (`RESULTS_round2.md`, D-107): 17 of the 22 approved by all three experts,
 2 by majority, 3 rejected by majority. The five objections were fixed on 2026-09-26
 (`fixes_round2.md`, D-108) and round 3 re-certifies those five, with the same commands at
-`--round 3` and `--prev-labels <round-2 folder>`.
+`--round 3` and `--prev-labels <round-2 folder>`. Round 3 ran on 2026-09-26 (`RESULTS_round3.md`,
+D-109): all five approved by all three experts.
+
+`certification.py` combines the rounds into `CERTIFICATION.md`:
+
+```bash
+python -m template_annotation_23092026.layer2.certification --labels <round-1 folder> <round-2 folder> <round-3 folder>
+```
+
+A template is certified when the latest round that reviewed it is a unanimous approval and the
+current code regenerates, byte for byte, the instances the experts were shown, so any later edit
+to a template or a table it reads voids its certification until it is reviewed again.
 
 `markdown_scan.py` records what the app's Markdown rendering removes from each question and
 solution (`markdown_scan.md`); the models read the raw text, the experts read the rendered view.
