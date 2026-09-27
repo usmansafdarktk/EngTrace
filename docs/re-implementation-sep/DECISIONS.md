@@ -4321,6 +4321,41 @@ changes is the router's routing rule, still to be designed, and two documented d
 the probe's ranking and the GPT-5 step - which are corrected in JUDGE_SELECTION, RESULTS_E2,
 RESULTS_E4, FINDINGS E0-F5, RESULTS_X1 and the pilot summary.
 
+## D-113 — The router is batched or it is not run; batched, it holds up, and costs about $114
+
+**Date:** 2026-09-27 · **Status:** DECIDED (the owner's call on the design; the smoke checks run
+with approval, $2.30) · **Supersedes in part:** D-110 (the router's cost) · **Evidence:**
+`analysis/router_batched.py`, RESULTS_X1 "The router, batched"
+
+**The design.** The full run can afford the router only batched, one judge call per trace. One call
+per residue step, about $371, is not coverable, so the choice is the batched router or none. The
+routing rule is rule C (D-112): every step the digit rule, as E4 ships it, does not flag goes to
+MiMo, a trace's steps together, on the framework's own Tribunal prompt.
+
+**The two smoke checks**, called as the single-step probe was called, every call answered after
+retries (a laptop shutdown cut four calls mid-run; `router_batched.py` now gives up on a call after
+900 s and asks it again):
+
+- *Planted defects*, 240 calls, $0.92. MiMo catches 19 of the 58 conceptual defects it is sent, 19 of
+  60 end to end against E0's 9; on the 49 also judged one step at a time it catches 16 either way,
+  and 14 of the 19 arithmetic defects sent against 12 one at a time. 2 false alarms on 842 clean
+  steps. **Batching costs no detection.**
+- *The 300 labelled traces*, 299 calls, $1.38. The router - the digit rule plus the batched judge -
+  finds 234 of the 388 steps the experts call incorrect, precision 0.707 and recall 0.603, against
+  the digit rule's 0.825 and 0.255. Almost all of the gain is in traces whose answer is not
+  correct; inside correct-answer traces recall moves from 0.320 to 0.360 and the trace AUROC from
+  0.639 to 0.675 (E0 0.542).
+
+**The cost.** A batched call cost $0.0038 on the planted traces and $0.0046 on the labelled ones, not
+the $0.0034 D-110 assumed, so the router over the full run is about $114 at the labelled rate ($95 at
+the planted one), and evaluation with it about $190. The budget of D-110 becomes, with this round's
+spend at about $49: $49 + $403 generation + $77 E5 + $114 router = about $643 against the ~$500 round.
+Whether the router is run at that price is the supervisor's call; what the pilot now says is what it
+buys - step-error recall more than doubled, mostly outside the hard case, and the only conceptual
+signal in the stack.
+
+**Still open:** building the router in the harness, and what it reports in the results table.
+
 ## Open decisions
 
 | # | Decision | Needed before |
@@ -4332,7 +4367,7 @@ RESULTS_E4, FINDINGS E0-F5, RESULTS_X1 and the pilot summary.
 | D-094 | Whether to narrow the P2/Pc range in `work_isothermal_virial` (now 50% redraw; an expert's thermal-stability objection, D-106, turns on the same range) and accept the 41% stability redraw in `floating_object_submersion_depth`; the residuals in `pass1_fixes.md` | the item pool is regenerated |
 | D-092 | ~~Answer-display lengthening and gold-movement sign-offs~~ **Decided by the owner 2026-09-23:** the two lengthened answers stay; `beam_internal_moment`, `terzaghi_strip_footing_bearing` and `effective_stress_profile` answers are lengthened too; the gold movements are accepted; and a scoped third round removes the census ties at 3% and above (eight templates), with the frozen pool to be censused before inference and stragglers fixed then | — |
 | D-093 | ~~Approval to run screening pass 1~~ **Both passes run (2026-09-23/24, $4.85 total); the 24 flags resolved (D-094).** **The Layer 2 protocol was decided (D-095) and run to completion (D-109).** | — |
-| — | ~~Whether the full run adds the step router~~ **In the stack (D-110).** Still open: its routing rule (it must forward every step the checker has not positively cleared; as specified it hides 58 of 178 hard-case slips, D-112), its reported score, building it, and measuring the batched prompt its $79 assumes (the measured single-step design costs $371, D-111) | before evaluation starts |
+| — | ~~Whether the full run adds the step router~~ **In the stack (D-110), batched or not at all (D-113).** ~~Its routing rule~~ **rule C (D-112).** ~~Measuring the batched prompt~~ **Measured: no detection lost, about $114 at full scale (D-113).** Still open: building it, its reported score, and whether the supervisor funds it at about $643 for the base plan | before evaluation starts |
 | — | The repo's templates no longer reproduce 17 of the 60 frozen items byte-identically (D-102); `milestones.build_all` raises on the pilot manifest; `pinned_templates.py` works around it for the pilot | any re-derivation of milestones from templates |
 | — | ~~Which families the next roster will evaluate~~ **Decided 2026-09-27 (D-110): the pricing document's eleven** | — |
 | — | The budget: the plan comes to about $606 against the ~$500 round with a batched router (D-110) | generation starts |

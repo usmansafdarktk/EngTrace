@@ -28,6 +28,7 @@ branches.
 | X4 · the final-answer check, corrected and measured offline | done (RESULTS_X1 Finding 1b, D-098) | $0.00 |
 | X5 · planted defects, the deterministic evaluators and E0's routing on them | done (Findings 7 and 8, D-102, D-104) | $0.00 |
 | X5 · the judges on the planted defects: GPT-5, Opus 4.5, MiMo | done (Finding 8, D-103) | $5.21 |
+| router · batched smoke checks, planted defects and the 300 labelled traces | done (RESULTS_X1, D-113) | $2.30 |
 | summary · [PILOT_SUMMARY.md](PILOT_SUMMARY.md) and its PDF | done; corrected 2026-09-27 (D-111) | — |
 
 **Read these first:** [PILOT_SUMMARY.md](PILOT_SUMMARY.md) (the whole pilot in twelve

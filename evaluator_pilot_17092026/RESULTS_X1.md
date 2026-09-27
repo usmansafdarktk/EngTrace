@@ -608,9 +608,50 @@ forwards every step the checker has not positively cleared would put those steps
 a judge, which catches a share of them, at the cost of a larger residue; which rule, and at
 what cost, belongs to the router's design (open).
 
-**What remains untested.** The probe asks a judge about one step in isolation; a router would
-batch a trace's ~4.4 residue steps into one prompt, which is more context per call and also
-more steps competing for attention. E1's three-judge panel was not probed as a panel. And the
+### The router, batched: two smoke checks (`analysis/router_batched.py`, D-113)
+
+The full run can afford the router only batched, one call per trace; one call per step is out of
+the budget (D-113). Both checks run rule C - every step the digit rule, as E4 ships it, does not
+flag goes to MiMo, a trace's steps in one call - on the framework's own Tribunal prompt, called as
+the single-step probe called it. $2.30 for both; every call returned after retries.
+
+**Planted defects, matched as before** (240 calls, $0.92, 6.4 steps per call):
+
+| | sent to the judge | caught, batched | the same defects, one step at a time |
+|---|---|---|---|
+| conceptual | 58 of 60 | **19 of 58** (0.328); 19 of 60 end to end | 16 of 49 batched, **16 of 49** single |
+| arithmetic | 19 of 60 (41 flagged by the digit rule) | **14 of 19** | 14 batched, **12** single, of 19 |
+| false alarms on the other steps under review | | **2 of 842** (0.002) | |
+
+Batching costs no detection: on the defects judged both ways the batched judge catches as many
+conceptual defects and more arithmetic ones, and it flags almost no clean step. End to end on this
+set the router catches 19 of 60 conceptual defects against E0's 9 of 60, and the stack - the digit
+rule where it flags, the batched judge on the rest - catches 55 of 60 arithmetic ones against E0's
+36.
+
+**The 300 labelled traces** (299 calls, $1.38, 6.6 steps per call; 8 of the 1,971 steps sent were
+left unjudged):
+
+| steps the experts call incorrect | precision | recall | F1 |
+|---|---|---|---|
+| all traces, the digit rule alone | 0.825 | 0.255 | 0.390 |
+| all traces, the digit rule plus the batched judge | 0.707 | **0.603** | **0.651** |
+| inside correct-answer traces, the digit rule alone | 0.750 | 0.320 | 0.449 |
+| inside correct-answer traces, the digit rule plus the batched judge | 0.703 | 0.360 | 0.476 |
+
+The judge more than doubles step-error recall overall, and almost all of that gain is in traces
+whose answer is not correct: inside correct-answer traces it adds 7 true flags (64 against 57) for
+8 false ones. Ranking the 228 correct-answer traces by flagged steps gives AUROC 0.675 (0.622 to
+0.730, traces resampled) against the digit rule's 0.639 and E0's 0.542; template-level intervals
+were not computed for it. For comparison, the 72B PRM reaches F1 0.527 over all traces and 0.250
+inside correct-answer ones (Finding 3).
+
+**What a batched call costs.** $0.0038 on the planted traces and $0.0046 on the labelled ones,
+against the $0.0034 the $79 estimate assumed. At the labelled rate, one call for each of the full
+run's traces with a step to send comes to about $114 ($95 at the planted rate).
+
+**What remains untested.** Both checks ran on the pilot's five models; the roster's steps per call,
+and so its cost per call, are estimates. E1's three-judge panel was not probed as a panel. And the
 planted set is a diagnostic: these rates describe what an evaluator does with defects of this
 shape, not how often models produce them.
 

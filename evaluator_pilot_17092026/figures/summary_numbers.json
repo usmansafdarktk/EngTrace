@@ -9,7 +9,14 @@
   "e5": 76.815234375,
   "models": 11,
   "open": 8,
-  "router_batched": 79.101,
+  "router_batched": 113.6735485875,
+  "router_batched_estimate": 79.101,
+  "router_batched_low": 94.64810133796875,
+  "router_calls": 24667.5,
+  "router_per_call": {
+   "labelled": 0.004608231421404682,
+   "planted": 0.0038369555625
+  },
   "router_per_step": 371.382,
   "traces": 24750
  },
@@ -65,6 +72,107 @@
      "n": 60
     }
    }
+  }
+ },
+ "router_batched": {
+  "labelled": {
+   "all": {
+    "router": {
+     "f1": 0.650904033379694,
+     "fn": 154,
+     "fp": 97,
+     "precision": 0.7069486404833837,
+     "recall": 0.6030927835051546,
+     "tp": 234
+    },
+    "rule": {
+     "f1": 0.38976377952755903,
+     "fn": 289,
+     "fp": 21,
+     "precision": 0.825,
+     "recall": 0.2551546391752577,
+     "tp": 99
+    },
+    "unjudged": 8
+   },
+   "calls": 299,
+   "correct_answer": {
+    "router": {
+     "f1": 0.4758364312267658,
+     "fn": 114,
+     "fp": 27,
+     "precision": 0.7032967032967034,
+     "recall": 0.3595505617977528,
+     "tp": 64
+    },
+    "rule": {
+     "f1": 0.44881889763779526,
+     "fn": 121,
+     "fp": 19,
+     "precision": 0.75,
+     "recall": 0.3202247191011236,
+     "tp": 57
+    },
+    "unjudged": 0
+   },
+   "hard_case": {
+    "auroc": 0.6754679410593389,
+    "flawed": 93,
+    "hi": 0.7300945760245736,
+    "lo": 0.6219824735449735,
+    "traces": 228
+   },
+   "median_s": 38.7,
+   "per_call": 0.004608231421404682,
+   "retried": 24,
+   "returned": 299,
+   "spent": 1.377861195,
+   "tokens_in": 1958.428093645485,
+   "tokens_out": 3701.5284280936453,
+   "unjudged": [
+    8,
+    1971
+   ]
+  },
+  "planted": {
+   "calls": 240,
+   "false_alarms": [
+    2,
+    842
+   ],
+   "families": {
+    "arithmetic": {
+     "caught": 14,
+     "caught_batched_same": 14,
+     "caught_single_same": 12,
+     "defects": 60,
+     "flags_original": 0,
+     "judged": 19,
+     "not_sent": 41,
+     "same_sets": 19
+    },
+    "conceptual": {
+     "caught": 19,
+     "caught_batched_same": 16,
+     "caught_single_same": 16,
+     "defects": 60,
+     "flags_original": 0,
+     "judged": 58,
+     "not_sent": 2,
+     "same_sets": 49
+    }
+   },
+   "median_s": 61.2,
+   "per_call": 0.0038369555625,
+   "retried": 6,
+   "returned": 240,
+   "spent": 0.920869335,
+   "tokens_in": 1729.2333333333333,
+   "tokens_out": 3398.6,
+   "unjudged": [
+    0,
+    1532
+   ]
   }
  },
  "routing": {

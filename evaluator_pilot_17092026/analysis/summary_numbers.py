@@ -49,6 +49,7 @@ import x1_analysis as X  # noqa: E402
 
 with redirect_stdout(io.StringIO()):
     import planted_judges as PJ  # noqa: E402
+    import router_batched as RB  # noqa: E402
     import router_planted as RP  # noqa: E402
 
 LABELS = _os.path.join(_PILOT, 'experts_filled_labels', 'version_2', 'labels')
@@ -136,17 +137,28 @@ def planted(rp):
             'digit_false_alarm_on_judged_steps': rp['digit_false_alarm_on_judged_steps']}
 
 
-def cost():
+def cost(rb):
+    """Judge cost of the full run. The router is priced from its batched smoke checks
+    (router_batched.py): one call per trace with a step to send - 299 of the 300 labelled
+    traces under rule C - at what a batched call cost there, on the labelled traces (the
+    pilot's full mix) and on the planted ones (clean traces only, the low end)."""
     rates = JC.rates()
     residue = RR.measure(LABELS, OPEN + CLOSED)
-    return {'models': OPEN + CLOSED, 'open': OPEN, 'closed': CLOSED,
-            'traces': (OPEN + CLOSED) * JC.ITEMS,
+    traces = (OPEN + CLOSED) * JC.ITEMS
+    lab = rb['labelled']
+    labelled = len(S.build_truth(S.read_labels(LABELS), S.read_consensus(LABELS))[0])
+    calls = traces * lab['calls'] / labelled        # a trace with no step to send costs no call
+    return {'models': OPEN + CLOSED, 'open': OPEN, 'closed': CLOSED, 'traces': traces,
             'e0': JC.roster_cost(rates['E0'], OPEN, CLOSED),
             'e0_range': [JC.ITEMS * (OPEN + CLOSED) * rates['E0']['W'],
                          JC.ITEMS * (OPEN + CLOSED) * rates['E0']['F']],
             'e5': JC.roster_cost(rates['E5'], OPEN, CLOSED),
-            'router_batched': residue['cost_batched'],
-            'router_per_step': residue['cost_per_step']}
+            'router_batched_estimate': residue['cost_batched'],
+            'router_per_step': residue['cost_per_step'],
+            'router_calls': calls,
+            'router_per_call': {'labelled': lab['per_call'], 'planted': rb['planted']['per_call']},
+            'router_batched': calls * lab['per_call'],
+            'router_batched_low': calls * rb['planted']['per_call']}
 
 
 def wilson(k, n, z=1.959964):
@@ -200,12 +212,14 @@ def text(planted_numbers, cost_numbers):
 def main():
     with redirect_stdout(io.StringIO()):
         rp = RP.measure()
+        rb = RB.measure()
     numbers = {'trace': trace(), 'steps': steps(), 'planted': planted(rp),
                'routing': {f: {'n': rp[f]['n'], 'forwarded': rp[f]['forwarded'],
                                'e0': rp[f]['e0'], 'router': rp[f]['router']}
                            for f in ('conceptual', 'arithmetic')},
                'stack_arithmetic': rp['arithmetic']['stack'],
-               'cost': cost()}
+               'router_batched': rb,
+               'cost': cost(rb)}
     numbers['text'] = text(numbers['planted'], numbers['cost'])
     with open(OUT, 'w', encoding='utf-8', newline='\n') as fh:
         json.dump(numbers, fh, indent=1, sort_keys=True)
@@ -218,8 +232,8 @@ def main():
     for k, v in numbers['steps'].items():
         print('  %-12s precision %.3f  recall %.3f' % (k, v['precision'], v['recall']))
     c = numbers['cost']
-    print('  cost  E0 %.2f  E5 %.2f  router batched %.2f  per step %.2f'
-          % (c['e0'], c['e5'], c['router_batched'], c['router_per_step']))
+    print('  cost  E0 %.2f  E5 %.2f  router batched, measured %.2f (%.2f at the planted rate)  per step %.2f'
+          % (c['e0'], c['e5'], c['router_batched'], c['router_batched_low'], c['router_per_step']))
     t = numbers['text']
     print('  annotation  %d submissions, %.1f hours recorded, median %.0f s'
           % (t['annotation']['submissions'], t['annotation']['hours'], t['annotation']['median_seconds']))

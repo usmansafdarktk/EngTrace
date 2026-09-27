@@ -654,3 +654,18 @@ the data is listed there with the number that replaces it. Two corrections chang
 plan should say: the router's measured gain is 0.150 to 0.294 on planted conceptual defects,
 asked one step at a time, and the answer-check correction's 21 points is a pilot-slice figure
 whose size on the new pool has to be measured (sections 4.2 and 4.3 now say so).
+
+**Update, later on 2026-09-27 (D-113).** The router is batched or it is not run: one call per step
+is not coverable. The batched smoke checks ran ($2.30): batching costs no detection, and the router
+catches 19 of 60 planted conceptual defects end to end, and more than doubles step-error recall on
+the labelled traces. But a batched call costs $0.0046, not $0.0034, so the router is about $114 over
+the full run, not $79. The table above becomes:
+
+| Item | Cost | Basis |
+|---|---|---|
+| spent | $49 | section 7's $47, plus the router's smoke checks |
+| inference, the 11 models of D-110 | $403 | pricing document |
+| E5 on the main run | $77 | `judge_cost.py`, ROSTER column |
+| step router, batched, rule C | $114 | `summary_numbers.py`: measured per call on the labelled traces ($95 at the planted rate) |
+| **subtotal, before any optional condition** | **$643** | about $143 over the ~$500 round |
+| without the router | $529 | about $29 over |

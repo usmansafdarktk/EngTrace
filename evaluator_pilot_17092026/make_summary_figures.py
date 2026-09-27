@@ -152,29 +152,30 @@ def fig_planted(N):
 def fig_routing(N):
     """Being able to catch a defect is not the same as being shown it."""
     R = N['routing']['conceptual']
-    e0, mimo = R['e0'], R['router']['mimo-v2.5-pro']
+    e0 = R['e0']
+    B = N['router_batched']['planted']['families']['conceptual']     # rule C, batched, MiMo
     published = [e0['shown'] / e0['n'], e0['caught_when_asked'] / e0['n'], e0['end_to_end'] / e0['n']]
-    routed = [R['forwarded'] / R['n'], mimo['caught_when_asked'] / mimo['n'], mimo['end_to_end'] / mimo['n']]
-    labels = ['shown the flawed step', 'a judge flags it\nwhen asked', 'caught end to end\n(counted per defect)']
+    routed = [B['judged'] / B['defects'], B['caught'] / B['judged'], B['caught'] / B['defects']]
+    labels = ['shown the flawed step', 'a judge flags it\nwhen shown', 'caught end to end\n(counted per defect)']
     x = range(3)
     fig, ax = plt.subplots(figsize=(6.6, 2.7))
     ax.bar([i - .19 for i in x], published, .36, label='published routing (E0\'s two judges)',
            color=LIGHT, edgecolor=GREY)
-    ax.bar([i + .19 for i in x], routed, .36, label='verify first, route the residue (MiMo)', color=ACCENT)
+    ax.bar([i + .19 for i in x], routed, .36, label='the router, batched (MiMo)', color=ACCENT)
     for i, (p, r) in enumerate(zip(published, routed)):
         ax.text(i - .19, p + .02, '%.3f' % p, ha='center', fontsize=8, color=INK)
         ax.text(i + .19, r + .02, '%.3f' % r, ha='center', fontsize=8, color=ACCENT)
     ax.set_xticks(list(x))
     ax.set_xticklabels(labels)
-    ax.set_ylim(0, 1.05)
+    ax.set_ylim(0, 1.12)
     ax.set_ylabel('conceptual defects')
     ax.legend(frameon=False, loc='upper right', ncol=1)
     ax.set_title('The published framework shows a judge the flawed step as often as a clean one.\n'
-                 'Counted per defect it catches %.2f; a verify-first router with MiMo catches %.2f.'
+                 'Counted per defect it catches %.2f; the batched router with MiMo catches %.2f.'
                  % (published[2], routed[2]), loc='left', fontsize=10, pad=10)
-    fig.text(0.01, -0.13, 'Planted conceptual defects, %d. The router\'s judge rates are over the %d '
-             'MiMo returned a verdict on; its judge was asked about one step per call.'
-             % (R['n'], mimo['n']), fontsize=7.5, color=INK, ha='left')
+    fig.text(0.01, -0.13, 'Planted conceptual defects, %d. The router sends a judge every step the digit '
+             'rule does not flag, a trace\'s steps in one call. E0\'s middle bar is asked one step at a time.'
+             % B['defects'], fontsize=7.5, color=INK, ha='left')
     save(fig, 'routing.png')
 
 
@@ -183,16 +184,15 @@ def fig_cost(N):
     C = N['cost']
     rows = [('published framework\n(its two judges)', C['e0'], GREY),
             ('recommended stack\n(deterministic + residual milestone judge)', C['e5'], ACCENT),
-            ('with a batched router\n(one call per trace; untested)', C['e5'] + C['router_batched'], GOOD),
-            ('with a per-step router\n(the design the probe measured)', C['e5'] + C['router_per_step'], WARN)]
-    fig, ax = plt.subplots(figsize=(6.6, 2.8))
+            ('with the batched router\n(priced at its measured calls)', C['e5'] + C['router_batched'], GOOD)]
+    fig, ax = plt.subplots(figsize=(6.6, 2.4))
     for i, (name, v, c) in enumerate(rows):
         y = len(rows) - i
         ax.barh(y, v, .5, color=c)
         ax.text(v + 6, y, '$%d' % round(v), va='center', fontsize=9, color=c)
     ax.set_yticks(range(1, len(rows) + 1))
     ax.set_yticklabels([r[0] for r in rows][::-1])
-    ax.set_xlim(0, 540)
+    ax.set_xlim(0, 400)
     ax.set_xlabel('judge cost to evaluate %s traces, US dollars (generation excluded)'
                   % format(C['traces'], ','))
     ax.set_title('Evaluating the full benchmark: %d models x 2,250 problems.' % C['models'],

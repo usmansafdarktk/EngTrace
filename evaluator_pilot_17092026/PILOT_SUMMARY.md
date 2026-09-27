@@ -320,11 +320,22 @@ exactly as often as the untouched one. It is forwarded because the matcher canno
 because anything is wrong with it. And the judges catch fewer of the defects they are shown (9 of
 30) than of the whole set (21 of 60).
 
-A verify-first router would send a judge every step no checker can verify. On the same planted
-set it forwards 51 of the 60 conceptual defects; the other 9 sit in steps whose arithmetic the
-checker verifies, which the router settles without a judge. With MiMo as its judge it catches 15
-of 51 end to end (0.294; 0.267 with GPT-5 as its judge), about twice the published framework's
-0.150. Those rates come from asking about one step per call.
+The router, as it will be built, sends a judge every step the digit rule does not flag, and a
+trace's steps go together in one call (section 3.1 says why). On the same planted set it sends 58
+of the 60 conceptual defects to the judge; the other two sit in steps the digit rule flags anyway,
+in the untouched original as well, so they are not catches. MiMo, judging all of a trace's steps
+at once, catches 19: 0.317 end to end, about twice the published framework's 0.150. Batching costs
+no detection. On the 49 conceptual defects also judged one step at a time MiMo catches 16 either
+way, and it catches 14 of the 19 arithmetic defects sent, against 12 one step at a time. It raised
+2 false alarms on the 842 clean steps judged alongside them.
+
+On the 300 labelled traces the whole router, the digit rule's flags plus the batched judge's, finds
+234 of the 388 steps the experts call incorrect (recall 0.603, precision 0.707), where the digit
+rule alone finds 99 (recall 0.255, precision 0.825). Almost all of the gain is in traces whose
+answer is not correct. Inside correct-answer traces the judge adds little: 64 of the 178 flawed
+steps against 57, at precision 0.703 against 0.750, and ranking those traces by their flagged
+steps gives AUROC 0.675 (0.622 to 0.730, traces resampled) against 0.639 for the digit rule alone
+and 0.542 for the published framework.
 
 A second finding fell out of the same run. The framework's answer check calls the final answer
 wrong on 32 of the 120 planted traces, although the plants never touch the answer. Those traces
@@ -385,34 +396,29 @@ margin is +0.088 and the interval, −0.002 to +0.181, includes zero.
 | milestone coverage | deterministic, order free, unit aware | none | **$0** |
 | arithmetic integrity | the digit rule, at displayed precision | none | **$0** |
 | residual milestone judging | one judge, only on the milestones the deterministic pass cannot settle | MiMo-V2.5-Pro | **~$77** |
-| step routing | verify what can be verified, send only the residue to a judge | MiMo-V2.5-Pro | **~$79 batched, ~$371 one step per call** |
+| step routing | every step the digit rule does not flag goes to the judge, a trace's steps in one call | MiMo-V2.5-Pro | **~$114** |
 
-With a batched router that is **about $156** in judge calls to evaluate the full benchmark, or
-about $448 if every residue step is its own call. The published framework would cost about $334
-on the same basis, and we are not running it at scale. The milestone judge and the published
-framework are scaled from their measured per-trace judge spend on the pilot, pricing the eight
-open-weight roster models at the pilot's weak model's rate and the three closed ones at its
-frontier models' rate: for E5 that is the expensive end, since a weak model leaves more milestones
-to the judge, and for the published framework it is the cheap end ($227 to $617 across the two
-rates). The router is priced at the $0.0034 MiMo averaged per call in E5.
+With the router that is **about $190** in judge calls to evaluate the full benchmark. The
+published framework would cost about $334 on the same basis, and we are not running it at scale.
+The milestone judge and the published framework are scaled from their measured per-trace judge
+spend on the pilot, pricing the eight open-weight roster models at the pilot's weak model's rate
+and the three closed ones at its frontier models' rate: for E5 that is the expensive end, since a
+weak model leaves more milestones to the judge, and for the published framework it is the cheap
+end ($227 to $617 across the two rates). The router is priced at what its batched calls cost on
+the labelled traces, $0.0046 a call, one call for every trace with a step to send; at the planted
+traces' $0.0038 it would be about $95. Judging one step per call would cost $371 or more, and is
+not affordable.
 
 The router is in the stack because it is the only component aimed at the pilot's central
-weakness. 63% of steps carry nothing a checker can recompute, 94% of traces hold at least one
-such step, and 14% of that residue is a step the experts call incorrect. On the planted set it
-lifts end-to-end conceptual detection from the published framework's 0.150 to 0.294 (section
-2.9). Two things are not established. That detection was measured asking about one step per
-call, which is the $371 design; the $79 figure assumes a trace's residue steps are batched into
-one prompt, as the Tribunal batches its mismatched steps, and a batched prompt has not been
-tested. And the router is not built.
-
-Its routing rule also needs changing before it is built. As specified, a step counts as
-verified as soon as any one of its claims can be recomputed, so a claim that passes can settle
-a step whose error sits elsewhere. Of the 178 steps the experts call incorrect inside
-correct-answer traces, 58 (a third) are never flagged by the digit rule and never reach a judge:
-31 hold their error where the checker does not reach, such as a link inside a chained equality,
-and 27 are slips the shipped digit rule declines to flag because the displayed operands cannot
-pin the result down. The router has to send a judge every step the checker has not positively
-cleared, which makes its residue larger than the 63% priced above.
+weakness, and its smoke checks settled the two questions its design had left open (section 2.9).
+Its rule sends a judge every step the digit rule does not flag, because the narrower rule first
+specified - forward only the steps holding nothing a checker can recompute - would never show a
+judge 58 of the 178 slips the experts found behind a correct answer: 31 hold their error where
+the checker does not reach, such as a link inside a chained equality, and 27 are slips the shipped
+digit rule declines to flag because the displayed operands cannot pin the result down. And putting
+a trace's steps in one call costs no detection. What is not established: the router is not built,
+and its checks ran on the pilot's five models, so its cost per call on the roster's models is an
+estimate.
 
 ### 3.2 The models
 
@@ -428,7 +434,7 @@ pilot was 9,658 tokens.
 |---|---|
 | gpt-oss-20b, gemma-4-26b-a4b-it, deepseek-v4.1-flash, qwen3-235b-a22b, glm-5.3-flash, glm-5.3, muse-glimmer-30b, kimi-k3 | gpt-5.4-mini, gemini-3.1-flash-lite, claude-sonnet-5 |
 
-Generation and judging together come to about $559 with a batched router.
+Generation and judging together come to about $593 with the router.
 
 No model that judged in any of the pilot's evaluators is on the roster, so nothing being evaluated
 has also been an instrument of the evaluation. The five pilot trace models and the robustness pair
@@ -484,9 +490,9 @@ compare against the published version, so the paper needs a sentence explaining 
   but not in phrasing, so they are not a held-out test.
 * **The digit rule shares its rule with the annotation guide**, so its agreement with the
   experts is partly by construction. The planted set is the independent check.
-* **The judges were asked about one step at a time.** A batched router would put several into
-  one prompt: more context per call, but also more steps competing for attention, and that is not
-  measured.
+* **The router's checks rest on the pilot's traces**: five models and 15 templates. Batched and
+  one-step detection matched on the planted defects; how the router does on the roster's models,
+  and what a call costs there, is not measured.
 * **Expert labels, traces and scores are not in the repository.** The labels are kept outside by
   decision and the traces and evaluator scores are not committed, so the committed scripts
   reproduce the numbers only with those files supplied. Regenerating the traces would not
@@ -503,10 +509,9 @@ compare against the published version, so the paper needs a sentence explaining 
    the current templates; `pinned_templates.py` runs the pilot against the templates as they were
    at the freeze. The full run needs the same guarantee: freeze the 2,250-item pool with per-item
    hashes, and score against the template commit it was generated from.
-3. **The router needs designing and building.** Its routing rule has to forward the steps
-   the checker has not positively cleared (section 3.1), its output has to be defined as a
-   reported score, and its batched prompt has to be measured, since the detection rate above
-   comes from single-step prompts.
+3. **The router needs building, and its reported score defining.** Its rule and its batched
+   prompt are measured (section 2.9); what it contributes to the results table - for example the
+   share of steps flagged, with the share left unjudged beside it - is not yet decided.
 4. **MiMo's non-returns.** The full run needs a retry count, a fallback (an unjudged milestone
    counts as missing under strict coverage), and the unjudged rate reported per model.
 5. **An anonymised ground-truth file**, together with the traces and evaluator scores (which
