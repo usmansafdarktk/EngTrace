@@ -193,6 +193,26 @@ the one finding that clears the bar comfortably is the dominance of the final an
 | arithmetic integrity | the digit rule | **$0** |
 | residual judging | one independent judge, only on milestones the deterministic pass cannot settle | **~$77** |
 
+**The judge is MiMo-V2.5-Pro.** It was chosen for independence — it is not from a family on
+the evaluated roster, which is what the judge/judged objection demands — and the pilot then
+showed it does not cost anything to get that: on planted defects it matches the frontier
+judges (0.314 against 0.333 on conceptual defects, identical 0.717 on arithmetic) with no
+false alarms. It is also the cheapest of the three at about a third of a cent per call. The
+deterministic layers use no model at all.
+
+**The benchmark.** Five branches x 30 templates x 15 instances = **2,250 problems** (870
+easy, 870 intermediate, 510 advanced), answered once by each model on the roster.
+
+**The roster — 11 models, about $403 to generate:**
+
+| open-weight ($212.81) | frontier ($190.18) |
+|---|---|
+| gpt-oss-20b · gemma-4-26b-a4b-it · deepseek-v4.1-flash · qwen3-235b-a22b · glm-5.3-flash · glm-5.3 · muse-glimmer-30b · kimi-k3 | gpt-5.4-mini · gemini-3.1-flash-lite · claude-sonnet-5 |
+
+Every model the pilot generated traces with, or used as a judge, is deliberately excluded
+from the roster, so nothing on it has been either a subject or an instrument of the
+evaluation. Costs assume one pass per problem at the pilot's measured token profile.
+
 **About $77 to evaluate the full benchmark**, against roughly $334 for the published
 framework — which we are not running at scale, because the evaluator comparison belongs to
 the 300 labelled traces where ground truth exists, and unlabelled full-run numbers would add
@@ -206,7 +226,10 @@ detection, from 18% to about 31%.
 **Not running:** the published tribunal as the reasoning metric (its score is dominated by
 answer correctness and its parser is broken); the third judge (adds nothing); the judge swap
 as a main arm (already shown equivalent); the multi-domain PRM (failed); threshold tuning
-(gains nothing).
+(gains nothing). The strongest process reward model, Qwen2.5-Math-PRM-72B, can still be run
+on local GPUs for no API cost as a secondary per-step signal — about 15 GPU-hours for the
+full benchmark — but not as a headline number, since it flags one real error in four inside
+correct-answer traces.
 
 **Two design notes.** The full benchmark has 150 templates against the pilot's 15, so
 intervals should again be cluster-robust by template, with the supportable comparisons
