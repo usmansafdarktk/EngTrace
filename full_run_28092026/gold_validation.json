@@ -1,0 +1,101 @@
+{
+ "items": 2250,
+ "templates": 150,
+ "not_reproduced": [],
+ "answer_check": {
+  "array": {
+   "correct": 105
+  },
+  "classification": {
+   "correct": 75
+  },
+  "multipart": {
+   "correct": 480
+  },
+  "scalar": {
+   "correct": 1335
+  },
+  "symbolic": {
+   "correct": 135
+  },
+  "vector": {
+   "correct": 120
+  }
+ },
+ "answer_check_failures": {},
+ "e3_gold_short": {},
+ "e3_null_mean": 0.123,
+ "e3_null_by_template_max": [
+  0.7,
+  "template_signal_operations"
+ ],
+ "digit_rule": {
+  "claims_checked": 6917,
+  "flagged_claims": 0,
+  "templates_flagged": {}
+ },
+ "milestones_per_item": {
+  "min": 0,
+  "median": 3.0,
+  "max": 13
+ },
+ "templates_with_an_item_of_at_most_one_milestone": [
+  "template_aliased_frequency_identification",
+  "template_autocorrelation_rect_pulse",
+  "template_average_energy_mqam",
+  "template_axial_deformation",
+  "template_basic_buoyant_force",
+  "template_batch_reactor_first_order",
+  "template_batch_reactor_zero_order",
+  "template_beam_deflection_formula",
+  "template_borrow_pit_fill_volume",
+  "template_cantilever_double_integration",
+  "template_cd_dc_system_analysis",
+  "template_coaxial_capacitance",
+  "template_constant_head_permeability",
+  "template_continuous_to_discrete_conversion",
+  "template_coulombs_law",
+  "template_cstr_volume_basic",
+  "template_damping_classification",
+  "template_exponential_mttf_topology",
+  "template_falling_film_max_velocity",
+  "template_finite_convolution",
+  "template_floating_object_submersion_depth",
+  "template_ft_esd_rect_pulse",
+  "template_gauss_law_symmetric",
+  "template_hagen_poiseuille_flowrate",
+  "template_heat_of_reaction_formation",
+  "template_hydrostatic_pressure_at_depth",
+  "template_impulse_response_from_lccde",
+  "template_incompressible_continuity",
+  "template_kinematic_viscosity",
+  "template_latent_heat_vaporization",
+  "template_logarithmic_decrement",
+  "template_lowpass_equivalent_bandpass",
+  "template_mean_variance",
+  "template_null_to_null_bandwidth",
+  "template_nyquist_rate_determination",
+  "template_particle_pathline",
+  "template_poisson_event_count",
+  "template_power_law_fluid_shear",
+  "template_rational_method_peak_flow",
+  "template_reynolds_number_flow_regime",
+  "template_signal_energy_power",
+  "template_signal_operations",
+  "template_single_sampling_oc_point",
+  "template_superposition_electric_field",
+  "template_system_properties_memory_causality",
+  "template_system_property_linearity",
+  "template_truss_method_of_sections",
+  "template_two_phase_specific_volume",
+  "template_two_step_transition_probability",
+  "template_undamped_response_initial_conditions",
+  "template_vorticity_check",
+  "template_xbar_known_sigma_classification"
+ ],
+ "templates_without_milestones": [
+  "template_gauss_law_symmetric",
+  "template_system_properties_memory_causality",
+  "template_system_property_linearity"
+ ]
+}

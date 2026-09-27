@@ -54,5 +54,18 @@ Every figure here is printed by `freeze.py` and recorded in `FREEZE.json`.
 `diversity.json`: question skeletons, reasoning paths, answer variants and near-duplicates, on the
 pool and over 500 public draws per template. It writes counts, answer labels and item ids only.
 
+## Gold validation (D-120)
+
+`gold_validation.py` runs the deterministic evaluators over the 2,250 gold solutions: every item
+regenerates byte-identically, the answer check scores every gold answer correct, E3 finds every
+milestone, and the digit rule flags no gold claim (`GOLD_VALIDATION.md`). It writes counts and ids;
+the text of anything that fails goes to `pool/_gold_validation_details.txt`, local like the pool.
+
+## The harness (D-121)
+
+`run_traces.py` runs the roster over the pool: `--dry-run` and `--status` are free; `--check`,
+`--calibrate N` and the run bill, and refuse to start without `--yes`. The roster, routing and
+ceilings are in `models.json`, with the reasons. Traces go to `traces/`, gitignored.
+
 `testset/` is not this pool. It is the 2026-09-17 generation from the default seed, and the
 pilot's `freeze.py --verify` rebuilds its slice from it, so it is left as it is.

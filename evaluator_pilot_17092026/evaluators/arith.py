@@ -131,7 +131,15 @@ def normalise(line: str) -> str:
     return s
 
 
-CLAUSE = re.compile(r'=>|⇒|→|->|,\s|;|\band\b|\bso\b|\bthen\b|\bwith\b|\bwhere\b|\bthus\b|\bhence\b|:\s')
+CLAUSE = re.compile(r'=>|⇒|→|->|,\s|;|\band\b|\bso\b|\bthen\b|\bwith\b|\bwhere\b|\bthus\b|\bhence\b|:\s'
+                    # A connector that opens a new assignment ends the claim before it:
+                    # `34 kN at a = 3.3 m`, `D3 = 0 for n = 4`, `from t = -2 to t = 2`
+                    # are lists of values, not the chain 34 = 3.3 (D-120).
+                    r'|\s(?:at|under|to|for|from|over|between|when|if|on|by)\s+'
+                    r'(?=[A-Za-z_][\w\[\]()\-]*\s*=(?!=))')
+# An '=' inside a label - `[1/(-r_A)]_at_X=0.85 = 4.55` - is not an equation when a spaced
+# '=' follows it (D-120).
+LABEL_EQ = re.compile(r'(?<=[\w\])])=(?=[-+]?\d)(?=.*\s=\s)')
 
 
 UNIT_WORDS = {'hours', 'hour', 'minutes', 'minute', 'seconds', 'second', 'meters',
@@ -223,7 +231,8 @@ def _evaluate(s: str, funcs):
 
 
 UNIT_FACTORS = (1.0, 60.0, 1 / 60.0, 3600.0, 1 / 3600.0, 1e3, 1e-3, 1e6, 1e-6, 1e9, 1e-9,
-                1e12, 1e-12, 100.0, 0.01)
+                1e12, 1e-12, 100.0, 0.01,
+                12.0, 1 / 12.0)          # ft and in, the US-unit templates (D-120)
 
 
 def agree(a: float, b: float, tol: float = ARITH_TOL) -> bool:
@@ -382,7 +391,7 @@ def check(text: str) -> Report:
         if '=' not in raw:
             continue
         for clause in CLAUSE.split(normalise(raw)):
-            segs = re.split(r'(?<![<>!=])=(?!=)', clause)
+            segs = re.split(r'(?<![<>!=])=(?!=)', LABEL_EQ.sub('≡', clause))
             if len(segs) < 2:
                 continue
             nums = []

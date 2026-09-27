@@ -1,0 +1,158 @@
+{
+  "_comment": [
+    "The full run's roster: the eleven of D-110, as the inference pricing document lists them",
+    "(docs/inference_pricing/build_pricing_doc.js, prices read on OpenRouter 19-21 September 2026).",
+    "",
+    "Every model goes through OpenRouter on OPENROUTER_API_KEY; the OpenAI and Anthropic keys in .env",
+    "return 401 (evaluator pilot). Open-weight models are routed as the pricing document says: the",
+    "cheapest upstream serving fp8 or better (provider.sort = price, provider.quantizations). Closed",
+    "models publish no quantization, so they take OpenRouter's default routing.",
+    "",
+    "Decoding: temperature and reasoning effort are left at each provider's default, as the pilot's",
+    "traces were made (evaluator_pilot_17092026/run_traces.py), so the stack validated on those traces",
+    "reads the same kind of output. The harness records every request's parameters on its row.",
+    "",
+    "max_tokens is a ceiling, not a reservation: a short answer bills short. 32,768 for every model,",
+    "the ceiling the pilot's reasoning models needed (GPT-5, Gemini, DeepSeek R1, Qwen3.8-27B all",
+    "truncated below it), and the plan's rule that running out should mean the model ran away, not that",
+    "the budget was tight (ANALYSIS_PLAN.md, D-117). An endpoint that caps lower is reported by --dry-run.",
+    "",
+    "price_per_m is the pricing document's snapshot, used for the estimate. The billed cost of every call",
+    "is read from the response (usage.cost) and is what --status reports.",
+    "",
+    "Checked 2026-09-28 against OpenRouter's public endpoint lists (run_traces --dry-run):",
+    "  - Closed models are routed by price too (provider_closed_weight), so the estimate and the routing agree.",
+    "  - muse-glimmer-30b: its only fp8-or-better endpoint (DeepInfra, bf16) caps output at 16,384, so its",
+    "    ceiling is 16,384; the other three endpoints do not declare a quantization.",
+    "  - qwen3-235b-a22b: ONE endpoint remains (Alibaba), quantization undeclared, output capped at 8,192,",
+    "    at $0.455/$1.82 per M against the document's $0.087/$0.35. No endpoint meets the fp8-or-better rule,",
+    "    so the paid modes skip it until the owner decides: keep it on that endpoint, or replace it."
+  ],
+  "route": {
+    "base_url": "https://openrouter.ai/api/v1",
+    "key_env": "OPENROUTER_API_KEY"
+  },
+  "provider_open_weight": {
+    "sort": "price",
+    "quantizations": [
+      "fp8",
+      "mxfp8",
+      "fp16",
+      "bf16",
+      "fp32"
+    ],
+    "allow_fallbacks": true
+  },
+  "max_tokens": 32768,
+  "pricing_basis_tokens": {
+    "in": 270,
+    "out": 5232,
+    "source": "build_pricing_doc.js REASON: GPT-5 on the evaluator pilot"
+  },
+  "models": [
+    {
+      "key": "gpt-oss-20b",
+      "model": "openai/gpt-oss-20b",
+      "weights": "open",
+      "price_per_m": {
+        "in": 0.018,
+        "out": 0.09
+      }
+    },
+    {
+      "key": "gemma-4-26b-a4b",
+      "model": "google/gemma-4-26b-a4b-it",
+      "weights": "open",
+      "price_per_m": {
+        "in": 0.09,
+        "out": 0.3
+      }
+    },
+    {
+      "key": "deepseek-v4.1-flash",
+      "model": "deepseek/deepseek-v4.1-flash",
+      "weights": "open",
+      "price_per_m": {
+        "in": 0.14,
+        "out": 0.42
+      }
+    },
+    {
+      "key": "qwen3-235b-a22b",
+      "model": "qwen/qwen3-235b-a22b",
+      "weights": "open",
+      "price_per_m": {
+        "in": 0.087,
+        "out": 0.35
+      }
+    },
+    {
+      "key": "glm-5.3-flash",
+      "model": "z-ai/glm-5.3-flash",
+      "weights": "open",
+      "price_per_m": {
+        "in": 0.075,
+        "out": 0.25
+      }
+    },
+    {
+      "key": "glm-5.3",
+      "model": "z-ai/glm-5.3",
+      "weights": "open",
+      "price_per_m": {
+        "in": 1.4,
+        "out": 4.4
+      }
+    },
+    {
+      "key": "muse-glimmer-30b",
+      "model": "meta/muse-glimmer-30b",
+      "weights": "open",
+      "price_per_m": {
+        "in": 0.3,
+        "out": 1.1
+      },
+      "max_tokens": 16384
+    },
+    {
+      "key": "kimi-k3",
+      "model": "moonshotai/kimi-k3",
+      "weights": "open",
+      "price_per_m": {
+        "in": 2.1,
+        "out": 10.95
+      }
+    },
+    {
+      "key": "gpt-5.4-mini",
+      "model": "openai/gpt-5.4-mini",
+      "weights": "closed",
+      "price_per_m": {
+        "in": 0.75,
+        "out": 4.5
+      }
+    },
+    {
+      "key": "gemini-3.1-flash-lite",
+      "model": "google/gemini-3.1-flash-lite",
+      "weights": "closed",
+      "price_per_m": {
+        "in": 0.25,
+        "out": 1.5
+      }
+    },
+    {
+      "key": "claude-sonnet-5",
+      "model": "anthropic/claude-sonnet-5",
+      "weights": "closed",
+      "price_per_m": {
+        "in": 2.0,
+        "out": 10.0
+      }
+    }
+  ],
+  "provider_closed_weight": {
+    "sort": "price",
+    "allow_fallbacks": true
+  }
+}

@@ -273,11 +273,13 @@ That is E4's checker with its 1% tolerance replaced by the displayed precision.
 
 | Hard case, 228 correct-answer traces | step precision | step recall | step F1 | trace AUROC |
 |---|---|---|---|---|
-| E4 at the 1% tolerance it shipped with | 0.154 | 0.034 | 0.055 | 0.480 |
-| tolerance 0.1% | 0.346 | 0.101 | 0.157 | 0.527 |
+| E4 at the 1% tolerance it shipped with | 0.154 | 0.034 | 0.055 | 0.479 |
+| tolerance 0.1% | 0.346 | 0.101 | 0.157 | 0.526 |
 | the digit rule, as D-097 measured it | 0.506 | 0.472 | 0.488 | 0.655 (0.594–0.717) |
 | **the digit rule as E4 now ships it** | **0.750** | 0.320 | 0.449 | 0.639 (0.587–0.692) |
 | *E2, 72B, for comparison* | 0.246 | 0.255 | 0.250 | 0.583 |
+
+*Re-run 2026-09-28 after the full pool's gold validation (D-120) fixed how the checker splits clauses: the 1% and 0.1% readings' trace AUROC moved by 0.001; the digit rule as shipped did not move.*
 
 The rule E4 ships (D-101) is the measured one with two corrections the gold validation
 forced: a unit conversion is compared after its unit factor (`0.09024 hours = 5.41 minutes`

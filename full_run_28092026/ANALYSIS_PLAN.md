@@ -73,6 +73,9 @@ ranking claims: E5 milestone coverage on wrong-answer traces (how far a model ge
 E4 digit rule's flag rate on correct-answer traces (arithmetic slips behind a right answer); the router's
 step-error flags if it runs. Per model, the judged fraction and the unjudged-milestone rate, so the
 reader sees how much of each score a judge decided.
+Milestone coverage is not defined for an item with no milestones: 45 items, the whole of three
+templates (`GOLD_VALIDATION.md`), are left out of milestone aggregates rather than scored 0, and 52
+templates have some item with a single milestone, where coverage is close to an answer check.
 
 **Q4. Consistency within a template.** Per model, the share of templates solved, meaning fully correct,
 on all 15 instances, on some, and on none, reported separately for the single-path templates (one reasoning path across their 15

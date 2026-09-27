@@ -4522,6 +4522,72 @@ byte-identically, so no re-freeze follows.
 **Not done:** the screening panel has not re-judged the two templates; a targeted re-judge costs a few
 cents if wanted (D-106's precedent).
 
+## D-120 — The full pool's gold validation, and the three evaluator gaps it closed
+
+**Date:** 2026-09-28 · **Status:** DECIDED · **Evidence:** `full_run_28092026/gold_validation.py`, `GOLD_VALIDATION.md`, `evaluator_pilot_17092026/evaluators/answer.py` and `arith.py`, the pilot's analyses re-run under `pinned_templates`
+
+The deterministic evaluators - the answer check, E3 and E4's digit rule - were run over the 2,250
+gold solutions, whose right answer is known, before any trace exists. All 2,250 items regenerate
+byte-identically from their templates, and E3 finds every milestone in its own gold. Two evaluators
+had gaps the pilot's 15 templates never exercised:
+
+- **The answer check called 20 gold answers wrong, in three templates.** Two are the classification
+  templates the pilot excluded as surface-predictable (D-057): "linear" and "not linear" were outside
+  its vocabulary, and a labelled yes/no answer ("Memoryless: No, Causal: Yes") could not be read,
+  since its word pattern skips two-letter words and its last-verdict-word rule cannot score two
+  labels. The third is one item answering with a bare pi. Fixed: linear and nonlinear form their own
+  family; a labelled yes/no is scored label by label, reading negated forms ("non-causal", "has
+  memory"); pi is read as a value.
+- **The digit rule flagged 103 of 6,970 gold claims, in seven templates.** Sentences listing
+  assignments - "34 kN at a = 3.3 m", "D3 = 0 for n = 4", "from t = -2 to t = 2" - were read as the
+  chain 34 = 3.3; a correct 58 ft = 696 in was flagged; an '=' inside a subscript label split a
+  claim. Fixed: a connector word that opens a new assignment ends the claim; ft and in convert; a
+  label's '=' is protected.
+
+After the fixes: 2,250 of 2,250 gold answers correct in all six answer types, and 0 of 6,917 gold
+claims flagged. Each rule fires only on the new forms, and the pilot's own analyses, re-run under the
+pin, print what they printed before - `answer_check`, `arith_gold_validation` and `planted`
+identical, every expert-agreement figure and the digit rule as shipped unchanged - except two
+secondary readings in `digit_rule`: at the 1% and 0.1% tolerances the trace AUROC moves from 0.480 to
+0.479 and from 0.527 to 0.526, corrected in RESULTS_X1 and RESULTS_E4.
+
+**Found and not fixed.** Three templates have no milestones (`gauss_law_symmetric`,
+`system_properties_memory_causality`, `system_property_linearity`), so milestone coverage is
+undefined for their 45 items, which are left out of milestone aggregates rather than scored 0
+(ANALYSIS_PLAN Q3); 52 templates have some item with a single milestone. E3's raw null, a sibling
+item's gold scored against an item's milestones, is 0.123 over the pool against the pilot's 0.072,
+and highest in `signal_operations` at 0.70.
+
+**D-118's relabel is not needed.** The answer check scores `critical_depth_froude_classification`
+the same under either label, because its answer line holds one number and no verdict word, and the
+comparator bindings carry their own copy of the label, so the inventory is left as it is.
+
+## D-121 — The full run's harness, and what its dry run found
+
+**Date:** 2026-09-28 · **Status:** DECIDED (the harness); OPEN (`qwen3-235b-a22b`; approval of the check and the calibration run) · **Evidence:** `full_run_28092026/run_traces.py`, `models.json`
+
+`run_traces.py` is the pilot's runner generalised: the same prompt, whose hash it checks against the
+pilot traces', and the same call, so the stack validated on those traces reads the same kind of
+output. It reads the frozen pool and refuses to run unless the pool matches the committed manifest;
+ends each (item, model) as answered, empty or service failure, the D-117 rules; reads the billed cost
+from every response rather than estimating it; routes open weights to the cheapest endpoint serving
+fp8 or better and closed models by price; leaves decoding at each provider's default, as the pilot
+did; and sets a 32,768-token ceiling. Every mode that bills refuses to start without `--yes`.
+
+The dry run reads OpenRouter's public endpoint lists, with no key and no model call. On the pricing
+document's basis, 270 input and 5,232 output tokens per item, the run is $402.98 for 24,750 calls;
+at today's cheapest eligible endpoints it is $319.09 for ten models. Two endpoints changed since the
+pricing document:
+
+- `qwen3-235b-a22b` has one endpoint left, Alibaba's, with no declared quantization, output capped at
+  8,192 tokens, at $0.455 and $1.82 per million against the document's $0.087 and $0.35. No endpoint
+  meets the routing rule, so the paid modes skip it until the owner decides.
+- `muse-glimmer-30b` has one eligible endpoint, DeepInfra at bf16, capping output at 16,384, which is
+  its ceiling.
+
+On the same basis `--check` bills about $0.01 and `--calibrate 20`, 220 calls, about $3.58; the
+calibration replaces the assumed length with measured ones, and its traces count toward the run.
+
 ## Open decisions
 
 | # | Decision | Needed before |
@@ -4537,7 +4603,9 @@ cents if wanted (D-106's precedent).
 | — | The repo's templates no longer reproduce 17 of the 60 frozen items byte-identically (D-102); `milestones.build_all` raises on the pilot manifest; `pinned_templates.py` works around it for the pilot | any re-derivation of milestones from templates |
 | — | ~~Which families the next roster will evaluate~~ **Decided 2026-09-27 (D-110): the pricing document's eleven** | — |
 | D-115 | ~~Round 4: the three chemical experts review `heat_of_reaction_formation` and `adiabatic_flame_temperature` as widened~~ **Done (D-119): both approved by all three; 150 of 150 certified** | — |
-| D-118 | Relabel `critical_depth_froude_classification`'s answer type from classification to scalar in the audit inventory, after checking what reads that label | the gold validation |
+| D-118 | ~~Relabel `critical_depth_froude_classification`'s answer type~~ **Not needed (D-120): scoring is the same under either label** | — |
+| D-121 | `qwen3-235b-a22b` has no endpoint meeting the routing rule: keep it on Alibaba's endpoint (8,192-token cap, undeclared quantization) or replace it | the run |
+| D-121 | Approve the harness check (about $0.01) and the calibration run (about $3.58, 220 calls) | the estimate the run is approved on |
 | D-117 | Confirm the analysis plan as a whole; its two scoring rules are decided | the first inference call |
 | D-114 | A private backup of `full_run_28092026/pool/` and `SEED.secret`; the tag on the commit inference runs at | inference starts |
 | — | The budget: the plan comes to about $606 against the ~$500 round with a batched router (D-110) | generation starts |

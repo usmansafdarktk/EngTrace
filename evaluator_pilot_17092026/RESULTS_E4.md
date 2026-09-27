@@ -256,9 +256,11 @@ experts mark incorrect):
 
 | rule | prec | rec | F1 | trace AUROC (flag count) |
 |---|---|---|---|---|
-| 1% (what E4 shipped) | 0.154 | 0.034 | 0.055 | 0.480 (0.437, 0.528) |
+| 1% (what E4 shipped) | 0.154 | 0.034 | 0.055 | 0.479 (0.436, 0.527) |
 | digit, bare | 0.506 | 0.472 | 0.488 | 0.655 (0.594, 0.717) |
 | **digit as E4 ships it** | **0.750** | **0.320** | **0.449** | **0.639 (0.587, 0.692)** |
+
+*Re-run 2026-09-28 after the full pool's gold validation (D-120) fixed how the checker splits clauses: the 1% and 0.1% readings' trace AUROC moved by 0.001; the digit rule as shipped did not move.*
 
 (That last column ranks traces by *how many* claims the rule flags, over all 228
 correct-answer traces; the 0.661 above ranks them by E4's `arith_consistency` rate,

@@ -27,6 +27,7 @@ belongs to analysis/digit_rule.py, which is about intermediate arithmetic.
 """
 import functools
 import os
+import math
 import re
 import sys
 
@@ -46,6 +47,19 @@ WINDOW = 700          # how far an answer segment runs: a conclusion, not a seco
 ROUNDING = re.compile(r'(?i)round half up|to \d+ decimals?|nearest whole|to \d+ significant')
 BOLD = re.compile(r'\*\*([^*]+)\*\*')
 WORD = re.compile(r'[A-Za-z][A-Za-z\-]{2,}')
+# Full-pool gold validation (D-120). The pilot's 15 templates never answered "linear",
+# a labelled yes/no, or a bare pi; three pool templates do, and their gold scored
+# incorrect against itself. Each rule below fires only on those forms, so the pilot's
+# scoring is unchanged.
+LINEAR = ('linear', 'nonlinear')                  # a family of its own: see verdict()
+LABELED = re.compile(r'(?i)\b([a-z][a-z\-]{2,})\s*:\s*\*{0,2}\s*(yes|no)\b')
+PI_EXPR = re.compile(r'(?<![\w.])(\d+(?:\.\d+)?)?\s*\*?\s*(?:pi|\u03c0)\b(?!\s*[*(])'
+                     r'(?:\s*/\s*(\d+(?:\.\d+)?))?')
+
+
+def _norm_linear(s):
+    """'not linear' and 'non-linear' are one verdict, written 'nonlinear'."""
+    return re.sub(r'(?i)\b(?:not\s+linear|non-\s?linear)\b', 'nonlinear', s)
 # Words that are an answer in themselves. Units and prose are not.
 VERDICT_WORDS = {
     'turbulent', 'laminar', 'transitional', 'overdamped', 'underdamped',
@@ -99,6 +113,13 @@ def values(seg):
         b = float(m.group(2))
         if b:
             out.append((float(m.group(1)) / b, 0.0))
+    # pi written as a symbol - `omega_a = pi`, `0.4*pi`, `3pi/4` - is a value (D-120);
+    # `pi*n` inside an expression is not.
+    for m in PI_EXPR.finditer(seg):
+        a = float(m.group(1)) if m.group(1) else 1.0
+        b = float(m.group(2)) if m.group(2) else 1.0
+        if b:
+            out.append((a * math.pi / b, 0.0))
     return out
 
 
@@ -166,15 +187,49 @@ def _words(seg, answer_type=None):
     """
     if answer_type not in ('classification',):
         return []
+    seg = _norm_linear(seg)
     out = []
     for m in BOLD.finditer(seg):
         for w in WORD.findall(m.group(1)):
-            if w.lower() in VERDICT_WORDS:
+            if w.lower() in VERDICT_WORDS or w.lower() in LINEAR:
                 out.append(w.lower())
     for w in WORD.findall(seg):
-        if w.lower() in VERDICT_WORDS and w.lower() not in out:
+        if (w.lower() in VERDICT_WORDS or w.lower() in LINEAR) and w.lower() not in out:
             out.append(w.lower())
     return out
+
+
+def _labeled(seg, answer_type=None):
+    """Labelled yes/no parts of a classification answer: 'Memoryless: No', 'Causal: Yes'.
+
+    Scored label by label (D-120). The last-verdict-word rule cannot score two of them:
+    it would credit 'Memoryless: Yes, Causal: Yes' for 'Memoryless: No, Causal: Yes'.
+    """
+    if answer_type not in ('classification',):
+        return []
+    out = []
+    for m in LABELED.finditer(seg):
+        pair = (m.group(1).lower(), m.group(2).lower())
+        if pair not in out:
+            out.append(pair)
+    return out
+
+
+def _stance(low, label):
+    """yes / no for a labelled property: 'causal: no', 'is not causal', 'non-causal'."""
+    lab = re.escape(label)
+    last = None
+    for m in re.finditer(r'\b%s\b\W{0,6}(yes|no)\b' % lab, low):
+        last = m.group(1)
+    if last:
+        return last
+    if re.search(r"\b(?:not|non-?|isn't|never)\s*%s\b" % lab, low):
+        return 'no'
+    if label == 'memoryless' and re.search(r'\b(?:has|have|with)\s+memory\b|\bdynamic\b', low):
+        return 'no'
+    if re.search(r'\b%s\b' % lab, low):
+        return 'yes'
+    return None
 
 
 @functools.lru_cache(maxsize=None)
@@ -238,7 +293,12 @@ def targets(item, ms=None):
         keep = (nums or values(seg))[-1:]
     if typ in ('scalar', 'array') and keep:
         keep = keep[-1:]                       # one value is asked for: the last stated
-    return {'numbers': keep, 'words': _words(seg, typ), 'exact': bool(ROUNDING.search(item.get('question') or ''))}
+    labeled = _labeled(seg, typ)
+    words = _words(seg, typ)
+    if labeled:                                # scored label by label instead (D-120)
+        words = [w for w in words if w not in ('yes', 'no')]
+    return {'numbers': keep, 'words': words, 'labeled': labeled,
+            'exact': bool(ROUNDING.search(item.get('question') or ''))}
 
 
 def verdict(text, item, tol=None, ms=None):
@@ -251,7 +311,7 @@ def verdict(text, item, tol=None, ms=None):
     seg = segment(text)
     have = values(seg)
     absolute = [(abs(v), u) for v, u in have]
-    low = seg.lower()
+    low = _norm_linear(seg).lower()
     rel = REL if tol is None else tol
     hits = []
     for v, gu in want['numbers']:
@@ -262,10 +322,13 @@ def verdict(text, item, tol=None, ms=None):
     for w in want['words']:
         # the LAST mention decides: an answer block that restates the criteria ("turbulent
         # occurs for Re > 5e6 ... the flow is laminar") must not be credited for both.
+        vocab = LINEAR if w in LINEAR else sorted(VERDICT_WORDS)
         last = None
-        for m in re.finditer(r'\b(%s)\b' % '|'.join(sorted(VERDICT_WORDS)), low):
+        for m in re.finditer(r'\b(%s)\b' % '|'.join(vocab), low):
             last = m.group(1)
         hits.append(last == w)
+    for label, value in want.get('labeled', []):
+        hits.append(_stance(low, label) == value)
     if not hits:
         return 'incorrect', {'targets': want, 'matched': 0, 'of': 0}
     n = sum(hits)

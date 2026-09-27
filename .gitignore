@@ -68,3 +68,6 @@ evaluator_pilot_17092026/analysis/out/
 # Committed instead: full_run_28092026/manifest.jsonl (hashes only) and FREEZE.json.
 full_run_28092026/pool/
 full_run_28092026/SEED.secret
+
+# The full run's traces restate the pool's questions, so they stay local like the pool.
+full_run_28092026/traces/
