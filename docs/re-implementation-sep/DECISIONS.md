@@ -4497,6 +4497,31 @@ answer-type tally and the diversity report. Relabelling it `scalar` needs no tem
 expert round, but the inventory is read by code, so what reads that label is checked first, in the gold
 validation. The analysis plan's sensitivity item for this template is withdrawn.
 
+## D-119 — Round 4: both widened templates approved by all three chemical experts; 150 of 150 certified
+
+**Date:** 2026-09-28 · **Status:** RECORDED · **Source:** `template_annotation_23092026/layer2/RESULTS_round4.md` (`score.py --round 4`), `layer2/CERTIFICATION.md` (`certification.py`, rounds 1-4)
+
+Round 4 sent the two templates widened under D-115, `heat_of_reaction_formation` and
+`adiabatic_flame_temperature`, to the three chemical experts: no planted defects, and a hand-check
+instance none of them had seen (seed 2401). All six verdicts approve, all six hand checks match the
+template within 1%, and Gwet AC1 on the verdict is 1.000. Their previous verdicts, all approvals, are
+round 1's, so round 4 is scored without a previous-round comparison, which `score.py` would have
+headed "round 3".
+
+The reviews were quick: a median of 1.8 to 2.0 minutes per template, 4 of the 6 under two minutes, for
+templates that had changed substantively. The hand checks, computed by each expert before the solution
+is shown, all matched, and they are the evidence the templates were worked rather than skimmed.
+
+**Certified: 150 of 150**, each by a unanimous latest round on the code as it stands: 126 last reviewed
+in round 1, 17 in round 2, 5 in round 3 and 2 in round 4. The round-4 tasks were built from the working
+tree at `fb88cf1` carrying the fixes, which were committed straight after as `03b1dd7`;
+`certification.py` confirms the current code regenerates every reviewed instance byte for byte. The pool
+(D-116) was frozen from the same code, and `freeze.py --verify` regenerates all 2,250 items
+byte-identically, so no re-freeze follows.
+
+**Not done:** the screening panel has not re-judged the two templates; a targeted re-judge costs a few
+cents if wanted (D-106's precedent).
+
 ## Open decisions
 
 | # | Decision | Needed before |
@@ -4511,7 +4536,7 @@ validation. The analysis plan's sensitivity item for this template is withdrawn.
 | — | ~~Whether the full run adds the step router~~ **In the stack (D-110), batched or not at all (D-113).** ~~Its routing rule~~ **rule C (D-112).** ~~Measuring the batched prompt~~ **Measured: no detection lost, about $114 at full scale (D-113).** Still open: building it, its reported score, and whether the supervisor funds it at about $643 for the base plan | before evaluation starts |
 | — | The repo's templates no longer reproduce 17 of the 60 frozen items byte-identically (D-102); `milestones.build_all` raises on the pilot manifest; `pinned_templates.py` works around it for the pilot | any re-derivation of milestones from templates |
 | — | ~~Which families the next roster will evaluate~~ **Decided 2026-09-27 (D-110): the pricing document's eleven** | — |
-| D-115 | Round 4: the three chemical experts review `heat_of_reaction_formation` and `adiabatic_flame_temperature` as widened; `certification.py` with the round-4 labels | the paper states what the experts certified |
+| D-115 | ~~Round 4: the three chemical experts review `heat_of_reaction_formation` and `adiabatic_flame_temperature` as widened~~ **Done (D-119): both approved by all three; 150 of 150 certified** | — |
 | D-118 | Relabel `critical_depth_froude_classification`'s answer type from classification to scalar in the audit inventory, after checking what reads that label | the gold validation |
 | D-117 | Confirm the analysis plan as a whole; its two scoring rules are decided | the first inference call |
 | D-114 | A private backup of `full_run_28092026/pool/` and `SEED.secret`; the tag on the commit inference runs at | inference starts |

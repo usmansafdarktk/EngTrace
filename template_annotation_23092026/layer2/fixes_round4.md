@@ -84,3 +84,9 @@ Built with `build_tasks --only template_heat_of_reaction_formation,template_adia
 defects, and hand-check instances none of them has seen. Send each expert the shared files in
 `dist_round4/` and their `kit_che-N/`. When the labels return, `certification.py` with the round-4
 folder added decides whether both are certified again.
+
+## Outcome, 2026-09-28 (D-119)
+
+Both templates approved by all three chemical experts; six of six hand checks matched within 1%
+(`RESULTS_round4.md`). `certification.py` over rounds 1-4: 150 of 150 certified, these two last
+reviewed in round 4, and the current code regenerates the reviewed instances byte for byte.

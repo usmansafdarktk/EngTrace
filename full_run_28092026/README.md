@@ -44,6 +44,7 @@ draws; this one takes 15 round-robin across the reasoning paths and answer forms
 | indices not taken as candidates | 585: 549 repeated questions, 35 display ties, 1 pilot question |
 | items changed from the D-114 freeze | 332, in 93 templates: 29 in the two widened templates, 303 from the coverage rule |
 | checks at the freeze, commit `03b1dd7` | Layer 0 gate 150 of 150; certification 148 of 150, the two widened templates awaiting round 4; `--verify` byte-identical in a separate process |
+| certification after round 4 | 150 of 150 (D-119): round 4 approved both widened templates, and the frozen items are the code they approved |
 | manifest SHA-256 | `028c7a637eb4895ed061bcbf79a69c656c57f4adc327a4c81cc4faf6d898e2b3` |
 | seed commitment | `cd53376fb0fe90ac807ff369a845a5a45e47c1bc48aa4fd470b709a191ddd64e`, unchanged |
 
