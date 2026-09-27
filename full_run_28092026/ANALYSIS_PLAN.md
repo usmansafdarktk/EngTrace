@@ -1,9 +1,10 @@
 # Analysis plan for the full run
 
 Written 2026-09-28, before any inference on the pool (D-117). It fixes which claims the paper will
-test, how, and at what unit, so the paper can say the analysis was set before the data. Items marked
-**proposed** are the owner's to confirm; the plan binds once confirmed, and in any case before the first
-inference call. Nothing here approves spend: each paid step still needs its own estimate and approval.
+test, how, and at what unit, so the paper can say the analysis was set before the data. The owner
+decided its two scoring rules on 2026-09-28; the plan as a whole binds once the owner confirms it, and in
+any case before the first inference call. Nothing here approves spend: each paid step still needs its own
+estimate and approval.
 
 ## What is analysed
 
@@ -18,12 +19,29 @@ inference call. Nothing here approves spend: each paid step still needs its own 
 mean of template means. Every interval resamples templates, not items (B = 10,000, percentile), because
 instances of a template share a derivation: the pilot's design effect was 2.6 to 4.2 (D-111).
 
-**Unusable traces** (empty, stopped at the token ceiling, or no answer segment): **proposed**, counted as
-incorrect in the headline, since not answering within the budget is the model's failure, and reported
-per model beside it. Sensitivity: the same figures with unusable traces excluded.
+**An unusable trace scores 0** (the owner, 2026-09-28). Not answering within the budget is the model's
+failure, and excluding such traces would score each model on a different set of items. Three rules keep
+that fair:
 
-**Partial answers** (a multipart answer with some parts right): **proposed**, not correct in the headline
-and reported separately; sensitivity with a partial counted as 0.5.
+- **Defined by the answer, not the format.** A trace is unusable when the answer check can read no final
+  answer: it is empty, cut off before answering, or never states one. A missing `**Answer:**` marker alone
+  does not make a trace unusable: in the pilot GPT-5 used the exact marker in 87% of traces and Llama 3.1
+  70B in 70% (FINDINGS R-F1). The gold validation confirms how the check reads such traces.
+- **Service failures are not the model's.** The harness retries HTTP errors, timeouts and provider
+  faults; one that persists is reported as missing and never scored.
+- **Generous, stated token ceilings.** Each model's ceiling is set high and recorded in Appendix P, so
+  running out means the model's reasoning ran away, not that the budget was tight.
+
+Per model, the unusable rate is reported beside the score, and an appendix gives the score with unusable
+traces excluded.
+
+**A partial answer scores 0.5** (the owner, 2026-09-28: not fully correct, but awarded some points). A
+correct answer scores 1 and an incorrect or unusable one 0, so a model's **answer score** is its mean over
+the items. Half a point uses only the three-way verdict, correct, partial or incorrect, which is what the
+expert validation measured: agreement 0.893 three-way and 0.947 on the traces the experts judged fully
+right or fully wrong (RESULTS_X1 Finding 1b). A fraction of parts correct would be finer, but it was never
+compared with the experts. Only multipart items can be partial, 480 of 2,250. Reported beside the answer
+score: the **fully-solved rate**, in which a partial scores 0, and each model's three-way split.
 
 ## Confirmatory questions
 
@@ -31,14 +49,16 @@ Each question names its test before the data. Within a family of comparisons, si
 Holm's correction; everything is also reported as an estimate with its interval, and a null is stated as
 "no difference as large as the detectable one", never as equality.
 
-**Q1. How accurate is each model, and which differences hold?** Accuracy per model with a template-level
-interval. Pairwise, 55 pairs: McNemar's exact test on the paired correct/incorrect verdicts and a
-template-level bootstrap interval of the difference; a model is said to beat another only at a Holm-
-adjusted p below 0.05.
+**Q1. How well does each model score, and which differences hold?** The answer score per model with a
+template-level interval. Pairwise, 55 pairs: a template-level paired bootstrap interval of the score
+difference and a sign-flip permutation test on the 150 per-template mean differences (10,000
+permutations); a model is said to beat another only at a Holm-adjusted p below 0.05. The same comparison
+on the fully-solved rate, with McNemar's exact test on the paired verdicts, checks that partial credit
+does not decide an ordering.
 
-**Q2. The complexity cliff.** Per model, accuracy on the 58 Easy templates minus the 34 Advanced ones,
-templates resampled within each tier; Holm across the eleven models. With σ the standard deviation of
-template-mean accuracy within a tier, the smallest gap this detects at 80% power and two-sided 0.05 is
+**Q2. The complexity cliff.** Per model, the answer score on the 58 Easy templates minus the 34 Advanced
+ones, templates resampled within each tier; Holm across the eleven models. With σ the standard deviation
+of the template-mean score within a tier, the smallest gap this detects at 80% power and two-sided 0.05 is
 2.80 x σ x sqrt(1/58 + 1/34) = 0.605 σ:
 
 | σ | 0.20 | 0.25 | 0.30 |
@@ -54,8 +74,8 @@ E4 digit rule's flag rate on correct-answer traces (arithmetic slips behind a ri
 step-error flags if it runs. Per model, the judged fraction and the unjudged-milestone rate, so the
 reader sees how much of each score a judge decided.
 
-**Q4. Consistency within a template.** Per model, the share of templates solved on all 15 instances, on
-some, and on none, reported separately for the single-path templates (one reasoning path across their 15
+**Q4. Consistency within a template.** Per model, the share of templates solved, meaning fully correct,
+on all 15 instances, on some, and on none, reported separately for the single-path templates (one reasoning path across their 15
 pool instances by `diversity.py`'s lower reading: 58 templates) and the rest. A single-path template
 answered on some instances but not all was missed on the numbers, not the method. Descriptive, with
 template-level intervals.
@@ -67,10 +87,12 @@ term and the order of the parts; a script rejects a paraphrase whose numbers or 
 near-copy; one own-branch expert confirms each is the same problem with the same answer, and a rejected
 pair is dropped from both arms. The same models, prompt, settings and scoring as the main run, run in the
 same week so the served models are the same.
-Per model: the paired difference, paraphrase minus original, with McNemar's exact test and a template-
-level interval, Holm across the models tested. Across models: Kendall's τ between their accuracies on the
-originals and on the paraphrases, with a bootstrap interval. Per model the detectable difference is
-2.80 x sqrt(d / 450) for a discordance rate d, before clustering widens it:
+Per model: the paired difference in answer score, paraphrase minus original, with a sign-flip
+permutation test over templates and a template-level interval, Holm across the models tested; McNemar's
+exact test on the fully-solved verdicts as a check. Across models: Kendall's τ between their answer scores
+on the originals and on the paraphrases, with a bootstrap interval. On the fully-solved verdict, the
+detectable difference per model is 2.80 x sqrt(d / 450) for a discordance rate d, before clustering
+widens it:
 
 | discordance d | 5% | 10% | 15% |
 |---|---|---|---|
@@ -79,17 +101,17 @@ originals and on the paraphrases, with a bootstrap interval. Per model the detec
 ## Sensitivity analyses
 
 - The answer check's relative tolerance at half and at double the fitted value.
+- The fully-solved rate in place of the answer score, and unusable traces excluded rather than scored 0.
 - Headline accuracy without the four templates the pilot excluded for shortcuts: two predictable from the
   question surface (D-057), one about 90% shortcuttable (D-046), one with a blind-guess floor of 1.0 (D-066).
-- Without `critical_depth_froude_classification`, whose class goes unscored (D-116).
 - Without the two templates widened for round 4, if round 4 has not returned when the paper is written.
 
 ## Also reported, not tested
 
-Branch and domain accuracy; accuracy by answer type; token use against accuracy; the error attribution
+Branch and domain scores; scores by answer type; token use against score; the error attribution
 from E4, E5 and the router; per-label accuracy on classification templates, noting that the pool
 over-represents rare branches by design (D-116). A decoding-variance repeat: one cheap model, 300 items
-(2 per template) three times at the main-run settings, reporting the spread of accuracy across repeats
+(2 per template) three times at the main-run settings, reporting the spread of the score across repeats
 (on the pricing document's basis about $1.40 for gemma-4-26b-a4b-it; needs approval).
 
 ## Not tested, and why

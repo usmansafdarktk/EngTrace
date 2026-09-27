@@ -4463,7 +4463,7 @@ unchanged. If round 4 changes either widened template, its 15 items are regenera
 
 ## D-117 — The analysis plan is written before the data
 
-**Date:** 2026-09-28 · **Status:** PROPOSED (binds when the owner confirms, and in any case before the first inference call) · **Evidence:** `full_run_28092026/ANALYSIS_PLAN.md`
+**Date:** 2026-09-28 · **Status:** PROPOSED as a whole (binds when the owner confirms, and in any case before the first inference call); its two scoring rules DECIDED by the owner the same day · **Evidence:** `full_run_28092026/ANALYSIS_PLAN.md`
 
 Reviewers in both cycles asked for variance, significance and fixed thresholds (yAYU 2 and 4, 9W1B 3
 and 4); a plan written after the results cannot answer them. `ANALYSIS_PLAN.md` fixes, before any
@@ -4472,10 +4472,30 @@ confirmatory questions with their tests (model accuracy and Holm-corrected pairw
 Easy-to-Advanced cliff with its detectable gap, 12 to 18 points for a template standard deviation of 0.20
 to 0.30; what process scores add on wrong- and right-answer traces; consistency within a template, split
 by single- and multi-path templates; the paraphrase test on 450 items with its paired test and ranking
-stability); the sensitivity analyses; and what is reported but not tested. Two definitions are the
-owner's to confirm: unusable traces count as incorrect in the headline, and partial answers are not
-correct. The May version's math-pretraining claim is dropped, as the roster has no math-specialised
+stability); the sensitivity analyses; and what is reported but not tested. The owner decided its two
+scoring rules: an unusable trace scores 0, defined by whether the check can read a final answer rather
+than by the marker, with persistent service failures reported as missing and never scored; and a partial
+answer scores 0.5, so the headline is an answer score, reported beside the fully-solved rate. The May
+version's math-pretraining claim is dropped, as the roster has no math-specialised
 model (D-110).
+
+## D-118 — Correction to D-116: the Froude template's answer line is not a defect
+
+**Date:** 2026-09-28 · **Status:** RECORDED · **Evidence:** `data/templates/branches/civil_engineering/water_resources/energy_and_rapidly_varied_flow.py`
+
+D-116 said `critical_depth_froude_classification`'s answer line "states only the Froude number, so the
+class goes unscored" and called it a template defect. It is not. The question asks to "determine the
+Froude number of the flow" and, "in your solution", to compute the critical depth and use it to justify
+whether the flow is subcritical or supercritical. The answer line states the Froude number, which is what
+the question asks for as its answer; the regime is a justification step inside the solution, the kind of
+step process evaluation exists to read. The claim came from the diversity report listing the template
+under classification with a single answer form, read without opening the template.
+
+What is off is metadata: the audit inventory labels the template's answer type `classification`, for a
+template that answers with a number, so it is counted among the classification templates in the pool's
+answer-type tally and the diversity report. Relabelling it `scalar` needs no template change and no
+expert round, but the inventory is read by code, so what reads that label is checked first, in the gold
+validation. The analysis plan's sensitivity item for this template is withdrawn.
 
 ## Open decisions
 
@@ -4492,8 +4512,8 @@ model (D-110).
 | — | The repo's templates no longer reproduce 17 of the 60 frozen items byte-identically (D-102); `milestones.build_all` raises on the pilot manifest; `pinned_templates.py` works around it for the pilot | any re-derivation of milestones from templates |
 | — | ~~Which families the next roster will evaluate~~ **Decided 2026-09-27 (D-110): the pricing document's eleven** | — |
 | D-115 | Round 4: the three chemical experts review `heat_of_reaction_formation` and `adiabatic_flame_temperature` as widened; `certification.py` with the round-4 labels | the paper states what the experts certified |
-| D-116 | `critical_depth_froude_classification`'s answer line states only the Froude number, so its class goes unscored: fix the answer line (a civil round) or state it | the answer check runs on the pool |
-| D-117 | Confirm the analysis plan, including how unusable traces and partial answers count | the first inference call |
+| D-118 | Relabel `critical_depth_froude_classification`'s answer type from classification to scalar in the audit inventory, after checking what reads that label | the gold validation |
+| D-117 | Confirm the analysis plan as a whole; its two scoring rules are decided | the first inference call |
 | D-114 | A private backup of `full_run_28092026/pool/` and `SEED.secret`; the tag on the commit inference runs at | inference starts |
 | — | The budget: the plan comes to about $606 against the ~$500 round with a batched router (D-110) | generation starts |
 | — | ~~Expert annotation of the frozen 300 (stage 3)~~ **Done: 15 experts, every trace labelled three times, with verification and adjudication rounds (RESULTS_X1)** | — |
