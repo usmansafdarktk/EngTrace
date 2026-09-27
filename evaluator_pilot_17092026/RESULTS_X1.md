@@ -587,6 +587,27 @@ assumed, and both are replaced by the counts above. On arithmetic the stack - th
 where a step verifies, the router's judge where it does not - catches 49 of 60, against E0's
 36 of 60.
 
+**The routing rule has a gap, measured on the experts' labels (D-112).** A step counts as
+verifiable when any one of its claims can be recomputed, so a step can be settled by a claim
+that passes while its error sits in another. Placing every step the experts call incorrect
+(`router_residue.py`, last section):
+
+| incorrect steps | inside correct-answer traces (178) | over all 300 traces (388) |
+|---|---|---|
+| the digit rule, as E4 ships it, flags the step | 57 | 99 |
+| residue: the router sends it to a judge | 63 | 186 |
+| settled as verified; the bare digit rule would flag it | 27 | 52 |
+| settled as verified; no rule flags it | 31 | 51 |
+| **never flagged and never shown to a judge** | **58 (32.6%)** | **103 (26.5%)** |
+
+The 27 are steps the shipped rule declines to flag because its operands' displayed precision
+cannot pin the result down; the 31 hold their error somewhere the checker does not reach,
+such as a link inside a chained equality (`aoq_ati_rectifying#3` is one). As specified, the
+router would never show a judge a third of the slips behind a correct answer. A rule that
+forwards every step the checker has not positively cleared would put those steps in front of
+a judge, which catches a share of them, at the cost of a larger residue; which rule, and at
+what cost, belongs to the router's design (open).
+
 **What remains untested.** The probe asks a judge about one step in isolation; a router would
 batch a trace's ~4.4 residue steps into one prompt, which is more context per call and also
 more steps competing for attention. E1's three-judge panel was not probed as a panel. And the
@@ -679,13 +700,24 @@ cost about $3 on this set.
 
 ## Follow-ups this turned up
 
-- The judge probe labelled Claude's `aoq_ati_rectifying#3` step as CLEAN. The experts
-  unanimously found a real slip in it: 0.93^49 = 0.0285538, not 0.02857, so P(X=1) is
-  0.0999, not 0.1000. It should be relabelled SLIP in `judge_probe.RELABEL`, and E2's
-  probe validation re-run.
-- The guide does not say how to treat a notational slip whose computed result is right
-  (GPT-5's `normal_depth_iteration#1`: a dropped minus sign in a displayed expression,
-  correct value). The experts called it correct; the guide should say so explicitly.
+- ~~The judge probe labelled Claude's `aoq_ati_rectifying#3` step as CLEAN~~ **Done
+  2026-09-27 (D-112).** The experts unanimously found a real slip in it: 0.93^49 =
+  0.0285538, not 0.02857, so P(X=1) is 0.0999, not 0.1000. It is relabelled SLIP in
+  `judge_probe.RELABEL`, and the probe and E2's validation are re-scored (JUDGE_SELECTION,
+  RESULTS_E2). Kimi K3 and Grok 4.6 now lead the probe at 0.96, with MiMo at 0.92; the 72B's
+  probe AUROC is 0.923. The same step also shows a gap in the recommended stack: neither
+  digit rule flags it, because the slip sits inside a chained equality the checker does not
+  compare, and the router would settle the step without a judge, because another claim in
+  it verifies (Finding 8, D-112).
+- ~~The guide does not say how to treat a notational slip whose computed result is
+  right~~ **Withdrawn 2026-09-27 (D-112): the case was misread.** GPT-5's
+  `normal_depth_iteration#1` step writes a wrong sign in its displayed formula, but its
+  value is wrong too: 1.86921 where the formula gives 1.86942, because 0.046272/2.8172 is
+  0.016425, not 0.01621. All three experts mark it a calculation error after adjudication,
+  with that arithmetic as the reason; only one expert's first pass called it correct. The
+  guide's existing rule covers it ("a wrong digit is a calculation error, even if the final
+  answer survives it"), the digit rule flags it too, and the pilot holds no step with a
+  notational slip and a right value, so nothing in the guide changes.
 - Electrical was the weakest branch when this was first written (between-rater step κ 0.584)
   and its third set was re-annotated (D-099). It is civil now: the lowest between-rater
   step κ (0.645) and the lowest within-rater κ (0.519), which is below its between-rater

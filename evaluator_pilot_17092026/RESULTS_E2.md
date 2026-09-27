@@ -39,16 +39,20 @@ card's example and refuses to continue unless the check passes.**
 
 Tested on the judge probe's steps, whose status is known without asking any model
 (D-087):
-- **SLIP** (12 steps): the shown arithmetic is wrong, confirmed by reading.
-- **CLEAN** (9 steps): a step from a right-answer trace whose checkable claims all hold.
+- **SLIP** (13 steps): the shown arithmetic is wrong, confirmed by reading or by the experts.
+- **CLEAN** (8 steps): a step from a right-answer trace whose checkable claims all hold.
+
+*Re-scored 2026-09-27 (D-112): Claude's `aoq_ati_rectifying#3`, first counted CLEAN, carries a
+slip all three experts found, and is now a SLIP. As first scored (12 SLIP, 9 CLEAN) the 72B's
+AUROC was 0.935, the 7B's 0.824 and VersaPRM's 0.565.*
 
 | PRM | mean reward, SLIP | mean reward, CLEAN | slips flagged | clean passed | AUROC |
 |---|---|---|---|---|---|
-| **Qwen-72B** | **0.251** | 0.894 | **9 / 12** | 8 / 9 | **0.935** |
-| Qwen-7B | 0.448 | 0.841 | 7 / 12 | 8 / 9 | 0.824 |
-| VersaPRM | 0.831 | 0.896 | **1 / 12** | 9 / 9 | 0.565 |
+| **Qwen-72B** | **0.305** | 0.886 | **9 / 13** | 7 / 8 | **0.923** |
+| Qwen-7B | 0.487 | 0.826 | 7 / 13 | 7 / 8 | 0.779 |
+| VersaPRM | 0.840 | 0.890 | **1 / 13** | 8 / 8 | 0.548 |
 
-- **VersaPRM does not discriminate.** It passed 11 of 12 known arithmetic slips and
+- **VersaPRM does not discriminate.** It passed 12 of 13 known arithmetic slips and
   rates 95–99% of all steps correct for every model. It barely correlates with anything
   (below). As an error detector on this benchmark it **fails validation**, and it is
   reported only as that finding. Its training data (MMLU-Pro reasoning across domains)
@@ -56,11 +60,12 @@ Tested on the judge probe's steps, whose status is known without asking any mode
   switched off scored the card's wrong step lower (0.59 vs 0.93), so the adapter made
   it more lenient.
 - **The 72B separates the two sets well, and the 7B less so.** Scale helps.
-- **Caveat on the 72B's AUROC: the probe is confounded by model.** 10 of the 12 slips
-  are Llama's, and 8 of the 9 clean steps come from frontier models. The 72B caught 9
-  of the 10 Llama slips but **neither non-Llama slip**: 0.969 on Gemma's
-  `aoq_ati_rectifying#0`, 0.739 on GPT-5's `normal_depth_iteration#1`. So part of that
-  0.935 may be "Llama's steps look worse", not "a wrong step is caught". The one clean
+- **Caveat on the 72B's AUROC: the probe is confounded by model.** 10 of the 13 slips
+  are Llama's, and 7 of the 8 clean steps come from frontier models. The 72B caught 9
+  of the 10 Llama slips but **none of the three non-Llama slips**: 0.969 on Gemma's
+  `aoq_ati_rectifying#0`, 0.739 on GPT-5's `normal_depth_iteration#1`, 0.959 on Claude's
+  `aoq_ati_rectifying#3`. So part of that 0.923 may be "Llama's steps look worse", not "a
+  wrong step is caught". The one clean
   Llama step scored 0.992, which argues against a pure model effect, but one step is
   not evidence. A clean test needs slips and clean steps from the same models, which
   is what the expert annotation will give.

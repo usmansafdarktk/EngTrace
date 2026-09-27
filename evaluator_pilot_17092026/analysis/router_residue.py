@@ -29,6 +29,14 @@ trace's residue steps are batched into one prompt, which is cheaper and has not 
 tested: more context per call, and more steps competing for the judge's attention.
 
 The full run is --models 11, the roster D-110 fixed.
+
+WHERE THE EXPERTS' INCORRECT STEPS LAND (D-112). The rule above settles a whole step as soon
+as ONE of its claims can be recomputed, so a step can be "verified" by a claim that passes
+while its error sits in another. The last section places every step the experts call
+incorrect in one of four buckets - the digit rule as E4 ships it flags it; the step is
+residue, so a judge sees it; the step is settled as verified although the bare digit rule
+would flag it (the shipped rule's operand-uncertainty widening absorbed it); or the step is
+settled as verified and no rule flags it. The last two never reach a judge.
 """
 import os as _os
 _ANALYSIS = _os.path.dirname(_os.path.abspath(__file__))
@@ -56,6 +64,44 @@ def verifiable(step):
         if c.left_value and c.right_value:
             return True
     return False
+
+
+BUCKETS = ('the digit rule flags it', 'residue: a judge sees it',
+           'settled, the bare digit rule would flag it', 'settled, no rule flags it')
+
+
+def landing(labels_dir, correct_answer_only):
+    """Every expert-labelled step placed in one of BUCKETS, with the labels counted per bucket."""
+    import digit_rule as DR
+    truth, _ = S.build_truth(S.read_labels(labels_dir), S.read_consensus(labels_dir))
+    keyfile = {r['code']: (r['model_key'], r['item_id'])
+               for r in map(json.loads, open(_os.path.join(S.TASKS, 'keyfile.jsonl'), encoding='utf-8'))}
+    texts = {}
+    for f in _os.listdir(_os.path.join(_PILOT, 'traces')):
+        if f.endswith('.jsonl'):
+            for line in open(_os.path.join(_PILOT, 'traces', f), encoding='utf-8'):
+                r = json.loads(line)
+                if r.get('ok'):
+                    texts[(r['model_key'], r['item_id'])] = r['text']
+    out = {b: Counter() for b in BUCKETS}
+    for code, t in truth.items():
+        if correct_answer_only and t['final_answer'] != 'correct':
+            continue
+        text = texts.get(keyfile[code])
+        steps = e2_prm.steps_of(text) if text else []
+        if len(steps) != len(t['steps']):
+            continue
+        for s, lab in zip(steps, t['steps']):
+            if DR.flagged(s, 'e4'):
+                b = BUCKETS[0]
+            elif not verifiable(s):
+                b = BUCKETS[1]
+            elif DR.flagged(s, 'digit'):
+                b = BUCKETS[2]
+            else:
+                b = BUCKETS[3]
+            out[b][lab['label']] += 1
+    return out
 
 
 def measure(labels_dir, models=MODELS):
@@ -139,6 +185,17 @@ def main():
     print('  router would do the same - but the detection rates in router_planted.py come from')
     print('  asking about one step at a time, so they describe the per-step design until a')
     print('  batched prompt is measured.')
+
+    for title, only in (('inside correct-answer traces', True), ('over all 300 traces', False)):
+        land = landing(a.labels, only)
+        bad = sum(land[b]['incorrect'] for b in BUCKETS)
+        print('\n  WHERE THE EXPERTS\' INCORRECT STEPS LAND, %s (%d steps)' % (title, bad))
+        for b in BUCKETS:
+            ok = land[b]['correct'] + land[b]['alternative_correct']
+            print('    %-44s %4d  (%4.1f%%)    correct steps in the same bucket: %d'
+                  % (b, land[b]['incorrect'], 100 * land[b]['incorrect'] / bad, ok))
+        never = land[BUCKETS[2]]['incorrect'] + land[BUCKETS[3]]['incorrect']
+        print('    never shown to a judge and not flagged: %d of %d (%.1f%%)' % (never, bad, 100 * never / bad))
 
 
 if __name__ == '__main__':

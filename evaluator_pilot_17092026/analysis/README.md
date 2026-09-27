@@ -38,7 +38,7 @@ between calls.
 | `arith_gold_validation.py [--rule]` | the arithmetic checker's gold validation under the 1% reading and the digit rule, with the two fixes it forced | RESULTS_E4 §The gold validation, D-101 |
 | `digit_rule.py` | the experts' digit rule by machine, four rules side by side, per step and per trace inside correct-answer traces | RESULTS_X1 Finding 5, RESULTS_E4, D-097, D-101 |
 | `judge_candidates.py` | every OpenRouter family outside the 27-model suite, with price, openness and JSON support (**net**) | JUDGE_SELECTION §The constraint |
-| `judge_probe.py build/run/report` | 21 known-label steps sent to 9 judges with the framework's own prompt (`run` is **paid**, ~$3; **venv**) | JUDGE_SELECTION §The probe; FINDINGS E0-F5 update |
+| `judge_probe.py build/run/report [--offline]` | 21 known-label steps sent to 9 judges with the framework's own prompt, two labels corrected in `RELABEL` (`run` is **paid**, ~$3; `report` reads live prices unless `--offline`; **venv**) | JUDGE_SELECTION §The probe; FINDINGS E0-F5 update; D-112 |
 | `e1_panel_check.py` | the E1 panel's availability on OpenRouter (listing, endpoints, a live JSON call that bills a few tokens) and E1's cost from probe token usage (**net**) | JUDGE_SELECTION; E1 cost estimate |
 | `e1_analysis.py` | E1 run health, E1 vs E0 and E0-3J, inter-judge agreement (Cohen's and Fleiss' kappa) for both panels | RESULTS_E1; FINDINGS E0-F8 |
 | `e5_analysis.py validate / report` | the E5 judge's validity on known answers (`validate` is **paid**, ~$0.43), then E5 against E3, E4 and E0 | RESULTS_E5 |
@@ -51,7 +51,7 @@ between calls.
 | `planted.py` | builds the planted-defect set (seeded, byte-identical) and scores the deterministic evaluators on it | RESULTS_X1 Finding 7, D-102 |
 | `planted_judges.py build/run/report` | the matched judge probe on the planted set: GPT-5, Opus 4.5, MiMo, each defect judged planted and untouched (`run` is **paid**; `report` is free; **venv**) | RESULTS_X1 Finding 8, D-103 |
 | `planted_routing.py` | E0's Tier 1 routing on the planted defects, the Tribunal replaced by a recorder, $0 (**venv**) | RESULTS_X1 Finding 8, D-104 |
-| `router_residue.py [--models]` | the steps no checker can verify, what the experts said about them, and a router's full-run cost batched and per step | RESULTS_X1 Finding 8, PILOT_SUMMARY §3.1, D-110 |
+| `router_residue.py [--models]` | the steps no checker can verify, what the experts said about them, a router's full-run cost batched and per step, and where every step the experts call incorrect lands (flagged, shown to a judge, or neither) | RESULTS_X1 Finding 8, PILOT_SUMMARY §3.1, D-110, D-112 |
 | `router_planted.py` | a verify-first router on the planted defects: forwarded, caught when asked, and both jointly; E0's routing on the same basis; the digit rule's false alarms on the judged steps and the slips it gives up (**venv**) | PILOT_SUMMARY §2.7-2.9, RESULTS_X1 Findings 7-8, D-111 |
 | `summary_numbers.py` | every value the pilot summary's figures draw, and the prose numbers no other script prints, written to `figures/summary_numbers.json` (**venv**) | PILOT_SUMMARY; `make_summary_figures.py` |
 | `inference_cost.py` | per-model inference cost of the full benchmark from the pilot's measured token counts (**net**: live prices) | the inference pricing document |

@@ -80,6 +80,11 @@ RELABEL = {
         'SLIP', 'writes sqrt(124343 * 582.96) = sqrt(72311151.28); the product is '
                 '72486995, a 0.24% error inside both E4 (1%) and E3 (0.5%) tolerances. '
                 'Every judge flagged it, correctly; the CLEAN label was wrong.'),
+    ('claude-opus-4.7', 'aoq_ati_rectifying#3'): (
+        'SLIP', 'writes 50 * 0.070 * (0.930)^49 = 50 * 0.070 * 0.02857 = 0.1000; 0.93^49 is '
+                '0.0285538, so P(X=1) is 0.0999. All three experts mark the step incorrect '
+                '(RESULTS_X1 follow-ups, D-112); GPT-5, GLM-5.3, Kimi K3, Grok 4.6 and Nemotron '
+                'flagged it, correctly, and the CLEAN label was wrong.'),
 }
 CATS = ('alternative correct', 'calculation error', 'conceptual error', 'other')
 
@@ -259,7 +264,9 @@ def run():
     print('done')
 
 
-def report():
+def report(offline=False):
+    """The probe table. `report --offline` skips OpenRouter's price catalogue, so the table can
+    be reproduced with no key and no network; the cost column then prints '-'."""
     from collections import defaultdict
     probe = json.load(open(PROBE, encoding='utf-8'))
     for p in probe:
@@ -271,13 +278,15 @@ def report():
     for r in _jsonl(_os.path.join(OUT, 'replies.jsonl')):
         if r.get('ok') or (r['judge'], r['probe']) not in replies:
             replies[(r['judge'], r['probe'])] = r
-    import urllib.request
-    from dotenv import load_dotenv
-    load_dotenv(_os.path.join(_REPO, '.env'))
-    cat = {m['id']: m['pricing'] for m in json.load(urllib.request.urlopen(urllib.request.Request(
-        'https://openrouter.ai/api/v1/models',
-        headers={'Authorization': 'Bearer ' + _os.environ['OPENROUTER_API_KEY'], 'User-Agent': 'engtrace'}),
-        timeout=60))['data']}
+    cat = {}
+    if not offline:
+        import urllib.request
+        from dotenv import load_dotenv
+        load_dotenv(_os.path.join(_REPO, '.env'))
+        cat = {m['id']: m['pricing'] for m in json.load(urllib.request.urlopen(urllib.request.Request(
+            'https://openrouter.ai/api/v1/models',
+            headers={'Authorization': 'Bearer ' + _os.environ['OPENROUTER_API_KEY'], 'User-Agent': 'engtrace'}),
+            timeout=60))['data']}
 
     n_slip = sum(p['label'] == 'SLIP' for p in probe)
     n_clean = len(probe) - n_slip
@@ -317,12 +326,16 @@ def report():
         fpr = false / n_clean if n_clean else 0
         bal = (tpr + (1 - fpr)) / 2
         rows.append((jid, bal))
-        print('%-15s %-22s %3d/%-2d %4d/%-2d %4d/%-2d %8.2f %9.4f %8.1f %7d' % (
+        print('%-15s %-22s %3d/%-2d %4d/%-2d %4d/%-2d %8.2f %9s %8.1f %7d' % (
             jid, fam[:22], parsed, n, caught, n_slip, false, n_clean, bal,
-            cost / max(len(secs), 1), sorted(secs)[len(secs) // 2] if secs else 0, trunc))
+            '-' if offline else '%.4f' % (cost / max(len(secs), 1)),
+            sorted(secs)[len(secs) // 2] if secs else 0, trunc))
     print('\ncaught = SLIP steps NOT called "Alternative Correct"; false = CLEAN steps flagged;')
     print('balanced = mean of catch rate and pass rate (0.5 = coin flip / rubber stamp).')
 
 
 if __name__ == '__main__':
-    {'build': build, 'run': run, 'report': report}[sys.argv[1]]()
+    if sys.argv[1] == 'report':
+        report(offline='--offline' in sys.argv[2:])
+    else:
+        {'build': build, 'run': run}[sys.argv[1]]()

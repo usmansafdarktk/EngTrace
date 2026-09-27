@@ -159,8 +159,9 @@ testing the part of E0 that actually decides scores.
 
 **Update, 2026-09-19 — the judges are not rubber stamps.** The 93% "Alternative
 Correct" invites the reading that E0's judges approve anything. A direct test says
-otherwise: given one step with a known, verified arithmetic error, GPT-5 and Opus 4.5
-each flagged 10 of 12 (JUDGE_SELECTION.md, `analysis/judge_probe.py`). The 93% is
+otherwise: given one step with a known, verified arithmetic error, GPT-5 flagged 11 of 13
+and Opus 4.5 10 of 13 (JUDGE_SELECTION.md, `analysis/judge_probe.py`; 10 of 12 each before
+the D-112 relabel). The 93% is
 better explained by what Tier 1 sends them — nearly every step, correct ones
 included, because its number-AND-similarity test rarely passes. The judges mostly see
 correct steps and mostly say so. The finding above stands; that reading of it does

@@ -54,8 +54,11 @@ Both were read and both are genuine:
 
 - **gpt-5, `normal_depth_iteration#1`**: writes
   `1.853 − (0.2892 × (−0.160))/(−2.8172) = 1.86921`. As written it evaluates to
-  1.8366; 1.86921 is what a **plus** gives. The sign in the shown formula is wrong,
-  the reported value is right (milestone 1.87).
+  1.8366, and with the sign corrected to 1.86942. The sign in the shown formula is wrong,
+  and so is the value's fourth decimal: 0.046272/2.8172 is 0.016425, not the 0.01621 the
+  trace uses. The value matches the milestone (1.87) only within its 0.5% tolerance, and
+  all three experts mark the step a calculation error. *(Corrected 2026-09-27, D-112: this
+  first said 1.86921 is what a plus gives and the value is right.)*
 - **llama-3.1-70b, `normal_depth_iteration#1`**: writes
   `(3.8 + 2×1.500×2) × 1.500 = 14.100 m²`. That evaluates to 14.7; the stated 14.100
   matches the milestone (14.0998). The shown coefficient is wrong, the value is not.

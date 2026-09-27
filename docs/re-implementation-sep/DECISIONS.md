@@ -3270,6 +3270,11 @@ the smallest documented Claude exposure (0.4M vs 13M+ exchanges). Kimi K3 and GL
 the strongest open families available for the next roster. The prior decision is the
 roster's families: a family cannot be both judge and judged.
 
+*(2026-09-27, D-112: a second probe step first labelled clean carried a real slip. Re-scored,
+Kimi K3 and Grok 4.6 lead the probe at 0.96 and MiMo and MiniMax tie at 0.92, so "matched
+MiniMax" still holds and the probe still cannot separate the top. The choice stands: see
+D-112 and JUDGE_SELECTION, "Does the relabel change the choice?")*
+
 ## D-089 — E1's judges get uniform call settings, and one provider is excluded
 
 **Date:** 2026-09-19 · **Status:** DECIDED · **Source:** E1 smoke test and first replay
@@ -3317,7 +3322,9 @@ continuous rewards are not compared with published numbers.
 72B separates slips from clean steps (AUROC 0.935), the 7B less well (0.824), and
 **VersaPRM fails validation**: it passed 11 of 12 known arithmetic slips and rates
 95-99% of every model's steps correct. E2's score is therefore the 72B's; VersaPRM is
-reported as a negative result, not as a score.
+reported as a negative result, not as a score. *(Re-scored 2026-09-27 after the D-112
+relabel, 13 slips and 8 clean steps: the 72B 0.923, the 7B 0.779, VersaPRM 0.548, passing 12
+of 13 slips. The conclusions do not change.)*
 
 ## D-091 — Commit messages are one line, and the history was rewritten to match
 
@@ -4250,6 +4257,70 @@ this entry is the record of what was wrong.
     analyses, so a figure cannot disagree with the scripts. The routing figure's legend no
     longer covers a bar.
 
+## D-112 — The two label-review follow-ups closed: one probe step relabelled, one guide change withdrawn, and a gap in the router's rule
+
+**Date:** 2026-09-27 · **Status:** DECIDED · **Evidence:** `analysis/judge_probe.py` (`RELABEL`;
+`report --offline`), `analysis/e2_analysis.py`, `analysis/router_residue.py` (last section),
+the adjudicated labels in `experts_filled_labels/version_2/` (local only)
+
+RESULTS_X1 closed with two follow-ups from reading the experts' labels. Both are closed here,
+and closing the first exposed something larger than either.
+
+**1. Claude's `aoq_ati_rectifying#3` step is a slip, and is relabelled.** The judge probe had
+it CLEAN. All three experts mark it incorrect: it writes 50 · 0.070 · (0.930)^49 = 50 · 0.070 ·
+0.02857 = 0.1000, and 0.93^49 is 0.0285538, so P(X=1) is 0.0999. `judge_probe.RELABEL` now
+carries it, and the probe (13 slips, 8 clean) and E2's validation are re-scored:
+
+| | as first scored | after the relabel |
+|---|---|---|
+| probe leaders (balanced) | MiniMax, MiMo 0.96 | Kimi K3, Grok 4.6 0.96 |
+| MiMo, MiniMax | 11/12 caught, 0/9 false, 0.96 | 11/13, 0/8, 0.92 |
+| GPT-5, GLM-5.3 | 10/12, 1/9, 0.86 | 11/13, 0/8, 0.92 |
+| Opus 4.5 | 10/12, 0/9, 0.92 | 10/13, 0/8, 0.88 |
+| E2 probe AUROC, 72B / 7B / VersaPRM | 0.935 / 0.824 / 0.565 | 0.923 / 0.779 / 0.548 |
+
+The five judges charged with a false alarm on this step were right, and MiMo, MiniMax and Opus
+missed it. The 72B passed it at 0.959, so it misses all three non-Llama slips in the probe.
+
+**It does not change the choice of judge.** The probe was never the deciding criterion, and it
+still cannot separate the judges that parse (one item moves "balanced" by about 0.05, and the
+relabel is one item). E5's judge was chosen for independence, and the two judges the relabel
+lifts to the top cannot take its place: Kimi K3 is on the roster (D-110), and Grok 4.6 has
+closed weights and documented exposure to OpenAI, whose gpt-5.4-mini and gpt-oss-20b are on the
+roster. MiMo's documented exposure, to Claude, remains the smallest of any candidate. On the
+larger matched test since, 120 planted defects, MiMo detects about as much as GPT-5 with no
+false alarm (D-103); Grok was not run on it, and that run (about $3.40) is the one to buy if a
+reviewer presses, not a re-reading of 21 steps.
+
+**2. The guide change is withdrawn, because its case was misread.** The follow-up said GPT-5's
+`normal_depth_iteration#1` step has a notational slip with a right value, which the experts
+called correct. It has a wrong sign in its displayed formula, and a wrong value as well: it
+writes 1.86921 where the formula gives 1.86942, because 0.046272/2.8172 is 0.016425, not the
+0.01621 it uses. After adjudication all three experts mark it a calculation error with that
+arithmetic as the reason; only one expert's first pass had called it correct. The guide already
+covers it - "a wrong digit is a calculation error, even if the final answer survives it" - the
+digit rule flags it, and the pilot holds no step with a notational slip and a right value. The
+guide is unchanged. RESULTS_E4's and JUDGE_SELECTION's descriptions of the step, which said the
+value is right, are corrected.
+
+**3. What the relabelled step exposed: a gap in the router's rule.** Neither digit rule flags the
+`aoq_ati_rectifying#3` slip, because it sits inside a chained equality the checker does not
+compare, and the router, as specified in `router_residue.py`, would settle the step without a
+judge, because another claim in it verifies. Placing every step the experts call incorrect:
+inside correct-answer traces, 57 of 178 are flagged by the digit rule, 63 are residue a judge
+sees, and **58 (32.6%) are never flagged and never shown to a judge** - 31 whose error the checker
+does not reach, and 27 the bare digit rule flags but the shipped rule's operand-uncertainty
+widening passes. Over all 300 traces it is 103 of 388 (26.5%). A router that settles a step on
+any verifiable claim would never show a judge a third of the slips behind a correct answer, so
+its rule has to forward every step the checker has not positively cleared. That enlarges the
+residue beyond the 63% the $79 and $371 were priced on, and it goes into the router's design.
+
+**What this changes in the evaluation stack.** The components stand: the answer check, E3
+milestones, E4's digit rule, E5 with MiMo, and a step router with MiMo. The judge stands. What
+changes is the router's routing rule, still to be designed, and two documented descriptions -
+the probe's ranking and the GPT-5 step - which are corrected in JUDGE_SELECTION, RESULTS_E2,
+RESULTS_E4, FINDINGS E0-F5, RESULTS_X1 and the pilot summary.
+
 ## Open decisions
 
 | # | Decision | Needed before |
@@ -4261,7 +4332,7 @@ this entry is the record of what was wrong.
 | D-094 | Whether to narrow the P2/Pc range in `work_isothermal_virial` (now 50% redraw; an expert's thermal-stability objection, D-106, turns on the same range) and accept the 41% stability redraw in `floating_object_submersion_depth`; the residuals in `pass1_fixes.md` | the item pool is regenerated |
 | D-092 | ~~Answer-display lengthening and gold-movement sign-offs~~ **Decided by the owner 2026-09-23:** the two lengthened answers stay; `beam_internal_moment`, `terzaghi_strip_footing_bearing` and `effective_stress_profile` answers are lengthened too; the gold movements are accepted; and a scoped third round removes the census ties at 3% and above (eight templates), with the frozen pool to be censused before inference and stragglers fixed then | — |
 | D-093 | ~~Approval to run screening pass 1~~ **Both passes run (2026-09-23/24, $4.85 total); the 24 flags resolved (D-094).** **The Layer 2 protocol was decided (D-095) and run to completion (D-109).** | — |
-| — | ~~Whether the full run adds the step router~~ **In the stack (D-110).** Still open: building it, and measuring the batched prompt its $79 assumes (the measured single-step design costs $371, D-111) | before evaluation starts |
+| — | ~~Whether the full run adds the step router~~ **In the stack (D-110).** Still open: its routing rule (it must forward every step the checker has not positively cleared; as specified it hides 58 of 178 hard-case slips, D-112), its reported score, building it, and measuring the batched prompt its $79 assumes (the measured single-step design costs $371, D-111) | before evaluation starts |
 | — | The repo's templates no longer reproduce 17 of the 60 frozen items byte-identically (D-102); `milestones.build_all` raises on the pilot manifest; `pinned_templates.py` works around it for the pilot | any re-derivation of milestones from templates |
 | — | ~~Which families the next roster will evaluate~~ **Decided 2026-09-27 (D-110): the pricing document's eleven** | — |
 | — | The budget: the plan comes to about $606 against the ~$500 round with a batched router (D-110) | generation starts |

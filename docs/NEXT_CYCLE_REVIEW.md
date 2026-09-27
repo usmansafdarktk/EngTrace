@@ -255,7 +255,9 @@ PRM800K, the self-preference results) and Related Work needs a paragraph on PRMs
 validity and meta-evaluation, which the May version lacks. The router is in the stack
 (D-110); its measured contribution goes here, stated with its basis: on planted conceptual
 defects, end-to-end detection from 0.150 to 0.294, asked one step per call, a design that
-costs $371 at full scale; the $79 batched design is untested (D-111).
+costs $371 at full scale; the $79 batched design is untested (D-111). Its routing rule has to
+change before it is built: settling a step on any verifiable claim would never show a judge 58
+of the 178 slips behind a correct answer (D-112).
 
 ### 4.3 Say what changed, and be exact about authorship
 

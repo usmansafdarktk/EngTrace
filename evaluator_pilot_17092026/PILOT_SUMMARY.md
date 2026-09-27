@@ -405,6 +405,15 @@ call, which is the $371 design; the $79 figure assumes a trace's residue steps a
 one prompt, as the Tribunal batches its mismatched steps, and a batched prompt has not been
 tested. And the router is not built.
 
+Its routing rule also needs changing before it is built. As specified, a step counts as
+verified as soon as any one of its claims can be recomputed, so a claim that passes can settle
+a step whose error sits elsewhere. Of the 178 steps the experts call incorrect inside
+correct-answer traces, 58 (a third) are never flagged by the digit rule and never reach a judge:
+31 hold their error where the checker does not reach, such as a link inside a chained equality,
+and 27 are slips the shipped digit rule declines to flag because the displayed operands cannot
+pin the result down. The router has to send a judge every step the checker has not positively
+cleared, which makes its residue larger than the 63% priced above.
+
 ### 3.2 The models
 
 **The benchmark.** Five branches × 30 templates × 15 instances = **2,250 problems** (870 easy,
@@ -494,15 +503,15 @@ compare against the published version, so the paper needs a sentence explaining 
    the current templates; `pinned_templates.py` runs the pilot against the templates as they were
    at the freeze. The full run needs the same guarantee: freeze the 2,250-item pool with per-item
    hashes, and score against the template commit it was generated from.
-3. **The router needs building**, and its batched prompt measuring, since the detection rate
-   above comes from single-step prompts.
+3. **The router needs designing and building.** Its routing rule has to forward the steps
+   the checker has not positively cleared (section 3.1), its output has to be defined as a
+   reported score, and its batched prompt has to be measured, since the detection rate above
+   comes from single-step prompts.
 4. **MiMo's non-returns.** The full run needs a retry count, a fallback (an unjudged milestone
    counts as missing under strict coverage), and the unjudged rate reported per model.
-5. **An anonymised ground-truth file** would let the analyses reproduce without exposing
-   annotator data. Pending a compliance decision.
-6. **Two small follow-ups** from the label review: one probe step needs relabelling, and the
-   annotation guide should say explicitly how to treat a notational slip whose computed result
-   is right.
+5. **An anonymised ground-truth file**, together with the traces and evaluator scores (which
+   hold no annotator data), would let the analyses reproduce without exposing annotator data.
+   Pending a compliance decision.
 
 ---
 
