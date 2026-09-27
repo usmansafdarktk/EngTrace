@@ -4356,20 +4356,66 @@ signal in the stack.
 
 **Still open:** building the router in the harness, and what it reports in the results table.
 
+## D-114 — Certification closed; the full run's pool is 150 x 15 from a private seed, and only hashes are committed
+
+**Date:** 2026-09-28 · **Status:** DECIDED (the owner's calls on the certification and the pool size; the seed rule as recommended) · **Evidence:** `full_run_28092026/freeze.py`, `full_run_28092026/FREEZE.json`, `template_annotation_23092026/layer0/gate_report.md`, `template_annotation_23092026/layer2/CERTIFICATION.md`
+
+**The templates are final.** The owner, 2026-09-28: "template annotation has been done over three
+rounds and properly closed". No template changes from here. D-108's open items (a plain-text look
+for the 65 templates judged through the Markdown rendering, `signal_operations`'s origin marker),
+D-106's targeted re-screen and D-094's residual redraw rates are closed without further action.
+What the experts saw is recorded in `layer2/markdown_scan.md`, and the paper's account of the
+certification should match it. At HEAD (`1acc7cf`) the gate passes 150 of 150 and all 150
+templates are certified, each regenerating byte for byte the instances its experts reviewed.
+
+**Why a private seed.** The templates and the generator's default master seed are public, so a
+committed per-item seed publishes the item: rerun the template with it. NEXT_CYCLE_REVIEW 9.1
+item 3 had said to commit the seed, which is corrected there. The default seed also produced the
+pilot slice, whose items are public with their gold and on whose traces the answer check was
+tuned. The pool is therefore drawn from a random 128-bit seed held in `SEED.secret`, gitignored
+with `pool/`. Committed: `manifest.jsonl` (per-item SHA-256 over question + NUL + solution, no
+text, no seed) and `FREEZE.json`, with the seed's SHA-256 as a commitment. Reviewers get the pool
+in the ARR supplementary archive. At publication the seed is revealed and the pool released.
+Publishing the pool now could not contaminate the models evaluated now, which were trained
+earlier; the rule protects the pool after release and lets the paper say the evaluated
+items were not public when the models ran.
+
+**Selection.** Indices 0, 1, 2, ... per template; an index is replaced by the next when its
+question repeats one already kept, matches a pilot-slice question, carries an exact display tie
+on a line T1 can parse (the tie census's test, D-016), or fails to generate. This carries out
+D-092's instruction to census the frozen pool and fix stragglers without editing a certified
+template. 56 indices were replaced: 51 repeated questions and 5 display ties, 4 of them in
+`server_configuration_selection`. None matched a pilot question.
+
+**15 per template, the owner's rule.** The owner, 2026-09-28: "150 x 15 = 2250, pool should have
+2250 instances in total". Two templates cannot supply 15 distinct questions in 75 indices:
+`adiabatic_flame_temperature` has 11 and `heat_of_reaction_formation` 4. Each keeps every distinct
+question once and fills to 15 with repeats in index order, 4 and 11 of them, each marked
+`repeat_of` in the pool and the manifest. The pool is **2,250 instances and 2,235 distinct
+questions**: 870 Easy, 870 Intermediate, 510 Advanced, 450 per branch. The paper should state both
+numbers; "2,250 unique problems" would be wrong.
+
+**Verified.** `freeze.py --verify` in a separate process regenerates all 2,250 byte-identically,
+and `--check-files` matches `pool/` to the manifest. Manifest SHA-256 `f0ffa108e79312e6…`, seed
+commitment `cd53376fb0fe90ac…`, both in full in `FREEZE.json`.
+
+**Open.** A private backup of `pool/` and `SEED.secret`; the tag, on the commit inference runs at.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
-| D-108 | Whether the review app shows questions and solutions as plain text, as the models read them, and whether the 65 templates judged through its Markdown rendering get a plain-text look; fixing `signal_operations`'s origin marker | the paper states what the experts certified |
+| D-108 | ~~Whether the review app shows questions and solutions as plain text, as the models read them, and whether the 65 templates judged through its Markdown rendering get a plain-text look; fixing `signal_operations`'s origin marker~~ **Closed by the owner 2026-09-28 (D-114): the certification is closed and no template changes** | — |
 | D-107 | ~~Fix the five templates round 2 objected to~~ **Fixed 2026-09-26 (D-108) and re-certified in round 3 (D-109): all five approved by all three** | — |
-| D-106 | Whether the screen re-judges the changed templates (a few cents, targeted; not run before round 2); the plasma row's per-row tag | the item pool is frozen |
+| D-106 | ~~Whether the screen re-judges the changed templates (a few cents, targeted; not run before round 2); the plasma row's per-row tag~~ **Closed by the owner 2026-09-28 (D-114): no re-judge** | — |
 | D-095 | ~~Layer 2 roster and dates~~ **Round 1 run 2026-09-24/25 with the pilot's 15 experts (D-106).** **Round 2 run 2026-09-25 (D-107).** **Round 3 run 2026-09-26 (D-109).** ~~Adjudication rule for split verdicts~~ **Not needed for this pool: after round 3 no split verdict is in force; all 150 templates are certified unanimously (D-109)** | — |
-| D-094 | Whether to narrow the P2/Pc range in `work_isothermal_virial` (now 50% redraw; an expert's thermal-stability objection, D-106, turns on the same range) and accept the 41% stability redraw in `floating_object_submersion_depth`; the residuals in `pass1_fixes.md` | the item pool is regenerated |
+| D-094 | ~~Whether to narrow the P2/Pc range in `work_isothermal_virial` (now 50% redraw; an expert's thermal-stability objection, D-106, turns on the same range) and accept the 41% stability redraw in `floating_object_submersion_depth`; the residuals in `pass1_fixes.md`~~ **Closed by the owner 2026-09-28 (D-114): the redraw rates stand** | — |
 | D-092 | ~~Answer-display lengthening and gold-movement sign-offs~~ **Decided by the owner 2026-09-23:** the two lengthened answers stay; `beam_internal_moment`, `terzaghi_strip_footing_bearing` and `effective_stress_profile` answers are lengthened too; the gold movements are accepted; and a scoped third round removes the census ties at 3% and above (eight templates), with the frozen pool to be censused before inference and stragglers fixed then | — |
 | D-093 | ~~Approval to run screening pass 1~~ **Both passes run (2026-09-23/24, $4.85 total); the 24 flags resolved (D-094).** **The Layer 2 protocol was decided (D-095) and run to completion (D-109).** | — |
 | — | ~~Whether the full run adds the step router~~ **In the stack (D-110), batched or not at all (D-113).** ~~Its routing rule~~ **rule C (D-112).** ~~Measuring the batched prompt~~ **Measured: no detection lost, about $114 at full scale (D-113).** Still open: building it, its reported score, and whether the supervisor funds it at about $643 for the base plan | before evaluation starts |
 | — | The repo's templates no longer reproduce 17 of the 60 frozen items byte-identically (D-102); `milestones.build_all` raises on the pilot manifest; `pinned_templates.py` works around it for the pilot | any re-derivation of milestones from templates |
 | — | ~~Which families the next roster will evaluate~~ **Decided 2026-09-27 (D-110): the pricing document's eleven** | — |
+| D-114 | A private backup of `full_run_28092026/pool/` and `SEED.secret`; the tag on the commit inference runs at | inference starts |
 | — | The budget: the plan comes to about $606 against the ~$500 round with a batched router (D-110) | generation starts |
 | — | ~~Expert annotation of the frozen 300 (stage 3)~~ **Done: 15 experts, every trace labelled three times, with verification and adjudication rounds (RESULTS_X1)** | — |
 | D-003 | Do the raw `inference_results/` generations still exist? | promising any corrected results table |

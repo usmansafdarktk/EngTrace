@@ -466,11 +466,12 @@ changes the plan, and thirteen items the reviewers raised are not yet covered.
    That paragraph is the single most useful sentence for this cycle. Add both cycles'
    reviews and meta-reviews to `docs/` before the plan is final.
 3. **The frozen pool would publish the test items.** `generate_testset.py` writes the
-   question text into every record (line 106), and section 2 item 5 says to commit the
-   manifest. On a public repository that puts the exact 2,250 evaluation items online
-   before any model is run. Commit per-item SHA-256, seed and template commit; keep the
-   text private until the results exist, and say so in the paper as part of the
-   contamination argument.
+   question and gold text into every record, so a committed pool is the exact test set online.
+   Hashes alone do not prevent that: the templates and the default master seed are public, so a
+   committed per-item seed publishes the item as well. *Corrected 2026-09-28:* this item first
+   said to commit the per-item seed, which would have published every item. Done under D-114:
+   the pool is drawn from a private 128-bit seed, and only per-item SHA-256 and a commitment to
+   the seed are committed (`full_run_28092026/`).
 4. **The budget arithmetic omits what is spent.** Section 7 sets $497 (inference $417.82
    plus E5 $79) against a $500 round, but $47 is already spent. The base plan alone is
    $544. Every option in section 7 needs about $50 more trimming, or an increase.

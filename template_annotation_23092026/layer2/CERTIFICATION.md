@@ -1,6 +1,6 @@
 # Layer 2 - certification status of every template
 
-Generated 2026-09-26T13:55:42+00:00 by `certification.py` at git `9c5dc45ef3` over 150 templates. A template is certified when the latest round that reviewed it is a unanimous approval by its three own-branch experts and the current code still produces, byte for byte, the five instances they were shown.
+Generated 2026-09-27T19:38:27+00:00 by `certification.py` at git `1acc7cfa2e` over 150 templates. A template is certified when the latest round that reviewed it is a unanimous approval by its three own-branch experts and the current code still produces, byte for byte, the five instances they were shown.
 
 | Round | Labels | Built at | Templates reviewed | Verdicts |
 |---:|---|---|---:|---:|

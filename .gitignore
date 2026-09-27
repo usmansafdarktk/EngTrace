@@ -62,3 +62,9 @@ evaluator_pilot_17092026/experts_filled_labels/
 
 # Mining output, rebuilt by hard_case_pool.py.
 evaluator_pilot_17092026/analysis/out/
+
+# The full run's item pool and its master seed stay local until publication (D-114):
+# the templates are public, so the seed or the text would publish the items.
+# Committed instead: full_run_28092026/manifest.jsonl (hashes only) and FREEZE.json.
+full_run_28092026/pool/
+full_run_28092026/SEED.secret

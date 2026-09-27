@@ -1,0 +1,345 @@
+{
+  "run": "full_run_28092026",
+  "frozen_at_utc": "2026-09-27T19:38:05+00:00",
+  "commit": "1acc7cfa2ee0cfdd5eb970a98569ed9866834f8e",
+  "template_inputs_dirty": false,
+  "script_sha256": {
+    "generate_testset.py": "6cdbb993f2a289637c839779f4dd47b55be8b0767208098d4b63ad9c397fdcb3",
+    "full_run_28092026/freeze.py": "17b18f559cb1ceb59ffd68ec68b8fcd2a4a3795eb1ada15932d16844f92117f7"
+  },
+  "seed": {
+    "bits": 128,
+    "commitment_sha256": "cd53376fb0fe90ac807ff369a845a5a45e47c1bc48aa4fd470b709a191ddd64e",
+    "held_in": "full_run_28092026/SEED.secret, not committed; revealed at publication"
+  },
+  "instances_per_template": 15,
+  "templates": 150,
+  "items": 2250,
+  "distinct_questions": 2235,
+  "by_branch": {
+    "chemical_engineering": 450,
+    "civil_engineering": 450,
+    "electrical_engineering": 450,
+    "industrial_engineering": 450,
+    "mechanical_engineering": 450
+  },
+  "by_level": {
+    "Advanced": 510,
+    "Easy": 870,
+    "Intermediate": 870
+  },
+  "by_answer_type": {
+    "array": 105,
+    "classification": 75,
+    "multipart": 480,
+    "scalar": 1335,
+    "symbolic": 135,
+    "vector": 120
+  },
+  "short_templates": [
+    {
+      "template_id": "template_adiabatic_flame_temperature",
+      "distinct": 11,
+      "repeats": 4,
+      "indices_tried": 75
+    },
+    {
+      "template_id": "template_heat_of_reaction_formation",
+      "distinct": 4,
+      "repeats": 11,
+      "indices_tried": 75
+    }
+  ],
+  "replacements": {
+    "count": 56,
+    "by_reason": {
+      "display tie": 5,
+      "duplicate question": 51
+    },
+    "items": [
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 14,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 15,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 16,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 17,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 18,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 19,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 20,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 21,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 22,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 23,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 24,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 25,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 26,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 27,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 28,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 29,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 30,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 31,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 32,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 33,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_critical_depth_froude_classification",
+        "instance_index": 6,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 8,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 9,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 14,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 16,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 11,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_decimation_aliasing_analysis",
+        "instance_index": 7,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 5,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 9,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 10,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 12,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 17,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 18,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 19,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 20,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 7,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 8,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 13,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 15,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 16,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 19,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 20,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 21,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_poisson_event_count",
+        "instance_index": 4,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mm1k_finite_capacity",
+        "instance_index": 12,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 6,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 8,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 13,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 14,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 16,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_server_configuration_selection",
+        "instance_index": 2,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_server_configuration_selection",
+        "instance_index": 3,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_server_configuration_selection",
+        "instance_index": 8,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_server_configuration_selection",
+        "instance_index": 11,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "instance_index": 2,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "instance_index": 14,
+        "reason": "duplicate question"
+      }
+    ]
+  },
+  "manifest_sha256": "f0ffa108e79312e6ce8fea9a7fbab64957463c14bd7f3c7494460c9389032fab",
+  "pool_sha256": "17c2ca034ac3ffb1e90f675f34cdc2ee0205f89d392336a8b7f8af953d2ef7ca",
+  "selection_rule": "For each template, take instance indices 0, 1, 2, ... and keep the first\n15 that are acceptable. An instance is replaced by the next index, and the replacement is\nlogged in FREEZE.json, when\n  - its question repeats one already kept for the template (a duplicate double-weights it);\n  - its question is one of the pilot slice's questions, which are public with their gold\n    and on whose traces the answer check was tuned;\n  - its gold solution carries an exact display tie on a line T1 can parse, the test of\n    template_annotation_23092026/layer0/tie_census.py: such an instance has no gold value\n    a decimal and a binary reader agree on (D-016). A tie on a line T1 cannot parse is\n    not seen;\n  - the template fails to generate it.\nEvery template has 15 instances, the owner's rule (D-114). A template whose question space\nis exhausted, 75 indices yielding fewer than 15 distinct acceptable questions, keeps each\ndistinct question once and fills its 15 with repeats in index order. A repeat carries\nrepeat_of, the item_id of the first instance with its question, in the pool and in the\nmanifest, and FREEZE.json lists the template under short_templates, so the number of\ndistinct questions is never overstated."
+}
