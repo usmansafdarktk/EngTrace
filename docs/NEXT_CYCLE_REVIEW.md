@@ -421,3 +421,187 @@ analysis plan, the anonymised truth file.
 - **Power.** 150 templates support model-level claims; they do not support fine evaluator
   rankings, and the pilot's 15 could not either. Report the detectable difference and let
   every null result say "no difference this large".
+
+---
+
+## 9. Second pass, 2026-09-27: what checks out, what does not, what is missing, and the 15-day plan
+
+A second session re-read sections 1 to 8 against the files they cite: RESULTS_X1, RESULTS_E1,
+RESULTS_E5, FINDINGS, JUDGE_SELECTION, `layer2/RESULTS.md`, `layer2/CERTIFICATION.md`,
+`layer2/markdown_scan.md`, `layer0/tie_census.md`, DECISIONS D-101 to D-109 and the pricing
+document. Every number quoted above matches its source. Four things do not hold, one date
+changes the plan, and thirteen items the reviewers raised are not yet covered.
+
+### 9.1 Corrections
+
+1. **The authoring record is not on master.** Section 4.3 cites
+   `docs/pilot_template_authoring_spec.md` at commit 63bb6ac. The file does not exist on
+   master, DECISIONS.md has no entry describing how the 60 civil and industrial templates
+   were written, and `pilot_new_branches/` (on disk, gitignored) holds draft templates and a
+   reference manifest only. The paper will describe an authoring pipeline that no committed
+   document records. Commit the spec, or a dated summary of the process, before submission.
+   The reviewer who raised authorship (gFWV 5) was told "fully authored by domain experts"
+   in May; a public repository that cannot show how 60 of 150 templates were written is the
+   wrong place to be caught.
+2. **No July meta-review is in the repository.** `docs/` holds the author responses for
+   both cycles and the May revision letter. The January AC's three suggested revisions are
+   known only through that letter, and the July AC's decision reason is recorded nowhere.
+   That paragraph is the single most useful sentence for this cycle. Add both cycles'
+   reviews and meta-reviews to `docs/` before the plan is final.
+3. **The frozen pool would publish the test items.** `generate_testset.py` writes the
+   question text into every record (line 106), and section 2 item 5 says to commit the
+   manifest. On a public repository that puts the exact 2,250 evaluation items online
+   before any model is run. Commit per-item SHA-256, seed and template commit; keep the
+   text private until the results exist, and say so in the paper as part of the
+   contamination argument.
+4. **The budget arithmetic omits what is spent.** Section 7 sets $497 (inference $417.82
+   plus E5 $79) against a $500 round, but $47 is already spent. The base plan alone is
+   $544. Every option in section 7 needs about $50 more trimming, or an increase.
+
+### 9.2 The date
+
+The ARR October 2026 cycle closes on 12 October, anywhere on Earth. That is 15 days from
+this note. Sections 2 to 7 describe more than 15 days of work; section 9.4 says what fits.
+
+### 9.3 Reviewer asks that sections 1 to 8 do not cover
+
+1. **Pre-registration and multiple comparisons** (yAYU 2, 9W1B 4). Twelve models and
+   pairwise claims invite the question "which tests were planned". The analysis-plan
+   D-entry (section 2 item 9) should list the comparisons, the tests and the correction
+   policy, and the paper should say the plan was fixed before generation.
+2. **A power statement for the cliff.** With 34 advanced templates, compute before the run,
+   from the pilot's per-template variance (`cluster_bootstrap.py`), the smallest
+   Easy-to-Advanced gap the design can detect, and report it beside the intervals. In July
+   the gap reached significance for one model in four with 22 templates.
+3. **Error position and accumulation.** cqGs 3 asked for causes: long context, error
+   accumulation, data sparsity. The stack gives three $0 analyses: the index of the first
+   flagged step as a fraction of trace length, per model and tier; failure probability
+   against gold depth (number of milestones) across 150 templates; and milestone coverage
+   on wrong-answer traces, which says how far a model gets before it fails. The third is the
+   result that justifies process scores at all, given X1 Finding 1 (the answer decides the
+   sound/unsound verdict, AUROC 0.974): process supervision earns its place on the traces
+   the answer check scores zero.
+4. **Evaluator validity on the deployed roster.** X1 validated the stack on four frontier
+   models and Llama; the roster is small and cheap models. Report per model the judged
+   fraction, the unparseable-answer rate and the unjudged-milestone rate, and if expert
+   time allows, a 100-trace spot-check of the weakest two models against the stack (one
+   hour per expert). R-F1 showed the trace structure holds on Gemma-4-31B and Qwen3.8-27B;
+   accuracy against experts on such models was never measured.
+5. **Judge failure policy at scale.** MiMo returned nothing on 17 of 240 calls in the
+   planted probe (RESULTS_X1 Finding 8). Over roughly 30,000 residual milestones that is
+   thousands of retries. Define the retry count, the fallback (an unjudged milestone counts
+   as MISSING under E5-strict) and report the unjudged rate per model.
+6. **Contamination.** The templates have been public since January. A model trained since
+   could have seen the wording and the gold trace structure, if not the values. The
+   paraphrase test (section 6) is also the direct test of wording memorisation, and the
+   paper should say so; the private-pool rule in 9.1 item 3 is the other half.
+7. **Anonymity.** ARR requires anonymised artifacts. The GitHub repository carries author
+   names, the DECISIONS log and the pilot record. The submission must link an anonymised
+   snapshot (anonymous.4open.science or the ARR zip), never the repository, and the PDF's
+   code icon must point there. 9W1B listed the software as unavailable last time.
+8. **The math pre-training claim** (yAYU 5, 9W1B 5) is in the abstract and contribution 3,
+   and the pricing roster has no math-specialised model. Either run Qwen2.5-Math-7B and
+   Qwen2.5-7B on HiPerGator at $0, with branch-level FAC, or delete the claim. A claim
+   carried without the models is worse than no claim.
+9. **No flagship model on the roster.** The pricing document's closed group is GPT-5.4
+   nano and mini, Gemini 3.1 Flash-Lite and Claude Sonnet 5. The May paper evaluated 27
+   models including every flagship; a reviewer will ask where GPT-5, Opus and Gemini Pro
+   went. A stratified 450-item subsample (three instances per template, all 150 templates)
+   for three flagships costs about $40 to $55 at the pilot's measured per-trace rates
+   (GPT-5 $0.049, Opus 4.7 $0.025, Gemini 3.1 Pro at least $0.013 with thinking unbilled in
+   the estimate). The supervisor said no frontier tier; ask with the number, because
+   "anchored on a subsample" is a defensible sentence and "no frontier model" is a
+   weakness line.
+10. **Difficulty tiers for the 60 new templates** come from the 2026-09-05 audit inventory
+    (`difficulty_map` in `generate_testset.py`). Section 3.4 of the paper names three axes;
+    say who assigned the tiers and how, and whether the experts saw the tier during
+    certification.
+11. **RAG has a cheaper cousin.** An open-book condition that supplies the template's
+    governing equations in the prompt is what perfect retrieval would deliver, needs no
+    corpus and no retriever, and bounds what RAG could add. It ranks below the tool
+    condition because the tool condition tests the paper's own claim, but it is the honest
+    answer to cqGs 4 if the tool condition is cut.
+12. **The paraphrase model is a roster decision.** It must come from a family on neither
+    the roster nor the judge. GLM-5.3 and Kimi K3 are on the pricing roster, so neither can
+    paraphrase; Nemotron or Seed can, since paraphrasing is easier than judging and their
+    parse failures as judges do not apply.
+13. **The decoupling narrative may not survive.** The abstract's "trade-off between numeric
+    precision and trace fidelity" came from E0's Reasoning F1. E5 puts the four frontier
+    models at 0.92 to 0.96 milestone coverage. Do not carry the sentence over; put the
+    hypothesis in the analysis plan and let the run decide.
+
+### 9.4 What fits in 15 days
+
+The critical path to inference is the roster decision, then the freeze, then the gold
+validation, then the harness dry run. Nothing else on the list blocks the run, and round 4
+does not either: a plain-text re-confirmation changes no template, so it can run while
+inference runs (if an expert then finds a defect, that template's certification is voided
+and the paper reports it). D-094's residuals should be closed by documentation, not by an
+edit: the 50% redraw in `work_isothermal_virial` is the range the expert accepted after
+the docstring argument (D-107), and an edit now voids two certifications and costs a round.
+
+**Days 1 to 4, in this order, all free.** Get the July reviews and meta-review into `docs/`.
+Decide the roster and the paraphrase model together, against the budget below. Commit the
+analysis plan as a D-entry, with the power statement. Regenerate the pool at HEAD, census
+ties and duplicates, freeze with hashes only, tag. Run the answer check, E3 and E4 on gold
+for all 2,250 items and audit milestone counts per template. Port `run_traces.py` to the
+pool and the roster with the retry policy from 9.3 item 5; dry-run; estimate; ask.
+Re-screen the 25 edited templates (cents). Start writing sections 3.3 and 4, related work,
+limitations and appendices K, L, M, O and P now: none of that text depends on the run.
+
+**Days 4 to 8.** Inference, then E3, E4, E5. Generate and verify the paraphrased 450-item
+subsample on day 4; send the 150-item expert spot-check and the plain-text round 4 out
+together, so each expert is approached once. Decoding repeat on one cheap model.
+
+**Days 8 to 12.** The analyses of section 3 and 9.3, the paraphrase delta, the error
+attribution, the small human error sample if experts return in time. Figures.
+
+**Days 12 to 15.** Proofread, the anonymised archive, the ARR responsible checklist, submit.
+
+**Cut first if it does not fit, and say so in Limitations:** the tool condition (two days
+of harness work and about $65), then the human error sample (the automated attribution
+covers the population), then LOJO (a historical analysis of E0, discharged in one sentence
+by the E1 result and the structural fact that the residual judge shares no family with the
+roster).
+
+### 9.5 Budget with the pilot spend counted
+
+| Item | Cost | Basis |
+|---|---|---|
+| spent | $47 | section 7 |
+| inference, 11 models (pricing roster without Kimi K3) | $288 | $417.82 minus $130.18 |
+| E5 on the main run | $70 | D-105 rates, with 2,250 fewer small-model traces |
+| paraphrase generation and verification, 450 items | $1 | 450 short calls |
+| paraphrased 450-item subsample, 11 models | $58 | $288 x 450 / 2,250 |
+| E5 on the paraphrase traces | $14 | 4,950 traces at D-105 rates |
+| decoding repeat, 300 items x 3, one cheap model | $2 | Gemma-4 at $3.59 per 2,250 |
+| re-screen 25 templates; MiMo conceptual probe (D-105) | $4 | D-105 |
+| **subtotal without the tool condition** | **$484** | |
+| tool condition, 3 models x 450 items | $65 | Sonnet 5 $24 + GPT-5.4 mini $11 + Gemma-4 $1, x 1.75 for tool turns |
+| flagship anchor, 3 models x 450 items | $40 to $55 | 9.3 item 9 |
+
+Without Kimi, the plan with the paraphrase test fits in $500. The tool condition or the
+flagship anchor needs about $55 more, or GLM-5.3's $53 dropped from the full run. Kimi K3
+is the right cut: it is the most expensive open model and carries the heaviest documented
+Claude exposure (JUDGE_SELECTION), and its "strongest open model" role can be filled on
+the 450-item subsample for $26 if the supervisor wants it.
+
+### 9.6 The four questions, answered short
+
+- **Before inference:** the ordered list in 9.4 days 1 to 4, plus 9.1 items 1 to 3. The
+  largest risk reducer is the gold validation of the stack on all 150 templates, because
+  the 60 new templates have never been read by any evaluator.
+- **Results and their presentation:** section 3, plus 9.3 items 1 to 5. The reviewers'
+  literal asks were a per-template SD column, template-level intervals, paired tests,
+  threshold grids, branch-level scores for the math models, inter-judge agreement and the
+  validation in the main text; all are in section 3, and the ones that need expert time
+  are the two spot-checks.
+- **Paper additions, and RAG:** sections 4 and 5 stand. No RAG; the tool condition if it
+  fits, the open-book condition as the fallback answer to cqGs 4; the related-work
+  paragraph on PRMs and judge validity; the honest account of authorship, the taxonomy
+  procedure, the certification rejections and why the numbers moved.
+- **Linguistic diversity:** section 6 stands, on the 450-item subsample for the whole
+  roster rather than the full pool for three models, framed as both the exploitation test
+  and the contamination test. Add one corpus statistic (distinct question wordings per
+  template and across the pool) so the limitation has a number, and keep the sentence in
+  Limitations that says what the test did and did not show.
