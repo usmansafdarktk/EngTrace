@@ -21,8 +21,8 @@ from reportlab.lib.styles import ParagraphStyle
 from reportlab.lib.units import mm
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.platypus import (BaseDocTemplate, Frame, HRFlowable, PageTemplate,
-                                Paragraph, Spacer, Table, TableStyle)
+from reportlab.platypus import (BaseDocTemplate, Frame, HRFlowable, Image, KeepTogether,
+                                PageTemplate, Paragraph, Spacer, Table, TableStyle)
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, 'PILOT_SUMMARY.md')
@@ -55,9 +55,9 @@ def styles():
         'title': ParagraphStyle('title', fontName='Calibri-Bold', fontSize=21, leading=25,
                                 textColor=INK, spaceAfter=10),
         'h2': ParagraphStyle('h2', fontName='Calibri-Bold', fontSize=13.5, leading=17,
-                             textColor=ACCENT, spaceBefore=15, spaceAfter=6),
+                             textColor=ACCENT, spaceBefore=15, spaceAfter=6, keepWithNext=1),
         'h3': ParagraphStyle('h3', fontName='Calibri-Bold', fontSize=11.5, leading=15,
-                             textColor=ACCENT, spaceBefore=12, spaceAfter=4),
+                             textColor=ACCENT, spaceBefore=12, spaceAfter=4, keepWithNext=1),
         'body': ParagraphStyle('body', fontSize=10, spaceAfter=7, **base),
         'bullet': ParagraphStyle('bullet', fontSize=10, leftIndent=12, bulletIndent=3,
                                  spaceAfter=4, **base),
@@ -84,11 +84,26 @@ def split_row(line):
 
 
 def widths(rows, total):
-    """Share the page by how much text each column actually carries."""
+    """Share the page by how much text each column carries, but never below the width its
+    longest single word needs: a numeric column headed `n` is narrow by weight and still
+    has to fit "60" without breaking it across two lines."""
     n = max(len(r) for r in rows)
-    weight = [max(len(r[i]) if i < len(r) else 0 for r in rows) ** 0.7 for i in range(n)]
-    scale = total / sum(weight)
-    return [w * scale for w in weight]
+    weight, floor = [], []
+    for i in range(n):
+        cells = [r[i] if i < len(r) else '' for r in rows]
+        weight.append(max(len(c) for c in cells) ** 0.7)
+        longest = max((max((len(w) for w in c.split()), default=0) for c in cells), default=1)
+        # the widest word, plus the cell's own left and right padding
+        widest = max((pdfmetrics.stringWidth(w, 'Calibri-Bold', 8.7)
+                      for c in cells for w in c.split()), default=8)
+        floor.append(min(widest + 14, total * 0.3))
+    out = [w * total / sum(weight) for w in weight]
+    for i, f in enumerate(floor):                  # raise the narrow ones to their floor
+        out[i] = max(out[i], f)
+    over = sum(out) - total
+    if over > 0:                                   # take it back from the widest column
+        out[out.index(max(out))] -= over
+    return out
 
 
 def build(md, st, avail):
@@ -108,6 +123,18 @@ def build(md, st, avail):
             flow.append(Spacer(1, 3))
             flow.append(HRFlowable(width='100%', thickness=0.6, color=RULE,
                                    spaceBefore=1, spaceAfter=7))
+        elif ln.startswith('!['):
+            # a figure: scaled to the text column, kept on one page with what follows
+            src = re.match(r'!\[[^\]]*\]\(([^)]+)\)', ln)
+            path = os.path.join(HERE, src.group(1).replace('/', os.sep))
+            if not os.path.exists(path):
+                raise SystemExit('figure not found: %s' % path)
+            from reportlab.lib.utils import ImageReader
+            iw, ih = ImageReader(path).getSize()
+            w = min(avail, iw * 0.5)
+            flow.append(Spacer(1, 4))
+            flow.append(Image(path, width=w, height=w * ih / iw))
+            flow.append(Spacer(1, 9))
         elif ln.startswith('|'):
             block = []
             while i < len(lines) and lines[i].strip().startswith('|'):
@@ -130,16 +157,17 @@ def build(md, st, avail):
             flow.append(t)
             flow.append(Spacer(1, 8))
             continue
-        elif ln.startswith('- ') or re.match(r'^\d+\. ', ln):
+        elif ln.startswith(('- ', '* ')) or re.match(r'^\d+\. ', ln):
             body = [ln]
             i += 1
-            while i < len(lines) and lines[i].startswith('  ') and lines[i].strip():
+            while (i < len(lines) and lines[i].startswith('  ') and lines[i].strip()
+                   and not lines[i].strip().startswith(('- ', '* '))):
                 body.append(lines[i].strip())
                 i += 1
             text = ' '.join(body)
             mark = re.match(r'^(\d+)\. ', text)
             bullet = mark.group(1) + '.' if mark else '\u2022'
-            text = re.sub(r'^(- |\d+\. )', '', text)
+            text = re.sub(r'^([-*] |\d+\. )', '', text)
             flow.append(Paragraph(inline(text), st['bullet'], bulletText=bullet))
             continue
         elif ln.startswith('*') and not ln.startswith('**') and ln.endswith('*'):
@@ -155,8 +183,9 @@ def build(md, st, avail):
         else:
             para = [ln]
             i += 1
-            while i < len(lines) and lines[i].strip() and not lines[i].startswith(('|', '#', '- ')) \
-                    and lines[i].strip() != '---':
+            while (i < len(lines) and lines[i].strip() != '---' and lines[i].strip()
+                   and not lines[i].startswith(('|', '#', '- ', '* ', '!['))
+                   and not re.match(r'^\d+\. ', lines[i])):
                 para.append(lines[i].strip())
                 i += 1
             flow.append(Paragraph(inline(' '.join(para)), st['body']))
