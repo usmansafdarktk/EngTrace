@@ -30,17 +30,22 @@ python -m full_run_28092026.freeze --check-files  # pool/ against the manifest; 
 python -m full_run_28092026.freeze                # rebuild. Only if a template changes, which voids the freeze
 ```
 
-## The pool as frozen, 2026-09-28
+## The pool as frozen, 2026-09-28 (D-116)
+
+Re-frozen after the two widened chemical templates (D-115) and with the coverage selection
+(D-116), from the same seed. The first freeze (D-114) took each template's first 15 acceptable
+draws; this one takes 15 round-robin across the reasoning paths and answer forms of the first 100.
 
 | | |
 |---|---|
 | items | 2,250: 870 Easy, 870 Intermediate, 510 Advanced; 450 per branch |
-| distinct questions | 2,235 |
-| short templates | `adiabatic_flame_temperature`: 11 distinct questions + 4 repeats; `heat_of_reaction_formation`: 4 distinct + 11 repeats; 75 indices searched in each |
-| replaced indices | 56: 51 repeated questions, 5 display ties (4 in `server_configuration_selection`, 1 in `critical_depth_froude_classification`); none for matching a pilot question |
-| checks at the freeze, commit `1acc7cf` | Layer 0 gate 150 of 150; certification 150 of 150, current output identical to what the experts reviewed; `--verify` byte-identical in a separate process |
-| manifest SHA-256 | `f0ffa108e79312e6ce8fea9a7fbab64957463c14bd7f3c7494460c9389032fab` |
-| seed commitment | `cd53376fb0fe90ac807ff369a845a5a45e47c1bc48aa4fd470b709a191ddd64e` |
+| distinct questions | 2,250; no template needs a repeat |
+| templates with more than one path-and-answer group in their first 100 draws | 101 |
+| indices not taken as candidates | 585: 549 repeated questions, 35 display ties, 1 pilot question |
+| items changed from the D-114 freeze | 332, in 93 templates: 29 in the two widened templates, 303 from the coverage rule |
+| checks at the freeze, commit `03b1dd7` | Layer 0 gate 150 of 150; certification 148 of 150, the two widened templates awaiting round 4; `--verify` byte-identical in a separate process |
+| manifest SHA-256 | `028c7a637eb4895ed061bcbf79a69c656c57f4adc327a4c81cc4faf6d898e2b3` |
+| seed commitment | `cd53376fb0fe90ac807ff369a845a5a45e47c1bc48aa4fd470b709a191ddd64e`, unchanged |
 
 Every figure here is printed by `freeze.py` and recorded in `FREEZE.json`.
 

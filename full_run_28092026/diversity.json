@@ -204,10 +204,10 @@
    "paths_lower": 3,
    "answer_variants": 4,
    "answer_spread": [
-    6,
-    5,
-    3,
-    1
+    4,
+    4,
+    4,
+    3
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
@@ -239,9 +239,9 @@
    "paths_lower": 2,
    "answer_variants": 4,
    "answer_spread": [
-    5,
     4,
-    3,
+    4,
+    4,
     3
    ],
    "answer_labels": null,
@@ -302,12 +302,14 @@
    "items": 15,
    "distinct_questions": 15,
    "question_skeletons": 4,
-   "paths_upper": 6,
-   "paths_lower": 6,
-   "answer_variants": 6,
+   "paths_upper": 8,
+   "paths_lower": 8,
+   "answer_variants": 8,
    "answer_spread": [
-    4,
-    4,
+    2,
+    2,
+    2,
+    2,
     2,
     2,
     2,
@@ -317,7 +319,7 @@
    "near_duplicate_pairs": {
     "1%": 0,
     "5%": 0,
-    "10%": 0
+    "10%": 1
    },
    "near_duplicates_5pct": []
   },
@@ -337,10 +339,10 @@
   "answer_type": "scalar",
   "pool": {
    "items": 15,
-   "distinct_questions": 11,
+   "distinct_questions": 15,
    "question_skeletons": 11,
-   "paths_upper": 1,
-   "paths_lower": 1,
+   "paths_upper": 2,
+   "paths_lower": 2,
    "answer_variants": 1,
    "answer_spread": [
     15
@@ -355,10 +357,10 @@
   },
   "reach": {
    "draws": 500,
-   "distinct_questions": 11,
-   "question_skeletons": 11,
-   "paths_upper": 1,
-   "paths_lower": 1,
+   "distinct_questions": 404,
+   "question_skeletons": 15,
+   "paths_upper": 2,
+   "paths_lower": 2,
    "answer_variants": 1
   }
  },
@@ -369,10 +371,10 @@
   "answer_type": "scalar",
   "pool": {
    "items": 15,
-   "distinct_questions": 4,
-   "question_skeletons": 4,
-   "paths_upper": 4,
-   "paths_lower": 4,
+   "distinct_questions": 15,
+   "question_skeletons": 15,
+   "paths_upper": 15,
+   "paths_lower": 15,
    "answer_variants": 1,
    "answer_spread": [
     15
@@ -387,10 +389,10 @@
   },
   "reach": {
    "draws": 500,
-   "distinct_questions": 4,
-   "question_skeletons": 4,
-   "paths_upper": 4,
-   "paths_lower": 4,
+   "distinct_questions": 25,
+   "question_skeletons": 23,
+   "paths_upper": 21,
+   "paths_lower": 20,
    "answer_variants": 1
   }
  },
@@ -402,13 +404,13 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 10,
+   "question_skeletons": 8,
    "paths_upper": 1,
    "paths_lower": 1,
    "answer_variants": 2,
    "answer_spread": [
-    13,
-    2
+    9,
+    6
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
@@ -435,9 +437,9 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 13,
-   "paths_upper": 1,
-   "paths_lower": 1,
+   "question_skeletons": 9,
+   "paths_upper": 2,
+   "paths_lower": 2,
    "answer_variants": 1,
    "answer_spread": [
     15
@@ -468,8 +470,8 @@
    "items": 15,
    "distinct_questions": 15,
    "question_skeletons": 9,
-   "paths_upper": 3,
-   "paths_lower": 3,
+   "paths_upper": 5,
+   "paths_lower": 5,
    "answer_variants": 1,
    "answer_spread": [
     15
@@ -531,12 +533,13 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 12,
+   "question_skeletons": 10,
    "paths_upper": 2,
    "paths_lower": 2,
-   "answer_variants": 1,
+   "answer_variants": 2,
    "answer_spread": [
-    15
+    10,
+    5
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
@@ -563,19 +566,19 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 12,
+   "question_skeletons": 10,
    "paths_upper": 1,
    "paths_lower": 1,
    "answer_variants": 2,
    "answer_spread": [
-    14,
-    1
+    8,
+    7
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
     "1%": 0,
     "5%": 0,
-    "10%": 0
+    "10%": 1
    },
    "near_duplicates_5pct": []
   },
@@ -633,8 +636,8 @@
    "paths_lower": 1,
    "answer_variants": 2,
    "answer_spread": [
-    10,
-    5
+    8,
+    7
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
@@ -702,7 +705,7 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 13,
+   "question_skeletons": 12,
    "paths_upper": 2,
    "paths_lower": 2,
    "answer_variants": 1,
@@ -766,14 +769,21 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 6,
+   "question_skeletons": 14,
    "paths_upper": 1,
    "paths_lower": 1,
-   "answer_variants": 3,
+   "answer_variants": 10,
    "answer_spread": [
-    10,
-    3,
-    2
+    2,
+    2,
+    2,
+    2,
+    2,
+    1,
+    1,
+    1,
+    1,
+    1
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
@@ -805,11 +815,11 @@
    "paths_lower": 1,
    "answer_variants": 5,
    "answer_spread": [
-    7,
     3,
-    2,
-    2,
-    1
+    3,
+    3,
+    3,
+    3
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
@@ -836,13 +846,15 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 13,
+   "question_skeletons": 12,
    "paths_upper": 1,
    "paths_lower": 1,
-   "answer_variants": 10,
+   "answer_variants": 12,
    "answer_spread": [
-    4,
-    3,
+    2,
+    2,
+    2,
+    1,
     1,
     1,
     1,
@@ -855,15 +867,10 @@
    "answer_labels": null,
    "near_duplicate_pairs": {
     "1%": 0,
-    "5%": 1,
-    "10%": 1
+    "5%": 0,
+    "10%": 2
    },
-   "near_duplicates_5pct": [
-    [
-     "gas_viscosity_kinetic_theory#5",
-     "gas_viscosity_kinetic_theory#12"
-    ]
-   ]
+   "near_duplicates_5pct": []
   },
   "reach": {
    "draws": 500,
@@ -885,10 +892,16 @@
    "question_skeletons": 15,
    "paths_upper": 2,
    "paths_lower": 2,
-   "answer_variants": 9,
+   "answer_variants": 15,
    "answer_spread": [
-    5,
-    3,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
     1,
     1,
     1,
@@ -987,16 +1000,18 @@
    "items": 15,
    "distinct_questions": 15,
    "question_skeletons": 15,
-   "paths_upper": 4,
-   "paths_lower": 4,
-   "answer_variants": 2,
+   "paths_upper": 5,
+   "paths_lower": 5,
+   "answer_variants": 3,
    "answer_spread": [
-    12,
-    3
+    8,
+    6,
+    1
    ],
    "answer_labels": {
-    "**Answer:** a) The Reynolds number is approximately **#**. b) The flow regime is **turbule": 12,
-    "**Answer:** a) The Reynolds number is approximately **#**. b) The flow regime is **laminar": 3
+    "**Answer:** a) The Reynolds number is approximately **#**. b) The flow regime is **turbule": 8,
+    "**Answer:** a) The Reynolds number is approximately **#**. b) The flow regime is **laminar": 6,
+    "**Answer:** a) The Reynolds number is approximately **#**. b) The flow regime is **transit": 1
    },
    "near_duplicate_pairs": {
     "1%": 0,
@@ -1631,15 +1646,15 @@
    "paths_lower": 3,
    "answer_variants": 3,
    "answer_spread": [
-    9,
     5,
-    1
+    5,
+    5
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
     "1%": 0,
     "5%": 0,
-    "10%": 0
+    "10%": 1
    },
    "near_duplicates_5pct": []
   },
@@ -1671,7 +1686,7 @@
    "near_duplicate_pairs": {
     "1%": 0,
     "5%": 1,
-    "10%": 2
+    "10%": 1
    },
    "near_duplicates_5pct": [
     [
@@ -1740,7 +1755,7 @@
    "near_duplicate_pairs": {
     "1%": 0,
     "5%": 0,
-    "10%": 0
+    "10%": 1
    },
    "near_duplicates_5pct": []
   },
@@ -1774,7 +1789,7 @@
    "near_duplicate_pairs": {
     "1%": 0,
     "5%": 0,
-    "10%": 1
+    "10%": 0
    },
    "near_duplicates_5pct": []
   },
@@ -1896,9 +1911,9 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 12,
-   "paths_upper": 12,
-   "paths_lower": 8,
+   "question_skeletons": 15,
+   "paths_upper": 15,
+   "paths_lower": 14,
    "answer_variants": 1,
    "answer_spread": [
     15
@@ -1928,9 +1943,9 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 8,
-   "paths_upper": 8,
-   "paths_lower": 8,
+   "question_skeletons": 9,
+   "paths_upper": 9,
+   "paths_lower": 9,
    "answer_variants": 1,
    "answer_spread": [
     15
@@ -1938,10 +1953,19 @@
    "answer_labels": null,
    "near_duplicate_pairs": {
     "1%": 0,
-    "5%": 0,
-    "10%": 1
+    "5%": 2,
+    "10%": 2
    },
-   "near_duplicates_5pct": []
+   "near_duplicates_5pct": [
+    [
+     "scs_curve_number_runoff#5",
+     "scs_curve_number_runoff#32"
+    ],
+    [
+     "scs_curve_number_runoff#10",
+     "scs_curve_number_runoff#18"
+    ]
+   ]
   },
   "reach": {
    "draws": 500,
@@ -2056,9 +2080,9 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 6,
-   "paths_upper": 3,
-   "paths_lower": 3,
+   "question_skeletons": 8,
+   "paths_upper": 6,
+   "paths_lower": 6,
    "answer_variants": 1,
    "answer_spread": [
     15
@@ -2125,14 +2149,14 @@
    "paths_lower": 2,
    "answer_variants": 2,
    "answer_spread": [
-    14,
-    1
+    8,
+    7
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
     "1%": 0,
     "5%": 0,
-    "10%": 1
+    "10%": 5
    },
    "near_duplicates_5pct": []
   },
@@ -2163,14 +2187,10 @@
    "answer_labels": null,
    "near_duplicate_pairs": {
     "1%": 0,
-    "5%": 2,
-    "10%": 2
+    "5%": 1,
+    "10%": 1
    },
    "near_duplicates_5pct": [
-    [
-     "lowpass_equivalent_bandpass#5",
-     "lowpass_equivalent_bandpass#13"
-    ],
     [
      "lowpass_equivalent_bandpass#8",
      "lowpass_equivalent_bandpass#12"
@@ -2195,8 +2215,8 @@
    "items": 15,
    "distinct_questions": 15,
    "question_skeletons": 3,
-   "paths_upper": 8,
-   "paths_lower": 8,
+   "paths_upper": 14,
+   "paths_lower": 14,
    "answer_variants": 1,
    "answer_spread": [
     15
@@ -2231,8 +2251,8 @@
    "paths_lower": 3,
    "answer_variants": 2,
    "answer_spread": [
-    9,
-    6
+    10,
+    5
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
@@ -2323,12 +2343,13 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 2,
-   "paths_upper": 2,
-   "paths_lower": 1,
-   "answer_variants": 1,
+   "question_skeletons": 3,
+   "paths_upper": 3,
+   "paths_lower": 2,
+   "answer_variants": 2,
    "answer_spread": [
-    15
+    14,
+    1
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
@@ -2410,9 +2431,9 @@
    "paths_lower": 5,
    "answer_variants": 3,
    "answer_spread": [
-    8,
-    5,
-    2
+    6,
+    6,
+    3
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
@@ -2471,9 +2492,9 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 14,
-   "paths_upper": 14,
-   "paths_lower": 14,
+   "question_skeletons": 15,
+   "paths_upper": 15,
+   "paths_lower": 15,
    "answer_variants": 1,
    "answer_spread": [
     15
@@ -2568,14 +2589,14 @@
    "items": 15,
    "distinct_questions": 15,
    "question_skeletons": 11,
-   "paths_upper": 11,
-   "paths_lower": 11,
+   "paths_upper": 15,
+   "paths_lower": 15,
    "answer_variants": 4,
    "answer_spread": [
     6,
-    5,
+    4,
     3,
-    1
+    2
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
@@ -2672,8 +2693,8 @@
    "paths_lower": 6,
    "answer_variants": 2,
    "answer_spread": [
-    9,
-    6
+    8,
+    7
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
@@ -2705,8 +2726,8 @@
    "paths_lower": 4,
    "answer_variants": 2,
    "answer_spread": [
-    9,
-    6
+    8,
+    7
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
@@ -2733,26 +2754,21 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 11,
-   "paths_upper": 11,
-   "paths_lower": 4,
+   "question_skeletons": 10,
+   "paths_upper": 10,
+   "paths_lower": 6,
    "answer_variants": 2,
    "answer_spread": [
-    9,
-    6
+    8,
+    7
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
     "1%": 0,
-    "5%": 1,
-    "10%": 1
+    "5%": 0,
+    "10%": 0
    },
-   "near_duplicates_5pct": [
-    [
-     "wave_parameters_basic#4",
-     "wave_parameters_basic#9"
-    ]
-   ]
+   "near_duplicates_5pct": []
   },
   "reach": {
    "draws": 500,
@@ -2840,8 +2856,8 @@
    "paths_lower": 2,
    "answer_variants": 2,
    "answer_spread": [
-    10,
-    5
+    8,
+    7
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
@@ -2869,14 +2885,14 @@
    "items": 15,
    "distinct_questions": 15,
    "question_skeletons": 2,
-   "paths_upper": 7,
-   "paths_lower": 7,
+   "paths_upper": 8,
+   "paths_lower": 8,
    "answer_variants": 6,
    "answer_spread": [
-    7,
+    5,
+    3,
     3,
     2,
-    1,
     1,
     1
    ],
@@ -2905,9 +2921,9 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 13,
-   "paths_upper": 13,
-   "paths_lower": 9,
+   "question_skeletons": 14,
+   "paths_upper": 14,
+   "paths_lower": 12,
    "answer_variants": 1,
    "answer_spread": [
     15
@@ -2937,16 +2953,17 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 13,
-   "paths_upper": 13,
-   "paths_lower": 13,
-   "answer_variants": 9,
+   "question_skeletons": 15,
+   "paths_upper": 15,
+   "paths_lower": 15,
+   "answer_variants": 10,
    "answer_spread": [
     3,
     2,
     2,
     2,
-    2,
+    1,
+    1,
     1,
     1,
     1,
@@ -2977,15 +2994,15 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 9,
-   "paths_upper": 11,
-   "paths_lower": 11,
+   "question_skeletons": 10,
+   "paths_upper": 15,
+   "paths_lower": 15,
    "answer_variants": 4,
    "answer_spread": [
-    6,
+    5,
     4,
     3,
-    2
+    3
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
@@ -3012,14 +3029,15 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 14,
-   "paths_upper": 14,
-   "paths_lower": 14,
-   "answer_variants": 12,
+   "question_skeletons": 15,
+   "paths_upper": 15,
+   "paths_lower": 15,
+   "answer_variants": 13,
    "answer_spread": [
     2,
     2,
-    2,
+    1,
+    1,
     1,
     1,
     1,
@@ -3060,14 +3078,14 @@
    "paths_lower": 7,
    "answer_variants": 3,
    "answer_spread": [
-    7,
     6,
-    2
+    5,
+    4
    ],
    "answer_labels": {
-    "**Answer:** a) Memoryless: **Yes** b) Causal: **Yes**": 7,
     "**Answer:** a) Memoryless: **No** b) Causal: **Yes**": 6,
-    "**Answer:** a) Memoryless: **No** b) Causal: **No**": 2
+    "**Answer:** a) Memoryless: **Yes** b) Causal: **Yes**": 5,
+    "**Answer:** a) Memoryless: **No** b) Causal: **No**": 4
    },
    "near_duplicate_pairs": {
     "1%": 0,
@@ -3098,12 +3116,12 @@
    "paths_lower": 5,
    "answer_variants": 2,
    "answer_spread": [
-    10,
-    5
+    8,
+    7
    ],
    "answer_labels": {
-    "**Answer:** The system satisfies both additivity and homogeneity, therefore, the system is": 10,
-    "**Answer:** The system fails at least one of the tests (additivity or homogeneity), theref": 5
+    "**Answer:** The system fails at least one of the tests (additivity or homogeneity), theref": 8,
+    "**Answer:** The system satisfies both additivity and homogeneity, therefore, the system is": 7
    },
    "near_duplicate_pairs": {
     "1%": 0,
@@ -3194,8 +3212,8 @@
    "items": 15,
    "distinct_questions": 15,
    "question_skeletons": 2,
-   "paths_upper": 4,
-   "paths_lower": 4,
+   "paths_upper": 6,
+   "paths_lower": 6,
    "answer_variants": 1,
    "answer_spread": [
     15
@@ -3258,8 +3276,8 @@
    "items": 15,
    "distinct_questions": 15,
    "question_skeletons": 1,
-   "paths_upper": 9,
-   "paths_lower": 9,
+   "paths_upper": 15,
+   "paths_lower": 15,
    "answer_variants": 1,
    "answer_spread": [
     15
@@ -3449,9 +3467,9 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 11,
-   "paths_upper": 7,
-   "paths_lower": 7,
+   "question_skeletons": 12,
+   "paths_upper": 10,
+   "paths_lower": 10,
    "answer_variants": 1,
    "answer_spread": [
     15
@@ -3481,9 +3499,9 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 11,
-   "paths_upper": 9,
-   "paths_lower": 9,
+   "question_skeletons": 12,
+   "paths_upper": 15,
+   "paths_lower": 15,
    "answer_variants": 1,
    "answer_spread": [
     15
@@ -3524,7 +3542,7 @@
    "near_duplicate_pairs": {
     "1%": 0,
     "5%": 0,
-    "10%": 0
+    "10%": 1
    },
    "near_duplicates_5pct": []
   },
@@ -3546,7 +3564,7 @@
    "items": 15,
    "distinct_questions": 15,
    "question_skeletons": 3,
-   "paths_upper": 5,
+   "paths_upper": 6,
    "paths_lower": 2,
    "answer_variants": 1,
    "answer_spread": [
@@ -3647,8 +3665,8 @@
    "items": 15,
    "distinct_questions": 15,
    "question_skeletons": 6,
-   "paths_upper": 5,
-   "paths_lower": 5,
+   "paths_upper": 6,
+   "paths_lower": 6,
    "answer_variants": 1,
    "answer_spread": [
     15
@@ -3656,15 +3674,10 @@
    "answer_labels": null,
    "near_duplicate_pairs": {
     "1%": 0,
-    "5%": 1,
-    "10%": 3
+    "5%": 0,
+    "10%": 1
    },
-   "near_duplicates_5pct": [
-    [
-     "arl_beta_mean_shift#1",
-     "arl_beta_mean_shift#14"
-    ]
-   ]
+   "near_duplicates_5pct": []
   },
   "reach": {
    "draws": 500,
@@ -3816,8 +3829,8 @@
    "paths_lower": 3,
    "answer_variants": 2,
    "answer_spread": [
-    11,
-    4
+    10,
+    5
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
@@ -3844,14 +3857,14 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 7,
-   "paths_upper": 7,
-   "paths_lower": 7,
+   "question_skeletons": 9,
+   "paths_upper": 9,
+   "paths_lower": 9,
    "answer_variants": 3,
    "answer_spread": [
-    8,
+    6,
     5,
-    2
+    4
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
@@ -3889,7 +3902,7 @@
    "near_duplicate_pairs": {
     "1%": 0,
     "5%": 0,
-    "10%": 0
+    "10%": 1
    },
    "near_duplicates_5pct": []
   },
@@ -3943,8 +3956,8 @@
    "items": 15,
    "distinct_questions": 15,
    "question_skeletons": 1,
-   "paths_upper": 5,
-   "paths_lower": 5,
+   "paths_upper": 6,
+   "paths_lower": 6,
    "answer_variants": 1,
    "answer_spread": [
     15
@@ -4016,7 +4029,7 @@
    "items": 15,
    "distinct_questions": 15,
    "question_skeletons": 4,
-   "paths_upper": 7,
+   "paths_upper": 8,
    "paths_lower": 4,
    "answer_variants": 1,
    "answer_spread": [
@@ -4058,7 +4071,7 @@
    "near_duplicate_pairs": {
     "1%": 1,
     "5%": 1,
-    "10%": 2
+    "10%": 4
    },
    "near_duplicates_5pct": [
     [
@@ -4089,14 +4102,14 @@
    "paths_lower": 3,
    "answer_variants": 2,
    "answer_spread": [
-    11,
-    4
+    10,
+    5
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
-    "1%": 0,
-    "5%": 31,
-    "10%": 37
+    "1%": 1,
+    "5%": 23,
+    "10%": 30
    },
    "near_duplicates_5pct": [
     [
@@ -4112,6 +4125,10 @@
      "system_reliability_topology#13"
     ],
     [
+     "system_reliability_topology#0",
+     "system_reliability_topology#18"
+    ],
+    [
      "system_reliability_topology#1",
      "system_reliability_topology#4"
     ],
@@ -4124,24 +4141,20 @@
      "system_reliability_topology#7"
     ],
     [
-     "system_reliability_topology#1",
-     "system_reliability_topology#9"
-    ],
-    [
-     "system_reliability_topology#1",
-     "system_reliability_topology#10"
-    ],
-    [
-     "system_reliability_topology#1",
-     "system_reliability_topology#14"
-    ],
-    [
      "system_reliability_topology#2",
      "system_reliability_topology#5"
     ],
     [
      "system_reliability_topology#2",
      "system_reliability_topology#11"
+    ],
+    [
+     "system_reliability_topology#2",
+     "system_reliability_topology#16"
+    ],
+    [
+     "system_reliability_topology#2",
+     "system_reliability_topology#17"
     ],
     [
      "system_reliability_topology#3",
@@ -4152,6 +4165,10 @@
      "system_reliability_topology#13"
     ],
     [
+     "system_reliability_topology#3",
+     "system_reliability_topology#18"
+    ],
+    [
      "system_reliability_topology#4",
      "system_reliability_topology#6"
     ],
@@ -4160,20 +4177,12 @@
      "system_reliability_topology#7"
     ],
     [
-     "system_reliability_topology#4",
-     "system_reliability_topology#9"
-    ],
-    [
-     "system_reliability_topology#4",
-     "system_reliability_topology#10"
-    ],
-    [
-     "system_reliability_topology#4",
-     "system_reliability_topology#14"
+     "system_reliability_topology#5",
+     "system_reliability_topology#11"
     ],
     [
      "system_reliability_topology#5",
-     "system_reliability_topology#11"
+     "system_reliability_topology#16"
     ],
     [
      "system_reliability_topology#6",
@@ -4184,44 +4193,16 @@
      "system_reliability_topology#8"
     ],
     [
-     "system_reliability_topology#6",
-     "system_reliability_topology#9"
+     "system_reliability_topology#11",
+     "system_reliability_topology#16"
     ],
     [
-     "system_reliability_topology#6",
-     "system_reliability_topology#10"
+     "system_reliability_topology#12",
+     "system_reliability_topology#18"
     ],
     [
-     "system_reliability_topology#6",
-     "system_reliability_topology#14"
-    ],
-    [
-     "system_reliability_topology#7",
-     "system_reliability_topology#9"
-    ],
-    [
-     "system_reliability_topology#7",
-     "system_reliability_topology#10"
-    ],
-    [
-     "system_reliability_topology#7",
-     "system_reliability_topology#14"
-    ],
-    [
-     "system_reliability_topology#8",
-     "system_reliability_topology#10"
-    ],
-    [
-     "system_reliability_topology#9",
-     "system_reliability_topology#10"
-    ],
-    [
-     "system_reliability_topology#9",
-     "system_reliability_topology#14"
-    ],
-    [
-     "system_reliability_topology#10",
-     "system_reliability_topology#14"
+     "system_reliability_topology#13",
+     "system_reliability_topology#18"
     ]
    ]
   },
@@ -4274,14 +4255,14 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 9,
-   "paths_upper": 11,
-   "paths_lower": 11,
+   "question_skeletons": 11,
+   "paths_upper": 15,
+   "paths_lower": 15,
    "answer_variants": 5,
    "answer_spread": [
+    5,
     4,
-    4,
-    4,
+    3,
     2,
     1
    ],
@@ -4374,13 +4355,14 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 4,
-   "paths_upper": 4,
-   "paths_lower": 4,
-   "answer_variants": 2,
+   "question_skeletons": 6,
+   "paths_upper": 8,
+   "paths_lower": 8,
+   "answer_variants": 3,
    "answer_spread": [
-    9,
-    6
+    8,
+    4,
+    3
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
@@ -4412,8 +4394,8 @@
    "paths_lower": 1,
    "answer_variants": 2,
    "answer_spread": [
-    9,
-    6
+    8,
+    7
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
@@ -4445,8 +4427,8 @@
    "paths_lower": 1,
    "answer_variants": 2,
    "answer_spread": [
-    11,
-    4
+    8,
+    7
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
@@ -4473,9 +4455,9 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 14,
-   "paths_upper": 13,
-   "paths_lower": 13,
+   "question_skeletons": 15,
+   "paths_upper": 15,
+   "paths_lower": 15,
    "answer_variants": 1,
    "answer_spread": [
     15
@@ -4505,9 +4487,9 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 14,
-   "paths_upper": 14,
-   "paths_lower": 14,
+   "question_skeletons": 15,
+   "paths_upper": 15,
+   "paths_lower": 15,
    "answer_variants": 1,
    "answer_spread": [
     15
@@ -4537,9 +4519,9 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 14,
-   "paths_upper": 14,
-   "paths_lower": 14,
+   "question_skeletons": 15,
+   "paths_upper": 15,
+   "paths_lower": 15,
    "answer_variants": 1,
    "answer_spread": [
     15
@@ -4569,13 +4551,13 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 13,
-   "paths_upper": 13,
-   "paths_lower": 12,
+   "question_skeletons": 15,
+   "paths_upper": 15,
+   "paths_lower": 15,
    "answer_variants": 2,
    "answer_spread": [
-    8,
-    7
+    9,
+    6
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
@@ -4607,8 +4589,8 @@
    "paths_lower": 4,
    "answer_variants": 2,
    "answer_spread": [
-    9,
-    6
+    8,
+    7
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
@@ -4636,12 +4618,12 @@
    "items": 15,
    "distinct_questions": 15,
    "question_skeletons": 15,
-   "paths_upper": 11,
-   "paths_lower": 11,
+   "paths_upper": 15,
+   "paths_lower": 15,
    "answer_variants": 2,
    "answer_spread": [
-    8,
-    7
+    9,
+    6
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
@@ -4668,13 +4650,13 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 14,
-   "paths_upper": 12,
-   "paths_lower": 7,
+   "question_skeletons": 15,
+   "paths_upper": 13,
+   "paths_lower": 11,
    "answer_variants": 2,
    "answer_spread": [
-    9,
-    6
+    8,
+    7
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
@@ -4701,13 +4683,13 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 15,
+   "question_skeletons": 14,
    "paths_upper": 2,
    "paths_lower": 2,
    "answer_variants": 2,
    "answer_spread": [
-    10,
-    5
+    8,
+    7
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
@@ -4734,9 +4716,9 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 10,
-   "paths_upper": 10,
-   "paths_lower": 10,
+   "question_skeletons": 15,
+   "paths_upper": 15,
+   "paths_lower": 15,
    "answer_variants": 1,
    "answer_spread": [
     15
@@ -4766,9 +4748,9 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 13,
-   "paths_upper": 13,
-   "paths_lower": 13,
+   "question_skeletons": 15,
+   "paths_upper": 15,
+   "paths_lower": 15,
    "answer_variants": 1,
    "answer_spread": [
     15
@@ -4867,9 +4849,9 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 8,
-   "paths_upper": 8,
-   "paths_lower": 8,
+   "question_skeletons": 10,
+   "paths_upper": 10,
+   "paths_lower": 10,
    "answer_variants": 1,
    "answer_spread": [
     15
@@ -4936,14 +4918,14 @@
    "paths_lower": 1,
    "answer_variants": 2,
    "answer_spread": [
-    11,
-    4
+    8,
+    7
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {
     "1%": 0,
     "5%": 0,
-    "10%": 0
+    "10%": 1
    },
    "near_duplicates_5pct": []
   },
@@ -5033,14 +5015,14 @@
    "paths_lower": 3,
    "answer_variants": 3,
    "answer_spread": [
-    7,
-    6,
-    2
+    5,
+    5,
+    5
    ],
    "answer_labels": {
-    "**Answer:** The damping ratio is #. The system is **Overdamped**.": 7,
-    "**Answer:** The damping ratio is #. The system is **Critically Damped**.": 6,
-    "**Answer:** The damping ratio is #. The system is **Underdamped**. The damped natural freq": 2
+    "**Answer:** The damping ratio is #. The system is **Underdamped**. The damped natural freq": 5,
+    "**Answer:** The damping ratio is #. The system is **Overdamped**.": 5,
+    "**Answer:** The damping ratio is #. The system is **Critically Damped**.": 5
    },
    "near_duplicate_pairs": {
     "1%": 0,
@@ -5199,11 +5181,11 @@
    "paths_lower": 5,
    "answer_variants": 5,
    "answer_spread": [
-    7,
-    4,
-    2,
-    1,
-    1
+    3,
+    3,
+    3,
+    3,
+    3
    ],
    "answer_labels": null,
    "near_duplicate_pairs": {

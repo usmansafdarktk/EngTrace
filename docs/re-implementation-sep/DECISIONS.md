@@ -4429,6 +4429,38 @@ three chemical experts, no plants, fresh hand-check instances.
 
 **Open.** Round 4's verdicts; the pool is re-frozen with these two templates as they now stand (D-116).
 
+## D-116 — The pool is re-frozen with coverage selection: 15 per template, spread across its reasoning paths and answer forms
+
+**Date:** 2026-09-28 · **Status:** DECIDED (the owner approved "coverage selection, then re-freeze") · **Supersedes in part:** D-114 (the selection rule) · **Evidence:** `full_run_28092026/freeze.py`, `FREEZE.json`, `DIVERSITY.md`
+
+D-114 took each template's first 15 acceptable draws, so a template's rarer branches and labels
+entered the pool only by chance: Reynolds' regime came out 12 turbulent, 3 laminar, 0 transitional.
+The rule now examines the first 100 draws, groups the acceptable ones by reasoning path and answer
+form (the lower reading of `diversity.py`: equation lines and answer segment with numbers and
+question-varying words masked), and takes the 15 round-robin across the groups, lowest index first.
+The exclusions are D-114's (repeated question, pilot question, display tie, generation error). A
+template with one group keeps exactly the instances D-114 froze.
+
+**What it changed.** Re-frozen from the same seed, after the two widened templates (D-115): 2,250
+items and 2,250 distinct questions, no repeats needed; 332 items in 93 templates differ from D-114's
+pool, 29 of them in the two widened templates. Measured by `diversity.py` on the new pool:
+
+- templates with one reasoning path in all 15 instances: 54 to 58, where D-114's pool had 56 to 61
+  and 500 public draws show 54 to 58. The pool now contains a second path for every template that
+  can produce one within 500 draws.
+- classification labels: Reynolds 8 turbulent, 6 laminar, 1 transitional (was 12, 3, 0); damping
+  5, 5, 5 (was 7, 6, 2); linearity 7 linear, 8 not (was 10, 5); memory and causality 6, 5, 4 across
+  its three combinations (was 7, 6, 2).
+- near-duplicate pairs at 5%: 61 (was 71).
+
+**What it costs, and the paper must say.** Rare branches are over-represented relative to how often a
+template produces them, so any per-branch or per-label statistic describes the pool's design, not the
+template's natural mix. `critical_depth_froude_classification` still shows one answer form: its answer
+line states only the Froude number, so the class goes unscored. That is a template defect, left open.
+
+`--verify` in a separate process regenerates all 2,250 byte-identically; the seed commitment is
+unchanged. If round 4 changes either widened template, its 15 items are regenerated and re-frozen.
+
 ## Open decisions
 
 | # | Decision | Needed before |
@@ -4444,6 +4476,7 @@ three chemical experts, no plants, fresh hand-check instances.
 | — | The repo's templates no longer reproduce 17 of the 60 frozen items byte-identically (D-102); `milestones.build_all` raises on the pilot manifest; `pinned_templates.py` works around it for the pilot | any re-derivation of milestones from templates |
 | — | ~~Which families the next roster will evaluate~~ **Decided 2026-09-27 (D-110): the pricing document's eleven** | — |
 | D-115 | Round 4: the three chemical experts review `heat_of_reaction_formation` and `adiabatic_flame_temperature` as widened; `certification.py` with the round-4 labels | the paper states what the experts certified |
+| D-116 | `critical_depth_froude_classification`'s answer line states only the Froude number, so its class goes unscored: fix the answer line (a civil round) or state it | the answer check runs on the pool |
 | D-114 | A private backup of `full_run_28092026/pool/` and `SEED.secret`; the tag on the commit inference runs at | inference starts |
 | — | The budget: the plan comes to about $606 against the ~$500 round with a batched router (D-110) | generation starts |
 | — | ~~Expert annotation of the frozen 300 (stage 3)~~ **Done: 15 experts, every trace labelled three times, with verification and adjudication rounds (RESULTS_X1)** | — |

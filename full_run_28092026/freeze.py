@@ -13,10 +13,9 @@ evaluator_pilot_17092026/freeze.py) and neither text nor seed; and FREEZE.json, 
 the SHA-256 of the seed as a commitment. At publication the seed is revealed, and anyone
 can regenerate the pool and check it against both.
 
-Selection rule. For each template, take instance indices 0, 1, 2, ... and keep the first
-15 that are acceptable. An instance is replaced by the next index, and the replacement is
-logged in FREEZE.json, when
-  - its question repeats one already kept for the template (a duplicate double-weights it);
+Selection rule (D-116). For each template, examine instance indices 0 to 99. An index is
+not a candidate when
+  - its question repeats one already seen for the template (a duplicate double-weights it);
   - its question is one of the pilot slice's questions, which are public with their gold
     and on whose traces the answer check was tuned;
   - its gold solution carries an exact display tie on a line T1 can parse, the test of
@@ -24,12 +23,18 @@ logged in FREEZE.json, when
     a decimal and a binary reader agree on (D-016). A tie on a line T1 cannot parse is
     not seen;
   - the template fails to generate it.
-Every template has 15 instances, the owner's rule (D-114). A template whose question space
-is exhausted, 75 indices yielding fewer than 15 distinct acceptable questions, keeps each
-distinct question once and fills its 15 with repeats in index order. A repeat carries
-repeat_of, the item_id of the first instance with its question, in the pool and in the
-manifest, and FREEZE.json lists the template under short_templates, so the number of
-distinct questions is never overstated.
+The candidates are grouped by reasoning path and answer form, the lower reading of
+full_run_28092026/diversity.py: the gold's equation lines and its answer segment with numbers
+and question-varying words masked. The 15 instances are taken round-robin across the groups in
+order of first appearance, lowest index first within a group, so every reasoning path and
+answer label the first 100 draws show is represented before any is repeated. A template with
+one group keeps its first 15 candidates, exactly the instances D-114 froze. Rare branches are
+therefore over-represented relative to how often a template produces them; FREEZE.json records
+each template's candidates, groups and groups selected.
+Every template has 15 instances, the owner's rule (D-114). A template with fewer than 15
+candidates keeps each distinct question once and fills its 15 with repeats in index order,
+each carrying repeat_of, the item_id of the first instance with its question, and FREEZE.json
+lists it under short_templates, so the number of distinct questions is never overstated.
 """
 from __future__ import annotations
 
@@ -58,7 +63,7 @@ from template_annotation_23092026.layer0.tie_census import dec_eval  # noqa: E40
 getcontext().prec = 60
 
 INSTANCES = 15
-MAX_EXTRA = 60          # indices tried beyond 15 before a template is declared short
+WALK = 100              # indices examined per template; the 15 are chosen among them
 SEED_BITS = 128
 SEED_PATH = HERE / 'SEED.secret'
 POOL_DIR = HERE / 'pool'
@@ -104,45 +109,57 @@ def pilot_questions() -> set[str]:
 
 
 def build(master_seed: int):
-    """-> (pool records, manifest rows, replacements, short templates). Deterministic."""
+    """-> (pool records, manifest rows, walk rejections, short templates, coverage)."""
+    from full_run_28092026.diversity import (answer_segment, mask, paths,  # noqa: E402
+                                             varying_words, word_masker)
     levels, types, pilot = difficulty_map(), answer_types(), pilot_questions()
-    records, rows, replaced, short_templates = [], [], [], []
+    records, rows, rejected, short_templates, coverage = [], [], [], [], []
     for ref in discover(None):
         tid = ref.template_id
         short = tid[len('template_'):]
-        kept, repeats, rejected, first = [], [], [], {}
-        i = 0
-        while len(kept) < INSTANCES and i < INSTANCES + MAX_EXTRA:
+        cands, repeats, first = [], [], {}
+        for i in range(WALK):
             seed = item_seed(master_seed, tid, i)
             inst = generate(ref, seed, capture=False)
+            reason = None
             if not inst.ok:
-                rejected.append((i, 'generation error: ' + str(inst.error)[:100]))
+                reason = 'generation error: ' + str(inst.error)[:100]
             elif inst.question in pilot:
-                rejected.append((i, 'pilot-slice question'))
+                reason = 'pilot-slice question'
             elif has_tie(inst.solution):
-                rejected.append((i, 'display tie'))
+                reason = 'display tie'
             elif inst.question in first:
+                reason = 'duplicate question'
                 repeats.append((i, seed, inst))
             else:
                 first[inst.question] = f'{short}#{i}'
-                kept.append((i, seed, inst))
-            i += 1
-        chosen = list(kept)
-        if len(kept) < INSTANCES:
-            fill = repeats[:INSTANCES - len(kept)]
-            if len(kept) + len(fill) < INSTANCES:
-                raise SystemExit(f'{tid}: {len(kept)} distinct and {len(repeats)} repeats '
-                                 f'in {i} indices, fewer than {INSTANCES}')
+                cands.append((i, seed, inst))
+            if reason:
+                rejected.append({'template_id': tid, 'instance_index': i, 'reason': reason})
+        mw = word_masker(varying_words([c[2].question for c in cands]))
+        key_of, groups = {}, {}
+        for c in cands:
+            key = (paths(c[2].solution, mw)[1], mw(mask(answer_segment(c[2].solution))[0]))
+            key_of[c[0]] = key
+            groups.setdefault(key, []).append(c)
+        queues = [list(g) for g in groups.values()]
+        chosen = []
+        while len(chosen) < INSTANCES and any(queues):
+            for q in queues:
+                if q and len(chosen) < INSTANCES:
+                    chosen.append(q.pop(0))
+        n_distinct = len(chosen)
+        if n_distinct < INSTANCES:
+            fill = repeats[:INSTANCES - n_distinct]
+            if n_distinct + len(fill) < INSTANCES:
+                raise SystemExit(f'{tid}: {n_distinct} candidates and {len(repeats)} repeats '
+                                 f'in {WALK} indices, fewer than {INSTANCES}')
             chosen += fill
-            short_templates.append({'template_id': tid, 'distinct': len(kept),
-                                    'repeats': len(fill), 'indices_tried': i})
+            short_templates.append({'template_id': tid, 'distinct': n_distinct,
+                                    'repeats': len(fill), 'indices_tried': WALK})
+        coverage.append({'template_id': tid, 'candidates': len(cands), 'groups': len(groups),
+                         'groups_selected': len({key_of[c[0]] for c in chosen if c[0] in key_of})})
         chosen.sort(key=lambda c: c[0])
-        last = chosen[-1][0]
-        used = {c[0] for c in chosen}
-        skipped = [(j, r) for j, r in rejected if j <= last]
-        skipped += [(j, 'duplicate question') for j, _s, _x in repeats if j <= last and j not in used]
-        for j, reason in sorted(skipped):
-            replaced.append({'template_id': tid, 'instance_index': j, 'reason': reason})
         for j, seed, inst in chosen:
             rec = record(ref, seed, inst.question, inst.solution, levels[tid])
             rec['item_id'] = f'{short}#{j}'
@@ -157,7 +174,7 @@ def build(master_seed: int):
                 rec['repeat_of'] = row['repeat_of'] = first[inst.question]
             records.append(rec)
             rows.append(row)
-    return records, rows, replaced, short_templates
+    return records, rows, rejected, short_templates, coverage
 
 
 def manifest_body(rows) -> str:
@@ -186,7 +203,7 @@ def read_seed(create: bool) -> int:
     return seed
 
 
-def freeze_doc(master_seed, rows, replaced, short, body) -> dict:
+def freeze_doc(master_seed, rows, replaced, short, coverage, body) -> dict:
     by_reason = collections.Counter(r['reason'].split(':')[0] for r in replaced)
     return {
         'run': 'full_run_28092026',
@@ -211,11 +228,15 @@ def freeze_doc(master_seed, rows, replaced, short, body) -> dict:
         'by_level': dict(sorted(collections.Counter(r['level'] for r in rows).items())),
         'by_answer_type': dict(sorted(collections.Counter(r['answer_type'] for r in rows).items())),
         'short_templates': short,
-        'replacements': {'count': len(replaced), 'by_reason': dict(sorted(by_reason.items())),
+        'coverage': {
+            'templates_with_more_than_one_group': sum(c['groups'] > 1 for c in coverage),
+            'templates': coverage,
+        },
+        'walk_rejections': {'count': len(replaced), 'by_reason': dict(sorted(by_reason.items())),
                          'items': replaced},
         'manifest_sha256': sha(body),
         'pool_sha256': sha(''.join(r['sha256'] for r in rows)),
-        'selection_rule': __doc__.split('Selection rule.')[1].strip(),
+        'selection_rule': __doc__.split('Selection rule (D-116).')[1].strip(),
     }
 
 
@@ -242,7 +263,7 @@ def check_files() -> int:
 
 def verify() -> int:
     """Regenerate from the seed in this process and compare with the committed record."""
-    _records, rows, _replaced, _short = build(read_seed(create=False))
+    _records, rows, _rejected, _short, _coverage = build(read_seed(create=False))
     fresh = manifest_body(rows)
     held = MANIFEST.read_text(encoding='utf-8')
     doc = json.loads(FREEZE.read_text(encoding='utf-8'))
@@ -277,11 +298,11 @@ def main() -> int:
         return check_files()
 
     master_seed = read_seed(create=True)
-    records, rows, replaced, short = build(master_seed)
+    records, rows, replaced, short, coverage = build(master_seed)
     body = manifest_body(rows)
     write(records, str(POOL_DIR))
     MANIFEST.write_text(body, encoding='utf-8', newline='\n')
-    doc = freeze_doc(master_seed, rows, replaced, short, body)
+    doc = freeze_doc(master_seed, rows, replaced, short, coverage, body)
     FREEZE.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + '\n', encoding='utf-8',
                       newline='\n')
 
@@ -292,9 +313,11 @@ def main() -> int:
     for t in short:
         print(f"short template {t['template_id']}: {t['distinct']} distinct + {t['repeats']} repeats "
               f"({t['indices_tried']} indices searched)")
-    print(f"replacements {doc['replacements']['count']}  {doc['replacements']['by_reason']}")
-    for r in replaced:
-        print(f"  {r['template_id']} #{r['instance_index']}: {r['reason']}")
+    print(f"indices not taken as candidates {doc['walk_rejections']['count']}  "
+          f"{doc['walk_rejections']['by_reason']}")
+    cov = doc['coverage']
+    print(f"templates with more than one path-and-answer group: "
+          f"{cov['templates_with_more_than_one_group']}")
     print(f"manifest sha256 {doc['manifest_sha256'][:16]}  seed commitment "
           f"{doc['seed']['commitment_sha256'][:16]}")
     return 0

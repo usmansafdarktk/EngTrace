@@ -1,11 +1,11 @@
 {
   "run": "full_run_28092026",
-  "frozen_at_utc": "2026-09-27T19:38:05+00:00",
-  "commit": "1acc7cfa2ee0cfdd5eb970a98569ed9866834f8e",
+  "frozen_at_utc": "2026-09-27T20:44:31+00:00",
+  "commit": "03b1dd7f0bab084b1ac2b6640b0e9a6e9b1e31bd",
   "template_inputs_dirty": false,
   "script_sha256": {
     "generate_testset.py": "6cdbb993f2a289637c839779f4dd47b55be8b0767208098d4b63ad9c397fdcb3",
-    "full_run_28092026/freeze.py": "17b18f559cb1ceb59ffd68ec68b8fcd2a4a3795eb1ada15932d16844f92117f7"
+    "full_run_28092026/freeze.py": "2b62c775c2ae8370f29312f107bb3140a41a23ed291e0b88c721bce325310302"
   },
   "seed": {
     "bits": 128,
@@ -15,7 +15,7 @@
   "instances_per_template": 15,
   "templates": 150,
   "items": 2250,
-  "distinct_questions": 2235,
+  "distinct_questions": 2250,
   "by_branch": {
     "chemical_engineering": 450,
     "civil_engineering": 450,
@@ -36,130 +36,1643 @@
     "symbolic": 135,
     "vector": 120
   },
-  "short_templates": [
-    {
-      "template_id": "template_adiabatic_flame_temperature",
-      "distinct": 11,
-      "repeats": 4,
-      "indices_tried": 75
-    },
-    {
-      "template_id": "template_heat_of_reaction_formation",
-      "distinct": 4,
-      "repeats": 11,
-      "indices_tried": 75
-    }
-  ],
-  "replacements": {
-    "count": 56,
+  "short_templates": [],
+  "coverage": {
+    "templates_with_more_than_one_group": 101,
+    "templates": [
+      {
+        "template_id": "template_levenspiel_plot_interpretation",
+        "candidates": 100,
+        "groups": 3,
+        "groups_selected": 3
+      },
+      {
+        "template_id": "template_batch_reactor_first_order",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_batch_reactor_second_order",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_batch_reactor_zero_order",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_cstr_volume_basic",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_pfr_volume_changing_rate",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_batch_moles_vs_conversion",
+        "candidates": 100,
+        "groups": 4,
+        "groups_selected": 4
+      },
+      {
+        "template_id": "template_flow_system_molar_flow_rates",
+        "candidates": 100,
+        "groups": 4,
+        "groups_selected": 4
+      },
+      {
+        "template_id": "template_gas_phase_concentration",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_limiting_reactant",
+        "candidates": 100,
+        "groups": 8,
+        "groups_selected": 8
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "candidates": 92,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "candidates": 25,
+        "groups": 20,
+        "groups_selected": 15
+      },
+      {
+        "template_id": "template_latent_heat_vaporization",
+        "candidates": 98,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_sensible_heat_constant_cp",
+        "candidates": 100,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_sensible_heat_temp_dependent_cp",
+        "candidates": 100,
+        "groups": 5,
+        "groups_selected": 5
+      },
+      {
+        "template_id": "template_ideal_gas_volume",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_pitzer_correlation_z",
+        "candidates": 100,
+        "groups": 3,
+        "groups_selected": 3
+      },
+      {
+        "template_id": "template_rackett_equation_volume",
+        "candidates": 99,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_two_phase_specific_volume",
+        "candidates": 99,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_vdw_solve_for_pressure",
+        "candidates": 100,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_vdw_solve_for_volume",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_work_isothermal_virial",
+        "candidates": 100,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_annulus_flowrate",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_falling_film_max_velocity",
+        "candidates": 100,
+        "groups": 10,
+        "groups_selected": 10
+      },
+      {
+        "template_id": "template_hagen_poiseuille_flowrate",
+        "candidates": 100,
+        "groups": 5,
+        "groups_selected": 5
+      },
+      {
+        "template_id": "template_gas_viscosity_kinetic_theory",
+        "candidates": 99,
+        "groups": 12,
+        "groups_selected": 12
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "candidates": 65,
+        "groups": 34,
+        "groups_selected": 15
+      },
+      {
+        "template_id": "template_newtons_law_shear_stress",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_power_law_fluid_shear",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_reynolds_number_flow_regime",
+        "candidates": 100,
+        "groups": 5,
+        "groups_selected": 5
+      },
+      {
+        "template_id": "template_constant_head_permeability",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_effective_stress_profile",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_upward_seepage_quick_condition",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_borrow_pit_fill_volume",
+        "candidates": 100,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_phase_relations_degree_of_saturation",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_relative_density_of_sand",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_infinite_slope_factor_of_safety",
+        "candidates": 97,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_terzaghi_strip_footing_bearing",
+        "candidates": 100,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_primary_consolidation_settlement",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_time_rate_of_consolidation",
+        "candidates": 100,
+        "groups": 4,
+        "groups_selected": 4
+      },
+      {
+        "template_id": "template_beam_deflection_formula",
+        "candidates": 100,
+        "groups": 4,
+        "groups_selected": 4
+      },
+      {
+        "template_id": "template_cantilever_double_integration",
+        "candidates": 100,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_virtual_work_truss_deflection",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_beam_internal_moment",
+        "candidates": 100,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_beam_support_reactions",
+        "candidates": 100,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_truss_method_of_joints",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_truss_method_of_sections",
+        "candidates": 100,
+        "groups": 3,
+        "groups_selected": 3
+      },
+      {
+        "template_id": "template_force_method_continuous_beam",
+        "candidates": 98,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_slope_deflection_end_moment",
+        "candidates": 99,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_influence_line_max_reaction",
+        "candidates": 100,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_critical_depth_froude_classification",
+        "candidates": 97,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_hydraulic_jump_energy_loss",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_max_hump_height_no_choking",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_linear_reservoir_routing_step",
+        "candidates": 95,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_rational_method_peak_flow",
+        "candidates": 99,
+        "groups": 14,
+        "groups_selected": 14
+      },
+      {
+        "template_id": "template_scs_curve_number_runoff",
+        "candidates": 98,
+        "groups": 9,
+        "groups_selected": 9
+      },
+      {
+        "template_id": "template_best_hydraulic_rectangular_section",
+        "candidates": 99,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_manning_rectangular_discharge",
+        "candidates": 100,
+        "groups": 4,
+        "groups_selected": 4
+      },
+      {
+        "template_id": "template_manning_trapezoidal_velocity",
+        "candidates": 96,
+        "groups": 4,
+        "groups_selected": 4
+      },
+      {
+        "template_id": "template_normal_depth_iteration",
+        "candidates": 100,
+        "groups": 6,
+        "groups_selected": 6
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "candidates": 40,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "candidates": 57,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_lowpass_equivalent_bandpass",
+        "candidates": 100,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_mean_variance",
+        "candidates": 100,
+        "groups": 14,
+        "groups_selected": 14
+      },
+      {
+        "template_id": "template_signal_energy_power",
+        "candidates": 96,
+        "groups": 3,
+        "groups_selected": 3
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "candidates": 74,
+        "groups": 4,
+        "groups_selected": 4
+      },
+      {
+        "template_id": "template_ber_estimation_mary",
+        "candidates": 99,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_bpsk_energy_basis",
+        "candidates": 100,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_euclidean_distance_binary",
+        "candidates": 100,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_null_to_null_bandwidth",
+        "candidates": 93,
+        "groups": 5,
+        "groups_selected": 5
+      },
+      {
+        "template_id": "template_coaxial_capacitance",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_coulombs_law",
+        "candidates": 100,
+        "groups": 75,
+        "groups_selected": 15
+      },
+      {
+        "template_id": "template_gauss_law_symmetric",
+        "candidates": 100,
+        "groups": 4,
+        "groups_selected": 4
+      },
+      {
+        "template_id": "template_superposition_electric_field",
+        "candidates": 100,
+        "groups": 97,
+        "groups_selected": 15
+      },
+      {
+        "template_id": "template_lorentz_force",
+        "candidates": 100,
+        "groups": 31,
+        "groups_selected": 15
+      },
+      {
+        "template_id": "template_phasor_addition",
+        "candidates": 100,
+        "groups": 50,
+        "groups_selected": 15
+      },
+      {
+        "template_id": "template_standing_wave_formation",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_time_to_phasor",
+        "candidates": 100,
+        "groups": 6,
+        "groups_selected": 6
+      },
+      {
+        "template_id": "template_wave_equation_interpretation",
+        "candidates": 100,
+        "groups": 4,
+        "groups_selected": 4
+      },
+      {
+        "template_id": "template_wave_parameters_basic",
+        "candidates": 99,
+        "groups": 6,
+        "groups_selected": 6
+      },
+      {
+        "template_id": "template_aliased_frequency_identification",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_cd_dc_system_analysis",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_continuous_to_discrete_conversion",
+        "candidates": 100,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_decimation_aliasing_analysis",
+        "candidates": 87,
+        "groups": 8,
+        "groups_selected": 8
+      },
+      {
+        "template_id": "template_nyquist_rate_determination",
+        "candidates": 100,
+        "groups": 12,
+        "groups_selected": 12
+      },
+      {
+        "template_id": "template_finite_convolution",
+        "candidates": 100,
+        "groups": 46,
+        "groups_selected": 15
+      },
+      {
+        "template_id": "template_impulse_response_from_lccde",
+        "candidates": 98,
+        "groups": 35,
+        "groups_selected": 15
+      },
+      {
+        "template_id": "template_signal_operations",
+        "candidates": 100,
+        "groups": 47,
+        "groups_selected": 15
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "candidates": 34,
+        "groups": 7,
+        "groups_selected": 7
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "candidates": 28,
+        "groups": 5,
+        "groups_selected": 5
+      },
+      {
+        "template_id": "template_basic_eoq",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_epq_finite_production",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_quantity_discount_all_units",
+        "candidates": 100,
+        "groups": 6,
+        "groups_selected": 6
+      },
+      {
+        "template_id": "template_reorder_point_lead_time",
+        "candidates": 100,
+        "groups": 3,
+        "groups_selected": 3
+      },
+      {
+        "template_id": "template_chase_vs_level_aggregate",
+        "candidates": 100,
+        "groups": 20,
+        "groups_selected": 15
+      },
+      {
+        "template_id": "template_line_balancing_heuristic",
+        "candidates": 100,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_takt_time_line_efficiency",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_newsvendor_normal_demand",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_qr_policy_one_iteration",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_safety_stock_reorder_point",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_aoq_ati_rectifying",
+        "candidates": 100,
+        "groups": 10,
+        "groups_selected": 10
+      },
+      {
+        "template_id": "template_single_sampling_oc_point",
+        "candidates": 100,
+        "groups": 20,
+        "groups_selected": 15
+      },
+      {
+        "template_id": "template_c_chart_revision",
+        "candidates": 98,
+        "groups": 4,
+        "groups_selected": 4
+      },
+      {
+        "template_id": "template_p_chart_limits_floor",
+        "candidates": 97,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_cp_cpk_from_specs",
+        "candidates": 100,
+        "groups": 3,
+        "groups_selected": 3
+      },
+      {
+        "template_id": "template_sigma_reduction_for_cpk",
+        "candidates": 98,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_arl_beta_mean_shift",
+        "candidates": 92,
+        "groups": 6,
+        "groups_selected": 6
+      },
+      {
+        "template_id": "template_chart_pair_selection",
+        "candidates": 100,
+        "groups": 3,
+        "groups_selected": 3
+      },
+      {
+        "template_id": "template_xbar_known_sigma_classification",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_xbar_r_control_limits",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_absorbing_chain_time_to_failure",
+        "candidates": 99,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_two_state_steady_state",
+        "candidates": 99,
+        "groups": 3,
+        "groups_selected": 3
+      },
+      {
+        "template_id": "template_two_step_transition_probability",
+        "candidates": 100,
+        "groups": 9,
+        "groups_selected": 9
+      },
+      {
+        "template_id": "template_poisson_event_count",
+        "candidates": 81,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_mm1_time_in_system",
+        "candidates": 92,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_mm1k_finite_capacity",
+        "candidates": 96,
+        "groups": 6,
+        "groups_selected": 6
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "candidates": 48,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_server_configuration_selection",
+        "candidates": 82,
+        "groups": 4,
+        "groups_selected": 4
+      },
+      {
+        "template_id": "template_exponential_mttf_topology",
+        "candidates": 100,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_system_reliability_topology",
+        "candidates": 100,
+        "groups": 3,
+        "groups_selected": 3
+      },
+      {
+        "template_id": "template_fluid_particle_acceleration",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "candidates": 75,
+        "groups": 27,
+        "groups_selected": 15
+      },
+      {
+        "template_id": "template_particle_pathline",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_volumetric_flow_rate",
+        "candidates": 100,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_vorticity_check",
+        "candidates": 100,
+        "groups": 8,
+        "groups_selected": 8
+      },
+      {
+        "template_id": "template_basic_buoyant_force",
+        "candidates": 100,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_floating_object_submersion_depth",
+        "candidates": 100,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_hydrostatic_force_on_plane",
+        "candidates": 100,
+        "groups": 57,
+        "groups_selected": 15
+      },
+      {
+        "template_id": "template_hydrostatic_pressure_at_depth",
+        "candidates": 100,
+        "groups": 62,
+        "groups_selected": 15
+      },
+      {
+        "template_id": "template_utube_manometer",
+        "candidates": 100,
+        "groups": 65,
+        "groups_selected": 15
+      },
+      {
+        "template_id": "template_axial_deformation",
+        "candidates": 100,
+        "groups": 36,
+        "groups_selected": 15
+      },
+      {
+        "template_id": "template_basic_stress_strain",
+        "candidates": 100,
+        "groups": 4,
+        "groups_selected": 4
+      },
+      {
+        "template_id": "template_multi_segment_rod",
+        "candidates": 100,
+        "groups": 47,
+        "groups_selected": 15
+      },
+      {
+        "template_id": "template_poissons_ratio",
+        "candidates": 98,
+        "groups": 11,
+        "groups_selected": 11
+      },
+      {
+        "template_id": "template_statically_indeterminate",
+        "candidates": 100,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_angle_of_twist",
+        "candidates": 100,
+        "groups": 15,
+        "groups_selected": 15
+      },
+      {
+        "template_id": "template_composite_shafts_series",
+        "candidates": 100,
+        "groups": 63,
+        "groups_selected": 15
+      },
+      {
+        "template_id": "template_shaft_design_power",
+        "candidates": 100,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_shear_stress_torsion",
+        "candidates": 100,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_statically_indeterminate_shaft",
+        "candidates": 100,
+        "groups": 10,
+        "groups_selected": 10
+      },
+      {
+        "template_id": "template_rotating_unbalance",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_system_properties",
+        "candidates": 100,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_vibration_isolator_design",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_vibration_transmissibility",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_damping_classification",
+        "candidates": 100,
+        "groups": 3,
+        "groups_selected": 3
+      },
+      {
+        "template_id": "template_equivalent_stiffness_frequency",
+        "candidates": 100,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_logarithmic_decrement",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_undamped_natural_frequency_torsional",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_undamped_natural_frequency_translational",
+        "candidates": 100,
+        "groups": 1,
+        "groups_selected": 1
+      },
+      {
+        "template_id": "template_undamped_response_initial_conditions",
+        "candidates": 100,
+        "groups": 5,
+        "groups_selected": 5
+      }
+    ]
+  },
+  "walk_rejections": {
+    "count": 585,
     "by_reason": {
-      "display tie": 5,
-      "duplicate question": 51
+      "display tie": 35,
+      "duplicate question": 549,
+      "pilot-slice question": 1
     },
     "items": [
       {
         "template_id": "template_adiabatic_flame_temperature",
-        "instance_index": 14,
+        "instance_index": 37,
         "reason": "duplicate question"
       },
       {
         "template_id": "template_adiabatic_flame_temperature",
-        "instance_index": 15,
+        "instance_index": 44,
         "reason": "duplicate question"
       },
       {
         "template_id": "template_adiabatic_flame_temperature",
-        "instance_index": 16,
+        "instance_index": 47,
         "reason": "duplicate question"
       },
       {
         "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 61,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 63,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 65,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 81,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 87,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 9,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 12,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 13,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
         "instance_index": 17,
         "reason": "duplicate question"
       },
       {
-        "template_id": "template_adiabatic_flame_temperature",
-        "instance_index": 18,
-        "reason": "duplicate question"
-      },
-      {
-        "template_id": "template_adiabatic_flame_temperature",
-        "instance_index": 19,
-        "reason": "duplicate question"
-      },
-      {
-        "template_id": "template_adiabatic_flame_temperature",
-        "instance_index": 20,
-        "reason": "duplicate question"
-      },
-      {
-        "template_id": "template_adiabatic_flame_temperature",
+        "template_id": "template_heat_of_reaction_formation",
         "instance_index": 21,
         "reason": "duplicate question"
       },
       {
-        "template_id": "template_adiabatic_flame_temperature",
+        "template_id": "template_heat_of_reaction_formation",
         "instance_index": 22,
         "reason": "duplicate question"
       },
       {
-        "template_id": "template_adiabatic_flame_temperature",
+        "template_id": "template_heat_of_reaction_formation",
         "instance_index": 23,
         "reason": "duplicate question"
       },
       {
-        "template_id": "template_adiabatic_flame_temperature",
+        "template_id": "template_heat_of_reaction_formation",
         "instance_index": 24,
         "reason": "duplicate question"
       },
       {
-        "template_id": "template_adiabatic_flame_temperature",
+        "template_id": "template_heat_of_reaction_formation",
         "instance_index": 25,
         "reason": "duplicate question"
       },
       {
-        "template_id": "template_adiabatic_flame_temperature",
+        "template_id": "template_heat_of_reaction_formation",
         "instance_index": 26,
         "reason": "duplicate question"
       },
       {
-        "template_id": "template_adiabatic_flame_temperature",
-        "instance_index": 27,
-        "reason": "duplicate question"
-      },
-      {
-        "template_id": "template_adiabatic_flame_temperature",
+        "template_id": "template_heat_of_reaction_formation",
         "instance_index": 28,
         "reason": "duplicate question"
       },
       {
-        "template_id": "template_adiabatic_flame_temperature",
+        "template_id": "template_heat_of_reaction_formation",
         "instance_index": 29,
         "reason": "duplicate question"
       },
       {
-        "template_id": "template_adiabatic_flame_temperature",
-        "instance_index": 30,
-        "reason": "duplicate question"
-      },
-      {
-        "template_id": "template_adiabatic_flame_temperature",
-        "instance_index": 31,
-        "reason": "duplicate question"
-      },
-      {
-        "template_id": "template_adiabatic_flame_temperature",
+        "template_id": "template_heat_of_reaction_formation",
         "instance_index": 32,
         "reason": "duplicate question"
       },
       {
-        "template_id": "template_adiabatic_flame_temperature",
-        "instance_index": 33,
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 34,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 35,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 36,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 37,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 38,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 39,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 40,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 41,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 42,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 44,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 45,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 46,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 47,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 48,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 49,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 50,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 52,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 53,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 54,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 55,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 56,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 57,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 58,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 59,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 60,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 61,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 62,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 63,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 65,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 66,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 67,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 68,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 70,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 71,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 72,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 73,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 74,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 75,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 76,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 77,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 78,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 79,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 80,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 81,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 82,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 83,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 84,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 85,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 86,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 87,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 88,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 89,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 90,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 91,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 92,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 93,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 94,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 95,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 96,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 97,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 98,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_heat_of_reaction_formation",
+        "instance_index": 99,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_latent_heat_vaporization",
+        "instance_index": 35,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_latent_heat_vaporization",
+        "instance_index": 95,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_rackett_equation_volume",
+        "instance_index": 52,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_two_phase_specific_volume",
+        "instance_index": 53,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_gas_viscosity_kinetic_theory",
+        "instance_index": 82,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 20,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 22,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 24,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 28,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 31,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 38,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 39,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 40,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 43,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 52,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 53,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 55,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 56,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 57,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 60,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 61,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 62,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 64,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 65,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 67,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 71,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 72,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 74,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 77,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 78,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 80,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 81,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 82,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 83,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 84,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 85,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 90,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 91,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 95,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_kinematic_viscosity",
+        "instance_index": 99,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_infinite_slope_factor_of_safety",
+        "instance_index": 58,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_infinite_slope_factor_of_safety",
+        "instance_index": 86,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_infinite_slope_factor_of_safety",
+        "instance_index": 96,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_force_method_continuous_beam",
+        "instance_index": 88,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_force_method_continuous_beam",
+        "instance_index": 97,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_slope_deflection_end_moment",
+        "instance_index": 76,
         "reason": "duplicate question"
       },
       {
         "template_id": "template_critical_depth_froude_classification",
         "instance_index": 6,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_critical_depth_froude_classification",
+        "instance_index": 26,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_critical_depth_froude_classification",
+        "instance_index": 60,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_linear_reservoir_routing_step",
+        "instance_index": 19,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_linear_reservoir_routing_step",
+        "instance_index": 23,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_linear_reservoir_routing_step",
+        "instance_index": 29,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_linear_reservoir_routing_step",
+        "instance_index": 42,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_linear_reservoir_routing_step",
+        "instance_index": 57,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_rational_method_peak_flow",
+        "instance_index": 72,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_scs_curve_number_runoff",
+        "instance_index": 30,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_scs_curve_number_runoff",
+        "instance_index": 76,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_best_hydraulic_rectangular_section",
+        "instance_index": 47,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_manning_trapezoidal_velocity",
+        "instance_index": 34,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_manning_trapezoidal_velocity",
+        "instance_index": 46,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_manning_trapezoidal_velocity",
+        "instance_index": 58,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_manning_trapezoidal_velocity",
+        "instance_index": 79,
         "reason": "display tie"
       },
       {
@@ -183,13 +1696,768 @@
         "reason": "duplicate question"
       },
       {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 19,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 22,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 30,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 32,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 35,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 36,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 37,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 38,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 39,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 40,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 41,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 43,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 44,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 45,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 47,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 48,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 49,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 51,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 53,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 54,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 55,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 56,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 57,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 58,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 59,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 60,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 61,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 62,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 63,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 64,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 65,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 67,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 69,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 70,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 71,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 72,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 73,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 74,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 76,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 77,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 78,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 79,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 80,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 81,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 82,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 83,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 85,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 87,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 88,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 90,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 91,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 93,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 94,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 95,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 97,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_autocorrelation_rect_pulse",
+        "instance_index": 99,
+        "reason": "duplicate question"
+      },
+      {
         "template_id": "template_ft_esd_rect_pulse",
         "instance_index": 11,
         "reason": "duplicate question"
       },
       {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 28,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 29,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 34,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 35,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 36,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 37,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 38,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 39,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 43,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 45,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 46,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 51,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 52,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 53,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 54,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 57,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 61,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 62,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 64,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 66,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 67,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 68,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 69,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 70,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 71,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 72,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 73,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 76,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 79,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 81,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 82,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 85,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 86,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 87,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 88,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 89,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 90,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 91,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 94,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 95,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 97,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ft_esd_rect_pulse",
+        "instance_index": 98,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_signal_energy_power",
+        "instance_index": 37,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_signal_energy_power",
+        "instance_index": 43,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_signal_energy_power",
+        "instance_index": 72,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_signal_energy_power",
+        "instance_index": 96,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 21,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 23,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 35,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 38,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 40,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 41,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 42,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 46,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 56,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 57,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 62,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 63,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 65,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 68,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 70,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 71,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 72,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 74,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 76,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 85,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 89,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 91,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 94,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 95,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 96,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_average_energy_mqam",
+        "instance_index": 98,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_ber_estimation_mary",
+        "instance_index": 94,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_null_to_null_bandwidth",
+        "instance_index": 21,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_null_to_null_bandwidth",
+        "instance_index": 53,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_null_to_null_bandwidth",
+        "instance_index": 77,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_null_to_null_bandwidth",
+        "instance_index": 81,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_null_to_null_bandwidth",
+        "instance_index": 87,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_null_to_null_bandwidth",
+        "instance_index": 92,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_null_to_null_bandwidth",
+        "instance_index": 93,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_wave_parameters_basic",
+        "instance_index": 66,
+        "reason": "duplicate question"
+      },
+      {
         "template_id": "template_decimation_aliasing_analysis",
         "instance_index": 7,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_decimation_aliasing_analysis",
+        "instance_index": 34,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_decimation_aliasing_analysis",
+        "instance_index": 56,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_decimation_aliasing_analysis",
+        "instance_index": 57,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_decimation_aliasing_analysis",
+        "instance_index": 67,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_decimation_aliasing_analysis",
+        "instance_index": 70,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_decimation_aliasing_analysis",
+        "instance_index": 73,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_decimation_aliasing_analysis",
+        "instance_index": 77,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_decimation_aliasing_analysis",
+        "instance_index": 79,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_decimation_aliasing_analysis",
+        "instance_index": 87,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_decimation_aliasing_analysis",
+        "instance_index": 88,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_decimation_aliasing_analysis",
+        "instance_index": 91,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_decimation_aliasing_analysis",
+        "instance_index": 99,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_impulse_response_from_lccde",
+        "instance_index": 69,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_impulse_response_from_lccde",
+        "instance_index": 91,
         "reason": "duplicate question"
       },
       {
@@ -233,6 +2501,296 @@
         "reason": "duplicate question"
       },
       {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 24,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 25,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 26,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 27,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 30,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 32,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 33,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 35,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 38,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 40,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 41,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 43,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 44,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 45,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 46,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 47,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 50,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 51,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 54,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 55,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 56,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 57,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 58,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 59,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 61,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 62,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 63,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 64,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 65,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 69,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 70,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 71,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 72,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 73,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 74,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 75,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 76,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 77,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 78,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 79,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 80,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 81,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 82,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 83,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 84,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 85,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 86,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 87,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 88,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 89,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 91,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 92,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 93,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 95,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 96,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 97,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 98,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_properties_memory_causality",
+        "instance_index": 99,
+        "reason": "duplicate question"
+      },
+      {
         "template_id": "template_system_property_linearity",
         "instance_index": 7,
         "reason": "duplicate question"
@@ -273,13 +2831,563 @@
         "reason": "duplicate question"
       },
       {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 24,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 26,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 27,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 28,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 29,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 30,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 32,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 33,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 36,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 37,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 38,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 40,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 41,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 42,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 45,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 46,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 47,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 48,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 49,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 50,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 52,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 53,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 54,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 55,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 56,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 57,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 58,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 59,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 60,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 61,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 62,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 63,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 64,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 65,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 66,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 67,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 68,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 71,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 72,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 73,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 74,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 75,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 76,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 77,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 78,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 79,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 80,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 81,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 82,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 83,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 84,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 85,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 87,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 88,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 89,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 90,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 91,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 92,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 93,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 94,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 95,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 96,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 97,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_system_property_linearity",
+        "instance_index": 99,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_c_chart_revision",
+        "instance_index": 81,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_c_chart_revision",
+        "instance_index": 87,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_p_chart_limits_floor",
+        "instance_index": 54,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_p_chart_limits_floor",
+        "instance_index": 83,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_p_chart_limits_floor",
+        "instance_index": 94,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_sigma_reduction_for_cpk",
+        "instance_index": 32,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_sigma_reduction_for_cpk",
+        "instance_index": 85,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_arl_beta_mean_shift",
+        "instance_index": 27,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_arl_beta_mean_shift",
+        "instance_index": 37,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_arl_beta_mean_shift",
+        "instance_index": 40,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_arl_beta_mean_shift",
+        "instance_index": 81,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_arl_beta_mean_shift",
+        "instance_index": 89,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_arl_beta_mean_shift",
+        "instance_index": 92,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_arl_beta_mean_shift",
+        "instance_index": 95,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_arl_beta_mean_shift",
+        "instance_index": 97,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_absorbing_chain_time_to_failure",
+        "instance_index": 19,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_two_state_steady_state",
+        "instance_index": 97,
+        "reason": "duplicate question"
+      },
+      {
         "template_id": "template_poisson_event_count",
         "instance_index": 4,
         "reason": "duplicate question"
       },
       {
+        "template_id": "template_poisson_event_count",
+        "instance_index": 24,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_poisson_event_count",
+        "instance_index": 25,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_poisson_event_count",
+        "instance_index": 32,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_poisson_event_count",
+        "instance_index": 39,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_poisson_event_count",
+        "instance_index": 48,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_poisson_event_count",
+        "instance_index": 50,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_poisson_event_count",
+        "instance_index": 56,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_poisson_event_count",
+        "instance_index": 60,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_poisson_event_count",
+        "instance_index": 64,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_poisson_event_count",
+        "instance_index": 65,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_poisson_event_count",
+        "instance_index": 70,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_poisson_event_count",
+        "instance_index": 76,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_poisson_event_count",
+        "instance_index": 78,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_poisson_event_count",
+        "instance_index": 83,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_poisson_event_count",
+        "instance_index": 86,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_poisson_event_count",
+        "instance_index": 91,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_poisson_event_count",
+        "instance_index": 94,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_poisson_event_count",
+        "instance_index": 96,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mm1_time_in_system",
+        "instance_index": 37,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mm1_time_in_system",
+        "instance_index": 40,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mm1_time_in_system",
+        "instance_index": 47,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mm1_time_in_system",
+        "instance_index": 79,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mm1_time_in_system",
+        "instance_index": 80,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mm1_time_in_system",
+        "instance_index": 82,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mm1_time_in_system",
+        "instance_index": 96,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mm1_time_in_system",
+        "instance_index": 98,
+        "reason": "duplicate question"
+      },
+      {
         "template_id": "template_mm1k_finite_capacity",
         "instance_index": 12,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mm1k_finite_capacity",
+        "instance_index": 77,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mm1k_finite_capacity",
+        "instance_index": 93,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mm1k_finite_capacity",
+        "instance_index": 98,
         "reason": "duplicate question"
       },
       {
@@ -308,6 +3416,241 @@
         "reason": "duplicate question"
       },
       {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 22,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 23,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 27,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 28,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 29,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 31,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 33,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 37,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 38,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 39,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 40,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 44,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 45,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 48,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 49,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 51,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 54,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 55,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 58,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 59,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 61,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 62,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 63,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 67,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 68,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 71,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 72,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 73,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 74,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 75,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 76,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 78,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 79,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 81,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 82,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 83,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 85,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 86,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 87,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 88,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 89,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 92,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 93,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 94,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 95,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 98,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_mmc_waiting_time",
+        "instance_index": 99,
+        "reason": "duplicate question"
+      },
+      {
         "template_id": "template_server_configuration_selection",
         "instance_index": 2,
         "reason": "display tie"
@@ -328,6 +3671,76 @@
         "reason": "display tie"
       },
       {
+        "template_id": "template_server_configuration_selection",
+        "instance_index": 26,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_server_configuration_selection",
+        "instance_index": 36,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_server_configuration_selection",
+        "instance_index": 37,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_server_configuration_selection",
+        "instance_index": 38,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_server_configuration_selection",
+        "instance_index": 64,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_server_configuration_selection",
+        "instance_index": 69,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_server_configuration_selection",
+        "instance_index": 70,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_server_configuration_selection",
+        "instance_index": 71,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_server_configuration_selection",
+        "instance_index": 77,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_server_configuration_selection",
+        "instance_index": 78,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_server_configuration_selection",
+        "instance_index": 80,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_server_configuration_selection",
+        "instance_index": 87,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_server_configuration_selection",
+        "instance_index": 95,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_server_configuration_selection",
+        "instance_index": 97,
+        "reason": "display tie"
+      },
+      {
         "template_id": "template_incompressible_continuity",
         "instance_index": 2,
         "reason": "duplicate question"
@@ -336,10 +3749,135 @@
         "template_id": "template_incompressible_continuity",
         "instance_index": 14,
         "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "instance_index": 27,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "instance_index": 28,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "instance_index": 33,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "instance_index": 38,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "instance_index": 43,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "instance_index": 48,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "instance_index": 49,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "instance_index": 51,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "instance_index": 52,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "instance_index": 54,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "instance_index": 57,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "instance_index": 58,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "instance_index": 60,
+        "reason": "pilot-slice question"
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "instance_index": 61,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "instance_index": 62,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "instance_index": 64,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "instance_index": 66,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "instance_index": 67,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "instance_index": 76,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "instance_index": 81,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "instance_index": 89,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "instance_index": 96,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_incompressible_continuity",
+        "instance_index": 97,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_poissons_ratio",
+        "instance_index": 56,
+        "reason": "display tie"
+      },
+      {
+        "template_id": "template_poissons_ratio",
+        "instance_index": 71,
+        "reason": "display tie"
       }
     ]
   },
-  "manifest_sha256": "f0ffa108e79312e6ce8fea9a7fbab64957463c14bd7f3c7494460c9389032fab",
-  "pool_sha256": "17c2ca034ac3ffb1e90f675f34cdc2ee0205f89d392336a8b7f8af953d2ef7ca",
-  "selection_rule": "For each template, take instance indices 0, 1, 2, ... and keep the first\n15 that are acceptable. An instance is replaced by the next index, and the replacement is\nlogged in FREEZE.json, when\n  - its question repeats one already kept for the template (a duplicate double-weights it);\n  - its question is one of the pilot slice's questions, which are public with their gold\n    and on whose traces the answer check was tuned;\n  - its gold solution carries an exact display tie on a line T1 can parse, the test of\n    template_annotation_23092026/layer0/tie_census.py: such an instance has no gold value\n    a decimal and a binary reader agree on (D-016). A tie on a line T1 cannot parse is\n    not seen;\n  - the template fails to generate it.\nEvery template has 15 instances, the owner's rule (D-114). A template whose question space\nis exhausted, 75 indices yielding fewer than 15 distinct acceptable questions, keeps each\ndistinct question once and fills its 15 with repeats in index order. A repeat carries\nrepeat_of, the item_id of the first instance with its question, in the pool and in the\nmanifest, and FREEZE.json lists the template under short_templates, so the number of\ndistinct questions is never overstated."
+  "manifest_sha256": "028c7a637eb4895ed061bcbf79a69c656c57f4adc327a4c81cc4faf6d898e2b3",
+  "pool_sha256": "a9b6adeed7e59b66c5afb63f1a457b05e50c1c95e968a006eaf06f0e080cf768",
+  "selection_rule": "For each template, examine instance indices 0 to 99. An index is\nnot a candidate when\n  - its question repeats one already seen for the template (a duplicate double-weights it);\n  - its question is one of the pilot slice's questions, which are public with their gold\n    and on whose traces the answer check was tuned;\n  - its gold solution carries an exact display tie on a line T1 can parse, the test of\n    template_annotation_23092026/layer0/tie_census.py: such an instance has no gold value\n    a decimal and a binary reader agree on (D-016). A tie on a line T1 cannot parse is\n    not seen;\n  - the template fails to generate it.\nThe candidates are grouped by reasoning path and answer form, the lower reading of\nfull_run_28092026/diversity.py: the gold's equation lines and its answer segment with numbers\nand question-varying words masked. The 15 instances are taken round-robin across the groups in\norder of first appearance, lowest index first within a group, so every reasoning path and\nanswer label the first 100 draws show is represented before any is repeated. A template with\none group keeps its first 15 candidates, exactly the instances D-114 froze. Rare branches are\ntherefore over-represented relative to how often a template produces them; FREEZE.json records\neach template's candidates, groups and groups selected.\nEvery template has 15 instances, the owner's rule (D-114). A template with fewer than 15\ncandidates keeps each distinct question once and fills its 15 with repeats in index order,\neach carrying repeat_of, the item_id of the first instance with its question, and FREEZE.json\nlists it under short_templates, so the number of distinct questions is never overstated."
 }
