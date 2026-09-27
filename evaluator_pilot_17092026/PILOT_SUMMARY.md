@@ -200,7 +200,7 @@ judges (0.314 against 0.333 on conceptual defects, identical 0.717 on arithmetic
 false alarms. It is also the cheapest of the three at about a third of a cent per call. The
 deterministic layers use no model at all.
 
-**The benchmark.** Five branches x 30 templates x 15 instances = **2,250 problems** (870
+**The benchmark.** Five branches × 30 templates × 15 instances = **2,250 problems** (870
 easy, 870 intermediate, 510 advanced), answered once by each model on the roster.
 
 **The roster — 11 models, about $403 to generate:**
