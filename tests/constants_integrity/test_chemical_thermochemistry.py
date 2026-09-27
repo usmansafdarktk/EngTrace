@@ -36,7 +36,7 @@ if REPO not in sys.path:
 
 from data.templates.branches.chemical_engineering.constants import (  # noqa: E402
     AIR_COMPOSITION, COMBUSTION_REACTIONS, CP_PARAMS, CP_VALID_T_MAX,
-    HEATS_OF_FORMATION, REACTIONS,
+    HEATS_OF_FORMATION, HESS_REACTIONS, REACTIONS,
 )
 
 R = 8.314462618          # CODATA 2018 molar gas constant, J/(mol K)
@@ -256,7 +256,7 @@ def run():
 
     # -- reaction stoichiometry --------------------------------------------
     for rxns, label in ((COMBUSTION_REACTIONS, 'COMBUSTION_REACTIONS'),
-                        (REACTIONS, 'REACTIONS')):
+                        (REACTIONS, 'REACTIONS'), (HESS_REACTIONS, 'HESS_REACTIONS')):
         for rx in rxns:
             checks += 1
             left, right = Counter(), Counter()
@@ -278,7 +278,7 @@ def run():
                     f'theoretical-air {N2_PER_O2}')
 
     # -- every species a reaction names must be priced ---------------------
-    for rx in COMBUSTION_REACTIONS + REACTIONS:
+    for rx in COMBUSTION_REACTIONS + HESS_REACTIONS:
         for sp in list(rx['reactants']) + list(rx['products']):
             checks += 1
             if sp not in HEATS_OF_FORMATION:

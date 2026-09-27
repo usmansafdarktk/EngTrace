@@ -3,7 +3,7 @@ import math
 from decimal import Decimal, ROUND_HALF_UP
 from data.templates.branches.chemical_engineering.constants import (
     SUBSTANCES_FOR_HEATING, SUBSTANCES_FOR_VAPORIZATION,
-    HEATS_OF_FORMATION, REACTIONS, CP_PARAMS, COMBUSTION_REACTIONS,
+    HEATS_OF_FORMATION, HESS_REACTIONS, CP_PARAMS, COMBUSTION_REACTIONS,
     CP_PARAMS_COMBUSTION, CP_COMBUSTION_VALID_T_MAX,
 )
 from data.templates.branches._emission import signed_term, joined_terms
@@ -261,8 +261,10 @@ def template_heat_of_reaction_formation():
             - str: A question asking to compute the standard heat of reaction.
             - str: A step-by-step solution showing the calculation.
     """
-    # 1. Parameterize the inputs by choosing a random reaction
-    reaction_data = random.choice(REACTIONS)
+    # 1. Parameterize the inputs by choosing a random reaction. HESS_REACTIONS, 25 rows,
+    #    not REACTIONS: the 4 shared rows gave this template only 4 distinct questions
+    #    (Layer 2 round 4, D-115).
+    reaction_data = random.choice(HESS_REACTIONS)
     equation = reaction_data["equation"]
     reactants = reaction_data["reactants"]
     products = reaction_data["products"]
@@ -479,6 +481,55 @@ def template_sensible_heat_temp_dependent_cp():
 
 
 # Template 5 (Advanced)
+def _fmt_num(x: Decimal) -> str:
+    """An exact decimal as printed: no trailing zeros, no exponent."""
+    return format(x.normalize(), 'f')
+
+
+def _fmt_coef(x: Decimal) -> str:
+    """A stoichiometric coefficient as an equation writes it: exact, and 1 omitted."""
+    s = _fmt_num(x)
+    return '' if s == '1' else s
+
+
+def _excess_air_mixture(reaction_data, excess_pct):
+    """Reactants, products and equation for a COMBUSTION_REACTIONS row burned with
+    excess_pct percent excess air (Layer 2 round 4, D-115).
+
+    Exact decimal arithmetic, so every coefficient the solution prints is the value
+    the energy balance uses. The excess oxygen leaves with the products and the air's
+    nitrogen, 3.76 per O2 as in the table, passes through; a fuel's own nitrogen
+    (ammonia) is kept apart from the air's. At 0 percent the table's row and equation
+    are returned unchanged, so a theoretical-air instance reads exactly as before.
+    """
+    base_r, base_p = reaction_data["reactants"], reaction_data["products"]
+    if excess_pct == 0:
+        return dict(base_r), dict(base_p), reaction_data["equation"], None
+    fuel_species = next(sp for sp in base_r if sp not in ("O2(g)", "N2(g)"))
+    fuel_nu = Decimal(str(base_r[fuel_species]))
+    o2_th = Decimal(str(base_r["O2(g)"]))
+    o2_sup = o2_th * (1 + Decimal(excess_pct) / 100)
+    n2_air = Decimal("3.76") * o2_sup
+    o2_ex = o2_sup - o2_th
+    n2_fuel = Decimal(str(base_p.get("N2(g)", 0))) - Decimal(str(base_r["N2(g)"]))
+    reactants = {fuel_species: float(fuel_nu), "O2(g)": float(o2_sup), "N2(g)": float(n2_air)}
+    products = {sp: nu for sp, nu in base_p.items() if sp != "N2(g)"}
+    products["O2(g)"] = float(o2_ex)
+    products["N2(g)"] = float(n2_fuel + n2_air)
+    terms = []
+    for sp, nu in base_p.items():
+        if sp != "N2(g)":
+            terms.append(f"{_fmt_coef(Decimal(str(nu)))}{sp}")
+        elif n2_fuel > 0:
+            terms.append(f"{_fmt_coef(n2_fuel)}N2(g)")
+    terms += [f"{_fmt_coef(o2_ex)}O2(g)", f"{_fmt_coef(n2_air)}N2(g)"]
+    equation = (f"{_fmt_coef(fuel_nu)}{fuel_species} + {_fmt_coef(o2_sup)}O2(g) + "
+                f"{_fmt_coef(n2_air)}N2(g) → " + " + ".join(terms))
+    air = {"fuel_nu": fuel_nu, "o2_th": o2_th, "o2_sup": o2_sup, "n2_air": n2_air,
+           "o2_ex": o2_ex}
+    return reactants, products, equation, air
+
+
 def template_adiabatic_flame_temperature():
     """
     Adiabatic Flame Temperature
@@ -542,6 +593,24 @@ def template_adiabatic_flame_temperature():
         arithmetic - so this is a statement about the polynomial, not the
         solver. Step 6 now says so, because a grader marking to +/-1 K would
         otherwise fail a solver who used NIST data directly (Reviewer C, C-2).
+
+        ROUND 4 (2026-09-28, D-115): EXCESS AIR. With theoretical air alone the
+        template had 11 distinct problems, one per fuel. It now samples 0-100
+        percent excess air in whole percent, 1,111 fuel-and-level cases: the
+        excess oxygen leaves with the products, the air's nitrogen passes through
+        at 3.76 per O2, and 0 percent reproduces the theoretical-air problem word
+        for word. Every figure in the paragraphs above was measured at
+        theoretical air, so each was measured again over all 1,111 cases
+        (template_annotation_23092026/layer2/round4_checks.py): six passes land
+        within 0.102 K of the exact fixed point, the map contracts by 0.089 to
+        0.135, flame temperatures run from 1430 to 2908 K inside the 3000 K
+        ceiling, and against a direct NIST Shomate solve the answer is off by at
+        most 2.41 K, 1.90 K at theoretical air, so Step 6 says 2.5 K where it said
+        2 K. The 0.116 K rounding margin does NOT carry over: in 13 cases the six
+        displayed passes and the exact fixed point round to different kelvins,
+        and in 12 the last pass displays an exact half kelvin, 20 cases in all.
+        There the answer's last digit would come from the iteration count or the
+        rounding convention rather than from the model, so the level is redrawn.
     """
     R = 8.314           # J/(mol K)
     T_initial = 298.15  # K
@@ -551,56 +620,73 @@ def template_adiabatic_flame_temperature():
 
     reaction_data = random.choice(COMBUSTION_REACTIONS)
     fuel = reaction_data["fuel"]
-    equation = reaction_data["equation"]
-    reactants = reaction_data["reactants"]
-    products = reaction_data["products"]
 
-    # Preconditions, checked and raised rather than caught and skipped. If a
-    # reaction names a species with no thermochemical data, that is a defect in
-    # constants.py and the benchmark should stop, not quietly ask a different
-    # question (P5).
-    missing_hf = [s for s in list(reactants) + list(products)
-                  if s not in HEATS_OF_FORMATION]
-    assert not missing_hf, (
-        f"{fuel}: no heat of formation for {missing_hf}")
-    missing_cp = [s for s in products if s not in CP_PARAMS_COMBUSTION]
-    assert not missing_cp, (
-        f"{fuel}: no high-temperature heat capacity for {missing_cp}")
+    # Excess air in whole percent (D-115). The level alone is redrawn, so the fuel
+    # shares stay flat (D-045), when the answer's last digit would not be the
+    # model's: the six displayed passes and the exact fixed point round to different
+    # kelvins, or the last pass displays an exact half kelvin. 20 of the 1,111
+    # fuel-and-level cases (template_annotation_23092026/layer2/round4_checks.md).
+    for _draw in range(101):
+        excess_pct = random.randint(0, 100)
+        reactants, products, equation, air = _excess_air_mixture(reaction_data, excess_pct)
 
-    # Standard heat of reaction at 298.15 K, bound through its display so the
-    # iteration below is computed from the number the reader sees.
-    products_enthalpy_298 = sum(nu * HEATS_OF_FORMATION[s]
-                                for s, nu in products.items())
-    reactants_enthalpy_298 = sum(nu * HEATS_OF_FORMATION[s]
-                                 for s, nu in reactants.items())
-    delta_H_298_kJ = _as_printed(products_enthalpy_298 - reactants_enthalpy_298,
+        # Preconditions, checked and raised rather than caught and skipped. If a
+        # reaction names a species with no thermochemical data, that is a defect in
+        # constants.py and the benchmark should stop, not quietly ask a different
+        # question (P5).
+        missing_hf = [s for s in list(reactants) + list(products)
+                      if s not in HEATS_OF_FORMATION]
+        assert not missing_hf, (
+            f"{fuel}: no heat of formation for {missing_hf}")
+        missing_cp = [s for s in products if s not in CP_PARAMS_COMBUSTION]
+        assert not missing_cp, (
+            f"{fuel}: no high-temperature heat capacity for {missing_cp}")
+
+        # Standard heat of reaction at 298.15 K, bound through its display so the
+        # iteration below is computed from the number the reader sees.
+        products_enthalpy_298 = sum(nu * HEATS_OF_FORMATION[s]
+                                    for s, nu in products.items())
+        reactants_enthalpy_298 = sum(nu * HEATS_OF_FORMATION[s]
+                                     for s, nu in reactants.items())
+        delta_H_298_kJ = _as_printed(products_enthalpy_298 - reactants_enthalpy_298,
+                                     f'.{dp}f')
+        delta_H_298_J = delta_H_298_kJ * 1000.0
+
+        assert delta_H_298_kJ < 0.0, (
+            f"{fuel}: combustion must be exothermic, got {delta_H_298_kJ} kJ")
+
+        def mean_cp_over_R(params, T):
+            """<Cp>/R for one species, averaged over T_initial to T."""
+            return (params["A"]
+                    + (params["B"] / 2) * (T + T_initial)
+                    + (params["C"] / 3) * (T * T + T * T_initial + T_initial ** 2)
+                    + (params["D"] / (T * T_initial) if params["D"] else 0.0))
+
+        # The iteration. Each step's divisor is bound through its display, so the
+        # printed line closes exactly (P1/P2).
+        T_k = initial_guess
+        iterations = []
+        for _ in range(n_iterations):
+            cp_mixture = _as_printed(
+                sum(nu * R * mean_cp_over_R(CP_PARAMS_COMBUSTION[s], T_k)
+                    for s, nu in products.items()), f'.{dp}f')
+            T_next = _as_printed(T_initial + (-delta_H_298_J) / cp_mixture,
                                  f'.{dp}f')
-    delta_H_298_J = delta_H_298_kJ * 1000.0
+            iterations.append((T_k, cp_mixture, T_next))
+            T_k = T_next
 
-    assert delta_H_298_kJ < 0.0, (
-        f"{fuel}: combustion must be exothermic, got {delta_H_298_kJ} kJ")
-
-    def mean_cp_over_R(params, T):
-        """<Cp>/R for one species, averaged over T_initial to T."""
-        return (params["A"]
-                + (params["B"] / 2) * (T + T_initial)
-                + (params["C"] / 3) * (T * T + T * T_initial + T_initial ** 2)
-                + (params["D"] / (T * T_initial) if params["D"] else 0.0))
-
-    # The iteration. Each step's divisor is bound through its display, so the
-    # printed line closes exactly (P1/P2).
-    T_k = initial_guess
-    iterations = []
-    for _ in range(n_iterations):
-        cp_mixture = _as_printed(
-            sum(nu * R * mean_cp_over_R(CP_PARAMS_COMBUSTION[s], T_k)
-                for s, nu in products.items()), f'.{dp}f')
-        T_next = _as_printed(T_initial + (-delta_H_298_J) / cp_mixture,
-                             f'.{dp}f')
-        iterations.append((T_k, cp_mixture, T_next))
-        T_k = T_next
-
-    adiabatic_temp_kelvin = round(T_k)
+        adiabatic_temp_kelvin = round(T_k)
+        T_exact = T_k
+        for _ in range(60):
+            T_exact = T_initial + (-delta_H_298_J) / sum(
+                nu * R * mean_cp_over_R(CP_PARAMS_COMBUSTION[s], T_exact)
+                for s, nu in products.items())
+        if (round(T_exact) == adiabatic_temp_kelvin
+                and abs(T_k - math.floor(T_k) - 0.5) > 1e-9):
+            break
+    else:
+        raise AssertionError(
+            f"{fuel}: no excess-air level gives an answer stable to the kelvin")
 
     # --- invariants (T7) ---------------------------------------------------
     assert all(cp > 0.0 for _, cp, _ in iterations), (
@@ -612,16 +698,39 @@ def template_adiabatic_flame_temperature():
         f"{fuel}: flame temperature {adiabatic_temp_kelvin} K outside the "
         f"{CP_COMBUSTION_VALID_T_MAX} K validity of CP_PARAMS_COMBUSTION")
 
+    air_phrase = ("the theoretical amount of dry air" if excess_pct == 0
+                  else f"{excess_pct}% excess dry air")
     question = (
         f"{fuel} gas enters a furnace at {T_initial} K and is burned completely with "
-        f"the theoretical amount of dry air (also at {T_initial} K). Assuming the "
+        f"{air_phrase} (also at {T_initial} K). Assuming the "
         f"process is adiabatic and there is no shaft work, estimate the "
         f"adiabatic flame temperature in Kelvin."
     )
 
+    if air is None:
+        step1 = (
+            f"**Step 1:** Write the balanced chemical equation including inert nitrogen from air.\n"
+            f"  {equation}\n\n"
+        )
+    else:
+        # Bound to names before printing (T5): each is the exact decimal the balance uses.
+        fuel_nu_txt, o2_th_txt, o2_sup_txt, n2_air_txt, o2_ex_txt = (
+            _fmt_num(air[k]) for k in ('fuel_nu', 'o2_th', 'o2_sup', 'n2_air', 'o2_ex'))
+        step1 = (
+            f"**Step 1:** Work out the air supplied, then write the balanced chemical equation "
+            f"including the excess oxygen and the inert nitrogen.\n"
+            f"Complete combustion of {fuel_nu_txt} mol of {fuel} needs "
+            f"{o2_th_txt} mol O2.\n"
+            f"O2 supplied = (1 + {excess_pct}/100) * {o2_th_txt} = "
+            f"{o2_sup_txt} mol\n"
+            f"N2 supplied = 3.76 * {o2_sup_txt} = {n2_air_txt} mol\n"
+            f"Excess O2 in the products = {o2_sup_txt} - {o2_th_txt} = "
+            f"{o2_ex_txt} mol\n"
+            f"  {equation}\n\n"
+        )
+
     solution = (
-        f"**Step 1:** Write the balanced chemical equation including inert nitrogen from air.\n"
-        f"  {equation}\n\n"
+        step1 +
 
         f"**Step 2:** Calculate the standard heat of reaction at {T_initial} K (ΔH_rxn°).\n"
         f"Using standard heats of formation:\n"
@@ -656,8 +765,8 @@ def template_adiabatic_flame_temperature():
         f"iteration has converged at this display precision.\n"
         f"T_ad = {adiabatic_temp_kelvin} K\n"
         f"The iteration is exact for this heat-capacity model, but the model "
-        f"itself is good to about ±2 K against NIST reference data, so the "
-        f"answer should be read as {adiabatic_temp_kelvin} ± 2 K.\n\n"
+        f"itself agrees with NIST reference data to within 2.5 K, so the "
+        f"answer should be read as {adiabatic_temp_kelvin} ± 2.5 K.\n\n"
 
         f"**Answer:** The estimated adiabatic flame temperature is **{adiabatic_temp_kelvin} K**."
     )

@@ -1,6 +1,6 @@
 # Exact display-tie census
 
-Generated 2026-09-26T13:09:40+00:00 by `tie_census.py` at git `85ccf8d028`, 500 seeds per template, 45.6 s. A tie is an emitted line whose exact value, recomputed in Decimal from the printed operands, sits exactly half-way at the printed precision; such an instance has no gold value a decimal reader and a binary reader agree on (D-016). Only lines T1 can parse are covered.
+Generated 2026-09-27T20:35:12+00:00 by `tie_census.py` at git `fb88cf1d19`, 500 seeds per template, 59.0 s. A tie is an emitted line whose exact value, recomputed in Decimal from the printed operands, sits exactly half-way at the printed precision; such an instance has no gold value a decimal reader and a binary reader agree on (D-016). Only lines T1 can parse are covered.
 
 | | Templates |
 |---|---:|
@@ -38,4 +38,4 @@ Examples:
 - `template_exponential_mttf_topology`: seed 411: MTTF = 1000 / 1.28 = 781.3 hours (rounded half up to one decimal)  (exact 781.25)
 - `template_system_reliability_topology`: seed 272: Rs = 1 - 0.075 * 0.054 = 1 - 0.004050 = 0.9960  (exact 0.995950)
 
-239,638 checks evaluated exactly; 28,971 skipped (functions or operators outside the exact evaluator, e.g. trigonometry and logarithms).
+241,120 checks evaluated exactly; 28,971 skipped (functions or operators outside the exact evaluator, e.g. trigonometry and logarithms).

@@ -4401,6 +4401,34 @@ commitment `cd53376fb0fe90ac…`, both in full in `FREEZE.json`.
 
 **Open.** A private backup of `pool/` and `SEED.secret`; the tag, on the commit inference runs at.
 
+## D-115 — Two chemical templates widened so each can supply 15 distinct problems; round 4 for the chemical experts
+
+**Date:** 2026-09-28 · **Status:** DECIDED (the owner's call to fix and re-certify); round 4 OPEN · **Evidence:** `template_annotation_23092026/layer2/fixes_round4.md`, `round4_checks.py` / `round4_checks.md`, `full_run_28092026/DIVERSITY.md`
+
+The diversity analysis found two templates that could not produce 15 distinct questions from any seed:
+`heat_of_reaction_formation` had 4 and `adiabatic_flame_temperature` 11, so D-114's freeze filled them
+with repeats. The owner, 2026-09-28: "i think we should fix these templates and we can ask the chemical
+annotators to look these up again ... 2 templates are doable". This reopens the certification for these
+two templates only.
+
+- **`heat_of_reaction_formation`** draws from a new table, `HESS_REACTIONS`: the four `REACTIONS` rows
+  plus 21 reactions built only from species already priced in `HEATS_OF_FORMATION`. The question, the
+  reasoning and the level are unchanged. `REACTIONS` itself is untouched, because three stoichiometry
+  templates also read it: widening it was tried first, and the gate caught generation errors in all
+  three. The constants suite now checks atom balance over `HESS_REACTIONS`.
+- **`adiabatic_flame_temperature`** samples 0-100% excess air in whole percent, 1,111 fuel-and-level
+  cases, with exact decimal coefficients; at 0% it reads as before. Its documented margins were measured
+  at theoretical air, so all were re-measured: six passes within 0.102 K of the fixed point, contraction
+  0.089-0.135, 1430-2908 K, and at most 2.41 K from a NIST Shomate solve, so Step 6 now says 2.5 K. The
+  rounding margin did not carry over, so a guard redraws the excess level in the 20 cases where the
+  answer's last kelvin would depend on the iteration count or a half-kelvin display.
+
+Gate 150 of 150; the tie census and the Markdown scan are unchanged, and neither template appears in
+either; certification is 148 of 150 until round 4 returns. Round 4 is built: the two templates for the
+three chemical experts, no plants, fresh hand-check instances.
+
+**Open.** Round 4's verdicts; the pool is re-frozen with these two templates as they now stand (D-116).
+
 ## Open decisions
 
 | # | Decision | Needed before |
@@ -4415,6 +4443,7 @@ commitment `cd53376fb0fe90ac…`, both in full in `FREEZE.json`.
 | — | ~~Whether the full run adds the step router~~ **In the stack (D-110), batched or not at all (D-113).** ~~Its routing rule~~ **rule C (D-112).** ~~Measuring the batched prompt~~ **Measured: no detection lost, about $114 at full scale (D-113).** Still open: building it, its reported score, and whether the supervisor funds it at about $643 for the base plan | before evaluation starts |
 | — | The repo's templates no longer reproduce 17 of the 60 frozen items byte-identically (D-102); `milestones.build_all` raises on the pilot manifest; `pinned_templates.py` works around it for the pilot | any re-derivation of milestones from templates |
 | — | ~~Which families the next roster will evaluate~~ **Decided 2026-09-27 (D-110): the pricing document's eleven** | — |
+| D-115 | Round 4: the three chemical experts review `heat_of_reaction_formation` and `adiabatic_flame_temperature` as widened; `certification.py` with the round-4 labels | the paper states what the experts certified |
 | D-114 | A private backup of `full_run_28092026/pool/` and `SEED.secret`; the tag on the commit inference runs at | inference starts |
 | — | The budget: the plan comes to about $606 against the ~$500 round with a batched router (D-110) | generation starts |
 | — | ~~Expert annotation of the frozen 300 (stage 3)~~ **Done: 15 experts, every trace labelled three times, with verification and adjudication rounds (RESULTS_X1)** | — |

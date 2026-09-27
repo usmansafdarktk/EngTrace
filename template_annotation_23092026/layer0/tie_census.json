@@ -1,6 +1,6 @@
 {
- "generated": "2026-09-26T13:09:40+00:00",
- "git_head": "85ccf8d028cf27a884beb2aec84e3a82a50b6995",
+ "generated": "2026-09-27T20:35:12+00:00",
+ "git_head": "fb88cf1d190b5a3bf50c1e97eaccfdef5a94c838",
  "seeds": 500,
  "rows": {
   "template_levenspiel_plot_interpretation": {
@@ -95,7 +95,7 @@
   },
   "template_adiabatic_flame_temperature": {
    "branch": "chemical_engineering",
-   "checks": 3500,
+   "checks": 4982,
    "skipped": 0,
    "instances_with_tie": 0,
    "rate": 0.0,
@@ -1416,5 +1416,5 @@
    "examples": []
   }
  },
- "seconds": 45.6
+ "seconds": 59.0
 }

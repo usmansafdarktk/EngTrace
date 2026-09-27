@@ -1,6 +1,6 @@
 {
- "generated": "2026-09-27T19:36:29+00:00",
- "git_head": "1acc7cfa2ee0cfdd5eb970a98569ed9866834f8e",
+ "generated": "2026-09-27T20:40:13+00:00",
+ "git_head": "fb88cf1d190b5a3bf50c1e97eaccfdef5a94c838",
  "seeds": 500,
  "gating": [
   "T1",
@@ -488,10 +488,10 @@
     "failures": 0,
     "excused": {},
     "unexcused": 0,
-    "marginals": 1739,
-    "checks": 3500,
+    "marginals": 1706,
+    "checks": 4982,
     "unit_rescales": 0,
-    "coverage": 0.368,
+    "coverage": 0.454,
     "examples": []
    },
    "T2": {
@@ -6747,5 +6747,5 @@
    "T7": false
   }
  },
- "seconds": 106.5
+ "seconds": 124.8
 }

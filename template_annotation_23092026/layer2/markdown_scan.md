@@ -1,6 +1,6 @@
 # Markdown rendering scan
 
-Generated 2026-09-26T13:09:52+00:00 by `markdown_scan.py` at git `85ccf8d028`, 200 seeds per template over 150 templates. The review app renders questions and solutions as Markdown; the models read the raw text. A lossy construct removes characters from what the expert sees.
+Generated 2026-09-27T20:36:19+00:00 by `markdown_scan.py` at git `fb88cf1d19`, 200 seeds per template over 150 templates. The review app renders questions and solutions as Markdown; the models read the raw text. A lossy construct removes characters from what the expert sees.
 
 | | Templates |
 |---|---:|

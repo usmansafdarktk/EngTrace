@@ -1,6 +1,6 @@
 # Layer 2 - certification status of every template
 
-Generated 2026-09-27T19:38:27+00:00 by `certification.py` at git `1acc7cfa2e` over 150 templates. A template is certified when the latest round that reviewed it is a unanimous approval by its three own-branch experts and the current code still produces, byte for byte, the five instances they were shown.
+Generated 2026-09-27T20:40:34+00:00 by `certification.py` at git `fb88cf1d19` over 150 templates. A template is certified when the latest round that reviewed it is a unanimous approval by its three own-branch experts and the current code still produces, byte for byte, the five instances they were shown.
 
 | Round | Labels | Built at | Templates reviewed | Verdicts |
 |---:|---|---|---:|---:|
@@ -10,16 +10,21 @@ Generated 2026-09-27T19:38:27+00:00 by `certification.py` at git `1acc7cfa2e` ov
 
 | | Templates |
 |---|---:|
-| certified | 150 of 150 |
-| of which last reviewed in round 1 | 128 |
+| certified | 148 of 150 |
+| of which last reviewed in round 1 | 126 |
 | of which last reviewed in round 2 | 17 |
 | of which last reviewed in round 3 | 5 |
-| not certified | 0 |
+| not certified | 2 |
+
+| Template | Why not |
+|---|---|
+| `template_adiabatic_flame_temperature` | current output differs from the reviewed instances |
+| `template_heat_of_reaction_formation` | current output differs from the reviewed instances |
 
 | Template | Branch | Last reviewed | Verdicts | Current output = reviewed | Certified |
 |---|---|---:|---|---|---|
 | `template_absorbing_chain_time_to_failure` | industrial | round 1 | A A A | yes | yes |
-| `template_adiabatic_flame_temperature` | chemical | round 1 | A A A | yes | yes |
+| `template_adiabatic_flame_temperature` | chemical | round 1 | A A A | NO | no |
 | `template_aliased_frequency_identification` | electrical | round 1 | A A A | yes | yes |
 | `template_angle_of_twist` | mechanical | round 2 | A A A | yes | yes |
 | `template_annulus_flowrate` | chemical | round 2 | A A A | yes | yes |
@@ -73,7 +78,7 @@ Generated 2026-09-27T19:38:27+00:00 by `certification.py` at git `1acc7cfa2e` ov
 | `template_gas_viscosity_kinetic_theory` | chemical | round 2 | A A A | yes | yes |
 | `template_gauss_law_symmetric` | electrical | round 1 | A A A | yes | yes |
 | `template_hagen_poiseuille_flowrate` | chemical | round 2 | A A A | yes | yes |
-| `template_heat_of_reaction_formation` | chemical | round 1 | A A A | yes | yes |
+| `template_heat_of_reaction_formation` | chemical | round 1 | A A A | NO | no |
 | `template_hydraulic_jump_energy_loss` | civil | round 1 | A A A | yes | yes |
 | `template_hydrostatic_force_on_plane` | mechanical | round 1 | A A A | yes | yes |
 | `template_hydrostatic_pressure_at_depth` | mechanical | round 1 | A A A | yes | yes |

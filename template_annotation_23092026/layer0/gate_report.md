@@ -1,6 +1,6 @@
 # Layer 0 gate report
 
-Generated 2026-09-27T19:36:29+00:00 by `gate.py` at git `1acc7cfa2e`, 500 seeds per template, 106.5 s. Gating: T1, T3, T4, T8 plus generation errors. Advisory: T5, T7.
+Generated 2026-09-27T20:40:13+00:00 by `gate.py` at git `fb88cf1d19`, 500 seeds per template, 124.8 s. Gating: T1, T3, T4, T8 plus generation errors. Advisory: T5, T7.
 
 | | Templates |
 |---|---:|

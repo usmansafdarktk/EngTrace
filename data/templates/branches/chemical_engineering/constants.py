@@ -628,6 +628,145 @@ REACTIONS = [
     }
 ]
 
+# The reactions template_heat_of_reaction_formation draws from, and ONLY that template.
+# REACTIONS above keeps the four rows the three stoichiometry templates also read, so
+# their certified instances do not move. Widened from 4 to 25 for Layer 2 round 4
+# (D-115): with REACTIONS alone the template had only 4 distinct questions. Every species
+# is already priced in HEATS_OF_FORMATION, so no new constant enters.
+# @kind: mathematical
+# @units: reactants=1, products=1
+# @domain: none (stoichiometry; no temperature or pressure condition)
+# [DERIVED] every reaction balances. The constants suite counts atoms on both sides of all recompute=atom_balance
+#   25 reactions from the species keys themselves (test_chemical_thermochemistry.py).
+HESS_REACTIONS = REACTIONS + [
+    {
+        "name": "Combustion of Ethane",
+        "equation": "2C2H6(g) + 7O2(g) → 4CO2(g) + 6H2O(l)",
+        "reactants": {"C2H6(g)": 2, "O2(g)": 7},
+        "products": {"CO2(g)": 4, "H2O(l)": 6}
+    },
+    {
+        "name": "Combustion of Propane to Water Vapour",
+        "equation": "C3H8(g) + 5O2(g) → 3CO2(g) + 4H2O(g)",
+        "reactants": {"C3H8(g)": 1, "O2(g)": 5},
+        "products": {"CO2(g)": 3, "H2O(g)": 4}
+    },
+    {
+        "name": "Combustion of Butane",
+        "equation": "2C4H10(g) + 13O2(g) → 8CO2(g) + 10H2O(g)",
+        "reactants": {"C4H10(g)": 2, "O2(g)": 13},
+        "products": {"CO2(g)": 8, "H2O(g)": 10}
+    },
+    {
+        "name": "Combustion of Acetylene",
+        "equation": "2C2H2(g) + 5O2(g) → 4CO2(g) + 2H2O(g)",
+        "reactants": {"C2H2(g)": 2, "O2(g)": 5},
+        "products": {"CO2(g)": 4, "H2O(g)": 2}
+    },
+    {
+        "name": "Combustion of Octane Vapour",
+        "equation": "2C8H18(g) + 25O2(g) → 16CO2(g) + 18H2O(g)",
+        "reactants": {"C8H18(g)": 2, "O2(g)": 25},
+        "products": {"CO2(g)": 16, "H2O(g)": 18}
+    },
+    {
+        "name": "Combustion of Benzene",
+        "equation": "2C6H6(l) + 15O2(g) → 12CO2(g) + 6H2O(l)",
+        "reactants": {"C6H6(l)": 2, "O2(g)": 15},
+        "products": {"CO2(g)": 12, "H2O(l)": 6}
+    },
+    {
+        "name": "Combustion of Liquid Methanol",
+        "equation": "2CH3OH(l) + 3O2(g) → 2CO2(g) + 4H2O(l)",
+        "reactants": {"CH3OH(l)": 2, "O2(g)": 3},
+        "products": {"CO2(g)": 2, "H2O(l)": 4}
+    },
+    {
+        "name": "Combustion of Methanol Vapour",
+        "equation": "2CH3OH(g) + 3O2(g) → 2CO2(g) + 4H2O(g)",
+        "reactants": {"CH3OH(g)": 2, "O2(g)": 3},
+        "products": {"CO2(g)": 2, "H2O(g)": 4}
+    },
+    {
+        "name": "Combustion of Liquid Ethanol",
+        "equation": "C2H5OH(l) + 3O2(g) → 2CO2(g) + 3H2O(l)",
+        "reactants": {"C2H5OH(l)": 1, "O2(g)": 3},
+        "products": {"CO2(g)": 2, "H2O(l)": 3}
+    },
+    {
+        "name": "Combustion of Ethanol Vapour",
+        "equation": "C2H5OH(g) + 3O2(g) → 2CO2(g) + 3H2O(g)",
+        "reactants": {"C2H5OH(g)": 1, "O2(g)": 3},
+        "products": {"CO2(g)": 2, "H2O(g)": 3}
+    },
+    {
+        "name": "Combustion of Carbon Monoxide",
+        "equation": "2CO(g) + O2(g) → 2CO2(g)",
+        "reactants": {"CO(g)": 2, "O2(g)": 1},
+        "products": {"CO2(g)": 2}
+    },
+    {
+        "name": "Combustion of Hydrogen",
+        "equation": "2H2(g) + O2(g) → 2H2O(g)",
+        "reactants": {"H2(g)": 2, "O2(g)": 1},
+        "products": {"H2O(g)": 2}
+    },
+    {
+        "name": "Water-Gas Shift",
+        "equation": "CO(g) + H2O(g) → CO2(g) + H2(g)",
+        "reactants": {"CO(g)": 1, "H2O(g)": 1},
+        "products": {"CO2(g)": 1, "H2(g)": 1}
+    },
+    {
+        "name": "Methanol Synthesis from Synthesis Gas",
+        "equation": "CO(g) + 2H2(g) → CH3OH(g)",
+        "reactants": {"CO(g)": 1, "H2(g)": 2},
+        "products": {"CH3OH(g)": 1}
+    },
+    {
+        "name": "Methanol Synthesis from Carbon Dioxide",
+        "equation": "CO2(g) + 3H2(g) → CH3OH(g) + H2O(g)",
+        "reactants": {"CO2(g)": 1, "H2(g)": 3},
+        "products": {"CH3OH(g)": 1, "H2O(g)": 1}
+    },
+    {
+        "name": "Ammonia Synthesis",
+        "equation": "N2(g) + 3H2(g) → 2NH3(g)",
+        "reactants": {"N2(g)": 1, "H2(g)": 3},
+        "products": {"NH3(g)": 2}
+    },
+    {
+        "name": "Oxidation of Nitric Oxide",
+        "equation": "2NO(g) + O2(g) → 2NO2(g)",
+        "reactants": {"NO(g)": 2, "O2(g)": 1},
+        "products": {"NO2(g)": 2}
+    },
+    {
+        "name": "Combustion of Ammonia to Nitrogen",
+        "equation": "4NH3(g) + 3O2(g) → 2N2(g) + 6H2O(g)",
+        "reactants": {"NH3(g)": 4, "O2(g)": 3},
+        "products": {"N2(g)": 2, "H2O(g)": 6}
+    },
+    {
+        "name": "Dry Reforming of Methane",
+        "equation": "CH4(g) + CO2(g) → 2CO(g) + 2H2(g)",
+        "reactants": {"CH4(g)": 1, "CO2(g)": 1},
+        "products": {"CO(g)": 2, "H2(g)": 2}
+    },
+    {
+        "name": "Partial Oxidation of Methane",
+        "equation": "2CH4(g) + O2(g) → 2CO(g) + 4H2(g)",
+        "reactants": {"CH4(g)": 2, "O2(g)": 1},
+        "products": {"CO(g)": 2, "H2(g)": 4}
+    },
+    {
+        "name": "Trimerization of Acetylene to Benzene",
+        "equation": "3C2H2(g) → C6H6(l)",
+        "reactants": {"C2H2(g)": 3},
+        "products": {"C6H6(l)": 1}
+    }
+]
+
 
 # A dictionary of substances with their heat capacity parameters for the
 # equation: Cp/R = A + B*T + C*T² + D*T⁻² where T is in Kelvin.
