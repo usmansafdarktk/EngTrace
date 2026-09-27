@@ -185,15 +185,19 @@ def report():
         print('    %-12s %3d  shown %.3f' % (b or 'conceptual', len(ks),
                                              sum(sets[k]['planted']['shown'] for k in ks) / len(ks)))
 
-    # end to end: routing x the judges' detection rate from Finding 8
-    print('\n  END TO END - routing x detection (Finding 8: either judge catches 0.350 of')
-    print('  conceptual defects, 0.800 of arithmetic, given the step is shown)')
+    # end to end, as a PRODUCT of two rates: routing x the judges' detection from Finding 8.
+    # It assumes the judges catch the shown defects as often as all of them, and they do
+    # not: analysis/router_planted.py counts shown-AND-caught defect by defect (0.150
+    # conceptual, 0.600 arithmetic), which is the figure to report.
+    print('\n  END TO END, as a product - routing x detection (Finding 8: either of E0\'s two judges')
+    print('  catches 0.350 of conceptual defects, 0.800 of arithmetic, when asked directly).')
+    print('  router_planted.py counts the same thing jointly; report that figure, not this one.')
     for f, rate in (('conceptual', 0.350), ('arithmetic', 0.800)):
         ks = [k for k in sets if fam[k] == f]
         if not ks:
             continue
         s = sum(sets[k]['planted']['shown'] for k in ks) / len(ks)
-        print('    %-12s shown %.3f x caught %.3f = %.3f of defects detected by E0 end to end'
+        print('    %-12s shown %.3f x caught %.3f = %.3f (product)'
               % (f, s, rate, s * rate))
 
     ans = Counter(r['final_answer_acc'] for r in rows if r['arm'] == 'planted')

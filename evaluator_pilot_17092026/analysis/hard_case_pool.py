@@ -7,10 +7,11 @@ whose final answer the experts call correct, their holistic verdict calls 3 unso
 too few to separate any two evaluators. This script does two things about that.
 
 A. THE POOL ALREADY IN THE LABELS. The experts' STEP labels disagree with their own
-   verdict: 56 of those correct-answer traces carry at least one step the experts mark
-   incorrect. Scoring the evaluators on "does this trace contain an incorrect step,
-   given the answer is right" is the hard-case comparison with 56 positives instead of
-   3. It needs no new traces and no new labelling - only the decision that this, not
+   verdict: 93 of those correct-answer traces carry at least one step the experts mark
+   incorrect (56 on version 1 of the labels, before the reasons, verification and
+   adjudication rounds). Scoring the evaluators on "does this trace contain an incorrect
+   step, given the answer is right" is the hard-case comparison with 93 positives
+   instead of 3. It needs no new traces and no new labelling - only the decision that this, not
    the holistic verdict, is the trace-level target when the answer is correct.
 
 B. CANDIDATES FOR A SECOND ROUND. To widen the pool, traces nobody has labelled

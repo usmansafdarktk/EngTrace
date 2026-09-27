@@ -21,6 +21,14 @@ Two rates matter, because they price differently:
 Costs are quoted at MiMo-V2.5-Pro's measured rate, since that is the judge E5 uses and the
 one that survives the judge/judged objection: $0.435 and $0.870 per million tokens, about
 $0.0034 a call as JUDGE_SELECTION records it.
+
+The two rates are two different routers, and only one of them has been measured for what
+it catches. The planted-defect probe (planted_judges.py, router_planted.py) asked a judge
+about ONE step per call, which is the per-step design. The per-trace figure assumes a
+trace's residue steps are batched into one prompt, which is cheaper and has not been
+tested: more context per call, and more steps competing for the judge's attention.
+
+The full run is --models 11, the roster D-110 fixed.
 """
 import os as _os
 _ANALYSIS = _os.path.dirname(_os.path.abspath(__file__))
@@ -38,7 +46,8 @@ import e2_prm  # noqa: E402
 import score_against_labels as S  # noqa: E402
 
 PER_CALL = 0.0034          # MiMo, measured over the pilot's E5 calls
-FULL_RUN = 12 * 2250       # the roster x the benchmark
+ITEMS = 2250               # the benchmark: 150 templates x 15 instances
+MODELS = 11                # the roster, D-110
 
 
 def verifiable(step):
@@ -49,11 +58,9 @@ def verifiable(step):
     return False
 
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument('--labels', default=_os.path.join(_PILOT, 'experts_filled_labels', 'version_2', 'labels'))
-    a = ap.parse_args()
-    truth, _ = S.build_truth(S.read_labels(a.labels), S.read_consensus(a.labels))
+def measure(labels_dir, models=MODELS):
+    """The residue over the labelled 300 and what routing it would cost, as one dict."""
+    truth, _ = S.build_truth(S.read_labels(labels_dir), S.read_consensus(labels_dir))
     keyfile = {r['code']: (r['model_key'], r['item_id'])
                for r in map(json.loads, open(_os.path.join(S.TASKS, 'keyfile.jsonl'), encoding='utf-8'))}
     texts = {}
@@ -82,37 +89,56 @@ def main():
         for i in res:
             label_of_residue[t['steps'][i]['label']] += 1
 
-    n = len(per_trace)
+    full = models * ITEMS
     with_res = sum(1 for x in per_trace if x)
+    return {'traces': len(per_trace), 'steps': steps_total, 'residue_steps': residue_total,
+            'traces_with_residue': with_res, 'per_trace': per_trace, 'by_model': dict(by_model),
+            'labels': dict(label_of_residue), 'models': models, 'full_run_traces': full,
+            'per_call': PER_CALL,
+            'calls_batched': full * with_res / len(per_trace),
+            'calls_per_step': full * st.mean(per_trace),
+            'cost_batched': full * with_res / len(per_trace) * PER_CALL,
+            'cost_per_step': full * st.mean(per_trace) * PER_CALL}
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--labels', default=_os.path.join(_PILOT, 'experts_filled_labels', 'version_2', 'labels'))
+    ap.add_argument('--models', type=int, default=MODELS, help='roster size (D-110: 11)')
+    a = ap.parse_args()
+    m = measure(a.labels, a.models)
+    per_trace, n, with_res = m['per_trace'], m['traces'], m['traces_with_residue']
     print('RESIDUE - steps a deterministic checker cannot verify (%d traces, %d steps)\n'
-          % (n, steps_total))
+          % (n, m['steps']))
     print('  steps that are residue          %d of %d  (%.1f%%)'
-          % (residue_total, steps_total, 100 * residue_total / steps_total))
+          % (m['residue_steps'], m['steps'], 100 * m['residue_steps'] / m['steps']))
     print('  traces with at least one        %d of %d  (%.1f%%)' % (with_res, n, 100 * with_res / n))
     print('  residue steps per trace         median %.1f, mean %.1f, max %d'
           % (st.median(per_trace), st.mean(per_trace), max(per_trace)))
     print('\n  by model')
-    for m, v in sorted(by_model.items()):
+    for model, v in sorted(m['by_model'].items()):
         print('    %-16s %5.1f residue steps per trace, %3d%% of its traces have one'
-              % (m, st.mean(v), round(100 * sum(1 for x in v if x) / len(v))))
+              % (model, st.mean(v), round(100 * sum(1 for x in v if x) / len(v))))
 
     print('\n  WHAT THE EXPERTS SAID ABOUT THOSE STEPS')
-    tot = sum(label_of_residue.values())
-    for k, v in label_of_residue.most_common():
+    labels = Counter(m['labels'])
+    tot = sum(labels.values())
+    for k, v in labels.most_common():
         print('    %-20s %5d  (%.1f%%)' % (k, v, 100 * v / tot))
-    bad = label_of_residue['incorrect']
     print('    so %.1f%% of the residue is a step the experts call incorrect - the fraction of'
-          % (100 * bad / tot))
+          % (100 * labels['incorrect'] / tot))
     print('    a judge\'s attention that would land on a real error')
 
-    print('\n  COST AT FULL SCALE (%d traces, MiMo at $%.4f a call)' % (FULL_RUN, PER_CALL))
-    rate = with_res / n
-    print('    one call per trace with residue:   %.0f calls  =  $%.0f'
-          % (FULL_RUN * rate, FULL_RUN * rate * PER_CALL))
-    print('    one call per residue STEP:         %.0f calls  =  $%.0f'
-          % (FULL_RUN * st.mean(per_trace), FULL_RUN * st.mean(per_trace) * PER_CALL))
-    print('\n  The per-trace figure is the one to budget: the framework already batches a')
-    print('  trace\'s mismatched steps into a single prompt, and a router would do the same.')
+    print('\n  COST AT FULL SCALE (%d models x %d items = %d traces, MiMo at $%.4f a call)'
+          % (m['models'], ITEMS, m['full_run_traces'], PER_CALL))
+    print('    one call per trace with residue:   %.0f calls  =  $%.0f   (batched; untested)'
+          % (m['calls_batched'], m['cost_batched']))
+    print('    one call per residue STEP:         %.0f calls  =  $%.0f   (the design the probe measured)'
+          % (m['calls_per_step'], m['cost_per_step']))
+    print('\n  The framework already batches a trace\'s mismatched steps into a single prompt, and a')
+    print('  router would do the same - but the detection rates in router_planted.py come from')
+    print('  asking about one step at a time, so they describe the per-step design until a')
+    print('  batched prompt is measured.')
 
 
 if __name__ == '__main__':

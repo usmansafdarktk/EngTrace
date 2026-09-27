@@ -3,8 +3,9 @@
     python evaluator_pilot_17092026/analysis/digit_rule.py [--labels DIR]
 
 Finding 5 of RESULTS_X1 says no evaluator detects a flawed step behind a correct final
-answer. It also says what those flaws are: 164 of the 167 are calculation slips, not
-conceptual errors. The annotation guide's rule for them is mechanical, and the
+answer. It also says what those flaws are: 175 of the 178 are calculation slips, not
+conceptual errors (164 of 167 when this was first written, before electrical's
+re-adjudication, D-099). The annotation guide's rule for them is mechanical, and the
 adjudication notes quote it constantly - *rounding is not an error, a wrong digit is*.
 
 So apply that rule by machine. For every arithmetic claim a trace writes, recompute the

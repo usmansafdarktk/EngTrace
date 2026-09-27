@@ -120,6 +120,37 @@ def report(title, codes, y, score, groupings, B):
                   % (name, pt, lo_c, hi_c, mde, verdict))
 
 
+BASELINE = 'baseline: expert answer verdict'
+
+
+def margins_over(codes, y, score, groupings, B, base=BASELINE):
+    """`base` minus every other score, with template-level intervals.
+
+    Section 1 measures each evaluator against E0. The pilot's headline - the final answer
+    dominates the trace-level verdict - is a claim about every evaluator, so it has to be
+    checked against the best of them, not only the published one."""
+    out = {}
+    for name in score:
+        if name == base:
+            continue
+        ok = [c for c in codes if score[name][c] is not None]
+        fn = lambda ks, nm=name: (X.auroc([(score[base][c], y[c]) for c in ks])
+                                  - X.auroc([(score[nm][c], y[c]) for c in ks]))
+        pt, se_c, lo_c, hi_c = spread(fn, ok, groupings['template'], B)
+        out[name] = {'margin': pt, 'lo': lo_c, 'hi': hi_c, 'mde': Z * se_c, 'n': len(ok)}
+    return out
+
+
+def trace_scores(codes, truth, rows, keyfile):
+    """Every evaluator's trace score, the experts' answer verdict beside them, and the target."""
+    score = {n: scores_for(rows, keyfile, codes, n, d, f) for n, d, f in X.HEADS}
+    score[BASELINE] = {
+        c: 1.0 if truth[c]['final_answer'] == 'correct' else (0.5 if truth[c]['final_answer'] == 'partial' else 0.0)
+        for c in codes}
+    y = {c: truth[c]['reasoning_sound'] == 'yes' for c in codes}
+    return score, y
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--labels', default=_os.path.join(_PILOT, 'experts_filled_labels', 'version_2', 'labels'))
@@ -135,12 +166,15 @@ def main():
     print('Clusters are templates: an instance is a re-draw of the same problem, so the '
           'independent unit is\nthe template, of which there are 15.')
 
-    score = {n: scores_for(rows, keyfile, codes, n, d, f) for n, d, f in X.HEADS}
-    score['baseline: expert answer verdict'] = {
-        c: 1.0 if truth[c]['final_answer'] == 'correct' else (0.5 if truth[c]['final_answer'] == 'partial' else 0.0)
-        for c in codes}
-    y = {c: truth[c]['reasoning_sound'] == 'yes' for c in codes}
+    score, y = trace_scores(codes, truth, rows, keyfile)
     report('1. TRACE LEVEL - separating sound from unsound reasoning', codes, y, score, groupings, a.B)
+
+    print('\n1b. THE EXPERTS\' ANSWER VERDICT MINUS EVERY EVALUATOR, templates resampled')
+    print('  %-24s %8s | %-22s | %10s %s' % ('evaluator', 'margin', 'template bootstrap 95%', 'MDE(80%)', ''))
+    for name, m in margins_over(codes, y, score, groupings, a.B).items():
+        print('  %-24s %+8.3f | (%+.3f, %+.3f)        | %10.3f %s'
+              % (name, m['margin'], m['lo'], m['hi'], m['mde'],
+                 'excludes zero' if m['lo'] > 0 or m['hi'] < 0 else 'INCLUDES ZERO'))
 
     right = [c for c in codes if truth[c]['final_answer'] == 'correct']
     flawed = {c: not any(s['label'] == 'incorrect' for s in truth[c]['steps']) for c in right}

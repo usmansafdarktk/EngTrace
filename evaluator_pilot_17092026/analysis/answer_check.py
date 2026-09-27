@@ -90,6 +90,14 @@ def main():
              sum((got[c] == 'correct') == (exp[c] == 'correct') for c in nonp) / len(nonp),
              sum(1 for c in nonp if e0.get(keyfile[c])
                  and (e0[keyfile[c]]['scores']['final_answer_acc'] == 1.0) == (exp[c] == 'correct')) / len(nonp)))
+    e0_says = {c: e0[keyfile[c]]['scores']['final_answer_acc'] == 1.0 for c in codes if e0.get(keyfile[c])}
+    false_wrong = [c for c in e0_says if not e0_says[c] and exp[c] == 'correct']
+    false_right = [c for c in e0_says if e0_says[c] and exp[c] != 'correct']
+    print('\n  E0 disagrees with the experts on %d: %d traces the experts call correct and E0 calls'
+          ' wrong, %d the other way' % (len(false_wrong) + len(false_right), len(false_wrong), len(false_right)))
+    print('  of the %d E0 calls wrong, the new check calls %d correct, %d partial, %d incorrect'
+          % (len(false_wrong), *(sum(got[c] == v for c in false_wrong) for v in ('correct', 'partial', 'incorrect'))))
+
     print('\n  confusion, experts -> new check')
     conf = Counter((exp[c], got[c]) for c in codes)
     for (e, g), n in conf.most_common():

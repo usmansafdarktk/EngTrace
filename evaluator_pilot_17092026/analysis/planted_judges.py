@@ -58,6 +58,7 @@ PLANTED = _os.path.join(_ANALYSIS, 'out', 'planted', 'planted.jsonl')
 JUDGES = [('gpt-5', 'openai/gpt-5', (1.25, 10.0)),
           ('opus-4.5', 'anthropic/claude-opus-4.5', (5.0, 25.0)),
           ('mimo-v2.5-pro', 'xiaomi/mimo-v2.5-pro', (0.435, 0.870))]
+E0_PAIR = ('gpt-5', 'opus-4.5')
 SEED = 20260924
 
 
@@ -249,16 +250,21 @@ def report():
             print('    %-10s %-12s %3d sets  caught %.3f'
                   % (jid, b or 'conceptual', len(sets), caught / len(sets)))
 
-    print('\n  EITHER JUDGE - the panel reading, which is how E0 votes')
-    for f in ('conceptual', 'arithmetic'):
-        sets = {s for (j, s) in got if fam.get(s) == f}
-        ok = [s for s in sets if all((j, s) in got and len(got[(j, s)]) == 2 for j, _m, _p in JUDGES)]
-        if not ok:
-            continue
-        caught = sum(any(_wrong(got[(j, s)]['planted']['verdict'])
-                         and not _wrong(got[(j, s)]['original']['verdict'])
-                         for j, _m, _p in JUDGES) for s in ok)
-        print('    %-12s %3d sets  caught by at least one judge %.3f' % (f, len(ok), caught / len(ok)))
+    # E0's Tribunal is these two (FINDINGS E0-F6). With two votes a split falls to min(), so
+    # either judge's flag decides the step: this is the reading E0's own routing multiplies.
+    panels = [('EITHER OF E0\'S TWO JUDGES - how E0 votes (a split falls to min())', E0_PAIR),
+              ('ANY OF THE THREE - a reading no evaluator uses, for reference', [j for j, _m, _p in JUDGES])]
+    for title, panel in panels:
+        print('\n  %s' % title)
+        for f in ('conceptual', 'arithmetic'):
+            sets = {s for (j, s) in got if fam.get(s) == f}
+            ok = [s for s in sets if all((j, s) in got and len(got[(j, s)]) == 2 for j in panel)]
+            if not ok:
+                continue
+            caught = sum(any(_wrong(got[(j, s)]['planted']['verdict'])
+                             and not _wrong(got[(j, s)]['original']['verdict'])
+                             for j in panel) for s in ok)
+            print('    %-12s %3d sets  caught by at least one judge %.3f' % (f, len(ok), caught / len(ok)))
 
 
 def _wrong(parsed, count_other=False):
