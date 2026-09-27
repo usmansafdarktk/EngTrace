@@ -22,7 +22,8 @@ const REASON = { in: 270, out: 5232 };
 // (gpt-5, claude-opus-4.7, gemini-3.1-pro, deepseek-r1, llama-3.1-70b, and the robustness
 // pair gemma-4-31b-it and qwen3.8-27b) and models used as judges (gpt-5, claude-opus-4.5,
 // gemini-3.1-pro, grok, minimax, mimo). deepseek-v4-flash dropped for v4.1-flash; the
-// frontier list trimmed to one or two models per provider, claude-haiku-4.5 dropped.
+// frontier list trimmed to one or two models per provider; claude-haiku-4.5 and
+// gpt-5.4-nano dropped (2026-09-27).
 const GROUPS = [
   ['Open-source models', 'Through OpenRouter, cheapest upstream serving fp8 or better.', 3, [
     ['openai/gpt-oss-20b', 0.018, 0.090], ['google/gemma-4-26b-a4b-it', 0.090, 0.300],
@@ -30,7 +31,7 @@ const GROUPS = [
     ['z-ai/glm-5.3-flash', 0.075, 0.250], ['z-ai/glm-5.3', 1.400, 4.400],
     ['meta/muse-glimmer-30b', 0.300, 1.100], ['moonshotai/kimi-k3', 2.100, 10.950]]],
   ['Frontier models', '', 2, [
-    ['openai/gpt-5.4-nano', 0.20, 1.25], ['openai/gpt-5.4-mini', 0.75, 4.50],
+    ['openai/gpt-5.4-mini', 0.75, 4.50],
     ['google/gemini-3.1-flash-lite', 0.25, 1.50],
     ['anthropic/claude-sonnet-5', 2.00, 10.00]]],
 ];
@@ -78,7 +79,9 @@ function table(rows, dp) {
       cell(money(cost(r, REASON)), 3, { ...o, bold: true }),
     ] });
   });
-  const total = rows.reduce((t, r) => t + cost(r, REASON), 0);
+  // The sum of what the column SHOWS, not of the unrounded values: a reader adds the
+  // printed figures, and a total a cent away from them reads as an error.
+  const total = rows.reduce((t, r) => t + Math.round(cost(r, REASON) * 100) / 100, 0);
   const foot = new TableRow({ cantSplit: true, children: [
     cell('Total', 0, { bold: true, fill: HEAD_FILL, color: ACCENT }), cell('', 1, { fill: HEAD_FILL }),
     cell('', 2, { fill: HEAD_FILL }), cell(money(total), 3, { bold: true, fill: HEAD_FILL, color: ACCENT }),
