@@ -3632,8 +3632,9 @@ remain unmeasured - the corpus holds 3 - and no method can be validated on 3 cas
 `evaluator_pilot_17092026/E0_RERUN.md`
 
 The published framework's final-answer check disagrees with the experts on 72 of 300
-traces, 68 of them traces the experts call correct. It understates every model's accuracy
-by about 21 points and ranks GPT-5 fourth where the experts rank it first.
+traces, 68 of them traces the experts call correct. On the pilot slice it understates
+accuracy by about 21 points overall, 0 to 33 per model (corrected 2026-09-27, D-111: this
+first read "every model"), and ranks GPT-5 fourth where the experts rank it first.
 
 `evaluators/answer.py` replaces it: the answer segment is read whole, each target is a
 quantity the gold COMPUTED rather than any number it prints, every part of a multi-part
@@ -3883,7 +3884,10 @@ a judge exactly as often as the untouched one. Tier 1 forwards it because it can
 the step to the gold, not because anything about it is wrong, so whether E0 catches a
 misstated rule is decided by a draw it was already making. Multiplying through D-103's
 detection rates, E0 catches about **18%** of conceptual defects of this shape end to end and
-**61%** of arithmetic ones.
+**61%** of arithmetic ones. (Corrected 2026-09-27, D-111: the end-to-end column above is that
+product. Counted defect by defect - shown AND caught - it is 9 of 60, **0.150**, and 36 of
+60, **0.600**, because the judges catch fewer of the defects E0 shows them;
+`analysis/router_planted.py`.)
 
 This is the evidence for the router that RESULTS_X1's recommendation 5 argues for. E0 spends
 on judges without aiming them; a checker that verified what it can and sent only the residue
@@ -3951,6 +3955,12 @@ Open before generation starts:
   families with the evaluated roster - the objection E1 exists to answer. The judge that
   survives it is MiMo, and its rate on the planted defects is unknown. ~$3.20 and an hour
   to close, and it decides whether the step router is worth building at all.
+
+**Superseded in part, 2026-09-27.** The roster and the costs by D-110: 11 models, 24,750
+traces, E5 about $77, and the router in the stack at $79 batched (untested) or $371 one step
+per call. MiMo's rate was measured: 16 of 51 conceptual defects. Point 1's "understates
+accuracy by about 21 points" is a pilot-slice figure, and the full-benchmark shift has to be
+measured when the table is regenerated (D-111).
 
 ## D-106 — Layer 2 round 1: the experts' rejections are verified claims too; 20 templates change, 2 do not
 
@@ -4120,6 +4130,126 @@ argument the expert accepted.
 rendering, which dropped multiplication and dollar signs from what they saw, and
 `signal_operations` still marks its origin only by asterisks. Both stay open under D-108.
 
+## D-110 — The full run's roster is the pricing document's eleven, and the router is in the stack
+
+**Date:** 2026-09-27 · **Status:** DECIDED (the owner's call, "for now") · **Supersedes in part:**
+D-105 (roster size and costs) · **Evidence:** `docs/inference_pricing/build_pricing_doc.js`,
+`evaluator_pilot_17092026/PILOT_SUMMARY.md` section 3, `analysis/judge_cost.py`,
+`analysis/router_residue.py`
+
+The roster is the eleven models of the inference pricing document as it stands on 2026-09-27,
+which the pilot summary reproduces:
+
+- open weight, $212.81: gpt-oss-20b, gemma-4-26b-a4b-it, deepseek-v4.1-flash, qwen3-235b-a22b,
+  glm-5.3-flash, glm-5.3, muse-glimmer-30b, kimi-k3
+- closed weight, $190.18: gpt-5.4-mini, gemini-3.1-flash-lite, claude-sonnet-5
+
+The pricing list dropped gpt-5.4-nano and claude-haiku-4.5 the same day. NEXT_CYCLE_REVIEW
+section 9.5 had proposed reaching eleven by dropping Kimi K3 instead ($288 of inference); this
+keeps Kimi K3. Generation is $402.99 on the pricing document's basis - every model writes as
+much per problem as GPT-5 did on the pilot, 5,232 output tokens with reasoning - and a
+reasoning-heavy model can exceed it (DeepSeek R1's median completion on the pilot was 9,658).
+
+The rule the roster follows is the pricing document's (2026-09-22): no model the pilot generated
+traces with, and no model used as a judge. The judge-and-judged objection needs only the second.
+The rule leaves out three things NEXT_CYCLE_REVIEW names as anchors: Llama 3.1 70B, which the
+expert labels anchor on; the Qwen2.5-Math-7B and Qwen2.5-7B pair behind the math-pretraining
+claim (9W1B 5); and any flagship (section 9.3 item 9). They stay open questions for the paper.
+
+**Evaluation, 11 x 2,250 = 24,750 traces, judge calls only:**
+
+| layer | judge | cost | source |
+|---|---|---|---|
+| answer check, E3 milestones, E4 digit rule | none | $0 | — |
+| E5, residual milestones | MiMo-V2.5-Pro | $76.82 | `judge_cost.py`, ROSTER column: 8 open at the pilot's weak-model rate, 3 closed at its frontier rate |
+| step router, residue batched per trace | MiMo-V2.5-Pro | $79.10 | `router_residue.py`; the batched prompt is untested |
+| step router, one call per residue step | MiMo-V2.5-Pro | $371.38 | `router_residue.py`; the design the planted probe measured |
+
+With a batched router that is $155.92, or $448.20 one step per call. The published framework
+on the same basis is $333.57 ($227 to $617 across the two rates) and is not run at scale
+(D-105).
+
+**The budget, counted.** About $47 is spent this round (NEXT_CYCLE_REVIEW section 7). With
+$402.99 of generation and $155.92 of evaluation the plan comes to about $606 against the ~$500
+round, and about $898 with a per-step router, before any paraphrase, tool or flagship
+condition. Closing that gap - a cut, a batched router, or a larger round - is the supervisor's
+call and is not made here.
+
+**The router** is in the stack as the pilot summary presents it: it is the only component aimed
+at conceptual error behind a correct answer, and on planted defects it lifts end-to-end
+detection from E0's 0.150 to 0.294 (D-111). It is not built, and its batched prompt has not been
+measured. D-105's condition for budgeting it - measure MiMo's conceptual rate - is met: 16 of
+51.
+
+## D-111 — The pilot summary said more than its data; each claim corrected against the script that owns it
+
+**Date:** 2026-09-27 · **Status:** DECIDED · **Evidence:** `analysis/router_planted.py`,
+`analysis/summary_numbers.py`, `analysis/cluster_bootstrap.py` (section 1b),
+`analysis/answer_check.py`, `analysis/judge_cost.py`, `analysis/router_residue.py`,
+`analysis/planted_judges.py`
+
+The pilot summary (PILOT_SUMMARY.md and its PDF) was checked number by number against the
+analyses. The claims below said more than the data, or something other than it. Each is
+corrected in the summary, its figures and RESULTS_X1, and the number that replaces it is printed
+by the script named. Overstating a result is not acceptable in this project in any document, and
+this entry is the record of what was wrong.
+
+1. **"The final answer beats the best evaluator by +0.124, with a clustered interval excluding
+   zero."** +0.124 is the margin over E0. Over E5, the best evaluator, it is +0.088 with a
+   template-level interval of −0.002 to +0.181, which includes zero. Over every other evaluator
+   the interval excludes zero (`cluster_bootstrap.py`, section 1b).
+2. **The router "shows the judge the flawed step every time" and lifts conceptual detection "to
+   about 0.35", "doubling" it.** The first was assumed and never measured. The router forwards 51
+   of the 60 conceptual plants: the other 9 sit in steps holding a claim that verifies, which it
+   settles without a judge. With MiMo it catches 15 of 51 end to end, 0.294. The 0.35 was E0's
+   two-judge union, not the router's judge (`router_planted.py`).
+3. **E0's end-to-end detection, 0.175 conceptual and 0.613 arithmetic, was a product of two
+   rates.** Counted defect by defect it is 9 of 60 (0.150) and 36 of 60 (0.600): the judges catch
+   fewer of the defects E0 shows them. This corrects D-104's table too.
+4. **"The benchmark understates every model by about 21 points"; "every model's accuracy rises
+   by roughly 21 points".** 21 is the pooled gap on the slice; per model it is 0 to 33
+   (`answer_check.py`). The slice was built to over-represent the answer types the comparator
+   reads worst - 20% of its items are scalar, against 59% of the pool's templates - so the size of
+   the full-benchmark shift has to be measured. This corrects D-098 and D-105 too.
+5. **E5 is "more accurate" than E0, "the most accurate reasoning metric".** E0 has no milestone
+   score to compare; at the trace level E5 does not beat E0; and on correct-answer traces with a
+   flawed step E3 to E5 score AUROC 0.39 to 0.43, below chance. The summary had left that result
+   out, and now reports it.
+6. **The digit rule "scores 1.000 where it can parse the claim".** True of the bare rule, 45 of
+   45. The rule E4 ships catches 40 of 45, and the five it gives up run from 1e-7 to 3e-5
+   relative - not all "below one part in 100,000" (`router_planted.py`).
+7. **The false-alarm row set a per-trace rate beside per-step ones.** The digit rule's 0.117 is
+   any flag anywhere in a clean trace; the judges' 0.000 is on one step each. On the same 120
+   untouched steps the digit rule flags 3.
+8. **The router was priced at $79 and credited with the probe's detection rate.** The $79 is for
+   a batched prompt nobody has tested; the detection comes from single-step prompts, and that
+   design costs $371 (`router_residue.py`).
+9. **The opening paragraph and section 2.3.** "A deterministic stack scores the same traces more
+   accurately" holds only for the answer check. "A judge is worth paying for in exactly one
+   place" contradicted the stack, which pays for two. "Judge identity does not matter, so the
+   panel is not buying accuracy": the first half is measured; the second is not, and E0 does beat
+   its own answer check at the trace level (0.850 against 0.812, significant when traces are
+   resampled; RESULTS_X1 Finding 1). "This answers the independence objection": it is first
+   evidence, not a per-judge bias test.
+10. **Smaller ones.** The design effect was "about 3.7" (it is 2.6 to 4.2 across evaluators); the
+    detectable difference "0.12 to 0.19 and no smaller" (0.06 for E0-3J and 0.004 for E1); "no
+    evaluator separates from E0" (E1 does, by a negligible −0.002); "a third of the templates
+    answer with a word" (2 of 15; 8 of 15 put no number on the answer line); "each of the 129
+    clean traces receives one defect" (120 do; the 60 controls are untouched traces, 58 of them
+    sources of a plant); VersaPRM "7%" (6%); "the framework already had this checker" (E4 had
+    it; the published framework has no arithmetic check); "blind to every slip" at 1% (it catches
+    3.4%); "45 of the 68 have the correct value in the answer line" (no committed script prints
+    it; `answer_check.py` now prints that the corrected check calls 56 of the 68 correct); "about
+    13 hours of expert time" (13.4 hours recorded by the app with a trace open, not counting the
+    two later rounds); self-consistency above between-expert agreement (pooled only: civil and
+    industrial invert it); MiMo's conceptual rate "of 60" (of 51); the published framework "judges
+    every trace" (it judges the steps Tier 1 cannot match); the closed-weight roster models headed
+    "frontier" (they are the small closed tiers).
+11. **The figures typed their values in.** `make_summary_figures.py` now reads
+    `figures/summary_numbers.json`, which `analysis/summary_numbers.py` computes from the
+    analyses, so a figure cannot disagree with the scripts. The routing figure's legend no
+    longer covers a bar.
+
 ## Open decisions
 
 | # | Decision | Needed before |
@@ -4131,10 +4261,11 @@ rendering, which dropped multiplication and dollar signs from what they saw, and
 | D-094 | Whether to narrow the P2/Pc range in `work_isothermal_virial` (now 50% redraw; an expert's thermal-stability objection, D-106, turns on the same range) and accept the 41% stability redraw in `floating_object_submersion_depth`; the residuals in `pass1_fixes.md` | the item pool is regenerated |
 | D-092 | ~~Answer-display lengthening and gold-movement sign-offs~~ **Decided by the owner 2026-09-23:** the two lengthened answers stay; `beam_internal_moment`, `terzaghi_strip_footing_bearing` and `effective_stress_profile` answers are lengthened too; the gold movements are accepted; and a scoped third round removes the census ties at 3% and above (eight templates), with the frozen pool to be censused before inference and stragglers fixed then | — |
 | D-093 | ~~Approval to run screening pass 1~~ **Both passes run (2026-09-23/24, $4.85 total); the 24 flags resolved (D-094).** **The Layer 2 protocol was decided (D-095) and run to completion (D-109).** | — |
-| — | Whether the full run adds the step router: $86, roughly doubles conceptual detection (D-106) | before evaluation starts |
-| — | The repo's templates no longer reproduce 17 of the 60 frozen items byte-identically (D-102); `milestones.build_all` raises on the pilot manifest | any re-derivation of milestones from templates |
-| — | Which families the next roster will evaluate (Kimi, GLM stay available as long as they are not judges) | the next benchmark run |
-| — | Expert annotation of the frozen 300 (stage 3): annotators, protocol, the ~100-trace triple-labelled overlap | any X1 agreement number |
+| — | ~~Whether the full run adds the step router~~ **In the stack (D-110).** Still open: building it, and measuring the batched prompt its $79 assumes (the measured single-step design costs $371, D-111) | before evaluation starts |
+| — | The repo's templates no longer reproduce 17 of the 60 frozen items byte-identically (D-102); `milestones.build_all` raises on the pilot manifest; `pinned_templates.py` works around it for the pilot | any re-derivation of milestones from templates |
+| — | ~~Which families the next roster will evaluate~~ **Decided 2026-09-27 (D-110): the pricing document's eleven** | — |
+| — | The budget: the plan comes to about $606 against the ~$500 round with a batched router (D-110) | generation starts |
+| — | ~~Expert annotation of the frozen 300 (stage 3)~~ **Done: 15 experts, every trace labelled three times, with verification and adjudication rounds (RESULTS_X1)** | — |
 | D-003 | Do the raw `inference_results/` generations still exist? | promising any corrected results table |
 | — | Phase 5 scoping: fold into Phase 1 or run as a parallel PR | Phase 1 start |
 | — | Whether the 9 self-inconsistent templates are fixed or replaced | Phase 1 start (item-pool ownership call) |

@@ -46,11 +46,13 @@ the trace level (E5 0.886 vs E0 0.850, intervals overlap, detectable difference 
 where it matters for the title: E5 is the most accurate milestone evaluator (F1 0.958 vs
 experts), the corrected answer check is the largest single improvement (0.947 vs 0.747), and
 the deterministic digit rule is the only signal on flawed-reasoning-behind-a-correct-answer
-(AUROC 0.661 vs 0.542). D-105 took the "instrument broadly" branch: full run on the
-deterministic stack with a residual judge, no E0 at scale. That is the right call and the
-paper should present it exactly that way: not "our evaluator beats the old one" but "the old
-one was measured against experts, found wrong on a quarter of answers, and replaced by one
-whose every component is validated against the same experts".
+(AUROC 0.661 vs 0.542; +0.149, with a template-level interval of +0.000 to +0.300 that touches
+zero). D-105 took the "instrument broadly" branch: full run on the deterministic stack with a
+residual judge, no E0 at scale. That is the right call and the paper should present it exactly
+that way: not "our evaluator beats the old one" but "the old one was measured against experts,
+found wrong on a quarter of answers, and replaced by one whose deterministic components and
+residual judge were validated against the same experts, on 15 templates and five models". The
+step router is not built, so it is not part of that sentence (D-110, D-111).
 
 ---
 
@@ -111,7 +113,9 @@ Ordered. Items 1 to 9 cost nothing in API spend. Nothing paid starts without app
 8. **Decide the roster against the claims it must support** (section 7). The pricing
    document's 12 models cost $417.82 for inference; with E5's ~$79 that is $497 against a
    ~$500 round, leaving nothing for the router ($86), the paraphrase test, the tool condition
-   or decoding repeats. This is the decision that gates everything else.
+   or decoding repeats. This is the decision that gates everything else. **Decided
+   2026-09-27 (D-110): the pricing document's eleven, $402.99 of inference; with E5 and a
+   batched router that is about $559, or about $606 with this round's spend (section 9.7).**
 9. **Write the analysis plan before the run.** Which claims, which comparisons, which tests,
    with template-level clustering, and the smallest effect 150 templates can detect. D-105
    says to settle this before generation; the pilot's `cluster_bootstrap.py` is the tool.
@@ -231,21 +235,27 @@ This is the paper's best new material and it answers "lack of profound insights"
 more tables would. From RESULTS_X1 Findings 5, 7 and 8 and D-102 to D-104:
 
 - The final answer nearly determines the expert's trace verdict (AUROC 0.974).
-- Arithmetic flaws behind a correct answer are deterministically detectable: the digit rule
-  scores 45 of 45 on planted slips inside a parseable claim and 0 of 15 outside one; three
-  flags in four are real on the experts' labels; it costs nothing.
+- Arithmetic flaws behind a correct answer can be flagged deterministically: the bare digit
+  rule scores 45 of 45 on planted slips inside a parseable claim and 0 of 15 outside one; as
+  E4 ships it, after its gold-validation corrections, 40 of 45 and 1 of 15, with three flags
+  in four real on the experts' labels and a third of their slips found (recall 0.320); it
+  costs nothing.
 - No deterministic evaluator detects a conceptual defect behind a correct answer (0 of 60
-  planted). Judges catch about a third (GPT-5 0.333, MiMo 0.314), with no false alarms in
-  240 clean steps. The published Tribunal's routing showed the judge the corrupted step
-  exactly as often as the clean one (0.500 vs 0.500), so end to end it caught 18% of them.
+  planted). The best judges catch about a third (GPT-5 0.333, MiMo 16 of 51; Opus 4.5
+  0.133), with no false alarm on the untouched steps. The published Tribunal's routing showed
+  the judge the corrupted step exactly as often as the clean one (0.500 vs 0.500), and
+  counted defect by defect it caught 9 of 60, 15% (D-111; the 18% first reported was a
+  product of two rates).
 - An off-the-shelf math PRM ranks steps well overall (72B AUROC 0.825) but three of its four
-  flags inside correct-answer traces are false; VersaPRM finds 7% of incorrect steps;
+  flags inside correct-answer traces are false; VersaPRM finds 6% of incorrect steps;
   thresholds are not the cause (D-100).
 
 This positions the paper in the process-supervision literature (ProcessBench, Math-Shepherd,
 PRM800K, the self-preference results) and Related Work needs a paragraph on PRMs, LLM-judge
-validity and meta-evaluation, which the May version lacks. If the router is funded, its
-measured contribution (0.175 to about 0.31 on conceptual defects, $86) goes here.
+validity and meta-evaluation, which the May version lacks. The router is in the stack
+(D-110); its measured contribution goes here, stated with its basis: on planted conceptual
+defects, end-to-end detection from 0.150 to 0.294, asked one step per call, a design that
+costs $371 at full scale; the $79 batched design is untested (D-111).
 
 ### 4.3 Say what changed, and be exact about authorship
 
@@ -269,16 +279,18 @@ measured contribution (0.175 to about 0.31 on conceptual defects, $86) goes here
   rejections as a strength. Appendix K becomes the Layer 0 / 1 / 2 description with the
   plant-detection rate, hand-check agreement, AC1 and kappa, and the panel's false-positive
   rate against the experts.
-- **Why the numbers moved.** The May Table 1 came from an answer check that understated
-  every model by about 21 points and ranked GPT-5 fourth where the experts rank it first
-  (D-098, D-105). The gold traces of eight published templates did not reproduce their own
+- **Why the numbers moved.** The May Table 1 came from an answer check that, on the pilot
+  slice, understated accuracy by 21 points overall (0 to 33 per model) and ranked GPT-5
+  fourth where the experts rank it first (D-098, D-105, D-111). The slice over-represents the
+  answer types that check misreads, so the paper states the size of the shift measured on the
+  new pool, not the slice's 21 points. The gold traces of eight published templates did not reproduce their own
   answers (Phase 1). The published Tribunal was two judges, not three (E0-F6), and a 20%
   sampling step reordered the ranking between two runs of identical code (E0-F7). None of
   this needs to be a confession in the abstract, but the framework validation section should
   state that the earlier check was measured against experts and found wrong, because a reader
   comparing versions will see the jump. Do not compare new numbers with old ones: the old
   pool is not reproducible (`inference_results/` is gone, phase6_item_pool_impact section 4).
-- **The roster changed and shrank.** 27 models became about 12, and the flagship tier is out
+- **The roster changed and shrank.** 27 models became 11 (D-110), and the flagship tier is out
   by the supervisor's steer. Frame the roster by capability tier and by what each claim
   needs, not as a regression from 27. Keep the anchors that claims depend on (section 7).
 - **Scope sentences.** The abstract's "stress-test generalization across diverse physical
@@ -362,6 +374,9 @@ did not show. Multi-modal and real-artifact seeds stay future work.
 ---
 
 ## 7. Budget and the decisions only you can make
+
+*This table is the first pass; section 9.5 recounted it, and section 9.7 records the roster
+decided on 2026-09-27 (D-110) and the budget that follows from it.*
 
 | Item | Cost | Status |
 |---|---|---|
@@ -566,6 +581,9 @@ roster).
 
 ### 9.5 Budget with the pilot spend counted
 
+*Superseded 2026-09-27 by D-110, which keeps Kimi K3 and drops gpt-5.4-nano; the recount is
+section 9.7.*
+
 | Item | Cost | Basis |
 |---|---|---|
 | spent | $47 | section 7 |
@@ -605,3 +623,32 @@ the 450-item subsample for $26 if the supervisor wants it.
   and the contamination test. Add one corpus statistic (distinct question wordings per
   template and across the pool) so the limitation has a number, and keep the sentence in
   Limitations that says what the test did and did not show.
+
+### 9.7 The roster, decided, and the budget it gives (2026-09-27)
+
+The owner chose the roster in the pilot summary and the inference pricing document, which are
+the same eleven models (D-110): section 9.5's proposal to drop Kimi K3 is not taken, and
+gpt-5.4-nano is dropped instead. Recounted on the same bases as 9.5:
+
+| Item | Cost | Basis |
+|---|---|---|
+| spent | $47 | section 7 |
+| inference, the 11 models of D-110 | $403 | pricing document ($402.99) |
+| E5 on the main run | $77 | `judge_cost.py`, ROSTER column (8 open at the weak rate, 3 closed at the frontier rate) |
+| step router, batched per trace | $79 | `router_residue.py`; the batched prompt is untested |
+| **subtotal, before any optional condition** | **$606** | |
+| step router, one call per step instead | +$292 | $371 in place of $79; the design the planted probe measured |
+
+So the base plan alone is about $106 over the ~$500 round with a batched router, and about
+$398 over it with a per-step one, before the paraphrase test (about $97 on the 450-item
+subsample: $1 to paraphrase, $81 of inference at $403 x 450 / 2,250, and $15 of E5 on its 4,950
+traces at the same rates), the tool condition ($65) or the flagship anchor ($40 to $55). The decision the
+supervisor faces is therefore not which optional condition to fund but how to close the base
+gap: a cheaper roster, a larger round, or a batched router that is measured before it is
+trusted. D-110 records the arithmetic and leaves that call open.
+
+The pilot summary was corrected the same day (D-111): every claim it made that said more than
+the data is listed there with the number that replaces it. Two corrections change what this
+plan should say: the router's measured gain is 0.150 to 0.294 on planted conceptual defects,
+asked one step at a time, and the answer-check correction's 21 points is a pilot-slice figure
+whose size on the new pool has to be measured (sections 4.2 and 4.3 now say so).
