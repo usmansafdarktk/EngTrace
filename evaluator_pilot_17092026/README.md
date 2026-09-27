@@ -25,10 +25,17 @@ branches.
 | 2 · E2, open process reward models on GPUs | done ([RESULTS_E2](RESULTS_E2.md)) | $0.00 (70 GPU-min, HiPerGator) |
 | 3 · expert annotation of the 300 | done: 15 experts, 3 per trace ([annotation/](annotation/README.md)) | — |
 | X1 · every evaluator against the expert labels | done ([RESULTS_X1](RESULTS_X1.md)) | $0.00 |
+| X4 · the final-answer check, corrected and measured offline | done (RESULTS_X1 Finding 1b, D-098) | $0.00 |
+| X5 · planted defects, the deterministic evaluators and E0's routing on them | done (Findings 7 and 8, D-102, D-104) | $0.00 |
+| X5 · the judges on the planted defects: GPT-5, Opus 4.5, MiMo | done (Finding 8, D-103) | $5.21 |
+| summary · [PILOT_SUMMARY.md](PILOT_SUMMARY.md) and its PDF | done; corrected 2026-09-27 (D-111) | — |
 
-**Read these first:** [FINDINGS.md](FINDINGS.md) (seven defects in the published
-framework, plus the robustness cohort), [RESULTS_E0.md](RESULTS_E0.md),
-[RESULTS_E3.md](RESULTS_E3.md), [RESULTS_E4.md](RESULTS_E4.md), [RESULTS_E1.md](RESULTS_E1.md), [RESULTS_E5.md](RESULTS_E5.md), [RESULTS_E2.md](RESULTS_E2.md), [RESULTS_X1.md](RESULTS_X1.md), and the pilot's decisions D-078 to D-098 in
+**Read these first:** [PILOT_SUMMARY.md](PILOT_SUMMARY.md) (the whole pilot in twelve
+pages, also as [the PDF](EngTrace-evaluator-pilot-summary.pdf)), [FINDINGS.md](FINDINGS.md)
+(seven defects in the published framework, plus the robustness cohort),
+[RESULTS_E0.md](RESULTS_E0.md), [RESULTS_E3.md](RESULTS_E3.md), [RESULTS_E4.md](RESULTS_E4.md),
+[RESULTS_E1.md](RESULTS_E1.md), [RESULTS_E5.md](RESULTS_E5.md), [RESULTS_E2.md](RESULTS_E2.md),
+[RESULTS_X1.md](RESULTS_X1.md), and the pilot's decisions D-078 to D-105, D-110 and D-111 in
 [DECISIONS.md](../docs/re-implementation-sep/DECISIONS.md). Every number in them is
 reproduced by a script in [analysis/](analysis/README.md).
 
@@ -37,11 +44,24 @@ reproduced by a script in [analysis/](analysis/README.md).
 ```
 evaluator_pilot_17092026/
   README.md          this file
+  PILOT_SUMMARY.md   the shareable summary; EngTrace-evaluator-pilot-summary.pdf is its PDF
+  make_summary_figures.py  draws figures/ from figures/summary_numbers.json
+  make_summary_pdf.py      renders PILOT_SUMMARY.md to the PDF
+  figures/           the summary's figures, and summary_numbers.json (analysis/summary_numbers.py)
   FINDINGS.md        defects in the published framework; robustness cohort results
   RESULTS_E0.md      E0 and E0-3J
+  RESULTS_E1.md      E1, the non-suite judge panel, and inter-judge agreement
   RESULTS_E2.md      E2, the three open PRMs (GPU runs and their smoke log: hpg/)
-  annotation/        stage 3: the expert annotation app, guide and scoring
   RESULTS_E3.md      E3, its null baseline, where it disagrees with E0
+  RESULTS_E4.md      E4, stated-arithmetic checking, and its re-run on the digit rule
+  RESULTS_E5.md      E5, E3 plus a residual judge, and the judge's validation
+  RESULTS_X1.md      every evaluator against the expert labels; planted defects; routing
+  JUDGE_SELECTION.md how E1's and E5's judges were chosen
+  E0_RERUN.md        the corrected answer check, and why E0 was not re-scored with it
+  annotation/        stage 3: the expert annotation app, guide and scoring
+  annotator_kit/     the standalone bundle each expert received
+  hpg/               E2's HiPerGator jobs, logs and committed PRM outputs
+  experts_filled_labels/  the experts' labels. Local only, gitignored, never committed.
   freeze.py          cuts and pins the slice; --verify fails if anything drifts
   run_traces.py      models over the slice; resumable, --check first
   verify_traces.py   checks produced traces against the slice; T1-T7 + plants
@@ -56,6 +76,10 @@ evaluator_pilot_17092026/
     arith.py           sympy checker for stated arithmetic: 1% "is it fabricated" and
                        the experts' digit rule, both validated on gold (D-085, D-087, D-097)
     e4_arith.py        E4: E3 milestones classed verified / contradicted / stated
+    e1_panel.py        E1: E0's Tribunal with the non-suite panel (D-088, D-089)
+    e2_prm.py          E2: the PRMs' step rewards, read from hpg/results/
+    e5_hybrid.py       E5: E3, then MiMo on the milestones E3 did not find
+    answer.py          the corrected final-answer check, three-way (D-098)
   analysis/          the script behind every reported number
   kaggle/            GPU offload for the scorer stack (D-086)
   slice/             FROZEN. Do not edit by hand.

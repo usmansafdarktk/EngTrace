@@ -132,8 +132,14 @@ def build(md, st, avail):
             from reportlab.lib.utils import ImageReader
             iw, ih = ImageReader(path).getSize()
             w = min(avail, iw * 0.5)
-            flow.append(Spacer(1, 4))
-            flow.append(Image(path, width=w, height=w * ih / iw))
+            # headings directly above a figure travel with it: keepWithNext does not bind a
+            # heading to a KeepTogether, so a figure that did not fit left its heading alone
+            # at the foot of the page before
+            lead = []
+            while (flow and isinstance(flow[-1], Paragraph)
+                   and flow[-1].style.name in ('h2', 'h3')):
+                lead.insert(0, flow.pop())
+            flow.append(KeepTogether(lead + [Spacer(1, 4), Image(path, width=w, height=w * ih / iw)]))
             flow.append(Spacer(1, 9))
         elif ln.startswith('|'):
             block = []

@@ -102,16 +102,16 @@ Three consequences:
   −0.09, −0.09) and the ordering is otherwise unchanged.
 - **The holistic verdict cannot rank reasoning evaluators on this slice.** "Right
   answer, flawed reasoning" is the case a reasoning evaluator exists for, and the
-  experts' verdict marks 3 such traces. Their *step* labels mark 87 — see Finding 5.
+  experts' verdict marks 3 such traces. Their *step* labels mark 93 — see Finding 5.
 - **The single largest available improvement is a correct final-answer check.** E0's
   check agrees with the experts on **76%** of traces, which puts a number on E0-F1 (a
   restated input read as the answer) and E0-F2 (no number on the Answer line). As a
   predictor of soundness it scores 0.812, where an accurate answer check scores 0.974.
 
-  **That gap is now closed** (`evaluators/answer.py`, measured by
+  **Most of that gap is closed** (`evaluators/answer.py`, measured by
   `analysis/answer_check.py`). E0 errs almost entirely in one direction - of its 72
   disagreements with the experts, 68 are traces the experts call **correct** and E0 calls
-  wrong. A deterministic check that reads the trace's answer segment, takes each target
+  wrong, and the corrected check calls 56 of those 68 correct. A deterministic check that reads the trace's answer segment, takes each target
   from a quantity the gold **computed**, scores every part of a multi-part answer and
   returns correct / partial / incorrect agrees with the experts on **0.947** of the 281
   non-partial traces where E0 manages 0.747, and on 0.893 of all 300 three ways. See
@@ -136,8 +136,13 @@ Three consequences:
 | llama-3.1-70b | 0.150 | 0.150 | 0.183 |
 | **all 300** | **0.760** | **0.547** | **0.753** |
 
-E0 understates every model by about 21 points and ranks **GPT-5 fourth**; the experts and
-the corrected check both put it first. Five defects account for it, each measured:
+E0 understates accuracy by 21 points overall - 33 for GPT-5, 28 for DeepSeek R1, 23 for
+Gemini, 22 for Claude, none for Llama - and ranks **GPT-5 fourth**; the experts and the
+corrected check both put it first. These are sizes on this slice, which was built to
+over-represent the answer types the comparator reads worst (12 of its 60 items are scalar,
+against 89 of the benchmark's 150 templates), so they do not carry over to the full
+benchmark: the shift there has to be measured when its table is regenerated. Five defects
+account for it, each measured:
 
 1. **The gold value was the last number in the solution.** For `manning_rectangular_discharge`
    that is the **3 in `m^3/s`**, so a trace scored correct if it wrote its unit in ASCII and
@@ -190,7 +195,7 @@ E3 at this level, as RESULTS_E4 found.
   much: the model was partly being scored against missing labels, not failing.
 - **Inside correct-answer traces, where a step-level evaluator would add most, 75% of
   its flags are false alarms** and it finds 26% of the real errors.
-- **VersaPRM's failure is confirmed:** it finds 7% of the incorrect steps. Raising its
+- **VersaPRM's failure is confirmed:** it finds 6% of the incorrect steps. Raising its
   threshold to ~0.9 restores its recall and still leaves it at F1 0.345 against the 72B's
   0.520, so the failure is discrimination, not scale.
 - **The 0.5 cut-off is not tuned.** Fitting it on half the traces and reporting on the
@@ -260,7 +265,7 @@ hard cases, and the intervals would not tighten enough to change any conclusion.
 
 ### The rule that does work (`analysis/digit_rule.py`)
 
-Since 164 of the 167 flaws are calculation slips, the guide's own rule for them can be
+Since 175 of the 178 flaws are calculation slips, the guide's own rule for them can be
 applied by machine: *rounding is not an error, a wrong digit is*. For every arithmetic
 claim a trace writes, recompute the left side from the numbers the trace itself shows
 and ask whether the displayed right side is a correct rounding at the precision shown.
@@ -306,14 +311,19 @@ comparison while resampling **templates** gives the honest precision
 | Trace level | AUROC | resampling traces | resampling templates | design effect | effective n |
 |---|---|---|---|---|---|
 | E0 | 0.850 | 0.804–0.892 | 0.760–0.927 | 3.7 | 82 |
+| E0-3J | 0.810 | 0.759–0.857 | 0.731–0.885 | 2.6 | 115 |
+| E1 | 0.849 | 0.803–0.890 | 0.758–0.927 | 3.7 | 81 |
+| E2, 72B, fraction of steps ok | 0.862 | 0.810–0.907 | 0.785–0.943 | 2.8 | 107 |
 | E2, 72B, lowest step reward | 0.878 | 0.833–0.916 | 0.789–0.956 | 4.2 | 72 |
+| E3 | 0.834 | 0.773–0.888 | 0.726–0.941 | 3.9 | 78 |
+| E4 | 0.835 | 0.773–0.890 | 0.725–0.946 | 3.9 | 76 |
 | E5 | 0.886 | 0.835–0.934 | 0.784–0.978 | 4.2 | 71 |
-| E3 / E4 | 0.834 | 0.773–0.888 | 0.726–0.941 | 3.9 | 78 |
 | *baseline: the experts' answer verdict* | 0.974 | 0.945–0.996 | **0.945–0.993** | **0.9** | 326 |
 
-**The slice is worth about 80 independent traces, not 300**, for separating evaluators.
-Clustering at the item rather than the template — the weaker assumption — gives a design
-effect of about 1.5–1.8 instead, so the true penalty sits between the two.
+**The slice is worth about 70 to 115 independent traces, not 300**, for separating
+evaluators, depending on the evaluator (82 for E0). Clustering at the item rather than the
+template — the weaker assumption — gives a design effect of about 1.5–1.8 instead, so the
+true penalty sits between the two.
 
 The minimum difference this design could detect, at 80% power and 95% confidence, follows
 from the clustered standard error:
@@ -322,22 +332,42 @@ from the clustered standard error:
 |---|---|---|---|
 | E5 | +0.036 | −0.093 to +0.173 | 0.192 |
 | E2, 72B, lowest step reward | +0.029 | −0.056 to +0.109 | 0.118 |
+| E2, 72B, fraction of steps ok | +0.012 | −0.075 to +0.106 | 0.133 |
+| E1 | −0.002 | −0.005 to −0.000 | 0.004 |
 | E0-3J | −0.040 | −0.084 to +0.003 | 0.062 |
-| E3 / E4 | −0.016 | −0.144 to +0.115 | 0.190 |
+| E3 | −0.016 | −0.143 to +0.115 | 0.189 |
+| E4 | −0.016 | −0.144 to +0.119 | 0.193 |
 | *the experts' answer verdict* | **+0.124** | **+0.043 to +0.218** | 0.127 |
+
+The last row is the answer verdict's margin over E0. Its margin over each evaluator
+(`cluster_bootstrap.py`, section 1b), which is what "the final answer beats every
+evaluator" has to rest on:
+
+| the experts' answer verdict minus | margin | template-level 95% |
+|---|---|---|
+| E0 | +0.124 | +0.043 to +0.218 |
+| E0-3J | +0.164 | +0.085 to +0.247 |
+| E1 | +0.126 | +0.044 to +0.218 |
+| E2, 72B, fraction of steps ok | +0.112 | +0.026 to +0.190 |
+| E2, 72B, lowest step reward | +0.096 | +0.011 to +0.185 |
+| E3 | +0.140 | +0.033 to +0.242 |
+| E4 | +0.140 | +0.030 to +0.243 |
+| **E5** | **+0.088** | **−0.002 to +0.181** |
 
 Three things follow, and they should be stated in the paper rather than left implied:
 
-- **The headline finding survives clustering.** The experts' answer verdict beats every
-  evaluator by +0.124 with a template-level interval that excludes zero. That the final
-  answer dominates the trace-level verdict is not an artifact of treating instances as
-  independent.
+- **The headline survives clustering against every evaluator but the best.** The experts'
+  answer verdict beats E0 by +0.124 and every other evaluator with a template-level interval
+  that excludes zero, except E5, whose interval includes it. That the final answer
+  dominates the trace-level verdict is not an artifact of treating instances as
+  independent; that it beats the best evaluator is not established at this power.
 - **"No evaluator beats E0" is a statement about power, not about equality.** Every
-  evaluator difference is smaller than what this design can detect (0.06–0.19 AUROC). The
-  pilot rules out large differences between evaluators; it never could have resolved small
-  ones. E1's −0.002 is the exception that proves the point: E1 tracks E0 trace by trace, so
-  its paired standard error is tiny and a difference of 0.002 is "significant" and
-  meaningless.
+  evaluator difference is smaller than what this design can detect (0.12–0.19 AUROC for
+  the evaluators built differently from E0; 0.06 for E0-3J and 0.004 for E1, which track
+  it trace by trace). The pilot rules out large differences between evaluators; it never
+  could have resolved small ones. E1's −0.002 is the exception that proves the point: E1
+  tracks E0 trace by trace, so its paired standard error is tiny and a difference of 0.002
+  is "significant" and meaningless.
 - **The one positive result on the hard case does not clear the bar either.** E4's
   arithmetic score is +0.149 over E0 there, and clustered by template that interval runs
   (+0.000, +0.300) against a detectable difference of 0.211. It is the largest evaluator
@@ -387,18 +417,22 @@ correctly, states the wrong rule for what it is doing, and lands the right answe
 every checker the pilot has - which is unsurprising, since none of them reads prose. The
 evaluators that could catch it are the judges, and they were asked directly (Finding 8).
 
-**The digit rule is perfect where it can parse and blind where it cannot.** Split by where
-the defect sits: **45 of 45** inside a claim `arith.py` parses, **0 of 15** on a stated
-value with no parseable working behind it. So the recall of 0.472 in Finding 5 is a parse
-ceiling, not a rule failure — extending parse coverage is the remaining gain, and changing
-the rule is not.
+**The digit rule, as Finding 5 measures it, is perfect where it can parse and blind where
+it cannot.** Split by where the defect sits: **45 of 45** inside a claim `arith.py`
+parses, **0 of 15** on a stated value with no parseable working behind it. As E4 ships it,
+with the two gold-validation corrections, it catches **40 of 45** and 1 of 15. So the bare
+rule's recall of 0.472 in Finding 5 is a parse ceiling, not a rule failure, and the shipped
+rule's 0.320 is that ceiling less what the corrections give up - extending parse coverage
+is the remaining gain.
 
 **E4's 1% tolerance is confirmed as the defect, by construction:** 1.000 on planted errors
 of 1% or more, **0.000** on the 14 below it, where the digit rule scores 1.000.
 
 **The gold-validation corrections cost 5 detections and remove 20 of 30 false flags.** The
-five are last-digit slips at 1e-7 to 1e-5 relative; the false-alarm rate on expert-clean
-traces falls from 26.7% to 11.7%. That trade now has a number on it.
+five are last-digit slips at about 1e-7 to 3e-5 relative (`router_planted.py` prints them);
+the false-alarm rate on expert-clean traces falls from 26.7% to 11.7%. That trade now has a
+number on it. The 11.7% is per trace - any flag anywhere in an untouched clean trace. On
+the 120 single steps the judges were shown untouched (Finding 8), the shipped rule flags 3.
 
 What this set cannot support: it says what an evaluator catches when a defect of a given
 shape is present, not how often models produce such defects or in what mix. The conceptual
@@ -413,7 +447,7 @@ a plantable site must itself be a parseable claim; the unbiased half of that fam
 1. **Fix the final-answer check first.** It is the dominant trace-level signal, and E0's
    parser is wrong on a quarter of traces.
 2. **For reasoning progress, milestone coverage with a residual judge (E5) is the
-   strongest candidate:** F1 0.957 against experts, and cheap ($0.47 for 300 traces) —
+   strongest candidate:** F1 0.958 against experts, and cheap ($0.47 for 300 traces) —
    but Finding 5 bounds the claim: it tracks progress, it does not catch a flawed step
    behind a right answer.
 3. **Step-level error detection is not solved by an off-the-shelf process reward model,
@@ -422,21 +456,23 @@ a plantable site must itself be a parseable claim; the unbiased half of that fam
    it on held-out halves gains −0.006). A deterministic digit check reaches three in four
    on the same steps and costs nothing, and now ships inside E4 (D-101).
 4. **Report the hard case with its two halves separated.** Arithmetic flaws behind a
-   correct answer are deterministically detectable — three flags in four are real, at no
-   cost, and perfect where the checker can parse. Conceptual flaws are detected by no
-   checker at all (0 of 60) and by a judge about a third of the time, with no false alarms
-   (Findings 7 and 8).
-5. **The evaluator this points to is a router, not a new judge.** The digit rule catches
-   every arithmetic defect it can parse and none it cannot; the judges catch 87% of exactly
-   those it cannot, and are the only thing with any conceptual signal. Sending what the
-   checker cannot verify to a judge covers both, and costs a judge call only on the
-   residue — which is what E5 already does for milestones, applied to steps. The measured
-   routing makes the case concrete: E0 currently shows a judge the corrupted step half the
-   time for conceptual defects, no more often than it shows the clean one, so its judge
-   spend buys a coin toss where a targeted router would buy a test.
+   correct answer can be flagged deterministically — three flags in four are real, at no
+   cost, though the shipped rule finds a third of them (recall 0.320) and 40 of 45 planted
+   slips it can parse. Conceptual flaws are detected by no checker at all (0 of 60) and by
+   the best judges about a third of the time, with no false alarms (Findings 7 and 8).
+5. **The evaluator this points to is a router, not a new judge.** The digit rule, as
+   Finding 5 measures it, catches every arithmetic defect it can parse and none it cannot;
+   E0's two judges catch 87% of exactly those it cannot (MiMo 67%), and the judges are the
+   only thing with any conceptual signal. Sending what the checker cannot verify to a judge
+   covers much of both, and costs a judge call only on the residue — which is what E5
+   already does for milestones, applied to steps. The measured routing makes the case
+   concrete: E0 shows a judge the corrupted step half the time for conceptual defects, no
+   more often than it shows the clean one, and catches 9 of 60 end to end; a verify-first
+   router with MiMo catches 15 of 51 (Finding 8).
 6. **Report the power, not just the intervals.** Clustered by template, this slice can
-   detect AUROC differences of about 0.12–0.19 between evaluators and no smaller (Finding
-   6). Every null result here should be read as "this design rules out a large difference",
+   detect AUROC differences from E0 of about 0.12–0.19 for the evaluators built differently
+   from it, and no smaller; its own variants, which track it trace by trace, are resolved
+   more finely (0.06 for E0-3J, 0.004 for E1; Finding 6). Every null result here should be read as "this design rules out a large difference",
    which is a claim the data supports, rather than "the evaluators are equivalent", which
    it does not.
 
@@ -462,7 +498,8 @@ defect, so only the difference counts. 480 calls, $4.67, no failures.
 MiMo matters more than the other two. GPT-5 and Claude share families with models on the
 evaluated roster, which is the judge/judged objection E1 exists to answer; MiMo does not, and
 it performs like them — 0.314 against GPT-5's 0.333 on conceptual defects, the same 0.717 on
-arithmetic, and no false alarm in 223 calls. Its verdicts are also the most decisive: of 51
+arithmetic, and no false alarm on the 111 untouched steps it returned a verdict on. Its
+verdicts are also the most decisive: of 51
 planted steps it named 11 a Conceptual Error where Opus retreated to *Other* 22 times out of
 60. (17 of its 240 calls never returned, after retries, so its conceptual row rests on 51 of
 the 60 matched sets.)
@@ -479,14 +516,17 @@ clean step is not it. The problem is sensitivity, not precision.
 
 **Judges and the digit rule are complementary, and the split is exact:**
 
-| arithmetic defect sits… | digit rule | GPT-5 | Opus 4.5 |
-|---|---|---|---|
-| inside a claim the checker parses (45) | **1.000** | 0.667 | 0.667 |
-| in a stated value with no parseable working (15) | **0.000** | **0.867** | **0.867** |
+| arithmetic defect sits… | digit rule, bare | digit rule, as E4 ships it | GPT-5 | Opus 4.5 | MiMo |
+|---|---|---|---|---|---|
+| inside a claim the checker parses (45) | **1.000** | 0.889 | 0.667 | 0.667 | 0.733 |
+| in a stated value with no parseable working (15) | **0.000** | 0.067 | **0.867** | **0.867** | 0.667 |
 
-The digit rule is perfect where it can parse and blind where it cannot; the judges are
+The bare digit rule is perfect where it can parse and blind where it cannot; the judges are
 strongest exactly where it is blind. A checker that routes what it cannot parse to a judge
-would cover both, and neither component is the one the framework currently spends on.
+would cover much of both, and neither component is the one the framework currently spends
+on. The split is not exact at the step level: a router settles a whole step when any claim in
+it verifies, so a stated value sitting beside a verified claim never reaches a judge - 3 of
+the 15 here, of which the digit rule still catches 1 (`router_planted.py`).
 
 ### Would E0 show the judge that step? (`analysis/planted_routing.py`)
 
@@ -494,20 +534,25 @@ Finding 8 asks what a judge does when shown a step. This asks whether E0 shows i
 run for real on all 120 planted defects and their unmodified originals, with the Tribunal
 replaced by a recorder, so the routing is measured and nothing is spent (163 minutes, $0).
 
-| | triggered | **planted step shown** | *same step, original* | end to end |
+| | triggered | **planted step shown** | *same step, original* | end to end, counted per defect |
 |---|---|---|---|---|
-| conceptual | 0.650 | **0.500** | *0.500* | 0.500 × 0.350 = **0.175** |
-| arithmetic | 0.833 | 0.767 | *0.683* | 0.767 × 0.800 = **0.613** |
+| conceptual | 0.650 | **0.500** | *0.500* | 9 of 60 = **0.150** |
+| arithmetic | 0.833 | 0.767 | *0.683* | 36 of 60 = **0.600** |
+
+End to end counts a defect as caught only when it was shown AND flagged by either of E0's
+two judges (`analysis/router_planted.py`). This section first reported the product of the
+two rates, 0.500 × 0.350 = 0.175 and 0.767 × 0.800 = 0.613; the product assumes the judges
+catch the shown defects as often as the rest, and they do not - 9 of the 30 conceptual
+defects shown, against 21 of all 60.
 
 **For a conceptual defect the routing carries no signal whatsoever.** The corrupted step is
 sent to a judge exactly as often as the untouched one — 0.500 against 0.500. Tier 1 forwards
 it because it cannot match the step to the gold at all, not because anything about it is
 wrong. Whether E0 catches a misstated rule is therefore decided by a coin it was already
-tossing, and the end-to-end rate is **0.175**: a judge that can catch a third of these is
-shown half of them.
+tossing, and it catches **9 of 60** end to end.
 
 For an arithmetic defect the routing is mildly informative (0.767 against 0.683), since a
-corrupted number is a little harder for Tier 1 to match, and the end-to-end rate is 0.613.
+corrupted number is a little harder for Tier 1 to match, and it catches 36 of 60 end to end.
 
 One more thing this exposed: E0's answer check calls the final answer **wrong on 32 of the
 120 planted traces**, though the plants never touch it and the originals were all correct.
@@ -526,13 +571,21 @@ cannot verify. That residue is measurable, and it is large:
 | traces with at least one | 282 of 300 (**94%**) |
 | residue steps per trace | median 4, mean 4.4, max 16 |
 | of that residue, steps the experts call incorrect | **14.0%** |
-| full run: one batched call per trace with residue | 25,380 calls, **$86** at MiMo's rate |
+| full run, 11 models: one batched call per trace with residue | 23,265 calls, **$79** at MiMo's rate (untested design) |
+| full run, 11 models: one call per residue step | 109,230 calls, **$371** (the design the probe measured) |
 
 So the router is not a small targeted sample: at trace level it forwards almost everything.
 Its selectivity is *within* the trace — 63% of steps instead of Tier 1's coin toss, and none
-of the 37% already settled deterministically. What it buys is the difference between showing
-a judge the corrupted step 0.500 of the time by accident and showing it every time: E0's
-end-to-end 0.175 on conceptual defects becomes about **0.31**, MiMo's own rate, for $86.
+of the 37% already settled deterministically.
+
+What it buys, measured on the planted set (`analysis/router_planted.py`): it forwards 51 of
+the 60 conceptual defects, not all of them - the other 9 sit in steps holding a claim that
+verifies, which the router settles without a judge. With MiMo as its judge it catches **15 of
+51** end to end (0.294; 16 of 60 with GPT-5), against E0's 9 of 60. This section first said
+the router shows a judge the corrupted step every time and catches about 0.31; the first was
+assumed, and both are replaced by the counts above. On arithmetic the stack - the digit rule
+where a step verifies, the router's judge where it does not - catches 49 of 60, against E0's
+36 of 60.
 
 **What remains untested.** The probe asks a judge about one step in isolation; a router would
 batch a trace's ~4.4 residue steps into one prompt, which is more context per call and also
@@ -547,11 +600,14 @@ against them.
 
 **The design is 15 templates.** 300 traces is 15 templates x 4 instances x 5 models, and
 instances of a template are the same problem with different numbers. Clustered by template
-the slice is worth about **80 independent traces**, and it can detect AUROC differences of
-roughly **0.12 to 0.19** between evaluators and no smaller (Finding 6). Every null result
-here means "no difference this large", not "no difference". The one finding that clears the
-bar comfortably is the one that matters most: the final answer dominates the trace-level
-verdict, +0.124 over the best evaluator with a clustered interval of +0.043 to +0.218.
+the slice is worth about **70 to 115 independent traces**, depending on the evaluator, and it
+can detect AUROC differences from E0 of roughly **0.12 to 0.19** for the evaluators built
+differently from it, and no smaller (Finding 6; E0's own variants track it closely enough to
+be measured more finely). Every null result here means "no difference this large", not "no
+difference". The finding that matters most clears the bar against all but the best
+evaluator: the final answer dominates the trace-level verdict, +0.124 over E0 with a
+clustered interval of +0.043 to +0.218, but only +0.088 over E5, with an interval of −0.002
+to +0.181 that includes zero.
 
 **The hard-case result is about arithmetic.** 175 of the 178 flawed steps behind a correct
 answer are calculation slips. Three are conceptual, which is too few to study. The planted
@@ -585,34 +641,41 @@ committed and the numbers stated, but the label files must come from the authors
 anonymised truth file - codes and majority labels, no per-rater rows - would close that, and
 is not yet a decision.
 
-**One branch's labels were re-annotated twice.** Chemical's and electrical's third sets were
-replaced after the verification round identified them as least self-consistent, and
-electrical was then re-adjudicated. Replacing an entire expert's set changed no ground-truth
-label; re-adjudicating the disputes it created changed 12 of 2,091 (D-099). Both originals
-are kept under `superseded/`, and the reliability figures above are the post-replacement
-ones.
+**Two label sets were re-annotated.** Chemical's and electrical's third sets were replaced
+after the verification round identified them as least self-consistent, and electrical was
+then re-adjudicated. Replacing an entire expert's set changed no ground-truth label;
+re-adjudicating the disputes it created changed 12 of electrical's 406 step labels, all to
+incorrect, and no verdict (D-099). Both originals are kept under `superseded/`, and the
+reliability figures above are the post-replacement ones.
+
+**Two branches invert the reliability ceiling.** Pooled, an expert agrees with their own
+first pass (κ 0.83) more than with the other experts (κ 0.78). In civil (0.519 within
+against 0.645 between) and industrial (0.820 against 0.867) it is the other way round. Both
+are the branches added in September, and each within-rater figure rests on seven
+re-labelled traces per expert.
 
 **What the judges were and were not asked.** E0's two judges were asked directly about
 every planted step, matched against the same step unmodified (Finding 8, $4.67): they catch
 a third of the conceptual defects and four fifths of the arithmetic ones, with no false
 alarms. E0's own routing was then measured separately (`analysis/planted_routing.py`, $0): it
 shows the judge the corrupted step half the time for conceptual defects — exactly as often
-as the untouched step, so the routing carries no signal — giving an end-to-end detection
-rate of 0.175, against 0.613 for arithmetic. E1's panel and E5's judge were not probed; E1
-costs about $3 on this set, E5 about $0.20.
+as the untouched step, so the routing carries no signal — and, counted defect by defect,
+catches 9 of 60 conceptual defects end to end and 36 of 60 arithmetic ones. E5's judge,
+MiMo, was probed the same way (Finding 8); E1's panel was not probed as a panel, which would
+cost about $3 on this set.
 
 ### What the pilot supports, and what it does not
 
 | Supported | Not supported |
 |---|---|
-| The final answer nearly determines the trace-level verdict | Any ranking among the four frontier models |
-| E5 is the most accurate milestone evaluator, at 1/13th of E0's cost | That E5 beats E0 at the trace level |
+| The final answer nearly determines the trace-level verdict, and beats E0 by a margin that survives clustering | That it beats the best evaluator, E5: +0.088, interval −0.002 to +0.181 |
+| E5 is the most accurate milestone evaluator, at $0.47 in judge calls against $6.28–6.53 for an E0 run | That E5 beats E0 at the trace level; E0 has no milestone score to compare |
 | An off-the-shelf PRM over-flags inside correct-answer traces, and its threshold is not the cause | That a better-calibrated PRM could not do better |
-| A digit-level arithmetic check finds three real errors in four, deterministically and free | That it finds conceptual errors — it finds none |
-| No deterministic evaluator detects a conceptual defect behind a correct answer | That the judges cannot: asked directly they catch 35% of them |
+| A digit-level arithmetic check flags slips at three real errors in four, deterministically and free | That it finds most of them (recall 0.320), or any conceptual error — it finds none |
+| No deterministic evaluator detects a conceptual defect behind a correct answer | That the judges cannot: asked directly, E0's two judges catch 35% between them, MiMo 31% |
 | E0's judges do not over-flag: 240 clean steps, 240 clean verdicts | That E0's routing is selective: for conceptual defects it shows the corrupted step no more often than the clean one |
-| End to end, E0 catches ~18% of conceptual and ~61% of arithmetic defects of this shape | That these rates transfer to defects models actually make |
-| The expert labels are reliable at kappa 0.78 between raters and 0.83 within | That 300 traces from 15 templates can separate evaluators finely |
+| End to end, E0 catches 15% of conceptual and 60% of arithmetic defects of this shape; a verify-first router with MiMo catches 29% of the conceptual ones, asked one step at a time | That these rates transfer to defects models actually make, or to a batched router prompt |
+| The expert labels are reliable at kappa 0.78 between raters and 0.83 within, pooled | That every branch meets that ceiling: civil and industrial invert it; or that 300 traces from 15 templates can separate evaluators finely |
 
 ## Follow-ups this turned up
 
@@ -623,5 +686,9 @@ costs about $3 on this set, E5 about $0.20.
 - The guide does not say how to treat a notational slip whose computed result is right
   (GPT-5's `normal_depth_iteration#1`: a dropped minus sign in a displayed expression,
   correct value). The experts called it correct; the guide should say so explicitly.
-- Electrical engineering has the lowest between-rater step κ (0.584) and the lowest
-  intra-rater agreement (0.891). If any branch needs a second look, it is that one.
+- Electrical was the weakest branch when this was first written (between-rater step κ 0.584)
+  and its third set was re-annotated (D-099). It is civil now: the lowest between-rater
+  step κ (0.645) and the lowest within-rater κ (0.519), which is below its between-rater
+  figure; industrial inverts too (0.820 within against 0.867 between). If any branch needs
+  a second look, it is civil, and industrial's verification round is worth widening past
+  seven traces per expert.

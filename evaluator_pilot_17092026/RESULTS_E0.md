@@ -144,8 +144,9 @@ follow the label set is silently counted as judging the step wrong.
 
 Every number above comes from the published framework's own final-answer check, which the
 expert labels show is wrong on 72 of 300 traces - almost always calling a correct answer
-wrong (68 of the 72). Its accuracy column therefore understates every model by about 21
-points and ranks GPT-5 fourth of five.
+wrong (68 of the 72). Its accuracy column therefore understates accuracy by about 21 points
+overall - 33 for GPT-5, 28 for DeepSeek R1, 23 for Gemini, 22 for Claude, none for Llama - and
+ranks GPT-5 fourth of five.
 
 `evaluators/answer.py` replaces it and agrees with the experts on 0.947 of the non-partial
 traces against E0's 0.747; `analysis/answer_check.py` is the measurement, RESULTS_X1

@@ -1,0 +1,364 @@
+{
+ "cost": {
+  "closed": 3,
+  "e0": 333.57009374999996,
+  "e0_range": [
+   227.40671249999997,
+   616.6724437500001
+  ],
+  "e5": 76.815234375,
+  "models": 11,
+  "open": 8,
+  "router_batched": 79.101,
+  "router_per_step": 371.382,
+  "traces": 24750
+ },
+ "planted": {
+  "digit_false_alarm_on_judged_steps": [
+   3,
+   120
+  ],
+  "digit_rule": {
+   "arithmetic": {
+    "caught": 41,
+    "n": 60
+   },
+   "conceptual": {
+    "caught": 0,
+    "n": 60
+   }
+  },
+  "judges": {
+   "gpt-5": {
+    "arithmetic": {
+     "caught": 43,
+     "flags_original": 0,
+     "n": 60
+    },
+    "conceptual": {
+     "caught": 20,
+     "flags_original": 0,
+     "n": 60
+    }
+   },
+   "mimo-v2.5-pro": {
+    "arithmetic": {
+     "caught": 43,
+     "flags_original": 0,
+     "n": 60
+    },
+    "conceptual": {
+     "caught": 16,
+     "flags_original": 0,
+     "n": 51
+    }
+   },
+   "opus-4.5": {
+    "arithmetic": {
+     "caught": 43,
+     "flags_original": 0,
+     "n": 60
+    },
+    "conceptual": {
+     "caught": 8,
+     "flags_original": 0,
+     "n": 60
+    }
+   }
+  }
+ },
+ "routing": {
+  "arithmetic": {
+   "e0": {
+    "caught_when_asked": 48,
+    "end_to_end": 36,
+    "n": 60,
+    "shown": 46
+   },
+   "forwarded": 12,
+   "n": 60,
+   "router": {
+    "gpt-5": {
+     "caught_when_asked": 43,
+     "end_to_end": 10,
+     "forwarded": 12,
+     "n": 60
+    },
+    "mimo-v2.5-pro": {
+     "caught_when_asked": 43,
+     "end_to_end": 8,
+     "forwarded": 12,
+     "n": 60
+    }
+   }
+  },
+  "conceptual": {
+   "e0": {
+    "caught_when_asked": 21,
+    "end_to_end": 9,
+    "n": 60,
+    "shown": 30
+   },
+   "forwarded": 51,
+   "n": 60,
+   "router": {
+    "gpt-5": {
+     "caught_when_asked": 20,
+     "end_to_end": 16,
+     "forwarded": 51,
+     "n": 60
+    },
+    "mimo-v2.5-pro": {
+     "caught_when_asked": 16,
+     "end_to_end": 15,
+     "forwarded": 45,
+     "n": 51
+    }
+   }
+  }
+ },
+ "stack_arithmetic": {
+  "caught": 49,
+  "judge": "mimo-v2.5-pro",
+  "missed_by_both": 11,
+  "n": 60
+ },
+ "steps": {
+  "digit_e4": {
+   "f1": 0.44881889763779526,
+   "fn": 121,
+   "fp": 19,
+   "precision": 0.75,
+   "recall": 0.3202247191011236,
+   "tp": 57
+  },
+  "digit_tol1": {
+   "f1": 0.05529953917050691,
+   "fn": 172,
+   "fp": 33,
+   "precision": 0.15384615384615385,
+   "recall": 0.033707865168539325,
+   "tp": 6
+  },
+  "prm_qwen72": {
+   "f1": 0.25,
+   "fn": 123,
+   "fp": 129,
+   "precision": 0.24561403508771928,
+   "recall": 0.2545454545454545,
+   "tp": 42
+  }
+ },
+ "text": {
+  "annotation": {
+   "hours": 13.38975,
+   "median_seconds": 38.8,
+   "submissions": 1020,
+   "with_seconds": 1020
+  },
+  "answer_types": {
+   "pool_templates": {
+    "array": 7,
+    "classification": 5,
+    "multipart": 32,
+    "scalar": 89,
+    "symbolic": 9,
+    "vector": 8
+   },
+   "slice_items": {
+    "array": 4,
+    "classification": 8,
+    "multipart": 16,
+    "scalar": 12,
+    "symbolic": 8,
+    "vector": 12
+   }
+  },
+  "digit_rule_lost_relative_errors": [
+   9.367310613652128e-08,
+   1.130280671226736e-06,
+   8.118810675477345e-06,
+   1.1617820187069765e-05,
+   2.6453160270881364e-05
+  ],
+  "prm_gpu_hours_full_run": 13.75,
+  "steps_by_branch": {
+   "chemical_engineering": 306,
+   "civil_engineering": 541,
+   "electrical_engineering": 406,
+   "industrial_engineering": 512,
+   "mechanical_engineering": 326
+  },
+  "wilson": {
+   "gpt-5": {
+    "arithmetic": [
+     0.5923271473263599,
+     0.8149317163588082
+    ],
+    "conceptual": [
+     0.22729261451704227,
+     0.45943133649436674
+    ]
+   },
+   "mimo-v2.5-pro": {
+    "arithmetic": [
+     0.5923271473263599,
+     0.8149317163588082
+    ],
+    "conceptual": [
+     0.20327678393067292,
+     0.4502699964143688
+    ]
+   },
+   "opus-4.5": {
+    "arithmetic": [
+     0.5923271473263599,
+     0.8149317163588082
+    ],
+    "conceptual": [
+     0.06914109445171927,
+     0.2416515977733807
+    ]
+   }
+  }
+ },
+ "trace": {
+  "margins": {
+   "E0": {
+    "hi": 0.2175881261595547,
+    "lo": 0.043145334891444675,
+    "margin": 0.12402361768866477,
+    "mde": 0.12710521089653584,
+    "n": 300
+   },
+   "E0-3J": {
+    "hi": 0.24663194444444447,
+    "lo": 0.08471933471933468,
+    "margin": 0.16415523709945257,
+    "mde": 0.11951011610185461,
+    "n": 300
+   },
+   "E1": {
+    "hi": 0.21832358674463936,
+    "lo": 0.04360937923556518,
+    "margin": 0.12568423642290416,
+    "mde": 0.12801839536589776,
+    "n": 300
+   },
+   "E2 (72B frac)": {
+    "hi": 0.19038855880961147,
+    "lo": 0.025840000000000085,
+    "margin": 0.11239684804864436,
+    "mde": 0.11925817343446621,
+    "n": 298
+   },
+   "E2 (72B min)": {
+    "hi": 0.18467707893626006,
+    "lo": 0.011367058115025697,
+    "margin": 0.09601662840478997,
+    "mde": 0.12613301131233345,
+    "n": 298
+   },
+   "E3": {
+    "hi": 0.2423103212576897,
+    "lo": 0.03338171262699563,
+    "margin": 0.14029153084445534,
+    "mde": 0.16443820368871526,
+    "n": 300
+   },
+   "E4": {
+    "hi": 0.24302362040133774,
+    "lo": 0.02985421836228297,
+    "margin": 0.13983024786272213,
+    "mde": 0.1689909722687929,
+    "n": 300
+   },
+   "E4 (arith 1%)": {
+    "hi": 0.38799283154121866,
+    "lo": 0.18315018315018317,
+    "margin": 0.3089887640449438,
+    "mde": 0.14694627716892983,
+    "n": 227
+   },
+   "E4 (arith)": {
+    "hi": 0.37076480263157896,
+    "lo": 0.11585365853658536,
+    "margin": 0.28015363448750286,
+    "mde": 0.18988577359065603,
+    "n": 227
+   },
+   "E5": {
+    "hi": 0.18109025687015567,
+    "lo": -0.0021521335807049846,
+    "margin": 0.08838181930007993,
+    "mde": 0.14927866273769247,
+    "n": 300
+   }
+  },
+  "rows": [
+   {
+    "auroc": 0.8504213051233163,
+    "head": "E0",
+    "hi": 0.9274193548387096,
+    "label": "E0 (published)",
+    "lo": 0.7603770418438129
+   },
+   {
+    "auroc": 0.8102896857125285,
+    "head": "E0-3J",
+    "hi": 0.8849959338574139,
+    "label": "E0 + 3rd judge",
+    "lo": 0.7311244019138756
+   },
+   {
+    "auroc": 0.8487606863890769,
+    "head": "E1",
+    "hi": 0.9268433179723502,
+    "label": "E1 (judges swapped)",
+    "lo": 0.7581109815488031
+   },
+   {
+    "auroc": 0.8620090587578333,
+    "head": "E2 (72B frac)",
+    "hi": 0.9434221964647929,
+    "label": "E2 (PRM, fraction)",
+    "lo": 0.7847704081632653
+   },
+   {
+    "auroc": 0.8783892784016877,
+    "head": "E2 (72B min)",
+    "hi": 0.955527950310559,
+    "label": "E2 (PRM, minimum)",
+    "lo": 0.7890450509342485
+   },
+   {
+    "auroc": 0.8341533919675257,
+    "head": "E3",
+    "hi": 0.9413421915734589,
+    "label": "E3 (milestones)",
+    "lo": 0.726423132222163
+   },
+   {
+    "auroc": 0.8346146749492589,
+    "head": "E4",
+    "hi": 0.9455995956970615,
+    "label": "E4 (+ arithmetic)",
+    "lo": 0.7251957137304981
+   },
+   {
+    "auroc": 0.8860631035119011,
+    "head": "E5",
+    "hi": 0.9784382284382285,
+    "label": "E5 (milestones + judge)",
+    "lo": 0.7838772980789093
+   },
+   {
+    "auroc": 0.974444922811981,
+    "head": "baseline: expert answer verdict",
+    "hi": 0.9928728070175439,
+    "label": "the experts' answer verdict",
+    "lo": 0.9447481288369355
+   }
+  ]
+ }
+}

@@ -5,10 +5,12 @@ One task, one run. Everything here is about E0's answer check and nothing else.
 ## Why
 
 E0 decides whether a trace's final answer is right, and it disagrees with the experts on
-**72 of 300 traces** — 68 of them traces the experts call **correct** and E0 calls wrong.
-In 45 of those the gold value is sitting in the trace's own answer segment
-(`analysis/answer_check.py`). Two known defects cause it: the gold's answer line restates
-the inputs (E0-F1), and 8 of 15 templates answer with a word, not a number (E0-F2).
+**72 of 300 traces** — 68 of them traces the experts call **correct** and E0 calls wrong
+(`analysis/answer_check.py`; the corrected check calls 56 of those 68 correct). Two known
+defects cause it: the gold's answer line restates the inputs (E0-F1), and 8 of 15 templates
+put no number on the answer line, two of them because the answer is a word (E0-F2).
+(An earlier version of this brief said "in 45 of those the gold value is in the trace's
+answer segment"; no committed script prints that figure, so it is withdrawn - D-111.)
 
 What that does to the headline number:
 
@@ -17,7 +19,8 @@ What that does to the headline number:
 | gpt-5 | 0.950 | **0.617** |
 | all 300 traces | 0.760 | **0.547** |
 
-The benchmark understates every model by about 21 points, and the ranking is wrong: E0
+On this slice E0 understates accuracy by about 21 points overall (0 to 33 per model), and
+the ranking is wrong: E0
 puts claude-opus-4.7 first and **GPT-5 fourth**, where the experts put GPT-5 first. A
 results table regenerated with the current check reproduces that error. The check also
 gates the judges (wrong-answer traces are sampled to the tribunal at 0.20), so the 68
