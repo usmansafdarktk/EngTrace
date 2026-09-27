@@ -44,5 +44,9 @@ python -m full_run_28092026.freeze                # rebuild. Only if a template 
 
 Every figure here is printed by `freeze.py` and recorded in `FREEZE.json`.
 
+**How varied the items are** is measured by `diversity.py`, which writes `DIVERSITY.md` and
+`diversity.json`: question skeletons, reasoning paths, answer variants and near-duplicates, on the
+pool and over 500 public draws per template. It writes counts, answer labels and item ids only.
+
 `testset/` is not this pool. It is the 2026-09-17 generation from the default seed, and the
 pilot's `freeze.py --verify` rebuilds its slice from it, so it is left as it is.

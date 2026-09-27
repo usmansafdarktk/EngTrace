@@ -1,0 +1,5225 @@
+[
+ {
+  "template_id": "template_levenspiel_plot_interpretation",
+  "branch": "chemical_engineering",
+  "level": "Advanced",
+  "answer_type": "array",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 15,
+   "paths_upper": 3,
+   "paths_lower": 3,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 195,
+   "paths_upper": 3,
+   "paths_lower": 3,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_batch_reactor_first_order",
+  "branch": "chemical_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 11,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 27,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_batch_reactor_second_order",
+  "branch": "chemical_engineering",
+  "level": "Advanced",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 11,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 27,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_batch_reactor_zero_order",
+  "branch": "chemical_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 8,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 27,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_cstr_volume_basic",
+  "branch": "chemical_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 13,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 73,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_pfr_volume_changing_rate",
+  "branch": "chemical_engineering",
+  "level": "Advanced",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 12,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 27,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_batch_moles_vs_conversion",
+  "branch": "chemical_engineering",
+  "level": "Easy",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 4,
+   "paths_upper": 4,
+   "paths_lower": 3,
+   "answer_variants": 4,
+   "answer_spread": [
+    6,
+    5,
+    3,
+    1
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 1
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 4,
+   "paths_upper": 4,
+   "paths_lower": 3,
+   "answer_variants": 4
+  }
+ },
+ {
+  "template_id": "template_flow_system_molar_flow_rates",
+  "branch": "chemical_engineering",
+  "level": "Intermediate",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 4,
+   "paths_upper": 3,
+   "paths_lower": 2,
+   "answer_variants": 4,
+   "answer_spread": [
+    5,
+    4,
+    3,
+    3
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 4,
+   "paths_upper": 3,
+   "paths_lower": 2,
+   "answer_variants": 4
+  }
+ },
+ {
+  "template_id": "template_gas_phase_concentration",
+  "branch": "chemical_engineering",
+  "level": "Advanced",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 9,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 24,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_limiting_reactant",
+  "branch": "chemical_engineering",
+  "level": "Intermediate",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 4,
+   "paths_upper": 6,
+   "paths_lower": 6,
+   "answer_variants": 6,
+   "answer_spread": [
+    4,
+    4,
+    2,
+    2,
+    2,
+    1
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 4,
+   "paths_upper": 8,
+   "paths_lower": 8,
+   "answer_variants": 8
+  }
+ },
+ {
+  "template_id": "template_adiabatic_flame_temperature",
+  "branch": "chemical_engineering",
+  "level": "Advanced",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 11,
+   "question_skeletons": 11,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 11,
+   "question_skeletons": 11,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_heat_of_reaction_formation",
+  "branch": "chemical_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 4,
+   "question_skeletons": 4,
+   "paths_upper": 4,
+   "paths_lower": 4,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 4,
+   "question_skeletons": 4,
+   "paths_upper": 4,
+   "paths_lower": 4,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_latent_heat_vaporization",
+  "branch": "chemical_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 10,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 2,
+   "answer_spread": [
+    13,
+    2
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 482,
+   "question_skeletons": 16,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 2
+  }
+ },
+ {
+  "template_id": "template_sensible_heat_constant_cp",
+  "branch": "chemical_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 13,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 35,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_sensible_heat_temp_dependent_cp",
+  "branch": "chemical_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 9,
+   "paths_upper": 3,
+   "paths_lower": 3,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 26,
+   "paths_upper": 5,
+   "paths_lower": 5,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_ideal_gas_volume",
+  "branch": "chemical_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 12,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 26,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_pitzer_correlation_z",
+  "branch": "chemical_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 12,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 27,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 2
+  }
+ },
+ {
+  "template_id": "template_rackett_equation_volume",
+  "branch": "chemical_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 12,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 2,
+   "answer_spread": [
+    14,
+    1
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 27,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 2
+  }
+ },
+ {
+  "template_id": "template_two_phase_specific_volume",
+  "branch": "chemical_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 12,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 1
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 453,
+   "question_skeletons": 24,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_vdw_solve_for_pressure",
+  "branch": "chemical_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 10,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 2,
+   "answer_spread": [
+    10,
+    5
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 27,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 2
+  }
+ },
+ {
+  "template_id": "template_vdw_solve_for_volume",
+  "branch": "chemical_engineering",
+  "level": "Advanced",
+  "answer_type": "array",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 10,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 2,
+    "10%": 4
+   },
+   "near_duplicates_5pct": [
+    [
+     "vdw_solve_for_volume#0",
+     "vdw_solve_for_volume#11"
+    ],
+    [
+     "vdw_solve_for_volume#3",
+     "vdw_solve_for_volume#12"
+    ]
+   ]
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 27,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_work_isothermal_virial",
+  "branch": "chemical_engineering",
+  "level": "Advanced",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 13,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 27,
+   "paths_upper": 3,
+   "paths_lower": 3,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_annulus_flowrate",
+  "branch": "chemical_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 11,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 29,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_falling_film_max_velocity",
+  "branch": "chemical_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 6,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 3,
+   "answer_spread": [
+    10,
+    3,
+    2
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 28,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 11
+  }
+ },
+ {
+  "template_id": "template_hagen_poiseuille_flowrate",
+  "branch": "chemical_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 6,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 5,
+   "answer_spread": [
+    7,
+    3,
+    2,
+    2,
+    1
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 10,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 7
+  }
+ },
+ {
+  "template_id": "template_gas_viscosity_kinetic_theory",
+  "branch": "chemical_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 13,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 10,
+   "answer_spread": [
+    4,
+    3,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 1,
+    "10%": 1
+   },
+   "near_duplicates_5pct": [
+    [
+     "gas_viscosity_kinetic_theory#5",
+     "gas_viscosity_kinetic_theory#12"
+    ]
+   ]
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 476,
+   "question_skeletons": 17,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 12
+  }
+ },
+ {
+  "template_id": "template_kinematic_viscosity",
+  "branch": "chemical_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 15,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 9,
+   "answer_spread": [
+    5,
+    3,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 102,
+   "question_skeletons": 100,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 50
+  }
+ },
+ {
+  "template_id": "template_newtons_law_shear_stress",
+  "branch": "chemical_engineering",
+  "level": "Easy",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 11,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 29,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_power_law_fluid_shear",
+  "branch": "chemical_engineering",
+  "level": "Advanced",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 11,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 21,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_reynolds_number_flow_regime",
+  "branch": "chemical_engineering",
+  "level": "Intermediate",
+  "answer_type": "classification",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 15,
+   "paths_upper": 4,
+   "paths_lower": 4,
+   "answer_variants": 2,
+   "answer_spread": [
+    12,
+    3
+   ],
+   "answer_labels": {
+    "**Answer:** a) The Reynolds number is approximately **#**. b) The flow regime is **turbule": 12,
+    "**Answer:** a) The Reynolds number is approximately **#**. b) The flow regime is **laminar": 3
+   },
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 100,
+   "paths_upper": 5,
+   "paths_lower": 5,
+   "answer_variants": 3
+  }
+ },
+ {
+  "template_id": "template_constant_head_permeability",
+  "branch": "civil_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_effective_stress_profile",
+  "branch": "civil_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 1
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_upward_seepage_quick_condition",
+  "branch": "civil_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 2
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_borrow_pit_fill_volume",
+  "branch": "civil_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 4,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 4,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_phase_relations_degree_of_saturation",
+  "branch": "civil_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 3,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 2,
+    "10%": 5
+   },
+   "near_duplicates_5pct": [
+    [
+     "phase_relations_degree_of_saturation#1",
+     "phase_relations_degree_of_saturation#12"
+    ],
+    [
+     "phase_relations_degree_of_saturation#3",
+     "phase_relations_degree_of_saturation#9"
+    ]
+   ]
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 499,
+   "question_skeletons": 3,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_relative_density_of_sand",
+  "branch": "civil_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 18,
+    "10%": 49
+   },
+   "near_duplicates_5pct": [
+    [
+     "relative_density_of_sand#0",
+     "relative_density_of_sand#10"
+    ],
+    [
+     "relative_density_of_sand#1",
+     "relative_density_of_sand#4"
+    ],
+    [
+     "relative_density_of_sand#1",
+     "relative_density_of_sand#14"
+    ],
+    [
+     "relative_density_of_sand#2",
+     "relative_density_of_sand#5"
+    ],
+    [
+     "relative_density_of_sand#2",
+     "relative_density_of_sand#10"
+    ],
+    [
+     "relative_density_of_sand#2",
+     "relative_density_of_sand#12"
+    ],
+    [
+     "relative_density_of_sand#2",
+     "relative_density_of_sand#13"
+    ],
+    [
+     "relative_density_of_sand#4",
+     "relative_density_of_sand#14"
+    ],
+    [
+     "relative_density_of_sand#5",
+     "relative_density_of_sand#12"
+    ],
+    [
+     "relative_density_of_sand#5",
+     "relative_density_of_sand#13"
+    ],
+    [
+     "relative_density_of_sand#6",
+     "relative_density_of_sand#7"
+    ],
+    [
+     "relative_density_of_sand#6",
+     "relative_density_of_sand#8"
+    ],
+    [
+     "relative_density_of_sand#6",
+     "relative_density_of_sand#9"
+    ],
+    [
+     "relative_density_of_sand#6",
+     "relative_density_of_sand#14"
+    ],
+    [
+     "relative_density_of_sand#7",
+     "relative_density_of_sand#14"
+    ],
+    [
+     "relative_density_of_sand#8",
+     "relative_density_of_sand#9"
+    ],
+    [
+     "relative_density_of_sand#10",
+     "relative_density_of_sand#13"
+    ],
+    [
+     "relative_density_of_sand#12",
+     "relative_density_of_sand#13"
+    ]
+   ]
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 499,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_infinite_slope_factor_of_safety",
+  "branch": "civil_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 4,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 1,
+    "5%": 2,
+    "10%": 5
+   },
+   "near_duplicates_5pct": [
+    [
+     "infinite_slope_factor_of_safety#1",
+     "infinite_slope_factor_of_safety#5"
+    ],
+    [
+     "infinite_slope_factor_of_safety#4",
+     "infinite_slope_factor_of_safety#8"
+    ]
+   ]
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 438,
+   "question_skeletons": 4,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_terzaghi_strip_footing_bearing",
+  "branch": "civil_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 4,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 499,
+   "question_skeletons": 4,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_primary_consolidation_settlement",
+  "branch": "civil_engineering",
+  "level": "Advanced",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_time_rate_of_consolidation",
+  "branch": "civil_engineering",
+  "level": "Advanced",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 2,
+   "paths_upper": 4,
+   "paths_lower": 4,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 492,
+   "question_skeletons": 2,
+   "paths_upper": 4,
+   "paths_lower": 4,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_beam_deflection_formula",
+  "branch": "civil_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 4,
+   "paths_upper": 4,
+   "paths_lower": 4,
+   "answer_variants": 2,
+   "answer_spread": [
+    8,
+    7
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 498,
+   "question_skeletons": 4,
+   "paths_upper": 4,
+   "paths_lower": 4,
+   "answer_variants": 2
+  }
+ },
+ {
+  "template_id": "template_cantilever_double_integration",
+  "branch": "civil_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 2,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 496,
+   "question_skeletons": 2,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_virtual_work_truss_deflection",
+  "branch": "civil_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_beam_internal_moment",
+  "branch": "civil_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 1,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_beam_support_reactions",
+  "branch": "civil_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 2,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 499,
+   "question_skeletons": 2,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_truss_method_of_joints",
+  "branch": "civil_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 2
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 498,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_truss_method_of_sections",
+  "branch": "civil_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 3,
+   "paths_upper": 3,
+   "paths_lower": 3,
+   "answer_variants": 3,
+   "answer_spread": [
+    9,
+    5,
+    1
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 3,
+   "paths_upper": 3,
+   "paths_lower": 3,
+   "answer_variants": 3
+  }
+ },
+ {
+  "template_id": "template_force_method_continuous_beam",
+  "branch": "civil_engineering",
+  "level": "Advanced",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 2,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 1,
+    "10%": 2
+   },
+   "near_duplicates_5pct": [
+    [
+     "force_method_continuous_beam#0",
+     "force_method_continuous_beam#5"
+    ]
+   ]
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 441,
+   "question_skeletons": 2,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_slope_deflection_end_moment",
+  "branch": "civil_engineering",
+  "level": "Advanced",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 496,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_influence_line_max_reaction",
+  "branch": "civil_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 1,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_critical_depth_froude_classification",
+  "branch": "civil_engineering",
+  "level": "Easy",
+  "answer_type": "classification",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": {
+    "**Answer:** The Froude number is #": 15
+   },
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 1
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 1,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_hydraulic_jump_energy_loss",
+  "branch": "civil_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 2,
+   "paths_upper": 2,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 1,
+    "10%": 3
+   },
+   "near_duplicates_5pct": [
+    [
+     "hydraulic_jump_energy_loss#2",
+     "hydraulic_jump_energy_loss#13"
+    ]
+   ]
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 2,
+   "paths_upper": 2,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_max_hump_height_no_choking",
+  "branch": "civil_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 3
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 496,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_linear_reservoir_routing_step",
+  "branch": "civil_engineering",
+  "level": "Advanced",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_rational_method_peak_flow",
+  "branch": "civil_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 12,
+   "paths_upper": 12,
+   "paths_lower": 8,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 64,
+   "paths_upper": 64,
+   "paths_lower": 17,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_scs_curve_number_runoff",
+  "branch": "civil_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 8,
+   "paths_upper": 8,
+   "paths_lower": 8,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 1
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 421,
+   "question_skeletons": 9,
+   "paths_upper": 9,
+   "paths_lower": 9,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_best_hydraulic_rectangular_section",
+  "branch": "civil_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 4,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 498,
+   "question_skeletons": 4,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_manning_rectangular_discharge",
+  "branch": "civil_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 5,
+   "paths_upper": 5,
+   "paths_lower": 4,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 497,
+   "question_skeletons": 5,
+   "paths_upper": 5,
+   "paths_lower": 4,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_manning_trapezoidal_velocity",
+  "branch": "civil_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 5,
+   "paths_upper": 5,
+   "paths_lower": 4,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 498,
+   "question_skeletons": 5,
+   "paths_upper": 5,
+   "paths_lower": 4,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_normal_depth_iteration",
+  "branch": "civil_engineering",
+  "level": "Advanced",
+  "answer_type": "array",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 6,
+   "paths_upper": 3,
+   "paths_lower": 3,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 10,
+   "paths_upper": 9,
+   "paths_lower": 9,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_autocorrelation_rect_pulse",
+  "branch": "electrical_engineering",
+  "level": "Intermediate",
+  "answer_type": "symbolic",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 45,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_ft_esd_rect_pulse",
+  "branch": "electrical_engineering",
+  "level": "Intermediate",
+  "answer_type": "symbolic",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 2,
+   "answer_spread": [
+    14,
+    1
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 1
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 80,
+   "question_skeletons": 1,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 2
+  }
+ },
+ {
+  "template_id": "template_lowpass_equivalent_bandpass",
+  "branch": "electrical_engineering",
+  "level": "Advanced",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 2,
+    "10%": 2
+   },
+   "near_duplicates_5pct": [
+    [
+     "lowpass_equivalent_bandpass#5",
+     "lowpass_equivalent_bandpass#13"
+    ],
+    [
+     "lowpass_equivalent_bandpass#8",
+     "lowpass_equivalent_bandpass#12"
+    ]
+   ]
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 491,
+   "question_skeletons": 1,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_mean_variance",
+  "branch": "electrical_engineering",
+  "level": "Easy",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 3,
+   "paths_upper": 8,
+   "paths_lower": 8,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 3,
+   "paths_upper": 19,
+   "paths_lower": 19,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_signal_energy_power",
+  "branch": "electrical_engineering",
+  "level": "Easy",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 3,
+   "paths_upper": 3,
+   "paths_lower": 3,
+   "answer_variants": 2,
+   "answer_spread": [
+    9,
+    6
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 364,
+   "question_skeletons": 3,
+   "paths_upper": 3,
+   "paths_lower": 3,
+   "answer_variants": 2
+  }
+ },
+ {
+  "template_id": "template_average_energy_mqam",
+  "branch": "electrical_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 4,
+   "paths_upper": 4,
+   "paths_lower": 4,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 1
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 282,
+   "question_skeletons": 4,
+   "paths_upper": 4,
+   "paths_lower": 4,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_ber_estimation_mary",
+  "branch": "electrical_engineering",
+  "level": "Advanced",
+  "answer_type": "symbolic",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 2,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 477,
+   "question_skeletons": 2,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_bpsk_energy_basis",
+  "branch": "electrical_engineering",
+  "level": "Easy",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 2,
+   "paths_upper": 2,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 4,
+   "paths_upper": 6,
+   "paths_lower": 2,
+   "answer_variants": 2
+  }
+ },
+ {
+  "template_id": "template_euclidean_distance_binary",
+  "branch": "electrical_engineering",
+  "level": "Intermediate",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 2,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 2,
+   "answer_spread": [
+    8,
+    7
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 1,
+    "5%": 4,
+    "10%": 8
+   },
+   "near_duplicates_5pct": [
+    [
+     "euclidean_distance_binary#0",
+     "euclidean_distance_binary#9"
+    ],
+    [
+     "euclidean_distance_binary#2",
+     "euclidean_distance_binary#11"
+    ],
+    [
+     "euclidean_distance_binary#5",
+     "euclidean_distance_binary#8"
+    ],
+    [
+     "euclidean_distance_binary#5",
+     "euclidean_distance_binary#9"
+    ]
+   ]
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 2,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 2
+  }
+ },
+ {
+  "template_id": "template_null_to_null_bandwidth",
+  "branch": "electrical_engineering",
+  "level": "Advanced",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 7,
+   "paths_upper": 5,
+   "paths_lower": 5,
+   "answer_variants": 3,
+   "answer_spread": [
+    8,
+    5,
+    2
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 310,
+   "question_skeletons": 9,
+   "paths_upper": 5,
+   "paths_lower": 5,
+   "answer_variants": 3
+  }
+ },
+ {
+  "template_id": "template_coaxial_capacitance",
+  "branch": "electrical_engineering",
+  "level": "Advanced",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 1
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_coulombs_law",
+  "branch": "electrical_engineering",
+  "level": "Easy",
+  "answer_type": "vector",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 14,
+   "paths_upper": 14,
+   "paths_lower": 14,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 49,
+   "paths_upper": 183,
+   "paths_lower": 183,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_gauss_law_symmetric",
+  "branch": "electrical_engineering",
+  "level": "Intermediate",
+  "answer_type": "vector",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 2,
+   "paths_upper": 4,
+   "paths_lower": 4,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 2,
+   "paths_upper": 4,
+   "paths_lower": 4,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_superposition_electric_field",
+  "branch": "electrical_engineering",
+  "level": "Intermediate",
+  "answer_type": "vector",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 13,
+   "paths_upper": 15,
+   "paths_lower": 15,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 173,
+   "paths_upper": 406,
+   "paths_lower": 406,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_lorentz_force",
+  "branch": "electrical_engineering",
+  "level": "Easy",
+  "answer_type": "vector",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 11,
+   "paths_upper": 11,
+   "paths_lower": 11,
+   "answer_variants": 4,
+   "answer_spread": [
+    6,
+    5,
+    3,
+    1
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 16,
+   "paths_upper": 32,
+   "paths_lower": 32,
+   "answer_variants": 4
+  }
+ },
+ {
+  "template_id": "template_phasor_addition",
+  "branch": "electrical_engineering",
+  "level": "Intermediate",
+  "answer_type": "symbolic",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 10,
+   "paths_upper": 15,
+   "paths_lower": 15,
+   "answer_variants": 2,
+   "answer_spread": [
+    9,
+    6
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 16,
+   "paths_upper": 71,
+   "paths_lower": 71,
+   "answer_variants": 2
+  }
+ },
+ {
+  "template_id": "template_standing_wave_formation",
+  "branch": "electrical_engineering",
+  "level": "Advanced",
+  "answer_type": "array",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_time_to_phasor",
+  "branch": "electrical_engineering",
+  "level": "Easy",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 8,
+   "paths_upper": 11,
+   "paths_lower": 6,
+   "answer_variants": 2,
+   "answer_spread": [
+    9,
+    6
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 8,
+   "paths_upper": 12,
+   "paths_lower": 6,
+   "answer_variants": 2
+  }
+ },
+ {
+  "template_id": "template_wave_equation_interpretation",
+  "branch": "electrical_engineering",
+  "level": "Intermediate",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 4,
+   "paths_upper": 4,
+   "paths_lower": 4,
+   "answer_variants": 2,
+   "answer_spread": [
+    9,
+    6
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 4,
+   "paths_upper": 4,
+   "paths_lower": 4,
+   "answer_variants": 2
+  }
+ },
+ {
+  "template_id": "template_wave_parameters_basic",
+  "branch": "electrical_engineering",
+  "level": "Easy",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 11,
+   "paths_upper": 11,
+   "paths_lower": 4,
+   "answer_variants": 2,
+   "answer_spread": [
+    9,
+    6
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 1,
+    "10%": 1
+   },
+   "near_duplicates_5pct": [
+    [
+     "wave_parameters_basic#4",
+     "wave_parameters_basic#9"
+    ]
+   ]
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 475,
+   "question_skeletons": 16,
+   "paths_upper": 16,
+   "paths_lower": 6,
+   "answer_variants": 2
+  }
+ },
+ {
+  "template_id": "template_aliased_frequency_identification",
+  "branch": "electrical_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 2
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_cd_dc_system_analysis",
+  "branch": "electrical_engineering",
+  "level": "Intermediate",
+  "answer_type": "symbolic",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_continuous_to_discrete_conversion",
+  "branch": "electrical_engineering",
+  "level": "Easy",
+  "answer_type": "symbolic",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 4,
+   "paths_upper": 4,
+   "paths_lower": 2,
+   "answer_variants": 2,
+   "answer_spread": [
+    10,
+    5
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 4,
+   "paths_upper": 5,
+   "paths_lower": 3,
+   "answer_variants": 3
+  }
+ },
+ {
+  "template_id": "template_decimation_aliasing_analysis",
+  "branch": "electrical_engineering",
+  "level": "Advanced",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 2,
+   "paths_upper": 7,
+   "paths_lower": 7,
+   "answer_variants": 6,
+   "answer_spread": [
+    7,
+    3,
+    2,
+    1,
+    1,
+    1
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 259,
+   "question_skeletons": 2,
+   "paths_upper": 10,
+   "paths_lower": 10,
+   "answer_variants": 7
+  }
+ },
+ {
+  "template_id": "template_nyquist_rate_determination",
+  "branch": "electrical_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 13,
+   "paths_upper": 13,
+   "paths_lower": 9,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 79,
+   "paths_upper": 79,
+   "paths_lower": 12,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_finite_convolution",
+  "branch": "electrical_engineering",
+  "level": "Intermediate",
+  "answer_type": "array",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 13,
+   "paths_upper": 13,
+   "paths_lower": 13,
+   "answer_variants": 9,
+   "answer_spread": [
+    3,
+    2,
+    2,
+    2,
+    2,
+    1,
+    1,
+    1,
+    1
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 49,
+   "paths_upper": 57,
+   "paths_lower": 57,
+   "answer_variants": 18
+  }
+ },
+ {
+  "template_id": "template_impulse_response_from_lccde",
+  "branch": "electrical_engineering",
+  "level": "Advanced",
+  "answer_type": "symbolic",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 9,
+   "paths_upper": 11,
+   "paths_lower": 11,
+   "answer_variants": 4,
+   "answer_spread": [
+    6,
+    4,
+    3,
+    2
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 427,
+   "question_skeletons": 18,
+   "paths_upper": 56,
+   "paths_lower": 56,
+   "answer_variants": 5
+  }
+ },
+ {
+  "template_id": "template_signal_operations",
+  "branch": "electrical_engineering",
+  "level": "Easy",
+  "answer_type": "array",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 14,
+   "paths_upper": 14,
+   "paths_lower": 14,
+   "answer_variants": 12,
+   "answer_spread": [
+    2,
+    2,
+    2,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1,
+    1
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 42,
+   "paths_upper": 93,
+   "paths_lower": 93,
+   "answer_variants": 40
+  }
+ },
+ {
+  "template_id": "template_system_properties_memory_causality",
+  "branch": "electrical_engineering",
+  "level": "Easy",
+  "answer_type": "classification",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 7,
+   "paths_upper": 7,
+   "paths_lower": 7,
+   "answer_variants": 3,
+   "answer_spread": [
+    7,
+    6,
+    2
+   ],
+   "answer_labels": {
+    "**Answer:** a) Memoryless: **Yes** b) Causal: **Yes**": 7,
+    "**Answer:** a) Memoryless: **No** b) Causal: **Yes**": 6,
+    "**Answer:** a) Memoryless: **No** b) Causal: **No**": 2
+   },
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 65,
+   "question_skeletons": 7,
+   "paths_upper": 7,
+   "paths_lower": 7,
+   "answer_variants": 3
+  }
+ },
+ {
+  "template_id": "template_system_property_linearity",
+  "branch": "electrical_engineering",
+  "level": "Intermediate",
+  "answer_type": "classification",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 5,
+   "paths_upper": 5,
+   "paths_lower": 5,
+   "answer_variants": 2,
+   "answer_spread": [
+    10,
+    5
+   ],
+   "answer_labels": {
+    "**Answer:** The system satisfies both additivity and homogeneity, therefore, the system is": 10,
+    "**Answer:** The system fails at least one of the tests (additivity or homogeneity), theref": 5
+   },
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 32,
+   "question_skeletons": 5,
+   "paths_upper": 5,
+   "paths_lower": 5,
+   "answer_variants": 2
+  }
+ },
+ {
+  "template_id": "template_basic_eoq",
+  "branch": "industrial_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 3,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 3,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_epq_finite_production",
+  "branch": "industrial_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 3,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 3,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_quantity_discount_all_units",
+  "branch": "industrial_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 2,
+   "paths_upper": 4,
+   "paths_lower": 4,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 2,
+   "paths_upper": 6,
+   "paths_lower": 6,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_reorder_point_lead_time",
+  "branch": "industrial_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 3,
+   "paths_lower": 3,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 499,
+   "question_skeletons": 1,
+   "paths_upper": 3,
+   "paths_lower": 3,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_chase_vs_level_aggregate",
+  "branch": "industrial_engineering",
+  "level": "Advanced",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 9,
+   "paths_lower": 9,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 1,
+   "paths_upper": 23,
+   "paths_lower": 23,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_line_balancing_heuristic",
+  "branch": "industrial_engineering",
+  "level": "Advanced",
+  "answer_type": "array",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 1,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_takt_time_line_efficiency",
+  "branch": "industrial_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 2,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 1
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 498,
+   "question_skeletons": 2,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_newsvendor_normal_demand",
+  "branch": "industrial_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 3,
+   "paths_upper": 2,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 3,
+   "paths_upper": 2,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_qr_policy_one_iteration",
+  "branch": "industrial_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_safety_stock_reorder_point",
+  "branch": "industrial_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 499,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_aoq_ati_rectifying",
+  "branch": "industrial_engineering",
+  "level": "Advanced",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 11,
+   "paths_upper": 7,
+   "paths_lower": 7,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 20,
+   "paths_upper": 10,
+   "paths_lower": 10,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_single_sampling_oc_point",
+  "branch": "industrial_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 11,
+   "paths_upper": 9,
+   "paths_lower": 9,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 499,
+   "question_skeletons": 30,
+   "paths_upper": 21,
+   "paths_lower": 21,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_c_chart_revision",
+  "branch": "industrial_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 3,
+   "paths_upper": 6,
+   "paths_lower": 4,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 494,
+   "question_skeletons": 3,
+   "paths_upper": 6,
+   "paths_lower": 4,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_p_chart_limits_floor",
+  "branch": "industrial_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 3,
+   "paths_upper": 5,
+   "paths_lower": 2,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 1,
+    "10%": 1
+   },
+   "near_duplicates_5pct": [
+    [
+     "p_chart_limits_floor#0",
+     "p_chart_limits_floor#13"
+    ]
+   ]
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 453,
+   "question_skeletons": 3,
+   "paths_upper": 6,
+   "paths_lower": 2,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_cp_cpk_from_specs",
+  "branch": "industrial_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 3,
+   "paths_upper": 7,
+   "paths_lower": 3,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 3,
+   "paths_upper": 9,
+   "paths_lower": 3,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_sigma_reduction_for_cpk",
+  "branch": "industrial_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 2,
+   "paths_upper": 4,
+   "paths_lower": 2,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 496,
+   "question_skeletons": 2,
+   "paths_upper": 4,
+   "paths_lower": 2,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_arl_beta_mean_shift",
+  "branch": "industrial_engineering",
+  "level": "Advanced",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 6,
+   "paths_upper": 5,
+   "paths_lower": 5,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 1,
+    "10%": 3
+   },
+   "near_duplicates_5pct": [
+    [
+     "arl_beta_mean_shift#1",
+     "arl_beta_mean_shift#14"
+    ]
+   ]
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 354,
+   "question_skeletons": 6,
+   "paths_upper": 6,
+   "paths_lower": 6,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_chart_pair_selection",
+  "branch": "industrial_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 3,
+   "paths_upper": 8,
+   "paths_lower": 3,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 3,
+   "paths_upper": 9,
+   "paths_lower": 3,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_xbar_known_sigma_classification",
+  "branch": "industrial_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 3,
+   "paths_upper": 3,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 3,
+   "paths_upper": 3,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_xbar_r_control_limits",
+  "branch": "industrial_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 3,
+   "paths_upper": 3,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 3,
+   "paths_upper": 3,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_absorbing_chain_time_to_failure",
+  "branch": "industrial_engineering",
+  "level": "Advanced",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 498,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_two_state_steady_state",
+  "branch": "industrial_engineering",
+  "level": "Easy",
+  "answer_type": "vector",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 3,
+   "paths_upper": 3,
+   "paths_lower": 3,
+   "answer_variants": 2,
+   "answer_spread": [
+    11,
+    4
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 484,
+   "question_skeletons": 3,
+   "paths_upper": 3,
+   "paths_lower": 3,
+   "answer_variants": 2
+  }
+ },
+ {
+  "template_id": "template_two_step_transition_probability",
+  "branch": "industrial_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 7,
+   "paths_upper": 7,
+   "paths_lower": 7,
+   "answer_variants": 3,
+   "answer_spread": [
+    8,
+    5,
+    2
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 9,
+   "paths_upper": 9,
+   "paths_lower": 9,
+   "answer_variants": 3
+  }
+ },
+ {
+  "template_id": "template_poisson_event_count",
+  "branch": "industrial_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 4,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 195,
+   "question_skeletons": 4,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_mm1_time_in_system",
+  "branch": "industrial_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 3,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 1
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 347,
+   "question_skeletons": 3,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_mm1k_finite_capacity",
+  "branch": "industrial_engineering",
+  "level": "Advanced",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 5,
+   "paths_lower": 5,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 423,
+   "question_skeletons": 1,
+   "paths_upper": 6,
+   "paths_lower": 6,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_mmc_waiting_time",
+  "branch": "industrial_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 3,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 2,
+    "10%": 3
+   },
+   "near_duplicates_5pct": [
+    [
+     "mmc_waiting_time#1",
+     "mmc_waiting_time#15"
+    ],
+    [
+     "mmc_waiting_time#2",
+     "mmc_waiting_time#4"
+    ]
+   ]
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 82,
+   "question_skeletons": 3,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_server_configuration_selection",
+  "branch": "industrial_engineering",
+  "level": "Intermediate",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 4,
+   "paths_upper": 7,
+   "paths_lower": 4,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 1
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 486,
+   "question_skeletons": 4,
+   "paths_upper": 8,
+   "paths_lower": 4,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_exponential_mttf_topology",
+  "branch": "industrial_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 2,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 1,
+    "5%": 1,
+    "10%": 2
+   },
+   "near_duplicates_5pct": [
+    [
+     "exponential_mttf_topology#6",
+     "exponential_mttf_topology#10"
+    ]
+   ]
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 490,
+   "question_skeletons": 2,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_system_reliability_topology",
+  "branch": "industrial_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 3,
+   "paths_upper": 3,
+   "paths_lower": 3,
+   "answer_variants": 2,
+   "answer_spread": [
+    11,
+    4
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 31,
+    "10%": 37
+   },
+   "near_duplicates_5pct": [
+    [
+     "system_reliability_topology#0",
+     "system_reliability_topology#3"
+    ],
+    [
+     "system_reliability_topology#0",
+     "system_reliability_topology#12"
+    ],
+    [
+     "system_reliability_topology#0",
+     "system_reliability_topology#13"
+    ],
+    [
+     "system_reliability_topology#1",
+     "system_reliability_topology#4"
+    ],
+    [
+     "system_reliability_topology#1",
+     "system_reliability_topology#6"
+    ],
+    [
+     "system_reliability_topology#1",
+     "system_reliability_topology#7"
+    ],
+    [
+     "system_reliability_topology#1",
+     "system_reliability_topology#9"
+    ],
+    [
+     "system_reliability_topology#1",
+     "system_reliability_topology#10"
+    ],
+    [
+     "system_reliability_topology#1",
+     "system_reliability_topology#14"
+    ],
+    [
+     "system_reliability_topology#2",
+     "system_reliability_topology#5"
+    ],
+    [
+     "system_reliability_topology#2",
+     "system_reliability_topology#11"
+    ],
+    [
+     "system_reliability_topology#3",
+     "system_reliability_topology#12"
+    ],
+    [
+     "system_reliability_topology#3",
+     "system_reliability_topology#13"
+    ],
+    [
+     "system_reliability_topology#4",
+     "system_reliability_topology#6"
+    ],
+    [
+     "system_reliability_topology#4",
+     "system_reliability_topology#7"
+    ],
+    [
+     "system_reliability_topology#4",
+     "system_reliability_topology#9"
+    ],
+    [
+     "system_reliability_topology#4",
+     "system_reliability_topology#10"
+    ],
+    [
+     "system_reliability_topology#4",
+     "system_reliability_topology#14"
+    ],
+    [
+     "system_reliability_topology#5",
+     "system_reliability_topology#11"
+    ],
+    [
+     "system_reliability_topology#6",
+     "system_reliability_topology#7"
+    ],
+    [
+     "system_reliability_topology#6",
+     "system_reliability_topology#8"
+    ],
+    [
+     "system_reliability_topology#6",
+     "system_reliability_topology#9"
+    ],
+    [
+     "system_reliability_topology#6",
+     "system_reliability_topology#10"
+    ],
+    [
+     "system_reliability_topology#6",
+     "system_reliability_topology#14"
+    ],
+    [
+     "system_reliability_topology#7",
+     "system_reliability_topology#9"
+    ],
+    [
+     "system_reliability_topology#7",
+     "system_reliability_topology#10"
+    ],
+    [
+     "system_reliability_topology#7",
+     "system_reliability_topology#14"
+    ],
+    [
+     "system_reliability_topology#8",
+     "system_reliability_topology#10"
+    ],
+    [
+     "system_reliability_topology#9",
+     "system_reliability_topology#10"
+    ],
+    [
+     "system_reliability_topology#9",
+     "system_reliability_topology#14"
+    ],
+    [
+     "system_reliability_topology#10",
+     "system_reliability_topology#14"
+    ]
+   ]
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 498,
+   "question_skeletons": 3,
+   "paths_upper": 3,
+   "paths_lower": 3,
+   "answer_variants": 2
+  }
+ },
+ {
+  "template_id": "template_fluid_particle_acceleration",
+  "branch": "mechanical_engineering",
+  "level": "Easy",
+  "answer_type": "vector",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_incompressible_continuity",
+  "branch": "mechanical_engineering",
+  "level": "Advanced",
+  "answer_type": "symbolic",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 9,
+   "paths_upper": 11,
+   "paths_lower": 11,
+   "answer_variants": 5,
+   "answer_spread": [
+    4,
+    4,
+    4,
+    2,
+    1
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 178,
+   "question_skeletons": 24,
+   "paths_upper": 42,
+   "paths_lower": 42,
+   "answer_variants": 10
+  }
+ },
+ {
+  "template_id": "template_particle_pathline",
+  "branch": "mechanical_engineering",
+  "level": "Advanced",
+  "answer_type": "vector",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 498,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_volumetric_flow_rate",
+  "branch": "mechanical_engineering",
+  "level": "Intermediate",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 2,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 2,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_vorticity_check",
+  "branch": "mechanical_engineering",
+  "level": "Intermediate",
+  "answer_type": "vector",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 4,
+   "paths_upper": 4,
+   "paths_lower": 4,
+   "answer_variants": 2,
+   "answer_spread": [
+    9,
+    6
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 6,
+   "paths_upper": 8,
+   "paths_lower": 8,
+   "answer_variants": 3
+  }
+ },
+ {
+  "template_id": "template_basic_buoyant_force",
+  "branch": "mechanical_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 15,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 2,
+   "answer_spread": [
+    9,
+    6
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 487,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 2
+  }
+ },
+ {
+  "template_id": "template_floating_object_submersion_depth",
+  "branch": "mechanical_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 15,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 2,
+   "answer_spread": [
+    11,
+    4
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 394,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 2
+  }
+ },
+ {
+  "template_id": "template_hydrostatic_force_on_plane",
+  "branch": "mechanical_engineering",
+  "level": "Advanced",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 14,
+   "paths_upper": 13,
+   "paths_lower": 13,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 155,
+   "paths_upper": 82,
+   "paths_lower": 82,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_hydrostatic_pressure_at_depth",
+  "branch": "mechanical_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 14,
+   "paths_upper": 14,
+   "paths_lower": 14,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 82,
+   "paths_upper": 82,
+   "paths_lower": 82,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_utube_manometer",
+  "branch": "mechanical_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 14,
+   "paths_upper": 14,
+   "paths_lower": 14,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 499,
+   "question_skeletons": 145,
+   "paths_upper": 145,
+   "paths_lower": 145,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_axial_deformation",
+  "branch": "mechanical_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 13,
+   "paths_upper": 13,
+   "paths_lower": 12,
+   "answer_variants": 2,
+   "answer_spread": [
+    8,
+    7
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 161,
+   "paths_upper": 161,
+   "paths_lower": 46,
+   "answer_variants": 2
+  }
+ },
+ {
+  "template_id": "template_basic_stress_strain",
+  "branch": "mechanical_engineering",
+  "level": "Easy",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 12,
+   "paths_upper": 5,
+   "paths_lower": 4,
+   "answer_variants": 2,
+   "answer_spread": [
+    9,
+    6
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 89,
+   "paths_upper": 6,
+   "paths_lower": 4,
+   "answer_variants": 2
+  }
+ },
+ {
+  "template_id": "template_multi_segment_rod",
+  "branch": "mechanical_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 15,
+   "paths_upper": 11,
+   "paths_lower": 11,
+   "answer_variants": 2,
+   "answer_spread": [
+    8,
+    7
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 474,
+   "paths_upper": 94,
+   "paths_lower": 65,
+   "answer_variants": 2
+  }
+ },
+ {
+  "template_id": "template_poissons_ratio",
+  "branch": "mechanical_engineering",
+  "level": "Intermediate",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 14,
+   "paths_upper": 12,
+   "paths_lower": 7,
+   "answer_variants": 2,
+   "answer_spread": [
+    9,
+    6
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 88,
+   "paths_upper": 44,
+   "paths_lower": 12,
+   "answer_variants": 2
+  }
+ },
+ {
+  "template_id": "template_statically_indeterminate",
+  "branch": "mechanical_engineering",
+  "level": "Advanced",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 15,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 2,
+   "answer_spread": [
+    10,
+    5
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 88,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 2
+  }
+ },
+ {
+  "template_id": "template_angle_of_twist",
+  "branch": "mechanical_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 10,
+   "paths_upper": 10,
+   "paths_lower": 10,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 15,
+   "paths_upper": 15,
+   "paths_lower": 15,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_composite_shafts_series",
+  "branch": "mechanical_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 13,
+   "paths_upper": 13,
+   "paths_lower": 13,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 95,
+   "paths_upper": 95,
+   "paths_lower": 95,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_shaft_design_power",
+  "branch": "mechanical_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 2,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 2,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_shear_stress_torsion",
+  "branch": "mechanical_engineering",
+  "level": "Easy",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 2,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 1,
+    "10%": 2
+   },
+   "near_duplicates_5pct": [
+    [
+     "shear_stress_torsion#11",
+     "shear_stress_torsion#14"
+    ]
+   ]
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 2,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_statically_indeterminate_shaft",
+  "branch": "mechanical_engineering",
+  "level": "Advanced",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 8,
+   "paths_upper": 8,
+   "paths_lower": 8,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 10,
+   "paths_upper": 10,
+   "paths_lower": 10,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_rotating_unbalance",
+  "branch": "mechanical_engineering",
+  "level": "Intermediate",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_system_properties",
+  "branch": "mechanical_engineering",
+  "level": "Easy",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 2,
+   "answer_spread": [
+    11,
+    4
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 2
+  }
+ },
+ {
+  "template_id": "template_vibration_isolator_design",
+  "branch": "mechanical_engineering",
+  "level": "Advanced",
+  "answer_type": "scalar",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 1
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_vibration_transmissibility",
+  "branch": "mechanical_engineering",
+  "level": "Intermediate",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_damping_classification",
+  "branch": "mechanical_engineering",
+  "level": "Intermediate",
+  "answer_type": "classification",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 3,
+   "paths_lower": 3,
+   "answer_variants": 3,
+   "answer_spread": [
+    7,
+    6,
+    2
+   ],
+   "answer_labels": {
+    "**Answer:** The damping ratio is #. The system is **Overdamped**.": 7,
+    "**Answer:** The damping ratio is #. The system is **Critically Damped**.": 6,
+    "**Answer:** The damping ratio is #. The system is **Underdamped**. The damped natural freq": 2
+   },
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 1,
+   "paths_upper": 3,
+   "paths_lower": 3,
+   "answer_variants": 3
+  }
+ },
+ {
+  "template_id": "template_equivalent_stiffness_frequency",
+  "branch": "mechanical_engineering",
+  "level": "Advanced",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 2,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 2,
+   "paths_upper": 2,
+   "paths_lower": 2,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_logarithmic_decrement",
+  "branch": "mechanical_engineering",
+  "level": "Intermediate",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 1
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 498,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_undamped_natural_frequency_torsional",
+  "branch": "mechanical_engineering",
+  "level": "Easy",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 2
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_undamped_natural_frequency_translational",
+  "branch": "mechanical_engineering",
+  "level": "Easy",
+  "answer_type": "multipart",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1,
+   "answer_spread": [
+    15
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 1,
+   "paths_upper": 1,
+   "paths_lower": 1,
+   "answer_variants": 1
+  }
+ },
+ {
+  "template_id": "template_undamped_response_initial_conditions",
+  "branch": "mechanical_engineering",
+  "level": "Intermediate",
+  "answer_type": "symbolic",
+  "pool": {
+   "items": 15,
+   "distinct_questions": 15,
+   "question_skeletons": 1,
+   "paths_upper": 5,
+   "paths_lower": 5,
+   "answer_variants": 5,
+   "answer_spread": [
+    7,
+    4,
+    2,
+    1,
+    1
+   ],
+   "answer_labels": null,
+   "near_duplicate_pairs": {
+    "1%": 0,
+    "5%": 0,
+    "10%": 0
+   },
+   "near_duplicates_5pct": []
+  },
+  "reach": {
+   "draws": 500,
+   "distinct_questions": 500,
+   "question_skeletons": 1,
+   "paths_upper": 5,
+   "paths_lower": 5,
+   "answer_variants": 5
+  }
+ }
+]
