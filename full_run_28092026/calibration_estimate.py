@@ -70,7 +70,7 @@ def main() -> int:
     tok = cfg['pricing_basis_tokens']
     rng = random.Random(SEED)
     pool_levels = Counter(it['level'] for it in its)
-    print(f'{"model":22s} {"rows":>4s} {"empty":>5s} {"trunc":>5s} {"fail":>4s} {"out tok":>7s} '
+    print(f'{"model":22s} {"rows":>4s} {"empty":>5s} {"trunc":>5s} {"fail":>4s} {"retry":>5s} {"out tok":>7s} '
           f'{"billed $":>8s} {"$/item":>8s} {"run $":>7s} {"95% interval":>15s} {"level $":>7s} '
           f'{"assumed $":>9s} {"hours":>5s}')
     totals = [0.0] * DRAWS
@@ -84,7 +84,8 @@ def main() -> int:
             continue
         c = Counter(r['status'] for r in rows)
         trunc = sum(r.get('finish_reason') == 'length' for r in rows)
-        costs = [r['billed_usd'] for r in rows if r.get('billed_usd') is not None]
+        retries = sum((r.get('attempts') or 1) - 1 for r in rows)
+        costs =[r['billed_usd'] for r in rows if r.get('billed_usd') is not None]
         outs = [r['completion_tokens'] for r in rows if r.get('completion_tokens') is not None]
         if not costs:
             print(f'{s["key"]:22s} {len(rows):4d}  no row reports a billed cost')
@@ -114,13 +115,13 @@ def main() -> int:
         assumed_total += assumed
         level_total += level_point
         print(f'{s["key"]:22s} {len(rows):4d} {c["empty"]:5d} {trunc:5d} '
-              f'{pending_failures(s["key"], done, a.until):4d} {sum(outs) / len(outs) if outs else 0:7.0f} '
+              f'{pending_failures(s["key"], done, a.until):4d} {retries:5d} {sum(outs) / len(outs) if outs else 0:7.0f} '
               f'{billed:8.3f} {per_item:8.5f} {point:7.2f} {f"{lo:.2f}-{hi:.2f}":>15s} {level_point:7.2f} '
               f'{assumed:9.2f} {hours:5.1f}')
         if len(costs) < len(rows):
             print(f'  {s["key"]}: {len(rows) - len(costs)} rows report no billed cost')
     lo, hi = interval(totals)
-    print(f'{"TOTAL":22s} {"":4s} {"":5s} {"":5s} {"":4s} {"":7s} {billed_total:8.3f} {"":8s} '
+    print(f'{"TOTAL":22s} {"":4s} {"":5s} {"":5s} {"":4s} {"":5s} {"":7s} {billed_total:8.3f} {"":8s} '
           f'{point_total:7.2f} {f"{lo:.2f}-{hi:.2f}":>15s} {level_total:7.2f} {assumed_total:9.2f}')
     n_rows = sum(row_levels.values())
     print('\nlevels, recorded rows against the pool: ' + ', '.join(
@@ -150,8 +151,9 @@ def main() -> int:
     print(f'\nrun $: billed so far plus $/item times the {len(its)}-item pool\'s remaining items. '
           f'assumed $: the dry run\'s basis,\n{tok["in"]} input and {tok["out"]} output tokens per '
           f'item at the pricing document\'s prices. trunc: rows that stopped at the output cap.\n'
-          f'fail: items left as service failures, called again by the next run. hours: the '
-          f'remaining calls at {a.workers} in flight.')
+          f'fail: items left as service failures, called again by the next run. retry: attempts\n'
+          f'beyond the first, whose cost the rows do not record. hours: the remaining calls at '
+          f'{a.workers} in flight.')
     return 0
 
 

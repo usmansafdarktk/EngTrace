@@ -4700,6 +4700,49 @@ $45.06.
 The owner resumed all six at 17:45 with the line moved to the projection's upper bound, $45.06: the
 two models' projections rest on their first templates, and only more of their items can correct them.
 
+## D-126 — The seven are complete: 15,750 of 15,750 items, $33.23 in the rows
+
+**Date:** 2026-09-28 · **Status:** DECIDED (the record); OPEN (the traces' Kaggle copy) · **Evidence:** `calibration_estimate.py --empties` with the seven `--model` keys; `run_traces.py --status`; OpenRouter's account usage; the traces (local)
+
+The six resumed processes ended by 22:18 local time. Each of the seven has a row for every one of
+its 2,250 items, answered or empty, and none is left as a service failure, so no re-run was needed.
+
+| model | answered | empty | output tokens per item | billed $ | calibration's estimate $ (D-123) | attempts beyond the first |
+|---|---|---|---|---|---|---|
+| gpt-oss-20b | 2,197 | 53 | 3,343 | 0.690 | 0.48 | 20 |
+| gemma-4-26b-a4b | 2,250 | 0 | 963 | 0.726 | 0.74 | 4 |
+| deepseek-v4.1-flash | 2,236 | 14 | 4,753 | 7.041 | 7.57 | 7 |
+| glm-5.3-flash | 2,208 | 42 | 4,901 | 4.512 | 2.78 | 27 |
+| muse-glimmer-30b | 2,221 | 29 | 3,658 | 10.045 | 9.28 | 10 |
+| gpt-5.4-mini | 2,250 | 0 | 721 | 7.737 | 7.24 | 0 |
+| gemini-3.1-flash-lite | 2,250 | 0 | 690 | 2.480 | 2.33 | 0 |
+| **seven** | **15,612** | **138** | | **33.230** | **30.41** | **68** |
+
+The seven's $33.23 is inside the approval's first interval, $26.67 to $34.66 (D-124), and under the
+$45.06 line (D-125). Two models ended above their calibration intervals: gpt-oss-20b, which wrote
+3,343 output tokens per item against the calibration's 2,284, and GLM-5.3 Flash, $4.51 against an
+upper end of $3.91. DeepSeek V4.1 Flash, whose early projection stopped the run, ended under its
+calibration estimate.
+
+The rows record the attempt each row kept. OpenRouter's account usage rose $35.75 over the run, from
+a read before the launch to one after the end, against $32.96 in the run's rows. The $2.79 the rows
+do not show covers the 68 attempts beyond the first, the calls in flight when the run was stopped
+(D-125), and any other use of the account in those hours, which cannot be told apart from here. The
+run itself therefore cost between $32.96 and $35.75, on top of the calibration's $1.80 and the
+check's $0.006.
+
+138 rows are empty. 136 of them ended at the output cap with no answer text; the other 2
+(gpt-oss-20b, `finite_convolution`) ended with the model stopping without any. The analysis plan
+scores an empty row 0 (D-117). They spread over 25 templates for gpt-oss-20b, 10 for GLM-5.3 Flash,
+7 for Muse and 4 for DeepSeek; Gemma, GPT-5.4 mini and Gemini have none. Seven more rows stopped at
+the cap after some answer text, and are scored on what they state.
+
+The traces, the seven's and the three held models' calibration rows, are archived locally beside the
+pool's backup with their checksum, every member checked against its source by SHA-256. The private
+Kaggle copy waits for the owner, because the upload needs manual mode.
+
+**Open.** The traces' Kaggle copy; the three held models (D-124); Qwen (D-121).
+
 ## Open decisions
 
 | # | Decision | Needed before |
@@ -4720,9 +4763,10 @@ two models' projections rest on their first templates, and only more of their it
 | D-121 | ~~Approve the harness check (about $0.01) and the calibration run (about $3.58, 220 calls)~~ **Approved by the owner 2026-09-28 (D-122)** | — |
 | D-122 | ~~Approve the full run: about $202 for the ten, 95% interval $163 to $251, on the calibration's bills (D-123)~~ **Approved for seven by the owner 2026-09-28 (D-124): $30.41, interval $26.67 to $34.66; the spend line moved to $45.06 after the stop (D-125)** | — |
 | D-124 | Whether and when to run `kimi-k3`, `glm-5.3` and `claude-sonnet-5`: $171.74, interval $134.07 to $221.32 | their traces |
+| D-126 | A private Kaggle copy of the traces; the local archive is made and verified | the evaluation |
 | D-117 | ~~Confirm the analysis plan as a whole; its two scoring rules are decided~~ **Confirmed by the owner 2026-09-28 (D-122)** | — |
 | D-114 | ~~A private backup of `full_run_28092026/pool/` and `SEED.secret`~~ **Backed up 2026-09-28: a private Kaggle dataset in the owner's account, downloaded back and matched file for file, and a local archive with its checksum.** ~~The tag on the commit inference runs at~~ **`full-run-inference` (D-122)** | — |
-| — | The budget: the plan comes to about $606 against the ~$500 round with a batched router (D-110). Calibration puts generation at about $202 for the ten against the plan's $403 (D-123) | generation starts |
+| — | The budget: the plan comes to about $606 against the ~$500 round with a batched router (D-110). Calibration puts generation at about $202 for the ten against the plan's $403 (D-123); the seven's run cost $32.96 to $35.75 (D-126) | generation starts |
 | — | ~~Expert annotation of the frozen 300 (stage 3)~~ **Done: 15 experts, every trace labelled three times, with verification and adjudication rounds (RESULTS_X1)** | — |
 | D-003 | Do the raw `inference_results/` generations still exist? | promising any corrected results table |
 | — | Phase 5 scoping: fold into Phase 1 or run as a parallel PR | Phase 1 start |
