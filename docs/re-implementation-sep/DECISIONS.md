@@ -4675,6 +4675,31 @@ in, the run stops for the owner.
 
 **Open.** Whether and when the three run.
 
+## D-125 — The run stopped at the spend line, and resumed with the line at $45.06
+
+**Date:** 2026-09-28 · **Status:** DECIDED · **Evidence:** `calibration_estimate.py --empties --until 2026-09-28T12:34:24Z` with the seven `--model` keys; OpenRouter's account usage
+
+At 17:33 local time, with a quarter of the seven's calls in, their projected cost passed D-124's line
+of $34.66, and the six processes still running were stopped at 17:34. At the stop, $9.76 was billed
+across the seven, calibration included, and the projection stood at $41.42, 95% interval $37.98 to
+$45.06.
+
+- Gemini 3.1 Flash-Lite had finished all 2,250 items, at $2.48, inside its calibration interval of
+  $1.99 to $2.69.
+- gpt-oss-20b, Gemma, Muse and GPT-5.4 mini projected inside their calibration intervals.
+- DeepSeek V4.1 Flash projected $15.48 against its calibration's $7.57, and GLM-5.3 Flash $4.88
+  against $2.78. The harness submits items in the pool's sorted order, so a slow model's first rows
+  come from the first templates alphabetically, not from the calibration's spread. Among them is
+  `adiabatic_flame_temperature`, where each of the two had 3 items end empty at the output cap.
+- Muse's 8 empty rows are all `aoq_ati_rectifying`, at its 16,384-token ceiling. The analysis plan
+  scores an empty row 0 (D-117).
+- OpenRouter's account usage rose $9.67 between a read before the launch and one after the stop,
+  against $9.49 in the rows the pass wrote. The difference is at most the cost of the calls in flight
+  when the processes were stopped.
+
+The owner resumed all six at 17:45 with the line moved to the projection's upper bound, $45.06: the
+two models' projections rest on their first templates, and only more of their items can correct them.
+
 ## Open decisions
 
 | # | Decision | Needed before |
@@ -4693,7 +4718,7 @@ in, the run stops for the owner.
 | D-118 | ~~Relabel `critical_depth_froude_classification`'s answer type~~ **Not needed (D-120): scoring is the same under either label** | — |
 | D-121 | `qwen3-235b-a22b` has no endpoint meeting the routing rule: keep it on Alibaba's endpoint (8,192-token cap, undeclared quantization) or replace it. **Skipped for now by the owner 2026-09-28 (D-122): the run goes ahead with the other ten** | Qwen's traces |
 | D-121 | ~~Approve the harness check (about $0.01) and the calibration run (about $3.58, 220 calls)~~ **Approved by the owner 2026-09-28 (D-122)** | — |
-| D-122 | ~~Approve the full run: about $202 for the ten, 95% interval $163 to $251, on the calibration's bills (D-123)~~ **Approved for seven by the owner 2026-09-28 (D-124): $30.41, interval $26.67 to $34.66** | — |
+| D-122 | ~~Approve the full run: about $202 for the ten, 95% interval $163 to $251, on the calibration's bills (D-123)~~ **Approved for seven by the owner 2026-09-28 (D-124): $30.41, interval $26.67 to $34.66; the spend line moved to $45.06 after the stop (D-125)** | — |
 | D-124 | Whether and when to run `kimi-k3`, `glm-5.3` and `claude-sonnet-5`: $171.74, interval $134.07 to $221.32 | their traces |
 | D-117 | ~~Confirm the analysis plan as a whole; its two scoring rules are decided~~ **Confirmed by the owner 2026-09-28 (D-122)** | — |
 | D-114 | ~~A private backup of `full_run_28092026/pool/` and `SEED.secret`~~ **Backed up 2026-09-28: a private Kaggle dataset in the owner's account, downloaded back and matched file for file, and a local archive with its checksum.** ~~The tag on the commit inference runs at~~ **`full-run-inference` (D-122)** | — |

@@ -1,6 +1,7 @@
 """Re-estimate the full run from the traces recorded so far. FREE: reads traces/, calls nothing.
 
-    python -m full_run_28092026.calibration_estimate [--workers 15] [--providers] [--model KEY ...]
+    python -m full_run_28092026.calibration_estimate [--workers 15] [--providers] [--empties] [--model KEY ...]
+                                                     [--until 2026-09-28T12:34:24Z]
 
 Per model, the billed cost per recorded item (answered or empty) times the items still to run, added
 to what is billed already. The 95% interval is a bootstrap over the recorded items, so it assumes they
@@ -23,7 +24,13 @@ DRAWS = 10_000
 SEED = 0
 
 
-def pending_failures(key: str, done: dict) -> int:
+def recorded(key: str, until: str | None) -> dict[str, dict]:
+    """existing(), limited to the rows written at or before `until` (UTC, in the rows' ts format)."""
+    rows = existing(key)
+    return rows if not until else {i: r for i, r in rows.items() if r.get('ts', '') <= until}
+
+
+def pending_failures(key: str, done: dict, until: str | None) -> int:
     """Items whose only rows are service failures: the next run calls them again."""
     path = trace_path(key)
     if not path.exists():
@@ -34,7 +41,7 @@ def pending_failures(key: str, done: dict) -> int:
             row = json.loads(ln)
         except json.JSONDecodeError:
             continue
-        if row.get('status') == 'service_failure':
+        if row.get('status') == 'service_failure' and (not until or row.get('ts', '') <= until):
             failed.add(row['item_id'])
     return len(failed - set(done))
 
@@ -49,7 +56,10 @@ def main() -> int:
     ap.add_argument('--workers', type=int, default=15, help='calls in flight per model')
     ap.add_argument('--providers', action='store_true',
                     help='also list, per model, the endpoints that served the rows and what each billed')
+    ap.add_argument('--empties', action='store_true',
+                    help='also list, per model, the templates of the empty rows and how they ended')
     ap.add_argument('--model', action='append', help='only this model key (repeatable); the total covers these')
+    ap.add_argument('--until', metavar='UTC', help='only rows written at or before this time, e.g. 2026-09-28T12:34:24Z')
     a = ap.parse_args()
     cfg = config()
     if a.model:
@@ -67,7 +77,7 @@ def main() -> int:
     point_total = billed_total = assumed_total = level_total = 0.0
     row_levels = Counter()
     for s in cfg['models']:
-        done = existing(s['key'])
+        done = recorded(s['key'], a.until)
         rows = list(done.values())
         if not rows:
             print(f'{s["key"]:22s}    0  no traces')
@@ -104,7 +114,7 @@ def main() -> int:
         assumed_total += assumed
         level_total += level_point
         print(f'{s["key"]:22s} {len(rows):4d} {c["empty"]:5d} {trunc:5d} '
-              f'{pending_failures(s["key"], done):4d} {sum(outs) / len(outs) if outs else 0:7.0f} '
+              f'{pending_failures(s["key"], done, a.until):4d} {sum(outs) / len(outs) if outs else 0:7.0f} '
               f'{billed:8.3f} {per_item:8.5f} {point:7.2f} {f"{lo:.2f}-{hi:.2f}":>15s} {level_point:7.2f} '
               f'{assumed:9.2f} {hours:5.1f}')
         if len(costs) < len(rows):
@@ -120,7 +130,7 @@ def main() -> int:
         print('\nserving endpoints: rows, and billed $ per million completion tokens')
         for s in cfg['models']:
             by = {}
-            for r in existing(s['key']).values():
+            for r in recorded(s['key'], a.until).values():
                 b = by.setdefault(r.get('provider') or '?', [0, 0.0, 0])
                 b[0] += 1
                 b[1] += r.get('billed_usd') or 0.0
@@ -129,6 +139,14 @@ def main() -> int:
                 print(f'  {s["key"]:22s} ' + ', '.join(
                     f'{p} {n} (${usd / toks * 1e6 if toks else 0:.2f}/M)'
                     for p, (n, usd, toks) in sorted(by.items(), key=lambda kv: -kv[1][0])))
+    if a.empties:
+        print('\nempty rows: template, count, and finish reasons')
+        for s in cfg['models']:
+            empty = [r for r in recorded(s['key'], a.until).values() if r['status'] == 'empty']
+            by_t = Counter(r['template_id'] for r in empty)
+            for t, n in by_t.most_common():
+                why = Counter(r.get('finish_reason') for r in empty if r['template_id'] == t)
+                print(f'  {s["key"]:22s} {t:46s} {n:3d}  {dict(why)}')
     print(f'\nrun $: billed so far plus $/item times the {len(its)}-item pool\'s remaining items. '
           f'assumed $: the dry run\'s basis,\n{tok["in"]} input and {tok["out"]} output tokens per '
           f'item at the pricing document\'s prices. trunc: rows that stopped at the output cap.\n'

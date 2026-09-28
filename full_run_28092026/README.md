@@ -76,7 +76,9 @@ for now, and decoding stays at each provider's default (D-122).
 
 `calibration_estimate.py` re-estimates the run from the traces recorded so far: each model's billed
 cost per item, a bootstrap interval, a level-reweighted figure and the hours left; `--providers` lists
-the endpoints that served the rows. It is free and calls nothing. The calibration's figures: D-123.
+the endpoints that served the rows, `--empties` the templates of the empty rows, and `--until` limits
+it to the rows written by a given time. It is free and calls nothing. The calibration's figures: D-123;
+the stop at the spend line: D-125.
 
 `testset/` is not this pool. It is the 2026-09-17 generation from the default seed, and the
 pilot's `freeze.py --verify` rebuilds its slice from it, so it is left as it is.
