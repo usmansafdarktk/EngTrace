@@ -26,7 +26,13 @@
     "    ceiling is 16,384; the other three endpoints do not declare a quantization.",
     "  - qwen3-235b-a22b: ONE endpoint remains (Alibaba), quantization undeclared, output capped at 8,192,",
     "    at $0.455/$1.82 per M against the document's $0.087/$0.35. No endpoint meets the fp8-or-better rule,",
-    "    so the paid modes skip it until the owner decides: keep it on that endpoint, or replace it."
+    "    so the paid modes skip it until the owner decides: keep it on that endpoint, or replace it.",
+    "",
+    "Added 2026-09-29 for calibration, at the owner's request (D-128); neither is in the pricing document:",
+    "  - qwen3-235b-a22b-2507: its cheapest fp8-or-better endpoint (GMICloud, fp8) charges the document's",
+    "    Qwen price, $0.087/$0.35 per M.",
+    "  - qwen3.8-27b: priced at its cheapest fp8-or-better endpoint (DeepInfra, bf16), $0.15/$1.875 per M,",
+    "    read on 2026-09-29."
   ],
   "route": {
     "base_url": "https://openrouter.ai/api/v1",
@@ -84,6 +90,24 @@
       "price_per_m": {
         "in": 0.087,
         "out": 0.35
+      }
+    },
+    {
+      "key": "qwen3-235b-a22b-2507",
+      "model": "qwen/qwen3-235b-a22b-2507",
+      "weights": "open",
+      "price_per_m": {
+        "in": 0.087,
+        "out": 0.35
+      }
+    },
+    {
+      "key": "qwen3.8-27b",
+      "model": "qwen/qwen3.8-27b",
+      "weights": "open",
+      "price_per_m": {
+        "in": 0.15,
+        "out": 1.875
       }
     },
     {

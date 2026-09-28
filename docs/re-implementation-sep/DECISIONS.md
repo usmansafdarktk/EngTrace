@@ -4755,6 +4755,27 @@ for the owner only if the three's recorded bill passes $221.32, the interval's u
 projection is not a trigger this time: the pool's sorted order makes an early projection run high
 (D-125).
 
+## D-128 — Two Qwen candidates are calibrated: Qwen3-235B-A22B-2507 and Qwen3.8-27B
+
+**Date:** 2026-09-29 · **Status:** DECIDED (the calibration); OPEN (the Qwen slot, D-121) · **Evidence:** `full_run_28092026/models.json`, `run_traces.py --dry-run` with the two `--model` keys
+
+`qwen3-235b-a22b` has no endpoint meeting the routing rule (D-121). OpenRouter's public list, read on
+2026-09-29 with the harness's own routing function, shows two candidates the owner chose to
+calibrate:
+
+- `qwen/qwen3-235b-a22b-2507`, the same model's July 2025 release, without thinking: 6 eligible
+  endpoints, the cheapest GMICloud at fp8 for $0.087/$0.35 per M, the price the pricing document gives
+  the original `qwen/qwen3-235b-a22b`.
+- `qwen/qwen3.8-27b`: 8 eligible endpoints, the cheapest DeepInfra at bf16 for $0.15/$1.875 per M. It
+  made traces in the evaluator pilot's robustness cohort, not as an evaluator.
+
+Both endpoints allow more than the 32,768-token ceiling. `models.json` gains the two entries; the
+existing entries, `run_traces.py`, the prompt and the pool are unchanged since `full-run-inference`,
+and the two run at the commit tagged `full-run-inference-qwen`. The dry run puts their calibration,
+20 items each, the same items as the others', at about $0.23 on the pricing document's basis. The
+owner approved the check and the calibration. Neither model is part of the roster until the owner
+decides the Qwen slot, and their full runs need their own approval.
+
 ## Open decisions
 
 | # | Decision | Needed before |
@@ -4771,7 +4792,7 @@ projection is not a trigger this time: the pool's sorted order makes an early pr
 | — | ~~Which families the next roster will evaluate~~ **Decided 2026-09-27 (D-110): the pricing document's eleven** | — |
 | D-115 | ~~Round 4: the three chemical experts review `heat_of_reaction_formation` and `adiabatic_flame_temperature` as widened~~ **Done (D-119): both approved by all three; 150 of 150 certified** | — |
 | D-118 | ~~Relabel `critical_depth_froude_classification`'s answer type~~ **Not needed (D-120): scoring is the same under either label** | — |
-| D-121 | `qwen3-235b-a22b` has no endpoint meeting the routing rule: keep it on Alibaba's endpoint (8,192-token cap, undeclared quantization) or replace it. **Skipped for now by the owner 2026-09-28 (D-122): the run goes ahead with the other ten** | Qwen's traces |
+| D-121 | `qwen3-235b-a22b` has no endpoint meeting the routing rule: keep it on Alibaba's endpoint (8,192-token cap, undeclared quantization) or replace it. **Skipped for now by the owner 2026-09-28 (D-122): the run goes ahead with the other ten.** Two candidates being calibrated: `qwen3-235b-a22b-2507` and `qwen3.8-27b` (D-128) | Qwen's traces |
 | D-121 | ~~Approve the harness check (about $0.01) and the calibration run (about $3.58, 220 calls)~~ **Approved by the owner 2026-09-28 (D-122)** | — |
 | D-122 | ~~Approve the full run: about $202 for the ten, 95% interval $163 to $251, on the calibration's bills (D-123)~~ **Approved for seven by the owner 2026-09-28 (D-124): $30.41, interval $26.67 to $34.66; the spend line moved to $45.06 after the stop (D-125)** | — |
 | D-124 | ~~Whether and when to run `kimi-k3`, `glm-5.3` and `claude-sonnet-5`: $171.74, interval $134.07 to $221.32~~ **Approved by the owner and started 2026-09-28 (D-127)** | — |
