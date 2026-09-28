@@ -20,7 +20,9 @@ pool and check it against the manifest and the seed commitment. Reviewers get `p
 ARR supplementary archive and can check it with `--check-files`, which needs no seed.
 
 **Back up `pool/` and `SEED.secret` privately.** Without the seed the pool cannot be
-regenerated, and `freeze.py` refuses to draw a new seed while a manifest exists.
+regenerated, and `freeze.py` refuses to draw a new seed while a manifest exists. Backed up
+2026-09-28 as a private dataset in the owner's Kaggle account, downloaded back and matched file
+for file, and as a local archive with its checksum. After any re-freeze, upload a new version.
 
 ## Commands
 

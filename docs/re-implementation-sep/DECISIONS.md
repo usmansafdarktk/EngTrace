@@ -4607,7 +4607,7 @@ calibration replaces the assumed length with measured ones, and its traces count
 | D-121 | `qwen3-235b-a22b` has no endpoint meeting the routing rule: keep it on Alibaba's endpoint (8,192-token cap, undeclared quantization) or replace it | the run |
 | D-121 | Approve the harness check (about $0.01) and the calibration run (about $3.58, 220 calls) | the estimate the run is approved on |
 | D-117 | Confirm the analysis plan as a whole; its two scoring rules are decided | the first inference call |
-| D-114 | A private backup of `full_run_28092026/pool/` and `SEED.secret`; the tag on the commit inference runs at | inference starts |
+| D-114 | ~~A private backup of `full_run_28092026/pool/` and `SEED.secret`~~ **Backed up 2026-09-28: a private Kaggle dataset in the owner's account, downloaded back and matched file for file, and a local archive with its checksum.** Still open: the tag on the commit inference runs at | inference starts |
 | — | The budget: the plan comes to about $606 against the ~$500 round with a batched router (D-110) | generation starts |
 | — | ~~Expert annotation of the frozen 300 (stage 3)~~ **Done: 15 experts, every trace labelled three times, with verification and adjudication rounds (RESULTS_X1)** | — |
 | D-003 | Do the raw `inference_results/` generations still exist? | promising any corrected results table |
