@@ -4743,6 +4743,18 @@ Kaggle copy waits for the owner, because the upload needs manual mode.
 
 **Open.** The traces' Kaggle copy; the three held models (D-124); Qwen (D-121).
 
+## D-127 — The three held models run: Kimi K3, GLM-5.3 and Claude Sonnet 5
+
+**Date:** 2026-09-28 · **Status:** DECIDED · **Evidence:** D-123, D-124
+
+The owner approved the full run for the three held back in D-124, on their calibration estimate of
+$171.74, 95% interval $134.07 to $221.32, their 20 calibration items each included. They started
+together at 23:27 local time, one detached process per model with 15 calls in flight, the harness
+unchanged since the tag `full-run-inference`, once the laptop was back on mains power. The run stops
+for the owner only if the three's recorded bill passes $221.32, the interval's upper end. A
+projection is not a trigger this time: the pool's sorted order makes an early projection run high
+(D-125).
+
 ## Open decisions
 
 | # | Decision | Needed before |
@@ -4762,7 +4774,7 @@ Kaggle copy waits for the owner, because the upload needs manual mode.
 | D-121 | `qwen3-235b-a22b` has no endpoint meeting the routing rule: keep it on Alibaba's endpoint (8,192-token cap, undeclared quantization) or replace it. **Skipped for now by the owner 2026-09-28 (D-122): the run goes ahead with the other ten** | Qwen's traces |
 | D-121 | ~~Approve the harness check (about $0.01) and the calibration run (about $3.58, 220 calls)~~ **Approved by the owner 2026-09-28 (D-122)** | — |
 | D-122 | ~~Approve the full run: about $202 for the ten, 95% interval $163 to $251, on the calibration's bills (D-123)~~ **Approved for seven by the owner 2026-09-28 (D-124): $30.41, interval $26.67 to $34.66; the spend line moved to $45.06 after the stop (D-125)** | — |
-| D-124 | Whether and when to run `kimi-k3`, `glm-5.3` and `claude-sonnet-5`: $171.74, interval $134.07 to $221.32 | their traces |
+| D-124 | ~~Whether and when to run `kimi-k3`, `glm-5.3` and `claude-sonnet-5`: $171.74, interval $134.07 to $221.32~~ **Approved by the owner and started 2026-09-28 (D-127)** | — |
 | D-126 | A private Kaggle copy of the traces; the local archive is made and verified | the evaluation |
 | D-117 | ~~Confirm the analysis plan as a whole; its two scoring rules are decided~~ **Confirmed by the owner 2026-09-28 (D-122)** | — |
 | D-114 | ~~A private backup of `full_run_28092026/pool/` and `SEED.secret`~~ **Backed up 2026-09-28: a private Kaggle dataset in the owner's account, downloaded back and matched file for file, and a local archive with its checksum.** ~~The tag on the commit inference runs at~~ **`full-run-inference` (D-122)** | — |
