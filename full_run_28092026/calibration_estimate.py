@@ -1,6 +1,6 @@
 """Re-estimate the full run from the traces recorded so far. FREE: reads traces/, calls nothing.
 
-    python -m full_run_28092026.calibration_estimate [--workers 15] [--providers]
+    python -m full_run_28092026.calibration_estimate [--workers 15] [--providers] [--model KEY ...]
 
 Per model, the billed cost per recorded item (answered or empty) times the items still to run, added
 to what is billed already. The 95% interval is a bootstrap over the recorded items, so it assumes they
@@ -49,8 +49,13 @@ def main() -> int:
     ap.add_argument('--workers', type=int, default=15, help='calls in flight per model')
     ap.add_argument('--providers', action='store_true',
                     help='also list, per model, the endpoints that served the rows and what each billed')
+    ap.add_argument('--model', action='append', help='only this model key (repeatable); the total covers these')
     a = ap.parse_args()
     cfg = config()
+    if a.model:
+        cfg['models'] = [s for s in cfg['models'] if s['key'] in a.model]
+        if len(cfg['models']) != len(set(a.model)):
+            raise SystemExit(f'unknown model key in {a.model}')
     its = items()
     tok = cfg['pricing_basis_tokens']
     rng = random.Random(SEED)

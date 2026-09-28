@@ -4657,6 +4657,24 @@ from the calibration's. The hours assume each call takes as long as the calibrat
 
 **Open.** The full run's approval, on this estimate.
 
+## D-124 — The full run starts on seven models; Kimi K3, GLM-5.3 and Claude Sonnet 5 wait
+
+**Date:** 2026-09-28 · **Status:** DECIDED (the seven); OPEN (the three) · **Evidence:** D-123; `calibration_estimate.py --model KEY ...`
+
+The owner approved the full run for seven of the ten: `gpt-oss-20b`, `gemma-4-26b-a4b`,
+`deepseek-v4.1-flash`, `glm-5.3-flash`, `muse-glimmer-30b`, `gpt-5.4-mini` and
+`gemini-3.1-flash-lite`. On the calibration's bills the seven come to $30.41, with a 95% bootstrap
+interval of $26.67 to $34.66; the three held back, `kimi-k3`, `glm-5.3` and `claude-sonnet-5`, come
+to $171.74, interval $134.07 to $221.32 (the script with each set's `--model` keys). The three keep
+their 20 calibration traces, which count toward the run whenever it resumes for them.
+
+The seven started 2026-09-28 at 17:27 local time, one detached process per model with 15 calls in
+flight, the harness unchanged since the tag `full-run-inference`. A spend line sits at the seven's
+upper bound, $34.66: if the bill passes it, or the projection does once a quarter of the calls are
+in, the run stops for the owner.
+
+**Open.** Whether and when the three run.
+
 ## Open decisions
 
 | # | Decision | Needed before |
@@ -4675,7 +4693,8 @@ from the calibration's. The hours assume each call takes as long as the calibrat
 | D-118 | ~~Relabel `critical_depth_froude_classification`'s answer type~~ **Not needed (D-120): scoring is the same under either label** | — |
 | D-121 | `qwen3-235b-a22b` has no endpoint meeting the routing rule: keep it on Alibaba's endpoint (8,192-token cap, undeclared quantization) or replace it. **Skipped for now by the owner 2026-09-28 (D-122): the run goes ahead with the other ten** | Qwen's traces |
 | D-121 | ~~Approve the harness check (about $0.01) and the calibration run (about $3.58, 220 calls)~~ **Approved by the owner 2026-09-28 (D-122)** | — |
-| D-122 | Approve the full run: about $202 for the ten, 95% interval $163 to $251, on the calibration's bills (D-123) | the run |
+| D-122 | ~~Approve the full run: about $202 for the ten, 95% interval $163 to $251, on the calibration's bills (D-123)~~ **Approved for seven by the owner 2026-09-28 (D-124): $30.41, interval $26.67 to $34.66** | — |
+| D-124 | Whether and when to run `kimi-k3`, `glm-5.3` and `claude-sonnet-5`: $171.74, interval $134.07 to $221.32 | their traces |
 | D-117 | ~~Confirm the analysis plan as a whole; its two scoring rules are decided~~ **Confirmed by the owner 2026-09-28 (D-122)** | — |
 | D-114 | ~~A private backup of `full_run_28092026/pool/` and `SEED.secret`~~ **Backed up 2026-09-28: a private Kaggle dataset in the owner's account, downloaded back and matched file for file, and a local archive with its checksum.** ~~The tag on the commit inference runs at~~ **`full-run-inference` (D-122)** | — |
 | — | The budget: the plan comes to about $606 against the ~$500 round with a batched router (D-110). Calibration puts generation at about $202 for the ten against the plan's $403 (D-123) | generation starts |
