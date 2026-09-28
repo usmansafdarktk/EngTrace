@@ -4616,6 +4616,47 @@ A correction to D-121: `--check` does not skip a model with no eligible endpoint
 model it is given. A Qwen call would carry the fp8-or-better filter that no endpoint meets, so the
 check runs on the ten by name.
 
+## D-123 — Calibration: 200 of 200 answered, $1.80 billed; the full run re-estimated at about $202
+
+**Date:** 2026-09-28 · **Status:** DECIDED (the record); OPEN (the full run's approval) · **Evidence:** `full_run_28092026/calibration_estimate.py` (`--providers` for the endpoints), `run_traces.py --status`, the traces (local)
+
+The check, one tiny call per model at the tagged commit, answered for all ten and billed about
+$0.006. The calibration then ran 20 items per model, 200 calls, one model at a time with 16 workers:
+200 answered, none empty, none stopped at the output cap, no service failure and no call needing a
+retry, so the rows' $1.797 is the calibration's whole bill. Its traces count toward the run.
+
+`calibration_estimate.py` projects each model from those bills: what is billed plus the mean bill per
+item times the 2,230 items left. The interval is a bootstrap over the 20 items, so it assumes they
+represent the pool. They are one item from each of 20 templates, 15% Advanced against the pool's 23%;
+reweighting the same bills by level gives $198.15 instead of $202.15.
+
+| model | output tokens per item | billed $ | full run $ | 95% interval | by level $ | assumed $ | hours at 15 workers |
+|---|---|---|---|---|---|---|---|
+| gpt-oss-20b | 2,284 | 0.004 | 0.48 | 0.33-0.65 | 0.49 | 1.07 | 1.3 |
+| gemma-4-26b-a4b | 958 | 0.007 | 0.74 | 0.57-0.96 | 0.73 | 3.59 | 0.4 |
+| deepseek-v4.1-flash | 3,581 | 0.067 | 7.57 | 4.66-11.37 | 7.37 | 5.03 | 1.0 |
+| glm-5.3-flash | 3,509 | 0.025 | 2.78 | 1.82-3.91 | 2.74 | 2.99 | 2.6 |
+| glm-5.3 | 5,264 | 0.419 | 47.09 | 29.70-66.42 | 45.18 | 52.65 | 1.4 |
+| muse-glimmer-30b | 3,379 | 0.083 | 9.28 | 7.80-10.83 | 9.32 | 13.13 | 0.8 |
+| kimi-k3 | 3,365 | 0.715 | 80.49 | 49.40-126.95 | 77.70 | 130.18 | 3.5 |
+| gpt-5.4-mini | 673 | 0.064 | 7.24 | 6.13-8.43 | 7.36 | 53.43 | 0.2 |
+| gemini-3.1-flash-lite | 646 | 0.021 | 2.33 | 1.99-2.69 | 2.34 | 17.81 | 0.1 |
+| claude-sonnet-5 | 1,889 | 0.393 | 44.16 | 36.09-52.49 | 44.92 | 118.93 | 0.7 |
+| **ten models** | | **1.797** | **202.15** | **163.47-251.32** | **198.15** | **398.81** | |
+
+The full run for the ten comes to about $202, about half the $398.81 the same ten cost on the
+pricing document's basis, which is the basis of the plan's $403 generation line for all eleven
+(D-110, D-113). Nine of the ten wrote less than
+the 5,232 output tokens assumed, the closed models and Gemma far less; GLM-5.3, at 5,264, was close
+to it. DeepSeek V4.1 Flash is the one model over its assumed cost: price-sorted routing with
+fallbacks served its 20 rows from four endpoints, 3 of them from Morph, the cheapest. GLM-5.3's came
+19 from Sail Research and 1 from Morph, not from Novita, which the dry run listed as cheapest. The
+requests carry the fp8-or-better filter, so the endpoint moves the price, not the rule. With ten
+processes in flight at once in the full run, the spread over endpoints, and so the price, may differ
+from the calibration's. The hours assume each call takes as long as the calibration's did.
+
+**Open.** The full run's approval, on this estimate.
+
 ## Open decisions
 
 | # | Decision | Needed before |
@@ -4634,10 +4675,10 @@ check runs on the ten by name.
 | D-118 | ~~Relabel `critical_depth_froude_classification`'s answer type~~ **Not needed (D-120): scoring is the same under either label** | — |
 | D-121 | `qwen3-235b-a22b` has no endpoint meeting the routing rule: keep it on Alibaba's endpoint (8,192-token cap, undeclared quantization) or replace it. **Skipped for now by the owner 2026-09-28 (D-122): the run goes ahead with the other ten** | Qwen's traces |
 | D-121 | ~~Approve the harness check (about $0.01) and the calibration run (about $3.58, 220 calls)~~ **Approved by the owner 2026-09-28 (D-122)** | — |
-| D-122 | Approve the full run, on the estimate the calibration measures | the run |
+| D-122 | Approve the full run: about $202 for the ten, 95% interval $163 to $251, on the calibration's bills (D-123) | the run |
 | D-117 | ~~Confirm the analysis plan as a whole; its two scoring rules are decided~~ **Confirmed by the owner 2026-09-28 (D-122)** | — |
 | D-114 | ~~A private backup of `full_run_28092026/pool/` and `SEED.secret`~~ **Backed up 2026-09-28: a private Kaggle dataset in the owner's account, downloaded back and matched file for file, and a local archive with its checksum.** ~~The tag on the commit inference runs at~~ **`full-run-inference` (D-122)** | — |
-| — | The budget: the plan comes to about $606 against the ~$500 round with a batched router (D-110) | generation starts |
+| — | The budget: the plan comes to about $606 against the ~$500 round with a batched router (D-110). Calibration puts generation at about $202 for the ten against the plan's $403 (D-123) | generation starts |
 | — | ~~Expert annotation of the frozen 300 (stage 3)~~ **Done: 15 experts, every trace labelled three times, with verification and adjudication rounds (RESULTS_X1)** | — |
 | D-003 | Do the raw `inference_results/` generations still exist? | promising any corrected results table |
 | — | Phase 5 scoping: fold into Phase 1 or run as a parallel PR | Phase 1 start |
