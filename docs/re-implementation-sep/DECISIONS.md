@@ -4776,6 +4776,27 @@ and the two run at the commit tagged `full-run-inference-qwen`. The dry run puts
 owner approved the check and the calibration. Neither model is part of the roster until the owner
 decides the Qwen slot, and their full runs need their own approval.
 
+## D-129 — The two Qwen candidates calibrated; their full runs started under the owner's $320 ceiling
+
+**Date:** 2026-09-29 · **Status:** DECIDED (the calibration; the start); OPEN (the Qwen slot, D-121) · **Evidence:** `calibration_estimate.py` with the twelve `--model` keys, at 02:35; `run_traces.py --status`
+
+After a check that answered for both, the calibration ran 20 items each at the tag
+`full-run-inference-qwen`: 40 of 40 answered, none empty, none at the output cap, no retry, and
+$0.443 billed.
+
+| model | output tokens per item | billed $ | full run $ | 95% interval | hours at 15 workers |
+|---|---|---|---|---|---|
+| qwen3-235b-a22b-2507 | 1,304 | 0.010 | 1.07 | 0.75-1.52 | 2.4 |
+| qwen3.8-27b | 8,480 | 0.433 | 48.72 | 32.18-68.20 | 8.3 |
+
+The owner approved their full runs on one condition: that the twelve models' total inference cost
+stay at or under $320. At 02:35, with Kimi K3 at 926 of its 2,250 items, the script put the twelve at
+$286.60, 95% interval $269.66 to $306.30: the finished models' bills, Kimi's projection from its rows,
+and the two calibrations. That interval treats Kimi's rows so far as representative, which the pool's
+sorted order does not guarantee (D-125), and the rows leave out retried and stopped attempts (D-126).
+Both runs started at 02:36, one detached process each with 15 calls in flight. The run stops for the
+owner if the twelve's recorded bill passes $320.
+
 ## Open decisions
 
 | # | Decision | Needed before |
@@ -4792,7 +4813,7 @@ decides the Qwen slot, and their full runs need their own approval.
 | — | ~~Which families the next roster will evaluate~~ **Decided 2026-09-27 (D-110): the pricing document's eleven** | — |
 | D-115 | ~~Round 4: the three chemical experts review `heat_of_reaction_formation` and `adiabatic_flame_temperature` as widened~~ **Done (D-119): both approved by all three; 150 of 150 certified** | — |
 | D-118 | ~~Relabel `critical_depth_froude_classification`'s answer type~~ **Not needed (D-120): scoring is the same under either label** | — |
-| D-121 | `qwen3-235b-a22b` has no endpoint meeting the routing rule: keep it on Alibaba's endpoint (8,192-token cap, undeclared quantization) or replace it. **Skipped for now by the owner 2026-09-28 (D-122): the run goes ahead with the other ten.** Two candidates being calibrated: `qwen3-235b-a22b-2507` and `qwen3.8-27b` (D-128) | Qwen's traces |
+| D-121 | `qwen3-235b-a22b` has no endpoint meeting the routing rule: keep it on Alibaba's endpoint (8,192-token cap, undeclared quantization) or replace it. **Skipped for now by the owner 2026-09-28 (D-122): the run goes ahead with the other ten.** Two candidates calibrated and running at full scale: `qwen3-235b-a22b-2507` and `qwen3.8-27b` (D-128, D-129). Still open: which of them fills the slot | the analysis |
 | D-121 | ~~Approve the harness check (about $0.01) and the calibration run (about $3.58, 220 calls)~~ **Approved by the owner 2026-09-28 (D-122)** | — |
 | D-122 | ~~Approve the full run: about $202 for the ten, 95% interval $163 to $251, on the calibration's bills (D-123)~~ **Approved for seven by the owner 2026-09-28 (D-124): $30.41, interval $26.67 to $34.66; the spend line moved to $45.06 after the stop (D-125)** | — |
 | D-124 | ~~Whether and when to run `kimi-k3`, `glm-5.3` and `claude-sonnet-5`: $171.74, interval $134.07 to $221.32~~ **Approved by the owner and started 2026-09-28 (D-127)** | — |
