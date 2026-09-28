@@ -65,6 +65,8 @@ the text of anything that fails goes to `pool/_gold_validation_details.txt`, loc
 
 ## The harness (D-121)
 
+Step by step, from the dry run to saving the results locally and to Kaggle: `INFERENCE_GUIDE.md`.
+
 `run_traces.py` runs the roster over the pool: `--dry-run` and `--status` are free; `--check`,
 `--calibrate N` and the run bill, and refuse to start without `--yes`. The roster, routing and
 ceilings are in `models.json`, with the reasons. Traces go to `traces/`, gitignored.
