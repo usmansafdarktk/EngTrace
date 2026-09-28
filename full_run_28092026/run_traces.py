@@ -348,8 +348,7 @@ def main() -> int:
     tok = cfg['pricing_basis_tokens']
     for s in specs:
         if routed_endpoint(s, cfg, tok)[0] is None:
-            print(f'
-{s["key"]}: SKIPPED - no endpoint meets the routing rule (see --dry-run)')
+            print(f'\n{s["key"]}: SKIPPED - no endpoint meets the routing rule (see --dry-run)')
             continue
         pool = calibration_sample(its, a.calibrate) if a.calibrate else its
         done = existing(s['key'])

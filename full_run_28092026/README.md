@@ -71,5 +71,8 @@ Step by step, from the dry run to saving the results locally and to Kaggle: `INF
 `--calibrate N` and the run bill, and refuse to start without `--yes`. The roster, routing and
 ceilings are in `models.json`, with the reasons. Traces go to `traces/`, gitignored.
 
+Inference runs at the commit tagged `full-run-inference`, on ten models: `qwen3-235b-a22b` is skipped
+for now, and decoding stays at each provider's default (D-122).
+
 `testset/` is not this pool. It is the 2026-09-17 generation from the default seed, and the
 pilot's `freeze.py --verify` rebuilds its slice from it, so it is left as it is.

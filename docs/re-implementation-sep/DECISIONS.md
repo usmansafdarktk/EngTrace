@@ -4588,6 +4588,34 @@ pricing document:
 On the same basis `--check` bills about $0.01 and `--calibrate 20`, 220 calls, about $3.58; the
 calibration replaces the assumed length with measured ones, and its traces count toward the run.
 
+## D-122 — Inference starts on ten models, at provider-default decoding, with the analysis plan confirmed
+
+**Date:** 2026-09-28 · **Status:** DECIDED (Qwen skipped for now; decoding; the analysis plan; the check and the calibration approved; the tag); OPEN (the full run's approval) · **Evidence:** `full_run_28092026/run_traces.py`, its dry run
+
+The harness as committed in D-121 could not be imported: the `\n` escape opening the paid modes'
+skip message (`run_traces.py`, line 351) had been written as a literal line break, a `SyntaxError`
+that stopped every mode, the dry run included. Rejoining the line is the only change. The dry run
+then passes: 2,250 items in 150 templates match the manifest, the prompt is the pilot's (sha256
+`c2bcb87984c4e50b`), and the run is $402.98 on the pricing document's basis ($4.17 of it Qwen's) and
+$334.65 for the ten models at today's cheapest eligible endpoints (D-121's dry run gave $319.09).
+
+The owner's decisions, 2026-09-28:
+
+- **`qwen3-235b-a22b` is skipped for now.** The run goes ahead with the other ten. Keeping it on
+  Alibaba's endpoint or replacing it stays open; either adds its traces without touching the other
+  models'.
+- **Decoding stays at each provider's default**, temperature and reasoning effort both, as for the
+  pilot traces the evaluator stack was validated on. The inference guide had listed temperature as
+  open.
+- **The analysis plan (D-117) is confirmed as a whole.**
+- **The check and the calibration run are approved** on D-121's estimate. With Qwen skipped,
+  calibration is 200 calls.
+- **Inference runs at the commit tagged `full-run-inference`** (D-114).
+
+A correction to D-121: `--check` does not skip a model with no eligible endpoint; it calls every
+model it is given. A Qwen call would carry the fp8-or-better filter that no endpoint meets, so the
+check runs on the ten by name.
+
 ## Open decisions
 
 | # | Decision | Needed before |
@@ -4604,10 +4632,11 @@ calibration replaces the assumed length with measured ones, and its traces count
 | — | ~~Which families the next roster will evaluate~~ **Decided 2026-09-27 (D-110): the pricing document's eleven** | — |
 | D-115 | ~~Round 4: the three chemical experts review `heat_of_reaction_formation` and `adiabatic_flame_temperature` as widened~~ **Done (D-119): both approved by all three; 150 of 150 certified** | — |
 | D-118 | ~~Relabel `critical_depth_froude_classification`'s answer type~~ **Not needed (D-120): scoring is the same under either label** | — |
-| D-121 | `qwen3-235b-a22b` has no endpoint meeting the routing rule: keep it on Alibaba's endpoint (8,192-token cap, undeclared quantization) or replace it | the run |
-| D-121 | Approve the harness check (about $0.01) and the calibration run (about $3.58, 220 calls) | the estimate the run is approved on |
-| D-117 | Confirm the analysis plan as a whole; its two scoring rules are decided | the first inference call |
-| D-114 | ~~A private backup of `full_run_28092026/pool/` and `SEED.secret`~~ **Backed up 2026-09-28: a private Kaggle dataset in the owner's account, downloaded back and matched file for file, and a local archive with its checksum.** Still open: the tag on the commit inference runs at | inference starts |
+| D-121 | `qwen3-235b-a22b` has no endpoint meeting the routing rule: keep it on Alibaba's endpoint (8,192-token cap, undeclared quantization) or replace it. **Skipped for now by the owner 2026-09-28 (D-122): the run goes ahead with the other ten** | Qwen's traces |
+| D-121 | ~~Approve the harness check (about $0.01) and the calibration run (about $3.58, 220 calls)~~ **Approved by the owner 2026-09-28 (D-122)** | — |
+| D-122 | Approve the full run, on the estimate the calibration measures | the run |
+| D-117 | ~~Confirm the analysis plan as a whole; its two scoring rules are decided~~ **Confirmed by the owner 2026-09-28 (D-122)** | — |
+| D-114 | ~~A private backup of `full_run_28092026/pool/` and `SEED.secret`~~ **Backed up 2026-09-28: a private Kaggle dataset in the owner's account, downloaded back and matched file for file, and a local archive with its checksum.** ~~The tag on the commit inference runs at~~ **`full-run-inference` (D-122)** | — |
 | — | The budget: the plan comes to about $606 against the ~$500 round with a batched router (D-110) | generation starts |
 | — | ~~Expert annotation of the frozen 300 (stage 3)~~ **Done: 15 experts, every trace labelled three times, with verification and adjudication rounds (RESULTS_X1)** | — |
 | D-003 | Do the raw `inference_results/` generations still exist? | promising any corrected results table |
