@@ -340,10 +340,19 @@ The pool over-represents the rare labels by design (D-116), so these rates are p
 | `system_property_linearity` | linear | 7 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 0.857 | 1.000 | 1.000 | 1.000 | 1.000 |
 | `system_property_linearity` | nonlinear | 8 | 0.375 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 1.000 | 0.875 | 1.000 | 1.000 | 1.000 |
 
+## Decoding repeats
+
+| model | items | repeat1 | repeat2 | repeat3 | main run, same items | SD | range | same verdict in every repeat |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `gpt-oss-20b` | 300 | 0.823 | 0.828 | 0.827 | 0.820 | 0.003 | 0.005 | 0.917 |
+| `gemma-4-26b-a4b` | 300 | 0.840 | 0.860 | 0.872 | 0.860 | 0.016 | 0.032 | 0.850 |
+| `qwen3-235b-a22b-2507` | 300 | 0.877 | 0.887 | 0.890 | 0.882 | 0.007 | 0.013 | 0.887 |
+| `gemini-3.1-flash-lite` | 300 | 0.880 | 0.867 | 0.888 | 0.878 | 0.011 | 0.022 | 0.937 |
+
 ## Set aside (D-132), outside every comparison
 
 - `qwen3.8-27b`: answer score 0.924 (95% CI 0.888 to 0.954), fully solved 0.918, unusable 89
 
 ## Provenance
 
-`analyze.py` at commit `8604565`; the score store `main` scored at commit `bf4a43b` on 2026-09-29T19:49:30+00:00. The evaluator hashes and the per-model trace hashes are in `results.json`.
+`analyze.py` at commit `fb0ea02`; the score store `main` scored at commit `bf4a43b` on 2026-09-29T19:49:30+00:00. The evaluator hashes and the per-model trace hashes are in `results.json`.

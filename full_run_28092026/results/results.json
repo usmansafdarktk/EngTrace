@@ -4426,7 +4426,56 @@
    }
   }
  },
- "repeats": {},
+ "repeats": {
+  "gpt-oss-20b": {
+   "items": 300,
+   "scores": {
+    "repeat1": 0.8233333333333334,
+    "repeat2": 0.8283333333333334,
+    "repeat3": 0.8266666666666667
+   },
+   "main_on_same_items": 0.82,
+   "sd": 0.0025458753860865763,
+   "range": 0.0050000000000000044,
+   "same_verdict_every_repeat": 0.9166666666666666
+  },
+  "gemma-4-26b-a4b": {
+   "items": 300,
+   "scores": {
+    "repeat1": 0.84,
+    "repeat2": 0.86,
+    "repeat3": 0.8716666666666667
+   },
+   "main_on_same_items": 0.86,
+   "sd": 0.01601503922822178,
+   "range": 0.03166666666666673,
+   "same_verdict_every_repeat": 0.85
+  },
+  "qwen3-235b-a22b-2507": {
+   "items": 300,
+   "scores": {
+    "repeat1": 0.8766666666666667,
+    "repeat2": 0.8866666666666667,
+    "repeat3": 0.89
+   },
+   "main_on_same_items": 0.8816666666666667,
+   "sd": 0.006938886664887101,
+   "range": 0.013333333333333308,
+   "same_verdict_every_repeat": 0.8866666666666667
+  },
+  "gemini-3.1-flash-lite": {
+   "items": 300,
+   "scores": {
+    "repeat1": 0.88,
+    "repeat2": 0.8666666666666667,
+    "repeat3": 0.8883333333333333
+   },
+   "main_on_same_items": 0.8783333333333333,
+   "sd": 0.010929064207169974,
+   "range": 0.021666666666666612,
+   "same_verdict_every_repeat": 0.9366666666666666
+  }
+ },
  "set_aside": {
   "qwen3.8-27b": {
    "score": 0.9235555555555556,
@@ -4458,7 +4507,7 @@
  ],
  "provenance": {
   "analyze": {
-   "git": "8604565a5d66b506946e97fcf07ec79f6d60ab7d",
+   "git": "fb0ea02a3e0a1f501079343f09edb463ec41cf24",
    "tag": null,
    "dirty": false,
    "sha256_lf": "cfd24dfe815c24c2dfee4449483e85833ca90c08c510486d942a48be0ecdcd2f",
