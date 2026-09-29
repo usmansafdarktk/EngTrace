@@ -109,6 +109,27 @@ python -m full_run_28092026.validate_scorer                    # free; needs the
 python -m full_run_28092026.analyze                            # free
 ```
 
+## The judged stages: E5 and the step router (D-142)
+
+`judge.py` is E5: MiMo-V2.5-Pro on the milestones E3 did not find. `router.py` is the step router:
+the digit rule's flags, and MiMo on every other step, batched per trace, on the framework's
+Tribunal prompt. Both read the score store and write `scores/<variant>/e5/` and
+`scores/<variant>/router/`. Their replies are cached by prompt, so none is bought twice, and the
+shared call code, with its deadline and spend cap, is in `judge_calls.py`. `--validate` replays
+the pilot's 300 labelled traces from its stored replies and reproduces its published figures
+(`E5_VALIDATION.md`, `ROUTER_VALIDATION.md`); `--dry-run` prices the full run. Both are free; the
+runs bill and need `--yes`.
+
+```bash
+python -m full_run_28092026.judge --validate        # free
+python -m full_run_28092026.judge --dry-run         # free
+python -m full_run_28092026.judge --yes --max-usd 50            # bills, once approved
+python -m full_run_28092026.router --validate       # free
+python -m full_run_28092026.router --dry-run        # free
+python -m full_run_28092026.router --yes --max-usd 200 --workers 8   # bills, once approved
+python -m full_run_28092026.analyze                 # free: Q3's E5 and router columns
+```
+
 ## Variant runs, paraphrases and the expert check (D-141)
 
 `subsamples.py` fixes the paraphrase subsample (the plan's 450) and the repeat subsample (300).

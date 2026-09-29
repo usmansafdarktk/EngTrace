@@ -244,7 +244,63 @@ def q2(runs, templates, levels, keys):
     return out
 
 
-def q3(runs, keys):
+def load_stage(stage: str, key: str, store: str = 'main') -> dict[str, dict] | None:
+    """judge.py's E5 rows or router.py's rows for one model, when that stage has run."""
+    p = SCORES / store / stage / f'{key}.jsonl'
+    if not p.exists():
+        return None
+    return {r['item_id']: r for r in map(json.loads, p.read_text(encoding='utf-8').splitlines())}
+
+
+def stage_q3(rows: list[dict], e5: dict | None, router: dict | None, seed: int) -> dict:
+    """Q3's judged columns for one model: E5 on the wrong-answer traces, its judged and unjudged
+    fractions, the router's flags, and which component points at a wrong answer (also reported)."""
+    wrong = lambda r: r['score'] == 0.0
+    out = {}
+    if e5:
+        answered = [e5[r['item_id']] for r in rows if r['status'] == 'answered' and e5[r['item_id']]['milestones_required']]
+        sent = [x for x in answered if x['sent']]
+        judged = sum(x['milestones_required'] - x['by_e3'] for x in sent)
+        cov, cov_ci, n = cluster_mean(per_template(rows, lambda r: e5[r['item_id']]['e5_strict'],
+                                                   lambda r: wrong(r) and e5[r['item_id']]['e5_strict'] is not None),
+                                      seed)
+        rcov, rcov_ci, _n = cluster_mean(per_template(rows, lambda r: e5[r['item_id']]['e5_strict'],
+                                                      lambda r: wrong(r) and not r['unusable']
+                                                      and e5[r['item_id']]['e5_strict'] is not None), seed + 1)
+        out.update({'e5_coverage_on_wrong': cov, 'e5_ci': cov_ci, 'e5_coverage_on_readable_wrong': rcov,
+                    'e5_readable_ci': rcov_ci,
+                    'e5_judged_fraction': judged / max(1, sum(x['milestones_required'] for x in answered)),
+                    'e5_unjudged_rate': sum(x['unjudged'] for x in sent) / max(1, judged),
+                    'e5_reached_share': sum(x['reached'] for x in sent) / max(1, judged),
+                    'e5_calls': len(sent), 'e5_without_reply': sum(not x['reply_ok'] for x in sent)})
+    if router:
+        flag_any = lambda r: 1.0 if router[r['item_id']]['router_flagged'] else 0.0
+        judge_any = lambda r: 1.0 if router[r['item_id']]['judge_flagged'] else 0.0
+        answered = [r for r in rows if r['status'] == 'answered']
+        fs, fs_ci, _ = cluster_mean(per_template(rows, flag_any, lambda r: fully(r) == 1), seed + 2)
+        js, js_ci, _ = cluster_mean(per_template(rows, judge_any, lambda r: fully(r) == 1), seed + 3)
+        ws, ws_ci, _ = cluster_mean(per_template(rows, flag_any, lambda r: wrong(r) and r['status'] == 'answered'),
+                                    seed + 4)
+        sent = sum(len(router[r['item_id']]['sent']) for r in answered)
+        out.update({'router_rate_on_fully_solved': fs, 'router_ci': fs_ci,
+                    'router_judge_rate_on_fully_solved': js, 'router_judge_ci': js_ci,
+                    'router_rate_on_wrong': ws, 'router_wrong_ci': ws_ci,
+                    'router_steps_flagged_per_trace': float(np.mean([len(router[r['item_id']]['router_flagged'])
+                                                                     for r in answered])),
+                    'router_unjudged_rate': sum(router[r['item_id']]['unjudged'] for r in answered) / max(1, sent),
+                    'router_calls': sum(bool(router[r['item_id']]['sent']) for r in answered),
+                    'router_without_reply': sum(router[r['item_id']]['reply_ok'] is False for r in answered)})
+    if e5 or router:
+        w = [r for r in rows if wrong(r) and r['status'] == 'answered']
+        out['attribution_on_wrong'] = {
+            'traces': len(w), 'digit_rule': float(np.mean([flagged(r) for r in w])) if w else None,
+            'e5_missing': (float(np.mean([e5[r['item_id']]['missing'] > 0 for r in w])) if w else None) if e5 else None,
+            'router_judge': (float(np.mean([bool(router[r['item_id']]['judge_flagged']) for r in w])) if w else None)
+            if router else None}
+    return out
+
+
+def q3(runs, keys, store='main'):
     wrong = lambda r: r['score'] == 0.0
     out = []
     for i, k in enumerate(keys):
@@ -267,7 +323,7 @@ def q3(runs, keys):
                     'e3_readable_ci': rcov_ci,
                     'fully_solved': n_right, 'digit_flag_rate_on_fully_solved': fc, 'digit_ci': fc_ci,
                     'digit_flag_rate_on_wrong': fw, 'digit_wrong_ci': fw_ci,
-                    'e5_coverage_on_wrong': None, 'e5_judged_fraction': None, 'e5_unjudged_rate': None})
+                    **stage_q3(rows, load_stage('e5', k, store), load_stage('router', k, store), 1100 + 10 * i)})
     return out
 
 
@@ -492,8 +548,22 @@ def render(res) -> str:
           '| model | wrong-answer traces | of them unusable | E3 coverage | 95% CI | readable only | 95% CI | '
           'E5 coverage |', '|---|---:|---:|---:|---:|---:|---:|---|']
     for r in res['q3']:
+        e5_cell = (f"{r['e5_coverage_on_wrong']:.3f} ({ci(r['e5_ci'])}); readable {r['e5_coverage_on_readable_wrong']:.3f}"
+                   if 'e5_coverage_on_wrong' in r else 'pending')
         L.append(f"| `{r['model']}` | {r['wrong']} | {r['wrong_unusable']} | {r['e3_coverage_on_wrong']:.3f} | "
-                 f"{ci(r['e3_ci'])} | {r['e3_coverage_on_readable_wrong']:.3f} | {ci(r['e3_readable_ci'])} | pending |")
+                 f"{ci(r['e3_ci'])} | {r['e3_coverage_on_readable_wrong']:.3f} | {ci(r['e3_readable_ci'])} | {e5_cell} |")
+    if any('e5_coverage_on_wrong' in r for r in res['q3']):
+        L += ['', "**E5's judge**, MiMo-V2.5-Pro on the milestones E3 did not find (`judge.py`). E5 coverage is "
+              "E5-strict: E3's milestones plus those the judge rules REACHED. On the pilot the judge never called a "
+              'fabricated value REACHED and found 76% of true ones, so the score is conservative (RESULTS_E5). '
+              'Judged fraction: milestones sent to the judge over those required, on answered traces; unjudged: '
+              'milestones the reply did not name, over those sent.', '',
+              '| model | calls | without a reply | judged fraction | of the judged, REACHED | unjudged |',
+              '|---|---:|---:|---:|---:|---:|']
+        for r in res['q3']:
+            if 'e5_coverage_on_wrong' in r:
+                L.append(f"| `{r['model']}` | {r['e5_calls']} | {r['e5_without_reply']} | {r['e5_judged_fraction']:.3f} | "
+                         f"{r['e5_reached_share']:.3f} | {r['e5_unjudged_rate']:.3f} |")
     L += ['', '**The digit rule.**', '',
           '| model | flag rate, wrong answers | 95% CI | fully solved traces | flag rate, fully solved | 95% CI | '
           'claims checked per trace | traces with a claim |', '|---|---:|---:|---:|---:|---:|---:|---:|']
@@ -501,6 +571,32 @@ def render(res) -> str:
         L.append(f"| `{r['model']}` | {r['digit_flag_rate_on_wrong']:.3f} | {ci(r['digit_wrong_ci'])} | "
                  f"{r['fully_solved']} | {r['digit_flag_rate_on_fully_solved']:.3f} | {ci(r['digit_ci'])} | "
                  f"{r['claims_per_trace']:.2f} | {r['traces_with_a_claim']:.3f} |")
+    if any('router_rate_on_fully_solved' in r for r in res['q3']):
+        L += ['', "**The step router** (`router.py`): the digit rule's flags, and MiMo-V2.5-Pro on every other step in "
+              'one batched call per trace. On the pilot\'s labelled traces it had precision 0.707 and recall 0.603 over '
+              'all steps, and 0.703 and 0.360 inside correct-answer traces (ROUTER_VALIDATION.md), so its rates are '
+              'flags, not counts of errors. A trace counts as flagged when any step is.', '',
+              '| model | calls | without a reply | flagged, fully solved | 95% CI | by the judge | 95% CI | '
+              'flagged, wrong answers | 95% CI | steps flagged per trace | unjudged steps |',
+              '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|']
+        for r in res['q3']:
+            if 'router_rate_on_fully_solved' in r:
+                L.append(f"| `{r['model']}` | {r['router_calls']} | {r['router_without_reply']} | "
+                         f"{r['router_rate_on_fully_solved']:.3f} | {ci(r['router_ci'])} | "
+                         f"{r['router_judge_rate_on_fully_solved']:.3f} | {ci(r['router_judge_ci'])} | "
+                         f"{r['router_rate_on_wrong']:.3f} | {ci(r['router_wrong_ci'])} | "
+                         f"{r['router_steps_flagged_per_trace']:.2f} | {r['router_unjudged_rate']:.3f} |")
+    if any('attribution_on_wrong' in r for r in res['q3']):
+        L += ['', '**Also reported, not tested: what points at a wrong answer.** On the answered traces that score 0, '
+              'the share with a digit-rule flag, with a milestone E5 rules MISSING, and with a step the router\'s '
+              'judge flags. A trace can be in several columns, or in none.', '',
+              '| model | answered wrong-answer traces | digit rule | E5 MISSING | router judge |', '|---|---:|---:|---:|---:|']
+        fmt = lambda v: '' if v is None else f'{v:.3f}'
+        for r in res['q3']:
+            a = r.get('attribution_on_wrong')
+            if a:
+                L.append(f"| `{r['model']}` | {a['traces']} | {fmt(a['digit_rule'])} | {fmt(a['e5_missing'])} | "
+                         f"{fmt(a['router_judge'])} |")
     s0 = res['q4'][0]
     L += ['', '## Q4. Consistency within a template', '',
           'The share of templates fully solved on all 15 instances, on some, and on none: the '
@@ -598,7 +694,7 @@ def main() -> int:
         raise SystemExit(f'no {a.store} scores for {missing}: run score.py first')
     templates, levels, single = check_store(runs)
     para = {k: load('paraphrase', k) for k in ROSTER} if a.store == 'main' else {}
-    res = {'q1': q1(runs, templates, ROSTER), 'q2': q2(runs, templates, levels, ROSTER), 'q3': q3(runs, ROSTER),
+    res = {'q1': q1(runs, templates, ROSTER), 'q2': q2(runs, templates, levels, ROSTER), 'q3': q3(runs, ROSTER, a.store),
            'q4': q4(runs, templates, single, ROSTER), 'q5': q5(runs, para, ROSTER, accepted_pairs()),
            'sensitivity': sensitivity(runs, templates, ROSTER), 'reported': reported(runs, ROSTER),
            'repeats': repeats(runs, ROSTER) if a.store == 'main' else {},
@@ -676,6 +772,28 @@ def selftest() -> int:
         bad.append('q5 found a loss that is not there')
     if not (r5['tau']['tau'] > 0.6 and r5['tau']['items'] == 450):
         bad.append(f"q5 tau {r5['tau']}")
+    # Q3's judged columns on two templates of a solved and a wrong trace each, answers worked by hand
+    rows3 = []
+    for t in (0, 1):
+        for n, sc in ((0, 1.0), (1, 0.0)):
+            r = fake(f'u{t}', n, sc)
+            r.update(status='answered', steps=[{'digit_flags': int(t == 0 and n == 1)}, {'digit_flags': 0}])
+            rows3.append(r)
+    e5r = {'u0-0': dict(milestones_required=2, by_e3=2, sent=False, reached=0, missing=0, unjudged=0, e5_strict=1.0, reply_ok=None),
+           'u1-0': dict(milestones_required=2, by_e3=2, sent=False, reached=0, missing=0, unjudged=0, e5_strict=1.0, reply_ok=None),
+           'u0-1': dict(milestones_required=4, by_e3=1, sent=True, reached=1, missing=2, unjudged=0, e5_strict=0.5, reply_ok=True),
+           'u1-1': dict(milestones_required=4, by_e3=1, sent=True, reached=0, missing=2, unjudged=1, e5_strict=0.25, reply_ok=True)}
+    rtr = {'u0-0': dict(router_flagged=[1], judge_flagged=[1], sent=[0, 1], unjudged=0, reply_ok=True),
+           'u1-0': dict(router_flagged=[], judge_flagged=[], sent=[0], unjudged=1, reply_ok=True),
+           'u0-1': dict(router_flagged=[0], judge_flagged=[], sent=[1], unjudged=0, reply_ok=True),
+           'u1-1': dict(router_flagged=[], judge_flagged=[], sent=[0, 1], unjudged=0, reply_ok=True)}
+    s3 = stage_q3(rows3, e5r, rtr, 7)
+    want3 = {'e5_coverage_on_wrong': 0.375, 'e5_judged_fraction': 0.5, 'e5_unjudged_rate': 1 / 6,
+             'e5_reached_share': 1 / 6, 'router_rate_on_fully_solved': 0.5, 'router_judge_rate_on_fully_solved': 0.5,
+             'router_rate_on_wrong': 0.5, 'router_unjudged_rate': 1 / 6, 'router_steps_flagged_per_trace': 0.5}
+    if any(abs(s3[k] - v) > 1e-12 for k, v in want3.items()) or \
+            s3['attribution_on_wrong'] != {'traces': 2, 'digit_rule': 0.5, 'e5_missing': 1.0, 'router_judge': 0.0}:
+        bad.append(f'stage_q3 {s3}')
     keep = {i for i in main_['m0'] if not i.startswith('t0-')}          # the experts reject template t0
     r5k = q5(main_, para_, list(main_), keep)
     if not all(o['items'] == 447 for o in r5k['models']) or r5k['expert_check'] != 447:

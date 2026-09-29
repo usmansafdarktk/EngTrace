@@ -5184,6 +5184,56 @@ as the closed-weight models are. It runs at temperature 0.7, with the prompt has
 **Timing.** The plan runs the paraphrase arm in the same week as the main run (28–29 September), so
 that the served models match: by about 5 October.
 
+## D-142 — E5 and the step router built for the full run, each reproducing the pilot exactly; nothing billed
+
+**Date:** 2026-09-29 · **Status:** DECIDED (each run awaits the owner's approval) · **Evidence:** `full_run_28092026/judge.py`, `router.py`, `judge_calls.py`, `E5_VALIDATION.md`, `ROUTER_VALIDATION.md`
+
+Both stages read score.py's store and write beside it: `scores/<variant>/e5/` and
+`scores/<variant>/router/`. Their replies are kept in stores keyed by the SHA-256 of (model, settings,
+prompt), so no reply is bought twice. A run refuses to start without `--yes` and stops starting
+calls at a spend cap. Each call has a wall-clock deadline of 900 s.
+- **E5** is the pilot's (D-105): the prompt and parser are `e5_hybrid`'s and the call is E1's, with
+  JSON mode, temperature 0, 16,384 tokens and three attempts. It goes out at OpenRouter's default
+  routing, as the pilot's did.
+  - **One call per trace** whose item has milestones E3 did not reach, holding the question, the
+    trace and those milestones.
+  - **The score is E5-strict.** E5-lenient is kept as a diagnostic only (RESULTS_E5).
+- **The router** is D-113's design.
+  - **Rule C:** every step the shipped digit rule does not flag, a trace's steps in one call.
+  - **The prompt** is the framework's Tribunal prompt, evaluated from the f-string in
+    `_tier2_tribunal_batch` as it stands in the framework's source. The framework's model libraries
+    are not needed.
+  - **The call:** 8,192 tokens at the provider's defaults, three attempts, and a retry at 16,384
+    when a reply is cut off.
+  - **A step is flagged** by the digit rule, or when the judge's category contains "error".
+
+**Validated on the pilot**, free: each stage replays the pilot's 300 labelled traces through the
+functions the full run uses, reading the pilot's stored replies.
+- **E5:** E3's flags equal the pilot's on 300 of 300 traces. The same 142 traces are sent, and every
+  prompt is found under the pilot's key. Every milestone's source and every E5-strict score equal the
+  pilot's on 300 of 300. The published totals reproduce: 951 of 1,245 milestones by E3; 73 REACHED,
+  36 NOT_NEEDED and 185 MISSING; the per-model scores from 0.962 to 0.321.
+- **The router:** all 299 prompts are byte-identical to those the pilot sent. The steps under review
+  are the same. The published figures reproduce: 8 steps unjudged; precision and recall 0.707 and
+  0.603 over all steps, and 0.703 and 0.360 inside correct-answer traces; AUROC 0.675 (0.622 to 0.730)
+  on 228 traces.
+
+**Priced on the full run** (`--dry-run`, the eleven models; tokens and call times are the pilot's,
+prices OpenRouter's public list):
+
+| | calls | input tokens | at Xiaomi's endpoint | across the six endpoints | time |
+|---|---:|---:|---:|---:|---|
+| E5 | 8,032 | 12.5 M | $26.56 | $18.59 to $49.71 | about 7.3 h at 16 workers |
+| router | 24,506, 7.0 steps each | 44.8 M | $103.32 (output per step), $98.41 (per call) | $72.32 to $194.94 | about 33 h at 8 workers |
+
+E5 comes in well under D-110's $76.82 because only 32% of the full run's traces leave a milestone to
+judge, against 47% of the pilot's. The router's estimate agrees with D-113's $114.
+
+`analyze.py` fills Q3's E5 and router columns when the stages have written their rows, and adds the
+table of what points at a wrong answer (digit rule, E5 MISSING, the router's judge). Its self-test
+checks these on a case worked by hand. The evaluator code gets its tag at the commit the paid runs
+start from.
+
 ## Open decisions
 
 | # | Decision | Needed before |
@@ -5192,7 +5242,8 @@ that the served models match: by about 5 October.
 | D-141 | Approve the paraphrase run over the eleven models: about $49.2 on the main run's bills for the same items | the week of the main run, so the served models match |
 | D-141 | Approve the three decoding repeats of `gemma-4-26b-a4b`: about $0.28 | reporting the decoding spread |
 | D-138 | The stricter match rule removes 252 credits, 129 of them on symbolic answers the check cannot verify either way: keep it (as decided) or reverse it | the paper's tables |
-| — | The E5 judge stage (`judge.py`, cached, with a dry run; about $77) is not built yet | Q3's E5 columns |
+| D-142 | Approve E5 over the eleven models: 8,032 calls, about $26.56 at Xiaomi's prices ($18.59 to $49.71), about 7 hours | Q3's E5 columns |
+| D-142 | Approve the step router over the eleven models: 24,506 calls, about $98 to $103 at Xiaomi's prices ($72 to $195), about 33 hours at 8 workers | Q3's router columns |
 | D-108 | ~~Whether the review app shows questions and solutions as plain text, as the models read them, and whether the 65 templates judged through its Markdown rendering get a plain-text look; fixing `signal_operations`'s origin marker~~ **Closed by the owner 2026-09-28 (D-114): the certification is closed and no template changes** | — |
 | D-107 | ~~Fix the five templates round 2 objected to~~ **Fixed 2026-09-26 (D-108) and re-certified in round 3 (D-109): all five approved by all three** | — |
 | D-106 | ~~Whether the screen re-judges the changed templates (a few cents, targeted; not run before round 2); the plasma row's per-row tag~~ **Closed by the owner 2026-09-28 (D-114): no re-judge** | — |
@@ -5200,7 +5251,7 @@ that the served models match: by about 5 October.
 | D-094 | ~~Whether to narrow the P2/Pc range in `work_isothermal_virial` (now 50% redraw; an expert's thermal-stability objection, D-106, turns on the same range) and accept the 41% stability redraw in `floating_object_submersion_depth`; the residuals in `pass1_fixes.md`~~ **Closed by the owner 2026-09-28 (D-114): the redraw rates stand** | — |
 | D-092 | ~~Answer-display lengthening and gold-movement sign-offs~~ **Decided by the owner 2026-09-23:** the two lengthened answers stay; `beam_internal_moment`, `terzaghi_strip_footing_bearing` and `effective_stress_profile` answers are lengthened too; the gold movements are accepted; and a scoped third round removes the census ties at 3% and above (eight templates), with the frozen pool to be censused before inference and stragglers fixed then | — |
 | D-093 | ~~Approval to run screening pass 1~~ **Both passes run (2026-09-23/24, $4.85 total); the 24 flags resolved (D-094).** **The Layer 2 protocol was decided (D-095) and run to completion (D-109).** | — |
-| — | ~~Whether the full run adds the step router~~ **In the stack (D-110), batched or not at all (D-113).** ~~Its routing rule~~ **rule C (D-112).** ~~Measuring the batched prompt~~ **Measured: no detection lost, about $114 at full scale (D-113).** Still open: building it, its reported score, and whether the supervisor funds it at about $643 for the base plan | before evaluation starts |
+| — | ~~Whether the full run adds the step router~~ **In the stack (D-110), batched or not at all (D-113).** ~~Its routing rule~~ **rule C (D-112).** ~~Measuring the batched prompt~~ **Measured: no detection lost, about $114 at full scale (D-113).** ~~Building it, its reported score~~ **Built and validated; Q3 reports its flags (D-142).** Still open: the approval of its run (above) | before evaluation starts |
 | — | The repo's templates no longer reproduce 17 of the 60 frozen items byte-identically (D-102); `milestones.build_all` raises on the pilot manifest; `pinned_templates.py` works around it for the pilot | any re-derivation of milestones from templates |
 | — | ~~Which families the next roster will evaluate~~ **Decided 2026-09-27 (D-110): the pricing document's eleven** | — |
 | D-115 | ~~Round 4: the three chemical experts review `heat_of_reaction_formation` and `adiabatic_flame_temperature` as widened~~ **Done (D-119): both approved by all three; 150 of 150 certified** | — |

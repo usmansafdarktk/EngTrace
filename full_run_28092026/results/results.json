@@ -1422,10 +1422,7 @@
    "digit_wrong_ci": [
     0.12200943907600255,
     0.24222367379255738
-   ],
-   "e5_coverage_on_wrong": null,
-   "e5_judged_fraction": null,
-   "e5_unjudged_rate": null
+   ]
   },
   {
    "model": "gemma-4-26b-a4b",
@@ -1455,10 +1452,7 @@
    "digit_wrong_ci": [
     0.2970258353960396,
     0.5245020971837817
-   ],
-   "e5_coverage_on_wrong": null,
-   "e5_judged_fraction": null,
-   "e5_unjudged_rate": null
+   ]
   },
   {
    "model": "deepseek-v4.1-flash",
@@ -1488,10 +1482,7 @@
    "digit_wrong_ci": [
     0.0,
     0.05714285714285714
-   ],
-   "e5_coverage_on_wrong": null,
-   "e5_judged_fraction": null,
-   "e5_unjudged_rate": null
+   ]
   },
   {
    "model": "qwen3-235b-a22b-2507",
@@ -1521,10 +1512,7 @@
    "digit_wrong_ci": [
     0.2554089527493783,
     0.5174153551309599
-   ],
-   "e5_coverage_on_wrong": null,
-   "e5_judged_fraction": null,
-   "e5_unjudged_rate": null
+   ]
   },
   {
    "model": "glm-5.3-flash",
@@ -1554,10 +1542,7 @@
    "digit_wrong_ci": [
     0.02999626865671642,
     0.14634146341463414
-   ],
-   "e5_coverage_on_wrong": null,
-   "e5_judged_fraction": null,
-   "e5_unjudged_rate": null
+   ]
   },
   {
    "model": "glm-5.3",
@@ -1587,10 +1572,7 @@
    "digit_wrong_ci": [
     0.0,
     0.05504587155963303
-   ],
-   "e5_coverage_on_wrong": null,
-   "e5_judged_fraction": null,
-   "e5_unjudged_rate": null
+   ]
   },
   {
    "model": "muse-glimmer-30b",
@@ -1620,10 +1602,7 @@
    "digit_wrong_ci": [
     0.0547945205479452,
     0.20202020202020202
-   ],
-   "e5_coverage_on_wrong": null,
-   "e5_judged_fraction": null,
-   "e5_unjudged_rate": null
+   ]
   },
   {
    "model": "kimi-k3",
@@ -1653,10 +1632,7 @@
    "digit_wrong_ci": [
     0.0,
     0.0
-   ],
-   "e5_coverage_on_wrong": null,
-   "e5_judged_fraction": null,
-   "e5_unjudged_rate": null
+   ]
   },
   {
    "model": "gpt-5.4-mini",
@@ -1686,10 +1662,7 @@
    "digit_wrong_ci": [
     0.09310344827586207,
     0.28409726256171935
-   ],
-   "e5_coverage_on_wrong": null,
-   "e5_judged_fraction": null,
-   "e5_unjudged_rate": null
+   ]
   },
   {
    "model": "gemini-3.1-flash-lite",
@@ -1719,10 +1692,7 @@
    "digit_wrong_ci": [
     0.1870967741935484,
     0.43511992197847177
-   ],
-   "e5_coverage_on_wrong": null,
-   "e5_judged_fraction": null,
-   "e5_unjudged_rate": null
+   ]
   },
   {
    "model": "claude-sonnet-5",
@@ -1752,10 +1722,7 @@
    "digit_wrong_ci": [
     0.027777777777777776,
     0.2638888888888889
-   ],
-   "e5_coverage_on_wrong": null,
-   "e5_judged_fraction": null,
-   "e5_unjudged_rate": null
+   ]
   }
  ],
  "q4": [
