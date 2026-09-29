@@ -95,7 +95,13 @@ is scored as its own variant, against the original items.
 
 `analyze.py` computes ANALYSIS_PLAN.md's questions from the store and writes `results/RESULTS.md` and
 `results/results.json`, aggregates only; `--selftest` checks its statistics on synthetic data. The
-method choices the plan leaves open are fixed in its docstring (D-136).
+method choices the plan leaves open are fixed in its docstring (D-136). `--store main_pre_d137` writes
+the same tables from the scores before the evaluator fixes, as a labelled record (D-140).
+
+The first results showed three defects in the answer check, each fixed after being measured on the
+gold, on the pilot's expert labels and on the full run: LaTeX numbers (D-137, `parser_fix.py`,
+`PARSER_FIX.md`), credit from stray digits (D-138, `match_audit.py`, `MATCH_AUDIT.md`), and verdict
+words (D-139, `word_audit.py`, `WORD_AUDIT.md`).
 
 ```bash
 python -m full_run_28092026.score --variant main --workers 8   # free

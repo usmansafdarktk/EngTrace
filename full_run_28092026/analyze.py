@@ -252,10 +252,19 @@ def q3(runs, keys):
         cov, cov_ci, n_cov = cluster_mean(per_template(rows, lambda r: r['e3']['coverage'],
                                                        lambda r: wrong(r) and r['e3']['coverage'] is not None),
                                           600 + i)
+        rcov, rcov_ci, n_rcov = cluster_mean(per_template(rows, lambda r: r['e3']['coverage'],
+                                                          lambda r: wrong(r) and not r['unusable']
+                                                          and r['e3']['coverage'] is not None), 650 + i)
         fc, fc_ci, n_right = cluster_mean(per_template(rows, flagged, lambda r: fully(r) == 1), 700 + i)
         fw, fw_ci, n_wrong = cluster_mean(per_template(rows, flagged, wrong), 750 + i)
-        out.append({'model': k, 'wrong': n_wrong, 'wrong_unusable': sum(wrong(r) and r['unusable'] for r in rows),
+        answered = [r for r in rows if r['status'] == 'answered']
+        claims = [sum(s['claims'] for s in r['steps']) for r in answered]
+        out.append({'model': k, 'claims_per_trace': float(np.mean(claims)),
+                    'traces_with_a_claim': float(np.mean([c > 0 for c in claims])),
+                    'wrong': n_wrong, 'wrong_unusable': sum(wrong(r) and r['unusable'] for r in rows),
                     'wrong_with_milestones': n_cov, 'e3_coverage_on_wrong': cov, 'e3_ci': cov_ci,
+                    'readable_wrong_with_milestones': n_rcov, 'e3_coverage_on_readable_wrong': rcov,
+                    'e3_readable_ci': rcov_ci,
                     'fully_solved': n_right, 'digit_flag_rate_on_fully_solved': fc, 'digit_ci': fc_ci,
                     'digit_flag_rate_on_wrong': fw, 'digit_wrong_ci': fw_ci,
                     'e5_coverage_on_wrong': None, 'e5_judged_fraction': None, 'e5_unjudged_rate': None})
@@ -390,10 +399,10 @@ def repeats(main, keys):
     return out
 
 
-def set_aside():
+def set_aside(store='main'):
     out = {}
     for k in SET_ASIDE:
-        rows = load('main', k)
+        rows = load(store, k)
         if rows:
             s = np.array([np.mean(v) for v in per_template(rows.values(), lambda r: r['score']).values()])
             out[k] = {'score': float(s.mean()), 'ci': boot_mean(s, 1999),
@@ -421,6 +430,8 @@ def render(res) -> str:
     m1, pairs = res['q1']['models'], res['q1']['pairs']
     sig = sum(p['p_holm'] < 0.05 for p in pairs)
     same = sum(p['same_verdict'] for p in pairs)
+    differ = [p for p in pairs if not p['same_verdict']]
+    only_mcnemar = sum(p['mcnemar_p_holm'] < 0.05 <= p['p_holm'] for p in differ)
     mf = res['milestones']
     L = ['# Results of the full run: the deterministic stack', '',
          'Printed by `analyze.py` from the score store (`score.py`) under ANALYSIS_PLAN.md (D-117); the '
@@ -437,7 +448,9 @@ def render(res) -> str:
     L += ['', f'Of the 55 pairs, {sig} differ at a Holm-adjusted p below 0.05 on the answer score (sign-flip '
           'permutation over the 150 per-template differences). The fully-solved check (McNemar exact, Holm) '
           f'gives the same verdict on {same} of 55: both tests or neither hold, and when both hold, in the same '
-          'direction.', '',
+          f'direction. On {only_mcnemar} of the {len(differ)} others McNemar holds and the template-level test does '
+          'not: McNemar treats the 2,250 items as independent, and instances of a template are not (D-111), so '
+          'a claim rests on the template-level test.', '',
           '| a | b | a - b | 95% CI | p (Holm) | fully solved a - b | 95% CI | McNemar p (Holm) | same verdict |',
           '|---|---|---:|---:|---:|---:|---:|---:|---|']
     for p in sorted(pairs, key=lambda p: (p['p_holm'], -abs(p['diff']))):
@@ -463,14 +476,22 @@ def render(res) -> str:
           'E3 is the deterministic part of E5, which adds the judge\'s verdict on the milestones E3 does not find. '
           "The digit rule's flag counts a trace when any step is flagged. Against the experts, on fully solved traces, "
           'it had precision 0.750 and recall 0.320 (SCORER_VALIDATION.md), so its rate is not a count of '
-          'slips.', '',
-          '| model | wrong-answer traces | of them unusable | E3 coverage | 95% CI | digit-rule flag rate | 95% CI | '
-          'fully solved | digit-rule flag rate | 95% CI | E5 coverage |',
-          '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|']
+          'slips; and it reads a different amount of arithmetic in each model\'s traces (claims checked per '
+          'answered trace, shown), so a low rate can mean little was read.', '',
+          '**Milestones on the wrong-answer traces.** An unusable trace reaches only what it wrote before it '
+          'stopped, and an empty one nothing, so coverage is also shown on the readable wrong answers alone.', '',
+          '| model | wrong-answer traces | of them unusable | E3 coverage | 95% CI | readable only | 95% CI | '
+          'E5 coverage |', '|---|---:|---:|---:|---:|---:|---:|---|']
     for r in res['q3']:
         L.append(f"| `{r['model']}` | {r['wrong']} | {r['wrong_unusable']} | {r['e3_coverage_on_wrong']:.3f} | "
-                 f"{ci(r['e3_ci'])} | {r['digit_flag_rate_on_wrong']:.3f} | {ci(r['digit_wrong_ci'])} | "
-                 f"{r['fully_solved']} | {r['digit_flag_rate_on_fully_solved']:.3f} | {ci(r['digit_ci'])} | pending |")
+                 f"{ci(r['e3_ci'])} | {r['e3_coverage_on_readable_wrong']:.3f} | {ci(r['e3_readable_ci'])} | pending |")
+    L += ['', '**The digit rule.**', '',
+          '| model | flag rate, wrong answers | 95% CI | fully solved traces | flag rate, fully solved | 95% CI | '
+          'claims checked per trace | traces with a claim |', '|---|---:|---:|---:|---:|---:|---:|---:|']
+    for r in res['q3']:
+        L.append(f"| `{r['model']}` | {r['digit_flag_rate_on_wrong']:.3f} | {ci(r['digit_wrong_ci'])} | "
+                 f"{r['fully_solved']} | {r['digit_flag_rate_on_fully_solved']:.3f} | {ci(r['digit_ci'])} | "
+                 f"{r['claims_per_trace']:.2f} | {r['traces_with_a_claim']:.3f} |")
     s0 = res['q4'][0]
     L += ['', '## Q4. Consistency within a template', '',
           'The share of templates fully solved on all 15 instances, on some, and on none: the '
@@ -553,24 +574,31 @@ def render(res) -> str:
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
     ap.add_argument('--selftest', action='store_true')
-    if ap.parse_args().selftest:
+    ap.add_argument('--store', default='main',
+                    help='the scores/ directory to read; another one is written as a labelled record')
+    ap.add_argument('--note', default='', help='a line saying what that other store is')
+    a = ap.parse_args()
+    if a.selftest:
         return selftest()
-    runs = {k: load('main', k) for k in ROSTER}
+    runs = {k: load(a.store, k) for k in ROSTER}
     missing = [k for k, v in runs.items() if v is None]
     if missing:
-        raise SystemExit(f'no main scores for {missing}: run score.py first')
+        raise SystemExit(f'no {a.store} scores for {missing}: run score.py first')
     templates, levels, single = check_store(runs)
-    para = {k: load('paraphrase', k) for k in ROSTER}
+    para = {k: load('paraphrase', k) for k in ROSTER} if a.store == 'main' else {}
     res = {'q1': q1(runs, templates, ROSTER), 'q2': q2(runs, templates, levels, ROSTER), 'q3': q3(runs, ROSTER),
            'q4': q4(runs, templates, single, ROSTER), 'q5': q5(runs, para, ROSTER),
            'sensitivity': sensitivity(runs, templates, ROSTER), 'reported': reported(runs, ROSTER),
-           'repeats': repeats(runs, ROSTER), 'set_aside': set_aside(),
-           'milestones': milestone_facts(runs[ROSTER[0]].values()),
-           'store': json.loads((SCORES / 'main' / 'CONFIG.json').read_text(encoding='utf-8'))}
-    OUT.mkdir(exist_ok=True)
-    (OUT / 'results.json').write_text(json.dumps(res, indent=1) + '\n', encoding='utf-8', newline='\n')
+           'repeats': repeats(runs, ROSTER) if a.store == 'main' else {},
+           'set_aside': set_aside(a.store), 'milestones': milestone_facts(runs[ROSTER[0]].values()),
+           'store': {'name': a.store, **json.loads((SCORES / a.store / 'CONFIG.json').read_text(encoding='utf-8'))}}
+    out = OUT if a.store == 'main' else OUT / a.store
+    out.mkdir(parents=True, exist_ok=True)
+    (out / 'results.json').write_text(json.dumps(res, indent=1) + '\n', encoding='utf-8', newline='\n')
     text = render(res)
-    (OUT / 'RESULTS.md').write_text(text, encoding='utf-8', newline='\n')
+    if a.store != 'main':
+        text = text.replace('\n', f'\n\n**A record, not the results:** computed from `scores/{a.store}`. {a.note}\n', 1)
+    (out / 'RESULTS.md').write_text(text, encoding='utf-8', newline='\n')
     print(text)
     return 0
 

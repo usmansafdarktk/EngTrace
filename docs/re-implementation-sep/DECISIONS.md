@@ -5031,6 +5031,102 @@ form, "14 056": it appears in 20 of Muse Glimmer's answers and in one each of th
 The pilot analyses that also call `milestones.numbers` (`e3_grid.py`, `e3_null.py`, `hard_case_pool.py`,
 `judge_probe.py`) would read the corrected numbers if re-run.
 
+## D-138 — No credit from a subscript or a bare 0 or 1: the answer check's match rule tightened
+
+**Date:** 2026-09-29 · **Status:** DECIDED (the owner may reverse it: one commit) · **Evidence:** `full_run_28092026/match_audit.py`, `MATCH_AUDIT.md`; the self-test in `evaluators/answer.py`
+
+Reading D-137's changed verdicts turned up an older weakness. `answer.match` accepts a stated number
+within one unit of its own last digit, and it applies that after scaling by a unit factor of up to
+10^12. A number whose one-unit window reaches zero therefore matches every gold at some scale. A bare
+`1`, for example, is 1,000,000 ± 1,000,000 at 10^6. `answer.values` also read subscripts as numbers,
+so `p_1`, `x_{1}` and `N_0` put exactly such digits into answers. In the full run, a formula with no
+value, `P_b = Q(\sqrt{2E_b/N_0})`, "matched" 15.15 through the 0 of `N_0`.
+
+**Two rules**, measured alone and together against the D-137 check before either was adopted:
+- **S.** A digit written as a subscript is not a value. E3's reader already skips such digits.
+- **R.** A number vouches for a gold at its own precision only when one unit of its last digit is
+  smaller than the number itself. The relative tolerance and the gold's own precision are unchanged.
+
+| | gold correct | pilot: verdicts changed | full run, 12 models: verdicts changed |
+|---|---:|---:|---:|
+| S | 2,250 | 0 | 66 |
+| R | 2,250 | 0 | 243 |
+| S+R, adopted | 2,250 | 0 | 252, all away from correct |
+
+The experts cannot arbitrate: no pilot verdict moves under either rule, so the pilot's agreement stays
+at D-137's 0.982 and 0.927. The full-run changes were read instead.
+- **123 are numeric answers** (scalar, multipart, array, vector). Every one read was a wrong value that
+  had been credited through a stray digit. Examples: 0.238 m for 0.151 m via `y_1`; 1,700 K for
+  1,594 K via the 1 of a space-split `1 700`; a queue's W via the 0 of `P_0`.
+- **129 are symbolic answers**, mostly `ber_estimation_mary`, `impulse_response_from_lccde` and
+  `autocorrelation_rect_pulse`. Number matching cannot verify a formula under either rule. Some formulas
+  are right, such as `36(8-|τ|)` for a gold that states 288 = 36 × 8, and they drop from correct to
+  partial. Their credit had come from stray digits, not from their numbers. The paper should say that
+  symbolic answers are scored by the numbers they state.
+
+Answer scores fall by 0.001 to 0.028 per model. gpt-oss-20b falls most, 0.826 → 0.798, and Claude
+Sonnet 5 falls 0.967 → 0.962. A one-significant-figure rounding still counts: "3.4 x 10^3" for 3,364
+and "0.5" for 0.4987 are among the new self-test cases. What R still allows is a single digit from 2
+to 9 at its own precision, such as a formula's `3` for 3.79; that residual is left as found.
+
+## D-139 — A verdict word is decided within its own family, a negated mention skipped
+
+**Date:** 2026-09-29 · **Status:** DECIDED · **Evidence:** `full_run_28092026/word_audit.py`, `WORD_AUDIT.md`; the self-test in `evaluators/answer.py`
+
+Reading the first results also showed a defect in how the answer check reads the word of a
+classification answer. The last mention decides, so that an answer restating the criteria is not
+credited for every regime it names. But every verdict word competed with every other, and a negated
+mention counted. Claude Sonnet 5's correct "ζ ≈ 1.00 (Critically Damped); ω_d = 0 rad/s (no oscillation
+occurs)" ended on `no`, and "... since the system is not underdamped" ended on `underdamped`.
+
+The rule adopted has two parts:
+- **Families.** Only words of the target's own family compete: damping, flow regime, yes/no and so on.
+  A word outside every family competes with all, as before, and `linear`/`nonlinear` keep their own
+  handling.
+- **Negation.** A mention negated just before it ("not", "non-", "n't", "never", "neither", "nor") is
+  skipped.
+
+Measured before adoption, alone and together:
+- The gold is unchanged at 2,250.
+- No pilot verdict moves.
+- In the full run, 25 verdicts change, all partial → correct and all in `damping_classification`. There
+  are 0 to 5 per model, out of its 75 classification items.
+
+The self-test pins both defects, and also a wrong regime that is still wrong: "not critically damped
+but overdamped" against a critically damped gold.
+
+## D-140 — The deterministic stack's results on the free pass, and what the evaluator fixes changed
+
+**Date:** 2026-09-29 · **Status:** RECORDED · **Evidence:** `full_run_28092026/results/RESULTS.md` and `results.json` (`analyze.py`); `results/main_pre_d137/` (the same, before the fixes)
+
+`analyze.py` ran on the eleven models' 24,750 traces, scored with the evaluators of D-137 to D-139.
+These are the answer check, E3 and the digit rule; E5 has not run, and neither has Q5.
+- **Q1.** Answer scores run from 0.799 (gpt-oss-20b) to 0.969 (DeepSeek V4.1 Flash).
+  - 32 of the 55 pairwise differences hold at a Holm-adjusted p below 0.05 on the template-level test.
+  - None holds among the top five: DeepSeek V4.1 Flash, Claude Sonnet 5, Kimi K3, GLM-5.3 Flash and
+    Muse Glimmer, which lie within 0.012 of each other.
+  - McNemar's check agrees on 46 pairs. On the other 9 it holds and the template-level test does not,
+    because it treats items as independent (D-111).
+- **Q2.** The Easy-to-Advanced gap holds for 7 of 11 models, with gaps from +0.047 to +0.194.
+- **Sensitivity.** The model ordering barely moves with the tolerance: Kendall's τ is 0.93 at half
+  tolerance and 0.96 at double. It barely moves with the fully-solved rate either (0.89), and does not
+  move without the shortcut templates (1.00). It does move when unusable traces are excluded (0.60),
+  because GLM-5.3's 100 empty rows are then no longer counted.
+
+**What the fixes changed.** Under the evaluators before D-137, the Q2 gap held for 2 of 11 models. The
+fixes moved five models' verdicts into it. For all eleven, the Advanced score fell and the Easy score
+rose or held. The fixes were found by reading these results, so both versions are kept: the one before
+the fixes as a labelled record, `results/main_pre_d137/`. The paper should say that the answer check was
+corrected after the first scoring pass, and why (D-137 to D-139). It should also report the Q2 result
+under both versions.
+
+**Added after the first run**, descriptive and outside the plan's tests (D-136 did not have them):
+- Q3's claims checked per trace, beside each digit-rule rate. The rule reads 1.68 claims per answered
+  trace for Kimi K3 and 8.35 for Qwen3-235B, so a low flag rate can mean little was read.
+- E3 coverage on the readable wrong answers alone, since 100 of GLM-5.3's 123 wrong-answer traces are
+  unusable.
+- The note on McNemar's nine disagreements.
+
 ## Open decisions
 
 | # | Decision | Needed before |

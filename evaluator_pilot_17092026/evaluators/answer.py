@@ -37,7 +37,9 @@ import milestones  # noqa: E402
 TOL = 0.02            # kept for callers that pass a relative tolerance explicitly
 REL = 0.002           # the window [0.0017, 0.0029] all agrees with the experts; see X4
 SCALES = milestones.SCALES + (1e12, 1e-12, 1e-2)   # pF/m against F/m, and percent
-NUM = re.compile(r'[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?')
+# A digit written as a subscript - `p_1`, `x_{1}` - names a thing, it is not a value (D-138);
+# E3's reader already skips it.
+NUM = re.compile(r'(?<![\d.])(?<!_)(?<!_\{)[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?')
 SUB = str.maketrans('₀₁₂₃₄₅₆₇₈₉', '0123456789')
 HEADING = re.compile(r'(?i)#+\s*final\s+answer')
 ANSWER = re.compile(r'(?i)(?:#+\s*final\s+answer|\*{0,2}answer\s*\(?[a-z]?\)?\s*\*{0,2}\s*[:\-])')
@@ -150,6 +152,10 @@ def match(gold, have, rel=REL, exact=False, gold_ulp=0.0):
 
     `exact` is for items whose QUESTION prescribes the rounding ("to 4 decimals, round half
     up"): there the experts require the digits, and a near miss is a miss.
+
+    A number's own last digit vouches for it only when one unit of that digit is smaller than
+    the number (D-138). A bare `0` or `1` fails that: one unit either side reaches zero, so under
+    some unit factor it lies within one unit of any gold - `1` at 1e6 is 1,000,000 +- 1,000,000.
     """
     for v, u in have:
         for sc in SCALES:
@@ -157,7 +163,7 @@ def match(gold, have, rel=REL, exact=False, gold_ulp=0.0):
             if exact:
                 if abs(t - gold) <= 1e-9 * max(1.0, abs(gold)):
                     return True
-            elif abs(t - gold) <= max(rel * abs(gold), tu, gold_ulp):
+            elif abs(t - gold) <= max(rel * abs(gold), tu if abs(v) > u else 0.0, gold_ulp):
                 return True
     return False
 
@@ -306,6 +312,33 @@ def targets(item, ms=None):
             'exact': bool(ROUNDING.search(item.get('question') or ''))}
 
 
+# Verdict words that answer the same question (D-139). Only a word of the target's own family can
+# overrule it: "critically damped; omega_d = 0 (no oscillation occurs)" ends on `no`, which
+# answers a yes/no question, not this one.
+FAMILIES = [('overdamped', 'underdamped', 'critically', 'undamped'), ('laminar', 'turbulent', 'transitional'),
+            ('safe', 'unsafe'), ('yes', 'no'), ('feasible', 'infeasible'), ('stable', 'unstable'),
+            ('acceptable', 'adequate', 'inadequate'), ('subsonic', 'supersonic'), ('saturated', 'superheated'),
+            ('subcritical', 'supercritical'), ('operational', 'failed')]
+# A mention negated just before it is not a verdict: "... since the system is not underdamped" (D-139).
+NEGATED = re.compile(r"(?:\bnot|\bnon-?|n't|\bnever|\bneither|\bnor)\s*(?:\w+\s+)?$")
+
+
+def _word_hit(low, w):
+    """Is verdict word `w` the answer? The LAST mention of its family decides, a negated one
+    skipped: an answer block that restates the criteria ("turbulent occurs for Re > 5e6 ... the
+    flow is laminar") must not be credited for both."""
+    if w in LINEAR:
+        vocab = LINEAR
+    else:
+        vocab = next((f for f in FAMILIES if w in f), tuple(sorted(VERDICT_WORDS)))
+    last = None
+    for m in re.finditer(r'\b(%s)\b' % '|'.join(vocab), low):
+        if NEGATED.search(low[max(0, m.start() - 24):m.start()]):
+            continue
+        last = m.group(1)
+    return last == w
+
+
 def verdict(text, item, tol=None, ms=None):
     """('correct' | 'partial' | 'incorrect', detail). Every part must match for correct.
 
@@ -325,13 +358,7 @@ def verdict(text, item, tol=None, ms=None):
         hits.append(match(v, have, rel, want['exact'], gu)
                     or match(abs(v), absolute, rel, want['exact'], gu))
     for w in want['words']:
-        # the LAST mention decides: an answer block that restates the criteria ("turbulent
-        # occurs for Re > 5e6 ... the flow is laminar") must not be credited for both.
-        vocab = LINEAR if w in LINEAR else sorted(VERDICT_WORDS)
-        last = None
-        for m in re.finditer(r'\b(%s)\b' % '|'.join(vocab), low):
-            last = m.group(1)
-        hits.append(last == w)
+        hits.append(_word_hit(low, w))
     for label, value in want.get('labeled', []):
         hits.append(_stance(low, label) == value)
     if not hits:
@@ -408,6 +435,24 @@ def selftest():
         ('**Answer:** a) The Reynolds number is approximately **304,114**. b) The flow regime is **turbulent**.',
          '', 'classification', (304114.0,),
          '## Final Answer\n**Answer:** a) \\(Re \\approx 3.40 \\times 10^5\\); b) turbulent', 'partial'),
+        # D-138: a subscript or a bare 0 or 1 does not vouch for a value; a rounding still does
+        ('**Answer:** The energy loss is 0.151 m.', '', 'scalar', (0.151,),
+         '**Answer:** \\(y_1 \\approx 0.238\\ \\text{m}\\), \\(h_L \\approx 0.374\\ \\text{m}\\)', 'incorrect'),
+        ('**Answer:** The argument is 15.15.', '', 'scalar', (15.15,),
+         '**Answer:** \\(P_b = Q\\left(\\sqrt{2E_b/N_0}\\right)\\)', 'incorrect'),
+        ('**Answer:** The volume is 3,364 m3.', '', 'scalar', (3364.0,),
+         '**Answer:** Step 1 gives about 3.4 x 10^3 m3', 'correct'),
+        ('**Answer:** The probability is 0.4987.', '', 'scalar', (0.4987,),
+         '**Answer:** P = 0.5', 'correct'),
+        # D-139: the verdict word's own family decides, a negated mention skipped
+        ('**Answer:** The damping ratio is 1.0000. The system is **Critically Damped**.', '', 'classification',
+         (1.0,), '## Final Answer\n**Answer:** ζ ≈ 1.00 (Critically Damped); ω_d = 0 rad/s (no oscillation occurs)',
+         'correct'),
+        ('**Answer:** The damping ratio is 1.0000. The system is **Critically Damped**.', '', 'classification',
+         (1.0,), '## Final Answer\n**Answer:** ζ = 1.00, critically damped; ω_d = 0 (since the system is not underdamped)',
+         'correct'),
+        ('**Answer:** The damping ratio is 1.0000. The system is **Critically Damped**.', '', 'classification',
+         (1.0,), '## Final Answer\n**Answer:** ζ = 1.00; the system is not critically damped but overdamped', 'partial'),
     ]
     bad = 0
     for sol, q, typ, ms, trace, want in cases:
@@ -418,7 +463,8 @@ def selftest():
     # values() alone: grouping joins only a number's own digits (D-137)
     reads = [('\\(\\log_2\\,256 = 8\\)', 2256.0, False), ('\\(x_1\\,000\\)', 1000.0, False),
              ('\\boxed{1\\,335}\\ \\text{K}', 1335.0, True), ('\\(4\\,477.9\\ \\text{psi}\\)', 4477.9, True),
-             ('\\(1\\,234\\,567\\)', 1234567.0, True), ('0.123\\,456', 123456.0, False)]
+             ('\\(1\\,234\\,567\\)', 1234567.0, True), ('0.123\\,456', 123456.0, False),
+             ('P_a(p_1) = 0.8002', 1.0, False), ('x_{12} = 3.5', 12.0, False), ('x_{12} = 3.5', 2.0, False)]
     for text, v, want in reads:
         if any(abs(x - v) < 1e-9 for x, _u in values(text)) != want:
             bad += 1
