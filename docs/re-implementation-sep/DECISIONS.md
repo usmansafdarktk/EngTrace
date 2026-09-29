@@ -4925,7 +4925,7 @@ What the scoring has to carry:
 | D-121 | ~~Approve the harness check (about $0.01) and the calibration run (about $3.58, 220 calls)~~ **Approved by the owner 2026-09-28 (D-122)** | — |
 | D-122 | ~~Approve the full run: about $202 for the ten, 95% interval $163 to $251, on the calibration's bills (D-123)~~ **Approved for seven by the owner 2026-09-28 (D-124): $30.41, interval $26.67 to $34.66; the spend line moved to $45.06 after the stop (D-125)** | — |
 | D-124 | ~~Whether and when to run `kimi-k3`, `glm-5.3` and `claude-sonnet-5`: $171.74, interval $134.07 to $221.32~~ **Approved by the owner and started 2026-09-28 (D-127)** | — |
-| D-126 | A private Kaggle copy of the traces; the local archive of all twelve models is made and verified (D-131) | the evaluation |
+| D-126 | ~~A private Kaggle copy of the traces~~ **Done 2026-09-29: the twelve models' archive as a private Kaggle dataset in the owner's account, downloaded back and matched file for file; the local archive is made and verified (D-131)** | — |
 | D-117 | ~~Confirm the analysis plan as a whole; its two scoring rules are decided~~ **Confirmed by the owner 2026-09-28 (D-122)** | — |
 | D-114 | ~~A private backup of `full_run_28092026/pool/` and `SEED.secret`~~ **Backed up 2026-09-28: a private Kaggle dataset in the owner's account, downloaded back and matched file for file, and a local archive with its checksum.** ~~The tag on the commit inference runs at~~ **`full-run-inference` (D-122)** | — |
 | — | The budget: the plan comes to about $606 against the ~$500 round with a batched router (D-110). Calibration puts generation at about $202 for the ten against the plan's $403 (D-123); the seven's run cost $32.96 to $35.75 (D-126) | generation starts |
