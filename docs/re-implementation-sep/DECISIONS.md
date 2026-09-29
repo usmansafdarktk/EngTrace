@@ -4848,6 +4848,32 @@ upload needs manual mode.
 
 **Open.** Which Qwen candidate fills the Qwen slot (D-121); the traces' Kaggle copy.
 
+## D-132 — The roster rule stands: Qwen3-235B-A22B-2507 fills the Qwen slot, and Qwen3.8-27B is set aside
+
+**Date:** 2026-09-29 · **Status:** DECIDED · **Evidence:** D-110; `docs/inference_pricing/build_pricing_doc.js`, the roster's exclusion list; D-128 to D-131
+
+The owner keeps D-110's roster rule: no model the pilot generated traces with, and no model used as a
+judge.
+
+- **`qwen3-235b-a22b-2507` fills the Qwen slot**, closing D-121. It is the same model's July 2025
+  release, without thinking, at the price the pricing document gives the original; the pilot did not
+  generate with it, and it is not a judge. It replaces the original like for like, because the
+  original's endpoints no longer meet the routing rule. Its full run is complete (D-130).
+- **`qwen3.8-27b` is set aside.** The pilot generated traces with it: it is one half of the
+  robustness pair that the pricing document's exclusion list names, with `gemma-4-31b-it`, and the
+  pilot's evaluators were checked on those two models' traces (R-F1, R-F2). Its 2,250 traces are kept,
+  labelled, outside the main results, and can serve only as a robustness check.
+- **No other Gemma is added.** `gemma-4-31b-it`, the only newer Gemma on OpenRouter, falls under the
+  same rule, and the Gemma 3 models are older and smaller.
+
+The roster the analysis scores is D-110's eleven with the 2507 release in the Qwen slot: 11 × 2,250 =
+24,750 traces, the size the evaluation was costed for (D-113).
+
+**Correction to D-128 and D-129.** D-128 described Qwen3.8-27B's part in the pilot, but not that
+D-110's rule excludes it: the candidates were read against the routing rule only, not the roster
+rule. Its calibration and full run, $56.705 in the rows, were therefore spent on a model the rule
+leaves out. The twelve-model totals in D-129 and D-131 stand as the record of what was billed.
+
 ## Open decisions
 
 | # | Decision | Needed before |
@@ -4864,7 +4890,7 @@ upload needs manual mode.
 | — | ~~Which families the next roster will evaluate~~ **Decided 2026-09-27 (D-110): the pricing document's eleven** | — |
 | D-115 | ~~Round 4: the three chemical experts review `heat_of_reaction_formation` and `adiabatic_flame_temperature` as widened~~ **Done (D-119): both approved by all three; 150 of 150 certified** | — |
 | D-118 | ~~Relabel `critical_depth_froude_classification`'s answer type~~ **Not needed (D-120): scoring is the same under either label** | — |
-| D-121 | `qwen3-235b-a22b` has no endpoint meeting the routing rule: keep it on Alibaba's endpoint (8,192-token cap, undeclared quantization) or replace it. **Skipped for now by the owner 2026-09-28 (D-122): the run goes ahead with the other ten.** Two candidates calibrated and running at full scale: `qwen3-235b-a22b-2507` and `qwen3.8-27b` (D-128, D-129). Still open: which of them fills the slot | the analysis |
+| D-121 | ~~`qwen3-235b-a22b` has no endpoint meeting the routing rule: keep it on Alibaba's endpoint (8,192-token cap, undeclared quantization) or replace it~~ **Replaced by `qwen3-235b-a22b-2507`; `qwen3.8-27b` set aside under D-110's rule (D-132)** | — |
 | D-121 | ~~Approve the harness check (about $0.01) and the calibration run (about $3.58, 220 calls)~~ **Approved by the owner 2026-09-28 (D-122)** | — |
 | D-122 | ~~Approve the full run: about $202 for the ten, 95% interval $163 to $251, on the calibration's bills (D-123)~~ **Approved for seven by the owner 2026-09-28 (D-124): $30.41, interval $26.67 to $34.66; the spend line moved to $45.06 after the stop (D-125)** | — |
 | D-124 | ~~Whether and when to run `kimi-k3`, `glm-5.3` and `claude-sonnet-5`: $171.74, interval $134.07 to $221.32~~ **Approved by the owner and started 2026-09-28 (D-127)** | — |

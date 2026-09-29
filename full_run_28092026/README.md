@@ -74,7 +74,9 @@ ceilings are in `models.json`, with the reasons. Traces go to `traces/`, gitigno
 Inference runs at the commit tagged `full-run-inference`, on ten models: `qwen3-235b-a22b` is skipped
 for now, and decoding stays at each provider's default (D-122). Two Qwen candidates added to
 `models.json` afterwards, `qwen3-235b-a22b-2507` and `qwen3.8-27b`, run at the tag
-`full-run-inference-qwen` (D-128).
+`full-run-inference-qwen` (D-128). The 2507 release fills the Qwen slot; `qwen3.8-27b` falls under the
+roster rule, as a model the pilot generated with, and its traces are set aside (D-132). The roster
+the analysis scores is eleven models, 24,750 traces.
 
 `calibration_estimate.py` re-estimates the run from the traces recorded so far: each model's billed
 cost per item, a bootstrap interval, a level-reweighted figure and the hours left; `--providers` lists
