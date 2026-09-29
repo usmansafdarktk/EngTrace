@@ -28,6 +28,18 @@ validated on those traces reads the same kind of output. What changes:
     the bill, not an estimate; Gemini's unreported thinking tokens cannot hide in it.
 
 Traces go to traces/<key>.jsonl beside this file, gitignored: they restate the pool's questions.
+
+VARIANT RUNS (D-141). `--variant` runs the same models, prompt, settings and states on another item
+set, into traces/<variant>/<key>.jsonl, so score.py scores it as that variant:
+  paraphrase        the 450 items of subsamples.PARAPHRASE, each question replaced by its paraphrase
+                    from paraphrase/pool.jsonl (paraphrase.py), checked against the committed
+                    paraphrase/manifest.jsonl before a call; the row records the paraphrase's hash as
+                    item_sha256 and the original's as original_sha256
+  repeat1..repeat3  the 300 items of subsamples.REPEAT with their original questions, one run each
+The dry run estimates a variant from each model's own bills on the same items in the main run.
+
+    python -m full_run_28092026.run_traces --variant paraphrase --dry-run          # FREE
+    python -m full_run_28092026.run_traces --variant repeat1 --model gemma-4-26b-a4b --dry-run
 """
 from __future__ import annotations
 
@@ -52,10 +64,12 @@ from dotenv import load_dotenv  # noqa: E402
 
 load_dotenv(REPO / '.env')
 
-from full_run_28092026 import freeze  # noqa: E402
+from full_run_28092026 import freeze, subsamples  # noqa: E402
 
 CONFIG = HERE / 'models.json'
 TRACES = HERE / 'traces'
+PARAPHRASES = HERE / 'paraphrase'
+VARIANTS = ('main', 'paraphrase') + subsamples.REPEAT_VARIANTS
 DEPLOYED_RUNNER = REPO / 'evaluation' / 'run_inference.py'
 PILOT_PROMPT_PREFIX = 'c2bcb87984c4e50b'   # evaluator_pilot_17092026/models.json: the annotated traces' prompt
 MAX_ATTEMPTS = 4
@@ -100,12 +114,39 @@ def items() -> list[dict]:
     return out
 
 
-def trace_path(key: str) -> Path:
-    return TRACES / f'{key}.jsonl'
+def variant_items(variant: str, its: list[dict]) -> list[dict]:
+    """The items a variant runs: a subsample of the pool, with paraphrased questions for `paraphrase`."""
+    if variant == 'main':
+        return its
+    by_id = {it['item_id']: it for it in its}
+    if variant in subsamples.REPEAT_VARIANTS:
+        return [by_id[i] for i in subsamples.repeat_ids()]
+    pool, manifest = PARAPHRASES / 'pool.jsonl', PARAPHRASES / 'manifest.jsonl'
+    if not pool.exists() or not manifest.exists():
+        raise SystemExit('paraphrase/pool.jsonl or its manifest is missing: run paraphrase.py first')
+    want = {r['item_id']: r for r in map(json.loads, manifest.read_text(encoding='utf-8').splitlines())
+            if r['passed']}
+    out = []
+    for r in map(json.loads, pool.read_text(encoding='utf-8').splitlines()):
+        m = want.get(r['item_id'])
+        if m is None:
+            continue
+        sha = hashlib.sha256(r['question'].encode('utf-8')).hexdigest()
+        if sha != m['sha256'] or by_id[r['item_id']]['sha256'] != m['original_sha256']:
+            raise SystemExit(f"{r['item_id']}: the paraphrase pool does not match its manifest - refusing to run")
+        out.append({**by_id[r['item_id']], 'question': r['question'], 'sha256': sha,
+                    'original_sha256': m['original_sha256']})
+    if len(out) != len(want):
+        raise SystemExit(f'the manifest passes {len(want)} paraphrases but the pool holds {len(out)}')
+    return out
 
 
-def existing(key: str) -> dict[str, dict]:
-    path = trace_path(key)
+def trace_path(key: str, variant: str = 'main') -> Path:
+    return TRACES / f'{key}.jsonl' if variant == 'main' else TRACES / variant / f'{key}.jsonl'
+
+
+def existing(key: str, variant: str = 'main') -> dict[str, dict]:
+    path = trace_path(key, variant)
     if not path.exists():
         return {}
     out = {}
@@ -176,13 +217,13 @@ def call(cli, spec: dict, cfg: dict, question: str, attempts: int = MAX_ATTEMPTS
     return empty_row or {'status': 'service_failure', 'error': last, 'attempts': attempts}
 
 
-def run_model(spec, todo, cfg, workers, label='run'):
+def run_model(spec, todo, cfg, workers, label='run', variant='main'):
     key = spec['key']
     cli = client(cfg)
-    TRACES.mkdir(exist_ok=True)
+    trace_path(key, variant).parent.mkdir(parents=True, exist_ok=True)
     params = request_params(spec, cfg)
     n, counts, billed = 0, Counter(), 0.0
-    with open(trace_path(key), 'a', encoding='utf-8', newline='\n') as fh, \
+    with open(trace_path(key, variant), 'a', encoding='utf-8', newline='\n') as fh, \
             cf.ThreadPoolExecutor(max_workers=workers) as pool:
         futs = {pool.submit(call, cli, spec, cfg, it['question']): it for it in todo}
         for fut in cf.as_completed(futs):
@@ -193,6 +234,10 @@ def run_model(spec, todo, cfg, workers, label='run'):
                    'item_sha256': it['sha256'], 'model_key': key, 'model_configured': spec['model'],
                    'prompt_sha256': PROMPT_SHA, 'request': params, 'mode': label,
                    'ts': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()), **res}
+            if variant != 'main':
+                row['variant'] = variant
+            if 'original_sha256' in it:
+                row['original_sha256'] = it['original_sha256']
             fh.write(json.dumps(row, ensure_ascii=False) + '\n')
             fh.flush()
             n += 1
@@ -286,18 +331,40 @@ def dry_run(cfg, its, specs) -> int:
     return 0
 
 
+def variant_dry_run(cfg, its, specs, variant) -> int:
+    """A variant's plan and estimate: each model's own billed cost per item on the same items in the
+    main run, which already carries its lengths, its routing and its prices."""
+    print(f'variant {variant}: {len(its)} items, {len({i["template_id"] for i in its})} templates; '
+          f'traces go to traces/{variant}/')
+    print(f'{"model":22s} {"to run":>7s} {"main $ on these":>16s} {"estimate $":>11s}')
+    total = 0.0
+    for s in specs:
+        todo = [it for it in its if it['item_id'] not in existing(s['key'], variant)]
+        main = existing(s['key'])
+        bills = [main[it['item_id']].get('billed_usd') or 0.0 for it in its if it['item_id'] in main]
+        per = sum(bills) / len(bills) if bills else None
+        est = per * len(todo) if per is not None else None
+        total += est or 0.0
+        print(f'{s["key"]:22s} {len(todo):7d} {"" if per is None else f"{sum(bills):16.3f}"} '
+              f'{"no main-run bills" if est is None else f"{est:11.3f}"}')
+    print(f'{"TOTAL":22s} {"":7s} {"":16s} {total:11.3f}')
+    print('\nThe estimate repeats the main run\'s spend on the same items; a paraphrase is about as long '
+          'as its original. Nothing was called.')
+    return 0
+
+
 def calibration_sample(its, n):
     """n items per model, spread over the templates in a fixed order: every k-th item."""
     step = max(1, len(its) // n)
     return its[::step][:n]
 
 
-def status(cfg, its, specs) -> int:
+def status(cfg, its, specs, variant='main') -> int:
     print(f'{"model":22s} {"answered":>9s} {"empty":>6s} {"missing":>8s} {"billed $":>9s} '
           f'{"out tok/item":>13s}  served')
     grand = 0.0
     for s in specs:
-        rows = list(existing(s['key']).values())
+        rows = list(existing(s['key'], variant).values())
         c = Counter(r['status'] for r in rows)
         billed = sum(r.get('billed_usd') or 0.0 for r in rows)
         grand += billed
@@ -317,6 +384,7 @@ def main() -> int:
     ap.add_argument('--check', action='store_true')
     ap.add_argument('--calibrate', type=int, metavar='N')
     ap.add_argument('--model', action='append', help='only this model key (repeatable)')
+    ap.add_argument('--variant', default='main', choices=VARIANTS)
     ap.add_argument('--workers', type=int, default=16)
     ap.add_argument('--yes', action='store_true', help='required for any mode that bills')
     a = ap.parse_args()
@@ -325,11 +393,15 @@ def main() -> int:
     specs = [s for s in cfg['models'] if not a.model or s['key'] in a.model]
     if not specs:
         raise SystemExit(f'no model matches {a.model}')
-    its = items()
+    if a.variant != 'main' and a.calibrate:
+        raise SystemExit('--calibrate is for the main run; a variant is estimated from its bills')
+    if a.variant in subsamples.REPEAT_VARIANTS and not a.model:
+        raise SystemExit('a repeat runs one chosen model: name it with --model')
+    its = variant_items(a.variant, items())
     if a.dry_run:
-        return dry_run(cfg, its, specs)
+        return dry_run(cfg, its, specs) if a.variant == 'main' else variant_dry_run(cfg, its, specs, a.variant)
     if a.status:
-        return status(cfg, its, specs)
+        return status(cfg, its, specs, a.variant)
     if not a.yes:
         raise SystemExit('this mode bills: re-run with --yes once the spend is approved '
                          '(see --dry-run for the estimate)')
@@ -351,12 +423,13 @@ def main() -> int:
             print(f'\n{s["key"]}: SKIPPED - no endpoint meets the routing rule (see --dry-run)')
             continue
         pool = calibration_sample(its, a.calibrate) if a.calibrate else its
-        done = existing(s['key'])
+        done = existing(s['key'], a.variant)
         todo = [it for it in pool if it['item_id'] not in done]
         print(f'\n{s["key"]}: {len(done)} done, {len(todo)} to run')
         if todo:
             counts, billed = run_model(s, todo, cfg, a.workers,
-                                       label='calibrate' if a.calibrate else 'run')
+                                       label='calibrate' if a.calibrate else ('run' if a.variant == 'main' else a.variant),
+                                       variant=a.variant)
             grand += billed
     print(f'\nbilled this invocation: ${grand:.3f}. Re-run the same command to resume; '
           f'only service failures and unrun items are called.')

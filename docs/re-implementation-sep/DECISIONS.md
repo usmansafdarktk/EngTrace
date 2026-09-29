@@ -5127,10 +5127,72 @@ under both versions.
   unusable.
 - The note on McNemar's nine disagreements.
 
+## D-141 — Variant runs, the paraphrase pipeline and the expert check: built and tested, nothing billed
+
+**Date:** 2026-09-29 · **Status:** DECIDED (each spend awaits the owner's approval) · **Evidence:** `full_run_28092026/subsamples.py`, `run_traces.py --variant`, `paraphrase.py`, `paraphrase_kit.py`, `paraphrase_app.py`, `paraphrase_guide.md`; the self-tests named below
+
+**The subsamples** are fixed in one module that the harness, the pipeline and the analysis all read.
+- **Paraphrase:** the plan's 1st, 6th and 11th item of each template in manifest order, 450 items,
+  90 per branch.
+- **Repeat:** the 1st and 8th of each template, 300 items. The plan says only "2 per template", so
+  this choice is fixed now, before any repeat runs.
+
+The two share 150 items, each template's first. Positions are counted, not indices, because the
+indices have gaps (D-116).
+
+**The harness.** `run_traces.py --variant paraphrase | repeat1..3` runs the same models, prompt,
+settings and row states into `traces/<variant>/`.
+- The paraphrase run refuses unless the paraphrase pool matches its committed manifest. Its rows
+  record the paraphrase's hash and the original's.
+- A repeat needs a named model.
+- A variant's dry run estimates from each model's own main-run bills on the same items:
+  - a repeat of `gemma-4-26b-a4b` costs $0.093, so the three repeats cost $0.28, against the plan's
+    $1.40 on pricing-document rates;
+  - the paraphrase run over the eleven models costs about $49.2. Kimi K3 is $19.6, Claude Sonnet 5
+    $11.8 and GLM-5.3 $10.9.
+
+**The writer** is Mistral Large 3 (`mistralai/mistral-large-2512`), from a family on neither the
+roster nor the judge's side. Only Mistral serves it, with no declared quantization, so it is routed
+as the closed-weight models are. It runs at temperature 0.7, with the prompt hashed into every row.
+- **Checks.** An attempt passes only if all of these hold:
+  - the numbers are the same, as a multiset;
+  - every technical token is kept;
+  - the part labels are in the same order;
+  - word similarity is at most 0.75;
+  - the length is 0.7 to 1.5 times the original's;
+  - there is no preamble.
+
+  The writer gets up to three attempts per item.
+- **Dry run.** $0.15 if every item passes at the first attempt, $0.45 at most.
+- **Self-test.** Constructed cases give the verdicts they should. Each of the 450 originals, checked
+  against itself, fails only the near-copy check.
+
+**The expert check.** One own-branch expert judges each paraphrase.
+- **Assignment.** An expert gets whole templates, 10 templates and 30 items each.
+- **Questions.** Three: same problem? same answer? a new ambiguity, error or hint? A pair is kept on
+  yes, yes, no, and any other answer needs a note.
+- **The app.** Plain text in read-only boxes, not rendered Markdown, which was round 1's trap
+  (D-108). It records timestamps. Kits carry only the expert's id and opaque codes.
+- **Self-tests.**
+  - The kits are built and scored on a stand-in pool: every paraphrase is assigned once, to its own
+    branch, and no item id is revealed.
+  - The app is driven headless with Streamlit's AppTest. Submitting is blocked until all three
+    questions are answered, a rejection is blocked without a note, and each row is saved.
+- **Q5.** `analyze.py` drops a rejected pair from both arms once the check returns, and labels Q5
+  provisional until then.
+
+**Timing.** The plan runs the paraphrase arm in the same week as the main run (28–29 September), so
+that the served models match: by about 5 October.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
+| D-141 | Approve writing the 450 paraphrases with Mistral Large 3: $0.15 to $0.45 (`paraphrase.py --dry-run`) | the expert check, and the paraphrase run by about 5 October |
+| D-141 | Approve the paraphrase run over the eleven models: about $49.2 on the main run's bills for the same items | the week of the main run, so the served models match |
+| D-141 | Approve the three decoding repeats of `gemma-4-26b-a4b`: about $0.28 | reporting the decoding spread |
+| D-138 | The stricter match rule removes 252 credits, 129 of them on symbolic answers the check cannot verify either way: keep it (as decided) or reverse it | the paper's tables |
+| — | The E5 judge stage (`judge.py`, cached, with a dry run; about $77) is not built yet | Q3's E5 columns |
 | D-108 | ~~Whether the review app shows questions and solutions as plain text, as the models read them, and whether the 65 templates judged through its Markdown rendering get a plain-text look; fixing `signal_operations`'s origin marker~~ **Closed by the owner 2026-09-28 (D-114): the certification is closed and no template changes** | — |
 | D-107 | ~~Fix the five templates round 2 objected to~~ **Fixed 2026-09-26 (D-108) and re-certified in round 3 (D-109): all five approved by all three** | — |
 | D-106 | ~~Whether the screen re-judges the changed templates (a few cents, targeted; not run before round 2); the plasma row's per-row tag~~ **Closed by the owner 2026-09-28 (D-114): no re-judge** | — |

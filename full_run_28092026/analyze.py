@@ -288,13 +288,22 @@ def q4(runs, templates, single, keys):
     return out
 
 
-def q5(main, para, keys):
-    """Paired paraphrase minus original, per model, on the items both arms hold."""
+def accepted_pairs() -> set[str] | None:
+    """The paraphrases the experts kept (paraphrase_kit.py --score), or None before they return."""
+    p = HERE / 'paraphrase' / 'accepted.json'
+    if not p.exists():
+        return None
+    return {i for i, r in json.loads(p.read_text(encoding='utf-8')).items() if r['kept']}
+
+
+def q5(main, para, keys, keep=None):
+    """Paired paraphrase minus original, per model, on the items both arms hold; a pair the expert
+    rejected leaves both arms (`keep`, when the check has returned)."""
     out, tested = [], []
     for i, k in enumerate(keys):
         if not para.get(k):
             continue
-        ids = sorted(set(para[k]) & set(main[k]))
+        ids = sorted(set(para[k]) & set(main[k]) & (keep if keep is not None else set(para[k])))
         diff = per_template([{'template_id': main[k][x]['template_id'],
                               'd': para[k][x]['score'] - main[k][x]['score']} for x in ids], lambda r: r['d'])
         point, c, n = cluster_mean(diff, 900 + i)
@@ -319,7 +328,7 @@ def q5(main, para, keys):
                 S[1, m, j] += para[k][x]['score']
                 N[:, m, j] += 1
         tau = {**kendall_boot(S, N, 990), 'items': len(common)}
-    return {'models': out, 'tau': tau}
+    return {'models': out, 'tau': tau, 'expert_check': None if keep is None else len(keep)}
 
 
 def sensitivity(runs, templates, keys):
@@ -505,6 +514,9 @@ def render(res) -> str:
                  f"{m['some']:.3f} | {m['none']:.3f} |")
     L += ['', '## Q5. Paraphrase robustness', '']
     if res['q5']['models']:
+        L += ['**Provisional: the experts\' check of the paraphrases has not returned**, so no pair has been '
+              'dropped yet.' if res['q5']['expert_check'] is None else
+              f"Pairs the experts kept: {res['q5']['expert_check']}; a rejected pair leaves both arms.", '']
         L += ['| model | items | paraphrase - original | 95% CI | p (Holm) | McNemar p (Holm) |', '|---|---:|---:|---:|---:|---:|']
         L += [f"| `{r['model']}` | {r['items']} | {r['diff']:+.3f} | {ci(r['ci'])} | {r['p_holm']:.4f} | "
               f"{r['mcnemar_p_holm']:.4f} |" for r in res['q5']['models']]
@@ -587,7 +599,7 @@ def main() -> int:
     templates, levels, single = check_store(runs)
     para = {k: load('paraphrase', k) for k in ROSTER} if a.store == 'main' else {}
     res = {'q1': q1(runs, templates, ROSTER), 'q2': q2(runs, templates, levels, ROSTER), 'q3': q3(runs, ROSTER),
-           'q4': q4(runs, templates, single, ROSTER), 'q5': q5(runs, para, ROSTER),
+           'q4': q4(runs, templates, single, ROSTER), 'q5': q5(runs, para, ROSTER, accepted_pairs()),
            'sensitivity': sensitivity(runs, templates, ROSTER), 'reported': reported(runs, ROSTER),
            'repeats': repeats(runs, ROSTER) if a.store == 'main' else {},
            'set_aside': set_aside(a.store), 'milestones': milestone_facts(runs[ROSTER[0]].values()),
@@ -664,6 +676,10 @@ def selftest() -> int:
         bad.append('q5 found a loss that is not there')
     if not (r5['tau']['tau'] > 0.6 and r5['tau']['items'] == 450):
         bad.append(f"q5 tau {r5['tau']}")
+    keep = {i for i in main_['m0'] if not i.startswith('t0-')}          # the experts reject template t0
+    r5k = q5(main_, para_, list(main_), keep)
+    if not all(o['items'] == 447 for o in r5k['models']) or r5k['expert_check'] != 447:
+        bad.append('q5 did not drop the rejected pairs from both arms')
     print('selftest:', 'all pass' if not bad else bad)
     return 1 if bad else 0
 

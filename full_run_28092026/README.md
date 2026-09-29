@@ -109,5 +109,25 @@ python -m full_run_28092026.validate_scorer                    # free; needs the
 python -m full_run_28092026.analyze                            # free
 ```
 
+## Variant runs, paraphrases and the expert check (D-141)
+
+`subsamples.py` fixes the paraphrase subsample (the plan's 450) and the repeat subsample (300).
+`run_traces.py --variant paraphrase | repeat1..3` runs them into `traces/<variant>/`, with a dry run
+priced on each model's main-run bills. `paraphrase.py` writes and checks the paraphrases (`--dry-run`
+and `--selftest` are free; writing bills and needs `--yes`). `paraphrase_kit.py` builds the experts'
+kits and scores their returns; `paraphrase_app.py` is the app shipped in them, and
+`paraphrase_guide.md` the guide. The paraphrase text, the kits and the returns stay local; the
+committed record is `paraphrase/manifest.jsonl` (hashes only), `PARAPHRASE.md` and
+`PARAPHRASE_REVIEW.md`.
+
+```bash
+python -m full_run_28092026.paraphrase --dry-run                                  # free
+python -m full_run_28092026.paraphrase --yes                                      # bills, once approved
+python -m full_run_28092026.paraphrase_kit --build                                # free: the kits
+python -m full_run_28092026.run_traces --variant paraphrase --dry-run             # free
+python -m full_run_28092026.score --variant paraphrase                            # free, after the run
+python -m full_run_28092026.paraphrase_kit --score <returned folder>              # free
+```
+
 `testset/` is not this pool. It is the 2026-09-17 generation from the default seed, and the
 pilot's `freeze.py --verify` rebuilds its slice from it, so it is left as it is.
