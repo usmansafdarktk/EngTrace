@@ -4797,6 +4797,31 @@ sorted order does not guarantee (D-125), and the rows leave out retried and stop
 Both runs started at 02:36, one detached process each with 15 calls in flight. The run stops for the
 owner if the twelve's recorded bill passes $320.
 
+## D-130 — The three held models and Qwen3-235B-A22B-2507 are complete
+
+**Date:** 2026-09-29 · **Status:** DECIDED (the record) · **Evidence:** `calibration_estimate.py --empties` with the four `--model` keys; `run_traces.py --status`; the traces (local)
+
+Claude Sonnet 5 finished at 00:21, GLM-5.3 at 01:48 and Kimi K3 at 08:54, local time; Qwen3-235B-A22B-2507
+finished at 04:15. Each has all 2,250 items recorded, answered or empty, and none is left as a
+service failure. Every row that stopped at the output cap used the full 32,768 tokens.
+
+| model | answered | empty | output tokens per item | billed $ | calibration's estimate $ | attempts beyond the first |
+|---|---|---|---|---|---|---|
+| claude-sonnet-5 | 2,250 | 0 | 2,566 | 59.447 | 44.16 | 2 |
+| glm-5.3 | 2,150 | 100 | 6,515 | 55.064 | 47.09 | 7 |
+| kimi-k3 | 2,245 | 5 | 3,866 | 99.000 | 80.49 | 17 |
+| qwen3-235b-a22b-2507 | 2,250 | 0 | 1,400 | 1.177 | 1.07 | 0 |
+
+The three held models came to $213.51, under their $221.32 line (D-127) and above their $171.74
+estimate. Claude Sonnet 5 ended above its interval of $36.09 to $52.49, writing 2,566 output tokens
+per item against the calibration's 1,889; GLM-5.3 and Kimi K3 ended inside theirs, and so did
+Qwen3-235B-A22B-2507.
+
+GLM-5.3's 100 empty rows cluster on a few templates: every item of `qr_policy_one_iteration` and
+`work_isothermal_virial`, 14 of `vdw_solve_for_volume`, 12 of `adiabatic_flame_temperature`, and 10
+each of `aoq_ati_rectifying` and `normal_depth_iteration`. These are largely the templates on which
+the other models' empty rows fall too (`--empties`).
+
 ## Open decisions
 
 | # | Decision | Needed before |
