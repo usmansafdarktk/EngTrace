@@ -1,0 +1,653 @@
+{
+ "models": [
+  {
+   "key": "gpt-oss-20b",
+   "lines": 2250,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 2197,
+    "empty": 53
+   },
+   "items": 2250,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 2197,
+   "empty": 53,
+   "modes": {
+    "calibrate": 20,
+    "run": 2230
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "openai/gpt-oss-20b": 2250
+   },
+   "providers": {
+    "Darkbloom": 2242,
+    "DekaLLM": 7,
+    "DeepInfra": 1
+   },
+   "provider_count": 3,
+   "capped_with_text": 4,
+   "no_answer_marker": 10,
+   "no_marker_no_number": 2,
+   "no_marker_templates": {
+    "template_standing_wave_formation": 3,
+    "template_chase_vs_level_aggregate": 1,
+    "template_decimation_aliasing_analysis": 1,
+    "template_gas_phase_concentration": 1,
+    "template_lowpass_equivalent_bandpass": 1
+   },
+   "think_in_text": 0,
+   "empty_templates": {
+    "template_force_method_continuous_beam": 6,
+    "template_slope_deflection_end_moment": 5,
+    "template_pitzer_correlation_z": 4,
+    "template_statically_indeterminate_shaft": 4,
+    "template_upward_seepage_quick_condition": 4,
+    "template_multi_segment_rod": 3
+   },
+   "empty_by_template_all": {
+    "template_adiabatic_flame_temperature": 1,
+    "template_chase_vs_level_aggregate": 1,
+    "template_borrow_pit_fill_volume": 1,
+    "template_continuous_to_discrete_conversion": 1,
+    "template_critical_depth_froude_classification": 1,
+    "template_finite_convolution": 2,
+    "template_force_method_continuous_beam": 6,
+    "template_hydraulic_jump_energy_loss": 1,
+    "template_influence_line_max_reaction": 1,
+    "template_mm1_time_in_system": 1,
+    "template_multi_segment_rod": 3,
+    "template_pitzer_correlation_z": 4,
+    "template_primary_consolidation_settlement": 2,
+    "template_relative_density_of_sand": 2,
+    "template_quantity_discount_all_units": 1,
+    "template_signal_operations": 2,
+    "template_slope_deflection_end_moment": 5,
+    "template_statically_indeterminate_shaft": 4,
+    "template_statically_indeterminate": 2,
+    "template_superposition_electric_field": 1,
+    "template_truss_method_of_sections": 1,
+    "template_upward_seepage_quick_condition": 4,
+    "template_utube_manometer": 2,
+    "template_virtual_work_truss_deflection": 3,
+    "template_wave_parameters_basic": 1
+   },
+   "output_tokens_median": 1795.0,
+   "output_tokens_max": 32768,
+   "billed_usd": 0.69
+  },
+  {
+   "key": "gemma-4-26b-a4b",
+   "lines": 2250,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 2250
+   },
+   "items": 2250,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 2250,
+   "empty": 0,
+   "modes": {
+    "calibrate": 20,
+    "run": 2230
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "google/gemma-4-26b-a4b-it": 2250
+   },
+   "providers": {
+    "DekaLLM": 1263,
+    "NextBit": 987
+   },
+   "provider_count": 2,
+   "capped_with_text": 1,
+   "no_answer_marker": 2,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {
+    "template_composite_shafts_series": 1,
+    "template_pitzer_correlation_z": 1
+   },
+   "think_in_text": 0,
+   "empty_templates": {},
+   "empty_by_template_all": {},
+   "output_tokens_median": 797.0,
+   "output_tokens_max": 32768,
+   "billed_usd": 0.726
+  },
+  {
+   "key": "deepseek-v4.1-flash",
+   "lines": 2250,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 2236,
+    "empty": 14
+   },
+   "items": 2250,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 2236,
+   "empty": 14,
+   "modes": {
+    "calibrate": 20,
+    "run": 2230
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "deepseek/deepseek-v4.1-flash": 2250
+   },
+   "providers": {
+    "CoreWeave": 793,
+    "Parasail": 472,
+    "Morph": 458,
+    "DeepInfra": 419
+   },
+   "provider_count": 7,
+   "capped_with_text": 1,
+   "no_answer_marker": 1,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {
+    "template_vdw_solve_for_volume": 1
+   },
+   "think_in_text": 0,
+   "empty_templates": {
+    "template_work_isothermal_virial": 8,
+    "template_adiabatic_flame_temperature": 3,
+    "template_normal_depth_iteration": 2,
+    "template_qr_policy_one_iteration": 1
+   },
+   "empty_by_template_all": {
+    "template_adiabatic_flame_temperature": 3,
+    "template_normal_depth_iteration": 2,
+    "template_qr_policy_one_iteration": 1,
+    "template_work_isothermal_virial": 8
+   },
+   "output_tokens_median": 3060.0,
+   "output_tokens_max": 32768,
+   "billed_usd": 7.041
+  },
+  {
+   "key": "qwen3-235b-a22b-2507",
+   "lines": 2250,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 2250
+   },
+   "items": 2250,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 2250,
+   "empty": 0,
+   "modes": {
+    "calibrate": 20,
+    "run": 2230
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "qwen/qwen3-235b-a22b-2507": 2250
+   },
+   "providers": {
+    "GMICloud": 2200,
+    "Parasail": 50
+   },
+   "provider_count": 2,
+   "capped_with_text": 1,
+   "no_answer_marker": 3,
+   "no_marker_no_number": 1,
+   "no_marker_templates": {
+    "template_adiabatic_flame_temperature": 2,
+    "template_arl_beta_mean_shift": 1
+   },
+   "think_in_text": 0,
+   "empty_templates": {},
+   "empty_by_template_all": {},
+   "output_tokens_median": 1013.0,
+   "output_tokens_max": 32768,
+   "billed_usd": 1.177
+  },
+  {
+   "key": "qwen3.8-27b",
+   "lines": 2250,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 2161,
+    "empty": 89
+   },
+   "items": 2250,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 2161,
+   "empty": 89,
+   "modes": {
+    "calibrate": 20,
+    "run": 2230
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "qwen/qwen3.8-27b": 2250
+   },
+   "providers": {
+    "Ionstream": 2240,
+    "DeepInfra": 6,
+    "Mancer 2": 4
+   },
+   "provider_count": 3,
+   "capped_with_text": 9,
+   "no_answer_marker": 11,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {
+    "template_mm1k_finite_capacity": 4,
+    "template_normal_depth_iteration": 2,
+    "template_adiabatic_flame_temperature": 1,
+    "template_gauss_law_symmetric": 1,
+    "template_gas_viscosity_kinetic_theory": 1
+   },
+   "think_in_text": 0,
+   "empty_templates": {
+    "template_qr_policy_one_iteration": 15,
+    "template_adiabatic_flame_temperature": 14,
+    "template_work_isothermal_virial": 14,
+    "template_normal_depth_iteration": 12,
+    "template_vdw_solve_for_volume": 10,
+    "template_aoq_ati_rectifying": 8
+   },
+   "empty_by_template_all": {
+    "template_adiabatic_flame_temperature": 14,
+    "template_annulus_flowrate": 4,
+    "template_aoq_ati_rectifying": 8,
+    "template_ber_estimation_mary": 4,
+    "template_bpsk_energy_basis": 1,
+    "template_force_method_continuous_beam": 1,
+    "template_mm1k_finite_capacity": 3,
+    "template_normal_depth_iteration": 12,
+    "template_qr_policy_one_iteration": 15,
+    "template_rotating_unbalance": 1,
+    "template_superposition_electric_field": 1,
+    "template_vdw_solve_for_volume": 10,
+    "template_virtual_work_truss_deflection": 1,
+    "template_work_isothermal_virial": 14
+   },
+   "output_tokens_median": 6725.5,
+   "output_tokens_max": 32768,
+   "billed_usd": 56.705
+  },
+  {
+   "key": "glm-5.3-flash",
+   "lines": 2250,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 2208,
+    "empty": 42
+   },
+   "items": 2250,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 2208,
+   "empty": 42,
+   "modes": {
+    "calibrate": 20,
+    "run": 2230
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "z-ai/glm-5.3-flash": 2250
+   },
+   "providers": {
+    "GMICloud": 990,
+    "Novita": 398,
+    "Parasail": 224,
+    "Sail Research": 205
+   },
+   "provider_count": 11,
+   "capped_with_text": 1,
+   "no_answer_marker": 3,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {
+    "template_aliased_frequency_identification": 1,
+    "template_autocorrelation_rect_pulse": 1,
+    "template_normal_depth_iteration": 1
+   },
+   "think_in_text": 0,
+   "empty_templates": {
+    "template_qr_policy_one_iteration": 13,
+    "template_normal_depth_iteration": 6,
+    "template_adiabatic_flame_temperature": 5,
+    "template_work_isothermal_virial": 5,
+    "template_aoq_ati_rectifying": 3,
+    "template_single_sampling_oc_point": 3
+   },
+   "empty_by_template_all": {
+    "template_adiabatic_flame_temperature": 5,
+    "template_aoq_ati_rectifying": 3,
+    "template_ber_estimation_mary": 2,
+    "template_c_chart_revision": 1,
+    "template_multi_segment_rod": 1,
+    "template_normal_depth_iteration": 6,
+    "template_qr_policy_one_iteration": 13,
+    "template_single_sampling_oc_point": 3,
+    "template_vdw_solve_for_volume": 3,
+    "template_work_isothermal_virial": 5
+   },
+   "output_tokens_median": 2500.0,
+   "output_tokens_max": 32768,
+   "billed_usd": 4.512
+  },
+  {
+   "key": "glm-5.3",
+   "lines": 2250,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 2150,
+    "empty": 100
+   },
+   "items": 2250,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 2150,
+   "empty": 100,
+   "modes": {
+    "calibrate": 20,
+    "run": 2230
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "z-ai/glm-5.3": 2250
+   },
+   "providers": {
+    "Baidu": 918,
+    "Sail Research": 748,
+    "Morph": 245,
+    "Novita": 172
+   },
+   "provider_count": 8,
+   "capped_with_text": 6,
+   "no_answer_marker": 6,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {
+    "template_adiabatic_flame_temperature": 1,
+    "template_ber_estimation_mary": 1,
+    "template_epq_finite_production": 1,
+    "template_euclidean_distance_binary": 1,
+    "template_mm1k_finite_capacity": 1
+   },
+   "think_in_text": 0,
+   "empty_templates": {
+    "template_qr_policy_one_iteration": 15,
+    "template_work_isothermal_virial": 15,
+    "template_vdw_solve_for_volume": 14,
+    "template_adiabatic_flame_temperature": 12,
+    "template_aoq_ati_rectifying": 10,
+    "template_normal_depth_iteration": 10
+   },
+   "empty_by_template_all": {
+    "template_adiabatic_flame_temperature": 12,
+    "template_annulus_flowrate": 1,
+    "template_aoq_ati_rectifying": 10,
+    "template_ber_estimation_mary": 3,
+    "template_bpsk_energy_basis": 4,
+    "template_chart_pair_selection": 1,
+    "template_mm1k_finite_capacity": 4,
+    "template_newsvendor_normal_demand": 2,
+    "template_normal_depth_iteration": 10,
+    "template_phasor_addition": 2,
+    "template_pitzer_correlation_z": 1,
+    "template_qr_policy_one_iteration": 15,
+    "template_rackett_equation_volume": 1,
+    "template_rotating_unbalance": 1,
+    "template_single_sampling_oc_point": 3,
+    "template_time_to_phasor": 1,
+    "template_vdw_solve_for_volume": 14,
+    "template_work_isothermal_virial": 15
+   },
+   "output_tokens_median": 3270.5,
+   "output_tokens_max": 32768,
+   "billed_usd": 55.064
+  },
+  {
+   "key": "muse-glimmer-30b",
+   "lines": 2250,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 2221,
+    "empty": 29
+   },
+   "items": 2250,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 2221,
+   "empty": 29,
+   "modes": {
+    "calibrate": 20,
+    "run": 2230
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "meta/muse-glimmer-30b": 2250
+   },
+   "providers": {
+    "DeepInfra": 2250
+   },
+   "provider_count": 1,
+   "capped_with_text": 0,
+   "no_answer_marker": 0,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {},
+   "think_in_text": 0,
+   "empty_templates": {
+    "template_qr_policy_one_iteration": 12,
+    "template_aoq_ati_rectifying": 8,
+    "template_rackett_equation_volume": 4,
+    "template_force_method_continuous_beam": 2,
+    "template_normal_depth_iteration": 1,
+    "template_single_sampling_oc_point": 1
+   },
+   "empty_by_template_all": {
+    "template_aoq_ati_rectifying": 8,
+    "template_force_method_continuous_beam": 2,
+    "template_normal_depth_iteration": 1,
+    "template_qr_policy_one_iteration": 12,
+    "template_rackett_equation_volume": 4,
+    "template_single_sampling_oc_point": 1,
+    "template_vdw_solve_for_volume": 1
+   },
+   "output_tokens_median": 2988.5,
+   "output_tokens_max": 16384,
+   "billed_usd": 10.045
+  },
+  {
+   "key": "kimi-k3",
+   "lines": 2250,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 2245,
+    "empty": 5
+   },
+   "items": 2250,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 2245,
+   "empty": 5,
+   "modes": {
+    "calibrate": 20,
+    "run": 2230
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "moonshotai/kimi-k3": 2250
+   },
+   "providers": {
+    "Morph": 2231,
+    "BaseTen": 19
+   },
+   "provider_count": 2,
+   "capped_with_text": 4,
+   "no_answer_marker": 4,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {
+    "template_adiabatic_flame_temperature": 2,
+    "template_normal_depth_iteration": 2
+   },
+   "think_in_text": 0,
+   "empty_templates": {
+    "template_normal_depth_iteration": 4,
+    "template_adiabatic_flame_temperature": 1
+   },
+   "empty_by_template_all": {
+    "template_adiabatic_flame_temperature": 1,
+    "template_normal_depth_iteration": 4
+   },
+   "output_tokens_median": 2192.0,
+   "output_tokens_max": 32768,
+   "billed_usd": 99.0
+  },
+  {
+   "key": "gpt-5.4-mini",
+   "lines": 2250,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 2250
+   },
+   "items": 2250,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 2250,
+   "empty": 0,
+   "modes": {
+    "calibrate": 20,
+    "run": 2230
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "openai/gpt-5.4-mini": 2250
+   },
+   "providers": {
+    "Azure": 2249,
+    "OpenAI": 1
+   },
+   "provider_count": 2,
+   "capped_with_text": 0,
+   "no_answer_marker": 0,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {},
+   "think_in_text": 0,
+   "empty_templates": {},
+   "empty_by_template_all": {},
+   "output_tokens_median": 632.0,
+   "output_tokens_max": 1985,
+   "billed_usd": 7.737
+  },
+  {
+   "key": "gemini-3.1-flash-lite",
+   "lines": 2250,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 2250
+   },
+   "items": 2250,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 2250,
+   "empty": 0,
+   "modes": {
+    "calibrate": 20,
+    "run": 2230
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "google/gemini-3.1-flash-lite": 2250
+   },
+   "providers": {
+    "Google AI Studio": 2250
+   },
+   "provider_count": 1,
+   "capped_with_text": 0,
+   "no_answer_marker": 0,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {},
+   "think_in_text": 0,
+   "empty_templates": {},
+   "empty_by_template_all": {},
+   "output_tokens_median": 653.0,
+   "output_tokens_max": 1921,
+   "billed_usd": 2.48
+  },
+  {
+   "key": "claude-sonnet-5",
+   "lines": 2250,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 2250
+   },
+   "items": 2250,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 2250,
+   "empty": 0,
+   "modes": {
+    "calibrate": 20,
+    "run": 2230
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "anthropic/claude-sonnet-5": 2250
+   },
+   "providers": {
+    "Claude Platform on AWS": 2250
+   },
+   "provider_count": 1,
+   "capped_with_text": 0,
+   "no_answer_marker": 0,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {},
+   "think_in_text": 0,
+   "empty_templates": {},
+   "empty_by_template_all": {},
+   "output_tokens_median": 1804.0,
+   "output_tokens_max": 30198,
+   "billed_usd": 59.447
+  }
+ ],
+ "archive": {
+  "archive": "full_run_traces_2026-09-29.zip",
+  "matched": 12,
+  "differ": [],
+  "absent": []
+ }
+}

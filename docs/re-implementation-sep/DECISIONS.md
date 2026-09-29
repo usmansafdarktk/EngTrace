@@ -4874,6 +4874,37 @@ D-110's rule excludes it: the candidates were read against the routing rule only
 rule. Its calibration and full run, $56.705 in the rows, were therefore spent on a model the rule
 leaves out. The twelve-model totals in D-129 and D-131 stand as the record of what was billed.
 
+## D-133 — The traces reviewed before scoring: every row the frozen item, one per item, one model per key
+
+**Date:** 2026-09-29 · **Status:** RECORDED · **Evidence:** `full_run_28092026/trace_review.py`, `TRACE_REVIEW.md`
+
+An independent check of the twelve trace files, before anything is scored. Every model has a final row
+for each of its 2,250 items and no item has two; every row's item hash matches the manifest; no line is
+malformed; every row carries the pilot's prompt hash; and each model key has one set of request
+parameters and one served model id, so no model changed under the run. The newest local archive holds
+the twelve files byte for byte.
+
+The roster's eleven hold 24,750 final rows, 243 of them empty, and $247.92 in the rows; the
+set-aside Qwen3.8-27B adds $56.705, D-131's total.
+
+What the scoring has to carry:
+
+- **Empty rows concentrate.** 153 of the 243 fall on six templates, out of 165 rows each:
+  `qr_policy_one_iteration` 41, `work_isothermal_virial` 28,
+  `normal_depth_iteration` 23, `adiabatic_flame_temperature` 22,
+  `aoq_ati_rectifying` 21 and `vdw_solve_for_volume` 18. Four of them are iterative by
+  construction. An empty row scores 0 (D-117), so on these templates the score measures finishing within
+  the output ceiling as well as solving, and the paper should say so where it reports them.
+- **Muse Glimmer ran at a 16,384-token ceiling**, its only eligible endpoint's cap, where the others had
+  32,768 (D-121), so its empty rows are not strictly comparable with theirs.
+- **Among answered rows**, 18 stopped at the cap after some answer text and are scored on what they
+  state; 29 carry no answer marker the check looks for; 3 carry neither a marker nor a
+  number at the end, the candidates for the plan's "never states one", which the answer check decides.
+- **No `<think>` block** leaks into any answer text.
+- **Open-weight models were served by several endpoints**, up to 11 for
+  `glm-5.3-flash`, all under the fp8-or-better filter. A quantization change can move outputs, so the
+  paper should say the endpoint varied within the rule.
+
 ## Open decisions
 
 | # | Decision | Needed before |
