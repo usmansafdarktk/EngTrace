@@ -84,5 +84,24 @@ the endpoints that served the rows, `--empties` the templates of the empty rows,
 it to the rows written by a given time. It is free and calls nothing. The calibration's figures: D-123;
 the stop at the spend line: D-125.
 
+## Scoring and analysis (D-134 to D-136)
+
+`score.py` runs the deterministic evaluators over the traces once and keeps every raw output, one row
+per trace, in `scores/<variant>/<model>.jsonl`, gitignored like the traces: the answer check at three
+tolerances, E3 per milestone, the digit rule per step. `--gold` runs it on the gold solutions.
+`validate_scorer.py` checks it on the gold and on the pilot's 300 expert-labelled traces, where it
+reproduces all ten published agreement figures (`SCORER_VALIDATION.md`). A paraphrase or repeat run
+is scored as its own variant, against the original items.
+
+`analyze.py` computes ANALYSIS_PLAN.md's questions from the store and writes `results/RESULTS.md` and
+`results/results.json`, aggregates only; `--selftest` checks its statistics on synthetic data. The
+method choices the plan leaves open are fixed in its docstring (D-136).
+
+```bash
+python -m full_run_28092026.score --variant main --workers 8   # free
+python -m full_run_28092026.validate_scorer                    # free; needs the experts' labels, local
+python -m full_run_28092026.analyze                            # free
+```
+
 `testset/` is not this pool. It is the 2026-09-17 generation from the default seed, and the
 pilot's `freeze.py --verify` rebuilds its slice from it, so it is left as it is.

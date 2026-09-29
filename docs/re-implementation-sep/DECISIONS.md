@@ -4905,6 +4905,85 @@ What the scoring has to carry:
   `glm-5.3-flash`, all under the fp8-or-better filter. A quantization change can move outputs, so the
   paper should say the endpoint varied within the rule.
 
+## D-134 — The full-run scorer: every evaluator's raw output in one store, clean on gold, matching the pilot's expert agreement
+
+**Date:** 2026-09-29 · **Status:** DECIDED · **Evidence:** `full_run_28092026/score.py`, `validate_scorer.py`, `SCORER_VALIDATION.md`
+
+The deterministic stack runs once per trace and keeps what each evaluator returned, so every later
+analysis reads the store instead of re-scoring: `scores/<variant>/<model>.jsonl`, gitignored with the
+traces. A row holds:
+- the item's metadata;
+- the trace's metadata and the SHA-256 of its text;
+- the answer check's label at the fitted tolerance and at half and double it, with the targets it looked for;
+- E3's reached flag per milestone;
+- per step, the claims the digit rule checked and flagged.
+
+Steps are split by `e2_prm.steps_of`, the split the experts labelled, so a later judge's or router's
+step scores refer to the same steps. The evaluators are imported unmodified, and each run records their
+hashes and the commit in `CONFIG.json`.
+
+- **Variants.** `main` reads `traces/<model>.jsonl`; any other variant reads `traces/<variant>/<model>.jsonl`.
+  A paraphrased trace is scored against its original item, so its gold, milestones and question are the
+  original's. The two arms of Q5 then differ only in what the model wrote.
+- **Unusable** follows D-117. It is an empty row, or an answered one from which the answer check can read
+  no final answer: no answer marker, and no number or verdict word in the last 700 characters.
+- **Gold.** All 2,250 gold solutions score correct at all three tolerances, and none is unusable. E3 finds
+  every milestone in the 2,180 items that have one. The digit rule flags none of 6,625 claims in 9,391
+  steps. That count is below GOLD_VALIDATION.md's 6,917 because here a claim is read only within a step;
+  neither check flags one.
+- **The pilot's 300 traces** were scored by the same function as the full run and compared with the
+  experts' labels. All ten published agreement figures reproduce:
+  - the answer check's 0.947 and 0.893;
+  - E3's precision, recall and F1;
+  - the digit rule's precision and recall, on all traces and in the hard case.
+
+  The answer labels equal the pilot's own call on 300 of 300. The digit rule's tp/fp/fn equal
+  `digit_rule.py`'s: 99/21/289, and 57/19/121 in the hard case.
+- **The free main pass** has scored all twelve models, 2,250 final rows each. E5, the paid judge on the
+  milestones E3 does not find, is the next stage. It reads this store and writes beside it.
+
+## D-135 — Correction to D-120 and ANALYSIS_PLAN Q3: 70 items have no milestones, not 45
+
+**Date:** 2026-09-29 · **Status:** RECORDED · **Evidence:** `full_run_28092026/GOLD_VALIDATION.md` (its per-template counts), `score.py --gold`, `analyze.py`
+
+D-120 and the plan's Q3 say that "45 items, the whole of three templates" have no milestones. Those three
+templates are `gauss_law_symmetric`, `system_properties_memory_causality` and `system_property_linearity`,
+45 items in all. But 25 more items, in 12 other templates, also have none, so the total is 70.
+GOLD_VALIDATION.md's own per-template list shows a 0 in those templates' counts.
+
+Both documents also say that 52 templates have "some item with a single milestone". GOLD_VALIDATION.md
+counts items with at most one milestone: 52 templates have such an item, and 46 of them an item with
+exactly one. The rule is unchanged: these items are left out of milestone aggregates, not scored 0. The
+plan carries a dated note.
+
+## D-136 — The analysis script: where the plan is silent, the method is fixed before any result was read
+
+**Date:** 2026-09-29 · **Status:** DECIDED · **Evidence:** `full_run_28092026/analyze.py` (its docstring and `--selftest`)
+
+`analyze.py` computes Q1 to Q5 from the score store alone, together with the sensitivity analyses and the
+tables the plan reports without testing. It stops unless the store holds the pool the plan describes: 150
+templates of 15 items, 58 Easy, 34 Advanced and 58 single-path. It is committed before its first run on
+the scores. Where the plan names a quantity but not its method, the script fixes it:
+
+- **Q2's p-value** comes from permuting the tier labels among the 92 Easy and Advanced templates. It sits
+  beside the plan's within-tier bootstrap interval.
+- **Q3's groups.** A wrong-answer trace scores 0 (incorrect or unusable), and a correct-answer trace is
+  fully solved; a partial answer is in neither. A trace counts as flagged by the digit rule when any of its
+  steps is. Until E5 runs, coverage is E3's, which is E5's deterministic part, and E5's columns are empty.
+- **Q1's fully-solved check** agrees with the answer score on a pair when both tests hold at Holm-adjusted
+  0.05, or neither does. When both hold, they must also point in the same direction.
+- **Q5.** The paired difference is the item mean, and the sign flips act on each template's summed
+  difference. Kendall's τ's interval resamples templates, as the plan asks of every interval.
+- **Resampled p-values** are (count + 1) / (draws + 1). Each test has its own seed, so a re-run prints the
+  same numbers.
+- **Per-label accuracy** on classification templates takes the gold's label from its answer targets. The
+  Froude template's label is the regime its Froude number implies (D-118).
+- **The plan's fourth sensitivity**, without the two round-4 templates, does not arise, because round 4
+  returned and certified both (D-119).
+
+The self-test checks each statistic on synthetic data with a known answer. Among its checks, it plants a
+paraphrase loss in three of eleven synthetic models and finds it in those three and in no other.
+
 ## Open decisions
 
 | # | Decision | Needed before |

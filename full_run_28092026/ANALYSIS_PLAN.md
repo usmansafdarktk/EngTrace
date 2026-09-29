@@ -76,6 +76,9 @@ reader sees how much of each score a judge decided.
 Milestone coverage is not defined for an item with no milestones: 45 items, the whole of three
 templates (`GOLD_VALIDATION.md`), are left out of milestone aggregates rather than scored 0, and 52
 templates have some item with a single milestone, where coverage is close to an answer check.
+*Correction, 2026-09-29 (D-135):* 70 items have no milestones: the 45 of those three templates and 25
+more in 12 other templates. The 52 templates are those with an item of at most one milestone; 46 have an
+item with exactly one. The rule is unchanged.
 
 **Q4. Consistency within a template.** Per model, the share of templates solved, meaning fully correct,
 on all 15 instances, on some, and on none, reported separately for the single-path templates (one reasoning path across their 15

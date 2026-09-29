@@ -71,3 +71,6 @@ full_run_28092026/SEED.secret
 
 # The full run's traces restate the pool's questions, so they stay local like the pool.
 full_run_28092026/traces/
+
+# The full run's score store holds values derived from the private pool and traces.
+full_run_28092026/scores/
