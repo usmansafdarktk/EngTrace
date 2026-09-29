@@ -5129,7 +5129,7 @@ under both versions.
 
 ## D-141 — Variant runs, the paraphrase pipeline and the expert check: built and tested, nothing billed
 
-**Date:** 2026-09-29 · **Status:** DECIDED (each spend awaits the owner's approval) · **Evidence:** `full_run_28092026/subsamples.py`, `run_traces.py --variant`, `paraphrase.py`, `paraphrase_kit.py`, `paraphrase_app.py`, `paraphrase_guide.md`; the self-tests named below
+**Date:** 2026-09-29 · **Status:** DECIDED (the runs are the owner's to start, by `EVALUATION_GUIDE.md`) · **Evidence:** `full_run_28092026/subsamples.py`, `run_traces.py --variant`, `paraphrase.py`, `paraphrase_kit.py`, `paraphrase_app.py`, `paraphrase_guide.md`; the self-tests named below
 
 **The subsamples** are fixed in one module that the harness, the pipeline and the analysis all read.
 - **Paraphrase:** the plan's 1st, 6th and 11th item of each template in manifest order, 450 items,
@@ -5186,7 +5186,7 @@ that the served models match: by about 5 October.
 
 ## D-142 — E5 and the step router built for the full run, each reproducing the pilot exactly; nothing billed
 
-**Date:** 2026-09-29 · **Status:** DECIDED (each run awaits the owner's approval) · **Evidence:** `full_run_28092026/judge.py`, `router.py`, `judge_calls.py`, `E5_VALIDATION.md`, `ROUTER_VALIDATION.md`
+**Date:** 2026-09-29 · **Status:** DECIDED (the runs are the owner's to start, by `EVALUATION_GUIDE.md`) · **Evidence:** `full_run_28092026/judge.py`, `router.py`, `judge_calls.py`, `E5_VALIDATION.md`, `ROUTER_VALIDATION.md`, `EVALUATION_GUIDE.md`
 
 Both stages read score.py's store and write beside it: `scores/<variant>/e5/` and
 `scores/<variant>/router/`. Their replies are kept in stores keyed by the SHA-256 of (model, settings,
@@ -5238,12 +5238,12 @@ start from.
 
 | # | Decision | Needed before |
 |---|---|---|
-| D-141 | Approve writing the 450 paraphrases with Mistral Large 3: $0.15 to $0.45 (`paraphrase.py --dry-run`) | the expert check, and the paraphrase run by about 5 October |
-| D-141 | Approve the paraphrase run over the eleven models: about $49.2 on the main run's bills for the same items | the week of the main run, so the served models match |
-| D-141 | Approve the three decoding repeats of `gemma-4-26b-a4b`: about $0.28 | reporting the decoding spread |
+| D-141 | Run: writing the 450 paraphrases with Mistral Large 3, $0.15 to $0.45 (`EVALUATION_GUIDE.md`, the paraphrase arm) | the expert check, and the paraphrase run by about 5 October |
+| D-141 | Run: the paraphrase run over the eleven models, about $49.2 on the main run's bills for the same items | the week of the main run, so the served models match |
+| D-141 | Run: the three decoding repeats of `gemma-4-26b-a4b`, about $0.28 | reporting the decoding spread |
 | D-138 | The stricter match rule removes 252 credits, 129 of them on symbolic answers the check cannot verify either way: keep it (as decided) or reverse it | the paper's tables |
-| D-142 | Approve E5 over the eleven models: 8,032 calls, about $26.56 at Xiaomi's prices ($18.59 to $49.71), about 7 hours | Q3's E5 columns |
-| D-142 | Approve the step router over the eleven models: 24,506 calls, about $98 to $103 at Xiaomi's prices ($72 to $195), about 33 hours at 8 workers | Q3's router columns |
+| D-142 | Run: E5 over the eleven models, 8,032 calls, about $26.56 at Xiaomi's prices ($18.59 to $49.71), about 7 hours (`EVALUATION_GUIDE.md`, step 3) | Q3's E5 columns |
+| D-142 | Run: the step router over the eleven models, 24,506 calls, about $98 to $103 at Xiaomi's prices ($72 to $195), about 33 hours at 8 workers (`EVALUATION_GUIDE.md`, step 4) | Q3's router columns |
 | D-108 | ~~Whether the review app shows questions and solutions as plain text, as the models read them, and whether the 65 templates judged through its Markdown rendering get a plain-text look; fixing `signal_operations`'s origin marker~~ **Closed by the owner 2026-09-28 (D-114): the certification is closed and no template changes** | — |
 | D-107 | ~~Fix the five templates round 2 objected to~~ **Fixed 2026-09-26 (D-108) and re-certified in round 3 (D-109): all five approved by all three** | — |
 | D-106 | ~~Whether the screen re-judges the changed templates (a few cents, targeted; not run before round 2); the plasma row's per-row tag~~ **Closed by the owner 2026-09-28 (D-114): no re-judge** | — |

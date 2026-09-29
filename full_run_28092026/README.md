@@ -86,6 +86,9 @@ the stop at the spend line: D-125.
 
 ## Scoring and analysis (D-134 to D-136)
 
+Step by step, from scoring to the judged stages, the analysis, the paraphrase and repeat arms and
+the backups: `EVALUATION_GUIDE.md`.
+
 `score.py` runs the deterministic evaluators over the traces once and keeps every raw output, one row
 per trace, in `scores/<variant>/<model>.jsonl`, gitignored like the traces: the answer check at three
 tolerances, E3 per milestone, the digit rule per step. `--gold` runs it on the gold solutions.
