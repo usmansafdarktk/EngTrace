@@ -81,6 +81,21 @@ class Store:
                 'keys_failed': len(self.failures), 'keys_given_up': sum(n >= MAX_FAILURES for n in self.failures.values()),
                 'billed_usd_all_lines': round(self.spent_total, 4)}
 
+    def reply_stats(self) -> dict:
+        """Per reply marked ok: the mean and median completion tokens billed over its attempts (the dry
+        runs price the mean), the median seconds of its last attempt, and the mean billed cost where the
+        store records one. What the dry runs' pilot basis is checked against (D-152)."""
+        import statistics
+        rs = list(self.store.values())
+        if not rs:
+            return {'replies': 0}
+        out = [r.get('billed_completion_tokens') or r.get('completion_tokens') or 0 for r in rs]
+        billed = [r['billed_usd'] for r in rs if r.get('billed_usd') is not None]
+        return {'replies': len(rs), 'completion_tokens_mean': round(statistics.mean(out)),
+                'completion_tokens_median': statistics.median(out),
+                'seconds_median': round(statistics.median(r.get('seconds') or 0 for r in rs), 1),
+                'billed_usd_mean': round(sum(billed) / len(billed), 5) if billed else None}
+
 
 def client(timeout: float = 300.0):
     from dotenv import load_dotenv

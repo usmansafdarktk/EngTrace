@@ -186,6 +186,9 @@ def status(variant: str, keys: list[str]) -> int:
     """What the reply store holds and what the stage has written. Free."""
     st = jc.Store(REPLIES)
     print(f'reply store {REPLIES.name}: {st.summary()}')
+    print(f'  per reply, this store: {st.reply_stats()}')
+    if PILOT_REPLIES.exists():
+        print(f'  the dry run\'s basis, from the pilot\'s labelled replies: {pilot_basis()}')
     out_dir = score.SCORES / variant / 'router'
     for key in keys:
         p = out_dir / f'{key}.jsonl'
