@@ -73,7 +73,8 @@ def one_call(cli, model: str, prompt: str, **kw) -> dict:
 
 def run(jobs: dict[str, str], fetch, store: Store, workers: int, max_usd: float, label: str) -> dict:
     """Fetch every job {key: prompt} not already in the store. Stops starting calls once the spend
-    passes max_usd; a call past its deadline is written as a failure, so the next run asks it again."""
+    passes max_usd; the calls already running still finish, so the spend can pass the cap by about one
+    call per worker. A call past its deadline is written as a failure, so the next run asks it again."""
     todo = {k: p for k, p in jobs.items() if store.get(k) is None}
     print(f'{label}: {len(jobs)} calls in all, {len(todo)} not in the store; {workers} workers, '
           f'cap ${max_usd:.2f}', flush=True)
