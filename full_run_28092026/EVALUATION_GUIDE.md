@@ -131,7 +131,7 @@ sampling noise at the providers' default decoding. About $0.09 a repeat.
 ```bash
 python -m full_run_28092026.run_traces --variant repeat1 --model gemma-4-26b-a4b --dry-run
 python -m full_run_28092026.run_traces --variant repeat1 --model gemma-4-26b-a4b --workers 15 --yes
-python -m full_run_28092026.run_traces --variant repeat1 --status
+python -m full_run_28092026.run_traces --variant repeat1 --model gemma-4-26b-a4b --status
 python -m full_run_28092026.trace_review --variant repeat1        # writes TRACE_REVIEW_repeat1.md; "as main" must be yes
 python -m full_run_28092026.score --variant repeat1
 ```
@@ -139,7 +139,7 @@ python -m full_run_28092026.score --variant repeat1
 Then the same with `repeat2` and `repeat3`. `--status` must show missing 0 before scoring; a re-run
 of the same command fills the gaps. `analyze` then prints the decoding-repeats table: the three
 scores on the same items, their SD and range, and the share of items with the same verdict in every
-repeat. A repeat needs `--model`: the harness refuses a bare repeat run.
+repeat. A repeat needs `--model`: the harness refuses a bare repeat run or status.
 
 ## 6. The digit rule's flags: an author reads a sample
 
