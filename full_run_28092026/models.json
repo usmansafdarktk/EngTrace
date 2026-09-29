@@ -32,7 +32,13 @@
     "  - qwen3-235b-a22b-2507: its cheapest fp8-or-better endpoint (GMICloud, fp8) charges the document's",
     "    Qwen price, $0.087/$0.35 per M.",
     "  - qwen3.8-27b: priced at its cheapest fp8-or-better endpoint (DeepInfra, bf16), $0.15/$1.875 per M,",
-    "    read on 2026-09-29."
+    "    read on 2026-09-29.",
+    "",
+    "The roster the analysis scores (D-132) is the eleven with qwen3-235b-a22b-2507 in the Qwen slot.",
+    "An entry with \"run\": false is inert (D-148): kept for the record of what was priced or run, but no",
+    "mode calls it unless --model names it. The original qwen3-235b-a22b was never run (no endpoint met",
+    "the routing rule; replaced by the 2507 release), and qwen3.8-27b is set aside under the roster rule,",
+    "so neither belongs in a variant run."
   ],
   "route": {
     "base_url": "https://openrouter.ai/api/v1",
@@ -87,6 +93,8 @@
       "key": "qwen3-235b-a22b",
       "model": "qwen/qwen3-235b-a22b",
       "weights": "open",
+      "run": false,
+      "run_reason": "never run: no endpoint met the fp8-or-better rule (D-121); replaced by qwen3-235b-a22b-2507 (D-132)",
       "price_per_m": {
         "in": 0.087,
         "out": 0.35
@@ -105,6 +113,8 @@
       "key": "qwen3.8-27b",
       "model": "qwen/qwen3.8-27b",
       "weights": "open",
+      "run": false,
+      "run_reason": "main run complete and set aside under the roster rule (D-132); not part of any variant run",
       "price_per_m": {
         "in": 0.15,
         "out": 1.875

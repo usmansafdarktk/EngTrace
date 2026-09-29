@@ -112,7 +112,11 @@ version with `kaggle datasets version -p . -m "<what changed>"`, and check it ag
 |---|---|---|---|
 | `answered` | Text came back, even if truncated. | No | Yes, by the answer check |
 | `empty` | The model returned no text. | No | 0 |
-| `service_failure` | The HTTP error, timeout or provider fault persisted through 4 attempts. | Yes | Never |
+| `service_failure` | The HTTP error, timeout or provider fault persisted through 4 attempts. A reply whose finish reason is `error` counts as a fault since D-148; seven such rows in the main run were kept and are reported as a count. | Yes | Never |
+
+An entry in `models.json` with `"run": false` is inert (D-148): no mode calls it unless `--model`
+names it, and the dry run and the status say so. The original `qwen3-235b-a22b` and the set-aside
+`qwen3.8-27b` are inert, so a bare variant run cannot bill them.
 
 ## If something goes wrong
 

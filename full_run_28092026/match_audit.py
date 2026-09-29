@@ -38,8 +38,8 @@ NUM = re.compile(r'[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?')                  # answer.N
 NUM_S = re.compile(r'(?<![\d.])(?<!_)(?<!_\{)[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?')
 
 
-def match_d137(gold, have, rel=answer.REL, exact=False, gold_ulp=0.0):
-    """answer.match at D-137."""
+def match_d137(gold, have, rel=answer.REL, exact=False, gold_ulp=0.0, unit=1.0):
+    """answer.match at D-137 (`unit` is accepted and ignored: answer.verdict passes it since D-147)."""
     for v, u in have:
         for sc in answer.SCALES:
             t, tu = v * sc, u * sc
@@ -54,7 +54,7 @@ def match_d137(gold, have, rel=answer.REL, exact=False, gold_ulp=0.0):
 MATCH = match_d137
 
 
-def match_r(gold, have, rel=answer.REL, exact=False, gold_ulp=0.0):
+def match_r(gold, have, rel=answer.REL, exact=False, gold_ulp=0.0, unit=1.0):
     for v, u in have:
         for sc in answer.SCALES:
             t, tu = v * sc, u * sc

@@ -177,8 +177,9 @@ def main() -> int:
          f"{step_c['hard']['tp']}/{step_c['hard']['fp']}/{step_c['hard']['fn']}.", '',
          f'"Published code" is the scorer with `answer.py` and `milestones.py` as they were published, at '
          f'`{parser_fix.PRE_FIX[:7]}`; "now" is the current code: LaTeX numbers read (D-137, `PARSER_FIX.md`), '
-         'no credit from a subscript or a bare 0 or 1 (D-138, `MATCH_AUDIT.md`) and a verdict word decided within '
-         'its family (D-139, `WORD_AUDIT.md`); the last two change none of these verdicts. The digit rule is '
+         'no credit from a subscript or a bare 0 or 1 (D-138, `MATCH_AUDIT.md`), a verdict word decided within '
+         'its family (D-139, `WORD_AUDIT.md`) and the last-digit windows decided by the rule rather than by binary '
+         'rounding (D-147, `BOUNDARY_AUDIT.md`); the last three change none of these verdicts. The digit rule is '
          'unchanged.', '',
          '| figure | published | published code | reproduced | now |', '|---|---:|---:|---|---:|']
     ok = g['answer_correct_all_three_tols'] == g['items'] and not g['unusable'] and not g['digit_flags']

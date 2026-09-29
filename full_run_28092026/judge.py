@@ -14,7 +14,9 @@ original item's, for a paraphrase variant too, as score.py scores it.
 THE CALL is E1's (e1_panel.CALL: JSON mode, temperature 0, 16,384 tokens), up to three attempts, an
 empty or malformed reply asked again (e1_panel.malformed), at OpenRouter's default routing, as the
 pilot called it. The key is the pilot's, the SHA-256 of (model, settings, prompt), so a prompt already
-answered is read from the store, never bought again.
+answered is read from the store, never bought again. The client's timeout is 300 s with no SDK
+retries, so one fetch (three attempts) stays inside judge_calls.DEADLINE; the pilot's 600 s with two
+SDK retries could outlive it (D-148).
 
 WHAT IS WRITTEN. scores/<variant>/e5/<model>.jsonl, one row per trace:
   - each milestone's source: e3, REACHED, NOT_NEEDED, MISSING, or UNJUDGED when the reply omits it;
@@ -122,7 +124,7 @@ def jobs_for(variant: str, key: str, items: dict, ms_all: dict) -> list[tuple]:
     """(row, milestones, job or None) for every scored trace of one model."""
     rows = {r['item_id']: r for r in map(json.loads, (score.SCORES / variant / f'{key}.jsonl')
                                               .read_text(encoding='utf-8').splitlines())}
-    texts = {r['item_id']: r.get('text') or '' for r in score.trace_rows(variant, key)}
+    texts = score.texts_matching(variant, key, rows.values())   # refuses if a trace no longer matches its store row
     out = []
     for i, row in rows.items():
         ms = ms_all[i]
@@ -155,9 +157,28 @@ def write(variant: str, keys: list[str], store: jc.Store) -> dict:
     (out_dir / 'CONFIG.json').write_text(json.dumps({'judge': e5.JUDGE, 'call': e1.CALL, 'attempts': e1.ATTEMPTS,
                                                      'prompt_sha256': e5.config()['prompt_sha256'],
                                                      'e5_sha256': e5.config()['e5_sha256'],
+                                                     'models': totals, 'reply_store': store.summary(),
+                                                     **jc.provenance(score.SCORES / variant / 'CONFIG.json'),
                                                      'written_at_utc': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())},
                                                     indent=1) + '\n', encoding='utf-8')
     return totals
+
+
+def status(variant: str, keys: list[str]) -> int:
+    """What the reply store holds and what the stage has written. Free."""
+    st = jc.Store(REPLIES)
+    print(f'reply store {REPLIES.name}: {st.summary()}')
+    out_dir = score.SCORES / variant / 'e5'
+    for key in keys:
+        p = out_dir / f'{key}.jsonl'
+        if not p.exists():
+            print(f'  {key:24s} no rows written')
+            continue
+        rows = [json.loads(l) for l in p.read_text(encoding='utf-8').splitlines()]
+        sent = [r for r in rows if r['sent']]
+        print(f'  {key:24s} rows {len(rows)}, calls {len(sent)}, without a reply '
+              f'{sum(r["reply_ok"] is False for r in sent)}, milestones unjudged {sum(r["unjudged"] for r in sent)}')
+    return 0
 
 
 def prices() -> dict:
@@ -222,11 +243,7 @@ def paid(variant: str, keys: list[str], workers: int, max_usd: float) -> int:
     items = score.pool_items()
     ms_all = score.milestone_sets(items)
     store = jc.Store(REPLIES)
-    jobs = {}
-    for key in keys:
-        for *_, j in jobs_for(variant, key, items, ms_all):
-            if j:
-                jobs[j[2]] = j[1]
+    jobs = jc.interleave({key: {j[2]: j[1] for *_, j in jobs_for(variant, key, items, ms_all) if j} for key in keys})
     cli = jc.client()
     summary = jc.run(jobs, lambda p: fetch(p, cli), store, workers, max_usd, 'E5')
     print(write(variant, keys, store))
@@ -321,10 +338,12 @@ def main() -> int:
     ap.add_argument('--dry-run', action='store_true')
     ap.add_argument('--validate', action='store_true')
     ap.add_argument('--score', action='store_true')
+    ap.add_argument('--status', action='store_true', help='FREE: the reply store and the rows written')
     ap.add_argument('--variant', default='main')
     ap.add_argument('--model', action='append')
     ap.add_argument('--workers', type=int, default=16)
-    ap.add_argument('--max-usd', type=float, default=100.0)
+    ap.add_argument('--max-usd', type=float, default=100.0,
+                    help='the cumulative cap for the stage: what the reply store already records counts toward it')
     ap.add_argument('--yes', action='store_true', help='required for the run, which bills')
     a = ap.parse_args()
     if a.validate:
@@ -332,6 +351,8 @@ def main() -> int:
     keys = a.model or roster(a.variant)
     if a.dry_run:
         return dry_run(a.variant, keys, a.workers)
+    if a.status:
+        return status(a.variant, keys)
     if a.score:
         print(write(a.variant, keys, jc.Store(REPLIES)))
         return 0

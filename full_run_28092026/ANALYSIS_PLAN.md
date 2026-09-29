@@ -34,6 +34,10 @@ that fair:
 
 Per model, the unusable rate is reported beside the score, and an appendix gives the score with unusable
 traces excluded.
+*Note, 2026-09-30 (D-148):* seven answered rows in the main run ended with a finish reason of `error` or
+none, a provider fault reported inside a 200, and were scored on what they state (3 correct, 3 incorrect,
+1 unusable); they are reported as a count, and the harness now retries such a reply as a service failure.
+The unusable count is reported as empty plus unreadable.
 
 **A partial answer scores 0.5** (the owner, 2026-09-28: not fully correct, but awarded some points). A
 correct answer scores 1 and an incorrect or unusable one 0, so a model's **answer score** is its mean over
@@ -42,6 +46,12 @@ expert validation measured: agreement 0.893 three-way and 0.947 on the traces th
 right or fully wrong (RESULTS_X1 Finding 1b). A fraction of parts correct would be finer, but it was never
 compared with the experts. Only multipart items can be partial, 480 of 2,250. Reported beside the answer
 score: the **fully-solved rate**, in which a partial scores 0, and each model's three-way split.
+*Correction, 2026-09-30 (D-145):* the sentence "only multipart items can be partial" was wrong. The check
+gives `partial` whenever some but not all of an item's targets match, and 531 items carry more than one
+target: 352 multipart, 83 symbolic, 51 vector and 45 classification. In the store 278 of the roster's 514
+partial verdicts fall on non-multipart items. Seven multipart templates have a single target on every
+item, and 84 multipart items are checked on fewer quantities than the question's labelled parts; "correct"
+means every quantity the check verifies. The rule is unchanged.
 
 ## Confirmatory questions
 
@@ -67,6 +77,13 @@ of the template-mean score within a tier, the smallest gap this detects at 80% p
 
 The paper reports each model's gap with its interval and this table; the May version's cliff claim is not
 carried over unless it survives this test.
+*Correction, 2026-09-30 (D-146):* the permutation test `analyze.py` added beside this interval (D-136)
+shuffles tier labels on the raw difference, which is liberal when the smaller tier has the larger spread;
+Advanced template means spread two to four times as widely as Easy ones, and the test's count of models
+moved with its seed. The count now rests on Welch's t-test with Holm across the eleven models, with the
+planned permutation printed beside it, and the detectable gap is also given at the strictest Holm step
+from the Welch standard error. The gap is also shown with unusable rows left out of the template means
+and without the nine symbolic templates. The intervals above are unchanged.
 
 **Q3. What process scores add beyond the answer.** Descriptive, with template-level intervals and no
 ranking claims: E5 milestone coverage on wrong-answer traces (how far a model gets before it fails); the
@@ -79,6 +96,12 @@ templates have some item with a single milestone, where coverage is close to an 
 *Correction, 2026-09-29 (D-135):* 70 items have no milestones: the 45 of those three templates and 25
 more in 12 other templates. The 52 templates are those with an item of at most one milestone; 46 have an
 item with exactly one. The rule is unchanged.
+*Corrections and additions, 2026-09-30 (D-148, D-149):* the digit rule's flag rate on wrong answers is
+over the answered wrong answers, because an empty trace has no step to flag; the first version counted
+the empties. Reported beside the rates, descriptive: the 1% flag rate E4 shipped with; E3's chance floor
+per model, the trace scored against a sibling item's milestones; where the first flagged step falls in a
+fully solved trace; and the wrong-answer rate against the item's milestone count. A judged stage with
+calls left unanswered is incomplete: its rates are over the answered calls and the count is printed.
 
 **Q4. Consistency within a template.** Per model, the share of templates solved, meaning fully correct,
 on all 15 instances, on some, and on none, reported separately for the single-path templates (one reasoning path across their 15
@@ -104,6 +127,12 @@ widens it:
 |---|---|---|---|
 | detectable paired difference | 3.0 points | 4.2 points | 5.1 points |
 
+*Additions, 2026-09-30 (D-149):* beside the answer score, the paired difference in E3 milestone coverage
+on the items with milestones, and in E5-strict once E5 has run on both arms (the coverage delta
+NEXT_CYCLE_REVIEW section 6 asks for); and the answer-score difference on the pairs both arms served from
+the same endpoint, since the arms run the same routing and each row records its provider. Kendall's tau is
+read against its noise floor (below).
+
 ## Sensitivity analyses
 
 - The answer check's relative tolerance at half and at double the fitted value.
@@ -111,6 +140,13 @@ widens it:
 - Headline accuracy without the four templates the pilot excluded for shortcuts: two predictable from the
   question surface (D-057), one about 90% shortcuttable (D-046), one with a blind-guess floor of 1.0 (D-066).
 - Without the two templates widened for round 4, if round 4 has not returned when the paper is written.
+- *Added 2026-09-30 (D-147, D-149), after the first results were read:* without the nine symbolic
+  templates, whose answers the check scores by the numbers they state (D-138); the answer check's
+  half-unit window, a correct rounding at the precision shown where the rule accepts one unit either way;
+  the whole-trace reading, which credits a quantity the question asks for when it is computed in the body
+  and left off the Answer line; and a noise floor for Kendall's tau, the ordering on one half of each
+  template's items against the other. The experts could not arbitrate the first two readings (no pilot
+  verdict moves) and split the third one each way, so none is the score.
 
 ## Also reported, not tested
 

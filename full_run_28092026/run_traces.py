@@ -190,6 +190,10 @@ def call(cli, spec: dict, cfg: dict, question: str, attempts: int = MAX_ATTEMPTS
             msg = r.choices[0].message
             extra = getattr(msg, 'model_extra', None) or {}
             text = msg.content or ''
+            if r.choices[0].finish_reason == 'error':
+                # A provider fault reported inside a 200: not the model's answer (D-148). Seven such
+                # rows in the main run were scored on what they state and are reported as a count.
+                raise RuntimeError('provider reported finish_reason=error')
             row = {
                 'text': text,
                 'reasoning': getattr(msg, 'reasoning', None) or extra.get('reasoning') or '',
@@ -390,9 +394,15 @@ def main() -> int:
     a = ap.parse_args()
 
     cfg = config()
-    specs = [s for s in cfg['models'] if not a.model or s['key'] in a.model]
+    # An entry with "run": false is inert (D-148): no mode calls it unless --model names it, and the
+    # dry run and the status say so instead of listing it as missing.
+    inert = {s['key']: s.get('run_reason', '') for s in cfg['models'] if s.get('run') is False}
+    specs = [s for s in cfg['models'] if (a.model and s['key'] in a.model) or (not a.model and s['key'] not in inert)]
     if not specs:
         raise SystemExit(f'no model matches {a.model}')
+    for k, why in inert.items():
+        if not a.model or k not in a.model:
+            print(f'{k}: inert (run: false): {why}')
     if a.variant != 'main' and a.calibrate:
         raise SystemExit('--calibrate is for the main run; a variant is estimated from its bills')
     if a.variant in subsamples.REPEAT_VARIANTS and not a.model:

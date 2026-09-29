@@ -138,7 +138,10 @@ def _ulp(lit):
     return 10.0 ** ((int(m.group(3)) if m.group(3) else 0) - len(m.group(2)))
 
 
-def match(gold, have, rel=REL, exact=False, gold_ulp=0.0):
+SLACK = 1e-9          # the windows below are inclusive; this keeps binary floating point from deciding a boundary
+
+
+def match(gold, have, rel=REL, exact=False, gold_ulp=0.0, unit=1.0):
     """Does any stated value equal `gold`?
 
     Three ways to be right, because one relative tolerance cannot serve them all:
@@ -156,6 +159,12 @@ def match(gold, have, rel=REL, exact=False, gold_ulp=0.0):
     A number's own last digit vouches for it only when one unit of that digit is smaller than
     the number (D-138). A bare `0` or `1` fails that: one unit either side reaches zero, so under
     some unit factor it lies within one unit of any gold - `1` at 1e6 is 1,000,000 +- 1,000,000.
+
+    The windows are inclusive, and a value exactly one unit off sits on the boundary: `0.638` for
+    0.639 is 0.0010000000000000009 away in binary, so the comparison carries a relative slack of
+    SLACK, and the verdict no longer depends on how the difference rounds (D-147). `unit` scales
+    the two last-digit windows: 1.0 is the rule the experts validated; 0.5 is the stricter
+    "correct rounding" reading, reported as a sensitivity only.
     """
     for v, u in have:
         for sc in SCALES:
@@ -163,7 +172,7 @@ def match(gold, have, rel=REL, exact=False, gold_ulp=0.0):
             if exact:
                 if abs(t - gold) <= 1e-9 * max(1.0, abs(gold)):
                     return True
-            elif abs(t - gold) <= max(rel * abs(gold), tu if abs(v) > u else 0.0, gold_ulp):
+            elif abs(t - gold) <= max(rel * abs(gold), unit * tu if abs(v) > u else 0.0, unit * gold_ulp) * (1 + SLACK):
                 return True
     return False
 
@@ -339,11 +348,19 @@ def _word_hit(low, w):
     return last == w
 
 
-def verdict(text, item, tol=None, ms=None):
+def verdict(text, item, tol=None, ms=None, unit=1.0, whole=False):
     """('correct' | 'partial' | 'incorrect', detail). Every part must match for correct.
 
     `tol` overrides the relative tolerance for callers that want to sweep it; the ulp rule
-    in match() applies either way.
+    in match() applies either way. `unit` scales the last-digit windows (see match).
+
+    `whole` is the body-lenient reading of D-147, a sensitivity, never the score: a numeric
+    part the Answer line leaves out is credited when the trace states it anywhere, but only
+    for a trace whose Answer line already matches at least one part. An Answer line that
+    matches nothing stays incorrect whatever the body holds: crediting a wrong final answer
+    because the right number appears in the working moved 27 pilot verdicts away from the
+    experts (BOUNDARY_AUDIT.md), and it is not the omission the reading is about. The prompt
+    asks for the final result on the Answer line, and the experts validated the check there.
     """
     want = targets(item, ms)
     seg = segment(text)
@@ -355,12 +372,18 @@ def verdict(text, item, tol=None, ms=None):
     for v, gu in want['numbers']:
         # |v| too: a deflection the gold states as 7.3 mm downward and the trace as
         # -7.326 mm is the same answer under a different sign convention.
-        hits.append(match(v, have, rel, want['exact'], gu)
-                    or match(abs(v), absolute, rel, want['exact'], gu))
+        hits.append(match(v, have, rel, want['exact'], gu, unit)
+                    or match(abs(v), absolute, rel, want['exact'], gu, unit))
     for w in want['words']:
         hits.append(_word_hit(low, w))
     for label, value in want.get('labeled', []):
         hits.append(_stance(low, label) == value)
+    if whole and any(hits) and not all(hits[:len(want['numbers'])]):
+        body = values(text)
+        body_abs = [(abs(v), u) for v, u in body]
+        for k, (v, gu) in enumerate(want['numbers']):
+            hits[k] = hits[k] or match(v, body, rel, want['exact'], gu, unit) \
+                or match(abs(v), body_abs, rel, want['exact'], gu, unit)
     if not hits:
         return 'incorrect', {'targets': want, 'matched': 0, 'of': 0}
     n = sum(hits)
@@ -460,6 +483,37 @@ def selftest():
         if got != want:
             bad += 1
             print('FAIL want %-9s got %-9s | %s' % (want, got, ' '.join(trace.split())[:60]))
+    # D-147: the boundary is decided by the rule, not by binary rounding, and the half-unit and
+    # whole-trace readings are what they say
+    boundary = [
+        # exactly one unit of the stated last digit off, where that window is the binding one (the
+        # relative tolerance is narrower): inside the inclusive window, whatever the float noise -
+        # 0.063 - 0.062 is 0.0010000000000000009 in binary
+        ('**Answer:** x = 0.063', '', 'scalar', (0.063,), '**Answer:** x = 0.062', 'correct', 1.0, False),
+        ('**Answer:** x = 0.063', '', 'scalar', (0.063,), '**Answer:** x = 0.062', 'incorrect', 0.5, False),
+        ('**Answer:** V = 114 m3', '', 'scalar', (114.0,), '**Answer:** V = 113 m3', 'correct', 1.0, False),
+        ('**Answer:** V = 114 m3', '', 'scalar', (114.0,), '**Answer:** V = 113 m3', 'incorrect', 0.5, False),
+        # two units off is outside both windows
+        ('**Answer:** V = 114 m3', '', 'scalar', (114.0,), '**Answer:** V = 112 m3', 'incorrect', 1.0, False),
+        # a correct rounding passes under both readings
+        ('**Answer:** V = 113.55 cm3/mol', '', 'scalar', (113.55,), '**Answer:** 114 cm3/mol', 'correct', 0.5, False),
+        # the whole-trace reading credits a value stated in the body but not on the Answer line
+        ('**Answer:** k = 74254 N/m and omega_n = 30.54 rad/s', '', 'multipart', (74254.0, 30.54),
+         '**Step 2:** k_eq = 74254 N/m\n## Final Answer\n**Answer:** 30.54 rad/s', 'partial', 1.0, False),
+        ('**Answer:** k = 74254 N/m and omega_n = 30.54 rad/s', '', 'multipart', (74254.0, 30.54),
+         '**Step 2:** k_eq = 74254 N/m\n## Final Answer\n**Answer:** 30.54 rad/s', 'correct', 1.0, True),
+        # ...but never a wrong Answer line whose body happens to hold the right number
+        ('**Answer:** V = 113.55 cm3/mol', '', 'scalar', (113.55,),
+         '**Step 3:** V = 113.55 cm3/mol\n## Final Answer\n**Answer:** 98.20 cm3/mol', 'incorrect', 1.0, True),
+        ('**Answer:** k = 74254 N/m and omega_n = 30.54 rad/s', '', 'multipart', (74254.0, 30.54),
+         '**Step 2:** k_eq = 74254 N/m, omega_n = 30.54\n## Final Answer\n**Answer:** 12.3 rad/s', 'incorrect', 1.0, True),
+    ]
+    for sol, q, typ, ms, trace, want, unit, whole in boundary:
+        got, _d = verdict(trace, item(sol, q, typ), ms=ms, unit=unit, whole=whole)
+        if got != want:
+            bad += 1
+            print('FAIL want %-9s got %-9s (unit %s, whole %s) | %s' % (want, got, unit, whole, ' '.join(trace.split())[:50]))
+    cases += boundary
     # values() alone: grouping joins only a number's own digits (D-137)
     reads = [('\\(\\log_2\\,256 = 8\\)', 2256.0, False), ('\\(x_1\\,000\\)', 1000.0, False),
              ('\\boxed{1\\,335}\\ \\text{K}', 1335.0, True), ('\\(4\\,477.9\\ \\text{psi}\\)', 4477.9, True),

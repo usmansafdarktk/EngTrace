@@ -84,27 +84,36 @@ the endpoints that served the rows, `--empties` the templates of the empty rows,
 it to the rows written by a given time. It is free and calls nothing. The calibration's figures: D-123;
 the stop at the spend line: D-125.
 
-## Scoring and analysis (D-134 to D-136)
+## Scoring and analysis (D-134 to D-136, corrected in D-143 to D-149)
 
 Step by step, from scoring to the judged stages, the analysis, the paraphrase and repeat arms and
 the backups: `EVALUATION_GUIDE.md`.
 
 `score.py` runs the deterministic evaluators over the traces once and keeps every raw output, one row
 per trace, in `scores/<variant>/<model>.jsonl`, gitignored like the traces: the answer check at three
-tolerances, E3 per milestone, the digit rule per step. `--gold` runs it on the gold solutions.
-`validate_scorer.py` checks it on the gold and on the pilot's 300 expert-labelled traces, where it
-reproduces all ten published agreement figures (`SCORER_VALIDATION.md`). A paraphrase or repeat run
-is scored as its own variant, against the original items.
+tolerances and under two sensitivity readings, E3 per milestone with the chance floor against a
+sibling item, the digit rule per step. `--gold` runs it on the gold solutions. `validate_scorer.py`
+checks it on the gold and on the pilot's 300 expert-labelled traces, where it reproduces all ten
+published agreement figures (`SCORER_VALIDATION.md`). A paraphrase or repeat run is scored as its own
+variant, against the original items. `CONFIG.json` beside the rows records what scored them: the
+commit and tag, a dirty flag, every evaluator file's LF-normalised hash and blob, the inputs' hashes
+and each model's trace hash (D-144); a store scored with other code is archived by `--replace`, never
+overwritten.
 
-`analyze.py` computes ANALYSIS_PLAN.md's questions from the store and writes `results/RESULTS.md` and
-`results/results.json`, aggregates only; `--selftest` checks its statistics on synthetic data. The
-method choices the plan leaves open are fixed in its docstring (D-136). `--store main_pre_d137` writes
-the same tables from the scores before the evaluator fixes, as a labelled record (D-140).
+`analyze.py` computes ANALYSIS_PLAN.md's questions from the store and writes `results/RESULTS.md`,
+`results/results.json` and `results/per_template.csv`, aggregates only; `--selftest` checks its
+statistics on synthetic data. The method choices the plan leaves open are fixed in its docstring
+(D-136), and the corrections and additions made after the first results were read are labelled where
+they appear (D-146, D-148, D-149). `--store main_pre_d137` writes the same tables from the scores
+before the evaluator fixes, as a labelled record (D-140).
 
 The first results showed three defects in the answer check, each fixed after being measured on the
 gold, on the pilot's expert labels and on the full run: LaTeX numbers (D-137, `parser_fix.py`,
 `PARSER_FIX.md`), credit from stray digits (D-138, `match_audit.py`, `MATCH_AUDIT.md`), and verdict
-words (D-139, `word_audit.py`, `WORD_AUDIT.md`).
+words (D-139, `word_audit.py`, `WORD_AUDIT.md`). Two independent reviews then found the last-digit
+windows decided by binary rounding at their edge; the inclusive rule was adopted the same way, and
+the half-unit and whole-trace readings are reported as sensitivities (D-147, `boundary_audit.py`,
+`BOUNDARY_AUDIT.md`).
 
 ```bash
 python -m full_run_28092026.score --variant main --workers 8   # free
