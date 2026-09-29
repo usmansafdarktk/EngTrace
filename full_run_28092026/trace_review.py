@@ -59,8 +59,12 @@ def manifest() -> dict[str, dict]:
 
 
 def variant_manifest(variant: str, man: dict) -> dict[str, dict]:
-    """What a variant's rows must hash to: the pool for a repeat, the passing paraphrases for the
-    paraphrase arm (with the original's hash beside each)."""
+    """What a variant's rows must hash to: the pool's entries for a repeat's 300 items (D-151; the whole
+    pool before, which counted the other 1,950 as missing), the passing paraphrases for the paraphrase
+    arm (with the original's hash beside each)."""
+    from full_run_28092026 import subsamples
+    if variant in subsamples.REPEAT_VARIANTS:
+        return {i: man[i] for i in subsamples.repeat_ids()}
     if variant != 'paraphrase':
         return man
     p = HERE / 'paraphrase' / 'manifest.jsonl'

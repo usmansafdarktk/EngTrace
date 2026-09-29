@@ -1,0 +1,180 @@
+{
+ "variant": "repeat3",
+ "models": [
+  {
+   "key": "gpt-oss-20b",
+   "lines": 300,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 294,
+    "empty": 6
+   },
+   "items": 300,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 294,
+   "empty": 6,
+   "modes": {
+    "repeat3": 300
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "openai/gpt-oss-20b": 300
+   },
+   "served_as_main": true,
+   "providers": {
+    "Darkbloom": 300
+   },
+   "provider_count": 1,
+   "capped_with_text": 2,
+   "no_answer_marker": 2,
+   "no_marker_no_number": 2,
+   "no_marker_templates": {
+    "template_decimation_aliasing_analysis": 1,
+    "template_absorbing_chain_time_to_failure": 1
+   },
+   "think_in_text": 0,
+   "empty_templates": {
+    "template_upward_seepage_quick_condition": 1,
+    "template_vdw_solve_for_volume": 1,
+    "template_slope_deflection_end_moment": 1,
+    "template_force_method_continuous_beam": 1,
+    "template_vdw_solve_for_pressure": 1,
+    "template_statically_indeterminate_shaft": 1
+   },
+   "empty_by_template_all": {
+    "template_upward_seepage_quick_condition": 1,
+    "template_vdw_solve_for_volume": 1,
+    "template_slope_deflection_end_moment": 1,
+    "template_force_method_continuous_beam": 1,
+    "template_vdw_solve_for_pressure": 1,
+    "template_statically_indeterminate_shaft": 1
+   },
+   "output_tokens_median": 1693.0,
+   "output_tokens_max": 32768,
+   "billed_usd": 0.091
+  },
+  {
+   "key": "gemma-4-26b-a4b",
+   "lines": 300,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 300
+   },
+   "items": 300,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 300,
+   "empty": 0,
+   "modes": {
+    "repeat3": 300
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "google/gemma-4-26b-a4b-it": 300
+   },
+   "served_as_main": true,
+   "providers": {
+    "DekaLLM": 291,
+    "NextBit": 9
+   },
+   "provider_count": 2,
+   "capped_with_text": 0,
+   "no_answer_marker": 0,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {},
+   "think_in_text": 0,
+   "empty_templates": {},
+   "empty_by_template_all": {},
+   "output_tokens_median": 786.0,
+   "output_tokens_max": 3646,
+   "billed_usd": 0.092
+  },
+  {
+   "key": "qwen3-235b-a22b-2507",
+   "lines": 300,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 300
+   },
+   "items": 300,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 300,
+   "empty": 0,
+   "modes": {
+    "repeat3": 300
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "qwen/qwen3-235b-a22b-2507": 300
+   },
+   "served_as_main": true,
+   "providers": {
+    "GMICloud": 296,
+    "Parasail": 4
+   },
+   "provider_count": 2,
+   "capped_with_text": 0,
+   "no_answer_marker": 0,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {},
+   "think_in_text": 0,
+   "empty_templates": {},
+   "empty_by_template_all": {},
+   "output_tokens_median": 691.5,
+   "output_tokens_max": 8130,
+   "billed_usd": 0.111
+  },
+  {
+   "key": "gemini-3.1-flash-lite",
+   "lines": 300,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 300
+   },
+   "items": 300,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 300,
+   "empty": 0,
+   "modes": {
+    "repeat3": 300
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "google/gemini-3.1-flash-lite": 300
+   },
+   "served_as_main": true,
+   "providers": {
+    "Google AI Studio": 300
+   },
+   "provider_count": 1,
+   "capped_with_text": 0,
+   "no_answer_marker": 0,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {},
+   "think_in_text": 0,
+   "empty_templates": {},
+   "empty_by_template_all": {},
+   "output_tokens_median": 656.0,
+   "output_tokens_max": 1647,
+   "billed_usd": 0.329
+  }
+ ],
+ "archive": {
+  "archive": null
+ }
+}
