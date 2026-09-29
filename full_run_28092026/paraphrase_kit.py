@@ -144,8 +144,12 @@ def score(returned: Path, out: Path, summary: Path | None) -> dict:
                 if owner[r['code']] != r['annotator_id']:
                     raise SystemExit(f"{f.name}: {r['code']} was not assigned to {r['annotator_id']}")
                 rows[r['code']] = r
-    accepted = {keyfile[c]: {'kept': kept(r), **{q: r[q] for q in QUESTIONS}, 'annotator_id': r['annotator_id']}
-                for c, r in rows.items()}
+    # Every assigned item is listed: a pair not yet returned is neither kept nor rejected, and the
+    # analysis keeps it provisionally while counting it as outstanding (D-150).
+    accepted = {keyfile[c]: ({'returned': True, 'kept': kept(rows[c]), **{q: rows[c][q] for q in QUESTIONS},
+                              'annotator_id': rows[c]['annotator_id']} if c in rows
+                             else {'returned': False, 'kept': None, 'annotator_id': owner[c]})
+                for c in keyfile}
     (out / 'accepted.json').write_text(json.dumps(accepted, indent=1) + '\n', encoding='utf-8')
     branch_of = {c: assignment[a]['branch'] for c, a in owner.items()}
     per_branch = collections.defaultdict(collections.Counter)

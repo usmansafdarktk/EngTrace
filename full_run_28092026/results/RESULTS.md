@@ -346,4 +346,4 @@ The pool over-represents the rare labels by design (D-116), so these rates are p
 
 ## Provenance
 
-`analyze.py` at commit `bf4a43b`; the score store `main` scored at commit `bf4a43b` on 2026-09-29T19:49:30+00:00. The evaluator hashes and the per-model trace hashes are in `results.json`.
+`analyze.py` at commit `7ebc348` (tag `full-run-evaluation`), dirty; the score store `main` scored at commit `bf4a43b` on 2026-09-29T19:49:30+00:00. The evaluator hashes and the per-model trace hashes are in `results.json`.

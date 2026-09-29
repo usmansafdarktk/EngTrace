@@ -5436,10 +5436,51 @@ Where a number is quoted, it is from the regenerated results.
   decoupling claim the paper no longer makes (NEXT_CYCLE_REVIEW 9.3 item 13); if that claim returns, the
   test returns with it.
 
+## D-150 — Stream 1 readiness: the judged-stage paths dry-tested end to end, a sample of the digit rule's flags drawn, the variant review, and one runbook per stream
+
+**Date:** 2026-09-30 · **Status:** DECIDED · **Evidence:** `full_run_28092026/EVALUATION_GUIDE.md` (stream 1), `PARAPHRASE_RUNBOOK.md` (stream 2), `flag_sample.py`, `trace_review.py --variant`, `paraphrase_kit.py`, `analyze.py`
+
+The owner will run the two remaining streams in separate sessions: the evaluation of the eleven models'
+traces (E5, the router, the repeats, the flag reading, the analysis) and the paraphrase experiment. Before
+that, a last check that the machinery is in place for both, done by exercising the paths rather than by
+reading them:
+
+- **The judged-stage paths, free.** `judge --score` and `router --score` were run against empty reply
+  stores, which is the "every call unanswered" case: both wrote their rows and a CONFIG carrying the commit
+  (`7ebc348`, tag `full-run-evaluation`, dirty false) and the store's digest; `analyze` marked every model
+  incomplete in its header and printed the count without a reply beside each E5 rate; a store CONFIG
+  rewritten under the stage made `analyze` refuse with the message that names `judge --score`; the dry rows
+  were then removed and the committed results regenerated identically, apart from the provenance line, which
+  names the commit the analysis ran at (the parent of the commit holding the results). No reply store was
+  created: nothing was called.
+- **The digit rule's flags.** `flag_sample.py --draw` takes up to 20 flagged claims per model, round-robin
+  across the model's templates, recomputed from the traces at the store's step index: 220 claims from
+  gpt-oss-20b 607, gemma-4-26b-a4b 796, deepseek-v4.1-flash 24, qwen3-235b-a22b-2507 1,547, glm-5.3-flash
+  185, glm-5.3 191, muse-glimmer-30b 464, kimi-k3 51, gpt-5.4-mini 357, gemini-3.1-flash-lite 416 and
+  claude-sonnet-5 375 flags in all. The sample and its CSV stay local under `scores/flag_review/`; an
+  author fills the verdicts (slip, checker, unsure) and `--score` writes `FLAG_REVIEW.md`, counts only,
+  with a per-model precision and its Wilson interval. A checker verdict with a pattern is fixed the D-137
+  way. The reading itself is still to be done.
+- **The variant review.** `trace_review.py --variant <name>` applies the main run's integrity checks to a
+  variant's traces: a paraphrase row against `paraphrase/manifest.jsonl` and the original's hash, a repeat's
+  against the pool manifest, and each model's served id against the main run's ("as main"), since the arms
+  must be answered by the same checkpoint. `judge --status` and `router --status` print the billed total
+  and the serving-provider mix per model, for the record the paper needs of the judge's endpoints.
+- **The experts' check, partial returns.** `accepted.json` now lists every assigned pair; one not yet
+  returned is kept provisionally and counted as outstanding, and only a rejected pair leaves both arms.
+  The first version dropped every unreturned pair as if rejected.
+- **The runbooks.** `EVALUATION_GUIDE.md` is rewritten as the stream 1 runbook and `PARAPHRASE_RUNBOOK.md`
+  written for stream 2: session-start checks with their expected output, each step's command, cost, time
+  and finish condition, what to commit and what stays local, what to record in DECISIONS, and what "done"
+  means. Every self-test passes after the changes.
+
+Nothing paid has run. The costs stand as D-142 and D-143 give them.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
+| D-150 | The author's reading of the 220 sampled digit-rule flags (`scores/flag_review/sample.csv`), then `flag_sample --score` and a checker fix if one is needed | Q3 in the paper |
 | D-147 | The inclusive last-digit boundary is adopted; the owner may reverse it (one commit). Whether the paper reports the half-unit or whole-trace reading as anything more than a sensitivity would need an expert spot-check of the format-only partials | the paper's tables |
 | D-146 | The paper reports the cliff per model with its interval and, if it states a count, the Welch count with the planned one beside it (as RESULTS.md now does) | the paper's section 5 |
 | — | The router's funding: with everything else run the round lands at about $450 on the account's basis (about $480 at E5's dearest endpoint); the router adds $72 to $195 and does not fit in $500 | the router's run |

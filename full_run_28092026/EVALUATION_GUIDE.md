@@ -1,127 +1,204 @@
-# Evaluation guide: scoring the full run
+# Stream 1 runbook: evaluating the eleven models' traces
 
-How to score the full run's traces, run the two judged stages and compute the results, and how to
-run the paraphrase and repeat arms. The reasons behind each rule are in `README.md`,
-`ANALYSIS_PLAN.md` and DECISIONS D-134 to D-149.
+The full run's inference is complete and its deterministic scoring is done, validated and committed.
+This runbook is everything that remains on the traces of the eleven roster models: the two judged
+stages (E5, the router), the decoding repeats, an author's reading of the digit rule's flags, the
+analysis, the backups and the record. It is written for a fresh session, in the order things should
+happen, with the output each command must give before the next is run.
 
-## The stages
+The paraphrase arm (Q5) is a separate stream with its own runbook, `PARAPHRASE_RUNBOOK.md`; the only
+point where the two meet is E5 on the paraphrase traces, which needs this stream's E5 first.
 
-| Stage | Script | What it does | Cost | Writes |
-|---|---|---|---|---|
-| Answer check, E3 milestones, E4 digit rule | `score.py` | Scores every trace once and keeps each evaluator's raw output | free | `scores/<variant>/<model>.jsonl`, `CONFIG.json` |
-| E5, the milestone judge | `judge.py` | MiMo-V2.5-Pro on the milestones E3 did not find, one call per trace | about $27 ($19 to $50), 8,032 calls | `scores/<variant>/e5/` |
-| The step router | `router.py` | The digit rule's flags, and MiMo on every other step, one batched call per trace | about $100 ($72 to $195), 24,506 calls | `scores/<variant>/router/` |
-| Analysis | `analyze.py` | The plan's Q1 to Q5, the sensitivity analyses and the reported tables | free | `results/RESULTS.md`, `results.json`, `per_template.csv` |
+The reasons behind each rule are in `README.md`, `ANALYSIS_PLAN.md` and DECISIONS D-134 to D-150.
+Every paid step needs the owner's approval on its dry-run estimate; nothing here starts a paid call
+on its own.
 
-The costs are the free dry runs' estimates for the main run's eleven models, at 29 September's prices.
-The judge is called at OpenRouter's default routing, as in the pilot, so its price depends on the
-provider that serves each call. Every reply records its provider and billed cost.
+## 0. What is already done, and what must not change
 
-## Before you start
+| Done | Where | Record |
+|---|---|---|
+| Pool frozen, 150 x 15 from a private seed | `pool/` (local), `manifest.jsonl`, `FREEZE.json` | D-114 to D-119 |
+| Inference, eleven roster models plus the set-aside Qwen3.8-27B, 27,000 rows | `traces/` (local), backed up locally and on Kaggle | D-122 to D-133 |
+| Deterministic scoring: answer check, E3, digit rule | `scores/main/` (local), scored at `bf4a43b`, CONFIG clean | D-134 to D-140, D-144, D-147 |
+| Validations: gold, pilot expert labels, E5 and router replay | `SCORER_VALIDATION.md`, `E5_VALIDATION.md`, `ROUTER_VALIDATION.md`, `BOUNDARY_AUDIT.md` | D-134, D-142, D-147 |
+| Analysis of the deterministic stack | `results/RESULTS.md`, `results.json`, `per_template.csv` | D-140, D-146, D-149 |
+| Tag `full-run-evaluation` on `7ebc348`, the evaluator code the paid stages start from | `git tag` | D-144 |
 
-- [ ] `full_run_28092026/pool/` and `traces/` are present. If they are not, restore them from the private backups.
-- [ ] The experts' labels are in `evaluator_pilot_17092026/experts_filled_labels/version_2/`, and the pilot's stored rows and judge replies are in `evaluator_pilot_17092026/scores/`. The validations replay them. Both stay local.
-- [ ] `OPENROUTER_API_KEY` is set in the repo's `.env`. Only the paid stages need it.
-- [ ] The spend for the paid stage you are about to run is approved.
-- [ ] The laptop is plugged in and set not to sleep. E5 takes about 7 hours at 16 workers and the router about 33 at 8; MiMo's providers held only 4 workers in the pilot, which doubles both.
-- [ ] No evaluator changes between a stage's validation and the end of its paid run.
-- [ ] On Windows, set `PYTHONIOENCODING=utf-8` in the shell: two self-tests print unicode, and the console code page cannot.
+**Nothing below changes a template, the pool, a trace file or an evaluator.** An evaluator change means
+re-validating, re-scoring with `--replace`, rebuilding the stage rows with `--score`, and a DECISIONS
+entry, as D-137 to D-139 and D-147 were done. The judged stages depend on E3 and the digit rule, not
+on the answer check, so an answer-check change after them costs no reply; a change to E3, the milestone
+derivation or the digit rule changes the prompts and the unanswered ones are bought again.
 
-Run every command from the repository root.
+## 1. Session start: check before anything else
 
-## Steps
-
-**1. Deterministic scoring. Free.** This has been run for the main run; its results are D-140 and,
-after the corrections of D-146 to D-149, `results/RESULTS.md`. Run it again only if the traces or the
-evaluators change.
+Run every command from the repository root. On Windows set `PYTHONIOENCODING=utf-8` first: two
+self-tests print unicode. Expected output is in the comment.
 
 ```bash
-python -m full_run_28092026.score --gold                    # all 2,250 gold solutions
-python -m full_run_28092026.score --variant main --workers 8
-python -m full_run_28092026.score --status                  # 2,250 rows per model, and each store's commit
-python -m full_run_28092026.validate_scorer                 # writes SCORER_VALIDATION.md
+git status --short                                   # nothing but the untracked figures_oct_12/
+git log --oneline -1                                 # at or after 7ebc348
+git tag                                              # full-run-inference, full-run-inference-qwen, full-run-evaluation
+python -m full_run_28092026.freeze --check-files     # FILES OK - 2250 items in pool/ match manifest.jsonl
+python -m full_run_28092026.run_traces --status      # 11 models, missing 0, $247.917; two inert entries named
+python -m full_run_28092026.score --status           # main: commit bf4a43b, 12 models in CONFIG, 2250 rows each
+python -m full_run_28092026.analyze --selftest       # selftest: all pass
+python -m full_run_28092026.judge --validate         # ends "The stage reproduces the pilot."
+python -m full_run_28092026.router --validate        # ends "The stage reproduces the pilot."
 ```
 
-`--gold` must print 2,250 correct at all three tolerances and under both sensitivity readings, 0
-unusable and 0 digit flags. `SCORER_VALIDATION.md` must end with "The gold is clean and the published
-code reproduces every figure".
+Also:
 
-`score.py` never overwrites silently (D-144). A store scored with other evaluator code or inputs is
-refused; `--replace` moves it to `scores/_replaced/<variant>_<utc>/` first, and a model already
-scored with the same code on the same traces is skipped. `CONFIG.json` beside the rows names the
-commit, its tag, whether the tree was dirty, every evaluator file's LF-normalised hash and blob, and
-each model's trace hash; it is written after each model, never before.
+- [ ] `OPENROUTER_API_KEY` is set in the repo's `.env`. It is the only key the stages use; the OpenAI and Anthropic keys there are dead (D-121).
+- [ ] The experts' labels are in `evaluator_pilot_17092026/experts_filled_labels/version_2/` and the pilot's stored replies in `evaluator_pilot_17092026/scores/`; the validations above read them. Both stay local.
+- [ ] The local backups exist: `~/EngTrace_private_backup/full_run_pool_and_seed_2026-09-28.zip` and `full_run_traces_2026-09-29.zip` with their `.sha256` files.
+- [ ] The laptop is on mains power and set not to sleep for the length of the stage (section 2).
+- [ ] The spend for the step you are about to run is approved by the owner, on the estimate the dry run prints today, not on the figures in this file.
 
-**2. Tag the evaluator code**, at the commit the paid stages start from, as was done for inference.
-The tag `full-run-evaluation` marks the commit whose evaluator files scored the store; a stage run at
-a later commit records its own commit, and its evaluator hashes must equal the store's.
+If any check fails, stop: section 9.
+
+## 2. Costs and times, as of 29 September
+
+| Step | Calls | Estimate | Range over MiMo's endpoints | Time |
+|---|---:|---:|---|---|
+| E5 | 8,032 | $26.56 | $18.59 to $49.71 | 7.3 h at 16 workers; about 29 h at 4 |
+| Router | 24,506 | $103.32 | $72.32 to $194.94 | 32.9 h at 8 workers; about 66 h at 4 |
+| Repeats, Gemma, 3 x 300 items | 900 | $0.28 | | minutes |
+
+Spent before this stream: about $354 on the rows' basis, $368 by the account (D-131, D-143). The
+router is the one step that does not fit the ~$500 round; whether it runs is the owner's call
+(Open decisions).
+
+MiMo is called at OpenRouter's default routing, as in the pilot, so the price depends on the
+provider that serves each call; every reply records its provider and billed cost, and `--status`
+prints the mix. The pilot's providers held 4 workers, not 16; the estimates at 16 and 8 are the
+optimistic case.
+
+## 3. E5, the milestone judge
+
+What it does: for every answered trace whose item has milestones E3 did not find, one call asks
+MiMo-V2.5-Pro whether each missed milestone is REACHED, NOT_NEEDED or MISSING; E5-strict credits E3's
+milestones plus REACHED. It fills Q3's E5 columns and the attribution table.
 
 ```bash
-git tag full-run-evaluation
-git push origin full-run-evaluation
+python -m full_run_28092026.judge --dry-run                      # free: calls, cost at today's prices, time
+python -m full_run_28092026.judge --yes --max-usd 55 --workers 16 > full_run_28092026/scores/e5.log 2>&1
+python -m full_run_28092026.judge --status                       # free, any time: the reply store and the rows
 ```
 
-**3. E5, the milestone judge.**
+- **The cap.** `--max-usd` is cumulative (D-148): what the reply store already records, replies and
+  failures alike, counts toward it, so it bounds the stage across resumes. Set it to the approved
+  amount. The dearest endpoint's estimate is $49.71, so a $50 cap may stop a few calls short if
+  routing lands there; the calls in flight when the cap is passed still finish, so the spend can pass
+  it by about one call per worker.
+- **While it runs**, `judge --status` in another shell shows lines in the store, replies, failed keys,
+  the billed total over every line, and, once the rows are written, calls without a reply per model.
+  The log prints every 50 returns with the cumulative bill.
+- **Finish.** The run writes `scores/main/e5/` and prints `without_reply` per model. It should be 0.
+  If it is not, re-run the same `--yes` command: only the unanswered calls are made. A key that has
+  failed in three runs is left alone and counted (`keys_given_up` in `--status`); a handful is
+  acceptable and is reported, hundreds means a provider problem (section 9).
+- **Rebuild without calling.** `judge --score` rewrites the rows from the stored replies and is free;
+  it is what to run after any re-score of the store.
+- **Then:** `analyze` (section 7) fills Q3's E5 columns. Until `without_reply` is 0 the header says the
+  stage is incomplete and the rates are over the answered calls only.
+
+## 4. The step router, if funded
+
+What it does: the digit rule's flags, plus MiMo on every other step of a trace in one batched call on
+the framework's own Tribunal prompt; a step is flagged when the rule flags it or the judge's category
+contains "error". It fills Q3's router columns. It is the only component with any signal on
+conceptual error behind a correct answer (D-113), and it costs the most.
 
 ```bash
-python -m full_run_28092026.judge --validate                     # free
-python -m full_run_28092026.judge --dry-run                      # free: calls, cost, time
-python -m full_run_28092026.judge --yes --max-usd 50 --workers 16 > full_run_28092026/scores/e5.log 2>&1
-python -m full_run_28092026.judge --status                       # free: the reply store and the rows
-```
-
-- `--validate` replays the pilot's 300 traces from its stored replies and writes `E5_VALIDATION.md`.
-  It must end with "The stage reproduces the pilot". If it does not, do not run the paid stage.
-- **`--max-usd` is cumulative** (D-148): what the reply store already records, replies and failures
-  alike, counts toward it, so the cap bounds the stage across resumes, not each invocation. The
-  calls in flight when it is passed still finish.
-- The paid run writes `scores/main/e5/` when it finishes, and prints `without_reply` per model. That
-  count should be 0. While it is not, `analyze` marks the stage incomplete, computes its rates over
-  the answered calls only, and prints the count beside them.
-- A call that outlives the 960 s deadline is not waited for, but its reply is stored when it arrives
-  and read on the next run. A prompt that has failed in three runs is left alone and counted.
-- The stage refuses to start if any store row no longer matches its trace, and records the digest of
-  the store CONFIG it read; `analyze` refuses a stage built from another store.
-
-**4. The step router.**
-
-```bash
-python -m full_run_28092026.router --validate                    # free
 python -m full_run_28092026.router --dry-run                     # free
 python -m full_run_28092026.router --yes --max-usd 200 --workers 8 > full_run_28092026/scores/router.log 2>&1
 python -m full_run_28092026.router --status                      # free
 ```
 
-- `--validate` writes `ROUTER_VALIDATION.md`, which must end with "The stage reproduces the pilot".
-- Run the router after E5, not beside it: both call the same judge, and its providers refuse traffic
-  beyond a point. The pilot had to drop to 4 workers. If many calls fail, re-run with `--workers 4`.
-- The paraphrase inference (below) can run beside either judged stage: it calls the roster's
-  providers, not MiMo's.
+- Run it after E5, not beside it: both call MiMo, and its providers refuse traffic beyond a point. If
+  many calls fail, re-run with `--workers 4`; expect about 66 hours then.
+- Everything said of the cap, `--status`, the finish and `--score` for E5 holds here; the reply store
+  is `scores/_judge/router_replies.jsonl`.
+- A reply cut off at 8,192 tokens is asked again at 16,384; three attempts per call.
 
-**Resuming either stage.** Re-run the same `--yes` command. Only the calls not already in the
-reply store are made, so nothing answered is paid for twice. `--score` rewrites a stage's rows from
-the stored replies without calling anything, and must be run again after any re-score of the store:
+## 5. The decoding repeats
 
-```bash
-python -m full_run_28092026.judge --score
-python -m full_run_28092026.router --score
-```
-
-**5. The analysis. Free.**
+One cheap model, Gemma 4 26B, on the 300-item repeat subsample (the 1st and 8th item of each template,
+`subsamples.py`), three times at the main run's settings, so the paper can say what part of a score is
+sampling noise at the providers' default decoding. About $0.09 a repeat.
 
 ```bash
-python -m full_run_28092026.analyze --selftest
-python -m full_run_28092026.analyze
+python -m full_run_28092026.run_traces --variant repeat1 --model gemma-4-26b-a4b --dry-run
+python -m full_run_28092026.run_traces --variant repeat1 --model gemma-4-26b-a4b --workers 15 --yes
+python -m full_run_28092026.run_traces --variant repeat1 --status
+python -m full_run_28092026.trace_review --variant repeat1        # writes TRACE_REVIEW_repeat1.md; "as main" must be yes
+python -m full_run_28092026.score --variant repeat1
 ```
 
-It writes `results/RESULTS.md`, `results/results.json` (aggregates, with the provenance of the store,
-the stages and the script itself) and `results/per_template.csv` (one row per template and model,
-aggregates only), and those three files are committed. Q3's E5 and router columns fill once steps 3
-and 4 have written their rows; until then they show "pending".
+Then the same with `repeat2` and `repeat3`. `--status` must show missing 0 before scoring; a re-run
+of the same command fills the gaps. `analyze` then prints the decoding-repeats table: the three
+scores on the same items, their SD and range, and the share of items with the same verdict in every
+repeat. A repeat needs `--model`: the harness refuses a bare repeat run.
 
-**6. Save the paid results locally and to Kaggle.** The judge's replies in `scores/_judge/` are the
-paid-for result, so keep two private copies of `scores/`, as for the traces (`INFERENCE_GUIDE.md`,
-step 6). First, a local archive with its checksum:
+## 6. The digit rule's flags: an author reads a sample
+
+Why: the rule's precision (three flags in four real) was measured on the pilot's five models; this
+roster writes differently, and its flags are uneven (Qwen3-235B-2507 has 1,547 on 18,785 claims; 16 of
+DeepSeek's 24 sit in one template). The pilot's own rule for the checker is "validate on gold, then
+read every flag raised on real traces", and reading is what found its last four parser defects. Q3
+prints the rule's rates with the pilot's precision beside them; if this roster's is lower, the paper
+must carry this figure instead.
+
+```bash
+python -m full_run_28092026.flag_sample --draw          # free: 220 flagged claims, 20 per model, seed 0
+```
+
+The sample is already drawn and lives in `scores/flag_review/sample.csv` (local, it holds trace
+text); re-running `--draw` with the same seed reproduces it. Open the CSV, and for each row recompute
+the left side from the numbers shown and ask whether the right side is a correct rounding at the
+precision it displays. Fill `verdict` with one of:
+
+- `slip`: the trace's arithmetic is wrong at the displayed digit; a real flag;
+- `checker`: the arithmetic is right and the checker misread it (a unit it did not know, a rounding
+  chain it should tolerate, a clause split wrongly, a value inherited from the wrong side); say why in
+  `note`, since the note is what a fix is built from;
+- `unsure`.
+
+Then:
+
+```bash
+python -m full_run_28092026.flag_sample --score         # writes FLAG_REVIEW.md: counts only, committed
+```
+
+If the checker verdicts show a pattern, the fix follows D-137's procedure: an audit script that
+measures the change on the gold (must stay 2,250 correct), the pilot's 300 traces against the experts
+and every full-run trace; adopt it only if the gold stays clean and no pilot verdict moves away from
+the experts; then `score --variant main --replace`, `judge --score` and `router --score` if those
+stages exist, `analyze`, and a DECISIONS entry. The digit rule feeds the router's prompts (rule C), so
+a change to it after the router has run means the changed prompts are bought again.
+
+## 7. The analysis, and what to commit
+
+```bash
+python -m full_run_28092026.analyze --selftest          # all pass
+python -m full_run_28092026.analyze                     # writes results/RESULTS.md, results.json, per_template.csv
+```
+
+- It refuses if a stage's rows were built from another store than the one on disk ("run `judge
+  --score`"), or if the store is not the pool the plan describes.
+- The header names the stages present and, if any has calls without a reply, marks it incomplete.
+- Its provenance block records the commit the script ran at, the store's CONFIG and each stage's
+  CONFIG. The commit it names is the one the analysis ran at, so it is the parent of the commit that
+  holds the results; that is expected.
+- Commit `results/RESULTS.md`, `results/results.json` and `results/per_template.csv`, and any
+  regenerated `TRACE_REVIEW*.md`, `E5_VALIDATION.md`, `ROUTER_VALIDATION.md`, `FLAG_REVIEW.md`. Never
+  anything under `scores/`, `traces/` or `pool/`. One short commit line, then push.
+
+## 8. Backups and the record
+
+**Back up the replies after each paid stage.** The judge's replies in `scores/_judge/` are the
+paid-for result. First a local archive with its checksum:
 
 ```powershell
 $d = "$env:USERPROFILE\EngTrace_private_backup"; $z = "$d\full_run_scores_$(Get-Date -Format yyyy-MM-dd).zip"
@@ -129,90 +206,54 @@ Compress-Archive -Path full_run_28092026\scores\* -DestinationPath $z -Force
 (Get-FileHash $z -Algorithm SHA256).Hash | Out-File -Encoding ascii "$z.sha256"
 ```
 
-Then a private Kaggle dataset, in manual mode, staged in a short path and never with `--public`:
+Then a private Kaggle dataset, in manual mode (auto mode blocks the upload), staged in a short path,
+never `--public`:
 
 ```powershell
 $s = "$d\kaggle_scores"; New-Item -ItemType Directory -Force $s | Out-Null; Copy-Item "$z*" $s
 [IO.File]::WriteAllText("$s\dataset-metadata.json",
   '{"title": "engtrace-full-run-scores", "id": "<your-kaggle-user>/engtrace-full-run-scores", "licenses": [{"name": "other"}]}')
-cd $s; kaggle datasets create -p .
+cd $s; kaggle datasets create -p .     # later versions: kaggle datasets version -p . -m "<what changed>"
 ```
 
-Download it back and compare every file's hash, as the inference guide does for the traces.
+Download it back and compare every file's hash, as `INFERENCE_GUIDE.md` step 6 does for the traces.
+The repeat traces under `traces/repeat*/` go into a new traces archive the same way.
 
-## The paraphrase arm (Q5)
+**Record each paid run in DECISIONS.md** the way D-123 to D-131 record inference: the date and
+commit, the dry-run estimate it was approved on, calls made, billed in the rows and by the account
+(the difference is retries and stopped calls), `without_reply` and `keys_given_up`, the providers that
+served the calls (`--status` prints them), and anything that stopped or resumed the run. Every number
+the paper will quote from these stages must be printed by `analyze.py` or `--status`, never typed.
 
-The plan runs it in the same week as the main run (28 to 29 September), so that the served models
-are the same: by about 5 October. The experts' check can run while the paraphrase traces are
-generated, because a pair the experts reject is dropped from both arms at analysis. The paraphrase
-inference does not wait for E5: the same-week rule binds the inference, and the two use different
-providers.
+## 9. If something goes wrong
 
-```bash
-python -m full_run_28092026.paraphrase --selftest       # free
-python -m full_run_28092026.paraphrase --dry-run        # free: $0.15 to $0.45
-python -m full_run_28092026.paraphrase --yes            # BILLS: writes and checks the 450 paraphrases
-python -m full_run_28092026.paraphrase_kit --build      # free: one kit per expert
-```
+- **A validation does not reproduce.** An evaluator or an input has changed since the tag. Do not run
+  a paid stage; find the change (`git status`, `git diff full-run-evaluation`) and record it.
+- **`score --status` shows a commit other than `bf4a43b` or DIRTY.** The store was re-scored. Fine if
+  recorded in DECISIONS; otherwise find out why before paying for anything built on it.
+- **A stage refuses: "store rows no longer match their traces".** The traces changed after scoring.
+  Restore them from the backup or re-score the variant.
+- **`analyze` refuses: "was built from another score store".** The store was re-scored after a stage
+  wrote its rows. Run the stage's `--score` and try again.
+- **The run stops at the cap.** Raise `--max-usd` only for an approved new total; the spend already
+  in the store counts toward it.
+- **A call hangs.** After 960 s it is no longer waited for; its reply is stored if it arrives, and the
+  next run asks again otherwise. The process writes its rows and ends.
+- **Error 402.** The account is out of credit.
+- **Error 429, or failures in the hundreds.** MiMo's providers are refusing traffic. Re-run with fewer
+  workers (4 held in the pilot). If one provider returns malformed replies, the pilot's precedent is
+  to exclude it by name (`e1_panel.PROVIDER_IGNORE`), measured first.
+- **A laptop shutdown mid-run.** Nothing is lost: re-run the same `--yes` command; the store holds
+  every answered call.
+- **`without a reply` stays above 0 after three runs.** Those keys are given up and counted; the
+  analysis leaves their traces out of the judged rates and prints the count. Record it.
 
-**The experts' check.** From `paraphrase/dist/`, send each expert `app.py`, `README.txt` and
-`guide.md`, together with their own `kit_<id>/` folder. Each expert runs `streamlit run app.py` and
-sends back `<id>.jsonl`. Put the returned files in `paraphrase/returned/`.
+## 10. Done means
 
-**The paraphrase run** is launched like the main run (`INFERENCE_GUIDE.md`, step 4), with the
-variant added. It runs the same routing as the main run; each row records its provider, and Q5
-reports the same-provider pairs beside the whole.
-
-```bash
-python -m full_run_28092026.run_traces --variant paraphrase --dry-run           # free: about $49
-python -m full_run_28092026.run_traces --variant paraphrase --model <key> --workers 15 --yes
-python -m full_run_28092026.score --variant paraphrase
-python -m full_run_28092026.paraphrase_kit --score full_run_28092026/paraphrase/returned
-python -m full_run_28092026.analyze
-```
-
-Q5 is marked provisional until the experts' returns are scored. E5 on the paraphrase arm
-(`judge.py --variant paraphrase`, about $5) feeds Q5's E5-strict paired difference and is worth
-buying only if the main-run E5 has run.
-
-## The decoding repeats
-
-One cheap model, 300 items, three times, at about $0.09 a repeat:
-
-```bash
-python -m full_run_28092026.run_traces --variant repeat1 --model gemma-4-26b-a4b --dry-run
-python -m full_run_28092026.run_traces --variant repeat1 --model gemma-4-26b-a4b --workers 15 --yes
-python -m full_run_28092026.score --variant repeat1
-```
-
-Then the same for `repeat2` and `repeat3`, and `analyze` prints the decoding-repeats table.
-
-## What is committed and what stays local
-
-| Committed | Local only, gitignored |
-|---|---|
-| The scripts | `pool/`, `SEED.secret`, `traces/` |
-| `SCORER_VALIDATION.md`, `E5_VALIDATION.md`, `ROUTER_VALIDATION.md` | `scores/`: the store and its CONFIG, the E5 and router rows, the judge's replies, the archived stores |
-| `PARSER_FIX.md`, `MATCH_AUDIT.md`, `WORD_AUDIT.md`, `BOUNDARY_AUDIT.md` | `paraphrase/pool.jsonl`, `attempts.jsonl`, `tasks/`, `dist/`, `returned/`, `accepted.json` |
-| `results/RESULTS.md`, `results/results.json`, `results/per_template.csv` | the experts' labels and returns |
-| `paraphrase/manifest.jsonl`, `PARAPHRASE.md`, `PARAPHRASE_REVIEW.md` | |
-
-## If something goes wrong
-
-- **A validation does not reproduce.** An evaluator or an input has changed. Do not run the paid stage until the change is found and recorded in DECISIONS.md.
-- **`score.py` refuses: "scored with other evaluator code or inputs".** The store on disk predates the current evaluators. `--replace` archives it and scores afresh; the archive stays under `scores/_replaced/`.
-- **`analyze.py` stops with "the store is not the pool the plan describes".** A model's scores are missing or incomplete. Re-run step 1 for that model.
-- **`analyze.py` stops with "was built from another score store".** The store was re-scored after a stage wrote its rows. Run the stage's `--score` and try again.
-- **A stage refuses: "store rows no longer match their traces".** The traces changed after scoring. Re-score the variant.
-- **The run stops at the cap.** The calls already running finish, so the spend can pass the cap by about one call per worker. Raise `--max-usd` only for an approved new total; the store's spend counts toward it.
-- **A call hangs.** After 960 s it is no longer waited for. The process writes its rows and ends; the reply is stored if it arrives, and the next run asks again otherwise.
-- **Error 402.** The account is out of credit. Top it up and re-run.
-- **Error 429, or many failed calls.** The judge's providers are refusing traffic. Re-run with fewer workers.
-- **"without a reply" is above 0 in RESULTS.md.** Some calls failed. Re-run the stage's `--yes` command, then `analyze`. A key that has failed three runs is given up and counted.
-
-## Rules
-
-- **Nothing changes while scores exist.** An evaluator change means re-validating, re-scoring and a DECISIONS entry, as D-137 to D-139 and D-147 were. The judged stages depend on E3 and the digit rule, not on the answer check, so an answer-check change after them needs no reply bought again, only `--score`.
-- **Every reported number** is printed by a committed script reading these outputs.
-- **The store, the replies and anything holding pool text stay local.** Only aggregates are committed.
-- **Every paid step needs its own approval**, after its dry-run estimate.
+- [ ] E5 rows for all eleven models, `without_reply` 0 or a recorded handful; replies backed up.
+- [ ] The router rows likewise, or a recorded decision not to run it.
+- [ ] Three repeat variants scored; `TRACE_REVIEW_repeat*.md` say "as main" yes.
+- [ ] `FLAG_REVIEW.md` committed, and any checker fix it forced done the D-137 way.
+- [ ] `results/RESULTS.md` regenerated with no "incomplete" in its header, committed and pushed.
+- [ ] A DECISIONS entry per paid run, and the Open decisions table updated.
+- [ ] `scores/` archived locally and on Kaggle, hashes checked.

@@ -142,6 +142,18 @@ python -m full_run_28092026.router --yes --max-usd 200 --workers 8   # bills, on
 python -m full_run_28092026.analyze                 # free: Q3's E5 and router columns
 ```
 
+## The two remaining streams, each with its runbook (D-150)
+
+- **Stream 1, the eleven models' traces:** E5, the router, the decoding repeats, an author's reading
+  of the digit rule's flags (`flag_sample.py`, `FLAG_REVIEW.md`), the analysis, the backups and the
+  record: `EVALUATION_GUIDE.md`.
+- **Stream 2, the paraphrase experiment (Q5):** writing and checking the paraphrases, the experts'
+  check, the inference on the paraphrases, scoring and analysis: `PARAPHRASE_RUNBOOK.md`.
+
+`trace_review.py --variant <name>` reviews a variant's traces as it reviewed the main run's, checking a
+paraphrase row against `paraphrase/manifest.jsonl` and the original's hash, and each model's served id
+against the main run's (`TRACE_REVIEW_<variant>.md`).
+
 ## Variant runs, paraphrases and the expert check (D-141)
 
 `subsamples.py` fixes the paraphrase subsample (the plan's 450) and the repeat subsample (300).
@@ -151,7 +163,8 @@ and `--selftest` are free; writing bills and needs `--yes`). `paraphrase_kit.py`
 kits and scores their returns; `paraphrase_app.py` is the app shipped in them, and
 `paraphrase_guide.md` the guide. The paraphrase text, the kits and the returns stay local; the
 committed record is `paraphrase/manifest.jsonl` (hashes only), `PARAPHRASE.md` and
-`PARAPHRASE_REVIEW.md`.
+`PARAPHRASE_REVIEW.md`. A pair the experts have not yet returned is kept provisionally and counted as
+outstanding; only a rejected pair leaves both arms.
 
 ```bash
 python -m full_run_28092026.paraphrase --dry-run                                  # free

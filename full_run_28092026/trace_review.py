@@ -1,6 +1,13 @@
 """An independent review of the full run's traces, before any scoring.
 
-    python -m full_run_28092026.trace_review      # writes TRACE_REVIEW.md and trace_review.json beside this file
+    python -m full_run_28092026.trace_review                       # writes TRACE_REVIEW.md and trace_review.json beside this file
+    python -m full_run_28092026.trace_review --variant paraphrase  # the same checks on a variant's traces (D-150)
+
+For a variant the item hash is checked against that variant's items: a repeat's rows against the pool
+manifest, a paraphrase's rows against paraphrase/manifest.jsonl, with each row's original_sha256
+against the pool manifest; the served model per key is compared with the main run's, since the arms
+must be answered by the same checkpoint; and the report goes to TRACE_REVIEW_<variant>.md. The
+archive check applies to the main run only.
 
 The decision log (D-122 to D-132) records what the run billed and how many rows ended empty. This
 checks, from the trace files alone, the things that would silently corrupt the evaluation:
@@ -51,8 +58,23 @@ def manifest() -> dict[str, dict]:
     return {r['item_id']: r for r in rows}
 
 
-def review_model(key: str, man: dict) -> dict | None:
-    path = TRACES / f'{key}.jsonl'
+def variant_manifest(variant: str, man: dict) -> dict[str, dict]:
+    """What a variant's rows must hash to: the pool for a repeat, the passing paraphrases for the
+    paraphrase arm (with the original's hash beside each)."""
+    if variant != 'paraphrase':
+        return man
+    p = HERE / 'paraphrase' / 'manifest.jsonl'
+    if not p.exists():
+        raise SystemExit('paraphrase/manifest.jsonl is missing: the paraphrase arm has not been written')
+    out = {}
+    for r in map(json.loads, p.read_text(encoding='utf-8').splitlines()):
+        if r['passed']:
+            out[r['item_id']] = {'sha256': r['sha256'], 'original_sha256': r['original_sha256']}
+    return out
+
+
+def review_model(key: str, man: dict, variant: str = 'main', main_served: dict | None = None) -> dict | None:
+    path = TRACES / f'{key}.jsonl' if variant == 'main' else TRACES / variant / f'{key}.jsonl'
     if not path.exists():
         return None
     malformed, lines = 0, 0
@@ -78,7 +100,9 @@ def review_model(key: str, man: dict) -> dict | None:
         served[r.get('served_model')] += 1
         providers[r.get('provider')] += 1
     wrong_item = [r['item_id'] for r in rows
-                  if r['item_id'] not in man or r.get('item_sha256') != man[r['item_id']]['sha256']]
+                  if r['item_id'] not in man or r.get('item_sha256') != man[r['item_id']]['sha256']
+                  or ('original_sha256' in man[r['item_id']]
+                      and r.get('original_sha256') != man[r['item_id']]['original_sha256'])]
     answered = [r for r in rows if r['status'] == 'answered']
     capped = sum(r.get('finish_reason') == 'length' for r in answered)
     no_marker, no_answer, think = [], [], []
@@ -102,6 +126,7 @@ def review_model(key: str, man: dict) -> dict | None:
         'prompt_hashes': len(prompts), 'prompt_is_pilots': set(prompts) == {PROMPT_SHA},
         'request_variants': len(requests),
         'served_models': dict(served.most_common()),
+        'served_as_main': (set(served) == set(main_served.get(key, {})) if main_served is not None else None),
         'providers': dict(providers.most_common(4)), 'provider_count': len(providers),
         'capped_with_text': capped,
         'no_answer_marker': len(no_marker),
@@ -139,29 +164,42 @@ def archive_check(keys: list[str]) -> dict:
 
 
 def main() -> int:
-    man = manifest()
-    keys = [m['key'] for m in config()['models']]
-    res = [r for r in (review_model(k, man) for k in keys) if r]
-    arch = archive_check([r['key'] for r in res])
-    (HERE / 'trace_review.json').write_text(json.dumps({'models': res, 'archive': arch}, indent=1) + '\n',
-                                            encoding='utf-8', newline='\n')
-    L = ['# Trace review: the full run before scoring', '',
+    import argparse
+    ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
+    ap.add_argument('--variant', default='main')
+    a = ap.parse_args()
+    variant = a.variant
+    man = variant_manifest(variant, manifest())
+    keys = [m['key'] for m in config()['models'] if not m.get('run') is False or variant == 'main']
+    main_served = None
+    if variant != 'main':
+        main_served = {k: (review_model(k, manifest()) or {}).get('served_models', {}) for k in keys}
+    res = [r for r in (review_model(k, man, variant, main_served) for k in keys) if r]
+    if not res:
+        raise SystemExit(f'no traces for variant {variant}')
+    arch = archive_check([r['key'] for r in res]) if variant == 'main' else {'archive': None}
+    suffix = '' if variant == 'main' else f'_{variant}'
+    (HERE / f'trace_review{suffix}.json').write_text(json.dumps({'variant': variant, 'models': res, 'archive': arch},
+                                                                indent=1) + '\n', encoding='utf-8', newline='\n')
+    L = [f'# Trace review: the {"full run" if variant == "main" else variant + " variant"} before scoring', '',
          'Generated by `trace_review.py`; the checks are defined in its docstring. Counts, model keys '
          'and template ids only.', '',
          '## Integrity and sameness', '',
          '| model | items | answered | empty | missing | 2 final rows | not a frozen item | malformed | '
-         'prompt | request sets | served models | providers | billed $ |',
-         '|---|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|---:|']
+         'prompt | request sets | served models | as main | providers | billed $ |',
+         '|---|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---|---:|---:|']
     for r in res:
         tag = ' (set aside)' if r['key'] in SET_ASIDE else ''
+        same = '' if r['served_as_main'] is None else ('yes' if r['served_as_main'] else 'NO')
         L.append(f"| `{r['key']}`{tag} | {r['items']} | {r['answered']} | {r['empty']} | "
                  f"{len(r['items_missing'])} | {r['items_with_two_final_rows']} | "
                  f"{r['rows_not_a_frozen_item']} | {r['malformed']} | "
                  f"{'pilot' if r['prompt_is_pilots'] else 'DIFFERS'} | {r['request_variants']} | "
-                 f"{len(r['served_models'])} | {r['provider_count']} | {r['billed_usd']:.3f} |")
+                 f"{len(r['served_models'])} | {same} | {r['provider_count']} | {r['billed_usd']:.3f} |")
     roster = [r for r in res if r['key'] not in SET_ASIDE]
     L += ['', f"Roster, {len(roster)} models: {sum(r['items'] for r in roster)} final rows, "
-          f"{sum(r['empty'] for r in roster)} empty, ${sum(r['billed_usd'] for r in roster):.2f} billed in the rows.",
+          f"{sum(r['empty'] for r in roster)} empty, ${sum(r['billed_usd'] for r in roster):.2f} billed in the rows."
+          + ('' if variant == 'main' else f' Items expected per model: {len(man)}.'),
           '', '## Answers, among answered rows', '',
           '| model | stopped at the cap with text | no answer marker | no marker and no number at the end | '
           '<think> in the text | output tokens, median / max |',
@@ -196,7 +234,7 @@ def main() -> int:
         L += ['', '## Local archive', '',
               f"`{arch['archive']}`: {arch['matched']} of {len(res)} trace files identical by SHA-256; "
               f"differ {arch['differ'] or 'none'}; absent {arch['absent'] or 'none'}."]
-    (HERE / 'TRACE_REVIEW.md').write_text('\n'.join(L) + '\n', encoding='utf-8', newline='\n')
+    (HERE / f'TRACE_REVIEW{suffix}.md').write_text('\n'.join(L) + '\n', encoding='utf-8', newline='\n')
     print('\n'.join(L))
     return 0
 

@@ -485,12 +485,18 @@ def q4(runs, templates, single, keys):
     return out
 
 
-def accepted_pairs() -> set[str] | None:
-    """The paraphrases the experts kept (paraphrase_kit.py --score), or None before they return."""
+def accepted_pairs() -> dict | None:
+    """The experts' check (paraphrase_kit.py --score): the pairs to keep, which are every assigned pair
+    the experts did not reject, with the counts returned, rejected and outstanding; None before any
+    return has been scored."""
     p = HERE / 'paraphrase' / 'accepted.json'
     if not p.exists():
         return None
-    return {i for i, r in json.loads(p.read_text(encoding='utf-8')).items() if r['kept']}
+    acc = json.loads(p.read_text(encoding='utf-8'))
+    return {'keep': {i for i, r in acc.items() if r.get('kept') is not False},
+            'returned': sum(1 for r in acc.values() if r.get('returned', True)),
+            'rejected': sum(1 for r in acc.values() if r.get('kept') is False),
+            'outstanding': sum(1 for r in acc.values() if not r.get('returned', True))}
 
 
 def paired(main_rows, para_rows, ids, fn, seed):
@@ -930,9 +936,12 @@ def render(res) -> str:
                  f"{m['some']:.3f} | {m['none']:.3f} |")
     L += ['', '## Q5. Paraphrase robustness', '']
     if res['q5']['models']:
+        es = res['q5'].get('expert_stats')
         L += ['**Provisional: the experts\' check of the paraphrases has not returned**, so no pair has been '
-              'dropped yet.' if res['q5']['expert_check'] is None else
-              f"Pairs the experts kept: {res['q5']['expert_check']}; a rejected pair leaves both arms.", '',
+              'dropped yet.' if es is None else
+              f"The experts' check: {es['returned']} pairs returned, {es['rejected']} rejected and dropped from both "
+              f"arms, {es['outstanding']} not yet returned and kept provisionally"
+              + (' (**provisional until they return**).' if es['outstanding'] else '.'), '',
               'Paraphrase minus original, paired by item; besides the answer score, E3 coverage on the items with '
               'milestones, E5-strict where both arms carry it, and the answer score on the pairs both arms served '
               'from the same endpoint (D-149).', '',
@@ -1061,9 +1070,11 @@ def main() -> int:
     para = {k: load('paraphrase', k) for k in ROSTER} if a.store == 'main' else {}
     e5_main = {k: load_stage('e5', k, 'main') for k in ROSTER} if a.store == 'main' else None
     e5_para = {k: load_stage('e5', k, 'paraphrase') for k in ROSTER} if a.store == 'main' else None
+    check = accepted_pairs()
     res = {'q1': q1(runs, templates, ROSTER), 'q2': q2(runs, templates, levels, ROSTER, symbolic),
            'q3': q3(runs, ROSTER, a.store), 'q4': q4(runs, templates, single, ROSTER),
-           'q5': q5(runs, para, ROSTER, accepted_pairs(), e5_main, e5_para),
+           'q5': {**q5(runs, para, ROSTER, check['keep'] if check else None, e5_main, e5_para),
+                  'expert_stats': {k: v for k, v in check.items() if k != 'keep'} if check else None},
            'sensitivity': sensitivity(runs, templates, ROSTER, symbolic), 'reported': reported(runs, ROSTER),
            'repeats': repeats(runs, ROSTER) if a.store == 'main' else {},
            'set_aside': set_aside(a.store), 'milestones': milestone_facts(runs[ROSTER[0]].values()),

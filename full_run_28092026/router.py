@@ -194,8 +194,11 @@ def status(variant: str, keys: list[str]) -> int:
             continue
         rows = [json.loads(l) for l in p.read_text(encoding='utf-8').splitlines()]
         sent = [r for r in rows if r['sent']]
+        provs = collections.Counter((r.get('reply') or {}).get('serving_provider') for r in sent if r.get('reply'))
         print(f'  {key:24s} rows {len(rows)}, calls {len(sent)}, without a reply '
-              f'{sum(r["reply_ok"] is False for r in sent)}, steps unjudged {sum(r["unjudged"] for r in sent)}')
+              f'{sum(r["reply_ok"] is False for r in sent)}, steps unjudged {sum(r["unjudged"] for r in sent)}, '
+              f'billed ${sum((r.get("reply") or {}).get("billed_usd") or 0.0 for r in sent):.3f}; '
+              f'served by {dict(provs.most_common(4)) or "-"}')
     return 0
 
 
