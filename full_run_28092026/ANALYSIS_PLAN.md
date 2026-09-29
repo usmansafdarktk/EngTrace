@@ -35,7 +35,7 @@ that fair:
 Per model, the unusable rate is reported beside the score, and an appendix gives the score with unusable
 traces excluded.
 *Note, 2026-09-30 (D-148):* seven answered rows in the main run ended with a finish reason of `error` or
-none, a provider fault reported inside a 200, and were scored on what they state (3 correct, 3 incorrect,
+none, a provider fault reported inside a 200, and were scored on what they state (4 correct, 2 incorrect,
 1 unusable); they are reported as a count, and the harness now retries such a reply as a service failure.
 The unusable count is reported as empty plus unreadable.
 

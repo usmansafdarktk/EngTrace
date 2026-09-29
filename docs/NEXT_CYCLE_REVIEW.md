@@ -1,5 +1,12 @@
 # EngTrace, third submission: where it stands and what is left
 
+*Update, 2026-09-30.* Sections 2 and 3 are largely overtaken: the pool is frozen (D-114 to D-116), inference is
+complete for the eleven-model roster (D-131, D-132), the deterministic stack is scored and validated
+(D-134 to D-140), and E5, the router, the paraphrase arm and the repeats are built and priced but not yet
+run (D-141, D-142). Two independent reviews of the evaluation machinery on 2026-09-29 and everything done
+in response are recorded in D-143 to D-149; the results as they stand are `full_run_28092026/results/RESULTS.md`,
+and the remaining paid steps and open calls are in DECISIONS.md's "Open decisions".
+
 Written 2026-09-27 against the May 2026 submission (`docs/_ARR_May__EngTrace.pdf`), both
 rebuttals (`docs/EngTrace Rebuttals Jan 2026.docx`, `docs/EngTrace_Rebuttal_Jul2026 (1).docx`),
 the revision letter, `docs/re-implementation-sep/EngTrace_Suggested_Actions.pdf`, and the

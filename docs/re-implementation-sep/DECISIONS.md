@@ -5234,10 +5234,216 @@ table of what points at a wrong answer (digit rule, E5 MISSING, the router's jud
 checks these on a case worked by hand. The evaluator code gets its tag at the commit the paid runs
 start from.
 
+## D-143 — Two independent reviews of the full run's evaluation machinery: what they found, and every item acted on
+
+**Date:** 2026-09-30 · **Status:** DECIDED (the owner, 2026-09-29: "act on all of them, all the action items"; nothing paid runs without notice) · **Evidence:** D-144 to D-149; `full_run_28092026/BOUNDARY_AUDIT.md`, `results/RESULTS.md` (regenerated), `EVALUATION_GUIDE.md`, `ANALYSIS_PLAN.md` (dated notes)
+
+On 2026-09-29 two reviewers with no shared context, one on each of two models, each read every script and
+document under `full_run_28092026/` and the evaluators it imports, ran every free check, and then assessed a
+list of nine proposed actions from a first review. Their reports were compared and every finding re-verified
+on the store before being acted on. What they found, in order of severity, and where each is closed:
+
+1. *Would change a reported number or claim.* The complexity cliff's "7 of 11" moved with the seed and rested on
+   a test that is liberal under unequal variances (D-146). glm-5.3's cliff was an output-ceiling effect (D-146).
+   The digit rule's wrong-answer rate counted empty traces (D-149). A quantity the question asks for, stated in
+   the body and left off the Answer line, scores partial, four times as often for Qwen3-235B-2507 as for any
+   other model (D-147). The plan's "only multipart items can be partial" was false (D-145). A partly failed
+   judge stage would have printed an understated E5 number, and a failed router call was recorded as a clean
+   trace (D-148). The answer check's last-digit windows were decided at their edge by binary rounding (D-147).
+   One of the 32 pairwise claims rested on partial credit and the seed (D-146).
+2. *Would fail a reproducibility check.* The score store's recorded commit did not contain the code that scored
+   it, and its hashes were line-ending dependent (D-144).
+3. *Robustness of the paid stages.* `--max-usd` reset on every resume; a call past the deadline was bought
+   again; a failing prompt was retried every run; stage rows were not tied to the store they read; a bare
+   variant run would have billed two models outside the roster; seven rows with a provider fault inside a
+   200 were scored (D-148).
+4. *Completeness.* The per-template SD the July rebuttal promised, the first-flagged-step position, failure
+   against milestone count, the 1% rate, the unusable split, E3's chance floor per model, the endpoint
+   table matched on template, a noise floor for Kendall's tau, Q5's coverage delta, a committed per-template
+   table, and the results' own provenance (D-149).
+
+Of the first review's nine proposals, the reviewers found seven correct or correct-but-incomplete and two in
+need of correction, and both corrections were taken: `arith.py` is not edited for a console-encoding
+cosmetic, because the edit would change a recorded evaluator hash (the guide sets `PYTHONIOENCODING`
+instead); and the paraphrase inference runs beside E5, not after it, since the same-week rule binds the
+inference and the two use different providers. One reviewer suggestion was not taken: pinning the
+paraphrase arm to each model's majority endpoint would break the plan's "same settings as the main run";
+the arms keep the same routing, each row records its endpoint, and Q5 reports the same-endpoint pairs beside
+the whole (D-149).
+
+Everything free was done and is recorded below; the paid steps (E5, the router, the paraphrase arm, the
+repeats) still wait for the owner's approval, each with its dry-run estimate.
+
+## D-144 — Provenance: the store's recorded commit was wrong and its hashes line-ending dependent; fixed, and the store re-scored from a clean, recorded commit
+
+**Date:** 2026-09-30 · **Status:** DECIDED · **Evidence:** `full_run_28092026/score.py` (`provenance`, `--replace`), `scores/main/CONFIG.json` (local), `results/results.json` (`provenance`), the archived store `scores/_replaced/main_20260929T194154Z/` (local)
+
+`scores/main/CONFIG.json` named commit `b73c711`, but the `answer.py` that scored the store carried the
+D-138 and D-139 rules committed 25 minutes later as `1363e80`: the store was scored from a dirty tree, and a
+reader checking out the recorded commit would have got an answer check that gives gpt-oss-20b 0.826 where
+RESULTS.md printed 0.799. `results/main_pre_d137/` named `9915400`, a commit at which `score.py` did not yet
+exist. The recorded evaluator hashes were over working-tree bytes under `core.autocrlf=true`, so `arith.py`,
+whose code had not changed, hashed differently from its blob, and no other checkout could match all seven.
+The rows themselves were right: re-scored at HEAD they were byte-identical (both reviewers).
+
+**What changed.** `score.py` now records, for each evaluator file, its SHA-256 over LF-normalised bytes and
+its blob at HEAD; the commit, its tag if any, and whether any evaluator or input file was dirty; the hashes
+of the manifest and `diversity.json`; and per model the trace file's hash and when it was scored. CONFIG is
+written after each model, never before. A store scored with other code or inputs is refused; `--replace`
+archives it under `scores/_replaced/` first, and a model already scored with the same code on the same
+traces is skipped. Rows are written atomically. The milestone cache carries a sidecar naming the manifest
+and the `milestones.py` it was built from. `judge.py` and `router.py` record their commit, dirty flag, tag,
+reply-store summary and the digest of the store CONFIG they read; `analyze.py` refuses a stage built from
+another store, and `results.json` records its own commit and LF hash, the store CONFIG and every stage
+CONFIG.
+
+**Re-scored** from the clean commit `bf4a43b` (dirty false): 12 models, 27,000 rows. Against the archived
+store, every old field is identical except the 81 verdicts D-147 changes (and the half- and double-tolerance
+sensitivity labels, which move on 134 and 31 rows under the same rule); four fields are new. The tag
+`full-run-evaluation` marks the commit the paid stages start from; its evaluator files are those the store's
+CONFIG names. `results/main_pre_d137/` is regenerated at the same commit with a note saying what its store's
+CONFIG cannot: the evaluators were `answer.py` and `milestones.py` at `3a7f247`, the rest as at `a72399b`.
+
+## D-145 — Correction to ANALYSIS_PLAN: partial credit applies to every item with more than one target, not to multipart items only
+
+**Date:** 2026-09-30 · **Status:** RECORDED · **Evidence:** `analyze.py`, the store (local); ANALYSIS_PLAN.md carries a dated note
+
+The plan said "only multipart items can be partial, 480 of 2,250". `answer.verdict` gives `partial` whenever
+some but not all of an item's targets match, and 531 items carry more than one target: 352 multipart, 83
+symbolic, 51 vector and 45 classification. In the store 278 of the roster's 514 partial verdicts fall on
+non-multipart items (symbolic 180, vector 57, classification 41). Seven multipart templates have a single
+target on every item (`aoq_ati_rectifying`, `arl_beta_mean_shift`, `chase_vs_level_aggregate`,
+`coaxial_capacitance`, `poissons_ratio`, `server_configuration_selection`, `signal_energy_power`), and 84
+multipart items in 8 templates are checked on fewer quantities than the question's labelled parts, so
+"correct" means every quantity the check verifies. The scoring is what the experts validated three-way and is
+unchanged; the paper must describe it as it is and list the templates scored on only some of their parts.
+
+## D-146 — Correction to D-136 and D-140: the cliff count rests on a test valid under unequal variances, and it is 3 of 11, not 7
+
+**Date:** 2026-09-30 · **Status:** DECIDED · **Supersedes in part:** D-136 (Q2's test), D-140 (the cliff count) · **Evidence:** `analyze.py` (`welch`, `q2`, `--selftest`), `results/RESULTS.md` Q2
+
+D-136 set Q2's p-value as a permutation of the tier labels on the raw Easy-minus-Advanced difference, and
+D-140 reported the gap holding for 7 of 11 models. The second reviewer found, and the re-check confirmed,
+that the count moved with the seed (7, 7 and 5 of 11 at 10,000 draws) and that the test is liberal here:
+Advanced template means spread two to four times as widely as Easy ones (deepseek-v4.1-flash 0.063 against
+0.209, glm-5.3 0.082 against 0.299, claude-sonnet-5 0.102 against 0.217), and a raw-difference permutation
+over-rejects when the smaller group has the larger variance; the self-test now shows it on synthetic nulls.
+
+**Adopted.** The count rests on Welch's t-test, Holm across the eleven models: **3 of 11** (gpt-oss-20b,
+gpt-5.4-mini, gemini-3.1-flash-lite). The planned permutation is printed beside it and gives 6 of 11 at
+100,000 draws. Every resampling test now draws 100,000 permutations, so the Holm floor over 55 pairs is
+0.0006 rather than 0.0055. The detectable gap is given as the plan defined it and at the strictest Holm step
+from the Welch standard error (gpt-oss-20b 0.156 becomes 0.221, deepseek 0.082 becomes 0.135). The plan's
+within-tier bootstrap intervals are unchanged and remain what the paper reports per model.
+
+**Two variations, added.** With unusable rows left out of the template means, glm-5.3's gap falls from +0.133
+to +0.009, glm-5.3-flash's from +0.072 to +0.036 and muse's from +0.050 to +0.029: 145 of the roster's 246
+unusable rows sit on Advanced templates, so those cliffs measure finishing within the output ceiling. Without
+the nine symbolic templates the count is unchanged. On the pre-D137 record the corrected count is 0 of 11
+against 2 under the planned test.
+
+**Q1.** The template-level test on the fully-solved rate now stands beside McNemar's item-level one. The pair
+gpt-oss-20b against qwen3-235b-a22b-2507, the 32nd claim, holds on the answer score at 0.0530 after D-147 and
+not on the fully-solved rate (0.51), so **31 of 55** pairs hold; the two template-level tests agree on all 55.
+
+## D-147 — The answer check's last-digit windows: the inclusive boundary adopted; the half-unit and whole-trace readings reported as sensitivities
+
+**Date:** 2026-09-30 · **Status:** DECIDED (the owner may reverse it: one commit) · **Evidence:** `full_run_28092026/boundary_audit.py`, `BOUNDARY_AUDIT.md`; the self-test in `evaluators/answer.py`; `SCORER_VALIDATION.md`
+
+`answer.match` accepts a value within one unit of its own last digit, or of the gold's. A value exactly one
+unit off sits on the edge, and in binary the edge is not exact: 0.063 - 0.062 is 0.0010000000000000009, so
+whether such a value passed depended on how the difference rounded. The windows are documented as inclusive
+("within one unit"), so the comparison now carries a relative slack of 1e-9 (`answer.SLACK`) and the verdict
+follows the rule. Measured as D-138 was, against the check before the change:
+
+| reading | gold | pilot verdicts moved | full run, 12 models |
+|---|---|---|---|
+| inclusive, adopted | 2,250 of 2,250 | 0; agreement 0.982 / 0.927 unchanged | 81 change: 67 incorrect to correct, 14 partial to correct; scores +0.001 to +0.008 (gpt-5.4-mini 0.829 to 0.837, gpt-oss-20b 0.799 to 0.805); 27 templates, led by `hydraulic_jump_energy_loss` 9 and `rational_method_peak_flow` 8 |
+| half-unit, a sensitivity | 2,250 | 0 | 275 change, 201 correct to incorrect; scores -0.002 to -0.026 |
+| whole trace, a sensitivity | 2,250 | 2: 1 to the experts, 1 away; non-partial agreement 0.986 | 425 against the check before, 358 of them partial to correct; qwen3-235b-a22b-2507 0.873 to 0.893, the others +0.002 to +0.011 |
+
+The half-unit reading requires a correct rounding at the precision shown; the experts validated the one-unit
+rule and cannot arbitrate (no pilot verdict moves), so it is reported, not scored. The whole-trace reading
+credits a numeric part the Answer line leaves out when the trace states it anywhere, for a trace whose
+Answer line already matches at least one part: it answers the question the format-only partials raised (92
+of Qwen3-235B-2507's 115 partial verdicts, 6 to 48 for the other models), and the pilot holds only two such
+traces, which the experts split one each way. It is reported, not scored, because the prompt asks for the
+final result on the Answer line and the experts validated the check there. A first version of that reading
+re-read every part from the whole trace; it credited wrong Answer lines whose working held the right number,
+turned 1,089 incorrect verdicts correct and moved 27 pilot verdicts away from the experts, and was rejected
+before it was adopted. E5 and the router depend on E3 and the digit rule, not on the answer check, so none of
+this touches a judge prompt.
+
+## D-148 — Guards for the paid stages, the harness and the roster file
+
+**Date:** 2026-09-30 · **Status:** DECIDED · **Evidence:** `full_run_28092026/judge_calls.py`, `judge.py`, `router.py`, `analyze.py` (`stage_q3`, `--selftest`), `run_traces.py`, `models.json`
+
+- **An unanswered call leaves a rate.** `judge.summarise` gave a trace whose call got no reply an E5 score
+  equal to E3's fraction, and `analyze` counted it; `router.summarise` recorded a failed call as 0 unjudged
+  and no flags, a clean trace. Now the router leaves every sent step unjudged, and `analyze` computes every
+  judged rate over the answered calls, prints the count without a reply beside it, and marks the stage
+  incomplete in the header. The self-test covers both.
+- **The cap is cumulative.** `judge_calls.run` started its spend count at zero on every invocation, so two
+  resumes at `--max-usd 50` could bill $100; the guide read as a cumulative cap. The count now starts from
+  what the reply store records over every line, replies and failures alike.
+- **Late replies are kept.** A worker stores its own result on return, so a call that outlives the deadline
+  is stored when it arrives and read on the next run instead of bought again. The client makes no SDK
+  retries and its timeout is 300 s, so one fetch of three attempts stays inside the deadline (960 s); the
+  pilot's 600 s with two SDK retries could outlive it. A key that has failed in three runs is left alone and
+  counted. Jobs are interleaved across models, so a stop at the cap leaves every model partly judged.
+- **Stages are tied to the store.** Both stages refuse to start if a store row's recorded trace hash no
+  longer matches the trace on disk, record the digest of the store CONFIG they read, and get `--status`.
+- **The roster file.** `qwen3-235b-a22b` (never run; no endpoint met the routing rule) and the set-aside
+  `qwen3.8-27b` carry `"run": false` with the reason, and no mode calls an inert entry unless `--model` names
+  it; a bare `--variant paraphrase --yes` would otherwise have billed the set-aside model about $11.
+- **A provider fault inside a 200** (`finish_reason` `error`) is a service failure and is retried. Seven such
+  rows in the main run (4 correct, 2 incorrect, 1 unusable) are kept and reported as a count.
+
+## D-149 — Reporting additions to the analysis, made after the first results were read and labelled as such
+
+**Date:** 2026-09-30 · **Status:** DECIDED · **Evidence:** `analyze.py` (docstring, `--selftest`), `score.py` (the new row fields), `results/RESULTS.md`, `results/per_template.csv`
+
+Each of these answers a reviewer's ask (NEXT_CYCLE_REVIEW sections 3.1, 3.3 and 9.3, the July rebuttal) or
+one of the two reviews, reads the existing store, and is labelled in RESULTS.md as added after the data.
+Where a number is quoted, it is from the regenerated results.
+
+- Beside every headline score, the per-template SD the July rebuttal promised, in both senses: within a
+  template over its 15 items (0.041 for deepseek-v4.1-flash to 0.213 for gpt-oss-20b) and between template
+  means (0.117 to 0.276).
+- The digit rule's wrong-answer rate over the answered wrong answers (glm-5.3 0.111 where the empties gave
+  0.016); the 1% rate beside it; the position of the first flagged step in a fully solved trace; and the
+  wrong-answer rate against the item's milestone count.
+- E3's chance floor per model, the trace scored against a sibling item's milestones (0.107 to 0.196 on the
+  readable wrong answers), stored per row so E5's coverage can be read against it.
+- "Unusable" split into empty and unreadable (243 and 3 on the roster); the answered rows cut at the output
+  cap and scored (18; 8 of them correct); the seven odd finish reasons.
+- The score by serving endpoint matched on template, because dispatch order confounds a raw per-endpoint
+  mean with the templates each endpoint served: every endpoint with more than 36 templates in common with
+  the others differs from them by at most 0.016; gpt-oss-20b's two minor endpoints served 8 rows in all and
+  their differences are noise.
+- A noise floor for Kendall's tau, the ordering on one half of each template's items against the other:
+  median 0.881 over 200 splits, because the top five models lie within 0.012 of each other.
+- Q5: the paired E3 coverage difference, the E5-strict difference once E5 has run on both arms (the coverage
+  delta section 6 asks for; without it the $5 for E5 on the paraphrase arm would feed nothing), and the
+  same-endpoint pairs alone.
+- The sensitivity rows of D-147 and the pool without the nine symbolic templates (D-138).
+- `results/per_template.csv`: one row per template and model, aggregates only, so figures and a reader's own
+  template bootstrap can be redone without the private store.
+- The results carry their provenance (D-144), the header says which stages have run and whether any is
+  incomplete, and the caption states that the Holm floor is 0.0006 and that a rate over a subset of traces
+  resamples the templates with a qualifying trace.
+- The Wilcoxon test on milestone coverage the July rebuttal promised is not added: it was tied to the
+  decoupling claim the paper no longer makes (NEXT_CYCLE_REVIEW 9.3 item 13); if that claim returns, the
+  test returns with it.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
+| D-147 | The inclusive last-digit boundary is adopted; the owner may reverse it (one commit). Whether the paper reports the half-unit or whole-trace reading as anything more than a sensitivity would need an expert spot-check of the format-only partials | the paper's tables |
+| D-146 | The paper reports the cliff per model with its interval and, if it states a count, the Welch count with the planned one beside it (as RESULTS.md now does) | the paper's section 5 |
+| — | The router's funding: with everything else run the round lands at about $450 on the account's basis (about $480 at E5's dearest endpoint); the router adds $72 to $195 and does not fit in $500 | the router's run |
+| — | A stratified read of the digit rule's flags on this roster (Qwen3-235B-2507 has 1,547 on 18,785 claims; 16 of deepseek's 24 sit in one template), the pilot's own rule before Q3 is reported; author time, no code | Q3 in the paper |
 | D-141 | Run: writing the 450 paraphrases with Mistral Large 3, $0.15 to $0.45 (`EVALUATION_GUIDE.md`, the paraphrase arm) | the expert check, and the paraphrase run by about 5 October |
 | D-141 | Run: the paraphrase run over the eleven models, about $49.2 on the main run's bills for the same items | the week of the main run, so the served models match |
 | D-141 | Run: the three decoding repeats of `gemma-4-26b-a4b`, about $0.28 | reporting the decoding spread |
