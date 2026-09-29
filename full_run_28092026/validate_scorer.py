@@ -15,6 +15,11 @@
                     differs from the labels' (digit_rule.py, its e4 row; RESULTS_X1 Finding 5)
    Each figure is also recomputed with the pilot's own functions on the same inputs, so a
    difference would be the scorer's plumbing, not a change in the evaluators.
+3. THE CODE CHANGED SINCE. The answer check and E3 read numbers differently since D-137, so the
+   published figures are reproduced with the code they were published with (answer.py and
+   milestones.py at parser_fix.PRE_FIX, loaded from git), and the figures the current code gives
+   are reported beside them. The check passes when the old code reproduces every published figure
+   and the gold is clean.
 Nothing here calls a model or the network. It writes figures only.
 """
 from __future__ import annotations
@@ -37,7 +42,7 @@ import arith  # noqa: E402
 import e2_prm  # noqa: E402
 import score_against_labels as S  # noqa: E402
 
-from full_run_28092026 import score  # noqa: E402
+from full_run_28092026 import parser_fix, score  # noqa: E402
 
 LABELS = PILOT / 'experts_filled_labels' / 'version_2' / 'labels'
 PUBLISHED = {   # RESULTS_X1 Findings 1b, 2 and 5; digit_rule.py's e4 rows
@@ -69,10 +74,34 @@ def prf(c):
     return round(p, 3), round(r, 3), round(f, 3)
 
 
+def answer_figures(labels, truth, codes):
+    """answer_check.py's definitions: correct-or-not over the traces the experts did not call
+    partial, and three-way over all."""
+    np_codes = [c for c in codes if truth[c]['final_answer'] != 'partial']
+    return (round(sum((labels[c] == 'correct') == (truth[c]['final_answer'] == 'correct')
+                      for c in np_codes) / len(np_codes), 3),
+            round(sum(labels[c] == truth[c]['final_answer'] for c in codes) / len(codes), 3))
+
+
+def e3_counts(hits, truth, codes):
+    """E3 against the experts' "obtained", per milestone (score_against_labels.report_milestones)."""
+    m = Counter()
+    for c in codes:
+        for reached, tm in zip(hits[c], truth[c]['milestones']):
+            if tm['status'] is None:
+                continue
+            truly = tm['status'] == 'reached'
+            m['tp'] += truly and reached
+            m['fp'] += (not truly) and reached
+            m['fn'] += truly and not reached
+    return m
+
+
 def main() -> int:
     g = score.gold(8)
     truth, keyfile, items, texts = pilot_inputs()
-    rows, pilot_labels = {}, {}
+    old_a, old_m = parser_fix.pre_fix_modules()
+    rows, pilot_labels, old_labels, old_hits = {}, {}, {}, {}
     for code, t in truth.items():
         key = keyfile[code]
         if key[1] not in items or key not in texts:
@@ -82,28 +111,21 @@ def main() -> int:
         for k in ('branch', 'domain', 'level', 'answer_type', 'repeat_of', 'single_path'):
             it.setdefault(k, None)
         ms = [{'id': m['id'], 'value': m['value']} for m in t['milestones']]
+        vals = tuple(m['value'] for m in ms)
         rows[code] = score.score_trace(it, {'status': 'answered', 'text': texts[key]}, ms)
-        pilot_labels[code] = A.verdict(texts[key], items[key[1]], None, tuple(m['value'] for m in ms))[0]
+        pilot_labels[code] = A.verdict(texts[key], items[key[1]], None, vals)[0]
+        old_labels[code] = old_a.verdict(texts[key], items[key[1]], None, vals)[0]
+        old_hits[code] = parser_fix.reached(old_m, ms, texts[key])
 
-    # answer check
+    # answer check, now and with the code the figures were published with
     codes = sorted(rows)
     same_as_pilot = sum(rows[c]['answer']['label'] == pilot_labels[c] for c in codes)
-    # answer_check.py's definition: correct-or-not, over the traces the experts did not call partial
-    np_codes = [c for c in codes if truth[c]['final_answer'] != 'partial']
-    agree_np = sum((rows[c]['answer']['label'] == 'correct') == (truth[c]['final_answer'] == 'correct')
-                   for c in np_codes) / len(np_codes)
-    agree_3 = sum(rows[c]['answer']['label'] == truth[c]['final_answer'] for c in codes) / len(codes)
+    agree_np, agree_3 = answer_figures({c: rows[c]['answer']['label'] for c in codes}, truth, codes)
+    old_np, old_3 = answer_figures(old_labels, truth, codes)
 
     # E3 against "obtained"
-    m = Counter()
-    for c in codes:
-        for reached, tm in zip(rows[c]['e3']['reached'], truth[c]['milestones']):
-            if tm['status'] is None:
-                continue
-            truly = tm['status'] == 'reached'
-            m['tp'] += truly and reached
-            m['fp'] += (not truly) and reached
-            m['fn'] += truly and not reached
+    m = e3_counts({c: rows[c]['e3']['reached'] for c in codes}, truth, codes)
+    m_old = e3_counts(old_hits, truth, codes)
 
     # digit rule, per step, with digit_rule.py's own flag for comparison
     step_c = {'all': Counter(), 'hard': Counter()}
@@ -129,13 +151,16 @@ def main() -> int:
                         cnt['fp' if f else 'tn'] += 1
 
     ep, er, ef = prf(m)
+    op, orr, of = prf(m_old)
     ap_, ar, af = prf(step_c['all'])
     hp, hr, hf = prf(step_c['hard'])
-    got = {'answer, non-partial agreement': round(agree_np, 3), 'answer, three-way agreement': round(agree_3, 3),
-           'E3 precision': ep, 'E3 recall': er, 'E3 F1': ef,
-           'digit rule, all traces, precision': ap_, 'digit rule, all traces, recall': ar,
-           'digit rule, hard case, precision': hp, 'digit rule, hard case, recall': hr,
-           'digit rule, hard case, F1': hf}
+    digit = {'digit rule, all traces, precision': ap_, 'digit rule, all traces, recall': ar,
+             'digit rule, hard case, precision': hp, 'digit rule, hard case, recall': hr,
+             'digit rule, hard case, F1': hf}
+    got = {'answer, non-partial agreement': agree_np, 'answer, three-way agreement': agree_3,
+           'E3 precision': ep, 'E3 recall': er, 'E3 F1': ef, **digit}
+    then = {'answer, non-partial agreement': old_np, 'answer, three-way agreement': old_3,
+            'E3 precision': op, 'E3 recall': orr, 'E3 F1': of, **digit}
     L = ['# Scorer validation', '', 'Generated by `validate_scorer.py`; the checks are defined in its docstring.', '',
          '## Gold, all 2,250 items', '', '| check | result |', '|---|---|',
          f"| scored correct at all three tolerances | {g['answer_correct_all_three_tols']} of {g['items']} |",
@@ -150,13 +175,17 @@ def main() -> int:
          f"{own['hard']['tp']}/{own['hard']['fp']}/{own['hard']['fn']} in the hard case, against the scorer's "
          f"{step_c['all']['tp']}/{step_c['all']['fp']}/{step_c['all']['fn']} and "
          f"{step_c['hard']['tp']}/{step_c['hard']['fp']}/{step_c['hard']['fn']}.", '',
-         '| figure | published | scorer | same |', '|---|---:|---:|---|']
-    ok = True
+         f'"Published code" is the scorer with `answer.py` and `milestones.py` as they were published, at '
+         f'`{parser_fix.PRE_FIX[:7]}`; "now" is the current code (D-137, `PARSER_FIX.md`). The digit rule is '
+         'unchanged.', '',
+         '| figure | published | published code | reproduced | now |', '|---|---:|---:|---|---:|']
+    ok = g['answer_correct_all_three_tols'] == g['items'] and not g['unusable'] and not g['digit_flags']
     for k, v in PUBLISHED.items():
-        same = abs(got[k] - v) < 5e-4
+        same = abs(then[k] - v) < 5e-4
         ok &= same
-        L.append(f'| {k} | {v:.3f} | {got[k]:.3f} | {"yes" if same else "NO"} |')
-    L += ['', 'All figures reproduced.' if ok else 'A figure differs: see the rows marked NO.']
+        L.append(f'| {k} | {v:.3f} | {then[k]:.3f} | {"yes" if same else "NO"} | {got[k]:.3f} |')
+    L += ['', 'The gold is clean and the published code reproduces every figure.' if ok
+          else 'A check failed: see the gold table and the rows marked NO.']
     (HERE / 'SCORER_VALIDATION.md').write_text('\n'.join(L) + '\n', encoding='utf-8', newline='\n')
     print('\n'.join(L))
     return 0 if ok else 1

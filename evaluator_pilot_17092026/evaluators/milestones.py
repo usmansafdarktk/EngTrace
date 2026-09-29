@@ -57,9 +57,18 @@ TRAJECTORY = re.compile(r'(_prev$|_curr$|_next$|^change$|^last_change$|^[yg]_[cp
 SCALES = (1.0, 1e3, 1e-3, 1e6, 1e-6, 1e9, 1e-9, 60.0, 1 / 60.0, 3600.0, 1 / 3600.0, 100.0, 0.01)
 
 
+# Thousands grouped by a LaTeX thin space, a braced comma or a narrow space - 28\,570, 11{,}003,
+# 3 021 - are one number (D-137). A plain space is not: `\log_2 256` is not 2,256.
+SEPARATOR = re.compile(r'\\,|\{,\}|[\u2009\u202f\u00a0]')
+GROUPED = re.compile(r'(?<![\d.,_^])\d{1,3}(?:(?:\\,|\{,\}|[\u2009\u202f\u00a0])\d{3})+(?!\d)')
+
+
 def numbers(text: str) -> list[float]:
-    """Every number written in a text. `×10^` and `10^-3` forms are folded in."""
-    t = text.replace(',', '').replace('−', '-')
+    """Every number written in a text. `×10^` and `10^-3` forms are folded in, and LaTeX's
+    `\\times 10^{5}` and `\\cdot 10^{5}` with them (D-137): until the full run they read as
+    three numbers."""
+    t = GROUPED.sub(lambda m: SEPARATOR.sub('', m.group(0)), text)
+    t = t.replace(',', '').replace('−', '-').replace('\\times', '*').replace('\\cdot', '*')
     t = re.sub(r'(\d)\s*[×x\*]\s*10\s*\^\s*\{?\s*([-+]?\d+)\s*\}?', r'\1e\2', t)
     out = []
     for m in NUM.finditer(t):

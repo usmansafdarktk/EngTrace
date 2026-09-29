@@ -75,6 +75,7 @@ STOP = {'the', 'is', 'are', 'and', 'of', 'at', 'in', 'for', 'per', 'with', 'appr
 
 SUP = str.maketrans('⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺', '0123456789-+')
 FRACTION = re.compile(r'(?<![\w.^])(\d+(?:\.\d+)?)\s*/\s*(\d+(?:\.\d+)?)(?![\w.])')
+SEPARATOR, GROUPED = milestones.SEPARATOR, milestones.GROUPED     # 28\,570 is one number (D-137)
 
 
 def values(seg):
@@ -88,13 +89,17 @@ def values(seg):
     `7.34 \times 10^{-11}`, `1.46 x 10^(-10)`, `\frac{5}{2}`, subscripted `P_a(p_1)` - and a
     checker reading only plain decimals marks correct answers wrong. Unit exponents go
     first, or `m^3/s` contributes a 3 and `m/s^2` a 2 that then masquerade as answers.
+
+    `\\times` and `\\cdot` become `x` and `*` BEFORE the exponent rules read them (D-137):
+    replaced after, as they were until the full run, `3.04 \\times 10^5` read as 3.04, 10 and 5.
     """
-    t = seg
+    t = GROUPED.sub(lambda m: SEPARATOR.sub('', m.group(0)), seg)
+    t = t.replace('\\times', ' x ').replace('\\cdot', ' * ')
     t = re.sub(r'(\d)\s*[x*\u00d7]\s*10\s*\^\s*\(?\{?\s*([-+]?\d+)\s*\}?\)?', r'\1e\2', t)
     t = re.sub(r'(\d)\s*[x*\u00d7]\s*10\s*([\u207b\u207a]?[\u2070\u00b9\u00b2\u00b3\u2074-\u2079]+)',
                lambda m: m.group(1) + 'e' + m.group(2).translate(SUP), t)
-    t = t.replace('\\times', ' x ').replace('\\cdot', ' * ').replace('\\,', ' ')
-    t = re.sub(r'\\d?frac\s*\{([^{}]*)\}\s*\{([^{}]*)\}', r' \1/\2 ', t)
+    t = t.replace('\\,', ' ')
+    t = re.sub(r'\\[dt]?frac\s*\{([^{}]*)\}\s*\{([^{}]*)\}', r' \1/\2 ', t)
     t = re.sub(r'(?<=[A-Za-z])\s*\^\s*-?\d+', ' ', t)                    # m^3/s, m/s^2
     t = re.sub(r'(?<=[A-Za-z])[\u2070\u00b9\u00b2\u00b3\u2074-\u2079]+', ' ', t)   # unicode units
     t = t.translate(SUB).translate(SUP)
@@ -382,6 +387,27 @@ def selftest():
         # a unit factor apart is the same answer
         ('**Answer:** The volume is 113.55 cm3/mol', '', 'scalar', (113.55,),
          '**Answer:** 0.11355 dm3/mol', 'correct'),
+        # D-137: forms from the full run's traces, the verdict the gold's arithmetic gives
+        ('**Answer:** a) The Reynolds number is approximately **304,114**. b) The flow regime is **turbulent**.',
+         '', 'classification', (304114.0,),
+         '## Final Answer\n**Answer:** a) \\(Re \\approx 3.04 \\times 10^5\\) dimensionless; b) turbulent flow',
+         'correct'),
+        ('**Answer:** The force is F = 5.520e-05 N.', '', 'scalar', (5.52e-05,),
+         '**Answer:** \\(F = 5.52 \\times 10^{-5}\\ \\text{N}\\)', 'correct'),
+        ('**Answer:** The force is F = 5.520e-05 N.', '', 'scalar', (5.52e-05,),
+         '**Answer:** \\(F = 5.52 \\cdot 10^{-5}\\) N', 'correct'),
+        ('**Answer:** The AOQ is 28,570 ppm.', '', 'scalar', (28570.0,),
+         '**Answer:** \\(28\\,570\\ \\text{ppm}\\)', 'correct'),
+        ('**Answer:** The AOQ is 11,003 ppm.', '', 'scalar', (11003.0,),
+         '**Answer:** \\(AOQ = 11{,}003\\) ppm', 'correct'),
+        ('**Answer:** The volume is 3,021 m3.', '', 'scalar', (3021.0,),
+         '**Answer:** 3 021 m³ of soil', 'correct'),
+        ('**Answer:** The phase is 10/3 rad.', '', 'scalar', (10 / 3,),
+         '**Answer:** \\(\\tfrac{10}{3}\\) rad', 'correct'),
+        # and a wrong value in the same notation is still wrong
+        ('**Answer:** a) The Reynolds number is approximately **304,114**. b) The flow regime is **turbulent**.',
+         '', 'classification', (304114.0,),
+         '## Final Answer\n**Answer:** a) \\(Re \\approx 3.40 \\times 10^5\\); b) turbulent', 'partial'),
     ]
     bad = 0
     for sol, q, typ, ms, trace, want in cases:
@@ -389,7 +415,15 @@ def selftest():
         if got != want:
             bad += 1
             print('FAIL want %-9s got %-9s | %s' % (want, got, ' '.join(trace.split())[:60]))
-    print('%d/%d cases pass' % (len(cases) - bad, len(cases)))
+    # values() alone: grouping joins only a number's own digits (D-137)
+    reads = [('\\(\\log_2\\,256 = 8\\)', 2256.0, False), ('\\(x_1\\,000\\)', 1000.0, False),
+             ('\\boxed{1\\,335}\\ \\text{K}', 1335.0, True), ('\\(4\\,477.9\\ \\text{psi}\\)', 4477.9, True),
+             ('\\(1\\,234\\,567\\)', 1234567.0, True), ('0.123\\,456', 123456.0, False)]
+    for text, v, want in reads:
+        if any(abs(x - v) < 1e-9 for x, _u in values(text)) != want:
+            bad += 1
+            print('FAIL values(%r) %s %s' % (text, 'misses' if want else 'reads', v))
+    print('%d/%d cases pass' % (len(cases) + len(reads) - bad, len(cases) + len(reads)))
     return bad
 
 

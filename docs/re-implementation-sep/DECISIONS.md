@@ -4984,6 +4984,53 @@ the scores. Where the plan names a quantity but not its method, the script fixes
 The self-test checks each statistic on synthetic data with a known answer. Among its checks, it plants a
 paraphrase loss in three of eleven synthetic models and finds it in those three and in no other.
 
+## D-137 — The answer check and E3 misread LaTeX numbers; fixed, and the pilot's agreement rises to 0.982
+
+**Date:** 2026-09-29 · **Status:** DECIDED · **Evidence:** `full_run_28092026/parser_fix.py`, `PARSER_FIX.md`, `validate_scorer.py`, `SCORER_VALIDATION.md`; `evaluator_pilot_17092026/analysis/answer_check.py`; the self-test in `evaluators/answer.py`
+
+The first run of `analyze.py` on the free scores showed an anomaly: DeepSeek V4.1 Flash solved 3 of 8
+turbulent Reynolds items. Its traces were right. It wrote `\(Re \approx 3.04 \times 10^5\)`, and the
+answer check read that as three numbers, 3.04, 10 and 5.
+
+- **The answer check** (`answer.values`) had an ordering bug. Its exponent rule ran before `\times` and
+  `\cdot` were rewritten, so the LaTeX forms never reached it. The docstring says the forms are handled.
+  The order has been this way since `cb84f32`, the commit that produced the published 0.947.
+- **E3's reader** (`milestones.numbers`) never rewrote `\times` or `\cdot` at all.
+- **Both readers** split thousands written `28\,570`, `11{,}003` or with a narrow space, and the answer
+  check did not read `\tfrac`.
+
+The fix is minimal. Both readers now read these forms as one number, and 14 new self-test cases pin
+them. A plain space still separates numbers, because `\log_2 256` is not 2,256. That leaves one residual
+form, "14 056": it appears in 20 of Muse Glimmer's answers and in one each of three other models'.
+
+**Checks.**
+- **Gold.** All 2,250 gold answers still score correct at all three tolerances. None of the 2,250
+  milestone sets changes.
+- **The pilot's 300 traces.** 10 answer verdicts change, and all 10 now equal the experts' verdict.
+  - The answer check's agreement goes from 0.947 to **0.982** on the traces the experts judged fully right
+    or wrong, and from 0.893 to **0.927** three ways.
+  - E3's precision, recall and F1 go from 0.926/0.915/0.921 to 0.927/0.920/0.923.
+  - The split-half tolerance fit still gives 0.0015 and 0.0020, so REL stays at 0.002.
+  - The pilot's DeepSeek R1 moves from 0.817 to 0.950 against the experts' 0.917. RESULTS_X1 carries a
+    dated addendum.
+
+  `validate_scorer.py` reproduces every published figure with the code it was published with. It reports
+  the corrected figures beside them, and the paper should cite the corrected ones.
+- **The full run** (`PARSER_FIX.md`). Changed verdicts range from 1 to 116 per model. Examples of the
+  score changes:
+  - DeepSeek V4.1 Flash: 0.941 → 0.974.
+  - GPT-5.4 mini: 0.811 → 0.838.
+  - Kimi K3: 0.942 → 0.963.
+  - gpt-oss-20b: 0.807 → 0.826.
+  - Claude Sonnet 5 and GLM-5.3: unchanged at three decimals.
+
+  Some verdicts move from correct: 18 for GPT-5.4 mini, 10 for gpt-oss-20b, 8 for Kimi K3. Every such
+  case read had matched through a stray exponent digit, and the model's answer was wrong. For example,
+  the "10" of `1.10 \times 10^4` passed for 10,739 at the ×1000 scale, where the stated 11,000 is 2.4% off.
+
+The pilot analyses that also call `milestones.numbers` (`e3_grid.py`, `e3_null.py`, `hard_case_pool.py`,
+`judge_probe.py`) would read the corrected numbers if re-run.
+
 ## Open decisions
 
 | # | Decision | Needed before |

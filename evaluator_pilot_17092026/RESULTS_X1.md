@@ -136,6 +136,15 @@ Three consequences:
 | llama-3.1-70b | 0.150 | 0.150 | 0.183 |
 | **all 300** | **0.760** | **0.547** | **0.753** |
 
+*Addendum, 2026-09-29 (D-137).* The corrected check read LaTeX's `3.04 \times 10^{5}` as three
+numbers, because its exponent rule ran before `\times` was rewritten; that is fixed, with thousands
+written `28\,570` or `11{,}003`. Re-run on these 300 traces (`analysis/answer_check.py`), 10 verdicts
+change, all 10 to the experts' verdict. Agreement is now **0.982** on the non-partial traces and
+**0.927** three ways. Per model the check gives gpt-5 0.950, claude-opus-4.7 0.950, deepseek-r1 0.950
+(0.817 above), gemini-3.1-pro 0.900 (0.867), llama-3.1-70b 0.183; all 300, 0.787. The split-half
+tolerance fit still gives 0.0015 and 0.0020. The figures above are kept as published;
+`full_run_28092026/validate_scorer.py` reproduces them with the code they were published with.
+
 E0 understates accuracy by 21 points overall - 33 for GPT-5, 28 for DeepSeek R1, 23 for
 Gemini, 22 for Claude, none for Llama - and ranks **GPT-5 fourth**; the experts and the
 corrected check both put it first. These are sizes on this slice, which was built to
