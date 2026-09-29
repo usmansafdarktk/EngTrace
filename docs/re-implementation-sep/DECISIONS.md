@@ -4822,6 +4822,32 @@ GLM-5.3's 100 empty rows cluster on a few templates: every item of `qr_policy_on
 each of `aoq_ati_rectifying` and `normal_depth_iteration`. These are largely the templates on which
 the other models' empty rows fall too (`--empties`).
 
+## D-131 — Inference is complete for twelve models: $304.62 in the rows, under the $320 ceiling
+
+**Date:** 2026-09-29 · **Status:** DECIDED (the record); OPEN (the Qwen slot; the traces' Kaggle copy) · **Evidence:** `run_traces.py --status`; `calibration_estimate.py --empties` with the twelve `--model` keys; OpenRouter's account usage; the traces (local, backed up)
+
+Qwen3.8-27B finished at 10:13 local time: 2,161 answered and 89 empty of its 2,250, $56.705 billed,
+9,148 output tokens per item, 28 attempts beyond the first, inside its calibration interval of
+$32.18 to $68.20 (D-129). All 98 of its rows that stopped at the output cap used the full 32,768
+tokens. Its empty rows fall on the same templates as the other models': 15 of `qr_policy_one_iteration`,
+14 each of `adiabatic_flame_temperature` and `work_isothermal_virial`, 12 of `normal_depth_iteration`
+and 10 of `vdw_solve_for_volume` among them.
+
+Every one of the twelve models has all 2,250 items recorded, answered or empty, with no service
+failure left: 27,000 rows, 332 of them empty. The original `qwen3-235b-a22b` stays skipped (D-121).
+The rows record $304.62 across the twelve, their calibrations included, under the owner's $320 ceiling
+(D-129); the checks add under a cent. OpenRouter's account usage rose $316.96 from the read before the
+seven started (D-126) to the end, on top of the $1.80 of check and calibration billed before that read,
+so $318.76 by the account. The $14.14 the rows do not show covers the attempts beyond the first, the
+calls in flight when the run was stopped (D-125), the checks, and any other use of the account in those
+hours, which cannot be told apart from here.
+
+The twelve models' traces are archived locally beside the pool's backup with their checksum, every
+member checked against its source by SHA-256. The private Kaggle copy waits for the owner, because the
+upload needs manual mode.
+
+**Open.** Which Qwen candidate fills the Qwen slot (D-121); the traces' Kaggle copy.
+
 ## Open decisions
 
 | # | Decision | Needed before |
@@ -4842,7 +4868,7 @@ the other models' empty rows fall too (`--empties`).
 | D-121 | ~~Approve the harness check (about $0.01) and the calibration run (about $3.58, 220 calls)~~ **Approved by the owner 2026-09-28 (D-122)** | — |
 | D-122 | ~~Approve the full run: about $202 for the ten, 95% interval $163 to $251, on the calibration's bills (D-123)~~ **Approved for seven by the owner 2026-09-28 (D-124): $30.41, interval $26.67 to $34.66; the spend line moved to $45.06 after the stop (D-125)** | — |
 | D-124 | ~~Whether and when to run `kimi-k3`, `glm-5.3` and `claude-sonnet-5`: $171.74, interval $134.07 to $221.32~~ **Approved by the owner and started 2026-09-28 (D-127)** | — |
-| D-126 | A private Kaggle copy of the traces; the local archive is made and verified | the evaluation |
+| D-126 | A private Kaggle copy of the traces; the local archive of all twelve models is made and verified (D-131) | the evaluation |
 | D-117 | ~~Confirm the analysis plan as a whole; its two scoring rules are decided~~ **Confirmed by the owner 2026-09-28 (D-122)** | — |
 | D-114 | ~~A private backup of `full_run_28092026/pool/` and `SEED.secret`~~ **Backed up 2026-09-28: a private Kaggle dataset in the owner's account, downloaded back and matched file for file, and a local archive with its checksum.** ~~The tag on the commit inference runs at~~ **`full-run-inference` (D-122)** | — |
 | — | The budget: the plan comes to about $606 against the ~$500 round with a batched router (D-110). Calibration puts generation at about $202 for the ten against the plan's $403 (D-123); the seven's run cost $32.96 to $35.75 (D-126) | generation starts |
