@@ -52,7 +52,7 @@ Also:
 - [ ] `OPENROUTER_API_KEY` is set in the repo's `.env`. It is the only key the stages use; the OpenAI and Anthropic keys there are dead (D-121).
 - [ ] The experts' labels are in `evaluator_pilot_17092026/experts_filled_labels/version_2/` and the pilot's stored replies in `evaluator_pilot_17092026/scores/`; the validations above read them. Both stay local.
 - [ ] The local backups exist: `~/EngTrace_private_backup/full_run_pool_and_seed_2026-09-28.zip` and `full_run_traces_2026-09-29.zip` with their `.sha256` files.
-- [ ] The laptop is on mains power and set not to sleep for the length of the stage (section 2).
+- [ ] The laptop is on mains power with the lid open, and cannot sleep for the length of the stage (section 2). The stages hold no keep-awake request themselves; launch them through `keepawake_run.ps1` (section 3) or set sleep to never.
 - [ ] The spend for the step you are about to run is approved by the owner, on the estimate the dry run prints today, not on the figures in this file.
 
 If any check fails, stop: section 9.
@@ -86,6 +86,17 @@ python -m full_run_28092026.judge --yes --max-usd 55 --workers 16 > full_run_280
 python -m full_run_28092026.judge --status                       # free, any time: the reply store and the rows
 ```
 
+- **Launching on Windows.** `keepawake_run.ps1` runs the same command under a keep-awake request, which
+  lasts as long as the process and changes no power setting, and appends to the log with a header and an
+  exit line. Started through WMI, the process outlives the session that launched it:
+
+  ```powershell
+  $cl = "powershell.exe -NoProfile -ExecutionPolicy Bypass -WindowStyle Minimized -File $PWD\full_run_28092026\keepawake_run.ps1 -Log full_run_28092026\scores\e5.log -m full_run_28092026.judge --yes --max-usd 55 --workers 16"
+  Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{ CommandLine = $cl; CurrentDirectory = "$PWD" }
+  ```
+
+  To stop it, end the `python.exe` whose command line holds `judge --yes`
+  (`Get-CimInstance Win32_Process -Filter "Name='python.exe'"`); every returned call is already in the store.
 - **The cap.** `--max-usd` is cumulative (D-148): what the reply store already records, replies and
   failures alike, counts toward it, so it bounds the stage across resumes. Set it to the approved
   amount. The dearest endpoint's estimate is $49.71, so a $50 cap may stop a few calls short if
@@ -118,8 +129,8 @@ python -m full_run_28092026.router --status                      # free
 
 - Run it after E5, not beside it: both call MiMo, and its providers refuse traffic beyond a point. If
   many calls fail, re-run with `--workers 4`; expect about 66 hours then.
-- Everything said of the cap, `--status`, the finish and `--score` for E5 holds here; the reply store
-  is `scores/_judge/router_replies.jsonl`.
+- Everything said of the launch, the cap, `--status`, the finish and `--score` for E5 holds here, with
+  `scores/router.log` for the log; the reply store is `scores/_judge/router_replies.jsonl`.
 - A reply cut off at 8,192 tokens is asked again at 16,384; three attempts per call.
 
 ## 5. The decoding repeats
