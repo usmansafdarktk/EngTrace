@@ -5834,7 +5834,7 @@ its prompts.
 
 ## D-160 — Two review agents checked both digit-rule fixes: their corrections adopted, the LaTeX control space read, round 3 redrawn
 
-**Date:** 2026-09-30 · **Status:** DECIDED (the owner: two independent agents check the fixes before round 3, which stays the last; of the two older gaps they found, the control space is closed and `≈`-only lines are left) · DONE (the review, the fix, the re-score, E5's rows, the analysis, round 3 redrawn) · **Evidence:** `digit_fix.py --review-sample` and `--fix 3` (`DIGIT_FIX_3.md`); `evaluators/arith.py` (THE REVIEW, self-test); `validate_scorer.py`; `gold_validation.py`; `score.py`; `judge.py --score`; `analyze.py`; `flag_sample.py --round 3`
+**Date:** 2026-09-30 · **Status:** DECIDED (the owner: two independent agents check the fixes before round 3, which stays the last; of the two older gaps they found, the control space is closed and `≈`-only lines are left) · DONE (the review, the fix, the re-score, E5's rows, the analysis, round 3 redrawn) · **Evidence:** `digit_fix.py --review-sample` and `--fix 3` (`DIGIT_FIX_3.md`); `gap_check.py` (`GAP_CHECK.md`); `evaluators/arith.py` (THE REVIEW, self-test); `validate_scorer.py`; `gold_validation.py`; `score.py`; `judge.py --score`; `analyze.py`; `flag_sample.py --round 3`
 
 - **The review.** `digit_fix --review-sample` drew 80 full-run steps whose flag the two fixes changed
   between `3a7f247` and `e783962`: 40 of the 924 that lost a flag and 40 of the 339 that gained one,
@@ -5883,12 +5883,14 @@ its prompts.
 
   Both are read now, and `\ll` and `\gg` are read as comparisons.
 - **The two older gaps: the owner's choice.** Both agents measured two gaps older than either fix as far
-  larger than the regressions:
+  larger than the regressions. `gap_check.py` measures each as a one-line switch on the adopted rule
+  (`GAP_CHECK.md`); the samples are of the steps each flagged against the candidate rule the owner chose
+  from:
   - **A LaTeX control space before a unit** (`\ \text{m}`) left its segment unread. Reading it as a space
-    flags 358 more steps. The samples read 18 of 19 (mine), 23 of 25 (B) and 12 of 14 (A) as real wrong
-    digits, and it changes nothing on gold, the pilot or either round. Closed.
-  - **A line whose only relation is `≈`** is never read. Reading it flags 488 more steps, 16 of 20 real
-    in my sample. It also brings misreadings of kinds no round has read (`≈ 17120` for 17,122,
+    flags 358 more steps. The samples read 18 of 19 decided (mine), 23 of 25 (B) and 12 of 14 (A) as real
+    wrong digits, and it changes nothing on gold, the pilot or either round. Closed.
+  - **A line whose only relation is `≈`** is never read. Reading it would flag 495 more steps, 16 of 20
+    real in my sample. It also brings misreadings of kinds no round has read (`≈ 17120` for 17,122,
     `515 ≈ 514.9`), and it flags two pilot steps the experts call correct, both real wrong digits of
     D-156's exception class. Left, as a recall gap.
 - **Before against after** (`DIGIT_FIX_3.md`: `e783962` against `5c83916`).
