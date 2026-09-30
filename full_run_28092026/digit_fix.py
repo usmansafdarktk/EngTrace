@@ -66,6 +66,7 @@ from full_run_28092026 import score  # noqa: E402
 
 PRE_FIX = '3a7f247954f487c360dd7b3a716bae794d9649f4'   # the last commit of arith.py before D-156
 D156 = 'bc7dfa459e04a29fda80f5df431e8d5458617596'      # the D-156 fix
+D159 = '834afb339632ed8f0ea981ee46421c0c18bcac02'      # the D-159 fix
 # The owner's documented exception (D-156): pilot steps, by trace code and step index, that gain a flag
 # the experts do not share, each a real wrong digit at the displayed precision on a line the old parser
 # could not read.
@@ -75,7 +76,7 @@ EXCEPTIONS = {('T-adac89', 5), ('T-3b9847', 12), ('T-d68431', 8), ('T-7e995f', 1
 FIXES = {1: {'label': 'D-156', 'pre': PRE_FIX, 'post': D156, 'design': 'round1', 'regression': [],
              'exceptions': EXCEPTIONS, 'report': 'DIGIT_FIX.md', 'changes': 'digit_fix_changes.jsonl',
              'pilot_changes': 'digit_fix_pilot_changes.jsonl'},
-         2: {'label': 'D-159', 'pre': D156, 'post': None, 'design': 'round2', 'regression': ['round1'],
+         2: {'label': 'D-159', 'pre': D156, 'post': D159, 'design': 'round2', 'regression': ['round1'],
              'exceptions': set(), 'report': 'DIGIT_FIX_2.md', 'changes': 'digit_fix_2_changes.jsonl',
              'pilot_changes': 'digit_fix_2_pilot_changes.jsonl'}}
 FLAGS = score.SCORES / 'flag_review'
