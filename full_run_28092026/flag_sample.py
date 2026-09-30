@@ -10,7 +10,8 @@ ROUNDS (D-156). Round 1 read the rule before its D-156 fix; the fix was built fr
 so its flags cannot measure the fixed rule. Round 2, and any later one, draws from the fixed rule's
 flags in the re-scored store, leaves out every step an earlier round drew, and keeps its files in
 scores/flag_review/round<n>/ and its report in FLAG_REVIEW_<n>.md; its seed is the round less one
-unless given. A drawn round is kept: --draw refuses to draw it again.
+unless given. A drawn round is kept: --draw refuses to draw it again. Round 3 and any later one also
+leave out the 80 steps two review agents read before it (D-160, scores/flag_review/agent_review/).
 
 WHY. The digit rule's precision, three flags in four real, was measured on the pilot's 300 traces from
 five frontier-plus-Llama models (SCORER_VALIDATION.md). This roster writes differently, and its flags
@@ -102,14 +103,23 @@ def set_round(n: int) -> None:
     REPORT = HERE / ('FLAG_REVIEW.md' if n == 1 else f'FLAG_REVIEW_{n}.md')
 
 
+AGENT_REVIEW = score.SCORES / 'flag_review' / 'agent_review' / 'sample.jsonl'   # the review agents' steps (D-160)
+
+
 def read_before(n: int) -> set:
-    """(model, item_id, step) of every claim an earlier round drew: a later round reads other steps."""
+    """(model, item_id, step) of every claim an earlier round drew and, from round 3 on, of every step the
+    two review agents read before it (D-160): a later round reads other steps."""
     out = set()
     for k in range(1, n):
         p = round_dir(k) / 'sample.jsonl'
         if not p.exists():
             raise SystemExit(f'round {k} has no sample at {p}: draw the rounds in order')
         out |= {(c['model'], c['item_id'], c['step']) for c in map(json.loads, p.read_text(encoding='utf-8').splitlines())}
+    if n >= 3:
+        if not AGENT_REVIEW.exists():
+            raise SystemExit(f'the review agents\' sample is missing at {AGENT_REVIEW}: run digit_fix --review-sample')
+        out |= {(c['model'], c['item_id'], c['step'])
+                for c in map(json.loads, AGENT_REVIEW.read_text(encoding='utf-8').splitlines())}
     return out
 VERDICTS = ('slip', 'checker', 'unsure')
 FIELDS = ['code', 'model', 'template_id', 'item_id', 'step', 'claim', 'left_value', 'right_value',
@@ -183,7 +193,8 @@ def draw(per_model: int, seed: int) -> int:
                         'displayed_ulp': c['displayed_ulp'], 'verdict': '', 'note': ''})
     print(f'round {ROUND}: {len(sample)} flagged claims drawn ({per_model} per model at most, seed {seed}) from '
           + ', '.join(f'{m} {n}' for m, n in totals.items())
-          + (f'; the {len(skip)} steps earlier rounds drew are left out' if skip else ''))
+          + (f'; the {len(skip)} steps earlier rounds' + (' and the review agents' if ROUND >= 3 else '')
+             + ' drew are left out' if skip else ''))
     print(f'fill the verdict column of {CSV.relative_to(HERE)} (slip / checker / unsure), then --score')
     return 0
 
