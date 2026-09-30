@@ -5768,7 +5768,10 @@ its prompts.
   
   28 new self-test cases pin them. They include three slips the rules must go on flagging: a wrong
   power of ten, a zero result, and a claim after a comparison.
-- **Four rules were narrowed on evidence while the fix was built:**
+- **Five rules were narrowed on evidence while the fix was built:**
+  - The Greek-names rule first held `psi`, which turned the unit psi into a variable; it was found
+    tracing round 1's `21.8 × 10⁶ psi`. psi stays a unit. With it, a formula written only in Greek
+    letters (`σ/ε`) now counts as a formula rather than as an unreadable segment, so it links the chain.
   - The implied unit first allowed any standard factor. That passed a wrong power of ten,
     (338.86×10⁶)/(122×10⁶) written 2.7775×10⁻³ m, and a zero result, 131 − 79 = 0 s through 10⁻¹². It now
     allows only the factor the written unit implies, and no conversion makes a zero.
@@ -5778,7 +5781,7 @@ its prompts.
     call correct. It now takes only an exact zero.
   - A truncated operand is widened by a whole unit; applied to a truncated result as well, that passed
     the slip 0.03461552… It now applies only inside an expression.
-- **Before against after** (`DIGIT_FIX_2.md`: `arith.py` at `bc7dfa4` against `834afb3`).
+- **Before against after** (`DIGIT_FIX_2.md`: `arith.py` at `bc7dfa4` against `e783962`).
   - **Gold.** Claims read went from 7,137 to 7,167; claims flagged stayed at 0.
   - **The pilot**, against the experts' step labels:
     - All traces: tp/fp/fn went from 122/22/266 to 123/18/265; precision from 0.847 to 0.872; recall
@@ -5794,9 +5797,10 @@ its prompts.
     expert, computing with 0.841 exactly, calls it a slip. This is a limit of the rule's definition, not
     a misreading.
   - **Round 1's flags**, whose slips must stay flagged. All 111 slips' steps stay flagged. Of the 11
-    misreadings D-156 left, 7 remain, and 1 step is flagged by a real false equation on another line.
-  - **The full run**, 12 models. Claims read went from 102,682 to 103,813, claims flagged from 4,384 to
-    4,142, and traces with a flag from 2,375 to 2,225. A flag disappears from 231 steps and appears on 32.
+    misreadings D-156 left, 8 remain, the ksi→psi conversion among them, and 1 step is flagged by a real
+    false equation on another line.
+  - **The full run**, 12 models. Claims read went from 102,682 to 103,834, claims flagged from 4,384 to
+    4,141, and traces with a flag from 2,375 to 2,226. A flag disappears from 230 steps and appears on 30.
 - **The published figures stand.** `validate_scorer.py` reproduces them all with the published code, and
   `router.py --validate` and `judge.py --validate` reproduce the pilot. The first fix's report is now
   pinned to its commits: `digit_fix.py` measures each fix between two fixed versions of `arith.py`, and
@@ -5808,11 +5812,12 @@ its prompts.
   - ratio notation, a sign convention, a quadrant, and `wL` and `Zc` as variables;
   - from round 1: ≈ used as a comparison, V as an unknown volume, and "22.5%" of a quantity.
 - **The re-score.**
-  - The main store and the three repeat stores were re-scored with `--replace` at `dfcef12`; the old
-    stores are kept in `scores/_replaced/`.
-  - `judge --score` rebuilt E5's rows at `dfcef12`, clean. No call was made, the reply store is
+  - The main store and the three repeat stores were re-scored with `--replace` at `c221a9a`. A first
+    re-score at `dfcef12` was superseded by the psi correction. The old stores are kept in
+    `scores/_replaced/`.
+  - `judge --score` rebuilt E5's rows at `c221a9a`, clean. No call was made, the reply store is
     unchanged at $36.3016, and no call is without a reply.
-  - The analysis at `c397a47` changes only the provenance and Q3's digit-rule fields; no answer score,
+  - The analysis at `c221a9a` changes only the provenance and Q3's digit-rule fields; no answer score,
     E3 figure or E5 figure moves. Its caption carries the fixed rule's pilot figures and both readings,
     labelled.
 - **The router, re-priced:** $98.41 to $103.63 at Xiaomi's prices on the pilot's output basis ($72.54 to
@@ -5820,8 +5825,9 @@ its prompts.
   $136.
 - **Round 3.** `flag_sample --round 3` drew 181 claims from the second fix's flags, with seed 2. That is
   20 per model for nine models, 1 for DeepSeek V4.1 Flash and none for Kimi K3, whose remaining flags all
-  sit on steps rounds 1 and 2 drew. No step is shared with an earlier round. Round 3 measures the second
-  fix; by the owner's rule, no round 4 follows.
+  sit on steps rounds 1 and 2 drew. No step is shared with an earlier round. It was drawn once before
+  the psi correction and drawn again after it, before anyone read it; the counts are the same. Round 3
+  measures the second fix; by the owner's rule, no round 4 follows.
 
 **Open.** Round 3's reading, and then the router, which needs the owner's approval of the estimate above.
 
