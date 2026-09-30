@@ -4,7 +4,7 @@ and checked by script before an expert sees it (D-141).
 
     python -m full_run_28092026.paraphrase --dry-run    # FREE: the selection, the writer's endpoint, the estimate
     python -m full_run_28092026.paraphrase --yes        # BILLS: writes the paraphrases; resumable
-    python -m full_run_28092026.paraphrase --yes --limit 40   # BILLS: the first 40 unresolved items only, a pilot of the prompt
+    python -m full_run_28092026.paraphrase --yes --limit 50   # BILLS: a pilot of the prompt, 10 unresolved items of each branch
     python -m full_run_28092026.paraphrase --check      # FREE: re-checks every attempt, rewrites the manifest
     python -m full_run_28092026.paraphrase --status     # FREE
 
@@ -20,9 +20,13 @@ returns only the problem. The rules grew from what the writer did on 30 Septembe
 (6091f248) lost 49 of 62 attempts to prettified notation (LaTeX, $ delimiters, Unicode superscripts and
 minus signs, · for *); the second (1ae64428), which forbade that, lost 43 of 61 to acronyms spelt out
 (PFR, CSTR), reaction orders turned into words ("order-2.1" as "second-order", a real error), = written as
-"equals", $ delimiters dropped where the original had them, near-copies and length. Rules 1 to 3 and 6 now
-name each of these. The checks were not loosened: the two arms must differ in wording only. A new prompt
-is tried on the first items with --limit before the rest are written. Mistral throttles OpenRouter's shared capacity upstream ("temporarily
+"equals", $ delimiters dropped where the original had them, near-copies and length. The third (bd06fbd6)
+named each of these in the abstract and passed 64% of attempts on chemical items, then 30% on civil ones:
+caret exponents in units became Unicode superscripts (kN/m^3 as kN/m³, 52 times in 138 attempts), =, > and
+% were written as words and "in m" as "in meters". Where a rule carried an example ("order-2.1") the
+habit stopped, so the fourth gives each rule its examples. The checks were not loosened: the two arms
+must differ in wording only. A new prompt is tried with --limit on some items of every branch before the
+rest are written. Mistral throttles OpenRouter's shared capacity upstream ("temporarily
 rate-limited"): on 30 September most calls were refused at eight workers and at two alike, and the
 throughput scaled with the workers, so the throttle is per call, not a cap we saturate. A refused call
 bills nothing; `write_one` therefore retries each call through RETRY_SLEEPS before recording a service
@@ -88,9 +92,9 @@ LENGTH = (0.7, 1.5)
 PROMPT = """Rewrite the engineering problem below in different words.
 
 Rules:
-1. Keep every number exactly as written, with its unit. A reaction order, an exponent, a percentage or a tolerance is a number too: "order-2.1" stays "order-2.1", never "second-order".
-2. Keep every symbol, variable name, subscript, formula, equation, chemical formula, acronym and technical term exactly as written, character for character: the same ^, *, /, _ and = with the same spacing, the same e-03 style exponents, the same (g) or (l) state labels, the same % signs, plain hyphen-minus signs. Acronyms such as CSTR, PFR or NPSH stay as acronyms; an equation such as "F_A0 = 3.96 mol/s" keeps its = sign and is not written as "equals" or "is".
-3. Do not change any notation or formatting. Add no LaTeX, Markdown, Unicode superscripts, subscripts, minus signs or multiplication dots that the original does not have; where the original wraps something in $...$ or other math delimiters, keep those delimiters exactly where they are. Copy any table or block of data unchanged.
+1. Keep every number exactly as written, with its unit written exactly as in the original: "13.5 m^3/s" stays "13.5 m^3/s", "in m" stays "in m" (not "in meters"), "60%" stays "60%". A reaction order, an exponent, a percentage or a tolerance is a number too: "order-2.1" stays "order-2.1", never "second-order".
+2. Keep every symbol, variable name, subscript, formula, equation, chemical formula, acronym and technical term exactly as written, character for character: the same ^, *, /, _, =, <, > and % with the same spacing, the same e-03 style exponents, the same (g) or (l) state labels, plain hyphen-minus signs. Exponents keep their caret: "kN/m^3" stays "kN/m^3", never "kN/m³"; "mm^2" stays "mm^2". Acronyms such as CSTR, PFR or NPSH stay as acronyms. An equation such as "F_A0 = 3.96 mol/s" keeps its = sign and is not written as "equals" or "is"; ">75%" stays ">75%", not "exceeds 75 %".
+3. Do not change any notation or formatting. Add no LaTeX, Markdown, Unicode superscripts (², ³), subscripts, minus signs or multiplication dots that the original does not have; where the original wraps something in $...$ or other math delimiters, keep those delimiters exactly where they are. Copy any table or block of data unchanged.
 4. Keep the parts of the problem, and any lettered or numbered sub-questions, in the same order.
 5. Do not add, remove or change any information, assumption or instruction. Do not hint at the method or the answer.
 6. Change the wording and the sentence structure throughout the prose: different verbs and connectives, clauses reordered within a sentence, sentences split or joined, so that the result reads as a genuinely different phrasing and not as a copy, while staying about the same length as the original.
@@ -236,8 +240,12 @@ def run(workers: int, limit: int = 0) -> int:
     prior = attempts_so_far()
     todo = [it for it in selection() if not any(r.get('check', {}).get('passed') for r in prior[it['item_id']])
             and len([r for r in prior[it['item_id']] if 'check' in r]) < ATTEMPTS]
-    if limit:
-        todo = todo[:limit]                  # a pilot of the prompt; the next run without --limit takes the rest
+    if limit:                                # a pilot of the prompt: the first items of each branch in turn,
+        by_branch = collections.defaultdict(list)   # so every branch's notation is tried
+        for it in todo:
+            by_branch[it['branch']].append(it)
+        queues = [by_branch[b] for b in sorted(by_branch)]
+        todo = [q[k] for k in range(max(len(q) for q in queues)) for q in queues if k < len(q)][:limit]
     print(f'{len(todo)} items to write')
     billed, done = 0.0, 0
     with open(ATTEMPTS_FILE, 'a', encoding='utf-8', newline='\n') as fh, cf.ThreadPoolExecutor(workers) as pool:

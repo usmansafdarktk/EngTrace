@@ -53,7 +53,7 @@ original, no preamble. Three attempts per item; an item with no passing attempt 
 
 ```bash
 python -m full_run_28092026.paraphrase --dry-run     # free: selection, writer's endpoint, $0.18 if all pass first time, $0.54 at most
-python -m full_run_28092026.paraphrase --yes --limit 40   # BILLS: a pilot of the prompt on the first 40 unresolved items; read --status before going on
+python -m full_run_28092026.paraphrase --yes --limit 50   # BILLS: a pilot of the prompt, 10 unresolved items of each branch; read --status before going on
 python -m full_run_28092026.paraphrase --yes         # BILLS: writes and checks; resumable; retries each call through the upstream throttle
 python -m full_run_28092026.paraphrase --status      # items attempted, passing, billed
 ```
