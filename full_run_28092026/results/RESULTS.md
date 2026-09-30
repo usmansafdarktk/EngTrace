@@ -1,6 +1,6 @@
-# Results of the full run: the deterministic stack
+# Results of the full run
 
-Printed by `analyze.py` from the score store (`score.py`) under ANALYSIS_PLAN.md (D-117); the method choices the plan leaves open are fixed in the script's docstring, and the corrections and additions made after the first results were read are labelled where they appear (D-146 to D-149). The answer check, E3 and E4's digit rule; E5's judge has not run, so its columns are empty. Every interval is 95% and resamples templates (B = 10,000): all 150 for a model's score, and the templates with a qualifying trace for a rate over a subset of traces. Every resampling test draws 100,000 permutations, so its Holm-adjusted floor over 55 pairs is 0.0006.
+Printed by `analyze.py` from the score store (`score.py`) under ANALYSIS_PLAN.md (D-117); the method choices the plan leaves open are fixed in the script's docstring, and the corrections and additions made after the first results were read are labelled where they appear (D-146 to D-149). The answer check, E3 and E4's digit rule, E5. Every interval is 95% and resamples templates (B = 10,000): all 150 for a model's score, and the templates with a qualifying trace for a rate over a subset of traces. Every resampling test draws 100,000 permutations, so its Holm-adjusted floor over 55 pairs is 0.0006.
 
 ## Q1. Answer score per model
 
@@ -122,17 +122,33 @@ Wrong-answer traces score 0 (incorrect or unusable); fully solved ones score 1; 
 
 | model | wrong-answer traces | of them unusable | E3 coverage | 95% CI | readable only | 95% CI | floor, readable | E5 coverage |
 |---|---:|---:|---:|---:|---:|---:|---:|---|
-| `gpt-oss-20b` | 407 | 55 | 0.394 | 0.329 to 0.464 | 0.456 | 0.389 to 0.527 | 0.113 | pending |
-| `gemma-4-26b-a4b` | 298 | 0 | 0.588 | 0.517 to 0.666 | 0.588 | 0.515 to 0.667 | 0.142 | pending |
-| `deepseek-v4.1-flash` | 54 | 14 | 0.385 | 0.241 to 0.570 | 0.549 | 0.379 to 0.708 | 0.107 | pending |
-| `qwen3-235b-a22b-2507` | 229 | 1 | 0.586 | 0.511 to 0.664 | 0.589 | 0.516 to 0.667 | 0.196 | pending |
-| `glm-5.3-flash` | 73 | 42 | 0.225 | 0.094 to 0.393 | 0.619 | 0.441 to 0.819 | 0.168 | pending |
-| `glm-5.3` | 118 | 100 | 0.069 | 0.021 to 0.158 | 0.697 | 0.535 to 0.938 | 0.117 | pending |
-| `muse-glimmer-30b` | 81 | 29 | 0.370 | 0.224 to 0.564 | 0.613 | 0.536 to 0.731 | 0.154 | pending |
-| `kimi-k3` | 68 | 5 | 0.567 | 0.419 to 0.690 | 0.618 | 0.507 to 0.727 | 0.135 | pending |
-| `gpt-5.4-mini` | 336 | 0 | 0.422 | 0.352 to 0.498 | 0.422 | 0.351 to 0.500 | 0.114 | pending |
-| `gemini-3.1-flash-lite` | 299 | 0 | 0.511 | 0.445 to 0.581 | 0.511 | 0.445 to 0.579 | 0.107 | pending |
-| `claude-sonnet-5` | 65 | 0 | 0.660 | 0.569 to 0.789 | 0.660 | 0.569 to 0.791 | 0.158 | pending |
+| `gpt-oss-20b` | 407 | 55 | 0.394 | 0.329 to 0.464 | 0.456 | 0.389 to 0.527 | 0.113 | 0.411 (0.346 to 0.484); readable 0.473 |
+| `gemma-4-26b-a4b` | 298 | 0 | 0.588 | 0.517 to 0.666 | 0.588 | 0.515 to 0.667 | 0.142 | 0.617 (0.542 to 0.694); readable 0.617 |
+| `deepseek-v4.1-flash` | 54 | 14 | 0.385 | 0.241 to 0.570 | 0.549 | 0.379 to 0.708 | 0.107 | 0.520 (0.312 to 0.770); readable 0.741 |
+| `qwen3-235b-a22b-2507` | 229 | 1 | 0.586 | 0.511 to 0.664 | 0.589 | 0.516 to 0.667 | 0.196 | 0.650 (0.577 to 0.726); readable 0.650 |
+| `glm-5.3-flash` | 73 | 42 | 0.225 | 0.094 to 0.393 | 0.619 | 0.441 to 0.819 | 0.168 | 0.232 (0.099 to 0.401); readable 0.639 |
+| `glm-5.3` | 118 | 100 | 0.069 | 0.021 to 0.158 | 0.697 | 0.535 to 0.938 | 0.117 | 0.089 (0.022 to 0.218); readable 0.902 |
+| `muse-glimmer-30b` | 81 | 29 | 0.370 | 0.224 to 0.564 | 0.613 | 0.536 to 0.731 | 0.154 | 0.425 (0.264 to 0.654); readable 0.705 |
+| `kimi-k3` | 68 | 5 | 0.567 | 0.419 to 0.690 | 0.618 | 0.507 to 0.727 | 0.135 | 0.656 (0.480 to 0.788); readable 0.715 |
+| `gpt-5.4-mini` | 336 | 0 | 0.422 | 0.352 to 0.498 | 0.422 | 0.351 to 0.500 | 0.114 | 0.471 (0.394 to 0.560); readable 0.471 |
+| `gemini-3.1-flash-lite` | 299 | 0 | 0.511 | 0.445 to 0.581 | 0.511 | 0.445 to 0.579 | 0.107 | 0.553 (0.484 to 0.624); readable 0.553 |
+| `claude-sonnet-5` | 65 | 0 | 0.660 | 0.569 to 0.789 | 0.660 | 0.569 to 0.791 | 0.158 | 0.735 (0.627 to 0.873); readable 0.735 |
+
+**E5's judge**, MiMo-V2.5-Pro on the milestones E3 did not find (`judge.py`). E5 coverage is E5-strict: E3's milestones plus those the judge rules REACHED. On the pilot the judge never called a fabricated value REACHED and found 76% of true ones, so the score is conservative (RESULTS_E5). Judged fraction: milestones sent to the judge over those required, on answered traces; unjudged: milestones the reply did not name, over those sent. A trace whose call got no reply is left out of every rate and counted (D-148).
+
+| model | calls | without a reply | judged fraction | of the judged, REACHED | unjudged |
+|---|---:|---:|---:|---:|---:|
+| `gpt-oss-20b` | 852 | 0 | 0.239 | 0.104 | 0.002 |
+| `gemma-4-26b-a4b` | 743 | 0 | 0.187 | 0.125 | 0.000 |
+| `deepseek-v4.1-flash` | 775 | 0 | 0.168 | 0.244 | 0.004 |
+| `qwen3-235b-a22b-2507` | 717 | 0 | 0.163 | 0.167 | 0.000 |
+| `glm-5.3-flash` | 610 | 0 | 0.138 | 0.255 | 0.001 |
+| `glm-5.3` | 499 | 0 | 0.112 | 0.277 | 0.000 |
+| `muse-glimmer-30b` | 736 | 0 | 0.169 | 0.287 | 0.002 |
+| `kimi-k3` | 732 | 0 | 0.156 | 0.269 | 0.001 |
+| `gpt-5.4-mini` | 923 | 0 | 0.252 | 0.133 | 0.002 |
+| `gemini-3.1-flash-lite` | 824 | 0 | 0.209 | 0.149 | 0.002 |
+| `claude-sonnet-5` | 621 | 0 | 0.131 | 0.217 | 0.004 |
 
 **The digit rule.** The wrong-answer rate is over the answered wrong answers (D-149: an empty trace has no step to flag). Beside it, the 1% tolerance E4 shipped with, blind to most slips (RESULTS_X1), and where the first flag falls in a fully solved trace (0 = first step, 1 = last).
 
@@ -165,6 +181,22 @@ Wrong-answer traces score 0 (incorrect or unusable); fully solved ones score 1; 
 | `gpt-5.4-mini` | 0.100 | 0.028 | 0.104 | 0.093 | 0.156 | 0.291 |
 | `gemini-3.1-flash-lite` | 0.114 | 0.021 | 0.077 | 0.079 | 0.143 | 0.269 |
 | `claude-sonnet-5` | 0.100 | 0.000 | 0.035 | 0.014 | 0.023 | 0.046 |
+
+**Also reported, not tested: what points at a wrong answer.** On the answered traces that score 0, the share with a digit-rule flag, with a milestone E5 rules MISSING, and with a step the router's judge flags. A trace can be in several columns, or in none.
+
+| model | answered wrong-answer traces | digit rule | E5 MISSING | router judge |
+|---|---:|---:|---:|---:|
+| `gpt-oss-20b` | 354 | 0.206 | 0.746 |  |
+| `gemma-4-26b-a4b` | 298 | 0.409 | 0.594 |  |
+| `deepseek-v4.1-flash` | 40 | 0.025 | 0.300 |  |
+| `qwen3-235b-a22b-2507` | 229 | 0.393 | 0.533 |  |
+| `glm-5.3-flash` | 31 | 0.194 | 0.258 |  |
+| `glm-5.3` | 18 | 0.111 | 0.056 |  |
+| `muse-glimmer-30b` | 52 | 0.173 | 0.442 |  |
+| `kimi-k3` | 63 | 0.000 | 0.238 |  |
+| `gpt-5.4-mini` | 336 | 0.176 | 0.735 |  |
+| `gemini-3.1-flash-lite` | 299 | 0.308 | 0.666 |  |
+| `claude-sonnet-5` | 65 | 0.154 | 0.185 |  |
 
 ## Q4. Consistency within a template
 
@@ -355,4 +387,4 @@ The pool over-represents the rare labels by design (D-116), so these rates are p
 
 ## Provenance
 
-`analyze.py` at commit `fb0ea02`; the score store `main` scored at commit `bf4a43b` on 2026-09-29T19:49:30+00:00. The evaluator hashes and the per-model trace hashes are in `results.json`.
+`analyze.py` at commit `774cfc0`; the score store `main` scored at commit `bf4a43b` on 2026-09-29T19:49:30+00:00; stages: e5 at `774cfc0`. The evaluator hashes and the per-model trace hashes are in `results.json`.

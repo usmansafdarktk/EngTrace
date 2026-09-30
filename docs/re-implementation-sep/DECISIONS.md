@@ -5615,6 +5615,34 @@ slips and 109 checker misreadings, none unsure, with a note on every checker ver
      honest figure needs a fresh sample, read after the fix.
   4. The router waits, since the rule's flags are part of its prompts.
 
+## D-155 — E5's run: every call answered, $36.30 in the rows
+
+**Date:** 2026-09-29 to 30 · **Status:** DONE · **Evidence:** `judge.py --status`; `scores/e5.log` and the reply store (local); `analyze.py` (`results/RESULTS.md`, the analysis at `774cfc0`)
+
+- **The run.** The owner approved it on the dry run's $26.56 ($18.59 to $49.71 across the six endpoints),
+  with a $55 cumulative cap and 16 workers.
+  - It was launched 2026-09-29 at 22:24 UTC at `efa8fe9`.
+  - It was restarted twice (D-152): at 22:58 UTC to free the workers held by calls that never returned,
+    and at 23:47 UTC on the fix at `1c16b6b`.
+  - The main pass ended at 11:00 UTC on the 30th with 19 calls without a reply. The guide's re-run of the
+    same command asked those 19 at `774cfc0`, and all 19 were answered.
+  - No call is without a reply for any of the eleven models. 53 keys failed at least once and were answered
+    later, and none was given up. The watchdog never saw the log fall silent.
+- **The bill.** $36.3016 over the store's 8,090 lines: 8,032 replies and 58 failure lines. The mean billed
+  per reply is $0.00451. Mean completion tokens were 3,354 (median 2,473), against the pilot's 3,024
+  (2,469), and the median call took 56.0 s.
+- **By the account.** The key's usage rose $38.325, from $356.587 at 22:11:51 UTC on the 29th, before the
+  repeats, to $394.912 at 11:10:56 UTC after the retry. The rows of the two stages hold $38.165, the
+  repeats' $1.863 and E5's $36.302. The $0.160 the rows do not show covers the calls in flight at the two
+  restarts and any other use of the key in those hours, which cannot be told apart from here.
+- **The providers.** At OpenRouter's default routing, `judge --status` shows each model's calls served
+  mostly by Xiaomi, DigitalOcean, Novita and StreamLake. AtlasCloud and GMICloud served a few of the first
+  replies.
+
+`analyze.py` now fills Q3's E5 columns, and its header names the four deterministic and judged stages
+present, with none incomplete. The digit rule's caption still carries the pilot's 0.750, which D-154
+replaces.
+
 ## Open decisions
 
 | # | Decision | Needed before |
@@ -5629,7 +5657,7 @@ slips and 109 checker misreadings, none unsure, with a note on every checker ver
 | D-141 | Run: the paraphrase run over the eleven models, about $49.2 on the main run's bills for the same items | the week of the main run, so the served models match |
 | D-141 | ~~Run: the three decoding repeats of `gemma-4-26b-a4b`, about $0.28~~ **Done 2026-09-30 over four models, by the owner's decision (D-151): $1.863 in the rows; `RESULTS.md` prints the table** | — |
 | D-138 | The stricter match rule removes 252 credits, 129 of them on symbolic answers the check cannot verify either way: keep it (as decided) or reverse it | the paper's tables |
-| D-142 | Run: E5 over the eleven models, 8,032 calls, about $26.56 at Xiaomi's prices ($18.59 to $49.71), about 7 hours (`EVALUATION_GUIDE.md`, step 3). **Approved and running since 2026-09-29 22:24 UTC under a $55 cap; about $40 projected on its first 508 replies (D-152)** | Q3's E5 columns |
+| D-142 | ~~Run: E5 over the eleven models, 8,032 calls, about $26.56 at Xiaomi's prices ($18.59 to $49.71), about 7 hours (`EVALUATION_GUIDE.md`, step 3)~~ **Done 2026-09-30 (D-155): every call answered, $36.30 in the rows; `RESULTS.md` carries the E5 columns** | — |
 | D-142 | Run: the step router over the eleven models, 24,506 calls, about $98 to $103 at Xiaomi's prices ($72 to $195), about 33 hours at 8 workers (`EVALUATION_GUIDE.md`, step 4). **The owner, 2026-09-30: after the author's flag reading; the estimate rests on the pilot's output lengths (D-152)** | Q3's router columns |
 | D-108 | ~~Whether the review app shows questions and solutions as plain text, as the models read them, and whether the 65 templates judged through its Markdown rendering get a plain-text look; fixing `signal_operations`'s origin marker~~ **Closed by the owner 2026-09-28 (D-114): the certification is closed and no template changes** | — |
 | D-107 | ~~Fix the five templates round 2 objected to~~ **Fixed 2026-09-26 (D-108) and re-certified in round 3 (D-109): all five approved by all three** | — |
