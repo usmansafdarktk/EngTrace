@@ -5578,11 +5578,49 @@ and refused an unknown code and an unknown verdict: all eight checks passed. The
 unchanged, and no `FLAG_REVIEW.md` was written. The workbook and any filled copy stay local, like the
 experts' labels.
 
+## D-154 — The flag reading: half of this roster's digit-rule flags are the checker's
+
+**Date:** 2026-09-30 · **Status:** MEASURED · OPEN (what to do about it) · **Evidence:** `flag_sample.py --merge` and `--score --read-by "a domain expert"` (`FLAG_REVIEW.md`); the filled workbook (local)
+
+A domain expert read the 220 sampled flags in the reader's workbook (D-153) and decided every one: 111
+slips and 109 checker misreadings, none unsure, with a note on every checker verdict.
+
+- **Precision 0.505** among the decided (Wilson 0.439 to 0.570), against the 0.750 the pilot measured
+  (SCORER_VALIDATION.md). By model it runs from 0.100 (glm-5.3, 2 of 20) to 1.000 (gpt-5.4-mini, 20 of
+  20); at 20 claims a model, every interval is wide.
+- **The notes** give the correct computation each time and name what the checker misread.
+  `FLAG_REVIEW.md` groups them by their first words: "split at" 34, "thousands separator" 14 in three
+  spellings, "missing brackets" 7, "unit conversion" 6, and single notes for the rest. Read in full, they
+  fall into five kinds:
+  - where a claim starts and ends: two claims read as one, split at '=>', 'Then', a period or
+    `\qquad`, or cut inside a chain of partial products;
+  - variables read as units (E I, D S, μ L, d, P, t, V);
+  - number formats: thousands separators written as spaces or `\,`, scientific notation in a
+    denominator read without its brackets, a trailing '…' that means truncation, ranges written with a
+    dash, a percentage of a quantity;
+  - units the checker does not convert (h and min, J and kJ, m and mm, ha, ksi and psi), and degrees
+    read as radians;
+  - relations other than equality ('>', '≈' as a comparison, '≠') read as '='.
+  
+  None of them is about the models' arithmetic.
+- **What follows.**
+  1. Q3 cannot print the pilot's 0.750 beside the digit rule's rates. This roster's is 0.505, and by
+     model the share of real slips among the flags varies so much that the raw flag rates do not compare
+     the models' arithmetic.
+  2. The misreadings are the kind D-137 fixed. `arith.py`, the rule's parser, shares no code with the
+     answer check or E3: neither imports it. So a fix confined to it moves no answer score, no E3 result
+     and no E5 prompt. The re-score, the rebuild of E5's rows from the stored replies and the analysis
+     are free, and no reply is bought again.
+  3. These 220 would be what a fix is built from, so their precision after it would flatter it. An
+     honest figure needs a fresh sample, read after the fix.
+  4. The router waits, since the rule's flags are part of its prompts.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
-| D-150 | The author's reading of the 220 sampled digit-rule flags (`scores/flag_review/sample.csv`), then `flag_sample --score` and a checker fix if one is needed. **2026-09-30 (D-153): one reader for all 220; for a reader outside the code, the workbook from `--reader-copy`, then `--merge` and `--score --read-by`** | Q3 in the paper; the router's run |
+| D-154 | Fix the digit rule's parser the D-137 way, then read a fresh sample; or keep the rule and report its measured 0.505 (per model 0.10 to 1.00) in Q3 | Q3 in the paper; the router's run |
+| D-150 | ~~The author's reading of the 220 sampled digit-rule flags (`scores/flag_review/sample.csv`), then `flag_sample --score` and a checker fix if one is needed~~ **Read 2026-09-30 by a domain expert, in the D-153 workbook: precision 0.505 against the pilot's 0.750 (D-154, `FLAG_REVIEW.md`)** | — |
 | D-147 | The inclusive last-digit boundary is adopted; the owner may reverse it (one commit). Whether the paper reports the half-unit or whole-trace reading as anything more than a sensitivity would need an expert spot-check of the format-only partials | the paper's tables |
 | D-146 | The paper reports the cliff per model with its interval and, if it states a count, the Welch count with the planned one beside it (as RESULTS.md now does) | the paper's section 5 |
 | — | The router's funding: with everything else run the round lands at about $450 on the account's basis (about $480 at E5's dearest endpoint); the router adds $72 to $195 and does not fit in $500. **2026-09-30 (D-151, D-152): with E5 at its projected $40 and the four-model repeats, about $465; the router's estimate rests on the pilot's output lengths, about $129 to $136 at Xiaomi's prices at E5's ratio (an extrapolation). The owner: the router waits for the author's flag reading** | the router's run |
