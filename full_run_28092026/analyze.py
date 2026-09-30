@@ -851,10 +851,15 @@ def render(res) -> str:
           'E3 is the deterministic part of E5, which adds the judge\'s verdict on the milestones E3 does not find. '
           'The floor is the same trace scored against a sibling item\'s milestones (D-149): what coverage a trace '
           'reaches by chance, per model, on the readable wrong answers. '
-          "The digit rule's flag counts a trace when any step is flagged. Against the experts, on fully solved traces, "
-          'it had precision 0.750 and recall 0.320 (SCORER_VALIDATION.md), so its rate is not a count of '
-          'slips; and it reads a different amount of arithmetic in each model\'s traces (claims checked per '
-          'answered trace, shown), so a low rate can mean little was read.', '',
+          "The digit rule's flag counts a trace when any step is flagged. Against the experts' step labels on the "
+          "pilot's fully solved traces it has precision 0.800 and recall 0.427 (0.750 and 0.320 before D-156; "
+          "SCORER_VALIDATION.md). *Added 2026-09-30 (D-154, D-156), after the first results were read:* on this "
+          'roster a domain expert found 111 of 220 sampled flags real before the fix, 0.505 (FLAG_REVIEW.md); the '
+          "fix took the flag off 97 of the sample's 109 misread steps and left it on all 111 slips' steps "
+          "(DIGIT_FIX.md), and the fixed rule's precision on this roster waits for a fresh sample. So its rate is "
+          "not a count of slips; and it "
+          "reads a different amount of arithmetic in each model's traces (claims checked per answered trace, "
+          'shown), so a low rate can mean little was read.', '',
           '**Milestones on the wrong-answer traces.** An unusable trace reaches only what it wrote before it '
           'stopped, and an empty one nothing, so coverage is also shown on the readable wrong answers alone.', '',
           '| model | wrong-answer traces | of them unusable | E3 coverage | 95% CI | readable only | 95% CI | floor, readable | '
