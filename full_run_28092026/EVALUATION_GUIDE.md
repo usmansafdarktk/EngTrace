@@ -239,7 +239,7 @@ cd $s; kaggle datasets create -p .     # later versions: kaggle datasets version
 Download it back and compare every file's hash, as `INFERENCE_GUIDE.md` step 6 does for the traces.
 The repeat traces under `traces/repeat*/` go into a new traces archive the same way:
 `backup_archive traces/repeat1 traces/repeat2 traces/repeat3 --name full_run_traces_repeats` (made and
-checked 2026-09-30; its Kaggle copy waits for manual mode).
+checked 2026-09-30, locally and on Kaggle, D-151).
 
 **Record each paid run in DECISIONS.md** the way D-123 to D-131 record inference: the date and
 commit, the dry-run estimate it was approved on, calls made, billed in the rows and by the account
