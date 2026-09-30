@@ -5752,11 +5752,177 @@ The paraphrase stream's commits use D-157, so this entry is D-158.
 report 0.752. Either way the decision comes before the router runs, since the rule's flags are part of
 its prompts.
 
+## D-159 — The digit rule's second fix, from round 2's notes: adopted with no pilot step moving away; round 3 drawn
+
+**Date:** 2026-09-30 · **Status:** DECIDED (the owner: a second fix, measured by a round 3, no round 4) · DONE (the fix, the re-score, E5's rows, the analysis, round 3 drawn) · **Evidence:** `evaluators/arith.py` (THE SECOND READING, self-test); `digit_fix.py --fix 2` (`DIGIT_FIX_2.md`); `validate_scorer.py`; `gold_validation.py`; `router.py --validate` and `--dry-run`; `judge.py --validate` and `--score`; `score.py --status`; `analyze.py`; `flag_sample.py --round 3`
+
+- **The fix.** It is confined to `arith.py`, like D-156's, and its rules are in the docstring under
+  THE SECOND READING:
+  - table cells;
+  - prose connectors, and a comparison's threshold;
+  - variables written in any script, and Greek letter names;
+  - the unit a side implies when it writes none;
+  - pair factors for Stokes, bar, atm and hectares;
+  - `...` read as a rounding or a truncation;
+  - `a/2π`, a degree sign as a unit, and a sum written a term a line.
+  
+  28 new self-test cases pin them. They include three slips the rules must go on flagging: a wrong
+  power of ten, a zero result, and a claim after a comparison.
+- **Four rules were narrowed on evidence while the fix was built:**
+  - The implied unit first allowed any standard factor. That passed a wrong power of ten,
+    (338.86×10⁶)/(122×10⁶) written 2.7775×10⁻³ m, and a zero result, 131 − 79 = 0 s through 10⁻¹². It now
+    allows only the factor the written unit implies, and no conversion makes a zero.
+  - The comparison rule first skipped every right side, which lost the slip W_L ≥ 824/179 = 4.61. It now
+    skips only a bare threshold.
+  - The zero guard first used a threshold, which flagged 1 mm⁴ = 10⁻¹² m⁴ on a pilot step the experts
+    call correct. It now takes only an exact zero.
+  - A truncated operand is widened by a whole unit; applied to a truncated result as well, that passed
+    the slip 0.03461552… It now applies only inside an expression.
+- **Before against after** (`DIGIT_FIX_2.md`: `arith.py` at `bc7dfa4` against `834afb3`).
+  - **Gold.** Claims read went from 7,137 to 7,167; claims flagged stayed at 0.
+  - **The pilot**, against the experts' step labels:
+    - All traces: tp/fp/fn went from 122/22/266 to 123/18/265; precision from 0.847 to 0.872; recall
+      from 0.314 to 0.317.
+    - Correct-answer traces: from 76/19/102 to 76/17/102; precision from 0.800 to 0.817; recall stayed
+      at 0.427; F1 is 0.561.
+    - Five steps change, all toward the experts: four flags removed from steps they call correct, and
+      one added to a step they call incorrect. None moves away, so no exception is needed.
+  - **Round 2's 206 flags**, the design set. Of the 51 misreadings, 42 steps are no longer flagged and 9
+    still are. Of the 155 slips, 154 are still flagged. The other is `-109 000 × 0.841 = -91.6 kN`. The
+    old rule flagged it only because it did not know kN from N. With the unit read, the rule's own
+    propagation accepts it, since 0.841 shown to three decimals can be 0.8405, which gives −91.6. The
+    expert, computing with 0.841 exactly, calls it a slip. This is a limit of the rule's definition, not
+    a misreading.
+  - **Round 1's flags**, whose slips must stay flagged. All 111 slips' steps stay flagged. Of the 11
+    misreadings D-156 left, 7 remain, and 1 step is flagged by a real false equation on another line.
+  - **The full run**, 12 models. Claims read went from 102,682 to 103,813, claims flagged from 4,384 to
+    4,142, and traces with a flag from 2,375 to 2,225. A flag disappears from 231 steps and appears on 32.
+- **The published figures stand.** `validate_scorer.py` reproduces them all with the published code, and
+  `router.py --validate` and `judge.py --validate` reproduce the pilot. The first fix's report is now
+  pinned to its commits: `digit_fix.py` measures each fix between two fixed versions of `arith.py`, and
+  `DIGIT_FIX.md` regenerates with the same figures.
+- **Left as they are:**
+  - running computations written as one chain: four;
+  - carried roundings: three;
+  - a unit no written unit implies, such as ksi→psi, and hours→minutes through a symbolic middle;
+  - ratio notation, a sign convention, a quadrant, and `wL` and `Zc` as variables;
+  - from round 1: ≈ used as a comparison, V as an unknown volume, and "22.5%" of a quantity.
+- **The re-score.**
+  - The main store and the three repeat stores were re-scored with `--replace` at `dfcef12`; the old
+    stores are kept in `scores/_replaced/`.
+  - `judge --score` rebuilt E5's rows at `dfcef12`, clean. No call was made, the reply store is
+    unchanged at $36.3016, and no call is without a reply.
+  - The analysis at `c397a47` changes only the provenance and Q3's digit-rule fields; no answer score,
+    E3 figure or E5 figure moves. Its caption carries the fixed rule's pilot figures and both readings,
+    labelled.
+- **The router, re-priced:** $98.41 to $103.63 at Xiaomi's prices on the pilot's output basis ($72.54 to
+  $195.58 across the endpoints), about 33 hours at 8 workers. D-152's ratio would make it about $129 to
+  $136.
+- **Round 3.** `flag_sample --round 3` drew 181 claims from the second fix's flags, with seed 2. That is
+  20 per model for nine models, 1 for DeepSeek V4.1 Flash and none for Kimi K3, whose remaining flags all
+  sit on steps rounds 1 and 2 drew. No step is shared with an earlier round. Round 3 measures the second
+  fix; by the owner's rule, no round 4 follows.
+
+**Open.** Round 3's reading, and then the router, which needs the owner's approval of the estimate above.
+
+## D-157 — The paraphrases written: four prompts, a throttled writer, and the notation restored by script
+
+**Date:** 2026-09-30 · **Status:** DECIDED · **Evidence:** `paraphrase.py` (docstring, `restore`, `--selftest`, `--check`, `--limit`), `PARAPHRASE.md`, `paraphrase/manifest.jsonl`; the set-aside attempt files `paraphrase/attempts_v{1,2,3}_*.jsonl` (local)
+
+Stream 2's first step (`PARAPHRASE_RUNBOOK.md` section 1) was approved at $0.45 and expected to pass most
+of the 450 items at the first attempt. It took four prompts and one change to the pipeline, all in one
+day, before the writer's output held the items' notation. What was found, what was changed and why, in
+order:
+
+- **Prompt 1 (`6091f248`, the D-141 prompt).** 62 real attempts, 13 passed, 10 items exhausted: the
+  writer prettified notation, `1/(-r_A)` as `\frac{1}{-r_A}`, `CH4(g)` as `$CH4(g)$` or `CO₂`, `m^3/s` as
+  `m³/s`, `*` as `·`, a Unicode minus for `-`. The tokens and numbers checks rejected every one, rightly:
+  the two arms must differ in wording only. $0.015.
+- **Prompt 2 (`1ae64428`)** forbade reformatting in the abstract. 83 attempts, 29 passed, 14 exhausted:
+  acronyms spelt out (`PFR`, `CSTR`), reaction orders turned into words (`order-2.1` as "second-order", a
+  real error the numbers check also caught), `=` as "equals", `$` delimiters dropped where the original
+  had them, near-copies. $0.022.
+- **Prompt 3 (`bd06fbd6`)** named each of those. A 40-item pilot, all chemical, passed 64% of attempts and
+  kept 91% of resolved items; the run then reached the civil items and fell to 30%: caret exponents in
+  units became superscripts (`kN/m^3` as `kN/m³` 52 times in 138 attempts), `=`, `>` and `%` became words,
+  "in m" became "in meters". 225 attempts, 91 passed, 31 exhausted. $0.068. Chemical kept 59 of 68
+  resolved items, civil 29 of 51.
+- **Prompt 4 (`aa5648ef`)** gives every rule a worked example, and `--limit` now pilots the first items of
+  each branch in turn rather than the first N of the list. The pilot, 10 items per branch: 22 of 66
+  attempts passed, 11 of 33 resolved items exhausted; chemical 5 of 5 attempts, civil and electrical 38%,
+  mechanical 23%, industrial 16%. New habits with each branch: `<=` as "at most", `2D` as
+  "two-dimensional", `x0` as `x₀`, `mu_X` as `μ_X`, `EOQ` spelt out, and `kN/m³` still 9 times. $0.019.
+
+**The decision (the owner, on the options laid out with these numbers):** the prompt is not the lever.
+Instead:
+
+1. **`restore()`**: before the checks, the original's ASCII notation is put back wherever the writer used a
+   Unicode form the original itself does not use (superscripts to `^`, subscript digits to plain or `_`
+   digits as the original writes them, `≤ ≥ ≠`, the Unicode minus, `·` and `×`, Greek letters to the names
+   the original uses). It is deterministic, the writer's raw text stays in `attempts.jsonl`, the served text
+   is what `pool.jsonl` and the manifest carry (flagged `restored`), and the six checks judge it like any
+   other text. Words written for symbols ("at most", "equals", "meters", an acronym spelt out) are prose
+   and are not mapped back; such an attempt fails as before. Measured on the stored attempts before it
+   was adopted: it recovered 12 of 44 failed attempts of the prompt-4 pilot and 37 of 134 of prompt 3's
+   run, and turned no pass into a failure (0 of 113).
+2. **Em and en dashes are punctuation**, not technical symbols: the tokens check had counted every
+   non-ASCII character as a symbol to keep, so a paraphrase that wrote a comma for an em dash failed. 21 of
+   the 450 originals contain one; 4 attempts on 2 items were failing for that alone.
+3. **The checks themselves are unchanged**, and the copy threshold in particular: 27 copy-only failures on
+   10 items were examined; their similarity over prose words alone was 0.67 to 0.76 against 0.39 to 0.62
+   for every passing paraphrase, so they are near-copies in prose too, not data-heavy items the measure
+   misjudged.
+4. **The part-label regex was a false positive**: `\b[Pp]art\s+\w+` read the prose "part of" (28 times in
+   the attempts), "part per" and "part rod" as part labels, so a paraphrase that used those words failed
+   the parts check against an original with no labels at all; no original in the pool writes a "Part N"
+   label. The pattern now takes a number or a single letter after "Part". On the stored attempts it
+   regained 12 items (7 of them exhausted) and broke no pass.
+5. **Examined and not adopted:** reading all-caps emphasis words (`WHOLE`, `UP`, `DOWN` in the industrial
+   templates) case-insensitively would regain 2 of 51 exhausted items, the rest failing on other counts
+   too; the writer's corrections of the originals (`-253°c` to `-253°C`, `N.s/m` to `N·s/m`) fail as
+   written and are left to the expert check's account, since the paper cannot claim character-for-character
+   fidelity and quietly accept a corrected original.
+6. **From scratch under prompt 4**, so that every item has three attempts under one prompt: the passes of
+   prompts 1 to 3 were set aside with their attempt files, not carried over ($0.06 and about 40 minutes
+   redone), and the manifest records the prompt hash per item.
+
+**The writer's endpoint.** Mistral alone serves `mistral-large-2512`, and through OpenRouter it was
+throttled all day ("temporarily rate-limited upstream"): the admitted rate swung between 0.7 and 5 calls
+a minute with the upstream's state, at two, eight and sixteen workers alike, so no worker count buys
+throughput when the endpoint is closed. A refused call bills nothing; `write_one` retries each call
+through `RETRY_SLEEPS` (fourteen tries over about three and a half minutes, jittered) before recording a
+service failure, and `--until-done` passes again over the deferred items until every item is resolved,
+waiting five minutes after a pass that admitted nothing. The run went at sixteen workers.
+`resolved()` judges stored rows through the current `restore()` and checks, so the to-do list and
+`--status` agree with `--check` after a change to the checks (before it, both read the flags stored at
+write time, and one pass re-asked six items that already passed under restore).
+
+**The run under prompt 4 with restore** (`PARAPHRASE.md`): 450 items written in six passes from 12:47 to
+15:32 UTC, 817 admitted calls against 416 refused retry cycles. **316 pass** (chemical 71, civil 71,
+electrical 64, industrial 49, mechanical 61 of 90 each), 264 at the first attempt, 39 at the second, 13
+at the third; 134 have no paraphrase after three; 35 of the passing ones carry restored notation; **29 of
+the 150 templates lose all three items**. Word similarity of the passing ones 0.198 to 0.75, median
+0.624; the failed attempts by check: tokens 362, numbers 163, copy 75, parts 20, length 13. Billed
+$0.312 including the pilot. Step 1 in all, prompts 1 to 4: **$0.416**, against the $0.69 ceiling approved
+for prompt 4 ($0.45, then $0.54 and $0.64 for prompts 2 and 3, each approved on its dry run); no cap was
+raised without an approval.
+
+**What this means for Q5.** The arm has 316 pairs instead of 450, over 121 templates instead of 150; the
+losses are the items the writer turns into words (`=`, `2D`, `%`, units, acronyms) or copies nearly
+verbatim, and they fall unevenly: industrial keeps 49 of 90 items, mechanical 61, electrical 64, chemical
+and civil 71 each. The template-level interval loses the 29 templates; the paper says so and reports the
+survival per branch from `PARAPHRASE.md`, and Q5's ranking stability is read over the 121 templates
+both arms share. The experts' check (`paraphrase_kit`) sees the restored text, as the models will, and
+adjudicates what the script cannot, including the passing paraphrases with the lowest word similarity.
+The alternative not taken today, a different writer family (Cohere, Amazon Nova), stays open if the
+experts reject many pairs.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
-| D-158 | A second fix of the digit rule's parser from round 2's notes, measured by a round 3 (no round 4), or 0.752 reported as measured | the router's run |
+| D-159 | Round 3 of the flag reading: the 181 claims in `scores/flag_review/round3/`, then `flag_sample --round 3 --merge <file>` and `--score --read-by "<who>"`, giving the second fix's precision on this roster; no round 4 | Q3 in the paper; the router's run |
+| D-158 | ~~A second fix of the digit rule's parser from round 2's notes, measured by a round 3 (no round 4), or 0.752 reported as measured~~ **Decided 2026-09-30: the second fix, adopted with no pilot step moving away (D-159); round 3 drawn** | — |
 | D-156 | ~~Round 2 of the flag reading: the 206 claims in `scores/flag_review/round2/` (workbook and instructions), then `flag_sample --round 2 --merge <file>` and `--score --read-by "<who>"`, giving the fixed rule's precision on this roster~~ **Read 2026-09-30 by the same domain expert: precision 0.752 (D-158, `FLAG_REVIEW_2.md`)** | — |
 | D-154 | ~~Fix the digit rule's parser the D-137 way, then read a fresh sample; or keep the rule and report its measured 0.505 (per model 0.10 to 1.00) in Q3~~ **Decided 2026-09-30: fixed, and adopted with a documented exception (D-156); round 2 drawn** | — |
 | D-150 | ~~The author's reading of the 220 sampled digit-rule flags (`scores/flag_review/sample.csv`), then `flag_sample --score` and a checker fix if one is needed~~ **Read 2026-09-30 by a domain expert, in the D-153 workbook: precision 0.505 against the pilot's 0.750 (D-154, `FLAG_REVIEW.md`)** | — |
@@ -5764,12 +5930,12 @@ its prompts.
 | D-146 | The paper reports the cliff per model with its interval and, if it states a count, the Welch count with the planned one beside it (as RESULTS.md now does) | the paper's section 5 |
 | — | The router's funding: with everything else run the round lands at about $450 on the account's basis (about $480 at E5's dearest endpoint); the router adds $72 to $195 and does not fit in $500. **2026-09-30 (D-151, D-152): with E5 at its projected $40 and the four-model repeats, about $465; the router's estimate rests on the pilot's output lengths, about $129 to $136 at Xiaomi's prices at E5's ratio (an extrapolation). The owner: the router waits for the author's flag reading** | the router's run |
 | — | A stratified read of the digit rule's flags on this roster (Qwen3-235B-2507 has 1,547 on 18,785 claims; 16 of deepseek's 24 sit in one template), the pilot's own rule before Q3 is reported; author time, no code | Q3 in the paper |
-| D-141 | Run: writing the 450 paraphrases with Mistral Large 3, $0.15 to $0.45 (`EVALUATION_GUIDE.md`, the paraphrase arm) | the expert check, and the paraphrase run by about 5 October |
+| D-141 | ~~Run: writing the 450 paraphrases with Mistral Large 3, $0.15 to $0.45 (`EVALUATION_GUIDE.md`, the paraphrase arm)~~ **Done 2026-09-30 (D-157): 316 of 450 pass after four prompts and the notation restore, 29 templates lose all three items, $0.416 in all; the 15 kits are built** | — |
 | D-141 | Run: the paraphrase run over the eleven models, about $49.2 on the main run's bills for the same items | the week of the main run, so the served models match |
 | D-141 | ~~Run: the three decoding repeats of `gemma-4-26b-a4b`, about $0.28~~ **Done 2026-09-30 over four models, by the owner's decision (D-151): $1.863 in the rows; `RESULTS.md` prints the table** | — |
 | D-138 | The stricter match rule removes 252 credits, 129 of them on symbolic answers the check cannot verify either way: keep it (as decided) or reverse it | the paper's tables |
 | D-142 | ~~Run: E5 over the eleven models, 8,032 calls, about $26.56 at Xiaomi's prices ($18.59 to $49.71), about 7 hours (`EVALUATION_GUIDE.md`, step 3)~~ **Done 2026-09-30 (D-155): every call answered, $36.30 in the rows; `RESULTS.md` carries the E5 columns** | — |
-| D-142 | Run: the step router over the eleven models, 24,506 calls, about $98 to $103 at Xiaomi's prices ($72 to $195), about 33 hours at 8 workers (`EVALUATION_GUIDE.md`, step 4). **The owner, 2026-09-30: after the author's flag reading; the estimate rests on the pilot's output lengths (D-152). Re-priced on the fixed flags: $98.41 to $103.53 at Xiaomi's prices, about $129 to $136 at E5's ratio (D-156)** | Q3's router columns |
+| D-142 | Run: the step router over the eleven models, 24,506 calls, about $98 to $103 at Xiaomi's prices ($72 to $195), about 33 hours at 8 workers (`EVALUATION_GUIDE.md`, step 4). **The owner, 2026-09-30: after the author's flag reading; the estimate rests on the pilot's output lengths (D-152). Re-priced on the fixed flags: $98.41 to $103.53 at Xiaomi's prices, about $129 to $136 at E5's ratio (D-156); on the second fix's, $98.41 to $103.63 (D-159)** | Q3's router columns |
 | D-108 | ~~Whether the review app shows questions and solutions as plain text, as the models read them, and whether the 65 templates judged through its Markdown rendering get a plain-text look; fixing `signal_operations`'s origin marker~~ **Closed by the owner 2026-09-28 (D-114): the certification is closed and no template changes** | — |
 | D-107 | ~~Fix the five templates round 2 objected to~~ **Fixed 2026-09-26 (D-108) and re-certified in round 3 (D-109): all five approved by all three** | — |
 | D-106 | ~~Whether the screen re-judges the changed templates (a few cents, targeted; not run before round 2); the plasma row's per-row tag~~ **Closed by the owner 2026-09-28 (D-114): no re-judge** | — |
