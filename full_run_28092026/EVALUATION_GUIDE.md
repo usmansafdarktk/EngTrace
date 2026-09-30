@@ -183,11 +183,26 @@ precision it displays. Fill `verdict` with one of:
   `note`, since the note is what a fix is built from;
 - `unsure`.
 
+**A reader outside the code (D-153)** gets a workbook instead of the CSV. It has an instructions sheet,
+each claim with its step's full text and the units the checker read, a verdict list, and no model names,
+so they cannot bias the reading. It holds trace text: send it privately, never commit it or the filled
+copy. Use one reader for all 220, not one per branch. The result is a precision per model, and the
+models' flags sit unevenly across branches (13 of DeepSeek's 20 are industrial), so a reader per branch
+would tie a model's figure to one reader. No branch expertise is needed: each row is arithmetic and
+rounding.
+
+```bash
+python -m full_run_28092026.flag_sample --reader-copy                  # scores/flag_review/flag_review_reader.xlsx
+python -m full_run_28092026.flag_sample --merge <the returned .xlsx>   # its verdicts into sample.csv, by code
+```
+
 Then:
 
 ```bash
-python -m full_run_28092026.flag_sample --score         # writes FLAG_REVIEW.md: counts only, committed
+python -m full_run_28092026.flag_sample --score --read-by "an author"  # writes FLAG_REVIEW.md: counts only, committed
 ```
+
+`--read-by` names who read the flags in the report's title, and the paper must say the same.
 
 If the checker verdicts show a pattern, the fix follows D-137's procedure: an audit script that
 measures the change on the gold (must stay 2,250 correct), the pilot's 300 traces against the experts

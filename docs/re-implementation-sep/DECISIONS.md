@@ -5547,11 +5547,40 @@ outlives the session that launched it. The laptop was on mains power.
 **Open.** E5's finish, `without_reply`, the billed total by the rows and by the account, and the providers,
 recorded when the run ends.
 
+## D-153 — The flag reading: one reader for all 220, a workbook for a reader outside the code, the model hidden
+
+**Date:** 2026-09-30 · **Status:** DECIDED · **Evidence:** `flag_sample.py` (`--reader-copy`, `--merge`, `--score --read-by`); a round trip on copies (below)
+
+The owner may give D-150's reading to someone other than an author. So that it reads the same either way:
+
+- **One reader for all 220, not one per branch.** The sample is balanced by model, not by branch, and by
+  branch it falls 65 industrial (27 templates), 51 civil (23), 35 mechanical (20), 35 electrical (20) and
+  34 chemical (19). The output is a precision per model, and the models' flags sit unevenly across
+  branches: 13 of DeepSeek's 20 are industrial, 7 of gpt-oss-20b's chemical. A reader per branch would tie
+  a model's figure to that branch's reader. No branch expertise is needed, because each row is arithmetic
+  and rounding at the displayed precision.
+- **A workbook for a reader outside the code.** `sample.csv` has no step text, which a reader needs to
+  judge a rounding chain, a unit or a wrongly split clause, and it names the model on every row, which can
+  bias the reading. `--reader-copy` writes `scores/flag_review/flag_review_reader.xlsx`: an instructions
+  sheet, then the claims in the sample's shuffled order, with the step's full text, the units the checker
+  read, a slip / checker / unsure list, numbers kept as text, and no model column. `--merge` writes the
+  returned verdicts and notes into `sample.csv` by `code`. It refuses a code or a verdict it does not know
+  and reports rows missing, verdicts changed and `checker` verdicts without a note.
+- **The encoding.** `--score` and `--merge` read a CSV with or without a byte-order mark, which Excel adds
+  when it saves "CSV UTF-8".
+- **Who read it.** `--score --read-by` names the reader in `FLAG_REVIEW.md`'s title (the default is "an
+  author"), and the paper says the same.
+
+A round trip on copies filled the workbook, merged it, scored it, read a CSV with a byte-order mark,
+and refused an unknown code and an unknown verdict: all eight checks passed. The real `sample.csv` was
+unchanged, and no `FLAG_REVIEW.md` was written. The workbook and any filled copy stay local, like the
+experts' labels.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
-| D-150 | The author's reading of the 220 sampled digit-rule flags (`scores/flag_review/sample.csv`), then `flag_sample --score` and a checker fix if one is needed | Q3 in the paper |
+| D-150 | The author's reading of the 220 sampled digit-rule flags (`scores/flag_review/sample.csv`), then `flag_sample --score` and a checker fix if one is needed. **2026-09-30 (D-153): one reader for all 220; for a reader outside the code, the workbook from `--reader-copy`, then `--merge` and `--score --read-by`** | Q3 in the paper; the router's run |
 | D-147 | The inclusive last-digit boundary is adopted; the owner may reverse it (one commit). Whether the paper reports the half-unit or whole-trace reading as anything more than a sensitivity would need an expert spot-check of the format-only partials | the paper's tables |
 | D-146 | The paper reports the cliff per model with its interval and, if it states a count, the Welch count with the planned one beside it (as RESULTS.md now does) | the paper's section 5 |
 | — | The router's funding: with everything else run the round lands at about $450 on the account's basis (about $480 at E5's dearest endpoint); the router adds $72 to $195 and does not fit in $500. **2026-09-30 (D-151, D-152): with E5 at its projected $40 and the four-model repeats, about $465; the router's estimate rests on the pilot's output lengths, about $129 to $136 at Xiaomi's prices at E5's ratio (an extrapolation). The owner: the router waits for the author's flag reading** | the router's run |
