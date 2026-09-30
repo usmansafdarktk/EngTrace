@@ -5923,7 +5923,7 @@ adjudicates what the script cannot, including the passing paraphrases with the l
 The alternative not taken today, a different writer family (Cohere, Amazon Nova), stays open if the
 experts reject many pairs.
 
-## D-160 — The paraphrase arm run over the eleven models the same day as its writing; scored and analysed, provisional
+## D-161 — The paraphrase arm run over the eleven models the same day as its writing; scored and analysed, provisional
 
 **Date:** 2026-09-30 · **Status:** DECIDED · **Evidence:** `TRACE_REVIEW_paraphrase.md`, `trace_review_paraphrase.json`, `results/RESULTS.md` (Q5), `traces/paraphrase/*.log` (local)
 
@@ -5963,8 +5963,10 @@ coverage differences are of the same size. Kendall's tau between the two arms' o
 template exploitation. Q5 is **provisional** until the experts' files are all scored
 (`paraphrase_kit --score`); the rejected pairs then leave both arms and the analysis is re-run.
 
+**Committed as `f8b63fc` under the number D-160 by mistake; D-160 is the review sample's (`afdc05b`, `3847fb5`).**
+
 **Open.** E5 on the paraphrase arm (runbook section 4, about $3 at 316 items) once approved; the experts'
-returns (D-159 when they are in).
+returns (a later entry when they are in).
 
 ## Open decisions
 
@@ -5980,7 +5982,7 @@ returns (D-159 when they are in).
 | — | The router's funding: with everything else run the round lands at about $450 on the account's basis (about $480 at E5's dearest endpoint); the router adds $72 to $195 and does not fit in $500. **2026-09-30 (D-151, D-152): with E5 at its projected $40 and the four-model repeats, about $465; the router's estimate rests on the pilot's output lengths, about $129 to $136 at Xiaomi's prices at E5's ratio (an extrapolation). The owner: the router waits for the author's flag reading** | the router's run |
 | — | A stratified read of the digit rule's flags on this roster (Qwen3-235B-2507 has 1,547 on 18,785 claims; 16 of deepseek's 24 sit in one template), the pilot's own rule before Q3 is reported; author time, no code | Q3 in the paper |
 | D-141 | ~~Run: writing the 450 paraphrases with Mistral Large 3, $0.15 to $0.45 (`EVALUATION_GUIDE.md`, the paraphrase arm)~~ **Done 2026-09-30 (D-157): 316 of 450 pass after four prompts and the notation restore, 29 templates lose all three items, $0.416 in all; the 15 kits are built** | — |
-| D-141 | ~~Run: the paraphrase run over the eleven models, about $49.2 on the main run's bills for the same items~~ **Done 2026-09-30 (D-160): 316 items, $34.17, every served model as the main run's; scored and analysed, Q5 provisional until the experts return** | — |
+| D-141 | ~~Run: the paraphrase run over the eleven models, about $49.2 on the main run's bills for the same items~~ **Done 2026-09-30 (D-161): 316 items, $34.17, every served model as the main run's; scored and analysed, Q5 provisional until the experts return** | — |
 | D-141 | ~~Run: the three decoding repeats of `gemma-4-26b-a4b`, about $0.28~~ **Done 2026-09-30 over four models, by the owner's decision (D-151): $1.863 in the rows; `RESULTS.md` prints the table** | — |
 | D-138 | The stricter match rule removes 252 credits, 129 of them on symbolic answers the check cannot verify either way: keep it (as decided) or reverse it | the paper's tables |
 | D-142 | ~~Run: E5 over the eleven models, 8,032 calls, about $26.56 at Xiaomi's prices ($18.59 to $49.71), about 7 hours (`EVALUATION_GUIDE.md`, step 3)~~ **Done 2026-09-30 (D-155): every call answered, $36.30 in the rows; `RESULTS.md` carries the E5 columns** | — |
