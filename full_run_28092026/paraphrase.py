@@ -125,7 +125,9 @@ STRIP = ',.;:!?"\'()[]{}'
 UNITS = {'m', 's', 'kg', 'g', 'K', 'N', 'J', 'W', 'V', 'Pa', 'Hz', 'mol', 'rad', 'bar', 'atm', 'psi', 'ft',
          'lb', 'lbf', 'lbm', 'mm', 'cm', 'km', 'min', 'h', 'hr', 'L', 'mL', 'ms', 'ns', 'dB', 'C', 'F',
          'kPa', 'MPa', 'GPa', 'kN', 'kJ', 'kW', 'MW', 'mA', 'kV', 'mV', 'kHz', 'MHz', 'GHz', 'Btu', 'hp', 'rpm'}
-PARTS = re.compile(r'\((?:[a-h]|i{1,3}|iv|vi{0,3}|ix|x)\)|(?<![\w(])[a-h]\)|\b[Pp]art\s+[A-Za-z0-9]+\b')
+# A part label: (a), a), (ii), or "Part 1" / "Part A" with a number or a single letter. Not "part of",
+# "part per" or "part rod", which the first version read as labels and failed 12 items on (D-157).
+PARTS = re.compile(r'\((?:[a-h]|i{1,3}|iv|vi{0,3}|ix|x)\)|(?<![\w(])[a-h]\)|\b[Pp]art\s+(?:\d+|[A-Za-z]|[IVX]{1,3})\b')
 PREAMBLE = re.compile(r"(?i)^\s*(?:here(?:'s| is)|sure|certainly|rewritten|paraphrase|the rewritten|revised)\b")
 DASHES = '—–'                       # em and en dash: punctuation, not symbols (D-157)
 SUP = {'⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9', '⁻': '-'}
@@ -464,7 +466,11 @@ def selftest() -> int:
              (good[:120], False, 'length')]
     two = '(a) Find the flow rate Q in m^3/s. (b) Find the head loss h_f in m.'
     cases_parts = [('(a) Determine Q in m^3/s; (b) determine h_f in m, the head loss.', True),
-                   ('(b) Determine h_f in m, the head loss; (a) determine Q in m^3/s.', False)]
+                   ('(b) Determine h_f in m, the head loss; (a) determine Q in m^3/s.', False),
+                   ('(a) Determine Q in m^3/s as part of the design; (b) determine h_f in m, the head loss.', True)]
+    bad = []
+    if PARTS.findall('Part 1 asks for Q; Part B for h_f; a part of the rod; parts per million') != ['Part 1', 'Part B']:
+        bad.append('parts: the label regex')
     # restore: the writer's Unicode forms put back as the original writes them; a dash is punctuation
     q3 = ('Water at 13.5 m^3/s enters a pipe of diameter D = 0.5 m — the flow is turbulent, with mu_w = 1.0e-3 Pa*s '
           'and x0 <= 2 m. Find the velocity v in m/s and the loss over 10^3 m.')
@@ -475,7 +481,6 @@ def selftest() -> int:
                      (check(q3, p3)['tokens'], False, 'raw fails tokens'),
                      (restore('an area of 5 m³', 'the area, 5 m³') == 'the area, 5 m³', True, 'a form the original has is kept'),
                      (restore('C_A0 and x_1', 'C_A₀ and x₁') == 'C_A_0 and x_1', True, 'subscripts follow the original')]
-    bad = []
     for got, want, reason in cases_restore:
         if got != want:
             bad.append(f'restore: {reason}')
