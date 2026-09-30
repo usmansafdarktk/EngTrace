@@ -205,14 +205,15 @@ python -m full_run_28092026.flag_sample --score --read-by "an author"  # writes 
 
 `--read-by` names who read the flags in the report's title, and the paper must say the same.
 
-**Round 1 is done, and so is the fix it forced (D-154, D-156).** A domain expert read it; 109 of the 220
-flags were the checker's, and the fix removed 97 of them from their steps. The fixed rule is measured by
-a fresh round, because the fix was built from round 1's notes. Round 2 is drawn: 206 claims, none on a
-step round 1 read. Every command takes `--round 2`:
+**Rounds 1 and 2 are done, and so are the two fixes they forced (D-154, D-156, D-158, D-159).** The same
+domain expert read both. In round 1, 109 of the 220 flags were the checker's; the first fix removed 97.
+Round 2 measured that fixed rule at 0.752, and the second fix removed 42 of its 51 misreadings. Round 3 is
+drawn: 181 claims, none on a step an earlier round read. It measures the second fix, and by the owner's
+rule no round 4 follows. Every command takes `--round 3`:
 
 ```bash
-python -m full_run_28092026.flag_sample --round 2 --merge <the returned .xlsx>          # scores/flag_review/round2/
-python -m full_run_28092026.flag_sample --round 2 --score --read-by "a domain expert"   # FLAG_REVIEW_2.md
+python -m full_run_28092026.flag_sample --round 3 --merge <the returned .xlsx>          # scores/flag_review/round3/
+python -m full_run_28092026.flag_sample --round 3 --score --read-by "<who read it>"     # FLAG_REVIEW_3.md
 ```
 
 If the checker verdicts show a pattern, the fix follows D-137's procedure: an audit script that
@@ -303,7 +304,8 @@ the paper will quote from these stages must be printed by `analyze.py` or `--sta
 - [ ] The router rows likewise, or a recorded decision not to run it.
 - [x] Three repeat variants scored; `TRACE_REVIEW_repeat*.md` say "as main" yes. *(2026-09-30, four models, D-151)*
 - [x] `FLAG_REVIEW.md` committed, and any checker fix it forced done the D-137 way. *(2026-09-30, D-154, D-156)*
-- [ ] Round 2 read, `FLAG_REVIEW_2.md` committed: the fixed rule's precision on this roster.
+- [x] Round 2 read, `FLAG_REVIEW_2.md` committed: the fixed rule's precision on this roster. *(0.752, D-158; the second fix followed, D-159)*
+- [ ] Round 3 read, `FLAG_REVIEW_3.md` committed: the second fix's precision on this roster; no round 4.
 - [ ] `results/RESULTS.md` regenerated with no "incomplete" in its header, committed and pushed.
 - [ ] A DECISIONS entry per paid run, and the Open decisions table updated.
 - [ ] `scores/` archived locally and on Kaggle, hashes checked.
