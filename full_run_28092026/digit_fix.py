@@ -2,10 +2,14 @@
 expert-labelled traces, on the 220 flags a domain expert read (D-154), and on every full-run trace.
 
     python -m full_run_28092026.digit_fix           # FREE: D-156, arith.py at 3a7f247 against bc7dfa4: DIGIT_FIX.md
-    python -m full_run_28092026.digit_fix --fix 2   # FREE: D-159, bc7dfa4 against arith.py as it stands: DIGIT_FIX_2.md
+    python -m full_run_28092026.digit_fix --fix 2   # FREE: D-159, bc7dfa4 against e783962: DIGIT_FIX_2.md
+    python -m full_run_28092026.digit_fix --fix 3   # FREE: D-160, e783962 against 5c83916: DIGIT_FIX_3.md
+    python -m full_run_28092026.digit_fix --review-sample   # FREE: the review agents' 80 steps, local
 
 A second fix (D-159) was built from round 2's notes the same way; it is measured against the first,
-on round 2's flags and on round 1's, whose slips it must go on flagging. FIXES lists both.
+on round 2's flags and on round 1's, whose slips it must go on flagging. A third (D-160) corrects what
+two review agents, each on its own, found wrong in both fixes' rules; its design reading is the 80
+steps they read, and both rounds' slips must stay flagged. FIXES lists all three.
 
 THE FIX. `arith.py`, E4's digit rule, read one chain of claims where a trace wrote several, and read
 some numbers, units and variables as something else: a domain expert found 109 of 220 sampled
@@ -67,6 +71,7 @@ from full_run_28092026 import score  # noqa: E402
 PRE_FIX = '3a7f247954f487c360dd7b3a716bae794d9649f4'   # the last commit of arith.py before D-156
 D156 = 'bc7dfa459e04a29fda80f5df431e8d5458617596'      # the D-156 fix
 D159 = 'e78396259b69f551433ec447e19964721734205f'      # the D-159 fix
+D160 = '5c83916e758594c97652593cce1d3273f3b82d94'      # the review agents' corrections (D-160)
 # The owner's documented exception (D-156): pilot steps, by trace code and step index, that gain a flag
 # the experts do not share, each a real wrong digit at the displayed precision on a line the old parser
 # could not read.
@@ -78,7 +83,12 @@ FIXES = {1: {'label': 'D-156', 'pre': PRE_FIX, 'post': D156, 'design': 'round1',
              'pilot_changes': 'digit_fix_pilot_changes.jsonl'},
          2: {'label': 'D-159', 'pre': D156, 'post': D159, 'design': 'round2', 'regression': ['round1'],
              'exceptions': set(), 'report': 'DIGIT_FIX_2.md', 'changes': 'digit_fix_2_changes.jsonl',
-             'pilot_changes': 'digit_fix_2_pilot_changes.jsonl'}}
+             'pilot_changes': 'digit_fix_2_pilot_changes.jsonl'},
+         # Built from the two review agents' findings, not from an expert's reading: its design reading is
+         # their 80 steps (`review`), and both expert rounds' slips must stay flagged (D-160).
+         3: {'label': 'D-160', 'pre': D159, 'post': D160, 'design': None, 'regression': ['round1', 'round2'],
+             'exceptions': set(), 'report': 'DIGIT_FIX_3.md', 'changes': 'digit_fix_3_changes.jsonl',
+             'pilot_changes': 'digit_fix_3_pilot_changes.jsonl'}}
 FLAGS = score.SCORES / 'flag_review'
 ROSTER_ALL = ['gpt-oss-20b', 'gemma-4-26b-a4b', 'deepseek-v4.1-flash', 'qwen3-235b-a22b-2507', 'glm-5.3-flash',
               'glm-5.3', 'muse-glimmer-30b', 'kimi-k3', 'gpt-5.4-mini', 'gemini-3.1-flash-lite',
@@ -319,6 +329,30 @@ def review_sample(per_kind: int = 40, seed: int = 7) -> int:
     return 0
 
 
+def review(pre, post=arith) -> collections.Counter:
+    """The 80 steps the two review agents read (D-160), by the kind of change and the verdicts the two gave
+    it, and whether this fix changes the claims flagged on the step. The verdicts are local, beside the
+    sample: verdicts_A.json, verdicts_B.json."""
+    va, vb = ({r['code']: r['verdict'] for r in json.loads((REVIEW / f'verdicts_{x}.json').read_text(encoding='utf-8'))}
+              for x in 'AB')
+    out = collections.Counter()
+    for line in (REVIEW / 'sample.jsonl').read_text(encoding='utf-8').splitlines():
+        r = json.loads(line)
+        key = (r['kind'], va[r['code']], vb[r['code']])
+        before, after = flagged(pre.check(r['step_text'])), flagged(post.check(r['step_text']))
+        out[key + ('steps',)] += 1
+        out[key + ('changed',)] += [(c.left, c.right) for c in before] != [(c.left, c.right) for c in after]
+    return out
+
+
+def review_rows(rv) -> list:
+    keys = sorted({k[:3] for k in rv})
+    return (['| the fixes before this one | agent A | agent B | steps | flags changed by this fix |',
+             '|---|---|---|---:|---:|']
+            + [f"| {'removed a flag' if k[0] == 'removed' else 'added a flag'} | {k[1]} | {k[2]} | "
+               f"{rv[k + ('steps',)]} | {rv[k + ('changed',)]} |" for k in keys])
+
+
 def reading_rows(rd) -> list:
     return ['| expert verdict | the same claim still flagged | another claim flagged in the step | no flag in the step |',
             '|---|---:|---:|---:|'] + [f"| {v} | {rd[(v, 'the same claim')]} | {rd[(v, 'another claim')]} | "
@@ -328,7 +362,7 @@ def reading_rows(rd) -> list:
 def main() -> int:
     import argparse
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
-    ap.add_argument('--fix', type=int, default=1, choices=sorted(FIXES), help='1: D-156; 2: D-159')
+    ap.add_argument('--fix', type=int, default=1, choices=sorted(FIXES), help='1: D-156; 2: D-159; 3: D-160')
     ap.add_argument('--review-sample', action='store_true', help='the two fixes\' changed steps, for the review agents')
     if ap.parse_args().review_sample:
         return review_sample()
@@ -343,7 +377,8 @@ def main() -> int:
         after = f'`arith.py` as it stands, SHA-256 (LF) `{sha[:16]}`'
     g = gold(pre_src, post_src)
     pil = pilot(pre, post)
-    rd = reading(pre, post, fx['design'])
+    rd = reading(pre, post, fx['design']) if fx['design'] else None
+    rv = None if fx['design'] else review(pre, post)
     regress = {r: reading(pre, post, r) for r in fx['regression']}
     per, changes = full_run(pre_src, post_src)
     CHANGES, PILOT_CHANGES = score.SCORES / fx['changes'], score.SCORES / fx['pilot_changes']
@@ -371,14 +406,24 @@ def main() -> int:
          f"from it {mv['away']}. Flags removed from steps the experts call correct: "
          f"{mv[('removed', 'correct')]}; from steps they call incorrect: {mv[('removed', 'incorrect')]}. Flags "
          f"added to steps they call incorrect: {mv[('added', 'incorrect')]}; to steps they call correct: "
-         f"{mv[('added', 'correct')]}.", '',
-         f"## The {sum(rd[(v, k)] for v in ('checker', 'slip') for k in ('the same claim', 'another claim', 'none'))} "
-         f"flags the domain expert read in {fx['design'].replace('round', 'round ')}, the ones this fix was built from", '',
-         f"The code before the fix reproduces {rd[('reproduced before', 'slip')] + rd[('reproduced before', 'checker')]} "
-         'of them on their own step. After the fix, on the same steps:', '']
-    L += reading_rows(rd)
-    L += ['', 'The fix was built from these notes, so this shows it does what it was built to do; the fixed '
-          "rule's precision needs a fresh sample, read after the fix.", '']
+         f"{mv[('added', 'correct')]}.", '']
+    if rd:
+        L += [f"## The {sum(rd[(v, k)] for v in ('checker', 'slip') for k in ('the same claim', 'another claim', 'none'))} "
+              f"flags the domain expert read in {fx['design'].replace('round', 'round ')}, the ones this fix was built from", '',
+              f"The code before the fix reproduces {rd[('reproduced before', 'slip')] + rd[('reproduced before', 'checker')]} "
+              'of them on their own step. After the fix, on the same steps:', '']
+        L += reading_rows(rd)
+        L += ['', 'The fix was built from these notes, so this shows it does what it was built to do; the fixed '
+              "rule's precision needs a fresh sample, read after the fix.", '']
+    else:
+        L += [f"## The {sum(v for k, v in rv.items() if k[3] == 'steps')} steps the two review agents read, "
+              'the ones this fix was built from', '',
+              'The two fixes before this one removed or added a flag on each step, and each agent, on its own, '
+              'judged whether that was right (their verdicts are local, beside the sample). By the pair of '
+              'verdicts, the steps whose flagged claims this fix changes:', '']
+        L += review_rows(rv)
+        L += ['', 'The fix was built from these findings, so this shows what it does to them; the fixed '
+              "rule's precision needs a fresh sample, read after the fix.", '']
     for r, rr in regress.items():
         L += [f"## {r.replace('round', 'Round ')}'s flags, read before: its slips must stay flagged", '',
               f"The code before this fix reproduces {rr[('reproduced before', 'slip')] + rr[('reproduced before', 'checker')]} "
