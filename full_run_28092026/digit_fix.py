@@ -258,6 +258,67 @@ def prf(c) -> str:
     return f"{c['tp']}/{c['fp']}/{c['fn']} | {p:.3f} | {r:.3f}"
 
 
+REVIEW = FLAGS / 'agent_review'
+
+
+def review_sample(per_kind: int = 40, seed: int = 7) -> int:
+    """Steps whose flag the two fixes, taken together, removed or added (`arith.py` at PRE_FIX against
+    `arith.py` as it stands), outside every expert round's steps and outside the set-aside model, for two
+    independent review agents (D-160): per_kind of each kind, round-robin across the models. A removed flag
+    should have been the checker's misreading, an added one a real slip. Written to
+    scores/flag_review/agent_review/sample.jsonl, local: it holds trace text."""
+    import random
+    _, changes = full_run(source_at(PRE_FIX), None)
+    read = set()
+    for p in sorted(FLAGS.glob('round*/sample.jsonl')):
+        read |= {(c['model'], c['item_id'], c['step']) for c in map(json.loads, p.read_text(encoding='utf-8').splitlines())}
+    pool = {'removed': collections.defaultdict(list), 'added': collections.defaultdict(list)}
+    for c in changes:
+        if c['model'] != 'qwen3.8-27b' and (c['model'], c['item_id'], c['step']) not in read:
+            pool['removed' if c['before'] else 'added'][c['model']].append(c)
+    rng = random.Random(seed)
+    chosen = []
+    for kind in ('removed', 'added'):
+        queues = [pool[kind][m] for m in sorted(pool[kind])]
+        for q in queues:
+            rng.shuffle(q)
+        rng.shuffle(queues)
+        picked = []
+        while len(picked) < per_kind and any(queues):
+            for q in queues:
+                if q and len(picked) < per_kind:
+                    picked.append(dict(q.pop(0), kind=kind))
+        chosen += picked
+    rng.shuffle(chosen)
+    pre, texts, out = load(source_at(PRE_FIX), 'pre_review'), {}, []
+    for c in chosen:
+        key = c['model']
+        if key not in texts:
+            rows = {r['item_id']: r for r in map(json.loads, (score.SCORES / 'main' / f'{key}.jsonl')
+                                                  .read_text(encoding='utf-8').splitlines())}
+            texts[key] = score.texts_matching('main', key, rows.values())
+        step = e2_prm.steps_of(texts[key][c['item_id']])[c['step']]
+        lines = step.splitlines()
+
+        def desc(rep):
+            return [{'left': x.left, 'right': x.right, 'left_value': x.left_value, 'right_value': x.right_value,
+                     'displayed_ulp': x.ulp, 'left_unit': x.left_unit, 'right_unit': x.right_unit,
+                     'line': lines[x.line] if x.line < len(lines) else ''} for x in flagged(rep)]
+        code = 'RV-' + hashlib.sha256(f"{key}|{c['item_id']}|{c['step']}".encode('utf-8')).hexdigest()[:8]
+        out.append({'code': code, 'kind': c['kind'], 'model': key, 'item_id': c['item_id'], 'step': c['step'],
+                    'flagged_before': desc(pre.check(step)), 'flagged_after': desc(arith.check(step)),
+                    'step_text': step})
+    REVIEW.mkdir(parents=True, exist_ok=True)
+    with open(REVIEW / 'sample.jsonl', 'w', encoding='utf-8', newline='\n') as fh:
+        for r in out:
+            fh.write(json.dumps(r, ensure_ascii=False) + '\n')
+    sizes = {k: sum(len(v) for v in pool[k].values()) for k in pool}
+    print(f"{len(out)} steps written to {REVIEW / 'sample.jsonl'} (seed {seed}): "
+          + ', '.join(f"{k} {sum(r['kind'] == k for r in out)} of {sizes[k]}" for k in pool)
+          + '; by model ' + str(dict(collections.Counter(r['model'] for r in out))))
+    return 0
+
+
 def reading_rows(rd) -> list:
     return ['| expert verdict | the same claim still flagged | another claim flagged in the step | no flag in the step |',
             '|---|---:|---:|---:|'] + [f"| {v} | {rd[(v, 'the same claim')]} | {rd[(v, 'another claim')]} | "
@@ -268,6 +329,9 @@ def main() -> int:
     import argparse
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
     ap.add_argument('--fix', type=int, default=1, choices=sorted(FIXES), help='1: D-156; 2: D-159')
+    ap.add_argument('--review-sample', action='store_true', help='the two fixes\' changed steps, for the review agents')
+    if ap.parse_args().review_sample:
+        return review_sample()
     fx = FIXES[ap.parse_args().fix]
     pre_src = source_at(fx['pre'])
     post_src = source_at(fx['post']) if fx['post'] else None
