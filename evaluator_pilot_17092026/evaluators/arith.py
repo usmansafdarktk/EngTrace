@@ -74,6 +74,25 @@ right milestone while the arithmetic they show evaluates to something else (a si
 written wrong; a coefficient written wrong). Both are kept as plants, so a checker
 change that stops catching them fails.
 
+READING THE FULL RUN'S FLAGS (D-154, D-156). With gold still at no flag, a domain expert read 220
+of the full run's flags and found 109 to be the checker's. Each rule below answers some of the notes:
+  - a claim ends at `\\Rightarrow`, `\\implies`, `\\to`, `\\qquad`, an aligned row's `\\\\`, a full stop,
+    `Then`, `Thus`, `Therefore` or `gives` in any case, and at `<`, `>`, `≤`, `≥` or `≠`; two spaces
+    before a new equation whose left side carries ∂, _, [ ] or a Greek letter separate the two
+  - thousands grouped by a space, `\\,`, `{,}` or a thin space are one number: `13 855`, `226\\,580`
+  - `a / 2.1506 × 10⁵` divides by the whole literal, and a literal in scientific notation shows its
+    precision with its exponent: `4.0007 × 10⁷` is known to 1e3, not to 1e-4
+  - single letters that are not unit symbols are variables: `48 E I`, `2 D S / H`, `8 μ L`, `(5/8) P`
+    and `d²` are symbolic, not the numbers 48, 2, 8 and 0.625 in the units `E I`, `D S / H`, `μ L`, `P`
+  - `0.916-0.917` is a range, not a subtraction; `39.5967...` is a truncation: the value lies in the
+    unit after the digits shown, and a number cut short inside a chain is read as the number
+  - `16sin(120°)`: trig glued to its coefficient is read in degrees as well
+  - `**4.301 minutes**` is markdown bold, so its unit reaches the chain; `customers/min` is a unit;
+    a unit tail never closes a bracket (`sin(75.35 rad)` is not `sin(75.35` in rad)
+  - a line after one that ends in an operator, or a segment opening with `+(`, continues an expression
+    begun above; and a segment the parser cannot read ends a chain rather than joining its neighbours
+    as though they were claimed equal
+
 WHAT IT CANNOT PARSE IT SAYS SO. Every segment is classified: evaluated, symbolic
 (skipped), or unparseable. A checker that silently parses 5% of lines and reports
 "100% consistent" would be this repo's recurring defect, so coverage is reported
@@ -83,6 +102,7 @@ from __future__ import annotations
 
 import math
 import re
+import warnings
 from dataclasses import dataclass, field
 
 import sympy
@@ -104,9 +124,28 @@ def _superscripts(s: str) -> str:
     return re.sub(r'[⁰¹²³⁴⁵⁶⁷⁸⁹⁻]+', lambda m: '**(' + m.group(0).translate(SUPDIGITS) + ')', s)
 
 
+BOLD = re.compile(r'(?<![\w)\]])\*\*(?=\S)(.+?)(?<=\S)\*\*(?![\w(])')
+GROUP_SEP = r'(?:\\,|\{,\}|\\ |[ \u2009\u202f\u00a0])'
+THOUSANDS = re.compile(r'(?<![\d.])\d{1,3}(?:' + GROUP_SEP + r'\d{3})+(?!\d)')
+IMPLIES = re.compile(r'\\(?:Rightarrow|Longrightarrow|implies|iff|Leftrightarrow|Longleftrightarrow|therefore'
+                     r'|rightarrow|longrightarrow|to)(?![A-Za-z])|[⟹⟶⇔⟺∴]')
+RELATIONS = ((r'\\(?:leq?|leqslant)(?![A-Za-z])', ' ≤ '), (r'\\(?:geq?|geqslant)(?![A-Za-z])', ' ≥ '),
+             (r'\\neq?(?![A-Za-z])', ' ≠ '), (r'\\lt(?![A-Za-z])', ' < '), (r'\\gt(?![A-Za-z])', ' > '))
+# Scientific notation has a decimal mantissa (`2.1506 × 10⁵`). An integer times a power of ten is
+# arithmetic: gold's `(92 - 20)/92 * 10^6` is ((92 - 20)/92) × 10⁶, a conversion to ppm (D-156).
+SCI = re.compile(r'(?<![\w.])(\d+\.\d+)\s*\*\s*10\s*\*\*\s*(?:\(\s*([-+]?\d+)\s*\)|([-+]?\d+))')
+
+
 def normalise(line: str) -> str:
     """LaTeX, markdown and unicode maths into something parse_expr reads."""
-    s = line
+    s = BOLD.sub(r'\1', line)                        # `**4.301 minutes**` is bold, not a power (D-156)
+    s = THOUSANDS.sub(lambda m: re.sub(GROUP_SEP, '', m.group(0)), s)    # 13 855, 226\,580, 8{,}212 (D-156)
+    s = IMPLIES.sub(' => ', s)                       # \Rightarrow, \implies, \to end a claim (D-156)
+    for pat, rel in RELATIONS:
+        s = re.sub(pat, rel, s)
+    s = s.replace('\\qquad', ' ; ').replace('\\\\', ' ; ').replace('&', ' ')    # side by side; aligned rows
+    s = re.sub(r'\\[()\[\]]', ' ', s)               # the \( \) \[ \] delimiters of inline maths
+    s = s.replace('…', '...').replace('\\%', '%')
     s = s.replace('$', ' ').replace('`', ' ').replace('**', '^')      # markdown bold -> ^ first
     s = re.sub(r'\\(?:left|right|displaystyle|,|;|!|quad|qquad)', ' ', s)
     for _ in range(4):                                               # nested \frac
@@ -128,10 +167,20 @@ def normalise(line: str) -> str:
     s = re.sub(r'(\d)\s*[eE]\s*([-+]?\d)', r'\1e\2', s)
     s = re.sub(r'(?<=\d)\s+x\s+(?=[\d(])', '*', s)                  # 121.0 x 10**6
     s = re.sub(r'(?<=\d),(?=\d{3}(?!\d))', '', s)                     # 1,000 -> 1000 only
+    s = re.sub(r'\\([A-Za-z]+)', r'\1', s)          # any other command is its name: \Phi(x) -> Phi(x)
+    # `2.1506 × 10⁵` is ONE number: `a / 2.1506 × 10⁵` divides by all of it, and its last digit is
+    # worth 10, not 1e-4 (D-156).
+    s = SCI.sub(lambda m: '(' + m.group(1) + 'e' + (m.group(2) or m.group(3)) + ')', s)
     return s
 
 
-CLAUSE = re.compile(r'=>|⇒|→|->|,\s|;|\band\b|\bso\b|\bthen\b|\bwith\b|\bwhere\b|\bthus\b|\bhence\b|:\s'
+CLAUSE = re.compile(r'=>|⇒|→|->|,\s|;|:\s'
+                    r'|(?i:\b(?:and|so|then|with|where|thus|hence|therefore|gives|giving|yields)\b)'
+                    # A full stop ends a sentence, a comparison is not an equation, and two spaces before
+                    # a new equation whose left side carries ∂, _, [ ] or a Greek letter part two (D-156).
+                    r'|(?<!\.)\.(?!\.)(?=\s|$)'
+                    r'|[<>≤≥≠]'
+                    r'|\s{2,}(?=[^\s=]*[∂_\[\]\u0391-\u03a9\u03b1-\u03c9][^\s=]*\s*=(?!=))'
                     # A connector that opens a new assignment ends the claim before it:
                     # `34 kN at a = 3.3 m`, `D3 = 0 for n = 4`, `from t = -2 to t = 2`
                     # are lists of values, not the chain 34 = 3.3 (D-120).
@@ -144,7 +193,14 @@ LABEL_EQ = re.compile(r'(?<=[\w\])])=(?=[-+]?\d)(?=.*\s=\s)')
 
 UNIT_WORDS = {'hours', 'hour', 'minutes', 'minute', 'seconds', 'second', 'meters',
               'metres', 'liters', 'litres', 'units', 'items', 'lots', 'degrees', 'kelvin',
-              'newtons', 'joules', 'watts', 'volts', 'amperes', 'ohms', 'farads', 'hr', 'min'}
+              'newtons', 'joules', 'watts', 'volts', 'amperes', 'ohms', 'farads', 'hr', 'min',
+              # what a queue or a line counts, per unit of time: `0.25 customers/min` (D-156)
+              'customers', 'customer', 'orders', 'vehicles', 'patients', 'people', 'workers',
+              'machines', 'batches', 'pieces', 'packets', 'symbols', 'cycles'}
+# The single letters that are unit symbols. Any other single letter is a variable: `48 E I` is 48EI,
+# not 48 in the unit `E I` (D-156). d and t are left out: traces write them as diameter and time far
+# more often than as day and tonne.
+UNIT_LETTERS = set('msgNJWVAKCFHTLlShM') | {'Ω', '%', '°'}
 
 
 def split_unit(seg: str):
@@ -162,6 +218,12 @@ def split_unit(seg: str):
         # A unit carries digits only in an exponent (m**2, s**(-1)). Any other digit
         # means the "tail" is arithmetic - `deg - 180 deg` - and must not be dropped.
         stray_digit = re.search(r'\d', re.sub(r'\*\*\s*\(?\s*-?\d+\s*\)?', '', m.group(2)))
+        if toks and all(len(t) == 1 for t in toks) and not set(toks) <= UNIT_LETTERS:
+            return s.strip(), ''          # `2 D S / H`, `8 μ L`, `(5/8) P`: variables (D-156)
+        if m.group(1).count('(') != m.group(1).count(')'):
+            return s.strip(), ''          # `sin(75.35 rad)`: a tail that closes a bracket is not a unit (D-156)
+        if set(toks) & FUNC_WORDS:
+            return s.strip(), ''          # `2 sqrt(m k)`: a tail holding a function is not a unit (D-156)
         unitlike = (all(len(t) <= 5 or t.lower() in UNIT_WORDS for t in toks)
                     and len(toks) <= 4 and not stray_digit)
         if toks and unitlike and not set(toks) <= FUNC_WORDS:
@@ -182,6 +244,18 @@ FUNCS_DEG = dict(FUNCS, sin=lambda x: sympy.sin(x * sympy.pi / 180),
                  acos=lambda x: sympy.acos(x) * 180 / sympy.pi)
 
 
+# `16sin(120)` is trig too: a coefficient glued on leaves no word boundary before `sin` (D-156).
+TRIG = re.compile(r'(?<![A-Za-z])(?:a?sin|a?cos|a?tan|arctan)(?![A-Za-z])')
+RANGE = re.compile(r'^\s*(\d+\.\d+)\s*-\s*(\d+\.\d+)\s*$')
+
+
+def is_range(lo: str, hi: str) -> bool:
+    """`0.916-0.917`, `2.13 - 2.14`: two numbers shown to the same place, the second one or two units
+    above the first, are a range the value lies in. A subtraction is not written that way (D-156)."""
+    u = ulp(lo)
+    return (u is not None and u == ulp(hi) and 0 < float(hi) - float(lo) <= 2 * u * (1 + 1e-9))
+
+
 def evaluate(seg: str):
     """(candidate values, kind, unit). Trig is evaluated in radians and in degrees,
     because traces write cos(30) meaning degrees as often as radians; a claim holds
@@ -196,9 +270,17 @@ def evaluate(seg: str):
     # minus is written against its operand (`-0.5`), so the space is the tell.
     if re.match(r'^-\s+\S', raw):
         return [], 'unparseable', ''
+    # `+(0.0121-1)=0`: a segment opening with `+(` or `+ ` is the last term of a sum begun on
+    # an earlier line; a signed number (`+0.162`) is written against its digits (D-156).
+    if re.match(r'^\+\s*[(\s]', raw):
+        return [], 'unparseable', ''
     s, unit = split_unit(seg)
+    s = re.sub(r'(?<=[\d)])\.\.\.', '', s)         # `sqrt(941713.24...)`: a number cut short is a number
+    m = RANGE.match(s)
+    if m and is_range(m.group(1), m.group(2)):
+        return [], 'unparseable', unit
     vals = []
-    for funcs in ((FUNCS, FUNCS_DEG) if re.search(r'\b(a?sin|a?cos|a?tan|arctan)\b', s) else (FUNCS,)):
+    for funcs in ((FUNCS, FUNCS_DEG) if TRIG.search(s) else (FUNCS,)):
         v, kind = _evaluate(s, funcs)
         if v is None:
             return [], kind, unit
@@ -219,7 +301,9 @@ def _evaluate(s: str, funcs):
     if re.search(r'\*\*\s*\(?\s*\d{3,}', s):                          # 10**1000: refuse
         return None, 'unparseable'
     try:
-        expr = parse_expr(s, local_dict=funcs, transformations=TRANSFORMS, evaluate=True)
+        with warnings.catch_warnings():             # `y[n](x)`: sympy warns while it refuses a fragment
+            warnings.simplefilter('ignore', SyntaxWarning)
+            expr = parse_expr(s, local_dict=funcs, transformations=TRANSFORMS, evaluate=True)
         if expr.free_symbols:
             return None, 'symbolic'
         v = complex(expr.evalf(15))
@@ -233,6 +317,8 @@ def _evaluate(s: str, funcs):
 UNIT_FACTORS = (1.0, 60.0, 1 / 60.0, 3600.0, 1 / 3600.0, 1e3, 1e-3, 1e6, 1e-6, 1e9, 1e-9,
                 1e12, 1e-12, 100.0, 0.01,
                 12.0, 1 / 12.0)          # ft and in, the US-unit templates (D-120)
+# 1e4 (ha and m²) was tried and left out: it passed a real slip, 4.036e-5 m³/mol "=" 0.4036 cm³/mol,
+# for the one hectare claim it would have read (D-156).
 
 
 def agree(a: float, b: float, tol: float = ARITH_TOL) -> bool:
@@ -385,40 +471,65 @@ class Report:
         return sum(c.ulp is not None for c in self.claims)
 
 
+# A line after one that ends in an operator continues an expression begun above: `+` /
+# `\frac{24(4.7)^2}{12}` / `-` / `\frac{24(3.0)^2}{12}=0` is one equation, not the claim 18 = 0 (D-156).
+CONTINUED = re.compile(r'(?:[-+*/×·]|\\times|\\cdot|\\pm)\s*$')
+
+
 def check(text: str) -> Report:
     rep = Report()
+    prev = ''
     for i, raw in enumerate(text.splitlines()):
+        continued = bool(CONTINUED.search(prev))
+        if raw.strip():
+            prev = raw
         if '=' not in raw:
             continue
-        for clause in CLAUSE.split(normalise(raw)):
+        for ci, clause in enumerate(CLAUSE.split(normalise(raw))):
             segs = re.split(r'(?<![<>!=])=(?!=)', LABEL_EQ.sub('≡', clause))
             if len(segs) < 2:
                 continue
-            nums = []
-            for sg in segs:
-                v, kind, unit = evaluate(sg)
+            # A segment the parser cannot read ends the chain: `735 (Shortage 757-735 = 22` does not
+            # claim 735 = 22, and `0.336-0.337` does not join its neighbours. A symbolic segment (a
+            # formula) still links them: `12.5 = P/A = 12.5` claims the two values equal (D-156).
+            chains, nums = [], []
+            for k, sg in enumerate(segs):
+                if continued and ci == 0 and k == 0:
+                    v, kind, unit = [], 'unparseable', ''
+                else:
+                    v, kind, unit = evaluate(sg)
                 rep.segments[kind] += 1
                 if v:
                     nums.append((sg.strip(), v, unit))
-            # `1/(41-23) hours = 60/18 = 3.33 minutes`: the unit is written once, at the
-            # end, and belongs to every unit-less link before it.
-            inherited, nxt = [], ''
-            for sg, v, u in reversed(nums):
-                nxt = u or nxt
-                inherited.append((sg, v, u or nxt))
-            nums = list(reversed(inherited))
-            for (ls, lv, lu), (rs, rv, ru) in zip(nums, nums[1:]):
-                u = displayed_ulp(rs)
-                if u is None:
-                    digit = True                      # no readable precision: unjudged
-                else:
-                    digit = agree_any_digit(lv, rv, lu, ru, u)
-                    if not digit:                     # only then pay for the propagation
-                        digit = agree_any_digit(lv, rv, lu, ru, u,
-                                                shown_uncertainty(ls, lv),
-                                                shown_uncertainty(rs, rv))
-                rep.claims.append(Claim(i, ls[:80], rs[:80], lv, rv,
-                                        agree_any(lv, rv, lu, ru), digit, u, lu, ru))
+                elif kind == 'unparseable':
+                    chains.append(nums)
+                    nums = []
+            chains.append(nums)
+            for nums in chains:
+                # `1/(41-23) hours = 60/18 = 3.33 minutes`: the unit is written once, at the
+                # end, and belongs to every unit-less link before it.
+                inherited, nxt = [], ''
+                for sg, v, u in reversed(nums):
+                    nxt = u or nxt
+                    inherited.append((sg, v, u or nxt))
+                nums = list(reversed(inherited))
+                for (ls, lv, lu), (rs, rv, ru) in zip(nums, nums[1:]):
+                    u = displayed_ulp(rs)
+                    # `39.5967...` is cut, not rounded: the value lies in the unit AFTER the digits
+                    # shown, [39.5967, 39.5968), so it is judged as a rounding of that unit's middle.
+                    # `0.03461552...` for 0.034615511 is still a wrong digit (D-156).
+                    rj = ([b + math.copysign(0.5 * u, b) for b in rv]
+                          if u is not None and rs.rstrip().endswith('...') else rv)
+                    if u is None:
+                        digit = True                      # no readable precision: unjudged
+                    else:
+                        digit = agree_any_digit(lv, rj, lu, ru, u)
+                        if not digit:                     # only then pay for the propagation
+                            digit = agree_any_digit(lv, rj, lu, ru, u,
+                                                    shown_uncertainty(ls, lv),
+                                                    shown_uncertainty(rs, rv))
+                    rep.claims.append(Claim(i, ls[:80], rs[:80], lv, rv,
+                                            agree_any(lv, rv, lu, ru), digit, u, lu, ru))
     return rep
 
 
@@ -490,6 +601,36 @@ def selftest() -> int:
         # `0.05` shown to two decimals is 0.045-0.055, so nothing past the second
         # figure of Re is pinned at all; write the operands out and the digit is.
         ('Re = 1000 * 2.500 * 0.0500 / 0.000890 = 141450', True, False),
+        # READING THE FULL RUN'S FLAGS (D-156). Each line is a form from the domain expert's notes
+        # that was flagged on correct arithmetic before the rule that now reads it.
+        (r'\sqrt{M\,T} = \sqrt{33\,961.1} \approx 184.3', True),               # thousands, \,
+        ('850 × 16.3 = 13 855', True),                                        # thousands, a space
+        (r'q = 8.314 \times 2849.24 = 23{,}688.6 \text{ J/mol} = 23.689 \text{ kJ/mol}', True),
+        (r'-3-0.66(5)=-6.30 \Rightarrow \Phi(-6.30)=0.0000', True),           # \Rightarrow ends a claim
+        (r'$-1 = B(-3) \Rightarrow B = \frac{1}{3}$', None),                  # ...so -1 is not B
+        (r'L = \sqrt{256} = 16. The number of points is n = L/2 = 8.', True), # a full stop ends one
+        ('beta = 0.8665-0.0000 = 0.8665. Then ARL = 1/(1-0.8665) = 7.4906', True),
+        ('t = 0.5542 / 1.461×10⁻⁶ ≈ 3.793×10⁵ min', True),                   # a×10^n is one number
+        ('t = 0.5542 / 1.461×10⁻⁶ ≈ 3.799×10⁵ min', True, False),            # ...known to 1e2
+        (r'N = \frac{118,038}{2,981} \approx 39.5967...', True),              # cut short, not rounded
+        (r'\sigma = \sqrt{0.0011982336} = 0.03461552...', True, False),       # ...but 0.034615511
+        ('y2 = 0.31 × 6.88 ≈ 2.13 – 2.14 m', None),                           # a range, not 2.13 - 2.14
+        (r'48 E I = 48 \times 29000 \times 5900 = 8212800000', True),         # E and I are variables
+        ('2 D S / H = 15,300,088 / 6.5778 ≈ 2,326,019', True),                # so are D, S and H
+        (r'$$(1.9)^2 = 3.61 \qquad (1.9)^4 = (3.61)^2 = 13.0321$$', True),    # \qquad parts two
+        ('f_s = 1/(1.03 × 10⁻³) = 970.87 Hz > 2f₀ = 2 × 162 = 324 Hz', True), # > is not =
+        ('T0 = 0 + 4 = 4 ≠ 0', True),                                         # nor is ≠
+        (r'g = 16\sin(120°) = 16 \times 0.8660 = 13.856', True),              # glued trig, degrees
+        ('W = 0.07168 hours = 0.07168 × 60 = **4.301 minutes**.', True),      # bold keeps its unit
+        ('∂v/∂x = 8(0.9) = 7.2 s⁻¹  ∂v/∂y = 8(3.3) = 26.4 s⁻¹', True),       # side by side
+        ('mu = 1 / 4 min = 0.25 customers/min = 0.25 × 60 = 15 customers/hour', True),
+        ('+(0.0121-1)=0', None),                                              # a sum begun above
+        ('\\frac{24(4.7)^2}{12}\n-\n\\frac{24(3.0)^2}{12}=0', None),           # ...one term a line
+        ('Month 1: 7 × 105 = 735 (Shortage 757-735 = 22', None),              # unreadable: no join
+        # Real slips the expert confirmed; the rules above must go on flagging them.
+        (r'\sin(4\pi \times 5.9856) = \sin(75.35 \text{ rad}) \approx -0.047', False),
+        (r'E_G = \frac{1.9714285714}{0.1565714286} \approx 12.5945', True, False),
+        (r'Fr_1 = \frac{9.0839}{1.7439} = 5.208', True, False),
     ]
     bad = 0
     for case in cases:
