@@ -42,8 +42,8 @@ a pair the expert rejects leaves both arms too.
 
 WHAT IS KEPT. paraphrase/attempts.jsonl, every attempt with its text, and paraphrase/pool.jsonl, the
 passing paraphrase per item, stay local and gitignored like the pool. paraphrase/manifest.jsonl is
-committed: per item its id, the original's and the paraphrase's SHA-256, the attempt that passed and
-each check's result, no text. PARAPHRASE.md is committed: counts.
+committed: per item its id, the original's and the paraphrase's SHA-256, the attempt that passed, the
+hash of the prompt that wrote it and each check's result, no text. PARAPHRASE.md is committed: counts.
 """
 from __future__ import annotations
 
@@ -271,12 +271,14 @@ def rebuild() -> int:
                 chosen = r
                 break
             fails.update(k for k in ('numbers', 'tokens', 'parts', 'copy', 'length', 'clean') if not r['check'][k])
-        n_att[len(rows) if chosen is None else chosen['attempt']] += 1
+        if chosen:
+            n_att[chosen['attempt']] += 1
         last = chosen or (rows[-1] if rows else None)
         manifest.append({'item_id': it['item_id'], 'template_id': it['template_id'], 'branch': it['branch'],
                          'original_sha256': it['sha256'], 'passed': chosen is not None,
                          'sha256': hashlib.sha256(chosen['text'].encode('utf-8')).hexdigest() if chosen else None,
                          'attempts': len(rows), 'attempt_passed': chosen['attempt'] if chosen else None,
+                         'prompt_sha256': chosen.get('prompt_sha256') if chosen else None,
                          'check': {k: v for k, v in last['check'].items()
                                    if k not in ('numbers_changed', 'tokens_missing')} if last else None,
                          'served_model': last.get('served_model') if last else None})
@@ -291,6 +293,9 @@ def rebuild() -> int:
             fh.write(json.dumps(r, ensure_ascii=False) + '\n')
     written = [m for m in manifest if m['attempts']]
     passed = [m for m in manifest if m['passed']]
+    exhausted = [m for m in written if not m['passed'] and m['attempts'] >= ATTEMPTS]
+    unresolved = len(its) - len(passed) - len(exhausted)       # not written yet, or deferred by a service failure
+    prompts = collections.Counter(m['prompt_sha256'][:16] for m in passed if m.get('prompt_sha256'))
     billed = sum(r.get('billed_usd') or 0.0 for rs in prior.values() for r in rs)
     sims = sorted(m['check']['similarity'] for m in passed)
     by_branch = collections.Counter(m['branch'] for m in passed)
@@ -302,13 +307,15 @@ def rebuild() -> int:
          f'| items written | {len(written)} |',
          f'| passing a paraphrase | {len(passed)} |',
          f'| passing at attempt 1, 2, 3 | {n_att[1]}, {n_att[2]}, {n_att[3]} |',
-         f'| no paraphrase after {ATTEMPTS} attempts | {sum(1 for m in written if not m["passed"])} |',
+         f'| no paraphrase after {ATTEMPTS} attempts | {len(exhausted)} |',
+         f'| not yet resolved (unwritten or deferred by a service failure; re-run) | {unresolved} |',
          f'| passing, per branch | ' + ', '.join(f'{b.replace("_engineering", "")} {n}' for b, n in sorted(by_branch.items())) + ' |',
          f'| word similarity of the passing ones: min, median, max | '
          + (f'{sims[0]}, {sims[len(sims) // 2]}, {sims[-1]}' if sims else '-') + ' |',
          f'| failed attempts by check | ' + (', '.join(f'{k} {v}' for k, v in fails.most_common()) or 'none') + ' |',
          f'| billed | ${billed:.3f} |',
-         f'| writer | `{WRITER["model"]}`, temperature {WRITER["temperature"]}; prompt sha256 `{PROMPT_SHA[:16]}` |']
+         f'| writer | `{WRITER["model"]}`, temperature {WRITER["temperature"]}; prompt sha256 of the passing ones '
+         + (', '.join(f'`{p}` ({n})' for p, n in prompts.most_common()) or f'`{PROMPT_SHA[:16]}` (none yet)') + ' |']
     (HERE / 'PARAPHRASE.md').write_text('\n'.join(L) + '\n', encoding='utf-8', newline='\n')
     print('\n'.join(L))
     return 0

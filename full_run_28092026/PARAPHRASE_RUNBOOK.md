@@ -60,8 +60,8 @@ python -m full_run_28092026.paraphrase --status      # items attempted, passing,
 
 What it writes, under `paraphrase/`: `attempts.jsonl` (every attempt, with text; local),
 `pool.jsonl` (the passing paraphrase per item; local), `manifest.jsonl` (per item its id, the
-original's and the paraphrase's SHA-256, the attempt that passed and each check's result; no text;
-**committed**), and `PARAPHRASE.md` (counts; **committed**). `--check` re-runs every check over the
+original's and the paraphrase's SHA-256, the attempt that passed, the hash of the prompt that wrote it
+and each check's result; no text; **committed**), and `PARAPHRASE.md` (counts; **committed**). `--check` re-runs every check over the
 stored attempts and rewrites the manifest and pool, free.
 
 Expected: most of the 450 pass at the first attempt. Read `PARAPHRASE.md`: the number passing, the
