@@ -20,7 +20,7 @@ The pilot's rule for the checker was "validate on gold, then read every flag rai
 flags. Q3 prints the digit rule's rates with the pilot's precision beside them; if this roster's is
 lower, the caption overstates them.
 
-WHAT --draw WRITES, under scores/flag_review/ (gitignored with the store; it holds trace text):
+WHAT --draw WRITES, under scores/flag_review/round<n>/ (gitignored with the store; it holds trace text):
   sample.jsonl   one flagged claim per line: a code, the model, item and template ids, the step index,
                  the claim as the checker split it (left = right), the values it evaluated each side to,
                  the displayed precision that judged it, the unit tails, and the step's text
@@ -39,7 +39,7 @@ correct rounding at the precision it displays. Verdicts:
   unsure    the reader cannot tell
 Say why in `note` for every `checker` verdict: the note is what the fix is built from.
 
-THE READER'S COPY (--reader-copy). scores/flag_review/flag_review_reader.xlsx, for a reader outside the
+THE READER'S COPY (--reader-copy). scores/flag_review/round<n>/flag_review_reader.xlsx, for a reader outside the
 code: one sheet of the claims in the sample's (shuffled) order with the step's full text and the units
 the checker read added, the model's name left out so it cannot bias the reading, numbers kept as text
 exactly as the checker saw them, and a slip / checker / unsure list in the verdict column. The
@@ -78,7 +78,7 @@ import e2_prm  # noqa: E402
 from full_run_28092026 import score  # noqa: E402
 from full_run_28092026.analyze import ROSTER  # noqa: E402
 
-OUT = score.SCORES / 'flag_review'
+OUT = score.SCORES / 'flag_review' / 'round1'
 SAMPLE = OUT / 'sample.jsonl'
 CSV = OUT / 'sample.csv'
 READER = OUT / 'flag_review_reader.xlsx'
@@ -89,12 +89,12 @@ ROUND = 1
 
 
 def round_dir(n: int) -> Path:
-    return score.SCORES / 'flag_review' / ('' if n == 1 else f'round{n}')
+    return score.SCORES / 'flag_review' / f'round{n}'
 
 
 def set_round(n: int) -> None:
-    """Round 1 keeps the files where D-150 put them; round n > 1 (D-156, after the digit rule's fix)
-    has its own folder, round<n>/, and its own report, FLAG_REVIEW_<n>.md."""
+    """Each round has its own folder, round<n>/ (the owner moved round 1's files there on 2026-09-30);
+    round 1's report is FLAG_REVIEW.md and a later round's (D-156, after the fix) FLAG_REVIEW_<n>.md."""
     global OUT, SAMPLE, CSV, READER, READER_NOTES, REPORT, ROUND
     ROUND, OUT = n, round_dir(n)
     SAMPLE, CSV, READER = OUT / 'sample.jsonl', OUT / 'sample.csv', OUT / 'flag_review_reader.xlsx'

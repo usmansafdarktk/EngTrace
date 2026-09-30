@@ -172,8 +172,8 @@ must carry this figure instead.
 python -m full_run_28092026.flag_sample --draw          # free: 220 flagged claims, 20 per model, seed 0
 ```
 
-The sample is already drawn and lives in `scores/flag_review/sample.csv` (local, it holds trace
-text); re-running `--draw` with the same seed reproduces it. Open the CSV, and for each row recompute
+The sample is already drawn and lives in `scores/flag_review/round1/sample.csv` (local, it holds trace
+text); `--draw` refuses to draw a round again, so its verdicts are kept. Open the CSV, and for each row recompute
 the left side from the numbers shown and ask whether the right side is a correct rounding at the
 precision it displays. Fill `verdict` with one of:
 
@@ -193,7 +193,7 @@ would tie a model's figure to one reader. No branch expertise is needed: each ro
 rounding.
 
 ```bash
-python -m full_run_28092026.flag_sample --reader-copy                  # flag_review_reader.xlsx and flag_review_instructions.md in scores/flag_review/
+python -m full_run_28092026.flag_sample --reader-copy                  # flag_review_reader.xlsx and flag_review_instructions.md in scores/flag_review/round1/
 python -m full_run_28092026.flag_sample --merge <the returned .xlsx>   # its verdicts into sample.csv, by code
 ```
 

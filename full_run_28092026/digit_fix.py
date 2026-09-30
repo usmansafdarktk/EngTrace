@@ -67,7 +67,7 @@ PILOT_CHANGES = score.SCORES / 'digit_fix_pilot_changes.jsonl'
 # the experts do not share, each a real wrong digit at the displayed precision on a line the old parser
 # could not read.
 EXCEPTIONS = {('T-adac89', 5), ('T-3b9847', 12), ('T-d68431', 8), ('T-7e995f', 11), ('T-30adfd', 6)}
-FLAGS = score.SCORES / 'flag_review'
+FLAGS = score.SCORES / 'flag_review' / 'round1'        # the 220 D-154's expert read
 ROSTER_ALL = ['gpt-oss-20b', 'gemma-4-26b-a4b', 'deepseek-v4.1-flash', 'qwen3-235b-a22b-2507', 'glm-5.3-flash',
               'glm-5.3', 'muse-glimmer-30b', 'kimi-k3', 'gpt-5.4-mini', 'gemini-3.1-flash-lite',
               'claude-sonnet-5', 'qwen3.8-27b']

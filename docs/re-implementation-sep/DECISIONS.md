@@ -5715,11 +5715,49 @@ The owner chose the fix (D-154).
 
 **Open.** Round 2's reading, and the router's run, which the owner set for after the flag reading.
 
+## D-158 — The flag reading, round 2: the fixed rule's precision on this roster is 0.752
+
+**Date:** 2026-09-30 · **Status:** MEASURED · OPEN (a second fix: the owner's call) · **Evidence:** `flag_sample.py --round 2 --merge` and `--score --read-by "the same domain expert as round 1"` (`FLAG_REVIEW_2.md`); the filled workbook (local)
+
+The paraphrase stream's commits use D-157, so this entry is D-158.
+
+- **The reading.** The domain expert who read round 1 read round 2's 206 claims (D-156) and decided
+  every one: 155 slips and 51 checker misreadings, none unsure, with a note on every checker verdict.
+- **Precision 0.752** among the decided (Wilson 0.689 to 0.806). Round 1 measured 0.505 with the rule
+  before the fix, on other steps of the same traces. The pilot's 0.750, per step against its experts'
+  labels on its own five models, is a different measure, printed beside it for scale.
+- **By model:**
+  - gpt-5.4-mini: 1.000 (20 of 20);
+  - gpt-oss-20b, gemma-4-26b-a4b, gemini-3.1-flash-lite and claude-sonnet-5: 0.900 each;
+  - qwen3-235b-a22b-2507: 0.800; muse-glimmer-30b: 0.750;
+  - glm-5.3-flash: 0.550; kimi-k3: 0.500; glm-5.3: 0.450;
+  - deepseek-v4.1-flash: 0.333, on its 6 claims.
+  
+  At 20 claims a model every interval is wide.
+- **The notes:**
+  - prose read as equations: "accepted if X = 0 or X = 1", "since Cp = 1.14 < 1.67", "using Q = 1090";
+  - markdown table cells run together, all six in Kimi's traces;
+  - `ẋ(0)` read as a function, four notes;
+  - units the rule does not know (Stokes, bar, ppm, µV), and units the model left unstated (m→mm,
+    Pa→MPa);
+  - a `…` after a correctly rounded number, where the expert suggests accepting rounding as well as
+    truncation;
+  - `a/2π` read as (a/2)π, and `\mu L` written in LaTeX;
+  - single cases: degrees in a conversion, a quadrant, ratio notation, carried roundings, a sign
+    convention and a running product.
+- **Housekeeping.** The owner moved round 1's files into `scores/flag_review/round1/`. `flag_sample.py`
+  and `digit_fix.py` now read them there, and round 1's report regenerates byte-identical.
+
+**Open.** Whether to fix the rule a second time, with a round 3 to measure it and no round 4, or to
+report 0.752. Either way the decision comes before the router runs, since the rule's flags are part of
+its prompts.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
-| D-156 | Round 2 of the flag reading: the 206 claims in `scores/flag_review/round2/` (workbook and instructions), then `flag_sample --round 2 --merge <file>` and `--score --read-by "<who>"`, giving the fixed rule's precision on this roster | Q3 in the paper; the router's run |
+| D-158 | A second fix of the digit rule's parser from round 2's notes, measured by a round 3 (no round 4), or 0.752 reported as measured | the router's run |
+| D-156 | ~~Round 2 of the flag reading: the 206 claims in `scores/flag_review/round2/` (workbook and instructions), then `flag_sample --round 2 --merge <file>` and `--score --read-by "<who>"`, giving the fixed rule's precision on this roster~~ **Read 2026-09-30 by the same domain expert: precision 0.752 (D-158, `FLAG_REVIEW_2.md`)** | — |
 | D-154 | ~~Fix the digit rule's parser the D-137 way, then read a fresh sample; or keep the rule and report its measured 0.505 (per model 0.10 to 1.00) in Q3~~ **Decided 2026-09-30: fixed, and adopted with a documented exception (D-156); round 2 drawn** | — |
 | D-150 | ~~The author's reading of the 220 sampled digit-rule flags (`scores/flag_review/sample.csv`), then `flag_sample --score` and a checker fix if one is needed~~ **Read 2026-09-30 by a domain expert, in the D-153 workbook: precision 0.505 against the pilot's 0.750 (D-154, `FLAG_REVIEW.md`)** | — |
 | D-147 | The inclusive last-digit boundary is adopted; the owner may reverse it (one commit). Whether the paper reports the half-unit or whole-trace reading as anything more than a sensitivity would need an expert spot-check of the format-only partials | the paper's tables |
