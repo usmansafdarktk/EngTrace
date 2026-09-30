@@ -154,14 +154,14 @@ Wrong-answer traces score 0 (incorrect or unusable); fully solved ones score 1; 
 
 | model | wrong answers, answered | flag rate | 95% CI | fully solved traces | flag rate | 95% CI | at 1% | claims checked per trace | traces with a claim | first flag: traces, median position |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| `gpt-oss-20b` | 354 | 0.203 | 0.142 to 0.269 | 1778 | 0.125 | 0.095 to 0.159 | 0.016 | 3.08 | 0.656 | 223, 0.667 |
+| `gpt-oss-20b` | 354 | 0.203 | 0.142 to 0.269 | 1778 | 0.125 | 0.095 to 0.159 | 0.015 | 3.08 | 0.656 | 223, 0.667 |
 | `gemma-4-26b-a4b` | 298 | 0.423 | 0.310 to 0.534 | 1877 | 0.126 | 0.093 to 0.163 | 0.017 | 4.30 | 0.686 | 237, 0.571 |
 | `deepseek-v4.1-flash` | 40 | 0.025 | 0.000 to 0.071 | 2167 | 0.003 | 0.001 to 0.006 | 0.005 | 2.10 | 0.546 | 7, 0.714 |
 | `qwen3-235b-a22b-2507` | 229 | 0.459 | 0.332 to 0.584 | 1906 | 0.222 | 0.176 to 0.269 | 0.068 | 9.49 | 0.889 | 423, 0.588 |
-| `glm-5.3-flash` | 31 | 0.097 | 0.000 to 0.258 | 2159 | 0.018 | 0.011 to 0.025 | 0.012 | 4.46 | 0.793 | 38, 0.739 |
-| `glm-5.3` | 18 | 0.056 | 0.000 to 0.111 | 2109 | 0.015 | 0.010 to 0.021 | 0.016 | 5.08 | 0.863 | 32, 0.784 |
+| `glm-5.3-flash` | 31 | 0.097 | 0.000 to 0.258 | 2159 | 0.018 | 0.012 to 0.025 | 0.013 | 4.46 | 0.794 | 39, 0.750 |
+| `glm-5.3` | 18 | 0.056 | 0.000 to 0.111 | 2109 | 0.015 | 0.010 to 0.021 | 0.016 | 5.08 | 0.864 | 32, 0.784 |
 | `muse-glimmer-30b` | 52 | 0.038 | 0.000 to 0.079 | 2150 | 0.057 | 0.043 to 0.072 | 0.021 | 3.18 | 0.685 | 122, 0.500 |
-| `kimi-k3` | 63 | 0.000 | 0.000 to 0.000 | 2156 | 0.005 | 0.002 to 0.008 | 0.004 | 1.94 | 0.508 | 11, 0.571 |
+| `kimi-k3` | 63 | 0.000 | 0.000 to 0.000 | 2156 | 0.005 | 0.002 to 0.008 | 0.004 | 1.94 | 0.509 | 11, 0.571 |
 | `gpt-5.4-mini` | 336 | 0.196 | 0.104 to 0.301 | 1853 | 0.107 | 0.077 to 0.140 | 0.013 | 2.70 | 0.625 | 198, 0.613 |
 | `gemini-3.1-flash-lite` | 299 | 0.301 | 0.177 to 0.430 | 1910 | 0.068 | 0.045 to 0.094 | 0.014 | 3.80 | 0.752 | 130, 0.500 |
 | `claude-sonnet-5` | 65 | 0.200 | 0.050 to 0.390 | 2157 | 0.110 | 0.084 to 0.139 | 0.016 | 4.48 | 0.804 | 238, 0.667 |
@@ -387,4 +387,4 @@ The pool over-represents the rare labels by design (D-116), so these rates are p
 
 ## Provenance
 
-`analyze.py` at commit `c397a47`; the score store `main` scored at commit `dfcef12` on 2026-09-30T15:26:12+00:00; stages: e5 at `dfcef12`. The evaluator hashes and the per-model trace hashes are in `results.json`.
+`analyze.py` at commit `c221a9a`; the score store `main` scored at commit `c221a9a` on 2026-09-30T15:47:20+00:00; stages: e5 at `c221a9a`. The evaluator hashes and the per-model trace hashes are in `results.json`.

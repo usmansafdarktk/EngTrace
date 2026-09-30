@@ -611,7 +611,7 @@ template_average_energy_mqam,electrical_engineering,digital_communications,Inter
 template_axial_deformation,mechanical_engineering,mechanics_of_materials,Easy,scalar,0,glm-5.3-flash,15,1.0,1.0,15,0,0,0,1.0,0.0,1539
 template_basic_buoyant_force,mechanical_engineering,fluid_mechanics,Easy,scalar,1,glm-5.3-flash,15,1.0,1.0,15,0,0,0,1.0,0.0,925
 template_basic_eoq,industrial_engineering,production_and_inventory,Easy,scalar,1,glm-5.3-flash,15,1.0,1.0,15,0,0,0,0.977778,0.0,2561
-template_basic_stress_strain,mechanical_engineering,mechanics_of_materials,Easy,multipart,0,glm-5.3-flash,15,1.0,1.0,15,0,0,0,1.0,0.0,1786
+template_basic_stress_strain,mechanical_engineering,mechanics_of_materials,Easy,multipart,0,glm-5.3-flash,15,1.0,1.0,15,0,0,0,1.0,0.066667,1786
 template_batch_moles_vs_conversion,chemical_engineering,reaction_kinetics,Easy,multipart,0,glm-5.3-flash,15,1.0,1.0,15,0,0,0,0.986667,0.0,1664
 template_batch_reactor_first_order,chemical_engineering,reaction_kinetics,Intermediate,scalar,1,glm-5.3-flash,15,1.0,1.0,15,0,0,0,1.0,0.066667,1140
 template_batch_reactor_second_order,chemical_engineering,reaction_kinetics,Advanced,scalar,1,glm-5.3-flash,15,1.0,1.0,15,0,0,0,0.648889,0.0,1061
