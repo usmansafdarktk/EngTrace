@@ -41,6 +41,16 @@ attempts per item. An item with no passing attempt has no paraphrase and leaves 
   copy      word-level similarity to the original at most COPY (a near-copy tests nothing)
   length    between LENGTH[0] and LENGTH[1] times the original's length
   clean     no preamble, comment or fence around the problem
+THE RESTORE (D-157). The writer will not hold notation however the rules are put: across four prompts
+on 30 September it wrote m^3 as m³, x0 as x₀, <= as ≤, mu_X as μ_X, and lost a caret exponent in a
+third of its failed attempts. So the text a model and an expert see is restore(original, text): the
+original's ASCII notation put back wherever the writer used a Unicode form the original itself does not
+use (superscripts, subscript digits, ≤ ≥ ≠, the Unicode minus, · and ×, Greek letters), a deterministic
+map that the six checks then judge like any other text. Em and en dashes are read as punctuation. On
+the stored attempts it recovered 12 of 44 and 37 of 134 failed attempts and turned no pass into a
+failure. Words written for symbols ("at most", "equals", "meters", "two-dimensional", an acronym spelt
+out) are prose and are not mapped back; such an attempt fails as before. attempts.jsonl keeps the
+writer's raw text; pool.jsonl and the manifest carry the restored text, flagged `restored`.
 Then one own-branch expert confirms each is the same problem with the same answer (paraphrase_kit.py);
 a pair the expert rejects leaves both arms too.
 
@@ -116,6 +126,33 @@ UNITS = {'m', 's', 'kg', 'g', 'K', 'N', 'J', 'W', 'V', 'Pa', 'Hz', 'mol', 'rad',
          'kPa', 'MPa', 'GPa', 'kN', 'kJ', 'kW', 'MW', 'mA', 'kV', 'mV', 'kHz', 'MHz', 'GHz', 'Btu', 'hp', 'rpm'}
 PARTS = re.compile(r'\((?:[a-h]|i{1,3}|iv|vi{0,3}|ix|x)\)|(?<![\w(])[a-h]\)|\b[Pp]art\s+[A-Za-z0-9]+\b')
 PREAMBLE = re.compile(r"(?i)^\s*(?:here(?:'s| is)|sure|certainly|rewritten|paraphrase|the rewritten|revised)\b")
+DASHES = '—–'                       # em and en dash: punctuation, not symbols (D-157)
+SUP = {'⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8', '⁹': '9', '⁻': '-'}
+SUB = {'₀': '0', '₁': '1', '₂': '2', '₃': '3', '₄': '4', '₅': '5', '₆': '6', '₇': '7', '₈': '8', '₉': '9'}
+PAIRS = {'≤': '<=', '≥': '>=', '≠': '!=', '−': '-', '·': '*', '×': '*', '⋅': '*'}
+GREEK = {'μ': 'mu', 'σ': 'sigma', 'τ': 'tau', 'θ': 'theta', 'ε': 'epsilon', 'ρ': 'rho', 'γ': 'gamma', 'η': 'eta',
+         'λ': 'lambda', 'ω': 'omega', 'φ': 'phi', 'α': 'alpha', 'β': 'beta', 'π': 'pi', 'ν': 'nu', 'κ': 'kappa',
+         'Δ': 'Delta', 'Ω': 'Omega', 'Θ': 'Theta'}
+
+
+def restore(original: str, text: str) -> str:
+    """The writer's text with the original's ASCII notation put back wherever the writer used a Unicode
+    form the original itself does not use: superscripts to ^, subscript digits to plain or _ digits as
+    the original writes them, ≤ ≥ ≠, the Unicode minus, · and × to their ASCII forms, Greek letters to
+    the names the original uses. Deterministic, and checked afterwards like any other text (D-157)."""
+    out = text
+    if not any(c in original for c in SUP):
+        out = re.sub('[' + ''.join(SUP) + ']+', lambda m: '^' + ''.join(SUP[c] for c in m.group(0)), out)
+    if not any(c in original for c in SUB):
+        under = bool(re.search(r'[A-Za-z]_\d', original))
+        out = re.sub('[' + ''.join(SUB) + ']+', lambda m: ('_' if under else '') + ''.join(SUB[c] for c in m.group(0)), out)
+    for u, a in PAIRS.items():
+        if u not in original and a[0] in original:
+            out = out.replace(u, a)
+    for g, name in GREEK.items():
+        if g not in original and re.search(r'\b' + name + r'\b|' + name + '_', original):
+            out = out.replace(g, name)
+    return out
 
 
 def tokens(text: str) -> list[str]:
@@ -138,7 +175,9 @@ def number_key(v: float) -> str:
 
 
 def check(original: str, text: str) -> dict:
-    """Each check's result for one attempt; `passed` when all hold."""
+    """Each check's result for one attempt; `passed` when all hold. `text` is the paraphrase as it will
+    be served, i.e. after restore(); em and en dashes are read as punctuation on both sides."""
+    original, text = (s.translate(str.maketrans(DASHES, ' ' * len(DASHES))) for s in (original, text))
     words_o = re.findall(r'\w+', original.lower())
     words_p = re.findall(r'\w+', text.lower())
     have = collections.Counter(tokens(text))
@@ -220,10 +259,12 @@ def item_until_pass(cli, it: dict, prior: list[dict]) -> list[dict]:
             rows.append({'item_id': it['item_id'], 'attempt': n, 'status': 'service_failure', **res})
             n -= 1                           # a service failure is not an attempt; the next run retries it
             break
-        chk = check(it['question'], res['text'])
+        final = restore(it['question'], res['text'])
+        chk = check(it['question'], final)
         rows.append({'item_id': it['item_id'], 'template_id': it['template_id'], 'attempt': n,
                      'original_sha256': it['sha256'], 'prompt_sha256': PROMPT_SHA, 'writer': WRITER,
-                     'ts': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()), **res, 'check': chk})
+                     'ts': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()), **res,
+                     'restored': final != res['text'], 'check': chk})
         if chk['passed']:
             break
     return rows
@@ -274,7 +315,8 @@ def rebuild() -> int:
         rows = sorted((r for r in prior[it['item_id']] if 'text' in r and 'check' in r), key=lambda r: r['attempt'])
         chosen = None
         for r in rows:
-            r['check'] = check(it['question'], r['text'])
+            r['final'] = restore(it['question'], r['text'])       # what a model and an expert will see
+            r['check'] = check(it['question'], r['final'])
             if r['check']['passed']:
                 chosen = r
                 break
@@ -284,14 +326,15 @@ def rebuild() -> int:
         last = chosen or (rows[-1] if rows else None)
         manifest.append({'item_id': it['item_id'], 'template_id': it['template_id'], 'branch': it['branch'],
                          'original_sha256': it['sha256'], 'passed': chosen is not None,
-                         'sha256': hashlib.sha256(chosen['text'].encode('utf-8')).hexdigest() if chosen else None,
+                         'sha256': hashlib.sha256(chosen['final'].encode('utf-8')).hexdigest() if chosen else None,
+                         'restored': (chosen['final'] != chosen['text']) if chosen else None,
                          'attempts': len(rows), 'attempt_passed': chosen['attempt'] if chosen else None,
                          'prompt_sha256': chosen.get('prompt_sha256') if chosen else None,
                          'check': {k: v for k, v in last['check'].items()
                                    if k not in ('numbers_changed', 'tokens_missing')} if last else None,
                          'served_model': last.get('served_model') if last else None})
         if chosen:
-            pool.append({'item_id': it['item_id'], 'template_id': it['template_id'], 'question': chosen['text']})
+            pool.append({'item_id': it['item_id'], 'template_id': it['template_id'], 'question': chosen['final']})
     OUT.mkdir(exist_ok=True)
     with open(MANIFEST, 'w', encoding='utf-8', newline='\n') as fh:
         for m in manifest:
@@ -304,6 +347,11 @@ def rebuild() -> int:
     exhausted = [m for m in written if not m['passed'] and m['attempts'] >= ATTEMPTS]
     unresolved = len(its) - len(passed) - len(exhausted)       # not written yet, or deferred by a service failure
     prompts = collections.Counter(m['prompt_sha256'][:16] for m in passed if m.get('prompt_sha256'))
+    per_template = collections.defaultdict(list)
+    for m in manifest:
+        per_template[m['template_id']].append(m)
+    lost = sorted(t.removeprefix('template_') for t, ms in per_template.items()
+                  if all(not m['passed'] and m['attempts'] >= ATTEMPTS for m in ms))
     billed = sum(r.get('billed_usd') or 0.0 for rs in prior.values() for r in rs)
     sims = sorted(m['check']['similarity'] for m in passed)
     by_branch = collections.Counter(m['branch'] for m in passed)
@@ -317,6 +365,8 @@ def rebuild() -> int:
          f'| passing at attempt 1, 2, 3 | {n_att[1]}, {n_att[2]}, {n_att[3]} |',
          f'| no paraphrase after {ATTEMPTS} attempts | {len(exhausted)} |',
          f'| not yet resolved (unwritten or deferred by a service failure; re-run) | {unresolved} |',
+         f'| passing ones with notation restored (Unicode the original lacks, put back as written) | {sum(1 for m in passed if m["restored"])} |',
+         f'| templates with no paraphrase for any of their items | {len(lost)}' + (': ' + ', '.join(lost) if lost else '') + ' |',
          f'| passing, per branch | ' + ', '.join(f'{b.replace("_engineering", "")} {n}' for b, n in sorted(by_branch.items())) + ' |',
          f'| word similarity of the passing ones: min, median, max | '
          + (f'{sims[0]}, {sims[len(sims) // 2]}, {sims[-1]}' if sims else '-') + ' |',
@@ -380,7 +430,20 @@ def selftest() -> int:
     two = '(a) Find the flow rate Q in m^3/s. (b) Find the head loss h_f in m.'
     cases_parts = [('(a) Determine Q in m^3/s; (b) determine h_f in m, the head loss.', True),
                    ('(b) Determine h_f in m, the head loss; (a) determine Q in m^3/s.', False)]
+    # restore: the writer's Unicode forms put back as the original writes them; a dash is punctuation
+    q3 = ('Water at 13.5 m^3/s enters a pipe of diameter D = 0.5 m — the flow is turbulent, with mu_w = 1.0e-3 Pa*s '
+          'and x0 <= 2 m. Find the velocity v in m/s and the loss over 10^3 m.')
+    p3 = ('A pipe of diameter D = 0.5 m carries water at 13.5 m³/s, the flow being turbulent, with μ_w = 1.0e-3 Pa·s '
+          'and x₀ ≤ 2 m. Determine the velocity v in m/s and the loss over 10³ m.')
+    c3 = check(q3, restore(q3, p3))
+    cases_restore = [(c3['tokens'] and c3['numbers'], True, 'restored keeps every token and number'),
+                     (check(q3, p3)['tokens'], False, 'raw fails tokens'),
+                     (restore('an area of 5 m³', 'the area, 5 m³') == 'the area, 5 m³', True, 'a form the original has is kept'),
+                     (restore('C_A0 and x_1', 'C_A₀ and x₁') == 'C_A_0 and x_1', True, 'subscripts follow the original')]
     bad = []
+    for got, want, reason in cases_restore:
+        if got != want:
+            bad.append(f'restore: {reason}')
     for text, want, reason in cases:
         c = check(q, text)
         if c['passed'] != want or (reason and c[reason]):

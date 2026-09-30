@@ -50,6 +50,10 @@ term as written and the parts in order, adds nothing, and hints at nothing. An a
 all six script checks hold: the same numbers as a multiset, every technical token kept, the part
 labels in order, word similarity at most 0.75 (a near-copy tests nothing), length 0.7 to 1.5 times the
 original, no preamble. Three attempts per item; an item with no passing attempt leaves both arms.
+Before the checks, `restore()` puts the original's ASCII notation back wherever the writer used a Unicode
+form the original does not have (`m³` to `m^3`, `x₀` to `x0`, `≤` to `<=`, Greek letters to their
+names); it is deterministic, the raw text stays in `attempts.jsonl`, and the served text is flagged
+`restored` in the manifest (D-157). Em and en dashes count as punctuation.
 
 ```bash
 python -m full_run_28092026.paraphrase --dry-run     # free: selection, writer's endpoint, $0.18 if all pass first time, $0.54 at most
