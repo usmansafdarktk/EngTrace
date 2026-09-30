@@ -53,6 +53,7 @@ original, no preamble. Three attempts per item; an item with no passing attempt 
 
 ```bash
 python -m full_run_28092026.paraphrase --dry-run     # free: selection, writer's endpoint, $0.18 if all pass first time, $0.54 at most
+python -m full_run_28092026.paraphrase --yes --limit 40   # BILLS: a pilot of the prompt on the first 40 unresolved items; read --status before going on
 python -m full_run_28092026.paraphrase --yes         # BILLS: writes and checks; resumable; retries each call through the upstream throttle
 python -m full_run_28092026.paraphrase --status      # items attempted, passing, billed
 ```
@@ -214,10 +215,14 @@ and the same cumulative cap.
   the writer retries each call up to nine times with a jittered backoff (`RETRY_SLEEPS`) before writing
   a service failure; if a run still defers many items, re-run it or wait for the throttle to ease.
 - **Most attempts fail the tokens or numbers check.** Look at `tokens_missing` and `numbers_changed` in
-  `attempts.jsonl` before anything else. On 30 September every such failure was the writer reformatting
-  notation (LaTeX, `$` delimiters, Unicode superscripts and minus signs, `·` for `*`); the prompt's rules
-  2 and 3 now forbid it. The checks are not to be loosened for this: the two arms must differ in wording
-  only.
+  `attempts.jsonl` before anything else. On 30 September the first prompt lost most attempts to
+  reformatted notation (LaTeX, `$` delimiters, Unicode superscripts and minus signs, `·` for `*`) and the
+  second to acronyms spelt out, "order-2.1" turned into "second-order", `=` written as "equals" and `$`
+  delimiters dropped; the prompt now names each. The checks are not to be loosened for this: the two arms
+  must differ in wording only. Try a changed prompt on the first items with `--limit` before the rest,
+  and restart from scratch (set `attempts.jsonl` aside under a v-name; the gitignore covers
+  `attempts*.jsonl`) so that every item has its three attempts under the one prompt the manifest
+  records.
 - **An item has no paraphrase after three attempts.** It leaves both arms; `PARAPHRASE.md` says how
   many and which check failed. Do not edit a paraphrase by hand: the manifest's hash would no longer
   match and the run would refuse it.

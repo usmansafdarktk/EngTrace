@@ -4,6 +4,7 @@ and checked by script before an expert sees it (D-141).
 
     python -m full_run_28092026.paraphrase --dry-run    # FREE: the selection, the writer's endpoint, the estimate
     python -m full_run_28092026.paraphrase --yes        # BILLS: writes the paraphrases; resumable
+    python -m full_run_28092026.paraphrase --yes --limit 40   # BILLS: the first 40 unresolved items only, a pilot of the prompt
     python -m full_run_28092026.paraphrase --check      # FREE: re-checks every attempt, rewrites the manifest
     python -m full_run_28092026.paraphrase --status     # FREE
 
@@ -15,10 +16,13 @@ as the closed-weight models are: the cheapest endpoint, which is Mistral's own.
 THE PROMPT (PROMPT below, hashed into every row) asks for a rewrite in new words and sentence
 structure that keeps every number, unit, symbol, variable, formula and technical term as written and
 the parts in the same order, adds and removes nothing, does not hint at the method or the answer, and
-returns only the problem. Its rules 2 and 3 spell out "as written" character for character and forbid
-reformatting (LaTeX, Markdown, Unicode superscripts and minus signs, added $ delimiters): the first run
-(2026-09-30, prompt 6091f248) lost 49 of 62 attempts to exactly that, the writer prettifying notation
-the checks then rightly rejected. Mistral throttles OpenRouter's shared capacity upstream ("temporarily
+returns only the problem. The rules grew from what the writer did on 30 September: the first prompt
+(6091f248) lost 49 of 62 attempts to prettified notation (LaTeX, $ delimiters, Unicode superscripts and
+minus signs, · for *); the second (1ae64428), which forbade that, lost 43 of 61 to acronyms spelt out
+(PFR, CSTR), reaction orders turned into words ("order-2.1" as "second-order", a real error), = written as
+"equals", $ delimiters dropped where the original had them, near-copies and length. Rules 1 to 3 and 6 now
+name each of these. The checks were not loosened: the two arms must differ in wording only. A new prompt
+is tried on the first items with --limit before the rest are written. Mistral throttles OpenRouter's shared capacity upstream ("temporarily
 rate-limited"): on 30 September most calls were refused at eight workers and at two alike, and the
 throughput scaled with the workers, so the throttle is per call, not a cap we saturate. A refused call
 bills nothing; `write_one` therefore retries each call through RETRY_SLEEPS before recording a service
@@ -84,12 +88,12 @@ LENGTH = (0.7, 1.5)
 PROMPT = """Rewrite the engineering problem below in different words.
 
 Rules:
-1. Keep every number exactly as written, with its unit.
-2. Keep every symbol, variable name, subscript, formula, equation, chemical formula and technical term exactly as written, character for character: the same ^, *, /, _ and = with the same spacing, the same e-03 style exponents, the same (g) or (l) state labels, the same % signs, plain hyphen-minus signs.
-3. Do not reformat any notation: no LaTeX, no Markdown, no Unicode superscripts, subscripts, minus signs or multiplication dots, and no math delimiters such as $...$ or \\( ... \\) unless the original has them in that place. Copy any table or block of data unchanged.
+1. Keep every number exactly as written, with its unit. A reaction order, an exponent, a percentage or a tolerance is a number too: "order-2.1" stays "order-2.1", never "second-order".
+2. Keep every symbol, variable name, subscript, formula, equation, chemical formula, acronym and technical term exactly as written, character for character: the same ^, *, /, _ and = with the same spacing, the same e-03 style exponents, the same (g) or (l) state labels, the same % signs, plain hyphen-minus signs. Acronyms such as CSTR, PFR or NPSH stay as acronyms; an equation such as "F_A0 = 3.96 mol/s" keeps its = sign and is not written as "equals" or "is".
+3. Do not change any notation or formatting. Add no LaTeX, Markdown, Unicode superscripts, subscripts, minus signs or multiplication dots that the original does not have; where the original wraps something in $...$ or other math delimiters, keep those delimiters exactly where they are. Copy any table or block of data unchanged.
 4. Keep the parts of the problem, and any lettered or numbered sub-questions, in the same order.
 5. Do not add, remove or change any information, assumption or instruction. Do not hint at the method or the answer.
-6. Change the wording and the sentence structure, so that the result reads as a genuinely different phrasing and not as a copy.
+6. Change the wording and the sentence structure throughout the prose: different verbs and connectives, clauses reordered within a sentence, sentences split or joined, so that the result reads as a genuinely different phrasing and not as a copy, while staying about the same length as the original.
 
 Return only the rewritten problem, with no preamble, heading or comment.
 
@@ -221,7 +225,7 @@ def item_until_pass(cli, it: dict, prior: list[dict]) -> list[dict]:
     return rows
 
 
-def run(workers: int) -> int:
+def run(workers: int, limit: int = 0) -> int:
     from openai import OpenAI
     cfg = run_config()
     key = os.getenv(cfg['route']['key_env'])
@@ -232,6 +236,8 @@ def run(workers: int) -> int:
     prior = attempts_so_far()
     todo = [it for it in selection() if not any(r.get('check', {}).get('passed') for r in prior[it['item_id']])
             and len([r for r in prior[it['item_id']] if 'check' in r]) < ATTEMPTS]
+    if limit:
+        todo = todo[:limit]                  # a pilot of the prompt; the next run without --limit takes the rest
     print(f'{len(todo)} items to write')
     billed, done = 0.0, 0
     with open(ATTEMPTS_FILE, 'a', encoding='utf-8', newline='\n') as fh, cf.ThreadPoolExecutor(workers) as pool:
@@ -387,6 +393,7 @@ def main() -> int:
     ap.add_argument('--selftest', action='store_true')
     ap.add_argument('--workers', type=int, default=8, help='parallel items; the upstream throttle is per call, so more workers give more throughput')
     ap.add_argument('--yes', action='store_true', help='required for the writing run, which bills')
+    ap.add_argument('--limit', type=int, default=0, help='write at most this many unresolved items (a pilot of the prompt)')
     a = ap.parse_args()
     if a.selftest:
         return selftest()
@@ -399,7 +406,7 @@ def main() -> int:
     if not a.yes:
         raise SystemExit('writing the paraphrases bills: re-run with --yes once the spend is approved '
                          '(see --dry-run for the estimate)')
-    return run(a.workers)
+    return run(a.workers, a.limit)
 
 
 if __name__ == '__main__':
