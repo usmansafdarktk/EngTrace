@@ -6068,10 +6068,67 @@ template exploitation. Q5 is **provisional** until the experts' files are all sc
 **Open.** E5 on the paraphrase arm (runbook section 4, about $3 at 316 items) once approved; the experts'
 returns (a later entry when they are in).
 
+## D-162 — The experts' check of the paraphrases returned in full: 39 of 316 pairs rejected, Q5 final; a tau that had ignored the rejections fixed
+
+**Date:** 2026-10-01 · **Status:** DECIDED · **Evidence:** `PARAPHRASE_REVIEW.md`, `paraphrase_kit.py --score`, `analyze.py` (`q5`), `results/RESULTS.md` (Q5); the experts' files and `paraphrase/accepted.json` (local)
+
+**The returns.** All fifteen experts returned their files within the night of 30 September (the last
+at 00:53 UTC on 1 October), 316 of 316 pairs, none outstanding; the folder they landed in,
+`paraphrase/experts_filled_paraphrases/`, was added to `.gitignore` before scoring. Median 41 seconds per
+item (32 to 300). **277 kept, 39 rejected** (12%): chemical 65 / 6, civil 60 / 11, electrical 61 / 3,
+industrial 43 / 6, mechanical 48 / 13. The answers behind the rejections: "same problem" no 31, "adds
+an ambiguity, an error or a hint" yes 24, "the answer still answers it" no 4; by pattern, 15 pairs
+differ in the problem but not in the answer, 12 differ and add something, 8 are the same problem with
+something added, 4 change the answer.
+
+**What the notes say** (they stay local; the reading is the author's). The rejections are of one kind:
+the writer drops or alters a qualifier that a script cannot weigh. "Solid" rod or shaft dropped
+(`statically_indeterminate` ×3, `statically_indeterminate_shaft` ×2, `angle_of_twist`); "uniform flow"
+made "steady, uniform" (`manning_trapezoidal_velocity` ×2); "approximately normally distributed" made
+"normal" (`newsvendor_normal_demand` ×3); "the magnitude of the force" made "the force", which admits a
+signed answer (`truss_method_of_joints` ×3, the 3 of the 4 answer-changing cases); "valued at" made
+"priced at" where the holding rate applies to the value (`epq_finite_production` ×3); "moisture content"
+made "contains 13.5% moisture", which can be read on the total mass (`phase_relations_degree_of_saturation`
+×3, `borrow_pit_fill_volume`); "normal boiling point" made "standard" (`latent_heat_vaporization` ×2);
+"submerged in diesel" made "underwater" (`hydrostatic_force_on_plane` ×2); "rigidly connected at B" made
+"a rigid composite shaft" (`composite_shafts_series` ×2); "absolute amplitude" made "amplitude"
+(`vibration_transmissibility` ×2). Five templates lose all three of their pairs to one expert's consistent
+reading, which is the check working as designed. Two `signal_operations` pairs were rejected for a
+leftover preamble, "Here's the rephrased version of the problem:", that the script's `clean` check let
+through: its regex expects an ASCII apostrophe and the writer wrote a curly one. The experts caught
+both; the regex is to be fixed before any further writing run, not now, since a `--check` after the fix
+would change the committed manifest under kits already judged (runbook, section 6).
+
+**The arm.** 277 pairs over 115 templates (of 150): 134 items never got a paraphrase (D-157) and 39 lost
+theirs here. The paper reports both losses per branch and names the check as the reason the arm is
+smaller than the 450 planned, not the models.
+
+**Q5, final** (`analyze`, the rejected pairs dropped from both arms): paraphrase minus original, paired by
+item over the 277, lies between -0.031 (`qwen3-235b-a22b-2507`, CI -0.074 to 0.011) and +0.016
+(`muse-glimmer-30b`) for every model; no difference survives Holm (the two nearest, `claude-sonnet-5`
+-0.018, CI -0.036 to -0.004, p 0.51, and `glm-5.3-flash` -0.020, CI -0.042 to 0.000, p 1.0); the E3
+coverage differences are of the same size (`gemma-4-26b-a4b` +0.022, `glm-5.3-flash` -0.031,
+`gpt-5.4-mini` -0.027 with intervals off zero, no adjustment applied to that column). The reading: no
+model's score depends on the templates' wording to any degree the paired test can see, which answers the
+reviewers' template-exploitation objection and the contamination question with the same measurement.
+
+**The tau that ignored the rejections.** `q5` applied the kept set to every per-model row but built the
+item set for Kendall's tau between the arms without it, so the provisional and the first final results
+both said "over the 316 items". Fixed: the tau's items are intersected with the kept pairs when the check
+has returned (the self-test, which passes no check, is unchanged). Over the 277: **tau 0.636, 95% CI
+0.457 to 0.871** (0.550 over the 316 before the fix), against the roster's noise floor of 0.881; as before, the top five models lie within 0.012 of one
+another, so the ordering between arms is not stable under any resampling, which is the reading, not
+exploitation.
+
+**Open.** E5 on the paraphrase arm (runbook section 4, about $3 at 277 kept pairs plus the 39 the judge
+would see anyway, since it runs on what is on disk) once approved; the private Kaggle copy of the arm's
+archive.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
+| D-161 | Run: E5 on the paraphrase arm, about $3 at 316 items (`PARAPHRASE_RUNBOOK.md` section 4), for Q5's E5 column; and the private Kaggle copy of `full_run_paraphrase_2026-09-30.zip` (manual mode, the owner's account) | Q5's E5 column in the paper |
 | D-160 | Round 3 of the flag reading: the 190 claims in `scores/flag_review/round3/` (workbook and instructions), then `flag_sample --round 3 --merge <file>` and `--score --read-by "<who>"`, giving the corrected rule's precision on this roster; no round 4 | Q3 in the paper; the router's run |
 | D-159 | ~~Round 3 of the flag reading: the 181 claims in `scores/flag_review/round3/`~~ **Redrawn 2026-09-30, unread, after two review agents' corrections (D-160)** | — |
 | D-158 | ~~A second fix of the digit rule's parser from round 2's notes, measured by a round 3 (no round 4), or 0.752 reported as measured~~ **Decided 2026-09-30: the second fix, adopted with no pilot step moving away (D-159); round 3 drawn** | — |
