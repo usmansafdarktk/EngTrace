@@ -82,4 +82,5 @@ full_run_28092026/paraphrase/pool.jsonl
 full_run_28092026/paraphrase/tasks/
 full_run_28092026/paraphrase/dist/
 full_run_28092026/paraphrase/returned/
+full_run_28092026/paraphrase/experts_filled_paraphrases/
 full_run_28092026/paraphrase/accepted.json

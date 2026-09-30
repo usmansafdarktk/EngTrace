@@ -539,7 +539,10 @@ def q5(main, para, keys, keep=None, e5_main=None, e5_para=None):
         o['p_holm'], o['mcnemar_p_holm'] = ph, qh
     tau = None
     if len(tested) >= 3:
-        common = sorted(set.intersection(*(set(para[k]) & set(main[k]) for k in tested)))
+        common = set.intersection(*(set(para[k]) & set(main[k]) for k in tested))
+        if keep is not None:                 # a rejected pair leaves both arms here too (D-162)
+            common &= keep
+        common = sorted(common)
         ts = sorted({main[tested[0]][x]['template_id'] for x in common})
         col = {t: j for j, t in enumerate(ts)}
         S = np.zeros((2, len(tested), len(ts)))

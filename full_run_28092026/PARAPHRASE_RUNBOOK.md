@@ -107,10 +107,12 @@ else. A message that has worked for the earlier rounds:
 The app records timestamps, blocks a submission until all three questions are answered, and requires
 a note for any answer that rejects the pair.
 
-**When files come back**, put each `<id>.jsonl` in `paraphrase/returned/` and score:
+**When files come back**, put each `<id>.jsonl` in one folder under `paraphrase/` (the 30 September
+returns are in `paraphrase/experts_filled_paraphrases/`; `returned/` and that folder are both
+gitignored, and any other name must be added to `.gitignore` before the files land) and score:
 
 ```bash
-python -m full_run_28092026.paraphrase_kit --score full_run_28092026/paraphrase/returned
+python -m full_run_28092026.paraphrase_kit --score full_run_28092026/paraphrase/experts_filled_paraphrases
 ```
 
 It refuses a code that is not in the build's keyfile or a file whose annotator was not assigned that
@@ -243,6 +245,11 @@ and the same cumulative cap.
   no eligible endpoint and says so; a served id different from the main run's shows as "as main NO"
   in the trace review. Record it; that model's Q5 row is then a comparison across checkpoints and the
   paper must say so or drop it.
+- **An expert rejects a pair for a preamble the script let through.** The `clean` check's regex expects
+  an ASCII apostrophe in "Here's"; the writer used a curly one on two `signal_operations` items on 30
+  September and the experts caught both (D-162). Fix the regex (`PREAMBLE` in `paraphrase.py`) before the
+  next writing run, not after a check the experts have already judged: a `--check` then would change the
+  committed manifest under kits already sent.
 - **A returned file names a code not in the keyfile, or an expert not assigned to it.** The kit was
   built again after it was sent (`--build` rebuilds the codes' assignment with the same seed, so the
   codes are stable unless the pool changed). Score against the build the experts received.
