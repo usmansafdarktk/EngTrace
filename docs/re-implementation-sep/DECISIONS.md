@@ -6156,6 +6156,30 @@ would see anyway, since it runs on what is on disk) once approved.
 **Open.** The router, which needs the owner's approval of a fresh dry-run estimate; and the Kaggle copy of
 `scores/` (manual mode, without `scores/flag_review/`).
 
+## D-164 — The router run approved at a $140 cap and launched on the final digit rule
+
+**Date:** 2026-09-30 · **Status:** DECIDED (the owner: approve, cap $140) · RUNNING · **Evidence:** `router.py --validate`, `--dry-run` and `--status`; `scores/router.log`
+
+- **Before the launch, all free:**
+  - `router --validate` reproduces the pilot. All 299 prompts are byte-identical to those sent, and every
+    figure matches its published value.
+  - `router --dry-run` on the store re-scored under the final rule (D-160) gives 24,506 calls and 171,941
+    steps under review. The estimate is $98.41 to $103.49 at Xiaomi's prices, $72.44 to $195.30 across
+    the six endpoints, and about 33 hours at 8 workers. The count is unchanged from D-159's, since the digit flags
+    change which steps a call sends, not the calls.
+  - The reply store was empty.
+- **The approval.** The owner approved a cumulative cap of $140. It covers the estimate at Xiaomi's prices
+  with E5's longer replies (about $129 to $136, D-152). If routing lands on dearer endpoints, the run stops
+  at the cap with every answer kept, and the owner decides then.
+- **The launch.** It ran through `keepawake_run.ps1`, detached, with `router --yes --max-usd 140
+  --workers 8`, at 2026-09-30T21:21:29Z. The paraphrase stream's own run went on beside it, untouched.
+- **The first 53 replies** (`router --status`): no failure; 3,482 completion tokens on the mean against
+  the basis's 3,702; $0.00392 a reply, about $96 over the run. The median call takes 59 s against the
+  pilot's 39, so the run looks nearer 50 hours than 33.
+
+**Open.** The run's end: `router --status` shows no call without a reply, then `analyze` fills Q3's router
+columns.
+
 ## Open decisions
 
 | # | Decision | Needed before |
@@ -6176,7 +6200,7 @@ would see anyway, since it runs on what is on disk) once approved.
 | D-141 | ~~Run: the three decoding repeats of `gemma-4-26b-a4b`, about $0.28~~ **Done 2026-09-30 over four models, by the owner's decision (D-151): $1.863 in the rows; `RESULTS.md` prints the table** | — |
 | D-138 | The stricter match rule removes 252 credits, 129 of them on symbolic answers the check cannot verify either way: keep it (as decided) or reverse it | the paper's tables |
 | D-142 | ~~Run: E5 over the eleven models, 8,032 calls, about $26.56 at Xiaomi's prices ($18.59 to $49.71), about 7 hours (`EVALUATION_GUIDE.md`, step 3)~~ **Done 2026-09-30 (D-155): every call answered, $36.30 in the rows; `RESULTS.md` carries the E5 columns** | — |
-| D-142 | Run: the step router over the eleven models, 24,506 calls, about $98 to $103 at Xiaomi's prices ($72 to $195), about 33 hours at 8 workers (`EVALUATION_GUIDE.md`, step 4). **The owner, 2026-09-30: after the author's flag reading; the estimate rests on the pilot's output lengths (D-152). Re-priced on the fixed flags: $98.41 to $103.53 at Xiaomi's prices, about $129 to $136 at E5's ratio (D-156); on the second fix's, $98.41 to $103.63 (D-159)** | Q3's router columns |
+| D-142 | Run: the step router over the eleven models, 24,506 calls, about $98 to $103 at Xiaomi's prices ($72 to $195), about 33 hours at 8 workers (`EVALUATION_GUIDE.md`, step 4). **The owner, 2026-09-30: after the author's flag reading; the estimate rests on the pilot's output lengths (D-152). Re-priced on the fixed flags: $98.41 to $103.53 at Xiaomi's prices, about $129 to $136 at E5's ratio (D-156); on the second fix's, $98.41 to $103.63 (D-159). Approved 2026-09-30 at a $140 cap on the final rule's flags ($98.41 to $103.49) and launched (D-164)** | Q3's router columns |
 | D-108 | ~~Whether the review app shows questions and solutions as plain text, as the models read them, and whether the 65 templates judged through its Markdown rendering get a plain-text look; fixing `signal_operations`'s origin marker~~ **Closed by the owner 2026-09-28 (D-114): the certification is closed and no template changes** | — |
 | D-107 | ~~Fix the five templates round 2 objected to~~ **Fixed 2026-09-26 (D-108) and re-certified in round 3 (D-109): all five approved by all three** | — |
 | D-106 | ~~Whether the screen re-judges the changed templates (a few cents, targeted; not run before round 2); the plasma row's per-row tag~~ **Closed by the owner 2026-09-28 (D-114): no re-judge** | — |
