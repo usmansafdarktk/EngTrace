@@ -116,7 +116,7 @@ Answer score on the 58 Easy templates minus the 34 Advanced, templates resampled
 
 ## Q3. What the process scores add beyond the answer
 
-Wrong-answer traces score 0 (incorrect or unusable); fully solved ones score 1; a partial answer is in neither. E3 coverage leaves out the 70 items with no milestones (all 15 of 3 templates and some items of 12 more); 52 templates have an item with at most one milestone (46 with exactly one), where coverage is close to an answer check. E3 is the deterministic part of E5, which adds the judge's verdict on the milestones E3 does not find. The floor is the same trace scored against a sibling item's milestones (D-149): what coverage a trace reaches by chance, per model, on the readable wrong answers. The digit rule's flag counts a trace when any step is flagged. Against the experts, on fully solved traces, it had precision 0.750 and recall 0.320 (SCORER_VALIDATION.md), so its rate is not a count of slips; and it reads a different amount of arithmetic in each model's traces (claims checked per answered trace, shown), so a low rate can mean little was read.
+Wrong-answer traces score 0 (incorrect or unusable); fully solved ones score 1; a partial answer is in neither. E3 coverage leaves out the 70 items with no milestones (all 15 of 3 templates and some items of 12 more); 52 templates have an item with at most one milestone (46 with exactly one), where coverage is close to an answer check. E3 is the deterministic part of E5, which adds the judge's verdict on the milestones E3 does not find. The floor is the same trace scored against a sibling item's milestones (D-149): what coverage a trace reaches by chance, per model, on the readable wrong answers. The digit rule's flag counts a trace when any step is flagged. Against the experts' step labels on the pilot's fully solved traces it has precision 0.800 and recall 0.427 (0.750 and 0.320 before D-156; SCORER_VALIDATION.md). *Added 2026-09-30 (D-154, D-156), after the first results were read:* on this roster a domain expert found 111 of 220 sampled flags real before the fix, 0.505 (FLAG_REVIEW.md); the fix took the flag off 97 of the sample's 109 misread steps and left it on all 111 slips' steps (DIGIT_FIX.md), and the fixed rule's precision on this roster waits for a fresh sample. So its rate is not a count of slips; and it reads a different amount of arithmetic in each model's traces (claims checked per answered trace, shown), so a low rate can mean little was read.
 
 **Milestones on the wrong-answer traces.** An unusable trace reaches only what it wrote before it stopped, and an empty one nothing, so coverage is also shown on the readable wrong answers alone.
 
@@ -154,17 +154,17 @@ Wrong-answer traces score 0 (incorrect or unusable); fully solved ones score 1; 
 
 | model | wrong answers, answered | flag rate | 95% CI | fully solved traces | flag rate | 95% CI | at 1% | claims checked per trace | traces with a claim | first flag: traces, median position |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| `gpt-oss-20b` | 354 | 0.206 | 0.142 to 0.278 | 1778 | 0.151 | 0.115 to 0.190 | 0.084 | 2.25 | 0.604 | 269, 0.600 |
-| `gemma-4-26b-a4b` | 298 | 0.409 | 0.295 to 0.524 | 1877 | 0.133 | 0.100 to 0.170 | 0.034 | 4.12 | 0.673 | 249, 0.571 |
-| `deepseek-v4.1-flash` | 40 | 0.025 | 0.000 to 0.071 | 2167 | 0.005 | 0.001 to 0.010 | 0.007 | 1.82 | 0.527 | 10, 0.500 |
-| `qwen3-235b-a22b-2507` | 229 | 0.393 | 0.259 to 0.524 | 1906 | 0.217 | 0.174 to 0.262 | 0.096 | 8.35 | 0.855 | 413, 0.571 |
-| `glm-5.3-flash` | 31 | 0.194 | 0.104 to 0.385 | 2159 | 0.062 | 0.045 to 0.081 | 0.060 | 4.10 | 0.788 | 133, 0.833 |
-| `glm-5.3` | 18 | 0.111 | 0.000 to 0.222 | 2109 | 0.065 | 0.050 to 0.082 | 0.069 | 4.44 | 0.843 | 137, 0.778 |
-| `muse-glimmer-30b` | 52 | 0.173 | 0.089 to 0.294 | 2150 | 0.123 | 0.096 to 0.152 | 0.103 | 3.10 | 0.679 | 265, 0.400 |
-| `kimi-k3` | 63 | 0.000 | 0.000 to 0.000 | 2156 | 0.017 | 0.012 to 0.023 | 0.018 | 1.68 | 0.471 | 37, 0.429 |
-| `gpt-5.4-mini` | 336 | 0.176 | 0.085 to 0.277 | 1853 | 0.097 | 0.070 to 0.126 | 0.016 | 2.56 | 0.611 | 179, 0.600 |
-| `gemini-3.1-flash-lite` | 299 | 0.308 | 0.185 to 0.436 | 1910 | 0.080 | 0.056 to 0.107 | 0.034 | 3.65 | 0.740 | 152, 0.500 |
-| `claude-sonnet-5` | 65 | 0.154 | 0.034 to 0.283 | 2157 | 0.116 | 0.089 to 0.145 | 0.037 | 4.09 | 0.785 | 250, 0.615 |
+| `gpt-oss-20b` | 354 | 0.229 | 0.160 to 0.305 | 1778 | 0.130 | 0.099 to 0.165 | 0.024 | 2.94 | 0.651 | 232, 0.655 |
+| `gemma-4-26b-a4b` | 298 | 0.436 | 0.323 to 0.548 | 1877 | 0.129 | 0.097 to 0.167 | 0.020 | 4.27 | 0.681 | 243, 0.533 |
+| `deepseek-v4.1-flash` | 40 | 0.025 | 0.000 to 0.071 | 2167 | 0.005 | 0.001 to 0.008 | 0.007 | 2.05 | 0.543 | 10, 0.757 |
+| `qwen3-235b-a22b-2507` | 229 | 0.463 | 0.338 to 0.587 | 1906 | 0.225 | 0.179 to 0.272 | 0.075 | 9.46 | 0.889 | 429, 0.591 |
+| `glm-5.3-flash` | 31 | 0.161 | 0.069 to 0.350 | 2159 | 0.034 | 0.022 to 0.049 | 0.030 | 4.42 | 0.793 | 74, 0.833 |
+| `glm-5.3` | 18 | 0.111 | 0.000 to 0.222 | 2109 | 0.030 | 0.019 to 0.044 | 0.030 | 5.04 | 0.863 | 64, 0.809 |
+| `muse-glimmer-30b` | 52 | 0.058 | 0.000 to 0.120 | 2150 | 0.065 | 0.048 to 0.084 | 0.031 | 3.19 | 0.685 | 140, 0.500 |
+| `kimi-k3` | 63 | 0.000 | 0.000 to 0.000 | 2156 | 0.007 | 0.003 to 0.012 | 0.007 | 1.90 | 0.499 | 16, 0.586 |
+| `gpt-5.4-mini` | 336 | 0.193 | 0.101 to 0.297 | 1853 | 0.107 | 0.077 to 0.140 | 0.013 | 2.67 | 0.619 | 198, 0.600 |
+| `gemini-3.1-flash-lite` | 299 | 0.311 | 0.188 to 0.438 | 1910 | 0.072 | 0.049 to 0.097 | 0.015 | 3.78 | 0.748 | 137, 0.500 |
+| `claude-sonnet-5` | 65 | 0.200 | 0.050 to 0.390 | 2157 | 0.112 | 0.086 to 0.140 | 0.019 | 4.43 | 0.800 | 242, 0.667 |
 
 **Wrong-answer rate against the item's milestone count** (D-149): how failure grows with the depth of the gold derivation.
 
@@ -186,17 +186,17 @@ Wrong-answer traces score 0 (incorrect or unusable); fully solved ones score 1; 
 
 | model | answered wrong-answer traces | digit rule | E5 MISSING | router judge |
 |---|---:|---:|---:|---:|
-| `gpt-oss-20b` | 354 | 0.206 | 0.746 |  |
-| `gemma-4-26b-a4b` | 298 | 0.409 | 0.594 |  |
+| `gpt-oss-20b` | 354 | 0.229 | 0.746 |  |
+| `gemma-4-26b-a4b` | 298 | 0.436 | 0.594 |  |
 | `deepseek-v4.1-flash` | 40 | 0.025 | 0.300 |  |
-| `qwen3-235b-a22b-2507` | 229 | 0.393 | 0.533 |  |
-| `glm-5.3-flash` | 31 | 0.194 | 0.258 |  |
+| `qwen3-235b-a22b-2507` | 229 | 0.463 | 0.533 |  |
+| `glm-5.3-flash` | 31 | 0.161 | 0.258 |  |
 | `glm-5.3` | 18 | 0.111 | 0.056 |  |
-| `muse-glimmer-30b` | 52 | 0.173 | 0.442 |  |
+| `muse-glimmer-30b` | 52 | 0.058 | 0.442 |  |
 | `kimi-k3` | 63 | 0.000 | 0.238 |  |
-| `gpt-5.4-mini` | 336 | 0.176 | 0.735 |  |
-| `gemini-3.1-flash-lite` | 299 | 0.308 | 0.666 |  |
-| `claude-sonnet-5` | 65 | 0.154 | 0.185 |  |
+| `gpt-5.4-mini` | 336 | 0.193 | 0.735 |  |
+| `gemini-3.1-flash-lite` | 299 | 0.311 | 0.666 |  |
+| `claude-sonnet-5` | 65 | 0.200 | 0.185 |  |
 
 ## Q4. Consistency within a template
 
@@ -387,4 +387,4 @@ The pool over-represents the rare labels by design (D-116), so these rates are p
 
 ## Provenance
 
-`analyze.py` at commit `774cfc0`; the score store `main` scored at commit `bf4a43b` on 2026-09-29T19:49:30+00:00; stages: e5 at `774cfc0`. The evaluator hashes and the per-model trace hashes are in `results.json`.
+`analyze.py` at commit `ac134b9`; the score store `main` scored at commit `bc7dfa4` on 2026-09-30T12:13:54+00:00; stages: e5 at `ac134b9`. The evaluator hashes and the per-model trace hashes are in `results.json`.
