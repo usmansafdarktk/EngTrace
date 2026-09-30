@@ -5923,6 +5923,49 @@ adjudicates what the script cannot, including the passing paraphrases with the l
 The alternative not taken today, a different writer family (Cohere, Amazon Nova), stays open if the
 experts reject many pairs.
 
+## D-160 — The paraphrase arm run over the eleven models the same day as its writing; scored and analysed, provisional
+
+**Date:** 2026-09-30 · **Status:** DECIDED · **Evidence:** `TRACE_REVIEW_paraphrase.md`, `trace_review_paraphrase.json`, `results/RESULTS.md` (Q5), `traces/paraphrase/*.log` (local)
+
+**The order.** The owner asked whether the experts' check (step 2) had to finish before the inference
+(step 3); it does not, and the runbook has the inference first so that the served checkpoints are the
+main run's. Step 3 was approved on its dry run at 16:5x UTC: 316 items over 121 templates, $33.05 on the
+main run's own per-item bills, under a $40 ceiling; the kits went out in parallel. A pair an expert later
+rejects leaves both arms at analysis; no trace is re-run for a verdict.
+
+**The run.** Eleven processes at 15 workers under the keep-awake launcher, 15:52 UTC. Ten complete by
+16:23; Kimi K3 ended its first pass at 16:13 with 55 Moonshot service failures ("temporarily
+rate-limited upstream", 64 of its 77 failure rows over the passes) and needed three more passes for those
+alone, complete at 16:53 with 315 answered and 1 empty. **$34.17** billed in the rows against the $33.05
+estimate and the $40 ceiling: Kimi $18.60 against $13.08, about 40% above its main-run per-item cost;
+GLM-5.3 $3.03 against $7.45, the same served model routed over four providers at the cheapest eligible
+price; the other nine within cents of their estimates.
+
+**The review** (`trace_review --variant paraphrase`): every model 316 items, **"as main" yes for all
+eleven**, prompt "pilot", one request set and one served model each, 0 duplicate final rows, 0 items
+outside the paraphrase pool, 3,476 final rows, 22 empty over 8 templates, the main run's usual ones
+(`vdw_solve_for_volume` 5, `work_isothermal_virial` 5, `adiabatic_flame_temperature` 4); an empty row
+scores 0 as in the main run.
+
+**Backup.** `~/EngTrace_private_backup/full_run_paraphrase_2026-09-30.zip`: `paraphrase/` (the attempts
+of all four prompts, the pool, the keyfile, the kits) and `traces/paraphrase/`, 64 files checked member
+by member, 8.4 MB, sha256 `0d13e18d…0845f7f` beside it. The private Kaggle copy is still to be made
+(manual mode, the owner's account), as for the main run's traces (D-126, D-131).
+
+**Scoring and analysis.** `score --variant paraphrase` (5½ minutes) against the original items' gold,
+milestones and question; answer means on the arm from 0.815 (`gpt-oss-20b`) to 0.979 (`muse-glimmer-30b`),
+unusable rows equal to the empties. `analyze` fills Q5: paraphrase minus original, paired by item over the
+316, lies between -0.032 (`qwen3-235b-a22b-2507`) and +0.014 (`muse-glimmer-30b`) for every model, no
+difference survives Holm (the smallest, `glm-5.3-flash` -0.027, CI -0.049 to -0.008, p 0.21), and the E3
+coverage differences are of the same size. Kendall's tau between the two arms' orderings of the models is
+0.550 (95% CI 0.449 to 0.849) against the roster's noise floor of 0.881: the top five models sit within
+0.012 of one another, so their order is not stable under any resampling, which is the reading, not
+template exploitation. Q5 is **provisional** until the experts' files are all scored
+(`paraphrase_kit --score`); the rejected pairs then leave both arms and the analysis is re-run.
+
+**Open.** E5 on the paraphrase arm (runbook section 4, about $3 at 316 items) once approved; the experts'
+returns (D-159 when they are in).
+
 ## Open decisions
 
 | # | Decision | Needed before |
@@ -5937,7 +5980,7 @@ experts reject many pairs.
 | — | The router's funding: with everything else run the round lands at about $450 on the account's basis (about $480 at E5's dearest endpoint); the router adds $72 to $195 and does not fit in $500. **2026-09-30 (D-151, D-152): with E5 at its projected $40 and the four-model repeats, about $465; the router's estimate rests on the pilot's output lengths, about $129 to $136 at Xiaomi's prices at E5's ratio (an extrapolation). The owner: the router waits for the author's flag reading** | the router's run |
 | — | A stratified read of the digit rule's flags on this roster (Qwen3-235B-2507 has 1,547 on 18,785 claims; 16 of deepseek's 24 sit in one template), the pilot's own rule before Q3 is reported; author time, no code | Q3 in the paper |
 | D-141 | ~~Run: writing the 450 paraphrases with Mistral Large 3, $0.15 to $0.45 (`EVALUATION_GUIDE.md`, the paraphrase arm)~~ **Done 2026-09-30 (D-157): 316 of 450 pass after four prompts and the notation restore, 29 templates lose all three items, $0.416 in all; the 15 kits are built** | — |
-| D-141 | Run: the paraphrase run over the eleven models, about $49.2 on the main run's bills for the same items | the week of the main run, so the served models match |
+| D-141 | ~~Run: the paraphrase run over the eleven models, about $49.2 on the main run's bills for the same items~~ **Done 2026-09-30 (D-160): 316 items, $34.17, every served model as the main run's; scored and analysed, Q5 provisional until the experts return** | — |
 | D-141 | ~~Run: the three decoding repeats of `gemma-4-26b-a4b`, about $0.28~~ **Done 2026-09-30 over four models, by the owner's decision (D-151): $1.863 in the rows; `RESULTS.md` prints the table** | — |
 | D-138 | The stricter match rule removes 252 credits, 129 of them on symbolic answers the check cannot verify either way: keep it (as decided) or reverse it | the paper's tables |
 | D-142 | ~~Run: E5 over the eleven models, 8,032 calls, about $26.56 at Xiaomi's prices ($18.59 to $49.71), about 7 hours (`EVALUATION_GUIDE.md`, step 3)~~ **Done 2026-09-30 (D-155): every call answered, $36.30 in the rows; `RESULTS.md` carries the E5 columns** | — |

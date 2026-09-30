@@ -1,0 +1,494 @@
+{
+ "variant": "paraphrase",
+ "models": [
+  {
+   "key": "gpt-oss-20b",
+   "lines": 316,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 311,
+    "empty": 5
+   },
+   "items": 316,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 311,
+   "empty": 5,
+   "modes": {
+    "paraphrase": 316
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "openai/gpt-oss-20b": 316
+   },
+   "served_as_main": true,
+   "providers": {
+    "Darkbloom": 316
+   },
+   "provider_count": 1,
+   "capped_with_text": 0,
+   "no_answer_marker": 1,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {
+    "template_standing_wave_formation": 1
+   },
+   "think_in_text": 0,
+   "empty_templates": {
+    "template_upward_seepage_quick_condition": 2,
+    "template_slope_deflection_end_moment": 1,
+    "template_vdw_solve_for_volume": 1,
+    "template_statically_indeterminate_shaft": 1
+   },
+   "empty_by_template_all": {
+    "template_upward_seepage_quick_condition": 2,
+    "template_slope_deflection_end_moment": 1,
+    "template_vdw_solve_for_volume": 1,
+    "template_statically_indeterminate_shaft": 1
+   },
+   "output_tokens_median": 1648.0,
+   "output_tokens_max": 32768,
+   "billed_usd": 0.082
+  },
+  {
+   "key": "gemma-4-26b-a4b",
+   "lines": 316,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 316
+   },
+   "items": 316,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 316,
+   "empty": 0,
+   "modes": {
+    "paraphrase": 316
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "google/gemma-4-26b-a4b-it": 316
+   },
+   "served_as_main": true,
+   "providers": {
+    "DekaLLM": 284,
+    "NextBit": 32
+   },
+   "provider_count": 2,
+   "capped_with_text": 1,
+   "no_answer_marker": 0,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {},
+   "think_in_text": 0,
+   "empty_templates": {},
+   "empty_by_template_all": {},
+   "output_tokens_median": 791.0,
+   "output_tokens_max": 32768,
+   "billed_usd": 0.109
+  },
+  {
+   "key": "deepseek-v4.1-flash",
+   "lines": 316,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 314,
+    "empty": 2
+   },
+   "items": 316,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 314,
+   "empty": 2,
+   "modes": {
+    "paraphrase": 316
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "deepseek/deepseek-v4.1-flash": 316
+   },
+   "served_as_main": true,
+   "providers": {
+    "AtlasCloud": 174,
+    "CoreWeave": 46,
+    "DeepInfra": 40,
+    "Morph": 28
+   },
+   "provider_count": 6,
+   "capped_with_text": 0,
+   "no_answer_marker": 0,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {},
+   "think_in_text": 0,
+   "empty_templates": {
+    "template_vdw_solve_for_volume": 1,
+    "template_work_isothermal_virial": 1
+   },
+   "empty_by_template_all": {
+    "template_vdw_solve_for_volume": 1,
+    "template_work_isothermal_virial": 1
+   },
+   "output_tokens_median": 3590.0,
+   "output_tokens_max": 32768,
+   "billed_usd": 0.89
+  },
+  {
+   "key": "qwen3-235b-a22b-2507",
+   "lines": 316,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 316
+   },
+   "items": 316,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 316,
+   "empty": 0,
+   "modes": {
+    "paraphrase": 316
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "qwen/qwen3-235b-a22b-2507": 316
+   },
+   "served_as_main": true,
+   "providers": {
+    "GMICloud": 211,
+    "Parasail": 102,
+    "Nebius": 3
+   },
+   "provider_count": 3,
+   "capped_with_text": 0,
+   "no_answer_marker": 0,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {},
+   "think_in_text": 0,
+   "empty_templates": {},
+   "empty_by_template_all": {},
+   "output_tokens_median": 763.5,
+   "output_tokens_max": 11369,
+   "billed_usd": 0.188
+  },
+  {
+   "key": "glm-5.3-flash",
+   "lines": 316,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 312,
+    "empty": 4
+   },
+   "items": 316,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 312,
+   "empty": 4,
+   "modes": {
+    "paraphrase": 316
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "z-ai/glm-5.3-flash": 316
+   },
+   "served_as_main": true,
+   "providers": {
+    "AtlasCloud": 147,
+    "StreamLake": 68,
+    "Novita": 61,
+    "Sail Research": 26
+   },
+   "provider_count": 7,
+   "capped_with_text": 1,
+   "no_answer_marker": 1,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {
+    "template_phasor_addition": 1
+   },
+   "think_in_text": 0,
+   "empty_templates": {
+    "template_work_isothermal_virial": 1,
+    "template_adiabatic_flame_temperature": 1,
+    "template_statically_indeterminate": 1,
+    "template_slope_deflection_end_moment": 1
+   },
+   "empty_by_template_all": {
+    "template_work_isothermal_virial": 1,
+    "template_adiabatic_flame_temperature": 1,
+    "template_statically_indeterminate": 1,
+    "template_slope_deflection_end_moment": 1
+   },
+   "output_tokens_median": 1340.5,
+   "output_tokens_max": 32768,
+   "billed_usd": 0.417
+  },
+  {
+   "key": "glm-5.3",
+   "lines": 316,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 306,
+    "empty": 10
+   },
+   "items": 316,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 306,
+   "empty": 10,
+   "modes": {
+    "paraphrase": 316
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "z-ai/glm-5.3": 316
+   },
+   "served_as_main": true,
+   "providers": {
+    "Baidu": 213,
+    "AtlasCloud": 58,
+    "Morph": 44,
+    "Novita": 1
+   },
+   "provider_count": 4,
+   "capped_with_text": 3,
+   "no_answer_marker": 3,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {
+    "template_annulus_flowrate": 1,
+    "template_ber_estimation_mary": 1,
+    "template_mm1k_finite_capacity": 1
+   },
+   "think_in_text": 0,
+   "empty_templates": {
+    "template_vdw_solve_for_volume": 3,
+    "template_work_isothermal_virial": 3,
+    "template_adiabatic_flame_temperature": 2,
+    "template_slope_deflection_end_moment": 1,
+    "template_damping_classification": 1
+   },
+   "empty_by_template_all": {
+    "template_vdw_solve_for_volume": 3,
+    "template_adiabatic_flame_temperature": 2,
+    "template_work_isothermal_virial": 3,
+    "template_slope_deflection_end_moment": 1,
+    "template_damping_classification": 1
+   },
+   "output_tokens_median": 3487.0,
+   "output_tokens_max": 32768,
+   "billed_usd": 3.032
+  },
+  {
+   "key": "muse-glimmer-30b",
+   "lines": 316,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 316
+   },
+   "items": 316,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 316,
+   "empty": 0,
+   "modes": {
+    "paraphrase": 316
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "meta/muse-glimmer-30b": 316
+   },
+   "served_as_main": true,
+   "providers": {
+    "DeepInfra": 316
+   },
+   "provider_count": 1,
+   "capped_with_text": 0,
+   "no_answer_marker": 0,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {},
+   "think_in_text": 0,
+   "empty_templates": {},
+   "empty_by_template_all": {},
+   "output_tokens_median": 3026.0,
+   "output_tokens_max": 11821,
+   "billed_usd": 1.36
+  },
+  {
+   "key": "kimi-k3",
+   "lines": 393,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 315,
+    "service_failure": 77,
+    "empty": 1
+   },
+   "items": 316,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 315,
+   "empty": 1,
+   "modes": {
+    "paraphrase": 316
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "moonshotai/kimi-k3": 316
+   },
+   "served_as_main": true,
+   "providers": {
+    "BaseTen": 316
+   },
+   "provider_count": 1,
+   "capped_with_text": 0,
+   "no_answer_marker": 0,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {},
+   "think_in_text": 0,
+   "empty_templates": {
+    "template_adiabatic_flame_temperature": 1
+   },
+   "empty_by_template_all": {
+    "template_adiabatic_flame_temperature": 1
+   },
+   "output_tokens_median": 2382.0,
+   "output_tokens_max": 32768,
+   "billed_usd": 18.601
+  },
+  {
+   "key": "gpt-5.4-mini",
+   "lines": 316,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 316
+   },
+   "items": 316,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 316,
+   "empty": 0,
+   "modes": {
+    "paraphrase": 316
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "openai/gpt-5.4-mini": 316
+   },
+   "served_as_main": true,
+   "providers": {
+    "Azure": 316
+   },
+   "provider_count": 1,
+   "capped_with_text": 0,
+   "no_answer_marker": 0,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {},
+   "think_in_text": 0,
+   "empty_templates": {},
+   "empty_by_template_all": {},
+   "output_tokens_median": 615.0,
+   "output_tokens_max": 1610,
+   "billed_usd": 1.047
+  },
+  {
+   "key": "gemini-3.1-flash-lite",
+   "lines": 316,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 316
+   },
+   "items": 316,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 316,
+   "empty": 0,
+   "modes": {
+    "paraphrase": 316
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "google/gemini-3.1-flash-lite": 316
+   },
+   "served_as_main": true,
+   "providers": {
+    "Google AI Studio": 316
+   },
+   "provider_count": 1,
+   "capped_with_text": 0,
+   "no_answer_marker": 0,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {},
+   "think_in_text": 0,
+   "empty_templates": {},
+   "empty_by_template_all": {},
+   "output_tokens_median": 624.0,
+   "output_tokens_max": 1420,
+   "billed_usd": 0.338
+  },
+  {
+   "key": "claude-sonnet-5",
+   "lines": 316,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 316
+   },
+   "items": 316,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 316,
+   "empty": 0,
+   "modes": {
+    "paraphrase": 316
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "anthropic/claude-sonnet-5": 316
+   },
+   "served_as_main": true,
+   "providers": {
+    "Claude Platform on AWS": 316
+   },
+   "provider_count": 1,
+   "capped_with_text": 0,
+   "no_answer_marker": 0,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {},
+   "think_in_text": 0,
+   "empty_templates": {},
+   "empty_by_template_all": {},
+   "output_tokens_median": 1771.5,
+   "output_tokens_max": 24772,
+   "billed_usd": 8.103
+  }
+ ],
+ "archive": {
+  "archive": null
+ }
+}

@@ -218,7 +218,25 @@ The share of templates fully solved on all 15 instances, on some, and on none: t
 
 ## Q5. Paraphrase robustness
 
-Not run yet.
+**Provisional: the experts' check of the paraphrases has not returned**, so no pair has been dropped yet.
+
+Paraphrase minus original, paired by item; besides the answer score, E3 coverage on the items with milestones, E5-strict where both arms carry it, and the answer score on the pairs both arms served from the same endpoint (D-149).
+
+| model | items | answer score diff | 95% CI | p (Holm) | McNemar p (Holm) | E3 coverage diff | 95% CI | E5 diff | 95% CI | same provider: pairs, diff |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `gpt-oss-20b` | 316 | -0.002 | -0.045 to 0.042 | 1.0000 | 1.0000 | -0.014 | -0.044 to 0.014 | pending |  | 314, -0.002 |
+| `gemma-4-26b-a4b` | 316 | +0.006 | -0.031 to 0.042 | 1.0000 | 1.0000 | +0.018 | -0.001 to 0.039 | pending |  | 186, +0.011 |
+| `deepseek-v4.1-flash` | 316 | -0.011 | -0.030 to 0.009 | 1.0000 | 1.0000 | +0.007 | -0.012 to 0.027 | pending |  | 34, +0.000 |
+| `qwen3-235b-a22b-2507` | 316 | -0.032 | -0.071 to 0.006 | 1.0000 | 1.0000 | -0.010 | -0.032 to 0.011 | pending |  | 211, -0.031 |
+| `glm-5.3-flash` | 316 | -0.027 | -0.049 to -0.008 | 0.2130 | 0.3867 | -0.040 | -0.063 to -0.019 | pending |  | 25, +0.000 |
+| `glm-5.3` | 316 | -0.002 | -0.025 to 0.020 | 1.0000 | 1.0000 | +0.001 | -0.018 to 0.020 | pending |  | 101, +0.020 |
+| `muse-glimmer-30b` | 316 | +0.014 | -0.003 to 0.033 | 1.0000 | 1.0000 | -0.010 | -0.034 to 0.012 | pending |  | 316, +0.014 |
+| `kimi-k3` | 316 | +0.002 | -0.009 to 0.014 | 1.0000 | 1.0000 | -0.008 | -0.027 to 0.011 | pending |  | 3, +0.000 |
+| `gpt-5.4-mini` | 316 | -0.019 | -0.054 to 0.015 | 1.0000 | 1.0000 | -0.030 | -0.054 to -0.007 | pending |  | 316, -0.019 |
+| `gemini-3.1-flash-lite` | 316 | -0.002 | -0.037 to 0.033 | 1.0000 | 1.0000 | -0.002 | -0.020 to 0.015 | pending |  | 316, -0.002 |
+| `claude-sonnet-5` | 316 | -0.013 | -0.029 to 0.002 | 1.0000 | 1.0000 | -0.010 | -0.025 to 0.005 | pending |  | 316, -0.013 |
+
+Kendall's tau between the models' answer scores on the originals and on the paraphrases, over the 316 items every tested model holds: 0.550, 95% CI 0.449 to 0.849; the noise floor for tau on this roster is 0.881 (below).
 
 ## Sensitivity
 
@@ -387,4 +405,4 @@ The pool over-represents the rare labels by design (D-116), so these rates are p
 
 ## Provenance
 
-`analyze.py` at commit `c221a9a`; the score store `main` scored at commit `c221a9a` on 2026-09-30T15:47:20+00:00; stages: e5 at `c221a9a`. The evaluator hashes and the per-model trace hashes are in `results.json`.
+`analyze.py` at commit `3847fb5`; the score store `main` scored at commit `c221a9a` on 2026-09-30T15:47:20+00:00; stages: e5 at `c221a9a`. The evaluator hashes and the per-model trace hashes are in `results.json`.

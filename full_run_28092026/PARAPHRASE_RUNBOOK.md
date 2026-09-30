@@ -165,13 +165,15 @@ that model's Q5 row with the caveat. The dearest models are Kimi K3 (about $19.6
 ($11.8) and GLM-5.3 ($10.9); an empty row scores 0 as in the main run. Only unrun items and service
 failures are called again on a re-run.
 
-**Back up the traces** as the main run's were (`INFERENCE_GUIDE.md` step 6), with the subfolder:
+**Back up the arm** as the main run's traces were (`INFERENCE_GUIDE.md` step 6), with the D-151 archive
+script, which checks every member and writes the checksum; the paraphrase folder holds the attempts,
+the pool, the keyfile and the kits, none of them in the repository:
 
-```powershell
-$d = "$env:USERPROFILE\EngTrace_private_backup"; $z = "$d\full_run_traces_paraphrase_$(Get-Date -Format yyyy-MM-dd).zip"
-Compress-Archive -Path full_run_28092026\traces\paraphrase\*.jsonl -DestinationPath $z -Force
-(Get-FileHash $z -Algorithm SHA256).Hash | Out-File -Encoding ascii "$z.sha256"
+```bash
+python -m full_run_28092026.backup_archive paraphrase traces/paraphrase --name full_run_paraphrase
 ```
+
+Then the private Kaggle copy, as in `INFERENCE_GUIDE.md` step 6 (manual mode; the owner's account).
 
 Then score and analyse (both free):
 
