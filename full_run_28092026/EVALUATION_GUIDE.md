@@ -205,6 +205,16 @@ python -m full_run_28092026.flag_sample --score --read-by "an author"  # writes 
 
 `--read-by` names who read the flags in the report's title, and the paper must say the same.
 
+**Round 1 is done, and so is the fix it forced (D-154, D-156).** A domain expert read it; 109 of the 220
+flags were the checker's, and the fix removed 97 of them from their steps. The fixed rule is measured by
+a fresh round, because the fix was built from round 1's notes. Round 2 is drawn: 206 claims, none on a
+step round 1 read. Every command takes `--round 2`:
+
+```bash
+python -m full_run_28092026.flag_sample --round 2 --merge <the returned .xlsx>          # scores/flag_review/round2/
+python -m full_run_28092026.flag_sample --round 2 --score --read-by "a domain expert"   # FLAG_REVIEW_2.md
+```
+
 If the checker verdicts show a pattern, the fix follows D-137's procedure: an audit script that
 measures the change on the gold (must stay 2,250 correct), the pilot's 300 traces against the experts
 and every full-run trace; adopt it only if the gold stays clean and no pilot verdict moves away from
@@ -289,10 +299,11 @@ the paper will quote from these stages must be printed by `analyze.py` or `--sta
 
 ## 10. Done means
 
-- [ ] E5 rows for all eleven models, `without_reply` 0 or a recorded handful; replies backed up.
+- [x] E5 rows for all eleven models, `without_reply` 0 or a recorded handful; replies backed up. *(2026-09-30, `without_reply` 0, $36.30, D-155; the local archive made, its Kaggle copy to do)*
 - [ ] The router rows likewise, or a recorded decision not to run it.
 - [x] Three repeat variants scored; `TRACE_REVIEW_repeat*.md` say "as main" yes. *(2026-09-30, four models, D-151)*
-- [ ] `FLAG_REVIEW.md` committed, and any checker fix it forced done the D-137 way.
+- [x] `FLAG_REVIEW.md` committed, and any checker fix it forced done the D-137 way. *(2026-09-30, D-154, D-156)*
+- [ ] Round 2 read, `FLAG_REVIEW_2.md` committed: the fixed rule's precision on this roster.
 - [ ] `results/RESULTS.md` regenerated with no "incomplete" in its header, committed and pushed.
 - [ ] A DECISIONS entry per paid run, and the Open decisions table updated.
 - [ ] `scores/` archived locally and on Kaggle, hashes checked.

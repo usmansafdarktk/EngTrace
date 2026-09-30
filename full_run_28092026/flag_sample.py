@@ -4,6 +4,13 @@
     python -m full_run_28092026.flag_sample --reader-copy                        # FREE: the workbook a reader fills in
     python -m full_run_28092026.flag_sample --merge <returned .xlsx or .csv>     # FREE: its verdicts into sample.csv
     python -m full_run_28092026.flag_sample --score [--read-by "an author"]      # FREE: the verdicts, counts only
+    python -m full_run_28092026.flag_sample --round 2 --draw | --reader-copy | --merge FILE | --score ...
+
+ROUNDS (D-156). Round 1 read the rule before its D-156 fix; the fix was built from that round's notes,
+so its flags cannot measure the fixed rule. Round 2, and any later one, draws from the fixed rule's
+flags in the re-scored store, leaves out every step an earlier round drew, and keeps its files in
+scores/flag_review/round<n>/ and its report in FLAG_REVIEW_<n>.md; its seed is the round less one
+unless given. A drawn round is kept: --draw refuses to draw it again.
 
 WHY. The digit rule's precision, three flags in four real, was measured on the pilot's 300 traces from
 five frontier-plus-Llama models (SCORER_VALIDATION.md). This roster writes differently, and its flags
@@ -77,6 +84,33 @@ CSV = OUT / 'sample.csv'
 READER = OUT / 'flag_review_reader.xlsx'
 INSTRUCTIONS = HERE / 'FLAG_READER_INSTRUCTIONS.md'          # committed: what the reader is told
 READER_NOTES = OUT / 'flag_review_instructions.md'           # the copy sent beside the workbook
+REPORT = HERE / 'FLAG_REVIEW.md'
+ROUND = 1
+
+
+def round_dir(n: int) -> Path:
+    return score.SCORES / 'flag_review' / ('' if n == 1 else f'round{n}')
+
+
+def set_round(n: int) -> None:
+    """Round 1 keeps the files where D-150 put them; round n > 1 (D-156, after the digit rule's fix)
+    has its own folder, round<n>/, and its own report, FLAG_REVIEW_<n>.md."""
+    global OUT, SAMPLE, CSV, READER, READER_NOTES, REPORT, ROUND
+    ROUND, OUT = n, round_dir(n)
+    SAMPLE, CSV, READER = OUT / 'sample.jsonl', OUT / 'sample.csv', OUT / 'flag_review_reader.xlsx'
+    READER_NOTES = OUT / 'flag_review_instructions.md'
+    REPORT = HERE / ('FLAG_REVIEW.md' if n == 1 else f'FLAG_REVIEW_{n}.md')
+
+
+def read_before(n: int) -> set:
+    """(model, item_id, step) of every claim an earlier round drew: a later round reads other steps."""
+    out = set()
+    for k in range(1, n):
+        p = round_dir(k) / 'sample.jsonl'
+        if not p.exists():
+            raise SystemExit(f'round {k} has no sample at {p}: draw the rounds in order')
+        out |= {(c['model'], c['item_id'], c['step']) for c in map(json.loads, p.read_text(encoding='utf-8').splitlines())}
+    return out
 VERDICTS = ('slip', 'checker', 'unsure')
 FIELDS = ['code', 'model', 'template_id', 'item_id', 'step', 'claim', 'left_value', 'right_value',
           'displayed_ulp', 'verdict', 'note']
@@ -86,8 +120,9 @@ def code_of(model: str, item_id: str, step: int, k: int) -> str:
     return 'FL-' + hashlib.sha256(f'{model}|{item_id}|{step}|{k}'.encode('utf-8')).hexdigest()[:8]
 
 
-def flagged_claims(model: str) -> list[dict]:
-    """Every claim the digit rule flags in the model's answered traces, recomputed from the text."""
+def flagged_claims(model: str, skip: frozenset = frozenset()) -> list[dict]:
+    """Every claim the digit rule flags in the model's answered traces, recomputed from the text,
+    leaving out the steps in `skip` (an earlier round's)."""
     rows = {r['item_id']: r for r in map(json.loads, (score.SCORES / 'main' / f'{model}.jsonl')
                                               .read_text(encoding='utf-8').splitlines())}
     texts = score.texts_matching('main', model, rows.values())
@@ -99,7 +134,7 @@ def flagged_claims(model: str) -> list[dict]:
         if len(steps) != len(r['steps']):
             raise SystemExit(f'{model}/{item_id}: the trace splits into {len(steps)} steps, the store has {len(r["steps"])}')
         for j, (step, srow) in enumerate(zip(steps, r['steps'])):
-            if not srow['digit_flags']:
+            if not srow['digit_flags'] or (model, item_id, j) in skip:
                 continue
             for k, c in enumerate(x for x in arith.check(step).claims if not x.ok_digit):
                 out.append({'code': code_of(model, item_id, j, k), 'model': model, 'template_id': r['template_id'],
@@ -112,10 +147,13 @@ def flagged_claims(model: str) -> list[dict]:
 
 def draw(per_model: int, seed: int) -> int:
     rng = random.Random(seed)
+    if SAMPLE.exists():
+        raise SystemExit(f'round {ROUND} is drawn already ({SAMPLE}); its sample and verdicts are kept, not drawn over')
+    skip = frozenset(read_before(ROUND))
     OUT.mkdir(parents=True, exist_ok=True)
     sample, totals = [], {}
     for model in ROSTER:
-        claims = flagged_claims(model)
+        claims = flagged_claims(model, skip)
         totals[model] = len(claims)
         by_t = collections.defaultdict(list)
         for c in claims:
@@ -143,8 +181,9 @@ def draw(per_model: int, seed: int) -> int:
                         'left_value': '; '.join(f'{v:.10g}' for v in c['left_value']),
                         'right_value': '; '.join(f'{v:.10g}' for v in c['right_value']),
                         'displayed_ulp': c['displayed_ulp'], 'verdict': '', 'note': ''})
-    print(f'{len(sample)} flagged claims drawn ({per_model} per model at most, seed {seed}) from '
-          + ', '.join(f'{m} {n}' for m, n in totals.items()))
+    print(f'round {ROUND}: {len(sample)} flagged claims drawn ({per_model} per model at most, seed {seed}) from '
+          + ', '.join(f'{m} {n}' for m, n in totals.items())
+          + (f'; the {len(skip)} steps earlier rounds drew are left out' if skip else ''))
     print(f'fill the verdict column of {CSV.relative_to(HERE)} (slip / checker / unsure), then --score')
     return 0
 
@@ -154,8 +193,9 @@ READER_COLUMNS = [('code', 13), ('problem', 30), ('claim', 38), ("checker's left
                   ('note', 40)]
 
 
-def reader_copy(path: Path = READER) -> int:
+def reader_copy(path: Path | None = None) -> int:
     """The workbook a reader fills in (the docstring's THE READER'S COPY), from sample.jsonl, in its order."""
+    path = path or READER
     from openpyxl import Workbook
     from openpyxl.styles import Alignment, Font
     from openpyxl.utils import get_column_letter
@@ -195,9 +235,9 @@ def reader_copy(path: Path = READER) -> int:
     return 0
 
 
-def merge(src: Path, csv_path: Path = CSV) -> int:
+def merge(src: Path, csv_path: Path | None = None) -> int:
     """The returned workbook's or CSV's verdicts and notes into sample.csv, by code."""
-    src = Path(src)
+    src, csv_path = Path(src), csv_path or CSV
     if src.suffix.lower() == '.xlsx':
         from openpyxl import load_workbook
         wb = load_workbook(src, read_only=True, data_only=True)
@@ -253,7 +293,22 @@ def wilson(k: int, n: int) -> tuple[float, float]:
     return c - h, c + h
 
 
-def score_verdicts(csv_path: Path = CSV, out: Path | None = None, read_by: str = 'an author') -> int:
+def earlier_rounds() -> str:
+    """For a later round's report: each earlier round's precision, computed from its own verdicts."""
+    parts = []
+    for k in range(1, ROUND):
+        p = round_dir(k) / 'sample.csv'
+        c = collections.Counter(r['verdict'].strip().lower() for r in csv.DictReader(open(p, encoding='utf-8-sig')))
+        d = c['slip'] + c['checker']
+        name = 'FLAG_REVIEW.md' if k == 1 else f'FLAG_REVIEW_{k}.md'
+        parts.append(f"round {k}: {c['slip']} of {d} decided, {c['slip'] / d:.3f} ({name})" if d else
+                     f'round {k}: no verdicts yet')
+    return ('Earlier rounds read other steps of the same traces, round 1 with the rule before the D-156 fix: '
+            + '; '.join(parts) + ". The fixed rule's pilot figures are in SCORER_VALIDATION.md.")
+
+
+def score_verdicts(csv_path: Path | None = None, out: Path | None = None, read_by: str = 'an author') -> int:
+    csv_path = csv_path or CSV
     rows = list(csv.DictReader(open(csv_path, encoding='utf-8-sig', newline='')))
     bad = [r['code'] for r in rows if r['verdict'].strip() and r['verdict'].strip().lower() not in VERDICTS]
     if bad:
@@ -268,7 +323,8 @@ def score_verdicts(csv_path: Path = CSV, out: Path | None = None, read_by: str =
         if v == 'checker' and r['note'].strip():
             notes[' '.join(r['note'].strip().lower().split()[:2])] += 1
     total = collections.Counter()
-    L = [f'# The digit rule\'s flags on this roster, read by {read_by} (D-150)', '',
+    L = [f'# The digit rule\'s flags on this roster, read by {read_by} (D-150)' if ROUND == 1 else
+         f'# The digit rule\'s flags on this roster after the D-156 fix, round {ROUND}, read by {read_by}', '',
          'Generated by `flag_sample.py --score`; the sample and the verdicts are defined in its docstring. Counts '
          'only: the claims stay local under `scores/flag_review/`.', '',
          '| model | flags drawn | read | slip | checker | unsure | precision among decided | 95% Wilson |',
@@ -288,11 +344,11 @@ def score_verdicts(csv_path: Path = CSV, out: Path | None = None, read_by: str =
     ci_all = f'{lo:.3f} to {hi:.3f}' if decided else ''
     L += [f"| all | {sum(drawn.values())} | {sum(total.values())} | {total['slip']} | {total['checker']} | {total['unsure']} | "
           f"{prec_all} | {ci_all} |", '',
-          'The pilot measured 0.750 on the 300 labelled traces (SCORER_VALIDATION.md); a roster figure below it '
-          'means Q3\'s digit-rule columns must carry this one instead.']
+          ('The pilot measured 0.750 on the 300 labelled traces (SCORER_VALIDATION.md); a roster figure below it '
+           'means Q3\'s digit-rule columns must carry this one instead.' if ROUND == 1 else earlier_rounds())]
     if notes:
         L += ['', 'Checker verdicts by the note\'s first words: ' + ', '.join(f'{k} {n}' for k, n in notes.most_common()) + '.']
-    (out or HERE / 'FLAG_REVIEW.md').write_text('\n'.join(L) + '\n', encoding='utf-8', newline='\n')
+    (out or REPORT).write_text('\n'.join(L) + '\n', encoding='utf-8', newline='\n')
     print('\n'.join(L))
     return 0
 
@@ -305,10 +361,12 @@ def main() -> int:
     ap.add_argument('--score', action='store_true')
     ap.add_argument('--read-by', default='an author', help='who read the flags, for the title of FLAG_REVIEW.md')
     ap.add_argument('--per-model', type=int, default=20)
-    ap.add_argument('--seed', type=int, default=0)
+    ap.add_argument('--seed', type=int, help='the draw\'s seed; the round number less one by default')
+    ap.add_argument('--round', type=int, default=1, help='1 before the D-156 fix; 2 or more after it')
     a = ap.parse_args()
+    set_round(a.round)
     if a.draw:
-        return draw(a.per_model, a.seed)
+        return draw(a.per_model, a.round - 1 if a.seed is None else a.seed)
     if a.reader_copy:
         return reader_copy()
     if a.merge:

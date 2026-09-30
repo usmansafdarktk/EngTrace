@@ -5643,11 +5643,84 @@ slips and 109 checker misreadings, none unsure, with a note on every checker ver
 present, with none incomplete. The digit rule's caption still carries the pilot's 0.750, which D-154
 replaces.
 
+## D-156 — The digit rule's parser fixed from the expert's notes, adopted with a documented exception, the store re-scored
+
+**Date:** 2026-09-30 · **Status:** DECIDED (the owner: fix, and adopt with the exception) · DONE (re-score, E5's rows, the analysis, round 2 drawn) · **Evidence:** `evaluators/arith.py` (its docstring and self-test); `digit_fix.py` (`DIGIT_FIX.md`); `validate_scorer.py` (`SCORER_VALIDATION.md`); `gold_validation.py` (`GOLD_VALIDATION.md`); `router.py --validate` and `--dry-run`; `judge.py --validate` and `--score`; `score.py --status`; `analyze.py` (`results/RESULTS.md`); `flag_sample.py --round 2`
+
+The owner chose the fix (D-154).
+
+- **The fix.** It is confined to `arith.py`; its rules are in the docstring, under READING THE FULL RUN'S
+  FLAGS. 27 new self-test cases pin them: the forms the notes name, and three slips the expert confirmed,
+  which must stay flagged. Three rules were changed or dropped on evidence:
+  - The unit factor 1e4 (ha and m²) passed a real slip, 4.036e-5 m³/mol "=" 0.4036 cm³/mol, and was left
+    out.
+  - Scientific notation was at first grouped for any mantissa. That flagged 15 gold claims in one
+    template: `(92 - 20)/92 * 10^6` is a conversion to ppm. It is now grouped only for a decimal mantissa.
+  - A unit tail holding a function (`2 sqrt(m k)`) is no longer a unit. This bug was older; the parser
+    only reached it once it read `\(…\)` lines.
+- **Before against after** (`DIGIT_FIX.md`: `arith.py` at `3a7f247` against the fix).
+  - **Gold.** Claims read went from 6,917 to 7,137; claims flagged stayed at 0.
+  - **The pilot**, against the experts' step labels:
+    - All traces: tp/fp/fn went from 99/21/289 to 122/22/266; precision from 0.825 to 0.847; recall
+      from 0.255 to 0.314.
+    - Correct-answer traces: from 57/19/121 to 76/19/102; precision from 0.750 to 0.800; recall from
+      0.320 to 0.427; F1 from 0.449 to 0.557.
+    - 32 steps change. 27 move toward the experts' label: 23 flags added to steps they call incorrect
+      and 4 removed from steps they call correct. 5 move away.
+  - **The 220 read in round 1**, the set the fix was built from. Of the 109 checker verdicts, 97 steps
+    are no longer flagged, 11 are still flagged by the same claim, and 1 is flagged by a real false
+    equation on another line. Of the 111 slips, 109 are still flagged by the same claim and 2 by another;
+    none is lost.
+  - **The full run**, 12 models and 26,668 answered traces. Claims read went from 92,148 to 102,682,
+    claims flagged from 5,029 to 4,384, and traces with a flag from 2,634 to 2,375. A flag disappears
+    from 946 steps and appears on 520.
+- **The exception.** D-137's rule allows no pilot step to move away from the experts, and five do. All
+  five are DeepSeek-R1 steps on lines the old parser could not read: some sit inside `\(…\)` delimiters,
+  and scientific notation was judged at its mantissa's precision. Each is a real wrong digit at the
+  precision the trace displays, and the experts' step labels, which judge a step's engineering, accept
+  it. For example, √(1.49486×10⁻⁹) is written 3.867×10⁻⁵ for 3.8663×10⁻⁵, and 3.252354/417 is written
+  0.00779939 for 0.00779941. The owner adopted the fix with these five as a documented exception
+  (`digit_fix.EXCEPTIONS`); any other step that moves away fails the audit again.
+- **Left as they are.** Eleven misreadings in the design set remain, because a rule for them would pass
+  real slips or change the rule's definition:
+  - three running computations written as one chain;
+  - three units the model did not state (m→mm, J→mJ, ksi→psi);
+  - one each of: ≈ used as a comparison, V as an unknown volume, a carried rounding, "22.5%" of a
+    quantity, and the hectare.
+- **The published figures stand.**
+  - `validate_scorer.py` reproduces the pilot's digit-rule figures with `arith.py` at `3a7f247` and
+    prints the fixed rule's figures beside them.
+  - `router.py --validate` replays the pilot with the pre-fix flags, so its prompts are rebuilt as sent,
+    and it reproduces.
+  - `judge.py --validate` is unaffected, and gold is clean.
+- **The re-score.**
+  - The main store was re-scored with `score --variant main --replace` at `bc7dfa4`; the old store is
+    kept in `scores/_replaced/`. The three repeat stores were re-scored the same way, at `ac134b9`, whose
+    only change is the analysis caption.
+  - `judge --score` rebuilt E5's rows from the stored replies. No call was made, the reply store is
+    unchanged at 8,090 lines and $36.3016, and no call is without a reply.
+  - The analysis at `ac134b9` changes only the digit rule's figures: its flag rates and intervals, claims
+    per trace, first-flag positions, the 1% rule's rates and the attribution column. No answer score, E3
+    figure or E5 figure moves, since neither the answer check nor E3 imports `arith.py`.
+  - The digit-rule caption now carries the fixed rule's pilot figures and the roster's round-1 reading,
+    labelled as an addition.
+- **The router, re-priced** on the new flags: 24,506 calls and 172,025 steps under review, $98.41 to
+  $103.53 at Xiaomi's prices on the pilot's output basis. D-152's ratio would make it about $129 to $136.
+- **Round 2.** The fix was built from round 1's notes, so round 1 cannot measure the fixed rule.
+  - `flag_sample --round 2` drew 206 claims from the fixed rule's flags, with seed 1. That is 20 per
+    model, except DeepSeek V4.1 Flash: it has only 6 flagged claims outside round 1's steps.
+  - No step is shared with round 1.
+  - The workbook and its instructions are in `scores/flag_review/round2/`. `FLAG_READER_INSTRUCTIONS.md`
+    no longer states a count.
+
+**Open.** Round 2's reading, and the router's run, which the owner set for after the flag reading.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
-| D-154 | Fix the digit rule's parser the D-137 way, then read a fresh sample; or keep the rule and report its measured 0.505 (per model 0.10 to 1.00) in Q3 | Q3 in the paper; the router's run |
+| D-156 | Round 2 of the flag reading: the 206 claims in `scores/flag_review/round2/` (workbook and instructions), then `flag_sample --round 2 --merge <file>` and `--score --read-by "<who>"`, giving the fixed rule's precision on this roster | Q3 in the paper; the router's run |
+| D-154 | ~~Fix the digit rule's parser the D-137 way, then read a fresh sample; or keep the rule and report its measured 0.505 (per model 0.10 to 1.00) in Q3~~ **Decided 2026-09-30: fixed, and adopted with a documented exception (D-156); round 2 drawn** | — |
 | D-150 | ~~The author's reading of the 220 sampled digit-rule flags (`scores/flag_review/sample.csv`), then `flag_sample --score` and a checker fix if one is needed~~ **Read 2026-09-30 by a domain expert, in the D-153 workbook: precision 0.505 against the pilot's 0.750 (D-154, `FLAG_REVIEW.md`)** | — |
 | D-147 | The inclusive last-digit boundary is adopted; the owner may reverse it (one commit). Whether the paper reports the half-unit or whole-trace reading as anything more than a sensitivity would need an expert spot-check of the format-only partials | the paper's tables |
 | D-146 | The paper reports the cliff per model with its interval and, if it states a count, the Welch count with the planned one beside it (as RESULTS.md now does) | the paper's section 5 |
@@ -5658,7 +5731,7 @@ replaces.
 | D-141 | ~~Run: the three decoding repeats of `gemma-4-26b-a4b`, about $0.28~~ **Done 2026-09-30 over four models, by the owner's decision (D-151): $1.863 in the rows; `RESULTS.md` prints the table** | — |
 | D-138 | The stricter match rule removes 252 credits, 129 of them on symbolic answers the check cannot verify either way: keep it (as decided) or reverse it | the paper's tables |
 | D-142 | ~~Run: E5 over the eleven models, 8,032 calls, about $26.56 at Xiaomi's prices ($18.59 to $49.71), about 7 hours (`EVALUATION_GUIDE.md`, step 3)~~ **Done 2026-09-30 (D-155): every call answered, $36.30 in the rows; `RESULTS.md` carries the E5 columns** | — |
-| D-142 | Run: the step router over the eleven models, 24,506 calls, about $98 to $103 at Xiaomi's prices ($72 to $195), about 33 hours at 8 workers (`EVALUATION_GUIDE.md`, step 4). **The owner, 2026-09-30: after the author's flag reading; the estimate rests on the pilot's output lengths (D-152)** | Q3's router columns |
+| D-142 | Run: the step router over the eleven models, 24,506 calls, about $98 to $103 at Xiaomi's prices ($72 to $195), about 33 hours at 8 workers (`EVALUATION_GUIDE.md`, step 4). **The owner, 2026-09-30: after the author's flag reading; the estimate rests on the pilot's output lengths (D-152). Re-priced on the fixed flags: $98.41 to $103.53 at Xiaomi's prices, about $129 to $136 at E5's ratio (D-156)** | Q3's router columns |
 | D-108 | ~~Whether the review app shows questions and solutions as plain text, as the models read them, and whether the 65 templates judged through its Markdown rendering get a plain-text look; fixing `signal_operations`'s origin marker~~ **Closed by the owner 2026-09-28 (D-114): the certification is closed and no template changes** | — |
 | D-107 | ~~Fix the five templates round 2 objected to~~ **Fixed 2026-09-26 (D-108) and re-certified in round 3 (D-109): all five approved by all three** | — |
 | D-106 | ~~Whether the screen re-judges the changed templates (a few cents, targeted; not run before round 2); the plasma row's per-row tag~~ **Closed by the owner 2026-09-28 (D-114): no re-judge** | — |

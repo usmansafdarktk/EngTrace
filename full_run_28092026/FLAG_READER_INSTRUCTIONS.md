@@ -1,7 +1,7 @@
-# Checking an arithmetic checker: 220 flagged calculations
+# Checking an arithmetic checker: flagged calculations
 
-Thank you for helping. The workbook `flag_review_reader.xlsx` has 220 rows. Each row is one calculation
-taken from an AI model's written solution to an engineering problem. An automatic checker decided that
+Thank you for helping. The workbook `flag_review_reader.xlsx` has one row per calculation. Each row is
+one calculation taken from an AI model's written solution to an engineering problem. An automatic checker decided that
 the result the model wrote is **wrong at the precision it shows**. We need a person to say whether the
 checker is right.
 
