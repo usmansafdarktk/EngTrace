@@ -218,16 +218,18 @@ python -m full_run_28092026.analyze                     # writes results/RESULTS
 **Back up the replies after each paid stage.** The judge's replies in `scores/_judge/` are the
 paid-for result. First a local archive with its checksum:
 
-```powershell
-$d = "$env:USERPROFILE\EngTrace_private_backup"; $z = "$d\full_run_scores_$(Get-Date -Format yyyy-MM-dd).zip"
-Compress-Archive -Path full_run_28092026\scores\* -DestinationPath $z -Force
-(Get-FileHash $z -Algorithm SHA256).Hash | Out-File -Encoding ascii "$z.sha256"
+```bash
+python -m full_run_28092026.backup_archive scores     # ~/EngTrace_private_backup/full_run_scores_<date>.zip, its .sha256, every member checked
 ```
+
+Run it after the stage ends: a store still being written is reported as differing. `Compress-Archive`
+refuses a file another process holds open, which is why the script uses Python's zipfile (D-151).
 
 Then a private Kaggle dataset, in manual mode (auto mode blocks the upload), staged in a short path,
 never `--public`:
 
 ```powershell
+$d = "$env:USERPROFILE\EngTrace_private_backup"; $z = "$d\full_run_scores_$(Get-Date -Format yyyy-MM-dd).zip"
 $s = "$d\kaggle_scores"; New-Item -ItemType Directory -Force $s | Out-Null; Copy-Item "$z*" $s
 [IO.File]::WriteAllText("$s\dataset-metadata.json",
   '{"title": "engtrace-full-run-scores", "id": "<your-kaggle-user>/engtrace-full-run-scores", "licenses": [{"name": "other"}]}')
@@ -235,7 +237,9 @@ cd $s; kaggle datasets create -p .     # later versions: kaggle datasets version
 ```
 
 Download it back and compare every file's hash, as `INFERENCE_GUIDE.md` step 6 does for the traces.
-The repeat traces under `traces/repeat*/` go into a new traces archive the same way.
+The repeat traces under `traces/repeat*/` go into a new traces archive the same way:
+`backup_archive traces/repeat1 traces/repeat2 traces/repeat3 --name full_run_traces_repeats` (made and
+checked 2026-09-30; its Kaggle copy waits for manual mode).
 
 **Record each paid run in DECISIONS.md** the way D-123 to D-131 record inference: the date and
 commit, the dry-run estimate it was approved on, calls made, billed in the rows and by the account

@@ -5503,6 +5503,10 @@ $7.96 and GLM-5.3 $6.94 a repeat). The other seven models have no decoding figur
   repeat scores on the 300 items, the main run's on the same items, the SD and range over the three
   repeats, and the share of items with the same verdict in all three: SDs of 0.003 to 0.016, ranges of
   0.005 to 0.032, and 0.850 to 0.937 of items with the same verdict every time.
+- **The backup.** The twelve repeat trace files are archived locally, `full_run_traces_repeats_2026-09-30.zip`
+  with its checksum, every member checked against its source by `backup_archive.py`. PowerShell's
+  `Compress-Archive` had refused one of them as held open by another process, which Python's zipfile does
+  not. The private Kaggle copy waits for the owner, because the upload needs manual mode.
 
 ## D-152 — E5's first night: calls that never return, the harness fix, and the cost basis
 
