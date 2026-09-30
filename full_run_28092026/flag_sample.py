@@ -33,9 +33,11 @@ correct rounding at the precision it displays. Verdicts:
 Say why in `note` for every `checker` verdict: the note is what the fix is built from.
 
 THE READER'S COPY (--reader-copy). scores/flag_review/flag_review_reader.xlsx, for a reader outside the
-code: an instructions sheet, then the claims in the sample's (shuffled) order with the step's full text
-and the units the checker read added, the model's name left out so it cannot bias the reading, numbers
-kept as text exactly as the checker saw them, and a slip / checker / unsure list in the verdict column.
+code: one sheet of the claims in the sample's (shuffled) order with the step's full text and the units
+the checker read added, the model's name left out so it cannot bias the reading, numbers kept as text
+exactly as the checker saw them, and a slip / checker / unsure list in the verdict column. The
+instructions are FLAG_READER_INSTRUCTIONS.md (committed: it holds no trace text), copied beside the
+workbook as flag_review_instructions.md, so the two files to send sit together.
 `--merge` takes the returned workbook (or a CSV, with or without a byte-order mark) and writes its
 verdicts and notes into sample.csv by `code`, refusing a code or verdict it does not know. Like the
 experts' labels, the filled files stay local and are never committed.
@@ -73,6 +75,8 @@ OUT = score.SCORES / 'flag_review'
 SAMPLE = OUT / 'sample.jsonl'
 CSV = OUT / 'sample.csv'
 READER = OUT / 'flag_review_reader.xlsx'
+INSTRUCTIONS = HERE / 'FLAG_READER_INSTRUCTIONS.md'          # committed: what the reader is told
+READER_NOTES = OUT / 'flag_review_instructions.md'           # the copy sent beside the workbook
 VERDICTS = ('slip', 'checker', 'unsure')
 FIELDS = ['code', 'model', 'template_id', 'item_id', 'step', 'claim', 'left_value', 'right_value',
           'displayed_ulp', 'verdict', 'note']
@@ -145,35 +149,6 @@ def draw(per_model: int, seed: int) -> int:
     return 0
 
 
-READER_INSTRUCTIONS = [
-    'Checking an arithmetic checker',
-    '',
-    "Each row of the Claims sheet is one calculation from an AI model's solution to an engineering problem. An "
-    'automatic checker decided that the result the model wrote is wrong at the precision it shows. We need a person '
-    'to say whether the checker is right.',
-    '',
-    'For each row:',
-    '1. Recompute the left side of "claim" from the numbers shown (a calculator is fine). "checker\'s left value" is '
-    'what the checker got, so this also shows whether it read the expression correctly.',
-    '2. Compare it with the number on the right side of "claim", at the precision in "displayed precision" (0.001 '
-    'means the value is shown to three decimals).',
-    '3. Choose a verdict from the list in the "verdict" column:',
-    "     slip: the model's arithmetic is wrong at the digit it shows.",
-    '     checker: the arithmetic is right and the checker misread it, for example a unit it did not recognise, a '
-    'value carried over rounded from an earlier step, a sentence split in the wrong place, or a number taken from '
-    'the wrong side.',
-    '     unsure: you cannot tell.',
-    '4. For every "checker" verdict, say briefly why in "note". The notes are what the checker will be fixed from.',
-    '',
-    '"step" holds the full step the claim came from, as the model wrote it. Its maths is LaTeX: \\frac{a}{b} is a/b, '
-    '\\sqrt{x} is the square root of x, \\times is a multiplication, \\approx is "about". "units" gives the units '
-    'the checker read on each side, where it found any.',
-    '',
-    'Please leave the other columns as they are and send the workbook back as it is (.xlsx).',
-    '',
-    'Confidential: the material comes from an unreleased test set. Please keep the file to yourself and delete your '
-    'copy when you are done.',
-]
 READER_COLUMNS = [('code', 13), ('problem', 30), ('claim', 38), ("checker's left value", 16), ('right value', 14),
                   ('displayed precision', 11), ('units (left | right)', 14), ('step', 90), ('verdict', 11),
                   ('note', 40)]
@@ -185,16 +160,12 @@ def reader_copy(path: Path = READER) -> int:
     from openpyxl.styles import Alignment, Font
     from openpyxl.utils import get_column_letter
     from openpyxl.worksheet.datavalidation import DataValidation
+    import shutil
     claims = [json.loads(l) for l in SAMPLE.read_text(encoding='utf-8').splitlines()]
     top = Alignment(wrap_text=True, vertical='top')
     wb = Workbook()
-    ins = wb.active
-    ins.title = 'Instructions'
-    ins.column_dimensions['A'].width = 120
-    for i, line in enumerate(READER_INSTRUCTIONS, 1):
-        ins.cell(row=i, column=1, value=line).alignment = top
-    ins['A1'].font = Font(bold=True, size=13)
-    ws = wb.create_sheet('Claims')
+    ws = wb.active
+    ws.title = 'Claims'
     for j, (name, width) in enumerate(READER_COLUMNS, 1):
         cell = ws.cell(row=1, column=j, value=name)
         cell.font, cell.alignment = Font(bold=True), top
@@ -218,7 +189,9 @@ def reader_copy(path: Path = READER) -> int:
     ws.auto_filter.ref = f'A1:{get_column_letter(len(READER_COLUMNS))}{last}'
     path.parent.mkdir(parents=True, exist_ok=True)
     wb.save(path)
+    shutil.copyfile(INSTRUCTIONS, path.parent / READER_NOTES.name)
     print(f'{len(claims)} claims written to {path}; it holds trace text: send it privately, never commit it')
+    print(f'the instructions to send with it: {path.parent / READER_NOTES.name} (a copy of {INSTRUCTIONS.name})')
     return 0
 
 
@@ -229,7 +202,8 @@ def merge(src: Path, csv_path: Path = CSV) -> int:
         from openpyxl import load_workbook
         wb = load_workbook(src, read_only=True, data_only=True)
         try:
-            rows = list(wb['Claims'].iter_rows(values_only=True))
+            ws = wb['Claims'] if 'Claims' in wb.sheetnames else wb.worksheets[0]
+            rows = list(ws.iter_rows(values_only=True))
         finally:
             wb.close()                                     # read-only mode holds the file open until closed
         head = [str(h or '').strip().lower() for h in rows[0]]

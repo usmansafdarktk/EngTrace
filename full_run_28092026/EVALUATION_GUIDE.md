@@ -183,16 +183,17 @@ precision it displays. Fill `verdict` with one of:
   `note`, since the note is what a fix is built from;
 - `unsure`.
 
-**A reader outside the code (D-153)** gets a workbook instead of the CSV. It has an instructions sheet,
-each claim with its step's full text and the units the checker read, a verdict list, and no model names,
-so they cannot bias the reading. It holds trace text: send it privately, never commit it or the filled
-copy. Use one reader for all 220, not one per branch. The result is a precision per model, and the
+**A reader outside the code (D-153)** gets a workbook instead of the CSV: each claim with its step's full
+text and the units the checker read, a verdict list, and no model names, so they cannot bias the reading.
+It goes with the instructions in `FLAG_READER_INSTRUCTIONS.md`, which `--reader-copy` copies beside it
+as `flag_review_instructions.md`. The workbook holds trace text: send it privately, and never commit it
+or the filled copy. Use one reader for all 220, not one per branch. The result is a precision per model, and the
 models' flags sit unevenly across branches (13 of DeepSeek's 20 are industrial), so a reader per branch
 would tie a model's figure to one reader. No branch expertise is needed: each row is arithmetic and
 rounding.
 
 ```bash
-python -m full_run_28092026.flag_sample --reader-copy                  # scores/flag_review/flag_review_reader.xlsx
+python -m full_run_28092026.flag_sample --reader-copy                  # flag_review_reader.xlsx and flag_review_instructions.md in scores/flag_review/
 python -m full_run_28092026.flag_sample --merge <the returned .xlsx>   # its verdicts into sample.csv, by code
 ```
 

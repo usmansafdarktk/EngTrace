@@ -5561,9 +5561,11 @@ The owner may give D-150's reading to someone other than an author. So that it r
   and rounding at the displayed precision.
 - **A workbook for a reader outside the code.** `sample.csv` has no step text, which a reader needs to
   judge a rounding chain, a unit or a wrongly split clause, and it names the model on every row, which can
-  bias the reading. `--reader-copy` writes `scores/flag_review/flag_review_reader.xlsx`: an instructions
-  sheet, then the claims in the sample's shuffled order, with the step's full text, the units the checker
-  read, a slip / checker / unsure list, numbers kept as text, and no model column. `--merge` writes the
+  bias the reading. `--reader-copy` writes `scores/flag_review/flag_review_reader.xlsx`: the claims in the
+  sample's shuffled order, with the step's full text, the units the checker read, a slip / checker / unsure
+  list, numbers kept as text, and no model column. The instructions are a separate file, committed because
+  it holds no trace text, so the record shows what the reader was told: `FLAG_READER_INSTRUCTIONS.md`,
+  copied beside the workbook as `flag_review_instructions.md`. `--merge` writes the
   returned verdicts and notes into `sample.csv` by `code`. It refuses a code or a verdict it does not know
   and reports rows missing, verdicts changed and `checker` verdicts without a note.
 - **The encoding.** `--score` and `--merge` read a CSV with or without a byte-order mark, which Excel adds
