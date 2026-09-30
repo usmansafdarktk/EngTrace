@@ -58,7 +58,8 @@ names); it is deterministic, the raw text stays in `attempts.jsonl`, and the ser
 ```bash
 python -m full_run_28092026.paraphrase --dry-run     # free: selection, writer's endpoint, $0.18 if all pass first time, $0.54 at most
 python -m full_run_28092026.paraphrase --yes --limit 50   # BILLS: a pilot of the prompt, 10 unresolved items of each branch; read --status before going on
-python -m full_run_28092026.paraphrase --yes         # BILLS: writes and checks; resumable; retries each call through the upstream throttle
+python -m full_run_28092026.paraphrase --yes --until-done --workers 16   # BILLS: writes and checks in passes until every item is resolved; resumable
+python -m full_run_28092026.paraphrase --yes         # BILLS: one pass only; an item a service failure deferred waits for the next
 python -m full_run_28092026.paraphrase --status      # items attempted, passing, billed
 ```
 
@@ -68,11 +69,14 @@ original's and the paraphrase's SHA-256, the attempt that passed, the hash of th
 and each check's result; no text; **committed**), and `PARAPHRASE.md` (counts; **committed**). `--check` re-runs every check over the
 stored attempts and rewrites the manifest and pool, free.
 
-Expected: most of the 450 pass at the first attempt. Read `PARAPHRASE.md`: the number passing, the
-failed attempts by check, the similarity range. If more than a few items have no paraphrase after three
-attempts, look at which check they fail (`attempts.jsonl` holds each attempt's check results) before
-spending on more attempts; a template whose questions the writer cannot rephrase within the rules is
-worth a sentence in the paper, not a fourth attempt.
+Expected (D-157, measured on 30 September): about half of the attempts pass, about 85% of the items keep a
+paraphrase, chemical items nearly all and industrial ones least; the rest are items the writer turns
+into words ("at most", "equals", "meters", an acronym spelt out) or copies nearly verbatim. Read
+`PARAPHRASE.md`: the number passing per branch, the failed attempts by check, the templates that lost
+all their items, the similarity range. If a check fails far more than that, look at which tokens go
+missing (`attempts.jsonl` holds each attempt's check results and raw text) before spending on more
+attempts; a template whose questions the writer cannot rephrase within the rules is worth a sentence
+in the paper, not a fourth attempt.
 
 Commit `paraphrase/manifest.jsonl` and `PARAPHRASE.md`. Record the run in DECISIONS: items written,
 passing, billed.

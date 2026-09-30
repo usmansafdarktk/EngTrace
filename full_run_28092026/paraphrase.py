@@ -3,7 +3,8 @@ subsamples.PARAPHRASE, written by a model from a family on neither the roster no
 and checked by script before an expert sees it (D-141).
 
     python -m full_run_28092026.paraphrase --dry-run    # FREE: the selection, the writer's endpoint, the estimate
-    python -m full_run_28092026.paraphrase --yes        # BILLS: writes the paraphrases; resumable
+    python -m full_run_28092026.paraphrase --yes        # BILLS: one pass over the unresolved items; resumable
+    python -m full_run_28092026.paraphrase --yes --until-done --workers 16   # BILLS: passes until every item is resolved
     python -m full_run_28092026.paraphrase --yes --limit 50   # BILLS: a pilot of the prompt, 10 unresolved items of each branch
     python -m full_run_28092026.paraphrase --check      # FREE: re-checks every attempt, rewrites the manifest
     python -m full_run_28092026.paraphrase --status     # FREE
@@ -96,7 +97,7 @@ MANIFEST = OUT / 'manifest.jsonl'
 WRITER = {'model': 'mistralai/mistral-large-2512', 'temperature': 0.7, 'max_tokens': 2048,
           'provider': {'sort': 'price', 'allow_fallbacks': True}}
 ATTEMPTS = 3
-RETRY_SLEEPS = (3, 5, 10, 15, 20, 30, 45, 60)   # pauses between the tries of one call; a refused call bills nothing
+RETRY_SLEEPS = (3, 5, 8, 10, 12, 15, 15, 15, 20, 20, 25, 30, 30)   # pauses between the tries of one call; a refused call bills nothing
 COPY = 0.75
 LENGTH = (0.7, 1.5)
 PROMPT = """Rewrite the engineering problem below in different words.
@@ -207,6 +208,14 @@ def selection() -> list[dict]:
     return [by_id[i] for i in subsamples.paraphrase_ids()]
 
 
+def resolved(it: dict, rows: list[dict]) -> tuple[bool, int]:
+    """For one item's stored rows: (a passing attempt exists under the current checks, real attempts made).
+    Judged afresh through restore() and check(), not from the flags stored at write time, so a change to
+    the checks (D-157) reaches the to-do list and --status as it reaches --check."""
+    real = [r for r in rows if 'text' in r and 'check' in r]
+    return any(check(it['question'], restore(it['question'], r['text']))['passed'] for r in real), len(real)
+
+
 def attempts_so_far() -> dict[str, list[dict]]:
     out = collections.defaultdict(list)
     if ATTEMPTS_FILE.exists():
@@ -270,25 +279,25 @@ def item_until_pass(cli, it: dict, prior: list[dict]) -> list[dict]:
     return rows
 
 
-def run(workers: int, limit: int = 0) -> int:
-    from openai import OpenAI
-    cfg = run_config()
-    key = os.getenv(cfg['route']['key_env'])
-    if not key:
-        raise SystemExit(f"{cfg['route']['key_env']} is not set in .env")
-    cli = OpenAI(api_key=key, base_url=cfg['route']['base_url'], timeout=300.0, max_retries=0)
-    OUT.mkdir(exist_ok=True)
+def write_pass(cli, workers: int, limit: int) -> tuple[int, int, float]:
+    """One pass over the unresolved items: (items to write, real attempts made, billed). An item a service
+    failure defers stays unresolved for the next pass."""
     prior = attempts_so_far()
-    todo = [it for it in selection() if not any(r.get('check', {}).get('passed') for r in prior[it['item_id']])
-            and len([r for r in prior[it['item_id']] if 'check' in r]) < ATTEMPTS]
-    if limit:                                # a pilot of the prompt: the first items of each branch in turn,
+    todo = []
+    for it in selection():
+        done, n = resolved(it, prior[it['item_id']])
+        if not done and n < ATTEMPTS:
+            todo.append(it)
+    if limit and todo:                       # a pilot of the prompt: the first items of each branch in turn,
         by_branch = collections.defaultdict(list)   # so every branch's notation is tried
         for it in todo:
             by_branch[it['branch']].append(it)
         queues = [by_branch[b] for b in sorted(by_branch)]
         todo = [q[k] for k in range(max(len(q) for q in queues)) for q in queues if k < len(q)][:limit]
-    print(f'{len(todo)} items to write')
-    billed, done = 0.0, 0
+    print(f'{time.strftime("%H:%M:%SZ", time.gmtime())} {len(todo)} items to write', flush=True)
+    if not todo:
+        return 0, 0, 0.0
+    billed, done, real = 0.0, 0, 0
     with open(ATTEMPTS_FILE, 'a', encoding='utf-8', newline='\n') as fh, cf.ThreadPoolExecutor(workers) as pool:
         futs = [pool.submit(item_until_pass, cli, it, [r for r in prior[it['item_id']] if 'check' in r])
                 for it in todo]
@@ -297,10 +306,32 @@ def run(workers: int, limit: int = 0) -> int:
                 fh.write(json.dumps(row, ensure_ascii=False) + '\n')
                 fh.flush()
                 billed += row.get('billed_usd') or 0.0
+                real += 'check' in row
             done += 1
             if done % 25 == 0 or done == len(todo):
-                print(f'  {done}/{len(todo)} items, billed ${billed:.3f}')
-    print(f'billed this invocation: ${billed:.3f}')
+                print(f'  {done}/{len(todo)} items, billed ${billed:.3f}', flush=True)
+    print(f'pass done: {real} attempts made, billed ${billed:.3f}', flush=True)
+    return len(todo), real, billed
+
+
+def run(workers: int, limit: int = 0, until_done: bool = False) -> int:
+    from openai import OpenAI
+    cfg = run_config()
+    key = os.getenv(cfg['route']['key_env'])
+    if not key:
+        raise SystemExit(f"{cfg['route']['key_env']} is not set in .env")
+    cli = OpenAI(api_key=key, base_url=cfg['route']['base_url'], timeout=300.0, max_retries=0)
+    OUT.mkdir(exist_ok=True)
+    total = 0.0
+    while True:
+        n, real, billed = write_pass(cli, workers, limit)
+        total += billed
+        if n == 0 or limit or not until_done:
+            break
+        if real == 0:                        # the endpoint let nothing through: wait before the next pass
+            print('nothing admitted this pass; waiting five minutes', flush=True)
+            time.sleep(300)
+    print(f'billed this invocation: ${total:.3f}')
     return rebuild()
 
 
@@ -406,8 +437,12 @@ def dry_run() -> int:
 def status() -> int:
     prior = attempts_so_far()
     rows = [r for rs in prior.values() for r in rs]
-    print(f'{len(prior)} items attempted, {len(rows)} attempts, '
-          f'{sum(any(r.get("check", {}).get("passed") for r in rs) for rs in prior.values())} passing, '
+    its = {it['item_id']: it for it in selection()}
+    verdicts = [resolved(its[i], rs) for i, rs in prior.items()]
+    print(f'{len(prior)} items attempted, {len(rows)} attempts '
+          f'({sum(1 for r in rows if "check" not in r)} service failures), '
+          f'{sum(1 for done, n in verdicts if done)} passing, '
+          f'{sum(1 for done, n in verdicts if not done and n >= ATTEMPTS)} exhausted, '
           f'billed ${sum(r.get("billed_usd") or 0.0 for r in rows):.3f}')
     return 0
 
@@ -472,6 +507,8 @@ def main() -> int:
     ap.add_argument('--workers', type=int, default=8, help='parallel items; the upstream throttle is per call, so more workers give more throughput')
     ap.add_argument('--yes', action='store_true', help='required for the writing run, which bills')
     ap.add_argument('--limit', type=int, default=0, help='write at most this many unresolved items (a pilot of the prompt)')
+    ap.add_argument('--until-done', action='store_true',
+                    help='pass again over the items a service failure deferred, until every item is resolved')
     a = ap.parse_args()
     if a.selftest:
         return selftest()
@@ -484,7 +521,7 @@ def main() -> int:
     if not a.yes:
         raise SystemExit('writing the paraphrases bills: re-run with --yes once the spend is approved '
                          '(see --dry-run for the estimate)')
-    return run(a.workers, a.limit)
+    return run(a.workers, a.limit, a.until_done)
 
 
 if __name__ == '__main__':
