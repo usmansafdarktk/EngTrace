@@ -853,12 +853,14 @@ def render(res) -> str:
           'reaches by chance, per model, on the readable wrong answers. '
           "The digit rule's flag counts a trace when any step is flagged. Against the experts' step labels on the "
           "pilot's fully solved traces it has precision 0.817 and recall 0.427 (0.750 and 0.320 before D-156; "
-          "0.800 and 0.427 between D-156 and D-159; SCORER_VALIDATION.md). *Added 2026-09-30 (D-154 to D-159), after "
-          'the first results were read:* on this roster a domain expert found 111 of 220 sampled flags real before '
-          'the first fix, 0.505 (FLAG_REVIEW.md), and 155 of 206 real after it, 0.752 (FLAG_REVIEW_2.md). The second '
-          "fix, built from those notes, took the flag off 42 of their 51 misread steps and left it on 154 of the 155 "
-          "slips' steps (DIGIT_FIX_2.md); its precision on this roster waits for a third reading. So its rate is "
-          "not a count of slips; and it "
+          "0.800 and 0.427 between D-156 and D-159, unchanged by D-160; SCORER_VALIDATION.md). *Added 2026-09-30 "
+          '(D-154 to D-160), after the first results were read:* on this roster a domain expert found 111 of 220 '
+          'sampled flags real before the first fix, 0.505 (FLAG_REVIEW.md), and 155 of 206 real after it, 0.752 '
+          "(FLAG_REVIEW_2.md). The second fix, built from those notes, took the flag off 42 of their 51 misread "
+          "steps and left it on 154 of the 155 slips' steps (DIGIT_FIX_2.md). Two review agents then checked both "
+          'fixes; the corrections they led to, with LaTeX control spaces now read, took the flag off 82 full-run '
+          "steps and put it on 370, and kept every slip's step the second fix had kept (D-160, DIGIT_FIX_3.md). "
+          "Its precision on this roster waits for a third reading. So its rate is not a count of slips; and it "
           "reads a different amount of arithmetic in each model's traces (claims checked per answered trace, "
           'shown), so a low rate can mean little was read.', '',
           '**Milestones on the wrong-answer traces.** An unusable trace reaches only what it wrote before it '
