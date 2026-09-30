@@ -5830,6 +5830,104 @@ its prompts.
   measures the second fix; by the owner's rule, no round 4 follows.
 
 **Open.** Round 3's reading, and then the router, which needs the owner's approval of the estimate above.
+*Superseded 2026-09-30: round 3 was redrawn after D-160, before anyone read it.*
+
+## D-160 — Two review agents checked both digit-rule fixes: their corrections adopted, the LaTeX control space read, round 3 redrawn
+
+**Date:** 2026-09-30 · **Status:** DECIDED (the owner: two independent agents check the fixes before round 3, which stays the last; of the two older gaps they found, the control space is closed and `≈`-only lines are left) · DONE (the review, the fix, the re-score, E5's rows, the analysis, round 3 redrawn) · **Evidence:** `digit_fix.py --review-sample` and `--fix 3` (`DIGIT_FIX_3.md`); `evaluators/arith.py` (THE REVIEW, self-test); `validate_scorer.py`; `gold_validation.py`; `score.py`; `judge.py --score`; `analyze.py`; `flag_sample.py --round 3`
+
+- **The review.** `digit_fix --review-sample` drew 80 full-run steps whose flag the two fixes changed
+  between `3a7f247` and `e783962`: 40 of the 924 that lost a flag and 40 of the 339 that gained one,
+  round-robin across ten models (seed 7). None is on a step an expert round drew, and none is from the
+  set-aside model. Two agents, each on its own and read-only, checked both fixes' code against the
+  docstring's rules, hunted regressions with probe lines, ran the self-test and gold, and judged the 80
+  steps. Their verdicts are local, beside the sample. No API was called.
+  - They agreed on 77 of the 80. Of the removed flags, A called 37 correct and 3 hid slips; B called 39
+    correct and 1 hid a slip. Of the added flags, both called 37 real slips; A called 3 new misreadings,
+    B called 2 new misreadings and 1 unsure.
+  - The three they split on turn on older rules, not on the fixes: the shown-rounding allowance given to
+    an exact datum (RV-3a6f2917), a right side `√N` judged at N's precision (RV-6caff853), and a carried
+    rounding of an integer (RV-1f8325a8).
+- **What they found in the fixes.** B reported nine regressions and two older misreadings the first fix
+  exposed. A reported sixteen regressions and five older gaps. Each input was reproduced on the rule as
+  it stood before anything changed. The corrections, each with a plant in the self-test, are in the
+  docstring under THE REVIEW:
+  - `a/Nπ` read both ways. D-159's a/(Nπ) had turned `4/3 π r³` into 4/(3π) r³.
+  - The unit a right side implies, read as written (`kN T`, `m s⁻²`, `\mu m`) and to its power (`mm²`,
+    `h⁻¹`).
+  - The continuation rules:
+    - A markdown closer, a rule or a blank line is not an operator. The first fix had hidden gemma's
+      `2.6693 × 24.4694 = 65.314`, where the product is 65.3162.
+    - A sum is written a term a line only by lines without an `=`.
+    - `+(` continues a sum only when it opens a clause. 124 claims had been lost, among them glm-5.3's
+      three Lorentz-force products, each off by ×1000.
+  - The `...` of a series; an operand cut short, which is widened upward only; an exponent not taken
+    for a mantissa.
+  - Whole-number ranges only as a clause's last segment.
+  - LaTeX letters (`\psi`, `\Pi`, `\ell`, `\hbar`, accents) as variables; T alone as a variable and a
+    tesla only inside a unit; `°R`; ångströms.
+- **Three rules narrowed on evidence while being built:**
+  - Dropping T from the unit letters, as B proposed, hid muse's `47(0.09873) − 22(0.01994) = 4.20063 T m
+    s⁻¹` (4.20163). So only T alone is a variable.
+  - Reading a range only as a chain's last segment, for A's `Δ = 3.25 − 3.26 = 0.01`, flagged again a
+    round-1 claim the expert called the checker's (`2π/18.67 = 0.336–0.337 m ≈ 0.34 m`). Decimal ranges
+    stay as D-156 read them, and A's form is left.
+  - The thousands fix below, alone, hid `2385.76 × 70 = 166,\!003.2 \ \text{cm}^3·\text{s}`, where the
+    product is 167,003.2. The old rule flagged it only through a misreading, and without the control
+    space the corrected right side is unread. The control-space fix restores it.
+- **Found by listing the flags the review pointed to.** A claim between two written units is a slip only
+  if no conversion makes it hold, so every such flag was listed:
+  - correct conversions with no factor: poise and Pa·s, inches and millimetres;
+  - one thousands spelling, `8,\!753,\!000`, which split its numbers into claims such as `000 = 776`. It
+    raised the flag on 64 full-run steps, mostly Qwen3-235B's, none of which any round had drawn.
+
+  Both are read now, and `\ll` and `\gg` are read as comparisons.
+- **The two older gaps: the owner's choice.** Both agents measured two gaps older than either fix as far
+  larger than the regressions:
+  - **A LaTeX control space before a unit** (`\ \text{m}`) left its segment unread. Reading it as a space
+    flags 358 more steps. The samples read 18 of 19 (mine), 23 of 25 (B) and 12 of 14 (A) as real wrong
+    digits, and it changes nothing on gold, the pilot or either round. Closed.
+  - **A line whose only relation is `≈`** is never read. Reading it flags 488 more steps, 16 of 20 real
+    in my sample. It also brings misreadings of kinds no round has read (`≈ 17120` for 17,122,
+    `515 ≈ 514.9`), and it flags two pilot steps the experts call correct, both real wrong digits of
+    D-156's exception class. Left, as a recall gap.
+- **Before against after** (`DIGIT_FIX_3.md`: `e783962` against `5c83916`).
+  - **Gold.** 7,167 claims, 0 flagged, unchanged.
+  - **The pilot.** No step changes. Precision and recall are 0.872 and 0.317 over all traces, and 0.817
+    and 0.427 inside correct-answer traces.
+  - **The agents' 80 steps.** The two steps both called misreadings lose the flag, and the 37 real slips
+    keep it. RV-3a6f2917's `√52,407.228 ≈ 229.0` (228.93) is now flagged.
+  - **Round 1.** All 111 slips' steps stay flagged. 8 misreadings stay flagged, and 1 step is flagged on
+    another line.
+  - **Round 2.** 154 of its 155 slips stay flagged, as after D-159, and 9 misreadings stay flagged.
+  - **The full run.** Claims read went from 103,834 to 119,573, claims flagged from 4,141 to 4,383, and
+    traces with a flag from 2,226 to 2,470. A flag leaves 82 steps and reaches 370. The control space
+    accounts for most of the gain: gpt-5.4-mini gains 123 steps, claude-sonnet-5 92 and gpt-oss-20b 81.
+    The thousands spelling accounts for most of the loss: Qwen3-235B loses 66.
+- **Left as they are:**
+  - a threshold followed by its own derivation, and the zero guard (`2 mm = 0 m`);
+  - a decimal subtraction written like a range, and a running computation over a count;
+  - the shown rounding given to exact data. Both agents called RV-15fc9f0c a hidden slip: 244/125.7 is
+    1.94113, written 1.9403…, where 125.7 = 3 × 41.9 is exact;
+  - a right side `√N` at N's precision, `e^{…}`, and a temperature's offset;
+  - a power of ten between two written units that the generic factors pass;
+  - lines whose only relation is `≈`.
+- **The re-score.**
+  - The main store was re-scored with `--replace` at `eea846e`, and the three repeat stores at
+    `937c842`. Only `flag_sample.py`'s report title changed between the two commits. `judge --score`
+    rebuilt E5's rows at `937c842` with no call, and every call sent has its reply. The old stores are
+    kept in `scores/_replaced/`.
+  - The analysis at `937c842` moves only the provenance and Q3's digit-rule fields; no answer score, E3
+    figure or E5 figure moves.
+  - The paraphrase store, scored by its own stream under D-159's rule, is not re-scored here: Q5 reads no
+    digit field, and `score --variant paraphrase --replace` redoes it free.
+- **Round 3, redrawn.** The draw made before the review (181 claims, never sent) is kept aside in
+  `scores/flag_review/_superseded/round3_before_d160/`. `flag_sample --round 3` drew 190 claims on 188
+  steps, with seed 2. That is 20 per model for nine models, plus all that DeepSeek V4.1 Flash (6) and
+  Kimi K3 (4) have left. None is on a step rounds 1 and 2 or the agents read; 496 steps were left out.
+  Round 3 measures the rule as it now stands, and by the owner's rule no round 4 follows.
+
+**Open.** Round 3's reading; then the router, which needs the owner's approval of its re-priced estimate.
 
 ## D-157 — The paraphrases written: four prompts, a throttled writer, and the notation restored by script
 
@@ -5972,7 +6070,8 @@ returns (a later entry when they are in).
 
 | # | Decision | Needed before |
 |---|---|---|
-| D-159 | Round 3 of the flag reading: the 181 claims in `scores/flag_review/round3/`, then `flag_sample --round 3 --merge <file>` and `--score --read-by "<who>"`, giving the second fix's precision on this roster; no round 4 | Q3 in the paper; the router's run |
+| D-160 | Round 3 of the flag reading: the 190 claims in `scores/flag_review/round3/` (workbook and instructions), then `flag_sample --round 3 --merge <file>` and `--score --read-by "<who>"`, giving the corrected rule's precision on this roster; no round 4 | Q3 in the paper; the router's run |
+| D-159 | ~~Round 3 of the flag reading: the 181 claims in `scores/flag_review/round3/`~~ **Redrawn 2026-09-30, unread, after two review agents' corrections (D-160)** | — |
 | D-158 | ~~A second fix of the digit rule's parser from round 2's notes, measured by a round 3 (no round 4), or 0.752 reported as measured~~ **Decided 2026-09-30: the second fix, adopted with no pilot step moving away (D-159); round 3 drawn** | — |
 | D-156 | ~~Round 2 of the flag reading: the 206 claims in `scores/flag_review/round2/` (workbook and instructions), then `flag_sample --round 2 --merge <file>` and `--score --read-by "<who>"`, giving the fixed rule's precision on this roster~~ **Read 2026-09-30 by the same domain expert: precision 0.752 (D-158, `FLAG_REVIEW_2.md`)** | — |
 | D-154 | ~~Fix the digit rule's parser the D-137 way, then read a fresh sample; or keep the rule and report its measured 0.505 (per model 0.10 to 1.00) in Q3~~ **Decided 2026-09-30: fixed, and adopted with a documented exception (D-156); round 2 drawn** | — |

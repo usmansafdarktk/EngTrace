@@ -207,9 +207,12 @@ python -m full_run_28092026.flag_sample --score --read-by "an author"  # writes 
 
 **Rounds 1 and 2 are done, and so are the two fixes they forced (D-154, D-156, D-158, D-159).** The same
 domain expert read both. In round 1, 109 of the 220 flags were the checker's; the first fix removed 97.
-Round 2 measured that fixed rule at 0.752, and the second fix removed 42 of its 51 misreadings. Round 3 is
-drawn: 181 claims, none on a step an earlier round read. It measures the second fix, and by the owner's
-rule no round 4 follows. Every command takes `--round 3`:
+Round 2 measured that fixed rule at 0.752, and the second fix removed 42 of its 51 misreadings. Before
+round 3 went out, two review agents checked both fixes, each on its own. What they found wrong is
+corrected, and LaTeX control spaces are now read (D-160, `DIGIT_FIX_3.md`). Round 3 is drawn from that
+rule: 190 claims, none on a step an earlier round or the agents read, with the reader's workbook and
+instructions beside them in `scores/flag_review/round3/`. It measures the rule as it now stands, and by
+the owner's rule no round 4 follows. Every command takes `--round 3`:
 
 ```bash
 python -m full_run_28092026.flag_sample --round 3 --merge <the returned .xlsx>          # scores/flag_review/round3/
@@ -305,7 +308,8 @@ the paper will quote from these stages must be printed by `analyze.py` or `--sta
 - [x] Three repeat variants scored; `TRACE_REVIEW_repeat*.md` say "as main" yes. *(2026-09-30, four models, D-151)*
 - [x] `FLAG_REVIEW.md` committed, and any checker fix it forced done the D-137 way. *(2026-09-30, D-154, D-156)*
 - [x] Round 2 read, `FLAG_REVIEW_2.md` committed: the fixed rule's precision on this roster. *(0.752, D-158; the second fix followed, D-159)*
-- [ ] Round 3 read, `FLAG_REVIEW_3.md` committed: the second fix's precision on this roster; no round 4.
+- [x] Both fixes checked by two independent review agents before round 3; their corrections adopted, the control space read. *(D-160, `DIGIT_FIX_3.md`)*
+- [ ] Round 3 read, `FLAG_REVIEW_3.md` committed: the corrected rule's precision on this roster; no round 4.
 - [ ] `results/RESULTS.md` regenerated with no "incomplete" in its header, committed and pushed.
 - [ ] A DECISIONS entry per paid run, and the Open decisions table updated.
 - [ ] `scores/` archived locally and on Kaggle, hashes checked.
