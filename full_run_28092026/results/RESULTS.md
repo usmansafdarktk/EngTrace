@@ -116,7 +116,7 @@ Answer score on the 58 Easy templates minus the 34 Advanced, templates resampled
 
 ## Q3. What the process scores add beyond the answer
 
-Wrong-answer traces score 0 (incorrect or unusable); fully solved ones score 1; a partial answer is in neither. E3 coverage leaves out the 70 items with no milestones (all 15 of 3 templates and some items of 12 more); 52 templates have an item with at most one milestone (46 with exactly one), where coverage is close to an answer check. E3 is the deterministic part of E5, which adds the judge's verdict on the milestones E3 does not find. The floor is the same trace scored against a sibling item's milestones (D-149): what coverage a trace reaches by chance, per model, on the readable wrong answers. The digit rule's flag counts a trace when any step is flagged. Against the experts' step labels on the pilot's fully solved traces it has precision 0.817 and recall 0.427 (0.750 and 0.320 before D-156; 0.800 and 0.427 between D-156 and D-159; SCORER_VALIDATION.md). *Added 2026-09-30 (D-154 to D-159), after the first results were read:* on this roster a domain expert found 111 of 220 sampled flags real before the first fix, 0.505 (FLAG_REVIEW.md), and 155 of 206 real after it, 0.752 (FLAG_REVIEW_2.md). The second fix, built from those notes, took the flag off 42 of their 51 misread steps and left it on 154 of the 155 slips' steps (DIGIT_FIX_2.md); its precision on this roster waits for a third reading. So its rate is not a count of slips; and it reads a different amount of arithmetic in each model's traces (claims checked per answered trace, shown), so a low rate can mean little was read.
+Wrong-answer traces score 0 (incorrect or unusable); fully solved ones score 1; a partial answer is in neither. E3 coverage leaves out the 70 items with no milestones (all 15 of 3 templates and some items of 12 more); 52 templates have an item with at most one milestone (46 with exactly one), where coverage is close to an answer check. E3 is the deterministic part of E5, which adds the judge's verdict on the milestones E3 does not find. The floor is the same trace scored against a sibling item's milestones (D-149): what coverage a trace reaches by chance, per model, on the readable wrong answers. The digit rule's flag counts a trace when any step is flagged. Against the experts' step labels on the pilot's fully solved traces it has precision 0.817 and recall 0.427 (0.750 and 0.320 before D-156; 0.800 and 0.427 between D-156 and D-159, unchanged by D-160; SCORER_VALIDATION.md). *Added 2026-09-30 (D-154 to D-160), after the first results were read:* on this roster a domain expert found 111 of 220 sampled flags real before the first fix, 0.505 (FLAG_REVIEW.md), and 155 of 206 real after it, 0.752 (FLAG_REVIEW_2.md). The second fix, built from those notes, took the flag off 42 of their 51 misread steps and left it on 154 of the 155 slips' steps (DIGIT_FIX_2.md). Two review agents then checked both fixes; the corrections they led to, with LaTeX control spaces now read, took the flag off 82 full-run steps and put it on 370, and kept every slip's step the second fix had kept (D-160, DIGIT_FIX_3.md). Its precision on this roster waits for a third reading. So its rate is not a count of slips; and it reads a different amount of arithmetic in each model's traces (claims checked per answered trace, shown), so a low rate can mean little was read.
 
 **Milestones on the wrong-answer traces.** An unusable trace reaches only what it wrote before it stopped, and an empty one nothing, so coverage is also shown on the readable wrong answers alone.
 
@@ -154,17 +154,17 @@ Wrong-answer traces score 0 (incorrect or unusable); fully solved ones score 1; 
 
 | model | wrong answers, answered | flag rate | 95% CI | fully solved traces | flag rate | 95% CI | at 1% | claims checked per trace | traces with a claim | first flag: traces, median position |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| `gpt-oss-20b` | 354 | 0.203 | 0.142 to 0.269 | 1778 | 0.125 | 0.095 to 0.159 | 0.015 | 3.08 | 0.656 | 223, 0.667 |
-| `gemma-4-26b-a4b` | 298 | 0.423 | 0.310 to 0.534 | 1877 | 0.126 | 0.093 to 0.163 | 0.017 | 4.30 | 0.686 | 237, 0.571 |
-| `deepseek-v4.1-flash` | 40 | 0.025 | 0.000 to 0.071 | 2167 | 0.003 | 0.001 to 0.006 | 0.005 | 2.10 | 0.546 | 7, 0.714 |
-| `qwen3-235b-a22b-2507` | 229 | 0.459 | 0.332 to 0.584 | 1906 | 0.222 | 0.176 to 0.269 | 0.068 | 9.49 | 0.889 | 423, 0.588 |
-| `glm-5.3-flash` | 31 | 0.097 | 0.000 to 0.258 | 2159 | 0.018 | 0.012 to 0.025 | 0.013 | 4.46 | 0.794 | 39, 0.750 |
-| `glm-5.3` | 18 | 0.056 | 0.000 to 0.111 | 2109 | 0.015 | 0.010 to 0.021 | 0.016 | 5.08 | 0.864 | 32, 0.784 |
-| `muse-glimmer-30b` | 52 | 0.038 | 0.000 to 0.079 | 2150 | 0.057 | 0.043 to 0.072 | 0.021 | 3.18 | 0.685 | 122, 0.500 |
-| `kimi-k3` | 63 | 0.000 | 0.000 to 0.000 | 2156 | 0.005 | 0.002 to 0.008 | 0.004 | 1.94 | 0.509 | 11, 0.571 |
-| `gpt-5.4-mini` | 336 | 0.196 | 0.104 to 0.301 | 1853 | 0.107 | 0.077 to 0.140 | 0.013 | 2.70 | 0.625 | 198, 0.613 |
-| `gemini-3.1-flash-lite` | 299 | 0.301 | 0.177 to 0.430 | 1910 | 0.068 | 0.045 to 0.094 | 0.014 | 3.80 | 0.752 | 130, 0.500 |
-| `claude-sonnet-5` | 65 | 0.200 | 0.050 to 0.390 | 2157 | 0.110 | 0.084 to 0.139 | 0.016 | 4.48 | 0.804 | 238, 0.667 |
+| `gpt-oss-20b` | 354 | 0.234 | 0.171 to 0.300 | 1778 | 0.147 | 0.116 to 0.181 | 0.021 | 3.74 | 0.782 | 262, 0.667 |
+| `gemma-4-26b-a4b` | 298 | 0.426 | 0.314 to 0.538 | 1877 | 0.128 | 0.095 to 0.165 | 0.015 | 4.39 | 0.689 | 240, 0.571 |
+| `deepseek-v4.1-flash` | 40 | 0.025 | 0.000 to 0.071 | 2167 | 0.006 | 0.002 to 0.009 | 0.006 | 3.27 | 0.804 | 12, 0.643 |
+| `qwen3-235b-a22b-2507` | 229 | 0.441 | 0.317 to 0.564 | 1906 | 0.226 | 0.179 to 0.273 | 0.054 | 9.83 | 0.906 | 430, 0.600 |
+| `glm-5.3-flash` | 31 | 0.097 | 0.000 to 0.258 | 2159 | 0.019 | 0.012 to 0.027 | 0.015 | 4.75 | 0.851 | 41, 0.750 |
+| `glm-5.3` | 18 | 0.056 | 0.000 to 0.111 | 2109 | 0.018 | 0.011 to 0.024 | 0.017 | 5.72 | 0.915 | 37, 0.727 |
+| `muse-glimmer-30b` | 52 | 0.038 | 0.000 to 0.079 | 2150 | 0.056 | 0.042 to 0.071 | 0.020 | 3.26 | 0.706 | 121, 0.500 |
+| `kimi-k3` | 63 | 0.000 | 0.000 to 0.000 | 2156 | 0.006 | 0.003 to 0.011 | 0.004 | 2.80 | 0.722 | 14, 0.563 |
+| `gpt-5.4-mini` | 336 | 0.262 | 0.170 to 0.361 | 1853 | 0.142 | 0.110 to 0.179 | 0.012 | 3.79 | 0.797 | 264, 0.600 |
+| `gemini-3.1-flash-lite` | 299 | 0.301 | 0.177 to 0.430 | 1910 | 0.069 | 0.046 to 0.095 | 0.014 | 3.86 | 0.757 | 131, 0.500 |
+| `claude-sonnet-5` | 65 | 0.231 | 0.073 to 0.416 | 2157 | 0.140 | 0.108 to 0.173 | 0.015 | 5.30 | 0.857 | 301, 0.667 |
 
 **Wrong-answer rate against the item's milestone count** (D-149): how failure grows with the depth of the gold derivation.
 
@@ -186,17 +186,17 @@ Wrong-answer traces score 0 (incorrect or unusable); fully solved ones score 1; 
 
 | model | answered wrong-answer traces | digit rule | E5 MISSING | router judge |
 |---|---:|---:|---:|---:|
-| `gpt-oss-20b` | 354 | 0.203 | 0.746 |  |
-| `gemma-4-26b-a4b` | 298 | 0.423 | 0.594 |  |
+| `gpt-oss-20b` | 354 | 0.234 | 0.746 |  |
+| `gemma-4-26b-a4b` | 298 | 0.426 | 0.594 |  |
 | `deepseek-v4.1-flash` | 40 | 0.025 | 0.300 |  |
-| `qwen3-235b-a22b-2507` | 229 | 0.459 | 0.533 |  |
+| `qwen3-235b-a22b-2507` | 229 | 0.441 | 0.533 |  |
 | `glm-5.3-flash` | 31 | 0.097 | 0.258 |  |
 | `glm-5.3` | 18 | 0.056 | 0.056 |  |
 | `muse-glimmer-30b` | 52 | 0.038 | 0.442 |  |
 | `kimi-k3` | 63 | 0.000 | 0.238 |  |
-| `gpt-5.4-mini` | 336 | 0.196 | 0.735 |  |
+| `gpt-5.4-mini` | 336 | 0.262 | 0.735 |  |
 | `gemini-3.1-flash-lite` | 299 | 0.301 | 0.666 |  |
-| `claude-sonnet-5` | 65 | 0.200 | 0.185 |  |
+| `claude-sonnet-5` | 65 | 0.231 | 0.185 |  |
 
 ## Q4. Consistency within a template
 
@@ -405,4 +405,4 @@ The pool over-represents the rare labels by design (D-116), so these rates are p
 
 ## Provenance
 
-`analyze.py` at commit `3847fb5`; the score store `main` scored at commit `c221a9a` on 2026-09-30T15:47:20+00:00; stages: e5 at `c221a9a`. The evaluator hashes and the per-model trace hashes are in `results.json`.
+`analyze.py` at commit `937c842`; the score store `main` scored at commit `eea846e` on 2026-09-30T19:08:35+00:00; stages: e5 at `937c842`. The evaluator hashes and the per-model trace hashes are in `results.json`.
