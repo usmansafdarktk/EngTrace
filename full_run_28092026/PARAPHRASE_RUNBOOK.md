@@ -11,7 +11,7 @@ test, since the templates have been public since January (NEXT_CYCLE_REVIEW sect
 
 Three steps, in this order; 2 and 3 run in parallel once 1 is done:
 
-1. **Write and check the paraphrases** (Mistral Large 3, $0.15 to $0.45, minutes).
+1. **Write and check the paraphrases** (Mistral Large 3, $0.18 to $0.54; minutes when Mistral's endpoint is open, an hour or more when it throttles).
 2. **The experts' check**: kits out, verdicts back (free; the long pole).
 3. **Inference on the paraphrases** (about $49) and scoring; then the analysis.
 
@@ -52,8 +52,8 @@ labels in order, word similarity at most 0.75 (a near-copy tests nothing), lengt
 original, no preamble. Three attempts per item; an item with no passing attempt leaves both arms.
 
 ```bash
-python -m full_run_28092026.paraphrase --dry-run     # free: selection, writer's endpoint, $0.15 if all pass first time, $0.45 at most
-python -m full_run_28092026.paraphrase --yes         # BILLS: writes and checks; resumable
+python -m full_run_28092026.paraphrase --dry-run     # free: selection, writer's endpoint, $0.18 if all pass first time, $0.54 at most
+python -m full_run_28092026.paraphrase --yes         # BILLS: writes and checks; resumable; retries each call through the upstream throttle
 python -m full_run_28092026.paraphrase --status      # items attempted, passing, billed
 ```
 
@@ -208,7 +208,16 @@ and the same cumulative cap.
 ## 6. If something goes wrong
 
 - **`paraphrase --yes` reports service failures.** They are not counted as attempts; re-run the same
-  command and only those items are asked again.
+  command and only those items are asked again. "Rate-limited upstream" is Mistral throttling
+  OpenRouter's shared capacity, not the worker count: on 30 September most calls were refused at eight
+  workers and at two alike, and the throughput scaled with the workers. A refused call bills nothing, so
+  the writer retries each call up to nine times with a jittered backoff (`RETRY_SLEEPS`) before writing
+  a service failure; if a run still defers many items, re-run it or wait for the throttle to ease.
+- **Most attempts fail the tokens or numbers check.** Look at `tokens_missing` and `numbers_changed` in
+  `attempts.jsonl` before anything else. On 30 September every such failure was the writer reformatting
+  notation (LaTeX, `$` delimiters, Unicode superscripts and minus signs, `·` for `*`); the prompt's rules
+  2 and 3 now forbid it. The checks are not to be loosened for this: the two arms must differ in wording
+  only.
 - **An item has no paraphrase after three attempts.** It leaves both arms; `PARAPHRASE.md` says how
   many and which check failed. Do not edit a paraphrase by hand: the manifest's hash would no longer
   match and the run would refuse it.

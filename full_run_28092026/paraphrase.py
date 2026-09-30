@@ -18,8 +18,11 @@ the parts in the same order, adds and removes nothing, does not hint at the meth
 returns only the problem. Its rules 2 and 3 spell out "as written" character for character and forbid
 reformatting (LaTeX, Markdown, Unicode superscripts and minus signs, added $ delimiters): the first run
 (2026-09-30, prompt 6091f248) lost 49 of 62 attempts to exactly that, the writer prettifying notation
-the checks then rightly rejected. The writer's endpoint is rate-limited upstream, so the default is two
-workers; eight produced 71 service failures in 134 rows.
+the checks then rightly rejected. Mistral throttles OpenRouter's shared capacity upstream ("temporarily
+rate-limited"): on 30 September most calls were refused at eight workers and at two alike, and the
+throughput scaled with the workers, so the throttle is per call, not a cap we saturate. A refused call
+bills nothing; `write_one` therefore retries each call through RETRY_SLEEPS before recording a service
+failure, and eight workers stay the default.
 
 THE CHECKS. An attempt passes only if all hold; otherwise the writer is asked again, up to three
 attempts per item. An item with no passing attempt has no paraphrase and leaves both arms of Q5.
@@ -47,6 +50,7 @@ import difflib
 import hashlib
 import json
 import os
+import random
 import re
 import sys
 import time
@@ -74,6 +78,7 @@ MANIFEST = OUT / 'manifest.jsonl'
 WRITER = {'model': 'mistralai/mistral-large-2512', 'temperature': 0.7, 'max_tokens': 2048,
           'provider': {'sort': 'price', 'allow_fallbacks': True}}
 ATTEMPTS = 3
+RETRY_SLEEPS = (3, 5, 10, 15, 20, 30, 45, 60)   # pauses between the tries of one call; a refused call bills nothing
 COPY = 0.75
 LENGTH = (0.7, 1.5)
 PROMPT = """Rewrite the engineering problem below in different words.
@@ -168,8 +173,12 @@ def attempts_so_far() -> dict[str, list[dict]]:
 
 
 def write_one(cli, question: str) -> dict:
+    """One call to the writer. Mistral throttles OpenRouter's shared capacity upstream and a refused call
+    bills nothing, so a failed call is tried again after each pause in RETRY_SLEEPS, with jitter; only
+    when they are spent is it written down as a service failure. `tries` and `seconds` record the wait."""
     t0 = time.time()
-    for attempt in range(4):
+    last = ''
+    for tries, pause in enumerate(RETRY_SLEEPS + (None,), start=1):
         try:
             r = cli.chat.completions.create(
                 model=WRITER['model'], messages=[{'role': 'user', 'content': PROMPT.format(question=question)}],
@@ -181,11 +190,13 @@ def write_one(cli, question: str) -> dict:
                     'finish_reason': r.choices[0].finish_reason, 'prompt_tokens': getattr(u, 'prompt_tokens', None),
                     'completion_tokens': getattr(u, 'completion_tokens', None),
                     'billed_usd': (getattr(u, 'model_extra', None) or {}).get('cost'),
-                    'seconds': round(time.time() - t0, 2)}
+                    'tries': tries, 'seconds': round(time.time() - t0, 2)}
         except Exception as exc:                                   # noqa: BLE001
             last = f'{type(exc).__name__}: {exc}'[:300]
-            time.sleep(5 * 2 ** attempt)
-    return {'text': '', 'error': last, 'billed_usd': 0.0}
+            if pause is None:
+                break
+            time.sleep(pause + random.uniform(0, pause / 2))
+    return {'text': '', 'error': last, 'tries': tries, 'billed_usd': 0.0}
 
 
 def item_until_pass(cli, it: dict, prior: list[dict]) -> list[dict]:
@@ -374,7 +385,7 @@ def main() -> int:
     ap.add_argument('--check', action='store_true')
     ap.add_argument('--status', action='store_true')
     ap.add_argument('--selftest', action='store_true')
-    ap.add_argument('--workers', type=int, default=2, help='the writer is rate-limited upstream; 8 mostly fail')
+    ap.add_argument('--workers', type=int, default=8, help='parallel items; the upstream throttle is per call, so more workers give more throughput')
     ap.add_argument('--yes', action='store_true', help='required for the writing run, which bills')
     a = ap.parse_args()
     if a.selftest:
