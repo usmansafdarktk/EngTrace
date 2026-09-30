@@ -154,7 +154,9 @@ Branch and domain scores; scores by answer type; token use against score; the er
 from E4, E5 and the router; per-label accuracy on classification templates, noting that the pool
 over-represents rare branches by design (D-116). A decoding-variance repeat: one cheap model, 300 items
 (2 per template) three times at the main-run settings, reporting the spread of the score across repeats
-(on the pricing document's basis about $1.40 for gemma-4-26b-a4b-it; needs approval).
+(on the pricing document's basis about $1.40 for gemma-4-26b-a4b-it; needs approval). *Added 2026-09-30
+(D-151), by the owner before the repeats ran:* four cheap models rather than one, `gemma-4-26b-a4b`,
+`gpt-oss-20b`, `qwen3-235b-a22b-2507` and `gemini-3.1-flash-lite`, $2.02 by the dry runs.
 
 ## Not tested, and why
 

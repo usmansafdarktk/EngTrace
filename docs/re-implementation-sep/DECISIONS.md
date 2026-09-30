@@ -5476,6 +5476,72 @@ reading them:
 
 Nothing paid has run. The costs stand as D-142 and D-143 give them.
 
+## D-151 — The decoding repeats over four cheap models, not one, and their run
+
+**Date:** 2026-09-30 · **Status:** DECIDED (the owner, before the runs) · DONE (the runs) · **Evidence:** `run_traces.py --variant repeatN --model … --dry-run` and `--status`; `trace_review.py --variant repeatN` (`TRACE_REVIEW_repeat1.md` to `_repeat3.md`); `score.py --variant repeatN`; `analyze.py` (`results/RESULTS.md`, Decoding repeats)
+
+The plan asks for one cheap model (ANALYSIS_PLAN, "Also reported, not tested"). One model's spread says
+nothing about another's, so the owner extended the repeats to the four cheapest models of the roster by
+the variant dry runs: `gemma-4-26b-a4b`, `gpt-oss-20b`, `qwen3-235b-a22b-2507` and
+`gemini-3.1-flash-lite`, from three developers. The dry runs priced a repeat at $0.674 for the four,
+$2.02 for three, against $0.28 for Gemma alone and $97.53 for all eleven (Kimi K3 $13.05, Claude Sonnet 5
+$7.96 and GLM-5.3 $6.94 a repeat). The other seven models have no decoding figure, and the paper says so.
+`analyze.py` needed no change: it prints a row for every model with repeat rows.
+
+- **The runs.** 2026-09-29, 22:13 to 23:46 UTC, at `047c79f`: one process per model, `repeat1` to
+  `repeat3` in turn, 15 workers, the main run's settings. Every variant has all 300 items for every model.
+  gpt-oss-20b left 5, 7 and 6 empty; the others none. The rows record $0.625, $0.615 and $0.623, $1.863
+  in all. The OpenRouter key's usage rose $1.471 from a read at 22:11:51 UTC, before the launch, to one at
+  22:23:59, by when Gemini and Gemma had finished and the other two had not. From 22:24 the repeats
+  shared the account with E5 (D-152), so from there on the rows carry the per-stage figure.
+- **The review.** Every variant: the pilot's prompt, one request set and one served model per key, the
+  same served model as the main run for all four ("as main" yes), no row outside the frozen items, none
+  malformed. The first run of the review counted a repeat against the whole pool, 1,950 "missing" per
+  model; `variant_manifest` now expects a repeat's 300 items (`fb0ea02`). The main run's review
+  regenerates unchanged.
+- **The scores.** Scored at `1c16b6b`, the store's CONFIG clean. `RESULTS.md` prints, per model, the three
+  repeat scores on the 300 items, the main run's on the same items, the SD and range over the three
+  repeats, and the share of items with the same verdict in all three: SDs of 0.003 to 0.016, ranges of
+  0.005 to 0.032, and 0.850 to 0.937 of items with the same verdict every time.
+
+## D-152 — E5's first night: calls that never return, the harness fix, and the cost basis
+
+**Date:** 2026-09-30 · **Status:** DECIDED (the fix) · OPEN (E5 running) · **Evidence:** `judge_calls.py --selftest`; `judge.py --status`; `judge.py --dry-run`; `router.py --status`; `scores/e5.log` (local)
+
+The owner approved E5 over the eleven models on the dry run's $26.56 at Xiaomi's prices ($18.59 to
+$49.71 across the six endpoints), with a $55 cumulative cap. It was launched 2026-09-29 at 22:24 UTC at
+`efa8fe9`, 16 workers, through `keepawake_run.ps1` started from WMI, so it holds a keep-awake request and
+outlives the session that launched it. The laptop was on mains power.
+
+- **Calls that never return.** Nine calls of the first run had no reply at the 960 s deadline and never
+  returned. Each kept its thread, so the fixed pool of 16 lost a worker each time, and within half an hour
+  the run was returning calls at less than half its first rate. The client's 300 s timeout
+  is between bytes, not over the call, and OpenRouter keeps a waiting connection open, so it never fires
+  (D-148 assumed it bounds a fetch). A restart at 22:58 UTC freed the workers; the nine prompts were asked
+  again and answered normally. Four more calls stuck in the next 350, about one in a hundred.
+- **The fix** (`1c16b6b`). A call past the deadline gives back its worker: the pool holds the `workers`
+  live calls plus room for `STUCK_THREADS` (256) abandoned ones, and a new call starts whenever a live one
+  returns or passes the deadline. Its reply is still stored if it arrives. What is sent and how a reply is
+  read do not change, and `judge --validate` and `router --validate` reproduce the pilot as before.
+  `judge_calls.py --selftest` runs `run()` offline with simulated hangs, eight checks. Run against the old
+  code, it fails the two hang checks, because three calls hanging on three workers stop the run until they
+  return: the self-test took 62 s there against 4.5 s on the fix. E5 was restarted on the fix at 23:47 UTC. A restart drops the calls in
+  flight, at most 16, and they are asked again; anything they billed shows in the account, not in the rows.
+- **The cost basis.** The dry runs take MiMo's output per call from the pilot's replies, and
+  `judge --status` and `router --status` now print the per-reply figures beside that basis. E5's first 508
+  replies average 4,209 completion tokens (median 3,122.5) against the pilot's 3,024 (2,469), 1.39 times;
+  the median call takes 70.8 s against 52.6. The mean billed per reply is $0.00501. Over 8,032 calls that
+  is about $40, against the $26.56 estimate and inside the cap. The first replies ran longer than these, and
+  the calls are taken one model at a time in turn, each model's in the order of its score store, so the
+  figure moves as the run reaches other templates.
+- **The router, by the same basis.** Its dry run's $98.41 and $103.32 at Xiaomi's prices assume the pilot's
+  output: 3,702 completion tokens per call for the first, 562 per step under review for the second. At E5's
+  ratio of 1.39 on output they become about $129 and $136. That is an extrapolation, not a measurement:
+  only the router's own replies will say how long they run.
+
+**Open.** E5's finish, `without_reply`, the billed total by the rows and by the account, and the providers,
+recorded when the run ends.
+
 ## Open decisions
 
 | # | Decision | Needed before |
@@ -5483,14 +5549,14 @@ Nothing paid has run. The costs stand as D-142 and D-143 give them.
 | D-150 | The author's reading of the 220 sampled digit-rule flags (`scores/flag_review/sample.csv`), then `flag_sample --score` and a checker fix if one is needed | Q3 in the paper |
 | D-147 | The inclusive last-digit boundary is adopted; the owner may reverse it (one commit). Whether the paper reports the half-unit or whole-trace reading as anything more than a sensitivity would need an expert spot-check of the format-only partials | the paper's tables |
 | D-146 | The paper reports the cliff per model with its interval and, if it states a count, the Welch count with the planned one beside it (as RESULTS.md now does) | the paper's section 5 |
-| — | The router's funding: with everything else run the round lands at about $450 on the account's basis (about $480 at E5's dearest endpoint); the router adds $72 to $195 and does not fit in $500 | the router's run |
+| — | The router's funding: with everything else run the round lands at about $450 on the account's basis (about $480 at E5's dearest endpoint); the router adds $72 to $195 and does not fit in $500. **2026-09-30 (D-151, D-152): with E5 at its projected $40 and the four-model repeats, about $465; the router's estimate rests on the pilot's output lengths, about $129 to $136 at Xiaomi's prices at E5's ratio (an extrapolation). The owner: the router waits for the author's flag reading** | the router's run |
 | — | A stratified read of the digit rule's flags on this roster (Qwen3-235B-2507 has 1,547 on 18,785 claims; 16 of deepseek's 24 sit in one template), the pilot's own rule before Q3 is reported; author time, no code | Q3 in the paper |
 | D-141 | Run: writing the 450 paraphrases with Mistral Large 3, $0.15 to $0.45 (`EVALUATION_GUIDE.md`, the paraphrase arm) | the expert check, and the paraphrase run by about 5 October |
 | D-141 | Run: the paraphrase run over the eleven models, about $49.2 on the main run's bills for the same items | the week of the main run, so the served models match |
-| D-141 | Run: the three decoding repeats of `gemma-4-26b-a4b`, about $0.28 | reporting the decoding spread |
+| D-141 | ~~Run: the three decoding repeats of `gemma-4-26b-a4b`, about $0.28~~ **Done 2026-09-30 over four models, by the owner's decision (D-151): $1.863 in the rows; `RESULTS.md` prints the table** | — |
 | D-138 | The stricter match rule removes 252 credits, 129 of them on symbolic answers the check cannot verify either way: keep it (as decided) or reverse it | the paper's tables |
-| D-142 | Run: E5 over the eleven models, 8,032 calls, about $26.56 at Xiaomi's prices ($18.59 to $49.71), about 7 hours (`EVALUATION_GUIDE.md`, step 3) | Q3's E5 columns |
-| D-142 | Run: the step router over the eleven models, 24,506 calls, about $98 to $103 at Xiaomi's prices ($72 to $195), about 33 hours at 8 workers (`EVALUATION_GUIDE.md`, step 4) | Q3's router columns |
+| D-142 | Run: E5 over the eleven models, 8,032 calls, about $26.56 at Xiaomi's prices ($18.59 to $49.71), about 7 hours (`EVALUATION_GUIDE.md`, step 3). **Approved and running since 2026-09-29 22:24 UTC under a $55 cap; about $40 projected on its first 508 replies (D-152)** | Q3's E5 columns |
+| D-142 | Run: the step router over the eleven models, 24,506 calls, about $98 to $103 at Xiaomi's prices ($72 to $195), about 33 hours at 8 workers (`EVALUATION_GUIDE.md`, step 4). **The owner, 2026-09-30: after the author's flag reading; the estimate rests on the pilot's output lengths (D-152)** | Q3's router columns |
 | D-108 | ~~Whether the review app shows questions and solutions as plain text, as the models read them, and whether the 65 templates judged through its Markdown rendering get a plain-text look; fixing `signal_operations`'s origin marker~~ **Closed by the owner 2026-09-28 (D-114): the certification is closed and no template changes** | — |
 | D-107 | ~~Fix the five templates round 2 objected to~~ **Fixed 2026-09-26 (D-108) and re-certified in round 3 (D-109): all five approved by all three** | — |
 | D-106 | ~~Whether the screen re-judges the changed templates (a few cents, targeted; not run before round 2); the plasma row's per-row tag~~ **Closed by the owner 2026-09-28 (D-114): no re-judge** | — |

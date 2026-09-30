@@ -69,6 +69,10 @@ Spent before this stream: about $354 on the rows' basis, $368 by the account (D-
 router is the one step that does not fit the ~$500 round; whether it runs is the owner's call
 (Open decisions).
 
+The estimates take MiMo's output per call from the pilot's replies. E5's first 508 replies ran 1.39 times
+as long on the mean, which puts E5 near $40 (D-152). `judge --status` and `router --status` print the
+per-reply figures beside that basis, so a stage's estimate can be checked in its first hour.
+
 MiMo is called at OpenRouter's default routing, as in the pilot, so the price depends on the
 provider that serves each call; every reply records its provider and billed cost, and `--status`
 prints the mix. The pilot's providers held 4 workers, not 16; the estimates at 16 and 8 are the
@@ -135,14 +139,17 @@ python -m full_run_28092026.router --status                      # free
 
 ## 5. The decoding repeats
 
-One cheap model, Gemma 4 26B, on the 300-item repeat subsample (the 1st and 8th item of each template,
-`subsamples.py`), three times at the main run's settings, so the paper can say what part of a score is
-sampling noise at the providers' default decoding. About $0.09 a repeat.
+**Done 2026-09-30 (D-151).** Four cheap models, by the owner's decision (the plan names one): Gemma 4
+26B, gpt-oss-20b, Qwen3-235B-2507 and Gemini 3.1 Flash-Lite, on the 300-item repeat subsample (the 1st
+and 8th item of each template, `subsamples.py`), three times at the main run's settings, so the paper can
+say what part of a score is sampling noise at the providers' default decoding. About $0.62 a repeat for
+the four; the runs billed $1.863 in the rows.
 
 ```bash
-python -m full_run_28092026.run_traces --variant repeat1 --model gemma-4-26b-a4b --dry-run
-python -m full_run_28092026.run_traces --variant repeat1 --model gemma-4-26b-a4b --workers 15 --yes
-python -m full_run_28092026.run_traces --variant repeat1 --model gemma-4-26b-a4b --status
+M="--model gemma-4-26b-a4b --model gpt-oss-20b --model qwen3-235b-a22b-2507 --model gemini-3.1-flash-lite"
+python -m full_run_28092026.run_traces --variant repeat1 $M --dry-run
+python -m full_run_28092026.run_traces --variant repeat1 $M --workers 15 --yes   # D-151 ran one process per model
+python -m full_run_28092026.run_traces --variant repeat1 $M --status
 python -m full_run_28092026.trace_review --variant repeat1        # writes TRACE_REVIEW_repeat1.md; "as main" must be yes
 python -m full_run_28092026.score --variant repeat1
 ```
@@ -248,8 +255,9 @@ the paper will quote from these stages must be printed by `analyze.py` or `--sta
   wrote its rows. Run the stage's `--score` and try again.
 - **The run stops at the cap.** Raise `--max-usd` only for an approved new total; the spend already
   in the store counts toward it.
-- **A call hangs.** After 960 s it is no longer waited for; its reply is stored if it arrives, and the
-  next run asks again otherwise. The process writes its rows and ends.
+- **A call hangs.** After 960 s it is no longer waited for and a new call takes its worker (D-152); its
+  reply is stored if it arrives, and the next run asks again otherwise. About one call in a hundred did
+  this on E5's first night. The process writes its rows and ends.
 - **Error 402.** The account is out of credit.
 - **Error 429, or failures in the hundreds.** MiMo's providers are refusing traffic. Re-run with fewer
   workers (4 held in the pilot). If one provider returns malformed replies, the pilot's precedent is
@@ -263,7 +271,7 @@ the paper will quote from these stages must be printed by `analyze.py` or `--sta
 
 - [ ] E5 rows for all eleven models, `without_reply` 0 or a recorded handful; replies backed up.
 - [ ] The router rows likewise, or a recorded decision not to run it.
-- [ ] Three repeat variants scored; `TRACE_REVIEW_repeat*.md` say "as main" yes.
+- [x] Three repeat variants scored; `TRACE_REVIEW_repeat*.md` say "as main" yes. *(2026-09-30, four models, D-151)*
 - [ ] `FLAG_REVIEW.md` committed, and any checker fix it forced done the D-137 way.
 - [ ] `results/RESULTS.md` regenerated with no "incomplete" in its header, committed and pushed.
 - [ ] A DECISIONS entry per paid run, and the Open decisions table updated.
