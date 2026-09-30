@@ -15,7 +15,11 @@ as the closed-weight models are: the cheapest endpoint, which is Mistral's own.
 THE PROMPT (PROMPT below, hashed into every row) asks for a rewrite in new words and sentence
 structure that keeps every number, unit, symbol, variable, formula and technical term as written and
 the parts in the same order, adds and removes nothing, does not hint at the method or the answer, and
-returns only the problem.
+returns only the problem. Its rules 2 and 3 spell out "as written" character for character and forbid
+reformatting (LaTeX, Markdown, Unicode superscripts and minus signs, added $ delimiters): the first run
+(2026-09-30, prompt 6091f248) lost 49 of 62 attempts to exactly that, the writer prettifying notation
+the checks then rightly rejected. The writer's endpoint is rate-limited upstream, so the default is two
+workers; eight produced 71 service failures in 134 rows.
 
 THE CHECKS. An attempt passes only if all hold; otherwise the writer is asked again, up to three
 attempts per item. An item with no passing attempt has no paraphrase and leaves both arms of Q5.
@@ -76,10 +80,11 @@ PROMPT = """Rewrite the engineering problem below in different words.
 
 Rules:
 1. Keep every number exactly as written, with its unit.
-2. Keep every symbol, variable name, subscript, formula and technical term exactly as written.
-3. Keep the parts of the problem, and any lettered or numbered sub-questions, in the same order.
-4. Do not add, remove or change any information, assumption or instruction. Do not hint at the method or the answer.
-5. Change the wording and the sentence structure, so that the result reads as a genuinely different phrasing and not as a copy.
+2. Keep every symbol, variable name, subscript, formula, equation, chemical formula and technical term exactly as written, character for character: the same ^, *, /, _ and = with the same spacing, the same e-03 style exponents, the same (g) or (l) state labels, the same % signs, plain hyphen-minus signs.
+3. Do not reformat any notation: no LaTeX, no Markdown, no Unicode superscripts, subscripts, minus signs or multiplication dots, and no math delimiters such as $...$ or \\( ... \\) unless the original has them in that place. Copy any table or block of data unchanged.
+4. Keep the parts of the problem, and any lettered or numbered sub-questions, in the same order.
+5. Do not add, remove or change any information, assumption or instruction. Do not hint at the method or the answer.
+6. Change the wording and the sentence structure, so that the result reads as a genuinely different phrasing and not as a copy.
 
 Return only the rewritten problem, with no preamble, heading or comment.
 
@@ -369,7 +374,7 @@ def main() -> int:
     ap.add_argument('--check', action='store_true')
     ap.add_argument('--status', action='store_true')
     ap.add_argument('--selftest', action='store_true')
-    ap.add_argument('--workers', type=int, default=8)
+    ap.add_argument('--workers', type=int, default=2, help='the writer is rate-limited upstream; 8 mostly fail')
     ap.add_argument('--yes', action='store_true', help='required for the writing run, which bills')
     a = ap.parse_args()
     if a.selftest:

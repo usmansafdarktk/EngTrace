@@ -77,7 +77,7 @@ full_run_28092026/scores/
 
 # The paraphrases restate private items; their text, the experts' kits and returns stay local (D-141).
 # Committed instead: paraphrase/manifest.jsonl (hashes only), PARAPHRASE.md and PARAPHRASE_REVIEW.md.
-full_run_28092026/paraphrase/attempts.jsonl
+full_run_28092026/paraphrase/attempts*.jsonl
 full_run_28092026/paraphrase/pool.jsonl
 full_run_28092026/paraphrase/tasks/
 full_run_28092026/paraphrase/dist/
