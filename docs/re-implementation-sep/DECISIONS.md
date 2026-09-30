@@ -6125,12 +6125,43 @@ would see anyway, since it runs on what is on disk) once approved.
 
 **Backup (2026-10-01).** The arm archived again with the experts' returns: `full_run_paraphrase_2026-10-01.zip`, 80 files checked member by member, sha256 `24d9f614…af9293`; uploaded in manual mode as the private Kaggle dataset `ayeshaiq/engtrace-full-run-paraphrase`, downloaded back and every member matched by path and hash (the one extra file is the checksum itself). The 30 September archive D-161 cites stays beside it.
 
+## D-163 — The flag reading, round 3: the corrected rule's precision on this roster is 0.905; no round 4
+
+**Date:** 2026-10-01 · **Status:** DONE (read by the same domain expert as rounds 1 and 2; by the owner's rule, the last round) · **Evidence:** `flag_sample.py --round 3 --merge` and `--score` (`FLAG_REVIEW_3.md`); `analyze.py`
+
+- **The reading.** The same domain expert read round 3's 190 claims. They were drawn after D-160 from
+  the rule as it stands, and none is on a step an earlier round or the review agents read.
+  - 171 are slips, 18 the checker's and 1 unsure. Precision among the 189 decided is 0.905 (95% Wilson
+    0.854 to 0.939). It was 0.505 before the first fix and 0.752 after it.
+  - Per model it runs from 0.632 for GLM-5.3-Flash (7 checker verdicts of 19 decided) to 1.000 for
+    GPT-5.4-mini and Gemini 3.1 Flash-Lite (20 each), DeepSeek V4.1 Flash (6) and Kimi K3 (4).
+- **The 18 misreadings, by the expert's notes:**
+  - five letters that are variables, read as units: `wL`, `SE`, and the unknowns `h`, `g` and `A`;
+  - three unit conversions the rule lacks: kbaud, √J to √pJ, and hours to minutes through a product;
+  - three expressions whose brackets the model left out but meant;
+  - two roundings to significant figures that end in zeros (`≈ 2700 K`, `2600 m³`);
+  - two cases of prose or list items set side by side;
+  - a range written to unequal decimals (`0.0795 – 0.080`), a chain of partial products, and
+    `14 → 14 = 0`, a change of zero.
+
+  The unsure claim sits on a step cut off in the middle of a number.
+- **No round 4.** The owner set round 3 as the last, so the rule is left as it stands. 0.905 is the
+  precision of the rule the results report. The misreadings above are recorded as its known limits,
+  with those D-159 and D-160 left.
+- **The caption.** Q3's caption carries the reading, labelled. The analysis was regenerated at
+  `a11c130`, and only the caption and the provenance move.
+- **Local only.** The verdicts and the filled workbook stay in `scores/flag_review/round3/`, gitignored
+  with the store. `FLAG_REVIEW_3.md` holds counts only.
+
+**Open.** The router, which needs the owner's approval of a fresh dry-run estimate; and the Kaggle copy of
+`scores/` (manual mode, without `scores/flag_review/`).
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
 | D-161 | Run: E5 on the paraphrase arm, about $3 at 316 items (`PARAPHRASE_RUNBOOK.md` section 4), for Q5's E5 column. ~~The private Kaggle copy of the arm's archive~~ **Done 2026-10-01: `ayeshaiq/engtrace-full-run-paraphrase`, private, from `full_run_paraphrase_2026-10-01.zip` (80 files, the experts' returns included), downloaded back and matched member by member** | Q5's E5 column in the paper |
-| D-160 | Round 3 of the flag reading: the 190 claims in `scores/flag_review/round3/` (workbook and instructions), then `flag_sample --round 3 --merge <file>` and `--score --read-by "<who>"`, giving the corrected rule's precision on this roster; no round 4 | Q3 in the paper; the router's run |
+| D-160 | ~~Round 3 of the flag reading: the 190 claims in `scores/flag_review/round3/` (workbook and instructions), then `flag_sample --round 3 --merge <file>` and `--score --read-by "<who>"`, giving the corrected rule's precision on this roster; no round 4~~ **Read 2026-10-01 by the same domain expert: precision 0.905 (D-163, `FLAG_REVIEW_3.md`)** | — |
 | D-159 | ~~Round 3 of the flag reading: the 181 claims in `scores/flag_review/round3/`~~ **Redrawn 2026-09-30, unread, after two review agents' corrections (D-160)** | — |
 | D-158 | ~~A second fix of the digit rule's parser from round 2's notes, measured by a round 3 (no round 4), or 0.752 reported as measured~~ **Decided 2026-09-30: the second fix, adopted with no pilot step moving away (D-159); round 3 drawn** | — |
 | D-156 | ~~Round 2 of the flag reading: the 206 claims in `scores/flag_review/round2/` (workbook and instructions), then `flag_sample --round 2 --merge <file>` and `--score --read-by "<who>"`, giving the fixed rule's precision on this roster~~ **Read 2026-09-30 by the same domain expert: precision 0.752 (D-158, `FLAG_REVIEW_2.md`)** | — |

@@ -309,7 +309,7 @@ the paper will quote from these stages must be printed by `analyze.py` or `--sta
 - [x] `FLAG_REVIEW.md` committed, and any checker fix it forced done the D-137 way. *(2026-09-30, D-154, D-156)*
 - [x] Round 2 read, `FLAG_REVIEW_2.md` committed: the fixed rule's precision on this roster. *(0.752, D-158; the second fix followed, D-159)*
 - [x] Both fixes checked by two independent review agents before round 3; their corrections adopted, the control space read. *(D-160, `DIGIT_FIX_3.md`)*
-- [ ] Round 3 read, `FLAG_REVIEW_3.md` committed: the corrected rule's precision on this roster; no round 4.
+- [x] Round 3 read, `FLAG_REVIEW_3.md` committed: the corrected rule's precision on this roster; no round 4. *(0.905, D-163)*
 - [ ] `results/RESULTS.md` regenerated with no "incomplete" in its header, committed and pushed.
 - [ ] A DECISIONS entry per paid run, and the Open decisions table updated.
 - [ ] `scores/` archived locally and on Kaggle, hashes checked.
