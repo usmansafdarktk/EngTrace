@@ -234,9 +234,10 @@ UNIT_WORDS = {'hours', 'hour', 'minutes', 'minute', 'seconds', 'second', 'meters
 UNIT_LETTERS = set('mgNJWVAKCFHTLlshM') | {'Ω', '%', '°'}
 # A Greek letter's name is a variable too: `8 \mu L` is 8μL, viscosity times length (D-159). Only `mu`
 # before a unit symbol is the micro prefix: `5 \mu m`, `2 \mu s`.
+# psi is left out: as a unit (pounds per square inch) it is far commoner in these traces than ψ.
 GREEK = {'alpha', 'beta', 'gamma', 'delta', 'epsilon', 'varepsilon', 'zeta', 'eta', 'theta', 'vartheta',
          'iota', 'kappa', 'lambda', 'mu', 'nu', 'xi', 'rho', 'sigma', 'tau', 'upsilon', 'phi', 'varphi',
-         'chi', 'psi', 'omega', 'Gamma', 'Delta', 'Theta', 'Lambda', 'Xi', 'Sigma', 'Phi', 'Psi'}
+         'chi', 'omega', 'Gamma', 'Delta', 'Theta', 'Lambda', 'Xi', 'Sigma', 'Phi'}
 MICRO = {'m', 's', 'g', 'F', 'A', 'V', 'W', 'J', 'H', 'N', 'C', 'T', 'l', 'mol', 'Pa'}
 
 
@@ -331,7 +332,8 @@ def _evaluate(s: str, funcs):
     if s.count('(') != s.count(')'):
         return None, 'unparseable'          # a clause fragment, not an expression
     if not s or len(s) > 200 or not re.search(r'\d', s):
-        return None, 'symbolic' if re.search(r'[A-Za-z]', s or '') else 'unparseable'
+        # `σ/ε` is a formula in any script, and a formula links the chain (D-159)
+        return None, 'symbolic' if re.search(r'[^\W\d_]', s or '') else 'unparseable'
     # An exponent is not a word: '1.21e8' must not read as the variable 'e8'. A word may be written
     # in any script: `ẋ(0)` is a variable, where sympy reads a symbol times zero, 0 (D-159).
     bare = re.sub(r'(?<=[\d.])[eE][-+]?\d+', '', s)
@@ -753,6 +755,9 @@ def selftest() -> int:
         ('x = 4.036 × 10⁻⁵ m³/mol = 0.4036 cm³/mol', False),                     # ...not for m³ and cm³
         (r'8 \, \mu \, L = 8 \times 5.00 \times 14.2 = 568', True),              # \mu L: variables
         (r'2 \mu = 2 \times 0.7 = 1.4', True),
+        ('E = σ/ε = 14.043/0.00064561 = 21.75 × 10³ ksi', True),              # σ/ε links; ksi a unit
+        ('p = 2 × 36.5 = 73.0 psi', True),                                    # psi is the unit
+        ('p = 2 × 36.5 = 74.0 psi', False),                                   # ...and still checked
         (r'E = \frac{814}{840} \times 100 = 0.969047 \dots \times 100 = 96.9047 \dots \%', True),
         (r's = \sqrt{0.0004279296} = 0.0206865…', True),                          # rounded, then …
         ('f = 267π/2π = 133.5 Hz', True),                                         # a/2π is a/(2π)
