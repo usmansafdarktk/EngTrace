@@ -93,6 +93,23 @@ of the full run's flags and found 109 to be the checker's. Each rule below answe
     begun above; and a segment the parser cannot read ends a chain rather than joining its neighbours
     as though they were claimed equal
 
+THE SECOND READING (D-158, D-159). The same expert read 206 flags of the fixed rule: 155 real,
+0.752. The rules below answer 42 of the 51 notes, and the audit (DIGIT_FIX_2.md) moves no pilot step
+away from the experts:
+  - a table cell ends at `&` or a spaced `|`, and `or`, `but`, `since`, `unless`, `using`, `versus`,
+    `would` and `give` end a claim, as `is` does before an assignment; after a comparison, a bare
+    number is its threshold (`P_detect≤2 = 0.3086`), while an expression is still a claim
+  - a word in any script is a variable (`ẋ(0)`), and so is a Greek letter's name (`8 \\mu L`), save
+    `mu` before a unit symbol; S is not siemens
+  - a side that writes no unit of its own may convert into the unit the other side writes, by the
+    factor that unit implies (`mm` from m, `kN` from N, minutes from hours, ppm); a base unit implies
+    nothing, and no conversion makes a zero; Stokes, bar, atm and hectares convert for their own pairs
+  - a trailing `...` or `\\dots` accepts a correct rounding as well as a truncation, and an operand cut
+    short may lie a whole unit higher; `a/2π` is a/(2π); `99° = ...` keeps its unit; a sum written a
+    term a line continues
+Left as they are: running computations, carried roundings, units the model left unstated where no
+unit on the right implies them, ratio notation, a sign convention, a quadrant, and `wL`, `Zc`.
+
 WHAT IT CANNOT PARSE IT SAYS SO. Every segment is classified: evaluated, symbolic
 (skipped), or unparseable. A checker that silently parses 5% of lines and reports
 "100% consistent" would be this repo's recurring defect, so coverage is reported
@@ -143,9 +160,13 @@ def normalise(line: str) -> str:
     s = IMPLIES.sub(' => ', s)                       # \Rightarrow, \implies, \to end a claim (D-156)
     for pat, rel in RELATIONS:
         s = re.sub(pat, rel, s)
-    s = s.replace('\\qquad', ' ; ').replace('\\\\', ' ; ').replace('&', ' ')    # side by side; aligned rows
+    s = s.replace('\\qquad', ' ; ').replace('\\\\', ' ; ')    # side by side; aligned rows
+    # A table cell ends at `&` (LaTeX) or a spaced `|` (markdown); `&=` only aligns (D-159).
+    s = re.sub(r'&(?!\s*=)', ' ; ', s).replace('&', ' ')
+    s = re.sub(r'(?<!\S)\|(?!\S)', ' ; ', s)
     s = re.sub(r'\\[()\[\]]', ' ', s)               # the \( \) \[ \] delimiters of inline maths
-    s = s.replace('…', '...').replace('\\%', '%')
+    s = s.replace('…', '...').replace('\\%', '%').replace('\\Omega', 'Ω')
+    s = re.sub(r'\\[lc]?dots(?![A-Za-z])', '...', s)   # `0.969047 \dots` is cut short (D-159)
     s = s.replace('$', ' ').replace('`', ' ').replace('**', '^')      # markdown bold -> ^ first
     s = re.sub(r'\\(?:left|right|displaystyle|,|;|!|quad|qquad)', ' ', s)
     for _ in range(4):                                               # nested \frac
@@ -160,8 +181,12 @@ def normalise(line: str) -> str:
           .replace('≈', '=').replace('\\approx', '=').replace('{', '(').replace('}', ')'))
     # A degree sign marks a unit, not an operator: `64.834° - 180° = -115.166°` is
     # arithmetic on degrees. Left in, the unit-tail rule swallowed `° - 180°` whole.
-    s = s.replace('°C', ' degC').replace('°F', ' degF').replace('°', ' ')
+    s = s.replace('°C', ' degC').replace('°F', ' degF')
+    # ...but a degree sign on the side of an equation is that side's unit: `99° = 11π/20 = 1.7279 rad`
+    # is a conversion (D-159).
+    s = re.sub(r'(\d)\s*°(?=\s*=)', r'\1 deg', s).replace('°', ' ')
     s = s.replace('μ', 'u').replace('µ', 'u')        # Greek mu and micro sign alike
+    s = re.sub(r'/\s*(\d+(?:\.\d+)?)\s*pi\b', r'/(\1*pi)', s)    # `267π/2π` is 267π/(2π) (D-159)
     s = _superscripts(s)
     s = s.replace('^', '**')
     s = re.sub(r'(\d)\s*[eE]\s*([-+]?\d)', r'\1e\2', s)
@@ -176,16 +201,21 @@ def normalise(line: str) -> str:
 
 CLAUSE = re.compile(r'=>|⇒|→|->|,\s|;|:\s'
                     r'|(?i:\b(?:and|so|then|with|where|thus|hence|therefore|gives|giving|yields)\b)'
-                    # A full stop ends a sentence, a comparison is not an equation, and two spaces before
-                    # a new equation whose left side carries ∂, _, [ ] or a Greek letter part two (D-156).
+                    # Prose that sets two values side by side: `X = 0 or X = 1`, `Cpk = 1.67 since
+                    # Cp = 1.14`, `803.16 units using Q = 1090`, `σ = 17.17 Ω would give Cpl = ...` (D-159).
+                    r'|(?i:\b(?:or|but|since|unless|using|versus|vs|would|give)\b)'
+                    # A full stop ends a sentence, and two spaces before a new equation whose left side
+                    # carries ∂, _, [ ] or a Greek letter part two (D-156).
                     r'|(?<!\.)\.(?!\.)(?=\s|$)'
-                    r'|[<>≤≥≠]'
                     r'|\s{2,}(?=[^\s=]*[∂_\[\]\u0391-\u03a9\u03b1-\u03c9][^\s=]*\s*=(?!=))'
                     # A connector that opens a new assignment ends the claim before it:
                     # `34 kN at a = 3.3 m`, `D3 = 0 for n = 4`, `from t = -2 to t = 2`
-                    # are lists of values, not the chain 34 = 3.3 (D-120).
-                    r'|\s(?:at|under|to|for|from|over|between|when|if|on|by)\s+'
+                    # are lists of values, not the chain 34 = 3.3 (D-120); so does `is` (D-159).
+                    r'|\s(?:at|under|to|for|from|over|between|when|if|on|by|is|are)\s+'
                     r'(?=[A-Za-z_][\w\[\]()\-]*\s*=(?!=))')
+# A comparison is not an equation (D-156), and what follows one is its right side, not a value:
+# `P_detect≤2 = 0.3086` states P(detect ≤ 2), not 2 = 0.3086 (D-159).
+RELATION = re.compile(r'[<>≤≥≠]')
 # An '=' inside a label - `[1/(-r_A)]_at_X=0.85 = 4.55` - is not an equation when a spaced
 # '=' follows it (D-120).
 LABEL_EQ = re.compile(r'(?<=[\w\])])=(?=[-+]?\d)(?=.*\s=\s)')
@@ -199,8 +229,15 @@ UNIT_WORDS = {'hours', 'hour', 'minutes', 'minute', 'seconds', 'second', 'meters
               'machines', 'batches', 'pieces', 'packets', 'symbols', 'cycles'}
 # The single letters that are unit symbols. Any other single letter is a variable: `48 E I` is 48EI,
 # not 48 in the unit `E I` (D-156). d and t are left out: traces write them as diameter and time far
-# more often than as day and tonne.
-UNIT_LETTERS = set('msgNJWVAKCFHTLlShM') | {'Ω', '%', '°'}
+# more often than as day and tonne; so is S (D-159), a retention, a spacing or a setup cost far more
+# often than siemens.
+UNIT_LETTERS = set('mgNJWVAKCFHTLlshM') | {'Ω', '%', '°'}
+# A Greek letter's name is a variable too: `8 \mu L` is 8μL, viscosity times length (D-159). Only `mu`
+# before a unit symbol is the micro prefix: `5 \mu m`, `2 \mu s`.
+GREEK = {'alpha', 'beta', 'gamma', 'delta', 'epsilon', 'varepsilon', 'zeta', 'eta', 'theta', 'vartheta',
+         'iota', 'kappa', 'lambda', 'mu', 'nu', 'xi', 'rho', 'sigma', 'tau', 'upsilon', 'phi', 'varphi',
+         'chi', 'psi', 'omega', 'Gamma', 'Delta', 'Theta', 'Lambda', 'Xi', 'Sigma', 'Phi', 'Psi'}
+MICRO = {'m', 's', 'g', 'F', 'A', 'V', 'W', 'J', 'H', 'N', 'C', 'T', 'l', 'mol', 'Pa'}
 
 
 def split_unit(seg: str):
@@ -224,6 +261,8 @@ def split_unit(seg: str):
             return s.strip(), ''          # `sin(75.35 rad)`: a tail that closes a bracket is not a unit (D-156)
         if set(toks) & FUNC_WORDS:
             return s.strip(), ''          # `2 sqrt(m k)`: a tail holding a function is not a unit (D-156)
+        if set(toks) & GREEK and not (toks[0] == 'mu' and len(toks) > 1 and toks[1] in MICRO):
+            return s.strip(), ''          # `8 mu L`, `2 mu`: Greek letters are variables (D-159)
         unitlike = (all(len(t) <= 5 or t.lower() in UNIT_WORDS for t in toks)
                     and len(toks) <= 4 and not stray_digit)
         if toks and unitlike and not set(toks) <= FUNC_WORDS:
@@ -274,8 +313,8 @@ def evaluate(seg: str):
     # an earlier line; a signed number (`+0.162`) is written against its digits (D-156).
     if re.match(r'^\+\s*[(\s]', raw):
         return [], 'unparseable', ''
-    s, unit = split_unit(seg)
-    s = re.sub(r'(?<=[\d)])\.\.\.', '', s)         # `sqrt(941713.24...)`: a number cut short is a number
+    # `sqrt(941713.24...)`, `96.9047 ... %`: a number cut short is a number, with its unit after it.
+    s, unit = split_unit(re.sub(r'(?<=[\d)])\s*\.\.\.', '', seg))
     m = RANGE.match(s)
     if m and is_range(m.group(1), m.group(2)):
         return [], 'unparseable', unit
@@ -293,9 +332,10 @@ def _evaluate(s: str, funcs):
         return None, 'unparseable'          # a clause fragment, not an expression
     if not s or len(s) > 200 or not re.search(r'\d', s):
         return None, 'symbolic' if re.search(r'[A-Za-z]', s or '') else 'unparseable'
-    # An exponent is not a word: '1.21e8' must not read as the variable 'e8'.
+    # An exponent is not a word: '1.21e8' must not read as the variable 'e8'. A word may be written
+    # in any script: `ẋ(0)` is a variable, where sympy reads a symbol times zero, 0 (D-159).
     bare = re.sub(r'(?<=[\d.])[eE][-+]?\d+', '', s)
-    words = set(re.findall(r'[A-Za-z_][A-Za-z_0-9]*', bare)) - {'e', 'E'}
+    words = set(re.findall(r'[^\W\d]\w*', bare)) - {'e', 'E'}
     if words - FUNC_WORDS:
         return None, 'symbolic'
     if re.search(r'\*\*\s*\(?\s*\d{3,}', s):                          # 10**1000: refuse
@@ -327,11 +367,51 @@ def agree(a: float, b: float, tol: float = ARITH_TOL) -> bool:
     return abs(a - b) / abs(b) <= tol
 
 
-def _unit_factors(lu: str, ru: str) -> set:
+# Conversions no generic factor covers, for these unit pairs only: 1e4 for hectares here cannot pass
+# the m³-and-cm³ slip that ruled it out as a general factor (D-156, D-159).
+PAIR_FACTORS = {('m**2/s', 'St'): 1e4, ('St', 'm**2/s'): 1e-4, ('bar', 'Pa'): 1e5, ('Pa', 'bar'): 1e-5,
+                ('bar', 'kPa'): 1e2, ('kPa', 'bar'): 1e-2, ('bar', 'MPa'): 0.1, ('MPa', 'bar'): 10.0,
+                ('atm', 'Pa'): 101325.0, ('Pa', 'atm'): 1 / 101325.0, ('atm', 'kPa'): 101.325,
+                ('kPa', 'atm'): 1 / 101.325, ('ha', 'm**2'): 1e4, ('m**2', 'ha'): 1e-4}
+
+
+def unit_key(u: str) -> str:
+    return re.sub(r'\*\*\((\d)\)', r'**\1', re.sub(r'\s+', '', u))
+
+
+SI_PREFIX = {'k': 1e3, 'M': 1e6, 'G': 1e9, 'c': 1e-2, 'm': 1e-3, 'u': 1e-6, 'n': 1e-9, 'p': 1e-12}
+PREFIXABLE = {'m', 'N', 'J', 'W', 'V', 'A', 'Pa', 'Hz', 'L', 'l', 's', 'C', 'F', 'H', 'T', 'Ω', 'eV', 'Wh'}
+TIME_FACTORS = {'min': {60.0, 1 / 60}, 'minute': {60.0, 1 / 60}, 'minutes': {60.0, 1 / 60},
+                'h': {1 / 60, 1 / 3600}, 'hr': {1 / 60, 1 / 3600}, 'hour': {1 / 60, 1 / 3600},
+                'hours': {1 / 60, 1 / 3600}, 'sec': {60.0, 3600.0}, 'seconds': {60.0, 3600.0}}
+
+
+def implied_factors(ru: str) -> set:
+    """What a unit written only on the right implies for a left side that writes none, computed in the
+    base unit (D-159): `mm` ×1e3 from m, `kN` ×1e-3 from N, `MPa` ×1e-6 from Pa, `uV` ×1e6 from V;
+    minutes from hours or seconds; ppm ×1e6. A base unit implies nothing, so `(338.86e6)/(122e6) =
+    2.7775 × 10⁻³ m` stays a slip, and no generic factor can pass a wrong power of ten."""
+    m = re.match(r'[A-Za-zΩ]+', unit_key(ru))
+    tok = m.group(0) if m else ''
+    if tok in TIME_FACTORS:
+        return TIME_FACTORS[tok]
+    if tok in ('ppm', 'ppb'):
+        return {1e6 if tok == 'ppm' else 1e9}
+    if len(tok) > 1 and tok[0] in SI_PREFIX and tok[1:] in PREFIXABLE:
+        return {1 / SI_PREFIX[tok[0]]}
+    return set()
+
+
+def _unit_factors(lu: str, ru: str, implied: set | None = None) -> set:
     """`1% = 0.01` and `91.4 deg = 1.594 rad` are conversions: a percent sign or an
     angle unit on EITHER side licenses the matching factor, because the bare side is
-    simply unit-less."""
+    simply unit-less. `implied`: the factors the right side's unit implies when the left
+    side writes no unit of its own: `0.05243/73 = 0.718 mN` (D-159)."""
     factors = set(UNIT_FACTORS) if (lu and ru and lu != ru) else {1.0}
+    factors |= implied or set()
+    pair = PAIR_FACTORS.get((unit_key(lu), unit_key(ru)))
+    if pair:
+        factors.add(pair)
     units = (lu + ' ' + ru).lower()
     if '%' in units:
         factors |= {100.0, 0.01}
@@ -340,10 +420,12 @@ def _unit_factors(lu: str, ru: str) -> set:
     return factors
 
 
-def agree_any(la, ra, lu: str, ru: str) -> bool:
+def agree_any(la, ra, lu: str, ru: str, implied: set | None = None) -> bool:
     """Any candidate pair agrees within ARITH_TOL; under a unit factor only if the
-    units differ."""
-    return any(agree(a * f, b) for a in la for b in ra for f in _unit_factors(lu, ru))
+    units differ, or the left side's is implied. A conversion never makes a zero: `131 - 79 =
+    0 s` is not 52 × 1e-12 (D-159)."""
+    return any(agree(a * f, b) for a in la for b in ra for f in _unit_factors(lu, ru, implied)
+               if f == 1.0 or b != 0.0)
 
 
 NUM_LITERAL = re.compile(r'[-+]?\d*\.?\d+(?:[eE][-+]?\d+)?')
@@ -384,6 +466,8 @@ def shown_uncertainty(seg: str, vals: list) -> list:
     under cancellation, where a relative tolerance is not.
     """
     out = [0.0] * len(vals)
+    s, _ = split_unit(re.sub(r'(?<=[\d)])\s*\.\.\.', '', seg))
+    bare = bool(re.fullmatch(r'\s*[-+]?\(?\s*(?:\d+\.?\d*|\.\d+)(?:[eE][-+]?\d+)?\s*\)?\s*', s))
     for m in ROUNDED_LITERAL.finditer(seg):
         lit = m.group(0)
         if '.' not in lit and 'e' not in lit and 'E' not in lit:
@@ -395,7 +479,10 @@ def shown_uncertainty(seg: str, vals: list) -> list:
             x = float(lit)
         except ValueError:
             continue
-        moved = seg[:m.start()] + '(' + repr(x + 0.5 * h) + ')' + seg[m.end():]
+        # An operand cut short (`0.969047... × 100`) may lie a whole unit of its last digit higher. A
+        # result cut short is judged as such by check_part, so it moves half a unit like any other (D-159).
+        step = h if bare is False and re.match(r'\s*\.\.\.', seg[m.end():]) else 0.5 * h
+        moved = seg[:m.start()] + '(' + repr(x + step) + ')' + seg[m.end():]
         vals2, kind, _ = evaluate(moved)
         if kind != 'num' or len(vals2) != len(vals):
             continue
@@ -404,7 +491,7 @@ def shown_uncertainty(seg: str, vals: list) -> list:
     return out
 
 
-def agree_any_digit(la, ra, lu: str, ru: str, u: float, ul=None, ur=None) -> bool:
+def agree_any_digit(la, ra, lu: str, ru: str, u: float, ul=None, ur=None, implied: set | None = None) -> bool:
     """The experts' rule: the right side, as displayed, is a correct rounding of the
     left side, computed from the numbers shown.
 
@@ -417,9 +504,11 @@ def agree_any_digit(la, ra, lu: str, ru: str, u: float, ul=None, ur=None) -> boo
     """
     ul = ul or [0.0] * len(la)
     ur = ur or [0.0] * len(ra)
-    for f in _unit_factors(lu, ru):
+    for f in _unit_factors(lu, ru, implied):
         for i, a in enumerate(la):
             for j, b in enumerate(ra):
+                if f != 1.0 and b == 0.0:
+                    continue                          # a conversion never makes a zero (D-159); 1e-12 m⁴ is not one
                 tol = max(0.5 * u, ur[j]) + ul[i] * abs(f)
                 if abs(a * f - b) <= tol * (1 + 1e-7):
                     return True
@@ -480,57 +569,73 @@ def check(text: str) -> Report:
     rep = Report()
     prev = ''
     for i, raw in enumerate(text.splitlines()):
-        continued = bool(CONTINUED.search(prev))
+        # A line continues the one above when that one ends in an operator (D-156), or when both are
+        # terms of one sum written a term a line, `+(9.47839)V_m` / `-(9.47839)(0.065898)=0` (D-159).
+        continued = bool(CONTINUED.search(prev) or (re.match(r'\s*[-+](?=[(\d\\])', prev)
+                                                     and re.match(r'\s*[-+](?=[(\\])', raw)))
         if raw.strip():
             prev = raw
         if '=' not in raw:
             continue
         for ci, clause in enumerate(CLAUSE.split(normalise(raw))):
-            segs = re.split(r'(?<![<>!=])=(?!=)', LABEL_EQ.sub('≡', clause))
-            if len(segs) < 2:
-                continue
-            # A segment the parser cannot read ends the chain: `735 (Shortage 757-735 = 22` does not
-            # claim 735 = 22, and `0.336-0.337` does not join its neighbours. A symbolic segment (a
-            # formula) still links them: `12.5 = P/A = 12.5` claims the two values equal (D-156).
-            chains, nums = [], []
-            for k, sg in enumerate(segs):
-                if continued and ci == 0 and k == 0:
-                    v, kind, unit = [], 'unparseable', ''
-                else:
-                    v, kind, unit = evaluate(sg)
-                rep.segments[kind] += 1
-                if v:
-                    nums.append((sg.strip(), v, unit))
-                elif kind == 'unparseable':
-                    chains.append(nums)
-                    nums = []
-            chains.append(nums)
-            for nums in chains:
-                # `1/(41-23) hours = 60/18 = 3.33 minutes`: the unit is written once, at the
-                # end, and belongs to every unit-less link before it.
-                inherited, nxt = [], ''
-                for sg, v, u in reversed(nums):
-                    nxt = u or nxt
-                    inherited.append((sg, v, u or nxt))
-                nums = list(reversed(inherited))
-                for (ls, lv, lu), (rs, rv, ru) in zip(nums, nums[1:]):
-                    u = displayed_ulp(rs)
-                    # `39.5967...` is cut, not rounded: the value lies in the unit AFTER the digits
-                    # shown, [39.5967, 39.5968), so it is judged as a rounding of that unit's middle.
-                    # `0.03461552...` for 0.034615511 is still a wrong digit (D-156).
-                    rj = ([b + math.copysign(0.5 * u, b) for b in rv]
-                          if u is not None and rs.rstrip().endswith('...') else rv)
-                    if u is None:
-                        digit = True                      # no readable precision: unjudged
-                    else:
-                        digit = agree_any_digit(lv, rj, lu, ru, u)
-                        if not digit:                     # only then pay for the propagation
-                            digit = agree_any_digit(lv, rj, lu, ru, u,
-                                                    shown_uncertainty(ls, lv),
-                                                    shown_uncertainty(rs, rv))
-                    rep.claims.append(Claim(i, ls[:80], rs[:80], lv, rv,
-                                            agree_any(lv, rv, lu, ru), digit, u, lu, ru))
+            for ri, part in enumerate(RELATION.split(clause)):
+                segs = re.split(r'(?<![<>!=])=(?!=)', LABEL_EQ.sub('≡', part))
+                if len(segs) < 2:
+                    continue
+                # After a comparison, a bare number is its threshold, `P_detect≤2 = 0.3086`; an
+                # expression is a claim, `W_L ≥ 824/179 = 4.61` (D-159).
+                threshold = ri > 0 and bool(re.fullmatch(r'\s*[-+]?\d+(?:\.\d+)?\s*', segs[0]))
+                check_part(rep, i, segs, (continued and ci == 0 and ri == 0) or threshold)
     return rep
+
+
+def check_part(rep: Report, i: int, segs: list, first_is_not_a_value: bool) -> None:
+    """The claims of one clause, cut at its `=`s. `first_is_not_a_value`: the first segment is the tail
+    of an expression begun above, or the right side of a comparison (D-156, D-159)."""
+    # A segment the parser cannot read ends the chain: `735 (Shortage 757-735 = 22` does not
+    # claim 735 = 22, and `0.336-0.337` does not join its neighbours. A symbolic segment (a
+    # formula) still links them: `12.5 = P/A = 12.5` claims the two values equal (D-156).
+    chains, nums = [], []
+    for k, sg in enumerate(segs):
+        if first_is_not_a_value and k == 0:
+            v, kind, unit = [], 'unparseable', ''
+        else:
+            v, kind, unit = evaluate(sg)
+        rep.segments[kind] += 1
+        if v:
+            nums.append((sg.strip(), v, unit))
+        elif kind == 'unparseable':
+            chains.append(nums)
+            nums = []
+    chains.append(nums)
+    for nums in chains:
+        # `1/(41-23) hours = 60/18 = 3.33 minutes`: the unit is written once, at the
+        # end, and belongs to every unit-less link before it. A link that writes no unit of its
+        # own may also convert into the next one's: `0.05243/73 = 0.718 mN` (D-159).
+        inherited, nxt = [], ''
+        for sg, v, u in reversed(nums):
+            nxt = u or nxt
+            inherited.append((sg, v, u or nxt, bool(u)))
+        nums = list(reversed(inherited))
+        for (ls, lv, lu, lown), (rs, rv, ru, rown) in zip(nums, nums[1:]):
+            implied = implied_factors(ru) if rown and not lown else set()
+            u = displayed_ulp(rs)
+            # `39.5967...` is cut short: the value lies in the unit AFTER the digits shown,
+            # [39.5967, 39.5968), judged as a rounding of that unit's middle; a correct rounding
+            # passes too, since traces also write `...` after one (D-156, D-159). `0.03461552...`
+            # for 0.034615511 is a wrong digit either way.
+            cut = u is not None and bool(re.search(r'[\d)]\s*\.\.\.', rs))
+            rj = [b + math.copysign(0.5 * u, b) for b in rv] if cut else None
+            if u is None:
+                digit = True                              # no readable precision: unjudged
+            else:
+                digit = any(agree_any_digit(lv, r, lu, ru, u, implied=implied) for r in (rv, rj) if r)
+                if not digit:                             # only then pay for the propagation
+                    ul, ur = shown_uncertainty(ls, lv), shown_uncertainty(rs, rv)
+                    digit = any(agree_any_digit(lv, r, lu, ru, u, ul, ur, implied=implied)
+                                for r in (rv, rj) if r)
+            rep.claims.append(Claim(i, ls[:80], rs[:80], lv, rv,
+                                    agree_any(lv, rv, lu, ru, implied), digit, u, lu, ru))
 
 
 def selftest() -> int:
@@ -627,6 +732,35 @@ def selftest() -> int:
         ('+(0.0121-1)=0', None),                                              # a sum begun above
         ('\\frac{24(4.7)^2}{12}\n-\n\\frac{24(3.0)^2}{12}=0', None),           # ...one term a line
         ('Month 1: 7 × 105 = 735 (Shortage 757-735 = 22', None),              # unreadable: no join
+        # THE SECOND READING (D-159): forms from round 2's notes.
+        ('25 & 0.64(5)=3.20 & 3-3.20=-0.20 & -3-3.20=-6.20', True),            # table cells
+        ('| n = 9 | 0.64(3) = 1.92 | 3-1.92 = 1.08 |', True),                    # markdown cells
+        ('the lot is accepted if X = 0 or X = 1.', None),                         # or
+        ('could not reach Cpk = 1.67 since Cp = 1.14 < 1.67', None),              # since, <
+        ('I_max = 803.16 units using Q = 1090 units', None),                      # using
+        ('the smallest n satisfying ARL1 ≤ 2.0 is n = 25', None),                 # is, ≤
+        ('P_detect≤2 = 0.3086', None),                                            # a threshold
+        (r'W_L \ge 824/179 = 4.61', True, False),                                 # ...not a threshold
+        ('ẋ(0) = 0.0370 × 21.851 × cos(-0.571) = 0.68 m/s', True),               # ẋ is a variable
+        ('F = 0.05243/73 = 0.718 mN', True),                                      # implied N -> mN
+        ('δ = (172.91 × 10³)(1.13)/(392.7 × 10⁶) = +0.498 mm', True),            # implied m -> mm
+        ('W2 = 0.06187 + 0.09091 = 0.15278 hours × 60 ≈ **9.17 minutes**', True),
+        ('d = (338.86 × 10⁶)/(122 × 10⁶) = 2.7775 × 10⁻³ m', False),             # a base unit implies nothing
+        ('remaining = 131 - 79 = 0 s', False),                                    # no conversion makes a zero
+        ('1 m²/s = 10^4 St', True),                                               # Stokes
+        ('P1 = 47.73 bar = 4.773×10⁶ Pa', True),                                  # bar
+        ('A = 1 ha = 10⁴ m²', True),                                              # hectares, for this pair only
+        ('x = 4.036 × 10⁻⁵ m³/mol = 0.4036 cm³/mol', False),                     # ...not for m³ and cm³
+        (r'8 \, \mu \, L = 8 \times 5.00 \times 14.2 = 568', True),              # \mu L: variables
+        (r'2 \mu = 2 \times 0.7 = 1.4', True),
+        (r'E = \frac{814}{840} \times 100 = 0.969047 \dots \times 100 = 96.9047 \dots \%', True),
+        (r's = \sqrt{0.0004279296} = 0.0206865…', True),                          # rounded, then …
+        ('f = 267π/2π = 133.5 Hz', True),                                         # a/2π is a/(2π)
+        ('phase: 99° = 11π/20 ≈ 1.7279 rad', True),                              # 99° is a unit
+        ('+(9.47839)V_m\n-(9.47839)(0.065898)=0', None),                          # a term a line
+        ('Ia = 0.2 S = 0.2 × 3.5135 = 0.7027 in', True),                          # S is a variable
+        ('T(1+1) = 2³ = 8 but T(1)+T(1) = 1³+1³ = 2', True),                     # but
+        ('w0 = π/2 ≈ 1.5708 rad versus π/3 ≈ 1.0472 rad.', True),                # versus
         # Real slips the expert confirmed; the rules above must go on flagging them.
         (r'\sin(4\pi \times 5.9856) = \sin(75.35 \text{ rad}) \approx -0.047', False),
         (r'E_G = \frac{1.9714285714}{0.1565714286} \approx 12.5945', True, False),

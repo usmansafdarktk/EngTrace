@@ -192,7 +192,8 @@ def main() -> int:
          'its family (D-139, `WORD_AUDIT.md`) and the last-digit windows decided by the rule rather than by binary '
          'rounding (D-147, `BOUNDARY_AUDIT.md`); the last three change none of these verdicts. The digit rule\'s '
          f'published figures are reproduced with `arith.py` at `{digit_fix.PRE_FIX[:7]}`; "now" is the rule as '
-         'fixed after a domain expert read the full run\'s flags (D-156, `DIGIT_FIX.md`).', '',
+         'fixed twice after a domain expert read the full run\'s flags (D-156, D-159; `DIGIT_FIX.md`, '
+         '`DIGIT_FIX_2.md`).', '',
          '| figure | published | published code | reproduced | now |', '|---|---:|---:|---|---:|']
     ok = g['answer_correct_all_three_tols'] == g['items'] and not g['unusable'] and not g['digit_flags']
     for k, v in PUBLISHED.items():

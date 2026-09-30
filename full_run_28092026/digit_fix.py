@@ -1,7 +1,11 @@
 """D-156: the digit rule's parser fix, measured before against after: on gold, on the pilot's 300
 expert-labelled traces, on the 220 flags a domain expert read (D-154), and on every full-run trace.
 
-    python -m full_run_28092026.digit_fix      # FREE: writes DIGIT_FIX.md beside this file
+    python -m full_run_28092026.digit_fix           # FREE: D-156, arith.py at 3a7f247 against bc7dfa4: DIGIT_FIX.md
+    python -m full_run_28092026.digit_fix --fix 2   # FREE: D-159, bc7dfa4 against arith.py as it stands: DIGIT_FIX_2.md
+
+A second fix (D-159) was built from round 2's notes the same way; it is measured against the first,
+on round 2's flags and on round 1's, whose slips it must go on flagging. FIXES lists both.
 
 THE FIX. `arith.py`, E4's digit rule, read one chain of claims where a trace wrote several, and read
 some numbers, units and variables as something else: a domain expert found 109 of 220 sampled
@@ -61,13 +65,20 @@ import e2_prm  # noqa: E402
 from full_run_28092026 import score  # noqa: E402
 
 PRE_FIX = '3a7f247954f487c360dd7b3a716bae794d9649f4'   # the last commit of arith.py before D-156
-CHANGES = score.SCORES / 'digit_fix_changes.jsonl'
-PILOT_CHANGES = score.SCORES / 'digit_fix_pilot_changes.jsonl'
+D156 = 'bc7dfa459e04a29fda80f5df431e8d5458617596'      # the D-156 fix
 # The owner's documented exception (D-156): pilot steps, by trace code and step index, that gain a flag
 # the experts do not share, each a real wrong digit at the displayed precision on a line the old parser
 # could not read.
 EXCEPTIONS = {('T-adac89', 5), ('T-3b9847', 12), ('T-d68431', 8), ('T-7e995f', 11), ('T-30adfd', 6)}
-FLAGS = score.SCORES / 'flag_review' / 'round1'        # the 220 D-154's expert read
+# Each fix, measured between two versions of arith.py (None: as it stands), on the reading it was built
+# from and on the earlier readings, whose slips it must go on flagging (D-156, D-159).
+FIXES = {1: {'label': 'D-156', 'pre': PRE_FIX, 'post': D156, 'design': 'round1', 'regression': [],
+             'exceptions': EXCEPTIONS, 'report': 'DIGIT_FIX.md', 'changes': 'digit_fix_changes.jsonl',
+             'pilot_changes': 'digit_fix_pilot_changes.jsonl'},
+         2: {'label': 'D-159', 'pre': D156, 'post': None, 'design': 'round2', 'regression': ['round1'],
+             'exceptions': set(), 'report': 'DIGIT_FIX_2.md', 'changes': 'digit_fix_2_changes.jsonl',
+             'pilot_changes': 'digit_fix_2_pilot_changes.jsonl'}}
+FLAGS = score.SCORES / 'flag_review'
 ROSTER_ALL = ['gpt-oss-20b', 'gemma-4-26b-a4b', 'deepseek-v4.1-flash', 'qwen3-235b-a22b-2507', 'glm-5.3-flash',
               'glm-5.3', 'muse-glimmer-30b', 'kimi-k3', 'gpt-5.4-mini', 'gemini-3.1-flash-lite',
               'claude-sonnet-5', 'qwen3.8-27b']
@@ -110,12 +121,13 @@ def flagged(rep) -> list:
 
 # ------------------------------------------------------------------ workers (the full run, gold)
 
-_PRE = None
+_PRE = _POST = None
 
 
-def _init(pre_src: str):
-    global _PRE
-    _PRE = load(pre_src, 'pre_d156_worker')
+def _init(pre_src: str, post_src: str | None):
+    global _PRE, _POST
+    _PRE = load(pre_src, 'pre_worker')
+    _POST = load(post_src, 'post_worker') if post_src else arith
 
 
 def _trace(job):
@@ -123,7 +135,7 @@ def _trace(job):
     model, item_id, text = job
     counts, changes = [], []
     for j, step in enumerate(e2_prm.steps_of(text)):
-        a, b = _PRE.check(step), arith.check(step)
+        a, b = _PRE.check(step), _POST.check(step)
         fa, fb = flagged(a), flagged(b)
         counts.append((len(a.claims), len(fa), len(b.claims), len(fb)))
         if bool(fa) != bool(fb):
@@ -134,13 +146,13 @@ def _trace(job):
 
 def _gold(job):
     item_id, solution = job
-    a, b = _PRE.check(solution), arith.check(solution)
+    a, b = _PRE.check(solution), _POST.check(solution)
     return item_id, len(a.claims), len(flagged(a)), len(b.claims), len(flagged(b))
 
 
 # ------------------------------------------------------------------ the four comparisons
 
-def pilot(pre) -> dict:
+def pilot(pre, post=arith) -> dict:
     """validate_scorer's pilot inputs and skip rule, per step, before and after."""
     from full_run_28092026.validate_scorer import pilot_inputs
     truth, keyfile, items, texts = pilot_inputs()
@@ -158,7 +170,7 @@ def pilot(pre) -> dict:
             continue
         traces += 1
         for j, (st, lab) in enumerate(zip(steps, t['steps'])):
-            c0, c1 = flagged(pre.check(st)), flagged(arith.check(st))
+            c0, c1 = flagged(pre.check(st)), flagged(post.check(st))
             f0, f1 = bool(c0), bool(c1)
             if lab['label'] == 'incorrect':
                 wrong = True
@@ -181,22 +193,23 @@ def pilot(pre) -> dict:
     return {'traces': traces, 'skipped': skipped, 'counts': cnt, 'moved': moved, 'away': away, 'changes': changes}
 
 
-def reading(pre) -> dict:
-    """The 220 flags D-154's expert read, before and after, on their own step."""
-    verdict = {r['code']: r['verdict'] for r in csv.DictReader(open(FLAGS / 'sample.csv', encoding='utf-8-sig'))}
+def reading(pre, post=arith, rnd: str = 'round1') -> dict:
+    """A round's flags, as the domain expert read them, before and after, on their own step."""
+    folder = FLAGS / rnd
+    verdict = {r['code']: r['verdict'] for r in csv.DictReader(open(folder / 'sample.csv', encoding='utf-8-sig'))}
     close = lambda a, b: abs(a - b) <= 1e-9 * max(1.0, abs(a), abs(b))    # noqa: E731
     out = collections.Counter()
-    for line in (FLAGS / 'sample.jsonl').read_text(encoding='utf-8').splitlines():
+    for line in (folder / 'sample.jsonl').read_text(encoding='utf-8').splitlines():
         c = json.loads(line)
         same = lambda fl: any(any(close(x, y) for x in f.left_value for y in c['left_value'])     # noqa: E731
                               and any(close(x, y) for x in f.right_value for y in c['right_value']) for f in fl)
-        before, after = flagged(pre.check(c['step_text'])), flagged(arith.check(c['step_text']))
+        before, after = flagged(pre.check(c['step_text'])), flagged(post.check(c['step_text']))
         out[('reproduced before', verdict[c['code']])] += same(before)
         out[(verdict[c['code']], 'the same claim' if same(after) else ('another claim' if after else 'none'))] += 1
     return out
 
 
-def full_run(pre_src: str, workers: int = 8) -> tuple[dict, list]:
+def full_run(pre_src: str, post_src: str | None = None, workers: int = 8) -> tuple[dict, list]:
     jobs = []
     for key in ROSTER_ALL:
         p = score.SCORES / 'main' / f'{key}.jsonl'
@@ -207,7 +220,7 @@ def full_run(pre_src: str, workers: int = 8) -> tuple[dict, list]:
         jobs += [(key, i, texts[i]) for i, r in rows.items() if r['status'] == 'answered']
     per = collections.defaultdict(collections.Counter)
     changes = []
-    with cf.ProcessPoolExecutor(workers, initializer=_init, initargs=(pre_src,)) as pool:
+    with cf.ProcessPoolExecutor(workers, initializer=_init, initargs=(pre_src, post_src)) as pool:
         for model, item_id, counts, ch in pool.map(_trace, jobs, chunksize=40):
             m = per[model]
             m['traces'] += 1
@@ -223,10 +236,10 @@ def full_run(pre_src: str, workers: int = 8) -> tuple[dict, list]:
     return per, changes
 
 
-def gold(pre_src: str, workers: int = 8) -> collections.Counter:
+def gold(pre_src: str, post_src: str | None = None, workers: int = 8) -> collections.Counter:
     items = score.pool_items()
     g = collections.Counter()
-    with cf.ProcessPoolExecutor(workers, initializer=_init, initargs=(pre_src,)) as pool:
+    with cf.ProcessPoolExecutor(workers, initializer=_init, initargs=(pre_src, post_src)) as pool:
         for _, ca, fa, cb, fb in pool.map(_gold, [(i, it['solution']) for i, it in items.items()], chunksize=40):
             g['items'] += 1
             g['claims before'] += ca
@@ -244,24 +257,41 @@ def prf(c) -> str:
     return f"{c['tp']}/{c['fp']}/{c['fn']} | {p:.3f} | {r:.3f}"
 
 
+def reading_rows(rd) -> list:
+    return ['| expert verdict | the same claim still flagged | another claim flagged in the step | no flag in the step |',
+            '|---|---:|---:|---:|'] + [f"| {v} | {rd[(v, 'the same claim')]} | {rd[(v, 'another claim')]} | "
+                                        f"{rd[(v, 'none')]} |" for v in ('checker', 'slip')]
+
+
 def main() -> int:
-    pre_src = source_at(PRE_FIX)
-    pre = load(pre_src, 'pre_d156')
-    now_sha = hashlib.sha256((EVAL / 'arith.py').read_bytes().replace(b'\r\n', b'\n')).hexdigest()
-    g = gold(pre_src)
-    pil = pilot(pre)
-    rd = reading(pre)
-    per, changes = full_run(pre_src)
+    import argparse
+    ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
+    ap.add_argument('--fix', type=int, default=1, choices=sorted(FIXES), help='1: D-156; 2: D-159')
+    fx = FIXES[ap.parse_args().fix]
+    pre_src = source_at(fx['pre'])
+    post_src = source_at(fx['post']) if fx['post'] else None
+    pre, post = load(pre_src, 'pre'), (load(post_src, 'post') if post_src else arith)
+    if fx['post']:
+        after = f"`arith.py` at `{fx['post'][:7]}`"
+    else:
+        sha = hashlib.sha256((EVAL / 'arith.py').read_bytes().replace(b'\r\n', b'\n')).hexdigest()
+        after = f'`arith.py` as it stands, SHA-256 (LF) `{sha[:16]}`'
+    g = gold(pre_src, post_src)
+    pil = pilot(pre, post)
+    rd = reading(pre, post, fx['design'])
+    regress = {r: reading(pre, post, r) for r in fx['regression']}
+    per, changes = full_run(pre_src, post_src)
+    CHANGES, PILOT_CHANGES = score.SCORES / fx['changes'], score.SCORES / fx['pilot_changes']
     for path, rows in ((CHANGES, changes), (PILOT_CHANGES, pil['changes'])):
         with open(path, 'w', encoding='utf-8', newline='\n') as fh:
             for c in rows:
                 fh.write(json.dumps(c, ensure_ascii=False) + '\n')
     mv = pil['moved']
-    unexplained = pil['away'] - EXCEPTIONS
+    unexplained = pil['away'] - fx['exceptions']
     ok = g['flagged after'] == 0 and not unexplained
-    L = ["# The digit rule's parser fix (D-156): before and after", '',
-         f'Generated by `digit_fix.py`; the comparison is defined in its docstring. Before: `arith.py` at '
-         f'`{PRE_FIX[:7]}`. After: `arith.py` as it stands, SHA-256 (LF) `{now_sha[:16]}`.', '',
+    L = [f"# The digit rule's parser fix ({fx['label']}): before and after", '',
+         f"Generated by `digit_fix.py --fix {ap.parse_args().fix}`; the comparison is defined in its docstring. "
+         f"Before: `arith.py` at `{fx['pre'][:7]}`. After: {after}.", '',
          '## Gold, every solution', '', '| | before | after |', '|---|---:|---:|',
          f"| claims checked | {g['claims before']} | {g['claims after']} |",
          f"| claims flagged | {g['flagged before']} | {g['flagged after']} |", '',
@@ -277,16 +307,19 @@ def main() -> int:
          f"{mv[('removed', 'correct')]}; from steps they call incorrect: {mv[('removed', 'incorrect')]}. Flags "
          f"added to steps they call incorrect: {mv[('added', 'incorrect')]}; to steps they call correct: "
          f"{mv[('added', 'correct')]}.", '',
-         "## The 220 flags the domain expert read (D-154)", '',
-         f"The pre-fix code reproduces {rd[('reproduced before', 'slip')] + rd[('reproduced before', 'checker')]} "
-         'of the 220 flags on their own step. After the fix, on the same steps:', '',
-         '| expert verdict | the same claim still flagged | another claim flagged in the step | no flag in the step |',
-         '|---|---:|---:|---:|']
-    for v in ('checker', 'slip'):
-        L.append(f"| {v} | {rd[(v, 'the same claim')]} | {rd[(v, 'another claim')]} | {rd[(v, 'none')]} |")
+         f"## The {sum(rd[(v, k)] for v in ('checker', 'slip') for k in ('the same claim', 'another claim', 'none'))} "
+         f"flags the domain expert read in {fx['design'].replace('round', 'round ')}, the ones this fix was built from", '',
+         f"The code before the fix reproduces {rd[('reproduced before', 'slip')] + rd[('reproduced before', 'checker')]} "
+         'of them on their own step. After the fix, on the same steps:', '']
+    L += reading_rows(rd)
     L += ['', 'The fix was built from these notes, so this shows it does what it was built to do; the fixed '
-          "rule's precision needs a fresh sample, read after the fix.", '',
-          '## The full run, answered traces', '',
+          "rule's precision needs a fresh sample, read after the fix.", '']
+    for r, rr in regress.items():
+        L += [f"## {r.replace('round', 'Round ')}'s flags, read before: its slips must stay flagged", '',
+              f"The code before this fix reproduces {rr[('reproduced before', 'slip')] + rr[('reproduced before', 'checker')]} "
+              "of them as the flags that fix left; after it, on the same steps:", '']
+        L += reading_rows(rr) + ['']
+    L += ['## The full run, answered traces', '',
           '| model | traces | claims checked, before / after | claims flagged, before / after | '
           'traces with a flag, before / after | steps: flag removed / added |', '|---|---:|---:|---:|---:|---:|']
     tot = collections.Counter()
@@ -304,13 +337,15 @@ def main() -> int:
           f"{tot['traces flagged after']} | {tot['steps flag removed']} / {tot['steps flag added']} |", '',
           f'The changed steps, with the claims each side flags, are in `scores/{CHANGES.name}` and '
           f'`scores/{PILOT_CHANGES.name}` (local).', '',
-          (f"Adopted (D-156): gold stays clean, and the {len(pil['away'])} pilot steps that move away from the "
-           "experts are the owner's documented exception: DeepSeek-R1 lines the old parser could not read, each a "
-           'real wrong digit at the precision it displays, which the step labels, judging engineering, accept.'
+          (f"Adopted ({fx['label']}): gold stays clean, and "
+           + (f"the {len(pil['away'])} pilot steps that move away from the experts are the owner's documented "
+              "exception: DeepSeek-R1 lines the old parser could not read, each a real wrong digit at the precision "
+              'it displays, which the step labels, judging engineering, accept.' if pil['away'] else
+              'no pilot step moves away from the experts.')
            if ok else 'NOT adopted: ' + ('gold has a flag. ' if g['flagged after'] else '') +
            (f'{len(unexplained)} pilot steps move away from the experts outside the documented exception: '
             + ', '.join(f'{c} step {j}' for c, j in sorted(unexplained)) + '.' if unexplained else ''))]
-    (HERE / 'DIGIT_FIX.md').write_text('\n'.join(L) + '\n', encoding='utf-8', newline='\n')
+    (HERE / fx['report']).write_text('\n'.join(L) + '\n', encoding='utf-8', newline='\n')
     print('\n'.join(L))
     return 0 if ok else 1
 
