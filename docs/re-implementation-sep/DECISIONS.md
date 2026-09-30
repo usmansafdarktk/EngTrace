@@ -6121,14 +6121,15 @@ another, so the ordering between arms is not stable under any resampling, which 
 exploitation.
 
 **Open.** E5 on the paraphrase arm (runbook section 4, about $3 at 277 kept pairs plus the 39 the judge
-would see anyway, since it runs on what is on disk) once approved; the private Kaggle copy of the arm's
-archive.
+would see anyway, since it runs on what is on disk) once approved.
+
+**Backup (2026-10-01).** The arm archived again with the experts' returns: `full_run_paraphrase_2026-10-01.zip`, 80 files checked member by member, sha256 `24d9f614…af9293`; uploaded in manual mode as the private Kaggle dataset `ayeshaiq/engtrace-full-run-paraphrase`, downloaded back and every member matched by path and hash (the one extra file is the checksum itself). The 30 September archive D-161 cites stays beside it.
 
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
-| D-161 | Run: E5 on the paraphrase arm, about $3 at 316 items (`PARAPHRASE_RUNBOOK.md` section 4), for Q5's E5 column; and the private Kaggle copy of `full_run_paraphrase_2026-09-30.zip` (manual mode, the owner's account) | Q5's E5 column in the paper |
+| D-161 | Run: E5 on the paraphrase arm, about $3 at 316 items (`PARAPHRASE_RUNBOOK.md` section 4), for Q5's E5 column. ~~The private Kaggle copy of the arm's archive~~ **Done 2026-10-01: `ayeshaiq/engtrace-full-run-paraphrase`, private, from `full_run_paraphrase_2026-10-01.zip` (80 files, the experts' returns included), downloaded back and matched member by member** | Q5's E5 column in the paper |
 | D-160 | Round 3 of the flag reading: the 190 claims in `scores/flag_review/round3/` (workbook and instructions), then `flag_sample --round 3 --merge <file>` and `--score --read-by "<who>"`, giving the corrected rule's precision on this roster; no round 4 | Q3 in the paper; the router's run |
 | D-159 | ~~Round 3 of the flag reading: the 181 claims in `scores/flag_review/round3/`~~ **Redrawn 2026-09-30, unread, after two review agents' corrections (D-160)** | — |
 | D-158 | ~~A second fix of the digit rule's parser from round 2's notes, measured by a round 3 (no round 4), or 0.752 reported as measured~~ **Decided 2026-09-30: the second fix, adopted with no pilot step moving away (D-159); round 3 drawn** | — |
