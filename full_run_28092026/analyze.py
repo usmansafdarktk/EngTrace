@@ -85,6 +85,9 @@ SCORES = HERE / 'scores'
 OUT = HERE / 'results'
 B = 10_000              # bootstrap draws for every interval (the plan)
 B_TEST = 100_000        # permutations / sign flips for every test (D-146; D-136 had 10,000)
+EQUIV_MARGIN = 0.05     # Q5's equivalence margin in answer-score points: the plan's largest detectable paired
+                        # difference (5.1 points at 15% discordance), fixed 2026-10-01 after the point estimates
+                        # were known and before the 90% intervals were computed (D-163)
 ROSTER = ['gpt-oss-20b', 'gemma-4-26b-a4b', 'deepseek-v4.1-flash', 'qwen3-235b-a22b-2507', 'glm-5.3-flash',
           'glm-5.3', 'muse-glimmer-30b', 'kimi-k3', 'gpt-5.4-mini', 'gemini-3.1-flash-lite', 'claude-sonnet-5']
 SET_ASIDE = ['qwen3.8-27b']
@@ -203,6 +206,18 @@ def cluster_mean(groups: dict[str, list[float]], seed: int) -> tuple[float, list
     rng = np.random.default_rng(seed)
     idx = rng.integers(0, len(tot), size=(B, len(tot)))
     return float(tot.sum() / cnt.sum()), pct(tot[idx].sum(axis=1) / cnt[idx].sum(axis=1)), int(cnt.sum())
+
+
+def cluster_boot(groups: dict[str, list[float]], seed: int) -> tuple[float, np.ndarray, int]:
+    """cluster_mean's point estimate with its bootstrap draws (the same draws, so the same 95% interval),
+    for an interval at another level as well (D-163)."""
+    if not groups:
+        return float('nan'), np.array([]), 0
+    tot = np.array([sum(v) for v in groups.values()])
+    cnt = np.array([len(v) for v in groups.values()])
+    rng = np.random.default_rng(seed)
+    idx = rng.integers(0, len(tot), size=(B, len(tot)))
+    return float(tot.sum() / cnt.sum()), tot[idx].sum(axis=1) / cnt[idx].sum(axis=1), int(cnt.sum())
 
 
 def sign_flip_p(d: np.ndarray, seed: int, draws: int = B_TEST) -> float:
@@ -500,10 +515,16 @@ def accepted_pairs() -> dict | None:
 
 
 def paired(main_rows, para_rows, ids, fn, seed):
+    """Second arm minus main, paired by item: the item mean with its template bootstrap at 95% and, from the
+    same draws, at 90%, which is the two-one-sided-tests reading against EQUIV_MARGIN (D-163)."""
     diff = per_template([{'template_id': main_rows[x]['template_id'], 'd': fn(para_rows[x]) - fn(main_rows[x])}
                          for x in ids], lambda r: r['d'])
-    point, c, n = cluster_mean(diff, seed)
-    return {'items': n, 'templates': len(diff), 'diff': point, 'ci': c,
+    point, draws, n = cluster_boot(diff, seed)
+    nan = [float('nan'), float('nan')]
+    c = pct(draws) if n else nan
+    c90 = [float(np.nanpercentile(draws, 5)), float(np.nanpercentile(draws, 95))] if n else nan
+    return {'items': n, 'templates': len(diff), 'diff': point, 'ci': c, 'ci90': c90,
+            'within_margin': bool(n and -EQUIV_MARGIN <= c90[0] and c90[1] <= EQUIV_MARGIN),
             'p': sign_flip_p(np.array([sum(v) for v in diff.values()]), seed + 50)}
 
 
@@ -553,8 +574,65 @@ def q5(main, para, keys, keep=None, e5_main=None, e5_para=None):
                 S[0, m, j] += main[k][x]['score']
                 S[1, m, j] += para[k][x]['score']
                 N[:, m, j] += 1
-        tau = {**kendall_boot(S, N, 990), 'items': len(common)}
-    return {'models': out, 'tau': tau, 'expert_check': None if keep is None else len(keep)}
+        tau = {**kendall_boot(S, N, 990), 'items': len(common), 'noise_arm': tau_noise_arm(main, tested, common)}
+    return {'models': out, 'tau': tau, 'expert_check': None if keep is None else len(keep),
+            'margin': EQUIV_MARGIN, 'vs_repeats': vs_repeats(main, para, tested, keep, out)}
+
+
+def tau_noise_arm(main, keys, ids, splits: int = 200, seed: int = 4243) -> dict:
+    """The tau noise floor at the paraphrase arm's own size and template mix: for each template with k
+    pairs in the arm, 2k of the main run's items drawn without replacement and split into two halves of
+    k (k halved where a template has fewer than 2k items); the models ordered on each half by the
+    item-weighted mean, as kendall_boot orders the two arms; tau between the two orderings (D-163)."""
+    rng = np.random.default_rng(seed)
+    ref = main[keys[0]]
+    k_by_t = collections.Counter(ref[x]['template_id'] for x in ids)
+    items_by_t = collections.defaultdict(list)
+    for x in sorted(ref):
+        items_by_t[ref[x]['template_id']].append(x)
+    taus, n_half = [], 0
+    for _ in range(splits):
+        a_ids, b_ids = [], []
+        for t, k in sorted(k_by_t.items()):
+            pool = items_by_t[t]
+            k = min(k, len(pool) // 2)
+            if k == 0:
+                continue
+            pick = rng.choice(len(pool), size=2 * k, replace=False)
+            a_ids += [pool[i] for i in pick[:k]]
+            b_ids += [pool[i] for i in pick[k:]]
+        n_half = len(a_ids)
+        a = [np.mean([main[m][x]['score'] for x in a_ids]) for m in keys]
+        b = [np.mean([main[m][x]['score'] for x in b_ids]) for m in keys]
+        taus.append(stats.kendalltau(a, b).statistic)
+    taus = np.array(taus)
+    return {'splits': splits, 'items_per_half': n_half, 'templates': len(k_by_t), 'median': float(np.median(taus)),
+            'q1': float(np.percentile(taus, 25)), 'q3': float(np.percentile(taus, 75)),
+            'p5': float(np.percentile(taus, 5)), 'p95': float(np.percentile(taus, 95))}
+
+
+def vs_repeats(main, para, keys, keep, q5_rows) -> dict:
+    """The paraphrase difference beside the run-to-run differences of the models with decoding repeats:
+    repeat minus main on the repeat items, paired as Q5 pairs; and both on the kept pairs the two
+    subsamples share (D-163)."""
+    out = {}
+    by_model = {r['model']: r for r in q5_rows}
+    for i, k in enumerate(keys):
+        arms = {v: rows for v in REPEATS if (rows := load(v, k))}
+        if not arms or not para.get(k) or k not in by_model:
+            continue
+        rep_ids = sorted(set.intersection(*(set(r) for r in arms.values())) & set(main[k]))
+        para_ids = set(para[k]) & set(main[k]) & (keep if keep is not None else set(para[k]))
+        common = sorted(set(rep_ids) & para_ids)
+        reps = {v: paired(main[k], rows, rep_ids, lambda r: r['score'], 5900 + i) for v, rows in arms.items()}
+        pr = by_model[k]
+        out[k] = {'paraphrase': {x: pr[x] for x in ('items', 'diff', 'ci')}, 'repeats': reps,
+                  'common_items': len(common),
+                  'paraphrase_on_common': paired(main[k], para[k], common, lambda r: r['score'], 7900 + i) if common else None,
+                  'repeats_on_common': {v: paired(main[k], rows, common, lambda r: r['score'], 6900 + i)
+                                        for v, rows in arms.items()} if common else {},
+                  'abs_within_repeat_spread': bool(abs(pr['diff']) <= max(abs(r['diff']) for r in reps.values()))}
+    return out
 
 
 def tau_noise(runs, keys, splits: int = 200, seed: int = 4242) -> dict:
@@ -973,6 +1051,40 @@ def render(res) -> str:
             L += ['', f"Kendall's tau between the models' answer scores on the originals and on the paraphrases, over "
                   f"the {t['items']} items every tested model holds: {t['tau']:.3f}, 95% CI {ci(t['ci'])}; the noise "
                   f"floor for tau on this roster is {res['sensitivity']['tau_noise']['median']:.3f} (below)."]
+            na = t.get('noise_arm')
+            if na:
+                L += ['', f"The noise floor at the arm's own size and template mix (D-163): two disjoint draws of "
+                      f"{na['items_per_half']} main-run items with the arm's per-template counts over its {na['templates']} "
+                      f"templates, the models ordered on each, {na['splits']} draws: median tau {na['median']:.3f}, quartiles "
+                      f"{na['q1']:.3f} to {na['q3']:.3f}, 5th to 95th percentile {na['p5']:.3f} to {na['p95']:.3f}. This, not the "
+                      f"roster-wide floor (halves of 7 or 8 items per template), is the comparison for the arm's tau."]
+        margin = res['q5'].get('margin')
+        if margin is not None:
+            L += ['', f"**Bounds (D-163).** The same bootstrap's 90% interval per model, read against a margin of "
+                  f"±{margin:.2f} in answer score: a model is within the margin when the whole interval is (the "
+                  f"two-one-sided-tests rule at 5%). The margin is the plan's largest detectable paired difference "
+                  f"(5.1 points at 15% discordance); it was fixed after the point estimates were known and before "
+                  f"these intervals were computed.", '',
+                  '| model | answer score diff | 90% CI | within the margin |', '|---|---:|---:|---|']
+            for r in res['q5']['models']:
+                L.append(f"| `{r['model']}` | {r['diff']:+.3f} | {ci(r['ci90'])} | {'yes' if r['within_margin'] else 'no'} |")
+        vr = res['q5'].get('vs_repeats')
+        if vr:
+            L += ['', "**Against run-to-run noise (D-163).** For the models with decoding repeats: the paraphrase "
+                  "difference beside each repeat minus the main run on the 300 repeat items, each paired by item with "
+                  "the same template bootstrap; and both on the kept pairs the two subsamples share.", '',
+                  '| model | paraphrase − original (pairs) | ' + ' | '.join(f'{v} − main (300)' for v in REPEATS)
+                  + ' | shared items | paraphrase on them | repeats on them | |paraphrase| within the repeats\' spread |',
+                  '|---|---:|' + '---:|' * len(REPEATS) + '---:|---:|---:|---|']
+            for k, v in vr.items():
+                p = v['paraphrase']
+                reps = ' | '.join((f"{v['repeats'][x]['diff']:+.3f} {ci(v['repeats'][x]['ci'])}" if x in v['repeats'] else '')
+                                  for x in REPEATS)
+                pc = v['paraphrase_on_common']
+                pc_cell = f"{pc['diff']:+.3f} {ci(pc['ci'])}" if pc else ''
+                rc_cell = ', '.join(f"{v['repeats_on_common'][x]['diff']:+.3f}" for x in REPEATS if x in v['repeats_on_common'])
+                L.append(f"| `{k}` | {p['diff']:+.3f} {ci(p['ci'])} ({p['items']}) | {reps} | {v['common_items']} | {pc_cell} | "
+                         f"{rc_cell} | {'yes' if v['abs_within_repeat_spread'] else 'no'} |")
     else:
         L.append('Not run yet.')
     sens = res['sensitivity']
@@ -1188,6 +1300,10 @@ def selftest() -> int:
         bad.append('q5 found a loss that is not there')
     if not (r5['tau']['tau'] > 0.6 and r5['tau']['items'] == 450):
         bad.append(f"q5 tau {r5['tau']}")
+    if not (all(got[f'm{m}']['within_margin'] for m in range(3, 11)) and not any(got[f'm{m}']['within_margin'] for m in range(3))):
+        bad.append('q5 bounds: a zero difference must sit within the margin and a 9-point loss outside it')
+    if not np.isfinite(r5['tau']['noise_arm']['median']):
+        bad.append(f"q5 arm-size noise floor {r5['tau']['noise_arm']}")
     if got['m0']['same_provider']['items'] != 300 or got['m0']['e3']['diff'] != 0.0:
         bad.append(f"q5 same-provider or e3 columns {got['m0']['same_provider']} {got['m0']['e3']}")
     # Q3's judged columns on two templates of a solved and a wrong trace each, answers worked by hand;
