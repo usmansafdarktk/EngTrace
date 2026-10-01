@@ -6065,7 +6065,7 @@ template exploitation. Q5 is **provisional** until the experts' files are all sc
 
 **Committed as `f8b63fc` under the number D-160 by mistake; D-160 is the review sample's (`afdc05b`, `3847fb5`).**
 
-**Open.** E5 on the paraphrase arm (runbook section 4, about $3 at 316 items) once approved; the experts'
+**Open.** *(Both closed in D-162: E5 on the arm ran for $4.56, the experts returned in full.)* E5 on the paraphrase arm (runbook section 4, about $3 at 316 items) once approved; the experts'
 returns (a later entry when they are in).
 
 ## D-162 — The experts' check of the paraphrases returned in full: 39 of 316 pairs rejected, Q5 final; a tau that had ignored the rejections fixed
@@ -6120,7 +6120,7 @@ has returned (the self-test, which passes no check, is unchanged). Over the 277:
 another, so the ordering between arms is not stable under any resampling, which is the reading, not
 exploitation.
 
-**Open.** E5 on the paraphrase arm (runbook section 4, about $3 at 277 kept pairs plus the 39 the judge
+**Open.** *(Closed below: E5 on the arm ran for $4.56.)* E5 on the paraphrase arm (runbook section 4, about $3 at 277 kept pairs plus the 39 the judge
 would see anyway, since it runs on what is on disk) once approved.
 
 **E5 on the arm (2026-09-30, approved at $10 of new spend).** 1,227 judge calls over the 316 paraphrase traces' milestones, all returned after one re-run for 3 failures; **$4.56** against the $4.06 estimate. The first launch passed `--max-usd 10`, which the stage reads as a cumulative cap over the store (already $36.30 from the main arm), so it made no call; it ran at `--max-usd 46.30`, the same $10, and the runbook now says so. Q5's E5-strict difference, paraphrase minus original over the kept pairs, lies between -0.014 (`gpt-oss-20b`) and +0.018 (`gemma-4-26b-a4b`, CI 0.000 to 0.037) for every model, every other interval spanning zero: the reasoning the judge reads holds under the rewording as the answers do.

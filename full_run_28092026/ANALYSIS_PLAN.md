@@ -127,6 +127,13 @@ widens it:
 |---|---|---|---|
 | detectable paired difference | 3.0 points | 4.2 points | 5.1 points |
 
+*As run (D-157, D-161, D-162; a note added 2026-10-01, the plan above unchanged).* The writer was
+Mistral Large 3. 316 of the 450 items got a paraphrase that passed the script's checks, after its
+notation was restored deterministically where the writer had used Unicode the original lacks. The
+experts kept 277 of them, over 115 of the 150 templates. With 277 pairs, the detectable difference
+above becomes 3.8, 5.3 and 6.5 points (2.80 x sqrt(d / 277)). E5-strict was added to Q5's paired
+columns, as D-149 provided.
+
 *Additions, 2026-09-30 (D-149):* beside the answer score, the paired difference in E3 milestone coverage
 on the items with milestones, and in E5-strict once E5 has run on both arms (the coverage delta
 NEXT_CYCLE_REVIEW section 6 asks for); and the answer-score difference on the pairs both arms served from

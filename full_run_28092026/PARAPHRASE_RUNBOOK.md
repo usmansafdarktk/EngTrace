@@ -1,5 +1,12 @@
 # Stream 2 runbook: the paraphrase experiment (Q5)
 
+**Status, 2026-10-01: done.** 316 of the 450 items got a paraphrase that passed the checks (D-157,
+$0.42); the eleven models answered them on 30 September with every served model as in the main run
+(D-161, $34.17); all fifteen experts returned, keeping 277 pairs over 115 templates and rejecting 39
+(D-162); E5 ran on the arm ($4.56, D-162). Q5 in `results/RESULTS.md` is final. The arm is archived
+locally and as the private Kaggle dataset `ayeshaiq/engtrace-full-run-paraphrase`. Stream 2 cost
+$39.15 in all. The rest of this runbook is the procedure as run, kept for a re-run.
+
 What it tests: whether the models exploit the templates' fixed wording. Each of 450 pool items (the
 1st, 6th and 11th of every template) gets one paraphrase that keeps every number, unit, symbol and
 part in place; an expert of the item's branch confirms it is the same problem with the same answer;
@@ -11,9 +18,9 @@ test, since the templates have been public since January (NEXT_CYCLE_REVIEW sect
 
 Three steps, in this order; 2 and 3 run in parallel once 1 is done:
 
-1. **Write and check the paraphrases** (Mistral Large 3, $0.18 to $0.54; minutes when Mistral's endpoint is open, an hour or more when it throttles).
-2. **The experts' check**: kits out, verdicts back (free; the long pole).
-3. **Inference on the paraphrases** (about $49) and scoring; then the analysis.
+1. **Write and check the paraphrases** (Mistral Large 3, $0.18 to $0.54 a run; minutes when Mistral's endpoint is open, hours when it throttles; on 30 September four prompts and $0.42 in all, D-157).
+2. **The experts' check**: kits out, verdicts back (free; on 30 September all fifteen returned overnight).
+3. **Inference on the paraphrases** (the dry run prices it on the main run's bills for the items that passed: $33.05 for 316, $34.17 billed) and scoring; then the analysis.
 
 The reasons behind each rule are in `ANALYSIS_PLAN.md` Q5, D-141, D-149 and D-150. Every paid step
 needs the owner's approval on its dry-run estimate.
@@ -38,7 +45,7 @@ python -m full_run_28092026.subsamples               # 450 paraphrase items; 300
 
 - [ ] `OPENROUTER_API_KEY` is set in `.env`; the writer and the roster both go through OpenRouter.
 - [ ] `full_run_28092026/pool/` and `traces/` are present (restore from the private backups if not).
-- [ ] The experts' roster is the layer-2 one (`template_annotation_23092026/layer2/build_tasks.roster`, the pilot's fifteen unless `layer2/annotators.json` overrides it): three per branch, so each expert gets ten templates, 30 items.
+- [ ] The experts' roster is the layer-2 one (`template_annotation_23092026/layer2/build_tasks.roster`, the pilot's fifteen unless `layer2/annotators.json` overrides it): three per branch, so each expert gets ten templates, up to 30 items (15 to 26 on 30 September, after the items with no paraphrase left).
 - [ ] The spend for the step you are about to run is approved.
 
 ## 1. Write and check the paraphrases
@@ -95,8 +102,8 @@ and the text they need; `paraphrase/tasks/keyfile.json` maps codes to items and 
 **Send each expert** `app.py`, `README.txt`, `guide.md` and their own `kit_<id>/` folder, and nothing
 else. A message that has worked for the earlier rounds:
 
-> Thank you again for the certification rounds. One more short task, about an hour: 30 problems
-> from your branch, each shown as the original and a reworded version. For each, three questions:
+> Thank you again for the certification rounds. One more short task, under an hour: <the count in
+> their kit, `--build` prints it> problems from your branch, each shown as the original and a reworded version. For each, three questions:
 > is it the same problem (same givens, same quantities asked, same conditions); does the original's
 > answer still answer it exactly; does the rewording add an ambiguity, an error or a hint. The app
 > shows plain text, saves after every item, and can be paused. Unzip the folder, `pip install
@@ -137,19 +144,20 @@ entries in `models.json` (the original `qwen3-235b-a22b`, the set-aside `qwen3.8
 called by a bare run.
 
 ```bash
-python -m full_run_28092026.run_traces --variant paraphrase --dry-run     # free: about $49 on the main run's bills for these items
+python -m full_run_28092026.run_traces --variant paraphrase --dry-run     # free: the main run's bills for the items that passed ($33.05 for 316)
 ```
 
-Then one process per model, as the main run was launched (`INFERENCE_GUIDE.md` step 4):
+Then one process per model, each under the keep-awake launcher with its own log, as it was run on 30
+September (the harness has no spend cap; the approved figure is watched through `--status`):
 
 ```powershell
 New-Item -ItemType Directory -Force full_run_28092026\traces\paraphrase | Out-Null
 $models = "gpt-oss-20b","gemma-4-26b-a4b","deepseek-v4.1-flash","qwen3-235b-a22b-2507","glm-5.3-flash",
           "glm-5.3","muse-glimmer-30b","kimi-k3","gpt-5.4-mini","gemini-3.1-flash-lite","claude-sonnet-5"
 foreach ($m in $models) {
-  Start-Process python -ArgumentList "-m full_run_28092026.run_traces --variant paraphrase --model $m --workers 15 --yes" `
-    -RedirectStandardOutput "full_run_28092026\traces\paraphrase\$m.log" `
-    -RedirectStandardError "full_run_28092026\traces\paraphrase\$m.err" -NoNewWindow
+  Start-Process powershell -WindowStyle Hidden -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-File',
+    'full_run_28092026\keepawake_run.ps1','-Log',"full_run_28092026\traces\paraphrase\$m.log",
+    '-m','full_run_28092026.run_traces','--variant','paraphrase','--model',$m,'--workers','15','--yes'
 }
 ```
 
@@ -163,9 +171,10 @@ python -m full_run_28092026.trace_review --variant paraphrase          # writes 
 The review must show, per model: items = the number of passing paraphrases, 2 final rows 0, not a
 frozen item 0, prompt "pilot", one request set, one served model and **"as main" yes**. A model served
 by a different checkpoint than the main run breaks the pairing for that model; record it and report
-that model's Q5 row with the caveat. The dearest models are Kimi K3 (about $19.6), Claude Sonnet 5
-($11.8) and GLM-5.3 ($10.9); an empty row scores 0 as in the main run. Only unrun items and service
-failures are called again on a re-run.
+that model's Q5 row with the caveat. The dearest models on 30 September were Kimi K3 ($18.60 against a
+$13.08 estimate), Claude Sonnet 5 ($8.10) and GLM-5.3 ($3.03 against $7.45, routed over cheaper
+providers); an empty row scores 0 as in the main run. Only unrun items and service failures are called
+again on a re-run: Kimi K3 needed three more passes for Moonshot's refusals.
 
 **Back up the arm** as the main run's traces were (`INFERENCE_GUIDE.md` step 6), with the D-151 archive
 script, which checks every member and writes the checksum; the paraphrase folder holds the attempts,
@@ -194,7 +203,7 @@ Commit `TRACE_REVIEW_paraphrase.md`, `trace_review_paraphrase.json` and the thre
 Record the run in DECISIONS as the main run's was (D-126, D-130): rows, empties, billed in the rows
 and by the account, served models against the main run's.
 
-## 4. E5 on the paraphrase arm (optional, about $5)
+## 4. E5 on the paraphrase arm (optional; $4.06 estimated, $4.56 billed on 30 September)
 
 Only after stream 1's E5 has run on the main traces, since Q5's E5 column is a paired difference and
 needs both arms:
@@ -214,7 +223,7 @@ and the same cumulative cap.
 
 | Committed | Local only, gitignored |
 |---|---|
-| `paraphrase/manifest.jsonl` (hashes and check results, no text), `PARAPHRASE.md`, `PARAPHRASE_REVIEW.md` | `paraphrase/attempts.jsonl`, `pool.jsonl`, `tasks/`, `dist/`, `returned/`, `accepted.json` |
+| `paraphrase/manifest.jsonl` (hashes and check results, no text), `PARAPHRASE.md`, `PARAPHRASE_REVIEW.md` | `paraphrase/attempts*.jsonl` (every prompt's), `pool.jsonl`, `tasks/`, `dist/`, `returned/`, `experts_filled_paraphrases/`, `accepted.json` |
 | `TRACE_REVIEW_paraphrase.md`, `trace_review_paraphrase.json` | `traces/paraphrase/`, `scores/paraphrase/` |
 | `results/RESULTS.md`, `results.json`, `per_template.csv` | the experts' returned files |
 
@@ -224,8 +233,9 @@ and the same cumulative cap.
   command and only those items are asked again. "Rate-limited upstream" is Mistral throttling
   OpenRouter's shared capacity, not the worker count: on 30 September most calls were refused at eight
   workers and at two alike, and the throughput scaled with the workers. A refused call bills nothing, so
-  the writer retries each call up to nine times with a jittered backoff (`RETRY_SLEEPS`) before writing
-  a service failure; if a run still defers many items, re-run it or wait for the throttle to ease.
+  the writer tries each call fourteen times over about three and a half minutes with a jittered backoff
+  (`RETRY_SLEEPS`) before writing a service failure, and `--until-done` passes again over the deferred
+  items until every item is resolved (six passes on 30 September).
 - **Most attempts fail the tokens or numbers check.** Look at `tokens_missing` and `numbers_changed` in
   `attempts.jsonl` before anything else. On 30 September the first prompt lost most attempts to
   reformatted notation (LaTeX, `$` delimiters, Unicode superscripts and minus signs, `·` for `*`) and the
@@ -258,8 +268,8 @@ and the same cumulative cap.
 
 ## 7. Done means
 
-- [ ] `PARAPHRASE.md` and `paraphrase/manifest.jsonl` committed; the pool and seed of the arm backed up with the traces.
-- [ ] All fifteen experts' files returned and scored; `PARAPHRASE_REVIEW.md` committed with 0 outstanding.
-- [ ] Traces for all eleven models, `missing` 0, `TRACE_REVIEW_paraphrase.md` with "as main" yes throughout, backed up.
-- [ ] `scores/paraphrase/` scored; `results/RESULTS.md` Q5 no longer marked provisional; committed and pushed.
-- [ ] DECISIONS entries for the writing run, the experts' returns and the inference run.
+- [x] `PARAPHRASE.md` and `paraphrase/manifest.jsonl` committed; the arm backed up with the traces (`full_run_paraphrase_2026-10-01.zip`, local and on Kaggle).
+- [x] All fifteen experts' files returned and scored; `PARAPHRASE_REVIEW.md` committed with 0 outstanding.
+- [x] Traces for all eleven models, `missing` 0, `TRACE_REVIEW_paraphrase.md` with "as main" yes throughout, backed up.
+- [x] `scores/paraphrase/` scored; `results/RESULTS.md` Q5 no longer marked provisional; committed and pushed.
+- [x] DECISIONS entries for the writing run (D-157), the inference run (D-161) and the experts' returns and E5 (D-162).

@@ -7,7 +7,9 @@ analysis, the backups and the record. It is written for a fresh session, in the 
 happen, with the output each command must give before the next is run.
 
 The paraphrase arm (Q5) is a separate stream with its own runbook, `PARAPHRASE_RUNBOOK.md`; the only
-point where the two meet is E5 on the paraphrase traces, which needs this stream's E5 first.
+point where the two meet is E5 on the paraphrase traces, which needs this stream's E5 first. That
+stream is done, E5 on its traces included (2026-10-01, D-157, D-161, D-162); its E5 replies are in
+the same store, `scores/_judge/e5_replies.jsonl`, and count toward the same cumulative cap.
 
 The reasons behind each rule are in `README.md`, `ANALYSIS_PLAN.md` and DECISIONS D-134 to D-150.
 Every paid step needs the owner's approval on its dry-run estimate; nothing here starts a paid call

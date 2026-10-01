@@ -7,6 +7,13 @@ run (D-141, D-142). Two independent reviews of the evaluation machinery on 2026-
 in response are recorded in D-143 to D-149; the results as they stand are `full_run_28092026/results/RESULTS.md`,
 and the remaining paid steps and open calls are in DECISIONS.md's "Open decisions".
 
+*Update, 2026-10-01.* The paraphrase test of section 6 is done, on the 450-item subsample of section
+9.4 rather than the whole pool. Mistral Large 3 wrote the paraphrases. 316 passed the script's checks
+and the branch experts kept 277, over 115 templates. All eleven models ran on them, and E5 too. No
+model's answer score, E3 coverage or E5-strict changes measurably between original and paraphrase
+(`results/RESULTS.md` Q5; D-157, D-161, D-162). It cost $39.15, against the about $97 that section
+9.7's recount set aside for it.
+
 Written 2026-09-27 against the May 2026 submission (`docs/_ARR_May__EngTrace.pdf`), both
 rebuttals (`docs/EngTrace Rebuttals Jan 2026.docx`, `docs/EngTrace_Rebuttal_Jul2026 (1).docx`),
 the revision letter, `docs/re-implementation-sep/EngTrace_Suggested_Actions.pdf`, and the

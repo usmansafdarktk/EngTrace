@@ -148,7 +148,8 @@ python -m full_run_28092026.analyze                 # free: Q3's E5 and router c
   of the digit rule's flags (`flag_sample.py`, `FLAG_REVIEW.md`), the analysis, the backups and the
   record: `EVALUATION_GUIDE.md`.
 - **Stream 2, the paraphrase experiment (Q5):** writing and checking the paraphrases, the experts'
-  check, the inference on the paraphrases, scoring and analysis: `PARAPHRASE_RUNBOOK.md`.
+  check, the inference on the paraphrases, scoring and analysis: `PARAPHRASE_RUNBOOK.md`. **Done
+  2026-10-01** (D-157, D-161, D-162): 277 expert-kept pairs over 115 templates, Q5 final, $39.15.
 
 `trace_review.py --variant <name>` reviews a variant's traces as it reviewed the main run's, checking a
 paraphrase row against `paraphrase/manifest.jsonl` and the original's hash, and each model's served id
@@ -164,11 +165,14 @@ kits and scores their returns; `paraphrase_app.py` is the app shipped in them, a
 `paraphrase_guide.md` the guide. The paraphrase text, the kits and the returns stay local; the
 committed record is `paraphrase/manifest.jsonl` (hashes only), `PARAPHRASE.md` and
 `PARAPHRASE_REVIEW.md`. A pair the experts have not yet returned is kept provisionally and counted as
-outstanding; only a rejected pair leaves both arms.
+outstanding; only a rejected pair leaves both arms. Before its checks, `paraphrase.py` restores the
+original's ASCII notation where the writer used Unicode the original lacks (D-157).
 
 ```bash
 python -m full_run_28092026.paraphrase --dry-run                                  # free
-python -m full_run_28092026.paraphrase --yes                                      # bills, once approved
+python -m full_run_28092026.paraphrase --yes --limit 50                           # bills: a pilot, 10 items per branch
+python -m full_run_28092026.paraphrase --yes --until-done --workers 16            # bills, once approved
+python -m full_run_28092026.paraphrase --check                                    # free: re-checks the stored attempts
 python -m full_run_28092026.paraphrase_kit --build                                # free: the kits
 python -m full_run_28092026.run_traces --variant paraphrase --dry-run             # free
 python -m full_run_28092026.score --variant paraphrase                            # free, after the run
