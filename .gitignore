@@ -84,3 +84,10 @@ full_run_28092026/paraphrase/dist/
 full_run_28092026/paraphrase/returned/
 full_run_28092026/paraphrase/experts_filled_paraphrases/
 full_run_28092026/paraphrase/accepted.json
+
+# docs/related_work_oct2026: the PDFs of cited and candidate papers and their extracted text
+# are NOT committed (size, copyright). papers.json, candidates/*.json, MANIFEST.json and
+# fetch_papers.py re-acquire and verify them on any checkout.
+docs/related_work_oct2026/papers/
+docs/related_work_oct2026/text/
+docs/related_work_oct2026/bib_raw/

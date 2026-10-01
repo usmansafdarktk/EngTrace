@@ -1,0 +1,2360 @@
+{
+ "generated_utc": "2026-10-01T17:19:49Z",
+ "generator": "docs/related_work_oct2026/check_arxiv_abs.py",
+ "entries": {
+  "austin2021mbpp": {
+   "arxiv": "2108.07732",
+   "url": "https://arxiv.org/abs/2108.07732",
+   "http": 200,
+   "catalogue_title": "Program Synthesis with Large Language Models",
+   "abs_title": "Program Synthesis with Large Language Models",
+   "abs_authors": [
+    "Jacob Austin",
+    "Augustus Odena",
+    "Maxwell Nye",
+    "Maarten Bosma",
+    "Henryk Michalewski",
+    "David Dohan",
+    "Ellen Jiang",
+    "Carrie Cai",
+    "Michael Terry",
+    "Quoc Le",
+    "Charles Sutton"
+   ],
+   "comments": "Jacob and Augustus contributed equally",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2021-08-16"
+    }
+   ],
+   "latest_version": 1,
+   "latest_date": "2021-08-16",
+   "checked_utc": "2026-10-01T17:16:44Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "chen2021humaneval": {
+   "arxiv": "2107.03374",
+   "url": "https://arxiv.org/abs/2107.03374",
+   "http": 200,
+   "catalogue_title": "Evaluating Large Language Models Trained on Code",
+   "abs_title": "Evaluating Large Language Models Trained on Code",
+   "abs_authors": [
+    "Mark Chen",
+    "Jerry Tworek",
+    "Heewoo Jun",
+    "Qiming Yuan",
+    "Henrique Ponde de Oliveira Pinto",
+    "Jared Kaplan",
+    "Harri Edwards",
+    "Yuri Burda",
+    "Nicholas Joseph",
+    "Greg Brockman",
+    "Alex Ray",
+    "Raul Puri",
+    "Gretchen Krueger",
+    "Michael Petrov",
+    "Heidy Khlaaf",
+    "Girish Sastry",
+    "Pamela Mishkin",
+    "Brooke Chan",
+    "Scott Gray",
+    "Nick Ryder",
+    "Mikhail Pavlov",
+    "Alethea Power",
+    "Lukasz Kaiser",
+    "Mohammad Bavarian",
+    "Clemens Winter",
+    "Philippe Tillet",
+    "Felipe Petroski Such",
+    "Dave Cummings",
+    "Matthias Plappert",
+    "Fotios Chantzis",
+    "Elizabeth Barnes",
+    "Ariel Herbert-Voss",
+    "William Hebgen Guss",
+    "Alex Nichol",
+    "Alex Paino",
+    "Nikolas Tezak",
+    "Jie Tang",
+    "Igor Babuschkin",
+    "Suchir Balaji",
+    "Shantanu Jain",
+    "William Saunders",
+    "Christopher Hesse",
+    "Andrew N. Carr",
+    "Jan Leike",
+    "Josh Achiam",
+    "Vedant Misra",
+    "Evan Morikawa",
+    "Alec Radford",
+    "Matthew Knight",
+    "Miles Brundage",
+    "Mira Murati",
+    "Katie Mayer",
+    "Peter Welinder",
+    "Bob McGrew",
+    "Dario Amodei",
+    "Sam McCandlish",
+    "Ilya Sutskever",
+    "Wojciech Zaremba"
+   ],
+   "comments": "corrected typos, added references, added authors, added acknowledgements",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2021-07-07"
+    },
+    {
+     "version": 2,
+     "date": "2021-07-14"
+    }
+   ],
+   "latest_version": 2,
+   "latest_date": "2021-07-14",
+   "checked_utc": "2026-10-01T17:16:48Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "chen2023frugalgpt": {
+   "arxiv": "2305.05176",
+   "url": "https://arxiv.org/abs/2305.05176",
+   "http": 200,
+   "catalogue_title": "FrugalGPT: How to Use Large Language Models While Reducing Cost and Improving Performance",
+   "abs_title": "FrugalGPT: How to Use Large Language Models While Reducing Cost and Improving Performance",
+   "abs_authors": [
+    "Lingjiao Chen",
+    "Matei Zaharia",
+    "James Zou"
+   ],
+   "comments": null,
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2023-05-09"
+    }
+   ],
+   "latest_version": 1,
+   "latest_date": "2023-05-09",
+   "checked_utc": "2026-10-01T17:19:11Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "cheng2024elecbench": {
+   "arxiv": "2407.05365",
+   "url": "https://arxiv.org/abs/2407.05365",
+   "http": 200,
+   "catalogue_title": "ElecBench: a Power Dispatch Evaluation Benchmark for Large Language Models",
+   "abs_title": "ElecBench: a Power Dispatch Evaluation Benchmark for Large Language Models",
+   "abs_authors": [
+    "Xiyuan Zhou",
+    "Huan Zhao",
+    "Yuheng Cheng",
+    "Yuji Cao",
+    "Gaoqi Liang",
+    "Guolong Liu",
+    "Wenxuan Liu",
+    "Yan Xu",
+    "Junhua Zhao"
+   ],
+   "comments": null,
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2024-07-07"
+    },
+    {
+     "version": 2,
+     "date": "2024-08-11"
+    }
+   ],
+   "latest_version": 2,
+   "latest_date": "2024-08-11",
+   "checked_utc": "2026-10-01T17:16:53Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "cobbe2021gsm8k": {
+   "arxiv": "2110.14168",
+   "url": "https://arxiv.org/abs/2110.14168",
+   "http": 200,
+   "catalogue_title": "Training Verifiers to Solve Math Word Problems",
+   "abs_title": "Training Verifiers to Solve Math Word Problems",
+   "abs_authors": [
+    "Karl Cobbe",
+    "Vineet Kosaraju",
+    "Mohammad Bavarian",
+    "Mark Chen",
+    "Heewoo Jun",
+    "Lukasz Kaiser",
+    "Matthias Plappert",
+    "Jerry Tworek",
+    "Jacob Hilton",
+    "Reiichiro Nakano",
+    "Christopher Hesse",
+    "John Schulman"
+   ],
+   "comments": null,
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2021-10-27"
+    },
+    {
+     "version": 2,
+     "date": "2021-11-18"
+    }
+   ],
+   "latest_version": 2,
+   "latest_date": "2021-11-18",
+   "checked_utc": "2026-10-01T17:16:57Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "deng2024contamination": {
+   "arxiv": "2311.09783",
+   "url": "https://arxiv.org/abs/2311.09783",
+   "http": 200,
+   "catalogue_title": "Investigating Data Contamination in Modern Benchmarks for Large Language Models",
+   "abs_title": "Investigating Data Contamination in Modern Benchmarks for Large Language Models",
+   "abs_authors": [
+    "Chunyuan Deng",
+    "Yilun Zhao",
+    "Xiangru Tang",
+    "Mark Gerstein",
+    "Arman Cohan"
+   ],
+   "comments": "NAACL 2024 Version",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2023-11-16"
+    },
+    {
+     "version": 2,
+     "date": "2024-04-03"
+    }
+   ],
+   "latest_version": 2,
+   "latest_date": "2024-04-03",
+   "checked_utc": "2026-10-01T17:17:02Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "du2025supergpqa": {
+   "arxiv": "2502.14739",
+   "url": "https://arxiv.org/abs/2502.14739",
+   "http": 200,
+   "catalogue_title": "SuperGPQA: Scaling LLM Evaluation across 285 Graduate Disciplines",
+   "abs_title": "SuperGPQA: Scaling LLM Evaluation across 285 Graduate Disciplines",
+   "abs_authors": [
+    "M-A-P Team",
+    "Xinrun Du",
+    "Yifan Yao",
+    "Kaijing Ma",
+    "Bingli Wang",
+    "Tianyu Zheng",
+    "King Zhu",
+    "Minghao Liu",
+    "Yiming Liang",
+    "Xiaolong Jin",
+    "Zhenlin Wei",
+    "Chujie Zheng",
+    "Kaixin Deng",
+    "Shawn Gavin",
+    "Shian Jia",
+    "Sichao Jiang",
+    "Yiyan Liao",
+    "Rui Li",
+    "Qinrui Li",
+    "Sirun Li",
+    "Yizhi Li",
+    "Yunwen Li",
+    "David Ma",
+    "Yuansheng Ni",
+    "Haoran Que",
+    "Qiyao Wang",
+    "Zhoufutu Wen",
+    "Siwei Wu",
+    "Tyshawn Hsing",
+    "Ming Xu",
+    "Zhenzhu Yang",
+    "Zekun Moore Wang",
+    "Junting Zhou",
+    "Yuelin Bai",
+    "Xingyuan Bu",
+    "Chenglin Cai",
+    "Liang Chen",
+    "Yifan Chen",
+    "Chengtuo Cheng",
+    "Tianhao Cheng",
+    "Keyi Ding",
+    "Siming Huang",
+    "Yun Huang",
+    "Yaoru Li",
+    "Yizhe Li",
+    "Zhaoqun Li",
+    "Tianhao Liang",
+    "Chengdong Lin",
+    "Hongquan Lin",
+    "Yinghao Ma",
+    "Tianyang Pang",
+    "Zhongyuan Peng",
+    "Zifan Peng",
+    "Qige Qi",
+    "Shi Qiu",
+    "Xingwei Qu",
+    "Shanghaoran Quan",
+    "Yizhou Tan",
+    "Zili Wang",
+    "Chenqing Wang",
+    "Hao Wang",
+    "Yiya Wang",
+    "Yubo Wang",
+    "Jiajun Xu",
+    "Kexin Yang",
+    "Ruibin Yuan",
+    "Yuanhao Yue",
+    "Tianyang Zhan",
+    "Chun Zhang",
+    "Jinyang Zhang",
+    "Xiyue Zhang",
+    "Xingjian Zhang",
+    "Yue Zhang",
+    "Yongchi Zhao",
+    "Xiangyu Zheng",
+    "Chenghua Zhong",
+    "Yang Gao",
+    "Zhoujun Li",
+    "Dayiheng Liu",
+    "Qian Liu",
+    "Tianyu Liu",
+    "Shiwen Ni",
+    "Junran Peng",
+    "Yujia Qin",
+    "Wenbo Su",
+    "Guoyin Wang",
+    "Shi Wang",
+    "Jian Yang",
+    "Min Yang",
+    "Meng Cao",
+    "Xiang Yue",
+    "Zhaoxiang Zhang",
+    "Wangchunshu Zhou",
+    "Jiaheng Liu",
+    "Qunshu Lin",
+    "Wenhao Huang",
+    "Ge Zhang"
+   ],
+   "comments": null,
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2025-02-20"
+    },
+    {
+     "version": 2,
+     "date": "2025-02-27"
+    },
+    {
+     "version": 3,
+     "date": "2025-03-05"
+    },
+    {
+     "version": 4,
+     "date": "2025-03-28"
+    }
+   ],
+   "latest_version": 4,
+   "latest_date": "2025-03-28",
+   "checked_utc": "2026-10-01T17:17:06Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "fan2024hardmath": {
+   "arxiv": "2410.09988",
+   "url": "https://arxiv.org/abs/2410.09988",
+   "http": 200,
+   "catalogue_title": "HARDMath: A Benchmark Dataset for Challenging Problems in Applied Mathematics",
+   "abs_title": "HARDMath: A Benchmark Dataset for Challenging Problems in Applied Mathematics",
+   "abs_authors": [
+    "Jingxuan Fan",
+    "Sarah Martinson",
+    "Erik Y. Wang",
+    "Kaylie Hausknecht",
+    "Jonah Brenner",
+    "Danxian Liu",
+    "Nianli Peng",
+    "Corey Wang",
+    "Michael P. Brenner"
+   ],
+   "comments": "Code and the HARDMath dataset is available at this https URL",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2024-10-13"
+    },
+    {
+     "version": 2,
+     "date": "2024-12-13"
+    }
+   ],
+   "latest_version": 2,
+   "latest_date": "2024-12-13",
+   "checked_utc": "2026-10-01T17:17:10Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "felten2025engibench": {
+   "arxiv": "2508.00831",
+   "url": "https://arxiv.org/abs/2508.00831",
+   "http": 200,
+   "catalogue_title": "EngiBench: A Framework for Data-Driven Engineering Design Research",
+   "abs_title": "EngiBench: A Framework for Data-Driven Engineering Design Research",
+   "abs_authors": [
+    "Florian Felten",
+    "Gabriel Apaza",
+    "Gerhard Bräunlich",
+    "Cashen Diniz",
+    "Xuliang Dong",
+    "Arthur Drake",
+    "Milad Habibi",
+    "Nathaniel J. Hoffman",
+    "Matthew Keeler",
+    "Soheyl Massoudi",
+    "Francis G. VanGessel",
+    "Mark Fuge"
+   ],
+   "comments": null,
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2025-06-02"
+    },
+    {
+     "version": 2,
+     "date": "2025-08-11"
+    }
+   ],
+   "latest_version": 2,
+   "latest_date": "2025-08-11",
+   "checked_utc": "2026-10-01T17:19:23Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "gulati2024putnamaxiom": {
+   "arxiv": "2508.08292",
+   "url": "https://arxiv.org/abs/2508.08292",
+   "http": 200,
+   "catalogue_title": "Putnam-AXIOM: A Functional and Static Benchmark for Measuring Higher Level Mathematical Reasoning",
+   "abs_title": "Putnam-AXIOM: A Functional and Static Benchmark for Measuring Higher Level Mathematical Reasoning in LLMs",
+   "abs_authors": [
+    "Aryan Gulati",
+    "Brando Miranda",
+    "Eric Chen",
+    "Emily Xia",
+    "Kai Fronsdal",
+    "Bruno Dumont",
+    "Elyas Obbad",
+    "Sanmi Koyejo"
+   ],
+   "comments": "27 pages total (10-page main paper + 17-page appendix), 12 figures, 6 tables. Submitted to ICML 2025 (under review)",
+   "journal_ref": "ICML 2025",
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2025-08-05"
+    },
+    {
+     "version": 2,
+     "date": "2025-08-27"
+    }
+   ],
+   "latest_version": 2,
+   "latest_date": "2025-08-27",
+   "checked_utc": "2026-10-01T17:17:15Z",
+   "title_check": "variant (one title extends the other; see the note)",
+   "arxiv_latest_check": "match"
+  },
+  "guo2025engdesign": {
+   "arxiv": "2509.16204",
+   "url": "https://arxiv.org/abs/2509.16204",
+   "http": 200,
+   "catalogue_title": "Toward Engineering AGI: Benchmarking the Engineering Design Capabilities of LLMs",
+   "abs_title": "Toward Engineering AGI: Benchmarking the Engineering Design Capabilities of LLMs",
+   "abs_authors": [
+    "Xingang Guo",
+    "Yaxin Li",
+    "Xiangyi Kong",
+    "Yilan Jiang",
+    "Xiayu Zhao",
+    "Zhihua Gong",
+    "Yufan Zhang",
+    "Daixuan Li",
+    "Tianle Sang",
+    "Beixiao Zhu",
+    "Gregory Jun",
+    "Yingbing Huang",
+    "Yiqi Liu",
+    "Yuqi Xue",
+    "Rahul Dev Kundu",
+    "Qi Jian Lim",
+    "Yizhou Zhao",
+    "Luke Alexander Granger",
+    "Mohamed Badr Younis",
+    "Darioush Keivan",
+    "Nippun Sabharwal",
+    "Shreyanka Sinha",
+    "Prakhar Agarwal",
+    "Kojo Vandyck",
+    "Hanlin Mai",
+    "Zichen Wang",
+    "Aditya Venkatesh",
+    "Ayush Barik",
+    "Jiankun Yang",
+    "Chongying Yue",
+    "Jingjie He",
+    "Libin Wang",
+    "Licheng Xu",
+    "Hao Chen",
+    "Jinwen Wang",
+    "Liujun Xu",
+    "Rushabh Shetty",
+    "Ziheng Guo",
+    "Dahui Song",
+    "Manvi Jha",
+    "Weijie Liang",
+    "Weiman Yan",
+    "Bryan Zhang",
+    "Sahil Bhandary Karnoor",
+    "Jialiang Zhang",
+    "Rutva Pandya",
+    "Xinyi Gong",
+    "Mithesh Ballae Ganesh",
+    "Feize Shi",
+    "Ruiling Xu",
+    "Yifan Zhang",
+    "Yanfeng Ouyang",
+    "Lianhui Qin",
+    "Elyse Rosenbaum",
+    "Corey Snyder",
+    "Peter Seiler",
+    "Geir Dullerud",
+    "Xiaojia Shelly Zhang",
+    "Zuofu Cheng",
+    "Pavan Kumar Hanumolu",
+    "Jian Huang",
+    "Mayank Kulkarni",
+    "Mahdi Namazifar",
+    "Huan Zhang",
+    "Bin Hu"
+   ],
+   "comments": "To Appear in NeurIPS 2025 Datasets & Benchmarks Track",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2025-07-01"
+    },
+    {
+     "version": 2,
+     "date": "2025-11-06"
+    }
+   ],
+   "latest_version": 2,
+   "latest_date": "2025-11-06",
+   "checked_utc": "2026-10-01T17:17:20Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "heesch2025realworld": {
+   "arxiv": "2505.13484",
+   "url": "https://arxiv.org/abs/2505.13484",
+   "http": 200,
+   "catalogue_title": "Evaluating Large Language Models for Real-World Engineering Tasks",
+   "abs_title": "Evaluating Large Language Models for Real-World Engineering Tasks",
+   "abs_authors": [
+    "Rene Heesch",
+    "Sebastian Eilermann",
+    "Alexander Windmann",
+    "Alexander Diedrich",
+    "Philipp Rosenthal",
+    "Oliver Niggemann"
+   ],
+   "comments": null,
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2025-05-12"
+    }
+   ],
+   "latest_version": 1,
+   "latest_date": "2025-05-12",
+   "checked_utc": "2026-10-01T17:17:24Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "hendrycks2021math": {
+   "arxiv": "2103.03874",
+   "url": "https://arxiv.org/abs/2103.03874",
+   "http": 200,
+   "catalogue_title": "Measuring Mathematical Problem Solving With the MATH Dataset",
+   "abs_title": "Measuring Mathematical Problem Solving With the MATH Dataset",
+   "abs_authors": [
+    "Dan Hendrycks",
+    "Collin Burns",
+    "Saurav Kadavath",
+    "Akul Arora",
+    "Steven Basart",
+    "Eric Tang",
+    "Dawn Song",
+    "Jacob Steinhardt"
+   ],
+   "comments": "NeurIPS 2021. Code and the MATH dataset is available at this https URL",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2021-03-05"
+    },
+    {
+     "version": 2,
+     "date": "2021-11-08"
+    }
+   ],
+   "latest_version": 2,
+   "latest_date": "2021-11-08",
+   "checked_utc": "2026-10-01T17:17:33Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "hendrycks2021mmlu": {
+   "arxiv": "2009.03300",
+   "url": "https://arxiv.org/abs/2009.03300",
+   "http": 200,
+   "catalogue_title": "Measuring Massive Multitask Language Understanding",
+   "abs_title": "Measuring Massive Multitask Language Understanding",
+   "abs_authors": [
+    "Dan Hendrycks",
+    "Collin Burns",
+    "Steven Basart",
+    "Andy Zou",
+    "Mantas Mazeika",
+    "Dawn Song",
+    "Jacob Steinhardt"
+   ],
+   "comments": "ICLR 2021; the test and code is available at this https URL",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2020-09-07"
+    },
+    {
+     "version": 2,
+     "date": "2020-09-21"
+    },
+    {
+     "version": 3,
+     "date": "2021-01-12"
+    }
+   ],
+   "latest_version": 3,
+   "latest_date": "2021-01-12",
+   "checked_utc": "2026-10-01T17:17:29Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "id_2203_04592": {
+   "arxiv": "2203.04592",
+   "url": "https://arxiv.org/abs/2203.04592",
+   "http": 200,
+   "catalogue_title": null,
+   "abs_title": "Mapping global dynamics of benchmark creation and saturation in artificial intelligence",
+   "abs_authors": [
+    "Simon Ott",
+    "Adriano Barbosa-Silva",
+    "Kathrin Blagec",
+    "Jan Brauner",
+    "Matthias Samwald"
+   ],
+   "comments": "This version includes more recent data and additional analyses",
+   "journal_ref": "Nature Communications volume 13, Article number: 6793 (2022)",
+   "related_doi": "10.1038/s41467-022-34591-0",
+   "versions": [
+    {
+     "version": 1,
+     "date": "2022-03-09"
+    },
+    {
+     "version": 2,
+     "date": "2022-06-30"
+    },
+    {
+     "version": 3,
+     "date": "2022-07-02"
+    },
+    {
+     "version": 4,
+     "date": "2022-10-07"
+    }
+   ],
+   "latest_version": 4,
+   "latest_date": "2022-10-07",
+   "checked_utc": "2026-10-01T17:19:36Z",
+   "title_check": "no catalogue title"
+  },
+  "id_2211_02570": {
+   "arxiv": "2211.02570",
+   "url": "https://arxiv.org/abs/2211.02570",
+   "http": 200,
+   "catalogue_title": null,
+   "abs_title": "The 'Problem' of Human Label Variation: On Ground Truth in Data, Modeling and Evaluation",
+   "abs_authors": [
+    "Barbara Plank"
+   ],
+   "comments": "EMNLP 2022",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2022-11-04"
+    }
+   ],
+   "latest_version": 1,
+   "latest_date": "2022-11-04",
+   "checked_utc": "2026-10-01T17:19:40Z",
+   "title_check": "no catalogue title"
+  },
+  "id_2301_09790": {
+   "arxiv": "2301.09790",
+   "url": "https://arxiv.org/abs/2301.09790",
+   "http": 200,
+   "catalogue_title": null,
+   "abs_title": "The Next Chapter: A Study of Large Language Models in Storytelling",
+   "abs_authors": [
+    "Zhuohan Xie",
+    "Trevor Cohn",
+    "Jey Han Lau"
+   ],
+   "comments": "Accepted to INLG2023",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2023-01-24"
+    },
+    {
+     "version": 2,
+     "date": "2023-03-15"
+    },
+    {
+     "version": 3,
+     "date": "2023-07-24"
+    }
+   ],
+   "latest_version": 3,
+   "latest_date": "2023-07-24",
+   "checked_utc": "2026-10-01T17:19:44Z",
+   "title_check": "no catalogue title"
+  },
+  "id_2303_08991": {
+   "arxiv": "2303.08991",
+   "url": "https://arxiv.org/abs/2303.08991",
+   "http": 200,
+   "catalogue_title": null,
+   "abs_title": "DeltaScore: Fine-Grained Story Evaluation with Perturbations",
+   "abs_authors": [
+    "Zhuohan Xie",
+    "Miao Li",
+    "Trevor Cohn",
+    "Jey Han Lau"
+   ],
+   "comments": "15 pages, 3 figures, 8 tables. Camera ready version for EMNLP 2023 findings",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2023-03-15"
+    },
+    {
+     "version": 2,
+     "date": "2023-04-24"
+    },
+    {
+     "version": 3,
+     "date": "2023-05-23"
+    },
+    {
+     "version": 4,
+     "date": "2023-10-08"
+    },
+    {
+     "version": 5,
+     "date": "2023-11-02"
+    }
+   ],
+   "latest_version": 5,
+   "latest_date": "2023-11-02",
+   "checked_utc": "2026-10-01T17:19:49Z",
+   "title_check": "no catalogue title"
+  },
+  "jimenez2024swebench": {
+   "arxiv": "2310.06770",
+   "url": "https://arxiv.org/abs/2310.06770",
+   "http": 200,
+   "catalogue_title": "SWE-bench: Can Language Models Resolve Real-World GitHub Issues?",
+   "abs_title": "SWE-bench: Can Language Models Resolve Real-World GitHub Issues?",
+   "abs_authors": [
+    "Carlos E. Jimenez",
+    "John Yang",
+    "Alexander Wettig",
+    "Shunyu Yao",
+    "Kexin Pei",
+    "Ofir Press",
+    "Karthik Narasimhan"
+   ],
+   "comments": "Data, code, and leaderboard are available at this https URL ICLR 2024, this https URL",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2023-10-10"
+    },
+    {
+     "version": 2,
+     "date": "2024-04-05"
+    },
+    {
+     "version": 3,
+     "date": "2024-11-11"
+    }
+   ],
+   "latest_version": 3,
+   "latest_date": "2024-11-11",
+   "checked_utc": "2026-10-01T17:17:37Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "kazemi2025bbeh": {
+   "arxiv": "2502.19187",
+   "url": "https://arxiv.org/abs/2502.19187",
+   "http": 200,
+   "catalogue_title": "BIG-Bench Extra Hard",
+   "abs_title": "BIG-Bench Extra Hard",
+   "abs_authors": [
+    "Mehran Kazemi",
+    "Bahare Fatemi",
+    "Hritik Bansal",
+    "John Palowitch",
+    "Chrysovalantis Anastasiou",
+    "Sanket Vaibhav Mehta",
+    "Lalit K. Jain",
+    "Virginia Aglietti",
+    "Disha Jindal",
+    "Peter Chen",
+    "Nishanth Dikkala",
+    "Gladys Tyen",
+    "Xin Liu",
+    "Uri Shalit",
+    "Silvia Chiappa",
+    "Kate Olszewska",
+    "Yi Tay",
+    "Vinh Q. Tran",
+    "Quoc V. Le",
+    "Orhan Firat"
+   ],
+   "comments": null,
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2025-02-26"
+    },
+    {
+     "version": 2,
+     "date": "2025-05-06"
+    }
+   ],
+   "latest_version": 2,
+   "latest_date": "2025-05-06",
+   "checked_utc": "2026-10-01T17:17:42Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "li2025eeebench": {
+   "arxiv": "2411.01492",
+   "url": "https://arxiv.org/abs/2411.01492",
+   "http": 200,
+   "catalogue_title": "EEE-Bench: A Comprehensive Multimodal Electrical And Electronics Engineering Benchmark",
+   "abs_title": "EEE-Bench: A Comprehensive Multimodal Electrical And Electronics Engineering Benchmark",
+   "abs_authors": [
+    "Ming Li",
+    "Jike Zhong",
+    "Tianle Chen",
+    "Yuxiang Lai",
+    "Konstantinos Psounis"
+   ],
+   "comments": "Accepted to CVPR 2025",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2024-11-03"
+    },
+    {
+     "version": 2,
+     "date": "2025-02-27"
+    }
+   ],
+   "latest_version": 2,
+   "latest_date": "2025-02-27",
+   "checked_utc": "2026-10-01T17:17:46Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "lightman2023verify": {
+   "arxiv": "2305.20050",
+   "url": "https://arxiv.org/abs/2305.20050",
+   "http": 200,
+   "catalogue_title": "Let's Verify Step by Step",
+   "abs_title": "Let's Verify Step by Step",
+   "abs_authors": [
+    "Hunter Lightman",
+    "Vineet Kosaraju",
+    "Yura Burda",
+    "Harri Edwards",
+    "Bowen Baker",
+    "Teddy Lee",
+    "Jan Leike",
+    "John Schulman",
+    "Ilya Sutskever",
+    "Karl Cobbe"
+   ],
+   "comments": null,
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2023-05-31"
+    }
+   ],
+   "latest_version": 1,
+   "latest_date": "2023-05-31",
+   "checked_utc": "2026-10-01T17:17:50Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "liu2025circuit": {
+   "arxiv": "2511.18221",
+   "url": "https://arxiv.org/abs/2511.18221",
+   "http": 200,
+   "catalogue_title": "Enhancing Large Language Models for Automated Homework Assessment in Undergraduate Circuit Analysis",
+   "abs_title": "Enhancing Large Language Models for Automated Homework Assessment in Undergraduate Circuit Analysis",
+   "abs_authors": [
+    "Liangliang Chen",
+    "Huiru Xie",
+    "Zhihao Qin",
+    "Yiming Guo",
+    "Jacqueline Rohde",
+    "Ying Zhang"
+   ],
+   "comments": "Accepted to 2025 Frontiers in Education (FIE) Conference",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2025-11-22"
+    }
+   ],
+   "latest_version": 1,
+   "latest_date": "2025-11-22",
+   "checked_utc": "2026-10-01T17:17:54Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "luo2024bigbench_t2i": {
+   "arxiv": "2407.15240",
+   "url": "https://arxiv.org/abs/2407.15240",
+   "http": 200,
+   "catalogue_title": "BIGbench: A Unified Benchmark for Evaluating Multi-dimensional Social Biases in Text-to-Image Models",
+   "abs_title": "BIGbench: A Unified Benchmark for Evaluating Multi-dimensional Social Biases in Text-to-Image Models",
+   "abs_authors": [
+    "Hanjun Luo",
+    "Haoyu Huang",
+    "Ziye Deng",
+    "Xinfeng Li",
+    "Hewei Wang",
+    "Yingbin Jin",
+    "Yang Liu",
+    "Wenyuan Xu",
+    "Zuozhu Liu"
+   ],
+   "comments": "arXiv admin note: substantial text overlap with arXiv:2405.17814",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2024-07-21"
+    },
+    {
+     "version": 2,
+     "date": "2024-07-23"
+    },
+    {
+     "version": 3,
+     "date": "2024-08-16"
+    },
+    {
+     "version": 4,
+     "date": "2025-02-24"
+    },
+    {
+     "version": 5,
+     "date": "2025-02-26"
+    },
+    {
+     "version": 6,
+     "date": "2025-03-31"
+    }
+   ],
+   "latest_version": 6,
+   "latest_date": "2025-03-31",
+   "checked_utc": "2026-10-01T17:17:58Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "mirzadeh2024gsmsymbolic": {
+   "arxiv": "2410.05229",
+   "url": "https://arxiv.org/abs/2410.05229",
+   "http": 200,
+   "catalogue_title": "GSM-Symbolic: Understanding the Limitations of Mathematical Reasoning in Large Language Models",
+   "abs_title": "GSM-Symbolic: Understanding the Limitations of Mathematical Reasoning in Large Language Models",
+   "abs_authors": [
+    "Iman Mirzadeh",
+    "Keivan Alizadeh",
+    "Hooman Shahrokhi",
+    "Oncel Tuzel",
+    "Samy Bengio",
+    "Mehrdad Farajtabar"
+   ],
+   "comments": "ICLR camera ready + additional discussion in the appendix",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2024-10-07"
+    },
+    {
+     "version": 2,
+     "date": "2025-08-27"
+    }
+   ],
+   "latest_version": 2,
+   "latest_date": "2025-08-27",
+   "checked_utc": "2026-10-01T17:18:02Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "mudur2025feabench": {
+   "arxiv": "2504.06260",
+   "url": "https://arxiv.org/abs/2504.06260",
+   "http": 200,
+   "catalogue_title": "FEABench: Evaluating Language Models on Multiphysics Reasoning Ability",
+   "abs_title": "FEABench: Evaluating Language Models on Multiphysics Reasoning Ability",
+   "abs_authors": [
+    "Nayantara Mudur",
+    "Hao Cui",
+    "Subhashini Venugopalan",
+    "Paul Raccuglia",
+    "Michael P. Brenner",
+    "Peter Norgaard"
+   ],
+   "comments": "39 pages. Accepted at the NeurIPS 2024 Workshops on Mathematical Reasoning and AI and Open-World Agents",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2025-04-08"
+    }
+   ],
+   "latest_version": 1,
+   "latest_date": "2025-04-08",
+   "checked_utc": "2026-10-01T17:18:07Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "qiu2025phybench": {
+   "arxiv": "2504.16074",
+   "url": "https://arxiv.org/abs/2504.16074",
+   "http": 200,
+   "catalogue_title": "PHYBench: Holistic Evaluation of Physical Perception and Reasoning in Large Language Models",
+   "abs_title": "PHYBench: Holistic Evaluation of Physical Perception and Reasoning in Large Language Models",
+   "abs_authors": [
+    "Shi Qiu",
+    "Shaoyang Guo",
+    "Zhuo-Yang Song",
+    "Yunbo Sun",
+    "Zeyu Cai",
+    "Jiashen Wei",
+    "Tianyu Luo",
+    "Yixuan Yin",
+    "Haoxu Zhang",
+    "Yi Hu",
+    "Chenyang Wang",
+    "Chencheng Tang",
+    "Haoling Chang",
+    "Qi Liu",
+    "Ziheng Zhou",
+    "Tianyu Zhang",
+    "Jingtian Zhang",
+    "Zhangyi Liu",
+    "Minghao Li",
+    "Yuku Zhang",
+    "Boxuan Jing",
+    "Xianqi Yin",
+    "Yutong Ren",
+    "Zizhuo Fu",
+    "Jiaming Ji",
+    "Weike Wang",
+    "Xudong Tian",
+    "Anqi Lv",
+    "Laifu Man",
+    "Jianxiang Li",
+    "Feiyu Tao",
+    "Qihua Sun",
+    "Zhou Liang",
+    "Yushu Mu",
+    "Zhongxuan Li",
+    "Jing-Jun Zhang",
+    "Shutao Zhang",
+    "Xiaotian Li",
+    "Xingqi Xia",
+    "Jiawei Lin",
+    "Zheyu Shen",
+    "Jiahang Chen",
+    "Qiuhao Xiong",
+    "Binran Wang",
+    "Fengyuan Wang",
+    "Ziyang Ni",
+    "Bohan Zhang",
+    "Fan Cui",
+    "Changkun Shao",
+    "Qing-Hong Cao",
+    "Ming-xing Luo",
+    "Yaodong Yang",
+    "Muhan Zhang",
+    "Hua Xing Zhu"
+   ],
+   "comments": "34 pages ,12 figures, 7 tables, latest update in 2025/05/18",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2025-04-22"
+    },
+    {
+     "version": 2,
+     "date": "2025-05-18"
+    }
+   ],
+   "latest_version": 2,
+   "latest_date": "2025-05-18",
+   "checked_utc": "2026-10-01T17:18:12Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "shojaee2025llmsrbench": {
+   "arxiv": "2504.10415",
+   "url": "https://arxiv.org/abs/2504.10415",
+   "http": 200,
+   "catalogue_title": "LLM-SRBench: A New Benchmark for Scientific Equation Discovery with Large Language Models",
+   "abs_title": "LLM-SRBench: A New Benchmark for Scientific Equation Discovery with Large Language Models",
+   "abs_authors": [
+    "Parshin Shojaee",
+    "Ngoc-Hieu Nguyen",
+    "Kazem Meidani",
+    "Amir Barati Farimani",
+    "Khoa D Doan",
+    "Chandan K Reddy"
+   ],
+   "comments": "ICML 2025 Oral. Project page: this https URL , Benchmark page: this https URL",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2025-04-14"
+    },
+    {
+     "version": 2,
+     "date": "2025-06-07"
+    }
+   ],
+   "latest_version": 2,
+   "latest_date": "2025-06-07",
+   "checked_utc": "2026-10-01T17:18:16Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "skelic2025circuit": {
+   "arxiv": "2502.07980",
+   "url": "https://arxiv.org/abs/2502.07980",
+   "http": 200,
+   "catalogue_title": "CIRCUIT: A Benchmark for Circuit Interpretation and Reasoning Capabilities of LLMs",
+   "abs_title": "CIRCUIT: A Benchmark for Circuit Interpretation and Reasoning Capabilities of LLMs",
+   "abs_authors": [
+    "Lejla Skelic",
+    "Yan Xu",
+    "Matthew Cox",
+    "Wenjie Lu",
+    "Tao Yu",
+    "Ruonan Han"
+   ],
+   "comments": null,
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2025-02-11"
+    }
+   ],
+   "latest_version": 1,
+   "latest_date": "2025-02-11",
+   "checked_utc": "2026-10-01T17:19:32Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "srivastava2022bigbench": {
+   "arxiv": "2206.04615",
+   "url": "https://arxiv.org/abs/2206.04615",
+   "http": 200,
+   "catalogue_title": "Beyond the Imitation Game: Quantifying and extrapolating the capabilities of language models",
+   "abs_title": "Beyond the Imitation Game: Quantifying and extrapolating the capabilities of language models",
+   "abs_authors": [
+    "Aarohi Srivastava",
+    "Abhinav Rastogi",
+    "Abhishek Rao",
+    "Abu Awal Md Shoeb",
+    "Abubakar Abid",
+    "Adam Fisch",
+    "Adam R. Brown",
+    "Adam Santoro",
+    "Aditya Gupta",
+    "Adrià Garriga-Alonso",
+    "Agnieszka Kluska",
+    "Aitor Lewkowycz",
+    "Akshat Agarwal",
+    "Alethea Power",
+    "Alex Ray",
+    "Alex Warstadt",
+    "Alexander W. Kocurek",
+    "Ali Safaya",
+    "Ali Tazarv",
+    "Alice Xiang",
+    "Alicia Parrish",
+    "Allen Nie",
+    "Aman Hussain",
+    "Amanda Askell",
+    "Amanda Dsouza",
+    "Ambrose Slone",
+    "Ameet Rahane",
+    "Anantharaman S. Iyer",
+    "Anders Andreassen",
+    "Andrea Madotto",
+    "Andrea Santilli",
+    "Andreas Stuhlmüller",
+    "Andrew Dai",
+    "Andrew La",
+    "Andrew Lampinen",
+    "Andy Zou",
+    "Angela Jiang",
+    "Angelica Chen",
+    "Anh Vuong",
+    "Animesh Gupta",
+    "Anna Gottardi",
+    "Antonio Norelli",
+    "Anu Venkatesh",
+    "Arash Gholamidavoodi",
+    "Arfa Tabassum",
+    "Arul Menezes",
+    "Arun Kirubarajan",
+    "Asher Mullokandov",
+    "Ashish Sabharwal",
+    "Austin Herrick",
+    "Avia Efrat",
+    "Aykut Erdem",
+    "Ayla Karakaş",
+    "B. Ryan Roberts",
+    "Bao Sheng Loe",
+    "Barret Zoph",
+    "Bartłomiej Bojanowski",
+    "Batuhan Özyurt",
+    "Behnam Hedayatnia",
+    "Behnam Neyshabur",
+    "Benjamin Inden",
+    "Benno Stein",
+    "Berk Ekmekci",
+    "Bill Yuchen Lin",
+    "Blake Howald",
+    "Bryan Orinion",
+    "Cameron Diao",
+    "Cameron Dour",
+    "Catherine Stinson",
+    "Cedrick Argueta",
+    "César Ferri Ramírez",
+    "Chandan Singh",
+    "Charles Rathkopf",
+    "Chenlin Meng",
+    "Chitta Baral",
+    "Chiyu Wu",
+    "Chris Callison-Burch",
+    "Chris Waites",
+    "Christian Voigt",
+    "Christopher D. Manning",
+    "Christopher Potts",
+    "Cindy Ramirez",
+    "Clara E. Rivera",
+    "Clemencia Siro",
+    "Colin Raffel",
+    "Courtney Ashcraft",
+    "Cristina Garbacea",
+    "Damien Sileo",
+    "Dan Garrette",
+    "Dan Hendrycks",
+    "Dan Kilman",
+    "Dan Roth",
+    "Daniel Freeman",
+    "Daniel Khashabi",
+    "Daniel Levy",
+    "Daniel Moseguí González",
+    "Danielle Perszyk",
+    "Danny Hernandez",
+    "Danqi Chen",
+    "Daphne Ippolito",
+    "Dar Gilboa",
+    "David Dohan",
+    "David Drakard",
+    "David Jurgens",
+    "Debajyoti Datta",
+    "Deep Ganguli",
+    "Denis Emelin",
+    "Denis Kleyko",
+    "Deniz Yuret",
+    "Derek Chen",
+    "Derek Tam",
+    "Dieuwke Hupkes",
+    "Diganta Misra",
+    "Dilyar Buzan",
+    "Dimitri Coelho Mollo",
+    "Diyi Yang",
+    "Dong-Ho Lee",
+    "Dylan Schrader",
+    "Ekaterina Shutova",
+    "Ekin Dogus Cubuk",
+    "Elad Segal",
+    "Eleanor Hagerman",
+    "Elizabeth Barnes",
+    "Elizabeth Donoway",
+    "Ellie Pavlick",
+    "Emanuele Rodola",
+    "Emma Lam",
+    "Eric Chu",
+    "Eric Tang",
+    "Erkut Erdem",
+    "Ernie Chang",
+    "Ethan A. Chi",
+    "Ethan Dyer",
+    "Ethan Jerzak",
+    "Ethan Kim",
+    "Eunice Engefu Manyasi",
+    "Evgenii Zheltonozhskii",
+    "Fanyue Xia",
+    "Fatemeh Siar",
+    "Fernando Martínez-Plumed",
+    "Francesca Happé",
+    "Francois Chollet",
+    "Frieda Rong",
+    "Gaurav Mishra",
+    "Genta Indra Winata",
+    "Gerard de Melo",
+    "Germán Kruszewski",
+    "Giambattista Parascandolo",
+    "Giorgio Mariani",
+    "Gloria Wang",
+    "Gonzalo Jaimovitch-López",
+    "Gregor Betz",
+    "Guy Gur-Ari",
+    "Hana Galijasevic",
+    "Hannah Kim",
+    "Hannah Rashkin",
+    "Hannaneh Hajishirzi",
+    "Harsh Mehta",
+    "Hayden Bogar",
+    "Henry Shevlin",
+    "Hinrich Schütze",
+    "Hiromu Yakura",
+    "Hongming Zhang",
+    "Hugh Mee Wong",
+    "Ian Ng",
+    "Isaac Noble",
+    "Jaap Jumelet",
+    "Jack Geissinger",
+    "Jackson Kernion",
+    "Jacob Hilton",
+    "Jaehoon Lee",
+    "Jaime Fernández Fisac",
+    "James B. Simon",
+    "James Koppel",
+    "James Zheng",
+    "James Zou",
+    "Jan Kocoń",
+    "Jana Thompson",
+    "Janelle Wingfield",
+    "Jared Kaplan",
+    "Jarema Radom",
+    "Jascha Sohl-Dickstein",
+    "Jason Phang",
+    "Jason Wei",
+    "Jason Yosinski",
+    "Jekaterina Novikova",
+    "Jelle Bosscher",
+    "Jennifer Marsh",
+    "Jeremy Kim",
+    "Jeroen Taal",
+    "Jesse Engel",
+    "Jesujoba Alabi",
+    "Jiacheng Xu",
+    "Jiaming Song",
+    "Jillian Tang",
+    "Joan Waweru",
+    "John Burden",
+    "John Miller",
+    "John U. Balis",
+    "Jonathan Batchelder",
+    "Jonathan Berant",
+    "Jörg Frohberg",
+    "Jos Rozen",
+    "Jose Hernandez-Orallo",
+    "Joseph Boudeman",
+    "Joseph Guerr",
+    "Joseph Jones",
+    "Joshua B. Tenenbaum",
+    "Joshua S. Rule",
+    "Joyce Chua",
+    "Kamil Kanclerz",
+    "Karen Livescu",
+    "Karl Krauth",
+    "Karthik Gopalakrishnan",
+    "Katerina Ignatyeva",
+    "Katja Markert",
+    "Kaustubh D. Dhole",
+    "Kevin Gimpel",
+    "Kevin Omondi",
+    "Kory Mathewson",
+    "Kristen Chiafullo",
+    "Ksenia Shkaruta",
+    "Kumar Shridhar",
+    "Kyle McDonell",
+    "Kyle Richardson",
+    "Laria Reynolds",
+    "Leo Gao",
+    "Li Zhang",
+    "Liam Dugan",
+    "Lianhui Qin",
+    "Lidia Contreras-Ochando",
+    "Louis-Philippe Morency",
+    "Luca Moschella",
+    "Lucas Lam",
+    "Lucy Noble",
+    "Ludwig Schmidt",
+    "Luheng He",
+    "Luis Oliveros Colón",
+    "Luke Metz",
+    "Lütfi Kerem Şenel",
+    "Maarten Bosma",
+    "Maarten Sap",
+    "Maartje ter Hoeve",
+    "Maheen Farooqi",
+    "Manaal Faruqui",
+    "Mantas Mazeika",
+    "Marco Baturan",
+    "Marco Marelli",
+    "Marco Maru",
+    "Maria Jose Ramírez Quintana",
+    "Marie Tolkiehn",
+    "Mario Giulianelli",
+    "Martha Lewis",
+    "Martin Potthast",
+    "Matthew L. Leavitt",
+    "Matthias Hagen",
+    "Mátyás Schubert",
+    "Medina Orduna Baitemirova",
+    "Melody Arnaud",
+    "Melvin McElrath",
+    "Michael A. Yee",
+    "Michael Cohen",
+    "Michael Gu",
+    "Michael Ivanitskiy",
+    "Michael Starritt",
+    "Michael Strube",
+    "Michał Swędrowski",
+    "Michele Bevilacqua",
+    "Michihiro Yasunaga",
+    "Mihir Kale",
+    "Mike Cain",
+    "Mimee Xu",
+    "Mirac Suzgun",
+    "Mitch Walker",
+    "Mo Tiwari",
+    "Mohit Bansal",
+    "Moin Aminnaseri",
+    "Mor Geva",
+    "Mozhdeh Gheini",
+    "Mukund Varma T",
+    "Nanyun Peng",
+    "Nathan A. Chi",
+    "Nayeon Lee",
+    "Neta Gur-Ari Krakover",
+    "Nicholas Cameron",
+    "Nicholas Roberts",
+    "Nick Doiron",
+    "Nicole Martinez",
+    "Nikita Nangia",
+    "Niklas Deckers",
+    "Niklas Muennighoff",
+    "Nitish Shirish Keskar",
+    "Niveditha S. Iyer",
+    "Noah Constant",
+    "Noah Fiedel",
+    "Nuan Wen",
+    "Oliver Zhang",
+    "Omar Agha",
+    "Omar Elbaghdadi",
+    "Omer Levy",
+    "Owain Evans",
+    "Pablo Antonio Moreno Casares",
+    "Parth Doshi",
+    "Pascale Fung",
+    "Paul Pu Liang",
+    "Paul Vicol",
+    "Pegah Alipoormolabashi",
+    "Peiyuan Liao",
+    "Percy Liang",
+    "Peter Chang",
+    "Peter Eckersley",
+    "Phu Mon Htut",
+    "Pinyu Hwang",
+    "Piotr Miłkowski",
+    "Piyush Patil",
+    "Pouya Pezeshkpour",
+    "Priti Oli",
+    "Qiaozhu Mei",
+    "Qing Lyu",
+    "Qinlang Chen",
+    "Rabin Banjade",
+    "Rachel Etta Rudolph",
+    "Raefer Gabriel",
+    "Rahel Habacker",
+    "Ramon Risco",
+    "Raphaël Millière",
+    "Rhythm Garg",
+    "Richard Barnes",
+    "Rif A. Saurous",
+    "Riku Arakawa",
+    "Robbe Raymaekers",
+    "Robert Frank",
+    "Rohan Sikand",
+    "Roman Novak",
+    "Roman Sitelew",
+    "Ronan LeBras",
+    "Rosanne Liu",
+    "Rowan Jacobs",
+    "Rui Zhang",
+    "Ruslan Salakhutdinov",
+    "Ryan Chi",
+    "Ryan Lee",
+    "Ryan Stovall",
+    "Ryan Teehan",
+    "Rylan Yang",
+    "Sahib Singh",
+    "Saif M. Mohammad",
+    "Sajant Anand",
+    "Sam Dillavou",
+    "Sam Shleifer",
+    "Sam Wiseman",
+    "Samuel Gruetter",
+    "Samuel R. Bowman",
+    "Samuel S. Schoenholz",
+    "Sanghyun Han",
+    "Sanjeev Kwatra",
+    "Sarah A. Rous",
+    "Sarik Ghazarian",
+    "Sayan Ghosh",
+    "Sean Casey",
+    "Sebastian Bischoff",
+    "Sebastian Gehrmann",
+    "Sebastian Schuster",
+    "Sepideh Sadeghi",
+    "Shadi Hamdan",
+    "Sharon Zhou",
+    "Shashank Srivastava",
+    "Sherry Shi",
+    "Shikhar Singh",
+    "Shima Asaadi",
+    "Shixiang Shane Gu",
+    "Shubh Pachchigar",
+    "Shubham Toshniwal",
+    "Shyam Upadhyay",
+    "Shyamolima",
+    "Debnath",
+    "Siamak Shakeri",
+    "Simon Thormeyer",
+    "Simone Melzi",
+    "Siva Reddy",
+    "Sneha Priscilla Makini",
+    "Soo-Hwan Lee",
+    "Spencer Torene",
+    "Sriharsha Hatwar",
+    "Stanislas Dehaene",
+    "Stefan Divic",
+    "Stefano Ermon",
+    "Stella Biderman",
+    "Stephanie Lin",
+    "Stephen Prasad",
+    "Steven T. Piantadosi",
+    "Stuart M. Shieber",
+    "Summer Misherghi",
+    "Svetlana Kiritchenko",
+    "Swaroop Mishra",
+    "Tal Linzen",
+    "Tal Schuster",
+    "Tao Li",
+    "Tao Yu",
+    "Tariq Ali",
+    "Tatsu Hashimoto",
+    "Te-Lin Wu",
+    "Théo Desbordes",
+    "Theodore Rothschild",
+    "Thomas Phan",
+    "Tianle Wang",
+    "Tiberius Nkinyili",
+    "Timo Schick",
+    "Timofei Kornev",
+    "Titus Tunduny",
+    "Tobias Gerstenberg",
+    "Trenton Chang",
+    "Trishala Neeraj",
+    "Tushar Khot",
+    "Tyler Shultz",
+    "Uri Shaham",
+    "Vedant Misra",
+    "Vera Demberg",
+    "Victoria Nyamai",
+    "Vikas Raunak",
+    "Vinay Ramasesh",
+    "Vinay Uday Prabhu",
+    "Vishakh Padmakumar",
+    "Vivek Srikumar",
+    "William Fedus",
+    "William Saunders",
+    "William Zhang",
+    "Wout Vossen",
+    "Xiang Ren",
+    "Xiaoyu Tong",
+    "Xinran Zhao",
+    "Xinyi Wu",
+    "Xudong Shen",
+    "Yadollah Yaghoobzadeh",
+    "Yair Lakretz",
+    "Yangqiu Song",
+    "Yasaman Bahri",
+    "Yejin Choi",
+    "Yichi Yang",
+    "Yiding Hao",
+    "Yifu Chen",
+    "Yonatan Belinkov",
+    "Yu Hou",
+    "Yufang Hou",
+    "Yuntao Bai",
+    "Zachary Seid",
+    "Zhuoye Zhao",
+    "Zijian Wang",
+    "Zijie J. Wang",
+    "Zirui Wang",
+    "Ziyi Wu"
+   ],
+   "comments": "27 pages, 17 figures + references and appendices, repo: this https URL",
+   "journal_ref": "Transactions on Machine Learning Research, May/2022, https://openreview.net/forum?id=uyTL5Bvosj",
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2022-06-09"
+    },
+    {
+     "version": 2,
+     "date": "2022-06-10"
+    },
+    {
+     "version": 3,
+     "date": "2023-06-12"
+    }
+   ],
+   "latest_version": 3,
+   "latest_date": "2023-06-12",
+   "checked_utc": "2026-10-01T17:19:19Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "suzgun2022bbh": {
+   "arxiv": "2210.09261",
+   "url": "https://arxiv.org/abs/2210.09261",
+   "http": 200,
+   "catalogue_title": "Challenging BIG-Bench Tasks and Whether Chain-of-Thought Can Solve Them",
+   "abs_title": "Challenging BIG-Bench Tasks and Whether Chain-of-Thought Can Solve Them",
+   "abs_authors": [
+    "Mirac Suzgun",
+    "Nathan Scales",
+    "Nathanael Schärli",
+    "Sebastian Gehrmann",
+    "Yi Tay",
+    "Hyung Won Chung",
+    "Aakanksha Chowdhery",
+    "Quoc V. Le",
+    "Ed H. Chi",
+    "Denny Zhou",
+    "Jason Wei"
+   ],
+   "comments": "GitHub repository: this https URL",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2022-10-17"
+    }
+   ],
+   "latest_version": 1,
+   "latest_date": "2022-10-17",
+   "checked_utc": "2026-10-01T17:19:15Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "syed2024transportbench": {
+   "arxiv": "2408.08302",
+   "url": "https://arxiv.org/abs/2408.08302",
+   "http": 200,
+   "catalogue_title": "Benchmarking the Capabilities of Large Language Models in Transportation System Engineering: Accuracy, Consistency, and Reasoning Behaviors",
+   "abs_title": "Benchmarking the Capabilities of Large Language Models in Transportation System Engineering: Accuracy, Consistency, and Reasoning Behaviors",
+   "abs_authors": [
+    "Usman Syed",
+    "Ethan Light",
+    "Xingang Guo",
+    "Huan Zhang",
+    "Lianhui Qin",
+    "Yanfeng Ouyang",
+    "Bin Hu"
+   ],
+   "comments": null,
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2024-08-15"
+    }
+   ],
+   "latest_version": 1,
+   "latest_date": "2024-08-15",
+   "checked_utc": "2026-10-01T17:18:20Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "verga2024poll": {
+   "arxiv": "2404.18796",
+   "url": "https://arxiv.org/abs/2404.18796",
+   "http": 200,
+   "catalogue_title": "Replacing Judges with Juries: Evaluating LLM Generations with a Panel of Diverse Models",
+   "abs_title": "Replacing Judges with Juries: Evaluating LLM Generations with a Panel of Diverse Models",
+   "abs_authors": [
+    "Pat Verga",
+    "Sebastian Hofstatter",
+    "Sophia Althammer",
+    "Yixuan Su",
+    "Aleksandra Piktus",
+    "Arkady Arkhangorodsky",
+    "Minjie Xu",
+    "Naomi White",
+    "Patrick Lewis"
+   ],
+   "comments": null,
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2024-04-29"
+    },
+    {
+     "version": 2,
+     "date": "2024-05-01"
+    }
+   ],
+   "latest_version": 2,
+   "latest_date": "2024-05-01",
+   "checked_utc": "2026-10-01T17:18:24Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "wang2018glue": {
+   "arxiv": "1804.07461",
+   "url": "https://arxiv.org/abs/1804.07461",
+   "http": 200,
+   "catalogue_title": "GLUE: A Multi-Task Benchmark and Analysis Platform for Natural Language Understanding",
+   "abs_title": "GLUE: A Multi-Task Benchmark and Analysis Platform for Natural Language Understanding",
+   "abs_authors": [
+    "Alex Wang",
+    "Amanpreet Singh",
+    "Julian Michael",
+    "Felix Hill",
+    "Omer Levy",
+    "Samuel R. Bowman"
+   ],
+   "comments": "ICLR 2019; this https URL",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2018-04-20"
+    },
+    {
+     "version": 2,
+     "date": "2018-09-18"
+    },
+    {
+     "version": 3,
+     "date": "2019-02-22"
+    }
+   ],
+   "latest_version": 3,
+   "latest_date": "2019-02-22",
+   "checked_utc": "2026-10-01T17:18:34Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "wang2019superglue": {
+   "arxiv": "1905.00537",
+   "url": "https://arxiv.org/abs/1905.00537",
+   "http": 200,
+   "catalogue_title": "SuperGLUE: A Stickier Benchmark for General-Purpose Language Understanding Systems",
+   "abs_title": "SuperGLUE: A Stickier Benchmark for General-Purpose Language Understanding Systems",
+   "abs_authors": [
+    "Alex Wang",
+    "Yada Pruksachatkun",
+    "Nikita Nangia",
+    "Amanpreet Singh",
+    "Julian Michael",
+    "Felix Hill",
+    "Omer Levy",
+    "Samuel R. Bowman"
+   ],
+   "comments": "NeurIPS 2019, this http URL updating acknowledegments",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2019-05-02"
+    },
+    {
+     "version": 2,
+     "date": "2019-07-12"
+    },
+    {
+     "version": 3,
+     "date": "2020-02-13"
+    }
+   ],
+   "latest_version": 3,
+   "latest_date": "2020-02-13",
+   "checked_utc": "2026-10-01T17:18:29Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "wang2023newton": {
+   "arxiv": "2310.07018",
+   "url": "https://arxiv.org/abs/2310.07018",
+   "http": 200,
+   "catalogue_title": "NEWTON: Are Large Language Models Capable of Physical Reasoning?",
+   "abs_title": "NEWTON: Are Large Language Models Capable of Physical Reasoning?",
+   "abs_authors": [
+    "Yi Ru Wang",
+    "Jiafei Duan",
+    "Dieter Fox",
+    "Siddhartha Srinivasa"
+   ],
+   "comments": "EMNLP 2023 Findings; 8 pages, 3 figures, 7 tables; Project page: this https URL",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2023-10-10"
+    }
+   ],
+   "latest_version": 1,
+   "latest_date": "2023-10-10",
+   "checked_utc": "2026-10-01T17:18:38Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "wang2023scibench": {
+   "arxiv": "2307.10635",
+   "url": "https://arxiv.org/abs/2307.10635",
+   "http": 200,
+   "catalogue_title": "SciBench: Evaluating College-Level Scientific Problem-Solving Abilities of Large Language Models",
+   "abs_title": "SciBench: Evaluating College-Level Scientific Problem-Solving Abilities of Large Language Models",
+   "abs_authors": [
+    "Xiaoxuan Wang",
+    "Ziniu Hu",
+    "Pan Lu",
+    "Yanqiao Zhu",
+    "Jieyu Zhang",
+    "Satyen Subramaniam",
+    "Arjun R. Loomba",
+    "Shichang Zhang",
+    "Yizhou Sun",
+    "Wei Wang"
+   ],
+   "comments": "To appear at ICML 2024",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2023-07-20"
+    },
+    {
+     "version": 2,
+     "date": "2024-02-08"
+    },
+    {
+     "version": 3,
+     "date": "2024-06-28"
+    }
+   ],
+   "latest_version": 3,
+   "latest_date": "2024-06-28",
+   "checked_utc": "2026-10-01T17:19:28Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "xie2025finchain": {
+   "arxiv": "2506.02515",
+   "url": "https://arxiv.org/abs/2506.02515",
+   "http": 200,
+   "catalogue_title": "FinChain: A Symbolic Benchmark for Verifiable Chain-of-Thought Financial Reasoning",
+   "abs_title": "FinChain: A Symbolic Benchmark for Verifiable Chain-of-Thought Financial Reasoning",
+   "abs_authors": [
+    "Zhuohan Xie",
+    "Daniil Orel",
+    "Rushil Thareja",
+    "Dhruv Sahnan",
+    "Hachem Madmoun",
+    "Fan Zhang",
+    "Debopriyo Banerjee",
+    "Georgi Georgiev",
+    "Xueqing Peng",
+    "Lingfei Qian",
+    "Jimin Huang",
+    "Jinyan Su",
+    "Aaryamonvikram Singh",
+    "Rui Xing",
+    "Rania Elbadry",
+    "Chen Xu",
+    "Haonan Li",
+    "Fajri Koto",
+    "Ivan Koychev",
+    "Tanmoy Chakraborty",
+    "Yuxia Wang",
+    "Salem Lahlou",
+    "Veselin Stoyanov",
+    "Sophia Ananiadou",
+    "Preslav Nakov"
+   ],
+   "comments": "24 pages, includes 12 figures and 9 tables; introduces the FinChain benchmark and ChainEval metric",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2025-06-03"
+    },
+    {
+     "version": 2,
+     "date": "2025-10-17"
+    },
+    {
+     "version": 3,
+     "date": "2026-01-08"
+    },
+    {
+     "version": 4,
+     "date": "2026-04-30"
+    }
+   ],
+   "latest_version": 4,
+   "latest_date": "2026-04-30",
+   "checked_utc": "2026-10-01T17:18:42Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "xu2025ugphysics": {
+   "arxiv": "2502.00334",
+   "url": "https://arxiv.org/abs/2502.00334",
+   "http": 200,
+   "catalogue_title": "UGPhysics: A Comprehensive Benchmark for Undergraduate Physics Reasoning with Large Language Models",
+   "abs_title": "UGPhysics: A Comprehensive Benchmark for Undergraduate Physics Reasoning with Large Language Models",
+   "abs_authors": [
+    "Xin Xu",
+    "Qiyun Xu",
+    "Tong Xiao",
+    "Tianhao Chen",
+    "Yuchen Yan",
+    "Jiaxin Zhang",
+    "Shizhe Diao",
+    "Can Yang",
+    "Yang Wang"
+   ],
+   "comments": "Accepted to ICML 2025",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2025-02-01"
+    },
+    {
+     "version": 2,
+     "date": "2025-02-05"
+    },
+    {
+     "version": 3,
+     "date": "2025-05-24"
+    },
+    {
+     "version": 4,
+     "date": "2025-06-03"
+    }
+   ],
+   "latest_version": 4,
+   "latest_date": "2025-06-03",
+   "checked_utc": "2026-10-01T17:18:46Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "zhang2020bertscore": {
+   "arxiv": "1904.09675",
+   "url": "https://arxiv.org/abs/1904.09675",
+   "http": 200,
+   "catalogue_title": "BERTScore: Evaluating Text Generation with BERT",
+   "abs_title": "BERTScore: Evaluating Text Generation with BERT",
+   "abs_authors": [
+    "Tianyi Zhang",
+    "Varsha Kishore",
+    "Felix Wu",
+    "Kilian Q. Weinberger",
+    "Yoav Artzi"
+   ],
+   "comments": "Code available at this https URL To appear in ICLR2020",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2019-04-21"
+    },
+    {
+     "version": 2,
+     "date": "2019-10-01"
+    },
+    {
+     "version": 3,
+     "date": "2020-02-24"
+    }
+   ],
+   "latest_version": 3,
+   "latest_date": "2020-02-24",
+   "checked_utc": "2026-10-01T17:18:50Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "zhang2025abenchphysics": {
+   "arxiv": "2507.04766",
+   "url": "https://arxiv.org/abs/2507.04766",
+   "http": 200,
+   "catalogue_title": "ABench-Physics: Benchmarking Physical Reasoning in LLMs via High-Difficulty and Dynamic Physics Problems",
+   "abs_title": "ABench-Physics: Benchmarking Physical Reasoning in LLMs via High-Difficulty and Dynamic Physics Problems",
+   "abs_authors": [
+    "Yiming Zhang",
+    "Yingfan Ma",
+    "Yanmei Gu",
+    "Zhengkai Yang",
+    "Yihong Zhuang",
+    "Feng Wang",
+    "Zenan Huang",
+    "Yuanyuan Wang",
+    "Chao Huang",
+    "Bowen Song",
+    "Cheng Lin",
+    "Junbo Zhao"
+   ],
+   "comments": null,
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2025-07-07"
+    }
+   ],
+   "latest_version": 1,
+   "latest_date": "2025-07-07",
+   "checked_utc": "2026-10-01T17:18:59Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "zhang2025physreason": {
+   "arxiv": "2502.12054",
+   "url": "https://arxiv.org/abs/2502.12054",
+   "http": 200,
+   "catalogue_title": "PhysReason: A Comprehensive Benchmark towards Physics-Based Reasoning",
+   "abs_title": "PhysReason: A Comprehensive Benchmark towards Physics-Based Reasoning",
+   "abs_authors": [
+    "Xinyu Zhang",
+    "Yuxuan Dong",
+    "Yanrui Wu",
+    "Jiaxing Huang",
+    "Chengyou Jia",
+    "Basura Fernando",
+    "Mike Zheng Shou",
+    "Lingling Zhang",
+    "Jun Liu"
+   ],
+   "comments": null,
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2025-02-17"
+    },
+    {
+     "version": 2,
+     "date": "2025-05-26"
+    }
+   ],
+   "latest_version": 2,
+   "latest_date": "2025-05-26",
+   "checked_utc": "2026-10-01T17:18:55Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "zhao2023survey": {
+   "arxiv": "2303.18223",
+   "url": "https://arxiv.org/abs/2303.18223",
+   "http": 200,
+   "catalogue_title": "A Survey of Large Language Models",
+   "abs_title": "A Survey of Large Language Models",
+   "abs_authors": [
+    "Wayne Xin Zhao",
+    "Kun Zhou",
+    "Junyi Li",
+    "Tianyi Tang",
+    "Xiaolei Wang",
+    "Yupeng Hou",
+    "Yingqian Min",
+    "Beichen Zhang",
+    "Junjie Zhang",
+    "Zican Dong",
+    "Yifan Du",
+    "Chen Yang",
+    "Yushuo Chen",
+    "Zhipeng Chen",
+    "Jinhao Jiang",
+    "Ruiyang Ren",
+    "Yifan Li",
+    "Xinyu Tang",
+    "Zikang Liu",
+    "Peiyu Liu",
+    "Jian-Yun Nie",
+    "Ji-Rong Wen"
+   ],
+   "comments": "ongoing work; 144 pages, 1081 citations",
+   "journal_ref": "Frontiers of Computer Science, Volume 20, Issue 12, Article 2012627 (2026)",
+   "related_doi": "10.1007/s11704-026-60308-3",
+   "versions": [
+    {
+     "version": 1,
+     "date": "2023-03-31"
+    },
+    {
+     "version": 2,
+     "date": "2023-04-09"
+    },
+    {
+     "version": 3,
+     "date": "2023-04-11"
+    },
+    {
+     "version": 4,
+     "date": "2023-04-12"
+    },
+    {
+     "version": 5,
+     "date": "2023-04-16"
+    },
+    {
+     "version": 6,
+     "date": "2023-04-24"
+    },
+    {
+     "version": 7,
+     "date": "2023-04-25"
+    },
+    {
+     "version": 8,
+     "date": "2023-04-27"
+    },
+    {
+     "version": 9,
+     "date": "2023-04-28"
+    },
+    {
+     "version": 10,
+     "date": "2023-05-07"
+    },
+    {
+     "version": 11,
+     "date": "2023-06-29"
+    },
+    {
+     "version": 12,
+     "date": "2023-09-11"
+    },
+    {
+     "version": 13,
+     "date": "2023-11-24"
+    },
+    {
+     "version": 14,
+     "date": "2024-09-24"
+    },
+    {
+     "version": 15,
+     "date": "2024-10-13"
+    },
+    {
+     "version": 16,
+     "date": "2025-03-11"
+    },
+    {
+     "version": 17,
+     "date": "2026-02-27"
+    },
+    {
+     "version": 18,
+     "date": "2026-03-08"
+    },
+    {
+     "version": 19,
+     "date": "2026-03-18"
+    }
+   ],
+   "latest_version": 19,
+   "latest_date": "2026-03-18",
+   "checked_utc": "2026-10-01T17:19:03Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  },
+  "zhou2025engibench": {
+   "arxiv": "2509.17677",
+   "url": "https://arxiv.org/abs/2509.17677",
+   "http": 200,
+   "catalogue_title": "EngiBench: A Benchmark for Evaluating Large Language Models on Engineering Problem Solving",
+   "abs_title": "EngiBench: A Benchmark for Evaluating Large Language Models on Engineering Problem Solving",
+   "abs_authors": [
+    "Xiyuan Zhou",
+    "Xinlei Wang",
+    "Yirui He",
+    "Yang Wu",
+    "Ruixi Zou",
+    "Yuheng Cheng",
+    "Yulu Xie",
+    "Wenxuan Liu",
+    "Huan Zhao",
+    "Yan Xu",
+    "Jinjin Gu",
+    "Junhua Zhao"
+   ],
+   "comments": "Accepted at ACL 2026 Findings",
+   "journal_ref": null,
+   "related_doi": null,
+   "versions": [
+    {
+     "version": 1,
+     "date": "2025-09-22"
+    },
+    {
+     "version": 2,
+     "date": "2026-05-02"
+    }
+   ],
+   "latest_version": 2,
+   "latest_date": "2026-05-02",
+   "checked_utc": "2026-10-01T17:19:07Z",
+   "title_check": "match",
+   "arxiv_latest_check": "match"
+  }
+ }
+}
