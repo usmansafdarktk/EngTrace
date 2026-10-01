@@ -87,7 +87,7 @@ B = 10_000              # bootstrap draws for every interval (the plan)
 B_TEST = 100_000        # permutations / sign flips for every test (D-146; D-136 had 10,000)
 EQUIV_MARGIN = 0.05     # Q5's equivalence margin in answer-score points: the plan's largest detectable paired
                         # difference (5.1 points at 15% discordance), fixed 2026-10-01 after the point estimates
-                        # were known and before the 90% intervals were computed (D-163)
+                        # were known and before the 90% intervals were computed (D-165)
 ROSTER = ['gpt-oss-20b', 'gemma-4-26b-a4b', 'deepseek-v4.1-flash', 'qwen3-235b-a22b-2507', 'glm-5.3-flash',
           'glm-5.3', 'muse-glimmer-30b', 'kimi-k3', 'gpt-5.4-mini', 'gemini-3.1-flash-lite', 'claude-sonnet-5']
 SET_ASIDE = ['qwen3.8-27b']
@@ -210,7 +210,7 @@ def cluster_mean(groups: dict[str, list[float]], seed: int) -> tuple[float, list
 
 def cluster_boot(groups: dict[str, list[float]], seed: int) -> tuple[float, np.ndarray, int]:
     """cluster_mean's point estimate with its bootstrap draws (the same draws, so the same 95% interval),
-    for an interval at another level as well (D-163)."""
+    for an interval at another level as well (D-165)."""
     if not groups:
         return float('nan'), np.array([]), 0
     tot = np.array([sum(v) for v in groups.values()])
@@ -516,7 +516,7 @@ def accepted_pairs() -> dict | None:
 
 def paired(main_rows, para_rows, ids, fn, seed):
     """Second arm minus main, paired by item: the item mean with its template bootstrap at 95% and, from the
-    same draws, at 90%, which is the two-one-sided-tests reading against EQUIV_MARGIN (D-163)."""
+    same draws, at 90%, which is the two-one-sided-tests reading against EQUIV_MARGIN (D-165)."""
     diff = per_template([{'template_id': main_rows[x]['template_id'], 'd': fn(para_rows[x]) - fn(main_rows[x])}
                          for x in ids], lambda r: r['d'])
     point, draws, n = cluster_boot(diff, seed)
@@ -583,7 +583,7 @@ def tau_noise_arm(main, keys, ids, splits: int = 200, seed: int = 4243) -> dict:
     """The tau noise floor at the paraphrase arm's own size and template mix: for each template with k
     pairs in the arm, 2k of the main run's items drawn without replacement and split into two halves of
     k (k halved where a template has fewer than 2k items); the models ordered on each half by the
-    item-weighted mean, as kendall_boot orders the two arms; tau between the two orderings (D-163)."""
+    item-weighted mean, as kendall_boot orders the two arms; tau between the two orderings (D-165)."""
     rng = np.random.default_rng(seed)
     ref = main[keys[0]]
     k_by_t = collections.Counter(ref[x]['template_id'] for x in ids)
@@ -614,7 +614,7 @@ def tau_noise_arm(main, keys, ids, splits: int = 200, seed: int = 4243) -> dict:
 def vs_repeats(main, para, keys, keep, q5_rows) -> dict:
     """The paraphrase difference beside the run-to-run differences of the models with decoding repeats:
     repeat minus main on the repeat items, paired as Q5 pairs; and both on the kept pairs the two
-    subsamples share (D-163)."""
+    subsamples share (D-165)."""
     out = {}
     by_model = {r['model']: r for r in q5_rows}
     for i, k in enumerate(keys):
@@ -935,7 +935,7 @@ def render(res) -> str:
           "The digit rule's flag counts a trace when any step is flagged. Against the experts' step labels on the "
           "pilot's fully solved traces it has precision 0.817 and recall 0.427 (0.750 and 0.320 before D-156; "
           "0.800 and 0.427 between D-156 and D-159, unchanged by D-160; SCORER_VALIDATION.md). *Added 2026-09-30 "
-          'and 2026-10-01 (D-154 to D-163), after the first results were read:* on this roster a domain expert found 111 of 220 '
+          'and 2026-10-01 (D-154 to D-165), after the first results were read:* on this roster a domain expert found 111 of 220 '
           'sampled flags real before the first fix, 0.505 (FLAG_REVIEW.md), and 155 of 206 real after it, 0.752 '
           "(FLAG_REVIEW_2.md). The second fix, built from those notes, took the flag off 42 of their 51 misread "
           "steps and left it on 154 of the 155 slips' steps (DIGIT_FIX_2.md). Two review agents then checked both "
@@ -1053,14 +1053,14 @@ def render(res) -> str:
                   f"floor for tau on this roster is {res['sensitivity']['tau_noise']['median']:.3f} (below)."]
             na = t.get('noise_arm')
             if na:
-                L += ['', f"The noise floor at the arm's own size and template mix (D-163): two disjoint draws of "
+                L += ['', f"The noise floor at the arm's own size and template mix (D-165): two disjoint draws of "
                       f"{na['items_per_half']} main-run items with the arm's per-template counts over its {na['templates']} "
                       f"templates, the models ordered on each, {na['splits']} draws: median tau {na['median']:.3f}, quartiles "
                       f"{na['q1']:.3f} to {na['q3']:.3f}, 5th to 95th percentile {na['p5']:.3f} to {na['p95']:.3f}. This, not the "
                       f"roster-wide floor (halves of 7 or 8 items per template), is the comparison for the arm's tau."]
         margin = res['q5'].get('margin')
         if margin is not None:
-            L += ['', f"**Bounds (D-163).** The same bootstrap's 90% interval per model, read against a margin of "
+            L += ['', f"**Bounds (D-165).** The same bootstrap's 90% interval per model, read against a margin of "
                   f"±{margin:.2f} in answer score: a model is within the margin when the whole interval is (the "
                   f"two-one-sided-tests rule at 5%). The margin is the plan's largest detectable paired difference "
                   f"(5.1 points at 15% discordance); it was fixed after the point estimates were known and before "
@@ -1070,7 +1070,7 @@ def render(res) -> str:
                 L.append(f"| `{r['model']}` | {r['diff']:+.3f} | {ci(r['ci90'])} | {'yes' if r['within_margin'] else 'no'} |")
         vr = res['q5'].get('vs_repeats')
         if vr:
-            L += ['', "**Against run-to-run noise (D-163).** For the models with decoding repeats: the paraphrase "
+            L += ['', "**Against run-to-run noise (D-165).** For the models with decoding repeats: the paraphrase "
                   "difference beside each repeat minus the main run on the 300 repeat items, each paired by item with "
                   "the same template bootstrap; and both on the kept pairs the two subsamples share.", '',
                   '| model | paraphrase − original (pairs) | ' + ' | '.join(f'{v} − main (300)' for v in REPEATS)
