@@ -201,7 +201,7 @@ needs both arms:
 
 ```bash
 python -m full_run_28092026.judge --variant paraphrase --dry-run
-python -m full_run_28092026.judge --variant paraphrase --yes --max-usd 10 --workers 16
+python -m full_run_28092026.judge --variant paraphrase --yes --max-usd 46.30 --workers 16   # the cap is CUMULATIVE over the store: $36.30 of main-arm E5 + $10
 python -m full_run_28092026.judge --variant paraphrase --status
 python -m full_run_28092026.analyze
 ```
