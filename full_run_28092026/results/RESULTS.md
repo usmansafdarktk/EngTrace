@@ -224,17 +224,17 @@ Paraphrase minus original, paired by item; besides the answer score, E3 coverage
 
 | model | items | answer score diff | 95% CI | p (Holm) | McNemar p (Holm) | E3 coverage diff | 95% CI | E5 diff | 95% CI | same provider: pairs, diff |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| `gpt-oss-20b` | 277 | +0.011 | -0.036 to 0.057 | 1.0000 | 1.0000 | -0.009 | -0.042 to 0.024 | pending |  | 275, +0.011 |
-| `gemma-4-26b-a4b` | 277 | +0.007 | -0.035 to 0.047 | 1.0000 | 1.0000 | +0.022 | 0.002 to 0.045 | pending |  | 166, +0.009 |
-| `deepseek-v4.1-flash` | 277 | -0.011 | -0.032 to 0.011 | 1.0000 | 1.0000 | +0.007 | -0.014 to 0.029 | pending |  | 31, +0.000 |
-| `qwen3-235b-a22b-2507` | 277 | -0.031 | -0.074 to 0.011 | 1.0000 | 1.0000 | -0.005 | -0.027 to 0.017 | pending |  | 186, -0.030 |
-| `glm-5.3-flash` | 277 | -0.020 | -0.042 to 0.000 | 0.9953 | 1.0000 | -0.031 | -0.053 to -0.009 | pending |  | 23, +0.000 |
-| `glm-5.3` | 277 | -0.005 | -0.031 to 0.018 | 1.0000 | 1.0000 | +0.000 | -0.021 to 0.021 | pending |  | 85, +0.012 |
-| `muse-glimmer-30b` | 277 | +0.016 | -0.004 to 0.038 | 1.0000 | 1.0000 | -0.014 | -0.041 to 0.011 | pending |  | 277, +0.016 |
-| `kimi-k3` | 277 | +0.002 | -0.011 to 0.016 | 1.0000 | 1.0000 | -0.008 | -0.029 to 0.012 | pending |  | 3, +0.000 |
-| `gpt-5.4-mini` | 277 | -0.018 | -0.053 to 0.018 | 1.0000 | 1.0000 | -0.027 | -0.053 to -0.003 | pending |  | 277, -0.018 |
-| `gemini-3.1-flash-lite` | 277 | +0.002 | -0.037 to 0.040 | 1.0000 | 1.0000 | +0.006 | -0.012 to 0.025 | pending |  | 277, +0.002 |
-| `claude-sonnet-5` | 277 | -0.018 | -0.036 to -0.004 | 0.5109 | 1.0000 | -0.008 | -0.025 to 0.008 | pending |  | 277, -0.018 |
+| `gpt-oss-20b` | 277 | +0.011 | -0.036 to 0.057 | 1.0000 | 1.0000 | -0.009 | -0.042 to 0.024 | -0.014 | -0.046 to 0.017 | 275, +0.011 |
+| `gemma-4-26b-a4b` | 277 | +0.007 | -0.035 to 0.047 | 1.0000 | 1.0000 | +0.022 | 0.002 to 0.045 | +0.018 | 0.000 to 0.037 | 166, +0.009 |
+| `deepseek-v4.1-flash` | 277 | -0.011 | -0.032 to 0.011 | 1.0000 | 1.0000 | +0.007 | -0.014 to 0.029 | +0.000 | -0.019 to 0.022 | 31, +0.000 |
+| `qwen3-235b-a22b-2507` | 277 | -0.031 | -0.074 to 0.011 | 1.0000 | 1.0000 | -0.005 | -0.027 to 0.017 | -0.010 | -0.033 to 0.012 | 186, -0.030 |
+| `glm-5.3-flash` | 277 | -0.020 | -0.042 to 0.000 | 0.9953 | 1.0000 | -0.031 | -0.053 to -0.009 | -0.009 | -0.029 to 0.009 | 23, +0.000 |
+| `glm-5.3` | 277 | -0.005 | -0.031 to 0.018 | 1.0000 | 1.0000 | +0.000 | -0.021 to 0.021 | -0.009 | -0.030 to 0.011 | 85, +0.012 |
+| `muse-glimmer-30b` | 277 | +0.016 | -0.004 to 0.038 | 1.0000 | 1.0000 | -0.014 | -0.041 to 0.011 | -0.010 | -0.037 to 0.014 | 277, +0.016 |
+| `kimi-k3` | 277 | +0.002 | -0.011 to 0.016 | 1.0000 | 1.0000 | -0.008 | -0.029 to 0.012 | -0.004 | -0.024 to 0.016 | 3, +0.000 |
+| `gpt-5.4-mini` | 277 | -0.018 | -0.053 to 0.018 | 1.0000 | 1.0000 | -0.027 | -0.053 to -0.003 | -0.011 | -0.038 to 0.015 | 277, -0.018 |
+| `gemini-3.1-flash-lite` | 277 | +0.002 | -0.037 to 0.040 | 1.0000 | 1.0000 | +0.006 | -0.012 to 0.025 | +0.003 | -0.014 to 0.021 | 277, +0.002 |
+| `claude-sonnet-5` | 277 | -0.018 | -0.036 to -0.004 | 0.5109 | 1.0000 | -0.008 | -0.025 to 0.008 | -0.006 | -0.023 to 0.012 | 277, -0.018 |
 
 Kendall's tau between the models' answer scores on the originals and on the paraphrases, over the 277 items every tested model holds: 0.636, 95% CI 0.457 to 0.871; the noise floor for tau on this roster is 0.881 (below).
 
@@ -405,4 +405,4 @@ The pool over-represents the rare labels by design (D-116), so these rates are p
 
 ## Provenance
 
-`analyze.py` at commit `a11c130`; the score store `main` scored at commit `eea846e` on 2026-09-30T19:08:35+00:00; stages: e5 at `937c842`. The evaluator hashes and the per-model trace hashes are in `results.json`.
+`analyze.py` at commit `58fd587`; the score store `main` scored at commit `eea846e` on 2026-09-30T19:08:35+00:00; stages: e5 at `937c842`. The evaluator hashes and the per-model trace hashes are in `results.json`.

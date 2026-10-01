@@ -6123,6 +6123,8 @@ exploitation.
 **Open.** E5 on the paraphrase arm (runbook section 4, about $3 at 277 kept pairs plus the 39 the judge
 would see anyway, since it runs on what is on disk) once approved.
 
+**E5 on the arm (2026-09-30, approved at $10 of new spend).** 1,227 judge calls over the 316 paraphrase traces' milestones, all returned after one re-run for 3 failures; **$4.56** against the $4.06 estimate. The first launch passed `--max-usd 10`, which the stage reads as a cumulative cap over the store (already $36.30 from the main arm), so it made no call; it ran at `--max-usd 46.30`, the same $10, and the runbook now says so. Q5's E5-strict difference, paraphrase minus original over the kept pairs, lies between -0.014 (`gpt-oss-20b`) and +0.018 (`gemma-4-26b-a4b`, CI 0.000 to 0.037) for every model, every other interval spanning zero: the reasoning the judge reads holds under the rewording as the answers do.
+
 **Backup (2026-10-01).** The arm archived again with the experts' returns: `full_run_paraphrase_2026-10-01.zip`, 80 files checked member by member, sha256 `24d9f614…af9293`; uploaded in manual mode as the private Kaggle dataset `ayeshaiq/engtrace-full-run-paraphrase`, downloaded back and every member matched by path and hash (the one extra file is the checksum itself). The 30 September archive D-161 cites stays beside it.
 
 ## D-163 — The flag reading, round 3: the corrected rule's precision on this roster is 0.905; no round 4
@@ -6184,7 +6186,7 @@ columns.
 
 | # | Decision | Needed before |
 |---|---|---|
-| D-161 | Run: E5 on the paraphrase arm, about $3 at 316 items (`PARAPHRASE_RUNBOOK.md` section 4), for Q5's E5 column. ~~The private Kaggle copy of the arm's archive~~ **Done 2026-10-01: `ayeshaiq/engtrace-full-run-paraphrase`, private, from `full_run_paraphrase_2026-10-01.zip` (80 files, the experts' returns included), downloaded back and matched member by member** | Q5's E5 column in the paper |
+| D-161 | ~~Run: E5 on the paraphrase arm, about $3 at 316 items (`PARAPHRASE_RUNBOOK.md` section 4), for Q5's E5 column~~ **Done 2026-09-30 (D-162): $4.56, every call answered.** ~~The private Kaggle copy of the arm's archive~~ **Done 2026-10-01: `ayeshaiq/engtrace-full-run-paraphrase`, private, from `full_run_paraphrase_2026-10-01.zip` (80 files, the experts' returns included), downloaded back and matched member by member** | Q5's E5 column in the paper |
 | D-160 | ~~Round 3 of the flag reading: the 190 claims in `scores/flag_review/round3/` (workbook and instructions), then `flag_sample --round 3 --merge <file>` and `--score --read-by "<who>"`, giving the corrected rule's precision on this roster; no round 4~~ **Read 2026-10-01 by the same domain expert: precision 0.905 (D-163, `FLAG_REVIEW_3.md`)** | — |
 | D-159 | ~~Round 3 of the flag reading: the 181 claims in `scores/flag_review/round3/`~~ **Redrawn 2026-09-30, unread, after two review agents' corrections (D-160)** | — |
 | D-158 | ~~A second fix of the digit rule's parser from round 2's notes, measured by a round 3 (no round 4), or 0.752 reported as measured~~ **Decided 2026-09-30: the second fix, adopted with no pilot step moving away (D-159); round 3 drawn** | — |
