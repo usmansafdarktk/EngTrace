@@ -6182,6 +6182,64 @@ would see anyway, since it runs on what is on disk) once approved.
 **Open.** The run's end: `router --status` shows no call without a reply, then `analyze` fills Q3's router
 columns.
 
+## D-165 — Q5 read as a bound: the equivalence margin, the noise floor at the arm's size, the repeats beside it; the stream audited and the paper notes written
+
+**Date:** 2026-10-01 · **Status:** DECIDED · **Evidence:** `analyze.py` (`paired`, `tau_noise_arm`, `vs_repeats`, `EQUIV_MARGIN`, `--selftest`), `results/RESULTS.md` Q5, `paraphrase_audit.py` and `PARAPHRASE_AUDIT.md`, `PARAPHRASE_PAPER_NOTES.md`
+
+The owner asked whether Q5 is publishable. It is, as a robustness section answering a named reviewer
+objection, once the null result is stated as a bound rather than as "nothing significant", once the
+ordering's stability is read against a noise floor computed at the arm's own size, and once the
+wording effect is set beside the run-to-run effect the decoding repeats measured. Three additions to
+`analyze.py`, each reusing Q5's definitions (the template bootstrap, its seeds, the item-weighted
+ordering), and nothing in the pre-registered test changed:
+
+1. **Bounds.** `paired()` now returns, from the same bootstrap draws, the 90% interval beside the 95%
+   one, read against `EQUIV_MARGIN = 0.05`: a model is within the margin when the whole 90% interval is
+   (the two-one-sided-tests rule at 5%). The margin is the plan's largest detectable paired difference
+   (5.1 points at 15% discordance, `ANALYSIS_PLAN.md` Q5); it was fixed after the point estimates were
+   known (all within ±3.2 points) and before the intervals were computed, and the results and the paper
+   notes say so. **Ten of eleven models are within ±5 points**; `qwen3-235b-a22b-2507` is not (−0.031,
+   90% CI −0.067 to +0.005). Two intervals lie wholly below zero, `glm-5.3-flash` (−0.020, −0.038 to
+   −0.004) and `claude-sonnet-5` (−0.018, −0.032 to −0.005): small decreases the data favour, within the
+   bound, not significant after Holm.
+2. **The noise floor at the arm's size.** The roster-wide floor (0.881) splits each template's 15 items
+   in half and is not the comparison for an arm of 277 items over 115 templates. `tau_noise_arm` draws,
+   for each template with k kept pairs, 2k of the main run's items and splits them into two halves of k,
+   orders the models on each by the item-weighted mean as `kendall_boot` orders the arms, and takes tau,
+   200 times: **median 0.783, quartiles 0.722 to 0.844, 5th to 95th percentile 0.636 to 0.917**. The
+   arm's tau, 0.636 (95% CI 0.457 to 0.871), sits at that distribution's 5th percentile: consistent with
+   sampling noise, at its lower edge. The reading for the paper: the tiers hold; the order within the top
+   tier, five models within 0.012 of one another, is not resolved by this arm.
+3. **Against run-to-run noise.** `vs_repeats` pairs each decoding repeat against the main run on the 300
+   repeat items with the same `paired()`, and also both arms on the 92 kept pairs the two subsamples
+   share. The paraphrase difference lies within the repeats' spread for `gemma-4-26b-a4b` and
+   `gemini-3.1-flash-lite`; not for `qwen3-235b-a22b-2507` (−0.031 against repeats within ±0.008) and
+   marginally not for `gpt-oss-20b` (+0.011 against +0.008). The sentence "rewording moves a model less
+   than re-running it" is therefore not available for the roster; the four rows are reported as they
+   are.
+
+The self-test gained two assertions: a zero difference sits within the margin and a nine-point loss
+outside it; the arm-size floor is finite. The results were regenerated from the clean tree.
+
+**The audit.** `paraphrase_audit.py` recomputes every number the stream reports from the artifacts on
+disk and compares it with what is committed: the manifest against the local pool (hashes, one prompt,
+the original's hash the frozen pool's, every served text passing the six checks as the code stands,
+the restored flag), the kits against the keyfile and the layer-2 roster (whole templates, own branch,
+at most ten, the kit text the restored text), the returns against the assignment (one submission per
+code from its expert, the kept rule recomputed, a note on every rejection), the traces (one final row
+per item and model, both hashes the manifest's, one served model each as the main run's, the spend),
+the scores (hashed to their traces, unusable rows the empty rows), the judge (a reply for every judged
+trace), the results (eleven rows over the kept pairs, a clean provenance) and the backups (the archive's
+checksum and members, the Kaggle listing). **28 checks, all pass**; `PARAPHRASE_AUDIT.md` is
+the record. Its first run failed three checks on the script's own field names and none on the data.
+
+**The paper notes.** `PARAPHRASE_PAPER_NOTES.md`: the figures to report with their sources, what to
+state (the bound, what it answers, the ordering, the two small decreases, Qwen, the smaller arm and
+why, the expert step's necessity, provenance), what not to state ("robust", "no contamination", "the
+ranking is stable", "less than re-running", 450, the roster-wide floor, the E3 columns as findings,
+per-branch conclusions), the margin's history, suggested wording for the section and the limitations,
+and the figures worth drawing.
+
 ## Open decisions
 
 | # | Decision | Needed before |

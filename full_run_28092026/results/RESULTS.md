@@ -116,7 +116,7 @@ Answer score on the 58 Easy templates minus the 34 Advanced, templates resampled
 
 ## Q3. What the process scores add beyond the answer
 
-Wrong-answer traces score 0 (incorrect or unusable); fully solved ones score 1; a partial answer is in neither. E3 coverage leaves out the 70 items with no milestones (all 15 of 3 templates and some items of 12 more); 52 templates have an item with at most one milestone (46 with exactly one), where coverage is close to an answer check. E3 is the deterministic part of E5, which adds the judge's verdict on the milestones E3 does not find. The floor is the same trace scored against a sibling item's milestones (D-149): what coverage a trace reaches by chance, per model, on the readable wrong answers. The digit rule's flag counts a trace when any step is flagged. Against the experts' step labels on the pilot's fully solved traces it has precision 0.817 and recall 0.427 (0.750 and 0.320 before D-156; 0.800 and 0.427 between D-156 and D-159, unchanged by D-160; SCORER_VALIDATION.md). *Added 2026-09-30 and 2026-10-01 (D-154 to D-163), after the first results were read:* on this roster a domain expert found 111 of 220 sampled flags real before the first fix, 0.505 (FLAG_REVIEW.md), and 155 of 206 real after it, 0.752 (FLAG_REVIEW_2.md). The second fix, built from those notes, took the flag off 42 of their 51 misread steps and left it on 154 of the 155 slips' steps (DIGIT_FIX_2.md). Two review agents then checked both fixes; the corrections they led to, with LaTeX control spaces now read, took the flag off 82 full-run steps and put it on 370, and kept every slip's step the second fix had kept (D-160, DIGIT_FIX_3.md). The same expert then read 190 flags of the rule as it now stands: 171 of the 189 decided are real, 0.905 (95% Wilson 0.854 to 0.939; per model 0.632 to 1.000; FLAG_REVIEW_3.md), and by the owner's rule no fourth reading follows. So its rate is still not a count of slips; and it reads a different amount of arithmetic in each model's traces (claims checked per answered trace, shown), so a low rate can mean little was read.
+Wrong-answer traces score 0 (incorrect or unusable); fully solved ones score 1; a partial answer is in neither. E3 coverage leaves out the 70 items with no milestones (all 15 of 3 templates and some items of 12 more); 52 templates have an item with at most one milestone (46 with exactly one), where coverage is close to an answer check. E3 is the deterministic part of E5, which adds the judge's verdict on the milestones E3 does not find. The floor is the same trace scored against a sibling item's milestones (D-149): what coverage a trace reaches by chance, per model, on the readable wrong answers. The digit rule's flag counts a trace when any step is flagged. Against the experts' step labels on the pilot's fully solved traces it has precision 0.817 and recall 0.427 (0.750 and 0.320 before D-156; 0.800 and 0.427 between D-156 and D-159, unchanged by D-160; SCORER_VALIDATION.md). *Added 2026-09-30 and 2026-10-01 (D-154 to D-165), after the first results were read:* on this roster a domain expert found 111 of 220 sampled flags real before the first fix, 0.505 (FLAG_REVIEW.md), and 155 of 206 real after it, 0.752 (FLAG_REVIEW_2.md). The second fix, built from those notes, took the flag off 42 of their 51 misread steps and left it on 154 of the 155 slips' steps (DIGIT_FIX_2.md). Two review agents then checked both fixes; the corrections they led to, with LaTeX control spaces now read, took the flag off 82 full-run steps and put it on 370, and kept every slip's step the second fix had kept (D-160, DIGIT_FIX_3.md). The same expert then read 190 flags of the rule as it now stands: 171 of the 189 decided are real, 0.905 (95% Wilson 0.854 to 0.939; per model 0.632 to 1.000; FLAG_REVIEW_3.md), and by the owner's rule no fourth reading follows. So its rate is still not a count of slips; and it reads a different amount of arithmetic in each model's traces (claims checked per answered trace, shown), so a low rate can mean little was read.
 
 **Milestones on the wrong-answer traces.** An unusable trace reaches only what it wrote before it stopped, and an empty one nothing, so coverage is also shown on the readable wrong answers alone.
 
@@ -237,6 +237,33 @@ Paraphrase minus original, paired by item; besides the answer score, E3 coverage
 | `claude-sonnet-5` | 277 | -0.018 | -0.036 to -0.004 | 0.5109 | 1.0000 | -0.008 | -0.025 to 0.008 | -0.006 | -0.023 to 0.012 | 277, -0.018 |
 
 Kendall's tau between the models' answer scores on the originals and on the paraphrases, over the 277 items every tested model holds: 0.636, 95% CI 0.457 to 0.871; the noise floor for tau on this roster is 0.881 (below).
+
+The noise floor at the arm's own size and template mix (D-165): two disjoint draws of 277 main-run items with the arm's per-template counts over its 115 templates, the models ordered on each, 200 draws: median tau 0.783, quartiles 0.722 to 0.844, 5th to 95th percentile 0.636 to 0.917. This, not the roster-wide floor (halves of 7 or 8 items per template), is the comparison for the arm's tau.
+
+**Bounds (D-165).** The same bootstrap's 90% interval per model, read against a margin of ±0.05 in answer score: a model is within the margin when the whole interval is (the two-one-sided-tests rule at 5%). The margin is the plan's largest detectable paired difference (5.1 points at 15% discordance); it was fixed after the point estimates were known and before these intervals were computed.
+
+| model | answer score diff | 90% CI | within the margin |
+|---|---:|---:|---|
+| `gpt-oss-20b` | +0.011 | -0.028 to 0.050 | yes |
+| `gemma-4-26b-a4b` | +0.007 | -0.028 to 0.040 | yes |
+| `deepseek-v4.1-flash` | -0.011 | -0.029 to 0.007 | yes |
+| `qwen3-235b-a22b-2507` | -0.031 | -0.067 to 0.005 | no |
+| `glm-5.3-flash` | -0.020 | -0.038 to -0.004 | yes |
+| `glm-5.3` | -0.005 | -0.026 to 0.014 | yes |
+| `muse-glimmer-30b` | +0.016 | 0.000 to 0.034 | yes |
+| `kimi-k3` | +0.002 | -0.009 to 0.013 | yes |
+| `gpt-5.4-mini` | -0.018 | -0.047 to 0.011 | yes |
+| `gemini-3.1-flash-lite` | +0.002 | -0.031 to 0.034 | yes |
+| `claude-sonnet-5` | -0.018 | -0.032 to -0.005 | yes |
+
+**Against run-to-run noise (D-165).** For the models with decoding repeats: the paraphrase difference beside each repeat minus the main run on the 300 repeat items, each paired by item with the same template bootstrap; and both on the kept pairs the two subsamples share.
+
+| model | paraphrase − original (pairs) | repeat1 − main (300) | repeat2 − main (300) | repeat3 − main (300) | shared items | paraphrase on them | repeats on them | |paraphrase| within the repeats' spread |
+|---|---:|---:|---:|---:|---:|---:|---:|---|
+| `gpt-oss-20b` | +0.011 -0.036 to 0.057 (277) | +0.003 -0.032 to 0.037 | +0.008 -0.023 to 0.040 | +0.007 -0.030 to 0.042 | 92 | +0.005 -0.065 to 0.076 | -0.027, +0.000, -0.005 | no |
+| `gemma-4-26b-a4b` | +0.007 -0.035 to 0.047 (277) | -0.020 -0.055 to 0.015 | +0.000 -0.035 to 0.033 | +0.012 -0.015 to 0.038 | 92 | -0.038 -0.103 to 0.027 | -0.022, +0.005, -0.027 | yes |
+| `qwen3-235b-a22b-2507` | -0.031 -0.074 to 0.011 (277) | -0.005 -0.035 to 0.025 | +0.005 -0.023 to 0.035 | +0.008 -0.022 to 0.037 | 92 | -0.027 -0.082 to 0.027 | -0.005, +0.000, +0.027 | no |
+| `gemini-3.1-flash-lite` | +0.002 -0.037 to 0.040 (277) | +0.002 -0.020 to 0.023 | -0.012 -0.035 to 0.012 | +0.010 -0.013 to 0.033 | 92 | -0.027 -0.076 to 0.016 | -0.027, -0.033, -0.033 | yes |
 
 ## Sensitivity
 
@@ -405,4 +432,4 @@ The pool over-represents the rare labels by design (D-116), so these rates are p
 
 ## Provenance
 
-`analyze.py` at commit `58fd587`; the score store `main` scored at commit `eea846e` on 2026-09-30T19:08:35+00:00; stages: e5 at `937c842`. The evaluator hashes and the per-model trace hashes are in `results.json`.
+`analyze.py` at commit `319e76c`; the score store `main` scored at commit `eea846e` on 2026-09-30T19:08:35+00:00; stages: e5 at `937c842`. The evaluator hashes and the per-model trace hashes are in `results.json`.
