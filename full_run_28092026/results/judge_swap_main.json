@@ -1,0 +1,282 @@
+{
+ "judge": "x-ai/grok-4.6",
+ "base_judge": "xiaomi/mimo-v2.5-pro",
+ "variant": "main",
+ "sample": 220,
+ "models": {
+  "gpt-oss-20b": {
+   "traces": 20,
+   "without_reply": 0,
+   "milestones_both_judged": 53,
+   "agreement_three_way": 0.7169811320754716,
+   "agreement_reached_vs_not": 0.9433962264150944,
+   "reached_share_base": 0.11320754716981132,
+   "reached_share_other": 0.09433962264150944,
+   "pairs": {
+    "MISSING->MISSING": 21,
+    "MISSING->NOT_NEEDED": 3,
+    "NOT_NEEDED->MISSING": 9,
+    "NOT_NEEDED->NOT_NEEDED": 13,
+    "NOT_NEEDED->REACHED": 1,
+    "REACHED->MISSING": 1,
+    "REACHED->NOT_NEEDED": 1,
+    "REACHED->REACHED": 4
+   },
+   "e5_strict_base": 0.5520757020757021,
+   "e5_strict_other": 0.538385225885226,
+   "diff": -0.013690476190476187,
+   "diff_ci_templates": [
+    -0.0588235294117647,
+    0.008403361344537818
+   ],
+   "templates": 17
+  },
+  "gemma-4-26b-a4b": {
+   "traces": 20,
+   "without_reply": 0,
+   "milestones_both_judged": 52,
+   "agreement_three_way": 0.6923076923076923,
+   "agreement_reached_vs_not": 0.9615384615384616,
+   "reached_share_base": 0.1346153846153846,
+   "reached_share_other": 0.1346153846153846,
+   "pairs": {
+    "MISSING->MISSING": 11,
+    "MISSING->NOT_NEEDED": 2,
+    "MISSING->REACHED": 1,
+    "NOT_NEEDED->MISSING": 12,
+    "NOT_NEEDED->NOT_NEEDED": 19,
+    "REACHED->MISSING": 1,
+    "REACHED->REACHED": 6
+   },
+   "e5_strict_base": 0.5480357142857143,
+   "e5_strict_other": 0.552202380952381,
+   "diff": 0.004166666666666663,
+   "diff_ci_templates": [
+    -0.026315789473684223,
+    0.039473684210526314
+   ],
+   "templates": 19
+  },
+  "deepseek-v4.1-flash": {
+   "traces": 20,
+   "without_reply": 0,
+   "milestones_both_judged": 41,
+   "agreement_three_way": 0.926829268292683,
+   "agreement_reached_vs_not": 0.975609756097561,
+   "reached_share_base": 0.2682926829268293,
+   "reached_share_other": 0.24390243902439024,
+   "pairs": {
+    "MISSING->NOT_NEEDED": 2,
+    "NOT_NEEDED->NOT_NEEDED": 28,
+    "REACHED->NOT_NEEDED": 1,
+    "REACHED->REACHED": 10
+   },
+   "e5_strict_base": 0.7330753968253968,
+   "e5_strict_other": 0.7164087301587301,
+   "diff": -0.01666666666666667,
+   "diff_ci_templates": [
+    -0.02380952380952381,
+    0.0
+   ],
+   "templates": 14
+  },
+  "qwen3-235b-a22b-2507": {
+   "traces": 20,
+   "without_reply": 0,
+   "milestones_both_judged": 41,
+   "agreement_three_way": 0.9024390243902439,
+   "agreement_reached_vs_not": 0.975609756097561,
+   "reached_share_base": 0.21951219512195122,
+   "reached_share_other": 0.24390243902439024,
+   "pairs": {
+    "MISSING->MISSING": 16,
+    "NOT_NEEDED->MISSING": 3,
+    "NOT_NEEDED->NOT_NEEDED": 12,
+    "NOT_NEEDED->REACHED": 1,
+    "REACHED->REACHED": 9
+   },
+   "e5_strict_base": 0.641984126984127,
+   "e5_strict_other": 0.648234126984127,
+   "diff": 0.00625,
+   "diff_ci_templates": [
+    0.0,
+    0.022058823529411766
+   ],
+   "templates": 17
+  },
+  "glm-5.3-flash": {
+   "traces": 20,
+   "without_reply": 0,
+   "milestones_both_judged": 39,
+   "agreement_three_way": 0.8974358974358975,
+   "agreement_reached_vs_not": 0.9487179487179487,
+   "reached_share_base": 0.1794871794871795,
+   "reached_share_other": 0.23076923076923078,
+   "pairs": {
+    "MISSING->MISSING": 3,
+    "MISSING->NOT_NEEDED": 1,
+    "NOT_NEEDED->MISSING": 1,
+    "NOT_NEEDED->NOT_NEEDED": 25,
+    "NOT_NEEDED->REACHED": 2,
+    "REACHED->REACHED": 7
+   },
+   "e5_strict_base": 0.6741865079365079,
+   "e5_strict_other": 0.6875198412698413,
+   "diff": 0.01333333333333333,
+   "diff_ci_templates": [
+    0.0,
+    0.04444444444444443
+   ],
+   "templates": 15
+  },
+  "glm-5.3": {
+   "traces": 20,
+   "without_reply": 0,
+   "milestones_both_judged": 34,
+   "agreement_three_way": 0.7058823529411765,
+   "agreement_reached_vs_not": 0.7352941176470589,
+   "reached_share_base": 0.3235294117647059,
+   "reached_share_other": 0.17647058823529413,
+   "pairs": {
+    "MISSING->NOT_NEEDED": 1,
+    "MISSING->REACHED": 2,
+    "NOT_NEEDED->NOT_NEEDED": 20,
+    "REACHED->MISSING": 7,
+    "REACHED->REACHED": 4
+   },
+   "e5_strict_base": 0.7331944444444445,
+   "e5_strict_other": 0.72,
+   "diff": -0.013194444444444443,
+   "diff_ci_templates": [
+    -0.1396604938271605,
+    0.08333333333333333
+   ],
+   "templates": 18
+  },
+  "muse-glimmer-30b": {
+   "traces": 20,
+   "without_reply": 0,
+   "milestones_both_judged": 44,
+   "agreement_three_way": 0.8636363636363636,
+   "agreement_reached_vs_not": 0.9090909090909091,
+   "reached_share_base": 0.3181818181818182,
+   "reached_share_other": 0.36363636363636365,
+   "pairs": {
+    "MISSING->MISSING": 1,
+    "MISSING->NOT_NEEDED": 2,
+    "MISSING->REACHED": 2,
+    "NOT_NEEDED->NOT_NEEDED": 24,
+    "NOT_NEEDED->REACHED": 1,
+    "REACHED->NOT_NEEDED": 1,
+    "REACHED->REACHED": 13
+   },
+   "e5_strict_base": 0.7526190476190476,
+   "e5_strict_other": 0.7722619047619047,
+   "diff": 0.01964285714285714,
+   "diff_ci_templates": [
+    -0.003289473684210526,
+    0.05780075187969924
+   ],
+   "templates": 19
+  },
+  "kimi-k3": {
+   "traces": 20,
+   "without_reply": 0,
+   "milestones_both_judged": 41,
+   "agreement_three_way": 0.7804878048780488,
+   "agreement_reached_vs_not": 0.8292682926829268,
+   "reached_share_base": 0.3170731707317073,
+   "reached_share_other": 0.34146341463414637,
+   "pairs": {
+    "MISSING->NOT_NEEDED": 2,
+    "MISSING->REACHED": 3,
+    "NOT_NEEDED->NOT_NEEDED": 22,
+    "NOT_NEEDED->REACHED": 1,
+    "REACHED->MISSING": 1,
+    "REACHED->NOT_NEEDED": 2,
+    "REACHED->REACHED": 10
+   },
+   "e5_strict_base": 0.7115674603174603,
+   "e5_strict_other": 0.7201190476190475,
+   "diff": 0.008551587301587293,
+   "diff_ci_templates": [
+    -0.03601190476190477,
+    0.06710069444444444
+   ],
+   "templates": 16
+  },
+  "gpt-5.4-mini": {
+   "traces": 20,
+   "without_reply": 0,
+   "milestones_both_judged": 47,
+   "agreement_three_way": 0.8297872340425532,
+   "agreement_reached_vs_not": 1.0,
+   "reached_share_base": 0.0851063829787234,
+   "reached_share_other": 0.0851063829787234,
+   "pairs": {
+    "MISSING->MISSING": 21,
+    "MISSING->NOT_NEEDED": 1,
+    "NOT_NEEDED->MISSING": 7,
+    "NOT_NEEDED->NOT_NEEDED": 14,
+    "REACHED->REACHED": 4
+   },
+   "e5_strict_base": 0.6592857142857143,
+   "e5_strict_other": 0.6592857142857143,
+   "diff": 0.0,
+   "diff_ci_templates": [
+    0.0,
+    0.0
+   ],
+   "templates": 19
+  },
+  "gemini-3.1-flash-lite": {
+   "traces": 20,
+   "without_reply": 0,
+   "milestones_both_judged": 39,
+   "agreement_three_way": 0.8974358974358975,
+   "agreement_reached_vs_not": 0.9743589743589743,
+   "reached_share_base": 0.23076923076923078,
+   "reached_share_other": 0.20512820512820512,
+   "pairs": {
+    "MISSING->MISSING": 8,
+    "MISSING->NOT_NEEDED": 1,
+    "NOT_NEEDED->MISSING": 2,
+    "NOT_NEEDED->NOT_NEEDED": 19,
+    "REACHED->NOT_NEEDED": 1,
+    "REACHED->REACHED": 8
+   },
+   "e5_strict_base": 0.6711904761904762,
+   "e5_strict_other": 0.6628571428571429,
+   "diff": -0.008333333333333337,
+   "diff_ci_templates": [
+    -0.009803921568627456,
+    0.0
+   ],
+   "templates": 17
+  },
+  "claude-sonnet-5": {
+   "traces": 20,
+   "without_reply": 0,
+   "milestones_both_judged": 35,
+   "agreement_three_way": 0.8,
+   "agreement_reached_vs_not": 0.9428571428571428,
+   "reached_share_base": 0.14285714285714285,
+   "reached_share_other": 0.2,
+   "pairs": {
+    "MISSING->NOT_NEEDED": 5,
+    "MISSING->REACHED": 1,
+    "NOT_NEEDED->NOT_NEEDED": 23,
+    "NOT_NEEDED->REACHED": 1,
+    "REACHED->REACHED": 5
+   },
+   "e5_strict_base": 0.677579365079365,
+   "e5_strict_other": 0.6959126984126984,
+   "diff": 0.01833333333333334,
+   "diff_ci_templates": [
+    0.0,
+    0.058333333333333355
+   ],
+   "templates": 16
+  }
+ }
+}

@@ -157,7 +157,7 @@ reported beside the main run, not in place of it; a dry run prices it (the two m
 and $2.48; reasoning multiplies output tokens). *Decision:* run it, or state the setting and leave the
 comparison unmade (RESULTS_PAPER_NOTES item 7).
 
-**C2. A judge-swap robustness check.** *Answers:* yAYU 1 / 9W1B 2 on the single judge. *Method:* E5 with a
+**C2. A judge-swap robustness check.** *(Done 2026-10-03, D-181: `JUDGE_SWAP.md` and RESULTS_X1 Finding 8; $10.53.)* *Answers:* yAYU 1 / 9W1B 2 on the single judge. *Method:* E5 with a
 second judge from another family on a stratified sample of the residual milestones (about $3 to $5), and
 Grok 4.6 on the planted set (about $3.40, `JUDGE_SELECTION.md`); report whether any Q3 figure moves by more
 than its interval. *Decision:* cheap; worth it if a reviewer's objection to one judge is expected.

@@ -6805,6 +6805,36 @@ runs once the traces exist (the main run's rates pro rata, about $1.30 and $3.80
 **Not decided here.** Whether to run it, at which effort (medium is the standard setting; high the ceiling), and the
 cap. The round stands at about $535 against a roughly $500 budget before this.
 
+## D-181 — C2, the judge swap: a second judge from another family agrees with MiMo within Q3's intervals, and catches as many planted defects
+
+**Date:** 2026-10-03 · **Status:** DONE ($10.53: $2.82 for the E5 sample, $7.71 for the planted set) · **Evidence:** `full_run_28092026/judge.py` (`--judge`, `--sample`, `--seed`; rows under `scores/main/e5_grok-4-6/`), `judge_swap.py`, `JUDGE_SWAP.md`, `results/judge_swap_main.json`; `evaluator_pilot_17092026/analysis/planted_judges.py` (`--judge`, Grok 4.6 in its list), its `report`, RESULTS_X1 Finding 8 (addendum)
+
+**The E5 sample.** Grok 4.6 (xAI; a family on neither the roster nor the full run's judge side, E1's judge in the
+pilot) answered E5's own prompts for 20 traces per model, 220 traces drawn by a seeded shuffle from those E5 sends,
+the same reply store and call settings. On the 466 milestones both judges ruled on, agreement on REACHED against not is
+0.83 to 1.00 for ten models and 0.74 for GLM-5.3 (34 milestones); three-way agreement 0.69 to 0.93. E5-strict coverage
+over the sampled traces differs, Grok minus MiMo, by −0.017 to +0.020 per model, every interval narrower than Q3's own
+and most including zero. The disagreements are almost all NOT_NEEDED against MISSING (54 of 466), which the strict score
+treats alike; REACHED moved on 24. So no Q3 figure that rests on the judge would move by more than its interval under
+a judge from another family.
+
+**The planted set.** Grok 4.6 on the 240 matched prompts of RESULTS_X1 Finding 8 (the planted step and the same step
+untouched): 22 of 60 conceptual defects caught (0.367; 0.550 counting "Other"), 52 of 60 arithmetic (0.867), 0 false
+alarms on the 120 untouched steps, every call returned, against GPT-5's 0.333 / 0.717, Opus 4.5's 0.133 / 0.717 and
+MiMo's 0.308 / 0.717. The run was restricted to Grok by the new `--judge` filter so that MiMo's 17 unreturned calls were
+not re-asked and its published basis (51 of 60) stands; the probe's resume loop now skips cancelled futures.
+
+**Costs against the estimate.** The E5 sample came in under its $5 to $9 figure; the planted set above its $3.40
+(Grok's reasoning tokens are billed as output at $6 per million), inside the cumulative budget set for the run. Both
+caps for the judged stages are cumulative over their reply stores, which already held the main run's spend; the first
+launches at $4 and $10 therefore made no calls and billed nothing, and were relaunched with caps above the stores'
+cumulative totals (the same holds for C1's E5 and router).
+
+**For the paper.** One sentence in the evaluator section: a second judge from a third family reproduces MiMo's
+milestone verdicts within the reported intervals on a 220-trace sample and catches 37% of planted conceptual defects
+against MiMo's 31%; the single-judge design is a cost choice, not a sensitivity. JUDGE_SELECTION's "if a reviewer
+presses the point, that is the run to buy" is bought.
+
 ## Open decisions
 
 | # | Decision | Needed before |

@@ -57,7 +57,11 @@ PLANTED = _os.path.join(_ANALYSIS, 'out', 'planted', 'planted.jsonl')
 # Prices per million tokens; MiMo's are derived from its recorded E5 calls.
 JUDGES = [('gpt-5', 'openai/gpt-5', (1.25, 10.0)),
           ('opus-4.5', 'anthropic/claude-opus-4.5', (5.0, 25.0)),
-          ('mimo-v2.5-pro', 'xiaomi/mimo-v2.5-pro', (0.435, 0.870))]
+          ('mimo-v2.5-pro', 'xiaomi/mimo-v2.5-pro', (0.435, 0.870)),
+          # C2 (D-181, 2026-10-03): the judge JUDGE_SELECTION named as the one to buy if a reviewer presses the
+          # single-judge point; from a family on neither the roster nor the full run's judge side. Its earlier
+          # rows, if any, are kept by the resume rule above.
+          ('grok-4.6', 'x-ai/grok-4.6', (2.0, 6.0))]
 E0_PAIR = ('gpt-5', 'opus-4.5')
 SEED = 20260924
 
@@ -144,8 +148,10 @@ def build(sample):
     print('calls if every judge runs: %d' % (len(probe) * len(JUDGES)))
 
 
-def run(budget, workers=4):
-    """Call the judges. PAID. Stops as soon as the spend would pass --budget."""
+def run(budget, workers=4, only=None):
+    """Call the judges. PAID. Stops as soon as the spend would pass --budget (cumulative over the reply store).
+    `only` restricts the run to one judge id, so adding a judge later (C2: Grok 4.6, D-181) does not re-ask the
+    calls an earlier judge never returned and move its published record."""
     probe = json.load(open(PROBE, encoding='utf-8'))
     done = set()
     spent = 0.0
@@ -156,7 +162,7 @@ def run(budget, workers=4):
                 spent += r.get('cost_usd', 0.0)
     price = {j[0]: j[2] for j in JUDGES}
     jobs = [(j, i) for j in JUDGES for i in range(len(probe))
-            if (j[0], probe[i]['set_id'], probe[i]['arm']) not in done]
+            if (j[0], probe[i]['set_id'], probe[i]['arm']) not in done and (only is None or j[0] == only)]
     print('%d calls outstanding, %.2f already spent' % (len(jobs), spent))
     if not jobs:
         return 0
@@ -171,6 +177,8 @@ def run(budget, workers=4):
     with cf.ThreadPoolExecutor(max_workers=workers) as pool, open(REPLIES, 'a', encoding='utf-8') as fh:
         futures = {pool.submit(one, j): j for j in jobs}
         for fut in cf.as_completed(futures):
+            if fut.cancelled():
+                continue
             res = fut.result()
             pin, pout = price[res['judge']]
             res['cost_usd'] = ((res.get('in') or 0) * pin + (res.get('out') or 0) * pout) / 1e6
@@ -301,11 +309,12 @@ def main():
     ap.add_argument('--sample', default='20,10', help='conceptual,arithmetic defects to probe')
     ap.add_argument('--budget', type=float, default=4.0, help='stop the run at this spend')
     ap.add_argument('--workers', type=int, default=4)
+    ap.add_argument('--judge', default=None, help='run only this judge id (e.g. grok-4.6)')
     a = ap.parse_args()
     if a.cmd == 'build':
         return build([int(x) for x in a.sample.split(',')])
     if a.cmd == 'run':
-        return run(a.budget, a.workers)
+        return run(a.budget, a.workers, a.judge)
     return report()
 
 

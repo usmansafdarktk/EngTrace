@@ -5,6 +5,11 @@ stored so none is bought twice (D-142).
     python -m full_run_28092026.judge --validate                       # FREE: the pilot's 300 traces, from its stored replies
     python -m full_run_28092026.judge --yes [--model KEY] [--max-usd 100] [--workers 16]   # BILLS
     python -m full_run_28092026.judge --score [--variant main]         # FREE: the E5 store from the stored replies
+    python -m full_run_28092026.judge --judge x-ai/grok-4.6 --sample 40 --seed 7 --dry-run   # C2 (D-181): a second judge
+    python -m full_run_28092026.judge --judge x-ai/grok-4.6 --sample 40 --seed 7 --yes --max-usd 5
+                                                                        # on a per-model sample of the traces E5 sends;
+                                                                        # rows go to scores/<variant>/e5_<judge>/, the
+                                                                        # same prompts, the same reply store
 
 WHAT IS SENT is the pilot's E5, imported unchanged from evaluators/e5_hybrid.py: for each answered
 trace whose item has milestones E3 did not reach (score.py's store), one call holding the question,
@@ -115,6 +120,20 @@ def summarise(milestones: list[dict], reached: list[bool], sent: bool, reply: di
 
 # ------------------------------------------------------------------ the full run
 
+OUT_NAME = 'e5'                 # the stage's folder under scores/<variant>/; a second judge writes to e5_<slug> (C2)
+
+
+def sample_keep(variant: str, keys: list[str], items: dict, ms_all: dict, n: int, seed: int) -> set:
+    """C2: n traces per model among those E5 sends to the judge, drawn by a seeded shuffle, as (model, item) pairs."""
+    import random
+    keep = set()
+    for key in keys:
+        sent = sorted(row['item_id'] for row, _ms, _r, j in jobs_for(variant, key, items, ms_all) if j)
+        random.Random(f'{seed}|{key}').shuffle(sent)
+        keep |= {(key, i) for i in sent[:n]}
+    return keep
+
+
 def roster(variant: str) -> list[str]:
     from full_run_28092026.analyze import ROSTER
     return [k for k in ROSTER if (score.SCORES / variant / f'{k}.jsonl').exists()]
@@ -134,17 +153,19 @@ def jobs_for(variant: str, key: str, items: dict, ms_all: dict) -> list[tuple]:
     return out
 
 
-def write(variant: str, keys: list[str], store: jc.Store) -> dict:
-    """The E5 rows from the stored replies. Free."""
+def write(variant: str, keys: list[str], store: jc.Store, keep: set | None = None) -> dict:
+    """The E5 rows from the stored replies. Free. With `keep` (C2), only those (model, item) traces are written."""
     items = score.pool_items()
     ms_all = score.milestone_sets(items)
-    out_dir = score.SCORES / variant / 'e5'
+    out_dir = score.SCORES / variant / OUT_NAME
     out_dir.mkdir(parents=True, exist_ok=True)
     totals = {}
     for key in keys:
         n_sent = n_missing = 0
         with open(out_dir / f'{key}.jsonl', 'w', encoding='utf-8', newline='\n') as fh:
             for row, ms, reached, j in jobs_for(variant, key, items, ms_all):
+                if keep is not None and (key, row['item_id']) not in keep:
+                    continue
                 reply = store.get(j[2]) if j else None
                 s = summarise(ms, reached, j is not None, reply)
                 n_sent += j is not None
@@ -158,6 +179,7 @@ def write(variant: str, keys: list[str], store: jc.Store) -> dict:
                                                      'prompt_sha256': e5.config()['prompt_sha256'],
                                                      'e5_sha256': e5.config()['e5_sha256'],
                                                      'models': totals, 'reply_store': store.summary(),
+                                                     'sample': (sorted(f'{k}|{i}' for k, i in keep) if keep is not None else None),
                                                      **jc.provenance(score.SCORES / variant / 'CONFIG.json'),
                                                      'written_at_utc': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime())},
                                                     indent=1) + '\n', encoding='utf-8')
@@ -195,9 +217,19 @@ def prices() -> dict:
             for e in eps}
 
 
+BASE_JUDGE = e5.JUDGE           # the pilot's judge; the basis below is measured on its replies whatever --judge names
+
+
 def pilot_basis() -> dict:
-    """Tokens per prompt character, completion tokens and seconds per call, from the pilot's replies."""
-    rep = replay()
+    """Tokens per prompt character, completion tokens and seconds per call, from the pilot's replies (MiMo's: the
+    prompts are the same for any judge; the completion length is MiMo's, a reasoning model's, and stands in for the
+    other judge's until it has replies of its own)."""
+    current = e5.JUDGE
+    e5.JUDGE = BASE_JUDGE
+    try:
+        rep = replay()
+    finally:
+        e5.JUDGE = current
     sent = [t for t in rep['traces'] if t['job']]
     store = jc.Store(PILOT_REPLIES)
     chars = toks = 0
@@ -213,18 +245,20 @@ def pilot_basis() -> dict:
             'seconds_per_call': statistics.median(secs), 'calls': len(outs)}
 
 
-def dry_run(variant: str, keys: list[str], workers: int) -> int:
+def dry_run(variant: str, keys: list[str], workers: int, keep: set | None = None) -> int:
     items = score.pool_items()
     ms_all = score.milestone_sets(items)
     basis = pilot_basis()
     pr = prices()
     total_calls, total_chars = 0, 0
-    print(f'E5 on {variant}: basis from the pilot\'s {basis["calls"]} replies: {basis["tokens_per_char"]:.3f} '
+    print(f'E5 on {variant} with judge {e5.JUDGE}: basis from the pilot\'s {basis["calls"]} replies: {basis["tokens_per_char"]:.3f} '
           f'tokens per prompt character, {basis["completion_per_call"]:.0f} completion tokens and '
-          f'{basis["seconds_per_call"]:.0f} s per call')
+          f'{basis["seconds_per_call"]:.0f} s per call' + (f'; a sample of {len(keep)} traces' if keep is not None else ''))
     print(f'{"model":24s} {"traces":>7s} {"calls":>6s} {"milestones sent":>16s} {"in tokens":>10s}')
     for key in keys:
         js = jobs_for(variant, key, items, ms_all)
+        if keep is not None:
+            js = [t for t in js if (key, t[0]['item_id']) in keep]
         sent = [j for *_, j in js if j]
         chars = sum(len(j[1]) for j in sent)
         total_calls += len(sent)
@@ -237,21 +271,22 @@ def dry_run(variant: str, keys: list[str], workers: int) -> int:
     at = pr.get('Xiaomi') or min(pr.values())
     lo, hi = min(pr.values(), key=cost), max(pr.values(), key=cost)
     print(f'{"TOTAL":24s} {"":7s} {total_calls:6d} {"":16s} {tin:10.0f}')
-    print(f'\nestimate: ${cost(at):.2f} at Xiaomi\'s own endpoint (${at[0]:.3f} in / ${at[1]:.3f} out per million); '
+    print(f'\nestimate: ${cost(at):.2f} at {"Xiaomi\'s own" if "Xiaomi" in pr else "the cheapest"} endpoint (${at[0]:.3f} in / ${at[1]:.3f} out per million); '
           f'${cost(lo):.2f} to ${cost(hi):.2f} across the {len(pr)} endpoints OpenRouter lists')
     print(f'time: about {total_calls * basis["seconds_per_call"] / workers / 3600:.1f} hours at {workers} workers. '
           'Nothing was called.')
     return 0
 
 
-def paid(variant: str, keys: list[str], workers: int, max_usd: float) -> int:
+def paid(variant: str, keys: list[str], workers: int, max_usd: float, keep: set | None = None) -> int:
     items = score.pool_items()
     ms_all = score.milestone_sets(items)
     store = jc.Store(REPLIES)
-    jobs = jc.interleave({key: {j[2]: j[1] for *_, j in jobs_for(variant, key, items, ms_all) if j} for key in keys})
+    jobs = jc.interleave({key: {j[2]: j[1] for row, _ms, _r, j in jobs_for(variant, key, items, ms_all)
+                                if j and (keep is None or (key, row['item_id']) in keep)} for key in keys})
     cli = jc.client()
-    summary = jc.run(jobs, lambda p: fetch(p, cli), store, workers, max_usd, 'E5')
-    print(write(variant, keys, store))
+    summary = jc.run(jobs, lambda p: fetch(p, cli), store, workers, max_usd, f'E5 ({e5.JUDGE})')
+    print(write(variant, keys, store, keep))
     jc.finish(summary)
     return 0
 
@@ -350,20 +385,33 @@ def main() -> int:
     ap.add_argument('--max-usd', type=float, default=100.0,
                     help='the cumulative cap for the stage: what the reply store already records counts toward it')
     ap.add_argument('--yes', action='store_true', help='required for the run, which bills')
+    ap.add_argument('--judge', default=None, help='C2: another judge model id; rows go to scores/<variant>/e5_<slug>/')
+    ap.add_argument('--sample', type=int, default=None, help='C2: this many traces per model among those E5 sends')
+    ap.add_argument('--seed', type=int, default=7)
     a = ap.parse_args()
     if a.validate:
         return validate()
+    global OUT_NAME
+    keep = None
+    if a.judge and a.judge != e5.JUDGE:
+        e5.JUDGE = a.judge                                     # the key, the call and the CONFIG all read it from here
+        OUT_NAME = 'e5_' + a.judge.split('/')[-1].replace('.', '-')
+    if a.sample is not None:
+        if not a.judge:
+            raise SystemExit('--sample is for a second judge (--judge); E5 itself runs on every trace')
+        items = score.pool_items()
+        keep = sample_keep(a.variant, a.model or roster(a.variant), items, score.milestone_sets(items), a.sample, a.seed)
     keys = a.model or roster(a.variant)
     if a.dry_run:
-        return dry_run(a.variant, keys, a.workers)
+        return dry_run(a.variant, keys, a.workers, keep)
     if a.status:
         return status(a.variant, keys)
     if a.score:
-        print(write(a.variant, keys, jc.Store(REPLIES)))
+        print(write(a.variant, keys, jc.Store(REPLIES), keep))
         return 0
     if not a.yes:
         raise SystemExit('E5 bills: re-run with --yes once the spend is approved (see --dry-run for the estimate)')
-    return paid(a.variant, keys, a.workers, a.max_usd)
+    return paid(a.variant, keys, a.workers, a.max_usd, keep)
 
 
 if __name__ == '__main__':

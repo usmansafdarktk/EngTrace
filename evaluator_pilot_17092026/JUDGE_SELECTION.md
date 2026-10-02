@@ -181,7 +181,8 @@ tightened:
   untouched (RESULTS_X1 Finding 8) — has MiMo detecting about as much as GPT-5 (16 of 51
   conceptual defects against 20 of 60; 43 of 60 arithmetic each) with no false alarm. Grok
   was not run on it. If a reviewer presses the point, that is the run to buy (240 calls,
-  about $3.40 at Grok's probe rate, which needs approval), not a re-reading of 21 steps.
+  about $3.40 at Grok's probe rate, which needs approval), not a re-reading of 21 steps. *Bought 2026-10-03 (C2,
+  D-181): Grok catches 22 of 60 conceptual and 52 of 60 arithmetic defects with no false alarm, at $7.71.*
 
 What the relabel does change is a description: MiMo and MiniMax are no longer the probe's
 best. And the slip MiMo missed is arithmetic inside a checkable step, which the stack assigns

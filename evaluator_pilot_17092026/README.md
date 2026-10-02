@@ -27,7 +27,7 @@ branches.
 | X1 · every evaluator against the expert labels | done ([RESULTS_X1](RESULTS_X1.md)) | $0.00 |
 | X4 · the final-answer check, corrected and measured offline | done (RESULTS_X1 Finding 1b, D-098) | $0.00 |
 | X5 · planted defects, the deterministic evaluators and E0's routing on them | done (Findings 7 and 8, D-102, D-104) | $0.00 |
-| X5 · the judges on the planted defects: GPT-5, Opus 4.5, MiMo | done (Finding 8, D-103) | $5.21 |
+| X5 · the judges on the planted defects: GPT-5, Opus 4.5, MiMo; Grok 4.6 added 2026-10-03 (C2, D-181) | done (Finding 8, D-103, D-181) | $5.21 + $7.71 |
 | router · batched smoke checks, planted defects and the 300 labelled traces | done (RESULTS_X1, D-113) | $2.30 |
 | summary · [PILOT_SUMMARY.md](PILOT_SUMMARY.md) and its PDF | done; corrected 2026-09-27 (D-111) | — |
 | LOJO and X2 · leave-one-judge-out on E0-3J replayed offline with controls; each judge's bias per family | done 2026-10-03 ([RESULTS_LOJO](RESULTS_LOJO.md), D-174) | $0.00 |

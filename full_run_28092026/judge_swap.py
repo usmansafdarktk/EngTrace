@@ -1,0 +1,116 @@
+"""C2, the judge-swap robustness check (docs/EVALUATION_NEXT_STEPS.md C2; D-181): a second judge from another family on
+a per-model sample of the traces E5 sends, against MiMo-V2.5-Pro's verdicts on the same milestones.
+
+    python -m full_run_28092026.judge_swap [--judge x-ai/grok-4.6] [--variant main]   # FREE: JUDGE_SWAP.md, results/judge_swap.json
+
+Reads scores/<variant>/e5/ (MiMo, the stage the results use) and scores/<variant>/e5_<slug>/ (the second judge, written
+by `judge.py --judge ... --sample ...` on the same prompts), and for the traces both hold: per model, the milestones the
+two judges both ruled on, their agreement on the three verdicts and on REACHED against not, E5-strict coverage over the
+sampled traces under each judge with the paired difference and a template bootstrap, and the share of judged milestones
+each judge rules REACHED. The question it answers is whether any Q3 figure that rests on the judge would move by more
+than its interval under a judge from another family; it does not say which judge is right, which the pilot's expert
+labels do for MiMo (E5_VALIDATION.md, RESULTS_E5).
+"""
+from __future__ import annotations
+
+import argparse
+import collections
+import json
+import sys
+from pathlib import Path
+
+import numpy as np
+
+HERE = Path(__file__).resolve().parent
+REPO = HERE.parent
+if str(REPO) not in sys.path:
+    sys.path.insert(0, str(REPO))
+
+from full_run_28092026 import score  # noqa: E402
+from full_run_28092026.analyze import ROSTER, boot_mean  # noqa: E402
+
+B = 10_000
+
+
+def rows_of(path: Path) -> dict:
+    return {r['item_id']: r for r in map(json.loads, path.read_text(encoding='utf-8').splitlines())} if path.exists() else {}
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--judge', default='x-ai/grok-4.6')
+    ap.add_argument('--variant', default='main')
+    a = ap.parse_args()
+    slug = 'e5_' + a.judge.split('/')[-1].replace('.', '-')
+    base_dir, other_dir = score.SCORES / a.variant / 'e5', score.SCORES / a.variant / slug
+    if not other_dir.exists():
+        raise SystemExit(f'{other_dir} does not exist: run judge.py --judge {a.judge} --sample N first')
+    cfg_other = json.loads((other_dir / 'CONFIG.json').read_text(encoding='utf-8'))
+    out = {'judge': a.judge, 'base_judge': json.loads((base_dir / 'CONFIG.json').read_text(encoding='utf-8')).get('judge'),
+           'variant': a.variant, 'sample': len(cfg_other.get('sample') or []), 'models': {}}
+    for key in ROSTER:
+        base, other = rows_of(base_dir / f'{key}.jsonl'), rows_of(other_dir / f'{key}.jsonl')
+        common = [i for i in other if i in base and base[i].get('sent') and other[i].get('sent')]
+        if not common:
+            continue
+        agree3 = agree2 = n_ms = 0
+        pair = collections.Counter()
+        reached = collections.Counter()
+        by_t = collections.defaultdict(list)
+        no_reply = 0
+        for i in common:
+            b, o = base[i], other[i]
+            if b.get('reply_ok') is False or o.get('reply_ok') is False:
+                no_reply += 1
+                continue
+            for sb, so in zip(b['sources'], o['sources']):
+                if sb == 'e3' or so == 'e3':
+                    continue
+                if 'UNJUDGED' in (sb, so):
+                    continue
+                n_ms += 1
+                agree3 += sb == so
+                agree2 += (sb == 'REACHED') == (so == 'REACHED')
+                pair[(sb, so)] += 1
+                reached['base'] += sb == 'REACHED'
+                reached['other'] += so == 'REACHED'
+            if b.get('e5_strict') is not None and o.get('e5_strict') is not None:
+                by_t[b['template_id']].append(o['e5_strict'] - b['e5_strict'])
+        d_all = np.array([x for v in by_t.values() for x in v])
+        t_means = np.array([np.mean(v) for v in by_t.values()])
+        out['models'][key] = {
+            'traces': len(common), 'without_reply': no_reply, 'milestones_both_judged': n_ms,
+            'agreement_three_way': agree3 / n_ms if n_ms else None, 'agreement_reached_vs_not': agree2 / n_ms if n_ms else None,
+            'reached_share_base': reached['base'] / n_ms if n_ms else None, 'reached_share_other': reached['other'] / n_ms if n_ms else None,
+            'pairs': {f'{sb}->{so}': n for (sb, so), n in sorted(pair.items())},
+            'e5_strict_base': float(np.mean([base[i]['e5_strict'] for i in common if base[i].get('e5_strict') is not None])),
+            'e5_strict_other': float(np.mean([other[i]['e5_strict'] for i in common if other[i].get('e5_strict') is not None])),
+            'diff': float(d_all.mean()) if len(d_all) else None,
+            'diff_ci_templates': boot_mean(t_means, 777) if len(t_means) > 1 else None,
+            'templates': len(by_t)}
+    OUT_JSON = HERE / 'results' / f'judge_swap_{a.variant}.json'
+    OUT_JSON.write_text(json.dumps(out, indent=1), encoding='utf-8')
+    L = ['# C2: the judge swap, a second judge on a sample of what E5 sends', '',
+         f"Generated by `judge_swap.py`; what it compares is in its docstring. `{out['judge']}` against `{out['base_judge']}` on "
+         f"{out['sample']} sampled traces of the `{a.variant}` store, the same prompts (D-181). Agreement is over the milestones both "
+         'judges ruled on; coverage is E5-strict over the sampled traces under each judge, and the difference is the other judge '
+         'minus MiMo with a template bootstrap. Which judge is right is not measured here; MiMo\'s validation against the experts is.', '',
+         '| model | traces | milestones both judged | agreement, three-way | agreement, REACHED vs not | REACHED share: MiMo / other | '
+         'E5-strict: MiMo / other | difference | 95% CI, templates |', '|---|---:|---:|---:|---:|---|---|---:|---:|']
+    for k, m in out['models'].items():
+        ci = m['diff_ci_templates']
+        L.append(f"| `{k}` | {m['traces']} | {m['milestones_both_judged']} | {m['agreement_three_way']:.3f} | {m['agreement_reached_vs_not']:.3f} | "
+                 f"{m['reached_share_base']:.3f} / {m['reached_share_other']:.3f} | {m['e5_strict_base']:.3f} / {m['e5_strict_other']:.3f} | "
+                 f"{m['diff']:+.3f} | " + (f"{ci[0]:+.3f} to {ci[1]:+.3f}" if ci else '-') + ' |')
+    pairs = collections.Counter()
+    for m in out['models'].values():
+        for k, n in m['pairs'].items():
+            pairs[k] += n
+    L += ['', 'Verdict pairs over all sampled milestones (MiMo -> other): ' + ', '.join(f'{k} {n}' for k, n in pairs.most_common()) + '.', '']
+    (HERE / 'JUDGE_SWAP.md').write_text('\n'.join(L) + '\n', encoding='utf-8', newline='\n')
+    print('\n'.join(L))
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(main())

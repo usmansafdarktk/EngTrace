@@ -505,6 +505,7 @@ defect, so only the difference counts. 480 calls, $4.67, no failures.
 | Claude Opus 4.5 | 0.133 (60), 0.483 counting *Other* | 0.717 (60) | **0.000** |
 | **MiMo-V2.5-Pro** — the judge E5 uses | **0.314** (51) | **0.717** (60) | **0.000** |
 | *either of E0's two* | 0.350 | 0.800 | — |
+| Grok 4.6 (*added 2026-10-03, C2, D-181*) | 0.367 (60); 0.550 counting *Other* | 0.867 (60) | **0.000** |
 
 MiMo matters more than the other two. GPT-5 and Claude share families with models on the
 evaluated roster, which is the judge/judged objection E1 exists to answer; MiMo does not, and
