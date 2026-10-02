@@ -109,6 +109,10 @@ their place on the wrong answers rests on the second. *Where:* Q3. *Effort:* two
 
 ## B. Needs the experts, no API spend; one request, batched
 
+*Built 2026-10-02 (D-172):* `full_run_28092026/expert_kits.py --build` draws B1 to B4 and writes one kit per expert
+(`expert_request/dist/`, local), with `reading_app.py` and `EXPERT_READING_GUIDE.md`; `--score DIR` scores the returns into
+`EXPERT_REQUEST.md`. What was sent is in that file. Sending is the owner's step.
+
 **B1. An expert reading of the answer check on this roster.** *Answers:* 9.3 item 4 (evaluator validity on
 the deployed roster): the pilot validated the check on other models and 15 templates, and D-168 found
 roster-specific misreadings by reading verdicts. *Method:* a stratified sample of about 150 verdicts from

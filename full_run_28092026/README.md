@@ -127,6 +127,11 @@ and pinned in `answer.py`'s self-test as a known limit.
 and per template, and what the wrong answers on `work_isothermal_virial` state (`RESIDUAL_INCORRECT.md`, D-171; the
 reading is in `docs/PILOT_AND_FULL_RUN_ASSESSMENT.md`). `--sample N` prints answer segments for reading and writes nothing.
 
+`expert_kits.py` builds the experts' reading request, B1 to B4 of `docs/EVALUATION_NEXT_STEPS.md`, as one kit per
+expert under `expert_request/dist/` (gitignored), with `reading_app.py` as the app and `EXPERT_READING_GUIDE.md` as
+the instructions, and scores the returned files into `EXPERT_REQUEST.md` (counts only; D-172). `--selftest` builds a
+small kit in a temp folder and drives the app through it.
+
 **For the paper:** `RESULTS_PAPER_NOTES.md` says which figures to report, with their sources, what they
 support and what they do not (D-170); `PARAPHRASE_PAPER_NOTES.md` does the same for Q5. The analyses still to
 do, in order, are in `docs/EVALUATION_NEXT_STEPS.md`.

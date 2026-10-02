@@ -6563,10 +6563,57 @@ templates to look at (`vdw_solve_for_volume`, `pfr_volume_changing_rate`, `best_
 `manning_rectangular_discharge`, `annulus_flowrate`, `pitzer_correlation_z`). The measurement judges no verdict; the
 reading of the three templates above is this session's and is recorded as such.
 
+## D-172 — The experts' reading request built: B1 to B4 as one kit per expert, an app and a guide; sending is the owner's step
+
+**Date:** 2026-10-02 · **Status:** BUILT · OPEN (the owner sends the kits and sets the return date; the sizes are flags and can be cut before sending) · **Evidence:** `full_run_28092026/expert_kits.py` (`--build`, `--score`, `--selftest`), `reading_app.py`, `EXPERT_READING_GUIDE.md`, `EXPERT_REQUEST.md` (the composition, counts only); `expert_request/` (local: tasks, keyfile, kits)
+
+**Why now.** B1 to B4 read the frozen store and traces as they stand at `2950875` and depend on none of the free
+analyses (section A), while the experts' time is the long pole and D-171 made B1 and B4 urgent. The owner asked for the
+request to go out first, with the instructions in a markdown file and an app, as for the paraphrase check.
+
+**What was drawn** (seed 20261002; `EXPERT_REQUEST.md` has the tables): 418 items, 1,004 readings.
+- *B1, 150 final answers* from the top five models: 75 the check called incorrect (49) or partial (26) and 75 it called
+  correct, each half round-robin over templates so no template dominates (103 templates; symbolic 17, multipart 30,
+  scalar 79). The expert sees the problem, the reference answer, the model's final answer and both in full; not the
+  model or the verdict. Two readers each, rotating pairs.
+- *B3, 100 milestones*: 50 the judge ruled REACHED and 50 MISSING, round-robin over the eleven models and their
+  templates, one per trace (53 templates). The expert sees the quantity's name and value, the reference and the trace;
+  not the verdict. Two readers each.
+- *B2, 160 wrong answers*: 40 each for `claude-sonnet-5`, `gpt-5.4-mini`, `gpt-oss-20b` and `gemma-4-26b-a4b`, split
+  over levels in proportion to each model's wrong answers (Claude's are mostly Advanced: 29 / 10 / 1), round-robin
+  over templates (79). The May version's six categories by its stop-at-first-yes hierarchy, plus "No error: the answer
+  is correct, or the question admits it" and "Incomplete", with a required excerpt for an error. Three readers each,
+  for the agreement figure May reported.
+- *B4, 8 templates*, chemical and civil: the two D-171 templates with one problem and three top-model answers each,
+  and six near-miss templates (`vdw_solve_for_volume`, `pfr_volume_changing_rate`, `annulus_flowrate`,
+  `pitzer_correlation_z`; `best_hydraulic_rectangular_section`, `manning_rectangular_discharge`) with one near-miss
+  answer each; two to four questions on whether the wording pins a single answer at 0.2%. All three experts of the
+  branch.
+
+**Who reads what.** Each item goes to experts of its own branch (the layer-2 roster of 15); queues run template, answer,
+milestone, error, shuffled within each block per expert. Load per expert: 53 to 81 items (chemical 79 to 81, civil 62
+to 64, electrical 70 to 71, industrial 67 to 69, mechanical 53 to 54); B2 is the bulk (`--b2-per-model 30` would cut
+about 15 items from each kit). Codes are opaque; the keyfile stays local.
+
+**What the app and the guide are.** `reading_app.py` is `paraphrase_app.py` generalised to the four kinds: plain-text
+display, one radio per question, a required note where a verdict needs one, a required excerpt for an error category,
+and `<id>.jsonl` written next to it. `EXPERT_READING_GUIDE.md` is the one-page instruction per kind; the kit carries it
+as `guide.md` with a `README.txt` on running it. `--selftest` builds a small kit in a temp folder, checks that no kit
+holds a model name, a verdict or an item id, drives the app through every kind with Streamlit's test harness, submits
+one item and scores the return.
+
+**What `--score` will report**, counts only, in `EXPERT_REQUEST.md`: B1 agreement with the check three-way and on each
+side, per branch and between readers (Cohen's kappa); B3 the share of REACHED the experts confirm and of MISSING they
+confirm, with the "route does not need it" share; B2 the category distribution per model and level, item majorities,
+the "No error" share and Fleiss' kappa; B4 the three experts' answers per question. The experts' notes stay local.
+
+**Not decided here.** The send itself, the return date, and whether B2 is cut. No score, store or result changes.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
+| D-172 | Send the fifteen kits in `full_run_28092026/expert_request/dist/` (app.py, README.txt, guide.md and the kit_<id> folder each) with a return date; cut B2 first if the load is too much (`--b2-per-model`); when the files come back, `expert_kits.py --score <folder>` | the paper's evaluator section, Q3 and the D-171 limitation |
 | D-171 | What the paper states about the two under-specified chemical templates and the 17 exact-digit templates (a limitation and a Q2 sensitivity row, as proposed), and whether one chemical expert reads `work_isothermal_virial` and `adiabatic_flame_temperature` with B1 (next steps B4) | the paper's sections 5 and 6; the experts' request |
 | D-170 | The analyses of `docs/EVALUATION_NEXT_STEPS.md` section A (free) in the order given; the expert request of section B, batched; a decision on each paid condition of section C after its dry run | the paper's results section; the experts' availability; the owner's approval per condition |
 | D-169 | ~~Upload the rewritten `full_run_scores_2026-10-02.zip` as a new version of the private Kaggle scores dataset (manual mode)~~ **Done 2026-10-02: new version of `ayeshaiq/engtrace-full-run-scores`, downloaded back, 87 of 88 members identical and the log a prefix of the live one (D-169, Backups).** In the paper: the `array` type and the two-quantity scalar lines are listed with D-145's multipart templates; the one wrong credit is a stated limit | the paper's scoring statements |

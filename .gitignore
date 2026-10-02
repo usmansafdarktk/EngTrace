@@ -85,6 +85,10 @@ full_run_28092026/paraphrase/returned/
 full_run_28092026/paraphrase/experts_filled_paraphrases/
 full_run_28092026/paraphrase/accepted.json
 
+# The experts' reading request (D-172): the kits hold pool text and the keyfile, the returns the experts' labels.
+# Committed instead: expert_kits.py, reading_app.py, EXPERT_READING_GUIDE.md and EXPERT_REQUEST.md (counts).
+full_run_28092026/expert_request/
+
 # docs/related_work_oct2026: the PDFs of cited and candidate papers and their extracted text
 # are NOT committed (size, copyright). papers.json, candidates/*.json, MANIFEST.json and
 # fetch_papers.py re-acquire and verify them on any checkout.
