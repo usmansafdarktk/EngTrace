@@ -30,8 +30,15 @@ trace the store did not score):
 
 WHO READS WHAT. The experts are the layer-2 roster (the pilot's 15, three per branch). An item goes to experts of
 its own branch: `answer` and `milestone` items to two of the three (rotating pairs, so every pair occurs), `error`
-and `template` items to all three. Each expert's queue runs template, answer, milestone, error, each block shuffled
-for that expert from the seed. Codes are opaque; the keyfile from code to item, model and hidden verdict stays local.
+and `template` items to all three. Codes are opaque; the keyfile from code to item, model and hidden verdict stays
+local.
+
+HOW IT IS DELIVERED. One bundle per expert, expert_request/dist/<id>/, with a sub-folder per task:
+B1_final_answers, B3_milestones, B2_wrong_answers and, for chemical and civil, B4_templates. Each sub-folder is
+complete on its own: app.py (the same reading_app.py, which takes its title from the one kind it finds), README.txt,
+guide.md (the general part of EXPERT_READING_GUIDE.md plus that task's section) and tasks/ with the expert's items
+of that kind, shuffled for that expert from the seed. Each produces its own <id>.jsonl, so the tasks can be sent or
+dropped separately; --score reads a folder tree.
 
 WHAT IS KEPT. expert_request/ (tasks, dist, build.json, scored.json, returns) holds pool text and the experts'
 labels and is gitignored. Committed: this script, reading_app.py, EXPERT_READING_GUIDE.md and EXPERT_REQUEST.md,
@@ -82,6 +89,12 @@ B2_MODELS = ['claude-sonnet-5', 'gpt-5.4-mini', 'gpt-oss-20b', 'gemma-4-26b-a4b'
 LEVELS = ['Easy', 'Intermediate', 'Advanced']
 READERS = {'template': 3, 'error': 3, 'answer': 2, 'milestone': 2}
 ORDER = ['template', 'answer', 'milestone', 'error']
+FOLDER = {'answer': 'B1_final_answers', 'error': 'B2_wrong_answers', 'milestone': 'B3_milestones',
+          'template': 'B4_templates'}
+TASK = {'answer': "B1, final answers: is a model's final answer correct? A minute or two each.",
+        'milestone': "B3, milestones: does a model's working obtain a given quantity? Two or three minutes each.",
+        'error': 'B2, wrong answers: why did a wrong answer go wrong? Three to five minutes each.',
+        'template': "B4, templates: does a problem's wording pin a single answer? Five to ten minutes each."}
 B4_MAIN = {'template_work_isothermal_virial': 'virial', 'template_adiabatic_flame_temperature': 'flame'}
 B4_NEAR = ['template_vdw_solve_for_volume', 'template_pfr_volume_changing_rate', 'template_annulus_flowrate',
            'template_pitzer_correlation_z', 'template_best_hydraulic_rectangular_section',
@@ -97,12 +110,11 @@ ERROR_OPTIONS = ['1. Hallucination', '2. Setup / Assumption Error', '3. Formula 
 EXPERT_TO_CHECK = {'correct': 'correct', 'partially correct': 'partial', 'incorrect': 'incorrect',
                    'no answer stated': 'incorrect'}
 
-README = """EngTrace reading request, October 2026 - how to run
+README_TASK = """EngTrace reading request, October 2026 - {task}
 
-You should have, side by side in one folder: app.py, this README, guide.md, and a folder named
-kit_<your id> holding your items.
+This folder holds one task: app.py, this README, guide.md, and a tasks folder with your items.
 
-1. Read guide.md first: it says what each of the four kinds of item asks.
+1. Read guide.md first: its last section but one describes this task.
 
 2. Run the app. You need Python 3.11 or newer. In this folder:
 
@@ -118,8 +130,27 @@ kit_<your id> holding your items.
    this folder next to app.py, to the coordinator.
 
 Questions about the task go to the coordinator, not to the other reviewers. Please do not share
-the kit: the problems are the benchmark's private test set until the paper is published.
+the folder: the problems are the benchmark's private test set until the paper is published.
 """
+
+README_EXPERT = """EngTrace reading request, October 2026 - your tasks
+
+Each sub-folder is one task, with its own app, guide and items; each returns its own file:
+
+{folders}
+
+Do them in the order listed if you can. Every sub-folder's README says how to run it; the guides
+share their first two sections and differ in the task's own.
+"""
+
+
+def guide_for(kind: str) -> str:
+    """The general part of the guide plus the one section for this task."""
+    head, *parts = GUIDE.read_text(encoding='utf-8').split('\n## ')
+    sections = {p.split('\n', 1)[0].strip(): p for p in parts}
+    own = next(t for t in sections if t.startswith(FOLDER[kind][:2] + ':'))
+    return head.rstrip() + '\n\n' + '\n\n'.join('## ' + sections[t].rstrip() for t in
+                                                ('What this is', 'How to run', own, 'Please')) + '\n'
 
 
 # ------------------------------------------------------------------ inputs
@@ -415,14 +446,24 @@ def build(out: Path, seed: int, b1: int, b3: int, b2_per_model: int, b2_models: 
     (tasks_dir / 'pool.json').write_text(json.dumps(pool, ensure_ascii=False), encoding='utf-8')
     (tasks_dir / 'assignment.json').write_text(json.dumps(queues, indent=1), encoding='utf-8')
     (tasks_dir / 'keyfile.json').write_text(json.dumps(keyfile, indent=1), encoding='utf-8')
-    shutil.copy(APP, dist / 'app.py')
-    shutil.copy(GUIDE, dist / 'guide.md')
-    (dist / 'README.txt').write_text(README, encoding='utf-8')
+    guides = {k: guide_for(k) for k in FOLDER}
     for aid, q in queues.items():
-        kit = dist / f'kit_{aid}' / 'tasks'
-        kit.mkdir(parents=True)
-        (kit / 'pool.json').write_text(json.dumps({c: pool[c] for c in q['codes']}, ensure_ascii=False), encoding='utf-8')
-        (kit / 'assignment.json').write_text(json.dumps({aid: q}, indent=1), encoding='utf-8')
+        listed = []
+        for kind in ORDER:
+            mine = [c for c in q['codes'] if pool[c]['kind'] == kind]
+            if not mine:
+                continue
+            folder = dist / aid / FOLDER[kind]
+            (folder / 'tasks').mkdir(parents=True)
+            shutil.copy(APP, folder / 'app.py')
+            (folder / 'guide.md').write_text(guides[kind], encoding='utf-8')
+            (folder / 'README.txt').write_text(README_TASK.format(task=TASK[kind]), encoding='utf-8')
+            (folder / 'tasks' / 'pool.json').write_text(json.dumps({c: pool[c] for c in mine}, ensure_ascii=False),
+                                                       encoding='utf-8')
+            (folder / 'tasks' / 'assignment.json').write_text(
+                json.dumps({aid: {'branch': q['branch'], 'codes': mine}}, indent=1), encoding='utf-8')
+            listed.append(f'  {FOLDER[kind]}/   {len(mine)} items.  {TASK[kind]}')
+        (dist / aid / 'README.txt').write_text(README_EXPERT.format(folders='\n'.join(listed)), encoding='utf-8')
     comp = composition(tasks, queues, seed, b2_models)
     (out / 'build.json').write_text(json.dumps(comp, indent=1), encoding='utf-8')
     if report:
@@ -484,7 +525,9 @@ def report_lines(comp: dict, results: dict | None) -> list[str]:
     L = ['# The experts\' reading request (B1 to B4)', '',
          f"Generated by `expert_kits.py`: `--build` writes what was sent, `--score` what came back. Counts only; the "
          f"kits, the keyfile and the experts' files stay local. Built {comp['built']} from the main store at "
-         f"`{comp['store_commit']}`, seed {comp['seed']}.", '',
+         f"`{comp['store_commit']}`, seed {comp['seed']}. Delivered as one bundle per expert with a sub-folder per task "
+         f"(`B1_final_answers`, `B3_milestones`, `B2_wrong_answers`, `B4_templates`), each with its own app, guide and "
+         f"return file.", '',
          '## What was sent', '',
          '| kind | items | readers per item | readings | composition |', '|---|---:|---:|---:|---|']
     a, m, e, t = k['answer'], k['milestone'], k['error'], k['template']
@@ -551,7 +594,7 @@ def read_returns(returned: Path, out: Path) -> tuple[dict, dict, dict]:
         for c in q['codes']:
             owners[c].add(aid)
     rows = {}
-    for f in sorted(returned.glob('*.jsonl')):
+    for f in sorted(returned.rglob('*.jsonl')):
         for line in f.read_text(encoding='utf-8').splitlines():
             if not line.strip():
                 continue
@@ -745,7 +788,7 @@ def results_lines(res: dict) -> list[str]:
 def selftest() -> int:
     tmp = Path(tempfile.mkdtemp(prefix='engtrace-expert-kits-'))
     try:
-        comp = build(tmp, SEED, b1=10, b3=6, b2_per_model=2, b2_models=B2_MODELS[:2], report=None)
+        comp = build(tmp, SEED, b1=40, b3=20, b2_per_model=5, b2_models=B2_MODELS[:2], report=None)
         print(f"built {comp['items']} items, {comp['readings']} readings in {tmp}")
         pool = json.loads((tmp / 'tasks' / 'pool.json').read_text(encoding='utf-8'))
         queues = json.loads((tmp / 'tasks' / 'assignment.json').read_text(encoding='utf-8'))
@@ -755,38 +798,32 @@ def selftest() -> int:
             for forbidden in ('model', 'check', 'judge', 'item_id'):
                 assert forbidden not in t, (c, forbidden)
         from streamlit.testing.v1 import AppTest
-        at = AppTest.from_file(str(tmp / 'dist' / 'app.py'), default_timeout=180)
-        at.run()
-        assert not at.exception, at.exception
-        aid = max(queues, key=lambda a: (len({pool[c]['kind'] for c in queues[a]['codes']}), -len(queues[a]['codes'])))
-        at.sidebar.selectbox[0].select(aid).run()
-        assert not at.exception, at.exception
-        seen = set()
-        for c in queues[aid]['codes']:
-            kind = pool[c]['kind']
-            if kind in seen:
-                continue
-            seen.add(kind)
-            at.sidebar.selectbox[1].select(c).run()
+        preferred = max(queues, key=lambda a: (len({pool[c]['kind'] for c in queues[a]['codes']}), -len(queues[a]['codes'])))
+        seen = []
+        for kind in ORDER:
+            holders = [a for a in [preferred] + sorted(queues) if (tmp / 'dist' / a / FOLDER[kind]).exists()]
+            assert holders, f'no expert received a {kind} folder'
+            aid = holders[0]
+            folder = tmp / 'dist' / aid / FOLDER[kind]
+            assert (folder / 'guide.md').read_text(encoding='utf-8').count('\n## ') == 4, kind
+            at = AppTest.from_file(str(folder / 'app.py'), default_timeout=180)
+            at.run()
             assert not at.exception, (kind, at.exception)
-            assert any(c in w.value for w in at.subheader), kind
-        print(f'the app renders every kind for {aid}: {sorted(seen)}')
-        # submit one final-answer item and check the return file
-        first = next(c for c in queues[aid]['codes'] if pool[c]['kind'] == 'answer')
-        at.sidebar.selectbox[1].select(first).run()
-        at.radio[0].set_value('correct').run()
-        at.button[0].click().run()
-        assert not at.exception, at.exception
-        returned = tmp / 'dist' / f'{aid}.jsonl'
-        assert returned.exists(), 'no return file written'
-        row = json.loads(returned.read_text(encoding='utf-8').splitlines()[0])
-        assert row['code'] == first and row['answers']['verdict'] == 'correct', row
-        print('a submission writes the return row')
-        # score the one-row return
-        ret = tmp / 'returned'
-        ret.mkdir()
-        shutil.copy(returned, ret / returned.name)
-        res = score_returns(ret, tmp, None)
+            at.sidebar.selectbox[0].select(aid).run()
+            assert not at.exception, (kind, at.exception)
+            first = json.loads((folder / 'tasks' / 'assignment.json').read_text(encoding='utf-8'))[aid]['codes'][0]
+            assert any(first in w.value for w in at.subheader), kind
+            seen.append((kind, aid))
+            if kind == 'answer':   # submit one item and check the return file lands in that folder
+                at.radio[0].set_value('correct').run()
+                at.button[0].click().run()
+                assert not at.exception, at.exception
+                returned = folder / f'{aid}.jsonl'
+                assert returned.exists(), 'no return file written'
+                row = json.loads(returned.read_text(encoding='utf-8').splitlines()[0])
+                assert row['code'] == first and row['answers']['verdict'] == 'correct', row
+        print('each task folder\'s app renders, and the final-answer one takes a submission: ' + ', '.join(f'{k} ({a})' for k, a in seen))
+        res = score_returns(tmp / 'dist', tmp, None)      # the returns are read from the folder tree
         assert res['returned_readings'] == 1, res['returned_readings']
         print('SELFTEST OK')
         return 0
@@ -810,7 +847,7 @@ def main() -> int:
     if a.build:
         comp = build(OUT, a.seed, a.b1, a.b3, a.b2_per_model, a.b2_models, REPORT)
         print('\n'.join(report_lines(comp, None)))
-        print(f'\nkits: {OUT / "dist"}  (one kit_<id> folder per expert; send app.py, README.txt, guide.md and the kit)')
+        print(f'\nkits: {OUT / "dist"}  (one folder per expert, a sub-folder per task; send the expert their folder)')
         return 0
     if a.score:
         score_returns(Path(a.score), OUT, REPORT)

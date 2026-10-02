@@ -2,12 +2,13 @@
 
     streamlit run app.py
 
-Finds the queues next to it, tasks/ (the whole request, as built in the repository) or one kit_<id>/tasks/ folder
-per expert (as distributed), lets the expert pick their id, and writes <id>.jsonl in the same folder as this file,
-one row per submitted item: that file is what the expert sends back. Four kinds of item share the queue (the guide
-names them): a final answer, a quantity in the working, why a wrong answer went wrong, and questions about a
-template. Everything is shown as plain text, as the model wrote or read it, never rendered as Markdown. Opening and
-submitting are timestamped. Built and scored by expert_kits.py.
+Finds the queue next to it, tasks/ (one expert's items for one task, as distributed) or kit_<id>/tasks/ folders (the
+whole request, as built in the repository), lets the expert pick their id, and writes <id>.jsonl in the same folder as
+this file, one row per submitted item: that file is what the expert sends back. One program serves the four kinds of
+item (the guide names them): a final answer, a quantity in the working, why a wrong answer went wrong, and questions
+about a template; as distributed each task folder holds one kind, and the app takes its title from it. Everything is
+shown as plain text, as the model wrote or read it, never rendered as Markdown. Opening and submitting are
+timestamped. Built and scored by expert_kits.py.
 """
 from __future__ import annotations
 
@@ -19,7 +20,6 @@ import os
 import streamlit as st
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-TASKS = os.path.join(HERE, 'tasks')
 LABELS = HERE                      # <id>.jsonl lands next to app.py, in the folder the expert runs it from
 
 TITLE = {'template': 'Questions about a template', 'answer': 'A final answer',
@@ -36,10 +36,12 @@ st.set_page_config(layout='wide', page_title='EngTrace reading request')
 
 
 @st.cache_data
-def load_tasks():
-    """{code: task} and {id: queue}, from tasks/ if present, else from every kit_<id>/tasks/ beside app.py."""
-    dirs = [TASKS] if os.path.exists(os.path.join(TASKS, 'assignment.json')) else \
-        sorted(os.path.dirname(p) for p in glob.glob(os.path.join(HERE, 'kit_*', 'tasks', 'assignment.json')))
+def load_tasks(root: str):
+    """{code: task} and {id: queue}, from root/tasks/ if present, else from every root/kit_<id>/tasks/. Keyed on
+    the folder, so two task folders opened in one process never share a cache."""
+    tasks = os.path.join(root, 'tasks')
+    dirs = [tasks] if os.path.exists(os.path.join(tasks, 'assignment.json')) else \
+        sorted(os.path.dirname(p) for p in glob.glob(os.path.join(root, 'kit_*', 'tasks', 'assignment.json')))
     pool, assignment = {}, {}
     for d in dirs:
         with open(os.path.join(d, 'pool.json'), encoding='utf8') as fh:
@@ -82,10 +84,12 @@ def pick(label: str, options: list[str], prev_value, key: str, horizontal: bool 
     return st.radio(label, options, index=index, horizontal=horizontal, key=key)
 
 
-pool, assignment = load_tasks()
+pool, assignment = load_tasks(HERE)
+KINDS = sorted({t['kind'] for t in pool.values()})
+ONE_KIND = KINDS[0] if len(KINDS) == 1 else None
 
 with st.sidebar:
-    st.title('EngTrace reading request')
+    st.title('EngTrace: ' + (TITLE[ONE_KIND].lower() if ONE_KIND else 'reading request'))
     aid = st.selectbox('Your reviewer id', [''] + sorted(assignment), index=0)
     if not aid:
         st.info('Pick your id to start. Read guide.md first.')
@@ -101,7 +105,7 @@ with st.sidebar:
     if codes:
         at = codes.index(st.session_state['code']) if st.session_state['code'] in codes else 0
         jump = st.selectbox('Jump to an item', codes, index=at,
-                            format_func=lambda c: f'{codes.index(c) + 1:2d}. {TITLE[pool[c]["kind"]]}'
+                            format_func=lambda c: f'{codes.index(c) + 1:2d}. {c if ONE_KIND else TITLE[pool[c]["kind"]]}'
                                                   + ('  (done)' if c in done else ''))
         if st.session_state['code'] is not None and jump != st.session_state['code']:
             st.session_state.update(code=jump, opened_at=now())

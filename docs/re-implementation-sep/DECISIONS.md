@@ -6609,6 +6609,11 @@ the "No error" share and Fleiss' kappa; B4 the three experts' answers per questi
 
 **Not decided here.** The send itself, the return date, and whether B2 is cut. No score, store or result changes.
 
+*Amended 2026-10-02, at the owner's request:* the kits are delivered as one bundle per expert with a sub-folder per
+task (`B1_final_answers`, `B3_milestones`, `B2_wrong_answers`, `B4_templates`), each with its own copy of the app, which
+takes its title from the one kind it finds, a guide made of the general part plus that task's section, and its own return
+file; the tasks can be sent or dropped separately, and `--score` reads a folder tree. The samples and readers are unchanged.
+
 ## Open decisions
 
 | # | Decision | Needed before |

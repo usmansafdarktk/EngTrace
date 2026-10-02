@@ -4,29 +4,34 @@
 
 The benchmark has been run. Eleven language models answered 2,250 engineering problems, one answer each, and every
 answer was scored by automatic checks that were validated against the labels you gave in September. Before the
-results go into the paper, four things need an engineer's reading rather than a check. Your kit holds items from
-your own branch only, and nothing in it has to be solved from scratch: every item shows the problem and its
-reference solution.
+results go into the paper, four things need an engineer's reading rather than a check. Your items are from your own
+branch only, and nothing has to be solved from scratch: every item shows the problem and its reference solution.
 
-There are four kinds of item. The app shows each kind with its own questions, and this guide says how to answer
-them. The kinds are mixed into one queue, with the longest reading last, and the app tells you which kind each item
-is. Most kits take between one and two hours in all; you can stop and continue at any time.
+Each task is its own folder with its own app, and the folder's `guide.md` describes that task only:
+
+- `B1_final_answers`: is a model's final answer correct? About 20 items, a minute or two each.
+- `B3_milestones`: does a model's working obtain a given quantity? About 13 items, two or three minutes each.
+- `B2_wrong_answers`: why did a wrong answer go wrong? 20 to 41 items, three to five minutes each.
+- `B4_templates` (chemical and civil engineers only): does a problem's wording pin a single answer? Two to six
+  items, five to ten minutes each.
+
+If you cannot do all of them, the order that helps most is B4, then B1, then B3, then B2.
 
 ## How to run
 
-You should have, side by side in one folder: `app.py`, `README.txt`, this guide, and a folder named `kit_<your id>`
-holding your items. As for the paraphrase check:
+Each task folder holds `app.py`, `README.txt`, `guide.md` and a `tasks` folder. As for the paraphrase check:
 
-1. You need Python 3.11 or newer. In this folder: `pip install streamlit` (once), then `streamlit run app.py`.
+1. You need Python 3.11 or newer. In the task's folder: `pip install streamlit` (once on your machine), then
+   `streamlit run app.py`.
 2. Your browser opens the app. Pick your id in the sidebar.
 3. Work through the items. The app saves after every item; to pause, close the tab and stop the app, and run it
    again to continue where you left off. You can jump back to any item and submit it again.
-4. When the app says you are done, send the file `<your id>.jsonl`, which the app writes next to `app.py`, to the
-   coordinator.
+4. When the app says you are done, send the file `<your id>.jsonl`, which the app writes next to that folder's
+   `app.py`, to the coordinator. Each task folder produces its own file.
 
 Everything is shown as plain text, exactly as the model wrote it or read it, never rendered.
 
-## Kind 1: a final answer (about 20 items)
+## B1: a final answer
 
 You see the problem, the reference answer, and the final answer a model stated. The model's full working and the
 full reference solution are one click away. Say whether the model's final answer is **correct**, **partially
@@ -42,7 +47,7 @@ correct**, **incorrect**, or **no answer stated**.
 - If you think the reference itself is wrong, or that the question allows the model's answer as well as the
   reference's, still give the verdict the reference implies, and say so in the note. The note is what we act on.
 
-## Kind 2: a quantity in the working (about 13 items)
+## B3: a quantity in the working
 
 You see the problem, one quantity from the reference solution (the name the solution uses for it, and its value),
 and a model's full working. Say whether the model's working obtains that quantity:
@@ -56,7 +61,7 @@ and a model's full working. Say whether the model's working obtains that quantit
 Use the reference solution to see what the quantity is; it appears there under the same name or value. An
 intermediate the model computes but writes wrongly counts as not obtained.
 
-## Kind 3: why a wrong answer went wrong (about 30 to 40 items)
+## B2: why a wrong answer went wrong
 
 You see the problem and a model's full working whose final answer the check scored as wrong; the reference solution
 is one click away. Reading the working from the top, choose the **first** of these six questions you would answer
@@ -83,7 +88,7 @@ before an answer** is for a trace cut off before it concludes.
 Then paste, into the excerpt box, the shortest piece of the working that shows the error: the line with the wrong
 equation, the wrong substitution or the wrong arithmetic. The excerpt is required for the six error categories.
 
-## Kind 4: questions about a template (chemical and civil engineers only, two to six items)
+## B4: questions about a template
 
 You see a problem as the benchmark posed it, its reference solution, and one or three model answers to it, with a
 short note on what the run found for that template. Each item asks two to four specific questions, mostly about
@@ -93,7 +98,7 @@ what wording, if any, would remove an ambiguity you see.
 
 ## Please
 
-Work alone, and do not discuss items with the other reviewers until everyone has submitted. Answer every item in your
-queue if you can; an item you cannot judge can be submitted with a note saying so. Questions about the task go to the
-coordinator, not to the other reviewers. Please do not share the kit's contents: the problems are the benchmark's
-private test set until the paper is published.
+Work alone, and do not discuss items with the other reviewers until everyone has submitted. Answer every item if you
+can; an item you cannot judge can be submitted with a note saying so. Questions about the task go to the
+coordinator, not to the other reviewers. Please do not share the folders: the problems are the benchmark's private
+test set until the paper is published.
