@@ -22,63 +22,65 @@ Correct 1, partial 0.5, incorrect or unusable 0. Fully solved: a partial scores 
 
 Of the 55 pairs, 32 differ at a Holm-adjusted p below 0.05 on the answer score (sign-flip permutation over the 150 per-template differences). The same template-level test on the fully-solved rate gives the same verdict on 54 of 55. McNemar's exact test on the paired item verdicts (Holm) gives the same verdict on 47 of 55; on 8 of the 8 others McNemar holds and the template-level test does not: McNemar treats the 2,250 items as independent, and instances of a template are not (D-111), so a claim rests on the template-level tests. 7 answered rows across the roster ended with a finish reason other than stop or length (a provider fault inside a 200) and are scored on what they state; the harness now retries such a reply (D-148).
 
-| a | b | a - b | 95% CI | p (Holm) | fully solved a - b | 95% CI | template p (Holm) | McNemar p (Holm) | same verdict |
-|---|---|---:|---:|---:|---:|---:|---:|---:|---|
-| `gpt-oss-20b` | `deepseek-v4.1-flash` | -0.162 | -0.205 to -0.121 | 0.0005 | -0.170 | -0.214 to -0.128 | 0.0005 | 0.0000 | yes |
-| `gpt-oss-20b` | `kimi-k3` | -0.160 | -0.204 to -0.119 | 0.0005 | -0.169 | -0.212 to -0.127 | 0.0005 | 0.0000 | yes |
-| `gpt-oss-20b` | `claude-sonnet-5` | -0.157 | -0.199 to -0.119 | 0.0005 | -0.166 | -0.208 to -0.126 | 0.0005 | 0.0000 | yes |
-| `gpt-oss-20b` | `glm-5.3-flash` | -0.155 | -0.197 to -0.116 | 0.0005 | -0.165 | -0.208 to -0.125 | 0.0005 | 0.0000 | yes |
-| `gpt-oss-20b` | `muse-glimmer-30b` | -0.152 | -0.191 to -0.116 | 0.0005 | -0.163 | -0.204 to -0.124 | 0.0005 | 0.0000 | yes |
-| `gpt-oss-20b` | `glm-5.3` | -0.133 | -0.177 to -0.091 | 0.0005 | -0.143 | -0.186 to -0.100 | 0.0005 | 0.0000 | yes |
-| `deepseek-v4.1-flash` | `gpt-5.4-mini` | +0.129 | 0.092 to 0.169 | 0.0005 | +0.136 | 0.097 to 0.177 | 0.0005 | 0.0000 | yes |
-| `kimi-k3` | `gpt-5.4-mini` | +0.127 | 0.088 to 0.169 | 0.0005 | +0.135 | 0.096 to 0.176 | 0.0005 | 0.0000 | yes |
-| `gpt-5.4-mini` | `claude-sonnet-5` | -0.125 | -0.164 to -0.088 | 0.0005 | -0.132 | -0.172 to -0.095 | 0.0005 | 0.0000 | yes |
-| `glm-5.3-flash` | `gpt-5.4-mini` | +0.122 | 0.089 to 0.160 | 0.0005 | +0.132 | 0.096 to 0.169 | 0.0005 | 0.0000 | yes |
-| `muse-glimmer-30b` | `gpt-5.4-mini` | +0.120 | 0.087 to 0.156 | 0.0005 | +0.129 | 0.094 to 0.165 | 0.0005 | 0.0000 | yes |
-| `gemma-4-26b-a4b` | `deepseek-v4.1-flash` | -0.112 | -0.146 to -0.081 | 0.0005 | -0.122 | -0.158 to -0.090 | 0.0005 | 0.0000 | yes |
-| `gemma-4-26b-a4b` | `kimi-k3` | -0.110 | -0.146 to -0.077 | 0.0005 | -0.121 | -0.157 to -0.088 | 0.0005 | 0.0000 | yes |
-| `gemma-4-26b-a4b` | `claude-sonnet-5` | -0.108 | -0.140 to -0.077 | 0.0005 | -0.118 | -0.152 to -0.087 | 0.0005 | 0.0000 | yes |
-| `gemma-4-26b-a4b` | `glm-5.3-flash` | -0.105 | -0.136 to -0.077 | 0.0005 | -0.118 | -0.152 to -0.087 | 0.0005 | 0.0000 | yes |
-| `deepseek-v4.1-flash` | `gemini-3.1-flash-lite` | +0.104 | 0.069 to 0.142 | 0.0005 | +0.107 | 0.073 to 0.145 | 0.0005 | 0.0000 | yes |
-| `gemma-4-26b-a4b` | `muse-glimmer-30b` | -0.103 | -0.137 to -0.073 | 0.0005 | -0.115 | -0.151 to -0.082 | 0.0005 | 0.0000 | yes |
-| `kimi-k3` | `gemini-3.1-flash-lite` | +0.102 | 0.068 to 0.140 | 0.0005 | +0.106 | 0.071 to 0.146 | 0.0005 | 0.0000 | yes |
-| `glm-5.3` | `gpt-5.4-mini` | +0.101 | 0.069 to 0.135 | 0.0005 | +0.109 | 0.076 to 0.145 | 0.0005 | 0.0000 | yes |
-| `gemini-3.1-flash-lite` | `claude-sonnet-5` | -0.100 | -0.137 to -0.067 | 0.0005 | -0.103 | -0.141 to -0.070 | 0.0005 | 0.0000 | yes |
-| `glm-5.3-flash` | `gemini-3.1-flash-lite` | +0.098 | 0.067 to 0.131 | 0.0005 | +0.103 | 0.070 to 0.139 | 0.0005 | 0.0000 | yes |
-| `muse-glimmer-30b` | `gemini-3.1-flash-lite` | +0.095 | 0.063 to 0.130 | 0.0005 | +0.100 | 0.066 to 0.137 | 0.0005 | 0.0000 | yes |
-| `deepseek-v4.1-flash` | `qwen3-235b-a22b-2507` | +0.090 | 0.064 to 0.120 | 0.0005 | +0.110 | 0.076 to 0.147 | 0.0005 | 0.0000 | yes |
-| `qwen3-235b-a22b-2507` | `kimi-k3` | -0.088 | -0.118 to -0.061 | 0.0005 | -0.109 | -0.145 to -0.075 | 0.0005 | 0.0000 | yes |
-| `qwen3-235b-a22b-2507` | `claude-sonnet-5` | -0.086 | -0.113 to -0.061 | 0.0005 | -0.106 | -0.141 to -0.073 | 0.0005 | 0.0000 | yes |
-| `gemma-4-26b-a4b` | `glm-5.3` | -0.084 | -0.115 to -0.055 | 0.0005 | -0.095 | -0.128 to -0.066 | 0.0005 | 0.0000 | yes |
-| `qwen3-235b-a22b-2507` | `glm-5.3-flash` | -0.084 | -0.110 to -0.059 | 0.0005 | -0.105 | -0.140 to -0.073 | 0.0005 | 0.0000 | yes |
-| `qwen3-235b-a22b-2507` | `muse-glimmer-30b` | -0.081 | -0.107 to -0.057 | 0.0005 | -0.103 | -0.138 to -0.070 | 0.0005 | 0.0000 | yes |
-| `glm-5.3` | `gemini-3.1-flash-lite` | +0.076 | 0.048 to 0.107 | 0.0005 | +0.080 | 0.052 to 0.112 | 0.0005 | 0.0000 | yes |
-| `qwen3-235b-a22b-2507` | `glm-5.3` | -0.062 | -0.089 to -0.036 | 0.0005 | -0.083 | -0.119 to -0.049 | 0.0005 | 0.0000 | yes |
-| `glm-5.3-flash` | `glm-5.3` | +0.022 | 0.009 to 0.037 | 0.0135 | +0.023 | 0.009 to 0.038 | 0.0230 | 0.0000 | yes |
-| `gpt-oss-20b` | `qwen3-235b-a22b-2507` | -0.071 | -0.113 to -0.030 | 0.0254 | -0.060 | -0.108 to -0.013 | 0.3199 | 0.0000 | no |
-| `deepseek-v4.1-flash` | `glm-5.3` | +0.028 | 0.010 to 0.050 | 0.0750 | +0.027 | 0.007 to 0.050 | 0.2551 | 0.0000 | yes |
-| `gpt-oss-20b` | `gemini-3.1-flash-lite` | -0.057 | -0.103 to -0.012 | 0.3067 | -0.063 | -0.108 to -0.017 | 0.1982 | 0.0000 | yes |
-| `gpt-oss-20b` | `gemma-4-26b-a4b` | -0.050 | -0.089 to -0.010 | 0.3067 | -0.048 | -0.088 to -0.009 | 0.4763 | 0.0000 | yes |
-| `glm-5.3` | `kimi-k3` | -0.027 | -0.051 to -0.006 | 0.3322 | -0.026 | -0.051 to -0.006 | 0.4763 | 0.0000 | yes |
-| `qwen3-235b-a22b-2507` | `gpt-5.4-mini` | +0.039 | 0.007 to 0.073 | 0.4429 | +0.026 | -0.015 to 0.066 | 1.0000 | 0.0585 | yes |
-| `glm-5.3` | `claude-sonnet-5` | -0.024 | -0.048 to -0.005 | 0.4808 | -0.023 | -0.047 to -0.004 | 0.8316 | 0.0000 | yes |
-| `gpt-oss-20b` | `gpt-5.4-mini` | -0.032 | -0.077 to 0.012 | 1.0000 | -0.034 | -0.080 to 0.011 | 1.0000 | 0.0113 | yes |
-| `gpt-5.4-mini` | `gemini-3.1-flash-lite` | -0.025 | -0.054 to 0.002 | 1.0000 | -0.029 | -0.058 to -0.001 | 0.9938 | 0.0027 | yes |
-| `gemma-4-26b-a4b` | `qwen3-235b-a22b-2507` | -0.022 | -0.052 to 0.008 | 1.0000 | -0.012 | -0.048 to 0.025 | 1.0000 | 1.0000 | yes |
-| `glm-5.3` | `muse-glimmer-30b` | -0.019 | -0.044 to 0.002 | 1.0000 | -0.020 | -0.046 to 0.002 | 1.0000 | 0.0019 | yes |
-| `gemma-4-26b-a4b` | `gpt-5.4-mini` | +0.017 | -0.013 to 0.048 | 1.0000 | +0.014 | -0.019 to 0.047 | 1.0000 | 1.0000 | yes |
-| `qwen3-235b-a22b-2507` | `gemini-3.1-flash-lite` | +0.014 | -0.015 to 0.045 | 1.0000 | -0.003 | -0.041 to 0.035 | 1.0000 | 1.0000 | yes |
-| `deepseek-v4.1-flash` | `muse-glimmer-30b` | +0.009 | -0.011 to 0.028 | 1.0000 | +0.007 | -0.013 to 0.026 | 1.0000 | 1.0000 | yes |
-| `gemma-4-26b-a4b` | `gemini-3.1-flash-lite` | -0.008 | -0.035 to 0.018 | 1.0000 | -0.015 | -0.042 to 0.011 | 1.0000 | 0.7116 | yes |
-| `muse-glimmer-30b` | `kimi-k3` | -0.007 | -0.028 to 0.012 | 1.0000 | -0.006 | -0.027 to 0.014 | 1.0000 | 1.0000 | yes |
-| `deepseek-v4.1-flash` | `glm-5.3-flash` | +0.007 | -0.004 to 0.018 | 1.0000 | +0.004 | -0.008 to 0.018 | 1.0000 | 1.0000 | yes |
-| `glm-5.3-flash` | `kimi-k3` | -0.005 | -0.019 to 0.008 | 1.0000 | -0.004 | -0.018 to 0.009 | 1.0000 | 1.0000 | yes |
-| `muse-glimmer-30b` | `claude-sonnet-5` | -0.005 | -0.025 to 0.015 | 1.0000 | -0.003 | -0.025 to 0.019 | 1.0000 | 1.0000 | yes |
-| `deepseek-v4.1-flash` | `claude-sonnet-5` | +0.004 | -0.006 to 0.016 | 1.0000 | +0.004 | -0.009 to 0.018 | 1.0000 | 1.0000 | yes |
-| `kimi-k3` | `claude-sonnet-5` | +0.002 | -0.006 to 0.013 | 1.0000 | +0.003 | -0.008 to 0.015 | 1.0000 | 1.0000 | yes |
-| `glm-5.3-flash` | `muse-glimmer-30b` | +0.002 | -0.016 to 0.020 | 1.0000 | +0.003 | -0.017 to 0.021 | 1.0000 | 1.0000 | yes |
-| `glm-5.3-flash` | `claude-sonnet-5` | -0.002 | -0.019 to 0.012 | 1.0000 | -0.000 | -0.017 to 0.014 | 1.0000 | 1.0000 | yes |
-| `deepseek-v4.1-flash` | `kimi-k3` | +0.002 | -0.006 to 0.009 | 1.0000 | +0.001 | -0.008 to 0.009 | 1.0000 | 1.0000 | yes |
+| a | b | a - b | 95% CI | p (Holm) | fully solved a - b | 95% CI | template p (Holm) | McNemar p (Holm) | same verdict | detectable, 0.05 / Holm |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---|---:|
+| `gpt-oss-20b` | `deepseek-v4.1-flash` | -0.162 | -0.205 to -0.121 | 0.0005 | -0.170 | -0.214 to -0.128 | 0.0005 | 0.0000 | yes | 0.060 / 0.090 |
+| `gpt-oss-20b` | `kimi-k3` | -0.160 | -0.204 to -0.119 | 0.0005 | -0.169 | -0.212 to -0.127 | 0.0005 | 0.0000 | yes | 0.061 / 0.090 |
+| `gpt-oss-20b` | `claude-sonnet-5` | -0.157 | -0.199 to -0.119 | 0.0005 | -0.166 | -0.208 to -0.126 | 0.0005 | 0.0000 | yes | 0.058 / 0.086 |
+| `gpt-oss-20b` | `glm-5.3-flash` | -0.155 | -0.197 to -0.116 | 0.0005 | -0.165 | -0.208 to -0.125 | 0.0005 | 0.0000 | yes | 0.059 / 0.087 |
+| `gpt-oss-20b` | `muse-glimmer-30b` | -0.152 | -0.191 to -0.116 | 0.0005 | -0.163 | -0.204 to -0.124 | 0.0005 | 0.0000 | yes | 0.055 / 0.081 |
+| `gpt-oss-20b` | `glm-5.3` | -0.133 | -0.177 to -0.091 | 0.0005 | -0.143 | -0.186 to -0.100 | 0.0005 | 0.0000 | yes | 0.061 / 0.091 |
+| `deepseek-v4.1-flash` | `gpt-5.4-mini` | +0.129 | 0.092 to 0.169 | 0.0005 | +0.136 | 0.097 to 0.177 | 0.0005 | 0.0000 | yes | 0.056 / 0.083 |
+| `kimi-k3` | `gpt-5.4-mini` | +0.127 | 0.088 to 0.169 | 0.0005 | +0.135 | 0.096 to 0.176 | 0.0005 | 0.0000 | yes | 0.057 / 0.084 |
+| `gpt-5.4-mini` | `claude-sonnet-5` | -0.125 | -0.164 to -0.088 | 0.0005 | -0.132 | -0.172 to -0.095 | 0.0005 | 0.0000 | yes | 0.054 / 0.080 |
+| `glm-5.3-flash` | `gpt-5.4-mini` | +0.122 | 0.089 to 0.160 | 0.0005 | +0.132 | 0.096 to 0.169 | 0.0005 | 0.0000 | yes | 0.051 / 0.075 |
+| `muse-glimmer-30b` | `gpt-5.4-mini` | +0.120 | 0.087 to 0.156 | 0.0005 | +0.129 | 0.094 to 0.165 | 0.0005 | 0.0000 | yes | 0.050 / 0.074 |
+| `gemma-4-26b-a4b` | `deepseek-v4.1-flash` | -0.112 | -0.146 to -0.081 | 0.0005 | -0.122 | -0.158 to -0.090 | 0.0005 | 0.0000 | yes | 0.047 / 0.070 |
+| `gemma-4-26b-a4b` | `kimi-k3` | -0.110 | -0.146 to -0.077 | 0.0005 | -0.121 | -0.157 to -0.088 | 0.0005 | 0.0000 | yes | 0.049 / 0.073 |
+| `gemma-4-26b-a4b` | `claude-sonnet-5` | -0.108 | -0.140 to -0.077 | 0.0005 | -0.118 | -0.152 to -0.087 | 0.0005 | 0.0000 | yes | 0.045 / 0.067 |
+| `gemma-4-26b-a4b` | `glm-5.3-flash` | -0.105 | -0.136 to -0.077 | 0.0005 | -0.118 | -0.152 to -0.087 | 0.0005 | 0.0000 | yes | 0.044 / 0.065 |
+| `deepseek-v4.1-flash` | `gemini-3.1-flash-lite` | +0.104 | 0.069 to 0.142 | 0.0005 | +0.107 | 0.073 to 0.145 | 0.0005 | 0.0000 | yes | 0.051 / 0.076 |
+| `gemma-4-26b-a4b` | `muse-glimmer-30b` | -0.103 | -0.137 to -0.073 | 0.0005 | -0.115 | -0.151 to -0.082 | 0.0005 | 0.0000 | yes | 0.046 / 0.068 |
+| `kimi-k3` | `gemini-3.1-flash-lite` | +0.102 | 0.068 to 0.140 | 0.0005 | +0.106 | 0.071 to 0.146 | 0.0005 | 0.0000 | yes | 0.052 / 0.077 |
+| `glm-5.3` | `gpt-5.4-mini` | +0.101 | 0.069 to 0.135 | 0.0005 | +0.109 | 0.076 to 0.145 | 0.0005 | 0.0000 | yes | 0.048 / 0.071 |
+| `gemini-3.1-flash-lite` | `claude-sonnet-5` | -0.100 | -0.137 to -0.067 | 0.0005 | -0.103 | -0.141 to -0.070 | 0.0005 | 0.0000 | yes | 0.050 / 0.074 |
+| `glm-5.3-flash` | `gemini-3.1-flash-lite` | +0.098 | 0.067 to 0.131 | 0.0005 | +0.103 | 0.070 to 0.139 | 0.0005 | 0.0000 | yes | 0.047 / 0.069 |
+| `muse-glimmer-30b` | `gemini-3.1-flash-lite` | +0.095 | 0.063 to 0.130 | 0.0005 | +0.100 | 0.066 to 0.137 | 0.0005 | 0.0000 | yes | 0.049 / 0.072 |
+| `deepseek-v4.1-flash` | `qwen3-235b-a22b-2507` | +0.090 | 0.064 to 0.120 | 0.0005 | +0.110 | 0.076 to 0.147 | 0.0005 | 0.0000 | yes | 0.040 / 0.059 |
+| `qwen3-235b-a22b-2507` | `kimi-k3` | -0.088 | -0.118 to -0.061 | 0.0005 | -0.109 | -0.145 to -0.075 | 0.0005 | 0.0000 | yes | 0.041 / 0.061 |
+| `qwen3-235b-a22b-2507` | `claude-sonnet-5` | -0.086 | -0.113 to -0.061 | 0.0005 | -0.106 | -0.141 to -0.073 | 0.0005 | 0.0000 | yes | 0.038 / 0.056 |
+| `gemma-4-26b-a4b` | `glm-5.3` | -0.084 | -0.115 to -0.055 | 0.0005 | -0.095 | -0.128 to -0.066 | 0.0005 | 0.0000 | yes | 0.042 / 0.063 |
+| `qwen3-235b-a22b-2507` | `glm-5.3-flash` | -0.084 | -0.110 to -0.059 | 0.0005 | -0.105 | -0.140 to -0.073 | 0.0005 | 0.0000 | yes | 0.037 / 0.054 |
+| `qwen3-235b-a22b-2507` | `muse-glimmer-30b` | -0.081 | -0.107 to -0.057 | 0.0005 | -0.103 | -0.138 to -0.070 | 0.0005 | 0.0000 | yes | 0.037 / 0.054 |
+| `glm-5.3` | `gemini-3.1-flash-lite` | +0.076 | 0.048 to 0.107 | 0.0005 | +0.080 | 0.052 to 0.112 | 0.0005 | 0.0000 | yes | 0.042 / 0.063 |
+| `qwen3-235b-a22b-2507` | `glm-5.3` | -0.062 | -0.089 to -0.036 | 0.0005 | -0.083 | -0.119 to -0.049 | 0.0005 | 0.0000 | yes | 0.038 / 0.057 |
+| `glm-5.3-flash` | `glm-5.3` | +0.022 | 0.009 to 0.037 | 0.0135 | +0.023 | 0.009 to 0.038 | 0.0230 | 0.0000 | yes | 0.021 / 0.031 |
+| `gpt-oss-20b` | `qwen3-235b-a22b-2507` | -0.071 | -0.113 to -0.030 | 0.0254 | -0.060 | -0.108 to -0.013 | 0.3199 | 0.0000 | no | 0.060 / 0.089 |
+| `deepseek-v4.1-flash` | `glm-5.3` | +0.028 | 0.010 to 0.050 | 0.0750 | +0.027 | 0.007 to 0.050 | 0.2551 | 0.0000 | yes | 0.029 / 0.043 |
+| `gpt-oss-20b` | `gemini-3.1-flash-lite` | -0.057 | -0.103 to -0.012 | 0.3067 | -0.063 | -0.108 to -0.017 | 0.1982 | 0.0000 | yes | 0.065 / 0.096 |
+| `gpt-oss-20b` | `gemma-4-26b-a4b` | -0.050 | -0.089 to -0.010 | 0.3067 | -0.048 | -0.088 to -0.009 | 0.4763 | 0.0000 | yes | 0.056 / 0.083 |
+| `glm-5.3` | `kimi-k3` | -0.027 | -0.051 to -0.006 | 0.3322 | -0.026 | -0.051 to -0.006 | 0.4763 | 0.0000 | yes | 0.032 / 0.048 |
+| `qwen3-235b-a22b-2507` | `gpt-5.4-mini` | +0.039 | 0.007 to 0.073 | 0.4429 | +0.026 | -0.015 to 0.066 | 1.0000 | 0.0585 | yes | 0.048 / 0.071 |
+| `glm-5.3` | `claude-sonnet-5` | -0.024 | -0.048 to -0.005 | 0.4808 | -0.023 | -0.047 to -0.004 | 0.8316 | 0.0000 | yes | 0.031 / 0.046 |
+| `gpt-oss-20b` | `gpt-5.4-mini` | -0.032 | -0.077 to 0.012 | 1.0000 | -0.034 | -0.080 to 0.011 | 1.0000 | 0.0113 | yes | 0.063 / 0.094 |
+| `gpt-5.4-mini` | `gemini-3.1-flash-lite` | -0.025 | -0.054 to 0.002 | 1.0000 | -0.029 | -0.058 to -0.001 | 0.9938 | 0.0027 | yes | 0.040 / 0.060 |
+| `gemma-4-26b-a4b` | `qwen3-235b-a22b-2507` | -0.022 | -0.052 to 0.008 | 1.0000 | -0.012 | -0.048 to 0.025 | 1.0000 | 1.0000 | yes | 0.042 / 0.062 |
+| `glm-5.3` | `muse-glimmer-30b` | -0.019 | -0.044 to 0.002 | 1.0000 | -0.020 | -0.046 to 0.002 | 1.0000 | 0.0019 | yes | 0.033 / 0.049 |
+| `gemma-4-26b-a4b` | `gpt-5.4-mini` | +0.017 | -0.013 to 0.048 | 1.0000 | +0.014 | -0.019 to 0.047 | 1.0000 | 1.0000 | yes | 0.044 / 0.065 |
+| `qwen3-235b-a22b-2507` | `gemini-3.1-flash-lite` | +0.014 | -0.015 to 0.045 | 1.0000 | -0.003 | -0.041 to 0.035 | 1.0000 | 1.0000 | yes | 0.042 / 0.062 |
+| `deepseek-v4.1-flash` | `muse-glimmer-30b` | +0.009 | -0.011 to 0.028 | 1.0000 | +0.007 | -0.013 to 0.026 | 1.0000 | 1.0000 | yes | 0.027 / 0.040 |
+| `gemma-4-26b-a4b` | `gemini-3.1-flash-lite` | -0.008 | -0.035 to 0.018 | 1.0000 | -0.015 | -0.042 to 0.011 | 1.0000 | 0.7116 | yes | 0.038 / 0.056 |
+| `muse-glimmer-30b` | `kimi-k3` | -0.007 | -0.028 to 0.012 | 1.0000 | -0.006 | -0.027 to 0.014 | 1.0000 | 1.0000 | yes | 0.028 / 0.041 |
+| `deepseek-v4.1-flash` | `glm-5.3-flash` | +0.007 | -0.004 to 0.018 | 1.0000 | +0.004 | -0.008 to 0.018 | 1.0000 | 1.0000 | yes | 0.016 / 0.024 |
+| `glm-5.3-flash` | `kimi-k3` | -0.005 | -0.019 to 0.008 | 1.0000 | -0.004 | -0.018 to 0.009 | 1.0000 | 1.0000 | yes | 0.020 / 0.029 |
+| `muse-glimmer-30b` | `claude-sonnet-5` | -0.005 | -0.025 to 0.015 | 1.0000 | -0.003 | -0.025 to 0.019 | 1.0000 | 1.0000 | yes | 0.029 / 0.043 |
+| `deepseek-v4.1-flash` | `claude-sonnet-5` | +0.004 | -0.006 to 0.016 | 1.0000 | +0.004 | -0.009 to 0.018 | 1.0000 | 1.0000 | yes | 0.016 / 0.024 |
+| `kimi-k3` | `claude-sonnet-5` | +0.002 | -0.006 to 0.013 | 1.0000 | +0.003 | -0.008 to 0.015 | 1.0000 | 1.0000 | yes | 0.014 / 0.020 |
+| `glm-5.3-flash` | `muse-glimmer-30b` | +0.002 | -0.016 to 0.020 | 1.0000 | +0.003 | -0.017 to 0.021 | 1.0000 | 1.0000 | yes | 0.026 / 0.038 |
+| `glm-5.3-flash` | `claude-sonnet-5` | -0.002 | -0.019 to 0.012 | 1.0000 | -0.000 | -0.017 to 0.014 | 1.0000 | 1.0000 | yes | 0.022 / 0.032 |
+| `deepseek-v4.1-flash` | `kimi-k3` | +0.002 | -0.006 to 0.009 | 1.0000 | +0.001 | -0.008 to 0.009 | 1.0000 | 1.0000 | yes | 0.010 / 0.015 |
+
+*Added 2026-10-03 (D-173, next steps A9):* the last column is the smallest mean per-template difference a paired test on these 150 differences detects at 80% power, at two-sided 0.05 (2.80 x the SD of the differences / sqrt(150)) and at the strictest Holm step over the 55 pairs. A pair whose difference is below its detectable value is one this design could not have separated: 23 of the 55 pairs, 23 of them not significant.
 
 ## Q2. The complexity cliff: Easy minus Advanced
 
@@ -98,21 +100,23 @@ Answer score on the 58 Easy templates minus the 34 Advanced, templates resampled
 | `gemini-3.1-flash-lite` | 0.937 | 0.738 | +0.199 | 0.083 to 0.327 | 0.0315 | 0.0029 | 0.164 | 0.347 | 0.150 | 0.233 |
 | `claude-sonnet-5` | 0.993 | 0.923 | +0.070 | 0.006 to 0.151 | 0.2906 | 0.0433 | 0.037 | 0.214 | 0.080 | 0.136 |
 
-**The cliff under two variations.** Unusable rows left out of the template means, because an empty row at the output cap measures finishing within the ceiling as well as solving, and most such rows fall on Advanced templates; and without the nine symbolic templates (D-138). Welch p, Holm across models.
+**The cliff under three variations.** Unusable rows left out of the template means, because an empty row at the output cap measures finishing within the ceiling as well as solving, and most such rows fall on Advanced templates; without the nine symbolic templates (D-138); and (*added 2026-10-03, D-171 and D-173*) without the two Advanced chemical templates whose question does not pin the answer to the check's tolerance, `work_isothermal_virial` and `adiabatic_flame_temperature`. Welch p, Holm across models.
 
-| model | gap, as scored | gap, unusable left out | 95% CI | Welch p (Holm) | gap, no symbolic | 95% CI | Welch p (Holm) |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| `gpt-oss-20b` | +0.189 | +0.179 | 0.073 to 0.293 | 0.0310 | +0.192 | 0.074 to 0.314 | 0.0389 |
-| `gemma-4-26b-a4b` | +0.151 | +0.151 | 0.054 to 0.255 | 0.0429 | +0.149 | 0.045 to 0.259 | 0.0780 |
-| `deepseek-v4.1-flash` | +0.067 | +0.055 | 0.003 to 0.128 | 0.5869 | +0.042 | 0.001 to 0.114 | 0.7893 |
-| `qwen3-235b-a22b-2507` | +0.078 | +0.078 | -0.011 to 0.174 | 0.5869 | +0.065 | -0.024 to 0.163 | 0.7893 |
-| `glm-5.3-flash` | +0.073 | +0.037 | -0.001 to 0.098 | 0.5869 | +0.067 | 0.012 to 0.141 | 0.3842 |
-| `glm-5.3` | +0.134 | +0.010 | -0.009 to 0.036 | 0.5869 | +0.128 | 0.028 to 0.242 | 0.2017 |
-| `muse-glimmer-30b` | +0.055 | +0.034 | -0.007 to 0.083 | 0.5869 | +0.035 | -0.013 to 0.090 | 0.7893 |
-| `kimi-k3` | +0.065 | +0.055 | 0.003 to 0.127 | 0.5869 | +0.036 | -0.003 to 0.094 | 0.7893 |
-| `gpt-5.4-mini` | +0.184 | +0.184 | 0.076 to 0.306 | 0.0316 | +0.188 | 0.070 to 0.315 | 0.0609 |
-| `gemini-3.1-flash-lite` | +0.199 | +0.199 | 0.083 to 0.327 | 0.0315 | +0.183 | 0.061 to 0.311 | 0.0700 |
-| `claude-sonnet-5` | +0.070 | +0.070 | 0.006 to 0.151 | 0.4714 | +0.048 | -0.004 to 0.122 | 0.7893 |
+| model | gap, as scored | gap, unusable left out | 95% CI | Welch p (Holm) | gap, no symbolic | 95% CI | Welch p (Holm) | gap, without the two chemical | 95% CI | Welch p (Holm) |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `gpt-oss-20b` | +0.189 | +0.179 | 0.073 to 0.293 | 0.0310 | +0.192 | 0.074 to 0.314 | 0.0389 | +0.157 | 0.050 to 0.268 | 0.0817 |
+| `gemma-4-26b-a4b` | +0.151 | +0.151 | 0.054 to 0.255 | 0.0429 | +0.149 | 0.045 to 0.259 | 0.0780 | +0.105 | 0.022 to 0.187 | 0.1319 |
+| `deepseek-v4.1-flash` | +0.067 | +0.055 | 0.003 to 0.128 | 0.5869 | +0.042 | 0.001 to 0.114 | 0.7893 | +0.036 | 0.002 to 0.086 | 0.5056 |
+| `qwen3-235b-a22b-2507` | +0.078 | +0.078 | -0.011 to 0.174 | 0.5869 | +0.065 | -0.024 to 0.163 | 0.7893 | +0.034 | -0.039 to 0.107 | 0.5056 |
+| `glm-5.3-flash` | +0.073 | +0.037 | -0.001 to 0.098 | 0.5869 | +0.067 | 0.012 to 0.141 | 0.3842 | +0.036 | 0.006 to 0.075 | 0.3364 |
+| `glm-5.3` | +0.134 | +0.010 | -0.009 to 0.036 | 0.5869 | +0.128 | 0.028 to 0.242 | 0.2017 | +0.087 | 0.015 to 0.176 | 0.3364 |
+| `muse-glimmer-30b` | +0.055 | +0.034 | -0.007 to 0.083 | 0.5869 | +0.035 | -0.013 to 0.090 | 0.7893 | +0.047 | -0.002 to 0.103 | 0.5056 |
+| `kimi-k3` | +0.065 | +0.055 | 0.003 to 0.127 | 0.5869 | +0.036 | -0.003 to 0.094 | 0.7893 | +0.040 | -0.000 to 0.106 | 0.5056 |
+| `gpt-5.4-mini` | +0.184 | +0.184 | 0.076 to 0.306 | 0.0316 | +0.188 | 0.070 to 0.315 | 0.0609 | +0.151 | 0.047 to 0.271 | 0.1154 |
+| `gemini-3.1-flash-lite` | +0.199 | +0.199 | 0.083 to 0.327 | 0.0315 | +0.183 | 0.061 to 0.311 | 0.0700 | +0.157 | 0.048 to 0.274 | 0.1154 |
+| `claude-sonnet-5` | +0.070 | +0.070 | 0.006 to 0.151 | 0.4714 | +0.048 | -0.004 to 0.122 | 0.7893 | +0.029 | -0.006 to 0.083 | 0.5056 |
+
+Without the two chemical templates the gap holds for 0 of 11 models under Welch with Holm.
 
 ## Q3. What the process scores add beyond the answer
 
@@ -133,6 +137,114 @@ Wrong-answer traces score 0 (incorrect or unusable); fully solved ones score 1; 
 | `gpt-5.4-mini` | 2180 | 0.800 | 0.761 to 0.837 | 0.800 | 0.759 to 0.836 | 0.835 | 0.797 to 0.869 | 0.835 | 0.798 to 0.870 | 0.141 | 0.220 |
 | `gemini-3.1-flash-lite` | 2180 | 0.840 | 0.808 to 0.870 | 0.840 | 0.807 to 0.871 | 0.865 | 0.835 to 0.892 | 0.865 | 0.835 to 0.893 | 0.070 | 0.122 |
 | `claude-sonnet-5` | 2180 | 0.902 | 0.878 to 0.924 | 0.902 | 0.879 to 0.924 | 0.923 | 0.902 to 0.943 | 0.923 | 0.902 to 0.943 | 0.139 | 0.057 |
+
+**Coverage compared across models** (*exploratory; added 2026-10-03, D-173, next steps A1 and A9: the comparison the July rebuttal promised, Wilcoxon on the continuous reasoning score beside McNemar on the answer*). Per model, E5-strict coverage as the mean of its template means over the 147 templates every model has coverage on (an unusable trace scores what it reached), with a template bootstrap, the per-template SD within and between as Q1 has them, and the model's rank on the answer score beside its rank on coverage. Below, the 55 pairs: the paired template bootstrap of the difference, the sign-flip permutation test and the Wilcoxon signed-rank test on the per-template differences, each Holm-corrected over the 55 pairs, and the smallest difference the design detects at 80% power. Coverage credits stated intermediates, so a terser model scores lower without reasoning worse: the comparison ranks what traces state, not how soundly they reason.
+
+| model | coverage | 95% CI | SD within | SD between | rank on answers | rank on coverage |
+|---|---:|---:|---:|---:|---:|---:|
+| `claude-sonnet-5` | 0.922 | 0.902 to 0.942 | 0.062 | 0.127 | 3 | 1 |
+| `kimi-k3` | 0.915 | 0.893 to 0.936 | 0.078 | 0.135 | 2 | 2 |
+| `glm-5.3-flash` | 0.912 | 0.885 to 0.936 | 0.076 | 0.157 | 4 | 3 |
+| `glm-5.3` | 0.901 | 0.866 to 0.931 | 0.072 | 0.201 | 6 | 4 |
+| `muse-glimmer-30b` | 0.898 | 0.872 to 0.923 | 0.079 | 0.160 | 5 | 5 |
+| `deepseek-v4.1-flash` | 0.897 | 0.870 to 0.922 | 0.075 | 0.158 | 1 | 6 |
+| `qwen3-235b-a22b-2507` | 0.893 | 0.868 to 0.916 | 0.097 | 0.152 | 7 | 7 |
+| `gemma-4-26b-a4b` | 0.876 | 0.848 to 0.903 | 0.105 | 0.171 | 9 | 8 |
+| `gemini-3.1-flash-lite` | 0.864 | 0.834 to 0.893 | 0.101 | 0.181 | 8 | 9 |
+| `gpt-5.4-mini` | 0.833 | 0.796 to 0.869 | 0.108 | 0.226 | 10 | 10 |
+| `gpt-oss-20b` | 0.816 | 0.778 to 0.851 | 0.142 | 0.226 | 11 | 11 |
+
+Of the 55 pairs, 28 differ at a Holm-adjusted p below 0.05 under the sign-flip test and 29 under Wilcoxon. Kendall's tau between the models' answer-score order and their coverage order: 0.709 (95% CI 0.514 to 0.855, templates resampled).
+
+| a | b | a - b | 95% CI | sign-flip p (Holm) | Wilcoxon p (Holm) | detectable, 0.05 / Holm |
+|---|---|---:|---:|---:|---:|---:|
+| `gpt-oss-20b` | `claude-sonnet-5` | -0.107 | -0.138 to -0.077 | 0.0005 | 0.0000 | 0.043 / 0.064 |
+| `gpt-oss-20b` | `kimi-k3` | -0.099 | -0.130 to -0.069 | 0.0005 | 0.0000 | 0.044 / 0.066 |
+| `gpt-oss-20b` | `glm-5.3-flash` | -0.096 | -0.129 to -0.065 | 0.0005 | 0.0000 | 0.047 / 0.069 |
+| `gpt-5.4-mini` | `claude-sonnet-5` | -0.089 | -0.118 to -0.063 | 0.0005 | 0.0000 | 0.039 / 0.059 |
+| `gpt-oss-20b` | `muse-glimmer-30b` | -0.083 | -0.112 to -0.055 | 0.0005 | 0.0000 | 0.041 / 0.061 |
+| `kimi-k3` | `gpt-5.4-mini` | +0.082 | 0.056 to 0.110 | 0.0005 | 0.0000 | 0.038 / 0.057 |
+| `gpt-oss-20b` | `deepseek-v4.1-flash` | -0.081 | -0.111 to -0.052 | 0.0005 | 0.0000 | 0.042 / 0.063 |
+| `glm-5.3-flash` | `gpt-5.4-mini` | +0.079 | 0.052 to 0.109 | 0.0005 | 0.0000 | 0.041 / 0.061 |
+| `gpt-oss-20b` | `qwen3-235b-a22b-2507` | -0.077 | -0.108 to -0.048 | 0.0005 | 0.0000 | 0.043 / 0.064 |
+| `muse-glimmer-30b` | `gpt-5.4-mini` | +0.065 | 0.041 to 0.091 | 0.0005 | 0.0000 | 0.035 / 0.052 |
+| `deepseek-v4.1-flash` | `gpt-5.4-mini` | +0.064 | 0.039 to 0.091 | 0.0005 | 0.0000 | 0.038 / 0.056 |
+| `qwen3-235b-a22b-2507` | `gpt-5.4-mini` | +0.060 | 0.035 to 0.087 | 0.0005 | 0.0002 | 0.036 / 0.054 |
+| `gemini-3.1-flash-lite` | `claude-sonnet-5` | -0.058 | -0.081 to -0.038 | 0.0005 | 0.0000 | 0.031 / 0.046 |
+| `kimi-k3` | `gemini-3.1-flash-lite` | +0.051 | 0.033 to 0.071 | 0.0005 | 0.0001 | 0.027 / 0.041 |
+| `glm-5.3-flash` | `gemini-3.1-flash-lite` | +0.048 | 0.027 to 0.069 | 0.0005 | 0.0004 | 0.030 / 0.045 |
+| `gpt-oss-20b` | `glm-5.3` | -0.085 | -0.123 to -0.049 | 0.0008 | 0.0000 | 0.053 / 0.079 |
+| `gpt-oss-20b` | `gemma-4-26b-a4b` | -0.060 | -0.088 to -0.034 | 0.0008 | 0.0034 | 0.039 / 0.058 |
+| `gemma-4-26b-a4b` | `claude-sonnet-5` | -0.046 | -0.068 to -0.027 | 0.0008 | 0.0001 | 0.030 / 0.044 |
+| `glm-5.3` | `gpt-5.4-mini` | +0.068 | 0.038 to 0.101 | 0.0015 | 0.0000 | 0.046 / 0.068 |
+| `gemma-4-26b-a4b` | `kimi-k3` | -0.039 | -0.059 to -0.020 | 0.0029 | 0.0093 | 0.028 / 0.042 |
+| `gemma-4-26b-a4b` | `gpt-5.4-mini` | +0.043 | 0.020 to 0.069 | 0.0140 | 0.0088 | 0.034 / 0.051 |
+| `qwen3-235b-a22b-2507` | `gemini-3.1-flash-lite` | +0.029 | 0.013 to 0.045 | 0.0184 | 0.0383 | 0.023 / 0.034 |
+| `deepseek-v4.1-flash` | `claude-sonnet-5` | -0.025 | -0.041 to -0.011 | 0.0238 | 0.0134 | 0.022 / 0.032 |
+| `muse-glimmer-30b` | `gemini-3.1-flash-lite` | +0.034 | 0.014 to 0.055 | 0.0243 | 0.0205 | 0.029 / 0.043 |
+| `deepseek-v4.1-flash` | `gemini-3.1-flash-lite` | +0.033 | 0.014 to 0.053 | 0.0267 | 0.0810 | 0.028 / 0.042 |
+| `qwen3-235b-a22b-2507` | `claude-sonnet-5` | -0.029 | -0.048 to -0.013 | 0.0267 | 0.0260 | 0.026 / 0.038 |
+| `gemma-4-26b-a4b` | `glm-5.3-flash` | -0.036 | -0.058 to -0.015 | 0.0310 | 0.0063 | 0.031 / 0.046 |
+| `gpt-oss-20b` | `gemini-3.1-flash-lite` | -0.048 | -0.078 to -0.020 | 0.0361 | 0.0349 | 0.042 / 0.063 |
+| `deepseek-v4.1-flash` | `kimi-k3` | -0.018 | -0.030 to -0.007 | 0.0626 | 0.1633 | 0.017 / 0.025 |
+| `gpt-5.4-mini` | `gemini-3.1-flash-lite` | -0.031 | -0.053 to -0.010 | 0.1214 | 0.1700 | 0.031 / 0.046 |
+| `qwen3-235b-a22b-2507` | `kimi-k3` | -0.022 | -0.039 to -0.006 | 0.1952 | 0.1013 | 0.024 / 0.035 |
+| `glm-5.3` | `gemini-3.1-flash-lite` | +0.037 | 0.010 to 0.064 | 0.2088 | 0.0071 | 0.039 / 0.058 |
+| `muse-glimmer-30b` | `claude-sonnet-5` | -0.024 | -0.045 to -0.005 | 0.3765 | 0.4283 | 0.029 / 0.042 |
+| `gemma-4-26b-a4b` | `qwen3-235b-a22b-2507` | -0.017 | -0.032 to -0.002 | 0.5995 | 0.3232 | 0.021 / 0.031 |
+| `gemma-4-26b-a4b` | `muse-glimmer-30b` | -0.022 | -0.043 to -0.002 | 0.6909 | 0.2551 | 0.029 / 0.043 |
+| `gemma-4-26b-a4b` | `deepseek-v4.1-flash` | -0.021 | -0.042 to -0.002 | 0.7304 | 1.0000 | 0.028 / 0.042 |
+| `gemma-4-26b-a4b` | `glm-5.3` | -0.025 | -0.054 to 0.003 | 1.0000 | 0.0122 | 0.041 / 0.061 |
+| `glm-5.3` | `claude-sonnet-5` | -0.021 | -0.051 to 0.005 | 1.0000 | 1.0000 | 0.041 / 0.060 |
+| `qwen3-235b-a22b-2507` | `glm-5.3-flash` | -0.019 | -0.039 to 0.001 | 1.0000 | 0.1415 | 0.028 / 0.042 |
+| `gpt-oss-20b` | `gpt-5.4-mini` | -0.017 | -0.049 to 0.014 | 1.0000 | 1.0000 | 0.045 / 0.067 |
+| `muse-glimmer-30b` | `kimi-k3` | -0.016 | -0.036 to 0.001 | 1.0000 | 1.0000 | 0.027 / 0.040 |
+| `deepseek-v4.1-flash` | `glm-5.3-flash` | -0.015 | -0.032 to 0.003 | 1.0000 | 0.1415 | 0.025 / 0.037 |
+| `glm-5.3` | `kimi-k3` | -0.014 | -0.042 to 0.011 | 1.0000 | 1.0000 | 0.038 / 0.056 |
+| `glm-5.3-flash` | `muse-glimmer-30b` | +0.014 | -0.003 to 0.031 | 1.0000 | 1.0000 | 0.024 / 0.036 |
+| `gemma-4-26b-a4b` | `gemini-3.1-flash-lite` | +0.012 | -0.001 to 0.026 | 1.0000 | 1.0000 | 0.019 / 0.028 |
+| `glm-5.3-flash` | `glm-5.3` | +0.011 | -0.004 to 0.028 | 1.0000 | 1.0000 | 0.023 / 0.034 |
+| `glm-5.3-flash` | `claude-sonnet-5` | -0.010 | -0.031 to 0.008 | 1.0000 | 1.0000 | 0.028 / 0.041 |
+| `qwen3-235b-a22b-2507` | `glm-5.3` | -0.008 | -0.036 to 0.022 | 1.0000 | 0.1700 | 0.041 / 0.061 |
+| `kimi-k3` | `claude-sonnet-5` | -0.008 | -0.021 to 0.005 | 1.0000 | 0.8923 | 0.019 / 0.028 |
+| `qwen3-235b-a22b-2507` | `muse-glimmer-30b` | -0.005 | -0.023 to 0.012 | 1.0000 | 1.0000 | 0.025 / 0.037 |
+| `deepseek-v4.1-flash` | `glm-5.3` | -0.004 | -0.029 to 0.022 | 1.0000 | 0.8188 | 0.036 / 0.054 |
+| `deepseek-v4.1-flash` | `qwen3-235b-a22b-2507` | +0.004 | -0.015 to 0.023 | 1.0000 | 1.0000 | 0.028 / 0.041 |
+| `glm-5.3-flash` | `kimi-k3` | -0.003 | -0.022 to 0.013 | 1.0000 | 1.0000 | 0.025 / 0.037 |
+| `glm-5.3` | `muse-glimmer-30b` | +0.003 | -0.022 to 0.025 | 1.0000 | 1.0000 | 0.033 / 0.049 |
+| `deepseek-v4.1-flash` | `muse-glimmer-30b` | -0.001 | -0.020 to 0.019 | 1.0000 | 0.8613 | 0.028 / 0.042 |
+
+**Does coverage track verbosity?** (*exploratory; D-173, next steps A10*). Per model, Spearman's rho across templates between the template's mean coverage and its mean number of steps and of arithmetic claims per readable trace; and coverage on the fully solved traces against the answered wrong answers, readable traces, template intervals.
+
+| model | rho(coverage, steps) | rho(coverage, claims) | median steps | coverage, fully solved | 95% CI | coverage, wrong answers | 95% CI | wrong answers |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| `gpt-oss-20b` | -0.259 | -0.147 | 9 | 0.907 | 0.883 to 0.930 | 0.464 | 0.397 to 0.539 | 322 |
+| `gemma-4-26b-a4b` | -0.215 | -0.283 | 5 | 0.918 | 0.894 to 0.941 | 0.601 | 0.526 to 0.680 | 269 |
+| `deepseek-v4.1-flash` | -0.230 | -0.135 | 6 | 0.906 | 0.881 to 0.929 | 0.676 | 0.551 to 0.809 | 26 |
+| `qwen3-235b-a22b-2507` | -0.202 | -0.183 | 10 | 0.917 | 0.893 to 0.939 | 0.636 | 0.558 to 0.716 | 194 |
+| `glm-5.3-flash` | -0.113 | -0.229 | 7 | 0.933 | 0.912 to 0.953 | 0.540 | 0.323 to 0.695 | 18 |
+| `glm-5.3` | -0.142 | -0.222 | 8 | 0.944 | 0.923 to 0.963 | 0.845 | 0.583 to 1.000 | 7 |
+| `muse-glimmer-30b` | -0.190 | -0.147 | 5 | 0.914 | 0.891 to 0.935 | 0.694 | 0.595 to 0.858 | 35 |
+| `kimi-k3` | -0.218 | -0.139 | 6 | 0.921 | 0.899 to 0.941 | 0.684 | 0.527 to 0.822 | 40 |
+| `gpt-5.4-mini` | -0.227 | -0.182 | 6 | 0.900 | 0.873 to 0.924 | 0.473 | 0.398 to 0.558 | 315 |
+| `gemini-3.1-flash-lite` | -0.209 | -0.249 | 5 | 0.914 | 0.890 to 0.936 | 0.537 | 0.467 to 0.611 | 266 |
+| `claude-sonnet-5` | -0.199 | -0.242 | 7 | 0.930 | 0.909 to 0.949 | 0.753 | 0.661 to 0.889 | 50 |
+
+**Verdict against coverage at the trace level** (*exploratory; D-173, next steps A11*). The share of fully solved traces with coverage below 0.5, and of answered wrong answers with coverage 1.0, template intervals. The second is what a process score adds on a wrong answer: a complete derivation to a wrong value.
+
+| model | fully solved traces | with coverage < 0.5 | 95% CI | answered wrong answers | with coverage 1.0 | 95% CI |
+|---|---:|---:|---:|---:|---:|---:|
+| `gpt-oss-20b` | 1743 | 0.036 | 0.019 to 0.056 | 322 | 0.130 | 0.071 to 0.209 |
+| `gemma-4-26b-a4b` | 1839 | 0.036 | 0.018 to 0.058 | 269 | 0.245 | 0.160 to 0.350 |
+| `deepseek-v4.1-flash` | 2116 | 0.034 | 0.017 to 0.055 | 26 | 0.154 | 0.026 to 0.438 |
+| `qwen3-235b-a22b-2507` | 1870 | 0.036 | 0.016 to 0.061 | 194 | 0.263 | 0.170 to 0.383 |
+| `glm-5.3-flash` | 2103 | 0.024 | 0.009 to 0.043 | 18 | 0.056 | 0.000 to 0.300 |
+| `glm-5.3` | 2051 | 0.020 | 0.004 to 0.040 | 7 | 0.714 | 0.429 to 1.000 |
+| `muse-glimmer-30b` | 2100 | 0.032 | 0.017 to 0.051 | 35 | 0.314 | 0.140 to 0.640 |
+| `kimi-k3` | 2113 | 0.029 | 0.014 to 0.048 | 40 | 0.275 | 0.061 to 0.500 |
+| `gpt-5.4-mini` | 1809 | 0.048 | 0.027 to 0.072 | 315 | 0.165 | 0.097 to 0.254 |
+| `gemini-3.1-flash-lite` | 1873 | 0.028 | 0.013 to 0.047 | 266 | 0.139 | 0.072 to 0.218 |
+| `claude-sonnet-5` | 2103 | 0.025 | 0.012 to 0.040 | 50 | 0.280 | 0.130 to 0.613 |
 
 **Milestones on the wrong-answer traces.** An unusable trace reaches only what it wrote before it stopped, and an empty one nothing, so coverage is also shown on the readable wrong answers alone.
 
@@ -274,19 +386,19 @@ The noise floor at the arm's own size and template mix (D-165): two disjoint dra
 
 **Bounds (D-165).** The same bootstrap's 90% interval per model, read against a margin of ±0.05 in answer score: a model is within the margin when the whole interval is (the two-one-sided-tests rule at 5%). The margin is the plan's largest detectable paired difference (5.1 points at 15% discordance); it was fixed after the point estimates were known and before these intervals were computed.
 
-| model | answer score diff | 90% CI | within the margin |
-|---|---:|---:|---|
-| `gpt-oss-20b` | +0.011 | -0.028 to 0.050 | yes |
-| `gemma-4-26b-a4b` | +0.007 | -0.028 to 0.040 | yes |
-| `deepseek-v4.1-flash` | -0.007 | -0.025 to 0.011 | yes |
-| `qwen3-235b-a22b-2507` | -0.031 | -0.067 to 0.005 | no |
-| `glm-5.3-flash` | -0.022 | -0.039 to -0.005 | yes |
-| `glm-5.3` | -0.007 | -0.028 to 0.012 | yes |
-| `muse-glimmer-30b` | +0.020 | 0.005 to 0.036 | yes |
-| `kimi-k3` | +0.000 | -0.008 to 0.009 | yes |
-| `gpt-5.4-mini` | -0.018 | -0.047 to 0.011 | yes |
-| `gemini-3.1-flash-lite` | +0.007 | -0.025 to 0.040 | yes |
-| `claude-sonnet-5` | -0.020 | -0.034 to -0.007 | yes |
+| model | answer score diff | 90% CI | within the margin | detectable at 0.05 (A9) |
+|---|---:|---:|---|---:|
+| `gpt-oss-20b` | +0.011 | -0.028 to 0.050 | yes | 0.073 |
+| `gemma-4-26b-a4b` | +0.007 | -0.028 to 0.040 | yes | 0.064 |
+| `deepseek-v4.1-flash` | -0.007 | -0.025 to 0.011 | yes | 0.027 |
+| `qwen3-235b-a22b-2507` | -0.031 | -0.067 to 0.005 | no | 0.052 |
+| `glm-5.3-flash` | -0.022 | -0.039 to -0.005 | yes | 0.026 |
+| `glm-5.3` | -0.007 | -0.028 to 0.012 | yes | 0.041 |
+| `muse-glimmer-30b` | +0.020 | 0.005 to 0.036 | yes | 0.041 |
+| `kimi-k3` | +0.000 | -0.008 to 0.009 | yes | 0.012 |
+| `gpt-5.4-mini` | -0.018 | -0.047 to 0.011 | yes | 0.056 |
+| `gemini-3.1-flash-lite` | +0.007 | -0.025 to 0.040 | yes | 0.064 |
+| `claude-sonnet-5` | -0.020 | -0.034 to -0.007 | yes | 0.020 |
 
 **Against run-to-run noise (D-165).** For the models with decoding repeats: the paraphrase difference beside each repeat minus the main run on the 300 repeat items, each paired by item with the same template bootstrap; and both on the kept pairs the two subsamples share.
 
@@ -335,6 +447,54 @@ The plan's fourth sensitivity, without the two templates widened for round 4, ap
 | `gpt-5.4-mini` | 0.800 | 0.838 | 0.911 | 0.831 | 0.854 | 0.918 | 0.841 | 0.734 |
 | `gemini-3.1-flash-lite` | 0.776 | 0.862 | 0.900 | 0.860 | 0.961 | 0.937 | 0.885 | 0.738 |
 | `claude-sonnet-5` | 0.949 | 0.996 | 0.947 | 0.973 | 0.994 | 0.993 | 0.980 | 0.923 |
+
+### By branch and level, with template intervals
+
+*Added 2026-10-03 (D-173, next steps A2).* The mean of the branch's template means with its template bootstrap (30 templates per branch); the last column is the smallest difference between two branches a model's within-branch spread lets 30 templates detect at 80% power (2.80 x pooled SD x sqrt(2/30)). Then the same by level.
+
+| model | chemical | civil | electrical | industrial | mechanical | detectable branch difference |
+|---|---:|---:|---:|---:|---:|---:|
+| `gpt-oss-20b` | 0.809 (0.678 to 0.919) | 0.673 (0.542 to 0.800) | 0.908 (0.861 to 0.948) | 0.820 (0.742 to 0.889) | 0.862 (0.794 to 0.924) | 0.189 |
+| `gemma-4-26b-a4b` | 0.734 (0.609 to 0.849) | 0.882 (0.816 to 0.940) | 0.904 (0.856 to 0.948) | 0.878 (0.773 to 0.962) | 0.921 (0.877 to 0.960) | 0.162 |
+| `deepseek-v4.1-flash` | 0.956 (0.887 to 0.996) | 0.993 (0.982 to 1.000) | 0.954 (0.900 to 0.989) | 0.980 (0.944 to 1.000) | 0.997 (0.991 to 1.000) | 0.076 |
+| `qwen3-235b-a22b-2507` | 0.827 (0.720 to 0.922) | 0.940 (0.911 to 0.964) | 0.886 (0.823 to 0.939) | 0.871 (0.773 to 0.951) | 0.906 (0.852 to 0.952) | 0.145 |
+| `glm-5.3-flash` | 0.947 (0.873 to 0.998) | 0.984 (0.956 to 1.000) | 0.981 (0.956 to 0.999) | 0.942 (0.869 to 0.989) | 0.992 (0.983 to 0.999) | 0.089 |
+| `glm-5.3` | 0.898 (0.796 to 0.987) | 0.973 (0.927 to 1.000) | 0.951 (0.910 to 0.983) | 0.922 (0.836 to 0.987) | 0.993 (0.982 to 1.000) | 0.126 |
+| `muse-glimmer-30b` | 0.963 (0.911 to 0.999) | 0.969 (0.933 to 0.996) | 0.971 (0.930 to 0.997) | 0.940 (0.867 to 0.991) | 0.991 (0.979 to 1.000) | 0.084 |
+| `kimi-k3` | 0.964 (0.907 to 0.998) | 0.987 (0.964 to 1.000) | 0.949 (0.886 to 0.987) | 0.980 (0.962 to 0.993) | 0.991 (0.980 to 0.999) | 0.072 |
+| `gpt-5.4-mini` | 0.800 (0.682 to 0.904) | 0.838 (0.758 to 0.907) | 0.911 (0.861 to 0.954) | 0.831 (0.724 to 0.922) | 0.854 (0.753 to 0.938) | 0.182 |
+| `gemini-3.1-flash-lite` | 0.776 (0.640 to 0.896) | 0.862 (0.764 to 0.942) | 0.900 (0.826 to 0.954) | 0.860 (0.751 to 0.949) | 0.961 (0.926 to 0.988) | 0.182 |
+| `claude-sonnet-5` | 0.949 (0.873 to 1.000) | 0.996 (0.987 to 1.000) | 0.947 (0.886 to 0.987) | 0.973 (0.949 to 0.993) | 0.994 (0.984 to 1.000) | 0.081 |
+
+| model | Easy (58) | Intermediate (58) | Advanced (34) |
+|---|---:|---:|---:|
+| `gpt-oss-20b` | 0.905 (0.847 to 0.953) | 0.782 (0.706 to 0.850) | 0.716 (0.610 to 0.810) |
+| `gemma-4-26b-a4b` | 0.921 (0.872 to 0.961) | 0.861 (0.797 to 0.918) | 0.771 (0.675 to 0.854) |
+| `deepseek-v4.1-flash` | 0.996 (0.992 to 0.999) | 0.983 (0.963 to 0.997) | 0.929 (0.856 to 0.984) |
+| `qwen3-235b-a22b-2507` | 0.917 (0.870 to 0.956) | 0.882 (0.827 to 0.930) | 0.839 (0.752 to 0.915) |
+| `glm-5.3-flash` | 0.995 (0.989 to 0.999) | 0.972 (0.933 to 0.995) | 0.922 (0.853 to 0.975) |
+| `glm-5.3` | 0.986 (0.971 to 0.997) | 0.965 (0.925 to 0.990) | 0.852 (0.746 to 0.944) |
+| `muse-glimmer-30b` | 0.982 (0.957 to 0.999) | 0.975 (0.941 to 0.995) | 0.927 (0.874 to 0.974) |
+| `kimi-k3` | 0.993 (0.987 to 0.998) | 0.982 (0.971 to 0.991) | 0.928 (0.857 to 0.983) |
+| `gpt-5.4-mini` | 0.918 (0.874 to 0.955) | 0.841 (0.771 to 0.902) | 0.734 (0.623 to 0.835) |
+| `gemini-3.1-flash-lite` | 0.937 (0.890 to 0.973) | 0.885 (0.820 to 0.941) | 0.738 (0.620 to 0.847) |
+| `claude-sonnet-5` | 0.993 (0.982 to 0.999) | 0.980 (0.964 to 0.992) | 0.923 (0.842 to 0.986) |
+
+**Branch pairs within a model.** Welch's t-test on the two branches' template means, Holm over the pairs within a model; the pairs that hold at 0.05 are listed as the higher branch, the lower, and the difference. A sentence of the form "branch X is hardest" needs that branch below every other at this test; "X is harder than Y" needs the pair listed.
+
+| model | pairs that hold | which |
+|---|---:|---|
+| `gpt-oss-20b` | 1 of 10 | electrical > civil (0.234) |
+| `gemma-4-26b-a4b` | 0 of 10 | none |
+| `deepseek-v4.1-flash` | 0 of 10 | none |
+| `qwen3-235b-a22b-2507` | 0 of 10 | none |
+| `glm-5.3-flash` | 0 of 10 | none |
+| `glm-5.3` | 0 of 10 | none |
+| `muse-glimmer-30b` | 0 of 10 | none |
+| `kimi-k3` | 0 of 10 | none |
+| `gpt-5.4-mini` | 0 of 10 | none |
+| `gemini-3.1-flash-lite` | 0 of 10 | none |
+| `claude-sonnet-5` | 0 of 10 | none |
 
 ### By domain
 
@@ -464,4 +624,4 @@ The pool over-represents the rare labels by design (D-116), so these rates are p
 
 ## Provenance
 
-`analyze.py` at commit `2f388c3`, dirty; the score store `main` scored at commit `2950875` on 2026-10-02T13:09:33+00:00; stages: e5 at `2950875`, router at `2950875`. The evaluator hashes and the per-model trace hashes are in `results.json`.
+`analyze.py` at commit `d661ec5`, dirty; the score store `main` scored at commit `2950875` on 2026-10-02T13:09:33+00:00; stages: e5 at `2950875`, router at `2950875`. The evaluator hashes and the per-model trace hashes are in `results.json`.

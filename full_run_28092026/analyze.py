@@ -63,6 +63,25 @@ D-149; the two independent reviews of 2026-09-29):
   - Q3 adds (2026-10-02, D-170) a table of E3 and E5-strict milestone coverage over every trace whose item
     has milestones, per model with template-level intervals, so the reasoning score has a headline beside
     the answer score; descriptive, outside the plan's tests.
+
+ADDED 2026-10-03 (D-173; docs/EVALUATION_NEXT_STEPS.md A1, A2, A9, A10, A11), each labelled exploratory where it
+appears, because the plan was fixed before the data and these were not in it:
+  - A9. Beside every paired comparison (Q1's 55 pairs, Q5's arm, the coverage pairs below), the smallest mean
+    per-template difference the design detects at 80% power: 2.80 x SD of the per-template differences / sqrt(n)
+    at two-sided 0.05, and the same at the strictest Holm step of its family.
+  - A1. Coverage compared across models: per model the mean of its template means of E5-strict coverage (E3 where
+    E5 has not run) with a template bootstrap and the within / between SDs; for the 55 pairs the paired template
+    bootstrap, the sign-flip test and the Wilcoxon signed-rank test on the per-template differences, Holm over
+    55; Kendall's tau between the answer-score order and the coverage order, templates resampled.
+  - A10. Per model, Spearman's rho across templates between mean coverage and the mean number of steps and of
+    arithmetic claims per readable trace; coverage on fully solved traces against answered wrong answers.
+  - A11. Per model, the share of fully solved traces with coverage below 0.5 and of answered wrong answers with
+    coverage 1.0, template intervals.
+  - A2. Branch and level means with template intervals; within a model the ten branch pairs under Welch's t-test
+    with Holm (the branches are different template sets, so the pairs are unpaired, and Welch is the test Q2
+    adopted in D-146); the smallest branch difference 30 templates detect from the pooled within-branch SD. Q2
+    gains a third variation, without the two Advanced chemical templates whose question does not pin the answer
+    to the check's tolerance (D-171).
 """
 from __future__ import annotations
 
@@ -101,6 +120,8 @@ FROUDE = 'template_critical_depth_froude_classification'
 REPEATS = ['repeat1', 'repeat2', 'repeat3']
 PLAN_COUNTS = {'templates': 150, 'per_template': 15, 'Easy': 58, 'Advanced': 34, 'single_path': 58}
 MS_BUCKETS = (('0', 0, 0), ('1', 1, 1), ('2', 2, 2), ('3', 3, 3), ('4-5', 4, 5), ('6+', 6, 10 ** 6))
+TWO_CHEMICAL = ['template_work_isothermal_virial', 'template_adiabatic_flame_temperature']   # D-171
+LEVELS = ['Easy', 'Intermediate', 'Advanced']
 Z80 = float(stats.norm.ppf(0.8))
 
 
@@ -240,6 +261,17 @@ def holm(ps: list[float]) -> list[float]:
     return adj
 
 
+def detectable_paired(d: np.ndarray, m: int = 1) -> dict:
+    """The smallest mean paired difference a test on these per-template differences detects at 80% power
+    (A9, D-173): at two-sided 0.05, the plan's 2.80 x SD / sqrt(n), and at the strictest Holm step over m tests."""
+    d = d[~np.isnan(d)]
+    if len(d) < 2:
+        return {'detectable': float('nan'), 'detectable_holm': float('nan'), 'sd_paired': float('nan')}
+    se = float(d.std(ddof=1) / np.sqrt(len(d)))
+    z_plain, z_holm = float(stats.norm.ppf(1 - 0.05 / 2)), float(stats.norm.ppf(1 - 0.05 / (2 * max(m, 1))))
+    return {'detectable': (z_plain + Z80) * se, 'detectable_holm': (z_holm + Z80) * se, 'sd_paired': float(d.std(ddof=1))}
+
+
 def mcnemar_p(a: np.ndarray, b: np.ndarray) -> float:
     """Exact McNemar on paired 0/1 verdicts."""
     n01 = int(np.sum((a == 1) & (b == 0)))
@@ -323,7 +355,8 @@ def q1(runs, templates, keys):
         pairs.append({'a': keys[i], 'b': keys[j], 'diff': float(d.mean()), 'ci': boot_mean(d, 1000 + n),
                       'p': sign_flip_p(d, 2000 + n), 'fully_diff': float(df.mean()),
                       'fully_ci': boot_mean(df, 3000 + n), 'fully_p': sign_flip_p(df, 4000 + n),
-                      'mcnemar_p': mcnemar_p(V[keys[i]], V[keys[j]])})
+                      'mcnemar_p': mcnemar_p(V[keys[i]], V[keys[j]]),
+                      **detectable_paired(d, len(keys) * (len(keys) - 1) // 2)})
     for o, ph, fh, qh in zip(pairs, holm([p['p'] for p in pairs]), holm([p['fully_p'] for p in pairs]),
                              holm([p['mcnemar_p'] for p in pairs])):
         o['p_holm'], o['fully_p_holm'], o['mcnemar_p_holm'] = ph, fh, qh
@@ -339,7 +372,8 @@ def q2(runs, templates, levels, keys, symbolic: set[str]):
     both = (tiers == 'Easy') | (tiers == 'Advanced')
     variants = {'as_scored': (lambda r: True, set(templates)),
                 'unusable_excluded': (lambda r: not r['unusable'], set(templates)),
-                'without_symbolic': (lambda r: True, set(templates) - symbolic)}
+                'without_symbolic': (lambda r: True, set(templates) - symbolic),
+                'without_two_chemical': (lambda r: True, set(templates) - set(TWO_CHEMICAL))}
     out = []
     for i, k in enumerate(keys):
         row = {'model': k}
@@ -365,7 +399,7 @@ def q2(runs, templates, levels, keys, symbolic: set[str]):
         o['p_perm_holm'] = ph
     for o, ph in zip(out, holm([o['p_welch'] for o in out])):
         o['p_welch_holm'] = ph
-    for name in ('unusable_excluded', 'without_symbolic'):
+    for name in ('unusable_excluded', 'without_symbolic', 'without_two_chemical'):
         for o, ph in zip(out, holm([o[name]['p_welch'] for o in out])):
             o[name]['p_welch_holm'] = ph
     return out
@@ -514,6 +548,127 @@ def q3_overall(runs, keys, store='main'):
     return out
 
 
+def coverage_value(r: dict, e5row: dict | None):
+    """One trace's E5-strict coverage: the judge's score where its call was answered, E3 where E3 settled every
+    milestone or E5 has not run; None for an item with no milestones or a trace whose call got no reply (D-148).
+    An unusable trace scores what it reached and an empty one nothing, as the headline table has it (D-170)."""
+    if r['milestones_required'] == 0 or r['e3']['coverage'] is None:
+        return None
+    if e5row is None:
+        return r['e3']['coverage']
+    if e5row.get('sent') and e5row.get('reply_ok') is False:
+        return None
+    return e5row['e5_strict'] if e5row.get('e5_strict') is not None else r['e3']['coverage']
+
+
+def q3_coverage(runs, templates, keys, store='main'):
+    """Coverage compared across models (exploratory; added 2026-10-03, D-173; next steps A1, A9, A10, A11).
+    The unit is the template: each model's coverage is the mean of its template means over the templates every
+    model has coverage on. Pairs: the paired template bootstrap, the sign-flip permutation test and the Wilcoxon
+    signed-rank test on the per-template differences, Holm over the 55 pairs, and the detectable difference.
+    Kendall's tau between the answer-score order and the coverage order resamples templates. A10 and A11 read
+    the readable traces only (an empty trace has no steps and reaches nothing)."""
+    e5 = {k: load_stage('e5', k, store) for k in keys}
+    stage = 'E5-strict' if all(e5[k] for k in keys) else 'E3'
+    vals = {k: (lambda r, _k=k: coverage_value(r, e5[_k].get(r['item_id']) if e5[_k] else None)) for k in keys}
+    col = {t: j for j, t in enumerate(templates)}
+    C = np.full((len(keys), len(templates)), np.nan)
+    SUM = np.zeros((2, len(keys), len(templates)))
+    N = np.zeros((2, len(keys), len(templates)))
+    for i, k in enumerate(keys):
+        v = vals[k]
+        by_t = per_template(runs[k].values(), v, lambda r: v(r) is not None)
+        C[i] = [np.mean(by_t[t]) if by_t.get(t) else np.nan for t in templates]
+        for r in runs[k].values():
+            j = col[r['template_id']]
+            SUM[0, i, j] += r['score']
+            N[0, i, j] += 1
+            x = v(r)
+            if x is not None:
+                SUM[1, i, j] += x
+                N[1, i, j] += 1
+    use = ~np.isnan(C).any(axis=0)
+    S_ans = template_matrix(runs, lambda r: r['score'], templates)
+    ans_rank = {keys[i]: rk + 1 for rk, i in enumerate(np.argsort(-S_ans.mean(axis=1)))}
+    cov_rank = {keys[i]: rk + 1 for rk, i in enumerate(np.argsort(-np.nanmean(C[:, use], axis=1)))}
+    models = []
+    for i, k in enumerate(keys):
+        v = vals[k]
+        rows = list(runs[k].values())
+        within = [np.std(x, ddof=1) for x in per_template(rows, v, lambda r: v(r) is not None).values() if len(x) > 1]
+        read = [r for r in rows if not r['unusable'] and v(r) is not None]
+        bt_cov = per_template(read, v)
+        bt_steps = per_template(read, lambda r: float(len(r['steps'])))
+        bt_claims = per_template(read, lambda r: float(sum(st.get('claims', 0) for st in r['steps'])))
+        ts = sorted(bt_cov)
+        cov_t = np.array([np.mean(bt_cov[t]) for t in ts])
+        rho = lambda bt: float(stats.spearmanr(cov_t, np.array([np.mean(bt[t]) for t in ts])).statistic) if len(ts) > 2 else float('nan')
+        solved_cov, solved_ci, n_solved = cluster_mean(per_template(read, v, lambda r: fully(r) == 1), 5100 + i)
+        wrong_cov, wrong_ci, n_wrong = cluster_mean(per_template(read, v, lambda r: r['score'] == 0), 5150 + i)
+        low, low_ci, _ = cluster_mean(per_template(read, lambda r: 1.0 if v(r) < 0.5 else 0.0, lambda r: fully(r) == 1), 5200 + i)
+        full, full_ci, _ = cluster_mean(per_template(read, lambda r: 1.0 if v(r) >= 1 - 1e-9 else 0.0, lambda r: r['score'] == 0), 5250 + i)
+        models.append({'model': k, 'coverage': float(np.nanmean(C[i, use])), 'ci': boot_mean(C[i, use], 5000 + i),
+                       'within_template_sd': float(np.mean(within)) if within else float('nan'),
+                       'between_template_sd': float(np.nanstd(C[i, use], ddof=1)),
+                       'answer_rank': ans_rank[k], 'coverage_rank': cov_rank[k],
+                       'rho_steps': rho(bt_steps), 'rho_claims': rho(bt_claims),
+                       'median_steps': float(np.median([len(r['steps']) for r in read])) if read else float('nan'),
+                       'coverage_fully_solved': solved_cov, 'coverage_fully_solved_ci': solved_ci, 'fully_solved_n': n_solved,
+                       'coverage_wrong': wrong_cov, 'coverage_wrong_ci': wrong_ci, 'wrong_n': n_wrong,
+                       'solved_low_coverage': low, 'solved_low_coverage_ci': low_ci,
+                       'wrong_full_coverage': full, 'wrong_full_coverage_ci': full_ci})
+    pairs = []
+    n_pairs = len(keys) * (len(keys) - 1) // 2
+    for n, (i, j) in enumerate(itertools.combinations(range(len(keys)), 2)):
+        d = (C[i] - C[j])[use]
+        pw = 1.0 if np.all(d == 0) else float(stats.wilcoxon(d).pvalue)
+        pairs.append({'a': keys[i], 'b': keys[j], 'diff': float(d.mean()), 'ci': boot_mean(d, 6000 + n),
+                      'p': sign_flip_p(d, 7000 + n), 'p_wilcoxon': pw, **detectable_paired(d, n_pairs)})
+    for o, ph, wh in zip(pairs, holm([p['p'] for p in pairs]), holm([p['p_wilcoxon'] for p in pairs])):
+        o['p_holm'], o['p_wilcoxon_holm'] = ph, wh
+    tau = kendall_boot(SUM[:, :, use], N[:, :, use], 8000) if len(keys) > 1 else None
+    return {'stage': stage, 'templates': int(use.sum()), 'models': models, 'pairs': pairs, 'tau': tau}
+
+
+def branches_levels(runs, templates, levels, keys):
+    """Branch and level means with template-level intervals, and the branch pairs within a model under Welch's
+    t-test with Holm over the pairs (added 2026-10-03, D-173; next steps A2). The branches are different template
+    sets, so the pairs are unpaired and the test is the one Q2 adopted (D-146). The detectable branch difference is
+    2.80 x the pooled within-branch SD of the template means x sqrt(2 / templates per branch)."""
+    ref = runs[keys[0]]
+    branch_of = {r['template_id']: r['branch'] for r in ref.values()}
+    branches = sorted(set(branch_of.values()))
+    S = template_matrix(runs, lambda r: r['score'], templates)
+    b_arr = np.array([branch_of[t] for t in templates])
+    l_arr = np.array([levels[t] for t in templates])
+    out = []
+    for i, k in enumerate(keys):
+        row = {'model': k, 'branch': {}, 'level': {}, 'pairs': []}
+        for n, b in enumerate(branches):
+            x = S[i][b_arr == b]
+            row['branch'][b] = {'mean': float(x.mean()), 'ci': boot_mean(x, 9000 + 10 * i + n),
+                                'sd': float(x.std(ddof=1)) if len(x) > 1 else float('nan'), 'templates': int(len(x))}
+        for n, lv in enumerate(LEVELS):
+            x = S[i][l_arr == lv]
+            if len(x):
+                row['level'][lv] = {'mean': float(x.mean()), 'ci': boot_mean(x, 9500 + 10 * i + n),
+                                    'sd': float(x.std(ddof=1)) if len(x) > 1 else float('nan'), 'templates': int(len(x))}
+        pooled = float(np.sqrt(np.nanmean([row['branch'][b]['sd'] ** 2 for b in branches])))
+        nb = float(np.mean([row['branch'][b]['templates'] for b in branches]))
+        row['detectable_branch'] = 2.80 * pooled * float(np.sqrt(2 / nb))
+        for a, b in itertools.combinations(branches, 2):
+            xa, xb = S[i][b_arr == a], S[i][b_arr == b]
+            diff = float(xa.mean() - xb.mean())
+            pv = float(stats.ttest_ind(xa, xb, equal_var=False).pvalue) if len(xa) > 1 and len(xb) > 1 else 1.0
+            if np.isnan(pv):                       # both branches constant: certain or no difference
+                pv = 1.0 if diff == 0 else 0.0
+            row['pairs'].append({'a': a, 'b': b, 'diff': diff, 'p_welch': pv})
+        for o, ph in zip(row['pairs'], holm([o['p_welch'] for o in row['pairs']]) if row['pairs'] else []):
+            o['p_holm'] = ph
+        out.append(row)
+    return out
+
+
 def q4(runs, templates, single, keys):
     out = []
     for i, k in enumerate(keys):
@@ -556,7 +711,8 @@ def paired(main_rows, para_rows, ids, fn, seed):
     c90 = [float(np.nanpercentile(draws, 5)), float(np.nanpercentile(draws, 95))] if n else nan
     return {'items': n, 'templates': len(diff), 'diff': point, 'ci': c, 'ci90': c90,
             'within_margin': bool(n and -EQUIV_MARGIN <= c90[0] and c90[1] <= EQUIV_MARGIN),
-            'p': sign_flip_p(np.array([sum(v) for v in diff.values()]), seed + 50)}
+            'p': sign_flip_p(np.array([sum(v) for v in diff.values()]), seed + 50),
+            **detectable_paired(np.array([np.mean(v) for v in diff.values()]), len(ROSTER))}
 
 
 def q5(main, para, keys, keep=None, e5_main=None, e5_para=None):
@@ -923,12 +1079,18 @@ def render(res) -> str:
           f'so a claim rests on the template-level tests. {odd} answered rows across the roster ended with a finish '
           'reason other than stop or length (a provider fault inside a 200) and are scored on what they state; the '
           'harness now retries such a reply (D-148).', '',
-          '| a | b | a - b | 95% CI | p (Holm) | fully solved a - b | 95% CI | template p (Holm) | McNemar p (Holm) | same verdict |',
-          '|---|---|---:|---:|---:|---:|---:|---:|---:|---|']
+          '| a | b | a - b | 95% CI | p (Holm) | fully solved a - b | 95% CI | template p (Holm) | McNemar p (Holm) | same verdict | detectable, 0.05 / Holm |',
+          '|---|---|---:|---:|---:|---:|---:|---:|---:|---|---:|']
     for p in sorted(pairs, key=lambda p: (p['p_holm'], -abs(p['diff']))):
         L.append(f"| `{p['a']}` | `{p['b']}` | {p['diff']:+.3f} | {ci(p['ci'])} | {p['p_holm']:.4f} | "
                  f"{p['fully_diff']:+.3f} | {ci(p['fully_ci'])} | {p['fully_p_holm']:.4f} | {p['mcnemar_p_holm']:.4f} | "
-                 f"{'yes' if p['same_verdict_template'] else 'no'} |")
+                 f"{'yes' if p['same_verdict_template'] else 'no'} | {f3(p.get('detectable'))} / {f3(p.get('detectable_holm'))} |")
+    below = [p for p in pairs if p.get('detectable') is not None and abs(p['diff']) < p['detectable']]
+    L += ['', '*Added 2026-10-03 (D-173, next steps A9):* the last column is the smallest mean per-template difference '
+          'a paired test on these 150 differences detects at 80% power, at two-sided 0.05 (2.80 x the SD of the '
+          'differences / sqrt(150)) and at the strictest Holm step over the 55 pairs. A pair whose difference is below '
+          f'its detectable value is one this design could not have separated: {len(below)} of the 55 pairs, '
+          f'{sum(p["p_holm"] >= 0.05 for p in below)} of them not significant.']
     n_welch = sum(r['p_welch_holm'] < 0.05 for r in res['q2'])
     n_perm = sum(r['p_perm_holm'] < 0.05 for r in res['q2'])
     L += ['', '## Q2. The complexity cliff: Easy minus Advanced', '',
@@ -947,15 +1109,22 @@ def render(res) -> str:
         L.append(f"| `{r['model']}` | {r['easy']:.3f} | {r['advanced']:.3f} | {r['gap']:+.3f} | {ci(r['ci'])} | "
                  f"{r['p_welch_holm']:.4f} | {r['p_perm_holm']:.4f} | {r['sd_easy']:.3f} | {r['sd_advanced']:.3f} | "
                  f"{r['detectable_planned']:.3f} | {r['detectable_holm']:.3f} |")
-    L += ['', '**The cliff under two variations.** Unusable rows left out of the template means, because an empty '
+    L += ['', '**The cliff under three variations.** Unusable rows left out of the template means, because an empty '
           'row at the output cap measures finishing within the ceiling as well as solving, and most such rows fall on '
-          'Advanced templates; and without the nine symbolic templates (D-138). Welch p, Holm across models.', '',
-          '| model | gap, as scored | gap, unusable left out | 95% CI | Welch p (Holm) | gap, no symbolic | 95% CI | Welch p (Holm) |',
-          '|---|---:|---:|---:|---:|---:|---:|---:|']
+          'Advanced templates; without the nine symbolic templates (D-138); and (*added 2026-10-03, D-171 and D-173*) '
+          'without the two Advanced chemical templates whose question does not pin the answer to the check\'s tolerance, '
+          '`work_isothermal_virial` and `adiabatic_flame_temperature`. Welch p, Holm across models.', '',
+          '| model | gap, as scored | gap, unusable left out | 95% CI | Welch p (Holm) | gap, no symbolic | 95% CI | Welch p (Holm) | '
+          'gap, without the two chemical | 95% CI | Welch p (Holm) |',
+          '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|']
     for r in res['q2']:
-        u, s = r['unusable_excluded'], r['without_symbolic']
+        u, s, c2 = r['unusable_excluded'], r['without_symbolic'], r.get('without_two_chemical')
+        c2_cell = f"{c2['gap']:+.3f} | {ci(c2['ci'])} | {c2['p_welch_holm']:.4f}" if c2 else ' | | '
         L.append(f"| `{r['model']}` | {r['gap']:+.3f} | {u['gap']:+.3f} | {ci(u['ci'])} | {u['p_welch_holm']:.4f} | "
-                 f"{s['gap']:+.3f} | {ci(s['ci'])} | {s['p_welch_holm']:.4f} |")
+                 f"{s['gap']:+.3f} | {ci(s['ci'])} | {s['p_welch_holm']:.4f} | {c2_cell} |")
+    if any(r.get('without_two_chemical') for r in res['q2']):
+        n_c2 = sum(r['without_two_chemical']['p_welch_holm'] < 0.05 for r in res['q2'] if r.get('without_two_chemical'))
+        L += ['', f'Without the two chemical templates the gap holds for {n_c2} of 11 models under Welch with Holm.']
     L += ['', '## Q3. What the process scores add beyond the answer', '',
           'Wrong-answer traces score 0 (incorrect or unusable); fully solved ones score 1; a partial answer is in '
           f"neither. E3 coverage leaves out the {mf['items_without']} items with no milestones (all 15 of "
@@ -1000,6 +1169,54 @@ def render(res) -> str:
             L.append(f"| `{o['model']}` | {o['traces_with_milestones']} | {o['e3_all']:.3f} | {ci(o['e3_all_ci'])} | "
                      f"{o['e3_readable']:.3f} | {ci(o['e3_readable_ci'])} | {e5c} | "
                      f"{f3(r.get('digit_flag_rate_on_fully_solved'))} | {f3(r.get('router_judge_rate_on_fully_solved'))} |")
+    qc = res.get('q3_coverage')
+    if qc:
+        n_flip = sum(p['p_holm'] < 0.05 for p in qc['pairs'])
+        n_wil = sum(p['p_wilcoxon_holm'] < 0.05 for p in qc['pairs'])
+        L += ['', f"**Coverage compared across models** (*exploratory; added 2026-10-03, D-173, next steps A1 and A9: "
+              'the comparison the July rebuttal promised, Wilcoxon on the continuous reasoning score beside McNemar on '
+              f"the answer*). Per model, {qc['stage']} coverage as the mean of its template means over the "
+              f"{qc['templates']} templates every model has coverage on (an unusable trace scores what it reached), "
+              'with a template bootstrap, the per-template SD within and between as Q1 has them, and the model\'s rank '
+              'on the answer score beside its rank on coverage. Below, the 55 pairs: the paired template bootstrap of '
+              'the difference, the sign-flip permutation test and the Wilcoxon signed-rank test on the per-template '
+              'differences, each Holm-corrected over the 55 pairs, and the smallest difference the design detects at '
+              '80% power. Coverage credits stated intermediates, so a terser model scores lower without reasoning '
+              'worse: the comparison ranks what traces state, not how soundly they reason.', '',
+              '| model | coverage | 95% CI | SD within | SD between | rank on answers | rank on coverage |',
+              '|---|---:|---:|---:|---:|---:|---:|']
+        for r in sorted(qc['models'], key=lambda r: -r['coverage']):
+            L.append(f"| `{r['model']}` | {r['coverage']:.3f} | {ci(r['ci'])} | {f3(r['within_template_sd'])} | "
+                     f"{r['between_template_sd']:.3f} | {r['answer_rank']} | {r['coverage_rank']} |")
+        tau_s = (f" Kendall's tau between the models' answer-score order and their coverage order: {qc['tau']['tau']:.3f} "
+                 f"(95% CI {ci(qc['tau']['ci'])}, templates resampled)." if qc.get('tau') else '')
+        L += ['', f"Of the 55 pairs, {n_flip} differ at a Holm-adjusted p below 0.05 under the sign-flip test and "
+              f"{n_wil} under Wilcoxon.{tau_s}", '',
+              '| a | b | a - b | 95% CI | sign-flip p (Holm) | Wilcoxon p (Holm) | detectable, 0.05 / Holm |',
+              '|---|---|---:|---:|---:|---:|---:|']
+        for p in sorted(qc['pairs'], key=lambda p: (p['p_holm'], -abs(p['diff']))):
+            L.append(f"| `{p['a']}` | `{p['b']}` | {p['diff']:+.3f} | {ci(p['ci'])} | {p['p_holm']:.4f} | "
+                     f"{p['p_wilcoxon_holm']:.4f} | {f3(p['detectable'])} / {f3(p['detectable_holm'])} |")
+        L += ['', "**Does coverage track verbosity?** (*exploratory; D-173, next steps A10*). Per model, Spearman's rho "
+              "across templates between the template's mean coverage and its mean number of steps and of arithmetic "
+              'claims per readable trace; and coverage on the fully solved traces against the answered wrong answers, '
+              'readable traces, template intervals.', '',
+              '| model | rho(coverage, steps) | rho(coverage, claims) | median steps | coverage, fully solved | 95% CI | '
+              'coverage, wrong answers | 95% CI | wrong answers |',
+              '|---|---:|---:|---:|---:|---:|---:|---:|---:|']
+        for r in qc['models']:
+            L.append(f"| `{r['model']}` | {f3(r['rho_steps'])} | {f3(r['rho_claims'])} | {r['median_steps']:.0f} | "
+                     f"{f3(r['coverage_fully_solved'])} | {ci(r['coverage_fully_solved_ci'])} | {f3(r['coverage_wrong'])} | "
+                     f"{ci(r['coverage_wrong_ci'])} | {r['wrong_n']} |")
+        L += ['', '**Verdict against coverage at the trace level** (*exploratory; D-173, next steps A11*). The share of '
+              'fully solved traces with coverage below 0.5, and of answered wrong answers with coverage 1.0, template '
+              'intervals. The second is what a process score adds on a wrong answer: a complete derivation to a wrong '
+              'value.', '',
+              '| model | fully solved traces | with coverage < 0.5 | 95% CI | answered wrong answers | with coverage 1.0 | 95% CI |',
+              '|---|---:|---:|---:|---:|---:|---:|']
+        for r in qc['models']:
+            L.append(f"| `{r['model']}` | {r['fully_solved_n']} | {f3(r['solved_low_coverage'])} | {ci(r['solved_low_coverage_ci'])} | "
+                     f"{r['wrong_n']} | {f3(r['wrong_full_coverage'])} | {ci(r['wrong_full_coverage_ci'])} |")
     L += ['',
           '**Milestones on the wrong-answer traces.** An unusable trace reaches only what it wrote before it '
           'stopped, and an empty one nothing, so coverage is also shown on the readable wrong answers alone.', '',
@@ -1120,9 +1337,11 @@ def render(res) -> str:
                   f"two-one-sided-tests rule at 5%). The margin is the plan's largest detectable paired difference "
                   f"(5.1 points at 15% discordance); it was fixed after the point estimates were known and before "
                   f"these intervals were computed.", '',
-                  '| model | answer score diff | 90% CI | within the margin |', '|---|---:|---:|---|']
+                  '| model | answer score diff | 90% CI | within the margin | detectable at 0.05 (A9) |',
+                  '|---|---:|---:|---|---:|']
             for r in res['q5']['models']:
-                L.append(f"| `{r['model']}` | {r['diff']:+.3f} | {ci(r['ci90'])} | {'yes' if r['within_margin'] else 'no'} |")
+                L.append(f"| `{r['model']}` | {r['diff']:+.3f} | {ci(r['ci90'])} | {'yes' if r['within_margin'] else 'no'} | "
+                         f"{f3(r.get('detectable'))} |")
         vr = res['q5'].get('vs_repeats')
         if vr:
             L += ['', "**Against run-to-run noise (D-165).** For the models with decoding repeats: the paraphrase "
@@ -1176,6 +1395,35 @@ def render(res) -> str:
     for k, r in rep['models'].items():
         L.append(f'| `{k}` | ' + ' | '.join(f'{v:.3f}' for v in r['branch'].values()) +
                  f" | {r['level']['Easy']:.3f} | {r['level']['Intermediate']:.3f} | {r['level']['Advanced']:.3f} |")
+    bl = res.get('branches_levels')
+    if bl:
+        brs = list(bl[0]['branch'])
+        lvs = [lv for lv in LEVELS if lv in bl[0]['level']]
+        L += ['', '### By branch and level, with template intervals', '',
+              '*Added 2026-10-03 (D-173, next steps A2).* The mean of the branch\'s template means with its template '
+              'bootstrap (30 templates per branch); the last column is the smallest difference between two branches a '
+              'model\'s within-branch spread lets 30 templates detect at 80% power (2.80 x pooled SD x sqrt(2/30)). '
+              'Then the same by level.', '',
+              '| model | ' + ' | '.join(b.replace('_engineering', '') for b in brs) + ' | detectable branch difference |',
+              '|---|' + '---:|' * (len(brs) + 1)]
+        for r in bl:
+            L.append(f"| `{r['model']}` | " + ' | '.join(f"{r['branch'][b]['mean']:.3f} ({ci(r['branch'][b]['ci'])})" for b in brs)
+                     + f" | {r['detectable_branch']:.3f} |")
+        L += ['', '| model | ' + ' | '.join(f"{lv} ({bl[0]['level'][lv]['templates']})" for lv in lvs) + ' |',
+              '|---|' + '---:|' * len(lvs)]
+        for r in bl:
+            L.append(f"| `{r['model']}` | " + ' | '.join(f"{r['level'][lv]['mean']:.3f} ({ci(r['level'][lv]['ci'])})" for lv in lvs) + ' |')
+        L += ['', '**Branch pairs within a model.** Welch\'s t-test on the two branches\' template means, Holm over the '
+              'pairs within a model; the pairs that hold at 0.05 are listed as the higher branch, the lower, and the '
+              'difference. A sentence of the form "branch X is hardest" needs that branch below every other at this '
+              'test; "X is harder than Y" needs the pair listed.', '',
+              '| model | pairs that hold | which |', '|---|---:|---|']
+        for r in bl:
+            held = sorted((p for p in r['pairs'] if p.get('p_holm', 1) < 0.05), key=lambda p: -abs(p['diff']))
+            which = '; '.join(f"{(p['a'] if p['diff'] > 0 else p['b']).replace('_engineering', '')} > "
+                              f"{(p['b'] if p['diff'] > 0 else p['a']).replace('_engineering', '')} ({abs(p['diff']):.3f})"
+                              for p in held) or 'none'
+            L.append(f"| `{r['model']}` | {len(held)} of {len(r['pairs'])} | {which} |")
     keys = list(rep['models'])
     for title, field in (('By domain', 'domain'), ('By answer type', 'answer_type')):
         L += ['', f'### {title}', '', '| ' + field.replace('_', ' ') + ' | ' + ' | '.join(f'`{k}`' for k in keys) + ' |',
@@ -1253,6 +1501,8 @@ def main() -> int:
     check = accepted_pairs()
     res = {'q1': q1(runs, templates, ROSTER), 'q2': q2(runs, templates, levels, ROSTER, symbolic),
            'q3': q3(runs, ROSTER, a.store), 'q3_overall': q3_overall(runs, ROSTER, a.store),
+           'q3_coverage': q3_coverage(runs, templates, ROSTER, a.store),
+           'branches_levels': branches_levels(runs, templates, levels, ROSTER),
            'q4': q4(runs, templates, single, ROSTER),
            'q5': {**q5(runs, para, ROSTER, check['keep'] if check else None, e5_main, e5_para),
                   'expert_stats': {k: v for k, v in check.items() if k != 'keep'} if check else None},
@@ -1416,6 +1666,34 @@ def selftest() -> int:
     pt = provider_table(runs_p, ['m'])['m']
     if abs(pt['q']['matched_diff'] - 1.0) > 1e-12 or abs(pt['p']['matched_diff'] + 1.0) > 1e-12 or pt['q']['templates_matched'] != 20:
         bad.append(f'provider table {pt}')
+    # A9: the detectable paired difference is 2.80 x SD / sqrt(n) at 0.05 and larger at the Holm step
+    dd = rng.normal(0, 0.1, 150)
+    dp = detectable_paired(dd, 55)
+    if abs(dp['detectable'] - 2.80 * dd.std(ddof=1) / np.sqrt(150)) > 0.01 * dp['detectable'] or not dp['detectable_holm'] > dp['detectable']:
+        bad.append(f'detectable paired {dp}')
+    # A1, A10, A11 and A2 on synthetic rows with two branches and three levels: a model against itself differs by nothing
+    rows_c = {}
+    for t in range(60):
+        for n in range(5):
+            r = fake(f'c{t:03d}', n, float(rng.integers(0, 2)), level=LEVELS[t % 3])
+            r['branch'] = 'b1' if t < 30 else 'b2'
+            r['e3'] = {'coverage': float(rng.random()), 'null_coverage': 0.1}
+            r['steps'] = [{'digit_flags': 0, 'tol1_flags': 0, 'claims': 1}] * int(rng.integers(1, 6))
+            rows_c[r['item_id']] = r
+    tset = sorted({r['template_id'] for r in rows_c.values()})
+    import warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')          # two identical models leave Kendall's tau undefined
+        qc = q3_coverage({'a': rows_c, 'b': dict(rows_c)}, tset, ['a', 'b'], store='no-such-store')
+    pc = qc['pairs'][0]
+    if pc['diff'] != 0 or pc['p'] != 1.0 or pc['p_wilcoxon'] != 1.0 or qc['stage'] != 'E3' or qc['templates'] != 60 \
+            or not (0 <= qc['models'][0]['solved_low_coverage'] <= 1):
+        bad.append(f'q3_coverage self-comparison {pc} {qc["stage"]} {qc["templates"]}')
+    lv = {r['template_id']: r['level'] for r in rows_c.values()}
+    blr = branches_levels({'a': rows_c}, tset, lv, ['a'])[0]
+    if set(blr['branch']) != {'b1', 'b2'} or len(blr['pairs']) != 1 or blr['branch']['b1']['templates'] != 30 \
+            or not (0 <= blr['pairs'][0]['p_holm'] <= 1) or set(blr['level']) != set(LEVELS):
+        bad.append(f'branches_levels {blr}')
     print('selftest:', 'all pass' if not bad else bad)
     return 1 if bad else 0
 

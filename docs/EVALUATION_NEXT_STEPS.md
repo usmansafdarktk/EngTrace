@@ -16,6 +16,9 @@ and a decision each.
 
 ## A. Analyses on the data in hand, all free
 
+*Status 2026-10-03 (D-173):* A1, A2, A8, A9, A10 and A11 are done and in `results/RESULTS.md` and
+`DECODING_TABLE.md`; A3 to A7 follow in D-174 onwards. Item 0 (a clean-tree regeneration) closes the batch.
+
 **A1. The reasoning score compared across models, as the July rebuttal promised.** *Answers:* yAYU 2 and
 9W1B 4 (no variance or significance), and the rebuttal's own promise of "Wilcoxon on milestone coverage"
 beside McNemar on the answer. *Method:* on the 150 per-template mean E5-strict coverages, for each of the

@@ -6614,6 +6614,49 @@ task (`B1_final_answers`, `B3_milestones`, `B2_wrong_answers`, `B4_templates`), 
 takes its title from the one kind it finds, a guide made of the general part plus that task's section, and its own return
 file; the tasks can be sent or dropped separately, and `--score` reads a folder tree. The samples and readers are unchanged.
 
+## D-173 — Free analyses A1, A2 and A8 to A11 added to the results: coverage compared across models, branch and level intervals, the decoding table, detectable differences, coverage against verbosity and against the verdict
+
+**Date:** 2026-10-03 · **Status:** DONE (free; every addition labelled exploratory and dated in `results/RESULTS.md`; the plan unchanged) · **Evidence:** `full_run_28092026/analyze.py` (docstring block "ADDED 2026-10-03", `detectable_paired`, `q3_coverage`, `branches_levels`, the third Q2 variant; `--selftest` extended), `results/RESULTS.md` and `results.json`, `decoding_table.py` and `DECODING_TABLE.md` (`results/decoding_table.json`)
+
+**A8, the decoding table.** Printed from the trace rows: every model ran at its provider's default decoding (the request
+carried only the token ceiling, 32,768, Muse 16,384, and OpenRouter's routing preferences); four roster models' endpoints
+reported zero reasoning tokens and returned no reasoning text on any row (`gemma-4-26b-a4b`, `qwen3-235b-a22b-2507`,
+`gpt-5.4-mini`, `gemini-3.1-flash-lite`), the other seven returned reasoning on 99.6% to 100% of rows; median completion
+tokens 632 to 3,270; endpoints, finish reasons and billed cost per model. Appendix P is written from this table.
+
+**A9, detectable differences.** Beside every paired comparison, the smallest mean per-template difference the design
+detects at 80% power (2.80 x SD of the per-template differences / sqrt(n)) at two-sided 0.05 and at the family's
+strictest Holm step. On Q1, 23 of the 55 pairs have a difference below their detectable value, and all 23 are the
+non-significant ones; the Q5 bounds table carries the arm's per-model figure.
+
+**A1, coverage compared across models.** E5-strict coverage as the mean of template means over the 147 templates every
+model has coverage on: 0.816 (gpt-oss-20b) to 0.922 (Claude Sonnet 5). Of the 55 pairs, 28 differ after Holm under the
+sign-flip test and 29 under Wilcoxon (the two tests disagree on four pairs, all near the threshold). Kendall's tau between
+the answer-score order and the coverage order 0.709 (95% CI 0.514 to 0.855). DeepSeek V4.1 Flash, first on answers, is
+below Claude Sonnet 5 on coverage by 0.025 (Holm p 0.024); Claude, Kimi and GLM-5.3-Flash do not separate from one
+another. The caption says what coverage measures.
+
+**A2, branch and level with intervals.** Branch means carry template intervals of about ±0.05 to ±0.13 (30 templates), and
+the smallest branch difference a model's within-branch spread lets 30 templates detect is 0.07 (Kimi) to 0.19 (gpt-oss-20b).
+Within a model, of the ten branch pairs under Welch with Holm, one holds in the whole roster (gpt-oss-20b: electrical above
+civil by 0.234); no other model has a branch pair that separates. So the paper may not say that any branch is hardest for
+any model but that one pair. Q2's third variation, without the two chemical templates of D-171, leaves the gap positive
+for every model (+0.029 to +0.157) and significant after Holm for none of the eleven (it was 4 of 11 as scored).
+
+**A10, coverage against verbosity.** Spearman's rho across templates between a template's mean coverage and its mean steps
+per trace is negative for every model (−0.11 to −0.26; against claims −0.14 to −0.28): coverage does not rise with the
+amount a model writes; longer derivations have more milestones to miss. Coverage on fully solved traces 0.900 to 0.944;
+on answered wrong answers 0.464 to 0.845.
+
+**A11, verdict against coverage.** Fully solved traces with coverage below 0.5: 2.0% to 4.8% per model. Answered wrong
+answers with coverage 1.0: 13% to 26% for the five models with more than 100 wrong answers (gpt-oss-20b 0.130, Gemini
+0.139, GPT-5.4 mini 0.165, Gemma 0.245, Qwen 0.263); 6% to 71% for the others on 7 to 50 traces. That is the share of
+wrong answers that are a complete derivation to a wrong value, the case a process score adds to.
+
+**Method notes.** The branch pairs are unpaired comparisons between template sets, so Welch's t-test is used, as D-146
+adopted for the tiers; the sign-flip test on the branch pairs the next-steps file proposed would have no pairing to flip.
+Item 0 (a clean-tree regeneration of the results) is done after the last change to `analyze.py` in this batch.
+
 ## Open decisions
 
 | # | Decision | Needed before |
