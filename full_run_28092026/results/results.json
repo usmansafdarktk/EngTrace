@@ -2203,11 +2203,31 @@
    "e5_calls": 852,
    "e5_without_reply": 0,
    "e5_incomplete": false,
+   "router_rate_on_fully_solved": 0.31664791901012374,
+   "router_ci": [
+    0.27894930959590836,
+    0.35473060244515464
+   ],
+   "router_judge_rate_on_fully_solved": 0.21316085489313835,
+   "router_judge_ci": [
+    0.18463153278529962,
+    0.24404129036503314
+   ],
+   "router_rate_on_wrong": 0.884180790960452,
+   "router_wrong_ci": [
+    0.8177437537149768,
+    0.9401202875938264
+   ],
+   "router_steps_flagged_per_trace": 0.9986345015930814,
+   "router_unjudged_rate": 0.0005175715542673774,
+   "router_calls": 2197,
+   "router_without_reply": 0,
+   "router_incomplete": false,
    "attribution_on_wrong": {
     "traces": 354,
     "digit_rule": 0.2344632768361582,
     "e5_missing": 0.7457627118644068,
-    "router_judge": null
+    "router_judge": 0.8389830508474576
    }
   },
   {
@@ -2296,11 +2316,31 @@
    "e5_calls": 743,
    "e5_without_reply": 0,
    "e5_incomplete": false,
+   "router_rate_on_fully_solved": 0.24520255863539445,
+   "router_ci": [
+    0.2009257713787843,
+    0.2916694297082228
+   ],
+   "router_judge_rate_on_fully_solved": 0.1455223880597015,
+   "router_judge_ci": [
+    0.11211441663711633,
+    0.1819148936170213
+   ],
+   "router_rate_on_wrong": 0.8187919463087249,
+   "router_wrong_ci": [
+    0.7156515093092432,
+    0.9126984126984127
+   ],
+   "router_steps_flagged_per_trace": 0.6567363272565585,
+   "router_unjudged_rate": 0.0,
+   "router_calls": 2249,
+   "router_without_reply": 1,
+   "router_incomplete": true,
    "attribution_on_wrong": {
     "traces": 298,
     "digit_rule": 0.4261744966442953,
     "e5_missing": 0.5939597315436241,
-    "router_judge": null
+    "router_judge": 0.6711409395973155
    }
   },
   {
@@ -2389,11 +2429,31 @@
    "e5_calls": 775,
    "e5_without_reply": 0,
    "e5_incomplete": false,
+   "router_rate_on_fully_solved": 0.015689893862482696,
+   "router_ci": [
+    0.009858462573191963,
+    0.02220192196969145
+   ],
+   "router_judge_rate_on_fully_solved": 0.010613751730503,
+   "router_judge_ci": [
+    0.005925250683682771,
+    0.016030244638232556
+   ],
+   "router_rate_on_wrong": 0.275,
+   "router_wrong_ci": [
+    0.0,
+    0.5714285714285714
+   ],
+   "router_steps_flagged_per_trace": 0.03175313059033989,
+   "router_unjudged_rate": 0.0002931047116582399,
+   "router_calls": 2236,
+   "router_without_reply": 0,
+   "router_incomplete": false,
    "attribution_on_wrong": {
     "traces": 40,
     "digit_rule": 0.025,
     "e5_missing": 0.3,
-    "router_judge": null
+    "router_judge": 0.25
    }
   },
   {
@@ -2482,11 +2542,31 @@
    "e5_calls": 717,
    "e5_without_reply": 0,
    "e5_incomplete": false,
+   "router_rate_on_fully_solved": 0.2929133858267717,
+   "router_ci": [
+    0.24595972608724348,
+    0.34137388315156797
+   ],
+   "router_judge_rate_on_fully_solved": 0.10971128608923884,
+   "router_judge_ci": [
+    0.08623331701855191,
+    0.13502138306927702
+   ],
+   "router_rate_on_wrong": 0.7685589519650655,
+   "router_wrong_ci": [
+    0.6517832062600322,
+    0.8727272727272727
+   ],
+   "router_steps_flagged_per_trace": 0.8448199199644286,
+   "router_unjudged_rate": 0.000972927241962775,
+   "router_calls": 2250,
+   "router_without_reply": 1,
+   "router_incomplete": true,
    "attribution_on_wrong": {
     "traces": 229,
     "digit_rule": 0.4410480349344978,
     "e5_missing": 0.5327510917030568,
-    "router_judge": null
+    "router_judge": 0.5851528384279476
    }
   },
   {
@@ -2575,11 +2655,31 @@
    "e5_calls": 610,
    "e5_without_reply": 0,
    "e5_incomplete": false,
+   "router_rate_on_fully_solved": 0.05048633626679018,
+   "router_ci": [
+    0.03903317323909446,
+    0.06313375822069325
+   ],
+   "router_judge_rate_on_fully_solved": 0.03288559518295507,
+   "router_judge_ci": [
+    0.02376462314936571,
+    0.04311152764761012
+   ],
+   "router_rate_on_wrong": 0.3870967741935484,
+   "router_wrong_ci": [
+    0.08695652173913043,
+    0.7000531914893608
+   ],
+   "router_steps_flagged_per_trace": 0.08106884057971014,
+   "router_unjudged_rate": 0.0002428068471530897,
+   "router_calls": 2208,
+   "router_without_reply": 0,
+   "router_incomplete": false,
    "attribution_on_wrong": {
     "traces": 31,
     "digit_rule": 0.0967741935483871,
     "e5_missing": 0.25806451612903225,
-    "router_judge": null
+    "router_judge": 0.3548387096774194
    }
   },
   {
@@ -2668,11 +2768,31 @@
    "e5_calls": 499,
    "e5_without_reply": 0,
    "e5_incomplete": false,
+   "router_rate_on_fully_solved": 0.041251778093883355,
+   "router_ci": [
+    0.029793368572801536,
+    0.053758325404376785
+   ],
+   "router_judge_rate_on_fully_solved": 0.026078710289236605,
+   "router_judge_ci": [
+    0.01629376475873891,
+    0.036671368124118475
+   ],
+   "router_rate_on_wrong": 0.1111111111111111,
+   "router_wrong_ci": [
+    0.0,
+    0.2728535353535335
+   ],
+   "router_steps_flagged_per_trace": 0.05534883720930232,
+   "router_unjudged_rate": 0.00010890873448050534,
+   "router_calls": 2150,
+   "router_without_reply": 0,
+   "router_incomplete": false,
    "attribution_on_wrong": {
     "traces": 18,
     "digit_rule": 0.05555555555555555,
     "e5_missing": 0.05555555555555555,
-    "router_judge": null
+    "router_judge": 0.05555555555555555
    }
   },
   {
@@ -2761,11 +2881,31 @@
    "e5_calls": 736,
    "e5_without_reply": 0,
    "e5_incomplete": false,
+   "router_rate_on_fully_solved": 0.11069767441860465,
+   "router_ci": [
+    0.09198644543429546,
+    0.13076199435559738
+   ],
+   "router_judge_rate_on_fully_solved": 0.05906976744186047,
+   "router_judge_ci": [
+    0.045559719366218616,
+    0.07352958396473343
+   ],
+   "router_rate_on_wrong": 0.36538461538461536,
+   "router_wrong_ci": [
+    0.16393442622950818,
+    0.6
+   ],
+   "router_steps_flagged_per_trace": 0.15128320576316975,
+   "router_unjudged_rate": 8.599931200550395e-05,
+   "router_calls": 2221,
+   "router_without_reply": 0,
+   "router_incomplete": false,
    "attribution_on_wrong": {
     "traces": 52,
     "digit_rule": 0.038461538461538464,
     "e5_missing": 0.4423076923076923,
-    "router_judge": null
+    "router_judge": 0.3269230769230769
    }
   },
   {
@@ -2854,11 +2994,31 @@
    "e5_calls": 732,
    "e5_without_reply": 0,
    "e5_incomplete": false,
+   "router_rate_on_fully_solved": 0.025974025974025976,
+   "router_ci": [
+    0.017988929889298892,
+    0.03486251327524215
+   ],
+   "router_judge_rate_on_fully_solved": 0.01948051948051948,
+   "router_judge_ci": [
+    0.012453730994778827,
+    0.027650039644731353
+   ],
+   "router_rate_on_wrong": 0.31746031746031744,
+   "router_wrong_ci": [
+    0.1,
+    0.6444444444444445
+   ],
+   "router_steps_flagged_per_trace": 0.058797327394209356,
+   "router_unjudged_rate": 0.0002867177980073113,
+   "router_calls": 2245,
+   "router_without_reply": 0,
+   "router_incomplete": false,
    "attribution_on_wrong": {
     "traces": 63,
     "digit_rule": 0.0,
     "e5_missing": 0.23809523809523808,
-    "router_judge": null
+    "router_judge": 0.31746031746031744
    }
   },
   {
@@ -2947,11 +3107,31 @@
    "e5_calls": 923,
    "e5_without_reply": 0,
    "e5_incomplete": false,
+   "router_rate_on_fully_solved": 0.3167835941716136,
+   "router_ci": [
+    0.2684374688915795,
+    0.3679609369396893
+   ],
+   "router_judge_rate_on_fully_solved": 0.22180248246087425,
+   "router_judge_ci": [
+    0.17901862805742416,
+    0.267820885958682
+   ],
+   "router_rate_on_wrong": 0.8363095238095238,
+   "router_wrong_ci": [
+    0.7375,
+    0.9174071708785694
+   ],
+   "router_steps_flagged_per_trace": 0.7817777777777778,
+   "router_unjudged_rate": 0.0004885538805136795,
+   "router_calls": 2250,
+   "router_without_reply": 0,
+   "router_incomplete": false,
    "attribution_on_wrong": {
     "traces": 336,
     "digit_rule": 0.2619047619047619,
     "e5_missing": 0.7351190476190477,
-    "router_judge": null
+    "router_judge": 0.7976190476190477
    }
   },
   {
@@ -3040,11 +3220,31 @@
    "e5_calls": 824,
    "e5_without_reply": 0,
    "e5_incomplete": false,
+   "router_rate_on_fully_solved": 0.17539267015706805,
+   "router_ci": [
+    0.13653520044253126,
+    0.21706367216384395
+   ],
+   "router_judge_rate_on_fully_solved": 0.1225130890052356,
+   "router_judge_ci": [
+    0.09067075471698113,
+    0.15756048023108862
+   ],
+   "router_rate_on_wrong": 0.7953020134228188,
+   "router_wrong_ci": [
+    0.6590033900100641,
+    0.9136212624584718
+   ],
+   "router_steps_flagged_per_trace": 0.4917741218319253,
+   "router_unjudged_rate": 0.0,
+   "router_calls": 2250,
+   "router_without_reply": 1,
+   "router_incomplete": true,
    "attribution_on_wrong": {
-    "traces": 299,
-    "digit_rule": 0.3010033444816054,
-    "e5_missing": 0.6655518394648829,
-    "router_judge": null
+    "traces": 298,
+    "digit_rule": 0.30201342281879195,
+    "e5_missing": 0.6644295302013423,
+    "router_judge": 0.6845637583892618
    }
   },
   {
@@ -3133,11 +3333,31 @@
    "e5_calls": 621,
    "e5_without_reply": 0,
    "e5_incomplete": false,
+   "router_rate_on_fully_solved": 0.18590635141400091,
+   "router_ci": [
+    0.1541251133272892,
+    0.2198716877967217
+   ],
+   "router_judge_rate_on_fully_solved": 0.05702364394993046,
+   "router_judge_ci": [
+    0.04363969736789914,
+    0.07196336561459558
+   ],
+   "router_rate_on_wrong": 0.49230769230769234,
+   "router_wrong_ci": [
+    0.22413149768399385,
+    0.78125
+   ],
+   "router_steps_flagged_per_trace": 0.2831111111111111,
+   "router_unjudged_rate": 0.00035190615835777126,
+   "router_calls": 2250,
+   "router_without_reply": 0,
+   "router_incomplete": false,
    "attribution_on_wrong": {
     "traces": 65,
     "digit_rule": 0.23076923076923078,
     "e5_missing": 0.18461538461538463,
-    "router_judge": null
+    "router_judge": 0.3076923076923077
    }
   }
  ],
@@ -5973,7 +6193,7 @@
  ],
  "provenance": {
   "analyze": {
-   "git": "319e76c92537b95f8e88bf7b98edeab52a7c6237",
+   "git": "142fa7f4bdfb57fab1d2e96705020ff01770b831",
    "tag": null,
    "dirty": false,
    "sha256_lf": "22113626ce6a17da03f0215cd886e89f4e0f149c5605a10ec057bb72a9e11804",
@@ -6183,6 +6403,71 @@
     "dirty": false,
     "store_config_sha256": "d50289da72128237f59957e093f970064fdbba1862961b6aff63a224c77d4ceb",
     "written_at_utc": "2026-09-30T19:11:55Z"
+   },
+   "router": {
+    "judge": "xiaomi/mimo-v2.5-pro",
+    "ceiling": 8192,
+    "ceiling_retry": 16384,
+    "attempts": 3,
+    "framework_ast_sha256": "577c4e4c2673038428d92616d6b7f53eb7137be85244a3cea513f332ed62bc1b",
+    "models": {
+     "gpt-oss-20b": {
+      "sent": 2197,
+      "without_reply": 0
+     },
+     "gemma-4-26b-a4b": {
+      "sent": 2249,
+      "without_reply": 1
+     },
+     "deepseek-v4.1-flash": {
+      "sent": 2236,
+      "without_reply": 0
+     },
+     "qwen3-235b-a22b-2507": {
+      "sent": 2250,
+      "without_reply": 1
+     },
+     "glm-5.3-flash": {
+      "sent": 2208,
+      "without_reply": 0
+     },
+     "glm-5.3": {
+      "sent": 2150,
+      "without_reply": 0
+     },
+     "muse-glimmer-30b": {
+      "sent": 2221,
+      "without_reply": 0
+     },
+     "kimi-k3": {
+      "sent": 2245,
+      "without_reply": 0
+     },
+     "gpt-5.4-mini": {
+      "sent": 2250,
+      "without_reply": 0
+     },
+     "gemini-3.1-flash-lite": {
+      "sent": 2250,
+      "without_reply": 1
+     },
+     "claude-sonnet-5": {
+      "sent": 2250,
+      "without_reply": 0
+     }
+    },
+    "reply_store": {
+     "lines": 25383,
+     "replies": 24503,
+     "keys_failed": 871,
+     "keys_given_up": 1,
+     "billed_usd_all_lines": 104.1648
+    },
+    "git": "142fa7f4bdfb57fab1d2e96705020ff01770b831",
+    "tag": null,
+    "dirty": false,
+    "store_config_sha256": "d50289da72128237f59957e093f970064fdbba1862961b6aff63a224c77d4ceb",
+    "written_at_utc": "2026-10-02T09:29:30Z"
    }
   }
  }

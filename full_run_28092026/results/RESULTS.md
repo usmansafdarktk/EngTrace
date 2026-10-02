@@ -1,6 +1,6 @@
 # Results of the full run
 
-Printed by `analyze.py` from the score store (`score.py`) under ANALYSIS_PLAN.md (D-117); the method choices the plan leaves open are fixed in the script's docstring, and the corrections and additions made after the first results were read are labelled where they appear (D-146 to D-149). The answer check, E3 and E4's digit rule, E5. Every interval is 95% and resamples templates (B = 10,000): all 150 for a model's score, and the templates with a qualifying trace for a rate over a subset of traces. Every resampling test draws 100,000 permutations, so its Holm-adjusted floor over 55 pairs is 0.0006.
+Printed by `analyze.py` from the score store (`score.py`) under ANALYSIS_PLAN.md (D-117); the method choices the plan leaves open are fixed in the script's docstring, and the corrections and additions made after the first results were read are labelled where they appear (D-146 to D-149). The answer check, E3 and E4's digit rule, E5 and the step router. Every interval is 95% and resamples templates (B = 10,000): all 150 for a model's score, and the templates with a qualifying trace for a rate over a subset of traces. Every resampling test draws 100,000 permutations, so its Holm-adjusted floor over 55 pairs is 0.0006. **Incomplete judged stages:** `gemma-4-26b-a4b`, `qwen3-235b-a22b-2507`, `gemini-3.1-flash-lite` have calls without a reply; their judged rates are over the answered calls only.
 
 ## Q1. Answer score per model
 
@@ -182,21 +182,37 @@ Wrong-answer traces score 0 (incorrect or unusable); fully solved ones score 1; 
 | `gemini-3.1-flash-lite` | 0.114 | 0.021 | 0.077 | 0.079 | 0.143 | 0.269 |
 | `claude-sonnet-5` | 0.100 | 0.000 | 0.035 | 0.014 | 0.023 | 0.046 |
 
+**The step router** (`router.py`): the digit rule's flags, and MiMo-V2.5-Pro on every other step in one batched call per trace. On the pilot's labelled traces it had precision 0.707 and recall 0.603 over all steps, and 0.703 and 0.360 inside correct-answer traces (ROUTER_VALIDATION.md), so its rates are flags, not counts of errors. A trace counts as flagged when any step is; a trace whose call got no reply is left out and counted.
+
+| model | calls | without a reply | flagged, fully solved | 95% CI | by the judge | 95% CI | flagged, wrong answers | 95% CI | steps flagged per trace | unjudged steps |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `gpt-oss-20b` | 2197 | 0 | 0.317 | 0.279 to 0.355 | 0.213 | 0.185 to 0.244 | 0.884 | 0.818 to 0.940 | 1.00 | 0.001 |
+| `gemma-4-26b-a4b` | 2249 | 1 | 0.245 | 0.201 to 0.292 | 0.146 | 0.112 to 0.182 | 0.819 | 0.716 to 0.913 | 0.66 | 0.000 |
+| `deepseek-v4.1-flash` | 2236 | 0 | 0.016 | 0.010 to 0.022 | 0.011 | 0.006 to 0.016 | 0.275 | 0.000 to 0.571 | 0.03 | 0.000 |
+| `qwen3-235b-a22b-2507` | 2250 | 1 | 0.293 | 0.246 to 0.341 | 0.110 | 0.086 to 0.135 | 0.769 | 0.652 to 0.873 | 0.84 | 0.001 |
+| `glm-5.3-flash` | 2208 | 0 | 0.050 | 0.039 to 0.063 | 0.033 | 0.024 to 0.043 | 0.387 | 0.087 to 0.700 | 0.08 | 0.000 |
+| `glm-5.3` | 2150 | 0 | 0.041 | 0.030 to 0.054 | 0.026 | 0.016 to 0.037 | 0.111 | 0.000 to 0.273 | 0.06 | 0.000 |
+| `muse-glimmer-30b` | 2221 | 0 | 0.111 | 0.092 to 0.131 | 0.059 | 0.046 to 0.074 | 0.365 | 0.164 to 0.600 | 0.15 | 0.000 |
+| `kimi-k3` | 2245 | 0 | 0.026 | 0.018 to 0.035 | 0.019 | 0.012 to 0.028 | 0.317 | 0.100 to 0.644 | 0.06 | 0.000 |
+| `gpt-5.4-mini` | 2250 | 0 | 0.317 | 0.268 to 0.368 | 0.222 | 0.179 to 0.268 | 0.836 | 0.738 to 0.917 | 0.78 | 0.000 |
+| `gemini-3.1-flash-lite` | 2250 | 1 | 0.175 | 0.137 to 0.217 | 0.123 | 0.091 to 0.158 | 0.795 | 0.659 to 0.914 | 0.49 | 0.000 |
+| `claude-sonnet-5` | 2250 | 0 | 0.186 | 0.154 to 0.220 | 0.057 | 0.044 to 0.072 | 0.492 | 0.224 to 0.781 | 0.28 | 0.000 |
+
 **Also reported, not tested: what points at a wrong answer.** On the answered traces that score 0, the share with a digit-rule flag, with a milestone E5 rules MISSING, and with a step the router's judge flags. A trace can be in several columns, or in none.
 
 | model | answered wrong-answer traces | digit rule | E5 MISSING | router judge |
 |---|---:|---:|---:|---:|
-| `gpt-oss-20b` | 354 | 0.234 | 0.746 |  |
-| `gemma-4-26b-a4b` | 298 | 0.426 | 0.594 |  |
-| `deepseek-v4.1-flash` | 40 | 0.025 | 0.300 |  |
-| `qwen3-235b-a22b-2507` | 229 | 0.441 | 0.533 |  |
-| `glm-5.3-flash` | 31 | 0.097 | 0.258 |  |
-| `glm-5.3` | 18 | 0.056 | 0.056 |  |
-| `muse-glimmer-30b` | 52 | 0.038 | 0.442 |  |
-| `kimi-k3` | 63 | 0.000 | 0.238 |  |
-| `gpt-5.4-mini` | 336 | 0.262 | 0.735 |  |
-| `gemini-3.1-flash-lite` | 299 | 0.301 | 0.666 |  |
-| `claude-sonnet-5` | 65 | 0.231 | 0.185 |  |
+| `gpt-oss-20b` | 354 | 0.234 | 0.746 | 0.839 |
+| `gemma-4-26b-a4b` | 298 | 0.426 | 0.594 | 0.671 |
+| `deepseek-v4.1-flash` | 40 | 0.025 | 0.300 | 0.250 |
+| `qwen3-235b-a22b-2507` | 229 | 0.441 | 0.533 | 0.585 |
+| `glm-5.3-flash` | 31 | 0.097 | 0.258 | 0.355 |
+| `glm-5.3` | 18 | 0.056 | 0.056 | 0.056 |
+| `muse-glimmer-30b` | 52 | 0.038 | 0.442 | 0.327 |
+| `kimi-k3` | 63 | 0.000 | 0.238 | 0.317 |
+| `gpt-5.4-mini` | 336 | 0.262 | 0.735 | 0.798 |
+| `gemini-3.1-flash-lite` | 298 | 0.302 | 0.664 | 0.685 |
+| `claude-sonnet-5` | 65 | 0.231 | 0.185 | 0.308 |
 
 ## Q4. Consistency within a template
 
@@ -432,4 +448,4 @@ The pool over-represents the rare labels by design (D-116), so these rates are p
 
 ## Provenance
 
-`analyze.py` at commit `319e76c`; the score store `main` scored at commit `eea846e` on 2026-09-30T19:08:35+00:00; stages: e5 at `937c842`. The evaluator hashes and the per-model trace hashes are in `results.json`.
+`analyze.py` at commit `142fa7f`; the score store `main` scored at commit `eea846e` on 2026-09-30T19:08:35+00:00; stages: e5 at `937c842`, router at `142fa7f`. The evaluator hashes and the per-model trace hashes are in `results.json`.
