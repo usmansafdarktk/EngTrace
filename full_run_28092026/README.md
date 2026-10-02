@@ -118,6 +118,14 @@ misreadings the pilot's templates never exercised: pi-fractions, one quantity st
 scalar gold line, and a pi-fraction whose numerator and denominator are the computed milestones (D-168,
 `answer_form_audit.py`, `ANSWER_FORM_AUDIT.md`). All three were adopted after every changed verdict was
 read, measured between pinned commits (`--fix`, `ANSWER_FORM_FIX.md`), and the stores re-scored (D-169).
+`ANSWER_FORM_AUDIT.md` is the design measurement as made at `e116b4f`, before the change, against the store as
+it then stood; it is kept as that record and not regenerated (the script refuses without `--readings`).
+`ANSWER_FORM_FIX.md` is the record of the change itself. One wrong credit the change introduces is recorded there
+and pinned in `answer.py`'s self-test as a known limit.
+
+**For the paper:** `RESULTS_PAPER_NOTES.md` says which figures to report, with their sources, what they
+support and what they do not (D-170); `PARAPHRASE_PAPER_NOTES.md` does the same for Q5. The analyses still to
+do, in order, are in `docs/EVALUATION_NEXT_STEPS.md`.
 
 ```bash
 python -m full_run_28092026.score --variant main --workers 8   # free

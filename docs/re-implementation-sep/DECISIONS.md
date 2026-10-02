@@ -6486,10 +6486,45 @@ D-147 were, and the paper reports it that way. The `array` type and the two-quan
 stay as they are and are listed beside D-145's multipart templates. `trace_review.py` now reads the dated
 main-run archive only (D-168's cosmetic defect); the committed review regenerates identically.
 
+## D-170 — Reporting addition and documentation pass after D-169: the reasoning score gets a headline table; the paper notes and the next-steps file are written; NEXT_CYCLE_REVIEW is marked stale
+
+**Date:** 2026-10-02 · **Status:** DECIDED · **Evidence:** `full_run_28092026/analyze.py` (`q3_overall`, docstring), `results/RESULTS.md` (Q3, "Milestone coverage over all traces"), `RESULTS_PAPER_NOTES.md`, `docs/EVALUATION_NEXT_STEPS.md`, `ANALYSIS_PLAN.md` (dated note), `EVALUATION_GUIDE.md`, `README.md`, `answer_form_audit.py` (`--readings` guard), `docs/NEXT_CYCLE_REVIEW.md` (status note)
+
+- **The reasoning score had no headline.** Q3 reported E5 coverage on the wrong-answer traces only, as the
+  plan asked ("what process scores add beyond the answer"). The paper's emphasis is the reasoning trace, so
+  `analyze.py` now also prints, per model with template-level intervals, E3 and E5-strict coverage over every
+  trace whose item has milestones (2,180 per model), an unusable trace scoring what it reached and an empty one
+  nothing, and over the readable traces alone, with the digit rule's and the router judge's flag rates on fully
+  solved traces repeated beside them. Descriptive, outside the plan's tests, labelled as added after the data.
+  E5-strict runs from 0.816 (gpt-oss-20b) to 0.923 (Claude Sonnet 5); the intervals of the top eight overlap;
+  the order differs from the answer score's (Claude first on coverage, DeepSeek V4.1 Flash first on answers),
+  and the caption says what coverage measures: progress through the gold derivation, not the absence of error
+  (RESULTS_X1 Finding 5). Results regenerated at `2950875`; only the new table and the header move.
+- **`RESULTS_PAPER_NOTES.md`** says, for the whole run as `PARAPHRASE_PAPER_NOTES.md` does for Q5, which figures
+  to report with their sources, what to state, what not to state, suggested wording for the results, the
+  evaluator section and the limitations, and the figures worth drawing. Its rule is the project's: tiers, not
+  an order within the top tier; coverage is coverage; flag rates are flags; four models ran without reasoning;
+  no claim the data do not carry.
+- **`docs/EVALUATION_NEXT_STEPS.md`** carries each remaining analysis and experiment with what it answers, the
+  method, the unit, the cost and where its output lands: the Wilcoxon and bootstrap comparison of coverage across
+  models the July rebuttal promised, branch and level intervals, leave-one-judge-out with controls, the X2 bias
+  estimate, the threshold appendix, attribution by error type, the shortcut audit, the decoding table, power
+  statements, the expert readings (the answer check on this roster, the error sample, the judge), and the paid
+  conditions (reasoning-on, judge swap, flagship anchor, tool use). It supersedes section 10 of
+  `NEXT_CYCLE_REVIEW.md`, which now carries a status note saying it is the September plan and no longer
+  maintained.
+- **Documentation made consistent with D-169:** the plan's dated note; the guide's store commit (`2950875`),
+  its "Done means" list closed for the router, the results, the records and the archive, and a closing
+  paragraph pointing to the review, the notes and the next steps; the README's account of the audit as a
+  frozen design record and of the fix record; `answer_form_audit.py` refuses its default mode without
+  `--readings`, since re-running the readings against the corrected code would overwrite the record with
+  nothing; `validate_scorer.py`'s sentence names D-169 and `SCORER_VALIDATION.md` is regenerated.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
+| D-170 | The analyses of `docs/EVALUATION_NEXT_STEPS.md` section A (free) in the order given; the expert request of section B, batched; a decision on each paid condition of section C after its dry run | the paper's results section; the experts' availability; the owner's approval per condition |
 | D-169 | ~~Upload the rewritten `full_run_scores_2026-10-02.zip` as a new version of the private Kaggle scores dataset (manual mode)~~ **Done 2026-10-02: new version of `ayeshaiq/engtrace-full-run-scores`, downloaded back, 87 of 88 members identical and the log a prefix of the live one (D-169, Backups).** In the paper: the `array` type and the two-quantity scalar lines are listed with D-145's multipart templates; the one wrong credit is a stated limit | the paper's scoring statements |
 | D-168 | ~~Adopt readings P and A of the answer check (`ANSWER_FORM_AUDIT.md`), then `score --replace` on main, paraphrase and repeats, `judge --score`, `router --score`, `analyze`, and a DECISIONS entry; or report both as sensitivities~~ **Adopted 2026-10-02 with reading N, after every changed verdict was read (D-169); re-scored and regenerated.** ~~Decide how `array` items and the two-quantity scalar lines are scored, or list those templates with D-145's~~ **Listed with D-145's (D-169).** ~~Fix `trace_review.py`'s archive glob~~ **Fixed (D-169)** | — |
 | D-167 | Confirm EMNLP 2026 for Huang et al. and Długosz et al. once the proceedings appear (ERI is confirmed). The authors' call, outside the Related Work folder: `JUDGE_SELECTION.md` should say self-preference "can be" more than 50%, and the cliff should be reported as a difference between the templates in each tier (`notes/followup_review.md`) | the reference list; the paper's sections 3.3 and 5 |

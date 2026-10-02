@@ -120,7 +120,7 @@ python -m full_run_28092026.judge --status                       # free, any tim
 - **Then:** `analyze` (section 7) fills Q3's E5 columns. Until `without_reply` is 0 the header says the
   stage is incomplete and the rates are over the answered calls only.
 
-## 4. The step router, if funded
+## 4. The step router, if funded *(funded and run, 2026-09-30 to 10-02: D-164)*
 
 What it does: the digit rule's flags, plus MiMo on every other step of a trace in one batched call on
 the framework's own Tribunal prompt; a step is flagged when the rule flags it or the judge's category
@@ -306,13 +306,19 @@ the paper will quote from these stages must be printed by `analyze.py` or `--sta
 
 ## 10. Done means
 
-- [x] E5 rows for all eleven models, `without_reply` 0 or a recorded handful; replies backed up. *(2026-09-30, `without_reply` 0, $36.30, D-155; the local archive made, its Kaggle copy to do)*
-- [ ] The router rows likewise, or a recorded decision not to run it.
+- [x] E5 rows for all eleven models, `without_reply` 0 or a recorded handful; replies backed up. *(2026-09-30, `without_reply` 0, $36.30, D-155; archived locally and on Kaggle with the router's replies, D-164 and D-169)*
+- [x] The router rows likewise, or a recorded decision not to run it. *(2026-10-02, 24,503 of 24,506 answered, $104.16, D-164)*
 - [x] Three repeat variants scored; `TRACE_REVIEW_repeat*.md` say "as main" yes. *(2026-09-30, four models, D-151)*
 - [x] `FLAG_REVIEW.md` committed, and any checker fix it forced done the D-137 way. *(2026-09-30, D-154, D-156)*
 - [x] Round 2 read, `FLAG_REVIEW_2.md` committed: the fixed rule's precision on this roster. *(0.752, D-158; the second fix followed, D-159)*
 - [x] Both fixes checked by two independent review agents before round 3; their corrections adopted, the control space read. *(D-160, `DIGIT_FIX_3.md`)*
 - [x] Round 3 read, `FLAG_REVIEW_3.md` committed: the corrected rule's precision on this roster; no round 4. *(0.905, D-163)*
-- [ ] `results/RESULTS.md` regenerated with no "incomplete" in its header, committed and pushed.
-- [ ] A DECISIONS entry per paid run, and the Open decisions table updated.
-- [ ] `scores/` archived locally and on Kaggle, hashes checked.
+- [x] `results/RESULTS.md` regenerated with no "incomplete" in its header, committed and pushed. *(2026-10-02; regenerated again after the D-169 re-score and with the D-170 coverage table)*
+- [x] A DECISIONS entry per paid run, and the Open decisions table updated. *(D-155, D-164)*
+- [x] `scores/` archived locally and on Kaggle, hashes checked. *(2026-10-02, D-164; rewritten and re-uploaded after the re-score, D-169)*
+
+**After the run was closed (D-168 to D-170).** An end-to-end review read a sample of the verdicts and found three
+answer-check misreadings the pilot templates never exercised; they were measured, read verdict by verdict, adopted,
+measured between pinned commits and the five stores re-scored (`ANSWER_FORM_AUDIT.md`, `ANSWER_FORM_FIX.md`,
+`scores/rescore_d169.log`). The results the paper cites are those regenerated at `2950875` or later; the notes for
+the paper are `RESULTS_PAPER_NOTES.md`, and the analyses still to do are in `docs/EVALUATION_NEXT_STEPS.md`.

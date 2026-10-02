@@ -578,6 +578,8 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument('--models', nargs='*', help='model keys; with it nothing is written')
     ap.add_argument('--fix', action='store_true', help='answer.py at PRE_FIX against POST_FIX; writes ANSWER_FORM_FIX.md')
+    ap.add_argument('--readings', action='store_true',
+                    help='the design readings P, A, C, N applied in memory to answer.py as it stands; writes ANSWER_FORM_AUDIT.md')
     a = ap.parse_args()
     from full_run_28092026.analyze import ROSTER
     keys = a.models or ROSTER
@@ -588,6 +590,11 @@ def main() -> int:
             (HERE / 'ANSWER_FORM_FIX.md').write_text('\n'.join(L) + '\n', encoding='utf-8', newline='\n')
         print('\n'.join(L))
         return 0
+    if not a.readings:
+        raise SystemExit('The committed ANSWER_FORM_AUDIT.md is the design measurement, made at e116b4f against the store '
+                         'as it then stood; since D-169 put readings P, A and N into answer.py, re-running them against '
+                         'the current code and store measures nothing and would overwrite that record. Use --fix for the '
+                         'change between pinned commits, or --readings to run the readings anyway.')
     P = variant_module()
     PC = variant_module(coef=True)
     PN = variant_module(pifrac=True)

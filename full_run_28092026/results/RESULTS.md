@@ -1,6 +1,6 @@
 # Results of the full run
 
-Printed by `analyze.py` from the score store (`score.py`) under ANALYSIS_PLAN.md (D-117); the method choices the plan leaves open are fixed in the script's docstring, and the corrections and additions made after the first results were read are labelled where they appear (D-146 to D-149). The answer check, E3 and E4's digit rule, E5 and the step router. Every interval is 95% and resamples templates (B = 10,000): all 150 for a model's score, and the templates with a qualifying trace for a rate over a subset of traces. Every resampling test draws 100,000 permutations, so its Holm-adjusted floor over 55 pairs is 0.0006. **Incomplete judged stages:** `gemma-4-26b-a4b`, `qwen3-235b-a22b-2507`, `gemini-3.1-flash-lite` have calls without a reply; their judged rates are over the answered calls only.
+Printed by `analyze.py` from the score store (`score.py`) under ANALYSIS_PLAN.md (D-117); the method choices the plan leaves open are fixed in the script's docstring, and the corrections and additions made after the first results were read are labelled where they appear (D-146 to D-149, D-170). The answer check is the one corrected after the run was read, D-137 to D-139, D-147 and D-169 (the run's README and `ANSWER_FORM_FIX.md`). The answer check, E3 and E4's digit rule, E5 and the step router. Every interval is 95% and resamples templates (B = 10,000): all 150 for a model's score, and the templates with a qualifying trace for a rate over a subset of traces. Every resampling test draws 100,000 permutations, so its Holm-adjusted floor over 55 pairs is 0.0006. **Incomplete judged stages:** `gemma-4-26b-a4b`, `qwen3-235b-a22b-2507`, `gemini-3.1-flash-lite` have calls without a reply; their judged rates are over the answered calls only.
 
 ## Q1. Answer score per model
 
@@ -117,6 +117,22 @@ Answer score on the 58 Easy templates minus the 34 Advanced, templates resampled
 ## Q3. What the process scores add beyond the answer
 
 Wrong-answer traces score 0 (incorrect or unusable); fully solved ones score 1; a partial answer is in neither. E3 coverage leaves out the 70 items with no milestones (all 15 of 3 templates and some items of 12 more); 52 templates have an item with at most one milestone (46 with exactly one), where coverage is close to an answer check. E3 is the deterministic part of E5, which adds the judge's verdict on the milestones E3 does not find. The floor is the same trace scored against a sibling item's milestones (D-149): what coverage a trace reaches by chance, per model, on the readable wrong answers. The digit rule's flag counts a trace when any step is flagged. Against the experts' step labels on the pilot's fully solved traces it has precision 0.817 and recall 0.427 (0.750 and 0.320 before D-156; 0.800 and 0.427 between D-156 and D-159, unchanged by D-160; SCORER_VALIDATION.md). *Added 2026-09-30 and 2026-10-01 (D-154 to D-165), after the first results were read:* on this roster a domain expert found 111 of 220 sampled flags real before the first fix, 0.505 (FLAG_REVIEW.md), and 155 of 206 real after it, 0.752 (FLAG_REVIEW_2.md). The second fix, built from those notes, took the flag off 42 of their 51 misread steps and left it on 154 of the 155 slips' steps (DIGIT_FIX_2.md). Two review agents then checked both fixes; the corrections they led to, with LaTeX control spaces now read, took the flag off 82 full-run steps and put it on 370, and kept every slip's step the second fix had kept (D-160, DIGIT_FIX_3.md). The same expert then read 190 flags of the rule as it now stands: 171 of the 189 decided are real, 0.905 (95% Wilson 0.854 to 0.939; per model 0.632 to 1.000; FLAG_REVIEW_3.md), and by the owner's rule no fourth reading follows. So its rate is still not a count of slips; and it reads a different amount of arithmetic in each model's traces (claims checked per answered trace, shown), so a low rate can mean little was read.
+
+**Milestone coverage over all traces** (*added 2026-10-02, D-170, descriptive and outside the plan's tests*). Per model, the share of the gold's milestones a trace states (E3), or states or the judge rules REACHED (E5-strict), averaged over every trace whose item has milestones, an unusable trace scoring what it reached and an empty one nothing, and over the readable traces alone; template-level intervals. Coverage measures progress through the gold derivation, not the absence of error: on the pilot's correct-answer traces with a flawed step the milestone evaluators scored below chance (RESULTS_X1 Finding 5). The last two columns repeat, from the tables below, the share of fully solved traces the digit rule flags and the share the router's judge flags.
+
+| model | traces with milestones | E3, all | 95% CI | E3, readable | 95% CI | E5-strict, all | 95% CI | E5-strict, readable | 95% CI | digit rule, fully solved | router judge, fully solved |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `gpt-oss-20b` | 2180 | 0.793 | 0.755 to 0.829 | 0.813 | 0.777 to 0.846 | 0.816 | 0.778 to 0.851 | 0.836 | 0.802 to 0.867 | 0.148 | 0.211 |
+| `gemma-4-26b-a4b` | 2180 | 0.855 | 0.823 to 0.884 | 0.855 | 0.824 to 0.884 | 0.875 | 0.847 to 0.902 | 0.875 | 0.847 to 0.902 | 0.129 | 0.143 |
+| `deepseek-v4.1-flash` | 2180 | 0.860 | 0.830 to 0.888 | 0.865 | 0.836 to 0.893 | 0.896 | 0.870 to 0.921 | 0.902 | 0.876 to 0.925 | 0.005 | 0.011 |
+| `qwen3-235b-a22b-2507` | 2180 | 0.869 | 0.840 to 0.896 | 0.869 | 0.841 to 0.896 | 0.893 | 0.868 to 0.917 | 0.893 | 0.868 to 0.917 | 0.225 | 0.109 |
+| `glm-5.3-flash` | 2180 | 0.882 | 0.854 to 0.908 | 0.899 | 0.875 to 0.922 | 0.911 | 0.885 to 0.935 | 0.929 | 0.907 to 0.949 | 0.019 | 0.033 |
+| `glm-5.3` | 2180 | 0.875 | 0.840 to 0.908 | 0.917 | 0.893 to 0.939 | 0.900 | 0.866 to 0.931 | 0.943 | 0.923 to 0.962 | 0.018 | 0.026 |
+| `muse-glimmer-30b` | 2180 | 0.859 | 0.830 to 0.888 | 0.871 | 0.843 to 0.897 | 0.898 | 0.871 to 0.923 | 0.910 | 0.888 to 0.932 | 0.056 | 0.059 |
+| `kimi-k3` | 2180 | 0.878 | 0.852 to 0.902 | 0.880 | 0.854 to 0.903 | 0.915 | 0.892 to 0.935 | 0.917 | 0.895 to 0.937 | 0.006 | 0.019 |
+| `gpt-5.4-mini` | 2180 | 0.800 | 0.761 to 0.837 | 0.800 | 0.759 to 0.836 | 0.835 | 0.797 to 0.869 | 0.835 | 0.798 to 0.870 | 0.141 | 0.220 |
+| `gemini-3.1-flash-lite` | 2180 | 0.840 | 0.808 to 0.870 | 0.840 | 0.807 to 0.871 | 0.865 | 0.835 to 0.892 | 0.865 | 0.835 to 0.893 | 0.070 | 0.122 |
+| `claude-sonnet-5` | 2180 | 0.902 | 0.878 to 0.924 | 0.902 | 0.879 to 0.924 | 0.923 | 0.902 to 0.943 | 0.923 | 0.902 to 0.943 | 0.139 | 0.057 |
 
 **Milestones on the wrong-answer traces.** An unusable trace reaches only what it wrote before it stopped, and an empty one nothing, so coverage is also shown on the readable wrong answers alone.
 
@@ -448,4 +464,4 @@ The pool over-represents the rare labels by design (D-116), so these rates are p
 
 ## Provenance
 
-`analyze.py` at commit `2950875`; the score store `main` scored at commit `2950875` on 2026-10-02T13:09:33+00:00; stages: e5 at `2950875`, router at `2950875`. The evaluator hashes and the per-model trace hashes are in `results.json`.
+`analyze.py` at commit `2f388c3`, dirty; the score store `main` scored at commit `2950875` on 2026-10-02T13:09:33+00:00; stages: e5 at `2950875`, router at `2950875`. The evaluator hashes and the per-model trace hashes are in `results.json`.

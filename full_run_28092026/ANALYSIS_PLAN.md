@@ -34,6 +34,13 @@ that fair:
 
 Per model, the unusable rate is reported beside the score, and an appendix gives the score with unusable
 traces excluded.
+*Note, 2026-10-02 (D-169, D-170):* the answer check that scores the store is the one corrected after the run was
+read: LaTeX numbers (D-137), no credit from a stray digit (D-138), verdict words by family (D-139), inclusive
+last-digit windows (D-147), and pi-fractions, a scalar gold line's second unit and a pi-fraction of two
+computed milestones (D-169). None of these moved a pilot verdict against the experts; D-169 moved 238
+full-run verdicts, every one read before adoption (`ANSWER_FORM_FIX.md`). The rules above are unchanged. Q3
+gained a descriptive table of E3 and E5-strict coverage over all traces with milestones (D-170), labelled
+as added after the data.
 *Note, 2026-09-30 (D-148):* seven answered rows in the main run ended with a finish reason of `error` or
 none, a provider fault reported inside a 200, and were scored on what they state (4 correct, 2 incorrect,
 1 unusable); they are reported as a count, and the harness now retries such a reply as a service failure.

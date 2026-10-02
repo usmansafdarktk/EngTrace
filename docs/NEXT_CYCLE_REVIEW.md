@@ -1,5 +1,14 @@
 # EngTrace, third submission: where it stands and what is left
 
+> **Status, 2026-10-02: this document is the September plan and is no longer maintained.** It was written on
+> 2026-09-27 before the pool was frozen and is stale in places: its budgets, its roster discussion, its "before
+> inference" checklist and much of sections 3 to 9 describe work that has since been done differently or
+> superseded. The dated updates below and section 10 were added as the work closed, but the file is not kept
+> current. For the state of the run read DECISIONS.md D-114 to D-170 and `full_run_28092026/results/RESULTS.md`;
+> for what the paper should say read `full_run_28092026/RESULTS_PAPER_NOTES.md` and `PARAPHRASE_PAPER_NOTES.md`;
+> for the analyses and experiments still to do read **`docs/EVALUATION_NEXT_STEPS.md`**, which supersedes
+> section 10 of this file.
+
 *Update, 2026-09-30.* Sections 2 and 3 are largely overtaken: the pool is frozen (D-114 to D-116), inference is
 complete for the eleven-model roster (D-131, D-132), the deterministic stack is scored and validated
 (D-134 to D-140), and E5, the router, the paraphrase arm and the repeats are built and priced but not yet
@@ -699,6 +708,9 @@ the full run, not $79. The table above becomes:
 ---
 
 ## 10. What remains, 2026-10-02
+
+*Superseded the same day by `docs/EVALUATION_NEXT_STEPS.md`, which carries each item with its method, its unit,
+its cost and what it answers; this list is kept as the first pass.*
 
 Written after the end-to-end review (D-168), against sections 3, 5, 6 and 9.3 and the July meta-review's
 three suggested revisions. Done and in `full_run_28092026/results/RESULTS.md`: template-level intervals

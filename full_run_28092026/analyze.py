@@ -60,6 +60,9 @@ D-149; the two independent reviews of 2026-09-29):
     reader's own bootstrap can be redone without the private store.
   - results.json records what produced it: this script's commit and LF hash, the store's CONFIG and
     every stage CONFIG, checked against the store they were built from.
+  - Q3 adds (2026-10-02, D-170) a table of E3 and E5-strict milestone coverage over every trace whose item
+    has milestones, per model with template-level intervals, so the reasoning score has a headline beside
+    the answer score; descriptive, outside the plan's tests.
 """
 from __future__ import annotations
 
@@ -483,6 +486,34 @@ def q3(runs, keys, store='main'):
     return out
 
 
+def q3_overall(runs, keys, store='main'):
+    """Milestone coverage over every trace whose item has milestones (added 2026-10-02, D-170; descriptive,
+    not in the plan): E3 and E5-strict, an unusable trace scoring what it reached and an empty one nothing,
+    and on the readable traces alone; template-level intervals. A trace whose E5 call got no reply is left
+    out of the E5 columns (D-148); a trace E3 settled in full has E5-strict equal to E3."""
+    out = []
+    for i, k in enumerate(keys):
+        rows = list(runs[k].values())
+        has_ms = lambda r: r['milestones_required'] > 0 and r['e3']['coverage'] is not None
+        e3a, e3a_ci, n_all = cluster_mean(per_template(rows, lambda r: r['e3']['coverage'], has_ms), 1500 + i)
+        e3r, e3r_ci, n_read = cluster_mean(per_template(rows, lambda r: r['e3']['coverage'],
+                                                        lambda r: has_ms(r) and not r['unusable']), 1550 + i)
+        row = {'model': k, 'traces_with_milestones': n_all, 'readable_with_milestones': n_read,
+               'e3_all': e3a, 'e3_all_ci': e3a_ci, 'e3_readable': e3r, 'e3_readable_ci': e3r_ci}
+        e5 = load_stage('e5', k, store)
+        if e5:
+            ok = lambda r: not (e5[r['item_id']]['sent'] and e5[r['item_id']]['reply_ok'] is False)
+            val = lambda r: (e5[r['item_id']]['e5_strict'] if e5[r['item_id']]['e5_strict'] is not None
+                             else r['e3']['coverage'])
+            e5a, e5a_ci, _ = cluster_mean(per_template(rows, val, lambda r: has_ms(r) and ok(r)), 1600 + i)
+            e5r, e5r_ci, _ = cluster_mean(per_template(rows, val, lambda r: has_ms(r) and ok(r) and not r['unusable']),
+                                          1650 + i)
+            row.update({'e5_all': e5a, 'e5_all_ci': e5a_ci, 'e5_readable': e5r, 'e5_readable_ci': e5r_ci,
+                        'e5_without_reply': sum(1 for r in rows if has_ms(r) and not ok(r))})
+        out.append(row)
+    return out
+
+
 def q4(runs, templates, single, keys):
     out = []
     for i, k in enumerate(keys):
@@ -862,7 +893,9 @@ def render(res) -> str:
     L = ['# Results of the full run' + (': the deterministic stack' if not has_e5 else ''), '',
          'Printed by `analyze.py` from the score store (`score.py`) under ANALYSIS_PLAN.md (D-117); the '
          'method choices the plan leaves open are fixed in the script\'s docstring, and the corrections and '
-         f'additions made after the first results were read are labelled where they appear (D-146 to D-149). {stack}. '
+         f'additions made after the first results were read are labelled where they appear (D-146 to D-149, D-170). '
+         'The answer check is the one corrected after the run was read, D-137 to D-139, D-147 and D-169 (the run\'s '
+         f'README and `ANSWER_FORM_FIX.md`). {stack}. '
          'Every interval is 95% and resamples templates (B = 10,000): all 150 for a model\'s score, and the templates '
          'with a qualifying trace for a rate over a subset of traces. Every resampling test draws 100,000 permutations, '
          'so its Holm-adjusted floor over 55 pairs is 0.0006.'
@@ -945,7 +978,29 @@ def render(res) -> str:
           "0.905 (95% Wilson 0.854 to 0.939; per model 0.632 to 1.000; FLAG_REVIEW_3.md), and by the owner's "
           "rule no fourth reading follows. So its rate is still not a count of slips; and it "
           "reads a different amount of arithmetic in each model's traces (claims checked per answered trace, "
-          'shown), so a low rate can mean little was read.', '',
+          'shown), so a low rate can mean little was read.']
+    q3o = res.get('q3_overall') or []
+    if q3o:
+        L += ['', "**Milestone coverage over all traces** (*added 2026-10-02, D-170, descriptive and outside the plan's "
+              "tests*). Per model, the share of the gold's milestones a trace states (E3), or states or the judge rules "
+              'REACHED (E5-strict), averaged over every trace whose item has milestones, an unusable trace scoring what it '
+              'reached and an empty one nothing, and over the readable traces alone; template-level intervals. Coverage '
+              "measures progress through the gold derivation, not the absence of error: on the pilot's correct-answer "
+              'traces with a flawed step the milestone evaluators scored below chance (RESULTS_X1 Finding 5). The last two '
+              'columns repeat, from the tables below, the share of fully solved traces the digit rule flags and the share '
+              "the router's judge flags.", '',
+              '| model | traces with milestones | E3, all | 95% CI | E3, readable | 95% CI | E5-strict, all | 95% CI | '
+              'E5-strict, readable | 95% CI | digit rule, fully solved | router judge, fully solved |',
+              '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|']
+        by_model = {r['model']: r for r in q3r}
+        for o in q3o:
+            r = by_model[o['model']]
+            e5c = (f"{o['e5_all']:.3f} | {ci(o['e5_all_ci'])} | {o['e5_readable']:.3f} | {ci(o['e5_readable_ci'])}"
+                   if 'e5_all' in o else 'pending | | pending | ')
+            L.append(f"| `{o['model']}` | {o['traces_with_milestones']} | {o['e3_all']:.3f} | {ci(o['e3_all_ci'])} | "
+                     f"{o['e3_readable']:.3f} | {ci(o['e3_readable_ci'])} | {e5c} | "
+                     f"{f3(r.get('digit_flag_rate_on_fully_solved'))} | {f3(r.get('router_judge_rate_on_fully_solved'))} |")
+    L += ['',
           '**Milestones on the wrong-answer traces.** An unusable trace reaches only what it wrote before it '
           'stopped, and an empty one nothing, so coverage is also shown on the readable wrong answers alone.', '',
           '| model | wrong-answer traces | of them unusable | E3 coverage | 95% CI | readable only | 95% CI | floor, readable | '
@@ -1197,7 +1252,8 @@ def main() -> int:
     e5_para = {k: load_stage('e5', k, 'paraphrase') for k in ROSTER} if a.store == 'main' else None
     check = accepted_pairs()
     res = {'q1': q1(runs, templates, ROSTER), 'q2': q2(runs, templates, levels, ROSTER, symbolic),
-           'q3': q3(runs, ROSTER, a.store), 'q4': q4(runs, templates, single, ROSTER),
+           'q3': q3(runs, ROSTER, a.store), 'q3_overall': q3_overall(runs, ROSTER, a.store),
+           'q4': q4(runs, templates, single, ROSTER),
            'q5': {**q5(runs, para, ROSTER, check['keep'] if check else None, e5_main, e5_para),
                   'expert_stats': {k: v for k, v in check.items() if k != 'keep'} if check else None},
            'sensitivity': sensitivity(runs, templates, ROSTER, symbolic), 'reported': reported(runs, ROSTER),
