@@ -6190,6 +6190,12 @@ would see anyway, since it runs on what is on disk) once approved.
     tokens against the basis's 3,702.
 - **The results** (`analyze` at `142fa7f`). Q3's router columns are filled, and the attribution table
   gains its router column. Only those fields and the provenance move.
+- **Backup (2026-10-02).** `backup_archive.py scores --exclude scores/flag_review scores/_replaced
+  scores/paraphrase` wrote `full_run_scores_2026-10-02.zip`, 85 files, each checked against its source,
+  sha256 `6e29439b…79c74919`. It holds the main and repeat stores, the stages' rows, E5's and the router's
+  reply stores, and the audit files. The expert's flag-reading labels are not in it. Superseded stores
+  can be regenerated, and the paraphrase arm has its own backup (D-162). A private Kaggle copy, uploaded
+  in manual mode, was downloaded back, and all 85 members matched by path and hash.
 
 ## D-165 — Q5 read as a bound: the equivalence margin, the noise floor at the arm's size, the repeats beside it; the stream audited and the paper notes written
 

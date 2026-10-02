@@ -251,7 +251,8 @@ python -m full_run_28092026.analyze                     # writes results/RESULTS
 paid-for result. First a local archive with its checksum:
 
 ```bash
-python -m full_run_28092026.backup_archive scores     # ~/EngTrace_private_backup/full_run_scores_<date>.zip, its .sha256, every member checked
+python -m full_run_28092026.backup_archive scores --exclude scores/flag_review scores/_replaced scores/paraphrase
+# ~/EngTrace_private_backup/full_run_scores_<date>.zip, its .sha256, every member checked; the expert's labels never leave
 ```
 
 Run it after the stage ends: a store still being written is reported as differing. `Compress-Archive`
