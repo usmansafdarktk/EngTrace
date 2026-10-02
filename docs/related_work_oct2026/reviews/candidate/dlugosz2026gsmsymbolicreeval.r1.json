@@ -1,0 +1,31 @@
+{
+ "key": "dlugosz2026gsmsymbolicreeval",
+ "reviewer": "r1",
+ "read": "partial: abstract, sections 1-3 in full (p.1-5), results in section 4 read for the significance counts and the Holm procedure (p.5-7); the rest skimmed",
+ "title_confirmed": true,
+ "venue_now": "EMNLP 2026 (main conference, Resources and Evaluation track), per the arXiv comment on 2605.28700v3 of 1 Sep 2026 (notes/arxiv_abs_check.json); the acknowledgements thank the reviewers of a '2026 ARR cycle' (p.10). No proceedings record yet, so the venue rests on the authors' comment. After the review: OpenReview shows an ACL ARR 2026 May submission, consistent with an EMNLP 2026 commitment; Semantic Scholar lists arXiv only. EMNLP 2026 still rests on the arXiv comment (check_venues.py, notes/venue_check.json).",
+ "what_it_is": "A statistical re-evaluation of GSM-Symbolic's headline finding that LLMs lose accuracy on template-generated variants of GSM8K questions (p.1). Re-evaluating 20 open-weight models with bootstrapped generalised linear mixed models that treat questions as random effects (the language-as-fixed-effect fallacy, p.2), it finds that only 8 show significant changes under the original prompt format (p.1). It also shows that the variants' integers are shifted towards larger values than GSM8K's (K-S 0.12, p < 0.001), and controlling for this large-number effect accounts for significance in half of the remaining cases (p.1). Holm-Bonferroni correction is applied across models (p.5). Alternative prompt formats then separate failure profiles: variable binding, arithmetic and dual-task interference (p.1).",
+ "domain": "grade-school math (GSM8K, GSM-Symbolic)",
+ "size": "20 open-weight models; GSM-Symbolic's 100 questions with 50 variants each (p.1)",
+ "source_of_items": "an existing set (GSM-Symbolic)",
+ "instances": "generated (re-uses GSM-Symbolic's templated variants)",
+ "has_gold_traces": "n/a",
+ "evaluation": "final-answer accuracy, analysed with GLMMs with per-question random effects, bootstrapped, Holm-corrected across models (p.1, p.5)",
+ "human_validation": "n/a",
+ "contamination_measures": "n/a (it studies a contamination test)",
+ "engtrace_use": {
+  "sentence": "Functional, symbolic and perturbed variants of existing problems test whether a model has memorised the original instance [MATH(); GSM-Symbolic; Putnam-AXIOM; MATH-Perturb], although the drops they report do not always survive re-analysis [@dlugosz2026gsmsymbolicreeval], ...",
+  "verdict": "imprecise",
+  "explanation": "The finding is right (p.1), but the paper re-analyses only GSM-Symbolic. 'The drops they report' reads as a finding about all four benchmarks the clause cites. Naming GSM-Symbolic fixes this and is shorter."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "... although GSM-Symbolic's drops do not always survive re-analysis [@dlugosz2026gsmsymbolicreeval], ...",
+ "facts_to_cite": [
+  "re-evaluates 20 open-weight models with bootstrapped GLMMs with per-question random effects; only 8 show significant changes under the original prompt format (p.1)",
+  "GSM-Symbolic's integers are shifted towards larger values than GSM8K's (K-S 0.12, p < 0.001); controlling for this accounts for significance in half of the remaining cases (p.1)",
+  "Holm-Bonferroni correction across models (p.5)"
+ ],
+ "overlap_with_engtrace": "Its critique has three parts, and EngTrace's analyses already meet each. (1) Items as random effects: the paper treats questions as random effects (p.2). EngTrace's full-run analyses resample templates for every interval and test model differences by sign-flip permutation over per-template differences, because 'instances of a template are not' independent; item-level McNemar is reported beside them only for contrast (full_run_28092026/results/RESULTS.md, lines 3 and 23; D-111). (2) Multiplicity: EngTrace applies Holm across the 55 pairs and across the eleven models in the cliff and paraphrase analyses (RESULTS.md lines 23 and 85; state brief section 4). (3) A confound between original and variant: the paraphrase arm keeps the original's numbers as a multiset (state brief section 4), so a magnitude shift like GSM-Symbolic's cannot arise there. What remains open is the complexity analysis: the cliff compares different templates in different tiers, so tier is confounded with whatever else differs between those templates; RESULTS.md checks two such factors (rows left unusable at the output cap, and the nine symbolic templates, line 101), and the paper should not read the gap as an effect of difficulty alone. Its message also matches EngTrace's own paraphrase result: no model's paraphrase difference survives Holm.",
+ "confidence": "high",
+ "notes": "(1) The venue rests on the arXiv comment alone. (2) It re-uses GSM-Symbolic's main set only; the harder variants and added clauses are out of its scope (p.1, footnote 1)."
+}

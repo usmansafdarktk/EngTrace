@@ -39,6 +39,7 @@ VENUES = [
     (r"Findings of (the )?EMNLP", "inproceedings", "Findings of the Association for Computational Linguistics: EMNLP {y}"),
     (r"Findings of IJCNLP-AACL", "inproceedings", "Findings of the Association for Computational Linguistics: IJCNLP-AACL {y}"),
     (r"\bNAACL\b", "inproceedings", "Proceedings of the {y} Conference of the North American Chapter of the Association for Computational Linguistics (NAACL)"),
+    (r"\bEACL\b.{0,30}Industry", "inproceedings", "Proceedings of the {y} Conference of the European Chapter of the Association for Computational Linguistics (EACL): Industry Track"),
     (r"\bEACL\b", "inproceedings", "Proceedings of the {y} Conference of the European Chapter of the Association for Computational Linguistics (EACL)"),
     (r"\bEMNLP\b", "inproceedings", "Proceedings of the {y} Conference on Empirical Methods in Natural Language Processing (EMNLP)"),
     (r"\bACL\b", "inproceedings", "Proceedings of the {y} Annual Meeting of the Association for Computational Linguistics (ACL)"),
@@ -63,7 +64,15 @@ VENUES = [
 # venues that rest on one source (an arXiv comment or an OpenReview page): flagged in the output
 # author strings the source garbles (arXiv prints SuperGPQA's "M-A-P Team" as "P Team")
 AUTHOR_FIXES = {"du2025supergpqa": ("author={P Team and", "author={{M-A-P Team} and")}
-SINGLE_SOURCE = {"huang2026verifierrobustness", "dlugosz2026gsmsymbolicreeval", "naser2026eri"}
+# (naser2026eri left the list on 2026-10-02: Crossref gives the DOI on its arXiv page as Computers &
+# Industrial Engineering 221, notes/venue_check.json)
+SINGLE_SOURCE = {"huang2026verifierrobustness", "dlugosz2026gsmsymbolicreeval"}
+# venues confirmed after the search, which the catalogue records as preprints (check_venues.py ->
+# notes/venue_check.json; notes/followup_review.md). They take precedence over the catalogue's venue.
+VENUE_CONFIRMED = {
+    "imani2025sympybench": "EACL 2026 Industry Track (ACL Anthology 2026.eacl-industry.8)",
+    "li2025atmosscibench": "NeurIPS 2025 Datasets and Benchmarks Track (OpenReview)",
+}
 
 
 def load_entries():
@@ -118,7 +127,7 @@ def source_for(e):
 
 
 def venue_of(e):
-    v = (e.get("venue_now") or e.get("venue") or "").strip()
+    v = (VENUE_CONFIRMED.get(e["key"]) or e.get("venue_now") or e.get("venue") or "").strip()
     if not v or re.match(r"(?i)arxiv", v) or re.search(r"(?i)arxiv only", v):
         return None
     return v
@@ -179,7 +188,8 @@ def convert(bib, e, kind):
             if y:
                 bib = set_field(bib, "year", y)
             flag = " (single source; confirm before submission)" if e["key"] in SINGLE_SOURCE else ""
-            comment = f"% {e['key']}: venue from the catalogue: {v}{flag}\n"
+            origin = "confirmed after the search" if e["key"] in VENUE_CONFIRMED else "from the catalogue"
+            comment = f"% {e['key']}: venue {origin}: {v}{flag}\n"
             return bib, comment
     return bib, f"% {e['key']}: venue in the catalogue not mapped, kept as a preprint: {v}\n"
 

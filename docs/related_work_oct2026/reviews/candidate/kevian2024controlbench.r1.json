@@ -1,0 +1,37 @@
+{
+ "key": "kevian2024controlbench",
+ "reviewer": "r1",
+ "read": "full: all sections, pages 1-21 (the reference list not read)",
+ "title_confirmed": true,
+ "venue_now": "not stated in the text; arXiv 2404.03647v1 [math.OC], 4 Apr 2024 (p.1 stamp). After the review: no venue in Semantic Scholar or OpenReview; a preprint (check_venues.py, notes/venue_check.json).",
+ "what_it_is": "ControlBench: 147 undergraduate control-engineering problems in 12 topics, 26 of them with visual elements such as Bode and Nyquist plots, taken from a Schaum's outline and two university courses and transcribed into LaTeX with a step-by-step solution for each (p.5). GPT-4, Claude 3 Opus and Gemini 1.0 Ultra answer zero-shot, a panel of human experts checks the correctness of each response, and a second pass after a 'check your answer' prompt gives a self-checked accuracy (ACC and ACC-s) (p.6-7). Failures of two of the models are sorted into seven error types (p.11). ControlBench-C converts 100 of the 147 problems into single-answer multiple choice, scored on the option chosen only (p.19-20).",
+ "domain": "engineering: control (undergraduate classical control: stability, time response, Bode, root locus, Nyquist, PID design) (p.1, p.5)",
+ "size": "147 problems (26 with visual elements); ControlBench-C: 100 multiple-choice problems; 3 models (p.1, p.5, p.19)",
+ "source_of_items": "textbooks and course exercises: Schaum's Outline of Feedback and Control Systems (DiStefano, Stubberud and Williams, 1997), plus problems from University of Michigan EECS 460 and University of Illinois ECE 486, transcribed by hand into LaTeX (p.5)",
+ "instances": "static",
+ "has_gold_traces": "partial: a human-written step-by-step solution exists for each of the 147 problems (p.5), but it is a static reference that the evaluation does not use; there is no automatic scoring (p.19)",
+ "evaluation": "ControlBench: human experts judge each response correct or incorrect (ACC), and again after a self-check prompt (ACC-s) (p.6-7); failure types are tallied for ACC-s (p.11). ControlBench-C: multiple choice, with ACC and ACC-s 'verified by examining the choice, without considering whether the reasoning is correct or not' (p.20).",
+ "human_validation": "Items: problems are 'carefully verified by human annotators' so that the LaTeX compiles (p.5), which concerns syntax, not correctness. Responses: judged by 'a panel of human experts' (p.1-2, p.19); the panel's size, rubric, adjudication and agreement are not reported. No automatic scorer exists to validate; the authors call building one 'an important future task' (p.20).",
+ "contamination_measures": "none stated; sensitivity to rewording is shown on two problems (p.17-19)",
+ "engtrace_use": {
+  "sentence": "Dedicated benchmarks typically cover one branch: [...] control (Kevian et al., 2024) [...]. / A few benchmarks look past the answer: experts graded the reasoning in TransportBench and ControlBench, [...]",
+  "verdict": "imprecise",
+  "explanation": "Listing it as the control benchmark is accurate: one engineering branch, undergraduate control (p.1, p.5). 'Experts graded the reasoning' is loose. What the experts did: judge whether each response solved the problem, a binary correctness verdict that gives ACC and ACC-s (p.4, p.6-7), and sort the failures of GPT-4 and Claude 3 Opus into seven error types, of which the text names reasoning errors, calculation errors and misreading of plots (p.11-12). They did not score steps, give partial credit or rate reasoning quality, and no rubric is given. The abstract says the panel gave 'insights into the accuracy, reasoning, and explanatory prowess of LLMs' (p.1; p.2 is similar), which is where the v3 wording comes from, but the reported metrics are answer-level (p.6: ACC is 'the proportion of instances where the LLMs correctly solve the given problems'). Whether a correct final answer with flawed reasoning was credited is not stated; footnote 4 describes a right final answer 'using only a partially correct reasoning path' (p.16). The multiple-choice variant ignores reasoning altogether, and the authors note that models 'can pick the right choice based on wrong reasoning' (p.20). A reader who takes 'graded the reasoning' to mean step-level scoring would be misled."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "ControlBench (Kevian et al., 2024) has 147 undergraduate control problems whose responses a panel of experts judged correct or incorrect, sorting the failures into error types; its multiple-choice variant, 100 of the problems, scores only the option chosen.",
+ "facts_to_cite": [
+  "147 problems in 12 topics, 26 with visual elements (p.5, Table 1)",
+  "sources: Schaum's Outline of Feedback and Control Systems (DiStefano et al., 1997), University of Michigan EECS 460, University of Illinois ECE 486 (p.5)",
+  "a detailed step-by-step LaTeX solution is provided for each problem (p.5)",
+  "experts judge the correctness of each response: ACC and ACC-s are Claude 3 Opus 58.5% (86/147) and 68.7% (101/147), GPT-4 45.6% and 47.6%, Gemini 1.0 Ultra 34.0% and 38.8% (p.7)",
+  "failures of GPT-4 and Claude 3 Opus are classified into seven error types; GPT-4's main bottleneck is reasoning, Claude 3 Opus's is calculation (p.11)",
+  "all three models misread Bode, Nyquist and root-locus plots (p.12)",
+  "ControlBench-C: 100 problems turned into single-answer multiple choice and scored on the choice only; ACC and ACC-s are GPT-4 64.0% and 78.0%, Claude 3 Opus 59.0% and 83.0%, Gemini 1.0 Ultra 56.0% and 75.0% (p.19-20)",
+  "the authors say they 'do not have a fast automated way to evaluate LLM responses on ControlBench' (p.19)",
+  "the authors say results should be read qualitatively because of randomness in generation (p.7)"
+ ],
+ "overlap_with_engtrace": "Shares: an engineering domain (control), human experts reading model solutions, step-by-step reference solutions, and the right-answer-wrong-reasoning concern (p.20). Lacks: generated instances (static, 147 problems), any automatic scoring (the authors say none exists, p.19), deterministic checks of intermediate values, and a validated evaluator (the experts are the evaluator and no agreement is reported). The positioning claim still holds. EngTrace supplies the automatic evaluator that the authors name as future work (p.20), checked against expert step labels.",
+ "confidence": "medium",
+ "notes": "(1) The names of the seven error types are in Figure 1 (p.11), which is not legible in the extracted text; only reasoning and calculation errors are named in the prose, so check the PDF before characterising the taxonomy. (2) Panel size, rubric, handling of correct answers with flawed reasoning, and agreement are not reported anywhere in the text. (3) Venue: not stated; only the arXiv stamp appears (p.1). (4) The models (GPT-4, Claude 3 Opus, Gemini 1.0 Ultra) are superseded, so the numbers do not compare with current models. (5) Implied by Table 2 and not stated by the paper: after self-check, GPT-4 fails 77 of 147 and Claude 3 Opus 46 of 147; how many failures were classified is not given."
+}

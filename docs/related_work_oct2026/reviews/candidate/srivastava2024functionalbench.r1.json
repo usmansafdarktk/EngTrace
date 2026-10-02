@@ -1,0 +1,35 @@
+{
+ "key": "srivastava2024functionalbench",
+ "reviewer": "r1",
+ "read": "partial: abstract, introduction, illustrative examples, approach, results, threats to validity, related work, future work and conclusion in full; the appendices of solved examples (p.28-37) and the reference list not read",
+ "title_confirmed": true,
+ "venue_now": "not stated in the text; arXiv 2402.19450v1 [cs.AI], 29 Feb 2024 (p.1 stamp); authors at Consequent AI. After the review: no venue in Semantic Scholar or OpenReview; a preprint (check_venues.py, notes/venue_check.json).",
+ "what_it_is": "A framework for functional benchmarks: each static question-answer pair of MATH is rewritten by hand as three functions (problem, solution, inputs) so that new numerical instances with the same reasoning can be generated from a seed (p.2, p.6). 2,060 of the 5,000 MATH test problems (41.2%), chosen to cover those that 4 closed-weight and 9 open-weight models solve statically, are functionalised (p.3, p.7). The generating code is kept private and three snapshots per quarter are released, here Oct, Nov and Dec 2023 (p.3, p.6). Thirteen models are scored on the static test and the three snapshots; the 'reasoning gap' is the percentage decrease from static to functional accuracy, 58.35% to 80.31% (p.1, p.9).",
+ "domain": "competition mathematics (MATH: seven subjects, five levels) (p.12-13)",
+ "size": "2,060 of 5,000 MATH test problems functionalised (p.7); three snapshots, Oct-Dec 2023 (p.3, p.9); 13 models (p.9)",
+ "source_of_items": "generated from templates: hand-written functional rewrites of existing MATH problems (p.2, p.6)",
+ "instances": "generated (code with typed random generators and a seed; generating code private, snapshots public) (p.2-3, p.6)",
+ "has_gold_traces": "partial: the solution function encodes the reasoning as code, with comments on the steps, but returns only the final answer, and only that is compared (p.6, p.8, p.10); the paper calls explicit steps 'ideal, but not critical' (p.1)",
+ "evaluation": "final answer: the unmodified MATH harness compares the boxed answer, with liberal equivalence checking (p.6-7, p.18); few-shot prompting without chain of thought (p.3, p.7); functional accuracy counts a problem as solved only if the static test and all three snapshots are solved (p.6)",
+ "human_validation": "None reported for the functionalised items or the scorer: no check of the generated instances' correctness is described. The paper lists output-matching failures that a human would accept (p.18). The team of mathematicians and computer scientists categorised the 302 snapshot-solved GPT-4 problems by hardness, 'surprise' and reasoning type, subjectively (p.14).",
+ "contamination_measures": "generated instances (a new snapshot each quarter, new seed from the month and the original text) with the generating code kept private (p.3, p.6)",
+ "engtrace_use": {
+  "sentence": "Functional, symbolic and perturbed variants of existing problems test whether a model has memorised the original instance (Srivastava et al., 2024; Mirzadeh et al., 2025; Gulati et al., 2025; Huang et al., 2025) [...]",
+  "verdict": "accurate",
+  "explanation": "The paper frames functional variants as exactly this test. Each snapshot problem 'is different from the original static QA' but 'requires the same reasoning' (p.2); a model that reasons 'should exhibit no difference in performance over the static version' (p.1); and the reasoning gap 'is a measure of reasoning vs memorization, with gap-0 being true reasoning and gap-100 being full memorization' (p.4). Contamination of static question-answer sets is the stated motivation (p.2). Caveats that the verb 'test' hides, all stated by the authors: functional accuracy requires the static problem and all three snapshots to be solved, so one miss counts (p.6); the gap is computed over problems the models already solve statically (p.7); results use a simple few-shot prompt and are 'likely' smaller with chain of thought or tools (p.1, p.17); for GPT-4, 239 of the 541 functionally solved problems are 'ungeneralizable' and static (p.14); output matching has noticeable limitations (p.18). The paper reads the gap as memorisation without testing that reading against training data."
+ },
+ "recommendation": "keep as is",
+ "suggested_wording": "Functional MATH rewrites 2,060 MATH problems as code that generates new instances with the same reasoning, and the relative drop from static to functional accuracy (58% to 80% across 13 models) is read as memorisation of the static instances (Srivastava et al., 2024).",
+ "facts_to_cite": [
+  "2,060 of 5,000 MATH test problems (41.2%) functionalised, chosen to cover those solved by 13 models (p.3, p.7)",
+  "each test is rewritten by hand as problem, solution and inputs functions; the seed is a hash of the month and the original text (p.2, p.6)",
+  "the functionalisation code 'will never be publicly accessible'; three snapshots are released every quarter (p.3)",
+  "functional accuracy = fraction of tests solved in all k snapshots and the static version; reasoning gap = percent decrease from static to functional accuracy (p.6)",
+  "13 models, gaps from 58.35% to 80.31% (p.1, p.9); GPT-4 has the lowest gap: static accuracy 25.98%, functional 10.82% (541 of 5,000) (p.14)",
+  "three snapshots are enough to stabilise the gap (p.9, p.12); the gap grows with difficulty level (p.12)",
+  "caveats: simple few-shot prompting; the gap is likely smaller with chain of thought or tools; unknown tool use in closed models (p.1, p.17)"
+ ],
+ "overlap_with_engtrace": "Shares: instances generated from code and a seed, with the generating code kept private (the closest precedent for EngTrace's private seed), gold answers computed by that code, and contamination as the motivation. Lacks: step-level scoring (final answers only), an engineering domain (competition mathematics), validation of the generated items or the scorer by experts, and multiple branches. The positioning claim still holds. The v3 positioning paragraph credits GSM-Symbolic and FinChain for template-generated instances; Functional MATH is an earlier code-generated precedent of the same kind.",
+ "confidence": "high",
+ "notes": "(1) The text states no venue; only the arXiv stamp appears (p.1). (2) The text says nothing on whether the quarterly snapshot releases continued. (3) The 13 models are from late 2023 (GPT-4, GPT-3.5, Claude 2.1, Mistral and open models, p.9); Huang et al. (2025) report no gaps this large on newer models (Huang p.5). (4) The headline gap is a relative decrease on a conjunctive metric, so quote it with its definition rather than as an accuracy drop. (5) The related-work section lists ROSCOE step-by-step scoring as an alternative technique (p.18) but does not use it."
+}

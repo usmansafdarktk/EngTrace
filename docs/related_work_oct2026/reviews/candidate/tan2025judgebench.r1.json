@@ -1,0 +1,31 @@
+{
+ "key": "tan2025judgebench",
+ "reviewer": "r1",
+ "read": "partial: abstract, sections 1-3 in full (p.1-6), the results tables and their discussion (p.7-9); appendices skimmed",
+ "title_confirmed": true,
+ "venue_now": "ICLR 2025: the page header reads 'Published as a conference paper at ICLR 2025' (p.1); arXiv 2410.12784v2, 5 Apr 2025",
+ "what_it_is": "A benchmark of LLM-based judges on 350 response pairs in knowledge, reasoning, mathematics and coding, each pairing one objectively correct and one objectively incorrect response sampled from the same strong model (e.g. GPT-4o) on hard existing datasets, so that the pair is hard to tell apart (p.3-4). Each pair is judged twice with the order swapped (p.4). Prompted, fine-tuned and multi-agent judges and reward models are compared (p.1).",
+ "domain": "general knowledge, reasoning, mathematics, coding",
+ "size": "350 response pairs (p.3)",
+ "source_of_items": "responses generated from existing difficult datasets, labelled by objective correctness (p.3-4)",
+ "instances": "static",
+ "has_gold_traces": "n/a",
+ "evaluation": "judge accuracy at picking the correct response, with order swapped (p.4)",
+ "human_validation": "n/a: labels come from the source datasets' answers",
+ "contamination_measures": "n/a",
+ "engtrace_use": {
+   "sentence": "... and on difficult objective comparisons they do little better than chance [@tan2025judgebench], ...",
+   "verdict": "imprecise",
+   "explanation": "The abstract says 'many strong models (e.g., GPT-4o) performing just slightly better than random guessing' (p.1): GPT-4o scores 56.57% overall where chance is 50% (Table, p.7). But reasoning models do much better in the same table: o3-mini (high) 80.86%, o1-preview 75.43%, DeepSeek-R1 73.14% (p.7-8). 'They' generalises from the non-reasoning judges to all."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "... and on difficult objective comparisons many do little better than chance [@tan2025judgebench], ...",
+ "facts_to_cite": [
+   "350 response pairs, one objectively correct and one incorrect response each (p.3)",
+   "many strong models (e.g., GPT-4o) perform just slightly better than random guessing (p.1)",
+   "GPT-4o 56.57% overall; o3-mini (high) 80.86% the best (p.7-8)"
+ ],
+ "overlap_with_engtrace": "Supports keeping the judge's role small and its precision measured. EngTrace's judge (MiMo-V2.5-Pro) is not asked to compare responses; it decides whether a trace reaches a value it is given, which is closer to the reference-given setting of krumdick2026nofreelabels than to JudgeBench's reference-free pairs. No change to the positioning claim.",
+ "confidence": "high",
+ "notes": "The venue is confirmed by the paper's own header. The results cited are from v2 (April 2025), which added reasoning models; the original version's weaker numbers are the source of the abstract's framing."
+}

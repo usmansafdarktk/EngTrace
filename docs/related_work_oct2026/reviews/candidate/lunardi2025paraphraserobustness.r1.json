@@ -1,0 +1,31 @@
+{
+ "key": "lunardi2025paraphraserobustness",
+ "reviewer": "r1",
+ "read": "partial: abstract, sections 1-3 in full (p.1-4), the ranking analysis in section 4 (p.6-7) and the conclusions (p.7); the rest skimmed",
+ "title_confirmed": true,
+ "venue_now": "ECAI 2025, per the arXiv comment 'Accepted at ECAI 2025' on 2509.04013v1 (notes/arxiv_abs_check.json)",
+ "what_it_is": "A study of how paraphrasing benchmark questions changes LLM scores and rankings (p.1). GPT-4o mini wrote five paraphrases of each of 53,966 questions from six multiple-choice benchmarks (ARC-C, HellaSwag, MMLU, OpenBookQA, RACE, SciQ), under a prompt asking it to preserve meaning; 31 questions it refused were dropped (p.3-4). Thirty-four LLMs answer the originals and the paraphrases in a four-option format (p.3-4). Absolute accuracy drops significantly, while Kendall's tau between the rankings on original and median paraphrased accuracy is above 0.9 on every benchmark (p.1, p.6-7).",
+ "domain": "general knowledge and commonsense multiple-choice benchmarks",
+ "size": "53,966 questions from six benchmarks, five paraphrases each; 34 models (p.3-4)",
+ "source_of_items": "perturbed from existing sets (LLM paraphrases)",
+ "instances": "perturbed",
+ "has_gold_traces": "n/a",
+ "evaluation": "four-option accuracy, consistency across paraphrases, Kendall's tau between rankings (p.4-7)",
+ "human_validation": "none reported for the paraphrases: meaning preservation rests on the prompt's instructions (p.4)",
+ "contamination_measures": "paraphrases as a probe of wording dependence",
+ "engtrace_use": {
+   "sentence": "... randomly sampled variants can overstate robustness [@mondorf2026lpds], and paraphrasing lowers absolute scores while leaving model rankings relatively stable [@lunardi2025paraphraserobustness].",
+   "verdict": "imprecise",
+   "explanation": "This is the paper's own summary (p.1, p.7), but it is a finding on six multiple-choice benchmarks with unchecked LLM paraphrases (p.3-4), and the sentence states it as a general fact. EngTrace's own arm does not reproduce it, on either count: no model's paraphrase difference is significant after Holm (between -3.1 and +1.6 points; ten of eleven within 5 points at 90%), and the agreement between the two orderings, tau 0.636, sits at the 5th percentile of the noise distribution at the arm's size (full_run_28092026/PARAPHRASE_PAPER_NOTES.md). Scoping the clause to multiple-choice benchmarks avoids a contradiction a reader would otherwise see."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "... and on multiple-choice benchmarks paraphrasing lowers absolute scores while leaving model rankings relatively stable [@lunardi2025paraphraserobustness].",
+ "facts_to_cite": [
+   "six multiple-choice benchmarks, 53,966 questions, five GPT-4o mini paraphrases each, 34 LLMs (p.3-4)",
+   "rankings remain relatively stable while absolute effectiveness declines significantly (p.1)",
+   "Kendall's tau between original and median paraphrased rankings above 0.9 on every benchmark (p.6-7)"
+ ],
+ "overlap_with_engtrace": "Shares: paraphrases as a test of whether scores depend on the wording. Differs: EngTrace's paraphrases keep every number, unit and symbol, are script-checked and then confirmed by an own-branch expert, who rejected 12% of those passing the scripts, mostly for a dropped qualifier that changes the problem (PARAPHRASE_PAPER_NOTES.md item 7); Lunardi's are unchecked. The two results should be set side by side only within the notes' rules: not 'robust to paraphrasing', not 'the ranking is stable', and not 'no contamination' for EngTrace. A fair contrast for the robustness section: on multiple-choice benchmarks with unchecked paraphrases, scores drop and rankings hold (tau above 0.9); on EngTrace's expert-checked paraphrases, no drop survives correction and the tiers hold but the order within the top tier is not resolved.",
+ "confidence": "high",
+ "notes": "(1) Nothing in v3 may imply that EngTrace's ranking is stable under rewording; the sentence is about this paper and stays so. (2) The paper's own caution (its benchmarks are multiple choice; open-ended sets like GSM8K were excluded, p.3) supports scoping the clause."
+}

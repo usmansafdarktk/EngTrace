@@ -64,7 +64,7 @@ Of the 40 works the May text cites, 11 are cited accurately, 13 imprecisely, 9 m
 | MMLU, Hendrycks et al. 2020 / 2021a | Intro, RW eng. | imprecise ×3 | imprecise | kept; the two reference entries are one paper (ICLR 2021) and are merged |
 | BIG-Bench, cited as Luo et al. 2024 | RW eng. | wrong ×3 | wrong | dropped; the cited paper is a text-to-image bias benchmark named BIGbench |
 | SuperGPQA, Du et al. 2025 | RW eng. | misleading ×3 | misleading | kept, reworded: 7,892 engineering questions, many requiring calculation, scored on the option chosen |
-| TransportBench, Syed et al. 2024 | RW eng. | accurate ×3 | accurate | kept; its experts graded the reasoning too |
+| TransportBench, Syed et al. 2024 | RW eng. | accurate ×3 | accurate | kept; its experts examined the reasoning too |
 | APBench, cited as Chen et al. 2025 | RW eng. | accurate ×3 | accurate | kept as Wu et al. 2025 (the first author is Di Wu) |
 | ElecBench, cited as Cheng et al. 2024 | RW eng. | accurate / imprecise / imprecise | imprecise | kept as Zhou et al. 2024 (the first author is Xiyuan Zhou) and now named |
 | EEE-Bench, Li et al. 2025 | RW eng. | imprecise ×3 | imprecise | kept; a whole branch in ten subdomains, so not "narrow" |

@@ -1,0 +1,431 @@
+{
+ "generated_utc": "2026-10-02T09:29:59Z",
+ "generator": "docs/related_work_oct2026/check_venues.py",
+ "entries": {
+  "huang2026verifierrobustness": {
+   "title": "From Accuracy to Robustness: A Study of Rule- and Model-based Verifiers in Mathematical Reasoning",
+   "arxiv": "2505.22203",
+   "semantic_scholar": {
+    "title": "From Accuracy to Robustness: A Study of Rule- and Model-based Verifiers in Mathematical Reasoning",
+    "venue": "",
+    "publication_venue": null,
+    "journal": null,
+    "year": 2025,
+    "types": null,
+    "external_ids": {
+     "ArXiv": "2505.22203",
+     "CorpusId": 278959435
+    }
+   },
+   "openreview": [
+    {
+     "venue": "ICLR 2026 Conference Withdrawn Submission",
+     "venueid": "ICLR.cc/2026/Conference/Withdrawn_Submission",
+     "forum": "ZBhZT307xx"
+    }
+   ]
+  },
+  "dlugosz2026gsmsymbolicreeval": {
+   "title": "The Importance of Being Statistically Earnest: A Critical Re-evaluation of GSM-Symbolic",
+   "arxiv": "2605.28700",
+   "semantic_scholar": {
+    "title": "The Importance of Being Statistically Earnest: A Critical Re-evaluation of GSM-Symbolic",
+    "venue": "arXiv.org",
+    "publication_venue": "arXiv.org",
+    "journal": {
+     "name": "ArXiv",
+     "volume": "abs/2605.28700"
+    },
+    "year": 2026,
+    "types": [
+     "JournalArticle"
+    ],
+    "external_ids": {
+     "ArXiv": "2605.28700",
+     "DBLP": "journals/corr/abs-2605-28700",
+     "DOI": "10.48550/arXiv.2605.28700",
+     "CorpusId": 288702080
+    }
+   },
+   "openreview": [
+    {
+     "venue": "ACL ARR 2026 May Submission",
+     "venueid": "aclweb.org/ACL/ARR/2026/May/Submission",
+     "forum": "aRfXcuMzq1"
+    }
+   ]
+  },
+  "naser2026eri": {
+   "title": "Engineering Reasoning and Instruction (ERI) Benchmark: A Large Taxonomy-driven Dataset for Foundation Models and Agents",
+   "arxiv": "2603.02239",
+   "semantic_scholar": {
+    "title": "Engineering Reasoning and Instruction (ERI) Benchmark: A Large Taxonomy-driven Dataset for Foundation Models and Agents",
+    "venue": "Computers &amp; Industrial Engineering",
+    "publication_venue": null,
+    "journal": {
+     "name": "ArXiv",
+     "volume": "abs/2603.02239"
+    },
+    "year": 2026,
+    "types": [
+     "JournalArticle"
+    ],
+    "external_ids": {
+     "DBLP": "journals/corr/abs-2603-02239",
+     "ArXiv": "2603.02239",
+     "DOI": "10.1016/j.cie.2026.112333",
+     "CorpusId": 286228759
+    }
+   },
+   "openreview": [],
+   "crossref": {
+    "doi": "10.1016/j.cie.2026.112333",
+    "container": [
+     "Computers &amp; Industrial Engineering"
+    ],
+    "volume": "221",
+    "article": "112333",
+    "issued": [
+     [
+      2026,
+      11
+     ]
+    ],
+    "type": "journal-article",
+    "title": [
+     "Engineering Reasoning and Instruction (ERI) benchmark: a large taxonomy-driven dataset for foundation models and agents"
+    ],
+    "authors": [
+     "M.Z. Naser",
+     "Ahmad Bani Awwad",
+     "Zoie McCreery",
+     "Radwa Eissa",
+     "Ahmad Z. Naser",
+     "Gianluca Cusatis",
+     "Andrew Metcalf",
+     "Kapil Madathil",
+     "Jamal Abdalla",
+     "Venkatesh Kodur",
+     "Mohammad Reza Saeb"
+    ]
+   }
+  },
+  "wang2026prime": {
+   "title": "PRIME: A Process-Outcome Alignment Benchmark for Verifiable Reasoning in Mathematics and Engineering",
+   "arxiv": "2602.11570",
+   "semantic_scholar": {
+    "title": "PRIME: A Process-Outcome Alignment Benchmark for Verifiable Reasoning in Mathematics and Engineering",
+    "venue": "Annual Meeting of the Association for Computational Linguistics",
+    "publication_venue": "Annual Meeting of the Association for Computational Linguistics",
+    "journal": {
+     "pages": "14973-14985"
+    },
+    "year": 2026,
+    "types": [
+     "JournalArticle",
+     "Conference"
+    ],
+    "external_ids": {
+     "ArXiv": "2602.11570",
+     "DBLP": "conf/acl/WangGLHZYZHRYXG26",
+     "DOI": "10.48550/arXiv.2602.11570",
+     "CorpusId": 285540655
+    }
+   },
+   "openreview": [
+    {
+     "venue": "ACL (1) 2026",
+     "venueid": "OpenReview.net/Public_Article",
+     "forum": "r3XHsTAZl9"
+    },
+    {
+     "venue": "CoRR 2026",
+     "venueid": "OpenReview.net/Public_Article",
+     "forum": "2Xny34mHK3"
+    }
+   ],
+   "acl_anthology": {
+    "id": "2026.acl-long.683",
+    "title": "PRIME: A Process-Outcome Alignment Benchmark for Verifiable Reasoning in Mathematics and Engineering",
+    "pages": "14973–14985",
+    "first_authors": [
+     "Xiangfeng Wang",
+     "Hangyu Guo",
+     "Yanlin Lai",
+     "Mitt Huang"
+    ]
+   }
+  },
+  "zhao2026prismphysics": {
+   "title": "PRISM-Physics: Causal DAG-Based Process Evaluation for Physics Reasoning",
+   "arxiv": "2510.03185",
+   "semantic_scholar": {
+    "title": "PRISM-Physics: Causal DAG-Based Process Evaluation for Physics Reasoning",
+    "venue": "arXiv.org",
+    "publication_venue": "arXiv.org",
+    "journal": {
+     "name": "ArXiv",
+     "volume": "abs/2510.03185"
+    },
+    "year": 2025,
+    "types": [
+     "JournalArticle"
+    ],
+    "external_ids": {
+     "DBLP": "journals/corr/abs-2510-03185",
+     "ArXiv": "2510.03185",
+     "DOI": "10.48550/arXiv.2510.03185",
+     "CorpusId": 281830257
+    }
+   },
+   "openreview": [
+    {
+     "venue": "ICLR 2026 Poster",
+     "venueid": "ICLR.cc/2026/Conference",
+     "forum": "4PZMeopXzP"
+    },
+    {
+     "venue": "CoRR 2025",
+     "venueid": "OpenReview.net/Public_Article",
+     "forum": "A68kL1Yt2Z"
+    }
+   ]
+  },
+  "yu2026hipho": {
+   "title": "HiPhO: How Far Are (M)LLMs from Humans in the Latest High School Physics Olympiad Benchmark?",
+   "arxiv": "2509.07894",
+   "semantic_scholar": {
+    "title": "HiPhO: How Far Are (M)LLMs from Humans in the Latest High School Physics Olympiad Benchmark?",
+    "venue": "arXiv.org",
+    "publication_venue": "arXiv.org",
+    "journal": {
+     "name": "ArXiv",
+     "volume": "abs/2509.07894"
+    },
+    "year": 2025,
+    "types": [
+     "JournalArticle"
+    ],
+    "external_ids": {
+     "DBLP": "journals/corr/abs-2509-07894",
+     "ArXiv": "2509.07894",
+     "DOI": "10.48550/arXiv.2509.07894",
+     "CorpusId": 281218340
+    }
+   },
+   "openreview": [
+    {
+     "venue": "CoRR 2025",
+     "venueid": "dblp.org/journals/CORR/2025",
+     "forum": "XePpnfnE75"
+    },
+    {
+     "venue": "Submitted to ICLR 2026",
+     "venueid": "ICLR.cc/2026/Conference/Rejected_Submission",
+     "forum": "FrP85x1meL"
+    },
+    {
+     "venue": "ICML 2026 regular",
+     "venueid": "ICML.cc/2026/Conference",
+     "forum": "w6DqR74BTt"
+    }
+   ]
+  },
+  "imani2025sympybench": {
+   "title": "SymPyBench: A Dynamic Benchmark for Scientific Reasoning with Executable Python Code",
+   "arxiv": "2512.05954",
+   "semantic_scholar": {
+    "title": "SymPyBench: A Dynamic Benchmark for Scientific Reasoning with Executable Python Code",
+    "venue": "Conference of the European Chapter of the Association for Computational Linguistics",
+    "publication_venue": "Conference of the European Chapter of the Association for Computational Linguistics",
+    "journal": {
+     "name": "ArXiv",
+     "volume": "abs/2512.05954"
+    },
+    "year": 2025,
+    "types": [
+     "JournalArticle",
+     "Conference"
+    ],
+    "external_ids": {
+     "ArXiv": "2512.05954",
+     "DBLP": "conf/eacl/ImaniMAZKD26",
+     "DOI": "10.48550/arXiv.2512.05954",
+     "CorpusId": 283672090
+    }
+   },
+   "openreview": [],
+   "acl_anthology": {
+    "id": "2026.eacl-industry.8",
+    "title": "SymPyBench: A Dynamic Benchmark for Scientific Reasoning with Executable Python Code",
+    "pages": "105–118",
+    "first_authors": [
+     "Shima Imani",
+     "Seungwhan Moon",
+     "Adel Ahmadyan",
+     "Lu Zhang"
+    ]
+   }
+  },
+  "huang2025mathperturb": {
+   "title": "MATH-Perturb: Benchmarking LLMs' Math Reasoning Abilities against Hard Perturbations",
+   "arxiv": "2502.06453",
+   "semantic_scholar": {
+    "title": "MATH-Perturb: Benchmarking LLMs' Math Reasoning Abilities against Hard Perturbations",
+    "venue": "International Conference on Machine Learning",
+    "publication_venue": "International Conference on Machine Learning",
+    "journal": {
+     "name": "ArXiv",
+     "volume": "abs/2502.06453"
+    },
+    "year": 2025,
+    "types": [
+     "JournalArticle",
+     "Conference"
+    ],
+    "external_ids": {
+     "ArXiv": "2502.06453",
+     "DBLP": "journals/corr/abs-2502-06453",
+     "DOI": "10.48550/arXiv.2502.06453",
+     "CorpusId": 276249117
+    }
+   },
+   "openreview": [
+    {
+     "venue": "Reasoning and Planning for LLMs @ ICLR2025",
+     "venueid": "ICLR.cc/2025/Workshop/LLM_Reason_and_Plan",
+     "forum": "M8OLGgYK7e"
+    },
+    {
+     "venue": "ICML 2025 poster",
+     "venueid": "ICML.cc/2025/Conference",
+     "forum": "OZy70UggXr"
+    },
+    {
+     "venue": "CoRR 2025",
+     "venueid": "dblp.org/journals/CORR/2025",
+     "forum": "9wy8j2dAfm"
+    }
+   ]
+  },
+  "srivastava2024functionalbench": {
+   "title": "Functional Benchmarks for Robust Evaluation of Reasoning Performance, and the Reasoning Gap",
+   "arxiv": "2402.19450",
+   "semantic_scholar": {
+    "title": "Functional Benchmarks for Robust Evaluation of Reasoning Performance, and the Reasoning Gap",
+    "venue": "arXiv.org",
+    "publication_venue": "arXiv.org",
+    "journal": {
+     "name": "ArXiv",
+     "volume": "abs/2402.19450"
+    },
+    "year": 2024,
+    "types": [
+     "JournalArticle"
+    ],
+    "external_ids": {
+     "DBLP": "journals/corr/abs-2402-19450",
+     "ArXiv": "2402.19450",
+     "DOI": "10.48550/arXiv.2402.19450",
+     "CorpusId": 268091179
+    }
+   },
+   "openreview": []
+  },
+  "kevian2024controlbench": {
+   "title": "Capabilities of Large Language Models in Control Engineering: A Benchmark Study on GPT-4, Claude 3 Opus, and Gemini 1.0 Ultra",
+   "arxiv": "2404.03647",
+   "semantic_scholar": {
+    "title": "Capabilities of Large Language Models in Control Engineering: A Benchmark Study on GPT-4, Claude 3 Opus, and Gemini 1.0 Ultra",
+    "venue": "arXiv.org",
+    "publication_venue": "arXiv.org",
+    "journal": {
+     "name": "ArXiv",
+     "volume": "abs/2404.03647"
+    },
+    "year": 2024,
+    "types": [
+     "JournalArticle"
+    ],
+    "external_ids": {
+     "ArXiv": "2404.03647",
+     "DBLP": "journals/corr/abs-2404-03647",
+     "DOI": "10.48550/arXiv.2404.03647",
+     "CorpusId": 268889949
+    }
+   },
+   "openreview": [
+    {
+     "venue": "CoRR 2024",
+     "venueid": "OpenReview.net/Public_Article",
+     "forum": "cM1sdor6ZY"
+    }
+   ]
+  },
+  "mostajabdaveh2025orqa": {
+   "title": "Evaluating LLM Reasoning in the Operations Research Domain with ORQA",
+   "arxiv": "2412.17874",
+   "semantic_scholar": {
+    "title": "Evaluating LLM Reasoning in the Operations Research Domain with ORQA",
+    "venue": "arXiv.org",
+    "publication_venue": "arXiv.org",
+    "journal": {
+     "name": "ArXiv",
+     "volume": "abs/2412.17874"
+    },
+    "year": 2024,
+    "types": [
+     "JournalArticle"
+    ],
+    "external_ids": {
+     "ArXiv": "2412.17874",
+     "DBLP": "journals/corr/abs-2412-17874",
+     "DOI": "10.48550/arXiv.2412.17874",
+     "CorpusId": 274992777
+    }
+   },
+   "openreview": [
+    {
+     "venue": "CoRR 2024",
+     "venueid": "OpenReview.net/Public_Article",
+     "forum": "ULV262ZOvv"
+    },
+    {
+     "venue": "AAAI 2025",
+     "venueid": "OpenReview.net/Public_Article",
+     "forum": "sW3atw2b4v"
+    }
+   ]
+  },
+  "li2025atmosscibench": {
+   "title": "AtmosSci-Bench: Evaluating the Recent Advance of Large Language Model for Atmospheric Science",
+   "arxiv": "2502.01159",
+   "semantic_scholar": {
+    "title": "AtmosSci-Bench: Evaluating the Recent Advance of Large Language Model for Atmospheric Science",
+    "venue": "Neural Information Processing Systems",
+    "publication_venue": "Neural Information Processing Systems",
+    "journal": {
+     "name": "ArXiv",
+     "volume": "abs/2502.01159"
+    },
+    "year": 2025,
+    "types": [
+     "JournalArticle"
+    ],
+    "external_ids": {
+     "DBLP": "conf/nips/LiDLY25",
+     "ArXiv": "2502.01159",
+     "DOI": "10.48550/arXiv.2502.01159",
+     "CorpusId": 276095236
+    }
+   },
+   "openreview": [
+    {
+     "venue": "NeurIPS 2025 Datasets and Benchmarks Track poster",
+     "venueid": "NeurIPS.cc/2025/Datasets_and_Benchmarks_Track",
+     "forum": "vDm8VWYYuX"
+    }
+   ]
+  }
+ }
+}

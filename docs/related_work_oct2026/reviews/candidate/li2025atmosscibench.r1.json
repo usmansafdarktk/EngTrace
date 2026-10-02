@@ -1,0 +1,33 @@
+{
+ "key": "li2025atmosscibench",
+ "reviewer": "r1",
+ "read": "partial: abstract, sections 1-4 in full (p.1-7), appendix J (evaluator coverage and the human-LLM consistency study, p.31) in full; section 5 and the other appendices skimmed",
+ "title_confirmed": true,
+ "venue_now": "arXiv 2502.01159v3, 4 Oct 2025 (p.1); no venue in the text; the arXiv comment gives only '37 pages, 4 figures, 13 tables'. At review time the bibliography had it as a preprint. Confirmed after the review: NeurIPS 2025 Datasets and Benchmarks Track poster on OpenReview; Semantic Scholar also gives NeurIPS. The bibliography now cites that version (check_venues.py, notes/venue_check.json).",
+ "what_it_is": "An atmospheric-science benchmark in two formats (p.1-2). Multiple-choice questions are generated from 67 templates that domain experts made from course materials at the authors' university: experts replace numbers with placeholders and set ranges, granularity and constraints; GPT-4o drafts a Python solver from each question's explanatory solution, and experts review and refine it; distractors are generated (p.4-6). MCQ10 has 10 instances per template (670), MCQ10_EXT adds 240, and MCQ30 has 30 per template for robustness (p.5). A separate set of 391 open-ended questions is curated without perturbation (p.5). MCQs are scored by the option extracted with a regular expression; open-ended answers go through a cascade: a numeric check within 5% with units handled by pint, then SymPy equivalence, then GPT-4o-mini with a rubric (p.6-7).",
+ "domain": "atmospheric science and adjacent fields: atmospheric dynamics, atmospheric physics, geophysics, hydrology, physical oceanography (p.2, p.4)",
+ "size": "67 templates; MCQ10 670, MCQ10_EXT 240, MCQ30 30 per template; 391 open-ended questions (p.5)",
+ "source_of_items": "course materials used in atmospheric-science classes at the authors' university, OCR'd with Mathpix with their explanations (p.4)",
+ "instances": "generated for the multiple-choice part (templates with expert-set ranges and constraints); static for the open-ended part (p.5-6)",
+ "has_gold_traces": "no: the source explanations are used to write the solvers (p.6) but no reference steps are scored or described as released; the solver computes the final answer",
+ "evaluation": "multiple choice: accuracy on the option extracted by regex (p.6). Open-ended: QuantityEvaluator (numeric within 5%, units by pint), then ExpressionEvaluator (SymPy simplification of the difference), then LLMEvaluator (GPT-4o-mini, rubric, 5% tolerance); an answer is correct if an evaluator finds it equivalent (p.7). The numeric stage settles about 50% of sub-questions and the symbolic stage over 90% of the rest (p.31)",
+ "human_validation": "Templates and solvers reviewed by domain experts (p.6). Grader: a human-LLM consistency study on the open-ended answers the LLMEvaluator handled: GPT-4o-mini's correct/incorrect label matched the human grader's in 92.79% of decisions on DeepSeek-R1 outputs and 93.02% on o3-mini outputs (Table 8, p.31); the number of decisions and who the graders were are not stated",
+ "contamination_measures": "generated instances with numerical perturbation (p.6); robustness across 30 instances per template (p.5)",
+ "engtrace_use": {
+  "sentence": "Generation paragraph: 'SymPyBench, AtmosSci-Bench [@li2025atmosscibench] and Sci-rho instantiate science problems from code templates.' Table A: atmospheric science | 67 templates with Python solvers | - | final answers | -",
+  "verdict": "imprecise",
+  "explanation": "The generation sentence is accurate (p.5-6). The Table A row is not. (1) 'Final answers' hides that the generated instances are multiple choice and scored on the option chosen (p.6); only the 391 static open-ended questions are scored on a produced answer, by the numeric, symbolic and LLM cascade (p.7). (2) The last cell '-' is wrong: appendix J reports 92.79% and 93.02% agreement between the LLM grader and human graders (p.31). The table's own note excuses '-' for sections not reviewed, but this result should be in the row."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "Table A: instances '67 templates with Python solvers, as multiple choice; 391 static open-ended questions'; scored 'the option chosen; open-ended answers by numeric, then symbolic, then LLM checks'; checked against people 'its LLM grader matched human graders on about 93% of the open-ended answers it decided'.",
+ "facts_to_cite": [
+  "67 expert-built question templates; MCQ10 expands each into 10 instances, 670 MCQs (p.5)",
+  "Python solvers drafted by GPT-4o from the explanatory solution, then reviewed and refined by experts (p.6)",
+  "391 open-ended questions curated without symbolic perturbation (p.5)",
+  "open-ended answers: numeric check within 5% tolerance, then SymPy equivalence, then GPT-4o-mini (p.7)",
+  "GPT-4o-mini agreed with human graders on 92.79% (DeepSeek-R1 outputs) and 93.02% (o3-mini outputs) of its decisions (Table 8, p.31)"
+ ],
+ "overlap_with_engtrace": "Shares: expert-built templates with code solvers that generate instances; an answer check that runs deterministic numeric and symbolic stages first and calls an LLM only for what they leave open, checked against human graders (the same pattern as EngTrace's answer check plus residual judge, at the answer level). Lacks: engineering; gold intermediate steps; any step-level scoring; free-response answers for the generated part (multiple choice). The positioning claim holds.",
+ "confidence": "high",
+ "notes": "(1) The cascade design is the closest answer-level analogue of EngTrace's deterministic-first evaluator in the cited set. (2) The human study's size and grader identities are not stated (p.31). (3) MCQ10_EXT's 240 questions come from three complementary domains (p.5)."
+}

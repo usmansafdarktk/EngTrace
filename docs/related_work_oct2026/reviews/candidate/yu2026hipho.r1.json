@@ -1,0 +1,32 @@
+{
+ "key": "yu2026hipho",
+ "reviewer": "r1",
+ "read": "partial: abstract, sections 1-4 in full (p.1-6), appendix A.2 (extraction pipeline, p.15) and B.3-B.4 (grading prompts and the human comparison, p.18-20) in full; section 5 and the remaining appendices skimmed",
+ "title_confirmed": true,
+ "venue_now": "arXiv 2509.07894v4, 19 Sep 2025, page header 'Preprint Version' (p.1); the text names no venue and the arXiv page has no comment. The bibliography's ICML 2026 comes from the search catalogue (candidates/physics_science.json). Confirmed after the review: ICML 2026 on OpenReview (venue id ICML.cc/2026/Conference; an earlier ICLR 2026 submission was rejected) (check_venues.py, notes/venue_check.json).",
+ "what_it_is": "A benchmark of 13 high-school physics Olympiad exams from 2024-2025 (360 problems, 519 subquestions; 308 English and 52 Chinese), text-only to diagram-based, that grades 30 (M)LLMs by exam score and maps the scores to the official medal thresholds (p.1, p.4). Every QA pair was checked by people against the original exam (p.5, p.15). Answers are checked by a rule-based math verifier with a strong-model fallback; for the 7 exams with official marking schemes, a strong model (Gemini-2.5-Flash) awards step-level partial credit against criteria extracted from the scheme, and a problem scores the maximum of the answer-level and step-level scores (p.4, p.6).",
+ "domain": "high-school physics olympiads (five fields; p.4)",
+ "size": "13 exams, 360 problems, 519 subquestions; 7 exams with marking schemes; 30 models (p.1, p.4)",
+ "source_of_items": "competitions: official exam papers, answers and marking schemes from Olympiad websites (p.5)",
+ "instances": "static; recency (2024-2025 exams) is the only freshness measure (p.1, p.4)",
+ "has_gold_traces": "partial: official marking schemes with point-weighted step criteria for 7 of 13 exams (p.4-5); final answers for all",
+ "evaluation": "exam score: answer level by Math-Verify, then a strong model if the rule check fails; step level by a strong model (Gemini-2.5-Flash) against the marking-scheme criteria; problem score = max(answer, step) (p.6); medals by official thresholds (p.1)",
+ "human_validation": "Items: human experts checked every extracted QA pair (p.5, p.15). Grader: no agreement statistic. 'Fully aligned with human examiners' (p.1-2) refers to using the official schemes. The only check of the LLM grader is Table 7 (p.19): one exam (IPhO 2024), two contestant models (Gemini-2.5-Pro, Claude-4-Sonnet), a single inference run, per-question scores from a human expert beside Gemini-2.5-Flash and GPT-4o at answer and step level. The text calls Gemini-2.5-Flash 'much closer' to the expert, with 'under 1-point differences in the examples' (p.6, p.19)",
+ "contamination_measures": "recency (exams from 2024-2025)",
+ "engtrace_use": {
+  "sentence": "PhysReason [@zhang2025physreason], PRISM-Physics [@zhao2026prismphysics] and HiPhO [@yu2026hipho] score steps against reference solutions, with an LLM judge, symbolic formula matching, and official marking schemes applied by an LLM judge, respectively.",
+  "verdict": "accurate",
+  "explanation": "HiPhO scores steps against official marking-scheme criteria applied by a strong model (p.6), which the sentence says. Two details are left out without harm to the sentence: step-level grading covers only the 7 exams with marking schemes (p.4), and a problem's score is the maximum of its answer-level and step-level scores (p.6). The text makes no claim that the LLM grader was validated, which is right: the paper's evidence is one illustrative comparison on IPhO 2024 (Table 7, p.19), with no agreement statistic."
+ },
+ "recommendation": "keep as is",
+ "suggested_wording": "(no change) HiPhO [@yu2026hipho] scores steps against official marking schemes applied by an LLM judge.",
+ "facts_to_cite": [
+  "13 Olympiad exams from 2024-2025; 360 problems and 519 subquestions (p.4)",
+  "7 of the 13 exams have marking schemes (Table 2, p.4)",
+  "step-level partial credit awarded by a strong model against the official marking scheme; problem score = max(answer-level, step-level) (p.6)",
+  "the grader is Gemini-2.5-Flash, compared with a human expert and GPT-4o on IPhO 2024 for two contestant models in a single run (Table 7, p.19)"
+ ],
+ "overlap_with_engtrace": "Shares: step-level partial credit against an official reference (the marking scheme); a rule-based answer check with a model fallback, as in EngTrace's answer check plus residual judge. Lacks: generated instances; engineering; deterministic checks of intermediate values (the step grader is an LLM); a measured agreement between its grader and humans. The positioning claim holds.",
+ "confidence": "high",
+ "notes": "(1) 'Fully aligned with human examiners' (p.1) is a claim about the marking schemes, not a measured agreement; the text should not repeat it. (2) The max(answer, step) rule means a correct final answer receives full credit whatever the steps (p.6), so HiPhO's step scores cannot penalise a correct answer reached by flawed reasoning, the failure EngTrace targets."
+}

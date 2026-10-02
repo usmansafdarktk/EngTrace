@@ -73,13 +73,13 @@ Verdicts agree across the three reviewers for 36 of 46 papers.
 | gerstmayr2026meceng | should | engineering_arxiv | 0 |  |
 | akbari2025circuitsense | should | engineering_arxiv | 0 |  |
 | ravishankara2026circuchain | should | engineering_arxiv | 0 |  |
-| mostajabdaveh2025orqa | should | engineering_arxiv | 0 |  |
+| mostajabdaveh2025orqa | should | engineering_arxiv | 1 | r1:keep |
 | chen2026optengine | should | engineering_arxiv | 0 |  |
 | qin2026structureclaw | should | engineering_arxiv | 0 |  |
 | silwal2026pecivilbench | should | engineering_arxiv | 0 |  |
 | somasekharan2026cfdllmbench | should | engineering_arxiv | 0 |  |
 | mohammadzadeh2025fembench | should | engineering_arxiv | 0 |  |
-| kevian2024controlbench | should | engineering_arxiv | 0 |  |
+| kevian2024controlbench | should | engineering_arxiv | 1 | r1:reword |
 | colle2025telemath | should | engineering_arxiv | 0 |  |
 | sun2026educircuithw | should | engineering_arxiv | 0 |  |
 | pers2026handwrittengrading | should | engineering_arxiv | 0 |  |
@@ -108,10 +108,10 @@ Verdicts agree across the three reviewers for 36 of 46 papers.
 | spiliopoulou2025playfavorites | must | llm_judge | 1 | r2:add-should |
 | goel2025greatmodels | must | llm_judge | 1 | r2:add-must |
 | kim2025correlatederrors | must | llm_judge | 1 | r2:add-should |
-| tan2025judgebench | must | llm_judge | 0 |  |
-| krumdick2026nofreelabels | must | llm_judge | 0 |  |
-| pombal2026rubricselfpreference | must | llm_judge | 0 |  |
-| huang2026verifierrobustness | must | llm_judge | 0 |  |
+| tan2025judgebench | must | llm_judge | 1 | r1:reword |
+| krumdick2026nofreelabels | must | llm_judge | 1 | r1:reword |
+| pombal2026rubricselfpreference | must | llm_judge | 1 | r1:keep |
+| huang2026verifierrobustness | must | llm_judge | 1 | r1:keep |
 | liu2023geval | should | llm_judge | 0 |  |
 | wataoka2024selfpreference | should | llm_judge | 0 |  |
 | ye2025justiceprejudice | should | llm_judge | 0 |  |
@@ -131,12 +131,12 @@ Verdicts agree across the three reviewers for 36 of 46 papers.
 | dorner2025limits | optional | llm_judge | 0 |  |
 | zhou2026juryprobe | optional | llm_judge | 0 |  |
 | li2026sparseoverlap | optional | llm_judge | 0 |  |
-| zhao2026prismphysics | must | physics_science | 0 |  |
-| yu2026hipho | must | physics_science | 0 |  |
-| imani2025sympybench | must | physics_science | 0 |  |
+| zhao2026prismphysics | must | physics_science | 1 | r1:reword |
+| yu2026hipho | must | physics_science | 1 | r1:keep |
+| imani2025sympybench | must | physics_science | 1 | r1:keep |
 | zhou2025scida | must | physics_science | 0 |  |
-| li2025atmosscibench | must | physics_science | 0 |  |
-| ansari2026physicsregrading | must | physics_science | 0 |  |
+| li2025atmosscibench | must | physics_science | 1 | r1:reword |
+| ansari2026physicsregrading | must | physics_science | 1 | r1:reword |
 | ren2026solutionhacking | must | physics_science | 0 |  |
 | xu2026physelite | should | physics_science | 0 |  |
 | dai2025physicsarena | should | physics_science | 0 |  |
@@ -168,7 +168,7 @@ Verdicts agree across the three reviewers for 36 of 46 papers.
 | zeng2025versaprm | must | process_supervision | 1 | r2:add-must |
 | xia2024reasoneval | must | process_supervision | 1 | r2:add-must |
 | golovneva2022roscoe | must | process_supervision | 1 | r2:add-should |
-| wang2026prime | must | process_supervision | 0 |  |
+| wang2026prime | must | process_supervision | 1 | r1:reword |
 | sun2026lsrben | should | process_supervision | 0 |  |
 | pandit2025hard2verify | should | process_supervision | 0 |  |
 | zeng2023mrgsm8k | should | process_supervision | 0 |  |
@@ -190,11 +190,11 @@ Verdicts agree across the three reviewers for 36 of 46 papers.
 | pronesti2026vprm | optional | process_supervision | 0 |  |
 | rizvi2025spare | optional | process_supervision | 0 |  |
 | cheng2026vera | must | symbolic_contamination | 0 |  |
-| dlugosz2026gsmsymbolicreeval | must | symbolic_contamination | 0 |  |
-| zhang2024gsm1k | must | symbolic_contamination | 0 |  |
-| srivastava2024functionalbench | must | symbolic_contamination | 0 |  |
-| huang2025mathperturb | must | symbolic_contamination | 0 |  |
-| akhtar2026benchmarksaturation | must | symbolic_contamination | 0 |  |
+| dlugosz2026gsmsymbolicreeval | must | symbolic_contamination | 1 | r1:reword |
+| zhang2024gsm1k | must | symbolic_contamination | 1 | r1:reword |
+| srivastava2024functionalbench | must | symbolic_contamination | 1 | r1:keep |
+| huang2025mathperturb | must | symbolic_contamination | 1 | r1:reword |
+| akhtar2026benchmarksaturation | must | symbolic_contamination | 1 | r1:reword |
 | chen2025staticdynamicsurvey | must | symbolic_contamination | 0 |  |
 | arabov2026rusfinchain | should | symbolic_contamination | 0 |  |
 | li2024gsmplus | should | symbolic_contamination | 0 |  |
@@ -206,7 +206,7 @@ Verdicts agree across the three reviewers for 36 of 46 papers.
 | balunovic2025matharena | should | symbolic_contamination | 0 |  |
 | white2024livebench | should | symbolic_contamination | 0 |  |
 | wu2025reasoningmemorization | should | symbolic_contamination | 0 |  |
-| lunardi2025paraphraserobustness | should | symbolic_contamination | 0 |  |
+| lunardi2025paraphraserobustness | should | symbolic_contamination | 1 | r1:reword |
 | singh2026gsmsem | should | symbolic_contamination | 0 |  |
 | shrestha2025gsmranges | should | symbolic_contamination | 0 |  |
 | sun2025bdcmitigation | should | symbolic_contamination | 0 |  |
@@ -216,4 +216,4 @@ Verdicts agree across the three reviewers for 36 of 46 papers.
 | xiao2026contaminationrankings | should | symbolic_contamination | 0 |  |
 | allawati2026contaminationresistant | optional | symbolic_contamination | 0 |  |
 
-Candidates by number of panel reviews: 0 reviews: 133, 1 reviews: 10, 2 reviews: 4, 3 reviews: 9.
+Candidates by number of panel reviews: 0 reviews: 115, 1 reviews: 28, 2 reviews: 4, 3 reviews: 9.

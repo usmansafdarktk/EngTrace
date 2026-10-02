@@ -12,11 +12,13 @@ The choices rest on `CITED_SET_AUDIT.md` (the May citations) and `NEW_PAPERS_AUD
 in the October search). Citation labels below are computed from the bibliography the way natbib prints
 them, so they match the LaTeX.
 
-Length, counted by `render_related_work.py` without citations: the main text has 723 words of prose, against
+Length, counted by `render_related_work.py` without citations: the main text has 704 words of prose, against
 227 in the May version. It adds the paragraph on process supervision and evaluator validity that the plan of
 record asks for, and the engineering paragraph now says what prior benchmarks actually score. Removing the
-two sentences marked [cut first] brings it to 667. If more must go, cut in this order: the coding benchmarks in
+sentence marked [cut first] brings it to 678. If more must go, cut in this order: the coding benchmarks in
 the first sentence, all but three of the single-branch benchmarks, and the PRIME and ChemCoTBench-V2 sentence.
+The follow-up review (`notes/followup_review.md`) cut the other [cut first] sentence, on re-graded physics
+answers, and cites that paper for its point about rule-based graders in the paragraph on evaluators.
 
 ---
 
@@ -26,34 +28,33 @@ the first sentence, all but three of the single-branch benchmarks, and the PRIME
 **Reasoning benchmarks and what they score.**
 Mathematical and coding benchmarks such as GSM8K [@cobbe2021gsm8k], MATH [@hendrycks2021math], HumanEval [@chen2021humaneval], MBPP [@austin2021mbpp] and SWE-bench [@jimenez2024swebench] score a final answer or a test outcome, and broad suites such as MMLU [@hendrycks2021mmlu] and SuperGPQA [@du2025supergpqa] score a chosen option.
 Yet a correct final answer can follow flawed reasoning [@cobbe2021gsm8k], increasingly so on harder problems: in ProcessBench, the share of correct-answer solutions that contain a process error rises from 3.5% on GSM8K to 51.8% on Omni-MATH [@zheng2024processbench].
-Most physics benchmarks likewise grade final answers or expressions [@xu2025ugphysics; @qiu2025phybench; @zhang2025abenchphysics; @wang2023scibench], while PhysReason [@zhang2025physreason], PRISM-Physics [@zhao2026prismphysics] and HiPhO [@yu2026hipho] score steps against reference solutions, with an LLM judge, symbolic formula matching, and official marking schemes applied by an LLM judge, respectively.
-<!-- cut first -->Graders themselves can fail: physicists re-grading 250 answers marked wrong on four physics benchmarks attributed all but 12 of them to errors in the benchmark or the grader [@ansari2026physicsregrading].
+Most physics benchmarks likewise grade final answers or expressions [@xu2025ugphysics; @qiu2025phybench; @zhang2025abenchphysics; @wang2023scibench], while PhysReason [@zhang2025physreason], PRISM-Physics [@zhao2026prismphysics] and HiPhO [@yu2026hipho] score steps against reference solutions, with an LLM judge, rule-based formula matching, and official marking schemes applied by an LLM judge, respectively.
 
 **Generated instances and contamination.**
-Static test sets saturate [@ott2022saturation; @akhtar2026benchmarksaturation] and leak into training data [@deng2024contamination; @zhang2024gsm1k], and safeguards such as private test sets have had limited effect on saturation [@akhtar2026benchmarksaturation].
-Functional, symbolic and perturbed variants of existing problems test whether a model has memorised the original instance [@srivastava2024functionalbench; @mirzadeh2024gsmsymbolic; @gulati2024putnamaxiom; @huang2025mathperturb], although the drops they report do not always survive re-analysis [@dlugosz2026gsmsymbolicreeval], randomly sampled variants can overstate robustness [@mondorf2026lpds], and paraphrasing lowers absolute scores while leaving model rankings relatively stable [@lunardi2025paraphraserobustness].
+Static test sets saturate [@ott2022saturation; @akhtar2026benchmarksaturation] and leak into training data [@deng2024contamination; @zhang2024gsm1k], and neither private test sets nor templating has measurably slowed saturation [@akhtar2026benchmarksaturation].
+Functional, symbolic and perturbed variants of existing problems test whether a model has memorised the original instance or its method [@srivastava2024functionalbench; @mirzadeh2024gsmsymbolic; @gulati2024putnamaxiom; @huang2025mathperturb], although GSM-Symbolic's drops do not always survive re-analysis [@dlugosz2026gsmsymbolicreeval], randomly sampled variants can overstate robustness [@mondorf2026lpds], and on multiple-choice benchmarks paraphrasing lowers absolute scores while leaving model rankings relatively stable [@lunardi2025paraphraserobustness].
 Generation has also been paired with gold solutions: HARDMath produces applied-mathematics problems with numerically validated step-by-step solutions [@fan2024hardmath]; FinChain pairs each templated financial problem with an executable gold reasoning chain and scores a model's steps against it [@xie2025finchain]; and SymPyBench [@imani2025sympybench], AtmosSci-Bench [@li2025atmosscibench] and Sci-ρ [@azmi2026scirho] instantiate science problems from code templates.
 
 **Engineering benchmarks.**
 General suites test engineering mostly through multiple choice; SuperGPQA's 7,892 engineering questions often require calculation but are scored on the option chosen [@du2025supergpqa].
-Dedicated benchmarks typically cover one branch: transportation [@syed2024transportbench], control [@kevian2024controlbench], power dispatch [@zhou2024elecbench], electrical and electronics engineering [@li2025eeebench], circuits [@skelic2025circuit], astrodynamics [@wu2025apbench], thermodynamics [@duzkar2026thermoqa], thermal-protection design [@zheng2026tpscalcbench] or operations research [@mostajabdaveh2025orqa].
+Dedicated benchmarks typically cover one branch: transportation [@syed2024transportbench], control [@kevian2024controlbench], power dispatch [@zhou2024elecbench], electrical and electronics engineering [@li2025eeebench], circuits [@skelic2025circuit], astrodynamics [@wu2025apbench], thermodynamics [@duzkar2026thermoqa], thermal-protection design [@zheng2026tpscalcbench] or operations research [@mostajabdaveh2025orqa; @chen2026optengine].
 Multi-branch benchmarks grade answers with LLM judges: EngiBench [@zhou2025engibench] with two LLM evaluators, plus rubrics for its open-ended level, and ERI [@naser2026eri] against reference answers that an LLM wrote along with the questions.
 <!-- cut first -->Other work evaluates design [@guo2025engdesign], multiphysics simulation [@mudur2025feabench] and questions from industrial practice [@heesch2025realworld], the last questioning evaluations built from examination materials whose correctness is easily verifiable.
-A few benchmarks look past the answer: experts graded the reasoning in TransportBench and ControlBench, LLM judges score it in ElecBench, TPS-CalcBench and EngVQA [@wasiq2026engvqa], and ThermoQA scores property values and weighted solution steps against values computed with a thermodynamic property library.
-Fewer generate their instances: CIRCUIT instantiates circuit templates with several numerical setups, and a power-systems agent benchmark draws held-out cases from privately seeded generators [@trashchenkov2026psab].
+A few benchmarks look past the answer: experts examined the reasoning in TransportBench and ControlBench, LLM judges score it in ElecBench, TPS-CalcBench and EngVQA [@wasiq2026engvqa], and ThermoQA scores property values and weighted solution steps against values computed with a thermodynamic property library.
+Fewer generate their instances: CIRCUIT instantiates circuit templates with several numerical setups, OPT-Engine [@chen2026optengine] generates optimisation problems of controlled complexity, and a power-systems agent benchmark draws held-out cases from privately seeded generators [@trashchenkov2026psab].
 To our knowledge, none combines generated instances across engineering branches with gold traces, deterministic checks of intermediate values, and an evaluator validated against experts' step-level labels.
 
 **Process supervision and the validity of evaluators.**
 Outcome supervision can match process supervision on final-answer error, but correct reasoning steps required process-based supervision or reward models that emulate it [@uesato2022processoutcome].
 Process reward models (PRMs) learn from human step labels [@lightman2023verify] or from labels estimated by rollouts [@wang2023mathshepherd], which are noisy [@zhang2025prmlessons], and are evaluated on human-annotated first-error benchmarks in mathematics [@zheng2024processbench; @song2025prmbench]; PRMs trained on mathematics perform poorly in other domains [@zeng2025versaprm].
-Beyond mathematics, PRIME tests whether verifiers catch answers that the reasoning does not support, in mathematics and engineering [@wang2026prime], and ChemCoTBench-V2 checks chemistry steps with deterministic rules [@guo2026chemcotbenchv2].
-LLM judges are the common alternative, but they favour their own outputs and those of related models [@zheng2023mtbench; @panickssery2024selfrecognition; @spiliopoulou2025playfavorites; @li2026preferenceleakage], even on objective rubric items [@pombal2026rubricselfpreference]; their errors are correlated across models [@goel2025greatmodels; @kim2025correlatederrors], which limits what a panel of judges [@verga2024poll] gains by voting; and on difficult objective comparisons they do little better than chance [@tan2025judgebench], agreeing with experts mainly on questions they can answer themselves unless given a reference answer [@krumdick2026nofreelabels].
-Rule-based checkers avoid these biases but can reject correct answers given in unexpected formats [@huang2026verifierrobustness].
+Beyond mathematics, PRIME tests whether verifiers catch answers that the reasoning does not support, in college-level STEM including engineering [@wang2026prime], and ChemCoTBench-V2 checks chemistry steps with deterministic rules [@guo2026chemcotbenchv2].
+LLM judges are the common alternative, but they favour their own outputs and those of related models [@zheng2023mtbench; @panickssery2024selfrecognition; @spiliopoulou2025playfavorites; @li2026preferenceleakage], even on objective rubric items [@pombal2026rubricselfpreference]; their errors are correlated across models [@goel2025greatmodels; @kim2025correlatederrors], which limits what a panel of judges [@verga2024poll] gains by voting; and on difficult objective comparisons many do little better than chance [@tan2025judgebench], agreeing with experts mainly on questions they can answer themselves unless given a correct reference [@krumdick2026nofreelabels].
+Rule-based checkers avoid these biases but can reject correct answers given in unexpected formats [@huang2026verifierrobustness; @ansari2026physicsregrading].
 
 **Positioning.**
 EngTrace brings these lines together.
 As in GSM-Symbolic and FinChain, symbolic templates generate the instances, here across five engineering branches and from a private seed, and as in FinChain the gold trace comes from the code that computes the answer.
-Intermediate values and arithmetic are checked deterministically against that trace; an LLM judge from a model family outside the evaluated roster decides only the milestones these checks leave open, given each one's expected value; and the full evaluator, with off-the-shelf PRMs as baselines, is validated against step labels from 15 domain experts.
+Intermediate values are checked deterministically against that trace and arithmetic by recomputation; an LLM judge from a model family outside the evaluated roster decides only what these checks leave open, given each milestone's expected value; and the full evaluator, with off-the-shelf PRMs as baselines, is validated against step labels from 15 domain experts.
 Expert-checked paraphrases test whether models exploit template wording.
 
 <!-- part: appendix -->
@@ -66,10 +67,10 @@ Expert-checked paraphrases test whether models exploit template wording.
 | FinChain [@xie2025finchain] | finance | generated from symbolic templates | executable gold chain | steps, against the gold chain | Spearman 0.655 with experts' ratings of reasoning quality |
 | HARDMath [@fan2024hardmath] | applied mathematics | generated by code | step-by-step, validated numerically | final answer, graded by an LLM with rubrics | – |
 | SymPyBench [@imani2025sympybench] | university physics | parameterised Python | step-by-step reasoning | answers, and consistency across variants | – |
-| AtmosSci-Bench [@li2025atmosscibench] | atmospheric science | 67 templates with Python solvers | – | final answers | – |
+| AtmosSci-Bench [@li2025atmosscibench] | atmospheric science | 67 templates with Python solvers, as multiple choice; 391 static open-ended questions | – | the option chosen; open-ended answers by numeric, then symbolic, then LLM checks | its LLM grader agreed with human graders on 92.79% and 93.02% of the open-ended answers it decided (two models' outputs) |
 | Sci-ρ [@azmi2026scirho] | school STEM | 606 Python templates | reasoning steps | steps, as an F1 from an LLM judge | – |
 | PhysReason [@zhang2025physreason] | physics | static | annotated solution steps | steps, an LLM judge locating the first error | about 98% first-error accuracy on 1,000 annotated solutions |
-| PRISM-Physics [@zhao2026prismphysics] | physics | static | formula graphs | steps, by symbolic formula matching | Kendall τb 0.346 with expert annotations (an LLM judge: 0.294) |
+| PRISM-Physics [@zhao2026prismphysics] | physics | static (PhD qualifying-exam problems) | formula graphs | steps, by rule-based formula matching | Kendall τb 0.346 with two experts' scores of 70 solutions (an outcome-only LLM judge: 0.294) |
 | CIRCUIT [@skelic2025circuit] | circuits | 102 templates, several numerical setups each | – | final answers, per template | human review found about 5% false positives |
 | ThermoQA [@duzkar2026thermoqa] | thermodynamics | static (293 problems) | states and steps computed with CoolProp | property values and weighted steps, within 2% | – |
 | TPS-CalcBench [@zheng2026tpscalcbench] | thermal-protection design | static (420 items) | – | answer, and a reasoning rubric scored by an LLM judge | weighted κ 0.68 to 0.82 per rubric dimension |
@@ -87,7 +88,7 @@ Expert-checked paraphrases test whether models exploit template wording.
 *Step verification.* Error-detection benchmarks extend beyond mathematics [@tyen2023bigbenchmistake; @zeng2024mrben; @he2025deltabench; @sun2026lsrben], physics now has a process reward model [@dong2026physprm], and GenPRM verifies each step with code [@zhao2025genprm]; reference-free step metrics include ROSCOE [@golovneva2022roscoe] and ReasonEval [@xia2024reasoneval].
 Closest to EngTrace's milestones, @wang2026milestoneoracles grade mathematical reasoning against milestone roadmaps with a deterministic symbolic verifier, though their milestones are written by a teacher model rather than computed by the problem's own code.
 *Judges.* @thakur2025judgingjudges and @ye2025justiceprejudice document the unreliability and biases of LLM judges; judges accept valid outputs but reject few invalid ones [@jain2025agreeableness], their agreement with human markers in physics depends on the task [@yeadon2026physicsjudge], and they should be validated against human judgments before use [@bavaresco2025llmsinsteadofhumans].
-@roytburg2026narcissists re-examine self-preference findings, and @jung2025trustescalate escalate only uncertain items to stronger judges, the pattern EngTrace's residual judge follows.
+@roytburg2026narcissists re-examine self-preference findings. @jung2025trustescalate escalate only uncertain items to stronger judges, and @huang2026verifierrobustness ask a model only about answers a rule-based verifier rejects, the pattern EngTrace's residual judge follows.
 
 <!-- part: md-notes -->
 ---

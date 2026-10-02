@@ -1,0 +1,35 @@
+{
+ "key": "zhao2026prismphysics",
+ "reviewer": "r1",
+ "read": "partial: abstract, sections 1-6 in full (p.1-10); appendices B (matching and scoring algorithms), C.1-C.2 (data source and rewriting pipeline) and F (evaluator analysis) in full; Figure 2 rendered from the PDF; appendices A, C.3-C.4, D, E and G skimmed",
+ "title_confirmed": true,
+ "venue_now": "arXiv 2510.03185v2, 30 Oct 2025, page header 'Preprint' (p.1); the text names no venue and the arXiv page has no comment. The bibliography's ICLR 2026 comes from the search catalogue (candidates/physics_science.json). Confirmed after the review: ICLR 2026 Poster on OpenReview (venue id ICLR.cc/2026/Conference) (check_venues.py, notes/venue_check.json).",
+ "what_it_is": "A process-level physics benchmark and scorer. Each reference solution is rewritten as a directed acyclic graph of formulas whose edges are prerequisites (p.3-6). A model's solution is scored by extracting its formulas, canonicalising them, matching each reference node by a rule-based equivalence check (constant substitution, then random numerical substitution: up to 40 trials with values in [2, 20], equivalence rejected unless at least 10 succeed and none contradicts, p.6, p.16), and crediting every matched node and its ancestors; the score is the credited fraction of nodes (p.18). Problems come from the book 'Major American Universities Ph.D. Qualifying Questions and Solutions' (p.19), rewritten and converted to DAGs by an LLM pipeline with rule-based and LLM checks (p.6, p.19). About 30 model configurations are reported, with step-level and final-answer accuracy (Table 1, p.8).",
+ "domain": "physics (seven areas: mechanics, electromagnetism, optics, atomic/nuclear/particle, thermodynamics and statistical physics, quantum mechanics, solid state; p.7)",
+ "size": "not stated in the text: Figure 2 (p.3) shows topics and difficulty without counts; 70 problems in the human study (p.9); about 30 model configurations (p.8)",
+ "source_of_items": "a published book of PhD qualifying-exam problems with worked solutions (p.19); textual-answer problems excluded (p.19)",
+ "instances": "static",
+ "has_gold_traces": "yes: the book's worked solutions converted into formula DAGs by an LLM rewriting pipeline, checked by rules and an LLM, with regeneration on failure (p.6, p.19); no human check of the DAGs is described",
+ "evaluation": "step-level: rule-based formula equivalence against the reference DAG with ancestor-closure credit, no LLM in the scorer (p.6, p.9, p.18); also final-answer accuracy (p.8). The authors call the core scorer deterministic (p.32); the equivalence test samples random values (p.16)",
+ "human_validation": "70 problems (10 per domain) with DeepSeek-V3 solutions, each scored by two experts (annotators include an IPhO gold medallist and a physics PhD), a third adjudicating large disagreements (p.9); the annotators are mostly the student co-authors (p.31). Kendall tau-b with the human scores: PRISM-DAG 0.346, an LLM judge 0.294, PSAS-S 0.213 (Table 2, p.9). The LLM judge baseline is outcome-based and gives only 0/1 scores (p.9). The human labels are per-solution scores, not step labels",
+ "contamination_measures": "none (a published book)",
+ "engtrace_use": {
+  "sentence": "PhysReason [@zhang2025physreason], PRISM-Physics [@zhao2026prismphysics] and HiPhO [@yu2026hipho] score steps against reference solutions, with an LLM judge, symbolic formula matching, and official marking schemes applied by an LLM judge, respectively. Table A: physics | static | formula graphs | steps, by symbolic formula matching | Kendall tau-b 0.346 with expert annotations (an LLM judge: 0.294)",
+  "verdict": "accurate",
+  "explanation": "Every element is supported: steps are scored against reference formula DAGs (p.6, p.18), by symbolic equivalence matching (p.1-2, p.6), and tau-b is 0.346 against 0.294 for an LLM judge (p.9). What the wording hides is the point that matters most for EngTrace: the scorer is rule-based with no LLM ('our non-LLM PRISM-DAG', p.9), which makes PRISM-Physics the nearest precedent for deterministic checks of intermediate steps. 'Symbolic formula matching' does not say that to a reader who knows symbolic checkers that fall back on LLMs. The Table A cell 'expert annotations' also hides that these are per-solution scores on 70 solutions from two annotators, and that the LLM baseline was outcome-only."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "Main text: '... with an LLM judge, rule-based formula matching, and official marking schemes applied by an LLM judge, respectively.' Table A: instances 'static (PhD qualifying-exam problems)'; scored 'steps, by rule-based formula matching'; checked 'Kendall tau-b 0.346 with two experts' scores of 70 solutions (an outcome-only LLM judge: 0.294)'.",
+ "facts_to_cite": [
+  "solutions are represented as DAGs of formulas encoding causal dependencies (p.1)",
+  "a fully rule-based method for symbolic formula equivalence matching, without heuristic judgments (p.1)",
+  "'our non-LLM PRISM-DAG' (p.9)",
+  "problems from Major American Universities Ph.D. Qualifying Questions and Solutions (p.19)",
+  "70 problems, 10 per domain, DeepSeek-V3 solutions, two experts each, a third adjudicating (p.9)",
+  "Kendall tau-b 0.346 (PRISM-DAG), 0.294 (LLM-as-judge), 0.213 (PSAS-S) (Table 2, p.9)",
+  "the LLM-as-judge baseline is outcome-based with binary scores (p.9)"
+ ],
+ "overlap_with_engtrace": "Shares: gold intermediate steps; step-level scoring by a non-LLM checker against those steps (the closest analogue of EngTrace's milestone check); partial credit; evaluator agreement measured against experts. Lacks: generated instances (a static book); engineering; values computed by code (its references are LLM-converted textbook solutions); an LLM fallback for what rules cannot settle (textual answers are excluded, p.19, p.32); step-level human labels (two experts' per-solution scores on 70 solutions). The positioning claim holds: it has deterministic step checks and some expert validation, but static physics problems and solution-level validation. The text should credit it as the closest precedent for rule-based step checks rather than leave 'symbolic' to imply it.",
+ "confidence": "high",
+ "notes": "(1) The framing says 'competition-level physics' (p.1-2) but the source is a book of PhD qualifying-exam problems (p.19). (2) The benchmark's size is not in the text. (3) The equivalence check samples random values (p.16), so it is rule-based rather than strictly deterministic unless seeded; the authors themselves call the core scorer deterministic (p.32). (4) Known failure modes of the matcher: context-dependent equivalence, textual answers and LaTeX parsing gaps (p.32). (5) The human annotators are mostly co-authors (p.31)."
+}

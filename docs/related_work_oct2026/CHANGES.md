@@ -5,6 +5,9 @@ citations, and `NEW_PAPERS_AUDIT.md` covers the October search. Replacement sent
 citation keys. The keys are in `related_work_sources.bib` or `intro_methods_sources.bib`. Every claim they
 make about a cited paper is in `facts.py` and verified by `verify_facts.py`.
 
+The follow-up review of 2026-10-02 (`notes/followup_review.md`) read the 18 main-text papers the panel
+had not reviewed and made a final pass over the section. Its changes are folded into the entries below.
+
 ## 1. Related Work, paragraph by paragraph
 
 **Mathematics and coding** becomes **Reasoning benchmarks and what they score.**
@@ -15,7 +18,11 @@ make about a cited paper is in `facts.py` and verified by `verify_facts.py`.
 - **Physics:** the physics benchmarks move here. The May "symbolic" and "qualitative" labels were wrong
   for ABench-Physics and LLM-SRBench. "Confined to theoretical physics" fitted none of the six. PhysReason
   is now credited with step scoring. PRISM-Physics and HiPhO are added as step-level physics evaluations.
-  SciBench, which the July rebuttal used, is added.
+  PRISM-Physics' step check is named as rule-based: it uses no LLM, which makes it the nearest physics
+  precedent for EngTrace's deterministic checks. SciBench, which the July rebuttal used, is added.
+- **Graders that fail:** the sentence on physicists re-grading 250 rejected answers (Ansari et al. 2026)
+  was cut, as the first [cut first] sentence. The paper is now cited for its finding that rule-based
+  graders reject correct answers in equivalent forms, in the paragraph on evaluators.
 - **Heesch et al.** leaves the transfer sentence, because the paper never tests transfer from math or
   code. It is cited in the engineering paragraph for what it is.
 - **LLM-SRBench** and **NEWTON** leave the main text. LLM-SRBench is dropped and NEWTON moves to the
@@ -25,23 +32,30 @@ make about a cited paper is in `facts.py` and verified by `verify_facts.py`.
 EngTrace's mechanism and cited only GSM-Symbolic and FinChain for them.
 - **What the paragraph covers:** the template and perturbation literature; the evidence on saturation
   (Ott et al.; Akhtar et al. 2026) and contamination (Deng et al.; GSM1k); the critiques (Długosz et al.
-  2026; Mondorf et al. 2026); paraphrase sensitivity (Lunardi et al. 2025).
+  2026, who re-analyse GSM-Symbolic only; Mondorf et al. 2026); paraphrase sensitivity on multiple-choice
+  benchmarks (Lunardi et al. 2025). Variants test memorisation of the original instance or, for
+  MATH-Perturb's hard perturbations, of its solution method.
 - **Precedents that already pair generation with gold solutions:** HARDMath, FinChain, SymPyBench,
   AtmosSci-Bench and Sci-ρ.
-- **What the text no longer claims:** that templates counter saturation. Akhtar et al. find that
-  safeguards such as private test sets have limited effect, and EngTrace's own scores already run high.
+- **What the text no longer claims:** that templates counter saturation. Akhtar et al. find that neither
+  private test sets (their H1) nor templating (H6: 14 templated against 46 other benchmarks, p = 0.10)
+  measurably slows saturation, and EngTrace's own scores already run high.
 
 **Engineering benchmarks** is rewritten around what each benchmark scores.
 - **Removed:** the "factual recall via multiple choice" sentence, which mis-cited BIG-Bench and
   mis-described MMLU and SuperGPQA.
 - **Single-branch list:** it names each benchmark with its correct first author: Zhou et al. for
   ElecBench, Wu et al. for APBench, Skelic et al. for CIRCUIT. It adds ControlBench, ThermoQA,
-  TPS-CalcBench and ORQA. The industrial branch had no reference before.
+  TPS-CalcBench, ORQA and OPT-Engine. The industrial branch had no reference before. ORQA is multiple
+  choice on formulating optimisation models; OPT-Engine generates inventory, production and other
+  operations-research problems with verified optimal solutions, the closer match to that branch.
 - **Multi-branch benchmarks:** EngiBench is described accurately. Two LLM evaluators score most problems,
   and rubrics apply only to the open-ended level. ERI is added.
 - **Reasoning and generation:** the paragraph credits the benchmarks that look past the answer:
-  TransportBench, ControlBench, ElecBench, TPS-CalcBench, EngVQA and ThermoQA. It also credits the two
-  that generate instances, CIRCUIT and the power-systems agent benchmark.
+  TransportBench, ControlBench, ElecBench, TPS-CalcBench, EngVQA and ThermoQA. Its experts "examined"
+  the reasoning in TransportBench and ControlBench: ControlBench's judged each answer right or wrong and
+  sorted the failures into seven error types, so "graded" said too much. It also credits the three that
+  generate instances: CIRCUIT, OPT-Engine and the power-systems agent benchmark.
 - **The closing sentence:** "existing benchmarks remain limited to outcome matching" becomes a hedged
   claim about the combination. The old claim was contradicted by seven of the papers the May text itself
   cited.
@@ -50,20 +64,26 @@ EngTrace's mechanism and cited only GSM-Symbolic and FinChain for them.
 (`docs/NEXT_CYCLE_REVIEW.md` §4.2) asks for this paragraph.
 - **Process supervision:** process against outcome supervision (Uesato et al.; Lightman et al.); PRMs and
   their benchmarks, which are mathematical; the failure of math-trained PRMs elsewhere (VersaPRM); and the
-  nearest work outside mathematics (PRIME, ChemCoTBench-V2).
-- **Judge validity:** self- and family preference, correlated errors, judges near chance on hard
-  objective items, and judges needing references.
-- **Rule-based checkers:** they have their own failure mode.
+  nearest work outside mathematics (PRIME, whose problems are college-level STEM, 18% of them engineering by
+  its Figure 3, and ChemCoTBench-V2).
+- **Judge validity:** self- and family preference, correlated errors, many judges near chance on hard
+  objective items (reasoning models do better on JudgeBench), and judges needing correct references.
+- **Rule-based checkers:** they have their own failure mode (Huang et al. 2026; Ansari et al. 2026).
 - **PoLL:** it is cited for panels of judges, not in support of the single residual judge. PoLL argues
   against single judges.
 
 **New closing paragraph: Positioning.** It states the combination EngTrace adds, crediting FinChain and
-GSM-Symbolic for the mechanism. It makes no "first" claim.
+GSM-Symbolic for the mechanism. It makes no "first" claim. It says the arithmetic check recomputes each
+claim (it checks the model's own numbers, not the gold trace), and that the judge decides only what the
+deterministic checks leave open, which covers the step router as well as the residual milestone judge.
 
 **New appendix.**
 - **Table A:** compares EngTrace with the fifteen closest benchmarks. Every cell is checked against the
-  paper.
-- **Further related work:** cites 32 more papers from the search, grouped by topic.
+  paper. The follow-up review corrected two rows: AtmosSci-Bench's generated instances are multiple
+  choice, and its LLM grader was checked against human graders (92.79% and 93.02% agreement); PRISM-Physics'
+  validation is two experts' scores of 70 solutions, against an outcome-only LLM judge.
+- **Further related work:** cites 32 more papers, 31 of them from the search (NEWTON is the other),
+  grouped by topic.
 
 ## 2. The Introduction: sentences that cite the same works
 
@@ -88,11 +108,16 @@ ThermoQA, TPS-CalcBench and others contradict:
 
 **L97-105**, where "Glue" cited SuperGLUE and "BBH" cited BIG-Bench Extra Hard, and templates were said to
 counter saturation:
-> First, static benchmarks saturate, as GLUE \citep{wang2018glue} and BIG-Bench Hard \citep{suzgun2022bbh}
-> did within a few years \citep{wang2019superglue,kazemi2025bbeh,ott2022saturation,akhtar2026benchmarksaturation},
-> and their items leak into training data \citep{deng2024contamination}; EngTrace draws its instances from
-> symbolic templates with a private seed, so no evaluated item was public when the models ran, and it tests
-> sensitivity to wording with expert-checked paraphrases.
+> First, static benchmarks saturate \citep{ott2022saturation,akhtar2026benchmarksaturation}, as GLUE
+> \citep{wang2018glue} and BIG-Bench Hard \citep{suzgun2022bbh} did within a few years
+> \citep{wang2019superglue,kazemi2025bbeh}, and their items leak into training data \citep{deng2024contamination};
+> EngTrace draws its instances from symbolic templates with a private seed, so no evaluated item was public
+> when the models ran, and it tests sensitivity to wording with expert-checked paraphrases.
+
+Akhtar et al. are cited for saturation in general, not for the two examples. By their index, which
+measures lost discrimination among the strongest models, BIG-Bench Hard is among the benchmarks that
+"remain unsaturated despite prolonged exposure" (p.6). BBEH, cited for BBH, reports frontier scores above
+90%. The earlier version of this sentence put the four citations in one bracket after both examples.
 
 **L105-111**, where MMLU was "broad factual recall" and MATH "abstract logic":
 > Second, most benchmarks evaluate skills in disciplinary silos: general benchmarks such as MMLU
@@ -162,9 +187,21 @@ rubrics for its open-ended level; FEABench's main metrics are intermediate):
 
 ## 6. Things that could not be confirmed
 
-- **Venues from one source:** EMNLP 2026 for Huang et al. and Długosz et al. (each from an arXiv comment)
-  and Computers & Industrial Engineering for ERI. Each is flagged in `related_work_sources.bib`. Confirm
-  them before submission.
+- **Venues from one source:** EMNLP 2026 for Huang et al. and Długosz et al. still rests on each paper's
+  arXiv comment, and neither has a proceedings record yet. OpenReview is consistent with both: it shows
+  Długosz et al. as an ARR May 2026 submission and Huang et al. as withdrawn from ICLR 2026
+  (`notes/venue_check.json`). Both stay flagged in `related_work_sources.bib`; confirm them before
+  submission.
+- **ERI's venue is confirmed.** Its arXiv page links DOI 10.1016/j.cie.2026.112333. Crossref gives that
+  DOI as Computers & Industrial Engineering, volume 221, and Semantic Scholar agrees.
+- **Venues the papers do not state, checked in October** (`check_venues.py`):
+  - ACL 2026 for PRIME (ACL Anthology 2026.acl-long.683);
+  - ICLR 2026 for PRISM-Physics and ICML 2026 for HiPhO (OpenReview);
+  - ICML 2025 for MATH-Perturb (OpenReview).
+- **Two papers the catalogue listed as preprints have since appeared.** The bibliography now cites
+  SymPyBench at the EACL 2026 Industry Track (2026.eacl-industry.8) and AtmosSci-Bench at the NeurIPS 2025
+  Datasets and Benchmarks Track (OpenReview), through `make_bib.py`'s `VENUE_CONFIRMED`.
+- **MATH() and ControlBench** have no venue in any index, and stay preprints.
 - **LSR-Ben's venue:** its PDF header says "Published as a conference paper at ICLR 2027", which cannot be
   true in October 2026. It is cited as a preprint.
 - **Abstract-only papers:** PE Civil Bench and PSE-Bench are on ScienceDirect, which blocks automated

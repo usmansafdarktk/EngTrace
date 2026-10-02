@@ -1,0 +1,32 @@
+{
+ "key": "huang2026verifierrobustness",
+ "reviewer": "r1",
+ "read": "partial: abstract, sections 1-4 in full (p.1-5), the outlines of sections 5-6 (reward hacking and probing) and appendix B (annotation validation); the rest skimmed",
+ "title_confirmed": true,
+ "venue_now": "EMNLP 2026 (main conference), per the arXiv comment on 2505.22203v3 of 27 Aug 2026 (notes/arxiv_abs_check.json); no proceedings record yet, so the venue rests on the authors' comment. After the review: OpenReview shows only an ICLR 2026 withdrawn submission; Semantic Scholar gives no venue. EMNLP 2026 still rests on the arXiv comment (check_venues.py, notes/venue_check.json).",
+ "what_it_is": "A study of answer verifiers for RL with verifiable rewards in mathematics (p.1). On 8,000 responses from four math RL datasets, labelled by GPT-4o and checked against people on 1,000 (Cohen's kappa 0.93, F1 0.98, p.3), three rule-based verifiers reach precision above 99% but recall of about 86%, and their false negatives grow as the generating model gets stronger (p.1, p.3). Model-based verifiers recover many of these (recall 84% to 92% on Skywork-OR1, p.1). A hybrid that runs the rule-based verifier first and asks a model only about the responses the rules reject adds about 3 points of recall while keeping precision above 98% (p.4). In RL training, model-based verifiers, especially fine-tuned ones, can be hacked: the policy learns patterns (single words such as 'True', gibberish, prompt injections) that the verifier accepts, and scaling the verifier does not fix it (p.1-2, p.5-6).",
+ "domain": "mathematical reasoning; similar phenomena reported for general science (p.2)",
+ "size": "8,000 labelled responses from four datasets; three rule-based and several model-based verifiers; GRPO training runs (p.3-6)",
+ "source_of_items": "responses sampled from several models on existing math RL datasets (p.3)",
+ "instances": "static",
+ "has_gold_traces": "n/a (final answers)",
+ "evaluation": "verifier precision and recall against labels; RL outcomes against oracle rewards; adversarial probing (p.3-6)",
+ "human_validation": "GPT-4o's labels checked against human judgments on 1,000 examples: Cohen's kappa 0.93, F1 0.98 (p.3)",
+ "contamination_measures": "n/a",
+ "engtrace_use": {
+  "sentence": "Rule-based checkers avoid these biases but can reject correct answers given in unexpected formats [@huang2026verifierrobustness].",
+  "verdict": "accurate",
+  "explanation": "The paper finds that rule-based verifiers 'fail to recognize equivalent answers in different formats, leading to substantial false negatives' (p.1), with precision above 99% (p.3). The sentence leaves out the paper's second result, which bears on EngTrace's design: the rule-first hybrid that sends only rule-rejected responses to a model is the pattern EngTrace's residual judge follows, and it improves recall at little cost to precision in static evaluation (p.4)."
+ },
+ "recommendation": "keep as is; also cite in the appendix's sentence on escalation, for the rule-first hybrid",
+ "suggested_wording": "Appendix: '@jung2025trustescalate escalate only uncertain items to stronger judges, and @huang2026verifierrobustness ask a model only about answers a rule-based verifier rejects, the pattern EngTrace's residual judge follows.'",
+ "facts_to_cite": [
+  "rule-based verifiers fail to recognise equivalent answers in different formats; average recall about 86% (p.1)",
+  "rule-based verifiers have near-perfect precision, above 99% (p.3)",
+  "hybrid: the rule-based verifier first, the model only when the rules flag a response as incorrect; about 3 points more recall at more than 98% precision (p.4)",
+  "model-based verifiers are susceptible to reward hacking in RL, particularly after fine-tuning (p.1)"
+ ],
+ "overlap_with_engtrace": "Implications for EngTrace. (1) The deterministic answer check is exposed to the false negatives this paper measures; EngTrace measured them directly, against experts, rather than assuming them away (answer-check agreement 0.982 on 281 non-partial traces after D-137, evaluator_pilot_17092026/RESULTS_X1.md via the state brief, section 3). (2) The residual judge is this paper's hybrid design: the deterministic milestone check first, MiMo only on the milestones it missed (full_run_28092026/judge.py). The paper's evidence favours it in static evaluation. (3) Its hacking result concerns a policy trained against the verifier; EngTrace's models are not optimised against its judge, so the result does not transfer directly, but its probing shows model verifiers can accept assertions of correctness, which is a reason the judge's precision against experts (E5 milestone precision 0.930, recall 0.989, RESULTS_X1) belongs in the paper. No change to the positioning claim.",
+ "confidence": "high",
+ "notes": "(1) The venue rests on the arXiv comment alone. (2) The paper's verifiers judge final answers in mathematics; EngTrace's judge decides intermediate milestones against expected values, a narrower question."
+}

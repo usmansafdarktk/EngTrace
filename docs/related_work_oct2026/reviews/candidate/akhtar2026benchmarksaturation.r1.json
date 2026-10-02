@@ -1,0 +1,34 @@
+{
+ "key": "akhtar2026benchmarksaturation",
+ "reviewer": "r1",
+ "read": "partial: abstract, sections 1-5 in full (p.1-8), the hypothesis definitions in appendix B; the remaining appendices skimmed",
+ "title_confirmed": true,
+ "venue_now": "ICML 2026, per the arXiv comment 'Published at ICML 2026 (Forty-Third International Conference on Machine Learning)' on 2602.16763v4 (notes/arxiv_abs_check.json)",
+ "what_it_is": "A study of saturation in 60 text-based LLM benchmarks (p.2, p.5). Saturation is defined as the loss of reliable discriminative power among state-of-the-art models and measured by an uncertainty-aware index from leaderboard data (p.2). Benchmarks are annotated on accessibility, language, curation, format, popularity and templating, and six hypotheses are tested, separating age-balanced comparisons (H1, H5, H6) from age-confounded ones (H2-H4) (p.5). Nearly half the benchmarks are saturated; age and test-set scale are the most consistent predictors (p.5-7).",
+ "domain": "meta-analysis of LLM benchmarks",
+ "size": "60 benchmarks: 56 public and 4 private; 14 templated and 46 non-templated (p.5)",
+ "source_of_items": "n/a (leaderboard data for existing benchmarks)",
+ "instances": "n/a",
+ "has_gold_traces": "n/a",
+ "evaluation": "a saturation index from leaderboard scores with uncertainty (p.2)",
+ "human_validation": "n/a",
+ "contamination_measures": "n/a; the paper treats private test sets (H1) and templating (H6) as candidate safeguards",
+ "engtrace_use": {
+   "sentence": "Static test sets saturate [@ott2022saturation; @akhtar2026benchmarksaturation] and leak into training data [@deng2024contamination; @zhang2024gsm1k], and safeguards such as private test sets have had limited effect on saturation [@akhtar2026benchmarksaturation].",
+   "verdict": "accurate",
+   "explanation": "The paper says 'commonly assumed safeguards, such as private test sets or closed-ended formats, have limited impact on saturation' (p.2) and rejects H1: 'Hiding test data does not appear to prevent saturation once benchmarks are widely adopted' (p.6). The private group is small (4 of 60 benchmarks, p.5), which the sentence need not say. H6, the question the earlier session could not settle, is answered on p.6: 'templated benchmarks (N = 14) do not differ significantly from non-templated ones (N = 46) in saturation behaviour (p = 0.10)'. The hypothesis was that templated benchmarks saturate faster (p.5); the data show no significant difference either way."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "Static test sets saturate [...] and leak into training data [...], and neither private test sets nor templated items have measurably slowed saturation [@akhtar2026benchmarksaturation].",
+ "facts_to_cite": [
+   "60 text-based LLM benchmarks: 56 public and 4 private, 14 templated and 46 non-templated (p.5)",
+   "commonly assumed safeguards, such as private test sets or closed-ended formats, have limited impact on saturation (p.2)",
+   "H1 rejected: hiding test data does not appear to prevent saturation once benchmarks are widely adopted (p.6)",
+   "templated benchmarks (N = 14) do not differ significantly from non-templated ones (N = 46) in saturation behaviour (p = 0.10) (p.6)",
+   "benchmark age and test-set scale are the most consistent predictors (p.7)",
+   "expert-curated benchmarks such as ARC-AGI and BIG-Bench Hard remain unsaturated despite prolonged exposure (p.6)"
+ ],
+ "overlap_with_engtrace": "Directly constrains how EngTrace may talk about saturation. Neither of EngTrace's design choices is a saturation safeguard on this evidence: templating made no significant difference (H6) and private test sets had limited effect (H1). EngTrace may say that its private seed means no evaluated item was public when the models ran (a contamination claim), and that step-level checks remain informative when answer scores are high; it should not say that templates or the private seed counter saturation. CHANGES.md already takes that line.",
+ "confidence": "high",
+ "notes": "(1) The paper lists BIG-Bench Hard among expert-curated benchmarks that 'remain unsaturated despite prolonged exposure' (p.6). The Introduction replacement in CHANGES.md cites this paper in the parenthesis for 'static benchmarks saturate, as GLUE and BIG-Bench Hard did within a few years', which a reader of this paper would find contradicted; the citation should be separated from the BBH example. (2) Saturation here is loss of discrimination among top models (p.2), not absolute accuracy."
+}
