@@ -6520,10 +6520,54 @@ main-run archive only (D-168's cosmetic defect); the committed review regenerate
   `--readings`, since re-running the readings against the corrected code would overwrite the record with
   nothing; `validate_scorer.py`'s sentence names D-169 and `SCORER_VALIDATION.md` is regenerated.
 
+## D-171 — The remaining incorrect verdicts measured: two Advanced chemical templates under-specify the answer, 17 templates require the digits; what it means for Q2, Q3 and the experts' reading
+
+**Date:** 2026-10-02 · **Status:** MEASURED · OPEN (what the paper states, and whether a chemical expert reads the two templates, is the owner's call) · **Evidence:** `full_run_28092026/residual_incorrect.py`, `RESIDUAL_INCORRECT.md`; `docs/PILOT_AND_FULL_RUN_ASSESSMENT.md` section 5
+
+**Why.** D-168 read twelve of the top five models' "incorrect" verdicts and found six to be right answers in another
+form; D-169 fixed those forms. Nothing had measured what the verdicts that remain look like, and the top models'
+wrong-answer subsets (26 to 50 traces) carry Q3's process-score analyses for those models.
+
+**What was measured, all free.** For every answered, usable trace the store labels `incorrect` (1,558 across the
+roster at `2950875`), the closest approach of any number on the Answer segment to any numeric target under the check's
+own unit scales, bucketed by relative distance; symbolic and word-only items counted apart. Roster-wide: 120 within
+0.2%, 406 at 0.2% to 1%, 336 at 1% to 5%, 228 at 5% to 20%, 365 beyond 20%, 90 symbolic, 11 word-only, 2 with no
+number. Every one of the 120 within the tolerance sits on one of the 17 templates whose question prescribes the
+rounding (`exact`), where a last-digit miss scores 0 by the experts' rule; the (Q, R) question, for one, prescribes
+every intermediate rounding, and the top models compute at full precision and land 1 to 4 units off. Those are
+legitimate zeros and a finding about the models. The top five's 171: 38 symbolic (34 on `ber_estimation_mary`,
+D-168's reading S), 27 within 0.2% (all exact-digit items), 31 at 0.2% to 1%, 40 at 1% to 5%, 33 beyond 5%, 2
+word-only; by template `work_isothermal_virial` 38, `ber_estimation_mary` 34, `adiabatic_flame_temperature` 19,
+`qr_policy_one_iteration` 13.
+
+**Two Advanced chemical templates do not pin the answer to the check's tolerance.** `work_isothermal_virial` asks for
+the work to compress one mole isothermally and reversibly "based on the virial equation of state truncated to two
+terms" and names neither the closed-system form (W = -∫P dV with Z = 1 + B/V, the gold's) nor the flow form
+(W = ∫V dP with Z = 1 + BP/RT, which is RT ln(P2/P1) + B(P2 - P1)); computing the flow-work value from the gold's own
+stated B and ideal-gas work and matching it with `answer.match`, **53 of its 97 incorrect traces state the flow work**
+(0 the ideal-gas work, 44 neither); three top models give 11,867 J/mol to five figures where the gold says 11,590.
+`adiabatic_flame_temperature` gives no heat-capacity data and asks for an estimate; the gold iterates a polynomial Cp
+with uncited coefficients; 48 of its 89 wrong answers lie at 0.2% to 5%. Both were certified by three chemical experts
+(round 2 and round 4); the wording was not the objection either time. Both are Advanced: the roster loses 237 of 330
+points on them, and without them the top five's Easy-to-Advanced gap is +0.029 to +0.047 instead of +0.055 to
++0.073, GLM-5.3's +0.087 instead of +0.134, the four significant models' +0.105 to +0.157 instead of +0.151 to
++0.199 (descriptive, no interval).
+
+**What changes and what does not.** No score, store or result changes: the pool is frozen (D-114), inference is done,
+and the sensitivity table already carries the symbolic templates. Proposed for the paper: the two templates as a
+stated limitation with a Q2 sensitivity row (A2 computes its interval); the 17 exact-digit templates named with the
+rule; the top models' wrong-answer subset sizes stated beside every Q3 row that uses them, or those rows restricted to
+models with more than 100 wrong answers. For the experts: one chemical expert reads the two questions and golds, three
+traces each, in the same request as B1 to B3 (next steps B4). The per-template near-miss table names the next
+templates to look at (`vdw_solve_for_volume`, `pfr_volume_changing_rate`, `best_hydraulic_rectangular_section`,
+`manning_rectangular_discharge`, `annulus_flowrate`, `pitzer_correlation_z`). The measurement judges no verdict; the
+reading of the three templates above is this session's and is recorded as such.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
+| D-171 | What the paper states about the two under-specified chemical templates and the 17 exact-digit templates (a limitation and a Q2 sensitivity row, as proposed), and whether one chemical expert reads `work_isothermal_virial` and `adiabatic_flame_temperature` with B1 (next steps B4) | the paper's sections 5 and 6; the experts' request |
 | D-170 | The analyses of `docs/EVALUATION_NEXT_STEPS.md` section A (free) in the order given; the expert request of section B, batched; a decision on each paid condition of section C after its dry run | the paper's results section; the experts' availability; the owner's approval per condition |
 | D-169 | ~~Upload the rewritten `full_run_scores_2026-10-02.zip` as a new version of the private Kaggle scores dataset (manual mode)~~ **Done 2026-10-02: new version of `ayeshaiq/engtrace-full-run-scores`, downloaded back, 87 of 88 members identical and the log a prefix of the live one (D-169, Backups).** In the paper: the `array` type and the two-quantity scalar lines are listed with D-145's multipart templates; the one wrong credit is a stated limit | the paper's scoring statements |
 | D-168 | ~~Adopt readings P and A of the answer check (`ANSWER_FORM_AUDIT.md`), then `score --replace` on main, paraphrase and repeats, `judge --score`, `router --score`, `analyze`, and a DECISIONS entry; or report both as sensitivities~~ **Adopted 2026-10-02 with reading N, after every changed verdict was read (D-169); re-scored and regenerated.** ~~Decide how `array` items and the two-quantity scalar lines are scored, or list those templates with D-145's~~ **Listed with D-145's (D-169).** ~~Fix `trace_review.py`'s archive glob~~ **Fixed (D-169)** | — |

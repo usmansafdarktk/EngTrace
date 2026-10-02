@@ -35,7 +35,8 @@ bootstrap intervals for each model's branch and level means (30 templates per br
 level); within a model, the ten pairwise branch differences with a sign-flip test and Holm; the smallest
 branch difference 30 templates detect at 80% power, from the within-branch template SD. Report the
 intervals in the branch table; make no ordering claim that does not survive the test. Domain means stay
-descriptive (10 templates each). *Where:* "By branch and level" gains interval columns; an appendix table
+descriptive (10 templates each). Also the Q2 gap without `work_isothermal_virial` and
+`adiabatic_flame_temperature`, with its interval (D-171; the descriptive values are in `RESIDUAL_INCORRECT.md`). *Where:* "By branch and level" gains interval columns; an appendix table
 of branch pairs. *Effort:* half a day.
 
 **A3. Leave-one-judge-out on the published Tribunal, with controls.** *Answers:* the judge-exclusion
@@ -128,6 +129,16 @@ pilot (it credited none of 88 fabricated values) but not on these models' traces
 milestones, half REACHED and half MISSING, shown with the trace to an expert of the branch; report the
 judge's precision on each. *Effort:* an hour per expert; the sampling script two hours.
 
+**B4. The two under-specified chemical templates, and the near-miss list** (*added 2026-10-02, D-171*). *Answers:*
+what the top models' remaining wrong answers are. `residual_incorrect.py` measured every remaining incorrect verdict's
+distance from the gold: 53 of the 97 wrong answers on `work_isothermal_virial` state the flow-work reading of a
+question that names neither closed-system nor flow work, and 48 of the 89 on `adiabatic_flame_temperature` lie within
+5% of a gold whose heat-capacity data the question does not give. *Method:* one chemical expert reads each question and
+gold with three traces, and says which reading the wording supports and whether the estimate can be held to 0.2%
+without the data; a glance at the six next templates on `RESIDUAL_INCORRECT.md`'s per-template table. *Outcome:* a
+stated limitation and a Q2 sensitivity row (the pool is frozen; no re-score unless the owner decides). *Effort:* an
+hour of one expert; the reading sheet half an hour. Goes in the same request as B1 to B3.
+
 ## C. Needs spend, and a decision each
 
 **C1. A reasoning-on run for GPT-5.4 mini and Gemini 3.1 Flash-Lite.** *Answers:* the four-models-without-
@@ -171,6 +182,7 @@ the subsample. *Decision:* the supervisor's; a third "future work" answer should
 
 A8 and A9 first (hours; they change sentences in the paper); then A1 and A2 (the reasoning comparisons and
 the branch intervals, which decide what the results section may say); then A3 and A4 together (the pilot's
-votes); A6, A7, A10, A11 as time allows. Send B1 to B3 to the experts in one request as soon as the
-sampling scripts exist, since their time is the long pole. C1 to C4 each need a dry-run estimate and the
+votes); A6, A7, A10, A11 as time allows. Send B1 to B4 to the experts in one request as soon as the
+sampling scripts exist, since their time is the long pole; D-171 makes B1 and B4 the most urgent items here, so
+their scripts come before A1. C1 to C4 each need a dry-run estimate and the
 owner's approval; C1 is the one that changes how the roster is read, C3 and C4 answer standing objections.

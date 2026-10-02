@@ -123,6 +123,10 @@ it then stood; it is kept as that record and not regenerated (the script refuses
 `ANSWER_FORM_FIX.md` is the record of the change itself. One wrong credit the change introduces is recorded there
 and pinned in `answer.py`'s self-test as a known limit.
 
+`residual_incorrect.py` measures how far the verdicts that remain incorrect after D-169 sit from the gold, per model
+and per template, and what the wrong answers on `work_isothermal_virial` state (`RESIDUAL_INCORRECT.md`, D-171; the
+reading is in `docs/PILOT_AND_FULL_RUN_ASSESSMENT.md`). `--sample N` prints answer segments for reading and writes nothing.
+
 **For the paper:** `RESULTS_PAPER_NOTES.md` says which figures to report, with their sources, what they
 support and what they do not (D-170); `PARAPHRASE_PAPER_NOTES.md` does the same for Q5. The analyses still to
 do, in order, are in `docs/EVALUATION_NEXT_STEPS.md`.
