@@ -27,7 +27,7 @@ judges, all connected) on the 154 traces both judged, 3 changed, all slightly do
 GPT-5 and Gemini inflate their own traces when judging them. Under E0, GPT-5's traces
 are judged partly by GPT-5 and score 0.474; judged entirely by models from other
 families they score 0.470. Gemini's go 0.454 to 0.452. **No aggregate self-preference
-is visible.** This is not yet X2 — a proper test is a per-judge, per-family model
+is visible.** *(X2 was measured on 2026-10-03: RESULTS_LOJO.md, D-174; no judge favours its own family, and all are lenient the same way.)* This is not yet X2 — a proper test is a per-judge, per-family model
 against the expert labels — but it is the first direct evidence, and it points the
 same way: removing the overlap does not change the scores.
 

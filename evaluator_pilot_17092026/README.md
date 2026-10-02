@@ -30,6 +30,8 @@ branches.
 | X5 · the judges on the planted defects: GPT-5, Opus 4.5, MiMo | done (Finding 8, D-103) | $5.21 |
 | router · batched smoke checks, planted defects and the 300 labelled traces | done (RESULTS_X1, D-113) | $2.30 |
 | summary · [PILOT_SUMMARY.md](PILOT_SUMMARY.md) and its PDF | done; corrected 2026-09-27 (D-111) | — |
+| LOJO and X2 · leave-one-judge-out on E0-3J replayed offline with controls; each judge's bias per family | done 2026-10-03 ([RESULTS_LOJO](RESULTS_LOJO.md), D-174) | $0.00 |
+| attribution · each component's flags against the experts' step error types | done 2026-10-03 ([RESULTS_ATTRIBUTION](RESULTS_ATTRIBUTION.md), D-176) | $0.00 |
 
 **Read these first:** [PILOT_SUMMARY.md](PILOT_SUMMARY.md) (the whole pilot in twelve
 pages, also as [the PDF](EngTrace-evaluator-pilot-summary.pdf)), [FINDINGS.md](FINDINGS.md)

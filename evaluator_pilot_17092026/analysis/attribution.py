@@ -101,7 +101,10 @@ def main() -> int:
         c = cat.lower()
         return 'Calculation Error' if 'calculation' in c else 'Conceptual Error' if 'conceptual' in c else 'Other' if 'error' in c or 'other' in c else None
 
-    res = {'steps_labelled': len(per_step), 'traces_skipped': skipped, 'scopes': {}}
+    res = {'steps_labelled': len(per_step), 'traces_skipped': skipped,
+           'steps_sent_to_judge': sum(1 for r in per_step if r[5]),
+           'steps_with_judge_verdict': sum(1 for r in per_step if r[5] and r[4] is not None),
+           'traces_with_router_reply': len({r[0] for r in per_step if r[5]}), 'scopes': {}}
     for scope, pick in (('all', lambda c: True), ('correct_answer', lambda c: c in right)):
         rows_ = [r for r in per_step if pick(r[0])]
         base = collections.Counter(r[2] for r in rows_)
@@ -166,7 +169,10 @@ def render(res) -> str:
          f"expert-labelled traces (version 2 with the adjudication); {res['steps_labelled']} labelled steps in the "
          f"{300 - res['traces_skipped']} traces whose step split matches the labels' ({res['traces_skipped']} left out). "
          'A flag\'s precision by type is the share of the component\'s flags that land on an expert-incorrect step of that '
-         'type; its recall by type is the share of such steps it flags (D-176; next steps A6).', '']
+         'type; its recall by type is the share of such steps it flags (D-176; next steps A6). The router\'s judge saw '
+         f"{res['steps_sent_to_judge']} of the labelled steps (rule C: every step the digit rule does not flag, in the "
+         f"{res['traces_with_router_reply']} traces whose batched call returned) and ruled on {res['steps_with_judge_verdict']} of them; "
+         'a step the digit rule flags is not sent, and a step the reply omits counts as not flagged.', '']
     for scope, title in (('all', 'All traces'), ('correct_answer', 'Inside correct-answer traces (the hard case)')):
         s = res['scopes'][scope]
         b = s['steps_by_expert_type']

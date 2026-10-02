@@ -34,6 +34,13 @@ that fair:
 
 Per model, the unusable rate is reported beside the score, and an appendix gives the score with unusable
 traces excluded.
+*Note, 2026-10-03 (D-173 to D-178):* exploratory additions, each dated and labelled where it appears in RESULTS.md and
+none a change to the tests above: the detectable paired difference beside every paired comparison; coverage compared
+across models (paired bootstrap, sign-flip and Wilcoxon over the 55 pairs, Holm; tau against the answer order); branch
+and level means with template intervals and the branch pairs within a model under Welch with Holm; Q2 under a third
+variation, without `work_isothermal_virial` and `adiabatic_flame_temperature` (D-171); coverage against verbosity and
+against the verdict; the distribution of the per-template SD. The decoding table, the threshold appendix, the shortcut
+audit and the pilot's leave-one-judge-out and attribution analyses are separate files (D-173 to D-177).
 *Note, 2026-10-02 (D-169, D-170):* the answer check that scores the store is the one corrected after the run was
 read: LaTeX numbers (D-137), no credit from a stray digit (D-138), verdict words by family (D-139), inclusive
 last-digit windows (D-147), and pi-fractions, a scalar gold line's second unit and a pi-fraction of two

@@ -82,6 +82,9 @@ appears, because the plan was fixed before the data and these were not in it:
     adopted in D-146); the smallest branch difference 30 templates detect from the pooled within-branch SD. Q2
     gains a third variation, without the two Advanced chemical templates whose question does not pin the answer
     to the check's tolerance (D-171).
+  - 2026-10-03, D-178 (the review of the additions above): Q1 adds the distribution of the per-template SD of the
+    score across a template's 15 instances (quartiles over the 150 templates, the templates with no instance
+    variance, the three with most), and results/per_template.csv carries every template's SD (`answer_score_sd`).
 """
 from __future__ import annotations
 
@@ -335,11 +338,21 @@ def q1(runs, templates, keys):
     for i, k in enumerate(keys):
         rows = list(runs[k].values())
         split = collections.Counter(verdict3(r) for r in rows)
-        within = [np.std(v, ddof=1) for v in per_template(rows, lambda r: r['score']).values() if len(v) > 1]
+        by_t_scores = per_template(rows, lambda r: r['score'])
+        sd_by_t = {t: float(np.std(v, ddof=1)) for t, v in by_t_scores.items() if len(v) > 1}
+        mean_by_t = {t: float(np.mean(v)) for t, v in by_t_scores.items()}
+        within = list(sd_by_t.values())
+        sds = np.array(within)
         capped = [r for r in rows if r['status'] == 'answered' and r.get('finish_reason') == 'length']
         odd = [r for r in rows if r['status'] == 'answered' and r.get('finish_reason') not in ('stop', 'length')]
         models.append({'model': k, 'score': float(S[i].mean()), 'ci': boot_mean(S[i], 100 + i),
                        'within_template_sd': float(np.mean(within)), 'between_template_sd': float(S[i].std(ddof=1)),
+                       'within_sd_quartiles': [float(np.percentile(sds, 25)), float(np.median(sds)), float(np.percentile(sds, 75))],
+                       'templates_no_instance_variance': int(np.sum(sds == 0)),
+                       'templates_no_variance_all_solved': sum(1 for t, sd in sd_by_t.items() if sd == 0 and mean_by_t[t] == 1.0),
+                       'templates_no_variance_none_solved': sum(1 for t, sd in sd_by_t.items() if sd == 0 and mean_by_t[t] == 0.0),
+                       'highest_variance_templates': [{'template': t, 'sd': sd} for t, sd in
+                                                      sorted(sd_by_t.items(), key=lambda kv: -kv[1])[:3]],
                        'fully_solved': float(F[i].mean()), 'fully_ci': boot_mean(F[i], 200 + i),
                        **{v: split[v] for v in ('correct', 'partial', 'incorrect', 'unusable')},
                        'empty': sum(r['status'] != 'answered' for r in rows),
@@ -984,6 +997,7 @@ def per_template_rows(runs, keys, levels, single) -> list[dict]:
             out.append({'template_id': t, 'branch': rs[0]['branch'], 'domain': rs[0]['domain'], 'level': levels[t],
                         'answer_type': rs[0]['answer_type'], 'single_path': int(single[t]), 'model': k, 'items': len(rs),
                         'answer_score': round(float(np.mean([r['score'] for r in rs])), 6),
+                        'answer_score_sd': round(float(np.std([r['score'] for r in rs], ddof=1)), 6) if len(rs) > 1 else '',
                         'fully_solved': round(float(np.mean([fully(r) for r in rs])), 6),
                         'correct': sum(verdict3(r) == 'correct' for r in rs), 'partial': sum(verdict3(r) == 'partial' for r in rs),
                         'incorrect': sum(verdict3(r) == 'incorrect' for r in rs), 'unusable': sum(r['unusable'] for r in rs),
@@ -1070,6 +1084,19 @@ def render(res) -> str:
                  f"{r['between_template_sd']:.3f} | {r['fully_solved']:.3f} | {ci(r['fully_ci'])} | "
                  f"{r['correct']} | {r['partial']} | {r['incorrect']} | {r['unusable']} ({r['empty']} + {r['unreadable']}) | "
                  f"{r['capped_scored']} |")
+    if all('within_sd_quartiles' in r for r in m1):
+        L += ['', '**Instance variance within a template** (*added 2026-10-03, D-178*). The SD-within column above is the mean '
+              'over templates of the SD of the score across a template\'s 15 instances; here its distribution: the quartiles over '
+              'the 150 templates, the templates with no instance variance at all (the same verdict on all 15 instances, split into '
+              'all solved and none solved), and the three templates with the largest instance variance. `results/per_template.csv` '
+              'carries every template\'s SD (`answer_score_sd`).', '',
+              '| model | per-template SD: lower quartile / median / upper quartile | templates with no instance variance (all solved / none solved) | highest instance variance |',
+              '|---|---|---|---|']
+        for r in sorted(m1, key=lambda r: -r['score']):
+            q = r['within_sd_quartiles']
+            L.append(f"| `{r['model']}` | {q[0]:.3f} / {q[1]:.3f} / {q[2]:.3f} | {r['templates_no_instance_variance']} "
+                     f"({r['templates_no_variance_all_solved']} / {r['templates_no_variance_none_solved']}) | "
+                     + '; '.join(f"`{x['template'].removeprefix('template_')}` {x['sd']:.2f}" for x in r['highest_variance_templates']) + ' |')
     odd = sum(r['odd_finish_scored'] for r in m1)
     L += ['', f'Of the 55 pairs, {sig} differ at a Holm-adjusted p below 0.05 on the answer score (sign-flip permutation '
           f'over the 150 per-template differences). The same template-level test on the fully-solved rate gives the '
@@ -1212,7 +1239,7 @@ def render(res) -> str:
               'fully solved traces with coverage below 0.5, and of answered wrong answers with coverage 1.0, template '
               'intervals. The second is what a process score adds on a wrong answer: a complete derivation to a wrong '
               'value.', '',
-              '| model | fully solved traces | with coverage < 0.5 | 95% CI | answered wrong answers | with coverage 1.0 | 95% CI |',
+              '| model | fully solved traces (items with milestones) | with coverage < 0.5 | 95% CI | answered wrong answers (items with milestones) | with coverage 1.0 | 95% CI |',
               '|---|---:|---:|---:|---:|---:|---:|']
         for r in qc['models']:
             L.append(f"| `{r['model']}` | {r['fully_solved_n']} | {f3(r['solved_low_coverage'])} | {ci(r['solved_low_coverage_ci'])} | "
@@ -1587,6 +1614,10 @@ def selftest() -> int:
     if abs(r1['models'][0]['between_template_sd'] - np.std([np.mean([rows[f"t{t:03d}-{n}"]["score"] for n in range(15)])
                                                             for t in range(150)], ddof=1)) > 1e-12:
         bad.append('between-template SD')
+    qs = r1['models'][0]['within_sd_quartiles']
+    if not (0 <= qs[0] <= qs[1] <= qs[2] <= 1) or len(r1['models'][0]['highest_variance_templates']) != 3 \
+            or r1['models'][0]['templates_no_instance_variance'] < r1['models'][0]['templates_no_variance_all_solved']:
+        bad.append(f"per-template SD distribution {qs}")
     # Q5: eleven models, three items per template; models 0-2 lose some solved items on the paraphrase
     main_, para_ = {}, {}
     for m in range(11):

@@ -44,6 +44,7 @@ import json
 import os
 import statistics
 import sys
+import zlib
 
 import numpy as np
 from scipy.optimize import linear_sum_assignment
@@ -219,6 +220,12 @@ class Trace:
 
 # ------------------------------------------------------------------ statistics
 
+def seed_of(*parts: str) -> int:
+    """A seed that is a function of its labels alone: Python's hash() is salted per process and would make the
+    intervals differ between runs."""
+    return zlib.crc32('|'.join(parts).encode('utf-8')) % (2 ** 31)
+
+
 def boot_mean(values_by_group: dict, seed: int, n=B):
     """Mean over all values with a cluster bootstrap over the groups (templates); and the trace bootstrap."""
     groups = [np.array(v, dtype=float) for v in values_by_group.values() if len(v)]
@@ -291,7 +298,7 @@ def main() -> int:
             change_by_t = collections.defaultdict(list)
             for k in ks:
                 change_by_t[e03[k]['template_id']].append((f_var[k] if f_var[k] is not None else f_full[k]) - f_full[k])
-            mean, ci_t, ci_tr = boot_mean(change_by_t, 11 + hash((m, name)) % 1000)
+            mean, ci_t, ci_tr = boot_mean(change_by_t, seed_of('lojo', m, name))
             moved = [k for k in ks if f_var[k] is not None and abs(f_var[k] - f_full[k]) > 1e-9]
             dropped = name.removeprefix('drop_')
             entry['drops'][name] = {
@@ -376,7 +383,7 @@ def main() -> int:
                 by_trace = collections.defaultdict(list)
                 for k, d, _, _, _ in vals:
                     by_trace[k].append(d)
-                mean, _, ci_tr = boot_mean(by_trace, 7 + hash((store_name, prov, m)) % 1000)
+                mean, _, ci_tr = boot_mean(by_trace, seed_of('x2', store_name, prov, m))
                 inc = [x for x in vals if x[4] == 0.0]
                 cor = [x for x in vals if x[4] == 1.0]
                 out[jm]['models'][m] = {

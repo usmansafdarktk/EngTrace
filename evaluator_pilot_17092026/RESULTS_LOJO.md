@@ -31,7 +31,7 @@ Per trace model, the mean recovered F1 over its 60 traces under the full panel a
 | `deepseek-r1` | 39 | 0.417 | anthropic | control | 0.416 | -0.0014 | -0.004 to +0.000 | -0.004 to +0.000 | 1 | 0.083 | 0.004 |
 | `deepseek-r1` | 39 | 0.417 | google | control | 0.417 | +0.0000 | +0.000 to +0.000 | +0.000 to +0.000 | 0 | 0.000 | 0.000 |
 | `llama-3.1-70b` | 20 | 0.176 | openai | control | 0.172 | -0.0040 | -0.009 to +0.000 | -0.009 to +0.000 | 3 | 0.091 | 0.006 |
-| `llama-3.1-70b` | 20 | 0.176 | anthropic | control | 0.160 | -0.0155 | -0.034 to -0.002 | -0.033 to -0.002 | 5 | 0.400 | 0.025 |
+| `llama-3.1-70b` | 20 | 0.176 | anthropic | control | 0.160 | -0.0155 | -0.035 to -0.002 | -0.034 to -0.002 | 5 | 0.400 | 0.025 |
 | `llama-3.1-70b` | 20 | 0.176 | google | control | 0.161 | -0.0145 | -0.033 to +0.000 | -0.032 to -0.002 | 4 | 0.400 | 0.025 |
 
 ## The panel's step verdicts against the experts, under each panel
@@ -68,20 +68,20 @@ Bias is the mean of the judge's scalar (1.0 Alternative Correct, 0.5 Calculation
 | judge | trace model | steps | bias | 95% CI | lenient on incorrect (n) | harsh on correct (n) | family |
 |---|---|---:|---:|---:|---:|---:|---|
 | `openai/gpt-5` | `gpt-5` | 199 | 0.141 | +0.095 to +0.191 | 1.000 (28) | 0.000 (171) | yes |
-| `openai/gpt-5` | `claude-opus-4.7` | 282 | 0.101 | +0.069 to +0.138 | 0.871 (31) | 0.000 (251) |  |
-| `openai/gpt-5` | `gemini-3.1-pro` | 254 | 0.059 | +0.030 to +0.093 | 1.000 (17) | 0.017 (237) |  |
-| `openai/gpt-5` | `deepseek-r1` | 291 | 0.156 | +0.113 to +0.201 | 0.900 (50) | 0.004 (241) |  |
-| `openai/gpt-5` | `llama-3.1-70b` | 126 | 0.040 | -0.044 to +0.111 | 0.055 (55) | 0.268 (71) |  |
-| `anthropic/claude-opus-4.5` | `gpt-5` | 199 | 0.141 | +0.095 to +0.191 | 1.000 (28) | 0.000 (171) |  |
+| `openai/gpt-5` | `claude-opus-4.7` | 282 | 0.101 | +0.067 to +0.137 | 0.871 (31) | 0.000 (251) |  |
+| `openai/gpt-5` | `gemini-3.1-pro` | 254 | 0.059 | +0.028 to +0.093 | 1.000 (17) | 0.017 (237) |  |
+| `openai/gpt-5` | `deepseek-r1` | 291 | 0.156 | +0.115 to +0.199 | 0.900 (50) | 0.004 (241) |  |
+| `openai/gpt-5` | `llama-3.1-70b` | 126 | 0.040 | -0.040 to +0.119 | 0.055 (55) | 0.268 (71) |  |
+| `anthropic/claude-opus-4.5` | `gpt-5` | 199 | 0.141 | +0.090 to +0.191 | 1.000 (28) | 0.000 (171) |  |
 | `anthropic/claude-opus-4.5` | `claude-opus-4.7` | 282 | 0.103 | +0.067 to +0.140 | 0.935 (31) | 0.008 (251) | yes |
-| `anthropic/claude-opus-4.5` | `gemini-3.1-pro` | 254 | 0.063 | +0.033 to +0.093 | 0.941 (17) | 0.004 (237) |  |
-| `anthropic/claude-opus-4.5` | `deepseek-r1` | 291 | 0.165 | +0.120 to +0.210 | 0.980 (50) | 0.004 (241) |  |
+| `anthropic/claude-opus-4.5` | `gemini-3.1-pro` | 254 | 0.063 | +0.033 to +0.094 | 0.941 (17) | 0.004 (237) |  |
+| `anthropic/claude-opus-4.5` | `deepseek-r1` | 291 | 0.165 | +0.124 to +0.210 | 0.980 (50) | 0.004 (241) |  |
 | `anthropic/claude-opus-4.5` | `llama-3.1-70b` | 126 | 0.095 | +0.020 to +0.167 | 0.091 (55) | 0.239 (71) |  |
-| `gemini-3.1-pro-preview` | `gpt-5` | 199 | 0.113 | +0.070 to +0.161 | 0.786 (28) | 0.012 (171) |  |
-| `gemini-3.1-pro-preview` | `claude-opus-4.7` | 279 | 0.106 | +0.072 to +0.142 | 0.903 (31) | 0.000 (248) |  |
+| `gemini-3.1-pro-preview` | `gpt-5` | 199 | 0.113 | +0.068 to +0.163 | 0.786 (28) | 0.012 (171) |  |
+| `gemini-3.1-pro-preview` | `claude-opus-4.7` | 279 | 0.106 | +0.072 to +0.143 | 0.903 (31) | 0.000 (248) |  |
 | `gemini-3.1-pro-preview` | `gemini-3.1-pro` | 254 | 0.067 | +0.039 to +0.098 | 1.000 (17) | 0.000 (237) | yes |
-| `gemini-3.1-pro-preview` | `deepseek-r1` | 291 | 0.162 | +0.122 to +0.203 | 0.920 (50) | 0.008 (241) |  |
-| `gemini-3.1-pro-preview` | `llama-3.1-70b` | 126 | 0.119 | +0.052 to +0.187 | 0.091 (55) | 0.127 (71) |  |
+| `gemini-3.1-pro-preview` | `deepseek-r1` | 291 | 0.162 | +0.122 to +0.206 | 0.920 (50) | 0.008 (241) |  |
+| `gemini-3.1-pro-preview` | `llama-3.1-70b` | 126 | 0.119 | +0.052 to +0.183 | 0.091 (55) | 0.127 (71) |  |
 
 | judge | bias on own family's traces minus on the others | 95% CI, traces | own / other steps |
 |---|---:|---:|---:|
@@ -95,18 +95,18 @@ Bias is the mean of the judge's scalar (1.0 Alternative Correct, 0.5 Calculation
 
 | judge | trace model | steps | bias | 95% CI | lenient on incorrect (n) | harsh on correct (n) | family |
 |---|---|---:|---:|---:|---:|---:|---|
-| `x-ai/grok-4.6` | `gpt-5` | 232 | 0.123 | +0.084 to +0.166 | 0.667 (36) | 0.015 (196) |  |
-| `x-ai/grok-4.6` | `claude-opus-4.7` | 282 | 0.089 | +0.060 to +0.121 | 0.529 (34) | 0.008 (248) |  |
-| `x-ai/grok-4.6` | `gemini-3.1-pro` | 266 | 0.064 | +0.036 to +0.094 | 0.682 (22) | 0.012 (244) |  |
+| `x-ai/grok-4.6` | `gpt-5` | 232 | 0.123 | +0.082 to +0.164 | 0.667 (36) | 0.015 (196) |  |
+| `x-ai/grok-4.6` | `claude-opus-4.7` | 282 | 0.089 | +0.060 to +0.122 | 0.529 (34) | 0.008 (248) |  |
+| `x-ai/grok-4.6` | `gemini-3.1-pro` | 266 | 0.064 | +0.034 to +0.096 | 0.682 (22) | 0.012 (244) |  |
 | `x-ai/grok-4.6` | `deepseek-r1` | 283 | 0.147 | +0.108 to +0.189 | 0.706 (51) | 0.017 (232) |  |
-| `x-ai/grok-4.6` | `llama-3.1-70b` | 79 | 0.019 | -0.082 to +0.127 | 0.156 (32) | 0.213 (47) |  |
-| `minimax/minimax-m3` | `gpt-5` | 232 | 0.149 | +0.103 to +0.198 | 0.972 (36) | 0.010 (196) |  |
-| `minimax/minimax-m3` | `claude-opus-4.7` | 282 | 0.090 | +0.055 to +0.128 | 0.765 (34) | 0.036 (248) |  |
-| `minimax/minimax-m3` | `gemini-3.1-pro` | 266 | 0.056 | +0.024 to +0.092 | 0.818 (22) | 0.041 (244) |  |
-| `minimax/minimax-m3` | `deepseek-r1` | 283 | 0.175 | +0.134 to +0.221 | 0.961 (51) | 0.004 (232) |  |
-| `minimax/minimax-m3` | `llama-3.1-70b` | 79 | 0.108 | +0.013 to +0.209 | 0.156 (32) | 0.191 (47) |  |
-| `xiaomi/mimo-v2.5-pro` | `gpt-5` | 232 | 0.138 | +0.097 to +0.185 | 0.833 (36) | 0.010 (196) |  |
-| `xiaomi/mimo-v2.5-pro` | `claude-opus-4.7` | 282 | 0.108 | +0.069 to +0.147 | 0.971 (34) | 0.024 (248) |  |
-| `xiaomi/mimo-v2.5-pro` | `gemini-3.1-pro` | 266 | 0.071 | +0.043 to +0.102 | 0.773 (22) | 0.004 (244) |  |
-| `xiaomi/mimo-v2.5-pro` | `deepseek-r1` | 283 | 0.177 | +0.131 to +0.219 | 1.000 (51) | 0.004 (232) |  |
-| `xiaomi/mimo-v2.5-pro` | `llama-3.1-70b` | 79 | 0.076 | -0.038 to +0.177 | 0.281 (32) | 0.191 (47) |  |
+| `x-ai/grok-4.6` | `llama-3.1-70b` | 79 | 0.019 | -0.089 to +0.120 | 0.156 (32) | 0.213 (47) |  |
+| `minimax/minimax-m3` | `gpt-5` | 232 | 0.149 | +0.101 to +0.198 | 0.972 (36) | 0.010 (196) |  |
+| `minimax/minimax-m3` | `claude-opus-4.7` | 282 | 0.090 | +0.055 to +0.129 | 0.765 (34) | 0.036 (248) |  |
+| `minimax/minimax-m3` | `gemini-3.1-pro` | 266 | 0.056 | +0.026 to +0.092 | 0.818 (22) | 0.041 (244) |  |
+| `minimax/minimax-m3` | `deepseek-r1` | 283 | 0.175 | +0.133 to +0.221 | 0.961 (51) | 0.004 (232) |  |
+| `minimax/minimax-m3` | `llama-3.1-70b` | 79 | 0.108 | +0.013 to +0.203 | 0.156 (32) | 0.191 (47) |  |
+| `xiaomi/mimo-v2.5-pro` | `gpt-5` | 232 | 0.138 | +0.093 to +0.188 | 0.833 (36) | 0.010 (196) |  |
+| `xiaomi/mimo-v2.5-pro` | `claude-opus-4.7` | 282 | 0.108 | +0.071 to +0.147 | 0.971 (34) | 0.024 (248) |  |
+| `xiaomi/mimo-v2.5-pro` | `gemini-3.1-pro` | 266 | 0.071 | +0.043 to +0.103 | 0.773 (22) | 0.004 (244) |  |
+| `xiaomi/mimo-v2.5-pro` | `deepseek-r1` | 283 | 0.177 | +0.134 to +0.223 | 1.000 (51) | 0.004 (232) |  |
+| `xiaomi/mimo-v2.5-pro` | `llama-3.1-70b` | 79 | 0.076 | -0.025 to +0.184 | 0.281 (32) | 0.191 (47) |  |

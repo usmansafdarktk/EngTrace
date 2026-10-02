@@ -322,3 +322,9 @@ answer-check misreadings the pilot templates never exercised; they were measured
 measured between pinned commits and the five stores re-scored (`ANSWER_FORM_AUDIT.md`, `ANSWER_FORM_FIX.md`,
 `scores/rescore_d169.log`). The results the paper cites are those regenerated at `2950875` or later; the notes for
 the paper are `RESULTS_PAPER_NOTES.md`, and the analyses still to do are in `docs/EVALUATION_NEXT_STEPS.md`.
+
+**After the next steps' section A (D-173 to D-178, 2026-10-03).** `analyze.py` gained the coverage comparison, the branch
+and level intervals, the detectable-difference columns and the per-template SD distribution; `decoding_table.py`,
+`threshold_appendix.py` and `shortcut_audit.py` write their own files; the pilot gained `analysis/lojo.py` and
+`analysis/attribution.py`. All free; `analyze --selftest` covers the additions. The results were regenerated from a
+clean tree afterwards, so the provenance line names the commit without "dirty".

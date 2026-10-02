@@ -137,19 +137,19 @@ that bear on evaluation. "Where" names the committed evidence; "state" is how it
 | concern | who | where it is answered | state |
 |---|---|---|---|
 | variance and significance for headline claims; per-template SD column; template bootstrap on the cliff; paired tests | meta-review 1; yAYU 2; 9W1B 4 | Q1 intervals, SD within / between, 55 Holm-corrected pairs; Q2 with Welch and the detectable gap; McNemar printed as a check | **done**, stronger than promised |
-| Wilcoxon signed-rank on the continuous reasoning score, promised beside McNemar | yAYU 2, 9W1B 4 (rebuttal) | not run; next steps A1 (on E5-strict coverage, 55 pairs, template bootstrap beside it) | **open**, half a day, free |
-| judge-exclusion ablation with placebo and untouched controls, "promised for camera-ready" | meta-review 1; yAYU 1; 9W1B 2; gFWV 4 (Jan) | the structural answer: MiMo-V2.5-Pro shares no family with the roster (D-110); E1 swapped the whole panel, ≤0.004; MiMo matches GPT-5 on planted defects. The literal LOJO is next steps A3 (on E0-3J's stored votes), X2 bias is A4 | **substantively answered, literally open**; the meta-review named it, so A3 should run, one day, free |
+| Wilcoxon signed-rank on the continuous reasoning score, promised beside McNemar | yAYU 2, 9W1B 4 (rebuttal) | not run; next steps A1 (on E5-strict coverage, 55 pairs, template bootstrap beside it) | **done 2026-10-03** (D-173: the coverage comparison in Q3, sign-flip and Wilcoxon over the 55 pairs, Holm) |
+| judge-exclusion ablation with placebo and untouched controls, "promised for camera-ready" | meta-review 1; yAYU 1; 9W1B 2; gFWV 4 (Jan) | the structural answer: MiMo-V2.5-Pro shares no family with the roster (D-110); E1 swapped the whole panel, ≤0.004; MiMo matches GPT-5 on planted defects. The literal LOJO is next steps A3 (on E0-3J's stored votes), X2 bias is A4 | **done 2026-10-03** (D-174: replayed offline, reproduces all 179 judged scores; no family effect at a detectable 0.003 to 0.025 F1; X2 finds every judge lenient the same way) |
 | inter-judge agreement within the Tribunal | 9W1B (comments) | Fleiss kappa 0.725 / 0.776 for the original panel, 0.563 / 0.622 for E1's (RESULTS_E1) | **done** for the Tribunal; the full run's judge is single, so the equivalent is its validation (REACHED never given to a fake value; planted-defect rates) |
-| threshold sensitivity: numeric tolerance, cross-encoder, alignment ratio | yAYU 4; 9W1B 3 | tolerance at half and double, half-unit window, whole-trace reading (Sensitivity); E3's grid 2% / 1% / 0.5% / 0.2% (RESULTS_E3); the digit rule at 1% and 0.1% (RESULTS_X1); the cross-encoder and alignment ratio no longer exist | **done in pieces**; A5 collates them into one appendix table, half a day |
+| threshold sensitivity: numeric tolerance, cross-encoder, alignment ratio | yAYU 4; 9W1B 3 | tolerance at half and double, half-unit window, whole-trace reading (Sensitivity); E3's grid 2% / 1% / 0.5% / 0.2% (RESULTS_E3); the digit rule at 1% and 0.1% (RESULTS_X1); the cross-encoder and alignment ratio no longer exist | **done 2026-10-03** (D-175, `THRESHOLD_APPENDIX.md`, collated from the scripts that measured each threshold) |
 | the ρ = 0.632 validation on 100 responses, no interval | yAYU 3; gFWV 2 and 4 (Jan) | superseded: 300 traces, 15 experts, three per trace, kappa reported, cluster-robust intervals, power stated | **done**; the paper must say the old study is replaced and why, not add an interval to it |
 | branch-level reporting for the math-specialised models; the causal claim | meta-review 2; yAYU 5; 9W1B 5 | the claim is dropped: no math-specialised model on the roster (D-110, D-117) | **dropped with a reason**; say so in one sentence; C5 only if the claim returns |
-| branch-level reporting in general | meta-review 2 | by-branch and by-domain tables, descriptive, no intervals | **partly**; A2 adds intervals and tests, half a day; until then no "branch X is hardest" sentence |
+| branch-level reporting in general | meta-review 2 | by-branch and by-domain tables, descriptive, no intervals | **done 2026-10-03** (D-173): intervals and Welch pairs; one branch pair holds in the whole roster, so no "hardest branch" sentence |
 | promote validation and thresholds to the main text | meta-review 2; 9W1B 6 | the material exists | **writing** |
 | framing: synthetic scope, physical versus linguistic diversity | meta-review 3; 9W1B 1; cqGs 2 (Jan) | the paraphrase arm (Q5) is a measured answer to the linguistic half | **done beyond what was promised**; state it as a bound (±5 points for 10 of 11), not as "robust" |
-| template exploitation / surface shortcuts | cqGs 2 (Jan), 9W1B 1 | the four known shortcut templates are a sensitivity row (tau 1.000); the corpus-wide audit is A7 | **partly**; A7 one day |
+| template exploitation / surface shortcuts | cqGs 2 (Jan), 9W1B 1 | the four known shortcut templates are a sensitivity row (tau 1.000); the corpus-wide audit is A7 | **done 2026-10-03** (D-177): two templates newly flagged, the headline unchanged by more than 0.002 |
 | a fourth branch | ynoK 1 | civil and industrial added, 30 templates each, certified | **done**, twice over |
 | tool-augmented or retrieval baselines | ynoK 3; cqGs 1 and 4 (Jan) | nothing run; C4 | **open**, paid; a third "future work" answer is the risk |
-| error analysis too coarse; causes of the cliff | nWW3 3 and 4, cqGs 3 (Jan) | Q3's attribution table and failure-against-depth (descriptive); A6 validates attribution by error type on the pilot's labels; B2 is the human sample | **partly**; the Jan rebuttal promised a five-category expert analysis of 200 traces, which was for the old roster |
+| error analysis too coarse; causes of the cliff | nWW3 3 and 4, cqGs 3 (Jan) | Q3's attribution table and failure-against-depth (descriptive); A6 validates attribution by error type on the pilot's labels; B2 is the human sample | **partly**: A6 done (D-176, each flag's precision by error type); B2, the human sample on the new run, is in the experts' request (D-172) |
 | the evaluation framework validated by the same kind of system it uses | gFWV 4 (Jan) | human labels now; deterministic components; the judge from outside the roster | **done** |
 | proofreading, broken reference | all | — | writing |
 
@@ -262,6 +262,10 @@ Three of those templates were read:
   anonymised truth file before submission, or state in the paper why it is withheld.
 
 ## 7. The order for the ten days left
+
+*Update 2026-10-03: items 0 and A1 to A11 of the next steps are done (D-173 to D-178), the experts' kits are built and
+awaiting the send (D-172), and C1 to C4 remain, each needing a dry run and the owner's approval. The order below is as written on
+2026-10-02.*
 
 The next-steps file's order is right in substance; this review moves two things forward.
 
