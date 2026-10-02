@@ -148,7 +148,10 @@ def review_model(key: str, man: dict, variant: str = 'main', main_served: dict |
 
 
 def archive_check(keys: list[str]) -> dict:
-    zips = sorted(BACKUP.glob('full_run_traces_*.zip'))
+    # the main run's archives are dated, `full_run_traces_<date>.zip`; the repeats' and the paraphrase
+    # arm's carry a name before the date and are not this check's (D-168)
+    zips = sorted(p for p in BACKUP.glob('full_run_traces_*.zip')
+                  if p.stem.removeprefix('full_run_traces_').replace('-', '').isdigit())
     if not zips:
         return {'archive': None}
     z = zips[-1]

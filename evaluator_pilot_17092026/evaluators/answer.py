@@ -24,6 +24,17 @@ percent), so a trace answering in m3/mol against a gold in cm3/mol is not marked
 the unit alone. TOL is relative: the experts accept a rounded answer (56.27 for 56.29) and
 this is the final answer, not a step, so it is not held to display precision - that rule
 belongs to analysis/digit_rule.py, which is about intermediate arithmetic.
+
+  PI-FRACTIONS AND RENDERINGS (D-169, after a read of the full run's verdicts). A pi-fraction is one
+  value: `(841*pi)/2447`, `\\dfrac{841\\pi}{2447}`, `841\\pi/2447`, `(3/17)\\pi` and `0.4\\pi` all state
+  a*pi/b. Until D-169 the parenthesis stopped the rule at 841*pi, a value the template also
+  computes, so the gold's own target was wrong on two signals templates, and LaTeX's `\\pi` never
+  joined its coefficient. Where a gold line's pi-fraction has a numerator and a denominator that are
+  both computed (the reduced fraction's `num` and `den`), the fraction's value is the target, so a
+  trace stating it as a decimal or unreduced is right. And a scalar gold line that states one
+  quantity in two units ("0.088960 radians, or 5.0970 degrees") accepts either, the second matched
+  at unit scale. The forms occur in none of the pilot's 15 templates, so the experts never
+  arbitrated them; ANSWER_FORM_AUDIT.md and ANSWER_FORM_FIX.md in full_run_28092026/ measure them.
 """
 import functools
 import os
@@ -55,8 +66,32 @@ WORD = re.compile(r'[A-Za-z][A-Za-z\-]{2,}')
 # scoring is unchanged.
 LINEAR = ('linear', 'nonlinear')                  # a family of its own: see verdict()
 LABELED = re.compile(r'(?i)\b([a-z][a-z\-]{2,})\s*:\s*\*{0,2}\s*(yes|no)\b')
-PI_EXPR = re.compile(r'(?<![\w.])(\d+(?:\.\d+)?)?\s*\*?\s*(?:pi|\u03c0)\b(?!\s*[*(])'
-                     r'(?:\s*/\s*(\d+(?:\.\d+)?))?')
+# A pi-fraction is one value (D-169): the coefficient may sit in parentheses with pi, and the
+# denominator may follow the closing one. `pi*n` and `pi(` inside an expression are still not values.
+PI_EXPR = re.compile(r'(?<![\w.])\(?\s*(\d+(?:\.\d+)?)?\s*\*?\s*(?:pi|\u03c0)\b(?!\s*[*(])'
+                     r'\s*\)?(?:\s*/\s*\(?\s*(\d+(?:\.\d+)?)\s*\)?)?')
+PI_OF_FRACTION = re.compile(r'(?<![\w.])\(\s*(\d+(?:\.\d+)?)\s*/\s*(\d+(?:\.\d+)?)\s*\)\s*\*?\s*(?=(?:pi|\u03c0)\b)')
+PI_FRACTION = re.compile(r'(?<![\w.])\(?\s*(\d+(?:\.\d+)?)\s*\*?\s*(?:pi|\u03c0)\s*\)?\s*/\s*\(?\s*(\d+(?:\.\d+)?)\s*\)?')
+# Two renderings of one quantity on a scalar gold line - "0.088960 radians, or 5.0970 degrees" - are
+# related by one of these factors, either way round (D-169). Powers of ten are not among them: the
+# unit factors in match() already serve a single target, and two different quantities can differ by one.
+RENDERINGS = (180.0 / math.pi, 2.0 * math.pi)
+
+
+def _pi_text(seg):
+    """The text PI_EXPR reads: LaTeX's `\\pi`, `\\frac`, `\\left`, `\\right` and `$` resolved, and
+    `(a/b)*pi` written `a*pi/b`, so that every pi-fraction is in the one shape the rule reads."""
+    p = seg.replace('\\pi', 'pi').replace('\\left', ' ').replace('\\right', ' ').replace('$', ' ')
+    p = re.sub(r'\\[dt]?frac\s*\{([^{}]*)\}\s*\{([^{}]*)\}', r' \1/\2 ', p)
+    return PI_OF_FRACTION.sub(r' \1*pi/\2 ', p)
+
+
+def _rendering(a, b):
+    """Are a and b one quantity in two units: related by 180/pi or 2*pi, either way round?"""
+    if not a or not b:
+        return False
+    r = abs(a / b)
+    return any(abs(r - f) <= 1e-3 * f or abs(r - 1 / f) <= 1e-3 / f for f in RENDERINGS)
 
 
 def _norm_linear(s):
@@ -120,9 +155,10 @@ def values(seg):
         b = float(m.group(2))
         if b:
             out.append((float(m.group(1)) / b, 0.0))
-    # pi written as a symbol - `omega_a = pi`, `0.4*pi`, `3pi/4` - is a value (D-120);
+    # pi written as a symbol - `omega_a = pi`, `0.4*pi`, `3pi/4` - is a value (D-120), and so is a
+    # pi-fraction in any of its shapes, `(841*pi)/2447` or `\dfrac{841\pi}{2447}` (D-169);
     # `pi*n` inside an expression is not.
-    for m in PI_EXPR.finditer(seg):
+    for m in PI_EXPR.finditer(_pi_text(seg)):
         a = float(m.group(1)) if m.group(1) else 1.0
         b = float(m.group(2)) if m.group(2) else 1.0
         if b:
@@ -141,7 +177,7 @@ def _ulp(lit):
 SLACK = 1e-9          # the windows below are inclusive; this keeps binary floating point from deciding a boundary
 
 
-def match(gold, have, rel=REL, exact=False, gold_ulp=0.0, unit=1.0):
+def match(gold, have, rel=REL, exact=False, gold_ulp=0.0, unit=1.0, scales=SCALES):
     """Does any stated value equal `gold`?
 
     Three ways to be right, because one relative tolerance cannot serve them all:
@@ -165,9 +201,13 @@ def match(gold, have, rel=REL, exact=False, gold_ulp=0.0, unit=1.0):
     SLACK, and the verdict no longer depends on how the difference rounds (D-147). `unit` scales
     the two last-digit windows: 1.0 is the rule the experts validated; 0.5 is the stricter
     "correct rounding" reading, reported as a sensitivity only.
+
+    `scales` are the unit factors tried. A rendering (D-169) is matched with (1.0,) alone, because
+    it already is the other unit: with the factors, a cut-off trace holding `pi d^4/32` and no
+    answer matched 0.5315 rad through 32 +- 1 at the 1/60 factor.
     """
     for v, u in have:
-        for sc in SCALES:
+        for sc in scales:
             t, tu = v * sc, u * sc
             if exact:
                 if abs(t - gold) <= 1e-9 * max(1.0, abs(gold)):
@@ -311,13 +351,24 @@ def targets(item, ms=None):
         nums = [(v, u) for v, u in values(seg)
                 if not any(milestones.close(v, g, 1e-9) for g in given)]
         keep = (nums or values(seg))[-1:]
+    # D-169: a pi-fraction whose numerator and denominator are both computed - the reduced
+    # fraction's `num` and `den` - is one quantity, and its value is the target.
+    for m in PI_FRACTION.finditer(_pi_text(seg)):
+        a, b = float(m.group(1)), float(m.group(2))
+        ia = next((k for k, (v, _) in enumerate(keep) if milestones.close(v, a, 1e-9)), None)
+        ib = next((k for k, (v, _) in enumerate(keep) if milestones.close(v, b, 1e-9)), None)
+        if ia is not None and ib is not None and ia != ib and b:
+            keep = [x for k, x in enumerate(keep) if k not in (ia, ib)] + [(a * math.pi / b, 0.0)]
+    renderings = []
     if typ in ('scalar', 'array') and keep:
+        if typ == 'scalar':                    # D-169: the same quantity in another unit, if stated
+            renderings = [(v, u) for v, u in keep[:-1] if _rendering(v, keep[-1][0])]
         keep = keep[-1:]                       # one value is asked for: the last stated
     labeled = _labeled(seg, typ)
     words = _words(seg, typ)
     if labeled:                                # scored label by label instead (D-120)
         words = [w for w in words if w not in ('yes', 'no')]
-    return {'numbers': keep, 'words': words, 'labeled': labeled,
+    return {'numbers': keep, 'renderings': renderings, 'words': words, 'labeled': labeled,
             'exact': bool(ROUNDING.search(item.get('question') or ''))}
 
 
@@ -371,9 +422,13 @@ def verdict(text, item, tol=None, ms=None, unit=1.0, whole=False):
     hits = []
     for v, gu in want['numbers']:
         # |v| too: a deflection the gold states as 7.3 mm downward and the trace as
-        # -7.326 mm is the same answer under a different sign convention.
+        # -7.326 mm is the same answer under a different sign convention. A rendering of the
+        # target in another unit counts as the target, at unit scale (D-169).
         hits.append(match(v, have, rel, want['exact'], gu, unit)
-                    or match(abs(v), absolute, rel, want['exact'], gu, unit))
+                    or match(abs(v), absolute, rel, want['exact'], gu, unit)
+                    or any(match(w, have, rel, want['exact'], wu, unit, scales=(1.0,))
+                           or match(abs(w), absolute, rel, want['exact'], wu, unit, scales=(1.0,))
+                           for w, wu in want.get('renderings', [])))
     for w in want['words']:
         hits.append(_word_hit(low, w))
     for label, value in want.get('labeled', []):
@@ -406,6 +461,11 @@ def selftest():
     """
     item = lambda sol, q='', t='scalar', mid='x#0': (
         {'item_id': mid, 'template_id': 'template_x', 'solution': sol, 'question': q, 'answer_type': t})
+    PI_GOLD = ('**Answer:** The resulting discrete-time signal is x[n] = 14.3 * cos((841*pi)/2447*n - 0.81 rad), '
+               'and its discrete-time angular frequency is omega = (841*pi)/2447 rad/sample.')
+    PI_GOLD_ND = ('**Answer:** The resulting discrete-time signal is x[n] = 9.55 * cos((129*pi)/1574*n - 135 deg), '
+                  'and its discrete-time angular frequency is omega = (129*pi)/1574 rad/sample.')
+    TWO_UNITS = '**Answer:** The total angle of twist at the free end C is 0.088960 radians, or 5.0970 degrees.'
     cases = [
         # E0-F1: the gold restates an input on its answer line; the trace gives the value
         ('**Answer:** The molar volume of saturated liquid n-Pentane at 283.81 K is **113.55 cm3/mol**.',
@@ -476,6 +536,38 @@ def selftest():
          'correct'),
         ('**Answer:** The damping ratio is 1.0000. The system is **Critically Damped**.', '', 'classification',
          (1.0,), '## Final Answer\n**Answer:** ζ = 1.00; the system is not critically damped but overdamped', 'partial'),
+        # D-169: a pi-fraction is one value, on the gold's line (the target) and in the trace, in every shape
+        (PI_GOLD, '', 'symbolic', (), '**Answer:** omega = 1.0797 rad/sample', 'correct'),
+        (PI_GOLD, '', 'symbolic', (), '**Answer:** \\(\\omega = \\dfrac{841\\pi}{2447}\\ \\text{rad/sample}\\)', 'correct'),
+        (PI_GOLD, '', 'symbolic', (), '**Answer:** \\(\\omega = \\left(\\frac{841\\pi}{2447}\\right)\\) rad/sample', 'correct'),
+        (PI_GOLD, '', 'symbolic', (), '**Answer:** omega = 841\\pi/2447 rad/sample', 'correct'),
+        (PI_GOLD, '', 'symbolic', (), '**Answer:** omega = (841/2447)\\pi rad/sample', 'correct'),
+        (PI_GOLD, '', 'symbolic', (), '**Answer:** omega = 0.3437π rad/sample', 'correct'),
+        (PI_GOLD, '', 'symbolic', (), '**Answer:** omega = 2642 rad/sample', 'incorrect'),      # 841*pi, the target before D-169
+        # the known limit D-169 records, pinned so that a change to it is noticed: the coefficient of a wrong
+        # `1.0797 pi` is a stated number within 0.2% of the target and is credited; not counting pi's
+        # coefficients as values would remove this credit and six right ones (ANSWER_FORM_AUDIT.md, reading C)
+        (PI_GOLD, '', 'symbolic', (), '**Answer:** omega = 1.0797\\pi rad/sample', 'correct'),
+        # the numerator and denominator are computed: the fraction's value is the target, in any reduction
+        (PI_GOLD_ND, '', 'symbolic', (1574.0, 129.0), '**Answer:** omega = 0.2575 rad/sample', 'correct'),
+        (PI_GOLD_ND, '', 'symbolic', (1574.0, 129.0), '**Answer:** omega = 645π/7870 rad/sample', 'correct'),
+        (PI_GOLD_ND, '', 'symbolic', (1574.0, 129.0), '**Answer:** omega = (129*pi)/1574 rad/sample', 'correct'),
+        (PI_GOLD_ND, '', 'symbolic', (1574.0, 129.0), '**Answer:** omega = 0.2500 rad/sample', 'incorrect'),
+        # pi inside an expression is still not a value, and a subscripted pi names a thing
+        ('**Answer:** The value is 3.14.', '', 'scalar', (3.14,), '**Answer:** y[n] = cos(pi*n); the value is 2.0', 'incorrect'),
+        ('**Answer:** The value is 3.14.', '', 'scalar', (3.14,), '**Answer:** \\(\\pi_1 = 2.0\\)', 'incorrect'),
+        # D-169: one quantity in two units on a scalar gold line - either is the answer
+        (TWO_UNITS, '', 'scalar', (0.08896, 5.097), '**Answer:** 0.08896 rad', 'correct'),
+        (TWO_UNITS, '', 'scalar', (0.08896, 5.097), '**Answer:** 5.10 degrees', 'correct'),
+        (TWO_UNITS, '', 'scalar', (0.08896, 5.097), '**Answer:** 0.0800 rad', 'incorrect'),
+        # ...matched at unit scale: a cut-off trace holding pi d^4/32 and no answer is not credited
+        ('**Answer:** The total angle of twist at the free end C is 0.53152 radians, or 30.4539 degrees.', '', 'scalar',
+         (0.53152, 30.4539), '## Formulae\n* J = \\frac{\\pi d^4}{32}\n* phi = TL/GJ\n## Solution\n**Step', 'incorrect'),
+        # two different quantities on one line are not renderings: the last stays the target, as before
+        ('**Answer:** 1. Liquid-phase Volume (V_liq) ≈ **0.0907 L/mol** 2. Vapor-phase Volume (V_vap) ≈ **1.7205 L/mol**',
+         '', 'array', (0.0907, 1.7205), '**Answer:** Liquid molar volume ≈ 0.0907 L/mol', 'incorrect'),
+        ('**Answer:** 1. Liquid-phase Volume (V_liq) ≈ **0.0907 L/mol** 2. Vapor-phase Volume (V_vap) ≈ **1.7205 L/mol**',
+         '', 'array', (0.0907, 1.7205), '**Answer:** liquid 0.0907 L/mol, vapor 1.7205 L/mol', 'correct'),
     ]
     bad = 0
     for sol, q, typ, ms, trace, want in cases:
