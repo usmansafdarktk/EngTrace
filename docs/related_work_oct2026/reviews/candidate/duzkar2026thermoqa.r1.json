@@ -1,0 +1,36 @@
+{
+ "key": "duzkar2026thermoqa",
+ "reviewer": "r1",
+ "read": "full",
+ "title_confirmed": true,
+ "venue_now": "arXiv 2604.19758v1, 25 March 2026, cs.AI (p.1); single author (Olivenet); no venue",
+ "what_it_is": "ThermoQA is a benchmark of 293 open-ended engineering-thermodynamics problems in three tiers: property lookups (110), component analyses of seven device types at three depths, energy, entropy and exergy (101), and full analyses of ten cycle types (82), with water, R-134a, air and combined air-water (p.1, p.3-4). Question parameters are sampled programmatically, and every reference value is computed with CoolProp 7.2.0 (IAPWS-IF97 for water, a Helmholtz equation of state for R-134a) or NASA polynomials for air (p.1, p.4). Tier 2 and 3 answers are scored as weighted sums over the named quantities a solution must report (5-12 per component question, 15-60 per cycle question, weighted 1-2 for inlet properties, 2-4 for intermediate calculations and 4-6 for final outcomes), each correct within +/-2% or +/-0.5 absolute, after regex and gpt-4.1-mini extraction (p.3-5, p.16-17). Six frontier LLMs are run three times each (p.5-6).",
+ "domain": "engineering: thermodynamics (p.1)",
+ "size": "293 problems: 110, 101 and 82 by tier (p.1); 6 models x 3 runs, 54 runs, about 5,300 API calls (p.5)",
+ "source_of_items": "generated from templates: parameters sampled from realistic ranges, outlet states derived with CoolProp ('anchor-derive'), no hand-authored solutions (p.2, p.4)",
+ "instances": "generated, but released as one fixed public set of 293 questions; the pipeline 'can produce new question instances indefinitely' (p.14), which the evaluation does not use",
+ "has_gold_traces": "partial: CoolProp-computed reference values for every scored intermediate quantity (state-point properties, component work and heat, final outcomes) (p.4, p.16); no gold solution text",
+ "evaluation": "final answer plus named intermediate quantities, checked deterministically within tolerance and weighted (p.4); values extracted by regex and by gpt-4.1-mini, keeping whichever extraction is correct (p.5, p.17); three runs per model, with standard deviations and Welch tests (p.5-6, p.17)",
+ "human_validation": "None of items or scoring. The reference values are cross-checked against NIST data (<0.01% on p.2; <0.037% maximum deviation over 13 saturation points on p.4).",
+ "contamination_measures": "programmatically sampled parameters; the author notes that the problem structures follow textbook patterns and contamination cannot be fully excluded (p.13); the set is public (p.1)",
+ "engtrace_use": {
+   "sentence": null,
+   "verdict": "n/a",
+   "explanation": "Belongs in: the engineering paragraph. Candidate, not cited in the May paper. It is the closest single-domain precedent for EngTrace's code-derived gold values: reference intermediate values computed by a property library and checked deterministically within a tolerance, with repeated runs (p.4-6). It contradicts the May claims that no engineering benchmark verifies the process beyond outcome matching (May p.1, p.3), although its scored 'steps' are quantities the question asks for (p.16)."
+ },
+ "recommendation": "add (must)",
+ "suggested_wording": "ThermoQA (D\u00fczkar, 2026) computes reference values for 293 engineering-thermodynamics problems with CoolProp and scores the named intermediate and final quantities of component and cycle analyses within +/-2%, weighted by importance, over three runs per model.",
+ "facts_to_cite": [
+   "293 problems: 110 property lookups, 101 component analyses, 82 cycle analyses (p.1, p.3-4)",
+   "reference values computed with CoolProp 7.2.0 (IAPWS-IF97, Helmholtz equation of state) and NASA polynomials; parameters sampled programmatically and checked for feasibility (p.1, p.4)",
+   "Tiers 2 and 3 scored as weighted sums over 5-12 or 15-60 named quantities, each within +/-2% or +/-0.5 absolute (+/-0.02 for dimensionless quantities) (p.3-4)",
+   "values extracted by regex and gpt-4.1-mini, keeping whichever extraction is correct (p.5, p.17)",
+   "six frontier models, three runs each; composite scores from 94.1% (Claude Opus 4.6) to 73.0% (MiniMax M2.5) (p.5, p.7)",
+   "multi-run standard deviations from +/-0.1% (GPT-5.4, Tier 3) to +/-2.5% (DeepSeek-R1, Tier 2) (p.1-2, p.10)",
+   "the dominant error is a missing value rather than an out-of-tolerance one (p.11)",
+   "dataset, code and model responses are public (p.1-2); contamination cannot be fully excluded (p.13)"
+ ],
+ "overlap_with_engtrace": "Shares: an engineering domain (thermodynamics, which EngTrace covers in its chemical branch); programmatically generated parameters (p.4); reference values computed by code (p.4); deterministic, tolerance-based checking of intermediate quantities (p.4); repeated runs (p.5-6). Lacks: multi-branch scope; scored intermediate values that the question does not request (in the one full Tier 2 example every scored quantity is a requested part, p.16, and the LLM extractor is told to return only final answers, p.17); arithmetic checks of the reasoning; any human validation of items or scoring; a private or regenerated pool (one public set, p.1, p.14). What EngTrace adds: five branches; milestones from the gold solution that the question does not give, matched anywhere in the solution; per-claim arithmetic checks; a residual judge validated against experts; expert certification of every template; and a pool drawn from a private seed.",
+ "confidence": "high",
+ "notes": "(1) The scored 'steps' are named quantities (properties, works, efficiencies) extracted by symbol. In the one full Tier 2 example they are listed in the question as parts (a)-(h) (p.16), and the LLM extractor returns 'only final answers, not intermediate calculations' (p.17), so this is closer to weighted multi-part answer scoring than to checking unrequested intermediate steps; the paper does not show whether Tier 3 questions list all 15-60 scored quantities. (2) The take-max extraction (keep whichever of the regex and LLM extractions is correct, p.5, p.17) can only raise scores. (3) Single-author preprint from a company; it discloses development with Claude's assistance and that Claude Opus 4.6 ranks first (p.13). (4) The NIST cross-check is given as <0.01% (p.2) and as <0.037% maximum (p.4). (5) The search note's description matches the text; its 'scored step by step' should be read with note (1)."
+}

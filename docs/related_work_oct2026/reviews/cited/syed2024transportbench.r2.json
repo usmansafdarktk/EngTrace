@@ -1,0 +1,35 @@
+{
+ "key": "syed2024transportbench",
+ "reviewer": "r2",
+ "read": "partial: abstract, Sections 1-3 and the Section 4 setup in full (pp.1-9); Section 5 case studies skimmed (pp.12-19); Section 6 conclusion (pp.20-21)",
+ "title_confirmed": true,
+ "venue_now": "arXiv preprint 2408.08302v1, 15 Aug 2024, marked 'Preprint submitted to Transportation Research Part C' (p.1)",
+ "what_it_is": "TransportBench is a set of 140 undergraduate transportation-engineering problems (73 true-or-false, 67 general Q&A) in ten topics, selected by the course instructor from two University of Illinois courses and adapted ('twisted') from course and textbook material, each with a step-by-step LaTeX solution (p.3-4). Seven LLMs answer zero-shot through their web interfaces, and human experts grade the answers for accuracy, also reading the reasoning (p.4-5). The paper adds consistency tests over five independent trials and under self-checking prompts (p.8-9) and case studies of reasoning, including correct conclusions reached by flawed reasoning (Section 5.2, p.16). Claude 3.5 Sonnet is best at 67.1% (p.6).",
+ "domain": "engineering: civil (transportation systems engineering)",
+ "size": "140 problems: 73 true-or-false and 67 general Q&A (p.3; Table 3, p.7); 7 LLMs (p.1)",
+ "source_of_items": "course homework and exam problems from CEE 310 and CEE 418 at the University of Illinois, adapted by the instructor (sixth author); some CEE 418 problems adapted from a co-authored textbook; figures replaced by text (p.3-4)",
+ "instances": "static",
+ "has_gold_traces": "partial: a step-by-step LaTeX reference solution for each problem, prepared mostly by the second author (p.4); not used for step-level scoring",
+ "evaluation": "final-answer accuracy graded by human expert annotation, with the reasoning also checked (p.5); consistency across five trials and under self-checking prompts (p.8-9); qualitative reasoning case studies (pp.12-19)",
+ "human_validation": "problems chosen by an instructor who taught the two courses 14 and 11 times (p.3); solutions written by the second author (p.4); LaTeX files checked by annotators (p.4); LLM answers graded by human experts (p.1, p.5); no inter-annotator agreement reported",
+ "contamination_measures": "none reported (problems are adapted from course material, but this is not presented as a contamination control)",
+ "engtrace_use": {
+   "sentence": "S-E1 (L182-190): [...] while specialized benchmarks like TransportBench, APBench, and EEE-Bench (Syed et al., 2024; Chen et al., 2025; Cheng et al., 2024; Li et al., 2025; Liu et al., 2025) are siloed within narrow sub-disciplines.",
+   "verdict": "accurate",
+   "explanation": "Supported: TransportBench covers only transportation systems engineering, which the paper calls 'a critical interdisciplinary subfield of civil engineering' (p.1), with 140 problems from two courses (p.3). For the paragraph's closing claim (S-E3, judged in batch E2), note that TransportBench is not pure outcome matching: human experts grade the answers and 'also check the reasoning provided by LLMs' (p.5), and Section 5.2 documents correct final answers reached through flawed reasoning (p.16), the observation EngTrace's process evaluation starts from."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "TransportBench (Syed et al., 2024) has experts grade seven LLMs on 140 undergraduate transportation-engineering problems from two university courses, and its case studies show correct conclusions reached through flawed reasoning.",
+ "facts_to_cite": [
+  "140 undergraduate transportation-engineering problems in ten topics: 73 true-or-false and 67 general Q&A (Table 1, p.3; Table 3, p.7)",
+  "Problems selected by the course instructor from CEE 310 and CEE 418 at the University of Illinois; some adapted from a co-authored textbook (p.3-4)",
+  "Each problem comes with a step-by-step LaTeX solution (p.4)",
+  "Seven LLMs (GPT-4, GPT-4o, Claude 3 Opus, Claude 3.5 Sonnet, Gemini 1.5 Pro, Llama 3 70B, Llama 3.1 405B) answer zero-shot; correctness is judged by human annotation, which also checks the reasoning (p.4-5)",
+  "Best accuracy: Claude 3.5 Sonnet, 67.1% (94/140) (p.6)",
+  "Consistency studied over five independent trials and under self-checking prompts (p.8-9)",
+  "LLMs can reach correct final answers through flawed reasoning (Section 5.2, p.16)"
+ ],
+ "overlap_with_engtrace": "Shares: an engineering domain (civil: transportation, which is not one of EngTrace's civil domains of geotechnical, structural and water resources); a reference solution with steps for every problem (p.4); expert human grading and attention to reasoning, including correct answers from flawed reasoning (p.5, p.16). Lacks: generated instances (140 static problems), automatic or step-level scoring against the reference solutions, validation of the graders (no agreement figures), contamination control; small size.",
+ "confidence": "high",
+ "notes": "Table 1 prints 68 general Q&A problems, but its rows sum to 67 and Table 3 uses 67 as the denominator (p.3, p.7): a slip in the paper; 73 + 67 = 140. The name TransportBench is the paper's own (abstract, p.1) though not in its title. The text shows only the arXiv v1 preprint; any later journal version is not visible here. Recommendation 'keep, reword' because the revised paragraph should cite it for what matters to EngTrace (expert grading; flawed reasoning behind correct answers) and must not fold it into an 'outcome matching only' generalisation."
+}

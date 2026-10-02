@@ -1,0 +1,32 @@
+{
+ "key": "xie2023deltascore",
+ "reviewer": "r3",
+ "read": "full: main text pp. 1-9 (abstract, introduction, related work, method, perturbations, experimental setup, results, discussion and conclusion, limitations); appendices pp. 13-15 skimmed.",
+ "title_confirmed": true,
+ "venue_now": "Findings of EMNLP 2023, pp. 5317-5331 (page 1 header)",
+ "what_it_is": "A reference-free metric for story evaluation. DELTASCORE scores a story by how much its likelihood under a pre-trained language model drops after an aspect-specific perturbation (e.g. typos for fluency, removing relevant words for relatedness): log p(s|c) - log p(s'|c), where c is the story's condition such as its title or prompt (pp. 1, 3). It is tested against the human ratings of ROCStories and WritingPrompts stories collected by Xie et al. (2023a) on five aspects, using story-level Kendall correlation (pp. 4-5). It outperforms similarity, discriminative and generative metrics, and the reference-based similarity metrics do worst (p. 8).",
+ "domain": "story evaluation (natural language generation metrics)",
+ "size": "120 ROC and 80 WP stories with human ratings after excluding human-written stories, rated by two annotator groups (p. 5, footnote 6); six scoring language models (BART, FLAN-T5, BLOOM, LLaMA, OPT, GPT-3.5) (p. 5); eleven comparison metrics (Table 4, p. 6)",
+ "source_of_items": "generated stories and human ratings reused from Xie et al. (2023a) (p. 4)",
+ "instances": "static (perturbations are applied to each story to compute its score; they do not create test items)",
+ "has_gold_traces": "no",
+ "evaluation": "metric meta-evaluation: story-level Kendall correlation between metric scores and aggregated human ratings (p. 5)",
+ "human_validation": "uses the existing ratings of Xie et al. (2023a): an in-house group and a crowdworker group, 3 annotators per story; one group for tuning, the other for the final comparison (p. 5)",
+ "contamination_measures": "none for the method; it leaves out the CNN stories partly because most of the scoring language models were trained on that dataset (p. 4, footnote 5)",
+ "engtrace_use": {
+  "sentence": "We evaluate the fluency and semantic fidelity of generated solutions using standard reference-based metrics (Xie et al., 2023b). (S-T, May section 4.3, L466-468)",
+  "verdict": "wrong",
+  "explanation": "DeltaScore is not a reference-based metric: it compares a story with its own perturbed copy given the story's condition and uses no human reference (Eq. 1, p. 3). Its results run against the use the May text makes of it: the reference-based similarity metrics (BLEU, BERTScore, MoverScore) generally had the lowest correlation with human judgements, 'highlighting the inadequacy of reference-based metrics for story evaluation' (p. 8). ROUGE is not among its compared metrics. As the source for 'standard reference-based metrics' the citation points at the wrong paper, and the next May sentence already cites BERTScore (Zhang et al., 2020) and ROUGE (Lin, 2004) directly. It is also a self-citation (C9)."
+ },
+ "recommendation": "drop",
+ "suggested_wording": "Among the metrics compared for story quality, reference-based similarity metrics such as BLEU and BERTScore generally correlated least with human judgements (Xie et al., 2023b).",
+ "facts_to_cite": [
+  "DELTASCORE is the likelihood drop of a story under a pre-trained language model after an aspect-targeted perturbation, conditioned on the story's title or prompt: log p(s|c) - log p(s'|c) (p. 3).",
+  "Evaluated on ROCStories and WritingPrompts stories rated for fluency, coherence, relatedness, logicality and interestingness, using story-level Kendall correlation (pp. 4-5).",
+  "It outperformed the compared metrics on all aspects, while reference-based similarity metrics generally performed worst (p. 8).",
+  "One of the simplest perturbations, shuffling all words (Jumble), was effective for most aspects (pp. 2, 8)."
+ ],
+ "overlap_with_engtrace": "None of the five features. Its only link is that the May paper's section 4.3 used reference-based similarity metrics (BERTScore, ROUGE-2) for textual quality; the brief records that these are to be kept 'in an appendix if at all', the pilot BERTScore having spanned only 0.866 to 0.882. DeltaScore's finding is evidence for demoting such metrics, not for using them.",
+ "confidence": "high",
+ "notes": "Self-citation by an EngTrace author (C9). I grade it 'wrong' rather than 'misleading' because the paper is neither a source of reference-based metrics nor an endorsement of them; a consolidator could defensibly call it 'misleading'. If an appendix keeps BERTScore and ROUGE it should cite Zhang et al. (2020) and Lin (2004) only; this paper could then be cited, with the caveat that its domain is stories, as one reason those metrics were demoted (the suggested wording above)."
+}

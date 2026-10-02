@@ -1,0 +1,34 @@
+{
+ "key": "li2025eeebench",
+ "reviewer": "r3",
+ "read": "full: abstract and introduction (pp. 1-3), section 2 on the benchmark (data collection, summary, analysis; pp. 4-6), section 3 experiments and error analysis (pp. 6-8), section 4 discussion of captions and 'laziness' (pp. 8-10), related work and conclusion (pp. 9-11); appendix B on limitations and ethics (p. 18) read; Table 2 (p. 6) and the other appendices skimmed",
+ "title_confirmed": true,
+ "venue_now": "CVPR 2025, per the printed reference ('Accepted to CVPR 2025') and notes/cited_set_resolution.md; the file is arXiv 2411.01492v2, 27 Feb 2025, headed 'Preprint' (p. 1), so the venue is not shown in the text",
+ "what_it_is": "EEE-Bench is a multimodal benchmark of 2,860 electrical and electronics engineering problems built around images: circuit diagrams, system diagrams and plots (pp. 1-2, 4). They span ten subdomains, from digital logic and circuit theory to control systems, electrical machines and electromagnetics (pp. 2, 4-5). Questions come from official EEE exams and verified online sources, filtered in two stages (p. 4). A question was kept only if two distinct sources gave identical solutions, and was removed if text-only GPT-4 answered it correctly in two trials. Graduate students then checked typos, image resolution and prompt completeness. 2,059 problems are multiple choice and 801 free-form, with answers of at most one word or number (p. 4). GPT-4o-mini reduces each response to a final answer, which is scored by accuracy (p. 7). Seventeen models are evaluated (one text-only LLM and 16 LMMs), with GPT-4o best at 46.78% (pp. 1, 6-7).",
+ "domain": "engineering: electrical and electronics (ten subdomains), multimodal (p. 2)",
+ "size": "2,860 problems: 2,059 multiple choice and 801 free-form; 2,813 unique images (p. 4); 17 models: 9 open-source LMMs, 7 closed-source LMMs and GPT-4 as a text-only LLM baseline (pp. 6-7)",
+ "source_of_items": "exams: official EEE exams and verified online sources, newly collected rather than drawn from earlier benchmarks (pp. 4, 18)",
+ "instances": "static",
+ "has_gold_traces": "no: the released metadata hold the answer, question type and choices but no solution field (p. 4); worked solutions appear only for illustrative examples (p. 5; appendix H)",
+ "evaluation": "final answer: GPT-4o-mini extracts a concise answer from the raw response, which is scored by accuracy against the ground truth, as in MathVista; zero-shot, with two runs averaged (p. 7)",
+ "human_validation": "Agreement of two sources on the solution serves as a quality filter, and graduate students made final checks for typos, image resolution and prompt completeness (p. 4). The GPT-4o-mini answer extractor is not validated, and no inter-annotator figures are reported. An error breakdown of GPT-4o's wrong answers (reasoning 50.3%, perception 26.5%) is given without saying who labelled it (p. 8).",
+ "contamination_measures": "none: 'newly collected' means not taken from earlier benchmarks, but the items come from public exams and openly licensed online sources (pp. 4, 18); the text-only filter targets reliance on the image, not contamination (p. 4)",
+ "engtrace_use": {
+  "sentence": "S-E1 (L182-190): '... while specialized benchmarks like TransportBench, APBench, and EEE-Bench (Syed et al., 2024; Chen et al., 2025; Cheng et al., 2024; Li et al., 2025; Liu et al., 2025) are siloed within narrow sub-disciplines.'",
+  "verdict": "imprecise",
+  "explanation": "The gist holds: EEE-Bench stays within one discipline, and its authors say it 'does not extend to the broader spectrum of engineering (e.g., civil, mechanical, and chemical engineering)' (p. 18). But 'narrow sub-discipline' understates it. It spans the whole electrical and electronics branch in ten subdomains (pp. 2, 4-5), more electrical ground than EngTrace's own three electrical domains. The sentence also omits that it is a multimodal, diagram-reading benchmark (pp. 1-2), the main way it differs from text-only EngTrace. The paragraph's closing generalisation (outcome matching, L199-201) fits: only extracted final answers are scored (p. 7). The key 'Li et al., 2025' matches the first author (p. 1)."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "EEE-Bench (Li et al., 2025) collects 2,860 multimodal exam problems across ten electrical and electronics subdomains, scored on the extracted final answer.",
+ "facts_to_cite": [
+  "2,860 problems, 2,059 multiple choice and 801 free-form, across ten EEE subdomains (p. 4)",
+  "multimodal: problems depend on circuit diagrams, system diagrams and plots (pp. 1-2)",
+  "collected from official EEE exams and verified online sources; kept only when two sources agree on the solution; questions answerable by text-only GPT-4 removed (p. 4)",
+  "GPT-4o-mini extracts final answers, which are scored by accuracy (p. 7)",
+  "best model GPT-4o at 46.78% (pp. 1, 7)",
+  "its authors note that it does not cover civil, mechanical or chemical engineering (p. 18)"
+ ],
+ "overlap_with_engtrace": "Shares: electrical engineering content (its signals and systems, communication systems and electromagnetics subdomains overlap EngTrace's electrical domains) and numeric free-form answers. Lacks: generated instances (fixed exam problems); gold traces (answers only); step-level or process evaluation (final answers only); validation of its LLM answer extractor; and comparability with text-only evaluation, since it requires reading images.",
+ "confidence": "medium",
+ "notes": "Venue: the printed 'ArXiv preprint ... Accepted to CVPR 2025' should become the CVPR 2025 proceedings entry (pp. 13337-13349 per notes/cited_set_resolution.md); the text here is the arXiv preprint. The verdict turns on 'narrow': EEE-Bench is broader within electrical engineering than EngTrace's electrical branch, so the revision should contrast it on modality, static items and answer-only scoring rather than on narrowness."
+}

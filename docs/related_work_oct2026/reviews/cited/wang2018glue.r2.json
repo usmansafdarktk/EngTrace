@@ -1,0 +1,32 @@
+{
+ "key": "wang2018glue",
+ "reviewer": "r2",
+ "read": "full: main text pp. 1-9 (abstract, introduction, related work, tasks, evaluation, diagnostic dataset, baselines, benchmark results, analysis, conclusion); appendices skimmed by heading (pp. 13-15)",
+ "title_confirmed": true,
+ "venue_now": "ICLR 2019 (page 1 header: 'Published as a conference paper at ICLR 2019'); the file is arXiv 1804.07461v3, 22 Feb 2019",
+ "what_it_is": "GLUE is a multi-task benchmark of nine English sentence and sentence-pair understanding tasks (CoLA, SST-2, MRPC, QQP, STS-B, MNLI, QNLI, RTE, WNLI), all built on pre-existing datasets, with an online evaluation server and leaderboard that scores held-out test sets, several with privately held labels (pp. 1-5, Table 1). It adds a hand-built diagnostic set of 1,100 NLI examples tagged by linguistic phenomenon (pp. 5-6). The paper's baselines (BiLSTM, ELMo, CoVe, attention, sentence encoders) reach a best macro-average of 70.0, and the authors conclude that 'solving GLUE is beyond the capabilities of current models and methods' (Table 4, p. 7; p. 8).",
+ "domain": "English natural language understanding (classification, paraphrase, similarity, inference)",
+ "size": "9 tasks, with training sets from 634 to 393k examples and test sets from 146 to 391k (Table 1, p. 2), plus a 1,100-example diagnostic set (p. 6)",
+ "source_of_items": "existing annotated datasets; the diagnostic set is expert-built by minimally editing naturally occurring sentences (p. 6)",
+ "instances": "static",
+ "has_gold_traces": "no",
+ "evaluation": "final labels: accuracy, F1, Matthews correlation or Pearson/Spearman correlation per task, macro-averaged into the GLUE score; the diagnostic set is scored by R3 (pp. 3-6)",
+ "human_validation": "for the diagnostic set only: six NLP researchers annotated 50 sentence pairs (Fleiss kappa 0.73, average R3 0.80), and a hypothesis-only classifier audit found near-chance accuracy (32.7% and 36.4%) on the diagnostic data (p. 6)",
+ "contamination_measures": "private test labels for several tasks, scored only through the evaluation server (pp. 1-2); no contamination analysis",
+ "engtrace_use": {
+  "sentence": "First, static benchmarks like Glue (Wang et al., 2019) and BBH (Kazemi et al., 2025) are increasingly prone to model saturation (Ott et al., 2022) and data contamination (Deng et al., 2024); EngTrace counters this through symbolic templates and domain-aware parameterization, generating unique, physically grounded problems that resist rote memorization. (Introduction, L97-105; GLUE is named but this paper is not cited, and is not in the reference list)",
+  "verdict": "accurate",
+  "explanation": "This verdict is for the sentence's characterisation of the benchmark it names; the citation itself is missing, because the May text attaches SuperGLUE to the name (citation map C1). 'Static benchmark prone to model saturation' fits GLUE: it is a fixed collection of existing datasets with fixed test sets (pp. 1-3), and its saturation is documented, though not in this paper, which found GLUE beyond the models of 2018 (p. 8), but in SuperGLUE, which shows the best GLUE score passing the human estimate about a year later (SuperGLUE p. 1). On contamination, GLUE kept several test sets' labels private (pp. 1-2); Deng et al. (2024, p. 2) report Elazar et al.'s finding of potential contamination of several GLUE and SuperGLUE datasets in pretraining corpora."
+ },
+ "recommendation": "add (must)",
+ "suggested_wording": "Static suites are outgrown quickly: on GLUE (Wang et al., 2019a), a fixed collection of nine language-understanding tasks, the best systems passed the non-expert human estimate a little over a year after release (Wang et al., 2019b).",
+ "facts_to_cite": [
+  "Nine English sentence and sentence-pair tasks, all built on pre-existing datasets (pp. 1-3, Table 1).",
+  "Scored through an online server and leaderboard; several test sets use labels 'never made public in any form' (Table 1 caption, p. 2; p. 1).",
+  "An expert-built diagnostic set of 1,100 NLI examples tagged by linguistic phenomenon (pp. 5-6).",
+  "At release the best baseline averaged 70.0 and the authors judged that 'solving GLUE is beyond the capabilities of current models and methods' (Table 4, p. 7; p. 8)."
+ ],
+ "overlap_with_engtrace": "Shares only a held-out test design (private labels, server scoring, pp. 1-2) and an expert-built diagnostic set checked by agreement (Fleiss kappa 0.73, p. 6). It is static, scores final labels only, and has no gold traces, no step-level evaluation and no engineering content.",
+ "confidence": "high",
+ "notes": "Not in the May reference list. It must be added if the revised Introduction keeps the name GLUE, cited as the ICLR 2019 paper; otherwise drop the name. Year clash with SuperGLUE (both Wang et al., 2019): use 2019a and 2019b. The catalogue lists the year as 2018 (arXiv); the ICLR version is 2019. The paper contains no evidence of saturation, so it must be paired with SuperGLUE for that claim."
+}

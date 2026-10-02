@@ -1,0 +1,33 @@
+{
+ "key": "wang2023scibench",
+ "reviewer": "r1",
+ "read": "partial: main text pp.1-9 in full (abstract, introduction, related work, section 3 dataset, section 4 experiments incl. setup, results, multimodal and exam subsets, section 5 error analysis, conclusion); appendices (textbook and exam details, prompts, examples, pp.13-28) skimmed",
+ "title_confirmed": true,
+ "venue_now": "ICML 2024, PMLR 235 (page 1 footer); the file is arXiv:2307.10635v3, 28 Jun 2024 (p.1)",
+ "what_it_is": "A college-level scientific problem-solving benchmark of 869 free-response problems from ten widely used textbooks in physics, chemistry and mathematics, 177 of which include visual elements, plus a closed set of 103 problems from seven midterm and final exams in computer science and mathematics (p.2, Table 2 p.4). Problems were OCR'd from PDFs and manually converted to LaTeX; answers are single numbers rounded to three decimals, and some problems carry step-by-step solutions (p.2, pp.4-5). Answers are scored against the gold value with a 5% relative tolerance; exam answers are graded with the instructors' rubrics (p.5). The best configuration scores 43.22% on the textbook set; a separate error analysis attributes wrong answers to ten skills using a GPT-3.5 classifier checked by human annotators (p.1, pp.7-8).",
+ "domain": "college physics (fundamentals, statistical thermodynamics, classical dynamics), chemistry (quantum and physical chemistry) and mathematics (calculus, statistics, differential equations); exam set in data mining, machine learning and differential equations (p.4)",
+ "size": "869 textbook problems (291 physics, 269 chemistry, 309 mathematics by Table 2, p.4), 177 of them multimodal; 103 closed exam problems; seven unimodal LLMs on the textbook set, plus multimodal models (p.2, p.5, p.7)",
+ "source_of_items": "textbooks (ten college textbooks) and course exams (p.2, p.4)",
+ "instances": "static",
+ "has_gold_traces": "partial: detailed step-by-step solutions for 9.1% to 21.5% of each textbook's problems (Table 2, p.4; p.5), used as few-shot examples and in error analysis, not in scoring",
+ "evaluation": "final answer: numerical comparison within 5% relative tolerance; the exam set is graded with instructor rubrics (p.5)",
+ "human_validation": "Human annotators collected and checked every problem's LaTeX (p.5); two college students annotated 112 errors in GPT-3.5 solutions (the line and the reason), from which ten skills were distilled with GPT-4's help (p.7); human annotators reviewed the GPT-3.5 skill classifier's output and discarded about 20% of its classifications (p.8). The answer scorer itself is not validated against human grading.",
+ "contamination_measures": "items chosen to be not readily accessible online in text form and manually converted from PDF to LaTeX (p.2, p.4); a closed exam set less likely to be in training data (p.4)",
+ "engtrace_use": {
+  "sentence": "Rebuttal R-1 (July 2026, not in the paper): 'SciBench (Wang et al., 2023) allows a 5% relative tolerance for grading numeric answers on college-level scientific problems, and ABench-Physics (Zhang et al., 2025b) uses a 1% tolerance for physics reasoning.'",
+  "verdict": "accurate",
+  "explanation": "The paper compares model outputs with the correct answers 'allowing a relative tolerance of 5%' (p.5), on college-level problems from physics, chemistry and mathematics textbooks (p.2). The only problem is the key: in the May reference list 'Wang et al., 2023' is NEWTON, and SciBench's archival version is ICML 2024 (p.1)."
+ },
+ "recommendation": "add (should)",
+ "suggested_wording": "SciBench (Wang et al., 2024) draws 869 college-level problems from physics, chemistry and mathematics textbooks and grades numerical answers within a 5% relative tolerance.",
+ "facts_to_cite": [
+  "869 free-response problems from ten college textbooks in physics, chemistry and mathematics, 177 with visual elements, plus 103 closed exam problems (p.2, p.4)",
+  "Answers are single numerical values, graded within a 5% relative tolerance; the exam set is graded with instructors' rubrics (p.5)",
+  "Step-by-step solutions are provided for only part of the problems (9.1% to 21.5% per textbook) (p.4)",
+  "The best configuration reaches 43.22% on the textbook set (p.1)",
+  "Problems were selected to be hard to find online in text form and manually converted from PDF to LaTeX to limit leakage (p.2, p.4)"
+ ],
+ "overlap_with_engtrace": "Shares: quantitative college-level problems in topics adjacent to EngTrace's chemical and mechanical branches (statistical thermodynamics, physical chemistry, classical dynamics; p.4); numerical answers graded with a relative tolerance (5%, against EngTrace's 0.2% or one unit in the last digit); reference solutions for a subset. Lacks: generated instances (static textbook problems); gold traces in scoring; step-level evaluation (its error analysis is post hoc, an LLM classifier labelling wrong answers by missing skill, pp.7-8); an engineering domain; validation of the answer scorer.",
+ "confidence": "high",
+ "notes": "Why add: it is the standard college-level science benchmark (ICML 2024) that both UGPhysics and PhysReason position themselves against, its numeric tolerance is directly comparable to EngTrace's answer check, and EngTrace's own July rebuttal relied on it, so a reviewer may expect it in the physical-sciences paragraph. Naming clash: cite it as Wang et al., 2024 (ICML) so it does not collide with NEWTON's 'Wang et al., 2023'; if the arXiv year is used, the two need 2023a/2023b."
+}

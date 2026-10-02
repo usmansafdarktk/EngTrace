@@ -1,0 +1,34 @@
+{
+ "key": "du2025supergpqa",
+ "reviewer": "r3",
+ "read": "partial: abstract and contents (pp. 1-3), introduction (pp. 4-5), section 2 data collection (pp. 5-9), section 3 statistics (pp. 10-15), section 4.1 baseline models and the text of 4.2-4.3 (pp. 16, 19, 21), related work (p. 25), contributions (p. 26); appendix C on quality review (pp. 47, 58-59), appendix F evaluation prompts (pp. 69-70) and G.2 robustness (pp. 73-74) read in part; result tables and appendices H-K (pp. 17-18, 77-249) skimmed",
+ "title_confirmed": true,
+ "venue_now": "arXiv 2502.14739v4, 28 Mar 2025 (p. 1); NeurIPS 2025 Datasets and Benchmarks according to notes/cited_set_resolution.md, which this text does not show",
+ "what_it_is": "SuperGPQA is a multiple-choice benchmark of graduate-level knowledge and reasoning across 285 subfields in 13 disciplines and 72 fields (pp. 1, 10). It was built in three stages (pp. 4-9). Expert annotators (PhD holders or candidates) chose credible sources, preferring textbook example problems with solutions. Crowd-sourced annotators (undergraduate and master's students) translated questions, converted other problems into multiple choice and wrote distractors. A rule-based, LLM-based and expert quality inspection then removed trivial or ambiguous items. The 26,529 questions average 9.67 options. 42.33% require calculation or formal reasoning, and 7,892 are in engineering, 55.40% of them calculation questions (pp. 10, 13). Models answer with a letter: zero-shot for chat and reasoning models, five-shot for base models (p. 16; pp. 69-70).",
+ "domain": "multi-discipline, graduate level (13 disciplines, 72 fields, 285 subfields); engineering has 7,892 questions in fields that include chemical, civil, electrical and mechanical engineering, mechanics, power engineering and engineering thermophysics, hydraulic and transportation engineering (pp. 10-11)",
+ "size": "26,529 questions, at least 50 per subfield (pp. 4, 10); evaluated 6 reasoning models (o3-mini in three modes), 28 chat models and 17 base models (p. 16)",
+ "source_of_items": "expert-screened sources, textbook example problems with solutions first and then website problems (p. 7), turned into multiple-choice questions with written distractors by crowd-sourced annotators (p. 8); some open-source datasets added (p. 13)",
+ "instances": "static",
+ "has_gold_traces": "no: each question has options and one correct answer (p. 10); the five-shot exemplars include worked rationales (p. 70), but the items carry no gold solution steps",
+ "evaluation": "multiple choice: the model's final line 'Answer: $LETTER' over up to ten options (A-J), scored by accuracy at temperature 0 (pp. 16, 69); robustness checked over 24 prompt formats, with standard deviation at most 1.37 points (p. 21)",
+ "human_validation": "Over 80 expert annotators took part (p. 1). Experts re-annotated questions that the LLM checks flagged as suspicious, with unrestricted web access and over 30 minutes per question (p. 9). The manual-review guidelines check that each answer is correct and unique (p. 58). No inter-annotator agreement or error rates are reported.",
+ "contamination_measures": "none systematic: plagiarism checks only against other candidate questions (p. 5). The paper warns of 'a significant risk of data leakage' from online exercise sites (p. 7) and suspects leakage for o1-mini and o3-mini in science and engineering (p. 19).",
+ "engtrace_use": {
+  "sentence": "S-E1 (L182-190): 'Generalist suites like MMLU (Hendrycks et al., 2021a), BIG-Bench (Luo et al., 2024), and SuperGPQA (Du et al., 2025) restrict assessment to factual recall via multiple-choice questions, ...'",
+  "verdict": "misleading",
+  "explanation": "'Multiple-choice' is exact: every item is a single-answer question with up to ten options (pp. 10, 69). 'Factual recall' is contradicted by the paper's composition and design. 42.33% of all questions, and 55.40% of the engineering ones, require mathematical calculation or formal reasoning (pp. 10, 13). Source screening put textbook example problems and calculation and reasoning problems first (p. 7). The authors also report that multiple-choice questions converted from calculation and reasoning problems discriminate better (p. 6). For an engineering paragraph the sentence also omits what matters most: 7,892 of the 26,529 questions are engineering questions (p. 10). The defensible contrast with EngTrace is that only the chosen option is scored, not that the questions test recall."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "SuperGPQA (Du et al., 2025) spans 285 graduate subfields with 26,529 multiple-choice questions, 7,892 of them in engineering and over half of those requiring calculation, but scores only the option chosen from up to ten.",
+ "facts_to_cite": [
+  "26,529 questions over 13 disciplines, 72 fields and 285 subfields (p. 10)",
+  "every question is multiple choice, with 9.67 options on average; models must end with 'Answer: $LETTER' (pp. 10, 69)",
+  "7,892 questions are in engineering; 55.40% of engineering questions and 42.33% of all questions require calculation or formal reasoning (pp. 10, 13)",
+  "built by expert source screening, crowd-sourced transcription into multiple choice with written distractors, and rule-, LLM- and expert-based quality inspection (pp. 4-9)",
+  "over 80 expert annotators (p. 1)",
+  "best model DeepSeek-R1 at 61.82% accuracy (p. 1)"
+ ],
+ "overlap_with_engtrace": "Shares: substantial university-level engineering coverage, including chemical, civil, electrical and mechanical fields (p. 11); calculation-heavy items; and expert involvement in item quality. Lacks: generated instances (fixed public items); gold traces (answer only); step-level or process evaluation (option letter only); and an evaluator that needs validation. Its expert review checks the items, not model reasoning.",
+ "confidence": "high",
+ "notes": "The file lists the corporate author 'M-A-P' on p. 1, and Xinrun Du heads the 'Leading Authors' list (p. 26), so 'Du et al., 2025' is consistent. Update the printed 'ArXiv preprint' to the NeurIPS 2025 Datasets and Benchmarks version if confirmed (notes/cited_set_resolution.md, problem 7). Of the three generalist suites in S-E1, SuperGPQA carries the most engineering weight and deserves the most precise description."
+}

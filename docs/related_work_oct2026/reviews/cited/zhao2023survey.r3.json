@@ -1,0 +1,33 @@
+{
+ "key": "zhao2023survey",
+ "reviewer": "r3",
+ "read": "partial: abstract and introduction (pp. 1-4); Section 7 Capacity and Evaluation in full for the opening, 7.1.3 Complex Reasoning and 7.3 Benchmarks and Evaluation Approaches (pp. 55-66); 8.1 LLM-based evaluation (meta-evaluation, remaining issues) and 8.2 specific-domain applications (pp. 76-78); conclusion (pp. 96-97); a keyword search of the whole text for engineering, contamination and saturation. The other ~110 pages (resources, pre-training, post-training, utilization, advanced topics) were skimmed by heading only. A survey has no benchmark-construction section.",
+ "title_confirmed": true,
+ "venue_now": "arXiv:2303.18223v19, 18 Mar 2026 (page 1 footer; page 1 also notes 'Version: v18 (major update on March 7, 2026)'). The text shows no journal venue; papers.json lists Frontiers of Computer Science 20(12), 2026, which this file does not show. The May entry cites the 2023 arXiv preprint.",
+ "what_it_is": "A general survey of large language models organised around pre-training, adaptation (post-training), utilization and capacity evaluation, plus resources, applications and open problems (pp. 1, 4). It is not a benchmark. Its evaluation section reviews basic abilities (language generation, knowledge utilization, complex reasoning), advanced abilities, comprehensive benchmarks (MMLU, BIG-bench, HELM, human-exam suites) and benchmark-, human- and model-based evaluation approaches with their pros and cons (pp. 55-66). The survey is revised continuously; the file is the 2026 version (p. 1).",
+ "domain": "general LLM research (survey). No engineering coverage: the domain-application section covers healthcare, education, law, finance and scientific research (pp. 77-78), and 'engineering' otherwise appears as prompt, data or feature engineering, the engineering of LLM training, and once software engineering as a multi-agent application (p. 80).",
+ "size": "a 144-page survey in this version; no items of its own beyond a small empirical comparison of existing models in Section 7.4 (pp. 66-70)",
+ "source_of_items": "n/a (literature survey)",
+ "instances": "n/a",
+ "has_gold_traces": "n/a",
+ "evaluation": "n/a for the survey itself. It reviews benchmark-based evaluation (close-ended problems, the generated text parsed by rules and compared with the ground truth, p. 64), human-based evaluation and model-based (LLM-as-judge) evaluation (pp. 64-66).",
+ "human_validation": "none relevant to the cited claim",
+ "contamination_measures": "n/a. The survey states that data contamination in benchmark-based evaluation 'has become increasingly severe since more and more open data has been collected for developing LLMs' (p. 65) and calls it 'a severe issue for fairly assessing the performance of LLMs' (p. 96).",
+ "engtrace_use": {
+  "sentence": "As LLMs expand into high-stakes engineering workflows, rigorous evaluation of their reasoning capabilities has become paramount (Zhao et al., 2023; Xie et al., 2023a). (S-I1, May L45-48)",
+  "verdict": "imprecise",
+  "explanation": "The survey supports the generic half of the sentence: evaluating LLM abilities, complex reasoning among them, is a central research concern (Section 7, pp. 55-66; reasoning issues p. 61). It supports none of the specific half: it never discusses engineering disciplines or high-stakes engineering use (its applications are healthcare, education, law, finance and science, pp. 77-78; software engineering appears once as a multi-agent application, p. 80). Citing a 144-page general survey for an engineering-specific motivation is loose. The survey does contain statements that bear directly on EngTrace's motivation and would make a precise citation: LLMs 'may generate the correct answer following an invalid reasoning path, or produce a wrong answer after a correct reasoning process' (p. 61), and LLM evaluators 'cannot serve as qualified evaluators for some difficult tasks (e.g., mathematical reasoning)' (p. 66)."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "LLMs can reach a correct final answer through an invalid chain of reasoning, or a wrong answer after a sound one (Zhao et al., 2023), so final-answer accuracy alone cannot certify the reasoning that produced it.",
+ "facts_to_cite": [
+  "Reasoning inconsistency is listed as a major issue of LLM complex reasoning: LLMs 'may generate the correct answer following an invalid reasoning path, or produce a wrong answer after a correct reasoning process'; process-level feedback is among the proposed remedies (p. 61).",
+  "Data contamination in benchmark-based evaluation 'has become increasingly severe since more and more open data has been collected for developing LLMs' (p. 65), and 'has become a severe issue for fairly assessing the performance of LLMs' (p. 96).",
+  "Model-based (LLM-as-judge) evaluation suffers position, verbosity and self-enhancement bias, and LLMs 'cannot serve as qualified evaluators for some difficult tasks (e.g., mathematical reasoning)' (pp. 65-66).",
+  "Current LLM-based evaluators 'might not be adequate for evaluating top-tier LLMs or complex tasks' (p. 77).",
+  "Benchmark-based evaluation formats each problem as a prompt, parses the generated text with human-written rules and compares the predicted answer with the ground truth (p. 64)."
+ ],
+ "overlap_with_engtrace": "A survey, so none of the five features (generated instances, gold traces, step-level evaluation, engineering domain, expert validation of the evaluator) apply. Its value is as background for three problems EngTrace's design answers: answers reached through invalid reasoning (p. 61; EngTrace's gold traces and step checks), contamination of public benchmarks (p. 65; the private generated pool), and the limits of LLM judges on hard reasoning (pp. 65-66, 77; deterministic components plus a residual judge validated against experts). It has nothing on engineering.",
+ "confidence": "high",
+ "notes": "A living document: page numbers here refer to arXiv v19 (18 Mar 2026), the file in text/. The May reference cites the 2023 preprint, and this file cannot show whether the p. 61, p. 65 and p. 66 passages were already in the 2023 versions; the revised reference should name the version consulted (or the journal version if the authors confirm it). The engineering half of S-I1 needs a source that actually evaluates LLMs on engineering tasks; citation_context_map.md C13 points to heesch2025realworld, which I have not read."
+}

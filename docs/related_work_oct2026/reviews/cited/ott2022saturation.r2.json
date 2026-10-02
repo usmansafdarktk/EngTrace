@@ -1,0 +1,33 @@
+{
+ "key": "ott2022saturation",
+ "reviewer": "r2",
+ "read": "full: pp. 1-11 (abstract, introduction, results, discussion, methods, data and code availability)",
+ "title_confirmed": true,
+ "venue_now": "Nature Communications 13:6793 (2022) (page headers pp. 1-11; received 24 March 2022, accepted 31 October 2022, p. 1)",
+ "what_it_is": "A meta-analysis of how AI benchmarks are created, used and saturated, built from Papers With Code data curated into an ontology (ITO): 3,765 benchmarks across 947 tasks in computer vision and NLP (pp. 1-3, Table 1; Methods, p. 9). It normalises state-of-the-art trajectories, clusters 1,079 metric trajectories from 654 benchmarks into continuous growth, saturation/stagnation, and stagnation followed by a burst (p. 3), maps benchmark creation, saturation and abandonment over time (pp. 4-5), and compares the most and least used datasets (pp. 6-8). It concludes that a large fraction of benchmarks quickly trends toward near-saturation, many are little used, and progress comes in unpredictable bursts (pp. 1, 8).",
+ "domain": "AI benchmarking practice (computer vision and NLP); meta-analysis",
+ "size": "3,765 benchmarks and 947 tasks (Table 1, p. 3); 1,079 state-of-the-art trajectories from 654 benchmarks clustered (p. 3); state-of-the-art values from 2008 to mid 2021, from a Papers With Code export dated 30 July 2022 (p. 9)",
+ "source_of_items": "Papers With Code results, manually curated (p. 9)",
+ "instances": "n/a (meta-analysis)",
+ "has_gold_traces": "n/a",
+ "evaluation": "n/a; trajectories analysed by normalised relative improvement and self-organising-map clustering (pp. 3-4)",
+ "human_validation": "a completeness check in which 365 sampled citing papers were annotated, estimating that Papers With Code captures about one third of state-of-the-art results (pp. 5-6); 40 datasets annotated for popularity attributes (pp. 6-8)",
+ "contamination_measures": "n/a; contamination is not discussed",
+ "engtrace_use": {
+  "sentence": "First, static benchmarks like Glue (Wang et al., 2019) and BBH (Kazemi et al., 2025) are increasingly prone to model saturation (Ott et al., 2022) and data contamination (Deng et al., 2024); EngTrace counters this through symbolic templates and domain-aware parameterization, generating unique, physically grounded problems that resist rote memorization. (Introduction, L97-105)",
+  "verdict": "accurate",
+  "explanation": "Ott et al. support the saturation claim they are cited for: 'a large fraction of benchmarks quickly trends towards near-saturation' (abstract, p. 1); 'a sizable portion of novel benchmarks in key domains such as NLP quickly trended towards saturation' (p. 1); and the effect 'was especially marked in the recent past' (p. 8), which covers 'increasingly'. Three limits matter for EngTrace. The data are computer-vision and NLP benchmarks up to mid 2021 (p. 9), mostly before current LLMs. The 'saturation/stagnation' pattern mixes true saturation with stagnation from lack of progress or of research interest (p. 1). And the remedies the paper proposes are more sub-benchmarks and 'living benchmarks' updated over time (p. 8), not templates; the sentence's next clause, that EngTrace 'counters this through symbolic templates', is not supported by Ott et al., and EngTrace's own answer scores (0.805 to 0.970 across 11 models, state brief section 4) show its answer level near ceiling too."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "Benchmarks saturate quickly: across 3,765 computer-vision and NLP benchmarks, a large fraction trended toward near-saturation soon after release, after which they either stop measuring progress or become misleading measures (Ott et al., 2022).",
+ "facts_to_cite": [
+  "Data on 3,765 benchmarks across 947 tasks in computer vision and NLP, from Papers With Code (abstract, p. 1; Table 1, p. 3).",
+  "A large fraction of benchmarks quickly trends toward near-saturation (p. 1), and the effect was especially marked in the recent past (p. 8).",
+  "Of 1,079 state-of-the-art metric trajectories (from 654 benchmarks), 378 fell in the saturation/stagnation cluster (p. 3).",
+  "Saturated benchmarks either can no longer measure progress or become misleading measures, with remaining gains driven by over-optimisation to benchmark specifics (p. 1).",
+  "Proposed remedies: benchmarks with many sub-benchmarks, and 'living benchmarks' updated over time to prevent overfitting and saturation (p. 8)."
+ ],
+ "overlap_with_engtrace": "Shares the motivation only. It is a meta-analysis with no items, traces or evaluator. Its 'living benchmark' updated over time (p. 8) is the nearest analogue to EngTrace's regenerable private pool, but it does not discuss generated instances, process evaluation, engineering or expert validation.",
+ "confidence": "high",
+ "notes": "The cluster sizes are labelled inconsistently: '1079 metric trajectories of 654 benchmarks' are split into 460 'trajectories', 378 'benchmarks' and 241 'benchmarks' (p. 3), which sums to 1,079 only as trajectories; cite 378 of 1,079 trajectories, not benchmarks. Papers With Code covers about a third of state-of-the-art results (p. 6). A combined replacement for S-I3 that keeps every claim within its source: 'Static answer-level benchmarks are outgrown quickly: the best GLUE systems passed the non-expert human estimate a little over a year after release (Wang et al., 2019a,b), state-of-the-art models exceed 90% on BIG-Bench Hard (Suzgun et al., 2023; Kazemi et al., 2025), and across 3,765 computer-vision and NLP benchmarks a large fraction trended toward near-saturation (Ott et al., 2022); public test items also leak into pretraining corpora (Deng et al., 2024).'"
+}

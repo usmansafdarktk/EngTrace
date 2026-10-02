@@ -1,0 +1,34 @@
+{
+ "key": "song2025prmbench",
+ "reviewer": "r1",
+ "read": "partial: pp. 1-9 (abstract, 1 introduction, 2 related work, 3 PRMBench categories, curation and quality control, 4 experiments, 5 analysis, conclusion, limitations) in full; appendices A.3 and B.2-B.5 (pp. 13-14) read; remaining appendix tables, examples and prompts (pp. 15-48) skimmed",
+ "title_confirmed": true,
+ "venue_now": "The text is arXiv 2501.03124v5, 28 Jun 2025 (p. 1), with no venue line. Other papers in this corpus cite it as ACL 2025 (Proceedings of the 63rd Annual Meeting, pp. 25299-25346).",
+ "what_it_is": "PRMBench evaluates process reward models' fine-grained error detection (abstract, p. 1). Starting from fully correct PRM800K solutions to MATH problems, GPT-4o is prompted with class-specific instructions to rewrite the ground-truth steps into versions containing errors, and QwQ supplies alternative correct solutions for the multi-solution class; outputs are filtered by structural rules and 10% are checked by five volunteers (pp. 4-5). The 6,216 test cases with 83,456 step labels fall into three categories and nine sub-categories: simplicity (non-redundancy, non-circular logic), soundness (empirical soundness, step consistency, domain consistency, confidence invariance) and sensitivity (prerequisite sensitivity, deception resistance, multi-solution consistency) (pp. 1-4; Table 2, p. 4). PRMs and prompted LLMs are scored with PRMScore, a weighted combination of F1 and negative F1 at step level (pp. 5-6).",
+ "domain": "competition math (MATH problems via PRM800K); an appendix extension, PRMBench-STEM, covers physics, chemistry and biology (Table 9, p. 14)",
+ "size": "6,216 test cases with 83,456 step-level labels and 13.4 steps on average (pp. 1-2; Table 2, p. 4); 25 models evaluated (p. 2); PRMBench-STEM adds 1,619 physics, 1,543 chemistry and 2,342 biology instances (Table 9, p. 14)",
+ "source_of_items": "perturbed from an existing set: GPT-4o rewrites of PRM800K ground-truth solutions, with rule-based filtering and partial human review",
+ "instances": "perturbed",
+ "has_gold_traces": "partial: built from PRM800K's ground-truth step-level solutions; each test case carries step labels marking the injected erroneous steps (p. 5)",
+ "evaluation": "step-level classification of each step as correct or erroneous (and as redundant), scored by PRMScore = w1*F1-negative + w2*F1 (pp. 5-6; Appendix B.3, p. 14); a best-of-8 comparison as secondary analysis (p. 8)",
+ "human_validation": "Five volunteers holding a bachelor's degree or equivalent reviewed 10% of instances: over 92% judged correctly modified and over 98% different from the original (p. 5; Appendix A.3.1, p. 13). The human score of 83.8 comes from three such volunteers on a 450-instance mini-test (Appendix A.3.2, p. 14). No inter-annotator agreement reported.",
+ "contamination_measures": "none stated",
+ "engtrace_use": {
+   "sentence": null,
+   "verdict": "n/a",
+   "explanation": "Not cited in the May paper. Belongs in the process supervision and judge validity paragraph next to ProcessBench. Its constructed errors, injected into correct gold solutions so that ground truth holds by construction (p. 5), are the nearest precedent for EngTrace's planted defects (60 arithmetic, 60 conceptual, 60 controls; brief sec. 3), and a reviewer will ask how the two designs differ. It also reports two PRM behaviours EngTrace sees in engineering: open PRMs favour positive rewards and miss erroneous steps (Table 4, p. 6; p. 7), and step-level scores disagree with best-of-N rankings (average Somers' D -0.05, p. 8). It scores the same Qwen2.5-Math-PRM-7B and -72B that EngTrace runs (Table 3, p. 6)."
+ },
+ "recommendation": "add (must)",
+ "suggested_wording": "PRMBench (Song et al., 2025) has GPT-4o inject nine kinds of error into correct PRM800K solutions, giving 6,216 test cases with 83,456 step labels, and finds that the best model trails human performance (68.8 against 83.8 PRMScore) and that open PRMs tend to pass erroneous steps.",
+ "facts_to_cite": [
+   "6,216 test cases with 83,456 step-level labels in three categories (simplicity, soundness, sensitivity) and nine sub-categories (abstract, p. 1; pp. 3-4; Table 2, p. 4).",
+   "Built from fully correct PRM800K solutions that GPT-4o rewrites into erroneous versions with class-specific prompts; QwQ generates alternative correct solutions for the multi-solution class (p. 5).",
+   "Quality control: structural filtering plus manual review of 10% of instances by five volunteers, over 92% judged correctly modified (p. 5).",
+   "Across 25 models the best, Gemini-2-Thinking, scores 68.8 PRMScore against a human score of 83.8 (p. 2; Table 3, p. 6); Qwen2.5-Math-PRM-72B scores 68.2 and Qwen2.5-Math-PRM-7B 65.5 (Table 3, p. 6).",
+   "Open PRMs are biased towards positive rewards: ReasonEval-7B and RLHFlow-DeepSeek-8B exceed 95% accuracy on correct steps but average about 17% on erroneous ones (p. 7; Table 4, p. 6).",
+   "PRMBench scores barely correlate with best-of-8 accuracy (average Somers' D -0.05), which the authors read as an inconsistency between step-level and outcome-level evaluation (p. 8)."
+ ],
+ "overlap_with_engtrace": "Shares step-level evaluation of PRMs and LLM critics and ground truth by construction from deliberately injected errors, as in EngTrace's planted defects. Differences: PRMBench's errors are LLM-written rewrites of correct math gold solutions (p. 5), whereas EngTrace plants exactly one defect into expert-clean model traces and verifies each plant without the checker under test, holding every digit fixed for the conceptual plants (PILOT_SUMMARY sec. 1.6). PRMBench has no generated instances, no engineering (its STEM extension is physics, chemistry and biology, p. 14), no gold intermediate values beyond PRM800K's correct steps, and its human checking is by bachelor's-level volunteers on 10% of items (p. 5; p. 13). EngTrace's VersaPRM result (recall 0.064, with 95-99% of steps rated correct; brief sec. 3, RESULTS_E2) is an engineering instance of PRMBench's positive-reward bias.",
+ "confidence": "medium",
+ "notes": "The abstract's '6,216 carefully designed problems' are test instances derived from PRM800K questions, not 6,216 distinct problems (Table 2, p. 4). The catalogue's 'math only' needs a qualifier: an appendix extension covers physics, chemistry and biology, still without engineering (Table 9, p. 14). PRMScore weights are 'designed to maximize the differentiation between different models' (p. 6), so PRMScores are not comparable to F1 or accuracy elsewhere. My own observation, not discussed in the paper: test cases are rewritten from PRM800K training and test solutions (p. 5), and several evaluated PRMs were trained on PRM800K (Llemma-PRM800k, ReasonEval), so they may have seen the unperturbed originals. Confidence 'medium' concerns must versus should; the facts are checked."
+}

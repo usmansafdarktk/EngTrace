@@ -1,0 +1,33 @@
+{
+ "key": "chen2023frugalgpt",
+ "reviewer": "r1",
+ "read": "full: all 13 pages (abstract, introduction and related work, problem statement, the three cost-saving strategies, LLM-cascade experiments, discussion and limitations, references)",
+ "title_confirmed": true,
+ "venue_now": "arXiv 2305.05176v1, 9 May 2023 (p.1 footer); this text shows no venue. papers.json records TMLR (published 2024-12). The May reference list's 'Proceedings of the 40th International Conference on Machine Learning (ICML)' is not supported by the text and conflicts with the catalogue.",
+ "what_it_is": "A position-and-method paper on cutting the cost of querying commercial LLM APIs, whose prices differ by up to two orders of magnitude across 12 APIs from 5 providers (p.1, Table 1 p.7). It outlines three strategies (prompt adaptation, LLM approximation, LLM cascade) and instantiates the cascade as FrugalGPT: a query goes to a list of LLM APIs in order, a learned scoring function rates the reliability of each answer, and the next, costlier API is called only when the score falls below a threshold (p.5-6). On three classification and reading-comprehension datasets it matches the best single LLM's accuracy at 59.2% to 98.3% lower cost, or raises accuracy at the same cost (p.1, Table 3 p.8).",
+ "domain": "general NLP query answering: financial-news classification (HEADLINES), legal overruling classification (OVERRULING), conversational reading comprehension (COQA) (p.6-7)",
+ "size": "12 LLM APIs from 5 providers (Table 1, p.7); 3 datasets: HEADLINES 10,000, OVERRULING 2,400 and COQA 7,982 examples (Table 2, p.7); cascades of length 3 (p.6)",
+ "source_of_items": "existing datasets, each randomly split into a training set to learn the cascade and a test set (p.6)",
+ "instances": "static",
+ "has_gold_traces": "no",
+ "evaluation": "final answer: accuracy against dataset labels, reported with query cost in USD (p.6-10)",
+ "human_validation": "none reported",
+ "contamination_measures": "none",
+ "engtrace_use": {
+  "sentence": "Inspired by recent advances in process supervision (Lightman et al., 2023) and cascaded model verification (Chen et al., 2023), we introduce a two-stage evaluation framework that validates intermediate reasoning steps in addition to final-answer accuracy through a tiered verification protocol. (sec. 4, May L390-395)",
+  "verdict": "imprecise",
+  "explanation": "The May tiered protocol does borrow FrugalGPT's escalation pattern: accept the cheap stage's output when it is judged reliable, call the costlier stage otherwise (May L496-502: Tier 1 accepts a chain at alignment ratio above 0.8 with a correct answer and escalates the rest to the Tribunal; FrugalGPT p.5). That gist is right. But FrugalGPT is not a verification method. It routes answer generation among LLM APIs to save money, using a reliability scorer (a DistilBERT regressor in the case study, p.6) trained on labelled examples from the task's own distribution (p.10), on classification and reading-comprehension datasets (p.6-7). It checks no reasoning, and its only use of 'verify' is the completion cache's lookup of a similar earlier query (p.5). 'Cascaded model verification' therefore relabels a cost-saving answer cascade as a verification technique. The reference entry's ICML venue is also unsupported (arXiv v1 text, p.1; TMLR per papers.json), as the citation map's C14a and C15f already flag."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "As in LLM cascades, which call a costlier model only when a cheaper stage's answer is judged unreliable (Chen et al., 2023), the residual judge sees only the milestones and steps that the deterministic checks leave undecided.",
+ "facts_to_cite": [
+  "FrugalGPT is an LLM cascade: a query is sent to a list of LLM APIs in sequence, and the next API is queried only if a scoring function judges the previous answer insufficiently reliable (p.5).",
+  "The scoring function is a small learned model (a DistilBERT regressor in the case study) that predicts from the query and the answer whether the answer is correct (p.5-6).",
+  "Prices of 12 commercial LLM APIs from 5 providers differed by up to two orders of magnitude (p.1, Table 1 p.7).",
+  "Matching the best individual LLM's accuracy, the cascade cut cost by 98.3% (HEADLINES), 73.3% (OVERRULING) and 59.2% (COQA) (Table 3, p.8).",
+  "Learning the cascade needs labelled examples from the same or a similar distribution as the test data (p.10)."
+ ],
+ "overlap_with_engtrace": "Shares only the escalation architecture: a cheap stage settles what it can and a costlier model handles the rest, which describes both the May Tier 1 to Tier 2 protocol and the current design (deterministic checks, then the residual judge on milestones E3 missed and on steps the digit rule does not flag, state brief sec. 2); both papers also report cost. Lacks everything that makes EngTrace a benchmark: no reasoning steps, traces, engineering content, generated instances or human validation. Its escalation rule is a learned score trained on labelled data (p.5-6, p.10), whereas EngTrace's routing is rule-based and its judge was validated against expert labels (state brief sec. 3).",
+ "confidence": "medium",
+ "notes": "Batch V question: FrugalGPT says nothing about process supervision or LLM-judge validity, so it has no place in the planned related-work paragraph. Its one defensible use is in the method section, crediting the cost-motivated cascade behind the residual judge and the step router (EngTrace records $36.3016 for 8,032 E5 calls and a $140 cap for the router, state brief sec. 2 and 4). If the revised method section does not present the residual judge as a cascade, drop the citation; nothing else depends on it. Never call it 'verification'. Internal inconsistencies, if anyone quotes numbers: the text says savings 'range from 50% to 98%' while Table 3 gives 59.2% to 98.3% (p.8); the abstract says accuracy improves by 4% at the same cost (p.1), the Figure 5 caption 'up to 5%' (p.9), and the HEADLINES case study reports 80% lower cost with 1.5% higher accuracy at a $6.5 budget (p.7). Reference list: replace ICML with the venue the authors confirm (TMLR per papers.json) or the arXiv id; this review saw only the arXiv v1 text."
+}

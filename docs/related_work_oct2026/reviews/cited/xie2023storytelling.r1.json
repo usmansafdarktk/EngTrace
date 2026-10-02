@@ -1,0 +1,32 @@
+{
+ "key": "xie2023storytelling",
+ "reviewer": "r1",
+ "read": "full (abstract, introduction, related work, setup pp2-3, automatic evaluation pp3-5, human evaluation pp5-7, plagiarism p7, discussion and conclusion pp7-8, limitations p9; appendices skimmed, including the agreement appendix)",
+ "title_confirmed": true,
+ "venue_now": "Proceedings of the 16th International Natural Language Generation Conference (INLG 2023), pages 323-351 (p1 header)",
+ "what_it_is": "An empirical comparison of story generation by GPT-3 (text-davinci-001, prompted with two or three example stories) against fine-tuned story generators (KGGPT2, PROGEN, MTCL, HINT, BART) on three corpora: ROCStories, WritingPrompts and CNN news (pp2-4; p4 Table 1). Stories are scored with reference-based and reference-free automatic metrics and by two groups of human judges, crowdworkers and in-house volunteers, on fluency, coherence, relatedness, logicality and interestingness (pp3-7). GPT-3's stories were rated significantly better than the other systems' and comparable to human-written ones; lexical metrics disagreed with the human ratings; and GPT-3 tended to reproduce real news stories, a form of soft plagiarism (p1; p7; p8).",
+ "domain": "open-ended story generation (NLG)",
+ "size": "3 datasets; 6 generation systems; automatic evaluation on 800 ROC, 1,000 WP and 600 CNN contexts (p3); human evaluation on 20 contexts per dataset for each annotator group, 3 annotators per story (pp5-6)",
+ "source_of_items": "existing story corpora (ROCStories, WritingPrompts, CNN/DailyMail) (p3)",
+ "instances": "static",
+ "has_gold_traces": "no",
+ "evaluation": "reference-based metrics (corpus BLEU, MS-Jaccard, BERTScore, BLEURT, backward BLEU), reference-free metrics (Self-BLEU, Distinct-3, lexical repetition, BARTScore, length), and 1-5 human ratings on five aspects (pp3-6)",
+ "human_validation": "Crowdworkers on Mechanical Turk and 15 in-house volunteers (14 PhD students, 1 staff member), three ratings per story; the two groups agreed on the main findings (pp5-6); agreement statistics are in an appendix.",
+ "contamination_measures": "n/a. It does check GPT-3's outputs for plagiarism: iThenticate similarity of 4%, 3% and 14% for ROC, WP and CNN, and a manual check finding 7 of 10 sampled CNN stories based on real news (p7).",
+ "engtrace_use": {
+  "sentence": "As LLMs expand into high-stakes engineering workflows, rigorous evaluation of their reasoning capabilities has become paramount (Zhao et al., 2023; Xie et al., 2023a). (L45-48)",
+  "verdict": "misleading",
+  "explanation": "The paper evaluates the quality of generated stories (p1). It does not evaluate reasoning, does not mention engineering, and makes no claim about high-stakes deployment. Its closest content is methodological: human evaluation remains the gold standard for story quality, and lexical metrics agree poorly with it (p8; p9). Cited for the importance of evaluating LLM reasoning in engineering, it implies support the paper does not give."
+ },
+ "recommendation": "drop",
+ "suggested_wording": "In story generation, crowdworkers and in-house judges rated GPT-3's stories as comparable to human-written ones, while lexical reference-based metrics disagreed with those ratings (Xie et al., 2023a).",
+ "facts_to_cite": [
+  "Compares prompted GPT-3 (text-davinci-001) with five fine-tuned story generators on ROCStories, WritingPrompts and CNN news (pp2-4; p4 Table 1).",
+  "Human judges, both crowdworkers and in-house, rated GPT-3's stories significantly above the other systems' and comparable to human-written stories (p1 abstract; pp5-6, Tables 4-5).",
+  "Lexical automatic metrics correlated weakly with human evaluation, and model-based metrics appeared more reliable (p8 conclusion).",
+  "GPT-3 tended to reproduce details of real news stories (7 of 10 sampled CNN stories), raising questions about memorisation (p7)."
+ ],
+ "overlap_with_engtrace": "None. Story generation, not reasoning; no gold traces, no step-level evaluation, no engineering, no generated instances. The only shared theme is distrust of reference-based metrics and reliance on human judgement, which EngTrace now addresses with expert-labelled traces (state brief section 3).",
+ "confidence": "high",
+ "notes": "Self-citation: Zhuohan Xie is an author of EngTrace and of this paper (citation_context_map C9). An off-topic self-citation in the first sentence of the paper invites a reviewer's objection; the opening claim is better carried by a source that supports it (see zhao2023survey, p61). The paper's memorisation finding (p7) concerns plagiarism in model outputs, not benchmark contamination, so it does not support the contamination framing either."
+}

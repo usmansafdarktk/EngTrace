@@ -1,0 +1,37 @@
+{
+ "key": "heesch2025realworld",
+ "reviewer": "r2",
+ "read": "full",
+ "title_confirmed": true,
+ "venue_now": "arXiv preprint 2505.13484v1, 12 May 2025; the title page is dated May 21, 2025 (p.1); the text shows no peer-reviewed venue",
+ "what_it_is": "Heesch et al. evaluate four LLMs (Qwen2.5-72B-Instruct, DeepSeek-R1-Distill-Llama-70B, Llama-3.3-70B-Instruct, GPT-4o) on over 100 questions they wrote from production-oriented engineering scenarios, organised by five research questions: world models, transitional and non-local relations, design intent, temporal and causal reasoning, and forecasting (p.1-3, p.5). The questions draw on a real glass-foaming plant, a simulated discrete manufacturing plant and product-design function structures (p.3, p.6-7); forecasting uses 200 time-series samples from two cyber-physical datasets, scored by MSE against LSTM and DLinear baselines (p.7, p.14-16). Each question is asked several times and only the least accurate answer is scored on a 0 / 0.5 (junior engineer) / 1 (senior engineer) scale (p.5). Models do best on state transitions, sequential understanding and simple diagnosis, and worst on type-level abstraction, multi-variable dependencies, formal and physical modelling and forecasting complex systems (p.8-16).",
+ "domain": "engineering: production and cyber-physical systems (plant operation, diagnosis, product design, forecasting)",
+ "size": "over 100 questions (45 for RQ1, 20 for RQ2, 20 for RQ3, the rest for RQ4; p.3, p.8, p.10) plus 200 forecasting samples (p.3, p.7); 4 models (p.5)",
+ "source_of_items": "written for the paper from a real plant, a simulation model and design function structures (p.3, p.6-7, p.13); public time-series datasets for forecasting (p.14)",
+ "instances": "static",
+ "has_gold_traces": "no",
+ "evaluation": "rubric: each response scored 0, 0.5 or 1, keeping the worst of repeated answers (p.5); who scored is not stated; MSE for forecasting (p.7)",
+ "human_validation": "None reported beyond the scoring itself: who scored the answers, and how consistently, is not stated (p.5); the rated answers are published in the authors' GitHub repository (p.7).",
+ "contamination_measures": "none stated; the questions were newly written for the paper (p.3, p.13) and are now public (p.3, p.7)",
+ "engtrace_use": {
+   "sentence": "S-M3 (L165-168): Yet neither abstract logical deduction nor algorithmic proficiency transfers to reliable reasoning under physical constraints (Heesch et al., 2025).",
+   "verdict": "misleading",
+   "explanation": "Heesch et al. do not study transfer: they measure no mathematics or coding performance and compare none with their engineering results, so the paper cannot show that such proficiency does not transfer. What it shows is that four LLMs struggle on engineering questions that need abstraction, formal and physical modelling, non-local dependencies and forecasting (p.1, p.14, p.16-18); its 'abstract reasoning' weakness (p.1) means type-level abstraction in engineering systems (p.8-9), not the mathematical deduction the sentence has in mind. The physical-constraint half has partial support: physical modelling, which 'requires integration of numerical reasoning, causal dependencies, and physical constraints', was hard for all four models (p.14). The citation also hides that the paper is itself an engineering evaluation, which the Benchmarks in Engineering paragraph never discusses (citation map C13), and one whose critique of evaluations 'adapted from examination materials where correctness is easily verifiable' (p.1-2) applies to EngTrace."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "Heesch et al. (2025) pose over 100 questions drawn from a real production plant, a simulated manufacturing line and product design to four LLMs, find them weakest at physical and formal modelling, multi-variable dependencies and forecasting, and argue that engineering evaluations adapted from examination material with easily verified answers miss real-world competencies.",
+ "facts_to_cite": [
+   "The authors criticise current LLM evaluations in engineering for relying on simplified use cases, often adapted from examination materials where correctness is easily verifiable, or on ad hoc scenarios (p.1-2)",
+   "Over 100 questions written from a real glass-foaming plant, a simulated discrete manufacturing plant and product-design function structures, plus 200 forecasting samples (p.1, p.3, p.6-7)",
+   "Four LLMs: Qwen2.5-72B-Instruct, DeepSeek-R1-Distill-Llama-70B, Llama-3.3-70B-Instruct and GPT-4o (p.5)",
+   "Each question is asked several times and only the least accurate answer is scored 0, 0.5 or 1 (p.5)",
+   "Physical modelling scored 0.13 to 0.50 across the four models; 'With minor exceptions, all models exhibited severe limitations' (Table 4 and text, p.14)",
+   "Multi-variable dependency resolution scored 0.38 to 0.63 (Table 2, p.10); type-level concept generation 0.40 to 0.85 (Table 1, p.9)",
+   "Specialised forecasting baselines (LSTM, DLinear) beat all four LLMs (p.15-16)",
+   "GPT-4o outperformed the locally hosted models on nearly all dimensions except forecasting (p.17)",
+   "The authors conclude that LLMs are not yet suited to autonomous use in complex engineering tasks but can assist human engineers (p.17-18)"
+ ],
+ "overlap_with_engtrace": "Shares: the engineering domain (production systems, diagnosis, design, cyber-physical forecasting) and a graded scale that separates partially from fully correct answers (p.5). Lacks: quantitative problems with verifiable numeric answers (most questions are qualitative or structural, p.8-14); generated instances; gold traces; step-level evaluation; an evaluator with documented raters or agreement (p.5); contamination control. Its critique of exam-style engineering tests with easily verified answers (p.1-2) is the strongest objection to EngTrace's design and should be answered in the text, not passed over.",
+ "confidence": "high",
+ "notes": "Move it to the engineering paragraph and drop the transfer claim, which this paper does not test; the revised text should state the trade-off EngTrace makes (verifiable, textbook-style quantitative problems, so that steps can be checked) against Heesch et al.'s call for real-world tasks. Their advice to 'Avoid quantitative tasks; stick to symbolic, model-based tasks' (p.17) refers to time-series analysis and prognosis (p.17-18), not to textbook calculation, and should not be quoted as if it did. The dataset's repository is named Wrenchmark (p.7, footnote 6); the paper never names the benchmark in its text. The reference entry (L1011) is correct."
+}

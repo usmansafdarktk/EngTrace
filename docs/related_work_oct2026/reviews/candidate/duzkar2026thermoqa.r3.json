@@ -1,0 +1,37 @@
+{
+ "key": "duzkar2026thermoqa",
+ "reviewer": "r3",
+ "read": "full: pp.1-14 (abstract, introduction, related work, tier design, ground-truth generation, scoring, evaluation pipeline, setup, results, discussion, limitations, conclusion) read in full; references and appendix pp.14-17 skimmed.",
+ "title_confirmed": true,
+ "venue_now": "arXiv 2604.19758v1 [cs.AI], 25 Mar 2026 (page 1 stamp); no venue; dataset on Hugging Face and code on GitHub (pp.1-2)",
+ "what_it_is": "ThermoQA is a 293-question open-ended benchmark of engineering thermodynamics in three tiers: 110 property lookups, 101 component analyses (turbine, compressor, pump, heat exchanger, boiler, mixing chamber, nozzle) and 82 full cycle analyses (Rankine, Brayton, vapour-compression refrigeration, combined cycle), for water, R-134a, variable-cp air and combined air-water (pp.1, 3-4). Question parameters are sampled from realistic ranges, and all answers and intermediate values are computed with CoolProp 7.2.0 and NASA polynomials, with no hand-authored solutions (pp.2, 4). Tier 2 and 3 answers are scored step by step: 5-12 (Tier 2) or 15-60 (Tier 3) intermediate values, extracted by regex and gpt-4.1-mini, are checked at +/-2% relative or +/-0.5 absolute and weighted 1-6 by engineering importance (pp.3-5). Six frontier models were run three times each: composites run from 94.1% (Claude Opus 4.6) to 73.0% (MiniMax M2.5), with run-to-run standard deviations of 0.1 to 2.5 points (pp.1, 7, 10).",
+ "domain": "engineering: engineering thermodynamics (property evaluation, component and cycle analysis, entropy and exergy)",
+ "size": "293 questions: 110 Tier 1, 101 Tier 2, 82 Tier 3 (p.1); six models x three runs, 54 evaluation runs, about 5,300 API calls (p.5)",
+ "source_of_items": "generated from code: parameters sampled from physically realistic ranges and validated with CoolProp, outlet states derived by conservation equations (p.4); the problem structures follow textbook patterns (p.13)",
+ "instances": "static (293 fixed, public questions generated once; the generator could produce more, p.3)",
+ "has_gold_traces": "partial: code-computed gold values for every scored intermediate step (5-12 per Tier 2 answer, 15-60 per Tier 3 answer; pp.3-4), with weights; no reference reasoning text",
+ "evaluation": "step-level or process, deterministic: each extracted value is compared with the computed value at +/-2% relative or +/-0.5 absolute, whichever is more lenient (dimensionless efficiencies and COP +/-0.02, quality +/-0.03); Tier 1 is scored per property and Tiers 2-3 as the weighted fraction of correct steps (p.4); values are extracted by regex and by gpt-4.1-mini over the full response, including exposed thinking tokens, keeping whichever extraction is correct (p.5)",
+ "human_validation": "none reported for items, extraction or scoring; the ground truth is checked against NIST reference data (<0.01%, p.2; <0.037% maximum deviation over 13 saturation points, p.4)",
+ "contamination_measures": "programmatically generated parameters (p.4), but the set is fixed and public; the paper says contamination from training corpora cannot be fully excluded (p.13)",
+ "engtrace_use": {
+   "sentence": null,
+   "verdict": "n/a",
+   "explanation": "Not cited in the May paper. Paragraph: engineering. It is the closest single-domain precedent for EngTrace's E3 milestones: gold intermediate values computed by code and checked within a tolerance, weighted toward the final engineering outcomes (pp.3-4), with three runs per model to measure decoding variance (p.5), much as EngTrace's decoding repeats do. EngTrace can no longer present code-derived intermediate checking as unprecedented, and must state what it adds: five branches rather than one domain; a pool drawn from a private seed rather than 293 public questions; a per-claim arithmetic check (E4) and a residual judge for milestones the deterministic match misses; and validation of its checks against expert labels, which ThermoQA does not report."
+ },
+ "recommendation": "add (must)",
+ "suggested_wording": "ThermoQA (Duzkar, 2026) scores the intermediate values of 293 thermodynamics problems against values computed with CoolProp, the closest single-domain precedent for code-derived milestones, though its questions are fixed and public.",
+ "facts_to_cite": [
+   "293 open-ended engineering thermodynamics problems: 110 property lookups, 101 component analyses and 82 cycle analyses, for water, R-134a, variable-cp air and combined air-water (pp.1, 3-4).",
+   "Ground truth is computed with CoolProp 7.2.0 (IAPWS-IF97 for water, Helmholtz EOS for R-134a) and NASA 7-coefficient polynomials for air; there are no hand-authored solutions (pp.2, 4).",
+   "Question parameters are sampled from physically realistic ranges and validated with CoolProp; outlet states are derived by conservation equations (p.4).",
+   "Tier 2 answers include 5-12 numerical steps and Tier 3 answers 15-60, each checked at +/-2% relative or +/-0.5 absolute and weighted 1-6 by engineering importance (pp.3-4).",
+   "Values are extracted by regex and by gpt-4.1-mini, including from exposed thinking tokens, and whichever extraction is correct is kept (p.5).",
+   "Six models, three runs each: composites from 94.1% (Claude Opus 4.6) to 73.0% (MiniMax M2.5); run-to-run standard deviations from 0.1 to 2.5 points (pp.1, 7, 10).",
+   "Tier 1 to Tier 3 degradation ranges from 2.8 points (Opus) to 32.5 points (MiniMax) (pp.1, 6-7).",
+   "The dominant error mode is a missing step rather than an out-of-tolerance value (p.11).",
+   "Limitations: well-posed textbook-pattern problems, no tool access, contamination not fully excluded; the benchmark was developed with Claude's assistance and Claude Opus 4.6 ranks first (p.13)."
+ ],
+ "overlap_with_engtrace": "Shares: engineering content (thermodynamics, which falls in EngTrace's chemical and mechanical branches); gold answers and intermediate values computed by code with no hand-authored solutions (pp.2, 4); deterministic tolerance checks of intermediate values with step weights (p.4); repeated runs to measure decoding variance (pp.5, 10). Lacks: a private or per-evaluation instance pool (293 fixed public questions, pp.1, 13); a check of the arithmetic a trace displays beyond the listed targets; any judge for steps that do not match; any human validation of extraction or scoring; multi-branch coverage. Its LLM extractor with take-max (p.5) can only raise scores.",
+ "confidence": "high",
+ "notes": "Paragraph: engineering. The author's surname carries a u-umlaut on page 1 (Duzkar here, to keep the file plain ASCII). (1) Single author, and the benchmark was developed with Claude's assistance while Claude Opus 4.6 ranks first; the author discloses both (p.13). (2) The take-max extraction (p.5) reads exposed thinking tokens and keeps whichever extraction scores, so it can only raise scores. (3) The NIST check is given as <0.01% (p.2) and as <0.037% maximum deviation (p.4). (4) The dominant error is a missing step, not a wrong value (p.11), which bears on how EngTrace reads milestone coverage. (5) The search note's description is accurate."
+}

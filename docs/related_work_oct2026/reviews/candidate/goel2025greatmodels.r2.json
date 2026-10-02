@@ -1,0 +1,37 @@
+{
+ "key": "goel2025greatmodels",
+ "reviewer": "r2",
+ "read": "full: abstract, sections 1-7 (pp. 1-9) in full; appendix B on the LLM-as-a-judge experiments (B.2-B.6, B.9-B.10, pp. 27-38) read; appendices A (metric derivations), C (weak-to-strong) and D (similarity trend) skimmed",
+ "title_confirmed": true,
+ "venue_now": "ICML 2025, PMLR 267 (page 1 footer: 'Proceedings of the 42nd International Conference on Machine Learning, Vancouver, Canada'); arXiv 2502.04313v2, 12 Jun 2025. The search note's 'spotlight' status is not shown in the text.",
+ "what_it_is": "Introduces CAPA, a chance-adjusted, probability-based measure of how similar two models' mistakes are, and uses it to study AI oversight. (1) LLM-as-a-judge: nine open-weight judges decide whether free-text answers of 39 models to 8,707 filtered MMLU-Pro questions are correct, without a reference answer; judgment scores rise with judge-model similarity (mean Pearson r = 0.84 on cross-family pairs), and the relation survives control for the evaluated model's accuracy. (2) Weak-to-strong training gains are larger when supervisor and student are less similar. (3) Across 130 Open LLM Leaderboard models, mistakes become more similar as capability rises, which the authors argue could compromise the independence of LM juries.",
+ "domain": "broad knowledge and problem solving (MMLU-Pro, 14 categories including engineering, math and physics; BBH); 15 binary NLP classification tasks for weak-to-strong; AlpacaEval for a chat-preference check",
+ "size": "Judge study: 9 judges x 39 evaluated models on 8,707 filtered MMLU-Pro questions; chat check: 23 models, 203,665 pairwise judgments on AlpacaEval; weak-to-strong: 12 model pairs x 15 tasks (180 runs); trend study: 130 models on MMLU-Pro and BBH",
+ "source_of_items": "existing benchmarks (MMLU-Pro filtered for free-text answerability, BBH, AlpacaEval, NLP classification tasks); per-sample predictions from the Hugging Face Open LLM Leaderboard 2",
+ "instances": "static",
+ "has_gold_traces": "no: MCQ ground-truth options only, used to compute accuracy and similarity",
+ "evaluation": "LLM judge giving binary correct/incorrect verdicts on free-text answers with no reference (p. 4; B.9 p. 37), compared with MCQ accuracy and with a reference-informed five-judge ensemble; Pearson and partial correlations and multiple regression of judgment score on similarity and accuracy",
+ "human_validation": "none: correctness is anchored on MMLU-Pro answer keys and on a majority vote of five open-weight judges given the reference options (B.3.2, p. 28); no human or expert labelling of judge verdicts",
+ "contamination_measures": "none",
+ "engtrace_use": {
+   "sentence": null,
+   "verdict": "n/a",
+   "explanation": "Candidate, not cited in the May paper. It bears on both versions of EngTrace's judging. Against the May Tribunal: the paper argues that excluding the judge from the ranking is not enough and that similar models are favoured, and that rising similarity among capable models could undermine LM juries 'by compromising independence and amplifying collective biases' (pp. 4, 8), which is the PoLL assumption the Tribunal relied on. For the new design, the warning is sharper: affinity bias is shown on cross-family judge-model pairs only (Figure 3, p. 5), so a residual judge from outside the roster's families is necessary but not sufficient, and its verdicts still need the expert check EngTrace runs. Two scope limits favour EngTrace's design and should be stated rather than ignored: the judges here had no reference answer (p. 4; p. 37), whereas E5 sees the gold milestone values; and the bias acts on whatever is judged, so EngTrace's deterministic answer check, milestone matcher and digit rule, which leave 0.112 to 0.252 of milestones to the judge per model, shrink the surface it can act on. Judges and evaluated models are all open-weight (p. 37), so the capability trend is shown for open models, not for GPT, Claude or Gemini."
+ },
+ "recommendation": "add (must)",
+ "suggested_wording": "Excluding the judge's own family is necessary but not sufficient: LLM judges also favour models from other families whose mistakes resemble their own, and models' mistakes grow more similar as capability rises, which undercuts the independence a panel of judges assumes (Goel et al., 2025).",
+ "facts_to_cite": [
+  "Proposes CAPA, a chance-adjusted probabilistic agreement metric based on overlap in model mistakes (section 2, pp. 2-4).",
+  "Nine open-weight judges score free-text answers of 39 models on 8,707 MMLU-Pro questions answerable without options, deciding correctness from their own knowledge, without a ground-truth answer (pp. 4-5; B.9 p. 37).",
+  "Judgment scores correlate with judge-model similarity for every judge (mean Pearson r = 0.84, p < 0.01), plotted on cross-family judge-model pairs only (Figure 3, p. 5).",
+  "The effect survives control for the evaluated model's accuracy: partial correlations 0.35 to 0.65, all significant (Table 2, p. 5).",
+  "The paper concludes that using a held-out LM as judge is not sufficient; similarity is a confounder that must be accounted for (p. 4).",
+  "The affinity effect appears in every MMLU-Pro category with r above 0.75, the one exception being gemma-2-9b-it on engineering (r = 0.28, p = 0.211) (B.5, p. 30).",
+  "Judges rate too many wrong responses as right, increasingly so as the evaluated models become stronger and more similar to the judge (B.3.3, p. 29).",
+  "Across 130 Open LLM Leaderboard models, compared within capability buckets and across developers, mistakes become more similar as capability increases (Figure 6, pp. 7-8).",
+  "The authors state that this trend could undermine LM juries by compromising independence and amplifying collective biases (p. 8), and that they show correlation, not causation (p. 9)."
+ ],
+ "overlap_with_engtrace": "Shares: binary correctness verdicts by LLM judges on free-text technical answers (MMLU-Pro includes engineering, math, physics), the cross-family judge question at the centre of EngTrace's roster rule, and attention to judges passing wrong answers. Lacks: generated instances, gold traces, step-level evaluation, reference-grounded judging (deliberately excluded), frontier closed models as judges or candidates, and any human or expert validation of judge verdicts.",
+ "confidence": "high",
+ "notes": "Paragraph: process supervision and judge validity. It is the strongest peer-reviewed evidence that family exclusion alone does not make a judge neutral, so the revision should cite it next to the roster rule and lean on the expert validation and the gold-grounded prompt as the further safeguards. Do not cite it for frontier closed models (none were studied) or for reference-grounded judging (judges had no reference). The search note's summary is accurate; it omits that judges had no reference answer and that the similarity trend is computed on open-weight leaderboard models."
+}

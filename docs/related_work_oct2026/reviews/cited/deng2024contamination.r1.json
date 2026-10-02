@@ -1,0 +1,35 @@
+{
+ "key": "deng2024contamination",
+ "reviewer": "r1",
+ "read": "full (abstract, introduction, related work, method pp3-5, experiments pp5-9, trade-off and conclusion p9, limitations p10, appendices A-D pp13-14)",
+ "title_confirmed": true,
+ "venue_now": "Text is arXiv:2311.09783v2, 3 Apr 2024 (p1 footer); no venue is printed in this file. The May reference list gives NAACL 2024 (Volume 1: Long Papers), pp. 8706-8719, which this file cannot confirm.",
+ "what_it_is": "A study of how to detect benchmark contamination in LLMs, not a benchmark. Method 1 is a BM25 retrieval system over the Pile and C4 that searches for overlap between benchmark items and pretraining documents (pp3-5). Method 2, Testset Slot Guessing (TS-Guessing), masks a keyword in a question or a wrong option in a multiple-choice item and asks the model to restore it; reproducing the exact masked text suggests prior exposure (pp4-5). On MMLU, ChatGPT and GPT-4 restored masked wrong options at exact-match rates of 0.52 and 0.57 (p1 abstract; p8 Table 3), and a ChatGPT fine-tuned on the MMLU test set reached nearly 100% (p9 Fig. 4).",
+ "domain": "NLP evaluation methodology (benchmark contamination in LLMs)",
+ "size": "Retrieval study on 7 benchmarks (MMLU, TruthfulQA, GSM8K, PIQA, HellaSwag, WinoGrande, OpenbookQA) against the Pile and C4 (p5; p6 Table 1); TS-Guessing on 6 benchmarks with ChatGPT, GPT-4, Claude-instant-1, Claude-2, LLaMA 2 7B and 13B, and Mistral-7B (pp7-8, Tables 2-3); a 100-item human study (p6).",
+ "source_of_items": "n/a (probes existing public benchmarks)",
+ "instances": "n/a (not a benchmark)",
+ "has_gold_traces": "n/a (not a benchmark)",
+ "evaluation": "Overlap scores (BM25, SacreBLEU, ROUGE-L, BLEURT, a ChatGPT-based 'GPTscore') for retrieval (pp5-6); exact match and ROUGE-L F1 for TS-Guessing (p8).",
+ "human_validation": "17 volunteers with NLP backgrounds judged whether 100 retrieved-document/benchmark pairs, sampled from the seven benchmarks, had the same meaning; 23 of 100 were judged contaminated; Krippendorff's alpha 0.8673 (p6).",
+ "contamination_measures": "Contamination is the subject: detection by retrieval against open corpora and by TS-Guessing (pp3-5). The authors advise that, besides a dataset's release date, the novelty of its source documents be considered (p8).",
+ "engtrace_use": {
+  "sentence": "First, static benchmarks like Glue (Wang et al., 2019) and BBH (Kazemi et al., 2025) are increasingly prone to model saturation (Ott et al., 2022) and data contamination (Deng et al., 2024); EngTrace counters this through symbolic templates and domain-aware parameterization, generating unique, physically grounded problems that resist rote memorization. (L97-105)",
+  "verdict": "accurate",
+  "explanation": "Judged for the contamination clause only. Deng et al. find evidence of potential contamination in widely used public benchmarks: overlap between TruthfulQA and C4 (p7; p14 Fig. 5) and exact-match restoration of masked MMLU options by ChatGPT and GPT-4 (p8 Table 3). They conclude that their 'findings add to the growing evidence of potential contamination in today's widely used benchmarks' (pp2-3), and they tie the risk to ever larger crawled training data (p1). Caveats: the paper hedges throughout ('potential contamination'), does not study GLUE or BBH (it mentions Elazar et al.'s evidence on GLUE and SuperGLUE in passing, pp2-3), and measures no trend over time."
+ },
+ "recommendation": "keep as is",
+ "suggested_wording": "Public benchmarks show signs of contamination: ChatGPT and GPT-4 could restore masked wrong options of MMLU test items at exact-match rates of 52% and 57% (Deng et al., 2024).",
+ "facts_to_cite": [
+  "Two detection methods: BM25 retrieval of benchmark items from the Pile and C4, and Testset Slot Guessing, which masks a keyword or a wrong multiple-choice option and asks the model to restore it (p1 abstract; pp3-5).",
+  "On MMLU, ChatGPT and GPT-4 restored masked wrong options with exact-match rates of 0.52 and 0.57 (p8 Table 3; p1 abstract). The body text gives ChatGPT 57% (p2, p8, p9); use the table's figures.",
+  "A ChatGPT fine-tuned on the MMLU test set reached nearly 100% exact match, showing the method's sensitivity (p9 Fig. 4).",
+  "Retrieval found evident overlap between TruthfulQA and C4 documents (p7; p14 Fig. 5).",
+  "The authors raise 'concerns about the potential contamination of the current benchmarks, particularly if they become publicly accessible' (p2).",
+  "They advise considering 'the novelty of source documents used in the dataset', not only its release date (p8).",
+  "Retrieval 'may be less suitable to detect contamination in reasoning benchmark[s]', and TS-Guessing is less reliable than retrieval because it rests on inferred knowledge (p9)."
+ ],
+ "overlap_with_engtrace": "Shares the motivation only. EngTrace prevents rather than detects contamination: items come from a private 128-bit seed, the pool is hashed and was not public when the models ran (D-114), and a paraphrase arm tests wording-level memorisation (state brief sections 1 and 4). It uses neither retrieval nor TS-Guessing. Deng's point on source novelty (p8) applies to EngTrace: the instances are new, but the templates were written from textbooks whose problem types are likely in pretraining data. No gold traces, no step-level evaluation, no engineering content.",
+ "confidence": "high",
+ "notes": "Internal inconsistency in the paper: the abstract and Table 3 give ChatGPT 52% and GPT-4 57% on MMLU, while the introduction (p2), section 4.2.2 (p8) and the conclusion (p9) give ChatGPT 57%. The May remedy clause ('symbolic templates ... resist rote memorization') should become what EngTrace measured: items from a private seed were not public when the models ran, and the paraphrase test found no evidence of wording-level memorisation; the paraphrase notes rule out claiming 'no contamination' (state brief section 5). Deng's source-novelty caveat (p8) is the honest limit to state: generation guards against item leakage, not against familiarity with textbook problem types."
+}

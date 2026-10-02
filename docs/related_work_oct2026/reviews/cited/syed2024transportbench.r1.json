@@ -1,0 +1,34 @@
+{
+ "key": "syed2024transportbench",
+ "reviewer": "r1",
+ "read": "full: pp.1-21 (abstract to conclusion); references skimmed",
+ "title_confirmed": true,
+ "venue_now": "arXiv:2408.08302v1, 15 Aug 2024; 'Preprint submitted to Transportation Research Part C' (p.1)",
+ "what_it_is": "TransportBench is a set of 140 undergraduate transportation-engineering problems (73 true-or-false, 67 general Q&A) over ten topics such as traffic flow and control, geometric design, planning and public transit systems (p.3). A co-author selected and adapted ('twisted') them from two University of Illinois courses he teaches, CEE 310 and CEE 418, and from a co-authored textbook, replacing figures with text; each problem has a step-by-step LaTeX solution (pp.3-4). Seven LLMs answered zero-shot through their web interfaces, and human experts graded correctness and also checked the reasoning (pp.4-5). The paper reports accuracy, consistency over five repeated trials and under self-checking prompts, and case studies of reasoning, including correct final answers reached through flawed reasoning (pp.5-20).",
+ "domain": "engineering: civil, transportation systems engineering (p.1)",
+ "size": "140 problems: 73 true-or-false and 67 general Q&A (p.3, Table 1; p.7, Table 3); 7 models: GPT-4, GPT-4o, Claude 3 Opus, Claude 3.5 Sonnet, Gemini 1.5 Pro, Llama 3 70B, Llama 3.1 405B (p.2)",
+ "source_of_items": "expert-written: course problems from CEE 310 and CEE 418 at UIUC, adapted by the course instructor (a co-author), some from his co-authored textbook (pp.3-4)",
+ "instances": "static (a few problems are modified by hand in the reasoning case studies, pp.13-19)",
+ "has_gold_traces": "partial: a detailed step-by-step LaTeX solution for each problem, most prepared by the second author (p.4); not used for any automated step scoring",
+ "evaluation": "human grading of final answers by experts, who also checked the models' reasoning (p.5); accuracy, mixed-response rate over 5 trials on the 73 true-or-false problems (p.9), self-checking accuracy and incorrect flips (p.12); qualitative reasoning analysis (pp.12-20)",
+ "human_validation": "All grading is by human experts (pp.4-5); no inter-grader agreement is reported, and the main accuracy uses one trial per problem (p.5).",
+ "contamination_measures": "none stated; problems were adapted from course material rather than copied (p.3), but this is not presented as a contamination measure",
+ "engtrace_use": {
+  "sentence": "S-E1 (L182-190): '... while specialized benchmarks like TransportBench, APBench, and EEE-Bench (Syed et al., 2024; Chen et al., 2025; Cheng et al., 2024; Li et al., 2025; Liu et al., 2025) are siloed within narrow sub-disciplines.'",
+  "verdict": "accurate",
+  "explanation": "TransportBench covers one sub-field, transportation systems engineering, which the paper calls 'a critical interdisciplinary subfield of civil engineering' (p.1), at undergraduate level from two courses (p.3). The name TransportBench is the paper's own (p.1). The sentence leaves out that grading is by hand and that the reasoning was inspected (p.5, pp.12-20); that matters for the closing claim that existing benchmarks 'remain limited to outcome matching' (S-E3), but S-E1 does not make that claim."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "TransportBench (Syed et al., 2024) poses 140 undergraduate transportation-engineering problems graded by human experts, who found that models sometimes reach correct final answers through flawed reasoning.",
+ "facts_to_cite": [
+  "140 undergraduate problems (73 true-or-false, 67 general Q&A) across ten transportation topics (p.3, Table 1; p.7, Table 3)",
+  "problems selected and adapted by the instructor of two UIUC courses, CEE 310 and CEE 418, some from his co-authored textbook (pp.3-4)",
+  "a step-by-step LaTeX solution is provided for each problem (p.4)",
+  "seven LLMs evaluated zero-shot, answers graded by human experts (pp.4-5); Claude 3.5 Sonnet best at 67.1% (94/140) (p.6)",
+  "models can reach correct final answers through flawed reasoning, e.g. Problem 10.55 on bus fleet size (Section 5.2, pp.16-18)",
+  "self-checking prompts can flip correct answers to wrong ones (Section 4, pp.10-12)"
+ ],
+ "overlap_with_engtrace": "Shares: engineering domain (civil, transportation); reference step-by-step solutions (p.4); expert attention to reasoning, with documented correct-answer, flawed-reasoning cases (pp.16-18). Lacks: generated instances (140 fixed problems); automated or step-level scoring (grading is manual and per answer); an expert-validated automated evaluator; scale (140 items, one trial each for the main accuracy, p.5).",
+ "confidence": "high",
+ "notes": "Table 1's Total row prints 68 general Q&A problems, but that column sums to 67, Table 3 uses /67, and 73 + 67 = 140 (p.3, p.7). The paper is a preprint (submitted to Transportation Research Part C, p.1). Its correct-answer, flawed-reasoning examples (pp.16-18) are direct support for EngTrace's motivation, and they qualify S-E3: this benchmark's graders did look at reasoning, if only qualitatively."
+}

@@ -1,0 +1,35 @@
+{
+ "key": "austin2021mbpp",
+ "reviewer": "r2",
+ "read": "partial: sections 1-4 (abstract, introduction, datasets, model and methods, MBPP synthesis results; pp.1-11) and section 9 (risks and limitations, pp.22-23) read in full; sections 5-8 (human-model collaboration, execution, MathQA, related work), the conclusion and appendices skimmed",
+ "title_confirmed": true,
+ "venue_now": "arXiv preprint 2108.07732v1, 16 Aug 2021 (p.1); the text shows no peer-reviewed venue",
+ "what_it_is": "The paper introduces MBPP, 974 short Python programming tasks crowd-sourced from workers with basic Python knowledge, each with a one-sentence description, a reference solution and three assert-statement test cases, plus a 426-task subset that the authors inspected, edited and hand-verified (p.1, p.4). It also converts MathQA into MathQA-Python, 23,914 problems (p.1, p.5). Programs sampled from decoder-only models of 244M to 137B parameters are scored by executing them against the test cases; the largest model solves 59.6% of MBPP few-shot (p.1, p.5). The paper also studies human feedback in dialogue, prediction of program execution, test-case adequacy and overlap with pretraining data (p.3, p.8, p.10).",
+ "domain": "function-level Python code generation (entry-level tasks); also math word problems written as Python (MathQA-Python)",
+ "size": "974 MBPP tasks (10 for prompting, 500 test, 374 fine-tuning, the rest validation; p.4); 426-task edited subset (p.4); 23,914 MathQA-Python problems (p.5); models of 244M to 137B parameters (p.1)",
+ "source_of_items": "crowd-sourced from an internal pool of crowdworkers, who could use internet references (p.4)",
+ "instances": "static",
+ "has_gold_traces": "no: each task has a reference solution and three tests (p.4), not a reasoning trace",
+ "evaluation": "unit tests: a sampled program solves a task if it passes the three test cases (p.5-6); 80 samples per task at temperature 0.5 (p.5)",
+ "human_validation": "The authors manually inspected, edited and pruned a subset into 426 hand-verified tasks with standard signatures, unambiguous descriptions and tests that match the description (p.4); all reference code was checked programmatically to pass its tests (p.4). Adversarial tests written for 50 test problems suggest about 12% of counted solutions would fail them (p.8).",
+ "contamination_measures": "tasks written from scratch; an overlap analysis found only 32 of 974 tasks (3.3%) with more than half their solution lines in the pretraining data (p.10)",
+ "engtrace_use": {
+   "sentence": "S-M2 (L161-165): Similarly, coding evaluations span from function-level generation in HumanEval (Chen et al., 2021) and MBPP (Austin et al., 2021) to real-world software engineering in SWE-Bench (Jimenez et al., 2024).",
+   "verdict": "accurate",
+   "explanation": "MBPP measures the ability 'to synthesize short Python programs from natural language descriptions' (p.1), each a single self-contained function checked by three tests (p.4), so grouping it with HumanEval under 'function-level generation' is accurate; the authors themselves call HumanEval 'nominally similar' (p.3)."
+ },
+ "recommendation": "keep as is",
+ "suggested_wording": "MBPP (Austin et al., 2021) scores 974 crowd-sourced, entry-level Python tasks by running each generated function against three test cases.",
+ "facts_to_cite": [
+   "974 short Python tasks crowd-sourced from workers with basic Python knowledge, each with a description, a reference solution and three test cases (p.4)",
+   "A 426-task subset was manually inspected, edited and hand-verified by the authors (p.4)",
+   "A sampled program solves a task if it passes the three tests; 80 samples are drawn per task (p.5)",
+   "The largest model (137B) solves 59.6% few-shot; fine-tuning adds about 10 percentage points for most model sizes (p.1)",
+   "About 12% of test-passing solutions would fail adversarial tests, estimated on 50 problems (p.8)",
+   "Only 32 of 974 tasks (3.3%) have more than half their solution lines in the pretraining data (p.10)",
+   "58% of 100 sampled tasks are mathematical in nature (p.4)"
+ ],
+ "overlap_with_engtrace": "Shares: execution-based, deterministic checking of outputs (p.5); an explicit pretraining-overlap analysis (p.10); a hand-verified subset (p.4). Its estimate that about 12% of test-passing solutions fail stronger tests (p.8) shows how outcome checks overcount, which parallels EngTrace's case for checking steps. Lacks: generated instances; gold reasoning traces; step-level evaluation; physical or engineering content; expert validation of the evaluator.",
+ "confidence": "high",
+ "notes": "The reference entry (L896) is correct. MBPP's tasks are partly arithmetic expressed as code (58% of a 100-task sample are mathematical, p.4)."
+}

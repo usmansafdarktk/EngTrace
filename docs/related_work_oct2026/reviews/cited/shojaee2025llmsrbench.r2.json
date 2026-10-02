@@ -1,0 +1,32 @@
+{
+ "key": "shojaee2025llmsrbench",
+ "reviewer": "r2",
+ "read": "partial: pp. 1-9 in full (abstract, introduction, LSR-Transform, LSR-Synth, evaluation, experiments, analysis, related work, conclusion), with Table 1's figures (p. 6) not read in detail; appendix B (pp. 14-16). Not read: appendices A, C-F, references",
+ "title_confirmed": true,
+ "venue_now": "ICML 2025, PMLR 267 (page 1 footer: 'Proceedings of the 42nd International Conference on Machine Learning'); the file is arXiv 2504.10415v2, 7 Jun 2025",
+ "what_it_is": "A benchmark for LLM-based scientific equation discovery (symbolic regression): given a dataset and a description of its variables, a method must find the equation behind the data (pp. 2-3). It has 239 problems: LSR-Transform, 111 problems made by solving the 100 Feynman physics equations for a different variable with SymPy, so that the target is a less familiar form, and LSR-Synth, 128 problems that combine known terms with GPT-4o-generated synthetic terms in chemistry (36), biology (24), physics (43) and materials science (25), checked for solvability, novelty and plausibility (pp. 3-5). Discovered equations are scored on symbolic accuracy, judged by GPT-4o, and on data fidelity (accuracy to tolerance and NMSE, in-domain and out-of-domain) (p. 5). Four discovery methods on three LLM backbones are evaluated; the best symbolic accuracy is 31.5% (p. 3).",
+ "domain": "scientific equation discovery in physics, chemistry, biology and materials science (p. 3)",
+ "size": "239 problems (111 LSR-Transform, 128 LSR-Synth); 4 methods (LLM-SR, LaSR, SGA, direct prompting) on 3 backbones (Llama-3.1-8B-Instruct, GPT-4o-mini, GPT-3.5-turbo), with 1k LLM calls per problem (pp. 3, 5-6)",
+ "source_of_items": "perturbed from an existing set (the Feynman equations, symbolically transformed) and generated (known and synthetic terms proposed by GPT-4o, solved numerically, screened by an LLM novelty check and cross-checked by experts) (pp. 3-5)",
+ "instances": "perturbed (LSR-Transform) and generated (LSR-Synth), released as a fixed set",
+ "has_gold_traces": "no: ground-truth equations and data only",
+ "evaluation": "expression-level metric with an LLM judge: symbolic accuracy judged by GPT-4o (equivalence after removing constants); data fidelity by accuracy to tolerance and NMSE on in-domain and out-of-domain data (p. 5; pp. 14-15)",
+ "human_validation": "LSR-Synth problems were cross-checked by two subject-matter experts (p. 5). The GPT-4o symbolic-accuracy judge agreed with two authors on 123 of 130 sampled problems (94.6%) (pp. 5, 15).",
+ "contamination_measures": "perturbations and synthetic terms: less common forms of known equations, synthetic terms passed by an LLM novelty check, and exclusion of transformed problems that an LLM solves without the data (pp. 3-5)",
+ "engtrace_use": {
+   "sentence": "S-P1: 'While UGPhysics (Xu et al., 2025) and PhysReason (Zhang et al., 2025a) effectively test the application of reasoning to natural laws, others target advanced symbolic (Zhang et al., 2025b; Qiu et al., 2025) or qualitative (Wang et al., 2023; Shojaee et al., 2025) understanding.' S-P2: 'Despite this progress, these benchmarks remain confined to theoretical physics, lacking the integrative context of engineering.'",
+   "verdict": "wrong",
+   "explanation": "S-P1 lists LLM-SRBench among benchmarks that target 'qualitative' understanding. The paper is the opposite: its task is to recover symbolic equations from numerical data, scored by symbolic accuracy and by numerical fit (NMSE, accuracy to tolerance) (pp. 3, 5), which makes it the most quantitative and symbolic of the six. S-P2's 'confined to theoretical physics' is also wrong: LSR-Synth spans chemistry, biology, physics and materials science (p. 3), and the task is empirical, data-driven discovery. Nor is it a problem-solving benchmark: it scores discovery methods allowed 1k LLM calls per problem (p. 5)."
+ },
+ "recommendation": "drop",
+ "suggested_wording": "LLM-SRBench (Shojaee et al., 2025) counters memorisation in scientific equation discovery by rewriting known Feynman physics equations into less common forms and by adding synthetic terms to known models.",
+ "facts_to_cite": [
+  "239 equation-discovery problems: 111 transformed from the 100 Feynman physics equations and 128 synthetic ones in chemistry, biology, physics and materials science (pp. 3-5).",
+  "The transformation solves each Feynman equation for another variable, giving a less common form of a known law, to counter memorisation (pp. 3-4).",
+  "Symbolic accuracy is judged by GPT-4o, which agreed with two authors on 123 of 130 sampled problems (94.6%) (pp. 5, 15).",
+  "The best method reaches 31.5% symbolic accuracy on LSR-Transform and 28.1% on LSR-Synth (p. 3)."
+ ],
+ "overlap_with_engtrace": "Shares: memorisation-resistant construction by transforming known problems (it cites GSM-Symbolic for the motivation, p. 3); an LLM judge checked against human judgement; expert cross-checks of generated items. Lacks: problem-solving traces, step-level evaluation and engineering domain. Its task, discovering equations from data by search, differs from EngTrace's, solving stated problems.",
+ "confidence": "high",
+ "notes": "The suggested wording is for the case where the writers keep it; it belongs in a sentence on memorisation-resistant construction, not in the list of physical-reasoning benchmarks, and nothing in EngTrace's positioning needs it. The May reference list misprints 4 of the 6 first names against p. 1 ('Payam' for Parshin Shojaee, 'Nam-Huan' for Ngoc-Hieu Nguyen, 'Kamyar' for Kazem Meidani, 'Khanh Duy' for Khoa D Doan) and gives arXiv rather than ICML 2025."
+}

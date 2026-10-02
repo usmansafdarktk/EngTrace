@@ -1,0 +1,34 @@
+{
+ "key": "zhao2023survey",
+ "reviewer": "r2",
+ "read": "partial: abstract and Section 1 introduction (pp. 1-4); Section 7 'Capacity and Evaluation' in full (pp. 55-66: 7.1 basic abilities including 7.1.3 complex reasoning, 7.3 benchmarks and evaluation approaches); Section 8 science applications (pp. 77-78); the Section 10 conclusion passage on evaluation (p. 96); the rest skimmed by section heading and by keyword search of the body, pp. 1-97 (high-stakes, safety-critical, engineering, contamination, saturation). The file is arXiv v19 (18 Mar 2026), 144 pages.",
+ "title_confirmed": true,
+ "venue_now": "arXiv 2303.18223v19, 18 Mar 2026 (page 1 stamp; the title page says 'Version: v18 (major update on March 7, 2026)', p. 1). The text names no journal; the catalogue's Frontiers of Computer Science 20(12), 2026 is not visible in this file.",
+ "what_it_is": "A long survey of large language models organised around pre-training, adaptation, utilization and capacity evaluation, plus resources, applications and open problems (abstract, p. 1; organisation, p. 4). It is not a benchmark and reports no new evaluation of reasoning beyond a summary comparison in Section 7.4 (p. 66 onward). Its evaluation chapter catalogues basic abilities (language generation, knowledge utilization, complex reasoning), advanced abilities, the main benchmarks (MMLU, BIG-bench, BBH, HELM, human-exam suites) and three evaluation approaches (benchmark-, human- and model-based) with their pros and cons (pp. 55-66).",
+ "domain": "survey of LLMs (general); no engineering content",
+ "size": "survey, 144 pages in the v19 file; not applicable as a benchmark",
+ "source_of_items": "n/a (survey of the literature)",
+ "instances": "n/a (survey)",
+ "has_gold_traces": "n/a (survey)",
+ "evaluation": "n/a; it reviews benchmark-based evaluation (generated text parsed with hand-written rules and scored by accuracy, p. 64), human-based evaluation and model-based (LLM-judge) evaluation (pp. 64-66)",
+ "human_validation": "none (survey)",
+ "contamination_measures": "none of its own; it names data contamination as a problem of benchmark-based evaluation that 'has become increasingly severe since more and more open data has been collected for developing LLMs' (p. 65) and 'a severe issue for fairly assessing the performance of LLMs' (p. 96)",
+ "engtrace_use": {
+  "sentence": "As LLMs expand into high-stakes engineering workflows, rigorous evaluation of their reasoning capabilities has become paramount (Zhao et al., 2023; Xie et al., 2023a). (Introduction, L45-48)",
+  "verdict": "imprecise",
+  "explanation": "The survey supports the general half of the sentence: it treats evaluating LLM abilities, including complex reasoning, as a major research area (Section 7, pp. 55-66) and describes LLMs as general-purpose task solvers with a growing range of real-world applications (p. 3). It says nothing about engineering workflows or high-stakes use. A keyword search of the body (pp. 1-97) finds no 'high-stakes' or 'safety-critical'; 'engineering' appears only as prompt, instruction or systems engineering of LLMs themselves (e.g. pp. 3, 44) and once for software-engineering applications (p. 80). So the citation carries the generic claim and none of the engineering or high-stakes premise (citation map C14d: 'General, not wrong'). The survey does contain statements that would support EngTrace more specifically: LLMs 'may generate the correct answer following an invalid reasoning path, or produce a wrong answer after a correct reasoning process' (p. 61); they 'might generate inaccurate intermediate steps, leading to a wrong final result' (p. 60); they struggle with the numerical computation inside complex reasoning (p. 61); LLM evaluators 'cannot serve as qualified evaluators for some difficult tasks (e.g., mathematical reasoning)' (p. 66); and contamination is increasingly severe (p. 65)."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "Surveys of LLM evaluation note that models may reach a correct final answer through an invalid reasoning path, or a wrong answer after a correct one (Zhao et al., 2023); a benchmark that scores only the answer cannot detect either.",
+ "facts_to_cite": [
+  "Reasoning inconsistency: LLMs 'may generate the correct answer following an invalid reasoning path, or produce a wrong answer after a correct reasoning process' (p. 61).",
+  "On knowledge-reasoning tasks LLMs 'might generate inaccurate intermediate steps, leading to a wrong final result' (p. 60).",
+  "LLMs still have difficulty with the numerical computation involved in complex reasoning, especially with numbers rarely seen in pre-training such as large numbers (p. 61).",
+  "Benchmark-based evaluation parses the model's text with human-written rules and scores the predicted answer by accuracy against the ground truth (p. 64).",
+  "Data contamination 'has become increasingly severe since more and more open data has been collected for developing LLMs' (p. 65) and is 'a severe issue for fairly assessing the performance of LLMs' (p. 96).",
+  "LLM judges show position, verbosity and self-enhancement bias, and 'cannot serve as qualified evaluators for some difficult tasks (e.g., mathematical reasoning)' (pp. 65-66)."
+ ],
+ "overlap_with_engtrace": "Nothing as an artefact: it is a survey with no instances, traces or evaluator. It offers secondary support for three of EngTrace's motivating claims: answer-reasoning inconsistency (p. 61), which motivates step-level checking; weakness in numerical computation (p. 61), which matches the X1 finding that 175 of the 178 incorrect steps inside correct-answer traces were calculation slips (state brief section 3); and contamination of open benchmarks (p. 65). It lacks generated instances, gold traces, step-level evaluation, engineering content and any expert validation of an evaluator.",
+ "confidence": "high",
+ "notes": "Page numbers are those of the v19 file (18 Mar 2026). The survey is revised often, so the bib entry should name the version used or the journal version the catalogue records. Its statements are secondary (the inconsistency point cites its refs [33, 435], p. 61); where the revised text has room, a primary source on process errors, such as Lightman et al. (2023), already in the reference list, is stronger. If the 'high-stakes engineering' premise is kept, it needs a source that actually discusses engineering use, or should be stated as the authors' motivation without a citation."
+}

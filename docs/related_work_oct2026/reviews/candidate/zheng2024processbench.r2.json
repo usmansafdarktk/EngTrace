@@ -1,0 +1,35 @@
+{
+ "key": "zheng2024processbench",
+ "reviewer": "r2",
+ "read": "full: main text pp. 1-9 (abstract, Secs. 1-5, limitations) read in full; appendices A-F (pp. 12-16) skimmed, with Table 4 (p. 12), Appendix C (p. 13) and the Appendix E prompt (p. 13) read",
+ "title_confirmed": true,
+ "venue_now": "ACL 2025 per the catalogue. The text file is arXiv 2412.06559v4 (26 May 2025, Qwen Team) and has no venue header.",
+ "what_it_is": "A benchmark for finding the earliest erroneous step in math solutions. Each of 3,400 test cases pairs a problem with a step-by-step solution written by one of 12 open Qwen or LLaMA models. Problems come from the GSM8K, MATH, OlympiadBench and Omni-MATH test sets, mostly competition or Olympiad level. Doctoral-level math experts mark the earliest error, or no error (pp. 1, 3-5). Three experts label each solution, extended to five until three agree; about 30% of solutions are discarded (p. 5). PRMs and prompted critic LLMs are scored by the F1 of their accuracies on erroneous and on correct solutions (p. 6). It measures verifiers, not solvers.",
+ "domain": "math, from grade school (GSM8K) to competition and Olympiad level (MATH, OlympiadBench, Omni-MATH)",
+ "size": "3,400 test cases: 400 from GSM8K and 1,000 each from MATH, OlympiadBench and Omni-MATH (Table 2, p. 5; Table 4, p. 12); 12 solution generators (p. 4). Evaluated: five open PRMs, one PRM the authors trained on PRM800K, and 19 prompted critic LLMs (17 open, plus GPT-4o and o1-mini) (Table 3, p. 7).",
+ "source_of_items": "existing datasets (GSM8K, MATH, OlympiadBench, Omni-MATH test sets); model-generated solutions, re-segmented into steps by Qwen2.5-72B-Instruct and annotated by experts",
+ "instances": "static",
+ "has_gold_traces": "partial: annotators were shown the source datasets' reference solutions and answers (p. 5), but each benchmark label is only the index of the earliest erroneous step (pp. 3-4); there are no gold intermediate values",
+ "evaluation": "step-level or process: earliest-error identification, scored as the harmonic mean (F1) of accuracy on erroneous and on correct solutions (p. 6); PRM step scores are thresholded into labels (p. 7)",
+ "human_validation": "Annotators had doctoral-level math expertise and passed a proficiency exam (p. 4). Three experts labelled each solution, extended up to five until three agreed; otherwise the solution was discarded, about 30% overall (p. 5). Table 2 (p. 5) gives the agreement profile: all of the first three experts agreed on 47.8% to 66.7% of erroneous samples and 80.1% to 95.9% of correct ones. The limitations admit possible label errors on Olympiad-level problems (p. 9).",
+ "contamination_measures": "none for the problems, which are public test sets; the authors' PRM800K-trained PRM excludes training samples whose problems appear in ProcessBench (Appendix C, p. 13)",
+ "engtrace_use": {
+  "sentence": null,
+  "verdict": "n/a",
+  "explanation": "Candidate; the May paper does not cite it. NEXT_CYCLE_REVIEW Sec. 4.2 names it. It is the reference benchmark for the claim EngTrace's X1 evidence makes: verifiers miss process errors, especially behind correct answers. The batch description is accurate: a human-annotated first-error benchmark of 3,400 math solutions, for PRMs and critic LLMs. One caution: ProcessBench itself does not evaluate Qwen2.5-Math-PRM-7B or -72B. The 78.3 F1 often quoted for the 72B PRM comes from Zhang et al. 2025 (zhang2025prmlessons Table 7, p. 10)."
+ },
+ "recommendation": "add (must)",
+ "suggested_wording": "ProcessBench (Zheng et al., 2025) asks PRMs and prompted critics to locate the earliest erroneous step in 3,400 expert-annotated solutions to math problems, most of competition level, and finds that existing PRMs generalise poorly beyond GSM8K and MATH and trail prompted critic models.",
+ "facts_to_cite": [
+  "3,400 test cases from GSM8K, MATH, OlympiadBench and Omni-MATH; each is a model-generated solution labelled with its earliest erroneous step, or none (abstract, p. 1; pp. 3-5).",
+  "Labelled by doctoral-level math experts: three per solution, up to five until three agree; about 30% of solutions discarded (pp. 4-5).",
+  "Among solutions with a correct final answer, the share containing a process error rises with difficulty: 3.5% (GSM8K), 18.8% (MATH), 32.2% (OlympiadBench), 51.8% (Omni-MATH) (Table 2, p. 5; p. 6).",
+  "Metric: the harmonic mean (F1) of accuracies on erroneous and correct samples (p. 6). The authors note that best-of-N, the usual way of evaluating PRMs, does not inspect individual steps (p. 6).",
+  "Existing open PRMs fail to generalise beyond GSM8K and MATH. They underperform both prompted critic LLMs and a PRM fine-tuned on PRM800K (abstract, p. 1; pp. 8-9).",
+  "Average F1 examples: Math-Shepherd-PRM-7B 31.5, GPT-4o 61.9, QwQ-32B-Preview 71.5, o1-mini 87.9 (Table 3, p. 7).",
+  "Monte Carlo step labels are criticised on two counts: they depend on the model that generated the solutions, and process errors behind correct answers make them wrong (pp. 8-9)."
+ ],
+ "overlap_with_engtrace": "Shares: expert step-level annotation of model-written solutions; first-error labels; measuring PRMs and LLM critics against expert labels; the finding that correct answers often rest on flawed processes. EngTrace's hard case is the engineering counterpart of ProcessBench's Table 2 rates: 93 of 228 correct-answer traces have an incorrect step (state brief Sec. 3). The definitions differ, though; EngTrace's errors are mostly calculation slips (175 of 178 steps). Lacks: engineering (math only); generated instances (static public test sets, so the problems may be contaminated); gold intermediate values (annotators see reference solutions, but each label is a single error index); evaluation of solver models (it measures verifiers only); deterministic step checks. EngTrace adds per-step labels from three own-branch experts with a reported Fleiss kappa (0.781 on steps). ProcessBench reports agreement only as how many annotators were needed to reach three in agreement.",
+ "confidence": "high",
+ "notes": "Paragraph: process supervision and judge validity. Posted to arXiv in 2024, published at ACL 2025; cite as Zheng et al., 2025 if citing by venue year. Do not attribute the Qwen2.5-Math-PRM-72B ProcessBench score (78.3) to this paper; it is in zhang2025prmlessons, by the same Qwen team."
+}

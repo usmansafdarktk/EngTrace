@@ -1,0 +1,35 @@
+{
+ "key": "austin2021mbpp",
+ "reviewer": "r1",
+ "read": "full: abstract, sections 1-4 (pp. 1-13: datasets, models and methods, MBPP synthesis results including the test-adequacy, overlap and edited-set analyses), risks and limitations, conclusion (pp. 22-23); skimmed sections 5-8 (human-model dialogue, program execution, MathQA results, related work) and the appendix",
+ "title_confirmed": true,
+ "venue_now": "arXiv preprint, arXiv:2108.07732v1 of 16 Aug 2021 (p1); the text shows no venue, consistent with the May entry.",
+ "what_it_is": "The paper evaluates Google decoder-only language models from 244M to 137B parameters on Python program synthesis from natural-language descriptions, and introduces two datasets: MBPP and MathQA-Python (pp. 1-5). MBPP (Mostly Basic Programming Problems) has 974 short Python tasks written by crowdworkers with basic Python knowledge, each a short description (usually one sentence), a self-contained reference function and three test cases; it is designed to be solvable by entry-level programmers (pp. 1, 4). The authors hand-verified and edited a subset of 426 problems (p4). Correctness is functional: 80 samples per problem are executed against the tests (p5). The largest model solves 59.6% of MBPP problems few-shot, and fine-tuning on 374 problems adds about 10 points (pp. 1, 3).",
+ "domain": "entry-level Python programming (in a sample of 100 problems, 58% mathematical, 43% list processing, 19% string processing; p4); the companion MathQA-Python covers math word problems rendered as Python programs (pp. 4-5)",
+ "size": "MBPP: 974 problems (10 for prompting, 500 test, 374 fine-tuning, 90 validation) plus an edited, hand-verified subset of 426 (p4); MathQA-Python: 23,914 problems (p5); models from 244M to 137B parameters (p5)",
+ "source_of_items": "crowd-sourced from an internal pool of crowdworkers, with internet references allowed (p4); 426 problems then edited and hand-verified by the authors (p4). MathQA-Python is translated from the existing MathQA dataset (pp. 4-5).",
+ "instances": "static",
+ "has_gold_traces": "partial: each MBPP task has a crowd-written reference solution (p4), a gold program rather than a reasoning trace, and scoring runs tests rather than comparing with it (p5). MathQA-Python's gold programs are straight-line computations of the answer (Fig. 2, p5).",
+ "evaluation": "unit tests: generated code is executed against the three test cases, with 80 samples per problem at temperature 0.5; reported as the share of problems solved by any sample and the share of samples that solve their problem (pp. 5-7). BLEU against the reference program correlates poorly with synthesis performance (Fig. 10, p10).",
+ "human_validation": "Items: the authors programmatically checked that every reference solution passes its tests under Python 3.6, and manually inspected, edited and pruned a subset into 426 questions with standard signatures, unambiguous text and tests that match the description (p4); on 100 problems present in both versions the 137B model's few-shot success rose from 63% to 79% on the edited ones (p11). Evaluator: for 50 of the 500 test problems the authors wrote adversarial 'challenge' tests, from which they estimate that about 12% of solutions counted as correct would fail stronger tests (p8).",
+ "contamination_measures": "items written from scratch by crowdworkers (p4); a line-overlap analysis against the pre-training data found 32 of 974 problems (3.3%) with more than half of their reference lines matched, and 91.5% with only one or two overlapping lines (p10). Crowdworkers could use internet references (p4), and the problems are open-sourced (p4).",
+ "engtrace_use": {
+   "sentence": "Similarly, coding evaluations span from function-level generation in HumanEval (Chen et al., 2021) and MBPP (Austin et al., 2021) to real-world software engineering in SWE-Bench (Jimenez et al., 2024). (S-M2)",
+   "verdict": "accurate",
+   "explanation": "MBPP's tasks are short, self-contained Python functions synthesised from a one-sentence description and checked by three assert tests (pp. 2, 4; Fig. 1), so 'function-level generation' is exact. Austin et al. (2021) is the paper that introduces MBPP (section 2.1, p4), though its title does not name it."
+ },
+ "recommendation": "keep as is",
+ "suggested_wording": "MBPP (Austin et al., 2021) contains 974 crowd-sourced, entry-level Python problems, each a short description with a reference solution and three test cases against which generated functions are executed.",
+ "facts_to_cite": [
+  "MBPP has 974 short Python programming tasks written by crowdworkers with basic Python knowledge, each with a short description, a self-contained reference function and three test cases (pp. 1, 4).",
+  "It is designed to be solvable by entry-level programmers; in a sample of 100 problems, 58% were mathematical in nature (pp. 1, 4).",
+  "The authors hand-verified and edited 426 of the problems; on 100 problems present in both versions, the 137B model's few-shot success rose from 63% to 79% on the edited versions (pp. 3-4, 11).",
+  "Correctness is functional: generated code is executed against the test cases, with 80 samples per problem (p5).",
+  "The largest (137B) model solves 59.6% of the problems few-shot; fine-tuning on 374 problems adds about 10 points for most model sizes (pp. 1, 3).",
+  "Adversarial tests written for 50 test problems suggest that about 12% of solutions counted as correct would fail stronger tests (p8).",
+  "Only 32 of 974 problems (3.3%) had more than half of their reference lines matched in the pre-training data (p10)."
+ ],
+ "overlap_with_engtrace": "Shares: deterministic, execution-based scoring rather than text similarity (pp. 5, 10); an explicit check of how far the automatic check can be trusted (adversarial tests on 50 problems, p8), close in spirit to EngTrace's validation of its deterministic checks; a contamination analysis (p10). Lacks: engineering or physical content (entry-level Python, p4); generated instances (a static set); gold reasoning traces (reference programs only); step-level evaluation (only test outcomes are scored); expert authorship or expert validation (crowdworkers wrote the items, the authors hand-verified a subset, p4); and a private pool (open-sourced, p4).",
+ "confidence": "high",
+ "notes": "The paper introduces both MBPP and MathQA-Python (pp. 1-5); the May text cites it only for MBPP, which is right. The May entry lists ten authors and 'et al.'; the paper has eleven, the last being Charles Sutton (p1). The test-adequacy finding (about 12% of passing solutions fail challenge tests, p8) is a coding-side precedent for checking an automatic evaluator's validity, if the revised text wants one."
+}

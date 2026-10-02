@@ -1,0 +1,32 @@
+{
+ "key": "suzgun2022bbh",
+ "reviewer": "r3",
+ "read": "full: main text pp. 1-10 (abstract, introduction, BBH construction, evaluation protocol, results, discussion, related work, conclusion); appendices pp. 11-49 skimmed (per-task results, filtered task lists, chain-of-thought prompts with the BIG-Bench canary on p. 23).",
+ "title_confirmed": true,
+ "venue_now": "The file is arXiv:2210.09261v1 (17 Oct 2022; page 1 footer) and shows no venue; papers.json gives Findings of ACL 2023, pp. 13003-13051.",
+ "what_it_is": "BIG-Bench Hard is a subset of 23 BIG-Bench tasks (27 subtasks) on which no model reported in the BIG-Bench paper had beaten the average human rater, chosen by filtering the 209 BIG-Bench tasks for at most three subtasks, at least 103 examples, a human-rater baseline and a multiple-choice or exact-match metric, keeping the 36 where no model beat the average rater and setting aside 13 of those as too hard or out of scope (pp. 1, 3; Table 1, p. 3). It has 6,511 evaluation examples, 250 per task for all but three tasks (p. 3). The paper shows that chain-of-thought prompting with three hand-written exemplars per task lets Codex beat the average human rater on 17 of 23 tasks and PaLM 540B on 10 (pp. 1, 5).",
+ "domain": "general reasoning and language understanding (algorithmic and multi-step arithmetic, logical deduction, natural language understanding, world knowledge)",
+ "size": "23 tasks (27 subtasks), 6,511 examples (p. 3); InstructGPT, Codex and PaLM model families (Table 2, p. 5)",
+ "source_of_items": "a filtered subset of BIG-Bench, a collaborative suite of crowd-sourced tasks (p. 3)",
+ "instances": "static",
+ "has_gold_traces": "partial: three hand-written chain-of-thought exemplars per task, used as few-shot prompts (p. 2; Appendix C); no per-item gold reasoning, and the models' rationales are not scored",
+ "evaluation": "final answer: exact match on the answer extracted after 'the answer is', under greedy decoding (p. 5)",
+ "human_validation": "none of its own; it uses BIG-Bench's average and maximum human-rater scores, and warns that they are not fully representative and should be interpreted with care (pp. 3, 9)",
+ "contamination_measures": "the BIG-Bench canary string is included so that the paper's examples can be filtered out of training corpora (p. 23); nothing else",
+ "engtrace_use": {
+  "sentence": "First, static benchmarks like Glue (Wang et al., 2019) and BBH (Kazemi et al., 2025) are increasingly prone to model saturation (Ott et al., 2022) and data contamination (Deng et al., 2024); EngTrace counters this through symbolic templates and domain-aware parameterization, generating unique, physically grounded problems that resist rote memorization. (S-I3, May L97-105; BBH is named, this paper is not cited)",
+  "verdict": "wrong",
+  "explanation": "The verdict grades the May text's attribution, not this paper: the sentence names BBH but cites Kazemi et al. (2025), BIG-Bench Extra Hard, and this paper is not in the reference list (C2). Calling BBH a static benchmark is right (a fixed set of 6,511 examples, p. 3). Its saturation is documented by the BBEH paper (pp. 1, 3 of that paper), not here. This paper does show how quickly its parent suite was overtaken: BBH's tasks were chosen because no reported model had beaten the average human rater, yet in the same paper chain-of-thought prompting took Codex past that average on 17 of the 23 (pp. 1, 3, 5). It says nothing about contamination beyond carrying the canary string (p. 23)."
+ },
+ "recommendation": "add (must)",
+ "suggested_wording": "BIG-Bench Hard (Suzgun et al., 2023) gathered 23 BIG-Bench tasks on which no reported model had beaten the average human rater, and in the same paper chain-of-thought prompting took Codex past that average on 17 of them.",
+ "facts_to_cite": [
+  "23 tasks (27 subtasks) selected from the 209 BIG-Bench tasks as those where no prior result beat the average human rater (p. 3; Table 1, p. 3).",
+  "6,511 evaluation examples: 250 per task except three tasks that use all their available examples (p. 3).",
+  "Scored by exact match on the extracted final answer under greedy decoding (p. 5).",
+  "With chain-of-thought prompting, Codex beat the average human rater on 17 of 23 tasks and PaLM 540B on 10 of 23 (abstract, p. 1; Table 2, p. 5); Codex's chain-of-thought average was 73.9 against an average human rater of 67.7 and a maximum of 94.4 (Table 2, p. 5)."
+ ],
+ "overlap_with_engtrace": "Shares final-answer exact-match scoring and the use of chain-of-thought, but its chains are prompt exemplars, not gold traces against which a model's steps are checked. No generated instances, no step-level evaluation, no engineering domain, no expert validation of an evaluator.",
+ "confidence": "high",
+ "notes": "Conditional recommendation: add this entry if the revised Introduction names BBH, and pair it with kazemi2025bbeh for the saturation fact; otherwise drop both. Cite the venue version (Findings of ACL 2023 per papers.json; the file is the 2022 arXiv v1), which also fixes the year in the in-text citation."
+}

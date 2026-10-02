@@ -1,0 +1,35 @@
+{
+ "key": "golovneva2022roscoe",
+ "reviewer": "r2",
+ "read": "full: main text pp. 1-10 (abstract, Secs. 1-8, ethics) read in full; appendices (pp. 13-57) skimmed by search, with Table 11 (dataset sizes, p. 20) and Appendix F (human annotation, p. 25) read",
+ "title_confirmed": true,
+ "venue_now": "ICLR 2023 (page header: 'Published as a conference paper at ICLR 2023'); arXiv 2212.07919v2 (12 Sep 2023)",
+ "what_it_is": "A suite of 18 interpretable automatic metrics for step-by-step rationales, under four headings: semantic alignment, semantic similarity, logical inference and language coherence (pp. 2, 4-5). They are computed with a fine-tuned SimCSE embedding model, an NLI model, GPT-2 perplexity and a grammar classifier (pp. 4-6). Most metrics are reference-free, scoring the chain against the source text, but some compare it with reference steps (pp. 3-4, 6). The metrics are meta-evaluated by Somers' D against binary error labels on two kinds of data (pp. 5-8). Diagnostic datasets are made by applying 12 perturbation rules to reference reasoning chains. Five further datasets of GPT-3 rationales were labelled by expert annotators using a nine-type error taxonomy.",
+ "domain": "general reasoning (logical, arithmetic, commonsense): EntailmentBank, ProofWriter, MATH, ASDIV, AQUA, EQASC and StrategyQA; GSM8K, DROP, ESNLI, COSMOS-QA and SemEVAL (pp. 5-6)",
+ "size": "Human-judged sets: 210 (DROP), 200 (GSM8K), 151 (ESNLI), 195 (CosmosQA) and 209 (SemEval) examples (Table 11, p. 20). Diagnostics: perturbed versions of six datasets reported in Table 7 (p. 7). 18 metrics (p. 2).",
+ "source_of_items": "existing datasets; the diagnostics are perturbed reference chains; the human-judged sets are model-generated rationales labelled by experts",
+ "instances": "perturbed (diagnostics) and static (human-judged)",
+ "has_gold_traces": "partial: the diagnostic datasets have reference step-by-step explanations, which are perturbed (pp. 5-6); the method does not assume references, although some metrics use them (pp. 3-4)",
+ "evaluation": "step-level or process: unsupervised similarity, NLI and language-model metrics per step and per chain, validated by Somers' D correlation with perturbation or human error labels (p. 7)",
+ "human_validation": "Five expert annotators rated each chain on a 1-5 Likert scale and marked each error type per step (p. 6; Appendix F, p. 25). Each example took about 2.5 minutes, and crowd workers were rejected as inaccurate (p. 25). No inter-annotator agreement is reported. Correlations with human judgement are 'moderate' (p. 8). On GSM8K the best ROSCOE variant reaches Somers' D 0.638, against 0.252 for ROUGE-L and 0.235 for BERTScore (Table 8, p. 8).",
+ "contamination_measures": "none",
+ "engtrace_use": {
+  "sentence": null,
+  "verdict": "n/a",
+  "explanation": "Candidate; the May paper does not cite it. The batch description calls ROSCOE 'the canonical reference-free metric suite'. That is imprecise: most of its metrics are reference-free, but six use reference steps (hallucination, redundancy, semantic coverage, reasoning alignment, commonsense and missing step; Table 3, p. 4; p. 6). It also calls ROSCOE the reasoning-specific counterpart to the BERTScore and ROUGE-2 metrics the May paper used against the gold trace, which is accurate. Those metrics are now demoted to an appendix at most (state brief Sec. 5), which weakens the case for must."
+ },
+ "recommendation": "add (should)",
+ "suggested_wording": "Earlier automatic step metrics such as ROSCOE (Golovneva et al., 2023) score rationales by embedding alignment, NLI contradiction and fluency, and correlate only moderately with expert error labels.",
+ "facts_to_cite": [
+  "18 metrics under four perspectives: semantic alignment, semantic similarity, logical inference and language coherence (p. 2; Tables 3-6, pp. 4-5).",
+  "A nine-type taxonomy of step errors: grammar, factuality, hallucination, redundancy, repetition, missing step, coherency, commonsense, arithmetic (Table 2, p. 3).",
+  "Most metrics are reference-free; some use reference steps (p. 6; Table 3, p. 4).",
+  "Meta-evaluated with Somers' D on synthetic perturbations (12 rules) and on five datasets of GPT-3 rationales labelled by five expert annotators (pp. 5-7).",
+  "Measured reference-free, ROSCOE beats ROUGE, BLEURT, BERTScore, BARTScore, PRISM and CTC on every diagnostic and human-judged dataset (Tables 7-8, pp. 7-8).",
+  "Correlations with human judgement are moderate. On GSM8K the best ROSCOE variant reaches 0.638, against ROUGE-L 0.252 and BERTScore 0.235 (Table 8, p. 8).",
+  "Score thresholds do not transfer across datasets (p. 9)."
+ ],
+ "overlap_with_engtrace": "Shares: automatic step-level evaluation of model rationales, validated against expert error labels; a perturbation-based diagnostic set, an early form of planted defects. Differs: ROSCOE measures textual alignment, entailment and fluency, and never checks whether a stated value is correct. EngTrace's checks are numeric and deterministic against gold values computed by the template code, plus an LLM judge for the residue. Another paper in this batch, ReasonEval, found ROSCOE's alignment and similarity scores near chance at detecting invalid steps in correct-answer math solutions (xia2024reasoneval Table 1, p. 4). That finding and EngTrace's own narrow pilot BERTScore range (0.866 to 0.882; state brief Sec. 5) support dropping similarity metrics. Lacks: engineering; generated instances; numeric gold traces; agreement statistics for its experts.",
+ "confidence": "medium",
+ "notes": "Paragraph: process supervision and judge validity, as the earlier generation of step metrics. It becomes must if the paper keeps BERTScore or ROUGE-2 against the gold trace anywhere, appendix included. ROSCOE is then the reasoning-specific comparison a reviewer will expect, and its Table 8 shows those two metrics correlating weakly with expert error labels. Cite by venue year (ICLR 2023) under the key golovneva2022roscoe. The abstract mentions six perturbed diagnostic datasets while Sec. 5 lists seven source datasets; StrategyQA is used only for fine-tuning (Table 11, p. 20)."
+}

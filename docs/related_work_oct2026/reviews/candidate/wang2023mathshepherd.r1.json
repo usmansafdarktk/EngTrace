@@ -1,0 +1,34 @@
+{
+ "key": "wang2023mathshepherd",
+ "reviewer": "r1",
+ "read": "full: pp. 1-12 (abstract, 1 introduction, 2 related works, 3 methodology, 4 experiments, 5 analysis, 6 limitations, 7 conclusion); reference list (pp. 12-15) skimmed; the paper has no appendix",
+ "title_confirmed": true,
+ "venue_now": "The text is arXiv 2312.08935v3, 19 Feb 2024 (p. 1), with no venue line. ACL 2024 (Proceedings of the 62nd Annual Meeting, Volume 1, pp. 9426-9439) as cited in ProcessBench's reference list (zheng2024processbench p. 10) and the Qwen lessons paper (zhang2025prmlessons p. 13).",
+ "what_it_is": "A method paper: Math-Shepherd is a process reward model for math trained without human step labels (abstract, p. 1). A step's label is its 'potential to deduce the correct answer', estimated by letting a fine-tuned completer LLM finish the solution N times from that step and checking the decoded answers against the gold answer; hard estimation labels the step good if any completion is correct, soft estimation uses the fraction correct (pp. 4-5). The PRM is evaluated only downstream: best-of-N reranking of 256 candidates on GSM8K and MATH500 and step-by-step PPO (pp. 3-7), e.g. Mistral-7B rising from 77.9% to 84.1% on GSM8K and 28.6% to 33.0% on MATH (Table 2, p. 7). Label quality was checked on 160 manually annotated GSM8K steps (p. 8).",
+ "domain": "grade-school and competition math (GSM8K, MATH); out-of-distribution check on a 33-question Hungarian national exam (p. 10)",
+ "size": "about 170k GSM8K and 270k MATH training solutions auto-labelled with an LLemma-7B completer, N=8 (p. 6); evaluation on the GSM8K test set and MATH500 with 256 candidates per problem (p. 6); generators and reward models from 7B to 70B (p. 6)",
+ "source_of_items": "existing datasets (GSM8K, MATH); solutions sampled from fine-tuned open models and labelled automatically by Monte Carlo completion",
+ "instances": "static",
+ "has_gold_traces": "no: only gold final answers; step labels are Monte Carlo estimates of whether completions from the step reach the gold answer (pp. 4-5)",
+ "evaluation": "final answer only: best-of-N accuracy after reranking by the minimum step score, and greedy accuracy after step-by-step PPO (pp. 5, 7); the PRM's step judgements are never scored against human labels",
+ "human_validation": "The authors manually annotated 160 steps sampled from the GSM8K training set: hard-estimation labels with a LLaMA2-70B completer reach 86% accuracy at N=4 and decline for larger N (p. 8); with a LLaMA2-13B completer, 85.0% against 75.0% for a rule that matches a step's result to steps of the reference solutions and 61.3% or 75.6% for NLI-based labelling (Table 4, p. 10). No inter-annotator agreement reported.",
+ "contamination_measures": "none (public GSM8K and MATH500 test sets, p. 6)",
+ "engtrace_use": {
+   "sentence": null,
+   "verdict": "n/a",
+   "explanation": "Not cited in the May paper. Belongs in the process supervision and judge validity paragraph as the standard reference for automatic Monte Carlo step labels. That labelling is the starting point of the Qwen2.5-Math-PRMs EngTrace runs ('We followed the commonly used MC estimation approach, Math-Shepherd', zhang2025prmlessons p. 3; consensus with an LLM judge added on top, p. 9), and NEXT_CYCLE_REVIEW sec. 4.2 names Math-Shepherd (brief sec. 6). The contrast for EngTrace: its step references are values computed by the template's code, not estimates of whether a completion can still reach the answer, which Math-Shepherd itself calls noisy (p. 4; pp. 11-12)."
+ },
+ "recommendation": "add (must)",
+ "suggested_wording": "Math-Shepherd (Wang et al., 2024) removed the need for human step labels by labelling a step correct when completions sampled from it still reach the gold answer, a Monte Carlo estimate of the step's promise rather than a check of its content, and evaluated the resulting PRM only through best-of-N and reinforcement-learning accuracy.",
+ "facts_to_cite": [
+   "Trains a math PRM on automatically constructed step labels, with no human annotation (abstract, p. 1).",
+   "A step's quality is defined as its potential to deduce the correct answer, estimated from N completions started at the step: hard estimation (any completion correct) or soft estimation (fraction correct) (pp. 4-5).",
+   "Used as a verifier (best-of-N over 256 candidates on GSM8K and MATH500) and as the reward for step-by-step PPO (pp. 3-7); with PPO, Mistral-7B goes from 77.9% to 84.1% on GSM8K and from 28.6% to 33.0% on MATH (abstract, p. 1; Table 2, p. 7).",
+   "On 160 manually annotated GSM8K steps, hard-estimation labels reach 86% accuracy at N=4 with a LLaMA2-70B completer (p. 8), against 75.0% for a rule matching step results to reference solutions (Table 4, p. 10).",
+   "The authors acknowledge that the automatic process annotation is noisy and that the effect of the noise on PRM performance is undetermined (pp. 11-12).",
+   "Published at ACL 2024, pp. 9426-9439 (as cited in zheng2024processbench p. 10 and zhang2025prmlessons p. 13)."
+ ],
+ "overlap_with_engtrace": "Shares step-level supervision of quantitative derivations. Lacks: generated instances (static GSM8K and MATH); gold intermediate values (gold final answers only; step labels are rollout estimates, pp. 4-5); any step-level evaluation of the PRM against human labels (only best-of-N and RL accuracy, pp. 5-7); engineering; expert validation beyond 160 authors' labels (p. 8). EngTrace did not run Math-Shepherd; its PRMs descend from this labelling scheme. Table 4 (p. 10), where matching step results against reference solutions labels GSM8K steps less accurately (75.0%) than rollouts (85.0%), is an objection a reviewer could raise against reference matching. EngTrace's answer is that its references are the template's own computed values and that its milestone check was validated against experts (E3 F1 0.921; brief sec. 3).",
+ "confidence": "medium",
+ "notes": "The catalogue key keeps the arXiv year (2023); cite by venue year, Wang et al. (2024). Math-Shepherd's step-level accuracy was measured later by others: ProcessBench gives Math-Shepherd-PRM-7B 31.5 average F1 (zheng2024processbench Table 3, p. 7), and the Qwen lessons paper finds Monte Carlo data gives worse step-error identification than LLM-judge or human labels (zhang2025prmlessons Table 4, p. 5). Confidence 'medium' is about must versus should only: if the paragraph has to be short, the Qwen lessons paper covers Monte Carlo labelling and cites Math-Shepherd for it, but the plan of record names Math-Shepherd and a PRM-literate reviewer will look for it."
+}

@@ -1,0 +1,33 @@
+{
+ "key": "liu2025circuit",
+ "reviewer": "r1",
+ "read": "full: pp.1-9 (all sections)",
+ "title_confirmed": true,
+ "venue_now": "Accepted to the 2025 Frontiers in Education (FIE) Conference, (c) 2025 IEEE (p.1); arXiv:2511.18221v1, 22 Nov 2025 (p.1)",
+ "what_it_is": "Not a benchmark: an enhancement pipeline that makes GPT-4o a more reliable grader of student homework in an undergraduate circuit-analysis course (p.1). It builds on the authors' earlier study (283 handwritten student solutions from 37 students on 119 textbook problems in six topics, converted to LaTeX; p.2), in which an LLM compares a student's solution with the reference solution on completeness, method, final answer, arithmetic and units (pp.2-3). The enhancement adds one prompt per aspect, problem summaries and the intended method as context, and targeted hints for GPT-4o's known errors (pp.4-7). On 87 student solutions from two entry-level topics, the share of fully correct assessments rose from 74.71% to 97.70% (p.7).",
+ "domain": "engineering education: undergraduate circuit analysis (electrical engineering) (p.1)",
+ "size": "earlier dataset: 283 student solutions, 37 students, 119 textbook problems (p.2); enhancement test: 87 student solutions (39 + 48) (p.7); models: GPT-4o (enhanced), with GPT-3.5 Turbo and Llama 3 70B in the earlier comparison (pp.2-4)",
+ "source_of_items": "textbook problems and real student homework from one university course (p.2)",
+ "instances": "static",
+ "has_gold_traces": "partial: reference solutions for the textbook problems serve as grading references (p.2); the paper has no model problem-solving task",
+ "evaluation": "LLM-as-grader of student work on five rubric aspects (completeness, method, final answer, arithmetic, unit), with the grader's outputs checked manually against predefined criteria (pp.2-4, p.7)",
+ "human_validation": "The LLM's assessments were checked manually (p.4); the enhancement fixed 11 of 13 previously wrong assessments, and on 87 solutions correct assessments rose from 74.71% to 97.70% (p.7). No inter-rater statistics.",
+ "contamination_measures": "none (not applicable)",
+ "engtrace_use": {
+  "sentence": "S-E1 (L182-190): '... specialized benchmarks like TransportBench, APBench, and EEE-Bench (Syed et al., 2024; Chen et al., 2025; Cheng et al., 2024; Li et al., 2025; Liu et al., 2025) are siloed within narrow sub-disciplines.'",
+  "verdict": "wrong",
+  "explanation": "The printed title is this paper, which introduces no benchmark of LLM problem solving: it improves GPT-4o as a homework grader (pp.1-2), so it cannot be one of the 'specialized benchmarks'. The printed entry also contradicts itself: its arXiv id (2502.07980) and its note ('Introduces the CIRCUIT benchmark') belong to Skelic et al.'s CIRCUIT, which this paper cites as its reference [16] (p.1). The printed author 'Jiaheng Liu' wrote neither paper; this one is by Liangliang Chen, Huiru Xie, Zhihao Qin, Yiming Guo, Jacqueline Rohde and Ying Zhang (p.1)."
+ },
+ "recommendation": "replace with skelic2025circuit",
+ "suggested_wording": "Only if the revised text discusses LLM graders: 'Chen et al. (2025) raised the share of correct GPT-4o assessments of circuit-analysis homework from 74.71% to 97.70% on 87 student solutions with per-aspect prompts and targeted hints.'",
+ "facts_to_cite": [
+  "an enhancement pipeline for GPT-4o grading undergraduate circuit-analysis homework, not a benchmark (p.1)",
+  "grading aspects: completeness, method, final answer, arithmetic and unit, judged against reference solutions (pp.2-3)",
+  "earlier dataset: 283 handwritten solutions from 37 students on 119 textbook problems (p.2)",
+  "fully correct assessments rose from 74.71% to 97.70% on 87 student solutions from two entry-level topics (p.7)",
+  "accepted to the 2025 Frontiers in Education Conference (p.1)"
+ ],
+ "overlap_with_engtrace": "Shares: engineering domain (circuit analysis); an LLM judging parts of a solution (method, arithmetic, units) against a reference, with human checking of the judge (pp.2-4, p.7). Lacks: a benchmark of model problem solving; generated instances; deterministic checks; scale (87 solutions in the enhancement test, two entry-level topics).",
+ "confidence": "high",
+ "notes": "Conflated reference: printed title = this paper (arXiv 2511.18221); printed id and note = CIRCUIT (arXiv 2502.07980, skelic2025circuit). S-E1 lists 'specialized benchmarks', which fits CIRCUIT, so the sentence should cite Skelic et al., 2025. This paper's grader-validation result is at most an optional citation for a judge-validity paragraph; it is small and focused on education."
+}

@@ -1,0 +1,33 @@
+{
+ "key": "liu2025circuit",
+ "reviewer": "r2",
+ "read": "full (pp.1-9; reference list skimmed)",
+ "title_confirmed": true,
+ "venue_now": "accepted to the 2025 Frontiers in Education (FIE) Conference (p.1 footnote); arXiv:2511.18221v1, 22 Nov 2025 (p.1)",
+ "what_it_is": "An engineering-education study, not a benchmark of model problem solving: it improves GPT-4o as an automatic grader of undergraduate circuit-analysis homework (p.1-2). The data are 283 handwritten student solutions from 37 students on 119 textbook problems in six topics, converted to LaTeX with Mathpix and proofread (p.2). The LLM judges completeness, method, final answer, arithmetic and units against a reference solution, and its judgments are graded by hand (p.2-4). Multi-step prompting, added context (problem summaries, intended method) and targeted hints raise GPT-4o's correct-response rate from 74.71% to 97.70% on 87 solutions from two entry-level topics (p.4-7).",
+ "domain": "engineering education: electrical (undergraduate circuit analysis), LLM as homework grader",
+ "size": "283 student solutions (37 students, 119 textbook problems, 6 topics) (p.2); enhanced GPT-4o tested on 87 solutions (39 + 48) (p.7); prior benchmarking of 3 LLMs as graders reproduced in Table I (p.4)",
+ "source_of_items": "student homework solutions to textbook problems from one university course (p.2)",
+ "instances": "static",
+ "has_gold_traces": "partial: an official reference solution and final answer for each problem, used as the grader's ground truth (p.2-3)",
+ "evaluation": "the LLM is the evaluator: its assessments of five aspects (completeness, method, final answer, arithmetic, units) are compared with manual grading; reported as the percentage of correct LLM responses (p.2-4, p.7)",
+ "human_validation": "Mathpix conversions proofread by hand (p.2); every LLM assessment graded manually against predefined criteria (p.4); no inter-rater statistics",
+ "contamination_measures": "not applicable",
+ "engtrace_use": {
+   "sentence": "S-E1 (L182-190): [...] while specialized benchmarks like TransportBench, APBench, and EEE-Bench (Syed et al., 2024; Chen et al., 2025; Cheng et al., 2024; Li et al., 2025; Liu et al., 2025) are siloed within narrow sub-disciplines.",
+   "verdict": "wrong",
+   "explanation": "The printed entry merges two papers under an author who wrote neither: its title is this paper, by Liangliang Chen, Huiru Xie, Zhihao Qin, Yiming Guo, Jacqueline Rohde and Ying Zhang (p.1), while its arXiv id (2502.07980) and note ('Introduces the CIRCUIT benchmark') belong to Skelic et al. And this paper is not a benchmark of model problem solving at all: it tunes GPT-4o to grade student homework (p.1-2), so it cannot stand for 'specialized benchmarks ... siloed within narrow sub-disciplines'. The benchmark the entry's note names is CIRCUIT (skelic2025circuit), which this paper itself cites as its reference [16] (p.1)."
+ },
+ "recommendation": "replace with skelic2025circuit",
+ "suggested_wording": "For the judge-validity paragraph, if wanted: grading undergraduate circuit-analysis homework against reference solutions, GPT-4o misjudged equivalent number formats, rounding, notation and valid alternative methods until given multi-step prompts and targeted hints (Chen et al., 2025).",
+ "facts_to_cite": [
+  "By Liangliang Chen, Huiru Xie, Zhihao Qin, Yiming Guo, Jacqueline Rohde and Ying Zhang (Georgia Tech); accepted to FIE 2025 (p.1)",
+  "283 handwritten student solutions from 37 students on 119 textbook circuit-analysis problems in six topics, converted to LaTeX and proofread (p.2)",
+  "The LLM assesses completeness, method, final answer, arithmetic and units against a reference solution; its outputs were graded manually (p.2-4)",
+  "GPT-4o's grading errors include missed equivalences of number formats, fractions and trigonometric forms, rounding differences, unit conversion, alternative methods and swapped notation (Table II, p.5)",
+  "Multi-step prompting, context augmentation and targeted hints fixed 11 of 13 earlier errors and raised GPT-4o's correct-response rate from 74.71% to 97.70% on 87 solutions in two entry-level topics (p.7)"
+ ],
+ "overlap_with_engtrace": "Shares: an engineering domain (electrical: circuit analysis) and the core problem of EngTrace's evaluator, an LLM judging the method, arithmetic and units of a worked solution against a reference solution, checked against manual grading (p.2-4). Lacks: a benchmark for models to solve, generated instances, deterministic checks, and validation at scale (87 solutions in two entry-level topics, p.7). Its list of grader errors (number formats, rounding, unit conversion, notation; p.5) is the kind EngTrace handles deterministically with tolerances, unit factors and the digit rule.",
+ "confidence": "high",
+ "notes": "Neither paper in the merged entry has an author named Liu. If this paper is cited at all, its key is Chen et al., 2025; that clashes with the APBench entry as printed (Chen et al., 2025), which should become Wu et al., 2025 anyway. It is optional at most: one course, small validation set, education framing. Its arXiv posting (22 Nov 2025) postdates CIRCUIT's (11 Feb 2025), and it cites CIRCUIT's GPT-4o accuracy of about 48% (p.1)."
+}

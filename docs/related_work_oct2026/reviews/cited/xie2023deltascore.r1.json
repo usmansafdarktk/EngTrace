@@ -1,0 +1,31 @@
+{
+ "key": "xie2023deltascore",
+ "reviewer": "r1",
+ "read": "full (abstract, introduction, related work, method pp3-4, experimental setup pp4-5, results pp5-8, discussion, conclusion and limitations pp8-9; appendices skimmed)",
+ "title_confirmed": true,
+ "venue_now": "Findings of the Association for Computational Linguistics: EMNLP 2023, pages 5317-5331 (p1 header)",
+ "what_it_is": "DeltaScore, a reference-free metric for fine-grained story evaluation. It scores a story by the drop in a pretrained language model's conditional log-likelihood when the story is perturbed in an aspect-specific way: typos for fluency, word or sentence shuffling for coherence, removing title words for relatedness, antonyms or commonsense violations for logicality, a blander rewrite for interestingness (p1; pp3-4, Table 1). It is evaluated by story-level Kendall correlation with the human ratings collected by Xie et al. (2023a) on ROCStories and WritingPrompts, where it outperforms similarity, discriminative and generative metrics; the simple word-shuffle perturbation (Jumble) works best across aspects (pp5-8).",
+ "domain": "story evaluation (NLG metrics)",
+ "size": "120 ROC and 80 WP stories with human ratings, after excluding human-written stories (p5 fn. 6); 6 language models as scorers (p5 Table 3); compared with 11 metrics (p6 Table 4)",
+ "source_of_items": "generated stories and human ratings from Xie et al. (2023a) (pp4-5)",
+ "instances": "perturbed (each story is perturbed to compute its score; the evaluation data are static)",
+ "has_gold_traces": "no",
+ "evaluation": "metric meta-evaluation: story-level Kendall correlation between metric scores and aggregated human ratings (p5)",
+ "human_validation": "Reuses the ratings of two annotator groups from Xie et al. (2023a), three annotators per story; one group's ratings tune the method and the other's give the final comparison (p5).",
+ "contamination_measures": "n/a. It leaves out the CNN data partly because most tested language models were trained on it, citing circularity (p4 fn. 5).",
+ "engtrace_use": {
+  "sentence": "We evaluate the fluency and semantic fidelity of generated solutions using standard reference-based metrics (Xie et al., 2023b). We employ BERTScore (Zhang et al., 2020) to measure deep semantic similarity via contextual embedding alignment, and ROUGE-2 (Lin, 2004) to quantify lexical overlap. (L466-471, section 4.3)",
+  "verdict": "misleading",
+  "explanation": "DeltaScore is not a reference-based metric: it is computed from the story and its condition only (p3), and Table 4 marks BLEU, BERTScore and MoverScore as the reference-based metrics it is compared with (p6). Its results cut against the May use: 'The similarity metrics generally has the lowest performance, highlighting the inadequacy of reference-based metrics for story evaluation' (p8). Cited as the authority for 'standard reference-based metrics' of fluency and semantic fidelity, it implies an endorsement the paper does not give; for stories it reports the opposite."
+ },
+ "recommendation": "drop",
+ "suggested_wording": "In story evaluation, reference-based similarity metrics such as BLEU and BERTScore generally correlated worst with human judgements among the metric families compared (Xie et al., 2023b).",
+ "facts_to_cite": [
+  "DeltaScore scores a story by the change in a language model's conditional log-likelihood between the original story and an aspect-specific perturbation of it (p3 eq. 1; p4 Table 1).",
+  "Evaluated by story-level Kendall correlation with human ratings on ROCStories and WritingPrompts, it outperformed similarity, discriminative and generative metrics; word shuffling (Jumble) was the most effective perturbation (pp7-8).",
+  "Reference-based similarity metrics (BLEU, BERTScore, MoverScore) generally had the lowest correlation with human judgements (p8; p7 Fig. 3)."
+ ],
+ "overlap_with_engtrace": "None in substance: a story-quality metric with no reasoning, no gold traces and no engineering. Its use of controlled perturbations to probe what a metric responds to is loosely analogous to EngTrace's planted-defect tests of its evaluator (state brief section 3), but DeltaScore uses perturbation to compute a score, not to measure an evaluator's detection rate.",
+ "confidence": "high",
+ "notes": "Self-citation (Zhuohan Xie; citation_context_map C9). The metrics of section 4.3 are themselves leaving the paper: the plan keeps 'ROUGE and BERTScore in an appendix if at all', and pilot BERTScore spanned only 0.866 to 0.882 (state brief section 5). If an appendix keeps them, cite BERTScore and ROUGE directly; EngTrace's own narrow BERTScore range is better evidence of their weakness than this out-of-domain study. For precedents of planted-defect meta-evaluation, DeltaScore's related work points to perturbation tests of NLG evaluation metrics (Sai et al., 2021; He et al., 2022; pp2-3), which would be the primary sources to check. The printed May reference gives 'Jey Lau' for Jey Han Lau (p1)."
+}

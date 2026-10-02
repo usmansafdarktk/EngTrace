@@ -1,0 +1,35 @@
+{
+ "key": "heesch2025realworld",
+ "reviewer": "r3",
+ "read": "full: all 19 pages of text (sections 1-5: research questions, state of the art, the five evaluations, discussion, conclusion); references skimmed",
+ "title_confirmed": true,
+ "venue_now": "arXiv preprint 2505.13484v1, 12 May 2025 (p1 margin; the title page is dated 21 May 2025); the text shows no venue",
+ "what_it_is": "An evaluation, not a mathematics or coding benchmark: four LLMs (Qwen2.5-72B-Instruct, DeepSeek-R1-Distill-Llama-70B, Llama 3.3 70B, GPT-4o) answer more than 100 questions written by the authors around a real glass-foaming plant, a simulated discrete-manufacturing plant and product design, organised by five research questions: world models, non-local relations, design intent, temporal and causal reasoning (including logical and physical modelling), and forecasting (p1, p3, p5-7). Each question is posed several times and only the least accurate answer is scored 0, 0.5 (junior engineer) or 1 (senior engineer) (p5); forecasting on 200 time-series samples is scored by MSE against LSTM and DLinear baselines (p7, p15). The models handle local, sequential and temporal reasoning but fail at abstraction, formal and physical modelling, non-local dependencies and forecasting (p1, p16-18).",
+ "domain": "engineering: industrial production systems and cyber-physical systems (manufacturing plants, product design, fault diagnosis, forecasting)",
+ "size": "more than 100 questions (45 for RQ1, 20 for RQ2, 20 for RQ3, and the remainder of 'over 80' plant questions for RQ4, whose count is not stated) plus 200 time-series samples from two CPS datasets (p3, p7-8, p10); four LLMs and two forecasting baselines (p5, p15)",
+ "source_of_items": "expert-written by the authors from a real plant, a simulation model and product-design material; time series from two standard CPS datasets, Three-Tank and ETTh1 (p3, p6-7, p14)",
+ "instances": "static",
+ "has_gold_traces": "no",
+ "evaluation": "rubric: the least accurate of several responses is scored on a three-point scale and averaged per category (p5); MSE for forecasting (p7, p16). Who scored the answers is not stated.",
+ "human_validation": "none reported: no grader identity and no inter-rater agreement; the rated answers are released on GitHub (p7)",
+ "contamination_measures": "questions written new for the paper (p3, p13), partly from confidential plant information (p5); otherwise none",
+ "engtrace_use": {
+  "sentence": "S-M3 (L165-168): 'Yet neither abstract logical deduction nor algorithmic proficiency transfers to reliable reasoning under physical constraints (Heesch et al., 2025).'",
+  "verdict": "misleading",
+  "explanation": "The paper tests no transfer. It evaluates four LLMs on engineering questions only (p3, p5), with no mathematics or coding benchmark and no comparison with one, so it cannot show that mathematical or algorithmic proficiency fails to transfer. What it does show, that the models 'struggle significantly with abstract reasoning, formal modeling, and context-sensitive engineering logic' (p1) and that in physical modelling, 'With minor exceptions, all models exhibited severe limitations' (p14), loosely supports 'unreliable reasoning under physical constraints'; but its finding of weak abstract reasoning cuts against the sentence's premise that abstract deduction is a strength models have. The citation also hides that this is itself an engineering evaluation, which the engineering paragraph never discusses (citation_context_map C13), and one whose critique of evaluations built on 'simplified use cases, often adapted from examination materials where correctness is easily verifiable' (p1, p2) applies to EngTrace's own textbook-style, deterministically checked items."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "Heesch et al. (2025) evaluate four LLMs on over 100 questions about a real production plant, a simulated one and product design, finding them sound on local and sequential reasoning but weak at formal and physical modelling, and argue that exam-style engineering items, whose correctness is easy to verify, miss these competencies.",
+ "facts_to_cite": [
+  "A curated set of more than 100 questions built around a real glass-foaming plant, a simulated discrete-manufacturing plant and product design, plus forecasting on 200 time-series samples (p1, p3, p6-7).",
+  "Four LLMs were evaluated: Qwen2.5-72B-Instruct, DeepSeek-R1-Distill-Llama-70B, Llama 3.3 70B and GPT-4o (p5).",
+  "Each question was posed several times and only the least accurate response was scored, on a 0 / 0.5 / 1 scale anchored to junior- and senior-engineer answers (p5).",
+  "The models do well on local, sequential and temporal reasoning but 'struggle significantly with abstract reasoning, formal modeling, and context-sensitive engineering logic' (p1); in physical modelling, 'With minor exceptions, all models exhibited severe limitations' (p14).",
+  "Specialised forecasting baselines (LSTM, DLinear) outperform all four LLMs (p15).",
+  "The authors criticise earlier engineering evaluations for 'the reliance on simplified use cases, often adapted from examination materials where correctness is easily verifiable' (p1; also p2).",
+  "The questions and rated answers are public, in the GitHub repository 'Wrenchmark' (p7, p18)."
+ ],
+ "overlap_with_engtrace": "Shares: engineering domain (industrial and manufacturing systems, loosely overlapping in topic with EngTrace's industrial branch); partial credit. Lacks: generated instances (static, hand-written); gold traces; step-level evaluation (whole answers rated); expert validation of the evaluator (grader unnamed, no agreement statistic); textbook quantitative problems of the kind EngTrace covers (its tasks are system-level and largely qualitative). It is the most direct critique of EngTrace's design choice of closed-form, verifiable items over realistic scenarios.",
+ "confidence": "high",
+ "notes": "Positioning (citation_context_map C13): this belongs in the engineering paragraph as a realistic-scenario evaluation that complements EngTrace, and its critique of exam-style, easily verified items is a likely reviewer objection; the revision should answer it with the May Introduction's own scope argument (step verification needs gold traces, which need controlled, closed-form problems). If the transfer claim of S-M3 is kept, it needs a different source; none of the Batch M papers tests transfer from mathematics or coding to physical reasoning."
+}

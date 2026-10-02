@@ -1,0 +1,36 @@
+{
+ "key": "cobbe2021gsm8k",
+ "reviewer": "r2",
+ "read": "full",
+ "title_confirmed": true,
+ "venue_now": "arXiv preprint 2110.14168v2, 18 Nov 2021 (p.1); the text shows no peer-reviewed venue",
+ "what_it_is": "GSM8K is a dataset of 8.5K grade-school math word problems written by human problem writers, split into 7.5K training and 1K test problems; each takes 2 to 8 steps of elementary arithmetic and comes with a natural-language solution (p.2-3). Writers were hired through Upwork and then Surge AI, could start from GPT-3-generated seed questions, and were told not to reuse problem settings or templates (p.15). The paper's main contribution is a method: verifiers trained on final-answer correctness rank 100 sampled solutions, a gain the authors equate to a 30x larger model (p.2, p.12). GPT-3 family models of 3B to 175B parameters are scored on whether the final answer is correct (p.5-6).",
+ "domain": "grade-school math word problems (elementary arithmetic)",
+ "size": "8.5K problems: 7.5K train, 1K test (p.3); GPT-3 models of 3B, 6B, 12B and 175B parameters (p.5-6)",
+ "source_of_items": "written by human problem writers (Upwork freelancers, then Surge AI workers), who could use or adapt GPT-3-generated seed questions (p.3, p.15)",
+ "instances": "static",
+ "has_gold_traces": "yes: every problem has a human-written natural-language step-by-step solution (p.2-3); calculator annotations were added automatically by hard-coded logic and a fine-tuned model (p.17). The solutions are used for training, not to score model steps",
+ "evaluation": "final answer (test@1 and test@N solve rates, p.5, p.7); the verifiers are trained only on whether a sampled solution reaches the correct final answer (p.5, p.7)",
+ "human_validation": "Other workers re-solved every problem and disagreements were repaired or discarded; a second agreement round on a smaller subset left 1.7% of problems with disagreements, the authors' estimate of problems with breaking errors or ambiguities (p.15; 'less than 2 percent', p.3). No validation of an evaluator is reported.",
+ "contamination_measures": "none (a static, public test set); the diversity measures (no shared templates, pairwise-similarity feedback to writers, p.3, p.15) target diversity, not contamination",
+ "engtrace_use": {
+   "sentence": "S-M1 (L155-161): In mathematics, benchmarks ranging from GSM8K (Cobbe et al., 2021) and Math (Hendrycks et al., 2021b) to HardMath (Fan et al., 2024), Putnam-Axiom (Gulati et al., 2024), and GSM-Symbolic (Mirzadeh et al., 2024) rigorously test abstract logical deduction and reasoning stability.",
+   "verdict": "imprecise",
+   "explanation": "Right paper, and the gist (a mathematics benchmark of an isolated skill, not physically grounded) holds. But 'abstract logical deduction' is loose for GSM8K: its problems are concrete everyday word problems solved by 'a sequence of elementary calculations using basic arithmetic operations' (p.3) and needing some background knowledge such as the number of days in a week (p.4); the authors describe the target as multi-step mathematical reasoning and 'informal reasoning ability' (p.1-2), with the main difficulty in 'properly interpreting a question and reasoning through the steps to solve it' (p.4). 'Reasoning stability' does not apply to a single static set scored once per problem (p.3, p.5). The sentence also misses the point that matters for EngTrace: GSM8K pairs every problem with a natural-language reference solution yet scores only the final answer, and its authors note that solutions can reach the correct answer through flawed reasoning (p.7, example p.22)."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "GSM8K (Cobbe et al., 2021) poses 8.5K human-written grade-school word problems that take two to eight arithmetic steps, each with a natural-language reference solution, but scores only the final answer.",
+ "facts_to_cite": [
+   "8.5K grade-school math word problems written by human problem writers, split 7.5K train and 1K test (p.3)",
+   "Problems take 2 to 8 steps of elementary arithmetic (addition, subtraction, multiplication, division) (p.3)",
+   "Every problem comes with a natural-language step-by-step solution (p.2-3)",
+   "Writers were told not to reuse problem settings or templates, and pairwise similarity scores were used to enforce this (p.3, p.15)",
+   "Performance is judged by whether the final answer is correct (p.5); verifiers are trained on final-answer correctness alone (p.5, p.7)",
+   "The authors note that some solutions reach the correct final answer through flawed reasoning, which makes outcome-trained verifiers give false positives (p.7; example p.22)",
+   "Re-solving by other workers left an estimated 1.7% of problems with breaking errors or ambiguities (p.15)",
+   "Ranking 100 samples with a verifier gives roughly the gain of a 30x larger model (p.2, p.12)"
+ ],
+ "overlap_with_engtrace": "Shares: multi-step quantitative word problems with a reference solution for every item (human-written, so a form of gold trace) and a deterministic final-answer check. Lacks: generated instances (a static set whose writers were told to avoid templates, the opposite of EngTrace's design, p.3, p.15); step-level evaluation (final answer only; its verifiers are outcome-supervised, p.7); engineering or physical content (everyday arithmetic); expert validation of any evaluator; contamination control. Its observation that correct answers can hide flawed reasoning (p.7, p.22) supports EngTrace's motivation for checking steps.",
+ "confidence": "high",
+ "notes": "Cobbe et al. give 7.5K/1K (p.3), but GSM-Symbolic reports the released split as 7,473 train and 1,319 test (mirzadeh2024gsmsymbolic p.4, p.16); the revised text should say 8.5K problems, or 1,319 test problems, not 1K. The paper's verifiers, trained on final-answer labels (p.5, p.7), are an early outcome-supervised baseline that the planned paragraph on process supervision may cite next to Lightman et al. (2023). The May reference entry (L930) is correct."
+}

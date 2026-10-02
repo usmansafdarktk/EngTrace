@@ -1,0 +1,35 @@
+{
+ "key": "cheng2024elecbench",
+ "reviewer": "r2",
+ "read": "partial: abstract, Section 1, Sections 2.1 and 2.3 (logicality), Section 3 (test set construction, evaluation process, scenarios), Section 4.1 and the opening of 4.2, Section 5 (pp.1-14); metric definitions in 2.2 and 2.4-2.7 and the appendix figures skimmed",
+ "title_confirmed": true,
+ "venue_now": "arXiv preprint 2407.05365v2, 11 Aug 2024, marked 'Preprint submitted to Elsevier' (p.1)",
+ "what_it_is": "ElecBench evaluates LLMs on power-system operation, with general, power-operation (dispatch, operation monitoring) and fault-diagnosis-and-recovery (black start) scenarios (p.12), scored on six primary metrics (factuality, logicality, stability, security, fairness, expressiveness) and 24 sub-metrics (p.1). Items come from professional literature, regulations and textbooks turned into question-answer pairs, from simulation software scenarios, from electrical-engineering items of C-Eval and MMLU, and from GPT-4-generated fictional concepts checked by search (p.9-10). Most responses are scored against standard answers by two GPT-4 judges, with a human deciding when their scores differ beyond a threshold; stability compares answers before and after perturbation, and simulation outputs are scored by program (p.11). Eight LLMs are evaluated (p.12); the number of test items is not stated in the sections read.",
+ "domain": "engineering: electrical (power-system operation and dispatch)",
+ "size": "item count not stated (none found by search); 6 metrics, 24 sub-metrics (p.1); 3 scenario groups (p.12); 8 LLMs: GPT-3.5, GPT-4, LLaMA2 7B/13B/70B, GAIA 7B/13B/70B (p.12)",
+ "source_of_items": "professional literature, regulations and textbooks (OCR plus automatic question generation), simulation software (economic dispatch, operation monitoring, black start), subsets of C-Eval and MMLU, and GPT-4-generated fictional concepts verified by hand (p.9-10)",
+ "instances": "static (with simulation-generated scenarios and perturbed question variants for the stability metric, p.9, p.11)",
+ "has_gold_traces": "no (standard answers only, p.11)",
+ "evaluation": "LLM judge: two independent GPT-4 scores averaged, human evaluation when they differ beyond a threshold; similarity-based stability scoring; programmatic scoring of simulation outputs; manual search-engine verification for information reliability (p.11); includes a 'logicality' metric on the reasoning process (p.5)",
+ "human_validation": "undergraduates with power-systems background select content (p.9); fictional concepts verified by search engine (p.9); professionals settle scenario-classification disagreements between two GPT-4 runs (p.10); humans adjudicate judge disagreements (p.11); no agreement statistics reported",
+ "contamination_measures": "none reported",
+ "engtrace_use": {
+   "sentence": "S-E1 (L182-190): [...] while specialized benchmarks like TransportBench, APBench, and EEE-Bench (Syed et al., 2024; Chen et al., 2025; Cheng et al., 2024; Li et al., 2025; Liu et al., 2025) are siloed within narrow sub-disciplines.",
+   "verdict": "imprecise",
+   "explanation": "The siloed characterisation fits: ElecBench covers power-system operation only (p.1, p.12). But the sentence names three benchmarks and cites five papers, so ElecBench is cited without its name and a reader cannot tell which work Cheng et al., 2024 is; and the first author is Xiyuan Zhou, with Yuheng Cheng third (p.1). For the closing claim S-E3 (batch E2), ElecBench is not outcome-only: its logicality metric judges 'the logical rigour of the entire reasoning process ... rather than directly on the accuracy of the conclusions' (p.5), scored by two GPT-4 judges with human review of disagreements (p.11)."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "ElecBench (Zhou et al., 2024) scores eight LLMs on power-system operation and dispatch along six metrics, including the logicality of their reasoning, mostly with two GPT-4 judges and a human reviewer when the judges disagree.",
+ "facts_to_cite": [
+  "Six primary metrics (factuality, logicality, stability, security, fairness, expressiveness) and 24 sub-metrics (p.1)",
+  "Scenarios: general; power operations (dispatch, operation monitoring); fault diagnosis and recovery (black start) (p.12)",
+  "Items from literature, regulations and textbooks, simulation software, electrical-engineering items of C-Eval and MMLU, and GPT-4-generated fictional concepts (p.9-10)",
+  "Logicality assesses the rigour of the reasoning process rather than the accuracy of the conclusion (p.5)",
+  "Two GPT-4 models score each response; a human decides when their scores differ beyond a threshold (p.11)",
+  "Eight LLMs evaluated: GPT-3.5, GPT-4, LLaMA2 7B/13B/70B and the power-dispatch model GAIA 7B/13B/70B (p.12)",
+  "The test set is public (p.1)"
+ ],
+ "overlap_with_engtrace": "Shares: an engineering domain (electrical: power systems, while EngTrace's electrical branch covers digital communications, electromagnetics and waves, and signals and systems); an LLM-judged metric for the quality of reasoning (logicality, p.5) and human adjudication of judge disagreements (p.11); some simulation-generated scenarios (p.9). Lacks: gold traces (standard answers only), deterministic step or value checks, measured judge-human agreement, a stated item count, contamination measures.",
+ "confidence": "high",
+ "notes": "Author error: the v2 byline is Xiyuan Zhou, Huan Zhao, Yuheng Cheng, Yuji Cao, Gaoqi Liang, Guolong Liu, Wenxuan Liu, Yan Xu and Junhua Zhao (p.1); the printed entry starts with Yuheng Cheng, adds Chao Yang and Xinlei Cai and omits four authors. An arXiv v1 byline could differ; the text is v2. The key should be Zhou et al., 2024 and the benchmark should be named. ElecBench's LLM-judged reasoning metric is a counter-example to S-E3's 'limited to outcome matching'; the revised text can contrast it with EngTrace's deterministic checks and expert-validated residual judge."
+}

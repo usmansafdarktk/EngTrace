@@ -1,0 +1,34 @@
+{
+ "key": "hendrycks2021mmlu",
+ "reviewer": "r3",
+ "read": "full: abstract, introduction and related work (pp. 1-3), section 3 'A multitask test' (pp. 3-5), section 4 experiments (pp. 5-7), discussion and conclusion (pp. 7-8); appendix A skimmed; appendix B.1-B.2 (task descriptions, exact-question contamination check, pp. 13-14) and Table 2 (task list, p. 15) read; example figures (pp. 16-27) skimmed",
+ "title_confirmed": true,
+ "venue_now": "ICLR 2021 (page 1 header: 'Published as a conference paper at ICLR 2021'); the file is arXiv 2009.03300v3, 12 Jan 2021 (p. 1)",
+ "what_it_is": "MMLU measures text models' multitask accuracy over 57 subjects in STEM, the humanities, the social sciences and other areas, from elementary to professional level (pp. 1, 3). Graduate and undergraduate students collected its 15,908 four-option multiple-choice questions by hand from freely available sources: GRE and USMLE practice questions, undergraduate course questions and questions for readers of Oxford University Press books. The questions are split into a few-shot dev set of 5 per subject, a 1,540-question validation set and a 14,079-question test set (p. 3). Models are scored by classification accuracy, the prediction being the most probable of the letters A to D (pp. 5-6). The authors frame the test as measuring the world knowledge and problem-solving ability models acquire in pretraining, and find calculation-heavy STEM subjects among the hardest (pp. 1, 6-8).",
+ "domain": "multi-subject: 57 tasks in STEM, humanities, social sciences and other areas; one task is Electrical Engineering ('Circuits, power systems, electrical drives', p. 15)",
+ "size": "15,908 questions (test 14,079; validation 1,540; dev 5 per subject), 57 tasks, at least 100 test questions per subject (p. 3); models: GPT-3 in four sizes and UnifiedQA, plus fine-tuned RoBERTa-base, ALBERT-xxlarge and GPT-2 (p. 5)",
+ "source_of_items": "exams and course material: practice questions for tests such as the GRE and USMLE, undergraduate course questions and Oxford University Press reader questions, collected by hand by students (p. 3)",
+ "instances": "static",
+ "has_gold_traces": "no: each item has only the correct option letter (pp. 3, 6)",
+ "evaluation": "multiple choice: accuracy, the prediction being the highest-probability option among A-D, zero-shot and few-shot with up to 5 dev examples (pp. 5-6); calibration is also measured (p. 7)",
+ "human_validation": "No item-level validation or error audit is reported. Human baselines: Amazon Mechanical Turk workers score 34.5%; expert-level accuracy is estimated at about 89.8% from 95th-percentile exam takers, with educated guesses where data were unavailable (p. 3).",
+ "contamination_measures": "post-hoc check only: Appendix B.2 finds no positive correlation between a question's GPT-3 log-probability and accuracy (r = -0.43 zero-shot, -0.56 few-shot), which the authors read as the exact questions not having been memorized; most source questions sit on pages separate from their answers, and the authors promise a list of sources (pp. 13-14)",
+ "engtrace_use": {
+  "sentence": "S-E1 (L182-190): 'Generalist suites like MMLU (Hendrycks et al., 2021a), BIG-Bench (Luo et al., 2024), and SuperGPQA (Du et al., 2025) restrict assessment to factual recall via multiple-choice questions, ...' and S-I3a (L105-111): 'general knowledge benchmarks (e.g., MMLU (Hendrycks et al., 2020)) test broad factual recall'",
+  "verdict": "imprecise",
+  "explanation": "The multiple-choice half is exact: every item is a four-option question scored by accuracy (pp. 3, 6). 'Factual recall' is narrower than the paper. MMLU is built to require 'extensive world knowledge and problem solving ability' (p. 1) and includes mathematics, physics and an Electrical Engineering task (pp. 4-5, 15, 18). Its main finding is that models do worst on 'highly procedural problems', the calculation-heavy STEM subjects with 'plug and chug' problems (pp. 6-8). The point EngTrace needs still holds: MMLU's engineering content is multiple choice and only the answer is scored. So the wording is loose, not misleading. The same applies to S-I3a: 'broad' is right (57 subjects), but 'factual recall' narrows 'world knowledge and problem solving'. 'Hendrycks et al., 2020' and 'Hendrycks et al., 2021a' are one paper listed twice (citation_context_map C5); this file is the ICLR 2021 version."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "General-knowledge suites such as MMLU (Hendrycks et al., 2021) pose four-option multiple-choice questions over 57 subjects, electrical engineering among them, and score only the option chosen.",
+ "facts_to_cite": [
+  "57 tasks spanning STEM, the humanities, the social sciences and other areas, from elementary to professional level (pp. 1, 3)",
+  "15,908 questions collected by hand by graduate and undergraduate students from freely available sources such as GRE and USMLE practice questions (p. 3)",
+  "every item is a four-option multiple-choice question; the score is classification accuracy over the predicted letter (pp. 3, 6)",
+  "includes an Electrical Engineering task covering circuits, power systems and electrical drives (p. 15; example question p. 18)",
+  "for GPT-3, 9 of the 10 lowest-accuracy tasks are STEM subjects that emphasise mathematics or calculations (pp. 6-7)",
+  "published at ICLR 2021 (p. 1)"
+ ],
+ "overlap_with_engtrace": "Shares: some engineering content (one Electrical Engineering task) and calculation questions with a single correct answer. Lacks: generated instances (fixed public questions); gold traces (answer letter only); step-level or process evaluation (option accuracy only); and an evaluator that needs expert validation (none is needed for multiple choice). Its engineering coverage is a single electrical task.",
+ "confidence": "high",
+ "notes": "Merge the two reference entries into the ICLR 2021 one (and check that MATH keeps a distinct year suffix). The paper describes its content as 'world knowledge and problem solving ability', so 'factual recall' should not be attributed to it; the defensible contrast with EngTrace is that it scores only the chosen option of a multiple-choice question."
+}

@@ -1,0 +1,31 @@
+{
+ "key": "wang2018glue",
+ "reviewer": "r3",
+ "read": "full: main text pp. 1-9 (abstract, introduction, related work, tasks, evaluation, diagnostic dataset, baselines, benchmark results, analysis, conclusion); appendices pp. 13-20 skimmed.",
+ "title_confirmed": true,
+ "venue_now": "ICLR 2019 (page 1 header: 'Published as a conference paper at ICLR 2019'); the file is arXiv v3 of 22 Feb 2019. papers.json also lists a BlackboxNLP 2018 workshop version; the file shows ICLR 2019, the version to cite.",
+ "what_it_is": "GLUE is a multi-task benchmark of nine English sentence and sentence-pair understanding tasks (CoLA, SST-2, MRPC, STS-B, QQP, MNLI, QNLI, RTE, WNLI) built on existing datasets, with an online leaderboard scored mainly on privately held test labels and a hand-built diagnostic set of 1,100 NLI examples tagged by linguistic phenomenon (pp. 1-6). It reports multi-task and pre-trained baselines whose low scores led the authors to conclude that 'solving GLUE is beyond the capabilities of current models and methods' (p. 8).",
+ "domain": "general English natural language understanding (acceptability, sentiment, paraphrase, similarity, inference)",
+ "size": "nine tasks with test sets from 146 (WNLI) to 391k (QQP) examples (Table 1, p. 2); diagnostic set of 1,100 examples (p. 6); BiLSTM baselines with ELMo, CoVe and attention variants plus pre-trained sentence encoders (pp. 6-8)",
+ "source_of_items": "existing datasets ('None of the datasets in GLUE were created from scratch for the benchmark', p. 1) plus an expert-constructed diagnostic set (pp. 5-6)",
+ "instances": "static",
+ "has_gold_traces": "no",
+ "evaluation": "per-task metrics (accuracy, F1, Matthews correlation, Pearson and Spearman correlation) and their macro-average on the leaderboard (pp. 3-5); R3 on the diagnostic set (p. 6)",
+ "human_validation": "for the diagnostic set only: six NLP researchers annotated 50 sentence pairs (Fleiss kappa 0.73, average R3 0.80), and hypothesis-only classifiers scored near chance on it (32.7% and 36.4%), indicating no annotation artifacts (p. 6)",
+ "contamination_measures": "privately held test labels, scored by submission to the benchmark website (pp. 1-2, Table 1)",
+ "engtrace_use": {
+  "sentence": "First, static benchmarks like Glue (Wang et al., 2019) and BBH (Kazemi et al., 2025) are increasingly prone to model saturation (Ott et al., 2022) and data contamination (Deng et al., 2024); EngTrace counters this through symbolic templates and domain-aware parameterization, generating unique, physically grounded problems that resist rote memorization. (S-I3, May L97-105; GLUE is named, this paper is not cited)",
+  "verdict": "wrong",
+  "explanation": "The verdict grades the May text's attribution, not this paper: the sentence names GLUE but cites Wang et al. (2019), the SuperGLUE paper, and this paper is not in the reference list (C1). Calling GLUE a static benchmark is right (fixed test sets from existing datasets, pp. 1-2). Its saturation is documented, but not here: this paper describes GLUE at release, when the baselines were far from solving it (p. 8); the evidence of saturation is in the SuperGLUE paper (its pp. 1-2). The only contamination evidence for GLUE in this batch is second-hand: Deng et al. (2024, pp. 2-3) cite Elazar et al. (2023) for potential contamination of several GLUE and SuperGLUE datasets."
+ },
+ "recommendation": "add (must)",
+ "suggested_wording": "GLUE (Wang et al., 2018), a static suite of nine language-understanding tasks with private test labels, was surpassed by models little more than a year after its release (Wang et al., 2019).",
+ "facts_to_cite": [
+  "Nine English sentence or sentence-pair tasks built on existing datasets, with privately held test labels and an online leaderboard (pp. 1-2; Table 1, p. 2).",
+  "An expert-constructed diagnostic set of 1,100 NLI examples tagged by linguistic phenomenon; six NLP researchers reached Fleiss kappa 0.73 on a 50-pair sample (pp. 5-6).",
+  "At release even the best baselines left 'room for improvement', and the authors judged that solving GLUE was beyond current models and methods (p. 8)."
+ ],
+ "overlap_with_engtrace": "None of the five features: static items reused from existing datasets, no gold traces, final-label scoring, general English NLU. Like EngTrace it keeps test labels private (p. 1). It matters only as the canonical example of a static benchmark that saturated.",
+ "confidence": "high",
+ "notes": "The recommendation is conditional: add this entry if the revised Introduction keeps GLUE as an example (then cite wang2019superglue, under its own name, for the saturation fact); otherwise drop GLUE and SuperGLUE together. 'Must' because naming a benchmark without its own paper is the error C1 records."
+}

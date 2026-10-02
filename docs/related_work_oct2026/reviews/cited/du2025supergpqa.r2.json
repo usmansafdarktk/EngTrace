@@ -1,0 +1,35 @@
+{
+ "key": "du2025supergpqa",
+ "reviewer": "r2",
+ "read": "partial: abstract, Sections 1-4 (pp.1-24) in full, contributions (p.26), Appendix C.3 opening (p.58) and F.1-F.2 evaluation prompts (p.69); the remaining appendices (pp.39-249) skimmed by search",
+ "title_confirmed": true,
+ "venue_now": "arXiv preprint 2502.14739v4, 28 Mar 2025 (p.1); no venue shown in the text",
+ "what_it_is": "A graduate-level multiple-choice benchmark of 26,529 questions across 13 disciplines, 72 fields and 285 subfields, with 9.67 options per question on average (p.10). Experts (PhD holders or candidates) chose credible sources, with textbook example problems first; crowd annotators (undergraduate and master's students) translated questions, converted non-multiple-choice problems into multiple choice and wrote distractors; a rule-, LLM- and expert-based inspection then filtered and revised items (p.4-9). Engineering is the second-largest discipline with 7,892 questions, and 42.33% of all questions require calculation or formal reasoning (p.10, p.13). Fifty-one models are scored on the selected letter; DeepSeek-R1 is best at 61.82% (p.1, p.16).",
+ "domain": "graduate-level, 13 disciplines; engineering: 7,892 questions in 30 fields, including chemical, civil, electrical, mechanical, mechanics, power engineering and engineering thermophysics, hydraulic and transportation engineering (p.10-11)",
+ "size": "26,529 questions (p.10); 7,892 in Engineering (p.10-11); 51 models: 6 reasoning, 28 chat, 17 base (p.16)",
+ "source_of_items": "textbooks and exercise websites selected by experts, transcribed and converted to multiple choice by crowd annotators with generated distractors (p.5-8)",
+ "instances": "static",
+ "has_gold_traces": "no",
+ "evaluation": "multiple choice: the response's last line must read Answer: LETTER (A to J); accuracy (p.69); zero-shot for reasoning and chat models, five-shot for base models (p.16)",
+ "human_validation": "over 80 expert annotators (p.1); experts select sources and re-annotate questions flagged by rule and LLM checks, following GPQA's rules, with unrestricted web access and over 30 minutes per question (p.9); no agreement statistics reported in the sections read",
+ "contamination_measures": "none as a control; the authors flag leakage risk from exercise websites (p.7) and suspect leakage behind o1-mini and o3-mini's science and engineering scores (p.19)",
+ "engtrace_use": {
+   "sentence": "S-E1 (L182-190): Generalist suites like MMLU (Hendrycks et al., 2021a), BIG-Bench (Luo et al., 2024), and SuperGPQA (Du et al., 2025) restrict assessment to factual recall via multiple-choice questions [...]",
+   "verdict": "misleading",
+   "explanation": "Multiple choice is right: every item is multiple-choice with up to ten options (p.10, p.69), so only the chosen letter is scored. 'Factual recall' is contradicted by the paper: 42.33% of questions require mathematical calculation or formal reasoning, 55.40% in Engineering (p.13); source screening prefers textbook example problems and calculation problems recast as multiple choice, which the authors find more discriminating (p.6-7); and the hard split 'specifically challenges models' reasoning capacities' (p.20). The sentence also omits what matters most for EngTrace's comparison: SuperGPQA is the cited suite with by far the most engineering content, 7,892 questions (29.7% of the benchmark) in 30 engineering fields that include EngTrace's chemical, civil, electrical and mechanical areas (p.10-11). Its limitation relative to EngTrace is the format (option selection, no process, static items), not a restriction to recall."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "SuperGPQA (Du et al., 2025) includes 7,892 graduate-level engineering questions across 30 fields, more than half of them requiring calculation, but presents every item as multiple choice with up to ten options and scores only the selected letter.",
+ "facts_to_cite": [
+  "26,529 questions across 13 disciplines, 72 fields and 285 subfields; 9.67 options per question on average (p.10)",
+  "Engineering: 7,892 questions in 30 fields, e.g. Chemical Engineering and Technology (410), Civil Engineering (358), Electrical Engineering (556), Mechanics (908), Power Engineering and Engineering Thermophysics (684) (p.10-11)",
+  "42.33% of all questions require mathematical calculation or formal reasoning; 55.40% of Engineering questions (p.13)",
+  "Experts (PhD holders or candidates) select sources; crowd annotators convert questions to multiple choice and write distractors; rule-, LLM- and expert-based quality inspection (p.4-9); over 80 expert annotators (p.1)",
+  "The prompt requires a final line Answer: LETTER with options A to J (p.69)",
+  "51 models evaluated; best, DeepSeek-R1, 61.82% (p.1, p.16)",
+  "The authors report that answers on exercise websites are unreliable and pose a leakage risk (p.7)"
+ ],
+ "overlap_with_engtrace": "Shares: the engineering domain at scale, with fields matching EngTrace's chemical (Chemical Engineering and Technology), civil (Civil Engineering; Hydraulic Engineering), electrical (Electrical Engineering; Information and Communication Engineering; Electronic Science and Technology) and mechanical branches (Mechanics; Mechanical Engineering; Power Engineering and Engineering Thermophysics); industrial engineering only thinly (Management Science and Engineering, 58 questions; operations research inside Control Science and Engineering) (p.11-12); expert screening of items (p.9). Lacks: generated instances (static items from textbooks and websites), gold traces (items carry question, options, answer, difficulty and discipline only; Fig. 2, p.6), any step-level or process evaluation (letter choice only, p.69), validation of an evaluator, and contamination control (risk acknowledged, p.7, p.19).",
+ "confidence": "medium",
+ "notes": "The byline is the M-A-P team (p.1); Xinrun Du heads the list of leading authors (p.26), so 'Du et al., 2025' is acceptable. The printed title lost its capitals (Supergpqa, llm). Engineering is one of the low-discrimination disciplines (CV 0.107; p.23-24). Grade: 'misleading' rather than 'imprecise' because the paper's own construction and statistics stress calculation, and because the omitted engineering coverage is the fact the engineering paragraph needs; a reader could defend 'imprecise' on the grounds that the multiple-choice half of the claim, the one that matters for process evaluation, is right."
+}

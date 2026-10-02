@@ -1,0 +1,35 @@
+{
+ "key": "du2025supergpqa",
+ "reviewer": "r1",
+ "read": "partial: abstract, introduction, data collection, statistics, experiments and main results (pp.1-19) in full; appendices skimmed (C on filtering and manual review, pp.47-63; F-G on evaluation prompts and robustness, pp.69-74)",
+ "title_confirmed": true,
+ "venue_now": "arXiv:2502.14739v4, 28 Mar 2025 (p.1); the text shows no venue",
+ "what_it_is": "SuperGPQA is a graduate-level multiple-choice benchmark of 26,529 questions across 13 disciplines, 72 fields and 285 subfields, aimed at long-tail disciplines (p.1, p.10). Experts (PhD holders or candidates) selected credible sources, crowd-sourced annotators (undergraduate and master's students) rewrote items, converting non-multiple-choice questions into multiple choice and generating distractors, and rule-based, LLM-based and expert inspection filtered them (pp.5-9). Items average 9.67 options (p.10), and 42.33% require mathematical calculation or formal reasoning (p.13). Engineering is the second-largest discipline with 7,892 questions (p.10). Models answer with a letter scored for accuracy; 51 models were evaluated, the best being DeepSeek-R1 at 61.82% (p.1, p.16, p.69).",
+ "domain": "285 graduate subfields in 13 disciplines; engineering: 7,892 questions in 30 fields, including chemical, civil, electrical and mechanical engineering, mechanics, power engineering and engineering thermophysics, hydraulic and transportation engineering (p.11, Table 2)",
+ "size": "26,529 questions (p.10), of which 7,892 engineering (p.10); 6 reasoning, 28 chat and 17 base models (p.16)",
+ "source_of_items": "expert-selected credible sources (priority: textbook example problems with solutions, then calculation and reasoning questions with solutions from websites, p.7), rewritten by crowd annotators into multiple choice with generated distractors (p.8)",
+ "instances": "static",
+ "has_gold_traces": "no: each item stores question, options, answer, difficulty and discipline (p.6, Figure 2)",
+ "evaluation": "multiple choice: the final line 'Answer: $LETTER' (A-J) is scored for accuracy; zero-shot for reasoning and chat models, five-shot for base models (p.16, p.69)",
+ "human_validation": "Over 80 expert annotators (p.1). Experts re-annotated questions flagged from LLM responses, with unrestricted web access and over 30 minutes per question (p.9); a manual review checklist covers answer correctness and uniqueness (p.58). No inter-annotator agreement or error-rate figures are reported.",
+ "contamination_measures": "real-time plagiarism checks against existing candidate questions during transcription (p.5); the authors warn that answers on exercise websites carry 'a significant risk of data leakage' (p.7) and suspect leakage for o1-mini and o3-mini in science and engineering (p.19)",
+ "engtrace_use": {
+  "sentence": "S-E1 (L182-190): 'Generalist suites like MMLU (Hendrycks et al., 2021a), BIG-Bench (Luo et al., 2024), and SuperGPQA (Du et al., 2025) restrict assessment to factual recall via multiple-choice questions, ...'",
+  "verdict": "misleading",
+  "explanation": "'Via multiple-choice questions' is right: every item is multiple choice, with 9.67 options on average, scored on the letter (p.10, p.69). 'Factual recall' is not: the paper evaluates 'graduate-level knowledge and reasoning capabilities' (p.1), prefers calculation and reasoning problems converted into multiple choice because they discriminate better (pp.6-7), and reports that 42.33% of all questions and 55.40% of engineering questions require mathematical calculation or formal reasoning (p.13). The sentence also hides what matters most for an engineering paper: SuperGPQA holds 7,892 engineering questions in 30 engineering fields (pp.10-11), a large engineering evaluation, though scored on the answer letter only."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "SuperGPQA (Du et al., 2025) includes 7,892 graduate-level engineering questions, 55.4% of them requiring calculation, but casts every item as multiple choice with about ten options and scores only the selected letter.",
+ "facts_to_cite": [
+  "26,529 questions across 13 disciplines, 72 fields and 285 subfields (p.10)",
+  "Engineering: 7,892 questions (p.10) in 30 fields, including chemical, civil, electrical and mechanical engineering (p.11, Table 2)",
+  "an average of 9.67 options per question (p.10)",
+  "42.33% of questions require mathematical calculation or formal reasoning; Engineering 55.40% (p.13)",
+  "non-multiple-choice source questions were converted into multiple choice with generated distractors (p.8)",
+  "scoring reads the final 'Answer: $LETTER' line (p.69)",
+  "best model DeepSeek-R1 at 61.82% (p.1)"
+ ],
+ "overlap_with_engtrace": "Shares: engineering coverage at scale, including fields EngTrace covers (chemical, civil, electrical, mechanical; p.11) and calculation-based items (p.13); expert involvement in item checking (p.9). Lacks: generated instances (static, sourced from textbooks and websites); gold traces; step-level evaluation (answer letter only); evaluator validation is moot because scoring is option matching.",
+ "confidence": "medium",
+ "notes": "The call between 'imprecise' and 'misleading' turns on how much weight 'factual recall' carries; I chose 'misleading' because the paper's own statistics contradict it (p.13) and the sentence omits SuperGPQA's engineering scale. For the revised engineering paragraph SuperGPQA is the strongest example of a broad suite with real engineering content in answer-only multiple-choice form."
+}

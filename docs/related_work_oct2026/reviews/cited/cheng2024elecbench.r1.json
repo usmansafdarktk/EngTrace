@@ -1,0 +1,34 @@
+{
+ "key": "cheng2024elecbench",
+ "reviewer": "r1",
+ "read": "partial: abstract, introduction, metric framework (section 2), test-set construction and evaluation process (section 3), overall results and discussion (pp.1-14) in full; per-metric results and examples in the appendices (pp.15-26) skimmed",
+ "title_confirmed": true,
+ "venue_now": "arXiv:2407.05365v2, 11 Aug 2024; 'Preprint submitted to Elsevier' (p.1)",
+ "what_it_is": "ElecBench is an evaluation framework and test set for LLMs in power-system operation and dispatch (p.1). It defines six primary metrics (factuality, logicality, stability, fairness, security, expressiveness) with 24 sub-metrics, and three scenarios: general, power operations (dispatch, operation monitoring) and fault diagnosis and recovery (black start) (pp.1-3, p.12). Items come from a private set (papers, regulations and textbooks turned into question-answer pairs, plus power-system simulation data), from electrical-engineering items in C-Eval and MMLU, and from GPT-4-generated fictional concepts for the hallucination and source-validity metrics (pp.9-10). Responses are compared with standard answers and scored by two independent GPT-4 judges, with a human deciding when their scores differ beyond a threshold; stability is scored by similarity before and after perturbation (p.11). Eight LLMs were evaluated (p.12).",
+ "domain": "engineering: electrical, power-system operation and dispatch (p.1)",
+ "size": "item count not stated in the text; 6 metrics, 24 sub-metrics, 3 scenarios (p.1, p.12); 8 models: GPT-3.5, GPT-4, LLaMA2 7B/13B/70B, GAIA 7B/13B/70B (p.12)",
+ "source_of_items": "mixed: professional literature and textbooks converted to question-answer pairs, simulation-generated power-system scenarios, electrical-engineering items selected from C-Eval and MMLU, and GPT-4-generated fictional concepts checked by search engine (pp.9-10)",
+ "instances": "static released test set, partly built from simulation runs and GPT-4 generation (pp.9-10, p.14)",
+ "has_gold_traces": "no: responses are compared with standard answers (p.11)",
+ "evaluation": "LLM judge: two independent GPT-4 scorers against standard answers, with human evaluation when they disagree beyond a threshold; similarity scores for stability; manual search-engine checks for information reliability; simulation outputs scored for security and accuracy (p.11). The logicality metric targets 'the logical rigour of the entire reasoning process ... rather than directly on the accuracy of the conclusions' (p.5).",
+ "human_validation": "Undergraduates with a power-systems background selected content (p.9); professionals resolved disagreements between two GPT-4 scenario classifiers (p.10); humans adjudicate disagreements between the two GPT-4 judges (p.11). No agreement statistics or judge-versus-human accuracy are reported.",
+ "contamination_measures": "none stated",
+ "engtrace_use": {
+  "sentence": "S-E1 (L182-190): '... while specialized benchmarks like TransportBench, APBench, and EEE-Bench (Syed et al., 2024; Chen et al., 2025; Cheng et al., 2024; Li et al., 2025; Liu et al., 2025) are siloed within narrow sub-disciplines.'",
+  "verdict": "accurate",
+  "explanation": "ElecBench is confined to the power sector, specifically power-system operation and dispatch (p.1, p.12), so the characterization holds. Two citation faults remain: the sentence never names ElecBench, so a reader cannot match the key to any of the three names given for five keys; and the first author of the cited arXiv version is Xiyuan Zhou, with Yuheng Cheng third (p.1), so the key should be 'Zhou et al., 2024'."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "ElecBench (Zhou et al., 2024) evaluates LLMs on power-system dispatch and fault-recovery scenarios, scoring answers with two GPT-4 judges and a human when they disagree.",
+ "facts_to_cite": [
+  "six primary metrics and 24 sub-metrics for the power sector (p.1, p.3)",
+  "scenarios: general, power operations (dispatch, operation monitoring), fault diagnosis and recovery (black start) (p.12)",
+  "items from professional literature, power-system simulations, electrical-engineering items of C-Eval and MMLU, and GPT-4-generated fictional concepts (pp.9-10)",
+  "answers scored by two independent GPT-4 judges, with human evaluation when their scores differ beyond a threshold (p.11)",
+  "eight LLMs evaluated: GPT-3.5, GPT-4, LLaMA2 7B/13B/70B and the power-dispatch model GAIA 7B/13B/70B (p.12)",
+  "the test set is public (p.1, p.14)"
+ ],
+ "overlap_with_engtrace": "Shares: engineering domain (electrical power systems); an LLM judge with a human in the loop (p.11); a metric aimed at the reasoning process (logicality, p.5); some programmatically produced content (simulation data, p.9). Lacks: generated parameterized instances with computed answers; gold step-by-step traces; deterministic step checks; any measured agreement between the GPT-4 judges and humans.",
+ "confidence": "high",
+ "notes": "Never named in the May text; first author Xiyuan Zhou in arXiv v2 (p.1), and the printed 'Chao Yang' and 'Xinlei Cai' are not among this version's nine authors. Its logicality metric scores reasoning with LLM judges (p.5, p.11), which the closing claim that existing benchmarks 'remain limited to outcome matching' (S-E3) should allow for. The text does not state the number of test items."
+}

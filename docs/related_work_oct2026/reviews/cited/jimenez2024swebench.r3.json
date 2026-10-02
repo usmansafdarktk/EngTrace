@@ -1,0 +1,33 @@
+{
+ "key": "jimenez2024swebench",
+ "reviewer": "r3",
+ "read": "full per protocol: abstract and sections 1-7 (construction, task formulation, features, Lite, SWE-Llama, setup, results and analysis, related work, discussion) in full; appendices skimmed",
+ "title_confirmed": true,
+ "venue_now": "ICLR 2024 (page header from p1); arXiv 2310.06770v3, 11 Nov 2024. The May entry gives the same venue.",
+ "what_it_is": "SWE-bench is 2,294 task instances built from real GitHub issues and the merged pull requests that resolved them in 12 popular Python repositories, filtered from about 90,000 PRs to those that resolve an issue, contribute tests, have at least one fail-to-pass test and install cleanly (p1-3). A model receives the issue text and the codebase and must produce a patch; an instance is resolved if the patch applies and the associated tests pass (p3). The paper also releases SWE-bench Lite (300 instances), SWE-bench-train (19,000 instances from 37 other repositories) and SWE-Llama (p2, p4). The best model at the time, Claude 2, resolved 1.96% (p1).",
+ "domain": "real-world software engineering (repository-level issue resolution in Python)",
+ "size": "2,294 instances across 12 repositories (p1, p3); Lite 300 (p4); models: ChatGPT-3.5, GPT-4, Claude 2, SWE-Llama 7b and 13b, with Claude 3 Opus and GPT-4-turbo added in Table 5 of this version (p5-6)",
+ "source_of_items": "real-world artefacts: GitHub issues and merged pull requests with their tests (p2)",
+ "instances": "static, but the collection pipeline can add new instances from issues created after a model's training date (p3)",
+ "has_gold_traces": "no: each instance has the reference ('gold') patch from the merged PR and its tests (p3-4); no intermediate reasoning",
+ "evaluation": "unit tests: apply the generated patch and run the instance's fail-to-pass tests and the other repository tests; the metric is the percentage of instances resolved (p3)",
+ "human_validation": "none for the instances beyond the automatic attribute and execution filters (p2-3); a qualitative analysis of 11 generations (p7)",
+ "contamination_measures": "recency (instances from issues created after a model's training date can be added, p3); training repositories disjoint from test repositories (p4); accuracy before and after 2023 compared, with little difference for most models (Table 7, p7)",
+ "engtrace_use": {
+  "sentence": "S-M2 (L161-165): 'Similarly, coding evaluations span from function-level generation in HumanEval (Chen et al., 2021) and MBPP (Austin et al., 2021) to real-world software engineering in SWE-Bench (Jimenez et al., 2024).'",
+  "verdict": "accurate",
+  "explanation": "The paper names real-world software engineering as its testbed (p1) and builds every instance from a real GitHub issue and pull request (p2-3), so 'real-world software engineering' is its own description."
+ },
+ "recommendation": "keep as is",
+ "suggested_wording": "SWE-bench (Jimenez et al., 2024) asks models to resolve 2,294 real GitHub issues from 12 Python repositories, judged by the repositories' own tests.",
+ "facts_to_cite": [
+  "2,294 task instances from real GitHub issues and the pull requests that resolved them, in 12 popular Python repositories, filtered from about 90,000 PRs (p1-3).",
+  "The model gets the issue text and the codebase and must produce a patch; an instance counts as resolved if the patch applies and the associated tests pass (p3).",
+  "Claude 2, the best model evaluated at the time, resolved 1.96% with BM25 retrieval (p1, p6).",
+  "The pipeline can add instances from issues created after a model's training date (p3); most models showed little difference between instances from before and after 2023 (Table 7, p7).",
+  "The authors note that relying solely on execution-based testing 'is insufficient to guarantee reliable performance of model generations' (p10)."
+ ],
+ "overlap_with_engtrace": "Shares: a deterministic, test-based outcome check; a contamination measure by recency (p3, p7). Lacks: generated instances; gold reasoning traces (only the gold patch) and step-level evaluation; engineering (physical) domain; expert validation of items or evaluator.",
+ "confidence": "high",
+ "notes": "The benchmark is written 'SWE-bench' (p1), not 'SWE-Bench' as in the May text. The May reference prints 'Shun Yao'; p1 has 'Shunyu Yao' (citation_context_map C-S). The discussion's remark that execution-based testing alone does not guarantee reliable generations (p10) is a quotable caveat on outcome-only checks if the revision wants one from coding."
+}

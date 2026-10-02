@@ -235,7 +235,8 @@
   "url": "https://www.sciencedirect.com/science/article/pii/S266682112600342X/pdfft?isDTMRedir=true&download=true",
   "notes": "engineering_web: should-cite - PSE-Bench: 200 open-ended process-systems-engineering questions scored by a five-judge LLM ensemble against 7-element rubrics, with human validation reporting a +0.85 (0-7 scale) judge leniency bias; a chemical-engineering datapoint for the judge-validity paragraph (details from the abstract snippet; full text blocked).",
   "found_by": "engineering_web",
-  "date": "2026-08"
+  "date": "2026-08",
+  "doi": "10.1016/j.ceja.2026.101375"
  },
  {
   "key": "silwal2026pecivilbench",
@@ -249,7 +250,8 @@
   "url": "https://www.sciencedirect.com/science/article/pii/S1093968726031129/pdfft?isDTMRedir=true&download=true",
   "notes": "engineering_web: should-cite - FE and PE Civil examination questions as a standardized civil-engineering reasoning benchmark for frontier and open-weight LLMs, plus a self-correcting agentic design pipeline; the current professional-licensure-exam reference (details from the abstract snippet; full text blocked).",
   "found_by": "engineering_web",
-  "date": "2026-09"
+  "date": "2026-09",
+  "doi": "10.1016/j.cacaie.2026.100126"
  },
  {
   "key": "mohammadzadeh2025fembench",

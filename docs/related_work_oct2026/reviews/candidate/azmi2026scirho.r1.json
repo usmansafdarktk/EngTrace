@@ -1,0 +1,38 @@
+{
+ "key": "azmi2026scirho",
+ "reviewer": "r1",
+ "read": "partial: main text (pages 1-9) and appendices A, C.2 and E in full; result tables, figures and prompt tables skimmed",
+ "title_confirmed": true,
+ "venue_now": "arXiv 2606.08034v2, 26 September 2026, cs.CV, marked 'Preprint' (p.1); no venue",
+ "what_it_is": "Sci-\u03c1 is a symbolic, visually grounded STEM benchmark at IGCSE and A-Level (high-school and pre-university) level: 606 Python templates written by eight contributors (STEM graduates, advanced undergraduates, olympiad medalists), each generating at least ten variants that change numbers, shapes, patterns, colours or function types, with the images drawn by the code (p.4-5, p.15-16). The English descriptions were machine-translated by Gemini 3 Pro into six more languages and checked by native speakers, giving 42,420 instances (606 x 10 x 7) (p.4-5). Each instance has a final answer computed by the template and LaTeX solution steps that the contributors wrote with LLM help from the template's Python computation (p.4, p.15-16, p.18). It reports average- and worst-case accuracy across variants for 17 VLMs, and, for five of them, step recall, precision and F1 judged by GPT-5.4 against the gold steps, with a worst-case step F1 (p.1, p.5-7).",
+ "domain": "high-school and pre-university STEM: mathematics, physics, chemistry, biology, computer science; multimodal; seven languages (p.1, p.5)",
+ "size": "606 templates (counted as 4,242 across the seven language versions), 42,420 instances (p.1, p.4-5); 17 VLMs, five of them in the step-level evaluation (p.1, p.7)",
+ "source_of_items": "expert-written templates: about 38% original, the rest adapted from open sources, mostly Cambridge IGCSE and A-Level past papers and earlier benchmarks (p.3, p.5)",
+ "instances": "generated: each template produces at least ten variants, sampled with a predetermined seed (p.4, p.15-16)",
+ "has_gold_traces": "yes: template-generated LaTeX step-by-step solutions whose values come from the template code; the step text was written with LLM assistance and checked by a second contributor (p.4, p.15-16, p.18)",
+ "evaluation": "final answer within a 1% tolerance, with average- and worst-case accuracy over variants (p.5); step-level recall, precision and F1, and worst-case step F1, from an LLM judge (GPT-5.4) comparing the model's steps with the gold steps (p.6); the judge was checked by re-judging GPT-5.4's own outputs with Gemini 2.5 Pro (p.24-25)",
+ "human_validation": "Each template was cross-validated by a second contributor (or one from another subject) who checked the description, answer, image and reasoning (p.4, p.16); translations were verified by native speakers, with 40 planted errors as an attention check (p.4, p.16). No human validation of the step judge is reported, only the second-judge comparison (p.24-25).",
+ "contamination_measures": "generated variants and worst-case accuracy across them (p.1, p.5); no private split and no contamination analysis",
+ "engtrace_use": {
+   "sentence": null,
+   "verdict": "n/a",
+   "explanation": "Belongs in: the physical sciences paragraph, beside the symbolic-template line (GSM-Symbolic). Candidate, not cited in the May paper. It is built the way EngTrace is (code templates generating variants, each with gold reasoning steps) and cites EngTrace (Gull et al., 2026, arXiv 2511.01650) as one inspiration for its step recall and precision metrics (p.6, p.10)."
+ },
+ "recommendation": "add (should)",
+ "suggested_wording": "Sci-\u03c1 (Azmi et al., 2026) generates 42,420 visually grounded high-school STEM instances in seven languages from 606 Python templates with step-by-step solutions, and reports worst-case accuracy across variants and step-level F1 from an LLM judge.",
+ "facts_to_cite": [
+   "606 Python templates (counted as 4,242 across seven languages) generating 42,420 instances, ten per template per language (p.1, p.4-5)",
+   "five subjects: mathematics 199, physics 195, chemistry 137, computer science 52 and biology 23 templates, at IGCSE and A-Level (p.5)",
+   "templates written by eight contributors (STEM graduates, advanced undergraduates, olympiad medalists); about 38% of problems original (p.5, p.15)",
+   "variants change numbers, shapes, patterns, colours or function types; images are drawn by the template code (p.5, p.16)",
+   "each instance has a computed answer and LaTeX solution steps, written with LLM help from the template code (p.4, p.15, p.18)",
+   "descriptions machine-translated by Gemini 3 Pro into six languages and verified by native speakers (p.4)",
+   "17 VLMs evaluated; answers accepted within 1%; average- and worst-case accuracy over variants (p.1, p.5)",
+   "step recall, precision, F1 and worst-case step F1 judged by GPT-5.4 against gold steps, for five models (p.6-7)",
+   "GPT-5.4 on English mathematics: 90.3% average-case, 72.4% worst-case accuracy (p.6)",
+   "cites EngTrace as an inspiration for its step-level metrics (p.6, p.10)"
+ ],
+ "overlap_with_engtrace": "Shares: code templates generating variants (p.15-16); gold reasoning steps generated with each instance (p.4); step-level precision and recall evaluation, partly inspired by EngTrace (p.6). Lacks: an engineering domain (high-school STEM, p.5); deterministic step checks (steps judged by GPT-5.4, p.6); human validation of the step judge (only a second LLM judge, p.24-25); a private or held-out pool. Different scope: multimodal and multilingual. What EngTrace adds: engineering problems in five branches at university level; deterministic checks of code-computed milestones and arithmetic; and evaluator validation against 15 experts.",
+ "confidence": "medium",
+ "notes": "(1) The abstract's '4,242 problem templates (606 per language)' (p.1) counts each template once per language: 606 templates were written, by eight people (p.4, p.15), and the six translations are Gemini 3 Pro drafts verified by native speakers (p.4). The search note's '4,242 expert-written Python templates' overstates this. (2) It cites EngTrace as Gull et al. (2026) with the arXiv 2511.01650 link (p.10), confirming the citing relation the search note took from Semantic Scholar. (3) The file is v2 (26 September 2026, cs.CV); the catalogue gives 2026-06 for v1. (4) Step-level results cover five models only, for budget reasons (p.7). (5) GPT-5.4 judged its own outputs; re-judged by Gemini 2.5 Pro, F falls by up to 4.6 points and worst-case F1 by up to 9.1 (computer science) (p.25). (6) I rate it should, not must: its design is close to EngTrace's, but it is high-school, visual STEM, outside the engineering comparison the section turns on."
+}

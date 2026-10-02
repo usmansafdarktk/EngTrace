@@ -1,0 +1,35 @@
+{
+ "key": "jimenez2024swebench",
+ "reviewer": "r1",
+ "read": "full: abstract, sections 1-9 (pp. 1-11: benchmark construction, task formulation, features, SWE-bench Lite, SWE-Llama, experimental setup, results, related work, discussion, ethics, reproducibility), Appendix A.1 and the execution-based validation passage (pp. 16, 19); skimmed the rest of the appendices (pp. 16-52), including the temporal analysis and the qualitative examples",
+ "title_confirmed": true,
+ "venue_now": "ICLR 2024 ('Published as a conference paper at ICLR 2024', p1 header); the file is arXiv:2310.06770v3 of 11 Nov 2024 (p1). The May entry (ICLR 2024) matches.",
+ "what_it_is": "SWE-bench is an evaluation framework of 2,294 software-engineering tasks drawn from real GitHub issues and the merged pull requests that resolved them, in 12 popular Python repositories (pp. 1-3). A three-stage pipeline filters about 90,000 pull requests to those that resolve an issue, contribute tests, install successfully and turn at least one test from fail to pass (pp. 2-3). Given the issue text and the full codebase, a model must produce a patch; the issue counts as resolved if the patch applies and all associated tests pass, and the metric is the percentage resolved (p3). With BM25 retrieval the best model in the original evaluation, Claude 2, resolves 1.96% of issues (pp. 1, 6).",
+ "domain": "real-world software engineering: resolving issues in Python repositories (astropy, django, flask, matplotlib, pylint, pytest, requests, scikit-learn, seaborn, sphinx, sympy, xarray; p4)",
+ "size": "2,294 task instances from 12 repositories (p3); SWE-bench Lite subset of 300 (p4); SWE-bench-train of 19,000 issue-PR pairs from 37 other repositories (pp. 2, 4); models evaluated: ChatGPT-3.5, GPT-4 / GPT-4-turbo, Claude 2, Claude 3 Opus, SWE-Llama 7b and 13b (pp. 5-6)",
+ "source_of_items": "real GitHub issues and merged pull requests, mined and filtered automatically (pp. 2-3, 16)",
+ "instances": "static (real instances, with a pipeline that can add new ones from pull requests created after a model's training date; pp. 3, 16)",
+ "has_gold_traces": "partial: each instance has the gold patch from the merged pull request (pp. 3, 16), a reference solution rather than a reasoning trace; models may produce other valid patches (p3), and scoring uses tests, not the gold patch",
+ "evaluation": "unit tests: the generated patch is applied and the instance's fail-to-pass and pass-to-pass tests are run; resolved if the patch applies and all pass (p3). Each instance has at least one fail-to-pass test, 40% have two or more, and a median of 51 further tests check that existing behaviour is kept (p3).",
+ "human_validation": "No human annotation of instances or outputs: 'we do not perform crowdsourcing or recruit human task workers for any part of SWE-bench, including its collection and evaluation procedures' (p11). Validity rests on execution-based filtering: the reference patch must install, apply and turn at least one test from fail to pass, and instances whose tests call functions first introduced in the solution are excluded (pp. 2-3, 16). The authors built the executable environments by hand per release version (p19) and examined 11 model generations qualitatively (p7).",
+ "contamination_measures": "recency: the pipeline can be rerun on pull requests created after a model's training date (pp. 3, 16); problem statements include only issue text written before the fix began, to avoid leaking the solution (p16); the training set's 37 repositories are disjoint from the evaluation repositories (p4); most models score about the same on instances from before and after 2023 (Table 7, p7).",
+ "engtrace_use": {
+   "sentence": "Similarly, coding evaluations span from function-level generation in HumanEval (Chen et al., 2021) and MBPP (Austin et al., 2021) to real-world software engineering in SWE-Bench (Jimenez et al., 2024). (S-M2)",
+   "verdict": "accurate",
+   "explanation": "SWE-bench is built from real GitHub issues and the pull requests that resolved them (pp. 1-3), and the authors present 'real-world software engineering' as their testbed (p1), with tasks that need edits across functions, classes and files of a large codebase (pp. 1, 3). The contrast with function-level HumanEval is the paper's own (p2). The only slip is the capitalisation: the paper writes 'SWE-bench'."
+ },
+ "recommendation": "keep as is",
+ "suggested_wording": "SWE-bench (Jimenez et al., 2024) builds 2,294 tasks from real GitHub issues and the merged pull requests that resolved them in 12 Python repositories, and counts an issue as resolved when the model's patch applies and passes the repository's tests.",
+ "facts_to_cite": [
+  "2,294 task instances from real GitHub issues and their merged pull requests in 12 popular Python repositories, filtered from about 90,000 pull requests (pp. 1-3).",
+  "Given the issue text and the full codebase, the model must produce a patch, which resolves the issue if it applies and all associated tests pass; each instance has at least one fail-to-pass test, and a median of 51 further tests check that existing behaviour is kept (p3).",
+  "Reference solutions edit on average 1.7 files, 3.0 functions and 32.8 lines (p3).",
+  "In the original evaluation with BM25 retrieval, the best model, Claude 2, resolves 1.96% of the issues (pp. 1, 6).",
+  "The collection pipeline can add instances from pull requests created after a model's training date, and problem statements include only issue text written before the fix began (pp. 3, 16).",
+  "No crowdworkers or human annotators took part in collection or evaluation (p11).",
+  "The authors note that relying solely on execution-based testing is insufficient to guarantee reliable model generations (p10)."
+ ],
+ "overlap_with_engtrace": "Shares: deterministic, execution-based scoring (p3); a renewable supply of instances as a defence against contamination, by recency rather than by generation (pp. 3, 16). Lacks: an engineering or physical domain (Python software maintenance); generated instances (real instances, renewed only by new pull requests); gold reasoning traces (a gold patch, and other valid patches exist, p3); step-level evaluation (only test outcomes are scored); human or expert validation of instances or evaluator (none, p11); and a private pool (the set is public, p11).",
+ "confidence": "high",
+ "notes": "Naming: the paper writes 'SWE-bench'; the May text writes 'SWE-Bench' (L165). Reference: the May entry prints 'Shun Yao'; the author is Shunyu Yao (p1). The file is arXiv v3 (11 Nov 2024), whose Table 5 adds Claude 3 Opus at 3.79% resolved while the abstract still names Claude 2 at 1.96% as the best model (pp. 1, 6); a revised text quoting a number should say which evaluation it comes from. Appendix A.7 (SWE-bench Lite) is cut off in the extracted text (p25), and the Lite sentence on p4 is broken in the paper itself; neither matters for the citation."
+}

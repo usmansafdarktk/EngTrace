@@ -98,3 +98,13 @@ carries the paragraph the paper belongs to and its priority (must, should, optio
 The revised Related Work cites only papers that appear in an audit with a recommendation of keep or
 add, and states about each only facts the audit lists. Every change from the May text is justified
 by an audit entry; `CHANGES.md` lists them.
+
+**Amendment, 2026-10-02 (second).** After the second wave was also cut off by the session limit, the owner
+asked to stop spending on reviewer agents and move to synthesis. The panel had by then reviewed all 46
+cited works (138 reviews, three per paper) and part of the candidate set: the eight engineering
+must-cites (three reviews each), the process-supervision must-cites (one to three each) and part of the
+LLM-judge must-cites (one each). No further reviewers were launched. For every candidate the revised text
+cites, each statement it makes about the paper is listed in `facts.py` with the passage that supports it,
+and `verify_facts.py` checks it against the paper's text (`fact_check.md`). That check replaces the
+consolidator for the candidate set, and `NEW_PAPERS_AUDIT.md` records which candidates had panel reviews.
+The cited-set consolidation was done by the orchestrator from the 138 reviews (`CITED_SET_AUDIT.md`).

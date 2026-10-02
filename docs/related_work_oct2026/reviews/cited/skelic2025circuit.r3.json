@@ -1,0 +1,34 @@
+{
+ "key": "skelic2025circuit",
+ "reviewer": "r3",
+ "read": "full: abstract, introduction and related work (pp. 1-2), section 3 on the dataset (pp. 3-4), section 4 on evaluation metrics and methods (p. 4), experiments and results (pp. 5-8), discussion, limitations and conclusion (pp. 8-9), author contributions and ethics (p. 11); appendix A on sources (p. 13) read; appendices B-E (netlist syntax, prompts, error types, examples) skimmed",
+ "title_confirmed": true,
+ "venue_now": "arXiv preprint 2502.07980v1, 11 Feb 2025 (p. 1); no venue in the text (notes/cited_set_resolution.md: an ICLR 2025 submission that was not accepted)",
+ "what_it_is": "CIRCUIT tests whether LLMs can interpret and reason about analog circuits (p. 1). Its 510 questions come from 102 templates, problems adapted from textbooks and MIT course material, each instantiated with five numerical setups (pp. 3, 13). 93 templates include diagrams and 79 also netlists, across basic, analog, power and RF categories at three course levels (pp. 3-4). Answers are parsed by regex and count as correct within an absolute difference of 0.001 of the ground truth (pp. 4-5). Besides global accuracy, a unit-test metric, pass@k/n, credits a template only if at least k of its five setups are right (p. 4). GPT-4o is best: 48.04% global accuracy, but only 27.45% of templates pass on all five setups (p. 1). A human review of GPT-4o's responses found about 5% of automatic evaluations to be false positives and attributed most errors to reasoning, especially topology (pp. 6, 9).",
+ "domain": "engineering: electrical, analog circuits (p. 1)",
+ "size": "510 questions = 102 templates x 5 numerical setups (p. 3); 3 models (GPT-4-turbo, GPT-4o, Gemini 1.5 Pro) under 4 prompt designs (p. 5)",
+ "source_of_items": "generated from templates: problems from textbooks and MIT courses adapted into templates with several numerical setups each (pp. 3, 13)",
+ "instances": "generated: five numerical setups per template, fixed in the released dataset (p. 3)",
+ "has_gold_traces": "no: each question has a single numerical ground truth (pp. 3-4); the authors name intermediate-step evaluation as future work (p. 8)",
+ "evaluation": "final answer: a regex-parsed numerical answer, correct within an absolute difference of 0.001 (pp. 4-5); global accuracy and per-template pass@k/n (p. 4); a human error analysis of a subset of GPT-4o responses, which counts a response correct only if it is free of errors (pp. 5-6)",
+ "human_validation": "Two authors reviewed the dataset for quality and consistency, and two carried out the human analysis (p. 11). The human review of GPT-4o's best-accuracy responses matches the automatic trends but finds about 5% of automatic evaluations to be false positives, responses scored correct automatically but judged incorrect on review (p. 6). No inter-rater agreement is reported.",
+ "contamination_measures": "none stated; the problems are adapted from published textbooks and course material with altered numerical setups (pp. 3, 13), and the dataset will not be public until the source authors consent (p. 11)",
+ "engtrace_use": {
+  "sentence": "S-E1 (L182-190), reached through the id (abs/2502.07980) and the note 'Introduces the CIRCUIT benchmark' in the printed 'Liu et al., 2025' entry: '... while specialized benchmarks like TransportBench, APBench, and EEE-Bench (Syed et al., 2024; Chen et al., 2025; Cheng et al., 2024; Li et al., 2025; Liu et al., 2025) are siloed within narrow sub-disciplines.'",
+  "verdict": "imprecise",
+  "explanation": "The scope claim fits: CIRCUIT covers analog circuits only (p. 1). But the citation does not identify it. The May text never names CIRCUIT and reaches it only through the 'Liu et al., 2025' entry, whose author and title belong to other people; only the arXiv id and the note point here (citation_context_map C8). More serious is the paragraph's closing contrast, which rests on these citations (L199-205). Automatic scoring here is indeed outcome matching (pp. 4-5). But the closing paragraph presents 'a symbolic benchmark that pairs unique problem instances' as what EngTrace adds, and CIRCUIT already builds its questions from templates with five numerical setups each and scores them per template like unit tests (pp. 3-4, 8). Its human review also shows final-answer scoring passing about 5% of responses that a human judged wrong (p. 6). Counting that closing contrast, the verdict would be misleading."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "CIRCUIT (Skelic et al., 2025) instantiates 102 analog-circuit templates with five numerical setups each and scores only the final numerical answer, crediting a template when enough of its setups are solved.",
+ "facts_to_cite": [
+  "510 questions from 102 templates with five numerical setups each, adapted from textbooks and MIT courses (pp. 3, 13)",
+  "an answer counts as correct within an absolute difference of 0.001 of the ground truth (pp. 4-5)",
+  "pass@k/n template metric: a template passes if at least k of its n = 5 setups are correct (p. 4)",
+  "GPT-4o: 48.04% global accuracy, and 27.45% of templates passed on all five setups (p. 1)",
+  "a human review found about 5% of automatic evaluations to be false positives (p. 6)",
+  "the authors name intermediate-step evaluation as future work (p. 8)"
+ ],
+ "overlap_with_engtrace": "Shares: engineering domain (electrical: analog circuits, not one of EngTrace's three electrical domains); numerical variants generated from templates and aggregated per template; an automatic numeric answer check; and a human check of that automatic evaluator. Lacks: gold traces; any step-level or process evaluation (only a human error analysis of a subset); generation beyond five fixed setups per template; coverage beyond analog circuits; and public data (withheld pending consent, p. 11).",
+ "confidence": "medium",
+ "notes": "This is the work that the id and note of the printed 'Liu et al., 2025' entry point to; it is not in the May reference list. It should replace liu2025circuit in the benchmark sentence as 'Skelic et al., 2025', and be named. Because it is templated, it should also be cited where the revised paper introduces template-based generation (alongside GSM-Symbolic), as an engineering precedent that EngTrace extends with gold traces, step-level checks, more branches and more instances per template. Status: arXiv only (notes/cited_set_resolution.md)."
+}

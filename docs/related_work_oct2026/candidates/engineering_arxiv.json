@@ -249,7 +249,8 @@
   "url": "https://www.sciencedirect.com/science/article/pii/S1093968726031129/pdf",
   "notes": "engineering_arxiv: should-cite - a professional-exam benchmark of Fundamentals of Engineering and PE Civil questions (13 LLMs under plain prompting, RAG and agentic RAG) plus an agentic concrete-design pipeline with transparent traces; the licensure-exam reference point for EngTrace's civil branch (no arXiv version found; publisher PDF blocks scripted download).",
   "found_by": "engineering_arxiv",
-  "date": "2026-06"
+  "date": "2026-06",
+  "doi": "10.1016/j.cacaie.2026.100126"
  },
  {
   "key": "somasekharan2026cfdllmbench",

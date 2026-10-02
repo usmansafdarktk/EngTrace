@@ -1,0 +1,35 @@
+{
+ "key": "austin2021mbpp",
+ "reviewer": "r3",
+ "read": "full per protocol: abstract, sections 1-3 and section 4 (MBPP results, 4.1-4.9) in full; sections 5-9 and the appendices skimmed by heading",
+ "title_confirmed": true,
+ "venue_now": "arXiv preprint 2108.07732v1, 16 Aug 2021 (p1 margin); the text shows no venue",
+ "what_it_is": "The paper introduces MBPP (Mostly Basic Programming Problems): 974 short Python tasks written by an internal pool of crowdworkers, each with a one-sentence description, a self-contained reference function and three assert test cases; 426 were inspected and edited by the authors into a hand-verified subset (p1, p4). It also introduces MathQA-Python (23,914 problems) (p1, p5). Decoder-only LMs from 244M to 137B parameters are scored by executing sampled programs against the tests; the largest solves 59.6% few-shot (p1, p5).",
+ "domain": "entry-level Python programming (58% of a 100-task sample are mathematical in nature, p4)",
+ "size": "974 tasks (10 for prompts, 500 test, 374 fine-tuning, the rest validation); 426 hand-verified (p4); models from 244M to 137B parameters (p1, p5)",
+ "source_of_items": "crowd-written by an internal pool of crowdworkers with basic Python knowledge; internet references allowed (p4)",
+ "instances": "static",
+ "has_gold_traces": "no: each task has a ground-truth reference program and three test cases (p4); no intermediate reasoning",
+ "evaluation": "unit tests: sampled programs (80 per problem at temperature 0.5) are executed against the three asserts; reported as the fraction of problems solved by any sample and the fraction of samples that solve their task (p5, p7)",
+ "human_validation": "Reference code programmatically checked to pass all tests (p4); a subset manually inspected, edited and pruned into 426 hand-verified tasks; on 100 shared tasks, few-shot accuracy rose from 63% to 79% after editing (p3, p4, p11). Evaluator: adversarial tests written for 50 of the 500 test tasks suggest that roughly 12% of counted solutions would fail stronger tests (p8).",
+ "contamination_measures": "measured pre-training overlap: only 32 of 974 tasks (3.3%) had more than half of their reference-program lines in the pre-training data (p10)",
+ "engtrace_use": {
+  "sentence": "S-M2 (L161-165): 'Similarly, coding evaluations span from function-level generation in HumanEval (Chen et al., 2021) and MBPP (Austin et al., 2021) to real-world software engineering in SWE-Bench (Jimenez et al., 2024).'",
+  "verdict": "accurate",
+  "explanation": "MBPP's tasks are short Python functions written from natural-language descriptions and 'designed to be solved by entry-level programmers' (p2; also p1, p4), so 'function-level generation' describes it exactly. The citation is the paper that introduces MBPP."
+ },
+ "recommendation": "keep as is",
+ "suggested_wording": "MBPP (Austin et al., 2021) poses 974 crowd-written entry-level Python tasks, each checked by three test cases.",
+ "facts_to_cite": [
+  "974 short Python programming tasks written by crowdworkers with basic Python knowledge, each with a problem statement, a self-contained reference function and three test cases (p1, p4).",
+  "A 426-task subset was manually inspected and edited by the authors (p4).",
+  "Programs are scored by executing them against the test cases (p5).",
+  "The largest model (137B) solves 59.6% of tasks few-shot, counting a task as solved if any of 80 samples passes (p1, p5, p7).",
+  "Adversarial test cases for 50 of the 500 test tasks suggest that about 12% of what is counted as solved would fail stronger tests (p8).",
+  "Only 32 of 974 tasks (3.3%) had more than half of their lines matched in the pre-training data (p10).",
+  "BLEU between samples and reference programs does not correlate well with synthesis performance (p10)."
+ ],
+ "overlap_with_engtrace": "Shares: a deterministic, execution-based outcome check; an explicit estimate of the evaluator's false-positive rate (about 12% of counted solutions fail adversarial tests, p8), the coding analogue of EngTrace's validation of its evaluator; a measured pre-training overlap (p10). Lacks: generated instances (static); gold reasoning traces and step-level evaluation; engineering domain; expert validation (crowd-written, author-edited).",
+ "confidence": "high",
+ "notes": "The paper also introduces MathQA-Python, which the May text does not mention. If the coding sentence has to shrink for space, MBPP is the most expendable of the three coding citations, since HumanEval already covers function-level generation."
+}

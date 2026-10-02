@@ -1,0 +1,35 @@
+{
+ "key": "xu2025ugphysics",
+ "reviewer": "r2",
+ "read": "partial: pp. 1-9 in full (abstract, introduction, related work, construction, MARJ, experiments, analysis, conclusion); appendices A-B (pp. 14-17); Algorithm 1 and Table 16 (pp. 21-22). Not read: topic tables (pp. 19-20), per-subject result tables and error cases (pp. 23-29), references",
+ "title_confirmed": true,
+ "venue_now": "ICML 2025, PMLR 267 (page 1 footer: 'Proceedings of the 42nd International Conference on Machine Learning'); the file is arXiv 2502.00334v4, 3 Jun 2025",
+ "what_it_is": "A static benchmark of 5,520 undergraduate physics problems taken from Chinese university exercise books, posed in Chinese and in English translation (11,040 items), covering 3 domains, 13 subjects and 59 topics, with seven answer types and four reasoning-skill labels assigned by GPT-4o (pp. 1-2, 4). Scoring is final-answer only, by MARJ: type-specific rules (SymPy equivalence for expressions, a 1% relative check on the mantissa of numerical answers), then a GPT-4o judge for answers the rules reject (p. 5). 31 LLMs are evaluated; the best, OpenAI-o1-mini, reaches 49.8% overall (pp. 1, 6). It reports that math-specialised LLMs gain little over their general-purpose counterparts (p. 6).",
+ "domain": "undergraduate physics: mechanics and thermodynamics, electromagnetism, modern physics (13 subjects, including quantum, atomic, solid-state and semiconductor physics and optics) (pp. 1, 4)",
+ "size": "5,520 problems in 2 languages = 11,040 items; 3 domains, 13 subjects, 59 topics; 31 LLMs evaluated (pp. 1-2, 4-5)",
+ "source_of_items": "textbooks: seven undergraduate physics exercise books ('The Great Compendium of Physics Problems', USTC), converted with Mathpix OCR and manually corrected; progressive problems split; proof, estimation, explanation and image problems excluded; translated from Chinese into English (p. 4)",
+ "instances": "static",
+ "has_gold_traces": "partial: each item keeps the exercise book's reference solution in a Problem-Solution-Answer format (average 318.5 solution tokens, Table 2, p. 4), but scoring uses only the final answer (pp. 4-5)",
+ "evaluation": "final answer: MARJ, a rule stage (true/false and multiple choice normalised; numerical values compared on the mantissa of the scientific notation within 1e-2 relative error; expressions and equations compared after removing physical constants; intervals by endpoints) followed by a GPT-4o judge for every answer the rules mark false (p. 5; pp. 16-17; Algorithm 1, p. 21)",
+ "human_validation": "OCR output and LaTeX manually reviewed and corrected by the team (p. 4). MARJ agreed with the authors' human annotation on 98% of 100 randomly selected examples (p. 7); no agreement statistic beyond that. 100 incorrect o1-mini answers were annotated by human evaluators for error type (p. 8). The reasoning-skill labels come from GPT-4o with no reported human check (p. 4).",
+ "contamination_measures": "n-gram leakage detection: 5-gram prediction accuracy on problem plus solution for 8 models, with 0.0% to 0.75% of items flagged per model (Table 6, pp. 8-9); items are static public exercises",
+ "engtrace_use": {
+   "sentence": "S-P1: 'While UGPhysics (Xu et al., 2025) and PhysReason (Zhang et al., 2025a) effectively test the application of reasoning to natural laws, others target advanced symbolic (Zhang et al., 2025b; Qiu et al., 2025) or qualitative (Wang et al., 2023; Shojaee et al., 2025) understanding.' S-P2: 'Despite this progress, these benchmarks remain confined to theoretical physics, lacking the integrative context of engineering.'",
+   "verdict": "imprecise",
+   "explanation": "S-P1's 'test the application of reasoning to natural laws' is a loose but fair gloss: UGPhysics poses undergraduate problems that need physical laws (p. 2), and 'Laws Application' is one of its four skill labels, beside Knowledge Recall, Math Derivation and Practical Application (pp. 4, 14). It omits what matters for the comparison with EngTrace: the items are static textbook exercises and only final answers are scored (pp. 4-5); the section's closing claim of outcome matching (S-E3) does hold for this paper. S-P2's 'confined to theoretical physics' is inaccurate for a set spanning 13 undergraduate subjects, including semiconductor and solid-state physics and optics, with a 'Practical Application' skill (pp. 1, 8, 14). 'Physics rather than engineering' would be accurate: it has no engineering subjects."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "UGPhysics (Xu et al., 2025) gathers 5,520 undergraduate physics exercises, posed in English and Chinese, and scores only final answers, with rules backed by a GPT-4o judge.",
+ "facts_to_cite": [
+  "5,520 undergraduate physics problems, each in English and Chinese (11,040 items), across 13 subjects and 59 topics (pp. 1-2, 4).",
+  "The problems come from seven undergraduate physics exercise books, converted by OCR and manually corrected (p. 4).",
+  "Scoring is final-answer only: rule-based matching, with GPT-4o judging the answers the rules reject (MARJ) (p. 5).",
+  "Numerical answers pass the rule stage within 1% relative error on the mantissa (p. 5; Algorithm 1, p. 21).",
+  "MARJ agreed with human judgement on 98% of 100 randomly sampled examples (p. 7).",
+  "Leakage was screened by 5-gram prediction accuracy; 0.0% to 0.75% of items were flagged per model (Table 6, p. 9).",
+  "31 LLMs were evaluated; the best, OpenAI-o1-mini, reaches 49.8% overall accuracy (pp. 1, 6)."
+ ],
+ "overlap_with_engtrace": "Shares: quantitative, multi-step undergraduate problems with reference solutions; a rule-first answer check with an LLM fallback, checked against human labels (98 of 100). Lacks: generated instances (static public exercises, screened for leakage by n-grams only); step-level evaluation (final answer only; the reference solutions are not used in scoring); engineering domain (physics only); expert validation of the evaluator beyond a 100-example check by the authors, with no agreement statistic.",
+ "confidence": "high",
+ "notes": "By design (to absorb unit differences), the rule stage compares only the mantissas of numerical answers and ignores the exponent (p. 5; Algorithm 1, p. 21), so an answer off by a power of ten can pass the rules; EngTrace's answer check is stricter (REL 0.002 against the gold quantities). Math-specialised models gain only +0.14 (7B) and +3.3 (72B) points over general Qwen2.5 (p. 6); EngTrace has dropped its math-pretraining claim and its roster has no math-specialised model, so this finding should not be used to reinstate it. The May reference list misprints 8 of the 9 first names against p. 1 (e.g. 'Xingyu Xu' for Xin Xu, 'Yizhong Wang' for Yang Wang) and gives arXiv rather than ICML 2025."
+}

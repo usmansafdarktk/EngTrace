@@ -1,0 +1,31 @@
+{
+ "key": "felten2025engibench",
+ "reviewer": "r2",
+ "read": "partial: abstract, introduction, Section 2 (problem setting, metrics, related work), Section 3 (API, features, implemented problems and algorithms), Section 4 (proof-of-concept experiments), Section 5 (use cases and limitations) and conclusion (pp. 1-10) in full; appendices (pp. 16-43) skimmed",
+ "title_confirmed": true,
+ "venue_now": "NeurIPS 2025 Datasets and Benchmarks Track, poster (papers.json); the fetched text is arXiv:2508.00831v2, 11 Aug 2025, marked 'Preprint.' (p. 1)",
+ "what_it_is": "An open-source Python library and a set of datasets for data-driven engineering design optimisation, aimed at machine-learning methods such as inverse design with generative models and surrogate-based optimisation, not at language models (pp. 1-3). It wraps seven simulation-backed design problems (airfoil shape optimisation with RANS CFD, 2D and 3D heat-conduction topology optimisation, thermoelastic and structural beam topology optimisation, a photonic demultiplexer, a DC-DC power converter) behind one API, with datasets, constraint checks and adjoint optimisers (pp. 5-8). A companion library, EngiOpt, provides baselines (GANs, conditional GANs, diffusion models, MLP+NSGA-II), compared on cumulative optimality gap, constraint violations, MMD and DPP diversity over 10 seeds (pp. 3-4, 8-9).",
+ "domain": "engineering design optimisation for machine learning: aerodynamics, heat transfer, structural topology, photonics, power electronics (pp. 6-8)",
+ "size": "7 problems with datasets (Table 1, p. 7); the baselines are ML models, and no LLM is evaluated (p. 8)",
+ "source_of_items": "simulation datasets generated with the library's simulators, several replicating set-ups from earlier publications (pp. 5-6)",
+ "instances": "not applicable: datasets of simulated designs, conditions and objective values for training ML models (pp. 2, 5)",
+ "has_gold_traces": "no (not applicable: there is no reasoning task)",
+ "evaluation": "ML design metrics: cumulative optimality gap, ratio of violated constraints, ratio of failed simulations, MMD and DPP diversity (pp. 3-4)",
+ "human_validation": "none reported; the problem implementations are described as rigorously tested and versioned (pp. 2, 6)",
+ "contamination_measures": "not applicable (no language-model evaluation)",
+ "engtrace_use": {
+   "sentence": "Not cited in the text. The Zhou et al. 2025 reference entry ends 'Distinct from the design-focused EngiBench by Felten et al.' (May L1248-1249); Felten et al. have no entry of their own.",
+   "verdict": "accurate",
+   "explanation": "The note's characterisation holds: Felten et al.'s EngiBench is 'a framework for data-driven engineering design research', an optimisation and machine-learning library for design problems (pp. 1-2), and it is distinct from Zhou et al.'s LLM benchmark. The defect is formal: the note names a work that has no reference entry (citation map, Part A, 'Named in the paper without a citation or an entry')."
+ },
+ "recommendation": "drop",
+ "suggested_wording": "Only if the disambiguation is kept, as a footnote: 'Not to be confused with EngiBench (Felten et al., 2025), a library of simulation-backed design-optimisation problems for machine-learning methods.'",
+ "facts_to_cite": [
+   "EngiBench (Felten et al.) is an open-source library and set of datasets for data-driven engineering design (p. 1).",
+   "It targets inverse design and surrogate modelling with machine-learning models, not language models (pp. 2-3, 8).",
+   "It implements seven simulation-backed design problems (p. 7)."
+ ],
+ "overlap_with_engtrace": "Shares only an engineering setting and the use of physics simulators. It has no language-model evaluation, no reasoning task, no gold traces and no step-level evaluation; its benchmark compares ML optimisers and generative models on design datasets (pp. 7-9).",
+ "confidence": "high",
+ "notes": "Naming clash: two 2025 papers are called EngiBench, and the text read here never mentions language models. 'drop' means: do not cite it in Related Work, and delete the unreferenced name from the Zhou et al. entry, since Zhou et al.'s full title and venue (Findings of ACL 2026) already identify the right paper. If the authors keep the disambiguation, it needs a proper entry (arXiv:2508.00831) and the footnote above."
+}

@@ -1,0 +1,84 @@
+% EngTrace, Related Work revised for the October 2026 submission.
+% Rendered by docs/related_work_oct2026/render_related_work.py from related_work_v3.src.md; edit the source.
+% Needs natbib (ACL style), booktabs, and the entries in related_work_sources.bib.
+% Every statement about another paper is checked by verify_facts.py (notes/fact_check.md).
+
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Reasoning benchmarks and what they score.}
+Mathematical and coding benchmarks such as GSM8K \citep{cobbe2021gsm8k}, MATH \citep{hendrycks2021math}, HumanEval \citep{chen2021humaneval}, MBPP \citep{austin2021mbpp} and SWE-bench \citep{jimenez2024swebench} score a final answer or a test outcome, and broad suites such as MMLU \citep{hendrycks2021mmlu} and SuperGPQA \citep{du2025supergpqa} score a chosen option.
+Yet a correct final answer can follow flawed reasoning \citep{cobbe2021gsm8k}, increasingly so on harder problems: in ProcessBench, the share of correct-answer solutions that contain a process error rises from 3.5\% on GSM8K to 51.8\% on Omni-MATH \citep{zheng2024processbench}.
+Most physics benchmarks likewise grade final answers or expressions \citep{xu2025ugphysics,qiu2025phybench,zhang2025abenchphysics,wang2023scibench}, while PhysReason \citep{zhang2025physreason}, PRISM-Physics \citep{zhao2026prismphysics} and HiPhO \citep{yu2026hipho} score steps against reference solutions, with an LLM judge, symbolic formula matching, and official marking schemes applied by an LLM judge, respectively.
+% [cut first] the next sentence can be removed if space is short
+Graders themselves can fail: physicists re-grading 250 answers marked wrong on four physics benchmarks attributed all but 12 of them to errors in the benchmark or the grader \citep{ansari2026physicsregrading}.
+
+\paragraph{Generated instances and contamination.}
+Static test sets saturate \citep{ott2022saturation,akhtar2026benchmarksaturation} and leak into training data \citep{deng2024contamination,zhang2024gsm1k}, and safeguards such as private test sets have had limited effect on saturation \citep{akhtar2026benchmarksaturation}.
+Functional, symbolic and perturbed variants of existing problems test whether a model has memorised the original instance \citep{srivastava2024functionalbench,mirzadeh2024gsmsymbolic,gulati2024putnamaxiom,huang2025mathperturb}, although the drops they report do not always survive re-analysis \citep{dlugosz2026gsmsymbolicreeval}, randomly sampled variants can overstate robustness \citep{mondorf2026lpds}, and paraphrasing lowers absolute scores while leaving model rankings relatively stable \citep{lunardi2025paraphraserobustness}.
+Generation has also been paired with gold solutions: HARDMath produces applied-mathematics problems with numerically validated step-by-step solutions \citep{fan2024hardmath}; FinChain pairs each templated financial problem with an executable gold reasoning chain and scores a model's steps against it \citep{xie2025finchain}; and SymPyBench \citep{imani2025sympybench}, AtmosSci-Bench \citep{li2025atmosscibench} and Sci-$\rho$ \citep{azmi2026scirho} instantiate science problems from code templates.
+
+\paragraph{Engineering benchmarks.}
+General suites test engineering mostly through multiple choice; SuperGPQA's 7,892 engineering questions often require calculation but are scored on the option chosen \citep{du2025supergpqa}.
+Dedicated benchmarks typically cover one branch: transportation \citep{syed2024transportbench}, control \citep{kevian2024controlbench}, power dispatch \citep{zhou2024elecbench}, electrical and electronics engineering \citep{li2025eeebench}, circuits \citep{skelic2025circuit}, astrodynamics \citep{wu2025apbench}, thermodynamics \citep{duzkar2026thermoqa}, thermal-protection design \citep{zheng2026tpscalcbench} or operations research \citep{mostajabdaveh2025orqa}.
+Multi-branch benchmarks grade answers with LLM judges: EngiBench \citep{zhou2025engibench} with two LLM evaluators, plus rubrics for its open-ended level, and ERI \citep{naser2026eri} against reference answers that an LLM wrote along with the questions.
+% [cut first] the next sentence can be removed if space is short
+Other work evaluates design \citep{guo2025engdesign}, multiphysics simulation \citep{mudur2025feabench} and questions from industrial practice \citep{heesch2025realworld}, the last questioning evaluations built from examination materials whose correctness is easily verifiable.
+A few benchmarks look past the answer: experts graded the reasoning in TransportBench and ControlBench, LLM judges score it in ElecBench, TPS-CalcBench and EngVQA \citep{wasiq2026engvqa}, and ThermoQA scores property values and weighted solution steps against values computed with a thermodynamic property library.
+Fewer generate their instances: CIRCUIT instantiates circuit templates with several numerical setups, and a power-systems agent benchmark draws held-out cases from privately seeded generators \citep{trashchenkov2026psab}.
+To our knowledge, none combines generated instances across engineering branches with gold traces, deterministic checks of intermediate values, and an evaluator validated against experts' step-level labels.
+
+\paragraph{Process supervision and the validity of evaluators.}
+Outcome supervision can match process supervision on final-answer error, but correct reasoning steps required process-based supervision or reward models that emulate it \citep{uesato2022processoutcome}.
+Process reward models (PRMs) learn from human step labels \citep{lightman2023verify} or from labels estimated by rollouts \citep{wang2023mathshepherd}, which are noisy \citep{zhang2025prmlessons}, and are evaluated on human-annotated first-error benchmarks in mathematics \citep{zheng2024processbench,song2025prmbench}; PRMs trained on mathematics perform poorly in other domains \citep{zeng2025versaprm}.
+Beyond mathematics, PRIME tests whether verifiers catch answers that the reasoning does not support, in mathematics and engineering \citep{wang2026prime}, and ChemCoTBench-V2 checks chemistry steps with deterministic rules \citep{guo2026chemcotbenchv2}.
+LLM judges are the common alternative, but they favour their own outputs and those of related models \citep{zheng2023mtbench,panickssery2024selfrecognition,spiliopoulou2025playfavorites,li2026preferenceleakage}, even on objective rubric items \citep{pombal2026rubricselfpreference}; their errors are correlated across models \citep{goel2025greatmodels,kim2025correlatederrors}, which limits what a panel of judges \citep{verga2024poll} gains by voting; and on difficult objective comparisons they do little better than chance \citep{tan2025judgebench}, agreeing with experts mainly on questions they can answer themselves unless given a reference answer \citep{krumdick2026nofreelabels}.
+Rule-based checkers avoid these biases but can reject correct answers given in unexpected formats \citep{huang2026verifierrobustness}.
+
+\paragraph{Positioning.}
+EngTrace brings these lines together.
+As in GSM-Symbolic and FinChain, symbolic templates generate the instances, here across five engineering branches and from a private seed, and as in FinChain the gold trace comes from the code that computes the answer.
+Intermediate values and arithmetic are checked deterministically against that trace; an LLM judge from a model family outside the evaluated roster decides only the milestones these checks leave open, given each one's expected value; and the full evaluator, with off-the-shelf PRMs as baselines, is validated against step labels from 15 domain experts.
+Expert-checked paraphrases test whether models exploit template wording.
+
+% ---- Appendix ----
+
+\section{Extended Related Work}
+\label{app:related}
+
+\begin{table*}[t]
+\centering
+\footnotesize
+\begin{tabular}{p{2.5cm}p{1.9cm}p{2.3cm}p{2.1cm}p{3.4cm}p{3.3cm}}
+\toprule
+\textbf{Benchmark} & \textbf{Domain} & \textbf{Instances} & \textbf{Gold steps} & \textbf{What is scored, and how} & \textbf{Scorer checked against people} \\
+\midrule
+FinChain \citep{xie2025finchain} & finance & generated from symbolic templates & executable gold chain & steps, against the gold chain & Spearman 0.655 with experts' ratings of reasoning quality \\
+HARDMath \citep{fan2024hardmath} & applied mathematics & generated by code & step-by-step, validated numerically & final answer, graded by an LLM with rubrics & -- \\
+SymPyBench \citep{imani2025sympybench} & university physics & parameterised Python & step-by-step reasoning & answers, and consistency across variants & -- \\
+AtmosSci-Bench \citep{li2025atmosscibench} & atmospheric science & 67 templates with Python solvers & -- & final answers & -- \\
+Sci-$\rho$ \citep{azmi2026scirho} & school STEM & 606 Python templates & reasoning steps & steps, as an F1 from an LLM judge & -- \\
+PhysReason \citep{zhang2025physreason} & physics & static & annotated solution steps & steps, an LLM judge locating the first error & about 98\% first-error accuracy on 1,000 annotated solutions \\
+PRISM-Physics \citep{zhao2026prismphysics} & physics & static & formula graphs & steps, by symbolic formula matching & Kendall $\tau_b$ 0.346 with expert annotations (an LLM judge: 0.294) \\
+CIRCUIT \citep{skelic2025circuit} & circuits & 102 templates, several numerical setups each & -- & final answers, per template & human review found about 5\% false positives \\
+ThermoQA \citep{duzkar2026thermoqa} & thermodynamics & static (293 problems) & states and steps computed with CoolProp & property values and weighted steps, within 2\% & -- \\
+TPS-CalcBench \citep{zheng2026tpscalcbench} & thermal-protection design & static (420 items) & -- & answer, and a reasoning rubric scored by an LLM judge & weighted $\kappa$ 0.68 to 0.82 per rubric dimension \\
+EngVQA \citep{wasiq2026engvqa} & engineering, multimodal & static (696 problems) & -- & eight solution stages, by an LLM judge & reported against adjusted (``synthetic'') human scores \\
+EngiBench \citep{zhou2025engibench} & several engineering branches & static & -- & answers by two LLM evaluators; rubrics for the open-ended level & humans resolve evaluator disagreements and review the open-ended scores \\
+ERI \citep{naser2026eri} & nine engineering disciplines & generated by an LLM (57,750 records) & LLM-written references & a five-point score from three LLM judges & -- \\
+TransportBench \citep{syed2024transportbench} & transportation & static & -- & answers and reasoning, graded by experts & the experts are the graders \\
+ChemCoTBench-V2 \citep{guo2026chemcotbenchv2} & chemistry & static & reference traces & intermediate steps, by deterministic rules & 87.4\% agreement with adjudicated expert labels ($\kappa$ 0.74; experts with each other, 90.1\%) \\
+\textbf{EngTrace} & five engineering branches & 150 templates, instances from a private seed & from the template code & final answer; intermediate values and arithmetic, deterministically; a residual LLM judge from outside the evaluated roster & step labels from 15 domain experts on 300 traces \\
+\bottomrule
+\end{tabular}
+\caption{How EngTrace relates to the closest benchmarks. ``--'' means not provided, or not reported in the sections reviewed for this audit.}
+\label{tab:related}
+\end{table*}
+\paragraph{Further related work.}
+\textit{Engineering.} Recent benchmarks extend coverage to agents working in professional engineering software \citep{gao2026engiworld}, strength of materials \citep{wan2025som1k}, circuit analysis from schematics with synthetically generated problems \citep{akbari2025circuitsense}, telecommunications mathematics \citep{colle2025telemath}, executable structural analysis \citep{qin2026structureclaw}, finite-element programming \citep{mohammadzadeh2025fembench}, computational fluid dynamics \citep{somasekharan2026cfdllmbench}, civil-engineering licensure questions \citep{silwal2026pecivilbench} and process systems engineering judged by several LLMs \citep{sukpancharoen2026psebench}.
+\textit{Science.} OlympiadBench pairs olympiad problems with expert step-by-step solutions but scores final answers \citep{he2024olympiadbench}; SciDA randomises numerical parameters at each evaluation \citep{zhou2025scida}; NEWTON generates physical-commonsense questions from templates \citep{wang2023newton}.
+\textit{Contamination.} VeRA turns benchmark items into executable task families \citep{cheng2026vera}, GSM-Plus perturbs GSM8K problems \citep{li2024gsmplus}, \citet{chen2025staticdynamicsurvey} survey the move from static to dynamic benchmarks, and \citet{xiao2026contaminationrankings} measure contamination as the gap between original and paraphrased items.
+\textit{Step verification.} Error-detection benchmarks extend beyond mathematics \citep{tyen2023bigbenchmistake,zeng2024mrben,he2025deltabench,sun2026lsrben}, physics now has a process reward model \citep{dong2026physprm}, and GenPRM verifies each step with code \citep{zhao2025genprm}; reference-free step metrics include ROSCOE \citep{golovneva2022roscoe} and ReasonEval \citep{xia2024reasoneval}.
+Closest to EngTrace's milestones, \citet{wang2026milestoneoracles} grade mathematical reasoning against milestone roadmaps with a deterministic symbolic verifier, though their milestones are written by a teacher model rather than computed by the problem's own code.
+\textit{Judges.} \citet{thakur2025judgingjudges} and \citet{ye2025justiceprejudice} document the unreliability and biases of LLM judges; judges accept valid outputs but reject few invalid ones \citep{jain2025agreeableness}, their agreement with human markers in physics depends on the task \citep{yeadon2026physicsjudge}, and they should be validated against human judgments before use \citep{bavaresco2025llmsinsteadofhumans}.
+\citet{roytburg2026narcissists} re-examine self-preference findings, and \citet{jung2025trustescalate} escalate only uncertain items to stronger judges, the pattern EngTrace's residual judge follows.

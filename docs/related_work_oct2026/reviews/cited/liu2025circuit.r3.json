@@ -1,0 +1,32 @@
+{
+ "key": "liu2025circuit",
+ "reviewer": "r3",
+ "read": "full: all nine pages (abstract, introduction, preliminaries with the dataset and earlier benchmarking results, the enhancement methods, results, conclusions)",
+ "title_confirmed": true,
+ "venue_now": "IEEE Frontiers in Education Conference 2025 ('Accepted to 2025 Frontiers in Education (FIE) Conference', p. 1); arXiv 2511.18221v1, 22 Nov 2025 (p. 1)",
+ "what_it_is": "An engineering-education paper, not a benchmark. It builds a pipeline that makes GPT-4o a more reliable grader of student homework in an undergraduate circuit-analysis course (p. 1). It reuses the authors' earlier dataset: 283 handwritten student solutions from 37 students on 119 textbook problems in six topics, transcribed to LaTeX with Mathpix and proofread (p. 2). In it an LLM compares each student solution with the reference solution and judges completeness, method, final answer, arithmetic and units (pp. 2-3). Multi-step prompting, added problem summaries and solution methods, and targeted hints raise GPT-4o's rate of fully correct assessments from 74.71% to 97.70% on 87 student solutions from two entry-level topics (pp. 5-7).",
+ "domain": "engineering education: undergraduate circuit analysis (electrical)",
+ "size": "earlier study: 283 student solutions from 37 students on 119 problems (p. 2); enhancement tested on 13 error cases and on 87 student solutions (p. 7); models: GPT-3.5 Turbo, GPT-4o and Llama 3 70B in the reproduced baseline, GPT-4o for the enhancement (pp. 3-4)",
+ "source_of_items": "students' handwritten homework on textbook problems from one course, with official reference solutions (p. 2)",
+ "instances": "static",
+ "has_gold_traces": "partial: official reference solutions are given to the LLM grader as ground truth for judging student work (pp. 2, 6); the paper does not evaluate model problem solving",
+ "evaluation": "accuracy of the LLM as a grader: the share of LLM assessments that humans judge correct on every aspect (completeness, method, final answer and arithmetic, units) (pp. 3-4, 7)",
+ "human_validation": "In the baseline study the LLM outputs were 'manually assessed based on predefined grading criteria' (p. 4). The enhancement is judged on 87 solutions, a response counting as correct only if every aspect is right (p. 7). The number of human graders and their agreement are not reported.",
+ "contamination_measures": "none (not applicable)",
+ "engtrace_use": {
+  "sentence": "S-E1 (L182-190), through the printed entry 'Jiaheng Liu et al. 2025. Enhancing large language models for automated homework assessment in undergraduate circuit analysis. ArXiv preprint, abs/2502.07980. Introduces the CIRCUIT benchmark.': '... while specialized benchmarks like TransportBench, APBench, and EEE-Bench (Syed et al., 2024; Chen et al., 2025; Cheng et al., 2024; Li et al., 2025; Liu et al., 2025) are siloed within narrow sub-disciplines.'",
+  "verdict": "wrong",
+  "explanation": "The printed entry merges two papers under an author who wrote neither. This file matches the printed title. Its authors are Liangliang Chen, Huiru Xie, Zhihao Qin, Yiming Guo, Jacqueline Rohde and Ying Zhang (p. 1), and it introduces no benchmark. It improves GPT-4o as a grader of student homework, using data from the authors' earlier study (pp. 1-2). It cannot support a list of 'specialized benchmarks ... siloed within narrow sub-disciplines'. The printed id (2502.07980) and the note 'Introduces the CIRCUIT benchmark' point to a different paper, CIRCUIT by Skelic et al., which this paper itself cites as its reference [16] (p. 1)."
+ },
+ "recommendation": "replace with skelic2025circuit",
+ "suggested_wording": "Not for the benchmark sentence. A judge-validity paragraph that wants an engineering example of LLM grading against reference solutions could say: 'Chen et al. (2025) prompt GPT-4o to grade circuit-analysis homework against reference solutions, judging method, arithmetic and units as well as the final answer.'",
+ "facts_to_cite": [
+  "authors Chen, Xie, Qin, Guo, Rohde and Zhang (Georgia Tech); accepted to FIE 2025 (p. 1)",
+  "a pipeline that improves GPT-4o as a grader of undergraduate circuit-analysis homework; it introduces no benchmark (pp. 1-2)",
+  "grading compares each student solution with the reference solution on completeness, method, final answer, arithmetic and units (pp. 2-3)",
+  "fully correct GPT-4o assessments rise from 74.71% to 97.70% on 87 student solutions (p. 7)"
+ ],
+ "overlap_with_engtrace": "Shares: engineering content (circuit analysis); a reference solution per problem; and an LLM that judges the method and arithmetic of a worked solution, not just its final answer, with humans checking the LLM. Lacks: any benchmark of model problem solving; generated instances; scale (87 solutions in the final test); and agreement statistics for its human checks.",
+ "confidence": "high",
+ "notes": "Naming clash and conflation: no 'Jiaheng Liu' wrote either paper. The printed id and note belong to skelic2025circuit (arXiv 2502.07980), the benchmark the sentence needs. This paper predates the May submission (arXiv v1, 22 Nov 2025), so the authors may have meant it, but it is not a benchmark. If cited anywhere, its key is 'Chen et al., 2025', which would collide with APBench's printed key unless that is corrected to 'Wu et al., 2025'."
+}

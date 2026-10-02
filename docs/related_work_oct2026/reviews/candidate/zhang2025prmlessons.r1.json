@@ -1,0 +1,35 @@
+{
+ "key": "zhang2025prmlessons",
+ "reviewer": "r1",
+ "read": "partial: pp. 1-11 (abstract, 1 introduction, 2 preliminary trials, 3 lessons, 4 our PRMs, 5 related work, 6 conclusion, limitation) in full; appendix A (p. 14) read; remaining appendix tables and the LLM-as-judge prompt (pp. 15-21) skimmed",
+ "title_confirmed": true,
+ "venue_now": "The text is arXiv 2501.07301v2, 5 Jun 2025, dated 2025-06-12 (p. 1), with no venue line. Other papers in this corpus cite it as Findings of ACL 2025, pp. 10495-10516.",
+ "what_it_is": "A method and analysis paper from the Qwen team that releases Qwen2.5-Math-PRM-7B and -72B (p. 1). PRMs trained on Monte Carlo (MC) step labels in Math-Shepherd's style identified erroneous steps on ProcessBench worse than PRMs trained on LLM-as-judge or human (PRM800K) labels, although MC-trained PRMs looked better under best-of-N (pp. 3-5). The authors argue that MC estimation judges a step by future outcomes, so completions can reach correct answers from wrong steps and wrong answers from correct ones (pp. 1-2, 4), and that best-of-N evaluation is biased: policies produce correct answers with flawed processes, PRMs tolerate them, and several PRMs put their minimum score on the final step (pp. 6-8). The released PRMs are trained on MC labels kept only where an LLM judge (Qwen2.5-72B-Instruct) agrees on the error location, and are evaluated by best-of-8 on seven math benchmarks and on ProcessBench (pp. 9-10).",
+ "domain": "math (best-of-8 on GSM8K, MATH, Minerva Math, GaoKao 2023 En, OlympiadBench, College Math and MMLU STEM; step errors on ProcessBench) (p. 3)",
+ "size": "about 500,000 queries for MC data synthesis (p. 3); 860k samples compared across labelling methods, 350k after consensus filtering (pp. 4-6); a 3M-sample MC set filtered to 1.5M (p. 5); two released PRMs, 7B and 72B (p. 1; p. 9)",
+ "source_of_items": "n/a (method paper): training data from existing math queries with model responses; evaluation on existing benchmarks",
+ "instances": "static",
+ "has_gold_traces": "no: PRM training labels are MC estimates filtered by agreement with an LLM judge (p. 9); step-error evaluation uses ProcessBench's human first-error labels (p. 3)",
+ "evaluation": "response-level best-of-8 accuracy and step-level ProcessBench F1 (pp. 3, 9-10)",
+ "human_validation": "Uses PRM800K as the human-label condition (p. 4) and ProcessBench's expert labels for evaluation. The authors manually annotated correct-answer responses of Qwen2.5-Math-7B-Instruct and found process errors in 5.1% (GSM8K), 11.9% (MATH), 27.4% (OlympiadBench) and 43.4% (Omni-MATH) of them (p. 6; Figure 6, p. 7); the number of annotated responses and any agreement are not reported.",
+ "contamination_measures": "PRM800K deduplicated against the test set (p. 4); otherwise none stated",
+ "engtrace_use": {
+   "sentence": null,
+   "verdict": "n/a",
+   "explanation": "Not cited in the May paper. Must be cited because EngTrace evaluates the two PRMs it releases: Qwen2.5-Math-PRM-72B as E2's primary PRM and the 7B as a size check (RESULTS_E2; brief sec. 3). It belongs in the process supervision paragraph. Its diagnosis frames EngTrace's result: on math, its developers report the 72B as the strongest open PRM at catching errors behind correct answers (58.1% first-error accuracy on ProcessBench's correct-answer, flawed-process cases, Table 5, p. 7; 78.3 average ProcessBench F1, Table 7, p. 10), while on expert-labelled engineering traces EngTrace finds step precision 0.246 and recall 0.255 inside correct-answer traces (brief sec. 3). The metrics differ, so the contrast can only be stated qualitatively."
+ },
+ "recommendation": "add (must)",
+ "suggested_wording": "We test the Qwen2.5-Math-PRMs (Zhang et al., 2025), trained on Monte Carlo step labels kept only where an LLM judge agrees, whose authors show that Monte Carlo labels are noisy and that best-of-N evaluation favours PRMs that tolerate correct answers reached through flawed steps.",
+ "facts_to_cite": [
+   "Releases Qwen2.5-Math-PRM-7B and Qwen2.5-Math-PRM-72B, initialised from Qwen2.5-Math-7B-Instruct and Qwen2.5-Math-72B-Instruct (p. 1; p. 9).",
+   "PRMs trained on Monte Carlo-estimated step labels identify erroneous steps worse than PRMs trained on LLM-as-judge or human (PRM800K) labels, despite more data (abstract, p. 1; Table 4 and p. 5).",
+   "MC estimation judges a step by its future outcomes, so completions can reach correct answers from incorrect steps or incorrect answers from correct steps (p. 1; p. 4).",
+   "Best-of-N evaluation is biased: policies produce correct answers with flawed processes, PRMs tolerate them, and several PRMs put their minimum step score on the final-answer step, a shift from process to outcome assessment (abstract, p. 1; pp. 6-8).",
+   "Consensus filtering keeps MC labels only where an LLM judge (Qwen2.5-72B-Instruct) agrees on the error location, retaining about 40% of the data (p. 5; p. 9).",
+   "On ProcessBench the 72B reaches 78.3 average F1 and the 7B 73.5, against 61.9 for GPT-4o-0806 and 87.9 for o1-mini (Table 7, p. 10).",
+   "On ProcessBench cases with correct answers but erroneous steps, the 72B locates the error in 58.1% and the 7B in 53.9%; every other open PRM tested stays below 50% (Table 5, p. 7)."
+ ],
+ "overlap_with_engtrace": "Shares the failure EngTrace measures, correct answers resting on flawed steps, and the argument for step-level rather than answer-level evaluation of PRMs (p. 8). Lacks: engineering (math only); generated instances; gold intermediate values; any expert validation of the PRMs outside ProcessBench's math labels. EngTrace supplies an out-of-domain, expert-labelled test of the released models: the 72B reaches step AUROC 0.825 overall with precision 0.539 and recall 0.515, falling to 0.246 and 0.255 inside correct-answer traces, and the 7B reaches AUROC 0.767 (brief sec. 3).",
+ "confidence": "high",
+ "notes": "The search note's link is half right: the paper's diagnosis that PRMs tolerate flawed processes behind correct answers (pp. 7-8) concerns missed errors, which matches EngTrace's low recall inside correct-answer traces (0.255), not its low precision (0.246, mostly false alarms); do not present the paper as predicting the false alarms. Name caution: Qwen2.5-Math-PRM-7B/72B (this paper) differ from ProcessBench's Qwen2.5-Math-7B-PRM800K (zheng2024processbench p. 13) and from the 'Qwen-2.5-Math-PRM' baseline in VersaPRM, which that paper describes as a PRM800K-trained Qwen (zeng2025versaprm Table 3, p. 24). The manual-annotation rates in Figure 6 (p. 7) concern one policy model and give no sample size."
+}

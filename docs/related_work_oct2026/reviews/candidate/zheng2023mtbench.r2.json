@@ -1,0 +1,37 @@
+{
+ "key": "zheng2023mtbench",
+ "reviewer": "r2",
+ "read": "full: abstract, sections 1-7 (pp. 1-10) in full; appendices A-F skimmed (prompts p. 14-15, data collection C p. 23-24, position-bias and agreement details D.1-D.4 pp. 25-27)",
+ "title_confirmed": true,
+ "venue_now": "NeurIPS 2023 Datasets and Benchmarks Track (page 1 footer; arXiv 2306.05685v4, 24 Dec 2023)",
+ "what_it_is": "The founding systematic study of LLM-as-a-judge for open-ended chat assistants. It introduces MT-Bench (80 hand-written two-turn questions in eight categories) and Chatbot Arena (crowdsourced pairwise battles, about 30K votes), and measures how often GPT-4, GPT-3.5 and Claude-v1 judges agree with human pairwise preferences (3K votes from 58 mostly graduate-student 'expert' labelers on MT-Bench; 3K sampled crowd votes from Arena). It names position, verbosity and self-enhancement bias and limited ability to grade math and reasoning, and proposes swapping positions, few-shot, chain-of-thought and reference-guided judging. Headline: GPT-4 reaches over 80% agreement with human preferences, the level of human-human agreement (85% vs 81% on non-tied MT-Bench votes).",
+ "domain": "general chat assistance (writing, roleplay, extraction, reasoning, math, coding, STEM knowledge, humanities knowledge); labels are preferences, not correctness",
+ "size": "80 MT-Bench questions x 2 turns, answers from 6 models (GPT-4, GPT-3.5, Claude-v1, Vicuna-13B, Alpaca-13B, LLaMA-13B); about 3K expert votes; 30K Arena conversations, 3K sampled for agreement over 9 models; 3 LLM judges",
+ "source_of_items": "expert-written (10 manually designed questions per category, p. 4); Arena prompts are user-submitted",
+ "instances": "static",
+ "has_gold_traces": "no: reference answers/solutions only for some math and reasoning questions, used for reference-guided judging and shown to human voters (p. 4, p. 6, p. 23); no step-level gold",
+ "evaluation": "LLM judge (pairwise comparison, single-answer 1-10 grading, reference-guided grading) validated against human pairwise preference votes; agreement is raw probability of agreement, not chance-corrected (p. 7, D.3 p. 26)",
+ "human_validation": "58 expert-level labelers, mostly graduate students, about 3K votes on MT-Bench; 3K crowd votes (2,114 unique IPs) from Arena (p. 7). GPT-4 vs humans 85% vs human-human 81% on non-tied votes (S2, random 50%); with ties counted (S1, random 33%) 66% vs 63% on the first turn (Table 5, p. 8). When humans disagreed with GPT-4 they judged its verdict reasonable in 75% of cases and changed their vote in 34% (p. 7). Agreement rises from about 70% to nearly 100% as the win-rate gap between the compared models grows (Figure 2, p. 7-8).",
+ "contamination_measures": "none",
+ "engtrace_use": {
+   "sentence": null,
+   "verdict": "n/a",
+   "explanation": "Candidate, not cited in the May paper. It is the paradigm the May three-frontier-model Tribunal inherited, and its own findings argue against how the Tribunal was used: self-enhancement is named but left unresolved (GPT-4 +10% and Claude-v1 +25% win rate on their own answers, but 'our study cannot determine whether the models exhibit a self-enhancement bias', p. 5), its validation is agreement with chat preferences rather than with correctness, and on 10 math questions GPT-4 called an incorrect answer correct in 14 of 20 judgments with the default prompt, 6 of 20 with chain-of-thought and 3 of 20 when given a reference answer (Table 4, p. 5; 'from 70% to 15%', p. 6). The last result is the earliest precedent for EngTrace giving its residual judge the template's gold milestone values; the first two say why a judge must be validated against expert correctness labels with chance-corrected agreement, as EngTrace's 15-expert study does."
+ },
+ "recommendation": "add (must)",
+ "suggested_wording": "LLM-as-a-judge was introduced and validated against human preferences on open-ended chat (Zheng et al., 2023), but the same study found GPT-4 accepting incorrect answers to simple math questions unless it was given a reference answer, which is why EngTrace's residual judge sees the gold milestone values and is validated against expert correctness labels rather than preferences.",
+ "facts_to_cite": [
+  "Introduces MT-Bench (80 two-turn questions, 8 categories, 10 hand-written per category) and Chatbot Arena (about 30K crowdsourced pairwise votes) (pp. 3-4).",
+  "Names position, verbosity and self-enhancement bias and limited reasoning ability as limitations of LLM judges (abstract p. 1; section 3.3 pp. 4-6).",
+  "GPT-4 judges match controlled and crowdsourced human preferences at over 80% agreement, the level of human-human agreement (abstract p. 1); on non-tied MT-Bench votes 85% vs 81% (p. 7, Table 5 p. 8).",
+  "Agreement is the raw probability that two judges agree on a pairwise vote, not chance-corrected; random agreement is 50% without ties and 33% with ties (p. 7; Table 5 p. 8; D.3 p. 26).",
+  "With a default prompt GPT-4 judged an incorrect math answer correct in 14 of 20 judgments on 10 questions; chain-of-thought 6 of 20; reference-guided 3 of 20 (Table 4 p. 5; 'from 70% to 15%' p. 6).",
+  "GPT-4 can be misled by the answers it grades even on problems it can solve on its own (p. 6).",
+  "Self-enhancement was not established: GPT-4 and Claude-v1 showed 10% and 25% higher win rates for their own answers but also favoured other models, and the authors state the study cannot determine whether the bias exists (p. 5).",
+  "GPT-4 agreement with humans rises from about 70% to nearly 100% as the performance gap between the two compared models grows (p. 7, Figure 2 p. 8).",
+  "Human labelers were 58 mostly graduate students paid about $35 per hour (p. 7, p. 24)."
+ ],
+ "overlap_with_engtrace": "Shares: an LLM judge checked against human labels; reference-guided judging (EngTrace's E5 receives the gold milestones). Lacks: generated instances (80 static questions); gold traces or step-level evaluation (whole-response pairwise preference or 1-10 score); engineering domain (one STEM-knowledge category among eight); correctness labels (preferences only); chance-corrected agreement; domain-expert validation (graduate-student labelers, not own-branch experts); any control for judge-candidate relatedness (GPT-4 and Claude judged their own outputs).",
+ "confidence": "high",
+ "notes": "Paragraph: process supervision and judge validity (the canonical LLM-as-a-judge citation; a reviewer of a paper that uses and validates an LLM judge will expect it, and the May Tribunal descends from it). Do not cite it as having demonstrated self-enhancement bias: it names the bias and reports suggestive win-rate differences, but explicitly says the data cannot determine whether it exists (p. 5). The 'over 80%' headline is non-tie, non-chance-corrected agreement on preferences; with ties counted the GPT-4-human figure is 66% (Table 5). The search note's description is accurate on the bias list and headline; it omits the reference-guided math result, which is the finding most useful to EngTrace."
+}

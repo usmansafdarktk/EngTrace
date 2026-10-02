@@ -1,0 +1,34 @@
+{
+ "key": "kazemi2025bbeh",
+ "reviewer": "r2",
+ "read": "full: main text pp. 1-12 (abstract, introduction, related work, Section 3 on BBH's limitations, Section 4 construction, Section 5 results and analyses, conclusion); appendices A to C skimmed (task construction pp. 17-33, including the Disambiguation QA verification p. 21 and Dyck Languages pp. 22-23; BBEH vs BBH p. 34; answer extraction pp. 35-36)",
+ "title_confirmed": true,
+ "venue_now": "arXiv 2502.19187v2, 6 May 2025 (page 1); the text shows no venue. The catalogue and the May reference give ACL 2025 (Long Papers), pp. 26473-26501.",
+ "what_it_is": "BIG-Bench Extra Hard (BBEH) replaces each of the 23 BBH tasks with a harder task probing a similar reasoning skill, because BBH had saturated (pp. 1-3, Table 1 p. 6). Tasks were made harder semi-adversarially until two Gemini reference models scored below 70%, and come from existing datasets, programmatic generation and author-written items (pp. 5, 17-33); there are 200 questions per task except Disambiguation QA, which has 120 (p. 5). Scoring extracts the final answer and checks it with a few simple rules (pp. 35-36); the headline metric is the harmonic mean of task accuracies, on which the best general-purpose model scores 9.8% and the best reasoning-specialised model 44.8% (pp. 1, 8-9).",
+ "domain": "general reasoning (temporal, spatial, causal, deductive, arithmetic, linguistic, humour, world knowledge); no engineering",
+ "size": "23 tasks; 200 questions per task except Disambiguation QA with 120 (p. 5), i.e. 4,520 questions (my count); BBEH Mini has 460 (p. 7); 12 models plus a random baseline evaluated (Table 2, p. 9)",
+ "source_of_items": "mixed: existing datasets adapted or made harder (e.g. BIG-Bench Mistake, SpatialLLMEval, SportQA, Linguini, SARC), programmatically generated items (e.g. Boolean Expressions, Multi-step Arithmetic, Temporal Sequences) and author-written items (Disambiguation QA) (Table 1, p. 6; pp. 17-33)",
+ "instances": "static (a fixed released set; several tasks were generated programmatically during construction, pp. 18, 26, 31)",
+ "has_gold_traces": "no; two tasks (Dyck Languages and a Word Sorting subtask) present a model-written chain of thought and ask for the first mistaken step, with that step number as the label (pp. 22-23, 33)",
+ "evaluation": "final answer only: the answer is extracted after 'The answer is' style prefixes and compared by rule-based exact matching (pp. 35-36); headline metric is the adjusted harmonic mean of task accuracies, with micro averages also reported (pp. 8-9)",
+ "human_validation": "limited: the 120 Disambiguation QA items were written by ten annotators (the authors) and each checked by a second annotator, with disagreements adjudicated and 25 items revised (p. 21); no agreement statistics or human baselines are reported",
+ "contamination_measures": "none reported (the text has no contamination analysis)",
+ "engtrace_use": {
+  "sentence": "First, static benchmarks like Glue (Wang et al., 2019) and BBH (Kazemi et al., 2025) are increasingly prone to model saturation (Ott et al., 2022) and data contamination (Deng et al., 2024); EngTrace counters this through symbolic templates and domain-aware parameterization, generating unique, physically grounded problems that resist rote memorization. (Introduction, L97-105)",
+  "verdict": "wrong",
+  "explanation": "The sentence names BBH but cites BBEH, a different and later benchmark (citation map C2); BBH is Suzgun et al. (suzgun2022bbh). The mismatch inverts the example: BBEH was built because BBH saturated and is itself far from saturated (best harmonic-mean accuracy 9.8% for general-purpose and 44.8% for reasoning models, p. 1), so it is a backwards source for 'a static benchmark prone to saturation'. The paper is, however, the right evidence for the claim about BBH: 'recent advances in LLMs have led to saturation on BIG-Bench, and its harder version BIG-Bench Hard (BBH). State-of-the-art models achieve near-perfect scores on many tasks in BBH' (p. 1), and the latest models reach 'accuracies in the range of 90+ percent', which caused BBH 'to disappear from the latest model evaluation reports' (p. 3). It says nothing about contamination."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "State-of-the-art models now exceed 90% accuracy on BIG-Bench Hard (Suzgun et al., 2023), which has dropped out of model evaluation reports and been succeeded by the harder BBEH (Kazemi et al., 2025).",
+ "facts_to_cite": [
+  "BBH has saturated: state-of-the-art models achieve near-perfect scores on many BBH tasks and over 90% accuracy overall (pp. 1, 3).",
+  "BBH's limitations: a high random-chance baseline (8 of 23 tasks binary, 5 more with at most 5 options), shortcuts, short inputs (700-character macro average) and few reasoning hops (p. 3).",
+  "BBEH replaces each of BBH's 23 tasks with a harder task testing similar skills (p. 2; Table 1, p. 6).",
+  "Tasks were iterated until both reference models (Gemini 1.5 Flash and Gemini 2.0 Flash Thinking) scored below 70% (p. 5).",
+  "Best harmonic-mean accuracy: 9.8% for general-purpose models, 44.8% for reasoning-specialised models (p. 1; Table 2, p. 9); the corresponding micro averages are 23.9% and 54.2% (p. 9).",
+  "In the task that asks for the first mistake in a chain of thought, models mostly miss the first error rather than flag a correct step (pp. 22-23)."
+ ],
+ "overlap_with_engtrace": "Shares programmatic generation for some tasks (pp. 18, 26, 31), deterministic automatic answer checking (p. 2, pp. 35-36) and, in two tasks, step-level error localisation in a reasoning trace (pp. 22-23, 33). It lacks gold reasoning traces for its items, does not score the model's own reasoning steps, has no engineering content, reports no contamination measures and no validation of its evaluator; its released set is fixed.",
+ "confidence": "high",
+ "notes": "Two different headline numbers appear: the abstract's 9.8% and 44.8% are harmonic means (p. 1), while the introduction's 23.9% and 54.2% are micro averages (pp. 2, 9); any number quoted in the revision must name the metric. The May reference misprints six author first names (citation map C-S). The Dyck Languages task comes from BIG-Bench Mistake (Tyen et al., 2024; p. 22), a step-level error-finding dataset that may deserve a look for the planned process-supervision paragraph (not reviewed here)."
+}

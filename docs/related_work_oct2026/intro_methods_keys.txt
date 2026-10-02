@@ -1,0 +1,11 @@
+# Keys used by the replacement sentences in CHANGES.md (Introduction, sections 3.3, 4, 4.3, Appendix K)
+# that the Related Work does not already cite; built into intro_methods_sources.bib.
+zhao2023survey
+wang2018glue
+suzgun2022bbh
+wang2019superglue
+kazemi2025bbeh
+chen2023frugalgpt
+zhang2020bertscore
+lin2004rouge
+plank2022hlv

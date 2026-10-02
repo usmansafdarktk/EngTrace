@@ -1,0 +1,37 @@
+{
+ "key": "mirzadeh2024gsmsymbolic",
+ "reviewer": "r3",
+ "read": "full: abstract, sections 1-5, appendices A.1-A.6 and B; per-model tables and figures in A.2-A.5 and references skimmed",
+ "title_confirmed": true,
+ "venue_now": "ICLR 2025 (page header from p1); arXiv 2410.05229v2, 27 Aug 2025. The May entry cites the arXiv preprint.",
+ "what_it_is": "GSM-Symbolic turns 100 GSM8K test questions into symbolic templates by annotating variables, their domains and conditions; the template parameterises the worked solution as well as the question (Figure 1, p2; p4). It generates 50 instances per template (5,000 per variant) and measures the spread of 8-shot CoT accuracy across 50 generated sets, the drop from GSM8K, sensitivity to name versus number changes, difficulty by removing or adding clauses (GSM-M1, P1, P2), and GSM-NoOp, which adds a seemingly relevant but inconsequential clause (p5-9). 25 open and closed models are scored on final-answer accuracy (p2, p5, p16).",
+ "domain": "grade-school math word problems",
+ "size": "100 templates x 50 instances = 5,000 examples per benchmark variant (GSM-Symbolic, M1, P1, P2, NoOp) (p5); 25 models: open models from 2B to 27B plus GPT-4o-mini, GPT-4o, o1-mini and o1-preview (p2, p5); nearly 500 evaluations (p5)",
+ "source_of_items": "generated from templates hand-annotated on 100 GSM8K test questions, i.e. perturbed from an existing set (p4, p16)",
+ "instances": "generated (templates instantiated with new names and numbers; difficulty variants add or remove clauses)",
+ "has_gold_traces": "partial: each template carries a parameterised solution, so each instance has an instantiated reference solution (Figure 1, p2); it is not used to score model reasoning",
+ "evaluation": "final answer: 8-shot CoT with greedy decoding, accuracy distribution over 50 generated sets (p5, p16). In an ablation, the arithmetic of equations extracted from responses is checked, at about 97% to 99% accuracy (Table 2, p23).",
+ "human_validation": "Items: automated template checks (no original value appears in the template; the original values satisfy the conditions; the template reproduces the original answer) (p4-5); 10 random samples per template reviewed manually; any question fewer than two models answer correctly is reviewed again (p5). No validation of the scorer.",
+ "contamination_measures": "generated instances; the accuracy drop from GSM8K is offered as a sign of possible contamination of GSM8K (p6); templates and generated data are public (p1, footnote 1)",
+ "engtrace_use": {
+  "sentence": "S-M1 (L155-161): '... and GSM-Symbolic (Mirzadeh et al., 2024) rigorously test abstract logical deduction and reasoning stability.' S-I2 (L84-94): 'Symbolic templates (Mirzadeh et al., 2024; Xie et al., 2025) serve as the generative mechanism, producing unique, contamination-resistant instances'.",
+  "verdict": "accurate",
+  "explanation": "S-M1: GSM-Symbolic measures the spread of accuracy across instantiations and its fragility under number changes, added clauses and irrelevant clauses (p1, p5-9), which is 'reasoning stability'; the authors frame it as a probe of 'genuine logical reasoning' rather than arithmetic (p1, p5). Only 'rigorously' overreaches: appendices A.3 and B concede the results would be non-significant under Ivanova et al.'s (2025) two-sample analysis (p18, p23-24). S-I2: GSM-Symbolic introduced symbolic templates as a generative mechanism (p1-2, p4) and presents templated variants as an answer to GSM8K's contamination risk (p2). Two cautions for the revision: its templates are built on public GSM8K questions and only names, numbers and clause count change, so its instances resist contamination only in part; and its templates already instantiate a solution with every question (Figure 1, p2), so pairing generated instances with gold solutions is not new with EngTrace; scoring the steps against them is."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "GSM-Symbolic (Mirzadeh et al., 2025) turns 100 GSM8K test questions into symbolic templates that parameterise both question and solution, and shows that accuracy varies across instantiations and falls when numbers change or an irrelevant clause is added, while scoring only the final answer.",
+ "facts_to_cite": [
+  "Templates are built from 100 GSM8K test questions by annotating variables, their domains and the conditions that keep question and answer correct; the template parameterises the solution too (Figure 1, p2; p4).",
+  "50 instances per template, 5,000 examples per benchmark variant; 25 models; 8-shot CoT with greedy decoding (p2, p5, p16).",
+  "Accuracy varies across the 50 generated sets; the original GSM8K accuracy is often more than one standard deviation from the centre of the generated distribution, on its right side for 21 of 25 models (p6).",
+  "Changing numbers lowers accuracy more than changing names (p7); adding clauses lowers accuracy and raises variance (GSM-M1, P1, P2; p7-8).",
+  "GSM-NoOp: adding a seemingly relevant but inconsequential clause causes drops of up to 65% (p1, p9).",
+  "Quality checks: automated template checks, manual review of 10 random samples per template, and re-review of any question fewer than two models answer correctly (p4-5).",
+  "Under Ivanova et al.'s (2025) assumptions, the authors concede their results would be statistically non-significant (p18).",
+  "An ablation checks the arithmetic of equations extracted from model responses (Table 2, p23).",
+  "Published at ICLR 2025 (p1)."
+ ],
+ "overlap_with_engtrace": "Shares: symbolic templates that generate instances (EngTrace's mechanism); a reference solution instantiated with each instance (Figure 1, p2); a contamination rationale (p2, p6); difficulty manipulation (p7-8); and, as an ablation only, a deterministic check of the arithmetic in extracted equations (p23), the idea behind EngTrace's E4 digit rule. Lacks: step-level evaluation (final answer only, p16); engineering domain (grade-school arithmetic); expert validation (authors' manual review only, p5); a private pool (templates and data public, p1); templates derived from existing public questions rather than new problems.",
+ "confidence": "high",
+ "notes": "Cite the ICLR 2025 version; the in-text year would become 2025. Author names on p1 are Keivan Alizadeh and Hooman Shahrokhi (the May entry prints Kiarash and Hidetoshi; citation_context_map C-S). The May section 3.2 phrase 'templates go beyond variable substitution' reads as a contrast with GSM-Symbolic, which also adds and removes clauses (p7-8) and inserts No-Op clauses (p9); the contrast should be stated precisely and checked against EngTrace's own figures (the state brief reports that 54 to 58 templates follow one reasoning path in all 15 instances)."
+}

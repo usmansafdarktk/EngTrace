@@ -1,0 +1,34 @@
+{
+ "key": "wang2023scibench",
+ "reviewer": "r2",
+ "read": "partial: pp. 1-5 in full (abstract, introduction, related work, dataset, experimental setup); results text (p. 6) skimmed; p. 7 (additional experiments, error analysis), pp. 8-9 (evaluation protocol, conclusion) and appendix D.1 (p. 21) read. Not read: results tables, appendices A-C, D.2, references",
+ "title_confirmed": true,
+ "venue_now": "ICML 2024, PMLR 235 (page 1 footer: 'Proceedings of the 41st International Conference on Machine Learning'); the file is arXiv 2307.10635v3, 28 Jun 2024",
+ "what_it_is": "A benchmark of college-level scientific problem solving: 869 free-response problems from ten widely used textbooks in physics, chemistry and mathematics (177 with visual context), plus a closed set of 103 problems from seven midterm and final exams in computer science and mathematics courses (pp. 2, 4). Textbook answers are single numbers graded at a 5% relative tolerance; the exam set is graded with the instructors' rubrics (p. 5). Detailed step-by-step solutions exist for 9.1% to 21.5% of each textbook's problems and serve as few-shot examples and for error analysis (pp. 4-5, 7). The best configuration averages 43.22% on the textbook set (p. 2).",
+ "domain": "college-level physics, chemistry and mathematics (textbooks); computer science and mathematics (exams) (pp. 2, 4)",
+ "size": "869 textbook problems (177 multimodal) and 103 exam problems; seven text-only LLMs (p. 5), plus four open multimodal models and caption-augmented GPT-4 (p. 7)",
+ "source_of_items": "textbooks (ten college textbooks, converted with Mathpix OCR and manually checked) and course exams (pp. 4-5)",
+ "instances": "static",
+ "has_gold_traces": "partial: detailed LaTeX solutions for 9.1% to 21.5% of problems per textbook (Table 2, p. 4), used for few-shot examples and error analysis, not for scoring (pp. 5, 7)",
+ "evaluation": "final answer: a single numerical answer within 5% relative tolerance (textbook set); the instructors' rubrics (exam set) (p. 5). A GPT-3.5 verifier classifies the missing skill behind each wrong answer, for analysis only (pp. 7-8)",
+ "human_validation": "Problems were manually converted to LaTeX and checked (p. 5). Two students annotated 112 GPT-3.5 errors with the line of the mistake and its reason, distilled into ten skills (p. 7). The GPT-3.5 skill classifier was correct on 123 of 151 human-checked samples (81.45%) (p. 21). The 5% answer check is not validated against human grading.",
+ "contamination_measures": "problems chosen because they are not readily accessible online in text form, and extracted manually from PDFs; a closed exam set (pp. 2, 4)",
+ "engtrace_use": {
+   "sentence": "R-1 (July 2026 rebuttal; SciBench is not cited in the May paper): 'SciBench (Wang et al., 2023) allows a 5% relative tolerance for grading numeric answers on college-level scientific problems, and ABench-Physics (Zhang et al., 2025b) uses a 1% tolerance for physics reasoning.'",
+   "verdict": "accurate",
+   "explanation": "R-1 is supported: model outputs are compared with the correct answers 'allowing a relative tolerance of 5%' (p. 5), and the problems are college-level (p. 1). The tolerance applies to the textbook set; the exam set is graded with instructors' rubrics (p. 5). The key needs care if the sentence moves into the paper: in the May reference list 'Wang et al., 2023' is NEWTON, and SciBench's version of record is ICML 2024 (p. 1 footer), so it should be cited as Wang et al., 2024."
+ },
+ "recommendation": "add (should)",
+ "suggested_wording": "SciBench (Wang et al., 2024) draws 869 college-level physics, chemistry and mathematics problems from ten textbooks and grades single numerical answers at a 5% relative tolerance.",
+ "facts_to_cite": [
+  "869 free-response problems from ten college textbooks in physics, chemistry and mathematics, 177 with visual context (pp. 2, 4).",
+  "A closed set of 103 problems from seven midterm and final exams in computer science and mathematics courses, graded with the instructors' rubrics (pp. 2, 5).",
+  "Textbook answers are single numbers, graded at a 5% relative tolerance (p. 5).",
+  "Detailed solutions are provided for 9.1% to 21.5% of each textbook's problems (Table 2, p. 4).",
+  "The best configuration averages 43.22% on the textbook set (p. 2).",
+  "The problems were chosen to be hard to find online in text form and were extracted manually from PDFs (pp. 2, 4)."
+ ],
+ "overlap_with_engtrace": "Shares: college-level quantitative problems with numerical answers, including physical chemistry and statistical thermodynamics close to EngTrace's chemical branch; a numerical tolerance (5%, against EngTrace's REL 0.002); reference solutions for a subset; human annotation of where model solutions go wrong (for analysis only). Lacks: generated instances (static textbook items); step-level evaluation (final answer only); engineering domain; any validation of its answer check.",
+ "confidence": "high",
+ "notes": "Belongs in the revised physical-sciences paragraph as the established college-level science benchmark (ICML 2024), the one PhysReason positions itself against (PhysReason, pp. 2-3), and the reference point for EngTrace's answer tolerance; 'should' rather than 'must'. Naming clash: the rebuttal's 'Wang et al., 2023' is NEWTON's key in the May reference list; cite SciBench as Wang et al., 2024. The paper gives the best exam-set score as 51.57% (p. 2) and GPT-4's exam average as 57.54% (p. 7); neither figure is needed."
+}

@@ -6240,10 +6240,40 @@ ranking is stable", "less than re-running", 450, the roster-wide floor, the E3 c
 per-branch conclusions), the margin's history, suggested wording for the section and the limitations,
 and the figures worth drawing.
 
+## D-166 — Related Work revised for the October submission: the May citations audited, the new literature added, the positioning claims the combination
+
+**Date:** 2026-10-02 · **Status:** DECIDED (the text); OPEN (the authors' choices listed below) · **Evidence:** `docs/related_work_oct2026/` (`README.md`, `CITED_SET_AUDIT.md`, `NEW_PAPERS_AUDIT.md`, `CHANGES.md`, `notes/fact_check.md`)
+
+Section 2 of the May submission was audited and rewritten. Each of the 46 works it cites, or names but
+attributes to another reference, was read by three independent reviewer agents. A search of six topics
+found 156 newer candidates. The revision cites 99 works: 67 in the main text and 32 in an appendix with
+a comparison table. Every statement it makes about another paper was checked against that paper's text
+(`verify_facts.py`, 177 of 177 claims found). What the audit changed:
+
+1. **The section's central claim is withdrawn.** "Existing benchmarks remain limited to outcome matching"
+   and the Introduction's "no existing benchmark verifies this process" are contradicted by seven of the
+   May citations, among them PhysReason, FinChain, FEABench and TransportBench, and by newer engineering
+   benchmarks: ThermoQA, TPS-CalcBench and EngVQA. The revision instead claims the combination, hedged
+   with "to our knowledge": generated instances across five branches, gold traces from the template code,
+   deterministic checks of intermediate values, and an evaluator validated against experts' step labels.
+2. **Four citations pointed at the wrong paper.** These were "Glue", "BBH", "BIG-Bench" and the "Liu et
+   al." CIRCUIT entry. Three characterisations were the opposite of the paper: ABench-Physics, LLM-SRBench
+   and FEABench. LLM-SRBench and the two storytelling self-citations are dropped, and the reference list
+   is regenerated from source records.
+3. **FinChain and CIRCUIT become named precedents.** FinChain is described in the third person, for
+   anonymity. A paragraph on process supervision and evaluator validity is added, as NEXT_CYCLE_REVIEW
+   §4.2 asked.
+4. **Templates are no longer presented as a remedy for saturation.** Akhtar et al. (2026) find such
+   safeguards have limited effect. The private seed is presented as the contamination answer.
+
+The reviewer panel was stopped on 2026-10-02 at the owner's request, to save cost. The remaining
+candidates were assessed through the fact check (`notes/review_protocol.md`).
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
+| D-166 | The authors' calls on the Related Work revision (`docs/related_work_oct2026/CHANGES.md`): adopt the replacement Introduction sentences (§2); whether the Limitations acknowledge Mondorf et al.'s finding on randomly sampled instances (§4); confirm three single-source venues (§6) | the paper's sections 1 and 2 |
 | D-161 | ~~Run: E5 on the paraphrase arm, about $3 at 316 items (`PARAPHRASE_RUNBOOK.md` section 4), for Q5's E5 column~~ **Done 2026-09-30 (D-162): $4.56, every call answered.** ~~The private Kaggle copy of the arm's archive~~ **Done 2026-10-01: `ayeshaiq/engtrace-full-run-paraphrase`, private, from `full_run_paraphrase_2026-10-01.zip` (80 files, the experts' returns included), downloaded back and matched member by member** | Q5's E5 column in the paper |
 | D-160 | ~~Round 3 of the flag reading: the 190 claims in `scores/flag_review/round3/` (workbook and instructions), then `flag_sample --round 3 --merge <file>` and `--score --read-by "<who>"`, giving the corrected rule's precision on this roster; no round 4~~ **Read 2026-10-01 by the same domain expert: precision 0.905 (D-163, `FLAG_REVIEW_3.md`)** | — |
 | D-159 | ~~Round 3 of the flag reading: the 181 claims in `scores/flag_review/round3/`~~ **Redrawn 2026-09-30, unread, after two review agents' corrections (D-160)** | — |

@@ -1,0 +1,35 @@
+{
+ "key": "skelic2025circuit",
+ "reviewer": "r1",
+ "read": "full: pp.1-14 (abstract, related work, dataset, evaluation, experiments, results, discussion, limitations, author contributions, appendices A-C on sources, netlists and prompts); appendices D-E (error types, examples) skimmed",
+ "title_confirmed": true,
+ "venue_now": "arXiv:2502.07980v1, 11 Feb 2025 (p.1); the text shows no venue",
+ "what_it_is": "CIRCUIT is a benchmark of 510 analog-circuit questions built from 102 templates, each with five numerical setups, adapted from textbooks, MIT courses and the first author's own problems (p.3, p.13). Each item asks for one numerical answer; most come with a diagram and many with a netlist, and templates fall into basic, analog, power and RF categories at three course levels (pp.3-4). Answers are parsed by regex and counted correct within an absolute difference of 0.001; besides global accuracy, a template counts as passed only if at least k of its five setups are right (pass@k/n), a unit-test-like measure of topology understanding (pp.4-5). It evaluates GPT-4-turbo, GPT-4o and Gemini 1.5 Pro with four prompts; GPT-4o reaches 48.04% globally and passes 27.45% of the unit tests (p.1, p.5).",
+ "domain": "engineering: electrical, analog circuits (basic, analog, power, RF) (pp.3-4)",
+ "size": "510 questions = 102 templates x 5 numerical setups; 93 templates with diagrams, 79 with netlists (p.3); 3 models (p.5)",
+ "source_of_items": "textbooks, MIT courses and original problems, adapted into templates with author-chosen numerical setups (p.3, p.13)",
+ "instances": "static: templated items with five fixed numerical setups per template, not regenerated per evaluation (p.3)",
+ "has_gold_traces": "no: one numerical answer per setup (p.3); a step-by-step solution appears only in the 1-shot prompt example (p.14)",
+ "evaluation": "final answer: regex-parsed numerical answer, correct if within 0.001 of the ground truth; global accuracy and template-level pass@k/n (pp.4-5); human error analysis of a subset of GPT-4o responses (p.6)",
+ "human_validation": "Two authors reviewed the dataset for quality and consistency, and two carried out the human analysis of responses (p.11). Human review of GPT-4o's best-scoring runs found about 5% of the automatically correct verdicts to be false positives (p.6), and classified errors as math, formatting and reasoning, with reasoning errors (including topology and direction errors) dominant (p.6, p.9).",
+ "contamination_measures": "none stated as such; the dataset is withheld until the source authors consent (p.11), for consent rather than contamination reasons",
+ "engtrace_use": {
+  "sentence": "S-E1 (L182-190), reached only through the printed 'Liu et al., 2025' entry, whose arXiv id (abs/2502.07980) and note ('Introduces the CIRCUIT benchmark') are this paper: '... specialized benchmarks like TransportBench, APBench, and EEE-Bench (...; Liu et al., 2025) are siloed within narrow sub-disciplines.'",
+  "verdict": "misleading",
+  "explanation": "Read as a citation of CIRCUIT, 'specialized ... siloed within narrow sub-disciplines' is true: it covers analog circuits only (p.1). But it omits what matters most for EngTrace: CIRCUIT is a template-based engineering benchmark, 102 templates with five numerical setups each, scored per template so that a template passes only if k of its five setups are solved (pp.3-4). It is a direct engineering precedent for the parameterized templates EngTrace presents as its generative mechanism (S-I2). It also checked reasoning by hand and found about 5% of automatically correct answers wrong on review (p.6), which bears on the closing claim that existing benchmarks are 'limited to outcome matching' (S-E3). The May text never names CIRCUIT, and the in-text key names an author who did not write it (p.1)."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "CIRCUIT (Skelic et al., 2025) builds 510 analog-circuit questions from 102 templates with five numerical setups each and scores final answers per template, yet human review found about 5% of automatically correct answers to be wrong.",
+ "facts_to_cite": [
+  "510 questions from 102 templates with five numerical setups each; 93 templates with diagrams, 79 with netlists (p.3)",
+  "templates adapted from textbooks, MIT courses and original problems (p.3, p.13)",
+  "template-level pass@k/n: a template passes only if k of its five setups are solved (p.4)",
+  "answers parsed by regex and correct if within 0.001 of the ground truth (pp.4-5)",
+  "GPT-4o: 48.04% global accuracy, 27.45% of unit tests passed (p.1)",
+  "human review found about 5% of automatic 'correct' verdicts to be false positives (p.6)",
+  "the authors name intermediate-step evaluation as future work (p.8)"
+ ],
+ "overlap_with_engtrace": "Shares: engineering domain (circuits, overlapping EngTrace's electrical branch); templates with varied numerical values and template-level scoring (pp.3-4); human checking of automatic verdicts (p.6). Lacks: instances sampled at scale from a generator (five fixed setups per template, 510 items); gold step-by-step traces; step-level evaluation (only proposed as future work, p.8); an evaluator validated by experts beyond a subset error analysis; breadth beyond circuits.",
+ "confidence": "medium",
+ "notes": "The sentence should cite CIRCUIT as Skelic et al., 2025 rather than the conflated 'Liu et al., 2025', whose title is a homework-grading paper (liu2025circuit). Surprise for the consolidator: CIRCUIT anticipates EngTrace's template idea in engineering and its point that correct final answers can hide wrong reasoning, so the revised text must say what EngTrace adds (instances sampled from a private seed, gold traces, step checks, five branches). The 'misleading' verdict is by omission; for S-E1's narrow claim alone, 'accurate' is defensible."
+}

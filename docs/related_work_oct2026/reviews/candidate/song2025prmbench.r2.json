@@ -1,0 +1,36 @@
+{
+ "key": "song2025prmbench",
+ "reviewer": "r2",
+ "read": "full: main text pp. 1-9 (abstract, Secs. 1-8) read in full; appendices (pp. 10-48) skimmed by search, with A.3 (annotation, pp. 13-14) and B.2-B.5 (models, evaluation procedure, PRMBench-STEM, p. 14) read",
+ "title_confirmed": true,
+ "venue_now": "ACL 2025 (main) per the catalogue. The text file is arXiv 2501.03124v5 (28 Jun 2025) and has no venue header.",
+ "what_it_is": "A benchmark of whether PRMs detect fine-grained kinds of step error. It starts from completely correct PRM800K solutions, which GPT-4o rewrites, under class-specific prompts, into versions containing erroneous steps; QwQ supplies alternative correct solutions for the multi-solution class (p. 5). Cases fall under three categories (simplicity, soundness, sensitivity) with nine sub-categories (pp. 3-4). Quality control combines structural filters with a manual check of 10% of instances (p. 5). Models are scored by PRMScore, a weighted combination of F1 and negative F1 over step labels (p. 6).",
+ "domain": "math (PRM800K / MATH problems); an appendix variant, PRMBench-STEM, covers physics, chemistry and biology (p. 14)",
+ "size": "6,216 problems with 83,456 step-level labels, 13.4 steps on average (pp. 1, 4); 25 models evaluated (pp. 1-2); human baseline on a 450-sample subset (p. 14). PRMBench-STEM: 1,619 physics, 1,543 chemistry and 2,342 biology instances (Table 9, p. 14).",
+ "source_of_items": "perturbed from an existing set: correct PRM800K solutions modified by GPT-4o to contain errors",
+ "instances": "perturbed",
+ "has_gold_traces": "partial: built on PRM800K's ground-truth step-level solutions (p. 5); each test case's step labels mark the inserted erroneous steps",
+ "evaluation": "step-level or process: per-step classification as correct or erroneous (and as redundant or not), scored as PRMScore = w1*F1neg + w2*F1 (p. 6; Appendix B.3, p. 14)",
+ "human_validation": "Five volunteers with bachelor's degrees checked 10% of instances. Over 92% passed on correctness of the modification and over 98% on difference from the original (p. 5; Appendix A.3.1, p. 13). The human score (83.8) comes from three bachelor's-degree volunteers on 50 instances per sub-category, 450 in all (Appendix A.3.2, p. 14). No inter-annotator agreement is reported.",
+ "contamination_measures": "none",
+ "engtrace_use": {
+  "sentence": null,
+  "verdict": "n/a",
+  "explanation": "Candidate; the May paper does not cite it. The batch description is accurate: 6,216 problems, 83,456 step labels, three error categories, PRMs well below human performance, math only, constructed errors. It omits two points that matter for EngTrace. First, PRMBench scores the same Qwen2.5-Math-PRM-7B and -72B that EngTrace ran (Table 3, p. 6). Second, its error-injection design is the precedent for EngTrace's planted defects."
+ },
+ "recommendation": "add (must)",
+ "suggested_wording": "PRMBench (Song et al., 2025) inserts nine types of error into correct PRM800K solutions; the best model it tests, Gemini-2-Thinking, scores 68.8 against a human 83.8, and most open PRMs are biased towards labelling steps correct.",
+ "facts_to_cite": [
+  "6,216 problems and 83,456 step-level labels across three categories (simplicity, soundness, sensitivity) and nine sub-categories (abstract, p. 1; pp. 3-4).",
+  "The errors are constructed: GPT-4o rewrites completely correct PRM800K solutions into erroneous versions, and QwQ supplies alternative solutions for multi-solution consistency (p. 5).",
+  "Quality check: five volunteers reviewed 10% of instances; over 92% were correctly modified and over 98% differed from the original (p. 5).",
+  "Of 25 models, the best (Gemini-2-Thinking) scores 68.8 PRMScore against a human 83.8 (p. 2; Table 3, p. 6).",
+  "Qwen2.5-Math-PRM-7B scores 65.5 and Qwen2.5-Math-PRM-72B 68.2; MathShepherd-Mistral-7B scores 47.0 (Table 3, p. 6).",
+  "Open PRMs favour positive labels: ReasonEval-7B and RLHFlow-DeepSeek-8B reach about 95% accuracy on correct steps but average about 17% on erroneous ones (p. 7; Table 4, p. 6).",
+  "PRMBench scores do not track best-of-N accuracy (Somers' D -0.05), so outcome-level evaluation does not reveal step-level error detection (p. 8; Table 6).",
+  "PRMs score lower on PRMBench-STEM (physics, chemistry, biology) than on the math set (p. 14)."
+ ],
+ "overlap_with_engtrace": "Shares: deliberately constructed step errors used to measure verifier recall, which is EngTrace's planted-defect method (60 arithmetic, 60 conceptual and 60 control traces; state brief Sec. 3); step-level scoring of PRMs; the two Qwen2.5-Math PRMs EngTrace evaluated. Its positive-label bias fits EngTrace's VersaPRM result (recall 0.064). Its best-of-N-versus-step inconsistency fits EngTrace's case against answer-only scoring. Lacks: engineering (math, plus physics, chemistry and biology in an appendix); generated instances (perturbed from a public set, with no contamination control); errors that occur naturally in model outputs (EngTrace's X1 labels are on real traces from five models); expert validation (volunteers with bachelor's degrees, a 10% check, no agreement statistic); deterministic checks. EngTrace's plants are fewer, but it runs them against both deterministic checks and LLM judges.",
+ "confidence": "medium",
+ "notes": "Paragraph: process supervision and judge validity. Must rather than should mainly because EngTrace presents its planted defects as evidence on the limits of verification. PRMBench is the standard precedent for injecting errors to test step verifiers. It is also, with ProcessBench, one of the two standard step-level PRM benchmarks that score the Qwen PRMs EngTrace ran. If the planted-defect results leave the paper, this drops to should. The paper calls these PRMs 'Qwen-PRM-7B/72B (Zhang et al., 2025)' (Appendix B.2, p. 14); they are the zhang2025prmlessons models. Its 'human performance' baseline comes from three volunteers with bachelor's degrees, not domain experts."
+}

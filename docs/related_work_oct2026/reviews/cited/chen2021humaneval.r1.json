@@ -1,0 +1,34 @@
+{
+ "key": "chen2021humaneval",
+ "reviewer": "r1",
+ "read": "full: abstract, sections 1-6 (pp. 1-10: evaluation framework, HumanEval, Codex fine-tuning, APPS results, supervised fine-tuning, docstring generation, limitations); skimmed section 7 (broader impacts, pp. 10-14) and Appendices A-H (pp. 18-35), reading E.5 in full",
+ "title_confirmed": true,
+ "venue_now": "arXiv preprint, arXiv:2107.03374v2 of 14 Jul 2021 (p1); the text shows no venue, consistent with the May entry.",
+ "what_it_is": "The paper introduces Codex, a GPT model fine-tuned on public GitHub code, and HumanEval, the evaluation set built to measure it: 164 hand-written Python problems, each with a function signature, docstring, reference body and on average 7.7 unit tests (pp. 1, 4). The task is to generate a standalone function from its docstring, and a sample counts as correct if it passes the unit tests; the paper reports pass@k with an unbiased estimator from n = 200 samples per problem (pp. 2-3). The problems 'assess language comprehension, reasoning, algorithms, and simple mathematics' (p4). Codex-12B solves 28.8% of the problems with one sample, against 0% for GPT-3 and 11.4% for GPT-J (p1).",
+ "domain": "Python programming: standalone functions synthesised from docstrings (language comprehension, reasoning, algorithms, simple mathematics; p4)",
+ "size": "164 problems with 7.7 unit tests on average (p4); models: Codex from 12M to 12B parameters, Codex-S, GPT-Neo, GPT-J, TabNine and GPT-3 (pp. 2, 6-7)",
+ "source_of_items": "hand-written by the paper's team ('all problems were hand-written and not programmatically copied from existing sources', p3; p4)",
+ "instances": "static",
+ "has_gold_traces": "partial: each problem has a reference solution (the function body, p4), a gold program rather than a worked reasoning trace; scoring never compares with it, and it appears only in the BLEU analysis (p6)",
+ "evaluation": "unit tests: functional correctness, reported as pass@k (pp. 2-3). The paper shows that BLEU against the reference solution does not separate correct from incorrect programs (Fig. 8, p6).",
+ "human_validation": "None reported for the HumanEval problems or their unit tests (no check of test adequacy or ambiguity). Hand grading appears only for the separate docstring-generation task: 10 samples per problem, 1,640 in all (p9).",
+ "contamination_measures": "hand-written problems, because the models were trained on a large fraction of GitHub, which already contains solutions to many public problem sets; the authors add that this is 'not a guarantee for problem novelty' (pp. 3-4). The set is public (p4).",
+ "engtrace_use": {
+   "sentence": "S-M2: 'Similarly, coding evaluations span from function-level generation in HumanEval (Chen et al., 2021) and MBPP (Austin et al., 2021) to real-world software engineering in SWE-Bench (Jimenez et al., 2024).' S-I3b (Introduction): 'specialized benchmarks (e.g., Math (Hendrycks et al., 2021b) or HumanEval (Chen et al., 2021)) assess abstract logic and algorithmic translation.'",
+   "verdict": "accurate",
+   "explanation": "S-M2: HumanEval's task is 'generating standalone Python functions from docstrings' (p2), scored by unit tests (p4), so 'function-level generation' is exact. S-I3b: the problems 'assess language comprehension, reasoning, algorithms, and simple mathematics' (p4) and turn a natural-language docstring into code (p2), which 'algorithmic translation' summarises fairly. The citation is the right one: Chen et al. (2021) introduces HumanEval (section 2.2, p4), although the paper is chiefly about the Codex model."
+ },
+ "recommendation": "keep as is",
+ "suggested_wording": "HumanEval (Chen et al., 2021) asks for standalone Python functions from docstrings and scores them by functional correctness on hand-written unit tests (pass@k), not by similarity to a reference solution.",
+ "facts_to_cite": [
+  "HumanEval has 164 hand-written Python problems, each with a function signature, docstring, reference body and on average 7.7 unit tests (p4).",
+  "The problems were hand-written because the models were trained on much of GitHub; the authors note this is 'not a guarantee for problem novelty' (pp. 3-4).",
+  "Scoring is functional correctness: pass@k, the probability that at least one of k samples passes the unit tests, estimated without bias from n = 200 samples (pp. 2-3).",
+  "BLEU scores of correct and incorrect solutions overlap heavily, so improvements in BLEU may not indicate functional correctness (Fig. 8, p6).",
+  "Codex-12B solves 28.8% of the problems with a single sample; GPT-3 solves 0% and GPT-J 11.4% (p1; 28.81% in Table 1, p7).",
+  "On synthetic docstrings that chain simple string operations, Codex-12B's pass rate falls by roughly a factor of 2-3 with each added operation (Fig. 11, p10)."
+ ],
+ "overlap_with_engtrace": "Shares: automatic, deterministic scoring by an executable check rather than by text similarity (pp. 2-3, 6), the principle behind EngTrace's answer check and digit rule; hand-written items as a contamination measure (p4). Lacks: engineering or physical content (Python functions, p4); generated instances (164 static problems); step-level evaluation (only the final program's behaviour is tested); gold reasoning traces (a reference program, not a worked solution); any validation of the unit tests or evaluator against experts; and a private pool (the set is public, p4).",
+ "confidence": "high",
+ "notes": "The paper is chiefly the Codex paper; HumanEval is its evaluation set (section 2.2). Internal inconsistencies: Appendix E.5 describes HumanEval as '158 problems' (p28) against 164 elsewhere (pp. 2, 4); the abstract's 70.2% solved with 100 samples (p1) differs from Table 1's pass@100 of 72.31% for Codex-12B (p7), probably a different sampling temperature. The BLEU finding (Fig. 8, p6) is a citable precedent for EngTrace's move from BERTScore and ROUGE-2 to deterministic checks (state brief, section 5), should the revised text want one."
+}

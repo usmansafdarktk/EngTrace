@@ -1,0 +1,34 @@
+{
+ "key": "chen2021humaneval",
+ "reviewer": "r3",
+ "read": "full per protocol: abstract, sections 1-3 (evaluation framework, HumanEval, code fine-tuning results), 6 (limitations) and 9 (conclusion) in full; sections 4-5, 7-8 and the appendices skimmed by heading (most of the paper is about Codex)",
+ "title_confirmed": true,
+ "venue_now": "arXiv preprint 2107.03374v2, 14 Jul 2021 (p1 margin); the text shows no venue",
+ "what_it_is": "The Codex paper. It introduces HumanEval, 164 hand-written Python programming problems, each with a function signature, docstring, reference body and on average 7.7 unit tests, and scores functional correctness by running generated functions against the tests, reported with an unbiased pass@k estimator (p2-4). Codex-12B solves 28.8% with one sample and 70.2% with 100 samples (p1). It also shows that BLEU does not track functional correctness (p6).",
+ "domain": "Python programming: function synthesis from docstrings",
+ "size": "164 problems, 7.7 tests each on average (p4); models: Codex 12M to 12B, Codex-S, GPT-3, GPT-Neo, GPT-J, TabNine (p2, p6-7)",
+ "source_of_items": "hand-written, 'not programmatically copied from existing sources' (p3, p4)",
+ "instances": "static",
+ "has_gold_traces": "no: each problem has a reference function body and unit tests (p4), but no intermediate reasoning",
+ "evaluation": "unit tests: functional correctness, pass@k estimated from n = 200 samples per problem (p2-3)",
+ "human_validation": "none reported for items or tests beyond their being hand-written",
+ "contamination_measures": "hand-written problems, because the models are trained on GitHub, which holds solutions to problems from other sources (p4); the authors add that this is 'not a guarantee for problem novelty' (p3)",
+ "engtrace_use": {
+  "sentence": "S-M2 (L161-165): 'Similarly, coding evaluations span from function-level generation in HumanEval (Chen et al., 2021) and MBPP (Austin et al., 2021) to real-world software engineering in SWE-Bench (Jimenez et al., 2024).' S-I3b (L105-111): 'specialized benchmarks (e.g., Math (Hendrycks et al., 2021b) or HumanEval (Chen et al., 2021)) assess abstract logic and algorithmic translation.'",
+  "verdict": "accurate",
+  "explanation": "S-M2: HumanEval asks for 'standalone Python functions from docstrings' (p2), which is function-level generation. S-I3b: its tasks 'assess language comprehension, reasoning, algorithms, and simple mathematics' (p4) by turning a docstring into a working function, so 'algorithmic translation' is a fair summary. The citation is correct: HumanEval is introduced in this paper."
+ },
+ "recommendation": "keep as is",
+ "suggested_wording": "HumanEval (Chen et al., 2021) checks Python functions synthesised from docstrings against hand-written unit tests.",
+ "facts_to_cite": [
+  "164 hand-written programming problems, each with a function signature, docstring, body and on average 7.7 unit tests (p4).",
+  "The problems were hand-written because the models are trained on GitHub; the authors note this is 'not a guarantee for problem novelty' (p3, p4).",
+  "Solutions are scored by functional correctness against the unit tests, reported as pass@k with an unbiased estimator (p2-3).",
+  "Codex-12B solves 28.8% of problems with one sample and 70.2% with 100 samples (p1).",
+  "BLEU distributions of correct and incorrect solutions overlap, so BLEU gains 'may not indicate improved rates of functional correctness' (p6).",
+  "The problems are comparable in difficulty to easy interview problems (p14)."
+ ],
+ "overlap_with_engtrace": "Shares: a deterministic, execution-based outcome check (unit tests), the coding analogue of EngTrace's deterministic answer check; concern about training-data overlap (p3-4); evidence that a surface metric (BLEU) does not track correctness (p6), which bears on EngTrace demoting ROUGE and BERTScore. Lacks: generated instances (static); gold reasoning traces and step-level evaluation; engineering domain; expert validation.",
+ "confidence": "high",
+ "notes": "The paper is mainly the Codex paper; HumanEval is its evaluation set, and this is the standard citation for it. If the revision explains why text-overlap metrics were dropped, the BLEU result (p6) is a citable precedent."
+}

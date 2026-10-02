@@ -1,0 +1,35 @@
+{
+ "key": "srivastava2022bigbench",
+ "reviewer": "r3",
+ "read": "partial: abstract and contents (pp. 2-3), introduction (pp. 4-6), section 2 'What is in BIG-bench?' in full (API, BIG-bench Lite, evaluated models, human raters, canary string; pp. 6-11), sections 3.1-3.4.1 (pp. 11-13), discussion and conclusion (pp. 25-26), appendix E on expert evaluation (p. 48); keyword table and figure (pp. 47, 50) and task-author list (pp. 27-42) skimmed; sections 3.5-4 and the remaining appendices and references skimmed",
+ "title_confirmed": true,
+ "venue_now": "TMLR (the acknowledgements thank 'the anonymous reviewers of TMLR', p. 42); the file is arXiv 2206.04615v3, 12 Jun 2023 (p. 1)",
+ "what_it_is": "BIG-bench (Beyond the Imitation Game benchmark) is a collaborative suite of 204 language tasks contributed by 450 authors at 132 institutions through GitHub pull requests and peer-reviewed there (pp. 2, 6). Topics run from linguistics and childhood development to mathematics, common-sense reasoning, biology, physics, social bias and software development (p. 2). About 80% of tasks are JSON example sets scored against targets with metrics such as exact string match, ROUGE or multiple-choice grade from model probabilities. About 20% are programmatic Python tasks that can query the model over several rounds and use custom metrics (p. 8). The paper evaluates dense and sparse Google models and OpenAI GPT-3 models across six orders of magnitude of scale, with expert human raters as a baseline (pp. 2, 9-10).",
+ "domain": "multi-domain language tasks (linguistics, mathematics, common sense, physics, social bias, code, non-English and more); the text names no engineering task, and the closest are physics tasks such as 'physics', 'physics_questions' and 'physical_intuition' (p. 37)",
+ "size": "204 tasks (p. 2); keyword counts 167 JSON, 42 programmatic, 146 multiple choice, 83 free response (Figure App.6, p. 50); BIG-bench Lite subset of 24 JSON tasks (p. 8); models: 13 dense BIG-G models, sparse BIG-G models and 8 GPT-3 sizes, plus published PaLM results (pp. 5, 9-10)",
+ "source_of_items": "expert-written, crowd-contributed tasks submitted by pull request and reviewed in discussion on the pull request (p. 6)",
+ "instances": "mostly static: about 80% of tasks are fixed JSON example sets; the other 20% are Python tasks that query the model, and the text does not say whether they generate new instances (p. 8)",
+ "has_gold_traces": "no: JSON tasks consist of inputs and targets (p. 8); no intermediate solution steps are described",
+ "evaluation": "a preferred metric per task, chosen by its authors: exact string match, multiple-choice grade, ROUGE and others for JSON tasks, custom metrics for programmatic tasks; the aggregate is the mean of normalized preferred metrics (pp. 8, 11)",
+ "human_validation": "Tasks were peer-reviewed on their GitHub pull requests (p. 6). A team of expert raters completed the tasks, with internet access, 30 minutes to 2 hours per day and task subsampling, to give mean and best rater baselines. The authors call these scores strong lower bounds rather than ceilings (pp. 10, 48). No agreement statistics or item audits are reported.",
+ "contamination_measures": "a canary GUID string in every task file to help keep BIG-bench out of training corpora, and a training_on_test_set task for diagnosis after the fact (p. 11); the evaluated models' training data, except PaLM's, predate the repository, so direct leakage is ruled out for them (p. 9)",
+ "engtrace_use": {
+  "sentence": "S-E1 (L182-190) names 'BIG-Bench' but attributes it to Luo et al. (2024): 'Generalist suites like MMLU (Hendrycks et al., 2021a), BIG-Bench (Luo et al., 2024), and SuperGPQA (Du et al., 2025) restrict assessment to factual recall via multiple-choice questions, ...'",
+  "verdict": "misleading",
+  "explanation": "Judged as a description of the real BIG-bench, which the sentence names but attributes to another paper. 'Generalist suite' fits: 204 tasks on topics from linguistics to physics and software (p. 2). 'Via multiple-choice questions' is only partly true. 146 tasks carry the multiple-choice keyword, but 83 are free response and 42 programmatic (Figure App.6, p. 50), scored by exact match, ROUGE or custom metrics (p. 8). 'Restrict assessment to factual recall' is not supported. The suite targets tasks 'believed to be beyond the capabilities of current language models' (p. 2), and its keyword table lists 58 logical-reasoning and 23 mathematics tasks (p. 47). The paper also separates knowledge or memorization tasks, which improve gradually with scale, from composite tasks that need multiple steps (pp. 2, 13). The sentence therefore describes a recall-only multiple-choice suite, which BIG-bench is not."
+ },
+ "recommendation": "drop",
+ "suggested_wording": "If kept, as a general suite rather than an engineering one: 'BIG-bench (Srivastava et al., 2023) gathers 204 contributed tasks, each scored against fixed targets by exact match, multiple-choice grade or ROUGE.'",
+ "facts_to_cite": [
+  "204 tasks contributed by 450 authors across 132 institutions (p. 2)",
+  "about 80% of tasks are JSON tasks scored against targets with metrics such as exact string match, ROUGE or multiple-choice grade; about 20% are programmatic tasks with custom metrics (p. 8)",
+  "146 tasks carry the multiple-choice keyword and 83 the free-response keyword (Figure App.6, p. 50)",
+  "expert human raters completed the tasks as a baseline (pp. 2, 10)",
+  "a canary string marks every task file so it can be filtered out of training corpora (p. 11)",
+  "documents benchmark saturation: superhuman performance on SuperGLUE less than 18 months after its release (pp. 5, 7)",
+  "published in TMLR (acknowledgements, p. 42)"
+ ],
+ "overlap_with_engtrace": "Shares little: a contamination marker (canary string) and some physics and mathematics tasks. Lacks: an engineering focus (no engineering task is named), generated instances (fixed example sets), gold traces, step-level evaluation and validation of an evaluator; scoring is against fixed targets.",
+ "confidence": "medium",
+ "notes": "Not in the May reference list: the May text names BIG-Bench but cites Luo et al. (2024). The verdict is firm. The recommendation is a judgement: BIG-bench adds no engineering evidence to the engineering paragraph, and describing it accurately does not support the 'multiple-choice' claim, so MMLU and SuperGPQA serve that sentence better. If the authors want BIG-bench, the Introduction's saturation sentence is a better home (pp. 5, 7). The keyword counts differ between Table App.3 (p. 47: free response 78, logical reasoning 58, programmatic 40) and Figure App.6 (p. 50: 83, 59, 42), probably from different snapshots. The text dump of Table App.3 shows no multiple-choice row, likely an extraction loss. BIG-Bench Hard (Suzgun et al.) and BIG-Bench Extra Hard (Kazemi et al.) are separate papers. Year: arXiv 2022, TMLR 2023 per notes/cited_set_resolution.md; this text shows only the June 2023 arXiv version and the TMLR acknowledgement."
+}

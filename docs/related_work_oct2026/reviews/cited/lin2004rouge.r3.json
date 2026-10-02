@@ -1,0 +1,34 @@
+{
+ "key": "lin2004rouge",
+ "reviewer": "r3",
+ "read": "full: all 8 pages (abstract, sections 1-7, result tables and references)",
+ "title_confirmed": true,
+ "venue_now": "Text Summarization Branches Out (ACL 2004 workshop), pp. 74-81, according to notes/cited_set_resolution.md; the text file (ACL Anthology W04-1013) carries no venue header",
+ "what_it_is": "Introduces the ROUGE package for the automatic evaluation of summaries: measures that count the units (n-grams, word sequences, word pairs) a candidate summary shares with human reference summaries (p. 1). It defines ROUGE-N (n-gram recall), ROUGE-L (an F-measure on the longest common subsequence), ROUGE-W (weighted LCS) and ROUGE-S/SU (skip-bigrams) (pp. 1-5). Seventeen ROUGE variants are validated by Pearson correlation, with bootstrap confidence intervals, between systems' average ROUGE scores and human content-coverage scores on DUC 2001-2003 single- and multi-document summarization data (pp. 5-7). ROUGE-2, -L, -W and -S work well for single-document summaries, while high correlations are hard to reach for multi-document summaries (p. 7).",
+ "domain": "automatic evaluation of text summarization (news; DUC 2001-2003)",
+ "size": "17 ROUGE measures (p. 6) evaluated on DUC 2001-2003 tasks, for example single-document 100-word summaries from 12 systems (DUC 2001, 149 summaries judged per system) and 14 systems (DUC 2002, 295 per system), and DUC 2003 very short summaries from 14 systems (624 per system) (p. 5)",
+ "source_of_items": "existing DUC evaluation data: system summaries, human reference summaries and human content-coverage judgements (pp. 5-6)",
+ "instances": "static",
+ "has_gold_traces": "no: human reference summaries only",
+ "evaluation": "metric meta-evaluation: Pearson correlation (Spearman and Kendall are said to track it closely) between system-average ROUGE scores and human coverage scores, with 95% bootstrap intervals, comparing single and multiple references and runs with and without stemming and stopword removal (pp. 5-6)",
+ "human_validation": "existing DUC human judgements: assessors scored each candidate summary's content coverage against one manual summary using the SEE tool (p. 6)",
+ "contamination_measures": "none (not applicable to a metric)",
+ "engtrace_use": {
+  "sentence": "We employ BERTScore (Zhang et al., 2020) to measure deep semantic similarity via contextual embedding alignment, and ROUGE-2 (Lin, 2004) to quantify lexical overlap. (section 4.3, L468-472)",
+  "verdict": "accurate",
+  "explanation": "ROUGE-N is defined as n-gram recall between a candidate summary and reference summaries (p. 1), so ROUGE-2 measures bigram overlap and 'quantify lexical overlap' is correct. Three points go beyond the verdict. The paper's own example shows ROUGE-2 giving the same score to two candidates with 'very different meanings' that share one bigram (p. 3). ROUGE was validated only on news summaries against human content coverage (pp. 5-6), not on reasoning or terminology, so the next May sentence's claim that the metrics 'assess the model's ability to employ appropriate domain-specific terminology' (L472-474) has no support here. And the May paper also reports ROUGE-L (Table 1, L633; Appendix M, Table 12) without citing it, although ROUGE-L is defined in this same paper (pp. 2-3)."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "ROUGE-2 (Lin, 2004), bigram recall against a reference, was validated against human content-coverage judgements of news summaries, and its author shows that it can give the same score to sentences with very different meanings that share a bigram; we report it, with ROUGE-L from the same package, only as an appendix baseline.",
+ "facts_to_cite": [
+  "ROUGE (Recall-Oriented Understudy for Gisting Evaluation) scores a summary by counting the overlapping units, such as n-grams, word sequences and word pairs, between it and human reference summaries (p. 1).",
+  "ROUGE-N is n-gram recall between a candidate summary and a set of reference summaries (p. 1); ROUGE-L is an F-measure based on the longest common subsequence (pp. 2-3).",
+  "With 'police killed the gunman' as the reference, 'police kill the gunman' and 'the gunman kill police' receive the same ROUGE-2 score although they have very different meanings (p. 3).",
+  "Seventeen ROUGE variants were validated by Pearson correlation between system-average ROUGE scores and human content-coverage scores on DUC 2001-2003 data (pp. 5-6).",
+  "ROUGE-2, ROUGE-L, ROUGE-W and ROUGE-S worked well for single-document summarization; correlations in the high 90s were hard to reach for multi-document summarization (p. 7).",
+  "Excluding stopwords and using multiple references usually improved correlation with human judgements (p. 7)."
+ ],
+ "overlap_with_engtrace": "Shares: comparison of generated text with a human or gold reference. Lacks: any notion of correctness beyond word overlap (p. 3); numerical, scientific or engineering content (news summaries); step-level or process evaluation; generated instances; and validation for anything other than summary content coverage (pp. 5-7). In EngTrace it served only as a lexical-overlap baseline (May Table 1 and Appendix M), which the revision keeps 'in an appendix if at all' (state brief section 5).",
+ "confidence": "high",
+ "notes": "Batch V question: ROUGE says nothing about process supervision or LLM judges. It bears on the judge-validity and meta-evaluation paragraph only as the standard lexical-overlap metric that EngTrace's quantity checks replace, and its own ROUGE-2 example (p. 3) shows why overlap is not correctness. With the evaluator now deterministic plus a residual judge, and the Table 12 comparison dropped (state brief section 5), the revised text may cite it in an appendix that reports ROUGE-2 or ROUGE-L (cite it for both, since both are defined here, pp. 1-3), and optionally in one clause on why overlap metrics are not part of the evaluator. It must not be cited for terminology use or for reasoning quality. If the appendix drops the similarity metrics, drop this citation; it does not belong in the Related Work paragraphs. Reference entry: correct (Text Summarization Branches Out, pp. 74-81, Barcelona, ACL)."
+}

@@ -1,0 +1,34 @@
+{
+ "key": "lin2004rouge",
+ "reviewer": "r1",
+ "read": "full: all 8 pages",
+ "title_confirmed": true,
+ "venue_now": "Text Summarization Branches Out (ACL 2004 workshop), Barcelona, pp. 74-81, per papers.json and the May entry; the text file (the ACL Anthology W04-1013 PDF) carries no venue header",
+ "what_it_is": "Introduces the ROUGE package for automatic summary evaluation by overlap with human reference summaries: ROUGE-N (n-gram recall), ROUGE-L (longest-common-subsequence F-measure), ROUGE-W (weighted LCS) and ROUGE-S/SU (skip-bigram) (p.1-5). Seventeen variants are validated by Pearson correlation of system-average scores with human content-coverage judgments on DUC 2001-2003 single-document, very short and multi-document summaries, with bootstrap confidence intervals (p.5-7). ROUGE-2, -L, -W and -S work well for single-document summaries; multi-document correlations are lower and less stable (p.6-8).",
+ "domain": "summarization evaluation (news summaries, DUC 2001-2003)",
+ "size": "4 measure families and 17 variants tested (p.6). DUC single-document: 12 systems (2001) and 14 (2002), with 149 and 295 summaries judged per system; very short summaries: 14 systems, 624 per system (2003); multi-document: 6 to 18 systems per task, with 29 (2001), 59 (2002) and 30 (2003) summaries judged per system per size (p.5)",
+ "source_of_items": "existing DUC 2001-2003 system and human summaries with their human judgments",
+ "instances": "static",
+ "has_gold_traces": "no (human reference summaries)",
+ "evaluation": "expression-level metric (n-gram, LCS and skip-bigram overlap with references); the metric's own validity is measured as Pearson correlation with human content-coverage scores (p.6)",
+ "human_validation": "DUC human judges assigned content-coverage scores against a single manual summary using the SEE tool (p.6); no inter-annotator agreement is reported; correlations carry bootstrap 95% confidence intervals (p.6)",
+ "contamination_measures": "none (not applicable to a metric)",
+ "engtrace_use": {
+  "sentence": "We employ BERTScore (Zhang et al., 2020) to measure deep semantic similarity via contextual embedding alignment, and ROUGE-2 (Lin, 2004) to quantify lexical overlap. (sec. 4.3, May L469-471)",
+  "verdict": "accurate",
+  "explanation": "ROUGE-N is n-gram recall between a candidate and a set of reference summaries (p.1); ROUGE-2 is bigram overlap, so 'to quantify lexical overlap' is right. Two cautions. ROUGE was validated against human content-coverage judgments of news summaries (p.6), not against fluency or terminology, so the surrounding May claims (fluency, May L466-467; domain-specific terminology, L472-474) get no support from it. And the paper's own example gives 'police kill the gunman' and 'the gunman kill police' the same ROUGE-2 score although their meanings differ greatly (p.3). Minor: section 4.3 names ROUGE-2, while Table 1 also reports ROUGE-L and Table 12 uses ROUGE-L (May L604, L633, L3067); this paper defines both (p.1-3), so the one citation covers both."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "ROUGE (Lin, 2004) scores n-gram overlap with reference summaries and was validated against human judgments of summary content coverage; it does not test correctness, and its own example gives the same ROUGE-2 score to two sentences with very different meanings.",
+ "facts_to_cite": [
+  "ROUGE (Recall-Oriented Understudy for Gisting Evaluation) scores a summary by its overlapping units (n-grams, word sequences, word pairs) with human reference summaries (p.1).",
+  "ROUGE-N is n-gram recall against a set of reference summaries (p.1); ROUGE-L is an F-measure based on the longest common subsequence (p.2).",
+  "It was validated by Pearson correlation with human content-coverage scores on DUC 2001-2003 data (p.5-6).",
+  "ROUGE-2 performed best among the ROUGE-N variants on 100-word single-document summaries, and ROUGE-2, -L, -W and -S worked well for single-document summarization (p.6-7).",
+  "ROUGE-N with N above 1 performed significantly worse on very short summaries (p.7), and high correlation was hard to reach for multi-document summaries (p.7-8).",
+  "Two sentences with very different meanings ('police kill the gunman', 'the gunman kill police') get the same ROUGE-2 score (p.3)."
+ ],
+ "overlap_with_engtrace": "Nothing structural: an n-gram overlap metric for news summaries, with no reasoning, numbers, steps or engineering content, no generated instances and no expert validation of its own. Its relevance is historical: the May paper reported ROUGE-2 and ROUGE-L as textual-quality metrics, and its Table 12 found ROUGE-L / BERTScore aligned with experts at rho 0.325 (May L3067-3069). The revised evaluator does not use it (state brief sec. 2 and 5).",
+ "confidence": "high",
+ "notes": "Batch V question: as with BERTScore, ROUGE is no longer part of the evaluator, and the plan keeps it 'in an appendix if at all' (state brief sec. 5). Keep the citation only where an appendix still reports ROUGE numbers, or in one clause saying why overlap metrics were dropped; otherwise drop it. It has nothing to say about process supervision or judge validity, though PoLL itself lists ROUGE among heuristic metrics that 'commonly fail to analyze the intended property of interest' (Verga et al., 2024, p.1-2). Venue: this text has no header; papers.json and the May entry agree on Text Summarization Branches Out, pp. 74-81."
+}

@@ -1,0 +1,36 @@
+{
+ "key": "xia2024reasoneval",
+ "reviewer": "r2",
+ "read": "full: main text pp. 1-8 (abstract, Secs. 1-7) read in full; references and appendix pages (pp. 8-12: solution examples, extra tables, prompts) skimmed",
+ "title_confirmed": true,
+ "venue_now": "AAAI 2025 (page 1 copyright line: 'Copyright 2025, Association for the Advancement of Artificial Intelligence'); arXiv 2404.05692v2 (14 Jan 2025)",
+ "what_it_is": "An evaluation methodology, not a dataset. LLM-based evaluators classify each step of a math solution as positive, neutral or negative. From these come a validity score (no calculation or logic mistake) and a redundancy score (valid but no progress), aggregated over the solution by min and max (p. 3). The best evaluators are math LLMs fine-tuned on PRM800K's human step labels (pp. 3-4). They are meta-evaluated on the authors' MR-MATH and on MR-GSM8K (pp. 3-6). MR-MATH holds 159 correct-answer solutions labelled by undergraduates, plus 300 PRM800K solutions for redundancy. The best evaluator is then used to show that higher final-answer accuracy in math LLMs does not bring fewer flawed steps (pp. 6-7).",
+ "domain": "math (MATH; GSM8K for out-of-distribution meta-evaluation)",
+ "size": "Training: PRM800K, about 800,000 step labels on 75,000 solutions (p. 3). Meta-evaluation: MR-MATH-invalid, 83 solutions with incorrect steps and 76 without, all with correct final answers; MR-MATH-redundant, 150 with redundant steps and 150 without (pp. 3-4); MR-GSM8K, about 1.4K samples per question type (pp. 5-6). Application: 10 math LLMs, 100 samples per MATH problem (p. 6).",
+ "source_of_items": "existing datasets (MATH, PRM800K, MR-GSM8K); model-generated solutions labelled by undergraduates with a solid math background",
+ "instances": "static",
+ "has_gold_traces": "no: the evaluators are reference-free, and the authors argue that a single reference solution is unreliable because many reasoning paths reach the same answer (p. 3)",
+ "evaluation": "step-level or process: LLM-based step classification yielding validity and redundancy scores; meta-evaluated by solution- and step-level F1 and AUC (pp. 3-4)",
+ "human_validation": "Undergraduates with a solid math background marked the first error in Abel and WizardMath solutions to build MR-MATH (pp. 3-4); the number of annotators and their agreement are not reported. The best evaluator, ReasonEval-Llemma-34B, reaches step-level F1 77.5 and AUC 92.8 on MR-MATH-invalid (Table 1, p. 4). Its false-positive estimates were spot-checked by hand for two models: 29.2% and 28.3% by hand, against the evaluator's 29.8% and 31.3% (Table 4, p. 6).",
+ "contamination_measures": "none",
+ "engtrace_use": {
+  "sentence": null,
+  "verdict": "n/a",
+  "explanation": "Candidate; the May paper does not cite it. The batch description is accurate: ReasonEval scores each step for validity and redundancy and finds that higher final-answer accuracy does not imply better steps. 'The closest model-based analogue to EngTrace's process scores' is fair for EngTrace's residual judge (E5) and step router. It does not cover EngTrace's deterministic checks: ReasonEval is reference-free and argues against reference-based step scoring (p. 3), the opposite design choice."
+ },
+ "recommendation": "add (must)",
+ "suggested_wording": "ReasonEval (Xia et al., 2025) scores the validity and redundancy of each step with LLM evaluators trained on PRM800K. Its own evaluator estimates that, across ten math LLMs on MATH, the share of correct answers reached through an invalid step falls only to about 20% as accuracy rises.",
+ "facts_to_cite": [
+  "Defines step validity (no calculation or logic mistake) and redundancy (valid but no progress) from three-class step probabilities, aggregated by min and max (pp. 2-3).",
+  "The evaluators are LLMs fine-tuned on PRM800K's human step labels, about 800,000 labels on 75,000 solutions (p. 3).",
+  "MR-MATH meta-evaluation set: undergraduate-labelled Abel and WizardMath solutions, 83 with incorrect steps and 76 without, all with correct final answers (pp. 3-4).",
+  "On MR-MATH-invalid, ReasonEval-Llemma-34B reaches step-level F1 77.5 and AUC 92.8, against GPT-4's 61.0 step-level F1. ROSCOE's alignment and similarity scores are near chance there, at solution-level F1 48.2 and 51.6 (Table 1, p. 4).",
+  "False-positive rate (a correct final answer with at least one incorrect step) across ten math LLMs on MATH: 16.5% to 40.6% (Table 4, p. 6).",
+  "That rate falls to about 20% as final-answer accuracy rises, then stops falling: WizardMath-7B-V1.1 (31.0% accuracy) and WizardMath-70B (18.7%) have rates of 16.7% and 16.5% (Table 4, p. 6).",
+  "These rates are model-estimated, with a validity threshold of 0.25 (p. 6). Hand spot checks gave 29.2% (Abel-13B) and 28.3% (WizardMath-13B), against the evaluator's 29.8% and 31.3% (Table 4, p. 6).",
+  "Argues that reference-based step scoring is unreliable because many reasoning paths lead to the same answer (p. 3)."
+ ],
+ "overlap_with_engtrace": "Shares: process scores for solver models beyond final-answer accuracy; meta-evaluation of the step evaluator against human labels; the correct-answer, flawed-step rate as a headline quantity, which is EngTrace's hard case (93 of 228 correct-answer traces; state brief Sec. 3). Differs: ReasonEval is a learned, reference-free LLM scorer. EngTrace's first tier is deterministic against gold intermediate values (E3 milestones, E4 digit rule), with an LLM judge only for the residue. EngTrace validates these against 15 experts' step labels with reported agreement; ReasonEval's validation set is 159 solutions labelled by undergraduates, with no agreement statistic. Lacks: engineering; generated instances; gold traces; expert annotators. EngTrace must answer its objection to reference-based scoring (p. 3): a model can take a valid path that never computes a gold milestone. EngTrace's order-free milestone matching and its residual judge are the answer, and the revised text should say so.",
+ "confidence": "medium",
+ "notes": "Paragraph: process supervision and judge validity. Must rather than should for two reasons. Its title and thesis, 'evaluating mathematical reasoning beyond accuracy', are EngTrace's thesis in math. And its false-positive-rate analysis measures the same quantity as EngTrace's hard case. A reviewer comparing EngTrace's process scores with earlier step evaluators would expect it. Cite by venue year (AAAI 2025) under the key xia2024reasoneval. The Table 4 rates come from the evaluator, not from human labels, apart from the two spot checks."
+}

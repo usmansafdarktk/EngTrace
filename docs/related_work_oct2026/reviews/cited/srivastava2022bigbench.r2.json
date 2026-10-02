@@ -1,0 +1,37 @@
+{
+ "key": "srivastava2022bigbench",
+ "reviewer": "r2",
+ "read": "partial: abstract and contents (pp.2-3), Sections 1-2 (pp.4-11) and 3.1-3.4.1 (pp.11-13) in full, Section 6.1 (p.25), task-author list in Section 7.2 (pp.28-41) and acknowledgements (p.42) skimmed; Sections 3.5-5 and the appendices not read",
+ "title_confirmed": true,
+ "venue_now": "TMLR (the acknowledgements thank the TMLR reviewers, p.42); arXiv:2206.04615v3, 12 Jun 2023 (p.1)",
+ "what_it_is": "BIG-bench (Beyond the Imitation Game) is a collaborative benchmark of 204 language tasks contributed by 450 authors across 132 institutions, chosen to probe capabilities believed to be beyond current models and to study how performance scales (p.2). About 80% of tasks are JSON example lists scored against targets by metrics such as exact match or ROUGE, or by option probabilities for multiple-choice tasks; about 20% are Python programs that can query the model over several rounds and define custom metrics (p.8). It evaluates OpenAI GPT models and Google dense and sparse transformers across six orders of magnitude of scale, with expert human raters as a baseline (p.2, p.9-10). A 24-task subset, BIG-bench Lite, is provided (p.6, p.8).",
+ "domain": "general language-model capabilities (linguistics, childhood development, math, common sense, biology, physics, social bias, software development; p.2); no task devoted to an engineering discipline (task list, pp.28-41)",
+ "size": "204 tasks (p.2), of which 161 JSON tasks (p.5) and 109 multiple-choice JSON tasks (p.12); BIG-bench Lite 24 tasks (p.6); models: GPT-3 series, 13 BIG-G dense models, BIG-G sparse models, plus published PaLM results (p.5, p.9-10)",
+ "source_of_items": "expert-written / community-contributed tasks submitted as GitHub pull requests and peer-reviewed in the pull-request discussion (p.6)",
+ "instances": "static",
+ "has_gold_traces": "no",
+ "evaluation": "final output only: multiple choice by option likelihood (multiple_choice_grade), exact string match, ROUGE and other generation metrics, or task-specific programmatic metrics; each task names one preferred metric, normalised 0-100 for aggregation (p.8, p.11)",
+ "human_validation": "task proposals peer-reviewed on GitHub (p.6); a team of expert raters completed the tasks, with internet search allowed, to give mean and max human baselines (p.2, p.10); no validation of the scoring itself",
+ "contamination_measures": "canary GUID string in every task file so the data can be filtered out of training corpora, plus a training_on_test_set task for post-hoc diagnosis (p.11); training data of the evaluated models (except PaLM) predates the repository (p.9)",
+ "engtrace_use": {
+   "sentence": "S-E1 (L182-190), which names BIG-Bench but cites Luo et al., 2024: Generalist suites like MMLU (Hendrycks et al., 2021a), BIG-Bench (Luo et al., 2024), and SuperGPQA (Du et al., 2025) restrict assessment to factual recall via multiple-choice questions [...]",
+   "verdict": "wrong",
+   "explanation": "BIG-bench is a generalist suite, but the characterisation contradicts the paper on both counts. Format: only 109 of its JSON tasks are multiple-choice (p.12); the other JSON tasks compare generated text with targets (exact match, ROUGE), and about 20% of tasks are programmatic, with multi-round interaction and custom metrics (p.8). Content: the suite targets tasks 'believed to be beyond the capabilities of current language models' (p.2) and distinguishes knowledge-based tasks, which improve smoothly with scale, from composite multi-step tasks that show breakthrough behaviour (p.13, p.25); it is not restricted to factual recall. The sentence also cites the wrong paper for it (Luo et al., 2024, a text-to-image bias benchmark)."
+ },
+ "recommendation": "drop",
+ "suggested_wording": "If BIG-bench is kept: BIG-bench (Srivastava et al., 2023) pools 204 community-contributed tasks scored on the model's output by option likelihood (109 multiple-choice JSON tasks), exact match, ROUGE or task-specific programs, and none of its tasks is devoted to an engineering discipline.",
+ "facts_to_cite": [
+  "204 tasks contributed by 450 authors across 132 institutions (p.2)",
+  "Tasks were chosen to probe capabilities believed to be beyond current language models (p.2)",
+  "About 80% of tasks are JSON tasks scored by comparing outputs with targets (e.g., ROUGE, exact match) or by option probabilities; about 20% are programmatic tasks with custom metrics (p.8)",
+  "109 multiple-choice JSON tasks (p.12) out of 161 JSON tasks (p.5)",
+  "Tasks proposed and peer-reviewed through GitHub pull requests (p.6)",
+  "Expert human raters completed the tasks as a baseline (p.2, p.10)",
+  "A canary GUID string marks every task file so the data can be kept out of training corpora (p.11)",
+  "SuperGLUE reached superhuman performance less than 18 months after release (p.5; Fig. 2, p.7)",
+  "Published in TMLR (acknowledgements, p.42)"
+ ],
+ "overlap_with_engtrace": "Shares: final-output scoring and a contamination measure (canary string, p.11); a few quantitative tasks (physics, physics_questions, unit_conversion, multistep_arithmetic; task list pp.28-41). Lacks: any engineering task, generated instances (static example lists), gold traces, step-level evaluation, and validation of an evaluator (the expert raters supply a performance baseline, not a check on the scoring, p.10).",
+ "confidence": "high",
+ "notes": "Recommendation is 'drop' from the engineering paragraph because BIG-bench has no engineering task and so cannot show how generalist suites assess engineering; MMLU (one Electrical Engineering task) and SuperGPQA (7,892 engineering questions) carry that point. Keeping it with the suggested wording is acceptable; what is not acceptable is the May characterisation or the Luo citation. BIG-bench's documentation of short benchmark lifespans (p.5-7) and its canary string (p.11) would fit the Introduction's saturation and contamination sentence better than the engineering paragraph. Year: the text shows arXiv v3 of 12 Jun 2023 and a TMLR acknowledgement, but no TMLR year."
+}

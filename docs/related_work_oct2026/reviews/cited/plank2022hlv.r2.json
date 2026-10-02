@@ -1,0 +1,33 @@
+{
+ "key": "plank2022hlv",
+ "reviewer": "r2",
+ "read": "full: main text pp. 1-6 (abstract, introduction, data, modeling, evaluation, conclusions, limitations, ethics); reference list and the dataset table (Appendix, p. 12) skimmed",
+ "title_confirmed": true,
+ "venue_now": "EMNLP 2022 (main conference), pp. 10671-10682 (page 1 header)",
+ "what_it_is": "A position paper arguing that variation among human annotators is often not noise. It defines human label variation (HLV) as plausible variation in annotation, arising from ambiguity, annotator uncertainty, genuine disagreement or several correct answers, and distinguishes it from annotation errors such as attention slips (pp. 1-2). It argues that HLV affects data, modelling and evaluation, urges releasing un-aggregated annotator-level labels, reviews methods that resolve or embrace variation, and calls for evaluation beyond a single gold label (pp. 3-5). It names telling errors apart from signal as an open, largely overlooked challenge (p. 4).",
+ "domain": "NLP annotation and evaluation methodology (position paper)",
+ "size": "n/a (position paper); an appendix table lists publicly available datasets with un-aggregated labels (p. 12)",
+ "source_of_items": "n/a",
+ "instances": "n/a",
+ "has_gold_traces": "n/a",
+ "evaluation": "n/a; it advocates soft-label evaluation against human label distributions (p. 5)",
+ "human_validation": "n/a",
+ "contamination_measures": "n/a",
+ "engtrace_use": {
+  "sentence": "The residual one-point variation reflects Human Label Variation (Plank, 2022): rater-specific judgments on pedagogical style and edge-case parameter realism inherent to subjective expert evaluation. (Appendix K.2, L2281-2285). Also the January 2026 rebuttal: 'As argued by Plank (2022), we view the lower agreement on subjective metrics not as noise, but as genuine human label variation (HLV) inherent to tasks lacking a single objective ground truth.'",
+  "verdict": "imprecise",
+  "explanation": "The concept is correctly attributed: Plank coins 'human label variation' for plausible variation that should not be treated as noise, including variation from subjectivity (pp. 1-2, 5), and ratings of pedagogical clarity are the kind of subjective judgement she means; the rebuttal's wording is a fair paraphrase. But the appendix uses the citation to settle that the one-point differences are variation rather than error, and the paper cannot do that. Plank separates variation from 'annotation differences, due to amongst others attention slips' (p. 2), notes that 'some disagreement is due to human labeling errors' (p. 1), and calls teasing errors apart from signal 'a related important challenge' that is 'largely overlooked' (p. 4); the appendix gives no evidence beyond the score distribution that the differences were not errors. Her prescription also runs the other way from the appendix's use: she argues against relying on aggregated labels and for releasing un-aggregated ones (p. 3), whereas the appendix invokes HLV to vouch for high aggregate agreement (AC2 0.824 to 0.934, L2285-2288)."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "Disagreement between expert annotators need not be error: on subjective criteria plausible human label variation is expected, though telling it apart from annotation error is itself an open problem (Plank, 2022).",
+ "facts_to_cite": [
+  "Defines human label variation as plausible variation in annotation, due to ambiguity of the instance, annotator uncertainty, genuine disagreement or several correct answers (p. 2).",
+  "Distinguishes such variation from annotation errors, e.g. attention slips (p. 2); some disagreement is error (p. 1).",
+  "Teasing apart errors from signal is an important and largely overlooked challenge (p. 4).",
+  "Urges releasing un-aggregated, annotator-level labels (p. 3).",
+  "Argues that evaluating against a single gold label is severely flawed for many tasks, and advocates soft-label evaluation (p. 5)."
+ ],
+ "overlap_with_engtrace": "Bears only on EngTrace's human-validation appendices, where three experts per template or per trace give labels with measured agreement (e.g. Fleiss kappa 0.781 on steps in X1; AC1 0.914 with Fleiss 0.589 in certification round 1; state brief sections 1 and 3). It has no benchmark, instances, traces or evaluator, and nothing on engineering or process evaluation; its relevance is to how residual expert disagreement is described.",
+ "confidence": "medium",
+ "notes": "Cited in the May paper only in Appendix K.2 (L2283) and in the January 2026 rebuttal, not in Related Work. The K.2 analysis it supported (1-5 ratings, alpha against AC2) belongs to the May certification, which the Layer 2 certification has replaced (state brief section 1), so the sentence will not carry over as written. Keep Plank only if the revised appendix discusses residual expert disagreement, and then pair it with evidence (for example, how the 45 unmatched hand checks of round 1, 459 of 504 matched, were resolved) rather than using it in place of evidence. Drop it otherwise."
+}

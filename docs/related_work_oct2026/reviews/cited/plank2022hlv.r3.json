@@ -1,0 +1,31 @@
+{
+ "key": "plank2022hlv",
+ "reviewer": "r3",
+ "read": "full: pp. 1-6 (abstract, introduction, data, modeling and evaluation sections with their open issues, conclusions, limitations, ethics); references and the dataset appendix skimmed.",
+ "title_confirmed": true,
+ "venue_now": "EMNLP 2022 (main conference), pp. 10671-10682 (page 1 header)",
+ "what_it_is": "A position paper arguing that variation among human annotators is often genuine signal rather than noise, and that it affects data collection, modelling and evaluation (p. 1). It defines human label variation (HLV) as plausible variation in annotation, arising from instance ambiguity, annotator uncertainty, genuine disagreement or several correct answers, and separates it from annotation errors such as attention slips (p. 2). It surveys methods that resolve or embrace such variation, urges the release of un-aggregated labels, names teasing apart errors from signal as an open and largely overlooked problem, and argues for evaluation beyond single gold labels (pp. 3-5).",
+ "domain": "NLP annotation and evaluation methodology (position paper)",
+ "size": "n/a (position paper; a repository of datasets with un-aggregated labels, p. 5 and appendix)",
+ "source_of_items": "n/a",
+ "instances": "n/a",
+ "has_gold_traces": "n/a",
+ "evaluation": "n/a (argues for soft-label and annotator-aware evaluation, p. 5)",
+ "human_validation": "n/a",
+ "contamination_measures": "n/a",
+ "engtrace_use": {
+  "sentence": "The residual one-point variation reflects Human Label Variation (Plank, 2022): rater-specific judgments on pedagogical style and edge-case parameter realism inherent to subjective expert evaluation. (S-K, May Appendix K.2, L2280-2286)",
+  "verdict": "imprecise",
+  "explanation": "The concept is attributed correctly: Plank argues that variation arising from subjectivity or several plausible answers is genuine rather than noise (pp. 1-2), which fits one-point differences in experts' 1-5 ratings of pedagogical clarity. The sentence goes further than the paper allows in two ways. It asserts that the variation is HLV, whereas Plank separates HLV from annotation error (p. 2) and calls teasing the two apart an open, largely overlooked problem (p. 4); the appendix shows the differences are small (none above one point), not that they are not errors. And it extends HLV to 'edge-case parameter realism', a physical-plausibility judgement, without showing that those cases are genuinely ambiguous: Plank presents a single ground truth as sensible where annotators highly agree on a factual answer (p. 1), and physical plausibility is closer to that case than pedagogical style is. Plank's further point, that such variation should be kept and reported through un-aggregated labels (p. 3), is not what the May text uses it for (supporting the claim that agreement is strong)."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "Residual one-point differences on the subjective quality dimensions are consistent with human label variation, plausible disagreement that is not necessarily error (Plank, 2022), although the ratings alone cannot separate the two.",
+ "facts_to_cite": [
+  "Human label variation is plausible variation in annotation, due to instance ambiguity, annotator uncertainty, genuine disagreement or several correct options (p. 2).",
+  "Annotation errors, such as attention slips, are distinct from HLV (p. 2), and separating errors from signal is an open challenge (p. 4).",
+  "Plank recommends releasing annotator-level (un-aggregated) labels (p. 3) and evaluating beyond hard gold labels (p. 5)."
+ ],
+ "overlap_with_engtrace": "Methodological only: it bears on how EngTrace reports residual disagreement among its expert raters. None of the five benchmark features apply, and it has no role in the Related Work section.",
+ "confidence": "medium",
+ "notes": "Confidence is medium on the verdict only (accurate and imprecise are both defensible; the facts are clear). The May Appendix K.2 passage analyses 1-5 ordinal ratings from the May certification (three experts per branch). The brief's current certification is Layers 0-2, whose Layer 2 reports expert verdicts and hand checks with AC1 0.914 and Fleiss 0.589 in round 1 (engtrace_state_brief.md section 1), so the sentence has no direct counterpart unless the revised appendix again analyses ordinal ratings. If the revised paper attributes residual disagreement on step labels (e.g. X1's Fleiss kappa 0.781 on steps) to HLV, the caution is stronger still: step correctness in a calculation is closer to the factual case in which Plank treats a single ground truth as sensible (p. 1), and she notes that some disagreement is labelling error (p. 1). review_batches_cited.md says the rebuttals also cite Plank; I did not read the rebuttals."
+}

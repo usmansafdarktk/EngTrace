@@ -1,0 +1,34 @@
+{
+ "key": "qiu2025phybench",
+ "reviewer": "r2",
+ "read": "partial: pp. 1-10 in full (abstract, introduction, related work, benchmark curation, EED metric, experiments, error analysis, conclusion and limitations); appendix index (p. 13), A.1 (p. 14), B.2-B.3 (p. 20), G.1-G.3 (pp. 27-28). Not read: appendices A.2-A.3, B.1, C-F, H, references",
+ "title_confirmed": true,
+ "venue_now": "not shown in the text: the file is arXiv 2504.16074v2, 18 May 2025, marked 'Preprint. Under review.' (p. 1); cited_set_resolution.md records NeurIPS 2025 Datasets and Benchmarks Track (poster)",
+ "what_it_is": "A static benchmark of 500 original physics problems, adapted from exercises for human learners by 178 Peking University physics students and kept from 757 after expert review and a test by 81 students, 50 of them Chinese Physics Olympiad gold medallists (pp. 4-5). Each problem asks for one symbolic expression for a target quantity; equations and floating-point answers are not accepted (p. 4). Answers are scored by binary accuracy and by the EED Score, a model-free expression-tree edit distance that gives partial credit (pp. 5-6). Of 16 models, the best, Gemini 2.5 Pro, reaches 36.9% accuracy against 61.9% for the human experts (pp. 1, 6).",
+ "domain": "physics from high school to olympiad level: mechanics, electromagnetism, thermodynamics, optics, modern and advanced physics (pp. 2-3)",
+ "size": "500 problems (from 757 reviewed); 16 models (14 through APIs, 2 run locally); a human baseline of 81 students and 559 answer sheets (pp. 5-6)",
+ "source_of_items": "expert-written: adapted from physics exercises (non-public and public sources not easily found online) by 178 Peking University physics students, with multi-round expert review (pp. 4-5)",
+ "instances": "static",
+ "has_gold_traces": "partial: reference solutions exist (a full solution averages about 3,000 characters, and truncated ones are used in the chain-of-thought poisoning test), but scoring uses only the final expression (pp. 10, 20, 27)",
+ "evaluation": "expression-level metric on the final answer: binary accuracy by symbolic equivalence, and the EED Score (SymPy expression trees, extended Zhang-Shasha edit distance: 100 for an exact match, 60 - 100r for a relative distance 0 < r < 0.6, otherwise 0) (pp. 5-6)",
+ "human_validation": "Each problem went through multi-round expert review, with LLM outputs shown to reviewers to expose ambiguity; then 81 students attempted subsets and flagged ambiguity, leaving 500 of 757 problems (pp. 4-5). The human baseline is 61.9 +/- 2.1% accuracy and 70.4 +/- 1.8 EED (p. 6). The EED metric is analysed for sample efficiency and robustness to its parameters (p. 6); no comparison with human grading is reported in the sections read.",
+ "contamination_measures": "original problems adapted from sources 'not easily discoverable through direct internet search or standard references' (p. 4); the items are static",
+ "engtrace_use": {
+   "sentence": "S-P1: 'While UGPhysics (Xu et al., 2025) and PhysReason (Zhang et al., 2025a) effectively test the application of reasoning to natural laws, others target advanced symbolic (Zhang et al., 2025b; Qiu et al., 2025) or qualitative (Wang et al., 2023; Shojaee et al., 2025) understanding.' S-P2: 'Despite this progress, these benchmarks remain confined to theoretical physics, lacking the integrative context of engineering.'",
+   "verdict": "imprecise",
+   "explanation": "S-P1 places PHYBench among benchmarks that target 'advanced symbolic' understanding. The format fits: problems run to olympiad level, and every answer is a single symbolic expression scored by symbolic equivalence and an expression-tree edit distance (pp. 1, 4-6). But the paper's own target is 'physical perception and reasoning' in 'realistic physical scenarios' (pp. 1, 4), and its error analysis finds over 90% of reasoning errors to be semantic rather than symbolic (Table 2, pp. 8-9), so 'symbolic understanding' describes the answer format rather than what the benchmark tests. S-P2's 'theoretical physics' is loose for high-school-to-olympiad problems across mechanics, electromagnetism, thermodynamics and optics (p. 3); 'physics, not engineering' is right. The closing outcome-matching claim (S-E3) holds: the authors state that EED 'does not capture the full reasoning process' (p. 10)."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "PHYBench (Qiu et al., 2025) adapts 500 physics problems, from high-school to olympiad level, so that each answer is a single symbolic expression, and grades it with an expression-tree edit distance that gives partial credit; its authors note that this scores only the final expression because physics solution paths are often non-unique.",
+ "facts_to_cite": [
+  "500 original problems, from high-school to olympiad level, adapted by 178 Peking University physics students and kept from 757 after expert review and a test by 81 students (pp. 4-5).",
+  "Each answer is a single symbolic expression; equations and floating-point approximations are not accepted (p. 4).",
+  "Answers are scored by accuracy and by the EED Score, an expression-tree edit distance with partial credit, which the authors report improves sample efficiency by 204% (pp. 1, 5-7).",
+  "The best model, Gemini 2.5 Pro, reaches 36.9% accuracy against a human-expert baseline of 61.9% (p. 6).",
+  "The authors state that EED 'does not capture the full reasoning process' and that physics 'solution paths are often non-unique, making it challenging to define a single canonical trace for evaluation' (pp. 10, 20).",
+  "Over 90% of first errors fall in reasoning rather than physical perception, and over 90% of those are semantic rather than symbolic (Table 2, pp. 8-9)."
+ ],
+ "overlap_with_engtrace": "Shares: rule-based, model-free scoring (SymPy) and a human-expert baseline; interest in where reasoning first goes wrong (first-mistake localisation on 50 problems, pp. 8-9) and in injected errors (a chain-of-thought poisoning test that corrupts a truncated reference solution, pp. 8-9, 27-28; it tests whether models notice, not whether an evaluator does, unlike EngTrace's planted defects). Lacks: generated instances (static originals); step-level scoring (final expression only); engineering domain; numerical answers with units (symbolic answers only). Its argument that physics has no single canonical trace (p. 20) is the objection EngTrace's template-computed, order-free milestones are designed to meet.",
+ "confidence": "medium",
+ "notes": "The verdict turns on reading 'symbolic' as the answer format (accurate) or as what the benchmark targets (not what the paper says); another reviewer could reasonably call S-P1 accurate for this paper. The May reference list misprints the three named first authors against p. 1 ('Siyu' for Shi Qiu, 'Shuo' for Shaoyang Guo, 'Ze-Yu' for Zhuo-Yang Song) and gives arXiv rather than the NeurIPS 2025 version."
+}

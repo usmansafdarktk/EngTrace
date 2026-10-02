@@ -1,0 +1,34 @@
+{
+ "key": "zhang2020bertscore",
+ "reviewer": "r1",
+ "read": "full: pages 1-9 (abstract, introduction, prior metrics, method, experimental setup, results, robustness, discussion); appendix (p.12-43) skimmed, with A (qualitative analysis, p.15-16) and D (text compression, p.21) read in full",
+ "title_confirmed": true,
+ "venue_now": "ICLR 2020 (page 1 header 'Published as a conference paper at ICLR 2020'); arXiv 1904.09675v3, 24 Feb 2020 (p.1 footer)",
+ "what_it_is": "An automatic evaluation metric for text generation: each candidate token is matched greedily to the most similar reference token by cosine similarity of contextual embeddings, and vice versa, giving recall, precision and F1, optionally idf-weighted (p.1, p.4). It is validated by correlation with existing human judgments on WMT18 machine translation (149 systems, 14 language pairs) and the COCO 2015 captioning challenge (12 entries), by model-selection accuracy, and by AUC on adversarial paraphrase detection (QQP, PAWS) (p.5-9). It correlates with human judgments better than the metrics it is compared with, at system and segment level (p.7).",
+ "domain": "text-generation evaluation: machine translation, image captioning, paraphrase detection",
+ "size": "outputs of 363 translation and captioning systems (p.1); WMT18: 149 systems, 14 language pairs (p.5), with WMT16-17 adding 202 systems (p.6); COCO 2015: 12 entries (p.6); 667 PAWS-QQP and 5,000 QQP items, which the paper calls 'sentences' (p.8); 12 contextual embedding models compared (p.5)",
+ "source_of_items": "existing benchmark data with human judgments (WMT16-18 metrics tasks, COCO 2015, QQP, PAWS)",
+ "instances": "static",
+ "has_gold_traces": "no (reference sentences)",
+ "evaluation": "expression-level metric (token-embedding similarity to a reference); the metric's own quality is measured as correlation with human judgments (Pearson, Kendall), Hits@1 model selection and paraphrase AUC (p.5-8)",
+ "human_validation": "no new human study; the WMT and COCO human judgments serve as ground truth (p.5-6)",
+ "contamination_measures": "none (not applicable to a metric)",
+ "engtrace_use": {
+  "sentence": "We employ BERTScore (Zhang et al., 2020) to measure deep semantic similarity via contextual embedding alignment, and ROUGE-2 (Lin, 2004) to quantify lexical overlap. (sec. 4.3, May L469-471)",
+  "verdict": "accurate",
+  "explanation": "BERTScore computes the similarity of a candidate to a reference from a greedy alignment of contextual token embeddings (p.1, p.4), and its stated aim is semantic equivalence rather than surface overlap (p.1), so 'deep semantic similarity via contextual embedding alignment' is a fair gloss. The sentences around it are not supported by this paper. Section 4.3 says the metrics evaluate 'fluency' and, together, 'the model's ability to employ appropriate domain-specific terminology' (May L466-474). BERTScore was validated against human judgments of translations and captions (p.5-8); its only grammar evidence is that precision correlates with human grammar judgments on a text-compression set (p.21); and its authors report that it 'finds it difficult to detect factual errors', scoring Tuesday-for-Monday as similar and failing to equate 5 ft 11 in with 1.80 metres (p.16). For engineering solutions, where a wrong number or unit is the error that matters, that limitation is the relevant fact."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "BERTScore (Zhang et al., 2020) scores similarity to a reference by aligning contextual token embeddings, and its authors report that it struggles to detect factual errors such as a wrong weekday and does not equate 5 ft 11 in with 1.80 m; EngTrace therefore checks values against the template's own computation rather than wording against the gold solution.",
+ "facts_to_cite": [
+  "BERTScore matches each candidate token to the most similar reference token, and vice versa, by cosine similarity of contextual embeddings, giving recall, precision and F1, optionally idf-weighted (p.4).",
+  "It was validated on WMT18 machine translation (149 systems, 14 language pairs), COCO 2015 captioning (12 entries) and adversarial paraphrase detection (p.5-8); 363 systems' outputs in all (p.1).",
+  "It correlated with human judgments better than the compared metrics at system and segment level (p.7).",
+  "Its authors report that it finds factual errors hard to detect (e.g. Tuesday for Monday) and fails to recognise that 5 ft 11 in equals 1.80 metres (p.16).",
+  "Raw scores fall in a narrow range in practice; the authors propose a linear baseline rescaling that improves readability and leaves ranking and correlation unchanged (p.5).",
+  "No single configuration outperforms all others; for English the authors recommend F1 computed with 24-layer RoBERTa-large (p.7, p.9)."
+ ],
+ "overlap_with_engtrace": "Nothing structural: a reference-similarity metric validated on translation and captioning, with no reasoning, steps, numbers or engineering content, no generated instances and no expert validation of its own (it uses the WMT and COCO judgments). Its relevance to EngTrace is historical: the May paper reported it as a textual-quality metric (Table 1), its own Table 12 found ROUGE-L / BERTScore aligned with experts at rho 0.325 (May L3067-3069), and the pilot's BERTScore spanned only 0.866 to 0.882 (state brief sec. 5). That narrow band is consistent with the limited range of raw scores the paper notes (p.5); whether EngTrace rescaled is not recorded in the files read here.",
+ "confidence": "high",
+ "notes": "Batch V question: BERTScore has no role in the current evaluator (deterministic answer check, E3 milestones, E4 digit rule, residual judge; state brief sec. 2), and the plan keeps ROUGE and BERTScore 'in an appendix if at all' (state brief sec. 5). So S-V3 should leave the evaluation-framework section. Keep this citation only (a) where an appendix still reports BERTScore numbers, where the citation is then required, and/or (b) in one clause explaining why similarity to a reference was dropped, citing the authors' own limitation (p.16). If neither survives, drop it. Beyond that one clause it has no place in the process-supervision and judge-validity paragraph. The May claim that BERTScore and ROUGE-2 'together ... assess the model's ability to employ appropriate domain-specific terminology' is supported by neither paper and should not return. The May reference entry prints 'Bertscore' without capitals (citation map C15h)."
+}

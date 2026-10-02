@@ -1,0 +1,38 @@
+{
+ "key": "trashchenkov2026psab",
+ "reviewer": "r1",
+ "read": "full",
+ "title_confirmed": true,
+ "venue_now": "arXiv 2606.20950v2, 2 July 2026, cs.AI (p.1); single author; no venue",
+ "what_it_is": "An executable benchmark for power-engineering agents: 41 task families in eight areas (network analysis, short circuit and protection, stability and grid code, distributed resources, microgrids and dispatch, reliability and restoration, power quality and standards, forecasting) (p.1, p.7). An agent reads a structured task file and writes a structured JSON solution; a deterministic evaluator recomputes the engineering quantities, checks the hard constraints and returns a feasibility flag, a score normalised to the reference optimum and a list of violations, while the agent's explanation is recorded but not scored (p.2, p.5, p.8). The public split has one case per family; held-out cases are produced on demand by a per-family generator that redraws a public case's numbers under a private seed, so the generator can be inspected while the instances stay private (p.6-7). Three command-line agents and a grid of four models under two harnesses are evaluated (p.9, p.12).",
+ "domain": "engineering: electric power systems (p.1, p.7)",
+ "size": "41 task families, one public case each and one held-out case per family per round (p.10, p.12); 328 generated variants used to validate the generator (p.11); 3 reference agents plus 4 models under 2 harnesses (p.9, p.12)",
+ "source_of_items": "author-built compact cases adapted from standards, textbook methods and papers, each with a provenance entry and a declared confidence level: 11 high, 28 medium, 2 low (p.7-8)",
+ "instances": "generated for the held-out split: per-family generators redraw a public case's numerical content under a private seed and keep a draw only if the reference solver solves it (p.6-7); the public split is static",
+ "has_gold_traces": "no: reference solvers compute the optimum that normalises the score (p.8); no reasoning is scored (the rationale is excluded, p.2)",
+ "evaluation": "deterministic, executable evaluator: recomputed quantities within a 0.1% relative band with a small absolute floor, the optimality gap for control and optimisation tasks, exact sets for classification and localisation, pass/fail for standards compliance; feasible rate, perfect rate and mean score per run (p.8-9)",
+ "human_validation": "Each task was checked for physical correctness against its cited source before inclusion (p.7); three evaluators are cross-checked against golden cases derived by hand (p.9); reading unanimous agent failures as likely defects exposed specification errors and an off-by-one evaluator bug that self-consistency checks had missed (p.11). No inter-rater statistics.",
+ "contamination_measures": "private-seed generator for the held-out split, with only aggregate held-out results published (p.1, p.6-7); public and held-out scores reported as broadly consistent (p.10)",
+ "engtrace_use": {
+   "sentence": null,
+   "verdict": "n/a",
+   "explanation": "Belongs in: the engineering paragraph, or the introduction where contamination resistance is argued. Candidate, not cited in the May paper. Relevant because the revised EngTrace pool is drawn from a private 128-bit seed with only per-item hashes committed (state brief, D-114): this paper uses the same idea (generator inspectable, instances private) in one engineering area, so the revision should present private-seed generation as shared practice, not as new."
+ },
+ "recommendation": "add (should)",
+ "suggested_wording": "In power engineering, the Power Systems Agent Benchmark (Trashchenkov, 2026) scores agents' structured solutions to 41 task families with deterministic evaluators that recompute the engineering quantities, and draws held-out cases from per-family generators with private seeds to limit contamination; it scores outcomes, not reasoning.",
+ "facts_to_cite": [
+   "41 task families in eight areas of power engineering (p.1, p.7)",
+   "agents return structured solutions; deterministic evaluators recompute the engineering quantities and check hard constraints, returning a feasibility flag, a score normalised to the reference optimum and a list of violations (p.1, p.8)",
+   "the agent's natural-language explanation is recorded but excluded from scoring (p.2)",
+   "exact computations are scored within a 0.1% relative band (p.8-9)",
+   "held-out cases are synthesised on demand by per-family generators from private seeds by redrawing a public case's numbers; only aggregate held-out results are published (p.1, p.6-7)",
+   "families rated for traceability to a standard or textbook: 11 high, 28 medium, 2 low (p.8)",
+   "the evaluators are compact deterministic surrogates; none invokes a full power-system simulator (p.6, p.12)",
+   "three command-line agents (Codex with gpt-5.5, Cursor with composer-2.5, OpenCode with deepseek-v4-flash-free) reach mean scores of 0.951-0.973 on the public split and 0.973-1.000 on held-out cases (p.9-10)",
+   "a unanimous agent failure exposed an evaluator bug that a reference solver sharing the evaluator's code could not catch (p.11)",
+   "one case per family per split and one run per agent configuration (p.12-13)"
+ ],
+ "overlap_with_engtrace": "Shares: an engineering domain (power systems; EngTrace's electrical branch covers digital communications, electromagnetics and signals, not power); generated held-out instances from a private seed (p.6-7), the closest precedent found for EngTrace's private-seed pool; deterministic recomputation of engineering quantities within a numeric tolerance (p.8-9). Lacks: reasoning traces and any step-level evaluation (the rationale is excluded, p.2); gold intermediate values; evaluator validation beyond three hand-derived golden cases (p.9); multi-branch scope; statistical depth (one case per family per split, single runs, p.12-13). Different object: agents' structured decisions, not reasoning traces. What EngTrace adds: trace-level checks of code-computed milestones and per-claim arithmetic, an evaluator validated against 15 experts, five branches, and 15 instances per template.",
+ "confidence": "medium",
+ "notes": "(1) The web search note keys this paper as 'trashchenkov2026powersystemsagent' (search_engineering_web.md:176), a key that appears in no catalogue; the catalogue and batch key is trashchenkov2026psab, and engineering_web.json has no entry for it. (2) Single-author arXiv preprint; the file is v2 (2 July 2026, p.1); the web note gives v1 as 18 June 2026. (3) It is an agent benchmark, and the strongest agents are near the ceiling (Codex and Cursor 0.973 public, 0.995 and 1.000 held-out, p.10), so it offers no reasoning comparison. (4) Its caution that a reference answer derived from the evaluator's own code cannot certify the evaluator (p.9, p.11, p.13) applies to EngTrace's gold-from-template-code design, which the Layer 0-2 certification addresses; worth a sentence in Limitations. (5) I rate it should, not must: a reviewer would not necessarily expect a single-author agent benchmark in power systems, but it becomes must if the revision presents the private seed as a contribution."
+}

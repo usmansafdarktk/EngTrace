@@ -1,0 +1,33 @@
+{
+ "key": "zhao2023survey",
+ "reviewer": "r1",
+ "read": "partial: abstract and introduction (pp1-4); section 7 'Capacity and Evaluation' with 7.1.3 Complex Reasoning (pp60-61) and 7.3 Benchmarks and Evaluation Approaches (pp63-66) in full and 7.1.1 skimmed (pp56-58); 8.1 'LLM for Evaluation' (pp76-77); 8.2 'LLM for Specific Domains' (pp77-78); conclusion (pp96-97); process-supervised RLHF (pp39-40); the rest of the 144 pages searched by keyword (engineering, high-stakes, safety-critical, contamination, process supervision)",
+ "title_confirmed": true,
+ "venue_now": "arXiv preprint 2303.18223; this text is v19 of 18 Mar 2026, marked 'Version: v18 (major update on March 7, 2026)' (p1). Not peer-reviewed; the page numbers below refer to this version.",
+ "what_it_is": "A long, continuously updated survey of large language models, organised around pre-training, post-training and adaptation, utilization, capacity evaluation, applications and advanced topics (p1, p4). Its evaluation section groups abilities into basic ones (language generation, knowledge utilization, complex reasoning) and advanced ones (human alignment, interaction with environments, tool use), lists representative benchmarks (p57 Table 14), and discusses benchmark-based, human-based and model-based evaluation with their weaknesses, including data contamination and LLM-judge biases (pp63-66). It introduces no benchmark relevant to EngTrace.",
+ "domain": "survey of LLMs (general)",
+ "size": "n/a (survey; 144 pages in this text)",
+ "source_of_items": "n/a",
+ "instances": "n/a (not a benchmark)",
+ "has_gold_traces": "n/a (not a benchmark)",
+ "evaluation": "n/a (reviews benchmark-based, human-based and model-based evaluation, pp63-66)",
+ "human_validation": "n/a",
+ "contamination_measures": "n/a; it names data contamination as a growing problem for benchmark-based evaluation (p65) and 'a severe issue for fairly assessing the performance of LLMs' (p96).",
+ "engtrace_use": {
+  "sentence": "As LLMs expand into high-stakes engineering workflows, rigorous evaluation of their reasoning capabilities has become paramount (Zhao et al., 2023; Xie et al., 2023a). (L45-48)",
+  "verdict": "imprecise",
+  "explanation": "The survey supports the general point that evaluating LLM abilities, complex reasoning among them, is a central research problem (section 7, pp55-66), and that applying LLMs to real-world tasks requires ensuring the accuracy of their output (p78). It says nothing about engineering workflows of the kind EngTrace tests, or about high stakes: 'engineering' occurs for LLM development, feature, instruction and prompt engineering (e.g. p3) and for software engineering as a multi-agent application (p80); its application domains are healthcare, education, law, finance and scientific research, plus software development (pp77-78). No chemical, civil, electrical, industrial or mechanical engineering use is discussed. The citation is a generic anchor for an engineering-specific premise."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "LLMs can reach a correct answer through an invalid reasoning path, or a wrong answer after a correct one (Zhao et al., 2023), so final-answer accuracy alone does not certify the reasoning behind it.",
+ "facts_to_cite": [
+  "Under 'reasoning inconsistency', LLMs 'may generate the correct answer following an invalid reasoning path, or produce a wrong answer after a correct reasoning process' (p61).",
+  "LLMs still struggle with numerical computation, especially with numbers rarely seen in pre-training; remedies include external tools and digit-level tokenization (p61).",
+  "Data contamination, test data or related content contained in pre-training corpora, 'has become increasingly severe since more and more open data has been collected' (p65) and is 'a severe issue for fairly assessing the performance of LLMs' (p96).",
+  "Model-based (LLM-judge) evaluation suffers from position, verbosity and self-enhancement bias, and LLMs 'cannot serve as qualified evaluators for some difficult tasks (e.g., mathematical reasoning)' (pp65-66).",
+  "Current LLM-based evaluators 'might not be adequate for evaluating top-tier LLMs or complex tasks', because even the most advanced LLMs struggle to identify their reasoning or factual errors without external feedback (p77)."
+ ],
+ "overlap_with_engtrace": "None as a benchmark. Several of its observations are what EngTrace measures: reasoning inconsistency (p61) corresponds to X1's 93 of 228 correct-answer traces that contain an incorrect step; the numerical-computation weakness (p61) to the 175 of those 178 incorrect steps that are calculation slips; and the limits of LLM judges on hard reasoning (pp65-66, p77) to EngTrace's design of deterministic checks plus a residual judge validated against experts (state brief sections 2 and 3).",
+ "confidence": "high",
+ "notes": "The survey is revised continuously (this is v19, March 2026): cite the arXiv identifier with the version or year used, since content and page numbers change between versions. For the judge-validity paragraph, primary sources are preferable to the survey (e.g. MT-Bench for position, verbosity and self-enhancement bias, which the survey cites as [729] on pp65-66). For the opening sentence, the reworded use (reasoning inconsistency, p61) lets the citation earn its place; as support for 'high-stakes engineering workflows' it does not."
+}

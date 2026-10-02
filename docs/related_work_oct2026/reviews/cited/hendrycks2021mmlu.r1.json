@@ -1,0 +1,34 @@
+{
+ "key": "hendrycks2021mmlu",
+ "reviewer": "r1",
+ "read": "full: pp.1-14 (abstract, introduction, related work, the test, experiments, discussion, appendices A-B including B.2 on contamination); task table and per-task examples (pp.15-27) skimmed",
+ "title_confirmed": true,
+ "venue_now": "ICLR 2021 (page header 'Published as a conference paper at ICLR 2021', p.1); arXiv:2009.03300v3, 12 Jan 2021 (p.1)",
+ "what_it_is": "MMLU is a multitask test of 57 subjects (STEM, humanities, social sciences, other) posed as four-option multiple-choice questions, built to measure knowledge acquired in pretraining in zero- and few-shot settings (p.1, p.3). Graduate and undergraduate students manually collected 15,908 questions from freely available sources such as GRE and USMLE practice questions, undergraduate course questions and Oxford University Press reader questions; the test split has 14,079 questions and every subject at least 100 (p.3). Scoring is classification accuracy on the highest-probability option (pp.5-6). The paper evaluates GPT-3 (four sizes), UnifiedQA, RoBERTa-base, ALBERT-xxlarge and GPT-2; the largest GPT-3 reaches 43.9% few-shot and does worst on calculation-heavy STEM subjects (pp.5-7).",
+ "domain": "general academic and professional knowledge, 57 subjects; engineering appears only as the Electrical Engineering subject (circuits, power systems, electrical drives) (p.6 Figure 6; p.15 Table 2)",
+ "size": "15,908 questions: 5 per subject for few-shot development, 1,540 validation, 14,079 test (p.3); 57 subjects; models: GPT-3 Small/Medium/Large/X-Large, UnifiedQA, RoBERTa-base, ALBERT-xxlarge, GPT-2 (p.5)",
+ "source_of_items": "exams and course materials: practice questions for tests such as the GRE and USMLE, undergraduate course questions and Oxford University Press reader questions, collected manually by students from free online sources (p.3)",
+ "instances": "static",
+ "has_gold_traces": "no: each item has four options and one correct letter (p.2 Figure 1a; p.6)",
+ "evaluation": "multiple choice: accuracy of the highest-probability option among A-D (pp.5-6); calibration also measured (p.7)",
+ "human_validation": "No item validation or agreement statistics are reported. Human reference points only: Amazon Mechanical Turk workers score 34.5%, and expert-level accuracy is estimated at about 89.8% from 95th-percentile exam takers, partly by educated guess (p.3).",
+ "contamination_measures": "post-hoc check only: App. B.2 finds accuracy not positively correlated with question entropy, suggesting the exact questions were not memorized, notes that most questions came from PDFs or websites with answers on separate pages, and promises a list of question sources (pp.13-14)",
+ "engtrace_use": {
+  "sentence": "S-E1 (L182-190): 'Generalist suites like MMLU (Hendrycks et al., 2021a), BIG-Bench (Luo et al., 2024), and SuperGPQA (Du et al., 2025) restrict assessment to factual recall via multiple-choice questions, ...'; also S-I3a (L105-111): 'general knowledge benchmarks (e.g., MMLU (Hendrycks et al., 2020)) test broad factual recall'",
+  "verdict": "imprecise",
+  "explanation": "The multiple-choice part is right: every MMLU item is a four-option question scored by the chosen option (p.2, pp.5-6). 'Factual recall' is loose: the paper says the test requires 'extensive world knowledge and problem solving ability' (p.1), that STEM subjects need 'procedural knowledge' (p.5), and that models do worst on 'calculation-heavy STEM subjects' (p.6). Its knowledge orientation is real (it measures 'knowledge acquired during pretraining', p.1), so the gist holds for both sentences. The two in-text keys (2020 and 2021a) are one paper: the arXiv v3 in the file carries the ICLR 2021 header (p.1)."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "Generalist suites such as MMLU (Hendrycks et al., 2021), whose 57 subjects include a single electrical-engineering task, pose four-option multiple-choice questions and score only the selected option.",
+ "facts_to_cite": [
+  "57 subjects across STEM, the humanities, the social sciences and other areas, from elementary to professional level (p.1, p.3)",
+  "15,908 questions collected manually by graduate and undergraduate students from freely available sources, including GRE and USMLE practice questions; test split 14,079, at least 100 per subject (p.3)",
+  "every item is four-option multiple choice, scored by the highest-probability option (p.2, pp.5-6)",
+  "the only engineering subject is Electrical Engineering (circuits, power systems, electrical drives) (p.6 Figure 6; p.15 Table 2)",
+  "the test is meant to require 'extensive world knowledge and problem solving ability' (p.1); models were weakest on calculation-heavy STEM subjects (pp.6-7)",
+  "evaluated zero-shot and few-shot; the 175B GPT-3 reached 43.9% few-shot (p.2, p.6)"
+ ],
+ "overlap_with_engtrace": "Shares: a STEM component with calculation questions, including one Electrical Engineering subject (p.15). Lacks: generated instances (static, publicly sourced questions, p.3); gold traces (answers only); step-level evaluation (only the chosen option is scored, pp.5-6); breadth in engineering (one subject); evaluator validation is moot because scoring is option matching.",
+ "confidence": "high",
+ "notes": "Merge the duplicate reference entries (Hendrycks et al. 2020, arXiv:2009.03300, and 2021a, ICLR) into one ICLR 2021 entry; per citation_context_map C5 this also turns MATH's '2021b' into '2021'. MMLU's App. B.2 (pp.13-14) is an early contamination check, usable if the introduction discusses memorization."
+}

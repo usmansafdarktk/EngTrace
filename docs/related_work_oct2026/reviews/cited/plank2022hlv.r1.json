@@ -1,0 +1,33 @@
+{
+ "key": "plank2022hlv",
+ "reviewer": "r1",
+ "read": "full (abstract, introduction, sections 2-4 on data, modeling and evaluation, conclusions, limitations and ethics, pp1-6; dataset appendix skimmed)",
+ "title_confirmed": true,
+ "venue_now": "Proceedings of EMNLP 2022, pages 10671-10682 (p1 header)",
+ "what_it_is": "A position paper arguing that variation among annotators' labels is often not noise but information, and that treating a single aggregated gold label as ground truth distorts data, modeling and evaluation (pp1-2). It defines human label variation (HLV) as 'plausible variation in annotation', arising from instance ambiguity, annotator uncertainty, genuine disagreement or multiple correct answers, as distinct from errors such as attention slips (p2). It surveys methods that resolve variation (aggregation, filtering) or embrace it (learning from un-aggregated labels, soft-label evaluation) (pp3-5), urges releasing annotator-level labels (p3), and provides a repository of datasets with un-aggregated labels (p5 and appendix).",
+ "domain": "NLP annotation, modeling and evaluation methodology (position paper)",
+ "size": "n/a (position paper; dataset repository in the appendix)",
+ "source_of_items": "n/a",
+ "instances": "n/a (not a benchmark)",
+ "has_gold_traces": "n/a (not a benchmark)",
+ "evaluation": "n/a (argues for evaluation beyond hard labels, e.g. soft-label metrics; p5)",
+ "human_validation": "n/a",
+ "contamination_measures": "n/a",
+ "engtrace_use": {
+  "sentence": "The residual one-point variation reflects Human Label Variation (Plank, 2022): rater-specific judgments on pedagogical style and edge-case parameter realism inherent to subjective expert evaluation. (Appendix K.2, L2281-2285; also used in the rebuttals)",
+  "verdict": "imprecise",
+  "explanation": "The gist is supported: subjectivity and plausible alternative judgements are canonical sources of HLV (pp1-2), and one-point differences on a 1-5 rating of pedagogical clarity are the kind of variation Plank describes. But the May text asserts that the variation 'reflects' HLV without separating it from error, which Plank calls an open challenge ('to tease apart errors from signal', p4); and the preceding sentence contrasts the pattern with 'genuine annotator disagreement' (L2281), whereas Plank lists genuine disagreement as one source of HLV (p2). Plank's thesis is that such variation is information to keep (pp1-2, p5), not a reason to set it aside."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "Where experts differed by one point on a subjective dimension, the difference may reflect plausible human label variation rather than error (Plank, 2022).",
+ "facts_to_cite": [
+  "Human label variation is 'plausible variation in annotation', arising from instance ambiguity, annotator uncertainty, genuine disagreement or multiple correct answers; errors such as attention slips are distinct (p2).",
+  "Relying on a single aggregated gold label assumes a ground truth that often does not exist, especially when language is involved (p1).",
+  "Separating annotation errors from genuine variation is an open challenge (p4).",
+  "Plank urges releasing annotator-level (un-aggregated) labels and documenting the annotation process (p3).",
+  "Evaluation against hard gold labels alone can mislead; soft-label metrics compare model outputs with the human label distribution (p5)."
+ ],
+ "overlap_with_engtrace": "Concerns EngTrace's human evaluation, not its benchmark design: expert certification (Layer 2 round 1: AC1 0.914, Fleiss 0.589) and the X1 expert labels (Fleiss kappa 0.781 on steps, 0.880 on milestones, 0.966 on answers) (state brief sections 1 and 3). It offers a vocabulary for residual disagreement, not evidence about any of EngTrace's labels.",
+ "confidence": "medium",
+ "notes": "The May use belonged to the old Stage 2 ordinal ratings (Appendix K.2), and the state brief treats the May figures as history. Keep the citation only if the revised appendices again interpret residual disagreement on a subjective dimension, and then hedge ('may reflect'). Do not use it for disagreement on objective labels, such as whether a step's arithmetic is wrong or whether a template has a defect: by Plank's own distinction (p2), a missed defect or a slip is error, not variation. If the paper cites Plank, a reviewer may ask whether annotator-level labels are released, as Plank urges (p3); the text should say plainly what is and is not released."
+}

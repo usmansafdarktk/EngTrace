@@ -1,0 +1,33 @@
+{
+ "key": "xie2023storytelling",
+ "reviewer": "r3",
+ "read": "full: main text pp. 1-9 (abstract, introduction, related work, experimental setup, automatic evaluation, human evaluation, plagiarism, discussion, conclusion, limitations, ethics); appendices A-N (pp. 13-29) skimmed by heading (model and dataset details, MTurk setup and agreement, prompts, example and plagiarised generations).",
+ "title_confirmed": true,
+ "venue_now": "INLG 2023 (Proceedings of the 16th International Natural Language Generation Conference), pp. 323-351 (page 1 header)",
+ "what_it_is": "An evaluation study of story generation. GPT-3 (text-davinci-001, prompted with 2-3 example stories) is compared with five fine-tuned story generators (KGGPT2, HINT, PROGEN, MTCL, BART) on ROCStories, WritingPrompts and CNN news stories (pp. 2-4). Stories are scored with reference-based and reference-free automatic metrics and rated by crowdworkers and in-house judges for fluency, coherence, relatedness, logicality and interestingness (pp. 3-6). GPT-3's stories are rated well above the other models' and on a par with or above the human-written ones, and a preliminary check finds that GPT-3 reproduces details of real news stories (pp. 6-8).",
+ "domain": "open-ended story generation in English (short commonsense stories, fiction, news)",
+ "size": "three datasets; 800, 1000 and 600 generation contexts for automatic evaluation on ROC, WP and CNN (p. 3); 320 stories rated by crowdworkers (140/100/80), 3 annotators each, plus an in-house round on 20 disjoint contexts per dataset (pp. 5-6); six generation systems (Table 1, p. 4)",
+ "source_of_items": "existing story datasets (ROCStories, WritingPrompts, CNN) used as generation conditions and as human references (p. 3)",
+ "instances": "static",
+ "has_gold_traces": "no",
+ "evaluation": "automatic text-generation metrics (corpus BLEU, MS-Jaccard, BERTScore, BLEURT, backward BLEU, Self-BLEU, Distinct-3, lexical repetition, BARTScore, length) and human 1-5 ratings on five story aspects (pp. 3-6)",
+ "human_validation": "AMT crowdworkers (3 per story, 320 stories) and in-house university volunteers (3 per story) rated the same five aspects; the two groups' results are reported as consistent (pp. 2, 5-6). No domain experts were used (p. 9).",
+ "contamination_measures": "none as a benchmark. It does check GPT-3's outputs for plagiarism: iThenticate similarity of 4%, 3% and 14% for ROC, WP and CNN, and a manual check found 7 of 10 sampled CNN stories based on real news (p. 7).",
+ "engtrace_use": {
+  "sentence": "As LLMs expand into high-stakes engineering workflows, rigorous evaluation of their reasoning capabilities has become paramount (Zhao et al., 2023; Xie et al., 2023a). (S-I1, May L45-48)",
+  "verdict": "misleading",
+  "explanation": "The paper evaluates story generation. It contains no reasoning task, no engineering task and no discussion of high-stakes use (pp. 1-9). The nearest points of contact are that it calls its own human evaluation rigorous (p. 1) and that one rated story aspect, logicality, is adherence to commonsense (p. 5). The sentence presents it as support for the claim that rigorous evaluation of LLM reasoning has become paramount as LLMs enter engineering workflows, which the paper does not address at all. It is a self-citation (Zhuohan Xie is an author of this paper and of EngTrace, C9), and a reviewer who follows it finds a storytelling study."
+ },
+ "recommendation": "drop",
+ "suggested_wording": "In story generation, lexical-overlap metrics agreed poorly with human ratings, while model-based metrics such as BERTScore and BLEURT came closer to the human verdicts (Xie et al., 2023a).",
+ "facts_to_cite": [
+  "Compares GPT-3 (text-davinci-001, 2-3 in-context example stories) with five fine-tuned story generators on ROCStories, WritingPrompts and CNN stories (pp. 2-4).",
+  "Crowdworkers and in-house judges, 3 per story, rated GPT-3's stories higher than the other systems' and comparable to or better than the human-written ones (pp. 5-6, 8).",
+  "Lexical-overlap metrics correlated weakly with human evaluation; model-based metrics gave conclusions closer to the human ones (pp. 7-8).",
+  "A manual check found 7 of 10 sampled GPT-3 CNN stories based on real news stories, with most details faithful to the originals (p. 7).",
+  "The limitations section names the circularity of using LLMs to evaluate LLM-generated text as the field's next challenge (p. 9)."
+ ],
+ "overlap_with_engtrace": "None of the five features: no generated instances, no gold traces, no step-level evaluation, no engineering domain, no expert validation of an evaluator (it used crowdworkers and volunteers, not domain experts, p. 9). Its only methodological contact is that it checks automatic metrics against human ratings, as the May EngTrace paper did for BERTScore and ROUGE, which the brief now keeps 'in an appendix if at all'.",
+ "confidence": "high",
+ "notes": "Self-citation flagged as C9 in citation_context_map.md. The suggested wording is offered only in case the authors want the paper somewhere (e.g. an appendix explaining why text-similarity metrics were demoted); it has no place in the Introduction or Related Work. Its memorisation finding (p. 7) concerns story generation and adds nothing to EngTrace's contamination argument, which deng2024contamination and the private-pool design cover."
+}

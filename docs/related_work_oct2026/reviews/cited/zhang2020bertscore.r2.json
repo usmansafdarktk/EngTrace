@@ -1,0 +1,35 @@
+{
+ "key": "zhang2020bertscore",
+ "reviewer": "r2",
+ "read": "full (main text pp. 1-9 and Appendices A-F text pp. 15-24 read; the results tables of Appendix F, pp. 25-43, skimmed)",
+ "title_confirmed": true,
+ "venue_now": "ICLR 2020 ('Published as a conference paper at ICLR 2020', page header from p. 1); the file is arXiv 1904.09675v3, 24 Feb 2020.",
+ "what_it_is": "A metric paper introducing BERTScore, a reference-based evaluation metric for text generation: each token of a candidate is matched greedily to its most similar reference token by cosine similarity of contextual embeddings (and vice versa), giving precision, recall and F1, with optional idf weighting and baseline rescaling (p. 1, pp. 3-5). It is validated by correlation with human judgements on WMT16-18 machine translation (system level, segment level and model selection) and the COCO 2015 captioning challenge, using the outputs of 363 systems, and by robustness on adversarial paraphrase detection with PAWS (p. 1, pp. 5-9). It reports stronger correlation than BLEU and other common metrics and recommends F1 computed with RoBERTa-large for English (p. 7, p. 9).",
+ "domain": "automatic evaluation of natural language generation: machine translation, image captioning, paraphrase detection",
+ "size": "Outputs of 363 translation and captioning systems (p. 1): 149 WMT18 systems over 14 language pairs (p. 5), 202 more from WMT16-17 (p. 6) and 12 COCO 2015 entries (p. 6); twelve pre-trained embedding models compared (p. 5); the PAWS-QQP development set of 667 sentences (p. 8).",
+ "source_of_items": "existing metric-evaluation datasets with human judgements (WMT16-18, COCO 2015) and paraphrase datasets (QQP, PAWS) (pp. 5-8)",
+ "instances": "static",
+ "has_gold_traces": "no: gold reference sentences only",
+ "evaluation": "expression-level metric (token-embedding similarity to a reference); the metric itself is evaluated by Pearson and Kendall correlation with human judgements, Hits@1 model selection and AUC on paraphrase detection (pp. 5-8)",
+ "human_validation": "No new human judgements: the paper uses the human scores released with WMT16-18 and COCO 2015 and the labels of QQP and PAWS (pp. 5-8).",
+ "contamination_measures": "none (not relevant)",
+ "engtrace_use": {
+   "sentence": "We employ BERTScore (Zhang et al., 2020) to measure deep semantic similarity via contextual embedding alignment, and ROUGE-2 (Lin, 2004) to quantify lexical overlap. (Section 4.3, L468-472)",
+   "verdict": "accurate",
+   "explanation": "For BERTScore the clause matches the paper: it computes similarity between candidate and reference tokens with contextual embeddings, matching each token to its most similar counterpart (p. 1, p. 4), with the stated goal of evaluating semantic equivalence (p. 1). 'Deep' is the May text's own flourish and 'alignment' is loose for greedy token-to-token matching (p. 4), but the gist is right. The problem is the next sentence, which the citation appears to support: 'Together, these metrics assess the model's ability to employ appropriate domain-specific terminology' (L472-474). The paper validates BERTScore only on translation, captioning and paraphrase detection (pp. 5-8), and its own qualitative analysis says that it 'finds it difficult to detect factual errors' and 'fails to identify that 5ft 11in is equivalent with 1.80 metres' (Appendix A, p. 16). Nothing in the paper concerns terminology or reasoning."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "Embedding-similarity metrics such as BERTScore (Zhang et al., 2020) were validated on translation and captioning, and their authors note that BERTScore has difficulty detecting factual errors and fails to recognise that 5 ft 11 in equals 1.80 m, which is why EngTrace checks the values and units a step states directly.",
+ "facts_to_cite": [
+  "BERTScore matches each candidate token to its most similar reference token (and vice versa) by cosine similarity of contextual embeddings, and combines the matches into precision, recall and F1 (p. 1, p. 4).",
+  "It was validated against human judgements on WMT16-18 translation and COCO 2015 captioning, using the outputs of 363 systems, and on adversarial paraphrase detection with PAWS (p. 1, pp. 5-9).",
+  "In translation it correlates with human judgements better than BLEU and other common metrics (Tables 1-4, pp. 6-7).",
+  "On COCO captioning, recall R_BERT correlates at 0.888 and 0.863 with the two human measures, while F_BERT reaches only 0.322 and 0.350 (Table 5, p. 8).",
+  "Its authors find that BERTScore 'finds it difficult to detect factual errors' (for example Tuesday output for Monday) and 'fails to identify that 5ft 11in is equivalent with 1.80 metres' (Appendix A, p. 16).",
+  "Raw scores occupy a narrower range than cosine similarity's -1 to 1; an optional baseline rescaling improves readability without changing rankings or human correlation (p. 5).",
+  "Published at ICLR 2020 (page header, p. 1)."
+ ],
+ "overlap_with_engtrace": "Shares only reference-based comparison of generated text with a gold reference, which is what the May pipeline used it for. Lacks: any check of numerical values or units (Appendix A, p. 16), step-level or process evaluation, generated instances, gold traces, the engineering domain and domain-expert validation; its human judgements concern translation and caption quality.",
+ "confidence": "high",
+ "notes": "Batch V question: BERTScore says nothing about process supervision or LLM judges. Its bearing on the planned paragraph is negative evidence from its own authors: a reference-similarity metric misses factual errors and unit equivalences (Appendix A, p. 16), which are the errors EngTrace's deterministic checks target (the E4 digit rule; E3's unit factors; state brief section 2). The plan of record removes BERTScore from the main evaluation ('Keep ROUGE and BERTScore in an appendix if at all'; the old Table 12 comparison goes with the n = 100 study; state brief section 5). The revised text may cite it (i) in an appendix that still reports it, and (ii) in at most one clause explaining why similarity to the gold trace is not used as evidence of a correct step. It must not be cited for 'domain-specific terminology' or for reasoning quality. If no appendix keeps the metric and no such clause is written, drop it. Other notes: the pilot's narrow BERTScore range (0.866 to 0.882; state brief section 5) is what raw, un-rescaled scores look like (p. 5; Table 11, p. 22, shows raw F_BERT of 0.85 to 0.94 against 0.61 to 0.71 rescaled), and rescaling does not change rankings (p. 5), so that range alone does not show the metric failed. An appendix should state whether scores were rescaled and which model and layer were used, since the authors find 'no one configuration' best (p. 9). The May reference prints 'Bertscore' (lost capitals; citation map C15h)."
+}

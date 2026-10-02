@@ -1,0 +1,36 @@
+{
+ "key": "chen2025apbench",
+ "reviewer": "r1",
+ "read": "full: pp.1-12 (results, discussion and methods, including data curation, progressive problems, scoring pipeline and curation workflow); references skimmed",
+ "title_confirmed": true,
+ "venue_now": "Scientific Reports 15:7944 (2025), doi:10.1038/s41598-025-91150-5 (p.1 footer); received 10 Dec 2024, accepted 18 Feb 2025 (p.13)",
+ "what_it_is": "APBench (Astrodynamics Problems Benchmark) collects college-level astrodynamics and space-engineering problems with worked solutions from textbooks and other sources, covering two- and three-body problems, orbit determination, maneuver optimization, rendezvous and docking, interplanetary mission planning and perturbations (pp.1-2). Each problem set has shared Content and one or more Questions with Solution, Answer, Format (numeric or message) and Source; problems were extracted with OpenAI-API scripts plus human checks (p.3, pp.10-12). The open APBench has 299 problems in three nested versions (alpha, beta, gamma), and a private APBench of 1,990 problems is withheld for copyright reasons (pp.4-5, p.8). Scoring uses final answers only: numeric answers within an adaptive error margin, message answers by an average of a GPT-4o judge score and embedding similarity (p.2, pp.11-12). Eighteen model configurations were evaluated; o1-preview led with 66.6% on APBench-gamma (p.6).",
+ "domain": "engineering: aerospace, astrodynamics and space engineering (pp.1-2)",
+ "size": "open: 299 problems (Gordon 17, PhD qualifying exam 8, Braeunig 144, Lynnane 130); private: 1,990 problems from eight textbook sources (p.5, Tables 1-2); 18 model configurations (p.6, Table 3)",
+ "source_of_items": "textbooks and course or exam problem sets with worked solutions: open web sources for the open set, published textbooks and a solutions manual for the private set (p.2, p.5)",
+ "instances": "static",
+ "has_gold_traces": "partial: each question stores a step-by-step Solution (p.3, p.10), but evaluation scores only the final Answer (p.2, p.11)",
+ "evaluation": "final answer: numeric answers are correct within an error margin of 0.1 + 0.01 log|answer| (a fixed 0.1 if that falls outside 0-1); message answers score 0.5 x (GPT-4o judge score normalized from 0-10 + all-MiniLM-L6-v2 cosine similarity), correct above 0.6 (pp.11-12); progressive prompting attaches earlier correctly answered sub-questions (p.10)",
+ "human_validation": "Humans intervene in curation (finding extraction patterns, checking question and solution splits, checking format labels; p.12) and examined the data for ethical issues (p.5). The LLM judge and the embedding score are not validated against human judgement.",
+ "contamination_measures": "a canary string (p.5); a private set of 1,990 problems, withheld for copyright reasons rather than contamination (p.4)",
+ "engtrace_use": {
+  "sentence": "S-E1 (L182-190): '... while specialized benchmarks like TransportBench, APBench, and EEE-Bench (Syed et al., 2024; Chen et al., 2025; Cheng et al., 2024; Li et al., 2025; Liu et al., 2025) are siloed within narrow sub-disciplines.'",
+  "verdict": "accurate",
+  "explanation": "APBench is confined to one sub-discipline, astrodynamics for space engineering (pp.1-2), so 'siloed within narrow sub-disciplines' holds. The citation itself is faulty: the authors are Di Wu, Raymond Zhang, Enrico M. Zucchelli, Yongchao Chen and Richard Linares (p.1), so the in-text key should be 'Wu et al., 2025'; the reference list also adds two non-authors (Daniel Jang, Giovanni Lavezzi) and reorders the rest."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "APBench (Wu et al., 2025) gathers textbook astrodynamics problems with worked solutions but scores only final answers, numeric ones within a relative margin of about 10% and the rest with an LLM judge combined with embedding similarity.",
+ "facts_to_cite": [
+  "open APBench: 299 problems from four sources; private APBench: 1,990 problems from eight textbooks (p.5)",
+  "open-ended questions by design, not multiple choice (pp.3-4, p.11)",
+  "each question has a step-by-step Solution, but evaluation focuses on final answers (p.2, p.10)",
+  "numeric answers accepted within an error margin of 0.1 + 0.01 log|answer| (p.11), applied as a relative band in the worked example (Fig. 1, p.2)",
+  "message answers scored by 0.5 x (GPT-4o judge + embedding similarity) with a 0.6 threshold (pp.11-12)",
+  "the authors call their accuracy criteria 'relatively loose' and say the buffer must be tightened (p.6, p.9)",
+  "a canary string to reduce leakage into training corpora (p.5)",
+  "o1-preview best at 66.6% on APBench-gamma; most models below 60% (pp.5-6)"
+ ],
+ "overlap_with_engtrace": "Shares: engineering domain (aerospace); numeric answers checked against a tolerance; reference worked solutions (p.3); a non-public split (p.4) and a canary string (p.5). Lacks: generated instances; step-level evaluation (the solutions are not scored); expert validation of the judge-plus-embedding scorer; a tight tolerance (about 10%, which the authors themselves call loose, p.6, p.9).",
+ "confidence": "high",
+ "notes": "Key and author list are wrong in the May reference (first author Di Wu, p.1). The text has no arXiv version. Its loose numeric margin is a useful contrast with EngTrace's 0.2% relative answer tolerance (state brief, D-137) and bears on the July rebuttal's tolerance discussion. The about-10% reading follows from the formula at answer magnitudes near 1 to 10 and from the bounds in Fig. 1 (p.2)."
+}

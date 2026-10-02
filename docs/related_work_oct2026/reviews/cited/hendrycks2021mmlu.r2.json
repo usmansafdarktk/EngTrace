@@ -1,0 +1,35 @@
+{
+ "key": "hendrycks2021mmlu",
+ "reviewer": "r2",
+ "read": "full main text (pp.1-8); appendix skimmed (A.1-A.3, B.1 task descriptions, B.2 contamination, Table 2 task list, task examples; pp.11-27)",
+ "title_confirmed": true,
+ "venue_now": "ICLR 2021 (page header, p.1); arXiv:2009.03300v3, 12 Jan 2021 (p.1)",
+ "what_it_is": "A multiple-choice test of text models over 57 subjects in STEM, the humanities, the social sciences and other areas, from elementary to professional level (p.1). Its 15,908 questions were collected by graduate and undergraduate students from freely available exam-practice and course material such as GRE and USMLE practice questions and Oxford University Press books (p.3). Models answer zero- or few-shot and are scored by classification accuracy over four options (p.3, p.6). It reports GPT-3 X-Large at 43.9% and singles out calculation-heavy STEM subjects and law and morality as weak spots (p.5-8).",
+ "domain": "multi-subject general knowledge and problem solving (57 subjects); engineering only as one Electrical Engineering task",
+ "size": "15,908 questions (dev 5 per subject, validation 1,540, test 14,079) in 57 tasks (p.3); models: GPT-3 in four sizes (2.7B to 175B), UnifiedQA, and fine-tuned RoBERTa-base, ALBERT-xxlarge and GPT-2 (p.5)",
+ "source_of_items": "exams and course material: practice questions for GRE, USMLE and AP-style exams, undergraduate course questions and Oxford University Press book questions, collected manually by students from free online sources (p.3)",
+ "instances": "static",
+ "has_gold_traces": "no",
+ "evaluation": "multiple choice: accuracy on the option with the highest probability among A to D (p.6); calibration also measured (p.7)",
+ "human_validation": "none for item correctness or for the scoring; human baselines only: Amazon Mechanical Turk workers 34.5% and an estimated expert level of about 89.8% (p.3)",
+ "contamination_measures": "a post-hoc check: question entropy is not positively correlated with accuracy, read as no exact memorisation; authors promise a list of question sources (Appendix B.2, p.13-14)",
+ "engtrace_use": {
+   "sentence": "S-E1 (L182-190): Generalist suites like MMLU (Hendrycks et al., 2021a), BIG-Bench (Luo et al., 2024), and SuperGPQA (Du et al., 2025) restrict assessment to factual recall via multiple-choice questions [...]. | S-I3a (L105-111): general knowledge benchmarks (e.g., MMLU (Hendrycks et al., 2020)) test broad factual recall",
+   "verdict": "imprecise",
+   "explanation": "The format claim is right: MMLU is a four-option multiple-choice test scored by accuracy (p.3, p.6), so it scores only the chosen option and nothing of the process. The content claim is loose: the paper designs the test to measure knowledge acquired in pretraining (p.1), which supports 'knowledge', but it also says the test covers 'world knowledge and problem solving ability' (p.1), includes mathematical problem solving where college questions 'often require chains of reasoning' (p.5), and finds models weakest on calculation-heavy 'plug and chug' STEM tasks (p.6-8). 'Restrict assessment to factual recall' therefore overstates. In the engineering paragraph the sentence also omits that MMLU does contain an Electrical Engineering task (circuits, power systems, electrical drives; Table 2, p.15; example p.18), which is the relevant fact: engineering appears, but only as multiple choice. The two in-text citations (2020 and 2021a) are the same paper."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "MMLU (Hendrycks et al., 2021) poses four-option multiple-choice questions across 57 subjects, with Electrical Engineering its only task named for an engineering discipline, and scores only the option the model selects.",
+ "facts_to_cite": [
+  "57 tasks spanning STEM, the humanities, the social sciences and other areas, from elementary to professional level (p.1, p.3)",
+  "15,908 questions collected manually by graduate and undergraduate students from freely available sources such as GRE and USMLE practice questions; test set of 14,079 (p.3)",
+  "Four-option multiple-choice questions scored by classification accuracy; for GPT-3 the highest-probability option among A to D is the prediction (p.3, p.6)",
+  "One of the 57 tasks is Electrical Engineering (circuits, power systems, electrical drives) (Table 2, p.15; example question, p.18)",
+  "GPT-3 X-Large reached 43.9% few-shot accuracy; the authors estimate expert-level accuracy at about 89.8% (p.2, p.3, p.5)",
+  "Nine of GPT-3's ten lowest-accuracy tasks are STEM subjects that emphasise mathematics or calculation (p.6-7)",
+  "Published at ICLR 2021 (p.1)"
+ ],
+ "overlap_with_engtrace": "Shares: an engineering slice (one Electrical Engineering task, p.15) and STEM items that need calculation (p.5-8). Lacks: generated instances (static questions collected online, p.3), gold traces, any step-level or process evaluation (option accuracy only, p.6), expert validation of items or of an evaluator, and contamination control beyond a post-hoc check. Of EngTrace's five branches only electrical is touched, and only as multiple choice.",
+ "confidence": "high",
+ "notes": "The May reference list carries this paper twice (Hendrycks et al., 2020, arXiv; Hendrycks et al., 2021a, ICLR); merge into the ICLR 2021 entry. The abstract of the May paper also names MMLU. Cross-reference: ElecBench (cheng2024elecbench) takes part of its public test set from MMLU's electrical-engineering items (ElecBench p.10)."
+}

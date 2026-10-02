@@ -1,0 +1,38 @@
+{
+ "key": "zheng2026tpscalcbench",
+ "reviewer": "r1",
+ "read": "partial: abstract, sections I-VI, VIII, IX and X in full; section VII (pilot interventions) and appendices A-F skimmed",
+ "title_confirmed": true,
+ "venue_now": "arXiv 2604.17966v1, 20 April 2026, cs.AI (p.1); no venue",
+ "what_it_is": "A diagnostic benchmark of closed-form calculations in hypersonic aerothermodynamics for thermal-protection-system design: 420 core items, plus an 810-item pre-gating set kept as a noise control, distilled from 4,560 candidates extracted from Anderson's Hypersonic and High-Temperature Gas Dynamics (2nd ed.), in four levels (L1 170, L2 120, L3 80, L4 50) and eight domains (p.1, p.4, p.7). It scores two tracks separately: outcome correctness, by relative-error bands with a unit check, and reasoning quality, on an eight-dimension weighted rubric (formula selection, parameter identification, unit consistency, calculation accuracy, physical plausibility, assumptions, interpretation, presentation) scored 0/1/2 by a Gemini-3-Pro-Preview judge that sees the reference solution (p.7-9). The headline KPI is the rubric score alone (p.10). Thirteen models are reported (twelve appear in the outcome table), with KPI from 12.6 to 87.9 (p.1, p.10-12).",
+ "domain": "engineering: aerospace (hypersonic aerothermodynamics, thermal protection systems) (p.1, p.4)",
+ "size": "420 core items (v4) and 810 pre-gating items (v2), from 4,560 raw candidates (p.1, p.6-7); 13 models stated (p.1, p.10), 12 in the outcome table (p.12)",
+ "source_of_items": "textbook: extracted by rule-based and LLM-assisted passes from Anderson's Hypersonic and High-Temperature Gas Dynamics, 2nd ed., then gated by automated checks, domain-expert review and a triple-reviewer go/no-go gate (p.4, p.6)",
+ "instances": "static (p.4, p.6); parameterised variants are named only as future work (p.20, p.22)",
+ "has_gold_traces": "partial: each item has an expert-confirmed reference answer (property P2, p.4) and a reference solution given to the judge (p.8); intermediate values are not scored deterministically",
+ "evaluation": "final answer plus rubric by LLM judge: Track 1 maps relative error to bands (below 1% scores 1.0, 1-10% 0.7, 10-50% 0.3, 50% or more 0) with a separate binary unit check, answers extracted by regex with an LLM fallback (p.8-9); Track 2 is an eight-dimension rubric scored 0/1/2 by Gemini-3-Pro-Preview given the reference solution (p.8-9); the KPI is the mean rubric score (p.10)",
+ "human_validation": "Items: domain-expert review of 1,930 candidates rejected 770, then a unanimous triple-reviewer go/no-go gate (p.6). Judge: one domain expert scored 62 items on all eight dimensions; weighted kappa per dimension ranged from 0.68 (physical plausibility) to 0.82 (parameter identification), 0.75 overall, with the judge more lenient on calculation accuracy and physical plausibility (+0.08 to +0.11) (p.8-10); Spearman 0.94 between the human and judge rankings of six models on those items; seven items (11%) with a disagreement of 2 points were adjudicated by a third reviewer (p.9). A 3-item pilot preceded this (p.22, p.25).",
+ "contamination_measures": "none against pretraining contamination (the items come from a published textbook, p.4); a chapter-grouped split keeps its own fine-tuning experiments from leaking into the test items (p.6-7)",
+ "engtrace_use": {
+   "sentence": null,
+   "verdict": "n/a",
+   "explanation": "Belongs in: the engineering paragraph; its judge-expert calibration also belongs in the judge-validity paragraph. Candidate, not cited in the May paper. It targets the failure EngTrace targets, correct answers reached by invalid reasoning, and reports 11-14% of items with a high outcome but a low process score (p.20-22); it contradicts the May claims that no benchmark verifies the engineering reasoning process (May p.1, p.3). Its judge-versus-expert agreement (p.9-10) is a direct comparator for EngTrace's validation figures."
+ },
+ "recommendation": "add (must)",
+ "suggested_wording": "TPS-CalcBench (Zheng et al., 2026) scores outcome and reasoning separately on 420 textbook-derived calculations in hypersonic thermal-protection design, rating reasoning on an eight-dimension rubric with an LLM judge whose per-dimension agreement with one domain expert on 62 items is weighted kappa 0.68-0.82.",
+ "facts_to_cite": [
+   "420 core items (and an 810-item pre-gating set) from 4,560 candidates extracted from Anderson's Hypersonic and High-Temperature Gas Dynamics, 2nd ed. (p.1, p.4)",
+   "four difficulty levels (L1 170, L2 120, L3 80, L4 50 items) and eight domain categories (p.7)",
+   "five-stage gating, including domain-expert review that rejected 770 candidates and a unanimous triple-reviewer go/no-go gate (p.6)",
+   "Track 1: relative-error bands (below 1%, 1-10%, 10-50%, 50% or more) with a separate unit check (p.8-9)",
+   "Track 2: eight weighted rubric dimensions scored 0/1/2 by a Gemini-3-Pro-Preview judge given the reference solution (p.8-9)",
+   "one domain expert scored 62 items: weighted kappa 0.68-0.82 per dimension, 0.75 overall; the judge is more lenient on calculation accuracy and physical plausibility (+0.08 to +0.11) (p.8-10)",
+   "Spearman 0.94 between the human and judge rankings of six models on the 62 items (p.9)",
+   "11-14% of items fall in the high-outcome, low-process quadrant ('right answer, wrong reasoning') (p.20-22)",
+   "KPI ranges from 12.6 to 87.9 across models (p.1, p.11)",
+   "the problems are posed in Chinese, from the textbook's Chinese translation (p.4, p.22)"
+ ],
+ "overlap_with_engtrace": "Shares: engineering calculations with numeric answers; outcome and process scored separately; an explicit target of right-answer-wrong-reasoning; human calibration of the judge. Lacks: generated instances (static textbook items, p.4); intermediate values computed by code and checked deterministically; any deterministic process check (every rubric dimension, calculation accuracy included, is judged by an LLM, p.8-9); multi-expert validation of the judge (one expert, 62 items, p.8); multi-branch scope (one aerospace subfield). What EngTrace adds: generated instances in five branches; deterministic milestone and per-claim arithmetic checks against values computed by the template code, with an LLM judge only for the residual; and evaluator error measured against labels from 15 experts on 300 traces.",
+ "confidence": "high",
+ "notes": "(1) The problems are posed in Chinese, from the textbook's Chinese translation (p.4, p.22); the revision should not imply an English benchmark. (2) The model count is inconsistent: 13 models in the abstract and setup (p.1, p.10), 12 in the outcome table (p.12), and 6 named as excluded (p.10-11). (3) The KPI is judge-only, so its process axis inherits the judge's leniency on calculation accuracy (p.9). (4) Many judge outputs were truncated ('ok_partial') and kept only the overall score, limiting the per-dimension analysis (p.11, p.13). (5) Release of the dataset, scripts and audit trails is claimed (p.23), but no link appears in the text. (6) The search notes' description (420 core items, dual track, one expert on 62 items, weighted kappa 0.68 to 0.82, judge lenient on calculation and plausibility) matches the text."
+}

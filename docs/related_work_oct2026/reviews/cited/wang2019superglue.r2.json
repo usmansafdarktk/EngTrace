@@ -1,0 +1,34 @@
+{
+ "key": "wang2019superglue",
+ "reviewer": "r2",
+ "read": "full: main text pp. 1-9 (abstract, introduction, related work, design process, task selection, scoring, analysis tools, usage rules, baselines, results, conclusion); appendices skimmed by heading (pp. 16-18)",
+ "title_confirmed": true,
+ "venue_now": "NeurIPS 2019 (33rd Conference on Neural Information Processing Systems, page 1 footer); the file is arXiv 1905.00537v3, 13 Feb 2020",
+ "what_it_is": "SuperGLUE is GLUE's successor, built because GLUE's headroom had eroded: by early July 2019 the best GLUE score (88.4) exceeded the non-expert human estimate (87.1) by 1.3 points (pp. 1-2). It has eight English language-understanding tasks drawn from existing datasets (BoolQ, CB, COPA, MultiRC, ReCoRD, RTE, WiC, WSC), chosen from about 30 public proposals for difficulty against a BERT baseline and solvability by people, plus two diagnostic sets (pp. 2-7). Each task is scored by accuracy, F1 or exact match against private test labels and averaged into one leaderboard number (pp. 5-7); at release the best BERT-based baseline trailed the human estimates by nearly 20 points (p. 9).",
+ "domain": "English natural language understanding (question answering, inference, coreference, word sense)",
+ "size": "8 tasks (train, dev and test sizes in Table 1, p. 3) plus 2 diagnostic datasets (pp. 6-7); baselines: most-frequent class, CBoW, BERT, BERT++ (Table 3, p. 8)",
+ "source_of_items": "existing datasets selected through an open call for task proposals (p. 5)",
+ "instances": "static",
+ "has_gold_traces": "no",
+ "evaluation": "final label or answer: accuracy, F1 or exact match per task, averaged into a single benchmark score (pp. 3, 6)",
+ "human_validation": "human performance estimated for every task, from published estimates or by trained Mechanical Turk crowdworkers re-annotating test samples (p. 9; Appendix C); proposed tasks too hard for people or too easy for the BERT baseline were filtered out (p. 5)",
+ "contamination_measures": "private test labels; at most two submissions per day and six per month 'to limit overfitting to the private test data'; systems may not use the unlabeled test data in development (p. 7)",
+ "engtrace_use": {
+  "sentence": "First, static benchmarks like Glue (Wang et al., 2019) and BBH (Kazemi et al., 2025) are increasingly prone to model saturation (Ott et al., 2022) and data contamination (Deng et al., 2024); EngTrace counters this through symbolic templates and domain-aware parameterization, generating unique, physically grounded problems that resist rote memorization. (Introduction, L97-105)",
+  "verdict": "wrong",
+  "explanation": "The sentence names GLUE, but the citation is SuperGLUE, a different benchmark with its own paper (citation map C1); GLUE is Wang et al., ICLR 2019 (wang2018glue). The paper is nonetheless the right evidence for what the sentence says about GLUE: GLUE performance 'has recently surpassed the level of non-expert humans, suggesting limited headroom for further research' (p. 1), with the July 2019 state of the art at 88.4 against a human estimate of 87.1 (p. 1), so that GLUE 'is no longer a suitable metric for quantifying such progress' (p. 2). As the source for the name it is wrong; as evidence of GLUE's saturation it is accurate. It also shows that the saturation came from more capable models ('ever-increasing model capacity, compute power, and data quantity', p. 3), not from GLUE being static."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "A little over a year after GLUE's release (Wang et al., 2019a), the best systems exceeded its non-expert human baseline, and its authors replaced it with the harder SuperGLUE (Wang et al., 2019b).",
+ "facts_to_cite": [
+  "By early July 2019 the state-of-the-art GLUE score (88.4) exceeded the non-expert human estimate (87.1) by 1.3 points, and exceeded it on four tasks (p. 1).",
+  "The authors judged GLUE 'no longer a suitable metric for quantifying such progress' (p. 2).",
+  "GLUE progress was driven by growing model capacity, compute and data, and by architectural innovations (p. 3).",
+  "SuperGLUE has eight tasks drawn from existing data, selected for difficulty against a BERT baseline and solvability by people (pp. 2, 5).",
+  "At release the best BERT-based baseline trailed the human estimate by nearly 20 points (p. 9).",
+  "Test labels are private and submissions are limited to two per day and six per month to limit overfitting to the test data (p. 7)."
+ ],
+ "overlap_with_engtrace": "Shares only the concern with headroom and with overfitting to a test set (private labels, submission limits, p. 7). It is a static, final-label benchmark of language understanding: no generated instances, no gold traces, no step-level evaluation, no engineering content, and its human validation is crowdworker baselines (p. 9), not expert validation of an evaluator.",
+ "confidence": "high",
+ "notes": "Naming clash: GLUE (ICLR 2019) and SuperGLUE (NeurIPS 2019) are both 'Wang et al., 2019' in author-year style, so the bib needs 2019a and 2019b. The May reference prints SuperGLUE as 'arXiv preprint arXiv:1905.00537'; it appeared at NeurIPS 2019 (p. 1). For EngTrace's framing: saturation is a matter of model capability, so templates alone do not counter it, and EngTrace's own answer scores already run from 0.805 to 0.970 across its 11 models (state brief section 4); the revised sentence should cite these papers for answer-level saturation, not claim EngTrace prevents it."
+}

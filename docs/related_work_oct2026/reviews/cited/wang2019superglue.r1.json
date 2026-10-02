@@ -1,0 +1,33 @@
+{
+ "key": "wang2019superglue",
+ "reviewer": "r1",
+ "read": "full (abstract, introduction, related work, design and tasks pp4-6, scoring and analysis tools pp6-7, usage rules p7, baselines and results pp8-9, conclusion p9; appendices A-D skimmed)",
+ "title_confirmed": true,
+ "venue_now": "NeurIPS 2019 (p1 footer: '33rd Conference on Neural Information Processing Systems (NeurIPS 2019), Vancouver, Canada'); arXiv:1905.00537v3, 13 Feb 2020. The May reference list gives only the arXiv identifier.",
+ "what_it_is": "SuperGLUE, the successor to GLUE, built because GLUE's headroom had eroded: as of early July 2019 the best GLUE score (88.4) exceeded the non-expert human estimate (87.1), and GLUE was judged 'no longer a suitable metric' (pp1-2). SuperGLUE retains GLUE's two hardest tasks and adds tasks chosen from an open call for proposals for their difficulty for a BERT baseline and their solvability by humans, for eight tasks in QA, NLI, coreference and word-sense formats (p2; pp4-6; p3 Table 1). It provides human performance estimates for all tasks, a leaderboard with private test labels, and submission limits; BERT-based baselines trailed humans by nearly 20 points (p8 Table 3; p9).",
+ "domain": "general-purpose English NLU",
+ "size": "Eight tasks; test sets from 146 (WSC) to 10k (ReCoRD) examples (p3 Table 1); baselines: most-frequent class, CBoW, BERT, BERT++ (p8 Table 3)",
+ "source_of_items": "existing datasets selected through a public call for task proposals (about 30 proposals received) (p5)",
+ "instances": "static",
+ "has_gold_traces": "no",
+ "evaluation": "final answer: accuracy, F1 and exact match per task, averaged with equal task weights (p6; p8 Table 3)",
+ "human_validation": "Human performance for every task: taken from prior work for WiC, MultiRC, RTE and ReCoRD, and otherwise collected from trained crowdworkers, five per example on 100 sampled test examples (all of WSC), by majority vote (p9; pp16-17 App. C). CB is restricted to items with inter-annotator agreement above 80% (p5).",
+ "contamination_measures": "Public but unlabelled test sets with private labels; systems may not use the unlabelled test data in development; at most two submissions per day and six per month 'to limit overfitting to the private test data' (p7). Candidate tasks with insufficient headroom were filtered out using machine and human baselines (p5).",
+ "engtrace_use": {
+  "sentence": "First, static benchmarks like Glue (Wang et al., 2019) and BBH (Kazemi et al., 2025) are increasingly prone to model saturation (Ott et al., 2022) and data contamination (Deng et al., 2024); ... (L97-105)",
+  "verdict": "wrong",
+  "explanation": "'Glue (Wang et al., 2019)' attributes GLUE to this entry, which is SuperGLUE (May reference L1160-1164; p1 title). GLUE is a different benchmark with its own paper (wang2018glue). The cited paper is nonetheless the best evidence for what the sentence claims about GLUE: GLUE's best score passed the non-expert human estimate about a year after release, and GLUE was 'no longer a suitable metric for quantifying such progress' (pp1-2). SuperGLUE itself was built to have substantial headroom (p9), so it should not be presented as an example of a saturated benchmark."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "GLUE (Wang et al., 2018) was saturated within about a year of release, when the best system passed the non-expert human estimate, which prompted the harder SuperGLUE (Wang et al., 2019).",
+ "facts_to_cite": [
+  "As of early July 2019, the best GLUE score (88.4) exceeded the non-expert human estimate (87.1) by 1.3 points, and exceeded it on four tasks (p1).",
+  "GLUE, introduced 'a little over one year' earlier, was judged 'no longer a suitable metric for quantifying such progress' (p1 abstract; p2).",
+  "SuperGLUE has eight tasks drawn from existing data, selected for difficulty for current models and solvability by humans; it retains GLUE's two hardest tasks (p2; pp4-5; p3 Table 1).",
+  "It reports human performance estimates for all tasks; the BERT++ baseline trails humans by nearly 20 points on average (p8 Table 3; p9).",
+  "Leaderboard rules limit submissions to two per day and six per month to limit overfitting to the private test data (p7)."
+ ],
+ "overlap_with_engtrace": "Shares only the response to saturation (a new, harder test set) and private test labels with submission limits, an anti-overfitting device comparable in spirit to EngTrace's private pool. Static, existing data; no generated instances, no gold traces, no step-level evaluation, no quantitative or engineering reasoning, no evaluator validation.",
+ "confidence": "high",
+ "notes": "Cite as NeurIPS 2019 rather than as the arXiv preprint (p1 footer). If the revised text keeps GLUE, it needs two entries, GLUE for the name and SuperGLUE for the saturation evidence, with distinct keys; the GLUE paper appeared at ICLR 2019, so the May key may come from a wrong BibTeX entry. The same pattern holds for BBH and BBEH (kazemi2025bbeh). Whether GLUE should stay as the example is a separate question: it is a 2018 classification suite, and the saturation premise needs care because EngTrace's own answer scores reach 0.970 (state brief section 4)."
+}

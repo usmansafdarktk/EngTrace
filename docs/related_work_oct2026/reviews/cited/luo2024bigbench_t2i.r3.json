@@ -1,0 +1,31 @@
+{
+ "key": "luo2024bigbench_t2i",
+ "reviewer": "r3",
+ "read": "full: abstract and introduction (pp. 1-2), definition system (pp. 2-3), dataset design (pp. 3-4), evaluation (pp. 4-6), experiments and results (pp. 6-9), conclusion and limitations (p. 9); appendices A (prompt construction) and B (human evaluation) read (pp. 12-13); remaining appendices skimmed",
+ "title_confirmed": true,
+ "venue_now": "arXiv preprint 2407.15240v6, 31 Mar 2025 (p. 1); no venue shown in the text",
+ "what_it_is": "BIGbench (Biases of Image Generation benchmark) measures social bias in text-to-image models (pp. 1-2). Its 47,040 prompts are built in three parts. Identity prompts combine acquired attributes (179 occupations in 15 categories, social relations, adjective pairs) with protected attributes (sex, race, age). GPT-4o wrote supplement prompts, which were screened by hand, and photorealism prompts were assigned at random (pp. 3-4, 12). A fine-tuned InternVL-4B aligner labels the sex, race and age of people in the generated images. From those labels the paper reports implicit and explicit bias scores and a 'manifestation factor' for eight text-to-image models and three debiasing methods (pp. 4-7).",
+ "domain": "text-to-image generation: social bias (occupations, social relations, characteristics against sex, race and age)",
+ "size": "47,040 prompts; 8 images per prompt per model; 8 text-to-image models and 3 debiasing methods (pp. 1, 6)",
+ "source_of_items": "generated from attribute lists: identity prompts combined from attribute lists, supplement prompts written by GPT-4o and screened by hand, photorealism prompts assigned at random (pp. 3-4, 12)",
+ "instances": "generated: a fixed prompt set built combinatorially from attribute lists, with randomly assigned prompt parts (pp. 3, 12)",
+ "has_gold_traces": "no: the ground truth is demographic proportions (UN and US BLS statistics) and the attributes named in each prompt (p. 4)",
+ "evaluation": "automated multimodal-LLM aligner (fine-tuned Mini-InternVL-4B 1.5) that labels protected attributes in generated images; cosine-similarity implicit bias score, explicit bias score (share of correctly generated images) and manifestation factor (pp. 4-6)",
+ "human_validation": "Ten trained annotators of different races labelled 1,000 generated images (majority vote, with a second round of voting and discussion when votes were close) as ground truth for the aligner; the fine-tuned InternVL reaches 97.93% average alignment accuracy (sex 100, race 98.6, age 95.2) (pp. 6, 13)",
+ "contamination_measures": "none (not applicable: it evaluates image generators)",
+ "engtrace_use": {
+  "sentence": "S-E1 (L182-190): 'Generalist suites like MMLU (Hendrycks et al., 2021a), BIG-Bench (Luo et al., 2024), and SuperGPQA (Du et al., 2025) restrict assessment to factual recall via multiple-choice questions, ...'",
+  "verdict": "wrong",
+  "explanation": "The citation points at the wrong paper. The sentence names the generalist language-model suite BIG-Bench, but this entry is 'BIGbench', a benchmark of social bias in text-to-image models (title and abstract, p. 1). It has no multiple-choice questions, tests no factual recall and evaluates no language model: it scores the demographic make-up of generated images with an MLLM aligner (pp. 4-6). The only link to the sentence is the near-identical name."
+ },
+ "recommendation": "drop",
+ "suggested_wording": "None for EngTrace: the paper has no bearing on its related work. If it were ever cited, an accurate clause would be: 'BIGbench (Luo et al., 2024) measures social bias in text-to-image models over 47,040 prompts.'",
+ "facts_to_cite": [
+  "a benchmark of social biases in text-to-image models, not a language-model suite (title and abstract, p. 1)",
+  "47,040 prompts built from occupation, social-relation and characteristic attributes combined with sex, race and age (pp. 1, 3-4)",
+  "evaluates 8 text-to-image models and 3 debiasing methods with a fine-tuned MLLM aligner validated on 1,000 human-labelled images (pp. 1, 6, 13)"
+ ],
+ "overlap_with_engtrace": "None that matters. It differs in modality (image generation), task (social bias) and measurement (demographic proportions); it has no engineering content, no gold traces and no step-level evaluation. The only shared trait is building prompts combinatorially from attribute lists.",
+ "confidence": "high",
+ "notes": "Name clash: 'BIGbench' (Luo et al., arXiv 2407.15240) versus BIG-bench (Srivastava et al., arXiv 2206.04615, TMLR). Remove this entry. If the revised sentence keeps BIG-bench, the replacement is srivastava2022bigbench (my review of it recommends dropping BIG-bench from the engineering paragraph). The printed author list is also wrong: v6 lists ten authors, Hanjun Luo, Haoyu Huang, Ziye Deng, Ruizhe Chen, Xinfeng Li, Hewei Wang, Yingbin Jin, Yang Liu, Wenyuan Xu and Zuozhu Liu (p. 1). The printed list has nine, all with different first names, and lacks Ruizhe Chen."
+}

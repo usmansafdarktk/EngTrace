@@ -1,0 +1,33 @@
+{
+ "key": "ott2022saturation",
+ "reviewer": "r3",
+ "read": "full: pp. 1-9 (abstract, introduction, results, discussion, methods, data and code availability); references pp. 9-11 skimmed.",
+ "title_confirmed": true,
+ "venue_now": "Nature Communications 13:6793 (2022) (page 1 header and footer; received 24 March 2022, accepted 31 October 2022)",
+ "what_it_is": "A meta-analysis of AI benchmarking built from Papers With Code: 3765 benchmarks across 947 tasks in computer vision and NLP, curated into a task ontology (pp. 1-3, 9). It clusters state-of-the-art (SOTA) trajectories into continuous growth, saturation/stagnation and stagnation followed by a burst (p. 3), maps the creation, use and abandonment of benchmarks over time (pp. 4-5), and relates dataset attributes to popularity (pp. 6-8). It finds that a large fraction of benchmarks quickly trend towards near-saturation, especially in recent years, that many benchmarks are barely used, and that progress comes in unforeseen bursts (pp. 1, 8).",
+ "domain": "AI benchmarking in computer vision and NLP (meta-research); pre-LLM-era data",
+ "size": "3765 benchmarks and 947 tasks (p. 2; Table 1, p. 3); 1079 SOTA trajectories from 654 benchmarks clustered (p. 3); 40 datasets annotated for popularity attributes (p. 6)",
+ "source_of_items": "the Papers With Code data dump exported 2022/07/30, curated manually into the Intelligence Task Ontology (p. 9)",
+ "instances": "n/a (analysis of benchmark result histories)",
+ "has_gold_traces": "n/a",
+ "evaluation": "SOTA trajectories normalised as relative improvement and clustered with self-organising maps; lifecycle maps; one-sided t-tests on popularity attributes (pp. 3-6, 9)",
+ "human_validation": "manual curation of the task hierarchy and of metric polarities; a check of 365 sampled papers estimated that Papers With Code captures about one third of published SOTA results (pp. 5-6, 8)",
+ "contamination_measures": "n/a; the paper discusses benchmark overfitting and benchmark-specific artifacts (pp. 1, 4), not training-data contamination",
+ "engtrace_use": {
+  "sentence": "First, static benchmarks like Glue (Wang et al., 2019) and BBH (Kazemi et al., 2025) are increasingly prone to model saturation (Ott et al., 2022) and data contamination (Deng et al., 2024); EngTrace counters this through symbolic templates and domain-aware parameterization, generating unique, physically grounded problems that resist rote memorization. (S-I3, May L97-105)",
+  "verdict": "accurate",
+  "explanation": "The paper supports the claim it is cited for: 'a large fraction of benchmarks quickly trends towards near-saturation' (abstract, p. 1), and the effect 'was especially marked in the recent past' (p. 8), which supports 'increasingly'. Two qualifications: the data are pre-LLM (CV and NLP leaderboards in a 2022 export, p. 9), and the saturation/stagnation pattern also covers stagnation from lost research interest, not only a reached ceiling (p. 1). The trouble is the clause it sits in, not the citation: 'EngTrace counters this through symbolic templates' implies that generated instances counter saturation. Templates counter contamination; saturation is a matter of difficulty, and fresh instances of the same templates are no harder. EngTrace's own answer scores run from 0.805 to 0.970, with the top five within 0.012 (engtrace_state_brief.md section 4). Ott et al.'s own remedies are broad suites of sub-benchmarks and 'living benchmarks' updated over time (p. 8)."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "Benchmarks lose their power to separate models as they saturate: across 3,765 vision and language benchmarks, a large fraction trended quickly towards near-saturation (Ott et al., 2022).",
+ "facts_to_cite": [
+  "Data on 3765 benchmarks across 947 AI tasks in computer vision and NLP, from Papers With Code (abstract, p. 1; p. 2; Table 1, p. 3).",
+  "A large fraction of benchmarks quickly trends towards near-saturation (abstract, p. 1), an effect especially marked in the recent past (p. 8).",
+  "Of 1079 clustered SOTA trajectories from 654 benchmarks, 378 fell in the saturation/stagnation cluster (p. 3).",
+  "Saturated benchmarks either stop measuring progress or, in continued use, become misleading measures in which differences between models are harder to establish (p. 1).",
+  "Proposed remedies: suites of many sub-benchmarks, and 'living benchmarks' updated over time to prevent overfitting and saturation (p. 8)."
+ ],
+ "overlap_with_engtrace": "A meta-analysis, so none of the five features apply. It motivates a benchmark that can be renewed: EngTrace's templates can draw new instances, which resembles the 'living benchmark' remedy (p. 8). But its evidence concerns difficulty ceilings, which redrawing items at the same difficulty does not raise.",
+ "confidence": "high",
+ "notes": "Pre-LLM data. For LLM-era saturation the BBEH paper's account of BBH (kazemi2025bbeh, pp. 1, 3) is more current and can be cited alongside. Minor inconsistency in the paper: p. 3 calls the cluster members both 'trajectories' and 'benchmarks' (460 + 378 + 241 = 1079 trajectories). The recommendation 'keep, reword' concerns the clause pairing this citation with 'EngTrace counters this', not the citation itself."
+}

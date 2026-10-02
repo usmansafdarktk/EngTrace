@@ -1,0 +1,35 @@
+{
+ "key": "ott2022saturation",
+ "reviewer": "r1",
+ "read": "full (abstract, introduction, Results pp1-8, Discussion pp8-9, Methods p9; reference list skimmed)",
+ "title_confirmed": true,
+ "venue_now": "Nature Communications 13:6793 (2022); received 24 March 2022, accepted 31 October 2022 (p1 header and footer)",
+ "what_it_is": "A meta-analysis of AI benchmarking, not a benchmark. The authors curate state-of-the-art (SOTA) result trajectories from Papers With Code into an ontology covering 3,765 computer-vision and NLP benchmarks across 947 tasks (p1; p3 Table 1), cluster trajectory shapes with self-organizing maps (p3), and map benchmark creation, saturation and abandonment over time (pp4-5). They report that a large fraction of benchmarks quickly trends towards near-saturation, that many benchmarks see little use, and that gains arrive in unforeseen bursts (p1 abstract; p8). The data are SOTA values from 2008 to mid-2021 (Papers With Code export of 2022-07-30), so the study predates LLMs (p9).",
+ "domain": "meta-science of AI benchmarks (computer vision and NLP)",
+ "size": "3,765 benchmarks over 947 tasks (1,318 NLP, 2,447 CV; p3 Table 1); 1,079 metric trajectories of 654 benchmarks clustered (p3); 40 datasets in the popularity comparison (p6); completeness check on 365 sampled papers (pp5-6)",
+ "source_of_items": "n/a (leaderboard results curated from Papers With Code; p1-2, p9)",
+ "instances": "n/a (not a benchmark)",
+ "has_gold_traces": "n/a (not a benchmark)",
+ "evaluation": "n/a (descriptive analysis of SOTA trajectories: relative-improvement normalisation, p4 eq. 1; SOM clustering, p3)",
+ "human_validation": "Manual curation of the task hierarchy and of metric polarity (85 manually curated polarity assignments, p9); a completeness study of 365 sampled citing papers estimating that Papers With Code captures about one third of SOTA results (pp5-6).",
+ "contamination_measures": "n/a; the paper does not discuss data contamination. It discusses over-optimisation to benchmark artefacts (p1, p4) and proposes 'living benchmarks' updated over time to prevent overfitting and saturation (p8).",
+ "engtrace_use": {
+  "sentence": "First, static benchmarks like Glue (Wang et al., 2019) and BBH (Kazemi et al., 2025) are increasingly prone to model saturation (Ott et al., 2022) and data contamination (Deng et al., 2024); EngTrace counters this through symbolic templates and domain-aware parameterization, generating unique, physically grounded problems that resist rote memorization. (L97-105)",
+  "verdict": "accurate",
+  "explanation": "Judged for the saturation clause only. Ott et al. report that 'a large fraction of benchmarks quickly trends towards near-saturation' (p1 abstract) and that 'this effect was especially marked in the recent past' (p8), which supports 'increasingly prone to model saturation'; their remedy, 'living benchmarks' updated over time (p8), supports the static-versus-refreshed contrast. Limits: the evidence is CV and NLP leaderboards up to mid-2021 (p9), so it predates LLMs and says nothing about GLUE or BBH specifically (SuperGLUE appears only as an example of a suite with sub-benchmarks, p7). The paper does not support the sentence's second half, that symbolic templates counter saturation: saturation in Ott's sense is a performance ceiling reached on the task (p1), and fresh instances of the same templates do not raise that ceiling."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "Across 3,765 computer-vision and NLP benchmarks, a large fraction quickly trended towards near-saturation (Ott et al., 2022).",
+ "facts_to_cite": [
+  "Analysis of 3,765 benchmarks across 947 AI tasks in computer vision and NLP, curated from Papers With Code (p1 abstract; p3 Table 1).",
+  "A large fraction of benchmarks quickly trends towards near-saturation (p1 abstract); the effect was especially marked in the recent past (p8).",
+  "In self-organizing-map clustering of 1,079 metric trajectories from 654 benchmarks, 378 fall in the saturation/stagnation cluster (p3). The paper calls the 378 'benchmarks', but the three cluster sizes (460, 378, 241) sum to the 1,079 trajectories, so they are trajectories.",
+  "Saturation/stagnation is initial growth followed by a long-term halt in SOTA improvement, which may reflect technological stagnation, a lack of research interest, or a reached ceiling (p1).",
+  "Near-saturated benchmarks either stop measuring progress or become misleading measures: real progress is not reflected, significant differences between models are harder to obtain, and gains come from over-optimisation to benchmark specifics (p1).",
+  "The authors suggest 'living benchmarks' updated over time, and benchmarks with many sub-benchmarks, to extend a benchmark's useful lifetime (p8).",
+  "The data cover SOTA results from 2008 to mid-2021, from a Papers With Code export of 2022-07-30 (p9)."
+ ],
+ "overlap_with_engtrace": "None technically: no items, no traces, no model evaluation. It supplies the saturation premise only. Its remedy (benchmarks refreshed over time) is closer to EngTrace's freshly drawn instances than to a fixed test set, but Ott's saturation is a performance ceiling, and EngTrace's own answer scores already run from 0.805 to 0.970 with the top five within 0.012 (state brief section 4). EngTrace's claim to headroom therefore has to rest on step-level verification, not on instance generation.",
+ "confidence": "high",
+ "notes": "The citation is sound; the sentence around it is not. (1) 'EngTrace counters this through symbolic templates' merges two problems: templates drawn from a private seed address memorisation of fixed items (contamination), not saturation. With full-run answer scores of 0.805 to 0.970 and the top five within 0.012 (state brief section 4), and only 31 of 55 pairwise differences holding at Holm p < 0.05, a reviewer could turn Ott's own symptoms of saturation (p1: harder-to-obtain significant differences) against EngTrace's final-answer metric. The revised Introduction should scope the remedy to contamination and place EngTrace's discriminating power in step-level checks (e.g. X1: 93 of 228 correct-answer traces contain an incorrect step; state brief section 3). (2) The study is pre-LLM; for LLM-era saturation, SuperGLUE (wang2019superglue, p1) and BBEH (kazemi2025bbeh, p1, p3) document the saturation of GLUE and BBH directly. (3) The printed reference (Nature Communications 13(1):6793) and author list match p1."
+}

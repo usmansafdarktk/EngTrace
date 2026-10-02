@@ -1,0 +1,35 @@
+{
+ "key": "wang2023mathshepherd",
+ "reviewer": "r2",
+ "read": "full: main text pp. 1-12 (abstract, Secs. 1-7, limitations) read in full; references (pp. 12-15) skimmed; the text has no appendix",
+ "title_confirmed": true,
+ "venue_now": "ACL 2024 (Proceedings of the 62nd Annual Meeting, pp. 9426-9439), per the catalogue and per Zhang et al. 2025's reference list (zhang2025prmlessons, p. 13). The text file is arXiv 2312.08935v3 (19 Feb 2024) and has no venue header.",
+ "what_it_is": "A process reward model (PRM) for math trained without human step labels. A step is labelled by its 'potential to deduce the correct answer': a completer model finishes N solutions from that step. Under hard estimation the step is good if any completion reaches the gold answer; under soft estimation its label is the fraction that do (pp. 2, 4-5). The PRM reranks 256 candidate solutions and serves as the reward for step-by-step PPO on GSM8K and MATH (pp. 3, 6-7). It is a training method, not a benchmark.",
+ "domain": "math (GSM8K, MATH/MATH500; a 33-question Hungarian national exam as an out-of-distribution check, p. 10)",
+ "size": "Training data: about 170k GSM8K and 270k MATH solutions, labelled with LLemma-7B as completer at N=8 (p. 6). Evaluation: GSM8K test set and MATH500, 256 candidates per problem (p. 6); generators and reward models from 7B to 70B (LLaMA2, LLemma, Mistral, DeepSeek) (p. 6).",
+ "source_of_items": "existing datasets (GSM8K, MATH); training solutions sampled from fine-tuned LLMs and labelled automatically",
+ "instances": "static",
+ "has_gold_traces": "no: only gold final answers are used; step labels are estimated from rollouts (pp. 4-5)",
+ "evaluation": "final answer: best-of-N accuracy after reranking and greedy accuracy after PPO (pp. 6-7); the automatic labels were checked against 160 hand-labelled steps (p. 8)",
+ "human_validation": "The authors hand-annotated 160 steps sampled from the GSM8K training set. Hard-estimation labels reached 86% accuracy with a LLaMA2-70B completer at N=4, and accuracy fell for larger N because of false positives (p. 8). On the same set, the method beat Li et al.'s NLI-based and rule-based labelling: 85.0% against 61.3-75.6% (Table 4, p. 10). The PRM's own step judgments are not validated against human labels. The limitations section leaves 'a comprehensive comparison between human and automated annotations' to future work (pp. 11-12).",
+ "contamination_measures": "none",
+ "engtrace_use": {
+  "sentence": null,
+  "verdict": "n/a",
+  "explanation": "Candidate; the May paper does not cite it. NEXT_CYCLE_REVIEW Sec. 4.2 names it among the papers the PRM paragraph must place EngTrace against. The batch description calls it 'the automatic-labelling paradigm behind the off-the-shelf PRMs EngTrace tests', which is only partly right. Qwen2.5-Math-PRM's labels are Monte Carlo estimates kept only where an LLM judge agrees (zhang2025prmlessons, p. 9). VersaPRM's labels come from an LLM labeller, applied on top of a PRM800K-trained base (zeng2025versaprm, pp. 5-6). EngTrace does not run Math-Shepherd's own PRM."
+ },
+ "recommendation": "add (must)",
+ "suggested_wording": "Math-Shepherd (Wang et al., 2024) trains a PRM without human labels, scoring each step by whether sampled completions from it still reach the gold final answer; this estimates step correctness rather than checking it.",
+ "facts_to_cite": [
+  "Step label = the step's potential to reach the correct answer, estimated by completing N solutions from it: hard estimation (any completion correct) or soft estimation (fraction correct) (pp. 4-5).",
+  "No human step annotation: about 170k GSM8K and 270k MATH training solutions labelled with LLemma-7B as completer, N=8 (p. 6).",
+  "Step-by-step PPO with the PRM raised Mistral-7B from 77.9% to 84.1% on GSM8K and from 28.6% to 33.0% on MATH, and PRM verification raised these to 89.1% and 43.5% (abstract, p. 1; Table 2, p. 7).",
+  "Evaluated by best-of-N accuracy (256 candidates) and greedy accuracy, following Lightman et al.; never by step-level agreement with human labels (pp. 3, 6-7).",
+  "On 160 hand-labelled GSM8K steps, hard-estimation labels were 86% accurate at N=4, and accuracy fell as N grew because of false positives (p. 8).",
+  "On the same 160 steps, a rule-based annotator that marks a step correct when its number matches a reference-solution step scored 75.0%, against Math-Shepherd's 85.0% (Table 4, p. 10).",
+  "The authors acknowledge that the automatic labels are noisy (pp. 11-12)."
+ ],
+ "overlap_with_engtrace": "Shares: step-level supervision of quantitative reasoning, and step labels obtained without per-step human annotation. Differs: Math-Shepherd estimates a step's worth from rollouts that reach a gold final answer. EngTrace's template code gives the gold intermediate values, so numeric milestones can be checked deterministically (E3, E4) instead of estimated. Its Table 4 is a caution for EngTrace (p. 10). On GSM8K, matching a step's number to a reference solution (75.0%) was less accurate than rollouts (85.0%) against 160 hand labels. EngTrace validated its equivalent check against experts instead (E3 milestone F1 0.921; E5 0.958; state brief Sec. 3). Lacks: engineering; generated instances; gold intermediate traces; expert validation of the PRM's judgments. It is a training method, not an evaluation benchmark.",
+ "confidence": "high",
+ "notes": "Paragraph: process supervision and judge validity. Cite by venue year (ACL 2024) under the key wang2023mathshepherd. Two later papers in this batch criticise the Monte Carlo labels it introduced. ProcessBench (pp. 8-9) notes that the labels depend on the policy model. Zhang et al. 2025 (pp. 1-5) shows completions can reach correct answers from incorrect steps. Both critiques support EngTrace's choice of gold values over estimated labels. Math-Shepherd's released PRM scores 31.5 average F1 on ProcessBench (zheng2024processbench Table 3, p. 7) and 47.0 PRMScore on PRMBench (song2025prmbench Table 3, p. 6)."
+}

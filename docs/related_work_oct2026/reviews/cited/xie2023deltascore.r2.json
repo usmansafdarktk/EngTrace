@@ -1,0 +1,33 @@
+{
+ "key": "xie2023deltascore",
+ "reviewer": "r2",
+ "read": "full: main text pp. 1-9 (abstract, introduction, related work, method, experiments, comparison with other metrics, conclusion, limitations); appendix Table 8 read (p. 15); other appendices skimmed",
+ "title_confirmed": true,
+ "venue_now": "Findings of EMNLP 2023, pp. 5317-5331 (page 1 header)",
+ "what_it_is": "A reference-free metric for fine-grained story evaluation. DELTASCORE is the difference between a pre-trained language model's log-likelihood of a story and of an aspect-targeted perturbation of it, such as added typos, jumbled words or antonyms (pp. 1, 3-4, Eq. 1). It is validated by story-level Kendall correlation with human ratings of fluency, coherence, relatedness, logicality and interestingness on ROCStories and WritingPrompts stories taken from Xie et al. (2023) (pp. 4-5). With OPT as the language model it outperforms all compared metrics, and the reference-based similarity metrics (BLEU, BERTScore, MoverScore) perform worst (p. 8).",
+ "domain": "story evaluation (natural language generation metric)",
+ "size": "human-rated stories: 120 ROCStories and 80 WritingPrompts stories, 3 raters each (p. 5, footnote 6); 6 language models used to compute the metric (Table 3, p. 5); 11 comparison metrics (p. 5)",
+ "source_of_items": "stories and human ratings reused from Xie et al. (2023), the storytelling study (p. 4; reference list, p. 11)",
+ "instances": "n/a (metric paper; the perturbations are part of the metric, not a benchmark)",
+ "has_gold_traces": "no",
+ "evaluation": "metric validity measured by story-level Kendall correlation between metric scores and aggregated human ratings (p. 5)",
+ "human_validation": "human ratings on a 1-5 scale from two annotator groups, in-house PhD students and crowdworkers, 3 per story; one group used for tuning and the other for the final comparison (p. 5)",
+ "contamination_measures": "n/a; it excludes CNN-Dailymail partly because most of the tested language models were trained on it (p. 4, footnote 5)",
+ "engtrace_use": {
+  "sentence": "We evaluate the fluency and semantic fidelity of generated solutions using standard reference-based metrics (Xie et al., 2023b). (section 4.3, L466-468; the next sentence cites BERTScore (Zhang et al., 2020) and ROUGE-2 (Lin, 2004))",
+  "verdict": "misleading",
+  "explanation": "The citation presents DeltaScore as a source for evaluating fluency and semantic fidelity with standard reference-based metrics. The paper argues the opposite: it proposes a reference-free, perturbation-based metric (pp. 1, 3), and in its comparison 'the similarity metrics generally has the lowest performance, highlighting the inadequacy of reference-based metrics for story evaluation' (p. 8). Its appendix puts BERTScore's Kendall |tau| with crowdworker fluency ratings at 0.035 on ROCStories and 0.318 on WritingPrompts (Table 8, p. 15). It does not evaluate ROUGE-2 at all (metrics listed on p. 5), and its domain is stories, not engineering solutions. So it does not support the use it is cited for, and its own evidence argues against relying on such metrics. BERTScore and ROUGE already carry their own citations in the next sentence (citation map C9)."
+ },
+ "recommendation": "drop",
+ "suggested_wording": "Drop with section 4.3; the state brief records BERTScore and ROUGE as leaving the main paper ('Keep ROUGE and BERTScore in an appendix if at all'). If an appendix still reports them, the accurate use is as a caution: in story evaluation, reference-based similarity metrics such as BERTScore correlated with human quality ratings less well than every other metric family compared (Xie et al., 2023b).",
+ "facts_to_cite": [
+  "DELTASCORE scores a story by the change in a pre-trained language model's log-likelihood after an aspect-specific perturbation (Eq. 1, p. 3).",
+  "It is reference-free and was evaluated on five story aspects against human ratings of ROCStories and WritingPrompts stories (pp. 4-5).",
+  "Reference-based similarity metrics (BLEU, BERTScore, MoverScore) had the lowest correlation with human ratings among the compared metric families (p. 8; Table 8, p. 15).",
+  "BERTScore's story-level Kendall |tau| with crowdworker fluency ratings was 0.035 on ROCStories and 0.318 on WritingPrompts (Table 8, p. 15).",
+  "DELTASCORE with OPT outperformed all compared metrics across the five aspects (p. 8)."
+ ],
+ "overlap_with_engtrace": "Little. It shares the practice of validating an automatic evaluator against human ratings with a rank correlation (p. 5), which EngTrace now does against experts. It has no generated instances, no gold traces, no step-level evaluation, no engineering domain and no expert raters (in-house PhD students and crowdworkers, p. 5); it measures story quality, not correctness.",
+ "confidence": "high",
+ "notes": "Self-citation: Zhuohan Xie is first author here and an EngTrace author (citation map C9). The 'Xie et al. (2023)' whose ratings it reuses is the storytelling study (reference list, p. 11), the other self-citation in this batch. EngTrace's own pilot shows BERTScore spanning only 0.866 to 0.882 (state brief section 5), which is better evidence than DeltaScore for dropping the metric."
+}

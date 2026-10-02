@@ -1,0 +1,36 @@
+{
+ "key": "chen2025apbench",
+ "reviewer": "r2",
+ "read": "full: all text pages (pp.1-12); reference list skimmed (pp.13-15)",
+ "title_confirmed": true,
+ "venue_now": "Scientific Reports 15:7944 (2025), doi 10.1038/s41598-025-91150-5 (p.1); received 10 Dec 2024, accepted 18 Feb 2025 (p.13)",
+ "what_it_is": "APBench is an astrodynamics benchmark for space engineering built from proven example problems in textbooks, online course books and a PhD qualifying exam: an open set of 299 problems and a private set of 1,990 withheld for copyright (p.2, p.4-5). Each item stores content, question, step-by-step solution, answer, format (numeric or message) and source, and questions within a problem set are progressive (p.3, p.10). Answers are open-ended rather than multiple-choice; numeric answers are accepted within an adaptive error margin, and message answers by a GPT-4o judge averaged with embedding similarity (p.3, p.11-12). Eighteen model configurations are compared; only o1-preview passes 60% on the full open set (p.3, p.6).",
+ "domain": "engineering: aerospace (astrodynamics: two- and three-body problems, orbit determination, manoeuvres, rendezvous, interplanetary missions; p.2)",
+ "size": "open APBench 299 problems (Table 1, p.5), nested as APBench-alpha, -beta, -gamma (p.8); private APBench 1,990 problems (Table 2, p.5); 18 model configurations (Table 3, p.6)",
+ "source_of_items": "textbooks, online course books and a PhD qualifying exam (Tables 1-2, p.5), extracted with OpenAI-API scripts plus manual checks (p.10, p.12)",
+ "instances": "static",
+ "has_gold_traces": "partial: a step-by-step solution stored with every item (p.10), selected for 'solution process availability' (p.3); not used for scoring, which focuses on final answers (p.2)",
+ "evaluation": "final answer: numeric answers within an error margin of 0.1 + 0.01 log(|answer|) (p.11); message answers scored 0.5 x (GPT-4o judge score + all-MiniLM-L6-v2 cosine similarity) and accepted above 0.6 (p.11-12); zero-shot (p.11)",
+ "human_validation": "human checks inside an LLM-assisted extraction pipeline (pattern editing, completeness of question and solution splitting, format labels) (p.12); manual screen for sensitive content (p.5); no validation of the GPT-4o judge reported",
+ "contamination_measures": "canary string to keep the data out of training corpora (p.5); a private set held back (for copyright, p.4)",
+ "engtrace_use": {
+   "sentence": "S-E1 (L182-190): [...] while specialized benchmarks like TransportBench, APBench, and EEE-Bench (Syed et al., 2024; Chen et al., 2025; Cheng et al., 2024; Li et al., 2025; Liu et al., 2025) are siloed within narrow sub-disciplines.",
+   "verdict": "accurate",
+   "explanation": "Supported: APBench covers astrodynamics problems for space engineering only (p.1-2). The citation is misattributed: the byline reads Di Wu, Raymond Zhang, Enrico M. Zucchelli, Yongchao Chen and Richard Linares (p.1), so the in-text key is Wu et al., 2025, and the printed entry's seven names (with Daniel Jang and Giovanni Lavezzi, in a different order) do not match this byline. For the closing claim S-E3 (batch E2), APBench does grade final answers only (p.2, p.11), although each item carries a step-by-step solution (p.10)."
+ },
+ "recommendation": "keep, reword",
+ "suggested_wording": "APBench (Wu et al., 2025) collects open-ended astrodynamics problems from textbooks and course material and grades only final answers, numeric ones within an adaptive margin of 0.1 + 0.01 log|answer| and descriptive ones by a GPT-4o judge averaged with embedding similarity.",
+ "facts_to_cite": [
+  "Scientific Reports 15:7944 (2025), by Di Wu, Raymond Zhang, Enrico M. Zucchelli, Yongchao Chen and Richard Linares (p.1)",
+  "Open APBench: 299 problems from four online sources; private APBench: 1,990 problems from eight published sources, kept private for copyright (p.4-5)",
+  "Open-ended questions, deliberately not multiple choice (p.3, p.11)",
+  "Each item stores a step-by-step solution (p.10); evaluation focuses on final answers (p.2)",
+  "Numeric answers accepted within an error margin of 0.1 + 0.01 log(|answer|), about 12% of the reference value in the worked example of Fig. 1 (p.2, p.11)",
+  "Message answers scored 0.5 x (GPT-4o judge + embedding similarity), correct above 0.6 (p.11-12)",
+  "Only o1-preview passes the 60% grade-C line on APBench-gamma (Fig. 3 caption, p.3)",
+  "A canary string is used to reduce leakage into training corpora (p.5)"
+ ],
+ "overlap_with_engtrace": "Shares: an engineering domain (aerospace, which is not one of EngTrace's five branches); open-ended numeric answers checked within a tolerance (APBench's margin of roughly 10% against EngTrace's relative 0.002); a step-by-step solution stored with each item (p.10); a canary string and a private split (p.4-5). Lacks: generated instances (static textbook problems), step-level evaluation (final answers only, p.2), validation of its GPT-4o judge, expert validation of items.",
+ "confidence": "high",
+ "notes": "Author error: the first author is Di Wu, not Yongchao Chen (fourth author) (p.1); the printed list also names Daniel Jang and Giovanni Lavezzi, who are not on the Scientific Reports byline; another version of the paper may carry them, which the text cannot show. Fixing the key to Wu et al., 2025 also avoids a clash with Chen et al., 2025, the first author of the FIE paper whose title the 'Liu et al., 2025' entry prints (liu2025circuit). Margin arithmetic: Fig. 1's bounds of -4.479 and -5.655 around a reference of about -5.067 are consistent with a relative margin of 0.1 + 0.01 ln(5.067), about 0.116 (p.2); the text itself does not say 'relative' or which logarithm."
+}
