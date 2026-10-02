@@ -149,6 +149,17 @@ headline is the answer score; the reasoning scores describe what the traces reac
     evaluators' hashes, and `results.json` records what produced each table; the private seed and the
     pool are released at publication.
 
+## Metric continuity: what became of May's Table 1 columns
+
+| May (§4, Table 1) | October | why |
+|---|---|---|
+| Final Answer Accuracy (FAC) | the **fully-solved rate** (Q1), the same definition under the corrected check; the **answer score** beside it gives a partial answer 0.5 (the owner's rule, D-117) | the published check was wrong on 72 of the pilot's 300 traces, 68 of them correct answers called wrong, and ranked GPT-5 fourth where the experts put it first; the replacement agrees with the experts on 0.982 (RESULTS_X1 Finding 1b, D-137). The paper may keep the name FAC for the fully-solved rate |
+| Reasoning (F1), Tier 1 matching plus the AI Tribunal | **E5-strict milestone coverage** (Q3), with the digit rule and the router as the step-level components | the Tribunal's routing and its 20% sample rested on the broken check (correlation 0.74); the published panel was two judges, not three (E0-F6); Tier 1 matched almost nothing, so the score was the judges' (E0-F5); the sample reordered the ranking between identical runs (E0-F7); the judges shared families with the roster and one no longer exists (E0-F4); E5 is the most accurate milestone evaluator against the experts (F1 0.958) and E0 has no milestone score; E0 at scale would have cost about $334 with no ground truth (D-105) |
+| BERTScore, ROUGE-2, ROUGE-L | dropped | 0.866 to 0.882 across models whose accuracy ran 0.15 to 0.70: no discrimination (RESULTS_E0, NEXT_CYCLE_REVIEW 3.5) |
+
+Reasoning F1 and milestone coverage are different quantities on different pools, rosters and checks: never
+place the two columns side by side, and say in the evaluator section that the metric was replaced and why.
+
 ## What not to state
 
 - Not "model X is the best": the top five are within 0.9 points and no pair among them separates.
