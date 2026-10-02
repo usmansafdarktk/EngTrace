@@ -6474,8 +6474,12 @@ paraphrase --score`, every sent call still with its reply (the router's 3 withou
 **Backups.** `~/EngTrace_private_backup/full_run_scores_2026-10-02.zip` was rewritten with the re-scored
 stores and the rebuilt stage rows: 88 files, each checked against its source, sha256 `1a3df7ec…dd3e07`. It
 replaces the morning's archive of the same name (D-164), whose stores are the superseded ones under
-`scores/_replaced/` and regenerate from `e116b4f`. The private Kaggle copy needs a new version, uploaded in
-manual mode by the owner.
+`scores/_replaced/` and regenerate from `e116b4f`. Uploaded the same day, with the owner's go-ahead, as a new
+version of the private Kaggle dataset `ayeshaiq/engtrace-full-run-scores` (`kaggle datasets version`, never
+`--public`), downloaded back and compared: 87 of the 88 members match their local source by path and SHA-256,
+and the 88th, `scores/rescore_d169.log`, is the live log's first 5,371 bytes, because the chain appended its
+archive-step report to the log after the archive had copied it; the archive's own `.sha256` matches. The
+check folder was removed afterwards.
 
 **For the paper.** The check was corrected after the run on a reading of its verdicts, as D-137 to D-139 and
 D-147 were, and the paper reports it that way. The `array` type and the two-quantity scalar lines of D-168
@@ -6486,7 +6490,7 @@ main-run archive only (D-168's cosmetic defect); the committed review regenerate
 
 | # | Decision | Needed before |
 |---|---|---|
-| D-169 | Upload the rewritten `full_run_scores_2026-10-02.zip` as a new version of the private Kaggle scores dataset (manual mode). In the paper: the `array` type and the two-quantity scalar lines are listed with D-145's multipart templates; the one wrong credit is a stated limit | the archive's second copy; the paper's scoring statements |
+| D-169 | ~~Upload the rewritten `full_run_scores_2026-10-02.zip` as a new version of the private Kaggle scores dataset (manual mode)~~ **Done 2026-10-02: new version of `ayeshaiq/engtrace-full-run-scores`, downloaded back, 87 of 88 members identical and the log a prefix of the live one (D-169, Backups).** In the paper: the `array` type and the two-quantity scalar lines are listed with D-145's multipart templates; the one wrong credit is a stated limit | the paper's scoring statements |
 | D-168 | ~~Adopt readings P and A of the answer check (`ANSWER_FORM_AUDIT.md`), then `score --replace` on main, paraphrase and repeats, `judge --score`, `router --score`, `analyze`, and a DECISIONS entry; or report both as sensitivities~~ **Adopted 2026-10-02 with reading N, after every changed verdict was read (D-169); re-scored and regenerated.** ~~Decide how `array` items and the two-quantity scalar lines are scored, or list those templates with D-145's~~ **Listed with D-145's (D-169).** ~~Fix `trace_review.py`'s archive glob~~ **Fixed (D-169)** | — |
 | D-167 | Confirm EMNLP 2026 for Huang et al. and Długosz et al. once the proceedings appear (ERI is confirmed). The authors' call, outside the Related Work folder: `JUDGE_SELECTION.md` should say self-preference "can be" more than 50%, and the cliff should be reported as a difference between the templates in each tier (`notes/followup_review.md`) | the reference list; the paper's sections 3.3 and 5 |
 | D-166 | The authors' calls on the Related Work revision (`docs/related_work_oct2026/CHANGES.md`): adopt the replacement Introduction sentences (§2); whether the Limitations acknowledge Mondorf et al.'s finding on randomly sampled instances (§4); confirm three single-source venues (§6) | the paper's sections 1 and 2 |
