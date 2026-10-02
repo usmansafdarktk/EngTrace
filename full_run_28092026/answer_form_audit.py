@@ -450,7 +450,7 @@ def report(g: collections.Counter, p: dict, f: dict, keys: list[str], mv: dict) 
 # ------------------------------------------------------------------ the fix, between pinned commits
 
 PRE_FIX = 'e116b4f'       # the last commit before D-169's change to answer.py
-POST_FIX = None           # the commit that holds the change; set when it exists (see --fix)
+POST_FIX = '5415f61'       # the commit that holds the change (D-169)
 FIX_CHANGES = score.SCORES / 'answer_form_fix_changes.jsonl'
 
 
