@@ -6747,6 +6747,38 @@ half. For the paper: the four known templates plus these two as a stated list, t
 four; `signal_operations` is also a case where a numbers-only check cannot tell a correct operation from a wrong one on
 the same values, which belongs beside D-145's scoring statements.
 
+## D-178 — The section-A additions reviewed: the per-template SD distribution added, the leave-one-judge-out seeds made deterministic, the E5 validation table collated, the documentation and the paper notes brought up to date
+
+**Date:** 2026-10-03 · **Status:** DONE (free) · **Evidence:** `full_run_28092026/analyze.py` (Q1 instance-variance table, `answer_score_sd` in `results/per_template.csv`, the A11 header), `results/RESULTS.md` regenerated from a clean tree; `evaluator_pilot_17092026/analysis/lojo.py` (`seed_of`), `RESULTS_LOJO.md`; `analysis/attribution.py` (judged-step counts), `RESULTS_ATTRIBUTION.md`; `threshold_appendix.py` (`e5_validation`), `THRESHOLD_APPENDIX.md`; `RESULTS_PAPER_NOTES.md` (the section "Added 2026-10-03"); `ANALYSIS_PLAN.md`, `EVALUATION_GUIDE.md`, the pilot's README, RESULTS_E1 and JUDGE_SELECTION, `docs/PILOT_AND_FULL_RUN_ASSESSMENT.md`
+
+**The gap the owner asked about.** Instance variance within a template was shown only as the mean of the per-template
+SDs (Q1's SD-within column) and as Q4's all / some / none counts. Q1 now carries the distribution of the per-template
+SD (quartiles over the 150 templates, the templates with no instance variance split into all solved and none solved,
+and the three templates with the most), and `per_template.csv` carries every template's SD. The per-template SD of the score across a template's 15 instances has a median of 0.000 to 0.258 per model and an upper quartile of 0.000 to 0.352; the templates with no instance variance at all number 57 to 130 of 150 per model, almost all of them solved on every instance (52 to 130), and the templates that lead the instance variance most often across the roster are `aoq_ati_rectifying` (5), `adiabatic_flame_temperature` (5), `chart_pair_selection` (4), `normal_depth_iteration` (3), `annulus_flowrate` (2).
+
+**The review of A1 to A11, and what it changed.**
+- `lojo.py` seeded its template and trace bootstraps from Python's `hash()` of label tuples, which is salted per
+  process, so the intervals would have differed between runs. The seeds are now a CRC of the labels; the report was
+  regenerated and only interval endpoints moved, in the third decimal; every point estimate and the family-effect
+  rows (fixed seed) are unchanged, so D-174's figures stand.
+- The threshold appendix lacked the one judged-stage decision that is a threshold-like choice, the strict reading of
+  E5's judge; it now collates the judge's validation from the pilot's stored replies, reproducing RESULTS_E5's counts
+  (67 / 20 / 1 on true values, 0 / 66 / 22 on fabricated ones), with the milestone read as the pilot's parser reads
+  it (the name before the equals sign the judge echoes). The appendix header says its pilot rows are re-runs with
+  today's evaluators.
+- `attribution.py` now states how many labelled steps the router's judge saw (1,917 of 2,037, in the 299 traces whose
+  batched call returned) and ruled on (1,909).
+- A11's table header says its denominators are traces of items with milestones.
+- Checked and left as they were: A1's 147-template basis and its two tests; A2's Welch pairs with the constant-branch
+  guard and the detectable branch difference; A7's label reader incl. D-118's Froude rule; A8's zero-reasoning rows
+  as the endpoint reported them; A9's z-approximation (2.80), the plan's own; A10's readable-trace basis.
+
+**Documentation.** `ANALYSIS_PLAN.md` carries a dated note on the exploratory additions; `EVALUATION_GUIDE.md` a closing
+paragraph; the pilot's README two status rows; RESULTS_E1 and JUDGE_SELECTION a pointer where they said X2 was not yet
+done; the assessment's review table marks the rows section A closed; `RESULTS_PAPER_NOTES.md` gains a section with the
+numbers to report, what to state and not to state, and wording for the coverage comparison, the evaluator section and
+the branch paragraph.
+
 ## Open decisions
 
 | # | Decision | Needed before |

@@ -20,6 +20,22 @@ Correct 1, partial 0.5, incorrect or unusable 0. Fully solved: a partial scores 
 | `gpt-5.4-mini` | 0.847 | 0.806 to 0.885 | 0.168 | 0.252 | 0.834 | 0.792 to 0.873 | 1876 | 59 | 315 | 0 (0 + 0) | 0 |
 | `gpt-oss-20b` | 0.814 | 0.770 to 0.856 | 0.207 | 0.270 | 0.800 | 0.755 to 0.842 | 1800 | 65 | 330 | 55 (53 + 2) | 4 |
 
+**Instance variance within a template** (*added 2026-10-03, D-178*). The SD-within column above is the mean over templates of the SD of the score across a template's 15 instances; here its distribution: the quartiles over the 150 templates, the templates with no instance variance at all (the same verdict on all 15 instances, split into all solved and none solved), and the three templates with the largest instance variance. `results/per_template.csv` carries every template's SD (`answer_score_sd`).
+
+| model | per-template SD: lower quartile / median / upper quartile | templates with no instance variance (all solved / none solved) | highest instance variance |
+|---|---|---|---|
+| `deepseek-v4.1-flash` | 0.000 / 0.000 / 0.000 | 130 (130 / 0) | `qr_policy_one_iteration` 0.52; `adiabatic_flame_temperature` 0.41; `impulse_response_from_lccde` 0.37 |
+| `kimi-k3` | 0.000 / 0.000 / 0.000 | 123 (123 / 0) | `work_isothermal_virial` 0.46; `normal_depth_iteration` 0.46; `adiabatic_flame_temperature` 0.41 |
+| `claude-sonnet-5` | 0.000 / 0.000 / 0.000 | 128 (128 / 0) | `adiabatic_flame_temperature` 0.49; `single_sampling_oc_point` 0.46; `chart_pair_selection` 0.41 |
+| `glm-5.3-flash` | 0.000 / 0.000 / 0.000 | 129 (129 / 0) | `adiabatic_flame_temperature` 0.51; `normal_depth_iteration` 0.51; `single_sampling_oc_point` 0.46 |
+| `muse-glimmer-30b` | 0.000 / 0.000 / 0.000 | 126 (126 / 0) | `aoq_ati_rectifying` 0.52; `rackett_equation_volume` 0.51; `adiabatic_flame_temperature` 0.51 |
+| `glm-5.3` | 0.000 / 0.000 / 0.000 | 122 (120 / 2) | `aoq_ati_rectifying` 0.49; `normal_depth_iteration` 0.49; `bpsk_energy_basis` 0.46 |
+| `qwen3-235b-a22b-2507` | 0.000 / 0.000 / 0.258 | 78 (76 / 0) | `annulus_flowrate` 0.52; `aoq_ati_rectifying` 0.51; `chart_pair_selection` 0.51 |
+| `gemini-3.1-flash-lite` | 0.000 / 0.000 / 0.258 | 98 (94 / 4) | `manning_rectangular_discharge` 0.52; `power_law_fluid_shear` 0.52; `chart_pair_selection` 0.51 |
+| `gemma-4-26b-a4b` | 0.000 / 0.000 / 0.302 | 77 (74 / 3) | `aoq_ati_rectifying` 0.52; `ideal_gas_volume` 0.52; `utube_manometer` 0.52 |
+| `gpt-5.4-mini` | 0.000 / 0.065 / 0.352 | 75 (71 / 4) | `annulus_flowrate` 0.52; `chart_pair_selection` 0.52; `rotating_unbalance` 0.52 |
+| `gpt-oss-20b` | 0.000 / 0.258 / 0.352 | 57 (52 / 5) | `aoq_ati_rectifying` 0.52; `phase_relations_degree_of_saturation` 0.52; `statically_indeterminate_shaft` 0.52 |
+
 Of the 55 pairs, 32 differ at a Holm-adjusted p below 0.05 on the answer score (sign-flip permutation over the 150 per-template differences). The same template-level test on the fully-solved rate gives the same verdict on 54 of 55. McNemar's exact test on the paired item verdicts (Holm) gives the same verdict on 47 of 55; on 8 of the 8 others McNemar holds and the template-level test does not: McNemar treats the 2,250 items as independent, and instances of a template are not (D-111), so a claim rests on the template-level tests. 7 answered rows across the roster ended with a finish reason other than stop or length (a provider fault inside a 200) and are scored on what they state; the harness now retries such a reply (D-148).
 
 | a | b | a - b | 95% CI | p (Holm) | fully solved a - b | 95% CI | template p (Holm) | McNemar p (Holm) | same verdict | detectable, 0.05 / Holm |
@@ -232,7 +248,7 @@ Of the 55 pairs, 28 differ at a Holm-adjusted p below 0.05 under the sign-flip t
 
 **Verdict against coverage at the trace level** (*exploratory; D-173, next steps A11*). The share of fully solved traces with coverage below 0.5, and of answered wrong answers with coverage 1.0, template intervals. The second is what a process score adds on a wrong answer: a complete derivation to a wrong value.
 
-| model | fully solved traces | with coverage < 0.5 | 95% CI | answered wrong answers | with coverage 1.0 | 95% CI |
+| model | fully solved traces (items with milestones) | with coverage < 0.5 | 95% CI | answered wrong answers (items with milestones) | with coverage 1.0 | 95% CI |
 |---|---:|---:|---:|---:|---:|---:|
 | `gpt-oss-20b` | 1743 | 0.036 | 0.019 to 0.056 | 322 | 0.130 | 0.071 to 0.209 |
 | `gemma-4-26b-a4b` | 1839 | 0.036 | 0.018 to 0.058 | 269 | 0.245 | 0.160 to 0.350 |
@@ -624,4 +640,4 @@ The pool over-represents the rare labels by design (D-116), so these rates are p
 
 ## Provenance
 
-`analyze.py` at commit `fd061ab`; the score store `main` scored at commit `2950875` on 2026-10-02T13:09:33+00:00; stages: e5 at `2950875`, router at `2950875`. The evaluator hashes and the per-model trace hashes are in `results.json`.
+`analyze.py` at commit `f9eb834`; the score store `main` scored at commit `2950875` on 2026-10-02T13:09:33+00:00; stages: e5 at `2950875`, router at `2950875`. The evaluator hashes and the per-model trace hashes are in `results.json`.

@@ -149,6 +149,108 @@ headline is the answer score; the reasoning scores describe what the traces reac
     evaluators' hashes, and `results.json` records what produced each table; the private seed and the
     pool are released at publication.
 
+## Added 2026-10-03: the section-A analyses (D-173 to D-178)
+
+Every figure below is in `results/RESULTS.md` (regenerated from a clean tree at the commit its provenance line names),
+`DECODING_TABLE.md`, `THRESHOLD_APPENDIX.md`, `SHORTCUT_AUDIT.md`, or the pilot's `RESULTS_LOJO.md` and
+`RESULTS_ATTRIBUTION.md`, all written by committed scripts. Each analysis was added after the data and is labelled
+exploratory where it appears; the plan's tests are unchanged. Cite the file, regenerate the table from it.
+
+### The numbers to report
+
+| what | value | source |
+|---|---|---|
+| coverage compared across models | E5-strict coverage as the mean of template means over 147 templates, 0.816 (gpt-oss-20b) to 0.922 (Claude Sonnet 5); 28 of 55 pairs differ after Holm under the sign-flip test, 29 under Wilcoxon; DeepSeek V4.1 Flash below Claude Sonnet 5 by 0.025 (Holm p 0.024); Claude, Kimi and GLM-5.3-Flash do not separate; Kendall's tau between the answer order and the coverage order 0.709 (0.514 to 0.855) | RESULTS.md Q3, "Coverage compared across models" |
+| detectable differences | 23 of the 55 answer-score pairs lie below the smallest difference the design detects at 80% power, all 23 the non-significant ones; the coverage pairs and Q5's arm carry the same column | Q1, the coverage pairs, Q5's bounds table |
+| instance variance within a template | The per-template SD of the score across a template's 15 instances has a median of 0.000 to 0.258 per model and an upper quartile of 0.000 to 0.352; the templates with no instance variance at all number 57 to 130 of 150 per model, almost all of them solved on every instance (52 to 130), and the templates that lead the instance variance most often across the roster are `aoq_ati_rectifying` (5), `adiabatic_flame_temperature` (5), `chart_pair_selection` (4), `normal_depth_iteration` (3), `annulus_flowrate` (2). | Q1, "Instance variance within a template"; `per_template.csv` (`answer_score_sd`) |
+| branch and level intervals | branch means with template intervals of about ±0.05 to ±0.13; the smallest branch difference 30 templates detect 0.07 (Kimi) to 0.19 (gpt-oss-20b); of the ten branch pairs per model under Welch with Holm, one holds in the roster (gpt-oss-20b, electrical above civil by 0.234) | "By branch and level, with template intervals" |
+| the cliff without the two chemical templates | gaps +0.029 to +0.157, significant after Holm for 0 of 11 (4 of 11 as scored) | Q2, three variations |
+| coverage against verbosity | Spearman's rho between a template's mean coverage and its mean steps per trace −0.11 to −0.26 for every model (against claims −0.14 to −0.28) | Q3, "Does coverage track verbosity?" |
+| verdict against coverage | fully solved traces with coverage below 0.5: 2.0% to 4.8%; answered wrong answers with coverage 1.0: 13% to 26% for the five models with more than 100 wrong answers | Q3, "Verdict against coverage" |
+| leave-one-judge-out on the Tribunal | replayed offline, reproducing all 179 judged scores exactly; dropping a family's own judge moves its mean F1 by 0.000 (Claude), −0.001 (Gemini) and −0.006 (GPT-5), the same as the placebo drops; detectable 0.003 to 0.025 | pilot `RESULTS_LOJO.md` |
+| per-judge bias (X2) | every judge's verdict minus the experts' is +0.04 to +0.18 on every family; 79% to 100% of expert-incorrect steps on frontier traces called Alternative Correct by every judge, 0% to 2% of correct steps called an error; own-family minus other-traces bias +0.042 (GPT-5; −0.034 to +0.119), −0.017 (Opus 4.5; −0.070 to +0.041), −0.060 (Gemini; −0.112 to −0.009); E1's three judges the same | `RESULTS_LOJO.md`, X2 |
+| thresholds | the answer check's tolerance 0.002, held out at 0.908 and 0.939 three-way agreement; ordering unchanged at half and double (tau 0.927); E3's 0.5% on a plateau (separation 0.699); the digit rule's four readings (hard-case precision 0.171, 0.345, 0.581, 0.817); E2's held-out gain −0.006; the E5 judge's validation 67 / 20 / 1 on true values and 0 / 66 / 22 on fabricated ones | `THRESHOLD_APPENDIX.md` |
+| attribution by type | the digit rule's flags are calculation slips 81% of the time (precision 0.872 on any error); the judge's "Conceptual Error" lands on a conceptual step 42% and a correct step 38% of the time, and finds 64% of the experts' conceptual steps; inside correct-answer traces the judge flags 19 steps at precision 0.368 | pilot `RESULTS_ATTRIBUTION.md` |
+| shortcut audit | the two known lookups lift +0.52 and +0.36 over their floors; `reynolds_number_flow_regime` +0.10, the two others 0.00 and +0.01; two templates newly flagged for restated inputs, `signal_operations` and `quantity_discount_all_units`; the headline changes by at most 0.002 without them | `SHORTCUT_AUDIT.md` |
+| decoding | provider defaults throughout; four models' endpoints reported zero reasoning tokens on every row; median completion tokens 632 to 3,270 | `DECODING_TABLE.md` |
+
+### What to state
+
+1. **Coverage compared across models, as the July rebuttal promised.** Report the ordering with its intervals and the
+   pair count under both tests, and say the two tests agree on 51 of 55 pairs. The sentence the rebuttal owes is one
+   about Wilcoxon on the continuous reasoning score beside McNemar on the answer: it is now a table. Keep the caption's
+   caveat: coverage credits stated intermediates, so it ranks what traces state.
+2. **Branch and level with intervals, and no "hardest branch".** Give the branch means with their intervals and the
+   detectable branch difference. The only branch sentence the data carry is that gpt-oss-20b scores higher on
+   electrical than on civil; for every other model and pair the test does not hold. Say that 30 templates per branch
+   detect differences of 7 to 19 points and that the branch spreads sit below that.
+3. **The cliff, with the two-template sensitivity.** The gap is positive for every model under every variation; it is
+   significant after Holm for four models as scored and for none without the two chemical templates of D-171. State
+   both counts in the cliff paragraph, not only the first.
+4. **Judge overlap, in the evaluator section.** One paragraph: the leave-one-judge-out ablation on the published
+   Tribunal, with placebo and untouched controls, finds no family effect at a detectable 0.003 to 0.025 F1; the
+   per-judge bias is positive and uniform across families and across E1's panel, so the Tribunal's error is the
+   task's, not self-preference; and the full run's judge shares no family with the roster. Then the swap result
+   already there (0.379 against 0.378).
+5. **Thresholds, promoted.** The appendix table exists; one sentence in the method section says the tolerance is the
+   check's only fitted number, how it was held out, and that the ordering is unchanged at half and double.
+6. **Attribution read through its precisions.** Where Q3's attribution table is cited, say that a digit flag is a
+   real slip with probability 0.87 and a calculation slip 0.81, and that the judge's category points to the cause
+   but a flag is never a count.
+7. **The shortcut audit as a stated list.** The four known templates plus the two newly flagged, with the sentence
+   that the headline is unchanged without them, and that `signal_operations` is also a case where a numbers-only
+   check cannot tell a correct operation from a wrong one on the same values.
+8. **Instance variance.** Beside the SD-within column, one sentence from the distribution: most templates are either
+   solved on every instance or vary little; the variance concentrates in a handful of templates per model, named in
+   the table, and `per_template.csv` carries all of it.
+9. **Power beside every null.** Where a difference is called not significant, give the detectable difference from
+   the same row.
+
+### What not to state
+
+- Not "chemical engineering is hardest" or any branch ordering: one pair in the roster holds.
+- Not "the cliff holds" without both counts (4 of 11 as scored, 0 of 11 without the two chemical templates).
+- Not "no self-preference" as evidence that the judges are accurate: they are uniformly lenient; the ablation
+  answers the overlap objection and nothing else.
+- Not "coverage is independent of verbosity": the correlation is negative and small; say "does not rise with the
+  amount written".
+- Not the two newly flagged templates as removed from the headline: the headline keeps them and the sensitivity says
+  they do not matter.
+- Not the threshold appendix's pilot rows as the published RESULTS_E3 and RESULTS_X1 figures: they are re-runs with
+  today's evaluators and differ in the third decimal; `SCORER_VALIDATION.md` reproduces the published ones.
+
+### Suggested wording
+
+**For the coverage comparison.** "Milestone coverage ranks the models differently from the answer score (Kendall's
+tau 0.71, 95% CI 0.51 to 0.86). Over the 55 pairs, 28 differ after Holm correction under a sign-flip test on the
+per-template differences and 29 under a Wilcoxon signed-rank test; the three models with the highest coverage,
+Claude Sonnet 5, Kimi K3 and GLM-5.3-Flash, do not separate from one another, and DeepSeek V4.1 Flash, first on the
+answer score, sits 0.025 below Claude Sonnet 5 on coverage. Coverage credits stated intermediates: it does not rise
+with the number of steps a model writes (Spearman's rho −0.11 to −0.26 across templates), and it ranks what traces
+state rather than how soundly they reason."
+
+**For the evaluator section.** "To test the overlap between judges and judged models directly, we recomputed the
+published Tribunal's scores on the pilot's 300 traces with each judge's votes removed in turn, from the stored
+matrices and replies, reproducing every stored score under the full panel. Removing a family's own judge changes its
+mean reasoning score by at most 0.006, the same as removing a judge from another family, with DeepSeek R1 and Llama
+3.1 70B as untouched controls; the design detects changes of 0.003 to 0.025. Per judge, the verdicts are lenient on
+every family alike: each judge called 79% to 100% of the steps the experts marked incorrect in frontier traces
+'Alternative Correct', and no judge was more lenient on its own family. The full run's judge, MiMo-V2.5-Pro, shares
+no family with the roster."
+
+**For the branch paragraph.** "Branch means carry template-level intervals of about ±0.05 to ±0.13 (30 templates per
+branch), and 30 templates detect branch differences of 7 to 19 points at 80% power depending on the model. Within a
+model, one branch pair in the roster separates after Holm correction (gpt-oss-20b, electrical above civil); we
+therefore report branch means without ranking them."
+
+### Figures and tables worth including
+
+- Table: coverage per model with intervals and the two ranks, beside the answer score.
+- Figure: the 55 coverage differences with their intervals, Holm verdicts marked.
+- Appendix table: branch and level means with intervals, the detectable branch difference, and the branch pairs that hold.
+- Appendix table: the thresholds (from `THRESHOLD_APPENDIX.md`) and the leave-one-judge-out table (from `RESULTS_LOJO.md`).
+- Appendix table: Appendix P from `DECODING_TABLE.md`.
+
 ## Metric continuity: what became of May's Table 1 columns
 
 | May (§4, Table 1) | October | why |

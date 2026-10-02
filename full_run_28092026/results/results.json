@@ -10,6 +10,28 @@
     ],
     "within_template_sd": 0.20733480811611488,
     "between_template_sd": 0.26987490312331575,
+    "within_sd_quartiles": [
+     0.0,
+     0.25819888974716115,
+     0.3518657752744984
+    ],
+    "templates_no_instance_variance": 57,
+    "templates_no_variance_all_solved": 52,
+    "templates_no_variance_none_solved": 5,
+    "highest_variance_templates": [
+     {
+      "template": "template_aoq_ati_rectifying",
+      "sd": 0.5163977794943222
+     },
+     {
+      "template": "template_phase_relations_degree_of_saturation",
+      "sd": 0.5163977794943222
+     },
+     {
+      "template": "template_statically_indeterminate_shaft",
+      "sd": 0.5163977794943222
+     }
+    ],
     "fully_solved": 0.8,
     "fully_ci": [
      0.7546666666666667,
@@ -38,6 +60,28 @@
     ],
     "within_template_sd": 0.16000346836220805,
     "between_template_sd": 0.23060145720619954,
+    "within_sd_quartiles": [
+     0.0,
+     0.0,
+     0.30153151376581133
+    ],
+    "templates_no_instance_variance": 77,
+    "templates_no_variance_all_solved": 74,
+    "templates_no_variance_none_solved": 3,
+    "highest_variance_templates": [
+     {
+      "template": "template_aoq_ati_rectifying",
+      "sd": 0.5163977794943222
+     },
+     {
+      "template": "template_ideal_gas_volume",
+      "sd": 0.5163977794943222
+     },
+     {
+      "template": "template_utube_manometer",
+      "sd": 0.5163977794943222
+     }
+    ],
     "fully_solved": 0.8475555555555556,
     "fully_ci": [
      0.808,
@@ -64,6 +108,28 @@
     ],
     "within_template_sd": 0.03350253603421968,
     "between_template_sd": 0.10527617172978435,
+    "within_sd_quartiles": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "templates_no_instance_variance": 130,
+    "templates_no_variance_all_solved": 130,
+    "templates_no_variance_none_solved": 0,
+    "highest_variance_templates": [
+     {
+      "template": "template_qr_policy_one_iteration",
+      "sd": 0.5163977794943222
+     },
+     {
+      "template": "template_adiabatic_flame_temperature",
+      "sd": 0.41403933560541256
+     },
+     {
+      "template": "template_impulse_response_from_lccde",
+      "sd": 0.37161167647860327
+     }
+    ],
     "fully_solved": 0.9697777777777777,
     "fully_ci": [
      0.9484444444444443,
@@ -90,6 +156,28 @@
     ],
     "within_template_sd": 0.1498260094587521,
     "between_template_sd": 0.2018315341638864,
+    "within_sd_quartiles": [
+     0.0,
+     0.0,
+     0.25819888974716115
+    ],
+    "templates_no_instance_variance": 78,
+    "templates_no_variance_all_solved": 76,
+    "templates_no_variance_none_solved": 0,
+    "highest_variance_templates": [
+     {
+      "template": "template_annulus_flowrate",
+      "sd": 0.5163977794943222
+     },
+     {
+      "template": "template_aoq_ati_rectifying",
+      "sd": 0.5070925528371101
+     },
+     {
+      "template": "template_chart_pair_selection",
+      "sd": 0.50709255283711
+     }
+    ],
     "fully_solved": 0.86,
     "fully_ci": [
      0.82,
@@ -116,6 +204,28 @@
     ],
     "within_template_sd": 0.04058459432407086,
     "between_template_sd": 0.12318904432339937,
+    "within_sd_quartiles": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "templates_no_instance_variance": 129,
+    "templates_no_variance_all_solved": 129,
+    "templates_no_variance_none_solved": 0,
+    "highest_variance_templates": [
+     {
+      "template": "template_adiabatic_flame_temperature",
+      "sd": 0.50709255283711
+     },
+     {
+      "template": "template_normal_depth_iteration",
+      "sd": 0.50709255283711
+     },
+     {
+      "template": "template_single_sampling_oc_point",
+      "sd": 0.45773770821706344
+     }
+    ],
     "fully_solved": 0.9653333333333334,
     "fully_ci": [
      0.9426666666666665,
@@ -142,6 +252,28 @@
     ],
     "within_template_sd": 0.05414889129862646,
     "between_template_sd": 0.1751252525736603,
+    "within_sd_quartiles": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "templates_no_instance_variance": 122,
+    "templates_no_variance_all_solved": 120,
+    "templates_no_variance_none_solved": 2,
+    "highest_variance_templates": [
+     {
+      "template": "template_aoq_ati_rectifying",
+      "sd": 0.48795003647426666
+     },
+     {
+      "template": "template_normal_depth_iteration",
+      "sd": 0.48795003647426666
+     },
+     {
+      "template": "template_bpsk_energy_basis",
+      "sd": 0.45773770821706344
+     }
+    ],
     "fully_solved": 0.9426666666666667,
     "fully_ci": [
      0.9111111111111112,
@@ -170,6 +302,28 @@
     ],
     "within_template_sd": 0.04957861486455825,
     "between_template_sd": 0.11640249200155045,
+    "within_sd_quartiles": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "templates_no_instance_variance": 126,
+    "templates_no_variance_all_solved": 126,
+    "templates_no_variance_none_solved": 0,
+    "highest_variance_templates": [
+     {
+      "template": "template_aoq_ati_rectifying",
+      "sd": 0.5163977794943222
+     },
+     {
+      "template": "template_rackett_equation_volume",
+      "sd": 0.5070925528371101
+     },
+     {
+      "template": "template_adiabatic_flame_temperature",
+      "sd": 0.50709255283711
+     }
+    ],
     "fully_solved": 0.9626666666666667,
     "fully_ci": [
      0.9413333333333332,
@@ -194,6 +348,28 @@
     ],
     "within_template_sd": 0.04648476365213039,
     "between_template_sd": 0.09945014127217432,
+    "within_sd_quartiles": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "templates_no_instance_variance": 123,
+    "templates_no_variance_all_solved": 123,
+    "templates_no_variance_none_solved": 0,
+    "highest_variance_templates": [
+     {
+      "template": "template_work_isothermal_virial",
+      "sd": 0.4577377082170635
+     },
+     {
+      "template": "template_normal_depth_iteration",
+      "sd": 0.4577377082170634
+     },
+     {
+      "template": "template_adiabatic_flame_temperature",
+      "sd": 0.4140393356054126
+     }
+    ],
     "fully_solved": 0.9688888888888889,
     "fully_ci": [
      0.9497777777777778,
@@ -221,6 +397,28 @@
     ],
     "within_template_sd": 0.16840780478182157,
     "between_template_sd": 0.25158992316017836,
+    "within_sd_quartiles": [
+     0.0,
+     0.06454972243679027,
+     0.35186577527449836
+    ],
+    "templates_no_instance_variance": 75,
+    "templates_no_variance_all_solved": 71,
+    "templates_no_variance_none_solved": 4,
+    "highest_variance_templates": [
+     {
+      "template": "template_annulus_flowrate",
+      "sd": 0.5163977794943222
+     },
+     {
+      "template": "template_chart_pair_selection",
+      "sd": 0.5163977794943222
+     },
+     {
+      "template": "template_rotating_unbalance",
+      "sd": 0.5163977794943222
+     }
+    ],
     "fully_solved": 0.8337777777777777,
     "fully_ci": [
      0.792,
@@ -245,6 +443,28 @@
     ],
     "within_template_sd": 0.12062397105086536,
     "between_template_sd": 0.25581198430671515,
+    "within_sd_quartiles": [
+     0.0,
+     0.0,
+     0.25819888974716115
+    ],
+    "templates_no_instance_variance": 98,
+    "templates_no_variance_all_solved": 94,
+    "templates_no_variance_none_solved": 4,
+    "highest_variance_templates": [
+     {
+      "template": "template_manning_rectangular_discharge",
+      "sd": 0.5163977794943222
+     },
+     {
+      "template": "template_power_law_fluid_shear",
+      "sd": 0.5163977794943222
+     },
+     {
+      "template": "template_chart_pair_selection",
+      "sd": 0.50709255283711
+     }
+    ],
     "fully_solved": 0.8626666666666669,
     "fully_ci": [
      0.8186666666666668,
@@ -269,6 +489,28 @@
     ],
     "within_template_sd": 0.04059631039043802,
     "between_template_sd": 0.11197745769380765,
+    "within_sd_quartiles": [
+     0.0,
+     0.0,
+     0.0
+    ],
+    "templates_no_instance_variance": 128,
+    "templates_no_variance_all_solved": 128,
+    "templates_no_variance_none_solved": 0,
+    "highest_variance_templates": [
+     {
+      "template": "template_adiabatic_flame_temperature",
+      "sd": 0.48795003647426666
+     },
+     {
+      "template": "template_single_sampling_oc_point",
+      "sd": 0.4577377082170634
+     },
+     {
+      "template": "template_chart_pair_selection",
+      "sd": 0.4140393356054126
+     }
+    ],
     "fully_solved": 0.9657777777777778,
     "fully_ci": [
      0.9440000000000002,
@@ -10025,10 +10267,10 @@
  ],
  "provenance": {
   "analyze": {
-   "git": "fd061ab929e546d8775fea430308b046b99b0046",
+   "git": "f9eb834680fad73d7f59679ae4e34baf2bc7cf89",
    "tag": null,
    "dirty": false,
-   "sha256_lf": "332e00eb991548312d3e61d8b0448647a25173d8c3b7c5cd0059b7ca39889ad5",
+   "sha256_lf": "2c3e95838ebc177b06da957e55e4a86cb814fbcb30a9be3a65f0f35d0b816871",
    "B": 10000,
    "B_TEST": 100000
   },

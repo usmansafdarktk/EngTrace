@@ -89,6 +89,13 @@ The threshold that maximises step F1 against the experts' labels, fitted on one 
 
 ## 5. The judged stages, and the published framework's constants
 
-E5's judge and the step router carry no numeric threshold: a milestone is REACHED, NOT_NEEDED or MISSING, and a step is flagged or not; the strict reading (REACHED only) was chosen after the judge gave NOT_NEEDED to a quarter of fabricated values (RESULTS_E5). For the record, the published framework's constants as its source states them: step tolerance 0.02, cross-encoder threshold 0.7, tribunal trigger 0.8, wrong-answer sample rate 0.2, final-answer tolerance 0.02; its cross-encoder and alignment-ratio thresholds no longer exist in the stack, so the sensitivity the July rebuttal promised for them is moot.
+E5's judge and the step router carry no numeric threshold: a milestone is REACHED, NOT_NEEDED or MISSING, and a step is flagged or not. The one reading chosen is the strict one, REACHED only, on the judge's validation against answers known without asking it (RESULTS_E5; the pilot's stored replies, `scores/e5_validation.jsonl`): milestones E3 had found, shown with their true values, and the same milestones with every value multiplied by 1.37, which the trace never states.
+
+| shown to the judge | REACHED | MISSING | NOT_NEEDED | unjudged |
+|---|---:|---:|---:|---:|
+| true values (should be REACHED), 88 | 67 | 20 | 1 | 0 |
+| values x1.37 (should be MISSING), 88 | 0 | 66 | 22 | 0 |
+
+REACHED was never given to a fabricated value, so the strict score is sound and conservative; NOT_NEEDED excused a quarter of them, so the lenient reading is not a score. For the record, the published framework's constants as its source states them: step tolerance 0.02, cross-encoder threshold 0.7, tribunal trigger 0.8, wrong-answer sample rate 0.2, final-answer tolerance 0.02; its cross-encoder and alignment-ratio thresholds no longer exist in the stack, so the sensitivity the July rebuttal promised for them is moot.
 
 What cannot be redone: the tolerance's split-half fit rests on the pilot's labels; the full run has none, so no threshold was re-tuned there (next steps, "Not to do").

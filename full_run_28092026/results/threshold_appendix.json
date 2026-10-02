@@ -229,6 +229,17 @@
   "gold_null_key": "e3_null_mean",
   "store_commit": "2950875"
  },
+ "e5_validation": {
+  "SENS": {
+   "MISSING": 20,
+   "REACHED": 67,
+   "NOT_NEEDED": 1
+  },
+  "SPEC": {
+   "MISSING": 66,
+   "NOT_NEEDED": 22
+  }
+ },
  "answer_check": {
   "shipped_rel": 0.002,
   "split_half": [

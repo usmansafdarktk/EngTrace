@@ -29,6 +29,8 @@ WHAT IT COLLATES.
 from __future__ import annotations
 
 import argparse
+import ast
+import collections
 import json
 import re
 import subprocess
@@ -128,6 +130,49 @@ def stack_constants() -> dict:
     return {'answer_rel': float(a.group(1)) if a else None, 'milestone_tol': float(d.group(1)) if d else None}
 
 
+def e5_validation() -> dict:
+    """The E5 judge's validation on answers known without asking it (RESULTS_E5, D-087): milestones E3 found, with
+    their true values (SENS, should be REACHED) and the same milestones with every value x1.37 (SPEC, should be
+    MISSING), each verdict read from the pilot's stored replies. The strict reading, REACHED only, rests on this."""
+    out = {'SENS': collections.Counter(), 'SPEC': collections.Counter()}
+    for line in (PILOT / 'scores' / 'e5_validation.jsonl').read_text(encoding='utf-8').splitlines():
+        if not line.strip():
+            continue
+        r = json.loads(line)
+        rep = r.get('reply')
+        if isinstance(rep, str):
+            try:
+                rep = ast.literal_eval(rep)
+            except (ValueError, SyntaxError):
+                rep = None
+        ms = r.get('milestones')
+        if isinstance(ms, str):
+            try:
+                ms = ast.literal_eval(ms)
+            except (ValueError, SyntaxError):
+                ms = []
+        verdicts = {}
+        try:
+            text = (rep.get('text') or '').strip() if isinstance(rep, dict) else ''
+            if text.startswith('```'):                      # as evaluators/e5_hybrid.parse reads a fenced reply
+                text = text.strip('`').split('\n', 1)[-1]
+            data = json.loads(text or '{}')
+            res = data.get('results') if isinstance(data, dict) else data
+            for x in res if isinstance(res, list) else []:
+                if isinstance(x, dict):
+                    # the prompt lists "- name = value" and the judge echoes it whole; the id is the name before '='
+                    name = str(x.get('milestone', '')).split('=')[0].strip()
+                    verdicts[name] = str(x.get('verdict', '')).upper().replace(' ', '_')
+        except (ValueError, AttributeError):
+            pass
+        for m in ms or []:
+            out[r['kind']][verdicts.get(m, 'UNJUDGED')] += 1
+    for k, c in out.items():
+        if sum(c.values()) != 88:
+            raise SystemExit(f'E5 validation: {k} holds {sum(c.values())} milestone verdicts, expected 88 (RESULTS_E5)')
+    return {k: dict(v) for k, v in out.items()}
+
+
 def full_run() -> dict:
     res = json.loads((HERE / 'results' / 'results.json').read_text(encoding='utf-8'))
     gold = json.loads((HERE / 'gold_validation.json').read_text(encoding='utf-8'))
@@ -206,10 +251,19 @@ def render(d: dict) -> str:
     for r in d['prm_threshold']:
         L.append(f"| {r['subset']} | {r['prm']} | {r['f1_at_fitted']:.3f} | {r['f1_at_0.5']:.3f} | {r['gain']:+.3f} | "
                  f"{r['fitted_threshold_halves'][0]:.3f}, {r['fitted_threshold_halves'][1]:.3f} |")
+    v = d.get('e5_validation') or {}
+    sens, spec = v.get('SENS', {}), v.get('SPEC', {})
     L += ['', '## 5. The judged stages, and the published framework\'s constants', '',
           'E5\'s judge and the step router carry no numeric threshold: a milestone is REACHED, NOT_NEEDED or MISSING, and a step '
-          'is flagged or not; the strict reading (REACHED only) was chosen after the judge gave NOT_NEEDED to a quarter of fabricated '
-          'values (RESULTS_E5). For the record, the published framework\'s constants as its source states them: step tolerance '
+          'is flagged or not. The one reading chosen is the strict one, REACHED only, on the judge\'s validation against answers '
+          'known without asking it (RESULTS_E5; the pilot\'s stored replies, `scores/e5_validation.jsonl`): milestones E3 had found, '
+          'shown with their true values, and the same milestones with every value multiplied by 1.37, which the trace never states.', '',
+          '| shown to the judge | REACHED | MISSING | NOT_NEEDED | unjudged |', '|---|---:|---:|---:|---:|',
+          f"| true values (should be REACHED), {sum(sens.values())} | {sens.get('REACHED', 0)} | {sens.get('MISSING', 0)} | {sens.get('NOT_NEEDED', 0)} | {sens.get('UNJUDGED', 0)} |",
+          f"| values x1.37 (should be MISSING), {sum(spec.values())} | {spec.get('REACHED', 0)} | {spec.get('MISSING', 0)} | {spec.get('NOT_NEEDED', 0)} | {spec.get('UNJUDGED', 0)} |", '',
+          'REACHED was never given to a fabricated value, so the strict score is sound and conservative; NOT_NEEDED excused a '
+          'quarter of them, so the lenient reading is not a score. '
+          'For the record, the published framework\'s constants as its source states them: step tolerance '
           f"{fw['STEP_TOLERANCE']}, cross-encoder threshold {fw['SEMANTIC_TAU']}, tribunal trigger {fw['TRIBUNAL_TRIGGER_THRESHOLD']}, "
           f"wrong-answer sample rate {fw['ERROR_SAMPLE_RATE']}, final-answer tolerance {fw['FINAL_TOLERANCE']}; its cross-encoder and "
           'alignment-ratio thresholds no longer exist in the stack, so the sensitivity the July rebuttal promised for them is moot.', '',
@@ -223,6 +277,7 @@ def main() -> int:
     ap.add_argument('--cached', action='store_true')
     a = ap.parse_args()
     d = {'stack_constants': stack_constants(), 'framework_constants': framework_constants(), 'full_run': full_run(),
+         'e5_validation': e5_validation(),
          'answer_check': parse_answer(run('answer_check', a.cached)),
          'e3_grid': parse_e3(run('e3_grid', a.cached)),
          'digit_rule': parse_digit(run('digit_rule', a.cached)),
