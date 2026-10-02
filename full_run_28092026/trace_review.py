@@ -65,8 +65,14 @@ def variant_manifest(variant: str, man: dict) -> dict[str, dict]:
     from full_run_28092026 import subsamples
     if variant in subsamples.REPEAT_VARIANTS:
         return {i: man[i] for i in subsamples.repeat_ids()}
-    if variant.startswith('reasoning-'):                 # C1: the originals of the 450-item subsample
+    if variant.startswith('reasoning-') or variant.startswith('flagship'):     # C1, C3: the originals of the 450-item subsample
         return {i: man[i] for i in subsamples.paraphrase_ids()}
+    if variant == 'openbook':                            # C4: the modified questions, by their manifest
+        p = HERE / 'openbook' / 'manifest.jsonl'
+        if not p.exists():
+            raise SystemExit('openbook/manifest.jsonl is missing: run openbook.py --build first')
+        return {r['item_id']: {'sha256': r['sha256'], 'original_sha256': r['original_sha256']}
+                for r in map(json.loads, p.read_text(encoding='utf-8').splitlines())}
     if variant != 'paraphrase':
         return man
     p = HERE / 'paraphrase' / 'manifest.jsonl'
@@ -132,7 +138,7 @@ def review_model(key: str, man: dict, variant: str = 'main', main_served: dict |
         'prompt_hashes': len(prompts), 'prompt_is_pilots': set(prompts) == {PROMPT_SHA},
         'request_variants': len(requests),
         'served_models': dict(served.most_common()),
-        'served_as_main': (set(served) == set(main_served.get(key, {})) if main_served is not None else None),
+        'served_as_main': (set(served) == set(main_served[key]) if main_served and main_served.get(key) else None),
         'providers': dict(providers.most_common(4)), 'provider_count': len(providers),
         'capped_with_text': capped,
         'no_answer_marker': len(no_marker),
@@ -179,7 +185,8 @@ def main() -> int:
     a = ap.parse_args()
     variant = a.variant
     man = variant_manifest(variant, manifest())
-    keys = [m['key'] for m in config()['models'] if not m.get('run') is False or variant == 'main']
+    keys = [m['key'] for m in config()['models']                 # an arm reviews whichever models it holds (the anchors, C3)
+            if variant == 'main' or (TRACES / variant / f"{m['key']}.jsonl").exists()]
     main_served = None
     if variant != 'main':
         main_served = {k: (review_model(k, manifest()) or {}).get('served_models', {}) for k in keys}

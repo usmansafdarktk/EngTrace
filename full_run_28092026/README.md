@@ -207,5 +207,26 @@ python -m full_run_28092026.score --variant paraphrase                          
 python -m full_run_28092026.paraphrase_kit --score <returned folder>              # free
 ```
 
+The section-C arms of `docs/EVALUATION_NEXT_STEPS.md` (D-179 to D-183) are variants of the same harness, all on
+the originals of the 450-item subsample. `--variant reasoning-<low|medium|high>` re-runs the closed models whose
+endpoints reported no reasoning tokens in the main run with OpenRouter's reasoning parameter at that effort (C1);
+`--variant flagship` runs the anchors of `models.json` (`anchor: true`, `run: false`: `gpt-5.4` and
+`deepseek-v4-pro`, both passing the roster rule) at the provider's default, and `flagship-reasoning-<effort>` the
+closed anchor with the parameter (C3); `--variant openbook` sends the question with the template's governing
+equations appended (`openbook.py --survey | --build`; `openbook/manifest.jsonl` is committed, the modified
+questions stay local) for one model from each tier (C4). A reasoning arm's dry run prices multipliers of the
+visible output and `--calibrate N --yes` measures the real lengths on N items first. The scorer, `trace_review.py`,
+`decoding_table.py --variant`, E5 and the router take an arm's name and its models from the arm's own files;
+`analyze.py` reports the paired arms (C1, C4) against the main run with Q5's machinery and the anchors (C3) on the
+subsample beside the roster, outside the pairwise family.
+
+```bash
+python -m full_run_28092026.run_traces --variant reasoning-medium --dry-run        # free; --calibrate 20 --yes bills a little
+python -m full_run_28092026.openbook --survey                                      # free: OPENBOOK_SURVEY.md
+python -m full_run_28092026.openbook --build                                       # free: openbook/items.jsonl (local) and the manifest
+python -m full_run_28092026.run_traces --variant openbook --dry-run                # free
+python -m full_run_28092026.decoding_table --variant flagship-reasoning-medium     # free, after the run
+```
+
 `testset/` is not this pool. It is the 2026-09-17 generation from the default seed, and the
 pilot's `freeze.py --verify` rebuilds its slice from it, so it is left as it is.

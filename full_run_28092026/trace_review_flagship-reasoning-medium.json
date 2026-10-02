@@ -1,0 +1,46 @@
+{
+ "variant": "flagship-reasoning-medium",
+ "models": [
+  {
+   "key": "gpt-5.4",
+   "lines": 450,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 450
+   },
+   "items": 450,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 450,
+   "empty": 0,
+   "modes": {
+    "flagship-reasoning-medium": 450
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "openai/gpt-5.4": 450
+   },
+   "served_as_main": null,
+   "providers": {
+    "Azure": 450
+   },
+   "provider_count": 1,
+   "capped_with_text": 0,
+   "no_answer_marker": 0,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {},
+   "think_in_text": 0,
+   "empty_templates": {},
+   "empty_by_template_all": {},
+   "output_tokens_median": 1239.0,
+   "output_tokens_max": 8572,
+   "billed_usd": 11.026
+  }
+ ],
+ "archive": {
+  "archive": null
+ }
+}

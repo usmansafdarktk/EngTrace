@@ -45,8 +45,8 @@ def pctl(v: list, q: float) -> float | None:
     return s[k]
 
 
-def one(key: str, cfg: dict) -> dict:
-    rows = [r for r in score.trace_rows('main', key) if r.get('status') in ('answered', 'empty')]
+def one(key: str, cfg: dict, variant: str = 'main') -> dict:
+    rows = [r for r in score.trace_rows(variant, key) if r.get('status') in ('answered', 'empty')]
     req = collections.Counter(str(r.get('request')) for r in rows)
     request = ast.literal_eval(req.most_common(1)[0][0]) if req else {}
     prov = request.get('extra_body', {}).get('provider', {}) if isinstance(request, dict) else {}
@@ -68,6 +68,7 @@ def one(key: str, cfg: dict) -> dict:
         'allow_fallbacks': prov.get('allow_fallbacks'),
         'sampling_parameters_sent': sorted(k for k in (request if isinstance(request, dict) else {})
                                            if k not in ('max_tokens', 'extra_body')),
+        'reasoning_parameter': (request.get('extra_body', {}).get('reasoning') if isinstance(request, dict) else None),
         'finish_reasons': dict(collections.Counter(str(r.get('finish_reason')) for r in rows)),
         'prompt_tokens': {'median': statistics.median(prompt) if prompt else None},
         'completion_tokens': {'median': statistics.median(comp) if comp else None, 'p90': pctl(comp, 0.9),
@@ -110,12 +111,35 @@ def table(res: list[dict]) -> list[str]:
 
 
 def main() -> int:
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument('--variant', default='main', help='a traces/<variant>/ arm: reasoning-<effort> (C1), flagship and flagship-reasoning-<effort> (C3), openbook (C4)')
+    a = ap.parse_args()
     cfg = {m['key']: m for m in json.loads((HERE / 'models.json').read_text(encoding='utf-8'))['models']}
-    res = [one(k, cfg[k]) for k in ROSTER + SET_ASIDE]
-    OUT_JSON.parent.mkdir(exist_ok=True)
-    OUT_JSON.write_text(json.dumps(res, indent=1), encoding='utf-8')
+    if a.variant == 'main':
+        keys, out_md, out_json = ROSTER + SET_ASIDE, OUT_MD, OUT_JSON
+    else:
+        keys = [k for k in list(ROSTER) + [k for k in cfg if k not in ROSTER]     # the roster first, then an arm's anchors (C3)
+                if score.trace_path(a.variant, k).exists()]
+        out_md = HERE / f'DECODING_TABLE_{a.variant}.md'
+        out_json = HERE / 'results' / f'decoding_table_{a.variant}.json'
+    res = [one(k, cfg[k], a.variant) for k in keys]
+    out_json.parent.mkdir(exist_ok=True)
+    out_json.write_text(json.dumps(res, indent=1), encoding='utf-8')
     lines = table(res)
-    OUT_MD.write_text('\n'.join(lines) + '\n', encoding='utf-8', newline='\n')
+    if a.variant != 'main':
+        rp = res[0]['reasoning_parameter'] if res else None
+        item, dec = (('C1', 'D-179, D-180') if a.variant.startswith('reasoning-') else
+                     ('C3', 'D-182') if a.variant.startswith('flagship') else
+                     ('C4', 'D-183') if a.variant == 'openbook' else ('a variant', 'D-141'))
+        what = (f'the same request as the main run plus the reasoning parameter `{json.dumps(rp)}`' if rp else
+                'the same request as the main run, at the provider' + chr(39) + 's default' +
+                (', on the question with the reference equations appended' if a.variant == 'openbook' else ''))
+        lines[0] = f'# Decoding settings and token use, the `{a.variant}` arm ({item})'
+        lines.insert(2, f'The arm `{a.variant}` ({dec}): {what}; rows are the arm' + chr(39) + 's items only. '
+                        'The main run' + chr(39) + 's table is `DECODING_TABLE.md`.')
+        lines.insert(3, '')
+    out_md.write_text('\n'.join(lines) + '\n', encoding='utf-8', newline='\n')
     print('\n'.join(lines))
     return 0
 

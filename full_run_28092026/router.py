@@ -165,7 +165,10 @@ def summarise(digit_flags: list[int], sent: list[int] | None, got: dict | None) 
 
 def roster(variant: str) -> list[str]:
     from full_run_28092026.analyze import ROSTER
-    return [k for k in ROSTER if (score.SCORES / variant / f'{k}.jsonl').exists()]
+    keys = [k for k in ROSTER if (score.SCORES / variant / f'{k}.jsonl').exists()]
+    if variant != 'main':      # an arm may carry a model outside the roster: the flagship anchors (C3, D-182)
+        keys += sorted(f.stem for f in (score.SCORES / variant).glob('*.jsonl') if f.stem not in keys)
+    return keys
 
 
 def jobs_for(variant: str, key: str, items: dict) -> list[tuple]:

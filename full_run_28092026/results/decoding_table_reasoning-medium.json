@@ -1,0 +1,104 @@
+[
+ {
+  "model_key": "gpt-5.4-mini",
+  "weights": "closed",
+  "configured": "openai/gpt-5.4-mini",
+  "served": {
+   "openai/gpt-5.4-mini": 450
+  },
+  "providers": {
+   "Azure": 450
+  },
+  "rows": 450,
+  "answered": 450,
+  "empty": 0,
+  "modes": {
+   "calibrate": 20,
+   "reasoning-medium": 430
+  },
+  "prompt_sha256": [
+   "c2bcb87984c4e50beaaa6876cce2e72932b91d6a755d07ab01ffc341cf9b6f7c"
+  ],
+  "request_variants": 1,
+  "max_tokens": 32768,
+  "provider_sort": "price",
+  "quantizations": null,
+  "allow_fallbacks": true,
+  "sampling_parameters_sent": [],
+  "reasoning_parameter": {
+   "effort": "medium"
+  },
+  "finish_reasons": {
+   "stop": 450
+  },
+  "prompt_tokens": {
+   "median": 243.0
+  },
+  "completion_tokens": {
+   "median": 1260.5,
+   "p90": 4191,
+   "max": 22637
+  },
+  "reasoning_tokens": {
+   "median": 516.0,
+   "p90": 3464,
+   "max": 22033,
+   "share_above_zero": 1.0,
+   "unreported_rows": 0
+  },
+  "reasoning_text_share": 0.8844444444444445,
+  "billed_usd": 4.444,
+  "seconds_median": 8.46
+ },
+ {
+  "model_key": "gemini-3.1-flash-lite",
+  "weights": "closed",
+  "configured": "google/gemini-3.1-flash-lite",
+  "served": {
+   "google/gemini-3.1-flash-lite": 450
+  },
+  "providers": {
+   "Google AI Studio": 450
+  },
+  "rows": 450,
+  "answered": 450,
+  "empty": 0,
+  "modes": {
+   "calibrate": 20,
+   "reasoning-medium": 430
+  },
+  "prompt_sha256": [
+   "c2bcb87984c4e50beaaa6876cce2e72932b91d6a755d07ab01ffc341cf9b6f7c"
+  ],
+  "request_variants": 1,
+  "max_tokens": 32768,
+  "provider_sort": "price",
+  "quantizations": null,
+  "allow_fallbacks": true,
+  "sampling_parameters_sent": [],
+  "reasoning_parameter": {
+   "effort": "medium"
+  },
+  "finish_reasons": {
+   "stop": 450
+  },
+  "prompt_tokens": {
+   "median": 253.5
+  },
+  "completion_tokens": {
+   "median": 1478.0,
+   "p90": 2395,
+   "max": 3519
+  },
+  "reasoning_tokens": {
+   "median": 801.0,
+   "p90": 1333,
+   "max": 2023,
+   "share_above_zero": 1.0,
+   "unreported_rows": 0
+  },
+  "reasoning_text_share": 1.0,
+  "billed_usd": 1.097,
+  "seconds_median": 4.425
+ }
+]

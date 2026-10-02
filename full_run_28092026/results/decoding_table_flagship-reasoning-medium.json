@@ -1,0 +1,52 @@
+[
+ {
+  "model_key": "gpt-5.4",
+  "weights": "closed",
+  "configured": "openai/gpt-5.4",
+  "served": {
+   "openai/gpt-5.4": 450
+  },
+  "providers": {
+   "Azure": 450
+  },
+  "rows": 450,
+  "answered": 450,
+  "empty": 0,
+  "modes": {
+   "flagship-reasoning-medium": 450
+  },
+  "prompt_sha256": [
+   "c2bcb87984c4e50beaaa6876cce2e72932b91d6a755d07ab01ffc341cf9b6f7c"
+  ],
+  "request_variants": 1,
+  "max_tokens": 32768,
+  "provider_sort": "price",
+  "quantizations": null,
+  "allow_fallbacks": true,
+  "sampling_parameters_sent": [],
+  "reasoning_parameter": {
+   "effort": "medium"
+  },
+  "finish_reasons": {
+   "stop": 450
+  },
+  "prompt_tokens": {
+   "median": 243.0
+  },
+  "completion_tokens": {
+   "median": 1239.0,
+   "p90": 2920,
+   "max": 8572
+  },
+  "reasoning_tokens": {
+   "median": 440.5,
+   "p90": 1885,
+   "max": 6732,
+   "share_above_zero": 0.9977777777777778,
+   "unreported_rows": 0
+  },
+  "reasoning_text_share": 0.8466666666666667,
+  "billed_usd": 11.026,
+  "seconds_median": 12.17
+ }
+]

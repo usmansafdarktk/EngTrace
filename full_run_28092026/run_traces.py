@@ -42,6 +42,15 @@ set, into traces/<variant>/<key>.jsonl, so score.py scores it as that variant:
                     default (D-168): by default `gpt-5.4-mini` and `gemini-3.1-flash-lite`, or the models --model
                     names. Everything else is the main run's: prompt, ceiling, routing, scoring. Reported beside the
                     main run on the same items, never in its place.
+  flagship          (C3) the same 450 items for the anchor models of models.json (`anchor: true`, inert for every
+                    other mode): flagships that pass the roster rule, reported beside the roster on those items as an
+                    anchor with 450-item intervals, outside the pairwise family. Priced from the pricing basis like the
+                    main run (they have no main-run bills); `--calibrate N` measures their lengths first.
+  openbook          (C4, D-183) the 450-item subsample's questions with the template's governing equations appended
+                    (openbook.py --build: openbook/items.jsonl, local, checked against the committed
+                    openbook/manifest.jsonl before a call), for the models --model names or, by default,
+                    `claude-sonnet-5`, `gpt-5.4-mini` and `gpt-oss-20b`; the row records the modified question's
+                    hash as item_sha256 and the original's as original_sha256, as the paraphrase arm does.
 The dry run estimates a variant from each model's own bills on the same items in the main run; for a reasoning
 variant the main run's visible output understates the bill, so its dry run prices output-token multipliers and
 `--calibrate N` (allowed for this variant) measures the real lengths on N items first.
@@ -80,7 +89,10 @@ PARAPHRASES = HERE / 'paraphrase'
 REASONING_EFFORTS = ('low', 'medium', 'high')
 REASONING_VARIANTS = tuple(f'reasoning-{e}' for e in REASONING_EFFORTS)
 REASONING_MODELS = ('gpt-5.4-mini', 'gemini-3.1-flash-lite')     # no reasoning tokens at the provider's default (D-168)
-VARIANTS = ('main', 'paraphrase') + subsamples.REPEAT_VARIANTS + REASONING_VARIANTS
+FLAGSHIP_REASONING = tuple(f'flagship-reasoning-{e}' for e in REASONING_EFFORTS)   # the closed anchor with reasoning on (D-182)
+VARIANTS = ('main', 'paraphrase') + subsamples.REPEAT_VARIANTS + REASONING_VARIANTS + ('flagship', 'openbook') + FLAGSHIP_REASONING
+OPENBOOK = HERE / 'openbook'
+OPENBOOK_MODELS = ('claude-sonnet-5', 'gpt-5.4-mini', 'gpt-oss-20b')   # one model from each tier (D-183)
 DEPLOYED_RUNNER = REPO / 'evaluation' / 'run_inference.py'
 PILOT_PROMPT_PREFIX = 'c2bcb87984c4e50b'   # evaluator_pilot_17092026/models.json: the annotated traces' prompt
 MAX_ATTEMPTS = 4
@@ -132,8 +144,26 @@ def variant_items(variant: str, its: list[dict]) -> list[dict]:
     by_id = {it['item_id']: it for it in its}
     if variant in subsamples.REPEAT_VARIANTS:
         return [by_id[i] for i in subsamples.repeat_ids()]
-    if variant in REASONING_VARIANTS:
+    if variant in REASONING_VARIANTS or variant == 'flagship' or variant in FLAGSHIP_REASONING:
         return [by_id[i] for i in subsamples.paraphrase_ids()]       # the originals of the 450-item subsample
+    if variant == 'openbook':
+        pool, manifest = OPENBOOK / 'items.jsonl', OPENBOOK / 'manifest.jsonl'
+        if not pool.exists() or not manifest.exists():
+            raise SystemExit('openbook/items.jsonl or its manifest is missing: run openbook.py --build first')
+        want = {r['item_id']: r for r in map(json.loads, manifest.read_text(encoding='utf-8').splitlines())}
+        out = []
+        for r in map(json.loads, pool.read_text(encoding='utf-8').splitlines()):
+            m = want.get(r['item_id'])
+            if m is None:
+                continue
+            sha = hashlib.sha256(r['question'].encode('utf-8')).hexdigest()
+            if sha != m['sha256'] or by_id[r['item_id']]['sha256'] != m['original_sha256']:
+                raise SystemExit(f"openbook item {r['item_id']} does not match its manifest: rebuild it")
+            out.append({**by_id[r['item_id']], 'question': r['question'], 'sha256': sha,
+                        'original_sha256': m['original_sha256']})
+        if len(out) != len(want):
+            raise SystemExit(f'the openbook manifest lists {len(want)} items but the pool holds {len(out)}')
+        return out
     pool, manifest = PARAPHRASES / 'pool.jsonl', PARAPHRASES / 'manifest.jsonl'
     if not pool.exists() or not manifest.exists():
         raise SystemExit('paraphrase/pool.jsonl or its manifest is missing: run paraphrase.py first')
@@ -177,10 +207,10 @@ def request_params(spec: dict, cfg: dict, variant: str = 'main') -> dict:
     p = {'max_tokens': spec.get('max_tokens', cfg['max_tokens'])}
     key = 'provider_open_weight' if spec['weights'] == 'open' else 'provider_closed_weight'
     p['extra_body'] = {'provider': cfg[key]}
-    if variant in REASONING_VARIANTS:
+    if variant in REASONING_VARIANTS or variant in FLAGSHIP_REASONING:
         # OpenRouter's unified reasoning parameter; the provider maps the effort to its own setting. The main run
         # sent nothing here and ran at each provider's default (D-122).
-        p['extra_body']['reasoning'] = {'effort': variant.split('-', 1)[1]}
+        p['extra_body']['reasoning'] = {'effort': variant.rsplit('-', 1)[1]}
     return p
 
 
@@ -305,8 +335,8 @@ def routed_endpoint(spec: dict, cfg: dict, tok: dict):
     return (best[0], best[1], len(eps)) if best else (None, None, 0)
 
 
-def dry_run(cfg, its, specs) -> int:
-    print(f'pool: {len(its)} items, {len({i["template_id"] for i in its})} templates, '
+def dry_run(cfg, its, specs, variant='main') -> int:
+    print(f'{"pool" if variant == "main" else "variant " + variant}: {len(its)} items, {len({i["template_id"] for i in its})} templates, '
           f'matching the committed manifest')
     ok = PROMPT_SHA.startswith(PILOT_PROMPT_PREFIX)
     print(f'prompt: sha256 {PROMPT_SHA[:16]}, read from evaluation/run_inference.py; '
@@ -320,7 +350,7 @@ def dry_run(cfg, its, specs) -> int:
     tot_doc = tot_routed = 0.0
     short = []
     for s in specs:
-        todo = len(its) - len(existing(s['key']))
+        todo = len(its) - len(existing(s['key'], variant))
         doc = todo * per_item_cost(s['price_per_m'], tok)
         ceiling = s.get('max_tokens', cfg['max_tokens'])
         try:
@@ -379,15 +409,16 @@ def reasoning_dry_run(cfg, its, specs, variant) -> int:
     the pricing document's rates with the output multiplied, because a model that reasons bills its reasoning as
     output. The multipliers bracket what is known: the pilot's GPT-5 wrote about 12 completion tokens for every
     visible one (README, stage 1); nothing here is a measurement of these models, which is what --calibrate is for."""
-    effort = variant.split('-', 1)[1]
+    effort = variant.rsplit('-', 1)[1]
+    base = 'flagship' if variant in FLAGSHIP_REASONING else 'main'      # the arm whose bills price this one
     mults = (1, 3, 6, 12)
     print(f'variant {variant}: {len(its)} items, {len({i["template_id"] for i in its})} templates; reasoning effort '
-          f'{effort!r} in the request; traces go to traces/{variant}/')
+          f'{effort!r} in the request; traces go to traces/{variant}/; priced from the {base} run\'s rows')
     print(f'{"model":22s} {"to run":>7s} {"main $":>8s} {"main out tok":>12s} ' + ' '.join(f'{"x" + str(m) + " $":>8s}' for m in mults))
     tot = Counter()
     for s in specs:
         todo = [it for it in its if it['item_id'] not in existing(s['key'], variant)]
-        main = existing(s['key'])
+        main = existing(s['key'], base)
         rows = [main[it['item_id']] for it in todo if it['item_id'] in main]
         pt = sum(r.get('prompt_tokens') or 0 for r in rows)
         ct = sum(r.get('completion_tokens') or 0 for r in rows)
@@ -453,17 +484,27 @@ def main() -> int:
     for k, why in inert.items():
         if not a.model or k not in a.model:
             print(f'{k}: inert (run: false): {why}')
-    if a.variant != 'main' and a.variant not in REASONING_VARIANTS and a.calibrate:
-        raise SystemExit('--calibrate is for the main run and the reasoning variants; another variant is estimated from its bills')
+    if a.variant != 'main' and a.variant not in REASONING_VARIANTS and a.variant not in ('flagship',) + FLAGSHIP_REASONING and a.calibrate:
+        raise SystemExit('--calibrate is for the main run, the reasoning variants and the flagship anchor; another variant is estimated from its bills')
     if a.variant in REASONING_VARIANTS and not a.model:
         specs = [s for s in cfg['models'] if s['key'] in REASONING_MODELS]
+    if a.variant == 'flagship':
+        specs = [s for s in cfg['models'] if s.get('anchor') and (not a.model or s['key'] in a.model)]
+        if not specs:
+            raise SystemExit('no anchor model in models.json (anchor: true)')
+    if a.variant in FLAGSHIP_REASONING:            # the closed anchor(s): the open one reasons at its default already
+        specs = [s for s in cfg['models'] if s.get('anchor') and (s['key'] in a.model if a.model else s['weights'] == 'closed')]
+        if not specs:
+            raise SystemExit('no closed anchor model in models.json')
+    if a.variant == 'openbook' and not a.model:
+        specs = [s for s in cfg['models'] if s['key'] in OPENBOOK_MODELS]
     if a.variant in subsamples.REPEAT_VARIANTS and not a.model:
         raise SystemExit('a repeat runs one chosen model: name it with --model')
     its = variant_items(a.variant, items())
     if a.dry_run:
-        if a.variant == 'main':
-            return dry_run(cfg, its, specs)
-        return reasoning_dry_run(cfg, its, specs, a.variant) if a.variant in REASONING_VARIANTS \
+        if a.variant in ('main', 'flagship'):
+            return dry_run(cfg, its, specs, a.variant)
+        return reasoning_dry_run(cfg, its, specs, a.variant) if a.variant in REASONING_VARIANTS + FLAGSHIP_REASONING \
             else variant_dry_run(cfg, its, specs, a.variant)
     if a.status:
         return status(cfg, its, specs, a.variant)

@@ -6835,11 +6835,71 @@ milestone verdicts within the reported intervals on a 220-trace sample and catch
 against MiMo's 31%; the single-judge design is a cost choice, not a sensitivity. JUDGE_SELECTION's "if a reviewer
 presses the point, that is the run to buy" is bought.
 
+## D-180 — C1 run: reasoning at medium effort for GPT-5.4 mini and Gemini 3.1 Flash-Lite on the 450 items, after a calibration
+
+**Date:** 2026-10-03 · **Status:** RUNNING (traces done and scored; E5 and the router on the arm in progress) · **Evidence:** `traces/reasoning-medium/` and `scores/reasoning-medium/` (local), `TRACE_REVIEW_reasoning-medium.md`, `DECODING_TABLE_reasoning-medium.md`, `results/decoding_table_reasoning-medium.json`; the paired block in `analyze.py` (`reasoning_arms`)
+
+**What was approved.** The owner approved C1 on 2026-10-03 ("calibrate first and then run the 450"): `--variant
+reasoning-medium --calibrate 20 --yes`, then the 450 items per model. Medium is the standard effort; the setting is the
+only change from the main run (same prompt, ceiling, routing, scorer; D-179).
+
+**What it billed.** The rows carry $5.54 ($4.44 GPT-5.4 mini, $1.10 Gemini 3.1 Flash-Lite), of which the calibration
+invocation was $0.21 and the 450-item invocation $5.33, against the dry run's $5.90 at x3. Both endpoints returned
+reasoning tokens on every row (median 3,464 and 1,333 against zero in the main run; `DECODING_TABLE_reasoning-medium.md`).
+The trace review is clean: 900 final rows, none empty, one request set and one provider per model, served as in the
+main run. E5 (143 calls priced at about $1) and the router (900 calls, about $3) run on the arm at caps of $43 and
+$109, cumulative over their reply stores (the first launches at $4 and $8 made no call, D-181 explains why).
+
+**What it reports.** `analyze.py` adds "C1 and C4. Arms run on the same items against the main run": arm minus main,
+paired by item, with Q5's machinery (item mean, template bootstrap, sign-flip over templates with Holm within the arm,
+the detectable paired difference). The numbers are written in part 2 of this entry once the judged stages end and
+`results/RESULTS.md` is regenerated from a clean tree.
+
+## D-182 — C3, the flagship anchors: GPT-5.4 and DeepSeek V4 Pro on the 450-item subsample, and GPT-5.4 with reasoning on
+
+**Date:** 2026-10-03 · **Status:** RUNNING (GPT-5.4's two arms done and scored; DeepSeek V4 Pro's default arm in progress) · **Evidence:** `models.json` (`anchor: true, run: false`), `run_traces.py` (`flagship`, `FLAGSHIP_REASONING`), `traces/flagship*/` and `scores/flagship*/` (local), `TRACE_REVIEW_flagship-reasoning-medium.md`, `DECODING_TABLE_flagship-reasoning-medium.md`; the `anchors` block in `analyze.py`
+
+**What was approved.** Option A with calibration (one closed and one open flagship, 450 items each, the stack as the
+main run's), and then a reasoning-on arm for the closed anchor at medium effort, about $18 by its dry run, after the
+default arm's rows showed GPT-5.4 writing no reasoning tokens at the provider's default. The anchors are `gpt-5.4`
+($2.50 / $15 per million) and `deepseek-v4-pro` ($0.209 / $0.418), neither a pilot generator nor a judge, so D-110's
+rule holds; they are reference points outside the pairwise family and no test is run against them.
+
+**What it billed so far.** The calibration invocation (20 items per anchor) $0.32; GPT-5.4's default arm 450 rows;
+GPT-5.4's reasoning arm 450 rows at $11.03 (reasoning tokens on 449 rows, median 440; one request set, one provider,
+none empty). DeepSeek V4 Pro's default arm is running. E5 on the GPT-5.4 reasoning arm prices at $0.47 (143 calls).
+The router is not run on the anchors: the anchor table reads E5-strict coverage and the digit rule's flag rate from
+the score rows, and the router's step-level figures are a roster comparison (Q3), which the anchors are outside of.
+
+**The stages and the anchors.** `judge.py`, `router.py`, `trace_review.py` and `decoding_table.py` took an arm's
+models from the roster list, so an anchor fell through all four (E5's dry run on the arm found no trace; the review
+wrote nothing). They now take an arm's models from the arm's own files, the roster first. The numbers are written in
+part 2 once DeepSeek's rows are scored and E5 has run on the two default arms.
+
+## D-183 — C4, the open-book condition: the governing equations supplied with the question, for one model from each tier
+
+**Date:** 2026-10-03 · **Status:** RUNNING · **Evidence:** `openbook.py` (`--survey`, `--build`), `OPENBOOK_SURVEY.md`, `openbook/manifest.jsonl` (hashes and counts; the modified questions local), `run_traces.py` (`openbook`, `OPENBOOK_MODELS`), `trace_review.py` (`variant_manifest`); the paired block in `analyze.py`
+
+**What was approved.** The open-book fallback of C4 rather than the tool condition ($65 to $150), by the owner on
+2026-10-03, with the tool condition to be reviewed at the end. The arm appends to each question a block headed
+"Reference equations (from an engineering handbook):", one symbolic equation per line, taken from the template
+function's own docstring where it states its equations in symbols (141 templates) and otherwise from the gold
+solution's symbolic lines before any substitution (2 templates); the seven templates with neither source are left
+out, so the arm holds 429 of the 450 subsample items. The prompt template is the main run's, so the prompt hash is
+unchanged; the row records the modified question's hash and the original's, as the paraphrase arm does, and the trace
+review checks both against the manifest. Models: `claude-sonnet-5`, `gpt-5.4-mini` and `gpt-oss-20b`, one from each
+tier; dry run $12.75 on their main-run bills for the same items.
+
+**What it measures.** Arm minus main, paired by item, with Q5's machinery: with the method given, the trace still has
+to set the problem up, substitute and compute, so the change is the part of the gap that formula recall accounts for.
+The condition supplies no data tables or constants beyond what the equation lines carry; a template whose difficulty
+lies in a property lookup is not helped by it. The numbers are written in part 2.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
-| D-179 | Run C1: `run_traces --variant reasoning-medium --calibrate 20 --yes` first (about $0.52), then the 450 items at a cap, then E5 and the router on the variant after their dry runs; or leave the setting stated in Appendix P and the comparison unmade | the paper's reading of the closed tier |
+| D-179 | ~~Run C1: `run_traces --variant reasoning-medium --calibrate 20 --yes` first (about $0.52), then the 450 items at a cap, then E5 and the router on the variant after their dry runs; or leave the setting stated in Appendix P and the comparison unmade~~ **Run 2026-10-03 at medium effort after the calibration, $5.54 in the rows (D-180); C2 to C4 approved the same day (D-181 to D-183)** | — |
 | D-172 | Send the fifteen kits in `full_run_28092026/expert_request/dist/` (app.py, README.txt, guide.md and the kit_<id> folder each) with a return date; cut B2 first if the load is too much (`--b2-per-model`); when the files come back, `expert_kits.py --score <folder>` | the paper's evaluator section, Q3 and the D-171 limitation |
 | D-171 | What the paper states about the two under-specified chemical templates and the 17 exact-digit templates (a limitation and a Q2 sensitivity row, as proposed), and whether one chemical expert reads `work_isothermal_virial` and `adiabatic_flame_temperature` with B1 (next steps B4) | the paper's sections 5 and 6; the experts' request |
 | D-170 | The analyses of `docs/EVALUATION_NEXT_STEPS.md` section A (free) in the order given; the expert request of section B, batched; a decision on each paid condition of section C after its dry run | the paper's results section; the experts' availability; the owner's approval per condition |

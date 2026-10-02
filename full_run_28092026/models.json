@@ -183,6 +183,30 @@
         "in": 2.0,
         "out": 10.0
       }
+    },
+    {
+      "key": "gpt-5.4",
+      "model": "openai/gpt-5.4",
+      "weights": "closed",
+      "price_per_m": {
+        "in": 2.5,
+        "out": 15.0
+      },
+      "run": false,
+      "anchor": true,
+      "run_reason": "C3 flagship anchor (D-182): runs only as --variant flagship on the 450-item subsample, outside the pairwise family; passes the roster rule (neither a pilot generator nor a judge)"
+    },
+    {
+      "key": "deepseek-v4-pro",
+      "model": "deepseek/deepseek-v4-pro",
+      "weights": "open",
+      "price_per_m": {
+        "in": 0.209,
+        "out": 0.418
+      },
+      "run": false,
+      "anchor": true,
+      "run_reason": "C3 flagship anchor (D-182): the open-weight flagship, same terms as gpt-5.4"
     }
   ],
   "provider_closed_weight": {

@@ -85,6 +85,14 @@ appears, because the plan was fixed before the data and these were not in it:
   - 2026-10-03, D-178 (the review of the additions above): Q1 adds the distribution of the per-template SD of the
     score across a template's 15 instances (quartiles over the 150 templates, the templates with no instance
     variance, the three with most), and results/per_template.csv carries every template's SD (`answer_score_sd`).
+  - 2026-10-03, D-179/D-180 (C1): the reasoning-on arm, scores/reasoning-<effort>/, reported beside the main run on
+    the same 450 items with Q5's paired machinery (item mean, template bootstrap, sign-flip test, Holm over the models
+    tested, the detectable difference): the paired change in answer score, fully-solved rate, E3 coverage and
+    E5-strict coverage where both arms carry it. The main run's figures stay the headline for those models.
+  - 2026-10-03, D-182/D-183 (C3, C4): the open-book arm (scores/openbook/, the governing equations appended to the
+    question) joins the same paired block; the flagship anchors (scores/flagship/ and scores/flagship-reasoning-*/)
+    are reported on the 450-item subsample with template intervals beside the roster's eleven on the same items,
+    outside the pairwise family and with no test.
 """
 from __future__ import annotations
 
@@ -779,6 +787,86 @@ def q5(main, para, keys, keep=None, e5_main=None, e5_para=None):
             'margin': EQUIV_MARGIN, 'vs_repeats': vs_repeats(main, para, tested, keep, out)}
 
 
+def reasoning_arms(main, e5_main, keys) -> list[dict]:
+    """C1 (D-179/D-180): every scores/reasoning-<effort>/ store, each model in it against the main run on the same
+    items, with paired() as Q5 uses it. Holm runs over the models within an arm."""
+    out = []
+    arms = sorted(p.name for p in SCORES.glob('reasoning-*') if p.is_dir()) + \
+        sorted(p.name for p in SCORES.glob('openbook') if p.is_dir())
+    for arm in arms:
+        rows = []
+        for i, k in enumerate(keys):
+            var = load(arm, k)
+            if not var:
+                continue
+            ids = sorted(set(var) & set(main[k]))
+            row = {'arm': arm, 'model': k, **paired(main[k], var, ids, lambda r: r['score'], 9700 + i)}
+            row['main_score_on_items'] = float(np.mean([main[k][x]['score'] for x in ids]))
+            row['arm_score'] = float(np.mean([var[x]['score'] for x in ids]))
+            row['arm_unusable'] = int(sum(var[x]['unusable'] for x in ids))
+            row['main_unusable_on_items'] = int(sum(main[k][x]['unusable'] for x in ids))
+            row['fully'] = paired(main[k], var, ids, fully, 9750 + i)
+            ms_ids = [x for x in ids if main[k][x]['e3']['coverage'] is not None and var[x]['e3']['coverage'] is not None]
+            row['e3'] = paired(main[k], var, ms_ids, lambda r: r['e3']['coverage'], 9800 + i) if ms_ids else None
+            e5v = load_stage('e5', k, arm)
+            row['e5'] = None
+            if e5_main and e5_main.get(k) and e5v:
+                e5_ids = [x for x in ms_ids if e5_main[k].get(x, {}).get('e5_strict') is not None
+                          and e5v.get(x, {}).get('e5_strict') is not None
+                          and e5_main[k][x]['reply_ok'] is not False and e5v[x]['reply_ok'] is not False]
+                m5 = {x: {'template_id': main[k][x]['template_id'], 'v': e5_main[k][x]['e5_strict']} for x in e5_ids}
+                p5 = {x: {'template_id': main[k][x]['template_id'], 'v': e5v[x]['e5_strict']} for x in e5_ids}
+                row['e5'] = paired(m5, p5, e5_ids, lambda r: r['v'], 9850 + i) if e5_ids else None
+            solved_main = [x for x in ids if fully(main[k][x]) == 1]
+            solved_arm = [x for x in ids if fully(var[x]) == 1]
+            row['digit_flag_rate_fully_solved'] = {
+                'main': float(np.mean([flagged(main[k][x]) for x in solved_main])) if solved_main else None,
+                'arm': float(np.mean([flagged(var[x]) for x in solved_arm])) if solved_arm else None}
+            rows.append(row)
+        for o, ph in zip(rows, holm([o['p'] for o in rows]) if rows else []):
+            o['p_holm'] = ph
+        out += rows
+    return out
+
+
+def anchors(runs, keys) -> list[dict]:
+    """C3 (D-182): the flagship anchors on the 450-item subsample, outside the pairwise family. For every
+    scores/flagship*/ store, each anchor's answer score (the mean of its template means, template bootstrap),
+    fully-solved rate, unusable count, level means, coverage over its traces with milestones (E5-strict where the
+    stage ran, E3 otherwise) and the digit rule's flag rate on fully solved traces; beside them the roster's eleven
+    on the same items from the main store. No test is run against an anchor."""
+    out = []
+    for arm_dir in sorted(SCORES.glob('flagship*')):
+        if not arm_dir.is_dir():
+            continue
+        arm = arm_dir.name
+        anchor_rows = {f.stem: load(arm, f.stem) for f in sorted(arm_dir.glob('*.jsonl'))}
+        anchor_rows = {k: v for k, v in anchor_rows.items() if v}
+        if not anchor_rows:
+            continue
+        ids = sorted(set.intersection(*(set(v) for v in anchor_rows.values())))
+
+        def stats(rows_by_id, key, variant, i):
+            rows = [rows_by_id[x] for x in ids if x in rows_by_id]
+            tm = np.array([np.mean(v) for v in per_template(rows, lambda r: r['score']).values()])
+            e5 = load_stage('e5', key, variant)
+            cv = lambda r: coverage_value(r, e5.get(r['item_id']) if e5 else None)
+            c, c_ci, _n = cluster_mean(per_template(rows, cv, lambda r: cv(r) is not None), 9900 + i)
+            solved = [r for r in rows if fully(r) == 1]
+            return {'model': key, 'arm': variant, 'items': len(rows), 'score': float(tm.mean()), 'ci': boot_mean(tm, 9950 + i),
+                    'fully_solved': float(np.mean([fully(r) for r in rows])), 'unusable': int(sum(r['unusable'] for r in rows)),
+                    'levels': {lv: float(np.mean([r['score'] for r in rows if r['level'] == lv])) for lv in LEVELS
+                               if any(r['level'] == lv for r in rows)},
+                    'coverage': c, 'coverage_ci': c_ci, 'coverage_stage': 'E5-strict' if e5 else 'E3',
+                    'digit_flag_rate_fully_solved': float(np.mean([flagged(r) for r in solved])) if solved else None,
+                    'median_completion_tokens': float(np.median([r['completion_tokens'] or 0 for r in rows])) if rows else None}
+
+        out.append({'arm': arm, 'items': len(ids),
+                    'anchors': [stats(v, k, arm, i) for i, (k, v) in enumerate(anchor_rows.items())],
+                    'roster': [stats(runs[k], k, 'main', 20 + i) for i, k in enumerate(keys)]})
+    return out
+
+
 def tau_noise_arm(main, keys, ids, splits: int = 200, seed: int = 4243) -> dict:
     """The tau noise floor at the paraphrase arm's own size and template mix: for each template with k
     pairs in the arm, 2k of the main run's items drawn without replacement and split into two halves of
@@ -1388,6 +1476,47 @@ def render(res) -> str:
                          f"{rc_cell} | {'yes' if v['abs_within_repeat_spread'] else 'no'} |")
     else:
         L.append('Not run yet.')
+    arms = res.get('reasoning_arms') or []
+    if arms:
+        L += ['', '## C1 and C4. Arms run on the same items against the main run: reasoning on, and open book', '',
+              '*Exploratory; added 2026-10-03 (D-179, D-180, D-183).* Each arm keeps the main run\'s prompt, ceiling, routing and '
+              'scoring on the originals of the 450-item subsample (three per template) and changes one thing. '
+              '`reasoning-<effort>`: OpenRouter\'s reasoning parameter at that effort, for the closed models whose endpoints '
+              'reported no reasoning tokens at the provider\'s default. `openbook`: the template\'s governing equations appended '
+              'to the question (`openbook.py`; 429 items, the seven templates without a symbolic equation left out), for one '
+              'model from each tier. Arm minus the main run, paired by item, with Q5\'s machinery: the item mean, a template '
+              'bootstrap, a sign-flip test over templates with Holm across the models in the arm, and the smallest paired '
+              'difference the arm detects at 80% power. The main run\'s scores remain the headline; an arm says what the '
+              'change cost or bought.', '',
+              '| arm | model | items | main run on these items | reasoning on | change | 95% CI | p (Holm) | detectable | '
+              'fully solved change | E3 coverage change | 95% CI | E5-strict change | 95% CI | unusable, main / arm | '
+              'digit flags on fully solved, main / arm |',
+              '|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|']
+        for r in arms:
+            e3c, e5c, dfr = r.get('e3'), r.get('e5'), r['digit_flag_rate_fully_solved']
+            L.append(f"| {r['arm']} | `{r['model']}` | {r['items']} | {r['main_score_on_items']:.3f} | {r['arm_score']:.3f} | "
+                     f"{r['diff']:+.3f} | {ci(r['ci'])} | {r['p_holm']:.4f} | {f3(r.get('detectable'))} | {r['fully']['diff']:+.3f} | "
+                     + (f"{e3c['diff']:+.3f} | {ci(e3c['ci'])}" if e3c else ' | ') + ' | '
+                     + (f"{e5c['diff']:+.3f} | {ci(e5c['ci'])}" if e5c else 'pending | ') + ' | '
+                     f"{r['main_unusable_on_items']} / {r['arm_unusable']} | {f3(dfr['main'])} / {f3(dfr['arm'])} |")
+    for anc in res.get('anchors') or []:
+        L += ['', f"## C3. Flagship anchors on the {anc['items']}-item subsample: `{anc['arm']}`", '',
+              '*Exploratory; added 2026-10-03 (D-182).* Flagships that pass the roster rule (neither a pilot generator nor a '
+              'judge), on the originals of the 450-item subsample, scored by the same stack; the roster\'s eleven on the same '
+              'items from the main run beside them. An anchor is a reference point outside the pairwise family: no test is '
+              'run against it. The `flagship` arm ran at each provider\'s default, as the main run did; a '
+              '`flagship-reasoning-<effort>` arm carries the reasoning parameter. Score and coverage carry template intervals '
+              '(150 templates of three items); level means are descriptive.', '',
+              '| model | arm | items | answer score | 95% CI | fully solved | unusable | Easy | Intermediate | Advanced | '
+              'coverage (stage) | 95% CI | digit flags on fully solved | median completion tokens |',
+              '|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|']
+        for r in anc['anchors'] + sorted(anc['roster'], key=lambda r: -r['score']):
+            lv = r['levels']
+            mct = '' if r['median_completion_tokens'] is None else f"{r['median_completion_tokens']:.0f}"
+            L.append(f"| `{r['model']}` | {r['arm']} | {r['items']} | {r['score']:.3f} | {ci(r['ci'])} | {r['fully_solved']:.3f} | "
+                     f"{r['unusable']} | {f3(lv.get('Easy'))} | {f3(lv.get('Intermediate'))} | {f3(lv.get('Advanced'))} | "
+                     f"{f3(r['coverage'])} ({r['coverage_stage']}) | {ci(r['coverage_ci'])} | {f3(r['digit_flag_rate_fully_solved'])} | "
+                     f"{mct} |")
     sens = res['sensitivity']
     tn = sens['tau_noise']
     L += ['', '## Sensitivity', '',
@@ -1534,6 +1663,8 @@ def main() -> int:
            'q5': {**q5(runs, para, ROSTER, check['keep'] if check else None, e5_main, e5_para),
                   'expert_stats': {k: v for k, v in check.items() if k != 'keep'} if check else None},
            'sensitivity': sensitivity(runs, templates, ROSTER, symbolic), 'reported': reported(runs, ROSTER),
+           'reasoning_arms': reasoning_arms(runs, e5_main, ROSTER) if a.store == 'main' else [],
+           'anchors': anchors(runs, ROSTER) if a.store == 'main' else [],
            'repeats': repeats(runs, ROSTER) if a.store == 'main' else {},
            'set_aside': set_aside(a.store), 'milestones': milestone_facts(runs[ROSTER[0]].values()),
            'symbolic_templates': sorted(symbolic), 'provenance': pv}
