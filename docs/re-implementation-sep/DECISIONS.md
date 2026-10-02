@@ -6278,10 +6278,61 @@ a comparison table. Every statement it makes about another paper was checked aga
 The reviewer panel was stopped on 2026-10-02 at the owner's request, to save cost. The remaining
 candidates were assessed through the fact check (`notes/review_protocol.md`).
 
+## D-167 — Related Work: the 18 unreviewed main-text papers read, the positioning holds; ten citing sentences or rows corrected, OPT-Engine added, two statements about EngTrace fixed
+
+**Date:** 2026-10-02 · **Status:** DECIDED (the text) · **Evidence:** `docs/related_work_oct2026/notes/followup_review.md`, its 18 reviews in `reviews/candidate/`, `notes/fact_check.md` (200 of 200), `notes/venue_check.json`
+
+D-166's section cited 18 new papers in its main text that no reviewer had read beyond the sentence
+citing them. Each was reviewed once, 12 in the session and 6 by one reviewer agent whose findings were
+re-checked against the papers' text. The claim that no benchmark combines generated instances across
+engineering branches, gold traces, deterministic checks of intermediate values and an evaluator
+validated against experts' step labels holds against Table A, the 100 cited works and the 86 uncited
+candidates. What changed in substance:
+
+1. **Saturation.** Akhtar et al. find that templated benchmarks saturate no differently from others
+   (14 against 46, p = 0.10, their H6), and private test sets did not help either. The text now says
+   that neither has measurably slowed saturation. D-166's conclusion stands: neither templates nor the
+   private seed is presented as a remedy. The seed answers contamination.
+2. **EngTrace's own description.** The digit rule recomputes each claim from the model's own numbers;
+   it does not check arithmetic against the gold trace, as the text had said. And the judge decides
+   "what these checks leave open", which covers the step router (D-110, D-113) as well as E5.
+3. **Precedents.**
+   - PRISM-Physics' step check is named as rule-based, with no LLM. It is the nearest physics
+     precedent for EngTrace's deterministic checks; its validation is two experts' scores of 70
+     solutions.
+   - OPT-Engine (ICML 2026) is added. It generates operations-research instances, inventory and
+     production among them, and is a closer reference for the industrial branch than the
+     multiple-choice ORQA.
+   - Table A's AtmosSci-Bench row is corrected: its generated items are multiple choice, and its LLM
+     grader agreed with human graders on 92.79% and 93.02% of answers.
+4. **Scope.** Seven citations now claim no more than their papers:
+   - PRIME is college-level STEM, 18% of it engineering;
+   - Długosz et al. re-analyse GSM-Symbolic only;
+   - Lunardi et al. studied multiple-choice benchmarks;
+   - Krumdick et al. require a correct reference;
+   - on JudgeBench, many judges are near chance, not all;
+   - MATH-Perturb probes memorised methods as well as instances;
+   - ControlBench's experts examined the reasoning but did not grade it.
+5. **Length.** The [cut first] sentence on physics re-grading is cut, and its paper is cited for
+   rule-based grader errors. The main text is 704 words (it was 723). The section cites 100 works:
+   68 in the main text and 32 in the appendix.
+
+**Venues** (`check_venues.py`, `notes/venue_check.json`).
+
+- ERI is confirmed: the DOI on its arXiv page is Computers & Industrial Engineering 221 in Crossref.
+- PRIME, PRISM-Physics, HiPhO and MATH-Perturb are confirmed in OpenReview or the ACL Anthology.
+- Two papers listed as preprints have appeared, and are now cited at their venues: SymPyBench (EACL 2026
+  Industry Track) and AtmosSci-Bench (NeurIPS 2025 Datasets and Benchmarks).
+- EMNLP 2026 for Huang et al. and Długosz et al. still rests on arXiv comments.
+
+The Introduction sentence in `CHANGES.md` §2 no longer cites Akhtar et al. for BIG-Bench Hard, which
+they count as unsaturated.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
+| D-167 | Confirm EMNLP 2026 for Huang et al. and Długosz et al. once the proceedings appear (ERI is confirmed). The authors' call, outside the Related Work folder: `JUDGE_SELECTION.md` should say self-preference "can be" more than 50%, and the cliff should be reported as a difference between the templates in each tier (`notes/followup_review.md`) | the reference list; the paper's sections 3.3 and 5 |
 | D-166 | The authors' calls on the Related Work revision (`docs/related_work_oct2026/CHANGES.md`): adopt the replacement Introduction sentences (§2); whether the Limitations acknowledge Mondorf et al.'s finding on randomly sampled instances (§4); confirm three single-source venues (§6) | the paper's sections 1 and 2 |
 | D-161 | ~~Run: E5 on the paraphrase arm, about $3 at 316 items (`PARAPHRASE_RUNBOOK.md` section 4), for Q5's E5 column~~ **Done 2026-09-30 (D-162): $4.56, every call answered.** ~~The private Kaggle copy of the arm's archive~~ **Done 2026-10-01: `ayeshaiq/engtrace-full-run-paraphrase`, private, from `full_run_paraphrase_2026-10-01.zip` (80 files, the experts' returns included), downloaded back and matched member by member** | Q5's E5 column in the paper |
 | D-160 | ~~Round 3 of the flag reading: the 190 claims in `scores/flag_review/round3/` (workbook and instructions), then `flag_sample --round 3 --merge <file>` and `--score --read-by "<who>"`, giving the corrected rule's precision on this roster; no round 4~~ **Read 2026-10-01 by the same domain expert: precision 0.905 (D-163, `FLAG_REVIEW_3.md`)** | — |
