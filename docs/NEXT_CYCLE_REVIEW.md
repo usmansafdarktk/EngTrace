@@ -14,6 +14,14 @@ model's answer score, E3 coverage or E5-strict changes measurably between origin
 (`results/RESULTS.md` Q5; D-157, D-161, D-162). It cost $39.15, against the about $97 that section
 9.7's recount set aside for it.
 
+*Update, 2026-10-02.* The run is complete and was reviewed end to end (D-168): E5 ($36.30) and the
+router ($104.16) have run with every call but three answered, the decoding repeats are done on four
+models, the flag reading closed at precision 0.905 (D-163), and every free check reproduces, the
+committed results included. The review found two answer-check misreadings the pilot's 15 templates
+never exercised, pi-fractions and one quantity stated in two units, measured in
+`full_run_28092026/ANSWER_FORM_AUDIT.md` and awaiting the owner's call; and that four roster models
+ran with no reasoning tokens at provider-default decoding. Section 10 lists what is still to do.
+
 Written 2026-09-27 against the May 2026 submission (`docs/_ARR_May__EngTrace.pdf`), both
 rebuttals (`docs/EngTrace Rebuttals Jan 2026.docx`, `docs/EngTrace_Rebuttal_Jul2026 (1).docx`),
 the revision letter, `docs/re-implementation-sep/EngTrace_Suggested_Actions.pdf`, and the
@@ -684,3 +692,60 @@ the full run, not $79. The table above becomes:
 | step router, batched, rule C | $114 | `summary_numbers.py`: measured per call on the labelled traces ($95 at the planted rate) |
 | **subtotal, before any optional condition** | **$643** | about $143 over the ~$500 round |
 | without the router | $529 | about $29 over |
+
+---
+
+## 10. What remains, 2026-10-02
+
+Written after the end-to-end review (D-168), against sections 3, 5, 6 and 9.3 and the July meta-review's
+three suggested revisions. Done and in `full_run_28092026/results/RESULTS.md`: template-level intervals
+for every aggregate; the per-template SD column (within and between); 55 Holm-corrected pairwise tests on
+the answer score and the fully-solved rate, with McNemar beside them; the cliff per model with its interval,
+the Welch count and the detectable gap; decoding repeats on four models; unusable traces per model;
+judged fraction and unjudged rate per model; E5 coverage on wrong answers against a chance floor; the digit
+rule's rates with its precision on this roster (0.905); the router's flags; first-flag position; failure
+against gold depth; the paraphrase test as a bound; branch, domain, answer-type and endpoint tables; the
+tolerance and reading sensitivities. Not yet done, in the order it should happen:
+
+**Evaluator decisions, free, change numbers (D-168).**
+1. Adopt or decline readings P and A of the answer check; if adopted, re-score the three stores, rebuild the
+   stage rows, regenerate the results, record it. The pilot cannot arbitrate either reading.
+2. Decide how `array` items and scalar lines stating two quantities are scored (the check verifies the
+   last value), or list those templates beside D-145's multipart ones in the paper.
+3. State per model what decoding ran: four models with no reasoning tokens, seven with (Appendix P).
+
+**Analyses promised or asked for, free, not yet in RESULTS.**
+4. Leave-one-judge-out on E0-3J over the 300 pilot traces, with a placebo drop and the untouched-model
+   controls: the judge-exclusion ablation the July meta-review names (section 3.4 item 2).
+5. X2: per-judge, per-generator-family bias of E0 and E1 against the expert labels (section 3.4 item 3).
+6. Branch- and level-level scores with template-level intervals; RESULTS gives the means only, and any
+   "branch X is hardest" sentence needs the interval.
+7. The threshold appendix collated from the existing grids: E3's 0.5% grid, the digit rule against the 1%
+   and 0.1% readings, E2's held-out 0.5, the answer tolerance at half and double (section 3.3). The
+   split-half tolerance fit cannot be redone on the full run, which has no expert labels; say so.
+8. Error attribution validated by type on the pilot's labelled steps: what the digit rule, E5 and the
+   router each flag among calculation, conceptual and unsupported steps (section 3.6, automated layer).
+9. The corpus-wide surface-shortcut audit, D-057's method on all 150 templates, with the blind-guess floor
+   per classification template (section 6); RESULTS already drops the four known templates.
+10. The Wilcoxon test on milestone coverage only if a decoupling claim returns (D-149).
+
+**Experiments needing experts or spend.**
+11. An expert spot-check of the answer check on this roster: a stratified sample of incorrect and partial
+    verdicts from the top models, about 100 to 150, one or two experts, no API spend. The pilot validated
+    the check on other models and 15 templates; the audit found roster-specific gaps (section 9.3 item 4).
+12. The human error-analysis sample on the new run, the six-category taxonomy, three annotators, a few
+    contrastive models (section 3.6, second layer).
+13. A reasoning-on run of `gpt-5.4-mini` and `gemini-3.1-flash-lite`, or the plain statement that they ran
+    without reasoning: otherwise the closed tier's scores invite the wrong reading.
+14. The tool-use condition on a subset, or the open-book fallback (section 5; 9.3 item 11).
+15. The flagship anchor on the 450-item subsample (9.3 item 9).
+16. Optional: E5 with a second judge on a sample, and Grok on the planted set, to show the conclusions
+    survive a judge swap (JUDGE_SELECTION item 5).
+17. The Qwen2.5-Math pair only if the math-pretraining claim is kept; the plan drops it.
+
+**Not analyses, blocking the paper.** The authoring record of the 60 AI-drafted templates (the spec is not
+on master, 9.1 item 1); the taxonomy procedure for the two new branches; who assigned the 60 templates'
+difficulty tiers; Appendix P (ceilings, endpoints, Muse's 16,384 cap, decoding); the explanation of why the
+numbers moved; the scoring statements for symbolic, array and multipart answers; the six iterative templates
+that hold most empty rows; `README.md` (still 90 templates); `figures_oct_12/` untracked; the anonymised
+archive.

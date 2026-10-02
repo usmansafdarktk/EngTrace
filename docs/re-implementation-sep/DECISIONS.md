@@ -6334,10 +6334,67 @@ candidates. What changed in substance:
 The Introduction sentence in `CHANGES.md` §2 no longer cites Akhtar et al. for BIG-Bench Hard, which
 they count as unsaturated.
 
+## D-168 — The full run reviewed end to end before the paper: the record reproduces; the answer check misreads pi-fractions and one-quantity-two-units lines, measured and not yet adopted
+
+**Date:** 2026-10-02 · **Status:** MEASURED · OPEN (adoption is the owner's call, as D-138 and D-147 were) · **Evidence:** `full_run_28092026/answer_form_audit.py`, `ANSWER_FORM_AUDIT.md`; `scores/answer_form_audit_changes.jsonl` (local); the free checks named below
+
+**What was checked, all free.** `freeze --check-files` (FILES OK); `run_traces --status` (11 models, missing 0,
+$247.917 in the rows); `score --status` (main at `eea846e`, clean, 12 models; the evaluator blobs its CONFIG
+names are HEAD's); `judge --status` (8,032 main-arm calls answered, none without a reply, 1,227 on the
+paraphrase arm; $40.86 over both); `router --status` (24,503 of 24,506 answered, one key given up; $104.16);
+`analyze --selftest` (all pass); `judge --validate` and `router --validate` (both reproduce the pilot);
+`validate_scorer` (gold clean; all ten published figures reproduce); `trace_review` (identical to the committed
+review apart from its archive line, because the script now picks the newer repeats archive, a cosmetic
+defect); and `analyze` regenerated `results/` byte-identical apart from the provenance commit. Q1's table was
+also recomputed from the store by a separate script: every count and score matches, including the 7 odd
+finish reasons of D-148.
+
+**What a read of the verdicts found.** Twelve "incorrect" verdicts drawn at random from the top five models'
+answered traces were read by hand: six were right answers in another form. The forms were measured by
+`answer_form_audit.py` the D-137 way, on the gold, on the pilot's 300 labelled traces and on every full-run
+trace, with `answer.py` unchanged:
+
+- **Pi-fractions (reading P).** `answer.PI_EXPR` reads `(841*pi)/2447` as 841*pi, which the template also
+  computes, so the target itself is wrong, and reads `\dfrac{841\pi}{2447}` as pi. Normalising the text first
+  so the existing rule reads a*pi/b: gold 2,250 of 2,250; no pilot verdict moves, because the form does not
+  occur in the 15 pilot templates, so the experts cannot arbitrate (as under D-138 and D-147); in the full run
+  142 verdicts change, 138 to correct, 3 from correct to partial and 1 from incorrect to partial (three-part
+  items answered in one part), all on `continuous_to_discrete_conversion` (75) and
+  `decimation_aliasing_analysis` (67), both signals_and_systems, the domain every model scores lowest on.
+  Answer scores rise by 0.004 to 0.006 per model; 13 of DeepSeek V4.1 Flash's 40 incorrect verdicts and 11
+  of Claude Sonnet 5's 65 are of this kind.
+- **One quantity in two units (reading A, on top of P).** A scalar gold line "0.088960 radians, or 5.0970
+  degrees" yields one target, the degrees, and a trace in radians is incorrect. Accepting another computed
+  value on the line that is the target in another unit (ratio 180/pi, 2*pi or a power of ten): 56 more
+  verdicts to correct, 55 on `composite_shafts_series` and 1 on `angle_of_twist`; Kimi K3 gains 10. A first
+  version that accepted any computed value on the line was rejected before adoption: it credited traces right
+  on one of two different quantities (`vdw_solve_for_volume`, `levenspiel_plot_interpretation`).
+- **Two-quantity lines typed scalar or array.** `answer.targets` keeps the last computed value for `scalar`
+  and `array` items, so the templates the audit lists (`vdw_solve_for_volume`, `levenspiel_plot_interpretation`,
+  `standing_wave_formation`, `finite_convolution`, `gas_viscosity_kinetic_theory` on one item) are verified on
+  one of the two or more values their gold line states: a trace right on the last alone is correct, one right
+  on the other alone is incorrect. A property of the type, not of a reading; it goes beside D-145's list, or
+  the type changes.
+- **Symbolic answers written as their value (reading S, counted only).** On `ber_estimation_mary`, 73 of the
+  roster's 117 incorrect or partial verdicts state the numeric value of the gold's `a * Q(b)`. D-138 scores a
+  symbolic answer by the numbers it states, and the nine symbolic templates are a sensitivity row in RESULTS.md;
+  this count says what that row absorbs.
+
+**If P and A are adopted.** The change is confined to `answer.py`; E5 and the router read E3 and the digit rule,
+so no reply is bought again. `score --replace` on the main, paraphrase and repeat stores, `judge --score`,
+`router --score` and `analyze` are free, and the entry records it as D-137 to D-139 did. Under P+A the top
+five lie between 0.965 and 0.976, still within 0.011 of one another.
+
+**Also found, no action taken.** Four roster models wrote no reasoning tokens at provider-default decoding:
+`gemma-4-26b-a4b`, `qwen3-235b-a22b-2507`, `gpt-5.4-mini` and `gemini-3.1-flash-lite`; the other seven did, at
+a median of 718 (Claude Sonnet 5) to 2,473 (GLM-5.3) per trace. D-122 chose the providers' defaults; Appendix
+P must state what each model ran with, and the closed tier's scores are read against it.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
+| D-168 | Adopt readings P and A of the answer check (`ANSWER_FORM_AUDIT.md`), then `score --replace` on main, paraphrase and repeats, `judge --score`, `router --score`, `analyze`, and a DECISIONS entry; or report both as sensitivities. Decide how `array` items and the two-quantity scalar lines are scored, or list those templates with D-145's. Fix `trace_review.py`'s archive glob | the paper's tables |
 | D-167 | Confirm EMNLP 2026 for Huang et al. and Długosz et al. once the proceedings appear (ERI is confirmed). The authors' call, outside the Related Work folder: `JUDGE_SELECTION.md` should say self-preference "can be" more than 50%, and the cliff should be reported as a difference between the templates in each tier (`notes/followup_review.md`) | the reference list; the paper's sections 3.3 and 5 |
 | D-166 | The authors' calls on the Related Work revision (`docs/related_work_oct2026/CHANGES.md`): adopt the replacement Introduction sentences (§2); whether the Limitations acknowledge Mondorf et al.'s finding on randomly sampled instances (§4); confirm three single-source venues (§6) | the paper's sections 1 and 2 |
 | D-161 | ~~Run: E5 on the paraphrase arm, about $3 at 316 items (`PARAPHRASE_RUNBOOK.md` section 4), for Q5's E5 column~~ **Done 2026-09-30 (D-162): $4.56, every call answered.** ~~The private Kaggle copy of the arm's archive~~ **Done 2026-10-01: `ayeshaiq/engtrace-full-run-paraphrase`, private, from `full_run_paraphrase_2026-10-01.zip` (80 files, the experts' returns included), downloaded back and matched member by member** | Q5's E5 column in the paper |

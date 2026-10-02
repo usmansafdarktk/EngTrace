@@ -113,7 +113,9 @@ gold, on the pilot's expert labels and on the full run: LaTeX numbers (D-137, `p
 words (D-139, `word_audit.py`, `WORD_AUDIT.md`). Two independent reviews then found the last-digit
 windows decided by binary rounding at their edge; the inclusive rule was adopted the same way, and
 the half-unit and whole-trace readings are reported as sensitivities (D-147, `boundary_audit.py`,
-`BOUNDARY_AUDIT.md`).
+`BOUNDARY_AUDIT.md`). A review of the finished run read a sample of its verdicts and measured two more
+misreadings the pilot's templates never exercised, pi-fractions and one quantity stated in two units
+(D-168, `answer_form_audit.py`, `ANSWER_FORM_AUDIT.md`); they are measured, not adopted.
 
 ```bash
 python -m full_run_28092026.score --variant main --workers 8   # free
