@@ -6694,6 +6694,59 @@ placebo and untouched controls finds no family effect at a detectable size of 0.
 is positive and uniform. The caveats stand in the report: 15 templates, five models, the published framework, which the
 full run replaced.
 
+## D-175 — The threshold appendix collated from the scripts that measured each threshold (A5)
+
+**Date:** 2026-10-03 · **Status:** DONE (free) · **Evidence:** `full_run_28092026/threshold_appendix.py`, `THRESHOLD_APPENDIX.md`, `results/threshold_appendix.json`; the captured outputs under `scores/_threshold_logs/` (local)
+
+One script runs the pilot's four threshold analyses as they stand (`answer_check.py`, `e3_grid.py` under the template pin,
+`digit_rule.py`, `prm_threshold.py`, all in the pinned environment), parses the tables they print with an assertion per
+expected row, reads the full run's sensitivity rows, chance floors and 1% flag rates from `results.json` and
+`gold_validation.json`, and reads the published framework's constants from its source. Nothing is typed. What the appendix
+shows: the answer check's one fitted tolerance (0.002) held out at 0.908 and 0.939 three-way agreement by halves; the
+full run's ordering unchanged at half and double the tolerance (tau 0.927 each way), under the half-unit window (0.991)
+and the whole-trace reading (1.000); E3's 0.5% tolerance on a plateau (separation 0.699 with unit scaling against 0.560
+at 2% and 0.687 at 0.2%), the full run's gold null 0.123 and per-model floors 0.10 to 0.22; the digit rule's four readings
+on the pilot's labels (hard-case precision 0.171 at 1%, 0.345 at 0.1%, 0.581 bare, 0.817 as shipped; recall 0.039, 0.107,
+0.646, 0.427) and the full run's flag rates under the shipped rule against the 1% reading; E2's held-out threshold gain for
+the 72B PRM −0.006 over all traces. The pilot figures are re-runs with today's evaluators, so a few differ in the third
+decimal from the RESULTS files of their date; `SCORER_VALIDATION.md` reproduces the published ones with the published code.
+The cross-encoder and alignment-ratio thresholds the July rebuttal promised to vary no longer exist in the stack.
+
+## D-176 — Error attribution validated by type on the pilot's labels (A6)
+
+**Date:** 2026-10-03 · **Status:** DONE (free, offline) · **Evidence:** `evaluator_pilot_17092026/analysis/attribution.py`, `RESULTS_ATTRIBUTION.md`, `analysis/out/attribution.json`
+
+On the 2,037 labelled steps of the 300 traces (every trace's step split matches the labels'), each component's flags
+against the experts' step type. The digit rule as shipped: 141 flags, 123 on incorrect steps (precision 0.872), 114 of
+them calculation slips and 9 conceptual; recall 0.354 on calculation steps, 0.155 on conceptual. The router's judge, by
+its own category: "Calculation Error" lands on a calculation step 60% of the time and on a correct step 34%; "Conceptual
+Error" lands on a conceptual step 42% of the time, a calculation step 18% and a correct step 38%, and finds 37 of the 58
+expert-conceptual steps (recall 0.638); any judge flag: precision 0.631, recall 0.280 on calculation and 0.724 on
+conceptual steps. Inside correct-answer traces the judge flags 19 steps at precision 0.368 and the digit rule 93 at
+0.817. At trace level, on the 72 wrong-answer traces an E5 MISSING milestone is present in 59, a router flag in 63 and a
+digit flag in 29, and none of the three lands on a trace without an incorrect step; on the 228 correct-answer traces 71%
+of E5's 17 MISSING traces hold no incorrect step. For the paper: a flag in Q3's attribution table is a flag with these
+precisions, and the judge's category is informative about the cause (a conceptual flag is conceptual twice as often as
+calculation) but never a count.
+
+## D-177 — The corpus-wide surface-shortcut audit (A7): two templates newly flagged, neither moving the headline
+
+**Date:** 2026-10-03 · **Status:** DONE (free) · **Evidence:** `full_run_28092026/shortcut_audit.py`, `SHORTCUT_AUDIT.md`, `results/shortcut_audit.json`
+
+(a) D-057's measurement on every classification template, 500 public draws each, labels read by the answer check's own
+readers (the Froude template by D-118's rule), a depth-2 tree on the question's masked surface fitted on even seeds and
+scored on odd: the two known lookups lift +0.52 and +0.36 over their floors (held-out 0.84 and 0.86 on these features,
+against D-057's 1.00 with its structural probes); `reynolds_number_flow_regime` +0.10 (the fluid's name carries its
+viscosity), `damping_classification` 0.00, `critical_depth_froude_classification` +0.01. (b) On the pool's items, whether
+the check's numeric targets are numbers the question states (within 0.2%) or rescales by a power of ten: 31 of 148
+templates have at least one such item; two have every target restated on half or more of their items,
+`signal_operations` (an array answer whose values are the input's, 13 of 13 items) and `quantity_discount_all_units` (the
+optimal quantity equals a stated price break on 8 of 14). Without those two the answer score changes by at most 0.002
+for any model. The audit measures the question's surface, not what the models did; the paraphrase arm is the behavioural
+half. For the paper: the four known templates plus these two as a stated list, the Sensitivity row already covering the
+four; `signal_operations` is also a case where a numbers-only check cannot tell a correct operation from a wrong one on
+the same values, which belongs beside D-145's scoring statements.
+
 ## Open decisions
 
 | # | Decision | Needed before |

@@ -16,8 +16,10 @@ and a decision each.
 
 ## A. Analyses on the data in hand, all free
 
-*Status 2026-10-03 (D-173):* A1, A2, A8, A9, A10 and A11 are done and in `results/RESULTS.md` and
-`DECODING_TABLE.md`; A3 to A7 follow in D-174 onwards. Item 0 (a clean-tree regeneration) closes the batch.
+*Status 2026-10-03:* all of section A is done. A1, A2, A9, A10, A11 in `results/RESULTS.md` (D-173); A8 in
+`DECODING_TABLE.md` (D-173); A3 and A4 in the pilot's `RESULTS_LOJO.md` (D-174); A5 in `THRESHOLD_APPENDIX.md` (D-175);
+A6 in the pilot's `RESULTS_ATTRIBUTION.md` (D-176); A7 in `SHORTCUT_AUDIT.md` (D-177). The results were regenerated from
+a clean tree afterwards (item 0).
 
 **A1. The reasoning score compared across models, as the July rebuttal promised.** *Answers:* yAYU 2 and
 9W1B 4 (no variance or significance), and the rebuttal's own promise of "Wilcoxon on milestone coverage"

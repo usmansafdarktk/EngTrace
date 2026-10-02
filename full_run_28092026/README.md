@@ -132,6 +132,13 @@ expert under `expert_request/dist/` (gitignored), with `reading_app.py` as the a
 the instructions, and scores the returned files into `EXPERT_REQUEST.md` (counts only; D-172). `--selftest` builds a
 small kit in a temp folder and drives the app through it.
 
+`decoding_table.py` prints the decoding settings and token use per model from the traces (`DECODING_TABLE.md`, D-173).
+`threshold_appendix.py` collates every threshold in the stack with the sensitivity it was measured under, by running the
+pilot's analyses and reading the results (`THRESHOLD_APPENDIX.md`, D-175). `shortcut_audit.py` is D-057's surface-shortcut
+measurement on every template, on public draws and on the pool's targets (`SHORTCUT_AUDIT.md`, D-177). The results script's
+additions of 2026-10-03 (coverage compared across models, branch and level intervals, detectable differences) are D-173;
+the pilot's leave-one-judge-out and attribution analyses are D-174 and D-176.
+
 **For the paper:** `RESULTS_PAPER_NOTES.md` says which figures to report, with their sources, what they
 support and what they do not (D-170); `PARAPHRASE_PAPER_NOTES.md` does the same for Q5. The analyses still to
 do, in order, are in `docs/EVALUATION_NEXT_STEPS.md`.
