@@ -6657,6 +6657,43 @@ wrong answers that are a complete derivation to a wrong value, the case a proces
 adopted for the tiers; the sign-flip test on the branch pairs the next-steps file proposed would have no pairing to flip.
 Item 0 (a clean-tree regeneration of the results) is done after the last change to `analyze.py` in this batch.
 
+## D-174 — Leave-one-judge-out on the published Tribunal replayed offline with controls, and the per-judge bias (X2): no family effect; every judge lenient the same way
+
+**Date:** 2026-10-03 · **Status:** DONE (free, offline; next steps A3 and A4) · **Evidence:** `evaluator_pilot_17092026/analysis/lojo.py`, `RESULTS_LOJO.md`, `analysis/out/lojo.json`
+
+**The replay.** E0-3J (the published framework with its three judges connected) on the pilot's 300 traces, recomputed
+from what the run left on disk: the cached Tier 1 matrices, the stored judge replies parsed with the framework's own
+logic, the cached single-pair similarities the recovery step uses, and the framework's own majority and tie-break,
+assignment and F1 arithmetic. Under the full panel it reproduces the stored recovered F1 of all 179 judged traces to
+1e-9 (largest deviation 0). Nothing was called.
+
+**Leave one judge out.** For each trace model, the drop of its own family's judge against the two other drops as
+placebos, and DeepSeek R1 and Llama 3.1 70B as controls. Mean recovered F1 over 60 traces: GPT-5 0.434 under the full
+panel, 0.428 without GPT-5 (one trace moves, −0.006) and 0.428 without Claude Opus 4.5 (the same trace), 0.434 without
+Gemini; Claude Opus 4.7 0.461 under every panel (no trace moves); Gemini 3.1 Pro 0.432, −0.001 without Gemini and −0.001
+without GPT-5; DeepSeek −0.001 under two drops; Llama −0.004 to −0.016. The family drop is indistinguishable from the
+placebo drops, and the detectable mean change at this size is 0.003 to 0.025 per model. Two structural facts explain
+the smallness: with two judges a split vote takes the conservative minimum, so a drop can only lower a score; and the
+panel calls almost every judged step Alternative Correct (E0-F5), so there are few splits to lose.
+
+**The panel against the experts.** On the judged steps with an expert label, the full panel's recall on expert-incorrect
+steps is 0.000 (GPT-5 traces), 0.065 (Claude), 0.000 (Gemini), 0.040 (DeepSeek) and 0.927 (Llama); dropping any judge
+changes accuracy by at most 0.02 and never in a family-specific direction.
+
+**X2.** Per judge and trace model, the judge's scalar minus the experts', on 126 to 291 judged labelled steps per cell:
++0.04 to +0.18 everywhere, with every judge calling 79% to 100% of the expert-incorrect steps on the four frontier
+models' traces Alternative Correct and 0% to 2% of expert-correct steps an error, and all three behaving differently only
+on Llama's traces (lenient 5% to 9%, harsh 13% to 27%). The family cells are not the lenient ones: own-family bias minus
+other-traces bias is +0.042 (GPT-5; 95% CI −0.034 to +0.119), −0.017 (Opus 4.5; −0.070 to +0.041) and −0.060 (Gemini;
+−0.112 to −0.009, the judge harder on its own family). E1's three judges, from no roster family, show the same leniency
+(+0.02 to +0.18). So the Tribunal's error is shared across families and across panels: it is the prompt and the task,
+not self-preference, and it is why the full run does not use the Tribunal (D-105).
+
+**For the paper.** One paragraph beside the E1 result discharges the July promise: the judge-exclusion ablation with
+placebo and untouched controls finds no family effect at a detectable size of 0.003 to 0.025 F1, and the per-judge bias
+is positive and uniform. The caveats stand in the report: 15 templates, five models, the published framework, which the
+full run replaced.
+
 ## Open decisions
 
 | # | Decision | Needed before |
