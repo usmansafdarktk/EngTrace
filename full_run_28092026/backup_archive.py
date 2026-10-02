@@ -3,6 +3,11 @@ member against the files it was made from (EVALUATION_GUIDE.md, section 8).
 
     python -m full_run_28092026.backup_archive scores                          # full_run_scores_<date>.zip
     python -m full_run_28092026.backup_archive traces/repeat1 traces/repeat2 traces/repeat3 --name full_run_traces_repeats
+    python -m full_run_28092026.backup_archive scores --exclude scores/flag_review scores/_replaced scores/paraphrase
+
+`--exclude` leaves folders out: the expert's flag-reading labels (scores/flag_review/) never leave this
+machine, superseded stores (scores/_replaced/) can be regenerated, and the paraphrase arm's store has its
+own backup (D-162).
 
 The archive goes to ~/EngTrace_private_backup/, with a `.sha256` in sha256sum's format like the earlier
 backups; members are named from full_run_28092026/. Python's zipfile reads a file another process holds
@@ -26,8 +31,11 @@ def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
     ap.add_argument('folders', nargs='+', help='folders under full_run_28092026/')
     ap.add_argument('--name', help='the archive name before the date (default: full_run_<last part of the first folder>)')
+    ap.add_argument('--exclude', nargs='*', default=[], help='folders under full_run_28092026/ to leave out')
     a = ap.parse_args()
-    files = sorted(f for d in a.folders for f in (HERE / d).rglob('*') if f.is_file())
+    skip = [(HERE / d).resolve() for d in a.exclude]
+    files = sorted(f for d in a.folders for f in (HERE / d).rglob('*')
+                   if f.is_file() and not any(f.resolve().is_relative_to(s) for s in skip))
     if not files:
         raise SystemExit(f'nothing to archive under {a.folders}')
     name = f"{a.name or 'full_run_' + Path(a.folders[0]).name}_{datetime.date.today():%Y-%m-%d}.zip"
