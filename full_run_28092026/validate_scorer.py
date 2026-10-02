@@ -190,7 +190,9 @@ def main() -> int:
          f'`{parser_fix.PRE_FIX[:7]}`; "now" is the current code: LaTeX numbers read (D-137, `PARSER_FIX.md`), '
          'no credit from a subscript or a bare 0 or 1 (D-138, `MATCH_AUDIT.md`), a verdict word decided within '
          'its family (D-139, `WORD_AUDIT.md`) and the last-digit windows decided by the rule rather than by binary '
-         'rounding (D-147, `BOUNDARY_AUDIT.md`); the last three change none of these verdicts. The digit rule\'s '
+         'rounding (D-147, `BOUNDARY_AUDIT.md`), and pi-fractions, a scalar gold line\'s second unit and a '
+         'pi-fraction of two computed milestones read (D-169, `ANSWER_FORM_FIX.md`); the last four change none of '
+         'these verdicts. The digit rule\'s '
          f'published figures are reproduced with `arith.py` at `{digit_fix.PRE_FIX[:7]}`; "now" is the rule as '
          'fixed twice after a domain expert read the full run\'s flags (D-156, D-159; `DIGIT_FIX.md`, '
          '`DIGIT_FIX_2.md`) and corrected after two review agents checked both fixes (D-160; `DIGIT_FIX_3.md`).', '',

@@ -6390,11 +6390,104 @@ five lie between 0.965 and 0.976, still within 0.011 of one another.
 a median of 718 (Claude Sonnet 5) to 2,473 (GLM-5.3) per trace. D-122 chose the providers' defaults; Appendix
 P must state what each model ran with, and the closed tier's scores are read against it.
 
+## D-169 — The answer check corrected after the run was read: pi-fractions, a scalar gold line's second unit and num/den fractions; every changed verdict read, the change measured between pinned commits, the stores re-scored
+
+**Date:** 2026-10-02 · **Status:** DECIDED (the owner: adopt readings P, A and N; C declined) · DONE (the change, the gate, the measurement, the re-score, the stage rows, the analysis, the archive) · **Evidence:** `evaluator_pilot_17092026/evaluators/answer.py` (docstring and self-test, 64 cases); `full_run_28092026/answer_form_audit.py` (`ANSWER_FORM_AUDIT.md`, the readings; `--fix`, `ANSWER_FORM_FIX.md`, the shipped change between `e116b4f` and `5415f61`); `SCORER_VALIDATION.md`; `GOLD_VALIDATION.md`; `results/RESULTS.md` (`analyze.py` at `2950875`); `scores/answer_form_fix_changes.jsonl` and `scores/rescore_d169.log` (local)
+
+**The gate.** Before anything changed, every verdict the readings move was read by hand with the gold's true
+value beside the trace's answer segment: 198 under P and A, 238 once reading N was added. 233 of the 234
+credits are right answers. One is not: `gpt-5.4-mini` on `continuous_to_discrete_conversion#1` writes
+"ω ≈ 0.7995π rad/sample (≈ 2.511 rad/sample)", a wrong answer, and is credited because the bare coefficient
+0.7995 lies within 0.2% of the true 0.7987 rad/sample. The four other moves are three-part aliasing items
+answered in one part, scored partial as D-145 scores every multi-target item; one of them, Gemma's
+`cos((π/2)n)` for `cos((3π/2)n)`, is equivalent for integer n and is a limitation. Two refinements were
+measured against the wrong credit:
+
+- Reading A as first written, matched with the check's unit factors, credited a cut-off Gemma trace of 832
+  characters (`composite_shafts_series#16`, finish reason `error`, one of D-148's seven) holding `πd⁴/32` and
+  no answer, through 32 ± 1 at the 1/60 factor. Matched at unit scale it does not, and no right credit is lost.
+- Reading C, a π-coefficient is not a standalone value, removes the wrong credit and two accidental credits of
+  wrong answers on `bpsk_energy_basis`, but strips the accidental credit of four right answers on
+  `cd_dc_system_analysis` (a phase written −0.75π for a 0.0075 s shift) and of two on
+  `continuous_to_discrete_conversion#10`: six outcomes worse for three better. Not adopted. The one wrong
+  credit is recorded as a known limit of a check that credits any number within 0.2% of the target on the
+  Answer line, and is pinned in the self-test so that a change to it is noticed.
+
+The owner chose P + A + N on 2026-10-02, with the stop condition of the gate met and explained.
+
+**What changed in `answer.py`, and nothing else.**
+- **P.** A pi-fraction is one value in every shape, `(841*pi)/2447`, `\dfrac{841\pi}{2447}`, `841\pi/2447`,
+  `(3/17)\pi`, `0.4\pi`: `PI_EXPR` allows the parentheses, `_pi_text` resolves LaTeX's `\pi`, `\frac`, `\left`,
+  `\right` and `$`, and `(a/b)π` is rewritten `a*pi/b`; `pi*n` and `pi(` are still not values. Until now the
+  parenthesis stopped the rule at 841π, a value the template also computes, so the gold's own target was
+  wrong on the seven `continuous_to_discrete_conversion` items with no milestones and on
+  `decimation_aliasing_analysis`.
+- **N.** A pi-fraction on the gold's answer line whose numerator and denominator are both computed, the
+  reduced fraction's `num` and `den` that the other eight `continuous_to_discrete_conversion` items expose as
+  their only milestones, is one quantity: the pair of integer targets becomes the fraction's value, so a trace
+  stating ω as a decimal or unreduced is right.
+- **A.** A scalar gold line stating one quantity in two units ("0.088960 radians, or 5.0970 degrees") accepts
+  either: the second is a rendering, related to the target by 180/π or 2π either way, matched at unit scale
+  (`match(scales=(1.0,))`). Powers of ten are not renderings: two different quantities can differ by one, and
+  the unit factors already serve the target.
+
+`milestones.py` is untouched, so E3, E5's prompts and the router's are what they were and no reply was bought
+again. 24 new self-test cases pin the forms, the counter-cases and the known limit; 64 of 64 pass.
+
+**Measured between pinned commits** (`answer_form_audit.py --fix`, `ANSWER_FORM_FIX.md`: `answer.py` at
+`e116b4f` against `5415f61`, both from git, on the same milestones). Gold 2,250 of 2,250 before and after.
+The pilot's 300 traces: 0 verdicts move and agreement stays 0.982 / 0.927, so the published figures stand;
+the forms occur in none of the 15 pilot templates, so the experts cannot vouch for them, and the paper says so
+as it does for D-138 and D-147. The full run: 238 verdicts change, the 238 the gate read and no other, with
+the same new verdicts: 234 to correct, 3 correct → partial, 1 incorrect → partial, on four templates,
+`continuous_to_discrete_conversion` 116, `decimation_aliasing_analysis` 67, `composite_shafts_series` 54,
+`angle_of_twist` 1. Per model 12 (GLM-5.3) to 32 (Gemma 4 26B, Qwen3-235B-2507) verdicts; answer scores
+rise by 0.005 (GLM-5.3-Flash) to 0.014 (Gemini 3.1 Flash-Lite).
+
+**Re-scored, all free** (`scores/rescore_d169.log`, 2026-10-02 12:32 to 13:16 UTC, at `2950875`, tree
+clean): `score --replace` on `main` (12 models), `paraphrase` and `repeat1` to `repeat3`, the old stores
+archived under `scores/_replaced/`; `judge --score` and `router --score` for `main` and `judge --variant
+paraphrase --score`, every sent call still with its reply (the router's 3 without one as in D-164);
+`analyze`; `gold_validation`, unchanged. `validate_scorer` regenerated with the change named; no figure moves.
+
+**What moved in RESULTS.md** (`analyze.py` at `2950875`):
+- **Q1.** DeepSeek V4.1 Flash 0.976, Kimi K3 0.974, Claude Sonnet 5 0.972, GLM-5.3-Flash 0.969, Muse Glimmer
+  0.967, GLM-5.3 0.948, Qwen3-235B-2507 0.886, Gemini 3.1 Flash-Lite 0.872, Gemma 4 26B 0.864, GPT-5.4 mini
+  0.847, gpt-oss-20b 0.814. Kimi K3 and Claude Sonnet 5 change places; the top five lie within 0.009. 32 of
+  55 pairs hold (31 before); the fully-solved test agrees on 54 of 55 (55), McNemar on 47 of 55 (46).
+- **Q2.** 4 of 11 under Welch with Holm (3 before; Gemma 4 26B joins gpt-oss-20b, GPT-5.4 mini and Gemini 3.1
+  Flash-Lite at p 0.043); 9 of 11 under the planned permutation (6).
+- **Q3.** Only the group memberships move, since 238 traces change group; no E3, E5 or digit-rule figure does.
+- **Q5.** Paired differences −0.031 (Qwen3-235B-2507) to +0.020 (Muse Glimmer); none survives Holm; 10 of 11
+  within ±5 points as before, Qwen not; Muse's 90% interval now lies wholly above zero (+0.005 to +0.036),
+  beside GLM-5.3-Flash's and Claude Sonnet 5's wholly below; Kendall's τ 0.673 (CI 0.455 to 0.881) against a
+  roster-wide floor of 0.891 (0.636 and 0.881 before).
+- **Domains.** signals_and_systems moves from 0.777–0.920 to 0.883–1.000 and is no longer every model's
+  weakest domain; thermodynamics, unchanged at 0.517–0.922, is the lowest for nine of the eleven. Electrical
+  for the top five: 0.947–0.981 (0.912–0.954 before).
+- **Sensitivity.** The ordering's τ with the headline: 0.927 at half and at double tolerance (0.891 and 0.964
+  before), 0.964 on the fully-solved rate (0.891), 0.991 under the half-unit window (0.917), 1.000 without the
+  shortcut templates and under the whole-trace reading, 0.964 without the symbolic templates, 0.636 with
+  unusable rows excluded (0.600).
+- **Repeats.** SDs 0.004 to 0.013 (0.003 to 0.016). The set-aside Qwen3.8-27B: 0.937 (0.924).
+
+**Backups.** `~/EngTrace_private_backup/full_run_scores_2026-10-02.zip` was rewritten with the re-scored
+stores and the rebuilt stage rows: 88 files, each checked against its source, sha256 `1a3df7ec…dd3e07`. It
+replaces the morning's archive of the same name (D-164), whose stores are the superseded ones under
+`scores/_replaced/` and regenerate from `e116b4f`. The private Kaggle copy needs a new version, uploaded in
+manual mode by the owner.
+
+**For the paper.** The check was corrected after the run on a reading of its verdicts, as D-137 to D-139 and
+D-147 were, and the paper reports it that way. The `array` type and the two-quantity scalar lines of D-168
+stay as they are and are listed beside D-145's multipart templates. `trace_review.py` now reads the dated
+main-run archive only (D-168's cosmetic defect); the committed review regenerates identically.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
-| D-168 | Adopt readings P and A of the answer check (`ANSWER_FORM_AUDIT.md`), then `score --replace` on main, paraphrase and repeats, `judge --score`, `router --score`, `analyze`, and a DECISIONS entry; or report both as sensitivities. Decide how `array` items and the two-quantity scalar lines are scored, or list those templates with D-145's. Fix `trace_review.py`'s archive glob | the paper's tables |
+| D-169 | Upload the rewritten `full_run_scores_2026-10-02.zip` as a new version of the private Kaggle scores dataset (manual mode). In the paper: the `array` type and the two-quantity scalar lines are listed with D-145's multipart templates; the one wrong credit is a stated limit | the archive's second copy; the paper's scoring statements |
+| D-168 | ~~Adopt readings P and A of the answer check (`ANSWER_FORM_AUDIT.md`), then `score --replace` on main, paraphrase and repeats, `judge --score`, `router --score`, `analyze`, and a DECISIONS entry; or report both as sensitivities~~ **Adopted 2026-10-02 with reading N, after every changed verdict was read (D-169); re-scored and regenerated.** ~~Decide how `array` items and the two-quantity scalar lines are scored, or list those templates with D-145's~~ **Listed with D-145's (D-169).** ~~Fix `trace_review.py`'s archive glob~~ **Fixed (D-169)** | — |
 | D-167 | Confirm EMNLP 2026 for Huang et al. and Długosz et al. once the proceedings appear (ERI is confirmed). The authors' call, outside the Related Work folder: `JUDGE_SELECTION.md` should say self-preference "can be" more than 50%, and the cliff should be reported as a difference between the templates in each tier (`notes/followup_review.md`) | the reference list; the paper's sections 3.3 and 5 |
 | D-166 | The authors' calls on the Related Work revision (`docs/related_work_oct2026/CHANGES.md`): adopt the replacement Introduction sentences (§2); whether the Limitations acknowledge Mondorf et al.'s finding on randomly sampled instances (§4); confirm three single-source venues (§6) | the paper's sections 1 and 2 |
 | D-161 | ~~Run: E5 on the paraphrase arm, about $3 at 316 items (`PARAPHRASE_RUNBOOK.md` section 4), for Q5's E5 column~~ **Done 2026-09-30 (D-162): $4.56, every call answered.** ~~The private Kaggle copy of the arm's archive~~ **Done 2026-10-01: `ayeshaiq/engtrace-full-run-paraphrase`, private, from `full_run_paraphrase_2026-10-01.zip` (80 files, the experts' returns included), downloaded back and matched member by member** | Q5's E5 column in the paper |

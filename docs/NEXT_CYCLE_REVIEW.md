@@ -17,10 +17,13 @@ model's answer score, E3 coverage or E5-strict changes measurably between origin
 *Update, 2026-10-02.* The run is complete and was reviewed end to end (D-168): E5 ($36.30) and the
 router ($104.16) have run with every call but three answered, the decoding repeats are done on four
 models, the flag reading closed at precision 0.905 (D-163), and every free check reproduces, the
-committed results included. The review found two answer-check misreadings the pilot's 15 templates
-never exercised, pi-fractions and one quantity stated in two units, measured in
-`full_run_28092026/ANSWER_FORM_AUDIT.md` and awaiting the owner's call; and that four roster models
-ran with no reasoning tokens at provider-default decoding. Section 10 lists what is still to do.
+committed results included. The review found three answer-check misreadings the pilot's 15 templates
+never exercised, pi-fractions, one quantity stated in two units, and a pi-fraction of two computed
+milestones, measured in `full_run_28092026/ANSWER_FORM_AUDIT.md`; the owner adopted the corrections
+the same day after every changed verdict was read (D-169, `ANSWER_FORM_FIX.md`), the stores were
+re-scored and `results/RESULTS.md` regenerated: the top five models now lie between 0.967 and 0.976,
+32 of 55 pairs hold, and the cliff holds for 4 of 11. The review also found that four roster models ran
+with no reasoning tokens at provider-default decoding. Section 10 lists what is still to do.
 
 Written 2026-09-27 against the May 2026 submission (`docs/_ARR_May__EngTrace.pdf`), both
 rebuttals (`docs/EngTrace Rebuttals Jan 2026.docx`, `docs/EngTrace_Rebuttal_Jul2026 (1).docx`),
@@ -708,10 +711,13 @@ against gold depth; the paraphrase test as a bound; branch, domain, answer-type 
 tolerance and reading sensitivities. Not yet done, in the order it should happen:
 
 **Evaluator decisions, free, change numbers (D-168).**
-1. Adopt or decline readings P and A of the answer check; if adopted, re-score the three stores, rebuild the
-   stage rows, regenerate the results, record it. The pilot cannot arbitrate either reading.
-2. Decide how `array` items and scalar lines stating two quantities are scored (the check verifies the
-   last value), or list those templates beside D-145's multipart ones in the paper.
+1. ~~Adopt or decline readings P and A of the answer check; if adopted, re-score the three stores, rebuild the
+   stage rows, regenerate the results, record it. The pilot cannot arbitrate either reading.~~ **Done
+   2026-10-02 (D-169): P, A at unit scale and N adopted, C declined; 238 verdicts read, the change measured
+   between pinned commits, five stores re-scored, results regenerated; one wrong credit recorded as a limit.**
+2. ~~Decide how `array` items and scalar lines stating two quantities are scored (the check verifies the
+   last value), or list those templates beside D-145's multipart ones in the paper.~~ **Decided (D-169): left
+   as they are, to be listed beside D-145's multipart templates in the paper.**
 3. State per model what decoding ran: four models with no reasoning tokens, seven with (Appendix P).
 
 **Analyses promised or asked for, free, not yet in RESULTS.**

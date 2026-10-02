@@ -21,7 +21,7 @@ on its own.
 |---|---|---|
 | Pool frozen, 150 x 15 from a private seed | `pool/` (local), `manifest.jsonl`, `FREEZE.json` | D-114 to D-119 |
 | Inference, eleven roster models plus the set-aside Qwen3.8-27B, 27,000 rows | `traces/` (local), backed up locally and on Kaggle | D-122 to D-133 |
-| Deterministic scoring: answer check, E3, digit rule | `scores/main/` (local), scored at `bf4a43b`, CONFIG clean | D-134 to D-140, D-144, D-147 |
+| Deterministic scoring: answer check, E3, digit rule | `scores/main/` (local), re-scored at `2950875` after the D-169 answer-check change, CONFIG clean | D-134 to D-140, D-144, D-147, D-156 to D-160, D-169 |
 | Validations: gold, pilot expert labels, E5 and router replay | `SCORER_VALIDATION.md`, `E5_VALIDATION.md`, `ROUTER_VALIDATION.md`, `BOUNDARY_AUDIT.md` | D-134, D-142, D-147 |
 | Analysis of the deterministic stack | `results/RESULTS.md`, `results.json`, `per_template.csv` | D-140, D-146, D-149 |
 | Tag `full-run-evaluation` on `7ebc348`, the evaluator code the paid stages start from | `git tag` | D-144 |
@@ -43,7 +43,7 @@ git log --oneline -1                                 # at or after 7ebc348
 git tag                                              # full-run-inference, full-run-inference-qwen, full-run-evaluation
 python -m full_run_28092026.freeze --check-files     # FILES OK - 2250 items in pool/ match manifest.jsonl
 python -m full_run_28092026.run_traces --status      # 11 models, missing 0, $247.917; two inert entries named
-python -m full_run_28092026.score --status           # main: commit bf4a43b, 12 models in CONFIG, 2250 rows each
+python -m full_run_28092026.score --status           # main: commit 2950875, 12 models in CONFIG, 2250 rows each
 python -m full_run_28092026.analyze --selftest       # selftest: all pass
 python -m full_run_28092026.judge --validate         # ends "The stage reproduces the pilot."
 python -m full_run_28092026.router --validate        # ends "The stage reproduces the pilot."
@@ -284,7 +284,7 @@ the paper will quote from these stages must be printed by `analyze.py` or `--sta
 
 - **A validation does not reproduce.** An evaluator or an input has changed since the tag. Do not run
   a paid stage; find the change (`git status`, `git diff full-run-evaluation`) and record it.
-- **`score --status` shows a commit other than `bf4a43b` or DIRTY.** The store was re-scored. Fine if
+- **`score --status` shows a commit other than `2950875` or DIRTY.** The store was re-scored. Fine if
   recorded in DECISIONS; otherwise find out why before paying for anything built on it.
 - **A stage refuses: "store rows no longer match their traces".** The traces changed after scoring.
   Restore them from the backup or re-score the variant.
