@@ -65,6 +65,8 @@ def variant_manifest(variant: str, man: dict) -> dict[str, dict]:
     from full_run_28092026 import subsamples
     if variant in subsamples.REPEAT_VARIANTS:
         return {i: man[i] for i in subsamples.repeat_ids()}
+    if variant.startswith('reasoning-'):                 # C1: the originals of the 450-item subsample
+        return {i: man[i] for i in subsamples.paraphrase_ids()}
     if variant != 'paraphrase':
         return man
     p = HERE / 'paraphrase' / 'manifest.jsonl'

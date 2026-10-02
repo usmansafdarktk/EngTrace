@@ -36,7 +36,15 @@ set, into traces/<variant>/<key>.jsonl, so score.py scores it as that variant:
                     paraphrase/manifest.jsonl before a call; the row records the paraphrase's hash as
                     item_sha256 and the original's as original_sha256
   repeat1..repeat3  the 300 items of subsamples.REPEAT with their original questions, one run each
-The dry run estimates a variant from each model's own bills on the same items in the main run.
+  reasoning-<effort>  (C1, docs/EVALUATION_NEXT_STEPS.md) the 450 items of subsamples.PARAPHRASE with their original
+                    questions, the request carrying OpenRouter's unified reasoning parameter at that effort (low,
+                    medium or high), for the models whose endpoints reported no reasoning tokens at the provider's
+                    default (D-168): by default `gpt-5.4-mini` and `gemini-3.1-flash-lite`, or the models --model
+                    names. Everything else is the main run's: prompt, ceiling, routing, scoring. Reported beside the
+                    main run on the same items, never in its place.
+The dry run estimates a variant from each model's own bills on the same items in the main run; for a reasoning
+variant the main run's visible output understates the bill, so its dry run prices output-token multipliers and
+`--calibrate N` (allowed for this variant) measures the real lengths on N items first.
 
     python -m full_run_28092026.run_traces --variant paraphrase --dry-run          # FREE
     python -m full_run_28092026.run_traces --variant repeat1 --model gemma-4-26b-a4b --dry-run
@@ -69,7 +77,10 @@ from full_run_28092026 import freeze, subsamples  # noqa: E402
 CONFIG = HERE / 'models.json'
 TRACES = HERE / 'traces'
 PARAPHRASES = HERE / 'paraphrase'
-VARIANTS = ('main', 'paraphrase') + subsamples.REPEAT_VARIANTS
+REASONING_EFFORTS = ('low', 'medium', 'high')
+REASONING_VARIANTS = tuple(f'reasoning-{e}' for e in REASONING_EFFORTS)
+REASONING_MODELS = ('gpt-5.4-mini', 'gemini-3.1-flash-lite')     # no reasoning tokens at the provider's default (D-168)
+VARIANTS = ('main', 'paraphrase') + subsamples.REPEAT_VARIANTS + REASONING_VARIANTS
 DEPLOYED_RUNNER = REPO / 'evaluation' / 'run_inference.py'
 PILOT_PROMPT_PREFIX = 'c2bcb87984c4e50b'   # evaluator_pilot_17092026/models.json: the annotated traces' prompt
 MAX_ATTEMPTS = 4
@@ -121,6 +132,8 @@ def variant_items(variant: str, its: list[dict]) -> list[dict]:
     by_id = {it['item_id']: it for it in its}
     if variant in subsamples.REPEAT_VARIANTS:
         return [by_id[i] for i in subsamples.repeat_ids()]
+    if variant in REASONING_VARIANTS:
+        return [by_id[i] for i in subsamples.paraphrase_ids()]       # the originals of the 450-item subsample
     pool, manifest = PARAPHRASES / 'pool.jsonl', PARAPHRASES / 'manifest.jsonl'
     if not pool.exists() or not manifest.exists():
         raise SystemExit('paraphrase/pool.jsonl or its manifest is missing: run paraphrase.py first')
@@ -160,10 +173,14 @@ def existing(key: str, variant: str = 'main') -> dict[str, dict]:
     return out
 
 
-def request_params(spec: dict, cfg: dict) -> dict:
+def request_params(spec: dict, cfg: dict, variant: str = 'main') -> dict:
     p = {'max_tokens': spec.get('max_tokens', cfg['max_tokens'])}
     key = 'provider_open_weight' if spec['weights'] == 'open' else 'provider_closed_weight'
     p['extra_body'] = {'provider': cfg[key]}
+    if variant in REASONING_VARIANTS:
+        # OpenRouter's unified reasoning parameter; the provider maps the effort to its own setting. The main run
+        # sent nothing here and ran at each provider's default (D-122).
+        p['extra_body']['reasoning'] = {'effort': variant.split('-', 1)[1]}
     return p
 
 
@@ -175,10 +192,10 @@ def client(cfg: dict):
     return OpenAI(api_key=key, base_url=cfg['route']['base_url'], timeout=600.0, max_retries=0)
 
 
-def call(cli, spec: dict, cfg: dict, question: str, attempts: int = MAX_ATTEMPTS) -> dict:
+def call(cli, spec: dict, cfg: dict, question: str, attempts: int = MAX_ATTEMPTS, variant: str = 'main') -> dict:
     """One completion with retries, ending in answered / empty / service_failure."""
     prompt = PROMPT.format(question=question)
-    params = request_params(spec, cfg)
+    params = request_params(spec, cfg, variant)
     last, empty_row = None, None
     for attempt in range(1, attempts + 1):
         try:
@@ -225,11 +242,11 @@ def run_model(spec, todo, cfg, workers, label='run', variant='main'):
     key = spec['key']
     cli = client(cfg)
     trace_path(key, variant).parent.mkdir(parents=True, exist_ok=True)
-    params = request_params(spec, cfg)
+    params = request_params(spec, cfg, variant)
     n, counts, billed = 0, Counter(), 0.0
     with open(trace_path(key, variant), 'a', encoding='utf-8', newline='\n') as fh, \
             cf.ThreadPoolExecutor(max_workers=workers) as pool:
-        futs = {pool.submit(call, cli, spec, cfg, it['question']): it for it in todo}
+        futs = {pool.submit(call, cli, spec, cfg, it['question'], MAX_ATTEMPTS, variant): it for it in todo}
         for fut in cf.as_completed(futs):
             it = futs[fut]
             res = fut.result()
@@ -357,6 +374,39 @@ def variant_dry_run(cfg, its, specs, variant) -> int:
     return 0
 
 
+def reasoning_dry_run(cfg, its, specs, variant) -> int:
+    """A reasoning variant's estimate: the main run's prompt and visible output tokens on the same items, priced at
+    the pricing document's rates with the output multiplied, because a model that reasons bills its reasoning as
+    output. The multipliers bracket what is known: the pilot's GPT-5 wrote about 12 completion tokens for every
+    visible one (README, stage 1); nothing here is a measurement of these models, which is what --calibrate is for."""
+    effort = variant.split('-', 1)[1]
+    mults = (1, 3, 6, 12)
+    print(f'variant {variant}: {len(its)} items, {len({i["template_id"] for i in its})} templates; reasoning effort '
+          f'{effort!r} in the request; traces go to traces/{variant}/')
+    print(f'{"model":22s} {"to run":>7s} {"main $":>8s} {"main out tok":>12s} ' + ' '.join(f'{"x" + str(m) + " $":>8s}' for m in mults))
+    tot = Counter()
+    for s in specs:
+        todo = [it for it in its if it['item_id'] not in existing(s['key'], variant)]
+        main = existing(s['key'])
+        rows = [main[it['item_id']] for it in todo if it['item_id'] in main]
+        pt = sum(r.get('prompt_tokens') or 0 for r in rows)
+        ct = sum(r.get('completion_tokens') or 0 for r in rows)
+        bill = sum(r.get('billed_usd') or 0.0 for r in rows)
+        price = s['price_per_m']
+        ests = {m: (pt * price['in'] + ct * m * price['out']) / 1e6 for m in mults}
+        for m in mults:
+            tot[m] += ests[m]
+        tot['main'] += bill
+        print(f'{s["key"]:22s} {len(todo):7d} {bill:8.3f} {ct // max(len(rows), 1):12d} ' + ' '.join(f'{ests[m]:8.2f}' for m in mults))
+    print(f'{"TOTAL":22s} {"":7s} {tot["main"]:8.3f} {"":12s} ' + ' '.join(f'{tot[m]:8.2f}' for m in mults))
+    print('\nmain $: what the main run billed on these items at the provider\'s default (no reasoning tokens for these '
+          'models, D-168). xN $: the same items with N times the visible output, at the pricing document\'s rates. '
+          'The judged stages come on top: E5 and the router on the new traces, priced by their own --dry-run on the '
+          'variant once it exists.\n--calibrate 20 runs 20 items per model first (bills about '
+          f'{20 / max(len(its), 1) * tot[6]:.2f} at x6) and replaces the multipliers with measured lengths. Nothing was called.')
+    return 0
+
+
 def calibration_sample(its, n):
     """n items per model, spread over the templates in a fixed order: every k-th item."""
     step = max(1, len(its) // n)
@@ -403,13 +453,18 @@ def main() -> int:
     for k, why in inert.items():
         if not a.model or k not in a.model:
             print(f'{k}: inert (run: false): {why}')
-    if a.variant != 'main' and a.calibrate:
-        raise SystemExit('--calibrate is for the main run; a variant is estimated from its bills')
+    if a.variant != 'main' and a.variant not in REASONING_VARIANTS and a.calibrate:
+        raise SystemExit('--calibrate is for the main run and the reasoning variants; another variant is estimated from its bills')
+    if a.variant in REASONING_VARIANTS and not a.model:
+        specs = [s for s in cfg['models'] if s['key'] in REASONING_MODELS]
     if a.variant in subsamples.REPEAT_VARIANTS and not a.model:
         raise SystemExit('a repeat runs one chosen model: name it with --model')
     its = variant_items(a.variant, items())
     if a.dry_run:
-        return dry_run(cfg, its, specs) if a.variant == 'main' else variant_dry_run(cfg, its, specs, a.variant)
+        if a.variant == 'main':
+            return dry_run(cfg, its, specs)
+        return reasoning_dry_run(cfg, its, specs, a.variant) if a.variant in REASONING_VARIANTS \
+            else variant_dry_run(cfg, its, specs, a.variant)
     if a.status:
         return status(cfg, its, specs, a.variant)
     if not a.yes:

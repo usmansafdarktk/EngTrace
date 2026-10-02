@@ -150,7 +150,7 @@ hour of one expert; the reading sheet half an hour. Goes in the same request as 
 
 ## C. Needs spend, and a decision each
 
-**C1. A reasoning-on run for GPT-5.4 mini and Gemini 3.1 Flash-Lite.** *Answers:* the four-models-without-
+**C1. A reasoning-on run for GPT-5.4 mini and Gemini 3.1 Flash-Lite.** *(Built 2026-10-03, D-179: `--variant reasoning-<effort>` on the 450-item subsample; dry run $2 to $23 for inference depending on output length, plus the judged stages; awaiting the owner's approval.)* *Answers:* the four-models-without-
 reasoning finding, which otherwise colours every closed-versus-open sentence. *Method:* the same prompt,
 pool and scoring with reasoning effort set explicitly, as a labelled variant (`run_traces.py --variant`),
 reported beside the main run, not in place of it; a dry run prices it (the two models' main runs cost $7.74

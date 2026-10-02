@@ -6779,10 +6779,37 @@ done; the assessment's review table marks the rows section A closed; `RESULTS_PA
 numbers to report, what to state and not to state, and wording for the coverage comparison, the evaluator section and
 the branch paragraph.
 
+## D-179 — C1 built: a reasoning-on variant of the harness for the two closed models that ran without reasoning; priced, not run
+
+**Date:** 2026-10-03 · **Status:** BUILT · OPEN (the owner's approval of the spend, after the owner's standing instruction to be asked before any paid item) · **Evidence:** `full_run_28092026/run_traces.py` (`REASONING_VARIANTS`, `request_params`, `reasoning_dry_run`), `trace_review.py` (`variant_manifest`)
+
+**What it is.** `--variant reasoning-low|medium|high` runs the originals of the 450-item subsample (the 1st, 6th and
+11th of every template, `subsamples.PARAPHRASE`) with OpenRouter's unified reasoning parameter at that effort in the
+request and everything else the main run's: prompt, ceiling, routing, scoring. By default it runs `gpt-5.4-mini` and
+`gemini-3.1-flash-lite`, the two closed models whose endpoints reported zero reasoning tokens on every main-run row
+(D-168, `DECODING_TABLE.md`); the two open ones in that group, Gemma 4 26B and Qwen3-235B-2507, are a non-reasoning
+release and a model with no reasoning mode, so the parameter would mean nothing there. Traces go to
+`traces/reasoning-<effort>/`, the scorer, E5 and the router take the variant name, and the trace review checks its rows
+against the subsample. The analysis to add once traces exist is Q5's paired machinery on the same 450 items: the
+paired change in answer score and in coverage, reasoning on against the main run, per model with template intervals,
+reported beside the main run and never in its place. The main run's figures for these two models stay the headline;
+the variant says what the setting cost them.
+
+**The price.** The main run billed $2.05 on these 450 items for the two models (721 and 689 visible output tokens per
+item). A model that reasons bills its reasoning as output, so the dry run prices multipliers of the visible output at
+the pricing document's rates: $5.90 at x3, $11.68 at x6, $23.24 at x12 (the pilot's GPT-5 wrote about twelve
+completion tokens for every visible one). E5 and the router on the 900 new traces come on top, priced by their own dry
+runs once the traces exist (the main run's rates pro rata, about $1.30 and $3.80, before any lengthening of the traces).
+`--calibrate 20` runs 20 items per model first, about $0.52 at x6, and replaces the multipliers with measured lengths.
+
+**Not decided here.** Whether to run it, at which effort (medium is the standard setting; high the ceiling), and the
+cap. The round stands at about $535 against a roughly $500 budget before this.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
+| D-179 | Run C1: `run_traces --variant reasoning-medium --calibrate 20 --yes` first (about $0.52), then the 450 items at a cap, then E5 and the router on the variant after their dry runs; or leave the setting stated in Appendix P and the comparison unmade | the paper's reading of the closed tier |
 | D-172 | Send the fifteen kits in `full_run_28092026/expert_request/dist/` (app.py, README.txt, guide.md and the kit_<id> folder each) with a return date; cut B2 first if the load is too much (`--b2-per-model`); when the files come back, `expert_kits.py --score <folder>` | the paper's evaluator section, Q3 and the D-171 limitation |
 | D-171 | What the paper states about the two under-specified chemical templates and the 17 exact-digit templates (a limitation and a Q2 sensitivity row, as proposed), and whether one chemical expert reads `work_isothermal_virial` and `adiabatic_flame_temperature` with B1 (next steps B4) | the paper's sections 5 and 6; the experts' request |
 | D-170 | The analyses of `docs/EVALUATION_NEXT_STEPS.md` section A (free) in the order given; the expert request of section B, batched; a decision on each paid condition of section C after its dry run | the paper's results section; the experts' availability; the owner's approval per condition |
