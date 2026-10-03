@@ -23,23 +23,24 @@ EDGE_CANDIDATES = [
 ]
 
 CSS = """
-@page { size: A4; margin: 18mm 17mm 20mm 17mm; }
-html { font-size: 10.5pt; }
-body { font-family: Georgia, 'Times New Roman', serif; line-height: 1.38; color: #111; max-width: none; margin: 0; }
-h1 { font-size: 1.75em; margin: 0 0 0.4em 0; line-height: 1.2; }
-h2 { font-size: 1.3em; margin: 1.3em 0 0.4em 0; border-bottom: 1px solid #999; padding-bottom: 2px; page-break-after: avoid; }
-h3 { font-size: 1.08em; margin: 1.1em 0 0.3em 0; page-break-after: avoid; }
-p { margin: 0.45em 0; text-align: left; }
-blockquote { margin: 0.6em 0 0.6em 1.2em; padding-left: 0.8em; border-left: 3px solid #bbb; color: #222; }
+@page { size: A4; margin: 20mm 22mm 22mm 22mm; }
+html { font-size: 11pt; }
+body { font-family: Georgia, 'Times New Roman', serif; line-height: 1.5; color: #111; max-width: none; margin: 0; }
+h1 { font-size: 1.7em; margin: 0 0 0.6em 0; line-height: 1.25; }
+h2 { font-size: 1.3em; margin: 1.8em 0 0.6em 0; border-bottom: 1px solid #999; padding-bottom: 3px; page-break-after: avoid; }
+h3 { font-size: 1.1em; margin: 1.4em 0 0.4em 0; page-break-after: avoid; }
+p { margin: 0.7em 0; text-align: left; }
+blockquote { margin: 0.8em 0 0.8em 1.2em; padding-left: 0.9em; border-left: 3px solid #bbb; color: #222; }
 code { font-family: Consolas, 'Courier New', monospace; font-size: 0.86em; background: #f3f3f3; padding: 0 2px; }
 pre { background: #f3f3f3; padding: 6px 8px; font-size: 0.82em; overflow-x: auto; white-space: pre-wrap; }
-table { border-collapse: collapse; width: 100%; margin: 0.6em 0; font-size: 0.86em; page-break-inside: auto; }
-th, td { border: 1px solid #999; padding: 3px 5px; vertical-align: top; text-align: left; }
+table { border-collapse: collapse; width: 100%; margin: 0.9em 0; font-size: 0.84em; line-height: 1.35; page-break-inside: auto; }
+th, td { border: 1px solid #999; padding: 4px 6px; vertical-align: top; text-align: left; }
 th { background: #e8e8e8; }
 tr { page-break-inside: auto; }
-ul, ol { margin: 0.3em 0 0.5em 1.4em; padding-left: 0.6em; }
-li { margin: 0.18em 0; }
-hr { border: 0; border-top: 1px solid #999; margin: 1em 0; }
+ul, ol { margin: 0.5em 0 0.8em 1.4em; padding-left: 0.6em; }
+li { margin: 0.35em 0; }
+li > p { margin: 0.3em 0; }
+hr { border: 0; border-top: 1px solid #999; margin: 1.4em 0; }
 """
 
 

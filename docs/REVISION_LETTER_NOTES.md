@@ -80,5 +80,14 @@ Accuracy, Reasoning F1, BERTScore and ROUGE).
 
 The September audit's findings on the published templates; the evaluator's measured defects; the Markdown rendering
 during certification (65 templates judged through a renderer that dropped `*` and `$`); the answer-check corrections
-after the run (238 verdicts moved, 234 to correct, every one read; one known wrong credit); and that the new numbers
-are high because the models of September 2026 solve the evaluation set at the top on final answers.
+after the run (238 verdicts moved, 234 to correct, every one read; one known wrong credit) and the two refinements of
+the arithmetic check on an expert's readings before its final held-out reading (0.505, 0.752, then 0.905 on a fresh
+sample); and that the new numbers are high because the models of September 2026 solve the evaluation set at the top on
+final answers. These are letter material: the paper describes the final check and its validation (decided 2026-10-04).
+
+## 6. The two retrieval conditions
+
+Both ran on 2026-10-03 (D-183, D-184). The paper reports the corrected open-book condition (`openbook2`, 405
+instances) and the tool condition for the two closed models. The letter may say that a first open-book build was
+discarded after a review found its equation blocks defective, and that the open-weight model could not be served with
+a tool through the endpoints the provider rule admits (three attempts recorded under `traces/tool/_*`, local).

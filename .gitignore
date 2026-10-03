@@ -104,3 +104,7 @@ docs/related_work_oct2026/bib_raw/
 # industrial templates (received 2026-10-03): the public-domain handbooks (the same files docs/references/
 # holds), copyrighted textbooks and their extracted text, and the manifest. Never committed.
 civil_industrial_sources/
+
+# current_overleaf_project/ is a local mirror of the Overleaf project (the paper lives on Overleaf);
+# it is synced by hand or by its own git clone of the Overleaf repository, not versioned here.
+current_overleaf_project/
