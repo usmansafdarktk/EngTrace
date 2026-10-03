@@ -251,6 +251,86 @@ therefore report branch means without ranking them."
 - Appendix table: the thresholds (from `THRESHOLD_APPENDIX.md`) and the leave-one-judge-out table (from `RESULTS_LOJO.md`).
 - Appendix table: Appendix P from `DECODING_TABLE.md`.
 
+## Added 2026-10-03: the section-C conditions (D-180 to D-183)
+
+Every figure below is in `results/RESULTS.md` (the blocks "C1 and C4" and "C3", regenerated from a clean tree at the
+commit its provenance line names), `JUDGE_SWAP.md`, the arms' `TRACE_REVIEW_<arm>.md` and `DECODING_TABLE_<arm>.md`,
+and the pilot's `RESULTS_X1.md` Finding 8, all written by committed scripts. Each arm was run after the main analysis
+on the originals of the 450-item subsample (three items per template) and is labelled exploratory where it appears;
+the main run's figures stay the headline and the arms are reported beside them, never in their place.
+
+### The numbers to report
+
+| what | value | source |
+|---|---|---|
+| reasoning on, for the two closed models that ran without it (C1) | GPT-5.4 mini 0.858 to 0.951 at medium effort (+0.093, 95% CI 0.056 to 0.133, Holm p < 0.0001, detectable 0.055); Gemini 3.1 Flash-Lite 0.874 to 0.890 (+0.016, −0.010 to 0.042, p 0.30, detectable 0.038). GPT-5.4 mini's gain holds in E5-strict coverage (+0.061, 0.034 to 0.090) and its digit and router flag rates on solved traces roughly halve (0.127 to 0.069; 0.232 to 0.135); Gemini's measures all sit inside the noise | "C1 and C4" |
+| a second judge (C2) | Grok 4.6 on E5's prompts for 220 traces: REACHED agreement 0.83 to 1.00 for ten models, 0.74 for GLM-5.3 (34 milestones); E5-strict coverage differs by −0.017 to +0.020 per model, every interval narrower than Q3's; on the planted set 22 of 60 conceptual defects (0.367; MiMo 0.308), 52 of 60 arithmetic, no false alarm on 120 untouched steps | `JUDGE_SWAP.md`; RESULTS_X1 Finding 8 |
+| flagship anchors on the subsample (C3) | GPT-5.4 0.941 (0.909 to 0.969) at the provider's default with no reasoning tokens, 0.980 (0.964 to 0.993) at medium reasoning; DeepSeek V4 Pro 0.968 (0.950 to 0.983); the roster's eleven on the same items 0.826 to 0.976, the top five 0.964 to 0.976; E5-strict coverage 0.892, 0.906 and 0.911 against the roster's 0.830 to 0.925 | the two "C3" blocks |
+| open book (C4) | with the governing equations appended, on 429 items: Claude Sonnet 5 +0.005 (−0.010 to 0.021), GPT-5.4 mini −0.007 (−0.034 to 0.021), gpt-oss-20b +0.041 (0.003 to 0.078, Holm p 0.13); none holds after Holm; E5-strict coverage up by +0.032, +0.032 and +0.061 | "C1 and C4" |
+| settings and tokens per arm | GPT-5.4 mini median reasoning tokens 3,464 and Gemini 3.1 Flash-Lite 1,333 under the parameter against zero in the main run; GPT-5.4 zero at the default and 440 at medium; DeepSeek V4 Pro reasons at its default (median 1,836, four rows at the ceiling) | `DECODING_TABLE_<arm>.md` |
+| cost | the four conditions billed about $53 (C1 $9.77, C2 $10.53, C3 $17.54 in rows, C4 $12.55 in rows, E5 on the C3 and C4 arms $2.99), the round about $588 | D-180 to D-183 |
+
+### What to state
+
+1. **The closed tier, with its setting.** Where the four no-reasoning models are named (Appendix P and the roster
+   paragraph), add that reasoning at medium effort moves GPT-5.4 mini by nine points on the subsample and Gemini 3.1
+   Flash-Lite by less than the design detects. The main run's scores remain in Table 1 as what the providers'
+   defaults produced; no sentence reads them as those models' ceiling.
+2. **The flagship sentence, for the saturation finding.** Two flagships that pass the roster rule, run on the
+   450-item subsample with the same stack, score inside the roster's top tier, so the pool's ceiling is reached by
+   the mid-tier models of September 2026 and the benchmark's discrimination lies below the top. Give the three
+   figures with intervals in an appendix table beside the roster on the same items; no test against them.
+3. **The judge swap, in the evaluator section.** One sentence, as D-181 words it: a second judge from a third family
+   reproduces MiMo's milestone verdicts within the reported intervals on a 220-trace sample and catches 37% of the
+   planted conceptual defects against MiMo's 31%; the single-judge design is a cost choice, not a sensitivity.
+4. **The open-book bound, for the retrieval objection.** With the governing equations supplied, the answer score
+   moves by less than the design detects for the two closed models and by four points, not significant after
+   correction, for gpt-oss-20b, while stated coverage rises; the remaining errors are in setting up, substituting
+   and computing, not in recalling the method. Say what the condition supplies (equations, no data tables) so the
+   bound is read as a bound on formula recall.
+5. **Power beside every null**, as for section A: the arms' detectable column sits in the same table.
+
+### What not to state
+
+- Not "reasoning closes the gap for the closed tier": one of the two models moves, the other does not, and the
+  arm is the subsample, not the pool.
+- Not GPT-5.4's or DeepSeek V4 Pro's figures as roster entries, in the pairwise tests or in Table 1: they are
+  anchors on 450 items, reported in an appendix with the roster on the same items.
+- Not "flagships do no better": GPT-5.4 with reasoning on has the highest point estimate; the statement the data
+  carry is that it lies inside the top tier's intervals.
+- Not "retrieval would not help": the open-book condition supplies equations only; it bounds formula recall, not
+  property lookups, and the tool condition was not run.
+- Not the arms' coverage rise as better reasoning: coverage credits stated intermediates, and the handed equations
+  prompt the traces to state them.
+- Not "the judge is validated" from C2 alone: it is agreement within intervals on a sample and a planted recall of
+  0.367 against 0.308; the pilot's expert validation remains the ground.
+
+### Suggested wording
+
+**For the roster paragraph.** "Four roster models ran with no reasoning tokens at their providers' defaults
+(Appendix P). Re-running the two closed ones with reasoning at medium effort on a 450-item subsample moves GPT-5.4
+mini from 0.858 to 0.951 (95% CI of the change 0.056 to 0.133) and Gemini 3.1 Flash-Lite from 0.874 to 0.890
+(−0.010 to 0.042); Table 1 reports the defaults."
+
+**For the saturation sentence.** "No flagship is on the roster by construction (no pilot generator and no judge).
+As anchors, GPT-5.4 and DeepSeek V4 Pro on the same 450-item subsample score 0.941 (0.909 to 0.969; 0.980 with
+reasoning on) and 0.968 (0.950 to 0.983), inside the interval band of the roster's top five on those items (0.964 to
+0.976): the pool is solved at the top by the mid-tier models of September 2026, and the benchmark's discrimination
+lies in where and how models fail."
+
+**For the retrieval objection.** "Supplying each template's governing equations with the question changes the
+answer score by +0.005 (Claude Sonnet 5), −0.007 (GPT-5.4 mini) and +0.041 (gpt-oss-20b; not significant after
+Holm correction) on 429 items, while milestone coverage rises by 0.03 to 0.06: the errors that remain are in
+setting up, substituting and computing, not in recalling the method. The condition bounds what formula retrieval
+would add; it does not supply data tables."
+
+### Figures and tables worth including
+
+- Appendix table: the paired-arm block (C1 and C4) as `RESULTS.md` prints it, with the detectable column.
+- Appendix table: the anchors (C3) beside the roster's eleven on the same items, score and coverage with intervals.
+- A footnote to Table 1 naming the two closed models' reasoning-on scores on the subsample, and Appendix P's row per model.
+- One sentence in the evaluator section for C2, with `JUDGE_SWAP.md`'s per-model agreement table in the appendix.
+
 ## Metric continuity: what became of May's Table 1 columns
 
 | May (§4, Table 1) | October | why |

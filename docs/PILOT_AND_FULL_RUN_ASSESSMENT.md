@@ -148,7 +148,7 @@ that bear on evaluation. "Where" names the committed evidence; "state" is how it
 | framing: synthetic scope, physical versus linguistic diversity | meta-review 3; 9W1B 1; cqGs 2 (Jan) | the paraphrase arm (Q5) is a measured answer to the linguistic half | **done beyond what was promised**; state it as a bound (±5 points for 10 of 11), not as "robust" |
 | template exploitation / surface shortcuts | cqGs 2 (Jan), 9W1B 1 | the four known shortcut templates are a sensitivity row (tau 1.000); the corpus-wide audit is A7 | **done 2026-10-03** (D-177): two templates newly flagged, the headline unchanged by more than 0.002 |
 | a fourth branch | ynoK 1 | civil and industrial added, 30 templates each, certified | **done**, twice over |
-| tool-augmented or retrieval baselines | ynoK 3; cqGs 1 and 4 (Jan) | nothing run; C4 | **open**, paid; a third "future work" answer is the risk |
+| tool-augmented or retrieval baselines | ynoK 3; cqGs 1 and 4 (Jan) | the open-book arm (D-183): equations supplied, no answer-score change beyond the noise, coverage up | **bounded** for formula recall; the tool condition remains the owner's call |
 | error analysis too coarse; causes of the cliff | nWW3 3 and 4, cqGs 3 (Jan) | Q3's attribution table and failure-against-depth (descriptive); A6 validates attribution by error type on the pilot's labels; B2 is the human sample | **partly**: A6 done (D-176, each flag's precision by error type); B2, the human sample on the new run, is in the experts' request (D-172) |
 | the evaluation framework validated by the same kind of system it uses | gFWV 4 (Jan) | human labels now; deterministic components; the judge from outside the roster | **done** |
 | proofreading, broken reference | all | — | writing |
@@ -266,6 +266,8 @@ Three of those templates were read:
 *Update 2026-10-03: items 0 and A1 to A11 of the next steps are done (D-173 to D-178), the experts' kits are built and
 awaiting the send (D-172), and C1 to C4 remain, each needing a dry run and the owner's approval. The order below is as written on
 2026-10-02.*
+
+*Update 2026-10-03, later: C1 to C4 are run after the owner approved the priced package (D-180 to D-183; C2 is D-181), except C4's tool condition, which stays the owner's call. Reasoning on moves GPT-5.4 mini by +0.093 and Gemini 3.1 Flash-Lite within the noise; a second judge from another family agrees with MiMo within Q3's intervals; two flagships on the subsample score inside the roster's top tier; the open-book condition moves no answer score beyond the noise while stated coverage rises. The C blocks of `full_run_28092026/results/RESULTS.md` and `JUDGE_SWAP.md` carry the figures; the round stands at about $588.*
 
 The next-steps file's order is right in substance; this review moves two things forward.
 

@@ -425,6 +425,57 @@ The noise floor at the arm's own size and template mix (D-165): two disjoint dra
 | `qwen3-235b-a22b-2507` | -0.031 -0.074 to 0.011 (277) | -0.002 -0.030 to 0.028 | +0.005 -0.023 to 0.035 | +0.005 -0.025 to 0.033 | 92 | -0.027 -0.082 to 0.027 | -0.005, +0.000, +0.027 | no |
 | `gemini-3.1-flash-lite` | +0.007 -0.032 to 0.046 (277) | -0.005 -0.027 to 0.017 | -0.012 -0.035 to 0.012 | +0.007 -0.015 to 0.030 | 92 | -0.027 -0.076 to 0.016 | -0.027, -0.033, -0.033 | yes |
 
+## C1 and C4. Arms run on the same items against the main run: reasoning on, and open book
+
+*Exploratory; added 2026-10-03 (D-179, D-180, D-183).* Each arm keeps the main run's prompt, ceiling, routing and scoring on the originals of the 450-item subsample (three per template) and changes one thing. `reasoning-<effort>`: OpenRouter's reasoning parameter at that effort, for the closed models whose endpoints reported no reasoning tokens at the provider's default. `openbook`: the template's governing equations appended to the question (`openbook.py`; 429 items, the seven templates without a symbolic equation left out), for one model from each tier. Arm minus the main run, paired by item, with Q5's machinery: the item mean, a template bootstrap, a sign-flip test over templates with Holm across the models in the arm, and the smallest paired difference the arm detects at 80% power. The main run's scores remain the headline; an arm says what the change cost or bought.
+
+| arm | model | items | main run on these items | arm | change | 95% CI | p (Holm) | detectable | fully solved change | E3 coverage change | 95% CI | E5-strict change | 95% CI | unusable, main / arm | digit flags on fully solved, main / arm | router judge flags on fully solved, main / arm |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|
+| reasoning-medium | `gpt-5.4-mini` | 450 | 0.858 | 0.951 | +0.093 | 0.056 to 0.133 | 0.0000 | 0.055 | +0.098 | +0.055 | 0.029 to 0.084 | +0.061 | 0.034 to 0.090 | 0 / 0 | 0.127 / 0.069 | 0.232 / 0.135 |
+| reasoning-medium | `gemini-3.1-flash-lite` | 450 | 0.874 | 0.890 | +0.016 | -0.010 to 0.042 | 0.2963 | 0.038 | +0.013 | +0.015 | -0.005 to 0.036 | +0.015 | -0.002 to 0.035 | 0 / 0 | 0.082 / 0.068 | 0.111 / 0.066 |
+| openbook | `gpt-oss-20b` | 429 | 0.828 | 0.868 | +0.041 | 0.003 to 0.078 | 0.1338 | 0.055 | +0.047 | +0.061 | 0.030 to 0.093 | +0.061 | 0.031 to 0.093 | 13 / 3 | 0.155 / 0.185 | not run |
+| openbook | `gpt-5.4-mini` | 429 | 0.865 | 0.858 | -0.007 | -0.034 to 0.021 | 1.0000 | 0.039 | -0.005 | +0.037 | 0.012 to 0.064 | +0.032 | 0.006 to 0.060 | 0 / 0 | 0.121 / 0.160 | not run |
+| openbook | `claude-sonnet-5` | 429 | 0.970 | 0.974 | +0.005 | -0.010 to 0.021 | 1.0000 | 0.023 | +0.005 | +0.029 | 0.010 to 0.047 | +0.032 | 0.013 to 0.052 | 0 / 0 | 0.131 / 0.128 | not run |
+
+## C3. Flagship anchors on the 450-item subsample: `flagship`
+
+*Exploratory; added 2026-10-03 (D-182).* Flagships that pass the roster rule (neither a pilot generator nor a judge), on the originals of the 450-item subsample, scored by the same stack; the roster's eleven on the same items from the main run beside them. An anchor is a reference point outside the pairwise family: no test is run against it. The `flagship` arm ran at each provider's default, as the main run did; a `flagship-reasoning-<effort>` arm carries the reasoning parameter. Score and coverage carry template intervals (150 templates of three items); level means are descriptive.
+
+| model | arm | items | answer score | 95% CI | fully solved | unusable | Easy | Intermediate | Advanced | coverage (stage) | 95% CI | digit flags on fully solved | median completion tokens |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|
+| `deepseek-v4-pro` | flagship | 450 | 0.968 | 0.950 to 0.983 | 0.956 | 3 | 0.989 | 0.963 | 0.941 | 0.911 (E5-strict) | 0.884 to 0.935 | 0.107 | 2596 |
+| `gpt-5.4` | flagship | 450 | 0.941 | 0.909 to 0.969 | 0.931 | 0 | 0.989 | 0.937 | 0.868 | 0.892 (E5-strict) | 0.862 to 0.920 | 0.119 | 738 |
+| `deepseek-v4.1-flash` | main | 450 | 0.976 | 0.954 to 0.991 | 0.964 | 3 | 0.997 | 0.980 | 0.931 | 0.893 (E5-strict) | 0.863 to 0.920 | 0.012 | 3178 |
+| `glm-5.3-flash` | main | 450 | 0.972 | 0.949 to 0.990 | 0.967 | 8 | 0.989 | 0.971 | 0.946 | 0.906 (E5-strict) | 0.877 to 0.934 | 0.014 | 2600 |
+| `kimi-k3` | main | 450 | 0.971 | 0.951 to 0.988 | 0.962 | 1 | 0.991 | 0.983 | 0.917 | 0.916 (E5-strict) | 0.890 to 0.939 | 0.007 | 2294 |
+| `claude-sonnet-5` | main | 450 | 0.971 | 0.952 to 0.988 | 0.964 | 0 | 0.994 | 0.968 | 0.936 | 0.925 (E5-strict) | 0.903 to 0.945 | 0.134 | 1773 |
+| `muse-glimmer-30b` | main | 450 | 0.964 | 0.942 to 0.983 | 0.956 | 5 | 0.986 | 0.971 | 0.917 | 0.902 (E5-strict) | 0.874 to 0.928 | 0.072 | 2972 |
+| `glm-5.3` | main | 450 | 0.952 | 0.926 to 0.976 | 0.947 | 16 | 0.991 | 0.951 | 0.887 | 0.905 (E5-strict) | 0.872 to 0.934 | 0.023 | 3155 |
+| `qwen3-235b-a22b-2507` | main | 450 | 0.888 | 0.850 to 0.923 | 0.858 | 0 | 0.931 | 0.862 | 0.858 | 0.895 (E5-strict) | 0.866 to 0.921 | 0.187 | 1020 |
+| `gemini-3.1-flash-lite` | main | 450 | 0.874 | 0.827 to 0.917 | 0.864 | 0 | 0.940 | 0.885 | 0.745 | 0.861 (E5-strict) | 0.828 to 0.893 | 0.082 | 659 |
+| `gpt-5.4-mini` | main | 450 | 0.858 | 0.813 to 0.899 | 0.842 | 0 | 0.928 | 0.851 | 0.750 | 0.834 (E5-strict) | 0.795 to 0.871 | 0.127 | 643 |
+| `gemma-4-26b-a4b` | main | 450 | 0.857 | 0.813 to 0.898 | 0.838 | 0 | 0.911 | 0.851 | 0.775 | 0.873 (E5-strict) | 0.844 to 0.901 | 0.119 | 806 |
+| `gpt-oss-20b` | main | 450 | 0.826 | 0.776 to 0.873 | 0.809 | 13 | 0.920 | 0.802 | 0.706 | 0.830 (E5-strict) | 0.793 to 0.865 | 0.157 | 1816 |
+
+## C3. Flagship anchors on the 450-item subsample: `flagship-reasoning-medium`
+
+*Exploratory; added 2026-10-03 (D-182).* Flagships that pass the roster rule (neither a pilot generator nor a judge), on the originals of the 450-item subsample, scored by the same stack; the roster's eleven on the same items from the main run beside them. An anchor is a reference point outside the pairwise family: no test is run against it. The `flagship` arm ran at each provider's default, as the main run did; a `flagship-reasoning-<effort>` arm carries the reasoning parameter. Score and coverage carry template intervals (150 templates of three items); level means are descriptive.
+
+| model | arm | items | answer score | 95% CI | fully solved | unusable | Easy | Intermediate | Advanced | coverage (stage) | 95% CI | digit flags on fully solved | median completion tokens |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|
+| `gpt-5.4` | flagship-reasoning-medium | 450 | 0.980 | 0.964 to 0.993 | 0.971 | 0 | 0.997 | 0.983 | 0.946 | 0.906 (E5-strict) | 0.877 to 0.931 | 0.032 | 1239 |
+| `deepseek-v4.1-flash` | main | 450 | 0.976 | 0.954 to 0.991 | 0.964 | 3 | 0.997 | 0.980 | 0.931 | 0.893 (E5-strict) | 0.863 to 0.920 | 0.012 | 3178 |
+| `glm-5.3-flash` | main | 450 | 0.972 | 0.949 to 0.990 | 0.967 | 8 | 0.989 | 0.971 | 0.946 | 0.906 (E5-strict) | 0.877 to 0.934 | 0.014 | 2600 |
+| `kimi-k3` | main | 450 | 0.971 | 0.951 to 0.988 | 0.962 | 1 | 0.991 | 0.983 | 0.917 | 0.916 (E5-strict) | 0.890 to 0.939 | 0.007 | 2294 |
+| `claude-sonnet-5` | main | 450 | 0.971 | 0.952 to 0.988 | 0.964 | 0 | 0.994 | 0.968 | 0.936 | 0.925 (E5-strict) | 0.903 to 0.945 | 0.134 | 1773 |
+| `muse-glimmer-30b` | main | 450 | 0.964 | 0.942 to 0.983 | 0.956 | 5 | 0.986 | 0.971 | 0.917 | 0.902 (E5-strict) | 0.874 to 0.928 | 0.072 | 2972 |
+| `glm-5.3` | main | 450 | 0.952 | 0.926 to 0.976 | 0.947 | 16 | 0.991 | 0.951 | 0.887 | 0.905 (E5-strict) | 0.872 to 0.934 | 0.023 | 3155 |
+| `qwen3-235b-a22b-2507` | main | 450 | 0.888 | 0.850 to 0.923 | 0.858 | 0 | 0.931 | 0.862 | 0.858 | 0.895 (E5-strict) | 0.866 to 0.921 | 0.187 | 1020 |
+| `gemini-3.1-flash-lite` | main | 450 | 0.874 | 0.827 to 0.917 | 0.864 | 0 | 0.940 | 0.885 | 0.745 | 0.861 (E5-strict) | 0.828 to 0.893 | 0.082 | 659 |
+| `gpt-5.4-mini` | main | 450 | 0.858 | 0.813 to 0.899 | 0.842 | 0 | 0.928 | 0.851 | 0.750 | 0.834 (E5-strict) | 0.795 to 0.871 | 0.127 | 643 |
+| `gemma-4-26b-a4b` | main | 450 | 0.857 | 0.813 to 0.898 | 0.838 | 0 | 0.911 | 0.851 | 0.775 | 0.873 (E5-strict) | 0.844 to 0.901 | 0.119 | 806 |
+| `gpt-oss-20b` | main | 450 | 0.826 | 0.776 to 0.873 | 0.809 | 13 | 0.920 | 0.802 | 0.706 | 0.830 (E5-strict) | 0.793 to 0.865 | 0.157 | 1816 |
+
 ## Sensitivity
 
 Answer score under each variation; the last row is Kendall's tau between that ordering of the models and the headline one. The three added readings (D-147, D-149) the experts could not arbitrate: the half-unit window requires a correct rounding at the precision shown where the rule accepts one unit either way; the whole-trace reading credits a quantity the question asks for when it is stated in the body and left off the Answer line (the prompt asks for it there); the pool without the nine symbolic templates, whose answers the check scores by the numbers they state (D-138). "Unusable excluded" is an item mean over the usable rows, not a mean of template means. Tau's noise floor: the ordering on one random half of each template's items against the other, median 0.891 over 200 splits (quartiles 0.855 to 0.927); the top five models lie within 0.012 of each other, so tau falls below 1 from sampling noise alone.
@@ -640,4 +691,4 @@ The pool over-represents the rare labels by design (D-116), so these rates are p
 
 ## Provenance
 
-`analyze.py` at commit `f9eb834`; the score store `main` scored at commit `2950875` on 2026-10-02T13:09:33+00:00; stages: e5 at `2950875`, router at `2950875`. The evaluator hashes and the per-model trace hashes are in `results.json`.
+`analyze.py` at commit `7cae823`; the score store `main` scored at commit `2950875` on 2026-10-02T13:09:33+00:00; stages: e5 at `2950875`, router at `2950875`. The evaluator hashes and the per-model trace hashes are in `results.json`.

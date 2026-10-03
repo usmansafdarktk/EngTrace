@@ -150,7 +150,7 @@ hour of one expert; the reading sheet half an hour. Goes in the same request as 
 
 ## C. Needs spend, and a decision each
 
-**C1. A reasoning-on run for GPT-5.4 mini and Gemini 3.1 Flash-Lite.** *(Built 2026-10-03, D-179: `--variant reasoning-<effort>` on the 450-item subsample; dry run $2 to $23 for inference depending on output length, plus the judged stages; awaiting the owner's approval.)* *Answers:* the four-models-without-
+**C1. A reasoning-on run for GPT-5.4 mini and Gemini 3.1 Flash-Lite.** *(Done 2026-10-03, D-180: medium effort on the 450 items after a calibration, $9.77 with E5 and the router; GPT-5.4 mini +0.093 (0.056 to 0.133), Gemini 3.1 Flash-Lite +0.016 (−0.010 to 0.042); `RESULTS.md`, "C1 and C4".)* *Answers:* the four-models-without-
 reasoning finding, which otherwise colours every closed-versus-open sentence. *Method:* the same prompt,
 pool and scoring with reasoning effort set explicitly, as a labelled variant (`run_traces.py --variant`),
 reported beside the main run, not in place of it; a dry run prices it (the two models' main runs cost $7.74
@@ -162,13 +162,13 @@ second judge from another family on a stratified sample of the residual mileston
 Grok 4.6 on the planted set (about $3.40, `JUDGE_SELECTION.md`); report whether any Q3 figure moves by more
 than its interval. *Decision:* cheap; worth it if a reviewer's objection to one judge is expected.
 
-**C3. A flagship anchor on the 450-item subsample.** *Answers:* 9.3 item 9 (no frontier model on the
+**C3. A flagship anchor on the 450-item subsample.** *(Done 2026-10-03, D-182: GPT-5.4 0.941 at the provider's default and 0.980 with reasoning on, DeepSeek V4 Pro 0.968, all inside the roster's top tier on the same items; $17.54 in rows; `RESULTS.md`, the "C3" blocks.)* *Answers:* 9.3 item 9 (no frontier model on the
 roster). *Method:* two or three flagship models on `subsamples.py`'s 450 items, scored by the same stack,
 reported as an anchor with 450-item intervals, outside the pairwise family. *Cost:* about $40 to $55 at the
 pilot's per-trace rates. *Decision:* the supervisor's; the paper otherwise needs a sentence on why the
 flagship tier is absent.
 
-**C4. A tool-use condition, or the open-book fallback.** *Answers:* cqGs 1 and 4, ynoK 3, the January AC.
+**C4. A tool-use condition, or the open-book fallback.** *(Open-book arm done 2026-10-03, D-183: no answer-score change holds after Holm for the three models, coverage rises; $12.55 in rows. The tool condition is not run and stays the owner's call.)* *Answers:* cqGs 1 and 4, ynoK 3, the January AC.
 *Method:* a Python tool on a stratified subsample for two or three models, same prompt otherwise, same
 stack; the digit rule's flag rate under the tool is itself the measurement. Or, cheaper, an open-book
 condition that supplies the governing equations in the prompt, bounding what retrieval could add. *Cost:*

@@ -6837,7 +6837,7 @@ presses the point, that is the run to buy" is bought.
 
 ## D-180 — C1 run: reasoning at medium effort for GPT-5.4 mini and Gemini 3.1 Flash-Lite on the 450 items, after a calibration
 
-**Date:** 2026-10-03 · **Status:** RUNNING (traces done and scored; E5 and the router on the arm in progress) · **Evidence:** `traces/reasoning-medium/` and `scores/reasoning-medium/` (local), `TRACE_REVIEW_reasoning-medium.md`, `DECODING_TABLE_reasoning-medium.md`, `results/decoding_table_reasoning-medium.json`; the paired block in `analyze.py` (`reasoning_arms`)
+**Date:** 2026-10-03 · **Status:** DONE ($9.77: $5.54 in the rows, $1.14 E5, $3.09 router) · **Evidence:** `traces/reasoning-medium/` and `scores/reasoning-medium/` (local), `TRACE_REVIEW_reasoning-medium.md`, `DECODING_TABLE_reasoning-medium.md`, `results/decoding_table_reasoning-medium.json`; the paired block in `analyze.py` (`reasoning_arms`)
 
 **What was approved.** The owner approved C1 on 2026-10-03 ("calibrate first and then run the 450"): `--variant
 reasoning-medium --calibrate 20 --yes`, then the 450 items per model. Medium is the standard effort; the setting is the
@@ -6855,9 +6855,26 @@ paired by item, with Q5's machinery (item mean, template bootstrap, sign-flip ov
 the detectable paired difference). The numbers are written in part 2 of this entry once the judged stages end and
 `results/RESULTS.md` is regenerated from a clean tree.
 
+**Results (part 2, 2026-10-03; `results/RESULTS.md`, "C1 and C4", at commit 7cae823).** On the 450 items, reasoning
+at medium effort lifts GPT-5.4 mini from 0.858 to 0.951 (+0.093, 95% CI 0.056 to 0.133, Holm p < 0.0001, detectable
+0.055) and Gemini 3.1 Flash-Lite from 0.874 to 0.890 (+0.016, −0.010 to 0.042, p 0.30, detectable 0.038). GPT-5.4
+mini's gain shows at every level of the stack: fully solved +0.098, E3 coverage +0.055 (0.029 to 0.084), E5-strict
+coverage +0.061 (0.034 to 0.090, 437 items), the digit rule's flag rate on fully solved traces 0.127 to 0.069, the
+router's judge flags on fully solved traces 0.232 to 0.135. Gemini's changes sit inside the noise on every measure
+(E5-strict +0.015, −0.002 to 0.035), though its flag rates fall as well (0.082 to 0.068; router 0.111 to 0.066). E5
+answered all 317 calls and the router all 900 (the router's shell was stopped by a time limit at 850 and resumed from
+its store for the last 50; nothing was bought twice). With reasoning on, GPT-5.4 mini scores level with GLM-5.3 on
+these items (0.952) and above Qwen3-235B-2507 (0.888); Gemini 3.1 Flash-Lite stays where it was.
+
+**For the paper.** The closed tier of the main run is in part a default-settings result, for one of the two models:
+Appendix P states the setting per model, the main run's figures stay the headline, and this arm is reported beside
+them with the sentence that reasoning at medium effort moves GPT-5.4 mini by nine points on the subsample and
+Gemini 3.1 Flash-Lite by less than the design detects. No sentence reads the closed tier's main-run scores as a
+ceiling for those models.
+
 ## D-182 — C3, the flagship anchors: GPT-5.4 and DeepSeek V4 Pro on the 450-item subsample, and GPT-5.4 with reasoning on
 
-**Date:** 2026-10-03 · **Status:** RUNNING (GPT-5.4's two arms done and scored; DeepSeek V4 Pro's default arm in progress) · **Evidence:** `models.json` (`anchor: true, run: false`), `run_traces.py` (`flagship`, `FLAGSHIP_REASONING`), `traces/flagship*/` and `scores/flagship*/` (local), `TRACE_REVIEW_flagship-reasoning-medium.md`, `DECODING_TABLE_flagship-reasoning-medium.md`; the `anchors` block in `analyze.py`
+**Date:** 2026-10-03 · **Status:** DONE ($17.54 in the rows: $6.51 the default arms with the $0.32 calibration, $11.03 the reasoning arm; E5 on the three arm-models inside the $2.99 the E5 store grew by over C3 and C4, against dry runs of $0.94, $0.47 and C4's $1.12) · **Evidence:** `models.json` (`anchor: true, run: false`), `run_traces.py` (`flagship`, `FLAGSHIP_REASONING`), `traces/flagship*/` and `scores/flagship*/` (local), `TRACE_REVIEW_flagship-reasoning-medium.md`, `DECODING_TABLE_flagship-reasoning-medium.md`; the `anchors` block in `analyze.py`
 
 **What was approved.** Option A with calibration (one closed and one open flagship, 450 items each, the stack as the
 main run's), and then a reasoning-on arm for the closed anchor at medium effort, about $18 by its dry run, after the
@@ -6876,9 +6893,30 @@ models from the roster list, so an anchor fell through all four (E5's dry run on
 wrote nothing). They now take an arm's models from the arm's own files, the roster first. The numbers are written in
 part 2 once DeepSeek's rows are scored and E5 has run on the two default arms.
 
+**Results (part 2, 2026-10-03; `results/RESULTS.md`, the two "C3" blocks, at commit 7cae823).** On the 450 items,
+with template intervals over 150 templates of three: DeepSeek V4 Pro 0.968 (0.950 to 0.983), fully solved 0.956,
+3 unusable rows (empty replies in `adiabatic_flame_temperature`, `work_isothermal_virial` and
+`qr_policy_one_iteration`; four rows at the 32,768 ceiling), E5-strict coverage 0.911 (0.884 to 0.935); GPT-5.4 at
+the provider's default 0.941 (0.909 to 0.969), coverage 0.892 (0.862 to 0.920), no reasoning tokens on any row,
+median 738 completion tokens; GPT-5.4 at medium reasoning 0.980 (0.964 to 0.993), coverage 0.906 (0.877 to 0.931),
+reasoning tokens on 449 rows, median 1,239 completion tokens. The roster's eleven on the same items run from 0.826
+(gpt-oss-20b) to 0.976 (DeepSeek V4.1 Flash), the top five at 0.964 to 0.976, coverage 0.830 to 0.925. Neither
+flagship separates from the roster's top tier: GPT-5.4 with reasoning on is the highest point estimate but inside the
+top five's intervals, DeepSeek V4 Pro sits among them, and GPT-5.4 at its default sits below them, level with GLM-5.3
+(0.952). By level, GPT-5.4 at the default drops to 0.868 on Advanced against 0.946 with reasoning on; the anchors'
+Advanced means (0.941, 0.868, 0.946) lie inside the roster's range (0.706 to 0.946). Digit flags on fully solved
+traces: 0.107, 0.119 and 0.032 against the roster's 0.007 to 0.187. E5 answered every call on all three arms; the
+router was not run on them (its dry run on the reasoning arm: 450 calls, $1.96, 0.6 hours).
+
+**For the paper.** The "no frontier model" objection (9.3 item 9) gets one sentence and an appendix table: two
+flagships that pass the roster rule, run on the 450-item subsample with the same stack, score inside the roster's top
+tier (0.941 to 0.980 against 0.964 to 0.976), so the pool's ceiling is reached by the mid-tier models of September
+2026 and the benchmark's discrimination lies below the top. The anchors stay outside the pairwise family and the
+roster tables; no test is reported against them.
+
 ## D-183 — C4, the open-book condition: the governing equations supplied with the question, for one model from each tier
 
-**Date:** 2026-10-03 · **Status:** RUNNING · **Evidence:** `openbook.py` (`--survey`, `--build`), `OPENBOOK_SURVEY.md`, `openbook/manifest.jsonl` (hashes and counts; the modified questions local), `run_traces.py` (`openbook`, `OPENBOOK_MODELS`), `trace_review.py` (`variant_manifest`); the paired block in `analyze.py`
+**Date:** 2026-10-03 · **Status:** DONE ($12.55 in the rows against the $12.75 dry run; E5 inside the $2.99 above, its dry run $1.12) · **Evidence:** `openbook.py` (`--survey`, `--build`), `OPENBOOK_SURVEY.md`, `openbook/manifest.jsonl` (hashes and counts; the modified questions local), `run_traces.py` (`openbook`, `OPENBOOK_MODELS`), `trace_review.py` (`variant_manifest`); the paired block in `analyze.py`
 
 **What was approved.** The open-book fallback of C4 rather than the tool condition ($65 to $150), by the owner on
 2026-10-03, with the tool condition to be reviewed at the end. The arm appends to each question a block headed
@@ -6895,14 +6933,33 @@ to set the problem up, substitute and compute, so the change is the part of the 
 The condition supplies no data tables or constants beyond what the equation lines carry; a template whose difficulty
 lies in a property lookup is not helped by it. The numbers are written in part 2.
 
+**Results (part 2, 2026-10-03; `results/RESULTS.md`, "C1 and C4", at commit 7cae823).** On the 429 items, open book
+minus the main run: Claude Sonnet 5 +0.005 (95% CI −0.010 to 0.021, detectable 0.023), GPT-5.4 mini −0.007 (−0.034
+to 0.021, detectable 0.039), gpt-oss-20b +0.041 (0.003 to 0.078, Holm p 0.13, detectable 0.055); no answer-score
+change holds after Holm, and the two closed models' changes are below what the arm detects. Coverage rises for all
+three, E3 by +0.029, +0.037 and +0.061 and E5-strict by +0.032 (0.013 to 0.052), +0.032 (0.006 to 0.060) and +0.061
+(0.031 to 0.093): handed the equations, the traces state more of the milestone intermediates. gpt-oss-20b's unusable
+rows fall from 13 to 3. The digit rule's flag rate on fully solved traces is unchanged for Claude (0.131 to 0.128)
+and higher for GPT-5.4 mini (0.121 to 0.160) and gpt-oss-20b (0.155 to 0.185): more arithmetic written out, more
+slips to flag. The trace review is clean against the manifest (1,287 rows, 3 empty, served as in the main run); E5
+answered every call (341); the router was not run on the arm.
+
+**For the paper.** The retrieval objection (cqGs 1 and 4, ynoK 3) gets a bound rather than a third "future work":
+with the governing equations supplied, the answer score moves by less than the design detects for the two closed
+models and by four points, not significant after correction, for gpt-oss-20b, while stated coverage rises; the
+remaining errors are in setting up, substituting and computing, not in recalling the method. The condition supplies
+equations only, so it bounds formula recall and not data lookups. The tool condition (a code tool, $65 to $150) is
+not run; whether to run it is the owner's call, with the arm's result as the prior.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
+| D-183 | Whether to run the tool condition of C4 (a Python tool for two or three models on the subsample, $65 to $150 by the plan's estimate), now that the open-book arm bounds what formula recall adds at a few points at most; or state the bound and leave the tool unrun | the paper's answer to the retrieval objection |
 | D-179 | ~~Run C1: `run_traces --variant reasoning-medium --calibrate 20 --yes` first (about $0.52), then the 450 items at a cap, then E5 and the router on the variant after their dry runs; or leave the setting stated in Appendix P and the comparison unmade~~ **Run 2026-10-03 at medium effort after the calibration, $5.54 in the rows (D-180); C2 to C4 approved the same day (D-181 to D-183)** | — |
 | D-172 | Send the fifteen kits in `full_run_28092026/expert_request/dist/` (app.py, README.txt, guide.md and the kit_<id> folder each) with a return date; cut B2 first if the load is too much (`--b2-per-model`); when the files come back, `expert_kits.py --score <folder>` | the paper's evaluator section, Q3 and the D-171 limitation |
 | D-171 | What the paper states about the two under-specified chemical templates and the 17 exact-digit templates (a limitation and a Q2 sensitivity row, as proposed), and whether one chemical expert reads `work_isothermal_virial` and `adiabatic_flame_temperature` with B1 (next steps B4) | the paper's sections 5 and 6; the experts' request |
-| D-170 | The analyses of `docs/EVALUATION_NEXT_STEPS.md` section A (free) in the order given; the expert request of section B, batched; a decision on each paid condition of section C after its dry run | the paper's results section; the experts' availability; the owner's approval per condition |
+| D-170 | The analyses of `docs/EVALUATION_NEXT_STEPS.md` section A (free) in the order given; the expert request of section B, batched; a decision on each paid condition of section C after its dry run **Section A done 2026-10-03 (D-173 to D-178); section C run the same day after the owner's approval of the priced package (D-180 to D-183; C2 is D-181), except C4's tool condition; section B awaits the send (D-172)** | the paper's results section; the experts' availability; the owner's approval per condition |
 | D-169 | ~~Upload the rewritten `full_run_scores_2026-10-02.zip` as a new version of the private Kaggle scores dataset (manual mode)~~ **Done 2026-10-02: new version of `ayeshaiq/engtrace-full-run-scores`, downloaded back, 87 of 88 members identical and the log a prefix of the live one (D-169, Backups).** In the paper: the `array` type and the two-quantity scalar lines are listed with D-145's multipart templates; the one wrong credit is a stated limit | the paper's scoring statements |
 | D-168 | ~~Adopt readings P and A of the answer check (`ANSWER_FORM_AUDIT.md`), then `score --replace` on main, paraphrase and repeats, `judge --score`, `router --score`, `analyze`, and a DECISIONS entry; or report both as sensitivities~~ **Adopted 2026-10-02 with reading N, after every changed verdict was read (D-169); re-scored and regenerated.** ~~Decide how `array` items and the two-quantity scalar lines are scored, or list those templates with D-145's~~ **Listed with D-145's (D-169).** ~~Fix `trace_review.py`'s archive glob~~ **Fixed (D-169)** | — |
 | D-167 | Confirm EMNLP 2026 for Huang et al. and Długosz et al. once the proceedings appear (ERI is confirmed). The authors' call, outside the Related Work folder: `JUDGE_SELECTION.md` should say self-preference "can be" more than 50%, and the cliff should be reported as a difference between the templates in each tier (`notes/followup_review.md`) | the reference list; the paper's sections 3.3 and 5 |
