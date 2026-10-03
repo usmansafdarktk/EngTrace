@@ -47,6 +47,7 @@
     "template_force_method_continuous_beam": 1,
     "template_sigma_reduction_for_cpk": 1
    },
+   "items_per_template": 3.0,
    "output_tokens_median": 1632,
    "output_tokens_max": 32768,
    "billed_usd": 0.095
@@ -87,6 +88,7 @@
    "think_in_text": 0,
    "empty_templates": {},
    "empty_by_template_all": {},
+   "items_per_template": 3.0,
    "output_tokens_median": 645,
    "output_tokens_max": 1820,
    "billed_usd": 1.494
@@ -126,6 +128,7 @@
    "think_in_text": 0,
    "empty_templates": {},
    "empty_by_template_all": {},
+   "items_per_template": 3.0,
    "output_tokens_median": 1640,
    "output_tokens_max": 31927,
    "billed_usd": 10.961

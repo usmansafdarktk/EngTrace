@@ -7,9 +7,10 @@ Reads scores/<variant>/e5/ (MiMo, the stage the results use) and scores/<variant
 by `judge.py --judge ... --sample ...` on the same prompts), and for the traces both hold: per model, the milestones the
 two judges both ruled on, their agreement on the three verdicts and on REACHED against not, E5-strict coverage over the
 sampled traces under each judge with the paired difference and a template bootstrap, and the share of judged milestones
-each judge rules REACHED. The question it answers is whether any Q3 figure that rests on the judge would move by more
-than its interval under a judge from another family; it does not say which judge is right, which the pilot's expert
-labels do for MiMo (E5_VALIDATION.md, RESULTS_E5).
+each judge rules REACHED. The question it answers is whether a model's E5-strict coverage figure (Q3) would move by more
+than its interval under a judge from another family, on a sample of what E5 sends (20 traces per model); it does not
+check the 55 pairwise coverage differences, and it does not say which judge is right, which the pilot's expert labels
+do for MiMo (E5_VALIDATION.md, RESULTS_E5).
 """
 from __future__ import annotations
 
@@ -135,9 +136,12 @@ def main() -> int:
     L += ['', 'Verdict pairs over all sampled milestones (MiMo -> other): ' + ', '.join(f'{k} {n}' for k, n in pairs.most_common()) + '.', '',
           f"Pooled over the {pk['milestones']} milestones: agreement {pk['agreement_three_way']:.3f} three-way and "
           f"{pk['agreement_reached_vs_not']:.3f} on REACHED against not; Cohen's kappa {fk(pk['kappa_three_way'])} and "
-          f"{fk(pk['kappa_reached_vs_not'])}. Kappa is chance-corrected and reads low where one verdict dominates (REACHED shares "
-          'above 0.8 for most models), so the raw agreement and the coverage difference above are the figures that answer the '
-          'question; kappa is given so that a reader can see the prevalence effect rather than suspect it.', '']
+          f"{fk(pk['kappa_reached_vs_not'])}. Kappa is chance-corrected and reads lower than the raw agreement where one verdict "
+          'dominates: on what E5 sends (milestones E3 did not find), MISSING and NOT_NEEDED are the common verdicts and REACHED the '
+          "minority (MiMo's REACHED share 0.09 to 0.36 per model above). The per-model coverage difference with its interval is "
+          'the figure that answers the question the swap asks; kappa is given so that a reader can see the prevalence effect '
+          'rather than suspect it. The sample is what E5 sends, 20 traces per model over 14 to 19 templates: it checks the '
+          'per-model coverage figure, not the 55 pairwise coverage differences of Q3.', '']
     (HERE / 'JUDGE_SWAP.md').write_text('\n'.join(L) + '\n', encoding='utf-8', newline='\n')
     print('\n'.join(L))
     return 0

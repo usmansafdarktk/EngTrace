@@ -117,8 +117,9 @@ def table(res: list[dict]) -> list[str]:
                  f"{f(ct['median'])} / {f(ct['p90'])} / {f(ct['max'])} | {f(rt['median'])} / {f(rt['p90'])} / {f(rt['max'])} | "
                  f"{f(rt['share_above_zero'], 3)} | {f(r['reasoning_text_share'], 3)} | {r['billed_usd']:.2f} |")
     L.append('')
-    none_reasoning = [r['model_key'] for r in res if r['model_key'] in ROSTER and r['reasoning_tokens']['share_above_zero'] == 0]
-    L.append(f"Roster models whose endpoint reported no reasoning tokens on any row: {', '.join(f'`{k}`' for k in none_reasoning) or 'none'}. "
+    only_roster = all(r['model_key'] in ROSTER + SET_ASIDE for r in res)          # an arm's anchors count too (D-182)
+    none_reasoning = [r['model_key'] for r in res if (r['model_key'] in ROSTER or not only_roster) and r['reasoning_tokens']['share_above_zero'] == 0]
+    L.append(f"Models whose endpoint reported no reasoning tokens on any row: {', '.join(f'`{k}`' for k in none_reasoning) or 'none'}. "
              'The other roster models returned reasoning tokens on nearly every row. One prompt hash per run; its value is in the JSON.')
     L.append('')
     return L
@@ -155,6 +156,8 @@ def main() -> int:
                 'the same request as the main run, at the provider' + chr(39) + 's default' +
                 (', on the question with the reference equations appended' if a.variant == 'openbook' else ''))
         lines[0] = f'# Decoding settings and token use, the `{a.variant}` arm ({item})'
+        lines[2] = lines[2].replace('preferences only, and no temperature, top-p or reasoning setting.',
+                                    'preferences, no temperature or top-p, and what the line below names for this arm.')
         lines.insert(2, f'The arm `{a.variant}` ({dec}): {what}; rows are the arm' + chr(39) + 's items only. '
                         'The main run' + chr(39) + 's table is `DECODING_TABLE.md`.')
         lines.insert(3, '')

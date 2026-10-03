@@ -47,6 +47,7 @@
   },
   "reasoning_text_share": 0.8466666666666667,
   "billed_usd": 11.026,
-  "seconds_median": 12.17
+  "seconds_median": 12.17,
+  "tool": null
  }
 ]

@@ -721,9 +721,10 @@ def accepted_pairs() -> dict | None:
             'outstanding': sum(1 for r in acc.values() if not r.get('returned', True))}
 
 
-def paired(main_rows, para_rows, ids, fn, seed):
+def paired(main_rows, para_rows, ids, fn, seed, m: int | None = None):
     """Second arm minus main, paired by item: the item mean with its template bootstrap at 95% and, from the
-    same draws, at 90%, which is the two-one-sided-tests reading against EQUIV_MARGIN (D-165)."""
+    same draws, at 90%, which is the two-one-sided-tests reading against EQUIV_MARGIN (D-165). `m` is the Holm
+    family the detectable difference is stated under (Q5: the roster; an arm: the models in the arm)."""
     diff = per_template([{'template_id': main_rows[x]['template_id'], 'd': fn(para_rows[x]) - fn(main_rows[x])}
                          for x in ids], lambda r: r['d'])
     point, draws, n = cluster_boot(diff, seed)
@@ -733,7 +734,7 @@ def paired(main_rows, para_rows, ids, fn, seed):
     return {'items': n, 'templates': len(diff), 'diff': point, 'ci': c, 'ci90': c90,
             'within_margin': bool(n and -EQUIV_MARGIN <= c90[0] and c90[1] <= EQUIV_MARGIN),
             'p': sign_flip_p(np.array([sum(v) for v in diff.values()]), seed + 50),
-            **detectable_paired(np.array([np.mean(v) for v in diff.values()]), len(ROSTER))}
+            **detectable_paired(np.array([np.mean(v) for v in diff.values()]), m or len(ROSTER))}
 
 
 def q5(main, para, keys, keep=None, e5_main=None, e5_para=None):
@@ -800,27 +801,38 @@ def reasoning_arms(main, e5_main, keys) -> list[dict]:
     for arm in arms:
         base = 'flagship' if arm.startswith('flagship-reasoning-') else 'main'
         arm_keys = list(keys) if base == 'main' else [f.stem for f in sorted((SCORES / arm).glob('*.jsonl'))]
+        loaded = {k: (load(arm, k), main.get(k) if base == 'main' else load(base, k)) for k in arm_keys}
+        family = sum(1 for v, r in loaded.values() if v and r)       # the arm's Holm family, for the detectable column
         rows = []
         for i, k in enumerate(arm_keys):
-            var = load(arm, k)
-            ref = main.get(k) if base == 'main' else load(base, k)
+            var, ref = loaded[k]
             if not var or not ref:
                 continue
             e5_ref = (e5_main or {}).get(k) if base == 'main' else load_stage('e5', k, base)
             ids = sorted(set(var) & set(ref))
-            row = {'arm': arm, 'base': base, 'model': k, **paired(ref, var, ids, lambda r: r['score'], 9700 + i)}
+            row = {'arm': arm, 'base': base, 'model': k, 'family': family,
+                   **paired(ref, var, ids, lambda r: r['score'], 9700 + i, m=family)}
+            both = [x for x in ids if not var[x]['unusable'] and not ref[x]['unusable']]
+            row['usable_in_both'] = {'items': len(both),
+                                     'diff': float(np.mean([var[x]['score'] - ref[x]['score'] for x in both])) if both else None}
+            row['noise'] = repeat_noise(k, ref)
             row['main_score_on_items'] = float(np.mean([ref[x]['score'] for x in ids]))
             row['arm_score'] = float(np.mean([var[x]['score'] for x in ids]))
             row['arm_unusable'] = int(sum(var[x]['unusable'] for x in ids))
             row['main_unusable_on_items'] = int(sum(ref[x]['unusable'] for x in ids))
-            row['fully'] = paired(ref, var, ids, fully, 9750 + i)
+            row['fully'] = paired(ref, var, ids, fully, 9750 + i, m=family)
             row['mcnemar_p'] = mcnemar_p(np.array([fully(var[x]) for x in ids]), np.array([fully(ref[x]) for x in ids]))
-            row['levels'] = {lv: {'main': float(np.mean([ref[x]['score'] for x in ids if ref[x]['level'] == lv])),
-                                  'arm': float(np.mean([var[x]['score'] for x in ids if var[x]['level'] == lv])),
-                                  'items': int(sum(ref[x]['level'] == lv for x in ids))}
-                             for lv in LEVELS if any(ref[x]['level'] == lv for x in ids)}
+            row['levels'] = {}
+            for j, lv in enumerate(LEVELS):
+                lids = [x for x in ids if ref[x]['level'] == lv]
+                if not lids:
+                    continue
+                d = paired(ref, var, lids, lambda r: r['score'], 9900 + 10 * i + j, m=family)
+                row['levels'][lv] = {'main': float(np.mean([ref[x]['score'] for x in lids])),
+                                     'arm': float(np.mean([var[x]['score'] for x in lids])), 'items': len(lids),
+                                     'templates': d['templates'], 'diff': d['diff'], 'ci': d['ci']}
             ms_ids = [x for x in ids if ref[x]['e3']['coverage'] is not None and var[x]['e3']['coverage'] is not None]
-            row['e3'] = paired(ref, var, ms_ids, lambda r: r['e3']['coverage'], 9800 + i) if ms_ids else None
+            row['e3'] = paired(ref, var, ms_ids, lambda r: r['e3']['coverage'], 9800 + i, m=family) if ms_ids else None
             e5v = load_stage('e5', k, arm)
             row['e5'] = None
             if e5_ref and e5v:
@@ -829,7 +841,7 @@ def reasoning_arms(main, e5_main, keys) -> list[dict]:
                           and e5_ref[x]['reply_ok'] is not False and e5v[x]['reply_ok'] is not False]
                 m5 = {x: {'template_id': ref[x]['template_id'], 'v': e5_ref[x]['e5_strict']} for x in e5_ids}
                 p5 = {x: {'template_id': ref[x]['template_id'], 'v': e5v[x]['e5_strict']} for x in e5_ids}
-                row['e5'] = paired(m5, p5, e5_ids, lambda r: r['v'], 9850 + i) if e5_ids else None
+                row['e5'] = paired(m5, p5, e5_ids, lambda r: r['v'], 9850 + i, m=family) if e5_ids else None
             solved_main = [x for x in ids if fully(ref[x]) == 1]
             solved_arm = [x for x in ids if fully(var[x]) == 1]
             row['digit_flag_rate_fully_solved'] = {
@@ -856,10 +868,27 @@ def reasoning_arms(main, e5_main, keys) -> list[dict]:
                                    'score_with_calls': float(np.mean(with_c)) if with_c else None,
                                    'score_without_calls': float(np.mean(without)) if without else None}
             rows.append(row)
-        for o, ph in zip(rows, holm([o['p'] for o in rows]) if rows else []):
-            o['p_holm'] = ph
+        for o, ph, pf, pm in zip(rows, holm([o['p'] for o in rows]) if rows else [],
+                                 holm([o['fully']['p'] for o in rows]) if rows else [],
+                                 holm([o['mcnemar_p'] for o in rows]) if rows else []):
+            o['p_holm'], o['fully_p_holm'], o['mcnemar_p_holm'] = ph, pf, pm
         out += rows
     return out
+
+
+def repeat_noise(key: str, ref) -> dict | None:
+    """Run-to-run noise for a model with decoding repeats (D-151): each repeat minus the main run on the repeat's
+    items, the item mean; the range over the repeats is the yardstick an arm's change is read against."""
+    from full_run_28092026 import subsamples
+    diffs = []
+    for v in subsamples.REPEAT_VARIANTS:
+        rep_rows = load(v, key)
+        if not rep_rows:
+            continue
+        ids = [x for x in rep_rows if x in ref]
+        if ids:
+            diffs.append(float(np.mean([rep_rows[x]['score'] - ref[x]['score'] for x in ids])))
+    return {'repeats': len(diffs), 'min': min(diffs), 'max': max(diffs)} if diffs else None
 
 
 def anchors(runs, keys) -> list[dict]:
@@ -886,10 +915,19 @@ def anchors(runs, keys) -> list[dict]:
             cv = lambda r: coverage_value(r, e5.get(r['item_id']) if e5 else None)
             c, c_ci, _n = cluster_mean(per_template(rows, cv, lambda r: cv(r) is not None), 9900 + i)
             solved = [r for r in rows if fully(r) == 1]
+            levels = {}
+            for j, lv in enumerate(LEVELS):
+                lr = [r for r in rows if r['level'] == lv]
+                if lr:
+                    ltm = np.array([np.mean(v) for v in per_template(lr, lambda r: r['score']).values()])
+                    levels[lv] = {'mean': float(np.mean([r['score'] for r in lr])), 'templates': len(ltm),
+                                  'ci': boot_mean(ltm, 9960 + 10 * i + j)}
+            e3c, e3_ci, _ = cluster_mean(per_template(rows, lambda r: r['e3']['coverage'], lambda r: r['e3']['coverage'] is not None), 9980 + i)
             return {'model': key, 'arm': variant, 'items': len(rows), 'score': float(tm.mean()), 'ci': boot_mean(tm, 9950 + i),
                     'fully_solved': float(np.mean([fully(r) for r in rows])), 'unusable': int(sum(r['unusable'] for r in rows)),
-                    'levels': {lv: float(np.mean([r['score'] for r in rows if r['level'] == lv])) for lv in LEVELS
-                               if any(r['level'] == lv for r in rows)},
+                    'empty': int(sum(r.get('status') != 'answered' for r in rows)),
+                    'unreadable': int(sum(r['unusable'] and r.get('status') == 'answered' for r in rows)),
+                    'levels': levels, 'e3_coverage': e3c, 'e3_ci': e3_ci,
                     'coverage': c, 'coverage_ci': c_ci, 'coverage_stage': 'E5-strict' if e5 else 'E3',
                     'digit_flag_rate_fully_solved': float(np.mean([flagged(r) for r in solved])) if solved else None,
                     'median_completion_tokens': float(np.median([r['completion_tokens'] or 0 for r in rows])) if rows else None}
@@ -1140,7 +1178,18 @@ def provenance(store: str) -> dict:
     me = Path(__file__)
     cfg_path = SCORES / store / 'CONFIG.json'
     cfg = read_json(cfg_path)
-    out = {'analyze': {'git': git('rev-parse', 'HEAD'), 'tag': git('describe', '--tags', '--exact-match') or None,
+    arms = {}
+    for d in sorted(SCORES.iterdir()):
+        if d.is_dir() and not d.name.startswith('_') and d.name not in ('main',) and (d / 'CONFIG.json').exists():
+            try:
+                c = json.loads((d / 'CONFIG.json').read_text(encoding='utf-8'))
+            except Exception:  # noqa: BLE001
+                continue
+            arms[d.name] = {'git': c.get('git'), 'dirty': c.get('dirty'), 'written_at_utc': c.get('written_at_utc'),
+                            'stages': {st: (json.loads((d / st / 'CONFIG.json').read_text(encoding='utf-8')).get('git')
+                                            if (d / st / 'CONFIG.json').exists() else None) for st in ('e5', 'router')}}
+    out = {'arm_stores': arms,
+           'analyze': {'git': git('rev-parse', 'HEAD'), 'tag': git('describe', '--tags', '--exact-match') or None,
                        'dirty': bool(git('status', '--porcelain', '--', me.relative_to(REPO).as_posix())),
                        'sha256_lf': hashlib.sha256(me.read_bytes().replace(b'\r\n', b'\n')).hexdigest(),
                        'B': B, 'B_TEST': B_TEST},
@@ -1525,25 +1574,39 @@ def render(res) -> str:
               'template bootstrap, a sign-flip test over templates with Holm across the models in the arm, the smallest paired '
               'difference the arm detects at 80% power, and McNemar on the fully-solved verdict; the level means are '
               'descriptive. The base run\'s scores remain the headline; an arm says what the change cost or bought.', '',
-              '| arm | model | items | base on these items | arm | change | 95% CI | p (Holm) | detectable | '
-              'fully solved change | McNemar p | by level, base to arm: Easy / Intermediate / Advanced | E3 coverage change | '
-              '95% CI | E5-strict change | 95% CI | unusable, base / arm | digit flags on fully solved, base / arm | '
-              'router judge flags on fully solved, base / arm | tool use: share of traces, calls per trace |',
-              '|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|---:|---|---|---|---|']
+              '| arm | model | items | base on these items | arm | change | 95% CI | p (Holm, arm family) | detectable | '
+              '90% CI, within ±0.05 | change on items usable in both | run-to-run noise (repeats minus main) | '
+              'fully solved change | sign-flip p (Holm) | McNemar p (Holm) | '
+              'by level, change with 95% CI: Easy / Intermediate / Advanced | E3 coverage change (items) | 95% CI | '
+              'E5-strict change (items) | 95% CI | unusable, base / arm | digit flags on fully solved, base / arm (unpaired) | '
+              'router judge flags on fully solved, base / arm (unpaired) | tool use: share of traces, calls per trace |',
+              '|---|---|---:|---:|---:|---:|---:|---:|---:|---|---:|---|---:|---:|---:|---|---:|---:|---:|---:|---|---|---|---|']
+
+        def pfmt(v):
+            return '<0.0001' if v is not None and v < 0.0001 else f'{v:.4f}'
         for r in arms:
             e3c, e5c, dfr = r.get('e3'), r.get('e5'), r['digit_flag_rate_fully_solved']
             lv = r.get('levels') or {}
-            by_level = ' / '.join(f"{lv[l]['main']:.3f} to {lv[l]['arm']:.3f}" if l in lv else '-' for l in LEVELS)
-            tu = r.get('tool_use')
+            by_level = ' / '.join(f"{lv[l]['diff']:+.3f} ({ci(lv[l]['ci'])}; {lv[l]['templates']} templates)" if l in lv else '-' for l in LEVELS)
+            tu, ub, nz = r.get('tool_use'), r.get('usable_in_both') or {}, r.get('noise')
             arm_cell = r['arm'] if r.get('base', 'main') == 'main' else f"{r['arm']} vs {r['base']}"
             L.append(f"| {arm_cell} | `{r['model']}` | {r['items']} | {r['main_score_on_items']:.3f} | {r['arm_score']:.3f} | "
-                     f"{r['diff']:+.3f} | {ci(r['ci'])} | {r['p_holm']:.4f} | {f3(r.get('detectable'))} | {r['fully']['diff']:+.3f} | "
-                     f"{r['mcnemar_p']:.4f} | {by_level} | "
-                     + (f"{e3c['diff']:+.3f} | {ci(e3c['ci'])}" if e3c else ' | ') + ' | '
-                     + (f"{e5c['diff']:+.3f} | {ci(e5c['ci'])}" if e5c else 'pending | ') + ' | '
+                     f"{r['diff']:+.3f} | {ci(r['ci'])} | {pfmt(r['p_holm'])} | {f3(r.get('detectable'))} | "
+                     f"{ci(r['ci90'])}, {'yes' if r['within_margin'] else 'no'} | "
+                     + (f"{ub['diff']:+.3f} ({ub['items']})" if ub.get('diff') is not None else '') + ' | '
+                     + (f"{nz['min']:+.3f} to {nz['max']:+.3f} ({nz['repeats']} repeats)" if nz else 'no repeats') + ' | '
+                     f"{r['fully']['diff']:+.3f} | {pfmt(r['fully']['p'])} ({pfmt(r['fully_p_holm'])}) | {pfmt(r['mcnemar_p'])} ({pfmt(r['mcnemar_p_holm'])}) | {by_level} | "
+                     + (f"{e3c['diff']:+.3f} ({e3c['items']}) | {ci(e3c['ci'])}" if e3c else ' | ') + ' | '
+                     + (f"{e5c['diff']:+.3f} ({e5c['items']}) | {ci(e5c['ci'])}" if e5c else 'pending | ') + ' | '
                      f"{r['main_unusable_on_items']} / {r['arm_unusable']} | {f3(dfr['main'])} / {f3(dfr['arm'])} | "
                      + (f"{f3(rj['main'])} / {f3(rj['arm'])}" if (rj := r.get('router_judge_fully_solved')) else 'not run') + ' | '
                      + (f"{tu['share_with_calls']:.2f}, {tu['calls_per_trace']:.1f}" if tu else '') + ' |')
+        L += ['', 'Reading the columns: a claim rests on the template-level tests (the sign-flip p with Holm over the arm\'s models); '
+              'McNemar is item-level and shown as Q5 shows it. The 90% interval is the two-one-sided-tests reading against the '
+              '±0.05 equivalence margin of D-165: "yes" means the change is bounded inside the margin. "Change on items usable in both" '
+              'leaves out items unusable in either arm, so a change that comes from fewer empty traces shows as the gap between the '
+              'two. The run-to-run noise is the model\'s decoding repeats minus the main run where repeats exist (D-151). The flag '
+              'rates are on each arm\'s own fully solved traces, unpaired and without intervals: descriptive.']
         if any(r.get('tool_use') for r in arms):
             L += ['', 'Tool arm, the answer score by whether the trace called the tool (descriptive: whether to call it is the '
                   'model\'s choice and depends on the item): ' + '; '.join(
@@ -1556,17 +1619,24 @@ def render(res) -> str:
               'items from the main run beside them. An anchor is a reference point outside the pairwise family: no test is '
               'run against it. The `flagship` arm ran at each provider\'s default, as the main run did; a '
               '`flagship-reasoning-<effort>` arm carries the reasoning parameter. Score and coverage carry template intervals '
-              '(150 templates of three items); level means are descriptive.', '',
-              '| model | arm | items | answer score | 95% CI | fully solved | unusable | Easy | Intermediate | Advanced | '
+              '(150 templates of three items), as do the level means. GPT-5.4\'s reasoning arm is paired against its default arm '
+              'in the block above, the one paired test among the anchors.', '',
+              '| model | arm | items | answer score | 95% CI | fully solved | unusable (empty / unreadable) | '
+              'Easy, 95% CI | Intermediate, 95% CI | Advanced, 95% CI | E3 coverage | 95% CI | '
               'coverage (stage) | 95% CI | digit flags on fully solved | median completion tokens |',
-              '|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|']
+              '|---|---|---:|---:|---:|---:|---:|---|---|---|---:|---:|---|---:|---:|---:|']
         for r in anc['anchors'] + sorted(anc['roster'], key=lambda r: -r['score']):
             lv = r['levels']
+            lvc = lambda l: (f"{lv[l]['mean']:.3f} ({ci(lv[l]['ci'])})" if l in lv else '-')
             mct = '' if r['median_completion_tokens'] is None else f"{r['median_completion_tokens']:.0f}"
             L.append(f"| `{r['model']}` | {r['arm']} | {r['items']} | {r['score']:.3f} | {ci(r['ci'])} | {r['fully_solved']:.3f} | "
-                     f"{r['unusable']} | {f3(lv.get('Easy'))} | {f3(lv.get('Intermediate'))} | {f3(lv.get('Advanced'))} | "
+                     f"{r['unusable']} ({r['empty']} / {r['unreadable']}) | {lvc('Easy')} | {lvc('Intermediate')} | {lvc('Advanced')} | "
+                     f"{f3(r['e3_coverage'])} | {ci(r['e3_ci'])} | "
                      f"{f3(r['coverage'])} ({r['coverage_stage']}) | {ci(r['coverage_ci'])} | {f3(r['digit_flag_rate_fully_solved'])} | "
                      f"{mct} |")
+        L += ['', f"Level means carry template intervals ({', '.join(str(v['templates']) for v in anc['anchors'][0]['levels'].values())} "
+              'templates for Easy, Intermediate and Advanced on the subsample); the anchors\' Advanced intervals are wide and '
+              'overlap the roster\'s, so a level difference between an anchor and a roster model is not a finding.']
     sens = res['sensitivity']
     tn = sens['tau_noise']
     L += ['', '## Sensitivity', '',

@@ -67,10 +67,10 @@ def variant_manifest(variant: str, man: dict) -> dict[str, dict]:
         return {i: man[i] for i in subsamples.repeat_ids()}
     if variant.startswith('reasoning-') or variant.startswith('flagship') or variant == 'tool':   # C1, C3, C4 tool: the subsample's originals
         return {i: man[i] for i in subsamples.paraphrase_ids()}
-    if variant == 'openbook':                            # C4: the modified questions, by their manifest
-        p = HERE / 'openbook' / 'manifest.jsonl'
+    if variant in ('openbook', 'openbook2'):             # C4: the modified questions, by their manifest (version 1 or 2)
+        p = HERE / 'openbook' / ('manifest.jsonl' if variant == 'openbook' else 'manifest2.jsonl')
         if not p.exists():
-            raise SystemExit('openbook/manifest.jsonl is missing: run openbook.py --build first')
+            raise SystemExit(f'{p.name} is missing: run openbook.py --build first')
         return {r['item_id']: {'sha256': r['sha256'], 'original_sha256': r['original_sha256']}
                 for r in map(json.loads, p.read_text(encoding='utf-8').splitlines())}
     if variant != 'paraphrase':
@@ -160,6 +160,7 @@ def review_model(key: str, man: dict, variant: str = 'main', main_served: dict |
                                                     if r['status'] == 'empty').most_common(6)),
         'empty_by_template_all': dict(collections.Counter(r['template_id'] for r in rows
                                                           if r['status'] == 'empty')),
+        'items_per_template': len(rows) / max(1, len({r['template_id'] for r in rows})),
         'output_tokens_median': statistics.median(toks) if toks else 0,
         'output_tokens_max': max(toks) if toks else 0,
         'billed_usd': round(billed, 3),
@@ -253,10 +254,11 @@ def main() -> int:
             tot[t] += n
             hit[t] += 1
     n_empty = sum(tot.values())
+    per_t = statistics.median([r['items_per_template'] for r in res]) if res else 15
     top = tot.most_common(10)
     L += ['', '## Empty rows across the roster, by template', '',
           f"{n_empty} empty rows over {len(tot)} templates. The ten with the most, each out of "
-          f"{15 * len(roster)} rows ({len(roster)} models x 15 items):", '',
+          f"{round(per_t) * len(roster)} rows ({len(roster)} models x {round(per_t)} items):", '',
           '| template | empty rows | models with one |', '|---|---:|---:|']
     L += [f"| `{t}` | {n} | {hit[t]} |" for t, n in top]
     L += ['', f"These ten hold {sum(n for _, n in top)} of the {n_empty}."]

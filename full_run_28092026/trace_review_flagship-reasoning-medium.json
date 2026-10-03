@@ -2,6 +2,7 @@
  "variant": "flagship-reasoning-medium",
  "models": [
   {
+   "tool": null,
    "key": "gpt-5.4",
    "lines": 450,
    "malformed": 0,
@@ -35,6 +36,7 @@
    "think_in_text": 0,
    "empty_templates": {},
    "empty_by_template_all": {},
+   "items_per_template": 3.0,
    "output_tokens_median": 1239.0,
    "output_tokens_max": 8572,
    "billed_usd": 11.026

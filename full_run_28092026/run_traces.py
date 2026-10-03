@@ -106,7 +106,7 @@ REASONING_VARIANTS = tuple(f'reasoning-{e}' for e in REASONING_EFFORTS)
 REASONING_MODELS = ('gpt-5.4-mini', 'gemini-3.1-flash-lite')     # no reasoning tokens at the provider's default (D-168)
 FLAGSHIP_REASONING = tuple(f'flagship-reasoning-{e}' for e in REASONING_EFFORTS)   # the closed anchor with reasoning on (D-182)
 TOOL = 'tool'                                                                     # C4's tool condition (D-184)
-VARIANTS = ('main', 'paraphrase') + subsamples.REPEAT_VARIANTS + REASONING_VARIANTS + ('flagship', 'openbook') + FLAGSHIP_REASONING + (TOOL,)
+VARIANTS = ('main', 'paraphrase') + subsamples.REPEAT_VARIANTS + REASONING_VARIANTS + ('flagship', 'openbook', 'openbook2') + FLAGSHIP_REASONING + (TOOL,)
 OPENBOOK = HERE / 'openbook'
 OPENBOOK_MODELS = ('claude-sonnet-5', 'gpt-5.4-mini', 'gpt-oss-20b')   # one model from each tier (D-183)
 TOOL_MODELS = OPENBOOK_MODELS               # the tool arm runs the open-book arm's three, for a like-for-like reading (D-184)
@@ -182,10 +182,11 @@ def variant_items(variant: str, its: list[dict]) -> list[dict]:
         return [by_id[i] for i in subsamples.repeat_ids()]
     if variant in REASONING_VARIANTS or variant == 'flagship' or variant in FLAGSHIP_REASONING or variant == TOOL:
         return [by_id[i] for i in subsamples.paraphrase_ids()]       # the originals of the 450-item subsample
-    if variant == 'openbook':
-        pool, manifest = OPENBOOK / 'items.jsonl', OPENBOOK / 'manifest.jsonl'
+    if variant in ('openbook', 'openbook2'):
+        sfx = '' if variant == 'openbook' else '2'
+        pool, manifest = OPENBOOK / f'items{sfx}.jsonl', OPENBOOK / f'manifest{sfx}.jsonl'
         if not pool.exists() or not manifest.exists():
-            raise SystemExit('openbook/items.jsonl or its manifest is missing: run openbook.py --build first')
+            raise SystemExit(f'openbook/items{sfx}.jsonl or its manifest is missing: run openbook.py --build' + (' --version 2' if sfx else '') + ' first')
         want = {r['item_id']: r for r in map(json.loads, manifest.read_text(encoding='utf-8').splitlines())}
         out = []
         for r in map(json.loads, pool.read_text(encoding='utf-8').splitlines()):
@@ -786,7 +787,7 @@ def main() -> int:
         specs = [s for s in cfg['models'] if s.get('anchor') and (s['key'] in a.model if a.model else s['weights'] == 'closed')]
         if not specs:
             raise SystemExit('no closed anchor model in models.json')
-    if a.variant == 'openbook' and not a.model:
+    if a.variant in ('openbook', 'openbook2') and not a.model:
         specs = [s for s in cfg['models'] if s['key'] in OPENBOOK_MODELS]
     if a.variant == TOOL and not a.model:
         specs = [s for s in cfg['models'] if s['key'] in TOOL_MODELS]

@@ -2,6 +2,7 @@
  "variant": "reasoning-medium",
  "models": [
   {
+   "tool": null,
    "key": "gpt-5.4-mini",
    "lines": 450,
    "malformed": 0,
@@ -36,11 +37,13 @@
    "think_in_text": 0,
    "empty_templates": {},
    "empty_by_template_all": {},
+   "items_per_template": 3.0,
    "output_tokens_median": 1260.5,
    "output_tokens_max": 22637,
    "billed_usd": 4.444
   },
   {
+   "tool": null,
    "key": "gemini-3.1-flash-lite",
    "lines": 450,
    "malformed": 0,
@@ -75,6 +78,7 @@
    "think_in_text": 0,
    "empty_templates": {},
    "empty_by_template_all": {},
+   "items_per_template": 3.0,
    "output_tokens_median": 1478.0,
    "output_tokens_max": 3519,
    "billed_usd": 1.097

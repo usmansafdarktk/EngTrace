@@ -22,7 +22,7 @@ Roster, 3 models: 1287 final rows, 3 empty, $12.55 billed in the rows. Items exp
 
 ## Empty rows across the roster, by template
 
-3 empty rows over 3 templates. The ten with the most, each out of 45 rows (3 models x 15 items):
+3 empty rows over 3 templates. The ten with the most, each out of 9 rows (3 models x 3 items):
 
 | template | empty rows | models with one |
 |---|---:|---:|

@@ -2,6 +2,7 @@
  "variant": "flagship",
  "models": [
   {
+   "tool": null,
    "key": "gpt-5.4",
    "lines": 450,
    "malformed": 0,
@@ -36,11 +37,13 @@
    "think_in_text": 0,
    "empty_templates": {},
    "empty_by_template_all": {},
+   "items_per_template": 3.0,
    "output_tokens_median": 737.5,
    "output_tokens_max": 2125,
    "billed_usd": 5.887
   },
   {
+   "tool": null,
    "key": "deepseek-v4-pro",
    "lines": 450,
    "malformed": 0,
@@ -87,6 +90,7 @@
     "template_work_isothermal_virial": 1,
     "template_qr_policy_one_iteration": 1
    },
+   "items_per_template": 3.0,
    "output_tokens_median": 2596.0,
    "output_tokens_max": 32768,
    "billed_usd": 0.628

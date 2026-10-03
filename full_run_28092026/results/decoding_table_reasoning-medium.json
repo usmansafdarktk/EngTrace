@@ -48,7 +48,8 @@
   },
   "reasoning_text_share": 0.8844444444444445,
   "billed_usd": 4.444,
-  "seconds_median": 8.46
+  "seconds_median": 8.46,
+  "tool": null
  },
  {
   "model_key": "gemini-3.1-flash-lite",
@@ -99,6 +100,7 @@
   },
   "reasoning_text_share": 1.0,
   "billed_usd": 1.097,
-  "seconds_median": 4.425
+  "seconds_median": 4.425,
+  "tool": null
  }
 ]
