@@ -72,6 +72,7 @@ variant the main run's visible output understates the bill, so its dry run price
     python -m full_run_28092026.run_traces --selftest                              # FREE: the tool arm, offline
     python -m full_run_28092026.run_traces --variant tool --dry-run                # FREE: multipliers on the main bills
     python -m full_run_28092026.run_traces --variant tool --calibrate 20 --yes     # BILLS: measured turns and lengths
+    python -m full_run_28092026.run_traces --variant tool --model gpt-oss-20b --ignore-provider Darkbloom --yes   # a provider that drops tool calls skipped
 """
 from __future__ import annotations
 
@@ -134,6 +135,7 @@ PILOT_PROMPT_PREFIX = 'c2bcb87984c4e50b'   # evaluator_pilot_17092026/models.jso
 MAX_ATTEMPTS = 4
 BACKOFF = 5                                 # seconds, doubled per attempt
 DONE = ('answered', 'empty')                # states a re-run does not call again
+PROVIDER_IGNORE: list[str] = []              # --ignore-provider: providers routing must skip in this invocation (recorded in each row's request)
 
 
 def deployed_prompt() -> str:
@@ -243,7 +245,7 @@ def existing(key: str, variant: str = 'main') -> dict[str, dict]:
 def request_params(spec: dict, cfg: dict, variant: str = 'main') -> dict:
     p = {'max_tokens': spec.get('max_tokens', cfg['max_tokens'])}
     key = 'provider_open_weight' if spec['weights'] == 'open' else 'provider_closed_weight'
-    p['extra_body'] = {'provider': cfg[key]}
+    p['extra_body'] = {'provider': {**cfg[key], **({'ignore': list(PROVIDER_IGNORE)} if PROVIDER_IGNORE else {})}}
     if variant in REASONING_VARIANTS or variant in FLAGSHIP_REASONING:
         # OpenRouter's unified reasoning parameter; the provider maps the effort to its own setting. The main run
         # sent nothing here and ran at each provider's default (D-122).
@@ -761,7 +763,11 @@ def main() -> int:
     ap.add_argument('--workers', type=int, default=16)
     ap.add_argument('--yes', action='store_true', help='required for any mode that bills')
     ap.add_argument('--selftest', action='store_true', help='FREE: the tool arm offline (the sandbox and the loop with a fake client)')
+    ap.add_argument('--ignore-provider', action='append', default=[], metavar='NAME',
+                    help='route past this OpenRouter provider in this invocation (repeatable); the row records it in its request. '
+                         'Used for the tool arm when a provider drops tool calls (D-184)')
     a = ap.parse_args()
+    PROVIDER_IGNORE[:] = a.ignore_provider
     if a.selftest:
         return tool_selftest()
 

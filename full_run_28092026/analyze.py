@@ -796,7 +796,7 @@ def reasoning_arms(main, e5_main, keys) -> list[dict]:
     items (descriptive), the digit rule's and the router's flag rates on fully solved traces, and the tool arm's use
     of its tool. Holm runs over the models within an arm."""
     out = []
-    arms = [q.name for pat in ('reasoning-*', 'openbook', 'tool', 'flagship-reasoning-*')
+    arms = [q.name for pat in ('reasoning-*', 'openbook*', 'tool', 'flagship-reasoning-*')
             for q in sorted(SCORES.glob(pat)) if q.is_dir()]
     for arm in arms:
         base = 'flagship' if arm.startswith('flagship-reasoning-') else 'main'

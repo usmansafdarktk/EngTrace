@@ -148,13 +148,13 @@ def main() -> int:
         rp = res[0]['reasoning_parameter'] if res else None
         item, dec = (('C1', 'D-179, D-180') if a.variant.startswith('reasoning-') else
                      ('C3', 'D-182') if a.variant.startswith('flagship') else
-                     ('C4', 'D-183') if a.variant == 'openbook' else
+                     ('C4', 'D-183') if a.variant.startswith('openbook') else
                      ('C4', 'D-184') if a.variant == 'tool' else ('a variant', 'D-141'))
         what = (f'the same request as the main run plus the reasoning parameter `{json.dumps(rp)}`' if rp else
                 'the same request as the main run plus the python tool (`tools`, `tool_choice: auto`); tokens and the bill are '
                 'summed over a row' + chr(39) + 's turns' if a.variant == 'tool' else
                 'the same request as the main run, at the provider' + chr(39) + 's default' +
-                (', on the question with the reference equations appended' if a.variant == 'openbook' else ''))
+                (', on the question with the reference equations appended' if a.variant.startswith('openbook') else ''))
         lines[0] = f'# Decoding settings and token use, the `{a.variant}` arm ({item})'
         lines[2] = lines[2].replace('preferences only, and no temperature, top-p or reasoning setting.',
                                     'preferences, no temperature or top-p, and what the line below names for this arm.')
