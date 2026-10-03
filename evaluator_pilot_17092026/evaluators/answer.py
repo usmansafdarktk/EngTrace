@@ -68,7 +68,10 @@ LINEAR = ('linear', 'nonlinear')                  # a family of its own: see ver
 LABELED = re.compile(r'(?i)\b([a-z][a-z\-]{2,})\s*:\s*\*{0,2}\s*(yes|no)\b')
 # A pi-fraction is one value (D-169): the coefficient may sit in parentheses with pi, and the
 # denominator may follow the closing one. `pi*n` and `pi(` inside an expression are still not values.
-PI_EXPR = re.compile(r'(?<![\w.])\(?\s*(\d+(?:\.\d+)?)?\s*\*?\s*(?:pi|\u03c0)\b(?!\s*[*(])'
+# The optional coefficient and the star each own the whitespace after them (D-186): the earlier form, three
+# `\s*` in a row, backtracked over every split of a long whitespace run and hung on a trace that ended in
+# 32,000 em spaces; the strings matched and the groups captured are the same.
+PI_EXPR = re.compile(r'(?<![\w.])\(?\s*(?:(\d+(?:\.\d+)?)\s*)?(?:\*\s*)?(?:pi|\u03c0)\b(?!\s*[*(])'
                      r'\s*\)?(?:\s*/\s*\(?\s*(\d+(?:\.\d+)?)\s*\)?)?')
 PI_OF_FRACTION = re.compile(r'(?<![\w.])\(\s*(\d+(?:\.\d+)?)\s*/\s*(\d+(?:\.\d+)?)\s*\)\s*\*?\s*(?=(?:pi|\u03c0)\b)')
 PI_FRACTION = re.compile(r'(?<![\w.])\(?\s*(\d+(?:\.\d+)?)\s*\*?\s*(?:pi|\u03c0)\s*\)?\s*/\s*\(?\s*(\d+(?:\.\d+)?)\s*\)?')
