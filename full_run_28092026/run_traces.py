@@ -355,11 +355,28 @@ def run_python(code: str, timeout: int = TOOL_TIMEOUT) -> dict:
     return {'ok': ok, 'refused': False, 'truncated': truncated, 'seconds': round(time.time() - t0, 2), 'output': out}
 
 
-def tool_call_dict(tc) -> dict:
-    if hasattr(tc, 'model_dump'):
-        return tc.model_dump(exclude_none=True)
-    return {'id': getattr(tc, 'id', None), 'type': 'function',
-            'function': {'name': tc.function.name, 'arguments': tc.function.arguments}}
+def tool_arguments(raw: str):
+    """The tool call's arguments as a dict, and whether they needed repair. Some endpoints return them as JSON with
+    control characters inside the string (gpt-oss-20b on DekaLLM wrote the code with literal newlines), which strict
+    JSON rejects; the second reading allows them, and a third takes the whole text as the code."""
+    try:
+        return json.loads(raw), False
+    except (json.JSONDecodeError, TypeError):
+        pass
+    try:
+        return json.loads(raw, strict=False), True
+    except (json.JSONDecodeError, TypeError):
+        return {'code': raw or ''}, True
+
+
+def tool_call_dict(tc, arguments: str | None = None) -> dict:
+    """The assistant's tool call as the provider expects it back; `arguments` replaces the raw text with valid JSON
+    (a provider refuses the whole conversation otherwise: "function.arguments must be valid JSON")."""
+    d = tc.model_dump(exclude_none=True) if hasattr(tc, 'model_dump') else \
+        {'id': getattr(tc, 'id', None), 'type': 'function', 'function': {'name': tc.function.name, 'arguments': tc.function.arguments}}
+    if arguments is not None:
+        d.setdefault('function', {})['arguments'] = arguments
+    return d
 
 
 def call_with_tool(cli, spec: dict, cfg: dict, question: str, attempts: int = MAX_ATTEMPTS, variant: str = TOOL) -> dict:
@@ -424,25 +441,28 @@ def call_with_tool(cli, spec: dict, cfg: dict, question: str, attempts: int = MA
                 empty_retries += 1                                 # an empty completion is asked again before it counts
                 continue
             break
-        assistant = {'role': 'assistant', 'content': msg.content or None, 'tool_calls': [tool_call_dict(tc) for tc in tool_calls]}
+        parsed = []
+        for tc in tool_calls:
+            fn = getattr(tc, 'function', None)
+            args, repaired = tool_arguments(getattr(fn, 'arguments', None) or '{}')
+            if not isinstance(args, dict):
+                args, repaired = {'code': str(args)}, True
+            parsed.append((tc, getattr(fn, 'name', None), args, repaired))
+        assistant = {'role': 'assistant', 'content': msg.content or None,
+                     'tool_calls': [tool_call_dict(tc, json.dumps(args)) for tc, _n, args, _r in parsed]}
         if extra.get('reasoning_details'):
             assistant['reasoning_details'] = extra['reasoning_details']   # OpenRouter: the reasoning carried across turns
         messages.append(assistant)
-        for tc in tool_calls:
+        for tc, name, args, repaired in parsed:
             calls += 1
-            fn = getattr(tc, 'function', None)
-            name, raw = getattr(fn, 'name', None), getattr(fn, 'arguments', None) or '{}'
             if name != 'python':
                 code, res = '', {'ok': False, 'refused': True, 'truncated': False, 'seconds': 0.0,
                                  'output': f'ToolError: there is no tool named {name!r}; the only tool is python.'}
             else:
-                try:
-                    code = json.loads(raw).get('code', '') or ''
-                    res = run_python(code)
-                except (json.JSONDecodeError, AttributeError):
-                    code, res = raw, {'ok': False, 'refused': True, 'truncated': False, 'seconds': 0.0,
-                                      'output': 'ToolError: the arguments were not a JSON object like {"code": "..."}.'}
-            log.append({'call': calls, 'code': code, **res})
+                code = args.get('code') or ''
+                code = code if isinstance(code, str) else json.dumps(code)
+                res = run_python(code)
+            log.append({'call': calls, 'code': code, 'args_repaired': repaired, **res})
             parts.append(f'```python\n{code.strip()}\n```\nOutput:\n```\n{res["output"]}\n```')
             messages.append({'role': 'tool', 'tool_call_id': getattr(tc, 'id', None) or f'call_{calls}', 'content': res['output']})
     final_text = text.strip()
@@ -696,8 +716,8 @@ def tool_selftest() -> int:
 
     class Fake:
         """Two turns: a tool call computing 2*3, then the answer; records what it was sent."""
-        def __init__(self):
-            self.sent = []
+        def __init__(self, repair=False):
+            self.sent, self.repair = [], repair
             self.chat = NS(completions=NS(create=self.create))
 
         def create(self, model, messages, **kw):
@@ -706,6 +726,9 @@ def tool_selftest() -> int:
             if len(self.sent) == 1:
                 tc = NS(id='call_1', type='function', function=NS(name='python', arguments='{"code": "print(2*3)"}'))
                 msg = NS(content='Let me compute.', tool_calls=[tc], model_extra={}, reasoning=None)
+            elif len(self.sent) == 2 and self.repair:        # a literal newline inside the JSON string: not strict JSON
+                tc = NS(id='call_2', type='function', function=NS(name='python', arguments='{"code": "x = 7\nprint(x)"}'))
+                msg = NS(content=None, tool_calls=[tc], model_extra={}, reasoning=None)
             else:
                 msg = NS(content='The product is 6.\n\nFinal answer: 6', tool_calls=None, model_extra={}, reasoning=None)
             return NS(choices=[NS(message=msg, finish_reason='stop')], usage=usage, model='fake/model', model_extra={'provider': 'Fake'})
@@ -724,6 +747,12 @@ def tool_selftest() -> int:
           and second[2] == {'role': 'tool', 'tool_call_id': 'call_1', 'content': '6'})
     check('the request carried the python tool with tool_choice auto', fake.sent[0][1].get('tools') == [PYTHON_TOOL] and fake.sent[0][1].get('tool_choice') == 'auto')
     check('the tool arm runs the subsample\'s originals', TOOL in VARIANTS and 'tool' == TOOL)
+    fake2 = Fake(repair=True)
+    row2 = call_with_tool(fake2, {'key': 'fake', 'model': 'fake/model', 'weights': 'closed'}, cfg, 'What is 2 times 3?')
+    sent_back = fake2.sent[2][0][3]['tool_calls'][0]['function']['arguments']
+    check('arguments with a literal newline are read, run, and sent back as valid JSON',
+          row2['tool_calls'] == 2 and row2['tool_turns'][1]['args_repaired'] and row2['tool_turns'][1]['output'] == '7'
+          and json.loads(sent_back) == {'code': 'x = 7\nprint(x)'} and row2['status'] == 'answered')
     print(f'selftest: {"all pass" if not fails else str(len(fails)) + " FAILED: " + "; ".join(fails)}')
     return 1 if fails else 0
 
