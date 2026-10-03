@@ -1,0 +1,132 @@
+[
+ {
+  "model_key": "gpt-5.4-mini",
+  "weights": "closed",
+  "configured": "openai/gpt-5.4-mini",
+  "served": {
+   "openai/gpt-5.4-mini": 450
+  },
+  "providers": {
+   "Azure": 450
+  },
+  "rows": 450,
+  "answered": 450,
+  "empty": 0,
+  "modes": {
+   "calibrate": 21,
+   "tool": 429
+  },
+  "prompt_sha256": [
+   "c2bcb87984c4e50beaaa6876cce2e72932b91d6a755d07ab01ffc341cf9b6f7c"
+  ],
+  "request_variants": 1,
+  "max_tokens": 32768,
+  "provider_sort": "price",
+  "quantizations": null,
+  "allow_fallbacks": true,
+  "sampling_parameters_sent": [
+   "tool_choice",
+   "tools"
+  ],
+  "reasoning_parameter": null,
+  "finish_reasons": {
+   "stop": 450
+  },
+  "prompt_tokens": {
+   "median": 341.0
+  },
+  "completion_tokens": {
+   "median": 664.5,
+   "p90": 1219,
+   "max": 2839
+  },
+  "reasoning_tokens": {
+   "median": 0.0,
+   "p90": 0,
+   "max": 0,
+   "share_above_zero": 0.0,
+   "unreported_rows": 0
+  },
+  "reasoning_text_share": 0.0,
+  "billed_usd": 1.754,
+  "seconds_median": 4.335,
+  "tool": {
+   "rows": 450,
+   "rows_with_calls": 85,
+   "share_with_calls": 0.18888888888888888,
+   "calls_median": 0.0,
+   "calls_p90": 2,
+   "calls_max": 7,
+   "turns_median": 1.0,
+   "scripts": 187,
+   "scripts_failed": 5,
+   "scripts_refused": 1,
+   "limit_rows": 0
+  }
+ },
+ {
+  "model_key": "claude-sonnet-5",
+  "weights": "closed",
+  "configured": "anthropic/claude-sonnet-5",
+  "served": {
+   "anthropic/claude-sonnet-5": 450
+  },
+  "providers": {
+   "Claude Platform on AWS": 450
+  },
+  "rows": 450,
+  "answered": 450,
+  "empty": 0,
+  "modes": {
+   "calibrate": 21,
+   "tool": 429
+  },
+  "prompt_sha256": [
+   "c2bcb87984c4e50beaaa6876cce2e72932b91d6a755d07ab01ffc341cf9b6f7c"
+  ],
+  "request_variants": 1,
+  "max_tokens": 32768,
+  "provider_sort": "price",
+  "quantizations": null,
+  "allow_fallbacks": true,
+  "sampling_parameters_sent": [
+   "tool_choice",
+   "tools"
+  ],
+  "reasoning_parameter": null,
+  "finish_reasons": {
+   "stop": 450
+  },
+  "prompt_tokens": {
+   "median": 1923.5
+  },
+  "completion_tokens": {
+   "median": 1488.0,
+   "p90": 2859,
+   "max": 10425
+  },
+  "reasoning_tokens": {
+   "median": 195.0,
+   "p90": 849,
+   "max": 7353,
+   "share_above_zero": 1.0,
+   "unreported_rows": 0
+  },
+  "reasoning_text_share": 0.5,
+  "billed_usd": 9.966,
+  "seconds_median": 13.93,
+  "tool": {
+   "rows": 450,
+   "rows_with_calls": 298,
+   "share_with_calls": 0.6622222222222223,
+   "calls_median": 1.0,
+   "calls_p90": 1,
+   "calls_max": 6,
+   "turns_median": 2.0,
+   "scripts": 384,
+   "scripts_failed": 42,
+   "scripts_refused": 0,
+   "limit_rows": 0
+  }
+ }
+]

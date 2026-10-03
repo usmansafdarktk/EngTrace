@@ -268,10 +268,11 @@ the main run's figures stay the headline and the arms are reported beside them, 
 | reasoning on, for the two closed models that ran without it (C1) | GPT-5.4 mini 0.858 to 0.951 at medium effort (+0.093, 95% CI 0.056 to 0.133, Holm p < 0.0001, detectable 0.055); Gemini 3.1 Flash-Lite 0.874 to 0.890 (+0.016, −0.010 to 0.042, p 0.30, detectable 0.038). GPT-5.4 mini's gain holds in E5-strict coverage (+0.061, 0.034 to 0.090), has its largest point change on Advanced items (+0.167, 0.069 to 0.279, against +0.060 and +0.083 on Easy and Intermediate, intervals overlapping), and its digit and router flag rates on its own solved traces are lower (0.127 against 0.069; 0.232 against 0.135; unpaired, descriptive); Gemini's measures all sit inside the noise and its 90% interval (−0.007 to 0.038) is inside the ±0.05 equivalence margin | "C1 and C4" |
 | a second judge (C2) | Grok 4.6 on E5's prompts for 220 traces (20 per model over 14 to 19 templates): REACHED agreement 0.83 to 1.00 for ten models, 0.74 for GLM-5.3 (34 milestones); Cohen's kappa pooled 0.69 three-way and 0.79 on REACHED against not; E5-strict coverage differs by −0.017 to +0.020 per model, every interval including zero and of the order of Q3's own (narrower for six models, wider for five); on the planted set 22 of 60 conceptual defects (0.367) against MiMo's 16 of 52 (0.308; Wilson intervals 0.26 to 0.49 and 0.20 to 0.44), 52 of 60 arithmetic, no false alarm on 120 untouched steps. The sample does not test Q3's 55 pairwise differences | `JUDGE_SWAP.md`; RESULTS_X1 Finding 8 |
 | flagship anchors on the subsample (C3) | GPT-5.4 0.941 (0.909 to 0.969) at the provider's default with no reasoning tokens, 0.980 (0.964 to 0.993) at medium reasoning; DeepSeek V4 Pro 0.968 (0.950 to 0.983); the roster's eleven on the same items 0.826 to 0.976, the top five 0.964 to 0.976 (the default arm below all five, level with GLM-5.3 at 0.952; the other two inside the top five's intervals); E5-strict coverage 0.892, 0.906 and 0.911 against the roster's 0.830 to 0.925; GPT-5.4's reasoning arm against its default arm, paired: +0.039 (0.016 to 0.067), fully solved +0.040 (template-level p 0.002), digit flags on its own solved traces 0.119 against 0.032 (unpaired) | the two "C3" blocks; the anchor row of "C1 and C4" |
-| open book (C4), as run | with the version-1 equation blocks appended, on 429 items: Claude Sonnet 5 +0.005 (−0.010 to 0.021), GPT-5.4 mini −0.007 (−0.034 to 0.021), gpt-oss-20b +0.041 (0.003 to 0.078, Holm p 0.13; +0.019 on the 413 items usable in both arms); no answer-score change holds after Holm at the template level; E5-strict coverage up by +0.032, +0.032 and +0.061. The review of D-183 found the blocks defective (notes passed the filter, two equations were lost, three templates' blocks carried an answer or another instance's statement); the corrected arm (`openbook2`) awaits approval, and until it runs the paper states the arm as run with the defects or leaves it out | "C1 and C4"; D-183 |
+| open book (C4), corrected arm `openbook2` | with the corrected equation blocks appended, on 405 items: gpt-oss-20b 0.816 to 0.880, +0.064 (0.027 to 0.104, Holm p 0.003; fully solved +0.069, template-level p 0.0008; +0.043 on the 388 items usable in both arms; 90% interval 0.033 to 0.098, outside the ±0.05 margin); GPT-5.4 mini −0.019 (−0.049 to 0.014) and Claude Sonnet 5 +0.007 (−0.005 to 0.022), both bounded inside ±0.05 (90% intervals −0.044 to 0.009 and −0.005 to 0.020); E5-strict coverage +0.064, +0.033 and +0.029 | "C1 and C4", the `openbook2` rows |
+| the tool condition (C4), `tool` | a Python tool offered with the prompt unchanged, on 450 items: Claude Sonnet 5 +0.004 (−0.004 to 0.014), GPT-5.4 mini −0.004 (−0.042 to 0.036), both bounded inside ±0.05; E5-strict −0.001 and +0.012; tool used on 0.66 and 0.19 of traces; digit flags on solved traces 0.134 to 0.129 and 0.127 to 0.093 (unpaired); gpt-oss-20b not servable with a tool through the admitted endpoints (D-184) | "C1 and C4", the `tool` rows |
+| open book (C4), version 1 as run | superseded by `openbook2`; with the version-1 equation blocks appended, on 429 items: Claude Sonnet 5 +0.005 (−0.010 to 0.021), GPT-5.4 mini −0.007 (−0.034 to 0.021), gpt-oss-20b +0.041 (0.003 to 0.078, Holm p 0.13; +0.019 on the 413 items usable in both arms); no answer-score change holds after Holm at the template level; E5-strict coverage up by +0.032, +0.032 and +0.061. The review of D-183 found the blocks defective (notes passed the filter, two equations were lost, three templates' blocks carried an answer or another instance's statement); the corrected arm (`openbook2`) awaits approval, and until it runs the paper states the arm as run with the defects or leaves it out | "C1 and C4"; D-183 |
 | settings and tokens per arm | GPT-5.4 mini median reasoning tokens 3,464 and Gemini 3.1 Flash-Lite 1,333 under the parameter against zero in the main run; GPT-5.4 zero at the default and 440 at medium; DeepSeek V4 Pro reasons at its default (median 1,836, four rows at the ceiling) | `DECODING_TABLE_<arm>.md` |
-| cost | the four conditions billed about $48 (C1 $9.77, C2 $5.31, C3 $17.54 in rows, C4 $12.55 in rows, E5 on the C3 and C4 arms $2.99), the round about $583 | D-180 to D-183 |
-| the tool condition (C4) | built as `--variant tool` and priced ($20 to $54 by assumption, calibration about $1.50), not run; if run, the digit rule's flag rate under the tool is the measurement and the paired block carries it | D-184 |
+| cost | the four conditions billed about $69 (C1 $9.77, C2 $5.31, C3 $17.54 in rows, C4 $12.55 for version 1 and $8.32 for `openbook2` with its E5, the tool arm $12.80 with its E5, E5 on the C3 and version-1 C4 arms $2.99), the round about $604 | D-180 to D-184 |
 
 ### What to state
 
@@ -290,11 +291,13 @@ the main run's figures stay the headline and the arms are reported beside them, 
    moves no model's coverage figure beyond its interval (differences −0.017 to +0.020) and catches 22 of 60 planted
    conceptual defects against MiMo's 16 of 52, with overlapping intervals; the sample does not test Q3's pairwise
    differences, so the sentence is about the per-model figures only.
-4. **The open-book condition, for the retrieval objection: measured, not a bound, until the corrected arm runs.** As
-   run, supplying the version-1 equation blocks changed the answer score by +0.005, −0.007 and +0.041 (none holding after
-   Holm) while stated coverage rose by 0.03 to 0.06; the blocks had the defects D-183 records. If the corrected arm
-   (`openbook2`) is run, its rows of `RESULTS.md` replace these figures and the equivalence column says whether the change
-   is bounded inside ±0.05. Where the remaining errors lie needs an error reading of the arm's traces, not done.
+4. **The two C4 conditions, for the retrieval objection.** Open book (the corrected `openbook2` arm): the governing
+   equations lift gpt-oss-20b by 0.064 (0.027 to 0.104), a change the template-level tests support, half of it from
+   traces that no longer run out of room; for GPT-5.4 mini and Claude Sonnet 5 the change is bounded inside ±0.05 while
+   stated coverage rises. Tool: a Python tool offered with the prompt unchanged changes neither closed model's score or
+   coverage beyond ±0.05, used on two thirds (Claude) and a fifth (GPT-5.4 mini) of the items, with GPT-5.4 mini's
+   arithmetic-slip rate on solved traces falling from 0.13 to 0.09. Say that the tool arm has no open-tier model
+   (D-184's endpoint finding) and that where the remaining errors lie is the experts' reading (D-185), not these arms.
 5. **Power beside every null**, as for section A: the arms' detectable column sits in the same table.
 
 ### What not to state
@@ -320,8 +323,12 @@ the main run's figures stay the headline and the arms are reported beside them, 
   was a budget choice.
 - Not "the errors that remain are in setting up, substituting and computing": C4 measured a score change, not where the
   errors lie.
-- Not the open-book arm as run as a bound on formula retrieval: its blocks carried notes and, for three templates, an
-  answer or another instance's statement (D-183).
+- Not the version-1 open-book figures: the paper uses the `openbook2` rows; version 1's blocks carried notes and, for
+  three templates, an answer or another instance's statement (D-183).
+- Not "tools do not help" for the open tier: gpt-oss-20b was not run with a tool, because no endpoint the roster rule
+  admits served its tool calls (D-184).
+- Not gpt-oss-20b's open-book gain as a retrieval result alone: 13 of its main-run traces were unusable against 5 under
+  open book; the change on items usable in both arms is +0.043.
 
 ### Suggested wording
 
@@ -336,10 +343,14 @@ provider's default, which returned no reasoning tokens, and 0.980 (0.964 to 0.99
 DeepSeek V4 Pro scores 0.968 (0.950 to 0.983). The roster's top five on those items score 0.964 to 0.976, with intervals
 that contain both reasoning anchors; neither flagship exceeds the top tier."
 
-**For the retrieval objection (only once the corrected arm has run; otherwise the arm as run is stated with its
-defects, or left out).** "Supplying each template's governing equations with the question changes the answer score
-by [the `openbook2` figures with intervals] on [n] items, [within / not within] a ±0.05 equivalence margin, while
-milestone coverage rises by [x]. The condition supplies equations, not data tables or a computation tool."
+**For the retrieval objection.** "Supplying each template's governing equations with the question changes the answer
+score by +0.064 (95% CI 0.027 to 0.104) for gpt-oss-20b on 405 items, half of it from traces that no longer exhaust
+their budget, and by amounts bounded inside a ±0.05 equivalence margin for GPT-5.4 mini (−0.019) and Claude Sonnet 5
+(+0.007), while milestone coverage rises by 0.03 to 0.06 for all three. Offered a Python tool with the prompt otherwise
+unchanged, Claude Sonnet 5 calls it on 66% of items and GPT-5.4 mini on 19%, and neither model's answer score or
+coverage changes beyond the same margin; GPT-5.4 mini's rate of flagged arithmetic slips on solved traces falls from
+0.13 to 0.09. Neither condition supplies data tables, and the open-weight model could not be served with a tool
+through the endpoints our provider rule admits."
 
 ### Figures and tables worth including
 

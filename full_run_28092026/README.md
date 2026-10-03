@@ -216,7 +216,8 @@ closed anchor with the parameter (C3); `--variant openbook` sends the question w
 equations appended (`openbook.py --survey | --build`; `openbook/manifest.jsonl` is committed, the modified
 questions stay local) for one model from each tier (C4); `--variant tool` offers the same three a Python tool in the
 request and runs their scripts in an isolated interpreter, the prompt unchanged (D-184; `--selftest` checks the sandbox
-and the loop offline). The open-book blocks have two filter versions: version 1 ran as `openbook` (D-183) and the
+and the loop offline; ran for the two closed models, gpt-oss-20b's tool calls being dropped or rate-limited by every
+endpoint the quantization rule admits, `--ignore-provider` recording the attempts). The open-book blocks have two filter versions: version 1 ran as `openbook` (D-183) and the
 corrected version 2 is the `openbook2` arm (`openbook.py --version 2`, `--diff`, `--carry`); C2's judge swap is
 `judge.py --judge --sample` and `judge_swap.py`, and the planted set per judge `planted_judges.py` (D-181). A reasoning arm's or the tool arm's dry run prices multipliers of the main run's bills and
 `--calibrate N --yes` measures the real lengths and turns on N items first. The scorer, `trace_review.py`,

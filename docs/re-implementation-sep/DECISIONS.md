@@ -6957,7 +6957,7 @@ and 34 templates and carry wide intervals (the regenerated "C3" block prints the
 
 ## D-183 — C4, the open-book condition: the governing equations supplied with the question, for one model from each tier
 
-**Date:** 2026-10-03 · **Status:** DONE as run ($12.55 in the rows against the $12.75 dry run; E5 inside the $2.99 above, its dry run $1.12) · REVIEWED the same day: the equation blocks had defects (the review paragraph below); the corrected build is the `openbook2` arm, 156 items carried over, 249 per model to run at $7.68 by its dry run plus E5, OPEN for the owner's approval · **Evidence:** `openbook.py` (`--survey`, `--build`), `OPENBOOK_SURVEY.md`, `openbook/manifest.jsonl` (hashes and counts; the modified questions local), `run_traces.py` (`openbook`, `OPENBOOK_MODELS`), `trace_review.py` (`variant_manifest`); the paired block in `analyze.py`
+**Date:** 2026-10-03 · **Status:** DONE as run ($12.55 in the rows against the $12.75 dry run; E5 inside the $2.99 above, its dry run $1.12) · REVIEWED the same day: the equation blocks had defects (the review paragraph below); the corrected build, the `openbook2` arm, RUN 2026-10-03 after the owner's approval ($7.38 for the 249 items per model against the $7.68 dry run, E5 $0.94 for 249 calls; 156 items per model carried from version 1): the figures the paper uses are the `openbook2` rows · **Evidence:** `openbook.py` (`--survey`, `--build`), `OPENBOOK_SURVEY.md`, `openbook/manifest.jsonl` (hashes and counts; the modified questions local), `run_traces.py` (`openbook`, `OPENBOOK_MODELS`), `trace_review.py` (`variant_manifest`); the paired block in `analyze.py`
 
 **What was approved.** The open-book fallback of C4 rather than the tool condition ($65 to $150), by the owner on
 2026-10-03, with the tool condition to be reviewed at the end. The arm appends to each question a block headed
@@ -7024,9 +7024,32 @@ the 156 unchanged items' version-1 rows (a valid sample for a byte-identical que
 the 249 other items per model price at $7.68 by the dry run (Claude Sonnet 5 $6.72) plus E5 about $1. Not run: the
 owner's call (Open decisions). Until then the paper states the arm as run with these defects, or leaves it out.
 
+**Results of the corrected arm (part 3, 2026-10-03; `results/RESULTS.md`, "C1 and C4", the `openbook2` rows, at commit
+451c111).** On the 405 items, open book (version 2) minus the main run: gpt-oss-20b 0.816 to 0.880, +0.064 (95% CI 0.027
+to 0.104, sign-flip Holm p 0.003, detectable 0.055; 90% interval 0.033 to 0.098, outside the ±0.05 margin), fully
+solved +0.069 (template-level p 0.0008, Holm 0.0025; McNemar 0.0003), +0.043 on the 388 items usable in both arms
+(unusable rows 13 to 5), E3 coverage +0.066 (0.036 to 0.099) and E5-strict +0.064 (0.033 to 0.098) on 396 items, the
+change on Intermediate +0.090 (0.020 to 0.167) and Advanced +0.083 (0.021 to 0.151), Easy inside the noise; its three
+decoding repeats put run-to-run noise at +0.003 to +0.012. GPT-5.4 mini 0.851 to 0.832, −0.019 (−0.049 to 0.014, p 0.58;
+90% interval −0.044 to 0.009, inside the margin), coverage up (E3 +0.035, E5-strict +0.033), digit flags on its solved
+traces 0.124 to 0.162. Claude Sonnet 5 0.969 to 0.977, +0.007 (−0.005 to 0.022, p 0.58; 90% interval −0.005 to 0.020,
+inside the margin), E5-strict +0.029 (0.010 to 0.050). So, with clean equation blocks, the governing equations lift
+the weakest of the three by six points, a change the template-level tests support and the equivalence margin does
+not bound, half of it from traces that no longer run out of room; for the two closed models the change is bounded
+inside ±0.05 while stated coverage rises by 0.03. The version-1 arm (above) had read +0.041 for gpt-oss-20b and
+−0.007 and +0.005 for the others; the corrected blocks move the open model's figure by +0.023 and the closed models'
+by about 0.01. Trace review clean against the manifest (1,215 rows, 4 empty; gpt-oss-20b's four new rows at the
+ceiling served by a second provider); E5 answered every call; the router was not run on the arm.
+
+**For the paper (final).** The retrieval objection gets a measured sentence: supplying the governing equations
+changes the answer score by +0.064 (0.027 to 0.104) for gpt-oss-20b and by amounts bounded inside ±0.05 for GPT-5.4
+mini and Claude Sonnet 5 (90% intervals −0.044 to 0.009 and −0.005 to 0.020), while milestone coverage rises by 0.03
+to 0.06 for all three; the condition supplies equations, not data tables or a computation tool, and where the
+remaining errors lie is the experts' error reading (D-185), not this arm.
+
 ## D-184 — C4's tool condition: built as `--variant tool`, self-tested offline, priced by its dry run; not run
 
-**Date:** 2026-10-03 · **Status:** BUILT · OPEN (the owner's approval of a calibration and then the run) · **Evidence:** `full_run_28092026/run_traces.py` (`TOOL`, `PYTHON_TOOL`, `TOOL_FORBIDDEN`, `sandbox_env`, `run_python`, `call_with_tool`, `tool_dry_run`, `tool_selftest`, `--selftest`), `trace_review.py` and `decoding_table.py` (a tool-use table each), `score.py` (the tool fields carried to the score rows), `analyze.py` (`reasoning_arms`: the tool arm in the paired block with its tool-use columns)
+**Date:** 2026-10-03 · **Status:** DONE for Claude Sonnet 5 and GPT-5.4 mini ($12.80: $11.72 in their rows including the smoke test and the calibration, $0.02 for gpt-oss-20b's three endpoint attempts, $1.06 E5); gpt-oss-20b NOT SERVABLE (below) · **Evidence:** `full_run_28092026/run_traces.py` (`TOOL`, `PYTHON_TOOL`, `TOOL_FORBIDDEN`, `sandbox_env`, `run_python`, `call_with_tool`, `tool_dry_run`, `tool_selftest`, `--selftest`), `trace_review.py` and `decoding_table.py` (a tool-use table each), `score.py` (the tool fields carried to the score rows), `analyze.py` (`reasoning_arms`: the tool arm in the paired block with its tool-use columns)
 
 **What it is.** The plan's tool condition (docs/EVALUATION_NEXT_STEPS.md C4): the main run's prompt word for word, the
 450 originals of the subsample, the same ceiling, routing and states, with one function tool in the request,
@@ -7067,6 +7090,43 @@ retrieval reviewers asked for a tool baseline by name.
 Then the calibration first, the cap, and, if the calibration shows the models rarely call the tool, whether a
 one-sentence nudge in the prompt is wanted; it would change the prompt hash and be a labelled variant of its own,
 and the arm as built keeps the prompt word for word.
+
+**The run (part 2, 2026-10-03, after the owner's approval).** A two-item live smoke test per model ($0.08) showed the
+loop working through OpenRouter for Claude Sonnet 5 and GPT-5.4 mini (tool calls made, a failing script retried by
+the model, transcripts scored), then the 20-item calibration ($0.49): Claude called the tool on 14 of 21 items at
+$0.022 per item, GPT-5.4 mini on 5 of 21 at $0.004, both far inside the x1.5 assumption, so their 430 remaining items
+ran as two processes ($9.50 and $1.67). Every row answered; one script refused by the filter in 900; no row at the
+call limit. Tool use over the 450 items: Claude 298 traces (0.66) at 0.9 calls per trace, 42 of 384 scripts raising;
+GPT-5.4 mini 85 traces (0.19) at 0.4 calls per trace, 5 of 187 raising. Two endpoint defects were met on the way and
+fixed in the harness: a provider returned tool arguments with literal newlines inside the JSON string, which the
+loop refused and then sent back unchanged, so the provider rejected the conversation (now read tolerantly and
+re-encoded as valid JSON; `--selftest` covers it); and `--ignore-provider` was added so an invocation can route past
+a provider, recorded in each row's request.
+
+**gpt-oss-20b is not servable with a tool through the endpoints the roster rule admits.** Three attempts, 20 items
+each, kept under `traces/tool/_darkbloom/`, `_dekallm/` and `_deepinfra/` (local): on Darkbloom, the provider of its main
+run, 0 of 21 rows carried a tool call and 10 were empty, 8 of them with reasoning that ends by deciding to use
+Python, so the provider drops the model's tool calls; on DekaLLM 6 of 20 rows carried a call but 8 were empty the same
+way and 3 failed on the arguments defect above; on DeepInfra the endpoint rate-limited the account to a few requests
+a minute (16 of 20 failed with 429 at 2 workers; 5 of the 4 answered rows carried calls). The remaining endpoints with
+tool support are fp4 or of unknown quantization, outside the roster rule (D-110's pricing document), so the arm
+reports the two closed models and the open tier is absent; running gpt-oss-20b on Groq or Bedrock would be the
+owner's call and a stated deviation.
+
+**Results (`results/RESULTS.md`, "C1 and C4", the `tool` rows, at commit 451c111).** Tool minus main on the 450
+items: Claude Sonnet 5 0.971 to 0.976, +0.004 (95% CI −0.004 to 0.014, p 1.0; 90% interval −0.003 to 0.013, inside the
+±0.05 margin), E5-strict −0.001 (−0.015 to 0.012); GPT-5.4 mini 0.858 to 0.853, −0.004 (−0.042 to 0.036, p 1.0; 90%
+interval −0.037 to 0.029, inside the margin), E5-strict +0.012 (−0.010 to 0.034). The measurement the plan named, the
+digit rule's flag rate on fully solved traces: Claude 0.134 against 0.129, GPT-5.4 mini 0.127 against 0.093 (each
+arm's own solved traces, unpaired). By whether the trace called the tool (descriptive; the choice is the model's and
+depends on the item): GPT-5.4 mini 0.818 with calls against 0.862 without, Claude 0.968 against 0.990, so the tool
+was called on the harder items. Both models' level changes include zero. Cost $12.80 against the $20 to $54 bracket.
+
+**For the paper.** The tool baseline the retrieval reviewers asked for: offered a Python tool with the prompt
+unchanged, Claude Sonnet 5 uses it on two thirds of the items and GPT-5.4 mini on a fifth, and neither model's answer
+score or milestone coverage changes beyond a ±0.05 margin; GPT-5.4 mini's arithmetic-slip rate on solved traces falls
+from 0.13 to 0.09. The pool's remaining errors are not removed by computation support for these two models. The open
+tier is absent from the arm for the endpoint reasons above, stated as a limit.
 
 ## D-185 — B1 to B4 returned: fifteen experts' readings of the check, the judge, the wrong answers and the two chemical templates, scored
 
@@ -7151,14 +7211,42 @@ revision letter.
 
 *Corrected 2026-10-03, the same evening.* The plan's first version repeated `docs/NEXT_CYCLE_REVIEW.md`'s claim that the 60 civil and industrial templates were AI-drafted under an authoring specification. The owner corrected it: they were written by a colleague of the authors and certified by the own-branch experts like the other 90 (all 60 approved by every expert in round 1). NEXT_CYCLE_REVIEW.md and `docs/related_work_oct2026/notes/engtrace_state_brief.md` are corrected in place, and the plan rewritten: a strict rule that no internal label, file name or implementation detail appears in the paper (with a glossary of replacements), two metrics (Final Answer Accuracy and Milestone Coverage) and two step-level diagnostics instead of twelve named measures, a flatter section tree written as paragraphs with bold headings, the appendix listed section by section against the May appendix, and the revision-letter and Overleaf notes split into `docs/REVISION_LETTER_NOTES.md` and `docs/OVERLEAF_WORKFLOW.md`.
 
+## D-187 — the answer check's PI_EXPR regrouped: a long whitespace run hung the scorer; identical matches on every stored trace
+
+**Date:** 2026-10-03 · **Status:** DONE (free) · **Evidence:** `evaluator_pilot_17092026/evaluators/answer.py` (`PI_EXPR`, commit 25faea1), `full_run_28092026/SCORER_VALIDATION.md` (regenerated, byte-identical), the scan in this entry
+
+**What happened.** Scoring the `openbook2` arm stalled on one trace, gpt-oss-20b's `mm1_time_in_system#10`: 32,776
+characters, the last 32,405 a run of em spaces (U+2003) up to the ceiling. The scorer's worker sat on it for more
+than twenty minutes. Timing each component in a subprocess put the stall in `answer.values()`, and inside it in
+`PI_EXPR`, whose prefix read `\(?\s*(\d+(?:\.\d+)?)?\s*\*?\s*(?:pi|π)`: three optional whitespace runs in a
+row, so on whitespace-only text the engine tried every split of the run at every start position. The main run's
+only comparable trace (Qwen3-235B-2507's `adiabatic_flame_temperature#7`, a 16,377-character run) had scored, slowly
+enough not to be noticed.
+
+**The fix.** The optional coefficient and the star each own the whitespace after them:
+`\(?\s*(?:(\d+(?:\.\d+)?)\s*)?(?:\*\s*)?(?:pi|π)`; the tail is unchanged. The language and the two capture
+groups are the same (a string of the old form splits into the new form by giving the first run to the leading
+`\s*`), and the engine no longer re-splits a run. The pathological trace now scores in 0.1 s (unusable, as a
+ceiling-hit whitespace trace should be).
+
+**That no verdict moves.** Old and new patterns were run over every stored trace (39,884 rows in 51 files: the main
+run, the paraphrase and repeat arms, the C arms and the set-aside attempts), on the full text and on the 700-character
+answer window after the same `_pi_text` normalisation: 79,764 of 79,768 segments identical in spans and groups; the
+four skipped are the two long-run traces, for which the old pattern does not finish; the main run's one was re-scored
+with the new pattern and its stored verdict is reproduced field for field. `validate_scorer.py` reproduces the gold
+and the pilot's expert agreement with the patched module and its report is byte-identical. The older stores were
+not re-scored: their `CONFIG.json` records the evaluator hash they were scored with, and the scan above is the
+proof that the hash change carries no verdict change. `openbook2` was re-scored from the clean tree after the commit.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
 | D-185 | Whether to add the sensitivity with the check's partial verdicts counted as correct on the eleven symbolic-answer templates the experts' reading flagged (free, `analyze.py`), and whether the paper's tables mark those templates | the paper's evaluator and limitations sections |
 | D-186 | The authors' decisions in `docs/PAPER_PLAN_OCT2026.md` section 9 (anonymised archive, the exact authorship sentence and the textbooks for the civil and industrial templates, the taxonomy and difficulty procedure for the new branches, the retrieval arms, the experts' labels, the two chemical templates, strict or partial-credit accuracy and the coverage metric's name, LPDS, housekeeping, the title) | the paper text |
-| D-184 | Approve the tool arm's calibration (`run_traces --variant tool --calibrate 20 --yes`, about $1.50) and then the run at a cap ($20 to $54 by the dry run's multipliers, plus E5 about $1.20), or state the open-book bound and leave the tool unrun | the paper's answer to the retrieval objection |
-| D-183 | Approve the corrected open-book arm: `run_traces --variant openbook2 --yes` for the 249 items per model not carried over ($7.68 by the dry run) and E5 on it (about $1); or report the arm as run with its defects stated, or leave it out | the paper's answer to the retrieval objection |
+| D-184 | ~~Approve the tool arm's calibration (`run_traces --variant tool --calibrate 20 --yes`, about $1.50) and then the run at a cap ($20 to $54 by the dry run's multipliers, plus E5 about $1.20), or state the open-book bound and leave the tool unrun~~ **Approved and run 2026-10-03 for Claude Sonnet 5 and GPT-5.4 mini ($12.80 with E5); gpt-oss-20b not servable through the admitted endpoints** | — |
+| D-184 | Whether to run gpt-oss-20b's tool arm on an endpoint outside the roster's quantization rule (Groq or Bedrock), as a stated deviation, so the open tier appears in the tool comparison; or leave it absent and stated | the paper's tool baseline |
+| D-183 | ~~Approve the corrected open-book arm: `run_traces --variant openbook2 --yes` for the 249 items per model not carried over ($7.68 by the dry run) and E5 on it (about $1); or report the arm as run with its defects stated, or leave it out~~ **Approved and run 2026-10-03 ($7.38 plus E5 $0.94); the `openbook2` rows are the figures** | — |
 | D-183 | ~~Whether to run the tool condition of C4 (a Python tool for two or three models on the subsample, $65 to $150 by the plan's estimate), now that the open-book arm bounds what formula recall adds at a few points at most; or state the bound and leave the tool unrun~~ **Built 2026-10-03 as `--variant tool` (D-184); the run awaits approval** | — |
 | D-179 | ~~Run C1: `run_traces --variant reasoning-medium --calibrate 20 --yes` first (about $0.52), then the 450 items at a cap, then E5 and the router on the variant after their dry runs; or leave the setting stated in Appendix P and the comparison unmade~~ **Run 2026-10-03 at medium effort after the calibration, $5.54 in the rows (D-180); C2 to C4 approved the same day (D-181 to D-183)** | — |
 | D-172 | ~~Send the fifteen kits in `full_run_28092026/expert_request/dist/` (app.py, README.txt, guide.md and the kit_<id> folder each) with a return date; cut B2 first if the load is too much (`--b2-per-model`); when the files come back, `expert_kits.py --score <folder>`~~ **Sent, returned and scored 2026-10-03 (D-185): 1,004 of 1,004 readings from 15 experts** | — |
