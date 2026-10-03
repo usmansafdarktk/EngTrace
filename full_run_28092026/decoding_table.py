@@ -137,6 +137,8 @@ def main() -> int:
                 if score.trace_path(a.variant, k).exists()]
         out_md = HERE / f'DECODING_TABLE_{a.variant}.md'
         out_json = HERE / 'results' / f'decoding_table_{a.variant}.json'
+        if not keys:
+            raise SystemExit(f'no traces for variant {a.variant}')
     res = [one(k, cfg[k], a.variant) for k in keys]
     out_json.parent.mkdir(exist_ok=True)
     out_json.write_text(json.dumps(res, indent=1), encoding='utf-8')
