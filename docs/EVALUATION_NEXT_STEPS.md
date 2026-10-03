@@ -118,7 +118,7 @@ their place on the wrong answers rests on the second. *Where:* Q3. *Effort:* two
 (`expert_request/dist/`, local), with `reading_app.py` and `EXPERT_READING_GUIDE.md`; `--score DIR` scores the returns into
 `EXPERT_REQUEST.md`. What was sent is in that file. Sending is the owner's step.
 
-**B1. An expert reading of the answer check on this roster.** *Answers:* 9.3 item 4 (evaluator validity on
+**B1. An expert reading of the answer check on this roster.** *(Done 2026-10-03, D-185: 300 readings, three-way agreement 0.780, two-way 0.820, precision 0.947 on "correct"; eleven symbolic-answer templates carry two thirds of the disagreements.)* *Answers:* 9.3 item 4 (evaluator validity on
 the deployed roster): the pilot validated the check on other models and 15 templates, and D-168 found
 roster-specific misreadings by reading verdicts. *Method:* a stratified sample of about 150 verdicts from
 the top models, half incorrect or partial and half correct, in a workbook like the digit rule's
@@ -127,18 +127,18 @@ model name), read by one or two experts for "correct / partial / incorrect"; rep
 check's verdict and the forms behind any disagreement; fix the D-137 way only if a pattern appears.
 *Effort:* a day to build, an hour per expert.
 
-**B2. The human error-analysis sample on the new run.** *Answers:* nWW3 3 and 4, cqGs 3; continuity with the
+**B2. The human error-analysis sample on the new run.** *(Done 2026-10-03, D-185: 480 readings, Fleiss' kappa 0.930; Claude Sonnet 5's wrong answers 64% "no error"; the three weaker models' errors calculation-dominated.)* *Answers:* nWW3 3 and 4, cqGs 3; continuity with the
 May version's six-category taxonomy (Appendices R to T). *Method:* 50 to 100 wrong-answer traces for each of
 three or four contrastive models (a top model, GLM-5.3 for its empties, a non-reasoning model, gpt-oss-20b),
 three annotators, the same decision hierarchy and agreement reporting as before; smaller than May's 2,200
 because A6's automated layer covers the population. *Effort:* expert time; the sampling script is an hour.
 
-**B3. A spot-check of the judge on this roster.** *Answers:* the judge's REACHED verdict was validated on the
+**B3. A spot-check of the judge on this roster.** *(Done 2026-10-03, D-185: 200 readings; REACHED precision 0.850, MISSING 0.790, a third of MISSING route differences.)* *Answers:* the judge's REACHED verdict was validated on the
 pilot (it credited none of 88 fabricated values) but not on these models' traces. *Method:* about 100 judged
 milestones, half REACHED and half MISSING, shown with the trace to an expert of the branch; report the
 judge's precision on each. *Effort:* an hour per expert; the sampling script two hours.
 
-**B4. The two under-specified chemical templates, and the near-miss list** (*added 2026-10-02, D-171*). *Answers:*
+**B4. The two under-specified chemical templates, and the near-miss list** (*added 2026-10-02, D-171*). *(Done 2026-10-03, D-185: virial not unique and its wording undecided 3 of 3; flame data sources differ 2 of 3; the six near-miss templates unique and their near misses wrong 3 of 3.)* *Answers:*
 what the top models' remaining wrong answers are. `residual_incorrect.py` measured every remaining incorrect verdict's
 distance from the gold: 53 of the 97 wrong answers on `work_isothermal_virial` state the flow-work reading of a
 question that names neither closed-system nor flow work, and 48 of the 89 on `adiabatic_flame_temperature` lie within

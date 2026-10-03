@@ -31,3 +31,77 @@ Items 418, readings 1004.
 | `mec-2` | mechanical | 0 | 14 | 20 | 20 | 54 |
 | `mec-3` | mechanical | 0 | 14 | 19 | 20 | 53 |
 
+## What came back
+
+Readings returned 1004 of 1004 assigned, from 15 experts; median seconds per item 33.
+
+### B1, the answer check against the experts
+
+| | |
+|---|---|
+| readings | 300 |
+| three-way agreement with the check | 0.780 |
+| the check said correct: experts said | correct 142, incorrect 8 |
+| the check said incorrect: experts said | correct 12, incorrect 83, partial 3 |
+| the check said partial: experts said | correct 34, incorrect 9, partial 9 |
+| by branch (same / different) | chemical 50 / 8; civil 50 / 2; electrical 39 / 41; industrial 65 / 3; mechanical 30 / 12 |
+| disagreements by template | `template_impulse_response_from_lccde` 4, `template_ber_estimation_mary` 4, `template_finite_convolution` 4, `template_lorentz_force` 4, `template_system_properties_memory_causality` 4, `template_time_to_phasor` 4, `template_cd_dc_system_analysis` 4, `template_autocorrelation_rect_pulse` 4, `template_system_property_linearity` 4, `template_damping_classification` 4, `template_incompressible_continuity` 4, `template_reynolds_number_flow_regime` 2, `template_pfr_volume_changing_rate` 2, `template_levenspiel_plot_interpretation` 2, `template_adiabatic_flame_temperature` 2, `template_decimation_aliasing_analysis` 2, `template_bpsk_energy_basis` 2, `template_mm1k_finite_capacity` 2, `template_statically_indeterminate_shaft` 2, `template_undamped_response_initial_conditions` 2, `template_upward_seepage_quick_condition` 1, `template_linear_reservoir_routing_step` 1, `template_phasor_addition` 1, `template_sigma_reduction_for_cpk` 1 |
+| items read by two experts; their agreement; Cohen's kappa | 150; 0.973; 0.947 |
+| notes left (local) | 124 |
+
+### B3, the judge against the experts
+
+| | |
+|---|---|
+| readings | 200 |
+| the judge said MISSING: experts said | "no, and its route does not need it" 33, "no, it never obtains it" 46, "yes, the working obtains it" 21 |
+| the judge said REACHED: experts said | "no, and its route does not need it" 11, "no, it never obtains it" 4, "yes, the working obtains it" 85 |
+| REACHED confirmed (precision) | 0.850 |
+| MISSING confirmed (not obtained, by either answer) | 0.790 |
+| of MISSING, "route does not need it" | 0.330 |
+| items read by two experts; their agreement; Cohen's kappa | 100; 0.880; 0.803 |
+| notes left (local) | 62 |
+
+### B2, the error categories
+
+Readings 480; Fleiss' kappa over the three readers, all models: 0.930.
+
+| model | readings by category | item majorities | "No error" share | Fleiss |
+|---|---|---|---:|---:|
+| `claude-sonnet-5` | No error 77, 6. Calculation Error 31, 3. Formula / Principle Error 6, 2. Setup / Assumption Error 6 | No error 26, 6. Calculation Error 10, 3. Formula / Principle Error 2, 2. Setup / Assumption Error 2 | 0.642 | 0.968 |
+| `gpt-oss-20b` | 6. Calculation Error 50, 3. Formula / Principle Error 31, 2. Setup / Assumption Error 16, No error 12, 1. Hallucination 10, 4. Unit / Dimensional Error 1 | 6. Calculation Error 17, 3. Formula / Principle Error 9, 2. Setup / Assumption Error 6, 1. Hallucination 4, No error 4 | 0.100 | 0.839 |
+| `gemma-4-26b-a4b` | 6. Calculation Error 84, 3. Formula / Principle Error 20, 2. Setup / Assumption Error 7, 5. Sign / Direction Error 6, No error 3 | 6. Calculation Error 28, 3. Formula / Principle Error 7, 5. Sign / Direction Error 2, 2. Setup / Assumption Error 2, No error 1 | 0.025 | 0.965 |
+| `gpt-5.4-mini` | 6. Calculation Error 85, 3. Formula / Principle Error 16, No error 6, 5. Sign / Direction Error 5, 2. Setup / Assumption Error 5, 1. Hallucination 3 | 6. Calculation Error 28, 3. Formula / Principle Error 5, 5. Sign / Direction Error 2, 2. Setup / Assumption Error 2, No error 2, 1. Hallucination 1 | 0.050 | 0.930 |
+
+| level | readings by category |
+|---|---|
+| Advanced | No error 83, 6. Calculation Error 74, 3. Formula / Principle Error 38, 2. Setup / Assumption Error 9, 1. Hallucination 6, 5. Sign / Direction Error 5, 4. Unit / Dimensional Error 1 |
+| Easy | 6. Calculation Error 69, No error 3, 1. Hallucination 2, 3. Formula / Principle Error 2, 2. Setup / Assumption Error 2 |
+| Intermediate | 6. Calculation Error 107, 3. Formula / Principle Error 33, 2. Setup / Assumption Error 23, No error 12, 5. Sign / Direction Error 6, 1. Hallucination 5 |
+
+### B4, the templates
+
+| template | role | readers | question | answers |
+|---|---|---:|---|---|
+| `work_isothermal_virial` | virial | 3 | reading | "either: the wording does not decide" 3 |
+| `work_isothermal_virial` | virial | 3 | form | "either: the wording does not decide" 3 |
+| `work_isothermal_virial` | virial | 3 | unique | "no" 3 |
+| `work_isothermal_virial` | virial | 3 | traces | "all of them" 3 |
+| `annulus_flowrate` | near | 3 | unique | "yes" 3 |
+| `annulus_flowrate` | near | 3 | trace | "no" 3 |
+| `pfr_volume_changing_rate` | near | 3 | unique | "yes" 3 |
+| `pfr_volume_changing_rate` | near | 3 | trace | "no" 3 |
+| `pitzer_correlation_z` | near | 3 | unique | "yes" 3 |
+| `pitzer_correlation_z` | near | 3 | trace | "no" 3 |
+| `vdw_solve_for_volume` | near | 3 | unique | "yes" 3 |
+| `vdw_solve_for_volume` | near | 3 | trace | "no" 3 |
+| `adiabatic_flame_temperature` | flame | 3 | data | "no: standard sources differ by more than that" 2, "only if the same data source is used" 1 |
+| `adiabatic_flame_temperature` | flame | 3 | method | "yes" 2, "no" 1 |
+| `adiabatic_flame_temperature` | flame | 3 | traces | "some of them" 3 |
+| `manning_rectangular_discharge` | near | 3 | unique | "yes" 3 |
+| `manning_rectangular_discharge` | near | 3 | trace | "no" 3 |
+| `best_hydraulic_rectangular_section` | near | 3 | unique | "yes" 3 |
+| `best_hydraulic_rectangular_section` | near | 3 | trace | "no" 3 |
+
+Notes left on the templates (local): 15.
+

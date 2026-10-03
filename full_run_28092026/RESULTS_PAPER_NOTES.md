@@ -348,6 +348,64 @@ milestone coverage rises by [x]. The condition supplies equations, not data tabl
 - A footnote to Table 1 naming the two closed models' reasoning-on scores on the subsample, and Appendix P's row per model.
 - One sentence in the evaluator section for C2, with `JUDGE_SWAP.md`'s per-model agreement table in the appendix.
 
+## Added 2026-10-03: the experts' readings (B1 to B4, D-185)
+
+Every figure is in `EXPERT_REQUEST.md` ("What came back"), counts only, written by `expert_kits.py --score` from
+the returned kits, which stay local. Fifteen experts, three per branch, 1,004 readings.
+
+### The numbers to report
+
+| what | value | source |
+|---|---|---|
+| the answer check against the experts (B1) | 150 items of this run, two readers each: three-way agreement 0.780, two-way 0.820; "correct" confirmed 142 of 150 (0.947); "incorrect" confirmed 83 of 98; "partial" expert-correct 34 of 52; disagreements concentrated in electrical (41 of 80 readings) on eleven symbolic, expression or classification templates (44 of 66); inter-expert agreement 0.973, kappa 0.947 | B1 |
+| the judge against the experts (B3) | 100 milestones, two readers each: REACHED precision 0.850 (85 confirmed, 11 not needed by the route, 4 never obtained); MISSING precision 0.790 (46 never obtained, 33 not needed by the route, 21 obtained); inter-expert 0.880, kappa 0.803 | B3 |
+| error categories (B2) | 160 wrong answers of four models, three readers each, Fleiss 0.930: Claude Sonnet 5 "no error" 26 of 40 item majorities; gpt-oss-20b, Gemma 4 26B and GPT-5.4 mini calculation 17, 28 and 28 of 40; hallucinations 16 of 480 readings; calculation dominates Easy (69 of 78) and Intermediate (107 of 186), Advanced splits between no error (83) and calculation (74) | B2 |
+| the two chemical templates and the near misses (B4) | virial: wording does not decide 3 of 3, not unique 3 of 3; flame: data sources differ by more than the tolerance 2 of 3; six near-miss templates: unique 3 of 3, near miss not correct 3 of 3 | B4 |
+
+### What to state
+
+1. **Roster-specific validation, in the evaluator section.** One paragraph: the check against 15 experts on 150
+   items of this run and the judge on 100 milestones, with the figures above; the check is conservative on
+   symbolic and expression answers (the eleven templates named in D-185), and the strict coverage is a lower bound
+   because a third of the judge's MISSING verdicts are route differences.
+2. **The error table, in the results.** By model and level, with the sentence that the top tier's residual wrong
+   answers are mostly not errors (Claude 26 of 40) while the weaker models' are real and mostly calculation.
+3. **The two chemical templates, in the limitations,** as the experts read them: the virial template's wording does
+   not decide the answer; the flame template depends on the data source. D-171's cliff sensitivity (4 of 11 as
+   scored, 0 of 11 without them) is now expert-backed.
+4. **Inter-expert agreement beside every expert figure** (0.973, 0.880, 0.930).
+
+### What not to state
+
+- Not "the check agrees with experts 78% of the time" as a population rate: the B1 sample is stratified by the
+  check's verdict (75 correct, 49 incorrect, 26 partial); report the agreement per verdict category.
+- Not "the judge is 85% accurate": REACHED precision 0.85 and MISSING precision 0.79 on sampled milestones; recall
+  was not measured here.
+- Not the error categories as rates over all traces: they are categories of sampled wrong answers, 40 per model.
+- Not the symbolic-answer disagreements as the check being wrong: the experts read the content and the check a
+  form; the paper names the eleven templates and either marks them or reports the partial-as-correct
+  sensitivity (Open decisions, D-185).
+
+### Suggested wording
+
+**For the evaluator section.** "On this run, fifteen domain experts (three per branch) read 150 final answers, two
+readers each: they agree with the check's three-way verdict on 78% of readings and with its correct-or-not reading
+on 82%, confirm 142 of its 150 'correct' verdicts, and call 34 of its 52 'partial' verdicts correct; the
+disagreements concentrate in eleven electrical and mechanical templates with symbolic or classification answers.
+On 100 milestones the judge's REACHED verdict is confirmed 85 times in 100 and its MISSING verdict 79 times, a
+third of the latter being milestones the trace's own route did not need. The experts agree with one another on
+97% of double-read answers and 88% of milestones."
+
+**For the error analysis.** "Three experts read each of 160 wrong answers (Fleiss' kappa 0.93). For Claude Sonnet 5,
+26 of 40 are no error at all, a form or an ambiguity the check cannot credit; for GPT-5.4 mini, Gemma 4 26B and
+gpt-oss-20b, 28, 28 and 17 of 40 are calculation errors, and formula or principle errors come second."
+
+### Figures and tables worth including
+
+- Table: the check and the judge against the experts, per verdict category, with inter-expert agreement.
+- Table: the error categories by model and level.
+- The two chemical templates' expert readings as a footnote to the cliff paragraph.
+
 ## Metric continuity: what became of May's Table 1 columns
 
 | May (§4, Table 1) | October | why |

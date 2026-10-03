@@ -7085,16 +7085,79 @@ the title), the order of work to 12 October, notes for the revision letter, and 
 imposes: the paper is written for readers with no history of EngTrace; every "what changed" sentence goes to the
 revision letter.
 
+## D-185 — B1 to B4 returned: fifteen experts' readings of the check, the judge, the wrong answers and the two chemical templates, scored
+
+**Date:** 2026-10-03 · **Status:** DONE (free; the experts' time) · **Evidence:** `full_run_28092026/EXPERT_REQUEST.md` ("What came back", counts only, rewritten by `expert_kits.py --score`), `expert_request/scored.json` (local), the returned kits in `expert_request/expert_requests_filled/` (local, never committed)
+
+**What came back.** 1,004 of 1,004 readings from 15 experts (three per branch), median 33 s per item; every kit
+complete; the labels stay on this machine.
+
+**B1, the answer check against the experts (150 items, two readers each, 300 readings).** Three-way agreement with
+the check 0.780; two-way (correct against not) 0.820. Of the check's "correct" verdicts 142 of 150 are confirmed (8
+the experts call incorrect); of its "incorrect", 83 of 98 (12 the experts call correct, 3 partial); of its "partial",
+34 of 52 are correct to the experts, 9 incorrect, 9 partial. The check is conservative: 46 of its 150 non-correct
+verdicts are expert-correct, 34 of them from the partial category (the form-only partials of D-147). By branch the
+readings agree for chemical 50 of 58, civil 50 of 52, industrial 65 of 68, mechanical 30 of 42 and electrical 39 of
+80: eleven templates carry 4 disagreements each, 44 of the 66, all symbolic, expression or classification answers
+(`impulse_response_from_lccde`, `ber_estimation_mary`, `finite_convolution`, `lorentz_force`,
+`system_properties_memory_causality`, `time_to_phasor`, `cd_dc_system_analysis`, `autocorrelation_rect_pulse`,
+`system_property_linearity`, `damping_classification`, `incompressible_continuity`), where the check reads a form
+and the experts read the content. The two experts agree with each other on 0.973 of the 150 double-read items
+(Cohen's kappa 0.947). Notes left: 124, local.
+
+**B3, the judge against the experts (100 milestones, two readers each, 200 readings).** Of the judge's REACHED
+verdicts 85 of 100 are confirmed ("the working obtains it"), 11 are milestones the trace's own route did not need and
+4 are never obtained: precision 0.850. Of its MISSING verdicts 79 of 100 are confirmed as not obtained, 33 of them
+because the route did not need the milestone, and 21 are obtained by the working: precision 0.790. So the strict
+coverage, which counts a MISSING or NOT_NEEDED milestone as not reached, is a lower bound on what the traces
+obtain, and a third of the judge's MISSING verdicts are route differences rather than omissions. Inter-expert
+agreement 0.880 (kappa 0.803). Notes 62, local.
+
+**B2, the error categories (160 wrong answers of four models, three readers each, 480 readings; Fleiss' kappa 0.930
+over the three readers).** By item majority (40 items per model), Claude Sonnet 5's "wrong answers" are No error 26,
+Calculation 10, Formula or Principle 2, Setup 2 (a 0.642 "no error" share of its readings): the top tier's residual
+misses are mostly not errors, as D-171 inferred from the closest-approach buckets. gpt-oss-20b: Calculation 17,
+Formula 9, Setup 6, Hallucination 4, No error 4 (0.100); Gemma 4 26B: Calculation 28, Formula 7, Sign 2, Setup 2, No
+error 1 (0.025); GPT-5.4 mini: Calculation 28, Formula 5, Sign 2, Setup 2, No error 2, Hallucination 1 (0.050).
+Calculation errors dominate the Easy (69 of 78 readings) and Intermediate (107 of 186) wrong answers; on Advanced the
+readings split between No error (83) and Calculation (74), with Formula or Principle (38) third; hallucinations are
+rare (16 of 480) and sit mostly in gpt-oss-20b.
+
+**B4, the templates (eight; three chemical or civil readers each).** `work_isothermal_virial`: all three say the
+wording does not decide between the closed-system and the flow work, the form does not decide either, the answer
+is not unique, and all of the shown traces' answers are acceptable readings. `adiabatic_flame_temperature`: two of
+three say standard data sources differ by more than the tolerance (the third: only with the same source), two say
+the method is standard, and all three accept some of the shown traces. The six near-miss templates
+(`annulus_flowrate`, `pfr_volume_changing_rate`, `pitzer_correlation_z`, `vdw_solve_for_volume`,
+`manning_rectangular_discharge`, `best_hydraulic_rectangular_section`) have unique answers (3 of 3 each) and their
+near-miss traces are not correct (3 of 3 each), so the tolerance is not too tight there. Notes 15, local.
+
+**For the paper.** The roster-specific validation both review cycles asked for now exists. Evaluator section: the
+check against 15 experts on 150 items of this run (0.78 three-way, 0.82 two-way, precision 0.947 on "correct",
+conservative on symbolic and expression answers, where eleven named templates carry two thirds of the
+disagreements), and the judge on 100 milestones (REACHED 0.85, MISSING 0.79, a third of MISSING being route
+differences). Results: the error-category table by model and level, with the sentence that the top tier's
+residual wrong answers are mostly not errors. Limitations: the two chemical templates as the experts read them
+(D-171's sensitivity, now expert-backed) and the symbolic-answer templates as the check's weak spot. A sensitivity
+with the check's partial verdicts counted as correct on the eleven templates is a free analysis not done here
+(Open decisions).
+
+**Limits.** Two readers per item for B1 and B3 and three for B2, from the trace's own branch; the experts read the
+check's and the judge's verdicts on sampled items, not the whole run; the B1 sample is stratified by the check's
+verdict (75 correct, 49 incorrect, 26 partial), so its agreement figures are per verdict category, not a population
+rate; the error categories were read on four models' wrong answers (the three C4 models and Gemma 4 26B).
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
+| D-185 | Whether to add the sensitivity with the check's partial verdicts counted as correct on the eleven symbolic-answer templates the experts' reading flagged (free, `analyze.py`), and whether the paper's tables mark those templates | the paper's evaluator and limitations sections |
 | D-185 | The authors' ten decisions in `docs/PAPER_PLAN_OCT2026.md` section 9 (anonymised archive, the authoring record of the 60 civil and industrial templates, the taxonomy and difficulty procedure for the new branches, the retrieval arms, the experts' labels, the two chemical templates, metric names, LPDS, housekeeping, the title) | the paper text |
 | D-184 | Approve the tool arm's calibration (`run_traces --variant tool --calibrate 20 --yes`, about $1.50) and then the run at a cap ($20 to $54 by the dry run's multipliers, plus E5 about $1.20), or state the open-book bound and leave the tool unrun | the paper's answer to the retrieval objection |
 | D-183 | Approve the corrected open-book arm: `run_traces --variant openbook2 --yes` for the 249 items per model not carried over ($7.68 by the dry run) and E5 on it (about $1); or report the arm as run with its defects stated, or leave it out | the paper's answer to the retrieval objection |
 | D-183 | ~~Whether to run the tool condition of C4 (a Python tool for two or three models on the subsample, $65 to $150 by the plan's estimate), now that the open-book arm bounds what formula recall adds at a few points at most; or state the bound and leave the tool unrun~~ **Built 2026-10-03 as `--variant tool` (D-184); the run awaits approval** | — |
 | D-179 | ~~Run C1: `run_traces --variant reasoning-medium --calibrate 20 --yes` first (about $0.52), then the 450 items at a cap, then E5 and the router on the variant after their dry runs; or leave the setting stated in Appendix P and the comparison unmade~~ **Run 2026-10-03 at medium effort after the calibration, $5.54 in the rows (D-180); C2 to C4 approved the same day (D-181 to D-183)** | — |
-| D-172 | Send the fifteen kits in `full_run_28092026/expert_request/dist/` (app.py, README.txt, guide.md and the kit_<id> folder each) with a return date; cut B2 first if the load is too much (`--b2-per-model`); when the files come back, `expert_kits.py --score <folder>` | the paper's evaluator section, Q3 and the D-171 limitation |
+| D-172 | ~~Send the fifteen kits in `full_run_28092026/expert_request/dist/` (app.py, README.txt, guide.md and the kit_<id> folder each) with a return date; cut B2 first if the load is too much (`--b2-per-model`); when the files come back, `expert_kits.py --score <folder>`~~ **Sent, returned and scored 2026-10-03 (D-185): 1,004 of 1,004 readings from 15 experts** | — |
 | D-171 | What the paper states about the two under-specified chemical templates and the 17 exact-digit templates (a limitation and a Q2 sensitivity row, as proposed), and whether one chemical expert reads `work_isothermal_virial` and `adiabatic_flame_temperature` with B1 (next steps B4) | the paper's sections 5 and 6; the experts' request |
 | D-170 | The analyses of `docs/EVALUATION_NEXT_STEPS.md` section A (free) in the order given; the expert request of section B, batched; a decision on each paid condition of section C after its dry run **Section A done 2026-10-03 (D-173 to D-178); section C run the same day after the owner's approval of the priced package (D-180 to D-183; C2 is D-181), except C4's tool condition; section B awaits the send (D-172)** | the paper's results section; the experts' availability; the owner's approval per condition |
 | D-169 | ~~Upload the rewritten `full_run_scores_2026-10-02.zip` as a new version of the private Kaggle scores dataset (manual mode)~~ **Done 2026-10-02: new version of `ayeshaiq/engtrace-full-run-scores`, downloaded back, 87 of 88 members identical and the log a prefix of the live one (D-169, Backups).** In the paper: the `array` type and the two-quantity scalar lines are listed with D-145's multipart templates; the one wrong credit is a stated limit | the paper's scoring statements |
