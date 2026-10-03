@@ -243,7 +243,8 @@ def score_trace(item: dict, row: dict, ms: list[dict], ms_null: list[dict] | Non
                                  'answer_type', 'repeat_of', 'single_path')}
     base.update({k: row.get(k) for k in ('model_key', 'status', 'finish_reason', 'provider', 'served_model',
                                           'prompt_tokens', 'completion_tokens', 'reasoning_tokens',
-                                          'billed_usd', 'seconds', 'attempts', 'mode')})
+                                          'billed_usd', 'seconds', 'attempts', 'mode',
+                                          'turns', 'tool_calls', 'tool_limit', 'tool_errors')})   # the tool arm's fields (D-184)
     base['trace_sha256'] = sha(text.encode('utf-8'))
     base['milestones_required'] = len(ms)
     if row.get('status') != 'answered':

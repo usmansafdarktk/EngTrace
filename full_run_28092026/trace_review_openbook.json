@@ -2,6 +2,7 @@
  "variant": "openbook",
  "models": [
   {
+   "tool": null,
    "key": "gpt-oss-20b",
    "lines": 429,
    "malformed": 0,
@@ -51,6 +52,7 @@
    "billed_usd": 0.095
   },
   {
+   "tool": null,
    "key": "gpt-5.4-mini",
    "lines": 429,
    "malformed": 0,
@@ -90,6 +92,7 @@
    "billed_usd": 1.494
   },
   {
+   "tool": null,
    "key": "claude-sonnet-5",
    "lines": 429,
    "malformed": 0,

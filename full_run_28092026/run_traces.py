@@ -51,12 +51,27 @@ set, into traces/<variant>/<key>.jsonl, so score.py scores it as that variant:
                     openbook/manifest.jsonl before a call), for the models --model names or, by default,
                     `claude-sonnet-5`, `gpt-5.4-mini` and `gpt-oss-20b`; the row records the modified question's
                     hash as item_sha256 and the original's as original_sha256, as the paraphrase arm does.
+  tool              (C4, D-184) the 450-item subsample's original questions with a Python tool offered in the request
+                    (`tools`: one function, `python(code)`; `tool_choice: auto`), for the open-book arm's three models
+                    by default. The prompt is the main run's, word for word: nothing tells the model to use the tool
+                    beyond the tool's own description. When the model calls it, the script runs in a fresh isolated
+                    interpreter (no inherited environment, a scratch directory, a wall-clock limit, the output
+                    truncated; a static filter refuses file, network, process and introspection access) and the
+                    output goes back as a tool message; the loop ends when a turn carries no tool call, or after
+                    TOOL_MAX_CALLS calls, when one more turn is asked with the tool withheld so the trace ends in an
+                    answer. The row's text is the transcript the scorer reads (every assistant text, each script and
+                    its output in fenced blocks, the final answer); final_text, turns, tool_calls, tool_errors,
+                    tool_refused, tool_limit and tool_turns record the tool use; tokens and the bill are summed over
+                    the turns. `--selftest` exercises the sandbox and the loop offline, for free.
 The dry run estimates a variant from each model's own bills on the same items in the main run; for a reasoning
 variant the main run's visible output understates the bill, so its dry run prices output-token multipliers and
 `--calibrate N` (allowed for this variant) measures the real lengths on N items first.
 
     python -m full_run_28092026.run_traces --variant paraphrase --dry-run          # FREE
     python -m full_run_28092026.run_traces --variant repeat1 --model gemma-4-26b-a4b --dry-run
+    python -m full_run_28092026.run_traces --selftest                              # FREE: the tool arm, offline
+    python -m full_run_28092026.run_traces --variant tool --dry-run                # FREE: multipliers on the main bills
+    python -m full_run_28092026.run_traces --variant tool --calibrate 20 --yes     # BILLS: measured turns and lengths
 """
 from __future__ import annotations
 
@@ -90,9 +105,30 @@ REASONING_EFFORTS = ('low', 'medium', 'high')
 REASONING_VARIANTS = tuple(f'reasoning-{e}' for e in REASONING_EFFORTS)
 REASONING_MODELS = ('gpt-5.4-mini', 'gemini-3.1-flash-lite')     # no reasoning tokens at the provider's default (D-168)
 FLAGSHIP_REASONING = tuple(f'flagship-reasoning-{e}' for e in REASONING_EFFORTS)   # the closed anchor with reasoning on (D-182)
-VARIANTS = ('main', 'paraphrase') + subsamples.REPEAT_VARIANTS + REASONING_VARIANTS + ('flagship', 'openbook') + FLAGSHIP_REASONING
+TOOL = 'tool'                                                                     # C4's tool condition (D-184)
+VARIANTS = ('main', 'paraphrase') + subsamples.REPEAT_VARIANTS + REASONING_VARIANTS + ('flagship', 'openbook') + FLAGSHIP_REASONING + (TOOL,)
 OPENBOOK = HERE / 'openbook'
 OPENBOOK_MODELS = ('claude-sonnet-5', 'gpt-5.4-mini', 'gpt-oss-20b')   # one model from each tier (D-183)
+TOOL_MODELS = OPENBOOK_MODELS               # the tool arm runs the open-book arm's three, for a like-for-like reading (D-184)
+TOOL_MAX_CALLS = 8                          # tool calls per item before the model is asked to answer with the tool withheld
+TOOL_TIMEOUT = 20                           # seconds of wall clock per script
+TOOL_OUTPUT_CHARS = 4000                    # what the model gets back from one script
+PYTHON_TOOL = {'type': 'function', 'function': {
+    'name': 'python',
+    'description': 'Run a Python 3 script for arithmetic and numerical computation (the standard library, numpy, scipy '
+                   'and sympy are available). The script runs in a fresh process each time: print() every value you '
+                   'need to see. No file, network or system access.',
+    'parameters': {'type': 'object',
+                   'properties': {'code': {'type': 'string', 'description': 'The Python source to run.'}},
+                   'required': ['code']}}}
+TOOL_FORBIDDEN = re.compile(r'''(?x)
+    ^\s*(?:import|from)\s+(?:os|sys|subprocess|socket|shutil|pathlib|ctypes|multiprocessing|threading|signal|importlib|
+        urllib|requests|http|ftplib|smtplib|telnetlib|webbrowser|pickle|marshal|builtins|code|pty|resource|tempfile|
+        glob|io|platform|getpass|sqlite3|asyncio|concurrent|xmlrpc|ssl|select|mmap|faulthandler|gc|inspect|site|
+        sysconfig|zipimport|runpy|pkgutil|setuptools|pip|winreg|msvcrt|_thread|codecs|fileinput|shelve|dbm)\b
+  | \b(?:open|exec|eval|compile|__import__|input|breakpoint|globals|locals|vars|getattr|setattr|delattr|memoryview)\s*\(
+  | __(?:builtins|subclasses|class|bases|mro|globals|dict|loader|spec|code|closure)__
+''', re.M)
 DEPLOYED_RUNNER = REPO / 'evaluation' / 'run_inference.py'
 PILOT_PROMPT_PREFIX = 'c2bcb87984c4e50b'   # evaluator_pilot_17092026/models.json: the annotated traces' prompt
 MAX_ATTEMPTS = 4
@@ -144,7 +180,7 @@ def variant_items(variant: str, its: list[dict]) -> list[dict]:
     by_id = {it['item_id']: it for it in its}
     if variant in subsamples.REPEAT_VARIANTS:
         return [by_id[i] for i in subsamples.repeat_ids()]
-    if variant in REASONING_VARIANTS or variant == 'flagship' or variant in FLAGSHIP_REASONING:
+    if variant in REASONING_VARIANTS or variant == 'flagship' or variant in FLAGSHIP_REASONING or variant == TOOL:
         return [by_id[i] for i in subsamples.paraphrase_ids()]       # the originals of the 450-item subsample
     if variant == 'openbook':
         pool, manifest = OPENBOOK / 'items.jsonl', OPENBOOK / 'manifest.jsonl'
@@ -211,6 +247,10 @@ def request_params(spec: dict, cfg: dict, variant: str = 'main') -> dict:
         # OpenRouter's unified reasoning parameter; the provider maps the effort to its own setting. The main run
         # sent nothing here and ran at each provider's default (D-122).
         p['extra_body']['reasoning'] = {'effort': variant.rsplit('-', 1)[1]}
+    if variant == TOOL:
+        # The python tool in the request, the model free to use it or not; everything else as the main run (D-184).
+        p['tools'] = [PYTHON_TOOL]
+        p['tool_choice'] = 'auto'
     return p
 
 
@@ -268,6 +308,154 @@ def call(cli, spec: dict, cfg: dict, question: str, attempts: int = MAX_ATTEMPTS
     return empty_row or {'status': 'service_failure', 'error': last, 'attempts': attempts}
 
 
+def sandbox_env(work: str) -> dict:
+    """The environment a model's script runs in: what Python needs on this OS and nothing of ours (no API key)."""
+    keep = ('SYSTEMROOT', 'SYSTEMDRIVE', 'WINDIR', 'COMSPEC', 'PATHEXT', 'HOME', 'LANG', 'LC_ALL')
+    env = {k: os.environ[k] for k in keep if k in os.environ}
+    env.update({'PATH': str(Path(sys.executable).parent), 'TEMP': work, 'TMP': work, 'TMPDIR': work,
+                'PYTHONIOENCODING': 'utf-8', 'PYTHONHASHSEED': '0', 'PYTHONDONTWRITEBYTECODE': '1', 'MPLBACKEND': 'Agg'})
+    return env
+
+
+def run_python(code: str, timeout: int = TOOL_TIMEOUT) -> dict:
+    """Run one script from the model in a fresh, isolated interpreter (-I: no inherited PYTHON* settings, no user
+    site, no script directory on the path), in a scratch working directory removed afterwards, with a wall-clock
+    limit and the output truncated. A static filter refuses scripts that reach for the file system, the network,
+    processes or introspection; the model sees the refusal as the tool's output and can write the computation
+    another way. The static filter is a guard for a research harness, not a security boundary."""
+    import shutil
+    import subprocess
+    import tempfile
+    t0 = time.time()
+    m = TOOL_FORBIDDEN.search(code or '')
+    if m:
+        return {'ok': False, 'refused': True, 'truncated': False, 'seconds': 0.0,
+                'output': f'ToolError: {m.group(0).strip()!r} is not available in this tool (numerical computation only).'}
+    work = tempfile.mkdtemp(prefix='engtrace_tool_')
+    try:
+        try:
+            r = subprocess.run([sys.executable, '-I', '-c', code], cwd=work, env=sandbox_env(work), capture_output=True,
+                               text=True, encoding='utf-8', errors='replace', timeout=timeout, stdin=subprocess.DEVNULL)
+            out = (r.stdout or '') + (('\n' + r.stderr) if r.stderr else '')
+            ok = r.returncode == 0
+        except subprocess.TimeoutExpired as exc:
+            got = exc.stdout or ''
+            out = (got if isinstance(got, str) else got.decode('utf-8', 'replace')) + \
+                f'\nTimeoutError: the script ran longer than {timeout} s and was stopped.'
+            ok = False
+    finally:
+        shutil.rmtree(work, ignore_errors=True)
+    out = out.strip() or '(no output: print() the values you need)'
+    truncated = len(out) > TOOL_OUTPUT_CHARS
+    if truncated:
+        out = out[:TOOL_OUTPUT_CHARS] + f'\n... [output truncated at {TOOL_OUTPUT_CHARS} characters]'
+    return {'ok': ok, 'refused': False, 'truncated': truncated, 'seconds': round(time.time() - t0, 2), 'output': out}
+
+
+def tool_call_dict(tc) -> dict:
+    if hasattr(tc, 'model_dump'):
+        return tc.model_dump(exclude_none=True)
+    return {'id': getattr(tc, 'id', None), 'type': 'function',
+            'function': {'name': tc.function.name, 'arguments': tc.function.arguments}}
+
+
+def call_with_tool(cli, spec: dict, cfg: dict, question: str, attempts: int = MAX_ATTEMPTS, variant: str = TOOL) -> dict:
+    """The tool arm's loop (C4, D-184). Each model turn is one completion with call()'s retries; when the turn
+    carries tool calls, each script runs and its output goes back as a tool message, and the model is asked again;
+    the loop ends when a turn carries no tool call, or after TOOL_MAX_CALLS calls, when one more turn is asked
+    with tool_choice 'none' so the trace ends in an answer. An empty final turn that did not hit the ceiling is
+    asked again, as in call(). The transcript (every assistant text, each script and its output in fenced
+    blocks, the final answer) is the row's text, what the scorer reads; the last message alone is final_text."""
+    prompt = PROMPT.format(question=question)
+    params = request_params(spec, cfg, variant)
+    messages = [{'role': 'user', 'content': prompt}]
+    parts, log = [], []
+    tot = Counter()
+    served = provider = finish = None
+    msg, extra, text = None, {}, ''
+    calls = attempts_used = empty_retries = 0
+    limit_hit = False
+    last_err = None
+    t_start = time.time()
+    while True:
+        p = dict(params)
+        if calls >= TOOL_MAX_CALLS:
+            p['tool_choice'] = 'none'
+            limit_hit = True
+        r = None
+        for attempt in range(1, attempts + 1):
+            attempts_used += 1
+            try:
+                r = cli.chat.completions.create(model=spec['model'], messages=messages, **p)
+                if r.choices[0].finish_reason == 'error':
+                    raise RuntimeError('provider reported finish_reason=error')
+                break
+            except Exception as exc:                               # noqa: BLE001
+                last_err = f'{type(exc).__name__}: {exc}'[:400]
+                r = None
+                if attempt < attempts:
+                    time.sleep(BACKOFF * (2 ** (attempt - 1)))
+        if r is None:
+            return {'status': 'service_failure', 'error': last_err, 'attempts': attempts_used, 'tool_calls': calls}
+        u = r.usage
+        det = getattr(u, 'completion_tokens_details', None)
+        tot['prompt_tokens'] += getattr(u, 'prompt_tokens', 0) or 0
+        tot['completion_tokens'] += getattr(u, 'completion_tokens', 0) or 0
+        rt = getattr(det, 'reasoning_tokens', None) if det else None
+        if rt is not None:
+            tot['reasoning_tokens'] += rt
+            tot['reasoning_reported'] += 1
+        tot['billed_usd'] += (getattr(u, 'model_extra', None) or {}).get('cost') or 0.0
+        tot['turns'] += 1
+        served = getattr(r, 'model', None) or served
+        provider = (getattr(r, 'model_extra', None) or {}).get('provider') or provider
+        msg = r.choices[0].message
+        extra = getattr(msg, 'model_extra', None) or {}
+        finish = r.choices[0].finish_reason
+        text = msg.content or ''
+        tool_calls = list(getattr(msg, 'tool_calls', None) or [])
+        if text.strip():
+            parts.append(text.strip())
+        if not tool_calls or limit_hit:
+            if not text.strip() and finish != 'length' and empty_retries < attempts - 1:
+                empty_retries += 1                                 # an empty completion is asked again before it counts
+                continue
+            break
+        assistant = {'role': 'assistant', 'content': msg.content or None, 'tool_calls': [tool_call_dict(tc) for tc in tool_calls]}
+        if extra.get('reasoning_details'):
+            assistant['reasoning_details'] = extra['reasoning_details']   # OpenRouter: the reasoning carried across turns
+        messages.append(assistant)
+        for tc in tool_calls:
+            calls += 1
+            fn = getattr(tc, 'function', None)
+            name, raw = getattr(fn, 'name', None), getattr(fn, 'arguments', None) or '{}'
+            if name != 'python':
+                code, res = '', {'ok': False, 'refused': True, 'truncated': False, 'seconds': 0.0,
+                                 'output': f'ToolError: there is no tool named {name!r}; the only tool is python.'}
+            else:
+                try:
+                    code = json.loads(raw).get('code', '') or ''
+                    res = run_python(code)
+                except (json.JSONDecodeError, AttributeError):
+                    code, res = raw, {'ok': False, 'refused': True, 'truncated': False, 'seconds': 0.0,
+                                      'output': 'ToolError: the arguments were not a JSON object like {"code": "..."}.'}
+            log.append({'call': calls, 'code': code, **res})
+            parts.append(f'```python\n{code.strip()}\n```\nOutput:\n```\n{res["output"]}\n```')
+            messages.append({'role': 'tool', 'tool_call_id': getattr(tc, 'id', None) or f'call_{calls}', 'content': res['output']})
+    final_text = text.strip()
+    row = {
+        'text': '\n\n'.join(parts), 'final_text': final_text,
+        'reasoning': getattr(msg, 'reasoning', None) or extra.get('reasoning') or '',
+        'served_model': served, 'provider': provider, 'finish_reason': finish,
+        'prompt_tokens': tot['prompt_tokens'], 'completion_tokens': tot['completion_tokens'],
+        'reasoning_tokens': tot['reasoning_tokens'] if tot['reasoning_reported'] else None,
+        'billed_usd': round(tot['billed_usd'], 6), 'seconds': round(time.time() - t_start, 2), 'attempts': attempts_used,
+        'turns': tot['turns'], 'tool_calls': calls, 'tool_limit': limit_hit,
+        'tool_errors': sum(not t['ok'] for t in log), 'tool_refused': sum(t['refused'] for t in log), 'tool_turns': log,
+    }
+    return {'status': 'answered' if final_text else 'empty', **row}
+
+
 def run_model(spec, todo, cfg, workers, label='run', variant='main'):
     key = spec['key']
     cli = client(cfg)
@@ -276,7 +464,8 @@ def run_model(spec, todo, cfg, workers, label='run', variant='main'):
     n, counts, billed = 0, Counter(), 0.0
     with open(trace_path(key, variant), 'a', encoding='utf-8', newline='\n') as fh, \
             cf.ThreadPoolExecutor(max_workers=workers) as pool:
-        futs = {pool.submit(call, cli, spec, cfg, it['question'], MAX_ATTEMPTS, variant): it for it in todo}
+        fn = call_with_tool if variant == TOOL else call
+        futs = {pool.submit(fn, cli, spec, cfg, it['question'], MAX_ATTEMPTS, variant): it for it in todo}
         for fut in cf.as_completed(futs):
             it = futs[fut]
             res = fut.result()
@@ -438,6 +627,104 @@ def reasoning_dry_run(cfg, its, specs, variant) -> int:
     return 0
 
 
+def tool_dry_run(cfg, its, specs, variant) -> int:
+    """The tool arm's estimate: the main run's bill on the same items, multiplied for the turns the loop adds (each
+    turn resends the conversation, so the prompt side grows with every call and the output is spread over turns).
+    The multipliers bracket an assumption, not a measurement: x1.5 for a model that rarely calls the tool, x2.5
+    for two or three calls per item, x4 for a model that works through the problem in the tool; --calibrate 20
+    measures the real turns and lengths first. Whether each model's endpoints support tools is read from
+    OpenRouter's public catalogue (no key, no call)."""
+    mults = (1.5, 2.5, 4)
+    print(f'variant {variant}: {len(its)} items, {len({i["template_id"] for i in its})} templates; the python tool in the '
+          f'request, tool_choice auto, up to {TOOL_MAX_CALLS} calls per item, {TOOL_TIMEOUT} s per script; traces go to traces/{variant}/')
+    try:
+        cat = catalogue()
+    except Exception as exc:                                       # noqa: BLE001
+        cat = {}
+        print(f'  (OpenRouter catalogue unreachable, {type(exc).__name__}: tool support not checked)')
+    print(f'{"model":22s} {"to run":>7s} {"main $":>8s} {"main out tok":>12s} ' + ' '.join(f'{"x" + str(m) + " $":>8s}' for m in mults) + '  tools in supported_parameters')
+    tot = Counter()
+    for s in specs:
+        todo = [it for it in its if it['item_id'] not in existing(s['key'], variant)]
+        main = existing(s['key'])
+        rows = [main[it['item_id']] for it in todo if it['item_id'] in main]
+        bill = sum(r.get('billed_usd') or 0.0 for r in rows)
+        ct = sum(r.get('completion_tokens') or 0 for r in rows)
+        sup = (cat.get(s['model']) or {}).get('supported_parameters')
+        support = 'unknown' if sup is None else ('yes' if 'tools' in sup else 'NO')
+        for m in mults:
+            tot[m] += bill * m
+        tot['main'] += bill
+        print(f'{s["key"]:22s} {len(todo):7d} {bill:8.3f} {ct // max(len(rows), 1):12d} ' + ' '.join(f'{bill * m:8.2f}' for m in mults) + f'  {support}')
+    print(f'{"TOTAL":22s} {"":7s} {tot["main"]:8.3f} {"":12s} ' + ' '.join(f'{tot[m]:8.2f}' for m in mults))
+    print('\nmain $: what the main run billed on these items. xN $: the same bill multiplied for the turns the tool loop adds; '
+          'an assumption until --calibrate measures it. E5 and the router on the new traces come on top, priced by their own '
+          f'--dry-run on the variant once it exists.\n--calibrate 20 runs 20 items per model first (about ${20 / max(len(its), 1) * tot[2.5]:.2f} '
+          'at x2.5) and replaces the multipliers with measured turns and lengths. Nothing was called.')
+    return 0
+
+
+def tool_selftest() -> int:
+    """FREE. The sandbox (a numeric script, a refused one, a timeout, truncation, the environment without our key)
+    and the loop against a fake client that returns a tool call and then an answer."""
+    from types import SimpleNamespace as NS
+    fails = []
+
+    def check(name, cond):
+        print(f'  {"ok " if cond else "FAIL"} {name}')
+        if not cond:
+            fails.append(name)
+
+    r = run_python('import numpy as np\nimport scipy, sympy\nprint(np.sqrt(16.0), 2 * 3)')
+    check('numpy, scipy and sympy import in the isolated interpreter; output captured', r['ok'] and '4.0 6' in r['output'])
+    r = run_python('import os\nprint(os.listdir("."))')
+    check('os is refused by the filter', r['refused'] and 'ToolError' in r['output'])
+    r = run_python('f = open("x.txt", "w")')
+    check('open() is refused by the filter', r['refused'])
+    r = run_python('print(1/0)')
+    check('a raising script returns ok False with the traceback', (not r['ok']) and 'ZeroDivisionError' in r['output'])
+    r = run_python('while True:\n    pass', timeout=2)
+    check('a runaway script is stopped at the limit', (not r['ok']) and 'TimeoutError' in r['output'])
+    r = run_python('print("x" * 10000)')
+    check('long output is truncated', r['truncated'] and len(r['output']) < 4200)
+    env = sandbox_env('C:/tmp')
+    check('no key, token or secret in the sandbox environment',
+          not any(k for k in env if any(w in k.upper() for w in ('KEY', 'TOKEN', 'SECRET'))) and 'OPENROUTER_API_KEY' not in env)
+
+    class Fake:
+        """Two turns: a tool call computing 2*3, then the answer; records what it was sent."""
+        def __init__(self):
+            self.sent = []
+            self.chat = NS(completions=NS(create=self.create))
+
+        def create(self, model, messages, **kw):
+            self.sent.append((list(messages), kw))
+            usage = NS(prompt_tokens=100, completion_tokens=20, completion_tokens_details=NS(reasoning_tokens=5), model_extra={'cost': 0.001})
+            if len(self.sent) == 1:
+                tc = NS(id='call_1', type='function', function=NS(name='python', arguments='{"code": "print(2*3)"}'))
+                msg = NS(content='Let me compute.', tool_calls=[tc], model_extra={}, reasoning=None)
+            else:
+                msg = NS(content='The product is 6.\n\nFinal answer: 6', tool_calls=None, model_extra={}, reasoning=None)
+            return NS(choices=[NS(message=msg, finish_reason='stop')], usage=usage, model='fake/model', model_extra={'provider': 'Fake'})
+
+    fake = Fake()
+    cfg = {'max_tokens': 1000, 'provider_closed_weight': {'sort': 'price'}, 'provider_open_weight': {'sort': 'price'}}
+    row = call_with_tool(fake, {'key': 'fake', 'model': 'fake/model', 'weights': 'closed'}, cfg, 'What is 2 times 3?')
+    check('the loop ends answered after one tool call and two turns', row['status'] == 'answered' and row['tool_calls'] == 1 and row['turns'] == 2)
+    check('the transcript carries the text, the script, its output and the answer',
+          'Let me compute.' in row['text'] and '```python\nprint(2*3)\n```' in row['text'] and 'Output:\n```\n6\n```' in row['text'] and row['text'].endswith('Final answer: 6'))
+    check('final_text is the last message alone', row['final_text'] == 'The product is 6.\n\nFinal answer: 6')
+    check('tokens and the bill are summed over the turns', row['prompt_tokens'] == 200 and row['completion_tokens'] == 40 and row['reasoning_tokens'] == 10 and abs(row['billed_usd'] - 0.002) < 1e-9)
+    second = fake.sent[1][0]
+    check('the second turn was sent the assistant tool call and the tool result',
+          len(second) == 3 and second[1]['role'] == 'assistant' and second[1]['tool_calls'][0]['function']['name'] == 'python'
+          and second[2] == {'role': 'tool', 'tool_call_id': 'call_1', 'content': '6'})
+    check('the request carried the python tool with tool_choice auto', fake.sent[0][1].get('tools') == [PYTHON_TOOL] and fake.sent[0][1].get('tool_choice') == 'auto')
+    check('the tool arm runs the subsample\'s originals', TOOL in VARIANTS and 'tool' == TOOL)
+    print(f'selftest: {"all pass" if not fails else str(len(fails)) + " FAILED: " + "; ".join(fails)}')
+    return 1 if fails else 0
+
+
 def calibration_sample(its, n):
     """n items per model, spread over the templates in a fixed order: every k-th item."""
     step = max(1, len(its) // n)
@@ -472,7 +759,10 @@ def main() -> int:
     ap.add_argument('--variant', default='main', choices=VARIANTS)
     ap.add_argument('--workers', type=int, default=16)
     ap.add_argument('--yes', action='store_true', help='required for any mode that bills')
+    ap.add_argument('--selftest', action='store_true', help='FREE: the tool arm offline (the sandbox and the loop with a fake client)')
     a = ap.parse_args()
+    if a.selftest:
+        return tool_selftest()
 
     cfg = config()
     # An entry with "run": false is inert (D-148): no mode calls it unless --model names it, and the
@@ -484,8 +774,8 @@ def main() -> int:
     for k, why in inert.items():
         if not a.model or k not in a.model:
             print(f'{k}: inert (run: false): {why}')
-    if a.variant != 'main' and a.variant not in REASONING_VARIANTS and a.variant not in ('flagship',) + FLAGSHIP_REASONING and a.calibrate:
-        raise SystemExit('--calibrate is for the main run, the reasoning variants and the flagship anchor; another variant is estimated from its bills')
+    if a.variant != 'main' and a.variant not in REASONING_VARIANTS and a.variant not in ('flagship', TOOL) + FLAGSHIP_REASONING and a.calibrate:
+        raise SystemExit('--calibrate is for the main run, the reasoning variants, the flagship anchor and the tool arm; another variant is estimated from its bills')
     if a.variant in REASONING_VARIANTS and not a.model:
         specs = [s for s in cfg['models'] if s['key'] in REASONING_MODELS]
     if a.variant == 'flagship':
@@ -498,10 +788,14 @@ def main() -> int:
             raise SystemExit('no closed anchor model in models.json')
     if a.variant == 'openbook' and not a.model:
         specs = [s for s in cfg['models'] if s['key'] in OPENBOOK_MODELS]
+    if a.variant == TOOL and not a.model:
+        specs = [s for s in cfg['models'] if s['key'] in TOOL_MODELS]
     if a.variant in subsamples.REPEAT_VARIANTS and not a.model:
         raise SystemExit('a repeat runs one chosen model: name it with --model')
     its = variant_items(a.variant, items())
     if a.dry_run:
+        if a.variant == TOOL:
+            return tool_dry_run(cfg, its, specs, a.variant)
         if a.variant in ('main', 'flagship'):
             return dry_run(cfg, its, specs, a.variant)
         return reasoning_dry_run(cfg, its, specs, a.variant) if a.variant in REASONING_VARIANTS + FLAGSHIP_REASONING \

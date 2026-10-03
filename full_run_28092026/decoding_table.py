@@ -80,7 +80,21 @@ def one(key: str, cfg: dict, variant: str = 'main') -> dict:
         'reasoning_text_share': sum(bool((r.get('reasoning') or '').strip()) for r in rows) / len(rows) if rows else None,
         'billed_usd': round(sum(r.get('billed_usd') or 0.0 for r in rows), 3),
         'seconds_median': statistics.median([r.get('seconds') or 0.0 for r in rows]) if rows else None,
+        'tool': tool_use(rows),
     }
+
+
+def tool_use(rows: list[dict]) -> dict | None:
+    """The tool arm's use of its tool (D-184), from the rows' tool fields; None for any other arm."""
+    t = [r for r in rows if r.get('tool_calls') is not None]
+    if not t:
+        return None
+    calls = [r['tool_calls'] for r in t]
+    return {'rows': len(t), 'rows_with_calls': sum(c > 0 for c in calls), 'share_with_calls': sum(c > 0 for c in calls) / len(t),
+            'calls_median': statistics.median(calls), 'calls_p90': pctl(calls, 0.9), 'calls_max': max(calls),
+            'turns_median': statistics.median([r.get('turns') or 1 for r in t]),
+            'scripts': sum(calls), 'scripts_failed': sum(r.get('tool_errors') or 0 for r in t),
+            'scripts_refused': sum(r.get('tool_refused') or 0 for r in t), 'limit_rows': sum(bool(r.get('tool_limit')) for r in t)}
 
 
 def table(res: list[dict]) -> list[str]:
@@ -131,14 +145,26 @@ def main() -> int:
         rp = res[0]['reasoning_parameter'] if res else None
         item, dec = (('C1', 'D-179, D-180') if a.variant.startswith('reasoning-') else
                      ('C3', 'D-182') if a.variant.startswith('flagship') else
-                     ('C4', 'D-183') if a.variant == 'openbook' else ('a variant', 'D-141'))
+                     ('C4', 'D-183') if a.variant == 'openbook' else
+                     ('C4', 'D-184') if a.variant == 'tool' else ('a variant', 'D-141'))
         what = (f'the same request as the main run plus the reasoning parameter `{json.dumps(rp)}`' if rp else
+                'the same request as the main run plus the python tool (`tools`, `tool_choice: auto`); tokens and the bill are '
+                'summed over a row' + chr(39) + 's turns' if a.variant == 'tool' else
                 'the same request as the main run, at the provider' + chr(39) + 's default' +
                 (', on the question with the reference equations appended' if a.variant == 'openbook' else ''))
         lines[0] = f'# Decoding settings and token use, the `{a.variant}` arm ({item})'
         lines.insert(2, f'The arm `{a.variant}` ({dec}): {what}; rows are the arm' + chr(39) + 's items only. '
                         'The main run' + chr(39) + 's table is `DECODING_TABLE.md`.')
         lines.insert(3, '')
+    if a.variant == 'tool':
+        lines += ['', '## Tool use', '',
+                  '| model | rows | rows with a tool call | calls per row: median / p90 / max | model turns, median | scripts | failed | refused | rows at the call limit |',
+                  '|---|---:|---:|---|---:|---:|---:|---:|---:|']
+        for r in res:
+            t = r.get('tool')
+            if t:
+                lines.append(f"| `{r['model_key']}` | {t['rows']} | {t['rows_with_calls']} | {t['calls_median']:.0f} / {t['calls_p90']:.0f} / {t['calls_max']} | "
+                             f"{t['turns_median']:.0f} | {t['scripts']} | {t['scripts_failed']} | {t['scripts_refused']} | {t['limit_rows']} |")
     out_md.write_text('\n'.join(lines) + '\n', encoding='utf-8', newline='\n')
     print('\n'.join(lines))
     return 0

@@ -52,7 +52,8 @@
   },
   "reasoning_text_share": 1.0,
   "billed_usd": 0.095,
-  "seconds_median": 25.64
+  "seconds_median": 25.64,
+  "tool": null
  },
  {
   "model_key": "gpt-5.4-mini",
@@ -101,7 +102,8 @@
   },
   "reasoning_text_share": 0.0,
   "billed_usd": 1.494,
-  "seconds_median": 3.35
+  "seconds_median": 3.35,
+  "tool": null
  },
  {
   "model_key": "claude-sonnet-5",
@@ -149,6 +151,7 @@
   },
   "reasoning_text_share": 0.9533799533799534,
   "billed_usd": 10.961,
-  "seconds_median": 13.31
+  "seconds_median": 13.31,
+  "tool": null
  }
 ]

@@ -36,6 +36,21 @@ def rows_of(path: Path) -> dict:
     return {r['item_id']: r for r in map(json.loads, path.read_text(encoding='utf-8').splitlines())} if path.exists() else {}
 
 
+def kappa(pairs, cls=lambda v: v):
+    """Cohen's kappa over a Counter of (base verdict, other verdict) -> count, with `cls` mapping a verdict to the class
+    compared (identity for three-way; REACHED against not for the binary reading). None when chance agreement is 1."""
+    n = sum(pairs.values())
+    if not n:
+        return None
+    po = sum(c for (a, b), c in pairs.items() if cls(a) == cls(b)) / n
+    ma, mb = collections.Counter(), collections.Counter()
+    for (a, b), c in pairs.items():
+        ma[cls(a)] += c
+        mb[cls(b)] += c
+    pe = sum(ma[k] * mb[k] for k in set(ma) | set(mb)) / n ** 2
+    return (po - pe) / (1 - pe) if pe < 1 else None
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument('--judge', default='x-ai/grok-4.6')
@@ -81,6 +96,7 @@ def main() -> int:
         out['models'][key] = {
             'traces': len(common), 'without_reply': no_reply, 'milestones_both_judged': n_ms,
             'agreement_three_way': agree3 / n_ms if n_ms else None, 'agreement_reached_vs_not': agree2 / n_ms if n_ms else None,
+            'kappa_three_way': kappa(pair), 'kappa_reached_vs_not': kappa(pair, lambda v: v == 'REACHED'),
             'reached_share_base': reached['base'] / n_ms if n_ms else None, 'reached_share_other': reached['other'] / n_ms if n_ms else None,
             'pairs': {f'{sb}->{so}': n for (sb, so), n in sorted(pair.items())},
             'e5_strict_base': float(np.mean([base[i]['e5_strict'] for i in common if base[i].get('e5_strict') is not None])),
@@ -95,18 +111,33 @@ def main() -> int:
          f"{out['sample']} sampled traces of the `{a.variant}` store, the same prompts (D-181). Agreement is over the milestones both "
          'judges ruled on; coverage is E5-strict over the sampled traces under each judge, and the difference is the other judge '
          'minus MiMo with a template bootstrap. Which judge is right is not measured here; MiMo\'s validation against the experts is.', '',
-         '| model | traces | milestones both judged | agreement, three-way | agreement, REACHED vs not | REACHED share: MiMo / other | '
-         'E5-strict: MiMo / other | difference | 95% CI, templates |', '|---|---:|---:|---:|---:|---|---|---:|---:|']
+         '| model | traces | milestones both judged | agreement, three-way | agreement, REACHED vs not | kappa, three-way | '
+         'kappa, REACHED vs not | REACHED share: MiMo / other | '
+         'E5-strict: MiMo / other | difference | 95% CI, templates |', '|---|---:|---:|---:|---:|---:|---:|---|---|---:|---:|']
+    fk = lambda v: '-' if v is None else f'{v:.3f}'
     for k, m in out['models'].items():
         ci = m['diff_ci_templates']
         L.append(f"| `{k}` | {m['traces']} | {m['milestones_both_judged']} | {m['agreement_three_way']:.3f} | {m['agreement_reached_vs_not']:.3f} | "
+                 f"{fk(m['kappa_three_way'])} | {fk(m['kappa_reached_vs_not'])} | "
                  f"{m['reached_share_base']:.3f} / {m['reached_share_other']:.3f} | {m['e5_strict_base']:.3f} / {m['e5_strict_other']:.3f} | "
                  f"{m['diff']:+.3f} | " + (f"{ci[0]:+.3f} to {ci[1]:+.3f}" if ci else '-') + ' |')
     pairs = collections.Counter()
     for m in out['models'].values():
         for k, n in m['pairs'].items():
             pairs[k] += n
-    L += ['', 'Verdict pairs over all sampled milestones (MiMo -> other): ' + ', '.join(f'{k} {n}' for k, n in pairs.most_common()) + '.', '']
+    pooled = collections.Counter({tuple(k.split('->')): n for k, n in pairs.items()})
+    out['pooled'] = {'milestones': sum(pooled.values()),
+                     'agreement_three_way': sum(c for (a, b), c in pooled.items() if a == b) / max(1, sum(pooled.values())),
+                     'agreement_reached_vs_not': sum(c for (a, b), c in pooled.items() if (a == 'REACHED') == (b == 'REACHED')) / max(1, sum(pooled.values())),
+                     'kappa_three_way': kappa(pooled), 'kappa_reached_vs_not': kappa(pooled, lambda v: v == 'REACHED')}
+    OUT_JSON.write_text(json.dumps(out, indent=1), encoding='utf-8')
+    pk = out['pooled']
+    L += ['', 'Verdict pairs over all sampled milestones (MiMo -> other): ' + ', '.join(f'{k} {n}' for k, n in pairs.most_common()) + '.', '',
+          f"Pooled over the {pk['milestones']} milestones: agreement {pk['agreement_three_way']:.3f} three-way and "
+          f"{pk['agreement_reached_vs_not']:.3f} on REACHED against not; Cohen's kappa {fk(pk['kappa_three_way'])} and "
+          f"{fk(pk['kappa_reached_vs_not'])}. Kappa is chance-corrected and reads low where one verdict dominates (REACHED shares "
+          'above 0.8 for most models), so the raw agreement and the coverage difference above are the figures that answer the '
+          'question; kappa is given so that a reader can see the prevalence effect rather than suspect it.', '']
     (HERE / 'JUDGE_SWAP.md').write_text('\n'.join(L) + '\n', encoding='utf-8', newline='\n')
     print('\n'.join(L))
     return 0

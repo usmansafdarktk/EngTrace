@@ -10,6 +10,8 @@
    "milestones_both_judged": 53,
    "agreement_three_way": 0.7169811320754716,
    "agreement_reached_vs_not": 0.9433962264150944,
+   "kappa_three_way": 0.5164233576642335,
+   "kappa_reached_vs_not": 0.6959847036328873,
    "reached_share_base": 0.11320754716981132,
    "reached_share_other": 0.09433962264150944,
    "pairs": {
@@ -37,6 +39,8 @@
    "milestones_both_judged": 52,
    "agreement_three_way": 0.6923076923076923,
    "agreement_reached_vs_not": 0.9615384615384616,
+   "kappa_three_way": 0.5011990407673861,
+   "kappa_reached_vs_not": 0.8349206349206351,
    "reached_share_base": 0.1346153846153846,
    "reached_share_other": 0.1346153846153846,
    "pairs": {
@@ -63,6 +67,8 @@
    "milestones_both_judged": 41,
    "agreement_three_way": 0.926829268292683,
    "agreement_reached_vs_not": 0.975609756097561,
+   "kappa_three_way": 0.8250355618776672,
+   "kappa_reached_vs_not": 0.9360374414976599,
    "reached_share_base": 0.2682926829268293,
    "reached_share_other": 0.24390243902439024,
    "pairs": {
@@ -86,6 +92,8 @@
    "milestones_both_judged": 41,
    "agreement_three_way": 0.9024390243902439,
    "agreement_reached_vs_not": 0.975609756097561,
+   "kappa_three_way": 0.8502283105022831,
+   "kappa_reached_vs_not": 0.9315525876460767,
    "reached_share_base": 0.21951219512195122,
    "reached_share_other": 0.24390243902439024,
    "pairs": {
@@ -110,6 +118,8 @@
    "milestones_both_judged": 39,
    "agreement_three_way": 0.8974358974358975,
    "agreement_reached_vs_not": 0.9487179487179487,
+   "kappa_three_way": 0.7815126050420168,
+   "kappa_reached_vs_not": 0.8433734939759034,
    "reached_share_base": 0.1794871794871795,
    "reached_share_other": 0.23076923076923078,
    "pairs": {
@@ -135,6 +145,8 @@
    "milestones_both_judged": 34,
    "agreement_three_way": 0.7058823529411765,
    "agreement_reached_vs_not": 0.7352941176470589,
+   "kappa_three_way": 0.4761171032357474,
+   "kappa_reached_vs_not": 0.31390134529148,
    "reached_share_base": 0.3235294117647059,
    "reached_share_other": 0.17647058823529413,
    "pairs": {
@@ -159,6 +171,8 @@
    "milestones_both_judged": 44,
    "agreement_three_way": 0.8636363636363636,
    "agreement_reached_vs_not": 0.9090909090909091,
+   "kappa_three_way": 0.7441860465116279,
+   "kappa_reached_vs_not": 0.7981651376146789,
    "reached_share_base": 0.3181818181818182,
    "reached_share_other": 0.36363636363636365,
    "pairs": {
@@ -185,6 +199,8 @@
    "milestones_both_judged": 41,
    "agreement_three_way": 0.7804878048780488,
    "agreement_reached_vs_not": 0.8292682926829268,
+   "kappa_three_way": 0.5881696428571429,
+   "kappa_reached_vs_not": 0.6137281292059218,
    "reached_share_base": 0.3170731707317073,
    "reached_share_other": 0.34146341463414637,
    "pairs": {
@@ -211,6 +227,8 @@
    "milestones_both_judged": 47,
    "agreement_three_way": 0.8297872340425532,
    "agreement_reached_vs_not": 1.0,
+   "kappa_three_way": 0.7020602218700476,
+   "kappa_reached_vs_not": 1.0,
    "reached_share_base": 0.0851063829787234,
    "reached_share_other": 0.0851063829787234,
    "pairs": {
@@ -235,6 +253,8 @@
    "milestones_both_judged": 39,
    "agreement_three_way": 0.8974358974358975,
    "agreement_reached_vs_not": 0.9743589743589743,
+   "kappa_three_way": 0.8300653594771242,
+   "kappa_reached_vs_not": 0.9248554913294798,
    "reached_share_base": 0.23076923076923078,
    "reached_share_other": 0.20512820512820512,
    "pairs": {
@@ -260,6 +280,8 @@
    "milestones_both_judged": 35,
    "agreement_three_way": 0.8,
    "agreement_reached_vs_not": 0.9428571428571428,
+   "kappa_three_way": 0.5270270270270271,
+   "kappa_reached_vs_not": 0.7999999999999999,
    "reached_share_base": 0.14285714285714285,
    "reached_share_other": 0.2,
    "pairs": {
@@ -278,5 +300,12 @@
    ],
    "templates": 16
   }
+ },
+ "pooled": {
+  "milestones": 466,
+  "agreement_three_way": 0.8154506437768241,
+  "agreement_reached_vs_not": 0.9313304721030042,
+  "kappa_three_way": 0.6928806805119168,
+  "kappa_reached_vs_not": 0.7900900900900899
  }
 }

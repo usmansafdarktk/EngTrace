@@ -65,7 +65,7 @@ def variant_manifest(variant: str, man: dict) -> dict[str, dict]:
     from full_run_28092026 import subsamples
     if variant in subsamples.REPEAT_VARIANTS:
         return {i: man[i] for i in subsamples.repeat_ids()}
-    if variant.startswith('reasoning-') or variant.startswith('flagship'):     # C1, C3: the originals of the 450-item subsample
+    if variant.startswith('reasoning-') or variant.startswith('flagship') or variant == 'tool':   # C1, C3, C4 tool: the subsample's originals
         return {i: man[i] for i in subsamples.paraphrase_ids()}
     if variant == 'openbook':                            # C4: the modified questions, by their manifest
         p = HERE / 'openbook' / 'manifest.jsonl'
@@ -128,7 +128,18 @@ def review_model(key: str, man: dict, variant: str = 'main', main_served: dict |
             think.append(r)
     toks = [r.get('completion_tokens') or 0 for r in rows]
     billed = sum(r.get('billed_usd') or 0.0 for r in rows)
+    tool_rows = [r for r in rows if r.get('tool_calls') is not None]        # the tool arm (D-184)
+    tool = None
+    if tool_rows:
+        calls = [r['tool_calls'] for r in tool_rows]
+        tool = {'rows': len(tool_rows), 'rows_with_calls': sum(c > 0 for c in calls),
+                'calls_median': statistics.median(calls), 'calls_max': max(calls),
+                'turns_median': statistics.median([r.get('turns') or 1 for r in tool_rows]),
+                'scripts': sum(calls), 'scripts_failed': sum(r.get('tool_errors') or 0 for r in tool_rows),
+                'scripts_refused': sum(r.get('tool_refused') or 0 for r in tool_rows),
+                'limit_rows': sum(bool(r.get('tool_limit')) for r in tool_rows)}
     return {
+        'tool': tool,
         'key': key, 'lines': lines, 'malformed': malformed, 'states_all_rows': dict(states),
         'items': len(final), 'items_missing': sorted(set(man) - set(final)),
         'items_with_two_final_rows': sum(1 for v in done_rows.values() if v > 1),
@@ -224,6 +235,17 @@ def main() -> int:
         L.append(f"| `{r['key']}` | {r['capped_with_text']} | {r['no_answer_marker']} | "
                  f"{r['no_marker_no_number']} | {r['think_in_text']} | "
                  f"{r['output_tokens_median']:.0f} / {r['output_tokens_max']} |")
+    if any(r.get('tool') for r in res):
+        L += ['', '## Tool use (the `tool` arm, D-184)', '',
+              'Rows are the final row per item; a script is one tool call; "refused" is the static filter, "failed" a script that '
+              'raised or ran out of time; a row at the call limit was asked to answer with the tool withheld.', '',
+              '| model | rows | rows with a tool call | calls per row, median / max | model turns, median | scripts | failed | refused | rows at the call limit |',
+              '|---|---:|---:|---:|---:|---:|---:|---:|---:|']
+        for r in res:
+            t = r.get('tool')
+            if t:
+                L.append(f"| `{r['key']}` | {t['rows']} | {t['rows_with_calls']} | {t['calls_median']:.0f} / {t['calls_max']} | "
+                         f"{t['turns_median']:.0f} | {t['scripts']} | {t['scripts_failed']} | {t['scripts_refused']} | {t['limit_rows']} |")
     tot = collections.Counter()
     hit = collections.Counter()
     for r in roster:

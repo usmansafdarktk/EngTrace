@@ -788,42 +788,55 @@ def q5(main, para, keys, keep=None, e5_main=None, e5_para=None):
 
 
 def reasoning_arms(main, e5_main, keys) -> list[dict]:
-    """C1 (D-179/D-180): every scores/reasoning-<effort>/ store, each model in it against the main run on the same
-    items, with paired() as Q5 uses it. Holm runs over the models within an arm."""
+    """The paired arms (C1 D-180, C4 D-183 and D-184, and the anchor's reasoning arm of C3 D-182): every
+    scores/reasoning-<effort>/, scores/openbook/ and scores/tool/ store against the main run on the same items, and
+    every scores/flagship-reasoning-<effort>/ store against the flagship arm (the same anchor at the provider's
+    default); each model with paired() as Q5 uses it, McNemar on the fully-solved verdict, the level means on the
+    items (descriptive), the digit rule's and the router's flag rates on fully solved traces, and the tool arm's use
+    of its tool. Holm runs over the models within an arm."""
     out = []
-    arms = sorted(p.name for p in SCORES.glob('reasoning-*') if p.is_dir()) + \
-        sorted(p.name for p in SCORES.glob('openbook') if p.is_dir())
+    arms = [q.name for pat in ('reasoning-*', 'openbook', 'tool', 'flagship-reasoning-*')
+            for q in sorted(SCORES.glob(pat)) if q.is_dir()]
     for arm in arms:
+        base = 'flagship' if arm.startswith('flagship-reasoning-') else 'main'
+        arm_keys = list(keys) if base == 'main' else [f.stem for f in sorted((SCORES / arm).glob('*.jsonl'))]
         rows = []
-        for i, k in enumerate(keys):
+        for i, k in enumerate(arm_keys):
             var = load(arm, k)
-            if not var:
+            ref = main.get(k) if base == 'main' else load(base, k)
+            if not var or not ref:
                 continue
-            ids = sorted(set(var) & set(main[k]))
-            row = {'arm': arm, 'model': k, **paired(main[k], var, ids, lambda r: r['score'], 9700 + i)}
-            row['main_score_on_items'] = float(np.mean([main[k][x]['score'] for x in ids]))
+            e5_ref = (e5_main or {}).get(k) if base == 'main' else load_stage('e5', k, base)
+            ids = sorted(set(var) & set(ref))
+            row = {'arm': arm, 'base': base, 'model': k, **paired(ref, var, ids, lambda r: r['score'], 9700 + i)}
+            row['main_score_on_items'] = float(np.mean([ref[x]['score'] for x in ids]))
             row['arm_score'] = float(np.mean([var[x]['score'] for x in ids]))
             row['arm_unusable'] = int(sum(var[x]['unusable'] for x in ids))
-            row['main_unusable_on_items'] = int(sum(main[k][x]['unusable'] for x in ids))
-            row['fully'] = paired(main[k], var, ids, fully, 9750 + i)
-            ms_ids = [x for x in ids if main[k][x]['e3']['coverage'] is not None and var[x]['e3']['coverage'] is not None]
-            row['e3'] = paired(main[k], var, ms_ids, lambda r: r['e3']['coverage'], 9800 + i) if ms_ids else None
+            row['main_unusable_on_items'] = int(sum(ref[x]['unusable'] for x in ids))
+            row['fully'] = paired(ref, var, ids, fully, 9750 + i)
+            row['mcnemar_p'] = mcnemar_p(np.array([fully(var[x]) for x in ids]), np.array([fully(ref[x]) for x in ids]))
+            row['levels'] = {lv: {'main': float(np.mean([ref[x]['score'] for x in ids if ref[x]['level'] == lv])),
+                                  'arm': float(np.mean([var[x]['score'] for x in ids if var[x]['level'] == lv])),
+                                  'items': int(sum(ref[x]['level'] == lv for x in ids))}
+                             for lv in LEVELS if any(ref[x]['level'] == lv for x in ids)}
+            ms_ids = [x for x in ids if ref[x]['e3']['coverage'] is not None and var[x]['e3']['coverage'] is not None]
+            row['e3'] = paired(ref, var, ms_ids, lambda r: r['e3']['coverage'], 9800 + i) if ms_ids else None
             e5v = load_stage('e5', k, arm)
             row['e5'] = None
-            if e5_main and e5_main.get(k) and e5v:
-                e5_ids = [x for x in ms_ids if e5_main[k].get(x, {}).get('e5_strict') is not None
+            if e5_ref and e5v:
+                e5_ids = [x for x in ms_ids if e5_ref.get(x, {}).get('e5_strict') is not None
                           and e5v.get(x, {}).get('e5_strict') is not None
-                          and e5_main[k][x]['reply_ok'] is not False and e5v[x]['reply_ok'] is not False]
-                m5 = {x: {'template_id': main[k][x]['template_id'], 'v': e5_main[k][x]['e5_strict']} for x in e5_ids}
-                p5 = {x: {'template_id': main[k][x]['template_id'], 'v': e5v[x]['e5_strict']} for x in e5_ids}
+                          and e5_ref[x]['reply_ok'] is not False and e5v[x]['reply_ok'] is not False]
+                m5 = {x: {'template_id': ref[x]['template_id'], 'v': e5_ref[x]['e5_strict']} for x in e5_ids}
+                p5 = {x: {'template_id': ref[x]['template_id'], 'v': e5v[x]['e5_strict']} for x in e5_ids}
                 row['e5'] = paired(m5, p5, e5_ids, lambda r: r['v'], 9850 + i) if e5_ids else None
-            solved_main = [x for x in ids if fully(main[k][x]) == 1]
+            solved_main = [x for x in ids if fully(ref[x]) == 1]
             solved_arm = [x for x in ids if fully(var[x]) == 1]
             row['digit_flag_rate_fully_solved'] = {
-                'main': float(np.mean([flagged(main[k][x]) for x in solved_main])) if solved_main else None,
+                'main': float(np.mean([flagged(ref[x]) for x in solved_main])) if solved_main else None,
                 'arm': float(np.mean([flagged(var[x]) for x in solved_arm])) if solved_arm else None}
-            row['router_judge_fully_solved'] = None          # where the router ran on the arm (C1): its judge flags
-            r_main, r_arm = load_stage('router', k, 'main'), load_stage('router', k, arm)
+            row['router_judge_fully_solved'] = None          # where the router ran on both arms (C1): its judge flags
+            r_main, r_arm = load_stage('router', k, base), load_stage('router', k, arm)
             if r_main and r_arm:
                 ok = lambda d, x: x in d and d[x]['reply_ok'] is not False
                 sm, sa = [x for x in solved_main if ok(r_main, x)], [x for x in solved_arm if ok(r_arm, x)]
@@ -831,6 +844,17 @@ def reasoning_arms(main, e5_main, keys) -> list[dict]:
                     'main': float(np.mean([bool(r_main[x]['judge_flagged']) for x in sm])) if sm else None,
                     'arm': float(np.mean([bool(r_arm[x]['judge_flagged']) for x in sa])) if sa else None,
                     'n_main': len(sm), 'n_arm': len(sa)}
+            calls = [var[x].get('tool_calls') for x in ids]
+            row['tool_use'] = None
+            if any(c is not None for c in calls):            # the tool arm (D-184)
+                calls = [c or 0 for c in calls]
+                with_c = [var[x]['score'] for x in ids if (var[x].get('tool_calls') or 0) > 0]
+                without = [var[x]['score'] for x in ids if not var[x].get('tool_calls')]
+                row['tool_use'] = {'share_with_calls': float(np.mean([c > 0 for c in calls])),
+                                   'calls_per_trace': float(np.mean(calls)),
+                                   'limit_rows': int(sum(bool(var[x].get('tool_limit')) for x in ids)),
+                                   'score_with_calls': float(np.mean(with_c)) if with_c else None,
+                                   'score_without_calls': float(np.mean(without)) if without else None}
             rows.append(row)
         for o, ph in zip(rows, holm([o['p'] for o in rows]) if rows else []):
             o['p_holm'] = ph
@@ -1487,28 +1511,44 @@ def render(res) -> str:
         L.append('Not run yet.')
     arms = res.get('reasoning_arms') or []
     if arms:
-        L += ['', '## C1 and C4. Arms run on the same items against the main run: reasoning on, and open book', '',
-              '*Exploratory; added 2026-10-03 (D-179, D-180, D-183).* Each arm keeps the main run\'s prompt, ceiling, routing and '
-              'scoring on the originals of the 450-item subsample (three per template) and changes one thing. '
-              '`reasoning-<effort>`: OpenRouter\'s reasoning parameter at that effort, for the closed models whose endpoints '
-              'reported no reasoning tokens at the provider\'s default. `openbook`: the template\'s governing equations appended '
-              'to the question (`openbook.py`; 429 items, the seven templates without a symbolic equation left out), for one '
-              'model from each tier. Arm minus the main run, paired by item, with Q5\'s machinery: the item mean, a template '
-              'bootstrap, a sign-flip test over templates with Holm across the models in the arm, and the smallest paired '
-              'difference the arm detects at 80% power. The main run\'s scores remain the headline; an arm says what the '
-              'change cost or bought.', '',
-              '| arm | model | items | main run on these items | arm | change | 95% CI | p (Holm) | detectable | '
-              'fully solved change | E3 coverage change | 95% CI | E5-strict change | 95% CI | unusable, main / arm | '
-              'digit flags on fully solved, main / arm | router judge flags on fully solved, main / arm |',
-              '|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|']
+        L += ['', '## C1 and C4. Arms run on the same items against a base run: reasoning on, open book, and the tool', '',
+              '*Exploratory; added 2026-10-03 (D-179, D-180, D-182, D-183, D-184).* Each arm keeps the base run\'s prompt, '
+              'ceiling, routing and scoring on the originals of the 450-item subsample (three per template) and changes one '
+              'thing. `reasoning-<effort>`: OpenRouter\'s reasoning parameter at that effort, for the closed roster models whose '
+              'endpoints reported no reasoning tokens at the provider\'s default (base: the main run). `openbook`: the '
+              'template\'s governing equations appended to the question (`openbook.py`; 429 items, the seven templates without '
+              'a symbolic equation left out), for one model from each tier (base: the main run). `tool`: a Python tool offered '
+              'in the request, the model\'s scripts run in an isolated interpreter and their output returned (`run_traces.py`, '
+              'D-184), for the same three (base: the main run; the tool-use columns say how much it was used). '
+              '`flagship-reasoning-<effort>`: the closed anchor of C3 with the parameter, against the `flagship` arm, the same '
+              'anchor at the provider\'s default. Arm minus base, paired by item, with Q5\'s machinery: the item mean, a '
+              'template bootstrap, a sign-flip test over templates with Holm across the models in the arm, the smallest paired '
+              'difference the arm detects at 80% power, and McNemar on the fully-solved verdict; the level means are '
+              'descriptive. The base run\'s scores remain the headline; an arm says what the change cost or bought.', '',
+              '| arm | model | items | base on these items | arm | change | 95% CI | p (Holm) | detectable | '
+              'fully solved change | McNemar p | by level, base to arm: Easy / Intermediate / Advanced | E3 coverage change | '
+              '95% CI | E5-strict change | 95% CI | unusable, base / arm | digit flags on fully solved, base / arm | '
+              'router judge flags on fully solved, base / arm | tool use: share of traces, calls per trace |',
+              '|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|---:|---|---|---|---|']
         for r in arms:
             e3c, e5c, dfr = r.get('e3'), r.get('e5'), r['digit_flag_rate_fully_solved']
-            L.append(f"| {r['arm']} | `{r['model']}` | {r['items']} | {r['main_score_on_items']:.3f} | {r['arm_score']:.3f} | "
+            lv = r.get('levels') or {}
+            by_level = ' / '.join(f"{lv[l]['main']:.3f} to {lv[l]['arm']:.3f}" if l in lv else '-' for l in LEVELS)
+            tu = r.get('tool_use')
+            arm_cell = r['arm'] if r.get('base', 'main') == 'main' else f"{r['arm']} vs {r['base']}"
+            L.append(f"| {arm_cell} | `{r['model']}` | {r['items']} | {r['main_score_on_items']:.3f} | {r['arm_score']:.3f} | "
                      f"{r['diff']:+.3f} | {ci(r['ci'])} | {r['p_holm']:.4f} | {f3(r.get('detectable'))} | {r['fully']['diff']:+.3f} | "
+                     f"{r['mcnemar_p']:.4f} | {by_level} | "
                      + (f"{e3c['diff']:+.3f} | {ci(e3c['ci'])}" if e3c else ' | ') + ' | '
                      + (f"{e5c['diff']:+.3f} | {ci(e5c['ci'])}" if e5c else 'pending | ') + ' | '
                      f"{r['main_unusable_on_items']} / {r['arm_unusable']} | {f3(dfr['main'])} / {f3(dfr['arm'])} | "
-                     + (f"{f3(rj['main'])} / {f3(rj['arm'])}" if (rj := r.get('router_judge_fully_solved')) else 'not run') + ' |')
+                     + (f"{f3(rj['main'])} / {f3(rj['arm'])}" if (rj := r.get('router_judge_fully_solved')) else 'not run') + ' | '
+                     + (f"{tu['share_with_calls']:.2f}, {tu['calls_per_trace']:.1f}" if tu else '') + ' |')
+        if any(r.get('tool_use') for r in arms):
+            L += ['', 'Tool arm, the answer score by whether the trace called the tool (descriptive: whether to call it is the '
+                  'model\'s choice and depends on the item): ' + '; '.join(
+                      f"`{r['model']}` with calls {f3(r['tool_use']['score_with_calls'])}, without {f3(r['tool_use']['score_without_calls'])}, "
+                      f"{r['tool_use']['limit_rows']} traces at the call limit" for r in arms if r.get('tool_use')) + '.']
     for anc in res.get('anchors') or []:
         L += ['', f"## C3. Flagship anchors on the {anc['items']}-item subsample: `{anc['arm']}`", '',
               '*Exploratory; added 2026-10-03 (D-182).* Flagships that pass the roster rule (neither a pilot generator nor a '
