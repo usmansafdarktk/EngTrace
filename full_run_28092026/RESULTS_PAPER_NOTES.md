@@ -265,12 +265,12 @@ the main run's figures stay the headline and the arms are reported beside them, 
 
 | what | value | source |
 |---|---|---|
-| reasoning on, for the two closed models that ran without it (C1) | GPT-5.4 mini 0.858 to 0.951 at medium effort (+0.093, 95% CI 0.056 to 0.133, Holm p < 0.0001, detectable 0.055); Gemini 3.1 Flash-Lite 0.874 to 0.890 (+0.016, −0.010 to 0.042, p 0.30, detectable 0.038). GPT-5.4 mini's gain holds in E5-strict coverage (+0.061, 0.034 to 0.090), is largest on Advanced items (0.750 to 0.917) and its digit and router flag rates on solved traces roughly halve (0.127 to 0.069; 0.232 to 0.135); Gemini's measures all sit inside the noise (McNemar 0.36) | "C1 and C4" |
-| a second judge (C2) | Grok 4.6 on E5's prompts for 220 traces: REACHED agreement 0.83 to 1.00 for ten models, 0.74 for GLM-5.3 (34 milestones); E5-strict coverage differs by −0.017 to +0.020 per model, every interval narrower than Q3's; Cohen's kappa pooled 0.69 three-way and 0.79 on REACHED against not; on the planted set 22 of 60 conceptual defects (0.367; MiMo 0.308), 52 of 60 arithmetic, no false alarm on 120 untouched steps | `JUDGE_SWAP.md`; RESULTS_X1 Finding 8 |
-| flagship anchors on the subsample (C3) | GPT-5.4 0.941 (0.909 to 0.969) at the provider's default with no reasoning tokens, 0.980 (0.964 to 0.993) at medium reasoning; DeepSeek V4 Pro 0.968 (0.950 to 0.983); the roster's eleven on the same items 0.826 to 0.976, the top five 0.964 to 0.976; E5-strict coverage 0.892, 0.906 and 0.911 against the roster's 0.830 to 0.925; GPT-5.4's reasoning arm against its default arm, paired: +0.039 (0.016 to 0.067), fully solved +0.040 (McNemar 0.0001), digit flags on solved traces 0.119 to 0.032 | the two "C3" blocks; the anchor row of "C1 and C4" |
-| open book (C4) | with the governing equations appended, on 429 items: Claude Sonnet 5 +0.005 (−0.010 to 0.021), GPT-5.4 mini −0.007 (−0.034 to 0.021), gpt-oss-20b +0.041 (0.003 to 0.078, Holm p 0.13); no answer-score change holds after Holm, and gpt-oss-20b's fully-solved rise (+0.047, McNemar p 0.014 unadjusted) is the one change a test supports; E5-strict coverage up by +0.032, +0.032 and +0.061 | "C1 and C4" |
+| reasoning on, for the two closed models that ran without it (C1) | GPT-5.4 mini 0.858 to 0.951 at medium effort (+0.093, 95% CI 0.056 to 0.133, Holm p < 0.0001, detectable 0.055); Gemini 3.1 Flash-Lite 0.874 to 0.890 (+0.016, −0.010 to 0.042, p 0.30, detectable 0.038). GPT-5.4 mini's gain holds in E5-strict coverage (+0.061, 0.034 to 0.090), has its largest point change on Advanced items (+0.167, 0.069 to 0.279, against +0.060 and +0.083 on Easy and Intermediate, intervals overlapping), and its digit and router flag rates on its own solved traces are lower (0.127 against 0.069; 0.232 against 0.135; unpaired, descriptive); Gemini's measures all sit inside the noise and its 90% interval (−0.007 to 0.038) is inside the ±0.05 equivalence margin | "C1 and C4" |
+| a second judge (C2) | Grok 4.6 on E5's prompts for 220 traces (20 per model over 14 to 19 templates): REACHED agreement 0.83 to 1.00 for ten models, 0.74 for GLM-5.3 (34 milestones); Cohen's kappa pooled 0.69 three-way and 0.79 on REACHED against not; E5-strict coverage differs by −0.017 to +0.020 per model, every interval including zero and of the order of Q3's own (narrower for six models, wider for five); on the planted set 22 of 60 conceptual defects (0.367) against MiMo's 16 of 52 (0.308; Wilson intervals 0.26 to 0.49 and 0.20 to 0.44), 52 of 60 arithmetic, no false alarm on 120 untouched steps. The sample does not test Q3's 55 pairwise differences | `JUDGE_SWAP.md`; RESULTS_X1 Finding 8 |
+| flagship anchors on the subsample (C3) | GPT-5.4 0.941 (0.909 to 0.969) at the provider's default with no reasoning tokens, 0.980 (0.964 to 0.993) at medium reasoning; DeepSeek V4 Pro 0.968 (0.950 to 0.983); the roster's eleven on the same items 0.826 to 0.976, the top five 0.964 to 0.976 (the default arm below all five, level with GLM-5.3 at 0.952; the other two inside the top five's intervals); E5-strict coverage 0.892, 0.906 and 0.911 against the roster's 0.830 to 0.925; GPT-5.4's reasoning arm against its default arm, paired: +0.039 (0.016 to 0.067), fully solved +0.040 (template-level p 0.002), digit flags on its own solved traces 0.119 against 0.032 (unpaired) | the two "C3" blocks; the anchor row of "C1 and C4" |
+| open book (C4), as run | with the version-1 equation blocks appended, on 429 items: Claude Sonnet 5 +0.005 (−0.010 to 0.021), GPT-5.4 mini −0.007 (−0.034 to 0.021), gpt-oss-20b +0.041 (0.003 to 0.078, Holm p 0.13; +0.019 on the 413 items usable in both arms); no answer-score change holds after Holm at the template level; E5-strict coverage up by +0.032, +0.032 and +0.061. The review of D-183 found the blocks defective (notes passed the filter, two equations were lost, three templates' blocks carried an answer or another instance's statement); the corrected arm (`openbook2`) awaits approval, and until it runs the paper states the arm as run with the defects or leaves it out | "C1 and C4"; D-183 |
 | settings and tokens per arm | GPT-5.4 mini median reasoning tokens 3,464 and Gemini 3.1 Flash-Lite 1,333 under the parameter against zero in the main run; GPT-5.4 zero at the default and 440 at medium; DeepSeek V4 Pro reasons at its default (median 1,836, four rows at the ceiling) | `DECODING_TABLE_<arm>.md` |
-| cost | the four conditions billed about $53 (C1 $9.77, C2 $10.53, C3 $17.54 in rows, C4 $12.55 in rows, E5 on the C3 and C4 arms $2.99), the round about $588 | D-180 to D-183 |
+| cost | the four conditions billed about $48 (C1 $9.77, C2 $5.31, C3 $17.54 in rows, C4 $12.55 in rows, E5 on the C3 and C4 arms $2.99), the round about $583 | D-180 to D-183 |
 | the tool condition (C4) | built as `--variant tool` and priced ($20 to $54 by assumption, calibration about $1.50), not run; if run, the digit rule's flag rate under the tool is the measurement and the paired block carries it | D-184 |
 
 ### What to state
@@ -279,18 +279,22 @@ the main run's figures stay the headline and the arms are reported beside them, 
    paragraph), add that reasoning at medium effort moves GPT-5.4 mini by nine points on the subsample and Gemini 3.1
    Flash-Lite by less than the design detects. The main run's scores remain in Table 1 as what the providers'
    defaults produced; no sentence reads them as those models' ceiling.
-2. **The flagship sentence, for the saturation finding.** Two flagships that pass the roster rule, run on the
-   450-item subsample with the same stack, score inside the roster's top tier, so the pool's ceiling is reached by
-   the mid-tier models of September 2026 and the benchmark's discrimination lies below the top. Give the three
-   figures with intervals in an appendix table beside the roster on the same items; no test against them.
-3. **The judge swap, in the evaluator section.** One sentence, as D-181 words it: a second judge from a third family
-   reproduces MiMo's milestone verdicts within the reported intervals on a 220-trace sample and catches 37% of the
-   planted conceptual defects against MiMo's 31%; the single-judge design is a cost choice, not a sensitivity.
-4. **The open-book bound, for the retrieval objection.** With the governing equations supplied, the answer score
-   moves by less than the design detects for the two closed models and by four points, not significant after
-   correction, for gpt-oss-20b, while stated coverage rises; the remaining errors are in setting up, substituting
-   and computing, not in recalling the method. Say what the condition supplies (equations, no data tables) so the
-   bound is read as a bound on formula recall.
+2. **The flagship sentence.** Two flagships that pass the roster rule, run on the 450-item subsample with the same
+   stack, do not exceed the roster's top tier: DeepSeek V4 Pro and GPT-5.4 with reasoning on sit inside the top five's
+   intervals, GPT-5.4 at its default below them. Say that the roster has no flagship by a budget choice within the rule,
+   that the flagships the reviewers named are excluded by the rule (pilot generators or judges), and that one anchor's
+   default wrote no reasoning tokens. Give the three figures with intervals in an appendix table beside the roster on the
+   same items; no test against them; no "solved at the top" sentence without the Advanced means beside it (0.87 to 0.95
+   for the anchors, 0.92 to 0.95 for the top five, with wide intervals).
+3. **The judge swap, in the evaluator section.** One sentence: on a 220-trace sample a second judge from a third family
+   moves no model's coverage figure beyond its interval (differences −0.017 to +0.020) and catches 22 of 60 planted
+   conceptual defects against MiMo's 16 of 52, with overlapping intervals; the sample does not test Q3's pairwise
+   differences, so the sentence is about the per-model figures only.
+4. **The open-book condition, for the retrieval objection: measured, not a bound, until the corrected arm runs.** As
+   run, supplying the version-1 equation blocks changed the answer score by +0.005, −0.007 and +0.041 (none holding after
+   Holm) while stated coverage rose by 0.03 to 0.06; the blocks had the defects D-183 records. If the corrected arm
+   (`openbook2`) is run, its rows of `RESULTS.md` replace these figures and the equivalence column says whether the change
+   is bounded inside ±0.05. Where the remaining errors lie needs an error reading of the arm's traces, not done.
 5. **Power beside every null**, as for section A: the arms' detectable column sits in the same table.
 
 ### What not to state
@@ -303,14 +307,21 @@ the main run's figures stay the headline and the arms are reported beside them, 
   carry is that it lies inside the top tier's intervals.
 - Not "retrieval would not help": the open-book condition supplies equations only; it bounds formula recall, not
   property lookups, and the tool condition was not run.
-- Not "open book changes nothing for gpt-oss-20b": its fully-solved rate rises by 0.047 (McNemar p 0.014) while the
-  answer score's change does not survive Holm; say both, with the interval.
-- Not the level means as tested differences: 150 items per level, descriptive; the one reading they support is that
-  reasoning on helps most on Advanced items for both GPT-5.4 and GPT-5.4 mini.
+- Not "open book changes nothing for gpt-oss-20b": its fully-solved rate rises by 0.047 (template-level p 0.030, 0.089
+  after Holm; McNemar 0.014) and its 90% interval is not inside the ±0.05 margin, while the answer score's change does
+  not survive Holm; say both, with the interval and with the defects of the arm as run.
+- Not the level means as tested differences: 174, 174 and 102 items per level on the subsample (58, 58 and 34 templates);
+  the per-level change intervals overlap, so "helps most on Advanced items" is a point-estimate reading only.
 - Not the arms' coverage rise as better reasoning: coverage credits stated intermediates, and the handed equations
   prompt the traces to state them.
 - Not "the judge is validated" from C2 alone: it is agreement within intervals on a sample and a planted recall of
   0.367 against 0.308; the pilot's expert validation remains the ground.
+- Not "no flagship by construction": the roster rule admits GPT-5.4 and DeepSeek V4 Pro; their absence from the roster
+  was a budget choice.
+- Not "the errors that remain are in setting up, substituting and computing": C4 measured a score change, not where the
+  errors lie.
+- Not the open-book arm as run as a bound on formula retrieval: its blocks carried notes and, for three templates, an
+  answer or another instance's statement (D-183).
 
 ### Suggested wording
 
@@ -319,17 +330,16 @@ the main run's figures stay the headline and the arms are reported beside them, 
 mini from 0.858 to 0.951 (95% CI of the change 0.056 to 0.133) and Gemini 3.1 Flash-Lite from 0.874 to 0.890
 (−0.010 to 0.042); Table 1 reports the defaults."
 
-**For the saturation sentence.** "No flagship is on the roster by construction (no pilot generator and no judge).
-As anchors, GPT-5.4 and DeepSeek V4 Pro on the same 450-item subsample score 0.941 (0.909 to 0.969; 0.980 with
-reasoning on) and 0.968 (0.950 to 0.983), inside the interval band of the roster's top five on those items (0.964 to
-0.976): the pool is solved at the top by the mid-tier models of September 2026, and the benchmark's discrimination
-lies in where and how models fail."
+**For the flagship sentence.** "The roster has no flagship: the roster rule excludes the pilot's generators and judges,
+and the budget set the rest. As anchors on the same 450-item subsample, GPT-5.4 scores 0.941 (0.909 to 0.969) at its
+provider's default, which returned no reasoning tokens, and 0.980 (0.964 to 0.993) with reasoning at medium effort;
+DeepSeek V4 Pro scores 0.968 (0.950 to 0.983). The roster's top five on those items score 0.964 to 0.976, with intervals
+that contain both reasoning anchors; neither flagship exceeds the top tier."
 
-**For the retrieval objection.** "Supplying each template's governing equations with the question changes the
-answer score by +0.005 (Claude Sonnet 5), −0.007 (GPT-5.4 mini) and +0.041 (gpt-oss-20b; not significant after
-Holm correction) on 429 items, while milestone coverage rises by 0.03 to 0.06: the errors that remain are in
-setting up, substituting and computing, not in recalling the method. The condition bounds what formula retrieval
-would add; it does not supply data tables."
+**For the retrieval objection (only once the corrected arm has run; otherwise the arm as run is stated with its
+defects, or left out).** "Supplying each template's governing equations with the question changes the answer score
+by [the `openbook2` figures with intervals] on [n] items, [within / not within] a ±0.05 equivalence margin, while
+milestone coverage rises by [x]. The condition supplies equations, not data tables or a computation tool."
 
 ### Figures and tables worth including
 

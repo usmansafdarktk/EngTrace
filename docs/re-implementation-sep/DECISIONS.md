@@ -6805,36 +6805,44 @@ runs once the traces exist (the main run's rates pro rata, about $1.30 and $3.80
 **Not decided here.** Whether to run it, at which effort (medium is the standard setting; high the ceiling), and the
 cap. The round stands at about $535 against a roughly $500 budget before this.
 
-## D-181 — C2, the judge swap: a second judge from another family agrees with MiMo within Q3's intervals, and catches as many planted defects
+## D-181 — C2, the judge swap: on a 220-trace sample a second judge from another family moves no model's coverage figure beyond its interval, and catches as many planted defects
 
-**Date:** 2026-10-03 · **Status:** DONE ($10.53: $2.82 for the E5 sample, $7.71 for the planted set) · **Evidence:** `full_run_28092026/judge.py` (`--judge`, `--sample`, `--seed`; rows under `scores/main/e5_grok-4-6/`), `judge_swap.py`, `JUDGE_SWAP.md`, `results/judge_swap_main.json`; `evaluator_pilot_17092026/analysis/planted_judges.py` (`--judge`, Grok 4.6 in its list), its `report`, RESULTS_X1 Finding 8 (addendum)
+**Date:** 2026-10-03 · **Status:** DONE ($5.31: $2.82 for the E5 sample, $2.50 for Grok's 240 planted calls; corrected 2026-10-03 from $10.53, which had read the probe report's four-judge total as Grok's) · **Evidence:** `full_run_28092026/judge.py` (`--judge`, `--sample`, `--seed`; rows under `scores/main/e5_grok-4-6/`), `judge_swap.py`, `JUDGE_SWAP.md`, `results/judge_swap_main.json`; `evaluator_pilot_17092026/analysis/planted_judges.py` (`--judge`, Grok 4.6 in its list), its `report`, RESULTS_X1 Finding 8 (addendum)
 
 **The E5 sample.** Grok 4.6 (xAI; a family on neither the roster nor the full run's judge side, E1's judge in the
 pilot) answered E5's own prompts for 20 traces per model, 220 traces drawn by a seeded shuffle from those E5 sends,
 the same reply store and call settings. On the 466 milestones both judges ruled on, agreement on REACHED against not is
 0.83 to 1.00 for ten models and 0.74 for GLM-5.3 (34 milestones); three-way agreement 0.69 to 0.93. E5-strict coverage
-over the sampled traces differs, Grok minus MiMo, by −0.017 to +0.020 per model, every interval narrower than Q3's own
-and most including zero. The disagreements are almost all NOT_NEEDED against MISSING (54 of 466), which the strict score
-treats alike; REACHED moved on 24. So no Q3 figure that rests on the judge would move by more than its interval under
-a judge from another family. *Added later the same day:* Cohen's kappa beside the raw agreement, pooled over the 466
-milestones 0.693 three-way and 0.790 on REACHED against not; per model 0.48 to 0.85 three-way and 0.31 (GLM-5.3, 34
-milestones) to 1.00 binary; kappa reads low where REACHED dominates, which `JUDGE_SWAP.md` says beside the figures.
+over the sampled traces differs, Grok minus MiMo, by −0.017 to +0.020 per model, every interval including zero and of
+the order of Q3's own (narrower for six models, wider for five; GLM-5.3's three times wider, on 34 milestones). Of the 86
+disagreements, 54 are NOT_NEEDED against MISSING, which the strict score treats alike; REACHED moved on 32. So on this
+sample no model's E5-strict coverage figure moves by more than its interval under a judge from another family; the 55
+pairwise coverage differences of Q3 are not checked by a sample of this size (20 traces per model over 14 to 19
+templates). Cohen's kappa beside the raw agreement: pooled over the 466 milestones 0.693 three-way and 0.790 on REACHED
+against not; per model 0.48 to 0.85 three-way and 0.31 (GLM-5.3) to 1.00 binary. Kappa reads below the raw agreement
+where one verdict dominates, here MISSING and NOT_NEEDED (REACHED is 0.09 to 0.36 of the judged milestones), which
+`JUDGE_SWAP.md` says beside the figures. (This paragraph corrected 2026-10-03 after review: the first version said
+"every interval narrower than Q3's own", "54 of 466" and "REACHED moved on 24", and had the kappa note backwards.)
 
 **The planted set.** Grok 4.6 on the 240 matched prompts of RESULTS_X1 Finding 8 (the planted step and the same step
 untouched): 22 of 60 conceptual defects caught (0.367; 0.550 counting "Other"), 52 of 60 arithmetic (0.867), 0 false
 alarms on the 120 untouched steps, every call returned, against GPT-5's 0.333 / 0.717, Opus 4.5's 0.133 / 0.717 and
-MiMo's 0.308 / 0.717. The run was restricted to Grok by the new `--judge` filter so that MiMo's 17 unreturned calls were
-not re-asked and its published basis (51 of 60) stands; the probe's resume loop now skips cancelled futures.
+MiMo's 0.308 / 0.717. The run was restricted to Grok by the new `--judge` filter so that MiMo's unreturned calls were not
+re-asked; the report now counts 52 conceptual sets for MiMo (16 caught, 0.308) against RESULTS_X1's 51 (0.314), one
+reply having returned in the day's first launch before the filter existed, a move in the third decimal; the probe's
+resume loop now skips cancelled futures.
 
-**Costs against the estimate.** The E5 sample came in under its $5 to $9 figure; the planted set above its $3.40
-(Grok's reasoning tokens are billed as output at $6 per million), inside the cumulative budget set for the run. Both
+**Costs against the estimate.** The E5 sample came in under its $5 to $9 figure at $2.82; Grok's 240 planted calls billed
+$2.50, under the $3.40 figure (the first version of this entry read the probe report's $7.71, the four judges' total,
+as Grok's). Both
 caps for the judged stages are cumulative over their reply stores, which already held the main run's spend; the first
 launches at $4 and $10 therefore made no calls and billed nothing, and were relaunched with caps above the stores'
 cumulative totals (the same holds for C1's E5 and router).
 
-**For the paper.** One sentence in the evaluator section: a second judge from a third family reproduces MiMo's
-milestone verdicts within the reported intervals on a 220-trace sample and catches 37% of planted conceptual defects
-against MiMo's 31%; the single-judge design is a cost choice, not a sensitivity. JUDGE_SELECTION's "if a reviewer
+**For the paper.** One sentence in the evaluator section: on a 220-trace sample a second judge from a third family moves
+no model's coverage figure beyond its interval (differences −0.017 to +0.020) and catches 22 of 60 planted conceptual
+defects against MiMo's 16 of 52 (Wilson 95% intervals 0.26 to 0.49 and 0.20 to 0.44, overlapping); on this sample the
+single-judge design shows no sensitivity. The sample does not test Q3's 55 pairwise coverage differences. JUDGE_SELECTION's "if a reviewer
 presses the point, that is the run to buy" is bought.
 
 ## D-180 — C1 run: reasoning at medium effort for GPT-5.4 mini and Gemini 3.1 Flash-Lite on the 450 items, after a calibration
@@ -6847,9 +6855,9 @@ only change from the main run (same prompt, ceiling, routing, scorer; D-179).
 
 **What it billed.** The rows carry $5.54 ($4.44 GPT-5.4 mini, $1.10 Gemini 3.1 Flash-Lite), of which the calibration
 invocation was $0.21 and the 450-item invocation $5.33, against the dry run's $5.90 at x3. Both endpoints returned
-reasoning tokens on every row (median 3,464 and 1,333 against zero in the main run; `DECODING_TABLE_reasoning-medium.md`).
+reasoning tokens on every row (median 516 and 801, 90th percentiles 3,464 and 1,333, against zero in the main run; `DECODING_TABLE_reasoning-medium.md`).
 The trace review is clean: 900 final rows, none empty, one request set and one provider per model, served as in the
-main run. E5 (143 calls priced at about $1) and the router (900 calls, about $3) run on the arm at caps of $43 and
+main run. E5 (317 calls, $1.14) and the router (900 calls, $3.09) ran on the arm at caps of $43 and
 $109, cumulative over their reply stores (the first launches at $4 and $8 made no call, D-181 explains why).
 
 **What it reports.** `analyze.py` adds "C1 and C4. Arms run on the same items against the main run": arm minus main,
@@ -6860,22 +6868,32 @@ the detectable paired difference). The numbers are written in part 2 of this ent
 **Results (part 2, 2026-10-03; `results/RESULTS.md`, "C1 and C4", at commit 7cae823).** On the 450 items, reasoning
 at medium effort lifts GPT-5.4 mini from 0.858 to 0.951 (+0.093, 95% CI 0.056 to 0.133, Holm p < 0.0001, detectable
 0.055) and Gemini 3.1 Flash-Lite from 0.874 to 0.890 (+0.016, −0.010 to 0.042, p 0.30, detectable 0.038). GPT-5.4
-mini's gain shows at every level of the stack: fully solved +0.098, E3 coverage +0.055 (0.029 to 0.084), E5-strict
-coverage +0.061 (0.034 to 0.090, 437 items), the digit rule's flag rate on fully solved traces 0.127 to 0.069, the
-router's judge flags on fully solved traces 0.232 to 0.135. Gemini's changes sit inside the noise on every measure
+mini's gain shows in every paired measure: fully solved +0.098, E3 coverage +0.055 (0.029 to 0.084; the 437 items with
+milestones), E5-strict coverage +0.061 (0.034 to 0.090; 437 items). Its digit-rule and router judge flag rates on fully
+solved traces are 0.127 against 0.069 and 0.232 against 0.135, each arm's own solved traces (379 and 423 for the
+router), unpaired and without intervals: descriptive. Gemini's changes sit inside the noise on every measure
 (E5-strict +0.015, −0.002 to 0.035), though its flag rates fall as well (0.082 to 0.068; router 0.111 to 0.066). E5
 answered all 317 calls and the router all 900 (the router's shell was stopped by a time limit at 850 and resumed from
 its store for the last 50; nothing was bought twice). With reasoning on, GPT-5.4 mini scores level with GLM-5.3 on
 these items (0.952) and above Qwen3-235B-2507 (0.888); Gemini 3.1 Flash-Lite stays where it was. *Added with the
-block's extension (commit 3e194c3):* McNemar on the fully-solved verdict p < 0.0001 for GPT-5.4 mini and 0.36 for
-Gemini; by level, GPT-5.4 mini's gain is largest on Advanced items (0.750 to 0.917) and smallest on Easy (0.928 to
-0.989), Gemini's three level means move by 0.005 to 0.030. Level means are descriptive, 150 items each.
+block's extension (commits 3e194c3 and 026210a):* the fully-solved change holds for GPT-5.4 mini by the template-level
+sign-flip test (p < 0.0001; McNemar, item-level, the same) and not for Gemini (0.44; 0.36). By level, GPT-5.4 mini's
+paired change is +0.060 (0.023 to 0.103) on Easy, +0.083 (0.023 to 0.149) on Intermediate and +0.167 (0.069 to 0.279)
+on Advanced (58, 58 and 34 templates; 174, 174 and 102 items): the Advanced point change is the largest and the
+intervals overlap; Gemini's three level changes include zero. The 90% interval of the score change is 0.062 to
+0.126 for GPT-5.4 mini, outside the ±0.05 equivalence margin of D-165, and −0.007 to 0.038 for Gemini, inside it:
+Gemini's change is bounded by the design, GPT-5.4 mini's is a gain. Gemini's three decoding repeats put its
+run-to-run noise at −0.012 to +0.007 on the repeat items; its +0.016 sits at the edge of that band.
 
 **For the paper.** The closed tier of the main run is in part a default-settings result, for one of the two models:
 Appendix P states the setting per model, the main run's figures stay the headline, and this arm is reported beside
 them with the sentence that reasoning at medium effort moves GPT-5.4 mini by nine points on the subsample and
 Gemini 3.1 Flash-Lite by less than the design detects. No sentence reads the closed tier's main-run scores as a
 ceiling for those models.
+
+**Limits.** One effort level was run (medium), and the comparison is with the main run made days earlier at the
+provider's default, with no same-day default control (C3's anchor has one, D-182); "Gemini by less than the design
+detects" holds for medium effort on this subsample. The flag-rate columns are unpaired.
 
 ## D-182 — C3, the flagship anchors: GPT-5.4 and DeepSeek V4 Pro on the 450-item subsample, and GPT-5.4 with reasoning on
 
@@ -6908,26 +6926,38 @@ reasoning tokens on 449 rows, median 1,239 completion tokens. The roster's eleve
 (gpt-oss-20b) to 0.976 (DeepSeek V4.1 Flash), the top five at 0.964 to 0.976, coverage 0.830 to 0.925. Neither
 flagship separates from the roster's top tier: GPT-5.4 with reasoning on is the highest point estimate but inside the
 top five's intervals, DeepSeek V4 Pro sits among them, and GPT-5.4 at its default sits below them, level with GLM-5.3
-(0.952). By level, GPT-5.4 at the default drops to 0.868 on Advanced against 0.946 with reasoning on; the anchors'
-Advanced means (0.941, 0.868, 0.946) lie inside the roster's range (0.706 to 0.946). Digit flags on fully solved
+(0.952). By level, with template intervals (58, 58 and 34 templates): GPT-5.4 at the default 0.989 (0.974 to 1.000), 0.937
+(0.879 to 0.983) and 0.868 (0.770 to 0.951) on Easy, Intermediate and Advanced, against 0.997 (0.991 to 1.000), 0.983
+(0.954 to 1.000) and 0.946 (0.892 to 0.990) with reasoning on, and DeepSeek V4 Pro 0.989 (0.974 to 1.000), 0.963 (0.934
+to 0.986) and 0.941 (0.882 to 0.990); the Advanced intervals are wide and overlap the roster's, so no level difference
+between an anchor and a roster model is a finding. E3 coverage 0.861, 0.877 and 0.874 (intervals in the block);
+DeepSeek's three unusable rows are empty replies, none unreadable. Digit flags on fully solved
 traces: 0.107, 0.119 and 0.032 against the roster's 0.007 to 0.187. E5 answered every call on all three arms; the
 router was not run on them (its dry run on the reasoning arm: 450 calls, $1.96, 0.6 hours). *Added with the paired
 block's extension (commit 3e194c3):* GPT-5.4's reasoning arm paired against its default arm on the same 450 items,
 the one paired test among the anchors: +0.039 (95% CI 0.016 to 0.067, sign-flip p 0.002, detectable 0.037), fully
 solved +0.040 (McNemar p 0.0001), E3 coverage +0.016 (0.004 to 0.029), E5-strict +0.014 (0.000 to 0.029), the digit
-rule's flag rate on fully solved traces 0.119 to 0.032; by level 0.989 to 0.997, 0.937 to 0.983, 0.868 to 0.946. The
-same setting moved GPT-5.4 mini by +0.093 (D-180): the flagship starts higher and gains less, with its gain again
-largest on Advanced items.
+rule's flag rate on fully solved traces 0.119 to 0.032; by level the paired change is +0.009 (0.000 to 0.023), +0.046 (0.011 to 0.092) and +0.078
+(0.010 to 0.167) on Easy, Intermediate and Advanced; the fully-solved change holds by the template-level test (p 0.002);
+the 90% interval of the score change, 0.019 to 0.061, lies outside the ±0.05 margin. The same setting moved GPT-5.4
+mini by +0.093 (D-180): the flagship starts higher and gains less; its largest point change is on Advanced items, with
+overlapping intervals.
 
 **For the paper.** The "no frontier model" objection (9.3 item 9) gets one sentence and an appendix table: two
-flagships that pass the roster rule, run on the 450-item subsample with the same stack, score inside the roster's top
-tier (0.941 to 0.980 against 0.964 to 0.976), so the pool's ceiling is reached by the mid-tier models of September
-2026 and the benchmark's discrimination lies below the top. The anchors stay outside the pairwise family and the
-roster tables; no test is reported against them.
+flagships that pass the roster rule, run on the 450-item subsample with the same stack, do not exceed the roster's top
+tier: DeepSeek V4 Pro (0.968) and GPT-5.4 with reasoning on (0.980) sit inside the top five's intervals (point estimates
+0.964 to 0.976), and GPT-5.4 at its provider's default (0.941) sits below them, level with GLM-5.3. The anchors stay
+outside the pairwise family and the roster tables; no test is reported against them. (Corrected 2026-10-03 after
+review: the first version put all three "inside the top tier".)
+
+**Limits.** Two anchors, one of them at a non-reasoning default; the flagships the reviewers named (GPT-5, Claude Opus
+4.7, Gemini 3.1 Pro) cannot be anchors under the roster rule, being pilot generators or judges, and the roster's lack
+of a flagship was a budget choice within that rule, not a construction. Level means on the subsample rest on 58, 58
+and 34 templates and carry wide intervals (the regenerated "C3" block prints them).
 
 ## D-183 — C4, the open-book condition: the governing equations supplied with the question, for one model from each tier
 
-**Date:** 2026-10-03 · **Status:** DONE ($12.55 in the rows against the $12.75 dry run; E5 inside the $2.99 above, its dry run $1.12) · **Evidence:** `openbook.py` (`--survey`, `--build`), `OPENBOOK_SURVEY.md`, `openbook/manifest.jsonl` (hashes and counts; the modified questions local), `run_traces.py` (`openbook`, `OPENBOOK_MODELS`), `trace_review.py` (`variant_manifest`); the paired block in `analyze.py`
+**Date:** 2026-10-03 · **Status:** DONE as run ($12.55 in the rows against the $12.75 dry run; E5 inside the $2.99 above, its dry run $1.12) · REVIEWED the same day: the equation blocks had defects (the review paragraph below); the corrected build is the `openbook2` arm, 156 items carried over, 249 per model to run at $7.68 by its dry run plus E5, OPEN for the owner's approval · **Evidence:** `openbook.py` (`--survey`, `--build`), `OPENBOOK_SURVEY.md`, `openbook/manifest.jsonl` (hashes and counts; the modified questions local), `run_traces.py` (`openbook`, `OPENBOOK_MODELS`), `trace_review.py` (`variant_manifest`); the paired block in `analyze.py`
 
 **What was approved.** The open-book fallback of C4 rather than the tool condition ($65 to $150), by the owner on
 2026-10-03, with the tool condition to be reviewed at the end. The arm appends to each question a block headed
@@ -6953,18 +6983,46 @@ three, E3 by +0.029, +0.037 and +0.061 and E5-strict by +0.032 (0.013 to 0.052),
 rows fall from 13 to 3. The digit rule's flag rate on fully solved traces is unchanged for Claude (0.131 to 0.128)
 and higher for GPT-5.4 mini (0.121 to 0.160) and gpt-oss-20b (0.155 to 0.185): more arithmetic written out, more
 slips to flag. The trace review is clean against the manifest (1,287 rows, 3 empty, served as in the main run); E5
-answered every call (341); the router was not run on the arm. *Added with the paired block's extension (commit
-3e194c3):* McNemar on the fully-solved verdict: Claude 0.79, GPT-5.4 mini 0.88, gpt-oss-20b 0.014 unadjusted (0.04
-after Holm over the three), so gpt-oss-20b's +0.047 in fully solved traces is the one change in the arm that a test
-supports, while its answer-score change does not survive Holm (0.13); by level its gain sits on Intermediate items
-(0.794 to 0.876) with Easy and Advanced within 0.02, and the two closed models' level means move by 0.03 or less.
+answered every call (341); the router was not run on the arm. *Added with the paired block's extension (commits
+3e194c3 and 026210a):* the fully-solved change by the template-level sign-flip test, the level a claim rests on:
+gpt-oss-20b +0.047, p 0.030 unadjusted and 0.089 after Holm over the three (McNemar, item-level, 0.014 and 0.041);
+Claude and GPT-5.4 mini p 0.80 and 0.88. So no change in the arm holds after Holm at the template level. The 90%
+intervals of the score change: Claude −0.008 to 0.017 and GPT-5.4 mini −0.029 to 0.016, inside the ±0.05 margin, so
+those two changes are bounded by the design; gpt-oss-20b's 0.008 to 0.072 is not, and its three decoding repeats put
+its run-to-run noise at +0.003 to +0.012. By level, gpt-oss-20b's change is +0.082 (0.018 to 0.155) on Intermediate
+items and inside the noise on Easy and Advanced; the two closed models' level changes all include zero. (The first
+version of this paragraph called the item-level McNemar result "the one change a test supports".)
 
-**For the paper.** The retrieval objection (cqGs 1 and 4, ynoK 3) gets a bound rather than a third "future work":
-with the governing equations supplied, the answer score moves by less than the design detects for the two closed
-models and by four points, not significant after correction, for gpt-oss-20b, while stated coverage rises; the
-remaining errors are in setting up, substituting and computing, not in recalling the method. The condition supplies
-equations only, so it bounds formula recall and not data lookups. The tool condition (a code tool, $65 to $150) is
-not run; whether to run it is the owner's call, with the arm's result as the prior.
+**For the paper (as corrected after review).** Until the corrected arm runs, the retrieval objection (cqGs 1 and 4,
+ynoK 3) gets a measured statement, not a bound: with version 1's equation blocks supplied, the answer score changed
+by +0.005, −0.007 and +0.041 (none holding after Holm at the template level) while stated coverage rose by 0.03 to
+0.06; the blocks had the defects below. The condition supplies equations only, never data tables or a computation
+tool. Where the remaining errors lie was not measured by this arm (that needs an error reading of its traces). The
+tool condition is D-184.
+
+**Review (2026-10-03, later the same day).** An independent review of the C conditions found the version-1 blocks
+defective in three ways. (1) The line filter read the fraction of an exponent as a number (`**0.2857` -> 2857), so
+`rackett_equation_volume` lost its only equation and was excluded, and refused a side that is `0`, so
+`vdw_solve_for_volume` lost its cubic and was excluded: the two excluded templates the arm's models fail most in the
+main run. (2) Notes from the template code with an `=` in them (rounding and reviewer remarks) passed the filter:
+by the reviewer's count about 60 of the 476 lines in more than 40 templates; under the corrected filter 93
+templates' blocks change. (3) The gold source leaked: `incompressible_continuity`'s block was item 0's worked
+solution ending in its answer, sent to items 9 and 16 as well; `system_properties_memory_causality`'s block stated
+item 0's system, which contradicts the other instances' questions; and `force_method_continuous_beam`'s docstring
+block carried `By = 5*w*L/4`, the uniform-load result, sent to the point-load instance too. Sensitivity of the arm
+as run: without those three templates (420 items) the changes are +0.006, −0.007 and +0.046; on the 156 items whose
+block is byte-identical under the corrected filter, +0.000, −0.032 and +0.038 (a subset, not a random one); on the
+413 items usable in both arms, gpt-oss-20b's change is +0.019, so its 13 to 3 unusable rows carry half of its +0.041.
+Version 2 of the filter (`openbook.py --version 2`, its docstring; `OPENBOOK_SURVEY_2.md`, `OPENBOOK_DIFF.md`): numbers
+read whole and never out of an exponent or a fraction, `= 0` allowed, a line with a quotation mark, scientific
+notation, a Markdown quote marker, a lowercase English stopword or a code or review word outside a parenthetical
+remark rejected (the remark itself dropped), a word-equals-word line rejected, the gold source dropped for symbolic
+answers and at any line naming the answer. Version 2 holds 135 templates and 405 items with 301 equation lines
+(version 1: 143, 429, 476); ten templates leave (their blocks were notes or the gold's symbolic answer) and the two
+above enter. Version 1's manifest stays as the record of the run; version 2 is the `openbook2` arm: `--carry` copied
+the 156 unchanged items' version-1 rows (a valid sample for a byte-identical question, marked `carried_from`), and
+the 249 other items per model price at $7.68 by the dry run (Claude Sonnet 5 $6.72) plus E5 about $1. Not run: the
+owner's call (Open decisions). Until then the paper states the arm as run with these defects, or leaves it out.
 
 ## D-184 — C4's tool condition: built as `--variant tool`, self-tested offline, priced by its dry run; not run
 
@@ -7003,8 +7061,9 @@ $20.26 at x1.5, $33.76 at x2.5, $54.01 at x4, an assumption until `--calibrate 2
 turns and lengths. E5 (about $1.20 at the open-book arm's rate) and the router (about $6 for the three, if run)
 come on top. Inside the plan's $65 to $150.
 
-**Not decided here.** Whether to run it: the open-book arm found that formula recall is not the gap, a code tool
-addresses computation, a different mechanism, and the retrieval reviewers asked for a tool baseline by name.
+**Not decided here.** Whether to run it: the open-book arm as run found little change in the answer score (with the defects D-183
+now records and a corrected arm awaiting approval); a code tool addresses computation, a different mechanism; the
+retrieval reviewers asked for a tool baseline by name.
 Then the calibration first, the cap, and, if the calibration shows the models rarely call the tool, whether a
 one-sentence nudge in the prompt is wanted; it would change the prompt hash and be a labelled variant of its own,
 and the arm as built keeps the prompt word for word.
@@ -7014,6 +7073,7 @@ and the arm as built keeps the prompt word for word.
 | # | Decision | Needed before |
 |---|---|---|
 | D-184 | Approve the tool arm's calibration (`run_traces --variant tool --calibrate 20 --yes`, about $1.50) and then the run at a cap ($20 to $54 by the dry run's multipliers, plus E5 about $1.20), or state the open-book bound and leave the tool unrun | the paper's answer to the retrieval objection |
+| D-183 | Approve the corrected open-book arm: `run_traces --variant openbook2 --yes` for the 249 items per model not carried over ($7.68 by the dry run) and E5 on it (about $1); or report the arm as run with its defects stated, or leave it out | the paper's answer to the retrieval objection |
 | D-183 | ~~Whether to run the tool condition of C4 (a Python tool for two or three models on the subsample, $65 to $150 by the plan's estimate), now that the open-book arm bounds what formula recall adds at a few points at most; or state the bound and leave the tool unrun~~ **Built 2026-10-03 as `--variant tool` (D-184); the run awaits approval** | — |
 | D-179 | ~~Run C1: `run_traces --variant reasoning-medium --calibrate 20 --yes` first (about $0.52), then the 450 items at a cap, then E5 and the router on the variant after their dry runs; or leave the setting stated in Appendix P and the comparison unmade~~ **Run 2026-10-03 at medium effort after the calibration, $5.54 in the rows (D-180); C2 to C4 approved the same day (D-181 to D-183)** | — |
 | D-172 | Send the fifteen kits in `full_run_28092026/expert_request/dist/` (app.py, README.txt, guide.md and the kit_<id> folder each) with a return date; cut B2 first if the load is too much (`--b2-per-model`); when the files come back, `expert_kits.py --score <folder>` | the paper's evaluator section, Q3 and the D-171 limitation |

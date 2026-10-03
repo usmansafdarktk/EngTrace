@@ -216,7 +216,9 @@ closed anchor with the parameter (C3); `--variant openbook` sends the question w
 equations appended (`openbook.py --survey | --build`; `openbook/manifest.jsonl` is committed, the modified
 questions stay local) for one model from each tier (C4); `--variant tool` offers the same three a Python tool in the
 request and runs their scripts in an isolated interpreter, the prompt unchanged (D-184; `--selftest` checks the sandbox
-and the loop offline). A reasoning arm's or the tool arm's dry run prices multipliers of the main run's bills and
+and the loop offline). The open-book blocks have two filter versions: version 1 ran as `openbook` (D-183) and the
+corrected version 2 is the `openbook2` arm (`openbook.py --version 2`, `--diff`, `--carry`); C2's judge swap is
+`judge.py --judge --sample` and `judge_swap.py`, and the planted set per judge `planted_judges.py` (D-181). A reasoning arm's or the tool arm's dry run prices multipliers of the main run's bills and
 `--calibrate N --yes` measures the real lengths and turns on N items first. The scorer, `trace_review.py`,
 `decoding_table.py --variant`, E5 and the router take an arm's name and its models from the arm's own files;
 `analyze.py` reports the paired arms (C1, C4) against the main run with Q5's machinery and the anchors (C3) on the
@@ -229,6 +231,12 @@ python -m full_run_28092026.openbook --build                                    
 python -m full_run_28092026.run_traces --variant openbook --dry-run                # free
 python -m full_run_28092026.run_traces --selftest                                  # free: the tool arm offline
 python -m full_run_28092026.run_traces --variant tool --dry-run                    # free
+python -m full_run_28092026.openbook --build --version 2                           # free: the corrected blocks (D-183 review)
+python -m full_run_28092026.openbook --diff                                        # free: OPENBOOK_DIFF.md, version 2 against the run
+python -m full_run_28092026.openbook --carry                                       # free: unchanged items' traces into openbook2
+python -m full_run_28092026.judge --judge x-ai/grok-4.6 --sample 20 --dry-run      # C2: a second judge on a sample (D-181)
+python -m full_run_28092026.judge_swap                                             # free: JUDGE_SWAP.md from the stored replies
+python -m evaluator_pilot_17092026.analysis.planted_judges report                  # free: the planted set per judge
 python -m full_run_28092026.decoding_table --variant flagship-reasoning-medium     # free, after the run
 ```
 

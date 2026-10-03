@@ -157,18 +157,18 @@ reported beside the main run, not in place of it; a dry run prices it (the two m
 and $2.48; reasoning multiplies output tokens). *Decision:* run it, or state the setting and leave the
 comparison unmade (RESULTS_PAPER_NOTES item 7).
 
-**C2. A judge-swap robustness check.** *(Done 2026-10-03, D-181: `JUDGE_SWAP.md` and RESULTS_X1 Finding 8; $10.53.)* *Answers:* yAYU 1 / 9W1B 2 on the single judge. *Method:* E5 with a
+**C2. A judge-swap robustness check.** *(Done 2026-10-03, D-181: `JUDGE_SWAP.md` and RESULTS_X1 Finding 8; $5.31.)* *Answers:* yAYU 1 / 9W1B 2 on the single judge. *Method:* E5 with a
 second judge from another family on a stratified sample of the residual milestones (about $3 to $5), and
 Grok 4.6 on the planted set (about $3.40, `JUDGE_SELECTION.md`); report whether any Q3 figure moves by more
 than its interval. *Decision:* cheap; worth it if a reviewer's objection to one judge is expected.
 
-**C3. A flagship anchor on the 450-item subsample.** *(Done 2026-10-03, D-182: GPT-5.4 0.941 at the provider's default and 0.980 with reasoning on, DeepSeek V4 Pro 0.968, all inside the roster's top tier on the same items; $17.54 in rows; `RESULTS.md`, the "C3" blocks.)* *Answers:* 9.3 item 9 (no frontier model on the
+**C3. A flagship anchor on the 450-item subsample.** *(Done 2026-10-03, D-182: GPT-5.4 0.941 at the provider's default and 0.980 with reasoning on, DeepSeek V4 Pro 0.968; the last two inside the top five's intervals on the same items, the default arm below them; $17.54 in rows; `RESULTS.md`, the "C3" blocks.)* *Answers:* 9.3 item 9 (no frontier model on the
 roster). *Method:* two or three flagship models on `subsamples.py`'s 450 items, scored by the same stack,
 reported as an anchor with 450-item intervals, outside the pairwise family. *Cost:* about $40 to $55 at the
 pilot's per-trace rates. *Decision:* the supervisor's; the paper otherwise needs a sentence on why the
 flagship tier is absent.
 
-**C4. A tool-use condition, or the open-book fallback.** *(Open-book arm done 2026-10-03, D-183: no answer-score change holds after Holm for the three models, coverage rises; $12.55 in rows. The tool condition is built as `--variant tool` (D-184: a Python tool in the request, the scripts run in an isolated interpreter, the prompt unchanged; dry run $20 to $54 by assumption, calibration about $1.50; `run_traces --selftest` checks it offline) and awaits the owner's approval.)* *Answers:* cqGs 1 and 4, ynoK 3, the January AC.
+**C4. A tool-use condition, or the open-book fallback.** *(Open-book arm done 2026-10-03, D-183: no answer-score change holds after Holm for the three models, coverage rises; $12.55 in rows. A review found the equation blocks defective (notes passed the filter, two equations were lost, three templates' blocks carried an answer or another instance's statement); the corrected build is the `openbook2` arm, 156 items carried over, 249 per model to run at $7.68, awaiting approval. The tool condition is built as `--variant tool` (D-184: a Python tool in the request, the scripts run in an isolated interpreter, the prompt unchanged; dry run $20 to $54 by assumption, calibration about $1.50; `run_traces --selftest` checks it offline) and awaits the owner's approval.)* *Answers:* cqGs 1 and 4, ynoK 3, the January AC.
 *Method:* a Python tool on a stratified subsample for two or three models, same prompt otherwise, same
 stack; the digit rule's flag rate under the tool is itself the measurement. Or, cheaper, an open-book
 condition that supplies the governing equations in the prompt, bounding what retrieval could add. *Cost:*

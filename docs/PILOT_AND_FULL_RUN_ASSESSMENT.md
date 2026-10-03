@@ -148,7 +148,7 @@ that bear on evaluation. "Where" names the committed evidence; "state" is how it
 | framing: synthetic scope, physical versus linguistic diversity | meta-review 3; 9W1B 1; cqGs 2 (Jan) | the paraphrase arm (Q5) is a measured answer to the linguistic half | **done beyond what was promised**; state it as a bound (±5 points for 10 of 11), not as "robust" |
 | template exploitation / surface shortcuts | cqGs 2 (Jan), 9W1B 1 | the four known shortcut templates are a sensitivity row (tau 1.000); the corpus-wide audit is A7 | **done 2026-10-03** (D-177): two templates newly flagged, the headline unchanged by more than 0.002 |
 | a fourth branch | ynoK 1 | civil and industrial added, 30 templates each, certified | **done**, twice over |
-| tool-augmented or retrieval baselines | ynoK 3; cqGs 1 and 4 (Jan) | the open-book arm (D-183): equations supplied, no answer-score change beyond the noise, coverage up | **bounded** for formula recall; the tool condition remains the owner's call |
+| tool-augmented or retrieval baselines | ynoK 3; cqGs 1 and 4 (Jan) | the open-book arm as run (D-183): equations supplied, no answer-score change beyond the noise, coverage up; its blocks found defective in review, the corrected `openbook2` arm built | **measured, not yet bounded**: the corrected arm and the tool condition (D-184) await the owner's call |
 | error analysis too coarse; causes of the cliff | nWW3 3 and 4, cqGs 3 (Jan) | Q3's attribution table and failure-against-depth (descriptive); A6 validates attribution by error type on the pilot's labels; B2 is the human sample | **partly**: A6 done (D-176, each flag's precision by error type); B2, the human sample on the new run, is in the experts' request (D-172) |
 | the evaluation framework validated by the same kind of system it uses | gFWV 4 (Jan) | human labels now; deterministic components; the judge from outside the roster | **done** |
 | proofreading, broken reference | all | — | writing |
@@ -250,7 +250,7 @@ Three of those templates were read:
   sampling scripts are the long pole and should be built first.
 - **A single judge.** MiMo-V2.5-Pro decides 11% to 25% of required milestones (10% to 29% of those REACHED) and
   every router-judge flag. Its defence is the pilot's validation and its independence from the roster; C2 (a
-  second judge from another family on a stratified sample, $3 to $5) is cheap insurance if the objection is
+  second judge from another family on a stratified sample, $3 to $5; done 2026-10-03, D-181, $5.31) is cheap insurance if the objection is
   expected.
 - **Exact-digit items and symbolic items.** 17 templates require the digits; nine symbolic templates are scored
   by the numbers they state. Name both sets, give the sensitivity without them, and say that a last-digit miss on a
@@ -267,7 +267,7 @@ Three of those templates were read:
 awaiting the send (D-172), and C1 to C4 remain, each needing a dry run and the owner's approval. The order below is as written on
 2026-10-02.*
 
-*Update 2026-10-03, later: C1 to C4 are run after the owner approved the priced package (D-180 to D-183; C2 is D-181), except C4's tool condition, which stays the owner's call. Reasoning on moves GPT-5.4 mini by +0.093 and Gemini 3.1 Flash-Lite within the noise; a second judge from another family agrees with MiMo within Q3's intervals; two flagships on the subsample score inside the roster's top tier; the open-book condition moves no answer score beyond the noise while stated coverage rises. The C blocks of `full_run_28092026/results/RESULTS.md` and `JUDGE_SWAP.md` carry the figures; the round stands at about $588.*
+*Update 2026-10-03, later: C1 to C4 are run after the owner approved the priced package (D-180 to D-183; C2 is D-181), except C4's tool condition, which stays the owner's call. Reasoning on moves GPT-5.4 mini by +0.093 and Gemini 3.1 Flash-Lite within the noise; on a 220-trace sample a second judge from another family moves no model's coverage figure beyond its interval; two flagships on the subsample do not exceed the roster's top tier (GPT-5.4 at its default sits below it); the open-book condition as run moves no answer score beyond the noise while stated coverage rises, but a review found its equation blocks defective and a corrected arm awaits approval. The C blocks of `full_run_28092026/results/RESULTS.md` and `JUDGE_SWAP.md` carry the figures; the round stands at about $583.*
 
 The next-steps file's order is right in substance; this review moves two things forward.
 
@@ -281,6 +281,7 @@ The next-steps file's order is right in substance; this review moves two things 
    A6 and A7 as time allows.
 4. **Decisions for the owner and the supervisor, each with a dry run:** C1 first (it changes the roster's
    reading), then C2 (cheap), then C3 and C4 (the standing objections). The round is already at about $535.
+   *(All four decided and run 2026-10-03, D-180 to D-184, with C4's corrected arm and the tool condition awaiting approval; the round about $583.)*
 5. **In the paper, whatever else happens:** the saturation finding stated as such; the four no-reasoning models;
    the two corrected check rounds with their counts; the 17 exact-digit and nine symbolic templates; the two
    chemical templates as a stated limitation with the cliff sensitivity; the pilot's validation population; tiers,
