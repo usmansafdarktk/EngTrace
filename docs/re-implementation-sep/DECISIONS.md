@@ -7068,23 +7068,6 @@ Then the calibration first, the cap, and, if the calibration shows the models ra
 one-sentence nudge in the prompt is wanted; it would change the prompt hash and be a labelled variant of its own,
 and the arm as built keeps the prompt word for word.
 
-## D-185 — The paper writing plan for the October 2026 submission is written
-
-**Date:** 2026-10-03 · **Status:** WRITTEN (the authors' decisions it lists are OPEN) · **Evidence:** `docs/PAPER_PLAN_OCT2026.md` and its PDF (`docs/render_md_pdf.py` renders it through headless Edge)
-
-The plan reads both review cycles, the May submission, the current Overleaf sources, the certification, the pilot,
-the full run's results and paper notes, the revised Related Work and the experts' readings, and fixes for the paper
-as it stands today: the one-paragraph story, a draft abstract and three contributions, twenty claims each with the
-file that prints its evidence and a binding "do not state" list, reader-facing metric names (Answer Score,
-Fully-Solved Rate, Milestone Coverage, Arithmetic Flag Rate, Step Flag Rate, level gap, and the rest) mapped to the
-internal labels, a section-by-section plan with an eight-page budget, the main-text-against-appendix split, the
-figures and tables with their source data, writing rules, the decisions the authors must make before the text is
-final (anonymity, the authoring record of the 60 new templates, the taxonomy and difficulty procedure for the new
-branches, the two retrieval arms, the experts' labels, the two chemical templates, metric names, LPDS, housekeeping,
-the title), the order of work to 12 October, notes for the revision letter, and the Overleaf workflow. The rule it
-imposes: the paper is written for readers with no history of EngTrace; every "what changed" sentence goes to the
-revision letter.
-
 ## D-185 — B1 to B4 returned: fifteen experts' readings of the check, the judge, the wrong answers and the two chemical templates, scored
 
 **Date:** 2026-10-03 · **Status:** DONE (free; the experts' time) · **Evidence:** `full_run_28092026/EXPERT_REQUEST.md` ("What came back", counts only, rewritten by `expert_kits.py --score`), `expert_request/scored.json` (local), the returned kits in `expert_request/expert_requests_filled/` (local, never committed)
@@ -7147,12 +7130,33 @@ check's and the judge's verdicts on sampled items, not the whole run; the B1 sam
 verdict (75 correct, 49 incorrect, 26 partial), so its agreement figures are per verdict category, not a population
 rate; the error categories were read on four models' wrong answers (the three C4 models and Gemma 4 26B).
 
+## D-186 — The paper writing plan for the October 2026 submission is written
+
+**Date:** 2026-10-03 · **Status:** WRITTEN (the authors' decisions it lists are OPEN) · **Evidence:** `docs/PAPER_PLAN_OCT2026.md` and its PDF (`docs/render_md_pdf.py` renders it through headless Edge)
+
+The plan reads both review cycles, the May submission, the current Overleaf sources, the certification, the pilot,
+the full run's results and paper notes, the revised Related Work and the experts' readings, and fixes for the paper
+as it stands today: the one-paragraph story, a draft abstract and three contributions, twenty claims each with the
+file that prints its evidence and a binding "do not state" list, reader-facing metric names (Answer Score,
+Fully-Solved Rate, Milestone Coverage, Arithmetic Flag Rate, Step Flag Rate, level gap, and the rest) mapped to the
+internal labels, a section-by-section plan with an eight-page budget, the main-text-against-appendix split, the
+figures and tables with their source data, writing rules, the decisions the authors must make before the text is
+final (anonymity, the authoring record of the 60 new templates, the taxonomy and difficulty procedure for the new
+branches, the two retrieval arms, the experts' labels, the two chemical templates, metric names, LPDS, housekeeping,
+the title), the order of work to 12 October, notes for the revision letter, and the Overleaf workflow. The rule it
+imposes: the paper is written for readers with no history of EngTrace; every "what changed" sentence goes to the
+revision letter.
+
+*Numbering.* First committed as D-185 (7626b30); renumbered D-186 because the experts' readings entry was committed as D-185 in parallel (9ecef73).
+
+*Corrected 2026-10-03, the same evening.* The plan's first version repeated `docs/NEXT_CYCLE_REVIEW.md`'s claim that the 60 civil and industrial templates were AI-drafted under an authoring specification. The owner corrected it: they were written by a colleague of the authors and certified by the own-branch experts like the other 90 (all 60 approved by every expert in round 1). NEXT_CYCLE_REVIEW.md and `docs/related_work_oct2026/notes/engtrace_state_brief.md` are corrected in place, and the plan rewritten: a strict rule that no internal label, file name or implementation detail appears in the paper (with a glossary of replacements), two metrics (Final Answer Accuracy and Milestone Coverage) and two step-level diagnostics instead of twelve named measures, a flatter section tree written as paragraphs with bold headings, the appendix listed section by section against the May appendix, and the revision-letter and Overleaf notes split into `docs/REVISION_LETTER_NOTES.md` and `docs/OVERLEAF_WORKFLOW.md`.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
 | D-185 | Whether to add the sensitivity with the check's partial verdicts counted as correct on the eleven symbolic-answer templates the experts' reading flagged (free, `analyze.py`), and whether the paper's tables mark those templates | the paper's evaluator and limitations sections |
-| D-185 | The authors' ten decisions in `docs/PAPER_PLAN_OCT2026.md` section 9 (anonymised archive, the authoring record of the 60 civil and industrial templates, the taxonomy and difficulty procedure for the new branches, the retrieval arms, the experts' labels, the two chemical templates, metric names, LPDS, housekeeping, the title) | the paper text |
+| D-186 | The authors' decisions in `docs/PAPER_PLAN_OCT2026.md` section 9 (anonymised archive, the exact authorship sentence and the textbooks for the civil and industrial templates, the taxonomy and difficulty procedure for the new branches, the retrieval arms, the experts' labels, the two chemical templates, strict or partial-credit accuracy and the coverage metric's name, LPDS, housekeeping, the title) | the paper text |
 | D-184 | Approve the tool arm's calibration (`run_traces --variant tool --calibrate 20 --yes`, about $1.50) and then the run at a cap ($20 to $54 by the dry run's multipliers, plus E5 about $1.20), or state the open-book bound and leave the tool unrun | the paper's answer to the retrieval objection |
 | D-183 | Approve the corrected open-book arm: `run_traces --variant openbook2 --yes` for the 249 items per model not carried over ($7.68 by the dry run) and E5 on it (about $1); or report the arm as run with its defects stated, or leave it out | the paper's answer to the retrieval objection |
 | D-183 | ~~Whether to run the tool condition of C4 (a Python tool for two or three models on the subsample, $65 to $150 by the plan's estimate), now that the open-book arm bounds what formula recall adds at a few points at most; or state the bound and leave the tool unrun~~ **Built 2026-10-03 as `--variant tool` (D-184); the run awaits approval** | — |

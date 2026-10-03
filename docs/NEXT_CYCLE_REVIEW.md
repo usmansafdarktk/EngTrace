@@ -1,5 +1,10 @@
 # EngTrace, third submission: where it stands and what is left
 
+> **Corrected 2026-10-03:** this file said in four places that the 60 civil and industrial templates were
+> "AI-agent-drafted under an authoring spec". That was a misreading and is wrong: the civil and industrial templates
+> were written by a colleague of the authors and certified by the own-branch experts like the other 90. The four
+> passages are corrected in place below and marked. No other file repeats the claim.
+>
 > **Status, 2026-10-02: this document is the September plan and is no longer maintained.** It was written on
 > 2026-09-27 before the pool was frozen and is stale in places: its budgets, its roster discussion, its "before
 > inference" checklist and much of sections 3 to 9 describe work that has since been done differently or
@@ -48,7 +53,8 @@ and inference starts, most of them free; (2) a results section that reports the 
 the July rebuttal promised, on the new run; (3) two experiments that answer the objections
 every reviewer repeated and that the current plan does not fund: a paraphrase robustness
 test and a tool-use condition; and (4) an honest account in the paper of what changed and
-why, including that the new branches were AI-drafted and expert-certified.
+why. *(Corrected 2026-10-03: an earlier version of this sentence called the new branches "AI-drafted"; they were
+written by a colleague and expert-certified.)*
 
 ---
 
@@ -64,7 +70,7 @@ why, including that the new branches were AI-drafted and expert-certified.
 | Inter-judge agreement never reported (9W1B) | E0-3J kappa 0.725 (4-way) / 0.776 (binary); E1 0.563 / 0.622 (RESULTS_E1). Screen AC1 0.929 (pass 2). | Report both. |
 | Certification IAA weak, perfect kappa unconvincing (gFWV 1) | Layer 2: 15 own-branch experts, 60 of 60 planted defects caught, hand checks 459 of 504, AC1 0.914, 53 rejections over three rounds, 25 templates fixed, all 150 certified unanimously (D-106 to D-109). | D-108: 65 templates were judged through a Markdown renderer that dropped `*` and `$` (section 2, item 1). |
 | Instance-level verification shallow (gFWV 3) | Layer 0 gate at 500 seeds: closure, determinism, contract, emission; 54 templates edited to pass (D-092). | Tie census on the frozen pool (section 2, item 4). |
-| Template authorship ambiguous (gFWV 5) | The original 90 were expert-authored. | The 60 new templates were AI-agent-drafted under `docs/pilot_template_authoring_spec.md` (commit 63bb6ac) and then expert-certified. The paper must say so (section 4.3). |
+| Template authorship ambiguous (gFWV 5) | The original 90 were expert-authored. | *Corrected 2026-10-03:* the 60 civil and industrial templates were written by a colleague of the authors and certified by the own-branch experts with the rest (all 60 approved by every expert in round 1). The paper states who wrote each branch's templates (section 4.3). |
 | Only three branches (ynoK 1, AC) | Five branches, 150 templates, 2,250 items. | Taxonomy figure, Appendix C textbooks, Appendix L statistics for five branches. The new domains came from a working ABET/ASCE/IISE taxonomy, not the paper's four-model panel (Appendix A/B); either run the panel procedure on the two branches (cheap) or describe what was actually done. |
 | 90 templates are 90 problems; linguistic diversity; template exploitation (nWW3 2, cqGs 2, 9W1B 1, ynoK 2, AC) | Structural diversity argument, Appendix G. Shortcut audit exists for four templates (D-046, D-057, D-066). | A paraphrase robustness experiment and a corpus-wide surface-shortcut audit (section 6). |
 | Tool-free setting conflates arithmetic with reasoning; no RAG or tool baseline (cqGs 1, 4; ynoK 3; AC) | Error taxonomy showing frontier failures are arithmetic. | A tool-use condition on a subset (section 5). RAG stays future work, with the reason stated. |
@@ -295,17 +301,18 @@ of the 178 slips behind a correct answer (D-112).
 
 ### 4.3 Say what changed, and be exact about authorship
 
-- **Authorship.** The paper says "the 90 symbolic Python templates were fully authored by
-  domain experts", added in response to gFWV 5. The 60 civil and industrial templates were
-  drafted by AI agents under a textbook-grounded authoring spec with multiple blind AI review
-  cycles (`docs/pilot_template_authoring_spec.md`, commit 63bb6ac), then passed the
-  deterministic gate, the non-suite screen and three rounds of own-branch expert certification
-  that rejected 22 of them in round 1 and required 25 fixes. That is a defensible pipeline
-  and it must be described as what it was. Writing "authored by domain experts" over 150
-  templates would be false, and the reviewer who raised authorship once will look again.
+- **Authorship.** *(Corrected 2026-10-03; the earlier text of this bullet claimed the 60 new templates were
+  "drafted by AI agents under an authoring spec", which was a misreading.)* The paper says "the 90 symbolic Python
+  templates were fully authored by domain experts", added in response to gFWV 5. The 60 civil and industrial
+  templates were written by a colleague of the authors, grounded in the textbooks and references of those
+  branches, and then passed the same deterministic gate, the same screen and the same own-branch expert
+  certification as the other 90; in round 1 every civil and industrial expert approved all 30 of their
+  templates, and all 22 round-1 rejections fell on the original three branches (`layer2/RESULTS.md`). The paper
+  states who wrote each branch's templates and how they were certified.
 - **The taxonomy for the new branches.** Section 3.1 and Appendices A, B and D describe a
   four-model panel with majority voting and a pedagogical significance score. The new
-  domains came from the authoring spec's working taxonomy (ABET, ASCE, IISE). Either run the
+  domains and areas were chosen by the colleague who wrote the templates, from the ABET, ASCE and IISE curricula
+  and the branch textbooks *(corrected 2026-10-03; an earlier version attributed them to an "authoring spec")*. Either run the
   Appendix A/B/D prompts on the two branches now (minutes, negligible cost) and report
   agreement with the chosen domains, or describe the procedure that was used.
 - **Certification, honestly.** The December pipeline approved 270 of 270 rows at 12 to 30
@@ -485,15 +492,12 @@ changes the plan, and thirteen items the reviewers raised are not yet covered.
 
 ### 9.1 Corrections
 
-1. **The authoring record is not on master.** Section 4.3 cites
-   `docs/pilot_template_authoring_spec.md` at commit 63bb6ac. The file does not exist on
-   master, DECISIONS.md has no entry describing how the 60 civil and industrial templates
-   were written, and `pilot_new_branches/` (on disk, gitignored) holds draft templates and a
-   reference manifest only. The paper will describe an authoring pipeline that no committed
-   document records. Commit the spec, or a dated summary of the process, before submission.
-   The reviewer who raised authorship (gFWV 5) was told "fully authored by domain experts"
-   in May; a public repository that cannot show how 60 of 150 templates were written is the
-   wrong place to be caught.
+1. **The authorship of the 60 new templates.** *(Corrected 2026-10-03.)* This item first said that an
+   "authoring spec" at commit 63bb6ac recorded AI drafting of the civil and industrial templates and was missing
+   from master. No such process took place: the templates were written by a colleague of the authors and arrived
+   in commit `96448c7` (2026-09-05); `pilot_new_branches/` held drafts and a reference manifest. What the paper
+   needs is one exact sentence on who wrote each branch's templates, agreed with that colleague, and the
+   textbooks of the two branches for Appendix B.
 2. **No July meta-review is in the repository.** `docs/` holds the author responses for
    both cycles and the May revision letter. The January AC's three suggested revisions are
    known only through that letter, and the July AC's decision reason is recorded nowhere.
@@ -761,8 +765,8 @@ tolerance and reading sensitivities. Not yet done, in the order it should happen
     survive a judge swap (JUDGE_SELECTION item 5).
 17. The Qwen2.5-Math pair only if the math-pretraining claim is kept; the plan drops it.
 
-**Not analyses, blocking the paper.** The authoring record of the 60 AI-drafted templates (the spec is not
-on master, 9.1 item 1); the taxonomy procedure for the two new branches; who assigned the 60 templates'
+**Not analyses, blocking the paper.** The authorship sentence for the 60 civil and industrial templates
+(*corrected 2026-10-03*: written by a colleague, not AI-drafted; 9.1 item 1); the taxonomy procedure for the two new branches; who assigned the 60 templates'
 difficulty tiers; Appendix P (ceilings, endpoints, Muse's 16,384 cap, decoding); the explanation of why the
 numbers moved; the scoring statements for symbolic, array and multipart answers; the six iterative templates
 that hold most empty rows; `README.md` (still 90 templates); `figures_oct_12/` untracked; the anonymised

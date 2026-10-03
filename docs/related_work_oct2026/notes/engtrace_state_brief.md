@@ -29,6 +29,8 @@ By answer type, the 150 templates are scalar 89, multipart 32, symbolic 9, vecto
 
 Branch reports there: civil "~50 template-review cycles" and 15 genuine gate failures; industrial "65 logged review cycles", one discard at the cap, two overruns, two cycles without a reviewer panel.
 
+*Corrected 2026-10-03 (the owner):* the draft spec above describes a pilot that did not produce the shipped templates. The 60 civil and industrial templates were written by a colleague of the authors and certified by the own-branch experts like the other 90; the certification files cited in the "Disagreement" item below are consistent with that (every civil and industrial expert approved all 30 in round 1). The paper and the revision letter must not describe the new branches as AI-drafted or spec-generated; `docs/NEXT_CYCLE_REVIEW.md`'s passages saying so are corrected in place.
+
 **Certification** (`template_annotation_23092026/README.md`, `layer2/RESULTS*.md`, `layer2/CERTIFICATION.md`, D-092 to D-119):
 
 - **Layer 0**, a deterministic gate at 500 seeds: all 150 pass, after 54 were edited for closure.
