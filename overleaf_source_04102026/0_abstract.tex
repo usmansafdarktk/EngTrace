@@ -1,0 +1,9 @@
+Most engineering benchmarks for large language models (LLMs) score only final answers; those assessing steps rely on LLM judges or human graders.
+We present \ourdataset, a benchmark of 150 symbolic templates spanning five engineering branches.
+Each template is code that samples physically grounded parameters and computes the answer and its gold reasoning trace, so every intermediate quantity is known.
+Three experts from each branch certified its templates and rejected every planted defect.
+Deterministic checks score the final answer and intermediate-quantity coverage, and flag arithmetic slips; an LLM judge from outside the evaluated model families decides only what these checks leave open.
+Against step-level labels from 15 experts on 300 responses, the answer check agrees on 93\% of verdicts and coverage reaches an F1 of 0.96.
+Errors planted in responses show that no deterministic check detects a misstated rule behind a correct answer; LLM judges catch at most about a third.
+On 2,250 instances generated from a private seed, eleven LLMs score 0.81 to 0.98 in final-answer accuracy; the top five cannot be separated.
+Coverage orders the models differently from accuracy, and responses with wrong answers still reach 46\% to 85\% of the intermediate quantities.
