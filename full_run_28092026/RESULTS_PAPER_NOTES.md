@@ -105,6 +105,8 @@ headline is the answer score; the reasoning scores describe what the traces reac
    scores; seven did. The roster therefore does not compare closed with open models, or small with large,
    at equal reasoning effort, and the paper must not read the closed tier's scores as the models' ceiling.
    Appendix P states the setting per model, the token ceiling, Muse's 16,384 cap, and the served endpoints.
+   *Added 2026-10-03:* the two closed ones were re-run with reasoning at medium effort on the subsample (C1, D-180):
+   GPT-5.4 mini +0.093, Gemini 3.1 Flash-Lite +0.016 within the noise; the section-C notes below carry the wording.
 8. **Unusable traces are scored 0, and where they fall.** 246 of 24,750 traces (1.0%) ended without a
    readable answer, 243 of them empty at the output ceiling; 153 fall on six templates, four iterative by
    construction (`qr_policy_one_iteration`, `work_isothermal_virial`, `normal_depth_iteration`,
@@ -263,12 +265,13 @@ the main run's figures stay the headline and the arms are reported beside them, 
 
 | what | value | source |
 |---|---|---|
-| reasoning on, for the two closed models that ran without it (C1) | GPT-5.4 mini 0.858 to 0.951 at medium effort (+0.093, 95% CI 0.056 to 0.133, Holm p < 0.0001, detectable 0.055); Gemini 3.1 Flash-Lite 0.874 to 0.890 (+0.016, −0.010 to 0.042, p 0.30, detectable 0.038). GPT-5.4 mini's gain holds in E5-strict coverage (+0.061, 0.034 to 0.090) and its digit and router flag rates on solved traces roughly halve (0.127 to 0.069; 0.232 to 0.135); Gemini's measures all sit inside the noise | "C1 and C4" |
-| a second judge (C2) | Grok 4.6 on E5's prompts for 220 traces: REACHED agreement 0.83 to 1.00 for ten models, 0.74 for GLM-5.3 (34 milestones); E5-strict coverage differs by −0.017 to +0.020 per model, every interval narrower than Q3's; on the planted set 22 of 60 conceptual defects (0.367; MiMo 0.308), 52 of 60 arithmetic, no false alarm on 120 untouched steps | `JUDGE_SWAP.md`; RESULTS_X1 Finding 8 |
-| flagship anchors on the subsample (C3) | GPT-5.4 0.941 (0.909 to 0.969) at the provider's default with no reasoning tokens, 0.980 (0.964 to 0.993) at medium reasoning; DeepSeek V4 Pro 0.968 (0.950 to 0.983); the roster's eleven on the same items 0.826 to 0.976, the top five 0.964 to 0.976; E5-strict coverage 0.892, 0.906 and 0.911 against the roster's 0.830 to 0.925 | the two "C3" blocks |
-| open book (C4) | with the governing equations appended, on 429 items: Claude Sonnet 5 +0.005 (−0.010 to 0.021), GPT-5.4 mini −0.007 (−0.034 to 0.021), gpt-oss-20b +0.041 (0.003 to 0.078, Holm p 0.13); none holds after Holm; E5-strict coverage up by +0.032, +0.032 and +0.061 | "C1 and C4" |
+| reasoning on, for the two closed models that ran without it (C1) | GPT-5.4 mini 0.858 to 0.951 at medium effort (+0.093, 95% CI 0.056 to 0.133, Holm p < 0.0001, detectable 0.055); Gemini 3.1 Flash-Lite 0.874 to 0.890 (+0.016, −0.010 to 0.042, p 0.30, detectable 0.038). GPT-5.4 mini's gain holds in E5-strict coverage (+0.061, 0.034 to 0.090), is largest on Advanced items (0.750 to 0.917) and its digit and router flag rates on solved traces roughly halve (0.127 to 0.069; 0.232 to 0.135); Gemini's measures all sit inside the noise (McNemar 0.36) | "C1 and C4" |
+| a second judge (C2) | Grok 4.6 on E5's prompts for 220 traces: REACHED agreement 0.83 to 1.00 for ten models, 0.74 for GLM-5.3 (34 milestones); E5-strict coverage differs by −0.017 to +0.020 per model, every interval narrower than Q3's; Cohen's kappa pooled 0.69 three-way and 0.79 on REACHED against not; on the planted set 22 of 60 conceptual defects (0.367; MiMo 0.308), 52 of 60 arithmetic, no false alarm on 120 untouched steps | `JUDGE_SWAP.md`; RESULTS_X1 Finding 8 |
+| flagship anchors on the subsample (C3) | GPT-5.4 0.941 (0.909 to 0.969) at the provider's default with no reasoning tokens, 0.980 (0.964 to 0.993) at medium reasoning; DeepSeek V4 Pro 0.968 (0.950 to 0.983); the roster's eleven on the same items 0.826 to 0.976, the top five 0.964 to 0.976; E5-strict coverage 0.892, 0.906 and 0.911 against the roster's 0.830 to 0.925; GPT-5.4's reasoning arm against its default arm, paired: +0.039 (0.016 to 0.067), fully solved +0.040 (McNemar 0.0001), digit flags on solved traces 0.119 to 0.032 | the two "C3" blocks; the anchor row of "C1 and C4" |
+| open book (C4) | with the governing equations appended, on 429 items: Claude Sonnet 5 +0.005 (−0.010 to 0.021), GPT-5.4 mini −0.007 (−0.034 to 0.021), gpt-oss-20b +0.041 (0.003 to 0.078, Holm p 0.13); no answer-score change holds after Holm, and gpt-oss-20b's fully-solved rise (+0.047, McNemar p 0.014 unadjusted) is the one change a test supports; E5-strict coverage up by +0.032, +0.032 and +0.061 | "C1 and C4" |
 | settings and tokens per arm | GPT-5.4 mini median reasoning tokens 3,464 and Gemini 3.1 Flash-Lite 1,333 under the parameter against zero in the main run; GPT-5.4 zero at the default and 440 at medium; DeepSeek V4 Pro reasons at its default (median 1,836, four rows at the ceiling) | `DECODING_TABLE_<arm>.md` |
 | cost | the four conditions billed about $53 (C1 $9.77, C2 $10.53, C3 $17.54 in rows, C4 $12.55 in rows, E5 on the C3 and C4 arms $2.99), the round about $588 | D-180 to D-183 |
+| the tool condition (C4) | built as `--variant tool` and priced ($20 to $54 by assumption, calibration about $1.50), not run; if run, the digit rule's flag rate under the tool is the measurement and the paired block carries it | D-184 |
 
 ### What to state
 
@@ -300,6 +303,10 @@ the main run's figures stay the headline and the arms are reported beside them, 
   carry is that it lies inside the top tier's intervals.
 - Not "retrieval would not help": the open-book condition supplies equations only; it bounds formula recall, not
   property lookups, and the tool condition was not run.
+- Not "open book changes nothing for gpt-oss-20b": its fully-solved rate rises by 0.047 (McNemar p 0.014) while the
+  answer score's change does not survive Holm; say both, with the interval.
+- Not the level means as tested differences: 150 items per level, descriptive; the one reading they support is that
+  reasoning on helps most on Advanced items for both GPT-5.4 and GPT-5.4 mini.
 - Not the arms' coverage rise as better reasoning: coverage credits stated intermediates, and the handed equations
   prompt the traces to state them.
 - Not "the judge is validated" from C2 alone: it is agreement within intervals on a sample and a planted recall of

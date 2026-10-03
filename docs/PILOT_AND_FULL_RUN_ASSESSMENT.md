@@ -236,11 +236,11 @@ Three of those templates were read:
   prescribed-precision compliance, and the process scores. Say it as a finding: the pool is solved at the top by
   models of September 2026, and the benchmark's discrimination now lies in where and how models fail rather than
   whether. No flagship is on the roster (D-110's rule and the budget); C3's 450-item anchor is the only way to
-  put one there, about $40 to $55, the supervisor's call.
+  put one there, about $40 to $55, the supervisor's call. *(Done 2026-10-03, D-182: two anchors, both inside the top tier.)*
 - **The roster is not compared at equal effort.** Four models wrote no reasoning tokens and are four of the five
   lowest scores (D-168). Appendix P must say this per model (A8, two hours), and no sentence may read the closed
   tier's scores as a ceiling. C1 (a reasoning-on variant for GPT-5.4 mini and Gemini 3.1 Flash-Lite) is the one
-  paid item that changes how the roster reads; it needs a dry run and approval.
+  paid item that changes how the roster reads; it needs a dry run and approval. *(Done 2026-10-03, D-180: +0.093 and +0.016.)*
 - **The check was corrected after the run, twice.** Every correction is measured, read and recorded, none moved
   a pilot verdict against the experts, and the forms were absent from the pilot's templates. That is defensible
   only if the paper says it plainly and gives the counts (D-169: 238 of 24,750, 234 to correct). Section 5 adds

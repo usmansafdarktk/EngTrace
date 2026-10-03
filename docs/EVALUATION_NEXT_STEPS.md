@@ -168,7 +168,7 @@ reported as an anchor with 450-item intervals, outside the pairwise family. *Cos
 pilot's per-trace rates. *Decision:* the supervisor's; the paper otherwise needs a sentence on why the
 flagship tier is absent.
 
-**C4. A tool-use condition, or the open-book fallback.** *(Open-book arm done 2026-10-03, D-183: no answer-score change holds after Holm for the three models, coverage rises; $12.55 in rows. The tool condition is not run and stays the owner's call.)* *Answers:* cqGs 1 and 4, ynoK 3, the January AC.
+**C4. A tool-use condition, or the open-book fallback.** *(Open-book arm done 2026-10-03, D-183: no answer-score change holds after Holm for the three models, coverage rises; $12.55 in rows. The tool condition is built as `--variant tool` (D-184: a Python tool in the request, the scripts run in an isolated interpreter, the prompt unchanged; dry run $20 to $54 by assumption, calibration about $1.50; `run_traces --selftest` checks it offline) and awaits the owner's approval.)* *Answers:* cqGs 1 and 4, ynoK 3, the January AC.
 *Method:* a Python tool on a stratified subsample for two or three models, same prompt otherwise, same
 stack; the digit rule's flag rate under the tool is itself the measurement. Or, cheaper, an open-book
 condition that supplies the governing equations in the prompt, bounding what retrieval could add. *Cost:*

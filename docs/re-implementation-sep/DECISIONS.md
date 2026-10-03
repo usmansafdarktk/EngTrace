@@ -6816,7 +6816,9 @@ the same reply store and call settings. On the 466 milestones both judges ruled 
 over the sampled traces differs, Grok minus MiMo, by −0.017 to +0.020 per model, every interval narrower than Q3's own
 and most including zero. The disagreements are almost all NOT_NEEDED against MISSING (54 of 466), which the strict score
 treats alike; REACHED moved on 24. So no Q3 figure that rests on the judge would move by more than its interval under
-a judge from another family.
+a judge from another family. *Added later the same day:* Cohen's kappa beside the raw agreement, pooled over the 466
+milestones 0.693 three-way and 0.790 on REACHED against not; per model 0.48 to 0.85 three-way and 0.31 (GLM-5.3, 34
+milestones) to 1.00 binary; kappa reads low where REACHED dominates, which `JUDGE_SWAP.md` says beside the figures.
 
 **The planted set.** Grok 4.6 on the 240 matched prompts of RESULTS_X1 Finding 8 (the planted step and the same step
 untouched): 22 of 60 conceptual defects caught (0.367; 0.550 counting "Other"), 52 of 60 arithmetic (0.867), 0 false
@@ -6864,7 +6866,10 @@ router's judge flags on fully solved traces 0.232 to 0.135. Gemini's changes sit
 (E5-strict +0.015, −0.002 to 0.035), though its flag rates fall as well (0.082 to 0.068; router 0.111 to 0.066). E5
 answered all 317 calls and the router all 900 (the router's shell was stopped by a time limit at 850 and resumed from
 its store for the last 50; nothing was bought twice). With reasoning on, GPT-5.4 mini scores level with GLM-5.3 on
-these items (0.952) and above Qwen3-235B-2507 (0.888); Gemini 3.1 Flash-Lite stays where it was.
+these items (0.952) and above Qwen3-235B-2507 (0.888); Gemini 3.1 Flash-Lite stays where it was. *Added with the
+block's extension (commit 3e194c3):* McNemar on the fully-solved verdict p < 0.0001 for GPT-5.4 mini and 0.36 for
+Gemini; by level, GPT-5.4 mini's gain is largest on Advanced items (0.750 to 0.917) and smallest on Easy (0.928 to
+0.989), Gemini's three level means move by 0.005 to 0.030. Level means are descriptive, 150 items each.
 
 **For the paper.** The closed tier of the main run is in part a default-settings result, for one of the two models:
 Appendix P states the setting per model, the main run's figures stay the headline, and this arm is reported beside
@@ -6906,7 +6911,13 @@ top five's intervals, DeepSeek V4 Pro sits among them, and GPT-5.4 at its defaul
 (0.952). By level, GPT-5.4 at the default drops to 0.868 on Advanced against 0.946 with reasoning on; the anchors'
 Advanced means (0.941, 0.868, 0.946) lie inside the roster's range (0.706 to 0.946). Digit flags on fully solved
 traces: 0.107, 0.119 and 0.032 against the roster's 0.007 to 0.187. E5 answered every call on all three arms; the
-router was not run on them (its dry run on the reasoning arm: 450 calls, $1.96, 0.6 hours).
+router was not run on them (its dry run on the reasoning arm: 450 calls, $1.96, 0.6 hours). *Added with the paired
+block's extension (commit 3e194c3):* GPT-5.4's reasoning arm paired against its default arm on the same 450 items,
+the one paired test among the anchors: +0.039 (95% CI 0.016 to 0.067, sign-flip p 0.002, detectable 0.037), fully
+solved +0.040 (McNemar p 0.0001), E3 coverage +0.016 (0.004 to 0.029), E5-strict +0.014 (0.000 to 0.029), the digit
+rule's flag rate on fully solved traces 0.119 to 0.032; by level 0.989 to 0.997, 0.937 to 0.983, 0.868 to 0.946. The
+same setting moved GPT-5.4 mini by +0.093 (D-180): the flagship starts higher and gains less, with its gain again
+largest on Advanced items.
 
 **For the paper.** The "no frontier model" objection (9.3 item 9) gets one sentence and an appendix table: two
 flagships that pass the roster rule, run on the 450-item subsample with the same stack, score inside the roster's top
@@ -6942,7 +6953,11 @@ three, E3 by +0.029, +0.037 and +0.061 and E5-strict by +0.032 (0.013 to 0.052),
 rows fall from 13 to 3. The digit rule's flag rate on fully solved traces is unchanged for Claude (0.131 to 0.128)
 and higher for GPT-5.4 mini (0.121 to 0.160) and gpt-oss-20b (0.155 to 0.185): more arithmetic written out, more
 slips to flag. The trace review is clean against the manifest (1,287 rows, 3 empty, served as in the main run); E5
-answered every call (341); the router was not run on the arm.
+answered every call (341); the router was not run on the arm. *Added with the paired block's extension (commit
+3e194c3):* McNemar on the fully-solved verdict: Claude 0.79, GPT-5.4 mini 0.88, gpt-oss-20b 0.014 unadjusted (0.04
+after Holm over the three), so gpt-oss-20b's +0.047 in fully solved traces is the one change in the arm that a test
+supports, while its answer-score change does not survive Holm (0.13); by level its gain sits on Intermediate items
+(0.794 to 0.876) with Easy and Advanced within 0.02, and the two closed models' level means move by 0.03 or less.
 
 **For the paper.** The retrieval objection (cqGs 1 and 4, ynoK 3) gets a bound rather than a third "future work":
 with the governing equations supplied, the answer score moves by less than the design detects for the two closed
@@ -6951,11 +6966,55 @@ remaining errors are in setting up, substituting and computing, not in recalling
 equations only, so it bounds formula recall and not data lookups. The tool condition (a code tool, $65 to $150) is
 not run; whether to run it is the owner's call, with the arm's result as the prior.
 
+## D-184 — C4's tool condition: built as `--variant tool`, self-tested offline, priced by its dry run; not run
+
+**Date:** 2026-10-03 · **Status:** BUILT · OPEN (the owner's approval of a calibration and then the run) · **Evidence:** `full_run_28092026/run_traces.py` (`TOOL`, `PYTHON_TOOL`, `TOOL_FORBIDDEN`, `sandbox_env`, `run_python`, `call_with_tool`, `tool_dry_run`, `tool_selftest`, `--selftest`), `trace_review.py` and `decoding_table.py` (a tool-use table each), `score.py` (the tool fields carried to the score rows), `analyze.py` (`reasoning_arms`: the tool arm in the paired block with its tool-use columns)
+
+**What it is.** The plan's tool condition (docs/EVALUATION_NEXT_STEPS.md C4): the main run's prompt word for word, the
+450 originals of the subsample, the same ceiling, routing and states, with one function tool in the request,
+`python(code)`, described as a Python 3 interpreter for arithmetic and numerical computation (the standard library,
+numpy, scipy and sympy), `tool_choice: auto`. Nothing else tells the model a tool exists; whether to call it is the
+model's choice and is recorded per trace. When it calls, the script runs in a fresh isolated interpreter
+(`python -I`) in a scratch directory removed afterwards, with an environment built from scratch (what the OS needs,
+no API key), a 20 s wall-clock limit and the output truncated at 4,000 characters; a static filter refuses scripts
+that reach for the file system, the network, processes or introspection, and the model sees the refusal as the
+tool's output. Up to 8 calls per item; then one more turn with the tool withheld, so the trace ends in an answer.
+The row's text is the transcript the scorer reads (every assistant text, each script and its output in fenced
+blocks, the final answer); `final_text`, `turns`, `tool_calls`, `tool_errors`, `tool_refused`, `tool_limit` and
+`tool_turns` record the tool use; tokens and the bill are summed over the turns. The default models are the
+open-book arm's three (`claude-sonnet-5`, `gpt-5.4-mini`, `gpt-oss-20b`), one from each tier, so that the two C4
+conditions read against the same base rows; OpenRouter's catalogue lists `tools` and `tool_choice` among the
+supported parameters of all three (checked 2026-10-03). `run_traces --selftest` (free) exercises the sandbox (a
+numeric script with numpy, scipy and sympy; `os` and `open()` refused; a raising script; a runaway script stopped
+at the limit; long output truncated; no key, token or secret in the environment) and the loop against a fake client
+(a tool call then an answer: the transcript, the summed tokens and bill, the messages sent back, the request's tool
+fields). Fourteen checks, all passing at the commit of this entry.
+
+**What it measures.** Arm minus main on the same items with the paired block's machinery, as the open-book arm:
+the answer score, fully solved (with McNemar), the level means, E3 and E5-strict coverage, and the digit rule's flag
+rate on fully solved traces, which the plan names as the measurement itself (does a computation tool remove the
+arithmetic slips the rule flags?), beside the share of traces that called the tool, the calls per trace, and the
+score with and without a call (descriptive). The trace review and the decoding table report the tool use per
+model; the judged stages take the arm's name as any other.
+
+**The price.** The dry run prices the main run's bill on these items ($13.50: Claude Sonnet 5 $11.81, GPT-5.4 mini
+$1.55, gpt-oss-20b $0.14) times multipliers for the turns the loop adds, each turn resending the conversation:
+$20.26 at x1.5, $33.76 at x2.5, $54.01 at x4, an assumption until `--calibrate 20 --yes` (about $1.50) measures the
+turns and lengths. E5 (about $1.20 at the open-book arm's rate) and the router (about $6 for the three, if run)
+come on top. Inside the plan's $65 to $150.
+
+**Not decided here.** Whether to run it: the open-book arm found that formula recall is not the gap, a code tool
+addresses computation, a different mechanism, and the retrieval reviewers asked for a tool baseline by name.
+Then the calibration first, the cap, and, if the calibration shows the models rarely call the tool, whether a
+one-sentence nudge in the prompt is wanted; it would change the prompt hash and be a labelled variant of its own,
+and the arm as built keeps the prompt word for word.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
-| D-183 | Whether to run the tool condition of C4 (a Python tool for two or three models on the subsample, $65 to $150 by the plan's estimate), now that the open-book arm bounds what formula recall adds at a few points at most; or state the bound and leave the tool unrun | the paper's answer to the retrieval objection |
+| D-184 | Approve the tool arm's calibration (`run_traces --variant tool --calibrate 20 --yes`, about $1.50) and then the run at a cap ($20 to $54 by the dry run's multipliers, plus E5 about $1.20), or state the open-book bound and leave the tool unrun | the paper's answer to the retrieval objection |
+| D-183 | ~~Whether to run the tool condition of C4 (a Python tool for two or three models on the subsample, $65 to $150 by the plan's estimate), now that the open-book arm bounds what formula recall adds at a few points at most; or state the bound and leave the tool unrun~~ **Built 2026-10-03 as `--variant tool` (D-184); the run awaits approval** | — |
 | D-179 | ~~Run C1: `run_traces --variant reasoning-medium --calibrate 20 --yes` first (about $0.52), then the 450 items at a cap, then E5 and the router on the variant after their dry runs; or leave the setting stated in Appendix P and the comparison unmade~~ **Run 2026-10-03 at medium effort after the calibration, $5.54 in the rows (D-180); C2 to C4 approved the same day (D-181 to D-183)** | — |
 | D-172 | Send the fifteen kits in `full_run_28092026/expert_request/dist/` (app.py, README.txt, guide.md and the kit_<id> folder each) with a return date; cut B2 first if the load is too much (`--b2-per-model`); when the files come back, `expert_kits.py --score <folder>` | the paper's evaluator section, Q3 and the D-171 limitation |
 | D-171 | What the paper states about the two under-specified chemical templates and the 17 exact-digit templates (a limitation and a Q2 sensitivity row, as proposed), and whether one chemical expert reads `work_isothermal_virial` and `adiabatic_flame_temperature` with B1 (next steps B4) | the paper's sections 5 and 6; the experts' request |

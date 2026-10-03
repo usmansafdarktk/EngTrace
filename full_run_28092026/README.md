@@ -214,8 +214,10 @@ endpoints reported no reasoning tokens in the main run with OpenRouter's reasoni
 `deepseek-v4-pro`, both passing the roster rule) at the provider's default, and `flagship-reasoning-<effort>` the
 closed anchor with the parameter (C3); `--variant openbook` sends the question with the template's governing
 equations appended (`openbook.py --survey | --build`; `openbook/manifest.jsonl` is committed, the modified
-questions stay local) for one model from each tier (C4). A reasoning arm's dry run prices multipliers of the
-visible output and `--calibrate N --yes` measures the real lengths on N items first. The scorer, `trace_review.py`,
+questions stay local) for one model from each tier (C4); `--variant tool` offers the same three a Python tool in the
+request and runs their scripts in an isolated interpreter, the prompt unchanged (D-184; `--selftest` checks the sandbox
+and the loop offline). A reasoning arm's or the tool arm's dry run prices multipliers of the main run's bills and
+`--calibrate N --yes` measures the real lengths and turns on N items first. The scorer, `trace_review.py`,
 `decoding_table.py --variant`, E5 and the router take an arm's name and its models from the arm's own files;
 `analyze.py` reports the paired arms (C1, C4) against the main run with Q5's machinery and the anchors (C3) on the
 subsample beside the roster, outside the pairwise family.
@@ -225,6 +227,8 @@ python -m full_run_28092026.run_traces --variant reasoning-medium --dry-run     
 python -m full_run_28092026.openbook --survey                                      # free: OPENBOOK_SURVEY.md
 python -m full_run_28092026.openbook --build                                       # free: openbook/items.jsonl (local) and the manifest
 python -m full_run_28092026.run_traces --variant openbook --dry-run                # free
+python -m full_run_28092026.run_traces --selftest                                  # free: the tool arm offline
+python -m full_run_28092026.run_traces --variant tool --dry-run                    # free
 python -m full_run_28092026.decoding_table --variant flagship-reasoning-medium     # free, after the run
 ```
 
