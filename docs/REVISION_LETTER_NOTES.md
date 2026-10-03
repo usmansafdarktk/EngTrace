@@ -78,8 +78,7 @@ Accuracy, Reasoning F1, BERTScore and ROUGE).
 
 ## 5. What the letter must disclose before a reader of the repository finds it
 
-The September audit's findings on the published templates; the evaluator's measured defects; the Markdown rendering
-during certification (65 templates judged through a renderer that dropped `*` and `$`); the answer-check corrections
+The September audit's findings on the published templates; the evaluator's measured defects; the answer-check corrections
 after the run (238 verdicts moved, 234 to correct, every one read; one known wrong credit) and the two refinements of
 the arithmetic check on an expert's readings before its final held-out reading (0.505, 0.752, then 0.905 on a fresh
 sample); and that the new numbers are high because the models of September 2026 solve the evaluation set at the top on

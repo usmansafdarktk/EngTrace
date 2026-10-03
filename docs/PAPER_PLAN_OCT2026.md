@@ -194,7 +194,8 @@ per-template SD, the judged fraction and the two diagnostics go to Appendix I.
 
 ARR long paper: eight pages of content, unlimited references and appendices; the review version must stand on its
 own. Few numbered subsections; most structure is paragraphs with bold run-in headings (`\paragraph{}`), as the
-current Overleaf sources already do. The budget sums to eight pages.
+current Overleaf sources already do. The budget sums to eight pages. Every subsection ends with a one-line pointer
+to the appendix section that holds its detail (section 6); the pointer sentence is given below for each.
 
 ### 1 Introduction (1.0 page)
 
@@ -208,6 +209,8 @@ current Overleaf sources already do. The budget sums to eight pages.
 - The three contributions.
 - `docs/related_work_oct2026/CHANGES.md` section 2 has the replacement sentences for every Introduction sentence
   that cites a prior benchmark; use them as written.
+- *Appendix pointer:* the Figure 1 caption ends "Appendix C gives the full template; Appendix F shows how the
+  milestones and calculations are checked."
 - Do not: "first"; "no existing benchmark verifies this process"; "safety-critical" beyond one motivating clause.
 
 ### 2 Related Work (0.75 page)
@@ -219,6 +222,8 @@ current Overleaf sources already do. The budget sums to eight pages.
   LPDS cited without saying they cite EngTrace. Whether the Limitations acknowledge LPDS's finding on randomly
   sampled instances is the authors' call (`CHANGES.md` section 4).
 - Venues to confirm before submission: EMNLP 2026 for Huang et al. and Dlugosz et al.
+- *Appendix pointer:* the section ends "Appendix M compares EngTrace with the fifteen closest benchmarks and
+  surveys further related work."
 
 ### 3 The EngTrace Benchmark (1.6 pages)
 
@@ -236,6 +241,8 @@ copied into `figs/`).
 - *Difficulty.* Easy, Intermediate, Advanced by conceptual complexity, mathematical sophistication and procedural
   depth; 58 / 58 / 34 templates. One sentence on who assigned the levels, for the original branches and for the new
   ones (the 2026-09-05 inventory holds them).
+- *Appendix pointer:* "Appendix A gives the selection procedure and prompts; Appendix B the textbooks and reference
+  data."
 
 **3.2 Templates and Instances (0.6 page).**
 
@@ -251,6 +258,8 @@ copied into `figs/`).
 - *The evaluation set.* 15 instances per template from a private 128-bit seed, chosen round-robin across each
   template's reasoning paths and answer forms, excluding repeated questions and display ties. The instances' hashes
   and a commitment to the seed are published now; the seed and the text at publication.
+- *Appendix pointer:* "Appendix C shows template examples and the structural-variation counts; Appendix D the
+  dataset statistics and how the evaluation set was drawn."
 
 **3.3 Certification (0.7 page).**
 
@@ -275,8 +284,8 @@ copied into `figs/`).
   round-1 rejections fell on the original three branches; rounds 2 to 4 re-certified the changed templates; 150 of
   150 certified unanimously on code that still regenerates the reviewed instances byte for byte. The screen's
   false-positive rate against the experts (10.2%) is why the screen is a reader and the experts the gate.
-- *State the limitation:* the review interface rendered text as Markdown, which removed multiplication and dollar
-  signs from what the experts saw in 65 templates.
+- *Appendix pointer:* "Appendix E gives the integrity checks, the screening prompt and rubric, the planted defects
+  and the per-round counts."
 
 ### 4 Evaluation Framework (1.5 pages)
 
@@ -300,6 +309,8 @@ Written in the register of the May section, with its equations.
   call.
 - *Step-level diagnostics.* The arithmetic check and the judged step check in four sentences, as flags with
   precision; used in 5.2.
+- *Appendix pointer:* "Appendix F gives the answer kinds and match rule, the judge prompt and its validation, the
+  arithmetic rule and the thresholds."
 
 **4.2 Validation Against Expert Judgment (0.7 page).**
 
@@ -326,6 +337,8 @@ Written in the register of the May section, with its equations.
   incorrect step, 175 of the 178 such steps arithmetic; coverage cannot see them. The design detects AUROC
   differences of 0.12 to 0.19 and no smaller.
 - *Judge independence.* C19 in four sentences.
+- *Appendix pointer:* "Appendix G gives the study design and label scheme, the full evaluator comparison, the
+  planted defects and the judge-independence tables."
 
 ### 5 Experiments (2.85 pages)
 
@@ -345,6 +358,8 @@ Written in the register of the May section, with its equations.
   every null with the smallest difference the design detects at 80% power. Optionally one plain sentence that the
   confirmatory tests were specified before the models were run, which answers "which tests were planned"; keep or
   drop, never "pre-registered".
+- *Appendix pointer:* "Appendix H lists the served models, their settings and token use, the prompt, and the
+  statistical protocol in full."
 
 **5.2 Results (2.0 pages).**
 
@@ -372,6 +387,9 @@ Written in the register of the May section, with its equations.
 - *Reasoning effort, flagship anchors, the governing equations and a code tool.* C15, C16, C17 and C18 in four
   sentences, in the suggested wording of `RESULTS_PAPER_NOTES.md` ("For the retrieval objection"); the open-weight
   model's absence from the tool condition stated as a limit.
+- *Appendix pointers, one line at the end of each paragraph:* accuracy and the pairwise tests, "Appendix I.1 and
+  I.2"; difficulty, "Appendix I.3 and I.4"; coverage and the diagnostics, "Appendix I.11 and I.12"; consistency and
+  depth, "Appendix I.7 and I.8"; rewording, "Appendix J"; the conditions, "Appendix K".
 
 **5.3 Error Analysis (0.4 page).**
 
@@ -385,6 +403,8 @@ Written in the register of the May section, with its equations.
   response that computes correctly, misstates the rule it applies and lands the right answer passes every
   deterministic check, so process scores earn their place on the wrong answers and on the arithmetic behind right
   ones (`RESIDUAL_INCORRECT.md`; `docs/PILOT_AND_FULL_RUN_ASSESSMENT.md` sections 5 and 6).
+- *Appendix pointer:* "Appendix L gives the taxonomy, the sample, the readers' agreement, the per-model tables and
+  the templates whose wording does not pin the answer."
 
 ### 6 Conclusion (0.3 page)
 
@@ -393,23 +413,31 @@ open-weight tier under tool use), without padding.
 
 ### Limitations (not counted; required)
 
-From `RESULTS_PAPER_NOTES.md` "For the limitations" and `PARAPHRASE_PAPER_NOTES.md`:
+One paragraph of scope statements, each a single sentence saying what the benchmark measures and does not. No
+stacked numbers, no process detail, and nothing that is a design feature or a result (prescribed rounding, symbolic
+answers scored by their numbers, the saturation at the top belong in Section 5). The tone is "this is what it is",
+not "this is what went wrong".
 
-- four models without extended reasoning at their providers' defaults;
-- 1.0% of responses with no readable answer, concentrated on six templates where the score also measures finishing
-  within the ceiling;
-- coverage credits stated intermediates and is blind to a misstated rule; the arithmetic check's flags are 90% real
-  but it finds under half of the slips the experts marked;
-- the top five are not separable at this size (150 templates detect FAC differences of about 1 to 4 points and level
-  gaps of 7 to 15);
-- the evaluator was validated on five models not among the evaluated eleven and on 15 templates, with
-  model-specific readings covering the final-answer check, the judge and the arithmetic check only;
-- the two under-specified chemical templates and the 17 exact-digit templates; the certification's Markdown
-  rendering;
-- the paraphrase test covers 115 of 150 templates, tests wording not method, used one writer and a margin fixed
-  after the point estimates;
-- the open-book condition supplies equations only and the tool condition covers the two closed models;
-- items are examination-style by construction; the experts' labels are not released (Appendix N).
+- Models ran at their providers' default settings, and four returned no reasoning tokens; comparisons are at
+  default effort, and the reasoning-effort condition shows what the setting changes for two of them.
+- One percent of responses reached the output ceiling without a final answer and score zero; they concentrate on six
+  iterative templates.
+- Milestone Coverage measures how far a derivation gets, not whether every step is sound; the two diagnostics flag
+  arithmetic slips and questionable steps with stated precision and do not catch every slip.
+- At 150 templates the design resolves accuracy differences of about one to four points, so the top five models are
+  reported as a tier.
+- The evaluator's expert validation used five models that are, by design, not among the evaluated eleven; on the
+  evaluated models, experts read samples of the final-answer verdicts, the judge's decisions and the arithmetic
+  flags.
+- Two Advanced chemical templates admit more than one textbook reading or depend on the data source; the level gap
+  is reported with and without them.
+- The rewording test covers the 115 templates whose problems could be reworded without changing them, and it tests
+  memorised wording, not memorised methods.
+- The additional conditions ran on a 450-instance subset, and the tool condition covers the two closed models.
+- Problems are examination-style by construction, which is what verifiable gold traces require; ill-posed problems
+  and real-world artefacts are out of scope.
+- *Appendix pointer* (shared with the Ethics Statement): "Appendix N states what is released, when, and what is
+  withheld."
 
 ### Ethics Statement
 
@@ -472,9 +500,9 @@ generated by a committed script from the files named, never typed.
   (table). E.3 the expert certification protocol: own-branch experts, hand check, the 20 planted defects (table:
   template, defect kind, description), opaque codes, timestamps, the interface (new screenshot or none). E.4 the
   outcome: plant detection, hand checks, agreement per branch (Fleiss, AC1, AC2), screen against experts
-  (false-positive rate, MAD), round-by-round counts, the Markdown-rendering finding (tables).
+  (false-positive rate, MAD), round-by-round counts (tables).
 - *Sources:* `template_annotation_23092026/README.md`, `layer0/gate_report.md`, `tie_census.md`, `screen/pass1/`,
-  `pass2/stats.md`, `pass1_fixes.md`, `layer2/RESULTS*.md`, `CERTIFICATION.md`, `markdown_scan.md`.
+  `pass2/stats.md`, `pass1_fixes.md`, `layer2/RESULTS*.md`, `CERTIFICATION.md`.
 
 **F. Scoring Details.** New; absorbs May N (prompt, adapted) and replaces May P.2.
 - *Content and format:* F.1 the final-answer check: answer kinds (table with counts), how targets are derived, the
@@ -525,8 +553,9 @@ generated by a committed script from the files named, never typed.
 **J. Robustness to Rewording.** New.
 - *Content and format:* design (subset, writer, the rewriting rules), the scripted checks, the expert check and its
   rejection reasons with counts, survival by branch and the list of lost templates, the results table (FAC, MC with
-  and without the judge; intervals; corrected p), the bounds table (90% intervals against ±5), tau against its noise
-  floor, the comparison with decoding repeats.
+  and without the judge; intervals; corrected p), the bounds table (90% intervals against ±5, with the note that the
+  margin equals the smallest difference the design detects and was fixed after the point estimates), tau against its
+  noise floor, the comparison with decoding repeats.
 - *Sources:* `PARAPHRASE.md`, `PARAPHRASE_REVIEW.md`, `PARAPHRASE_AUDIT.md`, `RESULTS.md` Q5, D-157 to D-165.
 
 **K. Additional Conditions.** New. Four conditions, all run on the 450-instance subset.
@@ -635,11 +664,16 @@ committed script; figures are drawn to read in greyscale; the ACL column is 3.03
 12. **Name the limits where the claim is made**: the judged fraction beside coverage, the precision beside a flag
     rate, the two chemical templates beside the level gap, the 115 templates beside the paraphrase bound, the two
     closed models beside the tool result.
-13. **Limits that must appear in the paper**: the Markdown rendering during certification; the two under-specified
-    chemical templates; the 17 exact-digit templates; the four no-reasoning models; the validation population
-    against the evaluated models; the open-weight tier's absence from the tool condition. The history of how the
-    final-answer check was refined during the work (its corrected answer forms, the verdicts that moved, the one
-    known wrong credit) is not paper material: the paper describes the check as it is and reports its validation,
-    including the expert reading of the arithmetic flags; the history goes to the revision letter and stays in the
-    repository record.
+13. **Scope statements that must appear, each in one sentence where the claim is made**: default decoding and the
+    four models without reasoning tokens, beside any closed-against-open or level sentence; the two chemical
+    templates, beside the level gap; the two closed models, beside the tool result; the validation population,
+    beside the evaluator's agreement figures. Limitations are scope, written in the measured tone of the Limitations
+    notes above. Process detail from the work (how the final-answer check was refined, which verdicts moved, the one
+    known wrong credit, how the certification interface displayed text) is not paper material: the paper describes
+    the benchmark and the evaluator as they are and reports their validation, including the expert reading of the
+    arithmetic flags; the history goes to the revision letter where it bears on a reviewer's point, and otherwise
+    stays in the repository record.
 14. **Length discipline**: cut evidence to the appendix before cutting a limit from the main text.
+15. **Appendix pointers.** Every main-text subsection whose detail lives in the appendix ends with one sentence
+    naming the appendix section (the sentences are given in section 5), and every appendix section opens by naming
+    the main-text paragraph it supports. Nothing moves to the appendix without its pointer.
