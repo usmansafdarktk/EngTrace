@@ -36,7 +36,7 @@ pre { background: #f3f3f3; padding: 6px 8px; font-size: 0.82em; overflow-x: auto
 table { border-collapse: collapse; width: 100%; margin: 0.6em 0; font-size: 0.86em; page-break-inside: auto; }
 th, td { border: 1px solid #999; padding: 3px 5px; vertical-align: top; text-align: left; }
 th { background: #e8e8e8; }
-tr { page-break-inside: avoid; }
+tr { page-break-inside: auto; }
 ul, ol { margin: 0.3em 0 0.5em 1.4em; padding-left: 0.6em; }
 li { margin: 0.18em 0; }
 hr { border: 0; border-top: 1px solid #999; margin: 1em 0; }
