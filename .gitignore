@@ -99,3 +99,8 @@ full_run_28092026/openbook/items2.jsonl
 docs/related_work_oct2026/papers/
 docs/related_work_oct2026/text/
 docs/related_work_oct2026/bib_raw/
+
+# civil_industrial_sources/ holds the reference set used by the colleague who wrote the civil and
+# industrial templates (received 2026-10-03): the public-domain handbooks (the same files docs/references/
+# holds), copyrighted textbooks and their extracted text, and the manifest. Never committed.
+civil_industrial_sources/
