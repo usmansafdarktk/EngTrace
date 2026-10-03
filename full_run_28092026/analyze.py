@@ -822,6 +822,15 @@ def reasoning_arms(main, e5_main, keys) -> list[dict]:
             row['digit_flag_rate_fully_solved'] = {
                 'main': float(np.mean([flagged(main[k][x]) for x in solved_main])) if solved_main else None,
                 'arm': float(np.mean([flagged(var[x]) for x in solved_arm])) if solved_arm else None}
+            row['router_judge_fully_solved'] = None          # where the router ran on the arm (C1): its judge flags
+            r_main, r_arm = load_stage('router', k, 'main'), load_stage('router', k, arm)
+            if r_main and r_arm:
+                ok = lambda d, x: x in d and d[x]['reply_ok'] is not False
+                sm, sa = [x for x in solved_main if ok(r_main, x)], [x for x in solved_arm if ok(r_arm, x)]
+                row['router_judge_fully_solved'] = {
+                    'main': float(np.mean([bool(r_main[x]['judge_flagged']) for x in sm])) if sm else None,
+                    'arm': float(np.mean([bool(r_arm[x]['judge_flagged']) for x in sa])) if sa else None,
+                    'n_main': len(sm), 'n_arm': len(sa)}
             rows.append(row)
         for o, ph in zip(rows, holm([o['p'] for o in rows]) if rows else []):
             o['p_holm'] = ph
@@ -1488,17 +1497,18 @@ def render(res) -> str:
               'bootstrap, a sign-flip test over templates with Holm across the models in the arm, and the smallest paired '
               'difference the arm detects at 80% power. The main run\'s scores remain the headline; an arm says what the '
               'change cost or bought.', '',
-              '| arm | model | items | main run on these items | reasoning on | change | 95% CI | p (Holm) | detectable | '
+              '| arm | model | items | main run on these items | arm | change | 95% CI | p (Holm) | detectable | '
               'fully solved change | E3 coverage change | 95% CI | E5-strict change | 95% CI | unusable, main / arm | '
-              'digit flags on fully solved, main / arm |',
-              '|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|']
+              'digit flags on fully solved, main / arm | router judge flags on fully solved, main / arm |',
+              '|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|']
         for r in arms:
             e3c, e5c, dfr = r.get('e3'), r.get('e5'), r['digit_flag_rate_fully_solved']
             L.append(f"| {r['arm']} | `{r['model']}` | {r['items']} | {r['main_score_on_items']:.3f} | {r['arm_score']:.3f} | "
                      f"{r['diff']:+.3f} | {ci(r['ci'])} | {r['p_holm']:.4f} | {f3(r.get('detectable'))} | {r['fully']['diff']:+.3f} | "
                      + (f"{e3c['diff']:+.3f} | {ci(e3c['ci'])}" if e3c else ' | ') + ' | '
                      + (f"{e5c['diff']:+.3f} | {ci(e5c['ci'])}" if e5c else 'pending | ') + ' | '
-                     f"{r['main_unusable_on_items']} / {r['arm_unusable']} | {f3(dfr['main'])} / {f3(dfr['arm'])} |")
+                     f"{r['main_unusable_on_items']} / {r['arm_unusable']} | {f3(dfr['main'])} / {f3(dfr['arm'])} | "
+                     + (f"{f3(rj['main'])} / {f3(rj['arm'])}" if (rj := r.get('router_judge_fully_solved')) else 'not run') + ' |')
     for anc in res.get('anchors') or []:
         L += ['', f"## C3. Flagship anchors on the {anc['items']}-item subsample: `{anc['arm']}`", '',
               '*Exploratory; added 2026-10-03 (D-182).* Flagships that pass the roster rule (neither a pilot generator nor a '
