@@ -31,10 +31,7 @@ Most use mathematical training data and generalize poorly to other domains~\cite
 LLM judges make correlated errors~\citep{goel2025greatmodels} and agree with experts mainly on
 questions they can answer themselves, unless given a correct
 reference~\citep{krumdick2026nofreelabels}.
-Even \textsc{FinChain} and \textsc{HARDMath}, despite their gold solutions, score responses by
-aligning steps with the gold chain and through an LLM judge with rubrics, respectively.
-\ourdataset instead checks steps by value: its evaluator matches the values a response states
-against the milestone values its template computes, and recomputes the response's arithmetic.
-An LLM judge from outside the evaluated model families rules on unmatched residual milestones only,
-given their expected values.
-Process supervision of engineering reasoning thus becomes verifiable.
+Even \textsc{FinChain} and \textsc{HARDMath} score responses by step alignment and rubric-based LLM
+judging, respectively.
+\ourdataset instead verifies steps against its computed milestones and recomputes arithmetic,
+leaving only unmatched residual milestones to an LLM judge given their expected values.
