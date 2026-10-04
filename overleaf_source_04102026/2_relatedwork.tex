@@ -11,16 +11,16 @@ Closest to \ourdataset, \textsc{ThermoQA} in thermodynamics~\citep{duzkar2026the
 \textsc{PRISM-Physics} in physics~\citep{zhao2026prismphysics} check steps against computed values
 and reference formulas, respectively, but on a fixed set of problems.
 
-\paragraph{Symbolic Benchmarks.} Fixed problems can leak into training data~\citep{zhang2024gsm1k},
-whereas symbolic benchmarks generate fresh instances from templates.
-Many vary existing problems to test whether a model has memorized the
+\paragraph{Symbolic Benchmarks.} Fixed problems can leak into training data~\citep{zhang2024gsm1k};
+to mitigate this, symbolic benchmarks generate varied instances from templates.
+Many build their templates from existing problems to test whether a model has memorized the
 original~\citep{mirzadeh2024gsmsymbolic, gulati2024putnamaxiom}.
 Some also generate gold solutions, in physics~\citep{imani2025sympybench}, applied
 mathematics~\citep{fan2024hardmath}, and finance~\citep{xie2025finchain}.
-In engineering, \textsc{CIRCUIT} and \textsc{OPT-Engine} generate circuit and optimization
-problems~\citep{skelic2025circuit, chen2026optengine}.
-Each \ourdataset template instead encodes the full derivation, computing every intermediate quantity
-exactly from physically grounded parameters.
+In engineering, \textsc{CIRCUIT} and \textsc{OPT-Engine} generate circuit and optimization problems
+with their answers~\citep{skelic2025circuit, chen2026optengine}.
+Like these, \ourdataset's templates generate engineering problems, but they also encode the full
+derivation, computing every intermediate quantity exactly from physically grounded parameters.
 
 \paragraph{Step-Level Evaluators.} Without exact references, step-level evaluation relies on process
 reward models or LLM judges.
