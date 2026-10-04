@@ -26,12 +26,15 @@ it~\citep{du2025supergpqa, zhou2025engibench}.
 To address these gaps, we introduce \ourdataset, a symbolic benchmark for verifiable process
 supervision of engineering reasoning.
 Following symbolic-template benchmarks in mathematics~\citep{mirzadeh2024gsmsymbolic} and
-finance~\citep{xie2025finchain}, \ourdataset represents each problem as a template: expert-certified
-code that samples physically grounded parameters, computes the answer, and emits a gold reasoning
-trace from the same computation.
+finance~\citep{xie2025finchain}, \ourdataset represents each problem as a template: executable
+Python code that samples physically grounded parameters, computes the answer, and emits a gold
+reasoning trace from the same computation.
 Because the trace comes from the computation itself, every intermediate quantity of the derivation
-is known exactly, as shown in~\autoref{fig:example}.
-The 150 templates span five engineering branches, 15 domains, and 42 areas.
+is known exactly.
+The 150 templates span five engineering branches, 15 domains, and 42 areas and are stratified across
+varying difficulty levels.
+Three domain experts from the template's own branch certify each template, and we draw the evaluated
+instances with a private seed, so that no instance was public when the models ran.
 
 Benchmarks that assess intermediate steps mostly rely on LLM judges or human graders, or cover a
 single domain~\citep{syed2024transportbench, zheng2026tpscalcbench, duzkar2026thermoqa}; \ourdataset
@@ -43,8 +46,6 @@ response displays.
 For the residual milestones that deterministic matching cannot find, it consults an LLM judge from
 outside the evaluated model families, because LLM judges can favor their own outputs and those of
 related models~\citep{panickssery2024selfrecognition, li2026preferenceleakage}.
-Three domain experts from the template's own branch certify each template, and we draw the evaluated
-instances with a private seed, so that no instance was public when the models ran.
 
 In summary, our contributions are as follows:
 \begin{itemize}
