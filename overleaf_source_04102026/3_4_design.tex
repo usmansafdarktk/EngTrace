@@ -45,38 +45,48 @@ Domain experts also assigned each template one of three levels, Easy, Intermedia
 along three dimensions: conceptual complexity (isolated principles vs.\ multi-domain synthesis),
 mathematical sophistication (direct algebraic substitution vs.\ differential equations), and
 procedural depth (the length of interdependent reasoning chains).
-The three levels hold 58, 58, and 34 templates (\autoref{appendix:statistics}).
+A detailed quantitative breakdown of the difficulty distribution is provided
+in~\autoref{appendix:statistics}.
 
-\subsection{Templates and Instances}
+
+
+
+\subsection{Template Generation Pipeline}
 \label{subsec:templates}
 
-\paragraph{Templates.}
-A template is a seeded Python function that generates one problem instance per seed.
-It samples physically grounded parameters, with constants and material properties from tables that
-record their provenance (\autoref{sec:appendix_data_sources}), and redraws them until the scenario
+The core of \ourdataset is the symbolic template, a Python blueprint for generating physically
+grounded engineering problems.
+As shown in~\autoref{fig:template-generation}, the pipeline first samples domain-aware parameters
+from authoritative data sources (\autoref{sec:appendix_data_sources}) and fundamental principles
+(see detailed examples in~\autoref{sec:appendix_param_details}), redrawing them until the scenario
 is physically valid (for example, the flow is laminar or a floating body stays upright).
-It then computes every quantity of the solution and writes the question and the gold reasoning
-trace, numbered steps that end in the answer.
-Because both come from one computation, every intermediate quantity is known exactly, with its
-unit; these quantities are the milestones whose coverage we measure (\autoref{sec:evaluation}).
-Answers are of six kinds: scalar, vector, array, symbolic, classification, and multipart.
+It then applies the governing equations of the domain to compute every quantity and checks physical
+plausibility.
+Finally, it writes the question and the gold reasoning trace, numbered steps that end in the answer,
+which takes one of six kinds: scalar, vector, array, symbolic, classification, or multipart.
+Because the question and the trace come from one computation, every intermediate quantity is known
+exactly, with its unit; these quantities are the milestones whose coverage we measure
+(\autoref{sec:evaluation}).
 
-\paragraph{Reasoning paths.}
-We call the sequence of equations in a gold trace, with numbers and names masked, the
-\emph{reasoning path} of the instance.
-In 92 of the 150 templates, the sampled parameters change the reasoning path, for example through a
-different governing equation or number of steps; the other 58 templates follow a single path
-(\autoref{appendix:statistics}).
+\begin{figure*}[t]
+    \centering
+    \includegraphics[width=0.75\linewidth]{figs/template-generation.pdf}
+    \caption{The \ourdataset \textbf{Template Generation Pipeline} maps domain-aware constraints to
+    serialized question-solution pairs via physically-validated computation, illustrated here using
+    a CSTR volume calculation example.}
+    \label{fig:template-generation}
+\end{figure*}
 
-\paragraph{Evaluation set.}
-We draw 15 instances per template, 2,250 in all, from a private 128-bit seed.
-For each template, we pick them round-robin across the reasoning paths and answer forms of its
-first 100 draws, skipping repeated questions, so each of the 92 templates with several paths
-contributes instances on at least two of them and all 2,250 questions are distinct.
-We publish SHA-256 hashes of the instances and of the seed, and will release the seed at
-publication so that anyone can verify the instances.
-\autoref{appendix:templates} shows template examples, and \autoref{appendix:statistics} gives the
-dataset statistics, the variation within templates, and the full selection rule.
+Templates go beyond variable substitution: domain-aware parameter sampling can change the physical
+regime, the governing equation, and with them the reasoning path, the sequence of equations in the
+gold trace (\autoref{appendix:statistics}; examples in~\autoref{sec:appendix_template_examples}).
+We test how rewording the questions affects the scores in~\autoref{sec:experiments}.
+We draw 15 instances per template, 2,250 in all, from a private 128-bit seed, round-robin across the
+reasoning paths and answer forms of each template, so that every template with several paths
+contributes instances on at least two of them and all questions are distinct
+(\autoref{appendix:statistics} gives the full selection rule).
+We publish SHA-256 hashes of the instances and of the seed, and will release the seed at publication
+so that anyone can verify the instances.
 
 \subsection{Certification}
 \label{subsec:certification}

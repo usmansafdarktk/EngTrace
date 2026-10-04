@@ -241,7 +241,9 @@ copied into `figs/`).
 - *Appendix pointer:* "Appendix A gives the selection procedure and prompts; Appendix B the textbooks and reference
   data."
 
-**3.2 Templates and Instances (0.6 page).**
+**3.2 Template Generation Pipeline (0.6 page).** *Written 2026-10-04 in May's form, with May's pipeline figure
+(`figs/template-generation.pdf`); the counts of reasoning paths and levels appear only in the statistics appendix, at
+the authors' request (D-188).*
 
 - *Template structure.* A seeded function that samples parameters, often inside a rejection loop enforcing physical
   validity (laminar regime, elastic range, upright floating); computes every quantity; binds each displayed value

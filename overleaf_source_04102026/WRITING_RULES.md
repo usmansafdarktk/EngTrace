@@ -67,11 +67,12 @@ vocabulary) are in `docs/PAPER_PLAN_OCT2026.md`, section 8; this file covers for
 Labels used before their sections exist. Each must be defined when its section is written, or the reference prints
 "??" in the PDF.
 
-- To define: `sec:evaluation` (Section 4), `sec:experiments` (Section 5), `appendix:templates` (template
-  construction and examples), `appendix:certification` (template certification), `appendix:scoring` (scoring
-  details).
+- To define: `sec:evaluation` (Section 4), `sec:experiments` (Section 5), `sec:appendix_param_details` (May's
+  domain-aware parameterization examples, to extend to five branches), `sec:appendix_template_examples` (May's
+  template listings), `appendix:certification` (template certification), `appendix:scoring` (scoring details).
 - Defined: `sec:intro`, `sec:related`, `sec:benchmark`, `subsec:taxonomy`, `subsec:templates`,
-  `subsec:certification`, `fig:engtrace-overview` (the five-branch figure, `figs/engtrace-overview-5branch.pdf`).
+  `subsec:certification`, `fig:engtrace-overview` (the five-branch figure, `figs/engtrace-overview-5branch.pdf`),
+  `fig:template-generation` (May's pipeline figure, `figs/template-generation.pdf`).
 - Defined in `appendices/taxonomy_content.tex`, with the May appendix's labels: `sec:appendix_domain_validation`,
   `sec:appendix_area_validation`, `sec:appendix_books` and `sec:appendix_data_sources` (one section, two tables:
   `tab:foundational_textbooks`, `tab:authoritative_sources`), `sec:appendix_significance_scoring`, and

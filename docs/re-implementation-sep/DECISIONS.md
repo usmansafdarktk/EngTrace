@@ -7301,6 +7301,12 @@ count, and how the evaluation set was drawn (15,000 draws, 549 repeated question
 validation-set question skipped, 101 templates with more than one group, 18 with more groups than instances). Every
 number comes from `docs/appendix_statistics.py`, whose `--check` finds all 28 generated rows and numbers in the file.
 
+*Added 2026-10-04.* Section 3.2 is now "Template Generation Pipeline", written in May's form around May's pipeline
+figure. At the authors' request the main text gives no counts that the statistics appendix lists (the reasoning
+paths, 92 and 58, and the levels, 58 / 58 / 34): it describes the variation in words and points to the appendix.
+May's "resists data contamination" is not carried over (the private seed carries that point), and May's "linguistic
+diversity remains future work" becomes a pointer to the rewording test in Section 5.
+
 ## Open decisions
 
 | # | Decision | Needed before |
