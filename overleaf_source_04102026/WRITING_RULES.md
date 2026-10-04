@@ -81,6 +81,6 @@ Labels used before their sections exist. Each must be defined when its section i
   civil and industrial) and `sec:appendix_template_examples` (three listings generated from the current template
   code by `docs/appendix_listings.py`, whose `--check` must pass after any template change).
 - Defined in `appendices/certification.tex`: `appendix:certification` (integrity checks, LLM screen with May's
-  prompt box and rubric `tab:qa_rubric`, expert protocol with `tab:planted_defects`, outcome with
+  prompt box and rubric `tab:qa_rubric`, expert protocol with `tab:planted_defects`, results with
   `tab:expert_agreement` and `tab:certification_rounds`; every number from `docs/appendix_certification.py`,
   whose `--check` must pass). Table rows may exceed 100 characters; prose may not.
