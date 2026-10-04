@@ -7307,6 +7307,18 @@ paths, 92 and 58, and the levels, 58 / 58 / 34): it describes the variation in w
 May's "resists data contamination" is not carried over (the private seed carries that point), and May's "linguistic
 diversity remains future work" becomes a pointer to the rewording test in Section 5.
 
+*Added 2026-10-04.* The template appendix (`appendices/template_examples.tex`) holds May's parameterization section
+verbatim with civil and industrial subsections (each claim checked against the constants and templates: AISC W
+shapes and steel modulus in the deflection template, Skempton's correlation, Terzaghi factors, Manning's n with a
+Froude-capped slope window, rational C and SCS curve numbers; normal quantiles, production multiple 1.5 to 6,
+MIL-STD-105E tables, utilization 0.55 to 0.92, rows summing to one, Poisson means at most four) and three listings
+built by `docs/appendix_listings.py`. **Open: the reasoning-path count.** Choosing the listings showed that the
+published lower reading (`diversity.py`) also reads the Given block, where a name printed differently from the
+question (a channel lining, a brand letter) becomes a new path. On the evaluation set, 92 templates have two or
+more paths as published, 80 when only the solution steps are read, and 75 when every word is masked as well (17
+templates drop out under the strictest reading, among them both Manning templates and the two-step Markov
+template). The statistics appendix states 92; the authors decide which reading it reports.
+
 ## Open decisions
 
 | # | Decision | Needed before |

@@ -1,0 +1,335 @@
+% -------------
+\section{Detailed Domain-Aware Parameterization Examples}
+\label{sec:appendix_param_details}
+To ensure that problems are not just mathematically solvable but are also grounded in physical and engineering realism, \ourdataset constrains all generated values by the principles of the domain being tested. The following provides specific examples of this methodology for each engineering branch.
+
+\subsection{Chemical Engineering}
+\begin{itemize}
+    \item \textbf{Reaction Kinetics and Stoichiometry}: Instead of abstract chemicals, problems select from curated lists of common gas, liquid, and biochemical reactants like Propane, Benzene, and Glucose. More importantly, many problems are built around pre-validated, balanced chemical equations to ensure that the fundamental principles of mass conservation and stoichiometry are carefully upheld from the outset.
+    \item \textbf{Thermodynamics}: Problems involving thermodynamic calculations use a multi-layered approach to realism. For common substances, a complete and consistent set of critical properties ($T_c, P_c, V_c$) is retrieved. For reaction calorimetry, problems utilize tabulated standard heats of formation ($\Delta H_f^\circ$). Crucially, for heat transfer calculations, the model moves beyond constant specific heats by incorporating temperature-dependent heat capacity parameters ($C_p/R = A + BT + CT^2 + DT^{-2}$), ensuring a high degree of physical accuracy across a range of conditions.
+    \item \textbf{Transport Phenomena and Fluid Mechanics}: To ensure realism in fluid dynamics problems, templates draw from extensive tables of fluid properties, including the density and viscosity of common liquids and gases. The benchmark also includes parameters for non-Newtonian fluids (e.g., Polymer Solutions \& Melts etc), allowing it to test more complex, real-world rheological behaviors beyond simple Newtonian assumptions.
+\end{itemize}
+
+\subsection{Electrical Engineering}
+\begin{itemize}
+    \item \textbf{Electromagnetics and Waves}: Instead of using an arbitrary number, the phase velocity of a wave is determined by selecting a specific propagation medium from a curated list (e.g., Distilled Water, Polyethylene, Fused Silica etc). This ensures that all subsequent calculations for parameters like wavelength or wave number are physically consistent with that material's properties. The generation process is further constrained by fundamental physical constants, including the speed of light in a vacuum ($c_0$) and the permittivity of free space ($\epsilon_0$).
+    \item \textbf{Signals and Systems}: Sampling frequencies are intentionally set relative to the Nyquist rate to either model ideal conversion or deliberately induce aliasing, directly testing frequency folding. Signal frequencies are generated as rational multiples of $\pi$, and convolution sequences are kept short and integer-valued to focus analysis on the computational process.
+    \item \textbf{Digital Communications}: Probabilities for discrete random variables are generated as exact rational numbers summing to one. Carrier frequencies are constrained to integer multiples of the bit rate, modulation orders ($M$) to powers of two, and energy per bit ($E_b$) and signal-to-noise ratios ($E_b/N_0$) to physically typical ranges. Data rates are assigned practical units (kbps, Mbps, Gbps) to ground problems in contemporary engineering contexts.
+\end{itemize}
+
+\subsection{Mechanical Engineering}
+\begin{itemize}
+    \item \textbf{Mechanics of Materials}: Problems are grounded in the behavior of real-world materials by co-selecting properties from comprehensive tables. When a material such as ``6061-T6 Aluminum'' or ``Carbon Fiber Reinforced Polymer'' is chosen, its physically consistent Young's Modulus ($E$), Poisson's Ratio ($\nu$), and Shear Modulus ($G$) are used for all calculations. This ensures that problems involving stress, strain, and torsional deformation are realistic. Properties are available in both SI (GPa) and US Customary (ksi) units to reflect practical engineering work.
+    \item \textbf{Fluid Mechanics}: Realism in fluid statics problems is achieved by utilizing extensive lists of fluid and solid densities. This allows for the accurate calculation of hydrostatic pressure and buoyancy forces for a wide range of scenarios, such as a steel object submerged in seawater. The parameterization is context-aware, selecting dense fluids like Mercury for manometer problems while using lighter fluids like oil or water for pipe flow scenarios.
+    \item \textbf{Vibrations and Acoustics}: Mass, spring stiffness, and damping coefficients are randomized within physically plausible ranges. Harmonic forcing amplitudes and frequencies are chosen relative to the system's natural frequency to ensure the dynamic response clearly demonstrates key phenomena such as resonance or beating.
+\end{itemize}
+
+\subsection{Civil Engineering}
+\begin{itemize}
+    \item \textbf{Structural Analysis}: Deflection problems select a rolled wide-flange section from
+    the AISC shapes database, so that its depth, area, and moment of inertia are those of a real
+    section, and use the elastic modulus of structural steel.
+    The span follows from a realistic span-to-depth ratio, and the load is derived from a target
+    deflection that stays within serviceability limits without overstressing the section.
+    \item \textbf{Geotechnical Engineering}: Soil problems select from tabulated natural-state soils
+    and draw specific gravity, permeability, friction angle, and coefficient of consolidation within
+    the ranges reported for each soil type.
+    Compression indices follow Skempton's correlation with the liquid limit, and bearing-capacity
+    problems use Terzaghi's tabulated bearing-capacity factors for the sampled friction angle.
+    \item \textbf{Water Resources}: Open-channel problems select a channel lining with its tabulated
+    Manning's roughness coefficient and draw the slope inside a window that keeps the flow regime
+    the problem assumes, such as subcritical uniform flow.
+    Hydrology problems take rational-method runoff coefficients by land use and SCS curve numbers
+    by land use and hydrologic soil group.
+\end{itemize}
+
+\subsection{Industrial Engineering}
+\begin{itemize}
+    \item \textbf{Production and Inventory}: Inventory problems draw demand, ordering and holding
+    costs, and lead times from tabulated item profiles, and take safety factors from standard
+    normal quantiles at typical cycle-service levels.
+    Production rates are 1.5 to 6 times the demand rate, so that finite-rate production is
+    feasible, and quantity-discount problems use two or three price breaks with realistic discount
+    steps.
+    \item \textbf{Quality and Reliability Control}: Control-chart problems use control-chart factors
+    computed from their statistical definitions, with subgroup sizes and measured characteristics
+    typical of manufacturing practice.
+    Acceptance-sampling problems read code letters, sample sizes, and acceptance numbers from the
+    tables of MIL-STD-105E, and reliability problems draw component failure rates and mission times
+    from tabulated component classes.
+    \item \textbf{Stochastic Operations}: Queueing problems draw arrival and service rates from
+    tabulated service scenarios with utilization strictly below one, so that a steady state exists.
+    Markov-chain problems generate transition matrices whose rows sum exactly to one, and
+    Poisson-process problems keep the expected number of events at most four, so that the printed
+    probabilities retain their precision.
+\end{itemize}
+
+
+% -------------
+\section{Template Implementation Examples}
+\label{sec:appendix_template_examples}
+
+The following examples illustrate both parametric and \textit{structural} diversity across
+templates.
+Structural variation refers to differences in the type of physical reasoning chain required, not
+merely in numerical values.
+The Easy template (\texttt{Template Rational Method Peak Flow}, civil engineering) applies the
+rational formula directly to a homogeneous catchment, or first computes an area-weighted runoff
+coefficient when the catchment combines two land uses.
+The Intermediate template (\texttt{Template Exponential MTTF Topology}, industrial engineering)
+samples the system topology: for pumps in series, the lifetime of the system is the minimum of
+independent exponential lifetimes, whereas for two pumps in parallel, the memoryless property splits
+the lifetime into two phases.
+The Advanced template (\texttt{Template Equivalent Stiffness Frequency}, mechanical engineering)
+reduces a series or parallel spring arrangement to an equivalent stiffness before computing the
+natural frequency.
+In each of the three, a sampled parameter changes the reasoning chain, not only the numbers.
+The listings show the template functions without their documentation strings.
+
+\vspace{6pt}
+
+\subsection{Easy}
+
+\vspace{6pt}
+
+\begin{lstlisting}[style=pythonstyle]
+def template_rational_method_peak_flow():
+    form = random.choice(["single", "composite"])
+
+    if form == "single":
+        use = random.choice(list(_RATIONAL_USES.keys()))
+        phrase = _RATIONAL_USES[use]
+        c_lo, c_hi = RATIONAL_C[use]
+        C = round(random.uniform(c_lo, c_hi), 2)
+        A = round(random.uniform(max(2.0, 0.52 / C), 20.0), 1)
+        i = random.randint(max(25, math.ceil(43.2 / (C * A))), 90)
+        Q = round(C * i * A / 360.0, 2)
+        setup_text = (
+            f"a {A:.1f} ha catchment consisting of a {phrase} with a "
+            f"runoff coefficient of C = {C:.2f} (per HEC-22)")
+        steps = (
+            f"**Step 1:** State the rational formula in SI form.\n"
+            f"Q = C * i * A / 360, with Q in m^3/s, i in mm/h, and A in "
+            f"ha.\n\n"
+            f"**Step 2:** Substitute the given values.\n"
+            f"Q = {C:.2f} * {i} * {A:.1f} / 360\n\n"
+            f"**Step 3:** Evaluate the peak discharge.\n"
+            f"Q = {Q:.2f} m^3/s\n\n"
+        )
+    else:
+        use1, use2 = random.sample(list(_RATIONAL_USES.keys()), 2)
+        p1, p2 = _RATIONAL_USES[use1], _RATIONAL_USES[use2]
+        c1 = round(random.uniform(*RATIONAL_C[use1]), 2)
+        c2 = round(random.uniform(*RATIONAL_C[use2]), 2)
+        A1 = round(random.uniform(3.0, 12.0), 1)
+        A2 = round(random.uniform(3.0, 12.0), 1)
+        A = round(A1 + A2, 1)
+        Cw = round((c1 * A1 + c2 * A2) / A, 3)
+        i = random.randint(max(25, math.ceil(43.2 / (Cw * A))), 90)
+        Q = round(Cw * i * A / 360.0, 2)
+        C = Cw
+        setup_text = (
+            f"a catchment with two land uses: {A1:.1f} ha of {p1} "
+            f"(C = {c1:.2f}) and {A2:.1f} ha of {p2} (C = {c2:.2f}), the "
+            f"runoff coefficients taken from HEC-22 Table 3-1")
+        steps = (
+            f"**Step 1:** Compute the area-weighted composite runoff "
+            f"coefficient.\n"
+            f"C_w = (C1*A1 + C2*A2) / (A1 + A2) "
+            f"= ({c1:.2f} * {A1:.1f} + {c2:.2f} * {A2:.1f}) / {A:.1f} "
+            f"= {Cw:.3f}\n\n"
+            f"**Step 2:** State the rational formula in SI form.\n"
+            f"Q = C_w * i * A / 360, with Q in m^3/s, i in mm/h, and A "
+            f"in ha.\n\n"
+            f"**Step 3:** Substitute and evaluate.\n"
+            f"Q = {Cw:.3f} * {i} * {A:.1f} / 360 = {Q:.2f} m^3/s\n\n"
+        )
+
+    assert 0.1 <= Q <= 6.0, f"peak flow out of bounds: {Q}"
+
+    question = (
+        f"During a design storm with rainfall intensity i = {i} mm/h, "
+        f"determine the peak discharge in m^3/s from {setup_text}, using "
+        f"the rational method in SI form (Q = C*i*A/360 with i in mm/h "
+        f"and A in hectares)."
+    )
+
+    solution = (
+        f"**Given:**\n"
+        f"Rainfall intensity (i): {i} mm/h\n"
+        f"Catchment: {setup_text}\n\n"
+        f"{steps}"
+        f"**Answer:** The peak discharge is {Q:.2f} m^3/s"
+    )
+
+    return question, solution
+\end{lstlisting}
+
+
+\vspace{6pt}
+
+\subsection{Intermediate}
+
+\vspace{6pt}
+
+\begin{lstlisting}[style=pythonstyle]
+def template_exponential_mttf_topology():
+    configuration = random.choice(["series", "parallel"])
+
+    if configuration == "series":
+        lam1 = random.randint(*_T9_SERIES_RATE_CENTS) / 100
+        lam2 = random.randint(*_T9_SERIES_RATE_CENTS) / 100
+        lam3 = random.randint(*_T9_SERIES_RATE_CENTS) / 100
+        lams = round(lam1 + lam2 + lam3, 2)          # exact 2-dp sum
+        mttf = float((Decimal("1000") / Decimal(f"{lams:.2f}"))
+                     .quantize(Decimal("0.1"), rounding=ROUND_HALF_UP))
+        assert 333.0 <= mttf <= 1667.0, f"series MTTF out of bounds: {mttf}"
+
+        question = (
+            f"A booster station moves slurry through three pumps "
+            f"connected in series along one line, so the station fails "
+            f"as soon as ANY one pump fails. The pumps fail "
+            f"independently, with exponentially distributed lifetimes "
+            f"and constant failure rates of {lam1:.2f}, {lam2:.2f}, and "
+            f"{lam3:.2f} failures per 1000 hours. Determine the mean "
+            f"time to failure (MTTF -- the expected operating time until "
+            f"the station first fails) of the station, in hours, to one "
+            f"decimal place (round half up)."
+        )
+        solution = (
+            f"**Given:**\n"
+            f"Three pumps in series; independent exponential lifetimes "
+            f"with failure rates lam1 = {lam1:.2f}, lam2 = {lam2:.2f}, "
+            f"lam3 = {lam3:.2f} per 1000 hours.\n\n"
+            f"**Step 1:** Characterize the station lifetime. The station "
+            f"fails at the FIRST pump failure, i.e., at the minimum of "
+            f"the three lifetimes; the minimum of independent "
+            f"exponential lifetimes is exponential with the SUM of the "
+            f"rates.\n\n"
+            f"**Step 2:** Sum the failure rates.\n"
+            f"lams = {lam1:.2f} + {lam2:.2f} + {lam3:.2f} = {lams:.2f} "
+            f"failures per 1000 hours\n\n"
+            f"**Step 3:** Invert the rate and convert to hours. A rate "
+            f"of {lams:.2f} per 1000 hours means a mean lifetime of\n"
+            f"MTTF = 1000 / {lams:.2f} = {mttf:.1f} hours (rounded half "
+            f"up to one decimal)\n\n"
+            f"**Answer:** The mean time to failure of the booster "
+            f"station is {mttf:.1f} hours"
+        )
+
+    else:
+        theta = random.randint(*_T9_THETA_RANGE)
+        t_first = theta / 2                          # exact (x.0 or x.5)
+        mttf = theta + t_first                       # 1.5*theta, exact
+        assert 1500.0 <= mttf <= 7500.0, f"parallel MTTF out of bounds: {mttf}"
+
+        question = (
+            f"A cooling loop is served by two identical pumps in "
+            f"parallel; the loop keeps operating as long as at least one "
+            f"pump operates, and fails only when BOTH pumps have "
+            f"failed. The pumps fail independently, with exponentially "
+            f"distributed lifetimes averaging {theta} hours each. Using "
+            f"the memoryless property, determine the mean time to "
+            f"failure (MTTF -- the expected operating time until the "
+            f"loop fails) of the cooling loop, in hours, to one decimal "
+            f"place."
+        )
+        solution = (
+            f"**Given:**\n"
+            f"Two identical pumps in parallel; independent exponential "
+            f"lifetimes with mean theta = {theta} hours (failure rate "
+            f"1/{theta} per hour each).\n\n"
+            f"**Step 1:** Split the loop lifetime into two phases: the "
+            f"time until the FIRST pump failure, then the remaining "
+            f"lifetime of the surviving pump.\n\n"
+            f"**Step 2:** Expected time to the first failure. While both "
+            f"pumps run, failures compete: the minimum of two "
+            f"independent exponentials is exponential with doubled rate "
+            f"2/{theta}, so\n"
+            f"E[first failure] = theta / 2 = {theta} / 2 = {t_first:.1f} "
+            f"hours\n\n"
+            f"**Step 3:** Expected remaining lifetime of the survivor. "
+            f"By the memoryless property, the surviving pump is "
+            f"statistically good as new at the moment the other fails, "
+            f"so its expected remaining lifetime is the full mean:\n"
+            f"E[remaining] = theta = {theta} hours\n\n"
+            f"**Step 4:** Add the phases.\n"
+            f"MTTF = {t_first:.1f} + {theta} = {mttf:.1f} hours\n\n"
+            f"**Answer:** The mean time to failure of the cooling loop "
+            f"is {mttf:.1f} hours"
+        )
+
+    return question, solution
+\end{lstlisting}
+
+
+\vspace{6pt}
+
+\subsection{Advanced}
+
+\vspace{6pt}
+
+\begin{lstlisting}[style=pythonstyle]
+def template_equivalent_stiffness_frequency():
+    # 1. Parameterize the inputs with random values
+    mass = round(random.uniform(5.0, 100.0), 2)       # in kg
+    stiffness_1 = random.randint(1000, 50000)         # in N/m
+    stiffness_2 = random.randint(1000, 50000)         # in N/m
+
+    # Randomly choose the spring configuration
+    configuration = random.choice(['series', 'parallel'])
+
+    # Standardize precision for final outputs
+    precision = 3
+
+    # 2. Perform the core calculations for the solution
+
+    # Step A: Calculate the equivalent stiffness (k_eq) based on the configuration
+    if configuration == 'parallel':
+        k_eq = stiffness_1 + stiffness_2
+        formula_str = "k_eq = k1 + k2"
+        calculation_str = f"k_eq = {stiffness_1} + {stiffness_2} = {k_eq} N/m"
+    else: # configuration == 'series'
+        k_eq = (stiffness_1 * stiffness_2) / (stiffness_1 + stiffness_2)
+        formula_str = "k_eq = (k1 * k2) / (k1 + k2)"
+        calculation_str = (
+            f"k_eq = ({stiffness_1} * {stiffness_2}) / ({stiffness_1} + {stiffness_2}) = "
+            f"{round(k_eq, 2)} N/m"
+        )
+
+    # Step B: Calculate the natural frequency using the equivalent stiffness
+    omega_n = math.sqrt(k_eq / mass)
+
+    # 3. Generate the question and solution strings
+
+    question = (
+        f"A mass of {mass} kg is attached to a system of two springs. The first spring has a "
+        f"stiffness (k1) of {stiffness_1} N/m, and the second spring has a stiffness (k2) of {stiffness_2} N/m. "
+        f"The two springs are arranged in {configuration}. "
+        f"Determine the equivalent stiffness of the spring system and the resulting undamped "
+        f"natural frequency (omega_n) in rad/s."
+    )
+
+    solution = (
+        f"**Given:**\n"
+        f"Mass (m) = {mass} kg\n"
+        f"Stiffness 1 (k1) = {stiffness_1} N/m\n"
+        f"Stiffness 2 (k2) = {stiffness_2} N/m\n"
+        f"Configuration = {configuration.capitalize()}\n\n"
+
+        f"**Step 1:** Calculate the equivalent stiffness (k_eq) for the {configuration} configuration.\n"
+        f"The formula for springs in {configuration} is: {formula_str}\n"
+        f"{calculation_str}\n\n"
+
+        f"**Step 2:** Calculate the undamped natural frequency (omega_n) using the equivalent stiffness.\n"
+        f"The formula is: omega_n = sqrt(k_eq / m)\n"
+        f"omega_n = sqrt({round(k_eq, 2)} / {mass})\n"
+        f"omega_n = {round(omega_n, precision)} rad/s\n\n"
+
+        f"**Answer:**\n"
+        f"The equivalent stiffness of the system is {round(k_eq, 2)} N/m.\n"
+        f"The undamped natural frequency is {round(omega_n, precision)} rad/s."
+    )
+
+    return question, solution
+\end{lstlisting}

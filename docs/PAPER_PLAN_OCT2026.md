@@ -479,7 +479,11 @@ templates cite them (D-188); May's data sources kept and the sources the constan
 - *Sources:* `docs/references/README.md`, `MANIFEST.json`; the colleague's `MANIFEST.md`;
   `data/templates/branches/*/constants.py`.
 
-**C. Template Construction and Examples.** Against May: F extended to five branches; G cut to one or two listings.
+**C. Template Construction and Examples.** Against May: F extended to five branches; G cut to one or two listings. *Written
+2026-10-04* in `overleaf_source_04102026/appendices/template_examples.tex`: May's F verbatim plus civil and
+industrial subsections; G with three listings, one per level from three branches (civil, industrial, mechanical),
+each a template whose sampled parameter changes the equations, generated from the current code by
+`docs/appendix_listings.py` (docstrings left out, as in May).
 - *Content and format:* bullets per branch on how parameters are grounded and constrained (add civil and industrial);
   one or two template listings from different branches, shorter than May's three; a small table of structural
   variation (templates that change the governing equation, step count or computed quantities with a sampled
