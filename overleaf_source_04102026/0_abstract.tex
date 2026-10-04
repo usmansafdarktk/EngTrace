@@ -1,8 +1,6 @@
-Engineering problems are solved by derivations with checkable intermediate quantities, yet benchmarks rarely check them.
-Existing engineering benchmarks such as \textsc{SuperGPQA} and \textsc{EngiBench} grade final answers, while the few that assess steps rely on large language model (LLM) judges or human graders.
+Engineering problems are solved by derivations whose intermediate quantities can be checked, yet benchmarks such as \textsc{SuperGPQA} and \textsc{EngiBench} grade final answers, and the few that assess steps mostly rely on large language model (LLM) judges or human graders.
 To address this gap, we present \ourdataset, a benchmark of 150 symbolic templates spanning five engineering branches, 15 domains and 42 areas.
 Each template is executable code that samples physically grounded parameters, computes the answer and emits a gold reasoning trace from the same computation, so every intermediate quantity is known with its unit.
-To assess reasoning, our evaluator deterministically checks the final answer, the intermediate quantities and the arithmetic, consulting an LLM judge only where these checks fall short.
-Across eleven open and closed LLMs, final-answer accuracy cannot separate the strongest models, but coverage of intermediate quantities ranks the models differently, and wrong answers often follow much of a correct derivation.
-Every model fails most often on the longest derivations.
-Overall, \ourdataset evaluates engineering reasoning by the values it reaches, not only by its final answer.
+Our evaluator is deterministic wherever a check exists: a final-answer check over six answer kinds, coverage of the gold intermediate quantities, and an arithmetic check of displayed calculations; an LLM judge from outside the evaluated model families adjudicates only the residue.
+On 2,250 instances, eleven open and closed LLMs score 0.81 to 0.98 in final-answer accuracy, and the top five cannot be separated.
+Coverage, however, ranks the models differently; models still reach 46\% to 85\% of the intermediate quantities when their answer is wrong, and every model fails most often on the longest derivations.
