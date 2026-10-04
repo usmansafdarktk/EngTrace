@@ -65,4 +65,4 @@ Labels used before their sections exist. Each must be defined when its section i
 
 - To define: `sec:benchmark` (Section 3), `sec:evaluation` (Section 4), `sec:experiments` (Section 5),
   `appendix:templates` (template examples), `appendix:scoring` (scoring details).
-- Defined: `sec:intro`, `fig:example`.
+- Defined: `sec:intro`.
