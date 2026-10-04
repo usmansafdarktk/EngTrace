@@ -37,7 +37,8 @@ vocabulary) are in `docs/PAPER_PLAN_OCT2026.md`, section 8; this file covers for
 
 - One file per section, named as `main.tex` inputs it (`0_abstract.tex`, `1_intro.tex`, `2_relatedwork.tex`, ...);
   the bibliography is `custom.bib`.
-- One sentence per line in the `.tex` files, so changes show sentence by sentence; LaTeX prints them as one paragraph.
+- In the `.tex` files every sentence starts on a new line and wraps at 100 characters, never inside a citation,
+  reference or `\textsc{}` name; changes then show sentence by sentence, and LaTeX still prints one paragraph.
 
 ## Cross-reference labels
 
