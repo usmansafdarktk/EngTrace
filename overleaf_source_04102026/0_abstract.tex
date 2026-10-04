@@ -2,5 +2,6 @@ Engineering problems are solved by derivations whose intermediate quantities can
 We present \ourdataset, a symbolic benchmark for verifiable process supervision of engineering reasoning, with 150 templates spanning five branches, 15 domains and 42 areas.
 Each template is expert-certified code that samples physically grounded parameters, computes the answer and emits a gold reasoning trace from the same computation, so every intermediate quantity is known exactly.
 Model solutions are scored deterministically wherever a check exists: a final-answer check over six answer kinds, coverage of the gold trace's intermediate quantities (milestones), and an arithmetic check of displayed calculations; residual milestones go to an LLM judge from outside the evaluated model families.
-On 2,250 instances, eleven LLMs score 0.81 to 0.98 in final-answer accuracy, with the top five not separable at this size.
-Milestone coverage orders the models differently; on wrong answers, models still reach 46\% to 85\% of the milestones (10\% to 22\% by chance), and every model's wrong-answer rate is highest on the longest derivations.
+On 2,250 instances, eleven LLMs reach 0.81 to 0.98 final-answer accuracy, the strongest five within 0.01 of one another.
+Milestone coverage, also high at 0.82 to 0.92, orders the models differently.
+Experts reading 160 wrong answers find mostly calculation slips on easy problems, and also wrong formulas or principles on harder ones.
