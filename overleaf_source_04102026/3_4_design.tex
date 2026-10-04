@@ -65,7 +65,8 @@ Answers are of six kinds: scalar, vector, array, symbolic, classification, and m
 We call the sequence of equations in a gold trace, with numbers and names masked, the
 \emph{reasoning path} of the instance.
 In 92 of the 150 templates, the sampled parameters change the reasoning path, for example through a
-different governing equation or number of steps; the other 58 templates follow a single path.
+different governing equation or number of steps; the other 58 templates follow a single path
+(\autoref{appendix:statistics}).
 
 \paragraph{Evaluation set.}
 We draw 15 instances per template, 2,250 in all, from a private 128-bit seed.
@@ -74,8 +75,8 @@ first 100 draws, skipping repeated questions, so each of the 92 templates with s
 contributes instances on at least two of them and all 2,250 questions are distinct.
 We publish SHA-256 hashes of the instances and of the seed, and will release the seed at
 publication so that anyone can verify the instances.
-\autoref{appendix:templates} shows template examples and the reasoning-path counts, and
-\autoref{appendix:statistics} gives the dataset statistics and the full selection rule.
+\autoref{appendix:templates} shows template examples, and \autoref{appendix:statistics} gives the
+dataset statistics, the variation within templates, and the full selection rule.
 
 \subsection{Certification}
 \label{subsec:certification}

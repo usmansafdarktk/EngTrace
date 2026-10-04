@@ -68,10 +68,12 @@ Labels used before their sections exist. Each must be defined when its section i
 "??" in the PDF.
 
 - To define: `sec:evaluation` (Section 4), `sec:experiments` (Section 5), `appendix:templates` (template
-  construction and examples), `appendix:statistics` (dataset statistics and the evaluation set),
-  `appendix:certification` (template certification), `appendix:scoring` (scoring details).
+  construction and examples), `appendix:certification` (template certification), `appendix:scoring` (scoring
+  details).
 - Defined: `sec:intro`, `sec:related`, `sec:benchmark`, `subsec:taxonomy`, `subsec:templates`,
   `subsec:certification`, `fig:engtrace-overview` (the five-branch figure, `figs/engtrace-overview-5branch.pdf`).
 - Defined in `appendices/taxonomy_content.tex`, with the May appendix's labels: `sec:appendix_domain_validation`,
   `sec:appendix_area_validation`, `sec:appendix_books` and `sec:appendix_data_sources` (one section, two tables:
-  `tab:foundational_textbooks`, `tab:authoritative_sources`), `sec:appendix_significance_scoring`.
+  `tab:foundational_textbooks`, `tab:authoritative_sources`), `sec:appendix_significance_scoring`, and
+  `appendix:statistics` (dataset statistics; tables `tab:difficulty_stats`, `tab:template_variation`; every number
+  from `docs/appendix_statistics.py`, whose `--check` must pass).

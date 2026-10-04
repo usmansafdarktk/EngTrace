@@ -7294,6 +7294,13 @@ Shapes Database v16.0; MIL-STD-105E, the NIST/SEMATECH e-Handbook). May's "extra
 "extracted ... and each constants table in the code records the provenance of its values", because entries tagged
 `[UNVERIFIED]` remain.
 
+*Added 2026-10-04.* The same file now ends with the Dataset Statistics section (label `appendix:statistics`, which the
+main text's level and reasoning-path sentences cite): May's two paragraphs and table for five branches, the answer
+kinds, a table of variation within a template (question wording, reasoning paths, answer forms) with the near-duplicate
+count, and how the evaluation set was drawn (15,000 draws, 549 repeated questions, 35 rounding ties and one
+validation-set question skipped, 101 templates with more than one group, 18 with more groups than instances). Every
+number comes from `docs/appendix_statistics.py`, whose `--check` finds all 28 generated rows and numbers in the file.
+
 ## Open decisions
 
 | # | Decision | Needed before |

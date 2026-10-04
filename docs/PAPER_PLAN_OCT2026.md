@@ -484,7 +484,10 @@ templates cite them (D-188); May's data sources kept and the sources the constan
   parameter; single-path templates).
 - *Sources:* `7_appendix.tex` F, G; `audit/template_audit_report.md`; `DIVERSITY.md`.
 
-**D. Dataset Statistics and the Evaluation Set.** Against May: L (Table 9) replaced.
+**D. Dataset Statistics and the Evaluation Set.** Against May: L (Table 9) replaced. *Written 2026-10-04* as the
+last section of `appendices/taxonomy_content.tex` (label `appendix:statistics`): May's two paragraphs and Table 9 for
+five branches, answer kinds, variation within a template (table) and how the evaluation set was drawn; every number
+from `docs/appendix_statistics.py`, whose `--check` passes.
 - *Content and format:* a table of templates by branch and level and by domain with area counts; instances by level;
   answer kinds with counts. A paragraph on how the 2,250 instances were drawn (private seed, round-robin over
   reasoning paths and answer forms, exclusions) and what is published now and at publication. A table or paragraph on

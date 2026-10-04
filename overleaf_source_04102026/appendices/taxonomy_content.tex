@@ -317,3 +317,104 @@ Please evaluate the following area:
 
 Do not include any preamble, conversational text, explanations, or markdown formatting around the JSON block.
 \end{tcolorbox}
+
+% -------------
+\section{Dataset Statistics}
+\label{appendix:statistics}
+
+\paragraph{Structural Balance and Granularity.}
+Each branch is represented by exactly 30 templates, ensuring that no single discipline dominates the
+aggregate performance measures.
+This uniform top-level distribution controls for branch-specific bias.
+At the granular level, the number of areas (6--11 per branch) reflects the curricular density of each
+discipline: Mechanical Engineering consolidates its sub-topics into six broad areas, Chemical and
+Electrical Engineering have seven, and Civil and Industrial Engineering have eleven
+(\autoref{tab:difficulty_stats}).
+
+\paragraph{Difficulty Distribution.}
+The dataset difficulty is stratified to mirror curricular progression, with 58 Easy, 58
+Intermediate, and 34 Advanced templates.
+We prioritize foundational and applied reasoning (Easy and Intermediate: 77\%) to test core
+engineering laws and procedural workflows, while reserving the most complex synthesis tasks for the
+Advanced level (23\%).
+Each template contributes 15 instances to the evaluation set, which therefore holds 870 Easy, 870
+Intermediate, and 510 Advanced instances, 450 per branch.
+\autoref{tab:difficulty_stats} presents the detailed statistical breakdown.
+
+\begin{table}[t]
+    \centering
+    \small
+    \setlength{\tabcolsep}{3.5pt}
+    \begin{tabular}{l|cc|ccc|c}
+        \toprule
+        \rowcolor{gray!10}
+        \multirow{2}{*}{\textbf{Branch}} & \multicolumn{2}{c|}{\textbf{Structure}} & \multicolumn{3}{c|}{\textbf{Difficulty Level}} & \multirow{2}{*}{\textbf{Total}} \\
+        & \textbf{Dom.} & \textbf{Areas} & \textbf{Easy} & \textbf{Int.} & \textbf{Adv.} & \\
+        \midrule
+        Chemical & 3 & 7 & 13 & 9 & 8 & \textbf{30} \\
+        Electrical & 3 & 7 & 11 & 12 & 7 & \textbf{30} \\
+        Civil & 3 & 11 & 12 & 12 & 6 & \textbf{30} \\
+        Industrial & 3 & 11 & 12 & 12 & 6 & \textbf{30} \\
+        Mechanical & 3 & 6 & 10 & 13 & 7 & \textbf{30} \\
+        \midrule
+        \textbf{Total} & \textbf{15} & \textbf{42} & \textbf{58} & \textbf{58} & \textbf{34} & \textbf{150} \\
+        \bottomrule
+    \end{tabular}
+    \caption{\textbf{Dataset Statistics by Branch.} The dataset features a perfectly balanced
+    distribution of 30 templates per branch, with difficulty levels scaled to test both foundational
+    knowledge and advanced synthesis.}
+    \label{tab:difficulty_stats}
+\end{table}
+
+\paragraph{Answer Kinds.}
+The final answers are of six kinds; by template, 89 scalar, 32 multipart, 9 symbolic, 8 vector,
+7 array, and 5 classification.
+
+\paragraph{Variation Within a Template.}
+We measure how far the 15 evaluation-set instances of a template differ in three respects, each with
+numbers masked (\autoref{tab:template_variation}): the question wording, in which a different
+material or fluid counts as a different wording; the reasoning path, that is, the lines of the gold
+trace that contain an equation, in order, with the names that vary between questions also masked;
+and the form of the answer.
+In 92 of the 150 templates, the instances follow two or more reasoning paths, and the other 58 follow
+a single path (chemical 18, electrical 5, civil 14, industrial 10, mechanical 11).
+The same 92 templates show more than one path in 500 further draws, so the evaluation set misses no
+template's second path; counting a name change inside an equation as a different path raises the
+count to 96 templates.
+Two instances of a template are near-duplicates when their questions share the wording and every
+number lies within 5\% of its counterpart; the evaluation set holds 61 such pairs, in 14 templates.
+
+\begin{table}[t]
+    \centering
+    \small
+    \setlength{\tabcolsep}{6pt}
+    \begin{tabular}{c|ccc}
+        \toprule
+        \rowcolor{gray!10}
+        \textbf{Variants} & \textbf{Wording} & \textbf{Reasoning Paths} & \textbf{Answer Forms} \\
+        \midrule
+        1 & 38 & 58 & 104 \\
+        2 & 17 & 31 & 25 \\
+        3--5 & 34 & 25 & 14 \\
+        6--15 & 61 & 36 & 7 \\
+        \bottomrule
+    \end{tabular}
+    \caption{\textbf{Variation Within a Template.} Number of templates whose 15 evaluation-set
+    instances show the given number of distinct question wordings, reasoning paths, and answer forms,
+    with numbers masked; each column sums to 150.}
+    \label{tab:template_variation}
+\end{table}
+
+\paragraph{Drawing the Evaluation Set.}
+For each template, we generate its first 100 draws from the private 128-bit seed, 15,000 draws in
+all, and skip 549 repeated questions, 35 rounding ties (instances whose gold trace prints a value
+lying exactly halfway between two roundings), and one question already used to validate the
+evaluator, so 14,415 remain.
+We group the remaining draws of a template by reasoning path and answer form and take the 15
+instances round-robin across the groups, in order of first appearance, so that no group is repeated
+before every group has been used.
+101 templates have more than one group, and 18 templates have more groups than their 15 instances
+can cover.
+All 2,250 questions are distinct.
+We publish the SHA-256 hash of every instance and of the seed, and will release the seed at
+publication so that anyone can regenerate the evaluation set and check it against the hashes.
