@@ -1,7 +1,7 @@
 \section{Related Work}
 \label{sec:related}
 
-\paragraph{Benchmarks in Physics.}
+\paragraph{Physics Benchmarks.}
 Most physics benchmarks grade final answers or expressions~\citep{xu2025ugphysics, qiu2025phybench}.
 \textsc{PhysReason}~\citep{zhang2025physreason} and
 \textsc{PRISM-Physics}~\citep{zhao2026prismphysics} also score steps against reference solutions,
@@ -9,7 +9,7 @@ with an LLM judge and with rule-based formula matching, respectively.
 \ourdataset also scores steps against a reference, in engineering, and takes the reference from the
 code that computes the answer, so every intermediate quantity is known exactly.
 
-\paragraph{Benchmarks from Templates.}
+\paragraph{Symbolic Benchmarks.}
 Static test sets leak into training data~\citep{zhang2024gsm1k}, and symbolic or functional variants
 of existing problems test whether a model has memorized the original
 instance~\citep{mirzadeh2024gsmsymbolic, gulati2024putnamaxiom}.
@@ -19,7 +19,7 @@ an executable gold reasoning chain~\citep{xie2025finchain}.
 \ourdataset carries this design to five engineering branches and draws its instances from a private
 seed.
 
-\paragraph{Benchmarks in Engineering.}
+\paragraph{Engineering Benchmarks.}
 General suites such as \textsc{SuperGPQA} test engineering mostly through multiple
 choice~\citep{du2025supergpqa}, multi-branch benchmarks grade answers with LLM
 judges~\citep{zhou2025engibench, naser2026eri}, and dedicated benchmarks typically cover one branch,
@@ -33,7 +33,7 @@ To our knowledge, none combines generated instances across engineering branches 
 deterministic checks of intermediate values, and an evaluator validated against domain experts'
 step-level labels.
 
-\paragraph{Evaluators of Reasoning.}
+\paragraph{Step-Level Evaluators.}
 Correct reasoning steps require process supervision or reward models that emulate
 it~\citep{uesato2022processoutcome}, yet process reward models are trained and tested mainly on
 mathematics~\citep{lightman2023verify, zheng2024processbench} and perform poorly in other
