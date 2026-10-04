@@ -63,6 +63,9 @@ vocabulary) are in `docs/PAPER_PLAN_OCT2026.md`, section 8; this file covers for
 Labels used before their sections exist. Each must be defined when its section is written, or the reference prints
 "??" in the PDF.
 
-- To define: `sec:benchmark` (Section 3), `sec:evaluation` (Section 4), `sec:experiments` (Section 5),
-  `appendix:templates` (template examples), `appendix:scoring` (scoring details).
-- Defined: `sec:intro`, `sec:related`.
+- To define: `sec:evaluation` (Section 4), `sec:experiments` (Section 5), `appendix:taxonomy` (taxonomy and
+  content selection), `appendix:sources` (source texts and reference data), `appendix:templates` (template
+  construction and examples), `appendix:statistics` (dataset statistics and the evaluation set),
+  `appendix:certification` (template certification), `appendix:scoring` (scoring details).
+- Defined: `sec:intro`, `sec:related`, `sec:benchmark`, `subsec:taxonomy`, `subsec:templates`,
+  `subsec:certification`, `fig:taxonomy` (the five-branch figure, `figs/engtrace-overview-5branch.pdf`).

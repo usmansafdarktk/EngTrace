@@ -108,6 +108,43 @@ by_branch = Counter(branch_of.get(t, "?") for t in rejected)
 check("C2", "22 round-1 rejections, all in the original three branches (chem 9, elec 3, mech 10)",
       len(rejected) == 22 and dict(by_branch) == {"chemical": 9, "electrical": 3, "mechanical": 10}, f"{len(rejected)}: {dict(by_branch)}")
 
+# ---------------------------------------------------------------- S3: the further numbers of the benchmark section
+t_by_domain, areas_by_domain, t_by_kind = defaultdict(set), defaultdict(set), defaultdict(set)
+for r in rows:
+    t_by_domain[(r["branch"], r["domain"])].add(r["template_id"])
+    areas_by_domain[(r["branch"], r["domain"])].add(r["area"])
+    t_by_kind[r["answer_type"]].add(r["template_id"])
+per_domain = {k: len(v) for k, v in t_by_domain.items()}
+chem = sorted(n for (b, _), n in per_domain.items() if b == "chemical_engineering")
+check("S3", "ten templates per domain, 8 to 12 in chemical engineering", chem == [8, 10, 12] and all(n == 10 for (b, _), n in per_domain.items() if b != "chemical_engineering"), str(sorted(per_domain.values())))
+n_areas = [len(v) for v in areas_by_domain.values()]
+check("S3", "three domains per branch, two to four areas per domain", all(sum(1 for (b, _) in per_domain if b == br) == 3 for br in t_by_branch) and (min(n_areas), max(n_areas)) == (2, 4), f"areas per domain {min(n_areas)} to {max(n_areas)}")
+check("S3", "six answer kinds", len(t_by_kind) == 6, str({k: len(v) for k, v in sorted(t_by_kind.items())}))
+div = json.loads(read(RUN / "diversity.json"))
+multi = {t["template_id"] for t in div if t["reach"]["paths_lower"] >= 2}
+multi_in_set = {t["template_id"] for t in div if t["pool"]["paths_lower"] >= 2}
+check("S3", "92 templates with more than one reasoning path, 58 with one (lower reading)", (len(multi), len(div) - len(multi)) == (92, 58), f"{len(multi)} / {len(div) - len(multi)} in 500 draws")
+check("S3", "each of the 92 contributes at least two paths to the evaluation set", multi <= multi_in_set and len(multi_in_set) == 92, f"{len(multi & multi_in_set)} of {len(multi)}; {len(multi_in_set)} in the evaluation set")
+freeze = json.loads(read(RUN / "FREEZE.json"))
+check("S3", "15 instances per template from a 128-bit seed", (freeze["instances_per_template"], freeze["seed"]["bits"]) == (15, 128), f"{freeze['instances_per_template']}, {freeze['seed']['bits']} bits")
+grep("S3", "selection from each template's first 100 draws", RUN / "FREEZE.json", r"instance indices 0 to 99")
+grep("S3", "54 templates edited to pass the integrity checks", CERT / "README.md", r"54 templates edited over three closure rounds")
+grep("S3", "24 templates flagged in the first screen pass (126 / 13 / 11)", CERT / "README.md", r"pass 1 \(2026-09-23\) 126 pass, 13 controversial, 11 critical failure, AC1 on the flag 0\.84; the 24 flags verified and fixed")
+grep("S3", "three screen judges, three instances each", CERT / "screen/pass2/stats.md", r"Judges: grok-4\.6, minimax-m3, mimo-v2\.5-pro\..*instance seeds \[1001, 1002, 1003\]")
+plants = re.findall(r"^\| plant_(\w{3})_\d \(template_\w+\) \| (\w+):", read(CERT / "layer2/RESULTS.md"), re.M)
+plant_kinds = defaultdict(set)
+for br, kind in plants:
+    plant_kinds[br].add(kind)
+check("S3", "20 planted defects, four per branch, one of each kind", len(plants) == 20 and len(plant_kinds) == 5 and all(v == {"constant", "unit", "sign", "arithmetic"} for v in plant_kinds.values()), f"{len(plants)}; {sorted(plant_kinds)}")
+grep("S3", "15 experts", CERT / "layer2/RESULTS.md", r"from 510 label rows by 15 experts")
+grep("S3", "experts told planted defects exist, not which", CERT / "layer2/README.md", r"Experts are told quality-control items exist, not which")
+grep("S3", "no screen verdict shown, no discussion before submission", CERT / "layer2/README.md", r"no screen verdict shown, no discussion until all three have submitted")
+grep("S3", "five instances shown per template", CERT / "layer2/CERTIFICATION.md", r"the five instances they were shown")
+grep("S3", "round 1: 20 templates revised, 2 objections not adopted", CERT / "layer2/fixes_round1.md", r"Twenty templates were changed; two claims were not adopted")
+grep("S3", "round 2: rejections on 5 of the 22 templates (17 + 2 + 3)", CERT / "layer2/RESULTS_round2.md", r"Templates: 17 approved by all three, 2 approved by majority, 3 rejected by majority")
+cert_rounds = table(CERT / "layer2/CERTIFICATION.md", r"Round \| Labels")
+check("S3", "rounds review 150, 22, 5 and 2 templates", [int(r[3]) for r in cert_rounds] == [150, 22, 5, 2], str([r[3] for r in cert_rounds]))
+
 # ---------------------------------------------------------------- C3: validation against the experts
 sv = RUN / "SCORER_VALIDATION.md"
 grep("C3", "answer check 0.982 non-partial (current code)", sv, r"\| answer, non-partial agreement \| 0\.947 \| 0\.947 \| yes \| 0\.982 \|")
