@@ -56,13 +56,13 @@ in~\autoref{appendix:statistics}.
 
 The core of \ourdataset is the symbolic template, a Python blueprint for generating physically
 grounded engineering problems.
-As shown in~\autoref{fig:template-generation}, the pipeline samples domain-aware parameters from
+As shown in~\autoref{fig:template-generation}, it samples domain-aware parameters from
 authoritative data sources (\autoref{sec:appendix_data_sources}) and fundamental principles
-(\autoref{sec:appendix_param_details}), redrawing them until the scenario is physically valid.
-It then applies the governing equations to compute every quantity, checks physical plausibility,
-and writes the question and the gold reasoning trace, numbered steps that end in the answer.
+(\autoref{sec:appendix_param_details}), redraws them until the scenario is physically valid,
+computes every quantity with the governing equations, and writes the question and the gold
+reasoning trace.
 Because both come from one computation, every intermediate quantity is known exactly, with its
-unit; these quantities are the milestones whose coverage our evaluator measures.
+unit; these are the milestones whose coverage our evaluator measures.
 
 \begin{figure*}[t]
     \centering
@@ -73,11 +73,10 @@ unit; these quantities are the milestones whose coverage our evaluator measures.
     \label{fig:template-generation}
 \end{figure*}
 
-Templates go beyond variable substitution: parameter sampling can change the physical regime, the
-governing equation, and the reasoning path (\autoref{appendix:statistics}; examples
-in~\autoref{sec:appendix_template_examples}).
-This diversity is physical rather than linguistic, since the wording of the questions comes from
-the template code; we examine linguistic diversity later, with expert-checked paraphrases.
+Templates go beyond variable substitution: sampled parameters can change the physical regime, the
+governing equation, and the reasoning path (\autoref{sec:appendix_template_examples}).
+This diversity is physical rather than linguistic, as the question wording comes from the template
+code; we return to linguistic diversity later.
 
 \subsection{Certification}
 \label{subsec:certification}
