@@ -7319,6 +7319,12 @@ more paths as published, 80 when only the solution steps are read, and 75 when e
 templates drop out under the strictest reading, among them both Manning templates and the two-step Markov
 template). The statistics appendix states 92; the authors decide which reading it reports.
 
+*Added 2026-10-04.* At the authors' request Section 3.2 is shortened (146 words): no forward references to
+Sections 4 and 5, one pointer to the statistics appendix, and no evaluation-set sentences (the selection rule stays
+in the statistics appendix for the experimental setup to cite). It states that the templates' diversity is physical
+rather than linguistic and that linguistic diversity is examined later with expert-checked paraphrases, the
+distinction the second meta-review asks to make explicit (`docs/meta-reviews.md`).
+
 ## Open decisions
 
 | # | Decision | Needed before |
