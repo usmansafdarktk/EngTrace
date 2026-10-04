@@ -3,7 +3,7 @@
 \label{appendix:certification}
 
 This section details the three checks of~\autoref{subsec:certification}, the automated integrity
-checks, the LLM screen, and the expert certification, and reports the outcome of each.
+checks, the LLM screen, and the expert certification, and reports their results.
 
 \subsection{Automated Integrity Checks}
 
@@ -25,8 +25,8 @@ All 150 templates pass, and we edited 54 templates to make them pass.
 
 \subsection{LLM Screen}
 
-Three LLM judges score every template: Grok 4.6 (xAI), MiniMax M3 (MiniMax), and MiMo-V2.5-Pro
-(Xiaomi), none of them from the family of an evaluated model.
+Three LLM judges score every template: \texttt{Grok 4.6} (xAI), \texttt{MiniMax M3} (MiniMax), and
+\texttt{MiMo-V2.5-Pro} (Xiaomi), none of them from the family of an evaluated model.
 We query them through OpenRouter at temperature 0, with the output constrained to JSON.
 Each judge receives the template's source code and three of its instances in the prompt below and
 scores them on the rubric of~\autoref{tab:qa_rubric}.
@@ -193,7 +193,7 @@ single printed line.
     \label{tab:planted_defects}
 \end{table*}
 
-\subsection{Outcome}
+\subsection{Results}
 
 Every expert rejects all four planted defects of their branch, 60 of 60 readings.
 Of the 504 first-round hand checks with a comparable number, 459 match the gold value within 1\%,
