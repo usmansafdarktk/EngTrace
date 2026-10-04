@@ -1,0 +1,46 @@
+\section{Introduction}
+\label{sec:intro}
+
+Engineering problems are solved by derivations whose intermediate quantities can be checked: a governing equation is chosen, the inputs are brought to consistent units, and each intermediate value feeds the next.
+A correct final answer can still rest on flawed reasoning~\citep{cobbe2021gsm8k}, more often on harder problems: in \textsc{ProcessBench}, the share of correct-answer solutions with a process error rises from 3.5\% on \textsc{GSM8K} to 51.8\% on olympiad-level problems~\citep{zheng2024processbench}.
+A score on the answer alone also cannot show where a derivation goes wrong, or how far a wrong one got.
+
+Yet engineering benchmarks for large language models (LLMs) mostly score the final answer.
+General suites test engineering through multiple choice: the 7,892 engineering questions of \textsc{SuperGPQA} often require calculation but are scored on the option chosen~\citep{du2025supergpqa}.
+Dedicated benchmarks typically cover one branch~\citep{syed2024transportbench, kevian2024controlbench, li2025eeebench}, and the multi-branch \textsc{EngiBench} grades answers with LLM evaluators~\citep{zhou2025engibench}.
+The few that look past the answer have experts read the reasoning~\citep{syed2024transportbench, kevian2024controlbench}, have an LLM judge score it~\citep{zheng2026tpscalcbench, wasiq2026engvqa}, or check steps against computed values within one domain, as \textsc{ThermoQA} does for thermodynamics~\citep{duzkar2026thermoqa}.
+Expert reading is costly to repeat, and LLM judges favour their own outputs and those of related models~\citep{panickssery2024selfrecognition, spiliopoulou2025playfavorites}.
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\linewidth]{figs/engtrace-example-template.pdf}
+    \caption{A template from \ourdataset (chemical branch), one generated instance, and the gold reasoning trace computed from the same values. A response is scored against this trace on its final answer, the intermediate quantities it reaches (milestones) and its displayed calculations. \autoref{appendix:templates} gives the full template; \autoref{appendix:scoring} shows the checks.}
+    \label{fig:example}
+\end{figure}
+
+We present \ourdataset, a symbolic benchmark for verifiable process supervision of engineering reasoning.
+Following symbolic-template benchmarks in mathematics and finance~\citep{mirzadeh2024gsmsymbolic, xie2025finchain}, each of its 150 templates is executable code that samples physically grounded parameters, computes the answer, and writes the gold reasoning trace from the same computation (\autoref{fig:example}), so every intermediate quantity is known exactly.
+The templates span five branches (chemical, civil, electrical, industrial and mechanical), 15 domains and 42 areas.
+Every template passes automated integrity checks, is screened by three LLM judges from outside the evaluated model families, and is certified by three experts of its own branch after a hand check; each expert also rejected all four defects planted among their branch's templates.
+The 2,250 evaluated instances, 15 per template, are drawn with a private seed, so no evaluated instance was public when the models ran.
+
+A model's response is scored deterministically wherever a check exists.
+A final-answer check covers six answer kinds; milestone coverage is the share of the gold trace's intermediate quantities (milestones) that the response reaches; and an arithmetic check recomputes displayed calculations from their printed operands.
+Only the milestones that matching cannot find go to an LLM judge, drawn from a model family outside the evaluated ones.
+We chose this design by comparing seven evaluators, among them a panel of LLM judges and three process reward models, against step-level labels from 15 engineering experts on 300 responses of five models outside the evaluated set: the final-answer check agrees with the experts' verdict on 93\% of responses, and milestone coverage reaches an F1 of 0.96.
+The same study marks the limit of verification: when a response states the wrong rule but still computes the right answer, no deterministic check notices, and LLM judges catch at most about a third of such planted errors.
+
+We evaluate eleven LLMs, eight open-weight and three closed, at their providers' default settings, with 95\% intervals and corrected tests that treat the template as the unit.
+Final-answer accuracy ranges from 0.81 to 0.98, and the five strongest models lie within 0.01 of one another, closer than the evaluation set can resolve.
+Milestone coverage orders the models differently (Kendall's $\tau = 0.71$), and responses with wrong answers still reach 46\% to 85\% of the milestones, against 10\% to 22\% by chance.
+Every model's wrong-answer rate is highest on the longest derivations; in an expert error analysis, errors on easy problems are almost entirely calculation slips, while wrong formulas or principles appear mostly on intermediate and advanced problems.
+On expert-checked paraphrases of 115 templates, a drop of five points or more from rewording alone is ruled out for ten of the eleven models.
+
+\ourdataset is a depth-oriented evaluation of a curriculum-based subset of engineering.
+Its problems are examination-style by construction, which is what verifiable gold traces require, so ill-posed problems and real-world artefacts such as technical drawings are out of scope.
+Our contributions are:
+\begin{itemize}
+    \item We build and certify \ourdataset, 150 symbolic templates across five engineering branches whose gold traces are computed by the template code, with 2,250 instances drawn from a private seed (\autoref{sec:benchmark}).
+    \item We design a deterministic-first evaluator, validate it against 15 experts' step-level labels beside six alternative designs, and report what no check can see (\autoref{sec:evaluation}).
+    \item We evaluate eleven LLMs with template-level statistics, reporting tiers rather than a ranking at the top, what milestone coverage adds to the final answer, where models fail, a bound on the effect of rewording, and what reasoning effort, the governing equations and a code tool change (\autoref{sec:experiments}).
+\end{itemize}
