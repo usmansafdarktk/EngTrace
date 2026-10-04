@@ -27,14 +27,15 @@ To address these gaps, we introduce \ourdataset, a symbolic benchmark for verifi
 supervision of engineering reasoning.
 Following symbolic-template benchmarks in mathematics~\citep{mirzadeh2024gsmsymbolic} and
 finance~\citep{xie2025finchain}, \ourdataset represents each problem as a template: executable
-Python code that samples physically grounded parameters, computes the answer, and emits a gold
-reasoning trace from the same computation.
-Because the trace comes from the computation itself, every intermediate quantity of the derivation
-is known exactly.
+Python code that samples physically grounded parameters, computes every intermediate quantity and
+the answer, and writes the gold reasoning trace from these values, so each quantity in the trace is
+computed rather than annotated (see~\autoref{fig:example}).
 The 150 templates span five engineering branches, 15 domains, and 42 areas and are stratified across
 varying difficulty levels.
-Three domain experts from the template's own branch certify each template, and we draw the evaluated
-instances with a private seed, so that no instance was public when the models ran.
+Every template undergoes automated integrity checks and an LLM screen before three domain experts
+from its own branch certify it.
+We draw the evaluated instances with a private seed, so that no instance was public when the models
+ran.
 
 Benchmarks that assess intermediate steps mostly rely on LLM judges or human graders, or cover a
 single domain~\citep{syed2024transportbench, zheng2026tpscalcbench, duzkar2026thermoqa}; \ourdataset
