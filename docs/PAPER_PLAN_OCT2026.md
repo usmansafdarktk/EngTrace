@@ -58,25 +58,24 @@ tool moves the strongest models' scores.
 mechanism now matches the title. A shorter form, if wanted: *EngTrace: Verifiable Process Evaluation of Engineering
 Reasoning from Symbolic Templates*.
 
-**Abstract, draft** (about 250 words; trim to taste).
+**Abstract, draft** (196 words; the authors' structure, every number checked by `docs/check_plan_claims.py`).
 
-> Engineering problems are solved by derivations whose intermediate quantities can be checked, yet most benchmarks
-> score only the final answer, and those that assess steps rely on LLM judges or human graders. We present
-> EngTrace, a benchmark of 150 symbolic templates spanning five engineering branches, 15 domains and 42 areas. Each
-> template is executable code that samples physically grounded parameters, computes the answer and emits a gold
-> reasoning trace from the same computation, so every intermediate quantity is known with its unit. Templates pass
-> automated integrity checks and an LLM screen, and are certified by three experts of their own branch, who caught
-> 60 of 60 planted defects. Evaluated instances are drawn from a private seed, so none was public when the models
-> ran. EngTrace scores a response deterministically wherever a check exists: a three-way final-answer check over six
-> answer kinds, coverage of the gold derivation's intermediate quantities, and an arithmetic check of every displayed
-> calculation; a judge from a model family outside the evaluated models decides only what these checks leave open.
-> The evaluator is validated against step-level labels from 15 experts on 300 responses (answer agreement 0.98,
-> milestone F1 0.96) and against 120 planted defects, which also show the limit of verification: no deterministic
-> check detects a misstated rule behind a correct answer, and judges catch about a third. On 2,250 instances, eleven
-> models score 0.81 to 0.98 on the final answer, with the top five inseparable at this size; every model scores lower
-> on Advanced templates; milestone coverage orders the models differently; and on wrong answers models still reach
-> 46 to 85% of the derivation. Expert-checked paraphrases change no model's score by more than five points for ten
-> of eleven models, and neither the governing equations in the prompt nor a code tool moves the strongest models.
+> Engineering derivations have intermediate quantities that can be checked, yet most engineering benchmarks score
+> only the final answer, and those that assess steps rely on LLM judges or cover one domain. We present EngTrace, a
+> symbolic benchmark for verifiable process supervision of engineering reasoning: 150 templates spanning five
+> engineering branches, 15 domains and 42 areas. Each template is expert-certified executable code that samples
+> physically grounded parameters and emits the answer and a gold reasoning trace from one computation. Each response
+> is scored deterministically wherever a check exists: the final answer, milestone coverage of the gold derivation's
+> intermediate quantities, and the arithmetic of displayed calculations; a judge from outside the evaluated model
+> families decides only what these checks leave open. Against step-level labels from 15 experts on 300 responses,
+> the evaluator reaches final-answer agreement 0.98 and milestone F1 0.96. On 2,250 instances from a private seed,
+> eleven LLMs score 0.81 to 0.98 in final-answer accuracy; the top five are not separable at this size. Milestone
+> coverage orders the models differently; even on wrong answers models reach 46% to 85% of the milestones (chance
+> 10% to 22%); and every model's wrong-answer rate is highest on the longest derivations.
+
+What the 200-word limit left out, for the Introduction's first page instead: the certification evidence (60 of 60
+planted defects caught), the planted-defect finding on the limit of verification, the paraphrase bound, and the
+reasoning-effort, flagship, open-book and tool conditions.
 
 **Contributions, draft.** Three, each owned by an active verb and each carrying its evidence.
 
@@ -116,10 +115,10 @@ sections; `PARAPHRASE_PAPER_NOTES.md`; D-111, D-146, D-171, D-180 to D-184).
 | C8 | On wrong answers models still reach 46% to 85% of the milestones (readable responses) against a chance floor of 10% to 22%; 13% to 26% of wrong answers are a complete derivation to a wrong value (the five models with more than 100 wrong answers) | Q3 "Milestones on the wrong-answer traces", "Verdict against coverage" |
 | C9 | The arithmetic check flags 0.5% to 22.5% of correct-answer responses, reading 2.8 to 9.8 calculations per response, at precision 0.905 on these models (171 of 189 flags read by a domain expert); the judged step check flags 1.1% to 22.0% | Q3 "The digit rule", "The step router"; `FLAG_REVIEW_3.md` |
 | C10 | The wrong-answer rate on instances whose gold derivation has six or more milestones is 0.037 to 0.291, against 0.000 to 0.045 on one-milestone instances, for every model | Q3 "Wrong-answer rate against the item's milestone count" |
-| C11 | The strongest models solve all 15 instances of 85% to 91% of the single-path templates; the weakest 36% to 48% | Q4 |
+| C11 | The six strongest models solve all 15 instances of 85% to 91% of the single-path templates; four of the five weakest solve all instances of only 36% to 48% (Gemini 3.1 Flash-Lite 67%) | Q4 |
 | C12 | On 277 expert-kept paraphrase pairs over 115 templates, the paired change in Final Answer Accuracy is −0.031 to +0.020, none significant after correction; for ten of eleven models the 90% interval lies within ±5 points; the tiers hold and the order within the top tier is not resolved (tau 0.673 against a sampling-noise median of 0.782) | Q5; `PARAPHRASE_PAPER_NOTES.md` |
 | C13 | Repeated decoding on four models (300 instances, three repeats): SD 0.004 to 0.013, the same verdict every time on 86% to 94% of instances | "Decoding repeats" |
-| C14 | The ordering is unchanged at half and double the answer tolerance (tau 0.927), without the six templates whose answers can be read off the question (within 0.002) and without the nine symbolic-answer templates (+0.002 to +0.011) | Sensitivity; `THRESHOLD_APPENDIX.md`; `SHORTCUT_AUDIT.md` |
+| C14 | The ordering is unchanged at half and double the answer tolerance (tau 0.927); without the six templates whose answers can be read off the question the scores move by at most 0.002, and without the nine symbolic-answer templates by −0.003 to +0.008 | Sensitivity; `THRESHOLD_APPENDIX.md`; `SHORTCUT_AUDIT.md` |
 | C15 | Reasoning at medium effort moves GPT-5.4 mini from 0.858 to 0.951 on the 450-instance subset (+0.093, 95% CI 0.056 to 0.133) and Gemini 3.1 Flash-Lite by less than the design detects (+0.016, −0.010 to 0.042) | "C1 and C4"; D-180 |
 | C16 | Two flagships that pass the selection rule do not exceed the top tier on the same 450 instances: DeepSeek V4 Pro 0.968 and GPT-5.4 with reasoning on 0.980 sit inside the top five's intervals (0.964 to 0.976); GPT-5.4 at its provider's default (no reasoning tokens) scores 0.941, below them | "C3"; D-182 |
 | C17 | Supplying each template's governing equations with the question (405 instances) lifts gpt-oss-20b by +0.064 (95% CI 0.027 to 0.104; +0.043 on the instances answered in both conditions, since fewer responses run out of room) and changes GPT-5.4 mini (−0.019) and Claude Sonnet 5 (+0.007) by amounts bounded inside ±5 points, while coverage rises by 0.03 to 0.06 for all three; the condition supplies equations, not data tables | "C1 and C4", the `openbook2` rows; D-183 |
@@ -322,8 +321,9 @@ Written in the register of the May section, with its equations.
   answer.
 - *Agreement with the experts* (Table 2). Seven designs compared: a step-matching evaluator with a three-judge panel,
   the same with a panel from outside the evaluated families, three process reward models, deterministic milestone
-  coverage, coverage with the arithmetic check, coverage with the judge. The final-answer check 0.982 / 0.927 against
-  the panel design's 0.760; milestone F1 0.923 and 0.958; the judge's validation; the arithmetic check 0.817 / 0.427
+  coverage, coverage with the arithmetic check, coverage with the judge. The final-answer check 0.982 on the
+  responses the experts did not call partial and 0.927 three-way on all 300, against the panel design's 0.747;
+  milestone F1 0.923 and 0.958; the judge's validation; the arithmetic check 0.817 / 0.427
   inside correct-answer responses; the judged step check 0.707 / 0.603; the best reward model ranks steps well but
   three of four of its flags inside correct-answer responses are false.
 - *Validation on the evaluated models.* Two experiments on this evaluation's own responses: (1) a domain expert read a
