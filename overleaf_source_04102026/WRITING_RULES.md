@@ -12,6 +12,8 @@ vocabulary) are in `docs/PAPER_PLAN_OCT2026.md`, section 8; this file covers for
    punctuation mark needs nothing extra). The one exception is text quoted verbatim in a code listing, where a macro
    does not expand.
 4. A citation is tied to the word before it with a tilde, never a space: `templates~\citep{mirzadeh2024gsmsymbolic}`.
+   The same holds for every cross-reference: `in~\autoref{fig:example}`, never `in \autoref{...}`.
+5. "LLM" and "LLMs" are used without spelling them out. Experts are "domain experts" throughout.
 
 ## Conventions of the current Overleaf project
 

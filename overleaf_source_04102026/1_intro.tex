@@ -1,8 +1,8 @@
 \section{Introduction}
 \label{sec:intro}
 
-As large language models (LLMs) take on engineering problems, it becomes essential to evaluate how
-they reason, not only what they answer.
+As LLMs enter specialized domains such as engineering, it becomes essential to evaluate how they
+reason, not only what they answer.
 Engineering reasoning requires physically grounded, multi-step problem solving, in which scientific
 principles, quantitative modeling, and practical constraints must converge, and in which
 intermediate steps are as consequential as the final result.
@@ -23,15 +23,14 @@ it~\citep{du2025supergpqa, zhou2025engibench}.
     \label{fig:example}
 \end{figure}
 
-We introduce \ourdataset, a symbolic benchmark for verifiable process supervision of engineering
-reasoning.
+To address these gaps, we introduce \ourdataset, a symbolic benchmark for verifiable process
+supervision of engineering reasoning.
 Following symbolic-template benchmarks in mathematics~\citep{mirzadeh2024gsmsymbolic} and
 finance~\citep{xie2025finchain}, \ourdataset represents each problem as a template: expert-certified
 code that samples physically grounded parameters, computes the answer, and emits a gold reasoning
 trace from the same computation.
-\autoref{fig:example} shows such a template, an instance it generates, and the gold trace; because
-the trace comes from the computation itself, every intermediate quantity of the derivation is known
-exactly.
+Because the trace comes from the computation itself, every intermediate quantity of the derivation
+is known exactly, as shown in~\autoref{fig:example}.
 The 150 templates span five engineering branches, 15 domains, and 42 areas.
 
 Benchmarks that assess intermediate steps mostly rely on LLM judges or human graders, or cover a
@@ -44,20 +43,17 @@ response displays.
 For the residual milestones that deterministic matching cannot find, it consults an LLM judge from
 outside the evaluated model families, because LLM judges can favor their own outputs and those of
 related models~\citep{panickssery2024selfrecognition, li2026preferenceleakage}.
-Three experts from the template's own branch certify each template, and we draw the evaluated
+Three domain experts from the template's own branch certify each template, and we draw the evaluated
 instances with a private seed, so that no instance was public when the models ran.
-\ourdataset is a depth-oriented evaluation of a curriculum-based subset of engineering: its problems
-are examination-style by construction, as verifiable gold traces require, which leaves ill-posed
-problems and real-world artifacts out of scope.
 
 In summary, our contributions are as follows:
 \begin{itemize}
     \item We introduce \ourdataset, 150 symbolic templates spanning five engineering branches, 15
           domains, and 42 areas, each of which passes automated integrity checks and certification
-          by three experts from its own branch, who rejected every defect we planted.
+          by three domain experts from its own branch.
     \item We design an evaluator that is deterministic wherever a check exists and validate it
-          against step-level labels from 15 engineering experts, reaching a milestone F1 of 0.96.
-    \item We evaluate eleven open-weights and closed LLMs on 2,250 unseen instances and show that
+          against step-level labels from domain experts, reaching a milestone F1 of 0.96.
+    \item We evaluate eleven open-weights and closed LLMs on 2,250 template instances and show that
           final-answer accuracy alone cannot separate the strongest models, whereas milestone
           coverage and an expert error analysis reveal how far their derivations get and where they
           fail.
