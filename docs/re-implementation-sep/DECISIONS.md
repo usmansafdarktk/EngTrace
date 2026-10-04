@@ -7260,9 +7260,19 @@ to five appendix sections still to be written. Four choices behind it:
 - **Bibliography.** The May ABET entry's URL (the 2024–2025 criteria) returns 404, and ABET now serves only the
   2026–2027 criteria, whose program criteria name AIChE, ASCE, IEEE, IISE and ASME as the lead societies of the five
   branches. The entry keeps the 2024–2025 edition without a URL. The May entries for ASME, IEEE and AIChE point to a
-  vision statement, a standards portal and bylaws rather than curricula, so they are not carried over, and the main
-  text does not name the societies (their acronyms would need spelling out). Gwet (2008), Fleiss (1971) and
-  Feinstein and Cicchetti (1990) support the agreement sentence.
+  vision statement, a standards portal and bylaws rather than curricula, so they are not carried over; the main
+  text names the five societies without citations. Gwet (2008), Fleiss (1971) and Feinstein and Cicchetti (1990)
+  support the agreement sentence.
+
+*Revised 2026-10-04, at the authors' request.* Section 3.1 now follows the May paper's taxonomy subsection: its
+title ("Taxonomy and Content Selection"), its figure block (now the five-branch PDF, its label
+`fig:engtrace-overview`, a caption extended to five branches) and its run-in paragraphs (Domain and Area Selection,
+Template Selection, plus Difficulty Levels). It states that domain experts hand-authored all 150 templates. It
+cites Hibbeler (*Structural Analysis*, 10th SI ed.) and Montgomery (*Introduction to Statistical Quality Control*,
+7th ed.) beside Fogler and Ulaby; both are the editions in the authors' source set and are cited in 4 civil and 5
+industrial template files. The May example of the significance weighting is kept with the area named as the
+figure names it (Conversion and Reactor Sizing; the May text called it "Levenspiel Plot Interpretation") and
+without the scores, which no file in the repository records; the counts (5 and 1) are checked.
 
 ## Open decisions
 

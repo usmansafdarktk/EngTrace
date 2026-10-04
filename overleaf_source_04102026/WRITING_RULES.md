@@ -68,4 +68,4 @@ Labels used before their sections exist. Each must be defined when its section i
   construction and examples), `appendix:statistics` (dataset statistics and the evaluation set),
   `appendix:certification` (template certification), `appendix:scoring` (scoring details).
 - Defined: `sec:intro`, `sec:related`, `sec:benchmark`, `subsec:taxonomy`, `subsec:templates`,
-  `subsec:certification`, `fig:taxonomy` (the five-branch figure, `figs/engtrace-overview-5branch.pdf`).
+  `subsec:certification`, `fig:engtrace-overview` (the five-branch figure, `figs/engtrace-overview-5branch.pdf`).

@@ -1,33 +1,47 @@
 \section{The \ourdataset Benchmark}
 \label{sec:benchmark}
 
-\subsection{Taxonomy and Scope}
+\subsection{Taxonomy and Content Selection}
 \label{subsec:taxonomy}
 
-\ourdataset covers five core engineering branches (chemical, civil, electrical, industrial, and
-mechanical engineering), whose problems are typically solved by quantitative derivations with
-checkable intermediate values.
-Each branch has three domains, each with two to four areas: 15 domains and 42 areas in all
-(\autoref{fig:taxonomy}).
-The domains and areas follow the ABET accreditation criteria~\citep{abet2024criteria}, the
-curricula of each branch's professional society, and the branch textbooks; we also cross-check the
-chemical, electrical, and mechanical lists with four LLMs prompted as curriculum designers.
-Domain experts wrote the 150 templates, 30 per branch and ten per domain (8 to 12 in chemical
-engineering).
-They also assigned each template a level, Easy, Intermediate, or Advanced, by its conceptual
-complexity, mathematical sophistication, and procedural depth, so that performance can be compared
-across difficulty; the three levels hold 58, 58, and 34 templates.
-\autoref{appendix:taxonomy} describes the selection procedure and its prompts, and
-\autoref{appendix:sources} lists the textbooks and reference data.
+The taxonomy of \ourdataset, illustrated in~\autoref{fig:engtrace-overview}, spans five engineering
+branches, 15 domains, and 42 areas, chosen to mirror formal engineering curricula.
 
 \begin{figure*}[t]
-  \centering
-  \includegraphics[width=\textwidth]{figs/engtrace-overview-5branch.pdf}
-  \caption{The taxonomy of \ourdataset: five engineering branches, each with three domains, and the
-    42 areas within the domains.
-    Each branch holds 30 templates.}
-  \label{fig:taxonomy}
+    \centering
+    \includegraphics[width=0.85\textwidth]{figs/engtrace-overview-5branch.pdf}
+    \caption{\ourdataset's \textbf{Hierarchical Taxonomy} spanning 15 domains across five branches:
+    process equilibrium and dynamics (Chemical); field theory and signal transmission (Electrical);
+    structures, soils, and water resources (Civil); production, quality, and stochastic operations
+    (Industrial); and physical mechanics and material properties (Mechanical).}
+    \label{fig:engtrace-overview}
 \end{figure*}
+
+\paragraph{Domain and Area Selection.}
+To identify core domains and critical areas, we synthesized the engineering curricular standards of
+ABET~\citep{abet2024criteria} and of the professional societies of the five branches (AIChE, ASCE,
+IEEE, IISE, and ASME), together with the standard textbooks of each branch.
+For the chemical, electrical, and mechanical branches, we further cross-checked these domains and
+areas against four LLMs prompted as curriculum designers (\autoref{appendix:taxonomy}).
+
+\paragraph{Template Selection.}
+Domain experts hand-authored all 150 symbolic Python templates, 30 per branch, grounding them
+directly in foundational textbooks and authoritative engineering
+handbooks~\citep[e.g.,][]{fogler2020elements, ulaby2015fundamentals, hibbeler2020, montgomery2013};
+\autoref{appendix:sources} lists all source texts.
+The number of templates per area is non-uniform: in the chemical, electrical, and mechanical
+branches, it follows a pedagogical significance score (1--5) that the same four LLMs assigned to
+each area within its domain.
+For instance, within the Reaction Kinetics domain, the core area of Mole Balances includes five
+templates, while the specialized area of Conversion and Reactor Sizing is represented by a single
+template.
+
+\paragraph{Difficulty Levels.}
+Domain experts also assigned each template one of three levels, Easy, Intermediate, or Advanced,
+along three dimensions: conceptual complexity (isolated principles vs.\ multi-domain synthesis),
+mathematical sophistication (direct algebraic substitution vs.\ differential equations), and
+procedural depth (the length of interdependent reasoning chains).
+The three levels hold 58, 58, and 34 templates (\autoref{appendix:statistics}).
 
 \subsection{Templates and Instances}
 \label{subsec:templates}

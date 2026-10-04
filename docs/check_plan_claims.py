@@ -120,6 +120,10 @@ check("S3", "ten templates per domain, 8 to 12 in chemical engineering", chem ==
 n_areas = [len(v) for v in areas_by_domain.values()]
 check("S3", "three domains per branch, two to four areas per domain", all(sum(1 for (b, _) in per_domain if b == br) == 3 for br in t_by_branch) and (min(n_areas), max(n_areas)) == (2, 4), f"areas per domain {min(n_areas)} to {max(n_areas)}")
 check("S3", "six answer kinds", len(t_by_kind) == 6, str({k: len(v) for k, v in sorted(t_by_kind.items())}))
+t_by_area = defaultdict(set)
+for r in rows:
+    t_by_area[r["area"]].add(r["template_id"])
+check("S3", "Mole Balances holds five templates, Conversion and Reactor Sizing one", (len(t_by_area["mole_balances"]), len(t_by_area["conversion_and_reactor_sizing"])) == (5, 1), f"{len(t_by_area['mole_balances'])}, {len(t_by_area['conversion_and_reactor_sizing'])}")
 div = json.loads(read(RUN / "diversity.json"))
 multi = {t["template_id"] for t in div if t["reach"]["paths_lower"] >= 2}
 multi_in_set = {t["template_id"] for t in div if t["pool"]["paths_lower"] >= 2}
