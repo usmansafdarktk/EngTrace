@@ -38,3 +38,12 @@ vocabulary) are in `docs/PAPER_PLAN_OCT2026.md`, section 8; this file covers for
 - One file per section, named as `main.tex` inputs it (`0_abstract.tex`, `1_intro.tex`, `2_relatedwork.tex`, ...);
   the bibliography is `custom.bib`.
 - One sentence per line in the `.tex` files, so changes show sentence by sentence; LaTeX prints them as one paragraph.
+
+## Cross-reference labels
+
+Labels used before their sections exist. Each must be defined when its section is written, or the reference prints
+"??" in the PDF.
+
+- To define: `sec:benchmark` (Section 3), `sec:evaluation` (Section 4), `sec:experiments` (Section 5),
+  `appendix:templates` (template examples), `appendix:scoring` (scoring details).
+- Defined: `sec:intro`, `fig:example`.
