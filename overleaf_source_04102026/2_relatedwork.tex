@@ -1,19 +1,18 @@
 \section{Related Work}
 \label{sec:related}
 
-\paragraph{Engineering Benchmarks.} Most engineering benchmarks grade answers: general suites such
-as \textsc{SuperGPQA} through multiple choice~\citep{du2025supergpqa}, multi-branch benchmarks with
-LLM judges~\citep{zhou2025engibench, naser2026eri}, and dedicated benchmarks within one
-branch~\citep{li2025eeebench, skelic2025circuit}.
-Those that assess reasoning mostly rely on domain experts~\citep{syed2024transportbench} or LLM
-judges~\citep{zheng2026tpscalcbench, wasiq2026engvqa}, as does \textsc{PhysReason} in
-physics~\citep{zhang2025physreason}.
-Closest to \ourdataset, \textsc{PRISM-Physics}~\citep{zhao2026prismphysics} and
-\textsc{ThermoQA}~\citep{duzkar2026thermoqa} check steps against reference formulas and computed
-values, respectively, but only on fixed problems.
+\paragraph{Engineering Benchmarks.} General suites such as
+\textsc{SuperGPQA}~\citep{du2025supergpqa} and most engineering benchmarks, whether
+multi-branch~\citep{zhou2025engibench, naser2026eri} or single-branch~\citep{li2025eeebench}, grade
+final answers.
+The few benchmarks that assess reasoning mostly rely on domain
+experts~\citep{syed2024transportbench} or LLM judges~\citep{zheng2026tpscalcbench, wasiq2026engvqa}.
+Closest to \ourdataset, \textsc{ThermoQA} in thermodynamics~\citep{duzkar2026thermoqa} and
+\textsc{PRISM-Physics} in physics~\citep{zhao2026prismphysics} check steps against computed values
+and reference formulas, respectively, but only on fixed problems.
 
-\paragraph{Symbolic Benchmarks.} Fixed problems can leak into training data~\citep{zhang2024gsm1k};
-symbolic benchmarks generate fresh instances from templates.
+\paragraph{Symbolic Benchmarks.} Fixed problems can leak into training data~\citep{zhang2024gsm1k},
+whereas symbolic benchmarks generate fresh instances from templates.
 Many vary existing problems to test whether a model has memorized the
 original~\citep{mirzadeh2024gsmsymbolic, gulati2024putnamaxiom}.
 Some also generate gold solutions, in physics~\citep{imani2025sympybench}, applied
@@ -25,9 +24,9 @@ physically grounded parameters, so every intermediate quantity is known exactly.
 
 \paragraph{Step-Level Evaluators.} These exact values still need an evaluator that decides which of
 them a response reaches.
-Process reward models and their benchmarks focus on
-mathematics~\citep{lightman2023verify, zheng2024processbench}, and models trained on mathematics
-perform poorly in other domains~\citep{zeng2025versaprm}.
+Work on process reward models centers on
+mathematics~\citep{lightman2023verify, zheng2024processbench}, and such models transfer poorly to
+other domains~\citep{zeng2025versaprm}.
 LLM judges make correlated errors~\citep{goel2025greatmodels} and agree with experts mainly on
 questions they can answer themselves, unless given a correct
 reference~\citep{krumdick2026nofreelabels}.
