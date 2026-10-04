@@ -1,19 +1,19 @@
 \section{Evaluation Framework}
 \label{sec:evaluation}
 
-Because each template computes every quantity in its gold trace, the final answer and most
-milestones of a response can be checked reproducibly without a model.
-We therefore check each response deterministically wherever possible and consult an LLM judge only
-on what the checks leave open.
-An expert study guides this design and validates it: on 300 responses from five LLMs outside the
-eleven we evaluate, which 15 domain experts label step by step, the final-answer check agrees with
-the experts' three-way verdict on 0.927 of the responses, and milestone matching with the judge
-reaches F1 0.958 against their milestone labels (\autoref{appendix:validation}).
+Because each template computes every quantity of its gold trace, we check responses
+deterministically, and hence reproducibly, wherever possible and consult an LLM judge only on what
+the checks leave open.
+An expert study guides and validates this design: on 300 responses from five LLMs outside the
+eleven we evaluate, each labeled step by step by three domain experts, the final-answer check
+matches the experts' three-way verdict on 0.927 of responses, and milestone matching with the judge
+reaches F1 0.958 (\autoref{appendix:validation}).
 
 \paragraph{Preliminaries.}
-An instance comprises a question, a gold trace, and milestones $\mathcal{M}$, the values that the
+An instance comprises a question, a gold trace, and milestones $\mathcal{M}$: the values that the
 template computes, the gold trace states, and the question does not give.
-Its targets are the milestones in the gold final answer, or a verdict word such as a flow regime.
+Its targets are the milestones in the gold final answer and any verdict word there, such as a flow
+regime.
 A response $r$ is a sequence of steps ending in a final answer.
 
 \paragraph{Final Answer Accuracy.}
@@ -25,20 +25,18 @@ $c \in \mathcal{C}$,
     |c\,\hat{y} - y| \le \max\bigl(\epsilon\,|y|,\; c\,u(\hat{y}),\; u(y)\bigr),
     \label{eq:match}
 \end{equation}
-so a correct rounding at either value's precision matches.
+so a correct rounding at either displayed precision matches.
 A response scores $v(r) = 1$ if every target matches, $0.5$ if only some do, and $0$ if none does or
-no final answer is readable; a partial answer is neither correct nor incorrect, and answering within
-the output limit is part of the task.
+no final answer is readable, since stating one within the output limit is part of the task.
 \emph{Final Answer Accuracy} (FAC) is the mean of $v(r)$ over instances.
 
 \paragraph{Milestone Coverage.}
-A milestone is reached if the response states its value within 0.5\%, the templates' display
-precision rather than a fitted constant, under a unit factor in $\mathcal{C}$, anywhere and in any
-order.
-Unmatched milestones go to an LLM judge from outside the evaluated families, \texttt{MiMo-V2.5-Pro},
-which sees the question, the response, and each milestone's name and value, not the gold trace, and
-rules each one reached, not needed, or missing.
-We credit only reached, as the judge also excuses unstated values as not needed
+A milestone is reached if the response states its value within 0.5\% under a unit factor, in any
+step and order; 0.5\% is the templates' display tolerance, not a fitted constant.
+Milestones that matching misses go to an LLM judge from outside the evaluated families,
+\texttt{MiMo-V2.5-Pro}, which sees the question, the response, and each milestone's name and value,
+but not the gold trace, and rules each reached, not needed, or missing.
+We credit only reached, since the judge also excuses unstated values as not needed
 (\autoref{appendix:scoring}).
 With $\mathcal{R}(r)$ the milestones matched or ruled reached,
 \begin{equation}
@@ -57,8 +55,7 @@ The judged step check sends every step the arithmetic check does not flag to the
 the question and the gold steps, and flags a step labeled a conceptual or calculation error.
 \emph{Arithmetic flags} and \emph{judged step flags} are the shares of correct-answer responses with
 at least one such flag.
-We report them as flags with a measured precision rather than as scores, because neither check sees
-every flawed step: no deterministic check detects a misstated rule behind a correct answer, and LLM
-judges catch at most about a third of such cases (\autoref{appendix:validation}).
-\autoref{appendix:scoring} gives the match rule in full, both judge prompts, the arithmetic rule,
-and the thresholds.
+They are flags with measured precision, not scores, since neither check sees every flawed step: no
+deterministic check detects a misstated rule behind a correct answer, and LLM judges catch at most
+about a third of such cases (\autoref{appendix:validation}).
+\autoref{appendix:scoring} gives the full rules, both judge prompts, and the thresholds.

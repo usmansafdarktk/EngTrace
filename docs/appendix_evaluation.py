@@ -221,12 +221,13 @@ sep = [float(r.split(" & ")[4].rstrip(" \\")) for r in grid_rows if " & yes & " 
 caught = [int(re.match(r"\\texttt\{[^}]+\} & (\d+) of", r).group(1)) for r in planted_rows]
 assert gold_ok[0] == gold_ok[1] and decides[2] == "three" and sampled[0] == "75", (gold_ok, decides, sampled)
 
-experts = one(r"(\d+) domain experts, three per branch", ps)
+readers = one(r"Every trace was labelled by (three) experts of its own branch", ps.replace("**", ""))
 assert max(rates) < 0.4, rates  # "at most about a third" in the main text
 main = [
-    f"on 300 responses from five LLMs outside the eleven we evaluate, which {experts[0]} domain experts",
-    f"three-way verdict on {now['answer, three-way agreement']} of the responses",
-    f"reaches F1 {e5[2]} against their milestone labels",
+    f"on 300 responses from five LLMs outside the eleven we evaluate, each labeled step by step by {readers[0]} "
+    f"domain experts",
+    f"three-way verdict on {now['answer, three-way agreement']} of responses",
+    f"milestone matching with the judge reaches F1 {e5[2]}",
     f"{pct(min(judged))} to {pct(max(judged))} of milestones",
 ]
 scoring = [
