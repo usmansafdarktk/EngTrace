@@ -10,8 +10,6 @@ experts~\citep{syed2024transportbench} or LLM judges~\citep{zheng2026tpscalcbenc
 Closest to \ourdataset, \textsc{ThermoQA} in thermodynamics~\citep{duzkar2026thermoqa} and
 \textsc{PRISM-Physics} in physics~\citep{zhao2026prismphysics} check steps against computed values
 and reference formulas, respectively, but on a fixed set of problems.
-\ourdataset instead checks each response step by step against exact values computed for its
-generated instance, deterministically wherever a check exists.
 
 \paragraph{Symbolic Benchmarks.} Fixed problems can leak into training data~\citep{zhang2024gsm1k},
 whereas symbolic benchmarks generate fresh instances from templates.
@@ -21,9 +19,8 @@ Some also generate gold solutions, in physics~\citep{imani2025sympybench}, appli
 mathematics~\citep{fan2024hardmath}, and finance~\citep{xie2025finchain}.
 In engineering, \textsc{CIRCUIT} and \textsc{OPT-Engine} generate circuit and optimization
 problems~\citep{skelic2025circuit, chen2026optengine}.
-In \ourdataset, by contrast, each template is the derivation itself.
-Its expert-certified code samples physically grounded parameters and computes the answer and gold
-trace together, so every intermediate quantity becomes a checkable milestone.
+Each \ourdataset template instead encodes the full derivation, computing every intermediate quantity
+exactly from physically grounded parameters.
 
 \paragraph{Step-Level Evaluators.} Without exact references, step-level evaluation relies on process
 reward models or LLM judges.
@@ -33,6 +30,5 @@ other domains~\citep{zeng2025versaprm}.
 LLM judges make correlated errors~\citep{goel2025greatmodels} and agree with experts mainly on
 questions they can answer themselves, unless given a correct
 reference~\citep{krumdick2026nofreelabels}.
-\ourdataset therefore sends its judge only the milestones that deterministic matching cannot find,
-each with its expected value.
-We validate the full evaluator against domain experts' step-level labels.
+\ourdataset therefore checks every milestone against its exact value, deterministically wherever a
+check exists and otherwise through a judge that receives this value.
