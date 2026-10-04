@@ -64,5 +64,5 @@ Labels used before their sections exist. Each must be defined when its section i
 "??" in the PDF.
 
 - To define: `sec:benchmark` (Section 3), `sec:evaluation` (Section 4), `sec:experiments` (Section 5),
-  `appendix:templates` (template examples), `appendix:scoring` (scoring details), `appendix:related` (extended related work).
+  `appendix:templates` (template examples), `appendix:scoring` (scoring details).
 - Defined: `sec:intro`, `sec:related`.

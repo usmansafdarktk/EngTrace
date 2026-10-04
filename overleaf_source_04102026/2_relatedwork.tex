@@ -5,40 +5,33 @@
 as \textsc{SuperGPQA} through multiple choice~\citep{du2025supergpqa}, multi-branch benchmarks with
 LLM judges~\citep{zhou2025engibench, naser2026eri}, and dedicated benchmarks within one
 branch~\citep{li2025eeebench, skelic2025circuit}.
-Most physics benchmarks likewise grade final answers or
-expressions~\citep{xu2025ugphysics, qiu2025phybench}.
-In both fields, benchmarks that assess reasoning mostly rely on domain
-experts~\citep{syed2024transportbench, kevian2024controlbench} or LLM
-judges~\citep{zheng2026tpscalcbench, wasiq2026engvqa, zhang2025physreason, yu2026hipho}.
-Closer to our evaluator, \textsc{PRISM-Physics} checks formulas against reference solutions with
-rule-based matching~\citep{zhao2026prismphysics}, and \textsc{ThermoQA} compares steps with values
-computed by a property library~\citep{duzkar2026thermoqa}, but both use fixed problems.
+Those that assess reasoning mostly rely on domain experts~\citep{syed2024transportbench} or LLM
+judges~\citep{zheng2026tpscalcbench, wasiq2026engvqa}, as does \textsc{PhysReason} in
+physics~\citep{zhang2025physreason}.
+Closest to \ourdataset, \textsc{PRISM-Physics}~\citep{zhao2026prismphysics} and
+\textsc{ThermoQA}~\citep{duzkar2026thermoqa} check steps against reference formulas and computed
+values, respectively, but only on fixed problems.
 
-\paragraph{Symbolic Benchmarks.} Fixed problems can leak into training
-data~\citep{deng2024contamination, zhang2024gsm1k}; symbolic benchmarks instead generate instances
-from templates.
+\paragraph{Symbolic Benchmarks.} Fixed problems can leak into training data~\citep{zhang2024gsm1k};
+symbolic benchmarks generate fresh instances from templates.
 Many vary existing problems to test whether a model has memorized the
 original~\citep{mirzadeh2024gsmsymbolic, gulati2024putnamaxiom}.
-Some also generate gold solutions, in science~\citep{imani2025sympybench, azmi2026scirho}, applied
+Some also generate gold solutions, in physics~\citep{imani2025sympybench}, applied
 mathematics~\citep{fan2024hardmath}, and finance~\citep{xie2025finchain}.
-In engineering, \textsc{CIRCUIT} and \textsc{OPT-Engine} generate problems within a single branch
+In engineering, \textsc{CIRCUIT} and \textsc{OPT-Engine} generate problems within one branch
 each~\citep{skelic2025circuit, chen2026optengine}.
-By contrast, \ourdataset's templates span five engineering branches and encode complete derivations.
-Their code samples physically grounded parameters and computes every intermediate quantity, so each
-instance carries an exact value for every milestone.
+\ourdataset's templates instead span five engineering branches and compute complete derivations from
+physically grounded parameters, so every intermediate quantity is known exactly.
 
-\paragraph{Step-Level Evaluators.} Exact milestones still need an evaluator that decides which of
+\paragraph{Step-Level Evaluators.} These exact values still need an evaluator that decides which of
 them a response reaches.
-Process reward models~\citep{lightman2023verify, wang2023mathshepherd} and the benchmarks that test
-them~\citep{zheng2024processbench, song2025prmbench} focus on mathematics, and models trained on
-mathematics perform poorly in other domains~\citep{zeng2025versaprm}.
+Process reward models and their benchmarks focus on
+mathematics~\citep{lightman2023verify, zheng2024processbench}, and models trained on mathematics
+perform poorly in other domains~\citep{zeng2025versaprm}.
 LLM judges make correlated errors~\citep{goel2025greatmodels} and agree with experts mainly on
 questions they can answer themselves, unless given a correct
 reference~\citep{krumdick2026nofreelabels}.
-The \ourdataset evaluator therefore checks final answers, milestones, and arithmetic
-deterministically wherever a check exists, and gives its judge the expected value of each residual
-milestone.
-We validate it against domain experts' step-level labels.
-To our knowledge, none of this work combines physically grounded instances generated across
-engineering branches, exactly computed gold traces, and an expert-validated step-level evaluator.
-\autoref{appendix:related} gives further comparisons.
+The \ourdataset evaluator therefore matches milestones deterministically wherever a check exists and
+gives its judge the expected value of each residual milestone.
+To our knowledge, none of this work combines generated, physically grounded instances across
+engineering branches, exact gold traces, and an expert-validated step-level evaluator.
