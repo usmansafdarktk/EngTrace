@@ -19,18 +19,15 @@ grounded parameters and computes every intermediate quantity of the derivation, 
 check each value a model states against an exact one rather than aligning or judging it.
 
 \paragraph{Engineering Benchmarks.} General suites such as \textsc{SuperGPQA} test engineering
-mostly through multiple choice~\citep{du2025supergpqa}, multi-branch benchmarks grade answers with
-LLM judges~\citep{zhou2025engibench, naser2026eri}, and dedicated benchmarks typically cover one
-branch, such as transportation~\citep{syed2024transportbench},
-control~\citep{kevian2024controlbench}, electrical and electronics
-engineering~\citep{li2025eeebench}, circuits~\citep{skelic2025circuit}, or thermal-protection
-design~\citep{zheng2026tpscalcbench}.
-Those that assess reasoning mostly use experts or LLM judges;
-\textsc{ThermoQA}~\citep{duzkar2026thermoqa} checks steps against computed values, but on 293 fixed
-problems.
-To our knowledge, none combines physically grounded instances generated across engineering branches,
-gold traces with exactly computed intermediate quantities, deterministic checks of those quantities,
-and an evaluator validated against domain experts' step-level labels.
+through multiple choice~\citep{du2025supergpqa}, and multi-branch benchmarks grade answers with LLM
+judges~\citep{zhou2025engibench, naser2026eri}.
+Dedicated benchmarks cover one branch~\citep{li2025eeebench, skelic2025circuit}, and those that
+assess reasoning mostly use experts or LLM judges~\citep{syed2024transportbench,
+kevian2024controlbench, zheng2026tpscalcbench}; \textsc{ThermoQA} checks steps against computed
+values, but on 293 fixed problems~\citep{duzkar2026thermoqa}.
+To our knowledge, none combines physically grounded instances across branches, exactly computed gold
+traces, deterministic checks of intermediate quantities, and an evaluator validated against domain
+experts' step-level labels.
 
 \paragraph{Step-Level Evaluators.} Correct reasoning steps require process supervision or reward
 models that emulate it~\citep{uesato2022processoutcome}, yet process reward models are trained and
