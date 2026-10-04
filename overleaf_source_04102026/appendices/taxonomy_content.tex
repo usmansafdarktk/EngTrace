@@ -1,0 +1,319 @@
+% -------------
+\section{LLM Prompt for Domain Validation}
+\label{sec:appendix_domain_validation}
+
+To identify core domains, we consulted a panel of four frontier models: \texttt{GPT-4o},
+\texttt{Claude 3.5 Sonnet}, \texttt{Gemini 2.5 Pro}, and \texttt{DeepSeek V3}.
+Each was prompted individually to identify cornerstone engineering domains.
+We finalized the 15 core domains via majority voting.
+The domain identification prompt is provided below.
+
+\begin{tcolorbox}[
+    colback=gray!5,
+    colframe=gray!40,
+    boxrule=0.4pt,
+    arc=2pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable
+]
+\ttfamily\small
+You are an expert academic and senior curriculum designer at a top-tier engineering university (like MIT or Caltech). You have decades of experience structuring undergraduate programs for ABET accreditation. \\
+
+Your task is to identify and rank the most fundamental, cornerstone
+domains for the five primary branches of engineering. The goal is to identify the non-overlapping, core subject areas that are prerequisites for almost all other advanced topics. \\
+
+For example, for Chemical Engineering, ``Reaction Kinetics" would be a fundamental domain, while a niche topic like ``Polymer Rheology" would be a sub-specialization, not a cornerstone. \\
+
+Please provide a ranked list of the top 5--7 most fundamental domains for each of the following five branches: \\
+1. Chemical Engineering \\
+2. Electrical Engineering \\
+3. Mechanical Engineering \\
+4. Civil Engineering \\
+5. Industrial Engineering \\
+
+Return your answer \textbf{only} in a strict JSON format as given below.
+
+\vspace{8pt}
+\noindent\bgroup\ttfamily
+\texttt{\char`\{}
+
+\vspace{8pt}
+\hspace*{1em}``chemical\_engineering": [\\
+\hspace*{2em}``Rank 1 Domain",\\
+\hspace*{2em}``Rank 2 Domain",\\
+\hspace*{2em}``Rank 3 Domain",\\
+\hspace*{2em}``Rank 4 Domain",\\
+\hspace*{2em}``Rank 5 Domain"\\
+\hspace*{1em}],\\
+
+\vspace{2pt}
+\hspace*{1em}``electrical\_engineering": [\\
+\hspace*{2em}``Rank 1 Domain",\\
+\hspace*{2em}``Rank 2 Domain",\\
+\hspace*{2em}``Rank 3 Domain",\\
+\hspace*{2em}``Rank 4 Domain",\\
+\hspace*{2em}``Rank 5 Domain"\\
+\hspace*{1em}],\\
+
+\vspace{2pt}
+\hspace*{1em}``mechanical\_engineering": [\\
+\hspace*{2em}``Rank 1 Domain",\\
+\hspace*{2em}``Rank 2 Domain",\\
+\hspace*{2em}``Rank 3 Domain",\\
+\hspace*{2em}``Rank 4 Domain",\\
+\hspace*{2em}``Rank 5 Domain"\\
+\hspace*{1em}],\\
+
+\vspace{2pt}
+\hspace*{1em}``civil\_engineering": [\\
+\hspace*{2em}``Rank 1 Domain",\\
+\hspace*{2em}``Rank 2 Domain",\\
+\hspace*{2em}``Rank 3 Domain",\\
+\hspace*{2em}``Rank 4 Domain",\\
+\hspace*{2em}``Rank 5 Domain"\\
+\hspace*{1em}],\\
+
+\vspace{2pt}
+\hspace*{1em}``industrial\_engineering": [\\
+\hspace*{2em}``Rank 1 Domain",\\
+\hspace*{2em}``Rank 2 Domain",\\
+\hspace*{2em}``Rank 3 Domain",\\
+\hspace*{2em}``Rank 4 Domain",\\
+\hspace*{2em}``Rank 5 Domain"\\
+\hspace*{1em}]\\
+
+\vspace{2pt}
+\texttt{\char`\}}
+\egroup
+\vspace{8pt}
+
+Do not include any preamble, conversational text, explanations, or markdown formatting around the JSON block.
+\end{tcolorbox}
+
+% -------------
+\section{LLM Prompt for Area Validation}
+\label{sec:appendix_area_validation}
+
+Following the domain validation procedure, we utilized the same model panel and aggregated the
+pedagogical areas via majority voting.
+The prompt used for area identification is provided below.
+
+\begin{tcolorbox}[
+    colback=gray!5,
+    colframe=gray!40,
+    boxrule=0.4pt,
+    arc=2pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable
+]
+\ttfamily\small
+You are an expert academic and senior curriculum designer at a top-tier engineering university (like MIT or Caltech). You have decades of experience structuring undergraduate programs for ABET accreditation. \\
+
+Your task is to identify and list the most fundamental, non-overlapping ``areas" or
+``sub-topics" within the provided engineering domain. \\
+
+A ``fundamental area" is a major pedagogical unit or chapter within a core course on this domain. \textbf{The areas you list should be distinct pillars of the subject.} For example, if the domain is
+``Thermodynamics," a fundamental area would be ``The First Law" or
+``Properties of Pure Fluids." A concept like ``Enthalpy" would be
+too specific. Similarly, within a ``Circuit Analysis" domain, ``Kirchhoff's Voltage Law" and ``Kirchhoff's Current Law" are foundational concepts often taught together and would be too granular to list separately. \\
+
+Please provide a list of the top 3-5 most fundamental areas for
+the following engineering domain:
+\texttt{[DOMAIN\_NAME\_HERE]} \\
+
+Return your answer \textbf{only} in a strict JSON format as given below.
+
+\vspace{8pt}
+\noindent\bgroup\ttfamily
+\texttt{\char`\{}
+
+\vspace{4pt}
+\hspace*{1em}``domain": ``[DOMAIN\_NAME\_HERE]",\\
+\hspace*{1em}``areas": [\\
+\hspace*{2em}``Area 1",\\
+\hspace*{2em}``Area 2",\\
+\hspace*{2em}``Area 3",\\
+\hspace*{2em}``Area 4"\\
+\hspace*{1em}]\\
+\texttt{\char`\}}
+\egroup
+\vspace{8pt}
+
+Do not include any preamble, conversational text, explanations, or markdown formatting around the JSON block.
+\end{tcolorbox}
+
+% -------------
+\section{Foundational Textbooks and Authoritative Data Sources}
+\label{sec:appendix_books}
+\label{sec:appendix_data_sources}
+
+The core engineering principles, problem typologies, and realistic constraints for the templates
+developed by us were sourced from the authoritative textbooks listed
+in~\autoref{tab:foundational_textbooks}.
+These texts, which are standard in top-tier engineering curricula, served as the primary knowledge
+base to ensure \ourdataset is pedagogically sound and grounded in the core engineering curriculum.
+They were also used to validate our selection of fundamental domains and areas.
+
+\begin{table}[t]
+\small
+\centering
+\renewcommand{\arraystretch}{1.1}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{p{0.35\linewidth} p{0.55\linewidth}}
+\toprule
+\rowcolor{gray!10}\textbf{Domain} & \textbf{Textbook} \\
+\midrule
+Reaction Kinetics & Elements of Chemical Reaction Engineering by H. Scott Fogler \\
+Thermodynamics & Introduction to Chemical Engineering Thermodynamics by J. M. Smith, H. C. Van Ness,
+and M. M. Abbott \\
+Transport Phenomena & Transport Phenomena by R. Byron Bird, Warren E. Stewart, and Edwin N.
+Lightfoot \\
+\addlinespace[2pt]
+Electromagnetics and Waves & Fundamentals of Applied Electromagnetics by F. T. Ulaby and Umberto
+Ravaioli \\
+Digital Communications & Digital Communications by John G. Proakis and Masoud Salehi \\
+Signals and Systems & Discrete-Time Signal Processing by Alan V. Oppenheim and Ronald W. Schafer \\
+\addlinespace[2pt]
+Mechanics of Materials & Mechanics of Materials by Ferdinand P. Beer, E. Russell Johnston, Jr., and
+John T. DeWolf \\
+Fluid Mechanics & Fundamentals of Fluid Mechanics by Bruce R. Munson, Donald F. Young, and Theodore
+H. Okiishi \\
+Vibrations and Acoustics & Mechanical Vibrations by Singiresu S. Rao \\
+\addlinespace[2pt]
+Structural Analysis & Structural Analysis by R. C. Hibbeler \\
+Geotechnical Engineering & Principles of Geotechnical Engineering by Braja M. Das and Khaled
+Sobhan \\
+Water Resources & Open Channel Hydraulics by Terry W. Sturm \newline
+Applied Hydrology by Ven Te Chow, David R. Maidment, and Larry W. Mays \\
+\addlinespace[2pt]
+Production and Inventory & Production and Operations Analysis by Steven Nahmias and Tava Lennon
+Olsen \\
+Quality and Reliability Control & Introduction to Statistical Quality Control by Douglas C.
+Montgomery \\
+Stochastic Operations & Introduction to Probability Models by Sheldon M. Ross \newline
+Introduction to Operations Research by Frederick S. Hillier and Gerald J. Lieberman \\
+\bottomrule
+\end{tabular}
+\caption{Foundational textbooks used for selecting domain-specific problems.}
+\label{tab:foundational_textbooks}
+\end{table}
+
+To ensure the physical and engineering realism of \ourdataset, we built our domain-aware
+parameterization on authoritative data.
+We extracted extensive lists of physical constants and material properties from the standard
+handbooks and data sources listed in~\autoref{tab:authoritative_sources}, and each constants table
+in the code records the provenance of its values.
+
+\begin{table}[t]
+\small
+\centering
+\renewcommand{\arraystretch}{1.1}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{p{0.35\linewidth} p{0.50\linewidth}}
+\toprule
+\rowcolor{gray!10}\textbf{Engineering Branch} & \textbf{Authoritative Data Sources} \\
+\midrule
+Chemical Engineering &
+Perry's Chemical Engineers' Handbook \newline
+NIST Chemistry WebBook \newline
+CRC Handbook of Chemistry and Physics \newline
+NIST-JANAF Thermochemical Tables \newline
+NASA Technical Report R-132 \\
+\addlinespace[2pt]
+Electrical Engineering &
+IEEE 100: The Authoritative Dictionary of IEEE Standards Terms \newline
+Standard Handbook for Electrical Engineers \newline
+ART-DEIT Database \newline
+CODATA 2022 Recommended Values \newline
+refractiveindex.info Database \\
+\addlinespace[2pt]
+Mechanical Engineering &
+ASM Handbook, Volume 1 \newline
+Marks' Standard Handbook for Mechanical Engineers \newline
+Shigley's Mechanical Engineering Design \newline
+MIL-HDBK-5J \newline
+USDA Wood Handbook \newline
+NIST Chemistry WebBook \newline
+PubChem \newline
+NIST SP 811 \\
+\addlinespace[2pt]
+Civil Engineering &
+NAVFAC DM-7.01 and DM-7.02 \newline
+FHWA HDS-4 and HEC-22 \newline
+NRCS TR-55 \newline
+USGS Water-Supply Paper 2339 \newline
+AISC Shapes Database v16.0 \newline
+NIST Chemistry WebBook \newline
+CODATA 2022 Recommended Values \newline
+NIST SP 811 \\
+\addlinespace[2pt]
+Industrial Engineering &
+MIL-STD-105E \newline
+NIST/SEMATECH e-Handbook of Statistical Methods \\
+\bottomrule
+\end{tabular}
+\caption{Primary data sources referenced for engineering parameterization across branches.}
+\label{tab:authoritative_sources}
+\end{table}
+
+% -------------
+\section{LLM Prompt for Pedagogical Scoring}
+\label{sec:appendix_significance_scoring}
+
+The following prompt was used to query LLMs (described in~\autoref{sec:appendix_domain_validation})
+to evaluate the pedagogical significance of each sub-topic within its parent domain.
+
+\begin{tcolorbox}[
+    colback=gray!5,
+    colframe=gray!30,
+    boxrule=0.4pt,
+    arc=2pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable
+]
+\ttfamily\small
+You are an expert academic and senior curriculum designer at a top-tier engineering university with decades of experience structuring undergraduate programs for ABET accreditation. \\
+
+Your task is to evaluate the pedagogical significance of a specific engineering ``area" within a broader ``domain" on a scale of 1 to 5, based on the rubric below. \\
+
+\textbf{Rubric:}
+\par\medskip\noindent
+\textbf{Score 5 (Cornerstone):} A
+foundational, prerequisite topic for nearly all other concepts in the domain.
+\par\medskip\noindent
+\textbf{Score 3 (Core Concept):} A standard, important topic that builds upon cornerstone principles but is not necessarily a universal prerequisite.
+\par\medskip\noindent
+\textbf{Score 1 (Specialized Application):} A focused application or an
+integrative topic taught after cornerstones and core concepts are mastered.
+\par\medskip
+
+Please evaluate the following area:
+\par\medskip\noindent
+\textbf{Domain:} [DOMAIN\_NAME\_HERE]
+\par\noindent
+\textbf{Area:} [AREA\_NAME\_HERE]
+\par\bigskip
+
+\noindent\bgroup\ttfamily
+\texttt{\char`\{}
+
+\par\medskip
+\hspace*{1em}``area": ``[AREA\_NAME\_HERE]",\\
+\hspace*{1em}``pedagogical\_significance\_score": <integer, a score from 1 to 5>,\\
+\hspace*{1em}``justification": <string, a one-sentence explanation for the score>.\\
+\vspace{2pt}
+\texttt{\char`\}}
+\egroup
+\par\bigskip
+
+Do not include any preamble, conversational text, explanations, or markdown formatting around the JSON block.
+\end{tcolorbox}

@@ -57,15 +57,21 @@ vocabulary) are in `docs/PAPER_PLAN_OCT2026.md`, section 8; this file covers for
   the bibliography is `custom.bib`.
 - In the `.tex` files every sentence starts on a new line and wraps at 100 characters, never inside a citation,
   reference or `\textsc{}` name; changes then show sentence by sentence, and LaTeX still prints one paragraph.
+  Prompt boxes copied verbatim from the May appendix keep their original source lines.
+- The appendix lives in `appendices/`: `7_appendix.tex` inputs one file per appendix section
+  (`taxonomy_content.tex`, ...), with paths relative to `main.tex` (`sections/appendices/...`). On Overleaf the folder
+  is `sections/appendices/`, and `main.tex` inputs `sections/appendices/7_appendix` in place of `sections/7_appendix`.
 
 ## Cross-reference labels
 
 Labels used before their sections exist. Each must be defined when its section is written, or the reference prints
 "??" in the PDF.
 
-- To define: `sec:evaluation` (Section 4), `sec:experiments` (Section 5), `appendix:taxonomy` (taxonomy and
-  content selection), `appendix:sources` (source texts and reference data), `appendix:templates` (template
+- To define: `sec:evaluation` (Section 4), `sec:experiments` (Section 5), `appendix:templates` (template
   construction and examples), `appendix:statistics` (dataset statistics and the evaluation set),
   `appendix:certification` (template certification), `appendix:scoring` (scoring details).
 - Defined: `sec:intro`, `sec:related`, `sec:benchmark`, `subsec:taxonomy`, `subsec:templates`,
   `subsec:certification`, `fig:engtrace-overview` (the five-branch figure, `figs/engtrace-overview-5branch.pdf`).
+- Defined in `appendices/taxonomy_content.tex`, with the May appendix's labels: `sec:appendix_domain_validation`,
+  `sec:appendix_area_validation`, `sec:appendix_books` and `sec:appendix_data_sources` (one section, two tables:
+  `tab:foundational_textbooks`, `tab:authoritative_sources`), `sec:appendix_significance_scoring`.

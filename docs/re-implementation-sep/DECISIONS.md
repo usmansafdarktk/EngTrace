@@ -7274,6 +7274,26 @@ industrial template files. The May example of the significance weighting is kept
 figure names it (Conversion and Reactor Sizing; the May text called it "Levenspiel Plot Interpretation") and
 without the scores, which no file in the repository records; the counts (5 and 1) are checked.
 
+*Revised again 2026-10-04, at the authors' request.* The section is titled "EngTrace Design and Methodology" (the
+label `sec:benchmark` stays). The authors state that the four-LLM cross-check of domains and areas and the
+pedagogical significance scores cover all five branches; the outputs are held by the domain experts and are not in
+the repository, so the sentence rests on their statement (the plan had recorded no run on the new branches). The main
+text now cites the five societies: May's entries for AIChE, IEEE and ASME (general society pages; ASME's URL opens an
+"About ASME" page, AIChE's refuses automated requests), the *Civil Engineering Body of Knowledge*, 3rd ed. (ASCE 2019,
+DOI 10.1061/9780784415221) and IISE's *Industrial and Systems Engineering Body of Knowledge* (2021). The appendix
+moves to `overleaf_source_04102026/appendices/`: `7_appendix.tex` and one file per section (on Overleaf
+`sections/appendices/`, so `main.tex` must input `sections/appendices/7_appendix`). Its first file,
+`taxonomy_content.tex`, holds May's A (the domain prompt lists five branches and the text says 15 core domains), B
+and D verbatim (checked word by word), and a merged C. C's textbook table adds civil and industrial with one text
+per domain, chosen by how many template files cite it, and two where the templates cite two books (Sturm and Chow
+for water resources; Ross, and Hillier and Lieberman, for stochastic operations); "Communication Systems" becomes
+"Digital Communications" to match the taxonomy. C's data-source table keeps May's entries and adds the sources the
+constants tables cite (NIST-JANAF, NASA TR R-132, CODATA 2022, refractiveindex.info, MIL-HDBK-5J, the USDA Wood
+Handbook, PubChem, NIST SP 811; NAVFAC DM-7.01 and 7.02, FHWA HDS-4 and HEC-22, NRCS TR-55, USGS WSP 2339, the AISC
+Shapes Database v16.0; MIL-STD-105E, the NIST/SEMATECH e-Handbook). May's "extracted and manually verified" becomes
+"extracted ... and each constants table in the code records the provenance of its values", because entries tagged
+`[UNVERIFIED]` remain.
+
 ## Open decisions
 
 | # | Decision | Needed before |
