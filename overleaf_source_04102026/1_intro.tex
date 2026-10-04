@@ -40,11 +40,13 @@ related models~\citep{panickssery2024selfrecognition, li2026preferenceleakage}.
 
 In summary, our contributions are as follows:
 \begin{itemize}
-    \item We introduce \ourdataset, 150 symbolic templates spanning five engineering branches, 15
-          domains, and 42 areas, each of which passes automated integrity checks and certification
-          by three domain experts from its own branch.
+    \item We introduce \ourdataset, 150 physically grounded symbolic templates spanning five
+          engineering branches, 15 domains, and 42 areas and stratified by difficulty, each of which
+          passes automated integrity checks, an LLM screen, and certification by three domain experts
+          from its own branch.
     \item We design an evaluator that is deterministic wherever a check exists and validate it
-          against step-level labels from domain experts, reaching a milestone F1 of 0.96.
+          against step-level labels from domain experts: its final-answer check agrees with the
+          experts on over 90\% of responses, and its milestone coverage reaches an F1 of 0.96.
     \item We evaluate eleven open-weights and closed LLMs on 2,250 template instances and show that
           final-answer accuracy alone cannot separate the strongest models, whereas milestone
           coverage and an expert error analysis reveal how far their derivations get and where they
