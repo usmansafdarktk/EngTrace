@@ -15,8 +15,9 @@ and reference formulas, respectively, but on a fixed set of problems.
 to mitigate this, symbolic benchmarks generate varied instances from templates.
 Many build their templates from existing problems to test whether a model has memorized the
 original~\citep{mirzadeh2024gsmsymbolic, gulati2024putnamaxiom}.
-Some also generate gold solutions, in physics~\citep{imani2025sympybench}, applied
-mathematics~\citep{fan2024hardmath}, and finance~\citep{xie2025finchain}.
+Some also generate gold solutions, as \textsc{SymPyBench} does in
+physics~\citep{imani2025sympybench}, \textsc{HARDMath} in applied
+mathematics~\citep{fan2024hardmath}, and \textsc{FinChain} in finance~\citep{xie2025finchain}.
 In engineering, \textsc{CIRCUIT} and \textsc{OPT-Engine} generate circuit and optimization problems
 with their answers~\citep{skelic2025circuit, chen2026optengine}.
 Like these, \ourdataset's templates generate engineering problems, but they also encode the full
@@ -30,8 +31,8 @@ Most use mathematical training data and generalize poorly to other domains~\cite
 LLM judges make correlated errors~\citep{goel2025greatmodels} and agree with experts mainly on
 questions they can answer themselves, unless given a correct
 reference~\citep{krumdick2026nofreelabels}.
-Even benchmarks with gold solutions score responses by aligning steps with the gold
-chain~\citep{xie2025finchain} or through an LLM judge with rubrics~\citep{fan2024hardmath}.
+Even \textsc{FinChain} and \textsc{HARDMath}, despite their gold solutions, score responses by
+aligning steps with the gold chain and through an LLM judge with rubrics, respectively.
 \ourdataset therefore checks every milestone against its exact value, deterministically wherever a
 check exists and otherwise through a judge that receives this value, providing verifiable process
 supervision of engineering reasoning.
