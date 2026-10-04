@@ -9,7 +9,9 @@ The few benchmarks that assess reasoning mostly rely on domain
 experts~\citep{syed2024transportbench} or LLM judges~\citep{zheng2026tpscalcbench, wasiq2026engvqa}.
 Closest to \ourdataset, \textsc{ThermoQA} in thermodynamics~\citep{duzkar2026thermoqa} and
 \textsc{PRISM-Physics} in physics~\citep{zhao2026prismphysics} check steps against computed values
-and reference formulas, respectively, but only on fixed problems.
+and reference formulas, respectively, but on a fixed set of problems.
+\ourdataset instead checks each response step by step against exact values computed for its
+generated instance, deterministically wherever a check exists.
 
 \paragraph{Symbolic Benchmarks.} Fixed problems can leak into training data~\citep{zhang2024gsm1k},
 whereas symbolic benchmarks generate fresh instances from templates.
@@ -17,20 +19,20 @@ Many vary existing problems to test whether a model has memorized the
 original~\citep{mirzadeh2024gsmsymbolic, gulati2024putnamaxiom}.
 Some also generate gold solutions, in physics~\citep{imani2025sympybench}, applied
 mathematics~\citep{fan2024hardmath}, and finance~\citep{xie2025finchain}.
-In engineering, \textsc{CIRCUIT} and \textsc{OPT-Engine} generate problems within one branch
-each~\citep{skelic2025circuit, chen2026optengine}.
-\ourdataset's templates instead span five engineering branches and compute complete derivations from
-physically grounded parameters, so every intermediate quantity is known exactly.
+In engineering, \textsc{CIRCUIT} and \textsc{OPT-Engine} generate circuit and optimization
+problems~\citep{skelic2025circuit, chen2026optengine}.
+In \ourdataset, by contrast, each template is the derivation itself.
+Its expert-certified code samples physically grounded parameters and computes the answer and gold
+trace together, so every intermediate quantity becomes a checkable milestone.
 
-\paragraph{Step-Level Evaluators.} These exact values still need an evaluator that decides which of
-them a response reaches.
+\paragraph{Step-Level Evaluators.} Without exact references, step-level evaluation relies on process
+reward models or LLM judges.
 Work on process reward models centers on
 mathematics~\citep{lightman2023verify, zheng2024processbench}, and such models transfer poorly to
 other domains~\citep{zeng2025versaprm}.
 LLM judges make correlated errors~\citep{goel2025greatmodels} and agree with experts mainly on
 questions they can answer themselves, unless given a correct
 reference~\citep{krumdick2026nofreelabels}.
-The \ourdataset evaluator therefore matches milestones deterministically wherever a check exists and
-gives its judge the expected value of each residual milestone.
-To our knowledge, none of this work combines generated, physically grounded instances across
-engineering branches, exact gold traces, and an expert-validated step-level evaluator.
+\ourdataset therefore sends its judge only the milestones that deterministic matching cannot find,
+each with its expected value.
+We validate the full evaluator against domain experts' step-level labels.
