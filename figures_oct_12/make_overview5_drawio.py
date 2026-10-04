@@ -147,7 +147,7 @@ class Diagram:
             "pageWidth": str(m.PAGE_W), "pageHeight": str(int(page_h)), "math": "0", "shadow": "0"})
         model.append(self.root)
         mxfile = ET.Element("mxfile", host="app.diagrams.net")
-        diagram = ET.SubElement(mxfile, "diagram", name="EngChain Taxonomy", id="engchain-taxonomy")
+        diagram = ET.SubElement(mxfile, "diagram", name="EngTrace Taxonomy", id="engtrace-taxonomy")
         diagram.append(model)
         ET.indent(mxfile)
         ET.ElementTree(mxfile).write(path, encoding="utf-8", xml_declaration=False)

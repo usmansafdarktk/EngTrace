@@ -1,5 +1,5 @@
 <mxfile host="app.diagrams.net">
-  <diagram name="EngChain Taxonomy" id="engchain-taxonomy">
+  <diagram name="EngTrace Taxonomy" id="engtrace-taxonomy">
     <mxGraphModel grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="4000" pageHeight="1186" math="0" shadow="0">
       <root>
         <mxCell id="0" />
@@ -329,11 +329,11 @@
         <mxCell id="hub-arc-6" value="" style="shape=mxgraph.basic.arc;html=1;aspect=fixed;fillColor=none;strokeColor=#EBDFD0;strokeWidth=10;linecap=round;pointerEvents=0;startAngle=0.8833;endAngle=0.0167;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" vertex="1" parent="1">
           <mxGeometry x="1848.00" y="207.00" width="304.00" height="304.00" as="geometry" />
         </mxCell>
-        <mxCell id="hub-label" value="&lt;div style=&quot;line-height:1&quot;&gt;EngChain&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;fontStyle=1;fontSize=60;spacing=0;fontFamily=Times New Roman;fontColor=#000000;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" vertex="1" parent="1">
+        <mxCell id="hub-label" value="&lt;div style=&quot;line-height:1&quot;&gt;EngTrace&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;fontStyle=1;fontSize=60;spacing=0;fontFamily=Times New Roman;fontColor=#000000;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" vertex="1" parent="1">
           <mxGeometry x="1810.00" y="329.00" width="380.00" height="60.00" as="geometry" />
         </mxCell>
-        <mxCell id="title" value="&lt;div style=&quot;line-height:1.18&quot;&gt;EngChain Taxonomy&lt;/div&gt;" style="rounded=1;absoluteArcSize=1;arcSize=28;whiteSpace=wrap;html=1;fillColor=#EBDFD0;strokeColor=none;fontStyle=1;fontSize=44;align=center;verticalAlign=middle;spacing=0;spacingLeft=44;spacingRight=44;spacingTop=9;spacingBottom=9;fontFamily=Times New Roman;fontColor=#000000;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" vertex="1" parent="1">
-          <mxGeometry x="1755.30" y="27.05" width="489.41" height="69.91" as="geometry" />
+        <mxCell id="title" value="&lt;div style=&quot;line-height:1.18&quot;&gt;EngTrace Taxonomy&lt;/div&gt;" style="rounded=1;absoluteArcSize=1;arcSize=28;whiteSpace=wrap;html=1;fillColor=#EBDFD0;strokeColor=none;fontStyle=1;fontSize=44;align=center;verticalAlign=middle;spacing=0;spacingLeft=44;spacingRight=44;spacingTop=9;spacingBottom=9;fontFamily=Times New Roman;fontColor=#000000;movable=1;resizable=1;rotatable=1;deletable=1;editable=1;locked=0;connectable=1;" vertex="1" parent="1">
+          <mxGeometry x="1759.44" y="27.05" width="481.12" height="69.91" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

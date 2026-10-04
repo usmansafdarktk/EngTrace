@@ -91,8 +91,8 @@ COL_GAP = 22
 MOD_GAP = 18
 PILL_GAP = 12
 
-FS_TITLE = 44       # "EngChain Taxonomy"
-FS_HUB = 60         # "EngChain"
+FS_TITLE = 44       # "EngTrace Taxonomy"
+FS_HUB = 60         # "EngTrace"
 FS_BRANCH = 38      # branch name
 FS_MODULE = 26      # module name
 FS_TOPIC = 24       # topic name
@@ -283,7 +283,7 @@ def hub_html(cx, cy):
             stroke-dasharray="{dash:.1f} {gap:.1f}" stroke-dashoffset="{off:.1f}"
             transform="rotate(-72 {r} {r})"/>
   </svg>
-  <div class="hublabel">EngChain</div>
+  <div class="hublabel">EngTrace</div>
 </div>""".format(
         lx=cx - HUB_R, ly=cy - HUB_R, d=d, r=HUB_R, ro=HUB_R - 6, rr=HUB_RING_R,
         ink=C_INK, dark=C_HUB_DARK, light=C_HUB_LIGHT,
@@ -438,14 +438,14 @@ body {{ font-family: "Times New Roman", Times, serif; color: {ink};
     )
 
     return """<!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>EngChain Taxonomy</title>
+<html><head><meta charset="utf-8"><title>EngTrace Taxonomy</title>
 <style>{css}</style></head>
 <body><div class="page">
   <div class="frame"></div>
   {arrows}
   {panels}
   {hub}
-  <div class="titlepill">EngChain Taxonomy</div>
+  <div class="titlepill">EngTrace Taxonomy</div>
 </div></body></html>""".format(
         css=css,
         arrows=arrows_svg(lay["routes"], page_h),

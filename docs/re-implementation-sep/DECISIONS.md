@@ -7335,7 +7335,8 @@ planted defects, agreement by branch and the four rounds. Every number and row c
 reports through `docs/appendix_certification.py` (36 of 36 present). Two points for the authors: the prompt the
 screen sent reads "peer reviewer for the EngChain benchmark" (`ai_assisted_quality_assurance/run_ai_tribunal.py`),
 while May's appendix and this one print "EngTrace"; and the difficulty sentence of 3.1 now points to the
-statistics appendix without counts, at the authors' request.
+statistics appendix without counts, at the authors' request. *Decided 2026-10-05:* the paper prints EngTrace in the prompt box, and the five-branch figure's
+label is regenerated as EngTrace (`figures_oct_12/make_overview5.py`); the rename is limited to the design section.
 
 ## Open decisions
 
