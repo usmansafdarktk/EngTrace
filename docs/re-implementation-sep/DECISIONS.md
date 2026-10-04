@@ -7338,6 +7338,36 @@ while May's appendix and this one print "EngTrace"; and the difficulty sentence 
 statistics appendix without counts, at the authors' request. *Decided 2026-10-05:* the paper prints EngTrace in the prompt box, and the five-branch figure's
 label is regenerated as EngTrace (`figures_oct_12/make_overview5.py`); the rename is limited to the design section.
 
+## D-189 — Section 4 written: the measures and the scoring process, with the expert study in the appendix
+
+**Date:** 2026-10-05 · **Status:** DONE · **Evidence:** `overleaf_source_04102026/5_evaluation.tex`,
+`appendices/scoring.tex`, `appendices/validation.tex`; `docs/appendix_evaluation.py --check` (every row and phrase
+present); `docs/check_plan_claims.py` (123 of 123 pass)
+
+Section 4 defines Final Answer Accuracy and Milestone Coverage, one equation each, and the two diagnostics. The
+detail is in two appendix sections, scoring (`appendix:scoring`) and validation (`appendix:validation`), whose
+tables and figures all come from the validation reports through `docs/appendix_evaluation.py`. Choices behind it:
+
+- **The expert study goes to the appendix (the authors, 2026-10-05).** Section 4 holds only the measures and how a
+  response is scored, without subsections. Its opening paragraph points to the study with two figures and their
+  basis (three-way agreement 0.927 on 300 responses from five models outside the eleven; milestone F1 0.958 with
+  the judge), because the abstract and the contributions call the evaluator expert-validated. The rest of the
+  plan's 4.2 (the comparison table, the planted defects, judge independence, the experts' readings on the
+  evaluated models) is in the validation appendix. One sentence on the limit of verification stays with the
+  diagnostics, as the reason they are flags rather than scores (plan section 8, rule 14).
+- **For Section 5.** Section 4 no longer gives the flags' precision, so Section 5 states it beside their rates:
+  0.905 for the arithmetic flags on the evaluated models, 0.707 for the judged step check on the study.
+- **Figures from earlier component versions, stated as the plan states them.** The milestone F1 with the judge
+  (0.958) was measured with the matching as the study ran it (its own F1 then 0.921, now 0.923); the judged step
+  check's 0.707 and 0.603 with the arithmetic rule before D-156. Neither can be measured again without new judge
+  calls.
+- **MiMo on the planted defects.** The appendix table gives 16 of 51 conceptual defects and 0 of 111 untouched
+  steps, from the study's report; D-181's recount (16 of 52) moves the rate in the third decimal and leaves the
+  range of 13% to 37% for the four judges unchanged.
+- **Names and bibliography.** Model names are set in `\texttt{}` (the authors, 2026-10-05; `WRITING_RULES.md`); the
+  eleven models' names in the second-judge table follow `RESULTS_PAPER_NOTES.md` and should match Section 5's.
+  Cohen (1960), Wilson (1927) and SymPy (Meurer et al., 2017) are added under `% Evaluation`, to check by hand.
+
 ## Open decisions
 
 | # | Decision | Needed before |

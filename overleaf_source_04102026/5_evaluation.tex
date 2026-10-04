@@ -3,12 +3,12 @@
 
 Because each template computes every quantity in its gold trace, the final answer and most
 milestones of a response can be checked reproducibly without a model.
-We check responses deterministically wherever possible, consult an LLM judge only on what the
-checks leave open (\autoref{subsec:scoring}), and validate every component against domain experts
-(\autoref{subsec:validation}).
-
-\subsection{Scoring a Response}
-\label{subsec:scoring}
+We therefore check each response deterministically wherever possible and consult an LLM judge only
+on what the checks leave open.
+An expert study guides this design and validates it: on 300 responses from five LLMs outside the
+eleven we evaluate, which 15 domain experts label step by step, the final-answer check agrees with
+the experts' three-way verdict on 0.927 of the responses, and milestone matching with the judge
+reaches F1 0.958 against their milestone labels (\autoref{appendix:validation}).
 
 \paragraph{Preliminaries.}
 An instance comprises a question, a gold trace, and milestones $\mathcal{M}$, the values that the
@@ -26,8 +26,9 @@ $c \in \mathcal{C}$,
     \label{eq:match}
 \end{equation}
 so a correct rounding at either value's precision matches.
-A response scores $v(r) = 1$ if every target matches, $0.5$ if some do, and $0$ if none does or no
-final answer is readable, since answering within the output limit is part of the task.
+A response scores $v(r) = 1$ if every target matches, $0.5$ if only some do, and $0$ if none does or
+no final answer is readable; a partial answer is neither correct nor incorrect, and answering within
+the output limit is part of the task.
 \emph{Final Answer Accuracy} (FAC) is the mean of $v(r)$ over instances.
 
 \paragraph{Milestone Coverage.}
@@ -55,43 +56,9 @@ result that is not a correct rounding at its printed precision.
 The judged step check sends every step the arithmetic check does not flag to the same judge, with
 the question and the gold steps, and flags a step labeled a conceptual or calculation error.
 \emph{Arithmetic flags} and \emph{judged step flags} are the shares of correct-answer responses with
-at least one such flag, reported with their precision.
+at least one such flag.
+We report them as flags with a measured precision rather than as scores, because neither check sees
+every flawed step: no deterministic check detects a misstated rule behind a correct answer, and LLM
+judges catch at most about a third of such cases (\autoref{appendix:validation}).
 \autoref{appendix:scoring} gives the match rule in full, both judge prompts, the arithmetic rule,
 and the thresholds.
-
-\subsection{Validation Against Expert Judgment}
-\label{subsec:validation}
-
-\paragraph{Agreement with Domain Experts.}
-We validate each component on 300 responses from five LLMs outside the eleven we evaluate, to 60
-instances of 15 templates across all branches and levels, which three domain experts of the
-instance's branch label step by step.
-The final-answer check agrees with the experts' three-way verdict on 0.927 of all 300 responses, and
-with their verdict on 0.982 of the 281 responses they do not mark partial, where a step-matching
-design with a panel of LLM judges agrees on 0.747; with $\epsilon$ fitted on either half, the
-three-way agreement is 0.908 and 0.939 on the other half.
-Milestone matching reaches F1 0.923 without the judge and 0.958 with it, and over all steps, the
-judged step check with the arithmetic check finds incorrect steps with precision 0.707 and recall
-0.603.
-On the evaluated models' responses, a domain expert confirms 171 of 189 sampled arithmetic flags
-(precision 0.905), and two domain experts per item confirm the final-answer check's correct
-verdicts on the five strongest models in 142 of 150 readings and its incorrect ones in 83 of 98, and
-call its partial ones fully correct in 34 of 52.
-
-\paragraph{The Limit of Verification.}
-Since 175 of the 178 incorrect steps that the experts find behind correct answers are arithmetic, we
-plant one defect in each of 120 clean responses: 60 one-digit slips, and 60 conceptual defects that
-misstate a criterion, rule, or formula without changing a digit.
-No deterministic check detects a conceptual defect (0 of 60), and four LLM judges catch 13\% to 37\%
-of them without false alarms, so LLM judges catch at most about a third of misstated rules behind a
-correct answer.
-
-\paragraph{Judge Independence.}
-The judge shares no family with an evaluated model, as LLM judges can favor their own
-family~\citep{panickssery2024selfrecognition, li2026preferenceleakage}; re-judging 220 sampled
-responses with \texttt{Grok 4.6}, from a third family, changes each model's coverage of them by
-$-0.017$ to $+0.020$.
-Absent self-preference is no proof of accuracy: each judge of the step-matching design's panel
-favors no family, yet accepts most of the incorrect steps it judges.
-\autoref{appendix:validation} details the study, the compared designs, the planted defects, and
-judge independence.

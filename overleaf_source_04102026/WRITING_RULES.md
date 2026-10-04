@@ -86,8 +86,9 @@ Labels used before their sections exist. Each must be defined when its section i
   prompt box and rubric `tab:qa_rubric`, expert protocol with `tab:planted_defects`, results with
   `tab:expert_agreement` and `tab:certification_rounds`; every number from `docs/appendix_certification.py`,
   whose `--check` must pass). Table rows may exceed 100 characters; prose may not.
-- Defined in `5_evaluation.tex`: `sec:evaluation`, `subsec:scoring`, `subsec:validation`, `eq:match` (the
-  final-answer match rule) and `eq:coverage` (Milestone Coverage).
+- Defined in `5_evaluation.tex`: `sec:evaluation` (no subsections: the measures and the scoring process, with the
+  expert study behind a pointer to `appendix:validation`), `eq:match` (the final-answer match rule) and
+  `eq:coverage` (Milestone Coverage).
 - Defined in `appendices/scoring.tex`: `appendix:scoring` (tables `tab:milestone_tolerance`, `tab:judge_validation`,
   `tab:arithmetic_readings`; the two judge prompts). Defined in `appendices/validation.tex`: `appendix:validation`
   (tables `tab:evaluator_comparison`, `tab:planted_detection`, `tab:judge_swap`, `tab:expert_readings`). Every

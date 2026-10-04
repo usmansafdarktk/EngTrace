@@ -2,9 +2,9 @@
 \section{Validation Against Expert Judgment}
 \label{appendix:validation}
 
-This section details the validation of~\autoref{subsec:validation}: the expert study, the evaluator
-designs compared on it, the planted defects, judge independence, and the domain experts' readings
-of the evaluated models' responses.
+This section details the expert study that guides and validates the evaluator
+of~\autoref{sec:evaluation}: the study itself, the evaluator designs compared on it, the planted
+defects, judge independence, and the domain experts' readings of the evaluated models' responses.
 
 \subsection{Expert Study}
 
@@ -105,6 +105,9 @@ to 0.378.
 
 \subsection{Planted Defects}
 
+Since 175 of the 178 incorrect steps that the experts find behind correct answers are arithmetic,
+their labels cannot show whether a misstated rule behind a correct answer is detected, so we build a
+set whose ground truth holds by construction.
 From the 129 responses that the experts label clean and the final-answer check scores correct, we
 plant exactly one defect in each of 120 of them and keep 60 untouched as controls.
 An arithmetic defect changes one digit of one displayed intermediate value and leaves the later
@@ -126,6 +129,9 @@ more than 22 of the 60 conceptual defects.
 In the step-matching design, a conceptual defect reaches a judge exactly as often as the same step
 untouched (0.500), and the design catches 0.150 of them end to end; the judged step check sends 58
 of the 60 to the judge and catches 19.
+The four judges thus catch 13\% to 37\% of the conceptual defects without false alarms: a misstated
+rule behind a correct answer passes every deterministic check, and LLM judges catch at most about a
+third of such cases.
 
 \begin{table}[t]
     \centering
@@ -150,8 +156,10 @@ of the 60 to the judge and catches 19.
 
 \subsection{Judge Independence}
 
-We choose \texttt{MiMo-V2.5-Pro} because it shares no family with an evaluated model and catches
-about as many planted defects as \texttt{GPT-5} (\autoref{tab:planted_detection}).
+We choose \texttt{MiMo-V2.5-Pro} because it shares no family with an evaluated model, as LLM judges
+can favor their own family~\citep{panickssery2024selfrecognition, li2026preferenceleakage}, and
+because it catches about as many planted defects as \texttt{GPT-5}
+(\autoref{tab:planted_detection}).
 To test the single-judge design, \texttt{Grok 4.6}, from a third family, re-judges with the same
 prompts the milestones that the judge decided in 20 responses per model, drawn from 14 to 19
 templates (\autoref{tab:judge_swap}).

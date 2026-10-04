@@ -221,22 +221,13 @@ sep = [float(r.split(" & ")[4].rstrip(" \\")) for r in grid_rows if " & yes & " 
 caught = [int(re.match(r"\\texttt\{[^}]+\} & (\d+) of", r).group(1)) for r in planted_rows]
 assert gold_ok[0] == gold_ok[1] and decides[2] == "three" and sampled[0] == "75", (gold_ok, decides, sampled)
 
+experts = one(r"(\d+) domain experts, three per branch", ps)
+assert max(rates) < 0.4, rates  # "at most about a third" in the main text
 main = [
-    f"five LLMs outside the eleven we evaluate, to {design[0]}",
-    f"{design[0]} instances of {design[1]} templates",
-    f"{now['answer, three-way agreement']} of all 300 responses",
-    f"{now['answer, non-partial agreement']} of the {non_partial} responses",
-    f"agrees on {panel}", f"{held[0][3]} and {held[1][3]} on the other half",
-    f"F1 {now['E3 F1']} without the judge and {e5[2]} with it",
+    f"on 300 responses from five LLMs outside the eleven we evaluate, which {experts[0]} domain experts",
+    f"three-way verdict on {now['answer, three-way agreement']} of the responses",
+    f"reaches F1 {e5[2]} against their milestone labels",
     f"{pct(min(judged))} to {pct(max(judged))} of milestones",
-    f"precision {rn[2]} and recall {rn[3]}",
-    f"{fr[3]} of {int(fr[3]) + int(fr[4])}", f"(precision {fr[6]})",
-    f"{b1n('correct', 'correct')} of {total(b1['correct'])}",
-    f"{b1n('incorrect', 'incorrect')} of {total(b1['incorrect'])}",
-    f"{b1n('partial', 'correct')} of {total(b1['partial'])}",
-    f"{slips[0]} of the {flawed[2]} incorrect steps", f"{clean[1]} clean responses",
-    f"(0 of {planted['conceptual defects'][0].split(' of ')[1]})", f"{pct(min(rates))} to {pct(max(rates))}",
-    f"{signed(f'{min(diffs):+.3f}')} to {signed(f'{max(diffs):+.3f}')}", "220 sampled responses",
 ]
 scoring = [
     f"On the {thousands(gold_ok[1])} gold traces, the check scores every instance correct",
@@ -269,6 +260,8 @@ validation = [
     f"find at most {max(now['digit rule, all traces, recall'], now['digit rule, hard case, recall'], rn[3], rc[3])} of "
     f"the steps that the experts mark incorrect",
     f"detects 0 of the {planted['conceptual defects'][0].split(' of ')[1]} conceptual defects",
+    f"catch {pct(min(rates))} to {pct(max(rates))} of the conceptual defects without false alarms",
+    f"{slips[0]} of the {flawed[2]} incorrect steps that the experts find",
     f"more than {max(caught)} of the 60 conceptual defects",
     f"untouched ({routing[1]})" if routing[0] == routing[1] else "ROUTING CHANGED",
     f"catches {routing[2]} of them end to end", f"sends {batched[0]} of the {batched[1]}", f"catches {batched[2]}.",
