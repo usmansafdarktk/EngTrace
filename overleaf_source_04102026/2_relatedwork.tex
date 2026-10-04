@@ -1,63 +1,46 @@
 \section{Related Work}
 \label{sec:related}
 
-\paragraph{Step-level evaluation in science.}
-Most physics benchmarks grade final answers or expressions~\citep{xu2025ugphysics, qiu2025phybench},
-while \textsc{PhysReason}~\citep{zhang2025physreason} and
-\textsc{PRISM-Physics}~\citep{zhao2026prismphysics} score steps against reference solutions, with an
-LLM judge and with rule-based formula matching, respectively.
+\paragraph{Benchmarks in Physics.}
+Most physics benchmarks grade final answers or expressions~\citep{xu2025ugphysics, qiu2025phybench}.
+\textsc{PhysReason}~\citep{zhang2025physreason} and
+\textsc{PRISM-Physics}~\citep{zhao2026prismphysics} also score steps against reference solutions,
+with an LLM judge and with rule-based formula matching, respectively.
 \ourdataset also scores steps against a reference, in engineering, and takes the reference from the
-code that computes the answer.
+code that computes the answer, so every intermediate quantity is known exactly.
 
-\paragraph{Generated instances with gold solutions.}
-Static test sets leak into training data~\citep{deng2024contamination, zhang2024gsm1k}, and
-functional and symbolic variants of existing problems test whether a model has memorized the
-original instance~\citep{srivastava2024functionalbench, mirzadeh2024gsmsymbolic,
-gulati2024putnamaxiom}.
-Generation has also been paired with gold solutions: \textsc{HARDMath} produces applied-mathematics
-problems with numerically validated step-by-step solutions~\citep{fan2024hardmath}, and
-\textsc{FinChain} pairs each templated financial problem with an executable gold reasoning chain and
-scores a model's steps against it~\citep{xie2025finchain}.
+\paragraph{Benchmarks from Templates.}
+Static test sets leak into training data~\citep{zhang2024gsm1k}, and symbolic or functional variants
+of existing problems test whether a model has memorized the original
+instance~\citep{mirzadeh2024gsmsymbolic, gulati2024putnamaxiom}.
+\textsc{HARDMath} produces applied-mathematics problems with numerically validated step-by-step
+solutions~\citep{fan2024hardmath}, and \textsc{FinChain} pairs each templated financial problem with
+an executable gold reasoning chain~\citep{xie2025finchain}.
 \ourdataset carries this design to five engineering branches and draws its instances from a private
 seed.
 
-\paragraph{Engineering benchmarks.}
-General suites test engineering mostly through multiple choice; \textsc{SuperGPQA}'s 7,892
-engineering questions often require calculation but are scored on the option
-chosen~\citep{du2025supergpqa}.
-Dedicated benchmarks typically cover one branch: transportation~\citep{syed2024transportbench},
-control~\citep{kevian2024controlbench}, power dispatch~\citep{zhou2024elecbench}, electrical and
-electronics engineering~\citep{li2025eeebench}, circuits~\citep{skelic2025circuit},
+\paragraph{Benchmarks in Engineering.}
+General suites such as \textsc{SuperGPQA} test engineering mostly through multiple
+choice~\citep{du2025supergpqa}, multi-branch benchmarks grade answers with LLM
+judges~\citep{zhou2025engibench, naser2026eri}, and dedicated benchmarks typically cover one branch,
+such as transportation~\citep{syed2024transportbench}, control~\citep{kevian2024controlbench},
+electrical and electronics engineering~\citep{li2025eeebench}, circuits~\citep{skelic2025circuit},
 thermodynamics~\citep{duzkar2026thermoqa}, or thermal-protection
 design~\citep{zheng2026tpscalcbench}.
-Multi-branch benchmarks grade answers with LLM judges: \textsc{EngiBench}~\citep{zhou2025engibench}
-with two LLM evaluators, and \textsc{ERI}~\citep{naser2026eri} against reference answers that an LLM
-wrote along with the questions.
-A few benchmarks look past the answer: experts examined the reasoning in \textsc{TransportBench} and
-\textsc{ControlBench}, \textsc{ElecBench} scores its logicality, an LLM judge scores it in
-\textsc{TPS-CalcBench}, and \textsc{ThermoQA} scores weighted solution steps against values computed
-with a thermodynamic property library.
-Fewer generate their instances: \textsc{CIRCUIT} instantiates circuit templates with several
-numerical setups, and \textsc{OPT-Engine}~\citep{chen2026optengine} generates optimization problems
-of controlled complexity.
+Of these, experts or LLM judges assess the reasoning in a few, and \textsc{CIRCUIT} instantiates
+templates.
 To our knowledge, none combines generated instances across engineering branches with gold traces,
 deterministic checks of intermediate values, and an evaluator validated against domain experts'
 step-level labels.
 
-\paragraph{Evaluators of reasoning steps.}
-Outcome supervision can match process supervision on final-answer error, but correct reasoning steps
-require process-based supervision or reward models that emulate
-it~\citep{uesato2022processoutcome}.
-Process reward models learn from human step labels~\citep{lightman2023verify} or from labels
-estimated by rollouts~\citep{wang2023mathshepherd} and are evaluated on human-annotated first-error
-benchmarks in mathematics~\citep{zheng2024processbench}, but those trained on mathematics perform
-poorly in other domains~\citep{zeng2025versaprm}.
-LLM judges are the common alternative, but their errors are correlated across
-models~\citep{goel2025greatmodels, kim2025correlatederrors}, on difficult objective comparisons many
-do little better than chance~\citep{tan2025judgebench}, and they agree with experts mainly on
+\paragraph{Evaluators of Reasoning.}
+Correct reasoning steps require process supervision or reward models that emulate
+it~\citep{uesato2022processoutcome}, yet process reward models are trained and tested mainly on
+mathematics~\citep{lightman2023verify, zheng2024processbench} and perform poorly in other
+domains~\citep{zeng2025versaprm}.
+LLM judges make correlated errors~\citep{goel2025greatmodels} and agree with experts mainly on
 questions they can answer themselves unless given a correct
 reference~\citep{krumdick2026nofreelabels}.
 \ourdataset therefore checks intermediate values deterministically, gives its judge each milestone's
 expected value, and validates the full evaluator against domain experts' labels.
-\autoref{appendix:related} compares \ourdataset with further benchmarks and surveys the wider
-related work.
+\autoref{appendix:related} gives a detailed comparison and further related work.
