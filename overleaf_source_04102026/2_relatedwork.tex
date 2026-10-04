@@ -35,6 +35,6 @@ Even \textsc{FinChain} and \textsc{HARDMath}, despite their gold solutions, scor
 aligning steps with the gold chain and through an LLM judge with rubrics, respectively.
 \ourdataset instead checks steps by value: its evaluator matches the values a response states
 against the milestone values its template computes, and recomputes the response's arithmetic.
-An LLM judge from outside the evaluated model families rules only on the milestones that
-deterministic matching cannot find, given their expected values.
+An LLM judge from outside the evaluated model families rules on unmatched residual milestones only,
+given their expected values.
 Process supervision of engineering reasoning thus becomes verifiable.
