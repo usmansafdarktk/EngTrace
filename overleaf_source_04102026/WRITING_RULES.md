@@ -33,6 +33,22 @@ vocabulary) are in `docs/PAPER_PLAN_OCT2026.md`, section 8; this file covers for
 - Captions go below figures and tables; figures must read in greyscale.
 - Cite the refereed version of a work when one exists; give DOIs where available.
 
+## From the ARR writing guide (`ARR_ How to Write a Research Article.docx`)
+
+- American English throughout (modeling, favor, artifacts); never mix spellings.
+- Active voice ("we draw the instances", not "the instances are drawn"); no tense switching within a paragraph.
+- Define every abbreviation before use, even LLM; mark a term at its definition with `\emph{}`, not quotes.
+- One term per concept; "measure", not "metric"; "significant" only with a statistical test; "open-weights" LLMs;
+  "use", not "employ".
+- The Introduction mentions only the closest work, to contrast it with ours, and ends with bullet-point
+  contributions that say why the work matters; the abstract and conclusion repeat the same points.
+- Every figure and table is discussed in the text; captions are in sentence case and end with a full stop.
+- Bibliography: cite the published version, not arXiv; booktitle "Proceedings of ...", a `series` field
+  (e.g. `ICLR~'25`), the conference location as `address`, no `month`; an arXiv-only paper is `@article` with
+  `journal={ArXiv preprint}` and `volume={arXiv:NNNN.NNNNN}`; protect capitals only where needed (`{LLM}`);
+  check every entry by hand. `custom.bib` holds only the citations the written sections use;
+  `custom_old.bib` is the previous bibliography, kept for reference.
+
 ## This folder
 
 - One file per section, named as `main.tex` inputs it (`0_abstract.tex`, `1_intro.tex`, `2_relatedwork.tex`, ...);

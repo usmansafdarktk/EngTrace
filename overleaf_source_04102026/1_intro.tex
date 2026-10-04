@@ -1,95 +1,69 @@
 \section{Introduction}
 \label{sec:intro}
 
-Many engineering problems are solved by derivations whose intermediate quantities can be checked,
-each feeding the next.
-A score on the final answer alone cannot show where such a derivation goes wrong or how far a wrong
-one got, and a correct answer can still rest on flawed reasoning~\citep{cobbe2021gsm8k}: in
-\textsc{ProcessBench}, the share of correct-answer solutions with a process error rises from 3.5\%
-on \textsc{GSM8K} to 51.8\% on \textsc{Omni-MATH}~\citep{zheng2024processbench}.
-
-Yet most engineering benchmarks for large language models (LLMs) score only the final answer.
-General suites test engineering mostly through multiple choice: \textsc{SuperGPQA} scores its 7,892
-engineering questions on the option chosen, although more than half of them require
-calculation~\citep{du2025supergpqa}.
-Dedicated benchmarks typically cover one
-branch~\citep{syed2024transportbench, kevian2024controlbench, li2025eeebench}, and the multi-branch
-\textsc{EngiBench} grades answers with LLM evaluators~\citep{zhou2025engibench}.
-A few look past the answer: experts read the
-reasoning~\citep{syed2024transportbench, kevian2024controlbench}, an LLM judge scores
-it~\citep{zheng2026tpscalcbench, wasiq2026engvqa}, or steps are checked against computed values
-within one domain, as in \textsc{ThermoQA}~\citep{duzkar2026thermoqa}.
-Expert reading is costly to repeat, and LLM judges can favour their own outputs and those of related
-models~\citep{panickssery2024selfrecognition, spiliopoulou2025playfavorites}.
-Checking each step by computation avoids both problems, but it requires the exact value of every
-intermediate quantity.
+As large language models (LLMs) take on engineering problems, it becomes essential to evaluate how
+they reason, not only what they answer.
+Engineering reasoning requires physically grounded, multi-step problem solving, in which scientific
+principles, quantitative modeling, and practical constraints must converge, and in which
+intermediate steps are as consequential as the final result.
+A correct final answer can still follow flawed reasoning~\citep{cobbe2021gsm8k}, so scoring the
+answer alone is not enough.
 
 \begin{figure}[t]
     \centering
     \includegraphics[width=\linewidth]{figs/engtrace-example-template.pdf}
-    \caption{A simplified view of a template from \ourdataset (chemical branch): the template
-        definition with the variables it samples, one generated instance, and the gold reasoning
-        trace, produced by the same computation. A response is checked for the trace's intermediate
-        quantities (milestones) and final answer; the calculations it displays are recomputed from
-        their own operands. \autoref{appendix:templates} gives full template listings and
-        \autoref{appendix:scoring} the checks.}
+    \caption{A simplified \ourdataset template (chemical branch), the instance it generates, and its
+        gold reasoning trace, computed together with the answer. We check model responses against
+        this trace.}
     \label{fig:example}
 \end{figure}
 
-We present \ourdataset, a symbolic benchmark for verifiable process supervision of engineering
-reasoning.
-As in \textsc{GSM-Symbolic} and \textsc{FinChain}~\citep{mirzadeh2024gsmsymbolic, xie2025finchain},
-symbolic templates generate the instances, and as in \textsc{FinChain}, the gold reasoning trace
-comes from the code that computes the answer (\autoref{fig:example}), so every intermediate quantity
-is known exactly.
-The 150 templates span five branches (chemical, civil, electrical, industrial and mechanical), 15
-domains and 42 areas.
-Every template passes automated integrity checks and an LLM screen, and three experts of its own
-branch certify it after working an instance by hand; each expert rejects all four defects planted
-among their branch's templates.
-The evaluation set holds 2,250 instances, 15 per template, drawn with a private seed, so none was
-public when the models ran.
-\ourdataset tests multi-step derivation on curriculum topics, not the breadth of engineering
-practice: its problems are examination-style by construction, as verifiable gold traces require, so
-ill-posed problems and real-world artefacts such as technical drawings are out of scope.
+Current benchmarks rarely evaluate this process.
+General benchmarks such as \textsc{MMLU}, \textsc{MATH}, and \textsc{HumanEval} test knowledge,
+mathematical problem solving, or code generation in
+isolation~\citep{hendrycks2021mmlu, hendrycks2021math, chen2021humaneval}, and most engineering
+benchmarks grade the final answer rather than the steps that produce
+it~\citep{du2025supergpqa, zhou2025engibench}.
+Those that do assess intermediate steps mostly rely on LLM judges or human graders, or cover a
+single domain~\citep{syed2024transportbench, zheng2026tpscalcbench, duzkar2026thermoqa}.
+To address this gap, we introduce \ourdataset, a symbolic benchmark for verifiable process
+supervision of engineering reasoning.
+Following symbolic-template benchmarks in mathematics and
+finance~\citep{mirzadeh2024gsmsymbolic, xie2025finchain}, \ourdataset represents each problem as a
+template: expert-certified code that samples physically grounded parameters, computes the answer,
+and emits a gold reasoning trace from the same computation.
+\autoref{fig:example} shows such a template, an instance it generates, and the gold trace; because
+the trace comes from the computation itself, every intermediate quantity of the derivation is known
+exactly.
 
-A model's response is scored deterministically wherever a check exists.
-A final-answer check covers six answer kinds; milestone coverage is the share of the gold trace's
-intermediate quantities (milestones) that the response reaches, matched by value, in any order and
-after unit conversion; and an arithmetic check recomputes displayed calculations from their printed
-operands.
-For milestone coverage, only the milestones that matching does not find, 11\% to 25\% of them across
-models, go to an LLM judge from a model family outside the evaluated ones.
-Against step-level labels from 15 engineering experts on 300 responses of five models outside the
-evaluated set, and compared with six other evaluators including a panel of LLM judges and process
-reward models, the final-answer check agrees with the experts' final-answer verdict on over 90\% of
-responses, and milestone coverage reaches an F1 of 0.96 (0.92 without the judge).
-When a response states the wrong rule but computes the right answer, however, no deterministic check
-notices, and the four LLM judges we tested catch 13\% to 37\% of such planted errors.
+These gold traces make reasoning checkable by computation.
+An expert-validated evaluator scores each response deterministically wherever a check exists: it
+verifies final answers of six kinds, measures the coverage of the gold trace's intermediate
+quantities, which we call \emph{milestones}, and recomputes the arithmetic that the response
+displays.
+For the residual milestones that deterministic matching cannot find, the evaluator consults an LLM
+judge from outside the evaluated model families, because LLM judges can favor their own outputs and
+those of related models~\citep{panickssery2024selfrecognition, spiliopoulou2025playfavorites}.
+Three experts from the template's own branch certify each template, and we draw the evaluated
+instances with a private seed, so that no instance was public when the models ran.
+\ourdataset is a depth-oriented evaluation of a curriculum-based subset of engineering: its problems
+are examination-style by construction, as verifiable gold traces require, which leaves ill-posed
+problems and real-world artifacts out of scope.
 
-We evaluate eleven LLMs, eight open-weight and three closed, at their providers' default decoding
-settings, under which four write no reasoning tokens, with template-resampled intervals and
-corrected tests.
-Final-answer accuracy ranges from 0.81 to 0.98, with the five strongest models within 0.01 of one
-another, closer than the evaluation set can resolve.
-Milestone coverage (0.82 to 0.92) orders the models differently (Kendall's $\tau = 0.71$, 95\% CI
-0.51 to 0.86) and separates one pair of the five strongest that final answers cannot.
-Every model errs more often when the gold trace has six or more milestones than when it has one; in
-an expert reading of 160 wrong answers from four models, those on easy problems are mostly
-calculation slips, while wrong formulas or principles appear in 18\% of readings on harder problems
-against 3\% on easy ones.
-For ten of the eleven models, the 90\% interval of the change under expert-checked rewording of 115
-templates lies within five points, a bound on memorised wording rather than methods.
-On a 450-instance subset, a Python tool moves neither closed model tested by more than five points,
-while medium reasoning effort lifts GPT-5.4 mini from 0.86 to 0.95.
-
-Our contributions are:
+In summary, our contributions are as follows:
 \begin{itemize}
-    \item We build and certify \ourdataset, 150 symbolic templates across five engineering branches
-          whose gold traces are computed by code (\autoref{sec:benchmark}).
-    \item We design an evaluator that is deterministic wherever a check exists, validate it against
-          15 experts' step-level labels, and measure what it misses (\autoref{sec:evaluation}).
-    \item We evaluate eleven LLMs with template-resampled intervals and corrected tests, under
-          rewording, reasoning effort, supplied equations and a code tool
-          (\autoref{sec:experiments}).
+    \item We introduce \ourdataset, 150 expert-certified symbolic templates spanning five
+          engineering branches, 15 domains, and 42 areas, whose code-computed gold traces make every
+          intermediate quantity of an engineering derivation checkable.
+    \item We design and validate an evaluator that checks reasoning by computation wherever
+          possible: against step-level labels from 15 engineering experts on responses of five
+          models outside the evaluation, its final-answer check agrees on over 90\% of responses and
+          its milestone coverage reaches an F1 of 0.96, and we identify the errors that no
+          deterministic check can detect.
+    \item We evaluate eleven open-weights and closed LLMs on 2,250 unseen instances and find that
+          the final answer alone does not tell the strongest models apart: final-answer accuracy
+          ranges from 0.81 to 0.98, with the five strongest within 0.01 of one another, while
+          milestone coverage ranks the models differently. Calculation slips dominate errors on easy
+          problems, while wrong formulas or principles appear mostly on intermediate and advanced
+          problems.
 \end{itemize}
