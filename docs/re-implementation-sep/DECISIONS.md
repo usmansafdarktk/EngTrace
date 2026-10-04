@@ -7240,12 +7240,36 @@ proof that the hash change carries no verdict change. `openbook2` was re-scored 
 
 *Revised 2026-10-04, after the authors' review.* The plan's sections on decisions and on the order of work are removed and their content carried where it applies; four writing rules added (simple consistent language, no unnecessary jargon, few terms used consistently, no overstatement); the taxonomy procedure for the new branches is stated as it was (no panel run); the refinement history of the final-answer check leaves the paper for the revision letter while the expert reading of the arithmetic flags stays as a validation experiment; the finished open-book (`openbook2`) and tool conditions (D-183 part 3, D-184 part 2) are folded into the claims, the results notes and the appendix; `current_overleaf_project/` is gitignored as a local mirror of the Overleaf project and `figures_oct_12/` committed.
 
+## D-188 — Section 3 of the paper written; authorship stated alike for every branch, structural variation measured on the evaluation set
+
+**Date:** 2026-10-04 · **Status:** DONE · **Evidence:** `overleaf_source_04102026/3_4_design.tex`; `docs/check_plan_claims.py`, its S3 checks (122 of 122 pass)
+
+The main text of Section 3 (taxonomy and scope, templates and instances, certification) is written, with pointers
+to five appendix sections still to be written. Four choices behind it:
+
+- **Authorship and levels (the authors, 2026-10-04).** Domain experts made all five branches, wrote all 150
+  templates and assigned their levels; the colleague handled the process. The paper says "domain experts wrote the
+  150 templates" and gives no separate description of the civil and industrial templates. D-186's correction stands:
+  nothing was AI-drafted.
+- **Structural variation (approved by the authors, 2026-10-04).** The paper reports `DIVERSITY.md`'s measure on the
+  shipped templates: 92 templates show more than one reasoning path in 500 draws under the lower reading, each
+  contributes at least two to the evaluation set, and 58 follow one path. The plan's 72 came from the 2026-09-05 code
+  audit, before the template revisions, and does not add up to 150 with the 58.
+- **Grounding.** The constants files still carry `[UNVERIFIED]` provenance tags, so the paper says only that the
+  tables record their provenance, not that every entry resolves to a referenced source.
+- **Bibliography.** The May ABET entry's URL (the 2024–2025 criteria) returns 404, and ABET now serves only the
+  2026–2027 criteria, whose program criteria name AIChE, ASCE, IEEE, IISE and ASME as the lead societies of the five
+  branches. The entry keeps the 2024–2025 edition without a URL. The May entries for ASME, IEEE and AIChE point to a
+  vision statement, a standards portal and bylaws rather than curricula, so they are not carried over, and the main
+  text does not name the societies (their acronyms would need spelling out). Gwet (2008), Fleiss (1971) and
+  Feinstein and Cicchetti (1990) support the agreement sentence.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
 | D-185 | Whether to add the sensitivity with the check's partial verdicts counted as correct on the eleven symbolic-answer templates the experts' reading flagged (free, `analyze.py`), and whether the paper's tables mark those templates | the paper's evaluator and limitations sections |
-| D-186 | The authors' remaining calls, carried where they apply in `docs/PAPER_PLAN_OCT2026.md` since its 2026-10-04 revision removed the decisions section: the anonymised archive and the experts' labels (Appendix N entry); the colleague's description and the primary textbook per domain for civil and industrial (section 3.3 notes and the Appendix B entry; the taxonomy question was decided 2026-10-04: no panel run, the procedure stated as it was); strict or partial-credit accuracy and the coverage name (section 4); LPDS and the title (section 2) | the paper text |
+| D-186 | The authors' remaining calls, carried where they apply in `docs/PAPER_PLAN_OCT2026.md` since its 2026-10-04 revision removed the decisions section: the anonymised archive and the experts' labels (Appendix N entry); ~~the colleague's description~~ **settled by D-188: domain experts wrote every branch's templates, no separate description**; the primary textbook per domain for civil and industrial (the Appendix B entry; the taxonomy question was decided 2026-10-04: no panel run, the procedure stated as it was); strict or partial-credit accuracy and the coverage name (section 4); LPDS and the title (section 2) | the paper text |
 | D-184 | ~~Approve the tool arm's calibration (`run_traces --variant tool --calibrate 20 --yes`, about $1.50) and then the run at a cap ($20 to $54 by the dry run's multipliers, plus E5 about $1.20), or state the open-book bound and leave the tool unrun~~ **Approved and run 2026-10-03 for Claude Sonnet 5 and GPT-5.4 mini ($12.80 with E5); gpt-oss-20b not servable through the admitted endpoints** | — |
 | D-184 | Whether to run gpt-oss-20b's tool arm on an endpoint outside the roster's quantization rule (Groq or Bedrock), as a stated deviation, so the open tier appears in the tool comparison; or leave it absent and stated | the paper's tool baseline |
 | D-183 | ~~Approve the corrected open-book arm: `run_traces --variant openbook2 --yes` for the 249 items per model not carried over ($7.68 by the dry run) and E5 on it (about $1); or report the arm as run with its defects stated, or leave it out~~ **Approved and run 2026-10-03 ($7.38 plus E5 $0.94); the `openbook2` rows are the figures** | — |
