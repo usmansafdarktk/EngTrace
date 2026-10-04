@@ -90,30 +90,21 @@ code; we return to linguistic diversity later.
 Because an error in a template recurs in every instance and gold trace, each template passes three
 checks before it enters the benchmark (\autoref{appendix:certification}).
 
-\paragraph{Automated Integrity Checks.}
+\paragraph{Automated Integrity Checks and LLM Screen.}
 At 500 seeds per template, automated checks verify that every printed calculation follows from its
-printed operands at the printed precision, that generation is deterministic, and that every
-instance keeps the output format; all 150 templates pass.
-
-\paragraph{LLM Screen.}
-Three LLM judges from families outside the evaluated models score each template's code and three of
-its instances for physical plausibility, mathematical correctness, and pedagogical clarity.
-After we verify their flags and revise the flagged templates, 147 of the 150 pass and none fails
-critically.
+printed operands, that generation is deterministic, and that every instance keeps the output format;
+all 150 templates pass.
+Three LLM judges from families outside the evaluated models then score each template's code and
+instances; after we revise the templates they flag, 147 of the 150 pass and none fails critically.
 The screen guides revision but does not certify: it passes 15 templates that a majority of their
 experts reject.
 
 \paragraph{Expert Certification.}
-Three domain experts per branch review its 30 templates mixed with four planted defects (one each:
-a wrong constant, unit conversion, sign, or printed result), without knowing which items are planted
-or seeing the screen's verdicts.
-For each template, an expert first solves one instance by hand, then reviews the gold trace and
-approves or rejects the template.
-Every expert rejects all four planted defects of their branch (60 of 60 readings), and 459 of 504
-hand checks match the gold value within 1\%.
-Agreement on approval is high (Gwet's AC1 of 0.914~\citep{gwet2008});
-Fleiss'~$\kappa$~\citep{fleiss1971} is 0.589, deflated because nearly every template is
-approved~\citep{feinstein1990high}.
-In the first round, at least one expert rejects 22 templates; we verify each rejection, revise the
-template or answer the objection, and return it to the same experts, until all 150 templates are
-approved unanimously on code that regenerates the reviewed instances byte for byte.
+Three domain experts per branch review its 30 templates mixed with four planted defects, without
+knowing which items are planted, and solve one instance of each template by hand before seeing its
+gold trace.
+Every expert rejects all four planted defects of their branch (60 of 60 readings), 459 of 504 hand
+checks match the gold value within 1\%, and agreement on approval is high (Gwet's
+AC1 0.914~\citep{gwet2008}; Fleiss'~$\kappa$~\citep{fleiss1971} 0.589, deflated because nearly every
+template is approved~\citep{feinstein1990high}).
+All 150 templates are certified by a unanimous vote of their three experts.
