@@ -24,6 +24,8 @@ vocabulary) are in `docs/PAPER_PLAN_OCT2026.md`, section 8; this file covers for
 - Run-in headings with `\paragraph{}`; few numbered subsections.
 - Numbers: thousands with a comma (`2,250`); percent as `\%`; ranges in tables as `0.81--0.98`; em dash as `---`.
 - Quotation marks as ``` ``this'' ```, never straight double quotes; `e.g.,` with its comma; F1 written as `F1`.
+- Model names in `\texttt{}`, spelled as their developers write them (`\texttt{MiMo-V2.5-Pro}`,
+  `\texttt{GPT-5.4 mini}`), and never wrapped across lines.
 - An abbreviation is spelled out at first use, in the abstract and again in the body: "large language models (LLMs)".
 
 ## From the ACL instructions (`current_overleaf_project/formatting.md`)
@@ -68,7 +70,7 @@ vocabulary) are in `docs/PAPER_PLAN_OCT2026.md`, section 8; this file covers for
 Labels used before their sections exist. Each must be defined when its section is written, or the reference prints
 "??" in the PDF.
 
-- To define: `sec:evaluation` (Section 4), `sec:experiments` (Section 5), `appendix:scoring` (scoring details).
+- To define: `sec:experiments` (Section 5).
 - Defined: `sec:intro`, `sec:related`, `sec:benchmark`, `subsec:taxonomy`, `subsec:templates`,
   `subsec:certification`, `fig:engtrace-overview` (the five-branch figure, `figs/engtrace-overview-5branch.pdf`),
   `fig:template-generation` (May's pipeline figure, `figs/template-generation.pdf`).
@@ -84,3 +86,10 @@ Labels used before their sections exist. Each must be defined when its section i
   prompt box and rubric `tab:qa_rubric`, expert protocol with `tab:planted_defects`, results with
   `tab:expert_agreement` and `tab:certification_rounds`; every number from `docs/appendix_certification.py`,
   whose `--check` must pass). Table rows may exceed 100 characters; prose may not.
+- Defined in `5_evaluation.tex`: `sec:evaluation`, `subsec:scoring`, `subsec:validation`, `eq:match` (the
+  final-answer match rule) and `eq:coverage` (Milestone Coverage).
+- Defined in `appendices/scoring.tex`: `appendix:scoring` (tables `tab:milestone_tolerance`, `tab:judge_validation`,
+  `tab:arithmetic_readings`; the two judge prompts). Defined in `appendices/validation.tex`: `appendix:validation`
+  (tables `tab:evaluator_comparison`, `tab:planted_detection`, `tab:judge_swap`, `tab:expert_readings`). Every
+  number in these two files and in `5_evaluation.tex` comes from `docs/appendix_evaluation.py`, whose `--check`
+  must pass.

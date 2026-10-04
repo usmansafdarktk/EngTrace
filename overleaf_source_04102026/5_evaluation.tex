@@ -1,0 +1,97 @@
+\section{Evaluation Framework}
+\label{sec:evaluation}
+
+Because each template computes every quantity in its gold trace, the final answer and most
+milestones of a response can be checked reproducibly without a model.
+We check responses deterministically wherever possible, consult an LLM judge only on what the
+checks leave open (\autoref{subsec:scoring}), and validate every component against domain experts
+(\autoref{subsec:validation}).
+
+\subsection{Scoring a Response}
+\label{subsec:scoring}
+
+\paragraph{Preliminaries.}
+An instance comprises a question, a gold trace, and milestones $\mathcal{M}$, the values that the
+template computes, the gold trace states, and the question does not give.
+Its targets are the milestones in the gold final answer, or a verdict word such as a flow regime.
+A response $r$ is a sequence of steps ending in a final answer.
+
+\paragraph{Final Answer Accuracy.}
+Let $u(v)$ be one unit in the last digit that a value $v$ displays, $\mathcal{C}$ a fixed set of
+unit factors (e.g., m to mm), and $\epsilon = 0.002$.
+A value $\hat{y}$ in the final answer matches a numerical target $y$ if, for some
+$c \in \mathcal{C}$,
+\begin{equation}
+    |c\,\hat{y} - y| \le \max\bigl(\epsilon\,|y|,\; c\,u(\hat{y}),\; u(y)\bigr),
+    \label{eq:match}
+\end{equation}
+so a correct rounding at either value's precision matches.
+A response scores $v(r) = 1$ if every target matches, $0.5$ if some do, and $0$ if none does or no
+final answer is readable, since answering within the output limit is part of the task.
+\emph{Final Answer Accuracy} (FAC) is the mean of $v(r)$ over instances.
+
+\paragraph{Milestone Coverage.}
+A milestone is reached if the response states its value within 0.5\%, the templates' display
+precision rather than a fitted constant, under a unit factor in $\mathcal{C}$, anywhere and in any
+order.
+Unmatched milestones go to an LLM judge from outside the evaluated families, \texttt{MiMo-V2.5-Pro},
+which sees the question, the response, and each milestone's name and value, not the gold trace, and
+rules each one reached, not needed, or missing.
+We credit only reached, as the judge also excuses unstated values as not needed
+(\autoref{appendix:scoring}).
+With $\mathcal{R}(r)$ the milestones matched or ruled reached,
+\begin{equation}
+    m(r) = |\mathcal{R}(r)| \,/\, |\mathcal{M}|,
+    \label{eq:coverage}
+\end{equation}
+and \emph{Milestone Coverage} (MC) is the mean of $m(r)$ over instances with milestones.
+The judge decides 11\% to 25\% of milestones, depending on the model.
+MC measures how far a derivation gets, not whether it is free of error.
+
+\paragraph{Step-Level Diagnostics.}
+Two diagnostics look for flawed steps behind a correct answer.
+The arithmetic check recomputes each displayed calculation from its printed operands and flags a
+result that is not a correct rounding at its printed precision.
+The judged step check sends every step the arithmetic check does not flag to the same judge, with
+the question and the gold steps, and flags a step labeled a conceptual or calculation error.
+\emph{Arithmetic flags} and \emph{judged step flags} are the shares of correct-answer responses with
+at least one such flag, reported with their precision.
+\autoref{appendix:scoring} gives the match rule in full, both judge prompts, the arithmetic rule,
+and the thresholds.
+
+\subsection{Validation Against Expert Judgment}
+\label{subsec:validation}
+
+\paragraph{Agreement with Domain Experts.}
+We validate each component on 300 responses from five LLMs outside the eleven we evaluate, to 60
+instances of 15 templates across all branches and levels, which three domain experts of the
+instance's branch label step by step.
+The final-answer check agrees with the experts' three-way verdict on 0.927 of all 300 responses, and
+with their verdict on 0.982 of the 281 responses they do not mark partial, where a step-matching
+design with a panel of LLM judges agrees on 0.747; with $\epsilon$ fitted on either half, the
+three-way agreement is 0.908 and 0.939 on the other half.
+Milestone matching reaches F1 0.923 without the judge and 0.958 with it, and over all steps, the
+judged step check with the arithmetic check finds incorrect steps with precision 0.707 and recall
+0.603.
+On the evaluated models' responses, a domain expert confirms 171 of 189 sampled arithmetic flags
+(precision 0.905), and two domain experts per item confirm the final-answer check's correct
+verdicts on the five strongest models in 142 of 150 readings and its incorrect ones in 83 of 98, and
+call its partial ones fully correct in 34 of 52.
+
+\paragraph{The Limit of Verification.}
+Since 175 of the 178 incorrect steps that the experts find behind correct answers are arithmetic, we
+plant one defect in each of 120 clean responses: 60 one-digit slips, and 60 conceptual defects that
+misstate a criterion, rule, or formula without changing a digit.
+No deterministic check detects a conceptual defect (0 of 60), and four LLM judges catch 13\% to 37\%
+of them without false alarms, so LLM judges catch at most about a third of misstated rules behind a
+correct answer.
+
+\paragraph{Judge Independence.}
+The judge shares no family with an evaluated model, as LLM judges can favor their own
+family~\citep{panickssery2024selfrecognition, li2026preferenceleakage}; re-judging 220 sampled
+responses with \texttt{Grok 4.6}, from a third family, changes each model's coverage of them by
+$-0.017$ to $+0.020$.
+Absent self-preference is no proof of accuracy: each judge of the step-matching design's panel
+favors no family, yet accepts most of the incorrect steps it judges.
+\autoref{appendix:validation} details the study, the compared designs, the planted defects, and
+judge independence.
