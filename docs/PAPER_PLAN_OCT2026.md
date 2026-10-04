@@ -261,7 +261,8 @@ the authors' request (D-188).*
 - *Appendix pointer:* "Appendix C shows template examples and the structural-variation counts; Appendix D the
   dataset statistics and how the evaluation set was drawn."
 
-**3.3 Certification (0.7 page).**
+**3.3 Template Certification (0.7 page).** *Written 2026-10-05: concise, headline numbers only; the detail is in
+`appendices/certification.tex` (label `appendix:certification`), every number from `docs/appendix_certification.py`.*
 
 - *Authorship.* Domain experts wrote all 150 templates and assigned their levels, in every branch alike; the paper
   gives no separate description for the civil and industrial templates (the authors, 2026-10-04; D-188). Whether

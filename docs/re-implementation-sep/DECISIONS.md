@@ -7325,6 +7325,18 @@ in the statistics appendix for the experimental setup to cite). It states that t
 rather than linguistic and that linguistic diversity is examined later with expert-checked paraphrases, the
 distinction the second meta-review asks to make explicit (`docs/meta-reviews.md`).
 
+*Added 2026-10-05.* Section 3.3 is now "Template Certification", concise, with the headline numbers only (500
+seeds and 150 of 150; 147 of 150 screened as passing, none critical, and 15 passed templates rejected by the experts;
+60 of 60 planted-defect readings; 459 of 504 hand checks; AC1 0.914 and Fleiss' kappa 0.589; 22 templates rejected
+in round 1; 150 approved unanimously). The detail is in `appendices/certification.tex`: the five integrity
+checks, the screen's judges, settings, rule, two passes and comparison with the experts, May's screening prompt
+box and rubric table (the rubric's caption no longer names the panel), the expert protocol, a table of the 20
+planted defects, agreement by branch and the four rounds. Every number and row comes from the certification
+reports through `docs/appendix_certification.py` (36 of 36 present). Two points for the authors: the prompt the
+screen sent reads "peer reviewer for the EngChain benchmark" (`ai_assisted_quality_assurance/run_ai_tribunal.py`),
+while May's appendix and this one print "EngTrace"; and the difficulty sentence of 3.1 now points to the
+statistics appendix without counts, at the authors' request.
+
 ## Open decisions
 
 | # | Decision | Needed before |

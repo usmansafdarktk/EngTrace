@@ -1,0 +1,266 @@
+% -------------
+\section{Template Certification}
+\label{appendix:certification}
+
+This section details the three checks of~\autoref{subsec:certification}, the automated integrity
+checks, the LLM screen, and the expert certification, and reports the outcome of each.
+
+\subsection{Automated Integrity Checks}
+
+We run every template at 500 seeds, and every seed must pass five checks.
+\begin{itemize}
+    \item \textbf{Closure}: every printed calculation, recomputed from its printed operands, gives
+    its printed result at the printed precision.
+    Lines the check cannot parse, such as a ratio rewritten across units or a result rounded in a
+    direction that the line states, are recorded with the reason and checked by hand: six line
+    patterns in four templates.
+    \item \textbf{Determinism}: the same seed regenerates the same instance in a separate process.
+    \item \textbf{Output format}: every solution has step markers numbered from one without gaps,
+    exactly one answer marker, and a non-empty question and solution.
+    \item \textbf{Clean output}: no printed expression is malformed, such as a doubled sign or a
+    zero coefficient printed as a product.
+    \item \textbf{Generation}: every seed produces an instance without error.
+\end{itemize}
+All 150 templates pass, and we edited 54 templates to make them pass.
+
+\subsection{LLM Screen}
+
+Three LLM judges score every template: Grok 4.6 (xAI), MiniMax M3 (MiniMax), and MiMo-V2.5-Pro
+(Xiaomi), none of them from the family of an evaluated model.
+We query them through OpenRouter at temperature 0, with the output constrained to JSON.
+Each judge receives the template's source code and three of its instances in the prompt below and
+scores them on the rubric of~\autoref{tab:qa_rubric}.
+A template is a critical failure when at least two judges flag it for human review or when the
+median score of any dimension is below 4; otherwise, it is controversial when the population
+standard deviation of the three judges' scores exceeds 0.5 on some dimension, and it passes when
+neither holds.
+
+In the first pass, 126 templates pass, 13 are controversial, and 11 are critical failures; the
+judges agree on the review flag with Gwet's AC1 of 0.84~\citep{gwet2008}.
+Before any edit, we check each claim in the judges' explanations against the code and the
+instances; 34 of the 45 claims hold, and we revise the 24 flagged templates.
+In the second pass, which re-judges the revised templates, 147 templates pass, 3 are controversial,
+and none is a critical failure (AC1 of 0.93).
+Against the experts' first-round verdicts, the screen is a weak filter: 15 of the 147 templates it
+passes are rejected by a majority of their experts, a false-positive rate of 10.2\%.
+The mean absolute difference between the median scores of the experts and of the judges is 0.587
+for physical plausibility, 0.187 for mathematical correctness, and 0.787 for pedagogical clarity.
+
+The screening prompt is provided below.
+
+\begin{tcolorbox}[
+    colback=gray!5,
+    colframe=gray!40,
+    boxrule=0.4pt,
+    arc=2pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable
+]
+\footnotesize
+\ttfamily
+You are an expert engineering professor and a senior Python developer acting as a peer reviewer for the EngTrace benchmark.  \\
+
+Your task is to meticulously evaluate a new problem template based on its source code and several example outputs. \\
+
+Analyze the provided information and then respond ONLY with a single, valid JSON object that strictly adheres to the schema described in the user prompt.  
+Do not add any explanatory text or markdown formatting around the JSON object. \\
+
+Please evaluate the following engineering problem template. \\
+
+\textbf{1. Template Source Code:} \\
+python \{template\_code\} \\
+
+\textbf{2. Generated Instances from the Template:} \\
+Instance 1: \\
+- Question: ``\{q1\}" \\
+- Solution: ``\{s1\}" \\
+
+Instance 2: \\
+- Question: ``\{q2\}" \\
+- Solution: ``\{s2\}" \\
+
+Instance 3: \\
+- Question: ``\{q3\}" \\
+- Solution: ``\{s3\}" \\
+
+
+\textbf{3. Evaluation Rubric \& JSON Schema:} \\
+Evaluate the template based on the rubric below. The \texttt{human\_review\_flag} should be \texttt{true} if any score is less than 4. The \texttt{explanation} should be a concise, one-sentence justification for the scores and the flag.
+
+
+
+\vspace{8pt}
+
+
+\noindent\bgroup\ttfamily
+\texttt{\char`\{} % opening curly brace
+
+\vspace{8pt}
+
+\hspace*{1em}``physical\_plausibility\_score": \textless integer, a score from 1--5 based on whether the problem respects the laws of physics and engineering\textgreater,\\
+
+\vspace{2pt}
+\hspace*{1em}``mathematical\_correctness\_score": \textless integer, a score from 1--5 based on whether the equations and calculations are accurate\textgreater,\\
+
+\vspace{2pt}
+\hspace*{1em}``pedagogical\_clarity\_score": \textless integer, a score from 1--5 based on whether the problem statement is clear, unambiguous, and solvable\textgreater,\\
+
+\vspace{2pt}
+\hspace*{1em}``confidence\_score": \textless integer, a score from 1--5 indicating your confidence in this evaluation\textgreater,\\
+
+\vspace{2pt}
+\hspace*{1em}``human\_review\_flag": \textless boolean, true if the template requires human inspection, otherwise false\textgreater,\\
+
+\vspace{2pt}
+\hspace*{1em}``explanation": "\textless string, a concise, one-sentence justification for the scores and flag\textgreater"\\
+
+\vspace{2pt}
+\texttt{\char`\}} % closing curly brace
+\egroup
+
+\vspace{8pt}
+\end{tcolorbox}
+
+\begin{table}[t]
+\small
+\centering
+\renewcommand{\arraystretch}{1.1}
+\setlength{\tabcolsep}{6pt}
+\begin{tabular}{l p{0.40\linewidth}}
+\toprule
+\rowcolor{gray!10}\textbf{Score Category} & \textbf{Description} \\
+\midrule
+\texttt{Physical Plausibility} & Does the problem scenario respect the laws of physics and engineering? \\
+\addlinespace[2pt]
+\texttt{Mathematical Correctness} & Are the equations used correct, and is the final calculation accurate based on the inputs? \\
+\addlinespace[2pt]
+\texttt{Pedagogical Clarity} & Is the problem statement clear, unambiguous, and solvable with the information provided? \\
+\addlinespace[2pt]
+\texttt{Confidence Score} & How confident is the LLM in its own validation of this template? \\
+\addlinespace[2pt]
+\texttt{Human Review Flag} & Based on the scores above, does this template require human inspection? \\
+\addlinespace[2pt]
+\texttt{Explanation} & A concise, one-sentence justification for the scores and the flag. \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Screening Rubric.} The rubric each LLM judge applies. Numerical criteria are rated on a 1--5 scale, and the \texttt{Human Review Flag} is a binary (true/false) indicator.}
+\label{tab:qa_rubric}
+\end{table}
+
+\subsection{Expert Certification}
+
+Fifteen domain experts certify the templates, three per branch, each reviewing only their own
+branch.
+Each expert receives 34 items, the 30 templates of the branch and four planted defects, shuffled in
+an order of their own under opaque item codes.
+Experts are told that quality-control items exist but not which items they are, they do not see the
+screen's verdicts, and the three experts of a branch do not discuss a template until all three have
+submitted.
+For each item, an expert solves one instance by hand and enters the answer before the solution is
+shown, and the interface reports whether the answer matches the gold value within 1\%.
+The expert then reads the worked solution and, if needed, the code, cycles through five instances,
+scores physical plausibility, mathematical correctness, and pedagogical clarity from 1 to 5, and
+approves or rejects the template; a rejection requires a written reason and a defect type.
+The interface records the time spent on each item.
+Each planted defect is a real template of the branch with one error written into it
+(\autoref{tab:planted_defects}); a wrong constant, unit conversion, or sign is carried consistently
+through the computation, the printed steps, and the answer, whereas a wrong printed result changes a
+single printed line.
+
+\begin{table*}[t]
+    \centering
+    \small
+    \renewcommand{\arraystretch}{1.1}
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{l p{0.205\textwidth} p{0.205\textwidth} p{0.205\textwidth} p{0.205\textwidth}}
+        \toprule
+        \rowcolor{gray!10}
+        \textbf{Branch} & \textbf{Wrong Constant} & \textbf{Wrong Unit Conversion} &
+        \textbf{Flipped Sign} & \textbf{Wrong Printed Result} \\
+        \midrule
+        Chemical & van der Waals pressure: $R$ with two digits transposed & annulus flow rate: kPa to Pa by a factor of 100 & heat of reaction: Hess's law reversed & first-order batch reactor: one printed time 4\% too high \\
+        Electrical & Coulomb's law: $\varepsilon_0$ ten times too large & wave parameters: MHz to Hz by a factor of $10^5$ & C/D and D/C conversion: a delay written as an advance & mean and variance: one printed mean 0.2 too high \\
+        Civil & Manning discharge: $R^{3/4}$ for $R^{2/3}$ & cantilever deflection: m to mm by a factor of 100 & effective stress: $\sigma' = \sigma + u$ & beam reactions: one printed reaction 4\% too high \\
+        Industrial & safety stock: a two-sided $z$ for a one-sided one & M/M/1 time in system: hours to minutes by a factor of 100 & $\bar{x}$ and $R$ chart limits: the lower limit as center plus $A_2\bar{R}$ & process capability: one printed $C_p$ 6\% too high \\
+        Mechanical & torsional shear stress: $J$ with $\pi/4$ for $\pi/2$ & hydrostatic pressure: kPa to Pa by a factor of 100 & U-tube manometer: the pipe-fluid column's sign flipped & natural frequency: one printed $\omega_n$ 4\% too high \\
+        \bottomrule
+    \end{tabular}
+    \caption{\textbf{Planted Defects.} The 20 planted defects, four per branch, each written into a
+    real template of the branch; every expert of the branch reviews all four.}
+    \label{tab:planted_defects}
+\end{table*}
+
+\subsection{Outcome}
+
+Every expert rejects all four planted defects of their branch, 60 of 60 readings.
+Of the 504 first-round hand checks with a comparable number, 459 match the gold value within 1\%,
+and 44 of the 45 mismatches end in a rejection.
+\autoref{tab:expert_agreement} gives the agreement among the three experts of each branch in the
+first round: Fleiss' $\kappa$ on approval falls where nearly every template is
+approved~\citep{feinstein1990high}, whereas Gwet's AC1 and its weighted form AC2, used for the 1--5
+scores, do not.
+
+\begin{table}[t]
+    \centering
+    \small
+    \setlength{\tabcolsep}{3.5pt}
+    \begin{tabular}{l|ccc|ccc}
+        \toprule
+        \rowcolor{gray!10}
+        \multirow{2}{*}{\textbf{Branch}} & \multicolumn{3}{c|}{\textbf{Approve or Reject}} &
+        \multicolumn{3}{c}{\textbf{AC2 on Scores}} \\
+        & $\kappa$ & \textbf{AC1} & \textbf{Agr.} &
+        \textbf{Phys.} & \textbf{Math.} & \textbf{Ped.} \\
+        \midrule
+        Chemical & 0.492 & 0.776 & 77\% & 0.898 & 0.952 & 0.912 \\
+        Electrical & 0.365 & 0.926 & 90\% & 0.941 & 0.989 & 0.976 \\
+        Civil & 1.000 & 1.000 & 100\% & 0.993 & 0.981 & 0.974 \\
+        Industrial & 1.000 & 1.000 & 100\% & 0.962 & 0.997 & 0.965 \\
+        Mechanical & 0.627 & 0.792 & 80\% & 0.927 & 0.973 & 0.952 \\
+        \textbf{All} & 0.589 & 0.914 & 89\% & 0.947 & 0.980 & 0.954 \\
+        \bottomrule
+    \end{tabular}
+    \caption{\textbf{Expert Agreement.} Agreement among the three experts of each branch in the
+    first round: Fleiss' $\kappa$, Gwet's AC1, and percent agreement on the verdict, and Gwet's AC2
+    on the physical, mathematical, and pedagogical scores.}
+    \label{tab:expert_agreement}
+\end{table}
+
+In the first round, at least one expert rejects 22 templates, 15 of them by a majority: chemical 9,
+electrical 3, and mechanical 10, while every civil and industrial expert approves all 30 templates
+of their branch (\autoref{tab:certification_rounds}).
+We check each rejection against the instances the expert saw; we revise 20 of them and, for the
+other 2, record in the template why we keep it unchanged, and all 22 return to the same experts.
+In the second round, 17 are approved by all three experts, 2 by a majority, and 3 are rejected by a
+majority; we revise the five templates with a rejection, and the third round approves all five
+unanimously.
+A fourth round re-certifies two chemical templates that we extended so that each yields 15 distinct
+questions.
+Every template is thus approved unanimously in the latest round that reviewed it, 126 in the first
+round, 17 in the second, 5 in the third, and 2 in the fourth, and its current code regenerates, byte
+for byte, the instances its experts reviewed.
+
+\begin{table}[t]
+    \centering
+    \small
+    \setlength{\tabcolsep}{3.5pt}
+    \begin{tabular}{c|cc|cc|c}
+        \toprule
+        \rowcolor{gray!10}
+        \textbf{Round} & \textbf{Templates} & \textbf{Verdicts} & \textbf{Rejecting} &
+        \textbf{Rejected} & \textbf{Hand Checks} \\
+        \midrule
+        1 & 150 & 450 & 43 & 22 & 459 of 504 \\
+        2 & 22 & 66 & 10 & 5 & 66 of 66 \\
+        3 & 5 & 15 & 0 & 0 & 13 of 15 \\
+        4 & 2 & 6 & 0 & 0 & 6 of 6 \\
+        \bottomrule
+    \end{tabular}
+    \caption{\textbf{Certification Rounds.} Templates reviewed, verdicts, rejecting verdicts,
+    templates rejected by at least one expert, and hand checks matching the gold value within 1\%,
+    per round.}
+    \label{tab:certification_rounds}
+\end{table}

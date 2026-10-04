@@ -68,8 +68,7 @@ vocabulary) are in `docs/PAPER_PLAN_OCT2026.md`, section 8; this file covers for
 Labels used before their sections exist. Each must be defined when its section is written, or the reference prints
 "??" in the PDF.
 
-- To define: `sec:evaluation` (Section 4), `sec:experiments` (Section 5), `appendix:certification` (template
-  certification), `appendix:scoring` (scoring details).
+- To define: `sec:evaluation` (Section 4), `sec:experiments` (Section 5), `appendix:scoring` (scoring details).
 - Defined: `sec:intro`, `sec:related`, `sec:benchmark`, `subsec:taxonomy`, `subsec:templates`,
   `subsec:certification`, `fig:engtrace-overview` (the five-branch figure, `figs/engtrace-overview-5branch.pdf`),
   `fig:template-generation` (May's pipeline figure, `figs/template-generation.pdf`).
@@ -81,3 +80,7 @@ Labels used before their sections exist. Each must be defined when its section i
 - Defined in `appendices/template_examples.tex`: `sec:appendix_param_details` (May's parameterization bullets plus
   civil and industrial) and `sec:appendix_template_examples` (three listings generated from the current template
   code by `docs/appendix_listings.py`, whose `--check` must pass after any template change).
+- Defined in `appendices/certification.tex`: `appendix:certification` (integrity checks, LLM screen with May's
+  prompt box and rubric `tab:qa_rubric`, expert protocol with `tab:planted_defects`, outcome with
+  `tab:expert_agreement` and `tab:certification_rounds`; every number from `docs/appendix_certification.py`,
+  whose `--check` must pass). Table rows may exceed 100 characters; prose may not.
