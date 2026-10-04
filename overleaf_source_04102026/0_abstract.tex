@@ -1,7 +1,7 @@
 Engineering problems are solved by derivations whose intermediate quantities can be checked, yet existing benchmarks such as \textsc{SuperGPQA} and \textsc{EEE-Bench} score only final answers, and those that assess steps, such as \textsc{TPS-CalcBench}, rely on large language model (LLM) judges or cover one domain.
 We present \ourdataset, a symbolic benchmark for verifiable process supervision of engineering reasoning, with 150 templates spanning five branches, 15 domains and 42 areas.
 Each template is expert-certified code that samples physically grounded parameters, computes the answer and emits a gold reasoning trace from the same computation, so every intermediate quantity is known exactly.
-Model solutions are scored deterministically wherever a check exists: a final-answer check over six answer kinds, coverage of the gold trace's intermediate quantities (milestones), and an arithmetic check of displayed calculations; residual milestones go to an LLM judge from outside the evaluated model families.
+Scoring is deterministic wherever a check exists, on final answers of six kinds, the gold trace's intermediate quantities (milestones) and displayed arithmetic, with an out-of-family LLM judge for residual milestones, and is validated against 15 experts (final-answer agreement 0.93, milestone F1 0.96).
 Across 2,250 instances, eleven LLMs attain final-answer accuracies of 0.81 to 0.98, the five strongest within 0.01 of one another.
 Milestone coverage is similarly high (0.82 to 0.92) but ranks the models differently.
 Errors on easy problems are almost entirely calculation slips, while wrong formulas or principles appear mostly on intermediate and advanced problems.
