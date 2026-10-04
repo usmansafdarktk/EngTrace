@@ -24,12 +24,14 @@ derivation, computing every intermediate quantity exactly from physically ground
 
 \paragraph{Step-Level Evaluators.} Without exact references, step-level evaluation relies on process
 reward models or LLM judges.
-Work on process reward models centers on
-mathematics~\citep{lightman2023verify, zheng2024processbench}, and such models transfer poorly to
-other domains~\citep{zeng2025versaprm}.
+Process reward models learn from human step labels~\citep{lightman2023verify} or from labels
+estimated by rollouts~\citep{wang2023mathshepherd}, which are noisy~\citep{zhang2025prmlessons}.
+Most use mathematical training data and generalize poorly to other domains~\citep{zeng2025versaprm}.
 LLM judges make correlated errors~\citep{goel2025greatmodels} and agree with experts mainly on
 questions they can answer themselves, unless given a correct
 reference~\citep{krumdick2026nofreelabels}.
+Even benchmarks with gold solutions score responses by aligning steps with the gold
+chain~\citep{xie2025finchain} or through an LLM judge with rubrics~\citep{fan2024hardmath}.
 \ourdataset therefore checks every milestone against its exact value, deterministically wherever a
 check exists and otherwise through a judge that receives this value, providing verifiable process
 supervision of engineering reasoning.
