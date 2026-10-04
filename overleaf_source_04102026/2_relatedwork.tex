@@ -1,42 +1,44 @@
 \section{Related Work}
 \label{sec:related}
 
-\paragraph{Physics Benchmarks.} Most physics benchmarks grade final answers or
+\paragraph{Engineering Benchmarks.} Most engineering benchmarks grade answers: general suites such
+as \textsc{SuperGPQA} through multiple choice~\citep{du2025supergpqa}, multi-branch benchmarks with
+LLM judges~\citep{zhou2025engibench, naser2026eri}, and dedicated benchmarks within one
+branch~\citep{li2025eeebench, skelic2025circuit}.
+Most physics benchmarks likewise grade final answers or
 expressions~\citep{xu2025ugphysics, qiu2025phybench}.
-\textsc{PhysReason}~\citep{zhang2025physreason} and
-\textsc{PRISM-Physics}~\citep{zhao2026prismphysics} score steps of fixed problems against reference
-solutions, with an LLM judge and with rule-based formula matching, respectively.
-\ourdataset instead generates each engineering instance with its own reference, computing every
-intermediate quantity exactly.
+In both fields, benchmarks that assess reasoning mostly rely on domain
+experts~\citep{syed2024transportbench, kevian2024controlbench} or LLM
+judges~\citep{zheng2026tpscalcbench, wasiq2026engvqa, zhang2025physreason, yu2026hipho}.
+Closer to our evaluator, \textsc{PRISM-Physics} checks formulas against reference solutions with
+rule-based matching~\citep{zhao2026prismphysics}, and \textsc{ThermoQA} compares steps with values
+computed by a property library~\citep{duzkar2026thermoqa}, but both use fixed problems.
 
-\paragraph{Symbolic Benchmarks.} Symbolic templates generate variants of existing problems to test
-whether a model has memorized the original~\citep{mirzadeh2024gsmsymbolic, gulati2024putnamaxiom}.
-\textsc{HARDMath} generates step-by-step solutions but grades responses with an LLM and
-rubrics~\citep{fan2024hardmath}, and \textsc{FinChain} aligns a model's steps with an executable
-gold chain~\citep{xie2025finchain}.
-\ourdataset uses its templates for checking as well as generation: the code samples physically
-grounded parameters and computes every intermediate quantity of the derivation, so the evaluator can
-check each value a model states against an exact one rather than aligning or judging it.
+\paragraph{Symbolic Benchmarks.} Fixed problems can leak into training
+data~\citep{deng2024contamination, zhang2024gsm1k}; symbolic benchmarks instead generate instances
+from templates.
+Many vary existing problems to test whether a model has memorized the
+original~\citep{mirzadeh2024gsmsymbolic, gulati2024putnamaxiom}.
+Some also generate gold solutions, in science~\citep{imani2025sympybench, azmi2026scirho}, applied
+mathematics~\citep{fan2024hardmath}, and finance~\citep{xie2025finchain}.
+In engineering, \textsc{CIRCUIT} and \textsc{OPT-Engine} generate problems within a single branch
+each~\citep{skelic2025circuit, chen2026optengine}.
+By contrast, \ourdataset's templates span five engineering branches and encode complete derivations.
+Their code samples physically grounded parameters and computes every intermediate quantity, so each
+instance carries an exact value for every milestone.
 
-\paragraph{Engineering Benchmarks.} General suites such as \textsc{SuperGPQA} test engineering
-through multiple choice~\citep{du2025supergpqa}, and multi-branch benchmarks grade answers with LLM
-judges~\citep{zhou2025engibench, naser2026eri}.
-Dedicated benchmarks cover one branch~\citep{li2025eeebench, skelic2025circuit}, and those that
-assess reasoning mostly use experts or LLM judges~\citep{syed2024transportbench,
-kevian2024controlbench, zheng2026tpscalcbench}; \textsc{ThermoQA} checks steps against computed
-values, but on 293 fixed problems~\citep{duzkar2026thermoqa}.
-To our knowledge, none combines physically grounded instances across branches, exactly computed gold
-traces, deterministic checks of intermediate quantities, and an evaluator validated against domain
-experts' step-level labels.
-
-\paragraph{Step-Level Evaluators.} Correct reasoning steps require process supervision or reward
-models that emulate it~\citep{uesato2022processoutcome}, yet process reward models are trained and
-tested mainly on mathematics~\citep{lightman2023verify, zheng2024processbench} and perform poorly in
-other domains~\citep{zeng2025versaprm}.
+\paragraph{Step-Level Evaluators.} Exact milestones still need an evaluator that decides which of
+them a response reaches.
+Process reward models~\citep{lightman2023verify, wang2023mathshepherd} and the benchmarks that test
+them~\citep{zheng2024processbench, song2025prmbench} focus on mathematics, and models trained on
+mathematics perform poorly in other domains~\citep{zeng2025versaprm}.
 LLM judges make correlated errors~\citep{goel2025greatmodels} and agree with experts mainly on
-questions they can answer themselves unless given a correct
+questions they can answer themselves, unless given a correct
 reference~\citep{krumdick2026nofreelabels}.
-\ourdataset therefore checks intermediate values deterministically wherever a check exists, gives
-its judge each remaining milestone's expected value, and validates the full evaluator against domain
-experts' labels.
+The \ourdataset evaluator therefore checks final answers, milestones, and arithmetic
+deterministically wherever a check exists, and gives its judge the expected value of each residual
+milestone.
+We validate it against domain experts' step-level labels.
+To our knowledge, none of this work combines physically grounded instances generated across
+engineering branches, exactly computed gold traces, and an expert-validated step-level evaluator.
 \autoref{appendix:related} gives further comparisons.
