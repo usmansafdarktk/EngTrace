@@ -4,33 +4,33 @@
 \paragraph{Physics Benchmarks.} Most physics benchmarks grade final answers or
 expressions~\citep{xu2025ugphysics, qiu2025phybench}.
 \textsc{PhysReason}~\citep{zhang2025physreason} and
-\textsc{PRISM-Physics}~\citep{zhao2026prismphysics} also score steps against reference solutions,
-with an LLM judge and with rule-based formula matching, respectively.
-\ourdataset also scores steps against a reference, in engineering, and takes the reference from the
-code that computes the answer, so every intermediate quantity is known exactly.
+\textsc{PRISM-Physics}~\citep{zhao2026prismphysics} score steps of fixed problems against reference
+solutions, with an LLM judge and with rule-based formula matching, respectively.
+\ourdataset instead generates each engineering instance with its own reference, computing every
+intermediate quantity exactly.
 
-\paragraph{Symbolic Benchmarks.} Static test sets leak into training data~\citep{zhang2024gsm1k},
-and symbolic or functional variants of existing problems test whether a model has memorized the
-original instance~\citep{mirzadeh2024gsmsymbolic, gulati2024putnamaxiom}.
-\textsc{HARDMath} produces applied-mathematics problems with numerically validated step-by-step
-solutions~\citep{fan2024hardmath}, and \textsc{FinChain} pairs each templated financial problem with
-an executable gold reasoning chain~\citep{xie2025finchain}.
-\ourdataset carries this design to five engineering branches and draws its instances from a private
-seed.
+\paragraph{Symbolic Benchmarks.} Symbolic templates generate variants of existing problems to test
+whether a model has memorized the original~\citep{mirzadeh2024gsmsymbolic, gulati2024putnamaxiom}.
+\textsc{HARDMath} generates step-by-step solutions but grades responses with an LLM and
+rubrics~\citep{fan2024hardmath}, and \textsc{FinChain} aligns a model's steps with an executable
+gold chain~\citep{xie2025finchain}.
+\ourdataset uses its templates for checking as well as generation: the code samples physically
+grounded parameters and computes every intermediate quantity of the derivation, so the evaluator can
+check each value a model states against an exact one rather than aligning or judging it.
 
 \paragraph{Engineering Benchmarks.} General suites such as \textsc{SuperGPQA} test engineering
 mostly through multiple choice~\citep{du2025supergpqa}, multi-branch benchmarks grade answers with
 LLM judges~\citep{zhou2025engibench, naser2026eri}, and dedicated benchmarks typically cover one
 branch, such as transportation~\citep{syed2024transportbench},
 control~\citep{kevian2024controlbench}, electrical and electronics
-engineering~\citep{li2025eeebench}, circuits~\citep{skelic2025circuit},
-thermodynamics~\citep{duzkar2026thermoqa}, or thermal-protection
+engineering~\citep{li2025eeebench}, circuits~\citep{skelic2025circuit}, or thermal-protection
 design~\citep{zheng2026tpscalcbench}.
-Of these, experts or LLM judges assess the reasoning in a few, and \textsc{CIRCUIT} instantiates
-templates.
-To our knowledge, none combines generated instances across engineering branches with gold traces,
-deterministic checks of intermediate values, and an evaluator validated against domain experts'
-step-level labels.
+Those that assess reasoning mostly use experts or LLM judges;
+\textsc{ThermoQA}~\citep{duzkar2026thermoqa} checks steps against computed values, but on 293 fixed
+problems.
+To our knowledge, none combines physically grounded instances generated across engineering branches,
+gold traces with exactly computed intermediate quantities, deterministic checks of those quantities,
+and an evaluator validated against domain experts' step-level labels.
 
 \paragraph{Step-Level Evaluators.} Correct reasoning steps require process supervision or reward
 models that emulate it~\citep{uesato2022processoutcome}, yet process reward models are trained and
@@ -39,6 +39,7 @@ other domains~\citep{zeng2025versaprm}.
 LLM judges make correlated errors~\citep{goel2025greatmodels} and agree with experts mainly on
 questions they can answer themselves unless given a correct
 reference~\citep{krumdick2026nofreelabels}.
-\ourdataset therefore checks intermediate values deterministically, gives its judge each milestone's
-expected value, and validates the full evaluator against domain experts' labels.
-\autoref{appendix:related} gives a detailed comparison and further related work.
+\ourdataset therefore checks intermediate values deterministically wherever a check exists, gives
+its judge each remaining milestone's expected value, and validates the full evaluator against domain
+experts' labels.
+\autoref{appendix:related} gives further comparisons.
