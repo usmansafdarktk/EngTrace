@@ -8,29 +8,33 @@ the judge, the arithmetic check, and the judged step check.
 \subsection{Final-Answer Check}
 
 \paragraph{Reading the Final Answer.}
-The check reads the final answer from the response's last final-answer heading or, if there is
-none, from its answer marker.
-It reads numbers written in LaTeX, as fractions or multiples of $\pi$, with superscripts, or with
-thousands separators, and a digit in a subscript, such as $p_1$, is not a value.
-A final answer is readable when the response has such a heading or marker, or ends in a number or a
-verdict word; an empty response is unreadable.
+The check reads a response's final answer from a window of 700 characters that starts at its last
+final-answer heading or, without one, at its answer marker; a response with neither is read from
+its last mention of ``answer'' or from its end.
+It reads numbers in scientific notation, including superscript exponents, in LaTeX, as fractions or
+multiples of $\pi$, and with thousands separators, and a digit subscripted with an underscore, as in
+\texttt{p\_1}, is not a value.
+A final answer is readable when the response has a final-answer heading or an answer marker, or a
+number or verdict word in its last 700 characters; an empty response is unreadable.
 
 \paragraph{Targets.}
 The targets are the values on the gold trace's final-answer line that the template computed, so a
-restated input or a constant of a formula is never a target.
+restated input or a constant of a formula is not a target; for an instance without milestones, the
+target is the last value on that line that the question does not give.
 A scalar or array answer has one target, the last such value; a vector, multipart, symbolic, or
 classification answer has one target per computed value it states.
-Where the answer is a word, the gold's verdict word is a target, decided by the response's last
-mention of a word of the same family (e.g., laminar, turbulent, or transitional) that is not
-negated, and a labeled yes-or-no property (e.g., ``causal: no'') is matched label by label.
+A classification answer also has the gold's verdict word as a target, which the response matches
+when its final answer's last mention of a word of the same family (e.g., laminar, turbulent, or
+transitional), not counting negated ones, is that word; a labeled yes-or-no property (e.g.,
+``causal: no'') is matched label by label.
 \autoref{appendix:statistics} gives the answer kinds by template.
 
 \paragraph{The Match Rule.}
-The unit factors of~\autoref{eq:match} are $10^{\pm 3}$, $10^{\pm 6}$, $10^{\pm 9}$, and
-$10^{\pm 12}$, 100 and 0.01 for percentages, and 60, 3,600, and their inverses for minutes and
-hours.
-A response's own last digit vouches for its value only when one unit of that digit is smaller than
-the value, so a bare 0 or 1 does not match every target.
+The unit factors $\mathcal{C}$ of~\autoref{eq:match} are $10^{\pm 3}$, $10^{\pm 6}$, $10^{\pm 9}$,
+and $10^{\pm 12}$ for metric prefixes, 100 and 0.01 for percentages, and 60, 3,600, and their
+inverses for seconds, minutes, and hours.
+A response's own last digit counts only when one unit of that digit is smaller than the value, so a
+bare 0 or 1 cannot match a target through its last digit.
 A value also matches in absolute value, since sign conventions differ, as for a deflection stated
 as downward.
 Where the question prescribes the rounding (e.g., ``to 4 decimals''), the digits must match
@@ -53,19 +57,21 @@ the regenerated question and gold trace equal the instance byte for byte.
 A milestone is a computed value that the gold trace states within 0.5\% and that the question does
 not give, even in other units.
 We exclude values within $10^{-9}$ of 0, 1, or 2, which match almost any text; loop counters and
-the intermediate states of an iterative scheme, which a response that starts from another guess
-does not pass through; and the entries of lookup tables.
-A quantity stored under two names counts once.
+other bookkeeping variables; the intermediate states of an iterative scheme, which a response that
+starts from another guess does not pass through; and the elements of containers such as lookup
+tables.
+A quantity stored under two names or in two units counts once.
 Every gold trace reaches all of its milestones, and the 70 instances without a milestone are left
 out of MC.
 
-\paragraph{Matching.}
+\paragraph{Milestone Matching.}
 Milestone matching uses the templates' display tolerance of 0.5\% and the unit factors of the
 final-answer check except $10^{\pm 12}$.
-\autoref{tab:milestone_tolerance} shows coverage on the expert study at four tolerances: the
-separation between a response's coverage of its own instance's milestones and of another
-instance's milestones is 0.646 to 0.699 between 0.2\% and 1\% with unit factors, and unit factors
-raise coverage at every tolerance.
+\autoref{tab:milestone_tolerance} shows how the tolerance and the unit factors affect coverage on
+the expert study, against a baseline of chance matches: the coverage that a response reaches of the
+milestones of the other instances of its template.
+With unit factors, the separation between the two is 0.646 to 0.699 from 0.2\% to 1\%; unit factors
+raise coverage at every tolerance and raise the separation at 0.5\% and below.
 
 \begin{table}[t]
     \centering
@@ -74,33 +80,34 @@ raise coverage at every tolerance.
     \begin{tabular}{cc|ccc}
         \toprule
         \rowcolor{gray!10}
-        \textbf{Tolerance} & \textbf{Units} & \textbf{Own} & \textbf{Other} & \textbf{Separation} \\
+        \textbf{Tolerance} & \textbf{Unit Factors} & \textbf{Own} & \textbf{Other} & \textbf{Separation} \\
         \midrule
         2\% & yes & 0.789 & 0.228 & 0.560 \\
         2\% & no & 0.721 & 0.110 & 0.611 \\
         1\% & yes & 0.766 & 0.119 & 0.646 \\
         1\% & no & 0.709 & 0.059 & 0.650 \\
-        0.5\% & yes & 0.739 & 0.040 & 0.699 \\
+        \textbf{0.5\%} & \textbf{yes} & \textbf{0.739} & \textbf{0.040} & \textbf{0.699} \\
         0.5\% & no & 0.695 & 0.019 & 0.676 \\
         0.2\% & yes & 0.711 & 0.023 & 0.687 \\
         0.2\% & no & 0.675 & 0.016 & 0.659 \\
         \bottomrule
     \end{tabular}
     \caption{\textbf{Milestone Tolerance.} Coverage of the expert study's 300 responses against
-    their own instance's milestones and against another instance's milestones (shared values
-    removed), and the difference between the two, by matching tolerance, with and without unit
-    factors.}
+    their own instance's milestones (Own) and against the milestones of the other instances of the
+    same template, without the values they share with the own instance (Other), and the difference
+    between the two (Separation), by matching tolerance, with and without unit factors.
+    The setting we use is in bold.}
     \label{tab:milestone_tolerance}
 \end{table}
 
 \paragraph{The Judge.}
-The judge, \texttt{MiMo-V2.5-Pro} (Xiaomi), receives one call per response with milestones that
-matching does not find, holding the question, the response, and each such milestone's name (the
-template's variable name) and value, rounded to six digits, but never the gold trace.
-We query it through OpenRouter at temperature 0, with JSON output and up to 16,384 tokens, and ask
-again, up to three attempts in all, when a reply is empty or malformed.
+The judge, \texttt{MiMo-V2.5-Pro} (Xiaomi), receives one call per response in which matching misses
+a milestone, holding the question, the response, and each missed milestone's name (the template's
+variable name) and value printed to six digits (e.g., 113.552), but never the gold trace.
+We query it through OpenRouter at temperature 0, with JSON output and up to 16,384 output tokens,
+and ask again, up to three attempts in all, when a reply is empty or malformed.
 On the expert study's 300 responses, matching finds 951 of the 1,245 milestones and the judge
-decides 294; on the evaluated models, the judge decides 11\% to 25\% of milestones.
+decides the other 294; on the evaluated models, the judge decides 11\% to 25\% of milestones.
 The prompt is provided below.
 
 \begin{tcolorbox}[
@@ -128,18 +135,18 @@ A correct solution to this problem obtains the intermediate quantities listed be
 An automatic checker could not find them in the student's solution by matching numbers.
 For EACH one, decide: \\
 
-- ``REACHED": the student does obtain this quantity correctly - possibly in different units, a
+- "REACHED": the student does obtain this quantity correctly - possibly in different units, a
 different but equivalent form, or with different rounding. \\
-- ``NOT\_NEEDED": the student reaches a correct result by a valid route that does not pass through
+- "NOT\_NEEDED": the student reaches a correct result by a valid route that does not pass through
 this quantity at all. \\
-- ``MISSING": the student does not obtain this quantity, or obtains it incorrectly. \\
+- "MISSING": the student does not obtain this quantity, or obtains it incorrectly. \\
 
 QUANTITIES: \\
 \{quantities\} \\
 
 Return a raw JSON object only: \\
-\{``results": [\{``milestone": ``\textless name\textgreater", ``verdict": ``REACHED" |
-``NOT\_NEEDED" | ``MISSING"\}]\}
+\{"results": [\{"milestone": "\textless name\textgreater", "verdict": "REACHED" | "NOT\_NEEDED" |
+"MISSING"\}]\}
 \end{tcolorbox}
 
 \paragraph{Validating the Judge.}
@@ -171,6 +178,7 @@ missing, so the strict reading is conservative.
 
 \subsection{Arithmetic Check}
 
+\paragraph{The Rule.}
 The check splits each step into chains such as $a = b = c$, evaluates every numeric segment with
 SymPy~\citep{meurer2017sympy}, and skips symbolic segments, which it cannot evaluate without values
 for their symbols.
@@ -180,10 +188,13 @@ own displayed numbers: $0.92979^{2/3} = 0.95300$ is flagged, because the value i
 decimals, whereas $0.92979^{2/3} = 0.9526$ passes.
 A unit conversion is compared after its unit factor, and a result is not held to a precision that
 its displayed operands cannot determine.
-On the 2,250 gold traces, the check flags none of the 6,875 calculations in their 9,391 steps.
+
+\paragraph{Validating the Rule.}
+On the 2,250 gold traces, the check flags none of the 6,875 calculations it reads in their 9,391
+steps.
 \autoref{tab:arithmetic_readings} compares the rule with relative tolerances on the expert study's
-labels: a tolerance of 1\%, which catches fabricated values, finds almost none of the slips that the
-domain experts mark inside correct-answer responses.
+labels: a tolerance of 1\%, which asks only whether the work shown could produce a value, finds
+almost none of the slips that the domain experts mark inside correct-answer responses.
 
 \begin{table}[t]
     \centering
@@ -199,18 +210,19 @@ domain experts mark inside correct-answer responses.
         1\% tolerance & 0.171 & 0.039 & 0.064 & 0.519 & 0.108 & 0.179 \\
         0.1\% tolerance & 0.345 & 0.107 & 0.163 & 0.619 & 0.188 & 0.289 \\
         Digits shown & 0.581 & 0.646 & 0.612 & 0.676 & 0.495 & 0.571 \\
-        Digits shown, as used & 0.817 & 0.427 & 0.561 & 0.872 & 0.317 & 0.465 \\
+        \textbf{Digits shown, as used} & \textbf{0.817} & \textbf{0.427} & \textbf{0.561} & \textbf{0.872} & \textbf{0.317} & \textbf{0.465} \\
         \bottomrule
     \end{tabular}
     \caption{\textbf{Arithmetic Rule.} Precision (P), recall (R), and F1 against the steps that the
     domain experts mark incorrect, inside correct-answer responses and in all 300 responses of the
     expert study, for a relative tolerance of 1\% and of 0.1\%, for the displayed precision alone,
-    and for the displayed precision with the exceptions we use.}
+    and for the displayed precision with the exceptions we use (in bold).}
     \label{tab:arithmetic_readings}
 \end{table}
 
 \subsection{Judged Step Check}
 
+\paragraph{The Check.}
 The judged step check splits a response into the steps on which the experts' labels are made and
 sends every non-empty step that the arithmetic check does not flag to the judge, in one call per
 response that holds the question, the gold trace's steps, the response's steps, and the indices of
@@ -219,10 +231,6 @@ The judge labels each step a conceptual error, a calculation error, alternative 
 a step labeled an error is flagged, and other is recorded but not flagged.
 We query it at the provider's defaults with up to 8,192 output tokens, ask again with 16,384 when a
 reply is cut, and ask again, up to three attempts in all, when a reply cannot be parsed.
-On the expert study, the judged step check with the arithmetic check finds incorrect steps with
-precision 0.707 and recall 0.603 over all steps, and 0.703 and 0.360 inside correct-answer
-responses; on the planted conceptual defects of~\autoref{appendix:validation}, it catches 19 of 60,
-with 2 false alarms on the 842 untouched steps judged with them.
 The prompt is provided below; the placeholders in braces hold the question, the two lists of steps,
 and the indices under review.
 
@@ -257,19 +265,25 @@ Compare them logically to the Ground Truth. \\
 
 CRITICAL RULES: \\
 1. If the step is factually correct but takes a different path than the Ground Truth, you MUST use
-``Alternative Correct". \\
+"Alternative Correct". \\
 2. Do not contradict the category definitions below. \\
 3. The final output must be a raw JSON object only. \\
 
 ERROR CATEGORIES: \\
-- ``Conceptual Error": The model applied the wrong scientific principle or formula. \\
-- ``Calculation Error": The model used the correct formula but made a mathematical mistake. \\
-- ``Alternative Correct": The model's step is valid and logically sound, but follows a different
+- "Conceptual Error": The model applied the wrong scientific principle or formula. \\
+- "Calculation Error": The model used the correct formula but made a mathematical mistake. \\
+- "Alternative Correct": The model's step is valid and logically sound, but follows a different
 method/phrasing. \\
-- ``Other": Nonsensical, irrelevant, hallucination, or formatting errors. \\
+- "Other": Nonsensical, irrelevant, hallucination, or formatting errors. \\
 
 OUTPUT FORMAT: \\
-Return a single JSON object containing a ``results" list. Each entry must have exactly two keys:
-``step\_index" and ``category". \\
-\{``results": [\{``step\_index": \{first index\}, ``category": ``Alternative Correct"\}]\}
+Return a single JSON object containing a "results" list. Each entry must have exactly two keys:
+"step\_index" and "category". \\
+\{"results": [\{"step\_index": \{first index\}, "category": "Alternative Correct"\}]\}
 \end{tcolorbox}
+
+\paragraph{Validating the Check.}
+On the expert study, the judged step check, together with the arithmetic check as the study ran it,
+finds incorrect steps with precision 0.707 and recall 0.603 over all steps, and 0.703 and 0.360
+inside correct-answer responses; on the planted conceptual defects of~\autoref{appendix:validation},
+it catches 19 of 60, with 2 false alarms on the 842 untouched steps judged with them.

@@ -121,11 +121,16 @@ judge_val = {r[0]: r[1:] for r in table(ta, r"^\| shown to the judge \| REACHED"
 tv, fv = judge_val["true values (should be REACHED), 88"], judge_val["values x1.37 (should be MISSING), 88"]
 judge_rows = [f"True values (88) & {tv[0]} & {tv[1]} & {tv[2]} \\\\",
               f"Values $\\times 1.37$ (88) & {fv[0]} & {fv[1]} & {fv[2]} \\\\"]
-grid_rows = [r[0].replace("%", "\\%") + f" & {r[1]} & {r[2]} & {r[3]} & {r[4]} \\\\"
-             for r in table(ta, r"^\| tolerance \| unit scaling \| real")]
+def bold_if(cells: list[str], used: bool) -> str:
+    """A table row, every cell in bold when it is the setting the evaluator uses."""
+    return " & ".join(f"\\textbf{{{c}}}" if used else c for c in cells) + " \\\\"
+
+
+grid = table(ta, r"^\| tolerance \| unit scaling \| real")
+grid_rows = [bold_if([r[0].replace("%", "\\%"), r[1], r[2], r[3], r[4]], (r[0], r[1]) == ("0.5%", "yes")) for r in grid]
 READING = {"1% tolerance": "1\\% tolerance", "0.1% tolerance": "0.1\\% tolerance",
            "digit rule, bare": "Digits shown", "digit rule, as shipped": "Digits shown, as used"}
-arith_rows = [f"{READING[r[0]]} & {r[2]} & {r[3]} & {r[4]} & {r[5]} & {r[6]} & {r[7]} \\\\"
+arith_rows = [bold_if([READING[r[0]], r[2], r[3], r[4], r[5], r[6], r[7]], r[0] == "digit rule, as shipped")
               for r in table(ta, r"^\| reading \| hard case: tp / fp / fn")]
 
 # ---------------------------------------------------------------- judge independence
@@ -217,7 +222,12 @@ pairs = one(r"items read by two experts; their agreement; Cohen's kappa \| 150; 
             r"items read by two experts; their agreement; Cohen's kappa \| 100; (0\.\d+); (0\.\d+) \|", er)
 gold_ok = one(r"\| scored correct at all three tolerances \| (\d+) of (\d+) \|", sv)
 no_ms = one(r"\| every milestone found \| (\d+); (\d+) items have no milestones \|", sv)
-sep = [float(r.split(" & ")[4].rstrip(" \\")) for r in grid_rows if " & yes & " in r and not r.startswith("2")]
+sep = [float(r[4]) for r in grid if r[1] == "yes" and r[0] != "2%"]  # with unit factors, 0.2% to 1%
+sep_gain = [r[0] for r in grid if r[1] == "yes" and float(r[4]) > float(next(o[4] for o in grid if o[0] == r[0]
+                                                                              and o[1] == "no"))]
+assert sep_gain == ["0.5%", "0.2%"], sep_gain  # "raise the separation at 0.5% and below"
+assert all(float(r[2]) > float(next(o[2] for o in grid if o[0] == r[0] and o[1] == "no"))
+           for r in grid if r[1] == "yes")  # "raise coverage at every tolerance"
 caught = [int(re.match(r"\\texttt\{[^}]+\} & (\d+) of", r).group(1)) for r in planted_rows]
 assert gold_ok[0] == gold_ok[1] and decides[2] == "three" and sampled[0] == "75", (gold_ok, decides, sampled)
 
@@ -234,11 +244,11 @@ scoring = [
     f"On the {thousands(gold_ok[1])} gold traces, the check scores every instance correct",
     f"the {no_ms[1]} instances without a milestone",
     f"it is {held[0][1]}, and on the other half {held[1][1]}", f"{held[0][3]} and {held[1][3]}",
-    f"{min(sep):.3f} to {max(sep):.3f} between 0.2\\% and 1\\%",
-    f"{settled[0]} of the {thousands(settled[1])} milestones", f"the judge decides {settled[2]}",
+    f"{min(sep):.3f} to {max(sep):.3f} from 0.2\\% to 1\\%",
+    f"{settled[0]} of the {thousands(settled[1])} milestones", f"the judge decides the other {settled[2]}",
     f"{pct(min(judged))} to {pct(max(judged))} of milestones",
     f"rules {fv[2]} of the 88 not needed", f"rules {tv[1]} of the 88 true values missing",
-    f"none of the {thousands(gold[0])} calculations in their {thousands(gold[1])} steps",
+    f"none of the {thousands(gold[0])} calculations it reads in their {thousands(gold[1])} steps",
     f"precision {rn[2]} and recall {rn[3]} over all steps, and {rc[2]} and {rc[3]}",
     f"catches {batched[2]} of {batched[1]}", f"{batched[3]} false alarms on the {batched[4]} untouched steps",
 ] + judge_rows + grid_rows + arith_rows
