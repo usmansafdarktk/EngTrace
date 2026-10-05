@@ -5,16 +5,21 @@
 \label{subsec:setup}
 
 \paragraph{Models.}
-We evaluate eleven LLMs: eight open-weights models (\texttt{DeepSeek V4.1 Flash},
-\texttt{Gemma 4 26B}, \texttt{GLM-5.3}, \texttt{GLM-5.3-Flash}, \texttt{gpt-oss-20b},
-\texttt{Kimi K3}, \texttt{Muse Glimmer 30B}, and \texttt{Qwen3-235B-2507}) and three closed models
-(\texttt{Claude Sonnet 5}, \texttt{Gemini 3.1 Flash-Lite}, and \texttt{GPT-5.4 mini}).
+We evaluate eleven LLMs.
+The eight open-weights models are \texttt{DeepSeek V4.1 Flash}~\citep{deepseekv41},
+\texttt{Gemma 4 26B}~\citep{gemma4}, \texttt{GLM-5.3}~\citep{glm5},
+\texttt{GLM-5.3-Flash}~\citep{glm5}, \texttt{gpt-oss-20b}~\citep{gptoss},
+\texttt{Kimi K3}~\citep{kimik3}, \texttt{Muse Glimmer 30B}~\citep{museglimmer}, and
+\texttt{Qwen3-235B-2507}~\citep{qwen3}.
+The three closed models are \texttt{Claude Sonnet 5}~\citep{claudesonnet5},
+\texttt{Gemini 3.1 Flash-Lite}~\citep{gemini31flashlite}, and \texttt{GPT-5.4 mini}~\citep{gpt54}.
 One rule selects them: no model that wrote responses for the expert study
 (\autoref{sec:evaluation}) and no model we use as a judge, so that the evaluator is validated on
 other models' responses and no model judges its own.
 Flagship models are either excluded by this rule or left out for cost; two flagships that the rule
-admits, \texttt{GPT-5.4} and \texttt{DeepSeek V4 Pro}, serve as anchors on a fixed subset of 450
-instances (three per template) that the further conditions below also use.
+admits, \texttt{GPT-5.4}~\citep{gpt54} and \texttt{DeepSeek V4 Pro}~\citep{deepseekv4}, serve as
+anchors on a fixed subset of 450 instances (three per template) that the further conditions below
+also use.
 
 \paragraph{Decoding and Prompt.}
 Each model answers each instance once, 24,750 responses in all, at its provider's default decoding

@@ -33,6 +33,13 @@ NAME = {
     "gemma-4-26b-a4b": "Gemma 4 26B", "gpt-5.4-mini": "GPT-5.4 mini", "gpt-oss-20b": "gpt-oss-20b",
     "gpt-5.4": "GPT-5.4", "deepseek-v4-pro": "DeepSeek V4 Pro",
 }
+CITE = {  # each model's source in overleaf_source_04102026/custom.bib, checked by hand against the developer's page
+    "deepseek-v4.1-flash": "deepseekv41", "gemma-4-26b-a4b": "gemma4", "glm-5.3": "glm5", "glm-5.3-flash": "glm5",
+    "gpt-oss-20b": "gptoss", "kimi-k3": "kimik3", "muse-glimmer-30b": "museglimmer", "qwen3-235b-a22b-2507": "qwen3",
+    "claude-sonnet-5": "claudesonnet5", "gemini-3.1-flash-lite": "gemini31flashlite", "gpt-5.4-mini": "gpt54",
+    "gpt-5.4": "gpt54", "deepseek-v4-pro": "deepseekv4",
+}
+BIB = HERE.parent / "overleaf_source_04102026" / "custom.bib"
 WORD = {2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine", 10: "ten",
         11: "eleven", 12: "twelve"}
 BITS = {"fp8": 8, "mxfp8": 8, "fp16": 16, "bf16": 16, "fp32": 32}
@@ -42,8 +49,8 @@ def tt(key: str) -> str:
     return rf"\texttt{{{NAME[key]}}}"
 
 
-def series(keys: list[str]) -> str:
-    names = [tt(k) for k in keys]
+def series(keys: list[str], cite: bool = False) -> str:
+    names = [tt(k) + (rf"~\citep{{{CITE[k]}}}" if cite else "") for k in keys]
     return names[0] if len(names) == 1 else ", ".join(names[:-1]) + ", and " + names[-1]
 
 
@@ -122,10 +129,11 @@ assert len(res["q1"]["pairs"]) == comb(len(roster), 2)
 assert all(m["sd_advanced"] > m["sd_easy"] for m in res["q2"]), "Advanced templates vary more than Easy ones"
 
 phrases = [
-    f"We evaluate {WORD[len(roster)]} LLMs: {WORD[len(open_)]} open-weights models ({series(open_)}) and "
-    f"{WORD[len(closed)]} closed models ({series(closed)})",
-    f"{WORD[len(anchors)]} flagships that the rule admits, {series(anchors).replace(', and ', ' and ')}, serve as "
-    f"anchors on a fixed subset of {subset} instances "
+    f"We evaluate {WORD[len(roster)]} LLMs.",
+    f"The {WORD[len(open_)]} open-weights models are {series(open_, cite=True)}.",
+    f"The {WORD[len(closed)]} closed models are {series(closed, cite=True)}.",
+    f"{WORD[len(anchors)]} flagships that the rule admits, {series(anchors, cite=True).replace(', and ', ' and ')}, "
+    f"serve as anchors on a fixed subset of {subset} instances "
     f"({WORD[subset // len(per_template)]} per template) that the further conditions below also use",
     f"Each model answers each instance once, {thousands(rows)} responses in all, at its provider's default decoding "
     "settings: we set no sampling parameters",
@@ -134,7 +142,8 @@ phrases = [
     f"every open-weights model runs at {min_bits}-bit floating-point precision or higher",
     f"{WORD[len(no_reasoning)]} models return no reasoning tokens ({series(no_reasoning)}, "
     f"{WORD[closed_without]} of the {WORD[len(closed)]} closed models), while the other {WORD[len(reasoning)]} write "
-    f"a median of {thousands(half_up(min(medians)))} to {thousands(half_up(max(medians)))} reasoning tokens per response",
+    f"a median of {thousands(half_up(min(medians)))} to {thousands(half_up(max(medians)))} reasoning tokens per "
+    "response",
     f"{unusable} responses ({100 * unusable / rows:.1f}\\%) contain no readable final answer and score 0; {empty} of "
     "them are empty, almost all at the output ceiling",
     f"the {k_inst} instances of a template share one derivation",
@@ -170,13 +179,19 @@ if "--check" in sys.argv:
     known_words = {w.lower() for w in NUMBER_WORDS.findall(prose(" ".join(phrases)))}
     stray = sorted(set(numbers(prose(tex))) - known_numbers)
     stray_words = sorted({w.lower() for w in NUMBER_WORDS.findall(prose(tex))} - known_words)
+    bib_keys = set(re.findall(r"@\w+\{([^,\s]+),", BIB.read_text(encoding="utf-8")))
+    cited = {k.strip() for c in re.findall(r"\\cite[pt]\{([^}]*)\}", tex) for k in c.split(",")}
+    unresolved = sorted(cited - bib_keys)
+    for k in unresolved:
+        print(f"UNRESOLVED citation: {k}")
     for p in missing:
         print(f"MISSING in {TEX.name}: {p}")
     for n in stray + stray_words:
         print(f"NOT GENERATED: {n}")
     print(f"{len(phrases) - len(missing)} of {len(phrases)} phrases present; "
           f"{len(stray) + len(stray_words)} numbers not generated")
-    sys.exit(1 if missing or stray or stray_words else 0)
+    print(f"{len(cited) - len(unresolved)} of {len(cited)} citation keys resolve in {BIB.name}")
+    sys.exit(1 if missing or stray or stray_words or unresolved else 0)
 
 for p in phrases:
     print(p)

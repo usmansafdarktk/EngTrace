@@ -7390,15 +7390,26 @@ The authors asked for the setup only (the section heading and 5.1); the results 
   alphabetically within open-weights and closed, so the setup implies no order.
 - **Empty responses at the ceiling** are counted from two recorded figures per model (rows with finish reason
   `length` minus the capped responses scored on their text): 241 of the 243, which the text calls "almost all".
-- **Bibliography.** Miller (2024), Efron and Tibshirani (1993), Dror et al. (2018), Welch (1947) and Holm (1979) are
-  added under `% Experiments`, to check by hand. The evaluated models are not cited: no verified entries exist for
-  this roster (the May bibliography's model cards are for other versions); open row below.
+- **Bibliography, statistics.** Miller (2024), Efron and Tibshirani (1993), Dror et al. (2018), Welch (1947) and
+  Holm (1979) are under `% Experiments`, each checked on 2026-10-05 against its record: the arXiv page (Miller, no
+  published version), the ACL Anthology BibTeX (Dror et al.), JSTOR and the DOI resolver (Welch, JSTOR 2332510, DOI
+  registered; Holm, JSTOR 4615733, no DOI), and the DOI resolver for the book (10.1007/978-1-4899-4541-9, added).
+- **Bibliography, models (the authors, 2026-10-05: cite every model, as the May version did).** Each model cites its
+  developer's own document, checked the same day on the developer's or arXiv's page: the technical reports of
+  DeepSeek-V4.1-Flash (arXiv 2609.19969), Gemma 4 (2607.02770), Kimi K3 (2607.24653), Qwen3 (2505.09388, which the
+  2507 checkpoint's model card cites), gpt-oss (2508.10925) and DeepSeek-V4 (2606.19348, the anchor DeepSeek V4 Pro;
+  the May key `deepseekv4`, now with its arXiv record); GLM-5.3 and GLM-5.3-Flash have no report of their own and
+  their Hugging Face model cards ask for the GLM-5 report (2602.15763); Muse Glimmer 30B has only its model card
+  (Hugging Face, Meta); the closed models cite the Claude Sonnet 5 system card (Anthropic, 30 June 2026), the Gemini
+  3.1 Flash-Lite model card (Google DeepMind, March 2026), and the GPT-5.4 Thinking system card (OpenAI, March 2026),
+  whose appendix covers GPT-5.4 mini and which also serves for the anchor GPT-5.4. No `month` fields, per the
+  writing rules; `paper_setup.py --check` now also fails on an unresolved key and checks each model's key.
 
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
-| D-190 | Whether Section 5.1 cites the eleven evaluated models' model cards or technical reports (no verified entries yet; the served identifiers go to Appendix H) | the paper's Section 5.1 |
+| D-190 | ~~Whether Section 5.1 cites the eleven evaluated models' model cards or technical reports~~ **Decided 2026-10-05 by the authors: every model is cited; entries checked against the developers' pages (D-190)** | — |
 | D-185 | Whether to add the sensitivity with the check's partial verdicts counted as correct on the eleven symbolic-answer templates the experts' reading flagged (free, `analyze.py`), and whether the paper's tables mark those templates | the paper's evaluator and limitations sections |
 | D-186 | The authors' remaining calls, carried where they apply in `docs/PAPER_PLAN_OCT2026.md` since its 2026-10-04 revision removed the decisions section: the anonymised archive and the experts' labels (Appendix N entry); ~~the colleague's description~~ **settled by D-188: domain experts wrote every branch's templates, no separate description**; the primary textbook per domain for civil and industrial (the Appendix B entry; the taxonomy question was decided 2026-10-04: no panel run, the procedure stated as it was); strict or partial-credit accuracy and the coverage name (section 4); LPDS and the title (section 2) | the paper text |
 | D-184 | ~~Approve the tool arm's calibration (`run_traces --variant tool --calibrate 20 --yes`, about $1.50) and then the run at a cap ($20 to $54 by the dry run's multipliers, plus E5 about $1.20), or state the open-book bound and leave the tool unrun~~ **Approved and run 2026-10-03 for Claude Sonnet 5 and GPT-5.4 mini ($12.80 with E5); gpt-oss-20b not servable through the admitted endpoints** | — |
