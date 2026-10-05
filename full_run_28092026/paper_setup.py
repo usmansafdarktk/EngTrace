@@ -213,25 +213,20 @@ mc_templates = res["q3_coverage"]["templates"]
 phrases = [  # Section 5.1
     f"We evaluate {WORD[len(roster)]} LLMs: {WORD[len(open_)]} open-weights models, {series(open_, cite=True)}; and "
     f"{WORD[len(closed)]} closed models, {series(closed, cite=True)}.",
-    "One rule selects them: no model whose responses we used to develop or validate the evaluator",
-    f"For cost, {WORD[len(anchors)]} flagships the rule admits, {series(anchors, cite=True)}, run only as anchors on "
-    f"a fixed subset of {subset} instances ({WORD[subset // len(per_template)]} per template), which the further "
-    "conditions also use",
-    f"Each model answers each instance once ({thousands(rows)} responses) with the same zero-shot prompt",
-    f"We set no sampling parameters, so each model decodes at its provider's defaults, with an output ceiling of "
-    f"{thousands(ceiling)} tokens ({thousands(lower['muse-glimmer-30b'])} for {tt('muse-glimmer-30b')}, the most "
-    "its endpoint allows)",
+    "None of them wrote responses that we used to develop or validate the evaluator",
+    f"For cost, {WORD[len(anchors)]} flagships, {series(anchors, cite=True)}, run only as anchors on a fixed subset "
+    f"of {subset} instances ({WORD[subset // len(per_template)]} per template), which the further conditions also "
+    "use",
+    f"Each model answers each instance once ({thousands(rows)} responses) with the same zero-shot prompt and no "
+    f"tools or retrieval, at its provider's default decoding settings and an output ceiling of {thousands(ceiling)} "
+    f"tokens ({thousands(lower['muse-glimmer-30b'])} for {tt('muse-glimmer-30b')})",
     f"{WORD[len(no_reasoning)]} models return no reasoning tokens ({series(no_reasoning)}, "
     f"{WORD[closed_without]} of the {WORD[len(closed)]} closed models), so the models are not compared at equal "
     "reasoning effort",
     f"{unusable} responses ({100 * unusable / rows:.1f}\\%) have no readable final answer and score 0, almost all "
     "of them empty at the output ceiling",
     f"because its {k_inst} instances share one derivation",
-    f"every {level}\\% interval is therefore a bootstrap over templates",
-    "because scores vary more across Advanced templates",
-    f"such as the {comb(len(roster), 2)} pairs of models",
-    f"keeps the probability of any false positive at {round(100 * sig)}\\% or less, and we report every "
-    f"non-significant difference with the smallest difference the design detects at {power}\\% power",
+    f"every {level}\\% interval is a bootstrap over templates",
 ]
 appendix_phrases = [  # appendices/models.tex
     f"It excludes the {WORD[len(study)]} models of the expert study ({listing([ttn(s) for s in study])}), "
@@ -258,6 +253,7 @@ appendix_phrases = [  # appendices/models.tex
     f"Every {level}\\% interval is a percentile bootstrap that resamples templates {thousands(B)} times",
     f"where we bound a change, we also give its {level90}\\% interval",
     f"a sign-flip permutation test with {thousands(B_TEST)} sign flips",
+    "because scores vary more across Advanced templates",
     f"its mean on the {levels['Easy']} Easy templates minus its mean on the {levels['Advanced']} Advanced ones",
     f"such as the {comb(len(roster), 2)} pairs of models for each measure or the {WORD[len(roster)]} level gaps",
     f"at {power}\\% power and a two-sided level of {sig:.2f} is ${factor}\\,s/\\sqrt{{n}}$",

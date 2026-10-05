@@ -60,7 +60,7 @@ vocabulary) are in `docs/PAPER_PLAN_OCT2026.md`, section 8; this file covers for
   and `6_results.tex` (results and error analysis), which `6_experiments_results.tex` inputs, so `main.tex` keeps
   `\input{sections/6_experiments_results}`; the wrapper compiles once `6_results.tex` exists.
 - A `\paragraph{}` heading and the first sentence of its paragraph share a source line (the authors, 2026-10-05;
-  Section 5 and its appendix so far, the earlier sections still start the text on the next line).
+  Section 5's appendix so far, the earlier sections still start the text on the next line).
 - In the `.tex` files every sentence starts on a new line and wraps at 100 characters, never inside a citation,
   reference or `\textsc{}` name; changes then show sentence by sentence, and LaTeX still prints one paragraph.
   Text copied verbatim from the May appendix (prompt boxes, the parameterization bullets) keeps its original
@@ -74,12 +74,14 @@ vocabulary) are in `docs/PAPER_PLAN_OCT2026.md`, section 8; this file covers for
 Labels used before their sections exist. Each must be defined when its section is written, or the reference prints
 "??" in the PDF.
 
-- Defined in `6_experiments.tex`: `sec:experiments` and `subsec:setup` (models, decoding and prompt, statistical
-  protocol); every number in it comes from `full_run_28092026/paper_setup.py`, whose `--check` must pass.
-- Defined in `appendices/models.tex`: `appendix:models` (selection; tables `tab:models`, in the May layout, and
-  `tab:decoding`), `appendix:prompt` (the inference prompt exactly as the run sent it) and `appendix:protocol` (the
-  statistical protocol in full). `full_run_28092026/paper_setup.py --check` checks every number, table row and
-  identifier, and that the prompt box is the template every response used.
+- Defined in `6_experiments.tex`: `sec:experiments`, `subsec:models` (the evaluated model suite) and `subsec:setup`
+  (the experimental setup), one paragraph each with no paragraph headings (the authors, 2026-10-05); every number in
+  it comes from `full_run_28092026/paper_setup.py`, whose `--check` must pass.
+- Defined in `appendices/models.tex`: `appendix:models` (the selection rule; table `tab:models`, in the May layout)
+  and `appendix:setup`, whose subsections are `appendix:decoding` (table `tab:decoding`), `appendix:prompt` (the
+  inference prompt exactly as the run sent it, and output processing) and `appendix:protocol` (the statistical
+  protocol in full). `full_run_28092026/paper_setup.py --check` checks every number, table row and identifier, and
+  that the prompt box is the template every response used.
 - Defined: `sec:intro`, `sec:related`, `sec:benchmark`, `subsec:taxonomy`, `subsec:templates`,
   `subsec:certification`, `fig:engtrace-overview` (the five-branch figure, `figs/engtrace-overview-5branch.pdf`),
   `fig:template-generation` (May's pipeline figure, `figs/template-generation.pdf`).

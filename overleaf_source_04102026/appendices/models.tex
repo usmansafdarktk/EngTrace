@@ -2,8 +2,8 @@
 \section{Evaluated Models}
 \label{appendix:models}
 
-\paragraph{Selection.} One rule selects the evaluated models (\autoref{subsec:setup}): no model
-whose responses we used to develop or validate the evaluator, and no model we use as a judge.
+One rule selects the evaluated models (\autoref{subsec:models}): no model whose responses we used to
+develop or validate the evaluator, and no model we use as a judge.
 It excludes the five models of the expert study (\texttt{GPT-5}, \texttt{Claude Opus 4.7},
 \texttt{Gemini 3.1 Pro}, \texttt{DeepSeek-R1}, and \texttt{Llama 3.1 70B}), two models whose
 responses we used to check the evaluator on smaller open-weights models (\texttt{Gemma 4 31B} and
@@ -64,8 +64,15 @@ the Hugging Face repository of an open-weights model.}
 \label{tab:models}
 \end{table*}
 
-\paragraph{Serving and Decoding.} We query every model through OpenRouter, and each request
-carries the prompt (\autoref{appendix:prompt}), the output ceiling, and routing preferences only,
+% -------------
+\section{Experimental Setup}
+\label{appendix:setup}
+
+\subsection{Decoding and Token Use}
+\label{appendix:decoding}
+
+We query every model through OpenRouter, and each request carries the prompt
+(\autoref{appendix:prompt}), the output ceiling, and routing preferences only,
 with no temperature, top-p, or reasoning setting, so each model decodes at its provider's defaults.
 OpenRouter sends each open-weights model to the cheapest provider that serves it at 8-bit
 floating-point precision or higher, and to the next one when a request fails, so the responses of
@@ -123,11 +130,9 @@ the responses without a readable final answer, and the cost billed.}
 \end{table*}
 
 
-% -------------
-\section{Inference Prompt and Output Processing}
+\subsection{Inference Prompt and Output Processing}
 \label{appendix:prompt}
 
-\subsection{Standardized Inference Prompt}
 To ensure consistent and parsable outputs across all models, we use a standardized zero-shot prompt,
 sent as a single user message with the instance's question in place of \texttt{\{question\}}.
 This prompt explicitly instructs the model to structure its response with specific headings and to
@@ -169,15 +174,13 @@ Problem:
 \end{verbatim}
 \end{quote}
 
-\subsection{Output Processing}
 The final-answer check does not require the prompt's format: it reads the answer after the last
 final-answer heading or the \texttt{**Answer:**} marker, and still reads a response that has
 neither, while milestone matching and the arithmetic check read the whole response
 (\autoref{appendix:scoring}).
 
 
-% -------------
-\section{Statistical Protocol}
+\subsection{Statistical Protocol}
 \label{appendix:protocol}
 
 \paragraph{Unit and Intervals.} The template is the unit of analysis (\autoref{subsec:setup}).

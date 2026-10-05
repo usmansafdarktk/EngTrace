@@ -7441,6 +7441,11 @@ the May style and every value verified. Choices:
   expert study's five, and points to the three sections. Tightened the same day at the authors' request (403 to 328
   words): the serving precision, the reasoning-token medians, the bootstrap and sign-flip counts, and the reason
   after the selection rule are left to the appendix, which states each.
+- **Restructured the same day at the authors' request.** Section 5's setup is two subsections, Evaluated Model
+  Suite (`subsec:models`) and Experimental Setup (`subsec:setup`), one paragraph each with no paragraph headings
+  (252 words; Welch's test, the Holm explanation and the detectable differences now only in the appendix). The
+  appendix is two sections to match, Evaluated Models and Experimental Setup, the second with subsections for
+  decoding and token use, the inference prompt, and the statistical protocol, which the setup names one by one.
 
 ## Open decisions
 
