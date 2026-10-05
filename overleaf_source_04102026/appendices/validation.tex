@@ -47,15 +47,15 @@ it that the study detects in the area under the ROC curve (AUROC) at the respons
 
 We compare six evaluator designs on these labels.
 \begin{itemize}
-    \item \textbf{Step matching, panel from evaluated families}: matches the response's steps to the
-    gold steps by numerical agreement and semantic similarity; when the final answer is correct but
-    fewer than 80\% of the gold steps match, and for a random fifth of wrong answers, it sends the
+    \item \textbf{Step matching with in-family judges}: matches the response's steps to the gold
+    steps by numerical agreement and semantic similarity; when the final answer is correct but fewer
+    than 80\% of the gold steps match, and for a random fifth of wrong answers, it sends the
     unmatched steps to a panel of three LLM judges from evaluated families (\texttt{GPT-5},
     \texttt{Claude Opus 4.5}, and \texttt{Gemini 3.1 Pro}); it scores the steps that match or that
     the panel accepts as an F1 against the gold steps. We run it with two and with all three judges
     voting.
-    \item \textbf{Step matching, panel from outside the evaluated families}: the same design with
-    \texttt{Grok 4.6}, \texttt{MiniMax M3}, and \texttt{MiMo-V2.5-Pro} as the judges.
+    \item \textbf{Step matching with outside judges}: the same design with judges from outside the
+    evaluated families, \texttt{Grok 4.6}, \texttt{MiniMax M3}, and \texttt{MiMo-V2.5-Pro}.
     \item \textbf{Process reward models}: three open-weights models that assign each step a reward,
     \texttt{Qwen2.5-Math-PRM-72B} and \texttt{Qwen2.5-Math-PRM-7B}~\citep{zhang2025prmlessons} and
     \texttt{VersaPRM}~\citep{zeng2025versaprm}; a step with a reward below 0.5 counts as incorrect.
