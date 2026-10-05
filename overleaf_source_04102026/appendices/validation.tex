@@ -45,15 +45,27 @@ it that the study detects in the area under the ROC curve (AUROC) at the respons
 
 \subsection{Evaluator Designs Compared}
 
-We compare seven designs on these labels: a step-matching design, which aligns the response's steps
-with the gold steps by semantic similarity and numerical agreement and sends the steps it cannot
-align to a panel of LLM judges from evaluated families (\texttt{GPT-5}, \texttt{Claude Opus 4.5},
-and \texttt{Gemini 3.1 Pro}), with two and with all three judges voting; the same design with a
-panel from outside the evaluated families (\texttt{Grok 4.6}, \texttt{MiniMax M3}, and
-\texttt{MiMo-V2.5-Pro}); three process reward models (\texttt{Qwen2.5-Math-PRM-72B} and
-\texttt{Qwen2.5-Math-PRM-7B}~\citep{zhang2025prmlessons}, and
-\texttt{VersaPRM}~\citep{zeng2025versaprm}); milestone matching; matching with the arithmetic
-check; and matching with the judge.
+We compare six evaluator designs on these labels.
+\begin{itemize}
+    \item \textbf{Step matching with a panel of LLM judges}: aligns the response's steps with the
+    gold steps by semantic similarity and numerical agreement, sends the steps it cannot align to a
+    panel of three LLM judges from evaluated families (\texttt{GPT-5}, \texttt{Claude Opus 4.5}, and
+    \texttt{Gemini 3.1 Pro}), and scores the share of gold steps recovered; we run it with two and
+    with all three judges voting.
+    \item \textbf{Step matching with an outside panel}: the same design with judges from outside the
+    evaluated families (\texttt{Grok 4.6}, \texttt{MiniMax M3}, and \texttt{MiMo-V2.5-Pro}).
+    \item \textbf{Process reward models}: three models that score every step,
+    \texttt{Qwen2.5-Math-PRM-72B} and \texttt{Qwen2.5-Math-PRM-7B}~\citep{zhang2025prmlessons} and
+    \texttt{VersaPRM}~\citep{zeng2025versaprm}.
+    \item \textbf{Milestone matching}: the deterministic matching of~\autoref{sec:evaluation},
+    without the judge.
+    \item \textbf{Matching with the arithmetic check}: milestone matching together with the
+    arithmetic check of every displayed calculation.
+    \item \textbf{Matching with the judge}: milestone matching, with the judge deciding the
+    milestones that matching misses.
+\end{itemize}
+The evaluator of~\autoref{sec:evaluation} combines the last three designs with the judged step
+check, which we validate on the same labels.
 \autoref{tab:evaluator_comparison} gives the agreement of each component with the experts: the
 final-answer check and milestone matching with the judge agree closely with them, whereas the
 step-level checks find at most 0.603 of the steps that the experts mark incorrect, which is why we
