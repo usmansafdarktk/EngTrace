@@ -7485,6 +7485,20 @@ The plan's sections 5.2 and 5.3 and Appendices I to L, written to the plan's bud
 - **Added to `custom.bib`** under "% Results": Kendall 1938, Spearman 1904, Wilcoxon 1945, McNemar 1947 and Piepho
   2004, typed from the published versions; to be checked by hand as every entry is.
 
+*Revised the same day at the authors' request.* The Results keep the May structure: three numbered subsubsections of
+one or two paragraphs each (Overall Model Performance with Table 1, which also carries one sentence per further
+result with its appendix pointer: coverage on wrong answers, the diagnostics, the paraphrase bound, the conditions;
+Performance by Engineering Branch and Domain; Performance by Difficulty Level with the level-gap figure, which also
+takes the depth result), then Error Analysis with its figure and two paragraphs without run-in headings (942 and 340
+words against 1,669 and 349). The paraphrase experiment is called "paraphrase" throughout, never "rewording":
+`appendices/rewording.tex` became `appendices/paraphrase.tex` (label `appendix:paraphrase`, title "Paraphrase Test").
+Two figures in the main text (the level gap per model, the error categories) and seven in the appendix (FAC and MC
+with intervals and tier letters; the pairs that separate, as a matrix; coverage on wrong answers against the floor;
+wrong-answer rate at one against six or more milestones; consistency within a template; the paraphrase change
+against the margin; the conditions against the margin), all drawn by `paper_results.py --write` in one hue with
+marker fill as the second encoding, so they read in greyscale. Every statement that left the main text is in the
+appendix prose, and the check passes on all five files.
+
 ## Open decisions
 
 | # | Decision | Needed before |

@@ -4,26 +4,37 @@
 
 This section supports the Results of~\autoref{subsec:results} with the measures in full and every
 comparison behind them: the extended tables (\autoref{tab:results_answer}
-and~\autoref{tab:results_process}), the pairwise comparisons (\autoref{tab:pairs_fac}
-and~\autoref{tab:pairs_mc}), the branch, level, domain, and answer-kind means
-(\autoref{tab:by_branch} to~\autoref{tab:by_domain_kind}), the level gap under its variations
-(\autoref{tab:level_gap}), the sensitivity analyses (\autoref{tab:sensitivity}), consistency and
-instance variance (\autoref{tab:consistency} and~\autoref{tab:instance_variance}), failure against
-depth (\autoref{tab:depth}), the decoding repeats (\autoref{tab:repeats}), completion tokens
-(\autoref{tab:tokens}), and the coverage and diagnostic details (\autoref{tab:coverage_wrong}
-to~\autoref{tab:attribution}).
+and~\autoref{tab:results_process}) with their figure (\autoref{fig:scores}), the pairwise
+comparisons (\autoref{tab:pairs_fac}, \autoref{tab:pairs_mc}, and~\autoref{fig:pairs}), the branch,
+level, domain, and answer-kind means (\autoref{tab:by_branch} to~\autoref{tab:by_domain_kind}), the
+level gap under its variations (\autoref{tab:level_gap}), the sensitivity analyses
+(\autoref{tab:sensitivity}), consistency and instance variance (\autoref{tab:consistency},
+\autoref{fig:consistency}, and~\autoref{tab:instance_variance}), failure against depth
+(\autoref{tab:depth} and~\autoref{fig:depth}), the decoding repeats (\autoref{tab:repeats}),
+completion tokens (\autoref{tab:tokens}), and the coverage and diagnostic details
+(\autoref{tab:coverage_wrong} to~\autoref{tab:attribution}, with~\autoref{fig:coverage_wrong}).
 Every interval resamples the 150 templates, every family of tests is Holm-corrected, and every
 non-significant difference carries the smallest difference the design detects at 80\% power
 (\autoref{appendix:protocol}).
 
 \subsection{Scores and Pairwise Comparisons}
 \autoref{tab:results_answer} extends the main table on the answer side
-and~\autoref{tab:results_process} on the process side.
+and~\autoref{tab:results_process} on the process side, and~\autoref{fig:scores} plots both measures
+with their intervals and tier letters.
 Strict FAC, which scores a partial answer 0, changes no conclusion: the pairwise test on it agrees
 with the test on FAC for 54 of the 55 pairs.
-\autoref{tab:pairs_fac} and~\autoref{tab:pairs_mc} list the 55 pairs for each measure: 32 of the 55
-pairs differ on FAC after correction, and 28 and 29 of the 55 pairs differ on MC under the sign-flip
-and the Wilcoxon test; every non-significant FAC difference lies below what its pair detects.
+Instances of a template mostly share one fate: 57 to 130 of the 150 templates per model have the
+same score on all 15 instances, and the variance across instances concentrates in a few templates
+(\autoref{tab:instance_variance}).
+\autoref{tab:pairs_fac} and~\autoref{tab:pairs_mc} list the 55 pairs for each measure,
+and~\autoref{fig:pairs} shows which pairs separate: 32 of the 55 pairs differ on FAC after
+correction, every non-significant FAC difference lies below what its pair detects (0.010 to 0.065),
+and 28 and 29 of the 55 pairs differ on MC under the sign-flip and the Wilcoxon test, which agree on
+52 pairs.
+On MC, the three highest models, \texttt{Claude Sonnet 5}, \texttt{Kimi K3}, and
+\texttt{GLM-5.3-Flash}, do not separate from one another, and coverage does not rise with the amount
+a model writes: Spearman's $\rho$~\citep{spearman1904} between a template's mean coverage and its
+mean number of steps is $-0.11$ to $-0.26$ for every model (\autoref{tab:coverage_verbosity}).
 
 % BEGIN GENERATED tab:results_answer (full_run_28092026/paper_results.py --write)
 \begin{table*}[t]
@@ -80,6 +91,24 @@ and the Wilcoxon test; every non-significant FAC difference lies below what its 
 \label{tab:results_process}
 \end{table*}
 % END GENERATED tab:results_process
+
+% BEGIN GENERATED fig:scores (full_run_28092026/paper_results.py --write)
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\columnwidth]{figs/scores.pdf}
+    \caption{\textbf{Final Answer Accuracy and Milestone Coverage with Intervals.} The values of~\autoref{tab:main_results} with their 95\% intervals; the letters are that table's tier letters, and models that share one do not differ after Holm correction.}
+    \label{fig:scores}
+\end{figure}
+% END GENERATED fig:scores
+
+% BEGIN GENERATED fig:pairs (full_run_28092026/paper_results.py --write)
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\columnwidth]{figs/pairs.pdf}
+    \caption{\textbf{Pairs That Separate After Correction.} Dark cells mark the pairs whose difference holds at a Holm-adjusted $p < 0.05$: Final Answer Accuracy above the diagonal (32 of 55 pairs) and Milestone Coverage below it (28 of 55); models in the order of~\autoref{tab:main_results}.}
+    \label{fig:pairs}
+\end{figure}
+% END GENERATED fig:pairs
 
 % BEGIN GENERATED tab:pairs_fac (full_run_28092026/paper_results.py --write)
 \begin{table*}[t]
@@ -366,10 +395,11 @@ Vector & 1.000 & 0.988 & 0.983 & 0.988 & 1.000 & 0.988 & 0.842 & 0.933 & 0.971 &
 \subsection{Sensitivity}
 \autoref{tab:sensitivity} gives FAC under each scoring variation and Kendall's $\tau$ between that
 ordering of the models and the ordering as scored.
-The ordering is unchanged without the four templates whose answers can be read off the question's
-wording and when a requested quantity stated in the body is credited, and it changes most when the
-responses with no readable answer are left out, because \texttt{GLM-5.3}'s 100 empty responses then
-stop counting.
+The ordering is unchanged at half and double the answer tolerance ($\tau = 0.927$), and FAC moves by
+at most 0.004 without the four templates whose answers can be read off the question's wording and by
+$-0.004$ to $+0.008$ without the nine symbolic-answer templates.
+The ordering changes most when the responses with no readable answer are left out, because
+\texttt{GLM-5.3}'s 100 empty responses then stop counting.
 
 % BEGIN GENERATED tab:sensitivity (full_run_28092026/paper_results.py --write)
 \begin{table*}[t]
@@ -403,14 +433,20 @@ $\tau$ with the scores as scored & 0.927 & 1 & 0.927 & 0.964 & 0.636 & 1.000 & 0
 % END GENERATED tab:sensitivity
 
 \subsection{Consistency, Instance Variance, Depth, Repeats, and Tokens}
-\autoref{tab:consistency} gives, for the 58 templates that follow one reasoning path and for the
-other 92, the share of templates a model solves on all 15 instances, on some, and on none.
-\autoref{tab:instance_variance} gives the variance of the score across a template's instances: most
-templates vary little, and the variance concentrates in a few templates, named in the table.
-\autoref{tab:depth} gives the wrong-answer rate by the number of milestones in the gold derivation,
-descriptive and without a test; the milestone count is the template's.
+\autoref{tab:consistency} and~\autoref{fig:consistency} give, for the 58 templates that follow one
+reasoning path and for the other 92, the share of templates a model solves on all instances, on
+some, and on none: the six strongest models solve all 15 instances of 84\% to 91\% of the
+single-path templates, whereas four of the five weakest solve all instances of 36\% to 48\% of them
+(\texttt{Gemini 3.1 Flash-Lite} 67\%) and some but not all instances of 48\% to 57\%; on a
+single-path template every instance follows the same method, so a partly solved template is a
+failure on the numbers, not the method.
+\autoref{tab:instance_variance} gives the variance of the score across a template's instances and
+names the templates that carry most of it.
+\autoref{tab:depth} and~\autoref{fig:depth} give the wrong-answer rate by the number of milestones
+in the gold derivation, descriptive and without a test; the milestone count is the template's.
 \autoref{tab:repeats} gives the decoding repeats of four models on 300 instances decoded three
-times; the other seven models have no decoding-variance figure.
+times: FAC has a standard deviation of 0.004 to 0.013 across repeats, and 86\% to 94\% of instances
+receive the same verdict every time; the other seven models have no decoding-variance figure.
 \autoref{tab:tokens} gives the median completion tokens by verdict.
 
 % BEGIN GENERATED tab:consistency (full_run_28092026/paper_results.py --write)
@@ -442,6 +478,15 @@ times; the other seven models have no decoding-variance figure.
 \label{tab:consistency}
 \end{table*}
 % END GENERATED tab:consistency
+
+% BEGIN GENERATED fig:consistency (full_run_28092026/paper_results.py --write)
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\columnwidth]{figs/consistency.pdf}
+    \caption{\textbf{Consistency Within a Template.} The share of templates whose 15 instances a model answers all correctly, some but not all, or none, for the 58 single-path templates and the other 92.}
+    \label{fig:consistency}
+\end{figure}
+% END GENERATED fig:consistency
 
 % BEGIN GENERATED tab:instance_variance (full_run_28092026/paper_results.py --write)
 \begin{table*}[t]
@@ -499,6 +544,15 @@ times; the other seven models have no decoding-variance figure.
 \end{table*}
 % END GENERATED tab:depth
 
+% BEGIN GENERATED fig:depth (full_run_28092026/paper_results.py --write)
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\columnwidth]{figs/depth.pdf}
+    \caption{\textbf{Wrong-Answer Rate Against the Depth of the Gold Derivation.} For each model, the share of instances answered wrong among those whose gold derivation has one milestone (hollow) and six or more (filled).}
+    \label{fig:depth}
+\end{figure}
+% END GENERATED fig:depth
+
 % BEGIN GENERATED tab:repeats (full_run_28092026/paper_results.py --write)
 \begin{table*}[t]
 \centering
@@ -549,16 +603,27 @@ times; the other seven models have no decoding-variance figure.
 % END GENERATED tab:tokens
 
 \subsection{Coverage and Diagnostics}
-\autoref{tab:coverage_wrong} gives the coverage of each model's wrong answers against its chance
-floor, with and without the judge, together with the share of wrong answers that reach every
-milestone and the share of correct answers that reach fewer than half; coverage leaves out the 70
-instances with no milestones.
-\autoref{tab:coverage_verbosity} gives the correlation of coverage with the amount written, which is
-negative and small for every model, and~\autoref{tab:diagnostics} the two flag rates with their
-intervals, the calculations read per response, and where the first flag falls.
-\autoref{tab:attribution} gives, for the answered wrong answers, the share with each kind of flag;
-the shares are of responses with a flag, read through each check's precision
-(\autoref{appendix:validation}), not diagnoses.
+\autoref{tab:coverage_wrong} and~\autoref{fig:coverage_wrong} give the coverage of each model's
+wrong answers against its chance floor, the same response matched against a sibling instance's
+milestones, with and without the judge: on readable wrong answers, matching alone finds 44\% to 81\%
+of the milestones against a floor of 10\% to 22\%, and 46\% to 85\% with the judge, the 85\% resting
+on the 7 wrong answers of \texttt{GLM-5.3}; among the five models with more than 100 wrong answers,
+13\% to 26\% of the wrong answers reach every milestone, a complete derivation to a wrong value.
+Coverage leaves out the 70 instances with no milestones.
+\autoref{tab:coverage_verbosity} gives the correlation of coverage with the amount written,
+and~\autoref{tab:diagnostics} the two flag rates with their intervals: the arithmetic check flags
+0.5\% to 22.5\% of correct-answer responses, at a precision of 0.905 on these models (171 of 189
+flags that a domain expert read were slips; \autoref{appendix:validation}), and the judged step
+check flags 1.1\% to 22.0\%, at a precision of 0.70 and a recall of 0.36 inside correct-answer
+responses in the expert study.
+These rates do not rank the models: the arithmetic check reads 2.8 to 9.8 displayed calculations per
+response, so \texttt{Qwen3-235B-2507}'s 22.5\% comes with 9.8 calculations per response and
+\texttt{DeepSeek V4.1 Flash}'s 0.5\% with 3.3, and with recall below one half a flag rate is neither
+a count of slips nor a share of correct answers that rest on flawed reasoning.
+\autoref{tab:attribution} gives, for the answered wrong answers, the share with each kind of flag: a
+milestone the judge rules missing in 14\% to 79\% of responses, a judged step flag in 14\% to 89\%,
+and an arithmetic flag in 0\% to 48\%, depending on the model; these are shares of responses with a
+flag, read through each check's precision, not diagnoses.
 
 % BEGIN GENERATED tab:coverage_wrong (full_run_28092026/paper_results.py --write)
 \begin{table*}[t]
@@ -588,6 +653,15 @@ the shares are of responses with a flag, read through each check's precision
 \label{tab:coverage_wrong}
 \end{table*}
 % END GENERATED tab:coverage_wrong
+
+% BEGIN GENERATED fig:coverage_wrong (full_run_28092026/paper_results.py --write)
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\columnwidth]{figs/coverage-wrong.pdf}
+    \caption{\textbf{Milestone Coverage on Wrong Answers Against the Chance Floor.} For each model's readable wrong answers, the chance floor (squares), the coverage by matching alone (hollow circles), and the coverage with the judge (filled circles); the number of wrong answers is at the right.}
+    \label{fig:coverage_wrong}
+\end{figure}
+% END GENERATED fig:coverage_wrong
 
 % BEGIN GENERATED tab:coverage_verbosity (full_run_28092026/paper_results.py --write)
 \begin{table*}[t]

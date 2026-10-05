@@ -2,10 +2,10 @@
 \section{Additional Conditions}
 \label{appendix:conditions}
 
-This section supports the last paragraph of the Results in~\autoref{subsec:results}: four
-conditions, each run after the main analysis on the originals of the 450-instance subset (three
-instances per template), each changing one thing while keeping the main run's prompt, output
-ceiling, and scoring, and each labeled exploratory (\autoref{appendix:protocol}).
+This section supports the last paragraph of~\autoref{subsec:overall_performance}: four conditions,
+each run after the main analysis on the originals of the 450-instance subset (three instances per
+template), each changing one thing while keeping the main run's prompt, output ceiling, and scoring,
+and each labeled exploratory (\autoref{appendix:protocol}).
 A condition is compared with its base run paired by instance: the mean change, a template bootstrap
 interval, a sign-flip test over templates with Holm correction across the models in the condition,
 the smallest paired change the condition detects at 80\% power, and the 90\% interval against the
@@ -50,14 +50,20 @@ our provider rule admits dropped \texttt{gpt-oss-20b}'s tool calls or rate-limit
 the open-weights tier is absent from this condition.
 
 \paragraph{Results.}
-\autoref{tab:conditions} gives every condition against its base run, and~\autoref{tab:anchors} the
-anchors beside the evaluated models.
+\autoref{tab:conditions} gives every condition against its base run, \autoref{fig:conditions} plots
+the changes against the margin, and~\autoref{tab:anchors} places the anchors beside the evaluated
+models.
 Reasoning at medium effort moves \texttt{GPT-5.4 mini} by 0.093 (95\% CI 0.056 to 0.133) and
-\texttt{Gemini 3.1 Flash-Lite} by less than the condition detects; the two flagships do not exceed
-the top tier; the governing equations lift \texttt{gpt-oss-20b}, partly through fewer responses
-running out of room, and leave the two closed models within the margin, while MC rises for all three
-because the supplied equations prompt the responses to state the intermediates; and the tool changes
-neither closed model beyond the margin.
+\texttt{Gemini 3.1 Flash-Lite} by less than the condition detects.
+Neither flagship exceeds the top tier: the top five on the same instances score 0.964 to 0.976, with
+intervals that contain both reasoning anchors, and on Advanced templates 0.92 to 0.95 against the
+anchors' 0.87 to 0.95.
+The governing equations lift \texttt{gpt-oss-20b} by 0.064 (95\% CI 0.027 to 0.104), partly because
+fewer responses run out of room (0.043 on the instances answered in both runs), and leave the two
+closed models within the margin, while MC rises by 0.03 to 0.06 for all three because the supplied
+equations prompt the responses to state the intermediates.
+The tool changes neither closed model beyond the margin, and \texttt{GPT-5.4 mini}'s arithmetic
+flags on correct answers fall from 0.127 to 0.093.
 No condition says where the remaining errors lie; that is the question the expert reading
 of~\autoref{subsec:error_analysis} answers.
 
@@ -86,6 +92,15 @@ Reasoning at medium effort & \texttt{GPT-5.4} & 450 & 0.941 & 0.980 & $+0.039$ &
 \label{tab:conditions}
 \end{table*}
 % END GENERATED tab:conditions
+
+% BEGIN GENERATED fig:conditions (full_run_28092026/paper_results.py --write)
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\columnwidth]{figs/conditions.pdf}
+    \caption{\textbf{Change in Final Answer Accuracy Under Each Condition.} Condition minus base run on the 450-instance subset, with 95\% intervals against the shaded $\pm 0.05$ margin; filled markers mark the changes that hold after Holm correction within the condition.}
+    \label{fig:conditions}
+\end{figure}
+% END GENERATED fig:conditions
 
 % BEGIN GENERATED tab:anchors (full_run_28092026/paper_results.py --write)
 \begin{table*}[t]

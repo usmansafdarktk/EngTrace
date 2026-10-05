@@ -1,26 +1,28 @@
-"""Generate the tables, the figure and the numbers of the paper's Results and Error Analysis (Sections 5.2 and 5.3) and
+"""Generate the tables, the figures and the numbers of the paper's Results and Error Analysis (Sections 5.3 and 5.4) and
 their appendices, and check them in the source.
 
     python full_run_28092026/paper_results.py           # print the phrases the prose must contain
-    python full_run_28092026/paper_results.py --write   # rewrite every generated block in the .tex files and draw the figure
+    python full_run_28092026/paper_results.py --write   # rewrite every generated block in the .tex files and draw the figures
     python full_run_28092026/paper_results.py --check   # exit 1 unless every generated block is current, every phrase is in
                                                         # its file, every number in the prose is a phrase's, every citation
-                                                        # key resolves and every \\autoref label is defined
+                                                        # key resolves, every \\autoref label is defined and every figure exists
 
-Files written: overleaf_source_04102026/6_results.tex (Table 1 and the prose phrases), appendices/results.tex,
-appendices/rewording.tex, appendices/conditions.tex, appendices/error_analysis.tex (their tables, between
-"% BEGIN GENERATED <name>" and "% END GENERATED <name>" markers), and figs/error-categories.pdf.
+Files written: overleaf_source_04102026/6_results.tex (Table 1, the two main-text figures and the prose phrases),
+appendices/results.tex, appendices/paraphrase.tex, appendices/conditions.tex, appendices/error_analysis.tex (their
+tables and figures, between "% BEGIN GENERATED <name>" and "% END GENERATED <name>" markers), and figs/*.pdf.
 
 Sources, each written by a committed script: results/results.json (analyze.py: every score, interval, test and
 condition), expert_request/scored.json and build.json (expert_kits.py: the experts' readings of wrong answers and of
 the templates, counts only), RESIDUAL_INCORRECT.md (residual_incorrect.py: the remaining incorrect verdicts by their
 distance to the target), PARAPHRASE.md and PARAPHRASE_REVIEW.md (paraphrase.py, paraphrase_kit.py --score: the
-rewording funnel), FLAG_REVIEW_3.md (flag_sample.py: the expert reading of the arithmetic flags), the shortcut
-template list of analyze.py, and the judged step check's precision row of appendices/validation.tex
-(docs/appendix_evaluation.py). Model display names are those of paper_setup.py.
+paraphrase funnel), FLAG_REVIEW_3.md (flag_sample.py: the expert reading of the arithmetic flags), the shortcut
+template list of analyze.py, the tool and paraphrase constants of run_traces.py and paraphrase.py, and the judged
+step check's precision row of appendices/validation.tex (docs/appendix_evaluation.py). Model display names are those
+of paper_setup.py.
 """
 from __future__ import annotations
 
+import itertools
 import json
 import math
 import re
@@ -33,9 +35,9 @@ HERE = Path(__file__).resolve().parent
 REPO = HERE.parent
 SRC = REPO / "overleaf_source_04102026"
 APPX = SRC / "appendices"
-FILES = {"main": SRC / "6_results.tex", "results": APPX / "results.tex", "rewording": APPX / "rewording.tex",
+FIGS = SRC / "figs"
+FILES = {"main": SRC / "6_results.tex", "results": APPX / "results.tex", "paraphrase": APPX / "paraphrase.tex",
          "conditions": APPX / "conditions.tex", "errors": APPX / "error_analysis.tex"}
-FIG = SRC / "figs" / "error-categories.pdf"
 BIB = SRC / "custom.bib"
 MARK = "% BEGIN GENERATED {name} (full_run_28092026/paper_results.py --write)\n{body}\n% END GENERATED {name}"
 
@@ -61,8 +63,13 @@ CATEGORIES = [("1. Hallucination", "Hallucination"), ("2. Setup / Assumption Err
 B2_MODELS = ["claude-sonnet-5", "gpt-5.4-mini", "gemma-4-26b-a4b", "gpt-oss-20b"]
 WORD = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine", 10: "ten",
         11: "eleven", 12: "twelve"}
+ORDINAL = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth", "eleventh"]
 NUMBER = re.compile(r"(?<![\w.\-])\d[\d,]*(?:\.\d+)?")
 NUMBER_WORDS = re.compile(r"\b(two|three|four|five|six|seven|eight|nine|ten|eleven|twelve)\b", re.I)
+
+# Figure style: one hue, text in ink, recessive axes; marker fill is the second encoding, so the figures read in greyscale.
+BLUE, DARK, LIGHT, INK, MUTED, BAND = "#2a78d6", "#0d366b", "#cde2fb", "#0b0b0b", "#52514e", "#eceae6"
+COLUMN = 3.03  # the ACL column width in inches
 
 
 # ----------------------------------------------------------------------------------------------- formatting
@@ -111,6 +118,10 @@ def thousands(n: int) -> str:
     return f"{n:,}"
 
 
+def rng(xs, fmt=f3, join=" to ") -> str:
+    return f"{fmt(min(xs))}{join}{fmt(max(xs))}"
+
+
 def block(name: str, body: str) -> str:
     return MARK.format(name=name, body=body.rstrip("\n"))
 
@@ -130,23 +141,13 @@ def table(spec: str, header: str, rows: list[str], caption: str, label: str, sta
     return "\n".join(lines)
 
 
+def figure(path: str, caption: str, label: str) -> str:
+    return "\n".join(["\\begin{figure}[t]", "    \\centering", f"    \\includegraphics[width=\\columnwidth]{{figs/{path}}}",
+                      f"    \\caption{{{caption}}}", f"    \\label{{{label}}}", "\\end{figure}"])
+
+
 def head(*cells: str) -> str:
     return " & ".join("\\textbf{" + c + "}" for c in cells)
-
-
-def wrap(text: str, width: int = 100) -> str:
-    """One sentence per line, wrapped at the width, never inside a macro argument."""
-    out = []
-    for sentence in text.split("\n"):
-        words, line = sentence.split(" "), ""
-        for w in words:
-            if line and len(line) + 1 + len(w) > width:
-                out.append(line)
-                line = w
-            else:
-                line = f"{line} {w}" if line else w
-        out.append(line)
-    return "\n".join(out)
 
 
 # ----------------------------------------------------------------------------------------------- sources
@@ -176,7 +177,7 @@ res = load(HERE / "results/results.json")
 scored = load(HERE / "expert_request/scored.json")
 built = load(HERE / "expert_request/build.json")
 residual = (HERE / "RESIDUAL_INCORRECT.md").read_text(encoding="utf-8")
-paraphrase = (HERE / "PARAPHRASE.md").read_text(encoding="utf-8")
+paraphrase_md = (HERE / "PARAPHRASE.md").read_text(encoding="utf-8")
 review = (HERE / "PARAPHRASE_REVIEW.md").read_text(encoding="utf-8")
 flags = (HERE / "FLAG_REVIEW_3.md").read_text(encoding="utf-8")
 validation_tex = (APPX / "validation.tex").read_text(encoding="utf-8")
@@ -203,11 +204,11 @@ REP = res["reported"]["models"]
 ARMS = [a for a in res["reasoning_arms"] if a["arm"] != "openbook"]  # version 1 of the open-book arm is superseded
 ANCH = {a["arm"]: a for a in res["anchors"]}
 REPEATS = res["repeats"]
-N_ITEMS = sum(m["correct"] + m["partial"] + m["incorrect"] + m["unusable"] for m in [Q1[ORDER[0]]])
+N_ITEMS = sum(Q1[ORDER[0]][k] for k in ("correct", "partial", "incorrect", "unusable"))
 N_TEMPLATES = Q2[ORDER[0]]["templates"]
 N_PAIRS = len(PAIRS)
 N_SINGLE = Q4[ORDER[0]]["single_path"]["templates"]
-assert all(m["correct"] + m["partial"] + m["incorrect"] + m["unusable"] == N_ITEMS for m in Q1.values())
+assert all(sum(m[k] for k in ("correct", "partial", "incorrect", "unusable")) == N_ITEMS for m in Q1.values())
 assert N_PAIRS == len(CPAIRS) == 55 and N_ITEMS == 2250 and N_TEMPLATES == 150
 
 ERR = scored["kinds"]["error"]
@@ -242,7 +243,7 @@ def letters(order: list[str], sep: set[frozenset]) -> dict[str, str]:
 SEP_FAC, SEP_MC = separated(PAIRS), separated(CPAIRS)
 CLD_FAC, CLD_MC = letters(ORDER, SEP_FAC), letters(ORDER, SEP_MC)
 TOP5 = ORDER[:5]
-assert not any(frozenset(p) in SEP_FAC for p in __import__("itertools").combinations(TOP5, 2))
+assert not any(frozenset(p) in SEP_FAC for p in itertools.combinations(TOP5, 2))
 nonsig = [p for p in PAIRS if p["p_holm"] >= 0.05]
 assert all(abs(p["diff"]) < p["detectable"] for p in nonsig)
 strict_agree = sum((p["p_holm"] < 0.05) == (p["fully_p_holm"] < 0.05) for p in PAIRS)
@@ -251,6 +252,7 @@ spread5 = max(scores[:5]) - min(scores[:5])
 sixth, rest = ORDER[5], ORDER[6:]
 sixth_sep = [k for k in TOP5 if frozenset((sixth, k)) in SEP_FAC]
 assert all(frozenset((a, b)) in SEP_FAC for a in rest for b in ORDER[:6])
+no_variance = [Q1[k]["templates_no_instance_variance"] for k in ORDER]
 
 gaps = [Q2[k]["gap"] for k in ORDER]
 gap_sig = [k for k in ORDER if Q2[k]["p_welch_holm"] < 0.05]
@@ -263,6 +265,12 @@ glm = Q2["glm-5.3"]
 branch_pairs = [(k, p) for k in ORDER for p in BL[k]["pairs"] if p["p_holm"] < 0.05]
 assert branch_pairs == [("gpt-oss-20b", branch_pairs[0][1])] and branch_pairs[0][1]["a"] == "civil_engineering" \
     and branch_pairs[0][1]["b"] == "electrical_engineering" and branch_pairs[0][1]["diff"] < 0
+n_branch_pairs = sum(len(BL[k]["pairs"]) for k in ORDER)
+lowest_branch = {k: min(BL[k]["branch"], key=lambda b: BL[k]["branch"][b]["mean"]) for k in ORDER}
+assert len(set(lowest_branch.values())) > 1
+lowest_domain = {k: min(REP[k]["domain"], key=REP[k]["domain"].get) for k in ORDER}
+thermo_models = [k for k in ORDER if lowest_domain[k] == "thermodynamics"]
+thermo = [REP[k]["domain"]["thermodynamics"] for k in ORDER]
 
 cov = [COV[k]["coverage"] for k in ORDER]
 tau = res["q3_coverage"]["tau"]
@@ -276,7 +284,7 @@ assert frozenset((first_fac, first_cov)) not in SEP_FAC and dc["p_holm"] < 0.05
 n_mc_sig, n_wil_sig = len(SEP_MC), len(separated(CPAIRS, "p_wilcoxon_holm"))
 agree = sum((p["p_holm"] < 0.05) == (p["p_wilcoxon_holm"] < 0.05) for p in CPAIRS)
 top3_cov = sorted(ORDER, key=lambda k: cov_rank[k])[:3]
-assert not any(frozenset(p) in SEP_MC for p in __import__("itertools").combinations(top3_cov, 2))
+assert not any(frozenset(p) in SEP_MC for p in itertools.combinations(top3_cov, 2))
 rho = [COV[k]["rho_steps"] for k in ORDER]
 
 e3w = [Q3[k]["e3_coverage_on_readable_wrong"] for k in ORDER]
@@ -292,9 +300,8 @@ router = [Q3[k]["router_judge_rate_on_fully_solved"] for k in ORDER]
 claims = [Q3[k]["claims_per_trace"] for k in ORDER]
 hi_digit = max(ORDER, key=lambda k: Q3[k]["digit_flag_rate_on_fully_solved"])
 lo_digit = min(ORDER, key=lambda k: Q3[k]["digit_flag_rate_on_fully_solved"])
-flag_row = md_table(flags, r"\| model \| flags drawn")
-flag_all = next(r for r in flag_row if r[0] == "all")
-flags_read, flags_slip, flags_checker, flags_unsure = (int(flag_all[i]) for i in (2, 3, 4, 5))
+flag_all = next(r for r in md_table(flags, r"\| model \| flags drawn") if r[0] == "all")
+flags_read, flags_slip, flags_unsure = int(flag_all[2]), int(flag_all[3]), int(flag_all[5])
 flags_decided = flags_read - flags_unsure
 flag_precision = flags_slip / flags_decided
 assert f3(flag_precision) == flag_all[6]
@@ -318,22 +325,22 @@ assert len(q5_out) == 1 and all(m["p_holm"] >= 0.05 for m in q5) and all(m["item
 q5_pairs, q5_templates, margin = q5[0]["items"], q5[0]["templates"], res["q5"]["margin"]
 q5_tau = res["q5"]["tau"]
 noise = q5_tau["noise_arm"]
-para = md_kv(paraphrase)
+para = md_kv(paraphrase_md)
 rev = md_kv(review)
-p_selected, p_passing, p_failed = int(para["items selected (subsamples.PARAPHRASE)"]), int(para["passing a paraphrase"]), \
-    int(para["no paraphrase after 3 attempts"])
+p_selected = int(para["items selected (subsamples.PARAPHRASE)"])
+p_passing, p_failed = int(para["passing a paraphrase"]), int(para["no paraphrase after 3 attempts"])
 p_attempts = [int(x) for x in para["passing at attempt 1, 2, 3"].split(", ")]
 p_restored = int(para["passing ones with notation restored (Unicode the original lacks, put back as written)"].split()[0])
 p_lost_templates = para["templates with no paraphrase for any of their items"].split(": ")[1].split(", ")
 p_lost = int(para["templates with no paraphrase for any of their items"].split(":")[0])
 p_checks = dict(re.findall(r"(\w+) (\d+)", para["failed attempts by check"]))
-p_branch_pass = dict((b, int(n)) for b, n in re.findall(r"(\w+) (\d+)", para["passing, per branch"]))
 r_kept, r_rejected, r_returned = int(rev["kept"]), int(rev["rejected"]), int(rev["returned"])
 r_branch = {b: (int(k), int(r)) for b, k, r in re.findall(r"(\w+) (\d+) / (\d+)", rev["kept / rejected, per branch"])}
 r_reasons = dict((k, int(v)) for k, v in re.findall(r"(\w+=\w+) (\d+)", rev["answers behind the rejections"]))
 assert p_selected == 450 and p_passing == r_returned == 316 and r_kept == q5_pairs == 277 and r_rejected == 39
 assert p_lost == len(p_lost_templates) and p_selected - p_passing == p_failed
 p_lost_experts = N_TEMPLATES - q5_templates - p_lost
+least_branch = min(r_branch, key=lambda b: r_branch[b][0])
 below90 = [k for k in ORDER if Q5[k]["ci90"][1] < 0]
 above90 = [k for k in ORDER if Q5[k]["ci90"][0] > 0]
 vs = res["q5"]["vs_repeats"]
@@ -341,6 +348,7 @@ vs_within = [k for k in ORDER if k in vs and vs[k]["abs_within_repeat_spread"]]
 vs_beyond = [k for k in ORDER if k in vs and not vs[k]["abs_within_repeat_spread"]]
 rep_sd = [REPEATS[k]["sd"] for k in REPEATS]
 rep_same = [REPEATS[k]["same_verdict_every_repeat"] for k in REPEATS]
+rep_items = REPEATS["gpt-oss-20b"]["items"]
 sens_tau = res["sensitivity"]["tau_with_headline"]
 short_shift = max(abs(SENS[k]["without_shortcut_templates"] - SENS[k]["fitted"]) for k in ORDER)
 sym_shift = [SENS[k]["without_symbolic_templates"] - SENS[k]["fitted"] for k in ORDER]
@@ -364,6 +372,7 @@ anchors_adv = [fl["deepseek-v4-pro"]["levels"]["Advanced"]["mean"], fl["gpt-5.4"
                flr["levels"]["Advanced"]["mean"]]
 assert all(x["ci"][0] <= fl["deepseek-v4-pro"]["score"] <= x["ci"][1] and x["ci"][0] <= flr["score"] <= x["ci"][1]
            for x in top5_sub)
+n_sub = ANCH["flagship"]["items"]
 ob_items, ob_templates = ob["gpt-oss-20b"]["items"], ob["gpt-oss-20b"]["templates"]
 mc_rise = [ob[m]["e5"]["diff"] for m in ob]
 
@@ -375,7 +384,8 @@ per_model_items = ERR_BUILD["items"] // len(B2_MODELS)
 readings_total = ERR["readings"]
 assert readings_total == 480 and per_model_items == 40 and sum(sum(v.values()) for v in by_level.values()) == 480
 level_n = {lv: sum(by_level[lv].values()) for lv in LEVELS}
-CALC, FORM, NOERR = CATEGORIES[5][0], CATEGORIES[2][0], CATEGORIES[6][0]
+CALC, FORM, NOERR, INCOMPLETE = CATEGORIES[5][0], CATEGORIES[2][0], CATEGORIES[6][0], CATEGORIES[7][0]
+assert all(by_model[m].get(INCOMPLETE, 0) == 0 for m in B2_MODELS)
 easy_calc, easy_n = by_level["Easy"].get(CALC, 0), level_n["Easy"]
 form_hard = sum(by_level[lv].get(FORM, 0) for lv in ("Intermediate", "Advanced"))
 hard_n = level_n["Intermediate"] + level_n["Advanced"]
@@ -387,6 +397,7 @@ others_form = [maj[m].get(FORM, 0) for m in others]
 assert all(maj[m].get(CALC, 0) == max(maj[m].values()) for m in others) and claude_noerr == max(maj["claude-sonnet-5"].values())
 assert all(sorted(maj[m].values())[-2] == maj[m].get(FORM, 0) for m in others)
 fleiss_all = ERR["fleiss_all"]
+fleiss_models = list(ERR["fleiss_by_model"].values())
 
 # The remaining incorrect verdicts of the top five (RESIDUAL_INCORRECT.md).
 res_model = {r[0]: r for r in md_table(residual, r"^\| \| n \| <=0\.2%")}
@@ -407,93 +418,56 @@ form_total = top5_symbolic + top5_near + two_chemical
 adv_top5 = [BL[k]["level"]["Advanced"]["mean"] for k in TOP5]
 near_templates = [t for t, v in TEMPLATES_READ.items() if v["role"] == "near"]
 near_total = sum(int(r[1]) for r in near_rows)
-fleiss_models = list(ERR["fleiss_by_model"].values())
 
 
 # ----------------------------------------------------------------------------------------------- phrases
-def rng(xs, fmt=f3, join=" to ") -> str:
-    return f"{fmt(min(xs))}{join}{fmt(max(xs))}"
-
-
 phrases = [  # 6_results.tex must contain each of these, whitespace aside
+    # overall model performance
     "with 95\\% intervals and a compact letter display", f"over the {N_PAIRS} pairs", f"FAC runs from {f3(min(scores))}",
     f"to {f3(max(scores))}",
     f"{WORD[5].capitalize()} models lie within {f3(spread5)} of one another, between {f3(min(scores[:5]))} and {f3(max(scores[:5]))}",
     f"{tt(sixth)} ({f3(Q1[sixth]['score'])}) follows and differs from only {WORD[len(sixth_sep)]} of the five ({tt(sixth_sep[0])}); "
     f"{Q1[sixth]['empty']} of its responses are empty at the output ceiling and score 0",
-    f"The remaining {WORD[len(rest)]} models lie between {f3(min(scores[6:]))} and {f3(max(scores[6:]))}, and each differs from every model of the top six",
-    f"In all, {len(SEP_FAC)} of the {N_PAIRS} pairs differ after correction, and the {len(nonsig)} that do not all lie below the smallest "
-    f"difference the design detects at 80\\% power ({rng([p['detectable'] for p in nonsig])}, depending on the pair)",
-    f"Four of the five lowest scores belong to the four models that return no reasoning tokens",
-    f"on the {r_mini['items']}-instance subset, {tt('gpt-5.4-mini')} moves from {f3(r_mini['main_score_on_items'])} to {f3(r_mini['arm_score'])} "
-    f"(95\\% CI of the change {ci(r_mini['ci'], False)}) and {tt('gemini-3.1-flash-lite')} from {f3(r_gem['main_score_on_items'])} to "
-    f"{f3(r_gem['arm_score'])} ({sgn(r_gem['ci'][0])} to {f3(r_gem['ci'][1])}), less than the design detects",
-    f"{rng([Q1[k]['templates_no_instance_variance'] for k in ORDER], str)} of the {N_TEMPLATES} templates per model have the same score on all 15 instances",
+    f"The remaining {WORD[len(rest)]} models lie between {f3(min(scores[6:]))} and {f3(max(scores[6:]))}, each differs from every model of the "
+    f"top six, and in all {len(SEP_FAC)} of the {N_PAIRS} pairs differ after correction",
+    "Four of the five lowest scores belong to the four models that return no reasoning tokens",
+    f"on the {r_mini['items']}-instance subset, {tt('gpt-5.4-mini')} moves from {f3(r_mini['main_score_on_items'])} to {f3(r_mini['arm_score'])} and "
+    f"{tt('gemini-3.1-flash-lite')} from {f3(r_gem['main_score_on_items'])} to {f3(r_gem['arm_score'])}, the second by less than the design detects",
+    f"MC runs from {f3(min(cov))} to {f3(max(cov))} and orders the models differently from FAC (Kendall's $\\tau$ {f3(tau['tau'])}, 95\\% CI "
+    f"{ci(tau['ci'], False)}",
+    f"{tt(first_cov)} is first on MC and {ORDINAL[ans_rank[first_cov] - 1]} on FAC, and {tt(first_fac)} is first on FAC and "
+    f"{ORDINAL[cov_rank[first_fac] - 1]} on MC, {f3(-dc_diff)} below {tt(first_cov)} (Holm-adjusted $p = {f3(dc['p_holm'])}$)",
+    f"matching alone finds {pct(min(e3w))} to {pct(max(e3w))} of the milestones against a chance floor of {pct(min(floor))} to {pct(max(floor))}, "
+    f"and {pct(min(e5w))} to {pct(max(e5w))} with the judge",
+    f"the arithmetic check flags {pct1(min(digit))} to {pct1(max(digit))} of responses at a precision of {f3(flag_precision)} on these models and "
+    f"the judged step check {pct1(min(router))} to {pct1(max(router))}",
+    f"reads {rng(claims, lambda x: f'{x:.1f}')} displayed calculations per response",
+    f"for ten of the eleven models: on {q5_pairs} paraphrase pairs that domain experts confirmed as the same problem, over {q5_templates} templates, "
+    f"the change in FAC lies within $\\pm {margin:.2f}$ at 90\\% confidence for ten models and reaches {sgn(Q5[q5_out[0]]['ci90'][0])} for "
+    f"{tt(q5_out[0])}",
+    f"run-to-run decoding noise on {WORD[len(REPEATS)]} models is {rng(rep_sd)}",
+    f"On the {n_sub}-instance subset, two flagships that pass the selection rule sit inside the top tier's intervals ({tt('deepseek-v4-pro')} "
+    f"{f3(fl['deepseek-v4-pro']['score'])}; {tt('gpt-5.4')} {f3(flr['score'])} with reasoning at medium effort and {f3(fl['gpt-5.4']['score'])} at "
+    f"its default, which returns no reasoning tokens), supplying each template's governing equations lifts {tt('gpt-oss-20b')} by "
+    f"{f3(ob['gpt-oss-20b']['diff'])} and changes the two closed models tested by amounts bounded within $\\pm {margin:.2f}$, and a Python tool, "
+    f"called on {pct(tool['claude-sonnet-5']['tool_use']['share_with_calls'])} and {pct(tool['gpt-5.4-mini']['tool_use']['share_with_calls'])} "
+    f"of instances, changes them by amounts bounded within $\\pm {margin:.2f}$",
+    # branch and domain
+    f"With {BL[ORDER[0]]['branch']['chemical_engineering']['templates']} templates per branch, a model's spread lets the design detect branch "
+    f"differences of {rng([BL[k]['detectable_branch'] for k in ORDER])}, the branch spreads sit below that, and one of the {n_branch_pairs} branch "
+    f"pairs in the whole evaluation separates after correction ({tt('gpt-oss-20b')}, electrical above civil)",
+    f"thermodynamics has the lowest mean for {WORD[len(thermo_models)]} of the {WORD[len(ORDER)]} models ({rng(thermo)})",
     # difficulty
     f"Every model scores lower on Advanced than on Easy templates, by {rng(gaps)}, but the gap is significant after correction for "
     f"{WORD[len(gap_sig)]} of the {WORD[len(ORDER)]} models",
-    f"{', '.join(tt(k) for k in gap_sig[:-1])}, and {tt(gap_sig[-1])} (gaps {rng([Q2[k]['gap'] for k in gap_sig])}), three of which run without reasoning tokens",
-    f"the top five models' gaps are {rng(top5_gaps)}, with intervals that {'all exclude zero' if top5_excl0 == 5 else f'exclude zero for {WORD[top5_excl0]} of the five'} but do not survive correction, "
-    f"against detectable gaps of {rng([Q2[k]['detectable_welch'] for k in ORDER])}",
-    f"{tt('glm-5.3')}'s gap of {f3(glm['gap'])} is mostly an output-ceiling effect",
-    f"without them the gap is {f3(glm['unusable_excluded']['gap'])}",
-    f"Without these two templates the gaps are {rng([Q2[k]['without_two_chemical']['gap'] for k in ORDER])} and none holds after correction",
-    f"one pair in the whole evaluation separates after correction ({tt('gpt-oss-20b')}, electrical above civil)",
-    # coverage
-    f"MC runs from {f3(min(cov))} to {f3(max(cov))} and orders the models differently from FAC (Kendall's $\\tau$ {f3(tau['tau'])}, 95\\% CI {ci(tau['ci'], False)}",
-    f"{tt(first_cov)} is first on MC and {['first', 'second', 'third'][ans_rank[first_cov] - 1]} on FAC; {tt(first_fac)} is first on FAC and "
-    f"{['first', 'second', 'third', 'fourth', 'fifth', 'sixth'][cov_rank[first_fac] - 1]} on MC, {f3(-dc_diff)} below {tt(first_cov)} "
-    f"(Holm-adjusted $p = {f3(dc['p_holm'])}$)",
-    f"Over the {N_PAIRS} pairs, {n_mc_sig} differ after correction under the sign-flip test and {n_wil_sig} under a Wilcoxon signed-rank test",
-    f"the two agreeing on {agree} pairs; the three models highest on MC, {tt(top3_cov[0])}, {tt(top3_cov[1])}, and {tt(top3_cov[2])}, do not separate",
-    f"mean number of steps is {sgn(max(rho), 2)} to {sgn(min(rho), 2)} for every model",
-    f"matching alone finds {pct(min(e3w))} to {pct(max(e3w))} of the milestones, against a chance floor of {pct(min(floor))} to {pct(max(floor))}",
-    f"with the judge the share is {pct(min(e5w))} to {pct(max(e5w))}, the {pct(max(e5w))} resting on the {Q3[e5w_max_model]['readable_wrong_with_milestones']} "
-    f"wrong answers of {tt(e5w_max_model)}",
-    f"Among the {WORD[len(many_wrong)]} models with more than 100 wrong answers, {pct(min(full_cov))} to {pct(max(full_cov))} of them reach every milestone",
-    f"a milestone the judge rules missing points at the failure in {pct(min(attr['e5_missing']))} to {pct(max(attr['e5_missing']))} of responses, "
-    f"a judged step flag in {pct(min(attr['router_judge']))} to {pct(max(attr['router_judge']))}, and an arithmetic flag in "
-    f"{pct(min(attr['digit_rule']))} to {pct(max(attr['digit_rule']))}",
-    # diagnostics
-    f"The arithmetic check flags {pct1(min(digit))} to {pct1(max(digit))} of correct-answer responses, at a precision of {f3(flag_precision)} on these models "
-    f"({flags_slip} of {flags_decided} flags that a domain expert read were slips), and the judged step check flags {pct1(min(router))} to {pct1(max(router))}, "
-    f"at a precision of {f2(router_precision)} and a recall of {f2(router_recall)} inside correct-answer responses",
-    f"reads {rng(claims, lambda x: f'{x:.1f}')} displayed calculations per response",
-    f"{tt(hi_digit)}'s {pct1(Q3[hi_digit]['digit_flag_rate_on_fully_solved'])} comes with {Q3[hi_digit]['claims_per_trace']:.1f} calculations per response and "
-    f"{tt(lo_digit)}'s {pct1(Q3[lo_digit]['digit_flag_rate_on_fully_solved'])} with {Q3[lo_digit]['claims_per_trace']:.1f}",
-    # consistency and depth
+    f"{', '.join(tt(k) for k in gap_sig[:-1])}, and {tt(gap_sig[-1])} (gaps {rng([Q2[k]['gap'] for k in gap_sig])}), three of which run without "
+    "reasoning tokens",
+    f"the top five models' gaps are {rng(top5_gaps)}, with intervals that "
+    f"{'all exclude zero' if top5_excl0 == 5 else f'exclude zero for {WORD[top5_excl0]} of the five'} but do not survive correction, against "
+    f"detectable gaps of {rng([Q2[k]['detectable_welch'] for k in ORDER])}",
+    f"{tt('glm-5.3')}'s gap of {f3(glm['gap'])} is mostly an output-ceiling effect", f"without them the gap is {f3(glm['unusable_excluded']['gap'])}",
+    f"without these two templates the gaps are {rng([Q2[k]['without_two_chemical']['gap'] for k in ORDER])} and none holds after correction",
     f"wrong-answer rates of {rng(depth6)} against {rng(depth1)}",
-    f"the six strongest models solve all 15 instances of {pct(min(single_all[k] for k in strong6))} to {pct(max(single_all[k] for k in strong6))} of the "
-    f"{N_SINGLE} single-path templates, whereas four of the five weakest solve all instances of {pct(min(single_all[k] for k in weak4))} to "
-    f"{pct(max(single_all[k] for k in weak4))} of them ({tt('gemini-3.1-flash-lite')} {pct(single_all['gemini-3.1-flash-lite'])}) and some but not all "
-    f"instances of {pct(min(single_some[k] for k in weak4))} to {pct(max(single_some[k] for k in weak4))}",
-    # rewording
-    f"for ten of the eleven models", f"one instance in five of every template ({p_selected} instances)",
-    f"{p_passing} rewrites passed scripted checks, and a domain expert of the instance's branch confirmed {r_kept} of them, on {q5_templates} templates",
-    f"On these {q5_pairs} pairs, the paired change in FAC lies between {sgn(min(q5_diff))} and {sgn(max(q5_diff))} across the eleven models",
-    f"for ten models the 90\\% interval lies within $\\pm {margin:.2f}$", f"for {tt(q5_out[0])} it reaches {sgn(Q5[q5_out[0]]['ci90'][0])}",
-    f"$\\tau = {f3(q5_tau['tau'])}$ ({ci(q5_tau['ci'], False)}), at the lower edge of what sampling alone produces at this size (median {f3(noise['median'])})",
-    f"the experts rejected {r_rejected} of the {r_returned} pairs that passed every scripted check ({pct(r_rejected / r_returned)})",
-    f"covers the {q5_templates} templates whose problems could be reworded without loss",
-    f"on {REPEATS['gpt-oss-20b']['items']} instances decoded three times, four models' FAC has a standard deviation of {rng(rep_sd)} across repeats, "
-    f"and {pct(min(rep_same))} to {pct(max(rep_same))} of instances receive the same verdict every time",
-    f"unchanged at half and double the answer tolerance ($\\tau = {f3(sens_tau['half_tol'])}$), and FAC moves by at most {f3(short_shift)} without the "
-    f"{WORD[len(SHORTCUT)]} templates whose answers can be read off the question's wording and by {sgn(min(sym_shift))} to {sgn(max(sym_shift))} without the "
-    f"{WORD[len(SYMBOLIC)]} symbolic-answer templates",
-    # conditions
-    f"On the {ANCH['flagship']['items']}-instance subset, two flagships",
-    f"{tt('deepseek-v4-pro')} scores {f3(fl['deepseek-v4-pro']['score'])} ({ci(fl['deepseek-v4-pro']['ci'], False)}), and {tt('gpt-5.4')} scores "
-    f"{f3(flr['score'])} ({ci(flr['ci'], False)}) with reasoning at medium effort and {f3(fl['gpt-5.4']['score'])} ({ci(fl['gpt-5.4']['ci'], False)}) at its "
-    f"provider's default, which returns no reasoning tokens; the top five on the same instances score {rng(sub_scores)}, with intervals that contain both "
-    f"reasoning anchors, and on Advanced templates {rng(sub_adv, f2)} against the anchors' {rng(anchors_adv, f2)}",
-    f"({ob_items} instances of the {ob_templates} templates that state them in symbols) lifts {tt('gpt-oss-20b')} by {f3(ob['gpt-oss-20b']['diff'])} "
-    f"({ci(ob['gpt-oss-20b']['ci'], False)}), partly because fewer responses run out of room ({f3(ob['gpt-oss-20b']['usable_in_both']['diff'])} on the instances "
-    f"answered in both conditions), and changes {tt('gpt-5.4-mini')} ({sgn(ob['gpt-5.4-mini']['diff'])}) and {tt('claude-sonnet-5')} "
-    f"({sgn(ob['claude-sonnet-5']['diff'])}) by amounts bounded within $\\pm {margin:.2f}$, while MC rises by {rng(mc_rise, f2)} for all three",
-    f"{tt('claude-sonnet-5')} calls it on {pct(tool['claude-sonnet-5']['tool_use']['share_with_calls'])} of instances and {tt('gpt-5.4-mini')} on "
-    f"{pct(tool['gpt-5.4-mini']['tool_use']['share_with_calls'])}, and neither model's FAC ({sgn(tool['claude-sonnet-5']['diff'])}; "
-    f"{sgn(tool['gpt-5.4-mini']['diff'])}) or MC changes beyond $\\pm {margin:.2f}$; {tt('gpt-5.4-mini')}'s arithmetic flags on correct answers fall from "
-    f"{f3(tool['gpt-5.4-mini']['digit_flag_rate_fully_solved']['main'])} to {f3(tool['gpt-5.4-mini']['digit_flag_rate_fully_solved']['arm'])}",
     # error analysis
     f"Three domain experts read each of {ERR_BUILD['items']} wrong answers, {per_model_items} from each of four models",
     f"(Fleiss'~$\\kappa$ {f3(fleiss_all)}", f"the {readings_total} readings",
@@ -503,45 +477,78 @@ phrases = [  # 6_results.tex must contain each of these, whitespace aside
     f"almost all calculation slips ({easy_calc} of {easy_n} readings), whereas wrong formulas or principles are {pct(form_hard_share)} of the readings on "
     f"Intermediate and Advanced problems against {pct(form_easy_share)} on Easy ones",
     f"(FAC {rng(scores[:5])}; {rng(adv_top5, f2)} on Advanced templates), and {form_total} of their {top5_incorrect} remaining incorrect verdicts",
-    f"{WORD[3].capitalize()} domain experts' {readings_total} readings of {ERR_BUILD['items']} wrong answers",  # figure caption
-    f"by model ({per_model_items} wrong answers each) and by level ({level_n['Easy']}, {level_n['Intermediate']}, and {level_n['Advanced']} readings)",
 ]
 
 appendix_phrases = {
     "results": [
         f"the {N_TEMPLATES} templates", "80\\% power", "scores a partial answer 0", f"for {strict_agree} of the {N_PAIRS} pairs",
-        f"{len(SEP_FAC)} of the {N_PAIRS} pairs differ on FAC", f"{n_mc_sig} and {n_wil_sig} of the {N_PAIRS} pairs differ on MC",
+        f"{rng(no_variance, str)} of the {N_TEMPLATES} templates per model have the same score on all 15 instances",
+        f"{len(SEP_FAC)} of the {N_PAIRS} pairs differ on FAC after correction, every non-significant FAC difference lies below what its pair "
+        f"detects ({rng([p['detectable'] for p in nonsig])}), and {n_mc_sig} and {n_wil_sig} of the {N_PAIRS} pairs differ on MC under the sign-flip "
+        f"and the Wilcoxon test, which agree on {agree} pairs",
+        f"the three highest models, {tt(top3_cov[0])}, {tt(top3_cov[1])}, and {tt(top3_cov[2])}, do not separate",
+        f"mean number of steps is {sgn(max(rho), 2)} to {sgn(min(rho), 2)} for every model",
         f"With {BL[ORDER[0]]['branch']['chemical_engineering']['templates']} templates per branch",
-        f"detect differences of {rng([BL[k]['detectable_branch'] for k in ORDER])} between two branches",
-        f"one of the {len(ORDER) * 10} branch pairs", f"for {WORD[len(gap_sig)]} of the {WORD[len(ORDER)]} models",
-        f"finds {gap_perm} of {len(ORDER)}", f"without the {WORD[len(SHORTCUT)]} templates",
+        f"detect differences of {rng([BL[k]['detectable_branch'] for k in ORDER])} between two branches", f"one of the {n_branch_pairs} branch pairs",
+        f"for {WORD[len(gap_sig)]} of the {WORD[len(ORDER)]} models", f"finds {gap_perm} of {len(ORDER)}",
+        f"unchanged at half and double the answer tolerance ($\\tau = {f3(sens_tau['half_tol'])}$), and FAC moves by at most {f3(short_shift)} "
+        f"without the {WORD[len(SHORTCUT)]} templates whose answers can be read off the question's wording and by {sgn(min(sym_shift))} to "
+        f"{sgn(max(sym_shift))} without the {WORD[len(SYMBOLIC)]} symbolic-answer templates",
         f"{tt('glm-5.3')}'s {Q1['glm-5.3']['empty']} empty responses",
-        f"for the {N_SINGLE} templates that follow one reasoning path and for the other {N_TEMPLATES - N_SINGLE}", "on all 15 instances",
-        f"of {WORD[len(REPEATS)]} models on {REPEATS['gpt-oss-20b']['items']} instances decoded three times; "
-        f"the other {WORD[len(ORDER) - len(REPEATS)]} models",
+        f"for the {N_SINGLE} templates that follow one reasoning path and for the other {N_TEMPLATES - N_SINGLE}",
+        f"the six strongest models solve all 15 instances of {pct(min(single_all[k] for k in strong6))} to {pct(max(single_all[k] for k in strong6))} "
+        f"of the single-path templates, whereas four of the five weakest solve all instances of {pct(min(single_all[k] for k in weak4))} to "
+        f"{pct(max(single_all[k] for k in weak4))} of them ({tt('gemini-3.1-flash-lite')} {pct(single_all['gemini-3.1-flash-lite'])}) and some "
+        f"but not all instances of {pct(min(single_some[k] for k in weak4))} to {pct(max(single_some[k] for k in weak4))}",
+        f"of {WORD[len(REPEATS)]} models on {rep_items} instances decoded three times: FAC has a standard deviation of {rng(rep_sd)} across repeats, "
+        f"and {pct(min(rep_same))} to {pct(max(rep_same))} of instances receive the same verdict every time; the other "
+        f"{WORD[len(ORDER) - len(REPEATS)]} models",
+        f"matching alone finds {pct(min(e3w))} to {pct(max(e3w))} of the milestones against a floor of {pct(min(floor))} to {pct(max(floor))}, and "
+        f"{pct(min(e5w))} to {pct(max(e5w))} with the judge, the {pct(max(e5w))} resting on the {Q3[e5w_max_model]['readable_wrong_with_milestones']} "
+        f"wrong answers of {tt(e5w_max_model)}; among the {WORD[len(many_wrong)]} models with more than 100 wrong answers, {pct(min(full_cov))} to "
+        f"{pct(max(full_cov))} of the wrong answers reach every milestone",
         f"the {res['milestones']['items_without']} instances with no milestones",
+        f"the arithmetic check flags {pct1(min(digit))} to {pct1(max(digit))} of correct-answer responses, at a precision of {f3(flag_precision)} on "
+        f"these models ({flags_slip} of {flags_decided} flags that a domain expert read were slips",
+        f"the judged step check flags {pct1(min(router))} to {pct1(max(router))}, at a precision of {f2(router_precision)} and a recall of "
+        f"{f2(router_recall)} inside correct-answer responses",
+        f"reads {rng(claims, lambda x: f'{x:.1f}')} displayed calculations per response, so {tt(hi_digit)}'s "
+        f"{pct1(Q3[hi_digit]['digit_flag_rate_on_fully_solved'])} comes with {Q3[hi_digit]['claims_per_trace']:.1f} calculations per response and "
+        f"{tt(lo_digit)}'s {pct1(Q3[lo_digit]['digit_flag_rate_on_fully_solved'])} with {Q3[lo_digit]['claims_per_trace']:.1f}",
+        f"a milestone the judge rules missing in {pct(min(attr['e5_missing']))} to {pct(max(attr['e5_missing']))} of responses, a judged step flag in "
+        f"{pct(min(attr['router_judge']))} to {pct(max(attr['router_judge']))}, and an arithmetic flag in {pct(min(attr['digit_rule']))} to "
+        f"{pct(max(attr['digit_rule']))}",
     ],
-    "rewording": [
+    "paraphrase": [
         f"three of its 15 instances ({p_selected} instances)", f"at most {COPY}", "three attempts",
         f"the experts rejected {pct(r_rejected / r_returned)} of the pairs",
-        f"from the {p_selected} instances to the {r_kept} kept pairs on {q5_templates} templates: the {p_lost} templates with no passing rewrite",
-        f"and {WORD[p_lost_experts]} more lost", "with 95\\% intervals", "the 90\\% interval against", f"$\\pm {margin:.2f}$",
+        f"from the {p_selected} instances to the {r_kept} kept pairs on {q5_templates} templates: the {p_lost} templates with no passing paraphrase",
+        f"and {WORD[p_lost_experts]} more lost", f"{least_branch} engineering is the least covered branch",
+        "with 95\\% intervals", "the 90\\% interval against", f"$\\pm {margin:.2f}$",
+        f"On these {q5_pairs} pairs, the paired change in FAC lies between {sgn(min(q5_diff))} and {sgn(max(q5_diff))} across the eleven models",
         f"{WORD[len(q5_within)]} of the {WORD[len(ORDER)]} 90\\% intervals lie within the margin, and {tt(q5_out[0])}'s reaches "
-        f"{sgn(Q5[q5_out[0]]['ci90'][0])}",
+        f"{sgn(Q5[q5_out[0]]['ci90'][0])}, so a five-point drop is not ruled out for that model",
         f"{WORD[len(below90)].capitalize()} 90\\% intervals lie wholly below zero ({' and '.join(tt(k) for k in below90)}) and "
         f"{'one' if len(above90) == 1 else WORD[len(above90)]} wholly above ({' and '.join(tt(k) for k in above90)})",
         f"is {f3(q5_tau['tau'])} (95\\% CI {ci(q5_tau['ci'], False)})",
         f"median $\\tau$ of {f3(noise['median'])} (quartiles {f3(noise['q1'])} to {f3(noise['q3'])}, 5th percentile {f3(noise['p5'])})",
-        "two random halves",
-        f"for the {WORD[len(vs)]} models with decoding repeats; the rewording change lies within the repeats' spread for "
+        "two random halves", f"covers the {q5_templates} templates whose problems could be paraphrased without loss",
+        f"for the {WORD[len(vs)]} models with decoding repeats; the paraphrase change lies within the repeats' spread for "
         f"{WORD[len(vs_within)]} of them and beyond it for {' and '.join(tt(k) for k in vs_beyond)}",
     ],
     "conditions": [
-        f"{WORD[4]} conditions", f"{ANCH['flagship']['items']}-instance subset (three instances per template)", "80\\% power",
+        f"{WORD[4]} conditions", f"{n_sub}-instance subset (three instances per template)", "80\\% power",
         "the 90\\% interval against", f"$\\pm {margin:.2f}$", f"For the {ob_templates} templates",
         f"the {N_TEMPLATES - ob_templates} templates without such a statement", f"holds {ob_items} instances",
         f"a {TOOL_TIMEOUT} s limit", f"truncated at {thousands(TOOL_OUTPUT_CHARS)} characters", f"up to {TOOL_MAX_CALLS} calls",
         f"by {f3(r_mini['diff'])} (95\\% CI {ci(r_mini['ci'], False)})", "two closed models", f"the {WORD[len(ORDER)]} evaluated models",
+        f"the top five on the same instances score {rng(sub_scores)}, with intervals that contain both reasoning anchors, and on Advanced "
+        f"templates {rng(sub_adv, f2)} against the anchors' {rng(anchors_adv, f2)}",
+        f"lift {tt('gpt-oss-20b')} by {f3(ob['gpt-oss-20b']['diff'])} (95\\% CI {ci(ob['gpt-oss-20b']['ci'], False)}), partly because fewer "
+        f"responses run out of room ({f3(ob['gpt-oss-20b']['usable_in_both']['diff'])} on the instances answered in both runs)",
+        f"MC rises by {rng(mc_rise, f2)} for all three",
+        f"{tt('gpt-5.4-mini')}'s arithmetic flags on correct answers fall from {f3(tool['gpt-5.4-mini']['digit_flag_rate_fully_solved']['main'])} to "
+        f"{f3(tool['gpt-5.4-mini']['digit_flag_rate_fully_solved']['arm'])}",
     ],
     "errors": [
         f"The taxonomy has {WORD[6]} categories", f"answers the {WORD[6]} questions", f"{WORD[2].capitalize()} options cover what the six do not",
@@ -557,8 +564,9 @@ appendix_phrases = {
         f"{exact_templates} templates prescribe the digits",
         f"accounts for {exact_incorrect} incorrect verdicts across the {WORD[len(ORDER)]} models", f"{near_total} of them within 0.2\\%",
         f"the {WORD[len(SYMBOLIC)]} templates with symbolic answers",
-        f"Of the top five models' {top5_incorrect} incorrect verdicts, {top5_symbolic} are symbolic, {top5_near} within 0.2\\% on a template that "
-        f"prescribes the digits, and {two_chemical} on the two chemical templates: {form_total} of the {top5_incorrect}",
+        f"Of the top five models' {top5_incorrect} incorrect verdicts, {top5_symbolic} are symbolic ({one_template_symbolic} on one template), "
+        f"{top5_near} within 0.2\\% on a template that prescribes the digits, and {two_chemical} on the two chemical templates: {form_total} of the "
+        f"{top5_incorrect}",
         f"{WORD[len(SHORTCUT)]} templates whose answers can be read off", f"at most {f3(short_shift)} without them",
     ],
 }
@@ -588,6 +596,20 @@ blocks["main"]["tab:main_results"] = table(
     "$^{\\ast}$Returns no reasoning tokens at its provider's defaults. "
     f"$^{{\\dagger}}${Q1['glm-5.3']['empty']} responses are empty at the output ceiling and score 0.",
     "tab:main_results")
+blocks["main"]["fig:level_gap"] = figure(
+    "level-gap.pdf",
+    "\\textbf{Final Answer Accuracy Gap Between Easy and Advanced Templates.} "
+    f"Each model's mean on the {BL[ORDER[0]]['level']['Easy']['templates']} Easy templates minus its mean on the "
+    f"{BL[ORDER[0]]['level']['Advanced']['templates']} Advanced ones, with its 95\\% interval. "
+    f"Filled markers mark the {WORD[len(gap_sig)]} gaps that hold after Holm correction under Welch's $t$-test; crosses mark the gap without the two "
+    "Advanced chemical templates whose wording does not pin the answer, which holds for no model.", "fig:level_gap")
+blocks["main"]["fig:error_categories"] = figure(
+    "error-categories.pdf",
+    "\\textbf{Error Categories of the Wrong Answers Read.} "
+    f"Three domain experts' {readings_total} readings of {ERR_BUILD['items']} wrong answers, as the share of each column's readings in each "
+    f"category, by model ({per_model_items} wrong answers each) and by level ({level_n['Easy']}, {level_n['Intermediate']}, and "
+    f"{level_n['Advanced']} readings); the categories run from the most to the least fundamental, and darker cells hold larger shares.",
+    "fig:error_categories")
 
 # Appendix: extended table, two halves.
 rows = [f"{tt(k)} & {f3(Q1[k]['score'])} & {ci(Q1[k]['ci'])} & {f3(Q1[k]['fully_solved'])} & {ci(Q1[k]['fully_ci'])} & {Q1[k]['unusable']} & "
@@ -608,6 +630,16 @@ blocks["results"]["tab:results_process"] = table(
     "MC by matching alone (no judge) over every response with milestones and MC with the judge (as in the main table); the share of milestones the judge "
     "decides; the share of correct-answer responses with an arithmetic flag, the displayed calculations the check reads per response, and the share "
     "with a judged step flag, with 95\\% intervals.", "tab:results_process", resize=True)
+blocks["results"]["fig:scores"] = figure(
+    "scores.pdf",
+    "\\textbf{Final Answer Accuracy and Milestone Coverage with Intervals.} "
+    "The values of~\\autoref{tab:main_results} with their 95\\% intervals; the letters are that table's tier letters, and models that share one do "
+    "not differ after Holm correction.", "fig:scores")
+blocks["results"]["fig:pairs"] = figure(
+    "pairs.pdf",
+    "\\textbf{Pairs That Separate After Correction.} "
+    f"Dark cells mark the pairs whose difference holds at a Holm-adjusted $p < 0.05$: Final Answer Accuracy above the diagonal ({len(SEP_FAC)} of "
+    f"{N_PAIRS} pairs) and Milestone Coverage below it ({n_mc_sig} of {N_PAIRS}); models in the order of~\\autoref{{tab:main_results}}.", "fig:pairs")
 
 # Pairwise comparisons.
 rows = [f"{tt(p['a'])} & {tt(p['b'])} & {sgn(p['diff'])} & {ci(p['ci'])} & {pv(p['p_holm'])} & {pv(p['fully_p_holm'])} & {pv(p['mcnemar_p_holm'])} & "
@@ -697,6 +729,11 @@ blocks["results"]["tab:consistency"] = table(
     "\\textbf{Consistency Within a Template.} "
     "The share of templates whose 15 instances a model all answers correctly, some but not all, or none, with 95\\% intervals, for the templates that "
     "follow one reasoning path and for the others.", "tab:consistency", resize=True)
+blocks["results"]["fig:consistency"] = figure(
+    "consistency.pdf",
+    "\\textbf{Consistency Within a Template.} "
+    f"The share of templates whose 15 instances a model answers all correctly, some but not all, or none, for the {N_SINGLE} single-path templates "
+    f"and the other {N_TEMPLATES - N_SINGLE}.", "fig:consistency")
 rows = [f"{tt(k)} & {f3(Q1[k]['within_sd_quartiles'][1])} & {f3(Q1[k]['within_sd_quartiles'][2])} & {Q1[k]['templates_no_instance_variance']} & "
         f"{Q1[k]['templates_no_variance_all_solved']} & {Q1[k]['templates_no_variance_none_solved']} & "
         + ", ".join(code(t["template"]) for t in Q1[k]["highest_variance_templates"]) for k in ORDER]
@@ -715,13 +752,18 @@ blocks["results"]["tab:depth"] = table(
     "\\textbf{Wrong-Answer Rate Against the Depth of the Gold Derivation.} "
     "The share of instances answered wrong, by the number of milestones in the instance's gold derivation (the number of instances in parentheses).",
     "tab:depth")
+blocks["results"]["fig:depth"] = figure(
+    "depth.pdf",
+    "\\textbf{Wrong-Answer Rate Against the Depth of the Gold Derivation.} "
+    "For each model, the share of instances answered wrong among those whose gold derivation has one milestone (hollow) and six or more (filled).",
+    "fig:depth")
 rows = [f"{tt(k)} & {REPEATS[k]['items']} & " + " & ".join(f3(REPEATS[k]["scores"][r]) for r in ("repeat1", "repeat2", "repeat3")) +
         f" & {f3(REPEATS[k]['main_on_same_items'])} & {f3(REPEATS[k]['sd'])} & {f3(REPEATS[k]['range'])} & {f3(REPEATS[k]['same_verdict_every_repeat'])}"
         for k in ORDER if k in REPEATS]
 blocks["results"]["tab:repeats"] = table(
     "l r r r r r r r r", head("Model", "Instances", "Repeat 1", "Repeat 2", "Repeat 3", "Main run", "SD", "Range", "Same verdict"), rows,
     "\\textbf{Decoding Repeats.} "
-    "FAC of four models on 300 instances decoded three more times at the same settings, the main run's FAC on the same instances, the standard "
+    f"FAC of four models on {rep_items} instances decoded three more times at the same settings, the main run's FAC on the same instances, the standard "
     "deviation and range across the repeats, and the share of instances with the same verdict in every repeat.", "tab:repeats", resize=True)
 rows = [f"{tt(k)} & {thousands(int(REP[k]['median_tokens']))} & {thousands(int(REP[k]['median_tokens_fully_solved']))} & "
         f"{thousands(int(REP[k]['median_tokens_not_fully_solved']))}" for k in ORDER]
@@ -742,6 +784,11 @@ blocks["results"]["tab:coverage_wrong"] = table(
     "For the readable wrong answers with milestones: their number, the coverage by matching alone with its 95\\% interval, the chance floor (the same "
     "response matched against a sibling instance's milestones), and the coverage with the judge; then the share of wrong answers that reach every "
     "milestone and the share of correct answers that reach fewer than half, with 95\\% intervals.", "tab:coverage_wrong", resize=True)
+blocks["results"]["fig:coverage_wrong"] = figure(
+    "coverage-wrong.pdf",
+    "\\textbf{Milestone Coverage on Wrong Answers Against the Chance Floor.} "
+    "For each model's readable wrong answers, the chance floor (squares), the coverage by matching alone (hollow circles), and the coverage with the "
+    "judge (filled circles); the number of wrong answers is at the right.", "fig:coverage_wrong")
 rows = [f"{tt(k)} & {f2(COV[k]['rho_steps'])} & {f2(COV[k]['rho_claims'])} & {int(COV[k]['median_steps'])} & {f3(COV[k]['coverage_fully_solved'])} "
         f"({ci(COV[k]['coverage_fully_solved_ci'])}) & {f3(COV[k]['coverage_wrong'])} ({ci(COV[k]['coverage_wrong_ci'])})" for k in ORDER]
 blocks["results"]["tab:coverage_verbosity"] = table(
@@ -770,43 +817,47 @@ blocks["results"]["tab:attribution"] = table(
     "On the answered wrong answers, the share with an arithmetic flag, with a milestone the judge rules missing, and with a judged step flag; a "
     "response can be in several columns or in none.", "tab:attribution", star=False)
 
-# Rewording.
+# Paraphrase test.
 funnel = [
     f"Instances selected (one in five of every template) & {p_selected}",
-    f"Rewrites that pass the scripted checks (at the first, second, third attempt) & {p_passing} ({', '.join(map(str, p_attempts))})",
-    f"Instances with no passing rewrite after three attempts & {p_failed}",
+    f"Paraphrases that pass the scripted checks (at the first, second, third attempt) & {p_passing} ({', '.join(map(str, p_attempts))})",
+    f"Instances with no passing paraphrase after three attempts & {p_failed}",
     f"Failed attempts by check: technical tokens, numbers, near-copy, part labels, length & {p_checks['tokens']}, {p_checks['numbers']}, {p_checks['copy']}, "
     f"{p_checks['parts']}, {p_checks['length']}",
-    f"Passing rewrites with the original's notation restored & {p_restored}",
+    f"Passing paraphrases with the original's notation restored & {p_restored}",
     f"Pairs the domain experts kept & {r_kept}",
     f"Pairs rejected: not the same problem, adds information, different answer & {r_rejected}: {r_reasons['same=no']}, {r_reasons['clear=yes']}, {r_reasons['answer=no']}",
     "Kept of passing, per branch & " + "; ".join(f"{b.capitalize()} {k} of {k + r}" for b, (k, r) in r_branch.items()),
-    f"Templates covered & {q5_templates} ({p_lost} with no passing rewrite, {p_lost_experts} more with no kept pair)",
+    f"Templates covered & {q5_templates} ({p_lost} with no passing paraphrase, {p_lost_experts} more with no kept pair)",
 ]
-blocks["rewording"]["tab:rewording_funnel"] = table(
+blocks["paraphrase"]["tab:paraphrase_funnel"] = table(
     "p{0.72\\columnwidth} r", head("Step", "Count"), funnel,
-    "\\textbf{The Rewording Funnel.} From the instances selected to the pairs the domain experts kept.", "tab:rewording_funnel", star=False)
+    "\\textbf{The Paraphrase Funnel.} From the instances selected to the pairs the domain experts kept.", "tab:paraphrase_funnel", star=False)
 rows = [f"{tt(k)} & {sgn(Q5[k]['diff'])} & {ci(Q5[k]['ci'])} & {ci(Q5[k]['ci90'])} & {'yes' if Q5[k]['within_margin'] else 'no'} & {pv(Q5[k]['p_holm'])} & "
         f"{f3(Q5[k]['detectable'])} & {sgn(Q5[k]['e3']['diff'])} ({ci(Q5[k]['e3']['ci'])}) & {sgn(Q5[k]['e5']['diff'])} ({ci(Q5[k]['e5']['ci'])})" for k in ORDER]
-blocks["rewording"]["tab:rewording_results"] = table(
+blocks["paraphrase"]["tab:paraphrase_results"] = table(
     "l r c c c r r c c",
     head("Model", "FAC change", "95\\% CI", "90\\% CI", f"Within $\\pm {margin:.2f}$", "$p$ (Holm)", "Detectable", "MC, no judge", "MC"), rows,
-    "\\textbf{Change Under Rewording.} "
+    "\\textbf{Change Under Paraphrase.} "
     f"Paraphrase minus original on the {q5_pairs} expert-kept pairs over {q5_templates} templates: the change in FAC with its 95\\% and 90\\% intervals, "
     f"whether the 90\\% interval lies within $\\pm {margin:.2f}$, the Holm-adjusted $p$ of the sign-flip test over templates, the smallest change the "
-    "design detects, and the change in MC by matching alone and with the judge (95\\% intervals).", "tab:rewording_results", resize=True)
+    "design detects, and the change in MC by matching alone and with the judge (95\\% intervals).", "tab:paraphrase_results", resize=True)
+blocks["paraphrase"]["fig:paraphrase"] = figure(
+    "paraphrase.pdf",
+    "\\textbf{Change in Final Answer Accuracy Under Paraphrase.} "
+    f"Paraphrase minus original on the {q5_pairs} expert-kept pairs, with 90\\% intervals against the shaded $\\pm {margin:.2f}$ margin; filled "
+    f"markers mark the {WORD[len(q5_within)]} models whose interval lies within the margin.", "fig:paraphrase")
 rows = [f"{tt(k)} & {sgn(vs[k]['paraphrase']['diff'])} ({ci(vs[k]['paraphrase']['ci'])}) & " +
         " & ".join(f"{sgn(vs[k]['repeats'][r]['diff'])} ({ci(vs[k]['repeats'][r]['ci'])})" for r in ("repeat1", "repeat2", "repeat3")) for k in ORDER if k in vs]
-blocks["rewording"]["tab:rewording_repeats"] = table(
-    "l c c c c", head("Model", "Rewording", "Repeat 1", "Repeat 2", "Repeat 3"), rows,
-    "\\textbf{Rewording Against Decoding Noise.} "
-    f"For the four models with decoding repeats: the change in FAC under rewording ({q5_pairs} pairs) beside each repeat's change from the main run "
-    f"on the {REPEATS['gpt-oss-20b']['items']} repeated instances, with 95\\% intervals.", "tab:rewording_repeats", resize=True)
+blocks["paraphrase"]["tab:paraphrase_repeats"] = table(
+    "l c c c c", head("Model", "Paraphrase", "Repeat 1", "Repeat 2", "Repeat 3"), rows,
+    "\\textbf{Paraphrase Against Decoding Noise.} "
+    f"For the four models with decoding repeats: the change in FAC under paraphrase ({q5_pairs} pairs) beside each repeat's change from the main run "
+    f"on the {rep_items} repeated instances, with 95\\% intervals.", "tab:paraphrase_repeats", resize=True)
 
 # Conditions.
 rows = []
 for a in ARMS:
-    base = "the main run" if a["base"] == "main" else "its default"
     tu = a["tool_use"]
     rows.append(f"{CONDITION[a['arm']]} & {tt(a['model'])} & {a['items']} & {f3(a['main_score_on_items'])} & {f3(a['arm_score'])} & {sgn(a['diff'])} & "
                 f"{ci(a['ci'])} & {pv(a['p_holm'])} & {f3(a['detectable'])} & {ci(a['ci90'])} & {'yes' if a['within_margin'] else 'no'} & "
@@ -818,12 +869,17 @@ blocks["conditions"]["tab:conditions"] = table(
     head("Condition", "Model", "Inst.", "Base", "Cond.", "Change", "95\\% CI", "$p$ (Holm)", "Detectable", "90\\% CI", "Bounded", "Both answered",
          "MC change", "Arith.\\ flags", "Tool use"), rows,
     "\\textbf{The Conditions Against Their Base Run.} "
-    "Condition minus base, paired by instance, on the instances of the 450-instance subset the condition covers: FAC in the base run and the "
+    f"Condition minus base, paired by instance, on the instances of the {n_sub}-instance subset the condition covers: FAC in the base run and the "
     "condition, the change with its 95\\% interval, the Holm-adjusted $p$ of the sign-flip test over templates within the condition, the smallest "
     f"change the condition detects, the 90\\% interval and whether it lies within $\\pm {margin:.2f}$, the change on the instances answered in both runs "
     "(their number), the change in MC with its interval, the share of correct-answer responses with an arithmetic flag in the base run and the "
     "condition (unpaired), and for the tool condition the share of responses that call the tool and the calls per response. "
     f"{tt('gpt-5.4')}'s reasoning condition is paired against its default-setting anchor run.", "tab:conditions", resize=True)
+blocks["conditions"]["fig:conditions"] = figure(
+    "conditions.pdf",
+    "\\textbf{Change in Final Answer Accuracy Under Each Condition.} "
+    f"Condition minus base run on the {n_sub}-instance subset, with 95\\% intervals against the shaded $\\pm {margin:.2f}$ margin; filled markers "
+    "mark the changes that hold after Holm correction within the condition.", "fig:conditions")
 rows = []
 for x in [fl["deepseek-v4-pro"], fl["gpt-5.4"], flr] + roster_sub:
     cond = {"flagship": "default", "flagship-reasoning-medium": "reasoning, medium", "main": "main run"}[x["arm"]]
@@ -835,7 +891,7 @@ for x in [fl["deepseek-v4-pro"], fl["gpt-5.4"], flr] + roster_sub:
 blocks["conditions"]["tab:anchors"] = table(
     "l l r c r r c c c r c r r",
     head("Model", "Run", "FAC", "95\\% CI", "Strict", "No answer", "Easy", "Intermediate", "Advanced", "MC", "95\\% CI", "Arith.\\ flags", "Tokens"), rows,
-    "\\textbf{The Flagship Anchors Beside the Evaluated Models on the Same 450 Instances.} "
+    f"\\textbf{{The Flagship Anchors Beside the Evaluated Models on the Same {n_sub} Instances.}} "
     "Above the rule, the two anchors at their providers' defaults and \\texttt{GPT-5.4} with reasoning at medium effort; below it, the eleven evaluated "
     "models' main-run responses on the same instances. FAC and strict FAC, the responses with no readable answer, the level means, MC, the share of "
     "correct-answer responses with an arithmetic flag, and the median completion tokens; intervals resample the 150 templates of three instances. "
@@ -890,19 +946,248 @@ blocks["errors"]["tab:exact_digits"] = table(
     "prescribes the digits of the answer, where the check requires them.", "tab:exact_digits", star=False)
 
 
-# ----------------------------------------------------------------------------------------------- figure
-def draw_figure(path: Path) -> None:
+# ----------------------------------------------------------------------------------------------- figures
+def _plt():
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
+    plt.rcParams.update({"pdf.fonttype": 42, "font.family": "sans-serif", "font.size": 6.5, "axes.linewidth": 0.4,
+                         "xtick.major.width": 0.4, "ytick.major.width": 0.4, "xtick.major.size": 2, "ytick.major.size": 0,
+                         "xtick.labelsize": 6.5, "ytick.labelsize": 6.5, "axes.labelsize": 6.5, "legend.fontsize": 6,
+                         "axes.edgecolor": MUTED, "xtick.color": MUTED, "ytick.color": INK, "axes.labelcolor": INK,
+                         "savefig.dpi": 300})
+    return plt
+
+
+def save(fig, name: str) -> None:
+    FIGS.mkdir(parents=True, exist_ok=True)
+    fig.savefig(FIGS / name, metadata={"CreationDate": None})
+    import matplotlib.pyplot as plt
+    plt.close(fig)
+
+
+def recess(ax, left: bool = True) -> None:
+    for s in ("top", "right") + (() if left else ("left",)):
+        ax.spines[s].set_visible(False)
+    ax.grid(axis="x", color="#e7e6e2", linewidth=0.4)
+    ax.set_axisbelow(True)
+
+
+def rows_axes(plt, n: int, height: float, width: float = COLUMN, left: float = 0.36, right: float = 0.97, bottom: float = 0.13,
+              top: float = 0.90, ncols: int = 1, wspace: float = 0.08):
+    fig, axes = plt.subplots(1, ncols, figsize=(width, height), sharey=True,
+                             gridspec_kw={"left": left, "right": right, "bottom": bottom, "top": top, "wspace": wspace})
+    axes = list(axes) if ncols > 1 else [axes]
+    for ax in axes:
+        ax.set_ylim(n - 0.5, -0.5)
+        recess(ax, left=ax is axes[0])
+    return fig, axes
+
+
+def interval_rows(ax, items, lw: float = 1.0) -> None:
+    """items: (y, lo, hi, x, filled, marker) rows: an interval line with a marker, filled or hollow."""
+    for y, lo, hi, x, filled, marker in items:
+        ax.plot([lo, hi], [y, y], color=BLUE, linewidth=lw, solid_capstyle="butt", zorder=2)
+        ax.plot([x], [y], marker=marker, markersize=4.2, markeredgewidth=0.8, markeredgecolor=BLUE,
+                markerfacecolor=BLUE if filled else "white", linestyle="none", zorder=3)
+
+
+def top_legend(fig, handles, ncol: int, y: float = 0.995) -> None:
+    fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False, handlelength=1.4,
+               columnspacing=1.0, handletextpad=0.5)
+
+
+def fig_level_gap() -> None:
+    plt = _plt()
+    fig, (ax,) = rows_axes(plt, len(ORDER), 2.5, top=0.84)
+    ax.set_yticks(range(len(ORDER)))
+    ax.set_yticklabels([NAME[k] for k in ORDER])
+    ax.axvline(0, color=MUTED, linewidth=0.5, linestyle=(0, (2, 2)), zorder=1)
+    interval_rows(ax, [(i, Q2[k]["ci"][0], Q2[k]["ci"][1], Q2[k]["gap"], Q2[k]["p_welch_holm"] < 0.05, "o") for i, k in enumerate(ORDER)])
+    ax.plot([Q2[k]["without_two_chemical"]["gap"] for k in ORDER], range(len(ORDER)), marker="x", markersize=4, markeredgewidth=0.8,
+            color=INK, linestyle="none", zorder=4)
+    ax.set_xlabel("FAC gap, Easy minus Advanced")
+    from matplotlib.lines import Line2D
+    handles = [Line2D([], [], marker="o", color=BLUE, markerfacecolor=BLUE, markersize=4.2, linewidth=1.0, label="holds after correction"),
+               Line2D([], [], marker="o", color=BLUE, markerfacecolor="white", markersize=4.2, linewidth=1.0, label="does not hold"),
+               Line2D([], [], marker="x", color=INK, markersize=4, linestyle="none", label="without the two chemical templates")]
+    top_legend(fig, handles, 2)
+    save(fig, "level-gap.pdf")
+
+
+def fig_scores() -> None:
+    plt = _plt()
+    fig, axes = rows_axes(plt, len(ORDER), 2.4, ncols=2, left=0.36, right=0.98, top=0.90, wspace=0.18)
+    axes[0].set_yticks(range(len(ORDER)))
+    axes[0].set_yticklabels([NAME[k] for k in ORDER])
+    for ax, (title, val, cld) in zip(axes, (("Final Answer Accuracy", {k: (Q1[k]["score"], Q1[k]["ci"]) for k in ORDER}, CLD_FAC),
+                                             ("Milestone Coverage", {k: (COV[k]["coverage"], COV[k]["ci"]) for k in ORDER}, CLD_MC))):
+        interval_rows(ax, [(i, val[k][1][0], val[k][1][1], val[k][0], True, "o") for i, k in enumerate(ORDER)])
+        lo = min(v[1][0] for v in val.values())
+        ax.set_xlim(lo - 0.02, 1.0 + 0.06 * (1.02 - lo))
+        for i, k in enumerate(ORDER):
+            ax.text(1.0 + 0.012 * (1.02 - lo), i, cld[k], va="center", ha="left", fontsize=5.8, color=MUTED)
+        ax.set_title(title, fontsize=6.5, color=INK, pad=3)
+        ax.set_xticks([x for x in (0.8, 0.9, 1.0) if x > lo - 0.02])
+    save(fig, "scores.pdf")
+
+
+def fig_pairs() -> None:
+    plt = _plt()
+    import numpy as np
+    n = len(ORDER)
+    m = np.full((n, n), 0.5)
+    for i, a in enumerate(ORDER):
+        for j, b in enumerate(ORDER):
+            if i < j:
+                m[i, j] = 1.0 if frozenset((a, b)) in SEP_FAC else 0.0
+            elif i > j:
+                m[i, j] = 1.0 if frozenset((a, b)) in SEP_MC else 0.0
+    fig, ax = plt.subplots(figsize=(COLUMN, 3.0), gridspec_kw={"left": 0.36, "right": 0.90, "bottom": 0.02, "top": 0.70})
+    from matplotlib.colors import ListedColormap
+    ax.imshow(m, cmap=ListedColormap([LIGHT, "#d9d8d4", DARK]), vmin=0, vmax=1, aspect="equal")
+    ax.set_xticks(range(n))
+    ax.set_xticklabels([NAME[k] for k in ORDER], rotation=55, ha="left", rotation_mode="anchor")
+    ax.xaxis.tick_top()
+    ax.set_yticks(range(n))
+    ax.set_yticklabels([NAME[k] for k in ORDER])
+    ax.set_xticks([x - 0.5 for x in range(1, n)], minor=True)
+    ax.set_yticks([y - 0.5 for y in range(1, n)], minor=True)
+    ax.grid(which="minor", color="white", linewidth=1.0)
+    ax.tick_params(which="both", length=0, pad=2)
+    for s in ax.spines.values():
+        s.set_visible(False)
+    ax.text(n - 0.4, -0.65, "FAC", ha="right", va="bottom", fontsize=6.5, color=INK, fontweight="bold")
+    ax.text(-0.6, n - 0.4, "MC", ha="left", va="top", fontsize=6.5, color=INK, fontweight="bold", transform=ax.transData, clip_on=False)
+    save(fig, "pairs.pdf")
+
+
+def fig_coverage_wrong() -> None:
+    plt = _plt()
+    fig, (ax,) = rows_axes(plt, len(ORDER), 2.4, right=0.90, top=0.88)
+    ax.set_yticks(range(len(ORDER)))
+    ax.set_yticklabels([NAME[k] for k in ORDER])
+    for i, k in enumerate(ORDER):
+        q = Q3[k]
+        f, e3, e5 = q["e3_null_on_readable_wrong"], q["e3_coverage_on_readable_wrong"], q["e5_coverage_on_readable_wrong"]
+        ax.plot([f, e5], [i, i], color="#b9cfe9", linewidth=1.0, zorder=1)
+        ax.plot([f], [i], marker="s", markersize=3.6, color=MUTED, linestyle="none", zorder=3)
+        ax.plot([e3], [i], marker="o", markersize=4.2, markeredgewidth=0.8, markeredgecolor=BLUE, markerfacecolor="white", linestyle="none", zorder=3)
+        ax.plot([e5], [i], marker="o", markersize=4.2, markeredgewidth=0.8, markeredgecolor=BLUE, markerfacecolor=BLUE, linestyle="none", zorder=4)
+        ax.text(1.02, i, str(q["readable_wrong_with_milestones"]), va="center", ha="left", fontsize=5.8, color=MUTED, clip_on=False)
+    ax.set_xlim(0, 1.0)
+    ax.set_xlabel("Milestone Coverage on readable wrong answers")
+    ax.text(1.02, -0.85, "n", ha="left", va="center", fontsize=5.8, color=MUTED, clip_on=False)
+    from matplotlib.lines import Line2D
+    handles = [Line2D([], [], marker="s", color=MUTED, markersize=3.6, linestyle="none", label="chance floor"),
+               Line2D([], [], marker="o", color=BLUE, markerfacecolor="white", markersize=4.2, linestyle="none", label="matching alone"),
+               Line2D([], [], marker="o", color=BLUE, markerfacecolor=BLUE, markersize=4.2, linestyle="none", label="with the judge")]
+    top_legend(fig, handles, 3)
+    save(fig, "coverage-wrong.pdf")
+
+
+def fig_depth() -> None:
+    plt = _plt()
+    fig, (ax,) = rows_axes(plt, len(ORDER), 2.35, top=0.88)
+    ax.set_yticks(range(len(ORDER)))
+    ax.set_yticklabels([NAME[k] for k in ORDER])
+    for i, k in enumerate(ORDER):
+        one, six = Q3[k]["by_milestone_count"]["1"]["wrong_rate"], Q3[k]["by_milestone_count"]["6+"]["wrong_rate"]
+        ax.plot([one, six], [i, i], color="#b9cfe9", linewidth=1.0, zorder=1)
+        ax.plot([one], [i], marker="o", markersize=4.2, markeredgewidth=0.8, markeredgecolor=BLUE, markerfacecolor="white", linestyle="none", zorder=3)
+        ax.plot([six], [i], marker="o", markersize=4.2, markeredgewidth=0.8, markeredgecolor=BLUE, markerfacecolor=BLUE, linestyle="none", zorder=4)
+    ax.set_xlim(0, max(depth6) + 0.03)
+    ax.set_xlabel("Wrong-answer rate")
+    from matplotlib.lines import Line2D
+    handles = [Line2D([], [], marker="o", color=BLUE, markerfacecolor="white", markersize=4.2, linestyle="none", label="one milestone"),
+               Line2D([], [], marker="o", color=BLUE, markerfacecolor=BLUE, markersize=4.2, linestyle="none", label="six or more milestones")]
+    ax.legend(handles=handles, loc="lower center", bbox_to_anchor=(0.5, 1.0), ncol=2, frameon=False, handlelength=1.2, columnspacing=1.0)
+    save(fig, "depth.pdf")
+
+
+def fig_consistency() -> None:
+    plt = _plt()
+    fig, axes = rows_axes(plt, len(ORDER), 2.4, ncols=2, left=0.36, right=0.98, top=0.86, wspace=0.1)
+    axes[0].set_yticks(range(len(ORDER)))
+    axes[0].set_yticklabels([NAME[k] for k in ORDER])
+    shades = {"all": DARK, "some": "#6da7ec", "none": LIGHT}
+    for ax, (group, title) in zip(axes, (("single_path", f"Single-path ({N_SINGLE})"), ("multi_path", f"Other ({N_TEMPLATES - N_SINGLE})"))):
+        for i, k in enumerate(ORDER):
+            left = 0.0
+            for part in ("all", "some", "none"):
+                v = Q4[k][group][part]
+                ax.barh(i, v, left=left, height=0.7, color=shades[part], edgecolor="white", linewidth=0.8, zorder=2)
+                if part == "all" and v > 0.12:
+                    ax.text(left + v / 2, i, f"{v * 100:.0f}", ha="center", va="center", fontsize=5.6, color="white")
+                left += v
+        ax.set_xlim(0, 1)
+        ax.set_xticks([0, 0.5, 1.0])
+        ax.set_xticklabels(["0", "50", "100%"])
+        ax.set_title(title, fontsize=6.5, color=INK, pad=3)
+        ax.grid(False)
+    from matplotlib.patches import Patch
+    handles = [Patch(color=shades[p], label=f"{p} correct") for p in ("all", "some", "none")]
+    top_legend(fig, handles, 3)
+    save(fig, "consistency.pdf")
+
+
+def band_axes(plt, n: int, height: float, xlabel: str, left: float = 0.36, top: float = 0.88):
+    fig, (ax,) = rows_axes(plt, n, height, left=left, top=top)
+    ax.axvspan(-margin, margin, color=BAND, zorder=0)
+    ax.axvline(0, color=MUTED, linewidth=0.5, linestyle=(0, (2, 2)), zorder=1)
+    ax.set_xlabel(xlabel)
+    return fig, ax
+
+
+def fig_paraphrase() -> None:
+    plt = _plt()
+    fig, ax = band_axes(plt, len(ORDER), 2.35, "Change in FAC, paraphrase minus original")
+    ax.set_yticks(range(len(ORDER)))
+    ax.set_yticklabels([NAME[k] for k in ORDER])
+    interval_rows(ax, [(i, Q5[k]["ci90"][0], Q5[k]["ci90"][1], Q5[k]["diff"], Q5[k]["within_margin"], "o") for i, k in enumerate(ORDER)])
+    from matplotlib.lines import Line2D
+    from matplotlib.patches import Patch
+    handles = [Line2D([], [], marker="o", color=BLUE, markerfacecolor=BLUE, markersize=4.2, linewidth=1.0, label="90% interval within the margin"),
+               Line2D([], [], marker="o", color=BLUE, markerfacecolor="white", markersize=4.2, linewidth=1.0, label="not within"),
+               Patch(color=BAND, label=f"\u00b1{margin:.2f} margin")]
+    top_legend(fig, handles, 3)
+    save(fig, "paraphrase.pdf")
+
+
+def fig_conditions() -> None:
+    plt = _plt()
+    titles = {"reasoning-medium": "Reasoning at medium effort", "openbook2": "Governing equations", "tool": "Python tool",
+              "flagship-reasoning-medium": "Anchor, reasoning at medium"}
+    rows = []  # (label, arm or None): a header row per condition, then its models
+    for cond in ("reasoning-medium", "openbook2", "tool", "flagship-reasoning-medium"):
+        rows.append((titles[cond], None))
+        rows += [(NAME[a["model"]], a) for a in ARMS if a["arm"] == cond]
+    fig, ax = band_axes(plt, len(rows), 2.65, "Change in FAC, condition minus base run", left=0.41, top=0.90)
+    ax.set_yticks(range(len(rows)))
+    ax.set_yticklabels([r[0] for r in rows])
+    for label, (_, a) in zip(ax.get_yticklabels(), rows):
+        if a is None:
+            label.set_style("italic")
+            label.set_color(MUTED)
+            label.set_fontsize(6)
+    interval_rows(ax, [(i, a["ci"][0], a["ci"][1], a["diff"], a["p_holm"] < 0.05, "o") for i, (_, a) in enumerate(rows) if a])
+    from matplotlib.lines import Line2D
+    from matplotlib.patches import Patch
+    handles = [Line2D([], [], marker="o", color=BLUE, markerfacecolor=BLUE, markersize=4.2, linewidth=1.0, label="holds after correction"),
+               Line2D([], [], marker="o", color=BLUE, markerfacecolor="white", markersize=4.2, linewidth=1.0, label="does not hold"),
+               Patch(color=BAND, label=f"\u00b1{margin:.2f} margin")]
+    top_legend(fig, handles, 3)
+    save(fig, "conditions.pdf")
+
+
+def fig_error_categories() -> None:
+    plt = _plt()
     from matplotlib.colors import LinearSegmentedColormap
-    plt.rcParams.update({"pdf.fonttype": 42, "font.family": "sans-serif", "font.size": 6.5, "axes.linewidth": 0.4})
-    cats = [c for c in CATEGORIES if c[0] != CATEGORIES[7][0]]  # no "Incomplete" reading was given
-    assert all(by_model[m].get(CATEGORIES[7][0], 0) == 0 for m in B2_MODELS)
+    cats = [c for c in CATEGORIES if c[0] != INCOMPLETE]  # no "Incomplete" reading was given
     cols = [(NAME[m], sum(by_model[m].values()), by_model[m]) for m in B2_MODELS] + [(lv, level_n[lv], by_level[lv]) for lv in LEVELS]
     shares = [[c[2].get(full, 0) / c[1] for c in cols] for full, _ in cats]
-    cmap = LinearSegmentedColormap.from_list("blue", ["#ffffff", "#cde2fb", "#9ec5f4", "#5598e7", "#2a78d6", "#184f95", "#0d366b"])
-    fig = plt.figure(figsize=(3.03, 2.55))
+    cmap = LinearSegmentedColormap.from_list("blue", ["#ffffff", LIGHT, "#9ec5f4", "#5598e7", BLUE, "#184f95", DARK])
+    fig = plt.figure(figsize=(COLUMN, 2.55))
     gs = fig.add_gridspec(2, 2, width_ratios=[4, 3], height_ratios=[22, 1], wspace=0.06, hspace=0.45, left=0.31, right=0.93, top=0.74, bottom=0.11)
     for j, (sl, title) in enumerate(((slice(0, 4), "By model"), (slice(4, 7), "By level"))):
         ax = fig.add_subplot(gs[0, j])
@@ -911,7 +1196,7 @@ def draw_figure(path: Path) -> None:
         ax.set_xticks(range(len(cols[sl])))
         ax.set_xticklabels([c[0] for c in cols[sl]], rotation=45, ha="left", rotation_mode="anchor")
         ax.xaxis.tick_top()
-        ax.set_xlabel(title, fontsize=6.5, color="#52514e", labelpad=3)
+        ax.set_xlabel(title, fontsize=6.5, color=MUTED, labelpad=3)
         if j == 0:
             ax.set_yticks(range(len(cats)))
             ax.set_yticklabels([s for _, s in cats])
@@ -919,7 +1204,7 @@ def draw_figure(path: Path) -> None:
             ax.set_yticks([])
         for i, row in enumerate(data):
             for k, v in enumerate(row):
-                ax.text(k, i, f"{v * 100:.0f}", ha="center", va="center", fontsize=6.2, color="#ffffff" if v > 0.5 else "#0b0b0b")
+                ax.text(k, i, f"{v * 100:.0f}", ha="center", va="center", fontsize=6.2, color="#ffffff" if v > 0.5 else INK)
         for s in ax.spines.values():
             s.set_visible(False)
         ax.tick_params(length=0, pad=2)
@@ -932,9 +1217,12 @@ def draw_figure(path: Path) -> None:
     cb.set_label("Share of readings (%)", fontsize=6.5, labelpad=1)
     cb.ax.tick_params(labelsize=6, length=2, width=0.4)
     cb.outline.set_linewidth(0.4)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    fig.savefig(path)
-    plt.close(fig)
+    save(fig, "error-categories.pdf")
+
+
+FIGURES = {"level-gap.pdf": fig_level_gap, "error-categories.pdf": fig_error_categories, "scores.pdf": fig_scores, "pairs.pdf": fig_pairs,
+           "coverage-wrong.pdf": fig_coverage_wrong, "depth.pdf": fig_depth, "consistency.pdf": fig_consistency,
+           "paraphrase.pdf": fig_paraphrase, "conditions.pdf": fig_conditions}
 
 
 # ----------------------------------------------------------------------------------------------- write and check
@@ -966,7 +1254,8 @@ def write_blocks() -> None:
                 raise SystemExit(f"{path.name} has no markers for {name}")
             tex = pattern.sub(lambda m: block(name, body), tex, count=1)
         path.write_text(tex, encoding="utf-8")
-    draw_figure(FIG)
+    for draw in FIGURES.values():
+        draw()
 
 
 def check() -> int:
@@ -990,7 +1279,7 @@ def check() -> int:
         stray = sorted(numbers(prose(tex)) - known) + sorted({w.lower() for w in NUMBER_WORDS.findall(prose(tex))} - words)
         cited = {k.strip() for c in re.findall(r"\\cite[pt]\{([^}]*)\}", tex) for k in c.split(",")}
         unresolved = sorted(cited - bib_keys)
-        refs = {r for r in re.findall(r"\\autoref\{([^}]*)\}", tex)}
+        refs = set(re.findall(r"\\autoref\{([^}]*)\}", tex))
         undefined = sorted(refs - labels)
         for p in missing:
             print(f"MISSING in {path.name}: {p}")
@@ -1007,19 +1296,20 @@ def check() -> int:
               f"{len(stray)} numbers not generated; {len(cited) - len(unresolved)} of {len(cited)} citation keys resolve; "
               f"{len(refs) - len(undefined)} of {len(refs)} references defined")
         failures += len(missing) + len(stray) + len(unresolved) + len(undefined) + len(long_lines)
-    if not FIG.exists():
-        print(f"MISSING figure {FIG}")
-        failures += 1
+    for name in FIGURES:
+        if not (FIGS / name).exists():
+            print(f"MISSING figure {FIGS / name}")
+            failures += 1
     return failures
 
 
 if __name__ == "__main__":
     if "--write" in sys.argv:
         write_blocks()
-        print(f"wrote {sum(len(b) for b in blocks.values())} generated blocks and {FIG.relative_to(REPO)}")
+        print(f"wrote {sum(len(b) for b in blocks.values())} generated blocks and {len(FIGURES)} figures to {FIGS.relative_to(REPO)}")
     elif "--check" in sys.argv:
         sys.exit(1 if check() else 0)
     else:
-        for key, ph in (("6_results.tex", phrases), *((f"appendices/{k}.tex", v) for k, v in appendix_phrases.items() if k != "main")):
+        for key, ph in (("6_results.tex", phrases), *((f"appendices/{k}.tex", v) for k, v in appendix_phrases.items())):
             print(f"% phrases {key} must contain")
             print("\n".join(ph))

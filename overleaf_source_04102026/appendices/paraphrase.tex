@@ -1,33 +1,34 @@
 % -------------
-\section{Robustness to Rewording}
-\label{appendix:rewording}
+\section{Paraphrase Test}
+\label{appendix:paraphrase}
 
-This section supports the Rewording paragraph of~\autoref{subsec:results}: the design of the test,
-the scripted and expert checks, and the results in full.
+This section supports the paraphrase result of~\autoref{subsec:overall_performance}: the design of
+the test, the scripted and expert checks, and the results in full.
 
 \paragraph{Design.}
 Fixed template wording could let a model recognize a problem type and reproduce a memorized method,
 so we test whether the wording alone moves the scores.
-For every template we select three of its 15 instances (450 instances) and rewrite each once with an
-LLM from a family outside both the evaluated models and the judge, under rules that keep every
-number, unit, symbol, formula, acronym, and labeled part in place and change only the wording.
-A script checks each rewrite (the numbers as a multiset, every technical token, the part labels, a
-word similarity to the original of at most 0.75, the length, and no preamble), restores the
+A paraphrase keeps every number, unit, symbol, formula, acronym, and labeled part of a question in
+place and changes only the wording.
+For every template we select three of its 15 instances (450 instances) and paraphrase each once with
+an LLM from a family outside both the evaluated models and the judge.
+A script checks each paraphrase (the numbers as a multiset, every technical token, the part labels,
+a word similarity to the original of at most 0.75, the length, and no preamble), restores the
 original's notation where the writer used symbols the original lacks, and gives the writer three
 attempts.
 A domain expert of the instance's branch then reads each passing pair and keeps it only if the
-rewrite is the same problem with the same answer and adds nothing; the experts rejected 12\% of the
-pairs that passed every scripted check, almost always for a dropped or altered qualifier that
+paraphrase is the same problem with the same answer and adds nothing; the experts rejected 12\% of
+the pairs that passed every scripted check, almost always for a dropped or altered qualifier that
 changes the physics or the asked quantity, such as whether a shaft is solid or a flow is uniform.
 The eleven models answer the paraphrases under the main run's prompt, settings, and scoring, on the
 same served checkpoints, against the original instances' gold answers and milestones.
-\autoref{tab:rewording_funnel} gives the funnel from the 450 instances to the 277 kept pairs on 115
-templates: the 29 templates with no passing rewrite are formula-bound ones whose technical tokens
+\autoref{tab:paraphrase_funnel} gives the funnel from the 450 instances to the 277 kept pairs on 115
+templates: the 29 templates with no passing paraphrase are formula-bound ones whose technical tokens
 the writer could not keep in place, and six more lost their last kept pair at the expert step, so
-the test covers the templates that can be reworded without loss, and industrial engineering is the
-least covered branch.
+the test covers the 115 templates whose problems could be paraphrased without loss, and industrial
+engineering is the least covered branch.
 
-% BEGIN GENERATED tab:rewording_funnel (full_run_28092026/paper_results.py --write)
+% BEGIN GENERATED tab:paraphrase_funnel (full_run_28092026/paper_results.py --write)
 \begin{table}[t]
 \centering
 \small
@@ -37,29 +38,31 @@ least covered branch.
 \textbf{Step} & \textbf{Count} \\
 \midrule
 Instances selected (one in five of every template) & 450 \\
-Rewrites that pass the scripted checks (at the first, second, third attempt) & 316 (264, 39, 13) \\
-Instances with no passing rewrite after three attempts & 134 \\
+Paraphrases that pass the scripted checks (at the first, second, third attempt) & 316 (264, 39, 13) \\
+Instances with no passing paraphrase after three attempts & 134 \\
 Failed attempts by check: technical tokens, numbers, near-copy, part labels, length & 362, 163, 75, 20, 13 \\
-Passing rewrites with the original's notation restored & 35 \\
+Passing paraphrases with the original's notation restored & 35 \\
 Pairs the domain experts kept & 277 \\
 Pairs rejected: not the same problem, adds information, different answer & 39: 31, 24, 4 \\
 Kept of passing, per branch & Chemical 65 of 71; Civil 60 of 71; Electrical 61 of 64; Industrial 43 of 49; Mechanical 48 of 61 \\
-Templates covered & 115 (29 with no passing rewrite, 6 more with no kept pair) \\
+Templates covered & 115 (29 with no passing paraphrase, 6 more with no kept pair) \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{The Rewording Funnel.} From the instances selected to the pairs the domain experts kept.}
-\label{tab:rewording_funnel}
+\caption{\textbf{The Paraphrase Funnel.} From the instances selected to the pairs the domain experts kept.}
+\label{tab:paraphrase_funnel}
 \end{table}
-% END GENERATED tab:rewording_funnel
+% END GENERATED tab:paraphrase_funnel
 
 \paragraph{Results.}
-\autoref{tab:rewording_results} gives, per model, the paired change paraphrase minus original in FAC
-and in MC with and without the judge, with 95\% intervals, the Holm-adjusted $p$ of the sign-flip
-test over templates, the smallest change the design detects, and the 90\% interval against the
-$\pm 0.05$ margin, which equals the paired difference the design was planned to detect and was fixed
-after the point estimates were known.
-No change is significant after correction; ten of the eleven 90\% intervals lie within the margin,
-and \texttt{Qwen3-235B-2507}'s reaches $-0.067$.
+\autoref{tab:paraphrase_results} and~\autoref{fig:paraphrase} give, per model, the paired change
+paraphrase minus original in FAC and in MC with and without the judge, with 95\% intervals, the
+Holm-adjusted $p$ of the sign-flip test over templates, the smallest change the design detects, and
+the 90\% interval against the $\pm 0.05$ margin, which equals the paired difference the design was
+planned to detect and was fixed after the point estimates were known.
+On these 277 pairs, the paired change in FAC lies between $-0.031$ and $+0.020$ across the eleven
+models, and no change is significant after correction; ten of the eleven 90\% intervals lie within
+the margin, and \texttt{Qwen3-235B-2507}'s reaches $-0.067$, so a five-point drop is not ruled out
+for that model; MC changes by the same small amounts.
 Two 90\% intervals lie wholly below zero (\texttt{Claude Sonnet 5} and \texttt{GLM-5.3-Flash}) and
 one wholly above (\texttt{Muse Glimmer 30B}): small changes the data favor within the bound, which
 the corrected tests do not support, and which we do not call findings.
@@ -68,12 +71,14 @@ CI 0.455 to 0.881).
 Sampling noise alone, measured by splitting each template's kept pairs into two random halves and
 ordering the models on each, gives a median $\tau$ of 0.782 (quartiles 0.721 to 0.855, 5th
 percentile 0.624), so the observed agreement sits at the lower edge of the noise distribution: the
-tiers hold, and the order within the top tier is not resolved by this test.
-\autoref{tab:rewording_repeats} sets the rewording change beside run-to-run decoding noise for the
-four models with decoding repeats; the rewording change lies within the repeats' spread for three of
-them and beyond it for \texttt{Qwen3-235B-2507}.
+tiers hold under paraphrase, and the order within the top tier is not resolved by this test.
+The test bounds memorized wording, not memorized methods, since the numbers and the problem
+structure are kept.
+\autoref{tab:paraphrase_repeats} sets the paraphrase change beside run-to-run decoding noise for the
+four models with decoding repeats; the paraphrase change lies within the repeats' spread for three
+of them and beyond it for \texttt{Qwen3-235B-2507}.
 
-% BEGIN GENERATED tab:rewording_results (full_run_28092026/paper_results.py --write)
+% BEGIN GENERATED tab:paraphrase_results (full_run_28092026/paper_results.py --write)
 \begin{table*}[t]
 \centering
 \small
@@ -97,12 +102,21 @@ them and beyond it for \texttt{Qwen3-235B-2507}.
 \bottomrule
 \end{tabular}
 }
-\caption{\textbf{Change Under Rewording.} Paraphrase minus original on the 277 expert-kept pairs over 115 templates: the change in FAC with its 95\% and 90\% intervals, whether the 90\% interval lies within $\pm 0.05$, the Holm-adjusted $p$ of the sign-flip test over templates, the smallest change the design detects, and the change in MC by matching alone and with the judge (95\% intervals).}
-\label{tab:rewording_results}
+\caption{\textbf{Change Under Paraphrase.} Paraphrase minus original on the 277 expert-kept pairs over 115 templates: the change in FAC with its 95\% and 90\% intervals, whether the 90\% interval lies within $\pm 0.05$, the Holm-adjusted $p$ of the sign-flip test over templates, the smallest change the design detects, and the change in MC by matching alone and with the judge (95\% intervals).}
+\label{tab:paraphrase_results}
 \end{table*}
-% END GENERATED tab:rewording_results
+% END GENERATED tab:paraphrase_results
 
-% BEGIN GENERATED tab:rewording_repeats (full_run_28092026/paper_results.py --write)
+% BEGIN GENERATED fig:paraphrase (full_run_28092026/paper_results.py --write)
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\columnwidth]{figs/paraphrase.pdf}
+    \caption{\textbf{Change in Final Answer Accuracy Under Paraphrase.} Paraphrase minus original on the 277 expert-kept pairs, with 90\% intervals against the shaded $\pm 0.05$ margin; filled markers mark the ten models whose interval lies within the margin.}
+    \label{fig:paraphrase}
+\end{figure}
+% END GENERATED fig:paraphrase
+
+% BEGIN GENERATED tab:paraphrase_repeats (full_run_28092026/paper_results.py --write)
 \begin{table*}[t]
 \centering
 \small
@@ -110,7 +124,7 @@ them and beyond it for \texttt{Qwen3-235B-2507}.
 \begin{tabular}{l c c c c}
 \toprule
 \rowcolor{gray!10}
-\textbf{Model} & \textbf{Rewording} & \textbf{Repeat 1} & \textbf{Repeat 2} & \textbf{Repeat 3} \\
+\textbf{Model} & \textbf{Paraphrase} & \textbf{Repeat 1} & \textbf{Repeat 2} & \textbf{Repeat 3} \\
 \midrule
 \texttt{Qwen3-235B-2507} & $-0.031$ ($-0.074$ to 0.011) & $-0.002$ ($-0.030$ to 0.028) & $+0.005$ ($-0.023$ to 0.035) & $+0.005$ ($-0.025$ to 0.033) \\
 \texttt{Gemini 3.1 Flash-Lite} & $+0.007$ ($-0.032$ to 0.046) & $-0.005$ ($-0.027$ to 0.017) & $-0.012$ ($-0.035$ to 0.012) & $+0.007$ ($-0.015$ to 0.030) \\
@@ -119,7 +133,7 @@ them and beyond it for \texttt{Qwen3-235B-2507}.
 \bottomrule
 \end{tabular}
 }
-\caption{\textbf{Rewording Against Decoding Noise.} For the four models with decoding repeats: the change in FAC under rewording (277 pairs) beside each repeat's change from the main run on the 300 repeated instances, with 95\% intervals.}
-\label{tab:rewording_repeats}
+\caption{\textbf{Paraphrase Against Decoding Noise.} For the four models with decoding repeats: the change in FAC under paraphrase (277 pairs) beside each repeat's change from the main run on the 300 repeated instances, with 95\% intervals.}
+\label{tab:paraphrase_repeats}
 \end{table*}
-% END GENERATED tab:rewording_repeats
+% END GENERATED tab:paraphrase_repeats
