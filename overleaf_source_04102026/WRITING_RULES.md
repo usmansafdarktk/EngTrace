@@ -61,6 +61,9 @@ vocabulary) are in `docs/PAPER_PLAN_OCT2026.md`, section 8; this file covers for
   `\input{sections/6_experiments_results}`; the wrapper compiles once `6_results.tex` exists.
 - A `\paragraph{}` heading and the first sentence of its paragraph share a source line (the authors, 2026-10-05;
   Section 5's appendix so far, the earlier sections still start the text on the next line).
+- The final state only (the authors, 2026-10-05): no history of the work in the paper, such as rounds of fixes,
+  which analyses were planned or added, when a margin or threshold was fixed, or which test replaced which; and no
+  cost figures. Appendices give implementation details, in lists where they read better than prose.
 - In the `.tex` files every sentence starts on a new line and wraps at 100 characters, never inside a citation,
   reference or `\textsc{}` name; changes then show sentence by sentence, and LaTeX still prints one paragraph.
   Text copied verbatim from the May appendix (prompt boxes, the parameterization bullets) keeps its original

@@ -7446,6 +7446,13 @@ the May style and every value verified. Choices:
   (252 words; Welch's test, the Holm explanation and the detectable differences now only in the appendix). The
   appendix is two sections to match, Evaluated Models and Experimental Setup, the second with subsections for
   decoding and token use, the inference prompt, and the statistical protocol, which the setup names one by one.
+- **Revised the same day at the authors' request: implementation details and the final state only.** No cost (the
+  cost column, the total row and the cost sentence removed, and "for cost" from Section 5.1); no routing rule beyond
+  the serving precision; no prompt-hash sentence; no responses-without-an-answer column (a result, not a setting).
+  The protocol states the procedure as it stands, without the planned-versus-added history, the replaced test or
+  when the equivalence margin was fixed; the authors decided these are not paper material (`WRITING_RULES.md`). The
+  selection, decoding and protocol are itemized lists; the selection names the expert study's five models and the
+  judges, with "among them" covering the two further models the evaluator was checked on.
 
 ## D-192 — Sections 5.2 and 5.3 written: results, error analysis, and the full-results, rewording, conditions and error-analysis appendices
 

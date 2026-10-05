@@ -154,7 +154,7 @@ reasoning = [k for k in roster if k not in no_reasoning]
 medians = [dec[k]["reasoning_tokens"]["median"] for k in reasoning]
 closed_without = sum(k in closed for k in no_reasoning)
 assert NO_THINKING in no_reasoning
-cost = sum(d["billed_usd"] for d in dec.values())
+assert min(dec[k]["reasoning_tokens"]["share_above_zero"] for k in reasoning) >= 0.99, "nearly every response"
 
 # ---------------------------------------------------------------- the prompt
 template = re.search(r'PROMPT_TEMPLATE = """(.*?)"""', runner, re.S).group(1)
@@ -214,7 +214,7 @@ phrases = [  # Section 5.1
     f"We evaluate {WORD[len(roster)]} LLMs: {WORD[len(open_)]} open-weights models, {series(open_, cite=True)}; and "
     f"{WORD[len(closed)]} closed models, {series(closed, cite=True)}.",
     "None of them wrote responses that we used to develop or validate the evaluator",
-    f"For cost, {WORD[len(anchors)]} flagships, {series(anchors, cite=True)}, run only as anchors on a fixed subset "
+    f"{WORD[len(anchors)].capitalize()} flagships, {series(anchors, cite=True)}, run only as anchors on a fixed subset "
     f"of {subset} instances ({WORD[subset // len(per_template)]} per template), which the further conditions also "
     "use",
     f"Each model answers each instance once ({thousands(rows)} responses) with the same zero-shot prompt and no "
@@ -229,38 +229,33 @@ phrases = [  # Section 5.1
     f"every {level}\\% interval is a bootstrap over templates",
 ]
 appendix_phrases = [  # appendices/models.tex
-    f"It excludes the {WORD[len(study)]} models of the expert study ({listing([ttn(s) for s in study])}), "
-    f"{WORD[len(ROBUSTNESS)]} models whose responses we used to check the evaluator on smaller open-weights models "
-    f"({listing([ttn(s) for s in ROBUSTNESS.values()])}), and every model we use as a judge "
-    f"({listing([ttn(s) for s in JUDGES.values()])})",
+    f"among them the {WORD[len(study)]} models of the expert study ({listing([ttn(s) for s in study])})",
+    f"every model we use as a judge ({listing([ttn(s) for s in JUDGES.values()])})",
     f"lists the {WORD[len(roster)]} evaluated models and the {WORD[len(anchors)]} flagship anchors",
-    f"OpenRouter sends each open-weights model to the cheapest provider that serves it at {min_bits}-bit "
-    "floating-point precision or higher",
-    f"every model returns a response, possibly empty, for all {thousands(len(manifest))} instances",
-    f"{tt('muse-glimmer-30b')} has a single eligible provider, which caps its output at "
-    f"{thousands(lower['muse-glimmer-30b'])} tokens",
-    f"{WORD[len(no_reasoning)].capitalize()} models return no reasoning tokens: {tt(NO_THINKING)} has no thinking "
-    f"mode, and {series([k for k in no_reasoning if k != NO_THINKING])} return none at their providers' defaults",
-    f"the {thousands(rows)} responses cost US\\${cost:,.2f} in all",
+    f"\\textbf{{Output ceiling}}: {thousands(ceiling)} tokens, except {thousands(lower['muse-glimmer-30b'])} for "
+    f"{tt('muse-glimmer-30b')}, whose single eligible provider caps its output there",
+    f"providers serve every open-weights model at {min_bits}-bit floating-point precision or higher",
+    f"every model returns one response, possibly empty, for each of the {thousands(len(manifest))} instances",
+    f"{tt(NO_THINKING)} has no thinking mode, and {series([k for k in no_reasoning if k != NO_THINKING])} return no "
+    f"reasoning tokens at their providers' defaults; the other {WORD[len(reasoning)]} models return them on nearly "
+    "every response",
     f"The eleven models of~\\autoref{{sec:experiments}}, grouped by access, and the {WORD[len(anchors)]} flagship "
     f"anchors run on the {subset}-instance subset",
     f"{tt('deepseek-v4.1-flash')} activates {PREFILL_DECODE[0]} in prefill and {PREFILL_DECODE[1]} in decoding",
     f"Per model over its {thousands(len(manifest))} responses",
-    f"and all {thousands(rows)} carry the same one",
     f"Every template has {k_inst} instances, so Final Answer Accuracy over the {thousands(len(manifest))} instances "
     f"equals the mean of the {len(per_template)} template means",
-    f"comparisons of Milestone Coverage use the {mc_templates} templates with milestones",
-    f"Every {level}\\% interval is a percentile bootstrap that resamples templates {thousands(B)} times",
-    f"where we bound a change, we also give its {level90}\\% interval",
+    f"every {level}\\% interval is a percentile bootstrap that resamples templates {thousands(B)} times; where we "
+    f"bound a change, we also give its {level90}\\% interval",
     f"a sign-flip permutation test with {thousands(B_TEST)} sign flips",
+    f"Milestone Coverage is compared over the {mc_templates} templates with milestones",
     "because scores vary more across Advanced templates",
-    f"its mean on the {levels['Easy']} Easy templates minus its mean on the {levels['Advanced']} Advanced ones",
+    f"a model's mean on the {levels['Easy']} Easy templates minus its mean on the {levels['Advanced']} Advanced ones",
     f"such as the {comb(len(roster), 2)} pairs of models for each measure or the {WORD[len(roster)]} level gaps",
-    f"at {power}\\% power and a two-sided level of {sig:.2f} is ${factor}\\,s/\\sqrt{{n}}$",
-    f"for a level gap it is ${factor}\\,\\sigma\\sqrt{{1/{levels['Easy']} + 1/{levels['Advanced']}}}$",
-    f"A change counts as bounded when its {level90}\\% interval lies within $\\pm {margin:.2f}$, which is two "
+    f"at {power}\\% power and a two-sided level of {sig:.2f}, ${factor}\\,s/\\sqrt{{n}}$ for a paired comparison",
+    f"${factor}\\,\\sigma\\sqrt{{1/{levels['Easy']} + 1/{levels['Advanced']}}}$ for a level gap",
+    f"a change counts as bounded when its {level90}\\% interval lies within $\\pm {margin:.2f}$, which is two "
     f"one-sided tests at {round(100 * sig)}\\%",
-    f"the {WORD[len(CONDITIONS)]} conditions on the {subset}-instance subset",
 ]
 
 
@@ -275,12 +270,10 @@ def decoding_row(k: str) -> str:
     return (rf"{tt(k)} & {thousands(d['max_tokens'])} & {len(d['providers'])} & "
             f"{tokens(d['completion_tokens']['median'])} / {tokens(d['completion_tokens']['p90'])} & "
             f"{tokens(d['reasoning_tokens']['median'])} / {tokens(d['reasoning_tokens']['p90'])} & "
-            f"{100 * d['reasoning_tokens']['share_above_zero']:.1f}\\% & {q1[k]['unusable']} & "
-            f"{d['billed_usd']:.2f} \\\\")
+            f"{100 * d['reasoning_tokens']['share_above_zero']:.1f}\\% \\\\")
 
 
-table_rows = ([models_row(k) for k in open_ + closed + alpha(anchors)] + [decoding_row(k) for k in open_ + closed]
-              + [rf"\textit{{All}} & & & & & & {unusable} & {cost:.2f} \\"])
+table_rows = [models_row(k) for k in open_ + closed + alpha(anchors)] + [decoding_row(k) for k in open_ + closed]
 
 NUMBER = re.compile(r"\d[\d,]*(?:\.\d+)?")
 NUMBER_WORDS = re.compile(r"\b(" + "|".join(WORD.values()) + r")\b", re.I)

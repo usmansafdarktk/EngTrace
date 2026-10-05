@@ -2,13 +2,16 @@
 \section{Evaluated Models}
 \label{appendix:models}
 
-One rule selects the evaluated models (\autoref{subsec:models}): no model whose responses we used to
-develop or validate the evaluator, and no model we use as a judge.
-It excludes the five models of the expert study (\texttt{GPT-5}, \texttt{Claude Opus 4.7},
-\texttt{Gemini 3.1 Pro}, \texttt{DeepSeek-R1}, and \texttt{Llama 3.1 70B}), two models whose
-responses we used to check the evaluator on smaller open-weights models (\texttt{Gemma 4 31B} and
-\texttt{Qwen3.8-27B}), and every model we use as a judge (\texttt{GPT-5}, \texttt{Claude Opus 4.5},
-\texttt{Gemini 3.1 Pro}, \texttt{Grok 4.6}, \texttt{MiniMax M3}, and \texttt{MiMo-V2.5-Pro}).
+One rule selects the evaluated models (\autoref{subsec:models}).
+It excludes:
+\begin{itemize}
+    \item \textbf{Models behind the evaluator}: every model whose responses we used to develop or
+    validate the evaluator, among them the five models of the expert study (\texttt{GPT-5},
+    \texttt{Claude Opus 4.7}, \texttt{Gemini 3.1 Pro}, \texttt{DeepSeek-R1}, and
+    \texttt{Llama 3.1 70B}).
+    \item \textbf{Judges}: every model we use as a judge (\texttt{GPT-5}, \texttt{Claude Opus 4.5},
+    \texttt{Gemini 3.1 Pro}, \texttt{Grok 4.6}, \texttt{MiniMax M3}, and \texttt{MiMo-V2.5-Pro}).
+\end{itemize}
 \autoref{tab:models} lists the eleven evaluated models and the two flagship anchors with their
 developing organization, size, and identifiers.
 
@@ -71,64 +74,62 @@ the Hugging Face repository of an open-weights model.}
 \subsection{Decoding and Token Use}
 \label{appendix:decoding}
 
-We query every model through OpenRouter, and each request carries the prompt
-(\autoref{appendix:prompt}), the output ceiling, and routing preferences only,
-with no temperature, top-p, or reasoning setting, so each model decodes at its provider's defaults.
-OpenRouter sends each open-weights model to the cheapest provider that serves it at 8-bit
-floating-point precision or higher, and to the next one when a request fails, so the responses of
-one model can come from several providers.
-A request that fails at the provider is sent again, and every model returns a response, possibly
-empty, for all 2,250 instances.
-\texttt{Muse Glimmer 30B} has a single eligible provider, which caps its output at 16,384 tokens.
-Four models return no reasoning tokens: \texttt{Qwen3-235B-2507} has no thinking mode, and
-\texttt{Gemma 4 26B}, \texttt{Gemini 3.1 Flash-Lite}, and \texttt{GPT-5.4 mini} return none at
-their providers' defaults.
-\autoref{tab:decoding} gives each model's ceiling, providers, token use, responses without a
-readable final answer, and cost; the 24,750 responses cost US\$247.92 in all.
+\begin{itemize}
+    \item \textbf{Requests}: we query every model through OpenRouter with the prompt
+    (\autoref{appendix:prompt}) and the output ceiling, and set no temperature, top-p, or reasoning
+    setting, so each model decodes at its provider's defaults.
+    \item \textbf{Output ceiling}: 32,768 tokens, except 16,384 for \texttt{Muse Glimmer 30B}, whose
+    single eligible provider caps its output there.
+    \item \textbf{Serving}: providers serve every open-weights model at 8-bit floating-point
+    precision or higher, and the responses of one model can come from several providers.
+    \item \textbf{Responses}: a request that fails at the provider is sent again, and every model
+    returns one response, possibly empty, for each of the 2,250 instances.
+    \item \textbf{Reasoning tokens}: \texttt{Qwen3-235B-2507} has no thinking mode, and
+    \texttt{Gemma 4 26B}, \texttt{Gemini 3.1 Flash-Lite}, and \texttt{GPT-5.4 mini} return no
+    reasoning tokens at their providers' defaults; the other seven models return them on nearly
+    every response.
+\end{itemize}
+\autoref{tab:decoding} gives each model's output ceiling, number of providers, and token use.
 
 \begin{table*}[t]
 \centering
-\resizebox{1.0\textwidth}{!}{%
+\small
 \renewcommand{\arraystretch}{1.1}
-\begin{tabular}{lrrrrrrr}
+\begin{tabular}{lrrrrr}
 \toprule
-Model & Ceiling & Providers & Completion tokens & Reasoning tokens & With reasoning & No readable & Cost \\
- & & & median / p90 & median / p90 & tokens & answer & (US\$) \\
+Model & Output ceiling & Providers & Completion tokens & Reasoning tokens & Responses with \\
+ & & & median / p90 & median / p90 & reasoning tokens \\
 \noalign{\vskip 0.5ex}\hdashline\noalign{\vskip 0.5ex}
 
 % Open-weights models
-\multicolumn{8}{l}{\textbf{Open-Weights LLMs}} \\
+\multicolumn{6}{l}{\textbf{Open-Weights LLMs}} \\
 \noalign{\vskip 0.5ex}\hdashline\noalign{\vskip 0.5ex}
-\texttt{DeepSeek V4.1 Flash} & 32,768 & 7 & 3,060 / 10,296 & 2,380 / 9,300 & 100.0\% & 14 & 7.04 \\
-\texttt{Gemma 4 26B} & 32,768 & 2 & 797 / 1,430 & 0 / 0 & 0.0\% & 0 & 0.73 \\
-\texttt{GLM-5.3} & 32,768 & 8 & 3,270 / 17,954 & 2,473 / 17,051 & 99.8\% & 100 & 55.06 \\
-\texttt{GLM-5.3-Flash} & 32,768 & 11 & 2,500 / 11,248 & 1,785 / 10,244 & 99.9\% & 42 & 4.51 \\
-\texttt{gpt-oss-20b} & 32,768 & 3 & 1,795 / 5,736 & 992 / 4,707 & 100.0\% & 55 & 0.69 \\
-\texttt{Kimi K3} & 32,768 & 2 & 2,192 / 8,295 & 1,496 / 7,148 & 100.0\% & 5 & 99.00 \\
-\texttt{Muse Glimmer 30B} & 16,384 & 1 & 2,988 / 6,370 & 1,824 / 3,793 & 100.0\% & 29 & 10.04 \\
-\texttt{Qwen3-235B-2507} & 32,768 & 2 & 1,013 / 2,323 & 0 / 0 & 0.0\% & 1 & 1.18 \\
+\texttt{DeepSeek V4.1 Flash} & 32,768 & 7 & 3,060 / 10,296 & 2,380 / 9,300 & 100.0\% \\
+\texttt{Gemma 4 26B} & 32,768 & 2 & 797 / 1,430 & 0 / 0 & 0.0\% \\
+\texttt{GLM-5.3} & 32,768 & 8 & 3,270 / 17,954 & 2,473 / 17,051 & 99.8\% \\
+\texttt{GLM-5.3-Flash} & 32,768 & 11 & 2,500 / 11,248 & 1,785 / 10,244 & 99.9\% \\
+\texttt{gpt-oss-20b} & 32,768 & 3 & 1,795 / 5,736 & 992 / 4,707 & 100.0\% \\
+\texttt{Kimi K3} & 32,768 & 2 & 2,192 / 8,295 & 1,496 / 7,148 & 100.0\% \\
+\texttt{Muse Glimmer 30B} & 16,384 & 1 & 2,988 / 6,370 & 1,824 / 3,793 & 100.0\% \\
+\texttt{Qwen3-235B-2507} & 32,768 & 2 & 1,013 / 2,323 & 0 / 0 & 0.0\% \\
 
 \noalign{\vskip 0.5ex}\hdashline\noalign{\vskip 0.5ex}
 
 % Closed models
-\multicolumn{8}{l}{\textbf{Closed LLMs}} \\
+\multicolumn{6}{l}{\textbf{Closed LLMs}} \\
 \noalign{\vskip 0.5ex}\hdashline\noalign{\vskip 0.5ex}
-\texttt{Claude Sonnet 5} & 32,768 & 1 & 1,804 / 4,773 & 718 / 3,358 & 99.6\% & 0 & 59.45 \\
-\texttt{Gemini 3.1 Flash-Lite} & 32,768 & 1 & 653 / 1,024 & 0 / 0 & 0.0\% & 0 & 2.48 \\
-\texttt{GPT-5.4 mini} & 32,768 & 2 & 632 / 1,196 & 0 / 0 & 0.0\% & 0 & 7.74 \\
+\texttt{Claude Sonnet 5} & 32,768 & 1 & 1,804 / 4,773 & 718 / 3,358 & 99.6\% \\
+\texttt{Gemini 3.1 Flash-Lite} & 32,768 & 1 & 653 / 1,024 & 0 / 0 & 0.0\% \\
+\texttt{GPT-5.4 mini} & 32,768 & 2 & 632 / 1,196 & 0 / 0 & 0.0\% \\
 
-\noalign{\vskip 0.5ex}\hdashline\noalign{\vskip 0.5ex}
-\textit{All} & & & & & & 246 & 247.92 \\
 \bottomrule
 \end{tabular}
-}
 \caption{\textbf{Decoding and Token Use.} Per model over its 2,250 responses: the output ceiling,
 the number of providers that served it, the median and 90th-percentile (p90) completion and
-reasoning tokens as the provider reports them, the share of responses with any reasoning tokens,
-the responses without a readable final answer, and the cost billed.}
+reasoning tokens as the provider reports them, and the share of responses with any reasoning
+tokens.}
 \label{tab:decoding}
 \end{table*}
-
 
 \subsection{Inference Prompt and Output Processing}
 \label{appendix:prompt}
@@ -137,7 +138,6 @@ To ensure consistent and parsable outputs across all models, we use a standardiz
 sent as a single user message with the instance's question in place of \texttt{\{question\}}.
 This prompt explicitly instructs the model to structure its response with specific headings and to
 format the final result for automated extraction.
-Every response records the SHA-256 hash of the prompt template, and all 24,750 carry the same one.
 
 \begin{quote}
 \small
@@ -174,49 +174,43 @@ Problem:
 \end{verbatim}
 \end{quote}
 
-The final-answer check does not require the prompt's format: it reads the answer after the last
-final-answer heading or the \texttt{**Answer:**} marker, and still reads a response that has
-neither, while milestone matching and the arithmetic check read the whole response
-(\autoref{appendix:scoring}).
-
+Each check reads the response as~\autoref{appendix:scoring} describes:
+\begin{itemize}
+    \item \textbf{Final answer}: the check reads the answer after the last final-answer heading or
+    the \texttt{**Answer:**} marker, and still reads a response that has neither.
+    \item \textbf{Milestones and arithmetic}: milestone matching searches the whole response, in any
+    order, and the arithmetic check reads every calculation the response displays.
+    \item \textbf{Judged steps}: the judged step check splits the response into steps the same way
+    as in the expert study.
+\end{itemize}
 
 \subsection{Statistical Protocol}
 \label{appendix:protocol}
 
-\paragraph{Unit and Intervals.} The template is the unit of analysis (\autoref{subsec:setup}).
+The template is the unit of analysis (\autoref{subsec:setup}).
 Every template has 15 instances, so Final Answer Accuracy over the 2,250 instances equals the mean
-of the 150 template means, and comparisons of Milestone Coverage use the 147 templates with
-milestones.
-Every 95\% interval is a percentile bootstrap that resamples templates 10,000 times, and where we
-bound a change, we also give its 90\% interval.
-
-\paragraph{Tests.} We compare two models on the per-template differences of their scores, with a
-paired bootstrap interval and a sign-flip permutation test with 100,000 sign flips.
-For Final Answer Accuracy, the same test on strict accuracy, which scores a partial answer 0, and
-McNemar's exact test on the paired verdicts serve as checks; for Milestone Coverage, a Wilcoxon
-signed-rank test does.
-A model's level gap is its mean on the 58 Easy templates minus its mean on the 34 Advanced ones;
-its interval resamples templates within each level, and Welch's $t$-test on the template
-means~\citep{welch1947generalization} tests it, because scores vary more across Advanced templates.
-We compare two orderings of the models with Kendall's $\tau$ and a bootstrap interval.
-
-\paragraph{Corrections and Power.} Holm's correction~\citep{holm1979simple} applies within each
-family of tests, such as the 55 pairs of models for each measure or the eleven level gaps.
-The smallest difference that a paired comparison detects at 80\% power and a two-sided level of
-0.05 is $2.80\,s/\sqrt{n}$, with $s$ the standard deviation of the $n$ per-template differences;
-for a level gap it is $2.80\,\sigma\sqrt{1/58 + 1/34}$, with $\sigma$ the pooled standard
-deviation of the template means within a level.
-A change counts as bounded when its 90\% interval lies within $\pm 0.05$, which is two one-sided
-tests at 5\%; we fixed this margin after the point estimates of the rewording test were known.
-
-\paragraph{Planned and Exploratory Analyses.} We fixed the questions, the unit, the scoring rules,
-and the tests before running any model: Final Answer Accuracy per model and the 55 comparisons
-between models, the level gap per model, Milestone Coverage on wrong answers and the two
-diagnostics on correct answers as descriptions with intervals, consistency within templates, and
-the rewording test.
-One planned test is replaced: the level gap uses Welch's $t$-test instead of a permutation of the
-level labels, which is liberal when the level with fewer templates varies more.
-The analyses we added afterwards are labelled exploratory where they appear: Milestone Coverage
-over all responses and its comparisons between models, the branch and level means with intervals,
-the sensitivity analyses added after the first results, and the four conditions on the
-450-instance subset.
+of the 150 template means.
+\begin{itemize}
+    \item \textbf{Intervals}: every 95\% interval is a percentile bootstrap that resamples templates
+    10,000 times; where we bound a change, we also give its 90\% interval.
+    \item \textbf{Comparing two models}: a paired bootstrap interval and a sign-flip permutation
+    test with 100,000 sign flips, both on the per-template differences of their scores; Milestone
+    Coverage is compared over the 147 templates with milestones.
+    For Final Answer Accuracy, the same test on strict accuracy, which scores a partial answer 0,
+    and McNemar's exact test on the paired verdicts serve as checks; for Milestone Coverage, a
+    Wilcoxon signed-rank test does.
+    \item \textbf{Level gaps}: a model's mean on the 58 Easy templates minus its mean on the 34
+    Advanced ones, with an interval that resamples templates within each level, tested with Welch's
+    $t$-test on the template means~\citep{welch1947generalization}, because scores vary more across
+    Advanced templates.
+    \item \textbf{Orderings}: Kendall's $\tau$ between two orderings of the models, with a bootstrap
+    interval.
+    \item \textbf{Multiple tests}: Holm's correction~\citep{holm1979simple} within each family of
+    tests, such as the 55 pairs of models for each measure or the eleven level gaps.
+    \item \textbf{Detectable differences}: at 80\% power and a two-sided level of 0.05,
+    $2.80\,s/\sqrt{n}$ for a paired comparison, with $s$ the standard deviation of the $n$
+    per-template differences, and $2.80\,\sigma\sqrt{1/58 + 1/34}$ for a level gap, with $\sigma$
+    the pooled standard deviation of the template means within a level.
+    \item \textbf{Bounded changes}: a change counts as bounded when its 90\% interval lies within
+    $\pm 0.05$, which is two one-sided tests at 5\%.
+\end{itemize}
