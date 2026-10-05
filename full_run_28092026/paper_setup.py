@@ -229,12 +229,13 @@ phrases = [  # Section 5.1
     f"every {level}\\% interval is a bootstrap over templates",
 ]
 appendix_phrases = [  # appendices/models.tex
-    f"among them the {WORD[len(study)]} models of the expert study ({listing([ttn(s) for s in study])})",
-    f"every model we use as a judge ({listing([ttn(s) for s in JUDGES.values()])})",
+    f"The first condition excludes, among others, the {WORD[len(study)]} models of the expert study "
+    f"({listing([ttn(s) for s in study])}); the second excludes every model we use as a judge "
+    f"({listing([ttn(s) for s in JUDGES.values()])})",
     f"lists the {WORD[len(roster)]} evaluated models and the {WORD[len(anchors)]} flagship anchors",
-    f"\\textbf{{Output ceiling}}: {thousands(ceiling)} tokens, except {thousands(lower['muse-glimmer-30b'])} for "
+    f"The ceiling is {thousands(ceiling)} tokens, except {thousands(lower['muse-glimmer-30b'])} for "
     f"{tt('muse-glimmer-30b')}, whose single eligible provider caps its output there",
-    f"providers serve every open-weights model at {min_bits}-bit floating-point precision or higher",
+    f"Providers serve every open-weights model at {min_bits}-bit floating-point precision or higher",
     f"every model returns one response, possibly empty, for each of the {thousands(len(manifest))} instances",
     f"{tt(NO_THINKING)} has no thinking mode, and {series([k for k in no_reasoning if k != NO_THINKING])} return no "
     f"reasoning tokens at their providers' defaults; the other {WORD[len(reasoning)]} models return them on nearly "
@@ -243,17 +244,17 @@ appendix_phrases = [  # appendices/models.tex
     f"anchors run on the {subset}-instance subset",
     f"{tt('deepseek-v4.1-flash')} activates {PREFILL_DECODE[0]} in prefill and {PREFILL_DECODE[1]} in decoding",
     f"Per model over its {thousands(len(manifest))} responses",
-    f"Every template has {k_inst} instances, so Final Answer Accuracy over the {thousands(len(manifest))} instances "
+    f"every template has {k_inst} instances, so Final Answer Accuracy over the {thousands(len(manifest))} instances "
     f"equals the mean of the {len(per_template)} template means",
-    f"every {level}\\% interval is a percentile bootstrap that resamples templates {thousands(B)} times; where we "
-    f"bound a change, we also give its {level90}\\% interval",
+    f"every {level}\\% interval is a percentile bootstrap that resamples templates {thousands(B)} times, and a "
+    f"bounded change also carries its {level90}\\% interval",
     f"a sign-flip permutation test with {thousands(B_TEST)} sign flips",
-    f"Milestone Coverage is compared over the {mc_templates} templates with milestones",
+    f"those of Milestone Coverage, which use the {mc_templates} templates with milestones",
     "because scores vary more across Advanced templates",
-    f"a model's mean on the {levels['Easy']} Easy templates minus its mean on the {levels['Advanced']} Advanced ones",
+    f"its mean on the {levels['Easy']} Easy templates minus its mean on the {levels['Advanced']} Advanced ones",
     f"such as the {comb(len(roster), 2)} pairs of models for each measure or the {WORD[len(roster)]} level gaps",
-    f"at {power}\\% power and a two-sided level of {sig:.2f}, ${factor}\\,s/\\sqrt{{n}}$ for a paired comparison",
-    f"${factor}\\,\\sigma\\sqrt{{1/{levels['Easy']} + 1/{levels['Advanced']}}}$ for a level gap",
+    f"at {power}\\% power and a two-sided level of {sig:.2f}, a paired comparison detects ${factor}\\,s/\\sqrt{{n}}$",
+    f"a level gap ${factor}\\,\\sigma\\sqrt{{1/{levels['Easy']} + 1/{levels['Advanced']}}}$",
     f"a change counts as bounded when its {level90}\\% interval lies within $\\pm {margin:.2f}$, which is two "
     f"one-sided tests at {round(100 * sig)}\\%",
 ]
