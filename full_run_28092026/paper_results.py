@@ -1032,26 +1032,37 @@ def fig_level_gap() -> None:
 
 def fig_coverage_wrong() -> None:
     plt = _plt()
-    fig, (ax,) = rows_axes(plt, len(ORDER), 2.4, right=0.90, top=0.88)
-    ax.set_yticks(range(len(ORDER)))
-    ax.set_yticklabels([NAME[k] for k in ORDER])
-    for i, k in enumerate(ORDER):
-        q = Q3[k]
-        f, e3, e5 = q["e3_null_on_readable_wrong"], q["e3_coverage_on_readable_wrong"], q["e5_coverage_on_readable_wrong"]
-        ax.plot([f, e5], [i, i], color="#b9cfe9", linewidth=1.0, zorder=1)
-        ax.plot([f], [i], marker="s", markersize=3.6, color=MUTED, linestyle="none", zorder=3)
-        ax.plot([e3], [i], marker="o", markersize=4.2, markeredgewidth=0.8, markeredgecolor=BLUE, markerfacecolor="white", linestyle="none", zorder=3)
-        ax.plot([e5], [i], marker="o", markersize=4.2, markeredgewidth=0.8, markeredgecolor=BLUE, markerfacecolor=BLUE, linestyle="none", zorder=4)
-        ax.text(1.02, i, str(q["readable_wrong_with_milestones"]), va="center", ha="left", fontsize=5.8, color=MUTED, clip_on=False)
-    ax.set_xlim(0, 1.0)
-    ax.set_xlabel("Milestone Coverage on readable wrong answers")
-    ax.text(1.02, -0.85, "n", ha="left", va="center", fontsize=5.8, color=MUTED, clip_on=False)
     from matplotlib.lines import Line2D
-    handles = [Line2D([], [], marker="s", color=MUTED, markersize=3.6, linestyle="none", label="chance floor"),
-               Line2D([], [], marker="o", color=BLUE, markerfacecolor="white", markersize=4.2, linestyle="none", label="matching alone"),
-               Line2D([], [], marker="o", color=BLUE, markerfacecolor=BLUE, markersize=4.2, linestyle="none", label="with the judge")]
-    top_legend(fig, handles, 3)
-    save(fig, "coverage-wrong.pdf")
+    # A band from the chance floor, palest, to the coverage with the judge, deepest; matching alone sits on it.
+    with plt.rc_context(SERIF):
+        fig, (ax,) = rows_axes(plt, len(ORDER), 2.8, left=0.318, right=0.91, bottom=0.111, top=0.877)
+        ax.set_yticks(range(len(ORDER)))
+        ax.set_yticklabels([FIG_NAME[k] for k in ORDER], fontweight="bold")
+        ax.tick_params(axis="y", colors="black", labelsize=6.5)
+        ax.tick_params(axis="x", colors="black", labelsize=6.5)
+        rows = [(i, Q3[k]["e3_null_on_readable_wrong"], Q3[k]["e3_coverage_on_readable_wrong"], Q3[k]["e5_coverage_on_readable_wrong"])
+                for i, k in enumerate(ORDER)]
+        gradient_rows(ax, [(i, f, e5, e5, BLUE) for i, f, _, e5 in rows])
+        for i, f, e3, e5 in rows:
+            ax.plot([f], [i], marker="s", markersize=3.8, color=MUTED, markeredgecolor="white", markeredgewidth=0.5, linestyle="none", zorder=3)
+            ax.plot([e3], [i], marker="o", markersize=4.6, markerfacecolor="white", markeredgecolor=BLUE, markeredgewidth=0.9, linestyle="none",
+                    zorder=3)
+            ax.plot([e5], [i], marker="o", markersize=4.6, markerfacecolor=DARK, markeredgecolor="white", markeredgewidth=0.6, linestyle="none",
+                    zorder=4)
+        for i, k in enumerate(ORDER):
+            ax.text(1.025, i, str(Q3[k]["readable_wrong_with_milestones"]), va="center", ha="left", fontsize=6.5, color="black", clip_on=False)
+        ax.text(1.025, -0.8, "n", ha="left", va="center", fontsize=6.5, style="italic", color="black", clip_on=False)
+        ax.set_xlim(0, 1.0)
+        ax.set_xlabel("Milestone Coverage of wrong answers", fontsize=6.5, fontweight="bold", color="black", labelpad=2)
+        handles = [Line2D([], [], marker="s", color=MUTED, markersize=3.8, linestyle="none", label="Chance floor"),
+                   Line2D([], [], marker="o", markerfacecolor="white", markeredgecolor=BLUE, markeredgewidth=0.9, markersize=4.6, linestyle="none",
+                          label="Matching alone"),
+                   Line2D([], [], marker="o", color=DARK, markersize=4.6, linestyle="none", label="With the judge")]
+        legend = fig.legend(handles=handles, loc="upper center", bbox_to_anchor=((0.318 + 0.91) / 2, 0.995), ncol=3, frameon=True,
+                            fancybox=False, framealpha=1, edgecolor="black", fontsize=6, borderpad=0.35, handlelength=1.0,
+                            handletextpad=0.4, columnspacing=1.2)
+        legend.get_frame().set_linewidth(0.5)
+        save(fig, "coverage-wrong.pdf")
 
 
 
@@ -1066,17 +1077,39 @@ def band_axes(plt, n: int, height: float, xlabel: str, left: float = 0.36, top: 
 
 def fig_paraphrase() -> None:
     plt = _plt()
-    fig, ax = band_axes(plt, len(ORDER), 2.35, "Change in FAC, paraphrase minus original")
-    ax.set_yticks(range(len(ORDER)))
-    ax.set_yticklabels([NAME[k] for k in ORDER])
-    interval_rows(ax, [(i, Q5[k]["ci90"][0], Q5[k]["ci90"][1], Q5[k]["diff"], Q5[k]["within_margin"], "o") for i, k in enumerate(ORDER)])
     from matplotlib.lines import Line2D
     from matplotlib.patches import Patch
-    handles = [Line2D([], [], marker="o", color=BLUE, markerfacecolor=BLUE, markersize=4.2, linewidth=1.0, label="90% interval within the margin"),
-               Line2D([], [], marker="o", color=BLUE, markerfacecolor="white", markersize=4.2, linewidth=1.0, label="not within"),
-               Patch(color=BAND, label=f"\u00b1{margin:.2f} margin")]
-    top_legend(fig, handles, 3)
-    save(fig, "paraphrase.pdf")
+    # The 90% interval as a band, deepest at the change; within the margin in strong blue with a dark filled marker, the rest paler and hollow.
+    rest, rest_edge = "#93b6e2", "#5b8fd3"
+    within = {k: Q5[k]["within_margin"] for k in ORDER}
+    with plt.rc_context(SERIF):
+        fig, (ax,) = rows_axes(plt, len(ORDER), 2.6, left=0.318, right=0.72, bottom=0.12, top=0.985)
+        ax.set_yticks(range(len(ORDER)))
+        ax.set_yticklabels([FIG_NAME[k] for k in ORDER], fontweight="bold")
+        ax.tick_params(axis="y", colors="black", labelsize=6.5)
+        ax.tick_params(axis="x", colors="black", labelsize=6.5)
+        ax.axvspan(-margin, margin, color=BAND, zorder=0)
+        ax.axvline(0, color=MUTED, linewidth=0.6, zorder=1)
+        ax.text(0.0015, 2.5, "No change", rotation=90, ha="left", va="center", fontsize=5.5, style="italic", color=MUTED)
+        gradient_rows(ax, [(i, Q5[k]["ci90"][0], Q5[k]["ci90"][1], Q5[k]["diff"], BLUE if within[k] else rest) for i, k in enumerate(ORDER)])
+        for i, k in enumerate(ORDER):
+            ax.plot([Q5[k]["diff"]], [i], marker="o", markersize=4.6, linestyle="none", zorder=3,
+                    **({"markerfacecolor": DARK, "markeredgecolor": "white", "markeredgewidth": 0.6} if within[k] else
+                       {"markerfacecolor": "white", "markeredgecolor": rest_edge, "markeredgewidth": 0.9}))
+        ax.set_xlim(-0.072, 0.058)
+        ax.set_xticks([-0.05, 0, 0.05])
+        ax.set_xticklabels(["−0.05", "0", "0.05"])
+        ax.set_xlabel("Final Answer Accuracy change under paraphrase", fontsize=6.5, fontweight="bold", color="black", labelpad=2)
+        handles = [Line2D([], [], marker="o", color=DARK, markersize=4.6, linestyle="none", label="Within the margin"),
+                   Line2D([], [], marker="o", markerfacecolor="white", markeredgecolor=rest_edge, markeredgewidth=0.9, markersize=4.6,
+                          linestyle="none", label="Not within"),
+                   Line2D([], [], color="#7fb0ea", linewidth=4.5, solid_capstyle="butt", label="90% interval"),
+                   Patch(color=BAND, label=f"\u00b1{margin:.2f} margin")]
+        legend = ax.legend(handles=handles, loc="upper left", bbox_to_anchor=(1.03, 1.0), frameon=True, fancybox=False, framealpha=1,
+                           edgecolor="black", fontsize=6, borderaxespad=0, borderpad=0.35, handlelength=1.1, handletextpad=0.4,
+                           labelspacing=0.3)
+        legend.get_frame().set_linewidth(0.5)
+        save(fig, "paraphrase.pdf")
 
 
 
