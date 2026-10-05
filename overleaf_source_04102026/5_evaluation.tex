@@ -12,8 +12,9 @@ reaches F1 0.958 (\autoref{appendix:validation}).
 \paragraph{Preliminaries.}
 An instance comprises a question, a gold trace, and milestones $\mathcal{M}$: the values that the
 template computes, the gold trace states, and the question does not give.
-Its targets are the milestones in the gold final answer and any verdict word there, such as a flow
-regime.
+Its targets are the milestones in the gold final answer (for an instance without milestones, the
+last value there that the question does not give) and, for a classification answer, its verdict
+word, such as a flow regime.
 A response $r$ is a sequence of steps ending in a final answer.
 
 \paragraph{Final Answer Accuracy.}

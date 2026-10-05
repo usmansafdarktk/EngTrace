@@ -75,16 +75,16 @@ python \{template\_code\} \\
 
 \textbf{2. Generated Instances from the Template:} \\
 Instance 1: \\
-- Question: ``\{q1\}" \\
-- Solution: ``\{s1\}" \\
+- Question: "\{q1\}" \\
+- Solution: "\{s1\}" \\
 
 Instance 2: \\
-- Question: ``\{q2\}" \\
-- Solution: ``\{s2\}" \\
+- Question: "\{q2\}" \\
+- Solution: "\{s2\}" \\
 
 Instance 3: \\
-- Question: ``\{q3\}" \\
-- Solution: ``\{s3\}" \\
+- Question: "\{q3\}" \\
+- Solution: "\{s3\}" \\
 
 
 \textbf{3. Evaluation Rubric \& JSON Schema:} \\
@@ -100,22 +100,22 @@ Evaluate the template based on the rubric below. The \texttt{human\_review\_flag
 
 \vspace{8pt}
 
-\hspace*{1em}``physical\_plausibility\_score": \textless integer, a score from 1--5 based on whether the problem respects the laws of physics and engineering\textgreater,\\
+\hspace*{1em}"physical\_plausibility\_score": \textless integer, a score from 1--5 based on whether the problem respects the laws of physics and engineering\textgreater,\\
 
 \vspace{2pt}
-\hspace*{1em}``mathematical\_correctness\_score": \textless integer, a score from 1--5 based on whether the equations and calculations are accurate\textgreater,\\
+\hspace*{1em}"mathematical\_correctness\_score": \textless integer, a score from 1--5 based on whether the equations and calculations are accurate\textgreater,\\
 
 \vspace{2pt}
-\hspace*{1em}``pedagogical\_clarity\_score": \textless integer, a score from 1--5 based on whether the problem statement is clear, unambiguous, and solvable\textgreater,\\
+\hspace*{1em}"pedagogical\_clarity\_score": \textless integer, a score from 1--5 based on whether the problem statement is clear, unambiguous, and solvable\textgreater,\\
 
 \vspace{2pt}
-\hspace*{1em}``confidence\_score": \textless integer, a score from 1--5 indicating your confidence in this evaluation\textgreater,\\
+\hspace*{1em}"confidence\_score": \textless integer, a score from 1--5 indicating your confidence in this evaluation\textgreater,\\
 
 \vspace{2pt}
-\hspace*{1em}``human\_review\_flag": \textless boolean, true if the template requires human inspection, otherwise false\textgreater,\\
+\hspace*{1em}"human\_review\_flag": \textless boolean, true if the template requires human inspection, otherwise false\textgreater,\\
 
 \vspace{2pt}
-\hspace*{1em}``explanation": "\textless string, a concise, one-sentence justification for the scores and flag\textgreater"\\
+\hspace*{1em}"explanation": "\textless string, a concise, one-sentence justification for the scores and flag\textgreater"\\
 
 \vspace{2pt}
 \texttt{\char`\}} % closing curly brace
