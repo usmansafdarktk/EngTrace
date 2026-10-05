@@ -4,8 +4,7 @@
 \subsection{Setup}
 \label{subsec:setup}
 
-\paragraph{Models.}
-We evaluate eleven LLMs.
+\paragraph{Models.} We evaluate eleven LLMs.
 The eight open-weights models are \texttt{DeepSeek V4.1 Flash}~\citep{deepseekv41},
 \texttt{Gemma 4 26B}~\citep{gemma4}, \texttt{GLM-5.3}~\citep{glm5},
 \texttt{GLM-5.3-Flash}~\citep{glm5}, \texttt{gpt-oss-20b}~\citep{gptoss},
@@ -13,7 +12,7 @@ The eight open-weights models are \texttt{DeepSeek V4.1 Flash}~\citep{deepseekv4
 \texttt{Qwen3-235B-2507}~\citep{qwen3}.
 The three closed models are \texttt{Claude Sonnet 5}~\citep{claudesonnet5},
 \texttt{Gemini 3.1 Flash-Lite}~\citep{gemini31flashlite}, and \texttt{GPT-5.4 mini}~\citep{gpt54}.
-One rule selects them: no model that wrote responses for the expert study
+One rule selects them: no model whose responses we used to develop or validate the evaluator
 (\autoref{sec:evaluation}) and no model we use as a judge, so that the evaluator is validated on
 other models' responses and no model judges its own.
 Flagship models are either excluded by this rule or left out for cost; two flagships that the rule
@@ -21,9 +20,8 @@ admits, \texttt{GPT-5.4}~\citep{gpt54} and \texttt{DeepSeek V4 Pro}~\citep{deeps
 anchors on a fixed subset of 450 instances (three per template) that the further conditions below
 also use.
 
-\paragraph{Decoding and Prompt.}
-Each model answers each instance once, 24,750 responses in all, at its provider's default decoding
-settings: we set no sampling parameters.
+\paragraph{Decoding and Prompt.} Each model answers each instance once, 24,750 responses in all,
+at its provider's default decoding settings: we set no sampling parameters.
 The output ceiling is 32,768 tokens (16,384 for \texttt{Muse Glimmer 30B}, the most its endpoint
 allows), and every open-weights model runs at 8-bit floating-point precision or higher.
 All models receive the same zero-shot prompt, which asks for the governing equations, numbered
@@ -35,9 +33,8 @@ response; the models are therefore not compared at equal reasoning effort.
 In all, 246 responses (1.0\%) contain no readable final answer and score 0; 243 of them are empty,
 almost all at the output ceiling.
 
-\paragraph{Statistical Protocol.}
-The template is our unit of analysis, because the 15 instances of a template share one derivation
-and their scores are correlated~\citep{miller2024errorbars}.
+\paragraph{Statistical Protocol.} The template is our unit of analysis, because the 15 instances of
+a template share one derivation and their scores are correlated~\citep{miller2024errorbars}.
 Every 95\% interval is a percentile bootstrap over templates with 10,000
 resamples~\citep{efron1993bootstrap}.
 We compare two models with a paired sign-flip permutation test on their per-template
@@ -48,5 +45,6 @@ Within each family of tests, such as the 55 pairs of models, Holm's
 correction~\citep{holm1979simple} keeps the probability of any false positive at 5\% or less.
 We report every non-significant difference with the smallest difference the design detects at
 80\% power.
-\autoref{appendix:models} lists the served models, their settings and token use, the prompt, and
-the statistical protocol in full.
+\autoref{appendix:models} lists the served models with their settings and token use,
+\autoref{appendix:prompt} gives the prompt, and \autoref{appendix:protocol} gives the statistical
+protocol in full.

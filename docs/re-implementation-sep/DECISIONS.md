@@ -7405,6 +7405,41 @@ The authors asked for the setup only (the section heading and 5.1); the results 
   whose appendix covers GPT-5.4 mini and which also serves for the anchor GPT-5.4. No `month` fields, per the
   writing rules; `paper_setup.py --check` now also fails on an unresolved key and checks each model's key.
 
+## D-191 — The models appendix: evaluated models, decoding and token use, the inference prompt, the protocol
+
+**Date:** 2026-10-05 · **Status:** DONE · **Evidence:** `overleaf_source_04102026/appendices/models.tex`;
+`full_run_28092026/paper_setup.py --check` (both files: every phrase and row present, every number generated, the
+prompt box equal to the sent prompt, every key resolves); `docs/check_plan_claims.py` (123 of 123 pass)
+
+The authors asked for the appendix sections the May version linked from its experiments (the model list,
+`sec:appendix_model_details`, and the inference prompt, `sec:appendix_inference_prompt`), with the models table in
+the May style and every value verified. Choices:
+
+- **The models table keeps May's layout** (grouped rows, dashed rules, `\resizebox`), with Identifier (the OpenRouter
+  identifier the run called) and Weights (the Hugging Face repository) in place of May's Backbone and Source, and
+  model names in `\texttt{}` per the writing rules. Organization, size and repository were checked on each
+  developer's card on 2026-10-05 (`paper_setup.py`'s CARD); identifiers, ceilings, providers, token use and cost come
+  from the decoding tables. GLM-5.3's card states no active count (secondary sources give about 40B), so its size is
+  the card's count of the released weights, 753B; DeepSeek V4.1 Flash activates 8B parameters in prefill and 16B in
+  decoding.
+- **The prompt is the one the run sent, which is May's.** `evaluation/run_inference.py` is unchanged since
+  2025-10-14, and its template's SHA-256 is the one hash on all 24,750 responses. May's box differed in display
+  only: `# ` headings where the template has `## `, and no closing `Problem:` / `{question}` lines. The new box
+  prints the template exactly, and the check fails on May's variant. May's wording is kept with three corrections:
+  "use" for "employed", a single user message rather than a "system prompt" (the runner sends one user message), and
+  the present tense.
+- **Output processing.** May's "Output Parsing Logic" described the earlier parser; one sentence pointing to the
+  scoring appendix replaces it.
+- **The statistical protocol** is its own section (the plan's Appendix H item), from `ANALYSIS_PLAN.md` and
+  `analyze.py`: the planned questions, the one replaced test (Welch for the level gap, D-146), 100,000 sign flips,
+  and the exploratory additions; the equivalence margin is stated as fixed after the rewording test's point
+  estimates.
+- **Not in the paper:** the set-aside Qwen3.8-27B run (D-132); the selection paragraph names the model only among
+  those the rule excludes.
+- **Section 5.1** now starts each paragraph on its heading line (the authors), states the rule as "no model whose
+  responses we used to develop or validate the evaluator", which covers the two robustness models as well as the
+  expert study's five, and points to the three sections.
+
 ## Open decisions
 
 | # | Decision | Needed before |

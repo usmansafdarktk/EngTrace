@@ -1,0 +1,219 @@
+% -------------
+\section{Evaluated Models}
+\label{appendix:models}
+
+\paragraph{Selection.} One rule selects the evaluated models (\autoref{subsec:setup}): no model
+whose responses we used to develop or validate the evaluator, and no model we use as a judge.
+It excludes the five models of the expert study (\texttt{GPT-5}, \texttt{Claude Opus 4.7},
+\texttt{Gemini 3.1 Pro}, \texttt{DeepSeek-R1}, and \texttt{Llama 3.1 70B}), two models whose
+responses we used to check the evaluator on smaller open-weights models (\texttt{Gemma 4 31B} and
+\texttt{Qwen3.8-27B}), and every model we use as a judge (\texttt{GPT-5}, \texttt{Claude Opus 4.5},
+\texttt{Gemini 3.1 Pro}, \texttt{Grok 4.6}, \texttt{MiniMax M3}, and \texttt{MiMo-V2.5-Pro}).
+\autoref{tab:models} lists the eleven evaluated models and the two flagship anchors with their
+developing organization, size, and identifiers.
+
+\begin{table*}[t]
+\centering
+\resizebox{1.0\textwidth}{!}{%
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{lllll}
+\toprule
+Model & Organization & Size & Identifier & Weights \\
+\noalign{\vskip 0.5ex}\hdashline\noalign{\vskip 0.5ex}
+
+% Open-weights models
+\multicolumn{5}{l}{\textbf{Open-Weights LLMs}} \\
+\noalign{\vskip 0.5ex}\hdashline\noalign{\vskip 0.5ex}
+\texttt{DeepSeek V4.1 Flash} & DeepSeek & 552B (8B/16B active) & \texttt{deepseek/deepseek-v4.1-flash} & \texttt{deepseek-ai/DeepSeek-V4.1-Flash} \\
+\texttt{Gemma 4 26B} & Google DeepMind & 25.2B (3.8B active) & \texttt{google/gemma-4-26b-a4b-it} & \texttt{google/gemma-4-26B-A4B-it} \\
+\texttt{GLM-5.3} & Z.ai & 753B & \texttt{z-ai/glm-5.3} & \texttt{zai-org/GLM-5.3} \\
+\texttt{GLM-5.3-Flash} & Z.ai & 320B (18B active) & \texttt{z-ai/glm-5.3-flash} & \texttt{zai-org/GLM-5.3-Flash} \\
+\texttt{gpt-oss-20b} & OpenAI & 21B (3.6B active) & \texttt{openai/gpt-oss-20b} & \texttt{openai/gpt-oss-20b} \\
+\texttt{Kimi K3} & Moonshot AI & 2.8T (104B active) & \texttt{moonshotai/kimi-k3} & \texttt{moonshotai/Kimi-K3} \\
+\texttt{Muse Glimmer 30B} & Meta & 30B & \texttt{meta/muse-glimmer-30b} & \texttt{meta-models/Muse-Glimmer-30B} \\
+\texttt{Qwen3-235B-2507} & Alibaba Cloud & 235B (22B active) & \texttt{qwen/qwen3-235b-a22b-2507} & \texttt{Qwen/Qwen3-235B-A22B-Instruct-2507} \\
+
+\noalign{\vskip 0.5ex}\hdashline\noalign{\vskip 0.5ex}
+
+% Closed models
+\multicolumn{5}{l}{\textbf{Closed LLMs}} \\
+\noalign{\vskip 0.5ex}\hdashline\noalign{\vskip 0.5ex}
+\texttt{Claude Sonnet 5} & Anthropic & N/A & \texttt{anthropic/claude-sonnet-5} & -- \\
+\texttt{Gemini 3.1 Flash-Lite} & Google DeepMind & N/A & \texttt{google/gemini-3.1-flash-lite} & -- \\
+\texttt{GPT-5.4 mini} & OpenAI & N/A & \texttt{openai/gpt-5.4-mini} & -- \\
+
+\noalign{\vskip 0.5ex}\hdashline\noalign{\vskip 0.5ex}
+
+% Flagship anchors on the 450-instance subset
+\multicolumn{5}{l}{\textbf{Flagship Anchors}} \\
+\noalign{\vskip 0.5ex}\hdashline\noalign{\vskip 0.5ex}
+\texttt{DeepSeek V4 Pro} & DeepSeek & 1.6T (49B active) & \texttt{deepseek/deepseek-v4-pro} & \texttt{deepseek-ai/DeepSeek-V4-Pro} \\
+\texttt{GPT-5.4} & OpenAI & N/A & \texttt{openai/gpt-5.4} & -- \\
+
+\bottomrule
+\end{tabular}
+}
+\caption{\textbf{Evaluated Models.} The eleven models of~\autoref{sec:experiments}, grouped by
+access, and the two flagship anchors run on the 450-instance subset.
+Size is the developer's stated parameter count, with the parameters active per token in
+parentheses for mixture-of-experts models: \texttt{DeepSeek V4.1 Flash} activates 8B in prefill and
+16B in decoding, and for \texttt{GLM-5.3}, whose card states no active count, we give the parameter
+count of its released weights; closed models do not disclose their size.
+Identifier is the model's identifier on OpenRouter, through which we query every model; Weights is
+the Hugging Face repository of an open-weights model.}
+\label{tab:models}
+\end{table*}
+
+\paragraph{Serving and Decoding.} We query every model through OpenRouter, and each request
+carries the prompt (\autoref{appendix:prompt}), the output ceiling, and routing preferences only,
+with no temperature, top-p, or reasoning setting, so each model decodes at its provider's defaults.
+OpenRouter sends each open-weights model to the cheapest provider that serves it at 8-bit
+floating-point precision or higher, and to the next one when a request fails, so the responses of
+one model can come from several providers.
+A request that fails at the provider is sent again, and every model returns a response, possibly
+empty, for all 2,250 instances.
+\texttt{Muse Glimmer 30B} has a single eligible provider, which caps its output at 16,384 tokens.
+Four models return no reasoning tokens: \texttt{Qwen3-235B-2507} has no thinking mode, and
+\texttt{Gemma 4 26B}, \texttt{Gemini 3.1 Flash-Lite}, and \texttt{GPT-5.4 mini} return none at
+their providers' defaults.
+\autoref{tab:decoding} gives each model's ceiling, providers, token use, responses without a
+readable final answer, and cost; the 24,750 responses cost US\$247.92 in all.
+
+\begin{table*}[t]
+\centering
+\resizebox{1.0\textwidth}{!}{%
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{lrrrrrrr}
+\toprule
+Model & Ceiling & Providers & Completion tokens & Reasoning tokens & With reasoning & No readable & Cost \\
+ & & & median / p90 & median / p90 & tokens & answer & (US\$) \\
+\noalign{\vskip 0.5ex}\hdashline\noalign{\vskip 0.5ex}
+
+% Open-weights models
+\multicolumn{8}{l}{\textbf{Open-Weights LLMs}} \\
+\noalign{\vskip 0.5ex}\hdashline\noalign{\vskip 0.5ex}
+\texttt{DeepSeek V4.1 Flash} & 32,768 & 7 & 3,060 / 10,296 & 2,380 / 9,300 & 100.0\% & 14 & 7.04 \\
+\texttt{Gemma 4 26B} & 32,768 & 2 & 797 / 1,430 & 0 / 0 & 0.0\% & 0 & 0.73 \\
+\texttt{GLM-5.3} & 32,768 & 8 & 3,270 / 17,954 & 2,473 / 17,051 & 99.8\% & 100 & 55.06 \\
+\texttt{GLM-5.3-Flash} & 32,768 & 11 & 2,500 / 11,248 & 1,785 / 10,244 & 99.9\% & 42 & 4.51 \\
+\texttt{gpt-oss-20b} & 32,768 & 3 & 1,795 / 5,736 & 992 / 4,707 & 100.0\% & 55 & 0.69 \\
+\texttt{Kimi K3} & 32,768 & 2 & 2,192 / 8,295 & 1,496 / 7,148 & 100.0\% & 5 & 99.00 \\
+\texttt{Muse Glimmer 30B} & 16,384 & 1 & 2,988 / 6,370 & 1,824 / 3,793 & 100.0\% & 29 & 10.04 \\
+\texttt{Qwen3-235B-2507} & 32,768 & 2 & 1,013 / 2,323 & 0 / 0 & 0.0\% & 1 & 1.18 \\
+
+\noalign{\vskip 0.5ex}\hdashline\noalign{\vskip 0.5ex}
+
+% Closed models
+\multicolumn{8}{l}{\textbf{Closed LLMs}} \\
+\noalign{\vskip 0.5ex}\hdashline\noalign{\vskip 0.5ex}
+\texttt{Claude Sonnet 5} & 32,768 & 1 & 1,804 / 4,773 & 718 / 3,358 & 99.6\% & 0 & 59.45 \\
+\texttt{Gemini 3.1 Flash-Lite} & 32,768 & 1 & 653 / 1,024 & 0 / 0 & 0.0\% & 0 & 2.48 \\
+\texttt{GPT-5.4 mini} & 32,768 & 2 & 632 / 1,196 & 0 / 0 & 0.0\% & 0 & 7.74 \\
+
+\noalign{\vskip 0.5ex}\hdashline\noalign{\vskip 0.5ex}
+\textit{All} & & & & & & 246 & 247.92 \\
+\bottomrule
+\end{tabular}
+}
+\caption{\textbf{Decoding and Token Use.} Per model over its 2,250 responses: the output ceiling,
+the number of providers that served it, the median and 90th-percentile (p90) completion and
+reasoning tokens as the provider reports them, the share of responses with any reasoning tokens,
+the responses without a readable final answer, and the cost billed.}
+\label{tab:decoding}
+\end{table*}
+
+
+% -------------
+\section{Inference Prompt and Output Processing}
+\label{appendix:prompt}
+
+\subsection{Standardized Inference Prompt}
+To ensure consistent and parsable outputs across all models, we use a standardized zero-shot prompt,
+sent as a single user message with the instance's question in place of \texttt{\{question\}}.
+This prompt explicitly instructs the model to structure its response with specific headings and to
+format the final result for automated extraction.
+Every response records the SHA-256 hash of the prompt template, and all 24,750 carry the same one.
+
+\begin{quote}
+\small
+\begin{verbatim}
+You are an expert engineer. Solve the following
+problem by providing a detailed, structured
+solution. Use the exact headings and
+formatting provided below.
+
+## Given
+List all known variables and their
+values with units.
+
+## Find
+State the variable(s) to be calculated.
+
+## Formulae
+Write down all necessary governing equations
+before substituting any values.
+
+## Solution
+Provide a step-by-step calculation. Each step
+must start on a new line and be formatted exactly
+as '**Step X:**', where X is the step number.
+Show the substitution of values into
+the formulae clearly.
+
+## Final Answer
+State the final numerical result with its units
+in the format: **Answer:** [value] [units]
+
+Problem:
+{question}
+\end{verbatim}
+\end{quote}
+
+\subsection{Output Processing}
+The final-answer check does not require the prompt's format: it reads the answer after the last
+final-answer heading or the \texttt{**Answer:**} marker, and still reads a response that has
+neither, while milestone matching and the arithmetic check read the whole response
+(\autoref{appendix:scoring}).
+
+
+% -------------
+\section{Statistical Protocol}
+\label{appendix:protocol}
+
+\paragraph{Unit and Intervals.} The template is the unit of analysis (\autoref{subsec:setup}).
+Every template has 15 instances, so Final Answer Accuracy over the 2,250 instances equals the mean
+of the 150 template means, and comparisons of Milestone Coverage use the 147 templates with
+milestones.
+Every 95\% interval is a percentile bootstrap that resamples templates 10,000 times, and where we
+bound a change, we also give its 90\% interval.
+
+\paragraph{Tests.} We compare two models on the per-template differences of their scores, with a
+paired bootstrap interval and a sign-flip permutation test with 100,000 sign flips.
+For Final Answer Accuracy, the same test on strict accuracy, which scores a partial answer 0, and
+McNemar's exact test on the paired verdicts serve as checks; for Milestone Coverage, a Wilcoxon
+signed-rank test does.
+A model's level gap is its mean on the 58 Easy templates minus its mean on the 34 Advanced ones;
+its interval resamples templates within each level, and Welch's $t$-test on the template
+means~\citep{welch1947generalization} tests it, because scores vary more across Advanced templates.
+We compare two orderings of the models with Kendall's $\tau$ and a bootstrap interval.
+
+\paragraph{Corrections and Power.} Holm's correction~\citep{holm1979simple} applies within each
+family of tests, such as the 55 pairs of models for each measure or the eleven level gaps.
+The smallest difference that a paired comparison detects at 80\% power and a two-sided level of
+0.05 is $2.80\,s/\sqrt{n}$, with $s$ the standard deviation of the $n$ per-template differences;
+for a level gap it is $2.80\,\sigma\sqrt{1/58 + 1/34}$, with $\sigma$ the pooled standard
+deviation of the template means within a level.
+A change counts as bounded when its 90\% interval lies within $\pm 0.05$, which is two one-sided
+tests at 5\%; we fixed this margin after the point estimates of the rewording test were known.
+
+\paragraph{Planned and Exploratory Analyses.} We fixed the questions, the unit, the scoring rules,
+and the tests before running any model: Final Answer Accuracy per model and the 55 comparisons
+between models, the level gap per model, Milestone Coverage on wrong answers and the two
+diagnostics on correct answers as descriptions with intervals, consistency within templates, and
+the rewording test.
+One planned test is replaced: the level gap uses Welch's $t$-test instead of a permutation of the
+level labels, which is liberal when the level with fewer templates varies more.
+The analyses we added afterwards are labelled exploratory where they appear: Milestone Coverage
+over all responses and its comparisons between models, the branch and level means with intervals,
+the sensitivity analyses added after the first results, and the four conditions on the
+450-instance subset.
