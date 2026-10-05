@@ -7368,10 +7368,37 @@ tables and figures all come from the validation reports through `docs/appendix_e
   eleven models' names in the second-judge table follow `RESULTS_PAPER_NOTES.md` and should match Section 5's.
   Cohen (1960), Wilson (1927) and SymPy (Meurer et al., 2017) are added under `% Evaluation`, to check by hand.
 
+## D-190 — Section 5.1 written: the models, decoding and prompt, and the statistical protocol
+
+**Date:** 2026-10-05 · **Status:** DONE · **Evidence:** `overleaf_source_04102026/6_experiments.tex`,
+`6_experiments_results.tex`; `full_run_28092026/paper_setup.py --check` (14 of 14 phrases present, every number in
+the prose generated); `docs/check_plan_claims.py` (123 of 123 pass)
+
+The authors asked for the setup only (the section heading and 5.1); the results and the error analysis go in
+`6_results.tex`, written separately. The wrapper inputs both files, so it compiles once that file exists. Choices:
+
+- **The test counts are the code's, not the plan's.** `ANALYSIS_PLAN.md` names 10,000 permutations; `analyze.py`
+  runs 100,000 sign flips for every test since D-146 (`B_TEST`) and 10,000 bootstrap draws (`B`). The text gives both
+  as `results.json` records them.
+- **No "specified before the models were run" sentence.** The plan's optional sentence would not hold for every test
+  the results use: the level gap rests on Welch's t-test, which replaced the planned permutation after the first
+  results (D-146). Appendix H can give the planned questions and the labelled additions.
+- **One appendix pointer for the subsection,** the plan's sentence naming everything Appendix H holds, rather than one
+  per paragraph, since all three paragraphs point to the same appendix (the Section 4 precedent, `ea5affd`). The
+  label `appendix:models` is defined when that appendix is written.
+- **Names and order.** Model names as the appendices print them (`docs/appendix_evaluation.py`), listed
+  alphabetically within open-weights and closed, so the setup implies no order.
+- **Empty responses at the ceiling** are counted from two recorded figures per model (rows with finish reason
+  `length` minus the capped responses scored on their text): 241 of the 243, which the text calls "almost all".
+- **Bibliography.** Miller (2024), Efron and Tibshirani (1993), Dror et al. (2018), Welch (1947) and Holm (1979) are
+  added under `% Experiments`, to check by hand. The evaluated models are not cited: no verified entries exist for
+  this roster (the May bibliography's model cards are for other versions); open row below.
+
 ## Open decisions
 
 | # | Decision | Needed before |
 |---|---|---|
+| D-190 | Whether Section 5.1 cites the eleven evaluated models' model cards or technical reports (no verified entries yet; the served identifiers go to Appendix H) | the paper's Section 5.1 |
 | D-185 | Whether to add the sensitivity with the check's partial verdicts counted as correct on the eleven symbolic-answer templates the experts' reading flagged (free, `analyze.py`), and whether the paper's tables mark those templates | the paper's evaluator and limitations sections |
 | D-186 | The authors' remaining calls, carried where they apply in `docs/PAPER_PLAN_OCT2026.md` since its 2026-10-04 revision removed the decisions section: the anonymised archive and the experts' labels (Appendix N entry); ~~the colleague's description~~ **settled by D-188: domain experts wrote every branch's templates, no separate description**; the primary textbook per domain for civil and industrial (the Appendix B entry; the taxonomy question was decided 2026-10-04: no panel run, the procedure stated as it was); strict or partial-credit accuracy and the coverage name (section 4); LPDS and the title (section 2) | the paper text |
 | D-184 | ~~Approve the tool arm's calibration (`run_traces --variant tool --calibrate 20 --yes`, about $1.50) and then the run at a cap ($20 to $54 by the dry run's multipliers, plus E5 about $1.20), or state the open-book bound and leave the tool unrun~~ **Approved and run 2026-10-03 for Claude Sonnet 5 and GPT-5.4 mini ($12.80 with E5); gpt-oss-20b not servable through the admitted endpoints** | — |

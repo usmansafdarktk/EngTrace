@@ -56,7 +56,9 @@ vocabulary) are in `docs/PAPER_PLAN_OCT2026.md`, section 8; this file covers for
 ## This folder
 
 - One file per section, named as `main.tex` inputs it (`0_abstract.tex`, `1_intro.tex`, `2_relatedwork.tex`, ...);
-  the bibliography is `custom.bib`.
+  the bibliography is `custom.bib`. Section 5 is two files, `6_experiments.tex` (the section heading and the setup)
+  and `6_results.tex` (results and error analysis), which `6_experiments_results.tex` inputs, so `main.tex` keeps
+  `\input{sections/6_experiments_results}`; the wrapper compiles once `6_results.tex` exists.
 - In the `.tex` files every sentence starts on a new line and wraps at 100 characters, never inside a citation,
   reference or `\textsc{}` name; changes then show sentence by sentence, and LaTeX still prints one paragraph.
   Text copied verbatim from the May appendix (prompt boxes, the parameterization bullets) keeps its original
@@ -70,7 +72,10 @@ vocabulary) are in `docs/PAPER_PLAN_OCT2026.md`, section 8; this file covers for
 Labels used before their sections exist. Each must be defined when its section is written, or the reference prints
 "??" in the PDF.
 
-- To define: `sec:experiments` (Section 5).
+- To define: `appendix:models` (the models and inference settings: served versions, settings and token use, the
+  prompt, the statistical protocol in full), referenced from `6_experiments.tex`.
+- Defined in `6_experiments.tex`: `sec:experiments` and `subsec:setup` (models, decoding and prompt, statistical
+  protocol); every number in it comes from `full_run_28092026/paper_setup.py`, whose `--check` must pass.
 - Defined: `sec:intro`, `sec:related`, `sec:benchmark`, `subsec:taxonomy`, `subsec:templates`,
   `subsec:certification`, `fig:engtrace-overview` (the five-branch figure, `figs/engtrace-overview-5branch.pdf`),
   `fig:template-generation` (May's pipeline figure, `figs/template-generation.pdf`).

@@ -139,6 +139,10 @@ measurement on every template, on public draws and on the pool's targets (`SHORT
 additions of 2026-10-03 (coverage compared across models, branch and level intervals, detectable differences) are D-173;
 the pilot's leave-one-judge-out and attribution analyses are D-174 and D-176.
 
+`paper_setup.py` prints the numbers of the paper's Section 5.1 (models, decoding and prompt, statistical protocol) from
+`results.json`, `decoding_table.json`, the manifest and `analyze.py`'s constants; `--check` fails unless
+`overleaf_source_04102026/6_experiments.tex` holds each of them and no other number (D-190).
+
 **For the paper:** `RESULTS_PAPER_NOTES.md` says which figures to report, with their sources, what they
 support and what they do not (D-170); `PARAPHRASE_PAPER_NOTES.md` does the same for Q5. The analyses still to
 do, in order, are in `docs/EVALUATION_NEXT_STEPS.md`.
