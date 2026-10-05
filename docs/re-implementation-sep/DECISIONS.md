@@ -7447,6 +7447,37 @@ the May style and every value verified. Choices:
   appendix is two sections to match, Evaluated Models and Experimental Setup, the second with subsections for
   decoding and token use, the inference prompt, and the statistical protocol, which the setup names one by one.
 
+## D-192 — Sections 5.2 and 5.3 written: results, error analysis, and the full-results, rewording, conditions and error-analysis appendices
+
+**Date:** 2026-10-05 · **Status:** DONE · **Evidence:** `overleaf_source_04102026/6_results.tex`,
+`appendices/results.tex`, `appendices/rewording.tex`, `appendices/conditions.tex`, `appendices/error_analysis.tex`,
+`figs/error-categories.pdf`; `full_run_28092026/paper_results.py --check` (every generated block current, every phrase
+present, every number in the prose generated, every citation key and label resolves); `docs/check_plan_claims.py`
+(123 of 123 pass)
+
+The plan's sections 5.2 and 5.3 and Appendices I to L, written to the plan's budgets and rules. Choices:
+
+- **Every table and the figure are generated in place.** `paper_results.py --write` rewrites the blocks between
+  `% BEGIN GENERATED` and `% END GENERATED` markers in the five files from `results/results.json`,
+  `expert_request/scored.json` and `build.json`, `RESIDUAL_INCORRECT.md`, `PARAPHRASE.md`, `PARAPHRASE_REVIEW.md`,
+  `FLAG_REVIEW_3.md`, and the constants of `analyze.py`, `run_traces.py` and `paraphrase.py`; `--check` compares the
+  blocks and the prose phrases, so no number is typed from a Markdown table.
+- **Table 1** is FAC and MC per model with 95% intervals and a compact letter display (Piepho 2004) built from the
+  Holm-corrected pairwise verdicts of each measure; MC is the mean of the 147 templates' means, the basis of the
+  pairwise tests, so its top value prints 0.922 where the all-responses mean is 0.923. The four models without
+  reasoning tokens and GLM-5.3's 100 empty responses are marked.
+- **One main-text figure**, the error categories of the 160 wrong answers as a shaded matrix by model and by level
+  (one hue, reads in greyscale, 3.03 in wide, Type 42 fonts); the difficulty and coverage figures of earlier drafts are
+  tables in the appendix.
+- **Not stated**, per the plan's section 3.2: no "best" model, no branch order, no trade-off between the measures, no
+  "robust to paraphrasing"; the level gap always with both counts (4 of 11 as scored; 0 of 11 without the two
+  chemical templates), the planned permutation's 9 of 11 only in the appendix; the top five's remaining incorrect
+  verdicts counted from `RESIDUAL_INCORRECT.md` (171, of which 122 are symbolic, prescribed-digit or two-chemical-template cases).
+- **Not produced:** Milestone Coverage by branch and level (not in `results.json`) and representative wrong answers
+  (the readers' consent is needed).
+- **Added to `custom.bib`** under "% Results": Kendall 1938, Spearman 1904, Wilcoxon 1945, McNemar 1947 and Piepho
+  2004, typed from the published versions; to be checked by hand as every entry is.
+
 ## Open decisions
 
 | # | Decision | Needed before |

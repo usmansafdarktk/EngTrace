@@ -1,0 +1,205 @@
+% -------------
+\section{Error Analysis}
+\label{appendix:error_analysis}
+
+This section supports the Error Analysis of~\autoref{subsec:error_analysis}: the taxonomy and the
+reading protocol, the sample, the readers' agreement, the results by model and by level, and the
+templates whose wording does not pin the answer.
+
+\subsection{Taxonomy and Protocol}
+The taxonomy has six categories, ordered from the most to the least fundamental stage of an
+engineering derivation: hallucination (a value, constant, or equation that exists in no engineering
+reference); setup or assumption error (the problem is framed wrongly before any equation is applied:
+a wrong boundary condition, an ignored constraint, or a misidentified configuration); formula or
+principle error (the setup is right, but the governing equation or principle is wrong); unit or
+dimensional error (a missing conversion, mixed unit systems, or a value substituted in the wrong
+unit); sign or direction error (the wrong sign or physical direction for a quantity); and
+calculation error (every earlier stage is right, and the arithmetic or algebra produces the wrong
+result).
+A reader answers the six questions in this order and stops at the first yes, so that the label is
+the most fundamental error present and not a downstream symptom, and pastes the shortest excerpt of
+the working that shows it.
+Two options cover what the six do not: no error (the answer is correct, or the question admits it)
+and incomplete (the working stops before an answer).
+Three domain experts of its branch, from the fifteen who certified the templates, read each wrong
+answer behind an opaque code and without the model's name.
+
+\subsection{Sample}
+We read 160 wrong answers, 40 from each of four models chosen to contrast the tiers:
+\texttt{Claude Sonnet 5} from the top tier, and \texttt{GPT-5.4 mini}, \texttt{Gemma 4 26B}, and
+\texttt{gpt-oss-20b} from the lower one.
+A wrong answer is a readable response whose final answer the check scores incorrect; for each model
+the 40 are drawn at random across levels in proportion to the model's wrong answers at each level
+and spread round-robin over its templates (\autoref{tab:error_sample}), 79 templates in all.
+
+% BEGIN GENERATED tab:error_sample (full_run_28092026/paper_results.py --write)
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{l r r r r}
+\toprule
+\rowcolor{gray!10}
+\textbf{Model} & \textbf{Easy} & \textbf{Intermediate} & \textbf{Advanced} & \textbf{Total} \\
+\midrule
+\texttt{Claude Sonnet 5} & 1 & 10 & 29 & 40 \\
+\texttt{GPT-5.4 mini} & 8 & 17 & 15 & 40 \\
+\texttt{Gemma 4 26B} & 9 & 16 & 15 & 40 \\
+\texttt{gpt-oss-20b} & 8 & 19 & 13 & 40 \\
+\midrule
+Branch & \multicolumn{4}{l}{chemical 41, industrial 36, civil 35, electrical 28, mechanical 20} \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{The Wrong Answers Read.} Answered wrong answers per model and level, drawn in proportion to the model's wrong answers at each level and spread over its templates; 79 templates in all.}
+\label{tab:error_sample}
+\end{table}
+% END GENERATED tab:error_sample
+
+\subsection{Agreement and Results}
+The three readers agree closely: Fleiss'~$\kappa$ of 0.930 over the 480 readings (0.839 to 0.968 per
+model).
+\autoref{tab:error_by_model} gives the readings and the majority labels by model,
+and~\autoref{tab:error_by_level} the readings by level; no reader used the incomplete option.
+The categories describe sampled wrong answers, 40 per model, and are not rates over all responses.
+Formula or principle errors are 18\% of the readings on Intermediate and Advanced problems against
+3\% on Easy ones, where calculation slips are 69 of 78 readings.
+
+% BEGIN GENERATED tab:error_by_model (full_run_28092026/paper_results.py --write)
+\begin{table*}[t]
+\centering
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l r r r r}
+\toprule
+\rowcolor{gray!10}
+\textbf{Category} & \textbf{Claude Sonnet 5} & \textbf{GPT-5.4 mini} & \textbf{Gemma 4 26B} & \textbf{gpt-oss-20b} \\
+\midrule
+Hallucination & 0 (0) & 3 (1) & 0 (0) & 10 (4) \\
+Setup or assumption & 6 (2) & 5 (2) & 7 (2) & 16 (6) \\
+Formula or principle & 6 (2) & 16 (5) & 20 (7) & 31 (9) \\
+Unit & 0 (0) & 0 (0) & 0 (0) & 1 (0) \\
+Sign or direction & 0 (0) & 5 (2) & 6 (2) & 0 (0) \\
+Calculation & 31 (10) & 85 (28) & 84 (28) & 50 (17) \\
+No error & 77 (26) & 6 (2) & 3 (1) & 12 (4) \\
+Incomplete & 0 (0) & 0 (0) & 0 (0) & 0 (0) \\
+\midrule
+Readings (wrong answers) & 120 (40) & 120 (40) & 120 (40) & 120 (40) \\
+Fleiss' $\kappa$ & 0.968 & 0.930 & 0.965 & 0.839 \\
+\bottomrule
+\end{tabular}
+}
+\caption{\textbf{Error Categories by Model.} Readings per category by the three domain experts and, in parentheses, the wrong answers whose majority label is the category; Fleiss' $\kappa$ over the three readers is 0.930 overall.}
+\label{tab:error_by_model}
+\end{table*}
+% END GENERATED tab:error_by_model
+
+% BEGIN GENERATED tab:error_by_level (full_run_28092026/paper_results.py --write)
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{l r r r}
+\toprule
+\rowcolor{gray!10}
+\textbf{Category} & \textbf{Easy} & \textbf{Intermediate} & \textbf{Advanced} \\
+\midrule
+Hallucination & 2 (3\%) & 5 (3\%) & 6 (3\%) \\
+Setup or assumption & 2 (3\%) & 23 (12\%) & 9 (4\%) \\
+Formula or principle & 2 (3\%) & 33 (18\%) & 38 (18\%) \\
+Unit & 0 (0\%) & 0 (0\%) & 1 (0\%) \\
+Sign or direction & 0 (0\%) & 6 (3\%) & 5 (2\%) \\
+Calculation & 69 (88\%) & 107 (58\%) & 74 (34\%) \\
+No error & 3 (4\%) & 12 (6\%) & 83 (38\%) \\
+Incomplete & 0 (0\%) & 0 (0\%) & 0 (0\%) \\
+\midrule
+Readings & 78 & 186 & 216 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Error Categories by Level.} Readings per category and their share of the level's readings.}
+\label{tab:error_by_level}
+\end{table}
+% END GENERATED tab:error_by_level
+
+\subsection{Templates Whose Wording Does Not Pin the Answer}
+Three chemical domain experts read the two Advanced chemical templates on which the top tier's wrong
+answers concentrate, and three experts of the template's branch read each of six templates on which
+many wrong answers land between 0.2\% and 5\% of the gold value; \autoref{tab:template_readings}
+gives the questions and the answers.
+For the compression-work template, the question names neither the closed-system nor the flow reading
+of the work, nor which two-term form of the virial equation, and the readings differ by more than
+the tolerance, so the experts call the answer not unique and the responses shown correct under one
+reading; for the flame-temperature template, standard data sources differ by more than the
+tolerance, so the answer depends on the data source the question leaves open.
+For the six near-miss templates, the experts confirm that the answer is unique and that a response
+landing within 5\% but outside the tolerance is not correct.
+The level gap of~\autoref{subsec:results} is therefore reported with and without the two chemical
+templates.
+Two further sources of incorrect verdicts at the top are a matter of form: 17 templates prescribe
+the digits of the answer in the question, and the check requires them, which accounts for 311
+incorrect verdicts across the eleven models, 120 of them within 0.2\% of the target
+(\autoref{tab:exact_digits}); and the nine templates with symbolic answers are scored by the numbers
+they state.
+Of the top five models' 171 incorrect verdicts, 38 are symbolic, 27 within 0.2\% on a template that
+prescribes the digits, and 57 on the two chemical templates: 122 of the 171.
+Finally, four templates whose answers can be read off the question's wording stay in the evaluation
+set, since FAC moves by at most 0.004 without them (\autoref{tab:sensitivity}).
+
+% BEGIN GENERATED tab:template_readings (full_run_28092026/paper_results.py --write)
+\begin{table*}[t]
+\centering
+\footnotesize
+\begin{tabular}{l p{0.36\textwidth} p{0.34\textwidth}}
+\toprule
+\rowcolor{gray!10}
+\textbf{Template} & \textbf{Question to the three experts} & \textbf{Answers} \\
+\midrule
+\texttt{work\_isothermal\_virial} & Does the wording decide between the closed-system and the flow reading? & ``either: the wording does not decide'' 3 \\
+\texttt{work\_isothermal\_virial} & Does it decide between the two forms of the truncated virial equation? & ``either: the wording does not decide'' 3 \\
+\texttt{work\_isothermal\_virial} & Does the question have one correct answer? & ``no'' 3 \\
+\texttt{work\_isothermal\_virial} & Are the responses shown correct under some reading? & ``all of them'' 3 \\
+\texttt{annulus\_flowrate} & Does the question have one correct answer? & ``yes'' 3 \\
+\texttt{annulus\_flowrate} & Is the response shown, which lands within 5\% of the gold, correct? & ``no'' 3 \\
+\texttt{pfr\_volume\_changing\_rate} & Does the question have one correct answer? & ``yes'' 3 \\
+\texttt{pfr\_volume\_changing\_rate} & Is the response shown, which lands within 5\% of the gold, correct? & ``no'' 3 \\
+\texttt{pitzer\_correlation\_z} & Does the question have one correct answer? & ``yes'' 3 \\
+\texttt{pitzer\_correlation\_z} & Is the response shown, which lands within 5\% of the gold, correct? & ``no'' 3 \\
+\texttt{vdw\_solve\_for\_volume} & Does the question have one correct answer? & ``yes'' 3 \\
+\texttt{vdw\_solve\_for\_volume} & Is the response shown, which lands within 5\% of the gold, correct? & ``no'' 3 \\
+\texttt{adiabatic\_flame\_temperature} & Do standard data sources agree within the tolerance? & ``no: standard sources differ by more than that'' 2; ``only if the same data source is used'' 1 \\
+\texttt{adiabatic\_flame\_temperature} & Is the gold method the standard one? & ``no'' 1; ``yes'' 2 \\
+\texttt{adiabatic\_flame\_temperature} & Are the responses shown correct under some reading? & ``some of them'' 3 \\
+\texttt{manning\_rectangular\_discharge} & Does the question have one correct answer? & ``yes'' 3 \\
+\texttt{manning\_rectangular\_discharge} & Is the response shown, which lands within 5\% of the gold, correct? & ``no'' 3 \\
+\texttt{best\_hydraulic\_rectangular\_section} & Does the question have one correct answer? & ``yes'' 3 \\
+\texttt{best\_hydraulic\_rectangular\_section} & Is the response shown, which lands within 5\% of the gold, correct? & ``no'' 3 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{The Experts' Reading of the Templates Whose Wording May Not Pin the Answer.} Three domain experts of the template's branch answered each question; the two chemical templates (compression work from a truncated virial equation; adiabatic flame temperature) and six templates on which many wrong answers land within 5\% of the gold value.}
+\label{tab:template_readings}
+\end{table*}
+% END GENERATED tab:template_readings
+
+% BEGIN GENERATED tab:exact_digits (full_run_28092026/paper_results.py --write)
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{l r}
+\toprule
+\rowcolor{gray!10}
+\textbf{Template} & \textbf{Incorrect verdicts within 0.2\%} \\
+\midrule
+\texttt{chart\_pair\_selection} & 37 \\
+\texttt{qr\_policy\_one\_iteration} & 25 \\
+\texttt{single\_sampling\_oc\_point} & 21 \\
+\texttt{basic\_eoq} & 12 \\
+\texttt{aoq\_ati\_rectifying} & 6 \\
+\texttt{newsvendor\_normal\_demand} & 5 \\
+\texttt{c\_chart\_revision} & 4 \\
+\texttt{xbar\_r\_control\_limits} & 4 \\
+\texttt{takt\_time\_line\_efficiency} & 3 \\
+\texttt{safety\_stock\_reorder\_point} & 2 \\
+\texttt{exponential\_mttf\_topology} & 1 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Incorrect Verdicts Within the Relative Tolerance.} Over all eleven models, the incorrect verdicts whose stated value lies within 0.2\% of the target; every one falls on a template whose question prescribes the digits of the answer, where the check requires them.}
+\label{tab:exact_digits}
+\end{table}
+% END GENERATED tab:exact_digits

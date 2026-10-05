@@ -1,0 +1,675 @@
+% -------------
+\section{Full Results}
+\label{appendix:results}
+
+This section supports the Results of~\autoref{subsec:results} with the measures in full and every
+comparison behind them: the extended tables (\autoref{tab:results_answer}
+and~\autoref{tab:results_process}), the pairwise comparisons (\autoref{tab:pairs_fac}
+and~\autoref{tab:pairs_mc}), the branch, level, domain, and answer-kind means
+(\autoref{tab:by_branch} to~\autoref{tab:by_domain_kind}), the level gap under its variations
+(\autoref{tab:level_gap}), the sensitivity analyses (\autoref{tab:sensitivity}), consistency and
+instance variance (\autoref{tab:consistency} and~\autoref{tab:instance_variance}), failure against
+depth (\autoref{tab:depth}), the decoding repeats (\autoref{tab:repeats}), completion tokens
+(\autoref{tab:tokens}), and the coverage and diagnostic details (\autoref{tab:coverage_wrong}
+to~\autoref{tab:attribution}).
+Every interval resamples the 150 templates, every family of tests is Holm-corrected, and every
+non-significant difference carries the smallest difference the design detects at 80\% power
+(\autoref{appendix:protocol}).
+
+\subsection{Scores and Pairwise Comparisons}
+\autoref{tab:results_answer} extends the main table on the answer side
+and~\autoref{tab:results_process} on the process side.
+Strict FAC, which scores a partial answer 0, changes no conclusion: the pairwise test on it agrees
+with the test on FAC for 54 of the 55 pairs.
+\autoref{tab:pairs_fac} and~\autoref{tab:pairs_mc} list the 55 pairs for each measure: 32 of the 55
+pairs differ on FAC after correction, and 28 and 29 of the 55 pairs differ on MC under the sign-flip
+and the Wilcoxon test; every non-significant FAC difference lies below what its pair detects.
+
+% BEGIN GENERATED tab:results_answer (full_run_28092026/paper_results.py --write)
+\begin{table*}[t]
+\centering
+\small
+\begin{tabular}{l r c r c r r r}
+\toprule
+\rowcolor{gray!10}
+\textbf{Model} & \textbf{FAC} & \textbf{95\% CI} & \textbf{Strict FAC} & \textbf{95\% CI} & \textbf{No answer} & \textbf{SD within} & \textbf{SD between} \\
+\midrule
+\texttt{DeepSeek V4.1 Flash} & 0.976 & 0.957--0.990 & 0.970 & 0.948--0.987 & 14 & 0.034 & 0.105 \\
+\texttt{Kimi K3} & 0.974 & 0.956--0.988 & 0.969 & 0.950--0.984 & 5 & 0.046 & 0.099 \\
+\texttt{Claude Sonnet 5} & 0.972 & 0.952--0.988 & 0.966 & 0.944--0.984 & 0 & 0.041 & 0.112 \\
+\texttt{GLM-5.3-Flash} & 0.969 & 0.947--0.986 & 0.965 & 0.943--0.984 & 42 & 0.041 & 0.123 \\
+\texttt{Muse Glimmer 30B} & 0.967 & 0.946--0.984 & 0.963 & 0.941--0.981 & 29 & 0.050 & 0.116 \\
+\texttt{GLM-5.3} & 0.948 & 0.918--0.973 & 0.943 & 0.911--0.970 & 100 & 0.054 & 0.175 \\
+\texttt{Qwen3-235B-2507} & 0.886 & 0.852--0.916 & 0.860 & 0.820--0.898 & 1 & 0.150 & 0.202 \\
+\texttt{Gemini 3.1 Flash-Lite} & 0.872 & 0.829--0.911 & 0.863 & 0.819--0.903 & 0 & 0.121 & 0.256 \\
+\texttt{Gemma 4 26B} & 0.864 & 0.825--0.899 & 0.848 & 0.808--0.885 & 0 & 0.160 & 0.231 \\
+\texttt{GPT-5.4 mini} & 0.847 & 0.806--0.885 & 0.834 & 0.792--0.873 & 0 & 0.168 & 0.252 \\
+\texttt{gpt-oss-20b} & 0.814 & 0.770--0.856 & 0.800 & 0.755--0.842 & 55 & 0.207 & 0.270 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Final Answer Accuracy in Full.} FAC and strict FAC, which scores a partial answer 0, with 95\% intervals; the number of responses with no readable final answer, which score 0; and the standard deviation of the score within a template (across its 15 instances) and between templates (of the template means).}
+\label{tab:results_answer}
+\end{table*}
+% END GENERATED tab:results_answer
+
+% BEGIN GENERATED tab:results_process (full_run_28092026/paper_results.py --write)
+\begin{table*}[t]
+\centering
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l r c r c r r c r r c}
+\toprule
+\rowcolor{gray!10}
+\textbf{Model} & \textbf{MC, no judge} & \textbf{95\% CI} & \textbf{MC} & \textbf{95\% CI} & \textbf{Judged} & \textbf{Arith.\ flags} & \textbf{95\% CI} & \textbf{Calc./resp.} & \textbf{Step flags} & \textbf{95\% CI} \\
+\midrule
+\texttt{DeepSeek V4.1 Flash} & 0.860 & 0.830--0.888 & 0.897 & 0.870--0.922 & 0.168 & 0.005 & 0.002--0.009 & 3.3 & 0.011 & 0.006--0.016 \\
+\texttt{Kimi K3} & 0.878 & 0.852--0.902 & 0.915 & 0.893--0.936 & 0.156 & 0.006 & 0.003--0.010 & 2.8 & 0.019 & 0.012--0.027 \\
+\texttt{Claude Sonnet 5} & 0.902 & 0.878--0.924 & 0.922 & 0.902--0.942 & 0.131 & 0.139 & 0.107--0.171 & 5.3 & 0.057 & 0.043--0.071 \\
+\texttt{GLM-5.3-Flash} & 0.882 & 0.854--0.908 & 0.912 & 0.885--0.936 & 0.138 & 0.019 & 0.012--0.027 & 4.8 & 0.033 & 0.024--0.043 \\
+\texttt{Muse Glimmer 30B} & 0.859 & 0.830--0.888 & 0.898 & 0.872--0.923 & 0.169 & 0.056 & 0.042--0.071 & 3.3 & 0.059 & 0.045--0.073 \\
+\texttt{GLM-5.3} & 0.875 & 0.840--0.908 & 0.901 & 0.866--0.931 & 0.112 & 0.018 & 0.012--0.026 & 5.7 & 0.026 & 0.016--0.037 \\
+\texttt{Qwen3-235B-2507} & 0.869 & 0.840--0.896 & 0.893 & 0.868--0.916 & 0.163 & 0.225 & 0.181--0.272 & 9.8 & 0.109 & 0.085--0.134 \\
+\texttt{Gemini 3.1 Flash-Lite} & 0.840 & 0.808--0.870 & 0.864 & 0.834--0.893 & 0.209 & 0.070 & 0.046--0.095 & 3.9 & 0.122 & 0.090--0.157 \\
+\texttt{Gemma 4 26B} & 0.855 & 0.823--0.884 & 0.876 & 0.848--0.903 & 0.187 & 0.129 & 0.096--0.166 & 4.4 & 0.143 & 0.110--0.179 \\
+\texttt{GPT-5.4 mini} & 0.800 & 0.761--0.837 & 0.833 & 0.796--0.869 & 0.252 & 0.141 & 0.108--0.178 & 3.8 & 0.220 & 0.177--0.264 \\
+\texttt{gpt-oss-20b} & 0.793 & 0.755--0.829 & 0.816 & 0.778--0.851 & 0.239 & 0.148 & 0.117--0.181 & 3.7 & 0.211 & 0.182--0.241 \\
+\bottomrule
+\end{tabular}
+}
+\caption{\textbf{Milestone Coverage and Diagnostics in Full.} MC by matching alone (no judge) over every response with milestones and MC with the judge (as in the main table); the share of milestones the judge decides; the share of correct-answer responses with an arithmetic flag, the displayed calculations the check reads per response, and the share with a judged step flag, with 95\% intervals.}
+\label{tab:results_process}
+\end{table*}
+% END GENERATED tab:results_process
+
+% BEGIN GENERATED tab:pairs_fac (full_run_28092026/paper_results.py --write)
+\begin{table*}[t]
+\centering
+\footnotesize
+\begin{tabular}{l l r c r r r r}
+\toprule
+\rowcolor{gray!10}
+\textbf{Model A} & \textbf{Model B} & \textbf{A $-$ B} & \textbf{95\% CI} & \textbf{$p$ (Holm)} & \textbf{Strict} & \textbf{McNemar} & \textbf{Detectable} \\
+\midrule
+\texttt{gpt-oss-20b} & \texttt{DeepSeek V4.1 Flash} & $-0.162$ & $-0.205$ to $-0.121$ & 0.001 & 0.001 & $<$0.001 & 0.060 \\
+\texttt{gpt-oss-20b} & \texttt{GLM-5.3-Flash} & $-0.155$ & $-0.197$ to $-0.116$ & 0.001 & 0.001 & $<$0.001 & 0.059 \\
+\texttt{gpt-oss-20b} & \texttt{GLM-5.3} & $-0.133$ & $-0.177$ to $-0.091$ & 0.001 & 0.001 & $<$0.001 & 0.061 \\
+\texttt{gpt-oss-20b} & \texttt{Muse Glimmer 30B} & $-0.152$ & $-0.191$ to $-0.116$ & 0.001 & 0.001 & $<$0.001 & 0.055 \\
+\texttt{gpt-oss-20b} & \texttt{Kimi K3} & $-0.160$ & $-0.204$ to $-0.119$ & 0.001 & 0.001 & $<$0.001 & 0.061 \\
+\texttt{gpt-oss-20b} & \texttt{Claude Sonnet 5} & $-0.157$ & $-0.199$ to $-0.119$ & 0.001 & 0.001 & $<$0.001 & 0.058 \\
+\texttt{Gemma 4 26B} & \texttt{DeepSeek V4.1 Flash} & $-0.112$ & $-0.146$ to $-0.081$ & 0.001 & 0.001 & $<$0.001 & 0.047 \\
+\texttt{Gemma 4 26B} & \texttt{GLM-5.3-Flash} & $-0.105$ & $-0.136$ to $-0.077$ & 0.001 & 0.001 & $<$0.001 & 0.044 \\
+\texttt{Gemma 4 26B} & \texttt{GLM-5.3} & $-0.084$ & $-0.115$ to $-0.055$ & 0.001 & 0.001 & $<$0.001 & 0.042 \\
+\texttt{Gemma 4 26B} & \texttt{Muse Glimmer 30B} & $-0.103$ & $-0.137$ to $-0.073$ & 0.001 & 0.001 & $<$0.001 & 0.046 \\
+\texttt{Gemma 4 26B} & \texttt{Kimi K3} & $-0.110$ & $-0.146$ to $-0.077$ & 0.001 & 0.001 & $<$0.001 & 0.049 \\
+\texttt{Gemma 4 26B} & \texttt{Claude Sonnet 5} & $-0.108$ & $-0.140$ to $-0.077$ & 0.001 & 0.001 & $<$0.001 & 0.045 \\
+\texttt{DeepSeek V4.1 Flash} & \texttt{Qwen3-235B-2507} & $+0.090$ & 0.064--0.120 & 0.001 & 0.001 & $<$0.001 & 0.040 \\
+\texttt{DeepSeek V4.1 Flash} & \texttt{GPT-5.4 mini} & $+0.129$ & 0.092--0.169 & 0.001 & 0.001 & $<$0.001 & 0.056 \\
+\texttt{DeepSeek V4.1 Flash} & \texttt{Gemini 3.1 Flash-Lite} & $+0.104$ & 0.069--0.142 & 0.001 & 0.001 & $<$0.001 & 0.051 \\
+\texttt{Qwen3-235B-2507} & \texttt{GLM-5.3-Flash} & $-0.084$ & $-0.110$ to $-0.059$ & 0.001 & 0.001 & $<$0.001 & 0.037 \\
+\texttt{Qwen3-235B-2507} & \texttt{GLM-5.3} & $-0.062$ & $-0.089$ to $-0.036$ & 0.001 & 0.001 & $<$0.001 & 0.038 \\
+\texttt{Qwen3-235B-2507} & \texttt{Muse Glimmer 30B} & $-0.081$ & $-0.107$ to $-0.057$ & 0.001 & 0.001 & $<$0.001 & 0.037 \\
+\texttt{Qwen3-235B-2507} & \texttt{Kimi K3} & $-0.088$ & $-0.118$ to $-0.061$ & 0.001 & 0.001 & $<$0.001 & 0.041 \\
+\texttt{Qwen3-235B-2507} & \texttt{Claude Sonnet 5} & $-0.086$ & $-0.113$ to $-0.061$ & 0.001 & 0.001 & $<$0.001 & 0.038 \\
+\texttt{GLM-5.3-Flash} & \texttt{GPT-5.4 mini} & $+0.122$ & 0.089--0.160 & 0.001 & 0.001 & $<$0.001 & 0.051 \\
+\texttt{GLM-5.3-Flash} & \texttt{Gemini 3.1 Flash-Lite} & $+0.098$ & 0.067--0.131 & 0.001 & 0.001 & $<$0.001 & 0.047 \\
+\texttt{GLM-5.3} & \texttt{GPT-5.4 mini} & $+0.101$ & 0.069--0.135 & 0.001 & 0.001 & $<$0.001 & 0.048 \\
+\texttt{GLM-5.3} & \texttt{Gemini 3.1 Flash-Lite} & $+0.076$ & 0.048--0.107 & 0.001 & 0.001 & $<$0.001 & 0.042 \\
+\texttt{Muse Glimmer 30B} & \texttt{GPT-5.4 mini} & $+0.120$ & 0.087--0.156 & 0.001 & 0.001 & $<$0.001 & 0.050 \\
+\texttt{Muse Glimmer 30B} & \texttt{Gemini 3.1 Flash-Lite} & $+0.095$ & 0.063--0.130 & 0.001 & 0.001 & $<$0.001 & 0.049 \\
+\texttt{Kimi K3} & \texttt{GPT-5.4 mini} & $+0.127$ & 0.088--0.169 & 0.001 & 0.001 & $<$0.001 & 0.057 \\
+\texttt{Kimi K3} & \texttt{Gemini 3.1 Flash-Lite} & $+0.102$ & 0.068--0.140 & 0.001 & 0.001 & $<$0.001 & 0.052 \\
+\texttt{GPT-5.4 mini} & \texttt{Claude Sonnet 5} & $-0.125$ & $-0.164$ to $-0.088$ & 0.001 & 0.001 & $<$0.001 & 0.054 \\
+\texttt{Gemini 3.1 Flash-Lite} & \texttt{Claude Sonnet 5} & $-0.100$ & $-0.137$ to $-0.067$ & 0.001 & 0.001 & $<$0.001 & 0.050 \\
+\texttt{GLM-5.3-Flash} & \texttt{GLM-5.3} & $+0.022$ & 0.009--0.037 & 0.013 & 0.023 & $<$0.001 & 0.021 \\
+\texttt{gpt-oss-20b} & \texttt{Qwen3-235B-2507} & $-0.071$ & $-0.113$ to $-0.030$ & 0.025 & 0.320 & $<$0.001 & 0.060 \\
+\texttt{DeepSeek V4.1 Flash} & \texttt{GLM-5.3} & $+0.028$ & 0.010--0.050 & 0.075 & 0.255 & $<$0.001 & 0.029 \\
+\texttt{gpt-oss-20b} & \texttt{Gemma 4 26B} & $-0.050$ & $-0.089$ to $-0.010$ & 0.307 & 0.476 & $<$0.001 & 0.056 \\
+\texttt{gpt-oss-20b} & \texttt{Gemini 3.1 Flash-Lite} & $-0.057$ & $-0.103$ to $-0.012$ & 0.307 & 0.198 & $<$0.001 & 0.065 \\
+\texttt{GLM-5.3} & \texttt{Kimi K3} & $-0.027$ & $-0.051$ to $-0.006$ & 0.332 & 0.476 & $<$0.001 & 0.032 \\
+\texttt{Qwen3-235B-2507} & \texttt{GPT-5.4 mini} & $+0.039$ & 0.007--0.073 & 0.443 & 1.000 & 0.058 & 0.048 \\
+\texttt{GLM-5.3} & \texttt{Claude Sonnet 5} & $-0.024$ & $-0.048$ to $-0.005$ & 0.481 & 0.832 & $<$0.001 & 0.031 \\
+\texttt{gpt-oss-20b} & \texttt{GPT-5.4 mini} & $-0.032$ & $-0.077$ to 0.012 & 1.000 & 1.000 & 0.011 & 0.063 \\
+\texttt{Gemma 4 26B} & \texttt{Qwen3-235B-2507} & $-0.022$ & $-0.052$ to 0.008 & 1.000 & 1.000 & 1.000 & 0.042 \\
+\texttt{Gemma 4 26B} & \texttt{GPT-5.4 mini} & $+0.017$ & $-0.013$ to 0.048 & 1.000 & 1.000 & 1.000 & 0.044 \\
+\texttt{Gemma 4 26B} & \texttt{Gemini 3.1 Flash-Lite} & $-0.008$ & $-0.035$ to 0.018 & 1.000 & 1.000 & 0.712 & 0.038 \\
+\texttt{DeepSeek V4.1 Flash} & \texttt{GLM-5.3-Flash} & $+0.007$ & $-0.004$ to 0.018 & 1.000 & 1.000 & 1.000 & 0.016 \\
+\texttt{DeepSeek V4.1 Flash} & \texttt{Muse Glimmer 30B} & $+0.009$ & $-0.011$ to 0.028 & 1.000 & 1.000 & 1.000 & 0.027 \\
+\texttt{DeepSeek V4.1 Flash} & \texttt{Kimi K3} & $+0.002$ & $-0.006$ to 0.009 & 1.000 & 1.000 & 1.000 & 0.010 \\
+\texttt{DeepSeek V4.1 Flash} & \texttt{Claude Sonnet 5} & $+0.004$ & $-0.006$ to 0.016 & 1.000 & 1.000 & 1.000 & 0.016 \\
+\texttt{Qwen3-235B-2507} & \texttt{Gemini 3.1 Flash-Lite} & $+0.014$ & $-0.015$ to 0.045 & 1.000 & 1.000 & 1.000 & 0.042 \\
+\texttt{GLM-5.3-Flash} & \texttt{Muse Glimmer 30B} & $+0.002$ & $-0.016$ to 0.020 & 1.000 & 1.000 & 1.000 & 0.026 \\
+\texttt{GLM-5.3-Flash} & \texttt{Kimi K3} & $-0.005$ & $-0.019$ to 0.008 & 1.000 & 1.000 & 1.000 & 0.020 \\
+\texttt{GLM-5.3-Flash} & \texttt{Claude Sonnet 5} & $-0.002$ & $-0.019$ to 0.012 & 1.000 & 1.000 & 1.000 & 0.022 \\
+\texttt{GLM-5.3} & \texttt{Muse Glimmer 30B} & $-0.019$ & $-0.044$ to 0.002 & 1.000 & 1.000 & 0.002 & 0.033 \\
+\texttt{Muse Glimmer 30B} & \texttt{Kimi K3} & $-0.007$ & $-0.028$ to 0.012 & 1.000 & 1.000 & 1.000 & 0.028 \\
+\texttt{Muse Glimmer 30B} & \texttt{Claude Sonnet 5} & $-0.005$ & $-0.025$ to 0.015 & 1.000 & 1.000 & 1.000 & 0.029 \\
+\texttt{Kimi K3} & \texttt{Claude Sonnet 5} & $+0.002$ & $-0.006$ to 0.013 & 1.000 & 1.000 & 1.000 & 0.014 \\
+\texttt{GPT-5.4 mini} & \texttt{Gemini 3.1 Flash-Lite} & $-0.025$ & $-0.054$ to 0.002 & 1.000 & 0.994 & 0.003 & 0.040 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Pairwise Comparisons of Final Answer Accuracy.} For each of the 55 pairs, the difference of FAC with its 95\% interval, the Holm-adjusted $p$ of the sign-flip test on the per-template differences, the same test on strict FAC, McNemar's exact test on the paired verdicts~\citep{mcnemar1947}, and the smallest difference the pair detects at 80\% power; 32 pairs differ at $p < 0.05$ after correction.}
+\label{tab:pairs_fac}
+\end{table*}
+% END GENERATED tab:pairs_fac
+
+% BEGIN GENERATED tab:pairs_mc (full_run_28092026/paper_results.py --write)
+\begin{table*}[t]
+\centering
+\footnotesize
+\begin{tabular}{l l r c r r r}
+\toprule
+\rowcolor{gray!10}
+\textbf{Model A} & \textbf{Model B} & \textbf{A $-$ B} & \textbf{95\% CI} & \textbf{$p$ (Holm)} & \textbf{Wilcoxon} & \textbf{Detectable} \\
+\midrule
+\texttt{gpt-oss-20b} & \texttt{DeepSeek V4.1 Flash} & $-0.081$ & $-0.111$ to $-0.052$ & 0.001 & $<$0.001 & 0.042 \\
+\texttt{gpt-oss-20b} & \texttt{Qwen3-235B-2507} & $-0.077$ & $-0.108$ to $-0.048$ & 0.001 & $<$0.001 & 0.043 \\
+\texttt{gpt-oss-20b} & \texttt{GLM-5.3-Flash} & $-0.096$ & $-0.129$ to $-0.065$ & 0.001 & $<$0.001 & 0.047 \\
+\texttt{gpt-oss-20b} & \texttt{Muse Glimmer 30B} & $-0.083$ & $-0.112$ to $-0.055$ & 0.001 & $<$0.001 & 0.041 \\
+\texttt{gpt-oss-20b} & \texttt{Kimi K3} & $-0.099$ & $-0.130$ to $-0.069$ & 0.001 & $<$0.001 & 0.044 \\
+\texttt{gpt-oss-20b} & \texttt{Claude Sonnet 5} & $-0.107$ & $-0.138$ to $-0.077$ & 0.001 & $<$0.001 & 0.043 \\
+\texttt{DeepSeek V4.1 Flash} & \texttt{GPT-5.4 mini} & $+0.064$ & 0.039--0.091 & 0.001 & $<$0.001 & 0.038 \\
+\texttt{Qwen3-235B-2507} & \texttt{GPT-5.4 mini} & $+0.060$ & 0.035--0.087 & 0.001 & $<$0.001 & 0.036 \\
+\texttt{GLM-5.3-Flash} & \texttt{GPT-5.4 mini} & $+0.079$ & 0.052--0.109 & 0.001 & $<$0.001 & 0.041 \\
+\texttt{GLM-5.3-Flash} & \texttt{Gemini 3.1 Flash-Lite} & $+0.048$ & 0.027--0.069 & 0.001 & $<$0.001 & 0.030 \\
+\texttt{Muse Glimmer 30B} & \texttt{GPT-5.4 mini} & $+0.065$ & 0.041--0.091 & 0.001 & $<$0.001 & 0.035 \\
+\texttt{Kimi K3} & \texttt{GPT-5.4 mini} & $+0.082$ & 0.056--0.110 & 0.001 & $<$0.001 & 0.038 \\
+\texttt{Kimi K3} & \texttt{Gemini 3.1 Flash-Lite} & $+0.051$ & 0.033--0.071 & 0.001 & $<$0.001 & 0.027 \\
+\texttt{GPT-5.4 mini} & \texttt{Claude Sonnet 5} & $-0.089$ & $-0.118$ to $-0.063$ & 0.001 & $<$0.001 & 0.039 \\
+\texttt{Gemini 3.1 Flash-Lite} & \texttt{Claude Sonnet 5} & $-0.058$ & $-0.081$ to $-0.038$ & 0.001 & $<$0.001 & 0.031 \\
+\texttt{gpt-oss-20b} & \texttt{Gemma 4 26B} & $-0.060$ & $-0.088$ to $-0.034$ & 0.001 & 0.003 & 0.039 \\
+\texttt{gpt-oss-20b} & \texttt{GLM-5.3} & $-0.085$ & $-0.123$ to $-0.049$ & 0.001 & $<$0.001 & 0.053 \\
+\texttt{Gemma 4 26B} & \texttt{Claude Sonnet 5} & $-0.046$ & $-0.068$ to $-0.027$ & 0.001 & $<$0.001 & 0.030 \\
+\texttt{GLM-5.3} & \texttt{GPT-5.4 mini} & $+0.068$ & 0.038--0.101 & 0.001 & $<$0.001 & 0.046 \\
+\texttt{Gemma 4 26B} & \texttt{Kimi K3} & $-0.039$ & $-0.059$ to $-0.020$ & 0.003 & 0.009 & 0.028 \\
+\texttt{Gemma 4 26B} & \texttt{GPT-5.4 mini} & $+0.043$ & 0.020--0.069 & 0.014 & 0.009 & 0.034 \\
+\texttt{Qwen3-235B-2507} & \texttt{Gemini 3.1 Flash-Lite} & $+0.029$ & 0.013--0.045 & 0.018 & 0.038 & 0.023 \\
+\texttt{DeepSeek V4.1 Flash} & \texttt{Claude Sonnet 5} & $-0.025$ & $-0.041$ to $-0.011$ & 0.024 & 0.013 & 0.022 \\
+\texttt{Muse Glimmer 30B} & \texttt{Gemini 3.1 Flash-Lite} & $+0.034$ & 0.014--0.055 & 0.024 & 0.021 & 0.029 \\
+\texttt{DeepSeek V4.1 Flash} & \texttt{Gemini 3.1 Flash-Lite} & $+0.033$ & 0.014--0.053 & 0.027 & 0.081 & 0.028 \\
+\texttt{Qwen3-235B-2507} & \texttt{Claude Sonnet 5} & $-0.029$ & $-0.048$ to $-0.013$ & 0.027 & 0.026 & 0.026 \\
+\texttt{Gemma 4 26B} & \texttt{GLM-5.3-Flash} & $-0.036$ & $-0.058$ to $-0.015$ & 0.031 & 0.006 & 0.031 \\
+\texttt{gpt-oss-20b} & \texttt{Gemini 3.1 Flash-Lite} & $-0.048$ & $-0.078$ to $-0.020$ & 0.036 & 0.035 & 0.042 \\
+\texttt{DeepSeek V4.1 Flash} & \texttt{Kimi K3} & $-0.018$ & $-0.030$ to $-0.007$ & 0.063 & 0.163 & 0.017 \\
+\texttt{GPT-5.4 mini} & \texttt{Gemini 3.1 Flash-Lite} & $-0.031$ & $-0.053$ to $-0.010$ & 0.121 & 0.170 & 0.031 \\
+\texttt{Qwen3-235B-2507} & \texttt{Kimi K3} & $-0.022$ & $-0.039$ to $-0.006$ & 0.195 & 0.101 & 0.024 \\
+\texttt{GLM-5.3} & \texttt{Gemini 3.1 Flash-Lite} & $+0.037$ & 0.010--0.064 & 0.209 & 0.007 & 0.039 \\
+\texttt{Muse Glimmer 30B} & \texttt{Claude Sonnet 5} & $-0.024$ & $-0.045$ to $-0.005$ & 0.377 & 0.428 & 0.029 \\
+\texttt{Gemma 4 26B} & \texttt{Qwen3-235B-2507} & $-0.017$ & $-0.032$ to $-0.002$ & 0.599 & 0.323 & 0.021 \\
+\texttt{Gemma 4 26B} & \texttt{Muse Glimmer 30B} & $-0.022$ & $-0.043$ to $-0.002$ & 0.691 & 0.255 & 0.029 \\
+\texttt{Gemma 4 26B} & \texttt{DeepSeek V4.1 Flash} & $-0.021$ & $-0.042$ to $-0.002$ & 0.730 & 1.000 & 0.028 \\
+\texttt{gpt-oss-20b} & \texttt{GPT-5.4 mini} & $-0.017$ & $-0.049$ to 0.014 & 1.000 & 1.000 & 0.045 \\
+\texttt{Gemma 4 26B} & \texttt{GLM-5.3} & $-0.025$ & $-0.054$ to 0.003 & 1.000 & 0.012 & 0.041 \\
+\texttt{Gemma 4 26B} & \texttt{Gemini 3.1 Flash-Lite} & $+0.012$ & $-0.001$ to 0.026 & 1.000 & 1.000 & 0.019 \\
+\texttt{DeepSeek V4.1 Flash} & \texttt{Qwen3-235B-2507} & $+0.004$ & $-0.015$ to 0.023 & 1.000 & 1.000 & 0.028 \\
+\texttt{DeepSeek V4.1 Flash} & \texttt{GLM-5.3-Flash} & $-0.015$ & $-0.032$ to 0.003 & 1.000 & 0.141 & 0.025 \\
+\texttt{DeepSeek V4.1 Flash} & \texttt{GLM-5.3} & $-0.004$ & $-0.029$ to 0.022 & 1.000 & 0.819 & 0.036 \\
+\texttt{DeepSeek V4.1 Flash} & \texttt{Muse Glimmer 30B} & $-0.001$ & $-0.020$ to 0.019 & 1.000 & 0.861 & 0.028 \\
+\texttt{Qwen3-235B-2507} & \texttt{GLM-5.3-Flash} & $-0.019$ & $-0.039$ to 0.001 & 1.000 & 0.141 & 0.028 \\
+\texttt{Qwen3-235B-2507} & \texttt{GLM-5.3} & $-0.008$ & $-0.036$ to 0.022 & 1.000 & 0.170 & 0.041 \\
+\texttt{Qwen3-235B-2507} & \texttt{Muse Glimmer 30B} & $-0.005$ & $-0.023$ to 0.012 & 1.000 & 1.000 & 0.025 \\
+\texttt{GLM-5.3-Flash} & \texttt{GLM-5.3} & $+0.011$ & $-0.004$ to 0.028 & 1.000 & 1.000 & 0.023 \\
+\texttt{GLM-5.3-Flash} & \texttt{Muse Glimmer 30B} & $+0.014$ & $-0.003$ to 0.031 & 1.000 & 1.000 & 0.024 \\
+\texttt{GLM-5.3-Flash} & \texttt{Kimi K3} & $-0.003$ & $-0.022$ to 0.013 & 1.000 & 1.000 & 0.025 \\
+\texttt{GLM-5.3-Flash} & \texttt{Claude Sonnet 5} & $-0.010$ & $-0.031$ to 0.008 & 1.000 & 1.000 & 0.028 \\
+\texttt{GLM-5.3} & \texttt{Muse Glimmer 30B} & $+0.003$ & $-0.022$ to 0.025 & 1.000 & 1.000 & 0.033 \\
+\texttt{GLM-5.3} & \texttt{Kimi K3} & $-0.014$ & $-0.042$ to 0.011 & 1.000 & 1.000 & 0.038 \\
+\texttt{GLM-5.3} & \texttt{Claude Sonnet 5} & $-0.021$ & $-0.051$ to 0.005 & 1.000 & 1.000 & 0.041 \\
+\texttt{Muse Glimmer 30B} & \texttt{Kimi K3} & $-0.016$ & $-0.036$ to 0.001 & 1.000 & 1.000 & 0.027 \\
+\texttt{Kimi K3} & \texttt{Claude Sonnet 5} & $-0.008$ & $-0.021$ to 0.005 & 1.000 & 0.892 & 0.019 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Pairwise Comparisons of Milestone Coverage.} For each of the 55 pairs, the difference of MC over the 147 templates with milestones, its 95\% interval, the Holm-adjusted $p$ of the sign-flip test and of a Wilcoxon signed-rank test~\citep{wilcoxon1945} on the per-template differences, and the smallest difference the pair detects; 28 and 29 pairs differ after correction under the two tests.}
+\label{tab:pairs_mc}
+\end{table*}
+% END GENERATED tab:pairs_mc
+
+\subsection{Branch, Level, Domain, and Answer Kind}
+\autoref{tab:by_branch} gives the branch means with their intervals.
+With 30 templates per branch, a model's spread lets the design detect differences of 0.072 to 0.189
+between two branches, and the branch spreads sit below that: one of the 110 branch pairs separates
+after correction (\texttt{gpt-oss-20b}, electrical above civil), so the branch means are not an
+order of difficulty.
+\autoref{tab:by_level} gives the level means, and~\autoref{tab:level_gap} the Easy-minus-Advanced
+gap under every variation: the gap is positive for every model under every variation, significant
+after correction for four of the eleven models under Welch's $t$-test (the planned permutation of
+level labels, which is liberal when the level with fewer templates varies more, finds 9 of 11), and
+significant for none without the two Advanced chemical templates
+of~\autoref{appendix:error_analysis}.
+\autoref{tab:by_domain_kind} gives the domain and answer-kind means; they carry no interval and no
+test and describe where each model's errors fall.
+
+% BEGIN GENERATED tab:by_branch (full_run_28092026/paper_results.py --write)
+\begin{table*}[t]
+\centering
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l c c c c c r l}
+\toprule
+\rowcolor{gray!10}
+\textbf{Model} & \textbf{Chemical} & \textbf{Civil} & \textbf{Electrical} & \textbf{Industrial} & \textbf{Mechanical} & \textbf{Detectable} & \textbf{Pairs that hold} \\
+\midrule
+\texttt{DeepSeek V4.1 Flash} & 0.956 (0.887--0.996) & 0.993 (0.982--1.000) & 0.954 (0.900--0.989) & 0.980 (0.944--1.000) & 0.997 (0.991--1.000) & 0.076 & none \\
+\texttt{Kimi K3} & 0.964 (0.907--0.998) & 0.987 (0.964--1.000) & 0.949 (0.886--0.987) & 0.980 (0.962--0.993) & 0.991 (0.980--0.999) & 0.072 & none \\
+\texttt{Claude Sonnet 5} & 0.949 (0.873--1.000) & 0.996 (0.987--1.000) & 0.947 (0.886--0.987) & 0.973 (0.949--0.993) & 0.994 (0.984--1.000) & 0.081 & none \\
+\texttt{GLM-5.3-Flash} & 0.947 (0.873--0.998) & 0.984 (0.956--1.000) & 0.981 (0.956--0.999) & 0.942 (0.869--0.989) & 0.992 (0.983--0.999) & 0.089 & none \\
+\texttt{Muse Glimmer 30B} & 0.963 (0.911--0.999) & 0.969 (0.933--0.996) & 0.971 (0.930--0.997) & 0.940 (0.867--0.991) & 0.991 (0.979--1.000) & 0.084 & none \\
+\texttt{GLM-5.3} & 0.898 (0.796--0.987) & 0.973 (0.927--1.000) & 0.951 (0.910--0.983) & 0.922 (0.836--0.987) & 0.993 (0.982--1.000) & 0.126 & none \\
+\texttt{Qwen3-235B-2507} & 0.827 (0.720--0.922) & 0.940 (0.911--0.964) & 0.886 (0.823--0.939) & 0.871 (0.773--0.951) & 0.906 (0.852--0.952) & 0.145 & none \\
+\texttt{Gemini 3.1 Flash-Lite} & 0.776 (0.640--0.896) & 0.862 (0.764--0.942) & 0.900 (0.826--0.954) & 0.860 (0.751--0.949) & 0.961 (0.926--0.988) & 0.182 & none \\
+\texttt{Gemma 4 26B} & 0.734 (0.609--0.849) & 0.882 (0.816--0.940) & 0.904 (0.856--0.948) & 0.878 (0.773--0.962) & 0.921 (0.877--0.960) & 0.162 & none \\
+\texttt{GPT-5.4 mini} & 0.800 (0.682--0.904) & 0.838 (0.758--0.907) & 0.911 (0.861--0.954) & 0.831 (0.724--0.922) & 0.854 (0.753--0.938) & 0.182 & none \\
+\texttt{gpt-oss-20b} & 0.809 (0.678--0.919) & 0.673 (0.542--0.800) & 0.908 (0.861--0.948) & 0.820 (0.742--0.889) & 0.862 (0.794--0.924) & 0.189 & Electrical $>$ Civil \\
+\bottomrule
+\end{tabular}
+}
+\caption{\textbf{Final Answer Accuracy by Branch.} The mean of the branch's 30 template means with its 95\% interval; the smallest difference between two branches that a model's spread lets 30 templates detect at 80\% power; and the branch pairs that differ under Welch's $t$-test after Holm correction over the ten pairs within the model.}
+\label{tab:by_branch}
+\end{table*}
+% END GENERATED tab:by_branch
+
+% BEGIN GENERATED tab:by_level (full_run_28092026/paper_results.py --write)
+\begin{table*}[t]
+\centering
+\small
+\begin{tabular}{l c c c}
+\toprule
+\rowcolor{gray!10}
+\textbf{Model} & \textbf{Easy (58)} & \textbf{Intermediate (58)} & \textbf{Advanced (34)} \\
+\midrule
+\texttt{DeepSeek V4.1 Flash} & 0.996 (0.992--0.999) & 0.983 (0.963--0.997) & 0.929 (0.856--0.984) \\
+\texttt{Kimi K3} & 0.993 (0.987--0.998) & 0.982 (0.971--0.991) & 0.928 (0.857--0.983) \\
+\texttt{Claude Sonnet 5} & 0.993 (0.982--0.999) & 0.980 (0.964--0.992) & 0.923 (0.842--0.986) \\
+\texttt{GLM-5.3-Flash} & 0.995 (0.989--0.999) & 0.972 (0.933--0.995) & 0.922 (0.853--0.975) \\
+\texttt{Muse Glimmer 30B} & 0.982 (0.957--0.999) & 0.975 (0.941--0.995) & 0.927 (0.874--0.974) \\
+\texttt{GLM-5.3} & 0.986 (0.971--0.997) & 0.965 (0.925--0.990) & 0.852 (0.746--0.944) \\
+\texttt{Qwen3-235B-2507} & 0.917 (0.870--0.956) & 0.882 (0.827--0.930) & 0.839 (0.752--0.915) \\
+\texttt{Gemini 3.1 Flash-Lite} & 0.937 (0.890--0.973) & 0.885 (0.820--0.941) & 0.738 (0.620--0.847) \\
+\texttt{Gemma 4 26B} & 0.921 (0.872--0.961) & 0.861 (0.797--0.918) & 0.771 (0.675--0.854) \\
+\texttt{GPT-5.4 mini} & 0.918 (0.874--0.955) & 0.841 (0.771--0.902) & 0.734 (0.623--0.835) \\
+\texttt{gpt-oss-20b} & 0.905 (0.847--0.953) & 0.782 (0.706--0.850) & 0.716 (0.610--0.810) \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Final Answer Accuracy by Level.} The mean of the level's template means with its 95\% interval; the number of templates in parentheses.}
+\label{tab:by_level}
+\end{table*}
+% END GENERATED tab:by_level
+
+% BEGIN GENERATED tab:level_gap (full_run_28092026/paper_results.py --write)
+\begin{table*}[t]
+\centering
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l r r r c r r r r r r}
+\toprule
+\rowcolor{gray!10}
+\textbf{Model} & \textbf{Easy} & \textbf{Advanced} & \textbf{Gap} & \textbf{95\% CI} & \textbf{Welch} & \textbf{Perm.} & \textbf{Detectable} & \textbf{No unreadable} & \textbf{No symbolic} & \textbf{No two chemical} \\
+\midrule
+\texttt{DeepSeek V4.1 Flash} & 0.996 & 0.929 & $+0.067$ & 0.011--0.144 & 0.291 & 0.008 & 0.095 & $+0.055$ (0.587) & $+0.042$ (0.789) & $+0.036$ (0.506) \\
+\texttt{Kimi K3} & 0.993 & 0.928 & $+0.065$ & 0.009--0.137 & 0.291 & 0.017 & 0.094 & $+0.055$ (0.587) & $+0.036$ (0.789) & $+0.040$ (0.506) \\
+\texttt{Claude Sonnet 5} & 0.993 & 0.923 & $+0.070$ & 0.006--0.151 & 0.291 & 0.043 & 0.104 & $+0.070$ (0.471) & $+0.048$ (0.789) & $+0.029$ (0.506) \\
+\texttt{GLM-5.3-Flash} & 0.995 & 0.922 & $+0.073$ & 0.020--0.145 & 0.190 & 0.007 & 0.091 & $+0.037$ (0.587) & $+0.067$ (0.384) & $+0.036$ (0.336) \\
+\texttt{Muse Glimmer 30B} & 0.982 & 0.927 & $+0.055$ & 0.004--0.112 & 0.291 & 0.050 & 0.080 & $+0.034$ (0.587) & $+0.035$ (0.789) & $+0.047$ (0.506) \\
+\texttt{GLM-5.3} & 0.986 & 0.852 & $+0.134$ & 0.042--0.240 & 0.098 & 0.005 & 0.145 & $+0.010$ (0.587) & $+0.128$ (0.202) & $+0.087$ (0.336) \\
+\texttt{Qwen3-235B-2507} & 0.917 & 0.839 & $+0.078$ & $-0.011$ to 0.174 & 0.291 & 0.076 & 0.134 & $+0.078$ (0.587) & $+0.065$ (0.789) & $+0.034$ (0.506) \\
+\texttt{Gemini 3.1 Flash-Lite} & 0.937 & 0.738 & $+0.199$ & 0.083--0.327 & 0.031 & 0.003 & 0.177 & $+0.199$ (0.031) & $+0.183$ (0.070) & $+0.157$ (0.115) \\
+\texttt{Gemma 4 26B} & 0.921 & 0.771 & $+0.151$ & 0.054--0.255 & 0.043 & 0.008 & 0.145 & $+0.151$ (0.043) & $+0.149$ (0.078) & $+0.105$ (0.132) \\
+\texttt{GPT-5.4 mini} & 0.918 & 0.734 & $+0.184$ & 0.076--0.306 & 0.032 & 0.005 & 0.167 & $+0.184$ (0.032) & $+0.188$ (0.061) & $+0.151$ (0.115) \\
+\texttt{gpt-oss-20b} & 0.905 & 0.716 & $+0.189$ & 0.079--0.307 & 0.023 & 0.005 & 0.164 & $+0.179$ (0.031) & $+0.192$ (0.039) & $+0.157$ (0.082) \\
+\bottomrule
+\end{tabular}
+}
+\caption{\textbf{The Level Gap Under Its Variations.} Easy minus Advanced, the mean of the 58 Easy template means minus the mean of the 34 Advanced ones, with its 95\% interval; the Holm-adjusted $p$ under Welch's $t$-test and under the planned permutation of level labels; the smallest gap the design detects; and the gap with its Holm-adjusted Welch $p$ when responses with no readable answer are left out, without the nine symbolic-answer templates, and without the two Advanced chemical templates whose wording does not pin the answer.}
+\label{tab:level_gap}
+\end{table*}
+% END GENERATED tab:level_gap
+
+% BEGIN GENERATED tab:by_domain_kind (full_run_28092026/paper_results.py --write)
+\begin{table*}[t]
+\centering
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l r r r r r r r r r r r }
+\toprule
+\rowcolor{gray!10}
+\textbf{Domain or answer kind} & \rotatebox{90}{\texttt{DeepSeek V4.1 Flash}} & \rotatebox{90}{\texttt{Kimi K3}} & \rotatebox{90}{\texttt{Claude Sonnet 5}} & \rotatebox{90}{\texttt{GLM-5.3-Flash}} & \rotatebox{90}{\texttt{Muse Glimmer 30B}} & \rotatebox{90}{\texttt{GLM-5.3}} & \rotatebox{90}{\texttt{Qwen3-235B-2507}} & \rotatebox{90}{\texttt{Gemini 3.1 Flash-Lite}} & \rotatebox{90}{\texttt{Gemma 4 26B}} & \rotatebox{90}{\texttt{GPT-5.4 mini}} & \rotatebox{90}{\texttt{gpt-oss-20b}} \\
+\midrule
+Digital communications & 0.923 & 0.897 & 0.913 & 0.967 & 0.950 & 0.923 & 0.840 & 0.877 & 0.883 & 0.923 & 0.930 \\
+Electromagnetics and waves & 0.990 & 0.980 & 0.953 & 0.977 & 0.997 & 0.947 & 0.883 & 0.883 & 0.887 & 0.830 & 0.910 \\
+Fluid mechanics & 0.997 & 0.987 & 0.987 & 0.987 & 0.987 & 0.987 & 0.913 & 0.950 & 0.893 & 0.950 & 0.880 \\
+Geotechnical engineering & 1.000 & 1.000 & 0.987 & 0.993 & 0.933 & 0.993 & 0.947 & 0.960 & 0.913 & 0.913 & 0.520 \\
+Mechanics of materials & 1.000 & 0.993 & 1.000 & 0.993 & 0.997 & 1.000 & 0.943 & 0.940 & 0.907 & 0.803 & 0.840 \\
+Production and inventory & 0.940 & 0.967 & 0.987 & 0.887 & 0.887 & 0.887 & 0.847 & 0.853 & 0.873 & 0.780 & 0.767 \\
+Quality and reliability control & 1.000 & 0.980 & 0.940 & 0.947 & 0.933 & 0.907 & 0.787 & 0.800 & 0.800 & 0.760 & 0.773 \\
+Reaction kinetics & 0.993 & 1.000 & 1.000 & 1.000 & 1.000 & 0.993 & 0.980 & 0.913 & 0.913 & 0.913 & 0.967 \\
+Signals and systems & 0.950 & 0.970 & 0.973 & 1.000 & 0.967 & 0.983 & 0.933 & 0.940 & 0.943 & 0.980 & 0.883 \\
+Stochastic operations & 1.000 & 0.993 & 0.993 & 0.993 & 1.000 & 0.973 & 0.980 & 0.927 & 0.960 & 0.953 & 0.920 \\
+Structural analysis & 1.000 & 0.993 & 1.000 & 1.000 & 0.987 & 1.000 & 0.947 & 0.913 & 0.913 & 0.827 & 0.733 \\
+Thermodynamics & 0.900 & 0.922 & 0.878 & 0.872 & 0.911 & 0.761 & 0.728 & 0.678 & 0.517 & 0.667 & 0.656 \\
+Transport phenomena & 0.992 & 0.983 & 0.992 & 0.992 & 0.996 & 0.983 & 0.783 & 0.750 & 0.838 & 0.858 & 0.842 \\
+Vibrations and acoustics & 0.993 & 0.993 & 0.997 & 0.997 & 0.990 & 0.993 & 0.860 & 0.993 & 0.963 & 0.810 & 0.867 \\
+Water resources & 0.980 & 0.967 & 1.000 & 0.960 & 0.987 & 0.927 & 0.927 & 0.713 & 0.820 & 0.773 & 0.767 \\
+\midrule
+Array & 0.962 & 0.962 & 0.990 & 0.914 & 0.971 & 0.762 & 0.924 & 0.771 & 0.867 & 0.800 & 0.886 \\
+Classification & 0.960 & 0.960 & 1.000 & 0.993 & 0.960 & 1.000 & 0.887 & 0.973 & 0.953 & 0.973 & 0.680 \\
+Multipart & 0.994 & 0.990 & 0.989 & 0.986 & 0.981 & 0.958 & 0.905 & 0.921 & 0.904 & 0.906 & 0.886 \\
+Scalar & 0.980 & 0.981 & 0.972 & 0.966 & 0.965 & 0.956 & 0.885 & 0.857 & 0.834 & 0.816 & 0.772 \\
+Symbolic & 0.874 & 0.856 & 0.867 & 0.952 & 0.907 & 0.907 & 0.830 & 0.811 & 0.867 & 0.881 & 0.870 \\
+Vector & 1.000 & 0.988 & 0.983 & 0.988 & 1.000 & 0.988 & 0.842 & 0.933 & 0.971 & 0.871 & 0.954 \\
+\bottomrule
+\end{tabular}
+}
+\caption{\textbf{Final Answer Accuracy by Domain and by Answer Kind.} Instance means per domain (upper rows) and per answer kind (lower rows); these carry no interval and no test and describe where each model's errors fall.}
+\label{tab:by_domain_kind}
+\end{table*}
+% END GENERATED tab:by_domain_kind
+
+\subsection{Sensitivity}
+\autoref{tab:sensitivity} gives FAC under each scoring variation and Kendall's $\tau$ between that
+ordering of the models and the ordering as scored.
+The ordering is unchanged without the four templates whose answers can be read off the question's
+wording and when a requested quantity stated in the body is credited, and it changes most when the
+responses with no readable answer are left out, because \texttt{GLM-5.3}'s 100 empty responses then
+stop counting.
+
+% BEGIN GENERATED tab:sensitivity (full_run_28092026/paper_results.py --write)
+\begin{table*}[t]
+\centering
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l r r r r r r r r r }
+\toprule
+\rowcolor{gray!10}
+\textbf{Model} & \textbf{Tolerance halved} & \textbf{As scored} & \textbf{Doubled} & \textbf{Strict} & \textbf{No unreadable} & \textbf{No 4 shortcut} & \textbf{No 9 symbolic} & \textbf{Half-unit window} & \textbf{Whole response} \\
+\midrule
+\texttt{DeepSeek V4.1 Flash} & 0.972 & 0.976 & 0.977 & 0.970 & 0.982 & 0.976 & 0.983 & 0.973 & 0.979 \\
+\texttt{Kimi K3} & 0.972 & 0.974 & 0.976 & 0.969 & 0.976 & 0.974 & 0.982 & 0.970 & 0.977 \\
+\texttt{Claude Sonnet 5} & 0.966 & 0.972 & 0.977 & 0.966 & 0.972 & 0.971 & 0.978 & 0.965 & 0.976 \\
+\texttt{GLM-5.3-Flash} & 0.968 & 0.969 & 0.970 & 0.965 & 0.988 & 0.968 & 0.970 & 0.965 & 0.972 \\
+\texttt{Muse Glimmer 30B} & 0.965 & 0.967 & 0.968 & 0.963 & 0.980 & 0.966 & 0.971 & 0.955 & 0.968 \\
+\texttt{GLM-5.3} & 0.946 & 0.948 & 0.948 & 0.943 & 0.992 & 0.946 & 0.950 & 0.943 & 0.951 \\
+\texttt{Qwen3-235B-2507} & 0.876 & 0.886 & 0.897 & 0.860 & 0.886 & 0.883 & 0.889 & 0.876 & 0.907 \\
+\texttt{Gemini 3.1 Flash-Lite} & 0.863 & 0.872 & 0.885 & 0.863 & 0.872 & 0.869 & 0.876 & 0.865 & 0.879 \\
+\texttt{Gemma 4 26B} & 0.844 & 0.864 & 0.895 & 0.848 & 0.864 & 0.861 & 0.864 & 0.849 & 0.876 \\
+\texttt{GPT-5.4 mini} & 0.836 & 0.847 & 0.859 & 0.834 & 0.847 & 0.843 & 0.845 & 0.813 & 0.853 \\
+\texttt{gpt-oss-20b} & 0.807 & 0.814 & 0.822 & 0.800 & 0.835 & 0.813 & 0.811 & 0.785 & 0.823 \\
+\midrule
+$\tau$ with the scores as scored & 0.927 & 1 & 0.927 & 0.964 & 0.636 & 1.000 & 0.964 & 0.991 & 1.000 \\
+\bottomrule
+\end{tabular}
+}
+\caption{\textbf{Sensitivity of Final Answer Accuracy to the Scoring Rules.} FAC with the answer tolerance halved and doubled; strict FAC; the mean over the responses with a readable answer; without the four templates whose answers can be read off the question's wording and without the nine templates with symbolic answers, which we score by the numbers they state; with a half-unit rounding window in place of one unit of the last digit; and crediting a requested quantity stated in the body but left off the final answer line. The last row is Kendall's $\tau$ between that ordering of the models and the ordering as scored; sampling noise alone puts $\tau$ at a median of 0.891 between random halves of the instances.}
+\label{tab:sensitivity}
+\end{table*}
+% END GENERATED tab:sensitivity
+
+\subsection{Consistency, Instance Variance, Depth, Repeats, and Tokens}
+\autoref{tab:consistency} gives, for the 58 templates that follow one reasoning path and for the
+other 92, the share of templates a model solves on all 15 instances, on some, and on none.
+\autoref{tab:instance_variance} gives the variance of the score across a template's instances: most
+templates vary little, and the variance concentrates in a few templates, named in the table.
+\autoref{tab:depth} gives the wrong-answer rate by the number of milestones in the gold derivation,
+descriptive and without a test; the milestone count is the template's.
+\autoref{tab:repeats} gives the decoding repeats of four models on 300 instances decoded three
+times; the other seven models have no decoding-variance figure.
+\autoref{tab:tokens} gives the median completion tokens by verdict.
+
+% BEGIN GENERATED tab:consistency (full_run_28092026/paper_results.py --write)
+\begin{table*}[t]
+\centering
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l c c c c c c}
+\toprule
+\rowcolor{gray!10}
+\textbf{Model} & \multicolumn{3}{c}{\textbf{Single-path templates (58)}} & \multicolumn{3}{c}{\textbf{Other templates (92)}} \\
+ & \textbf{All} & \textbf{Some} & \textbf{None} & \textbf{All} & \textbf{Some} & \textbf{None} \\
+\midrule
+\texttt{DeepSeek V4.1 Flash} & 0.897 (0.810--0.966) & 0.103 (0.034--0.190) & 0.000 (0.000--0.000) & 0.848 (0.772--0.913) & 0.152 (0.087--0.228) & 0.000 (0.000--0.000) \\
+\texttt{Kimi K3} & 0.862 (0.776--0.948) & 0.138 (0.052--0.241) & 0.000 (0.000--0.000) & 0.793 (0.707--0.870) & 0.207 (0.130--0.293) & 0.000 (0.000--0.000) \\
+\texttt{Claude Sonnet 5} & 0.897 (0.810--0.966) & 0.103 (0.034--0.190) & 0.000 (0.000--0.000) & 0.826 (0.750--0.902) & 0.174 (0.098--0.250) & 0.000 (0.000--0.000) \\
+\texttt{GLM-5.3-Flash} & 0.914 (0.828--0.983) & 0.086 (0.017--0.156) & 0.000 (0.000--0.000) & 0.826 (0.739--0.902) & 0.174 (0.098--0.250) & 0.000 (0.000--0.000) \\
+\texttt{Muse Glimmer 30B} & 0.862 (0.776--0.948) & 0.138 (0.052--0.241) & 0.000 (0.000--0.000) & 0.826 (0.750--0.902) & 0.174 (0.098--0.250) & 0.000 (0.000--0.000) \\
+\texttt{GLM-5.3} & 0.845 (0.741--0.931) & 0.138 (0.052--0.224) & 0.017 (0.000--0.052) & 0.772 (0.685--0.859) & 0.217 (0.141--0.304) & 0.011 (0.000--0.033) \\
+\texttt{Qwen3-235B-2507} & 0.448 (0.328--0.569) & 0.534 (0.414--0.655) & 0.017 (0.000--0.052) & 0.543 (0.446--0.641) & 0.435 (0.337--0.533) & 0.022 (0.000--0.054) \\
+\texttt{Gemini 3.1 Flash-Lite} & 0.672 (0.552--0.793) & 0.276 (0.172--0.397) & 0.052 (0.000--0.121) & 0.598 (0.500--0.696) & 0.391 (0.293--0.489) & 0.011 (0.000--0.033) \\
+\texttt{Gemma 4 26B} & 0.466 (0.345--0.603) & 0.500 (0.362--0.621) & 0.034 (0.000--0.086) & 0.511 (0.413--0.609) & 0.478 (0.380--0.576) & 0.011 (0.000--0.033) \\
+\texttt{GPT-5.4 mini} & 0.483 (0.362--0.603) & 0.483 (0.362--0.621) & 0.034 (0.000--0.086) & 0.467 (0.370--0.576) & 0.511 (0.402--0.609) & 0.022 (0.000--0.054) \\
+\texttt{gpt-oss-20b} & 0.362 (0.241--0.483) & 0.569 (0.448--0.690) & 0.069 (0.017--0.138) & 0.337 (0.239--0.435) & 0.652 (0.554--0.750) & 0.011 (0.000--0.033) \\
+\bottomrule
+\end{tabular}
+}
+\caption{\textbf{Consistency Within a Template.} The share of templates whose 15 instances a model all answers correctly, some but not all, or none, with 95\% intervals, for the templates that follow one reasoning path and for the others.}
+\label{tab:consistency}
+\end{table*}
+% END GENERATED tab:consistency
+
+% BEGIN GENERATED tab:instance_variance (full_run_28092026/paper_results.py --write)
+\begin{table*}[t]
+\centering
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l r r r r r l}
+\toprule
+\rowcolor{gray!10}
+\textbf{Model} & \textbf{Median SD} & \textbf{Upper quartile} & \textbf{No variance} & \textbf{All correct} & \textbf{None correct} & \textbf{Highest variance} \\
+\midrule
+\texttt{DeepSeek V4.1 Flash} & 0.000 & 0.000 & 130 & 130 & 0 & \texttt{qr\_policy\_one\_iteration}, \texttt{adiabatic\_flame\_temperature}, \texttt{impulse\_response\_from\_lccde} \\
+\texttt{Kimi K3} & 0.000 & 0.000 & 123 & 123 & 0 & \texttt{work\_isothermal\_virial}, \texttt{normal\_depth\_iteration}, \texttt{adiabatic\_flame\_temperature} \\
+\texttt{Claude Sonnet 5} & 0.000 & 0.000 & 128 & 128 & 0 & \texttt{adiabatic\_flame\_temperature}, \texttt{single\_sampling\_oc\_point}, \texttt{chart\_pair\_selection} \\
+\texttt{GLM-5.3-Flash} & 0.000 & 0.000 & 129 & 129 & 0 & \texttt{adiabatic\_flame\_temperature}, \texttt{normal\_depth\_iteration}, \texttt{single\_sampling\_oc\_point} \\
+\texttt{Muse Glimmer 30B} & 0.000 & 0.000 & 126 & 126 & 0 & \texttt{aoq\_ati\_rectifying}, \texttt{rackett\_equation\_volume}, \texttt{adiabatic\_flame\_temperature} \\
+\texttt{GLM-5.3} & 0.000 & 0.000 & 122 & 120 & 2 & \texttt{aoq\_ati\_rectifying}, \texttt{normal\_depth\_iteration}, \texttt{bpsk\_energy\_basis} \\
+\texttt{Qwen3-235B-2507} & 0.000 & 0.258 & 78 & 76 & 0 & \texttt{annulus\_flowrate}, \texttt{aoq\_ati\_rectifying}, \texttt{chart\_pair\_selection} \\
+\texttt{Gemini 3.1 Flash-Lite} & 0.000 & 0.258 & 98 & 94 & 4 & \texttt{manning\_rectangular\_discharge}, \texttt{power\_law\_fluid\_shear}, \texttt{chart\_pair\_selection} \\
+\texttt{Gemma 4 26B} & 0.000 & 0.302 & 77 & 74 & 3 & \texttt{aoq\_ati\_rectifying}, \texttt{ideal\_gas\_volume}, \texttt{utube\_manometer} \\
+\texttt{GPT-5.4 mini} & 0.065 & 0.352 & 75 & 71 & 4 & \texttt{annulus\_flowrate}, \texttt{chart\_pair\_selection}, \texttt{rotating\_unbalance} \\
+\texttt{gpt-oss-20b} & 0.258 & 0.352 & 57 & 52 & 5 & \texttt{aoq\_ati\_rectifying}, \texttt{phase\_relations\_degree\_of\_saturation}, \texttt{statically\_indeterminate\_shaft} \\
+\bottomrule
+\end{tabular}
+}
+\caption{\textbf{Instance Variance Within a Template.} The median and upper quartile over templates of the standard deviation of the score across a template's 15 instances; the number of templates with no variance at all, split into those solved on every instance and on none; and the templates with the highest variance.}
+\label{tab:instance_variance}
+\end{table*}
+% END GENERATED tab:instance_variance
+
+% BEGIN GENERATED tab:depth (full_run_28092026/paper_results.py --write)
+\begin{table*}[t]
+\centering
+\small
+\begin{tabular}{l r r r r r r }
+\toprule
+\rowcolor{gray!10}
+\textbf{Model} & \textbf{0 (70)} & \textbf{1 (290)} & \textbf{2 (452)} & \textbf{3 (367)} & \textbf{4--5 (532)} & \textbf{6+ (539)} \\
+\midrule
+\texttt{DeepSeek V4.1 Flash} & 0.000 & 0.000 & 0.000 & 0.011 & 0.015 & 0.052 \\
+\texttt{Kimi K3} & 0.014 & 0.000 & 0.007 & 0.019 & 0.028 & 0.037 \\
+\texttt{Claude Sonnet 5} & 0.000 & 0.000 & 0.018 & 0.014 & 0.023 & 0.046 \\
+\texttt{GLM-5.3-Flash} & 0.000 & 0.003 & 0.013 & 0.008 & 0.019 & 0.074 \\
+\texttt{Muse Glimmer 30B} & 0.014 & 0.000 & 0.015 & 0.033 & 0.030 & 0.054 \\
+\texttt{GLM-5.3} & 0.000 & 0.003 & 0.011 & 0.025 & 0.049 & 0.122 \\
+\texttt{Qwen3-235B-2507} & 0.057 & 0.041 & 0.058 & 0.082 & 0.081 & 0.156 \\
+\texttt{Gemini 3.1 Flash-Lite} & 0.029 & 0.021 & 0.049 & 0.076 & 0.143 & 0.249 \\
+\texttt{Gemma 4 26B} & 0.000 & 0.045 & 0.082 & 0.104 & 0.085 & 0.252 \\
+\texttt{GPT-5.4 mini} & 0.000 & 0.028 & 0.075 & 0.090 & 0.156 & 0.291 \\
+\texttt{gpt-oss-20b} & 0.143 & 0.034 & 0.088 & 0.188 & 0.222 & 0.256 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Wrong-Answer Rate Against the Depth of the Gold Derivation.} The share of instances answered wrong, by the number of milestones in the instance's gold derivation (the number of instances in parentheses).}
+\label{tab:depth}
+\end{table*}
+% END GENERATED tab:depth
+
+% BEGIN GENERATED tab:repeats (full_run_28092026/paper_results.py --write)
+\begin{table*}[t]
+\centering
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l r r r r r r r r}
+\toprule
+\rowcolor{gray!10}
+\textbf{Model} & \textbf{Instances} & \textbf{Repeat 1} & \textbf{Repeat 2} & \textbf{Repeat 3} & \textbf{Main run} & \textbf{SD} & \textbf{Range} & \textbf{Same verdict} \\
+\midrule
+\texttt{Qwen3-235B-2507} & 300 & 0.893 & 0.900 & 0.900 & 0.895 & 0.004 & 0.007 & 0.887 \\
+\texttt{Gemini 3.1 Flash-Lite} & 300 & 0.890 & 0.883 & 0.902 & 0.895 & 0.009 & 0.018 & 0.937 \\
+\texttt{Gemma 4 26B} & 300 & 0.857 & 0.873 & 0.882 & 0.877 & 0.013 & 0.025 & 0.857 \\
+\texttt{gpt-oss-20b} & 300 & 0.833 & 0.842 & 0.837 & 0.830 & 0.004 & 0.008 & 0.920 \\
+\bottomrule
+\end{tabular}
+}
+\caption{\textbf{Decoding Repeats.} FAC of four models on 300 instances decoded three more times at the same settings, the main run's FAC on the same instances, the standard deviation and range across the repeats, and the share of instances with the same verdict in every repeat.}
+\label{tab:repeats}
+\end{table*}
+% END GENERATED tab:repeats
+
+% BEGIN GENERATED tab:tokens (full_run_28092026/paper_results.py --write)
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{l r r r}
+\toprule
+\rowcolor{gray!10}
+\textbf{Model} & \textbf{All} & \textbf{Correct} & \textbf{Not correct} \\
+\midrule
+\texttt{DeepSeek V4.1 Flash} & 3,060 & 2,991 & 12,171 \\
+\texttt{Kimi K3} & 2,192 & 2,164 & 6,033 \\
+\texttt{Claude Sonnet 5} & 1,804 & 1,780 & 3,346 \\
+\texttt{GLM-5.3-Flash} & 2,500 & 2,401 & 32,768 \\
+\texttt{Muse Glimmer 30B} & 2,988 & 2,952 & 6,133 \\
+\texttt{GLM-5.3} & 3,270 & 3,072 & 32,768 \\
+\texttt{Qwen3-235B-2507} & 1,013 & 986 & 1,334 \\
+\texttt{Gemini 3.1 Flash-Lite} & 653 & 632 & 810 \\
+\texttt{Gemma 4 26B} & 797 & 767 & 1,044 \\
+\texttt{GPT-5.4 mini} & 632 & 609 & 835 \\
+\texttt{gpt-oss-20b} & 1,795 & 1,588 & 3,060 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{Completion Tokens Against the Verdict.} Median completion tokens per response, over all responses and by whether the final answer is correct.}
+\label{tab:tokens}
+\end{table}
+% END GENERATED tab:tokens
+
+\subsection{Coverage and Diagnostics}
+\autoref{tab:coverage_wrong} gives the coverage of each model's wrong answers against its chance
+floor, with and without the judge, together with the share of wrong answers that reach every
+milestone and the share of correct answers that reach fewer than half; coverage leaves out the 70
+instances with no milestones.
+\autoref{tab:coverage_verbosity} gives the correlation of coverage with the amount written, which is
+negative and small for every model, and~\autoref{tab:diagnostics} the two flag rates with their
+intervals, the calculations read per response, and where the first flag falls.
+\autoref{tab:attribution} gives, for the answered wrong answers, the share with each kind of flag;
+the shares are of responses with a flag, read through each check's precision
+(\autoref{appendix:validation}), not diagnoses.
+
+% BEGIN GENERATED tab:coverage_wrong (full_run_28092026/paper_results.py --write)
+\begin{table*}[t]
+\centering
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l r r c r r c c c}
+\toprule
+\rowcolor{gray!10}
+\textbf{Model} & \textbf{Wrong} & \textbf{Matching} & \textbf{95\% CI} & \textbf{Floor} & \textbf{With judge} & \textbf{95\% CI} & \textbf{Wrong, MC $= 1$} & \textbf{Correct, MC $< 0.5$} \\
+\midrule
+\texttt{DeepSeek V4.1 Flash} & 26 & 0.612 & 0.479--0.739 & 0.123 & 0.676 & 0.551--0.810 & 0.154 (0.026--0.438) & 0.034 (0.017--0.055) \\
+\texttt{Kimi K3} & 40 & 0.591 & 0.484--0.713 & 0.104 & 0.684 & 0.528--0.823 & 0.275 (0.061--0.500) & 0.029 (0.014--0.048) \\
+\texttt{Claude Sonnet 5} & 50 & 0.706 & 0.619--0.873 & 0.177 & 0.753 & 0.660--0.890 & 0.280 (0.130--0.613) & 0.025 (0.012--0.040) \\
+\texttt{GLM-5.3-Flash} & 18 & 0.513 & 0.308--0.667 & 0.220 & 0.540 & 0.318--0.687 & 0.056 (0.000--0.300) & 0.024 (0.009--0.043) \\
+\texttt{Muse Glimmer 30B} & 35 & 0.635 & 0.540--0.791 & 0.184 & 0.694 & 0.593--0.859 & 0.314 (0.140--0.640) & 0.032 (0.017--0.051) \\
+\texttt{GLM-5.3} & 7 & 0.810 & 0.571--1.000 & 0.167 & 0.845 & 0.583--1.000 & 0.714 (0.429--1.000) & 0.020 (0.004--0.040) \\
+\texttt{Qwen3-235B-2507} & 194 & 0.583 & 0.506--0.670 & 0.200 & 0.636 & 0.558--0.714 & 0.263 (0.170--0.383) & 0.036 (0.016--0.061) \\
+\texttt{Gemini 3.1 Flash-Lite} & 266 & 0.510 & 0.440--0.581 & 0.110 & 0.537 & 0.466--0.611 & 0.139 (0.072--0.218) & 0.028 (0.013--0.047) \\
+\texttt{Gemma 4 26B} & 269 & 0.587 & 0.511--0.669 & 0.147 & 0.601 & 0.523--0.682 & 0.245 (0.160--0.350) & 0.036 (0.018--0.058) \\
+\texttt{GPT-5.4 mini} & 315 & 0.436 & 0.364--0.517 & 0.118 & 0.473 & 0.398--0.559 & 0.165 (0.097--0.254) & 0.048 (0.027--0.072) \\
+\texttt{gpt-oss-20b} & 322 & 0.453 & 0.385--0.527 & 0.112 & 0.464 & 0.396--0.538 & 0.130 (0.071--0.209) & 0.036 (0.019--0.056) \\
+\bottomrule
+\end{tabular}
+}
+\caption{\textbf{Milestone Coverage on Wrong Answers.} For the readable wrong answers with milestones: their number, the coverage by matching alone with its 95\% interval, the chance floor (the same response matched against a sibling instance's milestones), and the coverage with the judge; then the share of wrong answers that reach every milestone and the share of correct answers that reach fewer than half, with 95\% intervals.}
+\label{tab:coverage_wrong}
+\end{table*}
+% END GENERATED tab:coverage_wrong
+
+% BEGIN GENERATED tab:coverage_verbosity (full_run_28092026/paper_results.py --write)
+\begin{table*}[t]
+\centering
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l r r r c c}
+\toprule
+\rowcolor{gray!10}
+\textbf{Model} & \textbf{$\rho$ (steps)} & \textbf{$\rho$ (calc.)} & \textbf{Median steps} & \textbf{MC, correct} & \textbf{MC, wrong} \\
+\midrule
+\texttt{DeepSeek V4.1 Flash} & -0.23 & -0.13 & 6 & 0.906 (0.881--0.929) & 0.676 (0.551--0.809) \\
+\texttt{Kimi K3} & -0.22 & -0.14 & 6 & 0.921 (0.899--0.941) & 0.684 (0.527--0.822) \\
+\texttt{Claude Sonnet 5} & -0.20 & -0.24 & 7 & 0.930 (0.909--0.949) & 0.753 (0.661--0.889) \\
+\texttt{GLM-5.3-Flash} & -0.11 & -0.23 & 7 & 0.933 (0.912--0.953) & 0.540 (0.323--0.695) \\
+\texttt{Muse Glimmer 30B} & -0.19 & -0.15 & 5 & 0.914 (0.891--0.935) & 0.694 (0.595--0.858) \\
+\texttt{GLM-5.3} & -0.14 & -0.22 & 8 & 0.944 (0.923--0.963) & 0.845 (0.583--1.000) \\
+\texttt{Qwen3-235B-2507} & -0.20 & -0.18 & 10 & 0.917 (0.893--0.939) & 0.636 (0.558--0.716) \\
+\texttt{Gemini 3.1 Flash-Lite} & -0.21 & -0.25 & 5 & 0.914 (0.890--0.936) & 0.537 (0.467--0.611) \\
+\texttt{Gemma 4 26B} & -0.21 & -0.28 & 5 & 0.918 (0.894--0.941) & 0.601 (0.526--0.680) \\
+\texttt{GPT-5.4 mini} & -0.23 & -0.18 & 6 & 0.900 (0.873--0.924) & 0.473 (0.398--0.558) \\
+\texttt{gpt-oss-20b} & -0.26 & -0.15 & 9 & 0.907 (0.883--0.930) & 0.464 (0.397--0.539) \\
+\bottomrule
+\end{tabular}
+}
+\caption{\textbf{Coverage Against Verbosity.} Spearman's $\rho$ across templates between a template's mean coverage and its mean number of steps and of displayed calculations per response; the median number of steps; and MC on correct-answer and on wrong-answer responses with 95\% intervals.}
+\label{tab:coverage_verbosity}
+\end{table*}
+% END GENERATED tab:coverage_verbosity
+
+% BEGIN GENERATED tab:diagnostics (full_run_28092026/paper_results.py --write)
+\begin{table*}[t]
+\centering
+\small
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{l r r c r r r r r c r}
+\toprule
+\rowcolor{gray!10}
+\textbf{Model} & \textbf{Correct} & \textbf{Arith.\ flags} & \textbf{95\% CI} & \textbf{At 1\%} & \textbf{Calc./resp.} & \textbf{With a calc.} & \textbf{First flag} & \textbf{Step flags} & \textbf{95\% CI} & \textbf{Steps/resp.} \\
+\midrule
+\texttt{DeepSeek V4.1 Flash} & 2182 & 0.005 & 0.002--0.009 & 0.006 & 3.27 & 0.804 & 0.64 & 0.011 & 0.006--0.016 & 0.03 \\
+\texttt{Kimi K3} & 2180 & 0.006 & 0.003--0.010 & 0.004 & 2.80 & 0.722 & 0.56 & 0.019 & 0.012--0.027 & 0.06 \\
+\texttt{Claude Sonnet 5} & 2173 & 0.139 & 0.107--0.171 & 0.015 & 5.30 & 0.857 & 0.67 & 0.057 & 0.043--0.071 & 0.28 \\
+\texttt{GLM-5.3-Flash} & 2172 & 0.019 & 0.012--0.027 & 0.015 & 4.75 & 0.851 & 0.75 & 0.033 & 0.024--0.043 & 0.08 \\
+\texttt{Muse Glimmer 30B} & 2166 & 0.056 & 0.042--0.071 & 0.020 & 3.26 & 0.706 & 0.50 & 0.059 & 0.045--0.073 & 0.15 \\
+\texttt{GLM-5.3} & 2121 & 0.018 & 0.012--0.026 & 0.017 & 5.72 & 0.915 & 0.73 & 0.026 & 0.016--0.037 & 0.06 \\
+\texttt{Qwen3-235B-2507} & 1935 & 0.225 & 0.181--0.272 & 0.053 & 9.83 & 0.906 & 0.60 & 0.109 & 0.085--0.134 & 0.84 \\
+\texttt{Gemini 3.1 Flash-Lite} & 1941 & 0.070 & 0.046--0.095 & 0.014 & 3.86 & 0.757 & 0.50 & 0.122 & 0.090--0.157 & 0.49 \\
+\texttt{Gemma 4 26B} & 1907 & 0.129 & 0.096--0.166 & 0.015 & 4.39 & 0.689 & 0.54 & 0.143 & 0.110--0.179 & 0.66 \\
+\texttt{GPT-5.4 mini} & 1876 & 0.141 & 0.108--0.178 & 0.012 & 3.79 & 0.797 & 0.60 & 0.220 & 0.177--0.264 & 0.78 \\
+\texttt{gpt-oss-20b} & 1800 & 0.148 & 0.117--0.181 & 0.021 & 3.74 & 0.782 & 0.67 & 0.211 & 0.182--0.241 & 1.00 \\
+\bottomrule
+\end{tabular}
+}
+\caption{\textbf{The Diagnostics on Correct-Answer Responses.} The number of correct-answer responses; the share with an arithmetic flag and its 95\% interval; the share at a 1\% tolerance in place of the digit rule; the displayed calculations read per response and the share of responses with any; the median relative position of the first flag (0 is the first step, 1 the last); the share with a judged step flag and its interval; and the steps flagged per response by either check.}
+\label{tab:diagnostics}
+\end{table*}
+% END GENERATED tab:diagnostics
+
+% BEGIN GENERATED tab:attribution (full_run_28092026/paper_results.py --write)
+\begin{table}[t]
+\centering
+\small
+\begin{tabular}{l r r r r}
+\toprule
+\rowcolor{gray!10}
+\textbf{Model} & \textbf{Wrong answers} & \textbf{Arithmetic flag} & \textbf{Missing milestone} & \textbf{Judged step flag} \\
+\midrule
+\texttt{DeepSeek V4.1 Flash} & 26 & 0.038 & 0.462 & 0.385 \\
+\texttt{Kimi K3} & 41 & 0.000 & 0.366 & 0.488 \\
+\texttt{Claude Sonnet 5} & 50 & 0.300 & 0.240 & 0.400 \\
+\texttt{GLM-5.3-Flash} & 18 & 0.111 & 0.444 & 0.611 \\
+\texttt{Muse Glimmer 30B} & 36 & 0.028 & 0.611 & 0.472 \\
+\texttt{GLM-5.3} & 7 & 0.000 & 0.143 & 0.143 \\
+\texttt{Qwen3-235B-2507} & 199 & 0.477 & 0.593 & 0.668 \\
+\texttt{Gemini 3.1 Flash-Lite} & 267 & 0.322 & 0.730 & 0.753 \\
+\texttt{Gemma 4 26B} & 269 & 0.450 & 0.643 & 0.743 \\
+\texttt{GPT-5.4 mini} & 315 & 0.276 & 0.771 & 0.848 \\
+\texttt{gpt-oss-20b} & 332 & 0.238 & 0.786 & 0.895 \\
+\bottomrule
+\end{tabular}
+\caption{\textbf{What Points at a Wrong Answer.} On the answered wrong answers, the share with an arithmetic flag, with a milestone the judge rules missing, and with a judged step flag; a response can be in several columns or in none.}
+\label{tab:attribution}
+\end{table}
+% END GENERATED tab:attribution
