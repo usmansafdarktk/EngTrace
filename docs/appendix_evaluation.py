@@ -87,7 +87,7 @@ comparison_rows = [
     f"Final-answer check, $\\epsilon$ fitted on the other half & each half & three-way agreement & "
     f"{held[0][3]}, {held[1][3]} \\\\",
     f"Milestone matching & milestones & P / R / F1 & {now['E3 precision']} / {now['E3 recall']} / {now['E3 F1']} \\\\",
-    f"Matching, then the judge & milestones & P / R / F1 & {e5[0]} / {e5[1]} / {e5[2]} \\\\",
+    f"Milestone matching with the judge & milestones & P / R / F1 & {e5[0]} / {e5[1]} / {e5[2]} \\\\",
     f"Arithmetic check & steps, all responses & P / R & {now['digit rule, all traces, precision']} / "
     f"{now['digit rule, all traces, recall']} \\\\",
     f"Arithmetic check & steps, correct answers & P / R & {now['digit rule, hard case, precision']} / "
