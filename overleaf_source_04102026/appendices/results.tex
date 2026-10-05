@@ -4,13 +4,13 @@
 
 This section supports the Results of~\autoref{subsec:results} with the measures in full and every
 comparison behind them: the extended tables (\autoref{tab:results_answer}
-and~\autoref{tab:results_process}) with their figure (\autoref{fig:scores}), the pairwise
-comparisons (\autoref{tab:pairs_fac}, \autoref{tab:pairs_mc}, and~\autoref{fig:pairs}), the branch,
+and~\autoref{tab:results_process}), the pairwise
+comparisons (\autoref{tab:pairs_fac} and~\autoref{tab:pairs_mc}), the branch,
 level, domain, and answer-kind means (\autoref{tab:by_branch} to~\autoref{tab:by_domain_kind}), the
 level gap under its variations (\autoref{tab:level_gap}), the sensitivity analyses
-(\autoref{tab:sensitivity}), consistency and instance variance (\autoref{tab:consistency},
-\autoref{fig:consistency}, and~\autoref{tab:instance_variance}), failure against depth
-(\autoref{tab:depth} and~\autoref{fig:depth}), the decoding repeats (\autoref{tab:repeats}),
+(\autoref{tab:sensitivity}), consistency and instance variance (\autoref{tab:consistency}
+and~\autoref{tab:instance_variance}), failure against depth
+(\autoref{tab:depth}), the decoding repeats (\autoref{tab:repeats}),
 completion tokens (\autoref{tab:tokens}), and the coverage and diagnostic details
 (\autoref{tab:coverage_wrong} to~\autoref{tab:attribution}, with~\autoref{fig:coverage_wrong}).
 Every interval resamples the 150 templates, every family of tests is Holm-corrected, and every
@@ -19,15 +19,14 @@ non-significant difference carries the smallest difference the design detects at
 
 \subsection{Scores and Pairwise Comparisons}
 \autoref{tab:results_answer} extends the main table on the answer side
-and~\autoref{tab:results_process} on the process side, and~\autoref{fig:scores} plots both measures
-with their intervals and tier letters.
+and~\autoref{tab:results_process} on the process side.
 Strict FAC, which scores a partial answer 0, changes no conclusion: the pairwise test on it agrees
 with the test on FAC for 54 of the 55 pairs.
 Instances of a template mostly share one fate: 57 to 130 of the 150 templates per model have the
 same score on all 15 instances, and the variance across instances concentrates in a few templates
 (\autoref{tab:instance_variance}).
-\autoref{tab:pairs_fac} and~\autoref{tab:pairs_mc} list the 55 pairs for each measure,
-and~\autoref{fig:pairs} shows which pairs separate: 32 of the 55 pairs differ on FAC after
+\autoref{tab:pairs_fac} and~\autoref{tab:pairs_mc} list the 55 pairs for each measure: 32 of the 55
+pairs differ on FAC after
 correction, every non-significant FAC difference lies below what its pair detects (0.010 to 0.065),
 and 28 and 29 of the 55 pairs differ on MC under the sign-flip and the Wilcoxon test, which agree on
 52 pairs.
@@ -91,24 +90,6 @@ mean number of steps is $-0.11$ to $-0.26$ for every model (\autoref{tab:coverag
 \label{tab:results_process}
 \end{table*}
 % END GENERATED tab:results_process
-
-% BEGIN GENERATED fig:scores (full_run_28092026/paper_results.py --write)
-\begin{figure}[t]
-    \centering
-    \includegraphics[width=\columnwidth]{figs/scores.pdf}
-    \caption{\textbf{Final Answer Accuracy and Milestone Coverage with Intervals.} The values of~\autoref{tab:main_results} with their 95\% intervals; the letters are that table's tier letters, and models that share one do not differ after Holm correction.}
-    \label{fig:scores}
-\end{figure}
-% END GENERATED fig:scores
-
-% BEGIN GENERATED fig:pairs (full_run_28092026/paper_results.py --write)
-\begin{figure}[t]
-    \centering
-    \includegraphics[width=\columnwidth]{figs/pairs.pdf}
-    \caption{\textbf{Pairs That Separate After Correction.} Dark cells mark the pairs whose difference holds at a Holm-adjusted $p < 0.05$: Final Answer Accuracy above the diagonal (32 of 55 pairs) and Milestone Coverage below it (28 of 55); models in the order of~\autoref{tab:main_results}.}
-    \label{fig:pairs}
-\end{figure}
-% END GENERATED fig:pairs
 
 % BEGIN GENERATED tab:pairs_fac (full_run_28092026/paper_results.py --write)
 \begin{table*}[t]
@@ -433,7 +414,7 @@ $\tau$ with the scores as scored & 0.927 & 1 & 0.927 & 0.964 & 0.636 & 1.000 & 0
 % END GENERATED tab:sensitivity
 
 \subsection{Consistency, Instance Variance, Depth, Repeats, and Tokens}
-\autoref{tab:consistency} and~\autoref{fig:consistency} give, for the 58 templates that follow one
+\autoref{tab:consistency} gives, for the 58 templates that follow one
 reasoning path and for the other 92, the share of templates a model solves on all instances, on
 some, and on none: the six strongest models solve all 15 instances of 84\% to 91\% of the
 single-path templates, whereas four of the five weakest solve all instances of 36\% to 48\% of them
@@ -442,7 +423,7 @@ single-path template every instance follows the same method, so a partly solved 
 failure on the numbers, not the method.
 \autoref{tab:instance_variance} gives the variance of the score across a template's instances and
 names the templates that carry most of it.
-\autoref{tab:depth} and~\autoref{fig:depth} give the wrong-answer rate by the number of milestones
+\autoref{tab:depth} gives the wrong-answer rate by the number of milestones
 in the gold derivation, descriptive and without a test; the milestone count is the template's.
 \autoref{tab:repeats} gives the decoding repeats of four models on 300 instances decoded three
 times: FAC has a standard deviation of 0.004 to 0.013 across repeats, and 86\% to 94\% of instances
@@ -478,15 +459,6 @@ receive the same verdict every time; the other seven models have no decoding-var
 \label{tab:consistency}
 \end{table*}
 % END GENERATED tab:consistency
-
-% BEGIN GENERATED fig:consistency (full_run_28092026/paper_results.py --write)
-\begin{figure}[t]
-    \centering
-    \includegraphics[width=\columnwidth]{figs/consistency.pdf}
-    \caption{\textbf{Consistency Within a Template.} The share of templates whose 15 instances a model answers all correctly, some but not all, or none, for the 58 single-path templates and the other 92.}
-    \label{fig:consistency}
-\end{figure}
-% END GENERATED fig:consistency
 
 % BEGIN GENERATED tab:instance_variance (full_run_28092026/paper_results.py --write)
 \begin{table*}[t]
@@ -543,15 +515,6 @@ receive the same verdict every time; the other seven models have no decoding-var
 \label{tab:depth}
 \end{table*}
 % END GENERATED tab:depth
-
-% BEGIN GENERATED fig:depth (full_run_28092026/paper_results.py --write)
-\begin{figure}[t]
-    \centering
-    \includegraphics[width=\columnwidth]{figs/depth.pdf}
-    \caption{\textbf{Wrong-Answer Rate Against the Depth of the Gold Derivation.} For each model, the share of instances answered wrong among those whose gold derivation has one milestone (hollow) and six or more (filled).}
-    \label{fig:depth}
-\end{figure}
-% END GENERATED fig:depth
 
 % BEGIN GENERATED tab:repeats (full_run_28092026/paper_results.py --write)
 \begin{table*}[t]

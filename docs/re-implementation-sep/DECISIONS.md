@@ -7492,10 +7492,7 @@ Performance by Engineering Branch and Domain; Performance by Difficulty Level wi
 takes the depth result), then Error Analysis with its figure and two paragraphs without run-in headings (942 and 340
 words against 1,669 and 349). The paraphrase experiment is called "paraphrase" throughout, never "rewording":
 `appendices/rewording.tex` became `appendices/paraphrase.tex` (label `appendix:paraphrase`, title "Paraphrase Test").
-Two figures in the main text (the level gap per model, the error categories) and seven in the appendix (FAC and MC
-with intervals and tier letters; the pairs that separate, as a matrix; coverage on wrong answers against the floor;
-wrong-answer rate at one against six or more milestones; consistency within a template; the paraphrase change
-against the margin; the conditions against the margin), all drawn by `paper_results.py --write` in one hue with
+Two figures in the main text (the level gap per model, the error categories) and, after the authors cut the rest as restating tables, two in the appendix (coverage on wrong answers against the floor; the paraphrase change against the margin), all drawn by `paper_results.py --write` in one hue with
 marker fill as the second encoding, so they read in greyscale. Every statement that left the main text is in the
 appendix prose, and the check passes on all five files.
 

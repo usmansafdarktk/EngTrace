@@ -69,7 +69,15 @@ NUMBER_WORDS = re.compile(r"\b(two|three|four|five|six|seven|eight|nine|ten|elev
 
 # Figure style: one hue, text in ink, recessive axes; marker fill is the second encoding, so the figures read in greyscale.
 BLUE, DARK, LIGHT, INK, MUTED, BAND = "#2a78d6", "#0d366b", "#cde2fb", "#0b0b0b", "#52514e", "#eceae6"
+HATCH = "#d3d3d3"  # the hatch lines of the error-category figure
 COLUMN = 3.03  # the ACL column width in inches
+SERIF = {"font.family": "serif", "font.serif": ["Times New Roman"], "font.size": 7, "legend.fontsize": 7}  # the figures' type
+FIG_NAME = {**NAME, "gpt-oss-20b": "GPT OSS 20B"}  # model labels in the figures, every name capitalized
+
+
+def wrap(name: str, width: int = 15) -> str:
+    """A figure label over two lines, broken at its last space, when it is longer than width characters."""
+    return name[::-1].replace(" ", "\n", 1)[::-1] if len(name) > width and " " in name else name
 
 
 # ----------------------------------------------------------------------------------------------- formatting
@@ -630,16 +638,6 @@ blocks["results"]["tab:results_process"] = table(
     "MC by matching alone (no judge) over every response with milestones and MC with the judge (as in the main table); the share of milestones the judge "
     "decides; the share of correct-answer responses with an arithmetic flag, the displayed calculations the check reads per response, and the share "
     "with a judged step flag, with 95\\% intervals.", "tab:results_process", resize=True)
-blocks["results"]["fig:scores"] = figure(
-    "scores.pdf",
-    "\\textbf{Final Answer Accuracy and Milestone Coverage with Intervals.} "
-    "The values of~\\autoref{tab:main_results} with their 95\\% intervals; the letters are that table's tier letters, and models that share one do "
-    "not differ after Holm correction.", "fig:scores")
-blocks["results"]["fig:pairs"] = figure(
-    "pairs.pdf",
-    "\\textbf{Pairs That Separate After Correction.} "
-    f"Dark cells mark the pairs whose difference holds at a Holm-adjusted $p < 0.05$: Final Answer Accuracy above the diagonal ({len(SEP_FAC)} of "
-    f"{N_PAIRS} pairs) and Milestone Coverage below it ({n_mc_sig} of {N_PAIRS}); models in the order of~\\autoref{{tab:main_results}}.", "fig:pairs")
 
 # Pairwise comparisons.
 rows = [f"{tt(p['a'])} & {tt(p['b'])} & {sgn(p['diff'])} & {ci(p['ci'])} & {pv(p['p_holm'])} & {pv(p['fully_p_holm'])} & {pv(p['mcnemar_p_holm'])} & "
@@ -729,11 +727,6 @@ blocks["results"]["tab:consistency"] = table(
     "\\textbf{Consistency Within a Template.} "
     "The share of templates whose 15 instances a model all answers correctly, some but not all, or none, with 95\\% intervals, for the templates that "
     "follow one reasoning path and for the others.", "tab:consistency", resize=True)
-blocks["results"]["fig:consistency"] = figure(
-    "consistency.pdf",
-    "\\textbf{Consistency Within a Template.} "
-    f"The share of templates whose 15 instances a model answers all correctly, some but not all, or none, for the {N_SINGLE} single-path templates "
-    f"and the other {N_TEMPLATES - N_SINGLE}.", "fig:consistency")
 rows = [f"{tt(k)} & {f3(Q1[k]['within_sd_quartiles'][1])} & {f3(Q1[k]['within_sd_quartiles'][2])} & {Q1[k]['templates_no_instance_variance']} & "
         f"{Q1[k]['templates_no_variance_all_solved']} & {Q1[k]['templates_no_variance_none_solved']} & "
         + ", ".join(code(t["template"]) for t in Q1[k]["highest_variance_templates"]) for k in ORDER]
@@ -752,11 +745,6 @@ blocks["results"]["tab:depth"] = table(
     "\\textbf{Wrong-Answer Rate Against the Depth of the Gold Derivation.} "
     "The share of instances answered wrong, by the number of milestones in the instance's gold derivation (the number of instances in parentheses).",
     "tab:depth")
-blocks["results"]["fig:depth"] = figure(
-    "depth.pdf",
-    "\\textbf{Wrong-Answer Rate Against the Depth of the Gold Derivation.} "
-    "For each model, the share of instances answered wrong among those whose gold derivation has one milestone (hollow) and six or more (filled).",
-    "fig:depth")
 rows = [f"{tt(k)} & {REPEATS[k]['items']} & " + " & ".join(f3(REPEATS[k]["scores"][r]) for r in ("repeat1", "repeat2", "repeat3")) +
         f" & {f3(REPEATS[k]['main_on_same_items'])} & {f3(REPEATS[k]['sd'])} & {f3(REPEATS[k]['range'])} & {f3(REPEATS[k]['same_verdict_every_repeat'])}"
         for k in ORDER if k in REPEATS]
@@ -875,11 +863,6 @@ blocks["conditions"]["tab:conditions"] = table(
     "(their number), the change in MC with its interval, the share of correct-answer responses with an arithmetic flag in the base run and the "
     "condition (unpaired), and for the tool condition the share of responses that call the tool and the calls per response. "
     f"{tt('gpt-5.4')}'s reasoning condition is paired against its default-setting anchor run.", "tab:conditions", resize=True)
-blocks["conditions"]["fig:conditions"] = figure(
-    "conditions.pdf",
-    "\\textbf{Change in Final Answer Accuracy Under Each Condition.} "
-    f"Condition minus base run on the {n_sub}-instance subset, with 95\\% intervals against the shaded $\\pm {margin:.2f}$ margin; filled markers "
-    "mark the changes that hold after Holm correction within the condition.", "fig:conditions")
 rows = []
 for x in [fl["deepseek-v4-pro"], fl["gpt-5.4"], flr] + roster_sub:
     cond = {"flagship": "default", "flagship-reasoning-medium": "reasoning, medium", "main": "main run"}[x["arm"]]
@@ -955,7 +938,7 @@ def _plt():
                          "xtick.major.width": 0.4, "ytick.major.width": 0.4, "xtick.major.size": 2, "ytick.major.size": 0,
                          "xtick.labelsize": 6.5, "ytick.labelsize": 6.5, "axes.labelsize": 6.5, "legend.fontsize": 6,
                          "axes.edgecolor": MUTED, "xtick.color": MUTED, "ytick.color": INK, "axes.labelcolor": INK,
-                         "savefig.dpi": 300})
+                         "hatch.linewidth": 0.4, "savefig.dpi": 300})
     return plt
 
 
@@ -992,6 +975,18 @@ def interval_rows(ax, items, lw: float = 1.0) -> None:
                 markerfacecolor=BLUE if filled else "white", linestyle="none", zorder=3)
 
 
+def gradient_rows(ax, items, height: float = 0.38, steps: int = 80) -> None:
+    """items: (y, lo, hi, x, color) rows: an interval band in color, deepest at the estimate x and paler toward its ends. Each
+    slice runs on under the next, which is drawn over it, so no seam shows between slices."""
+    from matplotlib.colors import to_rgb
+    for y, lo, hi, x, color in items:
+        rgb, span, step = to_rgb(color), max(x - lo, hi - x), (hi - lo) / steps
+        for j in range(steps):
+            t = abs(lo + (j + 0.5) * step - x) / span  # 0 at the estimate, 1 at the farther end
+            ax.barh(y, step * (2 if j < steps - 1 else 1), left=lo + j * step, height=height, color=[c + (1 - c) * 0.72 * t for c in rgb],
+                    linewidth=0, zorder=2)
+
+
 def top_legend(fig, handles, ncol: int, y: float = 0.995) -> None:
     fig.legend(handles=handles, loc="upper center", bbox_to_anchor=(0.5, y), ncol=ncol, frameon=False, handlelength=1.4,
                columnspacing=1.0, handletextpad=0.5)
@@ -999,67 +994,40 @@ def top_legend(fig, handles, ncol: int, y: float = 0.995) -> None:
 
 def fig_level_gap() -> None:
     plt = _plt()
-    fig, (ax,) = rows_axes(plt, len(ORDER), 2.5, top=0.84)
-    ax.set_yticks(range(len(ORDER)))
-    ax.set_yticklabels([NAME[k] for k in ORDER])
-    ax.axvline(0, color=MUTED, linewidth=0.5, linestyle=(0, (2, 2)), zorder=1)
-    interval_rows(ax, [(i, Q2[k]["ci"][0], Q2[k]["ci"][1], Q2[k]["gap"], Q2[k]["p_welch_holm"] < 0.05, "o") for i, k in enumerate(ORDER)])
-    ax.plot([Q2[k]["without_two_chemical"]["gap"] for k in ORDER], range(len(ORDER)), marker="x", markersize=4, markeredgewidth=0.8,
-            color=INK, linestyle="none", zorder=4)
-    ax.set_xlabel("FAC gap, Easy minus Advanced")
     from matplotlib.lines import Line2D
-    handles = [Line2D([], [], marker="o", color=BLUE, markerfacecolor=BLUE, markersize=4.2, linewidth=1.0, label="holds after correction"),
-               Line2D([], [], marker="o", color=BLUE, markerfacecolor="white", markersize=4.2, linewidth=1.0, label="does not hold"),
-               Line2D([], [], marker="x", color=INK, markersize=4, linestyle="none", label="without the two chemical templates")]
-    top_legend(fig, handles, 2)
-    save(fig, "level-gap.pdf")
-
-
-def fig_scores() -> None:
-    plt = _plt()
-    fig, axes = rows_axes(plt, len(ORDER), 2.4, ncols=2, left=0.36, right=0.98, top=0.90, wspace=0.18)
-    axes[0].set_yticks(range(len(ORDER)))
-    axes[0].set_yticklabels([NAME[k] for k in ORDER])
-    for ax, (title, val, cld) in zip(axes, (("Final Answer Accuracy", {k: (Q1[k]["score"], Q1[k]["ci"]) for k in ORDER}, CLD_FAC),
-                                             ("Milestone Coverage", {k: (COV[k]["coverage"], COV[k]["ci"]) for k in ORDER}, CLD_MC))):
-        interval_rows(ax, [(i, val[k][1][0], val[k][1][1], val[k][0], True, "o") for i, k in enumerate(ORDER)])
-        lo = min(v[1][0] for v in val.values())
-        ax.set_xlim(lo - 0.02, 1.0 + 0.06 * (1.02 - lo))
+    # The interval as a band, deepest at the gap; the gaps that hold in strong blue with a dark filled marker, the rest paler and hollow.
+    hold, rest, rest_edge = BLUE, "#93b6e2", "#5b8fd3"
+    holds = {k: Q2[k]["p_welch_holm"] < 0.05 for k in ORDER}
+    with plt.rc_context(SERIF):
+        fig, (ax,) = rows_axes(plt, len(ORDER), 2.6, left=0.318, right=0.97, bottom=0.12, top=0.985)
+        ax.set_yticks(range(len(ORDER)))
+        ax.set_yticklabels([FIG_NAME[k] for k in ORDER], fontweight="bold")
+        ax.tick_params(axis="y", colors="black", labelsize=6.5)
+        ax.tick_params(axis="x", colors="black", labelsize=6.5)
+        ax.axvline(0, color=MUTED, linewidth=0.6, zorder=1)
+        ax.text(-0.004, -0.42, "No gap", rotation=90, ha="right", va="top", fontsize=5.5, style="italic", color=MUTED)
+        gradient_rows(ax, [(i, Q2[k]["ci"][0], Q2[k]["ci"][1], Q2[k]["gap"], hold if holds[k] else rest) for i, k in enumerate(ORDER)])
         for i, k in enumerate(ORDER):
-            ax.text(1.0 + 0.012 * (1.02 - lo), i, cld[k], va="center", ha="left", fontsize=5.8, color=MUTED)
-        ax.set_title(title, fontsize=6.5, color=INK, pad=3)
-        ax.set_xticks([x for x in (0.8, 0.9, 1.0) if x > lo - 0.02])
-    save(fig, "scores.pdf")
+            ax.plot([Q2[k]["gap"]], [i], marker="o", markersize=4.6, linestyle="none", zorder=3,
+                    **({"markerfacecolor": DARK, "markeredgecolor": "white", "markeredgewidth": 0.6} if holds[k] else
+                       {"markerfacecolor": "white", "markeredgecolor": rest_edge, "markeredgewidth": 0.9}))
+        ax.plot([Q2[k]["without_two_chemical"]["gap"] for k in ORDER], range(len(ORDER)), marker="x", markersize=3.8, markeredgewidth=0.8,
+                color=INK, linestyle="none", zorder=4)
+        ax.set_xlim(-0.03, 0.36)
+        ax.set_xlabel("Final Answer Accuracy drop from Easy to Advanced", fontsize=6.5, fontweight="bold", color="black", labelpad=2)
+        handles = [Line2D([], [], marker="o", color=DARK, markersize=4.6, linestyle="none", label="Holds after Holm"),
+                   Line2D([], [], marker="o", markerfacecolor="white", markeredgecolor=rest_edge, markeredgewidth=0.9, markersize=4.6,
+                          linestyle="none", label="Does not hold"),
+                   Line2D([], [], marker="x", color=INK, markersize=3.8, markeredgewidth=0.8, linestyle="none", label="Without chemical pair"),
+                   Line2D([], [], color="#7fb0ea", linewidth=4.5, solid_capstyle="butt", label="95% interval")]
+        legend = ax.legend(handles=handles, loc="upper right", frameon=True, fancybox=False, framealpha=1, edgecolor="black", fontsize=6,
+                           borderaxespad=0.3, borderpad=0.35, handlelength=1.3, handletextpad=0.4, labelspacing=0.3)
+        legend.get_frame().set_linewidth(0.5)
+        save(fig, "level-gap.pdf")
 
 
-def fig_pairs() -> None:
-    plt = _plt()
-    import numpy as np
-    n = len(ORDER)
-    m = np.full((n, n), 0.5)
-    for i, a in enumerate(ORDER):
-        for j, b in enumerate(ORDER):
-            if i < j:
-                m[i, j] = 1.0 if frozenset((a, b)) in SEP_FAC else 0.0
-            elif i > j:
-                m[i, j] = 1.0 if frozenset((a, b)) in SEP_MC else 0.0
-    fig, ax = plt.subplots(figsize=(COLUMN, 3.0), gridspec_kw={"left": 0.36, "right": 0.90, "bottom": 0.02, "top": 0.70})
-    from matplotlib.colors import ListedColormap
-    ax.imshow(m, cmap=ListedColormap([LIGHT, "#d9d8d4", DARK]), vmin=0, vmax=1, aspect="equal")
-    ax.set_xticks(range(n))
-    ax.set_xticklabels([NAME[k] for k in ORDER], rotation=55, ha="left", rotation_mode="anchor")
-    ax.xaxis.tick_top()
-    ax.set_yticks(range(n))
-    ax.set_yticklabels([NAME[k] for k in ORDER])
-    ax.set_xticks([x - 0.5 for x in range(1, n)], minor=True)
-    ax.set_yticks([y - 0.5 for y in range(1, n)], minor=True)
-    ax.grid(which="minor", color="white", linewidth=1.0)
-    ax.tick_params(which="both", length=0, pad=2)
-    for s in ax.spines.values():
-        s.set_visible(False)
-    ax.text(n - 0.4, -0.65, "FAC", ha="right", va="bottom", fontsize=6.5, color=INK, fontweight="bold")
-    ax.text(-0.6, n - 0.4, "MC", ha="left", va="top", fontsize=6.5, color=INK, fontweight="bold", transform=ax.transData, clip_on=False)
-    save(fig, "pairs.pdf")
+
+
 
 
 def fig_coverage_wrong() -> None:
@@ -1086,49 +1054,6 @@ def fig_coverage_wrong() -> None:
     save(fig, "coverage-wrong.pdf")
 
 
-def fig_depth() -> None:
-    plt = _plt()
-    fig, (ax,) = rows_axes(plt, len(ORDER), 2.35, top=0.88)
-    ax.set_yticks(range(len(ORDER)))
-    ax.set_yticklabels([NAME[k] for k in ORDER])
-    for i, k in enumerate(ORDER):
-        one, six = Q3[k]["by_milestone_count"]["1"]["wrong_rate"], Q3[k]["by_milestone_count"]["6+"]["wrong_rate"]
-        ax.plot([one, six], [i, i], color="#b9cfe9", linewidth=1.0, zorder=1)
-        ax.plot([one], [i], marker="o", markersize=4.2, markeredgewidth=0.8, markeredgecolor=BLUE, markerfacecolor="white", linestyle="none", zorder=3)
-        ax.plot([six], [i], marker="o", markersize=4.2, markeredgewidth=0.8, markeredgecolor=BLUE, markerfacecolor=BLUE, linestyle="none", zorder=4)
-    ax.set_xlim(0, max(depth6) + 0.03)
-    ax.set_xlabel("Wrong-answer rate")
-    from matplotlib.lines import Line2D
-    handles = [Line2D([], [], marker="o", color=BLUE, markerfacecolor="white", markersize=4.2, linestyle="none", label="one milestone"),
-               Line2D([], [], marker="o", color=BLUE, markerfacecolor=BLUE, markersize=4.2, linestyle="none", label="six or more milestones")]
-    ax.legend(handles=handles, loc="lower center", bbox_to_anchor=(0.5, 1.0), ncol=2, frameon=False, handlelength=1.2, columnspacing=1.0)
-    save(fig, "depth.pdf")
-
-
-def fig_consistency() -> None:
-    plt = _plt()
-    fig, axes = rows_axes(plt, len(ORDER), 2.4, ncols=2, left=0.36, right=0.98, top=0.86, wspace=0.1)
-    axes[0].set_yticks(range(len(ORDER)))
-    axes[0].set_yticklabels([NAME[k] for k in ORDER])
-    shades = {"all": DARK, "some": "#6da7ec", "none": LIGHT}
-    for ax, (group, title) in zip(axes, (("single_path", f"Single-path ({N_SINGLE})"), ("multi_path", f"Other ({N_TEMPLATES - N_SINGLE})"))):
-        for i, k in enumerate(ORDER):
-            left = 0.0
-            for part in ("all", "some", "none"):
-                v = Q4[k][group][part]
-                ax.barh(i, v, left=left, height=0.7, color=shades[part], edgecolor="white", linewidth=0.8, zorder=2)
-                if part == "all" and v > 0.12:
-                    ax.text(left + v / 2, i, f"{v * 100:.0f}", ha="center", va="center", fontsize=5.6, color="white")
-                left += v
-        ax.set_xlim(0, 1)
-        ax.set_xticks([0, 0.5, 1.0])
-        ax.set_xticklabels(["0", "50", "100%"])
-        ax.set_title(title, fontsize=6.5, color=INK, pad=3)
-        ax.grid(False)
-    from matplotlib.patches import Patch
-    handles = [Patch(color=shades[p], label=f"{p} correct") for p in ("all", "some", "none")]
-    top_legend(fig, handles, 3)
-    save(fig, "consistency.pdf")
 
 
 def band_axes(plt, n: int, height: float, xlabel: str, left: float = 0.36, top: float = 0.88):
@@ -1154,75 +1079,53 @@ def fig_paraphrase() -> None:
     save(fig, "paraphrase.pdf")
 
 
-def fig_conditions() -> None:
-    plt = _plt()
-    titles = {"reasoning-medium": "Reasoning at medium effort", "openbook2": "Governing equations", "tool": "Python tool",
-              "flagship-reasoning-medium": "Anchor, reasoning at medium"}
-    rows = []  # (label, arm or None): a header row per condition, then its models
-    for cond in ("reasoning-medium", "openbook2", "tool", "flagship-reasoning-medium"):
-        rows.append((titles[cond], None))
-        rows += [(NAME[a["model"]], a) for a in ARMS if a["arm"] == cond]
-    fig, ax = band_axes(plt, len(rows), 2.65, "Change in FAC, condition minus base run", left=0.41, top=0.90)
-    ax.set_yticks(range(len(rows)))
-    ax.set_yticklabels([r[0] for r in rows])
-    for label, (_, a) in zip(ax.get_yticklabels(), rows):
-        if a is None:
-            label.set_style("italic")
-            label.set_color(MUTED)
-            label.set_fontsize(6)
-    interval_rows(ax, [(i, a["ci"][0], a["ci"][1], a["diff"], a["p_holm"] < 0.05, "o") for i, (_, a) in enumerate(rows) if a])
-    from matplotlib.lines import Line2D
-    from matplotlib.patches import Patch
-    handles = [Line2D([], [], marker="o", color=BLUE, markerfacecolor=BLUE, markersize=4.2, linewidth=1.0, label="holds after correction"),
-               Line2D([], [], marker="o", color=BLUE, markerfacecolor="white", markersize=4.2, linewidth=1.0, label="does not hold"),
-               Patch(color=BAND, label=f"\u00b1{margin:.2f} margin")]
-    top_legend(fig, handles, 3)
-    save(fig, "conditions.pdf")
 
 
 def fig_error_categories() -> None:
     plt = _plt()
-    from matplotlib.colors import LinearSegmentedColormap
+    from matplotlib.patches import Patch
     cats = [c for c in CATEGORIES if c[0] != INCOMPLETE]  # no "Incomplete" reading was given
-    cols = [(NAME[m], sum(by_model[m].values()), by_model[m]) for m in B2_MODELS] + [(lv, level_n[lv], by_level[lv]) for lv in LEVELS]
-    shares = [[c[2].get(full, 0) / c[1] for c in cols] for full, _ in cats]
-    cmap = LinearSegmentedColormap.from_list("blue", ["#ffffff", LIGHT, "#9ec5f4", "#5598e7", BLUE, "#184f95", DARK])
-    fig = plt.figure(figsize=(COLUMN, 2.55))
-    gs = fig.add_gridspec(2, 2, width_ratios=[4, 3], height_ratios=[22, 1], wspace=0.06, hspace=0.45, left=0.31, right=0.93, top=0.74, bottom=0.11)
-    for j, (sl, title) in enumerate(((slice(0, 4), "By model"), (slice(4, 7), "By level"))):
-        ax = fig.add_subplot(gs[0, j])
-        data = [row[sl] for row in shares]
-        ax.imshow(data, cmap=cmap, vmin=0, vmax=1, aspect="auto")
-        ax.set_xticks(range(len(cols[sl])))
-        ax.set_xticklabels([c[0] for c in cols[sl]], rotation=45, ha="left", rotation_mode="anchor")
-        ax.xaxis.tick_top()
-        ax.set_xlabel(title, fontsize=6.5, color=MUTED, labelpad=3)
-        if j == 0:
-            ax.set_yticks(range(len(cats)))
-            ax.set_yticklabels([s for _, s in cats])
-        else:
-            ax.set_yticks([])
-        for i, row in enumerate(data):
-            for k, v in enumerate(row):
-                ax.text(k, i, f"{v * 100:.0f}", ha="center", va="center", fontsize=6.2, color="#ffffff" if v > 0.5 else INK)
-        for s in ax.spines.values():
-            s.set_visible(False)
-        ax.tick_params(length=0, pad=2)
-        ax.set_xticks([x - 0.5 for x in range(1, len(cols[sl]))], minor=True)
-        ax.set_yticks([y - 0.5 for y in range(1, len(cats))], minor=True)
-        ax.grid(which="minor", color="#ffffff", linewidth=1.2)
-        ax.tick_params(which="minor", length=0)
-    cax = fig.add_subplot(gs[1, :])
-    cb = fig.colorbar(plt.cm.ScalarMappable(cmap=cmap, norm=plt.Normalize(0, 100)), cax=cax, orientation="horizontal")
-    cb.set_label("Share of readings (%)", fontsize=6.5, labelpad=1)
-    cb.ax.tick_params(labelsize=6, length=2, width=0.4)
-    cb.outline.set_linewidth(0.4)
-    save(fig, "error-categories.pdf")
+    # The May figure's palette: the errors before calculation in browns, darker the more fundamental, calculation in hatched
+    # mustard, no error in green; the lightness order and the hatching carry the categories in greyscale.
+    fills = ["#5c3b24", "#7f5638", "#a87c5b", "#b78f71", "#c3a084", "#d9b86c", "#b3dda0"]
+    hatches = ["...", "...", "...", "...", "...", "//", ""]
+    labels = {"claude-sonnet-5": "Claude\nSonnet 5", "gpt-5.4-mini": "GPT-5.4\nmini", "gemma-4-26b-a4b": "Gemma 4\n26B", "gpt-oss-20b": "GPT OSS\n20B"}
+    with plt.rc_context({"font.family": "serif", "font.serif": ["Times New Roman"], "font.size": 7, "legend.fontsize": 7}):
+        fig, ax = plt.subplots(figsize=(COLUMN, 2.3), gridspec_kw={"left": 0.11, "right": 0.75, "bottom": 0.15, "top": 0.97})
+        for x, m in enumerate(B2_MODELS):
+            n, bottom = sum(by_model[m].values()), 0.0
+            for (full, _), fill, hatch in reversed(list(zip(cats, fills, hatches))):  # no error at the base, the most fundamental on top
+                v = by_model[m].get(full, 0) / n
+                ax.bar(x, v, bottom=bottom, width=0.6, color=fill, linewidth=0, zorder=2)
+                if hatch:
+                    ax.bar(x, v, bottom=bottom, width=0.6, fill=False, hatch=hatch, edgecolor=HATCH, linewidth=0, zorder=3)
+                ax.bar(x, v, bottom=bottom, width=0.6, fill=False, edgecolor="white", linewidth=0.6, zorder=4)
+                if v >= 0.1:
+                    ax.text(x, bottom + v / 2, f"{v * 100:.0f}", ha="center", va="center", fontsize=7, fontweight="bold", zorder=5,
+                            color="white" if fill in fills[:2] else "black", bbox={"facecolor": fill, "edgecolor": "none", "pad": 0.6})
+                bottom += v
+        ax.set_xticks(range(len(B2_MODELS)))
+        ax.set_xticklabels([labels[m] for m in B2_MODELS], fontweight="bold")
+        ax.tick_params(axis="x", length=0, colors="black", labelsize=7)
+        ax.set_xlim(-0.42, len(B2_MODELS) - 0.58)
+        ax.tick_params(axis="y", colors="black", labelsize=7)
+        ax.set_ylim(0, 1)
+        ax.set_yticks([0, 0.25, 0.5, 0.75, 1.0])
+        ax.set_yticklabels(["0", "25", "50", "75", "100"])
+        ax.set_ylabel("Share of the readings (%)", fontsize=6.5, fontweight="bold", color="black", labelpad=2)
+        for s in ("top", "right"):
+            ax.spines[s].set_visible(False)
+        handles = [Patch(facecolor=fill, hatch=hatch, edgecolor=HATCH, linewidth=0, label=short.split(" or ")[0])
+                   for (_, short), fill, hatch in zip(cats, fills, hatches)]
+        legend = ax.legend(handles=handles, loc="upper left", bbox_to_anchor=(1.025, 1.0), frameon=True, fancybox=False, framealpha=1,
+                           edgecolor="black", fontsize=6, borderaxespad=0, borderpad=0.35, handlelength=1.1, handleheight=0.9,
+                           handletextpad=0.4, labelspacing=0.25)
+        legend.get_frame().set_linewidth(0.5)
+        save(fig, "error-categories.pdf")
 
 
-FIGURES = {"level-gap.pdf": fig_level_gap, "error-categories.pdf": fig_error_categories, "scores.pdf": fig_scores, "pairs.pdf": fig_pairs,
-           "coverage-wrong.pdf": fig_coverage_wrong, "depth.pdf": fig_depth, "consistency.pdf": fig_consistency,
-           "paraphrase.pdf": fig_paraphrase, "conditions.pdf": fig_conditions}
+FIGURES = {"level-gap.pdf": fig_level_gap, "error-categories.pdf": fig_error_categories,
+           "coverage-wrong.pdf": fig_coverage_wrong, "paraphrase.pdf": fig_paraphrase}
 
 
 # ----------------------------------------------------------------------------------------------- write and check

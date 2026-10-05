@@ -50,8 +50,8 @@ our provider rule admits dropped \texttt{gpt-oss-20b}'s tool calls or rate-limit
 the open-weights tier is absent from this condition.
 
 \paragraph{Results.}
-\autoref{tab:conditions} gives every condition against its base run, \autoref{fig:conditions} plots
-the changes against the margin, and~\autoref{tab:anchors} places the anchors beside the evaluated
+\autoref{tab:conditions} gives every condition against its base run, and~\autoref{tab:anchors}
+places the anchors beside the evaluated
 models.
 Reasoning at medium effort moves \texttt{GPT-5.4 mini} by 0.093 (95\% CI 0.056 to 0.133) and
 \texttt{Gemini 3.1 Flash-Lite} by less than the condition detects.
@@ -92,15 +92,6 @@ Reasoning at medium effort & \texttt{GPT-5.4} & 450 & 0.941 & 0.980 & $+0.039$ &
 \label{tab:conditions}
 \end{table*}
 % END GENERATED tab:conditions
-
-% BEGIN GENERATED fig:conditions (full_run_28092026/paper_results.py --write)
-\begin{figure}[t]
-    \centering
-    \includegraphics[width=\columnwidth]{figs/conditions.pdf}
-    \caption{\textbf{Change in Final Answer Accuracy Under Each Condition.} Condition minus base run on the 450-instance subset, with 95\% intervals against the shaded $\pm 0.05$ margin; filled markers mark the changes that hold after Holm correction within the condition.}
-    \label{fig:conditions}
-\end{figure}
-% END GENERATED fig:conditions
 
 % BEGIN GENERATED tab:anchors (full_run_28092026/paper_results.py --write)
 \begin{table*}[t]
