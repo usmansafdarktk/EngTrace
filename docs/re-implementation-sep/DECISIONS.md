@@ -7368,6 +7368,13 @@ tables and figures all come from the validation reports through `docs/appendix_e
   eleven models' names in the second-judge table follow `RESULTS_PAPER_NOTES.md` and should match Section 5's.
   Cohen (1960), Wilson (1927) and SymPy (Meurer et al., 2017) are added under `% Evaluation`, to check by hand.
 
+*Revised 2026-10-05, at the authors' request.* Both appendix sections are condensed to lists and short paragraphs
+with one table each (`tab:scoring_settings`, `tab:validation_results`): the prose gives the headline numbers and the
+insights, the tables the rest. Dropped: the per-model second-judge table (its range and intervals stay in the
+text), the statistical-power paragraph, the per-branch kappas, the adjudication counts and the Wilson interval with
+its reference. The judged step check's figures appear once, in the validation table, with a note that they count
+the arithmetic check's flags as recorded in the study.
+
 ## D-190 — Section 5.1 written: the models, decoding and prompt, and the statistical protocol
 
 **Date:** 2026-10-05 · **Status:** DONE · **Evidence:** `overleaf_source_04102026/6_experiments.tex`,

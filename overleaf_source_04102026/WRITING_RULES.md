@@ -103,8 +103,6 @@ Labels used before their sections exist. Each must be defined when its section i
 - Defined in `5_evaluation.tex`: `sec:evaluation` (no subsections: the measures and the scoring process, with the
   expert study behind a pointer to `appendix:validation`), `eq:match` (the final-answer match rule) and
   `eq:coverage` (Milestone Coverage).
-- Defined in `appendices/scoring.tex`: `appendix:scoring` (tables `tab:milestone_tolerance`, `tab:judge_validation`,
-  `tab:arithmetic_readings`; the two judge prompts). Defined in `appendices/validation.tex`: `appendix:validation`
-  (tables `tab:evaluator_comparison`, `tab:planted_detection`, `tab:judge_swap`, `tab:expert_readings`). Every
-  number in these two files and in `5_evaluation.tex` comes from `docs/appendix_evaluation.py`, whose `--check`
-  must pass.
+- Defined in `appendices/scoring.tex`: `appendix:scoring` (one table, `tab:scoring_settings`; the two judge prompts).
+  Defined in `appendices/validation.tex`: `appendix:validation` (one table, `tab:validation_results`). Every number
+  in these two files and in `5_evaluation.tex` comes from `docs/appendix_evaluation.py`, whose `--check` must pass.

@@ -2,259 +2,136 @@
 \section{Validation Against Expert Judgment}
 \label{appendix:validation}
 
-This section details the expert study that guides and validates the evaluator
-of~\autoref{sec:evaluation}: the study itself, the evaluator designs compared on it, the planted
-defects, judge independence, and the domain experts' readings of the evaluated models' responses.
+This section details the expert study behind~\autoref{sec:evaluation} and the domain experts'
+readings of the evaluated models' responses; \autoref{tab:validation_results} collects the results.
 
 \subsection{Expert Study}
 
-\paragraph{Responses.}
-The study draws four instances from each of 15 templates, 60 in all, across the five branches and
-three levels.
-Only 12 of the 60 instances (20\%) have a single scalar answer, against 89 of the 150 templates, so
-the study is a hard test of answer checking.
-Five LLMs outside the evaluated models, \texttt{GPT-5}, \texttt{Claude Opus 4.7},
-\texttt{Gemini 3.1 Pro}, \texttt{DeepSeek-R1}, and \texttt{Llama 3.1 70B}, answer every instance
-once, giving 300 responses.
-
-\paragraph{Labels.}
-Fifteen domain experts, three per branch, label every response of their branch, behind opaque codes
-and with assignments fixed in advance.
-Each expert labels every step as correct, alternative correct, incorrect (with an error type and a
-written reason), or not a claim; the status of every milestone; the final answer as correct,
-partial, incorrect, or not stated; and whether the reasoning is sound.
-Three rounds follow the first pass: every one of the 1,042 steps labeled incorrect receives a
-reason; each expert labels seven of their own responses again, blind to their first pass; and every
-step on which a branch's experts split two to one, 272 steps in 134 responses, returns to all three
-experts, blind and with the three labels anonymized and shuffled, and the majority of this second
-pass becomes the label.
-
-\paragraph{Agreement.}
-Between experts, Fleiss'~$\kappa$~\citep{fleiss1971} is 0.781 on steps (from 0.645 in civil to
-0.867 in industrial engineering), 0.880 on milestones, and 0.966 on final answers; within an
-expert, Cohen's~$\kappa$~\citep{cohen1960} between the two passes is 0.828.
-Adjudication changes 85 step labels and raises the number of steps labeled incorrect from 322 to
-388.
-
-\paragraph{Statistical Power.}
-The 300 responses come from 15 templates, so every interval resamples templates; the design effect
-of 2.6 to 4.2 makes the study worth about 70 to 115 independent responses.
-For evaluators built differently from the step-matching design below, the smallest difference from
-it that the study detects in the area under the ROC curve (AUROC) at the response level is 0.12 to
-0.19, so a null result here means no difference of that size.
-
-\subsection{Evaluator Designs Compared}
-
-We compare six evaluator designs on these labels.
 \begin{itemize}
-    \item \textbf{Step matching with in-family judges}: matches the response's steps to the gold
-    steps by numerical agreement and semantic similarity; when the final answer is correct but fewer
-    than 80\% of the gold steps match, and for a random fifth of wrong answers, it sends the
-    unmatched steps to a panel of three LLM judges from evaluated families (\texttt{GPT-5},
-    \texttt{Claude Opus 4.5}, and \texttt{Gemini 3.1 Pro}); it scores the steps that match or that
-    the panel accepts as an F1 against the gold steps. We run it with two and with all three judges
-    voting.
-    \item \textbf{Step matching with outside judges}: the same design with judges from outside the
-    evaluated families, \texttt{Grok 4.6}, \texttt{MiniMax M3}, and \texttt{MiMo-V2.5-Pro}.
-    \item \textbf{Process reward models}: three open-weights models that assign each step a reward,
-    \texttt{Qwen2.5-Math-PRM-72B} and \texttt{Qwen2.5-Math-PRM-7B}~\citep{zhang2025prmlessons} and
-    \texttt{VersaPRM}~\citep{zeng2025versaprm}; a step with a reward below 0.5 counts as incorrect.
-    \item \textbf{Milestone matching alone}: the deterministic matching of~\autoref{sec:evaluation},
-    which credits the milestones that a response states, with no judge.
-    \item \textbf{Milestone matching with the arithmetic check}: milestone matching plus the
-    arithmetic check of the displayed calculations it can parse.
-    \item \textbf{Milestone matching with the judge}: milestone matching, with
-    \texttt{MiMo-V2.5-Pro} ruling on the milestones that matching misses and only its reached
-    rulings credited.
+    \item \textbf{Instances}: 60, four from each of 15 templates across the five branches and three
+    levels; only 12 have a single scalar answer, against 89 of the 150 templates, which makes the
+    study a hard test of answer checking.
+    \item \textbf{Responses}: 300, from five LLMs outside the evaluated models (\texttt{GPT-5},
+    \texttt{Claude Opus 4.7}, \texttt{Gemini 3.1 Pro}, \texttt{DeepSeek-R1}, and
+    \texttt{Llama 3.1 70B}).
+    \item \textbf{Labels}: 15 domain experts, three per branch, label each response of their branch
+    behind an opaque code: every step (correct, alternative correct, incorrect with a type and a
+    reason, or not a claim), every milestone, the final answer (correct, partial, incorrect, or not
+    stated), and the soundness of the reasoning.
+    \item \textbf{Quality rounds}: a reason on all 1,042 steps labeled incorrect, a blind
+    re-labeling of seven responses per expert, and a blind adjudication of the 272 split steps.
+    \item \textbf{Agreement}: Fleiss'~$\kappa$~\citep{fleiss1971} 0.781 on steps, 0.880 on
+    milestones, and 0.966 on final answers; Cohen's~$\kappa$~\citep{cohen1960} 0.828 between an
+    expert's two passes.
 \end{itemize}
-The evaluator of~\autoref{sec:evaluation} combines the last three designs with the final-answer
-check and the judged step check, both validated on the same labels.
-\autoref{tab:evaluator_comparison} gives the agreement of each component with the experts: the
-final-answer check and milestone matching with the judge agree closely with them, whereas the
-step-level checks find at most 0.603 of the steps that the experts mark incorrect, which is why we
-report these checks as flags with their precision.
+
+\subsection{Evaluator Designs}
+
+We compare six designs on these labels.
+\begin{itemize}
+    \item \textbf{Step matching with in-family judges}: matches response steps to gold steps by
+    numerical agreement and semantic similarity, sends unmatched steps to a panel of \texttt{GPT-5},
+    \texttt{Claude Opus 4.5}, and \texttt{Gemini 3.1 Pro} when the answer is correct but fewer than
+    80\% of the gold steps match and for a random fifth of wrong answers, and scores an F1 over the
+    steps; we run it with two and with three judges voting.
+    \item \textbf{Step matching with outside judges}: the same, with \texttt{Grok 4.6},
+    \texttt{MiniMax M3}, and \texttt{MiMo-V2.5-Pro}.
+    \item \textbf{Process reward models}: \texttt{Qwen2.5-Math-PRM-72B},
+    \texttt{Qwen2.5-Math-PRM-7B}~\citep{zhang2025prmlessons}, and
+    \texttt{VersaPRM}~\citep{zeng2025versaprm}, which reward each step; a reward below 0.5 counts as
+    incorrect.
+    \item \textbf{Milestone matching alone}: as in~\autoref{sec:evaluation}, with no judge.
+    \item \textbf{Milestone matching with the arithmetic check}.
+    \item \textbf{Milestone matching with the judge}, crediting only reached.
+\end{itemize}
+Our evaluator combines the last three with the final-answer check and the judged step check.
+
+\paragraph{Main Findings.}
+\begin{itemize}
+    \item Whether the answer is right nearly decides the experts' verdict on a response's soundness
+    (area under the ROC curve, AUROC, 0.974), so evaluators can only be told apart on steps and
+    milestones.
+    \item Milestone matching with the judge agrees best with the experts' milestone labels.
+    \item Of the 178 incorrect steps behind correct answers, 175 are calculation slips, which rarely
+    change milestone coverage; the arithmetic check is there to find them.
+    \item The best reward model ranks steps well (AUROC 0.825) but over-flags inside correct
+    answers.
+    \item Outside judges leave the step-matching score unchanged (0.379 against 0.378).
+\end{itemize}
 
 \begin{table*}[t]
     \centering
     \small
-    \begin{tabular}{l|l|l|c}
+    \begin{tabular}{l|l|l}
         \toprule
         \rowcolor{gray!10}
-        \textbf{Component} & \textbf{Basis} & \textbf{Measure} & \textbf{Value} \\
+        \textbf{Component} & \textbf{Basis} & \textbf{Result} \\
         \midrule
-        Final-answer check & all 300 responses & three-way agreement & 0.927 \\
-        Final-answer check & 281 not marked partial & agreement & 0.982 \\
-        Step-matching designs' answer check & 281 not marked partial & agreement & 0.747 \\
-        Final-answer check, $\epsilon$ fitted on the other half & each half & three-way agreement & 0.908, 0.939 \\
-        Milestone matching & milestones & P / R / F1 & 0.927 / 0.920 / 0.923 \\
-        Milestone matching with the judge & milestones & P / R / F1 & 0.930 / 0.989 / 0.958 \\
-        Arithmetic check & steps, all responses & P / R & 0.872 / 0.317 \\
-        Arithmetic check & steps, correct answers & P / R & 0.817 / 0.427 \\
-        Judged step and arithmetic checks & steps, all responses & P / R & 0.707 / 0.603 \\
-        Judged step and arithmetic checks & steps, correct answers & P / R & 0.703 / 0.360 \\
-        Best process reward model & steps, all responses & P & 0.539 \\
-        Best process reward model & steps, correct answers & P & 0.246 \\
+        \multicolumn{3}{l}{\textit{Agreement with the expert labels on 300 responses}} \\
+        Final-answer check & three-way, all 300 responses & 0.927 \\
+        Final-answer check & 281 responses not marked partial & 0.982 (step matching 0.747) \\
+        Milestone matching & P / R / F1 & 0.927 / 0.920 / 0.923 \\
+        Milestone matching with the judge & P / R / F1 & 0.930 / 0.989 / 0.958 \\
+        Arithmetic check & P / R, all steps; correct answers & 0.872 / 0.317; 0.817 / 0.427 \\
+        Judged step and arithmetic checks$^\dagger$ & P / R, all steps; correct answers & 0.707 / 0.603; 0.703 / 0.360 \\
+        Best process reward model & P, all steps; correct answers & 0.539; 0.246 \\
+        \midrule
+        \multicolumn{3}{l}{\textit{Planted defects: conceptual / arithmetic caught, untouched steps flagged}} \\
+        Deterministic checks & conceptual & 0 of 60 \\
+        \texttt{GPT-5} & LLM judge, one step & 20 of 60 / 43 of 60 / 0 of 120 \\
+        \texttt{Claude Opus 4.5} & LLM judge, one step & 8 of 60 / 43 of 60 / 0 of 120 \\
+        \texttt{MiMo-V2.5-Pro} & LLM judge, one step & 16 of 51 / 43 of 60 / 0 of 111 \\
+        \texttt{Grok 4.6} & LLM judge, one step & 22 of 60 / 52 of 60 / 0 of 120 \\
+        Judged step check & conceptual, every unflagged step sent & 19 of 60 \\
+        Step matching with in-family judges & conceptual, end to end & 9 of 60 \\
+        \midrule
+        \multicolumn{3}{l}{\textit{Readings of the evaluated models' responses}} \\
+        Arithmetic flags & 189 decided flags & 171 real (precision 0.905) \\
+        Final answer correct & 150 readings & 142 confirmed \\
+        Final answer incorrect & 98 readings & 83 confirmed, 12 called correct \\
+        Final answer partial & 52 readings & 34 called fully correct \\
+        Judge reached & 100 readings & 85 confirmed \\
+        Judge missing & 100 readings & 79 confirmed, 33 of them not needed by the route \\
         \bottomrule
     \end{tabular}
-    \caption{\textbf{Agreement with the Experts.} Each component of the evaluator against the
-    domain experts' labels on the expert study's 300 responses: agreement on the final answer, and
-    precision (P), recall (R), and F1 on milestones and on the steps that the experts mark
-    incorrect, over all responses and inside the responses with a correct final answer.
-    The arithmetic check rows give the rule as we use it; the judged step check is scored together
-    with the arithmetic check as the study ran it, and does not judge the steps that check flags.}
-    \label{tab:evaluator_comparison}
+    \caption{\textbf{Validation Results.} Top: each component against the domain experts' labels on
+    the expert study (P precision, R recall; correct answers are responses with a correct final
+    answer). Middle: planted defects caught and untouched steps flagged. Bottom: the domain experts'
+    readings of the evaluated models' responses. $^\dagger$Counts the arithmetic check's flags as
+    recorded in the study.}
+    \label{tab:validation_results}
 \end{table*}
-
-Whether the answer is right nearly decides the response-level verdict: the experts' own
-final-answer verdict predicts their verdict on a response's soundness at AUROC 0.974, and they call
-only 3 of the 228 correct-answer responses unsound.
-Evaluators therefore have to be compared at the level of steps and milestones.
-The experts mark at least one incorrect step in 93 of the 228 correct-answer responses, 178 steps
-in all, and 175 of the 178 are calculation slips; such a slip rarely changes milestone coverage,
-and finding it is the task of the step-level diagnostics.
-The best reward model, \texttt{Qwen2.5-Math-PRM-72B}, ranks steps well (AUROC 0.825), but its
-precision is 0.539 over all steps and 0.246 inside correct-answer responses, and fitting its
-threshold on one half of the responses changes its F1 on the other half by $-0.006$.
-A panel from outside the evaluated families moves the step-matching design's mean score from 0.379
-to 0.378.
 
 \subsection{Planted Defects}
 
-Since 175 of the 178 incorrect steps that the experts find behind correct answers are arithmetic,
-their labels cannot show whether a misstated rule behind a correct answer is detected, so we build a
-set whose ground truth holds by construction.
-From the 129 responses that the experts label clean and the final-answer check scores correct, we
-plant exactly one defect in each of 120 of them and keep 60 untouched as controls.
-An arithmetic defect changes one digit of one displayed intermediate value and leaves the later
-steps and the final answer as they were; a conceptual defect changes the reasoning a step states,
-by flipping a criterion, misstating a rule, or stating a formula that contradicts the one used, and
-leaves every digit of the response unchanged.
-We verify every defect without the checker under test: an arithmetic defect by recomputing its
-calculation at full precision or against the template's value, and a conceptual defect by
-confirming that the response's digits are byte-identical to the original.
-Every deterministic check detects 0 of the 60 conceptual defects.
-
-We ask four LLM judges about each defect with the step prompt of~\autoref{appendix:scoring} and
-one step under review, once in the planted response and once in the untouched original, and count
-a defect as caught only when the judge flags the planted step and not the original
-(\autoref{tab:planted_detection}).
-\texttt{GPT-5} (OpenAI) and \texttt{Claude Opus 4.5} (Anthropic) share families with evaluated
-models, whereas \texttt{MiMo-V2.5-Pro} (Xiaomi) and \texttt{Grok 4.6} (xAI) do not; no judge catches
-more than 22 of the 60 conceptual defects.
-In the step-matching design, a conceptual defect reaches a judge exactly as often as the same step
-untouched (0.500), and the design catches 0.150 of them end to end; the judged step check sends 58
-of the 60 to the judge and catches 19.
-The four judges thus catch 13\% to 37\% of the conceptual defects without false alarms: a misstated
-rule behind a correct answer passes every deterministic check, and LLM judges catch at most about a
-third of such cases.
-
-\begin{table}[t]
-    \centering
-    \small
-    \setlength{\tabcolsep}{3pt}
-    \begin{tabular}{l|ccc}
-        \toprule
-        \rowcolor{gray!10}
-        \textbf{Judge} & \textbf{Conceptual} & \textbf{Arithmetic} & \textbf{Untouched} \\
-        \midrule
-        \texttt{GPT-5} & 20 of 60 & 43 of 60 & 0 of 120 \\
-        \texttt{Claude Opus 4.5} & 8 of 60 & 43 of 60 & 0 of 120 \\
-        \texttt{MiMo-V2.5-Pro} & 16 of 51 & 43 of 60 & 0 of 111 \\
-        \texttt{Grok 4.6} & 22 of 60 & 52 of 60 & 0 of 120 \\
-        \bottomrule
-    \end{tabular}
-    \caption{\textbf{Planted Defects.} Conceptual and arithmetic defects each LLM judge catches, and
-    untouched steps it flags; \texttt{MiMo-V2.5-Pro} returned a verdict on both versions of 51
-    conceptual defects.}
-    \label{tab:planted_detection}
-\end{table}
+Because the labels hold almost no conceptual error behind a correct answer, we plant one defect in
+each of 120 clean responses, verified without the checker under test: 60 one-digit slips in a
+displayed intermediate value and 60 conceptual defects that misstate a criterion, rule, or formula
+without changing any digit; 60 untouched responses serve as controls.
+Each LLM judge sees the planted step and, separately, the same step untouched, with the step prompt
+of~\autoref{appendix:scoring}, and a defect counts as caught only when the judge flags the planted
+step alone.
+No deterministic check catches a conceptual defect, and the four judges catch at most about a third
+of them without false alarms; the judged step check, which sends every unflagged step, catches more
+than step matching, whose panel sees a conceptual defect no more often than the same step untouched.
 
 \subsection{Judge Independence}
 
-We choose \texttt{MiMo-V2.5-Pro} because it shares no family with an evaluated model, as LLM judges
-can favor their own family~\citep{panickssery2024selfrecognition, li2026preferenceleakage}, and
-because it catches about as many planted defects as \texttt{GPT-5}
-(\autoref{tab:planted_detection}).
-To test the single-judge design, \texttt{Grok 4.6}, from a third family, re-judges with the same
-prompts the milestones that the judge decided in 20 responses per model, drawn from 14 to 19
-templates (\autoref{tab:judge_swap}).
-Each model's coverage of these responses changes by $-0.017$ to $+0.020$, and every 95\% interval,
-which resamples templates, includes zero; the sample checks each model's coverage, not the
-differences between models.
-On the step-matching design's panel, replayed offline on the expert study, dropping the judge from
-a response model's own family changes that model's score by at most 0.006, as much as dropping
-another family's judge, yet each judge calls 65\% to 70\% of the steps it judges that the experts
-mark incorrect alternative correct.
-An absence of self-preference therefore does not show that a judge is accurate.
-
-\begin{table*}[t]
-    \centering
-    \small
-    \begin{tabular}{l|cc|cc|cc}
-        \toprule
-        \rowcolor{gray!10}
-        \textbf{Model} & \textbf{Milestones} & \textbf{Agreement} & \textbf{MC, MiMo} &
-        \textbf{MC, Grok} & \textbf{Difference} & \textbf{95\% CI} \\
-        \midrule
-        \texttt{DeepSeek V4.1 Flash} & 41 & 0.976 & 0.733 & 0.716 & $-0.017$ & $-0.024$ to $+0.000$ \\
-        \texttt{Kimi K3} & 41 & 0.829 & 0.712 & 0.720 & $+0.009$ & $-0.036$ to $+0.067$ \\
-        \texttt{Claude Sonnet 5} & 35 & 0.943 & 0.678 & 0.696 & $+0.018$ & $+0.000$ to $+0.058$ \\
-        \texttt{GLM-5.3-Flash} & 39 & 0.949 & 0.674 & 0.688 & $+0.013$ & $+0.000$ to $+0.044$ \\
-        \texttt{Muse Glimmer 30B} & 44 & 0.909 & 0.753 & 0.772 & $+0.020$ & $-0.003$ to $+0.058$ \\
-        \texttt{GLM-5.3} & 34 & 0.735 & 0.733 & 0.720 & $-0.013$ & $-0.140$ to $+0.083$ \\
-        \texttt{Qwen3-235B-2507} & 41 & 0.976 & 0.642 & 0.648 & $+0.006$ & $+0.000$ to $+0.022$ \\
-        \texttt{Gemini 3.1 Flash-Lite} & 39 & 0.974 & 0.671 & 0.663 & $-0.008$ & $-0.010$ to $+0.000$ \\
-        \texttt{Gemma 4 26B} & 52 & 0.962 & 0.548 & 0.552 & $+0.004$ & $-0.026$ to $+0.039$ \\
-        \texttt{GPT-5.4 mini} & 47 & 1.000 & 0.659 & 0.659 & $+0.000$ & $+0.000$ to $+0.000$ \\
-        \texttt{gpt-oss-20b} & 53 & 0.943 & 0.552 & 0.538 & $-0.014$ & $-0.059$ to $+0.008$ \\
-        \bottomrule
-    \end{tabular}
-    \caption{\textbf{A Second Judge.} For 20 sampled responses per model, the milestones both judges
-    rule on, their agreement on reached against not reached, the model's coverage of the sampled
-    responses under \texttt{MiMo-V2.5-Pro} and under \texttt{Grok 4.6}, and the difference with a
-    95\% interval that resamples templates.}
-    \label{tab:judge_swap}
-\end{table*}
+\texttt{MiMo-V2.5-Pro} shares no family with an evaluated model, since LLM judges can favor their
+own family~\citep{panickssery2024selfrecognition, li2026preferenceleakage}, and catches about as
+many planted defects as \texttt{GPT-5}.
+Re-judging 220 sampled responses, 20 per model, with \texttt{Grok 4.6} from a third family changes
+each model's coverage by $-0.017$ to $+0.020$, and every 95\% interval includes zero.
+In the step-matching panel, dropping a response model's own-family judge changes its score by at
+most 0.006, no more than dropping another family's judge, yet each judge accepts 65\% to 70\% of the
+incorrect steps it judges: an absence of self-preference does not make a judge accurate.
 
 \subsection{Readings on the Evaluated Models}
 
-\paragraph{Arithmetic Flags.}
-A domain expert reads a sample of the arithmetic check's flags on the evaluated models' responses:
-up to 20 per model, spread over each model's templates, shown without the model's name, and none
-read while the check was developed.
-The expert labels each flag a real slip, a checker error, or unsure; of 190 flags, 171 are slips,
-18 are checker errors, and 1 is unsure, so 171 of the 189 decided flags are real, a precision of
-0.905 (Wilson 95\% interval~\citep{wilson1927} 0.854 to 0.939; 0.632 to 1.000 per model).
-
-\paragraph{Verdicts and Rulings.}
-Fifteen domain experts, two per item from the item's branch, read 150 final-answer verdicts on the
-five strongest models, sampled by the check's verdict (75 correct, 49 incorrect, and 26 partial),
-and 100 of the judge's rulings across all eleven models (50 reached and 50 missing).
-\autoref{tab:expert_readings} gives their readings by verdict; the two readers agree on 97\% of the
-final answers (Cohen's~$\kappa$ 0.947) and 88\% of the milestones ($\kappa$ 0.803).
-The experts call most partial verdicts fully correct (34 of 52 readings), so scoring a partial
-answer 0.5 is conservative.
-Of the judge's missing rulings, the experts find in 33 of 100 readings that the response's route
-does not need the milestone; the strict reading counts these as missing, so MC is lower for a
-response that takes another route.
-
-\begin{table*}[t]
-    \centering
-    \small
-    \begin{tabular}{l|c|l}
-        \toprule
-        \rowcolor{gray!10}
-        \textbf{Verdict} & \textbf{Readings} & \textbf{Domain Experts' Readings} \\
-        \midrule
-        Final answer correct & 150 & correct 142, incorrect 8 \\
-        Final answer incorrect & 98 & correct 12, incorrect 83, partial 3 \\
-        Final answer partial & 52 & correct 34, incorrect 9, partial 9 \\
-        Milestone reached & 100 & obtains it 85, never obtains it 4, does not need it 11 \\
-        Milestone missing & 100 & obtains it 21, never obtains it 46, does not need it 33 \\
-        \bottomrule
-    \end{tabular}
-    \caption{\textbf{Readings on the Evaluated Models.} The domain experts' readings of the
-    final-answer check's verdicts on the five strongest models and of the judge's rulings on all
-    eleven models, by verdict; each item is read by two experts.}
-    \label{tab:expert_readings}
-\end{table*}
+A domain expert reads up to 20 arithmetic flags per model, without the model's name.
+Two domain experts of the item's branch read each of 150 final-answer verdicts on the five strongest
+models (75 correct, 49 incorrect, and 26 partial) and 100 judge rulings across all eleven models
+(50 reached and 50 missing), and agree with each other on 97\% of answers and 88\% of milestones.
+Two readings bear on the scores: the experts call most partial verdicts fully correct, so scoring
+them 0.5 is conservative, and a third of the missing rulings are milestones that the response's
+route does not need, so MC is conservative for a response that takes another route.

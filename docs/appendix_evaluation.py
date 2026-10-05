@@ -1,9 +1,13 @@
-"""Build the rows of the evaluation tables from the validation reports, and check Section 4 and its appendix.
+"""Build the evaluation appendix's two tables from the validation reports, and check Section 4 and its appendix.
 
     python docs/appendix_evaluation.py           # print the table rows and the phrases the text uses
     python docs/appendix_evaluation.py --check   # exit 1 unless overleaf_source_04102026/5_evaluation.tex,
                                                  # appendices/scoring.tex and appendices/validation.tex hold
                                                  # every generated row and phrase
+
+The tables: `tab:scoring_settings` (each check's setting against its alternatives on the expert study) in
+scoring.tex, and `tab:validation_results` (agreement with the expert labels, planted defects, and the experts'
+readings of the evaluated models) in validation.tex.
 
 Sources. full_run_28092026/: SCORER_VALIDATION.md (the deterministic checks against the experts, current code),
 THRESHOLD_APPENDIX.md (the tolerance's split-half fit, the milestone tolerance grid, the arithmetic rule's readings,
@@ -13,7 +17,7 @@ arithmetic flags), EXPERT_REQUEST.md (the experts' readings of verdicts on the e
 results/RESULTS.md (the share of milestones the judge decides). evaluator_pilot_17092026/: PILOT_SUMMARY.md (the
 study's design, label agreement, the judge with matching, the reward models, the planted defects for three
 judges), RESULTS_LOJO.md (a panel of judges without each family's own judge). docs/re-implementation-sep/
-DECISIONS.md (D-181: the fourth judge on the planted defects). Model display names are written here.
+DECISIONS.md (D-181: the fourth judge on the planted defects).
 """
 from __future__ import annotations
 
@@ -28,13 +32,6 @@ RUN = ROOT / "full_run_28092026"
 PILOT = ROOT / "evaluator_pilot_17092026"
 SRC = ROOT / "overleaf_source_04102026"
 MAIN, SCORING, VALIDATION = SRC / "5_evaluation.tex", SRC / "appendices/scoring.tex", SRC / "appendices/validation.tex"
-
-NAME = {  # the evaluated models, in the order of their Final Answer Accuracy
-    "deepseek-v4.1-flash": "DeepSeek V4.1 Flash", "kimi-k3": "Kimi K3", "claude-sonnet-5": "Claude Sonnet 5",
-    "glm-5.3-flash": "GLM-5.3-Flash", "muse-glimmer-30b": "Muse Glimmer 30B", "glm-5.3": "GLM-5.3",
-    "qwen3-235b-a22b-2507": "Qwen3-235B-2507", "gemini-3.1-flash-lite": "Gemini 3.1 Flash-Lite",
-    "gemma-4-26b-a4b": "Gemma 4 26B", "gpt-5.4-mini": "GPT-5.4 mini", "gpt-oss-20b": "gpt-oss-20b",
-}
 
 
 def read(p: Path) -> str:
@@ -67,86 +64,96 @@ def signed(x: str) -> str:
     return f"${x}$"
 
 
+def thousands(n: str) -> str:
+    return f"{int(n):,}"
+
+
 sv, ta = read(RUN / "SCORER_VALIDATION.md"), read(RUN / "THRESHOLD_APPENDIX.md")
 ps, er = read(PILOT / "PILOT_SUMMARY.md"), read(RUN / "EXPERT_REQUEST.md")
+psb = ps.replace("**", "").replace("*", "")
 
-# ---------------------------------------------------------------- the deterministic checks against the experts
+# ---------------------------------------------------------------- the expert study against the labels
 now = {r[0]: r[4] for r in table(sv, r"^\| figure \| published \| published code")}
 held = table(ta, r"^\| fitted on half \| fitted tolerance")
 non_partial, panel = one(r"of the (\d+) traces they did not call partial, where the published check manages (0\.\d+)", ps)
-e5 = one(r"\| deterministic, then a judge on the residue \(E5\) \| (0\.\d+) \| (0\.\d+) \| (0\.\d+) \|",
-         ps.replace("**", ""))
+e5 = one(r"\| deterministic, then a judge on the residue \(E5\) \| (0\.\d+) \| (0\.\d+) \| (0\.\d+) \|", psb)
 router = {r[0]: r for r in table(read(RUN / "ROUTER_VALIDATION.md"), r"^\| steps the experts call incorrect")}
-prm = one(r"ranks steps well \(AUROC (0\.\d+)\), but only about half its flags are real errors \(precision (0\.\d+)\), "
-          r"and inside correct-answer traces that falls to (0\.\d+)", ps.replace("**", ""))
 rc, rn = router["inside correct-answer traces, the router"], router["all traces, the router"]
-comparison_rows = [
-    f"Final-answer check & all 300 responses & three-way agreement & {now['answer, three-way agreement']} \\\\",
-    f"Final-answer check & {non_partial} not marked partial & agreement & {now['answer, non-partial agreement']} \\\\",
-    f"Step-matching designs' answer check & {non_partial} not marked partial & agreement & {panel} \\\\",
-    f"Final-answer check, $\\epsilon$ fitted on the other half & each half & three-way agreement & "
-    f"{held[0][3]}, {held[1][3]} \\\\",
-    f"Milestone matching & milestones & P / R / F1 & {now['E3 precision']} / {now['E3 recall']} / {now['E3 F1']} \\\\",
-    f"Milestone matching with the judge & milestones & P / R / F1 & {e5[0]} / {e5[1]} / {e5[2]} \\\\",
-    f"Arithmetic check & steps, all responses & P / R & {now['digit rule, all traces, precision']} / "
-    f"{now['digit rule, all traces, recall']} \\\\",
-    f"Arithmetic check & steps, correct answers & P / R & {now['digit rule, hard case, precision']} / "
-    f"{now['digit rule, hard case, recall']} \\\\",
-    f"Judged step and arithmetic checks & steps, all responses & P / R & {rn[2]} / {rn[3]} \\\\",
-    f"Judged step and arithmetic checks & steps, correct answers & P / R & {rc[2]} / {rc[3]} \\\\",
-    f"Best process reward model & steps, all responses & P & {prm[1]} \\\\",
-    f"Best process reward model & steps, correct answers & P & {prm[2]} \\\\",
-]
+prm = one(r"ranks steps well \(AUROC (0\.\d+)\), but only about half its flags are real errors \(precision (0\.\d+)\), "
+          r"and inside correct-answer traces that falls to (0\.\d+)", psb)
+decides = one(r"AUROC (0\.\d+), against.*?Of (\d+) traces with a correct final answer, their holistic verdict calls "
+              r"only (three) unsound", psb)
+flawed = one(r"incorrect step in (\d+) of the (\d+) correct-answer traces \((\d+) steps\)", ps)
+slips = one(r"the experts found three such steps against (\d+) calculation slips", ps)
+outside = one(r"moved the pooled score from (0\.\d+) to (0\.\d+)", ps)
+design = one(r"(\d+) problems drawn from five engineering branches and three difficulty levels: (\d+) templates", ps)
+scalar = one(r"(\d+) of its (\d+) items \((\d+)%\) have a single scalar answer, against (\d+) of the benchmark's "
+             r"(\d+) templates", ps)
+experts = one(r"(\d+) domain experts, three per branch", ps)
+rounds = one(r"All ([\d,]+) of them\..*re-labelled (\w+) of their own traces.*?(\d+) split steps across (\d+) traces", ps)
+kappa = one(r"between experts, step labels \(Fleiss kappa\) \| \*\*(0\.\d+)\*\* \|.*within an expert, blind re-label "
+            r"\(Cohen kappa\) \| \*\*(0\.\d+)\*\* \|.*between experts, milestone status \| (0\.\d+) \|.*"
+            r"between experts, final-answer verdict \| (0\.\d+) \|", ps)
 
-# ---------------------------------------------------------------- the planted defects, per judge
-planted = {r[0]: r[1:] for r in table(ps.replace("**", ""), r"^\| \| digit rule \(as E4 ships it\) \| GPT-5")}
+# ---------------------------------------------------------------- planted defects
+planted = {r[0]: r[1:] for r in table(psb, r"^\| \| digit rule \(as E4 ships it\) \| GPT-5")}
 grok = one(r"(\d+) of (\d+) conceptual defects caught \(0\.367; 0\.550 counting \"Other\"\), (\d+) of (\d+) arithmetic "
            r"\(0\.867\), (\d+) false alarms on the (\d+) untouched steps", read(ROOT / "docs/re-implementation-sep/DECISIONS.md"))
+clean = one(r"From the (\d+) traces the experts called clean, (\d+) each receive exactly one defect and (\d+) are kept", ps)
+routing = one(r"\| the flawed step is shown to a judge \| (0\.\d+) \|.*?\| the same step, unmodified, is shown \| "
+              r"(0\.\d+) \|.*?caught by either of its two judges \| (0\.\d+) \|", psb)
+batched = one(r"it sends (\d+) of the (\d+) conceptual defects to the judge.*?catches (\d+): 0\.317 end to end", ps)
 
 
 def cnt(cell: str) -> str:
     return re.match(r"(\d+ of \d+)", cell).group(1)
 
 
-planted_rows = []
-for k, name in enumerate(["GPT-5", "Claude Opus 4.5", "MiMo-V2.5-Pro"], 1):  # the summary table's column order
-    planted_rows.append(f"\\texttt{{{name}}} & {cnt(planted['conceptual defects'][k])} & "
-                        f"{cnt(planted['arithmetic defects'][k])} & {cnt(planted['the same steps untouched, flagged'][k])} \\\\")
-planted_rows.append(f"\\texttt{{Grok 4.6}} & {grok[0]} of {grok[1]} & {grok[2]} of {grok[3]} & {grok[4]} of {grok[5]} \\\\")
+judges = [(name, cnt(planted["conceptual defects"][k]), cnt(planted["arithmetic defects"][k]),
+           cnt(planted["the same steps untouched, flagged"][k]))
+          for k, name in enumerate(["GPT-5", "Claude Opus 4.5", "MiMo-V2.5-Pro"], 1)]   # the summary table's columns
+judges.append(("Grok 4.6", f"{grok[0]} of {grok[1]}", f"{grok[2]} of {grok[3]}", f"{grok[4]} of {grok[5]}"))
+rates = [int(c.split(" of ")[0]) / int(c.split(" of ")[1]) for _, c, _, _ in judges]
+matching_caught = float(routing[2]) * 60
 assert cnt(planted["conceptual defects"][0]) == "0 of 60", planted
-rates = [int(a) / int(b) for a, b in (re.match(r"(\d+) of (\d+)", r.split(" & ")[1]).groups() for r in planted_rows)]
+assert abs(matching_caught - round(matching_caught)) < 1e-9, routing
+assert max(rates) < 0.4, rates                                      # "at most about a third"
+assert routing[0] == routing[1], routing                            # "no more often than the same step untouched"
+assert int(batched[2]) > round(matching_caught)                     # the judged step check "catches more"
+assert all(u.startswith("0 of") for _, _, _, u in judges)           # "without false alarms"
 
-# ---------------------------------------------------------------- the scoring tables
+# ---------------------------------------------------------------- the scoring settings table
 judge_val = {r[0]: r[1:] for r in table(ta, r"^\| shown to the judge \| REACHED")}
-tv, fv = judge_val["true values (should be REACHED), 88"], judge_val["values x1.37 (should be MISSING), 88"]
-judge_rows = [f"True values (88) & {tv[0]} & {tv[1]} & {tv[2]} \\\\",
-              f"Values $\\times 1.37$ (88) & {fv[0]} & {fv[1]} & {fv[2]} \\\\"]
-def bold_if(cells: list[str], used: bool) -> str:
-    """A table row, every cell in bold when it is the setting the evaluator uses."""
-    return " & ".join(f"\\textbf{{{c}}}" if used else c for c in cells) + " \\\\"
-
-
-grid = table(ta, r"^\| tolerance \| unit scaling \| real")
-grid_rows = [bold_if([r[0].replace("%", "\\%"), r[1], r[2], r[3], r[4]], (r[0], r[1]) == ("0.5%", "yes")) for r in grid]
-READING = {"1% tolerance": "1\\% tolerance", "0.1% tolerance": "0.1\\% tolerance",
-           "digit rule, bare": "Digits shown", "digit rule, as shipped": "Digits shown, as used"}
-arith_rows = [bold_if([READING[r[0]], r[2], r[3], r[4], r[5], r[6], r[7]], r[0] == "digit rule, as shipped")
-              for r in table(ta, r"^\| reading \| hard case: tp / fp / fn")]
+fv = judge_val["values x1.37 (should be MISSING), 88"]              # REACHED, MISSING, NOT_NEEDED, unjudged
+G = {(r[0], r[1]): r for r in table(ta, r"^\| tolerance \| unit scaling \| real")}
+A = {r[0]: r for r in table(ta, r"^\| reading \| hard case: tp / fp / fn")}
+assert int(fv[2]) / 88 == 0.25, fv                                  # "excuses a quarter of such values"
+settings_rows = [
+    f"Final answer & $\\epsilon$ fitted on each half & {held[0][3]}, {held[1][3]} \\\\",
+    f"Milestones & \\textbf{{0.5\\%, unit factors}} & \\textbf{{{G[('0.5%', 'yes')][4]}}} \\\\",
+    f"& 0.2\\%, unit factors & {G[('0.2%', 'yes')][4]} \\\\",
+    f"& 1\\%, unit factors & {G[('1%', 'yes')][4]} \\\\",
+    f"& 2\\%, unit factors & {G[('2%', 'yes')][4]} \\\\",
+    f"& 0.5\\%, no unit factors & {G[('0.5%', 'no')][4]} \\\\",
+    f"Judge & \\textbf{{reached only}} & \\textbf{{{fv[0]} of 88}} \\\\",
+    f"& reached or not needed & {int(fv[0]) + int(fv[2])} of 88 \\\\",
+    f"Arithmetic & \\textbf{{digits shown, as used}} & \\textbf{{{A['digit rule, as shipped'][2]} / "
+    f"{A['digit rule, as shipped'][3]}}} \\\\",
+    f"& digits shown alone & {A['digit rule, bare'][2]} / {A['digit rule, bare'][3]} \\\\",
+    f"& 0.1\\% tolerance & {A['0.1% tolerance'][2]} / {A['0.1% tolerance'][3]} \\\\",
+    f"& 1\\% tolerance & {A['1% tolerance'][2]} / {A['1% tolerance'][3]} \\\\",
+]
+fitted = (held[0][1], held[1][1])
 
 # ---------------------------------------------------------------- judge independence
-swap = {r[0]: r for r in table(read(RUN / "JUDGE_SWAP.md"), r"^\| model \| traces \| milestones both judged")}
-swap_rows = []
-for key, name in NAME.items():
-    r = swap[key]
-    mimo, other = r[8].split(" / ")
-    lo, hi = r[10].split(" to ")
-    swap_rows.append(f"\\texttt{{{name}}} & {r[2]} & {r[4]} & {mimo} & {other} & {signed(r[9])} & "
-                     f"{signed(lo)} to {signed(hi)} \\\\")
-diffs = [float(swap[k][9]) for k in NAME]
+swap = table(read(RUN / "JUDGE_SWAP.md"), r"^\| model \| traces \| milestones both judged")
+diffs = [float(r[9]) for r in swap]
+assert all(float(lo) <= 0 <= float(hi) for lo, hi in (r[10].split(" to ") for r in swap)), swap  # every CI holds zero
+swap_n = one(r"(\d+) traces per model over (\d+) to (\d+) templates", read(RUN / "JUDGE_SWAP.md"))
 lojo = read(PILOT / "RESULTS_LOJO.md")
 family = [abs(float(r[6])) for r in table(lojo, r"^\| trace model \| judged / 60 \| F1, full panel") if r[4] == "family"]
 lenient: dict[str, tuple[int, int]] = {}
-for r in table(lojo, r"^\| judge \| trace model \| steps \| bias \| 95% CI \| lenient"):  # the first panel: E0-3J
+for r in table(lojo, r"^\| judge \| trace model \| steps \| bias \| 95% CI \| lenient"):  # the in-family panel
     share, n = re.match(r"([\d.]+) \((\d+)\)", r[5]).groups()
     a, b = lenient.get(r[0], (0, 0))
     lenient[r[0]] = (a + round(float(share) * int(n)), b + int(n))
@@ -154,9 +161,13 @@ lenient_pct = sorted(round(100 * a / b) for a, b in lenient.values())
 
 # ---------------------------------------------------------------- the evaluated models
 flags = {r[0]: r for r in table(read(RUN / "FLAG_REVIEW_3.md"), r"^\| model \| flags drawn \| read")}
-per_model = sorted(float(r[6]) for k, r in flags.items() if k != "all")
+fr = flags["all"]
 b1 = dict(re.findall(r"\| the check said (\w+): experts said \| ([^|]+) \|", er))
 b3 = dict(re.findall(r"\| the judge said (\w+): experts said \| ([^|]+) \|", er))
+sampled = one(r"by the check's verdict: correct (\d+), incorrect (\d+), partial (\d+)", er)
+ruled = one(r"by the judge's verdict: MISSING (\d+), REACHED (\d+)", er)
+pairs = one(r"items read by two experts; their agreement; Cohen's kappa \| 150; (0\.\d+); (0\.\d+) \|.*"
+            r"items read by two experts; their agreement; Cohen's kappa \| 100; (0\.\d+); (0\.\d+) \|", er)
 
 
 def total(s: str) -> int:
@@ -167,72 +178,56 @@ def q(s: str, label: str) -> str:
     return re.search(rf'"{label}" (\d+)', s).group(1)
 
 
-OBTAINS, NEVER, UNNEEDED = "yes, the working obtains it", "no, it never obtains it", "no, and its route does not need it"
-readings_rows = [
-    f"Final answer correct & {total(b1['correct'])} & {b1['correct'].strip()} \\\\",
-    f"Final answer incorrect & {total(b1['incorrect'])} & {b1['incorrect'].strip()} \\\\",
-    f"Final answer partial & {total(b1['partial'])} & {b1['partial'].strip()} \\\\",
-] + [f"Milestone {v.lower()} & {total(b3[v])} & obtains it {q(b3[v], OBTAINS)}, never obtains it {q(b3[v], NEVER)}, "
-     f"does not need it {q(b3[v], UNNEEDED)} \\\\" for v in ("REACHED", "MISSING")]
-
-# ---------------------------------------------------------------- the phrases each file must contain
-res = read(RUN / "results/RESULTS.md")
-judged = [float(r[3]) for r in table(res, r"^\| model \| calls \| without a reply \| judged fraction \|")]
-kappa = one(r"between experts, step labels \(Fleiss kappa\) \| \*\*(0\.\d+)\*\* \|.*within an expert, blind re-label "
-            r"\(Cohen kappa\) \| \*\*(0\.\d+)\*\* \|.*between experts, milestone status \| (0\.\d+) \|.*"
-            r"between experts, final-answer verdict \| (0\.\d+) \|", ps)
-design = one(r"(\d+) problems drawn from five engineering branches and three difficulty levels: (\d+) templates", ps)
-clean = one(r"From the (\d+) traces the experts called clean, (\d+) each receive exactly one defect and (\d+) are kept", ps)
-flawed = one(r"incorrect step in (\d+) of the (\d+) correct-answer traces \((\d+) steps\)", ps)
-slips = one(r"the experts found three such steps against (\d+) calculation slips", ps)
-gold = one(r"\| digit-rule flags \| 0 of (\d+) claims in (\d+) steps \|", sv)
-settled = one(r"\| milestones: by E3, judged \| (\d+) of (\d+), (\d+) \(published", read(RUN / "E5_VALIDATION.md"))
-fr = flags["all"]
-
-
 def b1n(verdict: str, label: str) -> str:
     return re.search(rf"{label} (\d+)", b1[verdict]).group(1)
 
 
-def thousands(n: str) -> str:
-    return f"{int(n):,}"
+OBTAINS, UNNEEDED = "yes, the working obtains it", "no, and its route does not need it"
+missing_confirmed = total(b3["MISSING"]) - int(q(b3["MISSING"], OBTAINS))
+assert int(b1n("partial", "correct")) / total(b1["partial"]) > 0.5      # "most partial verdicts"
+assert 0.30 <= int(q(b3["MISSING"], UNNEEDED)) / total(b3["MISSING"]) < 0.37   # "a third of the missing rulings"
 
+# ---------------------------------------------------------------- the validation results table
+results_rows = [
+    "\\multicolumn{3}{l}{\\textit{Agreement with the expert labels on 300 responses}} \\\\",
+    f"Final-answer check & three-way, all 300 responses & {now['answer, three-way agreement']} \\\\",
+    f"Final-answer check & {non_partial} responses not marked partial & {now['answer, non-partial agreement']} "
+    f"(step matching {panel}) \\\\",
+    f"Milestone matching & P / R / F1 & {now['E3 precision']} / {now['E3 recall']} / {now['E3 F1']} \\\\",
+    f"Milestone matching with the judge & P / R / F1 & {e5[0]} / {e5[1]} / {e5[2]} \\\\",
+    f"Arithmetic check & P / R, all steps; correct answers & {now['digit rule, all traces, precision']} / "
+    f"{now['digit rule, all traces, recall']}; {now['digit rule, hard case, precision']} / "
+    f"{now['digit rule, hard case, recall']} \\\\",
+    f"Judged step and arithmetic checks$^\\dagger$ & P / R, all steps; correct answers & {rn[2]} / {rn[3]}; "
+    f"{rc[2]} / {rc[3]} \\\\",
+    f"Best process reward model & P, all steps; correct answers & {prm[1]}; {prm[2]} \\\\",
+    "\\multicolumn{3}{l}{\\textit{Planted defects: conceptual / arithmetic caught, untouched steps flagged}} \\\\",
+    f"Deterministic checks & conceptual & {cnt(planted['conceptual defects'][0])} \\\\",
+] + [f"\\texttt{{{n}}} & LLM judge, one step & {c} / {a} / {u} \\\\" for n, c, a, u in judges] + [
+    f"Judged step check & conceptual, every unflagged step sent & {batched[2]} of {batched[1]} \\\\",
+    f"Step matching with in-family judges & conceptual, end to end & {round(matching_caught)} of 60 \\\\",
+    "\\multicolumn{3}{l}{\\textit{Readings of the evaluated models' responses}} \\\\",
+    f"Arithmetic flags & {int(fr[3]) + int(fr[4])} decided flags & {fr[3]} real (precision {fr[6]}) \\\\",
+    f"Final answer correct & {total(b1['correct'])} readings & {b1n('correct', 'correct')} confirmed \\\\",
+    f"Final answer incorrect & {total(b1['incorrect'])} readings & {b1n('incorrect', 'incorrect')} confirmed, "
+    f"{b1n('incorrect', 'correct')} called correct \\\\",
+    f"Final answer partial & {total(b1['partial'])} readings & {b1n('partial', 'correct')} called fully correct \\\\",
+    f"Judge reached & {total(b3['REACHED'])} readings & {q(b3['REACHED'], OBTAINS)} confirmed \\\\",
+    f"Judge missing & {total(b3['MISSING'])} readings & {missing_confirmed} confirmed, {q(b3['MISSING'], UNNEEDED)} "
+    f"of them not needed by the route \\\\",
+]
 
-psb = ps.replace("**", "").replace("*", "")
-scalar = one(r"(\d+) of its (\d+) items \((\d+)%\) have a single scalar answer, against (\d+) of the benchmark's "
-             r"(\d+) templates", ps)
-rounds = one(r"All ([\d,]+) of them\..*re-labelled (\w+) of their own traces.*?(\d+) split steps across (\d+) traces", ps)
-by_branch = one(r"between-expert step kappa runs from (0\.\d+) \(civil\) to (0\.\d+) \(industrial\)", ps)
-adjudicated = one(r"changed (\d+) step labels, raising the count of steps called incorrect from (\d+) to (\d+)", ps)
-power = one(r"design effect of ([\d.]+) to ([\d.]+) depending.*?roughly (\d+) to (\d+) independent.*?"
-            r"can detect is (0\.\d+) to (0\.\d+)", ps)
-decides = one(r"AUROC (0\.\d+), against.*?Of (\d+) traces with a correct final answer, their holistic verdict calls "
-              r"only (three) unsound", psb)
-prm_fit = one(r"changes the held-out F1 by ([−-]0\.\d+)", psb)
-outside = one(r"moved the pooled score from (0\.\d+) to (0\.\d+)", ps)
-routing = one(r"\| the flawed step is shown to a judge \| (0\.\d+) \|.*?\| the same step, unmodified, is shown \| "
-              r"(0\.\d+) \|.*?caught by either of its two judges \| (0\.\d+) \|", psb)
-batched = one(r"it sends (\d+) of the (\d+) conceptual defects to the judge.*?catches (\d+): 0\.317 end to end.*?"
-              r"raised (\d+) false alarms on the (\d+) clean steps", ps)
-mimo_n = one(r"MiMo returned a verdict on both arms for (\d+) of the 60 conceptual defects and for (\d+) of the 120", ps)
-swap_n = one(r"(\d+) traces per model over (\d+) to (\d+) templates", read(RUN / "JUDGE_SWAP.md"))
-sampled = one(r"by the check's verdict: correct (\d+), incorrect (\d+), partial (\d+)", er)
-ruled = one(r"by the judge's verdict: MISSING (\d+), REACHED (\d+)", er)
-pairs = one(r"items read by two experts; their agreement; Cohen's kappa \| 150; (0\.\d+); (0\.\d+) \|.*"
-            r"items read by two experts; their agreement; Cohen's kappa \| 100; (0\.\d+); (0\.\d+) \|", er)
+# ---------------------------------------------------------------- the phrases each file must contain
+res = read(RUN / "results/RESULTS.md")
+judged = [float(r[3]) for r in table(res, r"^\| model \| calls \| without a reply \| judged fraction \|")]
+gold = one(r"\| digit-rule flags \| 0 of (\d+) claims in (\d+) steps \|", sv)
 gold_ok = one(r"\| scored correct at all three tolerances \| (\d+) of (\d+) \|", sv)
 no_ms = one(r"\| every milestone found \| (\d+); (\d+) items have no milestones \|", sv)
-sep = [float(r[4]) for r in grid if r[1] == "yes" and r[0] != "2%"]  # with unit factors, 0.2% to 1%
-sep_gain = [r[0] for r in grid if r[1] == "yes" and float(r[4]) > float(next(o[4] for o in grid if o[0] == r[0]
-                                                                              and o[1] == "no"))]
-assert sep_gain == ["0.5%", "0.2%"], sep_gain  # "raise the separation at 0.5% and below"
-assert all(float(r[2]) > float(next(o[2] for o in grid if o[0] == r[0] and o[1] == "no"))
-           for r in grid if r[1] == "yes")  # "raise coverage at every tolerance"
-caught = [int(re.match(r"\\texttt\{[^}]+\} & (\d+) of", r).group(1)) for r in planted_rows]
-assert gold_ok[0] == gold_ok[1] and decides[2] == "three" and sampled[0] == "75", (gold_ok, decides, sampled)
+settled = one(r"\| milestones: by E3, judged \| (\d+) of (\d+), (\d+) \(published", read(RUN / "E5_VALIDATION.md"))
+readers = one(r"Every trace was labelled by (three) experts of its own branch", psb)
+per_model = max(int(r[1]) for k, r in flags.items() if k != "all")
+assert gold_ok[0] == gold_ok[1] and decides[2] == "three" and sampled[0] == "75" and rounds[1] == "seven"
 
-readers = one(r"Every trace was labelled by (three) experts of its own branch", ps.replace("**", ""))
-assert max(rates) < 0.4, rates  # "at most about a third" in the main text
 main = [
     f"on 300 responses from five LLMs outside the eleven we evaluate, each labeled step by step by {readers[0]} "
     f"domain experts",
@@ -241,54 +236,37 @@ main = [
     f"{pct(min(judged))} to {pct(max(judged))} of milestones",
 ]
 scoring = [
-    f"On the {thousands(gold_ok[1])} gold traces, the check scores every instance correct",
-    f"the {no_ms[1]} instances without a milestone",
-    f"it is {held[0][1]}, and on the other half {held[1][1]}", f"{held[0][3]} and {held[1][3]}",
-    f"{min(sep):.3f} to {max(sep):.3f} from 0.2\\% to 1\\%",
-    f"{settled[0]} of the {thousands(settled[1])} milestones", f"the judge decides the other {settled[2]}",
-    f"{pct(min(judged))} to {pct(max(judged))} of milestones",
-    f"rules {fv[2]} of the 88 not needed", f"rules {tv[1]} of the 88 true values missing",
-    f"none of the {thousands(gold[0])} calculations it reads in their {thousands(gold[1])} steps",
-    f"precision {rn[2]} and recall {rn[3]} over all steps, and {rc[2]} and {rc[3]}",
-    f"catches {batched[2]} of {batched[1]}", f"{batched[3]} false alarms on the {batched[4]} untouched steps",
-] + judge_rows + grid_rows + arith_rows
+    f"Every one of the {thousands(gold_ok[1])} gold traces scores correct",
+    f"the {no_ms[1]} instances without milestones",
+    f"It decides {settled[2]} of the {thousands(settled[1])} milestones of the expert study and "
+    f"{pct(min(judged))} to {pct(max(judged))} of milestones on the evaluated models",
+    "excuses a quarter",
+    f"fitted values {fitted[0]} and {fitted[1]}",
+    f"among {88} milestone values multiplied by 1.37",
+    f"none of the {thousands(gold[0])} calculations it reads in the {thousands(gold_ok[1])} gold traces",
+] + settings_rows
 validation = [
-    f"Only {scalar[0]} of the {scalar[1]} instances ({scalar[2]}\\%) have a single scalar answer, against {scalar[3]} of "
-    f"the {scalar[4]} templates",
-    f"every one of the {rounds[0]} steps", f"labels {rounds[1]} of their own responses",
-    f"{rounds[2]} steps in {rounds[3]} responses",
-    f"is {kappa[0]} on steps (from {by_branch[0]} in civil to {by_branch[1]} in industrial engineering), {kappa[2]} on "
-    f"milestones, and {kappa[3]} on final answers",
-    f"between the two passes is {kappa[1]}",
-    f"changes {adjudicated[0]} step labels", f"from {adjudicated[1]} to {adjudicated[2]}",
-    f"design effect of {power[0]} to {power[1]}", f"about {power[2]} to {power[3]} independent responses",
-    f"is {power[4]} to {power[5]}",
-    f"at AUROC {decides[0]}", f"only 3 of the {decides[1]} correct-answer responses",
-    f"{flawed[0]} of the {flawed[1]} correct-answer responses, {flawed[2]} steps", f"{slips[0]} of the {flawed[2]}",
-    f"(AUROC {prm[0]})", f"precision is {prm[1]} over all steps and {prm[2]} inside",
-    f"other half by ${prm_fit[0].replace('−', '-')}$", f"from {outside[0]} to {outside[1]}",
-    f"{clean[0]} responses", f"in each of {clean[1]} of them", f"keep {clean[2]} untouched",
-    f"find at most {max(now['digit rule, all traces, recall'], now['digit rule, hard case, recall'], rn[3], rc[3])} of "
-    f"the steps that the experts mark incorrect",
-    f"detects 0 of the {planted['conceptual defects'][0].split(' of ')[1]} conceptual defects",
-    f"catch {pct(min(rates))} to {pct(max(rates))} of the conceptual defects without false alarms",
-    f"{slips[0]} of the {flawed[2]} incorrect steps that the experts find",
-    f"more than {max(caught)} of the 60 conceptual defects",
-    f"untouched ({routing[1]})" if routing[0] == routing[1] else "ROUTING CHANGED",
-    f"catches {routing[2]} of them end to end", f"sends {batched[0]} of the {batched[1]}", f"catches {batched[2]}.",
-    f"both versions of {mimo_n[0]}", f"{swap_n[0]} responses per model, drawn from {swap_n[1]} to {swap_n[2]}",
+    f"{design[0]}, four from each of {design[1]} templates",
+    f"only {scalar[0]} have a single scalar answer, against {scalar[3]} of the {scalar[4]} templates",
+    "300, from five LLMs outside the evaluated models",
+    f"{experts[0]} domain experts, three per branch",
+    f"a reason on all {rounds[0]} steps labeled incorrect", f"of {rounds[1]} responses per expert",
+    f"the {rounds[2]} split steps",
+    f"Fleiss'~$\\kappa$~\\citep{{fleiss1971}} {kappa[0]} on steps, {kappa[2]} on milestones, and {kappa[3]} on "
+    f"final answers",
+    f"Cohen's~$\\kappa$~\\citep{{cohen1960}} {kappa[1]} between an expert's two passes",
+    f"(area under the ROC curve, AUROC, {decides[0]})",
+    f"Of the {flawed[2]} incorrect steps behind correct answers, {slips[0]} are calculation slips",
+    f"(AUROC {prm[0]})", f"({outside[0]} against {outside[1]})",
+    f"each of {clean[1]} clean responses", f"{clean[2]} untouched responses serve as controls",
+    f"Re-judging {len(swap) * int(swap_n[0])} sampled responses, {swap_n[0]} per model",
     f"{signed(f'{min(diffs):+.3f}')} to {signed(f'{max(diffs):+.3f}')}",
-    f"by at most {max(family):.3f}", f"{lenient_pct[0]}\\% to {lenient_pct[-1]}\\%",
-    f"of {fr[1]} flags, {fr[3]} are slips, {fr[4]} are checker errors, and {fr[5]} is unsure",
-    f"{fr[3]} of the {int(fr[3]) + int(fr[4])}", f"precision of {fr[6]}", fr[7],
-    f"{per_model[0]:.3f} to {per_model[-1]:.3f}",
+    f"at most {max(family):.3f}", f"{lenient_pct[0]}\\% to {lenient_pct[-1]}\\%",
+    f"up to {per_model} arithmetic flags per model",
     f"({sampled[0]} correct, {sampled[1]} incorrect, and {sampled[2]} partial)",
     f"({ruled[1]} reached and {ruled[0]} missing)",
-    f"{pct(float(pairs[0]))} of the final answers (Cohen's~$\\kappa$ {pairs[1]})",
-    f"{pct(float(pairs[2]))} of the milestones ($\\kappa$ {pairs[3]})",
-    f"({b1n('partial', 'correct')} of {total(b1['partial'])} readings)",
-    f"in {q(b3['MISSING'], UNNEEDED)} of {total(b3['MISSING'])} readings",
-] + comparison_rows + planted_rows + swap_rows + readings_rows
+    f"{pct(float(pairs[0]))} of answers and {pct(float(pairs[2]))} of milestones",
+] + results_rows
 
 if "--check" in sys.argv:
     bad = 0
@@ -301,9 +279,7 @@ if "--check" in sys.argv:
         bad += len(missing)
     sys.exit(1 if bad else 0)
 
-for title, rows in (("components against the experts", comparison_rows), ("planted defects", planted_rows),
-                    ("judge validation", judge_rows), ("milestone tolerance", grid_rows),
-                    ("arithmetic readings", arith_rows), ("judge swap", swap_rows), ("readings", readings_rows)):
+for title, rows in (("scoring settings", settings_rows), ("validation results", results_rows)):
     print(f"% {title}")
     print("\n".join(rows))
 for title, ph in (("5_evaluation.tex", main), ("scoring.tex", scoring), ("validation.tex", validation)):
