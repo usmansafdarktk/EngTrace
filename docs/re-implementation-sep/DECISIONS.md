@@ -7438,7 +7438,9 @@ the May style and every value verified. Choices:
   those the rule excludes.
 - **Section 5.1** now starts each paragraph on its heading line (the authors), states the rule as "no model whose
   responses we used to develop or validate the evaluator", which covers the two robustness models as well as the
-  expert study's five, and points to the three sections.
+  expert study's five, and points to the three sections. Tightened the same day at the authors' request (403 to 328
+  words): the serving precision, the reasoning-token medians, the bootstrap and sign-flip counts, and the reason
+  after the selection rule are left to the appendix, which states each.
 
 ## Open decisions
 

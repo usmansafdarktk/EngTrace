@@ -167,7 +167,7 @@ empty = sum(m["empty"] for m in q1.values())
 # A response that stops at the ceiling is either scored on the text it has (counted as capped) or empty.
 at_ceiling = {k: dec[k]["finish_reasons"].get("length", 0) - q1[k]["capped_scored"] for k in roster}
 assert all(0 <= at_ceiling[k] <= q1[k]["empty"] for k in roster), at_ceiling
-assert sum(at_ceiling.values()) >= 0.95 * empty, "almost all empty responses are at the ceiling"
+assert sum(at_ceiling.values()) >= 0.95 * unusable, "almost all responses without an answer are empty at the ceiling"
 
 # ---------------------------------------------------------------- the anchors, their subset, the conditions
 anchors = sorted({a["model"] for arm in res["anchors"] for a in arm["anchors"]}, key=lambda k: k != "gpt-5.4")
@@ -211,30 +211,27 @@ assert all(m["templates"] == len(per_template) for m in res["q2"])
 mc_templates = res["q3_coverage"]["templates"]
 
 phrases = [  # Section 5.1
-    f"We evaluate {WORD[len(roster)]} LLMs.",
-    f"The {WORD[len(open_)]} open-weights models are {series(open_, cite=True)}.",
-    f"The {WORD[len(closed)]} closed models are {series(closed, cite=True)}.",
-    f"{WORD[len(anchors)]} flagships that the rule admits, {series(anchors, cite=True)}, serve as anchors on a fixed "
-    f"subset of {subset} instances ({WORD[subset // len(per_template)]} per template) that the further conditions "
-    "below also use",
-    f"Each model answers each instance once, {thousands(rows)} responses in all, at its provider's default decoding "
-    "settings: we set no sampling parameters",
-    f"The output ceiling is {thousands(ceiling)} tokens ({thousands(lower['muse-glimmer-30b'])} for "
-    f"{tt('muse-glimmer-30b')}, the most its endpoint allows)",
-    f"every open-weights model runs at {min_bits}-bit floating-point precision or higher",
+    f"We evaluate {WORD[len(roster)]} LLMs: {WORD[len(open_)]} open-weights models, {series(open_, cite=True)}; and "
+    f"{WORD[len(closed)]} closed models, {series(closed, cite=True)}.",
+    "One rule selects them: no model whose responses we used to develop or validate the evaluator",
+    f"For cost, {WORD[len(anchors)]} flagships the rule admits, {series(anchors, cite=True)}, run only as anchors on "
+    f"a fixed subset of {subset} instances ({WORD[subset // len(per_template)]} per template), which the further "
+    "conditions also use",
+    f"Each model answers each instance once ({thousands(rows)} responses) with the same zero-shot prompt",
+    f"We set no sampling parameters, so each model decodes at its provider's defaults, with an output ceiling of "
+    f"{thousands(ceiling)} tokens ({thousands(lower['muse-glimmer-30b'])} for {tt('muse-glimmer-30b')}, the most "
+    "its endpoint allows)",
     f"{WORD[len(no_reasoning)]} models return no reasoning tokens ({series(no_reasoning)}, "
-    f"{WORD[closed_without]} of the {WORD[len(closed)]} closed models), while the other {WORD[len(reasoning)]} write "
-    f"a median of {tokens(min(medians))} to {tokens(max(medians))} reasoning tokens per response",
-    f"{unusable} responses ({100 * unusable / rows:.1f}\\%) contain no readable final answer and score 0; {empty} of "
-    "them are empty, almost all at the output ceiling",
-    f"the {k_inst} instances of a template share one derivation",
-    f"Every {level}\\% interval is a percentile bootstrap over templates with {thousands(B)} resamples",
-    f"using {thousands(B_TEST)} sign flips",
+    f"{WORD[closed_without]} of the {WORD[len(closed)]} closed models), so the models are not compared at equal "
+    "reasoning effort",
+    f"{unusable} responses ({100 * unusable / rows:.1f}\\%) have no readable final answer and score 0, almost all "
+    "of them empty at the output ceiling",
+    f"because its {k_inst} instances share one derivation",
+    f"every {level}\\% interval is therefore a bootstrap over templates",
     "because scores vary more across Advanced templates",
     f"such as the {comb(len(roster), 2)} pairs of models",
-    f"keeps the probability of any false positive at {round(100 * sig)}\\% or less",
-    f"We report every non-significant difference with the smallest difference the design detects at {power}\\% "
-    "power",
+    f"keeps the probability of any false positive at {round(100 * sig)}\\% or less, and we report every "
+    f"non-significant difference with the smallest difference the design detects at {power}\\% power",
 ]
 appendix_phrases = [  # appendices/models.tex
     f"It excludes the {WORD[len(study)]} models of the expert study ({listing([ttn(s) for s in study])}), "
