@@ -1,68 +1,51 @@
 % -------------
-\section{Detailed Domain-Aware Parameterization Examples}
+\section{Domain-Aware Parameterization}
 \label{sec:appendix_param_details}
-To ensure that problems are not just mathematically solvable but are also grounded in physical and engineering realism, \ourdataset constrains all generated values by the principles of the domain being tested. The following provides specific examples of this methodology for each engineering branch.
 
-\subsection{Chemical Engineering}
-\begin{itemize}
-    \item \textbf{Reaction Kinetics and Stoichiometry}: Instead of abstract chemicals, problems select from curated lists of common gas, liquid, and biochemical reactants like Propane, Benzene, and Glucose. More importantly, many problems are built around pre-validated, balanced chemical equations to ensure that the fundamental principles of mass conservation and stoichiometry are carefully upheld from the outset.
-    \item \textbf{Thermodynamics}: Problems involving thermodynamic calculations use a multi-layered approach to realism. For common substances, a complete and consistent set of critical properties ($T_c, P_c, V_c$) is retrieved. For reaction calorimetry, problems utilize tabulated standard heats of formation ($\Delta H_f^\circ$). Crucially, for heat transfer calculations, the model moves beyond constant specific heats by incorporating temperature-dependent heat capacity parameters ($C_p/R = A + BT + CT^2 + DT^{-2}$), ensuring a high degree of physical accuracy across a range of conditions.
-    \item \textbf{Transport Phenomena and Fluid Mechanics}: To ensure realism in fluid dynamics problems, templates draw from extensive tables of fluid properties, including the density and viscosity of common liquids and gases. The benchmark also includes parameters for non-Newtonian fluids (e.g., Polymer Solutions \& Melts etc), allowing it to test more complex, real-world rheological behaviors beyond simple Newtonian assumptions.
-\end{itemize}
+Templates constrain the values they sample in four ways, shown below with examples from all five
+branches.
+\autoref{tab:authoritative_sources} lists the sources of the tabulated values.
 
-\subsection{Electrical Engineering}
-\begin{itemize}
-    \item \textbf{Electromagnetics and Waves}: Instead of using an arbitrary number, the phase velocity of a wave is determined by selecting a specific propagation medium from a curated list (e.g., Distilled Water, Polyethylene, Fused Silica etc). This ensures that all subsequent calculations for parameters like wavelength or wave number are physically consistent with that material's properties. The generation process is further constrained by fundamental physical constants, including the speed of light in a vacuum ($c_0$) and the permittivity of free space ($\epsilon_0$).
-    \item \textbf{Signals and Systems}: Sampling frequencies are intentionally set relative to the Nyquist rate to either model ideal conversion or deliberately induce aliasing, directly testing frequency folding. Signal frequencies are generated as rational multiples of $\pi$, and convolution sequences are kept short and integer-valued to focus analysis on the computational process.
-    \item \textbf{Digital Communications}: Probabilities for discrete random variables are generated as exact rational numbers summing to one. Carrier frequencies are constrained to integer multiples of the bit rate, modulation orders ($M$) to powers of two, and energy per bit ($E_b$) and signal-to-noise ratios ($E_b/N_0$) to physically typical ranges. Data rates are assigned practical units (kbps, Mbps, Gbps) to ground problems in contemporary engineering contexts.
-\end{itemize}
+\paragraph{Tabulated Properties.} A template selects a substance, material, section or scenario
+from a curated table and takes the properties the problem needs from that entry, so that they are
+mutually consistent.
+Examples are the critical properties, heats of formation and heat-capacity coefficients
+($C_p/R = A + BT + CT^2 + DT^{-2}$) of chemical species; the Young's modulus, Poisson's ratio and
+shear modulus of materials such as 6061-T6 aluminum, in SI or US customary units; the properties
+that set the phase velocity in media such as fused silica; the depth, area and moment of inertia of
+AISC wide-flange sections; the ranges of permeability and friction angle for each soil type; and the
+ranges of arrival and service rates for each queueing scenario.
 
-\subsection{Mechanical Engineering}
-\begin{itemize}
-    \item \textbf{Mechanics of Materials}: Problems are grounded in the behavior of real-world materials by co-selecting properties from comprehensive tables. When a material such as ``6061-T6 Aluminum'' or ``Carbon Fiber Reinforced Polymer'' is chosen, its physically consistent Young's Modulus ($E$), Poisson's Ratio ($\nu$), and Shear Modulus ($G$) are used for all calculations. This ensures that problems involving stress, strain, and torsional deformation are realistic. Properties are available in both SI (GPa) and US Customary (ksi) units to reflect practical engineering work.
-    \item \textbf{Fluid Mechanics}: Realism in fluid statics problems is achieved by utilizing extensive lists of fluid and solid densities. This allows for the accurate calculation of hydrostatic pressure and buoyancy forces for a wide range of scenarios, such as a steel object submerged in seawater. The parameterization is context-aware, selecting dense fluids like Mercury for manometer problems while using lighter fluids like oil or water for pipe flow scenarios.
-    \item \textbf{Vibrations and Acoustics}: Mass, spring stiffness, and damping coefficients are randomized within physically plausible ranges. Harmonic forcing amplitudes and frequencies are chosen relative to the system's natural frequency to ensure the dynamic response clearly demonstrates key phenomena such as resonance or beating.
-\end{itemize}
+\paragraph{Laws, Correlations and Standards.} Other values follow the relations and design tables
+used in practice.
+Reaction problems use balanced chemical equations, compression indices follow Skempton's
+correlation with the liquid limit, and bearing-capacity factors are Terzaghi's values for the
+sampled friction angle.
+Manning's coefficients follow the channel lining, runoff coefficients the land use, and SCS curve
+numbers the land use and hydrologic soil group.
+Acceptance-sampling plans come from the tables of MIL-STD-105E, control-chart factors from their
+statistical definitions, and safety factors from standard normal quantiles at typical
+cycle-service levels.
 
-\subsection{Civil Engineering}
-\begin{itemize}
-    \item \textbf{Structural Analysis}: Deflection problems select a rolled wide-flange section from
-    the AISC shapes database, so that its depth, area, and moment of inertia are those of a real
-    section, and use the elastic modulus of structural steel.
-    The span follows from a realistic span-to-depth ratio, and the load is derived from a target
-    deflection that stays within serviceability limits without overstressing the section.
-    \item \textbf{Geotechnical Engineering}: Soil problems select from tabulated natural-state soils
-    and draw specific gravity, permeability, friction angle, and coefficient of consolidation within
-    the ranges reported for each soil type.
-    Compression indices follow Skempton's correlation with the liquid limit, and bearing-capacity
-    problems use Terzaghi's tabulated bearing-capacity factors for the sampled friction angle.
-    \item \textbf{Water Resources}: Open-channel problems select a channel lining with its tabulated
-    Manning's roughness coefficient and draw the slope inside a window that keeps the flow regime
-    the problem assumes, such as subcritical uniform flow.
-    Hydrology problems take rational-method runoff coefficients by land use and SCS curve numbers
-    by land use and hydrologic soil group.
-\end{itemize}
+\paragraph{Regime-Aware Ranges.} Where the regime matters, templates set sampling ranges relative to
+the quantity that decides it, so that each instance stays in the regime its problem assumes or lands
+in the one it tests.
+A downsampling problem draws the signal frequency relative to the aliasing limit, so that the result
+aliases or not, and a forced-vibration problem draws the forcing frequency relative to the natural
+frequency, so that instances fall below, near and above resonance.
+Channel slopes keep the flow in the regime the problem assumes, such as subcritical uniform flow;
+beam loads keep deflections within serviceability limits without overstressing the section; queue
+utilizations stay below one, so that a steady state exists; and production rates are 1.5 to 6 times
+the demand rate, so that finite-rate production is feasible.
+Some templates also check each drawn scenario and redraw it when it leaves the regime: the
+falling-film template, for example, redraws until the film Reynolds number is below 1,500 and the
+maximum velocity below 10\,m/s.
 
-\subsection{Industrial Engineering}
-\begin{itemize}
-    \item \textbf{Production and Inventory}: Inventory problems draw demand, ordering and holding
-    costs, and lead times from tabulated item profiles, and take safety factors from standard
-    normal quantiles at typical cycle-service levels.
-    Production rates are 1.5 to 6 times the demand rate, so that finite-rate production is
-    feasible, and quantity-discount problems use two or three price breaks with realistic discount
-    steps.
-    \item \textbf{Quality and Reliability Control}: Control-chart problems use control-chart factors
-    computed from their statistical definitions, with subgroup sizes and measured characteristics
-    typical of manufacturing practice.
-    Acceptance-sampling problems read code letters, sample sizes, and acceptance numbers from the
-    tables of MIL-STD-105E, and reliability problems draw component failure rates and mission times
-    from tabulated component classes.
-    \item \textbf{Stochastic Operations}: Queueing problems draw arrival and service rates from
-    tabulated service scenarios with utilization strictly below one, so that a steady state exists.
-    Markov-chain problems generate transition matrices whose rows sum exactly to one, and
-    Poisson-process problems keep the expected number of events at most four, so that the printed
-    probabilities retain their precision.
-\end{itemize}
+\paragraph{Exact Values.} Templates draw some values from structured sets, so that they have the
+form the problem requires and the arithmetic stays exact.
+Probabilities of discrete random variables sum to exactly one as printed, rows of Markov transition
+matrices sum exactly to one, modulation orders are powers of two, carrier frequencies are integer
+multiples of the bit rate, and discrete-time frequencies are rational multiples of $\pi$.
 
 
 % -------------

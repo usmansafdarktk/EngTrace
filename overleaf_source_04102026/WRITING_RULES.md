@@ -66,8 +66,7 @@ vocabulary) are in `docs/PAPER_PLAN_OCT2026.md`, section 8; this file covers for
   cost figures. Appendices give implementation details, in lists where they read better than prose.
 - In the `.tex` files every sentence starts on a new line and wraps at 100 characters, never inside a citation,
   reference or `\textsc{}` name; changes then show sentence by sentence, and LaTeX still prints one paragraph.
-  Text copied verbatim from the May appendix (prompt boxes, the parameterization bullets) keeps its original
-  source lines.
+  Prompt boxes keep the prompt's own lines, which may exceed 100 characters.
 - The appendix lives in `appendices/`: `7_appendix.tex` inputs one file per appendix section
   (`taxonomy_content.tex`, ...), with paths relative to `main.tex` (`sections/appendices/...`). On Overleaf the folder
   is `sections/appendices/`, and `main.tex` inputs `sections/appendices/7_appendix` in place of `sections/7_appendix`.
@@ -93,13 +92,12 @@ Labels used before their sections exist. Each must be defined when its section i
   `tab:foundational_textbooks`, `tab:authoritative_sources`), `sec:appendix_significance_scoring`, and
   `appendix:statistics` (dataset statistics; tables `tab:difficulty_stats`, `tab:template_variation`; every number
   from `docs/appendix_statistics.py`, whose `--check` must pass).
-- Defined in `appendices/template_examples.tex`: `sec:appendix_param_details` (May's parameterization bullets plus
-  civil and industrial) and `sec:appendix_template_examples` (three listings generated from the current template
+- Defined in `appendices/template_examples.tex`: `sec:appendix_param_details` (four run-in paragraphs by principle,
+  with examples from all five branches; D-196) and `sec:appendix_template_examples` (three listings generated from the current template
   code by `docs/appendix_listings.py`, whose `--check` must pass after any template change).
 - Defined in `appendices/certification.tex`: `appendix:certification` (integrity checks, LLM screen with May's
-  prompt box and rubric `tab:qa_rubric`, expert protocol with `tab:planted_defects`, results with
-  `tab:expert_agreement` and `tab:certification_rounds`; every number from `docs/appendix_certification.py`,
-  whose `--check` must pass). Table rows may exceed 100 characters; prose may not.
+  prompt box, expert protocol with `tab:planted_defects`, results with `tab:expert_agreement` and the rounds
+  in the prose (D-196); every number from `docs/appendix_certification.py`, whose `--check` must pass). Table rows may exceed 100 characters; prose may not.
 - Defined in `5_evaluation.tex`: `sec:evaluation` (no subsections: the measures and the scoring process, with the
   expert study behind a pointer to `appendix:validation`), `eq:match` (the final-answer match rule) and
   `eq:coverage` (Milestone Coverage).

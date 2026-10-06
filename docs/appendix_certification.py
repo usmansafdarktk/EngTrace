@@ -94,11 +94,11 @@ for b in BRANCHES + ["all"]:
     pct = r[4].replace("%", "\\%")
     agreement_rows.append(f"{name} & {r[2]} & {r[3]} & {pct} & {r[5]} & {r[6]} & {r[7]} \\\\")
 
-# ---------------------------------------------------------------- the rounds
+# ---------------------------------------------------------------- the rounds (stated in the Results paragraph)
 cert = read(L2 / "CERTIFICATION.md")
 rounds = {int(r[0]): (int(r[3]), int(r[4])) for r in table(cert, r"\| Round \| Labels")}
 reports = {1: res1, 2: read(L2 / "RESULTS_round2.md"), 3: read(L2 / "RESULTS_round3.md"), 4: read(L2 / "RESULTS_round4.md")}
-round_rows = []
+R = {}
 for n in sorted(rounds):
     text = reports[n]
     if n == 1:  # the first table counts real templates approved out of 30 per expert
@@ -108,8 +108,21 @@ for n in sorted(rounds):
     rejected_templates = len(re.findall(r"^- \*\*template_\w+\*\* rejected by", text, re.M))
     compared, matched = one(r"(\d+) hand checks with a comparable number: (\d+) matched", text)
     templates, verdicts = rounds[n]
-    round_rows.append(f"{n} & {templates} & {verdicts} & {rejecting} & {rejected_templates} & {matched} of {compared} \\\\")
-last = dict(re.findall(r"\| of which last reviewed in round (\d) \| (\d+) \|", cert))
+    R[n] = dict(templates=templates, verdicts=verdicts, rejecting=rejecting, rejected=rejected_templates,
+                matched=matched, compared=compared)
+assert sorted(R) == [1, 2, 3, 4], R
+# the text: the third round reviews the second round's rejected templates and approves all; the fourth rejects none
+assert R[3]["templates"] == R[2]["rejected"] and R[3]["rejecting"] == R[4]["rejecting"] == 0, R
+round_phrases = [
+    f"{R[1]['matched']} of the {R[1]['compared']} first-round hand checks",
+    f"{R[1]['rejecting']} of the {R[1]['verdicts']} verdicts on templates are rejections",
+    f"{R[2]['rejecting']} of the {R[2]['verdicts']} verdicts are rejections, on {R[2]['rejected']} of the "
+    f"{R[2]['templates']} templates",
+    f"the third round approves all {R[3]['templates']}",
+    f"a fourth round re-certifies {['no', 'one', 'two', 'three'][R[4]['templates']]} templates",
+    f"{R[2]['matched']} of {R[2]['compared']}, {R[3]['matched']} of {R[3]['compared']}, and "
+    f"{R[4]['matched']} of {R[4]['compared']} hand checks",
+]
 
 # ---------------------------------------------------------------- counts the text states
 readme = read(CERT / "README.md")
@@ -125,9 +138,6 @@ mad = dict(re.findall(r"\| (physical_plausibility|mathematical_correctness|pedag
 register = table(gate, r"\| Template \| Pattern \| Lines absorbed")
 mismatch = one(r"Of the (\d+) mismatches, (\d+) ended in a rejection", res1)
 majority = one(r"lists the (\d+) templates at least one expert rejected \((\d+) by\s+majority\)", read(L2 / "fixes_round1.md"))
-fixed = one(r"(Twenty) templates were changed; (two) claims were not adopted", read(L2 / "fixes_round1.md"))
-r2 = one(r"Templates: (\d+) approved by all three, (\d+) approved by majority, (\d+) rejected by majority", reports[2])
-edited = one(r"(\d+) templates edited over three closure rounds", readme)
 by_branch = re.findall(r"^- \*\*template_(\w+)\*\* rejected by", res1, re.M)
 branch_of = dict(re.findall(r"^\| `template_(\w+)` \| (\w+) \|", cert, re.M))
 rej_by_branch = {b: sum(1 for t in by_branch if branch_of.get(t) == b) for b in BRANCHES}
@@ -135,7 +145,7 @@ rej_by_branch = {b: sum(1 for t in by_branch if branch_of.get(t) == b) for b in 
 seeds = one(r"(\d+) seeds per template", gate)
 
 prose = [
-    f"every template at {seeds[0]} seeds", f"{edited[0]} templates", f"six line patterns in four templates" if (len(register), len({r[0] for r in register})) == (6, 4) else "REGISTER CHANGED",
+    f"every template at {seeds[0]} seeds", f"six line patterns in four templates" if (len(register), len({r[0] for r in register})) == (6, 4) else "REGISTER CHANGED",
     f"{p1[0]} templates pass, {p1[1]} are controversial, and {p1[2]} are critical failures", f"AC1 of {p1[3]}",
     f"{claims[0]} of the {claims[1]} claims", f"the {p1[4]} flagged templates",
     f"{p2[0]} templates pass, {p2[1]} are controversial, and "
@@ -147,21 +157,18 @@ prose = [
     f"{majority[0]} templates", f"{majority[1]} of them by a majority",
     f"chemical {rej_by_branch['chemical']}, electrical {rej_by_branch['electrical']}, and mechanical "
     f"{rej_by_branch['mechanical']}" if rej_by_branch["civil"] == rej_by_branch["industrial"] == 0 else "BRANCHES CHANGED",
-    f"we revise {20 if fixed[0] == 'Twenty' else '?'} of them", f"for the other {2 if fixed[1] == 'two' else '?'}",
-    f"{r2[0]} are approved by all three experts, {r2[1]} by a majority, and {r2[2]} are rejected by a majority",
-    f"{last['1']} in the first round, {last['2']} in the second, {last['3']} in the third, and {last['4']} in the fourth",
 ]
 
 if "--check" in sys.argv:
     tex = " ".join(TEX.read_text(encoding="utf-8").split())
-    wanted = plant_rows + agreement_rows + round_rows + prose
+    wanted = plant_rows + agreement_rows + round_phrases + prose
     missing = [s for s in wanted if " ".join(s.split()) not in tex]
     for s in missing:
         print("MISSING:", s)
     print(f"{len(wanted) - len(missing)} of {len(wanted)} generated rows and numbers are in {TEX.name}")
     sys.exit(1 if missing else 0)
 
-for title, rows in (("planted defects", plant_rows), ("agreement, round 1", agreement_rows), ("rounds", round_rows)):
+for title, rows in (("planted defects", plant_rows), ("agreement, round 1", agreement_rows), ("rounds, in the prose", round_phrases)):
     print(f"% {title}")
     print("\n".join(rows))
 print("% phrases the prose must contain")

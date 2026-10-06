@@ -7503,6 +7503,45 @@ Two figures in the main text (the level gap per model, the error categories) and
 marker fill as the second encoding, so they read in greyscale. Every statement that left the main text is in the
 appendix prose, and the check passes on all five files.
 
+## D-196 — Appendices F and H made concise: parameterization by principle, certification at 60% of its length
+
+**Date:** 2026-10-06 · **Status:** DONE · **Evidence:** `overleaf_source_04102026/appendices/template_examples.tex`,
+`appendices/certification.tex`; `docs/appendix_certification.py --check` (33 of 33); `docs/appendix_listings.py
+--check` (3 of 3); lengths measured on a local pdfLaTeX build of the mirror's `main.tex` with this folder's sections
+
+The two appendices were cut at the authors' request (both ran over three pages) and audited for internal detail, fix
+history and accuracy before the authors called them final.
+
+- **Domain-aware parameterization (Appendix F).** The five branch subsections and fifteen bullets (987 words, 1.70
+  pages over three pages) become four run-in paragraphs by principle, each with examples across the branches:
+  tabulated properties; laws, correlations and standards; regime-aware ranges; exact values (459 words, 0.65 page).
+  Kept because Section 3.2 cites it for the principles behind sampling and the January rebuttal cited it four times.
+  Every claim kept was checked against `data/templates/branches`. Corrected: "beating" (no vibration template
+  produces it; the forced-vibration template spreads instances below, near and above resonance) and the May sentence
+  on sampling frequencies set around the Nyquist rate (no template does; the downsampling template draws the signal
+  frequency on either side of the aliasing limit). Added: some templates redraw a scenario that leaves its regime
+  (the falling film until Re < 1,500 and v_max < 10 m/s), which backs Section 3.2's "redraws them until the scenario
+  is physically valid". Title "Domain-Aware Parameterization", label unchanged, headings in title case.
+- **Template certification (Appendix H).** 2.50 pages to 1.51 (text and tables, measured). Subsections become run-in
+  paragraphs; the rubric table is dropped (the prompt carries the rubric); the prompt box keeps its wording in a
+  compact setting; the rounds table becomes two sentences that keep every count; the planted-defects table is kept by
+  the authors' choice (it shows how subtle the 20 defects are) and the agreement table is kept. Dropped as fix
+  history or internal detail: the 54 templates edited to pass the integrity checks, the round-by-round account of
+  revisions, the interface's timing, the router and JSON mode. Corrected: "cycles through five instances" (the
+  experts' guide makes the other four optional; now "as needed"), the first round's 450 verdicts named as verdicts on
+  templates, and the branch breakdown placed after the 22 templates it splits. The section ends on the final state:
+  unanimous approval in each template's latest round and byte-for-byte regeneration, as `CERTIFICATION.md` defines
+  certification.
+- **Check script.** `docs/appendix_certification.py` checks the rounds as prose phrases, asserts that round 3 reviews
+  round 2's rejected templates and that rounds 3 and 4 reject none, and no longer requires the dropped phrases.
+- **Kept as recorded:** 459 of 504 first-round hand checks match and 44 of the 45 mismatches end in a rejection. One
+  of the 45 is a correct answer typed with a Unicode minus, which the round-1 app read without its sign (the approved
+  one); the authors judged the difference immaterial (2026-10-06).
+- **Left open:** Table 2's `[t]` placement in `appendices/taxonomy_content.tex` holds Tables 3 to 7 back to page 29,
+  so the certification tables print away from their text; the mirror's `main.tex` cites an undefined
+  `sec:experimental-setup` in the Limitations (page 8) and loads `todonotes` twice. A figure of the certification app
+  is parked; three candidate screenshots are in `overleaf_source_04102026/figs/app_candidates/`, untracked.
+
 ## Open decisions
 
 | # | Decision | Needed before |

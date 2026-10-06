@@ -33,8 +33,11 @@ changes co-authors make on Overleaf are pulled into the mirror before the next l
 
 ## Compiling
 
-There is no TeX installation on this machine, so the page count and the final check are compiled on Overleaf unless
-MiKTeX (pdfLaTeX, the engine the ACL template assumes; `\pdfoutput=1` is a pdfTeX primitive) is installed locally.
+MiKTeX 25.12 (pdfLaTeX, the engine the ACL template assumes; `\pdfoutput=1` is a pdfTeX primitive) is installed for
+the user since 2026-10-06; missing packages install on first use. A local build lays `overleaf_source_04102026/`
+over a copy of the mirror (sections under `sections/`, appendices under `sections/appendices/`, `main.tex`
+inputting `sections/appendices/7_appendix`) and runs pdflatex, bibtex and pdflatex twice. Overleaf stays the
+reference for the final check.
 `docs/render_md_pdf.py` renders Markdown working documents through headless Edge and is not for the paper.
 
 ## Before submission
