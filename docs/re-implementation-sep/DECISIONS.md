@@ -7503,6 +7503,105 @@ Two figures in the main text (the level gap per model, the error categories) and
 marker fill as the second encoding, so they read in greyscale. Every statement that left the main text is in the
 appendix prose, and the check passes on all five files.
 
+## D-193 — Results figures: level bars in the main text, branch bars in the appendix, both at the column width
+
+**Date:** 2026-10-05 · **Status:** DONE (2026-10-06) · **Evidence:**
+`overleaf_source_04102026/figs/level-bars.pdf`, `figs/branch-bars.pdf`, `figs/error-categories.pdf`;
+`full_run_28092026/paper_results.py` (`fig_level_bars`, `fig_branch_bars`, `vector_hatches`)
+
+- **Placement (owner's decision).** The level bars figure (FAC by difficulty level for the four representative
+  models) goes in the main text, Section 5.3.3; the branch bars figure moves to the appendix, beside the domain radar.
+  Both are single-column figures. The radar stays in the appendix as drawn; the error-categories figure stays in 5.4.
+- **Drawn at the column width (3.03 in), same design and palette.** The level bars keep the grouped form; the branch
+  bars are stacked at the owner's request: one bar per model, each segment one branch's share of the model's FAC
+  (the branch mean divided by five, since every branch holds 30 of the 150 templates), labelled with the branch mean,
+  so a bar's height is the model's FAC.
+- **Hatching as vector lines.** In the two bar figures and the error-categories figure the hatch and dot fills are
+  drawn as clipped vector lines instead of PDF tiling patterns, which PDF viewers rasterize at low resolution; the
+  error-categories figure is otherwise unchanged (600 dpi renders differ on 0.45% of pixels, edge anti-aliasing).
+- **Done 2026-10-06:** the level bars sit in 5.3.3 and the branch bars in the appendix section "Branch and Domain
+  Performance" (`appendices/branch_domain.tex`, which replaces `level_domain.tex`), both single-column `figure`; the branch
+  caption explains the stacked form, and the interval whisker on top of each branch bar is dropped (it read as a range;
+  the interval is in Table 1).
+
+## D-194 — Results and its appendices made concise: insight-led main text, six appendix tables
+
+**Date:** 2026-10-06 · **Status:** DONE · **Evidence:** `overleaf_source_04102026/6_results.tex`,
+`appendices/results.tex`, `branch_domain.tex`, `paraphrase.tex`, `conditions.tex`, `error_analysis.tex`;
+`full_run_28092026/paper_results.py --check` (every block current, every phrase present, every number generated);
+`docs/check_plan_claims.py` (123 of 123)
+
+The owner's rules for the results text: a table or figure carries the numbers and the prose does not repeat them; the
+main text states headline numbers and insights only; paragraphs carry run-in headings and lists where items are
+parallel; a table only where one is needed, one table rather than several small ones.
+
+- **Main text.** Every paragraph opens with a run-in heading that states its finding (two tiers with no order within
+  the top; the lower tier partly a decoding setting; final answers and milestones rank different things; what the
+  process measures see; weak spots by model, not branch; difficulty separating only the lower tier; depth and the
+  reasoning setting; error types matching what helps; where the top tier still loses points); the four bounding
+  checks are one list. 5.3 runs 729 words and 5.4 278 (935 and 343 committed, 1,264 and 477 before this pass).
+- **Appendix tables: 29 committed, 24 before this pass, 6 now.** Branch and domain in one table; the level gap with
+  the depth of the gold derivation in one; coverage with the diagnostics in one; one each for the paraphrase, the
+  conditions and the error readings. The pairwise comparisons, the scoring-rule sensitivity, the paraphrase funnel and
+  repeats, the flagship anchors, the template readings and the prescribed-digit counts are short prose; consistency,
+  instance variance, completion tokens and the wrong-answer attribution are left out, since no sentence of the main
+  text rests on them. Secondary test counts sit in the captions.
+- **Appendix prose:** 2,995 words committed, 1,947 now; run-in headings throughout, lists for the conditions, the
+  taxonomy and the template readings; a float setting at the head of the results appendices lets up to three floats
+  share the top of a page.
+- **A dependency kept working:** `appendices/validation.tex` (another session's file) now prints the judged step
+  check's precision row in a new layout; `paper_results.py` reads either layout.
+
+## D-195 — Results and its appendices rewritten around the process measures; Table 1 redesigned; the experiments appendix renamed
+
+**Date:** 2026-10-06 · **Status:** DONE, awaiting the owner's review before the commit · **Evidence:**
+`overleaf_source_04102026/6_results.tex`, `appendices/results.tex`, `branch_domain.tex`, `paraphrase.tex`,
+`further_experiments.tex` (renamed from `conditions.tex`), `error_analysis.tex`, `7_appendix.tex`;
+`full_run_28092026/paper_results.py --check` (every block current, every phrase present, every number generated);
+`docs/check_plan_claims.py` (123 of 123)
+
+- **Why.** The owner found the D-194 text number-dense but insight-poor: it restated Table 1, carried appendix-grade
+  detail in the main text (τ, per-model flag ranges, symbolic and prescribed-digit counts) and left the paraphrase,
+  open-book and open-tool experiments as one clause. Both ARR rejections had faulted the results as "lack of profound
+  insights" and "largely descriptive", and two reviewers had asked for tool and retrieval baselines. The paper's claim
+  is process supervision, so the results are now organised around what the derivation shows that the answer cannot.
+- **Structure kept, one subsubsection added.** 5.3.1 Overall Model Performance (four paragraphs: two tiers and no order
+  within the top; a correct answer does not certify its derivation; wrong answers fail late; the tiers hold under
+  paraphrase, tolerance and repeats), 5.3.2 Performance by Engineering Branch and Domain, 5.3.3 Performance by
+  Difficulty Level (the depth of the gold derivation added), 5.3.4 Reasoning, Equations, and Tools (new: the three
+  experiments read on both measures), 5.4 Error Analysis (the expert reading as the human process reading, then where
+  the top tier still loses points). Run-in headings, short noun phrases in title case (Two Tiers, No Order Within the
+  Top; Derivations Behind Correct Answers; Derivations Behind Wrong Answers; Robustness), appear only in 5.3.1, as the
+  owner permitted; the other subsubsections and 5.4 are plain paragraphs that lead with their finding. Table 1's caption
+  is cut to the May shape (what the columns are, gray and bold, the footnote marks); the flag caveat and the pair counts
+  live in the text. The orientation sentence sits under 5.3.1 after the table, not before the heading (second pass,
+  the same day, on the owner's six points).
+- **Table 1 redesigned** as the answer measures beside the derivation measures: FAC and all 15 instances solved;
+  MC, arithmetic flags on correct answers with the calculations read per response, judged step flags on correct
+  answers. The three per-level FAC columns move to the appendix level table (`tab:level_gap`), whose permutation-test
+  column moves to its caption. The flag columns carry no bold, and the caption states their precision, recall and
+  dependence on displayed arithmetic.
+- **Appendix.** `conditions.tex` renamed `further_experiments.tex` (section "Further Experiments: Reasoning Effort,
+  Flagship Anchors, Open Book, and Open Tool", label `appendix:experiments`, table `tab:experiments`); "condition"
+  became "experiment" throughout. Each results appendix opens with the question it answers and the main-text
+  paragraph it supports. The coverage table keeps the column the main text rests on (the share of wrong answers with a
+  missing milestone), drops the flag-rate columns Table 1 now carries and two unread columns (judged step flags on wrong
+  answers; MC by matching over all responses), and gets plain headers; the branch-and-domain table moves to the Branch
+  and Domain appendix beside its two figures, whose prose now states the lowest branch per model (chemical for five,
+  electrical for three, industrial for two, civil for one); every appendix caption is cut to the Table 1 pattern, the
+  level table's two secondary results (the permutation count; GLM-5.3's gap over readable answers) moved into the
+  prose; the two undefined scoring-rule readings are glossed; the float-parameter block at the head of Full Results is
+  dropped, since the ARR guide warns against template tweaks; run-in headings are title case throughout. Six appendix
+  tables, as before; no figure redrawn.
+- **Claims checked against the record.** Milestone coverage on wrong answers is stated for the five models with more
+  than 100 wrong answers (44% to 59%; the earlier 44% to 81% rested on `GLM-5.3`'s seven wrong answers);
+  hallucination readings are 13 of 480 (the notes' 16 was wrong); of the top five's 171 incorrect verdicts, 49 remain
+  after the two chemical templates, the symbolic answers and the prescribed-digit near misses, and they are stated as
+  incorrect verdicts, not as errors, since the experts' reading of the check's incorrect verdicts (B1) called 12 of
+  98 correct. The judged-step share on wrong answers is 89%, not the hand-rounded 90%, which the phrase check caught.
+- **Left for the owner:** the one word in `6_experiments.tex` ("the further conditions also use", another session's
+  file); the abstract's two results sentences and contribution 3, which can now be sharpened to the process findings.
+
 ## D-196 — Appendices F and H made concise: parameterization by principle, certification at 60% of its length
 
 **Date:** 2026-10-06 · **Status:** DONE · **Evidence:** `overleaf_source_04102026/appendices/template_examples.tex`,

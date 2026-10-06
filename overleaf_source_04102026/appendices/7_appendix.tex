@@ -34,10 +34,14 @@
 \input{sections/appendices/models}
 
 % -------------
-% Full results: the extended tables, every pairwise comparison, branch, level, domain and answer-kind
-% means, the level gap under its variations, sensitivity, consistency, depth, repeats, coverage and
-% diagnostic details (tables written by full_run_28092026/paper_results.py --write).
+% Full results: the pairwise comparisons, the scoring rules, coverage behind wrong answers, the level
+% gap and depth (tables written by full_run_28092026/paper_results.py --write).
 \input{sections/appendices/results}
+
+% -------------
+% Branch and domain performance: FAC by branch and by domain for every model (table) and four
+% representative models (figures), written by full_run_28092026/paper_results.py --write.
+\input{sections/appendices/branch_domain}
 
 % -------------
 % Paraphrase test: design, scripted and expert checks, the funnel, the results, the noise
@@ -45,9 +49,9 @@
 \input{sections/appendices/paraphrase}
 
 % -------------
-% Additional conditions on the 450-instance subset: reasoning effort, flagship anchors, governing
-% equations, a code tool (tables written by full_run_28092026/paper_results.py --write).
-\input{sections/appendices/conditions}
+% Further experiments on the 450-instance subset: reasoning effort, flagship anchors, open book,
+% open tool (table written by full_run_28092026/paper_results.py --write).
+\input{sections/appendices/further_experiments}
 
 % -------------
 % Error analysis: taxonomy and protocol, the sample, agreement, results by model and level, the

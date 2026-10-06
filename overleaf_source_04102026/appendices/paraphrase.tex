@@ -2,138 +2,76 @@
 \section{Paraphrase Test}
 \label{appendix:paraphrase}
 
-This section supports the paraphrase result of~\autoref{subsec:overall_performance}: the design of
-the test, the scripted and expert checks, and the results in full.
+Because every instance of a template shares its wording, a model could recognize a problem from the
+wording alone and reproduce a method it has memorized for it.
+This section gives the design and the results of the paraphrase test
+of~\autoref{subsec:overall_performance}, which bounds how much the wording is worth.
 
-\paragraph{Design.}
-Fixed template wording could let a model recognize a problem type and reproduce a memorized method,
-so we test whether the wording alone moves the scores.
-A paraphrase keeps every number, unit, symbol, formula, acronym, and labeled part of a question in
-place and changes only the wording.
-For every template we select three of its 15 instances (450 instances) and paraphrase each once with
-an LLM from a family outside both the evaluated models and the judge.
-A script checks each paraphrase (the numbers as a multiset, every technical token, the part labels,
-a word similarity to the original of at most 0.75, the length, and no preamble), restores the
-original's notation where the writer used symbols the original lacks, and gives the writer three
-attempts.
-A domain expert of the instance's branch then reads each passing pair and keeps it only if the
-paraphrase is the same problem with the same answer and adds nothing; the experts rejected 12\% of
-the pairs that passed every scripted check, almost always for a dropped or altered qualifier that
-changes the physics or the asked quantity, such as whether a shaft is solid or a flow is uniform.
-The eleven models answer the paraphrases under the main run's prompt, settings, and scoring, on the
-same served checkpoints, against the original instances' gold answers and milestones.
-\autoref{tab:paraphrase_funnel} gives the funnel from the 450 instances to the 277 kept pairs on 115
-templates: the 29 templates with no passing paraphrase are formula-bound ones whose technical tokens
-the writer could not keep in place, and six more lost their last kept pair at the expert step, so
-the test covers the 115 templates whose problems could be paraphrased without loss, and industrial
-engineering is the least covered branch.
+\paragraph{Design.} We select three of every template's 15 instances (450 instances) and paraphrase
+each once with \texttt{Mistral Large 3}, an LLM from a family outside both the evaluated models and
+the judge (the writer), keeping every number, unit, symbol, formula, acronym, and labeled part in
+place.
+A paraphrase must pass two checks:
+\begin{itemize}[nosep, leftmargin=*]
+\item \emph{Scripted:} the numbers as a multiset, every technical token, the part labels, a word
+similarity to the original of at most 0.75, the length, and no preamble, with three attempts per
+instance and the original's notation restored where the writer used symbols the original lacks.
+\item \emph{Expert:} a domain expert of the instance's branch keeps a pair only if it is the same
+problem with the same answer and adds nothing.
+\end{itemize}
+Of the 450 instances, 316 pass the scripted checks and the domain experts keep 277 pairs on 115
+templates; most rejections are for a dropped or altered qualifier that changes the physics or the
+asked quantity, which the scripted checks had passed, and the templates left out are mostly
+formula-bound ones whose technical tokens the writer does not keep in place.
+The eleven models answer the kept paraphrases under the evaluation's prompt, settings, and scoring.
 
-% BEGIN GENERATED tab:paraphrase_funnel (full_run_28092026/paper_results.py --write)
-\begin{table}[t]
-\centering
-\small
-\begin{tabular}{p{0.72\columnwidth} r}
-\toprule
-\rowcolor{gray!10}
-\textbf{Step} & \textbf{Count} \\
-\midrule
-Instances selected (one in five of every template) & 450 \\
-Paraphrases that pass the scripted checks (at the first, second, third attempt) & 316 (264, 39, 13) \\
-Instances with no passing paraphrase after three attempts & 134 \\
-Failed attempts by check: technical tokens, numbers, near-copy, part labels, length & 362, 163, 75, 20, 13 \\
-Passing paraphrases with the original's notation restored & 35 \\
-Pairs the domain experts kept & 277 \\
-Pairs rejected: not the same problem, adds information, different answer & 39: 31, 24, 4 \\
-Kept of passing, per branch & Chemical 65 of 71; Civil 60 of 71; Electrical 61 of 64; Industrial 43 of 49; Mechanical 48 of 61 \\
-Templates covered & 115 (29 with no passing paraphrase, 6 more with no kept pair) \\
-\bottomrule
-\end{tabular}
-\caption{\textbf{The Paraphrase Funnel.} From the instances selected to the pairs the domain experts kept.}
-\label{tab:paraphrase_funnel}
-\end{table}
-% END GENERATED tab:paraphrase_funnel
-
-\paragraph{Results.}
-\autoref{tab:paraphrase_results} and~\autoref{fig:paraphrase} give, per model, the paired change
-paraphrase minus original in FAC and in MC with and without the judge, with 95\% intervals, the
-Holm-adjusted $p$ of the sign-flip test over templates, the smallest change the design detects, and
-the 90\% interval against the $\pm 0.05$ margin, which equals the paired difference the design was
-planned to detect and was fixed after the point estimates were known.
-On these 277 pairs, the paired change in FAC lies between $-0.031$ and $+0.020$ across the eleven
-models, and no change is significant after correction; ten of the eleven 90\% intervals lie within
-the margin, and \texttt{Qwen3-235B-2507}'s reaches $-0.067$, so a five-point drop is not ruled out
-for that model; MC changes by the same small amounts.
-Two 90\% intervals lie wholly below zero (\texttt{Claude Sonnet 5} and \texttt{GLM-5.3-Flash}) and
-one wholly above (\texttt{Muse Glimmer 30B}): small changes the data favor within the bound, which
-the corrected tests do not support, and which we do not call findings.
-Kendall's $\tau$ between the models' ordering on the originals and on the paraphrases is 0.673 (95\%
-CI 0.455 to 0.881).
-Sampling noise alone, measured by splitting each template's kept pairs into two random halves and
-ordering the models on each, gives a median $\tau$ of 0.782 (quartiles 0.721 to 0.855, 5th
-percentile 0.624), so the observed agreement sits at the lower edge of the noise distribution: the
-tiers hold under paraphrase, and the order within the top tier is not resolved by this test.
+\paragraph{Results.} Paraphrase moves no model across a tier.
+On the 277 kept pairs, no change in FAC holds after correction, and read against the $\pm 0.05$
+margin, which equals the paired difference the design detects at 80\% power, the 90\% interval lies
+within it for every model but \texttt{Qwen3-235B-2507} (\autoref{tab:paraphrase}).
+Three intervals lie wholly on one side of zero (\texttt{Claude Sonnet 5} and \texttt{GLM-5.3-Flash}
+below, \texttt{Muse Glimmer 30B} above): small changes the data lean toward but the corrected test
+does not support.
+The models' ordering on the paraphrases agrees with their ordering on the originals with Kendall's
+$\tau$ 0.673 (95\% interval 0.455 to 0.881), at the lower edge of what sampling noise alone gives,
+since two random halves of the same pairs agree with a median $\tau$ of 0.782 (quartiles 0.721 to
+0.855); the tiers hold under paraphrase, and the test does not resolve the order inside the top
+tier.
+For the four models decoded three more times on 300 instances, FAC varies by a standard deviation of
+0.004 to 0.013 across repeats, and the paraphrase change lies within the spread of the repeats'
+changes for three of the four and beyond it for \texttt{Qwen3-235B-2507}: for most models,
+paraphrase is no larger than decoding noise.
 The test bounds memorized wording, not memorized methods, since the numbers and the problem
-structure are kept.
-\autoref{tab:paraphrase_repeats} sets the paraphrase change beside run-to-run decoding noise for the
-four models with decoding repeats; the paraphrase change lies within the repeats' spread for three
-of them and beyond it for \texttt{Qwen3-235B-2507}.
+structure are kept, and it covers the 115 templates that can be paraphrased without loss, which are
+the less formula-bound ones.
 
-% BEGIN GENERATED tab:paraphrase_results (full_run_28092026/paper_results.py --write)
+% BEGIN GENERATED tab:paraphrase (full_run_28092026/paper_results.py --write)
 \begin{table*}[t]
 \centering
-\small
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{l r c c c r r c c}
+\footnotesize
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{l c c r r}
 \toprule
 \rowcolor{gray!10}
-\textbf{Model} & \textbf{FAC change} & \textbf{95\% CI} & \textbf{90\% CI} & \textbf{Within $\pm 0.05$} & \textbf{$p$ (Holm)} & \textbf{Detectable} & \textbf{MC, no judge} & \textbf{MC} \\
+\textbf{Model} & \textbf{FAC change (95\% interval)} & \textbf{90\% interval} & \textbf{$p$ (Holm)} & \textbf{MC change} \\
 \midrule
-\texttt{DeepSeek V4.1 Flash} & $-0.007$ & $-0.029$ to 0.015 & $-0.025$ to 0.011 & yes & 1.000 & 0.027 & $+0.007$ ($-0.014$ to 0.029) & $0.000$ ($-0.019$ to 0.022) \\
-\texttt{Kimi K3} & $0.000$ & $-0.009$ to 0.011 & $-0.008$ to 0.009 & yes & 1.000 & 0.012 & $-0.008$ ($-0.029$ to 0.012) & $-0.004$ ($-0.024$ to 0.016) \\
-\texttt{Claude Sonnet 5} & $-0.020$ & $-0.037$ to $-0.006$ & $-0.034$ to $-0.007$ & yes & 0.341 & 0.020 & $-0.008$ ($-0.025$ to 0.008) & $-0.006$ ($-0.023$ to 0.012) \\
-\texttt{GLM-5.3-Flash} & $-0.022$ & $-0.043$ to $-0.002$ & $-0.039$ to $-0.005$ & yes & 0.647 & 0.026 & $-0.031$ ($-0.053$ to $-0.009$) & $-0.009$ ($-0.029$ to 0.009) \\
-\texttt{Muse Glimmer 30B} & $+0.020$ & 0.003--0.040 & 0.005--0.036 & yes & 0.647 & 0.041 & $-0.014$ ($-0.041$ to 0.011) & $-0.010$ ($-0.037$ to 0.014) \\
-\texttt{GLM-5.3} & $-0.007$ & $-0.032$ to 0.016 & $-0.028$ to 0.012 & yes & 1.000 & 0.041 & $0.000$ ($-0.021$ to 0.021) & $-0.009$ ($-0.030$ to 0.011) \\
-\texttt{Qwen3-235B-2507} & $-0.031$ & $-0.074$ to 0.011 & $-0.067$ to 0.005 & no & 1.000 & 0.052 & $-0.005$ ($-0.027$ to 0.017) & $-0.010$ ($-0.033$ to 0.012) \\
-\texttt{Gemini 3.1 Flash-Lite} & $+0.007$ & $-0.032$ to 0.046 & $-0.025$ to 0.040 & yes & 1.000 & 0.064 & $+0.006$ ($-0.012$ to 0.025) & $+0.003$ ($-0.014$ to 0.021) \\
-\texttt{Gemma 4 26B} & $+0.007$ & $-0.035$ to 0.047 & $-0.028$ to 0.040 & yes & 1.000 & 0.064 & $+0.022$ (0.002--0.045) & $+0.018$ (0.000--0.037) \\
-\texttt{GPT-5.4 mini} & $-0.018$ & $-0.053$ to 0.018 & $-0.047$ to 0.011 & yes & 1.000 & 0.056 & $-0.027$ ($-0.053$ to $-0.003$) & $-0.011$ ($-0.038$ to 0.015) \\
-\texttt{gpt-oss-20b} & $+0.011$ & $-0.036$ to 0.057 & $-0.028$ to 0.050 & yes & 1.000 & 0.073 & $-0.009$ ($-0.042$ to 0.024) & $-0.014$ ($-0.046$ to 0.017) \\
+\texttt{DeepSeek V4.1 Flash} & $-0.007$ ($-0.029$ to 0.015) & $-0.025$ to 0.011 & 1.000 & $0.000$ \\
+\texttt{Kimi K3} & $0.000$ ($-0.009$ to 0.011) & $-0.008$ to 0.009 & 1.000 & $-0.004$ \\
+\texttt{Claude Sonnet 5} & $-0.020$ ($-0.037$ to $-0.006$) & $-0.034$ to $-0.007$ & 0.341 & $-0.006$ \\
+\texttt{GLM-5.3-Flash} & $-0.022$ ($-0.043$ to $-0.002$) & $-0.039$ to $-0.005$ & 0.647 & $-0.009$ \\
+\texttt{Muse Glimmer 30B} & $+0.020$ (0.003--0.040) & 0.005--0.036 & 0.647 & $-0.010$ \\
+\texttt{GLM-5.3} & $-0.007$ ($-0.032$ to 0.016) & $-0.028$ to 0.012 & 1.000 & $-0.009$ \\
+\texttt{Qwen3-235B-2507} & $-0.031$ ($-0.074$ to 0.011) & $-0.067$ to 0.005 & 1.000 & $-0.010$ \\
+\texttt{Gemini 3.1 Flash-Lite} & $+0.007$ ($-0.032$ to 0.046) & $-0.025$ to 0.040 & 1.000 & $+0.003$ \\
+\texttt{Gemma 4 26B} & $+0.007$ ($-0.035$ to 0.047) & $-0.028$ to 0.040 & 1.000 & $+0.018$ \\
+\texttt{GPT-5.4 mini} & $-0.018$ ($-0.053$ to 0.018) & $-0.047$ to 0.011 & 1.000 & $-0.011$ \\
+\texttt{gpt-oss-20b} & $+0.011$ ($-0.036$ to 0.057) & $-0.028$ to 0.050 & 1.000 & $-0.014$ \\
 \bottomrule
 \end{tabular}
-}
-\caption{\textbf{Change Under Paraphrase.} Paraphrase minus original on the 277 expert-kept pairs over 115 templates: the change in FAC with its 95\% and 90\% intervals, whether the 90\% interval lies within $\pm 0.05$, the Holm-adjusted $p$ of the sign-flip test over templates, the smallest change the design detects, and the change in MC by matching alone and with the judge (95\% intervals).}
-\label{tab:paraphrase_results}
+\caption{\textbf{Change Under Paraphrase.} Paraphrase minus original on the 277 expert-kept pairs
+over 115 templates, positive when the paraphrase scores higher: the change in FAC with its 95\%
+interval, its 90\% interval read against the $\pm 0.05$ margin, the Holm-adjusted $p$ of the
+sign-flip test over templates, and the change in MC.}
+\label{tab:paraphrase}
 \end{table*}
-% END GENERATED tab:paraphrase_results
-
-% BEGIN GENERATED fig:paraphrase (full_run_28092026/paper_results.py --write)
-\begin{figure}[t]
-    \centering
-    \includegraphics[width=\columnwidth]{figs/paraphrase.pdf}
-    \caption{\textbf{Change in Final Answer Accuracy Under Paraphrase.} Paraphrase minus original on the 277 expert-kept pairs, with 90\% intervals against the shaded $\pm 0.05$ margin; filled markers mark the ten models whose interval lies within the margin.}
-    \label{fig:paraphrase}
-\end{figure}
-% END GENERATED fig:paraphrase
-
-% BEGIN GENERATED tab:paraphrase_repeats (full_run_28092026/paper_results.py --write)
-\begin{table*}[t]
-\centering
-\small
-\resizebox{\textwidth}{!}{%
-\begin{tabular}{l c c c c}
-\toprule
-\rowcolor{gray!10}
-\textbf{Model} & \textbf{Paraphrase} & \textbf{Repeat 1} & \textbf{Repeat 2} & \textbf{Repeat 3} \\
-\midrule
-\texttt{Qwen3-235B-2507} & $-0.031$ ($-0.074$ to 0.011) & $-0.002$ ($-0.030$ to 0.028) & $+0.005$ ($-0.023$ to 0.035) & $+0.005$ ($-0.025$ to 0.033) \\
-\texttt{Gemini 3.1 Flash-Lite} & $+0.007$ ($-0.032$ to 0.046) & $-0.005$ ($-0.027$ to 0.017) & $-0.012$ ($-0.035$ to 0.012) & $+0.007$ ($-0.015$ to 0.030) \\
-\texttt{Gemma 4 26B} & $+0.007$ ($-0.035$ to 0.047) & $-0.020$ ($-0.055$ to 0.015) & $-0.003$ ($-0.037$ to 0.028) & $+0.005$ ($-0.020$ to 0.030) \\
-\texttt{gpt-oss-20b} & $+0.011$ ($-0.036$ to 0.057) & $+0.003$ ($-0.030$ to 0.035) & $+0.012$ ($-0.022$ to 0.043) & $+0.007$ ($-0.028$ to 0.040) \\
-\bottomrule
-\end{tabular}
-}
-\caption{\textbf{Paraphrase Against Decoding Noise.} For the four models with decoding repeats: the change in FAC under paraphrase (277 pairs) beside each repeat's change from the main run on the 300 repeated instances, with 95\% intervals.}
-\label{tab:paraphrase_repeats}
-\end{table*}
-% END GENERATED tab:paraphrase_repeats
+% END GENERATED tab:paraphrase

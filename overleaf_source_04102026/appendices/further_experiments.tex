@@ -1,0 +1,105 @@
+% -------------
+\section{Further Experiments: Reasoning Effort, Flagship Anchors, Open Book, and Open Tool}
+\label{appendix:experiments}
+
+Four experiments extend the evaluation, each answering one question it leaves open, and
+\autoref{subsec:reasoning_equations_tools} reads them.
+Each runs on the originals of the 450-instance subset (three instances per template) with the
+evaluation's prompt, output ceiling, and scoring, and changes one thing.
+We pair each experiment with the evaluation's responses on the same instances
+(\autoref{tab:experiments}) and read the 90\% interval against the $\pm 0.05$ margin, beside a
+sign-flip test over templates, Holm-corrected within the experiment, and the smallest change the
+experiment detects at 80\% power.
+
+\paragraph{Reasoning Effort.} Do the two closed models that return no reasoning tokens at their
+providers' defaults, \texttt{GPT-5.4 mini} and \texttt{Gemini 3.1 Flash-Lite}, score differently
+when they reason?
+Each answers the subset again with the serving API's reasoning-effort parameter set to medium and
+nothing else changed.
+The setting lifts \texttt{GPT-5.4 mini} beyond the margin on FAC and on MC and lowers its
+arithmetic flags on correct answers, with its largest point change on Advanced templates, whose
+level intervals overlap those of the other levels; it moves \texttt{Gemini 3.1 Flash-Lite} by less
+than the experiment detects.
+Where the setting works, it changes the derivation and not only the answer: more milestones
+stated, fewer slips behind correct answers.
+One of the two models moves, so the setting does not close the lower tier's gap in general.
+
+\paragraph{Flagship Anchors.} Does a flagship exceed the top tier, or is the ceiling an artifact of
+a roster without one?
+\texttt{GPT-5.4} and \texttt{DeepSeek V4 Pro}, the two flagships that pass the selection rule
+(\autoref{appendix:models}), answer the same subset at their providers' defaults, and
+\texttt{GPT-5.4}, whose default returns no reasoning tokens, also with reasoning at medium effort;
+an anchor is a reference point outside the pairwise tests, so no test is run against it.
+Neither exceeds the top tier: \texttt{DeepSeek V4 Pro} scores 0.968 and \texttt{GPT-5.4} 0.941 at
+its default and 0.980 with reasoning, against 0.964 to 0.976 for the top five on the same instances,
+whose intervals contain both reasoning anchors; on Advanced templates the anchors score 0.87 to 0.95
+and the top five 0.92 to 0.95.
+The ceiling is therefore not for want of a flagship.
+The one paired test among the anchors, \texttt{GPT-5.4} with reasoning against its default, is the
+last row of~\autoref{tab:experiments} and shows the reasoning-effort result again.
+
+\paragraph{Open Book.} Does recall of the governing equations limit the scores?
+For the 135 templates whose code states their governing equations, the question carries them as a
+handbook block, one per line, with no data tables or constants (405 instances); one top-tier model
+and two lower-tier ones, one closed and one open-weights, answer: \texttt{Claude Sonnet 5},
+\texttt{GPT-5.4 mini}, and \texttt{gpt-oss-20b}.
+The equations lift \texttt{gpt-oss-20b}, partly because fewer of its responses run out of room
+(the change on the 388 instances it answered in both runs is $+0.043$), and leave the two closed
+models within the margin, while MC rises for all three, consistent with the equations prompting the
+responses to state the intermediates.
+Recall of the equations is thus part of what bounds the weakest model and no part of what bounds
+the closed ones.
+The experiment supplies equations and no data tables, so it bounds what formula recall adds and not
+what a property lookup would.
+
+\paragraph{Open Tool.} Does arithmetic execution limit the scores?
+The model may call a Python interpreter with NumPy, SciPy, and SymPy up to 8 times before one final
+turn without it; each script runs isolated, with no credentials, a 20 s limit, and its output
+truncated at 4,000 characters, behind a filter that refuses file-system, network, process, and
+introspection access.
+The two closed models answer, since no endpoint that meets the selection rule serves
+\texttt{gpt-oss-20b}'s tool calls.
+The interpreter changes neither model's FAC or MC beyond the margin, though
+\texttt{GPT-5.4 mini}'s arithmetic flags on correct answers fall.
+Whether to call it is the model's choice, \texttt{Claude Sonnet 5} on 66\% of the instances and
+\texttt{GPT-5.4 mini} on 19\%, and both score lower on the instances where they call it than where
+they do not: the models reach for the tool on the problems they find harder, and the experiment
+bounds what an offered tool adds, not what required use would.
+No experiment says where the remaining errors lie; that is the question of the expert reading
+in~\autoref{subsec:error_analysis}.
+
+% BEGIN GENERATED tab:experiments (full_run_28092026/paper_results.py --write)
+\begin{table*}[t]
+\centering
+\footnotesize
+\renewcommand{\arraystretch}{1.1}
+\adjustbox{max width=\textwidth}{%
+\begin{tabular}{l r r r c r r c r c}
+\toprule
+\rowcolor{gray!10}
+\textbf{Model} & \textbf{Instances} & \textbf{\makecell{FAC,\\evaluation}} & \textbf{\makecell{FAC,\\experiment}} & \textbf{\makecell{Change\\(95\% interval)}} & \textbf{$p$ (Holm)} & \textbf{Detectable} & \textbf{90\% interval} & \textbf{\makecell{MC\\change}} & \textbf{\makecell{Arithmetic flags,\\evaluation / experiment}} \\
+\midrule
+\rowcolor{gray!10}\multicolumn{10}{l}{\textit{Reasoning at medium effort}} \\
+\texttt{GPT-5.4 mini} & 450 & 0.858 & 0.951 & $+0.093$ (0.056--0.133) & $<$0.001 & 0.055 & 0.062--0.126 & $+0.061$ & 0.127 / 0.069 \\
+\texttt{Gemini 3.1 Flash-Lite} & 450 & 0.874 & 0.890 & $+0.016$ ($-0.010$ to 0.042) & 0.296 & 0.038 & $-0.007$ to 0.038 & $+0.015$ & 0.082 / 0.068 \\
+\rowcolor{gray!10}\multicolumn{10}{l}{\textit{Open book: governing equations supplied}} \\
+\texttt{gpt-oss-20b} & 405 & 0.816 & 0.880 & $+0.064$ (0.027--0.104) & 0.003 & 0.055 & 0.033--0.098 & $+0.064$ & 0.163 / 0.178 \\
+\texttt{GPT-5.4 mini} & 405 & 0.851 & 0.832 & $-0.019$ ($-0.049$ to 0.014) & 0.580 & 0.045 & $-0.044$ to 0.009 & $+0.033$ & 0.124 / 0.162 \\
+\texttt{Claude Sonnet 5} & 405 & 0.969 & 0.977 & $+0.007$ ($-0.005$ to 0.022) & 0.580 & 0.021 & $-0.005$ to 0.020 & $+0.029$ & 0.144 / 0.128 \\
+\rowcolor{gray!10}\multicolumn{10}{l}{\textit{Open tool: Python interpreter offered}} \\
+\texttt{GPT-5.4 mini} & 450 & 0.858 & 0.853 & $-0.004$ ($-0.042$ to 0.036) & 1.000 & 0.055 & $-0.037$ to 0.029 & $+0.012$ & 0.127 / 0.093 \\
+\texttt{Claude Sonnet 5} & 450 & 0.971 & 0.976 & $+0.004$ ($-0.004$ to 0.014) & 1.000 & 0.014 & $-0.003$ to 0.013 & $-0.001$ & 0.134 / 0.129 \\
+\rowcolor{gray!10}\multicolumn{10}{l}{\textit{\texttt{GPT-5.4} with reasoning at medium effort, against its default}} \\
+\texttt{GPT-5.4} & 450 & 0.941 & 0.980 & $+0.039$ (0.016--0.067) & 0.002 & 0.037 & 0.019--0.061 & $+0.014$ & 0.119 / 0.032 \\
+\bottomrule
+\end{tabular}
+}
+\caption{\textbf{The Four Experiments Against the Evaluation.} Per model and experiment: the
+instances covered; FAC in the evaluation and under the experiment on those instances, paired by
+instance; the change with its 95\% interval, the Holm-adjusted $p$ of the sign-flip test over
+templates, the smallest change the experiment detects at 80\% power, and the 90\% interval read
+against the $\pm 0.05$ margin; the change in MC; and the share of correct-answer responses with an
+arithmetic flag in the evaluation and under the experiment (unpaired).}
+\label{tab:experiments}
+\end{table*}
+% END GENERATED tab:experiments
