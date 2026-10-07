@@ -1,6 +1,6 @@
 # Exact display-tie census
 
-Generated 2026-09-27T20:35:12+00:00 by `tie_census.py` at git `fb88cf1d19`, 500 seeds per template, 59.0 s. A tie is an emitted line whose exact value, recomputed in Decimal from the printed operands, sits exactly half-way at the printed precision; such an instance has no gold value a decimal reader and a binary reader agree on (D-016). Only lines T1 can parse are covered.
+Generated 2026-10-06T19:00:01+00:00 by `tie_census.py` at git `740ee256f4`, 500 seeds per template, 78.2 s. A tie is an emitted line whose exact value, recomputed in Decimal from the printed operands, sits exactly half-way at the printed precision; such an instance has no gold value a decimal reader and a binary reader agree on (D-016). Only lines T1 can parse are covered.
 
 | | Templates |
 |---|---:|

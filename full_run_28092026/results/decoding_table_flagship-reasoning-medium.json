@@ -7,7 +7,8 @@
    "openai/gpt-5.4": 450
   },
   "providers": {
-   "Azure": 450
+   "Azure": 449,
+   "OpenAI": 1
   },
   "rows": 450,
   "answered": 450,
@@ -31,22 +32,22 @@
    "stop": 450
   },
   "prompt_tokens": {
-   "median": 243.0
+   "median": 245.0
   },
   "completion_tokens": {
    "median": 1239.0,
    "p90": 2920,
-   "max": 8572
+   "max": 9522
   },
   "reasoning_tokens": {
    "median": 440.5,
    "p90": 1885,
-   "max": 6732,
+   "max": 7100,
    "share_above_zero": 0.9977777777777778,
    "unreported_rows": 0
   },
   "reasoning_text_share": 0.8466666666666667,
-  "billed_usd": 11.026,
+  "billed_usd": 11.133,
   "seconds_median": 12.17,
   "tool": null
  }

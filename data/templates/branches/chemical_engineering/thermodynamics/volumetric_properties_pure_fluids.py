@@ -686,6 +686,17 @@ def template_vdw_solve_for_volume():
 
 
 # Template 7 (Advanced)
+# The organic compounds of CRITICAL_PROPERTIES and the temperature above which
+# template_work_isothermal_virial does not hold them: they decompose before a
+# quasi-static compression can run (Layer 2 round 5; the experts' range was
+# about 700-750 K, and the owner chose 700 K). Read only by that template.
+_VIRIAL_ORGANICS = frozenset({
+    'Methane', 'Ethane', 'Propane', 'n-Butane', 'n-Pentane', 'n-Hexane', 'n-Heptane', 'n-Octane',
+    'Ethylene', 'Propylene', 'Benzene', 'Toluene', 'p-Xylene', 'Methanol', 'Ethanol', 'Acetone',
+})
+_VIRIAL_ORGANIC_T_MAX = 700.0  # K
+
+
 def template_work_isothermal_virial():
     """
     Work of Isothermal Compression for a Virial Gas
@@ -768,6 +779,49 @@ def template_work_isothermal_virial():
         recorded here and in the Layer 2 report. No number, text or sample
         changes.
 
+    Layer 2 round 5 (2026-10-06):
+        The three chemical experts, reading evaluated responses on
+        2026-10-03, found that the question decided neither the reading
+        (closed-system work -∫P dV, or steady-flow shaft work ∫V dP) nor
+        the form of the truncated virial equation (pressure-explicit
+        Z = 1 + B*P/(R*T), or the volume form Z = 1 + B/V): every response
+        they were shown was correct under one reading. The gold has always
+        computed one of them, the work done on the gas in a closed system,
+        W = -∫P dV, with the volume form throughout (screen pass 1) and B
+        from the Pitzer correlation with Abbott's B0 and B1. The question
+        now states exactly that: the closed system and the mechanically
+        reversible isothermal process, the work integral and its sign
+        (positive for a compression), the volume form written out, and
+        the B correlation by name; Step 1 names the same reading and form.
+        Re-solving each question from its own text then showed that the
+        stated reading does not always reach the gold: for helium, the
+        displayed chain (R*T at 2 dp, the work terms at 0.01 L·bar) moves a
+        work of tens of J/mol by up to 2% from the exact value, outside the
+        0.2% answer tolerance at 13 of the gate's 500 seeds, every one of
+        them helium. Such a draw, more than 0.1% from the exact work for
+        the stated data, is now redrawn, as a display tie is. Ranges,
+        constants and arithmetic are unchanged; an instance the guard does
+        not redraw is unchanged in every number (layer2/fixes_round5.md,
+        layer2/round5_checks.md).
+
+    Layer 2 round 5 verdicts (2026-10-06):
+        Two experts approved; one rejected on the objection of round 1:
+        the Vr >= 2 filter keeps only Tr of about 2 to 3, so organics are
+        compressed far above their decomposition range (n-pentane at
+        1135 K up to 142 bar), where no quasi-static compression of that
+        species can run; it asked for a temperature cap of about 700-750 K
+        on organics, or for dropping the substances left with no valid
+        state. With a second expert raising it, the owner adopted a cap of
+        700 K: a draw of an organic compound above it is redrawn. Eleven
+        of the 16 organics can then never meet the validity condition and
+        leave the template (n-butane to n-octane, benzene, toluene,
+        p-xylene, methanol, ethanol, acetone); methane, ethane, ethylene,
+        propane, propylene and the 11 inorganic substances remain. The
+        same expert's minor note is taken too: the solution's unspaced
+        '*' and '**' rendered as italics in the review app, so the
+        substituted lines now print '·' and '^'. No number changes
+        (layer2/fixes_round5.md).
+
     Returns:
         tuple: A tuple containing:
             - str: A question asking to compute the work of compression.
@@ -798,6 +852,12 @@ def template_work_isothermal_virial():
         P1 = round(P1_r * Pc, 2)
         P2 = round(P2_r * Pc, 2)
         Tr = _as_printed(T / Tc, '.3f')
+
+        # An organic compound held for a quasi-static compression above about
+        # 700 K decomposes (Layer 2 round 5): such a draw is redrawn. Checked
+        # after all four draws, so an attempt consumes the generator as before.
+        if substance_name in _VIRIAL_ORGANICS and T > _VIRIAL_ORGANIC_T_MAX:
+            continue
 
         # 2. Perform the core calculation. Every intermediate that is printed
         # and then consumed is bound through its own display first (D-016):
@@ -852,6 +912,24 @@ def template_work_isothermal_virial():
         term1 = _as_printed(RT * math.log(V2 / V1), '.2f')
         term2 = _as_printed(-BRT * ((1/V2) - (1/V1)), '.2f')
         W_virial_Lbar = _as_printed(-(term1 + term2), '.2f')
+
+        # The answer ends a chain of displayed values (Tr at 3 dp, B at 5, Z at
+        # 4, V at 5, R*T at 2, the terms at 2). For a light gas a few kelvin
+        # above its critical point (helium) the work is tens of J/mol, and the
+        # chain moves it by up to 2% from the work the stated data give, wider
+        # than the benchmark's 0.2% answer tolerance. A draw whose printed work
+        # lies more than 0.1%, half that tolerance, from the exact work for the
+        # stated data is redrawn (Layer 2 round 5); the ranges are unchanged.
+        Tr_x = T / Tc
+        B_x = (R * Tc / Pc) * ((0.083 - 0.422 / Tr_x**1.6)
+                               + omega * (0.139 - 0.172 / Tr_x**4.2))
+        disc_x = [(R * T) ** 2 + 4 * P * R * T * B_x for P in (P1, P2)]
+        if min(disc_x) <= 0:
+            continue
+        V1_x, V2_x = ((R * T + math.sqrt(d)) / (2 * P) for d, P in zip(disc_x, (P1, P2)))
+        W_exact_Lbar = -(R * T * math.log(V2_x / V1_x) - B_x * R * T * (1/V2_x - 1/V1_x))
+        if abs(W_virial_Lbar - W_exact_Lbar) > 0.001 * abs(W_exact_Lbar):
+            continue
         W_virial_J = W_virial_Lbar * 100  # Convert L·bar to Joules
 
         # For comparison, calculate ideal gas work
@@ -862,35 +940,45 @@ def template_work_isothermal_virial():
         raise RuntimeError(
             "work_isothermal_virial: no display-stable sample in 200 draws")
 
-    # 3. Generate the question and solution strings
+    # 3. Generate the question and solution strings. The question names the one
+    # reading the gold computes (Layer 2 round 5): a closed system, the work done
+    # on the gas as -∫P dV, the volume form of the virial equation, and B from the
+    # Pitzer correlation with Abbott's B0 and B1.
     question = (
-        f"Calculate the work in J/mol required to isothermally and reversibly "
-        f"compress 1 mole of {substance_name} from {P1} bar to {P2} bar at a "
-        f"constant temperature of {T} K. Base your calculation on the virial "
-        f"equation of state truncated to two terms. The properties for {substance_name} are:\n"
+        f"One mole of {substance_name} gas in a closed system (a piston-cylinder device) "
+        f"is compressed isothermally and mechanically reversibly from {P1} bar to "
+        f"{P2} bar at a constant temperature of {T} K. Calculate the work done on "
+        f"the gas in J/mol, W = -∫P dV taken from the initial to the final molar "
+        f"volume, so that W is positive for a compression. Base your calculation on "
+        f"the virial equation of state truncated to two terms in its volume form, "
+        f"Z = PV/(RT) = 1 + B/V, with the second virial coefficient B from the "
+        f"Pitzer correlation, B·Pc/(R·Tc) = B0 + ω·B1, using Abbott's equations "
+        f"for B0 and B1. The properties for {substance_name} are:\n"
         f"Tc = {Tc} K, Pc = {Pc} bar, ω = {omega}"
     )
 
     solution = (
-        f"**Step 1:** Define the pressure from the virial equation and find the analytical integral for work.\n"
+        f"**Step 1:** State the work for the closed system and the form of the virial equation, then integrate.\n"
+        f"For a mechanically reversible process in a closed system, the work done on the gas is W = -∫P dV from V1 to V2.\n"
+        f"The two-term virial equation in its volume form, Z = 1 + B/V, gives the pressure:\n"
         f"P = RT(1/V + B/V²)\n"
         f"The integrated form is: W = -(RT·ln(V2/V1) - BRT·(1/V2 - 1/V1))\n\n"
 
         f"**Step 2:** Calculate the second virial coefficient (B) at T = {T} K.\n"
         f"Reduced Temperature, Tr = T/Tc = {T}/{Tc} = {Tr}\n"
-        f"B0 = 0.083 - 0.422 / ({Tr})**1.6 = {B0}\n"
-        f"B1 = 0.139 - 0.172 / ({Tr})**4.2 = {B1}\n"
+        f"B0 = 0.083 - 0.422 / ({Tr})^1.6 = {B0}\n"
+        f"B1 = 0.139 - 0.172 / ({Tr})^4.2 = {B1}\n"
         f"B = (R·Tc/Pc) * (B0 + ω·B1) = {B} L/mol\n\n"
 
         f"**Step 3:** Determine the initial (V1) and final (V2) molar volumes from the same equation, Z = 1 + B/V. "
         f"With V = Z·R·T/P it becomes Z² - Z - B·P/(R·T) = 0, whose physical root is Z = (1 + sqrt(1 + 4·B·P/(R·T)))/2.\n"
-        f"Z1 = (1 + sqrt(1 + 4·B·P1/(R·T)))/2 = (1 + sqrt(1 + 4*{paren_neg(B)}*{P1}/({R}*{T})))/2 = {Z1}\n"
-        f"V1 = Z1·R·T/P1 = {Z1}*{R}*{T}/{P1} = {V1} L/mol\n"
-        f"Z2 = (1 + sqrt(1 + 4·B·P2/(R·T)))/2 = (1 + sqrt(1 + 4*{paren_neg(B)}*{P2}/({R}*{T})))/2 = {Z2}\n"
-        f"V2 = Z2·R·T/P2 = {Z2}*{R}*{T}/{P2} = {V2} L/mol\n\n"
+        f"Z1 = (1 + sqrt(1 + 4·B·P1/(R·T)))/2 = (1 + sqrt(1 + 4·{paren_neg(B)}·{P1}/({R}·{T})))/2 = {Z1}\n"
+        f"V1 = Z1·R·T/P1 = {Z1}·{R}·{T}/{P1} = {V1} L/mol\n"
+        f"Z2 = (1 + sqrt(1 + 4·B·P2/(R·T)))/2 = (1 + sqrt(1 + 4·{paren_neg(B)}·{P2}/({R}·{T})))/2 = {Z2}\n"
+        f"V2 = Z2·R·T/P2 = {Z2}·{R}·{T}/{P2} = {V2} L/mol\n\n"
 
         f"**Step 4:** Substitute V1 and V2 into the integrated work equation.\n"
-        f"W = -({RT}·ln({V2}/{V1}) {signed_term(-BRT)}*(1/{V2} - 1/{V1}))\n"
+        f"W = -({RT}·ln({V2}/{V1}) {signed_term(-BRT)}·(1/{V2} - 1/{V1}))\n"
         f"W = -({term1} {signed_term(term2)}) = {W_virial_Lbar} L·bar/mol\n\n"
 
         f"**Step 5:** Convert the work to the required units (J/mol).\n"

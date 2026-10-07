@@ -17,8 +17,8 @@
    "answered": 401,
    "empty": 4,
    "modes": {
-    "openbook": 156,
-    "openbook2": 249
+    "openbook": 153,
+    "openbook2": 252
    },
    "prompt_hashes": 1,
    "prompt_is_pilots": true,
@@ -42,18 +42,18 @@
    "think_in_text": 0,
    "empty_templates": {
     "template_slope_deflection_end_moment": 2,
-    "template_work_isothermal_virial": 1,
-    "template_rackett_equation_volume": 1
+    "template_rackett_equation_volume": 1,
+    "template_work_isothermal_virial": 1
    },
    "empty_by_template_all": {
-    "template_work_isothermal_virial": 1,
     "template_rackett_equation_volume": 1,
-    "template_slope_deflection_end_moment": 2
+    "template_slope_deflection_end_moment": 2,
+    "template_work_isothermal_virial": 1
    },
    "items_per_template": 3.0,
    "output_tokens_median": 1667,
    "output_tokens_max": 32768,
-   "billed_usd": 0.105
+   "billed_usd": 0.106
   },
   {
    "tool": null,
@@ -70,8 +70,8 @@
    "answered": 405,
    "empty": 0,
    "modes": {
-    "openbook": 156,
-    "openbook2": 249
+    "openbook": 153,
+    "openbook2": 252
    },
    "prompt_hashes": 1,
    "prompt_is_pilots": true,
@@ -94,8 +94,8 @@
    "empty_by_template_all": {},
    "items_per_template": 3.0,
    "output_tokens_median": 644,
-   "output_tokens_max": 1913,
-   "billed_usd": 1.4
+   "output_tokens_max": 2394,
+   "billed_usd": 1.409
   },
   {
    "tool": null,
@@ -112,8 +112,8 @@
    "answered": 405,
    "empty": 0,
    "modes": {
-    "openbook": 156,
-    "openbook2": 249
+    "openbook": 153,
+    "openbook2": 252
    },
    "prompt_hashes": 1,
    "prompt_is_pilots": true,
@@ -135,8 +135,8 @@
    "empty_by_template_all": {},
    "items_per_template": 3.0,
    "output_tokens_median": 1633,
-   "output_tokens_max": 13890,
-   "billed_usd": 9.986
+   "output_tokens_max": 23480,
+   "billed_usd": 10.225
   }
  ],
  "archive": {

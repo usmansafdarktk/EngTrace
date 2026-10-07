@@ -4,30 +4,37 @@
   {
    "tool": null,
    "key": "gpt-oss-20b",
-   "lines": 429,
+   "lines": 423,
    "malformed": 0,
    "states_all_rows": {
-    "answered": 426,
+    "answered": 420,
     "empty": 3
    },
-   "items": 429,
-   "items_missing": [],
+   "items": 423,
+   "items_missing": [
+    "adiabatic_flame_temperature#0",
+    "adiabatic_flame_temperature#10",
+    "adiabatic_flame_temperature#5",
+    "work_isothermal_virial#0",
+    "work_isothermal_virial#10",
+    "work_isothermal_virial#5"
+   ],
    "items_with_two_final_rows": 0,
    "rows_not_a_frozen_item": 0,
-   "answered": 426,
+   "answered": 420,
    "empty": 3,
    "modes": {
-    "openbook": 429
+    "openbook": 423
    },
    "prompt_hashes": 1,
    "prompt_is_pilots": true,
    "request_variants": 1,
    "served_models": {
-    "openai/gpt-oss-20b": 429
+    "openai/gpt-oss-20b": 423
    },
    "served_as_main": true,
    "providers": {
-    "Darkbloom": 429
+    "Darkbloom": 423
    },
    "provider_count": 1,
    "capped_with_text": 0,
@@ -48,36 +55,43 @@
     "template_sigma_reduction_for_cpk": 1
    },
    "items_per_template": 3.0,
-   "output_tokens_median": 1632,
+   "output_tokens_median": 1602,
    "output_tokens_max": 32768,
-   "billed_usd": 0.095
+   "billed_usd": 0.093
   },
   {
    "tool": null,
    "key": "gpt-5.4-mini",
-   "lines": 429,
+   "lines": 423,
    "malformed": 0,
    "states_all_rows": {
-    "answered": 429
+    "answered": 423
    },
-   "items": 429,
-   "items_missing": [],
+   "items": 423,
+   "items_missing": [
+    "adiabatic_flame_temperature#0",
+    "adiabatic_flame_temperature#10",
+    "adiabatic_flame_temperature#5",
+    "work_isothermal_virial#0",
+    "work_isothermal_virial#10",
+    "work_isothermal_virial#5"
+   ],
    "items_with_two_final_rows": 0,
    "rows_not_a_frozen_item": 0,
-   "answered": 429,
+   "answered": 423,
    "empty": 0,
    "modes": {
-    "openbook": 429
+    "openbook": 423
    },
    "prompt_hashes": 1,
    "prompt_is_pilots": true,
    "request_variants": 1,
    "served_models": {
-    "openai/gpt-5.4-mini": 429
+    "openai/gpt-5.4-mini": 423
    },
    "served_as_main": true,
    "providers": {
-    "Azure": 428,
+    "Azure": 422,
     "OpenAI": 1
    },
    "provider_count": 2,
@@ -89,36 +103,43 @@
    "empty_templates": {},
    "empty_by_template_all": {},
    "items_per_template": 3.0,
-   "output_tokens_median": 645,
-   "output_tokens_max": 1820,
-   "billed_usd": 1.494
+   "output_tokens_median": 641,
+   "output_tokens_max": 1728,
+   "billed_usd": 1.45
   },
   {
    "tool": null,
    "key": "claude-sonnet-5",
-   "lines": 429,
+   "lines": 423,
    "malformed": 0,
    "states_all_rows": {
-    "answered": 429
+    "answered": 423
    },
-   "items": 429,
-   "items_missing": [],
+   "items": 423,
+   "items_missing": [
+    "adiabatic_flame_temperature#0",
+    "adiabatic_flame_temperature#10",
+    "adiabatic_flame_temperature#5",
+    "work_isothermal_virial#0",
+    "work_isothermal_virial#10",
+    "work_isothermal_virial#5"
+   ],
    "items_with_two_final_rows": 0,
    "rows_not_a_frozen_item": 0,
-   "answered": 429,
+   "answered": 423,
    "empty": 0,
    "modes": {
-    "openbook": 429
+    "openbook": 423
    },
    "prompt_hashes": 1,
    "prompt_is_pilots": true,
    "request_variants": 1,
    "served_models": {
-    "anthropic/claude-sonnet-5": 429
+    "anthropic/claude-sonnet-5": 423
    },
    "served_as_main": true,
    "providers": {
-    "Claude Platform on AWS": 429
+    "Claude Platform on AWS": 423
    },
    "provider_count": 1,
    "capped_with_text": 0,
@@ -129,9 +150,9 @@
    "empty_templates": {},
    "empty_by_template_all": {},
    "items_per_template": 3.0,
-   "output_tokens_median": 1640,
+   "output_tokens_median": 1622,
    "output_tokens_max": 31927,
-   "billed_usd": 10.961
+   "billed_usd": 10.258
   }
  ],
  "archive": {

@@ -39,8 +39,8 @@
    "empty_by_template_all": {},
    "items_per_template": 3.0,
    "output_tokens_median": 737.5,
-   "output_tokens_max": 2125,
-   "billed_usd": 5.887
+   "output_tokens_max": 2945,
+   "billed_usd": 5.982
   },
   {
    "tool": null,
@@ -48,15 +48,15 @@
    "lines": 450,
    "malformed": 0,
    "states_all_rows": {
-    "answered": 447,
-    "empty": 3
+    "answered": 446,
+    "empty": 4
    },
    "items": 450,
    "items_missing": [],
    "items_with_two_final_rows": 0,
    "rows_not_a_frozen_item": 0,
-   "answered": 447,
-   "empty": 3,
+   "answered": 446,
+   "empty": 4,
    "modes": {
     "calibrate": 20,
     "flagship": 430
@@ -69,31 +69,29 @@
    },
    "served_as_main": null,
    "providers": {
-    "Baidu": 450
+    "Baidu": 444,
+    "StreamLake": 6
    },
-   "provider_count": 1,
-   "capped_with_text": 1,
-   "no_answer_marker": 2,
+   "provider_count": 2,
+   "capped_with_text": 0,
+   "no_answer_marker": 1,
    "no_marker_no_number": 0,
    "no_marker_templates": {
-    "template_work_isothermal_virial": 1,
     "template_rotating_unbalance": 1
    },
    "think_in_text": 0,
    "empty_templates": {
-    "template_adiabatic_flame_temperature": 1,
-    "template_work_isothermal_virial": 1,
+    "template_work_isothermal_virial": 3,
     "template_qr_policy_one_iteration": 1
    },
    "empty_by_template_all": {
-    "template_adiabatic_flame_temperature": 1,
-    "template_work_isothermal_virial": 1,
-    "template_qr_policy_one_iteration": 1
+    "template_qr_policy_one_iteration": 1,
+    "template_work_isothermal_virial": 3
    },
    "items_per_template": 3.0,
    "output_tokens_median": 2596.0,
    "output_tokens_max": 32768,
-   "billed_usd": 0.628
+   "billed_usd": 0.643
   }
  ],
  "archive": {

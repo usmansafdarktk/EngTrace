@@ -1,6 +1,6 @@
 # Layer 2 - certification status of every template
 
-Generated 2026-09-27T21:33:17+00:00 by `certification.py` at git `8b731dbf41` over 150 templates. A template is certified when the latest round that reviewed it is a unanimous approval by its three own-branch experts and the current code still produces, byte for byte, the five instances they were shown.
+Generated 2026-10-06T19:44:56+00:00 by `certification.py` at git `740ee256f4` over 150 templates. A template is certified when the latest round that reviewed it is a unanimous approval by its three own-branch experts and the current code still produces, byte for byte, the five instances they were shown.
 
 | Round | Labels | Built at | Templates reviewed | Verdicts |
 |---:|---|---|---:|---:|
@@ -8,20 +8,24 @@ Generated 2026-09-27T21:33:17+00:00 by `certification.py` at git `8b731dbf41` ov
 | 2 | `experts_filled_annotations_round_2` | `bc8aaf3` | 22 | 66 |
 | 3 | `experts_filled_annotations_round_3` | `9c5dc45` | 5 | 15 |
 | 4 | `experts_filled_annotations_round_4` | `fb88cf1` | 2 | 6 |
+| 5 | `experts_filled_annotations_round_5` | `740ee25` | 2 | 6 |
+| 6 | `experts_filled_annotations_round_6` | `740ee25` | 1 | 3 |
 
 | | Templates |
 |---|---:|
 | certified | 150 of 150 |
 | of which last reviewed in round 1 | 126 |
-| of which last reviewed in round 2 | 17 |
+| of which last reviewed in round 2 | 16 |
 | of which last reviewed in round 3 | 5 |
-| of which last reviewed in round 4 | 2 |
+| of which last reviewed in round 4 | 1 |
+| of which last reviewed in round 5 | 1 |
+| of which last reviewed in round 6 | 1 |
 | not certified | 0 |
 
 | Template | Branch | Last reviewed | Verdicts | Current output = reviewed | Certified |
 |---|---|---:|---|---|---|
 | `template_absorbing_chain_time_to_failure` | industrial | round 1 | A A A | yes | yes |
-| `template_adiabatic_flame_temperature` | chemical | round 4 | A A A | yes | yes |
+| `template_adiabatic_flame_temperature` | chemical | round 5 | A A A | yes | yes |
 | `template_aliased_frequency_identification` | electrical | round 1 | A A A | yes | yes |
 | `template_angle_of_twist` | mechanical | round 2 | A A A | yes | yes |
 | `template_annulus_flowrate` | chemical | round 2 | A A A | yes | yes |
@@ -167,6 +171,6 @@ Generated 2026-09-27T21:33:17+00:00 by `certification.py` at git `8b731dbf41` ov
 | `template_vorticity_check` | mechanical | round 1 | A A A | yes | yes |
 | `template_wave_equation_interpretation` | electrical | round 1 | A A A | yes | yes |
 | `template_wave_parameters_basic` | electrical | round 2 | A A A | yes | yes |
-| `template_work_isothermal_virial` | chemical | round 2 | A A A | yes | yes |
+| `template_work_isothermal_virial` | chemical | round 6 | A A A | yes | yes |
 | `template_xbar_known_sigma_classification` | industrial | round 1 | A A A | yes | yes |
 | `template_xbar_r_control_limits` | industrial | round 1 | A A A | yes | yes |

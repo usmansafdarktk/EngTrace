@@ -40,7 +40,7 @@
    "items_per_template": 3.0,
    "output_tokens_median": 1260.5,
    "output_tokens_max": 22637,
-   "billed_usd": 4.444
+   "billed_usd": 4.473
   },
   {
    "tool": null,
@@ -80,8 +80,8 @@
    "empty_by_template_all": {},
    "items_per_template": 3.0,
    "output_tokens_median": 1478.0,
-   "output_tokens_max": 3519,
-   "billed_usd": 1.097
+   "output_tokens_max": 4477,
+   "billed_usd": 1.108
   }
  ],
  "archive": {

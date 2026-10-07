@@ -30,12 +30,12 @@
    "stop": 450
   },
   "prompt_tokens": {
-   "median": 243.0
+   "median": 245.0
   },
   "completion_tokens": {
    "median": 737.5,
-   "p90": 1426,
-   "max": 2125
+   "p90": 1441,
+   "max": 2945
   },
   "reasoning_tokens": {
    "median": 0.0,
@@ -45,7 +45,7 @@
    "unreported_rows": 0
   },
   "reasoning_text_share": 0.0,
-  "billed_usd": 5.887,
+  "billed_usd": 5.982,
   "seconds_median": 7.125,
   "tool": null
  },
@@ -57,11 +57,12 @@
    "deepseek/deepseek-v4-pro": 450
   },
   "providers": {
-   "Baidu": 450
+   "Baidu": 444,
+   "StreamLake": 6
   },
   "rows": 450,
-  "answered": 447,
-  "empty": 3,
+  "answered": 446,
+  "empty": 4,
   "modes": {
    "calibrate": 20,
    "flagship": 430
@@ -87,22 +88,22 @@
    "length": 4
   },
   "prompt_tokens": {
-   "median": 240.0
+   "median": 241.0
   },
   "completion_tokens": {
    "median": 2596.0,
-   "p90": 6899,
+   "p90": 6911,
    "max": 32768
   },
   "reasoning_tokens": {
    "median": 1835.5,
-   "p90": 5870,
+   "p90": 6095,
    "max": 32768,
    "share_above_zero": 1.0,
    "unreported_rows": 0
   },
   "reasoning_text_share": 1.0,
-  "billed_usd": 0.628,
+  "billed_usd": 0.643,
   "seconds_median": 32.480000000000004,
   "tool": null
  }

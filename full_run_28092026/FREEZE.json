@@ -3877,7 +3877,278 @@
       }
     ]
   },
-  "manifest_sha256": "028c7a637eb4895ed061bcbf79a69c656c57f4adc327a4c81cc4faf6d898e2b3",
-  "pool_sha256": "a9b6adeed7e59b66c5afb63f1a457b05e50c1c95e968a006eaf06f0e080cf768",
-  "selection_rule": "For each template, examine instance indices 0 to 99. An index is\nnot a candidate when\n  - its question repeats one already seen for the template (a duplicate double-weights it);\n  - its question is one of the pilot slice's questions, which are public with their gold\n    and on whose traces the answer check was tuned;\n  - its gold solution carries an exact display tie on a line T1 can parse, the test of\n    template_annotation_23092026/layer0/tie_census.py: such an instance has no gold value\n    a decimal and a binary reader agree on (D-016). A tie on a line T1 cannot parse is\n    not seen;\n  - the template fails to generate it.\nThe candidates are grouped by reasoning path and answer form, the lower reading of\nfull_run_28092026/diversity.py: the gold's equation lines and its answer segment with numbers\nand question-varying words masked. The 15 instances are taken round-robin across the groups in\norder of first appearance, lowest index first within a group, so every reasoning path and\nanswer label the first 100 draws show is represented before any is repeated. A template with\none group keeps its first 15 candidates, exactly the instances D-114 froze. Rare branches are\ntherefore over-represented relative to how often a template produces them; FREEZE.json records\neach template's candidates, groups and groups selected.\nEvery template has 15 instances, the owner's rule (D-114). A template with fewer than 15\ncandidates keeps each distinct question once and fills its 15 with repeats in index order,\neach carrying repeat_of, the item_id of the first instance with its question, and FREEZE.json\nlists it under short_templates, so the number of distinct questions is never overstated."
+  "manifest_sha256": "f2c1dd2f16930171c388137e2ea3197eae85bdb9ac9a1c08d8dc57027d62ff77",
+  "pool_sha256": "e24fbf5b05d33ccc235ed829dc7245a5a0764cc335810befb9d37736950ac0d5",
+  "selection_rule": "For each template, examine instance indices 0 to 99. An index is\nnot a candidate when\n  - its question repeats one already seen for the template (a duplicate double-weights it);\n  - its question is one of the pilot slice's questions, which are public with their gold\n    and on whose traces the answer check was tuned;\n  - its gold solution carries an exact display tie on a line T1 can parse, the test of\n    template_annotation_23092026/layer0/tie_census.py: such an instance has no gold value\n    a decimal and a binary reader agree on (D-016). A tie on a line T1 cannot parse is\n    not seen;\n  - the template fails to generate it.\nThe candidates are grouped by reasoning path and answer form, the lower reading of\nfull_run_28092026/diversity.py: the gold's equation lines and its answer segment with numbers\nand question-varying words masked. The 15 instances are taken round-robin across the groups in\norder of first appearance, lowest index first within a group, so every reasoning path and\nanswer label the first 100 draws show is represented before any is repeated. A template with\none group keeps its first 15 candidates, exactly the instances D-114 froze. Rare branches are\ntherefore over-represented relative to how often a template produces them; FREEZE.json records\neach template's candidates, groups and groups selected.\nEvery template has 15 instances, the owner's rule (D-114). A template with fewer than 15\ncandidates keeps each distinct question once and fills its 15 with repeats in index order,\neach carrying repeat_of, the item_id of the first instance with its question, and FREEZE.json\nlists it under short_templates, so the number of distinct questions is never overstated.",
+  "round5": {
+    "refrozen_at_utc": "2026-10-06T19:05:41+00:00",
+    "templates": [
+      "template_adiabatic_flame_temperature",
+      "template_work_isothermal_virial"
+    ],
+    "commit": "740ee256f4b9392ddb8d1381172f895a88b8b894",
+    "template_inputs_dirty": true,
+    "template_files_sha256": {
+      "data/templates/branches/chemical_engineering/thermodynamics/heat_effects.py": "853f788e8bfecce1a288ec873eb1c4e67aa55054c4875dfb3220c1dd7d80b6e8",
+      "data/templates/branches/chemical_engineering/thermodynamics/volumetric_properties_pure_fluids.py": "161532a7ae44fc09600b8e74b5198a0cb23a86ff305dfc0930304e8a3d2c678d"
+    },
+    "script_sha256": {
+      "full_run_28092026/freeze.py": "42e76f197cd491fc4498cd2c0a778eb49b9f2906c1b0cf7347323700c81c56d1"
+    },
+    "seed_commitment_sha256": "cd53376fb0fe90ac807ff369a845a5a45e47c1bc48aa4fd470b709a191ddd64e",
+    "previous_manifest_sha256": "028c7a637eb4895ed061bcbf79a69c656c57f4adc327a4c81cc4faf6d898e2b3",
+    "previous_pool_sha256": "a9b6adeed7e59b66c5afb63f1a457b05e50c1c95e968a006eaf06f0e080cf768",
+    "previous_coverage": [
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "candidates": 92,
+        "groups": 2,
+        "groups_selected": 2
+      },
+      {
+        "template_id": "template_work_isothermal_virial",
+        "candidates": 100,
+        "groups": 2,
+        "groups_selected": 2
+      }
+    ],
+    "previous_walk_rejections": [
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 37,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 44,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 47,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 61,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 63,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 65,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 81,
+        "reason": "duplicate question"
+      },
+      {
+        "template_id": "template_adiabatic_flame_temperature",
+        "instance_index": 87,
+        "reason": "duplicate question"
+      }
+    ],
+    "items": [
+      {
+        "item_id": "adiabatic_flame_temperature#0",
+        "old_sha256": "0bf418d6430743d2693b6ca8cbe7084534cbbc3ddf1aa5d6e38daf96e5b94434",
+        "new_sha256": "9c50543abe04e86cb0011f2d93dcc94875be6c984a785a7f39d12673d66686ea"
+      },
+      {
+        "item_id": "adiabatic_flame_temperature#1",
+        "old_sha256": "bfb0aee62215cf56ff08f1dce2a660e0fbed39ecb198941c0301018cbf0d7e75",
+        "new_sha256": "2cd87162e65100d4e526f0d65e8a63914e2b5000f0dd541f6ff443c7cff1e575"
+      },
+      {
+        "item_id": "adiabatic_flame_temperature#2",
+        "old_sha256": "69600971efdc0eb5a6391a2bd15c5466d9acae9b8312af8ce4a475ab4a352079",
+        "new_sha256": "e324dde04786b9801450ff96d5211a68c82a9017d092838aa7aa02a6f3080126"
+      },
+      {
+        "item_id": "adiabatic_flame_temperature#3",
+        "old_sha256": "8a75fdbcdda0063c23988529b89ab2f6baaa38de38c4cbb0ea4fa7e4778c963f",
+        "new_sha256": "ecb0d7c30d761da8c8319be9616c94dff6b46d182728fec483ea0f553abc6d89"
+      },
+      {
+        "item_id": "adiabatic_flame_temperature#4",
+        "old_sha256": "6b12817dc65a7c891c5da2e35751cd613a48ebe23d9d640e29b87e007f5c18c3",
+        "new_sha256": "0773a3cd0d5cd6f2ad63589d92c592d584a03f15b4ac3d044440ccdf3f5fadca"
+      },
+      {
+        "item_id": "adiabatic_flame_temperature#5",
+        "old_sha256": "ad0d96762a48b8629325af80960f4d2607782a53289596cfbceae1eb08c91370",
+        "new_sha256": "e8da5e602526cbf42b7be65f1e82b0044e4f615e8cbae3f6bf6fd61ec1ef4a88"
+      },
+      {
+        "item_id": "adiabatic_flame_temperature#6",
+        "old_sha256": "56c999780cf8dff00565dd961c998ea3192d18a48104e21d178492e4deea087c",
+        "new_sha256": "71c23d97ca649db4415a33275837bfe608dda8ab03480f2ab6c6a77694b38b79"
+      },
+      {
+        "item_id": "adiabatic_flame_temperature#7",
+        "old_sha256": "b1e3681a90cd56aae4456a620e657968f93f5f9693824b5de030ec359893da10",
+        "new_sha256": "635609840930618d9cdb6c71b0eec4b139f9ef2d5af93251a5718ef571cf349a"
+      },
+      {
+        "item_id": "adiabatic_flame_temperature#8",
+        "old_sha256": "e3b51ae3f183320389b8264b258f60fabe61552f83f6ef59f7585b678e9bdded",
+        "new_sha256": "9c9dc7b8cf7ab0ad7475c71c23a44300de615bb260eca253d8662db1a0e8f1a3"
+      },
+      {
+        "item_id": "adiabatic_flame_temperature#9",
+        "old_sha256": "0e08b4443fbf24486af5eaa982d438fe1602e008c89618213df9ed14ad4267b5",
+        "new_sha256": "b79177153d17decb1a4dd34d07c436a0d7e7a74b6bd91e217f0e0aeeca4b648b"
+      },
+      {
+        "item_id": "adiabatic_flame_temperature#10",
+        "old_sha256": "f3390bad411a1722eba1c7c1489d688197d013f68cae26e8c72edd12b8812350",
+        "new_sha256": "4928ec6fe540a92bfc5899289af1ff956fa27363f26f14c515a76ded621e7c5b"
+      },
+      {
+        "item_id": "adiabatic_flame_temperature#11",
+        "old_sha256": "150633b99756edbfc9d92891ff5b1ac98e4b51faffeb9c5ae032304374a1721e",
+        "new_sha256": "9c9004adcacd07ac27fb41feca859805deb1fbd412a260a481f2762ebc761074"
+      },
+      {
+        "item_id": "adiabatic_flame_temperature#12",
+        "old_sha256": "6b811bdf4c9e177ecdfafa717dbada6dffb5d4ac919cabfd1f75b2fd28e49e8a",
+        "new_sha256": "63cb7055279db09710b41846b4b0f54e5796fe820dd9528f53a0bff9cb38512a"
+      },
+      {
+        "item_id": "adiabatic_flame_temperature#13",
+        "old_sha256": "c0d51be0a6f6ca2e007dabceaf942ec5a01b217a75935d9da593da2e3ea647d9",
+        "new_sha256": "0457d05eed7af406fe3a565a42ddf5d38094fa7fae4646c609843bf5d3e28df4"
+      },
+      {
+        "item_id": "adiabatic_flame_temperature#14",
+        "old_sha256": "5e1023fec4b0b291dc13e57aa3a399204e8454d418246220d69b3724ab8ba917",
+        "new_sha256": "2639791c2d2114849f4e02d6149ac30bf10e074f9eb1eb6cf8cf4e63cc760f74"
+      },
+      {
+        "item_id": "work_isothermal_virial#0",
+        "old_sha256": "3d90c833214a2f6db0f85f46dbec95e36a4c2635df9cd87ef1876c6d594a6e20",
+        "new_sha256": "2614afcbccb9eb9492c33180d9f9f29a5e206cd41352518b376ed018c5351858"
+      },
+      {
+        "item_id": "work_isothermal_virial#1",
+        "old_sha256": "fd242e4ab1e33e94faa5e2f7c2cad12cef72128501c762fe3b5e3ad0837583a5",
+        "new_sha256": "824fc6943f2e75210de45ca8dc685bbdb74b0f807e701e9e2a7f30545f692024"
+      },
+      {
+        "item_id": "work_isothermal_virial#2",
+        "old_sha256": "10b2fabd60ffc86a65329a0fd62966ab9c49036cbcd46189779d4aef986d3093",
+        "new_sha256": "1e3c9c77a149dc8c12df18f386ea5fc7eeb62e6c69bb1a7870fbb8b59e86658e"
+      },
+      {
+        "item_id": "work_isothermal_virial#3",
+        "old_sha256": "44f6b0df8c4b7dd59fe3398008a98d5d2845360666487b50a114df2c6c807802",
+        "new_sha256": "8755c594d24b6ccae995cf75ea6a1c47418de3341c9f45fc90e400d13d9e489a"
+      },
+      {
+        "item_id": "work_isothermal_virial#4",
+        "old_sha256": "7df0b9fef58bb406cb73d3d77333c422c454823b2f8ee851a60b179a8385e858",
+        "new_sha256": "acf5c69ad6f36de7a33fecc234f4ee7a782b5e3ccb46218f3fe9441c15a4b5e5"
+      },
+      {
+        "item_id": "work_isothermal_virial#5",
+        "old_sha256": "4b4594020088c8e9709ece9ae04541d9f80796b8495b2333ffecd52a211815d1",
+        "new_sha256": "ef384669cfe699492be508efdd17ecbf174bf38c8a93b4fea8fee42b1cb2d24a"
+      },
+      {
+        "item_id": "work_isothermal_virial#6",
+        "old_sha256": "6fe66c6b72e9725dd573c1e1225fef2ee3ddbc6e4b3bded46817b67054894dc8",
+        "new_sha256": "d80b6f8351ab38f03f9e6d6d48296458be8f93d086a0335b3da37e0327ad8e2e"
+      },
+      {
+        "item_id": "work_isothermal_virial#7",
+        "old_sha256": "7787a096aed229de8b206617de4b751187e09aa7d9b1fb36a35a4a047fabfe9f",
+        "new_sha256": "0796950388d23e8ef6ea8ba3c86e839fa5a88773c3c752a6a3f00108c2c1d67c"
+      },
+      {
+        "item_id": "work_isothermal_virial#8",
+        "old_sha256": "186d81ffdfb02c2a4df5f9834b5e1b7f234171a3c7027119378bb303a221b823",
+        "new_sha256": "e82875709e3557f583ed1710ccf0ceba735c25c37aa9b2979ce0a47f6074ee60"
+      },
+      {
+        "item_id": "work_isothermal_virial#9",
+        "old_sha256": "c03b03dba5d1774162e00fff6530ae88d0a211809c1b4453ee5e4da92d50fa1a",
+        "new_sha256": "479f3246c919776d81b35087919875f6bfa8dae9257406aa9147fb977049874f"
+      },
+      {
+        "item_id": "work_isothermal_virial#10",
+        "old_sha256": "ae47394ff70cf71df81d35a363885943c7e2699a00a251432fbe758a21bb2234",
+        "new_sha256": "3ad4cd0fb5328bb7db02a4070098d56c32f805671d993c6bb0433789af06bb76"
+      },
+      {
+        "item_id": "work_isothermal_virial#11",
+        "old_sha256": "1de7646e485a9ba584ef628db7fbfd567c1917e3e3450a2dd6d4d0af6e56108d",
+        "new_sha256": "d11d623b5f00cb7ac3164513e9cb03fa93f366771364294cadd646e9f5fb9703"
+      },
+      {
+        "item_id": "work_isothermal_virial#14",
+        "old_sha256": null,
+        "new_sha256": "dd786e8465e566fc6d9170da9046935c974f7d111501de79e4a5c096e51f7785"
+      },
+      {
+        "item_id": "work_isothermal_virial#15",
+        "old_sha256": null,
+        "new_sha256": "23e46b3dc3abf582ecf6022586e8ba7562dc52396c03e4bebfd16d5fe1fcdaad"
+      },
+      {
+        "item_id": "work_isothermal_virial#16",
+        "old_sha256": null,
+        "new_sha256": "43f7a0ff5a0de0a52779e1309e0984f4fa2e5aa6dadee90faefac5aa95243d31"
+      },
+      {
+        "item_id": "work_isothermal_virial#12",
+        "old_sha256": "425088c58e7c4e5fb01717c75e30e0fb77b96655bcd465921f6efe5e736cc433",
+        "new_sha256": null
+      },
+      {
+        "item_id": "work_isothermal_virial#19",
+        "old_sha256": "d5799436444832ef8dc4694b8baa4d3604cf272fae8abe8ec98b85b94e7d9702",
+        "new_sha256": null
+      },
+      {
+        "item_id": "work_isothermal_virial#24",
+        "old_sha256": "b3da9213aecfd247bc270c1e3e9996737b487f60f2590d8247f2450e48add56d",
+        "new_sha256": null
+      }
+    ],
+    "archive": "scores/_replaced/round5_20261006T190539Z/freeze",
+    "refreezes": [
+      {
+        "refrozen_at_utc": "2026-10-06T17:53:41+00:00",
+        "templates": [
+          "template_adiabatic_flame_temperature",
+          "template_work_isothermal_virial"
+        ],
+        "commit": "740ee256f4b9392ddb8d1381172f895a88b8b894",
+        "template_inputs_dirty": true,
+        "template_files_sha256": {
+          "data/templates/branches/chemical_engineering/thermodynamics/heat_effects.py": "853f788e8bfecce1a288ec873eb1c4e67aa55054c4875dfb3220c1dd7d80b6e8",
+          "data/templates/branches/chemical_engineering/thermodynamics/volumetric_properties_pure_fluids.py": "cf3396174cbfc6ec7e9c85188e07140c994ff564b1ca5e0d6c35b5a5484e4919"
+        },
+        "archive": "scores/_replaced/round5_20261006T175341Z/freeze"
+      },
+      {
+        "refrozen_at_utc": "2026-10-06T19:05:41+00:00",
+        "templates": [
+          "template_work_isothermal_virial"
+        ],
+        "commit": "740ee256f4b9392ddb8d1381172f895a88b8b894",
+        "template_inputs_dirty": true,
+        "template_files_sha256": {
+          "data/templates/branches/chemical_engineering/thermodynamics/volumetric_properties_pure_fluids.py": "161532a7ae44fc09600b8e74b5198a0cb23a86ff305dfc0930304e8a3d2c678d"
+        },
+        "archive": "scores/_replaced/round5_20261006T190539Z/freeze"
+      }
+    ]
+  }
 }

@@ -705,7 +705,7 @@
   "pool": {
    "items": 15,
    "distinct_questions": 15,
-   "question_skeletons": 12,
+   "question_skeletons": 9,
    "paths_upper": 2,
    "paths_lower": 2,
    "answer_variants": 1,
@@ -723,9 +723,9 @@
   "reach": {
    "draws": 500,
    "distinct_questions": 500,
-   "question_skeletons": 27,
-   "paths_upper": 3,
-   "paths_lower": 3,
+   "question_skeletons": 16,
+   "paths_upper": 2,
+   "paths_lower": 2,
    "answer_variants": 1
   }
  },

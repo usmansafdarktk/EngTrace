@@ -2,31 +2,32 @@
  "variant": "paraphrase",
  "models": [
   {
+   "tool": null,
    "key": "gpt-oss-20b",
-   "lines": 316,
+   "lines": 314,
    "malformed": 0,
    "states_all_rows": {
-    "answered": 311,
-    "empty": 5
+    "answered": 308,
+    "empty": 6
    },
-   "items": 316,
+   "items": 314,
    "items_missing": [],
    "items_with_two_final_rows": 0,
    "rows_not_a_frozen_item": 0,
-   "answered": 311,
-   "empty": 5,
+   "answered": 308,
+   "empty": 6,
    "modes": {
-    "paraphrase": 316
+    "paraphrase": 314
    },
    "prompt_hashes": 1,
    "prompt_is_pilots": true,
    "request_variants": 1,
    "served_models": {
-    "openai/gpt-oss-20b": 316
+    "openai/gpt-oss-20b": 314
    },
    "served_as_main": true,
    "providers": {
-    "Darkbloom": 316
+    "Darkbloom": 314
    },
    "provider_count": 1,
    "capped_with_text": 0,
@@ -40,46 +41,51 @@
     "template_upward_seepage_quick_condition": 2,
     "template_slope_deflection_end_moment": 1,
     "template_vdw_solve_for_volume": 1,
-    "template_statically_indeterminate_shaft": 1
+    "template_statically_indeterminate_shaft": 1,
+    "template_work_isothermal_virial": 1
    },
    "empty_by_template_all": {
     "template_upward_seepage_quick_condition": 2,
     "template_slope_deflection_end_moment": 1,
     "template_vdw_solve_for_volume": 1,
-    "template_statically_indeterminate_shaft": 1
+    "template_statically_indeterminate_shaft": 1,
+    "template_work_isothermal_virial": 1
    },
-   "output_tokens_median": 1648.0,
+   "items_per_template": 2.6166666666666667,
+   "output_tokens_median": 1644.5,
    "output_tokens_max": 32768,
-   "billed_usd": 0.082
+   "billed_usd": 0.084
   },
   {
+   "tool": null,
    "key": "gemma-4-26b-a4b",
-   "lines": 316,
+   "lines": 314,
    "malformed": 0,
    "states_all_rows": {
-    "answered": 316
+    "answered": 314
    },
-   "items": 316,
+   "items": 314,
    "items_missing": [],
    "items_with_two_final_rows": 0,
    "rows_not_a_frozen_item": 0,
-   "answered": 316,
+   "answered": 314,
    "empty": 0,
    "modes": {
-    "paraphrase": 316
+    "paraphrase": 314
    },
    "prompt_hashes": 1,
    "prompt_is_pilots": true,
    "request_variants": 1,
    "served_models": {
-    "google/gemma-4-26b-a4b-it": 316
+    "google/gemma-4-26b-a4b-it": 314
    },
    "served_as_main": true,
    "providers": {
-    "DekaLLM": 284,
-    "NextBit": 32
+    "DekaLLM": 281,
+    "NextBit": 30,
+    "Io Net": 3
    },
-   "provider_count": 2,
+   "provider_count": 3,
    "capped_with_text": 1,
    "no_answer_marker": 0,
    "no_marker_no_number": 0,
@@ -87,84 +93,88 @@
    "think_in_text": 0,
    "empty_templates": {},
    "empty_by_template_all": {},
-   "output_tokens_median": 791.0,
+   "items_per_template": 2.6166666666666667,
+   "output_tokens_median": 787.0,
    "output_tokens_max": 32768,
-   "billed_usd": 0.109
+   "billed_usd": 0.111
   },
   {
+   "tool": null,
    "key": "deepseek-v4.1-flash",
-   "lines": 316,
+   "lines": 314,
    "malformed": 0,
    "states_all_rows": {
-    "answered": 314,
-    "empty": 2
+    "answered": 311,
+    "empty": 3
    },
-   "items": 316,
+   "items": 314,
    "items_missing": [],
    "items_with_two_final_rows": 0,
    "rows_not_a_frozen_item": 0,
-   "answered": 314,
-   "empty": 2,
+   "answered": 311,
+   "empty": 3,
    "modes": {
-    "paraphrase": 316
+    "paraphrase": 314
    },
    "prompt_hashes": 1,
    "prompt_is_pilots": true,
    "request_variants": 1,
    "served_models": {
-    "deepseek/deepseek-v4.1-flash": 316
+    "deepseek/deepseek-v4.1-flash": 314
    },
    "served_as_main": true,
    "providers": {
-    "AtlasCloud": 174,
-    "CoreWeave": 46,
+    "AtlasCloud": 171,
+    "CoreWeave": 45,
     "DeepInfra": 40,
     "Morph": 28
    },
-   "provider_count": 6,
+   "provider_count": 7,
    "capped_with_text": 0,
    "no_answer_marker": 0,
    "no_marker_no_number": 0,
    "no_marker_templates": {},
    "think_in_text": 0,
    "empty_templates": {
-    "template_vdw_solve_for_volume": 1,
-    "template_work_isothermal_virial": 1
+    "template_work_isothermal_virial": 2,
+    "template_vdw_solve_for_volume": 1
    },
    "empty_by_template_all": {
     "template_vdw_solve_for_volume": 1,
-    "template_work_isothermal_virial": 1
+    "template_work_isothermal_virial": 2
    },
-   "output_tokens_median": 3590.0,
+   "items_per_template": 2.6166666666666667,
+   "output_tokens_median": 3561.5,
    "output_tokens_max": 32768,
-   "billed_usd": 0.89
+   "billed_usd": 0.849
   },
   {
+   "tool": null,
    "key": "qwen3-235b-a22b-2507",
-   "lines": 316,
+   "lines": 314,
    "malformed": 0,
    "states_all_rows": {
-    "answered": 316
+    "answered": 314
    },
-   "items": 316,
+   "items": 314,
    "items_missing": [],
    "items_with_two_final_rows": 0,
    "rows_not_a_frozen_item": 0,
-   "answered": 316,
+   "answered": 314,
    "empty": 0,
    "modes": {
-    "paraphrase": 316
+    "paraphrase": 314
    },
    "prompt_hashes": 1,
    "prompt_is_pilots": true,
    "request_variants": 1,
    "served_models": {
-    "qwen/qwen3-235b-a22b-2507": 316
+    "qwen/qwen3-235b-a22b-2507": 314
    },
    "served_as_main": true,
    "providers": {
-    "GMICloud": 211,
-    "Parasail": 102,
+    "GMICloud": 210,
+    "Parasail": 101,
     "Nebius": 3
    },
    "provider_count": 3,
@@ -175,39 +185,41 @@
    "think_in_text": 0,
    "empty_templates": {},
    "empty_by_template_all": {},
-   "output_tokens_median": 763.5,
+   "items_per_template": 2.6166666666666667,
+   "output_tokens_median": 761.5,
    "output_tokens_max": 11369,
-   "billed_usd": 0.188
+   "billed_usd": 0.182
   },
   {
+   "tool": null,
    "key": "glm-5.3-flash",
-   "lines": 316,
+   "lines": 314,
    "malformed": 0,
    "states_all_rows": {
-    "answered": 312,
-    "empty": 4
+    "answered": 311,
+    "empty": 3
    },
-   "items": 316,
+   "items": 314,
    "items_missing": [],
    "items_with_two_final_rows": 0,
    "rows_not_a_frozen_item": 0,
-   "answered": 312,
-   "empty": 4,
+   "answered": 311,
+   "empty": 3,
    "modes": {
-    "paraphrase": 316
+    "paraphrase": 314
    },
    "prompt_hashes": 1,
    "prompt_is_pilots": true,
    "request_variants": 1,
    "served_models": {
-    "z-ai/glm-5.3-flash": 316
+    "z-ai/glm-5.3-flash": 314
    },
    "served_as_main": true,
    "providers": {
-    "AtlasCloud": 147,
-    "StreamLake": 68,
-    "Novita": 61,
-    "Sail Research": 26
+    "AtlasCloud": 145,
+    "StreamLake": 66,
+    "Novita": 64,
+    "Sail Research": 25
    },
    "provider_count": 7,
    "capped_with_text": 1,
@@ -218,52 +230,52 @@
    },
    "think_in_text": 0,
    "empty_templates": {
-    "template_work_isothermal_virial": 1,
-    "template_adiabatic_flame_temperature": 1,
     "template_statically_indeterminate": 1,
-    "template_slope_deflection_end_moment": 1
+    "template_slope_deflection_end_moment": 1,
+    "template_work_isothermal_virial": 1
    },
    "empty_by_template_all": {
-    "template_work_isothermal_virial": 1,
-    "template_adiabatic_flame_temperature": 1,
     "template_statically_indeterminate": 1,
-    "template_slope_deflection_end_moment": 1
+    "template_slope_deflection_end_moment": 1,
+    "template_work_isothermal_virial": 1
    },
-   "output_tokens_median": 1340.5,
+   "items_per_template": 2.6166666666666667,
+   "output_tokens_median": 1336.0,
    "output_tokens_max": 32768,
-   "billed_usd": 0.417
+   "billed_usd": 0.404
   },
   {
+   "tool": null,
    "key": "glm-5.3",
-   "lines": 316,
+   "lines": 314,
    "malformed": 0,
    "states_all_rows": {
     "answered": 306,
-    "empty": 10
+    "empty": 8
    },
-   "items": 316,
+   "items": 314,
    "items_missing": [],
    "items_with_two_final_rows": 0,
    "rows_not_a_frozen_item": 0,
    "answered": 306,
-   "empty": 10,
+   "empty": 8,
    "modes": {
-    "paraphrase": 316
+    "paraphrase": 314
    },
    "prompt_hashes": 1,
    "prompt_is_pilots": true,
    "request_variants": 1,
    "served_models": {
-    "z-ai/glm-5.3": 316
+    "z-ai/glm-5.3": 314
    },
    "served_as_main": true,
    "providers": {
-    "Baidu": 213,
-    "AtlasCloud": 58,
-    "Morph": 44,
-    "Novita": 1
+    "Baidu": 211,
+    "AtlasCloud": 57,
+    "Morph": 42,
+    "AkashML": 3
    },
-   "provider_count": 4,
+   "provider_count": 5,
    "capped_with_text": 3,
    "no_answer_marker": 3,
    "no_marker_no_number": 0,
@@ -276,46 +288,46 @@
    "empty_templates": {
     "template_vdw_solve_for_volume": 3,
     "template_work_isothermal_virial": 3,
-    "template_adiabatic_flame_temperature": 2,
     "template_slope_deflection_end_moment": 1,
     "template_damping_classification": 1
    },
    "empty_by_template_all": {
     "template_vdw_solve_for_volume": 3,
-    "template_adiabatic_flame_temperature": 2,
-    "template_work_isothermal_virial": 3,
     "template_slope_deflection_end_moment": 1,
-    "template_damping_classification": 1
+    "template_damping_classification": 1,
+    "template_work_isothermal_virial": 3
    },
-   "output_tokens_median": 3487.0,
+   "items_per_template": 2.6166666666666667,
+   "output_tokens_median": 3450.0,
    "output_tokens_max": 32768,
-   "billed_usd": 3.032
+   "billed_usd": 3.166
   },
   {
+   "tool": null,
    "key": "muse-glimmer-30b",
-   "lines": 316,
+   "lines": 314,
    "malformed": 0,
    "states_all_rows": {
-    "answered": 316
+    "answered": 314
    },
-   "items": 316,
+   "items": 314,
    "items_missing": [],
    "items_with_two_final_rows": 0,
    "rows_not_a_frozen_item": 0,
-   "answered": 316,
+   "answered": 314,
    "empty": 0,
    "modes": {
-    "paraphrase": 316
+    "paraphrase": 314
    },
    "prompt_hashes": 1,
    "prompt_is_pilots": true,
    "request_variants": 1,
    "served_models": {
-    "meta/muse-glimmer-30b": 316
+    "meta/muse-glimmer-30b": 314
    },
    "served_as_main": true,
    "providers": {
-    "DeepInfra": 316
+    "DeepInfra": 314
    },
    "provider_count": 1,
    "capped_with_text": 0,
@@ -325,79 +337,79 @@
    "think_in_text": 0,
    "empty_templates": {},
    "empty_by_template_all": {},
-   "output_tokens_median": 3026.0,
-   "output_tokens_max": 11821,
-   "billed_usd": 1.36
+   "items_per_template": 2.6166666666666667,
+   "output_tokens_median": 3015.5,
+   "output_tokens_max": 14229,
+   "billed_usd": 1.352
   },
   {
+   "tool": null,
    "key": "kimi-k3",
-   "lines": 393,
+   "lines": 391,
    "malformed": 0,
    "states_all_rows": {
-    "answered": 315,
-    "service_failure": 77,
-    "empty": 1
+    "answered": 314,
+    "service_failure": 77
    },
-   "items": 316,
+   "items": 314,
    "items_missing": [],
    "items_with_two_final_rows": 0,
    "rows_not_a_frozen_item": 0,
-   "answered": 315,
-   "empty": 1,
+   "answered": 314,
+   "empty": 0,
    "modes": {
-    "paraphrase": 316
+    "paraphrase": 314
    },
    "prompt_hashes": 1,
    "prompt_is_pilots": true,
    "request_variants": 1,
    "served_models": {
-    "moonshotai/kimi-k3": 316
+    "moonshotai/kimi-k3": 314
    },
    "served_as_main": true,
    "providers": {
-    "BaseTen": 316
+    "BaseTen": 311,
+    "Morph": 3
    },
-   "provider_count": 1,
+   "provider_count": 2,
    "capped_with_text": 0,
    "no_answer_marker": 0,
    "no_marker_no_number": 0,
    "no_marker_templates": {},
    "think_in_text": 0,
-   "empty_templates": {
-    "template_adiabatic_flame_temperature": 1
-   },
-   "empty_by_template_all": {
-    "template_adiabatic_flame_temperature": 1
-   },
-   "output_tokens_median": 2382.0,
-   "output_tokens_max": 32768,
-   "billed_usd": 18.601
+   "empty_templates": {},
+   "empty_by_template_all": {},
+   "items_per_template": 2.6166666666666667,
+   "output_tokens_median": 2341.0,
+   "output_tokens_max": 29615,
+   "billed_usd": 17.765
   },
   {
+   "tool": null,
    "key": "gpt-5.4-mini",
-   "lines": 316,
+   "lines": 314,
    "malformed": 0,
    "states_all_rows": {
-    "answered": 316
+    "answered": 314
    },
-   "items": 316,
+   "items": 314,
    "items_missing": [],
    "items_with_two_final_rows": 0,
    "rows_not_a_frozen_item": 0,
-   "answered": 316,
+   "answered": 314,
    "empty": 0,
    "modes": {
-    "paraphrase": 316
+    "paraphrase": 314
    },
    "prompt_hashes": 1,
    "prompt_is_pilots": true,
    "request_variants": 1,
    "served_models": {
-    "openai/gpt-5.4-mini": 316
+    "openai/gpt-5.4-mini": 314
    },
    "served_as_main": true,
    "providers": {
-    "Azure": 316
+    "Azure": 314
    },
    "provider_count": 1,
    "capped_with_text": 0,
@@ -407,35 +419,37 @@
    "think_in_text": 0,
    "empty_templates": {},
    "empty_by_template_all": {},
-   "output_tokens_median": 615.0,
+   "items_per_template": 2.6166666666666667,
+   "output_tokens_median": 614.5,
    "output_tokens_max": 1610,
-   "billed_usd": 1.047
+   "billed_usd": 1.032
   },
   {
+   "tool": null,
    "key": "gemini-3.1-flash-lite",
-   "lines": 316,
+   "lines": 314,
    "malformed": 0,
    "states_all_rows": {
-    "answered": 316
+    "answered": 314
    },
-   "items": 316,
+   "items": 314,
    "items_missing": [],
    "items_with_two_final_rows": 0,
    "rows_not_a_frozen_item": 0,
-   "answered": 316,
+   "answered": 314,
    "empty": 0,
    "modes": {
-    "paraphrase": 316
+    "paraphrase": 314
    },
    "prompt_hashes": 1,
    "prompt_is_pilots": true,
    "request_variants": 1,
    "served_models": {
-    "google/gemini-3.1-flash-lite": 316
+    "google/gemini-3.1-flash-lite": 314
    },
    "served_as_main": true,
    "providers": {
-    "Google AI Studio": 316
+    "Google AI Studio": 314
    },
    "provider_count": 1,
    "capped_with_text": 0,
@@ -445,35 +459,37 @@
    "think_in_text": 0,
    "empty_templates": {},
    "empty_by_template_all": {},
-   "output_tokens_median": 624.0,
-   "output_tokens_max": 1420,
-   "billed_usd": 0.338
+   "items_per_template": 2.6166666666666667,
+   "output_tokens_median": 623.0,
+   "output_tokens_max": 1445,
+   "billed_usd": 0.335
   },
   {
+   "tool": null,
    "key": "claude-sonnet-5",
-   "lines": 316,
+   "lines": 314,
    "malformed": 0,
    "states_all_rows": {
-    "answered": 316
+    "answered": 314
    },
-   "items": 316,
+   "items": 314,
    "items_missing": [],
    "items_with_two_final_rows": 0,
    "rows_not_a_frozen_item": 0,
-   "answered": 316,
+   "answered": 314,
    "empty": 0,
    "modes": {
-    "paraphrase": 316
+    "paraphrase": 314
    },
    "prompt_hashes": 1,
    "prompt_is_pilots": true,
    "request_variants": 1,
    "served_models": {
-    "anthropic/claude-sonnet-5": 316
+    "anthropic/claude-sonnet-5": 314
    },
    "served_as_main": true,
    "providers": {
-    "Claude Platform on AWS": 316
+    "Claude Platform on AWS": 314
    },
    "provider_count": 1,
    "capped_with_text": 0,
@@ -483,9 +499,10 @@
    "think_in_text": 0,
    "empty_templates": {},
    "empty_by_template_all": {},
-   "output_tokens_median": 1771.5,
-   "output_tokens_max": 24772,
-   "billed_usd": 8.103
+   "items_per_template": 2.6166666666666667,
+   "output_tokens_median": 1762.5,
+   "output_tokens_max": 32340,
+   "billed_usd": 8.145
   }
  ],
  "archive": {

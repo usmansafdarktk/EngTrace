@@ -26,9 +26,10 @@
    },
    "served_as_main": null,
    "providers": {
-    "Azure": 450
+    "Azure": 449,
+    "OpenAI": 1
    },
-   "provider_count": 1,
+   "provider_count": 2,
    "capped_with_text": 0,
    "no_answer_marker": 0,
    "no_marker_no_number": 0,
@@ -38,8 +39,8 @@
    "empty_by_template_all": {},
    "items_per_template": 3.0,
    "output_tokens_median": 1239.0,
-   "output_tokens_max": 8572,
-   "billed_usd": 11.026
+   "output_tokens_max": 9522,
+   "billed_usd": 11.133
   }
  ],
  "archive": {

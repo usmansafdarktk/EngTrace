@@ -14,8 +14,8 @@
   "answered": 401,
   "empty": 4,
   "modes": {
-   "openbook": 156,
-   "openbook2": 249
+   "openbook": 153,
+   "openbook2": 252
   },
   "prompt_sha256": [
    "c2bcb87984c4e50beaaa6876cce2e72932b91d6a755d07ab01ffc341cf9b6f7c"
@@ -38,23 +38,23 @@
    "length": 6
   },
   "prompt_tokens": {
-   "median": 353
+   "median": 354
   },
   "completion_tokens": {
    "median": 1667,
-   "p90": 4774,
+   "p90": 4991,
    "max": 32768
   },
   "reasoning_tokens": {
    "median": 911,
-   "p90": 3590,
+   "p90": 3656,
    "max": 32765,
    "share_above_zero": 1.0,
    "unreported_rows": 0
   },
   "reasoning_text_share": 1.0,
-  "billed_usd": 0.105,
-  "seconds_median": 48.24,
+  "billed_usd": 0.106,
+  "seconds_median": 48.62,
   "tool": null
  },
  {
@@ -72,8 +72,8 @@
   "answered": 405,
   "empty": 0,
   "modes": {
-   "openbook": 156,
-   "openbook2": 249
+   "openbook": 153,
+   "openbook2": 252
   },
   "prompt_sha256": [
    "c2bcb87984c4e50beaaa6876cce2e72932b91d6a755d07ab01ffc341cf9b6f7c"
@@ -89,12 +89,12 @@
    "stop": 405
   },
   "prompt_tokens": {
-   "median": 292
+   "median": 293
   },
   "completion_tokens": {
    "median": 644,
    "p90": 1187,
-   "max": 1913
+   "max": 2394
   },
   "reasoning_tokens": {
    "median": 0,
@@ -104,7 +104,7 @@
    "unreported_rows": 0
   },
   "reasoning_text_share": 0.0,
-  "billed_usd": 1.4,
+  "billed_usd": 1.409,
   "seconds_median": 3.29,
   "tool": null
  },
@@ -122,8 +122,8 @@
   "answered": 405,
   "empty": 0,
   "modes": {
-   "openbook": 156,
-   "openbook2": 249
+   "openbook": 153,
+   "openbook2": 252
   },
   "prompt_sha256": [
    "c2bcb87984c4e50beaaa6876cce2e72932b91d6a755d07ab01ffc341cf9b6f7c"
@@ -139,22 +139,22 @@
    "stop": 405
   },
   "prompt_tokens": {
-   "median": 431
+   "median": 432
   },
   "completion_tokens": {
    "median": 1633,
    "p90": 4880,
-   "max": 13890
+   "max": 23480
   },
   "reasoning_tokens": {
    "median": 631,
    "p90": 3521,
-   "max": 12449,
+   "max": 21494,
    "share_above_zero": 0.9703703703703703,
    "unreported_rows": 0
   },
   "reasoning_text_share": 0.9703703703703703,
-  "billed_usd": 9.986,
+  "billed_usd": 10.225,
   "seconds_median": 13.77,
   "tool": null
  }

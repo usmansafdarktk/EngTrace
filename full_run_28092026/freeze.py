@@ -4,6 +4,22 @@
     python -m full_run_28092026.freeze --verify       # regenerate from SEED.secret; compare with both, byte for byte
     python -m full_run_28092026.freeze --check-files  # no seed needed: pool/ on disk against manifest.jsonl
 
+    python -m full_run_28092026.freeze --only-templates <id,id> --out <dir>             # re-freeze some templates to a scratch dir
+    python -m full_run_28092026.freeze --only-templates <id,id> --write --record round5 # ... and for real
+    python -m full_run_28092026.freeze --only-templates <id> --write --record round5 --amend   # again, same record
+
+Re-freezing some templates (Layer 2 round 5). When a template's code changes after the freeze,
+its 15 items are drawn again from the same seed under the same selection rule; every other row of
+manifest.jsonl and every other line of pool/ stays byte for byte, and the run refuses if any other
+row would move. --out writes the merged manifest and the touched pool files to a scratch directory
+and prints the diff; --write replaces them in place, copies the old manifest, FREEZE.json and pool
+files to scores/_replaced/<record>_<time>/freeze/ first, and records the change in FREEZE.json under
+<record>: the templates, each item's old and new sha256, the date, HEAD, whether the template inputs
+were uncommitted, and the sha256 of the template files and of this script. --amend writes into an
+existing record when a template is drawn again before anything has run on it (a later certification
+round asked for a change): each item keeps the old sha256 of the record's first write, the previous
+hashes stay those of the first write, and `refreezes` lists every write.
+
 What is committed and what is not (D-114). The templates and the generator's default
 master seed are public, so a published seed publishes the items. The pool is therefore
 drawn from a 128-bit seed kept in SEED.secret beside this file, gitignored together with
@@ -108,14 +124,19 @@ def pilot_questions() -> set[str]:
         return {json.loads(line)['question'] for line in fh if line.strip()}
 
 
-def build(master_seed: int):
-    """-> (pool records, manifest rows, walk rejections, short templates, coverage)."""
+def build(master_seed: int, only: set[str] | None = None):
+    """-> (pool records, manifest rows, walk rejections, short templates, coverage).
+
+    `only` restricts the build to those template ids; the rule applied to each is the same.
+    """
     from full_run_28092026.diversity import (answer_segment, mask, paths,  # noqa: E402
                                              varying_words, word_masker)
     levels, types, pilot = difficulty_map(), answer_types(), pilot_questions()
     records, rows, rejected, short_templates, coverage = [], [], [], [], []
     for ref in discover(None):
         tid = ref.template_id
+        if only is not None and tid not in only:
+            continue
         short = tid[len('template_'):]
         cands, repeats, first = [], [], {}
         for i in range(WALK):
@@ -287,15 +308,224 @@ def verify() -> int:
     return status or check_files()
 
 
+def merge_rows(held: list[dict], fresh: list[dict], only: set[str]) -> list[dict]:
+    """The held manifest rows with each template in `only` replaced by its fresh rows, in place."""
+    by_t = collections.defaultdict(list)
+    for r in fresh:
+        by_t[r['template_id']].append(r)
+    out, done = [], set()
+    for r in held:
+        t = r['template_id']
+        if t in only:
+            if t not in done:
+                out += by_t[t]
+                done.add(t)
+            continue
+        out.append(r)
+    if done != only:
+        raise SystemExit(f'not in manifest.jsonl: {sorted(only - done)}')
+    return out
+
+
+def merge_pool(records: list[dict], only: set[str], root: Path) -> list[Path]:
+    """Write the pool files holding `only`'s items under root; every other line is copied verbatim.
+
+    Written as generate_testset.write writes (text mode, one json.dumps per line), so a file that
+    holds no changed item would come back byte for byte."""
+    shorts = {t[len('template_'):] for t in only}
+    fresh = collections.defaultdict(list)
+    for rec in records:
+        fresh[Path(rec['branch'], rec['domain'], rec['area'] + '.jsonl')].append(rec)
+    written = []
+    for rel, recs in sorted(fresh.items()):
+        lines = (POOL_DIR / rel).read_text(encoding='utf-8').splitlines()
+        out, done = [], set()
+        for line in lines:
+            sid = json.loads(line)['id']
+            if sid in shorts:
+                if sid not in done:
+                    out += [json.dumps(x, ensure_ascii=False) for x in recs if x['id'] == sid]
+                    done.add(sid)
+                continue
+            out.append(line)
+        dst = root / rel
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        with open(dst, 'w', encoding='utf-8') as fh:
+            for line in out:
+                fh.write(line + '\n')
+        written.append(dst)
+    return written
+
+
+def merge_rejections(held: list[dict], fresh: list[dict], only: set[str]) -> list[dict]:
+    """FREEZE.json's walk rejections with `only`'s replaced where that template's stood, so the
+    record's diff shows what changed and nothing moves; a template with none before goes last."""
+    by_t = collections.defaultdict(list)
+    for x in fresh:
+        by_t[x['template_id']].append(x)
+    out, done = [], set()
+    for x in held:
+        t = x['template_id']
+        if t in only:
+            if t not in done:
+                out += by_t[t]
+                done.add(t)
+            continue
+        out.append(x)
+    return out + [x for t in sorted(only - done) for x in by_t[t]]
+
+
+def diff_rows(old: list[dict], new: list[dict]) -> dict:
+    o, n = {r['item_id']: r for r in old}, {r['item_id']: r for r in new}
+    return {'changed': sorted(k for k in o.keys() & n.keys() if o[k] != n[k]),
+            'removed': sorted(o.keys() - n.keys()), 'added': sorted(n.keys() - o.keys())}
+
+
+def refreeze(only: set[str], out: Path | None, record: str | None, amend: bool = False) -> int:
+    """Draw `only`'s items again from the same seed; scratch (`out`) or for real (`record`)."""
+    unknown = only - {r.template_id for r in discover(None)}
+    if unknown:
+        raise SystemExit(f'unknown template ids: {sorted(unknown)}')
+    master_seed = read_seed(create=False)
+    held_body = MANIFEST.read_text(encoding='utf-8')
+    held = [json.loads(x) for x in held_body.splitlines()]
+    records, rows, rejected, short, coverage = build(master_seed, only)
+    merged = merge_rows(held, rows, only)
+    d = diff_rows(held, merged)
+    by_id = {r['item_id']: r for r in held + merged}
+    outside = [k for k in d['changed'] + d['removed'] + d['added'] if by_id[k]['template_id'] not in only]
+    old_of = {r['item_id']: r['sha256'] for r in held if r['template_id'] in only}
+    new_of = {r['item_id']: r['sha256'] for r in rows}
+    print(f"rows {len(held)} -> {len(merged)}; changed {len(d['changed'])}, removed {len(d['removed'])}, "
+          f"added {len(d['added'])}; outside the named templates {len(outside)}")
+    for t in sorted(only):
+        old_ids = [r['item_id'] for r in held if r['template_id'] == t]
+        new_ids = [r['item_id'] for r in rows if r['template_id'] == t]
+        print(f"  {t}: item ids {'unchanged' if old_ids == new_ids else 'CHANGED'}; "
+              f"{sum(old_of.get(i) != new_of.get(i) for i in new_ids)} of {len(new_ids)} sha256 changed")
+    for c in coverage:
+        print(f"  {c['template_id']}: candidates {c['candidates']}, groups {c['groups']}, "
+              f"selected from {c['groups_selected']}")
+    if outside or len(merged) != len(held):
+        print('REFUSED - a row outside the named templates would change, or the count would')
+        return 1
+    body = manifest_body(merged)
+    if out is not None:
+        out.mkdir(parents=True, exist_ok=True)
+        (out / 'manifest.jsonl').write_text(body, encoding='utf-8', newline='\n')
+        files = merge_pool(records, only, out / 'pool')
+        (out / 'diff.json').write_text(json.dumps(d, indent=1) + '\n', encoding='utf-8', newline='\n')
+        print(f'scratch written to {out}: manifest.jsonl, diff.json, {len(files)} pool file(s)')
+        return 0
+
+    doc = json.loads(FREEZE.read_text(encoding='utf-8'))
+    prior = doc.get(record)
+    if prior is not None and not amend:
+        print(f'REFUSED - FREEZE.json already holds {record}; --amend adds to it and keeps its old sha256s')
+        return 1
+    if prior is None and amend:
+        print(f'REFUSED - --amend needs an existing {record} record')
+        return 1
+    stamp = dt.datetime.now(dt.timezone.utc).strftime('%Y%m%dT%H%M%SZ')
+    archive = HERE / 'scores' / '_replaced' / f'{record}_{stamp}' / 'freeze'
+    archive.mkdir(parents=True, exist_ok=False)
+    for src in [MANIFEST, FREEZE] + sorted({POOL_DIR / r['branch'] / r['domain'] / (r['area'] + '.jsonl')
+                                           for r in records}):
+        dst = archive / src.relative_to(HERE)
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        dst.write_bytes(src.read_bytes())
+    prev_cov = [c for c in doc['coverage']['templates'] if c['template_id'] in only]
+    prev_rej = [x for x in doc['walk_rejections']['items'] if x['template_id'] in only]
+    # An amended record keeps what it said before the first write: each item's old sha256, the
+    # previous manifest and pool hashes, and the previous selection of the templates it already held.
+    if prior:
+        had = set(prior['templates'])
+        prev_cov = prior['previous_coverage'] + [c for c in prev_cov if c['template_id'] not in had]
+        prev_rej = prior['previous_walk_rejections'] + [x for x in prev_rej if x['template_id'] not in had]
+    cov_new = {c['template_id']: c for c in coverage}
+    doc['coverage']['templates'] = [cov_new.get(c['template_id'], c) for c in doc['coverage']['templates']]
+    doc['coverage']['templates_with_more_than_one_group'] = sum(
+        c['groups'] > 1 for c in doc['coverage']['templates'])
+    items = merge_rejections(doc['walk_rejections']['items'], rejected, only)
+    doc['walk_rejections'] = {'count': len(items), 'by_reason': dict(sorted(collections.Counter(
+        x['reason'].split(':')[0] for x in items).items())), 'items': items}
+    doc['short_templates'] = [s for s in doc['short_templates'] if s['template_id'] not in only] + short
+    doc['distinct_questions'] = sum('repeat_of' not in r for r in merged)
+    templates = sorted(only | set(prior['templates'] if prior else ()))
+    files_of = lambda ts: sorted({ref.file_path for ref in discover(None) if ref.template_id in ts})  # noqa: E731
+    template_files = files_of(templates)
+    at = dt.datetime.now(dt.timezone.utc).replace(microsecond=0).isoformat()
+    archive_rel = str(archive.relative_to(HERE)).replace('\\', '/')
+    # Each item the record covers: old_sha256 before the record's first write (None for an id that was
+    # not then frozen), new_sha256 now (None for an id the selection no longer takes; its rows are stale).
+    had = set(prior['templates']) if prior else set()
+    rec_items = {x['item_id']: dict(x) for x in (prior['items'] if prior else [])}
+    for r in held:
+        if r['template_id'] in only and r['template_id'] not in had and r['item_id'] not in rec_items:
+            rec_items[r['item_id']] = {'item_id': r['item_id'], 'old_sha256': r['sha256'], 'new_sha256': None}
+    for i, x in rec_items.items():
+        if 'template_' + i.rsplit('#', 1)[0] in only:
+            x['new_sha256'] = new_of.get(i)
+    for r in rows:
+        rec_items.setdefault(r['item_id'], {'item_id': r['item_id'], 'old_sha256': None, 'new_sha256': r['sha256']})
+    current = [r['item_id'] for r in merged if r['item_id'] in rec_items]
+    gone = sorted((i for i in rec_items if i not in set(current)),
+                  key=lambda i: (i.rsplit('#', 1)[0], int(i.rsplit('#', 1)[1])))
+    history = list(prior.get('refreezes') or [{k: prior[k] for k in ('refrozen_at_utc', 'templates', 'commit',
+                                                                     'template_inputs_dirty', 'template_files_sha256',
+                                                                     'archive')}]) if prior else []
+    history.append({'refrozen_at_utc': at, 'templates': sorted(only), 'commit': git('rev-parse', 'HEAD'),
+                    'template_inputs_dirty': bool(git('status', '--porcelain', '--', *files_of(only))),
+                    'template_files_sha256': {p: file_sha(REPO / p) for p in files_of(only)},
+                    'archive': archive_rel})
+    doc[record] = {
+        'refrozen_at_utc': at,
+        'templates': templates,
+        'commit': git('rev-parse', 'HEAD'),
+        'template_inputs_dirty': bool(git('status', '--porcelain', '--', *template_files)),
+        'template_files_sha256': {p: file_sha(REPO / p) for p in template_files},
+        'script_sha256': {'full_run_28092026/freeze.py': file_sha(Path(__file__))},
+        'seed_commitment_sha256': sha(str(master_seed)),
+        'previous_manifest_sha256': prior['previous_manifest_sha256'] if prior else doc['manifest_sha256'],
+        'previous_pool_sha256': prior['previous_pool_sha256'] if prior else doc['pool_sha256'],
+        'previous_coverage': prev_cov,
+        'previous_walk_rejections': prev_rej,
+        'items': [rec_items[i] for i in current + gone],
+        'archive': archive_rel,
+        'refreezes': history,
+    }
+    doc['manifest_sha256'] = sha(body)
+    doc['pool_sha256'] = sha(''.join(r['sha256'] for r in merged))
+    merge_pool(records, only, POOL_DIR)
+    MANIFEST.write_text(body, encoding='utf-8', newline='\n')
+    FREEZE.write_text(json.dumps(doc, indent=2, ensure_ascii=False) + '\n', encoding='utf-8', newline='\n')
+    print(f'written: manifest.jsonl, FREEZE.json ({record}), pool/; old copies in {archive}')
+    return check_files()
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(description=__doc__.split('\n')[0])
     ap.add_argument('--verify', action='store_true')
     ap.add_argument('--check-files', action='store_true')
+    ap.add_argument('--only-templates', default=None, help='comma-separated template ids to draw again')
+    ap.add_argument('--out', default=None, help='with --only-templates: scratch directory, nothing else written')
+    ap.add_argument('--write', action='store_true', help='with --only-templates: replace in place')
+    ap.add_argument('--record', default=None, help='with --write: the FREEZE.json key for the change, e.g. round5')
+    ap.add_argument('--amend', action='store_true',
+                    help='with --write: add to an existing record, keeping its old sha256s and previous hashes')
     args = ap.parse_args()
     if args.verify:
         return verify()
     if args.check_files:
         return check_files()
+    if args.only_templates:
+        only = {t.strip() for t in args.only_templates.split(',') if t.strip()}
+        if bool(args.out) == bool(args.write):
+            raise SystemExit('--only-templates needs exactly one of --out <dir> and --write')
+        if args.write and not args.record:
+            raise SystemExit('--write needs --record <key>, e.g. --record round5')
+        return refreeze(only, Path(args.out) if args.out else None, args.record if args.write else None,
+                        amend=args.amend)
 
     master_seed = read_seed(create=True)
     records, rows, replaced, short, coverage = build(master_seed)

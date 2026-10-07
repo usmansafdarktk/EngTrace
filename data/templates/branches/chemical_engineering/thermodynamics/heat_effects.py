@@ -611,6 +611,19 @@ def template_adiabatic_flame_temperature():
         and in 12 the last pass displays an exact half kelvin, 20 cases in all.
         There the answer's last digit would come from the iteration count or the
         rounding convention rather than from the model, so the level is redrawn.
+
+        ROUND 5 (2026-10-06): THE DATA ARE STATED. The three chemical experts,
+        reading evaluated responses on 2026-10-03, found the method standard but
+        the data not: standard heat-capacity sources differ by more than the
+        0.2% answer tolerance, so a response built on another textbook's table
+        could be right by its data and wrong by the gold's. The question now
+        prints every number the energy balance consumes: the standard heats of
+        formation of every species in the equation (298.15 K, water as vapour),
+        the products' Cp/R coefficients exactly as CP_PARAMS_COMBUSTION holds
+        them, with the polynomial's form, its units and R, the air's 3.76 N2 per
+        O2, no dissociation, and that the answer is reported to the nearest
+        kelvin. The tolerance then holds a solver to the data given. Sampling,
+        solution and answer are unchanged (layer2/fixes_round5.md).
     """
     R = 8.314           # J/(mol K)
     T_initial = 298.15  # K
@@ -700,11 +713,34 @@ def template_adiabatic_flame_temperature():
 
     air_phrase = ("the theoretical amount of dry air" if excess_pct == 0
                   else f"{excess_pct}% excess dry air")
+
+    # The data block (Layer 2 round 5): every number the energy balance consumes,
+    # so the 0.2% tolerance holds a solver to the data given rather than to a
+    # textbook's table. Heats of formation for every species in the equation, the
+    # fuel first and then the products; Cp/R coefficients for every product, each
+    # printed at the shortest display that re-parses to the float consumed (D-037;
+    # _exact_spec raises rather than print a value the balance did not use).
+    fuel_species = next(s for s in reactants if s not in ("O2(g)", "N2(g)"))
+    hf_species = list(dict.fromkeys([fuel_species, *products, *reactants]))
+    hf_text = ", ".join(f"{s}: {HEATS_OF_FORMATION[s]}" for s in hf_species)
+    cp_lines = [
+        f"- {s}: A = {CP_PARAMS_COMBUSTION[s]['A']!r}, " + ", ".join(
+            f"{k} = {CP_PARAMS_COMBUSTION[s][k]:{_exact_spec(CP_PARAMS_COMBUSTION[s][k], 'e')}}"
+            for k in ("B", "C", "D"))
+        for s in products]
+
     question = (
         f"{fuel} gas enters a furnace at {T_initial} K and is burned completely with "
         f"{air_phrase} (also at {T_initial} K). Assuming the "
         f"process is adiabatic and there is no shaft work, estimate the "
-        f"adiabatic flame temperature in Kelvin."
+        f"adiabatic flame temperature in Kelvin, reported to the nearest kelvin. "
+        f"Use the data below. Dry air is 3.76 mol N2 per mol O2; the products are "
+        f"an ideal-gas mixture of the species listed, with no dissociation.\n"
+        f"Standard heats of formation at {T_initial} K, in kJ/mol (water as vapour): "
+        f"{hf_text}\n"
+        f"Ideal-gas heat capacities of the products, Cp/R = A + B·T + C·T² + D·T⁻² "
+        f"(T in K; A dimensionless, B in 1/K, C in 1/K², D in K²; R = {R} J/(mol·K)):\n"
+        + "\n".join(cp_lines)
     )
 
     if air is None:

@@ -1,0 +1,94 @@
+{
+ "base": "03b1dd7f0bab084b1ac2b6640b0e9a6e9b1e31bd",
+ "seeds": 500,
+ "rel_tol": 0.002,
+ "virial": {
+  "generated": 500,
+  "same_problem": 193,
+  "same_problem_solution_from_step2_identical": 193,
+  "redrawn": 307,
+  "redrawn_explained": 307,
+  "redrawn_old_beyond_half_tol": 15,
+  "redrawn_old_organic_above_cap": 292,
+  "redrawn_by_substance": {
+   "p-Xylene": 26,
+   "n-Pentane": 23,
+   "Acetone": 26,
+   "Benzene": 14,
+   "n-Octane": 16,
+   "Ethanol": 20,
+   "n-Hexane": 18,
+   "n-Butane": 18,
+   "Toluene": 19,
+   "n-Heptane": 22,
+   "Methanol": 27,
+   "Helium": 14,
+   "Propane": 24,
+   "Propylene": 18,
+   "Ethylene": 8,
+   "Ethane": 13,
+   "Hydrogen": 1
+  },
+  "organic_cap_K": 700.0,
+  "organics_above_cap": 0,
+  "substances_drawn": 16,
+  "organics_drawn": [
+   "Ethane",
+   "Ethylene",
+   "Methane",
+   "Propane",
+   "Propylene"
+  ],
+  "distinct_step1_blocks": 1,
+  "pre_repair_outside_tol": 13,
+  "pre_repair_outside_tol_by_substance": {
+   "Helium": 13
+  },
+  "pre_repair_worst_rel_other_substances": 0.001636,
+  "resolved_within_tol": 500,
+  "resolved_within_half_tol": 500,
+  "resolved_worst_rel": 0.000994,
+  "resolved_worst_seed": 38,
+  "outside_tol": [],
+  "other_readings_outside_tol": {
+   "closed, pressure-explicit form": 53,
+   "steady flow, volume form": 469,
+   "steady flow, pressure-explicit form": 469
+  }
+ },
+ "flame": {
+  "generated": 500,
+  "at_zero_excess_air": 6,
+  "solution_identical": 500,
+  "question_is_old_plus_data_block": 500,
+  "data_block_exact": 500,
+  "resolved_rounds_to_gold": 500,
+  "resolved_worst_K": 0.4935,
+  "resolved_worst_rel": 0.00024,
+  "resolved_worst_seed": 101
+ },
+ "kit": {
+  "round": 6,
+  "instances": 5,
+  "within": 5,
+  "seeds": [
+   2601,
+   2602,
+   2603,
+   2604,
+   2605
+  ]
+ },
+ "pool": {
+  "work_isothermal_virial": {
+   "items": 15,
+   "within": 15,
+   "worst_rel": 0.000752
+  },
+  "adiabatic_flame_temperature": {
+   "items": 15,
+   "within": 15,
+   "worst_rel": 0.000323
+  }
+ }
+}
