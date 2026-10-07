@@ -125,7 +125,7 @@ $30.88 judged stages, $0.30 the Qwen Thinking calibration).
 - Gemini was served by Google AI Studio and by Google (Vertex); the main run and the 450-item arm used Google AI Studio
   alone. The served model id is the same.
 - Cascade bills: paraphrase pairs $3.741 (825 rows); repeats $3.762 (1,800 rows).
-- **Decision taken in the stream, for the owner to confirm: rows without a finish reason are asked again.**
+- **Rows without a finish reason are asked again: decided in the stream, confirmed by the owner on 2026-10-07.**
   - What happened: Io Net ended 26 of Gemma's completions (about 1%) with no finish reason. The text was cut off
     mid-sentence at 3,111 to 12,006 completion tokens and 40 to 332 s, far below the ceiling. DekaLLM did so on none of
     its rows, and the main run had one such row in 26,970.
@@ -136,6 +136,8 @@ $30.88 judged stages, $0.30 the Qwen Thinking calibration).
   - Handling: the rows written before the rule were moved, not deleted, to `traces/_unfinished/<variant>/`
     (`run_traces --requeue-unfinished`), and their items asked again: 15 full-set items, 5 paraphrase pairs, and 3, 1
     and 2 repeat items. All answered on the next call, finishing `stop`, for $0.048.
+  - Verified 2026-10-07: each of the 26 items has a newer final row that finished `stop`, and its scored row was built
+    from that row; no final row of any WS-B store is left without a finish reason.
   - Alternative: scoring those rows as they stand can be rebuilt from the archive.
 - The 30 repaired items: nothing to re-run. Every WS-B run started after FREEZE DONE, on the final pool (manifest
   `f2c1dd2f…`).
@@ -188,7 +190,7 @@ $30.88 judged stages, $0.30 the Qwen Thinking calibration).
 - For the cascade: the paraphrase pairs (275) and, for the two re-run models in the repeat set (Gemini 3.1 Flash-Lite,
   Gemma 4), the three decoding repeats (300 items each) were re-run at the same setting.
 - Provider faults: Io Net cut about 1% of Gemma's reasoning-on completions short without a finish reason. Those items
-  were asked again; the decision above needs the owner's confirmation.
+  were asked again (the owner confirmed the rule).
 
 ## Open items
 - **`trace_review.py`** (not WS-B's file) misreads the new variants. `variant_manifest()` takes any name starting with
