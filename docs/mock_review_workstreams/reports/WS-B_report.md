@@ -165,6 +165,12 @@ $30.88 judged stages, $0.30 the Qwen Thinking calibration).
   - Dry runs, for comparison: E5 $7.79 and $0.91 at Xiaomi's endpoint; router $22.01 to $26.78.
   - The repeats are scored only, as the provider-default repeats are. The paraphrase pairs get E5 only, as the
     provider-default paraphrase arm has.
+- Local backups, 2026-10-07, made by `backup_archive.py` and checked member by member and against their `.sha256`:
+  - `~/EngTrace_private_backup/full_run_traces_reasoning_on_2026-10-07.zip`: the five trace folders, `_unfinished` and
+    `_calibration`; 32 files, sha256 `44b36211…`.
+  - `full_run_scores_reasoning_on_2026-10-07.zip`: the five score stores with their stage rows and logs, and the two
+    reply stores in `scores/_judge/`; 35 files, sha256 `208fb937…`.
+  - The Kaggle copy is the owner's manual-mode step.
 - `results/matched_config.json` (`run_traces --matched-config`; it refuses to write while a store it names is
   incomplete or the rows contradict the setting): 12 entries.
   - GPT-5.4 mini, Gemini 3.1 Flash-Lite and Gemma 4: `effort=medium`, `reasoning_store: reasoning-medium-full`, with

@@ -429,3 +429,7 @@ The repeats are scored only. Inference and stages together: $70.36; with the Qwe
 providers). It ran at 16, 24 and, for the router, 32 workers without a failure: E5 at about 17 calls a minute at 24
 workers, the router at 18 to 24 a minute at 32. A stage stopped mid-run resumes from its reply store: relaunch the
 same command, or the chain, and only the unanswered calls are made.
+
+The traces (with `_unfinished` and `_calibration`), the five score stores and the reply stores are archived locally
+(`full_run_traces_reasoning_on_2026-10-07.zip`, `full_run_scores_reasoning_on_2026-10-07.zip`, `backup_archive.py`);
+the Kaggle copy is the owner's manual-mode step.
