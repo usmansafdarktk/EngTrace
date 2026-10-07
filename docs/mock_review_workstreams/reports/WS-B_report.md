@@ -170,7 +170,8 @@ $30.88 judged stages, $0.30 the Qwen Thinking calibration).
     `_calibration`; 32 files, sha256 `44b36211…`.
   - `full_run_scores_reasoning_on_2026-10-07.zip`: the five score stores with their stage rows and logs, and the two
     reply stores in `scores/_judge/`; 35 files, sha256 `208fb937…`.
-  - The Kaggle copy is the owner's manual-mode step.
+  - A private Kaggle copy of both archives and their `.sha256` (a new dataset, uploaded 2026-10-07 in manual mode with
+    the owner's approval) was downloaded back: 69 of 69 files match by path and SHA-256, and it holds nothing else.
 - `results/matched_config.json` (`run_traces --matched-config`; it refuses to write while a store it names is
   incomplete or the rows contradict the setting): 12 entries.
   - GPT-5.4 mini, Gemini 3.1 Flash-Lite and Gemma 4: `effort=medium`, `reasoning_store: reasoning-medium-full`, with
