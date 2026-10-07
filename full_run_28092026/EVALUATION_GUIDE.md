@@ -432,4 +432,4 @@ same command, or the chain, and only the unanswered calls are made.
 
 The traces (with `_unfinished` and `_calibration`), the five score stores and the reply stores are archived locally
 (`full_run_traces_reasoning_on_2026-10-07.zip`, `full_run_scores_reasoning_on_2026-10-07.zip`, `backup_archive.py`);
-the Kaggle copy is the owner's manual-mode step.
+a private Kaggle copy (a new dataset, manual mode) was checked by download, 69 of 69 files matching by path and hash.
