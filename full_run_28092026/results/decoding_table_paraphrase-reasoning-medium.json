@@ -1,0 +1,164 @@
+[
+ {
+  "model_key": "gemma-4-26b-a4b",
+  "weights": "open",
+  "configured": "google/gemma-4-26b-a4b-it",
+  "served": {
+   "google/gemma-4-26b-a4b-it": 275
+  },
+  "providers": {
+   "Io Net": 239,
+   "DekaLLM": 34,
+   "NextBit": 2
+  },
+  "rows": 275,
+  "answered": 275,
+  "empty": 0,
+  "modes": {
+   "paraphrase-reasoning-medium": 275
+  },
+  "prompt_sha256": [
+   "c2bcb87984c4e50beaaa6876cce2e72932b91d6a755d07ab01ffc341cf9b6f7c"
+  ],
+  "request_variants": 1,
+  "max_tokens": 32768,
+  "provider_sort": "price",
+  "quantizations": [
+   "fp8",
+   "mxfp8",
+   "fp16",
+   "bf16",
+   "fp32"
+  ],
+  "allow_fallbacks": true,
+  "sampling_parameters_sent": [],
+  "reasoning_parameter": {
+   "effort": "medium"
+  },
+  "finish_reasons": {
+   "stop": 275
+  },
+  "prompt_tokens": {
+   "median": 269
+  },
+  "completion_tokens": {
+   "median": 5480,
+   "p90": 10880,
+   "max": 27444
+  },
+  "reasoning_tokens": {
+   "median": 4732,
+   "p90": 9654,
+   "max": 26374,
+   "share_above_zero": 1.0,
+   "unreported_rows": 0
+  },
+  "reasoning_text_share": 1.0,
+  "billed_usd": 0.474,
+  "seconds_median": 73.98,
+  "tool": null
+ },
+ {
+  "model_key": "gpt-5.4-mini",
+  "weights": "closed",
+  "configured": "openai/gpt-5.4-mini",
+  "served": {
+   "openai/gpt-5.4-mini": 275
+  },
+  "providers": {
+   "Azure": 275
+  },
+  "rows": 275,
+  "answered": 275,
+  "empty": 0,
+  "modes": {
+   "paraphrase-reasoning-medium": 275
+  },
+  "prompt_sha256": [
+   "c2bcb87984c4e50beaaa6876cce2e72932b91d6a755d07ab01ffc341cf9b6f7c"
+  ],
+  "request_variants": 1,
+  "max_tokens": 32768,
+  "provider_sort": "price",
+  "quantizations": null,
+  "allow_fallbacks": true,
+  "sampling_parameters_sent": [],
+  "reasoning_parameter": {
+   "effort": "medium"
+  },
+  "finish_reasons": {
+   "stop": 275
+  },
+  "prompt_tokens": {
+   "median": 245
+  },
+  "completion_tokens": {
+   "median": 1238,
+   "p90": 5001,
+   "max": 18565
+  },
+  "reasoning_tokens": {
+   "median": 516,
+   "p90": 4041,
+   "max": 17037,
+   "share_above_zero": 1.0,
+   "unreported_rows": 0
+  },
+  "reasoning_text_share": 0.8872727272727273,
+  "billed_usd": 2.6,
+  "seconds_median": 8.65,
+  "tool": null
+ },
+ {
+  "model_key": "gemini-3.1-flash-lite",
+  "weights": "closed",
+  "configured": "google/gemini-3.1-flash-lite",
+  "served": {
+   "google/gemini-3.1-flash-lite": 275
+  },
+  "providers": {
+   "Google AI Studio": 184,
+   "Google": 91
+  },
+  "rows": 275,
+  "answered": 275,
+  "empty": 0,
+  "modes": {
+   "paraphrase-reasoning-medium": 275
+  },
+  "prompt_sha256": [
+   "c2bcb87984c4e50beaaa6876cce2e72932b91d6a755d07ab01ffc341cf9b6f7c"
+  ],
+  "request_variants": 1,
+  "max_tokens": 32768,
+  "provider_sort": "price",
+  "quantizations": null,
+  "allow_fallbacks": true,
+  "sampling_parameters_sent": [],
+  "reasoning_parameter": {
+   "effort": "medium"
+  },
+  "finish_reasons": {
+   "stop": 275
+  },
+  "prompt_tokens": {
+   "median": 254
+  },
+  "completion_tokens": {
+   "median": 1449,
+   "p90": 2288,
+   "max": 3248
+  },
+  "reasoning_tokens": {
+   "median": 798,
+   "p90": 1302,
+   "max": 2380,
+   "share_above_zero": 1.0,
+   "unreported_rows": 0
+  },
+  "reasoning_text_share": 0.9963636363636363,
+  "billed_usd": 0.66,
+  "seconds_median": 4.67,
+  "tool": null
+ }
+]

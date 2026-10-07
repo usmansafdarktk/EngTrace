@@ -1,0 +1,115 @@
+{
+ "generated_by": "python -m full_run_28092026.run_traces --matched-config",
+ "written_at_utc": "2026-10-07T13:20:31Z",
+ "items": 2250,
+ "effort": "medium",
+ "prompt_sha256": "c2bcb87984c4e50beaaa6876cce2e72932b91d6a755d07ab01ffc341cf9b6f7c",
+ "models": [
+  {
+   "model": "gpt-oss-20b",
+   "default_store": "main",
+   "reasoning_store": null,
+   "reasoning_setting": "reasons by default",
+   "evidence": "reasoning tokens on 2250 of 2250 main-run rows at the provider's default"
+  },
+  {
+   "model": "gemma-4-26b-a4b",
+   "default_store": "main",
+   "reasoning_store": "reasoning-medium-full",
+   "reasoning_setting": "effort=medium",
+   "cascade": {
+    "paraphrase": "paraphrase-reasoning-medium",
+    "repeats": [
+     "repeat1-reasoning-medium",
+     "repeat2-reasoning-medium",
+     "repeat3-reasoning-medium"
+    ]
+   },
+   "evidence": "its card (Hugging Face google/gemma-4-26B-A4B-it) names \"configurable thinking modes\", switched on by enable_thinking; OpenRouter lists the reasoning parameter for its endpoints; reasoning tokens on 0 of 2250 main-run rows at the provider's default; on 2250 of 2250 reasoning-medium-full rows with the parameter at medium"
+  },
+  {
+   "model": "deepseek-v4.1-flash",
+   "default_store": "main",
+   "reasoning_store": null,
+   "reasoning_setting": "reasons by default",
+   "evidence": "reasoning tokens on 2250 of 2250 main-run rows at the provider's default"
+  },
+  {
+   "model": "qwen3-235b-a22b-2507",
+   "default_store": "main",
+   "reasoning_store": null,
+   "reasoning_setting": "none offered",
+   "evidence": "its card (Hugging Face Qwen/Qwen3-235B-A22B-Instruct-2507) says it \"supports only non-thinking mode\", and OpenRouter lists no reasoning parameter for it; reasoning tokens on 0 of 2250 main-run rows at the provider's default"
+  },
+  {
+   "model": "qwen3-235b-a22b-thinking-2507",
+   "default_store": null,
+   "sibling_of": "qwen3-235b-a22b-2507",
+   "run": false,
+   "reasoning_store": null,
+   "reasoning_setting": "reasons by default",
+   "evidence": "its card (Hugging Face Qwen/Qwen3-235B-A22B-Thinking-2507) says it \"supports only thinking mode\"; matched settings (D3): the Thinking sibling of qwen3-235b-a22b-2507, eligible under D-110's rule; not run, by the owner's decision of 2026-10-07 (too little time before the deadline). Calibrated on 20 items that day ($0.298, $0.0149 an item, a median 191 s and 3,930 completion tokens an item, all answered; rows in traces/_calibration/): the full set would bill about $33.60 plus about $10 of judged stages. It would run only as --variant main --model qwen3-235b-a22b-thinking-2507, a labelled twelfth row outside the eleven"
+  },
+  {
+   "model": "glm-5.3-flash",
+   "default_store": "main",
+   "reasoning_store": null,
+   "reasoning_setting": "reasons by default",
+   "evidence": "reasoning tokens on 2248 of 2250 main-run rows at the provider's default"
+  },
+  {
+   "model": "glm-5.3",
+   "default_store": "main",
+   "reasoning_store": null,
+   "reasoning_setting": "reasons by default",
+   "evidence": "reasoning tokens on 2246 of 2250 main-run rows at the provider's default"
+  },
+  {
+   "model": "muse-glimmer-30b",
+   "default_store": "main",
+   "reasoning_store": null,
+   "reasoning_setting": "reasons by default",
+   "evidence": "reasoning tokens on 2250 of 2250 main-run rows at the provider's default"
+  },
+  {
+   "model": "kimi-k3",
+   "default_store": "main",
+   "reasoning_store": null,
+   "reasoning_setting": "reasons by default",
+   "evidence": "reasoning tokens on 2250 of 2250 main-run rows at the provider's default"
+  },
+  {
+   "model": "gpt-5.4-mini",
+   "default_store": "main",
+   "reasoning_store": "reasoning-medium-full",
+   "reasoning_setting": "effort=medium",
+   "cascade": {
+    "paraphrase": "paraphrase-reasoning-medium",
+    "repeats": []
+   },
+   "evidence": "reasoning tokens on 0 of 2250 main-run rows at the provider's default; on 2250 of 2250 reasoning-medium-full rows with the parameter at medium"
+  },
+  {
+   "model": "gemini-3.1-flash-lite",
+   "default_store": "main",
+   "reasoning_store": "reasoning-medium-full",
+   "reasoning_setting": "effort=medium",
+   "cascade": {
+    "paraphrase": "paraphrase-reasoning-medium",
+    "repeats": [
+     "repeat1-reasoning-medium",
+     "repeat2-reasoning-medium",
+     "repeat3-reasoning-medium"
+    ]
+   },
+   "evidence": "reasoning tokens on 0 of 2250 main-run rows at the provider's default; on 2250 of 2250 reasoning-medium-full rows with the parameter at medium"
+  },
+  {
+   "model": "claude-sonnet-5",
+   "default_store": "main",
+   "reasoning_store": null,
+   "reasoning_setting": "reasons by default",
+   "evidence": "reasoning tokens on 2242 of 2250 main-run rows at the provider's default"
+  }
+ ]
+}

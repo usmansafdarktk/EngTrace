@@ -330,3 +330,102 @@ and level intervals, the detectable-difference columns and the per-template SD d
 clean tree afterwards, so the provenance line names the commit without "dirty".
 
 **After the next steps' section C (D-180 to D-184, 2026-10-03).** `run_traces.py` gained the arms `reasoning-<effort>`, `flagship`, `flagship-reasoning-<effort>`, `openbook` and `openbook2` (with `openbook.py`, two filter versions) and `tool`, all on the originals of the 450-item subsample; the scorer, `trace_review.py`, `decoding_table.py --variant`, E5 and the router take an arm's name and its models from the arm's own files; `analyze.py` reports the paired arms against their base run and the anchors beside the roster; `judge_swap.py` reports the second judge. Every paid arm was approved on its dry run and recorded with its bill; the tool arm is built and priced, not run. The arms' traces, scores and the judge reply stores are archived locally (`full_run_traces_c_arms_2026-10-03.zip`, `full_run_scores_c_arms_and_replies_2026-10-03.zip`, `backup_archive.py`); the Kaggle copy is the owner's manual-mode step.
+
+## 11. The full-set reasoning variants: the matched configuration (2026-10-06)
+
+**Why.** At their providers' defaults, four roster models returned no reasoning tokens on any row of the main run
+(`DECODING_TABLE.md`): Gemma 4 26B, Qwen3-235B-2507, Gemini 3.1 Flash-Lite and GPT-5.4 mini. Every model whose
+endpoint offers a reasoning setting is run again with it on, on all 2,250 items, so each model can be reported at
+matched settings. The setting is OpenRouter's unified reasoning parameter at medium effort, as the 450-item arm
+`reasoning-medium` sent it (D-180). Everything else is the main run's: the prompt (`--check` and every launch refuse
+unless its hash equals the one on the main run's rows), the 32,768 ceiling and the routing.
+
+| model | setting | evidence |
+|---|---|---|
+| GPT-5.4 mini, Gemini 3.1 Flash-Lite | effort medium (`reasoning-medium-full`) | the 450-item arm returned reasoning tokens on every row |
+| Gemma 4 26B | effort medium (`reasoning-medium-full`) | the calibration below: 20 of 20 rows reasoned |
+| Qwen3-235B-2507 | none offered | the Instruct release "supports only non-thinking mode" (its Hugging Face card); OpenRouter lists no reasoning parameter for it |
+| the other seven | reasons by default | reasoning tokens on 99.6% to 100% of their main-run rows |
+
+Qwen3-235B-A22B-Thinking-2507 is the Instruct release's Thinking sibling, a different model. It passes D-110's roster
+rule and is in `models.json` as an inert entry (`run: false`, `added_for: "matched settings"`). It runs only when named:
+`--variant main --model qwen3-235b-a22b-thinking-2507`, as a labelled twelfth row outside the eleven. It was calibrated
+on 20 items on 2026-10-07 ($0.298; a median 191 s and 3,930 completion tokens an item, all answered, served by Novita;
+the rows are in `traces/_calibration/`) and not run, by the owner's decision: the full set would have billed about
+$33.60 plus about $10 of judged stages, and taken about 3 h of inference at 64 workers.
+
+**The variants** (`run_traces.py`):
+
+- `reasoning-medium-full`: the 2,250 items with the parameter on, for `MATCHED_MODELS` or the models `--model` names.
+- `paraphrase-reasoning-medium`: the 275 kept paraphrase pairs (the 314 passing paraphrases less the 39 the expert
+  rejected, the pairs `analyze.py` keeps), for `MATCHED_MODELS`.
+- `repeat1-reasoning-medium` to `repeat3-reasoning-medium`: the 300 repeat items, for the `MATCHED_MODELS` in the
+  decoding repeats' set (Gemini 3.1 Flash-Lite and Gemma 4).
+
+**Commands, in order** (one process per model and variant, launched through `keepawake_run.ps1` as in section 3):
+
+```bash
+python -m full_run_28092026.run_traces --variant reasoning-medium-full --model gemma-4-26b-a4b --calibrate 20 --yes  # cents
+python -m full_run_28092026.run_traces --variant reasoning-medium-full --dry-run        # free: priced from measured bills
+python -m full_run_28092026.run_traces --variant reasoning-medium-full --model <key> --yes
+python -m full_run_28092026.run_traces --variant reasoning-medium-full --review         # free: exit 0 when complete and clean
+python -m full_run_28092026.run_traces --variant reasoning-medium-full --trace-review   # free: TRACE_REVIEW_<variant>.md
+python -m full_run_28092026.decoding_table --variant reasoning-medium-full              # DECODING_TABLE_<variant>.md
+python -m full_run_28092026.score --variant reasoning-medium-full                       # free
+python -m full_run_28092026.judge --variant reasoning-medium-full --dry-run             # free
+python -m full_run_28092026.judge --variant reasoning-medium-full --yes --max-usd <store total + approved> --workers 4
+python -m full_run_28092026.router --variant reasoning-medium-full --dry-run            # free
+python -m full_run_28092026.router --variant reasoning-medium-full --yes --max-usd <store total + approved> --workers 4
+# the cascade: the same run, review and score for paraphrase-reasoning-medium and repeat1..3-reasoning-medium;
+# E5 on the paraphrase variant only, as the provider-default paraphrase arm has it; the repeats are scored only, as
+# the provider-default repeats are
+python -m full_run_28092026.run_traces --matched-config                                 # free: results/matched_config.json
+```
+
+- `--only-items PATH` (a file of item ids, one per line) restricts every mode of every variant to those items: the
+  resume of a subset whose rows were archived.
+- `--trace-review` exists because `trace_review.py` reads any variant name that begins `reasoning-` as the 450-item
+  subsample and an unknown name as the whole pool. It passes the variant's own item set and runs that script unchanged.
+- The judged stages share the judge model with every other stream. Run one judged process at a time across the
+  machine, check the other streams' reports first, and remember that `--max-usd` is cumulative over the reply store.
+- `--matched-config` refuses to write while a store it names is incomplete or its rows contradict the setting.
+
+**Costs and times** (the bills are the rows' `billed_usd`; `run_traces --status` prints them):
+
+| run | items | inference billed |
+|---|---:|---:|
+| `--check` calls, five | | $0.008 |
+| GPT-5.4 mini, `reasoning-medium-full` | 2,250 | $22.650 |
+| Gemini 3.1 Flash-Lite, `reasoning-medium-full` | 2,250 | $5.526 |
+| Gemma 4 26B, `reasoning-medium-full` (its 20 calibration rows, $0.032, included) | 2,250 | $3.795 |
+| GPT-5.4 mini, `paraphrase-reasoning-medium` | 275 | $2.600 |
+| Gemini 3.1 Flash-Lite, `paraphrase-reasoning-medium` | 275 | $0.660 |
+| Gemma 4 26B, `paraphrase-reasoning-medium` | 275 | $0.481 |
+| Gemini 3.1 Flash-Lite, `repeat1..3-reasoning-medium` | 3 x 300 | $2.196 |
+| Gemma 4 26B, `repeat1..3-reasoning-medium` | 3 x 300 | $1.566 |
+| **Inference, all** | | **$39.48** |
+
+GPT-5.4 mini took about 35 minutes at 16 workers, Gemini about 11. Gemma took about 3 hours 10 minutes, at about a
+minute per item, while its four cascade runs shared its endpoints. Gemma's figures include 26 rows moved to
+`traces/_unfinished/` (below) and the calls that replaced them.
+
+**Rows without a finish reason.** Io Net ended about 1% of Gemma 4's completions with no finish reason, the text cut off
+mid-sentence far below the ceiling. In these variants `call()` treats that as a provider fault and asks again, as it
+does `finish_reason=error` (D-148). Rows written before that rule went to `traces/_unfinished/<variant>/`
+(`run_traces --requeue-unfinished`, which refuses a trace file changed in the last two minutes), and the next resume
+asked those items again.
+
+**The judged stages** (2026-10-07, 02:07 to 12:32 UTC; every call answered, none failed):
+
+| stage | calls | billed | dry run |
+|---|---:|---:|---|
+| E5, `reasoning-medium-full` | 2,391 | $7.285 | $7.79 at Xiaomi's endpoint ($5.45 to $14.67) |
+| E5, `paraphrase-reasoning-medium` | 281 | $0.833 | $0.91 ($0.64 to $1.72) |
+| router, `reasoning-medium-full` | 6,747 | $22.764 | $22.01 to $26.78 ($15.41 to $40.65) |
+| **Judged stages, all** | | **$30.88** | |
+
+The repeats are scored only. Inference and stages together: $70.36; with the Qwen Thinking calibration below, $70.66. At 4 workers the judge model answered about
+2.6 calls a minute (a call is generation-bound, a median 74 s at about 41 tokens a second, spread over several
+providers). It ran at 16, 24 and, for the router, 32 workers without a failure: E5 at about 17 calls a minute at 24
+workers, the router at 18 to 24 a minute at 32. A stage stopped mid-run resumes from its reply store: relaunch the
+same command, or the chain, and only the unanswered calls are made.

@@ -63,9 +63,40 @@ set, into traces/<variant>/<key>.jsonl, so score.py scores it as that variant:
                     its output in fenced blocks, the final answer); final_text, turns, tool_calls, tool_errors,
                     tool_refused, tool_limit and tool_turns record the tool use; tokens and the bill are summed over
                     the turns. `--selftest` exercises the sandbox and the loop offline, for free.
+  reasoning-medium-full  (the matched configuration) all 2,250 pool items with their original questions and the
+                    reasoning parameter at effort medium, as the 450-item arm `reasoning-medium` sent it, for the models
+                    that returned no reasoning tokens at their provider's default and whose endpoints honour the
+                    parameter: MATCHED_MODELS, or the models --model names (a calibration before a model joins).
+                    Everything else is the main run's: the prompt (--check and every launch refuse unless its hash
+                    equals the one on the main run's rows), the 32,768 ceiling and the routing.
+  paraphrase-reasoning-medium   the cascade's paraphrase pairs: the passing paraphrases less the pairs the expert
+                    rejected (paraphrase/accepted.json, the pairs analyze.py keeps), with the parameter on, for
+                    MATCHED_MODELS; rows record the paraphrase's hash and the original's as the paraphrase arm's do
+  repeat1-reasoning-medium .. repeat3-reasoning-medium   the cascade's repeats: the 300 repeat items with the
+                    parameter on, for the MATCHED_MODELS that are in the decoding repeats' set (REPEAT_MODELS, D-151)
 The dry run estimates a variant from each model's own bills on the same items in the main run; for a reasoning
 variant the main run's visible output understates the bill, so its dry run prices output-token multipliers and
-`--calibrate N` (allowed for this variant) measures the real lengths on N items first.
+`--calibrate N` (allowed for this variant) measures the real lengths on N items first. The matched-configuration
+variants are priced from bills measured with the parameter on, never the main run's: reasoning-medium-full from the
+450-item arm's rows (the rows decoding_table_reasoning-medium.json sums), or from its own calibration rows for a
+model the arm did not run; the cascade from each model's reasoning-medium-full rows on the same items.
+
+--only-items PATH restricts every mode of every variant to the item ids PATH lists, one per line: the resume of a
+subset whose rows were archived (re-drawn items). An id that is no pool item stops the run; an id outside the
+variant's items is skipped and counted. --review (FREE) prints the checks a finished run must pass before scoring:
+missing items, finish reasons, empty rows at the ceiling, the rows with reasoning tokens and with reasoning text, the
+providers, the request sets and the prompt hash against the main run's. --matched-config (FREE) writes
+results/matched_config.json, the setting and stores per roster model, once every store it names is complete.
+--trace-review (FREE) runs trace_review.py on one of these variants with the variant's item set, which that script's own
+reading of variant names does not give. In these variants a completion that comes back without a finish reason is a
+provider fault, asked again like finish_reason=error (Io Net cut about 1% of Gemma 4's completions so, mid-sentence);
+--requeue-unfinished (FREE) moves rows written so before the rule to traces/_unfinished/, so the next run asks again.
+
+    python -m full_run_28092026.run_traces --variant reasoning-medium-full --model gemma-4-26b-a4b --calibrate 20 --yes
+    python -m full_run_28092026.run_traces --variant reasoning-medium-full --dry-run                    # FREE
+    python -m full_run_28092026.run_traces --variant reasoning-medium-full --model gpt-5.4-mini --yes
+    python -m full_run_28092026.run_traces --variant reasoning-medium-full --review                     # FREE
+    python -m full_run_28092026.run_traces --variant repeat1 --model gemma-4-26b-a4b --only-items ids.txt --yes
 
     python -m full_run_28092026.run_traces --variant paraphrase --dry-run          # FREE
     python -m full_run_28092026.run_traces --variant repeat1 --model gemma-4-26b-a4b --dry-run
@@ -107,7 +138,24 @@ REASONING_VARIANTS = tuple(f'reasoning-{e}' for e in REASONING_EFFORTS)
 REASONING_MODELS = ('gpt-5.4-mini', 'gemini-3.1-flash-lite')     # no reasoning tokens at the provider's default (D-168)
 FLAGSHIP_REASONING = tuple(f'flagship-reasoning-{e}' for e in REASONING_EFFORTS)   # the closed anchor with reasoning on (D-182)
 TOOL = 'tool'                                                                     # C4's tool condition (D-184)
-VARIANTS = ('main', 'paraphrase') + subsamples.REPEAT_VARIANTS + REASONING_VARIANTS + ('flagship', 'openbook', 'openbook2') + FLAGSHIP_REASONING + (TOOL,)
+MATCHED_EFFORT = 'medium'                   # the matched configuration's effort: the 450-item arm's (D-180)
+FULL_REASONING = 'reasoning-medium-full'    # all 2,250 items with the parameter on
+CASCADE_PARAPHRASE = 'paraphrase-reasoning-medium'
+CASCADE_REPEATS = tuple(f'{v}-reasoning-medium' for v in subsamples.REPEAT_VARIANTS)
+MATCHED_VARIANTS = (FULL_REASONING, CASCADE_PARAPHRASE) + CASCADE_REPEATS
+MATCHED_MODELS = ('gpt-5.4-mini', 'gemini-3.1-flash-lite', 'gemma-4-26b-a4b')   # reasoning on over the full set (D3); Gemma 4 by its calibration: 20 of 20 rows reasoned
+REPEAT_MODELS = ('gemma-4-26b-a4b', 'gpt-oss-20b', 'qwen3-235b-a22b-2507', 'gemini-3.1-flash-lite')   # the decoding repeats' four (D-151)
+MATCHED_CONFIG = HERE / 'results' / 'matched_config.json'
+NO_SETTING = ('qwen3-235b-a22b-2507',)      # roster models whose endpoints offer no reasoning setting
+CARD_NOTES = {      # what a model's card and OpenRouter's catalogue say of its thinking mode (read 2026-10-06)
+    'qwen3-235b-a22b-2507': 'its card (Hugging Face Qwen/Qwen3-235B-A22B-Instruct-2507) says it "supports only non-thinking '
+                            'mode", and OpenRouter lists no reasoning parameter for it',
+    'gemma-4-26b-a4b': 'its card (Hugging Face google/gemma-4-26B-A4B-it) names "configurable thinking modes", switched on by '
+                       'enable_thinking; OpenRouter lists the reasoning parameter for its endpoints',
+    'qwen3-235b-a22b-thinking-2507': 'its card (Hugging Face Qwen/Qwen3-235B-A22B-Thinking-2507) says it "supports only '
+                                     'thinking mode"',
+}
+VARIANTS =('main', 'paraphrase') + subsamples.REPEAT_VARIANTS + REASONING_VARIANTS + ('flagship', 'openbook', 'openbook2') + FLAGSHIP_REASONING + (TOOL,) + MATCHED_VARIANTS
 OPENBOOK = HERE / 'openbook'
 OPENBOOK_MODELS = ('claude-sonnet-5', 'gpt-5.4-mini', 'gpt-oss-20b')   # one model from each tier (D-183)
 TOOL_MODELS = OPENBOOK_MODELS               # the tool arm runs the open-book arm's three, for a like-for-like reading (D-184)
@@ -177,11 +225,14 @@ def items() -> list[dict]:
 
 def variant_items(variant: str, its: list[dict]) -> list[dict]:
     """The items a variant runs: a subsample of the pool, with paraphrased questions for `paraphrase`."""
-    if variant == 'main':
+    if variant in ('main', FULL_REASONING):
         return its
     by_id = {it['item_id']: it for it in its}
-    if variant in subsamples.REPEAT_VARIANTS:
+    if variant in subsamples.REPEAT_VARIANTS or variant in CASCADE_REPEATS:
         return [by_id[i] for i in subsamples.repeat_ids()]
+    if variant == CASCADE_PARAPHRASE:
+        keep = kept_pairs()
+        return [it for it in variant_items('paraphrase', its) if it['item_id'] in keep]
     if variant in REASONING_VARIANTS or variant == 'flagship' or variant in FLAGSHIP_REASONING or variant == TOOL:
         return [by_id[i] for i in subsamples.paraphrase_ids()]       # the originals of the 450-item subsample
     if variant in ('openbook', 'openbook2'):
@@ -223,6 +274,42 @@ def variant_items(variant: str, its: list[dict]) -> list[dict]:
     return out
 
 
+def kept_pairs() -> set[str]:
+    """The paraphrase pairs the analysis keeps: every passing pair the expert did not reject (paraphrase/accepted.json,
+    the rule of analyze.accepted_pairs)."""
+    p = PARAPHRASES / 'accepted.json'
+    if not p.exists():
+        raise SystemExit('paraphrase/accepted.json is missing: the expert check has not been scored (paraphrase_kit.py --score)')
+    return {i for i, r in json.loads(p.read_text(encoding='utf-8')).items() if r.get('kept') is not False}
+
+
+def only_items(its: list[dict], pool: list[dict], path: str) -> list[dict]:
+    """--only-items: the variant's items whose ids PATH lists, one per line (the line's first word; blank lines and lines
+    starting with # skipped, since an id holds a # itself). An id that is no pool item stops the run (a typo, or an id a
+    re-draw retired); an id outside the variant's items is skipped and counted."""
+    words = [ln.split() for ln in Path(path).read_text(encoding='utf-8').splitlines()]
+    ids = {w[0] for w in words if w and not w[0].startswith('#')}
+    unknown = sorted(ids - {it['item_id'] for it in pool})
+    if unknown:
+        raise SystemExit(f'--only-items: {len(unknown)} of the {len(ids)} ids are not pool items (first: {unknown[:3]})')
+    out = [it for it in its if it['item_id'] in ids]
+    print(f'--only-items {path}: {len(out)} of its {len(ids)} ids are items of this variant'
+          + (f'; {len(ids) - len(out)} are not and are skipped' if len(out) < len(ids) else ''))
+    return out
+
+
+def main_prompt_hashes() -> Counter:
+    """The prompt hash on every row of the main run's trace files, counted: one value when the run used one prompt."""
+    c = Counter()
+    for p in sorted(TRACES.glob('*.jsonl')):
+        with open(p, encoding='utf-8') as fh:
+            for ln in fh:
+                k = ln.find('"prompt_sha256": "')
+                if k >= 0:
+                    c[ln[k + 18:k + 82]] += 1
+    return c
+
+
 def trace_path(key: str, variant: str = 'main') -> Path:
     return TRACES / f'{key}.jsonl' if variant == 'main' else TRACES / variant / f'{key}.jsonl'
 
@@ -250,6 +337,8 @@ def request_params(spec: dict, cfg: dict, variant: str = 'main') -> dict:
         # OpenRouter's unified reasoning parameter; the provider maps the effort to its own setting. The main run
         # sent nothing here and ran at each provider's default (D-122).
         p['extra_body']['reasoning'] = {'effort': variant.rsplit('-', 1)[1]}
+    if variant in MATCHED_VARIANTS:
+        p['extra_body']['reasoning'] = {'effort': MATCHED_EFFORT}      # as the 450-item arm sent it
     if variant == TOOL:
         # The python tool in the request, the model free to use it or not; everything else as the main run (D-184).
         p['tools'] = [PYTHON_TOOL]
@@ -284,6 +373,11 @@ def call(cli, spec: dict, cfg: dict, question: str, attempts: int = MAX_ATTEMPTS
                 # A provider fault reported inside a 200: not the model's answer (D-148). Seven such
                 # rows in the main run were scored on what they state and are reported as a count.
                 raise RuntimeError('provider reported finish_reason=error')
+            if r.choices[0].finish_reason is None and variant in MATCHED_VARIANTS:
+                # No finish reason, the text cut off mid-sentence well below the ceiling: Io Net ended about 1% of
+                # Gemma 4's completions so with reasoning on. A provider fault, asked again like the one above; the
+                # other variants keep the main run's reading (one such row in its 26,970).
+                raise RuntimeError('provider returned no finish reason')
             row = {
                 'text': text,
                 'reasoning': getattr(msg, 'reasoning', None) or extra.get('reasoning') or '',
@@ -562,7 +656,8 @@ def dry_run(cfg, its, specs, variant='main') -> int:
     tot_doc = tot_routed = 0.0
     short = []
     for s in specs:
-        todo = len(its) - len(existing(s['key'], variant))
+        done = existing(s['key'], variant)
+        todo = sum(it['item_id'] not in done for it in its)                  # the items listed, under --only-items
         doc = todo * per_item_cost(s['price_per_m'], tok)
         ceiling = s.get('max_tokens', cfg['max_tokens'])
         try:
@@ -687,6 +782,219 @@ def tool_dry_run(cfg, its, specs, variant) -> int:
     return 0
 
 
+def matched_dry_run(cfg, its, specs, variant) -> int:
+    """A matched-configuration variant's estimate, from bills measured with the parameter on, never the main run's.
+    reasoning-medium-full: each model's mean bill per row on the 450-item arm reasoning-medium (the rows
+    decoding_table_reasoning-medium.json sums), or on its own rows in this variant (its calibration) for a model the
+    arm did not run. The cascade: each model's reasoning-medium-full rows on the same items once 20 of them have run (a
+    paraphrase is about as long as its original), else its arm rows, else its reasoning-medium-full rows on all items. A
+    model with none of these has no estimate: --calibrate 20 first. Beside
+    the bill, the same mean tokens at the endpoint routing picks today, from OpenRouter's public list."""
+    sources = ([('reasoning-medium', 'the 450-item arm'), (FULL_REASONING, 'own rows')] if variant == FULL_REASONING
+               else [(FULL_REASONING, f'{FULL_REASONING}, same items'), ('reasoning-medium', 'the 450-item arm'),
+                     (FULL_REASONING, f'{FULL_REASONING}, all items')])       # same items once 20 of them have run
+    want = {it['item_id'] for it in its}
+    print(f'variant {variant}: {len(its)} items, {len({i["template_id"] for i in its})} templates; reasoning effort '
+          f'{MATCHED_EFFORT!r} in the request; traces go to traces/{variant}/')
+    print(f'{"model":22s} {"to run":>6s} {"priced from":30s} {"rows":>5s} {"in/row":>7s} {"out/row":>8s} {"$/row":>8s} '
+          f'{"estimate $":>10s} {"routed today $":>14s}  endpoint today')
+    total = routed_total = 0.0
+    for s in specs:
+        todo = [it for it in its if it['item_id'] not in existing(s['key'], variant)]
+        rows, label = [], 'none: --calibrate 20 first'
+        for src, what in sources:
+            got = existing(s['key'], src)
+            if what.endswith('same items'):
+                got = {i: r for i, r in got.items() if i in want}
+                if len(got) < 20:
+                    continue
+            if got:
+                rows, label = list(got.values()), what
+                break
+        if not rows:
+            print(f'{s["key"]:22s} {len(todo):6d} {label:30s}')
+            continue
+        n = len(rows)
+        tok = {'in': sum(r.get('prompt_tokens') or 0 for r in rows) / n, 'out': sum(r.get('completion_tokens') or 0 for r in rows) / n}
+        per = sum(r.get('billed_usd') or 0.0 for r in rows) / n
+        try:
+            ep, price, _n_ok = routed_endpoint(s, cfg, tok)
+        except Exception as exc:                                   # noqa: BLE001
+            ep, price = None, None
+            print(f'  ({s["key"]}: endpoint list unreachable, {type(exc).__name__})')
+        routed = len(todo) * per_item_cost(price, tok) if price else None
+        total += per * len(todo)
+        routed_total += routed or 0.0
+        where = (f"{ep.get('provider_name') or ep.get('name')}{' ' + ep['quantization'] if s['weights'] == 'open' and ep.get('quantization') else ''} "
+                 f"${price['in']:.3f}/${price['out']:.3f} per M" if ep else 'NO ELIGIBLE ENDPOINT')
+        print(f'{s["key"]:22s} {len(todo):6d} {label:30s} {n:5d} {tok["in"]:7.0f} {tok["out"]:8.0f} {per:8.5f} '
+              f'{per * len(todo):10.2f} {"" if routed is None else f"{routed:14.2f}":>14s}  {where}')
+    print(f'{"TOTAL":22s} {"":6s} {"":30s} {"":5s} {"":7s} {"":8s} {"":8s} {total:10.2f} {routed_total:14.2f}')
+    print('\n$/row: the mean bill per row of the rows named, with the parameter on; estimate: $/row times the rows to run. '
+          'routed today: the same mean tokens at the endpoint routing picks today (the bill is read from each response). '
+          'E5 and the router on the new traces come on top, priced by their own --dry-run once the traces exist. '
+          'Nothing was called.')
+    return 0
+
+
+def review(cfg, its, specs, variant) -> int:
+    """FREE. What a finished run must show before it is scored, per model on this variant's items: the items missing,
+    the finish reasons, the empty rows and those that ended at the ceiling, the rows whose endpoint reported reasoning
+    tokens and those that returned reasoning text, the request sets, whether every row carries the prompt hash the
+    main run's rows carry, and the providers that served. Exits 1 when an item is missing or a prompt differs."""
+    main_sha = main_prompt_hashes()
+    want = {it['item_id'] for it in its}
+    print(f'variant {variant}: {len(its)} items; the main run\'s rows carry prompt '
+          + ', '.join(f'{h[:16]} ({n} rows)' for h, n in main_sha.most_common()))
+    print(f'{"model":22s} {"rows":>5s} {"missing":>7s} {"empty":>5s} {"at ceiling":>10s} {"stop/length/other":>17s} '
+          f'{"reasoning tok":>13s} {"reasoning txt":>13s} {"requests":>8s} {"prompt = main":>13s} {"billed $":>9s}  providers')
+    bad = 0
+    for s in specs:
+        rows = [r for i, r in existing(s['key'], variant).items() if i in want]
+        n = len(rows)
+        fin = Counter(r.get('finish_reason') for r in rows)
+        finish = f"{fin['stop']}/{fin['length']}/{n - fin['stop'] - fin['length']}"
+        empty = sum(r['status'] == 'empty' for r in rows)
+        at_ceiling = sum(r['status'] == 'empty' and r.get('finish_reason') == 'length' for r in rows)
+        share = (lambda k: f'{k / n:.3f}') if n else (lambda k: '-')
+        rtok = share(sum((r.get('reasoning_tokens') or 0) > 0 for r in rows))
+        rtxt = share(sum(bool((r.get('reasoning') or '').strip()) for r in rows))
+        reqs = len({json.dumps(r.get('request'), sort_keys=True) for r in rows})
+        same = n > 0 and {r.get('prompt_sha256') for r in rows} == set(main_sha) == {PROMPT_SHA}
+        provs = Counter(r.get('provider') for r in rows)
+        bad += (n < len(its)) or not same
+        print(f'{s["key"]:22s} {n:5d} {len(its) - n:7d} {empty:5d} {at_ceiling:10d} {finish:>17s} {rtok:>13s} {rtxt:>13s} '
+              f'{reqs:8d} {"yes" if same else "NO":>13s} {sum(r.get("billed_usd") or 0.0 for r in rows):9.3f}  '
+              + '; '.join(f'{p} ({c})' for p, c in provs.most_common()))
+    print('\nrows: final rows (answered or empty) on this variant\'s items. at ceiling: empty rows that ended at the output '
+          'ceiling. reasoning tok / txt: the share of rows whose endpoint reported reasoning tokens above zero / returned '
+          'reasoning text. requests: distinct request parameter sets (1 expected). prompt = main: every row carries the '
+          'prompt hash the main run\'s rows carry.')
+    for s in specs:                                        # what the variant billed beyond its final rows
+        moved = TRACES / '_unfinished' / variant / f'{s["key"]}.jsonl'
+        rows = [json.loads(ln) for ln in moved.read_text(encoding='utf-8').splitlines()] if moved.exists() else []
+        if rows:
+            print(f'{s["key"]}: {len(rows)} rows without a finish reason moved to traces/_unfinished/ and asked again, '
+                  f'billed ${sum(r.get("billed_usd") or 0.0 for r in rows):.3f} besides the final rows')
+    return 1 if bad else 0
+
+
+def matched_config() -> int:
+    """FREE. results/matched_config.json, which the analysis's matched family reads: for every roster model the store of
+    its provider-default run (main), the store of its reasoning-on run if it has one, the setting ("effort=medium", "none
+    offered" or "reasons by default"), a re-run model's cascade stores, and the evidence, counted from the trace rows
+    with what the model's card says; the Qwen Thinking sibling has its own entry (sibling_of; run false while it is
+    priced and not run). Refuses to write while a store it names is incomplete or the rows contradict the setting."""
+    cfg = config()
+    pool = items()
+    sets = {v: {it['item_id'] for it in variant_items(v, pool)} for v in ('main',) + MATCHED_VARIANTS}
+
+    def count(variant, key):
+        rows = [r for i, r in existing(key, variant).items() if i in sets[variant]]
+        return len(rows), sum((r.get('reasoning_tokens') or 0) > 0 for r in rows)
+
+    models, bad = [], []
+    for s in cfg['models']:
+        key, sibling = s['key'], s.get('added_for') == 'matched settings'
+        if s.get('run') is False and not sibling:
+            continue                                       # never run, set aside, or an anchor outside the roster
+        n, k = count('main', key)
+        ev = [CARD_NOTES[key]] if key in CARD_NOTES else []
+        ev.append(f"reasoning tokens on {k} of {n} main-run rows at the provider's default" if n else
+                  s.get('run_reason') or 'not run')
+        e = {'model': key, 'default_store': 'main' if n == len(sets['main']) else None}
+        if sibling:
+            e.update(sibling_of=s['sibling_of'], run=n > 0)
+        if key in MATCHED_MODELS:
+            n2, k2 = count(FULL_REASONING, key)
+            ev.append(f'on {k2} of {n2} {FULL_REASONING} rows with the parameter at {MATCHED_EFFORT}')
+            reps = list(CASCADE_REPEATS) if key in REPEAT_MODELS else []
+            e.update(reasoning_store=FULL_REASONING, reasoning_setting=f'effort={MATCHED_EFFORT}',
+                     cascade={'paraphrase': CASCADE_PARAPHRASE, 'repeats': reps})
+            for v in (FULL_REASONING, CASCADE_PARAPHRASE, *reps):
+                if count(v, key)[0] != len(sets[v]):
+                    bad.append(f'{key}: {v} holds {count(v, key)[0]} of {len(sets[v])} items')
+            if k or k2 < 0.95 * n2:
+                bad.append(f'{key}: reasoning tokens on {k} main rows and on {k2} of {n2} {FULL_REASONING} rows')
+        elif key in NO_SETTING:
+            e.update(reasoning_store=None, reasoning_setting='none offered')
+            if k:
+                bad.append(f'{key}: no setting is offered, yet {k} main rows carry reasoning tokens')
+        else:
+            e.update(reasoning_store=None, reasoning_setting='reasons by default')
+            if n and k < 0.95 * n:
+                bad.append(f'{key}: reasons by default, yet only {k} of {n} main rows carry reasoning tokens')
+        if n != len(sets['main']) and not (sibling and n == 0):
+            bad.append(f'{key}: the main run holds {n} of {len(sets["main"])} items')
+        e['evidence'] = '; '.join(ev)
+        models.append(e)
+    if bad:
+        print('matched_config.json NOT written:\n  ' + '\n  '.join(bad))
+        return 1
+    MATCHED_CONFIG.parent.mkdir(exist_ok=True)
+    MATCHED_CONFIG.write_text(json.dumps({
+        'generated_by': 'python -m full_run_28092026.run_traces --matched-config',
+        'written_at_utc': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
+        'items': len(sets['main']), 'effort': MATCHED_EFFORT, 'prompt_sha256': PROMPT_SHA,
+        'models': models}, indent=1) + '\n', encoding='utf-8', newline='\n')
+    for e in models:
+        print(f"{e['model']:30s} {e['reasoning_setting']:20s} default {e['default_store'] or '-':5s} "
+              f"reasoning {e['reasoning_store'] or '-'}")
+    print(f'wrote {MATCHED_CONFIG.relative_to(REPO).as_posix()}')
+    return 0
+
+
+def requeue_unfinished(specs, variant) -> int:
+    """FREE. A matched-configuration variant's final rows that ended without a finish reason (answered, the text cut
+    off by the provider; call() now asks such a completion again) leave the trace file for
+    traces/_unfinished/<variant>/<model>.jsonl, kept there, so the next run of the variant calls those items again.
+    Only when no process is writing the variant: it refuses a trace file changed in the last two minutes."""
+    for s in specs:
+        path = trace_path(s['key'], variant)
+        if not path.exists():
+            continue
+        if time.time() - path.stat().st_mtime < 120:
+            raise SystemExit(f'{variant}/{path.name} changed in the last two minutes: is a run still writing it?')
+        lines = path.read_text(encoding='utf-8').splitlines()
+        final = {}
+        for i, ln in enumerate(lines):
+            try:
+                r = json.loads(ln)
+            except json.JSONDecodeError:
+                continue
+            if r.get('status') in DONE:
+                final[r['item_id']] = (i, r)
+        drop = {i: r['item_id'] for i, r in final.values() if r['status'] == 'answered' and r.get('finish_reason') is None}
+        if not drop:
+            print(f'{variant}/{s["key"]}: no final row without a finish reason')
+            continue
+        dest = TRACES / '_unfinished' / variant / f'{s["key"]}.jsonl'
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        with open(dest, 'a', encoding='utf-8', newline='\n') as fh:
+            for i in sorted(drop):
+                fh.write(lines[i] + '\n')
+        tmp = path.with_name(path.name + '.tmp')
+        with open(tmp, 'w', encoding='utf-8', newline='\n') as fh:
+            fh.writelines(ln + '\n' for i, ln in enumerate(lines) if i not in drop)
+        os.replace(tmp, path)
+        print(f'{variant}/{s["key"]}: {len(drop)} final rows without a finish reason moved to '
+              f'{dest.relative_to(HERE).as_posix()}: {", ".join(sorted(drop.values()))}')
+    return 0
+
+
+def trace_review(variant: str) -> int:
+    """FREE. trace_review.py on a matched-configuration variant, given the variant's item set: its own variant_manifest()
+    reads any name that begins `reasoning-` as the 450-item subsample and an unknown name as the whole pool, so it would
+    count most of these variants' rows as foreign or missing. Everything else is trace_review.py's own, which writes
+    TRACE_REVIEW_<variant>.md and trace_review_<variant>.json."""
+    from full_run_28092026 import trace_review as tr
+    man = {it['item_id']: {'sha256': it['sha256'], **({'original_sha256': it['original_sha256']} if 'original_sha256' in it else {})}
+           for it in variant_items(variant, items())}
+    tr.variant_manifest = lambda _variant, _man: man
+    sys.argv = ['trace_review', '--variant', variant]
+    return tr.main()
+
+
 def tool_selftest() -> int:
     """FREE. The sandbox (a numeric script, a refused one, a timeout, truncation, the environment without our key)
     and the loop against a fake client that returns a tool call and then an answer."""
@@ -763,12 +1071,15 @@ def calibration_sample(its, n):
     return its[::step][:n]
 
 
-def status(cfg, its, specs, variant='main') -> int:
+def status(cfg, its, specs, variant='main', only: bool = False) -> int:
     print(f'{"model":22s} {"answered":>9s} {"empty":>6s} {"missing":>8s} {"billed $":>9s} '
           f'{"out tok/item":>13s}  served')
     grand = 0.0
     for s in specs:
         rows = list(existing(s['key'], variant).values())
+        if only:                                                       # --only-items: the rows of the items listed
+            want = {it['item_id'] for it in its}
+            rows = [r for r in rows if r['item_id'] in want]
         c = Counter(r['status'] for r in rows)
         billed = sum(r.get('billed_usd') or 0.0 for r in rows)
         grand += billed
@@ -795,10 +1106,27 @@ def main() -> int:
     ap.add_argument('--ignore-provider', action='append', default=[], metavar='NAME',
                     help='route past this OpenRouter provider in this invocation (repeatable); the row records it in its request. '
                          'Used for the tool arm when a provider drops tool calls (D-184)')
+    ap.add_argument('--only-items', metavar='PATH', help='a text file of item ids, one per line: every mode works on the '
+                    'variant\'s items among them only (the resume of a subset whose rows were archived)')
+    ap.add_argument('--review', action='store_true', help='FREE: the checks a finished run must pass before scoring '
+                    '(missing items, finish reasons, empty rows at the ceiling, reasoning tokens and text, providers, '
+                    'the prompt hash against the main run\'s)')
+    ap.add_argument('--matched-config', action='store_true', help='FREE: write results/matched_config.json, the matched '
+                    'configuration per roster model, once every store it names is complete')
+    ap.add_argument('--trace-review', action='store_true', help='FREE: trace_review.py on a matched-configuration variant, '
+                    'given that variant\'s item set')
+    ap.add_argument('--requeue-unfinished', action='store_true', help='FREE: move a matched-configuration variant\'s final '
+                    'rows that ended without a finish reason to traces/_unfinished/, so the next run asks those items again')
     a = ap.parse_args()
     PROVIDER_IGNORE[:] = a.ignore_provider
     if a.selftest:
         return tool_selftest()
+    if a.matched_config:
+        return matched_config()
+    if a.trace_review:
+        if a.variant not in MATCHED_VARIANTS:
+            raise SystemExit('--trace-review is for the matched-configuration variants; run trace_review.py for the others')
+        return trace_review(a.variant)
 
     cfg = config()
     # An entry with "run": false is inert (D-148): no mode calls it unless --model names it, and the
@@ -810,7 +1138,7 @@ def main() -> int:
     for k, why in inert.items():
         if not a.model or k not in a.model:
             print(f'{k}: inert (run: false): {why}')
-    if a.variant != 'main' and a.variant not in REASONING_VARIANTS and a.variant not in ('flagship', TOOL) + FLAGSHIP_REASONING and a.calibrate:
+    if a.variant != 'main' and a.variant not in REASONING_VARIANTS and a.variant not in ('flagship', TOOL, FULL_REASONING) + FLAGSHIP_REASONING and a.calibrate:
         raise SystemExit('--calibrate is for the main run, the reasoning variants, the flagship anchor and the tool arm; another variant is estimated from its bills')
     if a.variant in REASONING_VARIANTS and not a.model:
         specs = [s for s in cfg['models'] if s['key'] in REASONING_MODELS]
@@ -828,16 +1156,41 @@ def main() -> int:
         specs = [s for s in cfg['models'] if s['key'] in TOOL_MODELS]
     if a.variant in subsamples.REPEAT_VARIANTS and not a.model:
         raise SystemExit('a repeat runs one chosen model: name it with --model')
-    its = variant_items(a.variant, items())
+    if a.variant == FULL_REASONING and not a.model:
+        specs = [s for s in cfg['models'] if s['key'] in MATCHED_MODELS]
+    if a.variant in (CASCADE_PARAPHRASE,) + CASCADE_REPEATS:          # the cascade runs the matched models only
+        allowed = [k for k in MATCHED_MODELS if a.variant == CASCADE_PARAPHRASE or k in REPEAT_MODELS]
+        outside = sorted(set(a.model or ()) - set(allowed))
+        if outside:
+            raise SystemExit(f'{a.variant} runs the matched models{" in the repeat set" if a.variant != CASCADE_PARAPHRASE else ""} '
+                             f'only ({", ".join(allowed) or "none"}), not {", ".join(outside)}')
+        specs = [s for s in cfg['models'] if s['key'] in (a.model or allowed)]
+        if not specs:
+            raise SystemExit(f'{a.variant}: no matched model to run')
+    pool = items()
+    its = variant_items(a.variant, pool)
+    if a.only_items:
+        its = only_items(its, pool, a.only_items)
+        if not its:
+            print('nothing to do: no listed id is an item of this variant')
+            return 0
     if a.dry_run:
         if a.variant == TOOL:
             return tool_dry_run(cfg, its, specs, a.variant)
+        if a.variant in MATCHED_VARIANTS:
+            return matched_dry_run(cfg, its, specs, a.variant)
         if a.variant in ('main', 'flagship'):
             return dry_run(cfg, its, specs, a.variant)
         return reasoning_dry_run(cfg, its, specs, a.variant) if a.variant in REASONING_VARIANTS + FLAGSHIP_REASONING \
             else variant_dry_run(cfg, its, specs, a.variant)
     if a.status:
-        return status(cfg, its, specs, a.variant)
+        return status(cfg, its, specs, a.variant, only=bool(a.only_items))
+    if a.review:
+        return review(cfg, its, specs, a.variant)
+    if a.requeue_unfinished:
+        if a.variant not in MATCHED_VARIANTS:
+            raise SystemExit('--requeue-unfinished is for the matched-configuration variants')
+        return requeue_unfinished(specs, a.variant)
     if not a.yes:
         raise SystemExit('this mode bills: re-run with --yes once the spend is approved '
                          '(see --dry-run for the estimate)')
@@ -845,13 +1198,23 @@ def main() -> int:
         raise SystemExit('the deployed prompt differs from the one the pilot traces used - refusing')
     if a.check:
         bad = 0
+        if a.variant == 'main' or a.variant in MATCHED_VARIANTS:     # the matched configuration asks the main run's prompt
+            hashes = main_prompt_hashes()
+            same = set(hashes) == {PROMPT_SHA}
+            bad += not same
+            print(f'  prompt sha256 {PROMPT_SHA[:16]}; the main run\'s rows carry '
+                  + ', '.join(f'{h[:16]} ({n} rows)' for h, n in hashes.most_common()) + (': the same' if same else ': DIFFERENT'))
+        v = a.variant if a.variant in MATCHED_VARIANTS else 'main'   # a matched variant's check carries its parameter
         for s in specs:
-            res = call(client(cfg), s, cfg, 'Reply with the single word OK.', attempts=2)
+            res = call(client(cfg), s, cfg, 'Reply with the single word OK.', attempts=2, variant=v)
             ok = res['status'] == 'answered'
             bad += not ok
             print(f'  {s["key"]:22s} {res["status"]:16s} served={res.get("served_model")} '
-                  f'provider={res.get("provider")} billed=${res.get("billed_usd") or 0:.5f}')
+                  f'provider={res.get("provider")} billed=${res.get("billed_usd") or 0:.5f}'
+                  + (f' reasoning_tokens={res.get("reasoning_tokens")}' if v != 'main' else ''))
         return 1 if bad else 0
+    if a.variant in MATCHED_VARIANTS and set(main_prompt_hashes()) != {PROMPT_SHA}:
+        raise SystemExit('the prompt differs from the one on the main run\'s rows - refusing')
     grand = 0.0
     tok = cfg['pricing_basis_tokens']
     for s in specs:

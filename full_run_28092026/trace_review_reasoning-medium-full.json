@@ -1,0 +1,142 @@
+{
+ "variant": "reasoning-medium-full",
+ "models": [
+  {
+   "tool": null,
+   "key": "gemma-4-26b-a4b",
+   "lines": 2250,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 2247,
+    "empty": 3
+   },
+   "items": 2250,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 2247,
+   "empty": 3,
+   "modes": {
+    "calibrate": 20,
+    "reasoning-medium-full": 2230
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "google/gemma-4-26b-a4b-it": 2250
+   },
+   "served_as_main": true,
+   "providers": {
+    "Io Net": 2194,
+    "DekaLLM": 56
+   },
+   "provider_count": 2,
+   "capped_with_text": 1,
+   "no_answer_marker": 1,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {
+    "template_truss_method_of_sections": 1
+   },
+   "think_in_text": 0,
+   "empty_templates": {
+    "template_rackett_equation_volume": 1,
+    "template_statically_indeterminate": 1,
+    "template_truss_method_of_sections": 1
+   },
+   "empty_by_template_all": {
+    "template_rackett_equation_volume": 1,
+    "template_statically_indeterminate": 1,
+    "template_truss_method_of_sections": 1
+   },
+   "items_per_template": 15.0,
+   "output_tokens_median": 5555.5,
+   "output_tokens_max": 32768,
+   "billed_usd": 3.77
+  },
+  {
+   "tool": null,
+   "key": "gpt-5.4-mini",
+   "lines": 2250,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 2250
+   },
+   "items": 2250,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 2250,
+   "empty": 0,
+   "modes": {
+    "reasoning-medium-full": 2250
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "openai/gpt-5.4-mini": 2250
+   },
+   "served_as_main": true,
+   "providers": {
+    "Azure": 2250
+   },
+   "provider_count": 1,
+   "capped_with_text": 0,
+   "no_answer_marker": 0,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {},
+   "think_in_text": 0,
+   "empty_templates": {},
+   "empty_by_template_all": {},
+   "items_per_template": 15.0,
+   "output_tokens_median": 1255.5,
+   "output_tokens_max": 27637,
+   "billed_usd": 22.65
+  },
+  {
+   "tool": null,
+   "key": "gemini-3.1-flash-lite",
+   "lines": 2250,
+   "malformed": 0,
+   "states_all_rows": {
+    "answered": 2250
+   },
+   "items": 2250,
+   "items_missing": [],
+   "items_with_two_final_rows": 0,
+   "rows_not_a_frozen_item": 0,
+   "answered": 2250,
+   "empty": 0,
+   "modes": {
+    "reasoning-medium-full": 2250
+   },
+   "prompt_hashes": 1,
+   "prompt_is_pilots": true,
+   "request_variants": 1,
+   "served_models": {
+    "google/gemini-3.1-flash-lite": 2250
+   },
+   "served_as_main": true,
+   "providers": {
+    "Google AI Studio": 2132,
+    "Google": 118
+   },
+   "provider_count": 2,
+   "capped_with_text": 0,
+   "no_answer_marker": 0,
+   "no_marker_no_number": 0,
+   "no_marker_templates": {},
+   "think_in_text": 0,
+   "empty_templates": {},
+   "empty_by_template_all": {},
+   "items_per_template": 15.0,
+   "output_tokens_median": 1485.0,
+   "output_tokens_max": 4352,
+   "billed_usd": 5.526
+  }
+ ],
+ "archive": {
+  "archive": null
+ }
+}

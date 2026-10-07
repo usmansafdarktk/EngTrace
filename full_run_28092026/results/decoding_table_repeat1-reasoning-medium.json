@@ -1,0 +1,114 @@
+[
+ {
+  "model_key": "gemma-4-26b-a4b",
+  "weights": "open",
+  "configured": "google/gemma-4-26b-a4b-it",
+  "served": {
+   "google/gemma-4-26b-a4b-it": 300
+  },
+  "providers": {
+   "Io Net": 258,
+   "DekaLLM": 41,
+   "NextBit": 1
+  },
+  "rows": 300,
+  "answered": 299,
+  "empty": 1,
+  "modes": {
+   "repeat1-reasoning-medium": 300
+  },
+  "prompt_sha256": [
+   "c2bcb87984c4e50beaaa6876cce2e72932b91d6a755d07ab01ffc341cf9b6f7c"
+  ],
+  "request_variants": 1,
+  "max_tokens": 32768,
+  "provider_sort": "price",
+  "quantizations": [
+   "fp8",
+   "mxfp8",
+   "fp16",
+   "bf16",
+   "fp32"
+  ],
+  "allow_fallbacks": true,
+  "sampling_parameters_sent": [],
+  "reasoning_parameter": {
+   "effort": "medium"
+  },
+  "finish_reasons": {
+   "stop": 299,
+   "length": 1
+  },
+  "prompt_tokens": {
+   "median": 268.0
+  },
+  "completion_tokens": {
+   "median": 5280.0,
+   "p90": 11301,
+   "max": 32768
+  },
+  "reasoning_tokens": {
+   "median": 4470.0,
+   "p90": 9610,
+   "max": 29267,
+   "share_above_zero": 1.0,
+   "unreported_rows": 0
+  },
+  "reasoning_text_share": 1.0,
+  "billed_usd": 0.517,
+  "seconds_median": 74.765,
+  "tool": null
+ },
+ {
+  "model_key": "gemini-3.1-flash-lite",
+  "weights": "closed",
+  "configured": "google/gemini-3.1-flash-lite",
+  "served": {
+   "google/gemini-3.1-flash-lite": 300
+  },
+  "providers": {
+   "Google AI Studio": 183,
+   "Google": 117
+  },
+  "rows": 300,
+  "answered": 300,
+  "empty": 0,
+  "modes": {
+   "repeat1-reasoning-medium": 300
+  },
+  "prompt_sha256": [
+   "c2bcb87984c4e50beaaa6876cce2e72932b91d6a755d07ab01ffc341cf9b6f7c"
+  ],
+  "request_variants": 1,
+  "max_tokens": 32768,
+  "provider_sort": "price",
+  "quantizations": null,
+  "allow_fallbacks": true,
+  "sampling_parameters_sent": [],
+  "reasoning_parameter": {
+   "effort": "medium"
+  },
+  "finish_reasons": {
+   "stop": 300
+  },
+  "prompt_tokens": {
+   "median": 254.0
+  },
+  "completion_tokens": {
+   "median": 1483.0,
+   "p90": 2414,
+   "max": 4266
+  },
+  "reasoning_tokens": {
+   "median": 788.5,
+   "p90": 1359,
+   "max": 2634,
+   "share_above_zero": 1.0,
+   "unreported_rows": 0
+  },
+  "reasoning_text_share": 1.0,
+  "billed_usd": 0.737,
+  "seconds_median": 4.825,
+  "tool": null
+ }
+]

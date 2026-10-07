@@ -1,0 +1,112 @@
+[
+ {
+  "model_key": "gemma-4-26b-a4b",
+  "weights": "open",
+  "configured": "google/gemma-4-26b-a4b-it",
+  "served": {
+   "google/gemma-4-26b-a4b-it": 300
+  },
+  "providers": {
+   "Io Net": 241,
+   "DekaLLM": 59
+  },
+  "rows": 300,
+  "answered": 300,
+  "empty": 0,
+  "modes": {
+   "repeat3-reasoning-medium": 300
+  },
+  "prompt_sha256": [
+   "c2bcb87984c4e50beaaa6876cce2e72932b91d6a755d07ab01ffc341cf9b6f7c"
+  ],
+  "request_variants": 1,
+  "max_tokens": 32768,
+  "provider_sort": "price",
+  "quantizations": [
+   "fp8",
+   "mxfp8",
+   "fp16",
+   "bf16",
+   "fp32"
+  ],
+  "allow_fallbacks": true,
+  "sampling_parameters_sent": [],
+  "reasoning_parameter": {
+   "effort": "medium"
+  },
+  "finish_reasons": {
+   "stop": 300
+  },
+  "prompt_tokens": {
+   "median": 268.0
+  },
+  "completion_tokens": {
+   "median": 5532.5,
+   "p90": 11233,
+   "max": 28918
+  },
+  "reasoning_tokens": {
+   "median": 4607.5,
+   "p90": 9891,
+   "max": 23910,
+   "share_above_zero": 1.0,
+   "unreported_rows": 0
+  },
+  "reasoning_text_share": 1.0,
+  "billed_usd": 0.525,
+  "seconds_median": 73.72999999999999,
+  "tool": null
+ },
+ {
+  "model_key": "gemini-3.1-flash-lite",
+  "weights": "closed",
+  "configured": "google/gemini-3.1-flash-lite",
+  "served": {
+   "google/gemini-3.1-flash-lite": 300
+  },
+  "providers": {
+   "Google AI Studio": 182,
+   "Google": 118
+  },
+  "rows": 300,
+  "answered": 300,
+  "empty": 0,
+  "modes": {
+   "repeat3-reasoning-medium": 300
+  },
+  "prompt_sha256": [
+   "c2bcb87984c4e50beaaa6876cce2e72932b91d6a755d07ab01ffc341cf9b6f7c"
+  ],
+  "request_variants": 1,
+  "max_tokens": 32768,
+  "provider_sort": "price",
+  "quantizations": null,
+  "allow_fallbacks": true,
+  "sampling_parameters_sent": [],
+  "reasoning_parameter": {
+   "effort": "medium"
+  },
+  "finish_reasons": {
+   "stop": 300
+  },
+  "prompt_tokens": {
+   "median": 254.0
+  },
+  "completion_tokens": {
+   "median": 1508.0,
+   "p90": 2353,
+   "max": 4192
+  },
+  "reasoning_tokens": {
+   "median": 823.0,
+   "p90": 1255,
+   "max": 2951,
+   "share_above_zero": 1.0,
+   "unreported_rows": 0
+  },
+  "reasoning_text_share": 1.0,
+  "billed_usd": 0.729,
+  "seconds_median": 4.71,
+  "tool": null
+ }
+]

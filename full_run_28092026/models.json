@@ -38,7 +38,16 @@
     "An entry with \"run\": false is inert (D-148): kept for the record of what was priced or run, but no",
     "mode calls it unless --model names it. The original qwen3-235b-a22b was never run (no endpoint met",
     "the routing rule; replaced by the 2507 release), and qwen3.8-27b is set aside under the roster rule,",
-    "so neither belongs in a variant run."
+    "so neither belongs in a variant run.",
+    "",
+    "Added 2026-10-06 for matched settings (decision D3 of docs/mock_review_workstreams/00_ORCHESTRATION.md):",
+    "qwen3-235b-a22b-thinking-2507, the Thinking sibling of qwen3-235b-a22b-2507, whose Instruct release has",
+    "no thinking mode. It passes D-110's roster rule: it is on neither exclusion list of",
+    "docs/inference_pricing/build_pricing_doc.js and appears nowhere in evaluator_pilot_17092026/. Priced at",
+    "its cheapest fp8-or-better endpoint, Novita (fp8, output capped at 32,768), $0.30/$3.00 per M, read",
+    "2026-10-06; Alibaba's cheaper endpoint ($0.23/$2.30) declares no quantization, and Venice's (fp8,",
+    "$0.45/$3.50) caps output at 16,384. Inert: a labelled twelfth row outside the eleven, run only as",
+    "--variant main --model qwen3-235b-a22b-thinking-2507, so a plain resume of the main run never calls it."
   ],
   "route": {
     "base_url": "https://openrouter.ai/api/v1",
@@ -107,6 +116,20 @@
       "price_per_m": {
         "in": 0.087,
         "out": 0.35
+      }
+    },
+    {
+      "key": "qwen3-235b-a22b-thinking-2507",
+      "model": "qwen/qwen3-235b-a22b-thinking-2507",
+      "weights": "open",
+      "run": false,
+      "run_reason": "matched settings (D3): the Thinking sibling of qwen3-235b-a22b-2507, eligible under D-110's rule; not run, by the owner's decision of 2026-10-07 (too little time before the deadline). Calibrated on 20 items that day ($0.298, $0.0149 an item, a median 191 s and 3,930 completion tokens an item, all answered; rows in traces/_calibration/): the full set would bill about $33.60 plus about $10 of judged stages. It would run only as --variant main --model qwen3-235b-a22b-thinking-2507, a labelled twelfth row outside the eleven",
+      "added_for": "matched settings",
+      "added": "2026-10-06",
+      "sibling_of": "qwen3-235b-a22b-2507",
+      "price_per_m": {
+        "in": 0.3,
+        "out": 3.0
       }
     },
     {
