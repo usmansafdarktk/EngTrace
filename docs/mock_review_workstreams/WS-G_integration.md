@@ -14,9 +14,9 @@ into the real tree before the writers start.
 - WS-B: RUNS SCORED; `results/matched_config.json` written.
 - WS-C: scripts and flags in place; `paper_results.py --out` tested.
 - WS-E: ANSWER FINAL (2026-10-08 12:34: `answer.py`, `milestones.py` and `symbolic_equivalence.py` as committed in
-  `c7894ed`); GRADES IN; the top-up scored. KAPPA IN is not needed: E1 is set aside and D7 keeps the authors' labels.
+  `c7894ed`); GRADES IN; the top-up scored. KAPPA IN is not needed: D7 keeps the domain experts' original labels, with no re-rating.
 - WS-F: CAPTIONS; approved PDFs in `figs/`.
-- Decisions in `00_ORCHESTRATION.md` section 3: D7 recorded (the authors' labels stay); D5 as WS-E implemented it
+- Decisions in `00_ORCHESTRATION.md` section 3: D7 recorded (the domain experts' original labels stay); D5 as WS-E implemented it
   (the check enabled on five templates); D2 (`--headline`) recorded before G4.
 
 ## The final evaluator (reviewed 2026-10-08)
@@ -57,7 +57,8 @@ expert counts: these are code changes, so they belong here, not with the writers
 
 ### G1. Labels: not run
 
-D7 (owner, 2026-10-08): the authors' labels stay (58 Easy, 58 Intermediate, 34 Advanced). Nothing is relabelled or
+D7 (owner, 2026-10-08): the domain experts' original labels stay, unchanged since the templates were written
+(58 Easy, 58 Intermediate, 34 Advanced). Nothing is relabelled or
 re-frozen: `apply_labels.py` is not run, and the manifest's `level`, `FREEZE.json` and `template_inventory.csv` stay
 as they are. The paper describes the labelling procedure
 (`template_annotation_23092026/levels/difficulty_labelling_protocol.md`) with no agreement figure, so

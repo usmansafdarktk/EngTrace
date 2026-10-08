@@ -1,4 +1,4 @@
-SIGNAL: KAPPA IN: none to report. E1 is set aside; D7 keeps the authors' labels, and the paper describes the labelling protocol without agreement figures until the experts' count files arrive
+SIGNAL: KAPPA IN: none to report. E1 is set aside; D7 keeps the domain experts' original labels, and the paper describes the labelling protocol without agreement figures until the experts' count files arrive
 SIGNAL: GRADES IN 2026-10-08 (362 of 362 readings; GRADES.md; five templates enabled, SYMBOLIC_CHECK.md)
 SIGNAL: ANSWER FINAL 2026-10-08 12:34 +0500 (answer.py, milestones.py and symbolic_equivalence.py are final; WS-G re-scores every store once)
 
@@ -9,7 +9,7 @@ carry counts only. One `.tex` file was edited, at the owner's request: `appendic
 
 ## E1 difficulty ratings
 - E1 is set aside and not used.
-- D7: the authors' labels stay (58 / 58 / 34), so nothing is relabelled or re-frozen.
+- D7: the domain experts' original labels stay (58 / 58 / 34), so nothing is relabelled or re-frozen.
 - The paper describes the procedure in `template_annotation_23092026/levels/difficulty_labelling_protocol.md`. No
   agreement figure until the experts' count files arrive; a committed script computes it then.
 - Domain and area validation: `appendices/taxonomy_content.tex` now names `Grok 4.6`, `MiniMax M3` and
