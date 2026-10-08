@@ -51,29 +51,34 @@ mostly Advanced and mostly no error.
 \begin{tabular}{l r r r r r r r }
 \toprule
 \rowcolor{gray!10}
- & \multicolumn{4}{c}{\textbf{By model: readings (majority labels)}} & \multicolumn{3}{c}{\textbf{By level: readings (share)}} \\
+ & \multicolumn{4}{c}{\textbf{By model: readings (majority labels)}} & \multicolumn{3}{c}{\textbf{By level: readings (share / share without no-error readings)}} \\
 \cmidrule(lr){2-5}\cmidrule(lr){6-8}
 \textbf{Category} & \texttt{Claude Sonnet 5} & \texttt{GPT-5.4 mini} & \texttt{Gemma 4 26B} & \texttt{gpt-oss-20b} & \textbf{Easy} & \textbf{Intermediate} & \textbf{Advanced} \\
 \midrule
-Hallucination & 0 (0) & 3 (1) & 0 (0) & 10 (4) & 2 (3\%) & 5 (3\%) & 6 (3\%) \\
-Setup or assumption & 6 (2) & 5 (2) & 7 (2) & 16 (6) & 2 (3\%) & 23 (12\%) & 9 (4\%) \\
-Formula or principle & 6 (2) & 16 (5) & 20 (7) & 31 (9) & 2 (3\%) & 33 (18\%) & 38 (18\%) \\
-Unit & 0 (0) & 0 (0) & 0 (0) & 1 (0) & 0 (0\%) & 0 (0\%) & 1 (0\%) \\
-Sign or direction & 0 (0) & 5 (2) & 6 (2) & 0 (0) & 0 (0\%) & 6 (3\%) & 5 (2\%) \\
-Calculation & 31 (10) & 85 (28) & 84 (28) & 50 (17) & 69 (88\%) & 107 (58\%) & 74 (34\%) \\
-No error & 77 (26) & 6 (2) & 3 (1) & 12 (4) & 3 (4\%) & 12 (6\%) & 83 (38\%) \\
+Hallucination & 0 (0) & 0 (0) & 0 (0) & 7 (3) & 2 (3\% / 3\%) & 5 (3\% / 3\%) & 0 (0\% / 0\%) \\
+Setup or assumption & 9 (3) & 5 (2) & 7 (2) & 16 (6) & 2 (3\% / 3\%) & 26 (13\% / 14\%) & 9 (7\% / 7\%) \\
+Formula or principle & 6 (2) & 16 (5) & 20 (7) & 31 (9) & 2 (3\% / 3\%) & 33 (17\% / 18\%) & 38 (28\% / 29\%) \\
+Unit & 0 (0) & 0 (0) & 0 (0) & 1 (0) & 0 (0\% / 0\%) & 0 (0\% / 0\%) & 1 (1\% / 1\%) \\
+Sign or direction & 0 (0) & 5 (2) & 6 (2) & 0 (0) & 0 (0\% / 0\%) & 6 (3\% / 3\%) & 5 (4\% / 4\%) \\
+Calculation & 36 (12) & 88 (29) & 84 (28) & 53 (18) & 69 (88\% / 92\%) & 113 (58\% / 62\%) & 79 (57\% / 60\%) \\
+No error & 6 (2) & 3 (1) & 0 (0) & 12 (4) & 3 (4\% / --) & 12 (6\% / --) & 6 (4\% / --) \\
 \midrule
-Wrong answers read by level & 1, 10, 29 & 8, 17, 15 & 9, 16, 15 & 8, 19, 13 & 26 & 62 & 72 \\
-Fleiss' $\kappa$ & 0.968 & 0.930 & 0.965 & 0.839 & & &  \\
+Wrong answers in the sample, by level & 1, 13, 5 & 8, 17, 14 & 9, 16, 14 & 8, 19, 13 & 26 & 65 & 46 \\
+Readings & 57 & 117 & 117 & 120 & 78 & 195 & 138 \\
+Fleiss' $\kappa$ & 1.000 & 0.917 & 0.962 & 0.835 & & &  \\
 \bottomrule
 \end{tabular}
 }
-\caption{\textbf{The Readings of the Wrong Answers.} Three domain experts read each of 160 wrong
-answers, 40 per model. Left: readings per category (120 per model) and, in parentheses, the wrong
-answers whose majority label is the category; then the wrong answers read per level. Right: readings
-per category by level and their share of the level's readings. Categories run from the most to the
-least fundamental; no domain expert used the incomplete option. Fleiss' $\kappa$ over the three
-domain experts is 0.930 overall.}
+\caption{The domain experts' readings of the wrong answers. The sample holds 137 wrong answers of
+four models (19 from \texttt{Claude Sonnet 5}, 39 from \texttt{GPT-5.4 mini}, 39 from
+\texttt{Gemma 4 26B}, and 40 from \texttt{gpt-oss-20b}); 3 domain experts of the answer's branch
+read each, and 137 have been read (411 readings). Left: readings per category and, in parentheses,
+the wrong answers whose majority label is the category. Right: readings per category by level, with
+their share of the level's readings and their share once the no-error readings are removed, so the
+error mix can be read apart from the share of answers the experts found correct. Below: the sample
+by level, the readings per column, and Fleiss' $\kappa$ over the 3 experts per model (0.912
+overall). Categories run from the most to the least fundamental; no domain expert used the
+incomplete option. A reading counts only while the store holds the question and response as read.}
 \label{tab:errors}
 \label{tab:error_by_level}
 \end{table*}

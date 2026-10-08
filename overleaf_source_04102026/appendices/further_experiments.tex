@@ -80,17 +80,17 @@ in~\autoref{subsec:error_analysis}.
 \textbf{Model} & \textbf{Instances} & \textbf{\makecell{FAC,\\evaluation}} & \textbf{\makecell{FAC,\\experiment}} & \textbf{\makecell{Change\\(95\% interval)}} & \textbf{$p$ (Holm)} & \textbf{Detectable} & \textbf{90\% interval} & \textbf{\makecell{MC\\change}} & \textbf{\makecell{Arithmetic flags,\\evaluation / experiment}} \\
 \midrule
 \rowcolor{gray!10}\multicolumn{10}{l}{\textit{Reasoning at medium effort}} \\
-\texttt{GPT-5.4 mini} & 450 & 0.858 & 0.951 & $+0.093$ (0.056--0.133) & $<$0.001 & 0.055 & 0.062--0.126 & $+0.061$ & 0.127 / 0.069 \\
-\texttt{Gemini 3.1 Flash-Lite} & 450 & 0.874 & 0.890 & $+0.016$ ($-0.010$ to 0.042) & 0.296 & 0.038 & $-0.007$ to 0.038 & $+0.015$ & 0.082 / 0.068 \\
+\texttt{GPT-5.4 mini} & 450 & 0.862 & 0.964 & $+0.102$ (0.063--0.143) & $<$0.001 & 0.058 & 0.070--0.137 & $+0.057$ & 0.125 / 0.067 \\
+\texttt{Gemini 3.1 Flash-Lite} & 450 & 0.884 & 0.898 & $+0.013$ ($-0.014$ to 0.042) & 0.407 & 0.040 & $-0.010$ to 0.038 & $+0.017$ & 0.086 / 0.075 \\
 \rowcolor{gray!10}\multicolumn{10}{l}{\textit{Open book: governing equations supplied}} \\
-\texttt{gpt-oss-20b} & 405 & 0.816 & 0.880 & $+0.064$ (0.027--0.104) & 0.003 & 0.055 & 0.033--0.098 & $+0.064$ & 0.163 / 0.178 \\
-\texttt{GPT-5.4 mini} & 405 & 0.851 & 0.832 & $-0.019$ ($-0.049$ to 0.014) & 0.580 & 0.045 & $-0.044$ to 0.009 & $+0.033$ & 0.124 / 0.162 \\
-\texttt{Claude Sonnet 5} & 405 & 0.969 & 0.977 & $+0.007$ ($-0.005$ to 0.022) & 0.580 & 0.021 & $-0.005$ to 0.020 & $+0.029$ & 0.144 / 0.128 \\
+\texttt{gpt-oss-20b} & 405 & 0.810 & 0.878 & $+0.068$ (0.031--0.106) & 0.001 & 0.054 & 0.037--0.100 & $+0.068$ & 0.165 / 0.179 \\
+\texttt{GPT-5.4 mini} & 405 & 0.853 & 0.837 & $-0.016$ ($-0.047$ to 0.016) & 0.629 & 0.044 & $-0.042$ to 0.010 & $+0.032$ & 0.123 / 0.161 \\
+\texttt{Claude Sonnet 5} & 405 & 0.980 & 0.989 & $+0.009$ ($-0.002$ to 0.021) & 0.629 & 0.017 & 0.000--0.020 & $+0.028$ & 0.146 / 0.133 \\
 \rowcolor{gray!10}\multicolumn{10}{l}{\textit{Open tool: Python interpreter offered}} \\
-\texttt{GPT-5.4 mini} & 450 & 0.858 & 0.853 & $-0.004$ ($-0.042$ to 0.036) & 1.000 & 0.055 & $-0.037$ to 0.029 & $+0.012$ & 0.127 / 0.093 \\
-\texttt{Claude Sonnet 5} & 450 & 0.971 & 0.976 & $+0.004$ ($-0.004$ to 0.014) & 1.000 & 0.014 & $-0.003$ to 0.013 & $-0.001$ & 0.134 / 0.129 \\
+\texttt{GPT-5.4 mini} & 450 & 0.862 & 0.859 & $-0.003$ ($-0.040$ to 0.036) & 0.909 & 0.054 & $-0.034$ to 0.029 & $+0.010$ & 0.125 / 0.094 \\
+\texttt{Claude Sonnet 5} & 450 & 0.982 & 0.992 & $+0.010$ (0.000--0.023) & 0.252 & 0.017 & 0.001--0.021 & $+0.002$ & 0.136 / 0.128 \\
 \rowcolor{gray!10}\multicolumn{10}{l}{\textit{\texttt{GPT-5.4} with reasoning at medium effort, against its default}} \\
-\texttt{GPT-5.4} & 450 & 0.941 & 0.980 & $+0.039$ (0.016--0.067) & 0.002 & 0.037 & 0.019--0.061 & $+0.014$ & 0.119 / 0.032 \\
+\texttt{GPT-5.4} & 450 & 0.951 & 0.997 & $+0.046$ (0.021--0.074) & $<$0.001 & 0.039 & 0.024--0.069 & $+0.012$ & 0.117 / 0.027 \\
 \bottomrule
 \end{tabular}
 }

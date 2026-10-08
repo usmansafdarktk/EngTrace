@@ -55,21 +55,21 @@ the less formula-bound ones.
 \rowcolor{gray!10}
 \textbf{Model} & \textbf{FAC change (95\% interval)} & \textbf{90\% interval} & \textbf{$p$ (Holm)} & \textbf{MC change} \\
 \midrule
-\texttt{DeepSeek V4.1 Flash} & $-0.007$ ($-0.029$ to 0.015) & $-0.025$ to 0.011 & 1.000 & $0.000$ \\
-\texttt{Kimi K3} & $0.000$ ($-0.009$ to 0.011) & $-0.008$ to 0.009 & 1.000 & $-0.004$ \\
-\texttt{Claude Sonnet 5} & $-0.020$ ($-0.037$ to $-0.006$) & $-0.034$ to $-0.007$ & 0.341 & $-0.006$ \\
-\texttt{GLM-5.3-Flash} & $-0.022$ ($-0.043$ to $-0.002$) & $-0.039$ to $-0.005$ & 0.647 & $-0.009$ \\
-\texttt{Muse Glimmer 30B} & $+0.020$ (0.003--0.040) & 0.005--0.036 & 0.647 & $-0.010$ \\
-\texttt{GLM-5.3} & $-0.007$ ($-0.032$ to 0.016) & $-0.028$ to 0.012 & 1.000 & $-0.009$ \\
-\texttt{Qwen3-235B-2507} & $-0.031$ ($-0.074$ to 0.011) & $-0.067$ to 0.005 & 1.000 & $-0.010$ \\
-\texttt{Gemini 3.1 Flash-Lite} & $+0.007$ ($-0.032$ to 0.046) & $-0.025$ to 0.040 & 1.000 & $+0.003$ \\
-\texttt{Gemma 4 26B} & $+0.007$ ($-0.035$ to 0.047) & $-0.028$ to 0.040 & 1.000 & $+0.018$ \\
-\texttt{GPT-5.4 mini} & $-0.018$ ($-0.053$ to 0.018) & $-0.047$ to 0.011 & 1.000 & $-0.011$ \\
-\texttt{gpt-oss-20b} & $+0.011$ ($-0.036$ to 0.057) & $-0.028$ to 0.050 & 1.000 & $-0.014$ \\
+\texttt{DeepSeek V4.1 Flash} & $-0.013$ ($-0.029$ to 0.000) & $-0.026$ to $-0.002$ & 1.000 & $-0.009$ \\
+\texttt{Claude Sonnet 5} & $-0.011$ ($-0.025$ to 0.000) & $-0.022$ to $-0.003$ & 1.000 & $-0.005$ \\
+\texttt{Kimi K3} & $+0.002$ ($-0.005$ to 0.011) & $-0.004$ to 0.009 & 1.000 & $-0.005$ \\
+\texttt{GLM-5.3-Flash} & $-0.011$ ($-0.029$ to 0.005) & $-0.026$ to 0.004 & 1.000 & $-0.015$ \\
+\texttt{Muse Glimmer 30B} & $+0.025$ (0.004--0.051) & 0.007--0.046 & 0.527 & $-0.007$ \\
+\texttt{GLM-5.3} & $+0.002$ ($-0.018$ to 0.022) & $-0.015$ to 0.019 & 1.000 & $+0.001$ \\
+\texttt{Qwen3-235B-2507} & $-0.036$ ($-0.080$ to 0.005) & $-0.073$ to $-0.002$ & 1.000 & $-0.015$ \\
+\texttt{Gemini 3.1 Flash-Lite} & $-0.009$ ($-0.051$ to 0.031) & $-0.043$ to 0.025 & 1.000 & $+0.002$ \\
+\texttt{Gemma 4 26B} & $+0.004$ ($-0.039$ to 0.044) & $-0.031$ to 0.038 & 1.000 & $+0.019$ \\
+\texttt{GPT-5.4 mini} & $0.000$ ($-0.035$ to 0.035) & $-0.029$ to 0.029 & 1.000 & $-0.013$ \\
+\texttt{gpt-oss-20b} & $+0.018$ ($-0.031$ to 0.067) & $-0.023$ to 0.059 & 1.000 & $-0.021$ \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Change Under Paraphrase.} Paraphrase minus original on the 277 expert-kept pairs
-over 115 templates, positive when the paraphrase scores higher: the change in FAC with its 95\%
+\caption{\textbf{Change Under Paraphrase.} Paraphrase minus original on the 275 expert-kept pairs
+over 114 templates, positive when the paraphrase scores higher: the change in FAC with its 95\%
 interval, its 90\% interval read against the $\pm 0.05$ margin, the Holm-adjusted $p$ of the
 sign-flip test over templates, and the change in MC.}
 \label{tab:paraphrase}

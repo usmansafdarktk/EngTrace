@@ -125,6 +125,68 @@ tokens.}
 \label{tab:decoding}
 \end{table*}
 
+% BEGIN GENERATED tab:providers (full_run_28092026/paper_results.py --write)
+\begin{table}[t]
+\centering
+\footnotesize
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{l l r r r r r}
+\toprule
+\rowcolor{gray!10}
+\textbf{Model} & \textbf{Endpoint} & \textbf{Responses} & \textbf{FAC} & \textbf{\makecell{No readable\\answer}} & \textbf{\makecell{Matched\\difference}} & \textbf{\makecell{Templates\\matched}} \\
+\midrule
+\texttt{DeepSeek V4.1 Flash} & CoreWeave & 782 & 0.992 & 0.1\% & $0.000$ & 141 \\
+ & Parasail & 466 & 0.992 & 0.0\% & $-0.002$ & 138 \\
+ & Morph & 456 & 0.991 & 0.0\% & $+0.002$ & 133 \\
+ & DeepInfra & 411 & 0.984 & 0.5\% & $0.000$ & 78 \\
+ & Makora & 87 & 1.000 & 0.0\% & $+0.003$ & 43 \\
+ & InferenceNet$^{\S}$ & 30 & 0.800 & 16.7\% & -- & 0 \\
+ & Novita$^{\S}$ & 16 & 1.000 & 0.0\% & $+0.016$ & 7 \\
+ & GMICloud$^{\S}$ & 2 & 1.000 & 0.0\% & $0.000$ & 2 \\
+\texttt{Kimi K3} & Morph$^{\S}$ & 2231 & 0.980 & 0.7\% & $-0.017$ & 7 \\
+ & BaseTen$^{\S}$ & 19 & 1.000 & 0.0\% & $+0.017$ & 7 \\
+\texttt{GLM-5.3-Flash} & GMICloud & 981 & 0.976 & 1.5\% & $-0.003$ & 145 \\
+ & Novita & 419 & 0.962 & 3.1\% & $+0.003$ & 120 \\
+ & Parasail & 220 & 0.964 & 3.6\% & $+0.002$ & 75 \\
+ & Sail Research & 201 & 0.965 & 2.0\% & $-0.022$ & 114 \\
+ & Phala & 166 & 0.991 & 0.6\% & $+0.004$ & 74 \\
+ & StreamLake & 80 & 0.950 & 3.8\% & $-0.025$ & 35 \\
+ & Z.AI & 79 & 0.994 & 0.0\% & $+0.004$ & 48 \\
+ & NextBit$^{\S}$ & 43 & 0.965 & 2.3\% & $+0.031$ & 13 \\
+ & AtlasCloud$^{\S}$ & 42 & 1.000 & 0.0\% & $+0.014$ & 15 \\
+ & SiliconFlow$^{\S}$ & 18 & 1.000 & 0.0\% & $0.000$ & 5 \\
+ & Morph$^{\S}$ & 1 & 1.000 & 0.0\% & $0.000$ & 1 \\
+\texttt{GLM-5.3} & Baidu & 918 & 0.956 & 3.6\% & $-0.006$ & 86 \\
+ & Sail Research & 739 & 0.964 & 3.0\% & $-0.004$ & 77 \\
+ & Morph & 257 & 0.940 & 5.4\% & $+0.021$ & 123 \\
+ & Novita & 167 & 0.943 & 5.4\% & $-0.004$ & 41 \\
+ & AtlasCloud & 137 & 0.927 & 7.3\% & $-0.010$ & 54 \\
+ & AkashML$^{\S}$ & 15 & 0.267 & 73.3\% & $-0.020$ & 5 \\
+ & BaseTen$^{\S}$ & 15 & 1.000 & 0.0\% & $0.000$ & 5 \\
+ & GMICloud$^{\S}$ & 2 & 1.000 & 0.0\% & $0.000$ & 2 \\
+\texttt{Qwen3-235B-2507} & GMICloud & 2192 & 0.899 & 0.0\% & $-0.010$ & 35 \\
+ & Parasail & 54 & 0.907 & 0.0\% & $+0.006$ & 35 \\
+ & Nebius$^{\S}$ & 4 & 1.000 & 0.0\% & $+0.182$ & 1 \\
+\texttt{Gemma 4 26B} & DekaLLM & 1245 & 0.883 & 0.0\% & $+0.002$ & 148 \\
+ & NextBit & 975 & 0.875 & 0.0\% & $-0.002$ & 148 \\
+ & Io Net$^{\S}$ & 30 & 0.333 & 0.0\% & -- & 0 \\
+\texttt{GPT-5.4 mini} & Azure$^{\S}$ & 2249 & 0.852 & 0.0\% & $-0.036$ & 1 \\
+ & OpenAI$^{\S}$ & 1 & 1.000 & 0.0\% & $+0.036$ & 1 \\
+\texttt{gpt-oss-20b} & Darkbloom$^{\S}$ & 2240 & 0.808 & 2.6\% & $-0.228$ & 9 \\
+ & DekaLLM$^{\S}$ & 9 & 0.889 & 0.0\% & $+0.239$ & 8 \\
+ & DeepInfra$^{\S}$ & 1 & 1.000 & 0.0\% & $+0.143$ & 1 \\
+\bottomrule
+\end{tabular}
+\caption{The serving endpoints behind the responses of the eight models that more than one endpoint
+served: the responses each served, their FAC and their share with no readable answer, and the
+template-matched difference, the endpoint's mean minus the model's mean on the same templates, over
+the templates both cover. The raw FAC per endpoint is not comparable across endpoints, since the
+router assigns instances unevenly; $^{\S}$marks the 19 endpoints that served or matched fewer than
+20 templates, whose difference rests on too few templates to read.}
+\label{tab:providers}
+\end{table}
+% END GENERATED tab:providers
+
 \subsection{Inference Prompt and Output Processing}
 \label{appendix:prompt}
 

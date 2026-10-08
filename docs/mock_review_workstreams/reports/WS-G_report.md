@@ -1,8 +1,11 @@
-SIGNAL: NUMBERS SHEET 2026-10-08 16:35 UTC (G2, G2b, G3 and G5 done on the final stores, the milestone matcher's floor fixed; G4 waits for D2 and WS-F's captions)
+SIGNAL: INTEGRATED 2026-10-08 17:20 UTC (generated blocks written into the real tree with `--headline default --repaired --text-only`; WS-F's figures and captions left for later, on the owner's instruction)
+SIGNAL: NUMBERS SHEET 2026-10-08 16:35 UTC (G2, G2b, G3 and G5 done on the final stores, the milestone matcher's floor fixed)
 
 # WS-G report
 
-Status 2026-10-08 16:35 UTC. INTEGRATED is not posted: G4 has not started, and no `.tex` file in the real tree has been written. No commit (none asked). The numbers sheet is `reports/NUMBERS_SHEET.md` (`python -m full_run_28092026.numbers_sheet`).
+Status 2026-10-08 17:20 UTC. Committed and pushed: `e83084c` (this stream's scripts and records), `412656a` (the paper-text edits pending in the tree, committed first on the owner's instruction), then the G4 writes. The numbers sheet is `reports/NUMBERS_SHEET.md` (`python -m full_run_28092026.numbers_sheet`).
+
+D2 (owner, 2026-10-08): **provider defaults** are the headline. Table 1 holds the eleven at their providers' defaults with a marked block for the three re-run with reasoning on, and the matched family is in `tab:matched`. This is the fallback `00_ORCHESTRATION.md` names, since the error analysis was not re-read for the re-run models. Its section 3 row is left for the orchestrator: another session has that file open.
 
 ## The final evaluator
 
@@ -79,40 +82,47 @@ Status 2026-10-08 16:35 UTC. INTEGRATED is not posted: G4 has not started, and n
    - the level gap holds after Holm (Welch) for gpt-oss-20b and Gemini 3.1 Flash-Lite (default), and for gpt-oss-20b (matched);
    - two paraphrase changes are not within the margin.
 3. B3: 5 of its 97 readings are of rulings now settled by matching (genuine matches at factor 1); the current-figures rule keeps them.
-4. `appendices/validation.tex` holds uncommitted edits from another session. The writers pause while G4 runs `--write`.
+4. The paper-text edits that were pending in the tree are committed (`412656a`), and the generated blocks were written on top of them. The writers continue from the committed tree and re-run `--write --text-only` after changing a phrase.
 5. `paraphrase_audit.py` predates round 5 and was not re-run.
 
-## --check outcomes now
+## Blocks written (G4)
+
+- **Markers placed** (the writers may move a pair; the block follows its markers):
+  - `appendices/results.tex`: `tab:matched` and `tab:single_path` after the pairwise paragraph; `tab:scoring_variants` before the coverage paragraph; `tab:coverage_variants`, `tab:judged_steps` and `tab:flag_precision` after `tab:coverage`; `tab:depth_model` after `tab:level_gap`.
+  - `appendices/models.tex`: `tab:providers` after `tab:decoding`.
+  - `appendices/taxonomy_content.tex`: `tab:area` before the difficulty paragraph.
+  - `appendices/scoring.tex`: `\input{sections/appendices/worked_example}` at the end.
+- **`paper_results.py --write --text-only --headline default --repaired`:** all 19 blocks.
+  - New: `tab:matched`, `tab:single_path`, `tab:coverage_variants`, `tab:scoring_variants`, `tab:providers`, `tab:depth_model`, `tab:flag_precision`, `tab:judged_steps`.
+  - Rewritten: `tab:main_results`, `tab:coverage`, `tab:level_gap`, `tab:branch_domain`, `tab:paraphrase`, `tab:experiments`, `tab:errors` and the figure blocks `fig:level_bars`, `fig:error_categories`, `fig:branch_bars`, `fig:domain_radar`.
+- **`docs/appendix_statistics.py --write`:** `tab:area`. **`worked_example.py --write`:** `appendices/worked_example.tex` (62 lines, self-test passes).
+- **Left for WS-F:**
+  - no figure PDF redrawn: `figs/error-categories.pdf` still shows the earlier B2 readings while its caption block now gives the current ones;
+  - `fig:domain_heatmap` and `fig:level_bars_all` are not placed;
+  - WS-F's captions replace the figure blocks' text later.
+
+## --check outcomes (real tree)
 
 | check | outcome |
 |---|---|
-| `paper_results.py --check` (scratch copies, both headlines) | fails: markers and phrases not yet placed, and 20 claims |
-| `docs/appendix_statistics.py --check` | passes (28 of 28 rows; `tab:area` markers to place) |
-| `full_run_28092026/paper_setup.py --check` | 1 claim; `6_experiments.tex`: 2 sentences, stale 246 and 1.0; `models.tex`: 13 rows and phrases, stale 147 |
-| `docs/appendix_certification.py --check` | 30 of 39; 9 rows and phrases wait for the certification prose |
-| `docs/appendix_evaluation.py --check` | 1 claim; 1 + 11 + 13 rows and phrases wait (`5_evaluation.tex`, `scoring.tex`, `validation.tex`) |
+| `docs/appendix_statistics.py --check` | **passes** (28 of 28 rows; `tab:area` current) |
+| `full_run_28092026/paper_results.py --check --headline default --repaired` | every block placed and current. 162 prose failures: 61 phrases to place, 81 old numbers no phrase generates, 20 claims |
+| `full_run_28092026/paper_setup.py --check` | waits for prose: `6_experiments.tex` 7 of 9 phrases, 2 old numbers; `models.tex` 31 of 44, 3 old numbers; 1 claim |
+| `docs/appendix_certification.py --check` | waits for prose: 30 of 39 (the six rounds, rounds 5 and 6, the hand checks, the undefined kappa) |
+| `docs/appendix_evaluation.py --check` | waits for prose: `5_evaluation.tex` 4 of 5, `scoring.tex` 13 of 24 (the symbolic step, the 1% cap), `validation.tex` 39 of 52; 1 claim |
 
-## G4: what remains (once D2 and WS-F's captions are in)
-
-Steps:
-1. Place the registry's markers.
-2. Paste WS-F's captions into the `figure()` calls.
-3. Run `paper_results.py --write --headline <D2> --repaired`.
-4. Run `worked_example.py --write`.
-5. Run `docs/appendix_statistics.py --write`.
-6. Run every `--check`.
-
-About 30 minutes. The writers pause meanwhile.
-
-## Regeneration commands (from the repository root)
+## Regeneration commands for the writers (from the repository root)
 
 ```
-python -m full_run_28092026.numbers_sheet
-python full_run_28092026/paper_results.py --write --text-only --headline <D2> --repaired
-python full_run_28092026/paper_results.py --check --headline <D2> --repaired
+python full_run_28092026/paper_results.py --write --text-only --headline default --repaired   # after editing a phrase
+python full_run_28092026/paper_results.py --check --headline default --repaired
 python docs/appendix_statistics.py --write
 python docs/appendix_statistics.py --check
+python -m full_run_28092026.worked_example --write
 python docs/appendix_certification.py --check
 python docs/appendix_evaluation.py --check
 python full_run_28092026/paper_setup.py --check
+python -m full_run_28092026.numbers_sheet
 ```
+
+Each script prints the rows and phrases it generates (run it without `--check`). A sentence that waits on a number carries `%% FILL: <what>` until it is written.

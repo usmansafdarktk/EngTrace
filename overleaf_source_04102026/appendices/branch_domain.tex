@@ -54,30 +54,30 @@ lower, \texttt{GPT-5.4 mini} in thermodynamics and \texttt{gpt-oss-20b} in geote
 \begin{tabular}{l r r r r r r r r r r r }
 \toprule
 \rowcolor{gray!10}
-\textbf{Branch or domain (templates)} & \rotatebox{90}{\texttt{DeepSeek V4.1 Flash}} & \rotatebox{90}{\texttt{Kimi K3}} & \rotatebox{90}{\texttt{Claude Sonnet 5}} & \rotatebox{90}{\texttt{GLM-5.3-Flash}} & \rotatebox{90}{\texttt{Muse Glimmer 30B}} & \rotatebox{90}{\texttt{GLM-5.3}} & \rotatebox{90}{\texttt{Qwen3-235B-2507}} & \rotatebox{90}{\texttt{Gemini 3.1 Flash-Lite}} & \rotatebox{90}{\texttt{Gemma 4 26B}} & \rotatebox{90}{\texttt{GPT-5.4 mini}} & \rotatebox{90}{\texttt{gpt-oss-20b}} \\
+\textbf{Branch or domain (templates)} & \rotatebox{90}{\texttt{DeepSeek V4.1 Flash}} & \rotatebox{90}{\texttt{Claude Sonnet 5}} & \rotatebox{90}{\texttt{Kimi K3}} & \rotatebox{90}{\texttt{GLM-5.3-Flash}} & \rotatebox{90}{\texttt{Muse Glimmer 30B}} & \rotatebox{90}{\texttt{GLM-5.3}} & \rotatebox{90}{\texttt{Qwen3-235B-2507}} & \rotatebox{90}{\texttt{Gemini 3.1 Flash-Lite}} & \rotatebox{90}{\texttt{Gemma 4 26B}} & \rotatebox{90}{\texttt{GPT-5.4 mini}} & \rotatebox{90}{\texttt{gpt-oss-20b}} \\
 \midrule
-\rowcolor{gray!10}\textit{Chemical} (30) & 0.956 & 0.964 & 0.949 & 0.947 & 0.963 & 0.898 & 0.827 & 0.776 & 0.734 & 0.800 & 0.809 \\
-\quad Reaction kinetics (10) & 0.993 & 1.000 & 1.000 & 1.000 & 1.000 & 0.993 & 0.980 & 0.913 & 0.913 & 0.913 & 0.967 \\
-\quad Thermodynamics (12) & \textbf{0.900} & 0.922 & \textbf{0.878} & \textbf{0.872} & 0.911 & \textbf{0.761} & \textbf{0.728} & \textbf{0.678} & \textbf{0.517} & \textbf{0.667} & 0.656 \\
-\quad Transport phenomena (8) & 0.992 & 0.983 & 0.992 & 0.992 & 0.996 & 0.983 & 0.783 & 0.750 & 0.838 & 0.858 & 0.842 \\
-\rowcolor{gray!10}\textit{Civil} (30) & 0.993 & 0.987 & 0.996 & 0.984 & 0.969 & 0.973 & 0.940 & 0.862 & 0.882 & 0.838 & 0.673$^{\ddagger}$ \\
-\quad Geotechnical engineering (10) & 1.000 & 1.000 & 0.987 & 0.993 & 0.933 & 0.993 & 0.947 & 0.960 & 0.913 & 0.913 & \textbf{0.520} \\
-\quad Structural analysis (10) & 1.000 & 0.993 & 1.000 & 1.000 & 0.987 & 1.000 & 0.947 & 0.913 & 0.913 & 0.827 & 0.733 \\
-\quad Water resources (10) & 0.980 & 0.967 & 1.000 & 0.960 & 0.987 & 0.927 & 0.927 & 0.713 & 0.820 & 0.773 & 0.767 \\
-\rowcolor{gray!10}\textit{Electrical} (30) & 0.954 & 0.949 & 0.947 & 0.981 & 0.971 & 0.951 & 0.886 & 0.900 & 0.904 & 0.911 & 0.908 \\
-\quad Digital communications (10) & 0.923 & \textbf{0.897} & 0.913 & 0.967 & 0.950 & 0.923 & 0.840 & 0.877 & 0.883 & 0.923 & 0.930 \\
-\quad Electromagnetics and waves (10) & 0.990 & 0.980 & 0.953 & 0.977 & 0.997 & 0.947 & 0.883 & 0.883 & 0.887 & 0.830 & 0.910 \\
-\quad Signals and systems (10) & 0.950 & 0.970 & 0.973 & 1.000 & 0.967 & 0.983 & 0.933 & 0.940 & 0.943 & 0.980 & 0.883 \\
-\rowcolor{gray!10}\textit{Industrial} (30) & 0.980 & 0.980 & 0.973 & 0.942 & 0.940 & 0.922 & 0.871 & 0.860 & 0.878 & 0.831 & 0.820 \\
-\quad Production and inventory (10) & 0.940 & 0.967 & 0.987 & 0.887 & \textbf{0.887} & 0.887 & 0.847 & 0.853 & 0.873 & 0.780 & 0.767 \\
-\quad Quality and reliability control (10) & 1.000 & 0.980 & 0.940 & 0.947 & 0.933 & 0.907 & 0.787 & 0.800 & 0.800 & 0.760 & 0.773 \\
-\quad Stochastic operations (10) & 1.000 & 0.993 & 0.993 & 0.993 & 1.000 & 0.973 & 0.980 & 0.927 & 0.960 & 0.953 & 0.920 \\
-\rowcolor{gray!10}\textit{Mechanical} (30) & 0.997 & 0.991 & 0.994 & 0.992 & 0.991 & 0.993 & 0.906 & 0.961 & 0.921 & 0.854 & 0.862 \\
-\quad Fluid mechanics (10) & 0.997 & 0.987 & 0.987 & 0.987 & 0.987 & 0.987 & 0.913 & 0.950 & 0.893 & 0.950 & 0.880 \\
-\quad Mechanics of materials (10) & 1.000 & 0.993 & 1.000 & 0.993 & 0.997 & 1.000 & 0.943 & 0.940 & 0.907 & 0.803 & 0.840 \\
-\quad Vibrations and acoustics (10) & 0.993 & 0.993 & 0.997 & 0.997 & 0.990 & 0.993 & 0.860 & 0.993 & 0.963 & 0.810 & 0.867 \\
+\rowcolor{gray!10}\textit{Chemical} (30) & 0.980 & 0.993 & 0.960 & 0.960 & 0.963 & 0.900 & 0.869 & 0.784 & 0.754 & 0.807 & 0.798 \\
+\quad Reaction kinetics (10) & 0.993 & 1.000 & 0.993 & 1.000 & 1.000 & 0.993 & 0.980 & 0.913 & 0.913 & 0.913 & 0.953 \\
+\quad Thermodynamics (12) & 0.961 & 0.989 & \textbf{0.917} & 0.906 & 0.922 & \textbf{0.767} & 0.833 & \textbf{0.700} & \textbf{0.567} & \textbf{0.683} & 0.650 \\
+\quad Transport phenomena (8) & 0.992 & 0.992 & 0.983 & 0.992 & 0.979 & 0.983 & \textbf{0.783} & 0.750 & 0.838 & 0.858 & 0.825 \\
+\rowcolor{gray!10}\textit{Civil} (30) & 0.993 & 0.996 & 0.982 & 0.982 & 0.962 & 0.973 & 0.940 & 0.862 & 0.882 & 0.838 & 0.671$^{\ddagger}$ \\
+\quad Geotechnical engineering (10) & 1.000 & 0.987 & 1.000 & 0.993 & 0.927 & 0.993 & 0.947 & 0.960 & 0.913 & 0.913 & \textbf{0.513} \\
+\quad Structural analysis (10) & 1.000 & 1.000 & 0.993 & 1.000 & 0.987 & 1.000 & 0.947 & 0.913 & 0.913 & 0.827 & 0.733 \\
+\quad Water resources (10) & 0.980 & 1.000 & 0.953 & 0.953 & 0.973 & 0.927 & 0.927 & 0.713 & 0.820 & 0.773 & 0.767 \\
+\rowcolor{gray!10}\textit{Electrical} (30) & 0.990 & 0.974 & 0.984 & 0.981 & 0.989 & 0.961 & 0.911 & 0.922 & 0.927 & 0.926 & 0.897 \\
+\quad Digital communications (10) & 0.990 & 0.980 & 0.987 & 0.980 & 1.000 & 0.947 & 0.897 & 0.917 & 0.917 & 0.967 & 0.933 \\
+\quad Electromagnetics and waves (10) & 0.990 & 0.953 & 0.977 & 0.977 & 0.987 & 0.943 & 0.890 & 0.877 & 0.887 & 0.830 & 0.867 \\
+\quad Signals and systems (10) & 0.990 & 0.990 & 0.990 & 0.987 & 0.980 & 0.993 & 0.947 & 0.973 & 0.977 & 0.980 & 0.890 \\
+\rowcolor{gray!10}\textit{Industrial} (30) & 0.980 & 0.973 & 0.980 & 0.942 & 0.938 & 0.918 & 0.871 & 0.860 & 0.878 & 0.831 & 0.816 \\
+\quad Production and inventory (10) & \textbf{0.940} & 0.987 & 0.967 & \textbf{0.887} & \textbf{0.880} & 0.880 & 0.847 & 0.853 & 0.873 & 0.780 & 0.767 \\
+\quad Quality and reliability control (10) & 1.000 & \textbf{0.940} & 0.980 & 0.947 & 0.933 & 0.907 & 0.787 & 0.800 & 0.800 & 0.760 & 0.773 \\
+\quad Stochastic operations (10) & 1.000 & 0.993 & 0.993 & 0.993 & 1.000 & 0.967 & 0.980 & 0.927 & 0.960 & 0.953 & 0.907 \\
+\rowcolor{gray!10}\textit{Mechanical} (30) & 0.998 & 0.999 & 0.996 & 0.996 & 0.993 & 0.998 & 0.904 & 0.962 & 0.919 & 0.858 & 0.859 \\
+\quad Fluid mechanics (10) & 1.000 & 1.000 & 1.000 & 0.997 & 0.997 & 1.000 & 0.913 & 0.953 & 0.893 & 0.963 & 0.887 \\
+\quad Mechanics of materials (10) & 1.000 & 1.000 & 0.993 & 0.993 & 0.997 & 1.000 & 0.943 & 0.940 & 0.907 & 0.803 & 0.833 \\
+\quad Vibrations and acoustics (10) & 0.993 & 0.997 & 0.993 & 0.997 & 0.987 & 0.993 & 0.857 & 0.993 & 0.957 & 0.807 & 0.857 \\
 \midrule
-Detectable branch difference & 0.076 & 0.072 & 0.081 & 0.089 & 0.084 & 0.126 & 0.145 & 0.182 & 0.162 & 0.182 & 0.189 \\
+Detectable branch difference & 0.037 & 0.030 & 0.055 & 0.080 & 0.081 & 0.123 & 0.129 & 0.173 & 0.152 & 0.184 & 0.188 \\
 \bottomrule
 \end{tabular}
 }
