@@ -9,9 +9,10 @@ WHAT IT ASKS. How many verdicts rest on each clause of the final-answer rule, an
 prescribing templates ask for. Each variant changes one clause and leaves the rest of the rule as it is:
   abs_clause_off       a stated value matches only with its own sign: the |v| reading (a deflection stated
                        negative against a gold stated positive) is dropped, for the target and its renderings
-  last_digit_bounded   the window of one unit in the response's last displayed digit, u(y^), is capped at 1%
-                       of the gold, min(u(y^), 0.01|y|), so a coarse rounding (`3.4 x 10^3` for 3,364) no
-                       longer vouches for itself; the relative tolerance and the gold's own last-digit window stay
+  last_digit_unbounded the window of one unit in the response's last displayed digit, u(y^), is not capped:
+                       the rule caps it at answer.OWN_DIGIT_CAP of the gold, min(u(y^), 0.01|y|) (D11d), and
+                       without the cap a coarse rounding (`3.4 x 10^3` for 3,364) vouches for itself again; the
+                       relative tolerance and the gold's own last-digit window are the same either way
   prescribed_relaxed   the questions that prescribe their rounding (answer.ROUNDING, 17 templates) are scored at
                        the tolerance like every other question, instead of on the exact digits
   per_part_credit      a partial answer scores matched / of instead of 0.5; correct 1 and incorrect 0 unchanged
@@ -19,17 +20,17 @@ An unusable row (no readable answer) scores 0 under every variant, as in the hea
 
 HOW. answer.py has no parameter for the first three clauses (its `tol`, `unit` and `whole` are other
 readings), so this file holds a local copy of answer.verdict and answer.match with three switches; every
-other piece (targets, segment, values, the word and label rules, the tolerance, the unit factors) is
-answer.py's own, imported. The copy with every switch off must reproduce the stored label, `matched` and
-`of` of every readable row: the run stops if one row differs, so the copy cannot drift from the rule the
-store was scored with. per_part_credit needs no re-read: a partial answer's stored `matched` and `of`.
+other piece (targets, segment, values, the word and label rules, the tolerance, the unit factors, the cap
+answer.OWN_DIGIT_CAP) is answer.py's own, imported. The copy with every switch at the rule must reproduce the
+stored label, `matched` and `of` of every readable row: the run stops if one row differs, so the copy cannot
+drift from the rule the store was scored with. per_part_credit needs no re-read: a partial answer's stored
+`matched` and `of`.
 
-THE SYMBOLIC CHECK (WS-E, at ANSWER FINAL). Once answer.py carries it, verdict() raises an incorrect or partial
-label to correct on the enabled templates when the final answer is equivalent to the gold
-(symbolic_equivalence.apply, after the rule's own label; no verdict lowered). This file reads the module and the
-enabled list from answer.py (`answer.symbolic_equivalence`, `answer.SYMBOLIC_EQUIVALENCE_TEMPLATES`, the names
-WS-E's report gives) and applies the same step after each variant's label, so every variant is the full rule with
-one clause changed; today neither name exists and nothing is applied. A row the step raised keeps the by-numbers
+THE SYMBOLIC CHECK (WS-E, ANSWER FINAL). verdict() raises an incorrect or partial label to correct on the
+enabled templates when the final answer is equivalent to the gold (symbolic_equivalence.apply, after the rule's
+own label; no verdict lowered). This file reads the module and the enabled list from answer.py
+(`answer.symbolic_equivalence`, `answer.SYMBOLIC_EQUIVALENCE_TEMPLATES`) and applies the same step after each
+variant's label, so every variant is the full rule with one clause changed. A row the step raised keeps the by-numbers
 `matched` and `of` out of the reproduction check, scores 1 under per-part credit, and is counted apart among the
 accepted answers (`symbolic`: no stated number was read). If answer.py adopts other names, the reproduction check
 stops the run on the first raised row; adapt symbolic_hook().
@@ -79,12 +80,11 @@ RESULTS = HERE / 'results'
 SECTIONS = RESULTS / 'sections'
 OUT_JSON = RESULTS / 'sensitivity_variants.json'
 OUT_MD = SECTIONS / 'sensitivity_variants.md'
-VARIANTS = ('abs_clause_off', 'last_digit_bounded', 'prescribed_relaxed', 'per_part_credit')
+VARIANTS = ('abs_clause_off', 'last_digit_unbounded', 'prescribed_relaxed', 'per_part_credit')
 LABELS = {'headline': 'headline', 'abs_clause_off': 'absolute-value clause off',
-          'last_digit_bounded': 'last digit bounded', 'prescribed_relaxed': 'prescribed digits relaxed',
+          'last_digit_unbounded': 'last digit unbounded', 'prescribed_relaxed': 'prescribed digits relaxed',
           'per_part_credit': 'per-part credit'}
 SCORE_OF = {'correct': 1.0, 'partial': 0.5, 'incorrect': 0.0}
-BOUND = 0.01                     # the cap on the response's last-digit window, as a fraction of the gold
 BINS = (('le_0.2', answer.REL), ('0.2_1', 0.01), ('1_5', 0.05), ('gt_5', math.inf))
 
 
@@ -133,10 +133,10 @@ def milestone_cache(items: dict) -> dict[str, list[dict]]:
 
 # ------------------------------------------------------------------ the rule, with its clauses switchable
 
-def _match(gold, have, rel, exact, gold_ulp, scales=answer.SCALES, bounded=False, errs=None):
-    """answer.match at unit 1.0 (the validated rule), with the response's last-digit window optionally capped
-    at BOUND x |gold|. With `errs`, every accepted (value, unit factor) adds its relative error, and the
-    search does not stop at the first."""
+def _match(gold, have, rel, exact, gold_ulp, scales=answer.SCALES, unbounded=False, errs=None):
+    """answer.match at unit 1.0 (the validated rule): the response's last-digit window capped at
+    answer.OWN_DIGIT_CAP x |gold|, or not capped with `unbounded`. With `errs`, every accepted (value, unit
+    factor) adds its relative error, and the search does not stop at the first."""
     hit = False
     for v, u in have:
         for sc in scales:
@@ -145,8 +145,8 @@ def _match(gold, have, rel, exact, gold_ulp, scales=answer.SCALES, bounded=False
                 ok = abs(t - gold) <= 1e-9 * max(1.0, abs(gold))
             else:
                 own = tu if abs(v) > u else 0.0
-                if bounded:
-                    own = min(own, BOUND * abs(gold))
+                if not unbounded:
+                    own = min(own, answer.OWN_DIGIT_CAP * abs(gold))
                 ok = abs(t - gold) <= max(rel * abs(gold), own, gold_ulp) * (1 + answer.SLACK)
             if ok:
                 if errs is None:
@@ -156,7 +156,7 @@ def _match(gold, have, rel, exact, gold_ulp, scales=answer.SCALES, bounded=False
     return hit
 
 
-def _hits(want, have, low, abs_clause=True, bounded=False, errs=None):
+def _hits(want, have, low, abs_clause=True, unbounded=False, errs=None):
     """answer.verdict's per-target hits at the fitted tolerance (unit 1.0, whole False), the absolute-value
     clause and the last-digit cap switchable. With `errs` (a list per numeric target), every accepted reading
     of each target adds its relative error."""
@@ -165,13 +165,13 @@ def _hits(want, have, low, abs_clause=True, bounded=False, errs=None):
     hits = []
     for k, (v, gu) in enumerate(want['numbers']):
         e = None if errs is None else errs[k]
-        parts = [_match(v, have, rel, exact, gu, bounded=bounded, errs=e)]
+        parts = [_match(v, have, rel, exact, gu, unbounded=unbounded, errs=e)]
         if abs_clause:
-            parts.append(_match(abs(v), absolute, rel, exact, gu, bounded=bounded, errs=e))
+            parts.append(_match(abs(v), absolute, rel, exact, gu, unbounded=unbounded, errs=e))
         for w, wu in want.get('renderings', []):
-            parts.append(_match(w, have, rel, exact, wu, scales=(1.0,), bounded=bounded, errs=e))
+            parts.append(_match(w, have, rel, exact, wu, scales=(1.0,), unbounded=unbounded, errs=e))
             if abs_clause:
-                parts.append(_match(abs(w), absolute, rel, exact, wu, scales=(1.0,), bounded=bounded, errs=e))
+                parts.append(_match(abs(w), absolute, rel, exact, wu, scales=(1.0,), unbounded=unbounded, errs=e))
             if errs is None and any(parts):
                 break
         hits.append(any(parts))
@@ -190,8 +190,8 @@ def _label(hits) -> tuple[str, int, int]:
 
 
 def symbolic_hook():
-    """answer.py's symbolic equivalence step, once WS-E enables it: (label, item, text) -> label. None while
-    answer.py does not carry it (as on 2026-10-07)."""
+    """answer.py's symbolic equivalence step: (label, item, text) -> label. None when answer.py carries no
+    enabled template."""
     mod = getattr(answer, 'symbolic_equivalence', None)
     enabled = getattr(answer, 'SYMBOLIC_EQUIVALENCE_TEMPLATES', None)
     if mod is None or not enabled:
@@ -209,7 +209,7 @@ def variant_verdicts(text: str, item: dict, ms, hook=None) -> dict:
     low = answer._norm_linear(seg).lower()
     out = {'headline': _label(_hits(want, have, low)),
            'abs_clause_off': _label(_hits(want, have, low, abs_clause=False)),
-           'last_digit_bounded': _label(_hits(want, have, low, bounded=True)),
+           'last_digit_unbounded': _label(_hits(want, have, low, unbounded=True)),
            'prescribed_relaxed': _label(_hits(dict(want, exact=False), have, low)),
            'exact': want['exact'], 'rel_errors': None, 'raised': False}
     if out['headline'][0] == 'correct' and want['numbers']:
@@ -253,7 +253,7 @@ def score_model(args) -> dict:
         same = vv['headline'][0] == a['label'] and (vv['raised'] or vv['headline'][1:] == (a['matched'], a['of']))
         if not same:
             bad.append((r['item_id'], vv['headline'], (a['label'], a['matched'], a['of'])))
-        for v in ('abs_clause_off', 'last_digit_bounded', 'prescribed_relaxed'):
+        for v in ('abs_clause_off', 'last_digit_unbounded', 'prescribed_relaxed'):
             rec[v] = SCORE_OF[vv[v][0]]
         rec['per_part_credit'] = {'correct': 1.0, 'incorrect': 0.0}.get(
             a['label'], (a['matched'] / a['of']) if a['of'] else 0.0)
@@ -325,10 +325,10 @@ def bins_of(rows) -> dict:
     out.update({'accepted': numeric + c['no_numeric'] + c['symbolic'], 'numeric': numeric,
                 'no_numeric': c['no_numeric'], 'symbolic': c['symbolic'],
                 'share': {n: (c[n] / numeric if numeric else None) for n, _ in BINS}})
-    # where an accepted error above 1% comes from: its templates and answer kinds, and how many the
-    # last-digit cap still accepts (through the gold's own last digit or another reading)
+    # where an accepted error above 1% comes from: its templates and answer kinds. With the response's own
+    # last digit capped at 1%, the rule accepts such a value only through the gold's own last-digit window
     over = [r for r in rows if r['bin'] in ('1_5', 'gt_5')]
-    out['over_1pct'] = {'n': len(over), 'kept_when_bounded': sum(r['last_digit_bounded'] == 1.0 for r in over),
+    out['over_1pct'] = {'n': len(over),
                         'by_answer_type': dict(collections.Counter(r['answer_type'] for r in over).most_common()),
                         'top_templates': dict(collections.Counter(r['template_id'] for r in over).most_common(5))}
     return out
@@ -403,8 +403,8 @@ def render(res: dict) -> str:
     L = ['## Scoring-rule variants', '',
          f"Generated by `{res['generated_by']}`.{q} FAC (the item mean: correct 1, partial 0.5, incorrect and "
          f"unusable 0) under the headline rule and under four variants, each changing one clause: the absolute-value "
-         f"clause off (a value matches only with its own sign); the response's last-digit window capped at "
-         f"min(u(y^), 0.01|y|); the exact digits of the {res['n_prescribing_templates']} templates whose question "
+         f"clause off (a value matches only with its own sign); the response's last-digit window not capped (the rule "
+         f"caps it at min(u(y^), 0.01|y|)); the exact digits of the {res['n_prescribing_templates']} templates whose question "
          f"prescribes its rounding relaxed to the tolerance; a partial answer credited matched / of instead of 0.5. "
          f"Beside each variant, the verdicts it moves up / down. Intervals: 95% template bootstrap, "
          f"{res['resamples']:,} resamples; Δ is the variant minus the headline. The last row of each table is "
@@ -443,8 +443,8 @@ def render(res: dict) -> str:
                  + ' | '.join(f"{b[n]} ({100 * b['share'][n]:.1f}%)" if b['share'][n] is not None else '-'
                               for n, _ in BINS) + ' |')
     o = res['relative_error_bins']['all']['over_1pct']
-    L += ['', f"Of the {o['n']} accepted answers above 1%, {o['kept_when_bounded']} stay accepted with the last-digit "
-          f"window capped (through the gold's own last digit or another reading). By answer kind: "
+    L += ['', f"{o['n']} accepted answers lie above 1% of the target; with the response's own last digit capped at 1%, "
+          f"each is within one unit of the gold's own last digit. By answer kind: "
           + ', '.join(f'{k} {v}' for k, v in o['by_answer_type'].items()) + '. Most frequent templates: '
           + ', '.join(f'`{k}` {v}' for k, v in o['top_templates'].items()) + '.', '']
     return '\n'.join(L)
@@ -466,21 +466,21 @@ def selftest() -> int:
     cases = [
         # (gold line, question, type, milestones, response, expected label per check)
         ('**Answer:** The deflection at the free end is 7.3 mm', '', 'scalar', (7.3,), '**Answer:** -7.326 mm',
-         {'headline': 'correct', 'abs_clause_off': 'incorrect', 'last_digit_bounded': 'correct',
+         {'headline': 'correct', 'abs_clause_off': 'incorrect', 'last_digit_unbounded': 'correct',
           'prescribed_relaxed': 'correct'}),
         ('**Answer:** The volume is 3,364 m3.', '', 'scalar', (3364.0,), '**Answer:** about 3.4 x 10^3 m3',
-         {'headline': 'correct', 'abs_clause_off': 'correct', 'last_digit_bounded': 'incorrect',
-          'prescribed_relaxed': 'correct'}),
+         {'headline': 'incorrect', 'abs_clause_off': 'incorrect', 'last_digit_unbounded': 'correct',
+          'prescribed_relaxed': 'incorrect'}),
         ('**Answer:** The probability is 0.4987.', '', 'scalar', (0.4987,), '**Answer:** P = 0.5',
-         {'headline': 'correct', 'abs_clause_off': 'correct', 'last_digit_bounded': 'correct',
+         {'headline': 'correct', 'abs_clause_off': 'correct', 'last_digit_unbounded': 'correct',
           'prescribed_relaxed': 'correct'}),
         ('**Answer:** The fraction is 0.1235.', 'Give it to 4 decimals, round half up.', 'scalar', (0.1235,),
          '**Answer:** 0.1234',
-         {'headline': 'incorrect', 'abs_clause_off': 'incorrect', 'last_digit_bounded': 'incorrect',
+         {'headline': 'incorrect', 'abs_clause_off': 'incorrect', 'last_digit_unbounded': 'incorrect',
           'prescribed_relaxed': 'correct'}),
         ('**Answer:** k = 74254 N/m, omega_n = 30.54 rad/s and zeta = 0.120', '', 'multipart', (74254.0, 30.54, 0.12),
          '**Answer:** k = 74254 N/m, omega_n = 30.54 rad/s, zeta = 0.31',
-         {'headline': 'partial', 'abs_clause_off': 'partial', 'last_digit_bounded': 'partial',
+         {'headline': 'partial', 'abs_clause_off': 'partial', 'last_digit_unbounded': 'partial',
           'prescribed_relaxed': 'partial'}),
     ]
     bad = 0
@@ -502,7 +502,7 @@ def selftest() -> int:
         print(f'FAIL per-part credit: {got}')
     # the symbolic step (WS-E, at ANSWER FINAL): a response it accepts is correct under every variant; one it does
     # not accept keeps each variant's own label
-    labels = ('headline', 'abs_clause_off', 'last_digit_bounded', 'prescribed_relaxed')
+    labels = ('headline', 'abs_clause_off', 'last_digit_unbounded', 'prescribed_relaxed')
     vv = variant_verdicts(cases[4][4], item(*cases[4][:3]), cases[4][3], lambda lab, it, text: 'correct')
     if not (vv['raised'] and all(vv[k][0] == 'correct' for k in labels)):
         bad += 1
@@ -511,17 +511,19 @@ def selftest() -> int:
     if vv['raised'] or [vv[k][0] for k in labels] != ['correct', 'incorrect', 'correct', 'correct']:
         bad += 1
         print(f'FAIL symbolic step declining: {[vv[k][0] for k in labels]}')
-    # the relative error of an accepted answer: 3.4e3 for 3,364 is 1.07%, -7.326 for 7.3 is 0.36%
-    for (sol, q, typ, ms, text, _), b in zip(cases[:3], ('0.2_1', '1_5', '0.2_1')):
+    # the relative error of an accepted answer: -7.326 for 7.3 is 0.36%, 0.5 for 0.4987 is 0.26%, and 7.38 for a gold
+    # stated 7.3 is 1.1%, accepted through the gold's own last digit, which the cap leaves as it is
+    coarse = ('**Answer:** The deflection at the free end is 7.3 mm', '', 'scalar', (7.3,), '**Answer:** 7.38 mm', None)
+    for (sol, q, typ, ms, text, _), b in zip((cases[0], cases[2], coarse), ('0.2_1', '0.2_1', '1_5')):
         e = variant_verdicts(text, item(sol, q, typ), ms)['rel_errors']
         if not e or bin_of(max(e)) != b:
             bad += 1
             print(f'FAIL relative-error bin: want {b} got {e} | {text}')
     # the summary: one flip up and one down are counted, and the template interval brackets the mean
     rows = [{'template_id': f't{i % 3}', 'headline': 1.0, 'abs_clause_off': 0.0 if i == 0 else 1.0,
-             'last_digit_bounded': 1.0, 'prescribed_relaxed': 1.0, 'per_part_credit': 1.0, 'bin': 'le_0.2'}
+             'last_digit_unbounded': 1.0, 'prescribed_relaxed': 1.0, 'per_part_credit': 1.0, 'bin': 'le_0.2'}
             for i in range(9)]
-    rows.append({'template_id': 't0', 'headline': 0.5, 'abs_clause_off': 0.5, 'last_digit_bounded': 0.5,
+    rows.append({'template_id': 't0', 'headline': 0.5, 'abs_clause_off': 0.5, 'last_digit_unbounded': 0.5,
                  'prescribed_relaxed': 0.5, 'per_part_credit': 2 / 3, 'bin': None})
     s = summarise({'rows': rows, 'readable': 10}, 200, 1)
     if s['changed']['abs_clause_off'] != {'up': 0, 'down': 1} or s['changed']['per_part_credit'] != {'up': 1, 'down': 0}:

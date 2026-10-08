@@ -151,9 +151,9 @@ check("S3", "rounds review 150, 22, 5 and 2 templates", [int(r[3]) for r in cert
 
 # ---------------------------------------------------------------- C3: validation against the experts
 sv = RUN / "SCORER_VALIDATION.md"
-grep("C3", "answer check 0.982 non-partial (current code)", sv, r"\| answer, non-partial agreement \| 0\.947 \| 0\.947 \| yes \| 0\.982 \|")
-grep("C3", "answer check 0.927 three-way (current code)", sv, r"\| answer, three-way agreement \| 0\.893 \| 0\.893 \| yes \| 0\.927 \|")
-grep("C3", "milestone F1 0.923 without the judge", sv, r"\| E3 F1 \| 0\.921 \| 0\.921 \| yes \| 0\.923 \|")
+grep("C3", "answer check 0.986 non-partial (current code)", sv, r"\| answer, non-partial agreement \| 0\.947 \| 0\.947 \| yes \| 0\.986 \|")
+grep("C3", "answer check 0.930 three-way (current code)", sv, r"\| answer, three-way agreement \| 0\.893 \| 0\.893 \| yes \| 0\.930 \|")
+grep("C3", "milestone F1 0.926 without the judge", sv, r"\| E3 F1 \| 0\.921 \| 0\.921 \| yes \| 0\.926 \|")
 grep("C3", "milestone F1 0.958 with the judge", PILOT / "PILOT_SUMMARY.md", r"\*\*0\.930\*\* \| \*\*0\.989\*\* \| \*\*0\.958\*\*")
 grep("C3", "judge credited 0 of 88 fabricated values", PILOT / "RESULTS_E5.md", r"should be MISSING \| \*\*0\*\* \| 66 \| \*\*22")
 grep("C3", "arithmetic check precision 0.817, recall 0.427 (hard case)", sv, r"hard case, precision \| 0\.750 \| 0\.750 \| yes \| 0\.817 \|.*hard case, recall \| 0\.320 \| 0\.320 \| yes \| 0\.427 \|")
@@ -213,7 +213,7 @@ rng("C9", "judged step flags 0.011 to 0.220", [num(r[5]) for r in router], 0.011
 judge = table(RES, r"^\| model \| calls \| without a reply \| judged fraction \|")
 rng("4.1", "judge decides 11% to 25% of required milestones", [num(r[3]) for r in judge], 0.112, 0.252)
 
-depth = table(RES, r"^\| model \| 0 \(70 items\) \|")
+depth = table(RES, r"^\| model \| 0 \(\d+ items\) \|")
 rng("C10", "wrong-answer rate on 6+ milestones 0.037 to 0.291", [num(r[6]) for r in depth], 0.037, 0.291)
 rng("C10", "wrong-answer rate on 1-milestone instances 0.000 to 0.045", [num(r[2]) for r in depth], 0.0, 0.045)
 

@@ -10,7 +10,7 @@
 THE RESPONSE. One real response from scores/main, chosen so that one box shows every mechanism of the scoring
 process: a wrong final answer by a lower-tier model, at least one milestone matched deterministically under a
 unit factor, one judge ruling of each kind (reached, not needed, missing), and an arithmetic flag. `--candidates`
-lists every main-store response that meets those conditions (14 on the store of 2026-10-07), shortest first.
+lists every main-store response that meets those conditions (13 on the final store), shortest first.
 The default, MODEL on ITEM below, is the one among them whose rulings all hold up on reading:
   - matching settles `MT` under the factor 10^3 (the response works in kg/mol where the correlation takes g/mol,
     so it states M*T a thousand times smaller than the gold);
@@ -19,11 +19,11 @@ The default, MODEL on ITEM below, is the one among them whose rulings all hold u
     hold), and `numerator` and `viscosity` missing (both wrong, by the same unit slip);
   - the arithmetic check flags the final division, whose printed result is 10^18 times smaller than its printed
     operands give.
-The sibling response on `gas_viscosity_kinetic_theory#7` was passed over: its second deterministic match is an
-artefact of the milestone reader, which drops a unicode superscript exponent (`1.152 × 10⁻¹⁹` reads as 1.152)
-and so matches the numerator under the 3,600 factor; on `#13` the judge credits a wrong numerator as reached.
-`--reader-gap` sizes that artefact over the main run (answer.values and arith.normalise fold such exponents;
-milestones.numbers does not): a fix belongs to the evaluator code and a re-score, not to this script.
+The sibling response on `gas_viscosity_kinetic_theory#7` was passed over when the item was chosen: the milestone
+reader then read a unicode exponent's mantissa alone (`1.152 × 10⁻¹⁹` as 1.152) and matched the numerator under the
+3,600 factor. The reader folds such exponents since ANSWER FINAL (D11a), and its comparison no longer treats any two
+numbers below 1e-12 as equal (WS-G, 2026-10-08), so neither artefact reaches this item. On `#13` the judge credits a
+wrong numerator as reached. `--reader-gap` sizes over the main run what the exponent fold changes.
 
 WHAT IS PRINTED, every value from the store rows and the trace: the question as the model received it
 (line breaks kept, nothing cut), the gold milestones with their values, how each was settled (matched: the

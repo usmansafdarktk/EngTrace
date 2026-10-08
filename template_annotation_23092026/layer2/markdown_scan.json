@@ -1,6 +1,6 @@
 {
- "generated": "2026-09-27T20:36:19+00:00",
- "git_head": "fb88cf1d190b5a3bf50c1e97eaccfdef5a94c838",
+ "generated": "2026-10-08T12:37:34+00:00",
+ "git_head": "b8b3358abdd5b405dea4828186e74a724a34d3d2",
  "seeds": 200,
  "templates": 150,
  "errors": {},
@@ -9,6 +9,12 @@
    "solution: emphasis (italic)": {
     "seeds": 200,
     "example": "seed 0: *muG + 0.24*"
+   }
+  },
+  "template_adiabatic_flame_temperature": {
+   "question: bullet list": {
+    "seeds": 200,
+    "example": "seed 0: -"
    }
   },
   "template_aliased_frequency_identification": {
@@ -613,12 +619,6 @@
    "solution: emphasis (italic)": {
     "seeds": 200,
     "example": "seed 0: *t - 8.89*"
-   }
-  },
-  "template_work_isothermal_virial": {
-   "solution: emphasis (italic)": {
-    "seeds": 200,
-    "example": "seed 0: *0.04823*"
    }
   }
  }

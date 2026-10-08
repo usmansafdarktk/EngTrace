@@ -161,6 +161,26 @@ template = re.search(r'PROMPT_TEMPLATE = """(.*?)"""', runner, re.S).group(1)
 hashes = {h for d in dec.values() for h in d["prompt_sha256"]}
 assert hashes == {hashlib.sha256(template.encode("utf-8")).hexdigest()}, "every response used this template"
 
+# ---------------------------------------------------------------- the matched configuration (results/matched_config.json)
+# The models that return no reasoning tokens at their providers' defaults and offer a reasoning setting answer every
+# instance again with it, on the main run's items, prompt and ceiling (run_traces.py's reasoning-medium-full); the
+# model whose endpoint offers none is the one left at its default.
+matched_cfg = load(HERE / "results/matched_config.json")
+rerun = alpha(m["model"] for m in matched_cfg["models"] if m.get("run", True) and m.get("reasoning_store"))
+rstores = {m["reasoning_store"] for m in matched_cfg["models"] if m.get("run", True) and m.get("reasoning_store")}
+assert len(rstores) == 1, rstores
+dec_r = {d["model_key"]: d for d in load(HERE / f"results/decoding_table_{rstores.pop()}.json")}
+assert set(dec_r) == set(rerun) and set(no_reasoning) - set(rerun) == {NO_THINKING}, (rerun, no_reasoning)
+assert [m["model"] for m in matched_cfg["models"] if m.get("reasoning_setting") == "none offered"] == [NO_THINKING]
+assert all(d["rows"] == len(manifest) and d["max_tokens"] == ceiling and set(d["prompt_sha256"]) == hashes
+           and d["reasoning_tokens"]["share_above_zero"] == 1.0 for d in dec_r.values()), "same items, prompt, ceiling"
+efforts = {d["reasoning_parameter"]["effort"] for d in dec_r.values()}
+assert len(efforts) == 1, efforts
+effort = efforts.pop()
+rerun_rows = sum(d["rows"] for d in dec_r.values())
+rerun_empty = {k: d["empty"] for k, d in dec_r.items() if d["empty"]}
+assert all(n <= dec_r[k]["finish_reasons"].get("length", 0) for k, n in rerun_empty.items()), "empty only at the ceiling"
+
 # ---------------------------------------------------------------- responses without a readable final answer
 unusable = sum(m["unusable"] for m in q1.values())
 empty = sum(m["empty"] for m in q1.values())
@@ -188,7 +208,7 @@ excluded_note = re.search(r"Excluded: models the evaluator pilot generated with\
                           r"judges\s*\((.*?)\)", pricing.replace("\n//", " "), re.S)
 generated, judged = [re.sub(r"\s+", " ", g).replace(" and ", ", ") for g in excluded_note.groups()]
 assert all(k in generated for k in ROBUSTNESS) and [j.strip() for j in judged.split(",")] == list(JUDGES), judged
-study = re.findall(r"\\texttt\{([^}]*)\}", re.search(r"Five LLMs outside the evaluated models, (.*?), answer every "
+study = re.findall(r"\\texttt\{([^}]*)\}", re.search(r"Five LLMs outside the evaluated models[\s(,]+(.*?)[\s),]*answer (?:every|each) "
                                                      r"instance", validation, re.S).group(1))
 assert len(study) == 5
 
@@ -206,7 +226,10 @@ sig = float(re.search(r"p\['p_holm'\] < (0\.\d+)", analyze).group(1))
 margin = float(re.search(r"EQUIV_MARGIN = ([\d.]+)", analyze).group(1))
 assert margin == res["q5"]["margin"]
 assert len(res["q1"]["pairs"]) == comb(len(roster), 2) == len(res["q3_coverage"]["pairs"])
-assert all(m["sd_advanced"] > m["sd_easy"] for m in res["q2"]), "Advanced templates vary more than Easy ones"
+CLAIMS_FAILED = []  # a prose claim the data no longer supports: reported, counted by --check, generation goes on
+if not all(m["sd_advanced"] > m["sd_easy"] for m in res["q2"]):
+    CLAIMS_FAILED.append("Advanced templates vary more than Easy ones, for every model (not for "
+                         + ", ".join(m["model"] for m in res["q2"] if m["sd_advanced"] <= m["sd_easy"]) + ")")
 assert all(m["templates"] == len(per_template) for m in res["q2"])
 mc_templates = res["q3_coverage"]["templates"]
 
@@ -225,6 +248,7 @@ phrases = [  # Section 5.1
     "reasoning effort",
     f"{unusable} responses ({100 * unusable / rows:.1f}\\%) have no readable final answer and score 0, almost all "
     "of them empty at the output ceiling",
+    f"{series(rerun)} also answer every instance with reasoning at {effort} effort ({thousands(rerun_rows)} responses)",
     f"because its {k_inst} instances share one derivation",
     f"every {level}\\% interval is a bootstrap over templates",
 ]
@@ -243,6 +267,10 @@ appendix_phrases = [  # appendices/models.tex
     f"The eleven models of~\\autoref{{sec:experiments}}, grouped by access, and the {WORD[len(anchors)]} flagship "
     f"anchors run on the {subset}-instance subset",
     f"{tt('deepseek-v4.1-flash')} activates {PREFILL_DECODE[0]} in prefill and {PREFILL_DECODE[1]} in decoding",
+] + [
+    f"with reasoning on, {tt(k)} leaves {n} of its {thousands(dec_r[k]['rows'])} responses empty at the output ceiling"
+    for k, n in sorted(rerun_empty.items())
+] + [
     f"Per model over its {thousands(len(manifest))} responses",
     f"every template has {k_inst} instances, so Final Answer Accuracy over the {thousands(len(manifest))} instances "
     f"equals the mean of the {len(per_template)} template means",
@@ -302,9 +330,11 @@ def flat(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+for c in CLAIMS_FAILED:
+    print(f"CLAIM FAILS: {c}")
 if "--check" in sys.argv:
     bib_keys = set(re.findall(r"@\w+\{([^,\s]+),", BIB.read_text(encoding="utf-8")))
-    failures = 0
+    failures = len(CLAIMS_FAILED)
     for path, own in ((TEX, phrases), (APPX, appendix_phrases + table_rows)):
         tex = path.read_text(encoding="utf-8")
         body = flat(re.sub(r"(?<!\\)%.*", "", tex))

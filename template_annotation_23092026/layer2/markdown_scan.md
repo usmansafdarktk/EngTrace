@@ -1,16 +1,17 @@
 # Markdown rendering scan
 
-Generated 2026-09-27T20:36:19+00:00 by `markdown_scan.py` at git `fb88cf1d19`, 200 seeds per template over 150 templates. The review app renders questions and solutions as Markdown; the models read the raw text. A lossy construct removes characters from what the expert sees.
+Generated 2026-10-08T12:37:34+00:00 by `markdown_scan.py` at git `b8b3358abd`, 200 seeds per template over 150 templates. The review app renders questions and solutions as Markdown; the models read the raw text. A lossy construct removes characters from what the expert sees.
 
 | | Templates |
 |---|---:|
-| any construct in the question | 43 |
+| any construct in the question | 44 |
 | lossy construct in the question | 31 |
-| lossy construct in the solution | 63 |
-| lossy in either | 65 |
+| lossy construct in the solution | 62 |
+| lossy in either | 64 |
 
 | Template | Branch | Construct | Seeds | Example |
 |---|---|---|---:|---|
+| `template_adiabatic_flame_temperature` | chemical | question: bullet list | 200 | seed 0: - |
 | `template_batch_moles_vs_conversion` | chemical | question: dollar pair (inline math) | 200 | seed 0: $CH4(g) + H2O(g) → CO(g) + 3H2(g)$ |
 | `template_batch_moles_vs_conversion` | chemical | question: strong (bold) | 200 | seed 0: **Reaction:** |
 | `template_batch_moles_vs_conversion` | chemical | solution: backslash escape (backslash dropped) | 200 | seed 0: rsion of $54.0 \%$, the final nu |
@@ -32,7 +33,6 @@ Generated 2026-09-27T20:36:19+00:00 by `markdown_scan.py` at git `fb88cf1d19`, 2
 | `template_sensible_heat_temp_dependent_cp` | chemical | question: emphasis (italic) | 177 | seed 0: *T + 1.510e+04* |
 | `template_sensible_heat_temp_dependent_cp` | chemical | solution: emphasis (italic) | 184 | seed 0: *(668.67)^2 - (1.510e+04/668.67) = 2227.0181I(383.0* |
 | `template_vdw_solve_for_volume` | chemical | solution: emphasis (italic) | 200 | seed 0: *V^2 + c1* |
-| `template_work_isothermal_virial` | chemical | solution: emphasis (italic) | 200 | seed 0: *0.04823* |
 | `template_beam_deflection_formula` | civil | solution: emphasis (italic) | 200 | seed 0: *L^3 / (48* |
 | `template_cantilever_double_integration` | civil | solution: emphasis (italic) | 200 | seed 0: *I* |
 | `template_force_method_continuous_beam` | civil | solution: emphasis (italic) | 200 | seed 0: *b* |

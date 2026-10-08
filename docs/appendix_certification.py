@@ -4,7 +4,7 @@
     python docs/appendix_certification.py --check   # exit 1 unless overleaf_source_04102026/appendices/certification.tex
                                                     # holds every generated row and number
 
-Sources (template_annotation_23092026/): layer2/RESULTS.md and RESULTS_round2-4.md (plants, hand checks, verdicts,
+Sources (template_annotation_23092026/): layer2/RESULTS.md and RESULTS_round2-6.md (plants, hand checks, verdicts,
 agreement), layer2/CERTIFICATION.md (rounds and the final status), layer0/gate_report.md (integrity checks),
 README.md (the screen's two passes), screen/pass2/stats.md, and docs/re-implementation-sep/DECISIONS.md (the
 screen's verified claims). The planted defects' short descriptions are written here; their templates and kinds are
@@ -87,17 +87,24 @@ plant_readings = one(r"Overall: (\d+) of (\d+) planted defects rejected", res1)
 
 # ---------------------------------------------------------------- agreement among a branch's three experts (round 1)
 agree = {r[0]: r for r in table(res1, r"\| Branch \| Templates with 3 verdicts")}
+# a branch whose experts approve every real template has one category only: Fleiss' kappa is 0/0, undefined, though
+# the report prints 1.000; the cell says so
+rejecting_r1 = {b: 0 for b in BRANCHES}
+for r in table(res1, r"\| Expert \| Branch \| Plants seen"):
+    rejecting_r1[r[1]] += 30 - int(r[5].split()[0])
+undefined_kappa = [b for b in BRANCHES if rejecting_r1[b] == 0]
 agreement_rows = []
 for b in BRANCHES + ["all"]:
     r = agree[b]
     name = "\\textbf{All}" if b == "all" else b.capitalize()
     pct = r[4].replace("%", "\\%")
-    agreement_rows.append(f"{name} & {r[2]} & {r[3]} & {pct} & {r[5]} & {r[6]} & {r[7]} \\\\")
+    kappa = "--" if b in undefined_kappa else r[2]
+    agreement_rows.append(f"{name} & {kappa} & {r[3]} & {pct} & {r[5]} & {r[6]} & {r[7]} \\\\")
 
 # ---------------------------------------------------------------- the rounds (stated in the Results paragraph)
 cert = read(L2 / "CERTIFICATION.md")
 rounds = {int(r[0]): (int(r[3]), int(r[4])) for r in table(cert, r"\| Round \| Labels")}
-reports = {1: res1, 2: read(L2 / "RESULTS_round2.md"), 3: read(L2 / "RESULTS_round3.md"), 4: read(L2 / "RESULTS_round4.md")}
+reports = {n: res1 if n == 1 else read(L2 / f"RESULTS_round{n}.md") for n in rounds}
 R = {}
 for n in sorted(rounds):
     text = reports[n]
@@ -110,18 +117,31 @@ for n in sorted(rounds):
     templates, verdicts = rounds[n]
     R[n] = dict(templates=templates, verdicts=verdicts, rejecting=rejecting, rejected=rejected_templates,
                 matched=matched, compared=compared)
-assert sorted(R) == [1, 2, 3, 4], R
-# the text: the third round reviews the second round's rejected templates and approves all; the fourth rejects none
+assert sorted(R) == [1, 2, 3, 4, 5, 6], R
+# the text: the third round reviews the second round's rejected templates and approves all; the fourth rejects none;
+# the fifth reviews the two repaired chemical templates, one expert rejecting one of them; the sixth reviews that one
+# template and approves it
 assert R[3]["templates"] == R[2]["rejected"] and R[3]["rejecting"] == R[4]["rejecting"] == 0, R
+assert R[6]["templates"] == R[5]["rejected"] and R[6]["rejecting"] == 0, R
+WORD = ["no", "one", "two", "three", "four", "five", "six", "seven"]
+later = [n for n in sorted(R) if n > 1]
 round_phrases = [
+    f"{WORD[len(R)]} rounds",
     f"{R[1]['matched']} of the {R[1]['compared']} first-round hand checks",
     f"{R[1]['rejecting']} of the {R[1]['verdicts']} verdicts on templates are rejections",
     f"{R[2]['rejecting']} of the {R[2]['verdicts']} verdicts are rejections, on {R[2]['rejected']} of the "
     f"{R[2]['templates']} templates",
     f"the third round approves all {R[3]['templates']}",
-    f"a fourth round re-certifies {['no', 'one', 'two', 'three'][R[4]['templates']]} templates",
-    f"{R[2]['matched']} of {R[2]['compared']}, {R[3]['matched']} of {R[3]['compared']}, and "
-    f"{R[4]['matched']} of {R[4]['compared']} hand checks",
+    f"a fourth round re-certifies {WORD[R[4]['templates']]} templates",
+    f"a fifth round re-certifies {WORD[R[5]['templates']]} templates",
+    f"{WORD[R[5]['rejecting']]} of its {R[5]['verdicts']} verdicts",
+    f"a sixth round re-certifies {WORD[R[6]['templates']]} template{'s' if R[6]['templates'] != 1 else ''}",
+    ", ".join(f"{R[n]['matched']} of {R[n]['compared']}" for n in later[:-1])
+    + f", and {R[later[-1]]['matched']} of {R[later[-1]]['compared']} hand checks",
+    # the first round's hand checks: one per label row, of which some give no number to compare
+    f"{R[1]['compared']} of the {one(r'from (\d+) label rows by \d+ experts', res1)[0]} hand checks have a number to compare",
+    # the agreement table's undefined cells
+    "undefined for " + " and ".join(undefined_kappa),
 ]
 
 # ---------------------------------------------------------------- counts the text states

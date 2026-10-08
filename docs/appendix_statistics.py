@@ -279,7 +279,13 @@ def load_agreement(path: Path | None) -> dict | None:
 
 
 def blocks(agreement: dict | None) -> dict[str, str]:
-    return {"tab:area": table_area(), "tab:levels_agreement": table_levels_agreement(agreement)}
+    """The generated blocks: `tab:area` always; `tab:levels_agreement` only once agreement.json holds ratings. D7 keeps
+    the domain experts' labels and states no agreement figure until the experts' count files arrive, so no stand-in is
+    placed in the tree meanwhile."""
+    out = {"tab:area": table_area()}
+    if agreement:
+        out["tab:levels_agreement"] = table_levels_agreement(agreement)
+    return out
 
 
 def pattern(name: str) -> re.Pattern:
@@ -370,11 +376,13 @@ def selftest() -> int:
                                                             for b in BRANCHES}}}
     real = table_levels_agreement(synth)
     assert "STAND-IN" not in real and "0.51 [0.43, 0.59]" in real and "\\textbf{10/58}" in real and "& -- &" in real
-    for name, body in blocks(None).items():
+    assert list(blocks(None)) == ["tab:area"] and list(blocks(synth)) == ["tab:area", "tab:levels_agreement"]
+    for name, body in blocks(synth).items():
         assert block(name, body).count("% BEGIN GENERATED") == 1 and body.count(f"\\label{{{name}}}") == 1
         cap = body[body.index("\\caption{"):body.index("\\label{")]
         assert all(len(l) <= 100 for l in cap.splitlines()), cap       # captions wrap at 100; table rows may exceed it
-    # a write into a scratch copy appends both blocks, and a second write replaces them in place
+    # a write into a scratch copy appends tab:area alone while there are no ratings, the agreement block once there
+    # are, and a second write replaces each in place
     import tempfile
     with tempfile.TemporaryDirectory(prefix="engtrace-stats-") as tmp:
         out = Path(tmp)
@@ -382,12 +390,16 @@ def selftest() -> int:
         once = (out / TEX_REL).read_text(encoding="utf-8")
         write(out, synth)
         twice = (out / TEX_REL).read_text(encoding="utf-8")
-        for name in blocks(None):
-            assert once.count(f"% BEGIN GENERATED {name}") == 1 == twice.count(f"% BEGIN GENERATED {name}"), name
-        assert "STAND-IN" in once and "STAND-IN" not in twice
+        write(out, synth)
+        thrice = (out / TEX_REL).read_text(encoding="utf-8")
+        assert once.count("% BEGIN GENERATED tab:area") == twice.count("% BEGIN GENERATED tab:area") == 1
+        assert "tab:levels_agreement" not in once and "STAND-IN" not in once
+        assert twice.count("% BEGIN GENERATED tab:levels_agreement") == 1 == thrice.count("% BEGIN GENERATED tab:levels_agreement")
+        assert "STAND-IN" not in twice and twice == thrice
         assert once.split("% BEGIN GENERATED")[0] == TEX.read_text(encoding="utf-8").rstrip("\n") + "\n\n"
     print("SELFTEST OK: 150 templates, 30 per branch, 15 domains, 42 areas in tab:area; tab:levels_agreement renders as a "
-          "stand-in and from a synthetic agreement.json; --write --out appends once and then replaces in place")
+          "stand-in and from a synthetic agreement.json, and is written only once ratings exist; --write --out appends "
+          "once and then replaces in place")
     return 0
 
 

@@ -89,7 +89,11 @@ def numbers(text: str) -> list[float]:
 
 
 def close(a: float, b: float, tol: float) -> bool:
-    if abs(b) < 1e-12:
+    """`a` equals `b` within the relative tolerance `tol`. A zero `b` has no relative tolerance, so it is matched by a
+    zero `a` (|a| < 1e-12). Any other `b`, however small, takes the relative test (WS-G, 2026-10-08): treating every
+    |b| below 1e-12 as zero let a scaled target match any small number, e.g. a milestone of 6.69e-4 at the 1e-9 unit
+    factor (6.69e-13) matched by a cross-section of 2.63e-19 m^2 in the same response."""
+    if b == 0:
         return abs(a) < 1e-12
     return abs(a - b) / abs(b) <= tol
 

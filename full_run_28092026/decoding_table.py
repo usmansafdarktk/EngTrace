@@ -145,8 +145,11 @@ def main() -> int:
     out_json.write_text(json.dumps(res, indent=1), encoding='utf-8')
     lines = table(res)
     if a.variant != 'main':
+        from full_run_28092026 import run_traces
         rp = res[0]['reasoning_parameter'] if res else None
-        item, dec = (('C1', 'D-179, D-180') if a.variant.startswith('reasoning-') else
+        matched = (run_traces.FULL_REASONING, run_traces.CASCADE_PARAPHRASE) + run_traces.CASCADE_REPEATS
+        item, dec = (('matched settings', 'the matched configuration, `results/matched_config.json`') if a.variant in matched else
+                     ('C1', 'D-179, D-180') if a.variant.startswith('reasoning-') else
                      ('C3', 'D-182') if a.variant.startswith('flagship') else
                      ('C4', 'D-183') if a.variant.startswith('openbook') else
                      ('C4', 'D-184') if a.variant == 'tool' else ('a variant', 'D-141'))

@@ -1,0 +1,5872 @@
+{
+ "stores": [
+  {
+   "variant": "main",
+   "archived": "scores/_replaced/main_20261008T114915Z",
+   "answer_py_old": "7e90e3803540",
+   "answer_py_new": "8fbe1072e1be",
+   "milestones_py_old": "32bb8287ae56",
+   "milestones_py_new": "9788a9ac6f41",
+   "commit_new": "b8b3358",
+   "dirty_new": true,
+   "second_judge_prompts_changed": {
+    "e5_grok-4-6": {
+     "claude-sonnet-5": [
+      "wave_equation_interpretation#5"
+     ],
+     "deepseek-v4.1-flash": [],
+     "gemini-3.1-flash-lite": [],
+     "gemma-4-26b-a4b": [],
+     "glm-5.3-flash": [
+      "annulus_flowrate#3",
+      "gas_viscosity_kinetic_theory#6",
+      "gas_viscosity_kinetic_theory#7",
+      "kinematic_viscosity#19",
+      "shear_stress_torsion#12",
+      "shear_stress_torsion#6"
+     ],
+     "glm-5.3": [
+      "wave_parameters_basic#33"
+     ],
+     "gpt-5.4-mini": [],
+     "gpt-oss-20b": [],
+     "kimi-k3": [
+      "gas_viscosity_kinetic_theory#5"
+     ],
+     "muse-glimmer-30b": [
+      "poissons_ratio#3"
+     ],
+     "qwen3-235b-a22b-2507": [],
+     "qwen3.8-27b": []
+    },
+    "e5_grok-4-6 (no call now)": {
+     "claude-sonnet-5": [
+      "wave_equation_interpretation#5"
+     ],
+     "deepseek-v4.1-flash": [],
+     "gemini-3.1-flash-lite": [],
+     "gemma-4-26b-a4b": [],
+     "glm-5.3-flash": [
+      "kinematic_viscosity#19",
+      "shear_stress_torsion#6"
+     ],
+     "glm-5.3": [],
+     "gpt-5.4-mini": [],
+     "gpt-oss-20b": [],
+     "kimi-k3": [],
+     "muse-glimmer-30b": [],
+     "qwen3-235b-a22b-2507": [],
+     "qwen3.8-27b": []
+    }
+   },
+   "models": {
+    "claude-sonnet-5": {
+     "rows_old": 2250,
+     "rows_new": 2250,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 47,
+     "e3_gained": 18,
+     "e3_lost": 16,
+     "judge_prompts_changed": 20,
+     "prompt_items": [
+      "annulus_flowrate#14",
+      "annulus_flowrate#7",
+      "beam_deflection_formula#1",
+      "beam_deflection_formula#2",
+      "beam_deflection_formula#5",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#1",
+      "cantilever_double_integration#10",
+      "cantilever_double_integration#12",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#6",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#8",
+      "cantilever_double_integration#9",
+      "coulombs_law#3",
+      "wave_parameters_basic#16",
+      "wave_parameters_basic#33",
+      "work_isothermal_virial#15",
+      "work_isothermal_virial#4"
+     ],
+     "e3_items": [
+      "annulus_flowrate#14",
+      "annulus_flowrate#7",
+      "basic_stress_strain#12",
+      "beam_deflection_formula#1",
+      "beam_deflection_formula#2",
+      "beam_deflection_formula#5",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#1",
+      "cantilever_double_integration#10",
+      "cantilever_double_integration#11",
+      "cantilever_double_integration#12",
+      "cantilever_double_integration#13",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#6",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#8",
+      "cantilever_double_integration#9",
+      "coulombs_law#0",
+      "coulombs_law#13",
+      "coulombs_law#3",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#1",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#14",
+      "gauss_law_symmetric#16",
+      "gauss_law_symmetric#17",
+      "gauss_law_symmetric#2",
+      "gauss_law_symmetric#20",
+      "gauss_law_symmetric#4",
+      "gauss_law_symmetric#5",
+      "gauss_law_symmetric#6",
+      "gauss_law_symmetric#7",
+      "gauss_law_symmetric#8",
+      "lorentz_force#16",
+      "volumetric_flow_rate#14",
+      "wave_equation_interpretation#15",
+      "wave_equation_interpretation#2",
+      "wave_equation_interpretation#4",
+      "wave_equation_interpretation#5",
+      "wave_equation_interpretation#6",
+      "wave_equation_interpretation#7",
+      "wave_equation_interpretation#9",
+      "wave_parameters_basic#16",
+      "wave_parameters_basic#33",
+      "work_isothermal_virial#15",
+      "work_isothermal_virial#4"
+     ],
+     "mean_old": 0.9806666666666667,
+     "mean_new": 0.9871111111111112,
+     "moves": [
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 9
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 12
+      },
+      {
+       "from": "partial",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 1
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 1
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 11,
+       "number rule": 1
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 5
+      },
+      "template_incompressible_continuity": {
+       "symbolic step": 4
+      }
+     },
+     "fields": {
+      "e3": 92,
+      "score": 22,
+      "answer": 48,
+      "milestones_required": 24
+     },
+     "answer_fields": {
+      "label_double_tol": 22,
+      "label": 22,
+      "label_half_tol": 24,
+      "label_half_unit": 20,
+      "matched": 5,
+      "label_whole_trace": 22,
+      "whole_matched": 16,
+      "targets": 14,
+      "of": 1
+     },
+     "e3_fields": {
+      "null_coverage": 44,
+      "scale": 64,
+      "coverage": 42,
+      "reached": 47
+     }
+    },
+    "deepseek-v4.1-flash": {
+     "rows_old": 2250,
+     "rows_new": 2250,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 30,
+     "e3_gained": 0,
+     "e3_lost": 12,
+     "judge_prompts_changed": 14,
+     "prompt_items": [
+      "beam_deflection_formula#1",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10",
+      "cantilever_double_integration#11",
+      "cantilever_double_integration#13",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#4",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#8",
+      "cantilever_double_integration#9",
+      "coulombs_law#3",
+      "work_isothermal_virial#15",
+      "work_isothermal_virial#4"
+     ],
+     "e3_items": [
+      "beam_deflection_formula#1",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10",
+      "cantilever_double_integration#11",
+      "cantilever_double_integration#13",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#4",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#8",
+      "cantilever_double_integration#9",
+      "coulombs_law#0",
+      "coulombs_law#13",
+      "coulombs_law#3",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#1",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#14",
+      "gauss_law_symmetric#16",
+      "gauss_law_symmetric#17",
+      "gauss_law_symmetric#2",
+      "gauss_law_symmetric#20",
+      "gauss_law_symmetric#4",
+      "gauss_law_symmetric#5",
+      "gauss_law_symmetric#6",
+      "gauss_law_symmetric#7",
+      "gauss_law_symmetric#8",
+      "volumetric_flow_rate#14",
+      "work_isothermal_virial#15",
+      "work_isothermal_virial#4"
+     ],
+     "mean_old": 0.9808888888888889,
+     "mean_new": 0.9882222222222222,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "partial",
+       "cause": "number rule",
+       "n": 1
+      },
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 9
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 16
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 1
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 13
+      },
+      "template_bpsk_energy_basis": {
+       "number rule": 1
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 4
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 6
+      },
+      "template_incompressible_continuity": {
+       "symbolic step": 1
+      }
+     },
+     "fields": {
+      "answer": 50,
+      "score": 26,
+      "milestones_required": 24,
+      "e3": 56
+     },
+     "answer_fields": {
+      "matched": 13,
+      "whole_matched": 16,
+      "label_half_unit": 24,
+      "label_double_tol": 25,
+      "label": 26,
+      "label_half_tol": 28,
+      "label_whole_trace": 17,
+      "targets": 14,
+      "of": 1
+     },
+     "e3_fields": {
+      "scale": 31,
+      "coverage": 25,
+      "reached": 30,
+      "null_coverage": 39
+     }
+    },
+    "gemini-3.1-flash-lite": {
+     "rows_old": 2250,
+     "rows_new": 2250,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 27,
+     "e3_gained": 0,
+     "e3_lost": 4,
+     "judge_prompts_changed": 6,
+     "prompt_items": [
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#4",
+      "cantilever_double_integration#7",
+      "coulombs_law#12",
+      "gauss_law_symmetric#2",
+      "work_isothermal_virial#15"
+     ],
+     "e3_items": [
+      "beam_deflection_formula#1",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#11",
+      "cantilever_double_integration#13",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#4",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#8",
+      "cantilever_double_integration#9",
+      "coulombs_law#0",
+      "coulombs_law#12",
+      "coulombs_law#13",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#1",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#14",
+      "gauss_law_symmetric#16",
+      "gauss_law_symmetric#17",
+      "gauss_law_symmetric#2",
+      "gauss_law_symmetric#20",
+      "gauss_law_symmetric#4",
+      "gauss_law_symmetric#5",
+      "gauss_law_symmetric#6",
+      "gauss_law_symmetric#7",
+      "gauss_law_symmetric#8",
+      "volumetric_flow_rate#14",
+      "work_isothermal_virial#15"
+     ],
+     "mean_old": 0.8735555555555555,
+     "mean_new": 0.8782222222222222,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 1
+      },
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 6
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 11
+      }
+     ],
+     "by_template": {
+      "template_ber_estimation_mary": {
+       "symbolic step": 6
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 7
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 3
+      },
+      "template_incompressible_continuity": {
+       "symbolic step": 1
+      },
+      "template_superposition_electric_field": {
+       "number rule": 1
+      }
+     },
+     "fields": {
+      "milestones_required": 24,
+      "e3": 46,
+      "score": 18,
+      "answer": 47
+     },
+     "answer_fields": {
+      "label_double_tol": 18,
+      "label": 18,
+      "label_half_tol": 18,
+      "label_half_unit": 16,
+      "label_whole_trace": 24,
+      "whole_matched": 23,
+      "targets": 14,
+      "matched": 6,
+      "of": 1
+     },
+     "e3_fields": {
+      "scale": 28,
+      "reached": 27,
+      "null_coverage": 32,
+      "coverage": 17
+     }
+    },
+    "gemma-4-26b-a4b": {
+     "rows_old": 2250,
+     "rows_new": 2250,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 27,
+     "e3_gained": 0,
+     "e3_lost": 6,
+     "judge_prompts_changed": 8,
+     "prompt_items": [
+      "annulus_flowrate#2",
+      "beam_deflection_formula#1",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#9",
+      "work_isothermal_virial#15",
+      "work_isothermal_virial#4"
+     ],
+     "e3_items": [
+      "annulus_flowrate#2",
+      "beam_deflection_formula#1",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#11",
+      "cantilever_double_integration#13",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#8",
+      "cantilever_double_integration#9",
+      "coulombs_law#0",
+      "coulombs_law#13",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#1",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#14",
+      "gauss_law_symmetric#16",
+      "gauss_law_symmetric#17",
+      "gauss_law_symmetric#2",
+      "gauss_law_symmetric#20",
+      "gauss_law_symmetric#4",
+      "gauss_law_symmetric#5",
+      "gauss_law_symmetric#6",
+      "gauss_law_symmetric#7",
+      "gauss_law_symmetric#8",
+      "volumetric_flow_rate#14",
+      "work_isothermal_virial#15",
+      "work_isothermal_virial#4"
+     ],
+     "mean_old": 0.868,
+     "mean_new": 0.872,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "partial",
+       "cause": "number rule",
+       "n": 4
+      },
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 3
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 19
+      },
+      {
+       "from": "partial",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 3
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 2
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 9,
+       "number rule": 2
+      },
+      "template_bpsk_energy_basis": {
+       "number rule": 1
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 6
+      },
+      "template_fluid_particle_acceleration": {
+       "number rule": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 4,
+       "number rule": 1
+      },
+      "template_incompressible_continuity": {
+       "symbolic step": 1
+      },
+      "template_undamped_natural_frequency_torsional": {
+       "number rule": 2
+      }
+     },
+     "fields": {
+      "e3": 61,
+      "score": 29,
+      "answer": 69,
+      "milestones_required": 24
+     },
+     "answer_fields": {
+      "label_double_tol": 29,
+      "label": 29,
+      "label_half_tol": 31,
+      "label_half_unit": 24,
+      "matched": 14,
+      "whole_matched": 35,
+      "label_whole_trace": 32,
+      "targets": 14,
+      "of": 1
+     },
+     "e3_fields": {
+      "null_coverage": 48,
+      "scale": 28,
+      "coverage": 19,
+      "reached": 27
+     }
+    },
+    "glm-5.3-flash": {
+     "rows_old": 2250,
+     "rows_new": 2250,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 95,
+     "e3_gained": 82,
+     "e3_lost": 7,
+     "judge_prompts_changed": 43,
+     "prompt_items": [
+      "angle_of_twist#27",
+      "annulus_flowrate#2",
+      "annulus_flowrate#3",
+      "beam_deflection_formula#1",
+      "beam_deflection_formula#11",
+      "beam_deflection_formula#2",
+      "beam_deflection_formula#5",
+      "cantilever_double_integration#12",
+      "cantilever_double_integration#3",
+      "composite_shafts_series#1",
+      "composite_shafts_series#10",
+      "composite_shafts_series#15",
+      "composite_shafts_series#16",
+      "composite_shafts_series#2",
+      "coulombs_law#3",
+      "fluid_particle_acceleration#7",
+      "gas_viscosity_kinetic_theory#0",
+      "gas_viscosity_kinetic_theory#1",
+      "gas_viscosity_kinetic_theory#10",
+      "gas_viscosity_kinetic_theory#13",
+      "gas_viscosity_kinetic_theory#19",
+      "gas_viscosity_kinetic_theory#2",
+      "gas_viscosity_kinetic_theory#23",
+      "gas_viscosity_kinetic_theory#25",
+      "gas_viscosity_kinetic_theory#28",
+      "gas_viscosity_kinetic_theory#3",
+      "gas_viscosity_kinetic_theory#30",
+      "gas_viscosity_kinetic_theory#4",
+      "gas_viscosity_kinetic_theory#5",
+      "gas_viscosity_kinetic_theory#6",
+      "gas_viscosity_kinetic_theory#7",
+      "poissons_ratio#45",
+      "shear_stress_torsion#1",
+      "shear_stress_torsion#12",
+      "wave_equation_interpretation#0",
+      "wave_equation_interpretation#1",
+      "wave_equation_interpretation#10",
+      "wave_equation_interpretation#16",
+      "wave_parameters_basic#1",
+      "wave_parameters_basic#11",
+      "wave_parameters_basic#16",
+      "wave_parameters_basic#5",
+      "wave_parameters_basic#7"
+     ],
+     "e3_items": [
+      "angle_of_twist#27",
+      "annulus_flowrate#14",
+      "annulus_flowrate#2",
+      "annulus_flowrate#3",
+      "beam_deflection_formula#1",
+      "beam_deflection_formula#11",
+      "beam_deflection_formula#2",
+      "beam_deflection_formula#5",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#11",
+      "cantilever_double_integration#12",
+      "cantilever_double_integration#13",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#8",
+      "cantilever_double_integration#9",
+      "composite_shafts_series#1",
+      "composite_shafts_series#10",
+      "composite_shafts_series#15",
+      "composite_shafts_series#16",
+      "composite_shafts_series#2",
+      "coulombs_law#0",
+      "coulombs_law#13",
+      "coulombs_law#2",
+      "coulombs_law#3",
+      "coulombs_law#5",
+      "euclidean_distance_binary#4",
+      "fluid_particle_acceleration#7",
+      "gas_viscosity_kinetic_theory#0",
+      "gas_viscosity_kinetic_theory#1",
+      "gas_viscosity_kinetic_theory#10",
+      "gas_viscosity_kinetic_theory#13",
+      "gas_viscosity_kinetic_theory#19",
+      "gas_viscosity_kinetic_theory#2",
+      "gas_viscosity_kinetic_theory#23",
+      "gas_viscosity_kinetic_theory#25",
+      "gas_viscosity_kinetic_theory#28",
+      "gas_viscosity_kinetic_theory#3",
+      "gas_viscosity_kinetic_theory#30",
+      "gas_viscosity_kinetic_theory#4",
+      "gas_viscosity_kinetic_theory#5",
+      "gas_viscosity_kinetic_theory#6",
+      "gas_viscosity_kinetic_theory#7",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#1",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#14",
+      "gauss_law_symmetric#16",
+      "gauss_law_symmetric#17",
+      "gauss_law_symmetric#2",
+      "gauss_law_symmetric#20",
+      "gauss_law_symmetric#4",
+      "gauss_law_symmetric#5",
+      "gauss_law_symmetric#6",
+      "gauss_law_symmetric#7",
+      "gauss_law_symmetric#8",
+      "hagen_poiseuille_flowrate#0",
+      "kinematic_viscosity#14",
+      "kinematic_viscosity#17",
+      "kinematic_viscosity#18",
+      "kinematic_viscosity#19",
+      "lorentz_force#10",
+      "lorentz_force#19",
+      "lorentz_force#2",
+      "lorentz_force#4",
+      "multi_segment_rod#11",
+      "multi_segment_rod#8",
+      "poissons_ratio#2",
+      "poissons_ratio#45",
+      "shaft_design_power#4",
+      "shear_stress_torsion#1",
+      "shear_stress_torsion#10",
+      "shear_stress_torsion#11",
+      "shear_stress_torsion#12",
+      "shear_stress_torsion#6",
+      "shear_stress_torsion#9",
+      "volumetric_flow_rate#14",
+      "wave_equation_interpretation#0",
+      "wave_equation_interpretation#1",
+      "wave_equation_interpretation#10",
+      "wave_equation_interpretation#12",
+      "wave_equation_interpretation#16",
+      "wave_equation_interpretation#18",
+      "wave_equation_interpretation#2",
+      "wave_equation_interpretation#3",
+      "wave_equation_interpretation#5",
+      "wave_equation_interpretation#6",
+      "wave_equation_interpretation#7",
+      "wave_equation_interpretation#8",
+      "wave_equation_interpretation#9",
+      "wave_parameters_basic#1",
+      "wave_parameters_basic#11",
+      "wave_parameters_basic#16",
+      "wave_parameters_basic#5",
+      "wave_parameters_basic#7"
+     ],
+     "mean_old": 0.9724444444444444,
+     "mean_new": 0.9722222222222222,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 4
+      },
+      {
+       "from": "correct",
+       "to": "partial",
+       "cause": "number rule",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 8
+      }
+     ],
+     "by_template": {
+      "template_aliased_frequency_identification": {
+       "number rule": 2
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 5
+      },
+      "template_bpsk_energy_basis": {
+       "number rule": 1
+      },
+      "template_incompressible_continuity": {
+       "symbolic step": 3
+      },
+      "template_normal_depth_iteration": {
+       "number rule": 1
+      },
+      "template_work_isothermal_virial": {
+       "number rule": 1
+      }
+     },
+     "fields": {
+      "score": 13,
+      "answer": 33,
+      "e3": 209,
+      "milestones_required": 24
+     },
+     "answer_fields": {
+      "label_double_tol": 12,
+      "whole_matched": 8,
+      "label": 13,
+      "matched": 10,
+      "label_half_tol": 13,
+      "label_half_unit": 13,
+      "label_whole_trace": 9,
+      "targets": 14,
+      "of": 1
+     },
+     "e3_fields": {
+      "scale": 195,
+      "coverage": 86,
+      "reached": 95,
+      "null_coverage": 46
+     }
+    },
+    "glm-5.3": {
+     "rows_old": 2250,
+     "rows_new": 2250,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 81,
+     "e3_gained": 58,
+     "e3_lost": 17,
+     "judge_prompts_changed": 38,
+     "prompt_items": [
+      "annulus_flowrate#13",
+      "annulus_flowrate#14",
+      "annulus_flowrate#2",
+      "annulus_flowrate#9",
+      "beam_deflection_formula#1",
+      "beam_deflection_formula#2",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#1",
+      "cantilever_double_integration#10",
+      "cantilever_double_integration#2",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#6",
+      "cantilever_double_integration#8",
+      "composite_shafts_series#15",
+      "composite_shafts_series#16",
+      "coulombs_law#0",
+      "coulombs_law#12",
+      "coulombs_law#9",
+      "euclidean_distance_binary#5",
+      "fluid_particle_acceleration#7",
+      "gas_viscosity_kinetic_theory#0",
+      "gas_viscosity_kinetic_theory#10",
+      "gas_viscosity_kinetic_theory#19",
+      "gas_viscosity_kinetic_theory#2",
+      "gas_viscosity_kinetic_theory#28",
+      "gas_viscosity_kinetic_theory#3",
+      "gas_viscosity_kinetic_theory#4",
+      "gas_viscosity_kinetic_theory#5",
+      "gas_viscosity_kinetic_theory#7",
+      "hagen_poiseuille_flowrate#4",
+      "wave_equation_interpretation#18",
+      "wave_parameters_basic#1",
+      "wave_parameters_basic#11",
+      "wave_parameters_basic#16",
+      "wave_parameters_basic#33",
+      "wave_parameters_basic#5",
+      "wave_parameters_basic#7"
+     ],
+     "e3_items": [
+      "annulus_flowrate#11",
+      "annulus_flowrate#13",
+      "annulus_flowrate#14",
+      "annulus_flowrate#2",
+      "annulus_flowrate#9",
+      "basic_stress_strain#0",
+      "beam_deflection_formula#1",
+      "beam_deflection_formula#2",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#1",
+      "cantilever_double_integration#10",
+      "cantilever_double_integration#11",
+      "cantilever_double_integration#13",
+      "cantilever_double_integration#2",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#6",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#8",
+      "cantilever_double_integration#9",
+      "composite_shafts_series#15",
+      "composite_shafts_series#16",
+      "coulombs_law#0",
+      "coulombs_law#12",
+      "coulombs_law#13",
+      "coulombs_law#9",
+      "euclidean_distance_binary#5",
+      "falling_film_max_velocity#17",
+      "fluid_particle_acceleration#7",
+      "gas_viscosity_kinetic_theory#0",
+      "gas_viscosity_kinetic_theory#10",
+      "gas_viscosity_kinetic_theory#19",
+      "gas_viscosity_kinetic_theory#2",
+      "gas_viscosity_kinetic_theory#28",
+      "gas_viscosity_kinetic_theory#3",
+      "gas_viscosity_kinetic_theory#4",
+      "gas_viscosity_kinetic_theory#5",
+      "gas_viscosity_kinetic_theory#7",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#1",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#14",
+      "gauss_law_symmetric#16",
+      "gauss_law_symmetric#17",
+      "gauss_law_symmetric#2",
+      "gauss_law_symmetric#20",
+      "gauss_law_symmetric#4",
+      "gauss_law_symmetric#5",
+      "gauss_law_symmetric#6",
+      "gauss_law_symmetric#7",
+      "gauss_law_symmetric#8",
+      "hagen_poiseuille_flowrate#11",
+      "hagen_poiseuille_flowrate#14",
+      "hagen_poiseuille_flowrate#4",
+      "hagen_poiseuille_flowrate#5",
+      "hagen_poiseuille_flowrate#7",
+      "hagen_poiseuille_flowrate#8",
+      "kinematic_viscosity#19",
+      "lorentz_force#11",
+      "lorentz_force#19",
+      "lorentz_force#4",
+      "poissons_ratio#0",
+      "shear_stress_torsion#14",
+      "volumetric_flow_rate#14",
+      "wave_equation_interpretation#1",
+      "wave_equation_interpretation#10",
+      "wave_equation_interpretation#12",
+      "wave_equation_interpretation#15",
+      "wave_equation_interpretation#16",
+      "wave_equation_interpretation#18",
+      "wave_equation_interpretation#2",
+      "wave_equation_interpretation#3",
+      "wave_equation_interpretation#4",
+      "wave_equation_interpretation#5",
+      "wave_equation_interpretation#8",
+      "wave_parameters_basic#1",
+      "wave_parameters_basic#11",
+      "wave_parameters_basic#16",
+      "wave_parameters_basic#33",
+      "wave_parameters_basic#5",
+      "wave_parameters_basic#7"
+     ],
+     "mean_old": 0.948,
+     "mean_new": 0.95,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 2
+      },
+      {
+       "from": "correct",
+       "to": "partial",
+       "cause": "number rule",
+       "n": 1
+      },
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 2
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 11
+      },
+      {
+       "from": "partial",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 1
+      }
+     ],
+     "by_template": {
+      "template_ber_estimation_mary": {
+       "symbolic step": 6
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 2
+      },
+      "template_epq_finite_production": {
+       "number rule": 1
+      },
+      "template_euclidean_distance_binary": {
+       "number rule": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 1
+      },
+      "template_incompressible_continuity": {
+       "symbolic step": 4
+      },
+      "template_mm1k_finite_capacity": {
+       "number rule": 1
+      },
+      "template_time_to_phasor": {
+       "number rule": 1
+      }
+     },
+     "fields": {
+      "e3": 169,
+      "milestones_required": 24,
+      "score": 17,
+      "answer": 35
+     },
+     "answer_fields": {
+      "label_double_tol": 17,
+      "label": 17,
+      "label_half_tol": 17,
+      "label_whole_trace": 14,
+      "label_half_unit": 12,
+      "whole_matched": 11,
+      "matched": 6,
+      "targets": 14,
+      "of": 1
+     },
+     "e3_fields": {
+      "scale": 149,
+      "coverage": 73,
+      "reached": 81,
+      "null_coverage": 53
+     }
+    },
+    "gpt-5.4-mini": {
+     "rows_old": 2250,
+     "rows_new": 2250,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 28,
+     "e3_gained": 1,
+     "e3_lost": 11,
+     "judge_prompts_changed": 15,
+     "prompt_items": [
+      "beam_deflection_formula#1",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10",
+      "cantilever_double_integration#11",
+      "cantilever_double_integration#13",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#8",
+      "cantilever_double_integration#9",
+      "coulombs_law#13",
+      "euclidean_distance_binary#6",
+      "euclidean_distance_binary#9",
+      "gauss_law_symmetric#14",
+      "volumetric_flow_rate#14"
+     ],
+     "e3_items": [
+      "beam_deflection_formula#1",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10",
+      "cantilever_double_integration#11",
+      "cantilever_double_integration#13",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#8",
+      "cantilever_double_integration#9",
+      "coulombs_law#0",
+      "coulombs_law#13",
+      "euclidean_distance_binary#6",
+      "euclidean_distance_binary#9",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#1",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#14",
+      "gauss_law_symmetric#16",
+      "gauss_law_symmetric#17",
+      "gauss_law_symmetric#2",
+      "gauss_law_symmetric#20",
+      "gauss_law_symmetric#4",
+      "gauss_law_symmetric#5",
+      "gauss_law_symmetric#6",
+      "gauss_law_symmetric#7",
+      "gauss_law_symmetric#8",
+      "volumetric_flow_rate#14"
+     ],
+     "mean_old": 0.8495555555555555,
+     "mean_new": 0.8517777777777777,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 3
+      },
+      {
+       "from": "correct",
+       "to": "partial",
+       "cause": "number rule",
+       "n": 1
+      },
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 4
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 12
+      },
+      {
+       "from": "partial",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 3
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 4
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 6,
+       "number rule": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 2,
+       "number rule": 2
+      },
+      "template_incompressible_continuity": {
+       "symbolic step": 4
+      },
+      "template_rackett_equation_volume": {
+       "number rule": 2
+      },
+      "template_vdw_solve_for_volume": {
+       "number rule": 1
+      },
+      "template_vibration_transmissibility": {
+       "number rule": 1
+      }
+     },
+     "fields": {
+      "score": 23,
+      "answer": 57,
+      "milestones_required": 24,
+      "e3": 43
+     },
+     "answer_fields": {
+      "label_double_tol": 23,
+      "label": 23,
+      "label_half_tol": 24,
+      "label_half_unit": 17,
+      "label_whole_trace": 30,
+      "whole_matched": 29,
+      "matched": 12,
+      "targets": 14,
+      "of": 1
+     },
+     "e3_fields": {
+      "scale": 29,
+      "coverage": 24,
+      "reached": 28,
+      "null_coverage": 30
+     }
+    },
+    "gpt-oss-20b": {
+     "rows_old": 2250,
+     "rows_new": 2250,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 31,
+     "e3_gained": 1,
+     "e3_lost": 10,
+     "judge_prompts_changed": 18,
+     "prompt_items": [
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#4",
+      "cantilever_double_integration#6",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#8",
+      "cantilever_double_integration#9",
+      "coulombs_law#0",
+      "coulombs_law#12",
+      "coulombs_law#3",
+      "gauss_law_symmetric#16",
+      "gauss_law_symmetric#17",
+      "gauss_law_symmetric#2",
+      "gauss_law_symmetric#5",
+      "gauss_law_symmetric#6",
+      "volumetric_flow_rate#14",
+      "work_isothermal_virial#15"
+     ],
+     "e3_items": [
+      "beam_deflection_formula#1",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10",
+      "cantilever_double_integration#11",
+      "cantilever_double_integration#13",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#4",
+      "cantilever_double_integration#6",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#8",
+      "cantilever_double_integration#9",
+      "coulombs_law#0",
+      "coulombs_law#12",
+      "coulombs_law#13",
+      "coulombs_law#3",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#1",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#14",
+      "gauss_law_symmetric#16",
+      "gauss_law_symmetric#17",
+      "gauss_law_symmetric#2",
+      "gauss_law_symmetric#20",
+      "gauss_law_symmetric#4",
+      "gauss_law_symmetric#5",
+      "gauss_law_symmetric#6",
+      "gauss_law_symmetric#7",
+      "gauss_law_symmetric#8",
+      "volumetric_flow_rate#14",
+      "work_isothermal_virial#15"
+     ],
+     "mean_old": 0.8144444444444444,
+     "mean_new": 0.808,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 16
+      },
+      {
+       "from": "correct",
+       "to": "partial",
+       "cause": "number rule",
+       "n": 10
+      },
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 2
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 11
+      },
+      {
+       "from": "partial",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 2
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 1,
+       "number rule": 1
+      },
+      "template_average_energy_mqam": {
+       "number rule": 1
+      },
+      "template_ber_estimation_mary": {
+       "number rule": 3,
+       "symbolic step": 6
+      },
+      "template_bpsk_energy_basis": {
+       "number rule": 1
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 1,
+       "number rule": 1
+      },
+      "template_constant_head_permeability": {
+       "number rule": 1
+      },
+      "template_coulombs_law": {
+       "number rule": 1
+      },
+      "template_falling_film_max_velocity": {
+       "number rule": 2
+      },
+      "template_gas_phase_concentration": {
+       "number rule": 2
+      },
+      "template_gauss_law_symmetric": {
+       "number rule": 4
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 3,
+       "number rule": 1
+      },
+      "template_incompressible_continuity": {
+       "symbolic step": 2
+      },
+      "template_limiting_reactant": {
+       "number rule": 1
+      },
+      "template_lowpass_equivalent_bandpass": {
+       "number rule": 1
+      },
+      "template_mmc_waiting_time": {
+       "number rule": 2
+      },
+      "template_phasor_addition": {
+       "number rule": 1
+      },
+      "template_poissons_ratio": {
+       "number rule": 1
+      },
+      "template_rotating_unbalance": {
+       "number rule": 1
+      },
+      "template_superposition_electric_field": {
+       "number rule": 1
+      },
+      "template_vibration_transmissibility": {
+       "number rule": 1
+      },
+      "template_work_isothermal_virial": {
+       "number rule": 1
+      }
+     },
+     "fields": {
+      "answer": 78,
+      "score": 41,
+      "e3": 54,
+      "milestones_required": 24
+     },
+     "answer_fields": {
+      "whole_matched": 54,
+      "matched": 36,
+      "label_double_tol": 41,
+      "label": 41,
+      "label_half_tol": 41,
+      "label_half_unit": 32,
+      "label_whole_trace": 51,
+      "targets": 14,
+      "of": 1
+     },
+     "e3_fields": {
+      "scale": 33,
+      "reached": 31,
+      "coverage": 25,
+      "null_coverage": 34
+     }
+    },
+    "kimi-k3": {
+     "rows_old": 2250,
+     "rows_new": 2250,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 59,
+     "e3_gained": 24,
+     "e3_lost": 20,
+     "judge_prompts_changed": 29,
+     "prompt_items": [
+      "annulus_flowrate#11",
+      "annulus_flowrate#9",
+      "beam_deflection_formula#1",
+      "beam_deflection_formula#2",
+      "beam_deflection_formula#5",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10",
+      "cantilever_double_integration#11",
+      "cantilever_double_integration#13",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#4",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#8",
+      "cantilever_double_integration#9",
+      "composite_shafts_series#3",
+      "gas_viscosity_kinetic_theory#19",
+      "gas_viscosity_kinetic_theory#5",
+      "gas_viscosity_kinetic_theory#6",
+      "poissons_ratio#12",
+      "poissons_ratio#3",
+      "shear_stress_torsion#1",
+      "shear_stress_torsion#2",
+      "shear_stress_torsion#5",
+      "shear_stress_torsion#6",
+      "wave_parameters_basic#1",
+      "wave_parameters_basic#24",
+      "work_isothermal_virial#15",
+      "work_isothermal_virial#4"
+     ],
+     "e3_items": [
+      "annulus_flowrate#11",
+      "annulus_flowrate#9",
+      "beam_deflection_formula#1",
+      "beam_deflection_formula#2",
+      "beam_deflection_formula#5",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10",
+      "cantilever_double_integration#11",
+      "cantilever_double_integration#13",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#4",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#8",
+      "cantilever_double_integration#9",
+      "composite_shafts_series#3",
+      "coulombs_law#0",
+      "coulombs_law#13",
+      "gas_viscosity_kinetic_theory#19",
+      "gas_viscosity_kinetic_theory#5",
+      "gas_viscosity_kinetic_theory#6",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#1",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#14",
+      "gauss_law_symmetric#16",
+      "gauss_law_symmetric#17",
+      "gauss_law_symmetric#2",
+      "gauss_law_symmetric#20",
+      "gauss_law_symmetric#4",
+      "gauss_law_symmetric#5",
+      "gauss_law_symmetric#6",
+      "gauss_law_symmetric#7",
+      "gauss_law_symmetric#8",
+      "hagen_poiseuille_flowrate#43",
+      "hagen_poiseuille_flowrate#7",
+      "kinematic_viscosity#0",
+      "kinematic_viscosity#17",
+      "lorentz_force#3",
+      "poissons_ratio#12",
+      "poissons_ratio#3",
+      "poissons_ratio#8",
+      "shear_stress_torsion#1",
+      "shear_stress_torsion#2",
+      "shear_stress_torsion#5",
+      "shear_stress_torsion#6",
+      "shear_stress_torsion#9",
+      "volumetric_flow_rate#14",
+      "wave_equation_interpretation#1",
+      "wave_equation_interpretation#10",
+      "wave_equation_interpretation#2",
+      "wave_equation_interpretation#5",
+      "wave_equation_interpretation#7",
+      "wave_parameters_basic#0",
+      "wave_parameters_basic#1",
+      "wave_parameters_basic#24",
+      "wave_parameters_basic#7",
+      "work_isothermal_virial#15",
+      "work_isothermal_virial#4"
+     ],
+     "mean_old": 0.9737777777777777,
+     "mean_new": 0.9804444444444445,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 3
+      },
+      {
+       "from": "correct",
+       "to": "partial",
+       "cause": "number rule",
+       "n": 3
+      },
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 13
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 13
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 3,
+       "number rule": 1
+      },
+      "template_batch_reactor_second_order": {
+       "number rule": 1
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 14
+      },
+      "template_bpsk_energy_basis": {
+       "number rule": 1
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 3
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 2
+      },
+      "template_incompressible_continuity": {
+       "symbolic step": 4
+      },
+      "template_normal_depth_iteration": {
+       "number rule": 2
+      },
+      "template_wave_parameters_basic": {
+       "number rule": 1
+      }
+     },
+     "fields": {
+      "e3": 125,
+      "score": 32,
+      "answer": 52,
+      "milestones_required": 24
+     },
+     "answer_fields": {
+      "label_double_tol": 31,
+      "label": 32,
+      "label_half_tol": 33,
+      "label_half_unit": 29,
+      "whole_matched": 11,
+      "matched": 10,
+      "label_whole_trace": 24,
+      "targets": 14,
+      "of": 1
+     },
+     "e3_fields": {
+      "null_coverage": 52,
+      "scale": 93,
+      "coverage": 55,
+      "reached": 59
+     }
+    },
+    "muse-glimmer-30b": {
+     "rows_old": 2250,
+     "rows_new": 2250,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 47,
+     "e3_gained": 16,
+     "e3_lost": 10,
+     "judge_prompts_changed": 18,
+     "prompt_items": [
+      "angle_of_twist#4",
+      "beam_deflection_formula#1",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10",
+      "cantilever_double_integration#11",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#4",
+      "cantilever_double_integration#7",
+      "poissons_ratio#3",
+      "poissons_ratio#45",
+      "rotating_unbalance#6",
+      "sensible_heat_temp_dependent_cp#3",
+      "time_rate_of_consolidation#2",
+      "work_isothermal_virial#1",
+      "work_isothermal_virial#14",
+      "work_isothermal_virial#15",
+      "work_isothermal_virial#4",
+      "work_isothermal_virial#5"
+     ],
+     "e3_items": [
+      "angle_of_twist#4",
+      "beam_deflection_formula#1",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10",
+      "cantilever_double_integration#11",
+      "cantilever_double_integration#13",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#4",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#8",
+      "cantilever_double_integration#9",
+      "coulombs_law#0",
+      "coulombs_law#13",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#1",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#14",
+      "gauss_law_symmetric#16",
+      "gauss_law_symmetric#17",
+      "gauss_law_symmetric#2",
+      "gauss_law_symmetric#20",
+      "gauss_law_symmetric#4",
+      "gauss_law_symmetric#5",
+      "gauss_law_symmetric#6",
+      "gauss_law_symmetric#7",
+      "gauss_law_symmetric#8",
+      "hagen_poiseuille_flowrate#11",
+      "hagen_poiseuille_flowrate#43",
+      "poissons_ratio#3",
+      "poissons_ratio#4",
+      "poissons_ratio#45",
+      "poissons_ratio#6",
+      "reynolds_number_flow_regime#10",
+      "reynolds_number_flow_regime#9",
+      "rotating_unbalance#6",
+      "sensible_heat_temp_dependent_cp#3",
+      "shear_stress_torsion#6",
+      "shear_stress_torsion#9",
+      "time_rate_of_consolidation#2",
+      "volumetric_flow_rate#14",
+      "wave_equation_interpretation#1",
+      "work_isothermal_virial#1",
+      "work_isothermal_virial#14",
+      "work_isothermal_virial#15",
+      "work_isothermal_virial#4",
+      "work_isothermal_virial#5"
+     ],
+     "mean_old": 0.9686666666666667,
+     "mean_new": 0.9691111111111111,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 9
+      },
+      {
+       "from": "correct",
+       "to": "partial",
+       "cause": "number rule",
+       "n": 3
+      },
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 6
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 12
+      },
+      {
+       "from": "partial",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 1
+      }
+     ],
+     "by_template": {
+      "template_annulus_flowrate": {
+       "number rule": 2
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 10
+      },
+      "template_epq_finite_production": {
+       "number rule": 1
+      },
+      "template_fluid_particle_acceleration": {
+       "number rule": 1
+      },
+      "template_hydraulic_jump_energy_loss": {
+       "number rule": 2
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 4,
+       "number rule": 1
+      },
+      "template_incompressible_continuity": {
+       "symbolic step": 4
+      },
+      "template_lorentz_force": {
+       "number rule": 1
+      },
+      "template_rackett_equation_volume": {
+       "number rule": 2
+      },
+      "template_relative_density_of_sand": {
+       "number rule": 1
+      },
+      "template_superposition_electric_field": {
+       "number rule": 1
+      },
+      "template_vibration_transmissibility": {
+       "number rule": 1
+      }
+     },
+     "fields": {
+      "e3": 144,
+      "answer": 60,
+      "score": 31,
+      "milestones_required": 24
+     },
+     "answer_fields": {
+      "label_half_unit": 37,
+      "label_double_tol": 31,
+      "whole_matched": 14,
+      "label": 31,
+      "matched": 18,
+      "label_half_tol": 31,
+      "label_whole_trace": 23,
+      "targets": 14,
+      "of": 1
+     },
+     "e3_fields": {
+      "scale": 114,
+      "null_coverage": 61,
+      "coverage": 39,
+      "reached": 47
+     }
+    },
+    "qwen3-235b-a22b-2507": {
+     "rows_old": 2250,
+     "rows_new": 2250,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 62,
+     "e3_gained": 16,
+     "e3_lost": 32,
+     "judge_prompts_changed": 38,
+     "prompt_items": [
+      "annulus_flowrate#14",
+      "beam_deflection_formula#1",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10",
+      "cantilever_double_integration#11",
+      "cantilever_double_integration#13",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#8",
+      "cantilever_double_integration#9",
+      "coaxial_capacitance#1",
+      "coaxial_capacitance#10",
+      "coaxial_capacitance#11",
+      "coaxial_capacitance#12",
+      "coaxial_capacitance#13",
+      "coaxial_capacitance#14",
+      "coaxial_capacitance#2",
+      "coaxial_capacitance#3",
+      "coaxial_capacitance#4",
+      "coaxial_capacitance#5",
+      "coaxial_capacitance#6",
+      "coaxial_capacitance#7",
+      "coaxial_capacitance#9",
+      "coulombs_law#14",
+      "coulombs_law#3",
+      "euclidean_distance_binary#6",
+      "euclidean_distance_binary#7",
+      "gas_viscosity_kinetic_theory#10",
+      "gas_viscosity_kinetic_theory#2",
+      "gas_viscosity_kinetic_theory#23",
+      "gas_viscosity_kinetic_theory#25",
+      "gas_viscosity_kinetic_theory#28",
+      "gas_viscosity_kinetic_theory#5",
+      "shaft_design_power#11",
+      "shaft_design_power#14",
+      "shaft_design_power#7",
+      "work_isothermal_virial#15",
+      "work_isothermal_virial#4"
+     ],
+     "e3_items": [
+      "annulus_flowrate#14",
+      "beam_deflection_formula#1",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10",
+      "cantilever_double_integration#11",
+      "cantilever_double_integration#13",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#8",
+      "cantilever_double_integration#9",
+      "coaxial_capacitance#1",
+      "coaxial_capacitance#10",
+      "coaxial_capacitance#11",
+      "coaxial_capacitance#12",
+      "coaxial_capacitance#13",
+      "coaxial_capacitance#14",
+      "coaxial_capacitance#2",
+      "coaxial_capacitance#3",
+      "coaxial_capacitance#4",
+      "coaxial_capacitance#5",
+      "coaxial_capacitance#6",
+      "coaxial_capacitance#7",
+      "coaxial_capacitance#9",
+      "coulombs_law#0",
+      "coulombs_law#13",
+      "coulombs_law#14",
+      "coulombs_law#3",
+      "euclidean_distance_binary#6",
+      "euclidean_distance_binary#7",
+      "gas_viscosity_kinetic_theory#10",
+      "gas_viscosity_kinetic_theory#2",
+      "gas_viscosity_kinetic_theory#23",
+      "gas_viscosity_kinetic_theory#25",
+      "gas_viscosity_kinetic_theory#28",
+      "gas_viscosity_kinetic_theory#5",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#1",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#14",
+      "gauss_law_symmetric#16",
+      "gauss_law_symmetric#17",
+      "gauss_law_symmetric#2",
+      "gauss_law_symmetric#20",
+      "gauss_law_symmetric#4",
+      "gauss_law_symmetric#5",
+      "gauss_law_symmetric#6",
+      "gauss_law_symmetric#7",
+      "gauss_law_symmetric#8",
+      "kinematic_viscosity#14",
+      "kinematic_viscosity#17",
+      "kinematic_viscosity#18",
+      "kinematic_viscosity#19",
+      "kinematic_viscosity#3",
+      "shaft_design_power#11",
+      "shaft_design_power#14",
+      "shaft_design_power#7",
+      "volumetric_flow_rate#14",
+      "wave_equation_interpretation#6",
+      "wave_parameters_basic#4",
+      "work_isothermal_virial#15",
+      "work_isothermal_virial#4"
+     ],
+     "mean_old": 0.8942222222222223,
+     "mean_new": 0.8991111111111111,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "partial",
+       "cause": "number rule",
+       "n": 2
+      },
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "number rule",
+       "n": 1
+      },
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 5
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 14
+      },
+      {
+       "from": "partial",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 2
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 6
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 6
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 4
+      },
+      "template_decimation_aliasing_analysis": {
+       "number rule": 1
+      },
+      "template_gauss_law_symmetric": {
+       "number rule": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 3,
+       "number rule": 2
+      },
+      "template_system_properties": {
+       "number rule": 1
+      }
+     },
+     "fields": {
+      "e3": 104,
+      "score": 24,
+      "answer": 49,
+      "milestones_required": 24
+     },
+     "answer_fields": {
+      "label_double_tol": 23,
+      "label": 24,
+      "label_half_tol": 26,
+      "label_half_unit": 22,
+      "label_whole_trace": 17,
+      "whole_matched": 19,
+      "matched": 11,
+      "targets": 14,
+      "of": 1
+     },
+     "e3_fields": {
+      "scale": 66,
+      "coverage": 55,
+      "reached": 62,
+      "null_coverage": 60
+     }
+    },
+    "qwen3.8-27b": {
+     "rows_old": 2220,
+     "rows_new": 2220,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 31,
+     "e3_gained": 1,
+     "e3_lost": 12,
+     "judge_prompts_changed": 15,
+     "prompt_items": [
+      "annulus_flowrate#13",
+      "beam_deflection_formula#1",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10",
+      "cantilever_double_integration#11",
+      "cantilever_double_integration#13",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#4",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#8",
+      "cantilever_double_integration#9",
+      "coaxial_capacitance#5",
+      "coulombs_law#3",
+      "gauss_law_symmetric#0"
+     ],
+     "e3_items": [
+      "annulus_flowrate#13",
+      "beam_deflection_formula#1",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10",
+      "cantilever_double_integration#11",
+      "cantilever_double_integration#13",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#4",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#8",
+      "cantilever_double_integration#9",
+      "coaxial_capacitance#5",
+      "coulombs_law#0",
+      "coulombs_law#13",
+      "coulombs_law#3",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#1",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#14",
+      "gauss_law_symmetric#16",
+      "gauss_law_symmetric#17",
+      "gauss_law_symmetric#2",
+      "gauss_law_symmetric#20",
+      "gauss_law_symmetric#4",
+      "gauss_law_symmetric#5",
+      "gauss_law_symmetric#6",
+      "gauss_law_symmetric#7",
+      "gauss_law_symmetric#8",
+      "kinematic_viscosity#17",
+      "volumetric_flow_rate#14"
+     ],
+     "mean_old": 0.9484234234234235,
+     "mean_new": 0.956081081081081,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 1
+      },
+      {
+       "from": "correct",
+       "to": "partial",
+       "cause": "number rule",
+       "n": 2
+      },
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "number rule",
+       "n": 1
+      },
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 12
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 12
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 6
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 10
+      },
+      "template_bpsk_energy_basis": {
+       "number rule": 1
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 4
+      },
+      "template_decimation_aliasing_analysis": {
+       "number rule": 1
+      },
+      "template_gauss_law_symmetric": {
+       "number rule": 2
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 2
+      },
+      "template_incompressible_continuity": {
+       "symbolic step": 2
+      }
+     },
+     "fields": {
+      "e3": 60,
+      "score": 28,
+      "answer": 48,
+      "milestones_required": 24
+     },
+     "answer_fields": {
+      "label_double_tol": 27,
+      "label": 28,
+      "label_half_tol": 30,
+      "label_half_unit": 28,
+      "label_whole_trace": 18,
+      "whole_matched": 10,
+      "matched": 8,
+      "targets": 14,
+      "of": 1
+     },
+     "e3_fields": {
+      "null_coverage": 41,
+      "scale": 34,
+      "coverage": 26,
+      "reached": 31
+     }
+    }
+   }
+  },
+  {
+   "variant": "flagship",
+   "archived": "scores/_replaced/flagship_20261008T120006Z",
+   "answer_py_old": "7e90e3803540",
+   "answer_py_new": "8fbe1072e1be",
+   "milestones_py_old": "32bb8287ae56",
+   "milestones_py_new": "9788a9ac6f41",
+   "commit_new": "b8b3358",
+   "dirty_new": true,
+   "second_judge_prompts_changed": {},
+   "models": {
+    "deepseek-v4-pro": {
+     "rows_old": 450,
+     "rows_new": 450,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 10,
+     "e3_gained": 5,
+     "e3_lost": 2,
+     "judge_prompts_changed": 3,
+     "prompt_items": [
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10",
+      "wave_parameters_basic#0"
+     ],
+     "e3_items": [
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#5",
+      "kinematic_viscosity#0",
+      "lorentz_force#0",
+      "wave_parameters_basic#0",
+      "wave_parameters_basic#5"
+     ],
+     "mean_old": 0.9655555555555555,
+     "mean_new": 0.9677777777777777,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 3
+      },
+      {
+       "from": "correct",
+       "to": "partial",
+       "cause": "number rule",
+       "n": 1
+      },
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 7
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 1
+      },
+      "template_basic_buoyant_force": {
+       "number rule": 1
+      },
+      "template_batch_reactor_second_order": {
+       "number rule": 1
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 1
+      },
+      "template_bpsk_energy_basis": {
+       "number rule": 1
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 2
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 3
+      },
+      "template_incompressible_continuity": {
+       "symbolic step": 1
+      },
+      "template_manning_trapezoidal_velocity": {
+       "number rule": 1
+      }
+     },
+     "fields": {
+      "e3": 18,
+      "score": 12,
+      "answer": 16,
+      "milestones_required": 4
+     },
+     "answer_fields": {
+      "label_double_tol": 12,
+      "whole_matched": 7,
+      "label": 12,
+      "label_half_tol": 12,
+      "label_half_unit": 11,
+      "matched": 8,
+      "label_whole_trace": 8,
+      "targets": 3
+     },
+     "e3_fields": {
+      "null_coverage": 8,
+      "scale": 13,
+      "coverage": 9,
+      "reached": 10
+     }
+    },
+    "gpt-5.4": {
+     "rows_old": 450,
+     "rows_new": 450,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 6,
+     "e3_gained": 0,
+     "e3_lost": 2,
+     "judge_prompts_changed": 2,
+     "prompt_items": [
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10"
+     ],
+     "e3_items": [
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#5"
+     ],
+     "mean_old": 0.9411111111111111,
+     "mean_new": 0.9511111111111111,
+     "moves": [
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 7
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 3
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 3
+      },
+      "template_incompressible_continuity": {
+       "symbolic step": 1
+      }
+     },
+     "fields": {
+      "score": 8,
+      "answer": 12,
+      "e3": 10,
+      "milestones_required": 4
+     },
+     "answer_fields": {
+      "label_double_tol": 8,
+      "label": 8,
+      "label_half_tol": 8,
+      "label_half_unit": 7,
+      "label_whole_trace": 7,
+      "whole_matched": 5,
+      "targets": 3,
+      "matched": 3
+     },
+     "e3_fields": {
+      "scale": 6,
+      "coverage": 5,
+      "reached": 6,
+      "null_coverage": 7
+     }
+    }
+   }
+  },
+  {
+   "variant": "flagship-reasoning-medium",
+   "archived": "scores/_replaced/flagship-reasoning-medium_20261008T120101Z",
+   "answer_py_old": "7e90e3803540",
+   "answer_py_new": "8fbe1072e1be",
+   "milestones_py_old": "32bb8287ae56",
+   "milestones_py_new": "9788a9ac6f41",
+   "commit_new": "b8b3358",
+   "dirty_new": true,
+   "second_judge_prompts_changed": {},
+   "models": {
+    "gpt-5.4": {
+     "rows_old": 450,
+     "rows_new": 450,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 6,
+     "e3_gained": 0,
+     "e3_lost": 2,
+     "judge_prompts_changed": 2,
+     "prompt_items": [
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10"
+     ],
+     "e3_items": [
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#5"
+     ],
+     "mean_old": 0.9844444444444445,
+     "mean_new": 0.9966666666666667,
+     "moves": [
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 2
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 7
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 3
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 2
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 3
+      },
+      "template_incompressible_continuity": {
+       "symbolic step": 1
+      }
+     },
+     "fields": {
+      "score": 9,
+      "answer": 15,
+      "e3": 10,
+      "milestones_required": 4
+     },
+     "answer_fields": {
+      "label_double_tol": 9,
+      "label": 9,
+      "label_half_tol": 10,
+      "label_half_unit": 8,
+      "label_whole_trace": 7,
+      "whole_matched": 5,
+      "matched": 4,
+      "targets": 3
+     },
+     "e3_fields": {
+      "scale": 6,
+      "coverage": 5,
+      "reached": 6,
+      "null_coverage": 7
+     }
+    }
+   }
+  },
+  {
+   "variant": "openbook",
+   "archived": "scores/_replaced/openbook_20261008T120141Z",
+   "answer_py_old": "7e90e3803540",
+   "answer_py_new": "8fbe1072e1be",
+   "milestones_py_old": "32bb8287ae56",
+   "milestones_py_new": "9788a9ac6f41",
+   "commit_new": "b8b3358",
+   "dirty_new": true,
+   "second_judge_prompts_changed": {},
+   "models": {
+    "claude-sonnet-5": {
+     "rows_old": 423,
+     "rows_new": 423,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 11,
+     "e3_gained": 7,
+     "e3_lost": 0,
+     "judge_prompts_changed": 2,
+     "prompt_items": [
+      "gas_viscosity_kinetic_theory#19",
+      "poissons_ratio#12"
+     ],
+     "e3_items": [
+      "basic_stress_strain#11",
+      "coulombs_law#0",
+      "gas_viscosity_kinetic_theory#19",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#5",
+      "poissons_ratio#12",
+      "shaft_design_power#0",
+      "shaft_design_power#10",
+      "wave_equation_interpretation#0",
+      "wave_equation_interpretation#10"
+     ],
+     "mean_old": 0.9810874704491725,
+     "mean_new": 0.9881796690307328,
+     "moves": [
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 4
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 1
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 3
+      },
+      "template_incompressible_continuity": {
+       "symbolic step": 1
+      }
+     },
+     "fields": {
+      "score": 5,
+      "answer": 9,
+      "e3": 31,
+      "milestones_required": 4
+     },
+     "answer_fields": {
+      "label_double_tol": 5,
+      "label": 5,
+      "label_half_tol": 5,
+      "label_half_unit": 4,
+      "label_whole_trace": 2,
+      "whole_matched": 1,
+      "matched": 1,
+      "targets": 3
+     },
+     "e3_fields": {
+      "scale": 26,
+      "coverage": 10,
+      "reached": 11,
+      "null_coverage": 11
+     }
+    },
+    "gpt-5.4-mini": {
+     "rows_old": 423,
+     "rows_new": 423,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 6,
+     "e3_gained": 0,
+     "e3_lost": 2,
+     "judge_prompts_changed": 2,
+     "prompt_items": [
+      "cantilever_double_integration#0",
+      "euclidean_distance_binary#5"
+     ],
+     "e3_items": [
+      "cantilever_double_integration#0",
+      "coulombs_law#0",
+      "euclidean_distance_binary#5",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#5"
+     ],
+     "mean_old": 0.8676122931442081,
+     "mean_new": 0.8699763593380615,
+     "moves": [
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 3
+      },
+      {
+       "from": "partial",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 1
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 1,
+       "number rule": 1
+      },
+      "template_incompressible_continuity": {
+       "symbolic step": 1
+      }
+     },
+     "fields": {
+      "score": 4,
+      "answer": 9,
+      "e3": 8,
+      "milestones_required": 4
+     },
+     "answer_fields": {
+      "label_double_tol": 4,
+      "whole_matched": 4,
+      "label": 4,
+      "label_half_tol": 4,
+      "label_half_unit": 5,
+      "matched": 4,
+      "targets": 3,
+      "label_whole_trace": 3
+     },
+     "e3_fields": {
+      "scale": 6,
+      "coverage": 5,
+      "reached": 6,
+      "null_coverage": 6
+     }
+    },
+    "gpt-oss-20b": {
+     "rows_old": 423,
+     "rows_new": 423,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 6,
+     "e3_gained": 0,
+     "e3_lost": 2,
+     "judge_prompts_changed": 2,
+     "prompt_items": [
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10"
+     ],
+     "e3_items": [
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#5"
+     ],
+     "mean_old": 0.8782505910165485,
+     "mean_new": 0.8782505910165485,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "partial",
+       "cause": "number rule",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 2
+      },
+      {
+       "from": "partial",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 1
+      }
+     ],
+     "by_template": {
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 1,
+       "number rule": 1
+      },
+      "template_incompressible_continuity": {
+       "symbolic step": 1
+      },
+      "template_vibration_transmissibility": {
+       "number rule": 1
+      }
+     },
+     "fields": {
+      "e3": 10,
+      "milestones_required": 4,
+      "answer": 7,
+      "score": 4
+     },
+     "answer_fields": {
+      "targets": 3,
+      "label_double_tol": 4,
+      "whole_matched": 2,
+      "label": 4,
+      "matched": 3,
+      "label_half_tol": 4,
+      "label_whole_trace": 3,
+      "label_half_unit": 3
+     },
+     "e3_fields": {
+      "scale": 6,
+      "coverage": 5,
+      "reached": 6,
+      "null_coverage": 7
+     }
+    }
+   }
+  },
+  {
+   "variant": "openbook2",
+   "archived": "scores/_replaced/openbook2_20261008T120311Z",
+   "answer_py_old": "7e90e3803540",
+   "answer_py_new": "8fbe1072e1be",
+   "milestones_py_old": "32bb8287ae56",
+   "milestones_py_new": "9788a9ac6f41",
+   "commit_new": "b8b3358",
+   "dirty_new": true,
+   "second_judge_prompts_changed": {},
+   "models": {
+    "claude-sonnet-5": {
+     "rows_old": 405,
+     "rows_new": 405,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 11,
+     "e3_gained": 6,
+     "e3_lost": 1,
+     "judge_prompts_changed": 3,
+     "prompt_items": [
+      "ber_estimation_mary#10",
+      "poissons_ratio#12",
+      "wave_parameters_basic#5"
+     ],
+     "e3_items": [
+      "basic_stress_strain#11",
+      "ber_estimation_mary#10",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#5",
+      "poissons_ratio#12",
+      "wave_equation_interpretation#0",
+      "wave_equation_interpretation#10",
+      "wave_equation_interpretation#5",
+      "wave_parameters_basic#5"
+     ],
+     "mean_old": 0.9839506172839506,
+     "mean_new": 0.9888888888888889,
+     "moves": [
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 2
+      }
+     ],
+     "by_template": {
+      "template_ber_estimation_mary": {
+       "symbolic step": 2
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 1
+      }
+     },
+     "fields": {
+      "e3": 28,
+      "score": 3,
+      "answer": 8,
+      "milestones_required": 4
+     },
+     "answer_fields": {
+      "label_double_tol": 3,
+      "label": 3,
+      "label_half_tol": 3,
+      "label_half_unit": 3,
+      "label_whole_trace": 3,
+      "whole_matched": 4,
+      "matched": 1,
+      "targets": 3
+     },
+     "e3_fields": {
+      "scale": 23,
+      "coverage": 10,
+      "reached": 11,
+      "null_coverage": 10
+     }
+    },
+    "gpt-5.4-mini": {
+     "rows_old": 405,
+     "rows_new": 405,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 5,
+     "e3_gained": 0,
+     "e3_lost": 1,
+     "judge_prompts_changed": 1,
+     "prompt_items": [
+      "euclidean_distance_binary#5"
+     ],
+     "e3_items": [
+      "coulombs_law#0",
+      "euclidean_distance_binary#5",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#5"
+     ],
+     "mean_old": 0.8320987654320988,
+     "mean_new": 0.837037037037037,
+     "moves": [
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 2
+      }
+     ],
+     "by_template": {
+      "template_ber_estimation_mary": {
+       "symbolic step": 2
+      }
+     },
+     "fields": {
+      "score": 2,
+      "answer": 7,
+      "milestones_required": 4,
+      "e3": 7
+     },
+     "answer_fields": {
+      "label_double_tol": 2,
+      "label": 2,
+      "label_half_tol": 2,
+      "label_half_unit": 2,
+      "label_whole_trace": 4,
+      "whole_matched": 2,
+      "targets": 3
+     },
+     "e3_fields": {
+      "scale": 5,
+      "reached": 5,
+      "null_coverage": 6,
+      "coverage": 4
+     }
+    },
+    "gpt-oss-20b": {
+     "rows_old": 405,
+     "rows_new": 405,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 5,
+     "e3_gained": 0,
+     "e3_lost": 1,
+     "judge_prompts_changed": 1,
+     "prompt_items": [
+      "cantilever_double_integration#0"
+     ],
+     "e3_items": [
+      "cantilever_double_integration#0",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#5"
+     ],
+     "mean_old": 0.8827160493827161,
+     "mean_new": 0.8777777777777778,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 3
+      },
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 1
+      }
+     ],
+     "by_template": {
+      "template_ber_estimation_mary": {
+       "symbolic step": 1
+      },
+      "template_force_method_continuous_beam": {
+       "number rule": 1
+      },
+      "template_max_hump_height_no_choking": {
+       "number rule": 1
+      },
+      "template_mm1k_finite_capacity": {
+       "number rule": 1
+      }
+     },
+     "fields": {
+      "answer": 10,
+      "score": 4,
+      "e3": 9,
+      "milestones_required": 4
+     },
+     "answer_fields": {
+      "matched": 4,
+      "label_half_unit": 4,
+      "label_double_tol": 4,
+      "label": 4,
+      "label_half_tol": 4,
+      "label_whole_trace": 6,
+      "whole_matched": 5,
+      "targets": 3
+     },
+     "e3_fields": {
+      "scale": 5,
+      "coverage": 4,
+      "reached": 5,
+      "null_coverage": 7
+     }
+    }
+   }
+  },
+  {
+   "variant": "paraphrase",
+   "archived": "scores/_replaced/paraphrase_20261008T120420Z",
+   "answer_py_old": "7e90e3803540",
+   "answer_py_new": "8fbe1072e1be",
+   "milestones_py_old": "32bb8287ae56",
+   "milestones_py_new": "9788a9ac6f41",
+   "commit_new": "b8b3358",
+   "dirty_new": true,
+   "second_judge_prompts_changed": {},
+   "models": {
+    "claude-sonnet-5": {
+     "rows_old": 314,
+     "rows_new": 314,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 4,
+     "e3_gained": 2,
+     "e3_lost": 1,
+     "judge_prompts_changed": 1,
+     "prompt_items": [
+      "cantilever_double_integration#0"
+     ],
+     "e3_items": [
+      "cantilever_double_integration#0",
+      "coulombs_law#0",
+      "poissons_ratio#0",
+      "wave_equation_interpretation#5"
+     ],
+     "mean_old": 0.9697452229299363,
+     "mean_new": 0.9761146496815286,
+     "moves": [
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 2
+      }
+     ],
+     "by_template": {
+      "template_ber_estimation_mary": {
+       "symbolic step": 1
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 2
+      }
+     },
+     "fields": {
+      "e3": 11,
+      "score": 3,
+      "answer": 5,
+      "milestones_required": 1
+     },
+     "answer_fields": {
+      "label_double_tol": 3,
+      "label": 3,
+      "label_half_tol": 3,
+      "label_half_unit": 4,
+      "label_whole_trace": 2,
+      "whole_matched": 2
+     },
+     "e3_fields": {
+      "scale": 6,
+      "coverage": 3,
+      "reached": 4,
+      "null_coverage": 5
+     }
+    },
+    "deepseek-v4.1-flash": {
+     "rows_old": 314,
+     "rows_new": 314,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 3,
+     "e3_gained": 0,
+     "e3_lost": 2,
+     "judge_prompts_changed": 2,
+     "prompt_items": [
+      "annulus_flowrate#10",
+      "cantilever_double_integration#0"
+     ],
+     "e3_items": [
+      "annulus_flowrate#10",
+      "cantilever_double_integration#0",
+      "coulombs_law#0"
+     ],
+     "mean_old": 0.9601910828025477,
+     "mean_new": 0.9777070063694268,
+     "moves": [
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 4
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 3
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 1
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 3
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 3
+      }
+     },
+     "fields": {
+      "e3": 8,
+      "score": 7,
+      "answer": 7,
+      "milestones_required": 1
+     },
+     "answer_fields": {
+      "label_double_tol": 7,
+      "label": 7,
+      "label_half_tol": 7,
+      "label_half_unit": 6,
+      "label_whole_trace": 7,
+      "whole_matched": 3,
+      "matched": 3
+     },
+     "e3_fields": {
+      "null_coverage": 6,
+      "scale": 3,
+      "coverage": 2,
+      "reached": 3
+     }
+    },
+    "gemini-3.1-flash-lite": {
+     "rows_old": 314,
+     "rows_new": 314,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 2,
+     "e3_gained": 0,
+     "e3_lost": 1,
+     "judge_prompts_changed": 1,
+     "prompt_items": [
+      "cantilever_double_integration#0"
+     ],
+     "e3_items": [
+      "cantilever_double_integration#0",
+      "coulombs_law#0"
+     ],
+     "mean_old": 0.8901273885350318,
+     "mean_new": 0.893312101910828,
+     "moves": [
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 1
+      }
+     ],
+     "by_template": {
+      "template_ber_estimation_mary": {
+       "symbolic step": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 1,
+       "number rule": 1
+      }
+     },
+     "fields": {
+      "score": 3,
+      "answer": 4,
+      "e3": 6,
+      "milestones_required": 1
+     },
+     "answer_fields": {
+      "label_double_tol": 3,
+      "label": 3,
+      "label_half_tol": 3,
+      "label_half_unit": 2,
+      "label_whole_trace": 4,
+      "whole_matched": 3,
+      "matched": 2
+     },
+     "e3_fields": {
+      "scale": 2,
+      "coverage": 1,
+      "reached": 2,
+      "null_coverage": 4
+     }
+    },
+    "gemma-4-26b-a4b": {
+     "rows_old": 314,
+     "rows_new": 314,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 3,
+     "e3_gained": 0,
+     "e3_lost": 2,
+     "judge_prompts_changed": 2,
+     "prompt_items": [
+      "annulus_flowrate#10",
+      "cantilever_double_integration#0"
+     ],
+     "e3_items": [
+      "annulus_flowrate#10",
+      "cantilever_double_integration#0",
+      "coulombs_law#0"
+     ],
+     "mean_old": 0.8630573248407644,
+     "mean_new": 0.8726114649681529,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "partial",
+       "cause": "number rule",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 7
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 1
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 2
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 3
+      },
+      "template_undamped_natural_frequency_torsional": {
+       "number rule": 1
+      }
+     },
+     "fields": {
+      "e3": 9,
+      "score": 8,
+      "answer": 11,
+      "milestones_required": 1
+     },
+     "answer_fields": {
+      "label_double_tol": 8,
+      "label": 8,
+      "label_half_tol": 8,
+      "label_half_unit": 5,
+      "whole_matched": 7,
+      "label_whole_trace": 6,
+      "matched": 4
+     },
+     "e3_fields": {
+      "null_coverage": 7,
+      "scale": 3,
+      "coverage": 2,
+      "reached": 3
+     }
+    },
+    "glm-5.3-flash": {
+     "rows_old": 314,
+     "rows_new": 314,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 14,
+     "e3_gained": 16,
+     "e3_lost": 1,
+     "judge_prompts_changed": 8,
+     "prompt_items": [
+      "annulus_flowrate#10",
+      "ber_estimation_mary#10",
+      "composite_shafts_series#12",
+      "coulombs_law#0",
+      "gas_viscosity_kinetic_theory#0",
+      "gas_viscosity_kinetic_theory#19",
+      "gas_viscosity_kinetic_theory#5",
+      "poissons_ratio#12"
+     ],
+     "e3_items": [
+      "annulus_flowrate#10",
+      "basic_stress_strain#0",
+      "ber_estimation_mary#10",
+      "composite_shafts_series#12",
+      "coulombs_law#0",
+      "gas_viscosity_kinetic_theory#0",
+      "gas_viscosity_kinetic_theory#19",
+      "gas_viscosity_kinetic_theory#5",
+      "hagen_poiseuille_flowrate#0",
+      "hagen_poiseuille_flowrate#14",
+      "kinematic_viscosity#0",
+      "lorentz_force#0",
+      "poissons_ratio#12",
+      "wave_equation_interpretation#10"
+     ],
+     "mean_old": 0.9665605095541401,
+     "mean_new": 0.9745222929936306,
+     "moves": [
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 2
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 1
+      }
+     ],
+     "by_template": {
+      "template_ber_estimation_mary": {
+       "symbolic step": 3
+      }
+     },
+     "fields": {
+      "e3": 34,
+      "score": 3,
+      "answer": 5,
+      "milestones_required": 1
+     },
+     "answer_fields": {
+      "label_double_tol": 3,
+      "label": 3,
+      "label_half_tol": 3,
+      "label_whole_trace": 2,
+      "label_half_unit": 2,
+      "matched": 1
+     },
+     "e3_fields": {
+      "scale": 31,
+      "coverage": 14,
+      "reached": 14,
+      "null_coverage": 4
+     }
+    },
+    "glm-5.3": {
+     "rows_old": 314,
+     "rows_new": 314,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 7,
+     "e3_gained": 7,
+     "e3_lost": 1,
+     "judge_prompts_changed": 4,
+     "prompt_items": [
+      "annulus_flowrate#10",
+      "coulombs_law#0",
+      "gas_viscosity_kinetic_theory#0",
+      "gas_viscosity_kinetic_theory#5"
+     ],
+     "e3_items": [
+      "annulus_flowrate#10",
+      "coulombs_law#0",
+      "gas_viscosity_kinetic_theory#0",
+      "gas_viscosity_kinetic_theory#5",
+      "hagen_poiseuille_flowrate#0",
+      "kinematic_viscosity#0",
+      "wave_equation_interpretation#10"
+     ],
+     "mean_old": 0.9665605095541401,
+     "mean_new": 0.964968152866242,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 1
+      }
+     ],
+     "by_template": {
+      "template_ber_estimation_mary": {
+       "symbolic step": 1
+      },
+      "template_mm1k_finite_capacity": {
+       "number rule": 1
+      }
+     },
+     "fields": {
+      "e3": 22,
+      "score": 2,
+      "answer": 3,
+      "milestones_required": 1
+     },
+     "answer_fields": {
+      "label_double_tol": 2,
+      "label": 2,
+      "label_half_tol": 2,
+      "label_half_unit": 2,
+      "whole_matched": 1,
+      "matched": 1,
+      "label_whole_trace": 1
+     },
+     "e3_fields": {
+      "null_coverage": 6,
+      "scale": 18,
+      "coverage": 7,
+      "reached": 7
+     }
+    },
+    "gpt-5.4-mini": {
+     "rows_old": 314,
+     "rows_new": 314,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 1,
+     "e3_gained": 0,
+     "e3_lost": 0,
+     "judge_prompts_changed": 0,
+     "prompt_items": [],
+     "e3_items": [
+      "coulombs_law#0"
+     ],
+     "mean_old": 0.85828025477707,
+     "mean_new": 0.8742038216560509,
+     "moves": [
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 2
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 6
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 2
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 2
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 3
+      }
+     },
+     "fields": {
+      "score": 8,
+      "answer": 10,
+      "milestones_required": 1,
+      "e3": 5
+     },
+     "answer_fields": {
+      "label_double_tol": 8,
+      "label": 8,
+      "label_half_tol": 8,
+      "label_half_unit": 6,
+      "label_whole_trace": 8,
+      "whole_matched": 7,
+      "matched": 3
+     },
+     "e3_fields": {
+      "scale": 1,
+      "reached": 1,
+      "null_coverage": 4
+     }
+    },
+    "gpt-oss-20b": {
+     "rows_old": 314,
+     "rows_new": 314,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 3,
+     "e3_gained": 0,
+     "e3_lost": 2,
+     "judge_prompts_changed": 3,
+     "prompt_items": [
+      "coulombs_law#0",
+      "euclidean_distance_binary#0",
+      "euclidean_distance_binary#5"
+     ],
+     "e3_items": [
+      "coulombs_law#0",
+      "euclidean_distance_binary#0",
+      "euclidean_distance_binary#5"
+     ],
+     "mean_old": 0.839171974522293,
+     "mean_new": 0.8423566878980892,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 2
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 6
+      }
+     ],
+     "by_template": {
+      "template_ber_estimation_mary": {
+       "symbolic step": 1
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 2
+      },
+      "template_hagen_poiseuille_flowrate": {
+       "number rule": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 3
+      },
+      "template_vibration_isolator_design": {
+       "number rule": 1
+      }
+     },
+     "fields": {
+      "score": 8,
+      "answer": 13,
+      "milestones_required": 1,
+      "e3": 5
+     },
+     "answer_fields": {
+      "label_double_tol": 9,
+      "label": 8,
+      "label_half_tol": 9,
+      "label_half_unit": 6,
+      "whole_matched": 10,
+      "matched": 7,
+      "label_whole_trace": 7
+     },
+     "e3_fields": {
+      "scale": 3,
+      "coverage": 3,
+      "reached": 3,
+      "null_coverage": 4
+     }
+    },
+    "kimi-k3": {
+     "rows_old": 314,
+     "rows_new": 314,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 7,
+     "e3_gained": 5,
+     "e3_lost": 1,
+     "judge_prompts_changed": 4,
+     "prompt_items": [
+      "annulus_flowrate#0",
+      "cantilever_double_integration#0",
+      "gas_viscosity_kinetic_theory#19",
+      "poissons_ratio#12"
+     ],
+     "e3_items": [
+      "annulus_flowrate#0",
+      "cantilever_double_integration#0",
+      "coulombs_law#0",
+      "gas_viscosity_kinetic_theory#19",
+      "poissons_ratio#12",
+      "wave_equation_interpretation#0",
+      "wave_equation_interpretation#5"
+     ],
+     "mean_old": 0.9808917197452229,
+     "mean_new": 0.9936305732484076,
+     "moves": [
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 3
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 2
+      }
+     ],
+     "by_template": {
+      "template_ber_estimation_mary": {
+       "symbolic step": 3
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 2
+      }
+     },
+     "fields": {
+      "e3": 16,
+      "score": 5,
+      "answer": 8,
+      "milestones_required": 1
+     },
+     "answer_fields": {
+      "label_double_tol": 5,
+      "label": 5,
+      "label_half_tol": 5,
+      "label_half_unit": 4,
+      "label_whole_trace": 6,
+      "whole_matched": 3,
+      "matched": 2
+     },
+     "e3_fields": {
+      "scale": 9,
+      "coverage": 6,
+      "reached": 7,
+      "null_coverage": 7
+     }
+    },
+    "muse-glimmer-30b": {
+     "rows_old": 314,
+     "rows_new": 314,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 8,
+     "e3_gained": 7,
+     "e3_lost": 3,
+     "judge_prompts_changed": 5,
+     "prompt_items": [
+      "angle_of_twist#6",
+      "annulus_flowrate#0",
+      "cantilever_double_integration#0",
+      "poissons_ratio#12",
+      "work_isothermal_virial#5"
+     ],
+     "e3_items": [
+      "angle_of_twist#6",
+      "annulus_flowrate#0",
+      "cantilever_double_integration#0",
+      "coulombs_law#0",
+      "poissons_ratio#0",
+      "poissons_ratio#12",
+      "wave_equation_interpretation#10",
+      "work_isothermal_virial#5"
+     ],
+     "mean_old": 0.9888535031847133,
+     "mean_new": 0.9952229299363057,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "partial",
+       "cause": "number rule",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 5
+      }
+     ],
+     "by_template": {
+      "template_ber_estimation_mary": {
+       "symbolic step": 2
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 3
+      },
+      "template_reynolds_number_flow_regime": {
+       "number rule": 1
+      }
+     },
+     "fields": {
+      "e3": 26,
+      "answer": 7,
+      "score": 6,
+      "milestones_required": 1
+     },
+     "answer_fields": {
+      "matched": 6,
+      "label_double_tol": 6,
+      "label": 6,
+      "label_half_tol": 6,
+      "label_half_unit": 4,
+      "whole_matched": 4,
+      "label_whole_trace": 3
+     },
+     "e3_fields": {
+      "scale": 21,
+      "coverage": 7,
+      "reached": 8,
+      "null_coverage": 9
+     }
+    },
+    "qwen3-235b-a22b-2507": {
+     "rows_old": 314,
+     "rows_new": 314,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 8,
+     "e3_gained": 3,
+     "e3_lost": 6,
+     "judge_prompts_changed": 6,
+     "prompt_items": [
+      "annulus_flowrate#10",
+      "cantilever_double_integration#0",
+      "coaxial_capacitance#10",
+      "coaxial_capacitance#5",
+      "falling_film_max_velocity#10",
+      "gas_viscosity_kinetic_theory#5"
+     ],
+     "e3_items": [
+      "annulus_flowrate#10",
+      "cantilever_double_integration#0",
+      "coaxial_capacitance#10",
+      "coaxial_capacitance#5",
+      "coulombs_law#0",
+      "falling_film_max_velocity#10",
+      "gas_viscosity_kinetic_theory#5",
+      "kinematic_viscosity#0"
+     ],
+     "mean_old": 0.8678343949044586,
+     "mean_new": 0.8678343949044586,
+     "moves": [
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 2
+      },
+      {
+       "from": "partial",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 2
+      }
+     ],
+     "by_template": {
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 1,
+       "number rule": 2
+      }
+     },
+     "fields": {
+      "e3": 16,
+      "score": 4,
+      "answer": 4,
+      "milestones_required": 1
+     },
+     "answer_fields": {
+      "label_double_tol": 4,
+      "label": 4,
+      "label_half_tol": 4,
+      "label_half_unit": 3,
+      "whole_matched": 3,
+      "matched": 3,
+      "label_whole_trace": 3
+     },
+     "e3_fields": {
+      "null_coverage": 8,
+      "scale": 10,
+      "coverage": 7,
+      "reached": 8
+     }
+    }
+   }
+  },
+  {
+   "variant": "paraphrase-reasoning-medium",
+   "archived": "scores/_replaced/paraphrase-reasoning-medium_20261008T120756Z",
+   "answer_py_old": "7e90e3803540",
+   "answer_py_new": "8fbe1072e1be",
+   "milestones_py_old": "32bb8287ae56",
+   "milestones_py_new": "9788a9ac6f41",
+   "commit_new": "b8b3358",
+   "dirty_new": true,
+   "second_judge_prompts_changed": {},
+   "models": {
+    "gemini-3.1-flash-lite": {
+     "rows_old": 275,
+     "rows_new": 275,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 2,
+     "e3_gained": 0,
+     "e3_lost": 1,
+     "judge_prompts_changed": 1,
+     "prompt_items": [
+      "cantilever_double_integration#0"
+     ],
+     "e3_items": [
+      "cantilever_double_integration#0",
+      "coulombs_law#0"
+     ],
+     "mean_old": 0.9309090909090909,
+     "mean_new": 0.9381818181818182,
+     "moves": [
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 3
+      },
+      {
+       "from": "partial",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 1
+      }
+     ],
+     "by_template": {
+      "template_ber_estimation_mary": {
+       "symbolic step": 1
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 2,
+       "number rule": 1
+      }
+     },
+     "fields": {
+      "score": 5,
+      "answer": 6,
+      "e3": 6,
+      "milestones_required": 1
+     },
+     "answer_fields": {
+      "label_double_tol": 5,
+      "label": 5,
+      "label_half_tol": 5,
+      "label_whole_trace": 5,
+      "label_half_unit": 3,
+      "matched": 3,
+      "whole_matched": 3
+     },
+     "e3_fields": {
+      "scale": 2,
+      "coverage": 1,
+      "reached": 2,
+      "null_coverage": 4
+     }
+    },
+    "gemma-4-26b-a4b": {
+     "rows_old": 275,
+     "rows_new": 275,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 2,
+     "e3_gained": 0,
+     "e3_lost": 1,
+     "judge_prompts_changed": 1,
+     "prompt_items": [
+      "cantilever_double_integration#0"
+     ],
+     "e3_items": [
+      "cantilever_double_integration#0",
+      "coulombs_law#0"
+     ],
+     "mean_old": 0.9327272727272727,
+     "mean_new": 0.9472727272727273,
+     "moves": [
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 6
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 1
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 1
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 2
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 3
+      }
+     },
+     "fields": {
+      "score": 7,
+      "answer": 7,
+      "e3": 6,
+      "milestones_required": 1
+     },
+     "answer_fields": {
+      "label_double_tol": 7,
+      "label": 7,
+      "label_half_tol": 7,
+      "label_half_unit": 6,
+      "label_whole_trace": 5,
+      "whole_matched": 5,
+      "matched": 3
+     },
+     "e3_fields": {
+      "scale": 2,
+      "coverage": 1,
+      "reached": 2,
+      "null_coverage": 4
+     }
+    },
+    "gpt-5.4-mini": {
+     "rows_old": 275,
+     "rows_new": 275,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 2,
+     "e3_gained": 0,
+     "e3_lost": 1,
+     "judge_prompts_changed": 1,
+     "prompt_items": [
+      "cantilever_double_integration#0"
+     ],
+     "e3_items": [
+      "cantilever_double_integration#0",
+      "coulombs_law#0"
+     ],
+     "mean_old": 0.9636363636363636,
+     "mean_new": 0.9763636363636363,
+     "moves": [
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 2
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 3
+      }
+     ],
+     "by_template": {
+      "template_ber_estimation_mary": {
+       "symbolic step": 2
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 3
+      }
+     },
+     "fields": {
+      "score": 5,
+      "answer": 5,
+      "e3": 6,
+      "milestones_required": 1
+     },
+     "answer_fields": {
+      "label_double_tol": 5,
+      "label": 5,
+      "label_half_tol": 5,
+      "label_whole_trace": 5,
+      "label_half_unit": 3,
+      "whole_matched": 3,
+      "matched": 3
+     },
+     "e3_fields": {
+      "scale": 2,
+      "coverage": 1,
+      "reached": 2,
+      "null_coverage": 4
+     }
+    }
+   }
+  },
+  {
+   "variant": "reasoning-medium",
+   "archived": "scores/_replaced/reasoning-medium_20261008T120853Z",
+   "answer_py_old": "7e90e3803540",
+   "answer_py_new": "8fbe1072e1be",
+   "milestones_py_old": "32bb8287ae56",
+   "milestones_py_new": "9788a9ac6f41",
+   "commit_new": "b8b3358",
+   "dirty_new": true,
+   "second_judge_prompts_changed": {},
+   "models": {
+    "gemini-3.1-flash-lite": {
+     "rows_old": 450,
+     "rows_new": 450,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 5,
+     "e3_gained": 0,
+     "e3_lost": 1,
+     "judge_prompts_changed": 1,
+     "prompt_items": [
+      "cantilever_double_integration#10"
+     ],
+     "e3_items": [
+      "cantilever_double_integration#10",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#5"
+     ],
+     "mean_old": 0.8944444444444445,
+     "mean_new": 0.8977777777777778,
+     "moves": [
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 4
+      },
+      {
+       "from": "partial",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 1
+      }
+     ],
+     "by_template": {
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 2
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 2,
+       "number rule": 1
+      }
+     },
+     "fields": {
+      "e3": 9,
+      "score": 5,
+      "answer": 9,
+      "milestones_required": 4
+     },
+     "answer_fields": {
+      "label_double_tol": 5,
+      "whole_matched": 6,
+      "label": 5,
+      "label_half_tol": 5,
+      "label_half_unit": 4,
+      "targets": 3,
+      "matched": 3,
+      "label_whole_trace": 3
+     },
+     "e3_fields": {
+      "scale": 5,
+      "coverage": 4,
+      "reached": 5,
+      "null_coverage": 7
+     }
+    },
+    "gpt-5.4-mini": {
+     "rows_old": 450,
+     "rows_new": 450,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 6,
+     "e3_gained": 0,
+     "e3_lost": 2,
+     "judge_prompts_changed": 2,
+     "prompt_items": [
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10"
+     ],
+     "e3_items": [
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#5"
+     ],
+     "mean_old": 0.9533333333333334,
+     "mean_new": 0.9644444444444444,
+     "moves": [
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 2
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 6
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 2
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 2
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 3
+      },
+      "template_incompressible_continuity": {
+       "symbolic step": 1
+      }
+     },
+     "fields": {
+      "score": 8,
+      "answer": 12,
+      "e3": 11,
+      "milestones_required": 4
+     },
+     "answer_fields": {
+      "label_double_tol": 8,
+      "label": 8,
+      "label_half_tol": 9,
+      "label_half_unit": 6,
+      "label_whole_trace": 6,
+      "whole_matched": 4,
+      "targets": 3,
+      "matched": 3
+     },
+     "e3_fields": {
+      "scale": 6,
+      "coverage": 5,
+      "reached": 6,
+      "null_coverage": 8
+     }
+    }
+   }
+  },
+  {
+   "variant": "reasoning-medium-full",
+   "archived": "scores/_replaced/reasoning-medium-full_20261008T120940Z",
+   "answer_py_old": "7e90e3803540",
+   "answer_py_new": "8fbe1072e1be",
+   "milestones_py_old": "32bb8287ae56",
+   "milestones_py_new": "9788a9ac6f41",
+   "commit_new": "b8b3358",
+   "dirty_new": true,
+   "second_judge_prompts_changed": {},
+   "models": {
+    "gemini-3.1-flash-lite": {
+     "rows_old": 2250,
+     "rows_new": 2250,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 27,
+     "e3_gained": 0,
+     "e3_lost": 7,
+     "judge_prompts_changed": 8,
+     "prompt_items": [
+      "beam_deflection_formula#1",
+      "cantilever_double_integration#12",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#8",
+      "cantilever_double_integration#9",
+      "work_isothermal_virial#15",
+      "work_isothermal_virial#4"
+     ],
+     "e3_items": [
+      "beam_deflection_formula#1",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#11",
+      "cantilever_double_integration#12",
+      "cantilever_double_integration#13",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#8",
+      "cantilever_double_integration#9",
+      "coulombs_law#0",
+      "coulombs_law#13",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#1",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#14",
+      "gauss_law_symmetric#16",
+      "gauss_law_symmetric#17",
+      "gauss_law_symmetric#2",
+      "gauss_law_symmetric#20",
+      "gauss_law_symmetric#4",
+      "gauss_law_symmetric#5",
+      "gauss_law_symmetric#6",
+      "gauss_law_symmetric#7",
+      "gauss_law_symmetric#8",
+      "volumetric_flow_rate#14",
+      "work_isothermal_virial#15",
+      "work_isothermal_virial#4"
+     ],
+     "mean_old": 0.9097777777777778,
+     "mean_new": 0.9166666666666666,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 1
+      },
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 10
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 15
+      },
+      {
+       "from": "partial",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 2
+      }
+     ],
+     "by_template": {
+      "template_ber_estimation_mary": {
+       "symbolic step": 10
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 9
+      },
+      "template_coulombs_law": {
+       "number rule": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 4,
+       "number rule": 1
+      },
+      "template_incompressible_continuity": {
+       "symbolic step": 2
+      },
+      "template_power_law_fluid_shear": {
+       "number rule": 1
+      }
+     },
+     "fields": {
+      "milestones_required": 24,
+      "e3": 46,
+      "score": 28,
+      "answer": 48
+     },
+     "answer_fields": {
+      "label_double_tol": 28,
+      "label": 28,
+      "label_half_tol": 28,
+      "label_whole_trace": 22,
+      "label_half_unit": 21,
+      "whole_matched": 16,
+      "matched": 9,
+      "targets": 14,
+      "of": 1
+     },
+     "e3_fields": {
+      "scale": 28,
+      "coverage": 20,
+      "reached": 27,
+      "null_coverage": 32
+     }
+    },
+    "gemma-4-26b-a4b": {
+     "rows_old": 2250,
+     "rows_new": 2250,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 30,
+     "e3_gained": 1,
+     "e3_lost": 13,
+     "judge_prompts_changed": 15,
+     "prompt_items": [
+      "beam_deflection_formula#1",
+      "beam_deflection_formula#7",
+      "bpsk_energy_basis#44",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10",
+      "cantilever_double_integration#11",
+      "cantilever_double_integration#13",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#4",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#8",
+      "cantilever_double_integration#9",
+      "volumetric_flow_rate#14",
+      "work_isothermal_virial#15",
+      "work_isothermal_virial#4"
+     ],
+     "e3_items": [
+      "beam_deflection_formula#1",
+      "beam_deflection_formula#7",
+      "bpsk_energy_basis#44",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10",
+      "cantilever_double_integration#11",
+      "cantilever_double_integration#13",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#4",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#8",
+      "cantilever_double_integration#9",
+      "coulombs_law#0",
+      "coulombs_law#13",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#1",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#14",
+      "gauss_law_symmetric#16",
+      "gauss_law_symmetric#17",
+      "gauss_law_symmetric#2",
+      "gauss_law_symmetric#20",
+      "gauss_law_symmetric#4",
+      "gauss_law_symmetric#5",
+      "gauss_law_symmetric#6",
+      "gauss_law_symmetric#7",
+      "gauss_law_symmetric#8",
+      "volumetric_flow_rate#14",
+      "work_isothermal_virial#15",
+      "work_isothermal_virial#4"
+     ],
+     "mean_old": 0.9324444444444444,
+     "mean_new": 0.942,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 2
+      },
+      {
+       "from": "correct",
+       "to": "partial",
+       "cause": "number rule",
+       "n": 1
+      },
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 10
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 28
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 11
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 12
+      },
+      "template_bpsk_energy_basis": {
+       "number rule": 1
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 10
+      },
+      "template_coulombs_law": {
+       "number rule": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 5
+      },
+      "template_superposition_electric_field": {
+       "number rule": 1
+      }
+     },
+     "fields": {
+      "score": 41,
+      "answer": 63,
+      "milestones_required": 24,
+      "e3": 51
+     },
+     "answer_fields": {
+      "label_double_tol": 40,
+      "label": 41,
+      "label_half_tol": 41,
+      "label_half_unit": 36,
+      "label_whole_trace": 25,
+      "whole_matched": 28,
+      "matched": 11,
+      "targets": 14,
+      "of": 1
+     },
+     "e3_fields": {
+      "scale": 30,
+      "coverage": 25,
+      "reached": 30,
+      "null_coverage": 35
+     }
+    },
+    "gpt-5.4-mini": {
+     "rows_old": 2250,
+     "rows_new": 2250,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 29,
+     "e3_gained": 0,
+     "e3_lost": 11,
+     "judge_prompts_changed": 13,
+     "prompt_items": [
+      "beam_deflection_formula#1",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10",
+      "cantilever_double_integration#11",
+      "cantilever_double_integration#13",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#4",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#8",
+      "cantilever_double_integration#9",
+      "work_isothermal_virial#15",
+      "work_isothermal_virial#4"
+     ],
+     "e3_items": [
+      "beam_deflection_formula#1",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#10",
+      "cantilever_double_integration#11",
+      "cantilever_double_integration#13",
+      "cantilever_double_integration#3",
+      "cantilever_double_integration#4",
+      "cantilever_double_integration#7",
+      "cantilever_double_integration#8",
+      "cantilever_double_integration#9",
+      "coulombs_law#0",
+      "coulombs_law#13",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#1",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#14",
+      "gauss_law_symmetric#16",
+      "gauss_law_symmetric#17",
+      "gauss_law_symmetric#2",
+      "gauss_law_symmetric#20",
+      "gauss_law_symmetric#4",
+      "gauss_law_symmetric#5",
+      "gauss_law_symmetric#6",
+      "gauss_law_symmetric#7",
+      "gauss_law_symmetric#8",
+      "volumetric_flow_rate#14",
+      "work_isothermal_virial#15",
+      "work_isothermal_virial#4"
+     ],
+     "mean_old": 0.9602222222222222,
+     "mean_new": 0.9693333333333334,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "partial",
+       "cause": "number rule",
+       "n": 1
+      },
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 11
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 20
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 10
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 10
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 6
+      },
+      "template_incompressible_continuity": {
+       "symbolic step": 4
+      },
+      "template_wave_parameters_basic": {
+       "number rule": 1
+      }
+     },
+     "fields": {
+      "score": 32,
+      "answer": 53,
+      "milestones_required": 24,
+      "e3": 53
+     },
+     "answer_fields": {
+      "label_double_tol": 32,
+      "label": 32,
+      "label_half_tol": 34,
+      "label_half_unit": 32,
+      "label_whole_trace": 22,
+      "whole_matched": 13,
+      "matched": 8,
+      "targets": 14,
+      "of": 1
+     },
+     "e3_fields": {
+      "scale": 30,
+      "coverage": 24,
+      "reached": 29,
+      "null_coverage": 37
+     }
+    }
+   }
+  },
+  {
+   "variant": "repeat1",
+   "archived": "scores/_replaced/repeat1_20261008T121147Z",
+   "answer_py_old": "7e90e3803540",
+   "answer_py_new": "8fbe1072e1be",
+   "milestones_py_old": "32bb8287ae56",
+   "milestones_py_new": "9788a9ac6f41",
+   "commit_new": "b8b3358",
+   "dirty_new": true,
+   "second_judge_prompts_changed": {},
+   "models": {
+    "gemini-3.1-flash-lite": {
+     "rows_old": 300,
+     "rows_new": 300,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 5,
+     "e3_gained": 0,
+     "e3_lost": 1,
+     "judge_prompts_changed": 1,
+     "prompt_items": [
+      "cantilever_double_integration#7"
+     ],
+     "e3_items": [
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#7",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#7"
+     ],
+     "mean_old": 0.89,
+     "mean_new": 0.9,
+     "moves": [
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 2
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 2
+      }
+     ],
+     "by_template": {
+      "template_ber_estimation_mary": {
+       "symbolic step": 2
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 1
+      }
+     },
+     "fields": {
+      "milestones_required": 5,
+      "e3": 7,
+      "score": 4,
+      "answer": 7
+     },
+     "answer_fields": {
+      "label_double_tol": 4,
+      "label": 4,
+      "label_half_tol": 4,
+      "label_half_unit": 2,
+      "label_whole_trace": 4,
+      "whole_matched": 2,
+      "targets": 2,
+      "matched": 1
+     },
+     "e3_fields": {
+      "scale": 5,
+      "reached": 5,
+      "coverage": 3,
+      "null_coverage": 4
+     }
+    },
+    "gemma-4-26b-a4b": {
+     "rows_old": 300,
+     "rows_new": 300,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 6,
+     "e3_gained": 0,
+     "e3_lost": 3,
+     "judge_prompts_changed": 3,
+     "prompt_items": [
+      "annulus_flowrate#7",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#7"
+     ],
+     "e3_items": [
+      "annulus_flowrate#7",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#7",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#7"
+     ],
+     "mean_old": 0.8566666666666667,
+     "mean_new": 0.8616666666666667,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "partial",
+       "cause": "number rule",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 4
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 1
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 1
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 1
+      },
+      "template_undamped_natural_frequency_torsional": {
+       "number rule": 1
+      }
+     },
+     "fields": {
+      "e3": 10,
+      "score": 5,
+      "answer": 9,
+      "milestones_required": 5
+     },
+     "answer_fields": {
+      "label_double_tol": 5,
+      "label": 5,
+      "label_half_tol": 5,
+      "label_half_unit": 5,
+      "whole_matched": 3,
+      "label_whole_trace": 3,
+      "targets": 2,
+      "matched": 2
+     },
+     "e3_fields": {
+      "null_coverage": 7,
+      "scale": 6,
+      "coverage": 5,
+      "reached": 6
+     }
+    },
+    "gpt-oss-20b": {
+     "rows_old": 300,
+     "rows_new": 300,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 5,
+     "e3_gained": 0,
+     "e3_lost": 1,
+     "judge_prompts_changed": 2,
+     "prompt_items": [
+      "cantilever_double_integration#7",
+      "coulombs_law#0"
+     ],
+     "e3_items": [
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#7",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#7"
+     ],
+     "mean_old": 0.8333333333333334,
+     "mean_new": 0.835,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 3
+      }
+     ],
+     "by_template": {
+      "template_ber_estimation_mary": {
+       "symbolic step": 2
+      },
+      "template_gas_viscosity_kinetic_theory": {
+       "number rule": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 1
+      }
+     },
+     "fields": {
+      "answer": 10,
+      "milestones_required": 5,
+      "e3": 7,
+      "score": 4
+     },
+     "answer_fields": {
+      "whole_matched": 5,
+      "matched": 4,
+      "label_half_unit": 3,
+      "label_double_tol": 5,
+      "label": 4,
+      "label_half_tol": 5,
+      "label_whole_trace": 4,
+      "targets": 2
+     },
+     "e3_fields": {
+      "scale": 5,
+      "reached": 5,
+      "coverage": 4,
+      "null_coverage": 4
+     }
+    },
+    "qwen3-235b-a22b-2507": {
+     "rows_old": 300,
+     "rows_new": 300,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 9,
+     "e3_gained": 1,
+     "e3_lost": 4,
+     "judge_prompts_changed": 5,
+     "prompt_items": [
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#7",
+      "coaxial_capacitance#7",
+      "coulombs_law#0",
+      "shaft_design_power#7"
+     ],
+     "e3_items": [
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#7",
+      "coaxial_capacitance#7",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#7",
+      "kinematic_viscosity#0",
+      "shaft_design_power#7"
+     ],
+     "mean_old": 0.9066666666666666,
+     "mean_new": 0.91,
+     "moves": [
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 2
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 2
+      }
+     },
+     "fields": {
+      "score": 2,
+      "answer": 4,
+      "e3": 16,
+      "milestones_required": 5
+     },
+     "answer_fields": {
+      "label_double_tol": 2,
+      "label": 2,
+      "label_half_tol": 2,
+      "label_half_unit": 2,
+      "label_whole_trace": 1,
+      "targets": 2
+     },
+     "e3_fields": {
+      "null_coverage": 8,
+      "scale": 11,
+      "reached": 9,
+      "coverage": 8
+     }
+    }
+   }
+  },
+  {
+   "variant": "repeat2",
+   "archived": "scores/_replaced/repeat2_20261008T121400Z",
+   "answer_py_old": "7e90e3803540",
+   "answer_py_new": "8fbe1072e1be",
+   "milestones_py_old": "32bb8287ae56",
+   "milestones_py_new": "9788a9ac6f41",
+   "commit_new": "b8b3358",
+   "dirty_new": true,
+   "second_judge_prompts_changed": {},
+   "models": {
+    "gemini-3.1-flash-lite": {
+     "rows_old": 300,
+     "rows_new": 300,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 6,
+     "e3_gained": 0,
+     "e3_lost": 2,
+     "judge_prompts_changed": 2,
+     "prompt_items": [
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#7"
+     ],
+     "e3_items": [
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#7",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#7"
+     ],
+     "mean_old": 0.8833333333333333,
+     "mean_new": 0.89,
+     "moves": [
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 2
+      }
+     ],
+     "by_template": {
+      "template_ber_estimation_mary": {
+       "symbolic step": 1
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 1
+      }
+     },
+     "fields": {
+      "milestones_required": 5,
+      "e3": 8,
+      "score": 3,
+      "answer": 6
+     },
+     "answer_fields": {
+      "label_double_tol": 3,
+      "label": 3,
+      "label_half_tol": 3,
+      "label_half_unit": 2,
+      "label_whole_trace": 3,
+      "targets": 2,
+      "whole_matched": 2,
+      "matched": 1
+     },
+     "e3_fields": {
+      "scale": 6,
+      "reached": 6,
+      "coverage": 4,
+      "null_coverage": 4
+     }
+    },
+    "gemma-4-26b-a4b": {
+     "rows_old": 300,
+     "rows_new": 300,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 8,
+     "e3_gained": 0,
+     "e3_lost": 4,
+     "judge_prompts_changed": 4,
+     "prompt_items": [
+      "annulus_flowrate#0",
+      "annulus_flowrate#7",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0"
+     ],
+     "e3_items": [
+      "annulus_flowrate#0",
+      "annulus_flowrate#7",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#7",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#7"
+     ],
+     "mean_old": 0.8766666666666667,
+     "mean_new": 0.8833333333333333,
+     "moves": [
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 4
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 1
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 1
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 1
+      }
+     },
+     "fields": {
+      "e3": 12,
+      "score": 4,
+      "answer": 7,
+      "milestones_required": 5
+     },
+     "answer_fields": {
+      "label_double_tol": 4,
+      "label": 4,
+      "label_half_tol": 4,
+      "label_half_unit": 3,
+      "whole_matched": 2,
+      "targets": 2,
+      "label_whole_trace": 2,
+      "matched": 1
+     },
+     "e3_fields": {
+      "scale": 8,
+      "coverage": 6,
+      "reached": 8,
+      "null_coverage": 7
+     }
+    },
+    "gpt-oss-20b": {
+     "rows_old": 300,
+     "rows_new": 300,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 5,
+     "e3_gained": 0,
+     "e3_lost": 1,
+     "judge_prompts_changed": 2,
+     "prompt_items": [
+      "cantilever_double_integration#7",
+      "coulombs_law#0"
+     ],
+     "e3_items": [
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#7",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#7"
+     ],
+     "mean_old": 0.845,
+     "mean_new": 0.8383333333333334,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 2
+      },
+      {
+       "from": "correct",
+       "to": "partial",
+       "cause": "number rule",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 2
+      },
+      {
+       "from": "partial",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 1
+      }
+     ],
+     "by_template": {
+      "template_ber_estimation_mary": {
+       "symbolic step": 1
+      },
+      "template_constant_head_permeability": {
+       "number rule": 1
+      },
+      "template_gas_viscosity_kinetic_theory": {
+       "number rule": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 1
+      },
+      "template_limiting_reactant": {
+       "number rule": 1
+      },
+      "template_logarithmic_decrement": {
+       "number rule": 1
+      }
+     },
+     "fields": {
+      "answer": 12,
+      "milestones_required": 5,
+      "e3": 7,
+      "score": 6
+     },
+     "answer_fields": {
+      "whole_matched": 6,
+      "matched": 6,
+      "label_half_unit": 5,
+      "label_half_tol": 8,
+      "label_double_tol": 6,
+      "label": 6,
+      "label_whole_trace": 6,
+      "targets": 2
+     },
+     "e3_fields": {
+      "scale": 5,
+      "reached": 5,
+      "coverage": 4,
+      "null_coverage": 4
+     }
+    },
+    "qwen3-235b-a22b-2507": {
+     "rows_old": 300,
+     "rows_new": 300,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 10,
+     "e3_gained": 2,
+     "e3_lost": 7,
+     "judge_prompts_changed": 7,
+     "prompt_items": [
+      "annulus_flowrate#0",
+      "cantilever_double_integration#7",
+      "coaxial_capacitance#7",
+      "coulombs_law#0",
+      "gas_viscosity_kinetic_theory#0",
+      "gas_viscosity_kinetic_theory#7",
+      "shaft_design_power#7"
+     ],
+     "e3_items": [
+      "annulus_flowrate#0",
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#7",
+      "coaxial_capacitance#7",
+      "coulombs_law#0",
+      "gas_viscosity_kinetic_theory#0",
+      "gas_viscosity_kinetic_theory#7",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#7",
+      "shaft_design_power#7"
+     ],
+     "mean_old": 0.9033333333333333,
+     "mean_new": 0.9066666666666666,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "partial",
+       "cause": "number rule",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 3
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 1
+      },
+      "template_ber_estimation_mary": {
+       "number rule": 1
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 1
+      }
+     },
+     "fields": {
+      "e3": 18,
+      "score": 4,
+      "answer": 7,
+      "milestones_required": 5
+     },
+     "answer_fields": {
+      "label_double_tol": 4,
+      "whole_matched": 3,
+      "label": 4,
+      "label_half_tol": 4,
+      "label_half_unit": 3,
+      "matched": 2,
+      "label_whole_trace": 1,
+      "targets": 2
+     },
+     "e3_fields": {
+      "scale": 11,
+      "coverage": 9,
+      "reached": 10,
+      "null_coverage": 11
+     }
+    }
+   }
+  },
+  {
+   "variant": "repeat3",
+   "archived": "scores/_replaced/repeat3_20261008T121511Z",
+   "answer_py_old": "7e90e3803540",
+   "answer_py_new": "8fbe1072e1be",
+   "milestones_py_old": "32bb8287ae56",
+   "milestones_py_new": "9788a9ac6f41",
+   "commit_new": "b8b3358",
+   "dirty_new": true,
+   "second_judge_prompts_changed": {},
+   "models": {
+    "gemini-3.1-flash-lite": {
+     "rows_old": 300,
+     "rows_new": 300,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 6,
+     "e3_gained": 0,
+     "e3_lost": 1,
+     "judge_prompts_changed": 1,
+     "prompt_items": [
+      "cantilever_double_integration#0"
+     ],
+     "e3_items": [
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#7",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#7"
+     ],
+     "mean_old": 0.9016666666666666,
+     "mean_new": 0.9083333333333333,
+     "moves": [
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 2
+      }
+     ],
+     "by_template": {
+      "template_ber_estimation_mary": {
+       "symbolic step": 1
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 1
+      }
+     },
+     "fields": {
+      "milestones_required": 5,
+      "e3": 8,
+      "score": 3,
+      "answer": 5
+     },
+     "answer_fields": {
+      "label_double_tol": 3,
+      "label": 3,
+      "label_half_tol": 3,
+      "label_half_unit": 2,
+      "label_whole_trace": 2,
+      "whole_matched": 2,
+      "targets": 2,
+      "matched": 1
+     },
+     "e3_fields": {
+      "scale": 6,
+      "reached": 6,
+      "coverage": 3,
+      "null_coverage": 4
+     }
+    },
+    "gemma-4-26b-a4b": {
+     "rows_old": 300,
+     "rows_new": 300,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 6,
+     "e3_gained": 0,
+     "e3_lost": 3,
+     "judge_prompts_changed": 3,
+     "prompt_items": [
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#7"
+     ],
+     "e3_items": [
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#7",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#7"
+     ],
+     "mean_old": 0.885,
+     "mean_new": 0.8933333333333333,
+     "moves": [
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 5
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 1
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 2
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 1
+      }
+     },
+     "fields": {
+      "score": 5,
+      "answer": 7,
+      "milestones_required": 5,
+      "e3": 10
+     },
+     "answer_fields": {
+      "label_double_tol": 5,
+      "label": 5,
+      "label_half_tol": 5,
+      "label_half_unit": 3,
+      "label_whole_trace": 2,
+      "whole_matched": 2,
+      "targets": 2,
+      "matched": 1
+     },
+     "e3_fields": {
+      "scale": 6,
+      "coverage": 5,
+      "reached": 6,
+      "null_coverage": 6
+     }
+    },
+    "gpt-oss-20b": {
+     "rows_old": 300,
+     "rows_new": 300,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 5,
+     "e3_gained": 0,
+     "e3_lost": 1,
+     "judge_prompts_changed": 2,
+     "prompt_items": [
+      "cantilever_double_integration#7",
+      "coulombs_law#0"
+     ],
+     "e3_items": [
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#7",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#7"
+     ],
+     "mean_old": 0.8366666666666667,
+     "mean_new": 0.8333333333333334,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 2
+      },
+      {
+       "from": "correct",
+       "to": "partial",
+       "cause": "number rule",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 3
+      }
+     ],
+     "by_template": {
+      "template_ber_estimation_mary": {
+       "symbolic step": 2
+      },
+      "template_constant_head_permeability": {
+       "number rule": 1
+      },
+      "template_gas_viscosity_kinetic_theory": {
+       "number rule": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 1
+      },
+      "template_logarithmic_decrement": {
+       "number rule": 1
+      }
+     },
+     "fields": {
+      "answer": 12,
+      "milestones_required": 5,
+      "e3": 7,
+      "score": 6
+     },
+     "answer_fields": {
+      "whole_matched": 6,
+      "matched": 6,
+      "label_half_unit": 5,
+      "label_double_tol": 7,
+      "label": 6,
+      "label_half_tol": 7,
+      "label_whole_trace": 5,
+      "targets": 2
+     },
+     "e3_fields": {
+      "scale": 5,
+      "reached": 5,
+      "coverage": 4,
+      "null_coverage": 4
+     }
+    },
+    "qwen3-235b-a22b-2507": {
+     "rows_old": 300,
+     "rows_new": 300,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 9,
+     "e3_gained": 0,
+     "e3_lost": 7,
+     "judge_prompts_changed": 6,
+     "prompt_items": [
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#7",
+      "coaxial_capacitance#7",
+      "composite_shafts_series#9",
+      "shaft_design_power#7"
+     ],
+     "e3_items": [
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#7",
+      "coaxial_capacitance#7",
+      "composite_shafts_series#9",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#7",
+      "shaft_design_power#7"
+     ],
+     "mean_old": 0.9066666666666666,
+     "mean_new": 0.9166666666666666,
+     "moves": [
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 4
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 2
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 1
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 1
+      }
+     },
+     "fields": {
+      "e3": 17,
+      "score": 5,
+      "answer": 9,
+      "milestones_required": 5
+     },
+     "answer_fields": {
+      "label_double_tol": 5,
+      "label": 5,
+      "label_half_tol": 5,
+      "label_half_unit": 6,
+      "label_whole_trace": 3,
+      "whole_matched": 1,
+      "matched": 2,
+      "targets": 2
+     },
+     "e3_fields": {
+      "null_coverage": 11,
+      "scale": 10,
+      "coverage": 8,
+      "reached": 9
+     }
+    }
+   }
+  },
+  {
+   "variant": "repeat1-reasoning-medium",
+   "archived": "scores/_replaced/repeat1-reasoning-medium_20261008T121718Z",
+   "answer_py_old": "7e90e3803540",
+   "answer_py_new": "8fbe1072e1be",
+   "milestones_py_old": "32bb8287ae56",
+   "milestones_py_new": "9788a9ac6f41",
+   "commit_new": "b8b3358",
+   "dirty_new": true,
+   "second_judge_prompts_changed": {},
+   "models": {
+    "gemini-3.1-flash-lite": {
+     "rows_old": 300,
+     "rows_new": 300,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 5,
+     "e3_gained": 0,
+     "e3_lost": 2,
+     "judge_prompts_changed": 2,
+     "prompt_items": [
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#7"
+     ],
+     "e3_items": [
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#7",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#7"
+     ],
+     "mean_old": 0.9216666666666666,
+     "mean_new": 0.9266666666666666,
+     "moves": [
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 1
+      }
+     ],
+     "by_template": {
+      "template_ber_estimation_mary": {
+       "symbolic step": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 1
+      }
+     },
+     "fields": {
+      "milestones_required": 5,
+      "e3": 7,
+      "score": 2,
+      "answer": 5
+     },
+     "answer_fields": {
+      "label_double_tol": 2,
+      "label": 2,
+      "label_half_tol": 2,
+      "label_half_unit": 2,
+      "label_whole_trace": 2,
+      "targets": 2,
+      "whole_matched": 1,
+      "matched": 1
+     },
+     "e3_fields": {
+      "scale": 5,
+      "coverage": 4,
+      "reached": 5,
+      "null_coverage": 4
+     }
+    },
+    "gemma-4-26b-a4b": {
+     "rows_old": 300,
+     "rows_new": 300,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 6,
+     "e3_gained": 0,
+     "e3_lost": 3,
+     "judge_prompts_changed": 3,
+     "prompt_items": [
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#7"
+     ],
+     "e3_items": [
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#7",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#7"
+     ],
+     "mean_old": 0.9433333333333334,
+     "mean_new": 0.955,
+     "moves": [
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 5
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 2
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 2
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 1
+      }
+     },
+     "fields": {
+      "score": 6,
+      "answer": 8,
+      "milestones_required": 5,
+      "e3": 8
+     },
+     "answer_fields": {
+      "label_double_tol": 6,
+      "label": 6,
+      "label_half_tol": 6,
+      "label_half_unit": 4,
+      "label_whole_trace": 3,
+      "whole_matched": 3,
+      "targets": 2,
+      "matched": 1
+     },
+     "e3_fields": {
+      "scale": 6,
+      "coverage": 5,
+      "reached": 6,
+      "null_coverage": 4
+     }
+    }
+   }
+  },
+  {
+   "variant": "repeat2-reasoning-medium",
+   "archived": "scores/_replaced/repeat2-reasoning-medium_20261008T121756Z",
+   "answer_py_old": "7e90e3803540",
+   "answer_py_new": "8fbe1072e1be",
+   "milestones_py_old": "32bb8287ae56",
+   "milestones_py_new": "9788a9ac6f41",
+   "commit_new": "b8b3358",
+   "dirty_new": true,
+   "second_judge_prompts_changed": {},
+   "models": {
+    "gemini-3.1-flash-lite": {
+     "rows_old": 300,
+     "rows_new": 300,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 5,
+     "e3_gained": 0,
+     "e3_lost": 0,
+     "judge_prompts_changed": 0,
+     "prompt_items": [],
+     "e3_items": [
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#7",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#7"
+     ],
+     "mean_old": 0.9116666666666666,
+     "mean_new": 0.92,
+     "moves": [
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 3
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 1
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 1
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 1
+      }
+     },
+     "fields": {
+      "score": 4,
+      "answer": 8,
+      "milestones_required": 5,
+      "e3": 7
+     },
+     "answer_fields": {
+      "label_double_tol": 4,
+      "whole_matched": 4,
+      "label": 4,
+      "label_half_tol": 4,
+      "label_half_unit": 4,
+      "label_whole_trace": 3,
+      "targets": 2,
+      "matched": 1
+     },
+     "e3_fields": {
+      "scale": 5,
+      "reached": 5,
+      "null_coverage": 4,
+      "coverage": 2
+     }
+    },
+    "gemma-4-26b-a4b": {
+     "rows_old": 300,
+     "rows_new": 300,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 6,
+     "e3_gained": 0,
+     "e3_lost": 3,
+     "judge_prompts_changed": 3,
+     "prompt_items": [
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#7"
+     ],
+     "e3_items": [
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#7",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#7"
+     ],
+     "mean_old": 0.9366666666666666,
+     "mean_new": 0.9483333333333334,
+     "moves": [
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 1
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 5
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 2
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 2
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 1
+      }
+     },
+     "fields": {
+      "score": 6,
+      "answer": 10,
+      "milestones_required": 5,
+      "e3": 8
+     },
+     "answer_fields": {
+      "label_double_tol": 6,
+      "label": 6,
+      "label_half_tol": 6,
+      "label_half_unit": 5,
+      "label_whole_trace": 4,
+      "whole_matched": 4,
+      "targets": 2,
+      "matched": 1
+     },
+     "e3_fields": {
+      "scale": 6,
+      "coverage": 5,
+      "reached": 6,
+      "null_coverage": 4
+     }
+    }
+   }
+  },
+  {
+   "variant": "repeat3-reasoning-medium",
+   "archived": "scores/_replaced/repeat3-reasoning-medium_20261008T121837Z",
+   "answer_py_old": "7e90e3803540",
+   "answer_py_new": "8fbe1072e1be",
+   "milestones_py_old": "32bb8287ae56",
+   "milestones_py_new": "9788a9ac6f41",
+   "commit_new": "b8b3358",
+   "dirty_new": true,
+   "second_judge_prompts_changed": {},
+   "models": {
+    "gemini-3.1-flash-lite": {
+     "rows_old": 300,
+     "rows_new": 300,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 5,
+     "e3_gained": 0,
+     "e3_lost": 2,
+     "judge_prompts_changed": 2,
+     "prompt_items": [
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#7"
+     ],
+     "e3_items": [
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#7",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#7"
+     ],
+     "mean_old": 0.9266666666666666,
+     "mean_new": 0.9333333333333333,
+     "moves": [
+      {
+       "from": "correct",
+       "to": "partial",
+       "cause": "number rule",
+       "n": 1
+      },
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 2
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 1
+      }
+     ],
+     "by_template": {
+      "template_ber_estimation_mary": {
+       "symbolic step": 2
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 1
+      },
+      "template_newtons_law_shear_stress": {
+       "number rule": 1
+      }
+     },
+     "fields": {
+      "milestones_required": 5,
+      "e3": 7,
+      "score": 4,
+      "answer": 8
+     },
+     "answer_fields": {
+      "label_double_tol": 4,
+      "label": 4,
+      "label_half_tol": 4,
+      "label_whole_trace": 2,
+      "label_half_unit": 4,
+      "whole_matched": 2,
+      "targets": 2,
+      "matched": 2
+     },
+     "e3_fields": {
+      "scale": 5,
+      "coverage": 4,
+      "reached": 5,
+      "null_coverage": 4
+     }
+    },
+    "gemma-4-26b-a4b": {
+     "rows_old": 300,
+     "rows_new": 300,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 6,
+     "e3_gained": 0,
+     "e3_lost": 3,
+     "judge_prompts_changed": 3,
+     "prompt_items": [
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#7"
+     ],
+     "e3_items": [
+      "beam_deflection_formula#7",
+      "cantilever_double_integration#0",
+      "cantilever_double_integration#7",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#7"
+     ],
+     "mean_old": 0.93,
+     "mean_new": 0.94,
+     "moves": [
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 6
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 2
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 2
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 1
+      }
+     },
+     "fields": {
+      "score": 6,
+      "answer": 9,
+      "milestones_required": 5,
+      "e3": 8
+     },
+     "answer_fields": {
+      "label_double_tol": 6,
+      "label": 6,
+      "label_half_tol": 6,
+      "label_half_unit": 4,
+      "label_whole_trace": 3,
+      "whole_matched": 4,
+      "targets": 2,
+      "matched": 1
+     },
+     "e3_fields": {
+      "scale": 6,
+      "coverage": 5,
+      "reached": 6,
+      "null_coverage": 4
+     }
+    }
+   }
+  },
+  {
+   "variant": "tool",
+   "archived": "scores/_replaced/tool_20261008T121921Z",
+   "answer_py_old": "7e90e3803540",
+   "answer_py_new": "8fbe1072e1be",
+   "milestones_py_old": "32bb8287ae56",
+   "milestones_py_new": "9788a9ac6f41",
+   "commit_new": "b8b3358",
+   "dirty_new": true,
+   "second_judge_prompts_changed": {},
+   "models": {
+    "claude-sonnet-5": {
+     "rows_old": 450,
+     "rows_new": 450,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 7,
+     "e3_gained": 1,
+     "e3_lost": 2,
+     "judge_prompts_changed": 3,
+     "prompt_items": [
+      "annulus_flowrate#0",
+      "beam_deflection_formula#5",
+      "work_isothermal_virial#0"
+     ],
+     "e3_items": [
+      "annulus_flowrate#0",
+      "beam_deflection_formula#5",
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#5",
+      "work_isothermal_virial#0"
+     ],
+     "mean_old": 0.9822222222222222,
+     "mean_new": 0.9922222222222222,
+     "moves": [
+      {
+       "from": "incorrect",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 2
+      },
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 5
+      }
+     ],
+     "by_template": {
+      "template_autocorrelation_rect_pulse": {
+       "symbolic step": 1
+      },
+      "template_ber_estimation_mary": {
+       "symbolic step": 3
+      },
+      "template_cd_dc_system_analysis": {
+       "symbolic step": 2
+      },
+      "template_incompressible_continuity": {
+       "symbolic step": 1
+      }
+     },
+     "fields": {
+      "e3": 20,
+      "score": 7,
+      "answer": 12,
+      "milestones_required": 4
+     },
+     "answer_fields": {
+      "label_double_tol": 7,
+      "label": 7,
+      "label_half_tol": 7,
+      "label_half_unit": 8,
+      "label_whole_trace": 4,
+      "whole_matched": 3,
+      "matched": 1,
+      "targets": 3
+     },
+     "e3_fields": {
+      "null_coverage": 11,
+      "scale": 13,
+      "coverage": 6,
+      "reached": 7
+     }
+    },
+    "gpt-5.4-mini": {
+     "rows_old": 450,
+     "rows_new": 450,
+     "only_one_side": 0,
+     "unusable_flips": 0,
+     "e3_rows": 4,
+     "e3_gained": 0,
+     "e3_lost": 0,
+     "judge_prompts_changed": 1,
+     "prompt_items": [
+      "gauss_law_symmetric#5"
+     ],
+     "e3_items": [
+      "coulombs_law#0",
+      "gauss_law_symmetric#0",
+      "gauss_law_symmetric#10",
+      "gauss_law_symmetric#5"
+     ],
+     "mean_old": 0.8577777777777778,
+     "mean_new": 0.8588888888888889,
+     "moves": [
+      {
+       "from": "partial",
+       "to": "correct",
+       "cause": "symbolic step",
+       "n": 3
+      },
+      {
+       "from": "partial",
+       "to": "incorrect",
+       "cause": "number rule",
+       "n": 2
+      }
+     ],
+     "by_template": {
+      "template_ber_estimation_mary": {
+       "symbolic step": 1
+      },
+      "template_impulse_response_from_lccde": {
+       "symbolic step": 1,
+       "number rule": 2
+      },
+      "template_incompressible_continuity": {
+       "symbolic step": 1
+      }
+     },
+     "fields": {
+      "answer": 13,
+      "score": 5,
+      "milestones_required": 4,
+      "e3": 8
+     },
+     "answer_fields": {
+      "matched": 4,
+      "label_half_unit": 4,
+      "label_double_tol": 5,
+      "label": 5,
+      "label_half_tol": 6,
+      "targets": 3,
+      "whole_matched": 6,
+      "label_whole_trace": 7
+     },
+     "e3_fields": {
+      "scale": 4,
+      "reached": 4,
+      "null_coverage": 7,
+      "coverage": 3
+     }
+    }
+   }
+  }
+ ],
+ "since": "20261008T000000Z"
+}

@@ -24,7 +24,7 @@
  },
  "answer_check_failures": {},
  "e3_gold_short": {},
- "e3_null_mean": 0.123,
+ "e3_null_mean": 0.1166,
  "e3_null_by_template_max": [
   0.7,
   "template_signal_operations"
@@ -94,7 +94,6 @@
   "template_xbar_known_sigma_classification"
  ],
  "templates_without_milestones": [
-  "template_gauss_law_symmetric",
   "template_system_properties_memory_causality",
   "template_system_property_linearity"
  ]

@@ -13,14 +13,18 @@ Sources. full_run_28092026/: SCORER_VALIDATION.md (the deterministic checks agai
 THRESHOLD_APPENDIX.md (the tolerance's split-half fit, the milestone tolerance grid, the arithmetic rule's readings,
 the judge's validation), ROUTER_VALIDATION.md (the judged step check), E5_VALIDATION.md (milestones settled by
 matching on the 300 responses), JUDGE_SWAP.md (a second judge), FLAG_REVIEW_3.md (the expert reading of the
-arithmetic flags), EXPERT_REQUEST.md (the experts' readings of verdicts on the evaluated models) and
-results/RESULTS.md (the share of milestones the judge decides). evaluator_pilot_17092026/: PILOT_SUMMARY.md (the
+arithmetic flags), EXPERT_REQUEST.md (the experts' readings of verdicts on the evaluated models, its current figures:
+the readings the store still holds, against the check's current verdicts), symbolic/SYMBOLIC_CHECK.md (the symbolic
+equivalence step against the experts' grades) and results/RESULTS.md (the share of milestones the judge decides);
+evaluator_pilot_17092026/evaluators/answer.py (the templates the symbolic step is enabled on, the cap on an answer's
+own last digit). evaluator_pilot_17092026/: PILOT_SUMMARY.md (the
 study's design, label agreement, the judge with matching, the reward models, the planted defects for three
 judges), RESULTS_LOJO.md (a panel of judges without each family's own judge). docs/re-implementation-sep/
 DECISIONS.md (D-181: the fourth judge on the planted defects).
 """
 from __future__ import annotations
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -158,10 +162,14 @@ settings_rows = [
 fitted = (held[0][1], held[1][1])
 
 # ---------------------------------------------------------------- judge independence
-swap = table(read(RUN / "JUDGE_SWAP.md"), r"^\| model \| traces \| milestones both judged")
+js = read(RUN / "JUDGE_SWAP.md")
+swap = table(js, r"^\| model \| traces \| milestones both judged")
 diffs = [float(r[9]) for r in swap]
 assert all(float(lo) <= 0 <= float(hi) for lo, hi in (r[10].split(" to ") for r in swap)), swap  # every CI holds zero
-swap_n = one(r"(\d+) traces per model over (\d+) to (\d+) templates", read(RUN / "JUDGE_SWAP.md"))
+swap_total = one(r"on (\d+) sampled traces of the", js)[0]
+swap_n = one(r"(\d+)(?: to (\d+))? traces per model over (\d+)(?: to (\d+))? templates", js)
+swap_per_model = swap_n[0] if not swap_n[1] else f"{swap_n[0]} to {swap_n[1]}"
+assert sum(int(r[1]) for r in swap) == int(swap_total), (swap_total, swap)
 lojo = read(PILOT / "RESULTS_LOJO.md")
 family = [abs(float(r[6])) for r in table(lojo, r"^\| trace model \| judged / 60 \| F1, full panel") if r[4] == "family"]
 lenient: dict[str, tuple[int, int]] = {}
@@ -174,16 +182,42 @@ lenient_pct = sorted(round(100 * a / b) for a, b in lenient.values())
 # ---------------------------------------------------------------- the evaluated models
 flags = {r[0]: r for r in table(read(RUN / "FLAG_REVIEW_3.md"), r"^\| model \| flags drawn \| read")}
 fr = flags["all"]
-b1 = dict(re.findall(r"\| the check said (\w+): experts said \| ([^|]+) \|", er))
-b3 = dict(re.findall(r"\| the judge said (\w+): experts said \| ([^|]+) \|", er))
-sampled = one(r"by the check's verdict: correct (\d+), incorrect (\d+), partial (\d+)", er)
-ruled = one(r"by the judge's verdict: MISSING (\d+), REACHED (\d+)", er)
-pairs = one(r"items read by two experts; their agreement; Cohen's kappa \| 150; (0\.\d+); (0\.\d+) \|.*"
-            r"items read by two experts; their agreement; Cohen's kappa \| 100; (0\.\d+); (0\.\d+) \|", er)
+
+
+def section(text: str, heading: str) -> str:
+    """The text under a `### heading` of EXPERT_REQUEST.md, up to the next heading."""
+    m = re.search(rf"^### {re.escape(heading)}\n(.*?)(?=^#)", text, re.S | re.M)
+    if not m:
+        raise SystemExit(f"EXPERT_REQUEST.md has no section '{heading}'")
+    return m.group(1)
 
 
 def total(s: str) -> int:
     return sum(int(n) for n in re.findall(r"\d+", s))
+
+
+# The current figures: the readings the main store still holds, B1 against the check's current verdicts (two readers
+# an item in B1 and B3, so a row's readings over two are its items)
+er_b1, er_b3 = section(er, "B1 now"), section(er, "B3 now")
+b1 = dict(re.findall(r"\| the check's current verdict (\w+): experts said \| ([^|]+) \|", er_b1))
+b3 = dict(re.findall(r"\| the judge ruled (\w+): experts said \| ([^|]+) \|", er_b3))
+b1_items, b3_items = (int(one(r"\| items; readings \| (\d+); (\d+) \|", s)[0]) for s in (er_b1, er_b3))
+sampled = tuple(str(total(b1[v]) // 2) for v in ("correct", "incorrect", "partial"))
+ruled = tuple(str(total(b3[v]) // 2) for v in ("MISSING", "REACHED"))
+assert sum(map(int, sampled)) == b1_items and sum(map(int, ruled)) == b3_items, (sampled, ruled, b1_items, b3_items)
+pairs = (one(r"\| items with two readers; agreement; Cohen's kappa \| \d+; (0\.\d+); (0\.\d+) \|", er_b1)
+         + one(r"\| items with two readers; agreement; Cohen's kappa \| \d+; (0\.\d+); (0\.\d+) \|", er_b3))
+
+# The symbolic equivalence step (D5) and the cap on an answer's own last digit (D11d)
+answer_src = read(ROOT / "evaluator_pilot_17092026/evaluators/answer.py")
+enabled = re.findall(r"'template_(\w+)'", one(r"SYMBOLIC_EQUIVALENCE_TEMPLATES = \((.*?)\)", answer_src)[0])
+own_cap = float(one(r"(?m)^OWN_DIGIT_CAP = ([\d.]+)", answer_src)[0])
+sc = read(RUN / "symbolic/SYMBOLIC_CHECK.md")
+sym_graded = one(r"(?m)^\| all \| (\d+) \| \d+ \| \d+ \| \d+ \| \d+ \| (\d\.\d+) \| (\d\.\d+) \|", sc)
+sym_earlier = one(r"(?m)^\| all \| (\d+) \| (\d\.\d+) \| (\d\.\d+) \| \d+ \| \d+ \| \d+ \| \d+ \|", sc)
+symbolic_templates = len({json.loads(l)["template_id"] for l in read(RUN / "manifest.jsonl").splitlines()
+                          if l.strip() and json.loads(l)["answer_type"] == "symbolic"})
+WORDS = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"]
 
 
 def q(s: str, label: str) -> str:
@@ -196,8 +230,14 @@ def b1n(verdict: str, label: str) -> str:
 
 OBTAINS, UNNEEDED = "yes, the working obtains it", "no, and its route does not need it"
 missing_confirmed = total(b3["MISSING"]) - int(q(b3["MISSING"], OBTAINS))
-assert int(b1n("partial", "correct")) / total(b1["partial"]) > 0.5      # "most partial verdicts"
-assert 0.30 <= int(q(b3["MISSING"], UNNEEDED)) / total(b3["MISSING"]) < 0.37   # "a third of the missing rulings"
+# Claims the prose makes from these readings: one the data no longer supports is reported and counted by --check,
+# and the rows and phrases are still generated
+CLAIMS_FAILED = [c for ok, c in (
+    (int(b1n("partial", "correct")) / total(b1["partial"]) > 0.5,
+     f"most partial verdicts are called fully correct ({b1n('partial', 'correct')} of {total(b1['partial'])} readings)"),
+    (0.30 <= int(q(b3["MISSING"], UNNEEDED)) / total(b3["MISSING"]) < 0.37,
+     f"a third of the missing rulings are not needed by the route ({q(b3['MISSING'], UNNEEDED)} of {total(b3['MISSING'])})"),
+) if not ok]
 
 # ---------------------------------------------------------------- the validation results table
 results_rows = [
@@ -240,7 +280,7 @@ no_ms = one(r"\| every milestone found \| (\d+); (\d+) items have no milestones 
 settled = one(r"\| milestones: by E3, judged \| (\d+) of (\d+), (\d+) \(published", read(RUN / "E5_VALIDATION.md"))
 readers = one(r"Every trace was labelled by (three) experts of its own branch", psb)
 per_model = max(int(r[1]) for k, r in flags.items() if k != "all")
-assert gold_ok[0] == gold_ok[1] and decides[2] == "three" and sampled[0] == "75" and rounds[1] == "seven"
+assert gold_ok[0] == gold_ok[1] and decides[2] == "three" and rounds[1] == "seven"
 
 x1 = read(PILOT / "RESULTS_X1.md")
 split = one(r"(\d+) split steps across (\d+) traces \((\d+) distinct steps", x1.replace("**", ""))
@@ -281,6 +321,11 @@ scoring = [
     f"fitted values {fitted[0]} and {fitted[1]}",
     f"among {88} milestone values multiplied by 1.37",
     f"none of the {thousands(gold[0])} calculations it reads in the {thousands(gold_ok[1])} gold traces",
+    # the symbolic equivalence step and the cap on an answer's own last digit (ANSWER FINAL)
+    f"{WORDS[len(enabled)]} of the {WORDS[symbolic_templates]} templates with symbolic answers",
+    f"precision {sym_graded[1]} and recall {sym_graded[2]} on the {sym_graded[0]} verdicts the experts graded",
+    f"precision {sym_earlier[1]} and recall {sym_earlier[2]} on the {sym_earlier[0]} earlier readings",
+    f"at most {own_cap * 100:g}\\% of the target",
 ] + settings_rows
 validation = [
     f"four instances from each of {design[1]} templates, {design[0]} in all",
@@ -299,7 +344,7 @@ validation = [
     f"({outside[0]} with two in-family judges, {outside[1]} with three outside ones)",
     f"each of {clean[1]} clean responses",
     f"up to {round(other * 60)} of 60",
-    f"Re-judging {len(swap) * int(swap_n[0])} sampled responses, {swap_n[0]} per model",
+    f"Re-judging {swap_total} sampled responses, {swap_per_model} per model",
     f"{signed(f'{min(diffs):+.3f}')} to {signed(f'{max(diffs):+.3f}')}",
     f"at most {max(family):.3f}", f"(the design detects changes of {detectable[0]} to {detectable[1]})",
     f"{frontier_pct[0]}\\% to {frontier_pct[-1]}\\%",
@@ -311,8 +356,10 @@ validation = [
     f"F1 {e3_f1_then} without the judge",
 ] + results_rows
 
+for c in CLAIMS_FAILED:
+    print(f"CLAIM FAILS: {c}")
 if "--check" in sys.argv:
-    bad = 0
+    bad = len(CLAIMS_FAILED)
     for path, wanted in ((MAIN, main), (SCORING, scoring), (VALIDATION, validation)):
         tex = " ".join(read(path).split()) if path.exists() else ""
         missing = [s for s in wanted if " ".join(s.split()) not in tex]

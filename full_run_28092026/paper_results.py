@@ -688,10 +688,9 @@ claim(sum(t in map(norm, SYMBOLIC) for t in _top3) >= 1, "a symbolic template is
 top5_empty = sum(Q1[k]["unusable"] for k in TOP5)
 claim(top5_empty == sum(Q1[k]["empty"] for k in TOP5), "every unusable top-five response is an empty one")
 top5_partial = sum(Q1[k]["partial"] for k in TOP5)
-assert top5_partial % 2 == 0
-top5_partial_points = top5_partial // 2
+top5_partial_points = top5_partial / 2  # half credit each: a half point when the count is odd
 lost_points = top5_empty + top5_partial_points + top5_incorrect
-drift(lost_points == round(sum(15 * N_TEMPLATES * (1 - Q1[k]["score"]) for k in TOP5)), "RESIDUAL_INCORRECT.md's incorrect counts do not add up to the top five's lost points")
+drift(abs(lost_points - sum(15 * N_TEMPLATES * (1 - Q1[k]["score"]) for k in TOP5)) < 1e-6, "RESIDUAL_INCORRECT.md's incorrect counts do not add up to the top five's lost points")
 _vir = re.search(r"\| incorrect traces \|[^\n]*\n\|[-:| ]+\n\| (\d+) \| (\d+) \|", residual)
 virial_n, virial_flow = (int(_vir.group(1)), int(_vir.group(2))) if _vir else (0, 0)
 median_sd_zero = sum(Q1[k]["within_sd_quartiles"][1] == 0 for k in ORDER)
@@ -777,8 +776,8 @@ def write_stand_ins() -> None:
                                        "spearman_within": {k: COV[k]["rho_claims"] for k in ORDER}},
                          "reasoning_tokens": {k: {"q1": COV[k]["coverage"] - 0.02, "q2": COV[k]["coverage"] - 0.01, "q3": COV[k]["coverage"],
                                                   "q4": COV[k]["coverage"] + 0.01} for k in ORDER}}
-    variants = ("abs_clause_off", "last_digit_bounded", "prescribed_relaxed", "per_part_credit")
-    offsets = {"abs_clause_off": -0.002, "last_digit_bounded": -0.004, "prescribed_relaxed": 0.01, "per_part_credit": 0.003}
+    variants = ("abs_clause_off", "last_digit_unbounded", "prescribed_relaxed", "per_part_credit")
+    offsets = {"abs_clause_off": -0.002, "last_digit_unbounded": 0.004, "prescribed_relaxed": 0.01, "per_part_credit": 0.003}
     sv_models = {k: {"headline": SENS[k]["fitted"], **{v: SENS[k]["fitted"] + offsets[v] for v in variants},
                      "changed": {v: {"up": max(0, round(offsets[v] * N_ITEMS)), "down": max(0, round(-offsets[v] * N_ITEMS))} for v in variants}} for k in ORDER}
     sensitivity_variants = {**tag, "stores": {"main": {"models": sv_models, "tau_with_headline": {v: 0.96 for v in variants}}},
@@ -859,8 +858,8 @@ RTOK = COVVAR.get("reasoning_tokens", {})
 SV_STORE = "matched" if HEADLINE == "matched" and "matched" in SENSVAR["stores"] else "main"  # the configuration Table 1 shows
 SV_MODELS = SENSVAR["stores"][SV_STORE]["models"]
 SV_TAU = SENSVAR["stores"][SV_STORE]["tau_with_headline"]
-SV_VARIANTS = ["abs_clause_off", "last_digit_bounded", "prescribed_relaxed", "per_part_credit"]
-SV_LABEL = {"abs_clause_off": ("Absolute-value", "clause off"), "last_digit_bounded": ("Last-digit term", "bounded"),
+SV_VARIANTS = ["abs_clause_off", "last_digit_unbounded", "prescribed_relaxed", "per_part_credit"]
+SV_LABEL = {"abs_clause_off": ("Absolute-value", "clause off"), "last_digit_unbounded": ("Last-digit term", "not capped"),
             "prescribed_relaxed": ("Prescribed digits", "relaxed"), "per_part_credit": ("Proportional", "partial credit")}
 assert set(ORDER) <= set(SV_MODELS), f"sensitivity_variants.json lacks {sorted(set(ORDER) - set(SV_MODELS))}"
 REL_BINS = SENSVAR.get("relative_error_bins", {})
@@ -1084,8 +1083,8 @@ phrases = [  # 6_results.tex must contain each of these, whitespace aside
     f"{pct(form_easy_share)} of the readings on Easy problems to {pct(form_hard_share)} on Intermediate and Advanced ones",
     f"For {tt('claude-sonnet-5')}, {claude_noerr} of {items_read_by_model['claude-sonnet-5']} wrong answers are ``no error'' by majority, "
     f"{claude_noerr_top3} of them on {WORD[len(_top3)]} templates",
-    f"Over {thousands(n_top5_responses)} responses, the top {WORD[len(TOP5)]} models lose {lost_points} answer points: {top5_empty} to "
-    f"responses empty at the output ceiling, {top5_partial_points} to {top5_partial} partial answers at half credit, and {top5_incorrect} to "
+    f"Over {thousands(n_top5_responses)} responses, the top {WORD[len(TOP5)]} models lose {lost_points:g} answer points: {top5_empty} to "
+    f"responses empty at the output ceiling, {top5_partial_points:g} to {top5_partial} partial answers at half credit, and {top5_incorrect} to "
     "incorrect verdicts, of which "
     + (f"{two_chemical} fall on the {WORD[len(TWO_CHEMICAL)]} chemical templates whose wording does not pin the answer, " if not REPAIRED else "")
     + f"{top5_symbolic} are symbolic answers scored by the numbers they state, and {top5_near} lie within 0.2\\% of a target whose "
@@ -1106,8 +1105,9 @@ appendix_phrases = {
         f"against {tt(strict_flip[0]['b'])}); a Wilcoxon test~\\citep{{wilcoxon1945}} separates {n_wil_sig} on MC; and McNemar's exact "
         f"test~\\citep{{mcnemar1947}}, which treats the {thousands(N_ITEMS)} instances as independent, separates {n_mcnemar_sig}"
         if strict_flip else f"Strict FAC separates {n_strict_sig} pairs",
-        f"swaps {WORD[n_tol_swaps]} pairs of models each, none of which differs after correction ($\\tau = {f3(sens_tau['half_tol'])}$ against "
-        "the ordering as scored)",
+        ("swaps no pair of models" if not n_tol_swaps else
+         f"swaps {WORD[n_tol_swaps]} pairs of models each, none of which differs after correction")
+        + f" ($\\tau = {f3(sens_tau['half_tol'])}$ against the ordering as scored)",
         f"leaving out the {WORD[len(SHORTCUT)]} templates answerable from their wording or the {WORD[len(SYMBOLIC)]} with symbolic answers move "
         f"no model's FAC by more than {f3(other_shift)} and keep $\\tau$ at {f3(other_tau)} or above",
         f"($\\tau = {f3(sens_tau['unusable_excluded'])}$), chiefly because {tt('glm-5.3')}'s {Q1['glm-5.3']['empty']} empty responses then drop out",
@@ -1425,7 +1425,7 @@ header = (" & & \\multicolumn{4}{c}{\\textbf{FAC under the variant (verdicts up/
 put("tab:scoring_variants", "results", table(
     "l r c c c c r r r r", header, rows,
     note("sensitivity_variants") + f"The final-answer rule re-applied offline over the {SV_STORE} store with one clause changed at a time: the "
-    "absolute-value clause off, the last-digit term bounded by one hundredth of the target, the exact-digit requirement of the prescribing templates "
+    "absolute-value clause off, the response's last-digit term no longer capped at one hundredth of the target, the exact-digit requirement of the prescribing templates "
     "relaxed to the tolerance, and partial credit in proportion to the parts matched instead of one half. Each cell gives FAC under the variant and "
     "the verdicts that rise and fall; the last row Kendall's $\\tau$ of the variant's ordering with the ordering as scored. Right: the accepted "
     "answers by their relative error to the target.",
