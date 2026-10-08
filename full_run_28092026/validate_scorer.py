@@ -192,7 +192,11 @@ def main() -> int:
          'its family (D-139, `WORD_AUDIT.md`) and the last-digit windows decided by the rule rather than by binary '
          'rounding (D-147, `BOUNDARY_AUDIT.md`), and pi-fractions, a scalar gold line\'s second unit and a '
          'pi-fraction of two computed milestones read (D-169, `ANSWER_FORM_FIX.md`); the last four change none of '
-         'these verdicts. The digit rule\'s '
+         'these verdicts. Since ANSWER FINAL (WS-E, 2026-10-08; decisions D5 and D11a to D11d in '
+         '`docs/mock_review_workstreams/00_ORCHESTRATION.md`) "now" also has the symbolic step on five templates '
+         '(`symbolic/SYMBOLIC_CHECK.md`), an answer\'s own last digit vouching for at most 1% of the target, an '
+         'exponent after a bracket not read as a value, and superscript exponents read by the milestone reader. '
+         'The digit rule\'s '
          f'published figures are reproduced with `arith.py` at `{digit_fix.PRE_FIX[:7]}`; "now" is the rule as '
          'fixed twice after a domain expert read the full run\'s flags (D-156, D-159; `DIGIT_FIX.md`, '
          '`DIGIT_FIX_2.md`) and corrected after two review agents checked both fixes (D-160; `DIGIT_FIX_3.md`).', '',
@@ -202,11 +206,64 @@ def main() -> int:
         same = abs(then[k] - v) < 5e-4
         ok &= same
         L.append(f'| {k} | {v:.3f} | {then[k]:.3f} | {"yes" if same else "NO"} | {got[k]:.3f} |')
+    sym_lines, sym_ok = symbolic_section()
+    ok &= sym_ok
     L += ['', 'The gold is clean and the published code reproduces every figure.' if ok
-          else 'A check failed: see the gold table and the rows marked NO.']
+          else 'A check failed: see the gold table, the rows marked NO and the symbolic section.']
+    L += [''] + sym_lines
     (HERE / 'SCORER_VALIDATION.md').write_text('\n'.join(L) + '\n', encoding='utf-8', newline='\n')
     print('\n'.join(L))
     return 0 if ok else 1
+
+
+def symbolic_section() -> tuple[list[str], bool]:
+    """The symbolic branch of the answer check (WS-E): on every template answer.SYMBOLIC_EQUIVALENCE_TEMPLATES names,
+    each gold is equivalent to itself through the equivalence check, and the items the experts graded (E2,
+    symbolic/grades.json) are scored as the check now scores them, counted against their grades. It fails only on a
+    gold; a graded item the check scores otherwise than graded is a disagreement that symbolic/SYMBOLIC_CHECK.md
+    explains, and is counted here."""
+    enabled = tuple(getattr(A, 'SYMBOLIC_EQUIVALENCE_TEMPLATES', ()))
+    L = ['## The symbolic equivalence check', '']
+    if not enabled:
+        return L + ['No template is enabled: `answer.SYMBOLIC_EQUIVALENCE_TEMPLATES` is empty, and every symbolic answer '
+                    'is scored by the numbers it states.'], True
+    from full_run_28092026.symbolic import equivalence as EQ
+    items = score.pool_items()
+    ms_all = score.milestone_sets(items)          # the milestones the score passes, so the label is the score's own
+    ok = True
+    L += ['| template | golds equivalent to themselves | graded equivalent: scored correct | graded not equivalent: '
+          'scored correct | of them raised by the symbolic step |', '|---|---:|---:|---:|---:|']
+    grades_path = HERE / 'symbolic' / 'grades.json'
+    grades = json.loads(grades_path.read_text(encoding='utf-8'))['items'] if grades_path.exists() else {}
+    texts = {}
+    for tid in enabled:
+        golds = [it for it in items.values() if it['template_id'] == tid]
+        n_gold = sum(EQ.check(it, it['solution'])[0] for it in golds)
+        ok &= n_gold == len(golds)
+        pos = neg = pos_ok = neg_ok = neg_raised = 0
+        for g in grades.values():
+            if g['template_id'] != tid or g['grade'] not in ('equivalent', 'not equivalent', 'unreadable'):
+                continue
+            if g['model'] not in texts:
+                rows = [json.loads(l) for l in (score.SCORES / 'main' / f"{g['model']}.jsonl").read_text(encoding='utf-8').splitlines()]
+                texts[g['model']] = score.texts_matching('main', g['model'], rows)
+            it = items[g['item_id']]
+            vals = tuple(m['value'] for m in ms_all[g['item_id']])        # score.score_answer's own call
+            label, det = A.verdict(texts[g['model']][g['item_id']], it, score.TOLS['fitted'], vals)
+            if g['grade'] == 'equivalent':
+                pos += 1
+                pos_ok += label == 'correct'
+            else:
+                neg += 1
+                neg_ok += label == 'correct'
+                neg_raised += label == 'correct' and bool((det.get('symbolic') or {}).get('equivalent'))
+        L.append(f"| `{tid.replace('template_', '')}` | {n_gold} of {len(golds)} | {pos_ok} of {pos} | {neg_ok} of {neg} | "
+                 f"{neg_raised} |")
+    L += ['', 'Every gold of the enabled templates is equivalent to itself.' if ok
+          else 'A gold of an enabled template is not equivalent to itself: the check is broken on it.',
+          'A graded-not-equivalent answer scored correct and not raised by the symbolic step is one the by-numbers rule '
+          'already scores correct (a control of the E2 kit); the symbolic step never lowers a verdict.']
+    return L, ok
 
 
 if __name__ == '__main__':

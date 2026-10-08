@@ -35,6 +35,20 @@ belongs to analysis/digit_rule.py, which is about intermediate arithmetic.
   quantity in two units ("0.088960 radians, or 5.0970 degrees") accepts either, the second matched
   at unit scale. The forms occur in none of the pilot's 15 templates, so the experts never
   arbitrated them; ANSWER_FORM_AUDIT.md and ANSWER_FORM_FIX.md in full_run_28092026/ measure them.
+
+  SYMBOLIC ANSWERS (WS-E, decision D5). On the templates SYMBOLIC_EQUIVALENCE_TEMPLATES names, an answer
+  the rules above score incorrect or partial is scored correct when its final expression is equivalent
+  to the gold's, to the precision the gold shows (symbolic_equivalence.py beside this file; validated
+  against the experts' grades of 302 answers, full_run_28092026/symbolic/SYMBOLIC_CHECK.md). No verdict
+  is lowered. This file pins that module's LF-normalised SHA-256, so the hash of answer.py that score.py
+  records covers the check too.
+
+  THE READERS AND THE LAST DIGIT (WS-E, decisions D11a to D11d, 2026-10-08). A number's own last digit
+  vouches for it up to 1% of the target, not further (D11d, OWN_DIGIT_CAP): "2" no longer matches 1.01.
+  An exponent after a bracket is a unit's, not a value: the 2 of `(signal units)^2` (D11b). The
+  milestone reader folds `1.152 × 10⁻¹⁹` written with superscripts (D11a, milestones.numbers). A
+  response with no answer heading is read from its last WINDOW characters (segment), which can hold an
+  intermediate number; the D11d bound keeps a coarse one there from matching (D11c, documented).
 """
 import functools
 import os
@@ -44,9 +58,30 @@ import sys
 
 sys.path[:0] = [os.path.dirname(os.path.abspath(__file__))]
 import milestones  # noqa: E402
+import symbolic_equivalence  # noqa: E402
 
 TOL = 0.02            # kept for callers that pass a relative tolerance explicitly
 REL = 0.002           # the window [0.0017, 0.0029] all agrees with the experts; see X4
+OWN_DIGIT_CAP = 0.01  # D11d: an answer's own last digit vouches for at most 1% of the target
+# D5: the templates whose symbolic answers are checked for equivalence (SYMBOLIC_CHECK.md: precision and recall at
+# least 0.9 against the experts' grades, every disagreement explained). The other symbolic templates keep the
+# by-numbers rule: phasor_addition and undamped_response_initial_conditions (the check moves no verdict the experts
+# call equivalent), continuous_to_discrete_conversion and ft_esd_rect_pulse (nothing to move).
+SYMBOLIC_EQUIVALENCE_TEMPLATES = ('template_autocorrelation_rect_pulse', 'template_ber_estimation_mary',
+                                  'template_cd_dc_system_analysis', 'template_impulse_response_from_lccde',
+                                  'template_incompressible_continuity')
+SYMBOLIC_EQUIVALENCE_SHA256 = 'd39cf431f58b81e5cf0480c0a8b0188c68bf972bd0d09597f734b149003cd768'
+
+
+def _lf_sha256(path):
+    import hashlib
+    with open(path, 'rb') as fh:
+        return hashlib.sha256(fh.read().replace(b'\r\n', b'\n')).hexdigest()
+
+
+if _lf_sha256(symbolic_equivalence.__file__) != SYMBOLIC_EQUIVALENCE_SHA256:
+    raise ImportError('symbolic_equivalence.py is not the version answer.py pins; a change to the check is a change to '
+                      'the answer check: update SYMBOLIC_EQUIVALENCE_SHA256 deliberately, then re-score the stores')
 SCALES = milestones.SCALES + (1e12, 1e-12, 1e-2)   # pF/m against F/m, and percent
 # A digit written as a subscript - `p_1`, `x_{1}` - names a thing, it is not a value (D-138);
 # E3's reader already skips it.
@@ -141,6 +176,7 @@ def values(seg):
     t = t.replace('\\,', ' ')
     t = re.sub(r'\\[dt]?frac\s*\{([^{}]*)\}\s*\{([^{}]*)\}', r' \1/\2 ', t)
     t = re.sub(r'(?<=[A-Za-z])\s*\^\s*-?\d+', ' ', t)                    # m^3/s, m/s^2
+    t = re.sub(r'(?<=[)\]}])\s*\^\s*\{?\s*-?\d+\s*\}?', ' ', t)          # (signal units)^2: an exponent, not a value (D11b)
     t = re.sub(r'(?<=[A-Za-z])[\u2070\u00b9\u00b2\u00b3\u2074-\u2079]+', ' ', t)   # unicode units
     t = t.translate(SUB).translate(SUP)
     t = re.sub(r'\\left|\\right|\\[()\[\]]|\$|\\mathrm|\\text\{[^{}]*\}', ' ', t)
@@ -208,6 +244,9 @@ def match(gold, have, rel=REL, exact=False, gold_ulp=0.0, unit=1.0, scales=SCALE
     `scales` are the unit factors tried. A rendering (D-169) is matched with (1.0,) alone, because
     it already is the other unit: with the factors, a cut-off trace holding `pi d^4/32` and no
     answer matched 0.5315 rad through 32 +- 1 at the 1/60 factor.
+
+    The number's own last digit vouches for at most OWN_DIGIT_CAP (1%) of the gold (D11d, the reviewers' bound
+    min(u(y_hat), 0.01|y|)): "2" for 1.01, or 0.5 x 10^3 for 540 at a unit factor, no longer match.
     """
     for v, u in have:
         for sc in scales:
@@ -215,7 +254,8 @@ def match(gold, have, rel=REL, exact=False, gold_ulp=0.0, unit=1.0, scales=SCALE
             if exact:
                 if abs(t - gold) <= 1e-9 * max(1.0, abs(gold)):
                     return True
-            elif abs(t - gold) <= max(rel * abs(gold), unit * tu if abs(v) > u else 0.0, unit * gold_ulp) * (1 + SLACK):
+            elif abs(t - gold) <= max(rel * abs(gold), min(unit * tu, OWN_DIGIT_CAP * abs(gold)) if abs(v) > u else 0.0,
+                                      unit * gold_ulp) * (1 + SLACK):
                 return True
     return False
 
@@ -227,6 +267,10 @@ def segment(text):
     "Answer (b): Turbulent" - so taking everything after the LAST marker keeps only the
     last part and throws the value away. Where the trace heads its conclusion (## Final
     Answer), the segment starts at that heading and keeps every part under it.
+
+    A trace with neither a heading nor a marker is read from its last WINDOW characters, which can
+    hold an intermediate number as well as the answer (D11c: kept and documented; the OWN_DIGIT_CAP
+    bound of match() keeps a coarse intermediate there from matching at a unit factor).
     """
     heads = list(HEADING.finditer(text))
     if heads:
@@ -443,10 +487,16 @@ def verdict(text, item, tol=None, ms=None, unit=1.0, whole=False):
             hits[k] = hits[k] or match(v, body, rel, want['exact'], gu, unit) \
                 or match(abs(v), body_abs, rel, want['exact'], gu, unit)
     if not hits:
-        return 'incorrect', {'targets': want, 'matched': 0, 'of': 0}
-    n = sum(hits)
-    label = 'correct' if n == len(hits) else ('partial' if n else 'incorrect')
-    return label, {'targets': want, 'matched': n, 'of': len(hits), 'answer_type': item.get('answer_type')}
+        label, detail = 'incorrect', {'targets': want, 'matched': 0, 'of': 0}
+    else:
+        n = sum(hits)
+        label = 'correct' if n == len(hits) else ('partial' if n else 'incorrect')
+        detail = {'targets': want, 'matched': n, 'of': len(hits), 'answer_type': item.get('answer_type')}
+    # D5: on the enabled templates, an equivalent final expression raises the verdict to correct; nothing is lowered
+    label, sym = symbolic_equivalence.apply(label, item, text, SYMBOLIC_EQUIVALENCE_TEMPLATES, tol, unit, segment)
+    if sym is not None:
+        detail['symbolic'] = sym
+    return label, detail
 
 
 def correct(text, item, tol=None, ms=None):
@@ -526,8 +576,14 @@ def selftest():
          '**Answer:** \\(y_1 \\approx 0.238\\ \\text{m}\\), \\(h_L \\approx 0.374\\ \\text{m}\\)', 'incorrect'),
         ('**Answer:** The argument is 15.15.', '', 'scalar', (15.15,),
          '**Answer:** \\(P_b = Q\\left(\\sqrt{2E_b/N_0}\\right)\\)', 'incorrect'),
+        # ...within 1% of the target since D11d: 3.4 x 10^3 is 1.07% from 3,364, a closer rounding still passes
         ('**Answer:** The volume is 3,364 m3.', '', 'scalar', (3364.0,),
-         '**Answer:** Step 1 gives about 3.4 x 10^3 m3', 'correct'),
+         '**Answer:** Step 1 gives about 3.4 x 10^3 m3', 'incorrect'),
+        ('**Answer:** The volume is 3,364 m3.', '', 'scalar', (3364.0,),
+         '**Answer:** Step 1 gives about 3.36 x 10^3 m3', 'correct'),
+        # D11d: a coarse last digit no longer carries a wrong value, "2" for 1.01, 0.5 x 10^3 for 540 at a unit factor
+        ('**Answer:** The ratio is 1.01.', '', 'scalar', (1.01,), '**Answer:** 2', 'incorrect'),
+        ('**Answer:** The speed is 540 m/s.', '', 'scalar', (540.0,), '**Answer:** about 0.5 x 10^3 m/s', 'incorrect'),
         ('**Answer:** The probability is 0.4987.', '', 'scalar', (0.4987,),
          '**Answer:** P = 0.5', 'correct'),
         # D-139: the verdict word's own family decides, a negated mention skipped
@@ -609,11 +665,31 @@ def selftest():
             bad += 1
             print('FAIL want %-9s got %-9s (unit %s, whole %s) | %s' % (want, got, unit, whole, ' '.join(trace.split())[:50]))
     cases += boundary
-    # values() alone: grouping joins only a number's own digits (D-137)
+    # D5: the symbolic step, on an enabled template only, and only upward
+    ac_gold = ('**Answer:**\nThe autocorrelation function is a **triangular function** described by:\n**R_g(tau) = '
+               '4*(3 - |tau|)**, for **|tau| <= 3**, and **0** otherwise.\nThis triangle has a peak value of **12** at '
+               'tau = 0.')
+    ac = {'item_id': 'autocorrelation_rect_pulse#selftest', 'template_id': 'template_autocorrelation_rect_pulse',
+          'solution': ac_gold, 'question': 'g(t) = 2 for -1.5 <= t <= 1.5, and 0 otherwise', 'answer_type': 'symbolic'}
+    symbolic = [
+        (ac, '## Final Answer\n**Answer:** R_g(τ) = 4(3 − |τ|) for |τ| ≤ 3, and 0 otherwise', 'correct'),
+        (ac, '## Final Answer\n**Answer:** R_g(τ) = 4(3 − |τ|) for |τ| ≤ 6, and 0 otherwise', 'incorrect'),
+        (dict(ac, template_id='template_x'), '## Final Answer\n**Answer:** R_g(τ) = 4(3 − |τ|) for |τ| ≤ 3', 'incorrect'),
+        (ac, '## Final Answer\n**Answer:** the peak is 12', 'correct'),
+    ]
+    for it, trace, want in symbolic:
+        got, d = verdict(trace, it, ms=(12.0,))
+        if got != want:
+            bad += 1
+            print('FAIL want %-9s got %-9s (symbolic %s) | %s' % (want, got, d.get('symbolic'), ' '.join(trace.split())[:60]))
+    cases += symbolic
+    # values() alone: grouping joins only a number's own digits (D-137); an exponent after a bracket is a unit's (D11b)
     reads = [('\\(\\log_2\\,256 = 8\\)', 2256.0, False), ('\\(x_1\\,000\\)', 1000.0, False),
              ('\\boxed{1\\,335}\\ \\text{K}', 1335.0, True), ('\\(4\\,477.9\\ \\text{psi}\\)', 4477.9, True),
              ('\\(1\\,234\\,567\\)', 1234567.0, True), ('0.123\\,456', 123456.0, False),
-             ('P_a(p_1) = 0.8002', 1.0, False), ('x_{12} = 3.5', 12.0, False), ('x_{12} = 3.5', 2.0, False)]
+             ('P_a(p_1) = 0.8002', 1.0, False), ('x_{12} = 3.5', 12.0, False), ('x_{12} = 3.5', 2.0, False),
+             ('R = 288 (signal units)^2', 2.0, False), ('R = 288 \\text{(V)}^{2}', 2.0, False),
+             ('R = 288 (signal units)^2', 288.0, True)]
     for text, v, want in reads:
         if any(abs(x - v) < 1e-9 for x, _u in values(text)) != want:
             bad += 1

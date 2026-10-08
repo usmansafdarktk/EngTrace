@@ -63,13 +63,20 @@ SEPARATOR = re.compile(r'\\,|\{,\}|[\u2009\u202f\u00a0]')
 GROUPED = re.compile(r'(?<![\d.,_^])\d{1,3}(?:(?:\\,|\{,\}|[\u2009\u202f\u00a0])\d{3})+(?!\d)')
 
 
+SUPERSCRIPT = str.maketrans('⁰¹²³⁴⁵⁶⁷⁸⁹⁻⁺', '0123456789-+')
+
+
 def numbers(text: str) -> list[float]:
     """Every number written in a text. `×10^` and `10^-3` forms are folded in, and LaTeX's
     `\\times 10^{5}` and `\\cdot 10^{5}` with them (D-137): until the full run they read as
-    three numbers."""
+    three numbers. The unicode form `1.152 × 10⁻¹⁹`, superscript digits, is folded too, as
+    answer.values and arith.normalise fold it (WS-E, D11a): read as 1.152 and 10, it missed the
+    milestone and could match the bare mantissa under a unit factor."""
     t = GROUPED.sub(lambda m: SEPARATOR.sub('', m.group(0)), text)
     t = t.replace(',', '').replace('−', '-').replace('\\times', '*').replace('\\cdot', '*')
     t = re.sub(r'(\d)\s*[×x\*]\s*10\s*\^\s*\{?\s*([-+]?\d+)\s*\}?', r'\1e\2', t)
+    t = re.sub(r'(\d)\s*[×x\*]\s*10\s*([⁻⁺]?[⁰¹²³⁴-⁹]+)',
+               lambda m: m.group(1) + 'e' + m.group(2).translate(SUPERSCRIPT), t)
     out = []
     for m in NUM.finditer(t):
         try:

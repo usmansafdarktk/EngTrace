@@ -3,6 +3,10 @@
     python -m full_run_28092026.expert_kits --build [--seed 20261002] [--b1 150] [--b3 100] [--b2-per-model 40] [--b2-models K ...]
                                                                    # FREE: expert_request/tasks/ and expert_request/dist/, local
     python -m full_run_28092026.expert_kits --score DIR            # FREE: the returned <id>.jsonl files; EXPERT_REQUEST.md, counts only
+    python -m full_run_28092026.expert_kits --score DIR --topup-returns DIR2     # ... merged with the B2 top-up's returns
+    python -m full_run_28092026.expert_kits --b2-topup [--seed 20261007]          # FREE: expert_request/topup/, local
+    python -m full_run_28092026.expert_kits --b2-matched VARIANT [--b2-models K ...]   # FREE: expert_request/matched_<VARIANT>/
+    python -m full_run_28092026.expert_kits --score-matched VARIANT DIR           # FREE: its returns, a separate B2 section
     python -m full_run_28092026.expert_kits --selftest             # FREE: a small build in a temp folder, the app driven through it
 
 WHAT IS DRAWN, from the main store as re-scored under D-169 and the traces it scored (score.texts_matching refuses a
@@ -51,6 +55,23 @@ milestones the experts say the working obtains, and of MISSING ones they say it 
 share, and the readers' agreement. B2: the category distribution per model and level, item majorities, the share of
 "No error", and Fleiss' kappa over the three readers. B4: per template and question, the three experts' answers as
 counts. The last submission per reader and item counts.
+
+WHEN THE STORE MOVES UNDER THE READINGS (WS-E, after two templates were repaired and re-run). A reading counts only
+while the store still holds what was read: --score drops a B1, B2 or B3 reading whose item's question, or whose
+trace, differs from the text the kit showed (the item was re-drawn, or the response re-run), and a B2 reading whose
+answer the current store no longer scores incorrect (for instance after a change to the answer check). B1 is scored
+against the check's CURRENT verdict, and the count of verdicts that changed since the reading is reported. B4 is
+kept as read. Every exclusion is counted by kind and reason, and the denominators are stated.
+
+  --b2-topup   For each B2 model, the readings dropped by that rule are replaced from the current main store's wrong
+               answers not yet read, so that the sample is again --b2-per-model per model, allocated over the levels
+               by the rule above (each level's shortfall against the model's proportional target first); a model
+               with fewer wrong answers than that in all takes all of them. Three readers per item, the same app and
+               guide section. Written to expert_request/topup/ (tasks, dist, build.json); --score merges its returns
+               (--topup-returns) with the kept readings, and until they come back reports the reduced sample.
+  --b2-matched The B2 draw (the same rule, a seed of its own) from another store's rows, for the models given:
+               the error analysis of a re-run configuration. Written to expert_request/matched_<variant>/; scored by
+               --score-matched into a section of its own, so the default-setting readings stay as they are.
 """
 from __future__ import annotations
 
@@ -100,6 +121,10 @@ B4_NEAR = ['template_vdw_solve_for_volume', 'template_pfr_volume_changing_rate',
            'template_pitzer_correlation_z', 'template_best_hydraulic_rectangular_section',
            'template_manning_rectangular_discharge']
 NEAR = (0.002, 0.05)
+RETURNED = OUT / 'expert_requests_filled'      # the returns of the 2026-10-02 build, as the owner filed them
+TOPUP = OUT / 'topup'
+TOPUP_SEED = 20261007
+KEPT = 'kept'
 
 ANSWER_OPTIONS = ['correct', 'partially correct', 'incorrect', 'no answer stated']
 MILESTONE_OPTIONS = ['yes, the working obtains it', 'no, it never obtains it', 'no, and its route does not need it']
@@ -160,16 +185,16 @@ def experts() -> list[dict]:
     return [{'id': r['id'], 'branch': r['branch']} for r in layer2_roster()]
 
 
-def load(models: list[str]):
-    """Items, milestones, store rows, trace texts and E5 rows for the models given."""
+def load(models: list[str], variant: str = 'main'):
+    """Items, milestones, store rows, trace texts and E5 rows for the models given, from one store."""
     items = score.pool_items()
     ms_all = score.milestone_sets(items)
     rows, texts, e5 = {}, {}, {}
     for key in models:
-        rows[key] = {r['item_id']: r for r in map(json.loads, (score.SCORES / 'main' / f'{key}.jsonl')
+        rows[key] = {r['item_id']: r for r in map(json.loads, (score.SCORES / variant / f'{key}.jsonl')
                                                    .read_text(encoding='utf-8').splitlines())}
-        texts[key] = score.texts_matching('main', key, rows[key].values())
-        p = score.SCORES / 'main' / 'e5' / f'{key}.jsonl'
+        texts[key] = score.texts_matching(variant, key, rows[key].values())
+        p = score.SCORES / variant / 'e5' / f'{key}.jsonl'
         e5[key] = {r['item_id']: r for r in map(json.loads, p.read_text(encoding='utf-8').splitlines())} \
             if p.exists() else {}
     return items, ms_all, rows, texts, e5
@@ -181,6 +206,11 @@ def code_of(*parts: str) -> str:
 
 def answered(r: dict) -> bool:
     return r['status'] == 'answered' and not r['unusable']
+
+
+def still_wrong(r: dict | None) -> bool:
+    """An answered, usable response the store scores incorrect: what B2 reads."""
+    return r is not None and answered(r) and r['answer']['label'] == 'incorrect'
 
 
 # ------------------------------------------------------------------ drawing
@@ -278,22 +308,26 @@ def draw_b3(items, ms_all, rows, texts, e5, n: int, rng: random.Random) -> list[
     return out
 
 
-def draw_b2(items, rows, texts, models: list[str], per_model: int, rng: random.Random) -> list[dict]:
+def error_task(items, texts, key: str, i: str, lv: str, code_kind: str = 'error') -> dict:
+    it = items[i]
+    return {'pool': {'kind': 'error', 'branch': it['branch'], 'question': it['question'],
+                     'solution': it['solution'], 'trace': texts[key][i], 'level': lv},
+            'key': {'kind': 'error', 'item_id': i, 'model': key, 'template_id': it['template_id'], 'level': lv},
+            'code': code_of(code_kind, key, i)}
+
+
+def draw_b2(items, rows, texts, models: list[str], per_model: int, rng: random.Random,
+            code_kind: str = 'error') -> list[dict]:
     out = []
     for key in models:
         cands = {lv: collections.defaultdict(list) for lv in LEVELS}
         for i, r in rows[key].items():
-            if answered(r) and r['answer']['label'] == 'incorrect':
+            if still_wrong(r):
                 cands[r['level']][r['template_id']].append(i)
         alloc = allocate({lv: sum(map(len, cands[lv].values())) for lv in LEVELS}, per_model)
         for lv in LEVELS:
             for i in round_robin(cands[lv], alloc.get(lv, 0), rng):
-                it = items[i]
-                out.append({'pool': {'kind': 'error', 'branch': it['branch'], 'question': it['question'],
-                                     'solution': it['solution'], 'trace': texts[key][i], 'level': lv},
-                            'key': {'kind': 'error', 'item_id': i, 'model': key, 'template_id': it['template_id'],
-                                    'level': lv},
-                            'code': code_of('error', key, i)})
+                out.append(error_task(items, texts, key, i, lv, code_kind))
     return out
 
 
@@ -394,6 +428,203 @@ def draw_b4(items, rows, texts) -> list[dict]:
     return out
 
 
+# ------------------------------------------------------------------ when the store moves: exclusions, top-up, matched
+
+def shown_pool(out: Path) -> dict:
+    """What each code of a build showed: tasks/pool.json, or the experts' task folders where that file is gone."""
+    p = out / 'tasks' / 'pool.json'
+    if p.exists():
+        return json.loads(p.read_text(encoding='utf-8'))
+    pool = {}
+    for f in sorted((out / 'dist').glob('*/*/tasks/pool.json')):
+        pool.update(json.loads(f.read_text(encoding='utf-8')))
+    if not pool:
+        raise SystemExit(f'{out}: neither tasks/pool.json nor dist/*/*/tasks/pool.json: the texts shown are needed')
+    return pool
+
+
+def reading_status(key: dict, shown: dict | None, items: dict, store: dict) -> str:
+    """Does a reading still apply to the store? KEPT, or why not. A B4 reading is about a template and stays."""
+    if key['kind'] == 'template':
+        return KEPT
+    if shown is None:
+        raise SystemExit(f"no shown text for an item of {key['model']} on {key['item_id']}")
+    it = items.get(key['item_id'])
+    if it is None or it['question'] != shown['question']:
+        return 'question changed'
+    r = store.get(key['model'], {}).get(key['item_id'])
+    if r is None or score.sha(shown['trace'].encode('utf-8')) != r.get('trace_sha256'):
+        return 'trace replaced'
+    if key['kind'] == 'answer' and not answered(r):
+        return 'no longer answered'
+    if key['kind'] == 'error' and not still_wrong(r):
+        return 'no longer incorrect'
+    return KEPT
+
+
+def store_rows(models, variant: str = 'main') -> dict:
+    return {m: {r['item_id']: r for r in map(json.loads, (score.SCORES / variant / f'{m}.jsonl')
+                                              .read_text(encoding='utf-8').splitlines())} for m in models}
+
+
+def level_need(target: dict, have: dict, avail: dict, n: int) -> dict:
+    """n new items over the levels: each level's shortfall against the target first (shared in proportion when the
+    shortfalls exceed n), then any remainder where items are left; never more than a level has."""
+    short = {lv: min(max(0, target.get(lv, 0) - have.get(lv, 0)), avail.get(lv, 0)) for lv in LEVELS}
+    need = allocate({lv: s for lv, s in short.items() if s}, n) if sum(short.values()) > n else dict(short)
+    need = {lv: need.get(lv, 0) for lv in LEVELS}
+    rest = n - sum(need.values())
+    while rest > 0 and any(avail.get(lv, 0) > need[lv] for lv in LEVELS):
+        lv = max(LEVELS, key=lambda x: (avail.get(x, 0) - need[x], -LEVELS.index(x)))
+        need[lv] += 1
+        rest -= 1
+    return need
+
+
+def topup_folders(base: Path) -> list[Path]:
+    """The B2 top-up rounds built so far, in order: topup/, topup2/, ... A round is never rebuilt in place (its kit may
+    be out with the experts, and their returns are scored against its keyfile): the next build is the next round."""
+    out = []
+    while True:
+        f = base / ('topup' if not out else f'topup{len(out) + 1}')
+        if not (f / 'build.json').exists():
+            return out
+        out.append(f)
+
+
+def draw_topup(base: Path, models: list[str], per_model: int, seed: int,
+               code_kind: str = 'error-topup') -> tuple[dict, list[dict]]:
+    """Per B2 model: which readings still apply (the original B2 and every earlier top-up round), and the replacements
+    that bring the sample back to per_model."""
+    keyfile = json.loads((base / 'tasks' / 'keyfile.json').read_text(encoding='utf-8'))
+    shown = shown_pool(base)
+    for f in topup_folders(base):
+        keyfile.update(json.loads((f / 'tasks' / 'keyfile.json').read_text(encoding='utf-8')))
+        shown.update(shown_pool(f))
+    items, _ms, rows, texts, _e5 = load(models)
+    rng = random.Random(seed)
+    plan, tasks = {}, []
+    for key in models:
+        read = {c: k for c, k in sorted(keyfile.items()) if k['kind'] == 'error' and k['model'] == key}
+        status = {c: reading_status(k, shown.get(c), items, rows) for c, k in read.items()}
+        kept = [c for c, s in status.items() if s == KEPT]
+        kept_items = {read[c]['item_id'] for c in kept}
+        wrong = {i: r for i, r in rows[key].items() if still_wrong(r)}
+        cands = {lv: collections.defaultdict(list) for lv in LEVELS}
+        for i, r in sorted(wrong.items()):
+            if i not in kept_items:
+                cands[r['level']][r['template_id']].append(i)
+        avail = {lv: sum(map(len, cands[lv].values())) for lv in LEVELS}
+        have = collections.Counter(rows[key][read[c]['item_id']]['level'] for c in kept)
+        if len(wrong) <= per_model:
+            need = dict(avail)                                   # fewer wrong answers than the sample: all of them
+        else:
+            target = allocate(dict(collections.Counter(r['level'] for r in wrong.values())), per_model)
+            need = level_need(target, have, avail, max(0, per_model - len(kept)))
+        added = collections.Counter()
+        for lv in LEVELS:
+            for i in round_robin(cands[lv], need.get(lv, 0), rng):
+                tasks.append(error_task(items, texts, key, i, lv, code_kind))
+                added[lv] += 1
+        dropped = {c: s for c, s in status.items() if s != KEPT}
+        plan[key] = {'read': len(read), 'kept': len(kept), 'kept_by_level': {lv: have[lv] for lv in LEVELS},
+                     'dropped': dict(collections.Counter(dropped.values())),
+                     'dropped_templates': dict(collections.Counter(read[c]['template_id'] for c in dropped)),
+                     'wrong_in_store': len(wrong),
+                     'wrong_by_level': dict(collections.Counter(r['level'] for r in wrong.values())),
+                     'added': sum(added.values()), 'added_by_level': {lv: added[lv] for lv in LEVELS},
+                     'final': len(kept) + sum(added.values())}
+    return plan, tasks
+
+
+def write_kits(out: Path, tasks: list[dict], queues: dict) -> None:
+    """tasks/ (pool, assignment, keyfile) and dist/<id>/<task folder>/ for a list of tasks and their queues."""
+    pool = {t['code']: t['pool'] for t in tasks}
+    keyfile = {t['code']: t['key'] for t in tasks}
+    tasks_dir, dist = out / 'tasks', out / 'dist'
+    for d in (tasks_dir, dist):
+        if d.exists():
+            shutil.rmtree(d)
+        d.mkdir(parents=True)
+    (tasks_dir / 'pool.json').write_text(json.dumps(pool, ensure_ascii=False), encoding='utf-8')
+    (tasks_dir / 'assignment.json').write_text(json.dumps(queues, indent=1), encoding='utf-8')
+    (tasks_dir / 'keyfile.json').write_text(json.dumps(keyfile, indent=1), encoding='utf-8')
+    guides = {k: guide_for(k) for k in FOLDER}
+    for aid, q in queues.items():
+        listed = []
+        for kind in ORDER:
+            mine = [c for c in q['codes'] if pool[c]['kind'] == kind]
+            if not mine:
+                continue
+            folder = dist / aid / FOLDER[kind]
+            (folder / 'tasks').mkdir(parents=True)
+            shutil.copy(APP, folder / 'app.py')
+            (folder / 'guide.md').write_text(guides[kind], encoding='utf-8')
+            (folder / 'README.txt').write_text(README_TASK.format(task=TASK[kind]), encoding='utf-8')
+            (folder / 'tasks' / 'pool.json').write_text(json.dumps({c: pool[c] for c in mine}, ensure_ascii=False),
+                                                       encoding='utf-8')
+            (folder / 'tasks' / 'assignment.json').write_text(
+                json.dumps({aid: {'branch': q['branch'], 'codes': mine}}, indent=1), encoding='utf-8')
+            listed.append(f'  {FOLDER[kind]}/   {len(mine)} items.  {TASK[kind]}')
+        if listed:
+            (dist / aid / 'README.txt').write_text(README_EXPERT.format(folders='\n'.join(listed)), encoding='utf-8')
+
+
+def error_composition(tasks: list[dict], queues: dict) -> dict:
+    e = [t for t in tasks if t['key']['kind'] == 'error']
+    models = sorted({t['key']['model'] for t in e})
+    return {'items': len(e), 'readers': READERS['error'],
+            'by_model_level': {k: {lv: sum(t['key']['model'] == k and t['key']['level'] == lv for t in e)
+                                   for lv in LEVELS} for k in models},
+            'by_branch': dict(collections.Counter(t['pool']['branch'] for t in e)),
+            'templates': len({t['key']['template_id'] for t in e}),
+            'experts': {aid: len(q['codes']) for aid, q in sorted(queues.items())}}
+
+
+def build_topup(base: Path, seed: int, per_model: int, models: list[str], report: Path | None) -> dict:
+    """The next top-up round (topup/ first, then topup2/, ...); an earlier round is never overwritten."""
+    rnd = len(topup_folders(base)) + 1
+    top = base / ('topup' if rnd == 1 else f'topup{rnd}')
+    if top.exists():
+        raise SystemExit(f'{top} exists without a build.json: remove it deliberately before building round {rnd}')
+    plan, tasks = draw_topup(base, models, per_model, seed + rnd - 1,
+                             'error-topup' if rnd == 1 else f'error-topup{rnd}')
+    if len({t['code'] for t in tasks}) != len(tasks):
+        raise SystemExit('code collision')
+    queues = assign(tasks, experts(), seed)
+    write_kits(top, tasks, queues)
+    comp = {'built': dt.date.today().isoformat(), 'round': rnd, 'seed': seed + rnd - 1, 'store_commit': store_commit(),
+            'per_model': per_model, 'models': plan, **error_composition(tasks, queues),
+            'readings': sum(len(q['codes']) for q in queues.values())}
+    (top / 'build.json').write_text(json.dumps(comp, indent=1), encoding='utf-8')
+    if report:
+        write_report(base, report)
+    return comp
+
+
+def build_matched(base: Path, variant: str, models: list[str], per_model: int, seed: int,
+                  report: Path | None) -> dict:
+    """B2 from another store (a re-run configuration), the same draw rule; kits in matched_<variant>/."""
+    items, _ms, rows, texts, _e5 = load(models, variant)
+    tasks = draw_b2(items, rows, texts, models, per_model, random.Random(seed), code_kind=f'error-{variant}')
+    if len({t['code'] for t in tasks}) != len(tasks):
+        raise SystemExit('code collision')
+    folder = base / f'matched_{variant}'
+    queues = assign(tasks, experts(), seed)
+    write_kits(folder, tasks, queues)
+    try:
+        commit = json.loads((score.SCORES / variant / 'CONFIG.json').read_text(encoding='utf-8')).get('git', '?')[:7]
+    except Exception:  # noqa: BLE001
+        commit = '?'
+    comp = {'built': dt.date.today().isoformat(), 'seed': seed, 'variant': variant, 'store_commit': commit,
+            'per_model': per_model, 'wrong_in_store': {k: sum(still_wrong(r) for r in rows[k].values()) for k in models},
+            **error_composition(tasks, queues), 'readings': sum(len(q['codes']) for q in queues.values())}
+    (folder / 'build.json').write_text(json.dumps(comp, indent=1), encoding='utf-8')
+    if report:
+        write_report(base, report)
+    return comp
+
+
 # ------------------------------------------------------------------ the build
 
 def assign(tasks: list[dict], roster: list[dict], seed: int) -> dict:
@@ -436,34 +667,7 @@ def build(out: Path, seed: int, b1: int, b3: int, b2_per_model: int, b2_models: 
         raise SystemExit('code collision')
     roster = experts()
     queues = assign(tasks, roster, seed)
-    pool = {t['code']: t['pool'] for t in tasks}
-    keyfile = {t['code']: t['key'] for t in tasks}
-    tasks_dir, dist = out / 'tasks', out / 'dist'
-    for d in (tasks_dir, dist):
-        if d.exists():
-            shutil.rmtree(d)
-        d.mkdir(parents=True)
-    (tasks_dir / 'pool.json').write_text(json.dumps(pool, ensure_ascii=False), encoding='utf-8')
-    (tasks_dir / 'assignment.json').write_text(json.dumps(queues, indent=1), encoding='utf-8')
-    (tasks_dir / 'keyfile.json').write_text(json.dumps(keyfile, indent=1), encoding='utf-8')
-    guides = {k: guide_for(k) for k in FOLDER}
-    for aid, q in queues.items():
-        listed = []
-        for kind in ORDER:
-            mine = [c for c in q['codes'] if pool[c]['kind'] == kind]
-            if not mine:
-                continue
-            folder = dist / aid / FOLDER[kind]
-            (folder / 'tasks').mkdir(parents=True)
-            shutil.copy(APP, folder / 'app.py')
-            (folder / 'guide.md').write_text(guides[kind], encoding='utf-8')
-            (folder / 'README.txt').write_text(README_TASK.format(task=TASK[kind]), encoding='utf-8')
-            (folder / 'tasks' / 'pool.json').write_text(json.dumps({c: pool[c] for c in mine}, ensure_ascii=False),
-                                                       encoding='utf-8')
-            (folder / 'tasks' / 'assignment.json').write_text(
-                json.dumps({aid: {'branch': q['branch'], 'codes': mine}}, indent=1), encoding='utf-8')
-            listed.append(f'  {FOLDER[kind]}/   {len(mine)} items.  {TASK[kind]}')
-        (dist / aid / 'README.txt').write_text(README_EXPERT.format(folders='\n'.join(listed)), encoding='utf-8')
+    write_kits(out, tasks, queues)
     comp = composition(tasks, queues, seed, b2_models)
     (out / 'build.json').write_text(json.dumps(comp, indent=1), encoding='utf-8')
     if report:
@@ -520,7 +724,8 @@ def store_commit() -> str:
         return '?'
 
 
-def report_lines(comp: dict, results: dict | None) -> list[str]:
+def report_lines(comp: dict, results: dict | None, topup: dict | None = None, matched: list | None = None,
+                 cur: dict | None = None) -> list[str]:
     k = comp['kinds']
     L = ['# The experts\' reading request (B1 to B4)', '',
          f"Generated by `expert_kits.py`: `--build` writes what was sent, `--score` what came back. Counts only; the "
@@ -553,6 +758,12 @@ def report_lines(comp: dict, results: dict | None) -> list[str]:
     L.append('')
     if results:
         L += results_lines(results)
+    if topup:
+        L += topup_lines(topup)
+    if cur:
+        L += current_lines(cur)
+    for mc, mr in matched or ():
+        L += matched_lines(mc, mr)
     return L
 
 
@@ -607,53 +818,56 @@ def read_returns(returned: Path, out: Path) -> tuple[dict, dict, dict]:
     return keyfile, queues, rows
 
 
-def score_returns(returned: Path, out: Path, report: Path | None) -> dict:
-    keyfile, queues, rows = read_returns(returned, out)
-    by_code = collections.defaultdict(dict)
-    for (aid, c), r in rows.items():
-        by_code[c][aid] = r
-    res = {'returned_readings': len(rows), 'assigned_readings': sum(len(q['codes']) for q in queues.values()),
-           'files': sorted({aid for aid, _ in rows}), 'kinds': {}}
-    # B1
+def b1_stats(keyfile: dict, by_code: dict, branch_of: dict, store: dict | None = None) -> dict:
+    """B1: the experts against the check's verdict at the reading (store None), or against its current verdict, the
+    store's, with the count of verdicts that changed since the reading."""
     agree = collections.Counter()
     by_check = collections.defaultdict(collections.Counter)
     by_branch = collections.defaultdict(collections.Counter)
     dis_t = collections.Counter()
-    pairs, notes = [], []
+    pairs, notes, changed, items = [], [], 0, 0
     for c, readers in by_code.items():
         k = keyfile[c]
-        if k['kind'] != 'answer':
+        if k['kind'] != 'answer' or not readers:
             continue
+        items += 1
+        check = k['check'] if store is None else store[k['model']][k['item_id']]['answer']['label']
+        changed += check != k['check']
         labs = {}
         for aid, r in readers.items():
             v = r['answers']['verdict']
             labs[aid] = v
             e = EXPERT_TO_CHECK[v]
-            by_check[k['check']][e] += 1
-            same = e == k['check']
+            by_check[check][e] += 1
+            same = e == check
             agree['same' if same else 'different'] += 1
-            by_branch[queues[aid]['branch']]['same' if same else 'different'] += 1
+            by_branch[branch_of[aid]]['same' if same else 'different'] += 1
             if not same:
                 dis_t[k['template_id']] += 1
             if r['note']:
-                notes.append({'code': c, 'reader': aid, 'check': k['check'], 'expert': v, 'template': k['template_id'],
+                notes.append({'code': c, 'reader': aid, 'check': check, 'expert': v, 'template': k['template_id'],
                               'model': k['model'], 'note': r['note']})
         if len(labs) == 2:
             pairs.append(tuple(labs[a] for a in sorted(labs)))
-    res['kinds']['answer'] = {
-        'readings': sum(agree.values()), 'agreement': agree['same'] / sum(agree.values()) if agree else None,
-        'by_check': {ck: dict(v) for ck, v in by_check.items()},
-        'by_branch': {b: dict(v) for b, v in by_branch.items()},
-        'disagreements_by_template': dict(dis_t.most_common()),
-        'items_read_twice': len(pairs), 'reader_agreement': (sum(a == b for a, b in pairs) / len(pairs)) if pairs else None,
-        'reader_kappa': cohen(pairs), 'notes': notes}
-    # B3
+    out = {'readings': sum(agree.values()), 'agreement': agree['same'] / sum(agree.values()) if agree else None,
+           'by_check': {ck: dict(v) for ck, v in by_check.items()},
+           'by_branch': {b: dict(v) for b, v in by_branch.items()},
+           'disagreements_by_template': dict(dis_t.most_common()),
+           'items_read_twice': len(pairs), 'reader_agreement': (sum(a == b for a, b in pairs) / len(pairs)) if pairs else None,
+           'reader_kappa': cohen(pairs), 'notes': notes}
+    if store is not None:
+        out.update(items=items, verdicts_changed_since_reading=changed)
+    return out
+
+
+def b3_stats(keyfile: dict, by_code: dict) -> dict:
     by_judge = collections.defaultdict(collections.Counter)
-    pairs, notes = [], []
+    pairs, notes, items = [], [], 0
     for c, readers in by_code.items():
         k = keyfile[c]
-        if k['kind'] != 'milestone':
+        if k['kind'] != 'milestone' or not readers:
             continue
+        items += 1
         labs = {}
         for aid, r in readers.items():
             v = r['answers']['obtained']
@@ -665,17 +879,18 @@ def score_returns(returned: Path, out: Path, report: Path | None) -> dict:
         if len(labs) == 2:
             pairs.append(tuple(labs[a] for a in sorted(labs)))
     yes, no1, no2 = MILESTONE_OPTIONS
-    rj = by_judge['REACHED']
-    mj = by_judge['MISSING']
-    res['kinds']['milestone'] = {
-        'readings': sum(sum(v.values()) for v in by_judge.values()),
-        'by_judge': {j: dict(v) for j, v in by_judge.items()},
-        'reached_precision': rj[yes] / sum(rj.values()) if rj else None,
-        'missing_precision': (mj[no1] + mj[no2]) / sum(mj.values()) if mj else None,
-        'missing_not_needed_share': mj[no2] / sum(mj.values()) if mj else None,
-        'items_read_twice': len(pairs), 'reader_agreement': (sum(a == b for a, b in pairs) / len(pairs)) if pairs else None,
-        'reader_kappa': cohen(pairs), 'notes': notes}
-    # B2
+    rj, mj = by_judge['REACHED'], by_judge['MISSING']
+    return {'readings': sum(sum(v.values()) for v in by_judge.values()),
+            'by_judge': {j: dict(v) for j, v in by_judge.items()},
+            'reached_precision': rj[yes] / sum(rj.values()) if rj else None,
+            'missing_precision': (mj[no1] + mj[no2]) / sum(mj.values()) if mj else None,
+            'missing_not_needed_share': mj[no2] / sum(mj.values()) if mj else None,
+            'items_read_twice': len(pairs), 'reader_agreement': (sum(a == b for a, b in pairs) / len(pairs)) if pairs else None,
+            'reader_kappa': cohen(pairs), 'notes': notes, 'items': items}
+
+
+def b2_stats(keyfile: dict, by_code: dict, level_of: dict | None = None) -> dict:
+    """The error categories over the readings given; `level_of` (code -> level) overrides the keyfile's level."""
     per_model = collections.defaultdict(collections.Counter)
     per_level = collections.defaultdict(collections.Counter)
     majority = collections.defaultdict(collections.Counter)
@@ -683,12 +898,13 @@ def score_returns(returned: Path, out: Path, report: Path | None) -> dict:
     notes = []
     for c, readers in by_code.items():
         k = keyfile[c]
-        if k['kind'] != 'error':
+        if k['kind'] != 'error' or not readers:
             continue
+        lv = (level_of or {}).get(c, k['level'])
         cnt = collections.Counter(r['answers']['category'] for r in readers.values())
         for cat, n in cnt.items():
             per_model[k['model']][cat] += n
-            per_level[k['level']][cat] += n
+            per_level[lv][cat] += n
         top, n = cnt.most_common(1)[0]
         majority[k['model']][top if n >= 2 else 'split'] += 1
         item_rows[k['model']].append(cnt)
@@ -696,17 +912,18 @@ def score_returns(returned: Path, out: Path, report: Path | None) -> dict:
             if r['note'] or r['excerpt']:
                 notes.append({'code': c, 'reader': aid, 'model': k['model'], 'template': k['template_id'],
                               'category': r['answers']['category'], 'excerpt': r['excerpt'], 'note': r['note']})
-    res['kinds']['error'] = {
-        'readings': sum(sum(v.values()) for v in per_model.values()),
-        'by_model': {mk: dict(v) for mk, v in per_model.items()},
-        'by_level': {lv: dict(v) for lv, v in per_level.items()},
-        'majority_by_model': {mk: dict(v) for mk, v in majority.items()},
-        'no_error_share_by_model': {mk: v[ERROR_OPTIONS[6]] / sum(v.values()) for mk, v in per_model.items() if sum(v.values())},
-        'fleiss_by_model': {mk: fleiss(v) for mk, v in item_rows.items()},
-        'fleiss_all': fleiss([r for v in item_rows.values() for r in v]), 'notes': notes}
-    # B4
-    t4 = {}
-    notes = []
+    return {'readings': sum(sum(v.values()) for v in per_model.values()),
+            'by_model': {mk: dict(v) for mk, v in per_model.items()},
+            'by_level': {lv: dict(v) for lv, v in per_level.items()},
+            'majority_by_model': {mk: dict(v) for mk, v in majority.items()},
+            'no_error_share_by_model': {mk: v[ERROR_OPTIONS[6]] / sum(v.values()) for mk, v in per_model.items() if sum(v.values())},
+            'fleiss_by_model': {mk: fleiss(v) for mk, v in item_rows.items()},
+            'fleiss_all': fleiss([r for v in item_rows.values() for r in v]), 'notes': notes,
+            'items_read': sum(len(v) for v in item_rows.values())}
+
+
+def b4_stats(keyfile: dict, by_code: dict) -> dict:
+    t4, notes = {}, []
     for c, readers in by_code.items():
         k = keyfile[c]
         if k['kind'] != 'template':
@@ -718,26 +935,177 @@ def score_returns(returned: Path, out: Path, report: Path | None) -> dict:
             if r['note']:
                 notes.append({'code': c, 'reader': aid, 'template': k['template_id'], 'note': r['note']})
         t4[k['template_id']] = {'role': k['role'], 'readers': len(readers), 'asks': {q: dict(v) for q, v in asks.items()}}
-    res['kinds']['template'] = {'templates': t4, 'notes': notes}
+    return {'templates': t4, 'notes': notes}
+
+
+def median_dwell(rows: dict) -> float | None:
     dwell = []
     for r in rows.values():
         try:
             dwell.append((dt.datetime.fromisoformat(r['submitted_at']) - dt.datetime.fromisoformat(r['opened_at'])).total_seconds())
         except (KeyError, ValueError):
             pass
-    res['median_seconds_per_item'] = statistics.median(dwell) if dwell else None
-    (out / 'scored.json').write_text(json.dumps(res, indent=1, ensure_ascii=False), encoding='utf-8')
-    comp = json.loads((out / 'build.json').read_text(encoding='utf-8'))
-    lines = report_lines(comp, res)
+    return statistics.median(dwell) if dwell else None
+
+
+def as_returned(keyfile: dict, queues: dict, rows: dict) -> dict:
+    """The figures as the readings came back, every reading counted, B1 against the verdict the reader saw judged:
+    what --score wrote before the store moved (scored.json), and what the report's "What came back" prints."""
+    by_code = collections.defaultdict(dict)
+    for (aid, c), r in rows.items():
+        by_code[c][aid] = r
+    branch_of = {aid: q['branch'] for aid, q in queues.items()}
+    return {'returned_readings': len(rows), 'assigned_readings': sum(len(q['codes']) for q in queues.values()),
+            'files': sorted({aid for aid, _ in rows}),
+            'kinds': {'answer': b1_stats(keyfile, by_code, branch_of), 'milestone': b3_stats(keyfile, by_code),
+                      'error': b2_stats(keyfile, by_code), 'template': b4_stats(keyfile, by_code)},
+            'median_seconds_per_item': median_dwell(rows)}
+
+
+def current(keyfile: dict, queues: dict, rows: dict, out: Path, topup_returned: Path | None) -> dict:
+    """The figures over the readings the store still holds, merged with the B2 top-up where one was built."""
+    shown = shown_pool(out)
+    items = score.pool_items()
+    models = {k['model'] for k in keyfile.values() if 'model' in k}
+    rounds = []                               # each top-up round: its keyfile, queues, returns and shown texts
+    for n, top in enumerate(topup_folders(out), 1):
+        rkey = json.loads((top / 'tasks' / 'keyfile.json').read_text(encoding='utf-8'))
+        rqueues = json.loads((top / 'tasks' / 'assignment.json').read_text(encoding='utf-8'))
+        found = [top / 'returned'] + sorted(top.glob('experts_filled*'))        # where the owner files a round's returns
+        rdir = topup_returned if (n == 1 and topup_returned is not None) else next((d for d in found if d.exists()), found[0])
+        rrows = read_returns(rdir, top)[2] if rdir.exists() else {}
+        rounds.append((rkey, rqueues, rrows, shown_pool(top)))
+        models |= {k['model'] for k in rkey.values()}
+    tkey = {c: k for r in rounds for c, k in r[0].items()}
+    tqueues = {}
+    for _k, rq, _r, _s in rounds:
+        for aid, q in rq.items():
+            tqueues.setdefault(aid, {'branch': q['branch'], 'codes': []})['codes'] += q['codes']
+    trows = {key: row for r in rounds for key, row in r[2].items()}
+    store = store_rows(sorted(models))
+    status = {c: reading_status(k, shown.get(c), items, store) for c, k in keyfile.items()}
+    topup = None
+    if rounds:
+        tstatus = {c: reading_status(k, rs.get(c), items, store) for rk, _q, _r, rs in rounds for c, k in rk.items()}
+        topup = {'rounds': len(rounds), 'items': len(tkey), 'assigned': sum(len(q['codes']) for q in tqueues.values()),
+                 'returned': len(trows), 'files': sorted({aid for aid, _ in trows}),
+                 'no_longer_apply': sum(s != KEPT for s in tstatus.values())}
+        status.update(tstatus)
+    keyfile = {**keyfile, **tkey}
+    rows = {**rows, **trows}
+    branch_of = {aid: q['branch'] for aid, q in {**queues, **tqueues}.items()}
+    excluded_items = collections.defaultdict(collections.Counter)
+    excluded_templates = collections.defaultdict(collections.Counter)
+    for c, s in status.items():
+        if s != KEPT:
+            excluded_items[keyfile[c]['kind']][s] += 1
+            excluded_templates[keyfile[c]['kind']][keyfile[c]['template_id']] += 1
+    excluded_readings = collections.defaultdict(collections.Counter)
+    by_code = collections.defaultdict(dict)
+    for (aid, c), r in rows.items():
+        if status[c] == KEPT:
+            by_code[c][aid] = r
+        else:
+            excluded_readings[keyfile[c]['kind']][status[c]] += 1
+    for c, s in status.items():              # a B2 item in the sample whose readings are not back yet
+        if s == KEPT and keyfile[c]['kind'] == 'error':
+            by_code.setdefault(c, {})
+    sample = [c for c in by_code if keyfile[c]['kind'] == 'error']
+    level_of = {c: store[keyfile[c]['model']][keyfile[c]['item_id']]['level'] for c in sample}
+    err = b2_stats(keyfile, by_code, level_of)
+    err['composition'] = {
+        'items': len(sample), 'items_read': err['items_read'], 'readers': READERS['error'],
+        'by_model_level': {m: {lv: sum(keyfile[c]['model'] == m and level_of[c] == lv for c in sample) for lv in LEVELS}
+                           for m in sorted({keyfile[c]['model'] for c in sample})},
+        'by_branch': dict(collections.Counter(items[keyfile[c]['item_id']]['branch'] for c in sample)),
+        'templates': len({keyfile[c]['template_id'] for c in sample}),
+        'from_topup': sum(c in tkey for c in sample)}
+    return {'basis': 'the readings the current main store still holds (question and trace as shown; a B2 answer '
+                     'still scored incorrect), B1 against the check\'s current verdict, merged with the B2 top-up',
+            'returned_readings': len(rows),
+            'assigned_readings': sum(len(q['codes']) for q in queues.values()) + sum(len(q['codes']) for q in tqueues.values()),
+            'files': sorted({aid for aid, _ in rows}),
+            'exclusions': {'items': {k: dict(v) for k, v in excluded_items.items()},
+                           'templates': {k: dict(v) for k, v in excluded_templates.items()},
+                           'readings': {k: dict(v) for k, v in excluded_readings.items()}},
+            'topup': topup,
+            'kinds': {'answer': b1_stats(keyfile, by_code, branch_of, store), 'milestone': b3_stats(keyfile, by_code),
+                      'error': err, 'template': b4_stats(keyfile, by_code)},
+            'median_seconds_per_item': median_dwell(rows)}
+
+
+SCORED_KEYS = {'answer': ('readings', 'agreement', 'by_check', 'by_branch', 'disagreements_by_template',
+                          'items_read_twice', 'reader_agreement', 'reader_kappa', 'notes'),
+               'milestone': ('readings', 'by_judge', 'reached_precision', 'missing_precision', 'missing_not_needed_share',
+                             'items_read_twice', 'reader_agreement', 'reader_kappa', 'notes'),
+               'error': ('readings', 'by_model', 'by_level', 'majority_by_model', 'no_error_share_by_model',
+                         'fleiss_by_model', 'fleiss_all', 'notes'),
+               'template': ('templates', 'notes')}
+
+
+def same_as_stored(res: dict, stored: dict) -> list[str]:
+    """Where a recomputed as-returned result differs from scored.json as first written (the keys it had)."""
+    bad = [k for k in ('returned_readings', 'assigned_readings', 'files', 'median_seconds_per_item')
+           if json.loads(json.dumps(res[k])) != stored.get(k)]
+    for kind, keys in SCORED_KEYS.items():
+        for k in keys:
+            if json.loads(json.dumps(res['kinds'][kind][k])) != stored['kinds'][kind].get(k):
+                bad.append(f'{kind}.{k}')
+    return bad
+
+
+def score_returns(returned: Path, out: Path, report: Path | None, topup_returned: Path | None = None) -> dict:
+    """scored.json (as returned) and scored_current.json (what the store still holds, with the top-up merged)."""
+    keyfile, queues, rows = read_returns(returned, out)
+    res = as_returned(keyfile, queues, rows)
+    scored = out / 'scored.json'
+    bad = same_as_stored(res, json.loads(scored.read_text(encoding='utf-8'))) if scored.exists() else ['new']
+    if bad:                                   # left as it is when the same returns give the same figures
+        if scored.exists():
+            print(f'NOTE: the returns give figures other than scored.json for: {", ".join(bad)} (rewritten)')
+        scored.write_text(json.dumps(res, indent=1, ensure_ascii=False), encoding='utf-8')
+    cur = current(keyfile, queues, rows, out, topup_returned)
+    (out / 'scored_current.json').write_text(json.dumps(cur, indent=1, ensure_ascii=False), encoding='utf-8')
     if report:
-        report.write_text('\n'.join(lines) + '\n', encoding='utf-8', newline='\n')
-    print('\n'.join(results_lines(res)))
+        write_report(out, report)
+    print('\n'.join(results_lines(res) + current_lines(cur)))
+    return {'as_returned': res, 'current': cur}
+
+
+def score_matched(base: Path, variant: str, returned: Path, report: Path | None) -> dict:
+    folder = base / f'matched_{variant}'
+    keyfile, queues, rows = read_returns(returned, folder)
+    by_code = collections.defaultdict(dict)
+    for (aid, c), r in rows.items():
+        by_code[c][aid] = r
+    res = {'variant': variant, 'returned_readings': len(rows),
+           'assigned_readings': sum(len(q['codes']) for q in queues.values()),
+           'files': sorted({aid for aid, _ in rows}), 'error': b2_stats(keyfile, by_code),
+           'median_seconds_per_item': median_dwell(rows)}
+    (folder / 'scored.json').write_text(json.dumps(res, indent=1, ensure_ascii=False), encoding='utf-8')
+    if report:
+        write_report(base, report)
+    print('\n'.join(b2_lines(res['error'], f'### B2, matched configuration (`{variant}`)')))
     return res
 
 
+def write_report(base: Path, report: Path) -> None:
+    """EXPERT_REQUEST.md from what is on disk: the build, the returns as scored, the top-up, the current figures and
+    any matched B2. The first two sections are what --build and --score always wrote."""
+    def opt(p: Path):
+        return json.loads(p.read_text(encoding='utf-8')) if p.exists() else None
+    comp = json.loads((base / 'build.json').read_text(encoding='utf-8'))
+    matched = [(json.loads(b.read_text(encoding='utf-8')), opt(b.parent / 'scored.json'))
+               for b in sorted(base.glob('matched_*/build.json'))]
+    report.write_text('\n'.join(report_lines(comp, opt(base / 'scored.json'), opt(base / 'topup' / 'build.json'), matched,
+                                             opt(base / 'scored_current.json'))) + '\n', encoding='utf-8', newline='\n')
+
+
+def pct(x) -> str:
+    return '-' if x is None else f'{x:.3f}'
+
+
 def results_lines(res: dict) -> list[str]:
-    def pct(x):
-        return '-' if x is None else f'{x:.3f}'
     k = res['kinds']
     L = ['## What came back', '',
          f"Readings returned {res['returned_readings']} of {res['assigned_readings']} assigned, from "
@@ -763,8 +1131,20 @@ def results_lines(res: dict) -> list[str]:
           f"| items read by two experts; their agreement; Cohen's kappa | {m['items_read_twice']}; {pct(m['reader_agreement'])}; {pct(m['reader_kappa'])} |",
           f"| notes left (local) | {len(m['notes'])} |", '']
     e = k['error']
-    L += ['### B2, the error categories', '', f"Readings {e['readings']}; Fleiss' kappa over the three readers, all models: {pct(e['fleiss_all'])}.", '',
-          '| model | readings by category | item majorities | "No error" share | Fleiss |', '|---|---|---|---:|---:|']
+    L += ['### B2, the error categories', '', f"Readings {e['readings']}; Fleiss' kappa over the three readers, all models: {pct(e['fleiss_all'])}.", '']
+    L += b2_table(e)
+    t = k['template']
+    L += ['### B4, the templates', '', '| template | role | readers | question | answers |', '|---|---|---:|---|---|']
+    for tid, v in t['templates'].items():
+        for q, c in v['asks'].items():
+            L.append(f"| `{tid.replace('template_', '')}` | {v['role']} | {v['readers']} | {q} | "
+                     + ', '.join(f'"{x}" {n}' for x, n in sorted(c.items(), key=lambda kv: -kv[1])) + ' |')
+    L += ['', f"Notes left on the templates (local): {len(t['notes'])}.", '']
+    return L
+
+
+def b2_table(e: dict) -> list[str]:
+    L = ['| model | readings by category | item majorities | "No error" share | Fleiss |', '|---|---|---|---:|---:|']
     for mk, v in e['by_model'].items():
         L.append(f"| `{mk}` | " + ', '.join(f'{c.split(":")[0]} {n}' for c, n in sorted(v.items(), key=lambda kv: -kv[1])) + ' | '
                  + ', '.join(f'{c.split(":")[0]} {n}' for c, n in sorted(e['majority_by_model'].get(mk, {}).items(), key=lambda kv: -kv[1]))
@@ -773,13 +1153,96 @@ def results_lines(res: dict) -> list[str]:
     for lv, v in e['by_level'].items():
         L.append(f"| {lv} | " + ', '.join(f'{c.split(":")[0]} {n}' for c, n in sorted(v.items(), key=lambda kv: -kv[1])) + ' |')
     L.append('')
-    t = k['template']
-    L += ['### B4, the templates', '', '| template | role | readers | question | answers |', '|---|---|---:|---|---|']
-    for tid, v in t['templates'].items():
-        for q, c in v['asks'].items():
-            L.append(f"| `{tid.replace('template_', '')}` | {v['role']} | {v['readers']} | {q} | "
-                     + ', '.join(f'"{x}" {n}' for x, n in sorted(c.items(), key=lambda kv: -kv[1])) + ' |')
-    L += ['', f"Notes left on the templates (local): {len(t['notes'])}.", '']
+    return L
+
+
+def b2_lines(e: dict, title: str) -> list[str]:
+    return [title, '', f"Readings {e['readings']} on {e['items_read']} items; Fleiss' kappa over the three readers, all "
+                       f"models: {pct(e['fleiss_all'])}.", ''] + b2_table(e)
+
+
+def current_lines(cur: dict) -> list[str]:
+    """The current figures. Row labels differ from "What came back" on purpose: a parser of that section must not
+    pick these up unawares (docs/appendix_evaluation.py reads its rows by their wording)."""
+    k = cur['kinds']
+    ex = cur['exclusions']
+    names = {'answer': 'B1', 'milestone': 'B3', 'error': 'B2'}
+    parts = []
+    for kind in ('answer', 'milestone', 'error'):
+        its = ex['items'].get(kind, {})
+        if its:
+            rd = ex['readings'].get(kind, {})
+            parts.append(f"{names[kind]} {sum(its.values())} items and {sum(rd.values())} readings ("
+                         + ', '.join(f'{why} {n}' for why, n in sorted(its.items())) + '; '
+                         + ', '.join(f"`{t.replace('template_', '')}` {n}" for t, n in
+                                     sorted(ex['templates'][kind].items(), key=lambda kv: (-kv[1], kv[0]))) + ')')
+    L = ['## The current figures: the readings the store still holds', '',
+         'Generated by `expert_kits.py --score` into `scored_current.json`. A reading counts while the main store still '
+         'holds what was read: the item\'s question and the trace as shown, and, for B2, an answer the check still scores '
+         'incorrect. B1 is scored against the check\'s current verdict. The B2 sample is merged with the top-up\'s '
+         'readings as they come back. ' + ('Left out: ' + '; '.join(parts) + '.' if parts else 'Nothing is left out.'), '']
+    if cur.get('topup'):
+        t = cur['topup']
+        L += [f"B2 top-up: {t['items']} items sent, {t['assigned']} readings; {t['returned']} returned from "
+              f"{len(t['files'])} experts.", '']
+    a = k['answer']
+    L += ['### B1 now', '', '| | |', '|---|---|', f"| items; readings | {a['items']}; {a['readings']} |",
+          f"| three-way agreement with the check's current verdict | {pct(a['agreement'])} |"]
+    for ck, v in sorted(a['by_check'].items()):
+        L.append(f"| the check's current verdict {ck}: experts said | " + ', '.join(f'{x} {n}' for x, n in sorted(v.items())) + ' |')
+    L += [f"| by branch, same / different | " + '; '.join(f"{b.replace('_engineering', '')} {v.get('same', 0)} / {v.get('different', 0)}"
+                                                     for b, v in sorted(a['by_branch'].items())) + ' |',
+          f"| verdicts changed since the reading | {a['verdicts_changed_since_reading']} |",
+          f"| items with two readers; agreement; Cohen's kappa | {a['items_read_twice']}; {pct(a['reader_agreement'])}; {pct(a['reader_kappa'])} |", '']
+    m = k['milestone']
+    L += ['### B3 now', '', '| | |', '|---|---|', f"| items; readings | {m['items']}; {m['readings']} |"]
+    for j, v in sorted(m['by_judge'].items()):
+        L.append(f"| the judge ruled {j}: experts said | " + ', '.join(f'"{x}" {n}' for x, n in sorted(v.items())) + ' |')
+    L += [f"| REACHED confirmed | {pct(m['reached_precision'])} |",
+          f"| MISSING confirmed, by either answer | {pct(m['missing_precision'])} |",
+          f"| of MISSING, \"route does not need it\" | {pct(m['missing_not_needed_share'])} |",
+          f"| items with two readers; agreement; Cohen's kappa | {m['items_read_twice']}; {pct(m['reader_agreement'])}; {pct(m['reader_kappa'])} |", '']
+    e = k['error']
+    comp = e['composition']
+    L += ['### B2 now', '',
+          'The sample: ' + '; '.join(f"`{mk}` {sum(lv.values())} (" + ', '.join(f'{x} {n}' for x, n in lv.items() if n) + ')'
+                                     for mk, lv in comp['by_model_level'].items())
+          + f"; {comp['items']} items on {comp['templates']} templates"
+          + (f" ({comp['from_topup']} from the top-up)" if comp['from_topup'] else '')
+          + f"; {comp['items_read']} of them read so far.", '',
+          f"Readings {e['readings']} on {e['items_read']} items; Fleiss' kappa over the three readers, all models: "
+          f"{pct(e['fleiss_all'])}.", '']
+    L += b2_table(e)
+    return L
+
+
+def topup_lines(t: dict) -> list[str]:
+    L = ['## The B2 top-up: what was sent', '',
+         f"Built {t['built']} from the main store at `{t['store_commit']}`, seed {t['seed']}: per model, the readings whose "
+         'question or trace the store no longer holds, or whose answer it no longer scores incorrect, are replaced from '
+         f"the wrong answers not yet read, so that each model again has {t['per_model']} (all of them where it has fewer), "
+         'allocated over the levels by the original rule. Three readers per item.', '',
+         '| model | read | dropped | kept | wrong answers in the store | added | sample now |',
+         '|---|---:|---|---:|---:|---|---:|']
+    for mk, v in t['models'].items():
+        dropped = ', '.join(f'{why} {n}' for why, n in sorted(v['dropped'].items())) or '0'
+        added = ', '.join(f'{lv} {n}' for lv, n in v['added_by_level'].items() if n) or '0'
+        L.append(f"| `{mk}` | {v['read']} | {dropped} | {v['kept']} | {v['wrong_in_store']} | {added} | {v['final']} |")
+    L += ['', f"Items {t['items']}, readings {t['readings']}; per expert: "
+              + (', '.join(f'`{aid}` {n}' for aid, n in t['experts'].items()) or 'none') + '.', '']
+    return L
+
+
+def matched_lines(comp: dict, res: dict | None) -> list[str]:
+    L = [f"## B2 for the matched configuration (`{comp['variant']}`)", '',
+         f"Built {comp['built']} from the `{comp['variant']}` store at `{comp['store_commit']}`, seed {comp['seed']}, by "
+         f"the B2 rule: {comp['per_model']} wrong answers per model, or all where fewer. Wrong answers in that store: "
+         + ', '.join(f'`{m}` {n}' for m, n in comp['wrong_in_store'].items()) + '. Sent: '
+         + '; '.join(f"`{m}` " + ', '.join(f'{lv} {n}' for lv, n in v.items() if n) for m, v in comp['by_model_level'].items())
+         + f"; {comp['items']} items, {comp['readings']} readings.", '']
+    if res:
+        L += [f"Returned {res['returned_readings']} of {res['assigned_readings']} readings from {len(res['files'])} experts.", '']
+        L += b2_lines(res['error'], '### B2, the error categories (matched configuration)')
     return L
 
 
@@ -823,20 +1286,105 @@ def selftest() -> int:
                 row = json.loads(returned.read_text(encoding='utf-8').splitlines()[0])
                 assert row['code'] == first and row['answers']['verdict'] == 'correct', row
         print('each task folder\'s app renders, and the final-answer one takes a submission: ' + ', '.join(f'{k} ({a})' for k, a in seen))
-        res = score_returns(tmp / 'dist', tmp, None)      # the returns are read from the folder tree
+        res = score_returns(tmp / 'dist', tmp, None)['as_returned']      # the returns are read from the folder tree
         assert res['returned_readings'] == 1, res['returned_readings']
+        selftest_moves(tmp)
         print('SELFTEST OK')
         return 0
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
 
+def simulate_errors(folder: Path, out: Path, seed: int = 1) -> int:
+    """Synthetic B2 returns for a kit folder: every assigned reader of every error item, a category at random."""
+    keyfile = json.loads((folder / 'tasks' / 'keyfile.json').read_text(encoding='utf-8'))
+    queues = json.loads((folder / 'tasks' / 'assignment.json').read_text(encoding='utf-8'))
+    rng = random.Random(seed)
+    out.mkdir(parents=True, exist_ok=True)
+    n = 0
+    for aid, q in sorted(queues.items()):
+        with (out / f'{aid}.jsonl').open('w', encoding='utf-8') as fh:
+            for pos, c in enumerate(q['codes'], 1):
+                if keyfile[c]['kind'] != 'error':
+                    continue
+                cat = rng.choice(ERROR_OPTIONS[:7])
+                fh.write(json.dumps({'annotator_id': aid, 'branch': q['branch'], 'kind': 'error', 'code': c,
+                                     'position': pos, 'opened_at': '2026-10-08T09:00:00+00:00',
+                                     'answers': {'category': cat}, 'excerpt': '' if cat in ERROR_OPTIONS[6:] else 'x',
+                                     'note': 'n' if cat == ERROR_OPTIONS[6] else '',
+                                     'submitted_at': '2026-10-08T09:01:00+00:00', 'source': 'simulated'}) + '\n')
+                n += 1
+    return n
+
+
+def selftest_moves(tmp: Path) -> None:
+    """The store moving under the readings, simulated by editing what the kit records it showed: two B2 traces
+    replaced and one B1 question re-drawn. The top-up replaces the two, --score leaves the three out and merges."""
+    pool_path = tmp / 'tasks' / 'pool.json'
+    pool = json.loads(pool_path.read_text(encoding='utf-8'))
+    keyfile = json.loads((tmp / 'tasks' / 'keyfile.json').read_text(encoding='utf-8'))
+    errs = sorted(c for c, k in keyfile.items() if k['kind'] == 'error')
+    victim = keyfile[errs[0]]['model']
+    other = next(k['model'] for c, k in keyfile.items() if k['kind'] == 'error' and k['model'] != victim)
+    hit = [c for c in errs if keyfile[c]['model'] == victim][:2]
+    for c in hit:
+        pool[c]['trace'] += ' (a later response)'
+    b1 = sorted(c for c, k in keyfile.items() if k['kind'] == 'answer')[0]
+    pool[b1]['question'] += ' (re-drawn)'
+    pool_path.write_text(json.dumps(pool, ensure_ascii=False), encoding='utf-8')
+    n_b2 = simulate_errors(tmp, tmp / 'returns')
+    comp = build_topup(tmp, TOPUP_SEED, 5, sorted({victim, other}), None)
+    v, o = comp['models'][victim], comp['models'][other]
+    assert v['dropped'] == {'trace replaced': 2} and v['kept'] == 3 and o['dropped'] == {} and o['added'] == 0, comp
+    assert v['final'] == min(5, v['wrong_in_store']) and v['added'] == v['final'] - 3, v
+    added = json.loads((tmp / 'topup' / 'tasks' / 'keyfile.json').read_text(encoding='utf-8'))
+    kept_items = {keyfile[c]['item_id'] for c in errs if keyfile[c]['model'] == victim and c not in hit}
+    assert not kept_items & {k['item_id'] for k in added.values()}, 'a replacement repeats a kept reading'
+    n_top = simulate_errors(tmp / 'topup', tmp / 'topup' / 'returned', seed=2)   # the round's own returns folder
+    both = score_returns(tmp / 'returns', tmp, None)
+    res = both['current']
+    assert both['as_returned']['kinds']['error']['readings'] == n_b2 and 'exclusions' not in both['as_returned']
+    assert not same_as_stored(both['as_returned'], json.loads((tmp / 'scored.json').read_text(encoding='utf-8')))
+    ex = res['exclusions']
+    assert ex['items'] == {'error': {'trace replaced': 2}, 'answer': {'question changed': 1}}, ex
+    assert ex['readings']['error'] == {'trace replaced': 6}, ex
+    e = res['kinds']['error']
+    assert e['readings'] == n_b2 - 6 + n_top and e['composition']['items'] == 10 - 2 + v['added'], e['composition']
+    assert e['composition']['from_topup'] == v['added'] and e['fleiss_all'] is not None
+    assert res['kinds']['answer']['items'] == 0                     # no B1 reading was returned in this simulation
+    assert res['assigned_readings'] == both['as_returned']['assigned_readings'] + comp['readings'], res['assigned_readings']
+    again = build_topup(tmp, TOPUP_SEED, 5, sorted({victim, other}), None)      # a second build is round 2, not a rebuild
+    assert again['round'] == 2 and (tmp / 'topup' / 'tasks' / 'keyfile.json').read_text(encoding='utf-8') == json.dumps(added, indent=1)
+    assert again['models'][victim]['dropped'] == {'trace replaced': 2} and again['models'][victim]['added'] == 0, again['models'][victim]
+    print(f"store moves: two B2 readings and one B1 item left out; the top-up adds {v['added']} for `{victim}`, none for "
+          f"`{other}`; --score merges {n_top} top-up readings with the {n_b2 - 6} kept; a second build is round 2 and "
+          'leaves round 1 as it was')
+    variant = 'reasoning-medium'
+    if (score.SCORES / variant / 'gpt-5.4-mini.jsonl').exists():
+        mc = build_matched(tmp, variant, ['gpt-5.4-mini'], 3, TOPUP_SEED, None)
+        n_m = simulate_errors(tmp / f'matched_{variant}', tmp / 'matched_returns', seed=3)
+        mr = score_matched(tmp, variant, tmp / 'matched_returns', None)
+        assert mc['items'] == 3 and mr['error']['readings'] == n_m == 9, (mc['items'], mr['error']['readings'])
+        write_report(tmp, tmp / 'EXPERT_REQUEST.md')
+        text = (tmp / 'EXPERT_REQUEST.md').read_text(encoding='utf-8')
+        assert '## The B2 top-up: what was sent' in text and f'matched configuration (`{variant}`)' in text
+        assert '## The current figures' in text and text.index('## What came back') < text.index('## The current figures')
+        cur_part = text[text.index('## The current figures'):]
+        assert '| the check said' not in cur_part and '| the judge said' not in cur_part   # not the old rows' wording
+        print(f'matched configuration: a B2 kit from `{variant}` is built, scored into its own section, and the report '
+              'carries the top-up and the matched sections')
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument('--build', action='store_true')
     ap.add_argument('--score', metavar='DIR', help='the folder holding the returned <id>.jsonl files')
+    ap.add_argument('--topup-returns', metavar='DIR', help="with --score: the B2 top-up's returned files")
+    ap.add_argument('--b2-topup', action='store_true', help='replace the B2 readings the store no longer holds')
+    ap.add_argument('--b2-matched', metavar='VARIANT', help='a B2 kit from another store (a re-run configuration)')
+    ap.add_argument('--score-matched', nargs=2, metavar=('VARIANT', 'DIR'))
     ap.add_argument('--selftest', action='store_true')
-    ap.add_argument('--seed', type=int, default=SEED)
+    ap.add_argument('--seed', type=int, default=None, help=f'default {SEED} for --build, {TOPUP_SEED} for the B2 additions')
     ap.add_argument('--b1', type=int, default=150, help='final-answer items (half wrong-side, half correct)')
     ap.add_argument('--b3', type=int, default=100, help='milestone items (half REACHED, half MISSING)')
     ap.add_argument('--b2-per-model', type=int, default=40)
@@ -844,13 +1392,27 @@ def main() -> int:
     a = ap.parse_args()
     if a.selftest:
         return selftest()
+    if a.b2_topup:
+        comp = build_topup(OUT, a.seed or TOPUP_SEED, a.b2_per_model, a.b2_models, REPORT)
+        print('\n'.join(topup_lines(comp)))
+        print(f'kits: {TOPUP / "dist"}  (one folder per expert; send the expert their folder)')
+        return 0
+    if a.b2_matched:
+        models = [m for m in a.b2_models if (score.SCORES / a.b2_matched / f'{m}.jsonl').exists()]
+        comp = build_matched(OUT, a.b2_matched, models, a.b2_per_model, a.seed or TOPUP_SEED, REPORT)
+        print('\n'.join(matched_lines(comp, None)))
+        print(f'kits: {OUT / ("matched_" + a.b2_matched) / "dist"}')
+        return 0
+    if a.score_matched:
+        score_matched(OUT, a.score_matched[0], Path(a.score_matched[1]), REPORT)
+        return 0
     if a.build:
-        comp = build(OUT, a.seed, a.b1, a.b3, a.b2_per_model, a.b2_models, REPORT)
+        comp = build(OUT, a.seed or SEED, a.b1, a.b3, a.b2_per_model, a.b2_models, REPORT)
         print('\n'.join(report_lines(comp, None)))
         print(f'\nkits: {OUT / "dist"}  (one folder per expert, a sub-folder per task; send the expert their folder)')
         return 0
     if a.score:
-        score_returns(Path(a.score), OUT, REPORT)
+        score_returns(Path(a.score), OUT, REPORT, Path(a.topup_returns) if a.topup_returns else None)
         return 0
     ap.print_help()
     return 1

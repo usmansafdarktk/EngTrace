@@ -1,0 +1,9 @@
+# E2 kits hold pool text, model responses and the keyfile; the returns are the experts' grades. Both stay
+# local, and so do the files that carry a grade per item (grades.json, validation.json). Committed: the scripts,
+# app.py, guide.md and the count reports GRADES.md, SYMBOLIC_CHECK.md and RESCORE_PREVIEW.md.
+tasks/
+dist/
+experts_filled_symbolic*/
+grades.json
+validation.json
+__pycache__/

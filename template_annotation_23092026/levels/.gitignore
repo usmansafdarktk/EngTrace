@@ -1,0 +1,8 @@
+# E1 kits hold evaluation-set text (questions and gold solutions) and the keyfile; the returns are the
+# experts' ratings. Both stay local, and so does agreement.json (the ratings per template). Committed: the
+# scripts, app.py, guide.md and the count report RESULTS.md.
+tasks/
+dist/
+experts_filled_levels*/
+agreement.json
+__pycache__/
