@@ -5,112 +5,112 @@
  "sample": 220,
  "models": {
   "gpt-oss-20b": {
-   "traces": 20,
+   "traces": 18,
    "without_reply": 0,
-   "milestones_both_judged": 53,
-   "agreement_three_way": 0.7169811320754716,
-   "agreement_reached_vs_not": 0.9433962264150944,
-   "kappa_three_way": 0.5164233576642335,
-   "kappa_reached_vs_not": 0.6959847036328873,
-   "reached_share_base": 0.11320754716981132,
-   "reached_share_other": 0.09433962264150944,
+   "milestones_both_judged": 36,
+   "agreement_three_way": 0.8055555555555556,
+   "agreement_reached_vs_not": 0.9166666666666666,
+   "kappa_three_way": 0.6853932584269663,
+   "kappa_reached_vs_not": 0.6785714285714285,
+   "reached_share_base": 0.16666666666666666,
+   "reached_share_other": 0.1388888888888889,
    "pairs": {
-    "MISSING->MISSING": 21,
+    "MISSING->MISSING": 12,
     "MISSING->NOT_NEEDED": 3,
-    "NOT_NEEDED->MISSING": 9,
+    "NOT_NEEDED->MISSING": 1,
     "NOT_NEEDED->NOT_NEEDED": 13,
     "NOT_NEEDED->REACHED": 1,
     "REACHED->MISSING": 1,
     "REACHED->NOT_NEEDED": 1,
     "REACHED->REACHED": 4
    },
-   "e5_strict_base": 0.5520757020757021,
-   "e5_strict_other": 0.538385225885226,
-   "diff": -0.013690476190476187,
+   "e5_strict_base": 0.5749559082892416,
+   "e5_strict_other": 0.5597442680776015,
+   "diff": -0.015211640211640207,
    "diff_ci_templates": [
-    -0.0588235294117647,
-    0.008403361344537818
+    -0.06249999999999999,
+    0.008928571428571432
    ],
-   "templates": 17
+   "templates": 16
   },
   "gemma-4-26b-a4b": {
-   "traces": 20,
+   "traces": 18,
    "without_reply": 0,
-   "milestones_both_judged": 52,
-   "agreement_three_way": 0.6923076923076923,
-   "agreement_reached_vs_not": 0.9615384615384616,
-   "kappa_three_way": 0.5011990407673861,
-   "kappa_reached_vs_not": 0.8349206349206351,
-   "reached_share_base": 0.1346153846153846,
-   "reached_share_other": 0.1346153846153846,
+   "milestones_both_judged": 45,
+   "agreement_three_way": 0.7111111111111111,
+   "agreement_reached_vs_not": 0.9555555555555556,
+   "kappa_three_way": 0.496124031007752,
+   "kappa_reached_vs_not": 0.7256097560975613,
+   "reached_share_base": 0.08888888888888889,
+   "reached_share_other": 0.08888888888888889,
    "pairs": {
-    "MISSING->MISSING": 11,
+    "MISSING->MISSING": 10,
     "MISSING->NOT_NEEDED": 2,
     "MISSING->REACHED": 1,
-    "NOT_NEEDED->MISSING": 12,
+    "NOT_NEEDED->MISSING": 9,
     "NOT_NEEDED->NOT_NEEDED": 19,
     "REACHED->MISSING": 1,
-    "REACHED->REACHED": 6
+    "REACHED->REACHED": 3
    },
-   "e5_strict_base": 0.5480357142857143,
-   "e5_strict_other": 0.552202380952381,
-   "diff": 0.004166666666666663,
+   "e5_strict_base": 0.5348544973544973,
+   "e5_strict_other": 0.5394841269841268,
+   "diff": 0.004629629629629626,
    "diff_ci_templates": [
-    -0.026315789473684223,
-    0.039473684210526314
+    -0.02777777777777779,
+    0.041666666666666664
    ],
-   "templates": 19
+   "templates": 18
   },
   "deepseek-v4.1-flash": {
-   "traces": 20,
+   "traces": 19,
    "without_reply": 0,
-   "milestones_both_judged": 41,
-   "agreement_three_way": 0.926829268292683,
-   "agreement_reached_vs_not": 0.975609756097561,
-   "kappa_three_way": 0.8250355618776672,
-   "kappa_reached_vs_not": 0.9360374414976599,
-   "reached_share_base": 0.2682926829268293,
-   "reached_share_other": 0.24390243902439024,
+   "milestones_both_judged": 39,
+   "agreement_three_way": 0.9487179487179487,
+   "agreement_reached_vs_not": 0.9743589743589743,
+   "kappa_three_way": 0.8680203045685279,
+   "kappa_reached_vs_not": 0.9304812834224598,
+   "reached_share_base": 0.2564102564102564,
+   "reached_share_other": 0.23076923076923078,
    "pairs": {
-    "MISSING->NOT_NEEDED": 2,
+    "MISSING->NOT_NEEDED": 1,
     "NOT_NEEDED->NOT_NEEDED": 28,
     "REACHED->NOT_NEEDED": 1,
-    "REACHED->REACHED": 10
+    "REACHED->REACHED": 9
    },
-   "e5_strict_base": 0.7330753968253968,
-   "e5_strict_other": 0.7164087301587301,
-   "diff": -0.01666666666666667,
+   "e5_strict_base": 0.7295530492898914,
+   "e5_strict_other": 0.7120091896407686,
+   "diff": -0.01754385964912281,
    "diff_ci_templates": [
-    -0.02380952380952381,
+    -0.025641025641025644,
     0.0
    ],
-   "templates": 14
+   "templates": 13
   },
   "qwen3-235b-a22b-2507": {
-   "traces": 20,
+   "traces": 19,
    "without_reply": 0,
-   "milestones_both_judged": 41,
-   "agreement_three_way": 0.9024390243902439,
-   "agreement_reached_vs_not": 0.975609756097561,
-   "kappa_three_way": 0.8502283105022831,
-   "kappa_reached_vs_not": 0.9315525876460767,
-   "reached_share_base": 0.21951219512195122,
-   "reached_share_other": 0.24390243902439024,
+   "milestones_both_judged": 40,
+   "agreement_three_way": 0.925,
+   "agreement_reached_vs_not": 0.975,
+   "kappa_three_way": 0.8848368522072937,
+   "kappa_reached_vs_not": 0.9310344827586207,
+   "reached_share_base": 0.225,
+   "reached_share_other": 0.25,
    "pairs": {
     "MISSING->MISSING": 16,
-    "NOT_NEEDED->MISSING": 3,
+    "NOT_NEEDED->MISSING": 2,
     "NOT_NEEDED->NOT_NEEDED": 12,
     "NOT_NEEDED->REACHED": 1,
     "REACHED->REACHED": 9
    },
-   "e5_strict_base": 0.641984126984127,
-   "e5_strict_other": 0.648234126984127,
-   "diff": 0.00625,
+   "e5_strict_base": 0.6362990810359231,
+   "e5_strict_other": 0.6428780284043443,
+   "diff": 0.006578947368421052,
    "diff_ci_templates": [
     0.0,
-    0.022058823529411766
+    0.0234375
    ],
-   "templates": 17
+   "templates": 16
   },
   "glm-5.3-flash": {
    "traces": 20,
@@ -194,58 +194,57 @@
    "templates": 19
   },
   "kimi-k3": {
-   "traces": 20,
+   "traces": 19,
    "without_reply": 0,
-   "milestones_both_judged": 41,
-   "agreement_three_way": 0.7804878048780488,
-   "agreement_reached_vs_not": 0.8292682926829268,
-   "kappa_three_way": 0.5881696428571429,
-   "kappa_reached_vs_not": 0.6137281292059218,
-   "reached_share_base": 0.3170731707317073,
-   "reached_share_other": 0.34146341463414637,
+   "milestones_both_judged": 37,
+   "agreement_three_way": 0.7567567567567568,
+   "agreement_reached_vs_not": 0.8108108108108109,
+   "kappa_three_way": 0.5641361256544504,
+   "kappa_reached_vs_not": 0.5921259842519686,
+   "reached_share_base": 0.35135135135135137,
+   "reached_share_other": 0.3783783783783784,
    "pairs": {
     "MISSING->NOT_NEEDED": 2,
     "MISSING->REACHED": 3,
-    "NOT_NEEDED->NOT_NEEDED": 22,
+    "NOT_NEEDED->NOT_NEEDED": 18,
     "NOT_NEEDED->REACHED": 1,
     "REACHED->MISSING": 1,
     "REACHED->NOT_NEEDED": 2,
     "REACHED->REACHED": 10
    },
-   "e5_strict_base": 0.7115674603174603,
-   "e5_strict_other": 0.7201190476190475,
-   "diff": 0.008551587301587293,
+   "e5_strict_base": 0.7314745196324143,
+   "e5_strict_other": 0.7404761904761905,
+   "diff": 0.0090016708437761,
    "diff_ci_templates": [
-    -0.03601190476190477,
-    0.06710069444444444
+    -0.038095238095238106,
+    0.0717195767195767
    ],
-   "templates": 16
+   "templates": 15
   },
   "gpt-5.4-mini": {
-   "traces": 20,
+   "traces": 18,
    "without_reply": 0,
-   "milestones_both_judged": 47,
-   "agreement_three_way": 0.8297872340425532,
+   "milestones_both_judged": 36,
+   "agreement_three_way": 0.9722222222222222,
    "agreement_reached_vs_not": 1.0,
-   "kappa_three_way": 0.7020602218700476,
+   "kappa_three_way": 0.9528795811518326,
    "kappa_reached_vs_not": 1.0,
-   "reached_share_base": 0.0851063829787234,
-   "reached_share_other": 0.0851063829787234,
+   "reached_share_base": 0.1111111111111111,
+   "reached_share_other": 0.1111111111111111,
    "pairs": {
-    "MISSING->MISSING": 21,
+    "MISSING->MISSING": 17,
     "MISSING->NOT_NEEDED": 1,
-    "NOT_NEEDED->MISSING": 7,
     "NOT_NEEDED->NOT_NEEDED": 14,
     "REACHED->REACHED": 4
    },
-   "e5_strict_base": 0.6592857142857143,
-   "e5_strict_other": 0.6592857142857143,
+   "e5_strict_base": 0.6908730158730159,
+   "e5_strict_other": 0.6908730158730159,
    "diff": 0.0,
    "diff_ci_templates": [
     0.0,
     0.0
    ],
-   "templates": 19
+   "templates": 17
   },
   "gemini-3.1-flash-lite": {
    "traces": 20,
@@ -302,10 +301,10 @@
   }
  },
  "pooled": {
-  "milestones": 466,
-  "agreement_three_way": 0.8154506437768241,
-  "agreement_reached_vs_not": 0.9313304721030042,
-  "kappa_three_way": 0.6928806805119168,
-  "kappa_reached_vs_not": 0.7900900900900899
+  "milestones": 424,
+  "agreement_three_way": 0.8443396226415094,
+  "agreement_reached_vs_not": 0.9245283018867925,
+  "kappa_three_way": 0.7352306702494038,
+  "kappa_reached_vs_not": 0.7778941854374019
  }
 }

@@ -109,3 +109,6 @@ civil_industrial_sources/
 # current_overleaf_project/ is a local mirror of the Overleaf project (the paper lives on Overleaf);
 # it is synced by hand or by its own git clone of the Overleaf repository, not versioned here.
 current_overleaf_project/
+
+# stand-in result files written by full_run_28092026/paper_results.py --stand-in (placeholders, never committed)
+full_run_28092026/results/stand_in/

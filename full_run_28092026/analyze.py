@@ -1,9 +1,13 @@
 """The analysis plan (ANALYSIS_PLAN.md, D-117), computed from the score store.
 
-    python -m full_run_28092026.analyze              # writes results/RESULTS.md, results.json and per_template.csv
+    python -m full_run_28092026.analyze              # writes results/RESULTS.md, results.json and per_template.csv,
+                                                     # and the matched family and exports (below)
+    python -m full_run_28092026.analyze --quick      # development: 1,000 resamples and 10,000 permutations; writes only
+                                                     # matched.json, single_path.json, providers.json and their sections
+    python -m full_run_28092026.analyze --quick --out DIR   # every output, quick, under DIR
     python -m full_run_28092026.analyze --selftest   # the statistics on synthetic data; writes nothing
 
-Reads scores/main/<model>.jsonl (score.py) for the eleven roster models, and scores/paraphrase/ and
+Reads scores/main/<model>.jsonl (score.py) for the roster models, and scores/paraphrase/ and
 scores/repeat1..3/ once those runs exist. The set-aside Qwen3.8-27B (D-132) is reported on its own
 line, outside every comparison. Nothing here reads a trace or calls a model.
 
@@ -93,6 +97,38 @@ appears, because the plan was fixed before the data and these were not in it:
     question) joins the same paired block; the flagship anchors (scores/flagship/ and scores/flagship-reasoning-*/)
     are reported on the 450-item subsample with template intervals beside the roster's eleven on the same items,
     outside the pairwise family and with no test.
+
+ADDED 2026-10-07 (WS-C1, the mock-review fixes: review 1 M4, M9a, M9d; review 2 W6, W12, W13, Q7). Each block writes
+its own file, so that results.json and RESULTS.md keep their content:
+  - The roster is the eleven plus any model results/matched_config.json names with a default store on disk (a twelfth
+    row); an entry with `run: false` or no store is skipped. The eleven keep their order, which indexes every seed.
+  - The matched-settings family, results/matched.json and results/sections/matched.md: each model at its reasoning-on
+    store where matched_config.json names one, else at its default store. On it, what Q1 and Q3 compute on the default
+    configuration, with the same functions and seeds, so a model whose rows did not change shows the same numbers in
+    both: the answer score (FAC) with its template interval, the 55 (66 with a twelfth model) sign-flip pairs with Holm
+    and the detectable difference, the compact letter display (`letters`, the insert-and-absorb display
+    paper_results.py prints), the share with no readable answer, the level means and the Easy-minus-Advanced gap
+    (Welch, Holm over the family's models, Q2's estimand), Milestone Coverage with the judge (E5-strict) and by
+    matching alone (E3) as q3_coverage computes it with their pairwise families, and the flag rates on fully solved
+    traces for every step-flag field the rows carry (`digit_flags` today) and for the router's judge. Kendall's tau
+    between the default and the matched orderings resamples templates. Per re-run model, the paired change against
+    its default rows over all items, with Q5's `paired` (item mean, template bootstrap at 95% and 90%, sign-flip over
+    templates, Holm over the re-run models, the detectable change, the ±0.05 margin of D-165) on the answer score
+    and on coverage, and the empty responses in each configuration. Also there: the E3 pairwise family on the default
+    configuration (`e3_pairs_default`), q3_coverage with the judge left out.
+  - results/single_path.json and sections/single_path.md: Q4 with its intervals, table-ready.
+  - results/providers.json and sections/providers.md: the "By serving endpoint" table, with the templates each
+    endpoint served, a flag where it served fewer than 20, and one where its matched difference rests on fewer than
+    20 (the endpoint that served nearly every row meets the others on few templates).
+  - The C1 and C4 arm block leaves out the full-set reasoning stores matched_config.json names: the matched family
+    reports them, paired over all items.
+  - Quick mode (`--quick` or ENGTRACE_QUICK=1; `set_quick()` for an importer): B = 1,000 and B_TEST = 10,000, read
+    when a test runs. Every output written under it says QUICK; it never overwrites results.json, RESULTS.md or
+    per_template.csv in results/ (`--out DIR` writes every output under DIR).
+  - For coverage_variants.py and the other scripts that import this module, with stable signatures:
+    `sign_flip_p(d, seed, draws=None)`, `holm(ps)`, `detectable_paired(d, m=1)`, `boot_mean(v, seed)`,
+    `pairwise_family(M, keys, seed_ci, seed_p, wilcoxon=False)`, `separated(pairs, key='p_holm', alpha=0.05)` and
+    `letters(order, sep)`.
 """
 from __future__ import annotations
 
@@ -102,6 +138,7 @@ import csv
 import hashlib
 import itertools
 import json
+import os
 import subprocess
 import sys
 from pathlib import Path
@@ -116,14 +153,48 @@ if str(REPO) not in sys.path:
 
 SCORES = HERE / 'scores'
 OUT = HERE / 'results'
-B = 10_000              # bootstrap draws for every interval (the plan)
-B_TEST = 100_000        # permutations / sign flips for every test (D-146; D-136 had 10,000)
+MATCHED_CONFIG = OUT / 'matched_config.json'     # run_traces.py --matched-config (WS-B)
+QUICK = os.environ.get('ENGTRACE_QUICK') == '1'  # development mode (WS-C1): fewer draws, every output says QUICK
+B = 1_000 if QUICK else 10_000          # bootstrap draws for every interval (the plan)
+B_TEST = 10_000 if QUICK else 100_000   # permutations / sign flips for every test (D-146; D-136 had 10,000)
 EQUIV_MARGIN = 0.05     # Q5's equivalence margin in answer-score points: the plan's largest detectable paired
                         # difference (5.1 points at 15% discordance), fixed 2026-10-01 after the point estimates
                         # were known and before the 90% intervals were computed (D-165)
-ROSTER = ['gpt-oss-20b', 'gemma-4-26b-a4b', 'deepseek-v4.1-flash', 'qwen3-235b-a22b-2507', 'glm-5.3-flash',
-          'glm-5.3', 'muse-glimmer-30b', 'kimi-k3', 'gpt-5.4-mini', 'gemini-3.1-flash-lite', 'claude-sonnet-5']
+# the eleven of the pre-registered run, in the order every seed below is indexed by
+ROSTER_BASE = ['gpt-oss-20b', 'gemma-4-26b-a4b', 'deepseek-v4.1-flash', 'qwen3-235b-a22b-2507', 'glm-5.3-flash',
+               'glm-5.3', 'muse-glimmer-30b', 'kimi-k3', 'gpt-5.4-mini', 'gemini-3.1-flash-lite', 'claude-sonnet-5']
 SET_ASIDE = ['qwen3.8-27b']
+STEP_FLAG_FIELDS = ('digit_flags', 'formula_flags')   # the step checks' flag fields; a field no row carries is skipped
+QUICK_NOTE = ('**QUICK**: development values, 1,000 bootstrap draws and 10,000 sign flips or permutations (the full '
+              'pass draws 10,000 and 100,000); the integration pass replaces every number here.')
+
+
+def set_quick(on: bool = True) -> None:
+    """Quick mode for development (WS-C1): 1,000 bootstrap draws and 10,000 sign flips or permutations instead of
+    10,000 and 100,000. An importing script calls this (or runs under ENGTRACE_QUICK=1) before it computes."""
+    global QUICK, B, B_TEST
+    QUICK, B, B_TEST = on, (1_000 if on else 10_000), (10_000 if on else 100_000)
+
+
+def matched_entries() -> list[dict]:
+    """results/matched_config.json's models, or nothing when the file is absent or unreadable."""
+    try:
+        return json.loads(MATCHED_CONFIG.read_text(encoding='utf-8')).get('models') or []
+    except (OSError, ValueError):
+        return []
+
+
+def roster() -> list[str]:
+    """The default configuration's models: the eleven, then any further model results/matched_config.json names with
+    rows in the main store (a twelfth row), in the file's order. An entry with `run: false` or no default store is
+    skipped, as the Qwen Thinking sibling is."""
+    extra = [e['model'] for e in matched_entries()
+             if e.get('run') is not False and e.get('default_store') == 'main' and e['model'] not in ROSTER_BASE
+             and (SCORES / 'main' / f"{e['model']}.jsonl").exists()]
+    return ROSTER_BASE + extra
+
+
+ROSTER = roster()
 # the four templates the pilot excluded for shortcuts: D-057 (two), D-046, D-066
 SHORTCUT = ['template_system_property_linearity', 'template_system_properties_memory_causality',
             'template_line_balancing_heuristic', 'template_levenspiel_plot_interpretation']
@@ -255,7 +326,10 @@ def cluster_boot(groups: dict[str, list[float]], seed: int) -> tuple[float, np.n
     return float(tot.sum() / cnt.sum()), tot[idx].sum(axis=1) / cnt[idx].sum(axis=1), int(cnt.sum())
 
 
-def sign_flip_p(d: np.ndarray, seed: int, draws: int = B_TEST) -> float:
+def sign_flip_p(d: np.ndarray, seed: int, draws: int | None = None) -> float:
+    """Two-sided sign-flip permutation test of a zero mean on paired (per-template) differences; `draws` defaults to
+    the module's B_TEST at call time, so quick mode reaches it."""
+    draws = B_TEST if draws is None else draws
     rng = np.random.default_rng(seed)
     d = d[~np.isnan(d)]
     obs = abs(d.mean())
@@ -290,9 +364,10 @@ def mcnemar_p(a: np.ndarray, b: np.ndarray) -> float:
     return 1.0 if n01 + n10 == 0 else float(stats.binomtest(n01, n01 + n10, 0.5).pvalue)
 
 
-def tier_perm_p(x: np.ndarray, is_easy: np.ndarray, seed: int, draws: int = B_TEST) -> float:
+def tier_perm_p(x: np.ndarray, is_easy: np.ndarray, seed: int, draws: int | None = None) -> float:
     """Easy minus Advanced, the tier labels shuffled among the templates of both tiers (the planned
     test, D-136; liberal under unequal variances, D-146)."""
+    draws = B_TEST if draws is None else draws
     rng = np.random.default_rng(seed)
     obs = abs(x[is_easy].mean() - x[~is_easy].mean())
     n_e = int(is_easy.sum())
@@ -304,13 +379,14 @@ def tier_perm_p(x: np.ndarray, is_easy: np.ndarray, seed: int, draws: int = B_TE
     return float((np.sum(null >= obs - 1e-12) + 1) / (draws + 1))
 
 
-def welch(xe: np.ndarray, xa: np.ndarray) -> dict:
+def welch(xe: np.ndarray, xa: np.ndarray, m: int | None = None) -> dict:
     """Welch's t-test, two-sided, and the gap detectable at 80% power: at two-sided 0.05 (the plan's
-    2.80 sigma) and at the strictest Holm step, 0.05 / 11, both from the Welch standard error."""
+    2.80 sigma) and at the strictest Holm step, 0.05 / m (the roster's size unless given), both from the
+    Welch standard error."""
     xe, xa = xe[~np.isnan(xe)], xa[~np.isnan(xa)]
     se = float(np.sqrt(xe.var(ddof=1) / len(xe) + xa.var(ddof=1) / len(xa)))
     p = float(stats.ttest_ind(xe, xa, equal_var=False).pvalue)
-    z_plain, z_holm = float(stats.norm.ppf(1 - 0.05 / 2)), float(stats.norm.ppf(1 - 0.05 / (2 * len(ROSTER))))
+    z_plain, z_holm = float(stats.norm.ppf(1 - 0.05 / 2)), float(stats.norm.ppf(1 - 0.05 / (2 * (m or len(ROSTER)))))
     return {'p_welch': p, 'se_welch': se, 'sd_easy': float(xe.std(ddof=1)), 'sd_advanced': float(xa.std(ddof=1)),
             'detectable_welch': (z_plain + Z80) * se, 'detectable_holm': (z_holm + Z80) * se}
 
@@ -335,6 +411,52 @@ def kendall_boot(S: np.ndarray, N: np.ndarray, seed: int) -> dict:
     taus = np.array([tau(rng.integers(0, T, size=T)) for _ in range(B)])
     return {'tau': float(tau(np.arange(T))), 'ci': [float(np.nanpercentile(taus, 2.5)),
                                                     float(np.nanpercentile(taus, 97.5))]}
+
+
+def pairwise_family(M: np.ndarray, keys: list[str], seed_ci: int, seed_p: int, wilcoxon: bool = False) -> list[dict]:
+    """Every pair of models on a models x templates matrix of template means (the templates every model has a value
+    on; the caller selects them): the mean per-template difference a - b, its paired template bootstrap (seed
+    seed_ci + n for the n-th pair), the sign-flip test (seed seed_p + n), Wilcoxon's signed-rank test when asked,
+    each Holm-corrected over the family, and the detectable difference at 0.05 and at the strictest Holm step.
+    q3_coverage's pairs are this with seeds 6000 and 7000 and Wilcoxon on."""
+    out = []
+    n_pairs = len(keys) * (len(keys) - 1) // 2
+    for n, (i, j) in enumerate(itertools.combinations(range(len(keys)), 2)):
+        d = M[i] - M[j]
+        o = {'a': keys[i], 'b': keys[j], 'diff': float(d.mean()), 'ci': boot_mean(d, seed_ci + n),
+             'p': sign_flip_p(d, seed_p + n)}
+        if wilcoxon:
+            o['p_wilcoxon'] = 1.0 if np.all(d == 0) else float(stats.wilcoxon(d).pvalue)
+        out.append({**o, **detectable_paired(d, n_pairs)})
+    for o, ph in zip(out, holm([p['p'] for p in out])):
+        o['p_holm'] = ph
+    if wilcoxon:
+        for o, wh in zip(out, holm([p['p_wilcoxon'] for p in out])):
+            o['p_wilcoxon_holm'] = wh
+    return out
+
+
+def separated(pairs: list[dict], key: str = 'p_holm', alpha: float = 0.05) -> set[frozenset]:
+    """The pairs of a family that differ at `alpha` on `key`, as unordered pairs of model keys."""
+    return {frozenset((p['a'], p['b'])) for p in pairs if p[key] < alpha}
+
+
+def letters(order: list[str], sep: set[frozenset]) -> dict[str, str]:
+    """A compact letter display (insert-and-absorb), the one paper_results.py prints: models that share a letter are
+    not separated. `order` sets the letters (a for the group of the first model, usually the highest score)."""
+    groups = [set(order)]
+    for pair in sorted(sep, key=lambda q: sorted(order.index(m) for m in q)):
+        a, b = sorted(pair, key=order.index)
+        new = []
+        for g in groups:
+            new += [g - {a}, g - {b}] if a in g and b in g else [g]
+        uniq = []
+        for g in new:
+            if g and g not in uniq:
+                uniq.append(g)
+        groups = [g for g in uniq if not any(g < h for h in uniq)]
+    groups.sort(key=lambda g: sorted(order.index(m) for m in g))
+    return {m: ''.join(chr(ord('a') + i) for i, g in enumerate(groups) if m in g) for m in order}
 
 
 # ------------------------------------------------------------------ the questions
@@ -506,6 +628,12 @@ def by_milestone_count(rows) -> dict:
     return out
 
 
+def store_of(store: str | dict, key: str) -> str:
+    """A model's store: `store` is one store name for every model, or a mapping from model to store (the matched
+    configuration, where each model sits at its own store)."""
+    return store[key] if isinstance(store, dict) else store
+
+
 def q3(runs, keys, store='main'):
     wrong = lambda r: r['score'] == 0.0
     wrong_answered = lambda r: wrong(r) and r['status'] == 'answered'
@@ -537,7 +665,8 @@ def q3(runs, keys, store='main'):
                     'tol1_flag_rate_on_fully_solved': t1, 'tol1_ci': t1_ci,
                     'wrong_answered': n_wrong_a, 'digit_flag_rate_on_wrong': fw, 'digit_wrong_ci': fw_ci,
                     'first_flag_position': first_flag_position(rows), 'by_milestone_count': by_milestone_count(rows),
-                    **stage_q3(rows, load_stage('e5', k, store), load_stage('router', k, store), 1100 + 10 * i)})
+                    **stage_q3(rows, load_stage('e5', k, store_of(store, k)), load_stage('router', k, store_of(store, k)),
+                               1100 + 10 * i)})
     return out
 
 
@@ -555,7 +684,7 @@ def q3_overall(runs, keys, store='main'):
                                                         lambda r: has_ms(r) and not r['unusable']), 1550 + i)
         row = {'model': k, 'traces_with_milestones': n_all, 'readable_with_milestones': n_read,
                'e3_all': e3a, 'e3_all_ci': e3a_ci, 'e3_readable': e3r, 'e3_readable_ci': e3r_ci}
-        e5 = load_stage('e5', k, store)
+        e5 = load_stage('e5', k, store_of(store, k))
         if e5:
             ok = lambda r: not (e5[r['item_id']]['sent'] and e5[r['item_id']]['reply_ok'] is False)
             val = lambda r: (e5[r['item_id']]['e5_strict'] if e5[r['item_id']]['e5_strict'] is not None
@@ -582,14 +711,15 @@ def coverage_value(r: dict, e5row: dict | None):
     return e5row['e5_strict'] if e5row.get('e5_strict') is not None else r['e3']['coverage']
 
 
-def q3_coverage(runs, templates, keys, store='main'):
+def q3_coverage(runs, templates, keys, store='main', judge: bool = True):
     """Coverage compared across models (exploratory; added 2026-10-03, D-173; next steps A1, A9, A10, A11).
     The unit is the template: each model's coverage is the mean of its template means over the templates every
     model has coverage on. Pairs: the paired template bootstrap, the sign-flip permutation test and the Wilcoxon
     signed-rank test on the per-template differences, Holm over the 55 pairs, and the detectable difference.
     Kendall's tau between the answer-score order and the coverage order resamples templates. A10 and A11 read
-    the readable traces only (an empty trace has no steps and reaches nothing)."""
-    e5 = {k: load_stage('e5', k, store) for k in keys}
+    the readable traces only (an empty trace has no steps and reaches nothing). `judge=False` leaves E5 out, so the
+    coverage is E3's, matching alone (WS-C1); `store` may map each model to its own store."""
+    e5 = {k: load_stage('e5', k, store_of(store, k)) if judge else None for k in keys}
     stage = 'E5-strict' if all(e5[k] for k in keys) else 'E3'
     vals = {k: (lambda r, _k=k: coverage_value(r, e5[_k].get(r['item_id']) if e5[_k] else None)) for k in keys}
     col = {t: j for j, t in enumerate(templates)}
@@ -638,15 +768,7 @@ def q3_coverage(runs, templates, keys, store='main'):
                        'coverage_wrong': wrong_cov, 'coverage_wrong_ci': wrong_ci, 'wrong_n': n_wrong,
                        'solved_low_coverage': low, 'solved_low_coverage_ci': low_ci,
                        'wrong_full_coverage': full, 'wrong_full_coverage_ci': full_ci})
-    pairs = []
-    n_pairs = len(keys) * (len(keys) - 1) // 2
-    for n, (i, j) in enumerate(itertools.combinations(range(len(keys)), 2)):
-        d = (C[i] - C[j])[use]
-        pw = 1.0 if np.all(d == 0) else float(stats.wilcoxon(d).pvalue)
-        pairs.append({'a': keys[i], 'b': keys[j], 'diff': float(d.mean()), 'ci': boot_mean(d, 6000 + n),
-                      'p': sign_flip_p(d, 7000 + n), 'p_wilcoxon': pw, **detectable_paired(d, n_pairs)})
-    for o, ph, wh in zip(pairs, holm([p['p'] for p in pairs]), holm([p['p_wilcoxon'] for p in pairs])):
-        o['p_holm'], o['p_wilcoxon_holm'] = ph, wh
+    pairs = pairwise_family(C[:, use], keys, 6000, 7000, wilcoxon=True)
     tau = kendall_boot(SUM[:, :, use], N[:, :, use], 8000) if len(keys) > 1 else None
     return {'stage': stage, 'templates': int(use.sum()), 'models': models, 'pairs': pairs, 'tau': tau}
 
@@ -794,10 +916,12 @@ def reasoning_arms(main, e5_main, keys) -> list[dict]:
     every scores/flagship-reasoning-<effort>/ store against the flagship arm (the same anchor at the provider's
     default); each model with paired() as Q5 uses it, McNemar on the fully-solved verdict, the level means on the
     items (descriptive), the digit rule's and the router's flag rates on fully solved traces, and the tool arm's use
-    of its tool. Holm runs over the models within an arm."""
+    of its tool. Holm runs over the models within an arm. The full-set reasoning stores results/matched_config.json
+    names are left out: the matched family reports them (WS-C1)."""
     out = []
+    matched_stores = {e['reasoning_store'] for e in matched_entries() if e.get('reasoning_store')}
     arms = [q.name for pat in ('reasoning-*', 'openbook*', 'tool', 'flagship-reasoning-*')
-            for q in sorted(SCORES.glob(pat)) if q.is_dir()]
+            for q in sorted(SCORES.glob(pat)) if q.is_dir() and q.name not in matched_stores]
     for arm in arms:
         base = 'flagship' if arm.startswith('flagship-reasoning-') else 'main'
         arm_keys = list(keys) if base == 'main' else [f.stem for f in sorted((SCORES / arm).glob('*.jsonl'))]
@@ -1166,6 +1290,526 @@ def per_template_rows(runs, keys, levels, single) -> list[dict]:
     return out
 
 
+# ------------------------------------------------------------------ the matched-settings family and the exports (WS-C1)
+
+FEW_TEMPLATES = 20      # an endpoint that served fewer templates is flagged in the endpoint export
+
+
+def matched_setup() -> dict | None:
+    """results/matched_config.json resolved: the models with a store, in roster order (the eleven first, so a model's
+    seeds are those of the default configuration), each at its reasoning store where one is named, else at its default
+    store; the entries skipped and why; the file's hash. None when the file is absent."""
+    if not MATCHED_CONFIG.exists():
+        return None
+    raw = MATCHED_CONFIG.read_bytes()
+    cfg = json.loads(raw.decode('utf-8'))
+    entries, skipped = {}, []
+    for e in cfg.get('models') or []:
+        store = e.get('reasoning_store') or e.get('default_store')
+        if e.get('run') is False or not store:
+            skipped.append({'model': e['model'], 'reason': 'run: false' if e.get('run') is False else 'no store',
+                            'sibling_of': e.get('sibling_of')})
+        elif not (SCORES / store / f"{e['model']}.jsonl").exists():
+            skipped.append({'model': e['model'], 'reason': f'no rows in scores/{store}', 'sibling_of': e.get('sibling_of')})
+        else:
+            entries[e['model']] = e
+    keys = [k for k in ROSTER if k in entries] + [k for k in entries if k not in ROSTER]
+    return {'source': MATCHED_CONFIG.relative_to(HERE).as_posix(), 'sha256': hashlib.sha256(raw).hexdigest(),
+            'generated_by': cfg.get('generated_by'), 'written_at_utc': cfg.get('written_at_utc'),
+            'effort': cfg.get('effort'), 'items': cfg.get('items'), 'keys': keys,
+            'store': {k: entries[k].get('reasoning_store') or entries[k]['default_store'] for k in keys},
+            'default_store': {k: entries[k].get('default_store') for k in keys},
+            'reasoning_store': {k: entries[k].get('reasoning_store') for k in keys},
+            'setting': {k: entries[k].get('reasoning_setting') for k in keys}, 'skipped': skipped}
+
+
+def level_gaps(runs, templates, levels, keys) -> list[dict]:
+    """Per model the level means (the mean of the level's template means, with branches_levels' template bootstrap)
+    and Q2's Easy-minus-Advanced gap as scored (templates resampled within each tier, Welch's t-test, Holm over the
+    models given), with the seeds of Q2 and branches_levels, so a model whose rows did not change keeps its numbers."""
+    tiers = np.array([levels[t] for t in templates])
+    out = []
+    for i, k in enumerate(keys):
+        S = template_matrix({k: runs[k]}, lambda r: r['score'], templates)[0]
+        row = {'model': k, 'levels': {}, 'levels_ci': {}}
+        for n, lv in enumerate(LEVELS):
+            x = S[tiers == lv]
+            if len(x):
+                row['levels'][lv] = float(x.mean())
+                row['levels_ci'][lv] = boot_mean(x, 9500 + 10 * i + n)
+        xe, xa = S[tiers == 'Easy'], S[tiers == 'Advanced']
+        w = welch(xe, xa, len(keys))
+        row.update({'gap': float(np.nanmean(xe) - np.nanmean(xa)), 'gap_ci': boot_gap(xe, xa, 400 + i),
+                    'gap_p': w['p_welch'], 'detectable_gap_holm': w['detectable_holm']})
+        out.append(row)
+    for o, ph in zip(out, holm([o['gap_p'] for o in out])):
+        o['gap_p_holm'] = ph
+    return out
+
+
+def step_flag_rates(runs, keys, q3_rows) -> dict:
+    """Per model and step-flag field the rows carry (STEP_FLAG_FIELDS: `digit_flags` today, a formula check's
+    `formula_flags` if it lands), the share of fully solved traces with a flagged step and its template interval.
+    `digit_flags` is taken from Q3 (its seeds); another field is computed here the same way."""
+    present = [f for f in STEP_FLAG_FIELDS if any(f in s for k in keys for r in runs[k].values() for s in r['steps'])]
+    out = {}
+    for i, k in enumerate(keys):
+        out[k] = {}
+        for n, f in enumerate(present):
+            if f == 'digit_flags':
+                q = q3_rows[k]
+                out[k][f] = {'rate': q['digit_flag_rate_on_fully_solved'], 'ci': q['digit_ci'], 'traces': q['fully_solved']}
+            else:
+                v, c, t = cluster_mean(per_template(runs[k].values(), lambda r, _f=f: 1.0 if any(s.get(_f) for s in r['steps']) else 0.0,
+                                                    lambda r: fully(r) == 1), 30000 + 100 * n + i)
+                out[k][f] = {'rate': v, 'ci': c, 'traces': t}
+    return out
+
+
+def pair_view(p: dict) -> dict:
+    """One pair as the shared schema has it (a, b, diff, ci, p_holm, detectable), with the raw p and the detectable
+    difference at the strictest Holm step beside them, and Wilcoxon's where the family ran it."""
+    o = {k: p[k] for k in ('a', 'b', 'diff', 'ci', 'p_holm', 'detectable')}
+    o.update({k: p[k] for k in ('p', 'detectable_holm', 'p_wilcoxon_holm') if k in p})
+    return o
+
+
+def single_path_view(r: dict) -> dict:
+    """Q4's row for one model as the export has it: all / some / none with their intervals, single-path and others."""
+    return {name: {**{c: r[src][c] for c in ('all', 'some', 'none')},
+                   'ci': {c: r[src][c + '_ci'] for c in ('all', 'some', 'none')}, 'templates': r[src]['templates']}
+            for name, src in (('single', 'single_path'), ('others', 'multi_path'))}
+
+
+def export_single_path(q4_rows: list[dict]) -> dict:
+    """results/single_path.json: Q4 per model with its intervals, the 'none' column and the others' columns."""
+    out = {'quick': QUICK}
+    for r in q4_rows:
+        out[r['model']] = single_path_view(r)
+    out['n_single'] = q4_rows[0]['single_path']['templates']
+    out['n_others'] = q4_rows[0]['multi_path']['templates']
+    return out
+
+
+def export_providers(runs, keys, store: str | None = None) -> list[dict]:
+    """results/providers.json: the endpoint table (provider_table), with the templates each endpoint served and a flag
+    where it served fewer than FEW_TEMPLATES (`few_templates`); one row per model and endpoint, models with one
+    endpoint left out as the table leaves them out. `few_matched` flags a matched difference that rests on fewer than
+    FEW_TEMPLATES templates, which also happens to the endpoint that served nearly every row when the others served
+    few templates. Each row says whether it was written in quick mode (the file is a list)."""
+    out = []
+    for k, provs in provider_table(runs, keys).items():
+        rows = list(runs[k].values())
+        for p, v in provs.items():
+            served = len({r['template_id'] for r in rows if (r.get('provider') or '?') == p})
+            row = {'model': k, 'endpoint': p, 'rows': v['rows'], 'raw_score': v['score'], 'unusable': v['unusable'],
+                   'matched_diff': v['matched_diff'], 'templates_matched': v['templates_matched'],
+                   'templates_served': served, 'few_templates': served < FEW_TEMPLATES,
+                   'few_matched': v['templates_matched'] < FEW_TEMPLATES, 'quick': QUICK}
+            if store:
+                row['store'] = store if isinstance(store, str) else store[k]
+            out.append(row)
+    return out
+
+
+def coverage_values(rows: dict, e5: dict | None) -> dict:
+    """Each trace's coverage as the headline has it (coverage_value): E5-strict with `e5` rows, E3 without."""
+    return {x: coverage_value(r, e5.get(x) if e5 else None) for x, r in rows.items()}
+
+
+def paired_changes(druns, mruns, setup, keys) -> dict:
+    """Per re-run model, its reasoning-on rows minus its default rows over every item both hold (all 2,250): Q5's
+    `paired` on the answer score (item mean, template bootstrap at 95% and 90%, sign flips over templates, the
+    detectable change, the ±0.05 margin), Holm over the re-run models; the same on coverage with the judge and by
+    matching alone over the items with milestones both values exist for; the empty and unusable responses in each.
+    `druns` maps a re-run model to its default rows."""
+    re_run = [k for k in keys if setup['reasoning_store'].get(k) and druns.get(k)]
+    out = {}
+    for i, k in enumerate(re_run):
+        ref, var = druns[k], mruns[k]
+        ids = sorted(set(ref) & set(var))
+        fam = len(re_run)
+        row = {'store': setup['reasoning_store'][k], 'default_store': setup['default_store'][k],
+               'setting': setup['setting'].get(k), **paired(ref, var, ids, lambda r: r['score'], 12000 + 10 * i, m=fam)}
+        row['fac_default'] = float(np.mean([ref[x]['score'] for x in ids]))
+        row['fac_reasoning'] = float(np.mean([var[x]['score'] for x in ids]))
+        row['change'] = row['diff']
+        for name, judge, seed in (('mc', True, 12001), ('mc_e3', False, 12002)):
+            cr = coverage_values({x: ref[x] for x in ids}, load_stage('e5', k, setup['default_store'][k]) if judge else None)
+            cv = coverage_values({x: var[x] for x in ids}, load_stage('e5', k, setup['reasoning_store'][k]) if judge else None)
+            ms = [x for x in ids if cr[x] is not None and cv[x] is not None]
+            a_ = {x: {'template_id': ref[x]['template_id'], 'v': cr[x]} for x in ms}
+            b_ = {x: {'template_id': ref[x]['template_id'], 'v': cv[x]} for x in ms}
+            d = paired(a_, b_, ms, lambda r: r['v'], seed + 10 * i, m=fam) if ms else None
+            row[name + '_change'] = d['diff'] if d else None
+            row[name + '_change_ci'] = d['ci'] if d else None
+            row[name + '_change_p'] = d['p'] if d else None
+            row[name + '_items'] = len(ms)
+        row.update({'empty_default': sum(ref[x]['status'] != 'answered' for x in ids),
+                    'empty_reasoning': sum(var[x]['status'] != 'answered' for x in ids),
+                    'unusable_default': sum(bool(ref[x]['unusable']) for x in ids),
+                    'unusable_reasoning': sum(bool(var[x]['unusable']) for x in ids)})
+        out[k] = row
+    for key, p_holm in (('p', 'p_holm'), ('mc_change_p', 'mc_change_p_holm'), ('mc_e3_change_p', 'mc_e3_change_p_holm')):
+        ks = [k for k in out if out[k][key] is not None]
+        for k, ph in zip(ks, holm([out[k][key] for k in ks]) if ks else []):
+            out[k][p_holm] = ph
+    return out
+
+
+def tau_between(druns, mruns, templates, keys, seed: int = 8100) -> dict | None:
+    """Kendall's tau between the models' answer-score orders under two configurations, templates resampled
+    (kendall_boot), over the models both configurations hold."""
+    both = [k for k in keys if druns.get(k) and mruns.get(k)]
+    if len(both) < 2:
+        return None
+    col = {t: j for j, t in enumerate(templates)}
+    S, N = np.zeros((2, len(both), len(templates))), np.zeros((2, len(both), len(templates)))
+    for m, k in enumerate(both):
+        for arm, rows in ((0, druns[k]), (1, mruns[k])):
+            for r in rows.values():
+                S[arm, m, col[r['template_id']]] += r['score']
+                N[arm, m, col[r['template_id']]] += 1
+    import warnings
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')          # a resample where every model ties leaves tau undefined
+        return {**kendall_boot(S, N, seed), 'models': len(both)}
+
+
+def matched_family(druns, mruns, templates, levels, single, setup, q1_default, cov_default, dstore: str = 'main') -> dict:
+    """The matched-settings family (WS-C1): every number Q1 and Q3 give the default configuration, on each model at
+    its matched store, with the same functions and seeds; the paired change per re-run model; Kendall's tau between
+    the two orderings; the E3 pairwise family on the default configuration. `druns` is the default configuration as
+    Q1 read it (every model of its family, from `dstore`), `mruns` every model's matched rows in `setup['keys']`'s
+    order, `setup` is matched_setup()'s; q1_default and cov_default are Q1's and q3_coverage's results on `druns`."""
+    keys, stores = setup['keys'], setup['store']
+    base = {k: (druns.get(k) if setup['default_store'][k] == dstore else load(setup['default_store'][k], k))
+            for k in keys if setup['default_store'].get(k)}
+    m1 = q1(mruns, templates, keys)
+    by1 = {r['model']: r for r in m1['models']}
+    q3m = {r['model']: r for r in q3(mruns, keys, stores)}
+    cov = q3_coverage(mruns, templates, keys, stores)
+    cov3 = q3_coverage(mruns, templates, keys, stores, judge=False)
+    byc = {r['model']: r for r in cov['models']}
+    byc3 = {r['model']: r for r in cov3['models']}
+    lg = {r['model']: r for r in level_gaps(mruns, templates, levels, keys)}
+    sp = {r['model']: r for r in q4(mruns, templates, single, keys)}
+    flags = step_flag_rates(mruns, keys, q3m)
+    order = sorted(keys, key=lambda k: -by1[k]['score'])
+    cld, cld_mc, cld_e3 = (letters(order, separated(m1['pairs'])), letters(order, separated(cov['pairs'])),
+                           letters(order, separated(cov3['pairs'])))
+    models = {}
+    for k in keys:
+        a, q, g = by1[k], q3m[k], lg[k]
+        n = a['correct'] + a['partial'] + a['incorrect'] + a['unusable']
+        reasoning = bool(setup['reasoning_store'].get(k))
+        models[k] = {
+            'store': stores[k], 'configuration': 'reasoning' if reasoning else 'default', 'setting': setup['setting'].get(k),
+            'items': n, 'fac': a['score'], 'fac_ci': a['ci'], 'letter': cld[k],
+            'fully_solved': a['fully_solved'], 'fully_ci': a['fully_ci'],
+            'all15_share': sp[k]['single_path']['all'] * sp[k]['single_path']['templates'] / len(templates)
+            + sp[k]['multi_path']['all'] * sp[k]['multi_path']['templates'] / len(templates),
+            'unreadable': a['unusable'] / n, 'no_readable_answer_n': a['unusable'], 'empty_n': a['empty'],
+            'answered_unreadable_n': a['unreadable'],
+            'mc_strict': byc[k]['coverage'], 'mc_strict_ci': byc[k]['ci'], 'mc_stage': cov['stage'], 'mc_letter': cld_mc[k],
+            'mc_e3': byc3[k]['coverage'], 'mc_e3_ci': byc3[k]['ci'], 'mc_e3_letter': cld_e3[k],
+            'judge_decided_share': q.get('e5_judged_fraction'),
+            'levels': g['levels'], 'levels_ci': g['levels_ci'], 'gap': g['gap'], 'gap_ci': g['gap_ci'], 'gap_p': g['gap_p'],
+            'gap_p_holm': g['gap_p_holm'], 'detectable_gap_holm': g['detectable_gap_holm'],
+            'digit_flag_rate': q['digit_flag_rate_on_fully_solved'], 'digit_flag_ci': q['digit_ci'],
+            'claims_per_trace': q['claims_per_trace'],
+            'router_flag_rate': q.get('router_judge_rate_on_fully_solved'), 'router_flag_ci': q.get('router_judge_ci'),
+            'router_any_flag_rate': q.get('router_rate_on_fully_solved'),
+            'flag_rates': flags[k], 'single_path': single_path_view(sp[k])}
+    dkeys = list(druns)
+    e3d = q3_coverage(druns, templates, dkeys, dstore, judge=False)
+    d_by1 = {r['model']: r for r in q1_default['models']}
+    d_order = sorted(d_by1, key=lambda k: -d_by1[k]['score'])
+    re_run = [k for k in keys if setup['reasoning_store'].get(k)]
+    stage_prov = {}
+    for s in sorted(set(stores.values()) | {dstore} | {setup['default_store'][k] for k in base}):
+        cfg_path = SCORES / s / 'CONFIG.json'
+        cfg = read_json(cfg_path) or {}
+        stage_prov[s] = {'config_sha256': hashlib.sha256(cfg_path.read_bytes()).hexdigest() if cfg_path.exists() else None,
+                         'git': cfg.get('git'), 'dirty': cfg.get('dirty'),
+                         'written_at_utc': cfg.get('written_at_utc', cfg.get('scored_at_utc')),
+                         'stages': {st: {'git': sc.get('git'), 'written_at_utc': sc.get('written_at_utc'),
+                                         'store_config_sha256': sc.get('store_config_sha256')}
+                                    for st, sc in stage_configs(s).items()}}
+    return {
+        'quick': QUICK, 'stand_in': False,
+        'config': {**{k: setup[k] for k in ('source', 'sha256', 'generated_by', 'written_at_utc', 'effort', 'items',
+                                            'skipped')},
+                   'models': [{'model': k, 'store': stores[k], 'default_store': setup['default_store'][k],
+                               'reasoning_store': setup['reasoning_store'][k], 'setting': setup['setting'][k]} for k in keys]},
+        'order': order, 'models': models,
+        'pairs': [pair_view(p) for p in m1['pairs']],
+        'mc_stage': cov['stage'], 'mc_templates': cov['templates'], 'mc_pairs': [pair_view(p) for p in cov['pairs']],
+        'mc_e3_templates': cov3['templates'], 'mc_e3_pairs': [pair_view(p) for p in cov3['pairs']],
+        'e3_default': {'templates': e3d['templates'],
+                       'models': {r['model']: {'coverage': r['coverage'], 'ci': r['ci']} for r in e3d['models']}},
+        'e3_pairs_default': [pair_view(p) for p in e3d['pairs']],
+        'paired_change': paired_changes(base, mruns, setup, keys),
+        'tau_default_vs_matched': tau_between(base, mruns, templates, keys),
+        'default': {'order': d_order, 'letters': letters(d_order, separated(q1_default['pairs'])),
+                    'mc_stage': cov_default['stage'],
+                    'mc_letters': letters(d_order, separated(cov_default['pairs'])),
+                    'e3_letters': letters(d_order, separated(e3d['pairs'])),
+                    'pairs_significant': sum(p['p_holm'] < 0.05 for p in q1_default['pairs']),
+                    'mc_pairs_significant': sum(p['p_holm'] < 0.05 for p in cov_default['pairs']),
+                    'e3_pairs_significant': sum(p['p_holm'] < 0.05 for p in e3d['pairs']),
+                    'fac': {k: d_by1[k]['score'] for k in d_order},
+                    'mc_strict': {r['model']: r['coverage'] for r in cov_default['models']}},
+        'providers_reasoning': export_providers({k: mruns[k] for k in re_run}, re_run, stores) if re_run else [],
+        'provenance': {'stores': stage_prov},
+    }
+
+
+def schema_errors(kind: str, obj) -> list[str]:
+    """What a written file lacks against the schema the WS-C1 brief shares with C4; empty when it holds."""
+    bad = []
+    is_num = lambda v: isinstance(v, (int, float)) and not isinstance(v, bool)
+    is_ci = lambda v: isinstance(v, list) and len(v) == 2 and all(is_num(x) for x in v)
+
+    def need(d, keys, where, num=(), ci=()):
+        if not isinstance(d, dict):
+            bad.append(f'{where}: not an object')
+            return
+        bad.extend(f'{where}: no {k}' for k in keys if k not in d)
+        bad.extend(f'{where}: {k} is not a number' for k in num if k in d and d[k] is not None and not is_num(d[k]))
+        bad.extend(f'{where}: {k} is not an interval' for k in ci if k in d and d[k] is not None and not is_ci(d[k]))
+    if kind == 'matched':
+        need(obj, ('quick', 'config', 'models', 'pairs', 'mc_pairs', 'e3_pairs_default', 'paired_change',
+                   'tau_default_vs_matched'), 'matched')
+        if not isinstance(obj.get('quick'), bool):
+            bad.append('matched: quick is not a boolean')
+        for k, m in (obj.get('models') or {}).items():
+            need(m, ('store', 'fac', 'fac_ci', 'letter', 'unreadable', 'mc_strict', 'mc_strict_ci', 'mc_e3', 'mc_e3_ci',
+                     'levels', 'gap', 'gap_ci', 'gap_p_holm', 'digit_flag_rate', 'router_flag_rate'), f'models.{k}',
+                 num=('fac', 'unreadable', 'mc_strict', 'mc_e3', 'gap', 'gap_p_holm', 'digit_flag_rate', 'router_flag_rate'),
+                 ci=('fac_ci', 'mc_strict_ci', 'mc_e3_ci', 'gap_ci'))
+            if isinstance(m, dict):
+                if 'letter' in m and not (isinstance(m['letter'], str) and m['letter']):
+                    bad.append(f'models.{k}: letter is empty')
+                need(m.get('levels'), LEVELS, f'models.{k}.levels', num=LEVELS)
+        n_models = len(obj.get('models') or {})
+        for fam in ('pairs', 'mc_pairs', 'e3_pairs_default'):
+            ps = obj.get(fam) or []
+            for j, p in enumerate(ps):
+                need(p, ('a', 'b', 'diff', 'ci', 'p_holm', 'detectable'), f'{fam}[{j}]', num=('diff', 'p_holm', 'detectable'),
+                     ci=('ci',))
+            if fam != 'e3_pairs_default' and len(ps) != n_models * (n_models - 1) // 2:
+                bad.append(f'{fam}: {len(ps)} pairs for {n_models} models')
+        for k, c in (obj.get('paired_change') or {}).items():
+            need(c, ('fac_default', 'fac_reasoning', 'change', 'ci', 'p_holm', 'detectable', 'ci90', 'mc_change',
+                     'empty_default', 'empty_reasoning'), f'paired_change.{k}',
+                 num=('fac_default', 'fac_reasoning', 'change', 'p_holm', 'detectable', 'mc_change'), ci=('ci', 'ci90'))
+        t = obj.get('tau_default_vs_matched')
+        if t is not None:
+            need(t, ('tau', 'ci'), 'tau_default_vs_matched', num=('tau',), ci=('ci',))
+    elif kind == 'single_path':
+        need(obj, ('quick', 'n_single', 'n_others'), 'single_path', num=('n_single', 'n_others'))
+        models = {k: v for k, v in obj.items() if k not in ('quick', 'n_single', 'n_others')}
+        if not models:
+            bad.append('single_path: no model')
+        for k, v in models.items():
+            for g in ('single', 'others'):
+                d = v.get(g) if isinstance(v, dict) else None
+                need(d, ('all', 'some', 'none', 'ci'), f'{k}.{g}', num=('all', 'some', 'none'))
+                if isinstance(d, dict) and all(is_num(d.get(c)) for c in ('all', 'some', 'none')):
+                    if abs(d['all'] + d['some'] + d['none'] - 1) > 1e-9:
+                        bad.append(f'{k}.{g}: all + some + none is not 1')
+                    need(d.get('ci'), ('all', 'some', 'none'), f'{k}.{g}.ci', ci=('all', 'some', 'none'))
+    elif kind == 'providers':
+        if not isinstance(obj, list):
+            return ['providers: not a list']
+        for j, r in enumerate(obj):
+            need(r, ('model', 'endpoint', 'rows', 'raw_score', 'unusable', 'matched_diff', 'templates_matched',
+                     'few_templates'), f'providers[{j}]', num=('rows', 'raw_score', 'unusable', 'matched_diff',
+                                                                'templates_matched'))
+            if isinstance(r, dict) and not isinstance(r.get('few_templates'), bool):
+                bad.append(f'providers[{j}]: few_templates is not a boolean')
+    else:
+        bad.append(f'no schema called {kind}')
+    return bad
+
+
+def pfmt(v) -> str:
+    return '' if v is None else '<0.0001' if v < 0.0001 else f'{v:.4f}'
+
+
+def render_matched(m: dict) -> str:
+    """results/sections/matched.md."""
+    cfg, models, d = m['config'], m['models'], m['default']
+    re_run = [k for k in m['order'] if models[k]['configuration'] == 'reasoning']
+    n_pairs, sig = len(m['pairs']), sum(p['p_holm'] < 0.05 for p in m['pairs'])
+    sig_mc = sum(p['p_holm'] < 0.05 for p in m['mc_pairs'])
+    sig_e3m = sum(p['p_holm'] < 0.05 for p in m['mc_e3_pairs'])
+    t = m['tau_default_vs_matched']
+    L = ['# Matched settings', '']
+    if m['quick']:
+        L += [QUICK_NOTE, '']
+    skipped = '; '.join(f"`{s['model']}` ({s['reason']})" for s in cfg['skipped']) or 'none'
+    L += [f"Printed by `analyze.py` (WS-C1) from `{cfg['source']}` (written {cfg['written_at_utc']}, sha256 "
+          f"`{cfg['sha256'][:12]}`): each model at its reasoning-on store where the file names one, else at its default "
+          'store. With reasoning on: ' + ', '.join(f"`{k}` ({models[k]['setting']}, `scores/{models[k]['store']}`)" for k in re_run)
+          + f'; the others at `scores/main`. Skipped: {skipped}. The functions and seeds are those of Q1, Q2 and Q3, so a '
+          'model whose rows did not change shows the numbers of the default configuration. FAC is the answer score '
+          '(correct 1, partial 0.5, incorrect or unusable 0), the mean of the 150 template means; every interval is 95% and '
+          'resamples templates. The letters are the compact letter display of the sign-flip pairs at a Holm-adjusted p '
+          'below 0.05: models that share a letter are not separated. No readable answer: empty, or answered without an '
+          f"answer the check can read. MC is Milestone Coverage, the mean of the template means over the templates every "
+          f"model has coverage on ({m['mc_templates']} with the judge, {m['mc_e3_templates']} by matching alone): with the "
+          f"judge ({m['mc_stage']}) and by matching alone (E3). Judge-decided share: the milestones sent to the judge over "
+          "those required, on answered responses. The flag rates are on fully solved responses: the arithmetic check's "
+          "flags and the step check's judge flags, template intervals.", '',
+          '| model | store | FAC | 95% CI | letter | letter, default | no readable answer | MC with the judge | 95% CI | letter | '
+          'MC by matching alone | 95% CI | judge-decided share | Easy | Intermediate | Advanced | gap | 95% CI | '
+          'Welch p (Holm) | arithmetic flags | 95% CI | calculations parsed per response | judged step flags | 95% CI |',
+          '|---|---|---:|---:|---|---|---:|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|']
+    for k in m['order']:
+        r = models[k]
+        lv = r['levels']
+        L.append(f"| `{k}`{' (reasoning on)' if r['configuration'] == 'reasoning' else ''} | {r['store']} | {r['fac']:.3f} | "
+                 f"{ci(r['fac_ci'])} | {r['letter']} | {d['letters'].get(k, '')} | {r['unreadable']:.3f} "
+                 f"({r['no_readable_answer_n']}) | {r['mc_strict']:.3f} | {ci(r['mc_strict_ci'])} | {r['mc_letter']} | "
+                 f"{r['mc_e3']:.3f} | {ci(r['mc_e3_ci'])} | {f3(r['judge_decided_share'])} | {lv['Easy']:.3f} | "
+                 f"{lv['Intermediate']:.3f} | {lv['Advanced']:.3f} | {r['gap']:+.3f} | {ci(r['gap_ci'])} | "
+                 f"{pfmt(r['gap_p_holm'])} | {f3(r['digit_flag_rate'])} | {ci(r['digit_flag_ci'])} | "
+                 f"{r['claims_per_trace']:.2f} | {f3(r['router_flag_rate'])} | "
+                 f"{ci(r['router_flag_ci']) if r['router_flag_ci'] else ''} |")
+    extra = sorted({f for r in models.values() for f in r['flag_rates']} - {'digit_flags'})
+    for f in extra:
+        L += ['', f"Flag rate of `{f}` on fully solved responses: " + '; '.join(
+            f"`{k}` {f3(models[k]['flag_rates'][f]['rate'])} ({ci(models[k]['flag_rates'][f]['ci'])})"
+            for k in m['order'] if f in models[k]['flag_rates']) + '.']
+    tiers = lambda cl: '; '.join(f"{g}: " + ', '.join(f'`{k}`' for k in m['order'] if g in cl.get(k, ''))
+                                 for g in sorted({c for v in cl.values() for c in v}))
+    L += ['', f"**Tiers.** Of the {n_pairs} pairs on FAC, {sig} differ at a Holm-adjusted p below 0.05 under the matched "
+          f"settings ({d['pairs_significant']} under the defaults). Matched settings: {tiers({k: models[k]['letter'] for k in models})}. "
+          f"Defaults: {tiers(d['letters'])}. On MC with the judge, {sig_mc} of {len(m['mc_pairs'])} pairs differ "
+          f"({d['mc_pairs_significant']} under the defaults); by matching alone {sig_e3m} ({d['e3_pairs_significant']} under "
+          'the defaults).' + (f" Kendall's tau between the default and the matched orderings on FAC: {t['tau']:.3f} (95% CI "
+                              f"{ci(t['ci'])}, templates resampled, {t['models']} models)." if t else '')]
+    pc = m['paired_change']
+    if pc:
+        L += ['', '## Paired change per re-run model', '',
+              'Reasoning-on rows minus default rows, paired by item over every item both stores hold: the item mean, the '
+              "template bootstrap at 95% and 90%, the sign-flip test over templates with Holm over the re-run models, the "
+              'smallest change the design detects at 80% power (two-sided 0.05), and the 90% interval read against the ±0.05 '
+              'margin of D-165 ("yes": the change is bounded inside it). MC changes are over the items with milestones where '
+              'both responses have a coverage value.', '',
+              '| model | setting | items | FAC default | FAC reasoning on | change | 95% CI | p (Holm) | detectable | 90% CI | '
+              'within ±0.05 | MC change with the judge (items) | 95% CI | p (Holm) | MC change by matching alone | 95% CI | '
+              'empty, default / reasoning on | no readable answer, default / reasoning on |',
+              '|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|---:|---:|---|---|']
+        for k, c in pc.items():
+            L.append(f"| `{k}` | {c['setting']} | {c['items']} | {c['fac_default']:.3f} | {c['fac_reasoning']:.3f} | "
+                     f"{c['change']:+.3f} | {ci(c['ci'])} | {pfmt(c['p_holm'])} | {f3(c['detectable'])} | {ci(c['ci90'])} | "
+                     f"{'yes' if c['within_margin'] else 'no'} | "
+                     + (f"{c['mc_change']:+.3f} ({c['mc_items']}) | {ci(c['mc_change_ci'])} | {pfmt(c.get('mc_change_p_holm'))}"
+                        if c['mc_change'] is not None else ' | | ') + ' | '
+                     + (f"{c['mc_e3_change']:+.3f} | {ci(c['mc_e3_change_ci'])}" if c['mc_e3_change'] is not None else ' | ')
+                     + f" | {c['empty_default']} / {c['empty_reasoning']} | {c['unusable_default']} / {c['unusable_reasoning']} |")
+
+    def pair_table(title, ps, note):
+        rows = ['', title, '', note, '', '| a | b | a - b | 95% CI | p (Holm) | detectable, 0.05 / Holm |',
+                '|---|---|---:|---:|---:|---:|']
+        for p in sorted(ps, key=lambda p: (p['p_holm'], -abs(p['diff']))):
+            rows.append(f"| `{p['a']}` | `{p['b']}` | {p['diff']:+.3f} | {ci(p['ci'])} | {pfmt(p['p_holm'])} | "
+                        f"{f3(p['detectable'])} / {f3(p.get('detectable_holm'))} |")
+        return rows
+    L += pair_table('## FAC pairs, matched settings', m['pairs'],
+                    f"The sign-flip permutation test on the {len(m['order'])} models' per-template differences, Holm over the "
+                    f"{n_pairs} pairs.")
+    L += pair_table('## MC pairs with the judge, matched settings', m['mc_pairs'],
+                    f"As Q3's coverage pairs: {m['mc_stage']} template means over {m['mc_templates']} templates, sign flips, "
+                    'Holm over the pairs.')
+    L += pair_table('## MC pairs by matching alone, default configuration', m['e3_pairs_default'],
+                    f"E3 coverage (matching alone, the judge left out) on the default configuration, template means over "
+                    f"{m['e3_default']['templates']} templates, sign flips, Holm over the pairs: the family Q3 runs on "
+                    'E5-strict. Per model: ' + '; '.join(f"`{k}` {v['coverage']:.3f} ({ci(v['ci'])})"
+                                                          for k, v in sorted(m['e3_default']['models'].items(),
+                                                                             key=lambda kv: -kv[1]['coverage'])) + '.')
+    if m['providers_reasoning']:
+        L += ['', '## Serving endpoints of the reasoning-on stores', '',
+              'As the default configuration\'s endpoint table (`providers.json`), for the re-run models served by more than '
+              'one endpoint.', '',
+              '| model | store | endpoint | rows | raw score | unusable | matched difference | templates matched | '
+              'templates served |', '|---|---|---|---:|---:|---:|---:|---:|---:|']
+        for r in m['providers_reasoning']:
+            md = '' if r['matched_diff'] is None else f"{r['matched_diff']:+.3f}"
+            L.append(f"| `{r['model']}` | {r['store']} | {r['endpoint']} | {r['rows']} | {r['raw_score']:.3f} | "
+                     f"{r['unusable']:.3f} | {md} | {r['templates_matched']} | {r['templates_served']} |")
+    return '\n'.join(L) + '\n'
+
+
+def render_single_path(sp: dict) -> str:
+    """results/sections/single_path.md."""
+    models = {k: v for k, v in sp.items() if k not in ('quick', 'n_single', 'n_others')}
+    L = ['# Consistency within a template: single-path and other templates', '']
+    if sp['quick']:
+        L += [QUICK_NOTE, '']
+    L += [f"Printed by `analyze.py` (WS-C1) from Q4, default configuration (`scores/main`). Per model, the share of the "
+          f"{sp['n_single']} single-path templates (one reasoning path across their instances, `diversity.py`'s lower "
+          f"reading) fully solved on all 15 instances, on some and on none, and the same for the {sp['n_others']} others; "
+          '95% intervals, templates resampled.', '',
+          '| model | single: all | 95% CI | some | 95% CI | none | 95% CI | others: all | 95% CI | some | 95% CI | none | 95% CI |',
+          '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|']
+    for k, v in sorted(models.items(), key=lambda kv: -kv[1]['single']['all']):
+        s, o = v['single'], v['others']
+        L.append(f"| `{k}` | " + ' | '.join(f"{g[c]:.3f} | {ci(g['ci'][c])}" for g in (s, o) for c in ('all', 'some', 'none'))
+                 + ' |')
+    nones = [v[g]['none'] for v in models.values() for g in ('single', 'others')]
+    L += ['', f"The \"none\" column (templates no instance of which the model fully solves) ranges from {min(nones):.3f} to "
+          f"{max(nones):.3f} over the models and both groups."]
+    return '\n'.join(L) + '\n'
+
+
+def render_providers(pv: list[dict]) -> str:
+    """results/sections/providers.md."""
+    L = ['# By serving endpoint', '']
+    if pv and pv[0]['quick']:
+        L += [QUICK_NOTE, '']
+    L += ['Printed by `analyze.py` (WS-C1) from the default configuration (`scores/main`), the table of RESULTS.md\'s '
+          '"By serving endpoint" (D-133, D-149) with the templates each endpoint served. Open-weight models were served by '
+          'several endpoints under the fp8-or-better rule; the harness dispatches items in template order and OpenRouter '
+          'falls back under load, so a raw per-endpoint mean is confounded with the templates each endpoint happened to '
+          'serve. The matched difference compares an endpoint with the other endpoints of the same model on the same '
+          f'templates. Two flags: the endpoint served fewer than {FEW_TEMPLATES} templates; its matched difference rests on '
+          f'fewer than {FEW_TEMPLATES} templates, which also happens to the endpoint that served nearly every row when the '
+          'others served few templates. Models served by one endpoint are not listed.', '',
+          '| model | endpoint | rows | raw score | unusable | matched difference | templates matched | templates served | '
+          f'served fewer than {FEW_TEMPLATES} | matched on fewer than {FEW_TEMPLATES} |',
+          '|---|---|---:|---:|---:|---:|---:|---:|---|---|']
+    for r in pv:
+        md = '' if r['matched_diff'] is None else f"{r['matched_diff']:+.3f}"
+        L.append(f"| `{r['model']}` | {r['endpoint']} | {r['rows']} | {r['raw_score']:.3f} | {r['unusable']:.3f} | {md} | "
+                 f"{r['templates_matched']} | {r['templates_served']} | {'yes' if r['few_templates'] else ''} | "
+                 f"{'yes' if r['few_matched'] else ''} |")
+    big = [r for r in pv if not r['few_matched'] and r['matched_diff'] is not None]
+    if big:
+        lo, hi = min(r['matched_diff'] for r in big), max(r['matched_diff'] for r in big)
+        L += ['', f"Over the {len(big)} endpoints whose matched difference rests on at least {FEW_TEMPLATES} templates, "
+              f"it lies between {lo:+.3f} and {hi:+.3f} (largest absolute value {max(abs(lo), abs(hi)):.3f}); of the other "
+              f"{len(pv) - len(big)}, {sum(r['few_templates'] for r in pv)} served fewer than {FEW_TEMPLATES} templates."]
+    return '\n'.join(L) + '\n'
+
+
+def write_exports(out: Path, exports: dict) -> list[Path]:
+    """Each export as <name>.json and sections/<name>.md under `out`, after its schema check."""
+    (out / 'sections').mkdir(parents=True, exist_ok=True)
+    written = []
+    for name, (obj, text) in exports.items():
+        errs = schema_errors(name, obj)
+        if errs:
+            raise SystemExit(f'{name}.json does not hold its schema: {errs[:10]}')
+        for p, body in ((out / f'{name}.json', json.dumps(obj, indent=1) + '\n'), (out / 'sections' / f'{name}.md', text)):
+            p.write_text(body, encoding='utf-8', newline='\n')
+            written.append(p)
+    return written
+
+
 # ------------------------------------------------------------------ provenance
 
 def git(*args) -> str:
@@ -1193,8 +1837,16 @@ def provenance(store: str) -> dict:
                        'dirty': bool(git('status', '--porcelain', '--', me.relative_to(REPO).as_posix())),
                        'sha256_lf': hashlib.sha256(me.read_bytes().replace(b'\r\n', b'\n')).hexdigest(),
                        'B': B, 'B_TEST': B_TEST},
-           'store': {'name': store, **(cfg or {})}, 'stages': {}}
+           'store': {'name': store, **(cfg or {})}, 'stages': stage_configs(store)}
+    return out
+
+
+def stage_configs(store: str) -> dict:
+    """Each stage's CONFIG for a store, checked against the digest of the store CONFIG it was built from (D-144);
+    stops when a stage was built from another score store than the one on disk."""
+    cfg_path = SCORES / store / 'CONFIG.json'
     digest = hashlib.sha256(cfg_path.read_bytes()).hexdigest() if cfg_path.exists() else None
+    out = {}
     for stage in ('e5', 'router'):
         sc = read_json(SCORES / store / stage / 'CONFIG.json')
         if sc is None:
@@ -1202,7 +1854,7 @@ def provenance(store: str) -> dict:
         if sc.get('store_config_sha256') and sc['store_config_sha256'] != digest:
             raise SystemExit(f'scores/{store}/{stage} was built from another score store than the one on disk: '
                              f'run `{"judge" if stage == "e5" else "router"} --score` to rebuild its rows first')
-        out['stages'][stage] = sc
+        out[stage] = sc
     return out
 
 
@@ -1761,9 +2413,15 @@ def main() -> int:
     ap.add_argument('--store', default='main',
                     help='the scores/ directory to read; another one is written as a labelled record')
     ap.add_argument('--note', default='', help='a line saying what that other store is')
+    ap.add_argument('--quick', action='store_true',
+                    help='1,000 resamples and 10,000 permutations (also ENGTRACE_QUICK=1); every output says QUICK, and '
+                         'results.json, RESULTS.md and per_template.csv are written only under --out')
+    ap.add_argument('--out', default=None, help='write every output under this directory instead of results/')
     a = ap.parse_args()
     if a.selftest:
         return selftest()
+    if a.quick:
+        set_quick(True)
     runs = {k: load(a.store, k) for k in ROSTER}
     missing = [k for k, v in runs.items() if v is None]
     if missing:
@@ -1788,20 +2446,56 @@ def main() -> int:
            'repeats': repeats(runs, ROSTER) if a.store == 'main' else {},
            'set_aside': set_aside(a.store), 'milestones': milestone_facts(runs[ROSTER[0]].values()),
            'symbolic_templates': sorted(symbolic), 'provenance': pv}
-    out = OUT if a.store == 'main' else OUT / a.store
+    if QUICK:
+        res['quick'] = True
+    out = Path(a.out).resolve() if a.out else (OUT if a.store == 'main' else OUT / a.store)
     out.mkdir(parents=True, exist_ok=True)
-    (out / 'results.json').write_text(json.dumps(res, indent=1) + '\n', encoding='utf-8', newline='\n')
-    rows = per_template_rows(runs, ROSTER, levels, single)
-    with open(out / 'per_template.csv', 'w', encoding='utf-8', newline='') as fh:
-        w = csv.DictWriter(fh, fieldnames=list(rows[0]))
-        w.writeheader()
-        w.writerows(rows)
-    text = render(res)
-    if a.store != 'main':
-        text = text.replace('\n', f'\n\n**A record, not the results:** computed from `scores/{a.store}`. {a.note}\n', 1)
-    (out / 'RESULTS.md').write_text(text, encoding='utf-8', newline='\n')
-    print(text)
+    written, text = [], None
+    if not QUICK or a.out:           # quick mode never overwrites the results other sessions read
+        (out / 'results.json').write_text(json.dumps(res, indent=1) + '\n', encoding='utf-8', newline='\n')
+        rows = per_template_rows(runs, ROSTER, levels, single)
+        with open(out / 'per_template.csv', 'w', encoding='utf-8', newline='') as fh:
+            w = csv.DictWriter(fh, fieldnames=list(rows[0]))
+            w.writeheader()
+            w.writerows(rows)
+        text = render(res)
+        if a.store != 'main':
+            text = text.replace('\n', f'\n\n**A record, not the results:** computed from `scores/{a.store}`. {a.note}\n', 1)
+        if QUICK:
+            text = text.replace('\n', f'\n\n{QUICK_NOTE}\n', 1)
+        (out / 'RESULTS.md').write_text(text, encoding='utf-8', newline='\n')
+        written += [out / 'results.json', out / 'per_template.csv', out / 'RESULTS.md']
+    if a.store == 'main':
+        written += write_exports(out, exports(runs, templates, levels, single, res, a.store))
+    if hasattr(sys.stdout, 'reconfigure'):     # a console or a redirected stream on Windows may lack the minus sign
+        sys.stdout.reconfigure(errors='replace')
+    if text and not QUICK:
+        print(text)
+    print(('QUICK: ' if QUICK else '') + 'written: ' + ', '.join(p.relative_to(out).as_posix() for p in written)
+          + f' (under {out})')
     return 0
+
+
+def exports(runs, templates, levels, single, res, store: str = 'main') -> dict:
+    """The WS-C1 files, name -> (object, Markdown section): the matched family when results/matched_config.json is
+    there, the single-path table and the endpoint table. The matched stores must hold the default store's items."""
+    out = {}
+    setup = matched_setup()
+    if setup:
+        mruns = {k: (runs[k] if setup['store'][k] == store and k in runs else load(setup['store'][k], k))
+                 for k in setup['keys']}
+        check_store(mruns)
+        ref = set(next(iter(runs.values())))
+        off = [k for k, rows in mruns.items() if set(rows) != ref]
+        if off:
+            raise SystemExit(f'matched stores hold another item set than scores/{store}: {off}')
+        mf = matched_family(runs, mruns, templates, levels, single, setup, res['q1'], res['q3_coverage'], store)
+        out['matched'] = (mf, render_matched(mf))
+    sp = export_single_path(res['q4'])
+    out['single_path'] = (sp, render_single_path(sp))
+    pv = export_providers(runs, list(runs))
+    out['providers'] = (pv, render_providers(pv))
+    return out
 
 
 # ------------------------------------------------------------------ self-test
@@ -1976,8 +2670,96 @@ def selftest() -> int:
     if set(blr['branch']) != {'b1', 'b2'} or len(blr['pairs']) != 1 or blr['branch']['b1']['templates'] != 30 \
             or not (0 <= blr['pairs'][0]['p_holm'] <= 1) or set(blr['level']) != set(LEVELS):
         bad.append(f'branches_levels {blr}')
+    bad += selftest_c1(rng)
     print('selftest:', 'all pass' if not bad else bad)
     return 1 if bad else 0
+
+
+def selftest_c1(rng) -> list[str]:
+    """WS-C1's additions on synthetic data: the letter display, the pairwise family, quick mode, and the matched family
+    and both exports against their schemas. Writes nothing."""
+    import warnings
+    bad = []
+    lt = letters(['a', 'b', 'c'], {frozenset(('a', 'c'))})
+    if lt != {'a': 'a', 'b': 'ab', 'c': 'b'} or letters(['a', 'b'], set()) != {'a': 'a', 'b': 'a'}:
+        bad.append(f'letters {lt}')
+    x0 = np.full(40, 0.9) + rng.normal(0, 0.01, 40)
+    pf = pairwise_family(np.vstack([x0, x0.copy(), np.full(40, 0.5) + rng.normal(0, 0.01, 40)]), ['x', 'y', 'z'], 100, 200,
+                         wilcoxon=True)
+    if separated(pf) != {frozenset(('x', 'z')), frozenset(('y', 'z'))} or pf[0]['p'] != 1.0 or pf[0]['p_wilcoxon'] != 1.0 \
+            or any('p_wilcoxon_holm' not in p or 'detectable_holm' not in p for p in pf):
+        bad.append(f"pairwise family {[(p['a'], p['b'], p['p_holm']) for p in pf]}")
+    was = QUICK
+    set_quick(True)
+    shift = rng.normal(5, 1, 150)
+    if (B, B_TEST) != (1_000, 10_000) or abs(sign_flip_p(shift, 9) - 1 / 10_001) > 1e-12:
+        bad.append(f'quick mode: B {B}, B_TEST {B_TEST}, sign flips not drawn at the quick count')
+    set_quick(was)
+    if B_TEST != (10_000 if was else 100_000) or abs(sign_flip_p(shift, 9) - 1 / (B_TEST + 1)) > 1e-12:
+        bad.append('quick mode did not switch back')
+    # two configurations of three models over 20 templates of 15 items: m0 re-run (0.5 -> 0.9 solved), m1 and m2 the same
+    keys = ['m0', 'm1', 'm2']
+    lv_of = lambda t: 'Easy' if t < 8 else 'Intermediate' if t < 14 else 'Advanced'
+    druns, mruns = {k: {} for k in keys}, {k: {} for k in keys}
+    for t in range(20):
+        for n in range(15):
+            for k, p_def, p_re in (('m0', 0.5, 0.9), ('m1', 0.7, 0.7), ('m2', 0.6, 0.6)):
+                d_sc = float(rng.random() < p_def)
+                r_sc = float(rng.random() < p_re) if k == 'm0' else d_sc
+                for runs_, sc, prov in ((druns, d_sc, 'p' if n % 3 else 'q'), (mruns, r_sc, 'p' if n % 2 else 'r')):
+                    r = fake(f's{t:02d}', n, sc, level=lv_of(t), single=t % 2 == 0, provider=prov)
+                    r['e3'] = {'coverage': 0.4 + 0.5 * sc, 'null_coverage': 0.1}
+                    r['steps'] = [{'digit_flags': int(n == 0), 'tol1_flags': 0, 'claims': 2}]
+                    runs_[k][r['item_id']] = r
+    mruns['m0']['s00-1'].update(status='empty', unusable=True, score=0.0)
+    templates = sorted({r['template_id'] for r in druns['m0'].values()})
+    levels = {t: lv_of(int(t[1:])) for t in templates}
+    single = {t: int(t[1:]) % 2 == 0 for t in templates}
+    setup = {'source': 'selftest', 'sha256': '0' * 64, 'generated_by': None, 'written_at_utc': None, 'effort': 'medium',
+             'items': 300, 'keys': keys, 'store': {'m0': 'no-such-reasoning', 'm1': 'no-such-default', 'm2': 'no-such-default'},
+             'default_store': {k: 'no-such-default' for k in keys},
+             'reasoning_store': {'m0': 'no-such-reasoning', 'm1': None, 'm2': None},
+             'setting': {'m0': 'effort=medium', 'm1': 'reasons by default', 'm2': 'none offered'},
+             'skipped': [{'model': 'm3', 'reason': 'run: false', 'sibling_of': 'm2'}]}
+    with warnings.catch_warnings():
+        warnings.simplefilter('ignore')
+        q1d = q1(druns, templates, keys)
+        covd = q3_coverage(druns, templates, keys, 'no-such-default')
+        mf = matched_family(druns, mruns, templates, levels, single, setup, q1d, covd, dstore='no-such-default')
+    errs = schema_errors('matched', mf)
+    if errs:
+        bad.append(f'matched schema: {errs[:5]}')
+    d1 = {r['model']: r for r in q1d['models']}
+    same = all(mf['models'][k]['fac'] == d1[k]['score'] and mf['models'][k]['fac_ci'] == d1[k]['ci'] for k in ('m1', 'm2'))
+    pc = mf['paired_change'].get('m0') or {}
+    if not same or set(mf['paired_change']) != {'m0'} or not (0.3 < pc.get('change', 0) < 0.5) or not pc['p_holm'] < 0.05 \
+            or pc['within_margin'] or pc['empty_reasoning'] != 1 or pc['empty_default'] != 0 or pc['items'] != 300:
+        bad.append(f"matched family: unchanged models {same}, change {pc.get('change')}, p {pc.get('p_holm')}")
+    if mf['models']['m0']['letter'] != 'a' or mf['order'][0] != 'm0' or mf['models']['m0']['configuration'] != 'reasoning' \
+            or not (mf['tau_default_vs_matched']['tau'] < 1) or len(mf['pairs']) != 3 or mf['mc_stage'] != 'E3':
+        bad.append(f"matched family: letters {[(k, v['letter']) for k, v in mf['models'].items()]}, "
+                   f"tau {mf['tau_default_vs_matched']}")
+    broken = json.loads(json.dumps(mf))
+    del broken['models']['m1']['letter']
+    broken['pairs'][0]['ci'] = [0.1]
+    if len(schema_errors('matched', broken)) != 2 or not schema_errors('matched', {}):
+        bad.append('the matched schema check missed a missing letter or a broken interval')
+    if '# Matched settings' not in render_matched(mf) or '## Paired change per re-run model' not in render_matched(mf):
+        bad.append('matched section')
+    sp = export_single_path(q4(druns, templates, single, keys))
+    if schema_errors('single_path', sp) or sp['n_single'] != 10 or sp['n_others'] != 10 or 'none' not in render_single_path(sp):
+        bad.append(f"single-path export {schema_errors('single_path', sp)[:5]}")
+    pv = export_providers(mruns, keys)
+    few = {(r['model'], r['endpoint']): r['few_templates'] for r in pv}
+    if schema_errors('providers', pv) or few.get(('m1', 'r')) is not False or len(pv) != 6:
+        bad.append(f"provider export {schema_errors('providers', pv)[:5]} {few}")
+    # endpoint q serves 3 of 30 templates; p serves all 30 but meets q on only those 3
+    pv_few = export_providers({'m': {f'w{t}-{n}': fake(f'w{t}', n, 1.0, provider='q' if t < 3 and n == 0 else 'p')
+                                     for t in range(30) for n in range(2)}}, ['m'])
+    flags_few = {r['endpoint']: (r['templates_served'], r['few_templates'], r['few_matched']) for r in pv_few}
+    if flags_few != {'p': (30, False, True), 'q': (3, True, True)} or 'fewer than' not in render_providers(pv_few):
+        bad.append(f'provider export, the few-templates flags {flags_few}')
+    return bad
 
 
 if __name__ == '__main__':

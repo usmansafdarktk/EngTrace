@@ -63,6 +63,14 @@ def variant_manifest(variant: str, man: dict) -> dict[str, dict]:
     pool before, which counted the other 1,950 as missing), the passing paraphrases for the paraphrase
     arm (with the original's hash beside each)."""
     from full_run_28092026 import subsamples
+    from full_run_28092026 import run_traces
+    if variant == run_traces.FULL_REASONING:                 # the matched-settings run: every pool item
+        return man
+    if variant in run_traces.CASCADE_REPEATS:                # the cascade repeats: the 300 repeat items
+        return {i: man[i] for i in subsamples.repeat_ids()}
+    if variant == run_traces.CASCADE_PARAPHRASE:             # the cascade paraphrases: the kept pairs, as the harness runs them
+        keep = run_traces.kept_pairs()
+        return {i: r for i, r in variant_manifest('paraphrase', man).items() if i in keep}
     if variant in subsamples.REPEAT_VARIANTS:
         return {i: man[i] for i in subsamples.repeat_ids()}
     if variant.startswith('reasoning-') or variant.startswith('flagship') or variant == 'tool':   # C1, C3, C4 tool: the subsample's originals

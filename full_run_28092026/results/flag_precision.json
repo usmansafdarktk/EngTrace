@@ -1,0 +1,537 @@
+{
+ "quick": true,
+ "generated_by": "python -m full_run_28092026.flag_precision --quick",
+ "written_at_utc": "2026-10-07T15:18:52+00:00",
+ "resamples": 1000,
+ "stores": {
+  "main": {
+   "models": {
+    "gpt-oss-20b": {
+     "flags": 403,
+     "carried_precision": 0,
+     "other": 403,
+     "other_truncated": 42,
+     "other_no_upstream": 257,
+     "other_not_reproduced": 104,
+     "share_carried": 0.0,
+     "share_ci": [
+      0.0,
+      0.0
+     ],
+     "stored_flags": 403,
+     "correct_answers": 1800,
+     "responses_flagged": 266,
+     "steps_walked": 2122,
+     "unverified_steps": 0,
+     "unverified_responses": 0
+    },
+    "gemma-4-26b-a4b": {
+     "flags": 486,
+     "carried_precision": 0,
+     "other": 486,
+     "other_truncated": 67,
+     "other_no_upstream": 298,
+     "other_not_reproduced": 121,
+     "share_carried": 0.0,
+     "share_ci": [
+      0.0,
+      0.0
+     ],
+     "stored_flags": 486,
+     "correct_answers": 1916,
+     "responses_flagged": 255,
+     "steps_walked": 1180,
+     "unverified_steps": 0,
+     "unverified_responses": 0
+    },
+    "deepseek-v4.1-flash": {
+     "flags": 12,
+     "carried_precision": 0,
+     "other": 12,
+     "other_truncated": 1,
+     "other_no_upstream": 10,
+     "other_not_reproduced": 1,
+     "share_carried": 0.0,
+     "share_ci": [
+      0.0,
+      0.0
+     ],
+     "stored_flags": 12,
+     "correct_answers": 2193,
+     "responses_flagged": 12,
+     "steps_walked": 54,
+     "unverified_steps": 0,
+     "unverified_responses": 0
+    },
+    "qwen3-235b-a22b-2507": {
+     "flags": 1257,
+     "carried_precision": 4,
+     "other": 1253,
+     "other_truncated": 150,
+     "other_no_upstream": 640,
+     "other_not_reproduced": 463,
+     "share_carried": 0.0031821797931583136,
+     "share_ci": [
+      0.0007185650448835401,
+      0.006216332872928176
+     ],
+     "stored_flags": 1257,
+     "correct_answers": 1954,
+     "responses_flagged": 455,
+     "steps_walked": 4865,
+     "unverified_steps": 0,
+     "unverified_responses": 0
+    },
+    "glm-5.3-flash": {
+     "flags": 51,
+     "carried_precision": 0,
+     "other": 51,
+     "other_truncated": 6,
+     "other_no_upstream": 27,
+     "other_not_reproduced": 18,
+     "share_carried": 0.0,
+     "share_ci": [
+      0.0,
+      0.0
+     ],
+     "stored_flags": 51,
+     "correct_answers": 2179,
+     "responses_flagged": 42,
+     "steps_walked": 294,
+     "unverified_steps": 0,
+     "unverified_responses": 0
+    },
+    "glm-5.3": {
+     "flags": 40,
+     "carried_precision": 1,
+     "other": 39,
+     "other_truncated": 6,
+     "other_no_upstream": 29,
+     "other_not_reproduced": 4,
+     "share_carried": 0.025,
+     "share_ci": [
+      0.0,
+      0.07900071123755328
+     ],
+     "stored_flags": 40,
+     "correct_answers": 2122,
+     "responses_flagged": 39,
+     "steps_walked": 265,
+     "unverified_steps": 0,
+     "unverified_responses": 0
+    },
+    "muse-glimmer-30b": {
+     "flags": 148,
+     "carried_precision": 3,
+     "other": 145,
+     "other_truncated": 27,
+     "other_no_upstream": 92,
+     "other_not_reproduced": 26,
+     "share_carried": 0.02027027027027027,
+     "share_ci": [
+      0.0,
+      0.045168621700879756
+     ],
+     "stored_flags": 148,
+     "correct_answers": 2170,
+     "responses_flagged": 128,
+     "steps_walked": 501,
+     "unverified_steps": 0,
+     "unverified_responses": 0
+    },
+    "kimi-k3": {
+     "flags": 17,
+     "carried_precision": 0,
+     "other": 17,
+     "other_truncated": 1,
+     "other_no_upstream": 14,
+     "other_not_reproduced": 2,
+     "share_carried": 0.0,
+     "share_ci": [
+      0.0,
+      0.0
+     ],
+     "stored_flags": 17,
+     "correct_answers": 2179,
+     "responses_flagged": 15,
+     "steps_walked": 68,
+     "unverified_steps": 0,
+     "unverified_responses": 0
+    },
+    "gpt-5.4-mini": {
+     "flags": 390,
+     "carried_precision": 1,
+     "other": 389,
+     "other_truncated": 46,
+     "other_no_upstream": 260,
+     "other_not_reproduced": 83,
+     "share_carried": 0.002564102564102564,
+     "share_ci": [
+      0.0,
+      0.008572042570609905
+     ],
+     "stored_flags": 390,
+     "correct_answers": 1882,
+     "responses_flagged": 271,
+     "steps_walked": 1513,
+     "unverified_steps": 0,
+     "unverified_responses": 0
+    },
+    "gemini-3.1-flash-lite": {
+     "flags": 183,
+     "carried_precision": 0,
+     "other": 183,
+     "other_truncated": 28,
+     "other_no_upstream": 130,
+     "other_not_reproduced": 25,
+     "share_carried": 0.0,
+     "share_ci": [
+      0.0,
+      0.0
+     ],
+     "stored_flags": 183,
+     "correct_answers": 1945,
+     "responses_flagged": 138,
+     "steps_walked": 547,
+     "unverified_steps": 0,
+     "unverified_responses": 0
+    },
+    "claude-sonnet-5": {
+     "flags": 428,
+     "carried_precision": 2,
+     "other": 426,
+     "other_truncated": 24,
+     "other_no_upstream": 234,
+     "other_not_reproduced": 168,
+     "share_carried": 0.004672897196261682,
+     "share_ci": [
+      0.0,
+      0.012049651390063887
+     ],
+     "stored_flags": 428,
+     "correct_answers": 2193,
+     "responses_flagged": 314,
+     "steps_walked": 2018,
+     "unverified_steps": 0,
+     "unverified_responses": 0
+    }
+   },
+   "all": {
+    "flags": 3415,
+    "carried_precision": 11,
+    "other": 3404,
+    "other_truncated": 398,
+    "other_no_upstream": 1991,
+    "other_not_reproduced": 1015,
+    "stored_flags": 3415,
+    "unverified_steps": 0,
+    "share_carried": 0.00322108345534407
+   }
+  },
+  "reasoning-medium-full": {
+   "models": {
+    "gemma-4-26b-a4b": {
+     "flags": 347,
+     "carried_precision": 0,
+     "other": 347,
+     "other_truncated": 27,
+     "other_no_upstream": 223,
+     "other_not_reproduced": 97,
+     "share_carried": 0.0,
+     "share_ci": [
+      0.0,
+      0.0
+     ],
+     "stored_flags": 347,
+     "correct_answers": 2073,
+     "responses_flagged": 208,
+     "steps_walked": 866,
+     "unverified_steps": 0,
+     "unverified_responses": 0
+    },
+    "gpt-5.4-mini": {
+     "flags": 186,
+     "carried_precision": 1,
+     "other": 185,
+     "other_truncated": 23,
+     "other_no_upstream": 117,
+     "other_not_reproduced": 45,
+     "share_carried": 0.005376344086021506,
+     "share_ci": [
+      0.0,
+      0.016135642517186667
+     ],
+     "stored_flags": 186,
+     "correct_answers": 2143,
+     "responses_flagged": 162,
+     "steps_walked": 703,
+     "unverified_steps": 0,
+     "unverified_responses": 0
+    },
+    "gemini-3.1-flash-lite": {
+     "flags": 187,
+     "carried_precision": 1,
+     "other": 186,
+     "other_truncated": 24,
+     "other_no_upstream": 121,
+     "other_not_reproduced": 41,
+     "share_carried": 0.0053475935828877,
+     "share_ci": [
+      0.0,
+      0.017762237762237752
+     ],
+     "stored_flags": 187,
+     "correct_answers": 2027,
+     "responses_flagged": 142,
+     "steps_walked": 455,
+     "unverified_steps": 0,
+     "unverified_responses": 0
+    }
+   },
+   "all": {
+    "flags": 720,
+    "carried_precision": 2,
+    "other": 718,
+    "other_truncated": 74,
+    "other_no_upstream": 461,
+    "other_not_reproduced": 183,
+    "stored_flags": 720,
+    "unverified_steps": 0,
+    "share_carried": 0.002777777777777778
+   }
+  }
+ },
+ "models": {
+  "gpt-oss-20b": {
+   "flags": 403,
+   "carried_precision": 0,
+   "other": 403,
+   "other_truncated": 42,
+   "other_no_upstream": 257,
+   "other_not_reproduced": 104,
+   "share_carried": 0.0,
+   "share_ci": [
+    0.0,
+    0.0
+   ],
+   "stored_flags": 403,
+   "correct_answers": 1800,
+   "responses_flagged": 266,
+   "steps_walked": 2122,
+   "unverified_steps": 0,
+   "unverified_responses": 0
+  },
+  "gemma-4-26b-a4b": {
+   "flags": 486,
+   "carried_precision": 0,
+   "other": 486,
+   "other_truncated": 67,
+   "other_no_upstream": 298,
+   "other_not_reproduced": 121,
+   "share_carried": 0.0,
+   "share_ci": [
+    0.0,
+    0.0
+   ],
+   "stored_flags": 486,
+   "correct_answers": 1916,
+   "responses_flagged": 255,
+   "steps_walked": 1180,
+   "unverified_steps": 0,
+   "unverified_responses": 0
+  },
+  "deepseek-v4.1-flash": {
+   "flags": 12,
+   "carried_precision": 0,
+   "other": 12,
+   "other_truncated": 1,
+   "other_no_upstream": 10,
+   "other_not_reproduced": 1,
+   "share_carried": 0.0,
+   "share_ci": [
+    0.0,
+    0.0
+   ],
+   "stored_flags": 12,
+   "correct_answers": 2193,
+   "responses_flagged": 12,
+   "steps_walked": 54,
+   "unverified_steps": 0,
+   "unverified_responses": 0
+  },
+  "qwen3-235b-a22b-2507": {
+   "flags": 1257,
+   "carried_precision": 4,
+   "other": 1253,
+   "other_truncated": 150,
+   "other_no_upstream": 640,
+   "other_not_reproduced": 463,
+   "share_carried": 0.0031821797931583136,
+   "share_ci": [
+    0.0007185650448835401,
+    0.006216332872928176
+   ],
+   "stored_flags": 1257,
+   "correct_answers": 1954,
+   "responses_flagged": 455,
+   "steps_walked": 4865,
+   "unverified_steps": 0,
+   "unverified_responses": 0
+  },
+  "glm-5.3-flash": {
+   "flags": 51,
+   "carried_precision": 0,
+   "other": 51,
+   "other_truncated": 6,
+   "other_no_upstream": 27,
+   "other_not_reproduced": 18,
+   "share_carried": 0.0,
+   "share_ci": [
+    0.0,
+    0.0
+   ],
+   "stored_flags": 51,
+   "correct_answers": 2179,
+   "responses_flagged": 42,
+   "steps_walked": 294,
+   "unverified_steps": 0,
+   "unverified_responses": 0
+  },
+  "glm-5.3": {
+   "flags": 40,
+   "carried_precision": 1,
+   "other": 39,
+   "other_truncated": 6,
+   "other_no_upstream": 29,
+   "other_not_reproduced": 4,
+   "share_carried": 0.025,
+   "share_ci": [
+    0.0,
+    0.07900071123755328
+   ],
+   "stored_flags": 40,
+   "correct_answers": 2122,
+   "responses_flagged": 39,
+   "steps_walked": 265,
+   "unverified_steps": 0,
+   "unverified_responses": 0
+  },
+  "muse-glimmer-30b": {
+   "flags": 148,
+   "carried_precision": 3,
+   "other": 145,
+   "other_truncated": 27,
+   "other_no_upstream": 92,
+   "other_not_reproduced": 26,
+   "share_carried": 0.02027027027027027,
+   "share_ci": [
+    0.0,
+    0.045168621700879756
+   ],
+   "stored_flags": 148,
+   "correct_answers": 2170,
+   "responses_flagged": 128,
+   "steps_walked": 501,
+   "unverified_steps": 0,
+   "unverified_responses": 0
+  },
+  "kimi-k3": {
+   "flags": 17,
+   "carried_precision": 0,
+   "other": 17,
+   "other_truncated": 1,
+   "other_no_upstream": 14,
+   "other_not_reproduced": 2,
+   "share_carried": 0.0,
+   "share_ci": [
+    0.0,
+    0.0
+   ],
+   "stored_flags": 17,
+   "correct_answers": 2179,
+   "responses_flagged": 15,
+   "steps_walked": 68,
+   "unverified_steps": 0,
+   "unverified_responses": 0
+  },
+  "gpt-5.4-mini": {
+   "flags": 390,
+   "carried_precision": 1,
+   "other": 389,
+   "other_truncated": 46,
+   "other_no_upstream": 260,
+   "other_not_reproduced": 83,
+   "share_carried": 0.002564102564102564,
+   "share_ci": [
+    0.0,
+    0.008572042570609905
+   ],
+   "stored_flags": 390,
+   "correct_answers": 1882,
+   "responses_flagged": 271,
+   "steps_walked": 1513,
+   "unverified_steps": 0,
+   "unverified_responses": 0
+  },
+  "gemini-3.1-flash-lite": {
+   "flags": 183,
+   "carried_precision": 0,
+   "other": 183,
+   "other_truncated": 28,
+   "other_no_upstream": 130,
+   "other_not_reproduced": 25,
+   "share_carried": 0.0,
+   "share_ci": [
+    0.0,
+    0.0
+   ],
+   "stored_flags": 183,
+   "correct_answers": 1945,
+   "responses_flagged": 138,
+   "steps_walked": 547,
+   "unverified_steps": 0,
+   "unverified_responses": 0
+  },
+  "claude-sonnet-5": {
+   "flags": 428,
+   "carried_precision": 2,
+   "other": 426,
+   "other_truncated": 24,
+   "other_no_upstream": 234,
+   "other_not_reproduced": 168,
+   "share_carried": 0.004672897196261682,
+   "share_ci": [
+    0.0,
+    0.012049651390063887
+   ],
+   "stored_flags": 428,
+   "correct_answers": 2193,
+   "responses_flagged": 314,
+   "steps_walked": 2018,
+   "unverified_steps": 0,
+   "unverified_responses": 0
+  }
+ },
+ "all": {
+  "flags": 3415,
+  "carried_precision": 11,
+  "other": 3404,
+  "other_truncated": 398,
+  "other_no_upstream": 1991,
+  "other_not_reproduced": 1015,
+  "stored_flags": 3415,
+  "unverified_steps": 0,
+  "share_carried": 0.00322108345534407
+ },
+ "expert_confirmed": {
+  "slips": 171,
+  "carried_precision": 0,
+  "other": 168,
+  "other_truncated": 17,
+  "other_no_upstream": 118,
+  "other_not_reproduced": 33,
+  "step_changed": 3,
+  "claim_not_found": 0,
+  "no_longer_flagged": 0
+ }
+}
