@@ -125,23 +125,39 @@ assert R[3]["templates"] == R[2]["rejected"] and R[3]["rejecting"] == R[4]["reje
 assert R[6]["templates"] == R[5]["rejected"] and R[6]["rejecting"] == 0, R
 WORD = ["no", "one", "two", "three", "four", "five", "six", "seven"]
 later = [n for n in sorted(R) if n > 1]
+# what the text says of the later rounds, checked against their records: round 3's two mismatched hand checks are
+# the U-tube manometer's gold value entered in pascals (its answer line is in kilopascals); round 4 widens two
+# templates' sampled parameters to 15 distinct problems each; round 5 states the reading and the data in the two
+# chemical questions; round 6 holds organic compounds below their decomposition range
+r3_entered = re.findall(r"^- template_(\w+) by \S+: entered `([\d.]+) (\w+)`", reports[3], re.M)
+assert len(r3_entered) == int(R[3]["compared"]) - int(R[3]["matched"]) and {t for t, _, _ in r3_entered} == {
+    "utube_manometer"} and {u for _, _, u in r3_entered} == {"Pa"}, r3_entered
+assert re.search(r"widened so each can supply 15 distinct problems", read(L2 / "fixes_round4.md")), "round 4"
+fixes5 = read(L2 / "fixes_round5.md")
+assert all(s in fixes5 for s in ("The question now pins that reading", "the data the energy balance consumes",
+                                 "Organic compounds are now capped at")), "rounds 5 and 6"
+rows_r1 = one(r"from (\d+) label rows by \d+ experts", res1)[0]
 round_phrases = [
     f"{WORD[len(R)]} rounds",
-    f"{R[1]['matched']} of the {R[1]['compared']} first-round hand checks",
-    f"{R[1]['rejecting']} of the {R[1]['verdicts']} verdicts on templates are rejections",
-    f"{R[2]['rejecting']} of the {R[2]['verdicts']} verdicts are rejections, on {R[2]['rejected']} of the "
+    # the first round's hand checks: one per label row, of which some give no number to compare
+    f"Of the {rows_r1} first-round hand checks, {R[1]['compared']} have a number to compare; {R[1]['matched']} of "
+    f"these match the gold value within 1\\%",
+    f"{R[1]['rejecting']} of the {R[1]['verdicts']} decisions on templates are rejections",
+    f"{R[2]['rejecting']} of the {R[2]['verdicts']} decisions are rejections, on {R[2]['rejected']} of the "
     f"{R[2]['templates']} templates",
     f"the third round approves all {R[3]['templates']}",
     f"a fourth round re-certifies {WORD[R[4]['templates']]} templates",
     f"a fifth round re-certifies {WORD[R[5]['templates']]} templates",
-    f"{WORD[R[5]['rejecting']]} of its {R[5]['verdicts']} verdicts",
+    f"{WORD[R[5]['rejecting']]} of its {R[5]['verdicts']} decisions",
     f"a sixth round re-certifies {WORD[R[6]['templates']]} template{'s' if R[6]['templates'] != 1 else ''}",
     ", ".join(f"{R[n]['matched']} of {R[n]['compared']}" for n in later[:-1])
     + f", and {R[later[-1]]['matched']} of {R[later[-1]]['compared']} hand checks",
-    # the first round's hand checks: one per label row, of which some give no number to compare
-    f"{R[1]['compared']} of the {one(r'from (\d+) label rows by \d+ experts', res1)[0]} hand checks have a number to compare",
-    # the agreement table's undefined cells
+    "in pascals where the gold answer is in kilopascals",
+    # the agreement table's undefined cells, and electrical's kappa beside its percent agreement
     "undefined for " + " and ".join(undefined_kappa),
+    f"in electrical, {rejecting_r1['electrical']} of the {3 * int(agree['electrical'][1])} decisions on templates are "
+    f"rejections, so {agree['electrical'][4].replace('%', chr(92) + '%')} agreement gives a $\\kappa$ of "
+    f"{agree['electrical'][2]}",
 ]
 
 # ---------------------------------------------------------------- counts the text states

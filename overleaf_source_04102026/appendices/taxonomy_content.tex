@@ -3,12 +3,15 @@
 \label{sec:appendix_domain_validation}
 
 % The panel the domain experts report for this cycle's domain and area validation, run outside this
-% repository (the owner, 2026-10-08); it replaces the previous cycles' panel of four.
-To identify core domains, we consulted a panel of three LLMs from families outside the evaluated models:
-\texttt{Grok 4.6}~\citep{grok46}, \texttt{MiniMax M3}~\citep{minimaxm3}, and \texttt{MiMo-V2.5-Pro}.
-Each was prompted individually to identify cornerstone engineering domains.
-We finalized the 15 core domains via majority voting.
-The domain identification prompt is provided below.
+% repository (the owner, 2026-10-08).
+We draw the candidate domains and areas of each branch from its curricular documents
+(\autoref{subsec:taxonomy}) and the standard textbooks of~\autoref{tab:foundational_textbooks}.
+A panel of three LLMs from families outside the evaluated models, \texttt{Grok 4.6}~\citep{grok46},
+\texttt{MiniMax M3}~\citep{minimaxm3}, and \texttt{MiMo-V2.5-Pro}~\citep{mimov25pro}, each prompted
+individually with the prompt below, names the cornerstone domains of each branch, and we finalize
+the 15 domains, three per branch, by majority vote.
+The same panel names the fundamental areas of each domain (\autoref{sec:appendix_area_validation})
+and scores each area's pedagogical significance (\autoref{sec:appendix_significance_scoring}).
 
 \begin{tcolorbox}[
     colback=gray!5,
@@ -27,7 +30,7 @@ You are an expert academic and senior curriculum designer at a top-tier engineer
 Your task is to identify and rank the most fundamental, cornerstone
 domains for the five primary branches of engineering. The goal is to identify the non-overlapping, core subject areas that are prerequisites for almost all other advanced topics. \\
 
-For example, for Chemical Engineering, ``Reaction Kinetics" would be a fundamental domain, while a niche topic like ``Polymer Rheology" would be a sub-specialization, not a cornerstone. \\
+For example, for Chemical Engineering, "Reaction Kinetics" would be a fundamental domain, while a niche topic like "Polymer Rheology" would be a sub-specialization, not a cornerstone. \\
 
 Please provide a ranked list of the top 5--7 most fundamental domains for each of the following five branches: \\
 1. Chemical Engineering \\
@@ -43,48 +46,48 @@ Return your answer \textbf{only} in a strict JSON format as given below.
 \texttt{\char`\{}
 
 \vspace{8pt}
-\hspace*{1em}``chemical\_engineering": [\\
-\hspace*{2em}``Rank 1 Domain",\\
-\hspace*{2em}``Rank 2 Domain",\\
-\hspace*{2em}``Rank 3 Domain",\\
-\hspace*{2em}``Rank 4 Domain",\\
-\hspace*{2em}``Rank 5 Domain"\\
+\hspace*{1em}"chemical\_engineering": [\\
+\hspace*{2em}"Rank 1 Domain",\\
+\hspace*{2em}"Rank 2 Domain",\\
+\hspace*{2em}"Rank 3 Domain",\\
+\hspace*{2em}"Rank 4 Domain",\\
+\hspace*{2em}"Rank 5 Domain"\\
 \hspace*{1em}],\\
 
 \vspace{2pt}
-\hspace*{1em}``electrical\_engineering": [\\
-\hspace*{2em}``Rank 1 Domain",\\
-\hspace*{2em}``Rank 2 Domain",\\
-\hspace*{2em}``Rank 3 Domain",\\
-\hspace*{2em}``Rank 4 Domain",\\
-\hspace*{2em}``Rank 5 Domain"\\
+\hspace*{1em}"electrical\_engineering": [\\
+\hspace*{2em}"Rank 1 Domain",\\
+\hspace*{2em}"Rank 2 Domain",\\
+\hspace*{2em}"Rank 3 Domain",\\
+\hspace*{2em}"Rank 4 Domain",\\
+\hspace*{2em}"Rank 5 Domain"\\
 \hspace*{1em}],\\
 
 \vspace{2pt}
-\hspace*{1em}``mechanical\_engineering": [\\
-\hspace*{2em}``Rank 1 Domain",\\
-\hspace*{2em}``Rank 2 Domain",\\
-\hspace*{2em}``Rank 3 Domain",\\
-\hspace*{2em}``Rank 4 Domain",\\
-\hspace*{2em}``Rank 5 Domain"\\
+\hspace*{1em}"mechanical\_engineering": [\\
+\hspace*{2em}"Rank 1 Domain",\\
+\hspace*{2em}"Rank 2 Domain",\\
+\hspace*{2em}"Rank 3 Domain",\\
+\hspace*{2em}"Rank 4 Domain",\\
+\hspace*{2em}"Rank 5 Domain"\\
 \hspace*{1em}],\\
 
 \vspace{2pt}
-\hspace*{1em}``civil\_engineering": [\\
-\hspace*{2em}``Rank 1 Domain",\\
-\hspace*{2em}``Rank 2 Domain",\\
-\hspace*{2em}``Rank 3 Domain",\\
-\hspace*{2em}``Rank 4 Domain",\\
-\hspace*{2em}``Rank 5 Domain"\\
+\hspace*{1em}"civil\_engineering": [\\
+\hspace*{2em}"Rank 1 Domain",\\
+\hspace*{2em}"Rank 2 Domain",\\
+\hspace*{2em}"Rank 3 Domain",\\
+\hspace*{2em}"Rank 4 Domain",\\
+\hspace*{2em}"Rank 5 Domain"\\
 \hspace*{1em}],\\
 
 \vspace{2pt}
-\hspace*{1em}``industrial\_engineering": [\\
-\hspace*{2em}``Rank 1 Domain",\\
-\hspace*{2em}``Rank 2 Domain",\\
-\hspace*{2em}``Rank 3 Domain",\\
-\hspace*{2em}``Rank 4 Domain",\\
-\hspace*{2em}``Rank 5 Domain"\\
+\hspace*{1em}"industrial\_engineering": [\\
+\hspace*{2em}"Rank 1 Domain",\\
+\hspace*{2em}"Rank 2 Domain",\\
+\hspace*{2em}"Rank 3 Domain",\\
+\hspace*{2em}"Rank 4 Domain",\\
+\hspace*{2em}"Rank 5 Domain"\\
 \hspace*{1em}]\\
 
 \vspace{2pt}
@@ -100,9 +103,8 @@ Do not include any preamble, conversational text, explanations, or markdown form
 \label{sec:appendix_area_validation}
 
 % The same three models as the domain validation (see the note there).
-Following the domain validation procedure, we utilized the same model panel and aggregated the
-pedagogical areas via majority voting.
-The prompt used for area identification is provided below.
+The panel of~\autoref{sec:appendix_domain_validation} answers the prompt below for each domain, and
+we finalize the 42 areas by majority vote, as for the domains.
 
 \begin{tcolorbox}[
     colback=gray!5,
@@ -118,13 +120,13 @@ The prompt used for area identification is provided below.
 \ttfamily\small
 You are an expert academic and senior curriculum designer at a top-tier engineering university (like MIT or Caltech). You have decades of experience structuring undergraduate programs for ABET accreditation. \\
 
-Your task is to identify and list the most fundamental, non-overlapping ``areas" or
-``sub-topics" within the provided engineering domain. \\
+Your task is to identify and list the most fundamental, non-overlapping "areas" or
+"sub-topics" within the provided engineering domain. \\
 
-A ``fundamental area" is a major pedagogical unit or chapter within a core course on this domain. \textbf{The areas you list should be distinct pillars of the subject.} For example, if the domain is
-``Thermodynamics," a fundamental area would be ``The First Law" or
-``Properties of Pure Fluids." A concept like ``Enthalpy" would be
-too specific. Similarly, within a ``Circuit Analysis" domain, ``Kirchhoff's Voltage Law" and ``Kirchhoff's Current Law" are foundational concepts often taught together and would be too granular to list separately. \\
+A "fundamental area" is a major pedagogical unit or chapter within a core course on this domain. \textbf{The areas you list should be distinct pillars of the subject.} For example, if the domain is
+"Thermodynamics," a fundamental area would be "The First Law" or
+"Properties of Pure Fluids." A concept like "Enthalpy" would be
+too specific. Similarly, within a "Circuit Analysis" domain, "Kirchhoff's Voltage Law" and "Kirchhoff's Current Law" are foundational concepts often taught together and would be too granular to list separately. \\
 
 Please provide a list of the top 3-5 most fundamental areas for
 the following engineering domain:
@@ -137,12 +139,12 @@ Return your answer \textbf{only} in a strict JSON format as given below.
 \texttt{\char`\{}
 
 \vspace{4pt}
-\hspace*{1em}``domain": ``[DOMAIN\_NAME\_HERE]",\\
-\hspace*{1em}``areas": [\\
-\hspace*{2em}``Area 1",\\
-\hspace*{2em}``Area 2",\\
-\hspace*{2em}``Area 3",\\
-\hspace*{2em}``Area 4"\\
+\hspace*{1em}"domain": "[DOMAIN\_NAME\_HERE]",\\
+\hspace*{1em}"areas": [\\
+\hspace*{2em}"Area 1",\\
+\hspace*{2em}"Area 2",\\
+\hspace*{2em}"Area 3",\\
+\hspace*{2em}"Area 4"\\
 \hspace*{1em}]\\
 \texttt{\char`\}}
 \egroup
@@ -156,12 +158,10 @@ Do not include any preamble, conversational text, explanations, or markdown form
 \label{sec:appendix_books}
 \label{sec:appendix_data_sources}
 
-The core engineering principles, problem typologies, and realistic constraints for the templates
-developed by us were sourced from the authoritative textbooks listed
-in~\autoref{tab:foundational_textbooks}.
-These texts, which are standard in top-tier engineering curricula, served as the primary knowledge
-base to ensure \ourdataset is pedagogically sound and grounded in the core engineering curriculum.
-They were also used to validate our selection of fundamental domains and areas.
+The domain experts who write the templates take their principles, problem types, and parameter
+constraints from the standard textbooks of~\autoref{tab:foundational_textbooks}, one or two per
+domain, which are also among the sources of the domains and areas
+(\autoref{sec:appendix_domain_validation}).
 
 \begin{table}[t]
 \small
@@ -203,15 +203,13 @@ Stochastic Operations & Introduction to Probability Models by Sheldon M. Ross \n
 Introduction to Operations Research by Frederick S. Hillier and Gerald J. Lieberman \\
 \bottomrule
 \end{tabular}
-\caption{Foundational textbooks used for selecting domain-specific problems.}
+\caption{Foundational textbooks of each domain, from which the templates take their problems.}
 \label{tab:foundational_textbooks}
 \end{table}
 
-To ensure the physical and engineering realism of \ourdataset, we built our domain-aware
-parameterization on authoritative data.
-We extracted extensive lists of physical constants and material properties from the standard
-handbooks and data sources listed in~\autoref{tab:authoritative_sources}, and each constants table
-in the code records the provenance of its values.
+The physical constants and material properties that the templates sample come from the handbooks
+and data sources of~\autoref{tab:authoritative_sources}, and each constants table in the code
+records the source of its values.
 
 \begin{table}[t]
 \small
@@ -230,9 +228,7 @@ NIST-JANAF Thermochemical Tables \newline
 NASA Technical Report R-132 \\
 \addlinespace[2pt]
 Electrical Engineering &
-IEEE 100: The Authoritative Dictionary of IEEE Standards Terms \newline
 Standard Handbook for Electrical Engineers \newline
-ART-DEIT Database \newline
 CODATA 2022 Recommended Values \newline
 refractiveindex.info Database \\
 \addlinespace[2pt]
@@ -261,7 +257,7 @@ MIL-STD-105E \newline
 NIST/SEMATECH e-Handbook of Statistical Methods \\
 \bottomrule
 \end{tabular}
-\caption{Primary data sources referenced for engineering parameterization across branches.}
+\caption{Data sources of the constants and material properties the templates sample, by branch.}
 \label{tab:authoritative_sources}
 \end{table}
 
@@ -269,8 +265,8 @@ NIST/SEMATECH e-Handbook of Statistical Methods \\
 \section{LLM Prompt for Pedagogical Scoring}
 \label{sec:appendix_significance_scoring}
 
-The following prompt was used to query LLMs (described in~\autoref{sec:appendix_domain_validation})
-to evaluate the pedagogical significance of each sub-topic within its parent domain.
+The panel of~\autoref{sec:appendix_domain_validation} scores the pedagogical significance of each
+area within its domain with the prompt below.
 
 \begin{tcolorbox}[
     colback=gray!5,
@@ -286,7 +282,7 @@ to evaluate the pedagogical significance of each sub-topic within its parent dom
 \ttfamily\small
 You are an expert academic and senior curriculum designer at a top-tier engineering university with decades of experience structuring undergraduate programs for ABET accreditation. \\
 
-Your task is to evaluate the pedagogical significance of a specific engineering ``area" within a broader ``domain" on a scale of 1 to 5, based on the rubric below. \\
+Your task is to evaluate the pedagogical significance of a specific engineering "area" within a broader "domain" on a scale of 1 to 5, based on the rubric below. \\
 
 \textbf{Rubric:}
 \par\medskip\noindent
@@ -310,9 +306,9 @@ Please evaluate the following area:
 \texttt{\char`\{}
 
 \par\medskip
-\hspace*{1em}``area": ``[AREA\_NAME\_HERE]",\\
-\hspace*{1em}``pedagogical\_significance\_score": <integer, a score from 1 to 5>,\\
-\hspace*{1em}``justification": <string, a one-sentence explanation for the score>.\\
+\hspace*{1em}"area": "[AREA\_NAME\_HERE]",\\
+\hspace*{1em}"pedagogical\_significance\_score": <integer, a score from 1 to 5>,\\
+\hspace*{1em}"justification": <string, a one-sentence explanation for the score>.\\
 \vspace{2pt}
 \texttt{\char`\}}
 \egroup
@@ -325,14 +321,14 @@ Do not include any preamble, conversational text, explanations, or markdown form
 \section{Dataset Statistics}
 \label{appendix:statistics}
 
-\paragraph{Structural Balance and Granularity.}
-Each branch is represented by exactly 30 templates, ensuring that no single discipline dominates the
-aggregate performance measures.
-This uniform top-level distribution controls for branch-specific bias.
-At the granular level, the number of areas (6--11 per branch) reflects the curricular density of each
-discipline: Mechanical Engineering consolidates its sub-topics into six broad areas, Chemical and
-Electrical Engineering have seven, and Civil and Industrial Engineering have eleven
-(\autoref{tab:difficulty_stats}).
+\paragraph{Structural Balance and Granularity.} Each branch holds 30 templates, so every branch
+weighs the same in the aggregate measures.
+The number of areas differs by branch (\autoref{tab:difficulty_stats}): Mechanical Engineering
+groups its topics into six broad areas, Chemical and Electrical Engineering have seven, and Civil and
+Industrial Engineering have eleven.
+\autoref{tab:area} gives the templates of every area by level; the number of templates per area
+follows the pedagogical significance the panel assigns to the area
+(\autoref{sec:appendix_significance_scoring}).
 
 % BEGIN GENERATED tab:area (docs/appendix_statistics.py --write)
 \begin{table*}[t]
@@ -429,15 +425,12 @@ shaded rows give the branch subtotals and the italic rows name the domain.}
 \end{table*}
 % END GENERATED tab:area
 
-\paragraph{Difficulty Distribution.}
-The dataset difficulty is stratified to mirror curricular progression, with 58 Easy, 58
-Intermediate, and 34 Advanced templates.
-We prioritize foundational and applied reasoning (Easy and Intermediate: 77\%) to test core
-engineering laws and procedural workflows, while reserving the most complex synthesis tasks for the
-Advanced level (23\%).
+\paragraph{Difficulty Distribution.} The domain experts' levels (\autoref{subsec:taxonomy}) give 58
+Easy, 58 Intermediate, and 34 Advanced templates, so 77\% of the templates are Easy or Intermediate
+and 23\% Advanced.
 Each template contributes 15 instances to the evaluation set, which therefore holds 870 Easy, 870
 Intermediate, and 510 Advanced instances, 450 per branch.
-\autoref{tab:difficulty_stats} presents the detailed statistical breakdown.
+\autoref{tab:difficulty_stats} gives the levels by branch.
 
 \begin{table}[t]
     \centering
@@ -458,9 +451,8 @@ Intermediate, and 510 Advanced instances, 450 per branch.
         \textbf{Total} & \textbf{15} & \textbf{42} & \textbf{58} & \textbf{58} & \textbf{34} & \textbf{150} \\
         \bottomrule
     \end{tabular}
-    \caption{\textbf{Dataset Statistics by Branch.} The dataset features a perfectly balanced
-    distribution of 30 templates per branch, with difficulty levels scaled to test both foundational
-    knowledge and advanced synthesis.}
+    \caption{\textbf{Dataset statistics by branch.} Domains, areas, and templates per difficulty level;
+    each branch holds 30 templates.}
     \label{tab:difficulty_stats}
 \end{table}
 
@@ -497,7 +489,7 @@ number lies within 5\% of its counterpart; the evaluation set holds 61 such pair
         6--15 & 61 & 36 & 7 \\
         \bottomrule
     \end{tabular}
-    \caption{\textbf{Variation Within a Template.} Number of templates whose 15 evaluation-set
+    \caption{\textbf{Variation within a template.} Number of templates whose 15 evaluation-set
     instances show the given number of distinct question wordings, reasoning paths, and answer forms,
     with numbers masked; each column sums to 150.}
     \label{tab:template_variation}

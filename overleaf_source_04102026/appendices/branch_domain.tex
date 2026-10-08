@@ -7,14 +7,14 @@ This section gives, for~\autoref{subsec:branch_domain}, every model's branch and
 \texttt{DeepSeek V4.1 Flash}, first on FAC and open-weights; \texttt{Claude Sonnet 5}, first on MC
 and closed; and, from the lower tier, \texttt{GPT-5.4 mini}, closed and returning no reasoning
 tokens at its provider's defaults, and \texttt{gpt-oss-20b}, open-weights and last on FAC.
-The lowest branch differs by model, chemical for five models, electrical for three, industrial for
-two, and civil for one, and a single branch pair differs within a model after correction, so the
-branch means carry no order of difficulty.
+The lowest branch differs by model, chemical for six models, industrial for four, and civil for
+one, and a single branch pair differs within a model after correction, so the branch means carry no
+order of difficulty.
 In~\autoref{fig:branch_bars}, the two top-tier models stay close to their FAC in every branch, while
 the two lower-tier models are lowest in different branches, \texttt{GPT-5.4 mini} in chemical and
 \texttt{gpt-oss-20b} in civil engineering.
-In~\autoref{fig:domain_radar}, the two top-tier models are lowest on thermodynamics, which holds the
-two chemical templates whose wording does not pin the answer, whereas the lower-tier models dip
+In~\autoref{fig:domain_radar}, \texttt{DeepSeek V4.1 Flash} is lowest on production and inventory
+and \texttt{Claude Sonnet 5} on quality and reliability control, whereas the lower-tier models dip
 lower, \texttt{GPT-5.4 mini} in thermodynamics and \texttt{gpt-oss-20b} in geotechnical engineering.
 
 % BEGIN GENERATED fig:branch_bars (full_run_28092026/paper_results.py --write)
@@ -23,12 +23,12 @@ lower, \texttt{GPT-5.4 mini} in thermodynamics and \texttt{gpt-oss-20b} in geote
     \includegraphics[width=\columnwidth]{figs/branch-bars.pdf}
     \caption{\textbf{Final Answer Accuracy by Engineering Branch for Four Representative Models.} One
     stacked bar per model, for \texttt{DeepSeek V4.1 Flash} (first on FAC), \texttt{Claude Sonnet 5}
-    (first on MC), \texttt{GPT-5.4 mini}, and \texttt{gpt-oss-20b}. Each of the five branches holds 30
-    of the 150 templates, so a segment is that branch's share of the model's FAC: the number inside it
-    is the branch's FAC, and its height is a fifth of that. The segments add up to the model's FAC,
-    printed above the bar; color marks the model and hatching the branch. The one branch pair that
-    differs after Holm correction within a model is \texttt{gpt-oss-20b}'s electrical above civil
-    (\autoref{tab:branch_domain}).}
+    (first on MC), \texttt{GPT-5.4 mini}, and \texttt{gpt-oss-20b} (GPT OSS 20B in the figure). Each of
+    the five branches holds 30 of the 150 templates, so a segment is that branch's share of the model's
+    FAC: the number inside it is the branch's FAC, and its height is a fifth of that. The segments add
+    up to the model's FAC, printed above the bar; color marks the model and hatching the branch. The one
+    branch pair that differs after Holm correction within a model is \texttt{gpt-oss-20b}'s electrical
+    above civil (\autoref{tab:branch_domain}).}
     \label{fig:branch_bars}
 \end{figure}
 % END GENERATED fig:branch_bars
@@ -40,7 +40,7 @@ lower, \texttt{GPT-5.4 mini} in thermodynamics and \texttt{gpt-oss-20b} in geote
     \caption{\textbf{Final Answer Accuracy by Domain for Four Representative Models.} The instance mean
     over each of the 15 domains, in the order of their branches around the rim, for the same four
     models; the radial axis starts at 0.4. The domain means carry no interval and no test
-    (\autoref{tab:by_domain_kind}).}
+    (\autoref{tab:by_domain_kind}). In the figure, \texttt{gpt-oss-20b} is labeled GPT OSS 20B.}
     \label{fig:domain_radar}
 \end{figure*}
 % END GENERATED fig:domain_radar

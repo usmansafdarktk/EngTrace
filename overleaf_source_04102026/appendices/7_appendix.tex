@@ -19,8 +19,9 @@
 \input{sections/appendices/certification}
 
 % -------------
-% Scoring details: the final-answer check, milestones and the judge, the arithmetic check, the judged
-% step check (numbers from docs/appendix_evaluation.py).
+% Scoring details: the final-answer check (symbolic answers, prescribed digits, the rule's
+% sensitivity), milestones and the judge, the arithmetic check, the judged step check, the worked
+% example (numbers from docs/appendix_evaluation.py).
 \input{sections/appendices/scoring}
 
 % -------------
@@ -29,13 +30,15 @@
 \input{sections/appendices/validation}
 
 % -------------
-% Evaluated models, decoding and token use, the inference prompt, the statistical protocol (numbers,
-% identifiers and the prompt checked by full_run_28092026/paper_setup.py).
+% Evaluated models, decoding and token use, matched settings, serving endpoints, the inference
+% prompt, the statistical protocol (numbers, identifiers and the prompt checked by
+% full_run_28092026/paper_setup.py).
 \input{sections/appendices/models}
 
 % -------------
-% Full results: the pairwise comparisons, the scoring rules, coverage behind wrong answers, the level
-% gap and depth (tables written by full_run_28092026/paper_results.py --write).
+% Full results: the pairwise comparisons, matched settings, consistency within a template, the
+% scoring rules, coverage behind wrong answers and its variants, the judged step and arithmetic flags,
+% the level gap and depth (tables written by full_run_28092026/paper_results.py --write).
 \input{sections/appendices/results}
 
 % -------------
@@ -49,12 +52,22 @@
 \input{sections/appendices/paraphrase}
 
 % -------------
-% Further experiments on the 450-instance subset: reasoning effort, flagship anchors, open book,
-% open tool (table written by full_run_28092026/paper_results.py --write).
+% Further experiments on the 450-instance subset: reasoning effort (with the full-set change at
+% matched settings), flagship anchors, open book, open tool (table written by
+% full_run_28092026/paper_results.py --write).
 \input{sections/appendices/further_experiments}
 
 % -------------
 % Error analysis: taxonomy and protocol, the sample, agreement, results by model and level, the
-% templates whose wording does not pin the answer (tables written by
+% near-miss templates and the incorrect verdicts that concern the answer's form (tables written by
 % full_run_28092026/paper_results.py --write).
 \input{sections/appendices/error_analysis}
+
+% -------------
+% Extended related work: the fifteen closest benchmarks (table) and further related work.
+\input{sections/appendices/related_work}
+
+% -------------
+% Release and reproducibility: what is released and withheld, query dates, the script behind each
+% table, the contamination policy.
+\input{sections/appendices/release}

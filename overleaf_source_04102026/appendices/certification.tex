@@ -23,7 +23,7 @@ In the first pass, 126 templates pass, 13 are controversial, and 11 are critical
 AC1 of 0.84 on the flag~\citep{gwet2008}); 34 of the 45 claims in the judges' explanations hold
 against the code and the instances, and after we revise the 24 flagged templates, 147 templates
 pass, 3 are controversial, and none is a critical failure (AC1 of 0.93).
-Against the experts' first-round verdicts, 15 of the 147 templates the screen passes are rejected
+Against the experts' first-round decisions, 15 of the 147 templates the screen passes are rejected
 by a majority of their experts, a false-positive rate of 10.2\%, and the median scores of experts
 and judges differ on average by 0.587 for physical plausibility, 0.187 for mathematical
 correctness, and 0.787 for pedagogical clarity.
@@ -71,14 +71,14 @@ Evaluate the template based on the rubric below. The \texttt{human\_review\_flag
         Mechanical & torsional shear stress: $J$ with $\pi/4$ for $\pi/2$ & hydrostatic pressure: kPa to Pa by a factor of 100 & U-tube manometer: the pipe-fluid column's sign flipped & natural frequency: one printed $\omega_n$ 4\% too high \\
         \bottomrule
     \end{tabular}
-    \caption{\textbf{Planted Defects.} The 20 planted defects, four per branch, each written into a
+    \caption{\textbf{Planted defects.} The 20 planted defects, four per branch, each written into a
     real template of the branch; every expert of the branch reviews all four.}
     \label{tab:planted_defects}
 \end{table*}
 
 \paragraph{Expert Certification.} Three domain experts per branch each review the 30 templates of
 their branch mixed with four planted defects, in an order of their own under opaque codes, knowing
-that planted items exist but not which; they do not see the screen's verdicts or discuss a template
+that planted items exist but not which; they do not see the screen's results or discuss a template
 before all three have submitted.
 For each item, an expert solves one instance by hand before the solution is shown, and the
 interface reports whether the answer is within 1\% of the gold value; the expert then reads the
@@ -103,30 +103,52 @@ printed line.
         \midrule
         Chemical & 0.492 & 0.776 & 77\% & 0.898 & 0.952 & 0.912 \\
         Electrical & 0.365 & 0.926 & 90\% & 0.941 & 0.989 & 0.976 \\
-        Civil & 1.000 & 1.000 & 100\% & 0.993 & 0.981 & 0.974 \\
-        Industrial & 1.000 & 1.000 & 100\% & 0.962 & 0.997 & 0.965 \\
+        Civil & -- & 1.000 & 100\% & 0.993 & 0.981 & 0.974 \\
+        Industrial & -- & 1.000 & 100\% & 0.962 & 0.997 & 0.965 \\
         Mechanical & 0.627 & 0.792 & 80\% & 0.927 & 0.973 & 0.952 \\
         \textbf{All} & 0.589 & 0.914 & 89\% & 0.947 & 0.980 & 0.954 \\
         \bottomrule
     \end{tabular}
-    \caption{\textbf{Expert Agreement.} Agreement among the three experts of each branch in the
-    first round: Fleiss' $\kappa$, Gwet's AC1, and percent agreement on the verdict, and Gwet's AC2
-    on the physical, mathematical, and pedagogical scores.}
+    \caption{\textbf{Expert agreement.} Agreement among the three experts of each branch in the
+    first round: Fleiss' $\kappa$, Gwet's AC1, and percent agreement on the decision, and Gwet's AC2
+    on the physical, mathematical, and pedagogical scores.
+    --: undefined, since every decision of the branch is an approval.}
     \label{tab:expert_agreement}
 \end{table}
 
 \paragraph{Results.} Every expert rejects all four planted defects of their branch, 60 of 60
-readings; 459 of the 504 first-round hand checks match the gold value within 1\%, and 44 of the 45
-mismatches end in a rejection.
-\autoref{tab:expert_agreement} gives the first-round agreement within each branch; Fleiss' $\kappa$
-is deflated where nearly every template is approved~\citep{feinstein1990high}, and Gwet's AC1 and
-AC2 are not.
-In the first round, 43 of the 450 verdicts on templates are rejections, and at least one expert
+readings.
+Of the 510 first-round hand checks, 504 have a number to compare; 459 of these match the gold value
+within 1\%, and 44 of the 45 mismatches end in a rejection.
+The planted defects test whether an expert catches a wrong number, through a constant, a unit
+conversion, a sign, or a printed result; they do not test whether a question states everything its
+answer depends on, which the domain experts' reading of wrong answers examines
+(\autoref{appendix:error_analysis}).
+\autoref{tab:expert_agreement} gives the first-round agreement within each branch.
+Fleiss' $\kappa$ is undefined for civil and industrial, where every decision is an approval, and is
+deflated where nearly every template is approved~\citep{feinstein1990high}: in electrical, 5 of the
+90 decisions on templates are rejections, so 90\% agreement gives a $\kappa$ of 0.365.
+Gwet's AC1 and AC2 are not deflated in this way.
+In the first round, 43 of the 450 decisions on templates are rejections, and at least one expert
 rejects 22 templates (chemical 9, electrical 3, and mechanical 10), 15 of them by a majority, while
 every civil and industrial expert approves all 30 templates of their branch.
-A rejected template returns to the same experts, revised where the rejection holds, until all three
-approve it: in the second round, 10 of the 66 verdicts are rejections, on 5 of the 22 templates;
-the third round approves all 5; and a fourth round re-certifies two templates after an extension.
-In these three rounds, 66 of 66, 13 of 15, and 6 of 6 hand checks match the gold value.
+
+A template that any expert rejects, or whose code changes, returns to the same three experts,
+revised where the rejection holds and with a hand-check instance none of them has seen, until all
+three approve it; certification takes six rounds:
+\begin{itemize}[nosep, leftmargin=*]
+\item in the second round, 10 of the 66 decisions are rejections, on 5 of the 22 templates;
+\item the third round approves all 5, and its two hand checks that do not match give the gold value
+in pascals where the gold answer is in kilopascals;
+\item a fourth round re-certifies two templates whose sampled parameters are widened so that each
+supplies 15 distinct instances;
+\item a fifth round re-certifies two templates whose questions state the system, the form of the
+equation, and the property data on which the answer depends, and one of its 6 decisions is a
+rejection, on the physical plausibility of compressing organic compounds above their decomposition
+temperatures;
+\item a sixth round re-certifies one template, with organic compounds held below their decomposition
+temperatures, and all three experts approve it.
+\end{itemize}
+In rounds 2 to 6, 66 of 66, 13 of 15, 6 of 6, 6 of 6, and 3 of 3 hand checks match the gold value.
 Every template is thus approved unanimously in the latest round that reviewed it, and its current
 code regenerates, byte for byte, the instances its experts reviewed.

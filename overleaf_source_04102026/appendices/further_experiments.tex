@@ -22,18 +22,24 @@ level intervals overlap those of the other levels; it moves \texttt{Gemini 3.1 F
 than the experiment detects.
 Where the setting works, it changes the derivation and not only the answer: more milestones
 stated, fewer slips behind correct answers.
-One of the two models moves, so the setting does not close the lower tier's gap in general.
+The matched settings of~\autoref{appendix:decoding} repeat the change on the full evaluation set
+for the three models whose endpoints offer the setting.
+On all 2,250 instances, reasoning at medium effort changes FAC by $+0.038$ for
+\texttt{Gemini 3.1 Flash-Lite} (95\% interval 0.023 to 0.056), $+0.070$ for \texttt{Gemma 4 26B}
+(95\% interval 0.049 to 0.092), and $+0.118$ for \texttt{GPT-5.4 mini} (95\% interval 0.082 to
+0.156), so with more instances the change for \texttt{Gemini 3.1 Flash-Lite} is detectable too, and
+none of the three is bounded within the margin (\autoref{tab:matched}).
 
 \paragraph{Flagship Anchors.} Does a flagship exceed the top tier, or is the ceiling an artifact of
-a roster without one?
+evaluating none?
 \texttt{GPT-5.4} and \texttt{DeepSeek V4 Pro}, the two flagships that pass the selection rule
 (\autoref{appendix:models}), answer the same subset at their providers' defaults, and
 \texttt{GPT-5.4}, whose default returns no reasoning tokens, also with reasoning at medium effort;
 an anchor is a reference point outside the pairwise tests, so no test is run against it.
-Neither exceeds the top tier: \texttt{DeepSeek V4 Pro} scores 0.968 and \texttt{GPT-5.4} 0.941 at
-its default and 0.980 with reasoning, against 0.964 to 0.976 for the top five on the same instances,
-whose intervals contain both reasoning anchors; on Advanced templates the anchors score 0.87 to 0.95
-and the top five 0.92 to 0.95.
+\texttt{DeepSeek V4 Pro} scores 0.968 and \texttt{GPT-5.4} 0.951 at its default and 0.997 with
+reasoning, against 0.959 to 0.990 for the top five on the same instances; the highest anchor run
+lies inside the interval of \texttt{DeepSeek V4.1 Flash}, and on Advanced templates the anchors
+score 0.89 to 1.00 and the top five 0.94 to 0.99.
 The ceiling is therefore not for want of a flagship.
 The one paired test among the anchors, \texttt{GPT-5.4} with reasoning against its default, is the
 last row of~\autoref{tab:experiments} and shows the reasoning-effort result again.
@@ -44,7 +50,7 @@ handbook block, one per line, with no data tables or constants (405 instances); 
 and two lower-tier ones, one closed and one open-weights, answer: \texttt{Claude Sonnet 5},
 \texttt{GPT-5.4 mini}, and \texttt{gpt-oss-20b}.
 The equations lift \texttt{gpt-oss-20b}, partly because fewer of its responses run out of room
-(the change on the 388 instances it answered in both runs is $+0.043$), and leave the two closed
+(the change on the 388 instances it answered in both runs is $+0.044$), and leave the two closed
 models within the margin, while MC rises for all three, consistent with the equations prompting the
 responses to state the intermediates.
 Recall of the equations is thus part of what bounds the weakest model and no part of what bounds
@@ -62,9 +68,8 @@ The two closed models answer, since no endpoint that meets the selection rule se
 The interpreter changes neither model's FAC or MC beyond the margin, though
 \texttt{GPT-5.4 mini}'s arithmetic flags on correct answers fall.
 Whether to call it is the model's choice, \texttt{Claude Sonnet 5} on 66\% of the instances and
-\texttt{GPT-5.4 mini} on 19\%, and both score lower on the instances where they call it than where
-they do not: the models reach for the tool on the problems they find harder, and the experiment
-bounds what an offered tool adds, not what required use would.
+\texttt{GPT-5.4 mini} on 18\%, so the experiment bounds what an offered tool adds, not what required
+use would.
 No experiment says where the remaining errors lie; that is the question of the expert reading
 in~\autoref{subsec:error_analysis}.
 

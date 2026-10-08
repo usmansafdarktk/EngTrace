@@ -53,7 +53,7 @@ Model & Organization & Size & Identifier & Weights \\
 \bottomrule
 \end{tabular}
 }
-\caption{\textbf{Evaluated Models.} The eleven models of~\autoref{sec:experiments}, grouped by
+\caption{\textbf{Evaluated models.} The eleven models of~\autoref{sec:experiments}, grouped by
 access, and the two flagship anchors run on the 450-instance subset.
 Size is the developer's stated parameter count, with the parameters active per token in
 parentheses for mixture-of-experts models: \texttt{DeepSeek V4.1 Flash} activates 8B in prefill and
@@ -85,6 +85,26 @@ empty, for each of the 2,250 instances.
 providers' defaults; the other seven models return them on nearly every response.
 \autoref{tab:decoding} gives each model's output ceiling, number of providers, and token use.
 
+\paragraph{Matched Settings.} The three models that return no reasoning tokens at their defaults
+but whose endpoints offer a reasoning setting, \texttt{Gemma 4 26B}, \texttt{Gemini 3.1 Flash-Lite},
+and \texttt{GPT-5.4 mini}, answer every instance a second time with the reasoning-effort parameter
+at medium and the same prompt and output ceiling, and every one of these responses carries
+reasoning tokens; with reasoning on, \texttt{Gemma 4 26B} leaves 3 of its 2,250 responses empty at
+the output ceiling.
+At matched settings, these responses replace the three models' default ones, and the other eight
+models keep theirs: seven reason by default, and the endpoint of \texttt{Qwen3-235B-2507} offers no
+reasoning setting.
+Its sibling with a thinking mode, \texttt{Qwen3-235B-A22B-Thinking-2507}, is a different model and
+is not evaluated.
+\autoref{appendix:release} gives the dates on which we queried both configurations.
+
+\paragraph{Serving Endpoints.} \autoref{tab:providers} gives, for every model that more than one
+endpoint served, the responses each endpoint served and its difference from the model's mean on the
+templates both cover.
+Over the 21 endpoints matched on at least 20 templates, these differences lie between $-0.025$ and
+$+0.021$; the endpoints that served or matched fewer templates are marked in the table, since their
+differences rest on too few templates to read.
+
 \begin{table*}[t]
 \centering
 \small
@@ -98,27 +118,28 @@ Model & Output ceiling & Providers & Completion tokens & Reasoning tokens & Resp
 % Open-weights models
 \multicolumn{6}{l}{\textbf{Open-Weights LLMs}} \\
 \noalign{\vskip 0.5ex}\hdashline\noalign{\vskip 0.5ex}
-\texttt{DeepSeek V4.1 Flash} & 32,768 & 7 & 3,060 / 10,296 & 2,380 / 9,300 & 100.0\% \\
-\texttt{Gemma 4 26B} & 32,768 & 2 & 797 / 1,430 & 0 / 0 & 0.0\% \\
-\texttt{GLM-5.3} & 32,768 & 8 & 3,270 / 17,954 & 2,473 / 17,051 & 99.8\% \\
-\texttt{GLM-5.3-Flash} & 32,768 & 11 & 2,500 / 11,248 & 1,785 / 10,244 & 99.9\% \\
-\texttt{gpt-oss-20b} & 32,768 & 3 & 1,795 / 5,736 & 992 / 4,707 & 100.0\% \\
-\texttt{Kimi K3} & 32,768 & 2 & 2,192 / 8,295 & 1,496 / 7,148 & 100.0\% \\
-\texttt{Muse Glimmer 30B} & 16,384 & 1 & 2,988 / 6,370 & 1,824 / 3,793 & 100.0\% \\
-\texttt{Qwen3-235B-2507} & 32,768 & 2 & 1,013 / 2,323 & 0 / 0 & 0.0\% \\
+\texttt{DeepSeek V4.1 Flash} & 32,768 & 8 & 3,060 / 10,296 & 2,380 / 9,300 & 100.0\% \\
+\texttt{Gemma 4 26B} & 32,768 & 3 & 797 / 1,434 & 0 / 0 & 0.0\% \\
+\texttt{GLM-5.3} & 32,768 & 8 & 3,270 / 17,954 & 2,473 / 16,298 & 99.8\% \\
+\texttt{GLM-5.3-Flash} & 32,768 & 11 & 2,500 / 11,328 & 1,785 / 10,247 & 99.9\% \\
+\texttt{gpt-oss-20b} & 32,768 & 3 & 1,795 / 6,164 & 993 / 4,987 & 100.0\% \\
+\texttt{Kimi K3} & 32,768 & 2 & 2,192 / 8,277 & 1,495 / 7,121 & 100.0\% \\
+\texttt{Muse Glimmer 30B} & 16,384 & 1 & 2,988 / 6,436 & 1,824 / 3,853 & 100.0\% \\
+\texttt{Qwen3-235B-2507} & 32,768 & 3 & 1,013 / 2,300 & 0 / 0 & 0.0\% \\
 
 \noalign{\vskip 0.5ex}\hdashline\noalign{\vskip 0.5ex}
 
 % Closed models
 \multicolumn{6}{l}{\textbf{Closed LLMs}} \\
 \noalign{\vskip 0.5ex}\hdashline\noalign{\vskip 0.5ex}
-\texttt{Claude Sonnet 5} & 32,768 & 1 & 1,804 / 4,773 & 718 / 3,358 & 99.6\% \\
-\texttt{Gemini 3.1 Flash-Lite} & 32,768 & 1 & 653 / 1,024 & 0 / 0 & 0.0\% \\
-\texttt{GPT-5.4 mini} & 32,768 & 2 & 632 / 1,196 & 0 / 0 & 0.0\% \\
+\texttt{Claude Sonnet 5} & 32,768 & 1 & 1,804 / 4,819 & 718 / 3,387 & 99.6\% \\
+\texttt{Gemini 3.1 Flash-Lite} & 32,768 & 1 & 653 / 1,031 & 0 / 0 & 0.0\% \\
+\texttt{GPT-5.4 mini} & 32,768 & 2 & 632 / 1,198 & 0 / 0 & 0.0\% \\
 
 \bottomrule
 \end{tabular}
-\caption{\textbf{Decoding and Token Use.} Per model over its 2,250 responses: the output ceiling,
+\caption{\textbf{Decoding and token use.} Per model over its 2,250 responses at the providers'
+defaults: the output ceiling,
 the number of providers that served it, the median and 90th-percentile (p90) completion and
 reasoning tokens as the provider reports them, and the share of responses with any reasoning
 tokens.}
@@ -253,15 +274,18 @@ On this unit, we estimate and test each quantity as follows:
     a paired bootstrap interval and a sign-flip permutation test with 100,000 sign flips.
     Strict accuracy, which scores a partial answer 0, and McNemar's exact test on the paired
     verdicts check the comparisons of Final Answer Accuracy; a Wilcoxon signed-rank test checks
-    those of Milestone Coverage, which use the 147 templates with milestones.
+    those of Milestone Coverage, which use the 148 templates with milestones.
     \item \textbf{Level gaps}: a model's level gap is its mean on the 58 Easy templates minus its
     mean on the 34 Advanced ones; we test it with Welch's $t$-test on the template
-    means~\citep{welch1947generalization}, because scores vary more across Advanced templates, and
-    its interval resamples templates within each level.
+    means~\citep{welch1947generalization}, because scores vary more across Advanced templates for
+    nine of the eleven models, and its interval resamples templates within each level.
     \item \textbf{Orderings}: we compare two orderings of the models with Kendall's $\tau$ and a
     bootstrap interval.
     \item \textbf{Multiple tests}: Holm's correction~\citep{holm1979simple} applies within each
     family of tests, such as the 55 pairs of models for each measure or the eleven level gaps.
+    \item \textbf{Matched settings}: the eleven models at matched settings form a second family of
+    55 pairs, tested and corrected in the same way, and a re-run model's change from its default
+    responses is paired by instance.
     \item \textbf{Detectable differences}: at 80\% power and a two-sided level of 0.05, a paired
     comparison detects $2.80\,s/\sqrt{n}$, with $s$ the standard deviation of the $n$ per-template
     differences, and a level gap $2.80\,\sigma\sqrt{1/58 + 1/34}$, with $\sigma$ the pooled

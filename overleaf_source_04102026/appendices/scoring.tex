@@ -4,14 +4,16 @@
 
 This section details the four checks of~\autoref{sec:evaluation};
 \autoref{tab:scoring_settings} tests each setting on the expert study
-of~\autoref{appendix:validation}.
+of~\autoref{appendix:validation}, and~\autoref{box:worked_example} scores one response end to end.
+Every check reads the response a model returns, not the reasoning text that some endpoints return
+separately.
 
 \subsection{Final-Answer Check}
 
 The check reads the final answer from the 700 characters that follow the response's last
 final-answer heading or, failing that, its answer marker (the first when several lie within 700
 characters of one another, otherwise the last) or its last mention of ``answer'', and otherwise
-from its last 700 characters; a response with neither a heading or marker nor a number or verdict
+from its last 700 characters; a response with neither a heading or marker nor a number or label
 word in its last 700 characters has no readable final answer.
 It reads scientific notation, LaTeX, fractions, multiples of $\pi$, and thousands separators as
 numbers, but not a digit subscripted with an underscore, as in \texttt{p\_1}.
@@ -19,16 +21,48 @@ The targets are the milestones on the gold trace's final-answer line, the last o
 array answer and every one otherwise; where the line states no milestone, the target is its last
 value that the question does not give, so a vector or multipart answer is then checked on that
 value alone.
-A classification answer also takes as targets any verdict word that its gold line states, which the
+A classification answer also takes as targets any label word that its gold line states, which the
 last non-negated word of the same family (e.g., laminar or turbulent) in the response's final answer
 must match, and any yes-or-no property, matched label by label.
 
 \autoref{eq:match} uses the unit factors $10^{\pm 3}$, $10^{\pm 6}$, $10^{\pm 9}$, $10^{\pm 12}$,
 100, 60, 3,600, and their inverses, and $\epsilon$ is the check's one fitted constant.
-A response's last digit counts only when one unit of it is smaller than the value, values also match
-in absolute value, a question that prescribes its rounding requires the exact digits, and a scalar
-gold answer stated in two units accepts either.
+A response's last digit counts only when one unit of it is smaller than the value, and its term
+$c\,u(\hat{y})$ in~\autoref{eq:match} counts for at most 1\% of the target; values also match in
+absolute value, a question that prescribes its rounding requires the exact digits, and a scalar gold
+answer stated in two units accepts either.
 Every one of the 2,250 gold traces scores correct.
+
+\paragraph{Symbolic Answers.} Nine templates answer with an expression, such as a signal or a
+velocity field, and the check scores them by the numbers the expression states.
+On five of the nine templates with symbolic answers it also decides equivalence: it parses the gold
+expression and every expression in the response's final answer with SymPy~\citep{meurer2017sympy},
+and accepts the response when, at every sample point of the free variable, its value lies within
+half a unit of the last digit of every decimal the gold writes, so an equal expression in another
+form is correct and an answer coarser than the gold is not.
+This step only raises an incorrect or partial verdict to correct and never lowers one.
+Against domain experts' equivalence grades, it reaches precision 1.000 and recall 0.990 on the 264
+verdicts the experts graded, which also served to settle the rule, and precision 1.000 and recall
+0.840 on the 30 readings of these templates in the experts' readings of the evaluated models
+(\autoref{appendix:validation} and~\autoref{appendix:error_analysis}), which the rule did not see.
+The other four templates with symbolic answers stay scored by the numbers they state.
+
+\paragraph{Prescribed Digits.} 17 templates prescribe the rounding of their answer and of the values
+it depends on, as their procedures do in practice (an order quantity in whole units, a standard
+normal value to four decimals), and the check then requires the prescribed digits: a value within
+the tolerance but not at those digits is incorrect by the question's own terms.
+We keep this requirement as part of the task; relaxing it to the tolerance raises 154 verdicts on 15
+templates and keeps Kendall's $\tau$ with the ordering as scored at 0.964
+(\autoref{tab:scoring_variants}).
+
+\paragraph{Sensitivity of the Rule.} \autoref{tab:scoring_variants} re-applies the rule with one
+clause changed at a time.
+Turning off the absolute-value clause lowers 325 verdicts on 20 templates ($\tau = 0.927$); leaving
+the last-digit term uncapped raises 68 verdicts on 36 templates ($\tau = 1.000$); and partial credit
+in proportion to the parts matched, instead of one half, moves 109 verdicts on 14 templates
+($\tau = 1.000$).
+Of the 22,131 accepted numeric answers, 92.7\% lie within 0.2\% of their target, 6.9\% between
+0.2\% and 1\%, which the last-digit terms admit, and 0.4\% further from it.
 
 \subsection{Milestones and the Judge}
 
@@ -38,7 +72,7 @@ that the gold trace states within 0.5\% and the question does not give under any
 We exclude values within $10^{-9}$ of 0, 1, or 2, bookkeeping variables, the intermediate states of
 iterative schemes, and the elements of containers such as lookup tables, and count a quantity
 stored twice once.
-Matching uses the unit factors above except $10^{\pm 12}$, and MC leaves out the 70 instances
+Matching uses the unit factors above except $10^{\pm 12}$, and MC leaves out the 57 instances
 without milestones.
 
 \paragraph{The Judge.} \texttt{MiMo-V2.5-Pro} (Xiaomi) receives one call per response in which
@@ -95,13 +129,13 @@ Return a raw JSON object only: \\
         \rowcolor{gray!10}
         \textbf{Check} & \textbf{Setting} & \textbf{Result} \\
         \midrule
-        Final answer & $\epsilon$ fitted on each half & 0.908, 0.939 \\
+        Final answer & $\epsilon$ fitted on each half & 0.915, 0.939 \\
         \midrule
-        Milestones & \textbf{0.5\%, unit factors} & \textbf{0.699} \\
-        & 0.2\%, unit factors & 0.687 \\
-        & 1\%, unit factors & 0.646 \\
-        & 2\%, unit factors & 0.560 \\
-        & 0.5\%, no unit factors & 0.676 \\
+        Milestones & \textbf{0.5\%, unit factors} & \textbf{0.705} \\
+        & 0.2\%, unit factors & 0.697 \\
+        & 1\%, unit factors & 0.653 \\
+        & 2\%, unit factors & 0.568 \\
+        & 0.5\%, no unit factors & 0.696 \\
         \midrule
         Judge & \textbf{reached only} & \textbf{0 of 88} \\
         & reached or not needed & 22 of 88 \\
@@ -112,7 +146,7 @@ Return a raw JSON object only: \\
         & 1\% tolerance & 0.171 / 0.039 \\
         \bottomrule
     \end{tabular}
-    \caption{\textbf{Scoring Settings.} Each check's setting, in bold where it has alternatives, on
+    \caption{\textbf{Scoring settings.} Each check's setting, in bold where it has alternatives, on
     the expert study: the three-way agreement with the experts on the half of the responses that
     $\epsilon$ was not fitted on (fitted values 0.0015 and 0.0020); the separation between a
     response's coverage of its own milestones and of the other instances of its template; the
@@ -135,8 +169,11 @@ It flags none of the 6,875 calculations it reads in the 2,250 gold traces.
 \subsection{Judged Step Check}
 
 The check sends the judge one call per response with the prompt below, at the provider's default
-settings, reviewing every non-empty step that the arithmetic check does not flag;
-\autoref{appendix:validation} reports its validation.
+settings, reviewing every non-empty step that the arithmetic check does not flag, and flags a step
+the judge labels a conceptual or calculation error.
+Its flags are the judge's rulings, not verified errors: \autoref{appendix:validation} reports their
+precision against the domain experts, and~\autoref{tab:judged_steps} their rates on the evaluated
+models.
 
 \begin{tcolorbox}[
     colback=gray!5,
@@ -185,6 +222,11 @@ Return a single JSON object containing a "results" list. Each entry must have ex
 "step\_index" and "category". \\
 \{"results": [\{"step\_index": \{first index\}, "category": "Alternative Correct"\}]\}
 \end{tcolorbox}
+
+\subsection{Worked Example}
+
+\autoref{box:worked_example} follows one wrong answer from the evaluation through every check, from
+the final-answer match to its scores $v(r)$ and $m(r)$.
 
 % The worked scoring example (box:worked_example), written by full_run_28092026/worked_example.py --write
 \input{sections/appendices/worked_example}

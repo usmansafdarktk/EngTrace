@@ -52,22 +52,25 @@ multiples of the bit rate, and discrete-time frequencies are rational multiples 
 \section{Template Implementation Examples}
 \label{sec:appendix_template_examples}
 
-The following examples illustrate both parametric and \textit{structural} diversity across
-templates.
-Structural variation refers to differences in the type of physical reasoning chain required, not
-merely in numerical values.
-The Easy template (\texttt{Template Rational Method Peak Flow}, civil engineering) applies the
-rational formula directly to a homogeneous catchment, or first computes an area-weighted runoff
-coefficient when the catchment combines two land uses.
-The Intermediate template (\texttt{Template Exponential MTTF Topology}, industrial engineering)
-samples the system topology: for pumps in series, the lifetime of the system is the minimum of
-independent exponential lifetimes, whereas for two pumps in parallel, the memoryless property splits
-the lifetime into two phases.
-The Advanced template (\texttt{Template Equivalent Stiffness Frequency}, mechanical engineering)
-reduces a series or parallel spring arrangement to an equivalent stiffness before computing the
-natural frequency.
-In each of the three, a sampled parameter changes the reasoning chain, not only the numbers.
-The listings show the template functions without their documentation strings.
+The three listings below show templates as they stand in the code, one per level and from three
+branches, without their documentation strings.
+The Easy template (natural frequency of a torsional pendulum, mechanical engineering) gives the
+disc's mass moment of inertia and the shaft's torsional stiffness, sampled over ranges from small
+rotors to flywheels, and asks for the natural frequency and period without stating the formula that
+relates them.
+The Intermediate template (mean time to failure of a cooling loop, industrial engineering) samples
+the system topology: for pumps in series, the lifetime of the system is the minimum of independent
+exponential lifetimes, whereas for two pumps in parallel, the memoryless property splits the
+lifetime into two phases, so a sampled parameter changes the derivation, not only the numbers.
+The Advanced template (molar volumes from the van der Waals equation, chemical engineering) couples
+the equation's parameters, computed from the critical properties, with the cubic equation of state,
+which it solves numerically for three real roots at a temperature and pressure that it redraws until
+the state lies in the two-phase region; the gold trace of each of its instances has six or more
+milestones.
+Every template prints each value at a stated precision, and every printed calculation recomputes
+from its printed operands (\autoref{appendix:certification}); the templates whose procedures round
+at a stated precision in practice also prescribe the rounding of their answer
+(\autoref{appendix:scoring}).
 
 \vspace{6pt}
 
@@ -76,73 +79,64 @@ The listings show the template functions without their documentation strings.
 \vspace{6pt}
 
 \begin{lstlisting}[style=pythonstyle]
-def template_rational_method_peak_flow():
-    form = random.choice(["single", "composite"])
+def template_undamped_natural_frequency_torsional():
+    # 1. Parameterize the inputs with random values
 
-    if form == "single":
-        use = random.choice(list(_RATIONAL_USES.keys()))
-        phrase = _RATIONAL_USES[use]
-        c_lo, c_hi = RATIONAL_C[use]
-        C = round(random.uniform(c_lo, c_hi), 2)
-        A = round(random.uniform(max(2.0, 0.52 / C), 20.0), 1)
-        i = random.randint(max(25, math.ceil(43.2 / (C * A))), 90)
-        Q = round(C * i * A / 360.0, 2)
-        setup_text = (
-            f"a {A:.1f} ha catchment consisting of a {phrase} with a "
-            f"runoff coefficient of C = {C:.2f} (per HEC-22)")
-        steps = (
-            f"**Step 1:** State the rational formula in SI form.\n"
-            f"Q = C * i * A / 360, with Q in m^3/s, i in mm/h, and A in "
-            f"ha.\n\n"
-            f"**Step 2:** Substitute the given values.\n"
-            f"Q = {C:.2f} * {i} * {A:.1f} / 360\n\n"
-            f"**Step 3:** Evaluate the peak discharge.\n"
-            f"Q = {Q:.2f} m^3/s\n\n"
-        )
-    else:
-        use1, use2 = random.sample(list(_RATIONAL_USES.keys()), 2)
-        p1, p2 = _RATIONAL_USES[use1], _RATIONAL_USES[use2]
-        c1 = round(random.uniform(*RATIONAL_C[use1]), 2)
-        c2 = round(random.uniform(*RATIONAL_C[use2]), 2)
-        A1 = round(random.uniform(3.0, 12.0), 1)
-        A2 = round(random.uniform(3.0, 12.0), 1)
-        A = round(A1 + A2, 1)
-        Cw = round((c1 * A1 + c2 * A2) / A, 3)
-        i = random.randint(max(25, math.ceil(43.2 / (Cw * A))), 90)
-        Q = round(Cw * i * A / 360.0, 2)
-        C = Cw
-        setup_text = (
-            f"a catchment with two land uses: {A1:.1f} ha of {p1} "
-            f"(C = {c1:.2f}) and {A2:.1f} ha of {p2} (C = {c2:.2f}), the "
-            f"runoff coefficients taken from HEC-22 Table 3-1")
-        steps = (
-            f"**Step 1:** Compute the area-weighted composite runoff "
-            f"coefficient.\n"
-            f"C_w = (C1*A1 + C2*A2) / (A1 + A2) "
-            f"= ({c1:.2f} * {A1:.1f} + {c2:.2f} * {A2:.1f}) / {A:.1f} "
-            f"= {Cw:.3f}\n\n"
-            f"**Step 2:** State the rational formula in SI form.\n"
-            f"Q = C_w * i * A / 360, with Q in m^3/s, i in mm/h, and A "
-            f"in ha.\n\n"
-            f"**Step 3:** Substitute and evaluate.\n"
-            f"Q = {Cw:.3f} * {i} * {A:.1f} / 360 = {Q:.2f} m^3/s\n\n"
-        )
+    # Mass moment of inertia (J_0): Represents the rotational inertia of the disc.
+    # The range covers small rotors to medium-sized flywheels.
+    mass_moment_of_inertia = round(random.uniform(0.05, 25.0), 3)  # in kg-m^2
 
-    assert 0.1 <= Q <= 6.0, f"peak flow out of bounds: {Q}"
+    # Torsional stiffness (k_t): Represents the shaft's resistance to twisting.
+    torsional_stiffness = random.randint(200, 75000)                # in N-m/rad
+
+    # Standardize precision for all calculations and final outputs
+    precision = 3
+
+    # 2. Perform the core calculations for the solution
+
+    # Step A: Calculate the undamped natural frequency in radians per second
+    omega_n = math.sqrt(torsional_stiffness / mass_moment_of_inertia)
+
+    # Step B: Convert the natural frequency from rad/s to Hertz (Hz)
+    f_n = omega_n / (2 * math.pi)
+
+    # Step C: Calculate the natural period of oscillation
+    tau_n = 1 / f_n
+
+    # 3. Generate the question and solution strings
 
     question = (
-        f"During a design storm with rainfall intensity i = {i} mm/h, "
-        f"determine the peak discharge in m^3/s from {setup_text}, using "
-        f"the rational method in SI form (Q = C*i*A/360 with i in mm/h "
-        f"and A in hectares)."
+        f"A torsional pendulum consists of a disc with a mass moment of inertia of "
+        f"{mass_moment_of_inertia} kg-m^2 attached to a shaft with a torsional stiffness of "
+        f"{torsional_stiffness} N-m/rad. The system is undamped. "
+        f"Calculate the natural frequency of torsional vibration in both rad/s and Hz, "
+        f"and determine the corresponding period."
     )
 
     solution = (
         f"**Given:**\n"
-        f"Rainfall intensity (i): {i} mm/h\n"
-        f"Catchment: {setup_text}\n\n"
-        f"{steps}"
-        f"**Answer:** The peak discharge is {Q:.2f} m^3/s"
+        f"Mass Moment of Inertia (J_0) = {mass_moment_of_inertia} kg-m^2\n"
+        f"Torsional Stiffness (k_t) = {torsional_stiffness} N-m/rad\n\n"
+
+        f"**Step 1:** Calculate the undamped natural frequency in radians per second (omega_n).\n"
+        f"The formula for a torsional system is: omega_n = sqrt(k_t / J_0)\n"
+        f"omega_n = sqrt({torsional_stiffness} / {mass_moment_of_inertia})\n"
+        f"omega_n = {round(omega_n, precision)} rad/s\n\n"
+
+        f"**Step 2:** Convert the natural frequency to Hertz (f_n).\n"
+        f"The relationship is: f_n = omega_n / (2 * pi)\n"
+        f"f_n = {round(omega_n, precision)} / (2 * pi)\n"
+        f"f_n = {round(f_n, precision)} Hz\n\n"
+
+        f"**Step 3:** Calculate the natural period of vibration (tau_n).\n"
+        f"The period is the reciprocal of the frequency in Hz.\n"
+        f"The formula is: tau_n = 1 / f_n\n"
+        f"tau_n = 1 / {round(f_n, precision)}\n"
+        f"tau_n = {round(tau_n, precision)} s\n\n"
+
+        f"**Answer:**\n"
+        f"The undamped torsional natural frequency is {round(omega_n, precision)} rad/s or {round(f_n, precision)} Hz.\n"
+        f"The natural period of vibration is {round(tau_n, precision)} seconds."
     )
 
     return question, solution
@@ -252,66 +246,95 @@ def template_exponential_mttf_topology():
 
 \vspace{6pt}
 
-\begin{lstlisting}[style=pythonstyle]
-def template_equivalent_stiffness_frequency():
-    # 1. Parameterize the inputs with random values
-    mass = round(random.uniform(5.0, 100.0), 2)       # in kg
-    stiffness_1 = random.randint(1000, 50000)         # in N/m
-    stiffness_2 = random.randint(1000, 50000)         # in N/m
+\begin{lstlisting}[style=pythonstyle, literate={²}{{$^2$}}1 {³}{{$^3$}}1 {·}{{$\cdot$}}1 {₀}{{$_0$}}1 {₁}{{$_1$}}1 {₂}{{$_2$}}1 {≈}{{$\approx$}}1]
+def template_vdw_solve_for_volume():
+    # 1. Parameterize the inputs with a Validation Loop
+    # We want to ensure we generate a problem with 3 roots (the "Two-Phase" scenario)
+    # as this is the most pedagogically valuable case for cubic EOS problems.
 
-    # Randomly choose the spring configuration
-    configuration = random.choice(['series', 'parallel'])
+    R = 0.08314  # L·bar/(mol·K)
 
-    # Standardize precision for final outputs
-    precision = 3
+    # Loop until we find a set of inputs that produces 3 distinct real roots
+    while True:
+        try:
+            substance_name = random.choice(list(CRITICAL_PROPERTIES.keys()))
+            properties = CRITICAL_PROPERTIES[substance_name]
+            Tc = properties["Tc"]
+            Pc = properties["Pc"]
 
-    # 2. Perform the core calculations for the solution
+            # Choose T well below critical point to ensure the "loop" is wide enough
+            Tr = random.uniform(0.65, 0.85)
+            T = round(Tr * Tc, 2)
 
-    # Step A: Calculate the equivalent stiffness (k_eq) based on the configuration
-    if configuration == 'parallel':
-        k_eq = stiffness_1 + stiffness_2
-        formula_str = "k_eq = k1 + k2"
-        calculation_str = f"k_eq = {stiffness_1} + {stiffness_2} = {k_eq} N/m"
-    else: # configuration == 'series'
-        k_eq = (stiffness_1 * stiffness_2) / (stiffness_1 + stiffness_2)
-        formula_str = "k_eq = (k1 * k2) / (k1 + k2)"
-        calculation_str = (
-            f"k_eq = ({stiffness_1} * {stiffness_2}) / ({stiffness_1} + {stiffness_2}) = "
-            f"{round(k_eq, 2)} N/m"
-        )
+            # Estimate VdW saturation pressure to hit the 3-root region
+            # Approx VdW vapor pressure: log10(Pr) ~ -3(1/Tr - 1)
+            approx_Pr_sat = 10**(-3.0 * (1.0/Tr - 1.0))
 
-    # Step B: Calculate the natural frequency using the equivalent stiffness
-    omega_n = math.sqrt(k_eq / mass)
+            # Pick P close to this saturation pressure
+            Pr = approx_Pr_sat * random.uniform(0.95, 1.05)
+            P = round(Pr * Pc, 3) # Use 3 decimals for precision
+
+            # 2. Perform the core calculation
+            a = (27 * (R**2) * (Tc**2)) / (64 * Pc)
+            b = (R * Tc) / (8 * Pc)
+
+            # Coefficients of the cubic polynomial: V³ + c₂V² + c₁V + c₀ = 0
+            c2 = -(b + R * T / P)
+            c1 = a / P
+            c0 = -(a * b) / P
+            coeffs = [1, c2, c1, c0]
+
+            roots = np.roots(coeffs)
+
+            # Filter for positive, real roots
+            tolerance = 1e-9
+            positive_real_roots = sorted([
+                root.real for root in roots if abs(root.imag) < tolerance and root.real > 0
+            ])
+
+            # If we found 3 roots, we have a valid problem. Break the loop.
+            if len(positive_real_roots) == 3:
+                V_f = positive_real_roots[0]
+                V_g = positive_real_roots[-1]
+                break
+
+        except Exception:
+            continue
 
     # 3. Generate the question and solution strings
-
     question = (
-        f"A mass of {mass} kg is attached to a system of two springs. The first spring has a "
-        f"stiffness (k1) of {stiffness_1} N/m, and the second spring has a stiffness (k2) of {stiffness_2} N/m. "
-        f"The two springs are arranged in {configuration}. "
-        f"Determine the equivalent stiffness of the spring system and the resulting undamped "
-        f"natural frequency (omega_n) in rad/s."
+        f"A vessel of {substance_name} is held at a temperature of {T} K and a pressure of {P} bar. "
+        f"Using the van der Waals equation of state, determine the possible molar volumes (L/mol) "
+        f"predicted for the liquid and vapor phases.\n\n"
+        f"The critical properties for {substance_name} are:\n"
+        f"Tc = {Tc} K\nPc = {Pc} bar"
     )
 
     solution = (
-        f"**Given:**\n"
-        f"Mass (m) = {mass} kg\n"
-        f"Stiffness 1 (k1) = {stiffness_1} N/m\n"
-        f"Stiffness 2 (k2) = {stiffness_2} N/m\n"
-        f"Configuration = {configuration.capitalize()}\n\n"
+        f"**Step 1:** Calculate the van der Waals parameters 'a' and 'b'.\n"
+        f"a = (27 * R^2 * Tc^2) / (64 * Pc) = {round(a, 4)} L^2·bar/mol^2\n"
+        f"b = (R * Tc) / (8 * Pc) = {round(b, 5)} L/mol\n\n"
 
-        f"**Step 1:** Calculate the equivalent stiffness (k_eq) for the {configuration} configuration.\n"
-        f"The formula for springs in {configuration} is: {formula_str}\n"
-        f"{calculation_str}\n\n"
+        f"**Step 2:** Formulate the cubic equation: V^3 + c2*V^2 + c1*V + c0 = 0.\n"
+        f"The coefficients are derived from the VdW equation:\n"
+        f"c2 = -(b + RT/P) = {round(c2, 4)} L/mol\n"
+        f"c1 = a/P = {round(c1, 4)} L^2/mol^2\n"
+        f"c0 = -(ab)/P = {round(c0, 6)} L^3/mol^3\n\n"
 
-        f"**Step 2:** Calculate the undamped natural frequency (omega_n) using the equivalent stiffness.\n"
-        f"The formula is: omega_n = sqrt(k_eq / m)\n"
-        f"omega_n = sqrt({round(k_eq, 2)} / {mass})\n"
-        f"omega_n = {round(omega_n, precision)} rad/s\n\n"
+        f"**Step 3:** Solve the polynomial for its roots.\n"
+        f"Using a numerical solver, we find three real, positive roots:\n"
+        f"Roots: {', '.join([f'{r:.4f}' for r in positive_real_roots])} L/mol\n\n"
+        f"\n\n"
+
+        f"**Step 4:** Interpret the physical significance of the roots.\n"
+        f"For a state in the subcritical region, the EOS predicts three roots:\n"
+        f"- The **smallest root** corresponds to the molar volume of the **Liquid Phase**.\n"
+        f"- The **largest root** corresponds to the molar volume of the **Vapor Phase**.\n"
+        f"- The intermediate root is physically unstable and disregarded.\n\n"
 
         f"**Answer:**\n"
-        f"The equivalent stiffness of the system is {round(k_eq, 2)} N/m.\n"
-        f"The undamped natural frequency is {round(omega_n, precision)} rad/s."
+        f"1. Liquid-phase Volume (V_liq) ≈ **{round(V_f, 4)} L/mol**\n"
+        f"2. Vapor-phase Volume (V_vap) ≈ **{round(V_g, 4)} L/mol**"
     )
 
     return question, solution

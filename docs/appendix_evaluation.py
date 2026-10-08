@@ -15,11 +15,14 @@ the judge's validation), ROUTER_VALIDATION.md (the judged step check), E5_VALIDA
 matching on the 300 responses), JUDGE_SWAP.md (a second judge), FLAG_REVIEW_3.md (the expert reading of the
 arithmetic flags), EXPERT_REQUEST.md (the experts' readings of verdicts on the evaluated models, its current figures:
 the readings the store still holds, against the check's current verdicts), symbolic/SYMBOLIC_CHECK.md (the symbolic
-equivalence step against the experts' grades) and results/RESULTS.md (the share of milestones the judge decides);
-evaluator_pilot_17092026/evaluators/answer.py (the templates the symbolic step is enabled on, the cap on an answer's
-own last digit). evaluator_pilot_17092026/: PILOT_SUMMARY.md (the
-study's design, label agreement, the judge with matching, the reward models, the planted defects for three
-judges), RESULTS_LOJO.md (a panel of judges without each family's own judge). docs/re-implementation-sep/
+equivalence step against the experts' grades), results/RESULTS.md (the share of milestones the judge decides),
+results/sensitivity_variants.json (clause_variants.py: the rule's clauses re-applied one at a time, the accepted
+answers by relative error), RESIDUAL_INCORRECT.md (the templates that prescribe their answer's digits) and analyze.py
+(the four templates answerable from their wording); evaluator_pilot_17092026/evaluators/answer.py (the templates the
+symbolic step is enabled on, the cap on an answer's own last digit). evaluator_pilot_17092026/: PILOT_SUMMARY.md (the
+study's design, label agreement, the judge with matching, the reward models and their threshold, the planted defects
+for three judges and the calls that returned no verdict), README.md (how the study's templates are chosen),
+RESULTS_LOJO.md (a panel of judges without each family's own judge). docs/re-implementation-sep/
 DECISIONS.md (D-181: the fourth judge on the planted defects).
 """
 from __future__ import annotations
@@ -219,6 +222,23 @@ symbolic_templates = len({json.loads(l)["template_id"] for l in read(RUN / "mani
                           if l.strip() and json.loads(l)["answer_type"] == "symbolic"})
 WORDS = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"]
 
+# The scoring rule's clauses re-applied one at a time (clause_variants.py's results/sensitivity_variants.json), the
+# accepted numeric answers by relative error, and the templates that prescribe their answer's digits
+# (RESIDUAL_INCORRECT.md, residual_incorrect.py)
+sv_main = json.loads(read(RUN / "results/sensitivity_variants.json"))["stores"]["main"]
+where, sv_tau = sv_main["where_changed"], sv_main["tau_with_headline"]
+bins = sv_main["relative_error_bins"]["all"]
+accepted = bins["numeric"]
+assert accepted == sum(bins[k] for k in ("le_0.2", "0.2_1", "1_5", "gt_5")), bins
+exact = one(r"Templates with an exact-digits target \(the question prescribes the rounding\): (\d+) of 150", read(
+    RUN / "RESIDUAL_INCORRECT.md"))[0]
+assert all(m["abs_clause_off"] <= m["headline"] for m in sv_main["models"].values()), "the clause only lowers verdicts"
+assert all(m["last_digit_unbounded"] >= m["headline"] for m in sv_main["models"].values()), "uncapped only raises"
+
+
+def of_accepted(n: int) -> str:
+    return f"{100 * n / accepted:.1f}\\%"
+
 
 def q(s: str, label: str) -> str:
     return re.search(rf'"{label}" (\d+)', s).group(1)
@@ -233,8 +253,9 @@ missing_confirmed = total(b3["MISSING"]) - int(q(b3["MISSING"], OBTAINS))
 # Claims the prose makes from these readings: one the data no longer supports is reported and counted by --check,
 # and the rows and phrases are still generated
 CLAIMS_FAILED = [c for ok, c in (
-    (int(b1n("partial", "correct")) / total(b1["partial"]) > 0.5,
-     f"most partial verdicts are called fully correct ({b1n('partial', 'correct')} of {total(b1['partial'])} readings)"),
+    ((int(b1n("partial", "correct")) + 0.5 * int(b1n("partial", "partial"))) / total(b1["partial"]) > 0.5,
+     f"scoring a partial verdict 0.5 is conservative on average (the experts' mean credit on "
+     f"{total(b1['partial'])} readings)"),
     (0.30 <= int(q(b3["MISSING"], UNNEEDED)) / total(b3["MISSING"]) < 0.37,
      f"a third of the missing rulings are not needed by the route ({q(b3['MISSING'], UNNEEDED)} of {total(b3['MISSING'])})"),
 ) if not ok]
@@ -257,7 +278,8 @@ results_rows = [
     f"Best process reward model & P, all steps; correct answers & {prm[1]}; {prm[2]} \\\\",
     "\\multicolumn{3}{l}{\\textit{Planted defects: conceptual / arithmetic caught, untouched steps flagged}} \\\\",
     f"Deterministic checks & conceptual & {cnt(planted['conceptual defects'][0])} \\\\",
-] + [f"\\texttt{{{n}}} & LLM judge, one step & {c} / {a} / {u} \\\\" for n, c, a, u in judges] + [
+] + [f"\\texttt{{{n}}}{'' if c.endswith(' of 60') and u.endswith(' of 120') else chr(36) + '^' + chr(92) + 'ddagger' + chr(36)}"
+     f" & LLM judge, one step & {c} / {a} / {u} \\\\" for n, c, a, u in judges] + [
     f"Judged step check & conceptual, every unflagged step sent & {batched[2]} of {batched[1]} \\\\",
     f"Step matching with in-family judges & conceptual, end to end & {round(matching_caught)} of 60 \\\\",
     "\\multicolumn{3}{l}{\\textit{Readings of the evaluated models' responses}} \\\\",
@@ -265,7 +287,8 @@ results_rows = [
     f"Final answer correct & {total(b1['correct'])} readings & {b1n('correct', 'correct')} confirmed \\\\",
     f"Final answer incorrect & {total(b1['incorrect'])} readings & {b1n('incorrect', 'incorrect')} confirmed, "
     f"{b1n('incorrect', 'correct')} called correct \\\\",
-    f"Final answer partial & {total(b1['partial'])} readings & {b1n('partial', 'correct')} called fully correct \\\\",
+    f"Final answer partial & {total(b1['partial'])} readings & {b1n('partial', 'correct')} called fully correct, "
+    f"{b1n('partial', 'incorrect')} incorrect \\\\",
     f"Judge reached & {total(b3['REACHED'])} readings & {q(b3['REACHED'], OBTAINS)} confirmed \\\\",
     f"Judge missing & {total(b3['MISSING'])} readings & {missing_confirmed} confirmed, {q(b3['MISSING'], UNNEEDED)} "
     f"of them not needed by the route \\\\",
@@ -324,8 +347,23 @@ scoring = [
     # the symbolic equivalence step and the cap on an answer's own last digit (ANSWER FINAL)
     f"{WORDS[len(enabled)]} of the {WORDS[symbolic_templates]} templates with symbolic answers",
     f"precision {sym_graded[1]} and recall {sym_graded[2]} on the {sym_graded[0]} verdicts the experts graded",
-    f"precision {sym_earlier[1]} and recall {sym_earlier[2]} on the {sym_earlier[0]} earlier readings",
+    f"precision {sym_earlier[1]} and recall {sym_earlier[2]} on the {sym_earlier[0]} readings of these templates",
+    f"The other {WORDS[symbolic_templates - len(enabled)]} templates with symbolic answers",
     f"at most {own_cap * 100:g}\\% of the target",
+    # the prescribed digits and the clause sensitivities (tab:scoring_variants)
+    f"{exact} templates prescribe the rounding of their answer",
+    f"relaxing it to the tolerance raises {where['prescribed_relaxed']['verdicts']} verdicts on "
+    f"{where['prescribed_relaxed']['templates']} templates and keeps Kendall's $\\tau$ with the ordering as scored at "
+    f"{sv_tau['prescribed_relaxed']:.3f}",
+    f"lowers {where['abs_clause_off']['verdicts']} verdicts on {where['abs_clause_off']['templates']} templates "
+    f"($\\tau = {sv_tau['abs_clause_off']:.3f}$)",
+    f"raises {where['last_digit_unbounded']['verdicts']} verdicts on {where['last_digit_unbounded']['templates']} "
+    f"templates ($\\tau = {sv_tau['last_digit_unbounded']:.3f}$)",
+    f"moves {where['per_part_credit']['verdicts']} verdicts on {where['per_part_credit']['templates']} templates "
+    f"($\\tau = {sv_tau['per_part_credit']:.3f}$)",
+    f"Of the {thousands(str(accepted))} accepted numeric answers, {of_accepted(bins['le_0.2'])} lie within 0.2\\% of their "
+    f"target, {of_accepted(bins['0.2_1'])} between 0.2\\% and 1\\%",
+    f"and {of_accepted(bins['1_5'] + bins['gt_5'])} further from it",
 ] + settings_rows
 validation = [
     f"four instances from each of {design[1]} templates, {design[0]} in all",
@@ -354,6 +392,30 @@ validation = [
     f"{pct(float(pairs[0]))} of answers and {pct(float(pairs[2]))} of milestones",
     f"{not_confirmed} of the {total(b3['REACHED'])} readings of reached rulings",
     f"F1 {e3_f1_then} without the judge",
+    # how the study's templates are chosen (the pilot's README), the in-sample caveat, the two milestone F1 values
+    f"{design[1]} templates, 60 in all, one template per branch and level" if one(
+        r"(\d+) templates, one per branch × level cell", read(PILOT / "README.md"))[0] == design[1] else "SLICE CHANGED",
+    "leaves out the four templates whose answers can be read off" if sorted(
+        re.findall(r"`(\w+)`", one(r"(Four templates are excluded everywhere.*?)\n\n", read(PILOT / "README.md"))[0]))
+    == sorted(t.replace("template_", "") for t in re.findall(r"'(template_\w+)'", one(
+        r"SHORTCUT = \[(.*?)\]", read(RUN / "analyze.py"))[0])) else "READ-OFF TEMPLATES CHANGED",
+    "Only $\\epsilon$ is cross-fitted",
+    f"the two milestone F1 values, {now['E3 F1']} and {e5[2]}",
+    # the judge's calls that returned no verdict, and the reward models' threshold
+    "{4} of its {5} calls returned no reply after retries, so its counts rest on the {0} conceptual defects and "
+    "the {2} untouched steps".format(*one(r"MiMo returned a verdict on both arms for (\d+) of the (\d+) conceptual "
+                                          r"defects and for (\d+) of the (\d+) untouched steps: (\d+) of its (\d+) calls "
+                                          r"never returned", psb)),
+    "changes step F1 by ${}$".format(one(r"changes the held-out F1 by (−0\.\d+)", psb)[0].replace("−", "-")),
+    "no threshold reaches precision {}".format(one(r"no threshold reaches precision (0\.\d+) on held-out data", psb)[0]),
+    # the readings' denominators and the judged step check's precision beside tab:judged_steps
+    f"each of {b1_items} final-answer verdicts", f"and {b3_items} judge rulings",
+    f"The experts call {b1n('partial', 'correct')} of their {total(b1['partial'])} readings of partial verdicts "
+    f"fully correct and {b1n('partial', 'incorrect')} incorrect",
+    f"{b1n('incorrect', 'correct')} of the {total(b1['incorrect'])} readings of incorrect verdicts call the answer "
+    "correct",
+    f"precision is {judge_all[0] / sum(judge_all):.3f} over all steps and {judge_cor[0] / sum(judge_cor):.3f} inside "
+    f"correct answers ({judge_cor[0]} of {sum(judge_cor)} flags)",
 ] + results_rows
 
 for c in CLAIMS_FAILED:

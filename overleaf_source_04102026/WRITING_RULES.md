@@ -102,13 +102,34 @@ Labels used before their sections exist. Each must be defined when its section i
   from `docs/appendix_statistics.py`, whose `--check` must pass).
 - Defined in `appendices/template_examples.tex`: `sec:appendix_param_details` (four run-in paragraphs by principle,
   with examples from all five branches; D-196) and `sec:appendix_template_examples` (three listings generated from the current template
-  code by `docs/appendix_listings.py`, whose `--check` must pass after any template change).
+  code by `docs/appendix_listings.py`, whose `--check` must pass after any template change: Easy, mechanical, a question
+  that does not state its formula; Intermediate, industrial; Advanced, chemical, an implicit solve with six or more
+  milestones).
+- Defined in `appendices/taxonomy_content.tex` besides the above: `tab:area` (templates per area and level, a block
+  written by `docs/appendix_statistics.py --write`).
 - Defined in `appendices/certification.tex`: `appendix:certification` (integrity checks, LLM screen with May's
   prompt box, expert protocol with `tab:planted_defects`, results with `tab:expert_agreement` and the rounds
   in the prose (D-196); every number from `docs/appendix_certification.py`, whose `--check` must pass). Table rows may exceed 100 characters; prose may not.
 - Defined in `5_evaluation.tex`: `sec:evaluation` (no subsections: the measures and the scoring process, with the
   expert study behind a pointer to `appendix:validation`), `eq:match` (the final-answer match rule) and
   `eq:coverage` (Milestone Coverage).
-- Defined in `appendices/scoring.tex`: `appendix:scoring` (one table, `tab:scoring_settings`; the two judge prompts).
-  Defined in `appendices/validation.tex`: `appendix:validation` (one table, `tab:validation_results`). Every number
+- Defined in `appendices/scoring.tex`: `appendix:scoring` (one table, `tab:scoring_settings`; the two judge prompts;
+  the worked example `box:worked_example`, a block in `appendices/worked_example.tex` written by
+  `python -m full_run_28092026.worked_example --write`, which `scoring.tex` inputs).
+  Defined in `appendices/validation.tex`: `appendix:validation` (one table, `tab:validation_results`) and its
+  subsection `appendix:readings` (the domain experts' readings of the evaluated models). Every number
   in these two files and in `5_evaluation.tex` comes from `docs/appendix_evaluation.py`, whose `--check` must pass.
+- Defined in `appendices/models.tex` besides the above: `tab:providers` (serving endpoints; a block written by
+  `full_run_28092026/paper_results.py --write`).
+- Defined in `appendices/results.tex`: `appendix:results` and the blocks `paper_results.py --write` writes there:
+  `tab:matched`, `tab:single_path`, `tab:scoring_variants`, `tab:coverage`, `tab:coverage_variants`,
+  `tab:judged_steps`, `tab:flag_precision`, `tab:level_gap`, `tab:depth_model`. Defined in
+  `appendices/branch_domain.tex`: `appendix:branch_domain`, `tab:branch_domain` (also `tab:by_branch`,
+  `tab:by_domain_kind`), `fig:branch_bars`, `fig:domain_radar`. Defined in `appendices/paraphrase.tex`:
+  `appendix:paraphrase`, `tab:paraphrase`. Defined in `appendices/further_experiments.tex`: `appendix:experiments`,
+  `tab:experiments`. Defined in `appendices/error_analysis.tex`: `appendix:error_analysis`, `tab:errors` (also
+  `tab:error_by_level`). The prose of these five files is checked by `paper_results.py --check` against its phrases:
+  a number the prose states must be one a phrase of that file generates.
+- Defined in `appendices/related_work.tex`: `appendix:related_work` (the extended related work; table
+  `tab:related_work`, the fifteen closest benchmarks). Defined in `appendices/release.tex`: `appendix:release` (what
+  is released and withheld, query dates, the script behind each table, the contamination policy).
