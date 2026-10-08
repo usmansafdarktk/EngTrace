@@ -144,7 +144,7 @@ def fig_level_gap(order: list[str], q2: dict, fig_name: dict, figs_dir: Path) ->
                        {"markerfacecolor": "white", "markeredgecolor": rest_edge, "markeredgewidth": 0.9}))
         ax.plot([q2[k]["without_two_chemical"]["gap"] for k in order], range(len(order)), marker="x", markersize=3.8, markeredgewidth=0.8,
                 color=INK, linestyle="none", zorder=4)
-        ax.set_xlim(-0.03, 0.36)
+        ax.set_xlim(-0.04, 0.36)
         ax.set_xlabel("Final Answer Accuracy drop from Easy to Advanced", fontsize=6.5, fontweight="bold", color="black", labelpad=2)
         handles = [Line2D([], [], marker="o", color=DARK, markersize=4.6, linestyle="none", label="Holds after Holm"),
                    Line2D([], [], marker="o", markerfacecolor="white", markeredgecolor=rest_edge, markeredgewidth=0.9, markersize=4.6,
@@ -217,13 +217,13 @@ def fig_paraphrase(order: list[str], q5: dict, margin: float, fig_name: dict, fi
         ax.tick_params(axis="x", colors="black", labelsize=6.5)
         ax.axvspan(-margin, margin, color=BAND, zorder=0)
         ax.axvline(0, color=MUTED, linewidth=0.6, zorder=1)
-        ax.text(0.0015, 2.5, "No change", rotation=90, ha="left", va="center", fontsize=5.5, style="italic", color=MUTED)
+        ax.text(0.0015, 0.5, "No change", rotation=90, ha="left", va="center", fontsize=5.5, style="italic", color=MUTED)
         gradient_rows(ax, [(i, q5[k]["ci90"][0], q5[k]["ci90"][1], q5[k]["diff"], BLUE if within[k] else rest) for i, k in enumerate(order)])
         for i, k in enumerate(order):
             ax.plot([q5[k]["diff"]], [i], marker="o", markersize=4.6, linestyle="none", zorder=3,
                     **({"markerfacecolor": DARK, "markeredgecolor": "white", "markeredgewidth": 0.6} if within[k] else
                        {"markerfacecolor": "white", "markeredgecolor": rest_edge, "markeredgewidth": 0.9}))
-        ax.set_xlim(-0.072, 0.058)
+        ax.set_xlim(-0.075, 0.061)
         ax.set_xticks([-0.05, 0, 0.05])
         ax.set_xticklabels(["−0.05", "0", "0.05"])
         ax.set_xlabel("Final Answer Accuracy change under paraphrase", fontsize=6.5, fontweight="bold", color="black", labelpad=2)
@@ -249,6 +249,7 @@ def fig_error_categories(by_model: dict, categories: list, incomplete: str, b2_m
     fills = ["#5c3b24", "#7f5638", "#a87c5b", "#b78f71", "#c3a084", "#d9b86c", "#b3dda0"]
     hatches = ["...", "...", "...", "...", "...", "//", ""]
     labels = {"claude-sonnet-5": "Claude\nSonnet 5", "gpt-5.4-mini": "GPT-5.4\nmini", "gemma-4-26b-a4b": "Gemma 4\n26B", "gpt-oss-20b": "GPT OSS\n20B"}
+    b2_models = sorted(b2_models, key=list(labels).index)  # the committed bar order, whatever order the data arrives in
     with plt.rc_context({"font.family": "serif", "font.serif": ["Times New Roman"], "font.size": 7, "legend.fontsize": 7}):
         fig, ax = plt.subplots(figsize=(COLUMN, 2.3), gridspec_kw={"left": 0.11, "right": 0.75, "bottom": 0.15, "top": 0.97})
         for x, m in enumerate(b2_models):
