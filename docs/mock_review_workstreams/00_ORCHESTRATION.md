@@ -58,7 +58,7 @@ reports folder; dependent sessions are told by the owner.
 | D6 | Prescribed digits | Keep the exact-digit requirement as the construct; report the relaxed score as a sensitivity | |
 | D7 | Difficulty labels after E1 | Report agreement and keep the labels if the majority differs on a handful; adopt the majority and regenerate if it differs widely (WS-E's `apply_labels.py`, then WS-G) | The domain experts' original labels stay, unchanged since the templates were written (58 / 58 / 34): no re-rating, nothing relabelled or re-frozen, no agreement figure in the paper (owner, 2026-10-08) |
 | D8 | Release and contamination policy | Release templates, generator, evaluator code, all responses and scores, judge rulings and hashes under MIT; the seed at publication; a held-out seed kept; names and per-rater files withheld | |
-| D9 | Figure model labels | Keep "GPT OSS 20B" in figures with one note per caption, or switch to `gpt-oss-20b`; consistent either way | |
+| D9 | Figure model labels | Keep "GPT OSS 20B" in figures with one note per caption, or switch to `gpt-oss-20b`; consistent either way | Keep "GPT OSS 20B" as the figures have it: the figures' designs stay unchanged (owner, 2026-10-08) |
 | D11 | **Evaluator fixes before ANSWER FINAL** (WS-E amendments of 2026-10-07 evening): (a) fold unicode superscript exponents in the milestone reader; (b) stop reading a unit exponent as a number in `answer.values`; (c) the non-final-segment fallback window; (d) bound the last-digit term by min(u(y_hat), 0.01|y|) as the rule | (a) fix; (b) fix; (c) fix or document after reading C3's sample; (d) adopt, state in the scoring appendix, re-validate on the expert study | |
 | D12 | **The absolute-value clause** (434 main-run verdicts on 22 templates depend on it) | Keep the clause and report the count as a sensitivity; have a 40-item sample read (E6) only if the text is to call it a convention allowance | |
 | D10 | Taxonomy facts | The rule that cut the prompted 5 to 7 domains to 3 per branch; what the LLM panel did (cross-check or vote); stated in the same words in §3.1 and the appendix | |
@@ -141,7 +141,8 @@ Generated block labels (WS-C writes, D1/D2 place the markers): `tab:main_results
 `tab:providers`, `tab:depth_model`, `tab:flag_precision`, `tab:judged_steps` (moved out of Table 1), `tab:area`,
 `tab:levels_agreement`, `tab:errors` (gains the no-error-removed shares), `box:worked_example`
 (`appendices/worked_example.tex`). Figures keep their labels: `fig:level_bars`, `fig:error_categories`,
-`fig:branch_bars`, `fig:domain_heatmap` (replaces `fig:domain_radar`).
+`fig:branch_bars`, `fig:domain_radar`. Owner, 2026-10-08: every figure in `figs/` keeps its current design and
+only its data is refreshed (WS-F's amendment); no heatmap, no `fig:level_bars_all`.
 
 Result files of the WS-C split (each script writes only its own; schemas in the C1 to C3 briefs; every file
 carries `"quick": true` when written in quick mode and C4 prints "STAND-IN" in a caption that reads a stand-in):

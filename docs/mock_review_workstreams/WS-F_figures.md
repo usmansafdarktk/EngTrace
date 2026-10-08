@@ -1,5 +1,36 @@
 # WS-F: Figures (Phase 1)
 
+## Amendment, 2026-10-08 (owner): refresh the data only
+
+This section replaces the mission and steps F2 to F8 below. F1 is done (FIGURES EXTRACTED, by WS-C4).
+
+Every figure in `overleaf_source_04102026/figs/` keeps its current design exactly; only its data is brought to the
+final results. No redesign and no new figure: the heatmap and the all-models level figure are dropped, and the owner
+commissions any further figure. `figs/app_candidates/` stays as it is: do not touch or remove it.
+
+The figures, all drawn by `full_run_28092026/paper_figures.py`:
+- `error-categories.pdf` (`fig:error_categories`): the PDF still shows the earlier error-analysis readings, while the
+  caption block WS-G wrote gives the current ones (B2: 137 items). It must change.
+- `branch-bars.pdf` (`fig:branch_bars`), `level-bars.pdf` (`fig:level_bars`) and
+  `domain_radar/domain-radar-labeled.pdf` (`fig:domain_radar`).
+- `level-gap.pdf`, `coverage-wrong.pdf` and `paraphrase.pdf` (in `figs/`, not placed in the paper).
+- `domain_radar/domain-radar-unlabeled.pdf` (not placed; `fig_domain_radar` draws it beside the labelled one).
+
+Steps:
+1. Draw into a scratch copy of the tree: `python full_run_28092026/paper_results.py --out <scratch> --headline default
+   --repaired` (without `--text-only`). The real tree is not touched.
+2. Keep `paper_figures.py`'s design as it is: layout, colours, hatching, fonts, labels ("GPT OSS 20B"). If a figure
+   cannot be drawn from the final data without a code change, make only the data-side change and report it.
+3. Render each current and refreshed PDF to PNG and compare. The design must be identical. List what moved in the
+   data (which bars or segments, by how much); a figure whose data did not change stays byte-identical.
+4. Show the owner the before-and-after renders and wait for approval. Before approval: no tex edit, no commit.
+5. On approval, copy the refreshed PDFs to the same paths in `figs/`.
+6. Read each placed figure's caption block (WS-G regenerated them) and list any sentence that no longer fits the
+   refreshed figure, for WS-D1 (it edits every caption in `paper_results.py`). Write no caption text yourself.
+
+Signal: `SIGNAL: FIGURES REFRESHED <date time>` at the top of `reports/WS-F_report.md`, with, per figure: design
+identical (yes or no), what changed in the data, the approval date, and the caption sentences that no longer fit.
+
 ## Mission
 
 First, move the figure-drawing code out of `full_run_28092026/paper_results.py` into a module of its own, so

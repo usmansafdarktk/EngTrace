@@ -112,3 +112,8 @@ current_overleaf_project/
 
 # stand-in result files written by full_run_28092026/paper_results.py --stand-in (placeholders, never committed)
 full_run_28092026/results/stand_in/
+
+# local-only material, not versioned (owner, 2026-10-09)
+ACL Mock Reviews/
+overleaf_source_04102026/ARR_ How to Write a Research Article.docx
+figures_oct_12/

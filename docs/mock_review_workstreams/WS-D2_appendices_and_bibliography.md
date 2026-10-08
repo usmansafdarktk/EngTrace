@@ -120,8 +120,8 @@ configurations; the paired changes).
 ### D2-5. Taxonomy and statistics (`appendices/taxonomy_content.tex`)
 
 The domain-selection paragraph rewritten to the actual process (D10), in the same words §3.1 uses (WS-D1 sends
-its sentence; align); the per-area table's sentence; the agreement table's sentence (kappa, majority
-differences, formula-stated count; D7's outcome); the statistics caption; the data-source table's unclear
+its sentence; align); the per-area table's sentence; no agreement table or figure (D7, owner
+2026-10-08: the domain experts' original labels stand; no re-rating is mentioned); the statistics caption; the data-source table's unclear
 entries. `appendix_statistics.py --check` passes.
 
 ### D2-6. Template examples (`appendices/template_examples.tex`, `docs/appendix_listings.py`)
@@ -139,8 +139,8 @@ readings if E3c ran, in their own paragraph with the configuration named); the "
 paragraph reduced to the six near-miss templates; the four read-off templates named with the sensitivity;
 the no-error-removed shares introduced. `appendices/paraphrase.tex`: the repeat models named; `Mistral Large 3`
 cited; the kept count; the margin's basis. `appendices/further_experiments.tex`: four; the instance counts per
-experiment after the repair. `appendices/branch_domain.tex`: the heatmap's paragraph replacing the radar's; the
-grouped-bar figure's paragraph.
+experiment after the repair. `appendices/branch_domain.tex`: the radar and the branch bars keep their designs
+(owner, 2026-10-08), so their paragraphs stay; update only their numbers.
 
 ### D2-8. Release appendix (`appendices/release.tex`, label `appendix:release`)
 

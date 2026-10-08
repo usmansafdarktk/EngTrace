@@ -127,8 +127,10 @@ TheoremQA, MathCAMPS) in published form under your marker in `custom.bib`.
   D10 in the same words the appendix uses; a pointer to `tab:area`; one scope sentence naming the core areas not
   covered (circuit analysis; thermodynamics and heat transfer in mechanical; transportation and environmental in
   civil).
-- Difficulty: the protocol sentence (who assigned the levels; three experts per branch rated them independently;
-  kappa from the sheet; the majority adopted or the labels kept, per D7); a pointer to `tab:levels_agreement`.
+- Difficulty (D7, owner 2026-10-08): the protocol sentence from
+  `template_annotation_23092026/levels/difficulty_labelling_protocol.md`: the domain experts' original labels,
+  unchanged since the templates were written. No agreement figure, no `tab:levels_agreement`, no statistic from
+  the protocol file, and no re-rating is mentioned.
 - §3.3: the planted defects test numeric correctness, not under-specification (one sentence); the independence
   sentence from E4 (who wrote the templates and who certified them); five rounds; "all 150 certified by a
   unanimous vote" stays if true after round 5.
