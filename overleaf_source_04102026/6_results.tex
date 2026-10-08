@@ -46,13 +46,12 @@ $^{\dagger}$100 responses empty at the output ceiling, scored 0.}
 \autoref{tab:main_results} places the two answer measures beside the three derivation measures; we
 read the final answer first and then what the derivation shows that the answer cannot.
 
-\paragraph{Two Tiers, No Order Within the Top.} The final answer sorts the models into two tiers
-and no further.
-Five models lie within 0.009 of one another, and no pair among them differs after Holm's correction,
-which tightens the 55 pairwise tests so that the chance of any false positive among them stays at
-most 5\%.
-The design detects differences of one to three points between them, and the lower five each differ
-from all six models above them.
+\paragraph{Two Tiers, No Order Within the Top.} The final answer sorts the models into two tiers: a
+top tier of five that lie within 0.009 of one another and a lower tier of five, each of which
+differs from every model above it, with one model between the two.
+No pair inside the top tier differs after Holm's correction, which tightens the 55 pairwise tests so
+that the chance of any false positive among them stays at most 5\%, and the design detects
+differences of one to three points between them.
 Four of the top five are open-weights, and four of the lower five return no reasoning tokens at
 their providers' defaults.
 The tiers differ in reliability more than in reach: almost no template defeats a model on all 15
@@ -88,15 +87,15 @@ templates, the top tier of at most 14\% (\autoref{appendix:results}).
 
 \paragraph{Stability of the Tiers.} Neither paraphrase, nor the answer tolerance, nor decoding
 noise moves a model across a tier.
-On 277 pairs of an instance and its expert-checked paraphrase over 115 templates, no change in FAC
-holds after correction, and for ten of the eleven models the change is bounded within $\pm 0.05$
-at 90\% confidence (\texttt{Qwen3-235B-2507} reaches $-0.067$).
-The order within the top tier is not resolved, and since the numbers and the problem structure
-stay, the test bounds memorized wording, not memorized methods.
-The domain experts rejected 12\% of the paraphrases that passed every scripted check, so a
-paraphrase test of technical problems needs an expert step.
-Halving or doubling the answer tolerance swaps no pair that differs, and decoding four models three
-more times moves FAC by a standard deviation of at most 0.013 (\autoref{appendix:paraphrase}).
+Each of 277 instances over 115 templates has a paraphrase that keeps every number, unit, and symbol
+in place and that a domain expert confirms is the same problem; no model's change in FAC between
+the two is significant after correction, and for ten of the eleven models it is bounded within
+$\pm 0.05$ at 90\% confidence (\texttt{Qwen3-235B-2507} reaches $-0.067$).
+Halving or doubling the answer tolerance swaps no pair of models that differs, and decoding four
+models three more times moves FAC by a standard deviation of at most 0.013.
+The tiers therefore hold, but not the order inside the top tier, and the paraphrase bounds
+memorized wording only, since the numbers and the problem structure stay
+(\autoref{appendix:paraphrase}).
 
 \subsubsection{Performance by Engineering Branch and Domain}
 \label{subsec:branch_domain}

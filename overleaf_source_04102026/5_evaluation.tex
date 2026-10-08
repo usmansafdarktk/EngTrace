@@ -9,34 +9,34 @@ eleven we evaluate, each labeled step by step by three domain experts, the final
 matches the experts' three-way verdict on 0.927 of responses, and milestone matching with the judge
 reaches F1 0.958 (\autoref{appendix:validation}).
 
-\paragraph{Preliminaries.}
-An instance comprises a question, a gold trace, and milestones $\mathcal{M}$: the values that the
-template computes, the gold trace states, and the question does not give.
-Its targets are the milestones in the gold final answer (for an instance without milestones, the
-last value there that the question does not give) and, for a classification answer, its verdict
-word, such as a flow regime.
+\paragraph{Preliminaries.} An instance comprises a question, a gold trace, and milestones
+$\mathcal{M}$: the values that the template computes, the gold trace states, and the question does
+not give.
+Its targets are the milestones that the gold final answer states (where it states none, its last
+value that the question does not give) and any verdict word it states for a classification answer,
+such as a flow regime.
 A response $r$ is a sequence of steps ending in a final answer.
 
-\paragraph{Final Answer Accuracy.}
-Let $u(v)$ be one unit in the last digit that a value $v$ displays, $\mathcal{C}$ a fixed set of
-unit factors (e.g., m to mm), and $\epsilon = 0.002$.
+\paragraph{Final Answer Accuracy.} Let $u(x)$ be one unit in the last digit that a value $x$
+displays, $\mathcal{C}$ a fixed set of unit factors (e.g., m to mm), and $\epsilon = 0.002$.
 A value $\hat{y}$ in the final answer matches a numerical target $y$ if, for some
 $c \in \mathcal{C}$,
 \begin{equation}
     |c\,\hat{y} - y| \le \max\bigl(\epsilon\,|y|,\; c\,u(\hat{y}),\; u(y)\bigr),
     \label{eq:match}
 \end{equation}
-so a correct rounding at either displayed precision matches.
+so a value within one unit of either value's last displayed digit matches
+(\autoref{appendix:scoring} gives the exceptions).
 A response scores $v(r) = 1$ if every target matches, $0.5$ if only some do, and $0$ if none does or
 no final answer is readable, since stating one within the output limit is part of the task.
 \emph{Final Answer Accuracy} (FAC) is the mean of $v(r)$ over instances.
 
-\paragraph{Milestone Coverage.}
-A milestone is reached if the response states its value within 0.5\% under a unit factor, in any
-step and order; 0.5\% is the templates' display tolerance, not a fitted constant.
+\paragraph{Milestone Coverage.} A milestone is reached if the response states its value within
+0.5\% under a unit factor, in any step and order; 0.5\% is the tolerance at which the gold trace
+counts as stating a milestone, not a fitted constant.
 Milestones that matching misses go to an LLM judge from outside the evaluated families,
-\texttt{MiMo-V2.5-Pro}, which sees the question, the response, and each milestone's name and value,
-but not the gold trace, and rules each reached, not needed, or missing.
+\texttt{MiMo-V2.5-Pro}~\citep{mimov25pro}, which sees the question, the response, and each
+milestone's name and value, but not the gold trace, and rules each reached, not needed, or missing.
 We credit only reached, since the judge also excuses unstated values as not needed
 (\autoref{appendix:scoring}).
 With $\mathcal{R}(r)$ the milestones matched or ruled reached,
@@ -48,14 +48,13 @@ and \emph{Milestone Coverage} (MC) is the mean of $m(r)$ over instances with mil
 The judge decides 11\% to 25\% of milestones, depending on the model.
 MC measures how far a derivation gets, not whether it is free of error.
 
-\paragraph{Step-Level Diagnostics.}
-Two diagnostics look for flawed steps behind a correct answer.
-The arithmetic check recomputes each displayed calculation from its printed operands and flags a
-result that is not a correct rounding at its printed precision.
+\paragraph{Step-Level Diagnostics.} Two diagnostics look for flawed steps behind a correct answer.
+The arithmetic check recomputes each displayed calculation it can parse from its printed operands
+and flags a result that is not a correct rounding at its printed precision.
 The judged step check sends every step the arithmetic check does not flag to the same judge, with
 the question and the gold steps, and flags a step labeled a conceptual or calculation error.
 \emph{Arithmetic flags} and \emph{judged step flags} are the shares of correct-answer responses with
 at least one such flag.
-They are flags with measured precision, not scores, since neither check sees every flawed step: no
-deterministic check detects a misstated rule behind a correct answer, and LLM judges catch at most
-about a third of such cases.
+They are flags with measured precision, not scores, since neither check sees every flawed step: on
+60 planted misstated rules behind correct answers, none of our deterministic checks flags any, and
+four LLM judges label at most about a third of them an error.

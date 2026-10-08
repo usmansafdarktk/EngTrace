@@ -21,7 +21,15 @@ vocabulary) are in `docs/PAPER_PLAN_OCT2026.md`, section 8; this file covers for
   are part of the sentence (`\citet{xie2025finchain} build ...`).
 - Cross-references with `\autoref{}`, tied with a tilde: `in~\autoref{sec:evaluation}` prints "§4", "Figure 2",
   "Table 1" or "Appendix A". Labels carry a prefix: `sec:`, `subsec:`, `fig:`, `tab:`, `eq:`, `appendix:`.
-- Run-in headings with `\paragraph{}`; few numbered subsections.
+- Headings follow the ACL instructions (`current_overleaf_project/formatting.md`), which describe two numbered
+  levels: `\section` (12 pt bold, "1 Introduction") and `\subsection` (11 pt bold, "6.1 File Format"), numbered by
+  `acl.sty`. No `\subsubsection`. Each heading stands on its own line, its `\label` on the next. Few subsections.
+- Below them, run-in headings with `\paragraph{Title.}`: bold, in the text size, ending with a full stop, and run
+  into the text, so the first sentence follows the heading on the same source line
+  (`\paragraph{Milestones.} We rerun ...`).
+- A new paragraph is a blank line; `acl.sty` indents it by 1em (the 0.4 cm the instructions ask for), except the first
+  after a heading. No `\noindent`, `\\` or `\vspace` in running text.
+- Headings in title case throughout (the ARR guide asks for consistent capitalization of headings).
 - Numbers: thousands with a comma (`2,250`); percent as `\%`; ranges in tables as `0.81--0.98`; em dash as `---`.
 - Quotation marks as ``` ``this'' ```, never straight double quotes; `e.g.,` with its comma; F1 written as `F1`.
 - Model names in `\texttt{}`, spelled as their developers write them (`\texttt{MiMo-V2.5-Pro}`,

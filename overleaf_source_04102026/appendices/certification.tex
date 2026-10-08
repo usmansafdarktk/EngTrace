@@ -13,8 +13,9 @@ Lines the closure check cannot parse, six line patterns in four templates, are c
 all 150 templates pass.
 
 \paragraph{LLM Screen.} Three LLM judges from families outside the evaluated models,
-\texttt{Grok 4.6} (xAI), \texttt{MiniMax M3} (MiniMax), and \texttt{MiMo-V2.5-Pro} (Xiaomi), score
-each template's code and three of its instances with the prompt below, at temperature 0.
+\texttt{Grok 4.6}~\citep{grok46}, \texttt{MiniMax M3}~\citep{minimaxm3}, and
+\texttt{MiMo-V2.5-Pro}, score each template's code and three of its instances with the prompt
+below, at temperature 0.
 A template fails critically when at least two judges flag it for review or the median score of any
 dimension is below 4, is controversial when the judges' scores on some dimension have a population
 standard deviation above 0.5, and passes otherwise.

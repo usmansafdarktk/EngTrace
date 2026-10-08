@@ -3,55 +3,49 @@
 \label{appendix:scoring}
 
 This section details the four checks of~\autoref{sec:evaluation};
-\autoref{tab:scoring_settings} compares each setting with its alternatives on the expert study
+\autoref{tab:scoring_settings} tests each setting on the expert study
 of~\autoref{appendix:validation}.
 
 \subsection{Final-Answer Check}
 
-\begin{itemize}
-    \item \textbf{Reading}: the final answer is read from a window of 700 characters that starts at
-    the response's last final-answer heading or, failing that, at its answer marker, its last
-    mention of ``answer'', or its end.
-    A response with no heading or marker, and no number or verdict word in its last 700 characters,
-    has no readable final answer.
-    \item \textbf{Numbers}: scientific notation, LaTeX, fractions, multiples of $\pi$, and thousands
-    separators are read as numbers; a digit subscripted with an underscore, as in \texttt{p\_1}, is
-    not.
-    \item \textbf{Targets}: the values on the gold trace's final-answer line that the template
-    computed, only the last one for a scalar or array answer, and for an instance without
-    milestones, the last value on that line that the question does not give.
-    A classification answer adds its verdict word, which the last non-negated word of the same
-    family (e.g., laminar or turbulent) in the response's final answer must match, and yes-or-no
-    properties, matched label by label.
-    \item \textbf{Matching}: \autoref{eq:match} with the unit factors $10^{\pm 3}$, $10^{\pm 6}$,
-    $10^{\pm 9}$, $10^{\pm 12}$, 100, 60, 3,600, and their inverses, and $\epsilon$ as the check's
-    one fitted constant.
-    A response's last digit counts only when one unit of it is smaller than the value, values also
-    match in absolute value, a question that prescribes its rounding requires the exact digits, and
-    a scalar gold answer stated in two units accepts either.
-    Every one of the 2,250 gold traces scores correct.
-\end{itemize}
+The check reads the final answer from the 700 characters that follow the response's last
+final-answer heading or, failing that, its answer marker (the first when several lie within 700
+characters of one another, otherwise the last) or its last mention of ``answer'', and otherwise
+from its last 700 characters; a response with neither a heading or marker nor a number or verdict
+word in its last 700 characters has no readable final answer.
+It reads scientific notation, LaTeX, fractions, multiples of $\pi$, and thousands separators as
+numbers, but not a digit subscripted with an underscore, as in \texttt{p\_1}.
+The targets are the milestones on the gold trace's final-answer line, the last one for a scalar or
+array answer and every one otherwise; where the line states no milestone, the target is its last
+value that the question does not give, so a vector or multipart answer is then checked on that
+value alone.
+A classification answer also takes as targets any verdict word that its gold line states, which the
+last non-negated word of the same family (e.g., laminar or turbulent) in the response's final answer
+must match, and any yes-or-no property, matched label by label.
+
+\autoref{eq:match} uses the unit factors $10^{\pm 3}$, $10^{\pm 6}$, $10^{\pm 9}$, $10^{\pm 12}$,
+100, 60, 3,600, and their inverses, and $\epsilon$ is the check's one fitted constant.
+A response's last digit counts only when one unit of it is smaller than the value, values also match
+in absolute value, a question that prescribes its rounding requires the exact digits, and a scalar
+gold answer stated in two units accepts either.
+Every one of the 2,250 gold traces scores correct.
 
 \subsection{Milestones and the Judge}
 
-\paragraph{Milestones.}
-We rerun each template at the instance's seed and, if the regenerated question and gold trace equal
-the instance byte for byte, take as milestones the computed values that the gold trace states within
-0.5\% and the question does not give in any unit.
-Values within $10^{-9}$ of 0, 1, or 2, bookkeeping variables, the intermediate states of iterative
-schemes, and the elements of lookup tables are excluded, and a quantity stored twice counts once.
-Matching uses the unit factors above except $10^{\pm 12}$, and the 70 instances without milestones
-are left out of MC.
+\paragraph{Milestones.} We rerun each template at the instance's seed and, if the regenerated
+question and gold trace equal the instance byte for byte, take as milestones the computed values
+that the gold trace states within 0.5\% and the question does not give under any unit factor.
+We exclude values within $10^{-9}$ of 0, 1, or 2, bookkeeping variables, the intermediate states of
+iterative schemes, and the elements of containers such as lookup tables, and count a quantity
+stored twice once.
+Matching uses the unit factors above except $10^{\pm 12}$, and MC leaves out the 70 instances
+without milestones.
 
-\paragraph{The Judge.}
-\texttt{MiMo-V2.5-Pro} (Xiaomi) receives one call per response in which matching misses a milestone,
-with the question, the response, and each missed milestone's name and value but never the gold
-trace, at temperature 0, with JSON output and up to three attempts.
-It decides 294 of the 1,245 milestones of the expert study and 11\% to 25\% of milestones on the
-evaluated models.
-We credit only reached because the judge never calls an unstated value reached but excuses a quarter
-of such values as not needed (\autoref{tab:scoring_settings}).
-The prompt is provided below.
+\paragraph{The Judge.} \texttt{MiMo-V2.5-Pro} (Xiaomi) receives one call per response in which
+matching misses a milestone, with the prompt below, at temperature 0, with JSON output and up to
+three attempts; it decides 294 of the 1,245 milestones of the expert study.
+We credit only reached because the judge calls none of the 88 unstated values of
+\autoref{tab:scoring_settings} reached but excuses a quarter of them as not needed.
 
 \begin{tcolorbox}[
     colback=gray!5,
@@ -140,10 +134,9 @@ It flags none of the 6,875 calculations it reads in the 2,250 gold traces.
 
 \subsection{Judged Step Check}
 
-The check sends every non-empty step that the arithmetic check does not flag to the judge, in one
-call per response with the question, the gold and response steps, and the indices under review, at
-the provider's default settings; a step labeled a conceptual or calculation error is flagged.
-The prompt is provided below, and~\autoref{appendix:validation} reports the check's validation.
+The check sends the judge one call per response with the prompt below, at the provider's default
+settings, reviewing every non-empty step that the arithmetic check does not flag;
+\autoref{appendix:validation} reports its validation.
 
 \begin{tcolorbox}[
     colback=gray!5,

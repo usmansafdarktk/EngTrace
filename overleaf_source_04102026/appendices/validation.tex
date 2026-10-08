@@ -7,23 +7,23 @@ readings of the evaluated models' responses; \autoref{tab:validation_results} co
 
 \subsection{Expert Study}
 
-\begin{itemize}
-    \item \textbf{Instances}: 60, four from each of 15 templates across the five branches and three
-    levels; only 12 have a single scalar answer, against 89 of the 150 templates, which makes the
-    study a hard test of answer checking.
-    \item \textbf{Responses}: 300, from five LLMs outside the evaluated models (\texttt{GPT-5},
-    \texttt{Claude Opus 4.7}, \texttt{Gemini 3.1 Pro}, \texttt{DeepSeek-R1}, and
-    \texttt{Llama 3.1 70B}).
-    \item \textbf{Labels}: 15 domain experts, three per branch, label each response of their branch
-    behind an opaque code: every step (correct, alternative correct, incorrect with a type and a
-    reason, or not a claim), every milestone, the final answer (correct, partial, incorrect, or not
-    stated), and the soundness of the reasoning.
-    \item \textbf{Quality rounds}: a reason on all 1,042 steps labeled incorrect, a blind
-    re-labeling of seven responses per expert, and a blind adjudication of the 272 split steps.
-    \item \textbf{Agreement}: Fleiss'~$\kappa$~\citep{fleiss1971} 0.781 on steps, 0.880 on
-    milestones, and 0.966 on final answers; Cohen's~$\kappa$~\citep{cohen1960} 0.828 between an
-    expert's two passes.
-\end{itemize}
+The study draws four instances from each of 15 templates, 60 in all, across the five branches and
+three levels; only 3 of its templates have a single scalar answer, against 89 of the 150, which
+makes it a hard test of answer checking.
+Five LLMs outside the evaluated models (\texttt{GPT-5}~\citep{gpt5},
+\texttt{Claude Opus 4.7}~\citep{claudeopus47}, \texttt{Gemini 3.1 Pro}~\citep{gemini31pro},
+\texttt{DeepSeek-R1}~\citep{guo2025deepseekr1}, and
+\texttt{Llama 3.1 70B}~\citep{grattafiori2024llama3}) answer each instance once, giving 300
+responses.
+Fifteen domain experts, three per branch, label each response of their branch behind an opaque code:
+every step (correct, alternative correct, incorrect with an error type, or not a claim), every
+milestone, the final answer (correct, partial, incorrect, or not stated), and the soundness of the
+reasoning.
+Three rounds follow: a written reason for each of the 1,042 incorrect step labels, a blind
+re-labeling of seven responses per expert, and a blind adjudication of the 255 distinct steps on
+which experts split.
+The experts agree at Fleiss'~$\kappa$~\citep{fleiss1971} 0.781 on steps, 0.880 on milestones, and
+0.966 on final answers, and an expert's two passes at Cohen's~$\kappa$~\citep{cohen1960} 0.828.
 
 \subsection{Evaluator Designs}
 
@@ -31,33 +31,36 @@ We compare six designs on these labels.
 \begin{itemize}
     \item \textbf{Step matching with in-family judges}: matches response steps to gold steps by
     numerical agreement and semantic similarity, sends unmatched steps to a panel of \texttt{GPT-5},
-    \texttt{Claude Opus 4.5}, and \texttt{Gemini 3.1 Pro} when the answer is correct but fewer than
-    80\% of the gold steps match and for a random fifth of wrong answers, and scores an F1 over the
-    steps; we run it with two and with three judges voting.
+    \texttt{Claude Opus 4.5}~\citep{claudeopus45}, and \texttt{Gemini 3.1 Pro} when the answer is
+    correct but fewer than 80\% of the gold steps match and for a random fifth of wrong answers, and
+    scores an F1 over the steps; we run it with two and with three judges voting.
     \item \textbf{Step matching with outside judges}: the same, with \texttt{Grok 4.6},
     \texttt{MiniMax M3}, and \texttt{MiMo-V2.5-Pro}.
-    \item \textbf{Process reward models}: \texttt{Qwen2.5-Math-PRM-72B},
+    \item \textbf{Process reward models}: three open-weights models that assign each step a reward,
+    with a step below 0.5 counted as incorrect (\texttt{Qwen2.5-Math-PRM-72B},
     \texttt{Qwen2.5-Math-PRM-7B}~\citep{zhang2025prmlessons}, and
-    \texttt{VersaPRM}~\citep{zeng2025versaprm}, which reward each step; a reward below 0.5 counts as
-    incorrect.
-    \item \textbf{Milestone matching alone}: as in~\autoref{sec:evaluation}, with no judge.
-    \item \textbf{Milestone matching with the arithmetic check}.
-    \item \textbf{Milestone matching with the judge}, crediting only reached.
+    \texttt{VersaPRM}~\citep{zeng2025versaprm}).
+    \item \textbf{Milestone matching alone}: credits each gold milestone that the response states
+    within 0.5\% under a unit factor, in any step and order (\autoref{sec:evaluation}), with no
+    judge.
+    \item \textbf{Milestone matching with the arithmetic check}: milestone matching plus the
+    arithmetic check, which recomputes each displayed calculation it can parse and flags a result
+    that is not a correct rounding at its displayed precision.
+    \item \textbf{Milestone matching with the judge}: milestone matching, with
+    \texttt{MiMo-V2.5-Pro} ruling each milestone that matching misses reached, not needed, or
+    missing, and only reached credited.
 \end{itemize}
 Our evaluator combines the last three with the final-answer check and the judged step check.
 
-\paragraph{Main Findings.}
-\begin{itemize}
-    \item Whether the answer is right nearly decides the experts' verdict on a response's soundness
-    (area under the ROC curve, AUROC, 0.974), so evaluators can only be told apart on steps and
-    milestones.
-    \item Milestone matching with the judge agrees best with the experts' milestone labels.
-    \item Of the 178 incorrect steps behind correct answers, 175 are calculation slips, which rarely
-    change milestone coverage; the arithmetic check is there to find them.
-    \item The best reward model ranks steps well (AUROC 0.825) but over-flags inside correct
-    answers.
-    \item Outside judges leave the step-matching score unchanged (0.379 against 0.378).
-\end{itemize}
+\paragraph{Main Findings.} Whether the answer is right nearly decides the experts' verdict on a
+response's soundness (area under the receiver operating characteristic curve, AUROC, 0.974), so
+the soundness verdict cannot tell reasoning evaluators apart, and we compare them on steps and
+milestones, where matching with the judge agrees best with the experts' milestone labels.
+Of the 178 incorrect steps behind correct answers, 175 are calculation slips, which rarely change
+milestone coverage; the arithmetic check is there to find them.
+The best reward model ranks steps well (AUROC 0.825), but three of four of its flags inside correct
+answers are false, and outside judges barely move the step-matching score (0.379 with two in-family
+judges, 0.378 with three outside ones).
 
 \begin{table*}[t]
     \centering
@@ -71,9 +74,10 @@ Our evaluator combines the last three with the final-answer check and the judged
         Final-answer check & three-way, all 300 responses & 0.927 \\
         Final-answer check & 281 responses not marked partial & 0.982 (step matching 0.747) \\
         Milestone matching & P / R / F1 & 0.927 / 0.920 / 0.923 \\
-        Milestone matching with the judge & P / R / F1 & 0.930 / 0.989 / 0.958 \\
+        Milestone matching with the judge$^\dagger$ & P / R / F1 & 0.930 / 0.989 / 0.958 \\
         Arithmetic check & P / R, all steps; correct answers & 0.872 / 0.317; 0.817 / 0.427 \\
         Judged step and arithmetic checks$^\dagger$ & P / R, all steps; correct answers & 0.707 / 0.603; 0.703 / 0.360 \\
+        Judged step check alone$^\dagger$ & P, all steps; correct answers & 0.640; 0.467 (7 of 15) \\
         Best process reward model & P, all steps; correct answers & 0.539; 0.246 \\
         \midrule
         \multicolumn{3}{l}{\textit{Planted defects: conceptual / arithmetic caught, untouched steps flagged}} \\
@@ -96,9 +100,11 @@ Our evaluator combines the last three with the final-answer check and the judged
     \end{tabular}
     \caption{\textbf{Validation Results.} Top: each component against the domain experts' labels on
     the expert study (P precision, R recall; correct answers are responses with a correct final
-    answer). Middle: planted defects caught and untouched steps flagged. Bottom: the domain experts'
-    readings of the evaluated models' responses. $^\dagger$Counts the arithmetic check's flags as
-    recorded in the study.}
+    answer).
+    Middle: planted defects caught and untouched steps flagged.
+    Bottom: the domain experts' readings of the evaluated models' responses.
+    $^\dagger$Measured with the study's recorded milestone matches (F1 0.921 without the judge) or
+    arithmetic flags.}
     \label{tab:validation_results}
 \end{table*}
 
@@ -107,31 +113,35 @@ Our evaluator combines the last three with the final-answer check and the judged
 Because the labels hold almost no conceptual error behind a correct answer, we plant one defect in
 each of 120 clean responses, verified without the checker under test: 60 one-digit slips in a
 displayed intermediate value and 60 conceptual defects that misstate a criterion, rule, or formula
-without changing any digit; 60 untouched responses serve as controls.
+without changing any digit.
 Each LLM judge sees the planted step and, separately, the same step untouched, with the step prompt
 of~\autoref{appendix:scoring}, and a defect counts as caught only when the judge flags the planted
 step alone.
-No deterministic check catches a conceptual defect, and the four judges catch at most about a third
-of them without false alarms; the judged step check, which sends every unflagged step, catches more
-than step matching, whose panel sees a conceptual defect no more often than the same step untouched.
+None of our deterministic checks flags a conceptual defect, and the four judges label at most about
+a third of them an error, without false alarms (up to 33 of 60 when ``Other'' labels count); the
+judged step check, which sends every unflagged step, catches more than step matching, whose panel
+sees a conceptual defect no more often than the same step untouched.
 
 \subsection{Judge Independence}
 
-\texttt{MiMo-V2.5-Pro} shares no family with an evaluated model, since LLM judges can favor their
-own family~\citep{panickssery2024selfrecognition, li2026preferenceleakage}, and catches about as
-many planted defects as \texttt{GPT-5}.
+We use \texttt{MiMo-V2.5-Pro} because it shares no family with an evaluated model, as LLM judges can
+favor their own family~\citep{panickssery2024selfrecognition, li2026preferenceleakage}, and catches
+about as many planted defects as \texttt{GPT-5}.
 Re-judging 220 sampled responses, 20 per model, with \texttt{Grok 4.6} from a third family changes
-each model's coverage by $-0.017$ to $+0.020$, and every 95\% interval includes zero.
+each model's coverage of them by $-0.017$ to $+0.020$, and every 95\% interval includes zero.
 In the step-matching panel, dropping a response model's own-family judge changes its score by at
-most 0.006, no more than dropping another family's judge, yet each judge accepts 65\% to 70\% of the
-incorrect steps it judges: an absence of self-preference does not make a judge accurate.
+most 0.006, as much as dropping one of the other two (the design detects changes of 0.003 to
+0.025), yet each judge accepts 90\% to 97\% of the incorrect steps it judges outside
+\texttt{Llama 3.1 70B}'s responses: an absence of self-preference does not make a judge accurate.
 
 \subsection{Readings on the Evaluated Models}
 
-A domain expert reads up to 20 arithmetic flags per model, without the model's name.
+A domain expert reads up to 20 flagged calculations per model, drawn from all its answered
+responses, without the model's name.
 Two domain experts of the item's branch read each of 150 final-answer verdicts on the five strongest
 models (75 correct, 49 incorrect, and 26 partial) and 100 judge rulings across all eleven models
 (50 reached and 50 missing), and agree with each other on 97\% of answers and 88\% of milestones.
-Two readings bear on the scores: the experts call most partial verdicts fully correct, so scoring
-them 0.5 is conservative, and a third of the missing rulings are milestones that the response's
-route does not need, so MC is conservative for a response that takes another route.
+The readings cut both ways: the experts call most partial verdicts fully correct, so scoring them
+0.5 is conservative, and in a third of their readings of missing rulings the response's route does
+not need the milestone, so MC is conservative for a response that takes another route, but 15 of the
+100 readings of reached rulings do not confirm them.
