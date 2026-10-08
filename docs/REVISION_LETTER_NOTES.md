@@ -4,6 +4,10 @@ Split out of `docs/PAPER_PLAN_OCT2026.md` on 2026-10-03. Low priority until the 
 drafted after it. The letter is the only place where "what changed and why" is said; the paper describes EngTrace
 as it is.
 
+Updated 2026-10-09 for the October revision (section 7). Every figure below is from
+`docs/mock_review_workstreams/reports/NUMBERS_SHEET.md` (each line there names its source file); cost figures stay out
+of the letter.
+
 ## Spine: one row per reviewer point
 
 The letter's body is a table with one row per numbered point from both cycles (January: gFWV, nWW3, cqGs and the
@@ -29,26 +33,37 @@ Accuracy, Reasoning F1, BERTScore and ROUGE).
 ## 2. Promises kept, in their new form
 
 - Variance and significance (yAYU 2, 9W1B 4): per-template SD, template-level intervals, 55 Holm-corrected pairs,
-  Welch's test on the level gap, detectable differences beside every null (`results/RESULTS.md` Q1, Q2).
+  Welch's test on the level gap, detectable differences beside every null (`results/RESULTS.md` Q1, Q2). Now: 38 of
+  55 FAC pairs separated after Holm at provider defaults, 36 at matched settings; decoding repeats for four models
+  (300 instances, three repeats each).
 - Wilcoxon on the continuous reasoning score beside McNemar on the answer (the July rebuttal's own promise): the
   coverage comparison over the 55 pairs (Q3, "Coverage compared across models").
 - The judge-exclusion ablation with placebo and untouched controls (meta-review 1; yAYU 1; 9W1B 2; gFWV 4): replayed
   offline on the panel design, no family effect at a detectable 0.003 to 0.025 (pilot `RESULTS_LOJO.md`, D-174); plus
-  the per-judge bias (uniform leniency), the judge swap on the new evaluator (`JUDGE_SWAP.md`, D-181) and a judge from
+  the per-judge bias (uniform leniency), the judge swap on the new evaluator (`JUDGE_SWAP.md`, D-181; now 201 responses on unchanged prompts, Cohen's
+  kappa 0.720 three-way, MC shifts of -0.018 to +0.019) and a judge from
   no roster family.
 - Threshold sensitivity (yAYU 4, 9W1B 3): `THRESHOLD_APPENDIX.md`; the cross-encoder and alignment-ratio thresholds
-  the rebuttal promised to vary no longer exist in the evaluator.
+  the rebuttal promised to vary no longer exist in the evaluator. Now also the scoring-rule variants
+  (`tab:scoring_variants`): tolerance halved or doubled, tau 1.000 / 0.964; the absolute-value clause off, 325
+  verdicts on 20 templates (tau 0.927); prescribed digits relaxed, 154 on 15 (tau 0.964); the last digit uncapped, 68
+  on 36 (tau 1.000); proportional part credit, 109 on 14 (tau 1.000).
 - Inter-judge agreement (9W1B): the May panel 0.725 / 0.776, the replacement panel 0.563 / 0.622 (pilot `RESULTS_E1.md`).
 - A fourth branch (ynoK 1; January AC): civil and industrial, 30 templates each, certified.
-- Linguistic diversity and template exploitation (meta-review 3; 9W1B 1; cqGs 2; nWW3 2): the paraphrase arm as a
-  bound of ±5 points for ten of eleven models (`PARAPHRASE_PAPER_NOTES.md`); the surface-shortcut audit
+- Linguistic diversity and template exploitation (meta-review 3; 9W1B 1; cqGs 2; nWW3 2): the paraphrase arm on 275
+  expert-kept pairs over 114 templates, nine of eleven models within ±0.05 (gpt-oss-20b and Qwen3-235B-2507 are not); the surface-shortcut audit
   (`SHORTCUT_AUDIT.md`).
-- Tool or retrieval baselines (cqGs 1 and 4; ynoK 3; January AC): the open-book condition and the tool condition, in
-  whatever state they are at submission (D-183, D-184).
+- Tool or retrieval baselines (cqGs 1 and 4; ynoK 3; January AC): the open-book condition (405 instances; it lifts
+  gpt-oss-20b, +0.044 on the 388 instances answered in both runs, and leaves the two closed models within the margin)
+  and the tool condition for the two closed models (Claude Sonnet 5 +0.010, GPT-5.4 mini -0.003) (D-183, D-184).
 - Error analysis too coarse, causes of the cliff (nWW3 3 and 4; cqGs 3): attribution validated by error type on the
-  experts' labels (pilot `RESULTS_ATTRIBUTION.md`), the human reading of 160 wrong answers (`EXPERT_REQUEST.md` B2),
-  failure against derivation depth, the two-template sensitivity of the level gap.
-- Validation in the main text (9W1B 6; meta-review 2): the evaluation framework's validation subsection.
+  experts' labels (pilot `RESULTS_ATTRIBUTION.md`), the human reading of 137 wrong answers of four models at provider defaults, three experts each (411 readings, Fleiss'
+  kappa 0.912; `EXPERT_REQUEST.md` B2 now), failure against derivation depth (wrong-answer odds 1.23 per milestone
+  pooled; the slope holds for 5 of 11 models after Holm), the level gap after Holm (2 of 11 models by Welch's test, 6
+  by permutation).
+- Validation in the main text (9W1B 6; meta-review 2): the evaluation framework's validation subsection; the final
+  evaluator agrees with the experts on 0.930 of verdicts three-way and 0.986 of those not marked partial; milestone
+  F1 0.926 by matching alone, 0.958 with the judge.
 - Proofreading and the broken reference: moot, the text is new.
 
 ## 3. Promises replaced with a reason
@@ -61,8 +76,10 @@ Accuracy, Reasoning F1, BERTScore and ROUGE).
 
 ## 4. Objections answered by construction rather than by argument
 
-- gFWV 1 (perfect kappa unconvincing): the certification rejected 53 real templates over its rounds, caught 60 of 60
-  planted defects, and records hand checks and timestamps.
+- gFWV 1 (perfect kappa unconvincing): the certification ran six rounds (150 of 150 certified), caught 60 of 60
+  planted defects, and records hand checks (459 of the 504 comparable ones match within 1%) and timestamps; kappa is
+  printed as undefined where every verdict approves. The count of 53 rejected real templates is not in
+  `layer2/CERTIFICATION.md`: confirm its source before the letter uses it.
 - gFWV 3 (instance-level verification shallow): the integrity checks at 500 seeds, the validation of every
   evaluation-set item's gold solution, the display-tie census.
 - gFWV 5 (authorship): stated exactly for each branch. The 90 chemical, electrical and mechanical templates were
@@ -74,7 +91,8 @@ Accuracy, Reasoning F1, BERTScore and ROUGE).
 - nWW3 1 and 2 (comprehensiveness; 90 templates are 90 problems): five branches, 150 templates, structural variation
   measured (72 templates change the governing equation, step count or computed quantities with a sampled parameter),
   the evaluation set's coverage of reasoning paths.
-- cqGs 3 (causes of the cliff): depth, attribution, the two-template sensitivity, the human reading by level.
+- cqGs 3 (causes of the cliff): depth (the depth model), attribution, the human reading by level; the two templates
+  behind the earlier sensitivity are repaired (section 7).
 
 ## 5. What the letter must disclose before a reader of the repository finds it
 
@@ -84,9 +102,49 @@ the arithmetic check on an expert's readings before its final held-out reading (
 sample); and that the new numbers are high because the models of September 2026 solve the evaluation set at the top on
 final answers. These are letter material: the paper describes the final check and its validation (decided 2026-10-04).
 
+Added for October (section 7): the two chemical templates repaired after the run, because their wording did not pin
+the answer, re-certified in rounds 5 and 6, and their 30 items re-run for every model and condition; and the one
+re-score with the final evaluator, which moved 276 verdicts over the eleven models (198 raised by the symbolic step,
+77 lowered and 1 raised by the number rule) and the mean score per model by -0.0064 to +0.0073. The symbolic rule was
+settled on the experts' grades of these same verdicts, so its 1.000 / 0.990 is in-sample; the earlier readings it did
+not see give 1.000 / 0.840.
+
 ## 6. The two retrieval conditions
 
 Both ran on 2026-10-03 (D-183, D-184). The paper reports the corrected open-book condition (`openbook2`, 405
 instances) and the tool condition for the two closed models. The letter may say that a first open-book build was
 discarded after a review found its equation blocks defective, and that the open-weight model could not be served with
 a tool through the endpoints the provider rule admits (three attempts recorded under `traces/tool/_*`, local).
+
+## 7. The October revision (6 to 9 October), point by point
+
+An internal mock review of the draft set the work; each change is listed with where the paper
+holds it, its number, and the numbered points of the earlier cycles it also answers. "Internal" marks a change that
+answers no numbered point; the letter lists those under further changes.
+
+| Change | Where | Number | Points |
+|---|---|---|---|
+| Two chemical templates repaired after the experts' B4 reading (wording did not pin the answer), re-certified, their 30 items re-run everywhere | section 3.3, `appendix:certification` | round 5: 2 templates, one rejection; round 6: unanimous; 150 of 150 certified; six near-miss templates named in the error analysis | gFWV 1, gFWV 3 |
+| Matched settings: the three models without reasoning by default re-run with reasoning on, all 2,250 items | sections 5.1 and 6, `tab:matched`, `appendix:models` | FAC +0.118 (GPT-5.4 mini), +0.070 (Gemma 4 26B), +0.038 (Gemini 3.1 Flash-Lite); tau 0.709 between the orderings; Qwen3-235B-2507 has no setting | internal |
+| Symbolic answers graded by experts; an equivalence step on five templates, the other four scored by the numbers they state | `appendix:scoring` | 302 verdicts, 362 readings (two-reader agreement 0.950, kappa 0.882); 1.000 / 0.990 in-sample, 1.000 / 0.840 on earlier readings | 9W1B 6, meta-review 2 |
+| Final evaluator: 1% cap on the answer's own last digit, two reader fixes, the milestone floor; one re-score; re-validation | section 4, `appendix:validation` | 0.930 three-way, 0.986 non-partial; milestone F1 0.926 (0.958 with the judge); experts' readings: 144 items, 0.847 three-way with the current verdict | 9W1B 6, meta-review 2 |
+| Scoring-rule sensitivities | `tab:scoring_variants` | as in section 2 (threshold sensitivity) | yAYU 4, 9W1B 3 |
+| Milestone Coverage under four readings; verbosity; single-path table | section 6, `appendix:results` | Claude Sonnet 5 above DeepSeek V4.1 Flash holds as scored (Holm p 0.049), by matching alone (0.0005), intermediate-only (0.027), not route-adjusted (1.000): route conformity; verbosity +0.0023 MC per 10 numbers shown; no-instance share 0.000 to 0.069 | internal |
+| Judge swap on unchanged prompts | `appendix:results` | 201 responses; kappa 0.720; MC shifts -0.018 to +0.019 | meta-review 1, yAYU 1, 9W1B 2, gFWV 4 |
+| Error-analysis sample brought current | `appendix:error_analysis`, `tab:errors` | 137 items on 77 templates, 411 readings, kappa 0.912; shares with the no-error readings removed | nWW3 3, nWW3 4, cqGs 3 |
+| Depth model; level gap after Holm | section 6, `tab:depth_model`, `tab:level_gap` | odds ratio 1.23 per milestone pooled, 5 of 11 models; gap: Welch 2 of 11, permutation 6, matched 1 | cqGs 3, nWW3 4, yAYU 2, 9W1B 4 |
+| Paraphrase bound | `appendix:paraphrase` | 275 pairs over 114 templates; nine of eleven within ±0.05 | meta-review 3, 9W1B 1, cqGs 2, nWW3 2 |
+| Taxonomy and coverage: domains from the NCEES FE exam specifications through a three-LLM panel; per-area table; uncovered core areas named | section 3.1, `tab:area`, `appendix:taxonomy` | 15 domains, three per branch; 42 areas | nWW3 1, meta-review 3 |
+| Framing: title, "process evaluation", synthetic scope; Limitations, Ethics, Conclusion | front matter, main text | nine scope sentences in Limitations | meta-review 3 |
+| Related work: dynamic and functional benchmarks, reference-free evaluators, PRMBench, five science benchmarks; ThermoQA and FinChain deltas | section 2, `appendix:related_work` | 15 closest benchmarks compared | internal |
+| Release and contamination: MIT, the seed at publication, a held-out seed | `appendix:release` | | internal |
+| Difficulty: the domain experts' original labels and their protocol | section 3.1 | 58 / 58 / 34 | internal |
+| Worked example; listings for one template per level | `appendix:scoring`, `appendix:template_examples` | | meta-review 3 (presentation) |
+| Figures: the same designs, data brought to the final results | figures | | internal |
+
+Claims the letter must not carry over from the earlier cycles:
+- The "complexity cliff" is now model-specific: the Easy-minus-Advanced gap holds after Holm for 2 of 11 models by
+  Welch's test (gpt-oss-20b, Gemini 3.1 Flash-Lite) and 6 by permutation.
+- The contrast between frontier and open-weight models is removed from the paper; the July meta-review's summary
+  mentions it, so the letter says it was removed (the authors give the reason).
+- The math-pretraining claim stays dropped (section 3).

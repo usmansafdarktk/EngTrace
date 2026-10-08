@@ -1503,8 +1503,8 @@ header = (" & & \\multicolumn{4}{c}{\\textbf{FAC under the variant (verdicts up/
           + " & ".join(mk(*SV_LABEL[v]) for v in SV_VARIANTS) + " & " + " & ".join(f"\\textbf{{{REL_LABEL[b]}}}" for b in REL_KEYS))
 put("tab:scoring_variants", "results", table(
     "l r c c c c r r r r", header, rows,
-    note("sensitivity_variants") + f"The final-answer rule re-applied offline over the {SV_STORE} store with one clause changed at a time: the "
-    "absolute-value clause off, the response's last-digit term no longer capped at one hundredth of the target, the exact-digit requirement of the prescribing templates "
+    note("sensitivity_variants") + "The final-answer rule re-applied to every response of the evaluation with one clause changed at a time: the "
+    "absolute-value clause off, the response's last-digit term not capped at one hundredth of the target, the exact-digit requirement of the prescribing templates "
     "relaxed to the tolerance, and partial credit in proportion to the parts matched instead of one half. Each cell gives FAC under the variant and "
     "the verdicts that rise and fall; the last row Kendall's $\\tau$ of the variant's ordering with the ordering as scored. Right: the accepted "
     "answers by their relative error to the target.",
@@ -1523,8 +1523,8 @@ put("tab:providers", "results", table(
     + mk("Matched", "difference") + " & " + mk("Templates", "matched"), rows,
     note("providers") + f"The serving endpoints behind the responses of the {WORD[len(P_MODELS)]} models that more than one endpoint served: the "
     "responses each served, their FAC and their share with no readable answer, and the template-matched difference, the endpoint's mean minus the "
-    "model's mean on the same templates, over the templates both cover. The raw FAC per endpoint is not comparable across endpoints, since the "
-    f"router assigns instances unevenly; $^{{\\S}}$marks the {few_endpoints} endpoints that served or matched fewer than 20 templates, whose "
+    "model's mean on the same templates, over the templates both cover. The raw FAC per endpoint is not comparable across endpoints, since "
+    f"OpenRouter assigns instances to endpoints unevenly; $^{{\\S}}$marks the {few_endpoints} endpoints that served or matched fewer than 20 templates, whose "
     "difference rests on too few templates to read.",
     "tab:providers", size="\\footnotesize", star=False))
 
@@ -1573,7 +1573,7 @@ _bp_model = branch_pairs[0][0] if branch_pairs else "gpt-oss-20b"
 low_b, high_b = (_bp["a"], _bp["b"]) if _bp["diff"] < 0 else (_bp["b"], _bp["a"])
 put("tab:branch_domain", "branch_domain", table(
     "l " + "r " * len(ORDER), "\\textbf{Branch or domain (templates)} & " + " & ".join("\\rotatebox{90}{" + tt(k) + "}" for k in ORDER), rows,
-    "\\textbf{Final Answer Accuracy by Branch and by Domain.} "
+    "\\textbf{Final Answer Accuracy by branch and by domain.} "
     f"Models in order of FAC. Shaded rows: the mean of the branch's {n_branch_templates} template means; below each, its domains' instance "
     "means, which carry no interval or test; template counts in parentheses. Bold: each model's lowest domain. $^{\\ddagger}$The one branch "
     f"pair that differs within a model after Holm correction (Welch's $t$-test over the model's ten pairs): {tt(_bp_model)}'s "
@@ -1599,7 +1599,7 @@ header = (" & \\multicolumn{3}{c}{\\textbf{FAC by level}} & \\multicolumn{" + st
           + " & ".join(f"\\textbf{{{b.replace('-', '--')}}}" for b in bins))
 put("tab:level_gap", "results", table(
     "l r r r c r r " + ("" if REPAIRED else "c ") + "r " * len(bins), header, rows,
-    "\\textbf{Difficulty Level and Trace Depth.} "
+    "\\textbf{Difficulty level and trace depth.} "
     f"Left: FAC over the {n_easy} Easy, {n_int} Intermediate, and {n_adv} Advanced templates. Middle: the Easy mean minus the Advanced mean, "
     "with its 95\\% interval, the Holm-adjusted $p$ of Welch's $t$-test, and the smallest gap the design detects at 80\\% power"
     + ("" if REPAIRED else ", and the gap with its $p$ without the two Advanced chemical templates whose wording does not pin the answer")
@@ -1622,7 +1622,7 @@ header = (" & \\multicolumn{6}{c}{\\textbf{Wrong answers}} & \\textbf{All respon
           + mk("Flag", "precision ($n$)"))
 put("tab:coverage", "results", table(
     "l r r r r r r r c", header, rows,
-    "\\textbf{Milestone Coverage Behind Wrong Answers.} "
+    "\\textbf{Milestone Coverage behind wrong answers.} "
     "Per model, the readable wrong answers with milestones: how many; MC by matching alone and with the judge; the chance floor, the same "
     "responses matched against a sibling instance's milestones; the share that reach every milestone; and, over the answered wrong answers, "
     "the share with a milestone the judge rules missing. Then the share of all milestones the judge decides, and the precision of the "
@@ -1635,7 +1635,7 @@ rows = [f"{tt(k)} & {sgn(Q5[k]['diff'])} ({ci(Q5[k]['ci'])}) & {ci(Q5[k]['ci90']
         for k in ORDER]
 put("tab:paraphrase", "paraphrase", table(
     "l c c r r", head("Model", "FAC change (95\\% interval)", "90\\% interval", "$p$ (Holm)", "MC change"), rows,
-    "\\textbf{Change Under Paraphrase.} "
+    "\\textbf{Change under paraphrase.} "
     f"Paraphrase minus original on the {q5_pairs} expert-kept pairs over {q5_templates} templates, positive when the paraphrase scores higher: "
     f"the change in FAC with its 95\\% interval, its 90\\% interval read against the $\\pm {margin:.2f}$ margin, the Holm-adjusted $p$ of the "
     "sign-flip test over templates, and the change in MC.",
@@ -1658,7 +1658,7 @@ put("tab:experiments", "experiments", table(
     "\\textbf{Model} & \\textbf{Instances} & " + mk("FAC,", "evaluation") + " & " + mk("FAC,", "experiment") + " & "
     + mk("Change", "(95\\% interval)") + " & \\textbf{$p$ (Holm)} & \\textbf{Detectable} & \\textbf{90\\% interval} & " + mk("MC", "change")
     + " & " + mk("Arithmetic flags,", "evaluation / experiment"), rows,
-    f"\\textbf{{The {WORD[n_experiments].capitalize()} Experiments Against the Evaluation.}} "
+    f"\\textbf{{The {WORD[n_experiments]} experiments against the evaluation.}} "
     "Per model and experiment: the instances covered; FAC in the evaluation and under the experiment on those instances, paired by instance; "
     "the change with its 95\\% interval, the Holm-adjusted $p$ of the sign-flip test over templates, the smallest change the experiment "
     f"detects at 80\\% power, and the 90\\% interval read against the $\\pm {margin:.2f}$ margin; the change in MC; and the share of "
@@ -1691,13 +1691,12 @@ header = (" & \\multicolumn{" + str(len(B2_TEXT)) + "}{c}{\\textbf{By model: rea
 put("tab:errors", "errors", table(
     "l " + "r " * (len(B2_TEXT) + 3), header, rows,
     f"The domain experts' readings of the wrong answers. The sample holds {items_total} wrong answers of {WORD[len(B2_MODELS)]} models "
-    f"({series([f'{items_by_model[m]} from {tt(m)}' for m in B2_TEXT])}); {readers} domain experts of the answer's branch read each, and "
-    f"{items_read_total} have been read ({readings_total} readings). Left: readings per category and, in parentheses, the wrong answers whose "
+    f"({series([f'{items_by_model[m]} from {tt(m)}' for m in B2_TEXT])}); {WORD[readers]} domain experts of the answer's branch read each "
+    f"({readings_total} readings). Left: readings per category and, in parentheses, the wrong answers whose "
     "majority label is the category. Right: readings per category by level, with their share of the level's readings and their share once the "
     "no-error readings are removed, so the error mix can be read apart from the share of answers the experts found correct. Below: the sample "
-    f"by level, the readings per column, and Fleiss' $\\kappa$ over the {readers} experts per model ({f3(fleiss_all)} overall). Categories run "
-    "from the most to the least fundamental; no domain expert used the incomplete option. A reading counts only while the store holds the "
-    "question and response as read.",
+    f"by level, the readings per column, and Fleiss' $\\kappa$ over the {WORD[readers]} experts per model ({f3(fleiss_all)} overall). Categories run "
+    "from the most to the least fundamental; no domain expert used the incomplete option.",
     "tab:errors", size="\\footnotesize\n\\setlength{\\tabcolsep}{4pt}", resize=True, aliases=("tab:error_by_level",)))
 
 # The placed figures (drawn by paper_figures.py). The figures label gpt-oss-20b "GPT OSS 20B" (D9, owner 2026-10-08); each caption says so.
@@ -1720,14 +1719,14 @@ put("fig:level_bars", "main", figure(
     "fig:level_bars"))
 put("fig:domain_radar", "branch_domain", figure(
     "domain_radar/domain-radar-labeled.pdf",
-    "\\textbf{Final Answer Accuracy by Domain for Four Representative Models.} "
+    "\\textbf{Final Answer Accuracy by domain for four representative models.} "
     f"The instance mean over each of the {len(domain_templates)} domains, in the order of their branches around the rim, for the same four "
     "models; the radial axis starts at 0.4. The domain means carry no interval and no test (\\autoref{tab:by_domain_kind}). " + FIG_NAME_NOTE,
     "fig:domain_radar", star=True, width="0.74\\textwidth"))
 assert len(BRANCH) == 5 and n_branch_templates * len(BRANCH) == N_TEMPLATES  # "a fifth" in the caption
 put("fig:branch_bars", "branch_domain", figure(
     "branch-bars.pdf",
-    "\\textbf{Final Answer Accuracy by Engineering Branch for Four Representative Models.} "
+    "\\textbf{Final Answer Accuracy by engineering branch for four representative models.} "
     f"One stacked bar per model, for {REP_NAMES}. Each of the {WORD[len(BRANCH)]} branches holds {n_branch_templates} of the {N_TEMPLATES} "
     "templates, so a segment is that branch's share of the model's FAC: the number inside it is the branch's FAC, and its height is a fifth of "
     "that. The segments add up to the model's FAC, printed above the bar; color marks the model and hatching the branch. The one branch pair "
