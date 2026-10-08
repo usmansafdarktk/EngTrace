@@ -1,54 +1,51 @@
 \section{Introduction}
 \label{sec:intro}
 
-As LLMs enter specialized domains such as engineering, it becomes essential to evaluate how they
-reason, not only what they answer.
-Engineering reasoning requires physically grounded, multi-step problem solving, in which scientific
-principles, quantitative modeling, and practical constraints must converge, and in which
-intermediate steps are as consequential as the final result.
-A correct final answer can still follow flawed reasoning~\citep{zheng2024processbench}, yet current
-benchmarks rarely evaluate engineering reasoning beyond the answer.
-General benchmarks such as \textsc{MMLU}~\citep{hendrycks2021mmlu},
-\textsc{MATH}~\citep{hendrycks2021math}, and \textsc{HumanEval}~\citep{chen2021humaneval} test
-knowledge, mathematical problem solving, or code generation in isolation, and most engineering
-benchmarks grade the final answer rather than the steps that produce
-it~\citep{du2025supergpqa, zhou2025engibench}.
+As large language models (LLMs) enter specialized domains such as engineering, it becomes
+essential to evaluate how they reason, not only what they answer.
+Engineering derivations are multi-step and physically grounded, and they pass through intermediate
+quantities that can be checked.
+A correct final answer can still follow flawed reasoning~\citep{zheng2024processbench}, yet most
+engineering benchmarks grade the final answer rather than the steps that produce
+it~\citep{du2025supergpqa, zhou2025engibench}, and those that assess steps rely on LLM judges or
+human graders, or cover a single
+domain~\citep{syed2024transportbench, zheng2026tpscalcbench, duzkar2026thermoqa}.
+On examination-style engineering derivations, our expert study finds that the answer nearly settles
+soundness: whether it is right nearly decides domain experts' verdict on a response, and 175 of the
+178 flawed steps behind correct answers are arithmetic slips (\autoref{appendix:validation}).
+What step-level checks add is therefore where a wrong derivation breaks, the slips behind right
+answers, and a comparison of models whose answers tie.
 
-To address these gaps, we introduce \ourdataset, a symbolic benchmark for verifiable process
-supervision of engineering reasoning.
+To provide these checks, we introduce \ourdataset, a symbolic benchmark for verifiable process
+evaluation of engineering reasoning.
 Following symbolic-template benchmarks in mathematics~\citep{mirzadeh2024gsmsymbolic} and
 finance~\citep{xie2025finchain}, \ourdataset represents each problem as a template: executable
 Python code that samples physically grounded parameters and computes the answer together with every
 intermediate quantity of its gold reasoning trace.
-The 150 templates span five engineering branches, 15 domains, and 42 areas and are stratified across
-varying difficulty levels.
-Every template undergoes automated integrity checks and an LLM screen before three domain experts
-from its own branch certify it.
-We draw the evaluated instances with a private seed, so that no instance was public when the models
-ran.
+The 150 templates span five engineering branches, 15 domains, and 42 areas at three difficulty
+levels, and we draw the evaluated instances with a private seed, so that no instance was public when
+the models answered.
+The benchmark covers a depth-oriented subset of engineering, three core domains per branch, and its
+problems are examination-style by construction, since a gold trace must be computable.
 
-Benchmarks that assess intermediate steps mostly rely on LLM judges or human graders, or cover a
-single domain~\citep{syed2024transportbench, zheng2026tpscalcbench, duzkar2026thermoqa}; \ourdataset
-instead uses its gold traces to score each response with an expert-validated evaluator that is
-deterministic wherever a check exists.
-The evaluator verifies final answers of six kinds, measures the coverage of the gold trace's
-intermediate quantities, which we call \emph{milestones}, and recomputes the arithmetic that the
-response displays.
-For the residual milestones that deterministic matching cannot find, it consults an LLM judge from
-outside the evaluated model families, because LLM judges can favor their own outputs and those of
-related models~\citep{panickssery2024selfrecognition, li2026preferenceleakage}.
+Our evaluator checks deterministically what can be checked: the final value of six answer kinds,
+the gold trace's intermediate quantities, which we call \emph{milestones}, among the values a
+response states, and the arithmetic it displays.
+An LLM judge decides only the milestones that matching misses, and it comes from outside the
+evaluated model families, because LLM judges can favor their own outputs and those of related
+models~\citep{panickssery2024selfrecognition, li2026preferenceleakage}.
 
 In summary, our contributions are as follows:
 \begin{itemize}
-    \item We introduce \ourdataset, 150 physically grounded symbolic templates spanning five
-          engineering branches, 15 domains, and 42 areas and stratified by difficulty, each of which
-          passes automated integrity checks, an LLM screen, and certification by three domain experts
-          from its own branch.
-    \item We present an evaluator that is deterministic wherever a check exists and validate it
-          against step-level labels from domain experts (final-answer agreement above 90\%,
-          milestone coverage F1 0.96).
-    \item We evaluate eleven open-weights and closed LLMs on 2,250 template instances and show that
-          final-answer accuracy alone cannot separate the strongest models, whereas milestone
-          coverage and an expert error analysis reveal how far their derivations get and where they
-          fail.
+    \item \ourdataset, 150 physically grounded symbolic templates spanning five engineering
+          branches, 15 domains, and 42 areas, each certified by three domain experts from its own
+          branch, with evaluation instances drawn from a private seed.
+    \item An evaluator that checks final values, intermediate values, and displayed arithmetic
+          deterministically, validated against domain experts' step labels (three-way final-answer
+          agreement 0.930, milestone F1 0.958), with what it cannot see: a rule misstated behind a
+          correct answer passes every deterministic check.
+    \item An evaluation of eleven LLMs on 2,250 instances, at the providers' defaults and at matched
+          reasoning settings: on the final answer the strongest models are near the ceiling of these
+          problems, and Milestone Coverage, the step checks, and an expert reading of wrong answers
+          show what lies beyond it.
 \end{itemize}

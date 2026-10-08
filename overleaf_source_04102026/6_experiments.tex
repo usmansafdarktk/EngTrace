@@ -26,15 +26,17 @@ tools or retrieval, at its provider's default decoding settings and an output ce
 tokens (16,384 for \texttt{Muse Glimmer 30B}).
 At these defaults, four models return no reasoning tokens (\texttt{Gemma 4 26B},
 \texttt{Qwen3-235B-2507}, \texttt{Gemini 3.1 Flash-Lite}, and \texttt{GPT-5.4 mini}, two of the
-three closed models), so the models are not compared at equal reasoning effort.
-In all, 246 responses (1.0\%) have no readable final answer and score 0, almost all of them empty
-at the output ceiling.
-The template is the unit of analysis, because its 15 instances share one
-derivation~\citep{miller2024errorbars}; every 95\% interval is a bootstrap over
+three closed models), so the defaults do not compare the models at equal reasoning effort.
+We therefore also evaluate a matched configuration, in which \texttt{Gemini 3.1 Flash-Lite},
+\texttt{Gemma 4 26B}, and \texttt{GPT-5.4 mini} also answer every instance with reasoning at medium
+effort (6,750 responses) and \texttt{Qwen3-235B-2507}, whose endpoint offers no reasoning setting,
+keeps its default.
+At the defaults, 260 responses (1.1\%) have no readable final answer and score 0, almost all of
+them empty at the output ceiling.
+The template is the unit of analysis, because a template's 15 instances and their gold traces come
+from one procedure~\citep{miller2024errorbars}; every 95\% interval is a bootstrap over
 templates~\citep{efron1993bootstrap}.
 We compare two models with a sign-flip permutation test on their per-template
-differences~\citep{dror2018hitchhiker} and correct each family of tests with Holm's
-method~\citep{holm1979simple}.
-All these details are in~\autoref{appendix:setup}: the decoding settings and token use
-in~\autoref{appendix:decoding}, the prompt in~\autoref{appendix:prompt}, and the statistical
-protocol in~\autoref{appendix:protocol}.
+differences~\citep{dror2018hitchhiker} and correct each family of tests, such as the 55 pairs of
+models in one configuration, with Holm's method~\citep{holm1979simple}.
+\autoref{appendix:setup} gives the decoding settings, the prompt, and the statistical protocol.

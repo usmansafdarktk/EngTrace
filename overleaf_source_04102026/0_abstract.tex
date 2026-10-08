@@ -1,18 +1,18 @@
-Engineering problems are solved by derivations whose intermediate quantities can be checked, yet
-existing benchmarks such as \textsc{SuperGPQA} and \textsc{EEE-Bench} score only final answers, and
-those that assess steps, such as \textsc{TPS-CalcBench}, mostly rely on large language model (LLM)
-judges or human graders.
-We present \ourdataset, a symbolic benchmark for verifiable process supervision of engineering
-reasoning, with 150 templates spanning five branches, 15 domains and 42 areas.
-Each template is expert-certified code that samples physically grounded parameters, computes the
-answer and emits a gold reasoning trace from the same computation, so every intermediate quantity is
-known exactly.
-Models are scored by an expert-validated evaluator that is deterministic wherever a check exists:
-final answers of six kinds, coverage of the gold trace's intermediate quantities (milestones), and
-displayed arithmetic, with residual milestones sent to an LLM judge from outside the evaluated model
-families.
-Across 2,250 instances, eleven LLMs attain final-answer accuracies of 0.81 to 0.98, the five
-strongest within 0.01 of one another.
-Milestone coverage is similarly high (0.82 to 0.92) but ranks the models differently.
-Errors on easy problems are almost entirely calculation slips, while wrong formulas or principles
-appear mostly on intermediate and advanced problems.
+Engineering derivations have checkable intermediate quantities, yet most engineering benchmarks
+score only final answers, and step-level ones rely on large language model (LLM) judges or cover
+one domain.
+We present \ourdataset: 150 expert-certified symbolic templates across five engineering branches,
+15 domains, and 42 areas, each computing an instance's answer and gold reasoning trace together.
+Our evaluator deterministically checks the final values of six answer kinds (symbolic ones by
+equivalence on five templates, by stated numbers on four), the gold trace's intermediate
+quantities, and displayed arithmetic; a judge from outside the evaluated families decides only the
+quantities that matching misses.
+A misstated rule behind a correct answer escapes these checks.
+We evaluate eleven LLMs on 2,250 privately seeded instances, at the providers' defaults and, for
+three models, with reasoning on.
+On the final answer, the five strongest lie within two points, near the ceiling.
+The process measures locate where wrong derivations break, find slips behind right answers, and
+compare tied models.
+Reasoning lifts those three models by 0.04 to 0.12, narrowing their gap to the strongest.
+Expert readings of 137 wrong answers find mostly calculation errors, and wrong formulas rise from
+3\% of Easy readings to 21\% of harder ones.

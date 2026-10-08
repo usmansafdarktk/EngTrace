@@ -6,8 +6,8 @@
 \subsection{Taxonomy and Content Selection}
 \label{subsec:taxonomy}
 
-The taxonomy of \ourdataset, illustrated in~\autoref{fig:engtrace-overview}, is chosen to mirror
-formal engineering curricula.
+The taxonomy of \ourdataset, illustrated in~\autoref{fig:engtrace-overview}, follows formal
+engineering curricula.
 
 \begin{figure*}[t]
     \centering
@@ -21,14 +21,16 @@ formal engineering curricula.
 \end{figure*}
 
 \paragraph{Domain and Area Selection.}
-To identify core domains and critical areas, we synthesized the engineering curricular standards of
-ABET~\citep{abet2024criteria} and of the professional societies of the five branches
-(AIChE~\citep{aiche2025constitution}, ASCE~\citep{asce2019cebok}, IEEE~\citep{ieee2025standards},
-IISE~\citep{iise2021bok}, and ASME~\citep{asme2025vision}), together with the standard textbooks of
-each branch.
-We further cross-checked these domains and areas against four LLMs prompted as curriculum designers
-(prompts provided in~\autoref{sec:appendix_domain_validation}
-and~\autoref{sec:appendix_area_validation}).
+We draw the candidate domains and areas of each branch from its curricular documents, the
+accreditation criteria of ABET~\citep{abet2024criteria}, the Fundamentals of Engineering exam
+specifications of NCEES for the five
+branches~\citep{ncees2020fechemical, ncees2020fecivil, ncees2020feelectrical, ncees2020feindustrial, ncees2020femechanical},
+and the bodies of knowledge of ASCE~\citep{asce2019cebok} and IISE~\citep{iise2021bok}, and from the
+standard textbooks of each branch.
+A panel of three LLMs from families outside the evaluated models, each prompted as a curriculum
+designer, names the cornerstone domains of each branch and the fundamental areas of each domain,
+and we finalize the 15 domains, three per branch, and their 42 areas by majority vote (prompts
+in~\autoref{sec:appendix_domain_validation} and~\autoref{sec:appendix_area_validation}).
 
 \paragraph{Template Selection.}
 Domain experts hand-authored all symbolic Python templates, grounding them directly in foundational
@@ -36,20 +38,21 @@ textbooks and authoritative engineering
 handbooks~\citep[e.g.,][]{fogler2020elements, ulaby2015fundamentals, hibbeler2020, montgomery2013}
 (see~\autoref{sec:appendix_books} for the complete list of source texts).
 The template distribution per area is non-uniform and follows a pedagogical significance score
-(1--5) that the same four LLMs assigned to each area within its domain (detailed prompt provided
-in~\autoref{sec:appendix_significance_scoring}).
-For instance, within the Reaction Kinetics domain, the core area of Mole Balances includes five
-templates, while the specialized area of Conversion and Reactor Sizing is represented by a single
-template.
+(1--5) that the same three LLMs assigned to each area within its domain
+(\autoref{sec:appendix_significance_scoring}); \autoref{tab:area} gives the templates per area and
+level.
+Each branch holds three domains by design, so core areas such as circuit analysis in electrical
+engineering, thermodynamics and heat transfer in mechanical engineering, and transportation and
+environmental engineering in civil engineering are not covered.
 
 \paragraph{Difficulty Levels.}
-Domain experts also assigned each template one of three levels, Easy, Intermediate, or Advanced,
-along three dimensions: conceptual complexity (isolated principles vs.\ multi-domain synthesis),
-mathematical sophistication (direct algebraic substitution vs.\ differential equations), and
-procedural depth (the length of interdependent reasoning chains).
-\autoref{appendix:statistics} gives the difficulty distribution of the templates by branch, along
-with their distribution across domains, the answer kinds, the variation within a template, and how
-the evaluation set is drawn.
+The levels are the domain experts' labels, set when the templates were written and fixed before any
+model ran: following a fixed protocol, the template's author and two other experts of its branch
+rate it from 1 to 3 on conceptual complexity, mathematical sophistication, and procedural depth,
+counting only what the solver must supply, and the sum of the median scores sets the level (3--4
+Easy, 5--6 Intermediate, 7--9 Advanced).
+\autoref{appendix:statistics} gives the levels by branch and the other statistics of the templates
+and the evaluation set.
 
 
 
@@ -71,7 +74,7 @@ unit; these are the milestones whose coverage our evaluator measures.
     \centering
     \includegraphics[width=0.75\linewidth]{figs/template-generation.pdf}
     \caption{The \ourdataset \textbf{Template Generation Pipeline} maps domain-aware constraints to
-    serialized question-solution pairs via physically-validated computation, illustrated here using
+    serialized question-solution pairs via physically validated computation, illustrated here using
     a CSTR volume calculation example.}
     \label{fig:template-generation}
 \end{figure*}
@@ -104,8 +107,12 @@ experts reject.
 Three domain experts per branch review its 30 templates mixed with four planted defects, without
 knowing which items are planted, and solve one instance of each template by hand before seeing its
 gold trace.
-Every expert rejects all four planted defects of their branch (60 of 60 readings), 459 of 504 hand
-checks match the gold value within 1\%, and agreement on approval is high (Gwet's
-AC1 0.914~\citep{gwet2008}; Fleiss'~$\kappa$~\citep{fleiss1971} 0.589, deflated because nearly every
-template is approved~\citep{feinstein1990high}).
-All 150 templates are certified by a unanimous vote of their three experts.
+%% FILL: E4, who wrote the templates and who certified them (the independence sentence)
+Every expert rejects all four planted defects of their branch (60 of 60 readings), 459 of the 504
+hand checks that yield a comparable number match the gold value within 1\%, and agreement on
+approval is high (Gwet's AC1 0.914~\citep{gwet2008}; Fleiss'~$\kappa$~\citep{fleiss1971} 0.589,
+deflated because nearly every template is approved~\citep{feinstein1990high}).
+The planted defects test numeric correctness, such as transposed digits or a flipped sign, and not
+whether a question pins down a single reading.
+A template that any of its experts rejects is revised and reviewed again; after six rounds, all 150
+templates are certified by a unanimous vote of their three experts.

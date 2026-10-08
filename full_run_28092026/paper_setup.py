@@ -227,11 +227,25 @@ margin = float(re.search(r"EQUIV_MARGIN = ([\d.]+)", analyze).group(1))
 assert margin == res["q5"]["margin"]
 assert len(res["q1"]["pairs"]) == comb(len(roster), 2) == len(res["q3_coverage"]["pairs"])
 CLAIMS_FAILED = []  # a prose claim the data no longer supports: reported, counted by --check, generation goes on
-if not all(m["sd_advanced"] > m["sd_easy"] for m in res["q2"]):
-    CLAIMS_FAILED.append("Advanced templates vary more than Easy ones, for every model (not for "
-                         + ", ".join(m["model"] for m in res["q2"] if m["sd_advanced"] <= m["sd_easy"]) + ")")
+adv_spread = sum(m["sd_advanced"] > m["sd_easy"] for m in res["q2"])  # models whose Advanced template scores vary more
+if not adv_spread > len(roster) / 2:
+    CLAIMS_FAILED.append(f"Advanced templates vary more than Easy ones for most models (for {adv_spread} of {len(roster)})")
 assert all(m["templates"] == len(per_template) for m in res["q2"])
 mc_templates = res["q3_coverage"]["templates"]
+
+# ---------------------------------------------------------------- the serving endpoints (results/providers.json, analyze.py)
+# The template-matched difference of each endpoint, over the endpoints matched on at least the minimum number of templates.
+providers = load(HERE / "results/providers.json")
+providers = providers["rows"] if isinstance(providers, dict) else providers
+MIN_MATCHED = 20  # the providers table's threshold for an endpoint whose difference can be read
+assert all(r["few_matched"] == (r["templates_matched"] < MIN_MATCHED) for r in providers if r.get("matched_diff") is not None)
+readable_endpoints = [r for r in providers if not r["few_matched"] and r.get("matched_diff") is not None]
+endpoint_diffs = [r["matched_diff"] for r in readable_endpoints]
+
+
+def sgn(x: float) -> str:
+    r = round(x, 3)
+    return f"$-{abs(r):.3f}$" if r < 0 else f"$+{r:.3f}$"
 
 phrases = [  # Section 5.1
     f"We evaluate {WORD[len(roster)]} LLMs: {WORD[len(open_)]} open-weights models, {series(open_, cite=True)}; and "
@@ -244,13 +258,15 @@ phrases = [  # Section 5.1
     f"tools or retrieval, at its provider's default decoding settings and an output ceiling of {thousands(ceiling)} "
     f"tokens ({thousands(lower['muse-glimmer-30b'])} for {tt('muse-glimmer-30b')})",
     f"{WORD[len(no_reasoning)]} models return no reasoning tokens ({series(no_reasoning)}, "
-    f"{WORD[closed_without]} of the {WORD[len(closed)]} closed models), so the models are not compared at equal "
-    "reasoning effort",
+    f"{WORD[closed_without]} of the {WORD[len(closed)]} closed models), so the defaults do not compare the models at "
+    "equal reasoning effort",
     f"{unusable} responses ({100 * unusable / rows:.1f}\\%) have no readable final answer and score 0, almost all "
     "of them empty at the output ceiling",
     f"{series(rerun)} also answer every instance with reasoning at {effort} effort ({thousands(rerun_rows)} responses)",
-    f"because its {k_inst} instances share one derivation",
+    f"{tt(NO_THINKING)}, whose endpoint offers no reasoning setting, keeps its default",
+    f"because a template's {k_inst} instances and their gold traces come from one procedure",
     f"every {level}\\% interval is a bootstrap over templates",
+    f"such as the {comb(len(roster), 2)} pairs of models in one configuration",
 ]
 appendix_phrases = [  # appendices/models.tex
     f"The first condition excludes, among others, the {WORD[len(study)]} models of the expert study "
@@ -278,13 +294,15 @@ appendix_phrases = [  # appendices/models.tex
     f"bounded change also carries its {level90}\\% interval",
     f"a sign-flip permutation test with {thousands(B_TEST)} sign flips",
     f"those of Milestone Coverage, which use the {mc_templates} templates with milestones",
-    "because scores vary more across Advanced templates",
+    f"because scores vary more across Advanced templates for {WORD[adv_spread]} of the {WORD[len(roster)]} models",
     f"its mean on the {levels['Easy']} Easy templates minus its mean on the {levels['Advanced']} Advanced ones",
     f"such as the {comb(len(roster), 2)} pairs of models for each measure or the {WORD[len(roster)]} level gaps",
     f"at {power}\\% power and a two-sided level of {sig:.2f}, a paired comparison detects ${factor}\\,s/\\sqrt{{n}}$",
     f"a level gap ${factor}\\,\\sigma\\sqrt{{1/{levels['Easy']} + 1/{levels['Advanced']}}}$",
     f"a change counts as bounded when its {level90}\\% interval lies within $\\pm {margin:.2f}$, which is two "
     f"one-sided tests at {round(100 * sig)}\\%",
+    f"Over the {len(readable_endpoints)} endpoints matched on at least {MIN_MATCHED} templates, these differences lie between "
+    f"{sgn(min(endpoint_diffs))} and {sgn(max(endpoint_diffs))}",
 ]
 
 
@@ -309,7 +327,9 @@ NUMBER_WORDS = re.compile(r"\b(" + "|".join(WORD.values()) + r")\b", re.I)
 
 
 def strip_blocks(tex: str) -> str:
-    """Comments, tables, the prompt box, layout settings and the hash's name, none of them a reported number."""
+    """Comments, tables, the prompt box, layout settings and the hash's name, none of them a reported number; and the blocks
+    paper_results.py generates (it checks them itself)."""
+    tex = re.sub(r"% BEGIN GENERATED (\S+) .*?% END GENERATED \1", " ", tex, flags=re.S)
     tex = re.sub(r"(?<!\\)%.*", "", tex)
     tex = re.sub(r"\\begin\{(tabular|verbatim)\}.*?\\end\{\1\}", " ", tex, flags=re.S)
     tex = re.sub(r"\\(resizebox|renewcommand)\{[^}]*\}\{[^}]*\}", " ", tex)
