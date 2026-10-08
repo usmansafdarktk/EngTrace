@@ -3,7 +3,7 @@
 # app.py, guide.md and the count reports GRADES.md, SYMBOLIC_CHECK.md and RESCORE_PREVIEW.md.
 tasks/
 dist/
-experts_filled_symbolic*/
+experts_filled*/
 grades.json
 validation.json
 __pycache__/

@@ -3,6 +3,6 @@
 # scripts, app.py, guide.md and the count report RESULTS.md.
 tasks/
 dist/
-experts_filled_levels*/
+experts_filled*/
 agreement.json
 __pycache__/

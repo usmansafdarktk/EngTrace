@@ -2,8 +2,10 @@
 \section{LLM Prompt for Domain Validation}
 \label{sec:appendix_domain_validation}
 
-To identify core domains, we consulted a panel of four frontier models: \texttt{GPT-4o},
-\texttt{Claude 3.5 Sonnet}, \texttt{Gemini 2.5 Pro}, and \texttt{DeepSeek V3}.
+% The panel the domain experts report for this cycle's domain and area validation, run outside this
+% repository (the owner, 2026-10-08); it replaces the previous cycles' panel of four.
+To identify core domains, we consulted a panel of three LLMs from families outside the evaluated models:
+\texttt{Grok 4.6}~\citep{grok46}, \texttt{MiniMax M3}~\citep{minimaxm3}, and \texttt{MiMo-V2.5-Pro}.
 Each was prompted individually to identify cornerstone engineering domains.
 We finalized the 15 core domains via majority voting.
 The domain identification prompt is provided below.
@@ -97,6 +99,7 @@ Do not include any preamble, conversational text, explanations, or markdown form
 \section{LLM Prompt for Area Validation}
 \label{sec:appendix_area_validation}
 
+% The same three models as the domain validation (see the note there).
 Following the domain validation procedure, we utilized the same model panel and aggregated the
 pedagogical areas via majority voting.
 The prompt used for area identification is provided below.
