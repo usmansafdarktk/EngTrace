@@ -7707,6 +7707,34 @@ with the response to each); `full_run_28092026/coverage_cases.py --selftest`; ev
   story and the blind spot; Limitations cover under-specified wording and the answer-rule simplifications with their
   measured effect; the Overleaf mirror's old `engchain-overview.pdf` is unused; both bibliographies hold one entry per key.
 
+## D-199 — The introduction revised with the owner: the study premise after the gap, a concise evaluator paragraph, contributions on the final data
+
+**Date:** 2026-10-09 · **Status:** DONE · **Evidence:** `overleaf_source_04102026/1_intro.tex` (440 words of running text; no
+generator covers it, so every number was checked by hand against `docs/mock_review_workstreams/reports/NUMBERS_SHEET.md`
+and the guarded appendices)
+
+- **Opening paragraph.** "LLMs" is not spelled out (writing rule 5); the gap sentence cites EEE-Bench beside SuperGPQA
+  and EngiBench and ends "or are limited to a single domain"; the expert-study sentence supports the gap ("correct
+  answers still come with 178 flawed steps, 175 of them calculation slips"), and the soundness finding (AUROC 0.974)
+  stays in the validation appendix, since beside the gap it read as a contradiction; the paragraph ends on what the
+  final answer cannot show, so "To address these gaps" has a referent.
+- **Figure.** The CSTR template example returns after the opening paragraph with the May caption, "supervision"
+  changed to "evaluation"; the template sentence points to it.
+- **Second paragraph.** The private seed is out of the introduction (setup material, the owner); the scope sentence stays.
+- **Evaluator paragraph.** The pre-workstream form ("deterministic wherever a check exists": verifies, measures,
+  recomputes); the judge decides the milestones matching misses, while its step role and the self-preference citations
+  stay in Section 4 and the validation appendix; the blind spot is stated once, here, measured with planted defects.
+- **Contributions.** "We present / design / evaluate"; contribution 1 relists no counts; contribution 2 quotes the
+  agreement figures and leaves the in-sample caveat to Section 4 and Limitations; contribution 3 gives the five
+  strongest within 0.02 on final-answer accuracy and says milestone coverage and the arithmetic check show that their
+  derivations still differ (coverage separates one of the ten pairs, so not "distinguishes"), then the half of the
+  gold milestones that wrong answers keep and the experts' error mix by level.
+- **Not restored.** MMLU, MATH and HumanEval: general context rather than the closest work; their entries are gone from
+  `custom.bib`.
+- **Left open.** The abstract still spells out LLM and says "residual milestones"; `WRITING_RULES.md` contradicts itself
+  on spelling out LLM; `full_run_28092026/paper_results.py --check` fails on phrases in `6_results.tex` and
+  `error_analysis.tex` about the repaired chemical templates and on a stale `tab:level_gap` block, outside this change.
+
 ## Open decisions
 
 | # | Decision | Needed before |
