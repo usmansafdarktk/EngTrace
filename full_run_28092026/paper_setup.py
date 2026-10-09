@@ -252,7 +252,7 @@ phrases = [  # Section 5.1
     f"{WORD[len(closed)]} closed models, {series(closed, cite=True)}.",
     "None of them wrote responses that we used to develop or validate the evaluator",
     f"{WORD[len(anchors)].capitalize()} flagships, {series(anchors, cite=True)}, run only as anchors on a fixed subset "
-    f"of {subset} instances ({WORD[subset // len(per_template)]} per template), which the further conditions also "
+    f"of {subset} instances ({WORD[subset // len(per_template)]} per template), which the further experiments also "
     "use",
     f"Each model answers each instance once ({thousands(rows)} responses) with the same zero-shot prompt and no "
     f"tools or retrieval, at its provider's default decoding settings and an output ceiling of {thousands(ceiling)} "

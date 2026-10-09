@@ -23,7 +23,8 @@ vocabulary) are in `docs/PAPER_PLAN_OCT2026.md`, section 8; this file covers for
   "Table 1" or "Appendix A". Labels carry a prefix: `sec:`, `subsec:`, `fig:`, `tab:`, `eq:`, `appendix:`.
 - Headings follow the ACL instructions (`current_overleaf_project/formatting.md`), which describe two numbered
   levels: `\section` (12 pt bold, "1 Introduction") and `\subsection` (11 pt bold, "6.1 File Format"), numbered by
-  `acl.sty`. No `\subsubsection`. Each heading stands on its own line, its `\label` on the next. Few subsections.
+  `acl.sty`. `\subsubsection` only where the results section already uses it (its four numbered parts hold
+  run-in paragraphs of their own). Each heading stands on its own line, its `\label` on the next. Few subsections.
 - Below them, run-in headings with `\paragraph{Title.}`: bold, in the text size, ending with a full stop, and run
   into the text, so the first sentence follows the heading on the same source line
   (`\paragraph{Milestones.} We rerun ...`).
@@ -130,6 +131,5 @@ Labels used before their sections exist. Each must be defined when its section i
   `tab:experiments`. Defined in `appendices/error_analysis.tex`: `appendix:error_analysis`, `tab:errors` (also
   `tab:error_by_level`). The prose of these five files is checked by `paper_results.py --check` against its phrases:
   a number the prose states must be one a phrase of that file generates.
-- Defined in `appendices/related_work.tex`: `appendix:related_work` (the extended related work; table
-  `tab:related_work`, the fifteen closest benchmarks). Defined in `appendices/release.tex`: `appendix:release` (what
+- Defined in `appendices/release.tex`: `appendix:release` (what
   is released and withheld, query dates, the script behind each table, the contamination policy).

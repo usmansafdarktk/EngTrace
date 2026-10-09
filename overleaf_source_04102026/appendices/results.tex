@@ -9,10 +9,10 @@ not hold comes with the smallest difference the design detects at 80\% power
 (\autoref{appendix:protocol}).
 
 \paragraph{Pairwise Comparisons.} Of the 55 pairs, 38 differ on FAC after Holm correction under the
-sign-flip test over templates: inside the top five, only \texttt{DeepSeek V4.1 Flash} from
+sign-flip test over templates: inside the first five, only \texttt{DeepSeek V4.1 Flash} from
 \texttt{GLM-5.3-Flash}; \texttt{GLM-5.3} from \texttt{DeepSeek V4.1 Flash},
 \texttt{Claude Sonnet 5}, \texttt{Kimi K3}, and \texttt{GLM-5.3-Flash}; each of the lower five from
-every model of the top six; and inside the lower five, \texttt{gpt-oss-20b} from
+every model of the upper tier; and inside the lower five, \texttt{gpt-oss-20b} from
 \texttt{Qwen3-235B-2507}, \texttt{Gemini 3.1 Flash-Lite}, and \texttt{Gemma 4 26B}.
 Every non-significant FAC difference lies below what its pair detects (0.013 to 0.064).
 On MC, 28 pairs differ: the three highest models, \texttt{Claude Sonnet 5}, \texttt{GLM-5.3-Flash},
@@ -30,7 +30,8 @@ letters of its own family of pairwise tests.
 At matched settings the five highest models are \texttt{DeepSeek V4.1 Flash},
 \texttt{Claude Sonnet 5}, \texttt{Kimi K3}, \texttt{GLM-5.3-Flash}, and \texttt{GPT-5.4 mini}, and
 Kendall's $\tau$ between the orderings at the providers' defaults and at matched settings is 0.709.
-Reasoning raises all three re-run models, and none of the three changes is bounded within the
+Reasoning raises all three models run with it (Holm-adjusted $p$ $<$0.001), and for
+\texttt{Gemma 4 26B} and \texttt{GPT-5.4 mini} the 90\% interval lies wholly above $+0.05$, the
 margin of~\autoref{appendix:protocol}; \autoref{appendix:experiments} reads them beside the
 reasoning-effort experiment.
 The expert readings of wrong answers (\autoref{appendix:error_analysis}) are of the responses at the
@@ -40,7 +41,7 @@ providers' defaults, so they do not describe the three models at matched setting
 templates whose instances it solves on all, on some, and on none, separately for the templates whose
 instances all follow one derivation and for the others.
 No model fails every instance of more than a few templates, and each lower-tier model solves some
-but not all instances of more single-path templates than any top-six model; the table shows how
+but not all instances of more single-path templates than any upper-tier model; the table shows how
 consistent a model is within a template, not why.
 
 % BEGIN GENERATED tab:matched (full_run_28092026/paper_results.py --write)
@@ -70,14 +71,15 @@ consistent a model is within a template, not why.
 \bottomrule
 \end{tabular}
 }
-\caption{FAC at the providers' default settings and at matched settings, with the tier letters of
-each configuration's own 55-pair family (Holm-corrected sign-flip tests over templates; models
-sharing a letter do not differ). Setting: what the matched configuration runs. For the three re-run
-models, the change from their default rows over the same 2,250 instances, paired by instance: with
-its 95\% interval, the Holm-adjusted $p$ of the sign-flip test over templates, the 90\% interval
-read against the $\pm 0.05$ margin, the change in MC, and the empty responses in each configuration.
-Kendall's $\tau$ between the two orderings is 0.709 (95\% interval 0.636 to 0.818). $^{\ast}$No
-reasoning tokens at the provider's default. $^{\ddagger}$Re-run with reasoning at medium effort.}
+\caption{\textbf{Matched settings.} FAC at the providers' default settings and at matched settings,
+with the tier letters of each configuration's own 55-pair family (Holm-corrected sign-flip tests
+over templates; models sharing a letter do not differ). Setting: what the matched configuration
+runs. For the three models run with reasoning on, the change from their default rows over the same
+2,250 instances, paired by instance: with its 95\% interval, the Holm-adjusted $p$ of the sign-flip
+test over templates, the 90\% interval read against the $\pm 0.05$ margin, the change in MC, and the
+empty responses in each configuration. Kendall's $\tau$ between the two orderings is 0.709 (95\%
+interval 0.636 to 0.818). $^{\ast}$No reasoning tokens at the provider's default. $^{\ddagger}$Run
+with reasoning at medium effort.}
 \label{tab:matched}
 \end{table*}
 % END GENERATED tab:matched
@@ -109,11 +111,11 @@ reasoning tokens at the provider's default. $^{\ddagger}$Re-run with reasoning a
 \bottomrule
 \end{tabular}
 }
-\caption{Consistency within a template: the share of templates whose 15 instances a model solves on
-all, on some but not all, and on none, with 95\% intervals over templates, for the 58 templates
-whose instances all follow one derivation and the 92 whose instances follow several. A template
-counts as solved on an instance when the final answer is correct; the shares are of templates, not
-of instances.}
+\caption{\textbf{Consistency within a template.} The share of templates whose 15 instances a model
+solves on all, on some but not all, and on none, with 95\% intervals over templates, for the 58
+templates whose instances all follow one derivation and the 92 whose instances follow several. A
+template counts as solved on an instance when the final answer is correct; the shares are of
+templates, not of instances.}
 \label{tab:single_path}
 \end{table*}
 % END GENERATED tab:single_path
@@ -159,13 +161,13 @@ Kendall's $\tau$ with FAC as scored & & 0.927 & 1.000 & 0.964 & 1.000 & & & & \\
 \bottomrule
 \end{tabular}
 }
-\caption{The final-answer rule re-applied to every response of the evaluation with one clause
-changed at a time: the absolute-value clause off, the response's last-digit term not capped at one
-hundredth of the target, the exact-digit requirement of the prescribing templates relaxed to the
-tolerance, and partial credit in proportion to the parts matched instead of one half. Each cell
-gives FAC under the variant and the verdicts that rise and fall; the last row Kendall's $\tau$ of
-the variant's ordering with the ordering as scored. Right: the accepted answers by their relative
-error to the target.}
+\caption{\textbf{Scoring-rule variants.} The final-answer rule re-applied to every response of the
+evaluation with one clause changed at a time: the absolute-value clause off, the response's
+last-digit term not capped at one hundredth of the target, the exact-digit requirement of the
+prescribing templates relaxed to the tolerance, and partial credit in proportion to the parts
+matched instead of one half. Each cell gives FAC under the variant and the verdicts that rise and
+fall; the last row Kendall's $\tau$ of the variant's ordering with the ordering as scored. Right:
+the accepted answers by their relative error to the target.}
 \label{tab:scoring_variants}
 \end{table*}
 % END GENERATED tab:scoring_variants
@@ -177,7 +179,7 @@ arithmetic flags of~\autoref{tab:main_results}.
 The flag rates do not rank the models: the two checks together recall fewer than half of the flawed
 steps inside correct answers (\autoref{appendix:validation}), the precision varies across models,
 and the arithmetic check reads more calculations where a model writes more arithmetic out.
-Coverage does not rise with the amount a model writes.
+Coverage rises by at most 0.003 (MC per 10 numeric values shown) with the amount a model writes.
 Spearman's $\rho$~\citep{spearman1904} between a template's mean coverage and its mean number of
 steps is $-0.09$ to $-0.26$ for every model; the slope of MC on the number of values a response
 displays is $+0.0015$ (MC per 10 numeric values shown; 95\% interval 0.000 to 0.003) with template
@@ -188,12 +190,14 @@ fixed effects, and within models Spearman's $\rho$ runs from $-0.24$ to $-0.07$.
 (Holm-adjusted $p$ 0.049), by matching alone (0.001), and on intermediate milestones only (0.027),
 but not under route-adjusted coverage (1.000), where the milestones the judge rules not needed leave
 the denominator: what separates them is how closely a response follows the gold derivation's route,
-not how far it gets.
-Their MC gap as scored, $+0.023$, is of the size of the judge's own variation: re-judging a sample
-with a second judge shifts a model's coverage by $-0.018$ to $+0.019$
-(\autoref{appendix:validation}).
-\autoref{tab:judged_steps} gives the judged step flags, whose precision~\autoref{appendix:readings}
-reports, and~\autoref{tab:flag_precision} classifies every arithmetic flag on a correct answer: 11
+not whether it reaches the quantities its own route needs, a reading that rests on the judge's
+not-needed rulings, which the experts did not read.
+The separation does not rest on the judge: matching alone, which the judge does not touch,
+separates them more strongly ($+0.042$, Holm-adjusted $p$ 0.001); re-judging a sample with a second
+judge shifts a model's coverage by $-0.018$ to $+0.019$ (\autoref{appendix:validation}).
+\autoref{tab:judged_steps} gives the judged step flags, whose precision on the expert study
+\autoref{tab:validation_results} reports, and~\autoref{tab:flag_precision} classifies every
+arithmetic flag on a correct answer: 11
 of the 3,409 (0.3\%) are carried precision, a printed result that is a correct rounding of the
 value recomputed from the unrounded values earlier in the response, and none of the 171 slips the
 domain expert confirmed is.
@@ -263,17 +267,18 @@ left out.}
 \bottomrule
 \end{tabular}
 }
-\caption{Milestone Coverage under four definitions, per model: as scored (the judge's rulings added
-to the matcher's), by matching alone, route-adjusted (milestones the judge rules not needed leave
-the denominator), and intermediate only (the milestones that state the final answer leave the set).
-All: the mean over all responses with milestones, with its 95\% interval over templates; wrong: the
-mean over wrong answers; tier: models sharing a letter do not differ after Holm's correction over
-the pairwise sign-flip tests of that definition. Intermediate only: the answer milestones are those
-whose value equals a number of the answer check's targets under its unit factors; once they leave
-the set, 502 instances have no milestone left (57 have none at all). \texttt{Claude Sonnet 5}
-against \texttt{DeepSeek V4.1 Flash}: Holm-adjusted $p$ 0.049 as scored, 0.001 by matching alone,
-1.000 route-adjusted. The slope of MC on the number of values a response displays, with template
-fixed effects, is $+0.0015$ (MC per 10 numeric values shown; 95\% interval 0.000 to 0.003).}
+\caption{\textbf{Milestone Coverage under four definitions.} Per model: as scored (the judge's
+rulings added to the matcher's), by matching alone, route-adjusted (milestones the judge rules not
+needed leave the denominator), and intermediate only (the milestones that state the final answer
+leave the set). All: the mean over all responses with milestones, with its 95\% interval over
+templates; wrong: the mean over wrong answers; tier: models sharing a letter do not differ after
+Holm's correction over the pairwise sign-flip tests of that definition. Intermediate only: the
+answer milestones are those whose value equals a number of the answer check's targets under its unit
+factors; once they leave the set, 502 instances have no milestone left (57 have none at all).
+\texttt{Claude Sonnet 5} against \texttt{DeepSeek V4.1 Flash}: Holm-adjusted $p$ 0.049 as scored,
+0.001 by matching alone, 1.000 route-adjusted. The slope of MC on the number of values a response
+displays, with template fixed effects, is $+0.0015$ (MC per 10 numeric values shown; 95\% interval
+0.000 to 0.003).}
 \label{tab:coverage_variants}
 \end{table*}
 % END GENERATED tab:coverage_variants
@@ -286,7 +291,7 @@ fixed effects, is $+0.0015$ (MC per 10 numeric values shown; 95\% interval 0.000
 \begin{tabular}{l c r c r}
 \toprule
 \rowcolor{gray!10}
-\textbf{Model} & \textbf{\makecell{Judged step flags,\\correct answers}} & \textbf{\makecell{Steps flagged\\per response}} & \textbf{\makecell{Judged step flags,\\wrong answers}} & \textbf{\makecell{Judge-decided\\milestones}} \\
+\textbf{Model} & \textbf{\makecell{Judged step flags,\\correct answers}} & \textbf{\makecell{Steps flagged\\per response}} & \textbf{\makecell{Any step flagged,\\wrong answers}} & \textbf{\makecell{Judge-decided\\milestones}} \\
 \midrule
 \texttt{DeepSeek V4.1 Flash} & 0.010 {\scriptsize\textcolor{gray}{(0.005--0.015)}} & 0.03 & 0.417 {\scriptsize\textcolor{gray}{(0.000--0.636)}} & 0.17 \\
 \texttt{Claude Sonnet 5} & 0.054 {\scriptsize\textcolor{gray}{(0.041--0.068)}} & 0.28 & 0.650 {\scriptsize\textcolor{gray}{(0.412--0.875)}} & 0.12 \\
@@ -305,15 +310,15 @@ fixed effects, is $+0.0015$ (MC per 10 numeric values shown; 95\% interval 0.000
 \texttt{GPT-5.4 mini}$^{\ddagger}$ & 0.115 {\scriptsize\textcolor{gray}{(0.091--0.140)}} & -- & -- & -- \\
 \bottomrule
 \end{tabular}
-\caption{The judged step check on the responses of the evaluation: the share of correct-answer
-responses with at least one step the judge flags (95\% interval over templates), the flagged steps
-per response, the same share on wrong answers, and the share of milestones the judge rather than the
-matcher decides. The check runs the judge at the provider's default settings, so its flags are
-judged, not verified: in the expert study, 7 of the 15 flags it raises inside correct answers are
-errors (precision 0.47), and together with the arithmetic check it finds 0.36 of the flawed steps
-there at precision 0.70 (\autoref{tab:validation_results}). $^{\ast}$No reasoning tokens at the
-provider's default. $^{\dagger}$99 responses empty at the output ceiling. $^{\ddagger}$Reasoning at
-medium effort.}
+\caption{\textbf{Judged step flags.} The judged step check on the responses of the evaluation: the
+share of correct-answer responses with at least one step the judge flags (95\% interval over
+templates), the flagged steps per response, the share of wrong answers with at least one step either
+check flags, and the share of milestones the judge rather than the matcher decides. The check runs
+the judge at the provider's default settings, so its flags are judged, not verified: in the expert
+study, 7 of the 15 flags it raises inside correct answers are errors (precision 0.47), and together
+with the arithmetic check it finds 0.36 of the flawed steps there at precision 0.70
+(\autoref{tab:validation_results}). $^{\ast}$No reasoning tokens at the provider's default.
+$^{\dagger}$99 responses empty at the output ceiling. $^{\ddagger}$Reasoning at medium effort.}
 \label{tab:judged_steps}
 \end{table*}
 % END GENERATED tab:judged_steps
@@ -344,12 +349,13 @@ All models & 3409 & 11 & 3398 & 0\% \\
 Slips the domain expert confirmed & 171 & 0 & 168 & 0\% \\
 \bottomrule
 \end{tabular}
-\caption{Every arithmetic flag on a correct-answer response classified as carried precision, where
-the printed result is a correct rounding of the value recomputed from the unrounded upstream values
-that appear earlier in the response, or other. The last row applies the same classification to the
-171 flags the domain expert confirmed as slips. A carried-precision flag marks a rounding the
-response carried forward, not a wrong operation; the classification is mechanical and was not read
-by an expert.}
+\caption{\textbf{Carried precision among the arithmetic flags.} Every arithmetic flag on a
+correct-answer response classified as carried precision, where the printed result is a correct
+rounding of the value recomputed from the unrounded upstream values that appear earlier in the
+response, or other. The last row applies the same classification to the 171 flags the domain expert
+confirmed as slips; 3 of them sit in steps whose text changed after the reading and are not
+classified. A carried-precision flag marks a rounding the response carried forward, not a wrong
+operation; the classification is mechanical and was not read by an expert.}
 \label{tab:flag_precision}
 \end{table}
 % END GENERATED tab:flag_precision
@@ -365,9 +371,11 @@ Over the responses with a readable answer, \texttt{GLM-5.3}'s gap is $-0.004$ (H
 $p$ 1.000), so its gap as scored comes from its empty responses at the output ceiling.
 The share scored 0 counts empty responses at the output ceiling as well as wrong answers.
 \autoref{tab:depth_model} therefore relates a wrong answer to the depth of the gold derivation over
-readable responses only, with the answer kind as a covariate: the slope of the wrong-answer rate on
-the milestone count holds after Holm correction for five of the eleven models over readable
-responses, the four weakest among them, and for the other six it does not hold after correction.
+readable responses only, with the answer kind as a covariate.
+Pooled over the models, each further milestone multiplies the odds of a wrong answer by 1.23 (95\%
+interval 1.13 to 1.34); per model, the slope of the wrong-answer rate on the milestone count holds
+after Holm correction for five of the eleven models over readable responses, the four weakest among
+them, and for the other six it does not hold after correction.
 
 % BEGIN GENERATED tab:level_gap (full_run_28092026/paper_results.py --write)
 \begin{table*}[t]
@@ -432,12 +440,12 @@ trace (293, 462, 368, 542, and 528 instances).}
 \bottomrule
 \end{tabular}
 }
-\caption{The wrong-answer rate against the depth of the gold derivation, over readable responses
-only (empty responses and responses that state no answer are left out): per bin of the gold
-milestone count, the rate with its 95\% interval over templates (293, 462, 368, 540, and 522
-instances); then the slope of a template-clustered logistic model of a wrong answer on the milestone
-count, with the answer kind as a covariate, and its Holm-adjusted $p$ over the eleven models. The
-slope holds after correction for five of them.}
+\caption{\textbf{Wrong answers by the depth of the gold derivation.} The wrong-answer rate over
+readable responses only (empty responses and responses that state no answer are left out): per bin
+of the gold milestone count, the rate with its 95\% interval over templates (293, 462, 368, 540, and
+522 instances); then the slope of a template-clustered logistic model of a wrong answer on the
+milestone count, with the answer kind as a covariate, and its Holm-adjusted $p$ over the eleven
+models. The slope holds after correction for five of them.}
 \label{tab:depth_model}
 \end{table*}
 % END GENERATED tab:depth_model

@@ -324,8 +324,9 @@ def main() -> int:
     ex = fp['expert_confirmed']
     S.put('Slips the domain expert confirmed that are carried precision', f"{ex['carried_precision']} of {ex['slips']} "
           f"({ex['step_changed']} in steps whose text changed with the repaired items)", 'full_run_28092026/results/flag_precision.json: expert_confirmed')
-    S.table(['model', 'arithmetic flags on correct answers [95% CI]', 'judged step flags on correct answers [95% CI]',
-             'judged step flags on wrong answers [95% CI]', 'steps flagged per response'],
+    S.table(['model', 'arithmetic flags on correct answers [95% CI]',
+             'any step flagged on correct answers, arithmetic or judge [95% CI] (the judge alone: tab:judged_steps)',
+             'any step flagged on wrong answers [95% CI]', 'steps flagged per response'],
             [[nm(k), f"{f3(q3[k]['digit_flag_rate_on_fully_solved'])} {ci(q3[k]['digit_ci'])}",
               f"{f3(q3[k]['router_rate_on_fully_solved'])} {ci(q3[k]['router_ci'])}",
               f"{f3(q3[k]['router_rate_on_wrong'])} {ci(q3[k]['router_wrong_ci'])}", f"{q3[k]['router_steps_flagged_per_trace']:.2f}"]

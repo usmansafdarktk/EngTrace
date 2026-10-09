@@ -211,7 +211,7 @@ def table_area() -> str:
         L += ["\\bottomrule", "\\end{tabular}", "\\end{minipage}"]
         return L
 
-    caption = (f"Templates per area and level: {n_area} areas in {n_dom} domains. Each branch has "
+    caption = (f"\\textbf{{Templates per area and level.}} {n_area} areas in {n_dom} domains; each branch has "
                f"{sum(total.values()) // len(BRANCHES)} templates; the shaded rows give the branch subtotals and the "
                f"italic rows name the domain.")
     lines = (["\\begin{table*}[t]", "\\centering", "\\footnotesize", "\\renewcommand{\\arraystretch}{1.05}",

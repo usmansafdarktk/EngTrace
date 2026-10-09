@@ -179,7 +179,7 @@ Source: `full_run_28092026/results/coverage_variants.json: models.<model>.<readi
 - Arithmetic flags on correct answers that are carried precision (main run): **11 of 3409 (0.3%); other: truncated 401, no upstream value 1985, not reproduced 1012** (`full_run_28092026/results/flag_precision.json: all`)
 - Slips the domain expert confirmed that are carried precision: **0 of 171 (3 in steps whose text changed with the repaired items)** (`full_run_28092026/results/flag_precision.json: expert_confirmed`)
 
-| model | arithmetic flags on correct answers [95% CI] | judged step flags on correct answers [95% CI] | judged step flags on wrong answers [95% CI] | steps flagged per response |
+| model | arithmetic flags on correct answers [95% CI] | any step flagged on correct answers, arithmetic or judge [95% CI] (the judge alone: tab:judged_steps) | any step flagged on wrong answers [95% CI] | steps flagged per response |
 |---|---|---|---|---|
 | DeepSeek V4.1 Flash | 0.006 [0.003, 0.010] | 0.015 [0.010, 0.022] | 0.417 [0.000, 0.636] | 0.03 |
 | Claude Sonnet 5 | 0.143 [0.111, 0.177] | 0.186 [0.154, 0.220] | 0.650 [0.412, 0.875] | 0.28 |

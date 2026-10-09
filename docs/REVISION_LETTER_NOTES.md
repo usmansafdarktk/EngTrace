@@ -136,7 +136,7 @@ answers no numbered point; the letter lists those under further changes.
 | Paraphrase bound | `appendix:paraphrase` | 275 pairs over 114 templates; nine of eleven within ±0.05 | meta-review 3, 9W1B 1, cqGs 2, nWW3 2 |
 | Taxonomy and coverage: domains from the NCEES FE exam specifications through a three-LLM panel; per-area table; uncovered core areas named | section 3.1, `tab:area`, `appendix:taxonomy` | 15 domains, three per branch; 42 areas | nWW3 1, meta-review 3 |
 | Framing: title, "process evaluation", synthetic scope; Limitations, Ethics, Conclusion | front matter, main text | nine scope sentences in Limitations | meta-review 3 |
-| Related work: dynamic and functional benchmarks, reference-free evaluators, PRMBench, five science benchmarks; ThermoQA and FinChain deltas | section 2, `appendix:related_work` | 15 closest benchmarks compared | internal |
+| Related work: dynamic and functional benchmarks, reference-free evaluators, PRMBench, five science benchmarks; ThermoQA and FinChain deltas | section 2 | the extended comparison table was dropped on 2026-10-09 (external figures, not asked for) | internal |
 | Release and contamination: MIT, the seed at publication, a held-out seed | `appendix:release` | | internal |
 | Difficulty: the domain experts' original labels and their protocol | section 3.1 | 58 / 58 / 34 | internal |
 | Worked example; listings for one template per level | `appendix:scoring`, `appendix:template_examples` | | meta-review 3 (presentation) |

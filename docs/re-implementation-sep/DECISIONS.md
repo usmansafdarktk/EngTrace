@@ -7641,6 +7641,47 @@ history and accuracy before the authors called them final.
   `sec:experimental-setup` in the Limitations (page 8) and loads `todonotes` twice. A figure of the certification app
   is parked; three candidate screenshots are in `overleaf_source_04102026/figs/app_candidates/`, untracked.
 
+## D-197 — The paper review of 9 October: claims at their evidence, Table 1 as a hybrid, the extended related work dropped
+
+**Date:** 2026-10-09 · **Status:** DONE · **Evidence:** `overleaf_source_04102026/` and `current_overleaf_project/main.tex`
+(29 files changed, one deleted; every generator `--check` passes); `full_run_28092026/paper_results.py` (phrases, Table 1,
+captions); `docs/mock_review_workstreams/reports/NUMBERS_SHEET.md` regenerated
+
+One pass over the paper for consistency, claim strength and accuracy, with four Opus reviewers (numbers, narrative,
+claim strength, the earlier results text against the new) whose findings were re-checked against the result files
+before being applied.
+
+- **Corrected.** The reasoning-effort experiment's MC change (+0.057, 90% interval 0.035 to 0.080) is no longer
+  "beyond the margin"; the paraphrase noise floor is described as two disjoint draws of 275 original instances; the
+  judged-step table's wrong-answer column is labelled as any flagged step (`router_rate_on_wrong` counts arithmetic
+  and judge flags), and the numbers sheet's column likewise; the flag-precision caption explains the 3 confirmed slips
+  it does not classify.
+- **Claims at their evidence.** The abstract, introduction, conclusion and Limitations say what the data show: wrong
+  answers keep much of the gold route, slips are flagged, one tied pair separates; the judge decides unmatched
+  milestones and flags steps; the validation figures carry the in-sample caveat and both F1 values (0.926 by matching
+  alone, 0.958 with the judge); MC is defined once ("how much of the gold route a derivation states"); the
+  route-conformity reading is marked as resting on the judge's unread not-needed rulings; the judge-noise sentence is
+  replaced (matching alone separates the pair more strongly); "the first five" is defined and `GLM-5.3` placed
+  explicitly; the causal glosses ("knows the method", "conceptual errors grow", "the one model") are reworded; the
+  Claude-only contrast carries the other upper-tier models' range; the 27 prescribed-digit verdicts are stated as
+  incorrect by the question's terms; the out-of-sample readings on the evaluated models reach Section 4.
+- **Table 1 (hybrid, after the owner's preference for the earlier table).** FAC, tier letters, all 15 instances
+  solved (restored; the prose cites it), no readable answer, MC, arithmetic flags, calculations parsed; the reasoning
+  block stays; MC by matching alone and the judge-decided share stay in their appendix tables, which also removes the
+  mismatch between Table 1's `q3_overall.e3_all` and `coverage_variants.json`. The three reasoning rows print "--" for
+  the all-15 share, which `matched.json` does not carry.
+- **Restored from the earlier results text.** The lead-in, topic sentences, the display caveat, a "The Reasoning
+  Setting" paragraph, the paragraph break before the equations and tool results, the tool-scope clause.
+- **Form.** Every generated caption opens with a bold title; "top five / top tier" is "first five / upper tier"
+  throughout; three uncited bibliography entries removed; the rules file records that Section 5 keeps its four
+  `\subsubsection` headings.
+- **Dropped.** `appendices/related_work.tex`, the extended comparison of fifteen benchmarks: neither review cycle
+  asked for it, and its table carried fifteen figures from other papers that were checked by pattern search only
+  (`docs/related_work_oct2026/notes/fact_check.md`); the 33 bibliography entries only it cited are pruned from
+  `custom.bib` (the owner, 2026-10-09).
+- **Not done.** The experts' details stay out of the anonymous submission (the owner, 2026-10-09);
+  `full_run_28092026/results/RESULTS.md`'s stale "noise floor 0.964" sentence is the analysis script's to fix.
+
 ## Open decisions
 
 | # | Decision | Needed before |

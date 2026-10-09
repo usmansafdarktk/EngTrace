@@ -29,8 +29,8 @@ mathematics~\citep{fan2024hardmath}, and in engineering \textsc{CIRCUIT} and \te
 generate problems with their answers~\citep{skelic2025circuit, chen2026optengine}.
 \textsc{FinChain} pairs each templated financial problem with an executable gold reasoning chain
 and scores a response by aligning its steps with that chain~\citep{xie2025finchain}; \ourdataset
-adds the recomputation of displayed arithmetic, a judge confined to the milestones that matching
-misses, expert certification of every template, and instances from a private seed.
+adds the recomputation of displayed arithmetic, a judge that sees only unmatched milestones and
+unflagged steps, expert certification of every template, and instances from a private seed.
 
 \paragraph{Step-Level Evaluators.} Without exact references, step-level evaluation relies on process
 reward models (PRMs), LLM judges, or reference-free measures.
@@ -44,6 +44,5 @@ solution~\citep{golovneva2022roscoe, prasad2023receval, xia2024reasoneval}.
 LLM judges make correlated errors~\citep{goel2025greatmodels} and agree with experts mainly on
 questions they can answer themselves, unless given a correct
 reference~\citep{krumdick2026nofreelabels}.
-\ourdataset instead checks steps against its computed milestones and recomputes arithmetic, leaving
-only unmatched milestones to an LLM judge given their expected values.
-\autoref{appendix:related_work} compares \ourdataset with the closest benchmarks in detail.
+\ourdataset instead checks steps against its computed milestones and recomputes arithmetic, sending
+only the unmatched milestones, with their expected values, and the unflagged steps to an LLM judge.

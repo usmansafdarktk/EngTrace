@@ -2,7 +2,7 @@
 \section{Error Analysis}
 \label{appendix:error_analysis}
 
-What kind of error produces a wrong answer, and are the top tier's remaining incorrect verdicts
+What kind of error produces a wrong answer, and are the first five's remaining incorrect verdicts
 errors at all?
 This section gives the taxonomy, the sample, and the readings
 behind~\autoref{subsec:error_analysis}, then the near misses and the incorrect verdicts that
@@ -72,8 +72,8 @@ Fleiss' $\kappa$ & 1.000 & 0.917 & 0.962 & 0.835 & & &  \\
 \bottomrule
 \end{tabular}
 }
-\caption{The domain experts' readings of the wrong answers. The sample holds 137 wrong answers of
-four models (19 from \texttt{Claude Sonnet 5}, 39 from \texttt{GPT-5.4 mini}, 39 from
+\caption{\textbf{The domain experts' readings of the wrong answers.} The sample holds 137 wrong
+answers of four models (19 from \texttt{Claude Sonnet 5}, 39 from \texttt{GPT-5.4 mini}, 39 from
 \texttt{Gemma 4 26B}, and 40 from \texttt{gpt-oss-20b}); three domain experts of the answer's branch
 read each (411 readings). Left: readings per category and, in parentheses, the wrong answers whose
 majority label is the category. Right: readings per category by level, with their share of the
@@ -93,12 +93,16 @@ land between 0.2\% and 5\% of the gold value (\texttt{annulus\_flowrate},
 \texttt{pfr\_volume\_changing\_rate}, \texttt{pitzer\_correlation\_z}, and
 \texttt{vdw\_solve\_for\_volume}).
 For each of the six, all three answer that the question has one correct answer and that the
-response shown, within 5\% of the gold value, is not correct, so these near misses are the models'
-errors.
+response shown, within 5\% of the gold value, is not correct, so the near miss shown on each of
+these templates is the model's error, not the wording's.
 
-\paragraph{Incorrect Verdicts and the Answer's Form.} Of the top five models' 99 incorrect verdicts,
-28 fall on three templates: 13 on \texttt{qr\_policy\_one\_iteration}, 8 on
+\paragraph{Incorrect Verdicts and the Answer's Form.} Of the first five models' 99 incorrect
+verdicts, 28 fall on three templates: 13 on \texttt{qr\_policy\_one\_iteration}, 8 on
 \texttt{primary\_consolidation\_settlement}, and 7 on \texttt{newsvendor\_normal\_demand}.
+Of the same 99, 27 lie within 0.2\% of a target whose digits the question prescribes and 3 are
+symbolic answers scored by the numbers they state; over 11,250 responses, the first five lose 231.5
+answer points in all, 102 to responses with no readable final answer and 30.5 to 61 partial answers
+at half credit.
 Two sources of incorrect verdicts concern the answer's form rather than its value.
 First, 17 templates prescribe the digits of the answer, so a value within the tolerance but not at
 the prescribed digits is incorrect by the question's own terms (311 incorrect verdicts across the

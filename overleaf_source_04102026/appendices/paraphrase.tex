@@ -26,15 +26,16 @@ formula-bound ones whose technical tokens the writer does not keep in place.
 The eleven models answer the kept paraphrases under the evaluation's prompt, settings, and scoring.
 
 \paragraph{Results.} On the 275 kept pairs, no change in FAC holds after correction.
-Read against the $\pm 0.05$ margin, which equals the paired difference the design detects at 80\%
-power, the 90\% interval lies within it for every model but \texttt{Qwen3-235B-2507} and
+Read against the $\pm 0.05$ margin, which is about the paired difference the design detects at
+80\% power, the 90\% interval lies within it for every model but \texttt{Qwen3-235B-2507} and
 \texttt{gpt-oss-20b} (\autoref{tab:paraphrase}).
 Four 90\% intervals lie wholly on one side of zero (\texttt{DeepSeek V4.1 Flash},
 \texttt{Claude Sonnet 5}, and \texttt{Qwen3-235B-2507} below, \texttt{Muse Glimmer 30B} above):
 small changes the data lean toward but the corrected test does not support.
 The models' ordering on the paraphrases agrees with their ordering on the originals with Kendall's
 $\tau$ 0.807 (95\% interval 0.547 to 0.844), which is what sampling noise alone gives, since two
-random halves of the same pairs agree with a median $\tau$ of 0.807 (quartiles 0.754 to 0.860).
+disjoint draws of 275 original instances with the same template mix agree with a median $\tau$ of
+0.807 (quartiles 0.754 to 0.860).
 For the four models decoded three more times on 300 instances (\texttt{Qwen3-235B-2507},
 \texttt{Gemini 3.1 Flash-Lite}, \texttt{Gemma 4 26B}, and \texttt{gpt-oss-20b}), FAC varies by a
 standard deviation of 0.003 to 0.016 across repeats, and the paraphrase change lies within the

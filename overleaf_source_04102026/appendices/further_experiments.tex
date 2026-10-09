@@ -16,31 +16,33 @@ providers' defaults, \texttt{GPT-5.4 mini} and \texttt{Gemini 3.1 Flash-Lite}, s
 when they reason?
 Each answers the subset again with the serving API's reasoning-effort parameter set to medium and
 nothing else changed.
-The setting lifts \texttt{GPT-5.4 mini} beyond the margin on FAC and on MC and lowers its
-arithmetic flags on correct answers, with its largest point change on Advanced templates, whose
-level intervals overlap those of the other levels; it moves \texttt{Gemini 3.1 Flash-Lite} by less
-than the experiment detects.
-Where the setting works, it changes the derivation and not only the answer: more milestones
-stated, fewer slips behind correct answers.
+The setting lifts \texttt{GPT-5.4 mini} beyond the margin on FAC, raises its MC by 0.057 (95\%
+interval 0.031 to 0.085), and lowers its arithmetic flags on correct answers, with its largest point
+change on Advanced templates, whose level intervals overlap those of the other levels; it moves
+\texttt{Gemini 3.1 Flash-Lite} by less than the experiment detects.
+For \texttt{GPT-5.4 mini}, the setting changes the derivation and not only the answer: more
+milestones stated, fewer slips behind correct answers; over all instances, MC moves by $+0.008$ for
+\texttt{Gemma 4 26B} and $+0.016$ for \texttt{Gemini 3.1 Flash-Lite} (\autoref{tab:matched}).
 The matched settings of~\autoref{appendix:decoding} repeat the change on the full evaluation set
 for the three models whose endpoints offer the setting.
 On all 2,250 instances, reasoning at medium effort changes FAC by $+0.038$ for
 \texttt{Gemini 3.1 Flash-Lite} (95\% interval 0.023 to 0.056), $+0.070$ for \texttt{Gemma 4 26B}
 (95\% interval 0.049 to 0.092), and $+0.118$ for \texttt{GPT-5.4 mini} (95\% interval 0.082 to
 0.156), so with more instances the change for \texttt{Gemini 3.1 Flash-Lite} is detectable too, and
-none of the three is bounded within the margin (\autoref{tab:matched}).
+for \texttt{Gemma 4 26B} and \texttt{GPT-5.4 mini} the 90\% interval lies wholly above $+0.05$
+(\autoref{tab:matched}).
 
-\paragraph{Flagship Anchors.} Does a flagship exceed the top tier, or is the ceiling an artifact of
-evaluating none?
+\paragraph{Flagship Anchors.} Does a flagship exceed the upper tier, or is the ceiling an artifact
+of evaluating none?
 \texttt{GPT-5.4} and \texttt{DeepSeek V4 Pro}, the two flagships that pass the selection rule
 (\autoref{appendix:models}), answer the same subset at their providers' defaults, and
 \texttt{GPT-5.4}, whose default returns no reasoning tokens, also with reasoning at medium effort;
 an anchor is a reference point outside the pairwise tests, so no test is run against it.
 \texttt{DeepSeek V4 Pro} scores 0.968 and \texttt{GPT-5.4} 0.951 at its default and 0.997 with
-reasoning, against 0.959 to 0.990 for the top five on the same instances; the highest anchor run
+reasoning, against 0.959 to 0.990 for the first five on the same instances; the highest anchor run
 lies inside the interval of \texttt{DeepSeek V4.1 Flash}, and on Advanced templates the anchors
-score 0.89 to 1.00 and the top five 0.94 to 0.99.
-The ceiling is therefore not for want of a flagship.
+score 0.89 to 1.00 and the first five 0.94 to 0.99.
+The flagships therefore do not score clearly above the first five.
 The one paired test among the anchors, \texttt{GPT-5.4} with reasoning against its default, is the
 last row of~\autoref{tab:experiments} and shows the reasoning-effort result again.
 
@@ -53,8 +55,8 @@ The equations lift \texttt{gpt-oss-20b}, partly because fewer of its responses r
 (the change on the 388 instances it answered in both runs is $+0.044$), and leave the two closed
 models within the margin, while MC rises for all three, consistent with the equations prompting the
 responses to state the intermediates.
-Recall of the equations is thus part of what bounds the weakest model and no part of what bounds
-the closed ones.
+Recall of the equations is thus part of what limits the weakest model; for the two closed models,
+supplying them changes FAC by less than the $\pm 0.05$ margin.
 The experiment supplies equations and no data tables, so it bounds what formula recall adds and not
 what a property lookup would.
 

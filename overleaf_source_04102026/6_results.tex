@@ -11,89 +11,108 @@
 \setlength{\tabcolsep}{4pt}
 \renewcommand{\arraystretch}{1.1}
 \adjustbox{max width=\textwidth}{%
-\begin{tabular}{l c c r c c r c r}
+\begin{tabular}{l c c c r c c r}
 \toprule
- & \multicolumn{3}{c}{\textbf{Final answer}} & \multicolumn{5}{c}{\textbf{Derivation}} \\
-\cmidrule(lr){2-4}\cmidrule(lr){5-9}
-\textbf{Model} & \textbf{FAC $\uparrow$} & \textbf{Tier} & \textbf{\makecell{No readable\\answer}} & \textbf{MC $\uparrow$} & \textbf{\makecell{MC by\\matching alone}} & \textbf{\makecell{Judge-\\decided}} & \textbf{\makecell{Arithmetic flags,\\correct answers}} & \textbf{\makecell{Calculations parsed\\per response}} \\
+ & \multicolumn{4}{c}{\textbf{Final answer}} & \multicolumn{3}{c}{\textbf{Derivation}} \\
+\cmidrule(lr){2-5}\cmidrule(lr){6-8}
+\textbf{Model} & \textbf{FAC $\uparrow$} & \textbf{Tier} & \textbf{\makecell{All 15 instances\\solved $\uparrow$}} & \textbf{\makecell{No readable\\answer}} & \textbf{MC $\uparrow$} & \textbf{\makecell{Arithmetic flags,\\correct answers}} & \textbf{\makecell{Calculations parsed\\per response}} \\
 \midrule
-\rowcolor{gray!10}\multicolumn{9}{l}{\textit{Open-weights LLMs}} \\
-\texttt{DeepSeek V4.1 Flash} & 0.988 {\scriptsize\textcolor{gray}{(0.979--0.995)}} & a & 0.4\% & 0.899 {\scriptsize\textcolor{gray}{(0.874--0.922)}} & 0.860 {\scriptsize\textcolor{gray}{(0.830--0.889)}} & 0.17 & 0.006 {\scriptsize\textcolor{gray}{(0.003--0.010)}} & 3.3 \\
-\texttt{Kimi K3} & 0.980 {\scriptsize\textcolor{gray}{(0.967--0.990)}} & ab & 0.7\% & 0.912 {\scriptsize\textcolor{gray}{(0.888--0.934)}} & 0.877 {\scriptsize\textcolor{gray}{(0.849--0.902)}} & 0.15 & 0.007 {\scriptsize\textcolor{gray}{(0.003--0.011)}} & 2.8 \\
-\texttt{GLM-5.3-Flash} & 0.972 {\scriptsize\textcolor{gray}{(0.953--0.987)}} & b & 2.0\% & 0.912 {\scriptsize\textcolor{gray}{(0.886--0.936)}} & 0.891 {\scriptsize\textcolor{gray}{(0.863--0.917)}} & 0.13 & 0.019 {\scriptsize\textcolor{gray}{(0.012--0.026)}} & 4.7 \\
-\texttt{Muse Glimmer 30B} & 0.969 {\scriptsize\textcolor{gray}{(0.949--0.985)}} & abc & 1.4\% & 0.897 {\scriptsize\textcolor{gray}{(0.871--0.922)}} & 0.862 {\scriptsize\textcolor{gray}{(0.832--0.890)}} & 0.17 & 0.058 {\scriptsize\textcolor{gray}{(0.044--0.074)}} & 3.3 \\
-\texttt{GLM-5.3}$^{\dagger}$ & 0.950 {\scriptsize\textcolor{gray}{(0.921--0.975)}} & c & 4.4\% & 0.900 {\scriptsize\textcolor{gray}{(0.866--0.930)}} & 0.880 {\scriptsize\textcolor{gray}{(0.845--0.912)}} & 0.11 & 0.018 {\scriptsize\textcolor{gray}{(0.012--0.025)}} & 5.7 \\
-\texttt{Qwen3-235B-2507}$^{\ast}$ & 0.899 {\scriptsize\textcolor{gray}{(0.869--0.926)}} & d & 0.0\% & 0.892 {\scriptsize\textcolor{gray}{(0.867--0.916)}} & 0.866 {\scriptsize\textcolor{gray}{(0.835--0.894)}} & 0.16 & 0.232 {\scriptsize\textcolor{gray}{(0.187--0.279)}} & 10.2 \\
-\texttt{Gemma 4 26B}$^{\ast}$ & 0.872 {\scriptsize\textcolor{gray}{(0.835--0.905)}} & d & 0.0\% & 0.876 {\scriptsize\textcolor{gray}{(0.847--0.903)}} & 0.855 {\scriptsize\textcolor{gray}{(0.824--0.884)}} & 0.19 & 0.132 {\scriptsize\textcolor{gray}{(0.099--0.168)}} & 4.6 \\
-\texttt{gpt-oss-20b} & 0.808 {\scriptsize\textcolor{gray}{(0.764--0.849)}} & e & 2.6\% & 0.812 {\scriptsize\textcolor{gray}{(0.775--0.847)}} & 0.790 {\scriptsize\textcolor{gray}{(0.751--0.827)}} & 0.24 & 0.147 {\scriptsize\textcolor{gray}{(0.116--0.181)}} & 3.8 \\
-\rowcolor{gray!10}\multicolumn{9}{l}{\textit{Closed LLMs}} \\
-\texttt{Claude Sonnet 5} & 0.987 {\scriptsize\textcolor{gray}{(0.980--0.993)}} & ab & 0.1\% & 0.922 {\scriptsize\textcolor{gray}{(0.902--0.942)}} & 0.903 {\scriptsize\textcolor{gray}{(0.880--0.925)}} & 0.12 & 0.143 {\scriptsize\textcolor{gray}{(0.111--0.177)}} & 5.3 \\
-\texttt{Gemini 3.1 Flash-Lite}$^{\ast}$ & 0.878 {\scriptsize\textcolor{gray}{(0.837--0.915)}} & d & 0.0\% & 0.864 {\scriptsize\textcolor{gray}{(0.835--0.892)}} & 0.840 {\scriptsize\textcolor{gray}{(0.809--0.870)}} & 0.21 & 0.070 {\scriptsize\textcolor{gray}{(0.048--0.095)}} & 3.9 \\
-\texttt{GPT-5.4 mini}$^{\ast}$ & 0.852 {\scriptsize\textcolor{gray}{(0.810--0.890)}} & de & 0.0\% & 0.834 {\scriptsize\textcolor{gray}{(0.798--0.868)}} & 0.799 {\scriptsize\textcolor{gray}{(0.760--0.836)}} & 0.25 & 0.141 {\scriptsize\textcolor{gray}{(0.108--0.178)}} & 3.8 \\
-\rowcolor{gray!10}\multicolumn{9}{l}{\textit{With reasoning at medium effort (\autoref{tab:matched})}} \\
-\texttt{GPT-5.4 mini}$^{\ddagger}$ & 0.969 {\scriptsize\textcolor{gray}{(0.958--0.980)}} & -- & 0.0\% & 0.892 {\scriptsize\textcolor{gray}{(0.866--0.917)}} & 0.847 {\scriptsize\textcolor{gray}{(0.815--0.877)}} & 0.18 & 0.075 {\scriptsize\textcolor{gray}{(0.057--0.096)}} & 3.3 \\
-\texttt{Gemma 4 26B}$^{\ddagger}$ & 0.942 {\scriptsize\textcolor{gray}{(0.916--0.964)}} & -- & 0.1\% & 0.884 {\scriptsize\textcolor{gray}{(0.856--0.910)}} & 0.850 {\scriptsize\textcolor{gray}{(0.819--0.880)}} & 0.19 & 0.099 {\scriptsize\textcolor{gray}{(0.066--0.135)}} & 3.3 \\
-\texttt{Gemini 3.1 Flash-Lite}$^{\ddagger}$ & 0.917 {\scriptsize\textcolor{gray}{(0.884--0.945)}} & -- & 0.0\% & 0.881 {\scriptsize\textcolor{gray}{(0.851--0.908)}} & 0.855 {\scriptsize\textcolor{gray}{(0.824--0.886)}} & 0.19 & 0.069 {\scriptsize\textcolor{gray}{(0.047--0.094)}} & 3.5 \\
+\rowcolor{gray!10}\multicolumn{8}{l}{\textit{Open-weights LLMs}} \\
+\texttt{DeepSeek V4.1 Flash} & 0.988 {\scriptsize\textcolor{gray}{(0.979--0.995)}} & a & 0.900 & 0.4\% & 0.899 {\scriptsize\textcolor{gray}{(0.874--0.922)}} & 0.006 {\scriptsize\textcolor{gray}{(0.003--0.010)}} & 3.3 \\
+\texttt{Kimi K3} & 0.980 {\scriptsize\textcolor{gray}{(0.967--0.990)}} & ab & 0.833 & 0.7\% & 0.912 {\scriptsize\textcolor{gray}{(0.888--0.934)}} & 0.007 {\scriptsize\textcolor{gray}{(0.003--0.011)}} & 2.8 \\
+\texttt{GLM-5.3-Flash} & 0.972 {\scriptsize\textcolor{gray}{(0.953--0.987)}} & b & 0.853 & 2.0\% & 0.912 {\scriptsize\textcolor{gray}{(0.886--0.936)}} & 0.019 {\scriptsize\textcolor{gray}{(0.012--0.026)}} & 4.7 \\
+\texttt{Muse Glimmer 30B} & 0.969 {\scriptsize\textcolor{gray}{(0.949--0.985)}} & abc & 0.807 & 1.4\% & 0.897 {\scriptsize\textcolor{gray}{(0.871--0.922)}} & 0.058 {\scriptsize\textcolor{gray}{(0.044--0.074)}} & 3.3 \\
+\texttt{GLM-5.3}$^{\dagger}$ & 0.950 {\scriptsize\textcolor{gray}{(0.921--0.975)}} & c & 0.813 & 4.4\% & 0.900 {\scriptsize\textcolor{gray}{(0.866--0.930)}} & 0.018 {\scriptsize\textcolor{gray}{(0.012--0.025)}} & 5.7 \\
+\texttt{Qwen3-235B-2507}$^{\ast}$ & 0.899 {\scriptsize\textcolor{gray}{(0.869--0.926)}} & d & 0.513 & 0.0\% & 0.892 {\scriptsize\textcolor{gray}{(0.867--0.916)}} & 0.232 {\scriptsize\textcolor{gray}{(0.187--0.279)}} & 10.2 \\
+\texttt{Gemma 4 26B}$^{\ast}$ & 0.872 {\scriptsize\textcolor{gray}{(0.835--0.905)}} & d & 0.500 & 0.0\% & 0.876 {\scriptsize\textcolor{gray}{(0.847--0.903)}} & 0.132 {\scriptsize\textcolor{gray}{(0.099--0.168)}} & 4.6 \\
+\texttt{gpt-oss-20b} & 0.808 {\scriptsize\textcolor{gray}{(0.764--0.849)}} & e & 0.313 & 2.6\% & 0.812 {\scriptsize\textcolor{gray}{(0.775--0.847)}} & 0.147 {\scriptsize\textcolor{gray}{(0.116--0.181)}} & 3.8 \\
+\rowcolor{gray!10}\multicolumn{8}{l}{\textit{Closed LLMs}} \\
+\texttt{Claude Sonnet 5} & 0.987 {\scriptsize\textcolor{gray}{(0.980--0.993)}} & ab & 0.867 & 0.1\% & 0.922 {\scriptsize\textcolor{gray}{(0.902--0.942)}} & 0.143 {\scriptsize\textcolor{gray}{(0.111--0.177)}} & 5.3 \\
+\texttt{Gemini 3.1 Flash-Lite}$^{\ast}$ & 0.878 {\scriptsize\textcolor{gray}{(0.837--0.915)}} & d & 0.627 & 0.0\% & 0.864 {\scriptsize\textcolor{gray}{(0.835--0.892)}} & 0.070 {\scriptsize\textcolor{gray}{(0.048--0.095)}} & 3.9 \\
+\texttt{GPT-5.4 mini}$^{\ast}$ & 0.852 {\scriptsize\textcolor{gray}{(0.810--0.890)}} & de & 0.487 & 0.0\% & 0.834 {\scriptsize\textcolor{gray}{(0.798--0.868)}} & 0.141 {\scriptsize\textcolor{gray}{(0.108--0.178)}} & 3.8 \\
+\rowcolor{gray!10}\multicolumn{8}{l}{\textit{With reasoning at medium effort (\autoref{tab:matched})}} \\
+\texttt{GPT-5.4 mini}$^{\ddagger}$ & 0.969 {\scriptsize\textcolor{gray}{(0.958--0.980)}} & -- & -- & 0.0\% & 0.892 {\scriptsize\textcolor{gray}{(0.866--0.917)}} & 0.075 {\scriptsize\textcolor{gray}{(0.057--0.096)}} & 3.3 \\
+\texttt{Gemma 4 26B}$^{\ddagger}$ & 0.942 {\scriptsize\textcolor{gray}{(0.916--0.964)}} & -- & -- & 0.1\% & 0.884 {\scriptsize\textcolor{gray}{(0.856--0.910)}} & 0.099 {\scriptsize\textcolor{gray}{(0.066--0.135)}} & 3.3 \\
+\texttt{Gemini 3.1 Flash-Lite}$^{\ddagger}$ & 0.917 {\scriptsize\textcolor{gray}{(0.884--0.945)}} & -- & -- & 0.0\% & 0.881 {\scriptsize\textcolor{gray}{(0.851--0.908)}} & 0.069 {\scriptsize\textcolor{gray}{(0.047--0.094)}} & 3.5 \\
 \bottomrule
 \end{tabular}
 }
-\caption{Final Answer Accuracy (FAC) and Milestone Coverage (MC) of the eleven models at their
-providers' default settings, over 2,250 instances of 150 templates, with 95\% bootstrap intervals
-over templates. Tier: models sharing a letter do not differ in FAC after Holm's correction over the
-55 pairwise sign-flip tests. No readable answer: responses that are empty or state no answer, scored
-0. Judge-decided: the share of milestones the judge, not the matcher, decides. Arithmetic flags: the
-share of correct answers with a step the arithmetic check flags (precision 0.905 on the 189 flags a
-domain expert decided on). Bottom block: the three models that accept a reasoning setting, on the
-same instances with reasoning at medium effort; their tiers are in \autoref{tab:matched}.
-$^{\ast}$No reasoning tokens at the provider's default. $^{\dagger}$99 responses empty at the output
-ceiling. Judged step flags: \autoref{tab:judged_steps}.}
+\caption{\textbf{Overall performance of the evaluated LLMs.} Final Answer Accuracy (FAC) and
+Milestone Coverage (MC) of the eleven models at their providers' default settings, over 2,250
+instances of 150 templates, with 95\% bootstrap intervals over templates. Tier: models sharing a
+letter do not differ in FAC after Holm's correction over the 55 pairwise sign-flip tests. All 15
+instances solved: the share of templates answered correctly on every instance. No readable answer:
+responses that are empty or state no answer, scored 0. The judge decides 11\% to 25\% of a model's
+milestones; MC by matching alone is in \autoref{tab:coverage_variants}. Arithmetic flags: the share
+of correct answers with a step the arithmetic check flags (precision 0.905 on the 189 flags a domain
+expert decided on). Bottom block: the three models that accept a reasoning setting, on the same
+instances with reasoning at medium effort; their tiers are in \autoref{tab:matched}. $^{\ast}$No
+reasoning tokens at the provider's default. $^{\dagger}$99 responses empty at the output ceiling.
+Judged step flags: \autoref{tab:judged_steps}.}
 \label{tab:main_results}
 \end{table*}
 % END GENERATED tab:main_results
 
-\paragraph{Two Tiers and a Ceiling.} At the providers' defaults, the final answer
-(\autoref{tab:main_results}) sorts the models into an upper tier of six models with FAC of 0.950 to
-0.988 and a lower tier of five with 0.808 to 0.899, each of which differs from each upper-tier model
-after Holm's correction over the 55 pairwise tests.
-The first five lie within 0.019 of one another, and only one of their ten pairs differs
+\autoref{tab:main_results} places the answer measures beside the derivation measures; we read the
+final answer first and then what the derivation shows that the answer cannot.
+
+\paragraph{Two Tiers and a Ceiling.} At the providers' defaults, the final answer sorts the models
+into an upper tier of six models with FAC of 0.950 to 0.988 and a lower tier of five with 0.808 to
+0.899, each of which differs from each upper-tier model after Holm's correction over the 55
+pairwise tests.
+The first five, the upper tier without \texttt{GLM-5.3}, whose 99 empty responses place it sixth,
+lie within 0.019 of one another, and only one of their ten pairs differs
 (\texttt{DeepSeek V4.1 Flash} above \texttt{GLM-5.3-Flash}), although the design detects
 differences of one to three points between them.
 On the final answer these five are near the ceiling of the evaluation set: even on Advanced
 templates they score 0.94 to 0.98.
-The tiers differ in reliability more than in reach: no model fails every instance of more than 4\%
-of the templates, but the upper six solve 81\% to 90\% of the templates on every instance and the
-lower five only 31\% to 63\%, a difference that one instance per problem would hide.
+The tiers differ in reliability more than in reach: no model fails every instance of more than six
+of the 150 templates, but the upper six solve 81\% to 90\% of the templates on every instance and
+the lower five only 31\% to 63\%, a difference that one instance per problem would hide.
 Four of the lower five return no reasoning tokens at their providers' defaults.
 
-\paragraph{Derivations Behind Correct Answers.} As scored, MC separates \texttt{Claude Sonnet 5}
-from \texttt{DeepSeek V4.1 Flash}, which the final answer does not (Holm-adjusted $p$ 0.049), and so
-does matching alone (0.001), but not once the milestones the judge rules not needed leave the
-denominator (1.000): the difference lies in how closely each derivation follows the gold route, not
-in how far it gets.
-Behind correct answers, the arithmetic check flags a displayed calculation that does not follow
-from its own operands in up to 23.2\% of a model's correct answers.
-Of the 189 flags a domain expert decided on, 171 are real slips (precision 0.905), none of them a
-rounding carried forward from unrounded values earlier in the response.
+\paragraph{Derivations Behind Correct Answers.} The derivation shows differences that the final
+answer does not, and slips that it passes.
+As scored, MC separates \texttt{Claude Sonnet 5} from \texttt{DeepSeek V4.1 Flash}, which the
+final answer does not (Holm-adjusted $p$ 0.049), and so does matching alone (0.001), but not once
+the milestones the judge rules not needed leave the denominator (1.000;
+\autoref{tab:coverage_variants}).
+The difference lies in how closely each derivation follows the gold route, not in whether it
+reaches the quantities its own route needs; this reading rests on the judge's not-needed rulings,
+which the experts did not read.
+MC credits the intermediate values a response states, so it ranks how much of the gold route a
+model shows, not how soundly it reasons.
+The arithmetic check flags a displayed calculation that does not follow from its own operands in up
+to 23.2\% of a model's correct answers.
+Of the 189 flags a domain expert decided on, 171 are real slips (precision 0.905), and a mechanical
+check finds none of the 168 it can classify to be a rounding carried forward from unrounded values
+earlier in the response.
 The judged step check flags a further step in up to 21.9\% of correct-answer responses, but its
 flags are judged rather than verified: in the expert study, 7 of the 15 it raises inside correct
 answers are errors (precision 0.467).
-These are flags, not counts: both checks together miss more than half of the flawed steps the
-domain experts marked, a model that displays more arithmetic exposes more to the check, and no
-deterministic check sees a rule misstated behind a correct answer.
+These are flags, not counts: in the expert study, both checks together find 0.36 of the flawed
+steps the domain experts marked inside correct answers, a model that displays more arithmetic
+exposes more to the check, and no deterministic check sees a rule misstated behind a correct
+answer.
 
 \paragraph{Derivations Behind Wrong Answers.} Wrong answers keep much of their derivation, and the
-process measures locate the break.
-On their wrong answers, the five lower-tier models still state 44\% to 59\% of the gold milestones,
-against a chance floor of at most 17\%.
-Up to 26\% of these wrong answers are complete derivations to a wrong value.
-A milestone the judge rules missing marks most of the lower tier's wrong answers (63\% to 78\%) but
-only 20\% of \texttt{Claude Sonnet 5}'s.
+judge's missing rulings point to the gold quantities a derivation does not reach.
+On their wrong answers, the five lower-tier models still state 44\% to 59\% of the gold
+milestones, against a chance floor of at most 17.5\% (\autoref{tab:coverage}).
+Up to 26\% of these wrong answers reach every gold milestone yet end in an answer the check scores
+incorrect.
+A milestone the judge rules missing marks 63\% to 78\% of the lower tier's wrong answers and 50\%
+to 83\% of the other upper-tier models', but only 20\% of \texttt{Claude Sonnet 5}'s, 55\% of
+which reach every milestone.
 On the 58 templates whose instances all follow one derivation, the lower tier solves some but not
 all instances of up to 59\% of the templates and the upper tier of at most 22\%
-(\autoref{tab:single_path}), so a lower-tier model often knows the method and misses the numbers.
+(\autoref{tab:single_path}), so a lower-tier model often solves one instance of a derivation and
+fails another, a pattern consistent with the expert reading, in which calculation errors dominate
+(\autoref{subsec:error_analysis}).
 
 \paragraph{Stability of the Tiers.} Neither paraphrase, nor the answer tolerance, nor decoding
-noise moves a model across the tiers; the reasoning setting does.
+noise, measured on four lower-tier models, moves a model across the tiers; the reasoning setting
+does.
 Each of 275 instances over 114 templates has a paraphrase that keeps every number, unit, and symbol
 in place, confirmed by a domain expert.
 No model's change in FAC between the two is significant after correction, and for nine of the
@@ -107,29 +126,34 @@ Restricting FAC to the responses that state an answer reorders the upper tier on
 $\tau$ 0.709 with the ordering as scored): \texttt{GLM-5.3}, whose 99 empty responses then drop
 out, rises from sixth to first, so its place in~\autoref{tab:main_results} reflects the output
 ceiling.
-With reasoning at medium effort, \texttt{Gemini 3.1 Flash-Lite} gains $+0.038$,
-\texttt{Gemma 4 26B} gains $+0.070$, and \texttt{GPT-5.4 mini} gains $+0.118$ on all 2,250
-instances (\autoref{tab:matched}).
+At the providers' defaults, then, the tiers survive paraphrase, tolerance, and decoding noise, and
+the paraphrase bounds memorized wording only (\autoref{appendix:paraphrase}).
+
+\paragraph{The Reasoning Setting.} With reasoning at medium effort, \texttt{Gemini 3.1 Flash-Lite}
+gains $+0.038$, \texttt{Gemma 4 26B} gains $+0.070$, and \texttt{GPT-5.4 mini} gains $+0.118$ on
+all 2,250 instances (\autoref{tab:matched}).
 At these matched settings, \texttt{GPT-5.4 mini} rises to 0.969, level with
-\texttt{Muse Glimmer 30B}, and the two tiers give way to a graded order: only \texttt{gpt-oss-20b}
-differs from every other model, while the first four still differ from every model at or below
-\texttt{GLM-5.3}.
-The tiers therefore hold at the providers' defaults, though not the order among the first five; the
-paraphrase bounds memorized wording only (\autoref{appendix:paraphrase}).
+\texttt{Muse Glimmer 30B}, and the two tiers give way to overlapping groups: only
+\texttt{gpt-oss-20b} differs from every other model, while \texttt{DeepSeek V4.1 Flash},
+\texttt{Claude Sonnet 5}, \texttt{Kimi K3}, and \texttt{GLM-5.3-Flash} still differ from
+\texttt{GLM-5.3} and every model below it.
+The two tiers are therefore a result at the providers' defaults; with reasoning on,
+\texttt{GPT-5.4 mini} no longer differs from \texttt{Kimi K3}, \texttt{GLM-5.3-Flash}, and
+\texttt{Muse Glimmer 30B}.
 
 \subsubsection{Performance by Engineering Branch and Domain}
 \label{subsec:branch_domain}
 
-The first five are uniform across engineering and the lower tier is not: for the first five, the
-spread between the highest and the lowest branch mean is 0.018 to 0.056, and no domain mean falls
-below 0.88.
+Branch means spread less for the first five than for the other six, but the spreads carry no test.
+For the first five, the spread between the highest and the lowest branch mean is 0.018 to 0.056,
+and no domain mean falls below 0.88.
 For the lower tier, the spread is 0.071 to 0.226, and each model falls below 0.79 in at least one
-domain.
+domain; \texttt{GLM-5.3} lies between, with a spread of 0.098 and a lowest domain mean of 0.767.
 No branch is hard for every model: with 30 templates per branch, differences below 3 to 19 points
 cannot be told from sampling noise, and only one of the 110 within-model branch comparisons holds
 after correction (\texttt{gpt-oss-20b}, electrical above civil).
 Thermodynamics is the lowest domain for five of the eleven models, but the domain means carry no
-test (\autoref{appendix:branch_domain}).
+test, so this ranks domains, not fields (\autoref{appendix:branch_domain}).
 
 \subsubsection{Performance by Difficulty Level}
 \label{subsec:difficulty_level}
@@ -147,14 +171,16 @@ test (\autoref{appendix:branch_domain}).
 \end{figure}
 % END GENERATED fig:level_bars
 
-Every model scores lower on Advanced than on Easy templates (\autoref{fig:level_bars}), by 0.008 to
-0.181.
-At the providers' defaults, the gap holds after Holm's correction for
-\texttt{Gemini 3.1 Flash-Lite} and \texttt{gpt-oss-20b} under Welch's $t$-test and for six models
-under a permutation test, and at matched settings for \texttt{gpt-oss-20b} alone.
+Difficulty labels separate few models after correction; the depth of the gold trace goes with more
+wrong answers for every model.
+Every model's mean is lower on Advanced than on Easy templates (\autoref{fig:level_bars}), by
+0.008 to 0.181, with intervals that include zero for five models.
+The gap holds after Holm's correction for \texttt{Gemini 3.1 Flash-Lite} and \texttt{gpt-oss-20b}
+under Welch's $t$-test, the test we read because scores vary more across Advanced templates, and at
+matched settings for \texttt{gpt-oss-20b} alone (\autoref{tab:level_gap}).
 For all eleven models, the share of responses scored 0 is higher on instances with six or more gold
 milestones than on instances with one, reaching 0.121 to 0.271 for the lower tier against at most
-0.061 for the first five.
+0.061 for the first five (\texttt{GLM-5.3}: 0.112).
 Over readable responses, with the answer kind as a covariate and templates as clusters, each
 further milestone multiplies the odds of a wrong answer by 1.23 (95\% interval 1.13 to 1.34) when
 pooled over the models; per model, the slope holds after Holm's correction for five of the eleven
@@ -163,25 +189,32 @@ pooled over the models; per model, the slope holds after Holm's correction for f
 \subsubsection{Reasoning, Equations, and Tools}
 \label{subsec:reasoning_equations_tools}
 
-Four experiments on a 450-instance subset each change one thing in the evaluation
-(\autoref{appendix:experiments}); reasoning effort is the one change that moves a model by more than
-any difference within a tier, and it changes the derivation, not only the answer.
-On the subset, \texttt{GPT-5.4 mini} gains 0.102 in FAC and 0.057 in MC with reasoning at medium
-effort, while its arithmetic flags on correct answers roughly halve.
+Four experiments on a 450-instance subset extend the evaluation, three changing one thing and one
+adding two flagships as anchors (\autoref{appendix:experiments}); reasoning effort has the largest
+effect, and for \texttt{GPT-5.4 mini} it changes the derivation, not only the answer.
+On the subset, \texttt{GPT-5.4 mini} gains 0.057 in MC with reasoning at medium effort, beside the
+FAC gain above, while its arithmetic flags on correct answers roughly halve.
 The flagship \texttt{GPT-5.4}, which also returns no reasoning tokens at its default, gains 0.046
 and sheds most of its flags.
-Nor does a larger model clearly raise the ceiling: on the same subset the two flagships score 0.951
-to 0.997 against 0.959 to 0.990 for the first five.
+Nor does a larger model clearly raise the ceiling: on the same subset \texttt{DeepSeek V4 Pro}
+scores 0.968 and \texttt{GPT-5.4} 0.951 at its default and 0.997 with reasoning, against 0.959 to
+0.990 for the first five, and no test is run against the anchors.
 The highest flagship score, \texttt{GPT-5.4}'s with reasoning, lies inside the interval of
 \texttt{DeepSeek V4.1 Flash}, and on Advanced templates the flagships score 0.89 to 1.00 and the
 first five 0.94 to 0.99.
-Given each template's governing equations with the question, every model states more milestones,
-but only the weakest model answers more correctly ($+0.068$, partly because fewer of its responses
-run out of room), and the two closed models stay within $\pm 0.05$.
+
+Reference equations and an offered interpreter move no model of the upper tier beyond the margin.
+Given each template's governing equations with the question, each of the three models given them
+states more milestones, but only \texttt{gpt-oss-20b} answers more correctly ($+0.068$, partly
+because fewer of its responses are empty at the output ceiling), and \texttt{Claude Sonnet 5} and
+\texttt{GPT-5.4 mini} stay within $\pm 0.05$.
 Offered a Python interpreter, which \texttt{Claude Sonnet 5} calls on two thirds of the instances,
-neither closed model changes in FAC or MC beyond $\pm 0.05$, a bound that says little for
-\texttt{Claude Sonnet 5}, which is already near the ceiling.
-The experiments supply equations without data tables and offer the tool rather than require it.
+neither \texttt{Claude Sonnet 5} nor \texttt{GPT-5.4 mini} changes in FAC or MC beyond
+$\pm 0.05$, a bound that says little for \texttt{Claude Sonnet 5}, which is already near the
+ceiling.
+The experiments supply equations without data tables, offer the tool rather than require it, and
+cover the two closed models in the tool experiment, since no admitted endpoint serves the
+open-weights model's tool calls.
 
 \subsection{Error Analysis}
 \label{subsec:error_analysis}
@@ -204,28 +237,35 @@ tiers (19 from \texttt{Claude Sonnet 5}, 39 from \texttt{GPT-5.4 mini}, 39 from
 settings) and assigned the first category that applies in a six-category hierarchy from
 hallucination to calculation, or ``no error'' (Fleiss'~$\kappa$ 0.912~\citep{fleiss1971};
 \autoref{fig:error_categories}).
-Execution errors dominate, and conceptual errors grow with difficulty.
+Calculation errors dominate, and conceptual errors (a hallucination, a wrong setup, or a wrong
+formula) are rarer on Easy problems than on the harder ones.
 Calculation is the majority label for \texttt{GPT-5.4 mini}, \texttt{Gemma 4 26B}, and
 \texttt{Claude Sonnet 5} (29 of 39, 28 of 39, and 12 of 19 wrong answers) and the largest for
 \texttt{gpt-oss-20b} (18 of 40).
-\texttt{gpt-oss-20b} is the one model with many conceptual errors: a hallucination, a wrong setup,
-or a wrong formula in 18 of its 40.
+Conceptual errors are most common for \texttt{gpt-oss-20b}: a hallucination, a wrong setup, or a
+wrong formula in 18 of its 40 wrong answers, against 5 of 19 for \texttt{Claude Sonnet 5}, 7 of 39
+for \texttt{GPT-5.4 mini}, and 9 of 39 for \texttt{Gemma 4 26B}.
 On Easy problems, 88\% of the 78 readings of 26 wrong answers are calculation errors, and wrong
 formulas or principles rise from 3\% of the readings on Easy problems to 21\% on Intermediate and
 Advanced ones.
-The reading agrees with the experiments, each agreement resting on one or two models: the mostly
-slipping \texttt{GPT-5.4 mini} and \texttt{Gemma 4 26B} gain the most from reasoning, and the
-equations lift only \texttt{gpt-oss-20b}, the one with conceptual errors.
+The reading agrees with the reasoning setting and the experiments, each agreement resting on one
+or two models: \texttt{GPT-5.4 mini} and \texttt{Gemma 4 26B}, whose wrong answers are mostly
+calculation slips, gain 0.118 and 0.070 with reasoning (\texttt{Gemini 3.1 Flash-Lite}, $+0.038$,
+was not read), and the equations lift only \texttt{gpt-oss-20b}, the model with the most
+conceptual errors, partly through fewer responses empty at the output ceiling.
 
+The first five lose few answer points, and the largest share goes to responses with no readable
+answer.
 Over 11,250 responses, the first five models lose 231.5 answer points.
 Of these, 102 go to responses with no readable final answer and 30.5 to 61 partial answers at half
 credit.
 Of their 99 incorrect verdicts, 27 lie within 0.2\% of a target whose digits the question
-prescribes and 3 are symbolic answers scored by the numbers they state, which leaves 69.
-On the final answer, then, the evaluation set is near ceiling for the first five, and what still
-differs among them lies in the derivation: how closely it follows the gold route, and how often its
-displayed arithmetic slips, which the arithmetic check flags in 0.6\% to 14.3\% of their correct
-answers.
+prescribes, which makes them incorrect by its terms, 3 are symbolic answers scored by the numbers
+they state, and 69 fall in neither group (\autoref{appendix:error_analysis}).
+On the final answer, then, the evaluation set is near ceiling for the first five, and most of what
+still differs among them lies in the derivation: how closely it follows the gold route, and how
+often its displayed arithmetic slips, which the arithmetic check flags in 0.6\% to 14.3\% of their
+correct answers, at rates that depend on how much arithmetic each displays.
 Since a response that misstates the rule it applies but computes the right answer passes every
-deterministic check, the process measures flag where to read, and the expert reading certifies
-(\autoref{appendix:error_analysis}).
+deterministic check, the process measures mark where to read, and only a reader can confirm such a
+rule.

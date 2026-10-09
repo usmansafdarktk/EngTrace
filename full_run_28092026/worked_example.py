@@ -276,7 +276,7 @@ def render(d: dict) -> str:
                   f"reached $= {d['reached']}$ of $|\\mathcal{{M}}| = {d['n']}$, so "
                   f"$m(r) = {d['reached']}/{d['n']} = {d['m']:.2f}$ (\\autoref{{eq:coverage}})."))
     L += [r'\end{tcolorbox}']
-    caption = (f"A worked scoring example: a wrong answer by \\texttt{{{name}}} on an {item['level']} "
+    caption = (f"\\textbf{{A worked scoring example.}} A wrong answer by \\texttt{{{name}}} on an {item['level']} "
                f"{BRANCH[item['branch']]}-engineering instance. Matching settles {n_e3} of the {d['n']} milestones "
                f"under a unit factor, the judge rules the other {d['n'] - n_e3}, the arithmetic check flags "
                f"{len(d['flags'])} of the {len(d['steps'])} steps, and the response scores "

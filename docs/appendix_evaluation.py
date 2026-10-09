@@ -332,8 +332,12 @@ main = [
     f"on 300 responses from five LLMs outside the eleven we evaluate, each labeled step by step by {readers[0]} "
     f"domain experts",
     f"three-way verdict on {now['answer, three-way agreement']} of responses",
-    f"milestone matching with the judge reaches F1 {e5[2]}",
+    f"milestone matching reaches F1 {now['E3 F1']} alone and {e5[2]} with the judge",
     f"{pct(min(judged))} to {pct(max(judged))} of milestones",
+    # the out-of-sample readings on the evaluated models (B1 and B3), stated once in the main text
+    f"domain experts confirm {b1n('correct', 'correct')} of {total(b1['correct'])} readings of correct verdicts, "
+    f"{b1n('incorrect', 'incorrect')} of {total(b1['incorrect'])} of incorrect ones, and {q(b3['REACHED'], OBTAINS)} of "
+    f"{total(b3['REACHED'])} reached rulings",
     f"on {planted['conceptual defects'][0].split(' of ')[1]} planted misstated rules behind correct answers",
 ]
 scoring = [

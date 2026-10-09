@@ -6,11 +6,13 @@ be checked: the final value, the presence of the gold trace's intermediate value
 arithmetic; a judge decides what these checks leave open.
 An expert study guides and validates this design: on 300 responses from five LLMs outside the
 eleven we evaluate, each labeled step by step by three domain experts, the final-answer check
-matches the experts' three-way verdict on 0.930 of responses, and milestone matching with the judge
-reaches F1 0.958 (\autoref{appendix:validation}).
+matches the experts' three-way verdict on 0.930 of responses, and milestone matching reaches F1
+0.926 alone and 0.958 with the judge (\autoref{appendix:validation}).
 The study also informed the checks' settings, so these figures are in-sample, except that the
 answer tolerance, the one fitted constant, is also fitted on one half of the responses and measured
 on the other (\autoref{tab:scoring_settings}).
+On the evaluated models, domain experts confirm 160 of 166 readings of correct verdicts, 75 of 86
+of incorrect ones, and 83 of 98 reached rulings (\autoref{appendix:readings}).
 \autoref{box:worked_example} scores one response step by step.
 
 \paragraph{Preliminaries.} An instance comprises a question, a gold trace, and milestones
@@ -55,7 +57,7 @@ With $\mathcal{R}(r)$ the milestones matched or ruled reached,
 and \emph{Milestone Coverage} (MC) is the mean of $m(r)$ over instances with milestones.
 The judge decides 11\% to 25\% of milestones, depending on the model.
 MC credits the gold route: a valid route that bypasses a milestone is not credited, so MC measures
-how far a derivation gets along that route, not whether it is free of error.
+how much of the gold route a derivation states, not whether it is free of error.
 
 \paragraph{Step-Level Diagnostics.} Two diagnostics look for flawed steps behind a correct answer.
 The arithmetic check recomputes each displayed calculation it can parse from its printed operands
@@ -64,7 +66,7 @@ The judged step check sends every step the arithmetic check does not flag to the
 provider's default settings, with the question and the gold steps, and flags a step labeled a
 conceptual or calculation error; its flags are judged, not verified.
 \emph{Arithmetic flags} and \emph{judged step flags} are the shares of correct-answer responses with
-at least one such flag.
+at least one such flag; MC and the two flag rates together are the process measures of this paper.
 They are flags with measured precision, not scores, since neither check sees every flawed step: on
 60 planted misstated rules behind correct answers, none of our deterministic checks flags any, and
 four LLM judges label at most about a third of them an error.
