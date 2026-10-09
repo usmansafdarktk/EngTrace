@@ -173,6 +173,33 @@ conservative for a response that takes another route; but 15 of the 98 readings 
 do not confirm them, and 8 of the 86 readings of incorrect verdicts call the answer correct.
 The readings are reported per verdict category; the scorer's accuracy per model is not measured.
 
+\paragraph{By Answer Kind.} \autoref{tab:answer_kinds} gives the final-answer check's agreement with
+the domain experts by answer kind.
+On the study it matches the experts' verdict on every scalar, array and symbolic response; multipart
+responses agree least, mostly on one template whose gold answer line, the check's target, states
+only the last of the results its question asks for.
+Of the 44 readings that differ from the check's verdict, the check credits less than the experts in
+28, more in 12, and in the other 4 the experts differ from each other or give partial credit by
+judgment.
+The 18 readings that call a partial verdict fully correct concern a label stated with a hedge or
+followed by the criteria that decide it (6), a power of ten written once for a whole vector or a
+unit note read as a yes-or-no answer (8), and an equivalent form that the number rule cannot read
+(4).
+The 8 readings that call an incorrect verdict correct concern an array whose last listed number, the
+check's target, is an index (4) and a label answered as ``yes'' or restated after the verdict (4).
+The 9 readings that call a partial verdict incorrect concern a number matched in another part's role
+(4), an answer that states two values for one quantity (2), a value within the tolerance but off in
+the gold's printed digits (2), and a judgment of partial credit (1).
+The 6 readings that call a correct verdict incorrect concern a value one unit off in its last digit
+(4) and a gold whose last digit carries the rounding of its intermediate values, on which the two
+experts differ (2); the 3 that give an incorrect verdict partial credit concern a right part of an
+array scored on its last value (2) and a judgment of partial credit (1).
+\autoref{tab:answer_cases} shows one discrepancy in each direction.
+
+% Agreement by answer kind and the two cases (tab:answer_kinds, tab:answer_cases), written by
+% full_run_28092026/answer_audit.py --write
+\input{sections/appendices/answer_kinds}
+
 \autoref{tab:judged_steps} gives the judged step check's flag rates on the evaluated models.
 On the expert study the check's precision is 0.640 over all steps and 0.467 inside correct answers
 (7 of 15 flags), so about half of its flags on correct answers mark a real error.

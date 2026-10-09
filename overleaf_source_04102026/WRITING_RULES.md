@@ -118,7 +118,9 @@ Labels used before their sections exist. Each must be defined when its section i
   the worked example `box:worked_example`, a block in `appendices/worked_example.tex` written by
   `python -m full_run_28092026.worked_example --write`, which `scoring.tex` inputs).
   Defined in `appendices/validation.tex`: `appendix:validation` (one table, `tab:validation_results`) and its
-  subsection `appendix:readings` (the domain experts' readings of the evaluated models). Every number
+  subsection `appendix:readings` (the domain experts' readings of the evaluated models), which inputs
+  `tab:answer_kinds` and `tab:answer_cases`, a block in `appendices/answer_kinds.tex` written by
+  `python -m full_run_28092026.answer_audit --write` (checked by `--check-block`). Every number
   in these two files and in `5_evaluation.tex` comes from `docs/appendix_evaluation.py`, whose `--check` must pass.
 - Defined in `appendices/models.tex` besides the above: `tab:providers` (serving endpoints; a block written by
   `full_run_28092026/paper_results.py --write`).

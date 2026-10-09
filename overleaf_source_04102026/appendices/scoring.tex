@@ -33,6 +33,16 @@ absolute value, a question that prescribes its rounding requires the exact digit
 answer stated in two units accepts either.
 Every one of the 2,250 gold traces scores correct.
 
+\paragraph{What Must Match.} Matching in absolute value leaves a target's sign unchecked, since sign
+conventions differ (a deflection given as a negative displacement, a contraction as a negative
+change), and a unit factor applies whatever unit is written beside a value, since answers often
+state another unit (kilonewtons for newtons).
+Each target is matched by any value in the final answer, not by the value written for that quantity,
+and an array answer is matched by its last value.
+Labels must match on classification items; on six templates of other kinds the question also asks
+for a label (whether aliasing occurred, the limiting reactant, the signal type, the system type,
+whether the flow is rotational, the direction of propagation), which no target checks.
+
 \paragraph{Symbolic Answers.} Nine templates answer with an expression, such as a signal or a
 velocity field, and the check scores them by the numbers the expression states.
 On five of the nine templates with symbolic answers it also decides equivalence: it parses the gold
@@ -63,6 +73,13 @@ in proportion to the parts matched, instead of one half, moves 109 verdicts on 1
 ($\tau = 1.000$).
 Of the 22,131 accepted numeric answers, 92.7\% lie within 0.2\% of their target, 6.9\% between
 0.2\% and 1\%, which the last-digit terms admit, and 0.4\% further from it.
+Scoring instead every stated part and label part as a target, accepting a unit factor only where the
+written unit allows it and the absolute value only where the sign is a convention, judging a target
+near zero without its own last-digit window, and reading the notation and label wording of the
+discrepant readings (\autoref{appendix:readings}) as the domain experts read them moves no model's
+FAC by more than 0.008 and leaves the ordering of the eleven models unchanged.
+Requiring a correct rounding, within half a unit of the last digit rather than one unit, moves a
+model's FAC by up to 0.031 and also leaves the ordering unchanged.
 
 \subsection{Milestones and the Judge}
 

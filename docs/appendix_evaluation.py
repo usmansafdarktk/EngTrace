@@ -337,7 +337,7 @@ main = [
     # the out-of-sample readings on the evaluated models (B1 and B3), stated once in the main text
     f"domain experts confirm {b1n('correct', 'correct')} of {total(b1['correct'])} readings of correct verdicts, "
     f"{b1n('incorrect', 'incorrect')} of {total(b1['incorrect'])} of incorrect ones, and {q(b3['REACHED'], OBTAINS)} of "
-    f"{total(b3['REACHED'])} reached rulings",
+    f"{total(b3['REACHED'])} readings of reached rulings",
     f"on {planted['conceptual defects'][0].split(' of ')[1]} planted misstated rules behind correct answers",
 ]
 scoring = [
@@ -421,6 +421,72 @@ validation = [
     f"precision is {judge_all[0] / sum(judge_all):.3f} over all steps and {judge_cor[0] / sum(judge_cor):.3f} inside "
     f"correct answers ({judge_cor[0]} of {sum(judge_cor)} flags)",
 ] + results_rows
+
+# ---------------------------------------------------------------- the answer check by answer kind and its discrepancies
+# full_run_28092026/answer_audit.py --write: agreement by kind, the readings' discrepancies by verdict category and cause,
+# and the bounds of the stricter readings of the rule (its tab:answer_kinds block is checked by --check-block)
+aud = json.loads((RUN / "results" / "answer_audit_paper.json").read_text(encoding="utf-8"))
+NUMBER_WORD = {1: "one", 2: "two", 3: "three", 4: "four", 5: "five", 6: "six", 7: "seven", 8: "eight", 9: "nine"}
+bk, cat, dr, bound = aud["by_kind"], aud["readings_by_category"], aud["readings_direction"], aud["bound"]
+full_kinds = sorted(k for k in bk if bk[k]["study"][0] == bk[k]["study"][1])
+least = min(bk, key=lambda k: bk[k]["study"][0] / bk[k]["study"][1])
+
+
+def n_cat(c: str) -> int:
+    return sum(cat.get(c, {}).values())
+
+
+def n_cause(c: str, *causes: str) -> int:
+    return sum(cat.get(c, {}).get(x, 0) for x in causes)
+
+
+# each sentence names every cause of its category, and the categories are the B1 counts the prose states elsewhere
+NAMED = {"partial>correct": ("label_rule", "reader_factored_power", "reader_no_units_stance", "equivalent_form"),
+         "incorrect>correct": ("array_target_index", "label_rule"),
+         "partial>incorrect": ("value_in_other_role", "contradictory_answer", "tolerance", "expert_partial_judgment"),
+         "correct>incorrect": ("last_digit_window", "gold_rounding"),
+         "incorrect>partial": ("array_last_value_only", "expert_partial_judgment")}
+assert all(n_cause(c, *xs) == n_cat(c) for c, xs in NAMED.items()) and set(cat) == set(NAMED), cat
+assert (n_cat("partial>correct"), n_cat("partial>incorrect"), n_cat("incorrect>correct")) == (
+    int(b1n("partial", "correct")), int(b1n("partial", "incorrect")), int(b1n("incorrect", "correct"))), cat
+assert n_cat("correct>incorrect") == total(b1["correct"]) - int(b1n("correct", "correct")), cat
+kinds_ok = full_kinds == ["array", "scalar", "symbolic"] and least == "multipart"
+main += [
+    "matches the experts' verdict on every scalar, array and symbolic response of the study, and multipart responses "
+    "agree least" if kinds_ok else "KINDS CHANGED",
+]
+scoring += [
+    f"on {NUMBER_WORD[aud['label_part_templates']]} templates of other kinds the question also asks for a label",
+    f"moves no model's FAC by more than {bound['combined']['at_most']:.3f} and leaves the ordering of the eleven models "
+    "unchanged" if bound["combined"]["tau"] == 1.0 else "ORDER CHANGED",
+    f"moves a model's FAC by up to {bound['half_unit']['largest_rounded']:.3f} and also leaves the ordering unchanged"
+    if bound["half_unit"]["tau"] == 1.0 else "ORDER CHANGED",
+]
+validation += [
+    "it matches the experts' verdict on every scalar, array and symbolic response; multipart responses agree least"
+    if kinds_ok else "KINDS CHANGED",
+    f"Of the {sum(dr.values())} readings that differ from the check's verdict, the check credits less than the experts "
+    f"in {dr['strict']}, more in {dr['lenient']}, and in the other {dr['split']} the experts differ",
+    f"The {n_cat('partial>correct')} readings that call a partial verdict fully correct concern a label stated with a "
+    f"hedge or followed by the criteria that decide it ({n_cause('partial>correct', 'label_rule')}), a power of ten "
+    f"written once for a whole vector or a unit note read as a yes-or-no answer "
+    f"({n_cause('partial>correct', 'reader_factored_power', 'reader_no_units_stance')}), and an equivalent form that the "
+    f"number rule cannot read ({n_cause('partial>correct', 'equivalent_form')})",
+    f"The {n_cat('incorrect>correct')} readings that call an incorrect verdict correct concern an array whose last listed "
+    f"number, the check's target, is an index ({n_cause('incorrect>correct', 'array_target_index')}) and a label answered "
+    f"as ``yes'' or restated after the verdict ({n_cause('incorrect>correct', 'label_rule')})",
+    f"The {n_cat('partial>incorrect')} readings that call a partial verdict incorrect concern a number matched in another "
+    f"part's role ({n_cause('partial>incorrect', 'value_in_other_role')}), an answer that states two values for one "
+    f"quantity ({n_cause('partial>incorrect', 'contradictory_answer')}), a value within the tolerance but off in the "
+    f"gold's printed digits ({n_cause('partial>incorrect', 'tolerance')}), and a judgment of partial credit "
+    f"({n_cause('partial>incorrect', 'expert_partial_judgment')})",
+    f"The {n_cat('correct>incorrect')} readings that call a correct verdict incorrect concern a value one unit off in its "
+    f"last digit ({n_cause('correct>incorrect', 'last_digit_window')}) and a gold whose last digit carries the rounding of "
+    f"its intermediate values, on which the two experts differ ({n_cause('correct>incorrect', 'gold_rounding')}); the "
+    f"{n_cat('incorrect>partial')} that give an incorrect verdict partial credit concern a right part of an array scored "
+    f"on its last value ({n_cause('incorrect>partial', 'array_last_value_only')}) and a judgment of partial credit "
+    f"({n_cause('incorrect>partial', 'expert_partial_judgment')})",
+]
 
 for c in CLAIMS_FAILED:
     print(f"CLAIM FAILS: {c}")

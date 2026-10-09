@@ -480,6 +480,36 @@ def main() -> int:
             [[r[0], r[1]] for r in md_rows(b1, r'^\| \| \|') if r[0]] + [[r[0], r[1]] for r in md_rows(b3, r'^\| \| \|') if r[0]],
             'full_run_28092026/EXPERT_REQUEST.md: B1 now, B3 now (the readings the store still holds; B1 against the current verdicts)')
 
+    # ------------------------------------------------------------------ the answer check by answer kind
+    aud = load(HERE / 'results' / 'answer_audit_paper.json')
+    src = 'full_run_28092026/results/answer_audit_paper.json (answer_audit.py --write)'
+    S.h3('The final-answer check by answer kind (tab:answer_kinds) and its discrepancies')
+    S.table(['answer kind', 'study responses', 'three-way', 'not partial', 'readings agreeing'],
+            [[k, v['study'][1], f"{v['study'][0] / v['study'][1]:.3f}", f"{v['study'][2] / v['study'][3]:.3f}",
+              f"{v['readings'][0]} of {v['readings'][1]}"] for k, v in aud['by_kind'].items()], src)
+    dr = aud['readings_direction']
+    S.put('Readings that differ from the check: the check credits less / more / experts split or judge partial credit',
+          f"{sum(dr.values())}: {dr['strict']} / {dr['lenient']} / {dr['split']}", src)
+    S.table(['check > experts', 'causes (readings)'],
+            [[c, ', '.join(f'{k} {n}' for k, n in sorted(v.items(), key=lambda kv: -kv[1]))]
+             for c, v in aud['readings_by_category'].items()], src)
+    S.put('Templates of other kinds whose question also asks for a label no target checks', aud['label_part_templates'], src)
+    b = aud['bound']
+    S.put('Every stated part and label part a target, unit factor only where the written unit allows it, absolute value '
+          'only where the sign is a convention, targets near zero without their window, notation and label wording read: '
+          'largest FAC change; bound; tau; verdicts moved',
+          f"{b['combined']['largest_change']:+.4f}; no more than {b['combined']['at_most']:.3f}; {b['combined']['tau']:.3f}; "
+          f"{b['combined']['moved']}", src + ' from results/answer_audit.json')
+    S.put('Requiring a correct rounding (half a unit): largest FAC change; rounded; tau; verdicts moved',
+          f"{b['half_unit']['largest_change']:+.4f}; {b['half_unit']['largest_rounded']:.3f}; {b['half_unit']['tau']:.3f}; "
+          f"{b['half_unit']['moved']}", src + ' from results/answer_audit.json')
+    a, c = aud['cases']['lenient'], aud['cases']['strict']
+    S.put('tab:answer_cases, credited more than the experts (their readings are in the generated table, not here)',
+          f"{a['item']}: {a['stated']} for {a['gold']} (unrounded {a['unrounded']}); check {a['check']}", src)
+    S.put('tab:answer_cases, credited less than the experts (their readings are in the generated table, not here)',
+          f"{c['item']}: cos(pi n/{c['den']}) for cos({c['gold_num']} pi n/{c['den']}); check {c['check']} "
+          f"({c['matched']} of {c['of']})", src)
+
     # ------------------------------------------------------------------ providers
     S.h('Serving endpoints')
     well = [r for r in prov if r.get('matched_diff') is not None and not r['few_matched']]

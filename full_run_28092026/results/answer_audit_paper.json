@@ -1,0 +1,187 @@
+{
+ "by_kind": {
+  "scalar": {
+   "study": [
+    60,
+    60,
+    60,
+    60
+   ],
+   "readings": [
+    139,
+    146,
+    139,
+    145
+   ]
+  },
+  "multipart": {
+   "study": [
+    64,
+    80,
+    64,
+    65
+   ],
+   "readings": [
+    50,
+    60,
+    50,
+    52
+   ]
+  },
+  "vector": {
+   "study": [
+    56,
+    60,
+    56,
+    59
+   ],
+   "readings": [
+    12,
+    16,
+    12,
+    16
+   ]
+  },
+  "array": {
+   "study": [
+    20,
+    20,
+    20,
+    20
+   ],
+   "readings": [
+    8,
+    14,
+    8,
+    12
+   ]
+  },
+  "symbolic": {
+   "study": [
+    40,
+    40,
+    40,
+    40
+   ],
+   "readings": [
+    31,
+    34,
+    31,
+    33
+   ]
+  },
+  "classification": {
+   "study": [
+    39,
+    40,
+    37,
+    37
+   ],
+   "readings": [
+    4,
+    18,
+    4,
+    18
+   ]
+  }
+ },
+ "all": {
+  "study": [
+   279,
+   300,
+   277,
+   281
+  ],
+  "readings": [
+   244,
+   288,
+   244,
+   276
+  ]
+ },
+ "readings_direction": {
+  "strict": 28,
+  "lenient": 12,
+  "split": 4
+ },
+ "readings_by_category": {
+  "partial>correct": {
+   "equivalent_form": 4,
+   "reader_no_units_stance": 4,
+   "reader_factored_power": 4,
+   "label_rule": 6
+  },
+  "partial>incorrect": {
+   "value_in_other_role": 4,
+   "expert_partial_judgment": 1,
+   "tolerance": 2,
+   "contradictory_answer": 2
+  },
+  "incorrect>partial": {
+   "array_last_value_only": 2,
+   "expert_partial_judgment": 1
+  },
+  "correct>incorrect": {
+   "last_digit_window": 4,
+   "gold_rounding": 2
+  },
+  "incorrect>correct": {
+   "array_target_index": 4,
+   "label_rule": 4
+  }
+ },
+ "study_by_cause": {
+  "answer_parts_unchecked": 15,
+  "expert_partial_judgment": 1,
+  "unit_factor_slip": 2,
+  "reader_minus_sign": 2,
+  "last_digit_window": 1
+ },
+ "label_part_templates": 6,
+ "bound": {
+  "combined": {
+   "largest_change": -0.007777777777777883,
+   "largest_rounded": 0.008,
+   "at_most": 0.008,
+   "tau": 1.0,
+   "moved": 218
+  },
+  "half_unit": {
+   "largest_change": -0.031333333333333324,
+   "largest_rounded": 0.031,
+   "at_most": 0.032,
+   "tau": 1.0,
+   "moved": 298
+  }
+ },
+ "cases": {
+  "lenient": {
+   "item": "mm1k_finite_capacity#1",
+   "branch": "industrial",
+   "level": "Advanced",
+   "stated": 3.44,
+   "gold": 3.45,
+   "unrounded": 3.4475,
+   "check": "correct",
+   "experts": [
+    "incorrect",
+    "incorrect"
+   ]
+  },
+  "strict": {
+   "item": "decimation_aliasing_analysis#15",
+   "branch": "electrical",
+   "level": "Advanced",
+   "M": 3,
+   "gold_num": 15,
+   "den": 8,
+   "check": "partial",
+   "matched": 1,
+   "of": 3,
+   "experts": [
+    "correct",
+    "correct"
+   ]
+  }
+ }
+}

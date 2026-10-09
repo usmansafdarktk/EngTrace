@@ -3,36 +3,28 @@
 
 Because each template computes every quantity of its gold trace, we check deterministically what can
 be checked: the final value, the presence of the gold trace's intermediate values, and displayed
-arithmetic; a judge decides what these checks leave open.
-An expert study guides and validates this design: on 300 responses from five LLMs outside the
-eleven we evaluate, each labeled step by step by three domain experts, the final-answer check
-matches the experts' three-way verdict on 0.930 of responses, and milestone matching reaches F1
-0.926 alone and 0.958 with the judge (\autoref{appendix:validation}).
-The study also informed the checks' settings, so these figures are in-sample, except that the
-answer tolerance, the one fitted constant, is also fitted on one half of the responses and measured
-on the other (\autoref{tab:scoring_settings}).
-On the evaluated models, domain experts confirm 160 of 166 readings of correct verdicts, 75 of 86
-of incorrect ones, and 83 of 98 reached rulings (\autoref{appendix:readings}).
-\autoref{box:worked_example} scores one response step by step.
+arithmetic; a judge decides what these checks leave open.~\autoref{box:worked_example} scores one response step by step.
 
 \paragraph{Preliminaries.} An instance comprises a question, a gold trace, and milestones
 $\mathcal{M}$: the values that the template computes, the gold trace states, and the question does
 not give.
-A response $r$ is a sequence of steps ending in a final answer.
-The \emph{targets} of an instance are the milestones that its gold final answer states or, where it
-states none, the answer's last value that the question does not give.
-A classification answer also targets the label that the gold answer states, such as a flow regime.
+A response $r$ is the text a model returns, a sequence of steps ending in a final answer; no check
+reads the reasoning text that some endpoints return separately.
 
-\paragraph{Final Answer Accuracy.} Let $u(x)$ be one unit in the last digit that a value $x$
-displays, $\mathcal{C}$ a fixed set of unit factors (e.g., m to mm), and $\epsilon = 0.002$.
+\paragraph{Final Answer Accuracy.} The \emph{targets} of an instance are the milestones that its
+gold final answer states or, where it states none, the answer's last value that the question does
+not give.
+A classification answer also targets the label that the gold answer states, such as a flow regime.
+Let $u(x)$ be one unit in the last digit that a value $x$ displays, $\mathcal{C}$ a fixed set of
+unit factors (e.g., m to mm), and $\epsilon = 0.002$, the check's one fitted constant.
 A value $\hat{y}$ in the final answer matches a numerical target $y$ if, for some
 $c \in \mathcal{C}$,
 \begin{equation}
     |c\,\hat{y} - y| \le \max\bigl(\epsilon\,|y|,\; \min(c\,u(\hat{y}),\, 0.01\,|y|),\; u(y)\bigr),
     \label{eq:match}
 \end{equation}
-so a value within one unit of either value's last displayed digit matches, the response's own digit
-up to 1\% of the target.
+so a value matches within one unit of the last digit that either value displays, the response's
+unit counting only up to 1\% of the target.
 Symbolic answers are checked for equivalence on five templates and by their stated numbers on four
 (\autoref{appendix:scoring}).
 A response scores $v(r) = 1$ if every target matches, $0.5$ if only some do, and $0$ if none does or
@@ -40,12 +32,11 @@ no final answer is readable, since stating one within the output limit is part o
 \emph{Final Answer Accuracy} (FAC) is the mean of $v(r)$ over instances.
 
 \paragraph{Milestone Coverage.} A milestone is reached if the response states its value within
-0.5\% under a unit factor, in any step and order; 0.5\% is the tolerance at which the gold trace
-counts as stating a milestone, not a fitted constant.
-Matching compares values only, not the quantity's name, the unit written beside it, or the order of
-steps, so a coincidental value counts, which the chance floor of~\autoref{tab:coverage} measures.
-Matching, like every check, reads the response's visible text, not the reasoning text that some
-endpoints return separately.
+0.5\% under a unit factor; 0.5\% is the tolerance at which the gold trace counts as stating a
+milestone, not a fitted constant.
+Matching compares values only, not the quantity's name, the unit written beside it, the step it
+appears in, or the order and dependencies among steps, so a coincidental value counts, which the
+chance floor of~\autoref{tab:coverage} measures.
 Milestones that matching misses go to an LLM judge from outside the evaluated families,
 \texttt{MiMo-V2.5-Pro}~\citep{mimov25pro}, which sees the question, the response, and each
 milestone's name and value, but not the gold trace, and rules each reached, not needed, or missing.
@@ -58,10 +49,9 @@ With $\mathcal{R}(r)$ the milestones matched or ruled reached,
 \end{equation}
 and \emph{Milestone Coverage} (MC) is the mean of $m(r)$ over instances with milestones.
 The judge decides 11\% to 25\% of milestones, depending on the model.
-MC credits the gold route: a valid route that bypasses a milestone is not credited, so MC measures
-how much of the gold route a derivation states, not whether it is free of error
-(\autoref{box:coverage_cases} shows a valid route that bypasses two milestones and a misstated rule
-that every deterministic check passes).
+MC credits the gold route: a valid route that bypasses a milestone is not credited (case A
+of~\autoref{box:coverage_cases}), so MC measures how much of the gold route a derivation states,
+not whether it is free of error (case B).
 
 \paragraph{Step-Level Diagnostics.} Two diagnostics look for flawed steps behind a correct answer.
 The arithmetic check recomputes each displayed calculation it can parse from its printed operands
@@ -74,3 +64,15 @@ at least one such flag; MC and the two flag rates together are the process measu
 They are flags with measured precision, not scores, since neither check sees every flawed step: on
 60 planted misstated rules behind correct answers, none of our deterministic checks flags any, and
 four LLM judges label at most about a third of them an error.
+
+\paragraph{Validation.} An expert study guides and validates these checks: on 300 responses from
+five LLMs outside the eleven we evaluate, each labeled step by step by three domain experts, the
+final-answer check matches the experts' three-way verdict on 0.930 of responses, and milestone
+matching reaches F1 0.926 alone and 0.958 with the judge (\autoref{appendix:validation}).
+By answer kind, the final-answer check matches the experts' verdict on every scalar, array and
+symbolic response of the study, and multipart responses agree least (\autoref{tab:answer_kinds}).
+The study also informed the checks' settings, so these figures are in-sample, except that
+$\epsilon$ is also fitted on one half of the responses and measured on the other
+(\autoref{tab:scoring_settings}).
+On the evaluated models, domain experts confirm 160 of 166 readings of correct verdicts, 75 of 86
+of incorrect ones, and 83 of 98 readings of reached rulings (\autoref{appendix:readings}).

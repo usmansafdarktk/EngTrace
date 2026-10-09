@@ -1,0 +1,46 @@
+% BEGIN GENERATED tab:answer_kinds and tab:answer_cases (full_run_28092026/answer_audit.py --write)
+\begin{table}[t]
+    \centering
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \begin{tabular}{@{}l r r r r@{}}
+        \toprule
+        \rowcolor{gray!10}
+        \textbf{Answer kind} & \textbf{Study} & \textbf{Three-way} & \textbf{Not partial} & \textbf{Readings} \\
+        \midrule
+        Scalar & 60 & 1.000 & 1.000 & 139 of 146 \\
+        Multipart & 80 & 0.800 & 0.985 & 50 of 60 \\
+        Vector & 60 & 0.933 & 0.949 & 12 of 16 \\
+        Array & 20 & 1.000 & 1.000 & 8 of 14 \\
+        Symbolic & 40 & 1.000 & 1.000 & 31 of 34 \\
+        Classification & 40 & 0.975 & 1.000 & 4 of 18 \\
+        \midrule
+        All & 300 & 0.930 & 0.986 & 244 of 288 \\
+        \bottomrule
+    \end{tabular}
+    \caption{\textbf{Final-answer check by answer kind.} Study: the expert study's responses of each kind and
+    the check's agreement with the experts' verdict, three-way and on the responses the experts did not call
+    partial. Readings: the domain experts' readings of the evaluated models' verdicts that agree with the
+    check; the sample is stratified by verdict, so these are counts, not rates for a kind.}
+    \label{tab:answer_kinds}
+\end{table}
+
+\begin{table*}[t]
+    \centering
+    \small
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabular}{@{}p{0.2\linewidth} p{0.12\linewidth} p{0.12\linewidth} p{0.07\linewidth} p{0.09\linewidth} p{0.26\linewidth}@{}}
+        \toprule
+        \rowcolor{gray!10}
+        \textbf{Question} & \textbf{Final answer} & \textbf{Gold} & \textbf{Check} & \textbf{Experts} & \textbf{Why they differ} \\
+        \midrule
+        Average time in the system of an M/M/1/K queue (industrial, Advanced) & 3.44 minutes & 3.45 minutes & correct & incorrect (both) & the rule accepts a value one unit off in its last digit; the unrounded value, $L/\lambda_{\mathrm{eff}}$, is 3.4475 minutes, which rounds to 3.45, not 3.44 \\
+        Output signal after downsampling by $M = 3$ (electrical, Advanced) & $y[n] = \cos(\pi n/8)$ & $y[n] = \cos(15\pi n/8)$ & partial & correct (both) & the same sequence, since $15\pi/8 = 2\pi - \pi/8$; the check reads the stated numbers and finds 1 of its 3 targets \\
+        \bottomrule
+    \end{tabular}
+    \caption{\textbf{One discrepancy in each direction.} Two final answers of the evaluated models on which
+    the check's verdict differs from both domain experts' readings: it credits the first more and the second
+    less than they do.}
+    \label{tab:answer_cases}
+\end{table*}
+% END GENERATED tab:answer_kinds and tab:answer_cases

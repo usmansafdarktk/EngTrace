@@ -1,0 +1,2921 @@
+{
+ "generated_by": "python -m full_run_28092026.answer_audit",
+ "written_at_utc": "2026-10-09T18:12:56+00:00",
+ "agreement": {
+  "study": {
+   "headline": {
+    "all": [
+     279,
+     300,
+     277,
+     281
+    ],
+    "by_kind": {
+     "scalar": [
+      60,
+      60,
+      60,
+      60
+     ],
+     "multipart": [
+      64,
+      80,
+      64,
+      65
+     ],
+     "vector": [
+      56,
+      60,
+      56,
+      59
+     ],
+     "array": [
+      20,
+      20,
+      20,
+      20
+     ],
+     "symbolic": [
+      40,
+      40,
+      40,
+      40
+     ],
+     "classification": [
+      39,
+      40,
+      37,
+      37
+     ]
+    }
+   },
+   "R1 minus signs read": {
+    "all": [
+     280,
+     300,
+     278,
+     281
+    ],
+    "by_kind": {
+     "scalar": [
+      60,
+      60,
+      60,
+      60
+     ],
+     "multipart": [
+      64,
+      80,
+      64,
+      65
+     ],
+     "vector": [
+      58,
+      60,
+      58,
+      59
+     ],
+     "array": [
+      20,
+      20,
+      20,
+      20
+     ],
+     "symbolic": [
+      39,
+      40,
+      39,
+      40
+     ],
+     "classification": [
+      39,
+      40,
+      37,
+      37
+     ]
+    }
+   },
+   "R2 factored power of ten read": {
+    "all": [
+     279,
+     300,
+     277,
+     281
+    ],
+    "by_kind": {
+     "scalar": [
+      60,
+      60,
+      60,
+      60
+     ],
+     "multipart": [
+      64,
+      80,
+      64,
+      65
+     ],
+     "vector": [
+      56,
+      60,
+      56,
+      59
+     ],
+     "array": [
+      20,
+      20,
+      20,
+      20
+     ],
+     "symbolic": [
+      40,
+      40,
+      40,
+      40
+     ],
+     "classification": [
+      39,
+      40,
+      37,
+      37
+     ]
+    }
+   },
+   "R3 \"no units\" not read as a stance": {
+    "all": [
+     279,
+     300,
+     277,
+     281
+    ],
+    "by_kind": {
+     "scalar": [
+      60,
+      60,
+      60,
+      60
+     ],
+     "multipart": [
+      64,
+      80,
+      64,
+      65
+     ],
+     "vector": [
+      56,
+      60,
+      56,
+      59
+     ],
+     "array": [
+      20,
+      20,
+      20,
+      20
+     ],
+     "symbolic": [
+      40,
+      40,
+      40,
+      40
+     ],
+     "classification": [
+      39,
+      40,
+      37,
+      37
+     ]
+    }
+   },
+   "R4 label word: first mention": {
+    "all": [
+     279,
+     300,
+     277,
+     281
+    ],
+    "by_kind": {
+     "scalar": [
+      60,
+      60,
+      60,
+      60
+     ],
+     "multipart": [
+      64,
+      80,
+      64,
+      65
+     ],
+     "vector": [
+      56,
+      60,
+      56,
+      59
+     ],
+     "array": [
+      20,
+      20,
+      20,
+      20
+     ],
+     "symbolic": [
+      40,
+      40,
+      40,
+      40
+     ],
+     "classification": [
+      39,
+      40,
+      37,
+      37
+     ]
+    }
+   },
+   "R5 label word: revised last mention": {
+    "all": [
+     279,
+     300,
+     277,
+     281
+    ],
+    "by_kind": {
+     "scalar": [
+      60,
+      60,
+      60,
+      60
+     ],
+     "multipart": [
+      64,
+      80,
+      64,
+      65
+     ],
+     "vector": [
+      56,
+      60,
+      56,
+      59
+     ],
+     "array": [
+      20,
+      20,
+      20,
+      20
+     ],
+     "symbolic": [
+      40,
+      40,
+      40,
+      40
+     ],
+     "classification": [
+      39,
+      40,
+      37,
+      37
+     ]
+    }
+   },
+   "T1 arrays: every computed value": {
+    "all": [
+     279,
+     300,
+     277,
+     281
+    ],
+    "by_kind": {
+     "scalar": [
+      60,
+      60,
+      60,
+      60
+     ],
+     "multipart": [
+      64,
+      80,
+      64,
+      65
+     ],
+     "vector": [
+      56,
+      60,
+      56,
+      59
+     ],
+     "array": [
+      20,
+      20,
+      20,
+      20
+     ],
+     "symbolic": [
+      40,
+      40,
+      40,
+      40
+     ],
+     "classification": [
+      39,
+      40,
+      37,
+      37
+     ]
+    }
+   },
+   "T2 targets near zero: no gold last-digit window": {
+    "all": [
+     279,
+     300,
+     277,
+     281
+    ],
+    "by_kind": {
+     "scalar": [
+      60,
+      60,
+      60,
+      60
+     ],
+     "multipart": [
+      64,
+      80,
+      64,
+      65
+     ],
+     "vector": [
+      56,
+      60,
+      56,
+      59
+     ],
+     "array": [
+      20,
+      20,
+      20,
+      20
+     ],
+     "symbolic": [
+      40,
+      40,
+      40,
+      40
+     ],
+     "classification": [
+      39,
+      40,
+      37,
+      37
+     ]
+    }
+   },
+   "T3 every stated part a target": {
+    "all": [
+     280,
+     300,
+     278,
+     281
+    ],
+    "by_kind": {
+     "scalar": [
+      60,
+      60,
+      60,
+      60
+     ],
+     "multipart": [
+      64,
+      80,
+      64,
+      65
+     ],
+     "vector": [
+      58,
+      60,
+      58,
+      59
+     ],
+     "array": [
+      20,
+      20,
+      20,
+      20
+     ],
+     "symbolic": [
+      39,
+      40,
+      39,
+      40
+     ],
+     "classification": [
+      39,
+      40,
+      37,
+      37
+     ]
+    }
+   },
+   "T4 label parts checked": {
+    "all": [
+     279,
+     300,
+     277,
+     281
+    ],
+    "by_kind": {
+     "scalar": [
+      60,
+      60,
+      60,
+      60
+     ],
+     "multipart": [
+      64,
+      80,
+      64,
+      65
+     ],
+     "vector": [
+      56,
+      60,
+      56,
+      59
+     ],
+     "array": [
+      20,
+      20,
+      20,
+      20
+     ],
+     "symbolic": [
+      40,
+      40,
+      40,
+      40
+     ],
+     "classification": [
+      39,
+      40,
+      37,
+      37
+     ]
+    }
+   },
+   "U1 no unit factors": {
+    "all": [
+     266,
+     300,
+     263,
+     281
+    ],
+    "by_kind": {
+     "scalar": [
+      60,
+      60,
+      60,
+      60
+     ],
+     "multipart": [
+      56,
+      80,
+      56,
+      65
+     ],
+     "vector": [
+      51,
+      60,
+      50,
+      59
+     ],
+     "array": [
+      20,
+      20,
+      20,
+      20
+     ],
+     "symbolic": [
+      40,
+      40,
+      40,
+      40
+     ],
+     "classification": [
+      39,
+      40,
+      37,
+      37
+     ]
+    }
+   },
+   "U2 unit factor only where the written unit allows it": {
+    "all": [
+     280,
+     300,
+     278,
+     281
+    ],
+    "by_kind": {
+     "scalar": [
+      60,
+      60,
+      60,
+      60
+     ],
+     "multipart": [
+      65,
+      80,
+      65,
+      65
+     ],
+     "vector": [
+      56,
+      60,
+      56,
+      59
+     ],
+     "array": [
+      20,
+      20,
+      20,
+      20
+     ],
+     "symbolic": [
+      40,
+      40,
+      40,
+      40
+     ],
+     "classification": [
+      39,
+      40,
+      37,
+      37
+     ]
+    }
+   },
+   "S1 absolute-value clause off, signs read": {
+    "all": [
+     278,
+     300,
+     276,
+     281
+    ],
+    "by_kind": {
+     "scalar": [
+      58,
+      60,
+      58,
+      60
+     ],
+     "multipart": [
+      64,
+      80,
+      64,
+      65
+     ],
+     "vector": [
+      58,
+      60,
+      58,
+      59
+     ],
+     "array": [
+      20,
+      20,
+      20,
+      20
+     ],
+     "symbolic": [
+      39,
+      40,
+      39,
+      40
+     ],
+     "classification": [
+      39,
+      40,
+      37,
+      37
+     ]
+    }
+   },
+   "S2 sign policy, signs read": {
+    "all": [
+     280,
+     300,
+     278,
+     281
+    ],
+    "by_kind": {
+     "scalar": [
+      60,
+      60,
+      60,
+      60
+     ],
+     "multipart": [
+      64,
+      80,
+      64,
+      65
+     ],
+     "vector": [
+      58,
+      60,
+      58,
+      59
+     ],
+     "array": [
+      20,
+      20,
+      20,
+      20
+     ],
+     "symbolic": [
+      39,
+      40,
+      39,
+      40
+     ],
+     "classification": [
+      39,
+      40,
+      37,
+      37
+     ]
+    }
+   },
+   "D1 half-unit last-digit windows": {
+    "all": [
+     279,
+     300,
+     277,
+     281
+    ],
+    "by_kind": {
+     "scalar": [
+      60,
+      60,
+      60,
+      60
+     ],
+     "multipart": [
+      64,
+      80,
+      64,
+      65
+     ],
+     "vector": [
+      56,
+      60,
+      56,
+      59
+     ],
+     "array": [
+      20,
+      20,
+      20,
+      20
+     ],
+     "symbolic": [
+      40,
+      40,
+      40,
+      40
+     ],
+     "classification": [
+      39,
+      40,
+      37,
+      37
+     ]
+    }
+   },
+   "Y1 equivalence decides on its five templates": {
+    "all": [
+     279,
+     300,
+     277,
+     281
+    ],
+    "by_kind": {
+     "scalar": [
+      60,
+      60,
+      60,
+      60
+     ],
+     "multipart": [
+      64,
+      80,
+      64,
+      65
+     ],
+     "vector": [
+      56,
+      60,
+      56,
+      59
+     ],
+     "array": [
+      20,
+      20,
+      20,
+      20
+     ],
+     "symbolic": [
+      40,
+      40,
+      40,
+      40
+     ],
+     "classification": [
+      39,
+      40,
+      37,
+      37
+     ]
+    }
+   },
+   "C1 reader and target fixes (R1-R3, R5, T1-T4)": {
+    "all": [
+     280,
+     300,
+     278,
+     281
+    ],
+    "by_kind": {
+     "scalar": [
+      60,
+      60,
+      60,
+      60
+     ],
+     "multipart": [
+      64,
+      80,
+      64,
+      65
+     ],
+     "vector": [
+      58,
+      60,
+      58,
+      59
+     ],
+     "array": [
+      20,
+      20,
+      20,
+      20
+     ],
+     "symbolic": [
+      39,
+      40,
+      39,
+      40
+     ],
+     "classification": [
+      39,
+      40,
+      37,
+      37
+     ]
+    }
+   },
+   "C2 C1 with U2 and S2": {
+    "all": [
+     281,
+     300,
+     279,
+     281
+    ],
+    "by_kind": {
+     "scalar": [
+      60,
+      60,
+      60,
+      60
+     ],
+     "multipart": [
+      65,
+      80,
+      65,
+      65
+     ],
+     "vector": [
+      58,
+      60,
+      58,
+      59
+     ],
+     "array": [
+      20,
+      20,
+      20,
+      20
+     ],
+     "symbolic": [
+      39,
+      40,
+      39,
+      40
+     ],
+     "classification": [
+      39,
+      40,
+      37,
+      37
+     ]
+    }
+   },
+   "C3 C2 with D1 and Y1": {
+    "all": [
+     281,
+     300,
+     279,
+     281
+    ],
+    "by_kind": {
+     "scalar": [
+      60,
+      60,
+      60,
+      60
+     ],
+     "multipart": [
+      65,
+      80,
+      65,
+      65
+     ],
+     "vector": [
+      58,
+      60,
+      58,
+      59
+     ],
+     "array": [
+      20,
+      20,
+      20,
+      20
+     ],
+     "symbolic": [
+      39,
+      40,
+      39,
+      40
+     ],
+     "classification": [
+      39,
+      40,
+      37,
+      37
+     ]
+    }
+   }
+  },
+  "readings": {
+   "headline": {
+    "all": [
+     244,
+     288,
+     244,
+     276
+    ],
+    "by_kind": {
+     "scalar": [
+      139,
+      146,
+      139,
+      145
+     ],
+     "multipart": [
+      50,
+      60,
+      50,
+      52
+     ],
+     "vector": [
+      12,
+      16,
+      12,
+      16
+     ],
+     "array": [
+      8,
+      14,
+      8,
+      12
+     ],
+     "symbolic": [
+      31,
+      34,
+      31,
+      33
+     ],
+     "classification": [
+      4,
+      18,
+      4,
+      18
+     ]
+    }
+   },
+   "R1 minus signs read": {
+    "all": [
+     244,
+     288,
+     244,
+     276
+    ],
+    "by_kind": {
+     "scalar": [
+      139,
+      146,
+      139,
+      145
+     ],
+     "multipart": [
+      50,
+      60,
+      50,
+      52
+     ],
+     "vector": [
+      12,
+      16,
+      12,
+      16
+     ],
+     "array": [
+      8,
+      14,
+      8,
+      12
+     ],
+     "symbolic": [
+      31,
+      34,
+      31,
+      33
+     ],
+     "classification": [
+      4,
+      18,
+      4,
+      18
+     ]
+    }
+   },
+   "R2 factored power of ten read": {
+    "all": [
+     248,
+     288,
+     248,
+     276
+    ],
+    "by_kind": {
+     "scalar": [
+      139,
+      146,
+      139,
+      145
+     ],
+     "multipart": [
+      50,
+      60,
+      50,
+      52
+     ],
+     "vector": [
+      16,
+      16,
+      16,
+      16
+     ],
+     "array": [
+      8,
+      14,
+      8,
+      12
+     ],
+     "symbolic": [
+      31,
+      34,
+      31,
+      33
+     ],
+     "classification": [
+      4,
+      18,
+      4,
+      18
+     ]
+    }
+   },
+   "R3 \"no units\" not read as a stance": {
+    "all": [
+     248,
+     288,
+     248,
+     276
+    ],
+    "by_kind": {
+     "scalar": [
+      139,
+      146,
+      139,
+      145
+     ],
+     "multipart": [
+      50,
+      60,
+      50,
+      52
+     ],
+     "vector": [
+      12,
+      16,
+      12,
+      16
+     ],
+     "array": [
+      8,
+      14,
+      8,
+      12
+     ],
+     "symbolic": [
+      31,
+      34,
+      31,
+      33
+     ],
+     "classification": [
+      8,
+      18,
+      8,
+      18
+     ]
+    }
+   },
+   "R4 label word: first mention": {
+    "all": [
+     252,
+     288,
+     252,
+     276
+    ],
+    "by_kind": {
+     "scalar": [
+      139,
+      146,
+      139,
+      145
+     ],
+     "multipart": [
+      50,
+      60,
+      50,
+      52
+     ],
+     "vector": [
+      12,
+      16,
+      12,
+      16
+     ],
+     "array": [
+      8,
+      14,
+      8,
+      12
+     ],
+     "symbolic": [
+      31,
+      34,
+      31,
+      33
+     ],
+     "classification": [
+      12,
+      18,
+      12,
+      18
+     ]
+    }
+   },
+   "R5 label word: revised last mention": {
+    "all": [
+     252,
+     288,
+     252,
+     276
+    ],
+    "by_kind": {
+     "scalar": [
+      139,
+      146,
+      139,
+      145
+     ],
+     "multipart": [
+      50,
+      60,
+      50,
+      52
+     ],
+     "vector": [
+      12,
+      16,
+      12,
+      16
+     ],
+     "array": [
+      8,
+      14,
+      8,
+      12
+     ],
+     "symbolic": [
+      31,
+      34,
+      31,
+      33
+     ],
+     "classification": [
+      12,
+      18,
+      12,
+      18
+     ]
+    }
+   },
+   "T1 arrays: every computed value": {
+    "all": [
+     246,
+     288,
+     244,
+     276
+    ],
+    "by_kind": {
+     "scalar": [
+      139,
+      146,
+      139,
+      145
+     ],
+     "multipart": [
+      50,
+      60,
+      50,
+      52
+     ],
+     "vector": [
+      12,
+      16,
+      12,
+      16
+     ],
+     "array": [
+      10,
+      14,
+      8,
+      12
+     ],
+     "symbolic": [
+      31,
+      34,
+      31,
+      33
+     ],
+     "classification": [
+      4,
+      18,
+      4,
+      18
+     ]
+    }
+   },
+   "T2 targets near zero: no gold last-digit window": {
+    "all": [
+     244,
+     288,
+     244,
+     276
+    ],
+    "by_kind": {
+     "scalar": [
+      139,
+      146,
+      139,
+      145
+     ],
+     "multipart": [
+      50,
+      60,
+      50,
+      52
+     ],
+     "vector": [
+      12,
+      16,
+      12,
+      16
+     ],
+     "array": [
+      8,
+      14,
+      8,
+      12
+     ],
+     "symbolic": [
+      31,
+      34,
+      31,
+      33
+     ],
+     "classification": [
+      4,
+      18,
+      4,
+      18
+     ]
+    }
+   },
+   "T3 every stated part a target": {
+    "all": [
+     244,
+     288,
+     244,
+     276
+    ],
+    "by_kind": {
+     "scalar": [
+      139,
+      146,
+      139,
+      145
+     ],
+     "multipart": [
+      50,
+      60,
+      50,
+      52
+     ],
+     "vector": [
+      10,
+      16,
+      12,
+      16
+     ],
+     "array": [
+      10,
+      14,
+      8,
+      12
+     ],
+     "symbolic": [
+      31,
+      34,
+      31,
+      33
+     ],
+     "classification": [
+      4,
+      18,
+      4,
+      18
+     ]
+    }
+   },
+   "T4 label parts checked": {
+    "all": [
+     244,
+     288,
+     244,
+     276
+    ],
+    "by_kind": {
+     "scalar": [
+      139,
+      146,
+      139,
+      145
+     ],
+     "multipart": [
+      50,
+      60,
+      50,
+      52
+     ],
+     "vector": [
+      12,
+      16,
+      12,
+      16
+     ],
+     "array": [
+      8,
+      14,
+      8,
+      12
+     ],
+     "symbolic": [
+      31,
+      34,
+      31,
+      33
+     ],
+     "classification": [
+      4,
+      18,
+      4,
+      18
+     ]
+    }
+   },
+   "U1 no unit factors": {
+    "all": [
+     236,
+     288,
+     240,
+     276
+    ],
+    "by_kind": {
+     "scalar": [
+      139,
+      146,
+      139,
+      145
+     ],
+     "multipart": [
+      44,
+      60,
+      48,
+      52
+     ],
+     "vector": [
+      10,
+      16,
+      10,
+      16
+     ],
+     "array": [
+      8,
+      14,
+      8,
+      12
+     ],
+     "symbolic": [
+      31,
+      34,
+      31,
+      33
+     ],
+     "classification": [
+      4,
+      18,
+      4,
+      18
+     ]
+    }
+   },
+   "U2 unit factor only where the written unit allows it": {
+    "all": [
+     244,
+     288,
+     244,
+     276
+    ],
+    "by_kind": {
+     "scalar": [
+      139,
+      146,
+      139,
+      145
+     ],
+     "multipart": [
+      50,
+      60,
+      50,
+      52
+     ],
+     "vector": [
+      12,
+      16,
+      12,
+      16
+     ],
+     "array": [
+      8,
+      14,
+      8,
+      12
+     ],
+     "symbolic": [
+      31,
+      34,
+      31,
+      33
+     ],
+     "classification": [
+      4,
+      18,
+      4,
+      18
+     ]
+    }
+   },
+   "S1 absolute-value clause off, signs read": {
+    "all": [
+     244,
+     288,
+     244,
+     276
+    ],
+    "by_kind": {
+     "scalar": [
+      139,
+      146,
+      139,
+      145
+     ],
+     "multipart": [
+      50,
+      60,
+      50,
+      52
+     ],
+     "vector": [
+      12,
+      16,
+      12,
+      16
+     ],
+     "array": [
+      8,
+      14,
+      8,
+      12
+     ],
+     "symbolic": [
+      31,
+      34,
+      31,
+      33
+     ],
+     "classification": [
+      4,
+      18,
+      4,
+      18
+     ]
+    }
+   },
+   "S2 sign policy, signs read": {
+    "all": [
+     244,
+     288,
+     244,
+     276
+    ],
+    "by_kind": {
+     "scalar": [
+      139,
+      146,
+      139,
+      145
+     ],
+     "multipart": [
+      50,
+      60,
+      50,
+      52
+     ],
+     "vector": [
+      12,
+      16,
+      12,
+      16
+     ],
+     "array": [
+      8,
+      14,
+      8,
+      12
+     ],
+     "symbolic": [
+      31,
+      34,
+      31,
+      33
+     ],
+     "classification": [
+      4,
+      18,
+      4,
+      18
+     ]
+    }
+   },
+   "D1 half-unit last-digit windows": {
+    "all": [
+     246,
+     288,
+     246,
+     276
+    ],
+    "by_kind": {
+     "scalar": [
+      141,
+      146,
+      141,
+      145
+     ],
+     "multipart": [
+      50,
+      60,
+      50,
+      52
+     ],
+     "vector": [
+      12,
+      16,
+      12,
+      16
+     ],
+     "array": [
+      8,
+      14,
+      8,
+      12
+     ],
+     "symbolic": [
+      31,
+      34,
+      31,
+      33
+     ],
+     "classification": [
+      4,
+      18,
+      4,
+      18
+     ]
+    }
+   },
+   "Y1 equivalence decides on its five templates": {
+    "all": [
+     242,
+     288,
+     242,
+     276
+    ],
+    "by_kind": {
+     "scalar": [
+      139,
+      146,
+      139,
+      145
+     ],
+     "multipart": [
+      50,
+      60,
+      50,
+      52
+     ],
+     "vector": [
+      12,
+      16,
+      12,
+      16
+     ],
+     "array": [
+      8,
+      14,
+      8,
+      12
+     ],
+     "symbolic": [
+      29,
+      34,
+      29,
+      33
+     ],
+     "classification": [
+      4,
+      18,
+      4,
+      18
+     ]
+    }
+   },
+   "C1 reader and target fixes (R1-R3, R5, T1-T4)": {
+    "all": [
+     260,
+     288,
+     260,
+     276
+    ],
+    "by_kind": {
+     "scalar": [
+      139,
+      146,
+      139,
+      145
+     ],
+     "multipart": [
+      50,
+      60,
+      50,
+      52
+     ],
+     "vector": [
+      14,
+      16,
+      16,
+      16
+     ],
+     "array": [
+      10,
+      14,
+      8,
+      12
+     ],
+     "symbolic": [
+      31,
+      34,
+      31,
+      33
+     ],
+     "classification": [
+      16,
+      18,
+      16,
+      18
+     ]
+    }
+   },
+   "C2 C1 with U2 and S2": {
+    "all": [
+     260,
+     288,
+     260,
+     276
+    ],
+    "by_kind": {
+     "scalar": [
+      139,
+      146,
+      139,
+      145
+     ],
+     "multipart": [
+      50,
+      60,
+      50,
+      52
+     ],
+     "vector": [
+      14,
+      16,
+      16,
+      16
+     ],
+     "array": [
+      10,
+      14,
+      8,
+      12
+     ],
+     "symbolic": [
+      31,
+      34,
+      31,
+      33
+     ],
+     "classification": [
+      16,
+      18,
+      16,
+      18
+     ]
+    }
+   },
+   "C3 C2 with D1 and Y1": {
+    "all": [
+     262,
+     288,
+     260,
+     276
+    ],
+    "by_kind": {
+     "scalar": [
+      141,
+      146,
+      141,
+      145
+     ],
+     "multipart": [
+      50,
+      60,
+      50,
+      52
+     ],
+     "vector": [
+      16,
+      16,
+      16,
+      16
+     ],
+     "array": [
+      10,
+      14,
+      8,
+      12
+     ],
+     "symbolic": [
+      29,
+      34,
+      29,
+      33
+     ],
+     "classification": [
+      16,
+      18,
+      16,
+      18
+     ]
+    }
+   }
+  }
+ },
+ "causes": {
+  "study": {
+   "answer_parts_unchecked": 15,
+   "expert_partial_judgment": 1,
+   "unit_factor_slip": 2,
+   "reader_minus_sign": 2,
+   "last_digit_window": 1
+  },
+  "readings": {
+   "equivalent_form": 4,
+   "value_in_other_role": 4,
+   "array_last_value_only": 2,
+   "expert_partial_judgment": 2,
+   "reader_no_units_stance": 4,
+   "reader_factored_power": 4,
+   "label_rule": 10,
+   "last_digit_window": 4,
+   "gold_rounding": 2,
+   "array_target_index": 4,
+   "tolerance": 2,
+   "contradictory_answer": 2
+  }
+ },
+ "main": {
+  "headline": {
+   "moved": 0,
+   "up": 0,
+   "down": 0,
+   "by_kind": {},
+   "templates": 0,
+   "top_templates": {},
+   "fac": {
+    "gpt-oss-20b": 0.808,
+    "gemma-4-26b-a4b": 0.872,
+    "deepseek-v4.1-flash": 0.9882222222222222,
+    "qwen3-235b-a22b-2507": 0.8991111111111111,
+    "glm-5.3-flash": 0.9722222222222222,
+    "glm-5.3": 0.95,
+    "muse-glimmer-30b": 0.9691111111111111,
+    "kimi-k3": 0.9804444444444445,
+    "gpt-5.4-mini": 0.8517777777777777,
+    "gemini-3.1-flash-lite": 0.8782222222222222,
+    "claude-sonnet-5": 0.9871111111111112
+   },
+   "delta": {
+    "gpt-oss-20b": 0.0,
+    "gemma-4-26b-a4b": 0.0,
+    "deepseek-v4.1-flash": 0.0,
+    "qwen3-235b-a22b-2507": 0.0,
+    "glm-5.3-flash": 0.0,
+    "glm-5.3": 0.0,
+    "muse-glimmer-30b": 0.0,
+    "kimi-k3": 0.0,
+    "gpt-5.4-mini": 0.0,
+    "gemini-3.1-flash-lite": 0.0,
+    "claude-sonnet-5": 0.0
+   },
+   "tau": 1.0
+  },
+  "R1 minus signs read": {
+   "moved": 19,
+   "up": 11,
+   "down": 8,
+   "by_kind": {
+    "multipart down": 1,
+    "symbolic down": 7,
+    "symbolic up": 10,
+    "vector up": 1
+   },
+   "templates": 5,
+   "top_templates": {
+    "cd_dc_system_analysis": 9,
+    "phasor_addition": 5,
+    "undamped_response_initial_conditions": 3,
+    "time_to_phasor": 1,
+    "lorentz_force": 1
+   },
+   "fac": {
+    "gpt-oss-20b": 0.8084444444444444,
+    "gemma-4-26b-a4b": 0.8724444444444445,
+    "deepseek-v4.1-flash": 0.9882222222222222,
+    "qwen3-235b-a22b-2507": 0.8991111111111111,
+    "glm-5.3-flash": 0.9722222222222222,
+    "glm-5.3": 0.95,
+    "muse-glimmer-30b": 0.9691111111111111,
+    "kimi-k3": 0.9804444444444445,
+    "gpt-5.4-mini": 0.852,
+    "gemini-3.1-flash-lite": 0.878,
+    "claude-sonnet-5": 0.9868888888888889
+   },
+   "delta": {
+    "gpt-oss-20b": 0.0004444444444443585,
+    "gemma-4-26b-a4b": 0.0004444444444444695,
+    "deepseek-v4.1-flash": 0.0,
+    "qwen3-235b-a22b-2507": 0.0,
+    "glm-5.3-flash": 0.0,
+    "glm-5.3": 0.0,
+    "muse-glimmer-30b": 0.0,
+    "kimi-k3": 0.0,
+    "gpt-5.4-mini": 0.00022222222222223476,
+    "gemini-3.1-flash-lite": -0.00022222222222223476,
+    "claude-sonnet-5": -0.00022222222222223476
+   },
+   "tau": 1.0
+  },
+  "R2 factored power of ten read": {
+   "moved": 12,
+   "up": 12,
+   "down": 0,
+   "by_kind": {
+    "vector up": 12
+   },
+   "templates": 1,
+   "top_templates": {
+    "lorentz_force": 12
+   },
+   "fac": {
+    "gpt-oss-20b": 0.808,
+    "gemma-4-26b-a4b": 0.8722222222222222,
+    "deepseek-v4.1-flash": 0.9882222222222222,
+    "qwen3-235b-a22b-2507": 0.8991111111111111,
+    "glm-5.3-flash": 0.9726666666666667,
+    "glm-5.3": 0.95,
+    "muse-glimmer-30b": 0.9691111111111111,
+    "kimi-k3": 0.9811111111111112,
+    "gpt-5.4-mini": 0.8517777777777777,
+    "gemini-3.1-flash-lite": 0.8793333333333333,
+    "claude-sonnet-5": 0.9873333333333333
+   },
+   "delta": {
+    "gpt-oss-20b": 0.0,
+    "gemma-4-26b-a4b": 0.00022222222222223476,
+    "deepseek-v4.1-flash": 0.0,
+    "qwen3-235b-a22b-2507": 0.0,
+    "glm-5.3-flash": 0.0004444444444444695,
+    "glm-5.3": 0.0,
+    "muse-glimmer-30b": 0.0,
+    "kimi-k3": 0.0006666666666667043,
+    "gpt-5.4-mini": 0.0,
+    "gemini-3.1-flash-lite": 0.0011111111111110628,
+    "claude-sonnet-5": 0.00022222222222212373
+   },
+   "tau": 1.0
+  },
+  "R3 \"no units\" not read as a stance": {
+   "moved": 2,
+   "up": 2,
+   "down": 0,
+   "by_kind": {
+    "classification up": 2
+   },
+   "templates": 1,
+   "top_templates": {
+    "system_properties_memory_causality": 2
+   },
+   "fac": {
+    "gpt-oss-20b": 0.808,
+    "gemma-4-26b-a4b": 0.872,
+    "deepseek-v4.1-flash": 0.9886666666666667,
+    "qwen3-235b-a22b-2507": 0.8991111111111111,
+    "glm-5.3-flash": 0.9722222222222222,
+    "glm-5.3": 0.95,
+    "muse-glimmer-30b": 0.9691111111111111,
+    "kimi-k3": 0.9804444444444445,
+    "gpt-5.4-mini": 0.8517777777777777,
+    "gemini-3.1-flash-lite": 0.8782222222222222,
+    "claude-sonnet-5": 0.9871111111111112
+   },
+   "delta": {
+    "gpt-oss-20b": 0.0,
+    "gemma-4-26b-a4b": 0.0,
+    "deepseek-v4.1-flash": 0.0004444444444444695,
+    "qwen3-235b-a22b-2507": 0.0,
+    "glm-5.3-flash": 0.0,
+    "glm-5.3": 0.0,
+    "muse-glimmer-30b": 0.0,
+    "kimi-k3": 0.0,
+    "gpt-5.4-mini": 0.0,
+    "gemini-3.1-flash-lite": 0.0,
+    "claude-sonnet-5": 0.0
+   },
+   "tau": 1.0
+  },
+  "R4 label word: first mention": {
+   "moved": 13,
+   "up": 9,
+   "down": 4,
+   "by_kind": {
+    "classification down": 4,
+    "classification up": 9
+   },
+   "templates": 3,
+   "top_templates": {
+    "damping_classification": 7,
+    "reynolds_number_flow_regime": 5,
+    "system_property_linearity": 1
+   },
+   "fac": {
+    "gpt-oss-20b": 0.8082222222222222,
+    "gemma-4-26b-a4b": 0.872,
+    "deepseek-v4.1-flash": 0.988,
+    "qwen3-235b-a22b-2507": 0.8991111111111111,
+    "glm-5.3-flash": 0.9722222222222222,
+    "glm-5.3": 0.95,
+    "muse-glimmer-30b": 0.9695555555555555,
+    "kimi-k3": 0.9813333333333333,
+    "gpt-5.4-mini": 0.8517777777777777,
+    "gemini-3.1-flash-lite": 0.8782222222222222,
+    "claude-sonnet-5": 0.9871111111111112
+   },
+   "delta": {
+    "gpt-oss-20b": 0.00022222222222212373,
+    "gemma-4-26b-a4b": 0.0,
+    "deepseek-v4.1-flash": -0.00022222222222223476,
+    "qwen3-235b-a22b-2507": 0.0,
+    "glm-5.3-flash": 0.0,
+    "glm-5.3": 0.0,
+    "muse-glimmer-30b": 0.0004444444444443585,
+    "kimi-k3": 0.000888888888888828,
+    "gpt-5.4-mini": 0.0,
+    "gemini-3.1-flash-lite": 0.0,
+    "claude-sonnet-5": 0.0
+   },
+   "tau": 1.0
+  },
+  "R5 label word: revised last mention": {
+   "moved": 6,
+   "up": 6,
+   "down": 0,
+   "by_kind": {
+    "classification up": 6
+   },
+   "templates": 3,
+   "top_templates": {
+    "reynolds_number_flow_regime": 3,
+    "system_property_linearity": 2,
+    "damping_classification": 1
+   },
+   "fac": {
+    "gpt-oss-20b": 0.8082222222222222,
+    "gemma-4-26b-a4b": 0.872,
+    "deepseek-v4.1-flash": 0.9882222222222222,
+    "qwen3-235b-a22b-2507": 0.8991111111111111,
+    "glm-5.3-flash": 0.9722222222222222,
+    "glm-5.3": 0.95,
+    "muse-glimmer-30b": 0.9697777777777777,
+    "kimi-k3": 0.9813333333333333,
+    "gpt-5.4-mini": 0.8517777777777777,
+    "gemini-3.1-flash-lite": 0.8782222222222222,
+    "claude-sonnet-5": 0.9871111111111112
+   },
+   "delta": {
+    "gpt-oss-20b": 0.00022222222222212373,
+    "gemma-4-26b-a4b": 0.0,
+    "deepseek-v4.1-flash": 0.0,
+    "qwen3-235b-a22b-2507": 0.0,
+    "glm-5.3-flash": 0.0,
+    "glm-5.3": 0.0,
+    "muse-glimmer-30b": 0.0006666666666665932,
+    "kimi-k3": 0.000888888888888828,
+    "gpt-5.4-mini": 0.0,
+    "gemini-3.1-flash-lite": 0.0,
+    "claude-sonnet-5": 0.0
+   },
+   "tau": 1.0
+  },
+  "T1 arrays: every computed value": {
+   "moved": 51,
+   "up": 17,
+   "down": 34,
+   "by_kind": {
+    "array down": 34,
+    "array up": 17
+   },
+   "templates": 4,
+   "top_templates": {
+    "levenspiel_plot_interpretation": 25,
+    "vdw_solve_for_volume": 18,
+    "finite_convolution": 4,
+    "standing_wave_formation": 4
+   },
+   "fac": {
+    "gpt-oss-20b": 0.808,
+    "gemma-4-26b-a4b": 0.8702222222222222,
+    "deepseek-v4.1-flash": 0.9884444444444445,
+    "qwen3-235b-a22b-2507": 0.8995555555555556,
+    "glm-5.3-flash": 0.9722222222222222,
+    "glm-5.3": 0.9502222222222222,
+    "muse-glimmer-30b": 0.9693333333333334,
+    "kimi-k3": 0.9804444444444445,
+    "gpt-5.4-mini": 0.8511111111111112,
+    "gemini-3.1-flash-lite": 0.8762222222222222,
+    "claude-sonnet-5": 0.9866666666666667
+   },
+   "delta": {
+    "gpt-oss-20b": 0.0,
+    "gemma-4-26b-a4b": -0.001777777777777767,
+    "deepseek-v4.1-flash": 0.00022222222222223476,
+    "qwen3-235b-a22b-2507": 0.0004444444444444695,
+    "glm-5.3-flash": 0.0,
+    "glm-5.3": 0.00022222222222223476,
+    "muse-glimmer-30b": 0.00022222222222223476,
+    "kimi-k3": 0.0,
+    "gpt-5.4-mini": -0.0006666666666665932,
+    "gemini-3.1-flash-lite": -0.0020000000000000018,
+    "claude-sonnet-5": -0.0004444444444444695
+   },
+   "tau": 1.0
+  },
+  "T2 targets near zero: no gold last-digit window": {
+   "moved": 15,
+   "up": 0,
+   "down": 15,
+   "by_kind": {
+    "array down": 6,
+    "vector down": 9
+   },
+   "templates": 2,
+   "top_templates": {
+    "vorticity_check": 9,
+    "signal_operations": 6
+   },
+   "fac": {
+    "gpt-oss-20b": 0.8066666666666666,
+    "gemma-4-26b-a4b": 0.8715555555555555,
+    "deepseek-v4.1-flash": 0.9877777777777778,
+    "qwen3-235b-a22b-2507": 0.8986666666666666,
+    "glm-5.3-flash": 0.9717777777777777,
+    "glm-5.3": 0.9495555555555556,
+    "muse-glimmer-30b": 0.9686666666666667,
+    "kimi-k3": 0.98,
+    "gpt-5.4-mini": 0.8504444444444444,
+    "gemini-3.1-flash-lite": 0.8777777777777778,
+    "claude-sonnet-5": 0.9866666666666667
+   },
+   "delta": {
+    "gpt-oss-20b": -0.0013333333333334085,
+    "gemma-4-26b-a4b": -0.0004444444444444695,
+    "deepseek-v4.1-flash": -0.0004444444444444695,
+    "qwen3-235b-a22b-2507": -0.0004444444444444695,
+    "glm-5.3-flash": -0.0004444444444444695,
+    "glm-5.3": -0.0004444444444443585,
+    "muse-glimmer-30b": -0.0004444444444444695,
+    "kimi-k3": -0.0004444444444444695,
+    "gpt-5.4-mini": -0.0013333333333332975,
+    "gemini-3.1-flash-lite": -0.0004444444444444695,
+    "claude-sonnet-5": -0.0004444444444444695
+   },
+   "tau": 1.0
+  },
+  "T3 every stated part a target": {
+   "moved": 90,
+   "up": 29,
+   "down": 61,
+   "by_kind": {
+    "array down": 34,
+    "array up": 13,
+    "multipart down": 3,
+    "symbolic down": 7,
+    "symbolic up": 10,
+    "vector down": 17,
+    "vector up": 6
+   },
+   "templates": 12,
+   "top_templates": {
+    "levenspiel_plot_interpretation": 25,
+    "vdw_solve_for_volume": 18,
+    "superposition_electric_field": 13,
+    "cd_dc_system_analysis": 9,
+    "coulombs_law": 8,
+    "phasor_addition": 5,
+    "standing_wave_formation": 4,
+    "undamped_response_initial_conditions": 3
+   },
+   "fac": {
+    "gpt-oss-20b": 0.8077777777777778,
+    "gemma-4-26b-a4b": 0.8695555555555555,
+    "deepseek-v4.1-flash": 0.9884444444444445,
+    "qwen3-235b-a22b-2507": 0.8984444444444445,
+    "glm-5.3-flash": 0.9722222222222222,
+    "glm-5.3": 0.9497777777777778,
+    "muse-glimmer-30b": 0.9686666666666667,
+    "kimi-k3": 0.9804444444444445,
+    "gpt-5.4-mini": 0.8511111111111112,
+    "gemini-3.1-flash-lite": 0.8762222222222222,
+    "claude-sonnet-5": 0.9864444444444445
+   },
+   "delta": {
+    "gpt-oss-20b": -0.00022222222222223476,
+    "gemma-4-26b-a4b": -0.0024444444444444713,
+    "deepseek-v4.1-flash": 0.00022222222222223476,
+    "qwen3-235b-a22b-2507": -0.0006666666666665932,
+    "glm-5.3-flash": 0.0,
+    "glm-5.3": -0.00022222222222212373,
+    "muse-glimmer-30b": -0.0004444444444444695,
+    "kimi-k3": 0.0,
+    "gpt-5.4-mini": -0.0006666666666665932,
+    "gemini-3.1-flash-lite": -0.0020000000000000018,
+    "claude-sonnet-5": -0.0006666666666667043
+   },
+   "tau": 1.0
+  },
+  "T4 label parts checked": {
+   "moved": 41,
+   "up": 0,
+   "down": 41,
+   "by_kind": {
+    "multipart down": 41
+   },
+   "templates": 2,
+   "top_templates": {
+    "limiting_reactant": 27,
+    "decimation_aliasing_analysis": 14
+   },
+   "fac": {
+    "gpt-oss-20b": 0.8051111111111111,
+    "gemma-4-26b-a4b": 0.872,
+    "deepseek-v4.1-flash": 0.9873333333333333,
+    "qwen3-235b-a22b-2507": 0.8944444444444445,
+    "glm-5.3-flash": 0.9722222222222222,
+    "glm-5.3": 0.95,
+    "muse-glimmer-30b": 0.9691111111111111,
+    "kimi-k3": 0.9802222222222222,
+    "gpt-5.4-mini": 0.8517777777777777,
+    "gemini-3.1-flash-lite": 0.8777777777777778,
+    "claude-sonnet-5": 0.9871111111111112
+   },
+   "delta": {
+    "gpt-oss-20b": -0.002888888888888941,
+    "gemma-4-26b-a4b": 0.0,
+    "deepseek-v4.1-flash": -0.000888888888888939,
+    "qwen3-235b-a22b-2507": -0.004666666666666597,
+    "glm-5.3-flash": 0.0,
+    "glm-5.3": 0.0,
+    "muse-glimmer-30b": 0.0,
+    "kimi-k3": -0.00022222222222223476,
+    "gpt-5.4-mini": 0.0,
+    "gemini-3.1-flash-lite": -0.0004444444444444695,
+    "claude-sonnet-5": 0.0
+   },
+   "tau": 1.0
+  },
+  "U1 no unit factors": {
+   "moved": 825,
+   "up": 0,
+   "down": 825,
+   "by_kind": {
+    "array down": 1,
+    "multipart down": 444,
+    "scalar down": 259,
+    "symbolic down": 3,
+    "vector down": 118
+   },
+   "templates": 34,
+   "top_templates": {
+    "basic_buoyant_force": 120,
+    "bpsk_energy_basis": 111,
+    "wave_equation_interpretation": 82,
+    "wave_parameters_basic": 80,
+    "gauss_law_symmetric": 57,
+    "hydrostatic_force_on_plane": 57,
+    "euclidean_distance_binary": 52,
+    "utube_manometer": 48
+   },
+   "fac": {
+    "gpt-oss-20b": 0.7817777777777778,
+    "gemma-4-26b-a4b": 0.8384444444444444,
+    "deepseek-v4.1-flash": 0.9668888888888889,
+    "qwen3-235b-a22b-2507": 0.8491111111111111,
+    "glm-5.3-flash": 0.96,
+    "glm-5.3": 0.9308888888888889,
+    "muse-glimmer-30b": 0.9533333333333334,
+    "kimi-k3": 0.9622222222222222,
+    "gpt-5.4-mini": 0.8195555555555556,
+    "gemini-3.1-flash-lite": 0.8453333333333334,
+    "claude-sonnet-5": 0.9673333333333334
+   },
+   "delta": {
+    "gpt-oss-20b": -0.026222222222222258,
+    "gemma-4-26b-a4b": -0.03355555555555556,
+    "deepseek-v4.1-flash": -0.021333333333333315,
+    "qwen3-235b-a22b-2507": -0.04999999999999993,
+    "glm-5.3-flash": -0.012222222222222245,
+    "glm-5.3": -0.01911111111111108,
+    "muse-glimmer-30b": -0.01577777777777778,
+    "kimi-k3": -0.01822222222222225,
+    "gpt-5.4-mini": -0.03222222222222215,
+    "gemini-3.1-flash-lite": -0.032888888888888856,
+    "claude-sonnet-5": -0.019777777777777783
+   },
+   "tau": 0.9636363636363636
+  },
+  "U2 unit factor only where the written unit allows it": {
+   "moved": 9,
+   "up": 0,
+   "down": 9,
+   "by_kind": {
+    "array down": 1,
+    "multipart down": 1,
+    "scalar down": 3,
+    "vector down": 4
+   },
+   "templates": 6,
+   "top_templates": {
+    "lorentz_force": 4,
+    "virtual_work_truss_deflection": 1,
+    "hagen_poiseuille_flowrate": 1,
+    "beam_deflection_formula": 1,
+    "power_law_fluid_shear": 1,
+    "vdw_solve_for_volume": 1
+   },
+   "fac": {
+    "gpt-oss-20b": 0.8068888888888889,
+    "gemma-4-26b-a4b": 0.8717777777777778,
+    "deepseek-v4.1-flash": 0.9877777777777778,
+    "qwen3-235b-a22b-2507": 0.8991111111111111,
+    "glm-5.3-flash": 0.9722222222222222,
+    "glm-5.3": 0.95,
+    "muse-glimmer-30b": 0.9691111111111111,
+    "kimi-k3": 0.9804444444444445,
+    "gpt-5.4-mini": 0.8511111111111112,
+    "gemini-3.1-flash-lite": 0.8777777777777778,
+    "claude-sonnet-5": 0.9871111111111112
+   },
+   "delta": {
+    "gpt-oss-20b": -0.0011111111111111738,
+    "gemma-4-26b-a4b": -0.00022222222222223476,
+    "deepseek-v4.1-flash": -0.0004444444444444695,
+    "qwen3-235b-a22b-2507": 0.0,
+    "glm-5.3-flash": 0.0,
+    "glm-5.3": 0.0,
+    "muse-glimmer-30b": 0.0,
+    "kimi-k3": 0.0,
+    "gpt-5.4-mini": -0.0006666666666665932,
+    "gemini-3.1-flash-lite": -0.0004444444444444695,
+    "claude-sonnet-5": 0.0
+   },
+   "tau": 1.0
+  },
+  "S1 absolute-value clause off, signs read": {
+   "moved": 63,
+   "up": 11,
+   "down": 52,
+   "by_kind": {
+    "multipart down": 29,
+    "scalar down": 8,
+    "symbolic down": 11,
+    "symbolic up": 10,
+    "vector down": 4,
+    "vector up": 1
+   },
+   "templates": 14,
+   "top_templates": {
+    "statically_indeterminate": 21,
+    "cd_dc_system_analysis": 9,
+    "multi_segment_rod": 5,
+    "phasor_addition": 5,
+    "poissons_ratio": 4,
+    "incompressible_continuity": 3,
+    "cantilever_double_integration": 3,
+    "time_to_phasor": 3
+   },
+   "fac": {
+    "gpt-oss-20b": 0.8051111111111111,
+    "gemma-4-26b-a4b": 0.8708888888888889,
+    "deepseek-v4.1-flash": 0.9882222222222222,
+    "qwen3-235b-a22b-2507": 0.898,
+    "glm-5.3-flash": 0.972,
+    "glm-5.3": 0.95,
+    "muse-glimmer-30b": 0.9686666666666667,
+    "kimi-k3": 0.9788888888888889,
+    "gpt-5.4-mini": 0.8482222222222222,
+    "gemini-3.1-flash-lite": 0.8762222222222222,
+    "claude-sonnet-5": 0.9868888888888889
+   },
+   "delta": {
+    "gpt-oss-20b": -0.002888888888888941,
+    "gemma-4-26b-a4b": -0.0011111111111110628,
+    "deepseek-v4.1-flash": 0.0,
+    "qwen3-235b-a22b-2507": -0.0011111111111110628,
+    "glm-5.3-flash": -0.00022222222222223476,
+    "glm-5.3": 0.0,
+    "muse-glimmer-30b": -0.0004444444444444695,
+    "kimi-k3": -0.0015555555555555323,
+    "gpt-5.4-mini": -0.003555555555555534,
+    "gemini-3.1-flash-lite": -0.0020000000000000018,
+    "claude-sonnet-5": -0.00022222222222223476
+   },
+   "tau": 1.0
+  },
+  "S2 sign policy, signs read": {
+   "moved": 45,
+   "up": 11,
+   "down": 34,
+   "by_kind": {
+    "multipart down": 17,
+    "scalar down": 2,
+    "symbolic down": 11,
+    "symbolic up": 10,
+    "vector down": 4,
+    "vector up": 1
+   },
+   "templates": 12,
+   "top_templates": {
+    "statically_indeterminate": 10,
+    "cd_dc_system_analysis": 9,
+    "phasor_addition": 5,
+    "poissons_ratio": 4,
+    "incompressible_continuity": 3,
+    "time_to_phasor": 3,
+    "undamped_response_initial_conditions": 3,
+    "multi_segment_rod": 2
+   },
+   "fac": {
+    "gpt-oss-20b": 0.806,
+    "gemma-4-26b-a4b": 0.8713333333333333,
+    "deepseek-v4.1-flash": 0.9882222222222222,
+    "qwen3-235b-a22b-2507": 0.8986666666666666,
+    "glm-5.3-flash": 0.9722222222222222,
+    "glm-5.3": 0.95,
+    "muse-glimmer-30b": 0.9691111111111111,
+    "kimi-k3": 0.9804444444444445,
+    "gpt-5.4-mini": 0.8491111111111111,
+    "gemini-3.1-flash-lite": 0.8764444444444445,
+    "claude-sonnet-5": 0.9868888888888889
+   },
+   "delta": {
+    "gpt-oss-20b": -0.0020000000000000018,
+    "gemma-4-26b-a4b": -0.0006666666666667043,
+    "deepseek-v4.1-flash": 0.0,
+    "qwen3-235b-a22b-2507": -0.0004444444444444695,
+    "glm-5.3-flash": 0.0,
+    "glm-5.3": 0.0,
+    "muse-glimmer-30b": 0.0,
+    "kimi-k3": 0.0,
+    "gpt-5.4-mini": -0.002666666666666595,
+    "gemini-3.1-flash-lite": -0.001777777777777767,
+    "claude-sonnet-5": -0.00022222222222223476
+   },
+   "tau": 1.0
+  },
+  "D1 half-unit last-digit windows": {
+   "moved": 298,
+   "up": 0,
+   "down": 298,
+   "by_kind": {
+    "array down": 19,
+    "classification down": 6,
+    "multipart down": 48,
+    "scalar down": 207,
+    "symbolic down": 5,
+    "vector down": 13
+   },
+   "templates": 74,
+   "top_templates": {
+    "mmc_waiting_time": 17,
+    "scs_curve_number_runoff": 17,
+    "rational_method_peak_flow": 13,
+    "manning_trapezoidal_velocity": 11,
+    "hydraulic_jump_energy_loss": 10,
+    "finite_convolution": 9,
+    "pfr_volume_changing_rate": 8,
+    "upward_seepage_quick_condition": 8
+   },
+   "fac": {
+    "gpt-oss-20b": 0.7822222222222223,
+    "gemma-4-26b-a4b": 0.8575555555555555,
+    "deepseek-v4.1-flash": 0.9855555555555555,
+    "qwen3-235b-a22b-2507": 0.8906666666666667,
+    "glm-5.3-flash": 0.9686666666666667,
+    "glm-5.3": 0.9455555555555556,
+    "muse-glimmer-30b": 0.9546666666666667,
+    "kimi-k3": 0.9773333333333334,
+    "gpt-5.4-mini": 0.8204444444444444,
+    "gemini-3.1-flash-lite": 0.8717777777777778,
+    "claude-sonnet-5": 0.9813333333333333
+   },
+   "delta": {
+    "gpt-oss-20b": -0.02577777777777779,
+    "gemma-4-26b-a4b": -0.014444444444444482,
+    "deepseek-v4.1-flash": -0.002666666666666706,
+    "qwen3-235b-a22b-2507": -0.008444444444444366,
+    "glm-5.3-flash": -0.003555555555555534,
+    "glm-5.3": -0.004444444444444362,
+    "muse-glimmer-30b": -0.014444444444444482,
+    "kimi-k3": -0.0031111111111110645,
+    "gpt-5.4-mini": -0.031333333333333324,
+    "gemini-3.1-flash-lite": -0.006444444444444475,
+    "claude-sonnet-5": -0.005777777777777882
+   },
+   "tau": 1.0
+  },
+  "Y1 equivalence decides on its five templates": {
+   "moved": 34,
+   "up": 0,
+   "down": 34,
+   "by_kind": {
+    "symbolic down": 34
+   },
+   "templates": 5,
+   "top_templates": {
+    "cd_dc_system_analysis": 19,
+    "impulse_response_from_lccde": 6,
+    "ber_estimation_mary": 4,
+    "autocorrelation_rect_pulse": 3,
+    "incompressible_continuity": 2
+   },
+   "fac": {
+    "gpt-oss-20b": 0.8057777777777778,
+    "gemma-4-26b-a4b": 0.872,
+    "deepseek-v4.1-flash": 0.9882222222222222,
+    "qwen3-235b-a22b-2507": 0.8973333333333333,
+    "glm-5.3-flash": 0.9708888888888889,
+    "glm-5.3": 0.9486666666666667,
+    "muse-glimmer-30b": 0.966,
+    "kimi-k3": 0.9804444444444445,
+    "gpt-5.4-mini": 0.8477777777777777,
+    "gemini-3.1-flash-lite": 0.8768888888888889,
+    "claude-sonnet-5": 0.9871111111111112
+   },
+   "delta": {
+    "gpt-oss-20b": -0.0022222222222222365,
+    "gemma-4-26b-a4b": 0.0,
+    "deepseek-v4.1-flash": 0.0,
+    "qwen3-235b-a22b-2507": -0.001777777777777767,
+    "glm-5.3-flash": -0.0013333333333332975,
+    "glm-5.3": -0.0013333333333332975,
+    "muse-glimmer-30b": -0.0031111111111111756,
+    "kimi-k3": 0.0,
+    "gpt-5.4-mini": -0.0040000000000000036,
+    "gemini-3.1-flash-lite": -0.0013333333333332975,
+    "claude-sonnet-5": 0.0
+   },
+   "tau": 1.0
+  },
+  "C1 reader and target fixes (R1-R3, R5, T1-T4)": {
+   "moved": 170,
+   "up": 53,
+   "down": 117,
+   "by_kind": {
+    "array down": 40,
+    "array up": 17,
+    "classification up": 8,
+    "multipart down": 44,
+    "symbolic down": 7,
+    "symbolic up": 10,
+    "vector down": 26,
+    "vector up": 18
+   },
+   "templates": 21,
+   "top_templates": {
+    "limiting_reactant": 27,
+    "levenspiel_plot_interpretation": 25,
+    "vdw_solve_for_volume": 18,
+    "decimation_aliasing_analysis": 14,
+    "superposition_electric_field": 13,
+    "lorentz_force": 13,
+    "cd_dc_system_analysis": 9,
+    "vorticity_check": 9
+   },
+   "fac": {
+    "gpt-oss-20b": 0.804,
+    "gemma-4-26b-a4b": 0.8695555555555555,
+    "deepseek-v4.1-flash": 0.9877777777777778,
+    "qwen3-235b-a22b-2507": 0.8937777777777778,
+    "glm-5.3-flash": 0.9724444444444444,
+    "glm-5.3": 0.9497777777777778,
+    "muse-glimmer-30b": 0.9691111111111111,
+    "kimi-k3": 0.9815555555555555,
+    "gpt-5.4-mini": 0.85,
+    "gemini-3.1-flash-lite": 0.8766666666666667,
+    "claude-sonnet-5": 0.9864444444444445
+   },
+   "delta": {
+    "gpt-oss-20b": -0.0040000000000000036,
+    "gemma-4-26b-a4b": -0.0024444444444444713,
+    "deepseek-v4.1-flash": -0.0004444444444444695,
+    "qwen3-235b-a22b-2507": -0.005333333333333301,
+    "glm-5.3-flash": 0.00022222222222223476,
+    "glm-5.3": -0.00022222222222212373,
+    "muse-glimmer-30b": 0.0,
+    "kimi-k3": 0.0011111111111110628,
+    "gpt-5.4-mini": -0.001777777777777767,
+    "gemini-3.1-flash-lite": -0.0015555555555555323,
+    "claude-sonnet-5": -0.0006666666666667043
+   },
+   "tau": 1.0
+  },
+  "C2 C1 with U2 and S2": {
+   "moved": 218,
+   "up": 53,
+   "down": 165,
+   "by_kind": {
+    "array down": 51,
+    "array up": 17,
+    "classification up": 8,
+    "multipart down": 63,
+    "scalar down": 5,
+    "symbolic down": 11,
+    "symbolic up": 10,
+    "vector down": 35,
+    "vector up": 18
+   },
+   "templates": 30,
+   "top_templates": {
+    "limiting_reactant": 27,
+    "levenspiel_plot_interpretation": 25,
+    "vdw_solve_for_volume": 18,
+    "lorentz_force": 17,
+    "finite_convolution": 15,
+    "decimation_aliasing_analysis": 14,
+    "superposition_electric_field": 13,
+    "statically_indeterminate": 12
+   },
+   "fac": {
+    "gpt-oss-20b": 0.8002222222222222,
+    "gemma-4-26b-a4b": 0.868,
+    "deepseek-v4.1-flash": 0.9871111111111112,
+    "qwen3-235b-a22b-2507": 0.8928888888888888,
+    "glm-5.3-flash": 0.9722222222222222,
+    "glm-5.3": 0.9495555555555556,
+    "muse-glimmer-30b": 0.9688888888888889,
+    "kimi-k3": 0.9813333333333333,
+    "gpt-5.4-mini": 0.8464444444444444,
+    "gemini-3.1-flash-lite": 0.8744444444444445,
+    "claude-sonnet-5": 0.9862222222222222
+   },
+   "delta": {
+    "gpt-oss-20b": -0.007777777777777883,
+    "gemma-4-26b-a4b": -0.0040000000000000036,
+    "deepseek-v4.1-flash": -0.0011111111111110628,
+    "qwen3-235b-a22b-2507": -0.00622222222222224,
+    "glm-5.3-flash": 0.0,
+    "glm-5.3": -0.0004444444444443585,
+    "muse-glimmer-30b": -0.00022222222222223476,
+    "kimi-k3": 0.000888888888888828,
+    "gpt-5.4-mini": -0.005333333333333301,
+    "gemini-3.1-flash-lite": -0.003777777777777769,
+    "claude-sonnet-5": -0.000888888888888939
+   },
+   "tau": 1.0
+  },
+  "C3 C2 with D1 and Y1": {
+   "moved": 559,
+   "up": 35,
+   "down": 524,
+   "by_kind": {
+    "array down": 80,
+    "array up": 9,
+    "classification down": 6,
+    "classification up": 8,
+    "multipart down": 113,
+    "scalar down": 212,
+    "symbolic down": 57,
+    "symbolic up": 1,
+    "vector down": 56,
+    "vector up": 17
+   },
+   "templates": 87,
+   "top_templates": {
+    "cd_dc_system_analysis": 28,
+    "levenspiel_plot_interpretation": 27,
+    "limiting_reactant": 27,
+    "finite_convolution": 23,
+    "superposition_electric_field": 23,
+    "lorentz_force": 19,
+    "mmc_waiting_time": 17,
+    "scs_curve_number_runoff": 17
+   },
+   "fac": {
+    "gpt-oss-20b": 0.7706666666666667,
+    "gemma-4-26b-a4b": 0.8517777777777777,
+    "deepseek-v4.1-flash": 0.9844444444444445,
+    "qwen3-235b-a22b-2507": 0.8808888888888889,
+    "glm-5.3-flash": 0.9673333333333334,
+    "glm-5.3": 0.9435555555555556,
+    "muse-glimmer-30b": 0.9506666666666667,
+    "kimi-k3": 0.9782222222222222,
+    "gpt-5.4-mini": 0.8115555555555556,
+    "gemini-3.1-flash-lite": 0.8666666666666667,
+    "claude-sonnet-5": 0.9791111111111112
+   },
+   "delta": {
+    "gpt-oss-20b": -0.03733333333333333,
+    "gemma-4-26b-a4b": -0.020222222222222253,
+    "deepseek-v4.1-flash": -0.003777777777777769,
+    "qwen3-235b-a22b-2507": -0.01822222222222214,
+    "glm-5.3-flash": -0.0048888888888888316,
+    "glm-5.3": -0.006444444444444364,
+    "muse-glimmer-30b": -0.018444444444444485,
+    "kimi-k3": -0.0022222222222222365,
+    "gpt-5.4-mini": -0.04022222222222216,
+    "gemini-3.1-flash-lite": -0.011555555555555541,
+    "claude-sonnet-5": -0.008000000000000007
+   },
+   "tau": 1.0
+  }
+ },
+ "paths": {
+  "scalar|eps": 10203,
+  "scalar|digit": 881,
+  "scalar|rendering": 60,
+  "multipart|exact": 254,
+  "symbolic|eps": 1161,
+  "symbolic|words or labels": 81,
+  "scalar|unit": 259,
+  "scalar|exact": 1897,
+  "multipart|eps": 3896,
+  "multipart|digit": 393,
+  "multipart|unit": 451,
+  "symbolic|digit": 52,
+  "symbolic|sign": 116,
+  "vector|eps": 972,
+  "vector|digit": 94,
+  "classification|digit": 76,
+  "classification|eps": 397,
+  "array|eps": 789,
+  "vector|unit": 104,
+  "scalar|sign": 87,
+  "symbolic|unit": 28,
+  "array|digit": 58,
+  "array|exact": 163,
+  "multipart|sign": 112,
+  "vector|sign": 112,
+  "classification|words or labels": 323,
+  "array|sign": 15,
+  "array|unit": 1
+ },
+ "coverage": {
+  "an array scored on its last value": {
+   "items": 58,
+   "templates": 4,
+   "by_kind": {
+    "array": [
+     58,
+     4
+    ]
+   },
+   "template_list": [
+    "finite_convolution",
+    "levenspiel_plot_interpretation",
+    "standing_wave_formation",
+    "vdw_solve_for_volume"
+   ]
+  },
+  "a stated part that is not a target: a computed value the last-value rule drops": {
+   "items": 44,
+   "templates": 4,
+   "by_kind": {
+    "array": [
+     44,
+     4
+    ]
+   },
+   "template_list": [
+    "finite_convolution",
+    "levenspiel_plot_interpretation",
+    "standing_wave_formation",
+    "vdw_solve_for_volume"
+   ]
+  },
+  "a label part the question asks for, not checked": {
+   "items": 90,
+   "templates": 6,
+   "by_kind": {
+    "multipart": [
+     75,
+     5
+    ],
+    "vector": [
+     15,
+     1
+    ]
+   },
+   "template_list": [
+    "decimation_aliasing_analysis",
+    "limiting_reactant",
+    "signal_energy_power",
+    "system_properties",
+    "vorticity_check",
+    "wave_equation_interpretation"
+   ]
+  },
+  "a question naming one value to report among other requested results": {
+   "items": 360,
+   "templates": 24,
+   "by_kind": {
+    "classification": [
+     15,
+     1
+    ],
+    "scalar": [
+     270,
+     18
+    ],
+    "multipart": [
+     60,
+     4
+    ],
+    "array": [
+     15,
+     1
+    ]
+   },
+   "template_list": [
+    "absorbing_chain_time_to_failure",
+    "aoq_ati_rectifying",
+    "arl_beta_mean_shift",
+    "basic_eoq",
+    "c_chart_revision",
+    "chart_pair_selection",
+    "chase_vs_level_aggregate",
+    "cp_cpk_from_specs",
+    "critical_depth_froude_classification",
+    "epq_finite_production",
+    "line_balancing_heuristic",
+    "mm1_time_in_system",
+    "mm1k_finite_capacity",
+    "mmc_waiting_time",
+    "newsvendor_normal_demand",
+    "p_chart_limits_floor",
+    "poisson_event_count",
+    "qr_policy_one_iteration",
+    "safety_stock_reorder_point",
+    "server_configuration_selection",
+    "sigma_reduction_for_cpk",
+    "takt_time_line_efficiency",
+    "xbar_known_sigma_classification",
+    "xbar_r_control_limits"
+   ]
+  },
+  "a target lies within its own last-digit window of zero": {
+   "items": 15,
+   "templates": 6,
+   "by_kind": {
+    "multipart": [
+     3,
+     2
+    ],
+    "vector": [
+     5,
+     2
+    ],
+    "symbolic": [
+     4,
+     1
+    ],
+    "array": [
+     3,
+     1
+    ]
+   },
+   "template_list": [
+    "coulombs_law",
+    "decimation_aliasing_analysis",
+    "impulse_response_from_lccde",
+    "lowpass_equivalent_bandpass",
+    "signal_operations",
+    "vorticity_check"
+   ]
+  },
+  "a stated part that is not a target: a value not among the computed values": {
+   "items": 85,
+   "templates": 7,
+   "by_kind": {
+    "vector": [
+     41,
+     3
+    ],
+    "array": [
+     26,
+     2
+    ],
+    "multipart": [
+     18,
+     2
+    ]
+   },
+   "template_list": [
+    "coulombs_law",
+    "finite_convolution",
+    "gauss_law_symmetric",
+    "standing_wave_formation",
+    "superposition_electric_field",
+    "undamped_natural_frequency_torsional",
+    "wave_parameters_basic"
+   ]
+  },
+  "a stated part that is not a target: a minus the reader does not join to its number": {
+   "items": 21,
+   "templates": 2,
+   "by_kind": {
+    "vector": [
+     13,
+     1
+    ],
+    "multipart": [
+     8,
+     1
+    ]
+   },
+   "template_list": [
+    "lorentz_force",
+    "time_to_phasor"
+   ]
+  },
+  "an array whose gold line lists indices beside the values": {
+   "items": 13,
+   "templates": 1,
+   "by_kind": {
+    "array": [
+     13,
+     1
+    ]
+   },
+   "template_list": [
+    "finite_convolution"
+   ]
+  },
+  "a stated part that is not a target: a magnitude with its sign in words (the computed value is negative)": {
+   "items": 17,
+   "templates": 2,
+   "by_kind": {
+    "array": [
+     2,
+     1
+    ],
+    "multipart": [
+     15,
+     1
+    ]
+   },
+   "template_list": [
+    "finite_convolution",
+    "statically_indeterminate"
+   ]
+  },
+  "_reasons_by_template": {
+   "a computed value the last-value rule drops": {
+    "template_standing_wave_formation": 15,
+    "template_levenspiel_plot_interpretation": 14,
+    "template_vdw_solve_for_volume": 14,
+    "template_finite_convolution": 1
+   },
+   "a value not among the computed values": {
+    "template_standing_wave_formation": 57,
+    "template_coulombs_law": 20,
+    "template_superposition_electric_field": 15,
+    "template_wave_parameters_basic": 15,
+    "template_gauss_law_symmetric": 13,
+    "template_finite_convolution": 13,
+    "template_undamped_natural_frequency_torsional": 3
+   },
+   "a minus the reader does not join to its number": {
+    "template_lorentz_force": 19,
+    "template_time_to_phasor": 8
+   },
+   "a magnitude with its sign in words (the computed value is negative)": {
+    "template_statically_indeterminate": 15,
+    "template_finite_convolution": 2
+   }
+  }
+ }
+}

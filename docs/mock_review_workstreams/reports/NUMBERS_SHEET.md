@@ -366,6 +366,38 @@ Source: `full_run_28092026/SCORER_VALIDATION.md (the "now" column)`.
 Source: `full_run_28092026/EXPERT_REQUEST.md: B1 now, B3 now (the readings the store still holds; B1 against the current verdicts)`.
 
 
+### The final-answer check by answer kind (tab:answer_kinds) and its discrepancies
+
+
+| answer kind | study responses | three-way | not partial | readings agreeing |
+|---|---|---|---|---|
+| scalar | 60 | 1.000 | 1.000 | 139 of 146 |
+| multipart | 80 | 0.800 | 0.985 | 50 of 60 |
+| vector | 60 | 0.933 | 0.949 | 12 of 16 |
+| array | 20 | 1.000 | 1.000 | 8 of 14 |
+| symbolic | 40 | 1.000 | 1.000 | 31 of 34 |
+| classification | 40 | 0.975 | 1.000 | 4 of 18 |
+
+Source: `full_run_28092026/results/answer_audit_paper.json (answer_audit.py --write)`.
+
+- Readings that differ from the check: the check credits less / more / experts split or judge partial credit: **44: 28 / 12 / 4** (`full_run_28092026/results/answer_audit_paper.json (answer_audit.py --write)`)
+
+| check > experts | causes (readings) |
+|---|---|
+| partial>correct | label_rule 6, equivalent_form 4, reader_no_units_stance 4, reader_factored_power 4 |
+| partial>incorrect | value_in_other_role 4, tolerance 2, contradictory_answer 2, expert_partial_judgment 1 |
+| incorrect>partial | array_last_value_only 2, expert_partial_judgment 1 |
+| correct>incorrect | last_digit_window 4, gold_rounding 2 |
+| incorrect>correct | array_target_index 4, label_rule 4 |
+
+Source: `full_run_28092026/results/answer_audit_paper.json (answer_audit.py --write)`.
+
+- Templates of other kinds whose question also asks for a label no target checks: **6** (`full_run_28092026/results/answer_audit_paper.json (answer_audit.py --write)`)
+- Every stated part and label part a target, unit factor only where the written unit allows it, absolute value only where the sign is a convention, targets near zero without their window, notation and label wording read: largest FAC change; bound; tau; verdicts moved: **-0.0078; no more than 0.008; 1.000; 218** (`full_run_28092026/results/answer_audit_paper.json (answer_audit.py --write) from results/answer_audit.json`)
+- Requiring a correct rounding (half a unit): largest FAC change; rounded; tau; verdicts moved: **-0.0313; 0.031; 1.000; 298** (`full_run_28092026/results/answer_audit_paper.json (answer_audit.py --write) from results/answer_audit.json`)
+- tab:answer_cases, credited more than the experts (their readings are in the generated table, not here): **mm1k_finite_capacity#1: 3.44 for 3.45 (unrounded 3.4475); check correct** (`full_run_28092026/results/answer_audit_paper.json (answer_audit.py --write)`)
+- tab:answer_cases, credited less than the experts (their readings are in the generated table, not here): **decimation_aliasing_analysis#15: cos(pi n/8) for cos(15 pi n/8); check partial (1 of 3)** (`full_run_28092026/results/answer_audit_paper.json (answer_audit.py --write)`)
+
 ## Serving endpoints
 
 - Matched difference over endpoints matched on at least 20 templates (range): **-0.025 (GLM-5.3-Flash, StreamLake) to +0.021 (GLM-5.3, Morph), over 21 endpoints** (`full_run_28092026/results/providers.json: matched_diff, few_matched`)
