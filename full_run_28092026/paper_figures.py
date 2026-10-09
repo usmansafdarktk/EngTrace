@@ -142,14 +142,11 @@ def fig_level_gap(order: list[str], q2: dict, fig_name: dict, figs_dir: Path) ->
             ax.plot([q2[k]["gap"]], [i], marker="o", markersize=4.6, linestyle="none", zorder=3,
                     **({"markerfacecolor": DARK, "markeredgecolor": "white", "markeredgewidth": 0.6} if holds[k] else
                        {"markerfacecolor": "white", "markeredgecolor": rest_edge, "markeredgewidth": 0.9}))
-        ax.plot([q2[k]["without_two_chemical"]["gap"] for k in order], range(len(order)), marker="x", markersize=3.8, markeredgewidth=0.8,
-                color=INK, linestyle="none", zorder=4)
         ax.set_xlim(-0.04, 0.36)
         ax.set_xlabel("Final Answer Accuracy drop from Easy to Advanced", fontsize=6.5, fontweight="bold", color="black", labelpad=2)
         handles = [Line2D([], [], marker="o", color=DARK, markersize=4.6, linestyle="none", label="Holds after Holm"),
                    Line2D([], [], marker="o", markerfacecolor="white", markeredgecolor=rest_edge, markeredgewidth=0.9, markersize=4.6,
                           linestyle="none", label="Does not hold"),
-                   Line2D([], [], marker="x", color=INK, markersize=3.8, markeredgewidth=0.8, linestyle="none", label="Without chemical pair"),
                    Line2D([], [], color="#7fb0ea", linewidth=4.5, solid_capstyle="butt", label="95% interval")]
         legend = ax.legend(handles=handles, loc="upper right", frameon=True, fancybox=False, framealpha=1, edgecolor="black", fontsize=6,
                            borderaxespad=0.3, borderpad=0.35, handlelength=1.3, handletextpad=0.4, labelspacing=0.3)
