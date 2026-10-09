@@ -42,6 +42,8 @@ no final answer is readable, since stating one within the output limit is part o
 \paragraph{Milestone Coverage.} A milestone is reached if the response states its value within
 0.5\% under a unit factor, in any step and order; 0.5\% is the tolerance at which the gold trace
 counts as stating a milestone, not a fitted constant.
+Matching compares values only, not the quantity's name, the unit written beside it, or the order of
+steps, so a coincidental value counts, which the chance floor of~\autoref{tab:coverage} measures.
 Matching, like every check, reads the response's visible text, not the reasoning text that some
 endpoints return separately.
 Milestones that matching misses go to an LLM judge from outside the evaluated families,
@@ -57,7 +59,9 @@ With $\mathcal{R}(r)$ the milestones matched or ruled reached,
 and \emph{Milestone Coverage} (MC) is the mean of $m(r)$ over instances with milestones.
 The judge decides 11\% to 25\% of milestones, depending on the model.
 MC credits the gold route: a valid route that bypasses a milestone is not credited, so MC measures
-how much of the gold route a derivation states, not whether it is free of error.
+how much of the gold route a derivation states, not whether it is free of error
+(\autoref{box:coverage_cases} shows a valid route that bypasses two milestones and a misstated rule
+that every deterministic check passes).
 
 \paragraph{Step-Level Diagnostics.} Two diagnostics look for flawed steps behind a correct answer.
 The arithmetic check recomputes each displayed calculation it can parse from its printed operands

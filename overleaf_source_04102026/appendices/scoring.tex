@@ -74,6 +74,12 @@ iterative schemes, and the elements of containers such as lookup tables, and cou
 stored twice once.
 Matching uses the unit factors above except $10^{\pm 12}$, and MC leaves out the 57 instances
 without milestones.
+Matching checks the value alone: not the quantity's name, the unit written beside it, the step it
+appears in, or the order and dependencies among steps, so a value that coincides with a milestone
+counts, and the chance floor of~\autoref{tab:coverage}, the same responses matched against a
+sibling instance's milestones, measures how often that happens.
+The judge sees each milestone's name and value and rules on the response's own route; it is the
+one check that can credit a quantity stated in another form or excuse one the route does not need.
 
 \paragraph{The Judge.} \texttt{MiMo-V2.5-Pro} (Xiaomi) receives one call per response in which
 matching misses a milestone, with the prompt below, at temperature 0, with JSON output and up to
@@ -227,6 +233,12 @@ Return a single JSON object containing a "results" list. Each entry must have ex
 
 \autoref{box:worked_example} follows one wrong answer from the evaluation through every check, from
 the final-answer match to its scores $v(r)$ and $m(r)$.
+\autoref{box:coverage_cases} then shows what coverage does and does not measure: a correct
+derivation that takes a valid route past two gold milestones and scores $m(r) = 1/3$, and a
+planted misstated rule whose numbers are those of the right rule, which every deterministic check
+passes and only some judges see.
 
 % The worked scoring example (box:worked_example), written by full_run_28092026/worked_example.py --write
 \input{sections/appendices/worked_example}
+% The two coverage cases (box:coverage_cases), written by full_run_28092026/coverage_cases.py --write
+\input{sections/appendices/coverage_cases}

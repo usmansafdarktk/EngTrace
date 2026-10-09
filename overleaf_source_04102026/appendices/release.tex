@@ -45,10 +45,11 @@ numbers and the inference prompt;
 \autoref{tab:expert_agreement};
 \item \texttt{appendix\_evaluation.py}: \autoref{tab:scoring_settings} and
 \autoref{tab:validation_results};
-\item \texttt{worked\_example.py}: \autoref{box:worked_example}.
+\item \texttt{worked\_example.py} and \texttt{coverage\_cases.py}: \autoref{box:worked_example}
+and \autoref{box:coverage_cases}.
 \end{itemize}
-The first six scripts also check that the paper holds what they produce, and the last recomputes
-every value it prints from the response.
+The first six scripts also check that the paper holds what they produce, and the last two recompute
+every value they print from the responses.
 
 \paragraph{Contamination.} Once the seed is public, the evaluation set can enter training data.
 The generator draws a fresh evaluation set from any new seed by the same selection rule, so a later

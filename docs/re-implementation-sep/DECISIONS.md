@@ -7682,6 +7682,31 @@ before being applied.
 - **Not done.** The experts' details stay out of the anonymous submission (the owner, 2026-10-09);
   `full_run_28092026/results/RESULTS.md`'s stale "noise floor 0.964" sentence is the analysis script's to fix.
 
+## D-198 — The supervisor's comments of 7 October answered; the abstract restored to the agreed wording; two coverage cases
+
+**Date:** 2026-10-09 · **Status:** DONE · **Evidence:** `docs/SUPERVISOR_COMMENTS_OCT2026.md` (the four comments verbatim,
+with the response to each); `full_run_28092026/coverage_cases.py --selftest`; every generator `--check` passes
+
+- **Abstract.** The owner restored the abstract agreed before the workstreams (the May wording), with only the changes
+  the final data and decision D1 require: "process evaluation", the final numbers (0.81 to 0.99, within 0.02, coverage
+  0.81 to 0.92), "near the ceiling", "mostly calculation slips", LLM spelled out, and, on the supervisor's comment, the
+  scope sentence "a misstated rule behind a correct answer escapes these checks". The matched-settings result and the
+  pair-specific coverage sentence are out of the abstract as internal detail and a narrow claim; the coverage sentence
+  is the broad finding that wrong answers still state about half of the gold milestones. 198 words.
+- **Coverage and alternative derivations.** Section 4 and `appendices/scoring.tex` state what matching checks (values
+  only; not names, written units, step position or dependencies; the chance floor measures coincidence);
+  `appendices/results.tex` states the judge's contribution (0.019 to 0.038 over matching alone; 28 against 26 pairs
+  separated); a new generated box, `box:coverage_cases` (`appendices/coverage_cases.tex`, from
+  `full_run_28092026/coverage_cases.py`), shows a valid route that bypasses two milestones (Kimi K3,
+  `vorticity_check#6`, m(r) = 1/3) and a planted misstated rule with matched values (probe `conc:T-4d854e` of the
+  validation study, "R = A / P" written as "R = P / A"), which every deterministic check passes and the paper's judge
+  does not catch.
+- **Final benchmark quality.** Already met by Path B (D4; WS-A); the certification appendix now also says that the
+  evaluation set holds instances of the certified versions only.
+- **Contribution, story, completion.** The introduction's sentence on what step checks add carries the tied-models
+  story and the blind spot; Limitations cover under-specified wording and the answer-rule simplifications with their
+  measured effect; the Overleaf mirror's old `engchain-overview.pdf` is unused; both bibliographies hold one entry per key.
+
 ## Open decisions
 
 | # | Decision | Needed before |

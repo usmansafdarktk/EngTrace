@@ -1049,6 +1049,7 @@ upper_missing = [Q3[k]["attribution_on_wrong"]["e5_missing"] for k in UPPER if k
 m_mini_level = [k for k in TOP5 if frozenset((k, "gpt-5.4-mini")) not in M_SEP]  # first-five models GPT-5.4 mini no longer differs from
 claim(all(frozenset((k, "gpt-5.4-mini")) in SEP_FAC for k in m_mini_level), "GPT-5.4 mini differed from those models at the defaults")
 above_margin = [k for k in RERUN if M_PAIRED[k]["ci90"][0] > margin]  # re-run models whose 90% interval lies wholly above the margin
+judge_add = [CV_MODELS[k]["as_scored"]["all"] - CV_MODELS[k]["matching_only"]["all"] for k in ORDER]  # the judge's contribution to MC
 claim(bool(above_margin), "at least one reasoning gain lies wholly above the margin")
 claim(all(dom_min[l] < min(dom_min[t] for t in top_rep) for l in low_rep), "the lower-tier representatives dip below the top-tier ones")
 
@@ -1234,6 +1235,9 @@ appendix_phrases = {
         f"them more strongly ({sgn(SEP_RULE['diff']['matching_only'])}, Holm-adjusted $p$ {pv(SEP_RULE['matching_only'])}); re-judging a "
         f"sample with a second judge shifts a model's coverage by {sgn(min(SWAP_DIFF))} to {sgn(max(SWAP_DIFF))}",
         stand("coverage_variants") + f"Coverage rises by at most {f3(VERB['ci'][1])} ({VERB_UNIT})",
+        stand("coverage_variants") + f"The judge adds {f3(min(judge_add))} to {f3(max(judge_add))} to a model's coverage over matching alone, "
+        f"and the pairs separated are nearly the same ({len(separated(CV_PAIRS['as_scored']))} against "
+        f"{len(separated(CV_PAIRS['matching_only']))} of the {N_PAIRS})",
         stand("depth_model") + f"Pooled over the models, each further milestone multiplies the odds of a wrong answer by "
         f"{f2(D_POOLED['odds_ratio'])} (95\\% interval {f2(D_POOLED['or_ci'][0])} to {f2(D_POOLED['or_ci'][1])})",
         stand("matched") + f"Reasoning raises all three models run with it (Holm-adjusted $p$ {pv(max(M_PAIRED[k]['p_holm'] for k in RERUN))}), "

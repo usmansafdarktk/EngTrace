@@ -1,18 +1,18 @@
-Engineering derivations have checkable intermediate quantities, yet most engineering benchmarks
-score only final answers, and step-level ones use large language model (LLM) judges or human
-graders, or cover one domain.
-We present \ourdataset: 150 expert-certified symbolic templates across five engineering branches,
-15 domains, and 42 areas, each computing an instance's answer and gold trace.
-Our evaluator deterministically checks the final values of six answer kinds (symbolic ones by
-equivalence on five templates, by stated numbers on four), the gold trace's intermediate
-quantities, and displayed arithmetic; a judge from outside the evaluated families decides what
-matching misses and flags steps.
-A misstated rule behind a correct answer escapes these checks.
-We evaluate eleven LLMs on 2,250 privately seeded instances at the providers' defaults and three
-of them with reasoning on.
-On the final answer, the five strongest lie within two points, near the ceiling.
-The process measures show how much of the gold route wrong answers keep, flag slips behind right
-answers, and separate one tied pair.
-Reasoning lifts those three models by 0.04 to 0.12.
-Experts read 137 wrong answers and find mostly calculation errors; wrong formulas rise from 3\% of
-Easy readings to 21\% of harder ones.
+Engineering problems are solved by derivations whose intermediate quantities can be checked, yet
+existing benchmarks such as \textsc{SuperGPQA} and \textsc{EEE-Bench} score only final answers, and
+step-level ones, such as \textsc{TPS-CalcBench}, rely on large language model (LLM) judges or
+human graders.
+We present \ourdataset, a symbolic benchmark for verifiable process evaluation of engineering
+reasoning, with 150 templates spanning five branches, 15 domains, and 42 areas.
+Each template is expert-certified code that samples physically grounded parameters and computes
+the answer and a gold reasoning trace together, so every intermediate quantity is known exactly.
+An expert-validated evaluator is deterministic wherever a check exists: final answers of six kinds,
+coverage of the gold trace's intermediate quantities (milestones), and displayed arithmetic, with
+residual milestones sent to an LLM judge outside the evaluated families; a misstated rule behind a
+correct answer escapes these checks.
+Across 2,250 instances, eleven LLMs attain final-answer accuracies of 0.81 to 0.99, the five
+strongest within 0.02 and near the ceiling.
+Milestone coverage is similarly high (0.81 to 0.92), and wrong answers still state about half of
+the gold milestones.
+Errors on Easy problems are mostly calculation slips, while wrong formulas or principles appear
+mostly on Intermediate and Advanced problems.
