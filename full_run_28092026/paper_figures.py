@@ -198,41 +198,75 @@ def band_axes(plt, n: int, height: float, xlabel: str, margin: float, left: floa
     return fig, ax
 
 
-def fig_paraphrase(order: list[str], q5: dict, margin: float, fig_name: dict, figs_dir: Path) -> None:
-    """The FAC change under paraphrase per model with its 90% interval (paraphrase.pdf; not placed in the paper)."""
+def fig_paraphrase(order: list[str], q5: dict, margin: float, fig_name: dict, figs_dir: Path, repeats: dict) -> None:
+    """The change under paraphrase (paraphrased minus original) per model, two panels on the same rows (paraphrase.pdf; not placed
+    in the paper; text width). Left, the final answer: the FAC change with its 90% interval (filled within the margin, hollow not),
+    the same-prompt repeat runs as ticks, and the smallest detectable change as a column. Right, the derivation: the MC change with
+    the judge (band and filled marker) joined to the change by matching alone (ring). The item counts, the sign and the ordering's
+    tau belong in the caption. q5 is results.json's q5 per model; repeats is its q5.vs_repeats."""
     plt = _plt()
     from matplotlib.lines import Line2D
-    from matplotlib.patches import Patch
-    # The 90% interval as a band, deepest at the change; within the margin in strong blue with a dark filled marker, the rest paler and hollow.
-    rest, rest_edge = "#93b6e2", "#5b8fd3"
+    # Colors by measure, from the level and branch figures' palette: blue the final answer, green the derivation, orange the
+    # repeat runs, purple the detectable change.
+    blue_pale, blue_edge, green, green_dark, orange, purple = "#93b6e2", "#5b8fd3", "#1baf7a", "#0b6b4a", "#eb6834", "#4a3aa7"
+    band = "#f0f0f0"  # the margin, a light neutral grey
+    n = len(order)
     within = {k: q5[k]["within_margin"] for k in order}
     with plt.rc_context(SERIF):
-        fig, (ax,) = rows_axes(plt, len(order), 2.6, left=0.318, right=0.72, bottom=0.12, top=0.985)
-        ax.set_yticks(range(len(order)))
-        ax.set_yticklabels([fig_name[k] for k in order], fontweight="bold")
-        ax.tick_params(axis="y", colors="black", labelsize=6.5)
-        ax.tick_params(axis="x", colors="black", labelsize=6.5)
-        ax.axvspan(-margin, margin, color=BAND, zorder=0)
-        ax.axvline(0, color=MUTED, linewidth=0.6, zorder=1)
-        ax.text(0.0015, 0.5, "No change", rotation=90, ha="left", va="center", fontsize=5.5, style="italic", color=MUTED)
-        gradient_rows(ax, [(i, q5[k]["ci90"][0], q5[k]["ci90"][1], q5[k]["diff"], BLUE if within[k] else rest) for i, k in enumerate(order)])
+        fig, (a, b) = rows_axes(plt, n, 2.75, width=6.3, left=0.145, right=0.985, bottom=0.138, top=0.825, ncols=2, wspace=0.30)
+        for ax in (a, b):
+            ax.set_yticks(range(n))
+            ax.tick_params(axis="y", colors="black", labelsize=6.5)
+            ax.tick_params(axis="x", colors="black", labelsize=6.5)
+            ax.axvspan(-margin, margin, color=band, zorder=0)
+            for i in range(n):  # faint row guides, to follow a model from one panel to the other
+                ax.axhline(i, color="#d4d4d4", linewidth=0.4, linestyle=(0, (1, 1.5)), zorder=0.5)
+            ax.text(-margin + 0.0012, 2, f"±{margin:.2f} margin", rotation=90, ha="left", va="center", fontsize=5.5, style="italic",
+                    color=MUTED, zorder=1, bbox={"facecolor": band, "edgecolor": "none", "pad": 0.3})  # the band labelled in place
+            ax.axvline(0, color=MUTED, linewidth=0.6, zorder=1)
+            ax.set_xlim(-0.075, 0.061)
+            ax.set_xticks([-0.05, 0, 0.05])
+            ax.set_xticklabels(["−0.05", "0", "0.05"])
+        a.set_yticklabels([fig_name[k] for k in order], fontweight="bold")
+
+        gradient_rows(a, [(i, q5[k]["ci90"][0], q5[k]["ci90"][1], q5[k]["diff"], BLUE if within[k] else blue_pale) for i, k in enumerate(order)])
         for i, k in enumerate(order):
-            ax.plot([q5[k]["diff"]], [i], marker="o", markersize=4.6, linestyle="none", zorder=3,
-                    **({"markerfacecolor": DARK, "markeredgecolor": "white", "markeredgewidth": 0.6} if within[k] else
-                       {"markerfacecolor": "white", "markeredgecolor": rest_edge, "markeredgewidth": 0.9}))
-        ax.set_xlim(-0.075, 0.061)
-        ax.set_xticks([-0.05, 0, 0.05])
-        ax.set_xticklabels(["−0.05", "0", "0.05"])
-        ax.set_xlabel("Final Answer Accuracy change under paraphrase", fontsize=6.5, fontweight="bold", color="black", labelpad=2)
-        handles = [Line2D([], [], marker="o", color=DARK, markersize=4.6, linestyle="none", label="Within the margin"),
-                   Line2D([], [], marker="o", markerfacecolor="white", markeredgecolor=rest_edge, markeredgewidth=0.9, markersize=4.6,
-                          linestyle="none", label="Not within"),
-                   Line2D([], [], color="#7fb0ea", linewidth=4.5, solid_capstyle="butt", label="90% interval"),
-                   Patch(color=BAND, label=f"±{margin:.2f} margin")]
-        legend = ax.legend(handles=handles, loc="upper left", bbox_to_anchor=(1.03, 1.0), frameon=True, fancybox=False, framealpha=1,
-                           edgecolor="black", fontsize=6, borderaxespad=0, borderpad=0.35, handlelength=1.1, handletextpad=0.4,
-                           labelspacing=0.3)
-        legend.get_frame().set_linewidth(0.5)
+            for r in repeats.get(k, {}).get("repeats", {}).values():
+                a.plot([r["diff"]] * 2, [i - 0.30, i + 0.30], color=orange, linewidth=1.0, solid_capstyle="butt", zorder=3)
+            a.plot([q5[k]["diff"]], [i], marker="o", markersize=4.6, linestyle="none", zorder=4,
+                   **({"markerfacecolor": DARK, "markeredgecolor": "white", "markeredgewidth": 0.6} if within[k] else
+                      {"markerfacecolor": "white", "markeredgecolor": blue_edge, "markeredgewidth": 0.9}))
+            a.text(0.067, i, f"{q5[k]['detectable_holm']:.3f}", va="center", ha="left", fontsize=6, color=purple, clip_on=False)
+        a.text(0.067, -0.55, "Detectable\nchange", ha="left", va="bottom", fontsize=6, style="italic", color=purple, clip_on=False,
+               linespacing=1.0)
+        a.set_xlabel("Final Answer Accuracy change", fontsize=6.5, fontweight="bold", color="black", labelpad=2)
+
+        gradient_rows(b, [(i, q5[k]["e5"]["ci90"][0], q5[k]["e5"]["ci90"][1], q5[k]["e5"]["diff"], green) for i, k in enumerate(order)])
+        for i, k in enumerate(order):
+            b.plot([q5[k]["e3"]["diff"], q5[k]["e5"]["diff"]], [i, i], color=green_dark, linewidth=0.9, solid_capstyle="butt",
+                   zorder=2.5)  # matching alone joined to the judge's reading, so the gap between them shows
+            b.plot([q5[k]["e3"]["diff"]], [i], marker="o", markersize=4.0, markerfacecolor="white", markeredgecolor=green,
+                   markeredgewidth=0.9, linestyle="none", zorder=3)
+            b.plot([q5[k]["e5"]["diff"]], [i], marker="o", markersize=4.6, markerfacecolor=green_dark, markeredgecolor="white",
+                   markeredgewidth=0.6, linestyle="none", zorder=4)
+        b.set_xlabel("Milestone Coverage change", fontsize=6.5, fontweight="bold", color="black", labelpad=2)
+
+        panels = ((a, "Final answer", DARK, [
+            Line2D([], [], marker="o", color=DARK, markersize=4.6, linestyle="none", label="Within margin"),
+            Line2D([], [], marker="o", markerfacecolor="white", markeredgecolor=blue_edge, markeredgewidth=0.9, markersize=4.6,
+                   linestyle="none", label="Not within"),
+            Line2D([], [], color=orange, linewidth=1.0, marker="|", markersize=6, linestyle="none", label="Same-prompt rerun")]),
+                  (b, "Derivation", green_dark, [
+            Line2D([], [], marker="o", color=green_dark, markersize=4.6, linestyle="none", label="With the judge"),
+            Line2D([], [], marker="o", markerfacecolor="white", markeredgecolor=green, markeredgewidth=0.9, markersize=4.0,
+                   linestyle="none", label="Matching alone")]))
+        for ax, title, color, handles in panels:  # one single-row legend per panel, titled with the panel's measure
+            legend = ax.legend(handles=handles, title=title, loc="lower center", bbox_to_anchor=(0.5, 1.02), ncol=len(handles),
+                               frameon=True, fancybox=False, framealpha=1, edgecolor="black", fontsize=6, title_fontsize=7,
+                               borderaxespad=0, borderpad=0.35, handlelength=1.1, handletextpad=0.4, columnspacing=0.9)
+            legend.get_title().set_fontweight("bold")
+            legend.get_title().set_color(color)
+            legend.get_frame().set_linewidth(0.5)
         save(fig, figs_dir, "paraphrase.pdf")
 
 
