@@ -2,35 +2,46 @@
 \section{Template Certification}
 \label{appendix:certification}
 
-This section details the three checks of~\autoref{subsec:certification} and their results.
+This section details the three checks of~\autoref{subsec:certification} (automated integrity
+checks, an LLM screen, and expert certification) and their results.
 
-\paragraph{Automated Integrity Checks.} We run every template at 500 seeds, and every seed must
-generate an instance without error, regenerate it identically in a separate process, keep the
-output format (numbered steps and one answer marker), print no malformed expression, and pass the
-closure check: every printed calculation, recomputed from its printed operands, gives its printed
-result at the printed precision.
-Lines the closure check cannot parse, six line patterns in four templates, are checked by hand, and
-all 150 templates pass.
+\paragraph{Automated Integrity Checks.} We run every template at 500 seeds.
+Every seed must generate an instance without error, regenerate it identically in a separate
+process, keep the output format (numbered steps and one answer marker), print no malformed
+expression, and pass the closure check: every printed calculation, recomputed from its printed
+operands, gives its printed result at the printed precision.
+We check by hand the lines that the closure check cannot parse (six line patterns in four
+templates), and all 150 templates pass.
 
 \paragraph{LLM Screen.} Three LLM judges from families outside the evaluated models,
 \texttt{Grok 4.6}~\citep{grok46}, \texttt{MiniMax M3}~\citep{minimaxm3}, and
 \texttt{MiMo-V2.5-Pro}, score each template's code and three of its instances with the prompt
-below, at temperature 0.
-A template fails critically when at least two judges flag it for review or the median score of any
-dimension is below 4, is controversial when the judges' scores on some dimension have a population
-standard deviation above 0.5, and passes otherwise.
-In the first pass, 126 templates pass, 13 are controversial, and 11 are critical failures (Gwet's
-AC1 of 0.84 on the flag~\citep{gwet2008}); 34 of the 45 claims in the judges' explanations hold
-against the code and the instances, and after we revise the 24 flagged templates, 147 templates
-pass, 3 are controversial, and none is a critical failure (AC1 of 0.93).
+below, at temperature 0, on physical plausibility, mathematical correctness, and pedagogical
+clarity.
+The screen gives each template one of three outcomes:
+\begin{itemize}[nosep, leftmargin=*]
+\item \textbf{Critical failure:} At least two judges flag the template for human review, or its
+median score on any of the three is below 4.
+\item \textbf{Controversial:} Not a critical failure, but the judges' scores on one of the three
+have a population standard deviation above 0.5.
+\item \textbf{Pass:} Neither of the above.
+\end{itemize}
+
+In the first pass, 126 templates pass, 13 are controversial, and 11 are critical failures, and the
+judges agree on the review flag with Gwet's AC1 of 0.84~\citep{gwet2008}.
+We check each claim in the judges' explanations against the code and the instances, and 34 of the
+45 claims hold; after we revise the 24 flagged templates, 147 templates pass, 3 are controversial,
+and none is a critical failure in the second pass (AC1 of 0.93).
+
 Against the experts' first-round decisions, 15 of the 147 templates the screen passes are rejected
-by a majority of their experts, a false-positive rate of 10.2\%, and the median scores of experts
-and judges differ on average by 0.587 for physical plausibility, 0.187 for mathematical
-correctness, and 0.787 for pedagogical clarity.
+by a majority of their experts, so 10.2\% of the screen's passes are false positives.
+On average, the median scores of experts and judges differ by 0.587 for physical plausibility,
+0.187 for mathematical correctness, and 0.787 for pedagogical clarity, on the scale of 1 to 5.
+The screen therefore guides revision, and the experts decide certification.
 
 \begin{tcolorbox}[colback=gray!5, colframe=gray!40, boxrule=0.4pt, arc=2pt, left=5pt, right=5pt,
     top=5pt, bottom=5pt, breakable]
-\scriptsize\ttfamily
+\ttfamily\small
 You are an expert engineering professor and a senior Python developer acting as a peer reviewer for the EngTrace benchmark.\\
 Your task is to meticulously evaluate a new problem template based on its source code and several example outputs.\\
 Analyze the provided information and then respond ONLY with a single, valid JSON object that strictly adheres to the schema described in the user prompt. Do not add any explanatory text or markdown formatting around the JSON object.\\[3pt]
@@ -77,17 +88,58 @@ Evaluate the template based on the rubric below. The \texttt{human\_review\_flag
 \end{table*}
 
 \paragraph{Expert Certification.} Three domain experts per branch each review the 30 templates of
-their branch mixed with four planted defects, in an order of their own under opaque codes, knowing
-that planted items exist but not which; they do not see the screen's results or discuss a template
-before all three have submitted.
-For each item, an expert solves one instance by hand before the solution is shown, and the
-interface reports whether the answer is within 1\% of the gold value; the expert then reads the
-solution and, as needed, the code and the template's other four instances, scores the three
-dimensions from 1 to 5, and approves or rejects, naming a defect type and a reason for a rejection.
+their branch mixed with four planted defects.
+Each expert sees the items in an order of their own, under opaque codes, and knows that planted
+items exist but not which ones.
+The experts do not see the screen's results, and they do not discuss a template before all three
+have submitted.
 Each planted defect is a real template of the branch with one error written into it
 (\autoref{tab:planted_defects}); a wrong constant, unit conversion, or sign is carried through the
 computation, the printed steps, and the answer, whereas a wrong printed result changes a single
 printed line.
+The planted defects test whether an expert catches a wrong number, through a constant, a unit
+conversion, a sign, or a printed result; whether a question states everything its answer depends
+on is examined separately, in the domain experts' reading of six near-miss templates
+(\autoref{appendix:error_analysis}).
+
+\paragraph{Certification App.} The experts work in a \texttt{Streamlit} web app
+(\autoref{fig:certification_app}) built around the protocol:
+\begin{itemize}[nosep, leftmargin=*]
+\item \textbf{Blind hand check:} For each item, the expert solves one instance by hand; the app
+shows the solution only once the expert enters an answer.
+\item \textbf{Automatic comparison:} The app reports whether the answer is within 1\% of the gold
+value and, on a mismatch, asks the expert to find which side is right.
+\item \textbf{Multi-instance review:} Beside the gold solution, the expert can read the template's
+source code and step through its other four instances, all generated in advance.
+\item \textbf{Structured verdict:} The expert scores physical plausibility, mathematical
+correctness, and pedagogical clarity from 1 to 5, approves or rejects, rates their confidence
+from 1 to 5, and can name defect types from a fixed list: physics or scenario implausible;
+governing equation or formula; constant or table value; unit or conversion; sign or direction; a
+step that does not follow; final answer or unit wrong; question ambiguous or unsolvable; and
+wording or formatting.
+\item \textbf{Required justification:} The app accepts a rejection only with a note on what is
+wrong and where and at least one defect type.
+\end{itemize}
+
+\begin{figure*}[tp]
+    \centering
+    \definecolor{framegray}{HTML}{EBDFD0}% the frame color of the overview figure
+    \setlength{\fboxsep}{0pt}
+    \setlength{\fboxrule}{0.5pt}
+    {\small\textbf{(a)} Hand check}\par\smallskip
+    \fcolorbox{framegray}{white}{%
+        \includegraphics[width=0.985\textwidth]{figs/app_candidates/app-1-hand-check.pdf}}
+    \par\bigskip
+    {\small\textbf{(b)} Review}\par\smallskip
+    \fcolorbox{framegray}{white}{%
+        \includegraphics[width=0.985\textwidth]{figs/app_candidates/app-2-review.pdf}}
+    \caption{\textbf{Certification app.}
+    (a) The hand check: the expert enters the final answer with its unit before the solution is
+    shown.
+    (b) The review: the result of the hand check, the question beside the gold solution, the source
+    code in a second tab, the template's other instances, and the verdict form.}
+    \label{fig:certification_app}
+\end{figure*}
 
 \begin{table}[!htbp]
     \centering
@@ -117,25 +169,24 @@ printed line.
 \end{table}
 
 \paragraph{Results.} Every expert rejects all four planted defects of their branch, 60 of 60
-readings.
+readings, one per expert and planted defect.
+Each expert makes one hand check per item.
 Of the 510 first-round hand checks, 504 have a number to compare; 459 of these match the gold value
 within 1\%, and 44 of the 45 mismatches end in a rejection.
-The planted defects test whether an expert catches a wrong number, through a constant, a unit
-conversion, a sign, or a printed result; they do not test whether a question states everything its
-answer depends on, which the domain experts' reading of six near-miss templates examines
-(\autoref{appendix:error_analysis}).
 \autoref{tab:expert_agreement} gives the first-round agreement within each branch.
 Fleiss' $\kappa$ is undefined for civil and industrial, where every decision is an approval, and is
 deflated where nearly every template is approved~\citep{feinstein1990high}: in electrical, 5 of the
 90 decisions on templates are rejections, so 90\% agreement gives a $\kappa$ of 0.365.
-Gwet's AC1 and AC2 are not deflated in this way.
-In the first round, 43 of the 450 decisions on templates are rejections, and at least one expert
-rejects 22 templates (chemical 9, electrical 3, and mechanical 10), 15 of them by a majority, while
-every civil and industrial expert approves all 30 templates of their branch.
+Gwet's AC1 and AC2 are not deflated in this way, so the table reports them beside $\kappa$.
+In the first round, 43 of the 450 decisions on templates are rejections.
+At least one expert rejects 22 templates (chemical 9, electrical 3, and mechanical 10), 15 of them
+by a majority, and every civil and industrial expert approves all 30 templates of their branch.
 
-A template that any expert rejects, or whose code changes, returns to the same three experts,
-revised where the rejection holds and with a hand-check instance none of them has seen, until all
-three approve it; certification takes six rounds:
+A template that any expert rejects, or whose code changes, returns to the same three experts until
+all three approve it.
+It is revised where the rejection holds, and each expert hand-checks a new instance that none of
+the three has seen.
+Certification takes six rounds:
 \begin{itemize}[nosep, leftmargin=*]
 \item in the second round, 10 of the 66 decisions are rejections, on 5 of the 22 templates;
 \item the third round approves all 5, and its two hand checks that do not match give the gold value
@@ -150,6 +201,6 @@ temperatures;
 temperatures, and all three experts approve it.
 \end{itemize}
 In rounds 2 to 6, 66 of 66, 13 of 15, 6 of 6, 6 of 6, and 3 of 3 hand checks match the gold value.
-Every template is thus approved unanimously in the latest round that reviewed it, its current
-code regenerates, byte for byte, the instances its experts reviewed, and the evaluation set holds
-instances of these certified versions only.
+Every template is thus approved unanimously in the latest round that reviewed it.
+Its current code regenerates, byte for byte, the instances its experts reviewed, and the evaluation
+set holds instances of these certified versions only.

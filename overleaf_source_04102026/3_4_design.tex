@@ -21,15 +21,13 @@ engineering curricula.
 \end{figure*}
 
 \paragraph{Domain and Area Selection.}
-We draw the candidate domains and areas of each branch from its curricular documents, the
-accreditation criteria of ABET~\citep{abet2024criteria}, the Fundamentals of Engineering exam
-specifications of NCEES for the five
-branches~\citep{ncees2020fechemical, ncees2020fecivil, ncees2020feelectrical, ncees2020feindustrial, ncees2020femechanical},
-and the bodies of knowledge of ASCE~\citep{asce2019cebok} and IISE~\citep{iise2021bok}, and from the
-standard textbooks of each branch.
-A panel of three LLMs from families outside the evaluated models, each prompted as a curriculum
-designer, names the cornerstone domains of each branch and the fundamental areas of each domain,
-and we finalize the 15 domains, three per branch, and their 42 areas by majority vote (prompts
+We drew the candidate domains and areas from the accreditation criteria of
+ABET~\citep{abet2024criteria}, the Fundamentals of Engineering exam specifications of
+NCEES~\citep{ncees2020fechemical, ncees2020fecivil, ncees2020feelectrical, ncees2020feindustrial, ncees2020femechanical},
+the bodies of knowledge of ASCE~\citep{asce2019cebok} and IISE~\citep{iise2021bok}, and the standard
+textbooks of each branch.
+A panel of three LLMs prompted as curriculum designers named the cornerstone domains and their
+fundamental areas, and we finalized the 15 domains and 42 areas by majority vote (prompts
 in~\autoref{sec:appendix_domain_validation} and~\autoref{sec:appendix_area_validation}).
 
 \paragraph{Template Selection.}
@@ -41,18 +39,14 @@ The template distribution per area is non-uniform and follows a pedagogical sign
 (1--5) that the same three LLMs assigned to each area within its domain
 (\autoref{sec:appendix_significance_scoring}); \autoref{tab:area} gives the templates per area and
 level.
-Each branch holds three domains by design, so core areas such as circuit analysis in electrical
-engineering, thermodynamics and heat transfer in mechanical engineering, and transportation and
-environmental engineering in civil engineering are not covered.
 
 \paragraph{Difficulty Levels.}
-The levels are the domain experts' labels, set when the templates were written and fixed before any
-model ran: following a fixed protocol, the template's author and two other experts of its branch
-rate it from 1 to 3 on conceptual complexity, mathematical sophistication, and procedural depth,
-counting only what the solver must supply, and the sum of the median scores sets the level (3--4
-Easy, 5--6 Intermediate, 7--9 Advanced).
-\autoref{appendix:statistics} gives the levels by branch and the other statistics of the templates
-and the evaluation set.
+Domain experts also assigned each template one of three levels, Easy, Intermediate, or Advanced,
+following the protocol in~\autoref{sec:appendix_difficulty} and scoring three dimensions:
+conceptual complexity (isolated principles vs.\ multi-domain synthesis), mathematical
+sophistication (direct algebraic substitution vs.\ differential equations), and procedural depth
+(the length of interdependent reasoning chains).
+\autoref{appendix:statistics} details how the templates are distributed across branches and levels.
 
 
 
@@ -112,7 +106,4 @@ Every expert rejects all four planted defects of their branch (60 of 60 readings
 hand checks that yield a comparable number match the gold value within 1\%, and agreement on
 approval is high (Gwet's AC1 0.914~\citep{gwet2008}; Fleiss'~$\kappa$~\citep{fleiss1971} 0.589,
 deflated because nearly every template is approved~\citep{feinstein1990high}).
-The planted defects test numeric correctness, such as transposed digits or a flipped sign, and not
-whether a question pins down a single reading.
-A template that any of its experts rejects is revised and reviewed again; after six rounds, all 150
-templates are certified by a unanimous vote of their three experts.
+After six rounds, all 150 templates are certified by a unanimous vote of their three experts.

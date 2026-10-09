@@ -138,6 +138,15 @@ prose = [
     f"{numbers['templates with more groups than instances selected']} templates",
 ]
 
+# The depth sentence after the domain prompt: three domains per branch, each with templates at every level.
+dom_levels = {}
+for b, d, _, lv, _ in tmpl.values():
+    dom_levels.setdefault((b, d), set()).add(lv)
+three_per_branch = all(sum(1 for bb, _ in dom_levels if bb == b) == 3 for b in BRANCHES)
+every_level = all(levels == set(LEVELS) for levels in dom_levels.values())
+prose.append("We keep three domains per branch to cover each in depth, across all its areas and all three levels"
+             if three_per_branch and every_level else "[depth sentence after the domain prompt no longer holds]")
+
 
 # ================================================================ generated blocks
 def pretty(snake: str) -> str:

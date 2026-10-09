@@ -2,14 +2,12 @@
 \section{LLM Prompt for Domain Validation}
 \label{sec:appendix_domain_validation}
 
-% The panel the domain experts report for this cycle's domain and area validation, run outside this
-% repository (the owner, 2026-10-08).
 We draw the candidate domains and areas of each branch from its curricular documents
 (\autoref{subsec:taxonomy}) and the standard textbooks of~\autoref{tab:foundational_textbooks}.
 A panel of three LLMs from families outside the evaluated models, \texttt{Grok 4.6}~\citep{grok46},
-\texttt{MiniMax M3}~\citep{minimaxm3}, and \texttt{MiMo-V2.5-Pro}~\citep{mimov25pro}, each prompted
-individually with the prompt below, names the cornerstone domains of each branch, and we finalize
-the 15 domains, three per branch, by majority vote.
+\texttt{MiniMax M3}~\citep{minimaxm3}, and \texttt{MiMo-V2.5-Pro}, each prompted individually with
+the prompt below, names the cornerstone domains of each branch, and we finalize the 15 domains,
+three per branch, by majority vote.
 The same panel names the fundamental areas of each domain (\autoref{sec:appendix_area_validation})
 and scores each area's pedagogical significance (\autoref{sec:appendix_significance_scoring}).
 
@@ -32,7 +30,7 @@ domains for the five primary branches of engineering. The goal is to identify th
 
 For example, for Chemical Engineering, "Reaction Kinetics" would be a fundamental domain, while a niche topic like "Polymer Rheology" would be a sub-specialization, not a cornerstone. \\
 
-Please provide a ranked list of the top 5--7 most fundamental domains for each of the following five branches: \\
+Please provide a ranked list of the top 5-7 most fundamental domains for each of the following five branches: \\
 1. Chemical Engineering \\
 2. Electrical Engineering \\
 3. Mechanical Engineering \\
@@ -98,11 +96,16 @@ Return your answer \textbf{only} in a strict JSON format as given below.
 Do not include any preamble, conversational text, explanations, or markdown formatting around the JSON block.
 \end{tcolorbox}
 
+We keep three domains per branch to cover each in depth, across all its areas and all three levels
+(\autoref{tab:area}).
+Domains outside this selection, such as circuit analysis in electrical engineering, thermodynamics
+and heat transfer in mechanical engineering, and transportation and environmental engineering in
+civil engineering, can be added with templates of the same form.
+
 % -------------
 \section{LLM Prompt for Area Validation}
 \label{sec:appendix_area_validation}
 
-% The same three models as the domain validation (see the note there).
 The panel of~\autoref{sec:appendix_domain_validation} answers the prompt below for each domain, and
 we finalize the 42 areas by majority vote, as for the domains.
 
@@ -154,7 +157,7 @@ Do not include any preamble, conversational text, explanations, or markdown form
 \end{tcolorbox}
 
 % -------------
-\section{Foundational Textbooks and Authoritative Data Sources}
+\section{Textbooks and Data Sources}
 \label{sec:appendix_books}
 \label{sec:appendix_data_sources}
 
@@ -208,9 +211,9 @@ take their problems.}
 \label{tab:foundational_textbooks}
 \end{table}
 
-The physical constants and material properties that the templates sample come from the handbooks
-and data sources of~\autoref{tab:authoritative_sources}, and each constants table in the code
-records the source of its values.
+The templates take their physical constants and material properties from the handbooks and data
+sources listed in~\autoref{tab:authoritative_sources}.
+Each table of constants in the template code names its source.
 
 \begin{table}[t]
 \small
@@ -320,6 +323,93 @@ Do not include any preamble, conversational text, explanations, or markdown form
 \end{tcolorbox}
 
 % -------------
+\section{Difficulty Labeling}
+\label{sec:appendix_difficulty}
+
+Three domain experts of the template's branch set its difficulty level; one is its author and the
+other two did not write it.
+Each expert first scores the template on their own, from 1 to 3 on conceptual complexity,
+mathematical sophistication, and procedural depth, counting only what the solver must supply: a
+formula or method that the question states does not count.
+Each dimension takes the median of the three scores, and the sum of the three medians sets the
+level: 3--4 Easy, 5--6 Intermediate, and 7--9 Advanced.
+When a template's instances follow several reasoning paths, the experts score each path, and the
+template takes the median level of its paths.
+After the experts have scored, the panel of~\autoref{sec:appendix_domain_validation} rates every
+template with the prompt below as a second check; a template whose panel level differs from the
+experts' level goes back to its three experts for review, and the panel sets no level itself.
+The experts fix the levels before any evaluated model runs and never change them on the basis of
+evaluation results.
+
+\begin{tcolorbox}[
+    colback=gray!5,
+    colframe=gray!40,
+    boxrule=0.4pt,
+    arc=2pt,
+    left=6pt,
+    right=6pt,
+    top=6pt,
+    bottom=6pt,
+    breakable
+]
+\ttfamily\small
+You are an expert academic and senior engineering educator at a top-tier engineering university (like MIT or Caltech). You have decades of experience designing undergraduate courses and examinations for ABET-accredited programs. \\
+
+Your task is to rate the difficulty of an engineering problem template for a student who has just completed the core undergraduate course in its domain. Rate only what the student must supply: if the question states a formula, method, or principle, do not count it. \\
+
+Rate the template on three dimensions, each on a scale of 1 to 3: \\
+
+Conceptual complexity: \\
+1 = one principle, applied directly \\
+2 = several principles from one domain, or one modelling choice (e.g., flow regime, configuration, control volume) \\
+3 = principles from several domains, or assumptions the student must choose and justify \\
+
+Mathematical sophistication: \\
+1 = direct substitution into formulas (arithmetic, powers, roots, logarithms) \\
+2 = rearrangement, simultaneous or nonlinear equations, or probability beyond a single formula \\
+3 = calculus, differential equations, or an iterative or numerical solution \\
+
+Procedural depth: \\
+1 = 1-2 dependent intermediate quantities \\
+2 = 3-5 dependent intermediate quantities \\
+3 = 6 or more dependent intermediate quantities \\
+
+Sum the three scores and assign a level: 3-4 = Easy, 5-6 = Intermediate, 7-9 = Advanced. \\
+
+If the instances follow different reasoning paths, rate each path separately. \\
+
+Please evaluate the following template: \\
+Domain: [DOMAIN\_NAME\_HERE] \\
+Area: [AREA\_NAME\_HERE] \\
+Template source code: [TEMPLATE\_CODE\_HERE] \\
+Instances (one per reasoning path): [INSTANCES\_HERE] \\
+
+Return your answer only in a strict JSON format as given below.
+
+\vspace{8pt}
+\noindent\bgroup\ttfamily
+\texttt{\char`\{}
+
+\vspace{4pt}
+\hspace*{1em}"template": "[TEMPLATE\_NAME\_HERE]",\\
+\hspace*{1em}"paths": [\\
+\hspace*{2em}\texttt{\char`\{}\\
+\hspace*{3em}"path": "<short description of the reasoning path>",\\
+\hspace*{3em}"conceptual\_complexity": <integer 1-3>,\\
+\hspace*{3em}"mathematical\_sophistication": <integer 1-3>,\\
+\hspace*{3em}"procedural\_depth": <integer 1-3>,\\
+\hspace*{3em}"level": "<Easy | Intermediate | Advanced>",\\
+\hspace*{3em}"justification": "<one sentence explaining the scores>"\\
+\hspace*{2em}\texttt{\char`\}}\\
+\hspace*{1em}]\\
+\texttt{\char`\}}
+\egroup
+\vspace{8pt}
+
+Do not include any preamble, conversational text, explanations, or markdown formatting around the JSON block.
+\end{tcolorbox}
+
+% -------------
 \section{Dataset Statistics}
 \label{appendix:statistics}
 
@@ -329,8 +419,8 @@ behind~\autoref{subsec:taxonomy} and~\autoref{subsec:templates}.
 \paragraph{Structural Balance and Granularity.} Each branch holds 30 templates, so every branch
 weighs the same in the aggregate measures.
 The number of areas differs by branch (\autoref{tab:difficulty_stats}): Mechanical Engineering
-groups its topics into six broad areas, Chemical and Electrical Engineering have seven, and Civil and
-Industrial Engineering have eleven.
+groups its topics into six broad areas, Chemical and Electrical Engineering have seven, and Civil
+and Industrial Engineering have eleven.
 \autoref{tab:area} gives the templates of every area by level; the number of templates per area
 follows the pedagogical significance the panel assigns to the area
 (\autoref{sec:appendix_significance_scoring}).
@@ -456,8 +546,8 @@ Intermediate, and 510 Advanced instances, 450 per branch.
         \textbf{Total} & \textbf{15} & \textbf{42} & \textbf{58} & \textbf{58} & \textbf{34} & \textbf{150} \\
         \bottomrule
     \end{tabular}
-    \caption{\textbf{Dataset statistics by branch.} Domains, areas, and templates per difficulty level;
-    each branch holds 30 templates.}
+    \caption{\textbf{Dataset statistics by branch.} Domains, areas, and templates per difficulty
+    level; each branch holds 30 templates.}
     \label{tab:difficulty_stats}
 \end{table}
 
@@ -471,8 +561,8 @@ numbers masked (\autoref{tab:template_variation}): the question wording, in whic
 material or fluid counts as a different wording; the reasoning path, that is, the lines of the gold
 trace that contain an equation, in order, with the names that vary between questions also masked;
 and the form of the answer.
-In 92 of the 150 templates, the instances follow two or more reasoning paths, and the other 58 follow
-a single path (chemical 18, electrical 5, civil 14, industrial 10, mechanical 11).
+In 92 of the 150 templates, the instances follow two or more reasoning paths, and the other 58
+follow a single path (chemical 18, electrical 5, civil 14, industrial 10, mechanical 11).
 The same 92 templates show more than one path in 500 further draws, so the evaluation set misses no
 template's second path; counting a name change inside an equation as a different path raises the
 count to 96 templates.
@@ -495,8 +585,8 @@ number lies within 5\% of its counterpart; the evaluation set holds 61 such pair
         \bottomrule
     \end{tabular}
     \caption{\textbf{Variation within a template.} Number of templates whose 15 evaluation-set
-    instances show the given number of distinct question wordings, reasoning paths, and answer forms,
-    with numbers masked; each column sums to 150.}
+    instances show the given number of distinct question wordings, reasoning paths, and answer
+    forms, with numbers masked; each column sums to 150.}
     \label{tab:template_variation}
 \end{table}
 
