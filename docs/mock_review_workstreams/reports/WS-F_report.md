@@ -11,7 +11,7 @@ are drawn from the same `figure_data()`.
 
 Today's `paper_figures.py`, fed the inputs the committed PDFs were drawn from (`results.json` at `081373e`,
 `expert_request/scored.json`), reproduces all 8 committed PDFs byte for byte. For `error-categories`, this holds with
-the committed bar order. The design is therefore unchanged, and only the data and the three approved fixes below differ.
+the committed bar order. The design is therefore unchanged, and only the data and the approved fixes below differ.
 Every figure's data changed, so none stays byte-identical.
 
 ## Fixes in `paper_figures.py` (approved by the owner, 2026-10-08)
