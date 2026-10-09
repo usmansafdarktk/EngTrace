@@ -178,9 +178,6 @@ Fleiss' $\kappa$ is undefined for civil and industrial, where every decision is 
 deflated where nearly every template is approved~\citep{feinstein1990high}: in electrical, 5 of the
 90 decisions on templates are rejections, so 90\% agreement gives a $\kappa$ of 0.365.
 Gwet's AC1 and AC2 are not deflated in this way, so the table reports them beside $\kappa$.
-In the first round, 43 of the 450 decisions on templates are rejections.
-At least one expert rejects 22 templates (chemical 9, electrical 3, and mechanical 10), 15 of them
-by a majority, and every civil and industrial expert approves all 30 templates of their branch.
 
 A template that any expert rejects, or whose code changes, returns to the same three experts until
 all three approve it.
@@ -188,19 +185,24 @@ It is revised where the rejection holds, and each expert hand-checks a new insta
 the three has seen.
 Certification takes six rounds:
 \begin{itemize}[nosep, leftmargin=*]
-\item in the second round, 10 of the 66 decisions are rejections, on 5 of the 22 templates;
-\item the third round approves all 5, and its two hand checks that do not match give the gold value
-in pascals where the gold answer is in kilopascals;
-\item a fourth round re-certifies two templates whose sampled parameters are widened so that each
-supplies 15 distinct instances;
-\item a fifth round re-certifies two templates whose questions state the system, the form of the
-equation, and the property data on which the answer depends, and one of its 6 decisions is a
-rejection, on the physical plausibility of compressing organic compounds above their decomposition
-temperatures;
-\item a sixth round re-certifies one template, with organic compounds held below their decomposition
-temperatures, and all three experts approve it.
+\item \textbf{Round 1:} All 150 templates and the 20 planted defects; 43 of the 450 decisions on
+templates are rejections, and at least one expert rejects 22 templates (chemical 9, electrical 3,
+and mechanical 10), 15 of them by a majority, while every civil and industrial expert approves all
+30 templates of their branch.
+\item \textbf{Round 2:} The 22 templates that at least one expert rejected; 10 of the 66 decisions
+are rejections, on 5 of the 22 templates, and 66 of 66 hand checks match the gold value.
+\item \textbf{Round 3:} The 5 templates rejected in round 2; all three experts approve all 5, and
+13 of 15 hand checks match, the other two giving the gold value in pascals where the gold answer
+is in kilopascals.
+\item \textbf{Round 4:} Two templates whose sampled parameters are widened so that each supplies
+15 distinct instances; all three experts approve both, and 6 of 6 hand checks match.
+\item \textbf{Round 5:} Two templates whose questions state the system, the form of the equation,
+and the property data on which the answer depends; one of the 6 decisions is a rejection, on the
+physical plausibility of compressing organic compounds above their decomposition temperatures, and
+6 of 6 hand checks match.
+\item \textbf{Round 6:} The template rejected in round 5, with organic compounds held below their
+decomposition temperatures; all three experts approve it, and 3 of 3 hand checks match.
 \end{itemize}
-In rounds 2 to 6, 66 of 66, 13 of 15, 6 of 6, 6 of 6, and 3 of 3 hand checks match the gold value.
 Every template is thus approved unanimously in the latest round that reviewed it.
 Its current code regenerates, byte for byte, the instances its experts reviewed, and the evaluation
 set holds instances of these certified versions only.

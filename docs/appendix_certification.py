@@ -142,16 +142,19 @@ round_phrases = [
     # the first round's hand checks: one per label row, of which some give no number to compare
     f"Of the {rows_r1} first-round hand checks, {R[1]['compared']} have a number to compare; {R[1]['matched']} of "
     f"these match the gold value within 1\\%",
+    # one item per round, each opening with its bold label (the round list after the Results paragraph)
+    f"\\textbf{{Round 1:}} All {R[1]['templates']} templates and the {int(plant_readings[1]) // 3} planted defects",
     f"{R[1]['rejecting']} of the {R[1]['verdicts']} decisions on templates are rejections",
+    f"\\textbf{{Round 2:}} The {R[2]['templates']} templates that at least one expert rejected",
     f"{R[2]['rejecting']} of the {R[2]['verdicts']} decisions are rejections, on {R[2]['rejected']} of the "
     f"{R[2]['templates']} templates",
-    f"the third round approves all {R[3]['templates']}",
-    f"a fourth round re-certifies {WORD[R[4]['templates']]} templates",
-    f"a fifth round re-certifies {WORD[R[5]['templates']]} templates",
-    f"{WORD[R[5]['rejecting']]} of its {R[5]['verdicts']} decisions",
-    f"a sixth round re-certifies {WORD[R[6]['templates']]} template{'s' if R[6]['templates'] != 1 else ''}",
-    ", ".join(f"{R[n]['matched']} of {R[n]['compared']}" for n in later[:-1])
-    + f", and {R[later[-1]]['matched']} of {R[later[-1]]['compared']} hand checks",
+    f"\\textbf{{Round 3:}} The {R[3]['templates']} templates rejected in round 2; all three experts approve all "
+    f"{R[3]['templates']}",
+    f"\\textbf{{Round 4:}} {WORD[R[4]['templates']].capitalize()} templates",
+    f"\\textbf{{Round 5:}} {WORD[R[5]['templates']].capitalize()} templates",
+    f"{WORD[R[5]['rejecting']]} of the {R[5]['verdicts']} decisions is a rejection",
+    "\\textbf{Round 6:} The template rejected in round 5" if R[6]["templates"] == 1 else "ROUND 6 CHANGED",
+    *[f"{R[n]['matched']} of {R[n]['compared']} hand checks match" for n in later],
     "in pascals where the gold answer is in kilopascals",
     # the agreement table's undefined cells, and electrical's kappa beside its percent agreement
     "undefined for " + " and ".join(undefined_kappa),
