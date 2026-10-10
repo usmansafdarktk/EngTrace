@@ -45,7 +45,7 @@ step the arithmetic check flags (precision 0.905 on the 189 flags a domain exper
 $^{\ddagger}$Run with reasoning at medium effort, the setting matched to the models that reason by
 default; \autoref{tab:matched} gives the same models at their providers' defaults and the paired
 change. $^{\ast}$No reasoning setting offered. $^{\dagger}$99 responses empty at the output ceiling.
-Judged step flags: \autoref{tab:judged_steps}.}
+Judged step flags: \autoref{tab:coverage}.}
 \label{tab:main_results}
 \end{table*}
 % END GENERATED tab:main_results
@@ -106,7 +106,7 @@ and 46\% to 83\% of the other models', but only 20\% of \texttt{Claude Sonnet 5}
 reach every milestone.
 On the 58 templates whose instances all follow one derivation, the first five solve some but not
 all instances of 7\% to 34\% of the templates and the other six of 14\% to 59\%
-(\autoref{tab:single_path}), so a low-scoring model often solves one instance of a derivation and
+(\autoref{appendix:results}), so a low-scoring model often solves one instance of a derivation and
 fails another, a pattern consistent with the expert reading, in which calculation errors dominate
 (\autoref{subsec:error_analysis}).
 
@@ -185,7 +185,7 @@ milestones than on instances with one, reaching 0.104 to 0.254 for the last five
 Over readable responses, with the answer kind as a covariate and templates as clusters, each
 further milestone multiplies the odds of a wrong answer by 1.21 (95\% interval 1.09 to 1.33) when
 pooled over the models; per model, the slope holds after Holm's correction for three of the eleven
-(\autoref{tab:depth_model}).
+(\autoref{tab:level_gap}).
 
 \subsubsection{Reasoning, Equations, and Tools}
 \label{subsec:reasoning_equations_tools}

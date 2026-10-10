@@ -125,8 +125,8 @@ Labels used before their sections exist. Each must be defined when its section i
 - Defined in `appendices/models.tex` besides the above: `tab:providers` (serving endpoints; a block written by
   `full_run_28092026/paper_results.py --write`).
 - Defined in `appendices/results.tex`: `appendix:results` and the blocks `paper_results.py --write` writes there:
-  `tab:matched`, `tab:single_path`, `tab:scoring_variants`, `tab:coverage`, `tab:coverage_variants`,
-  `tab:judged_steps`, `tab:flag_precision`, `tab:level_gap`, `tab:depth_model`. Defined in
+  `tab:matched`, `tab:scoring_variants`, `tab:coverage` (also `tab:judged_steps`), `tab:coverage_variants`,
+  `tab:level_gap`. Defined in
   `appendices/branch_domain.tex`: `appendix:branch_domain`, `tab:branch_domain` (also `tab:by_branch`,
   `tab:by_domain_kind`), `fig:branch_bars`, `fig:domain_radar`. Defined in `appendices/paraphrase.tex`:
   `appendix:paraphrase`, `tab:paraphrase`. Defined in `appendices/further_experiments.tex`: `appendix:experiments`,

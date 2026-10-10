@@ -22,7 +22,7 @@ Flags (the registry in docs/mock_review_workstreams/00_ORCHESTRATION.md, section
                                  providers' defaults); tab:matched always holds both configurations
     --repaired                   the two chemical templates are repaired: the "with and without" clauses and the B4-reading phrases
                                  are not generated, and tab:level_gap drops its "without two chemical" column
-    --judged-in-table            the judged step flags stay in Table 1 (they are in tab:judged_steps otherwise)
+    --judged-in-table            the judged step flags stay in Table 1 (they are in tab:coverage otherwise)
     --text-only                  with --write or --out: the blocks only, the figures as drawn
 
 Files written: 6_results.tex (Table 1, the two main-text figures and the prose phrases), appendices/results.tex,
@@ -1208,9 +1208,9 @@ phrases = [  # 6_results.tex must contain each of these, whitespace aside
     f"{tt('claude-sonnet-5')}'s, {pct(COV['claude-sonnet-5']['wrong_full_coverage'])} of which reach every milestone",
     (f"On the {N_SINGLE} templates whose instances all follow one derivation, the first {WORD[len(TOP5)]} solve some but not all instances of "
      f"{pct(min(first5_some))} to {pct(max(first5_some))} of the templates and the other {WORD[len(other6_some)]} of {pct(min(other6_some))} to "
-     f"{pct(max(other6_some))} (\\autoref{{tab:single_path}})" if MATCHED_HEAD else
+     f"{pct(max(other6_some))} (\\autoref{{appendix:results}})" if MATCHED_HEAD else
      f"On the {N_SINGLE} templates whose instances all follow one derivation, the lower tier solves some but not all instances of up to "
-     f"{pct(max(low_some))} of the templates and the upper tier of at most {pct(max(top_some))} (\\autoref{{tab:single_path}})"),
+     f"{pct(max(low_some))} of the templates and the upper tier of at most {pct(max(top_some))} (\\autoref{{appendix:results}})"),
     # the stability of the tiers
     f"Each of {q5_pairs} instances over {q5_templates} templates has a paraphrase that keeps every number, unit, and symbol in place",
     f"for {WORD[len(q5_within)]} of the {WORD[len(ORDER)]} models it is bounded within $\\pm {margin:.2f}$ at 90\\% confidence ("
@@ -1263,7 +1263,7 @@ phrases = [  # 6_results.tex must contain each of these, whitespace aside
     f"multiplies the odds of a wrong answer by {f2(D_POOLED['odds_ratio'])} (95\\% interval {f2(D_POOLED['or_ci'][0])} to "
     f"{f2(D_POOLED['or_ci'][1])}) when pooled over the models",
     stand("depth_model") + f"per model, the slope holds after Holm's correction for {WORD[len(depth_holds)]} of the {WORD[len(ORDER)]} "
-    "(\\autoref{tab:depth_model})",
+    "(\\autoref{tab:level_gap})",
     # 5.3.4
     f"{WORD[n_experiments].capitalize()} experiments on a {n_sub}-instance subset extend the evaluation, three changing one thing and one "
     "adding two flagships as anchors",
@@ -1306,6 +1306,24 @@ phrases = [  # 6_results.tex must contain each of these, whitespace aside
     f"{top5_symbolic} are symbolic answers scored by the numbers they state, and {remaining_incorrect} fall in neither group",
     f"which the arithmetic check flags in {pct1(min(digit_top5))} to {pct1(max(digit_top5))} of their correct answers",
 ]
+
+# Consistency within a template, stated in the results appendix (the per-model table is not printed): the ranges over the models of
+# the templates solved on all and on some instances, single-path and other templates, and the most templates a model fails on all.
+def sp_rng(group: str, col: str) -> str:
+    vals = [S_MODELS[k][group][col] for k in ORDER]
+    return f"{pct(min(vals))} to {pct(max(vals))}"
+
+
+SP_SRC = "matched" if HEADLINE == "matched" else "single_path"  # the file S_MODELS reads
+sp_none = {g: max(round(S_MODELS[k][g]["none"] * n) for k in ORDER) for g, n in (("single", N_SINGLE), ("others", N_MULTI))}
+claim(set(sorted(ORDER, key=lambda k: -S_MODELS[k]["single"]["some"])[:2]) == set(ORDER[-2:]),
+      "the two lowest models solve some but not all instances of more single-path templates than any other model")
+# Carried precision, stated in the results appendix (the per-model table is not printed): the largest share for one model, and the
+# confirmed slips the classification can place (the others sit in steps it cannot classify).
+fp_max_share = max(FP_MODELS[k]["carried_precision"] / FP_MODELS[k]["flags"] for k in ORDER if FP_MODELS[k]["flags"])
+fp_classified = FP_EXPERT["carried_precision"] + FP_EXPERT["other"]
+drift(FP_EXPERT["slips"] - fp_classified == FP_EXPERT.get("step_changed", 0),
+      f"flag_precision.json: {FP_EXPERT['slips']} confirmed slips, {fp_classified} classified, {FP_EXPERT.get('step_changed', 0)} not classifiable")
 
 appendix_phrases = {
     "results": [
@@ -1368,10 +1386,18 @@ appendix_phrases = {
         f"{f2(D_POOLED['odds_ratio'])} (95\\% interval {f2(D_POOLED['or_ci'][0])} to {f2(D_POOLED['or_ci'][1])})",
         stand("matched") + f"Reasoning raises all three models run with it (Holm-adjusted $p$ {pv(max(M_PAIRED[k]['p_holm'] for k in RERUN))}), "
         f"and for {series([tt(k) for k in above_margin])} the 90\\% interval lies wholly above $+{margin:.2f}$",
-        stand("flag_precision") + f"{fp_carried} of the {thousands(fp_total)} ({pct1(fp_carried / fp_total)}) are carried precision, a printed result that "
-        "is a correct rounding of the value recomputed from the unrounded values earlier in the response, and "
-        + (f"none of the {FP_EXPERT['slips']} slips the domain expert confirmed is" if not FP_EXPERT["carried_precision"] else
-           f"{FP_EXPERT['carried_precision']} of the {FP_EXPERT['slips']} slips the domain expert confirmed are"),
+        stand("flag_precision") + f"{fp_carried} of the {thousands(fp_total)} ({pct1(fp_carried / fp_total)}; at most {pct1(fp_max_share)} for any "
+        "model) are carried precision, a printed result that is a correct rounding of the value recomputed from the unrounded values earlier "
+        f"in the response, and of the {FP_EXPERT['slips']} slips the domain expert confirmed, "
+        + (f"none of the {fp_classified} it can classify is" if not FP_EXPERT["carried_precision"] else
+           f"{FP_EXPERT['carried_precision']} of the {fp_classified} it can classify are"),
+        # consistency within a template (the counts behind the Results sentence on single-path templates)
+        stand(SP_SRC) + f"separately for the {N_SINGLE} templates whose instances all follow one derivation and for the {N_MULTI} others",
+        stand(SP_SRC) + f"Across the models, the share of templates solved on every instance runs from {sp_rng('single', 'all')} on the "
+        f"single-path templates and from {sp_rng('others', 'all')} on the others, and the share solved on some but not all from "
+        f"{sp_rng('single', 'some')} and from {sp_rng('others', 'some')}",
+        stand(SP_SRC) + f"No model fails every instance of more than {WORD.get(sp_none['single'], str(sp_none['single']))} of the {N_SINGLE} "
+        f"single-path templates or {WORD.get(sp_none['others'], str(sp_none['others']))} of the {N_MULTI} others",
     ],
     "branch_domain": [
         f"of {WORD[len(REPRESENTATIVE)]} representative models",
@@ -1519,7 +1545,7 @@ def row_values(k: str, src: str) -> dict:
 
 def main_row(k: str, src: str, rerun: bool = False, letter: bool = True) -> str:
     """Table 1 (the review of 2026-10-09): FAC, tier, the all-instances share, the unreadable share, MC, the flags and the calculations
-    parsed; MC by matching alone and the judge-decided share stay in tab:coverage_variants, tab:coverage and tab:judged_steps."""
+    parsed; MC by matching alone, the judge-decided share and the judged step flags stay in tab:coverage_variants and tab:coverage."""
     v = row_values(k, src)
     cells = [mark(k, rerun), with_interval(v["fac"], v["fac_ci"]), v["letter"] if letter else "--", val(v["solved"]), pct1(v["unreadable"]),
              with_interval(v["mc5"], v["mc5_ci"])]
@@ -1582,7 +1608,7 @@ put("tab:main_results", "main", table(
     f"{pct(min(judged_share))} to {pct(max(judged_share))} of a model's milestones; MC by matching alone is in "
     "\\autoref{tab:coverage_variants}. " + _flag_note + main_rows_note
     + STAR_NOTE + f" $^{{\\dagger}}${glm_empty_shown} responses empty at the output ceiling."
-    + (" Judged step flags: \\autoref{tab:judged_steps}." if not JUDGED_IN_TABLE else ""),
+    + (" Judged step flags: \\autoref{tab:coverage}." if not JUDGED_IN_TABLE else ""),
     "tab:main_results", shade_header=False, size="\\small\n\\setlength{\\tabcolsep}{4pt}", resize=True))
 
 # The matched family: both configurations side by side, the paired change for the re-run models.
@@ -1612,43 +1638,6 @@ put("tab:matched", "results", table(
     f"orderings is {f3(M_TAU['tau'])}" + (f" (95\\% interval {ci(M_TAU['ci'], False)})" if M_TAU.get("ci") else "")
     + "." + STAR_NOTE + " $^{\\ddagger}$Run with reasoning at medium effort.",
     "tab:matched", size="\\footnotesize", resize=True))
-
-# The judged step flags, moved out of Table 1.
-rows = [f"{mark(k, rerun=MATCHED_HEAD and k in RERUN)} & {with_interval(Q3[k]['router_judge_rate_on_fully_solved'], Q3[k]['router_judge_ci'])} & "
-        f"{f2(Q3[k]['router_steps_flagged_per_trace'])} & {with_interval(Q3[k]['router_rate_on_wrong'], Q3[k]['router_wrong_ci'])} & "
-        f"{f2(Q3[k]['e5_judged_fraction'])}" for k in ORDER]
-if not MATCHED_HEAD and RERUN and any(M_MODELS[k].get("router_flag_rate") is not None for k in RERUN):
-    rows += [group_row("With reasoning at medium effort", 5)] + [f"{mark(k, rerun=True)} & {val(M_MODELS[k].get('router_flag_rate'), M_MODELS[k].get('router_flag_ci'))} & -- & -- & --"
-                                                               for k in RERUN]
-put("tab:judged_steps", "results", table(
-    "l c r c r", "\\textbf{Model} & " + mk("Judged step flags,", "correct answers") + " & " + mk("Steps flagged", "per response") + " & "
-    + mk("Any step flagged,", "wrong answers") + " & " + mk("Judge-decided", "milestones"), rows,
-    (note("matched") if RERUN else "") + "\\textbf{Judged step flags.} The judged step check on the responses of the evaluation"
-    + (" at matched settings" if MATCHED_HEAD else "") + ": the share of "
-    "correct-answer responses with at least one step the judge flags (95\\% interval over templates), the flagged steps per response, the "
-    "share of wrong answers with at least one step either check flags, and the share of "
-    f"milestones the judge rather than the matcher decides. The check runs the judge at the provider's default settings, so its flags are "
-    f"judged, not verified: in the expert study, {router_alone_tp} of the {router_alone_n} flags it raises inside correct answers are errors "
-    f"(precision {f2(router_alone_precision)}), and together with the arithmetic check it finds {f2(router_recall)} of the flawed steps there "
-    f"at precision {f2(router_precision)} (\\autoref{{tab:validation_results}}).{STAR_NOTE} "
-    f"$^{{\\dagger}}${Q1['glm-5.3']['empty']} responses empty at the output ceiling. $^{{\\ddagger}}$"
-    + ("Run with reasoning at medium effort." if MATCHED_HEAD else "Reasoning at medium effort."),
-    "tab:judged_steps", size="\\footnotesize"))
-
-# Consistency within a template: single-path and other templates.
-rows = [f"{tt(k)} & " + " & ".join(with_interval(S_MODELS[k][g][c], S_MODELS[k][g]["ci"][c]) for g in ("single", "others") for c in ("all", "some", "none"))
-        for k in ORDER]
-header = (f" & \\multicolumn{{3}}{{c}}{{\\textbf{{Single-path templates ({SINGLE.get('n_single', N_SINGLE)})}}}} & \\multicolumn{{3}}{{c}}{{\\textbf{{Other "
-          f"templates ({SINGLE.get('n_others', N_MULTI)})}}}} \\\\\n\\cmidrule(lr){{2-4}}\\cmidrule(lr){{5-7}}\n"
-          "\\textbf{Model} & \\textbf{All} & \\textbf{Some} & \\textbf{None} & \\textbf{All} & \\textbf{Some} & \\textbf{None}")
-put("tab:single_path", "results", table(
-    "l c c c c c c", header, rows,
-    note("single_path") + "\\textbf{Consistency within a template.} "
-    f"The share of templates whose 15 instances a model solves on all, on some but not all, "
-    f"and on none, with 95\\% intervals over templates, for the {SINGLE.get('n_single', N_SINGLE)} templates whose instances all follow one "
-    f"derivation and the {SINGLE.get('n_others', N_MULTI)} whose instances follow several. A template counts as solved on an instance when the "
-    "final answer is correct; the shares are of templates, not of instances.",
-    "tab:single_path", size="\\footnotesize", resize=True))
 
 # Milestone Coverage variants.
 rows = []
@@ -1730,41 +1719,6 @@ put("tab:providers", "results", table(
     + (" $^{\\ddagger}$Responses with reasoning at medium effort; a model that one endpoint served is not listed." if HEADLINE == "matched" else ""),
     "tab:providers", size="\\footnotesize", star=False))
 
-# Depth, controlled.
-rows = [f"{tt(k)} & " + " & ".join(with_interval(D_MODELS[k]["bins"][b]["rate"], D_MODELS[k]["bins"][b]["ci"]) for b in D_BINS)
-        + f" & {sgn(D_MODELS[k]['slope'])} ({ci(D_MODELS[k]['ci'])}) & {pv(D_MODELS[k]['p_holm'])}" for k in ORDER]
-header = (" & \\multicolumn{" + str(len(D_BINS)) + "}{c}{\\textbf{Wrong-answer rate by gold milestones}} & \\multicolumn{2}{c}{\\textbf{Logistic slope}} \\\\\n"
-          f"\\cmidrule(lr){{2-{1 + len(D_BINS)}}}\\cmidrule(lr){{{2 + len(D_BINS)}-{3 + len(D_BINS)}}}\n\\textbf{{Model}} & "
-          + " & ".join(f"\\textbf{{{b.replace('-', '--')}}}" for b in D_BINS) + " & " + mk("Per milestone", "(95\\% interval)") + " & \\textbf{$p$ (Holm)}")
-put("tab:depth_model", "results", table(
-    "l " + "c " * len(D_BINS) + "c r", header, rows,
-    note("depth_model") + "\\textbf{Wrong answers by the depth of the gold derivation.} The wrong-answer rate over readable responses only (empty responses and "
-    "responses that state no answer are left out): per bin of the gold milestone count, the rate with its 95\\% interval over templates ("
-    + ", ".join(str(D_MODELS[ORDER[0]]["bins"][b]["n"]) for b in D_BINS[:-1]) + f", and {D_MODELS[ORDER[0]]['bins'][D_BINS[-1]]['n']} instances); "
-    "then the slope of a template-clustered logistic model of a wrong answer on the milestone count, with the answer kind as a covariate, and its "
-    f"Holm-adjusted $p$ over the {WORD[len(ORDER)]} models. The slope holds after correction for {WORD[len(depth_holds)]} of them.",
-    "tab:depth_model", size="\\footnotesize", resize=True))
-
-# Carried precision among the arithmetic flags.
-rows = [f"{tt(k)} & {FP_MODELS[k]['flags']} & {FP_MODELS[k]['carried_precision']} & {FP_MODELS[k]['other']} & "
-        f"{pct(FP_MODELS[k]['carried_precision'] / FP_MODELS[k]['flags']) if FP_MODELS[k]['flags'] else '--'}" for k in ORDER]
-rows += ["\\midrule", f"All models & {fp_total} & {fp_carried} & {fp_total - fp_carried} & {pct(fp_carried / fp_total) if fp_total else '--'}",
-         f"Slips the domain expert confirmed & {FP_EXPERT['slips']} & {FP_EXPERT['carried_precision']} & {FP_EXPERT['other']} & "
-         f"{pct(FP_EXPERT['carried_precision'] / FP_EXPERT['slips']) if FP_EXPERT['slips'] else '--'}"]
-put("tab:flag_precision", "errors", table(
-    "l r r r r", "\\textbf{Model} & " + mk("Arithmetic flags,", "correct answers") + " & " + mk("Carried", "precision") + " & \\textbf{Other} & "
-    + mk("Carried", "share"), rows,
-    note("flag_precision") + "\\textbf{Carried precision among the arithmetic flags.} Every arithmetic flag on a correct-answer response "
-    "classified as carried precision, where the printed result is a "
-    "correct rounding of the value recomputed from the unrounded upstream values that appear earlier in the response, or other. The last row "
-    f"applies the same classification to the {FP_EXPERT['slips']} flags the domain expert confirmed as slips"
-    + (" (read on responses at the providers' default settings)" if MATCHED_HEAD else "")
-    + (f"; {FP_EXPERT['step_changed']} of them sit in steps whose text changed after the reading and are not classified"
-       if FP_EXPERT.get("step_changed") else "")
-    + ". A carried-precision flag marks a "
-    "rounding the response carried forward, not a wrong operation; the classification is mechanical and was not read by an expert.",
-    "tab:flag_precision", size="\\footnotesize", star=False))
-
 # Branch and domain: shaded branch rows, each followed by its domains; the models across, in order of FAC.
 dom_by_branch = {b: sorted(d for d in domain_templates if branch_of[d] == b) for b in BRANCH}
 lower_held = {(k, pp["a"] if pp["diff"] < 0 else pp["b"]) for k, pp in branch_pairs}  # the lower branch of the pair that holds
@@ -1788,7 +1742,8 @@ put("tab:branch_domain", "branch_domain", table(
     "detect at 80\\% power, per model.",
     "tab:branch_domain", size="\\footnotesize", resize=True, aliases=("tab:by_branch", "tab:by_domain_kind")))
 
-# The level means, the level gap with its tests, and the share scored 0 by the depth of the gold derivation.
+# The level means, the level gap with its tests, the share scored 0 by the depth of the gold derivation, and the controlled depth
+# model's slope per model (its per-bin rates over readable responses repeat the share scored 0 but for the empty responses).
 bins = [b for b in Q3[ORDER[0]]["by_milestone_count"] if b != "0"]
 rows = []
 for k in ORDER:
@@ -1796,48 +1751,62 @@ for k in ORDER:
     chem = "" if REPAIRED else f" & {sgn(q['without_two_chemical']['gap'])} ({pv(q['without_two_chemical']['p_welch_holm'])})"
     rows.append(f"{tt(k)} & " + " & ".join(f3(BL[k]["level"][lv]["mean"]) for lv in LEVELS)
                 + f" & {sgn(q['gap'])} ({ci(q['ci'])}) & {pv(q['p_welch_holm'])} & {f3(q['detectable_planned'])}" + chem + " & "
-                + " & ".join(f3(Q3[k]["by_milestone_count"][b]["wrong_rate"]) for b in bins))
+                + " & ".join(f3(Q3[k]["by_milestone_count"][b]["wrong_rate"]) for b in bins)
+                + f" & {sgn(D_MODELS[k]['slope'])} ({ci(D_MODELS[k]['ci'])}) & {pv(D_MODELS[k]['p_holm'])}")
 n_gap_cols = 3 if REPAIRED else 4
+slope_col = 5 + n_gap_cols + len(bins)  # the first of the two slope columns
 header = (" & \\multicolumn{3}{c}{\\textbf{FAC by level}} & \\multicolumn{" + str(n_gap_cols) + "}{c}{\\textbf{Easy minus Advanced}} & \\multicolumn{"
-          + str(len(bins)) + "}{c}{\\textbf{Share scored 0, by gold milestones}} \\\\\n\\cmidrule(lr){2-4}\\cmidrule(lr){5-" + str(4 + n_gap_cols)
-          + "}\\cmidrule(lr){" + str(5 + n_gap_cols) + "-" + str(4 + n_gap_cols + len(bins)) + "}\n"
+          + str(len(bins)) + "}{c}{\\textbf{Share scored 0, by gold milestones}} & \\multicolumn{2}{c}{\\textbf{Logistic slope}} \\\\\n"
+          "\\cmidrule(lr){2-4}\\cmidrule(lr){5-" + str(4 + n_gap_cols) + "}\\cmidrule(lr){" + str(5 + n_gap_cols) + "-" + str(4 + n_gap_cols + len(bins))
+          + "}\\cmidrule(lr){" + str(slope_col) + "-" + str(slope_col + 1) + "}\n"
           "\\textbf{Model} & \\textbf{Easy} & \\textbf{Intermediate} & \\textbf{Advanced} & \\textbf{Gap (95\\% interval)} & \\textbf{Welch $p$} & "
           "\\textbf{Detectable}" + ("" if REPAIRED else " & " + mk("Without two", "chemical")) + " & "
-          + " & ".join(f"\\textbf{{{b.replace('-', '--')}}}" for b in bins))
+          + " & ".join(f"\\textbf{{{b.replace('-', '--')}}}" for b in bins) + " & " + mk("Per milestone", "(95\\% interval)") + " & \\textbf{$p$ (Holm)}")
 put("tab:level_gap", "results", table(
-    "l r r r c r r " + ("" if REPAIRED else "c ") + "r " * len(bins), header, rows,
-    "\\textbf{Difficulty level and trace depth.} "
+    "l r r r c r r " + ("" if REPAIRED else "c ") + "r " * len(bins) + "c r", header, rows,
+    note("depth_model") + "\\textbf{Difficulty level and trace depth.} "
     f"Left: FAC over the {n_easy} Easy, {n_int} Intermediate, and {n_adv} Advanced templates. Middle: the Easy mean minus the Advanced mean, "
     "with its 95\\% interval, the Holm-adjusted $p$ of Welch's $t$-test, and the smallest gap the design detects at 80\\% power"
     + ("" if REPAIRED else ", and the gap with its $p$ without the two Advanced chemical templates whose wording does not pin the answer")
     + ". Right: the share of instances scored 0, empty responses included, by the number of milestones in the gold trace ("
     + ", ".join(str(Q3[ORDER[0]]["by_milestone_count"][b]["items"]) for b in bins[:-1])
-    + f", and {Q3[ORDER[0]]['by_milestone_count'][bins[-1]]['items']} instances).",
+    + f", and {Q3[ORDER[0]]['by_milestone_count'][bins[-1]]['items']} instances). Far right: over readable responses only (empty responses and "
+    "responses that state no answer are left out), the slope of a template-clustered logistic model of a wrong answer on the milestone count, "
+    f"with the answer kind as a covariate, and its Holm-adjusted $p$ over the {WORD[len(ORDER)]} models; the slope holds after correction for "
+    f"{WORD[len(depth_holds)]} of them.",
     "tab:level_gap", size="\\footnotesize", resize=True))
 
-# Coverage behind the wrong answers, the judge's share, and the precision of the arithmetic flags.
+# Coverage behind the wrong answers, the judge's share, the step flags (the judged step check's columns, which Table 1 does not print),
+# and the precision of the arithmetic flags. MC with the judge on wrong answers is tab:coverage_variants' "as scored, wrong" column.
 flag_by_model = {r[0]: (r[6], int(r[2]) - int(r[5])) for r in md_table(flags, r"\| model \| flags drawn") if r[0] != "all"}
 assert set(flag_by_model) == set(ORDER)
 rows = [f"{tt(k)} & {Q3[k]['readable_wrong_with_milestones']} & {f3(Q3[k]['e3_coverage_on_readable_wrong'])} & "
-        f"{f3(Q3[k]['e3_null_on_readable_wrong'])} & {f3(Q3[k]['e5_coverage_on_readable_wrong'])} & {f3(COV[k]['wrong_full_coverage'])} & "
-        f"{f3(Q3[k]['attribution_on_wrong']['e5_missing'])} & {f3(Q3[k]['e5_judged_fraction'])} & "
+        f"{f3(Q3[k]['e3_null_on_readable_wrong'])} & {f3(COV[k]['wrong_full_coverage'])} & {f3(Q3[k]['attribution_on_wrong']['e5_missing'])} & "
+        f"{with_interval(Q3[k]['router_rate_on_wrong'], Q3[k]['router_wrong_ci'])} & {f3(Q3[k]['e5_judged_fraction'])} & "
+        f"{f2(Q3[k]['router_steps_flagged_per_trace'])} & {with_interval(Q3[k]['router_judge_rate_on_fully_solved'], Q3[k]['router_judge_ci'])} & "
         + ("--" if MATCHED_HEAD and k in RERUN else f"{flag_by_model[k][0]} ({flag_by_model[k][1]})") for k in ORDER]
-header = (" & \\multicolumn{6}{c}{\\textbf{Wrong answers}} & \\textbf{All responses} & \\textbf{Correct answers} \\\\\n"
-          "\\cmidrule(lr){2-7}\\cmidrule(lr){8-8}\\cmidrule(lr){9-9}\n"
-          "\\textbf{Model} & \\textbf{Number} & " + mk("MC by", "matching") + " & " + mk("Chance", "floor") + " & " + mk("MC with", "judge")
-          + " & " + mk("All", "reached") + " & " + mk("Milestone", "missing") + " & " + mk("Judge-decided", "milestones") + " & "
-          + mk("Flag", "precision ($n$)"))
+header = (" & \\multicolumn{6}{c}{\\textbf{Wrong answers}} & \\multicolumn{2}{c}{\\textbf{All responses}} & \\multicolumn{2}{c}{\\textbf{Correct "
+          "answers}} \\\\\n\\cmidrule(lr){2-7}\\cmidrule(lr){8-9}\\cmidrule(lr){10-11}\n"
+          "\\textbf{Model} & \\textbf{Number} & " + mk("MC by", "matching") + " & " + mk("Chance", "floor") + " & " + mk("All", "reached")
+          + " & " + mk("Milestone", "missing") + " & " + mk("Any step", "flagged") + " & " + mk("Judge-decided", "milestones") + " & "
+          + mk("Steps flagged", "per response") + " & " + mk("Judged step", "flags") + " & " + mk("Arithmetic flag", "precision ($n$)"))
 put("tab:coverage", "results", table(
-    "l r r r r r r r c", header, rows,
-    "\\textbf{Milestone Coverage behind wrong answers.} "
-    "Per model, the readable wrong answers with milestones: how many; MC by matching alone and with the judge; the chance floor, the same "
-    "responses matched against a sibling instance's milestones; the share that reach every milestone; and, over the answered wrong answers, "
-    "the share with a milestone the judge rules missing. Then the share of all milestones the judge decides, and the precision of the "
-    f"arithmetic flags a domain expert read, with their number ({flags_slip} of {flags_decided} were slips overall"
+    "l r r r r r c r r c c", header, rows,
+    (note("matched") if RERUN else "") + "\\textbf{Milestone Coverage behind wrong answers, and the step flags.} "
+    "Per model, the readable wrong answers with milestones: how many; MC by matching alone (with the judge: \\autoref{tab:coverage_variants}); "
+    "the chance floor, the same responses matched against a sibling instance's milestones; and the share that reach every milestone. Over the "
+    "answered wrong answers: the share with a milestone the judge rules missing, and the share with at least one step either check flags. Over "
+    "all answered responses: the share of milestones the judge rather than the matcher decides, and the steps either check flags per response. "
+    "Over correct answers: the share with at least one step the judge flags, and the precision of the arithmetic flags a domain expert read, "
+    f"with their number ({flags_slip} of {flags_decided} were slips overall"
     + (f"; the expert read responses at the providers' default settings, so the column is empty for {series([tt(k) for k in RERUN])}, run "
-       "here with reasoning at medium effort" if MATCHED_HEAD else "") + f"). The "
-    f"{res['milestones']['items_without']} instances without milestones are left out.",
-    "tab:coverage", size="\\footnotesize", resize=True))
+       "here with reasoning at medium effort" if MATCHED_HEAD else "") + "). The two shares of responses with a flagged step carry 95\\% "
+    "intervals over templates. The judged step check runs the judge at the provider's default settings, so its flags are judged, not verified: "
+    f"in the expert study, {router_alone_tp} of the {router_alone_n} flags it raises inside correct answers are errors (precision "
+    f"{f2(router_alone_precision)}), and together with the arithmetic check it finds {f2(router_recall)} of the flawed steps there at precision "
+    f"{f2(router_precision)} (\\autoref{{tab:validation_results}}). The {res['milestones']['items_without']} instances without milestones are left "
+    "out of the coverage columns.",
+    "tab:coverage", size="\\footnotesize", resize=True, aliases=("tab:judged_steps",)))
 
 # Paraphrase.
 rows = [f"{tt(k)} & {sgn(Q5[k]['diff'])} ({ci(Q5[k]['ci'])}) & {ci(Q5[k]['ci90'])} & {pv(Q5[k]['p_holm'])} & {sgn(Q5[k]['e5']['diff'])}"
@@ -1953,8 +1922,10 @@ put("fig:error_categories", "main", figure(
     f"Each bar gives one model's readings ({rng([sum(by_model[m].values()) for m in B2_MODELS], str)}; {readers} domain experts per wrong "
     "answer, at the providers' default settings) by category; \\autoref{tab:error_by_level} gives them by level. " + FIG_NAME_NOTE,
     "fig:error_categories"))
-REGISTRY = ("tab:main_results", "tab:single_path", "tab:matched", "tab:coverage_variants", "tab:scoring_variants", "tab:providers",
-            "tab:depth_model", "tab:flag_precision", "tab:judged_steps", "tab:errors")  # the blocks the registry names for this script
+# The blocks the registry names for this script. The judged step flags are in tab:coverage (also labelled tab:judged_steps), the depth
+# slopes in tab:level_gap, and the single-path counts and the carried-precision split are sentences of the results appendix.
+REGISTRY = ("tab:main_results", "tab:matched", "tab:coverage_variants", "tab:scoring_variants", "tab:providers", "tab:coverage",
+            "tab:level_gap", "tab:errors")
 assert all(label in blocks for label in REGISTRY)
 
 
