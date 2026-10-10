@@ -2,16 +2,19 @@
 \section{Conclusion}
 \label{sec:conclusion}
 
-We introduced \ourdataset, 150 expert-certified symbolic templates in five engineering branches, and
-an evaluator that checks final answers, intermediate quantities, and displayed arithmetic
-deterministically wherever a check exists, with residual milestones sent to an LLM judge.
-On the final answer the five strongest of eleven LLMs are near the ceiling of these problems, while
-the process measures show how much of the gold derivation wrong answers keep and where correct
-answers hide arithmetic slips; a rule misstated behind a correct answer escapes every deterministic
-check.
-Reasoning at medium effort lifts \texttt{GPT-5.4 mini}, \texttt{Gemma 4 26B}, and
-\texttt{Gemini 3.1 Flash-Lite}, which return no reasoning tokens by default, by 0.04 to 0.12.
-The domain experts' reading of wrong answers finds mostly calculation slips, with conceptual errors
-growing on harder problems.
-Next steps are tests of memorized methods rather than wording, problems built on multi-modal
-artifacts such as diagrams, and the open-weights models under tool use.
+We introduced \ourdataset, a symbolic benchmark for verifiable process evaluation of engineering
+reasoning, whose expert-certified templates generate each problem together with a gold derivation
+in which every intermediate quantity, or milestone, is known exactly.
+An evaluator that agrees closely with human judgment scores each response on its answer, the
+milestones it reaches, and the arithmetic it shows, using deterministic checks wherever possible.
+Final-answer accuracy barely separates the strongest models and conceals much of the underlying
+reasoning: wrong answers often cover many of the milestones, while correct ones can contain
+calculation slips.
+Such slips, more than conceptual errors, account for most failures, and harder problems widen the
+gap between stronger and weaker models.
+Future work will confirm the principles and assumptions a solution applies, not only its numbers,
+since a misstated rule behind a correct result escapes every numerical test, and will turn the gold
+derivations into feedback for training and selecting LLMs.
+Moreover, extending the approach beyond examination-style questions, to open-ended design, real
+artifacts such as drawings and standards, and workflows that call solvers, simulators, and
+handbooks, would bring evaluation closer to engineering practice.

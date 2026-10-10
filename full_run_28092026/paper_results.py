@@ -1820,12 +1820,7 @@ appendix_phrases["limitations"] = [
     f"the interpreter is offered to the {WORD[len(tool)]} closed models, not required",
     f"The paraphrase test covers the {q5_templates} templates that can be reworded without changing the problem",
 ]
-appendix_phrases["conclusion"] = [
-    f"We introduced \\ourdataset, {N_TEMPLATES} expert-certified symbolic templates in {WORD[len(BRANCH)]} engineering branches",
-    f"On the final answer the {WORD[len(TOP5)]} strongest of {WORD[len(ORDER)]} LLMs are near the ceiling of these problems",
-    f"Reasoning at medium effort lifts {series([tt(k) for k in RERUN])}, which return no reasoning tokens by default, by "
-    f"{f2(min(m_change.values()))} to {f2(max(m_change.values()))}",
-]
+appendix_phrases["conclusion"] = []  # broad findings without numbers; listed so that any number added later must be generated
 
 # Branch and domain: shaded branch rows, each followed by its domains; the models across, in order of FAC.
 dom_by_branch = {b: sorted(d for d in domain_templates if branch_of[d] == b) for b in BRANCH}
