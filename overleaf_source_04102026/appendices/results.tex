@@ -4,55 +4,48 @@
 
 This section holds the tests and measures behind~\autoref{subsec:overall_performance}
 and~\autoref{subsec:difficulty_level}.
-Intervals resample templates, every family of tests is Holm-corrected, and a difference that does
-not hold comes with the smallest difference the design detects at 80\% power
+Intervals resample templates, every family of tests is Holm-corrected, and each FAC comparison and
+level gap that does not hold comes with the smallest difference the design detects at 80\% power
 (\autoref{appendix:protocol}).
 
-\paragraph{Pairwise Comparisons.} Of the 55 pairs, 36 differ on FAC after Holm correction under the
-sign-flip test over templates: inside the first five, \texttt{DeepSeek V4.1 Flash} from
-\texttt{GLM-5.3-Flash}, \texttt{DeepSeek V4.1 Flash} from \texttt{GPT-5.4 mini}, and
-\texttt{Claude Sonnet 5} from \texttt{GPT-5.4 mini}; \texttt{Muse Glimmer 30B} from none of them;
-27 of the 30 pairs between the first six and the last five; and inside the last five,
-\texttt{GLM-5.3} from \texttt{Qwen3-235B-2507}, \texttt{GLM-5.3} from \texttt{gpt-oss-20b},
-\texttt{Gemma 4 26B} from \texttt{Qwen3-235B-2507}, \texttt{Gemma 4 26B} from \texttt{gpt-oss-20b},
-\texttt{Gemini 3.1 Flash-Lite} from \texttt{gpt-oss-20b}, and \texttt{Qwen3-235B-2507} from
-\texttt{gpt-oss-20b}.
+\paragraph{Pairwise Comparisons.} The final answer separates most pairs of models but few at the
+top, and MC separates fewer pairs, none that the final answer does not.
+Of the 55 pairs, 36 differ on FAC after Holm correction under the sign-flip test over templates:
+three inside the first five (\texttt{DeepSeek V4.1 Flash} from \texttt{GLM-5.3-Flash},
+\texttt{DeepSeek V4.1 Flash} from \texttt{GPT-5.4 mini}, and \texttt{Claude Sonnet 5} from
+\texttt{GPT-5.4 mini}), none between \texttt{Muse Glimmer 30B} and the first five, 27 of the 30
+between the first six and the last five, and six inside the last five.
 Every non-significant FAC difference lies below what its pair detects (0.013 to 0.039).
 On MC, 15 pairs differ, each of them also on FAC: the three highest models,
 \texttt{Claude Sonnet 5}, \texttt{GLM-5.3-Flash}, and \texttt{Kimi K3}, do not separate, nor do
 \texttt{Claude Sonnet 5} and \texttt{DeepSeek V4.1 Flash}, which FAC does not separate either;
-Kendall's $\tau$~\citep{kendall1938} between the two orderings is 0.709 (95\% interval 0.345 to
-0.818).
+Kendall's $\tau$~\citep{kendall1938} between the FAC and MC orderings is 0.709 (95\% interval 0.345
+to 0.818).
 Strict FAC, which scores a partial answer 0, separates 29 pairs and agrees with FAC on 48 of the 55;
 a Wilcoxon test~\citep{wilcoxon1945} separates 17 on MC; and McNemar's exact
 test~\citep{mcnemar1947}, which treats the 2,250 instances as independent, separates 45.
 
-\paragraph{Matched Settings.} \autoref{tab:matched} gives FAC at matched settings, the configuration
-reported throughout, where \texttt{Gemma 4 26B}, \texttt{Gemini 3.1 Flash-Lite}, and
-\texttt{GPT-5.4 mini} reason at medium effort (\autoref{appendix:decoding}), and at the providers'
-defaults, each with the tier letters of its own family of pairwise tests.
-At the providers' defaults, \texttt{GPT-5.4 mini}, \texttt{Gemma 4 26B}, and
-\texttt{Gemini 3.1 Flash-Lite} return no reasoning tokens and score 0.852, 0.872, and 0.878; the
-five highest models are \texttt{DeepSeek V4.1 Flash}, \texttt{Claude Sonnet 5}, \texttt{Kimi K3},
-\texttt{GLM-5.3-Flash}, and \texttt{Muse Glimmer 30B}, and Kendall's $\tau$ between the orderings at
-the providers' defaults and at matched settings is 0.709.
-Reasoning raises all three models run with it (Holm-adjusted $p$ $<$0.001), and for
-\texttt{GPT-5.4 mini} and \texttt{Gemma 4 26B} the 90\% interval lies wholly above $+0.05$, the
-margin of~\autoref{appendix:protocol}; \autoref{appendix:experiments} reads them beside the
-reasoning-effort experiment.
-The expert readings of wrong answers (\autoref{appendix:error_analysis}) are of the responses at the
+\paragraph{Matched Settings.} Reasoning raises all three models run with it (Holm-adjusted $p$
+$<$0.001), and for \texttt{GPT-5.4 mini} and \texttt{Gemma 4 26B} the 90\% interval lies wholly
+above $+0.05$, the margin of~\autoref{appendix:protocol}.
+It also reorders the models: at the providers' defaults the final answer sorts them into two tiers,
+an upper six each of which differs from each of a lower five, while at matched settings, the
+configuration the evaluation reports, \texttt{GPT-5.4 mini} joins the first five
+(\autoref{tab:matched}; settings in~\autoref{appendix:decoding}).
+\autoref{appendix:experiments} reads these gains beside the reasoning-effort experiment, and the
+expert readings of wrong answers (\autoref{appendix:error_analysis}) are of the responses at the
 providers' defaults, so they do not describe the three models at matched settings.
 
-\paragraph{Consistency Within a Template.} We count, per model, the templates whose instances the
-model solves on all, on some, and on none, separately for the 58 templates whose instances all
-follow one derivation and for the 92 others.
+\paragraph{Consistency Within a Template.} The two lowest models, \texttt{Qwen3-235B-2507} and
+\texttt{gpt-oss-20b}, solve some but not all instances of more single-path templates than any other
+model: they often solve a derivation on one instance and fail it on another.
+We count, per model, the templates whose instances the model solves on all, on some, and on none,
+separately for the 58 templates whose instances all follow one derivation and for the 92 others.
 Across the models, the share of templates solved on every instance runs from 34\% to 93\% on the
 single-path templates and from 29\% to 88\% on the others, and the share solved on some but not
 all from 7\% to 59\% and from 12\% to 70\%.
 No model fails every instance of more than four of the 58 single-path templates or two of the 92
-others, and the two lowest models, \texttt{Qwen3-235B-2507} and \texttt{gpt-oss-20b}, solve some
-but not all instances of more single-path templates than any other model; the counts show how
-consistent a model is within a template, not why.
+others; the counts show how consistent a model is within a template, not why.
 
 % BEGIN GENERATED tab:matched (full_run_28092026/paper_results.py --write)
 \begin{table*}[t]
@@ -94,9 +87,10 @@ medium effort.}
 \end{table*}
 % END GENERATED tab:matched
 
-\paragraph{Scoring Rules.} Halving the answer tolerance swaps one pair of models and doubling it
-swaps two, and no swapped pair differs after correction ($\tau = 0.964$ and $0.927$ against the
-ordering as scored).
+\paragraph{Scoring Rules.} The tolerance, and which answers and templates count, barely move the
+ordering.
+Halving the answer tolerance swaps one pair of models and doubling it swaps two, and no swapped pair
+differs after correction ($\tau = 0.964$ and $0.927$ against the ordering as scored).
 Requiring a correct rounding at the displayed precision rather than accepting one unit either way,
 crediting a requested quantity stated in the body but not on the answer line, and leaving out the
 four templates answerable from their wording or the nine with symbolic answers move no model's FAC
@@ -146,33 +140,28 @@ the accepted answers by their relative error to the target.}
 \end{table*}
 % END GENERATED tab:scoring_variants
 
-\paragraph{Coverage and What Marks a Wrong Answer.} \autoref{tab:coverage} gives, per model,
-coverage on the wrong answers against its chance floor, the share of wrong answers with a milestone
-the judge rules missing, the share of milestones the judge decides, and the precision of the
-arithmetic flags of~\autoref{tab:main_results}.
-The flag rates do not rank the models: the two checks together recall fewer than half of the flawed
-steps inside correct answers (\autoref{appendix:validation}), the precision varies across models,
-and the arithmetic check reads more calculations where a model writes more arithmetic out.
-Coverage rises by at most 0.004 (MC per 10 numeric values shown) with the amount a model writes.
-Spearman's $\rho$~\citep{spearman1904} between a template's mean coverage and its mean number of
-steps is $-0.09$ to $-0.28$ for every model; the slope of MC on the number of values a response
-displays is $+0.0020$ (MC per 10 numeric values shown; 95\% interval 0.0005 to 0.0041) with template
-fixed effects, and within models Spearman's $\rho$ runs from $-0.21$ to $-0.07$.
+\paragraph{Coverage and What Marks a Wrong Answer.} For every model, wrong answers state far more
+gold milestones than the chance floor, and for most models a milestone the judge rules missing marks
+most of them (\autoref{tab:coverage}).
+The flag rates, arithmetic and judged, do not rank the models: the two checks together recall fewer
+than half of the flawed steps inside correct answers (\autoref{appendix:validation}), the precision
+of the arithmetic flags varies across models, and the arithmetic check reads more calculations where
+a model writes more arithmetic out.
+Nor does MC reward writing more: with template fixed effects, its slope on the number of values a
+response displays is barely positive (\autoref{tab:coverage_variants}), and within each model
+coverage falls slightly as a response displays more values (Spearman's
+$\rho$~\citep{spearman1904} $-0.21$ to $-0.07$), consistent with lower coverage on templates with
+more steps ($\rho$ $-0.09$ to $-0.28$ between a template's mean coverage and its number of steps).
 
-\autoref{tab:coverage_variants} computes MC under four definitions.
-\texttt{Claude Sonnet 5} and \texttt{DeepSeek V4.1 Flash} differ after Holm's correction by matching
-alone (Holm-adjusted $p$ 0.001) and on intermediate milestones only (0.032), but not as scored
-(0.069) or under route-adjusted coverage (1.000), where the milestones the judge rules not needed
-leave the denominator: what separates them is how closely a response follows the gold derivation's
-route, not whether it reaches the quantities its own route needs, a reading that rests on the
-judge's not-needed rulings, which the experts did not read.
-Matching alone, which the judge does not touch, separates them ($+0.042$, Holm-adjusted $p$
-0.001); re-judging a sample with a second judge shifts a model's coverage by $-0.018$ to $+0.019$
+Under the four definitions of~\autoref{tab:coverage_variants}, what separates
+\texttt{Claude Sonnet 5} from \texttt{DeepSeek V4.1 Flash} is how closely a response follows the
+gold derivation's route, not whether it reaches the quantities its own route needs: the two differ
+by matching alone and on intermediate milestones only, but not as scored or once the milestones the
+judge rules not needed leave the denominator.
+The judge raises every model's coverage by 0.019 to 0.045 over matching alone and narrows the
+differences between models: matching alone separates 20 of the 55 pairs, MC as scored 15, and a
+second judge on a sample shifts a model's coverage by $-0.018$ to $+0.019$
 (\autoref{appendix:validation}).
-The judge adds 0.019 to 0.045 to a model's coverage over matching alone, and matching alone
-separates more pairs (20 against 15 of the 55).
-\autoref{tab:coverage} also gives the judged step flags, whose precision on the expert study
-\autoref{tab:validation_results} reports.
 A mechanical check classifies every arithmetic flag on a correct answer: 12 of the 3,077 (0.4\%;
 at most 2.5\% for any model) are carried precision, a printed result that is a correct rounding of
 the value recomputed from the unrounded values earlier in the response, and of the 171 slips the
@@ -270,23 +259,16 @@ values shown; 95\% interval 0.0005 to 0.0041).}
 \end{table*}
 % END GENERATED tab:coverage_variants
 
-\paragraph{Difficulty Level and Depth.} \autoref{tab:level_gap} gives every model's level means,
-its Easy-minus-Advanced gap with its tests, and the share of responses scored 0 by the number of
-milestones in the gold trace.
+\paragraph{Difficulty Level and Depth.} The level gap is model-specific, and for \texttt{GLM-5.3} it
+comes from empty responses: over the responses with a readable answer, its gap is $-0.004$
+(Holm-adjusted Welch $p$ 1.000).
 We read Welch's test, since the permutation of level labels assumes equal spread across levels and
-the Advanced level, with fewer templates, varies more for nine of the eleven models; under that
-permutation the gap holds for four models.
-Welch's $p$ in~\autoref{tab:level_gap} is Holm-adjusted over the eleven models.
-Over the responses with a readable answer, \texttt{GLM-5.3}'s gap is $-0.004$ (Holm-adjusted Welch
-$p$ 1.000), so its gap as scored comes from its empty responses at the output ceiling.
-The share scored 0 counts empty responses at the output ceiling as well as wrong answers.
-The last two columns of~\autoref{tab:level_gap} therefore relate a wrong answer to the depth of the
-gold derivation over readable responses only, with the answer kind as a covariate.
-Pooled over the models, each further milestone multiplies the odds of a wrong answer by 1.21 (95\%
-interval 1.09 to 1.33); per model, the slope of the wrong-answer rate on the milestone count holds
-after Holm correction for three of the eleven models over readable responses,
-\texttt{DeepSeek V4.1 Flash}, \texttt{Gemini 3.1 Flash-Lite}, and \texttt{gpt-oss-20b}, and for the
-others it does not hold after correction.
+the Advanced level, with fewer templates, varies more than the Easy level for nine of the eleven
+models; under that permutation the gap holds for four models (\autoref{tab:level_gap}).
+The share scored 0 counts responses with no readable answer as well as wrong answers, so the last
+two columns of~\autoref{tab:level_gap} relate a wrong answer to the depth of the gold derivation
+over readable responses only, with the answer kind as a covariate: the logistic slope holds after
+Holm correction for three of the eleven models.
 
 % BEGIN GENERATED tab:level_gap (full_run_28092026/paper_results.py --write)
 \begin{table*}[t]

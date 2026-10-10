@@ -5,12 +5,12 @@
 Because every instance of a template shares its wording, a model could recognize a problem from the
 wording alone and reproduce a method it has memorized for it.
 This section gives the design and the results of the paraphrase test
-of~\autoref{subsec:overall_performance}, which bounds how much the wording is worth.
+of~\autoref{subsec:overall_performance}.
 
 \paragraph{Design.} We select three of every template's 15 instances (450 instances) and paraphrase
-each once with \texttt{Mistral Large 3}~\citep{mistral2025mistral3}, an LLM from a family outside
-both the evaluated models and the judge (the writer), keeping every number, unit, symbol, formula,
-acronym, and labeled part in place.
+each once with \texttt{Mistral Large 3}~\citep{mistral2025mistral3} (the writer), an LLM from a
+family outside both the evaluated models and the judge, keeping every number, unit, symbol,
+formula, acronym, and labeled part in place.
 A paraphrase must pass two checks:
 \begin{itemize}[nosep, leftmargin=*]
 \item \emph{Scripted:} the numbers as a multiset, every technical token, the part labels, a word
@@ -20,30 +20,30 @@ instance and the original's notation restored where the writer used symbols the 
 problem with the same answer and adds nothing.
 \end{itemize}
 Of the 450 instances, 314 pass the scripted checks and the domain experts keep 275 pairs on 114
-templates; most rejections are for a dropped or altered qualifier that changes the physics or the
-asked quantity, which the scripted checks had passed, and the templates left out are mostly
-formula-bound ones whose technical tokens the writer does not keep in place.
+templates; the templates left out are mostly formula-bound ones whose technical tokens the writer
+does not keep in place.
+The expert step is needed: the experts reject 39 pairs that pass every scripted check, mostly for
+a dropped or altered qualifier that changes the physics or the asked quantity.
 The eleven models answer the kept paraphrases under the evaluation's prompt, settings, and scoring.
 
 \paragraph{Results.} On the 275 kept pairs, no change in FAC holds after correction.
-Read against the $\pm 0.05$ margin, which is about the paired difference the design detects at
-80\% power, the 90\% interval lies within it for every model but \texttt{Qwen3-235B-2507} and
-\texttt{gpt-oss-20b} (\autoref{tab:paraphrase}).
-Four 90\% intervals lie wholly on one side of zero (\texttt{DeepSeek V4.1 Flash},
-\texttt{Claude Sonnet 5}, and \texttt{Qwen3-235B-2507} below, \texttt{Muse Glimmer 30B} above):
-small changes the data lean toward but the corrected test does not support.
-The models' ordering on the paraphrases agrees with their ordering on the originals with Kendall's
-$\tau$ 0.722 (95\% interval 0.449 to 0.844), within the range sampling noise alone gives, below
-its lower quartile, since two disjoint draws of 275 original instances with the same template mix
-agree with a median $\tau$ of 0.807 (quartiles 0.748 to 0.860; 5th percentile 0.647).
-For the four models decoded three more times on 300 instances (\texttt{Gemma 4 26B},
-\texttt{Gemini 3.1 Flash-Lite}, \texttt{Qwen3-235B-2507}, and \texttt{gpt-oss-20b}), FAC varies by a
-standard deviation of 0.003 to 0.008 across repeats, and the paraphrase change lies within the
-spread of the repeats' changes for two of the four and beyond it for \texttt{Qwen3-235B-2507} and
-\texttt{gpt-oss-20b}.
+Read against the $\pm 0.05$ margin, the 90\% interval lies within it for every model but
+\texttt{Qwen3-235B-2507} and \texttt{gpt-oss-20b}, the two models whose paired differences the
+design measures least precisely: the smallest difference it detects at 80\% power is 0.052 and
+0.079 for them and at most 0.044 for the others (\autoref{tab:paraphrase}).
+MC changes by at most 0.023 in either direction, so the derivation is at least as robust to the
+wording as the answer.
+The paraphrases reorder the models within the range sampling noise produces, though at its high end:
+their ordering agrees with the originals' at Kendall's $\tau$ 0.722 (95\% interval 0.449 to 0.844),
+while two disjoint draws of 275 original instances with the same template mix agree with a median
+$\tau$ of 0.807 (quartiles 0.748 to 0.860; 5th percentile 0.647).
+For the same two models, the paraphrase change also exceeds decoding noise: of the four models
+decoded three more times on 300 instances (\texttt{Gemma 4 26B}, \texttt{Gemini 3.1 Flash-Lite},
+\texttt{Qwen3-235B-2507}, and \texttt{gpt-oss-20b}), FAC varies by a standard deviation of 0.003 to
+0.008 across repeats, and the paraphrase change lies beyond the spread of the repeats' changes for
+\texttt{Qwen3-235B-2507} and \texttt{gpt-oss-20b} and within it for the other two.
 The test bounds memorized wording, not memorized methods, since the numbers and the problem
-structure are kept, and it covers the 114 templates that can be paraphrased without loss, which are
-the less formula-bound ones.
+structure are kept, and it covers only the 114 templates that can be paraphrased without loss.
 
 % BEGIN GENERATED tab:paraphrase (full_run_28092026/paper_results.py --write)
 \begin{table*}[t]

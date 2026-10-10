@@ -2,21 +2,20 @@
 \section{Branch and Domain Performance}
 \label{appendix:branch_domain}
 
+The branch means carry no order of difficulty: the lowest branch differs by model, chemical for five
+models, industrial for four, and civil for one, with \texttt{DeepSeek V4.1 Flash} tied between
+chemical and industrial.
+Within a model, a single branch pair differs after correction.
 This section gives, for~\autoref{subsec:branch_domain}, every model's branch and domain means
 (\autoref{tab:branch_domain}) and draws those of four representative models:
 \texttt{DeepSeek V4.1 Flash}, first on FAC and open-weights; \texttt{Claude Sonnet 5}, first on MC
 and closed; \texttt{GPT-5.4 mini}, closed and fifth on FAC; and \texttt{gpt-oss-20b}, open-weights
 and last on FAC.
-The lowest branch differs by model, chemical for five models, industrial for five, and civil for
-one, and a single branch pair differs within a model after correction, so the branch means carry no
-order of difficulty.
 In~\autoref{fig:branch_bars}, \texttt{DeepSeek V4.1 Flash}, \texttt{Claude Sonnet 5}, and
-\texttt{GPT-5.4 mini} stay close to their FAC in every branch, while \texttt{gpt-oss-20b} is lowest
-in civil engineering.
-In~\autoref{fig:domain_radar}, \texttt{DeepSeek V4.1 Flash} is lowest on production and inventory
-and \texttt{Claude Sonnet 5} on quality and reliability control, whereas the other two dip lower,
-\texttt{GPT-5.4 mini} in production and inventory and \texttt{gpt-oss-20b} in geotechnical
-engineering.
+\texttt{GPT-5.4 mini} stay close to their FAC in every branch, while \texttt{gpt-oss-20b} varies far
+more and is lowest in civil engineering.
+In~\autoref{fig:domain_radar}, the same three stay above 0.93 in every domain, each lowest in an
+industrial one, while \texttt{gpt-oss-20b} falls to 0.51 in geotechnical engineering.
 
 % BEGIN GENERATED fig:branch_bars (full_run_28092026/paper_results.py --write)
 \begin{figure}[t]
@@ -28,22 +27,21 @@ engineering.
     in the figure). Each of the five branches holds 30 of the 150 templates, so a segment is that
     branch's share of the model's FAC: the number inside it is the branch's FAC, and its height is a
     fifth of that. The segments add up to the model's FAC, printed above the bar; color marks the model
-    and hatching the branch. The one branch pair that differs after Holm correction within a model is
-    \texttt{gpt-oss-20b}'s electrical above civil (\autoref{tab:branch_domain}).}
+    and hatching the branch.}
     \label{fig:branch_bars}
 \end{figure}
 % END GENERATED fig:branch_bars
 
 % BEGIN GENERATED fig:domain_radar (full_run_28092026/paper_results.py --write)
-\begin{figure*}[t]
+\begin{figure}[t]
     \centering
-    \includegraphics[width=0.74\textwidth]{figs/domain_radar/domain-radar-labeled.pdf}
+    \includegraphics[width=\columnwidth]{figs/domain_radar/domain-radar-labeled.pdf}
     \caption{\textbf{Final Answer Accuracy by domain for four representative models.} The instance mean
     over each of the 15 domains, in the order of their branches around the rim, for the same four
     models; the radial axis starts at 0.4. The domain means carry no interval and no test
     (\autoref{tab:by_domain_kind}). In the figure, \texttt{gpt-oss-20b} is labeled GPT OSS 20B.}
     \label{fig:domain_radar}
-\end{figure*}
+\end{figure}
 % END GENERATED fig:domain_radar
 
 % BEGIN GENERATED tab:branch_domain (full_run_28092026/paper_results.py --write)

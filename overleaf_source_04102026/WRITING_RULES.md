@@ -133,5 +133,3 @@ Labels used before their sections exist. Each must be defined when its section i
   `tab:experiments`. Defined in `appendices/error_analysis.tex`: `appendix:error_analysis`, `tab:errors` (also
   `tab:error_by_level`). The prose of these five files is checked by `paper_results.py --check` against its phrases:
   a number the prose states must be one a phrase of that file generates.
-- Defined in `appendices/release.tex`: `appendix:release` (what
-  is released and withheld, query dates, the script behind each table, the contamination policy).

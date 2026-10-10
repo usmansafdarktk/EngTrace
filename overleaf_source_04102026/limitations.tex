@@ -1,0 +1,33 @@
+% -------------
+\section*{Limitations}
+\label{sec:limitations}
+
+The problems are examination-style by construction, as verifiable gold traces require, and cover
+undergraduate curricula in five branches; ill-posed problems and real-world artifacts are out of
+scope.
+The main comparison is at matched settings, where three models reason at medium effort and the
+endpoint of \texttt{Qwen3-235B-2507} offers no reasoning setting; the domain experts' readings of
+the evaluated models and the further experiments are of responses at the providers' defaults.
+The evaluator's agreement figures come from an expert study on five models that are, by design, not
+among the evaluated eleven; on the evaluated models, experts read samples of the final-answer
+verdicts, the judge's rulings, and the arithmetic flags (\autoref{appendix:readings}).
+The final-answer check credits a correct value wherever it stands in the final answer and under any
+of its unit factors; stricter scoring swaps only two models that the final answer does not separate
+(\autoref{appendix:scoring}).
+Milestone Coverage credits the intermediate values a response states and the judge rules reached,
+so a valid route that bypasses a milestone is not credited, and it reads the visible response, not
+reasoning text an endpoint returns separately; high coverage does not certify sound reasoning.
+An LLM judge from outside the evaluated families decides 11\% to 24\% of milestones, depending on
+the model; on sampled responses, a second judge from another family moves each model's coverage by
+at most 0.019.
+The arithmetic check and the judged step check flag slips with stated precision and do not catch
+every flawed step, and a rule misstated behind a correct answer escapes every deterministic check.
+Open-weights models are served by one or more providers at 8-bit precision or higher, and an
+endpoint matched on at least 20 templates differs from its model's mean by at most 0.025
+(\autoref{tab:providers}).
+The further experiments ran on a 450-instance subset; the open book supplies the governing equations
+without data tables, and the interpreter is offered to the two closed models, not required.
+The paraphrase test covers the 114 templates that can be reworded without changing the problem, and
+it tests memorized wording, not memorized methods.
+Once public, the evaluation set can enter training data; the generator draws fresh instances from
+new seeds, so a later evaluation need not reuse published ones (\autoref{appendix:statistics}).

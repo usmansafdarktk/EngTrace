@@ -25,22 +25,16 @@ A domain expert answers the six questions in this order and stops at the first y
 the most fundamental error and not a downstream symptom; two further options are no error (the
 answer is correct, or the question admits it) and incomplete.
 
-\paragraph{Sample and Readings.} We read 137 wrong answers from four models (19 from
-\texttt{Claude Sonnet 5}, 39 from \texttt{GPT-5.4 mini}, 39 from \texttt{Gemma 4 26B}, and 40 from
-\texttt{gpt-oss-20b}), chosen to span the range, each a readable response at the providers'
-default settings whose final answer the check scores incorrect; we draw up to 40 per model at
-random, across levels in proportion to the model's wrong answers and spread over its templates, 77
-templates in all.
+\paragraph{Sample and Readings.} We read 137 wrong answers from four models that span the FAC order
+(\texttt{Claude Sonnet 5}, \texttt{GPT-5.4 mini}, \texttt{Gemma 4 26B}, and \texttt{gpt-oss-20b}),
+each a readable response at the providers' default settings whose final answer the check scores
+incorrect; we draw up to 40 per model at random, across levels in proportion to the model's wrong
+answers and spread over its templates, 77 templates in all.
 Three domain experts of the wrong answer's branch, from the fifteen who certified the templates,
 read each full response without the model's name.
-\autoref{tab:errors} gives the readings by model and by level with the agreement; for each level it
-gives a category's share of all readings and its share of the readings that name an error, so the
-error mix can be compared across levels apart from the answers the experts find correct.
-Beyond what~\autoref{subsec:error_analysis} reads from it, the table shows that unit and dimension
-errors are nearly absent (1 of 411 readings) and sign errors rare (11, in two models), that 7 of
-the 7 hallucination readings are \texttt{gpt-oss-20b}'s, and that agreement is high for every model
-and lowest for \texttt{gpt-oss-20b} (Fleiss' $\kappa$ 0.835 against 0.917 to 1.000), whose errors
-spread across the conceptual categories.
+Unit and dimension errors are nearly absent and sign errors rare, in two models only; every
+hallucination reading is \texttt{gpt-oss-20b}'s; and agreement, high for every model, is lowest for
+\texttt{gpt-oss-20b}, whose errors spread across the conceptual categories (\autoref{tab:errors}).
 The categories describe sampled wrong answers, not rates over all responses, and they describe the
 responses at the providers' default settings, not those of the three models at matched settings.
 
@@ -86,32 +80,31 @@ Categories run from the most to the least fundamental; no domain expert used the
 \end{table*}
 % END GENERATED tab:errors
 
-\paragraph{Near Misses.} To see whether the wording explains answers that land close to the gold
-value, three domain experts of each template's branch read six templates on which many wrong answers
-land between 0.2\% and 5\% of the gold value (\texttt{annulus\_flowrate},
-\texttt{best\_hydraulic\_rectangular\_section}, \texttt{manning\_rectangular\_discharge},
-\texttt{pfr\_volume\_changing\_rate}, \texttt{pitzer\_correlation\_z}, and
-\texttt{vdw\_solve\_for\_volume}).
-For each of the six, all three answer that the question has one correct answer and that the
-response shown, within 5\% of the gold value, is not correct, so the near miss shown on each of
-these templates is the model's error, not the wording's.
+\paragraph{Near Misses.} On each of six templates where many wrong answers land between 0.2\% and
+5\% of the gold value, the near miss shown to the domain experts is the model's error, not the
+wording's.
+Three domain experts of each template's branch read these templates
+(\texttt{annulus\_flowrate}, \texttt{best\_hydraulic\_rectangular\_section},
+\texttt{manning\_rectangular\_discharge}, \texttt{pfr\_volume\_changing\_rate},
+\texttt{pitzer\_correlation\_z}, and \texttt{vdw\_solve\_for\_volume}), and for each, all three
+answer that the question has one correct answer and that the response shown, within 5\% of the
+gold value, is not correct.
 
-\paragraph{Incorrect Verdicts and the Answer's Form.} Of the first five models' 126 incorrect
-verdicts, 34 fall on three templates: 18 on \texttt{qr\_policy\_one\_iteration}, 9 on
-\texttt{single\_sampling\_oc\_point}, and 7 on \texttt{adiabatic\_flame\_temperature}.
-Of the same 126, 38 lie within 0.2\% of a target whose digits the question prescribes and 5 are
-symbolic answers scored by the numbers they state; over 11,250 responses, the first five lose 231
-answer points in all, 71 to responses with no readable final answer and 34 to 68 partial answers
-at half credit.
+\paragraph{Incorrect Verdicts and the Answer's Form.} About a quarter of the first five's incorrect
+verdicts fall on three templates, and most of these lie within 0.2\% of a target whose digits the
+question prescribes: of the 126, 18 fall on \texttt{qr\_policy\_one\_iteration}, 9 on
+\texttt{single\_sampling\_oc\_point}, and 7 on \texttt{adiabatic\_flame\_temperature}; on the first
+two, 24 of the 27 lie that close.
 Two sources of incorrect verdicts concern the answer's form rather than its value.
 First, 17 templates prescribe the digits of the answer, so a value within the tolerance but not at
 the prescribed digits is incorrect by the question's own terms (240 incorrect verdicts across the
 eleven models, 108 of them within 0.2\% of the target on 11 of these templates).
 Second, four of the nine templates with symbolic answers are scored by the numbers they state, while
-the other five also accept an equivalent expression (\autoref{appendix:scoring}).
-Scored under other rules, the absolute-value clause, the last-digit term, the prescribed digits and
-proportional partial credit each move a model's FAC by at most 0.030 and keep Kendall's $\tau$ with
-the ordering as scored at 0.782 or above (\autoref{tab:scoring_variants}).
+the other five also accept an equivalent expression (\autoref{appendix:scoring}); the first five's
+symbolic incorrect verdicts all fall on one of these five, \texttt{ber\_estimation\_mary}.
+Changing one clause of the rule at a time (the absolute-value clause, the last-digit term, the
+prescribed digits, or proportional partial credit) moves a model's FAC by at most 0.030 and keeps
+Kendall's $\tau$ with the ordering as scored at 0.782 or above (\autoref{tab:scoring_variants}).
 Four templates whose answers can be read off the question's wording stay in the evaluation set,
 since leaving them out moves FAC by at most 0.002: \texttt{levenspiel\_plot\_interpretation},
 \texttt{line\_balancing\_heuristic}, \texttt{system\_properties\_memory\_causality}, and

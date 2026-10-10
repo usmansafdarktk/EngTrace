@@ -1,0 +1,17 @@
+% -------------
+\section{Conclusion}
+\label{sec:conclusion}
+
+We introduced \ourdataset, 150 expert-certified symbolic templates in five engineering branches, and
+an evaluator that checks final answers, intermediate quantities, and displayed arithmetic
+deterministically wherever a check exists, with residual milestones sent to an LLM judge.
+On the final answer the five strongest of eleven LLMs are near the ceiling of these problems, while
+the process measures show how much of the gold derivation wrong answers keep and where correct
+answers hide arithmetic slips; a rule misstated behind a correct answer escapes every deterministic
+check.
+Reasoning at medium effort lifts \texttt{GPT-5.4 mini}, \texttt{Gemma 4 26B}, and
+\texttt{Gemini 3.1 Flash-Lite}, which return no reasoning tokens by default, by 0.04 to 0.12.
+The domain experts' reading of wrong answers finds mostly calculation slips, with conceptual errors
+growing on harder problems.
+Next steps are tests of memorized methods rather than wording, problems built on multi-modal
+artifacts such as diagrams, and the open-weights models under tool use.

@@ -139,9 +139,9 @@ answers no numbered point; the letter lists those under further changes.
 | Depth model; level gap after Holm | section 6, `tab:level_gap` (with the depth slopes) | odds ratio 1.21 per milestone pooled (1.09 to 1.33), 3 of 11 models; gap: Welch 1 of 11 (gpt-oss-20b), permutation 4 | cqGs 3, nWW3 4, yAYU 2, 9W1B 4 |
 | Paraphrase bound | `appendix:paraphrase` | 275 pairs over 114 templates; nine of eleven within ±0.05 | meta-review 3, 9W1B 1, cqGs 2, nWW3 2 |
 | Taxonomy and coverage: domains from the NCEES FE exam specifications through a three-LLM panel; per-area table; uncovered core areas named | section 3.1, `tab:area`, `appendix:taxonomy` | 15 domains, three per branch; 42 areas | nWW3 1, meta-review 3 |
-| Framing: title, "process evaluation", synthetic scope; Limitations, Ethics, Conclusion | front matter, main text | nine scope sentences in Limitations | meta-review 3 |
+| Framing: title, "process evaluation", synthetic scope; Limitations, Ethics, Conclusion | front matter, main text (`conclusion.tex`, `limitations.tex`, `ethics.tex`) | eleven scope sentences in Limitations | meta-review 3 |
 | Related work: dynamic and functional benchmarks, reference-free evaluators, PRMBench, five science benchmarks; ThermoQA and FinChain deltas | section 2 | the extended comparison table was dropped on 2026-10-09 (external figures, not asked for) | internal |
-| Release and contamination: MIT, the seed at publication, a held-out seed | `appendix:release` | | internal |
+| Contamination: the generator draws fresh instances from new seeds | Limitations | | internal |
 | Difficulty: the domain experts' original labels and their protocol | section 3.1 | 58 / 58 / 34 | internal |
 | Worked example; listings for one template per level | `appendix:scoring`, `appendix:template_examples` | | meta-review 3 (presentation) |
 | Figures: the same designs, data brought to the final results | figures | | internal |
