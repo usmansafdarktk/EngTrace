@@ -134,3 +134,101 @@ Quartiles of reasoning tokens within each model; MC as scored per quartile (item
 | gpt-5.4-mini | reasoning-medium-full | 0.929 | 0.892 | 0.898 | 0.855 | 196, 437, 960, 2,952 | 0.000, 0.000, 0.000, 0.000 | -0.193 |
 | gemini-3.1-flash-lite | reasoning-medium-full | 0.941 | 0.906 | 0.858 | 0.821 | 525, 733, 930, 1,308 | 0.000, 0.000, 0.000, 0.000 | -0.257 |
 | claude-sonnet-5 | main | 0.945 | 0.936 | 0.905 | 0.905 | 160, 473, 1,044, 2,908 | 0.000, 0.000, 0.000, 0.004 | -0.174 |
+
+### Matched settings
+
+Each model at its reasoning setting where its endpoint offers one, else at its default: gemma-4-26b-a4b at `reasoning-medium-full`, gpt-5.4-mini at `reasoning-medium-full`, gemini-3.1-flash-lite at `reasoning-medium-full`; the other 8 at their default store, the same responses as above (their values are asserted equal to the default family's). The same readings, seeds and tests as above. Templates in each reading's comparison: as scored (E3 + judge) 148, matching alone (E3) 148, route-adjusted 148, intermediate-only 127. The judge adds 0.019 to 0.045 to a model's MC over matching alone. Route-adjusted, responses left out: gpt-oss-20b 7, gemma-4-26b-a4b 2, deepseek-v4.1-flash 3, qwen3-235b-a22b-2507 4, glm-5.3-flash 1, glm-5.3 0, muse-glimmer-30b 4, kimi-k3 2, gpt-5.4-mini 6, gemini-3.1-flash-lite 7, claude-sonnet-5 4.
+
+| model | store | as scored | matching alone | route-adjusted | intermediate-only | wrong: as scored | wrong: matching | wrong: route-adj. | wrong: interm. | wrong n |
+|---|---|---|---|---|---|---|---|---|---|---|
+| gpt-oss-20b | main | 0.812 [0.775, 0.847] | 0.790 [0.752, 0.826] | 0.872 [0.840, 0.902] | 0.759 [0.711, 0.805] | 0.465 | 0.455 | 0.509 | 0.534 | 335 |
+| gemma-4-26b-a4b | reasoning-medium-full | 0.884 [0.856, 0.910] | 0.850 [0.819, 0.880] | 0.959 [0.944, 0.973] | 0.813 [0.770, 0.853] | 0.569 | 0.548 | 0.631 | 0.603 | 116 |
+| deepseek-v4.1-flash | main | 0.899 [0.874, 0.922] | 0.861 [0.831, 0.890] | 0.982 [0.974, 0.988] | 0.822 [0.778, 0.864] | 0.667 | 0.667 | 0.711 | 0.644 | 12 |
+| qwen3-235b-a22b-2507 | main | 0.892 [0.867, 0.916] | 0.866 [0.836, 0.894] | 0.956 [0.942, 0.969] | 0.834 [0.792, 0.873] | 0.616 | 0.586 | 0.675 | 0.673 | 173 |
+| glm-5.3-flash | main | 0.912 [0.886, 0.936] | 0.891 [0.864, 0.916] | 0.966 [0.947, 0.981] | 0.859 [0.818, 0.898] | 0.458 | 0.378 | 0.524 | 0.462 | 12 |
+| glm-5.3 | main | 0.900 [0.866, 0.930] | 0.881 [0.846, 0.912] | 0.946 [0.916, 0.971] | 0.852 [0.807, 0.893] | 0.596 | 0.486 | 0.596 | 0.825 | 8 |
+| muse-glimmer-30b | main | 0.897 [0.871, 0.922] | 0.862 [0.832, 0.890] | 0.962 [0.944, 0.977] | 0.830 [0.787, 0.871] | 0.653 | 0.583 | 0.681 | 0.788 | 33 |
+| kimi-k3 | main | 0.912 [0.888, 0.934] | 0.877 [0.850, 0.902] | 0.973 [0.961, 0.983] | 0.847 [0.806, 0.885] | 0.584 | 0.584 | 0.627 | 0.646 | 20 |
+| gpt-5.4-mini | reasoning-medium-full | 0.892 [0.866, 0.917] | 0.847 [0.815, 0.877] | 0.972 [0.962, 0.981] | 0.817 [0.771, 0.860] | 0.689 | 0.640 | 0.819 | 0.711 | 61 |
+| gemini-3.1-flash-lite | reasoning-medium-full | 0.881 [0.851, 0.908] | 0.855 [0.824, 0.886] | 0.953 [0.935, 0.969] | 0.815 [0.770, 0.856] | 0.540 | 0.515 | 0.603 | 0.574 | 174 |
+| claude-sonnet-5 | main | 0.922 [0.902, 0.942] | 0.903 [0.880, 0.925] | 0.984 [0.978, 0.990] | 0.859 [0.817, 0.897] | 0.869 | 0.850 | 0.935 | 0.834 | 20 |
+
+#### The separation rule at matched settings
+
+Claude Sonnet 5 minus DeepSeek V4.1 Flash, Holm-adjusted p over each reading's 55 pairs: as scored (E3 + judge) +0.023, p = 0.0686; matching alone (E3) +0.042, p = 0.0005; route-adjusted +0.003, p = 1.0000; intermediate-only +0.037, p = 0.0324. 
+**The separation does not hold**: the pair separates after Holm under matching alone (E3) (p = 0.0005) but not under as scored (E3 + judge) (p = 0.0686) and route-adjusted (p = 1.0000), so the results sentence does not claim it.
+
+#### The 55 pairs at matched settings
+
+- as scored (E3 + judge): 15 of 55 separated after Holm; separated here but not in the default family: gpt-oss-20b vs gpt-5.4-mini; there but not here: deepseek-v4.1-flash vs claude-sonnet-5, deepseek-v4.1-flash vs gemini-3.1-flash-lite, deepseek-v4.1-flash vs gpt-5.4-mini, gemma-4-26b-a4b vs glm-5.3-flash, gemma-4-26b-a4b vs gpt-5.4-mini, gemma-4-26b-a4b vs kimi-k3, glm-5.3 vs gpt-5.4-mini, glm-5.3-flash vs gemini-3.1-flash-lite, glm-5.3-flash vs gpt-5.4-mini, kimi-k3 vs gpt-5.4-mini, muse-glimmer-30b vs gemini-3.1-flash-lite, muse-glimmer-30b vs gpt-5.4-mini, qwen3-235b-a22b-2507 vs gemini-3.1-flash-lite, qwen3-235b-a22b-2507 vs gpt-5.4-mini.
+- matching alone (E3): 20 of 55 separated after Holm; separated here but not in the default family: gemma-4-26b-a4b vs glm-5.3-flash, gpt-oss-20b vs gpt-5.4-mini; there but not here: deepseek-v4.1-flash vs gpt-5.4-mini, gemma-4-26b-a4b vs gpt-5.4-mini, glm-5.3 vs gpt-5.4-mini, glm-5.3-flash vs gemini-3.1-flash-lite, gpt-5.4-mini vs gemini-3.1-flash-lite, kimi-k3 vs gemini-3.1-flash-lite, muse-glimmer-30b vs gpt-5.4-mini, qwen3-235b-a22b-2507 vs gpt-5.4-mini.
+- route-adjusted: 17 of 55 separated after Holm; separated here but not in the default family: gpt-oss-20b vs gpt-5.4-mini; there but not here: deepseek-v4.1-flash vs gpt-5.4-mini, gemma-4-26b-a4b vs gpt-5.4-mini, gemma-4-26b-a4b vs kimi-k3, glm-5.3-flash vs gemini-3.1-flash-lite, glm-5.3-flash vs gpt-5.4-mini, gpt-5.4-mini vs claude-sonnet-5, gpt-5.4-mini vs gemini-3.1-flash-lite, kimi-k3 vs gemini-3.1-flash-lite, kimi-k3 vs gpt-5.4-mini, muse-glimmer-30b vs gemini-3.1-flash-lite, muse-glimmer-30b vs gpt-5.4-mini, qwen3-235b-a22b-2507 vs gemini-3.1-flash-lite, qwen3-235b-a22b-2507 vs gpt-5.4-mini.
+- intermediate-only: 9 of 55 separated after Holm; separated here but not in the default family: gemma-4-26b-a4b vs claude-sonnet-5; there but not here: deepseek-v4.1-flash vs gpt-5.4-mini, gemini-3.1-flash-lite vs claude-sonnet-5, gemma-4-26b-a4b vs gpt-5.4-mini, glm-5.3 vs gpt-5.4-mini, glm-5.3-flash vs gemini-3.1-flash-lite, glm-5.3-flash vs gpt-5.4-mini, kimi-k3 vs gemini-3.1-flash-lite, kimi-k3 vs gpt-5.4-mini, muse-glimmer-30b vs gpt-5.4-mini, qwen3-235b-a22b-2507 vs gpt-5.4-mini.
+
+Difference a minus b in the mean of template means, Holm-adjusted sign-flip p within each reading's family. Pairs separated at 0.05: as scored (E3 + judge) 15, matching alone (E3) 20, route-adjusted 17, intermediate-only 9.
+
+| a | b | as scored (E3 + judge): diff | p Holm | matching alone (E3): diff | p Holm | route-adjusted: diff | p Holm | intermediate-only: diff | p Holm |
+|---|---|---|---|---|---|---|---|---|---|
+| gpt-oss-20b | gemma-4-26b-a4b | -0.072 | 0.0005* | -0.061 | 0.0030* | -0.087 | 0.0005* | -0.054 | 0.2349 |
+| gpt-oss-20b | deepseek-v4.1-flash | -0.087 | 0.0005* | -0.071 | 0.0005* | -0.110 | 0.0005* | -0.063 | 0.0837 |
+| gpt-oss-20b | qwen3-235b-a22b-2507 | -0.080 | 0.0005* | -0.076 | 0.0005* | -0.084 | 0.0005* | -0.075 | 0.0108* |
+| gpt-oss-20b | glm-5.3-flash | -0.100 | 0.0005* | -0.102 | 0.0005* | -0.094 | 0.0005* | -0.100 | 0.0005* |
+| gpt-oss-20b | glm-5.3 | -0.088 | 0.0005* | -0.092 | 0.0005* | -0.073 | 0.0048* | -0.093 | 0.0041* |
+| gpt-oss-20b | muse-glimmer-30b | -0.085 | 0.0005* | -0.072 | 0.0005* | -0.090 | 0.0005* | -0.071 | 0.0075* |
+| gpt-oss-20b | kimi-k3 | -0.100 | 0.0005* | -0.087 | 0.0005* | -0.101 | 0.0005* | -0.088 | 0.0016* |
+| gpt-oss-20b | gpt-5.4-mini | -0.080 | 0.0005* | -0.057 | 0.0152* | -0.100 | 0.0005* | -0.058 | 0.1035 |
+| gpt-oss-20b | gemini-3.1-flash-lite | -0.068 | 0.0009* | -0.066 | 0.0018* | -0.081 | 0.0005* | -0.055 | 0.2607 |
+| gpt-oss-20b | claude-sonnet-5 | -0.110 | 0.0005* | -0.113 | 0.0005* | -0.112 | 0.0005* | -0.100 | 0.0005* |
+| gemma-4-26b-a4b | deepseek-v4.1-flash | -0.015 | 1.0000 | -0.011 | 1.0000 | -0.022 | 0.0148* | -0.009 | 1.0000 |
+| gemma-4-26b-a4b | qwen3-235b-a22b-2507 | -0.008 | 1.0000 | -0.016 | 1.0000 | +0.003 | 1.0000 | -0.021 | 1.0000 |
+| gemma-4-26b-a4b | glm-5.3-flash | -0.028 | 0.2617 | -0.041 | 0.0214* | -0.006 | 1.0000 | -0.046 | 0.1074 |
+| gemma-4-26b-a4b | glm-5.3 | -0.016 | 1.0000 | -0.031 | 1.0000 | +0.014 | 1.0000 | -0.039 | 1.0000 |
+| gemma-4-26b-a4b | muse-glimmer-30b | -0.013 | 1.0000 | -0.011 | 1.0000 | -0.003 | 1.0000 | -0.017 | 1.0000 |
+| gemma-4-26b-a4b | kimi-k3 | -0.028 | 0.0548 | -0.026 | 0.2035 | -0.014 | 1.0000 | -0.034 | 0.1290 |
+| gemma-4-26b-a4b | gpt-5.4-mini | -0.008 | 1.0000 | +0.003 | 1.0000 | -0.013 | 1.0000 | -0.004 | 1.0000 |
+| gemma-4-26b-a4b | gemini-3.1-flash-lite | +0.004 | 1.0000 | -0.005 | 1.0000 | +0.007 | 1.0000 | -0.002 | 1.0000 |
+| gemma-4-26b-a4b | claude-sonnet-5 | -0.038 | 0.0030* | -0.052 | 0.0005* | -0.025 | 0.0055* | -0.046 | 0.0302* |
+| deepseek-v4.1-flash | qwen3-235b-a22b-2507 | +0.007 | 1.0000 | -0.005 | 1.0000 | +0.025 | 0.0031* | -0.013 | 1.0000 |
+| deepseek-v4.1-flash | glm-5.3-flash | -0.013 | 1.0000 | -0.030 | 0.2000 | +0.016 | 0.1570 | -0.038 | 0.5740 |
+| deepseek-v4.1-flash | glm-5.3 | -0.001 | 1.0000 | -0.020 | 1.0000 | +0.036 | 0.0355* | -0.030 | 1.0000 |
+| deepseek-v4.1-flash | muse-glimmer-30b | +0.002 | 1.0000 | -0.001 | 1.0000 | +0.020 | 0.2194 | -0.008 | 1.0000 |
+| deepseek-v4.1-flash | kimi-k3 | -0.013 | 1.0000 | -0.016 | 0.6835 | +0.008 | 0.9215 | -0.025 | 0.5770 |
+| deepseek-v4.1-flash | gpt-5.4-mini | +0.007 | 1.0000 | +0.014 | 1.0000 | +0.010 | 1.0000 | +0.005 | 1.0000 |
+| deepseek-v4.1-flash | gemini-3.1-flash-lite | +0.018 | 1.0000 | +0.006 | 1.0000 | +0.029 | 0.0052* | +0.007 | 1.0000 |
+| deepseek-v4.1-flash | claude-sonnet-5 | -0.023 | 0.0686 | -0.042 | 0.0005* | -0.003 | 1.0000 | -0.037 | 0.0324* |
+| qwen3-235b-a22b-2507 | glm-5.3-flash | -0.020 | 1.0000 | -0.025 | 1.0000 | -0.010 | 1.0000 | -0.025 | 1.0000 |
+| qwen3-235b-a22b-2507 | glm-5.3 | -0.008 | 1.0000 | -0.015 | 1.0000 | +0.011 | 1.0000 | -0.018 | 1.0000 |
+| qwen3-235b-a22b-2507 | muse-glimmer-30b | -0.005 | 1.0000 | +0.004 | 1.0000 | -0.006 | 1.0000 | +0.005 | 1.0000 |
+| qwen3-235b-a22b-2507 | kimi-k3 | -0.020 | 1.0000 | -0.011 | 1.0000 | -0.017 | 1.0000 | -0.013 | 1.0000 |
+| qwen3-235b-a22b-2507 | gpt-5.4-mini | -0.000 | 1.0000 | +0.019 | 1.0000 | -0.016 | 0.5805 | +0.017 | 1.0000 |
+| qwen3-235b-a22b-2507 | gemini-3.1-flash-lite | +0.012 | 1.0000 | +0.011 | 1.0000 | +0.003 | 1.0000 | +0.020 | 1.0000 |
+| qwen3-235b-a22b-2507 | claude-sonnet-5 | -0.030 | 0.0323* | -0.036 | 0.0425* | -0.028 | 0.0005* | -0.024 | 1.0000 |
+| glm-5.3-flash | glm-5.3 | +0.012 | 1.0000 | +0.010 | 1.0000 | +0.020 | 0.2390 | +0.007 | 1.0000 |
+| glm-5.3-flash | muse-glimmer-30b | +0.015 | 1.0000 | +0.030 | 0.1039 | +0.004 | 1.0000 | +0.030 | 0.9273 |
+| glm-5.3-flash | kimi-k3 | +0.000 | 1.0000 | +0.015 | 1.0000 | -0.008 | 1.0000 | +0.012 | 1.0000 |
+| glm-5.3-flash | gpt-5.4-mini | +0.020 | 1.0000 | +0.044 | 0.0212* | -0.006 | 1.0000 | +0.042 | 0.4503 |
+| glm-5.3-flash | gemini-3.1-flash-lite | +0.031 | 0.1592 | +0.036 | 0.1132 | +0.013 | 1.0000 | +0.045 | 0.2368 |
+| glm-5.3-flash | claude-sonnet-5 | -0.010 | 1.0000 | -0.011 | 1.0000 | -0.018 | 0.5820 | +0.001 | 1.0000 |
+| glm-5.3 | muse-glimmer-30b | +0.003 | 1.0000 | +0.019 | 1.0000 | -0.016 | 1.0000 | +0.022 | 1.0000 |
+| glm-5.3 | kimi-k3 | -0.012 | 1.0000 | +0.004 | 1.0000 | -0.028 | 0.4947 | +0.005 | 1.0000 |
+| glm-5.3 | gpt-5.4-mini | +0.008 | 1.0000 | +0.034 | 1.0000 | -0.026 | 1.0000 | +0.035 | 1.0000 |
+| glm-5.3 | gemini-3.1-flash-lite | +0.019 | 1.0000 | +0.026 | 1.0000 | -0.007 | 1.0000 | +0.038 | 1.0000 |
+| glm-5.3 | claude-sonnet-5 | -0.022 | 1.0000 | -0.021 | 1.0000 | -0.039 | 0.0912 | -0.007 | 1.0000 |
+| muse-glimmer-30b | kimi-k3 | -0.014 | 1.0000 | -0.015 | 1.0000 | -0.011 | 1.0000 | -0.017 | 1.0000 |
+| muse-glimmer-30b | gpt-5.4-mini | +0.005 | 1.0000 | +0.015 | 1.0000 | -0.010 | 1.0000 | +0.013 | 1.0000 |
+| muse-glimmer-30b | gemini-3.1-flash-lite | +0.017 | 1.0000 | +0.006 | 1.0000 | +0.009 | 1.0000 | +0.015 | 1.0000 |
+| muse-glimmer-30b | claude-sonnet-5 | -0.025 | 0.3759 | -0.041 | 0.0038* | -0.022 | 0.1251 | -0.029 | 1.0000 |
+| kimi-k3 | gpt-5.4-mini | +0.020 | 0.2431 | +0.030 | 0.0319* | +0.001 | 1.0000 | +0.030 | 0.2371 |
+| kimi-k3 | gemini-3.1-flash-lite | +0.031 | 0.0381* | +0.021 | 1.0000 | +0.021 | 0.5016 | +0.032 | 0.5738 |
+| kimi-k3 | claude-sonnet-5 | -0.010 | 1.0000 | -0.026 | 0.0326* | -0.011 | 1.0000 | -0.012 | 1.0000 |
+| gpt-5.4-mini | gemini-3.1-flash-lite | +0.012 | 1.0000 | -0.008 | 1.0000 | +0.019 | 0.6695 | +0.003 | 1.0000 |
+| gpt-5.4-mini | claude-sonnet-5 | -0.030 | 0.0013* | -0.056 | 0.0005* | -0.012 | 0.4267 | -0.042 | 0.0016* |
+| gemini-3.1-flash-lite | claude-sonnet-5 | -0.042 | 0.0026* | -0.047 | 0.0005* | -0.031 | 0.0057* | -0.044 | 0.1604 |
+
+Smallest detectable difference (80% power, at the strictest Holm step), median over the 55 pairs: as scored (E3 + judge) 0.040, matching alone (E3) 0.047, route-adjusted 0.035, intermediate-only 0.057.
+
+#### Verbosity at matched settings
+
+Response-level least squares of MC as scored on the numeric values shown and the visible completion tokens, template fixed effects, pooled over 11 models (23,862 readable responses, 148 templates); 95% intervals resample templates. Per 10 numeric values: +0.0020 [+0.0005, +0.0041]; per 1,000 visible tokens: -0.0010 [-0.0114, +0.0076]. Within model and template (template-by-model fixed effects): +0.0025 [+0.0005, +0.0049] and -0.0041 [-0.0186, +0.0092]. Interquartile range of the count: 34 to 73; of visible tokens: 559 to 1,040. Spearman across the models' means (MC against the mean count): +0.409. Rows with more reasoning than completion tokens, floored at zero visible tokens: glm-5.3-flash 3, glm-5.3 18.
+
+MC against reasoning tokens: the quartiles above, each already at its model's matched store.

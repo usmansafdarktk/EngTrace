@@ -21,22 +21,21 @@ experiments also use.
 \subsection{Experimental Setup}
 \label{subsec:setup}
 
-Each model answers each instance once (24,750 responses) with the same zero-shot prompt and no
-tools or retrieval, at its provider's default decoding settings and an output ceiling of 32,768
-tokens (16,384 for \texttt{Muse Glimmer 30B}).
-At these defaults, four models return no reasoning tokens (\texttt{Gemma 4 26B},
-\texttt{Qwen3-235B-2507}, \texttt{Gemini 3.1 Flash-Lite}, and \texttt{GPT-5.4 mini}, two of the
-three closed models), so the defaults do not compare the models at equal reasoning effort.
-We therefore also evaluate a matched configuration, in which \texttt{Gemini 3.1 Flash-Lite},
-\texttt{Gemma 4 26B}, and \texttt{GPT-5.4 mini} also answer every instance with reasoning at medium
-effort (6,750 responses) and \texttt{Qwen3-235B-2507}, whose endpoint offers no reasoning setting,
-keeps its default.
-At the defaults, 260 responses (1.1\%) have no readable final answer and score 0, almost all of
-them empty at the output ceiling.
+We evaluate the models at matched settings, each with the same zero-shot prompt, no tools or
+retrieval, and an output ceiling of 32,768 tokens (16,384 for \texttt{Muse Glimmer 30B}):
+reasoning is on wherever the endpoint offers it, so seven models reason at their providers'
+defaults, \texttt{Gemini 3.1 Flash-Lite}, \texttt{Gemma 4 26B}, and \texttt{GPT-5.4 mini} answer
+every instance with reasoning at medium effort, and \texttt{Qwen3-235B-2507}, whose endpoint
+offers no reasoning setting, keeps its default.
+Each model answers each instance once (24,750 responses); the three models' responses at their
+providers' defaults, where they return no reasoning tokens (6,750 responses), are the comparison
+of~\autoref{tab:matched}.
+263 responses (1.1\%) have no readable final answer and score 0, almost all of them empty at the
+output ceiling.
 The template is the unit of analysis, because a template's 15 instances and their gold traces come
 from one procedure~\citep{miller2024errorbars}; every 95\% interval is a bootstrap over
 templates~\citep{efron1993bootstrap}.
 We compare two models with a sign-flip permutation test on their per-template
 differences~\citep{dror2018hitchhiker} and correct each family of tests, such as the 55 pairs of
-models in one configuration, with Holm's method~\citep{holm1979simple}.
+models at one setting, with Holm's method~\citep{holm1979simple}.
 \autoref{appendix:setup} gives the decoding settings, the prompt, and the statistical protocol.

@@ -72,8 +72,8 @@ the Hugging Face repository of an open-weights model.}
 \label{appendix:decoding}
 
 We query every model through OpenRouter with the prompt (\autoref{appendix:prompt}) and the output
-ceiling, and set no temperature, top-p, or reasoning setting, so each model decodes at its
-provider's defaults.
+ceiling, and set no temperature or top-p; the three models whose endpoints offer a reasoning setting
+run at medium effort, and every other model decodes at its provider's defaults.
 The ceiling is 32,768 tokens, except 16,384 for \texttt{Muse Glimmer 30B}, whose single eligible
 provider caps its output there.
 Providers serve every open-weights model at 8-bit floating-point precision or higher, and the
@@ -85,18 +85,17 @@ empty, for each of the 2,250 instances.
 providers' defaults; the other seven models return them on nearly every response.
 \autoref{tab:decoding} gives each model's output ceiling, number of providers, and token use.
 
-\paragraph{Matched Settings.} The three models that return no reasoning tokens at their defaults
-but whose endpoints offer a reasoning setting, \texttt{Gemma 4 26B}, \texttt{Gemini 3.1 Flash-Lite},
-and \texttt{GPT-5.4 mini}, answer every instance a second time with the reasoning-effort parameter
-at medium and the same prompt and output ceiling, and every one of these responses carries
+\paragraph{Matched Settings.} At matched settings, the configuration the paper reports, the three
+models that return no reasoning tokens at their defaults but whose endpoints offer a reasoning setting, \texttt{Gemma 4 26B},
+\texttt{Gemini 3.1 Flash-Lite}, and \texttt{GPT-5.4 mini}, answer every instance with reasoning at
+medium effort and the same prompt and output ceiling, and every one of these responses carries
 reasoning tokens; with reasoning on, \texttt{Gemma 4 26B} leaves 3 of its 2,250 responses empty at
 the output ceiling.
-At matched settings, these responses replace the three models' default ones, and the other eight
-models keep theirs: seven reason by default, and the endpoint of \texttt{Qwen3-235B-2507} offers no
-reasoning setting.
+The other eight models have the same responses at both settings: seven reason by default, and the
+endpoint of \texttt{Qwen3-235B-2507} offers no reasoning setting.
 Its sibling with a thinking mode, \texttt{Qwen3-235B-A22B-Thinking-2507}, is a different model and
 is not evaluated.
-\autoref{appendix:release} gives the dates on which we queried both configurations.
+\autoref{appendix:release} gives the query dates.
 
 \paragraph{Serving Endpoints.} \autoref{tab:providers} gives, for every model that more than one
 endpoint served, the responses each endpoint served and its difference from the model's mean on the
@@ -119,7 +118,7 @@ Model & Output ceiling & Providers & Completion tokens & Reasoning tokens & Resp
 \multicolumn{6}{l}{\textbf{Open-Weights LLMs}} \\
 \noalign{\vskip 0.5ex}\hdashline\noalign{\vskip 0.5ex}
 \texttt{DeepSeek V4.1 Flash} & 32,768 & 8 & 3,060 / 10,296 & 2,380 / 9,300 & 100.0\% \\
-\texttt{Gemma 4 26B} & 32,768 & 3 & 797 / 1,434 & 0 / 0 & 0.0\% \\
+\texttt{Gemma 4 26B}$^{\ddagger}$ & 32,768 & 2 & 5,556 / 11,174 & 4,754 / 9,905 & 100.0\% \\
 \texttt{GLM-5.3} & 32,768 & 8 & 3,270 / 17,954 & 2,473 / 16,298 & 99.8\% \\
 \texttt{GLM-5.3-Flash} & 32,768 & 11 & 2,500 / 11,328 & 1,785 / 10,247 & 99.9\% \\
 \texttt{gpt-oss-20b} & 32,768 & 3 & 1,795 / 6,164 & 993 / 4,987 & 100.0\% \\
@@ -133,16 +132,25 @@ Model & Output ceiling & Providers & Completion tokens & Reasoning tokens & Resp
 \multicolumn{6}{l}{\textbf{Closed LLMs}} \\
 \noalign{\vskip 0.5ex}\hdashline\noalign{\vskip 0.5ex}
 \texttt{Claude Sonnet 5} & 32,768 & 1 & 1,804 / 4,819 & 718 / 3,387 & 99.6\% \\
+\texttt{Gemini 3.1 Flash-Lite}$^{\ddagger}$ & 32,768 & 2 & 1,485 / 2,426 & 812 / 1,373 & 100.0\% \\
+\texttt{GPT-5.4 mini}$^{\ddagger}$ & 32,768 & 1 & 1,256 / 4,317 & 516 / 3,433 & 100.0\% \\
+
+\noalign{\vskip 0.5ex}\hdashline\noalign{\vskip 0.5ex}
+
+% The three models at their providers' defaults
+\multicolumn{6}{l}{\textbf{At the providers' defaults}} \\
+\noalign{\vskip 0.5ex}\hdashline\noalign{\vskip 0.5ex}
+\texttt{Gemma 4 26B} & 32,768 & 3 & 797 / 1,434 & 0 / 0 & 0.0\% \\
 \texttt{Gemini 3.1 Flash-Lite} & 32,768 & 1 & 653 / 1,031 & 0 / 0 & 0.0\% \\
 \texttt{GPT-5.4 mini} & 32,768 & 2 & 632 / 1,198 & 0 / 0 & 0.0\% \\
 
 \bottomrule
 \end{tabular}
-\caption{\textbf{Decoding and token use.} Per model over its 2,250 responses at the providers'
-defaults: the output ceiling,
-the number of providers that served it, the median and 90th-percentile (p90) completion and
-reasoning tokens as the provider reports them, and the share of responses with any reasoning
-tokens.}
+\caption{\textbf{Decoding and token use.} Per model over its 2,250 responses at matched settings:
+the output ceiling, the number of providers that served it, the median and 90th-percentile (p90)
+completion and reasoning tokens as the provider reports them, and the share of responses with any
+reasoning tokens; the bottom block gives the three models that return no reasoning tokens at their
+providers' defaults on their responses there. $^{\ddagger}$Reasoning at medium effort.}
 \label{tab:decoding}
 \end{table*}
 
@@ -185,14 +193,13 @@ tokens.}
  & AkashML$^{\S}$ & 15 & 0.267 & 73.3\% & $-0.020$ & 5 \\
  & BaseTen$^{\S}$ & 15 & 1.000 & 0.0\% & $0.000$ & 5 \\
  & GMICloud$^{\S}$ & 2 & 1.000 & 0.0\% & $0.000$ & 2 \\
+\texttt{Gemma 4 26B}$^{\ddagger}$ & Io Net & 2194 & 0.943 & 0.1\% & $-0.003$ & 36 \\
+ & DekaLLM & 56 & 0.911 & 1.8\% & $+0.003$ & 36 \\
+\texttt{Gemini 3.1 Flash-Lite}$^{\ddagger}$ & Google AI Studio$^{\S}$ & 2132 & 0.913 & 0.0\% & $+0.001$ & 18 \\
+ & Google$^{\S}$ & 118 & 0.975 & 0.0\% & $-0.001$ & 18 \\
 \texttt{Qwen3-235B-2507} & GMICloud & 2192 & 0.899 & 0.0\% & $-0.010$ & 35 \\
  & Parasail & 54 & 0.907 & 0.0\% & $+0.006$ & 35 \\
  & Nebius$^{\S}$ & 4 & 1.000 & 0.0\% & $+0.182$ & 1 \\
-\texttt{Gemma 4 26B} & DekaLLM & 1245 & 0.883 & 0.0\% & $+0.002$ & 148 \\
- & NextBit & 975 & 0.875 & 0.0\% & $-0.002$ & 148 \\
- & Io Net$^{\S}$ & 30 & 0.333 & 0.0\% & -- & 0 \\
-\texttt{GPT-5.4 mini} & Azure$^{\S}$ & 2249 & 0.852 & 0.0\% & $-0.036$ & 1 \\
- & OpenAI$^{\S}$ & 1 & 1.000 & 0.0\% & $+0.036$ & 1 \\
 \texttt{gpt-oss-20b} & Darkbloom$^{\S}$ & 2240 & 0.808 & 2.6\% & $-0.228$ & 9 \\
  & DekaLLM$^{\S}$ & 9 & 0.889 & 0.0\% & $+0.239$ & 8 \\
  & DeepInfra$^{\S}$ & 1 & 1.000 & 0.0\% & $+0.143$ & 1 \\
@@ -202,8 +209,10 @@ tokens.}
 more than one endpoint served: the responses each served, their FAC and their share with no readable
 answer, and the template-matched difference, the endpoint's mean minus the model's mean on the same
 templates, over the templates both cover. The raw FAC per endpoint is not comparable across
-endpoints, since OpenRouter assigns instances to endpoints unevenly; $^{\S}$marks the 19 endpoints
-that served or matched fewer than 20 templates, whose difference rests on too few templates to read.}
+endpoints, since OpenRouter assigns instances to endpoints unevenly; $^{\S}$marks the 18 endpoints
+that served or matched fewer than 20 templates, whose difference rests on too few templates to read.
+$^{\ddagger}$Responses with reasoning at medium effort; a model that one endpoint served is not
+listed.}
 \label{tab:providers}
 \end{table}
 % END GENERATED tab:providers
@@ -283,9 +292,9 @@ On this unit, we estimate and test each quantity as follows:
     bootstrap interval.
     \item \textbf{Multiple tests}: Holm's correction~\citep{holm1979simple} applies within each
     family of tests, such as the 55 pairs of models for each measure or the eleven level gaps.
-    \item \textbf{Matched settings}: the eleven models at matched settings form a second family of
-    55 pairs, tested and corrected in the same way, and the change of a model run with reasoning on
-    from its default responses is paired by instance.
+    \item \textbf{Providers' defaults}: the three models' default responses, with the other eight
+    models, form a second family of 55 pairs, tested and corrected in the same way, and a model's
+    change between the two settings is paired by instance.
     \item \textbf{Detectable differences}: at 80\% power and a two-sided level of 0.05, a paired
     comparison detects $2.80\,s/\sqrt{n}$, with $s$ the standard deviation of the $n$ per-template
     differences, and a level gap $2.80\,\sigma\sqrt{1/58 + 1/34}$, with $\sigma$ the pooled

@@ -33,12 +33,12 @@ Four 90\% intervals lie wholly on one side of zero (\texttt{DeepSeek V4.1 Flash}
 \texttt{Claude Sonnet 5}, and \texttt{Qwen3-235B-2507} below, \texttt{Muse Glimmer 30B} above):
 small changes the data lean toward but the corrected test does not support.
 The models' ordering on the paraphrases agrees with their ordering on the originals with Kendall's
-$\tau$ 0.807 (95\% interval 0.547 to 0.844), which is what sampling noise alone gives, since two
-disjoint draws of 275 original instances with the same template mix agree with a median $\tau$ of
-0.807 (quartiles 0.754 to 0.860).
-For the four models decoded three more times on 300 instances (\texttt{Qwen3-235B-2507},
-\texttt{Gemini 3.1 Flash-Lite}, \texttt{Gemma 4 26B}, and \texttt{gpt-oss-20b}), FAC varies by a
-standard deviation of 0.003 to 0.016 across repeats, and the paraphrase change lies within the
+$\tau$ 0.722 (95\% interval 0.449 to 0.844), within the range sampling noise alone gives, below
+its lower quartile, since two disjoint draws of 275 original instances with the same template mix
+agree with a median $\tau$ of 0.807 (quartiles 0.748 to 0.860; 5th percentile 0.647).
+For the four models decoded three more times on 300 instances (\texttt{Gemma 4 26B},
+\texttt{Gemini 3.1 Flash-Lite}, \texttt{Qwen3-235B-2507}, and \texttt{gpt-oss-20b}), FAC varies by a
+standard deviation of 0.003 to 0.008 across repeats, and the paraphrase change lies within the
 spread of the repeats' changes for two of the four and beyond it for \texttt{Qwen3-235B-2507} and
 \texttt{gpt-oss-20b}.
 The test bounds memorized wording, not memorized methods, since the numbers and the problem
@@ -59,12 +59,12 @@ the less formula-bound ones.
 \texttt{Claude Sonnet 5} & $-0.011$ ($-0.025$ to 0.000) & $-0.022$ to $-0.003$ & 1.000 & $-0.005$ \\
 \texttt{Kimi K3} & $+0.002$ ($-0.005$ to 0.011) & $-0.004$ to 0.009 & 1.000 & $-0.005$ \\
 \texttt{GLM-5.3-Flash} & $-0.011$ ($-0.029$ to 0.005) & $-0.026$ to 0.004 & 1.000 & $-0.015$ \\
+\texttt{GPT-5.4 mini} & $+0.005$ ($-0.012$ to 0.024) & $-0.009$ to 0.021 & 1.000 & $+0.023$ \\
 \texttt{Muse Glimmer 30B} & $+0.025$ (0.004--0.051) & 0.007--0.046 & 0.527 & $-0.007$ \\
 \texttt{GLM-5.3} & $+0.002$ ($-0.018$ to 0.022) & $-0.015$ to 0.019 & 1.000 & $+0.001$ \\
+\texttt{Gemma 4 26B} & $0.000$ ($-0.033$ to 0.028) & $-0.026$ to 0.023 & 1.000 & $-0.009$ \\
+\texttt{Gemini 3.1 Flash-Lite} & $-0.013$ ($-0.031$ to 0.004) & $-0.028$ to 0.000 & 1.000 & $-0.006$ \\
 \texttt{Qwen3-235B-2507} & $-0.036$ ($-0.080$ to 0.005) & $-0.073$ to $-0.002$ & 1.000 & $-0.015$ \\
-\texttt{Gemini 3.1 Flash-Lite} & $-0.009$ ($-0.051$ to 0.031) & $-0.043$ to 0.025 & 1.000 & $+0.002$ \\
-\texttt{Gemma 4 26B} & $+0.004$ ($-0.039$ to 0.044) & $-0.031$ to 0.038 & 1.000 & $+0.019$ \\
-\texttt{GPT-5.4 mini} & $0.000$ ($-0.035$ to 0.035) & $-0.029$ to 0.029 & 1.000 & $-0.013$ \\
 \texttt{gpt-oss-20b} & $+0.018$ ($-0.031$ to 0.067) & $-0.023$ to 0.059 & 1.000 & $-0.021$ \\
 \bottomrule
 \end{tabular}

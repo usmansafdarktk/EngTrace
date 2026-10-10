@@ -27,7 +27,7 @@ answer is correct, or the question admits it) and incomplete.
 
 \paragraph{Sample and Readings.} We read 137 wrong answers from four models (19 from
 \texttt{Claude Sonnet 5}, 39 from \texttt{GPT-5.4 mini}, 39 from \texttt{Gemma 4 26B}, and 40 from
-\texttt{gpt-oss-20b}), chosen to contrast the tiers, each a readable response at the providers'
+\texttt{gpt-oss-20b}), chosen to span the range, each a readable response at the providers'
 default settings whose final answer the check scores incorrect; we draw up to 40 per model at
 random, across levels in proportion to the model's wrong answers and spread over its templates, 77
 templates in all.
@@ -96,23 +96,23 @@ For each of the six, all three answer that the question has one correct answer a
 response shown, within 5\% of the gold value, is not correct, so the near miss shown on each of
 these templates is the model's error, not the wording's.
 
-\paragraph{Incorrect Verdicts and the Answer's Form.} Of the first five models' 99 incorrect
-verdicts, 28 fall on three templates: 13 on \texttt{qr\_policy\_one\_iteration}, 8 on
-\texttt{primary\_consolidation\_settlement}, and 7 on \texttt{newsvendor\_normal\_demand}.
-Of the same 99, 27 lie within 0.2\% of a target whose digits the question prescribes and 3 are
-symbolic answers scored by the numbers they state; over 11,250 responses, the first five lose 231.5
-answer points in all, 102 to responses with no readable final answer and 30.5 to 61 partial answers
+\paragraph{Incorrect Verdicts and the Answer's Form.} Of the first five models' 126 incorrect
+verdicts, 34 fall on three templates: 18 on \texttt{qr\_policy\_one\_iteration}, 9 on
+\texttt{single\_sampling\_oc\_point}, and 7 on \texttt{adiabatic\_flame\_temperature}.
+Of the same 126, 38 lie within 0.2\% of a target whose digits the question prescribes and 5 are
+symbolic answers scored by the numbers they state; over 11,250 responses, the first five lose 231
+answer points in all, 71 to responses with no readable final answer and 34 to 68 partial answers
 at half credit.
 Two sources of incorrect verdicts concern the answer's form rather than its value.
 First, 17 templates prescribe the digits of the answer, so a value within the tolerance but not at
-the prescribed digits is incorrect by the question's own terms (311 incorrect verdicts across the
-eleven models, 120 of them within 0.2\% of the target on 11 of these templates).
+the prescribed digits is incorrect by the question's own terms (240 incorrect verdicts across the
+eleven models, 108 of them within 0.2\% of the target on 11 of these templates).
 Second, four of the nine templates with symbolic answers are scored by the numbers they state, while
 the other five also accept an equivalent expression (\autoref{appendix:scoring}).
 Scored under other rules, the absolute-value clause, the last-digit term, the prescribed digits and
 proportional partial credit each move a model's FAC by at most 0.030 and keep Kendall's $\tau$ with
-the ordering as scored at 0.927 or above (\autoref{tab:scoring_variants}).
+the ordering as scored at 0.782 or above (\autoref{tab:scoring_variants}).
 Four templates whose answers can be read off the question's wording stay in the evaluation set,
-since leaving them out moves FAC by at most 0.004: \texttt{levenspiel\_plot\_interpretation},
+since leaving them out moves FAC by at most 0.002: \texttt{levenspiel\_plot\_interpretation},
 \texttt{line\_balancing\_heuristic}, \texttt{system\_properties\_memory\_causality}, and
 \texttt{system\_property\_linearity}.

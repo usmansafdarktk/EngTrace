@@ -1,0 +1,129 @@
+% phrases 6_results.tex must contain
+the eleven models form a graded order of eight overlapping groups, with FAC of 0.808 to 0.988, and 36 of the 55 pairs differ after Holm's correction
+only \texttt{gpt-oss-20b} differs from every other model, while \texttt{DeepSeek V4.1 Flash}, \texttt{Claude Sonnet 5}, \texttt{Kimi K3}, and \texttt{GLM-5.3-Flash} differ from \texttt{GLM-5.3} and every model below it
+The first five lie within 0.019 of one another, and only three of their ten pairs differ, although the design detects differences of one to two points between them
+even on Advanced templates they score 0.94 to 0.98
+no model fails every instance of more than five of the 150 templates, but the first five solve 72\% to 90\% of the templates on every instance and the other six 31\% to 81\%
+Of the three models run with reasoning at medium effort, only \texttt{GPT-5.4 mini} reaches the first five
+As scored, MC does not separate \texttt{Claude Sonnet 5} from \texttt{DeepSeek V4.1 Flash} after Holm's correction, nor does the final answer (Holm-adjusted $p$ 0.069); matching alone does (0.001), but not once the milestones the judge rules not needed leave the denominator (1.000;
+The arithmetic check flags a displayed calculation that does not follow from its own operands in up to 23.2\% of a model's correct answers
+Of the 189 flags a domain expert decided on, 171 are real slips (precision 0.905), and a mechanical check finds none of the 168 it can classify to be a rounding carried forward from unrounded values earlier in the response
+The judged step check flags a further step in up to 20.6\% of correct-answer responses, but its flags are judged rather than verified: in the expert study, 7 of the 15 it raises inside correct answers are errors (precision 0.467)
+in the expert study, both checks together find 0.36 of the flawed steps the domain experts marked inside correct answers
+On their wrong answers, the last four models still state 46\% to 59\% of the gold milestones, against a chance floor of at most 17.5\%
+Up to 25\% of these wrong answers reach every gold milestone yet end in an answer the check scores incorrect
+A milestone the judge rules missing marks 63\% to 78\% of the last four's wrong answers and 46\% to 83\% of the other models', but only 20\% of \texttt{Claude Sonnet 5}'s, 55\% of which reach every milestone
+On the 58 templates whose instances all follow one derivation, the first five solve some but not all instances of 7\% to 34\% of the templates and the other six of 14\% to 59\% (\autoref{tab:single_path})
+Each of 275 instances over 114 templates has a paraphrase that keeps every number, unit, and symbol in place
+for nine of the eleven models it is bounded within $\pm 0.05$ at 90\% confidence (\texttt{Qwen3-235B-2507} reaches $-0.073$ and \texttt{gpt-oss-20b} reaches $+0.059$)
+decoding four models (\texttt{Gemma 4 26B}, \texttt{Gemini 3.1 Flash-Lite}, \texttt{Qwen3-235B-2507}, and \texttt{gpt-oss-20b}) three more times on 300 instances, two per template, moves FAC by a standard deviation of at most 0.008
+Restricting FAC to the responses that state an answer reorders only the first seven (Kendall's $\tau$ 0.636 with the ordering as scored): \texttt{GLM-5.3}, whose 99 empty responses then drop out, rises from seventh to first
+With reasoning at medium effort, \texttt{GPT-5.4 mini} gains $+0.118$, \texttt{Gemma 4 26B} gains $+0.070$, and \texttt{Gemini 3.1 Flash-Lite} gains $+0.038$ on all 2,250 instances (\autoref{tab:matched})
+With reasoning on, \texttt{GPT-5.4 mini} rises to 0.969, level with \texttt{Muse Glimmer 30B}, and no longer differs from \texttt{Kimi K3} and \texttt{GLM-5.3-Flash}
+For the first five, the spread between the highest and the lowest branch mean is 0.018 to 0.053, and no domain mean falls below 0.88
+For the last five, the spread is 0.071 to 0.226, and each model falls below 0.81 in at least one domain; \texttt{Muse Glimmer 30B} lies between, with a spread of 0.056 and a lowest domain mean of 0.880
+with 30 templates per branch, differences below 3 to 19 points cannot be told from sampling noise, and only one of the 110 within-model branch comparisons holds after correction (\texttt{gpt-oss-20b}, electrical above civil)
+Thermodynamics is the lowest domain for four of the eleven models
+Every model's mean is lower on Advanced than on Easy templates (\autoref{fig:level_bars}), by 0.006 to 0.181, with intervals that include zero for seven models
+The gap holds after Holm's correction for \texttt{gpt-oss-20b} alone under Welch's $t$-test, the test we read because scores vary more across Advanced templates (\autoref{tab:level_gap})
+For all eleven models, the share of responses scored 0 is higher on instances with six or more gold milestones than on instances with one, reaching 0.104 to 0.254 for the last five against at most 0.061 for the first five (\texttt{Muse Glimmer 30B}: 0.047)
+Over readable responses, with the answer kind as a covariate and templates as clusters, each further milestone multiplies the odds of a wrong answer by 1.21 (95\% interval 1.09 to 1.33) when pooled over the models
+per model, the slope holds after Holm's correction for three of the eleven (\autoref{tab:depth_model})
+Four experiments on a 450-instance subset extend the evaluation, three changing one thing and one adding two flagships as anchors
+On the subset, \texttt{GPT-5.4 mini} gains 0.057 in MC with reasoning at medium effort, beside the FAC gain above, while its arithmetic flags on correct answers roughly halve
+The flagship \texttt{GPT-5.4}, which also returns no reasoning tokens at its default, gains 0.046 and sheds most of its flags
+on the same subset \texttt{DeepSeek V4 Pro} scores 0.968 and \texttt{GPT-5.4} 0.951 at its default and 0.997 with reasoning, against 0.964 to 0.990 for the first five, and no test is run against the anchors
+The highest flagship score, \texttt{GPT-5.4}'s with reasoning, lies inside the interval of \texttt{DeepSeek V4.1 Flash}, and on Advanced templates the flagships score 0.89 to 1.00 and the first five 0.94 to 0.99
+only \texttt{gpt-oss-20b} answers more correctly ($+0.068$, partly because fewer of its responses are empty at the output ceiling), and \texttt{Claude Sonnet 5} and \texttt{GPT-5.4 mini} stay within $\pm 0.05$
+which \texttt{Claude Sonnet 5} calls on two thirds of the instances, neither \texttt{Claude Sonnet 5} nor \texttt{GPT-5.4 mini} changes in FAC or MC beyond $\pm 0.05$
+Three domain experts read the full response of 137 wrong answers from four models that span the FAC order (19 from \texttt{Claude Sonnet 5}, 39 from \texttt{GPT-5.4 mini}, 39 from \texttt{Gemma 4 26B}, and 40 from \texttt{gpt-oss-20b}; 411 readings, all at the providers' default settings) and assigned the first category that applies in a six-category hierarchy from hallucination to calculation, or ``no error'' (Fleiss'~$\kappa$ 0.912~\citep{fleiss1971}
+Calculation is the majority label for \texttt{GPT-5.4 mini}, \texttt{Gemma 4 26B}, and \texttt{Claude Sonnet 5} (29 of 39, 28 of 39, and 12 of 19 wrong answers) and the largest for \texttt{gpt-oss-20b} (18 of 40)
+Conceptual errors are most common for \texttt{gpt-oss-20b}: a hallucination, a wrong setup, or a wrong formula in 18 of its 40 wrong answers, against 5 of 19 for \texttt{Claude Sonnet 5}, 7 of 39 for \texttt{GPT-5.4 mini}, and 9 of 39 for \texttt{Gemma 4 26B}
+\texttt{GPT-5.4 mini} and \texttt{Gemma 4 26B}, whose wrong answers are mostly calculation slips, gain 0.118 and 0.070 with reasoning (\texttt{Gemini 3.1 Flash-Lite}, $+0.038$, was not read)
+On Easy problems, 88\% of the 78 readings of 26 wrong answers are calculation errors
+wrong formulas or principles rise from 3\% of the readings on Easy problems to 21\% on Intermediate and Advanced ones
+Over 11,250 responses, the first five models lose 231 answer points
+71 go to responses with no readable final answer and 34 to 68 partial answers at half credit
+Of their 126 incorrect verdicts, 38 lie within 0.2\% of a target whose digits the question prescribes, which makes them incorrect by its terms, 5 are symbolic answers scored by the numbers they state, and 83 fall in neither group
+which the arithmetic check flags in 0.6\% to 14.3\% of their correct answers
+
+% phrases appendices/results.tex must contain
+the smallest difference the design detects at 80\% power
+Of the 55 pairs, 36 differ on FAC after Holm correction under the sign-flip test over templates: inside the first five, \texttt{DeepSeek V4.1 Flash} from \texttt{GLM-5.3-Flash}, \texttt{DeepSeek V4.1 Flash} from \texttt{GPT-5.4 mini}, and \texttt{Claude Sonnet 5} from \texttt{GPT-5.4 mini}; \texttt{Muse Glimmer 30B} from none of them; 27 of the 30 pairs between the first six and the last five; and inside the last five, \texttt{GLM-5.3} from \texttt{Qwen3-235B-2507}, \texttt{GLM-5.3} from \texttt{gpt-oss-20b}, \texttt{Gemma 4 26B} from \texttt{Qwen3-235B-2507}, \texttt{Gemma 4 26B} from \texttt{gpt-oss-20b}, \texttt{Gemini 3.1 Flash-Lite} from \texttt{gpt-oss-20b}, and \texttt{Qwen3-235B-2507} from \texttt{gpt-oss-20b}
+Every non-significant FAC difference lies below what its pair detects (0.013 to 0.039)
+On MC, 15 pairs differ: the three highest models, \texttt{Claude Sonnet 5}, \texttt{GLM-5.3-Flash}, and \texttt{Kimi K3}, do not separate, nor do \texttt{Claude Sonnet 5} and \texttt{DeepSeek V4.1 Flash}, which FAC does not separate either; Kendall's $\tau$~\citep{kendall1938} between the two orderings is 0.709 (95\% interval 0.345 to 0.818)
+Strict FAC, which scores a partial answer 0, separates 29 pairs and agrees with FAC on 48 of the 55; a Wilcoxon test~\citep{wilcoxon1945} separates 17 on MC; and McNemar's exact test~\citep{mcnemar1947}, which treats the 2,250 instances as independent, separates 45
+Halving the answer tolerance swaps one pair of models and doubling it swaps two, and no swapped pair differs after correction ($\tau = 0.964$ and $0.927$ against the ordering as scored)
+leaving out the four templates answerable from their wording or the nine with symbolic answers move no model's FAC by more than 0.028 and keep $\tau$ at 0.964 or above
+($\tau = 0.636$), chiefly because \texttt{GLM-5.3}'s 99 empty responses then drop out
+Spearman's $\rho$~\citep{spearman1904} between a template's mean coverage and its mean number of steps is $-0.09$ to $-0.28$ for every model
+under that permutation the gap holds for four models
+\texttt{GLM-5.3}'s gap is $-0.004$ (Holm-adjusted Welch $p$ 1.000)
+Kendall's $\tau$ between the orderings at the providers' defaults and at matched settings is 0.709
+\texttt{Claude Sonnet 5} and \texttt{DeepSeek V4.1 Flash} differ after Holm's correction by matching alone (Holm-adjusted $p$ 0.001) and on intermediate milestones only (0.032), but not as scored (0.069) or under route-adjusted coverage (1.000)
+the slope of MC on the number of values a response displays is $+0.0020$ (MC per 10 numeric values shown; 95\% interval 0.0005 to 0.0041) with template fixed effects, and within models Spearman's $\rho$ runs from $-0.21$ to $-0.07$
+the slope of the wrong-answer rate on the milestone count holds after Holm correction for three of the eleven models over readable responses
+Matching alone, which the judge does not touch, separates them ($+0.042$, Holm-adjusted $p$ 0.001); re-judging a sample with a second judge shifts a model's coverage by $-0.018$ to $+0.019$
+Coverage rises by at most 0.004 (MC per 10 numeric values shown)
+The judge adds 0.019 to 0.045 to a model's coverage over matching alone, and matching alone separates more pairs (20 against 15 of the 55)
+Pooled over the models, each further milestone multiplies the odds of a wrong answer by 1.21 (95\% interval 1.09 to 1.33)
+Reasoning raises all three models run with it (Holm-adjusted $p$ $<$0.001), and for \texttt{GPT-5.4 mini} and \texttt{Gemma 4 26B} the 90\% interval lies wholly above $+0.05$
+12 of the 3,077 (0.4\%) are carried precision, a printed result that is a correct rounding of the value recomputed from the unrounded values earlier in the response, and none of the 171 slips the domain expert confirmed is
+
+% phrases appendices/branch_domain.tex must contain
+of four representative models
+The lowest branch differs by model, chemical for five models, industrial for five, and civil for one, and a single branch pair differs within a model after correction
+\texttt{DeepSeek V4.1 Flash}, \texttt{Claude Sonnet 5}, and \texttt{GPT-5.4 mini} stay close to their FAC in every branch, while \texttt{gpt-oss-20b} is lowest in civil engineering
+\texttt{DeepSeek V4.1 Flash} is lowest on production and inventory and \texttt{Claude Sonnet 5} on quality and reliability control, whereas the other two dip lower, \texttt{GPT-5.4 mini} in production and inventory and \texttt{gpt-oss-20b} in geotechnical engineering
+
+% phrases appendices/paraphrase.tex must contain
+We select three of every template's 15 instances (450 instances)
+A paraphrase must pass two checks
+a word similarity to the original of at most 0.75
+with three attempts per instance
+Of the 450 instances, 314 pass the scripted checks and the domain experts keep 275 pairs on 114 templates
+The eleven models answer the kept paraphrases
+the $\pm 0.05$ margin, which is about the paired difference the design detects at 80\% power, the 90\% interval lies within it for every model but \texttt{Qwen3-235B-2507} and \texttt{gpt-oss-20b}
+(\texttt{DeepSeek V4.1 Flash}, \texttt{Claude Sonnet 5}, and \texttt{Qwen3-235B-2507} below, \texttt{Muse Glimmer 30B} above)
+For the four models decoded three more times on 300 instances (\texttt{Gemma 4 26B}, \texttt{Gemini 3.1 Flash-Lite}, \texttt{Qwen3-235B-2507}, and \texttt{gpt-oss-20b}), FAC varies by a standard deviation of 0.003 to 0.008 across repeats, and the paraphrase change lies within the spread of the repeats' changes for two of the four and beyond it for \texttt{Qwen3-235B-2507} and \texttt{gpt-oss-20b}
+On the 275 kept pairs, no change in FAC holds after correction
+Kendall's $\tau$ 0.722 (95\% interval 0.449 to 0.844), below what sampling noise alone gives, since two disjoint draws of 275 original instances with the same template mix agree with a median $\tau$ of 0.807 (quartiles 0.748 to 0.860)
+it covers the 114 templates that can be paraphrased without loss
+
+% phrases appendices/further_experiments.tex must contain
+Four experiments extend the evaluation
+450-instance subset (three instances per template)
+the two closed models
+For the 135 templates whose code states their governing equations
+(405 instances)
+up to 8 times
+a 20 s limit
+truncated at 4,000 characters
+the 90\% interval against the $\pm 0.05$ margin
+80\% power
+the change on the 388 instances it answered in both runs is $+0.044$
+\texttt{Claude Sonnet 5} on 66\% of the instances and \texttt{GPT-5.4 mini} on 18\%
+\texttt{DeepSeek V4 Pro} scores 0.968 and \texttt{GPT-5.4} 0.951 at its default and 0.997 with reasoning, against 0.964 to 0.990 for the first five on the same instances; the highest anchor run lies inside the interval of \texttt{DeepSeek V4.1 Flash}, and on Advanced templates the anchors score 0.89 to 1.00 and the first five 0.94 to 0.99
+raises its MC by 0.057 (95\% interval 0.031 to 0.085)
+On all 2,250 instances, reasoning at medium effort changes FAC by $+0.118$ for \texttt{GPT-5.4 mini} (95\% interval 0.082 to 0.156), $+0.070$ for \texttt{Gemma 4 26B} (95\% interval 0.049 to 0.092), and $+0.038$ for \texttt{Gemini 3.1 Flash-Lite} (95\% interval 0.023 to 0.056)
+for \texttt{GPT-5.4 mini} and \texttt{Gemma 4 26B} the 90\% interval lies wholly above $+0.05$
+over all instances, MC moves by $+0.008$ for \texttt{Gemma 4 26B} and $+0.016$ for \texttt{Gemini 3.1 Flash-Lite}
+
+% phrases appendices/error_analysis.tex must contain
+The six categories follow the stages
+answers the six questions in this order
+two further options
+We read 137 wrong answers from four models (19 from \texttt{Claude Sonnet 5}, 39 from \texttt{GPT-5.4 mini}, 39 from \texttt{Gemma 4 26B}, and 40 from \texttt{gpt-oss-20b})
+we draw up to 40 per model at random
+77 templates in all
+Three domain experts of the wrong answer's branch
+three domain experts of each template's branch read six templates on which many wrong answers land between 0.2\% and 5\% of the gold value
+For each of the six, all three answer that the question has one correct answer and that the response shown, within 5\% of the gold value, is not correct
+17 templates prescribe the digits of the answer, so a value within the tolerance but not at the prescribed digits is incorrect by the question's own terms (240 incorrect verdicts across the eleven models, 108 of them within 0.2\% of the target on 11 of these templates)
+unit and dimension errors are nearly absent (1 of 411 readings) and sign errors rare (11, in two models), that 7 of the 7 hallucination readings are \texttt{gpt-oss-20b}'s, and that agreement is high for every model and lowest for \texttt{gpt-oss-20b} (Fleiss' $\kappa$ 0.835 against 0.917 to 1.000)
+Of the first five models' 126 incorrect verdicts, 34 fall on three templates: 18 on \texttt{qr\_policy\_one\_iteration}, 9 on \texttt{single\_sampling\_oc\_point}, and 7 on \texttt{adiabatic\_flame\_temperature}
+Of the same 126, 38 lie within 0.2\% of a target whose digits the question prescribes and 5 are symbolic answers scored by the numbers they state; over 11,250 responses, the first five lose 231 answer points in all, 71 to responses with no readable final answer and 34 to 68 partial answers at half credit
+the nine templates with symbolic answers
+four of the nine templates with symbolic answers are scored by the numbers they state
+Four templates whose answers can be read off the question's wording stay in the evaluation set, since leaving them out moves FAC by at most 0.002
+the absolute-value clause, the last-digit term, the prescribed digits and proportional partial credit each move a model's FAC by at most 0.030 and keep Kendall's $\tau$ with the ordering as scored at 0.782 or above (\autoref{tab:scoring_variants})

@@ -10,6 +10,10 @@ We pair each experiment with the evaluation's responses on the same instances
 (\autoref{tab:experiments}) and read the 90\% interval against the $\pm 0.05$ margin, beside a
 sign-flip test over templates, Holm-corrected within the experiment, and the smallest change the
 experiment detects at 80\% power.
+Apart from that one change, the experiments run at the providers' defaults, as do the evaluation's
+responses they are paired with, so for \texttt{GPT-5.4 mini} and \texttt{Gemini 3.1 Flash-Lite} the
+evaluation column of~\autoref{tab:experiments} is without reasoning; \autoref{tab:matched} gives
+their change with reasoning on over the full evaluation set.
 
 \paragraph{Reasoning Effort.} Do the two closed models that return no reasoning tokens at their
 providers' defaults, \texttt{GPT-5.4 mini} and \texttt{Gemini 3.1 Flash-Lite}, score differently
@@ -25,22 +29,22 @@ milestones stated, fewer slips behind correct answers; over all instances, MC mo
 \texttt{Gemma 4 26B} and $+0.016$ for \texttt{Gemini 3.1 Flash-Lite} (\autoref{tab:matched}).
 The matched settings of~\autoref{appendix:decoding} repeat the change on the full evaluation set
 for the three models whose endpoints offer the setting.
-On all 2,250 instances, reasoning at medium effort changes FAC by $+0.038$ for
-\texttt{Gemini 3.1 Flash-Lite} (95\% interval 0.023 to 0.056), $+0.070$ for \texttt{Gemma 4 26B}
-(95\% interval 0.049 to 0.092), and $+0.118$ for \texttt{GPT-5.4 mini} (95\% interval 0.082 to
-0.156), so with more instances the change for \texttt{Gemini 3.1 Flash-Lite} is detectable too, and
-for \texttt{Gemma 4 26B} and \texttt{GPT-5.4 mini} the 90\% interval lies wholly above $+0.05$
+On all 2,250 instances, reasoning at medium effort changes FAC by $+0.118$ for
+\texttt{GPT-5.4 mini} (95\% interval 0.082 to 0.156), $+0.070$ for \texttt{Gemma 4 26B} (95\%
+interval 0.049 to 0.092), and $+0.038$ for \texttt{Gemini 3.1 Flash-Lite} (95\% interval 0.023 to
+0.056), so with more instances the change for \texttt{Gemini 3.1 Flash-Lite} is detectable too, and
+for \texttt{GPT-5.4 mini} and \texttt{Gemma 4 26B} the 90\% interval lies wholly above $+0.05$
 (\autoref{tab:matched}).
 
-\paragraph{Flagship Anchors.} Does a flagship exceed the upper tier, or is the ceiling an artifact
+\paragraph{Flagship Anchors.} Does a flagship exceed the first five, or is the ceiling an artifact
 of evaluating none?
 \texttt{GPT-5.4} and \texttt{DeepSeek V4 Pro}, the two flagships that pass the selection rule
 (\autoref{appendix:models}), answer the same subset at their providers' defaults, and
 \texttt{GPT-5.4}, whose default returns no reasoning tokens, also with reasoning at medium effort;
 an anchor is a reference point outside the pairwise tests, so no test is run against it.
 \texttt{DeepSeek V4 Pro} scores 0.968 and \texttt{GPT-5.4} 0.951 at its default and 0.997 with
-reasoning, against 0.959 to 0.990 for the first five on the same instances; the highest anchor run
-lies inside the interval of \texttt{DeepSeek V4.1 Flash}, and on Advanced templates the anchors
+reasoning, against 0.967 to 0.990 for the first five on the same instances; the highest anchor
+run lies inside the interval of \texttt{DeepSeek V4.1 Flash}, and on Advanced templates the anchors
 score 0.89 to 1.00 and the first five 0.94 to 0.99.
 The flagships therefore do not score clearly above the first five.
 The one paired test among the anchors, \texttt{GPT-5.4} with reasoning against its default, is the
@@ -48,8 +52,9 @@ last row of~\autoref{tab:experiments} and shows the reasoning-effort result agai
 
 \paragraph{Open Book.} Does recall of the governing equations limit the scores?
 For the 135 templates whose code states their governing equations, the question carries them as a
-handbook block, one per line, with no data tables or constants (405 instances); one top-tier model
-and two lower-tier ones, one closed and one open-weights, answer: \texttt{Claude Sonnet 5},
+handbook block, one per line, with no data tables or constants (405 instances); one model of the
+first five and two lower-scoring ones at the providers' defaults, one closed and one open-weights,
+answer: \texttt{Claude Sonnet 5},
 \texttt{GPT-5.4 mini}, and \texttt{gpt-oss-20b}.
 The equations lift \texttt{gpt-oss-20b}, partly because fewer of its responses run out of room
 (the change on the 388 instances it answered in both runs is $+0.044$), and leave the two closed
@@ -106,7 +111,10 @@ instances covered; FAC in the evaluation and under the experiment on those insta
 instance; the change with its 95\% interval, the Holm-adjusted $p$ of the sign-flip test over
 templates, the smallest change the experiment detects at 80\% power, and the 90\% interval read
 against the $\pm 0.05$ margin; the change in MC; and the share of correct-answer responses with an
-arithmetic flag in the evaluation and under the experiment (unpaired).}
+arithmetic flag in the evaluation and under the experiment (unpaired). The experiments and their
+evaluation column are at the providers' default settings on the same instances (for
+\texttt{GPT-5.4 mini} and \texttt{Gemini 3.1 Flash-Lite} without reasoning); the full-set change
+with reasoning on is in \autoref{tab:matched}.}
 \label{tab:experiments}
 \end{table*}
 % END GENERATED tab:experiments

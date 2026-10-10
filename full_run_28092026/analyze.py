@@ -129,6 +129,16 @@ its own file, so that results.json and RESULTS.md keep their content:
     `sign_flip_p(d, seed, draws=None)`, `holm(ps)`, `detectable_paired(d, m=1)`, `boot_mean(v, seed)`,
     `pairwise_family(M, keys, seed_ci, seed_p, wilcoxon=False)`, `separated(pairs, key='p_holm', alpha=0.05)` and
     `letters(order, sep)`.
+
+ADDED 2026-10-10 (W1A; the paper reports the matched configuration): results/matched.json also carries, on the matched
+rows, what results.json holds per model on the default configuration, with the same functions and seeds: Q1's and
+q3_coverage's full results (`q1`, `q3_coverage`) and the pairs each test separates (`pairs_separated`: FAC under the sign
+flips, strict FAC, McNemar, MC under the sign flips and Wilcoxon, MC by matching alone); each model's Q3 row
+(`models[k]['q3']`); `q2`, `q3_overall`, `branches_levels`, `q4`, `sensitivity` and `reported`; Q5 as one family over every
+model (`q5`: a re-run model's reasoning-on rows against its cascade paraphrase store, matched_config.json's
+`cascade.paraphrase`, the others' default rows against scores/paraphrase/, Holm over the family, Kendall's tau between the
+paraphrase and original orderings); and the decoding repeats (`repeats`: a re-run model's cascade repeat stores against its
+reasoning-on rows, the others' default repeats). sections/matched.md prints each family.
 """
 from __future__ import annotations
 
@@ -859,11 +869,12 @@ def paired(main_rows, para_rows, ids, fn, seed, m: int | None = None):
             **detectable_paired(np.array([np.mean(v) for v in diff.values()]), m or len(ROSTER))}
 
 
-def q5(main, para, keys, keep=None, e5_main=None, e5_para=None):
+def q5(main, para, keys, keep=None, e5_main=None, e5_para=None, rep_stores=None):
     """Paired paraphrase minus original, per model, on the items both arms hold; a pair the expert
     rejected leaves both arms (`keep`, when the check has returned). Besides the answer score: the
     E3 coverage difference on items with milestones, E5-strict once both arms carry it, and the
-    answer score on the pairs both arms served from the same provider."""
+    answer score on the pairs both arms served from the same provider. `rep_stores` names each model's
+    repeat stores for the run-to-run yardstick, as repeats() takes it."""
     out, tested = [], []
     for i, k in enumerate(keys):
         if not para.get(k):
@@ -907,7 +918,7 @@ def q5(main, para, keys, keep=None, e5_main=None, e5_para=None):
                 N[:, m, j] += 1
         tau = {**kendall_boot(S, N, 990), 'items': len(common), 'noise_arm': tau_noise_arm(main, tested, common)}
     return {'models': out, 'tau': tau, 'expert_check': None if keep is None else len(keep),
-            'margin': EQUIV_MARGIN, 'vs_repeats': vs_repeats(main, para, tested, keep, out)}
+            'margin': EQUIV_MARGIN, 'vs_repeats': vs_repeats(main, para, tested, keep, out, rep_stores)}
 
 
 def reasoning_arms(main, e5_main, keys) -> list[dict]:
@@ -1094,14 +1105,14 @@ def tau_noise_arm(main, keys, ids, splits: int = 200, seed: int = 4243) -> dict:
             'p5': float(np.percentile(taus, 5)), 'p95': float(np.percentile(taus, 95))}
 
 
-def vs_repeats(main, para, keys, keep, q5_rows) -> dict:
+def vs_repeats(main, para, keys, keep, q5_rows, stores: dict | None = None) -> dict:
     """The paraphrase difference beside the run-to-run differences of the models with decoding repeats:
     repeat minus main on the repeat items, paired as Q5 pairs; and both on the kept pairs the two
-    subsamples share (D-165)."""
+    subsamples share (D-165). `stores` names each model's repeat stores, as repeats() takes it."""
     out = {}
     by_model = {r['model']: r for r in q5_rows}
     for i, k in enumerate(keys):
-        arms = {v: rows for v in REPEATS if (rows := load(v, k))}
+        arms = {v: rows for v in (stores or {}).get(k, REPEATS) if (rows := load(v, k))}
         if not arms or not para.get(k) or k not in by_model:
             continue
         rep_ids = sorted(set.intersection(*(set(r) for r in arms.values())) & set(main[k]))
@@ -1232,10 +1243,12 @@ def reported(runs, keys):
     return out
 
 
-def repeats(main, keys):
+def repeats(main, keys, stores: dict | None = None):
+    """Each model's decoding repeats against `main` on the items every repeat holds. `stores` maps a model to its
+    repeat stores (the matched configuration's, W1A); a model it does not name reads REPEATS."""
     out = {}
     for k in keys:
-        arms = {v: rows for v in REPEATS if (rows := load(v, k))}
+        arms = {v: rows for v in (stores or {}).get(k, REPEATS) if (rows := load(v, k))}
         if not arms:
             continue
         ids = sorted(set.intersection(*(set(r) for r in arms.values())))
@@ -1298,7 +1311,8 @@ FEW_TEMPLATES = 20      # an endpoint that served fewer templates is flagged in 
 def matched_setup() -> dict | None:
     """results/matched_config.json resolved: the models with a store, in roster order (the eleven first, so a model's
     seeds are those of the default configuration), each at its reasoning store where one is named, else at its default
-    store; the entries skipped and why; the file's hash. None when the file is absent."""
+    store; each model's cascade stores (paraphrase, repeats); the entries skipped and why; the file's hash. None when
+    the file is absent."""
     if not MATCHED_CONFIG.exists():
         return None
     raw = MATCHED_CONFIG.read_bytes()
@@ -1320,7 +1334,8 @@ def matched_setup() -> dict | None:
             'store': {k: entries[k].get('reasoning_store') or entries[k]['default_store'] for k in keys},
             'default_store': {k: entries[k].get('default_store') for k in keys},
             'reasoning_store': {k: entries[k].get('reasoning_store') for k in keys},
-            'setting': {k: entries[k].get('reasoning_setting') for k in keys}, 'skipped': skipped}
+            'setting': {k: entries[k].get('reasoning_setting') for k in keys},
+            'cascade': {k: entries[k].get('cascade') or {} for k in keys}, 'skipped': skipped}
 
 
 def level_gaps(runs, templates, levels, keys) -> list[dict]:
@@ -1476,12 +1491,42 @@ def tau_between(druns, mruns, templates, keys, seed: int = 8100) -> dict | None:
         return {**kendall_boot(S, N, seed), 'models': len(both)}
 
 
-def matched_family(druns, mruns, templates, levels, single, setup, q1_default, cov_default, dstore: str = 'main') -> dict:
+def matched_repeat_stores(setup, keys) -> dict:
+    """Each model's decoding-repeat stores at matched settings: a re-run model's cascade (matched_config.json's
+    `cascade.repeats`; none when it names none), every other model REPEATS."""
+    cascade = setup.get('cascade') or {}
+    return {k: list((cascade.get(k) or {}).get('repeats') or []) if setup['reasoning_store'].get(k) else list(REPEATS)
+            for k in keys}
+
+
+def matched_q5(mruns, keys, setup) -> dict:
+    """Q5 at matched settings, one family over every model (W1A): a re-run model's reasoning-on rows against its cascade
+    paraphrase store, every other model's default rows against scores/paraphrase/; the experts' keep set, q5's pairing,
+    seeds and E5 columns, Holm over the family, Kendall's tau between the paraphrase and original orderings, and the
+    run-to-run yardstick from each model's own repeat stores (matched_repeat_stores)."""
+    cascade = setup.get('cascade') or {}
+    para_store = {k: (cascade.get(k) or {}).get('paraphrase') if setup['reasoning_store'].get(k) else 'paraphrase'
+                  for k in keys}
+    para = {k: load(s, k) if s else None for k, s in para_store.items()}
+    e5_main = {k: load_stage('e5', k, setup['store'][k]) for k in keys}
+    e5_para = {k: load_stage('e5', k, s) if s else None for k, s in para_store.items()}
+    check = accepted_pairs()
+    return {**q5(mruns, para, keys, check['keep'] if check else None, e5_main, e5_para, matched_repeat_stores(setup, keys)),
+            'expert_stats': {k: v for k, v in check.items() if k != 'keep'} if check else None,
+            'stores': {k: s for k, s in para_store.items() if para.get(k)}}
+
+
+def matched_family(druns, mruns, templates, levels, single, setup, q1_default, cov_default, dstore: str = 'main',
+                   symbolic: set[str] | None = None) -> dict:
     """The matched-settings family (WS-C1): every number Q1 and Q3 give the default configuration, on each model at
     its matched store, with the same functions and seeds; the paired change per re-run model; Kendall's tau between
     the two orderings; the E3 pairwise family on the default configuration. `druns` is the default configuration as
     Q1 read it (every model of its family, from `dstore`), `mruns` every model's matched rows in `setup['keys']`'s
-    order, `setup` is matched_setup()'s; q1_default and cov_default are Q1's and q3_coverage's results on `druns`."""
+    order, `setup` is matched_setup()'s; q1_default and cov_default are Q1's and q3_coverage's results on `druns`.
+    Beside them (W1A), what results.json holds per model, on the matched rows: Q1's and q3_coverage's full results, the
+    pairs each test separates, each model's Q3 row, Q2, q3_overall, branches_levels, Q4, Q5 as one family (matched_q5),
+    the decoding repeats, the sensitivity table and the reported breakdowns. `symbolic` is main()'s set of symbolic
+    templates, read from `druns` when not given."""
     keys, stores = setup['keys'], setup['store']
     base = {k: (druns.get(k) if setup['default_store'][k] == dstore else load(setup['default_store'][k], k))
             for k in keys if setup['default_store'].get(k)}
@@ -1493,7 +1538,8 @@ def matched_family(druns, mruns, templates, levels, single, setup, q1_default, c
     byc = {r['model']: r for r in cov['models']}
     byc3 = {r['model']: r for r in cov3['models']}
     lg = {r['model']: r for r in level_gaps(mruns, templates, levels, keys)}
-    sp = {r['model']: r for r in q4(mruns, templates, single, keys)}
+    q4m = q4(mruns, templates, single, keys)
+    sp = {r['model']: r for r in q4m}
     flags = step_flag_rates(mruns, keys, q3m)
     order = sorted(keys, key=lambda k: -by1[k]['score'])
     cld, cld_mc, cld_e3 = (letters(order, separated(m1['pairs'])), letters(order, separated(cov['pairs'])),
@@ -1520,7 +1566,7 @@ def matched_family(druns, mruns, templates, levels, single, setup, q1_default, c
             'claims_per_trace': q['claims_per_trace'],
             'router_flag_rate': q.get('router_judge_rate_on_fully_solved'), 'router_flag_ci': q.get('router_judge_ci'),
             'router_any_flag_rate': q.get('router_rate_on_fully_solved'),
-            'flag_rates': flags[k], 'single_path': single_path_view(sp[k])}
+            'flag_rates': flags[k], 'single_path': single_path_view(sp[k]), 'q3': q}
     dkeys = list(druns)
     e3d = q3_coverage(druns, templates, dkeys, dstore, judge=False)
     d_by1 = {r['model']: r for r in q1_default['models']}
@@ -1536,6 +1582,15 @@ def matched_family(druns, mruns, templates, levels, single, setup, q1_default, c
                          'stages': {st: {'git': sc.get('git'), 'written_at_utc': sc.get('written_at_utc'),
                                          'store_config_sha256': sc.get('store_config_sha256')}
                                     for st, sc in stage_configs(s).items()}}
+    if symbolic is None:
+        symbolic = {r['template_id'] for r in next(iter(druns.values())).values() if r['answer_type'] == 'symbolic'}
+    ps, cs = m1['pairs'], cov['pairs']
+    separated_n = {'pairs': len(ps), 'fac': len(separated(ps)), 'fac_strict': len(separated(ps, 'fully_p_holm')),
+                   'fac_strict_agree': sum((p['p_holm'] < 0.05) == (p['fully_p_holm'] < 0.05) for p in ps),
+                   'fac_mcnemar': len(separated(ps, 'mcnemar_p_holm')), 'mc': len(separated(cs)),
+                   'mc_wilcoxon': len(separated(cs, 'p_wilcoxon_holm')),
+                   'mc_wilcoxon_agree': sum((p['p_holm'] < 0.05) == (p['p_wilcoxon_holm'] < 0.05) for p in cs),
+                   'mc_e3': len(separated(cov3['pairs']))}
     return {
         'quick': QUICK, 'stand_in': False,
         'config': {**{k: setup[k] for k in ('source', 'sha256', 'generated_by', 'written_at_utc', 'effort', 'items',
@@ -1561,6 +1616,11 @@ def matched_family(druns, mruns, templates, levels, single, setup, q1_default, c
                     'fac': {k: d_by1[k]['score'] for k in d_order},
                     'mc_strict': {r['model']: r['coverage'] for r in cov_default['models']}},
         'providers_reasoning': export_providers({k: mruns[k] for k in re_run}, re_run, stores) if re_run else [],
+        'pairs_separated': separated_n, 'q1': m1, 'q3_coverage': cov,
+        'q2': q2(mruns, templates, levels, keys, symbolic), 'q3_overall': q3_overall(mruns, keys, stores),
+        'branches_levels': branches_levels(mruns, templates, levels, keys), 'q4': q4m, 'q5': matched_q5(mruns, keys, setup),
+        'repeats': repeats(mruns, keys, matched_repeat_stores(setup, keys)),
+        'sensitivity': sensitivity(mruns, templates, keys, symbolic), 'reported': reported(mruns, keys),
         'provenance': {'stores': stage_prov},
     }
 
@@ -1580,7 +1640,8 @@ def schema_errors(kind: str, obj) -> list[str]:
         bad.extend(f'{where}: {k} is not an interval' for k in ci if k in d and d[k] is not None and not is_ci(d[k]))
     if kind == 'matched':
         need(obj, ('quick', 'config', 'models', 'pairs', 'mc_pairs', 'e3_pairs_default', 'paired_change',
-                   'tau_default_vs_matched'), 'matched')
+                   'tau_default_vs_matched', 'pairs_separated', 'q1', 'q2', 'q3_overall', 'q3_coverage', 'branches_levels',
+                   'q4', 'q5', 'repeats', 'sensitivity', 'reported'), 'matched')
         if not isinstance(obj.get('quick'), bool):
             bad.append('matched: quick is not a boolean')
         for k, m in (obj.get('models') or {}).items():
@@ -1607,6 +1668,58 @@ def schema_errors(kind: str, obj) -> list[str]:
         t = obj.get('tau_default_vs_matched')
         if t is not None:
             need(t, ('tau', 'ci'), 'tau_default_vs_matched', num=('tau',), ci=('ci',))
+        mkeys = set(obj.get('models') or {})
+        q3_need = ('wrong', 'wrong_with_milestones', 'readable_wrong_with_milestones', 'e3_coverage_on_readable_wrong',
+                   'e3_null_on_readable_wrong', 'digit_flag_rate_on_wrong', 'first_flag_position', 'by_milestone_count',
+                   'claims_per_trace')
+        e5_need = ('e5_coverage_on_readable_wrong', 'e5_reached_share', 'e5_judged_fraction', 'e5_wrong_used',
+                   'attribution_on_wrong')
+        router_need = ('router_judge_rate_on_fully_solved', 'router_judge_ci', 'router_steps_flagged_per_trace',
+                       'router_rate_on_wrong', 'router_rate_on_fully_solved', 'attribution_on_wrong')
+        q3s = {k: m.get('q3') for k, m in (obj.get('models') or {}).items() if isinstance(m, dict)}
+        routed = any(isinstance(q, dict) and 'router_rate_on_fully_solved' in q for q in q3s.values())
+        for k, q in q3s.items():
+            need(q, q3_need + (e5_need if obj.get('mc_stage') == 'E5-strict' else ()) + (router_need if routed else ()),
+                 f'models.{k}.q3', num=('wrong', 'e3_coverage_on_readable_wrong', 'claims_per_trace', 'e5_reached_share',
+                                        'router_judge_rate_on_fully_solved'), ci=('router_judge_ci',))
+        for fam in ('q2', 'q3_overall', 'branches_levels', 'q4'):
+            rows = obj.get(fam)
+            if not isinstance(rows, list) or {r.get('model') for r in rows if isinstance(r, dict)} != mkeys:
+                bad.append(f'{fam}: not one row per model')
+        for j, r in enumerate(obj.get('q2') or []):
+            need(r, ('gap', 'ci', 'p_welch_holm', 'p_perm_holm', 'unusable_excluded', 'without_symbolic',
+                     'without_two_chemical'), f'q2[{j}]', num=('gap', 'p_welch_holm', 'p_perm_holm'), ci=('ci',))
+        for j, r in enumerate(obj.get('branches_levels') or []):
+            need(r, ('branch', 'level', 'pairs', 'detectable_branch'), f'branches_levels[{j}]')
+        q1m, cv = obj.get('q1') or {}, obj.get('q3_coverage') or {}
+        need(q1m, ('models', 'pairs'), 'q1')
+        need(cv, ('stage', 'templates', 'models', 'pairs', 'tau'), 'q3_coverage')
+        if isinstance(q1m, dict) and isinstance(cv, dict) and ({r.get('model') for r in q1m.get('models') or []} != mkeys
+                                                               or {r.get('model') for r in cv.get('models') or []} != mkeys):
+            bad.append('q1 or q3_coverage: not one row per model')
+        for j, p in enumerate(q1m.get('pairs') or [] if isinstance(q1m, dict) else []):
+            need(p, ('a', 'b', 'p_holm', 'fully_p_holm', 'mcnemar_p_holm'), f'q1.pairs[{j}]',
+                 num=('p_holm', 'fully_p_holm', 'mcnemar_p_holm'))
+        for j, p in enumerate(cv.get('pairs') or [] if isinstance(cv, dict) else []):
+            need(p, ('a', 'b', 'p_holm', 'p_wilcoxon_holm'), f'q3_coverage.pairs[{j}]', num=('p_holm', 'p_wilcoxon_holm'))
+        q5m = obj.get('q5') or {}
+        need(q5m, ('models', 'tau', 'margin', 'expert_check', 'vs_repeats'), 'q5')
+        for j, r in enumerate(q5m.get('models') or [] if isinstance(q5m, dict) else []):
+            need(r, ('model', 'items', 'diff', 'ci', 'ci90', 'within_margin', 'p_holm', 'mcnemar_p_holm'), f'q5.models[{j}]',
+                 num=('items', 'diff', 'p_holm', 'mcnemar_p_holm'), ci=('ci', 'ci90'))
+            if isinstance(r, dict) and r.get('model') not in mkeys:
+                bad.append(f'q5.models[{j}]: not a matched model')
+        for k, r in (obj.get('repeats') or {}).items():
+            need(r, ('items', 'scores', 'sd', 'range', 'same_verdict_every_repeat'), f'repeats.{k}',
+                 num=('items', 'sd', 'range', 'same_verdict_every_repeat'))
+        sn, rp = obj.get('sensitivity') or {}, obj.get('reported') or {}
+        need(sn, ('models', 'tau_with_headline', 'tau_noise'), 'sensitivity')
+        need(rp, ('models', 'classification', 'providers'), 'reported')
+        if isinstance(sn, dict) and isinstance(rp, dict) and ({r.get('model') for r in sn.get('models') or []} != mkeys
+                                                              or set(rp.get('models') or {}) != mkeys):
+            bad.append('sensitivity or reported: not one row per model')
+        counts = ('pairs', 'fac', 'fac_strict', 'fac_mcnemar', 'mc', 'mc_wilcoxon', 'mc_e3')
+        need(obj.get('pairs_separated'), counts, 'pairs_separated', num=counts)
     elif kind == 'single_path':
         need(obj, ('quick', 'n_single', 'n_others'), 'single_path', num=('n_single', 'n_others'))
         models = {k: v for k, v in obj.items() if k not in ('quick', 'n_single', 'n_others')}
@@ -1741,7 +1854,212 @@ def render_matched(m: dict) -> str:
             md = '' if r['matched_diff'] is None else f"{r['matched_diff']:+.3f}"
             L.append(f"| `{r['model']}` | {r['store']} | {r['endpoint']} | {r['rows']} | {r['raw_score']:.3f} | "
                      f"{r['unusable']:.3f} | {md} | {r['templates_matched']} | {r['templates_served']} |")
+    L += render_matched_families(m)
     return '\n'.join(L) + '\n'
+
+
+def render_matched_families(m: dict) -> list[str]:
+    """The families W1A added to sections/matched.md: what results.json holds per model, on the matched rows."""
+    order, models = m['order'], m['models']
+    cio = lambda c: ci(c) if c else ''
+    tag = lambda k: f"`{k}`{' (reasoning on)' if models[k]['configuration'] == 'reasoning' else ''}"
+    ps = m['pairs_separated']
+    L = ['', '## Pairwise comparisons, matched settings', '',
+         f"Of the {ps['pairs']} pairs, these differ at a Holm-adjusted p below 0.05: on FAC under the sign-flip test over "
+         f"templates {ps['fac']}; on strict FAC (fully solved, sign flips over templates) {ps['fac_strict']}, which agrees "
+         f"with FAC on {ps['fac_strict_agree']}; under McNemar's exact test on the instances {ps['fac_mcnemar']}; on MC with "
+         f"the judge under the sign-flip test {ps['mc']} and under Wilcoxon's signed-rank test {ps['mc_wilcoxon']} (the two "
+         f"agree on {ps['mc_wilcoxon_agree']}); on MC by matching alone {ps['mc_e3']}."]
+    q1m = {r['model']: r for r in m['q1']['models']}
+    L += ['', '## Answers per model (Q1), matched settings', '',
+          "Verdict counts over the instances; the fully solved rate (strict FAC) with its template interval; the SD of the "
+          "score over a template's 15 instances (median and quartiles over the templates) and between the template means; "
+          "the templates with no instance variance, all solved and none solved.", '',
+          '| model | correct | partial | incorrect | unusable | empty | strict FAC | 95% CI | within-template SD, median '
+          '(quartiles) | between-template SD | no instance variance | all solved | none solved |',
+          '|---|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|---:|']
+    for k in order:
+        a = q1m[k]
+        qs = a['within_sd_quartiles']
+        L.append(f"| {tag(k)} | {a['correct']} | {a['partial']} | {a['incorrect']} | {a['unusable']} | {a['empty']} | "
+                 f"{a['fully_solved']:.3f} | {ci(a['fully_ci'])} | {qs[1]:.3f} ({qs[0]:.3f} to {qs[2]:.3f}) | "
+                 f"{a['between_template_sd']:.3f} | {a['templates_no_instance_variance']} | "
+                 f"{a['templates_no_variance_all_solved']} | {a['templates_no_variance_none_solved']} |")
+    top5 = order[:5]
+    lost = {k: q1m[k]['unusable'] + q1m[k]['partial'] / 2 + q1m[k]['incorrect'] for k in top5}
+    L += ['', 'Answer points lost by the first five on FAC: ' + '; '.join(f"`{k}` {v:g}" for k, v in lost.items())
+          + f"; {sum(lost.values()):g} in all (no readable answer {sum(q1m[k]['unusable'] for k in top5)}, partial "
+          f"{sum(q1m[k]['partial'] for k in top5)} at half a point, incorrect {sum(q1m[k]['incorrect'] for k in top5)}). "
+          f"Their FAC spread: {max(models[k]['fac'] for k in top5) - min(models[k]['fac'] for k in top5):.3f}."]
+    q2m = {r['model']: r for r in m['q2']}
+    held = [k for k in order if q2m[k]['p_welch_holm'] < 0.05]
+    held_perm = [k for k in order if q2m[k]['p_perm_holm'] < 0.05]
+    var = lambda v: f"{v['gap']:+.3f} ({pfmt(v['p_welch_holm'])})"
+    L += ['', '## Level gap (Q2), matched settings', '',
+          "Easy minus Advanced on the template means, templates resampled within each tier; Welch's t-test and the planned "
+          f"tier-label permutation, each with Holm over the {len(order)} models, and the gap Welch detects at the strictest "
+          "Holm step; then the gap with its Welch p (Holm) with unusable rows left out, without the symbolic templates and "
+          f"without the two chemical templates. The gap holds under Welch for {len(held)} of {len(order)} ("
+          + (', '.join(f'`{k}`' for k in held) or 'none') + f") and under the permutation for {len(held_perm)} ("
+          + (', '.join(f'`{k}`' for k in held_perm) or 'none') + ').', '',
+          '| model | Easy | Advanced | gap | 95% CI | Welch p (Holm) | permutation p (Holm) | detectable (Holm) | '
+          'unusable excluded | without symbolic | without two chemical |',
+          '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|']
+    for k in order:
+        g = q2m[k]
+        L.append(f"| {tag(k)} | {g['easy']:.3f} | {g['advanced']:.3f} | {g['gap']:+.3f} | {ci(g['ci'])} | "
+                 f"{pfmt(g['p_welch_holm'])} | {pfmt(g['p_perm_holm'])} | {g['detectable_holm']:.3f} | "
+                 f"{var(g['unusable_excluded'])} | {var(g['without_symbolic'])} | {var(g['without_two_chemical'])} |")
+    bl = {r['model']: r for r in m['branches_levels']}
+    rp = m['reported']['models']
+    branches = sorted(bl[order[0]]['branch'])
+    L += ['', '## Branches and domains, matched settings', '',
+          'Branch means of the template means with template intervals; the spread between the highest and the lowest '
+          'branch; the smallest branch difference the design detects; the within-model branch pairs at a Holm-adjusted '
+          'Welch p below 0.05; the lowest and the highest domain (item means, as RESULTS.md reports them).', '',
+          '| model | ' + ' | '.join(b.replace('_', ' ') for b in branches) + ' | spread | lowest branch | detectable | '
+          'pairs at Holm 0.05 | lowest domain | highest domain |',
+          '|---|' + '---:|' * len(branches) + '---:|---|---:|---|---|---|']
+    for k in order:
+        b = bl[k]['branch']
+        means = {x: b[x]['mean'] for x in branches}
+        dm = rp[k]['domain']
+        dlo, dhi = min(dm, key=dm.get), max(dm, key=dm.get)
+        sig = [f"{p['a']} - {p['b']} {p['diff']:+.3f}" for p in bl[k]['pairs'] if p['p_holm'] < 0.05]
+        L.append(f"| {tag(k)} | " + ' | '.join(f"{b[x]['mean']:.3f} ({ci(b[x]['ci'])})" for x in branches)
+                 + f" | {max(means.values()) - min(means.values()):.3f} | {min(means, key=means.get)} | "
+                 f"{bl[k]['detectable_branch']:.3f} | {'; '.join(sig) or 'none'} | {dlo} {dm[dlo]:.3f} | {dhi} {dm[dhi]:.3f} |")
+    domains = sorted(rp[order[0]]['domain'])
+    L += ['', 'Domain means (item means) per model:', '',
+          '| model | ' + ' | '.join(d.replace('_', ' ') for d in domains) + ' |', '|---|' + '---:|' * len(domains)]
+    for k in order:
+        L.append(f"| {tag(k)} | " + ' | '.join(f"{rp[k]['domain'][d]:.3f}" for d in domains) + ' |')
+    L += ['', '## Wrong answers, coverage and flags (Q3), matched settings', '',
+          "RESULTS.md's Q3 on each model's matched store. Wrong answers score 0; coverage on the readable ones with "
+          "milestones, by matching alone (E3) beside its chance floor (a sibling instance's milestones) and with the judge "
+          "(E5-strict), template intervals; the judge's reached share and the share of milestones it decided; the digit "
+          "rule on answered wrong answers; the router's judge flags on fully solved responses with their template interval, "
+          "its steps flagged per answered response, the router's flags on fully solved and on wrong responses; the share of "
+          "answered wrong answers each component points at (digit rule / E5 missing a milestone / router judge, responses "
+          "in brackets); the first flagged step's position on fully solved responses (median, 0 the first step; responses "
+          "in brackets); arithmetic claims per answered response.", '',
+          '| model | wrong | with milestones | readable | E3 on readable wrong | 95% CI | E3 floor | E5-strict on readable '
+          'wrong | 95% CI | E5 responses | reached share | judge-decided share | digit rule on wrong | router judge on fully '
+          'solved | 95% CI | router steps flagged per response | router on fully solved | router on wrong | attribution | '
+          'first flag, median | claims per response |',
+          '|---|' + '---:|' * 17 + '---|---:|---:|']
+    for k in order:
+        q = models[k]['q3']
+        at = q.get('attribution_on_wrong') or {}
+        ff = q['first_flag_position']
+        L.append(f"| {tag(k)} | {q['wrong']} | {q['wrong_with_milestones']} | {q['readable_wrong_with_milestones']} | "
+                 f"{f3(q['e3_coverage_on_readable_wrong'])} | {cio(q.get('e3_readable_ci'))} | "
+                 f"{f3(q['e3_null_on_readable_wrong'])} | {f3(q.get('e5_coverage_on_readable_wrong'))} | "
+                 f"{cio(q.get('e5_readable_ci'))} | {q.get('e5_wrong_used', '')} | {f3(q.get('e5_reached_share'))} | "
+                 f"{f3(q.get('e5_judged_fraction'))} | {f3(q['digit_flag_rate_on_wrong'])} | "
+                 f"{f3(q.get('router_judge_rate_on_fully_solved'))} | {cio(q.get('router_judge_ci'))} | "
+                 f"{f3(q.get('router_steps_flagged_per_trace'))} | {f3(q.get('router_rate_on_fully_solved'))} | "
+                 f"{f3(q.get('router_rate_on_wrong'))} | "
+                 + (f"{f3(at.get('digit_rule'))} / {f3(at.get('e5_missing'))} / {f3(at.get('router_judge'))} ({at['traces']})"
+                    if at else '') + f" | {f3(ff['median'])} ({ff['traces']}) | {q['claims_per_trace']:.2f} |")
+    buckets = list(models[order[0]]['q3']['by_milestone_count'])
+    L += ['', "Wrong-answer rate by the instance's milestone count (instances in brackets):", '',
+          '| model | ' + ' | '.join(f'{b} milestones' for b in buckets) + ' |', '|---|' + '---:|' * len(buckets)]
+    for k in order:
+        bm = models[k]['q3']['by_milestone_count']
+        L.append(f"| {tag(k)} | " + ' | '.join(f"{f3(bm[b]['wrong_rate'])} ({bm[b]['items']})" for b in buckets) + ' |')
+    L += ['', '## Coverage over every response with milestones (q3_overall), matched settings', '',
+          'E3 and E5-strict over every response whose instance has milestones (an unusable response scores what it '
+          'reached, an empty one nothing), and over the readable ones; template intervals.', '',
+          '| model | responses | E3, all | 95% CI | E3, readable | 95% CI | E5-strict, all | 95% CI | E5-strict, readable | '
+          '95% CI |', '|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|']
+    for r in sorted(m['q3_overall'], key=lambda r: order.index(r['model'])):
+        L.append(f"| {tag(r['model'])} | {r['traces_with_milestones']} | {r['e3_all']:.3f} | {ci(r['e3_all_ci'])} | "
+                 f"{r['e3_readable']:.3f} | {ci(r['e3_readable_ci'])} | {f3(r.get('e5_all'))} | {cio(r.get('e5_all_ci'))} | "
+                 f"{f3(r.get('e5_readable'))} | {cio(r.get('e5_readable_ci'))} |")
+    cv = m['q3_coverage']
+    cvm = {r['model']: r for r in cv['models']}
+    tc = cv['tau']
+    L += ['', '## Coverage across models (q3_coverage), matched settings', '',
+          f"As Q3's coverage table ({cv['stage']}, {cv['templates']} templates): the answer and coverage ranks, Spearman's "
+          "rho across templates between coverage and the steps and claims per readable response, coverage on fully solved "
+          "and on wrong readable responses (responses in brackets), the share of fully solved responses below 0.5 coverage "
+          "and of wrong ones at full coverage, template intervals."
+          + (f" Kendall's tau between the answer and the coverage orderings: {tc['tau']:.3f} (95% CI {ci(tc['ci'])})."
+             if tc else ''), '',
+          '| model | MC | 95% CI | answer rank | coverage rank | rho, steps | rho, claims | median steps | on fully solved | '
+          'on wrong | solved below 0.5 | 95% CI | wrong at 1.0 | 95% CI |', '|---|' + '---:|' * 13]
+    for k in order:
+        c = cvm[k]
+        L.append(f"| {tag(k)} | {c['coverage']:.3f} | {ci(c['ci'])} | {c['answer_rank']} | {c['coverage_rank']} | "
+                 f"{c['rho_steps']:.3f} | {c['rho_claims']:.3f} | {c['median_steps']:g} | {c['coverage_fully_solved']:.3f} "
+                 f"({c['fully_solved_n']}) | {c['coverage_wrong']:.3f} ({c['wrong_n']}) | {c['solved_low_coverage']:.3f} | "
+                 f"{ci(c['solved_low_coverage_ci'])} | {c['wrong_full_coverage']:.3f} | {ci(c['wrong_full_coverage_ci'])} |")
+    q4m = {r['model']: r for r in m['q4']}
+    L += ['', '## Consistency within a template (Q4), matched settings', '',
+          f"The share of the {q4m[order[0]]['single_path']['templates']} single-path templates and of the "
+          f"{q4m[order[0]]['multi_path']['templates']} others fully solved on all 15 instances, on some and on none; 95% "
+          'intervals, templates resampled.', '',
+          '| model | single: all | some | none | others: all | some | none |', '|---|---:|---:|---:|---:|---:|---:|']
+    for k in order:
+        L.append(f"| {tag(k)} | " + ' | '.join(f"{q4m[k][g][c]:.3f} ({ci(q4m[k][g][c + '_ci'])})"
+                                               for g in ('single_path', 'multi_path') for c in ('all', 'some', 'none')) + ' |')
+    p5 = m['q5']
+    rows5 = sorted(p5['models'], key=lambda r: order.index(r['model']))
+    t5, within = p5['tau'], [r['model'] for r in rows5 if r['within_margin']]
+    kept = p5['expert_check']
+    L += ['', '## Paraphrase (Q5), matched settings, one family', '',
+          'Paraphrase minus original, paired by instance on the '
+          + (f'{kept} pairs the experts kept' if kept is not None else 'pairs both arms hold')
+          + ", each model at its matched store (a re-run model's reasoning-on rows against its reasoning-on paraphrase store, "
+          "the others' default rows against `scores/paraphrase`): the item mean, the template bootstrap at 95% and 90%, the "
+          "sign-flip test over templates and McNemar's test on the fully solved verdict, each with Holm over the "
+          f"{len(rows5)} models; the 90% interval read against the margin of ±{p5['margin']} (D-165). Within the margin: "
+          f"{len(within)} of {len(rows5)}."
+          + (f" Kendall's tau between the paraphrase and the original orderings: {t5['tau']:.3f} (95% CI {ci(t5['ci'])}, "
+             f"{t5['items']} instances); its noise floor at the arm's size and template mix, median "
+             f"{t5['noise_arm']['median']:.3f} (quartiles {t5['noise_arm']['q1']:.3f} to {t5['noise_arm']['q3']:.3f})."
+             if t5 else ''), '',
+          '| model | paraphrase store | items | templates | change | 95% CI | 90% CI | within ±0.05 | p (Holm) | McNemar p '
+          '(Holm) | E3 change | E5-strict change | same endpoint: change (items) |',
+          '|---|---|---:|---:|---:|---:|---:|---|---:|---:|---:|---:|---:|']
+    for r in rows5:
+        L.append(f"| {tag(r['model'])} | {(p5.get('stores') or {}).get(r['model'], '')} | {r['items']} | {r['templates']} | "
+                 f"{r['diff']:+.3f} | {ci(r['ci'])} | {ci(r['ci90'])} | {'yes' if r['within_margin'] else 'no'} | "
+                 f"{pfmt(r['p_holm'])} | {pfmt(r['mcnemar_p_holm'])} | " + (f"{r['e3']['diff']:+.3f}" if r['e3'] else '')
+                 + ' | ' + (f"{r['e5']['diff']:+.3f}" if r['e5'] else '') + ' | '
+                 + (f"{r['same_provider']['diff']:+.3f} ({r['same_provider']['items']})" if r['same_provider'] else '') + ' |')
+    if p5['vs_repeats']:
+        L += ['', 'Beside the run-to-run differences (each repeat minus the matched rows on the repeat instances): '
+              + '; '.join(f"`{k}` paraphrase {v['paraphrase']['diff']:+.3f}, repeats "
+                          + ', '.join(f"{r['diff']:+.3f}" for r in v['repeats'].values())
+                          + f" ({'within' if v['abs_within_repeat_spread'] else 'beyond'} the largest absolute repeat difference)"
+                          for k, v in p5['vs_repeats'].items()) + '.']
+    rep = m['repeats']
+    L += ['', '## Decoding repeats, matched settings', '',
+          "Each model's repeat stores at its matched setting (a re-run model's reasoning-on repeats, the others' default "
+          'repeats), on the instances every repeat holds: the score per repeat, the matched rows on the same instances, the '
+          'SD and the range over the repeats, and the share of instances with the same verdict in every repeat.', '',
+          '| model | items | repeats | matched rows on the items | SD | range | same verdict every repeat |',
+          '|---|---:|---|---:|---:|---:|---:|']
+    for k in [k for k in order if k in rep]:
+        r = rep[k]
+        L.append(f"| {tag(k)} | {r['items']} | " + ', '.join(f"{v} {s:.3f}" for v, s in r['scores'].items())
+                 + f" | {r['main_on_same_items']:.3f} | {f3(r['sd'])} | {r['range']:.3f} | {r['same_verdict_every_repeat']:.3f} |")
+    sn = m['sensitivity']
+    snm = {r['model']: r for r in sn['models']}
+    cols = ('half_tol', 'double_tol', 'fully_solved', 'unusable_excluded', 'without_shortcut_templates',
+            'without_symbolic_templates', 'half_unit', 'whole_trace')
+    tn = sn['tau_noise']
+    L += ['', '## Sensitivity, matched settings', '',
+          "Each model's item mean under each reading of the answer check and each pool, and Kendall's tau of each ordering "
+          "with the headline (as scored); the tau noise floor (two halves of each template's instances): median "
+          f"{tn['median']:.3f}, quartiles {tn['q1']:.3f} to {tn['q3']:.3f}.", '',
+          '| model | as scored | ' + ' | '.join(c.replace('_', ' ') for c in cols) + ' |', '|---|' + '---:|' * (len(cols) + 1)]
+    for k in order:
+        L.append(f"| {tag(k)} | {snm[k]['fitted']:.3f} | " + ' | '.join(f3(snm[k][c]) for c in cols) + ' |')
+    L.append('| tau with the headline | | ' + ' | '.join(f3(sn['tau_with_headline'][c]) for c in cols) + ' |')
+    return L
 
 
 def render_single_path(sp: dict) -> str:
@@ -2489,7 +2807,8 @@ def exports(runs, templates, levels, single, res, store: str = 'main') -> dict:
         off = [k for k, rows in mruns.items() if set(rows) != ref]
         if off:
             raise SystemExit(f'matched stores hold another item set than scores/{store}: {off}')
-        mf = matched_family(runs, mruns, templates, levels, single, setup, res['q1'], res['q3_coverage'], store)
+        mf = matched_family(runs, mruns, templates, levels, single, setup, res['q1'], res['q3_coverage'], store,
+                            set(res['symbolic_templates']))
         out['matched'] = (mf, render_matched(mf))
     sp = export_single_path(res['q4'])
     out['single_path'] = (sp, render_single_path(sp))
@@ -2720,12 +3039,34 @@ def selftest_c1(rng) -> list[str]:
              'default_store': {k: 'no-such-default' for k in keys},
              'reasoning_store': {'m0': 'no-such-reasoning', 'm1': None, 'm2': None},
              'setting': {'m0': 'effort=medium', 'm1': 'reasons by default', 'm2': 'none offered'},
+             'cascade': {'m0': {'paraphrase': 'para-re', 'repeats': ['rep1-re', 'rep2-re']}},
              'skipped': [{'model': 'm3', 'reason': 'run: false', 'sibling_of': 'm2'}]}
-    with warnings.catch_warnings():
-        warnings.simplefilter('ignore')
-        q1d = q1(druns, templates, keys)
-        covd = q3_coverage(druns, templates, keys, 'no-such-default')
-        mf = matched_family(druns, mruns, templates, levels, single, setup, q1d, covd, dstore='no-such-default')
+    # W1A: the paraphrase and repeat stores through a stand-in for load(); the experts reject template s00; m0 and m1 lose
+    # their solved instances 0 and 1 on the paraphrase (m0 on its reasoning-on store), m2 nothing
+    sub = lambda rows, ns: {x: dict(r) for x, r in rows.items() if int(x.rsplit('-', 1)[1]) in ns}
+    lose = lambda r: (dict(r, score=0.0, answer=dict(r['answer'], label='incorrect'))
+                      if r['score'] == 1.0 and int(r['item_id'].rsplit('-', 1)[1]) < 2 else r)
+    stand_in = {('paraphrase', k): {x: lose(r) if k != 'm2' else r for x, r in sub(druns[k], {0, 1, 2, 3}).items()}
+                for k in keys}
+    stand_in.update({('para-re', 'm0'): {x: lose(r) for x, r in sub(mruns['m0'], {0, 1, 2, 3}).items()},
+                     ('rep1-re', 'm0'): sub(mruns['m0'], {5, 6}), ('rep2-re', 'm0'): sub(mruns['m0'], {5, 6, 7}),
+                     ('repeat1', 'm0'): sub(druns['m0'], {5, 6}), ('repeat1', 'm1'): sub(druns['m1'], {5, 6}),
+                     ('repeat2', 'm1'): sub(druns['m1'], {5, 6})})
+    keep = {x for x in druns['m0'] if not x.startswith('s00-')}
+    saved = {f: globals()[f] for f in ('load', 'accepted_pairs')}
+    globals().update(load=lambda v, k: stand_in.get((v, k)),
+                     accepted_pairs=lambda: {'keep': keep, 'returned': 80, 'rejected': 4, 'outstanding': 0})
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore')
+            q1d = q1(druns, templates, keys)
+            covd = q3_coverage(druns, templates, keys, 'no-such-default')
+            mf = matched_family(druns, mruns, templates, levels, single, setup, q1d, covd, dstore='no-such-default')
+            q5d = q5(druns, {k: stand_in[('paraphrase', k)] for k in keys}, keys, keep)
+            q2d = {r['model']: r for r in q2(druns, templates, levels, keys, set())}
+            bld = {r['model']: r for r in branches_levels(druns, templates, levels, keys)}
+    finally:
+        globals().update(saved)
     errs = schema_errors('matched', mf)
     if errs:
         bad.append(f'matched schema: {errs[:5]}')
@@ -2739,12 +3080,36 @@ def selftest_c1(rng) -> list[str]:
             or not (mf['tau_default_vs_matched']['tau'] < 1) or len(mf['pairs']) != 3 or mf['mc_stage'] != 'E3':
         bad.append(f"matched family: letters {[(k, v['letter']) for k, v in mf['models'].items()]}, "
                    f"tau {mf['tau_default_vs_matched']}")
+    m5, d5 = ({r['model']: r for r in q['models']} for q in (mf['q5'], q5d))
+    if set(m5) != set(keys) or not (m5['m0']['diff'] < 0 and m5['m0']['items'] == 76 and m5['m0']['diff'] != d5['m0']['diff']) \
+            or any((m5[k]['diff'], m5[k]['ci'], m5[k]['p']) != (d5[k]['diff'], d5[k]['ci'], d5[k]['p']) for k in ('m1', 'm2')) \
+            or not d5['m1']['diff'] < 0 or mf['q5']['expert_check'] != len(keep) \
+            or mf['q5']['stores'] != {'m0': 'para-re', 'm1': 'paraphrase', 'm2': 'paraphrase'} \
+            or set(mf['q5']['vs_repeats']) != {'m0', 'm1'} or set(mf['q5']['vs_repeats']['m0']['repeats']) != {'rep1-re', 'rep2-re'}:
+        bad.append(f"matched Q5: {[(k, r['diff'], r['items']) for k, r in m5.items()]} {mf['q5'].get('stores')}")
+    rp_ = mf['repeats']
+    rep_ids = [x for x in mruns['m0'] if int(x.rsplit('-', 1)[1]) in (5, 6)]
+    if set(rp_) != {'m0', 'm1'} or set(rp_['m0']['scores']) != {'rep1-re', 'rep2-re'} or rp_['m0']['items'] != 40 \
+            or abs(rp_['m0']['main_on_same_items'] - np.mean([mruns['m0'][x]['score'] for x in rep_ids])) > 1e-12 \
+            or set(rp_['m1']['scores']) != {'repeat1', 'repeat2'}:
+        bad.append(f"matched repeats {[(k, list(v['scores']), v['items']) for k, v in rp_.items()]}")
+    m2_, mb = {r['model']: r for r in mf['q2']}, {r['model']: r for r in mf['branches_levels']}
+    same2 = lambda r: (r['gap'], r['ci'], r['p_welch'], r['p_perm'])
+    if any(same2(m2_[k]) != same2(q2d[k]) or mb[k]['branch'] != bld[k]['branch'] for k in ('m1', 'm2')) \
+            or m2_['m0']['gap'] == q2d['m0']['gap'] \
+            or mf['models']['m0']['q3']['wrong'] != sum(r['score'] == 0 for r in mruns['m0'].values()) \
+            or mf['pairs_separated']['pairs'] != 3 or set(mf['reported']['models']) != set(keys) \
+            or [r['model'] for r in mf['sensitivity']['models']] != keys:
+        bad.append('matched Q2, branches, Q3 rows, separated pairs, reported or sensitivity')
     broken = json.loads(json.dumps(mf))
     del broken['models']['m1']['letter']
     broken['pairs'][0]['ci'] = [0.1]
-    if len(schema_errors('matched', broken)) != 2 or not schema_errors('matched', {}):
-        bad.append('the matched schema check missed a missing letter or a broken interval')
-    if '# Matched settings' not in render_matched(mf) or '## Paired change per re-run model' not in render_matched(mf):
+    del broken['models']['m2']['q3']['wrong']
+    if len(schema_errors('matched', broken)) != 3 or not schema_errors('matched', {}):
+        bad.append('the matched schema check missed a missing letter, a broken interval or a missing Q3 column')
+    text = render_matched(mf)
+    if any(h not in text for h in ('# Matched settings', '## Paired change per re-run model', '## Level gap (Q2), matched settings',
+                                   '## Paraphrase (Q5), matched settings, one family', '## Decoding repeats, matched settings')):
         bad.append('matched section')
     sp = export_single_path(q4(druns, templates, single, keys))
     if schema_errors('single_path', sp) or sp['n_single'] != 10 or sp['n_others'] != 10 or 'none' not in render_single_path(sp):

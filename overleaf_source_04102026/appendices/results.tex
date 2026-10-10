@@ -8,30 +8,36 @@ Intervals resample templates, every family of tests is Holm-corrected, and a dif
 not hold comes with the smallest difference the design detects at 80\% power
 (\autoref{appendix:protocol}).
 
-\paragraph{Pairwise Comparisons.} Of the 55 pairs, 38 differ on FAC after Holm correction under the
-sign-flip test over templates: inside the first five, only \texttt{DeepSeek V4.1 Flash} from
-\texttt{GLM-5.3-Flash}; \texttt{GLM-5.3} from \texttt{DeepSeek V4.1 Flash},
-\texttt{Claude Sonnet 5}, \texttt{Kimi K3}, and \texttt{GLM-5.3-Flash}; each of the lower five from
-every model of the upper tier; and inside the lower five, \texttt{gpt-oss-20b} from
-\texttt{Qwen3-235B-2507}, \texttt{Gemini 3.1 Flash-Lite}, and \texttt{Gemma 4 26B}.
-Every non-significant FAC difference lies below what its pair detects (0.013 to 0.064).
-On MC, 28 pairs differ: the three highest models, \texttt{Claude Sonnet 5}, \texttt{GLM-5.3-Flash},
-and \texttt{Kimi K3}, do not separate, while \texttt{Claude Sonnet 5} and
-\texttt{DeepSeek V4.1 Flash}, which FAC does not separate, do; Kendall's
-$\tau$~\citep{kendall1938} between the two orderings is 0.782 (95\% interval 0.564 to 0.891).
-Strict FAC, which scores a partial answer 0, separates 34 pairs and agrees with FAC on 51 of the 55;
-a Wilcoxon test~\citep{wilcoxon1945} separates 29 on MC; and McNemar's exact
+\paragraph{Pairwise Comparisons.} Of the 55 pairs, 36 differ on FAC after Holm correction under the
+sign-flip test over templates: inside the first five, \texttt{DeepSeek V4.1 Flash} from
+\texttt{GLM-5.3-Flash}, \texttt{DeepSeek V4.1 Flash} from \texttt{GPT-5.4 mini}, and
+\texttt{Claude Sonnet 5} from \texttt{GPT-5.4 mini}; \texttt{Muse Glimmer 30B} from none of them;
+27 of the 30 pairs between the first six and the last five; and inside the last five,
+\texttt{GLM-5.3} from \texttt{Qwen3-235B-2507}, \texttt{GLM-5.3} from \texttt{gpt-oss-20b},
+\texttt{Gemma 4 26B} from \texttt{Qwen3-235B-2507}, \texttt{Gemma 4 26B} from \texttt{gpt-oss-20b},
+\texttt{Gemini 3.1 Flash-Lite} from \texttt{gpt-oss-20b}, and \texttt{Qwen3-235B-2507} from
+\texttt{gpt-oss-20b}.
+Every non-significant FAC difference lies below what its pair detects (0.013 to 0.039).
+On MC, 15 pairs differ, each of them also on FAC: the three highest models,
+\texttt{Claude Sonnet 5}, \texttt{GLM-5.3-Flash}, and \texttt{Kimi K3}, do not separate, nor do
+\texttt{Claude Sonnet 5} and \texttt{DeepSeek V4.1 Flash}, which FAC does not separate either;
+Kendall's $\tau$~\citep{kendall1938} between the two orderings is 0.709 (95\% interval 0.345 to
+0.818).
+Strict FAC, which scores a partial answer 0, separates 29 pairs and agrees with FAC on 48 of the 55;
+a Wilcoxon test~\citep{wilcoxon1945} separates 17 on MC; and McNemar's exact
 test~\citep{mcnemar1947}, which treats the 2,250 instances as independent, separates 45.
 
-\paragraph{Matched Settings.} \autoref{tab:matched} gives FAC at the providers' defaults and at
-matched settings, where \texttt{Gemma 4 26B}, \texttt{Gemini 3.1 Flash-Lite}, and
-\texttt{GPT-5.4 mini} reason at medium effort (\autoref{appendix:decoding}), each with the tier
-letters of its own family of pairwise tests.
-At matched settings the five highest models are \texttt{DeepSeek V4.1 Flash},
-\texttt{Claude Sonnet 5}, \texttt{Kimi K3}, \texttt{GLM-5.3-Flash}, and \texttt{GPT-5.4 mini}, and
-Kendall's $\tau$ between the orderings at the providers' defaults and at matched settings is 0.709.
+\paragraph{Matched Settings.} \autoref{tab:matched} gives FAC at matched settings, the configuration
+reported throughout, where \texttt{Gemma 4 26B}, \texttt{Gemini 3.1 Flash-Lite}, and
+\texttt{GPT-5.4 mini} reason at medium effort (\autoref{appendix:decoding}), and at the providers'
+defaults, each with the tier letters of its own family of pairwise tests.
+At the providers' defaults, \texttt{GPT-5.4 mini}, \texttt{Gemma 4 26B}, and
+\texttt{Gemini 3.1 Flash-Lite} return no reasoning tokens and score 0.852, 0.872, and 0.878; the
+five highest models are \texttt{DeepSeek V4.1 Flash}, \texttt{Claude Sonnet 5}, \texttt{Kimi K3},
+\texttt{GLM-5.3-Flash}, and \texttt{Muse Glimmer 30B}, and Kendall's $\tau$ between the orderings at
+the providers' defaults and at matched settings is 0.709.
 Reasoning raises all three models run with it (Holm-adjusted $p$ $<$0.001), and for
-\texttt{Gemma 4 26B} and \texttt{GPT-5.4 mini} the 90\% interval lies wholly above $+0.05$, the
+\texttt{GPT-5.4 mini} and \texttt{Gemma 4 26B} the 90\% interval lies wholly above $+0.05$, the
 margin of~\autoref{appendix:protocol}; \autoref{appendix:experiments} reads them beside the
 reasoning-effort experiment.
 The expert readings of wrong answers (\autoref{appendix:error_analysis}) are of the responses at the
@@ -40,9 +46,10 @@ providers' defaults, so they do not describe the three models at matched setting
 \paragraph{Consistency Within a Template.} \autoref{tab:single_path} counts, per model, the
 templates whose instances it solves on all, on some, and on none, separately for the templates whose
 instances all follow one derivation and for the others.
-No model fails every instance of more than a few templates, and each lower-tier model solves some
-but not all instances of more single-path templates than any upper-tier model; the table shows how
-consistent a model is within a template, not why.
+No model fails every instance of more than a few templates, and the two lowest models,
+\texttt{Qwen3-235B-2507} and \texttt{gpt-oss-20b}, solve some but not all instances of more
+single-path templates than any other model; the table shows how consistent a model is within a
+template, not why.
 
 % BEGIN GENERATED tab:matched (full_run_28092026/paper_results.py --write)
 \begin{table*}[t]
@@ -61,12 +68,12 @@ consistent a model is within a template, not why.
 \texttt{Claude Sonnet 5} & 0.987 {\scriptsize\textcolor{gray}{(0.980--0.993)}} & ab & 0.987 {\scriptsize\textcolor{gray}{(0.980--0.993)}} & ab & reasons by default & -- & -- & -- & -- & -- \\
 \texttt{Kimi K3} & 0.980 {\scriptsize\textcolor{gray}{(0.967--0.990)}} & ab & 0.980 {\scriptsize\textcolor{gray}{(0.967--0.990)}} & abc & reasons by default & -- & -- & -- & -- & -- \\
 \texttt{GLM-5.3-Flash} & 0.972 {\scriptsize\textcolor{gray}{(0.953--0.987)}} & b & 0.972 {\scriptsize\textcolor{gray}{(0.953--0.987)}} & bc & reasons by default & -- & -- & -- & -- & -- \\
+\texttt{GPT-5.4 mini}$^{\ddagger}$ & 0.852 {\scriptsize\textcolor{gray}{(0.810--0.890)}} & de & 0.969 {\scriptsize\textcolor{gray}{(0.958--0.980)}} & cde & effort medium & $+0.118$ (0.082--0.156) & $<$0.001 & 0.088--0.149 & $+0.058$ & 0 / 0 \\
 \texttt{Muse Glimmer 30B} & 0.969 {\scriptsize\textcolor{gray}{(0.949--0.985)}} & abc & 0.969 {\scriptsize\textcolor{gray}{(0.949--0.985)}} & abcd & reasons by default & -- & -- & -- & -- & -- \\
 \texttt{GLM-5.3}$^{\dagger}$ & 0.950 {\scriptsize\textcolor{gray}{(0.921--0.975)}} & c & 0.950 {\scriptsize\textcolor{gray}{(0.921--0.975)}} & def & reasons by default & -- & -- & -- & -- & -- \\
-\texttt{Qwen3-235B-2507}$^{\ast}$ & 0.899 {\scriptsize\textcolor{gray}{(0.869--0.926)}} & d & 0.899 {\scriptsize\textcolor{gray}{(0.869--0.926)}} & g & none offered & -- & -- & -- & -- & -- \\
-\texttt{Gemini 3.1 Flash-Lite}$^{\ddagger}$ & 0.878 {\scriptsize\textcolor{gray}{(0.837--0.915)}} & d & 0.917 {\scriptsize\textcolor{gray}{(0.884--0.945)}} & fg & effort medium & $+0.038$ (0.023--0.056) & $<$0.001 & 0.025--0.053 & $+0.016$ & 0 / 0 \\
 \texttt{Gemma 4 26B}$^{\ddagger}$ & 0.872 {\scriptsize\textcolor{gray}{(0.835--0.905)}} & d & 0.942 {\scriptsize\textcolor{gray}{(0.916--0.964)}} & ef & effort medium & $+0.070$ (0.049--0.092) & $<$0.001 & 0.053--0.088 & $+0.008$ & 0 / 3 \\
-\texttt{GPT-5.4 mini}$^{\ddagger}$ & 0.852 {\scriptsize\textcolor{gray}{(0.810--0.890)}} & de & 0.969 {\scriptsize\textcolor{gray}{(0.958--0.980)}} & cde & effort medium & $+0.118$ (0.082--0.156) & $<$0.001 & 0.088--0.149 & $+0.058$ & 0 / 0 \\
+\texttt{Gemini 3.1 Flash-Lite}$^{\ddagger}$ & 0.878 {\scriptsize\textcolor{gray}{(0.837--0.915)}} & d & 0.917 {\scriptsize\textcolor{gray}{(0.884--0.945)}} & fg & effort medium & $+0.038$ (0.023--0.056) & $<$0.001 & 0.025--0.053 & $+0.016$ & 0 / 0 \\
+\texttt{Qwen3-235B-2507}$^{\ast}$ & 0.899 {\scriptsize\textcolor{gray}{(0.869--0.926)}} & d & 0.899 {\scriptsize\textcolor{gray}{(0.869--0.926)}} & g & none offered & -- & -- & -- & -- & -- \\
 \texttt{gpt-oss-20b} & 0.808 {\scriptsize\textcolor{gray}{(0.764--0.849)}} & e & 0.808 {\scriptsize\textcolor{gray}{(0.764--0.849)}} & h & reasons by default & -- & -- & -- & -- & -- \\
 \bottomrule
 \end{tabular}
@@ -78,8 +85,8 @@ runs. For the three models run with reasoning on, the change from their default 
 2,250 instances, paired by instance: with its 95\% interval, the Holm-adjusted $p$ of the sign-flip
 test over templates, the 90\% interval read against the $\pm 0.05$ margin, the change in MC, and the
 empty responses in each configuration. Kendall's $\tau$ between the two orderings is 0.709 (95\%
-interval 0.636 to 0.818). $^{\ast}$No reasoning tokens at the provider's default. $^{\ddagger}$Run
-with reasoning at medium effort.}
+interval 0.636 to 0.818). $^{\ast}$No reasoning setting offered. $^{\ddagger}$Run with reasoning at
+medium effort.}
 \label{tab:matched}
 \end{table*}
 % END GENERATED tab:matched
@@ -101,12 +108,12 @@ with reasoning at medium effort.}
 \texttt{Claude Sonnet 5} & 0.914 {\scriptsize\textcolor{gray}{(0.844--0.983)}} & 0.086 {\scriptsize\textcolor{gray}{(0.017--0.155)}} & 0.000 {\scriptsize\textcolor{gray}{(0.000--0.000)}} & 0.837 {\scriptsize\textcolor{gray}{(0.761--0.913)}} & 0.163 {\scriptsize\textcolor{gray}{(0.087--0.239)}} & 0.000 {\scriptsize\textcolor{gray}{(0.000--0.000)}} \\
 \texttt{Kimi K3} & 0.862 {\scriptsize\textcolor{gray}{(0.776--0.948)}} & 0.138 {\scriptsize\textcolor{gray}{(0.052--0.225)}} & 0.000 {\scriptsize\textcolor{gray}{(0.000--0.000)}} & 0.815 {\scriptsize\textcolor{gray}{(0.728--0.891)}} & 0.185 {\scriptsize\textcolor{gray}{(0.109--0.261)}} & 0.000 {\scriptsize\textcolor{gray}{(0.000--0.000)}} \\
 \texttt{GLM-5.3-Flash} & 0.897 {\scriptsize\textcolor{gray}{(0.810--0.966)}} & 0.103 {\scriptsize\textcolor{gray}{(0.034--0.190)}} & 0.000 {\scriptsize\textcolor{gray}{(0.000--0.000)}} & 0.826 {\scriptsize\textcolor{gray}{(0.739--0.902)}} & 0.174 {\scriptsize\textcolor{gray}{(0.098--0.250)}} & 0.000 {\scriptsize\textcolor{gray}{(0.000--0.000)}} \\
+\texttt{GPT-5.4 mini} & 0.655 {\scriptsize\textcolor{gray}{(0.534--0.776)}} & 0.345 {\scriptsize\textcolor{gray}{(0.224--0.466)}} & 0.000 {\scriptsize\textcolor{gray}{(0.000--0.000)}} & 0.761 {\scriptsize\textcolor{gray}{(0.674--0.848)}} & 0.239 {\scriptsize\textcolor{gray}{(0.152--0.326)}} & 0.000 {\scriptsize\textcolor{gray}{(0.000--0.000)}} \\
 \texttt{Muse Glimmer 30B} & 0.776 {\scriptsize\textcolor{gray}{(0.672--0.879)}} & 0.224 {\scriptsize\textcolor{gray}{(0.121--0.328)}} & 0.000 {\scriptsize\textcolor{gray}{(0.000--0.000)}} & 0.826 {\scriptsize\textcolor{gray}{(0.750--0.902)}} & 0.174 {\scriptsize\textcolor{gray}{(0.098--0.261)}} & 0.000 {\scriptsize\textcolor{gray}{(0.000--0.000)}} \\
 \texttt{GLM-5.3} & 0.845 {\scriptsize\textcolor{gray}{(0.741--0.931)}} & 0.138 {\scriptsize\textcolor{gray}{(0.052--0.224)}} & 0.017 {\scriptsize\textcolor{gray}{(0.000--0.052)}} & 0.793 {\scriptsize\textcolor{gray}{(0.707--0.880)}} & 0.196 {\scriptsize\textcolor{gray}{(0.120--0.283)}} & 0.011 {\scriptsize\textcolor{gray}{(0.000--0.033)}} \\
+\texttt{Gemma 4 26B} & 0.759 {\scriptsize\textcolor{gray}{(0.655--0.862)}} & 0.241 {\scriptsize\textcolor{gray}{(0.138--0.345)}} & 0.000 {\scriptsize\textcolor{gray}{(0.000--0.000)}} & 0.717 {\scriptsize\textcolor{gray}{(0.620--0.804)}} & 0.283 {\scriptsize\textcolor{gray}{(0.196--0.380)}} & 0.000 {\scriptsize\textcolor{gray}{(0.000--0.000)}} \\
+\texttt{Gemini 3.1 Flash-Lite} & 0.776 {\scriptsize\textcolor{gray}{(0.655--0.879)}} & 0.207 {\scriptsize\textcolor{gray}{(0.103--0.310)}} & 0.017 {\scriptsize\textcolor{gray}{(0.000--0.052)}} & 0.641 {\scriptsize\textcolor{gray}{(0.543--0.739)}} & 0.359 {\scriptsize\textcolor{gray}{(0.261--0.457)}} & 0.000 {\scriptsize\textcolor{gray}{(0.000--0.000)}} \\
 \texttt{Qwen3-235B-2507} & 0.448 {\scriptsize\textcolor{gray}{(0.328--0.586)}} & 0.534 {\scriptsize\textcolor{gray}{(0.414--0.655)}} & 0.017 {\scriptsize\textcolor{gray}{(0.000--0.052)}} & 0.554 {\scriptsize\textcolor{gray}{(0.457--0.652)}} & 0.424 {\scriptsize\textcolor{gray}{(0.326--0.522)}} & 0.022 {\scriptsize\textcolor{gray}{(0.000--0.054)}} \\
-\texttt{Gemini 3.1 Flash-Lite} & 0.672 {\scriptsize\textcolor{gray}{(0.552--0.793)}} & 0.276 {\scriptsize\textcolor{gray}{(0.172--0.397)}} & 0.052 {\scriptsize\textcolor{gray}{(0.000--0.121)}} & 0.598 {\scriptsize\textcolor{gray}{(0.500--0.696)}} & 0.402 {\scriptsize\textcolor{gray}{(0.304--0.500)}} & 0.000 {\scriptsize\textcolor{gray}{(0.000--0.000)}} \\
-\texttt{Gemma 4 26B} & 0.466 {\scriptsize\textcolor{gray}{(0.345--0.603)}} & 0.500 {\scriptsize\textcolor{gray}{(0.362--0.621)}} & 0.034 {\scriptsize\textcolor{gray}{(0.000--0.086)}} & 0.522 {\scriptsize\textcolor{gray}{(0.424--0.620)}} & 0.478 {\scriptsize\textcolor{gray}{(0.380--0.576)}} & 0.000 {\scriptsize\textcolor{gray}{(0.000--0.000)}} \\
-\texttt{GPT-5.4 mini} & 0.500 {\scriptsize\textcolor{gray}{(0.379--0.638)}} & 0.431 {\scriptsize\textcolor{gray}{(0.310--0.552)}} & 0.069 {\scriptsize\textcolor{gray}{(0.017--0.138)}} & 0.478 {\scriptsize\textcolor{gray}{(0.380--0.587)}} & 0.500 {\scriptsize\textcolor{gray}{(0.391--0.598)}} & 0.022 {\scriptsize\textcolor{gray}{(0.000--0.054)}} \\
 \texttt{gpt-oss-20b} & 0.345 {\scriptsize\textcolor{gray}{(0.224--0.466)}} & 0.586 {\scriptsize\textcolor{gray}{(0.466--0.707)}} & 0.069 {\scriptsize\textcolor{gray}{(0.017--0.138)}} & 0.293 {\scriptsize\textcolor{gray}{(0.207--0.391)}} & 0.696 {\scriptsize\textcolor{gray}{(0.598--0.783)}} & 0.011 {\scriptsize\textcolor{gray}{(0.000--0.033)}} \\
 \bottomrule
 \end{tabular}
@@ -120,14 +127,14 @@ templates, not of instances.}
 \end{table*}
 % END GENERATED tab:single_path
 
-\paragraph{Scoring Rules.} Halving the answer tolerance swaps no pair of models and doubling it
-swaps one, \texttt{Gemini 3.1 Flash-Lite} and \texttt{Gemma 4 26B}, and no swapped pair differs
-after correction ($\tau = 1.000$ and $0.964$ against the ordering as scored).
+\paragraph{Scoring Rules.} Halving the answer tolerance swaps one pair of models and doubling it
+swaps two, and no swapped pair differs after correction ($\tau = 0.964$ and $0.927$ against the
+ordering as scored).
 Requiring a correct rounding at the displayed precision rather than accepting one unit either way,
 crediting a requested quantity stated in the body but not on the answer line, and leaving out the
 four templates answerable from their wording or the nine with symbolic answers move no model's FAC
-by more than 0.033 and keep $\tau$ at 0.964 or above.
-The ordering changes most when only readable answers count ($\tau = 0.709$), chiefly because
+by more than 0.028 and keep $\tau$ at 0.964 or above.
+The ordering changes most when only readable answers count ($\tau = 0.636$), chiefly because
 \texttt{GLM-5.3}'s 99 empty responses then drop out.
 \autoref{tab:scoring_variants} changes one clause of the final-answer rule at a time, and
 \autoref{appendix:scoring} reads it.
@@ -149,15 +156,15 @@ The ordering changes most when only readable answers count ($\tau = 0.709$), chi
 \texttt{Claude Sonnet 5} & 0.987 & 0.979 (0/24) & 0.987 (1/0) & 0.992 (11/0) & 0.987 (3/2) & 2067 & 86 & 3 & 5 \\
 \texttt{Kimi K3} & 0.980 & 0.964 (0/42) & 0.982 (6/0) & 0.983 (6/0) & 0.980 (0/6) & 2047 & 89 & 2 & 5 \\
 \texttt{GLM-5.3-Flash} & 0.972 & 0.942 (0/76) & 0.974 (5/0) & 0.974 (4/0) & 0.972 (2/2) & 2041 & 93 & 4 & 3 \\
+\texttt{GPT-5.4 mini} & 0.969 & 0.964 (0/15) & 0.970 (1/0) & 0.976 (15/0) & 0.969 (2/2) & 1914 & 184 & 4 & 8 \\
 \texttt{Muse Glimmer 30B} & 0.969 & 0.967 (0/6) & 0.974 (13/0) & 0.971 (5/0) & 0.969 (2/1) & 1829 & 294 & 3 & 3 \\
 \texttt{GLM-5.3} & 0.950 & 0.924 (0/69) & 0.951 (4/0) & 0.950 (0/0) & 0.950 (4/2) & 1988 & 95 & 3 & 3 \\
+\texttt{Gemma 4 26B} & 0.942 & 0.937 (0/17) & 0.943 (3/0) & 0.950 (18/0) & 0.943 (9/1) & 1947 & 79 & 3 & 9 \\
+\texttt{Gemini 3.1 Flash-Lite} & 0.917 & 0.913 (0/13) & 0.918 (3/0) & 0.923 (14/0) & 0.916 (2/6) & 1919 & 72 & 2 & 5 \\
 \texttt{Qwen3-235B-2507} & 0.899 & 0.898 (0/4) & 0.900 (4/0) & 0.907 (18/0) & 0.897 (5/26) & 1812 & 100 & 4 & 6 \\
-\texttt{Gemini 3.1 Flash-Lite} & 0.878 & 0.873 (0/16) & 0.879 (1/0) & 0.886 (17/0) & 0.878 (6/5) & 1830 & 81 & 2 & 3 \\
-\texttt{Gemma 4 26B} & 0.872 & 0.867 (0/18) & 0.873 (6/0) & 0.882 (23/0) & 0.873 (14/3) & 1761 & 111 & 3 & 4 \\
-\texttt{GPT-5.4 mini} & 0.852 & 0.845 (0/26) & 0.853 (5/0) & 0.863 (25/0) & 0.852 (7/6) & 1638 & 201 & 4 & 4 \\
 \texttt{gpt-oss-20b} & 0.808 & 0.793 (0/36) & 0.815 (22/0) & 0.824 (37/0) & 0.808 (7/2) & 1439 & 298 & 5 & 5 \\
 \midrule
-Kendall's $\tau$ with FAC as scored & & 0.927 & 1.000 & 0.964 & 1.000 & & & & \\
+Kendall's $\tau$ with FAC as scored & & 0.782 & 0.964 & 0.917 & 1.000 & & & & \\
 \bottomrule
 \end{tabular}
 }
@@ -179,28 +186,28 @@ arithmetic flags of~\autoref{tab:main_results}.
 The flag rates do not rank the models: the two checks together recall fewer than half of the flawed
 steps inside correct answers (\autoref{appendix:validation}), the precision varies across models,
 and the arithmetic check reads more calculations where a model writes more arithmetic out.
-Coverage rises by at most 0.003 (MC per 10 numeric values shown) with the amount a model writes.
+Coverage rises by at most 0.004 (MC per 10 numeric values shown) with the amount a model writes.
 Spearman's $\rho$~\citep{spearman1904} between a template's mean coverage and its mean number of
-steps is $-0.09$ to $-0.26$ for every model; the slope of MC on the number of values a response
-displays is $+0.0015$ (MC per 10 numeric values shown; 95\% interval 0.000 to 0.003) with template
-fixed effects, and within models Spearman's $\rho$ runs from $-0.24$ to $-0.07$.
+steps is $-0.09$ to $-0.28$ for every model; the slope of MC on the number of values a response
+displays is $+0.0020$ (MC per 10 numeric values shown; 95\% interval 0.0005 to 0.0041) with template
+fixed effects, and within models Spearman's $\rho$ runs from $-0.21$ to $-0.07$.
 
 \autoref{tab:coverage_variants} computes MC under four definitions.
-\texttt{Claude Sonnet 5} and \texttt{DeepSeek V4.1 Flash} differ after Holm's correction as scored
-(Holm-adjusted $p$ 0.049), by matching alone (0.001), and on intermediate milestones only (0.027),
-but not under route-adjusted coverage (1.000), where the milestones the judge rules not needed leave
-the denominator: what separates them is how closely a response follows the gold derivation's route,
-not whether it reaches the quantities its own route needs, a reading that rests on the judge's
-not-needed rulings, which the experts did not read.
-The judge adds 0.019 to 0.038 to a model's coverage over matching alone, and the pairs separated
-are nearly the same (28 against 26 of the 55).
-The separation does not rest on the judge: matching alone, which the judge does not touch,
-separates them more strongly ($+0.042$, Holm-adjusted $p$ 0.001); re-judging a sample with a second
-judge shifts a model's coverage by $-0.018$ to $+0.019$ (\autoref{appendix:validation}).
+\texttt{Claude Sonnet 5} and \texttt{DeepSeek V4.1 Flash} differ after Holm's correction by matching
+alone (Holm-adjusted $p$ 0.001) and on intermediate milestones only (0.032), but not as scored
+(0.069) or under route-adjusted coverage (1.000), where the milestones the judge rules not needed
+leave the denominator: what separates them is how closely a response follows the gold derivation's
+route, not whether it reaches the quantities its own route needs, a reading that rests on the
+judge's not-needed rulings, which the experts did not read.
+Matching alone, which the judge does not touch, separates them ($+0.042$, Holm-adjusted $p$
+0.001); re-judging a sample with a second judge shifts a model's coverage by $-0.018$ to $+0.019$
+(\autoref{appendix:validation}).
+The judge adds 0.019 to 0.045 to a model's coverage over matching alone, and matching alone
+separates more pairs (20 against 15 of the 55).
 \autoref{tab:judged_steps} gives the judged step flags, whose precision on the expert study
 \autoref{tab:validation_results} reports, and~\autoref{tab:flag_precision} classifies every
-arithmetic flag on a correct answer: 11
-of the 3,409 (0.3\%) are carried precision, a printed result that is a correct rounding of the
+arithmetic flag on a correct answer: 12
+of the 3,077 (0.4\%) are carried precision, a printed result that is a correct rounding of the
 value recomputed from the unrounded values earlier in the response, and none of the 171 slips the
 domain expert confirmed is.
 
@@ -221,12 +228,12 @@ domain expert confirmed is.
 \texttt{Claude Sonnet 5} & 20 & 0.850 & 0.150 & 0.869 & 0.550 & 0.200 & 0.125 & 0.950 (20) \\
 \texttt{Kimi K3} & 20 & 0.584 & 0.113 & 0.584 & 0.200 & 0.636 & 0.150 & 1.000 (4) \\
 \texttt{GLM-5.3-Flash} & 12 & 0.378 & 0.134 & 0.458 & 0.083 & 0.750 & 0.126 & 0.632 (19) \\
+\texttt{GPT-5.4 mini} & 61 & 0.640 & 0.137 & 0.689 & 0.311 & 0.459 & 0.184 & -- \\
 \texttt{Muse Glimmer 30B} & 33 & 0.583 & 0.178 & 0.653 & 0.364 & 0.588 & 0.167 & 0.800 (20) \\
 \texttt{GLM-5.3} & 8 & 0.486 & 0.146 & 0.596 & 0.500 & 0.500 & 0.107 & 0.900 (20) \\
+\texttt{Gemma 4 26B} & 116 & 0.548 & 0.099 & 0.569 & 0.181 & 0.724 & 0.186 & -- \\
+\texttt{Gemini 3.1 Flash-Lite} & 174 & 0.515 & 0.116 & 0.540 & 0.161 & 0.750 & 0.187 & -- \\
 \texttt{Qwen3-235B-2507} & 173 & 0.586 & 0.175 & 0.616 & 0.249 & 0.631 & 0.158 & 0.950 (20) \\
-\texttt{Gemini 3.1 Flash-Lite} & 257 & 0.511 & 0.112 & 0.537 & 0.140 & 0.726 & 0.207 & 1.000 (20) \\
-\texttt{Gemma 4 26B} & 260 & 0.588 & 0.145 & 0.602 & 0.258 & 0.635 & 0.187 & 0.900 (20) \\
-\texttt{GPT-5.4 mini} & 311 & 0.442 & 0.117 & 0.485 & 0.164 & 0.778 & 0.250 & 1.000 (20) \\
 \texttt{gpt-oss-20b} & 335 & 0.455 & 0.117 & 0.465 & 0.146 & 0.777 & 0.238 & 0.950 (20) \\
 \bottomrule
 \end{tabular}
@@ -236,8 +243,10 @@ with milestones: how many; MC by matching alone and with the judge; the chance f
 responses matched against a sibling instance's milestones; the share that reach every milestone;
 and, over the answered wrong answers, the share with a milestone the judge rules missing. Then the
 share of all milestones the judge decides, and the precision of the arithmetic flags a domain expert
-read, with their number (171 of 189 were slips overall). The 57 instances without milestones are
-left out.}
+read, with their number (171 of 189 were slips overall; the expert read responses at the providers'
+default settings, so the column is empty for \texttt{GPT-5.4 mini}, \texttt{Gemma 4 26B}, and
+\texttt{Gemini 3.1 Flash-Lite}, run here with reasoning at medium effort). The 57 instances without
+milestones are left out.}
 \label{tab:coverage}
 \end{table*}
 % END GENERATED tab:coverage
@@ -255,17 +264,17 @@ left out.}
 \cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-10}\cmidrule(lr){11-13}
 \textbf{Model} & \textbf{All} & \textbf{Wrong} & \textbf{Tier} & \textbf{All} & \textbf{Wrong} & \textbf{Tier} & \textbf{All} & \textbf{Wrong} & \textbf{Tier} & \textbf{All} & \textbf{Wrong} & \textbf{Tier} \\
 \midrule
-\texttt{DeepSeek V4.1 Flash} & 0.899 {\scriptsize\textcolor{gray}{(0.874--0.922)}} & 0.667 & ab & 0.861 {\scriptsize\textcolor{gray}{(0.831--0.890)}} & 0.667 & bc & 0.982 {\scriptsize\textcolor{gray}{(0.974--0.988)}} & 0.711 & a & 0.822 {\scriptsize\textcolor{gray}{(0.778--0.864)}} & 0.644 & bcd \\
-\texttt{Claude Sonnet 5} & 0.922 {\scriptsize\textcolor{gray}{(0.902--0.942)}} & 0.869 & c & 0.903 {\scriptsize\textcolor{gray}{(0.880--0.925)}} & 0.850 & a & 0.984 {\scriptsize\textcolor{gray}{(0.978--0.990)}} & 0.935 & ab & 0.859 {\scriptsize\textcolor{gray}{(0.817--0.897)}} & 0.834 & a \\
-\texttt{Kimi K3} & 0.912 {\scriptsize\textcolor{gray}{(0.888--0.934)}} & 0.584 & ac & 0.877 {\scriptsize\textcolor{gray}{(0.850--0.902)}} & 0.584 & b & 0.973 {\scriptsize\textcolor{gray}{(0.961--0.983)}} & 0.627 & abc & 0.847 {\scriptsize\textcolor{gray}{(0.806--0.885)}} & 0.646 & ab \\
-\texttt{GLM-5.3-Flash} & 0.912 {\scriptsize\textcolor{gray}{(0.886--0.936)}} & 0.458 & ac & 0.891 {\scriptsize\textcolor{gray}{(0.864--0.916)}} & 0.378 & ab & 0.966 {\scriptsize\textcolor{gray}{(0.947--0.981)}} & 0.524 & abcd & 0.859 {\scriptsize\textcolor{gray}{(0.818--0.898)}} & 0.462 & ab \\
-\texttt{Muse Glimmer 30B} & 0.897 {\scriptsize\textcolor{gray}{(0.871--0.922)}} & 0.653 & abc & 0.862 {\scriptsize\textcolor{gray}{(0.832--0.890)}} & 0.583 & bc & 0.962 {\scriptsize\textcolor{gray}{(0.944--0.977)}} & 0.681 & abcd & 0.830 {\scriptsize\textcolor{gray}{(0.787--0.871)}} & 0.788 & abc \\
-\texttt{GLM-5.3} & 0.900 {\scriptsize\textcolor{gray}{(0.866--0.930)}} & 0.596 & abcd & 0.881 {\scriptsize\textcolor{gray}{(0.846--0.912)}} & 0.486 & abc & 0.946 {\scriptsize\textcolor{gray}{(0.916--0.971)}} & 0.596 & bcdef & 0.852 {\scriptsize\textcolor{gray}{(0.807--0.893)}} & 0.825 & abc \\
-\texttt{Qwen3-235B-2507} & 0.892 {\scriptsize\textcolor{gray}{(0.867--0.916)}} & 0.616 & ab & 0.866 {\scriptsize\textcolor{gray}{(0.836--0.894)}} & 0.586 & bc & 0.956 {\scriptsize\textcolor{gray}{(0.942--0.969)}} & 0.675 & cd & 0.834 {\scriptsize\textcolor{gray}{(0.792--0.873)}} & 0.673 & abc \\
-\texttt{Gemini 3.1 Flash-Lite} & 0.864 {\scriptsize\textcolor{gray}{(0.835--0.892)}} & 0.537 & de & 0.840 {\scriptsize\textcolor{gray}{(0.808--0.870)}} & 0.511 & c & 0.932 {\scriptsize\textcolor{gray}{(0.911--0.951)}} & 0.605 & e & 0.800 {\scriptsize\textcolor{gray}{(0.757--0.841)}} & 0.588 & cde \\
-\texttt{Gemma 4 26B} & 0.876 {\scriptsize\textcolor{gray}{(0.847--0.903)}} & 0.602 & bd & 0.855 {\scriptsize\textcolor{gray}{(0.825--0.884)}} & 0.588 & bc & 0.942 {\scriptsize\textcolor{gray}{(0.922--0.959)}} & 0.667 & de & 0.817 {\scriptsize\textcolor{gray}{(0.773--0.858)}} & 0.627 & abcd \\
-\texttt{GPT-5.4 mini} & 0.834 {\scriptsize\textcolor{gray}{(0.798--0.868)}} & 0.485 & ef & 0.797 {\scriptsize\textcolor{gray}{(0.758--0.834)}} & 0.442 & d & 0.901 {\scriptsize\textcolor{gray}{(0.870--0.929)}} & 0.537 & fg & 0.760 {\scriptsize\textcolor{gray}{(0.708--0.810)}} & 0.531 & e \\
-\texttt{gpt-oss-20b} & 0.812 {\scriptsize\textcolor{gray}{(0.775--0.847)}} & 0.465 & f & 0.790 {\scriptsize\textcolor{gray}{(0.752--0.826)}} & 0.455 & d & 0.872 {\scriptsize\textcolor{gray}{(0.840--0.902)}} & 0.509 & g & 0.759 {\scriptsize\textcolor{gray}{(0.711--0.805)}} & 0.534 & de \\
+\texttt{DeepSeek V4.1 Flash} & 0.899 {\scriptsize\textcolor{gray}{(0.874--0.922)}} & 0.667 & abc & 0.861 {\scriptsize\textcolor{gray}{(0.831--0.890)}} & 0.667 & bcd & 0.982 {\scriptsize\textcolor{gray}{(0.974--0.988)}} & 0.711 & a & 0.822 {\scriptsize\textcolor{gray}{(0.778--0.864)}} & 0.644 & bc \\
+\texttt{Claude Sonnet 5} & 0.922 {\scriptsize\textcolor{gray}{(0.902--0.942)}} & 0.869 & a & 0.903 {\scriptsize\textcolor{gray}{(0.880--0.925)}} & 0.850 & a & 0.984 {\scriptsize\textcolor{gray}{(0.978--0.990)}} & 0.935 & ab & 0.859 {\scriptsize\textcolor{gray}{(0.817--0.897)}} & 0.834 & a \\
+\texttt{Kimi K3} & 0.912 {\scriptsize\textcolor{gray}{(0.888--0.934)}} & 0.584 & ab & 0.877 {\scriptsize\textcolor{gray}{(0.850--0.902)}} & 0.584 & bc & 0.973 {\scriptsize\textcolor{gray}{(0.961--0.983)}} & 0.627 & abc & 0.847 {\scriptsize\textcolor{gray}{(0.806--0.885)}} & 0.646 & ab \\
+\texttt{GLM-5.3-Flash} & 0.912 {\scriptsize\textcolor{gray}{(0.886--0.936)}} & 0.458 & abc & 0.891 {\scriptsize\textcolor{gray}{(0.864--0.916)}} & 0.378 & ab & 0.966 {\scriptsize\textcolor{gray}{(0.947--0.981)}} & 0.524 & abc & 0.859 {\scriptsize\textcolor{gray}{(0.818--0.898)}} & 0.462 & ab \\
+\texttt{GPT-5.4 mini} & 0.892 {\scriptsize\textcolor{gray}{(0.866--0.917)}} & 0.689 & bc & 0.847 {\scriptsize\textcolor{gray}{(0.815--0.877)}} & 0.640 & d & 0.972 {\scriptsize\textcolor{gray}{(0.962--0.981)}} & 0.819 & abc & 0.817 {\scriptsize\textcolor{gray}{(0.771--0.860)}} & 0.711 & bc \\
+\texttt{Muse Glimmer 30B} & 0.897 {\scriptsize\textcolor{gray}{(0.871--0.922)}} & 0.653 & abc & 0.862 {\scriptsize\textcolor{gray}{(0.832--0.890)}} & 0.583 & bcd & 0.962 {\scriptsize\textcolor{gray}{(0.944--0.977)}} & 0.681 & abc & 0.830 {\scriptsize\textcolor{gray}{(0.787--0.871)}} & 0.788 & ab \\
+\texttt{GLM-5.3} & 0.900 {\scriptsize\textcolor{gray}{(0.866--0.930)}} & 0.596 & abc & 0.881 {\scriptsize\textcolor{gray}{(0.846--0.912)}} & 0.486 & abcd & 0.946 {\scriptsize\textcolor{gray}{(0.916--0.971)}} & 0.596 & bc & 0.852 {\scriptsize\textcolor{gray}{(0.807--0.893)}} & 0.825 & ab \\
+\texttt{Gemma 4 26B} & 0.884 {\scriptsize\textcolor{gray}{(0.856--0.910)}} & 0.569 & bc & 0.850 {\scriptsize\textcolor{gray}{(0.819--0.880)}} & 0.548 & cd & 0.959 {\scriptsize\textcolor{gray}{(0.944--0.973)}} & 0.631 & c & 0.813 {\scriptsize\textcolor{gray}{(0.770--0.853)}} & 0.603 & bc \\
+\texttt{Gemini 3.1 Flash-Lite} & 0.881 {\scriptsize\textcolor{gray}{(0.851--0.908)}} & 0.540 & c & 0.855 {\scriptsize\textcolor{gray}{(0.824--0.886)}} & 0.515 & bcd & 0.953 {\scriptsize\textcolor{gray}{(0.935--0.969)}} & 0.603 & c & 0.815 {\scriptsize\textcolor{gray}{(0.770--0.856)}} & 0.574 & abc \\
+\texttt{Qwen3-235B-2507} & 0.892 {\scriptsize\textcolor{gray}{(0.867--0.916)}} & 0.616 & bc & 0.866 {\scriptsize\textcolor{gray}{(0.836--0.894)}} & 0.586 & bcd & 0.956 {\scriptsize\textcolor{gray}{(0.942--0.969)}} & 0.675 & c & 0.834 {\scriptsize\textcolor{gray}{(0.792--0.873)}} & 0.673 & ab \\
+\texttt{gpt-oss-20b} & 0.812 {\scriptsize\textcolor{gray}{(0.775--0.847)}} & 0.465 & d & 0.790 {\scriptsize\textcolor{gray}{(0.752--0.826)}} & 0.455 & e & 0.872 {\scriptsize\textcolor{gray}{(0.840--0.902)}} & 0.509 & d & 0.759 {\scriptsize\textcolor{gray}{(0.711--0.805)}} & 0.534 & c \\
 \bottomrule
 \end{tabular}
 }
@@ -277,10 +286,10 @@ templates; wrong: the mean over wrong answers; tier: models sharing a letter do 
 Holm's correction over the pairwise sign-flip tests of that definition. Intermediate only: the
 answer milestones are those whose value equals a number of the answer check's targets under its unit
 factors; once they leave the set, 502 instances have no milestone left (57 have none at all).
-\texttt{Claude Sonnet 5} against \texttt{DeepSeek V4.1 Flash}: Holm-adjusted $p$ 0.049 as scored,
-0.001 by matching alone, 1.000 route-adjusted. The slope of MC on the number of values a response
-displays, with template fixed effects, is $+0.0015$ (MC per 10 numeric values shown; 95\% interval
-0.000 to 0.003).}
+\texttt{Claude Sonnet 5} against \texttt{DeepSeek V4.1 Flash}: Holm-adjusted $p$ 0.069 as scored,
+0.001 by matching alone, 1.000 route-adjusted, 0.032 intermediate only. The slope of MC on the
+number of values a response displays, with template fixed effects, is $+0.0020$ (MC per 10 numeric
+values shown; 95\% interval 0.0005 to 0.0041).}
 \label{tab:coverage_variants}
 \end{table*}
 % END GENERATED tab:coverage_variants
@@ -299,28 +308,24 @@ displays, with template fixed effects, is $+0.0015$ (MC per 10 numeric values sh
 \texttt{Claude Sonnet 5} & 0.054 {\scriptsize\textcolor{gray}{(0.041--0.068)}} & 0.28 & 0.650 {\scriptsize\textcolor{gray}{(0.412--0.875)}} & 0.12 \\
 \texttt{Kimi K3} & 0.017 {\scriptsize\textcolor{gray}{(0.011--0.024)}} & 0.05 & 0.545 {\scriptsize\textcolor{gray}{(0.350--0.765)}} & 0.15 \\
 \texttt{GLM-5.3-Flash} & 0.032 {\scriptsize\textcolor{gray}{(0.023--0.042)}} & 0.07 & 0.333 {\scriptsize\textcolor{gray}{(0.077--0.667)}} & 0.13 \\
+\texttt{GPT-5.4 mini}$^{\ddagger}$ & 0.115 {\scriptsize\textcolor{gray}{(0.091--0.140)}} & 0.27 & 0.770 {\scriptsize\textcolor{gray}{(0.646--0.885)}} & 0.18 \\
 \texttt{Muse Glimmer 30B} & 0.059 {\scriptsize\textcolor{gray}{(0.046--0.074)}} & 0.15 & 0.529 {\scriptsize\textcolor{gray}{(0.208--0.743)}} & 0.17 \\
 \texttt{GLM-5.3}$^{\dagger}$ & 0.026 {\scriptsize\textcolor{gray}{(0.016--0.036)}} & 0.06 & 0.250 {\scriptsize\textcolor{gray}{(0.000--0.625)}} & 0.11 \\
+\texttt{Gemma 4 26B}$^{\ddagger}$ & 0.074 {\scriptsize\textcolor{gray}{(0.053--0.097)}} & 0.35 & 0.853 {\scriptsize\textcolor{gray}{(0.731--0.935)}} & 0.19 \\
+\texttt{Gemini 3.1 Flash-Lite}$^{\ddagger}$ & 0.093 {\scriptsize\textcolor{gray}{(0.068--0.121)}} & 0.37 & 0.875 {\scriptsize\textcolor{gray}{(0.803--0.927)}} & 0.19 \\
 \texttt{Qwen3-235B-2507}$^{\ast}$ & 0.107 {\scriptsize\textcolor{gray}{(0.084--0.131)}} & 0.86 & 0.864 {\scriptsize\textcolor{gray}{(0.776--0.930)}} & 0.16 \\
-\texttt{Gemini 3.1 Flash-Lite}$^{\ast}$ & 0.122 {\scriptsize\textcolor{gray}{(0.091--0.158)}} & 0.50 & 0.907 {\scriptsize\textcolor{gray}{(0.831--0.960)}} & 0.21 \\
-\texttt{Gemma 4 26B}$^{\ast}$ & 0.146 {\scriptsize\textcolor{gray}{(0.112--0.182)}} & 0.66 & 0.908 {\scriptsize\textcolor{gray}{(0.834--0.960)}} & 0.19 \\
-\texttt{GPT-5.4 mini}$^{\ast}$ & 0.219 {\scriptsize\textcolor{gray}{(0.176--0.265)}} & 0.80 & 0.923 {\scriptsize\textcolor{gray}{(0.883--0.953)}} & 0.25 \\
 \texttt{gpt-oss-20b} & 0.206 {\scriptsize\textcolor{gray}{(0.177--0.237)}} & 1.01 & 0.916 {\scriptsize\textcolor{gray}{(0.871--0.950)}} & 0.24 \\
-\rowcolor{gray!10}\multicolumn{5}{l}{\textit{With reasoning at medium effort}} \\
-\texttt{Gemini 3.1 Flash-Lite}$^{\ddagger}$ & 0.093 {\scriptsize\textcolor{gray}{(0.068--0.121)}} & -- & -- & -- \\
-\texttt{Gemma 4 26B}$^{\ddagger}$ & 0.074 {\scriptsize\textcolor{gray}{(0.053--0.097)}} & -- & -- & -- \\
-\texttt{GPT-5.4 mini}$^{\ddagger}$ & 0.115 {\scriptsize\textcolor{gray}{(0.091--0.140)}} & -- & -- & -- \\
 \bottomrule
 \end{tabular}
-\caption{\textbf{Judged step flags.} The judged step check on the responses of the evaluation: the
-share of correct-answer responses with at least one step the judge flags (95\% interval over
-templates), the flagged steps per response, the share of wrong answers with at least one step either
-check flags, and the share of milestones the judge rather than the matcher decides. The check runs
-the judge at the provider's default settings, so its flags are judged, not verified: in the expert
-study, 7 of the 15 flags it raises inside correct answers are errors (precision 0.47), and together
-with the arithmetic check it finds 0.36 of the flawed steps there at precision 0.70
-(\autoref{tab:validation_results}). $^{\ast}$No reasoning tokens at the provider's default.
-$^{\dagger}$99 responses empty at the output ceiling. $^{\ddagger}$Reasoning at medium effort.}
+\caption{\textbf{Judged step flags.} The judged step check on the responses of the evaluation at
+matched settings: the share of correct-answer responses with at least one step the judge flags (95\%
+interval over templates), the flagged steps per response, the share of wrong answers with at least
+one step either check flags, and the share of milestones the judge rather than the matcher decides.
+The check runs the judge at the provider's default settings, so its flags are judged, not verified:
+in the expert study, 7 of the 15 flags it raises inside correct answers are errors (precision 0.47),
+and together with the arithmetic check it finds 0.36 of the flawed steps there at precision 0.70
+(\autoref{tab:validation_results}). $^{\ast}$No reasoning setting offered. $^{\dagger}$99 responses
+empty at the output ceiling. $^{\ddagger}$Run with reasoning at medium effort.}
 \label{tab:judged_steps}
 \end{table*}
 % END GENERATED tab:judged_steps
@@ -339,15 +344,15 @@ $^{\dagger}$99 responses empty at the output ceiling. $^{\ddagger}$Reasoning at 
 \texttt{Claude Sonnet 5} & 430 & 2 & 428 & 0\% \\
 \texttt{Kimi K3} & 17 & 0 & 17 & 0\% \\
 \texttt{GLM-5.3-Flash} & 50 & 0 & 50 & 0\% \\
+\texttt{GPT-5.4 mini} & 187 & 1 & 186 & 1\% \\
 \texttt{Muse Glimmer 30B} & 147 & 3 & 144 & 2\% \\
 \texttt{GLM-5.3} & 40 & 1 & 39 & 3\% \\
+\texttt{Gemma 4 26B} & 347 & 0 & 347 & 0\% \\
+\texttt{Gemini 3.1 Flash-Lite} & 187 & 1 & 186 & 1\% \\
 \texttt{Qwen3-235B-2507} & 1260 & 4 & 1256 & 0\% \\
-\texttt{Gemini 3.1 Flash-Lite} & 182 & 0 & 182 & 0\% \\
-\texttt{Gemma 4 26B} & 487 & 0 & 487 & 0\% \\
-\texttt{GPT-5.4 mini} & 384 & 1 & 383 & 0\% \\
 \texttt{gpt-oss-20b} & 399 & 0 & 399 & 0\% \\
 \midrule
-All models & 3409 & 11 & 3398 & 0\% \\
+All models & 3077 & 12 & 3065 & 0\% \\
 Slips the domain expert confirmed & 171 & 0 & 168 & 0\% \\
 \bottomrule
 \end{tabular}
@@ -355,9 +360,10 @@ Slips the domain expert confirmed & 171 & 0 & 168 & 0\% \\
 correct-answer response classified as carried precision, where the printed result is a correct
 rounding of the value recomputed from the unrounded upstream values that appear earlier in the
 response, or other. The last row applies the same classification to the 171 flags the domain expert
-confirmed as slips; 3 of them sit in steps whose text changed after the reading and are not
-classified. A carried-precision flag marks a rounding the response carried forward, not a wrong
-operation; the classification is mechanical and was not read by an expert.}
+confirmed as slips (read on responses at the providers' default settings); 3 of them sit in steps
+whose text changed after the reading and are not classified. A carried-precision flag marks a
+rounding the response carried forward, not a wrong operation; the classification is mechanical and
+was not read by an expert.}
 \label{tab:flag_precision}
 \end{table}
 % END GENERATED tab:flag_precision
@@ -367,17 +373,18 @@ its Easy-minus-Advanced gap with its tests, and the share of responses scored 0 
 milestones in the gold trace.
 We read Welch's test, since the permutation of level labels assumes equal spread across levels and
 the Advanced level, with fewer templates, varies more for nine of the eleven models; under that
-permutation the gap holds for six models.
+permutation the gap holds for four models.
 Welch's $p$ in~\autoref{tab:level_gap} is Holm-adjusted over the eleven models.
 Over the responses with a readable answer, \texttt{GLM-5.3}'s gap is $-0.004$ (Holm-adjusted Welch
 $p$ 1.000), so its gap as scored comes from its empty responses at the output ceiling.
 The share scored 0 counts empty responses at the output ceiling as well as wrong answers.
 \autoref{tab:depth_model} therefore relates a wrong answer to the depth of the gold derivation over
 readable responses only, with the answer kind as a covariate.
-Pooled over the models, each further milestone multiplies the odds of a wrong answer by 1.23 (95\%
-interval 1.13 to 1.34); per model, the slope of the wrong-answer rate on the milestone count holds
-after Holm correction for five of the eleven models over readable responses, the four weakest among
-them, and for the other six it does not hold after correction.
+Pooled over the models, each further milestone multiplies the odds of a wrong answer by 1.21 (95\%
+interval 1.09 to 1.33); per model, the slope of the wrong-answer rate on the milestone count holds
+after Holm correction for three of the eleven models over readable responses,
+\texttt{DeepSeek V4.1 Flash}, \texttt{Gemini 3.1 Flash-Lite}, and \texttt{gpt-oss-20b}, and for the
+others it does not hold after correction.
 
 % BEGIN GENERATED tab:level_gap (full_run_28092026/paper_results.py --write)
 \begin{table*}[t]
@@ -392,16 +399,16 @@ them, and for the other six it does not hold after correction.
 \cmidrule(lr){2-4}\cmidrule(lr){5-7}\cmidrule(lr){8-12}
 \textbf{Model} & \textbf{Easy} & \textbf{Intermediate} & \textbf{Advanced} & \textbf{Gap (95\% interval)} & \textbf{Welch $p$} & \textbf{Detectable} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4--5} & \textbf{6+} \\
 \midrule
-\texttt{DeepSeek V4.1 Flash} & 0.995 & 0.986 & 0.979 & $+0.016$ ($-0.001$ to 0.041) & 0.659 & 0.024 & 0.000 & 0.000 & 0.000 & 0.006 & 0.032 \\
-\texttt{Claude Sonnet 5} & 0.993 & 0.983 & 0.984 & $+0.008$ ($-0.007$ to 0.024) & 0.920 & 0.022 & 0.000 & 0.017 & 0.003 & 0.013 & 0.011 \\
-\texttt{Kimi K3} & 0.992 & 0.985 & 0.953 & $+0.039$ ($-0.002$ to 0.094) & 0.659 & 0.055 & 0.000 & 0.006 & 0.014 & 0.028 & 0.025 \\
-\texttt{GLM-5.3-Flash} & 0.994 & 0.970 & 0.939 & $+0.055$ (0.012--0.113) & 0.276 & 0.057 & 0.003 & 0.017 & 0.011 & 0.022 & 0.061 \\
-\texttt{Muse Glimmer 30B} & 0.976 & 0.968 & 0.958 & $+0.019$ ($-0.026$ to 0.067) & 0.920 & 0.066 & 0.003 & 0.017 & 0.038 & 0.030 & 0.047 \\
-\texttt{GLM-5.3} & 0.984 & 0.966 & 0.865 & $+0.120$ (0.030--0.223) & 0.168 & 0.110 & 0.003 & 0.013 & 0.027 & 0.057 & 0.112 \\
-\texttt{Qwen3-235B-2507} & 0.917 & 0.890 & 0.885 & $+0.031$ ($-0.035$ to 0.097) & 0.920 & 0.098 & 0.034 & 0.056 & 0.073 & 0.085 & 0.121 \\
-\texttt{Gemini 3.1 Flash-Lite} & 0.937 & 0.888 & 0.762 & $+0.175$ (0.068--0.292) & 0.046 & 0.140 & 0.024 & 0.048 & 0.073 & 0.149 & 0.227 \\
-\texttt{Gemma 4 26B} & 0.919 & 0.866 & 0.802 & $+0.117$ (0.032--0.205) & 0.103 & 0.118 & 0.044 & 0.080 & 0.106 & 0.094 & 0.227 \\
-\texttt{GPT-5.4 mini} & 0.916 & 0.844 & 0.756 & $+0.160$ (0.049--0.284) & 0.103 & 0.145 & 0.020 & 0.076 & 0.095 & 0.170 & 0.271 \\
+\texttt{DeepSeek V4.1 Flash} & 0.995 & 0.986 & 0.979 & $+0.016$ ($-0.001$ to 0.041) & 0.791 & 0.024 & 0.000 & 0.000 & 0.000 & 0.006 & 0.032 \\
+\texttt{Claude Sonnet 5} & 0.993 & 0.983 & 0.984 & $+0.008$ ($-0.007$ to 0.024) & 1.000 & 0.022 & 0.000 & 0.017 & 0.003 & 0.013 & 0.011 \\
+\texttt{Kimi K3} & 0.992 & 0.985 & 0.953 & $+0.039$ ($-0.002$ to 0.094) & 0.791 & 0.055 & 0.000 & 0.006 & 0.014 & 0.028 & 0.025 \\
+\texttt{GLM-5.3-Flash} & 0.994 & 0.970 & 0.939 & $+0.055$ (0.012--0.113) & 0.368 & 0.057 & 0.003 & 0.017 & 0.011 & 0.022 & 0.061 \\
+\texttt{GPT-5.4 mini} & 0.982 & 0.953 & 0.975 & $+0.006$ ($-0.013$ to 0.028) & 1.000 & 0.029 & 0.007 & 0.022 & 0.014 & 0.048 & 0.034 \\
+\texttt{Muse Glimmer 30B} & 0.976 & 0.968 & 0.958 & $+0.019$ ($-0.026$ to 0.067) & 1.000 & 0.066 & 0.003 & 0.017 & 0.038 & 0.030 & 0.047 \\
+\texttt{GLM-5.3} & 0.984 & 0.966 & 0.865 & $+0.120$ (0.030--0.223) & 0.216 & 0.110 & 0.003 & 0.013 & 0.027 & 0.057 & 0.112 \\
+\texttt{Gemma 4 26B} & 0.967 & 0.934 & 0.912 & $+0.055$ ($-0.003$ to 0.116) & 0.528 & 0.083 & 0.017 & 0.041 & 0.046 & 0.042 & 0.104 \\
+\texttt{Gemini 3.1 Flash-Lite} & 0.959 & 0.928 & 0.826 & $+0.132$ (0.049--0.225) & 0.062 & 0.111 & 0.007 & 0.039 & 0.057 & 0.098 & 0.152 \\
+\texttt{Qwen3-235B-2507} & 0.917 & 0.890 & 0.885 & $+0.031$ ($-0.035$ to 0.097) & 1.000 & 0.098 & 0.034 & 0.056 & 0.073 & 0.085 & 0.121 \\
 \texttt{gpt-oss-20b} & 0.900 & 0.768 & 0.719 & $+0.181$ (0.070--0.299) & 0.035 & 0.149 & 0.061 & 0.091 & 0.190 & 0.236 & 0.254 \\
 \bottomrule
 \end{tabular}
@@ -428,16 +435,16 @@ trace (293, 462, 368, 542, and 528 instances).}
 \cmidrule(lr){2-6}\cmidrule(lr){7-8}
 \textbf{Model} & \textbf{1} & \textbf{2} & \textbf{3} & \textbf{4--5} & \textbf{6+} & \textbf{\makecell{Per milestone\\(95\% interval)}} & \textbf{$p$ (Holm)} \\
 \midrule
-\texttt{DeepSeek V4.1 Flash} & 0.000 {\scriptsize\textcolor{gray}{(0.000--0.000)}} & 0.000 {\scriptsize\textcolor{gray}{(0.000--0.000)}} & 0.000 {\scriptsize\textcolor{gray}{(0.000--0.000)}} & 0.002 {\scriptsize\textcolor{gray}{(0.000--0.006)}} & 0.021 {\scriptsize\textcolor{gray}{(0.004--0.049)}} & $+0.504$ (0.218--0.791) & 0.004 \\
+\texttt{DeepSeek V4.1 Flash} & 0.000 {\scriptsize\textcolor{gray}{(0.000--0.000)}} & 0.000 {\scriptsize\textcolor{gray}{(0.000--0.000)}} & 0.000 {\scriptsize\textcolor{gray}{(0.000--0.000)}} & 0.002 {\scriptsize\textcolor{gray}{(0.000--0.006)}} & 0.021 {\scriptsize\textcolor{gray}{(0.004--0.049)}} & $+0.504$ (0.218--0.791) & 0.005 \\
 \texttt{Claude Sonnet 5} & 0.000 {\scriptsize\textcolor{gray}{(0.000--0.000)}} & 0.017 {\scriptsize\textcolor{gray}{(0.002--0.039)}} & 0.003 {\scriptsize\textcolor{gray}{(0.000--0.010)}} & 0.013 {\scriptsize\textcolor{gray}{(0.003--0.025)}} & 0.008 {\scriptsize\textcolor{gray}{(0.000--0.019)}} & $+0.023$ ($-0.194$ to 0.241) & 1.000 \\
 \texttt{Kimi K3} & 0.000 {\scriptsize\textcolor{gray}{(0.000--0.000)}} & 0.006 {\scriptsize\textcolor{gray}{(0.000--0.017)}} & 0.011 {\scriptsize\textcolor{gray}{(0.003--0.022)}} & 0.011 {\scriptsize\textcolor{gray}{(0.002--0.026)}} & 0.013 {\scriptsize\textcolor{gray}{(0.002--0.028)}} & $+0.168$ ($-0.031$ to 0.367) & 0.493 \\
 \texttt{GLM-5.3-Flash} & 0.003 {\scriptsize\textcolor{gray}{(0.000--0.011)}} & 0.009 {\scriptsize\textcolor{gray}{(0.000--0.020)}} & 0.003 {\scriptsize\textcolor{gray}{(0.000--0.009)}} & 0.002 {\scriptsize\textcolor{gray}{(0.000--0.006)}} & 0.010 {\scriptsize\textcolor{gray}{(0.002--0.021)}} & $+0.189$ ($-0.110$ to 0.487) & 0.862 \\
+\texttt{GPT-5.4 mini} & 0.007 {\scriptsize\textcolor{gray}{(0.000--0.017)}} & 0.022 {\scriptsize\textcolor{gray}{(0.004--0.045)}} & 0.014 {\scriptsize\textcolor{gray}{(0.003--0.026)}} & 0.048 {\scriptsize\textcolor{gray}{(0.022--0.079)}} & 0.034 {\scriptsize\textcolor{gray}{(0.014--0.062)}} & $+0.137$ (0.005--0.268) & 0.288 \\
 \texttt{Muse Glimmer 30B} & 0.003 {\scriptsize\textcolor{gray}{(0.000--0.012)}} & 0.013 {\scriptsize\textcolor{gray}{(0.000--0.037)}} & 0.030 {\scriptsize\textcolor{gray}{(0.003--0.074)}} & 0.009 {\scriptsize\textcolor{gray}{(0.002--0.020)}} & 0.019 {\scriptsize\textcolor{gray}{(0.002--0.047)}} & $+0.072$ ($-0.159$ to 0.302) & 1.000 \\
 \texttt{GLM-5.3} & 0.003 {\scriptsize\textcolor{gray}{(0.000--0.011)}} & 0.007 {\scriptsize\textcolor{gray}{(0.000--0.014)}} & 0.000 {\scriptsize\textcolor{gray}{(0.000--0.000)}} & 0.004 {\scriptsize\textcolor{gray}{(0.000--0.010)}} & 0.004 {\scriptsize\textcolor{gray}{(0.000--0.011)}} & $-0.028$ ($-0.303$ to 0.247) & 1.000 \\
-\texttt{Qwen3-235B-2507} & 0.034 {\scriptsize\textcolor{gray}{(0.013--0.057)}} & 0.056 {\scriptsize\textcolor{gray}{(0.018--0.113)}} & 0.073 {\scriptsize\textcolor{gray}{(0.023--0.154)}} & 0.085 {\scriptsize\textcolor{gray}{(0.045--0.134)}} & 0.121 {\scriptsize\textcolor{gray}{(0.063--0.193)}} & $+0.132$ (0.005--0.260) & 0.249 \\
-\texttt{Gemini 3.1 Flash-Lite} & 0.024 {\scriptsize\textcolor{gray}{(0.004--0.051)}} & 0.048 {\scriptsize\textcolor{gray}{(0.010--0.108)}} & 0.073 {\scriptsize\textcolor{gray}{(0.020--0.159)}} & 0.149 {\scriptsize\textcolor{gray}{(0.076--0.229)}} & 0.227 {\scriptsize\textcolor{gray}{(0.135--0.328)}} & $+0.241$ (0.128--0.355) & $<$0.001 \\
-\texttt{Gemma 4 26B} & 0.044 {\scriptsize\textcolor{gray}{(0.008--0.086)}} & 0.080 {\scriptsize\textcolor{gray}{(0.030--0.144)}} & 0.106 {\scriptsize\textcolor{gray}{(0.041--0.195)}} & 0.094 {\scriptsize\textcolor{gray}{(0.050--0.144)}} & 0.227 {\scriptsize\textcolor{gray}{(0.139--0.324)}} & $+0.226$ (0.111--0.340) & 0.001 \\
-\texttt{GPT-5.4 mini} & 0.020 {\scriptsize\textcolor{gray}{(0.003--0.045)}} & 0.076 {\scriptsize\textcolor{gray}{(0.028--0.142)}} & 0.095 {\scriptsize\textcolor{gray}{(0.031--0.185)}} & 0.170 {\scriptsize\textcolor{gray}{(0.100--0.250)}} & 0.271 {\scriptsize\textcolor{gray}{(0.169--0.378)}} & $+0.255$ (0.135--0.375) & $<$0.001 \\
+\texttt{Gemma 4 26B} & 0.017 {\scriptsize\textcolor{gray}{(0.000--0.040)}} & 0.039 {\scriptsize\textcolor{gray}{(0.005--0.092)}} & 0.044 {\scriptsize\textcolor{gray}{(0.003--0.117)}} & 0.042 {\scriptsize\textcolor{gray}{(0.014--0.079)}} & 0.102 {\scriptsize\textcolor{gray}{(0.044--0.174)}} & $+0.226$ (0.059--0.394) & 0.065 \\
+\texttt{Gemini 3.1 Flash-Lite} & 0.007 {\scriptsize\textcolor{gray}{(0.000--0.018)}} & 0.039 {\scriptsize\textcolor{gray}{(0.002--0.100)}} & 0.057 {\scriptsize\textcolor{gray}{(0.011--0.131)}} & 0.098 {\scriptsize\textcolor{gray}{(0.046--0.159)}} & 0.152 {\scriptsize\textcolor{gray}{(0.078--0.236)}} & $+0.233$ (0.103--0.363) & 0.005 \\
+\texttt{Qwen3-235B-2507} & 0.034 {\scriptsize\textcolor{gray}{(0.013--0.057)}} & 0.056 {\scriptsize\textcolor{gray}{(0.018--0.113)}} & 0.073 {\scriptsize\textcolor{gray}{(0.023--0.154)}} & 0.085 {\scriptsize\textcolor{gray}{(0.045--0.134)}} & 0.121 {\scriptsize\textcolor{gray}{(0.063--0.193)}} & $+0.132$ (0.005--0.260) & 0.288 \\
 \texttt{gpt-oss-20b} & 0.055 {\scriptsize\textcolor{gray}{(0.021--0.099)}} & 0.075 {\scriptsize\textcolor{gray}{(0.030--0.131)}} & 0.172 {\scriptsize\textcolor{gray}{(0.075--0.287)}} & 0.207 {\scriptsize\textcolor{gray}{(0.124--0.301)}} & 0.226 {\scriptsize\textcolor{gray}{(0.143--0.316)}} & $+0.211$ (0.121--0.301) & $<$0.001 \\
 \bottomrule
 \end{tabular}
@@ -447,7 +454,7 @@ readable responses only (empty responses and responses that state no answer are 
 of the gold milestone count, the rate with its 95\% interval over templates (293, 462, 368, 540, and
 522 instances); then the slope of a template-clustered logistic model of a wrong answer on the
 milestone count, with the answer kind as a covariate, and its Holm-adjusted $p$ over the eleven
-models. The slope holds after correction for five of them.}
+models. The slope holds after correction for three of them.}
 \label{tab:depth_model}
 \end{table*}
 % END GENERATED tab:depth_model

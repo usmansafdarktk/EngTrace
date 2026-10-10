@@ -5,7 +5,8 @@ review 2 W3, Q3, Q4). What MC measures, and whether its one top-tier separation 
                                                                # results/sections/coverage_variants.md
     python -m full_run_28092026.coverage_variants --quick      # 1,000 resamples, 10,000 permutations; QUICK in both files
     python -m full_run_28092026.coverage_variants --selftest   # e5_strict reproduced for every stored response, the
-                                                               # variants and the regression on hand-made data; writes nothing
+                                                               # variants, the regression and the matched family on
+                                                               # hand-made data; writes nothing
     python -m full_run_28092026.coverage_variants --render     # the section again from the JSON written; computes nothing
 
 Reads scores/<store>/<model>.jsonl (score.py: E3's `reached` per milestone, the answer row's `targets`, the token
@@ -62,6 +63,13 @@ MC AGAINST REASONING TOKENS (descriptive): per model, its responses with a value
 reasoning_tokens within the model (ranks, ties in row order), MC as scored per quartile, the median tokens and the
 share of empty responses per quartile, at the default store where the model reasons there (reasoning tokens on at
 least 90% of its rows) and otherwise at its reasoning store.
+
+MATCHED SETTINGS (the headline configuration, key `matched`): each model at its reasoning store where
+matched_config.json names one, else at its default store, whose responses are the same in both configurations. The
+family again on that selection, in the default family's shapes: the templates on which every model has a value under
+each reading, the per-model summaries (seeds by the model's place in the roster, so an unchanged model's values equal
+its default ones, asserted), the 55 pairs with Holm per reading, the separation rule, the verbosity model over the
+matched responses and the reasoning-token quartiles, each model at its matched store. The default family stays as it is.
 
 QUICK MODE (--quick or ENGTRACE_QUICK=1): 1,000 bootstrap draws and 10,000 sign flips instead of analyze's 10,000
 and 100,000; both outputs say QUICK. The integration pass runs without it.
@@ -121,6 +129,11 @@ def roster() -> list[dict]:
         out.append({'key': m['model'], 'default': m['default_store'],
                     'reasoning': rs if rs and (score.SCORES / rs / f"{m['model']}.jsonl").exists() else None})
     return out
+
+
+def matched_store(m: dict) -> str:
+    """A roster entry's store at matched settings: its reasoning store where there is one, else its default."""
+    return m['reasoning'] or m['default']
 
 
 # ------------------------------------------------------------------ one response
@@ -233,6 +246,20 @@ def summary(rows: dict, vals: dict, c: np.ndarray, use: np.ndarray, v: str, i: i
             'responses': sum(1 for r in rows.values() if f(r) is not None)}
 
 
+def left_out(vals: dict) -> int:
+    """Responses with a value as scored and none route-adjusted (the judge rules all their milestones not needed)."""
+    return sum(1 for x in vals.values() if x['as_scored'] is not None and x['route_adjusted'] is None)
+
+
+def family(keys: list[str], got: dict, templates: list[str], draws: int) -> tuple[dict, dict, dict, dict]:
+    """One configuration (got: model -> (rows, vals)): per reading, the models-by-templates matrix, the templates on
+    which every model has a value, each model's summaries (seeds by its place in keys) and the pairs."""
+    C = {v: np.vstack([matrix(*got[k], v, templates) for k in keys]) for v in VARIANTS}
+    use = {v: ~np.isnan(C[v]).any(axis=0) for v in VARIANTS}
+    summ = {k: {v: summary(*got[k], C[v][i], use[v], v, i) for v in VARIANTS} for i, k in enumerate(keys)}
+    return C, use, summ, {v: pairs(C[v], use[v], keys, draws) for v in VARIANTS}
+
+
 def pairs(C: np.ndarray, use: np.ndarray, keys: list[str], draws: int) -> list[dict]:
     """q3_coverage's pairs: seeds 6000 + n (interval) and 7000 + n (sign flips), Holm over the family."""
     out = []
@@ -294,6 +321,17 @@ def fe_fit(y, X, cell, cluster, n_clusters, draws: int, seed: int) -> dict:
     W = np.stack([np.bincount(rng.integers(0, n_clusters, n_clusters), minlength=n_clusters) for _ in range(draws)])
     bb = np.linalg.solve(np.einsum('bt,tij->bij', W, Sxx), np.einsum('bt,ti->bi', W, Sxy)[..., None])[..., 0]
     return {'beta': beta.tolist(), 'ci': [analyze.pct(bb[:, j]) for j in range(X.shape[1])]}
+
+
+def verbosity_rows(key: str, rows: dict, vals: dict, texts: dict) -> list[dict]:
+    """The verbosity model's rows for one model: its readable responses with a value, in store order."""
+    return [{'model': key, 'template': r['template_id'], 'mc': vals[i]['as_scored'], 'numbers': numbers_shown(texts[i]),
+             'tokens': visible_tokens(r)} for i, r in rows.items() if not r['unusable'] and vals[i]['as_scored'] is not None]
+
+
+def floored(got: dict, keys: list[str]) -> dict:
+    return {k: sum(1 for r in got[k][0].values() if (r.get('completion_tokens') or 0) < (r.get('reasoning_tokens') or 0))
+            for k in keys}
 
 
 def verbosity(data: list[dict], draws: int) -> dict:
@@ -375,19 +413,18 @@ def run(quick: bool) -> dict:
         if set(rows) != set(ref):
             raise SystemExit(f'{k}: its default store holds a different item set')
     templates = sorted({r['template_id'] for r in ref.values()})
-    C = {v: np.vstack([matrix(*default[k], v, templates) for k in keys]) for v in VARIANTS}
-    use = {v: ~np.isnan(C[v]).any(axis=0) for v in VARIANTS}
+    C, use, summ, fam = family(keys, default, templates, draws_test)
 
     reasoning = {m['key']: store_values(m['reasoning'], m['key'], ms_all, targets) for m in ros if m['reasoning']}
+    for k, (rows, _v) in reasoning.items():
+        if set(rows) != set(ref):
+            raise SystemExit(f'{k}: its reasoning store holds a different item set')
     models = {}
     for i, m in enumerate(ros):
         k = m['key']
         rows, vals = default[k]
-        block = {v: summary(rows, vals, C[v][i], use[v], v, i) for v in VARIANTS}
-        block['store'] = m['default']
-        block['route_adjusted_left_out'] = sum(1 for x in vals.values()
-                                               if x['as_scored'] is not None and x['route_adjusted'] is None)
-        block['sources'] = source_counts(m['default'], k, vals)
+        block = {**summ[k], 'store': m['default'], 'route_adjusted_left_out': left_out(vals),
+                 'sources': source_counts(m['default'], k, vals)}
         if m['reasoning']:
             rr, rv = reasoning[k]
             block['matched_store'] = {'store': m['reasoning'],
@@ -396,20 +433,11 @@ def run(quick: bool) -> dict:
             block['matched_store'] = None
         models[k] = block
 
-    fam = {v: pairs(C[v], use[v], keys, draws_test) for v in VARIANTS}
-
-    data = []
-    for k in keys:
-        rows, vals = default[k]
-        texts = score.texts_matching(ros[keys.index(k)]['default'], k, rows.values())
-        for i, r in rows.items():
-            if r['unusable'] or vals[i]['as_scored'] is None:
-                continue
-            data.append({'model': k, 'template': r['template_id'], 'mc': vals[i]['as_scored'],
-                         'numbers': numbers_shown(texts[i]), 'tokens': visible_tokens(r)})
-    verb = verbosity(data, analyze.B)
-    verb['tokens_floored'] = {k: sum(1 for r in default[k][0].values()
-                                     if (r.get('completion_tokens') or 0) < (r.get('reasoning_tokens') or 0)) for k in keys}
+    vrows = {m['key']: verbosity_rows(m['key'], *default[m['key']],
+                                      score.texts_matching(m['default'], m['key'], default[m['key']][0].values()))
+             for m in ros}
+    verb = verbosity([d for k in keys for d in vrows[k]], analyze.B)
+    verb['tokens_floored'] = floored(default, keys)
 
     rq = {}
     for m in ros:
@@ -423,6 +451,28 @@ def run(quick: bool) -> dict:
         else:
             rq[k] = None
 
+    mstores = {m['key']: matched_store(m) for m in ros}
+    matched = {k: reasoning[k] if k in reasoning else default[k] for k in keys}
+    _Cm, use_m, summ_m, fam_m = family(keys, matched, templates, draws_test)
+    m_models = {}
+    for k in keys:
+        rows, vals = matched[k]
+        if k in reasoning:
+            same = [v for v in VARIANTS if (use_m[v] == use[v]).all()]
+            assert all(jsonable(summ_m[k][v]) == jsonable(models[k]['matched_store'][v]) for v in same), k
+        else:
+            assert jsonable(summ_m[k]) == jsonable(summ[k]), f'{k}: unchanged at matched settings, yet its values differ'
+        m_models[k] = {**summ_m[k], 'store': mstores[k], 'route_adjusted_left_out': left_out(vals),
+                       'sources': source_counts(mstores[k], k, vals)}
+    m_vrows = {k: verbosity_rows(k, *matched[k], score.texts_matching(mstores[k], k, matched[k][0].values()))
+               if k in reasoning else vrows[k] for k in keys}
+    m_verb = verbosity([d for k in keys for d in m_vrows[k]], analyze.B)
+    m_verb['tokens_floored'] = floored(matched, keys)
+    m_rq = {}
+    for k in keys:
+        got = reasoning_quartiles(*matched[k])
+        m_rq[k] = {'store': mstores[k], **got} if got else None
+
     return {'quick': quick, 'draws': {'bootstrap': analyze.B, 'sign_flips': draws_test},
             'rule': {**target_rule(ms_all, targets, ref),
                      'route_adjusted': ('(e3 + REACHED) / (n - NOT_NEEDED); a response whose milestones the judge '
@@ -434,6 +484,13 @@ def run(quick: bool) -> dict:
             'separation_rule': separation(fam),
             'verbosity': verb,
             'reasoning_tokens': rq,
+            'matched': {'templates': {v: int(use_m[v].sum()) for v in VARIANTS},
+                        'models': m_models,
+                        'pairs': fam_m,
+                        'separation_rule': separation(fam_m),
+                        'verbosity': m_verb,
+                        'reasoning_tokens': m_rq,
+                        'stores': mstores},
             'provenance': provenance({s for s, _k in stores})}
 
 
@@ -449,6 +506,111 @@ def ci(c) -> str:
 
 def pfmt(p) -> str:
     return f'{p:.4f}' if p >= 0.0001 else f'{p:.1e}'
+
+
+def coverage_rows(models: dict, keys: list[str], store: bool = False) -> list[str]:
+    """The per-model table's rows: each reading with its interval, then the wrong-answer means."""
+    return [f'| {k} | ' + (f'{models[k]["store"]} | ' if store else '')
+            + ' | '.join(f'{f3(models[k][v]["all"])} {ci(models[k][v]["ci"])}' for v in VARIANTS) + ' | '
+            + ' | '.join(f3(models[k][v]['wrong']) for v in VARIANTS) + f' | {models[k]["as_scored"]["wrong_n"]} |'
+            for k in keys]
+
+
+def separation_lines(sep: dict | None, where: str) -> list[str]:
+    if sep is None:
+        return [f'Claude Sonnet 5 or DeepSeek V4.1 Flash is missing from {where}; the rule is not evaluated.']
+    L = [f'Claude Sonnet 5 minus DeepSeek V4.1 Flash, Holm-adjusted p over each reading\'s 55 pairs: '
+         + '; '.join(f'{LABEL[v]} {sep["diff"][v]:+.3f}, p = {pfmt(sep[v])}' for v in VARIANTS) + '. ']
+    sign = np.sign(sep['diff']['as_scored'])
+    ok = {v: sep[v] < 0.05 and np.sign(sep['diff'][v]) == sign for v in ('as_scored', 'matching_only', 'route_adjusted')}
+    said = lambda vs: ' and '.join(f'{LABEL[v]} (p = {pfmt(sep[v])})' for v in vs)
+    yes, no = [v for v in ok if ok[v]], [v for v in ok if not ok[v]]
+    if sep['holds']:
+        L.append(f'**The separation holds**: the pair separates after Holm, in one direction, under {said(yes)}.')
+    else:
+        got = f'separates after Holm under {said(yes)} but not under ' if yes else 'does not separate after Holm under '
+        L.append(f'**The separation does not hold**: the pair {got}{said(no)}, so the results sentence does not '
+                 'claim it.')
+    return L
+
+
+def pair_lines(P: dict) -> list[str]:
+    """The 55 pairs under each reading: the count separated, the table, the detectable difference."""
+    L = ['Difference a minus b in the mean of template means, Holm-adjusted sign-flip p within each reading\'s family. '
+         'Pairs separated at 0.05: ' + ', '.join(f'{LABEL[v]} {sum(p["p_holm"] < 0.05 for p in P[v])}'
+                                                 for v in VARIANTS) + '.', '',
+         '| a | b | ' + ' | '.join(f'{LABEL[v]}: diff | p Holm' for v in VARIANTS) + ' |',
+         '|---|---|' + '---|---|' * len(VARIANTS)]
+    for n in range(len(P['as_scored'])):
+        ps = [P[v][n] for v in VARIANTS]
+        L.append(f'| {ps[0]["a"]} | {ps[0]["b"]} | ' + ' | '.join(
+            f'{p["diff"]:+.3f} | {pfmt(p["p_holm"])}{"*" if p["p_holm"] < 0.05 else ""}' for p in ps) + ' |')
+    L += ['', 'Smallest detectable difference (80% power, at the strictest Holm step), median over the 55 pairs: '
+          + ', '.join(f'{LABEL[v]} {np.median([p["detectable_holm"] for p in P[v]]):.3f}' for v in VARIANTS) + '.']
+    return L
+
+
+def verbosity_text(vb: dict) -> str:
+    w = vb['within_model']
+    return (f'Response-level least squares of MC as scored on the numeric values shown and the visible completion tokens, '
+            f'template fixed effects, pooled over {len(vb["per_model"])} models ({vb["responses"]:,} readable responses, '
+            f'{vb["templates"]} templates); 95% intervals resample templates. Per 10 numeric values: '
+            f'{vb["slope_numbers"]:+.4f} {ci4(vb["ci"])}; per 1,000 visible tokens: {vb["slope_tokens"]:+.4f} '
+            f'{ci4(vb["ci_tokens"])}. Within model and template (template-by-model fixed effects): '
+            f'{w["slope_numbers"]:+.4f} {ci4(w["ci"])} and {w["slope_tokens"]:+.4f} {ci4(w["ci_tokens"])}. '
+            f'Interquartile range of the count: {vb["iqr_numbers"][0]:.0f} to {vb["iqr_numbers"][1]:.0f}; of visible '
+            f'tokens: {vb["iqr_tokens"][0]:,.0f} to {vb["iqr_tokens"][1]:,.0f}. Spearman across the models\' means '
+            f'(MC against the mean count): {vb["spearman_between_models"]:+.3f}. Rows with more reasoning than completion '
+            f'tokens, floored at zero visible tokens: '
+            + ', '.join(f'{k} {n}' for k, n in vb['tokens_floored'].items() if n) + '.')
+
+
+def matched_lines(res: dict) -> list[str]:
+    """The "Matched settings" subsection: the family again with each model at its matched store."""
+    M, keys = res['matched'], res['keys']
+    mm, D = M['models'], res['pairs']
+    rerun = [k for k in keys if M['stores'][k] != res['models'][k]['store']]
+    add = [mm[k]['as_scored']['all'] - mm[k]['matching_only']['all'] for k in keys]
+    L = ['', '### Matched settings', '',
+         'Each model at its reasoning setting where its endpoint offers one, else at its default: '
+         + ', '.join(f'{k} at `{M["stores"][k]}`' for k in rerun) + '; the other '
+         f'{len(keys) - len(rerun)} at their default store, the same responses as above (their values are asserted '
+         'equal to the default family\'s). The same readings, seeds and tests as above. Templates in each reading\'s '
+         'comparison: ' + ', '.join(f'{LABEL[v]} {M["templates"][v]}' for v in VARIANTS) + '. The judge adds '
+         f'{min(add):.3f} to {max(add):.3f} to a model\'s MC over matching alone. Route-adjusted, responses left out: '
+         + ', '.join(f'{k} {mm[k]["route_adjusted_left_out"]}' for k in keys) + '.', '',
+         '| model | store | as scored | matching alone | route-adjusted | intermediate-only | wrong: as scored | wrong: matching | wrong: route-adj. | wrong: interm. | wrong n |',
+         '|---|---|---|---|---|---|---|---|---|---|---|'] + coverage_rows(mm, keys, store=True)
+    L += ['', '#### The separation rule at matched settings', '']
+    L += separation_lines(M['separation_rule']['claude_vs_deepseek'], 'the matched stores')
+    L += ['', '#### The 55 pairs at matched settings', '']
+    for v in VARIANTS:
+        sep = {(p['a'], p['b']) for p in M['pairs'][v] if p['p_holm'] < 0.05}
+        was = {(p['a'], p['b']) for p in D[v] if p['p_holm'] < 0.05}
+        name = lambda s: ', '.join(f'{a} vs {b}' for a, b in sorted(s)) or 'none'
+        L.append(f'- {LABEL[v]}: {len(sep)} of {len(M["pairs"][v])} separated after Holm; separated here but not in '
+                 f'the default family: {name(sep - was)}; there but not here: {name(was - sep)}.')
+    L += [''] + pair_lines(M['pairs'])
+    L += ['', '#### Verbosity at matched settings', '', verbosity_text(M['verbosity'])]
+    if M['reasoning_tokens'] == res['reasoning_tokens']:
+        L += ['', 'MC against reasoning tokens: the quartiles above, each already at its model\'s matched store.']
+    else:
+        L += ['', '#### MC against reasoning tokens at matched settings', ''] + rq_lines(M['reasoning_tokens'], keys)
+    return L
+
+
+def rq_lines(rq: dict, keys: list[str]) -> list[str]:
+    L = ['| model | store | Q1 | Q2 | Q3 | Q4 | median tokens Q1 to Q4 | empty Q1 to Q4 | Spearman |',
+         '|---|---|---|---|---|---|---|---|---|']
+    for k in keys:
+        x = rq[k]
+        if x is None:
+            L.append(f'| {k} | | no reasoning tokens in any store | | | | | | |')
+            continue
+        L.append(f'| {k} | {x["store"]} | ' + ' | '.join(f3(x[f"q{j}"]) for j in range(1, 5)) + ' | '
+                 + ', '.join(f'{t:,.0f}' for t in x['tokens_median']) + ' | '
+                 + ', '.join(f'{e:.3f}' for e in x['empty_share']) + f' | {x["spearman"]:+.3f} |')
+    return L
 
 
 def render(res: dict) -> str:
@@ -473,11 +635,7 @@ def render(res: dict) -> str:
          + ', '.join(f'{k} {res["models"][k]["sources"]["not_needed_share_of_unmatched"]:.3f} '
                      f'({res["models"][k]["sources"]["unmatched"]:,})' for k in keys) + '.', '',
          '| model | as scored | matching alone | route-adjusted | intermediate-only | wrong: as scored | wrong: matching | wrong: route-adj. | wrong: interm. | wrong n |',
-         '|---|---|---|---|---|---|---|---|---|---|']
-    for k in keys:
-        b = res['models'][k]
-        L.append(f'| {k} | ' + ' | '.join(f'{f3(b[v]["all"])} {ci(b[v]["ci"])}' for v in VARIANTS) + ' | '
-                 + ' | '.join(f3(b[v]['wrong']) for v in VARIANTS) + f' | {b["as_scored"]["wrong_n"]} |')
+         '|---|---|---|---|---|---|---|---|---|---|'] + coverage_rows(res['models'], keys)
     rs = [k for k in keys if res['models'][k]['matched_store']]
     if rs:
         L += ['', 'At the reasoning store `matched_config.json` names (same templates):', '',
@@ -487,49 +645,11 @@ def render(res: dict) -> str:
             b = res['models'][k]['matched_store']
             L.append(f'| {k} | {b["store"]} | ' + ' | '.join(f'{f3(b[v]["all"])} {ci(b[v]["ci"])}' for v in VARIANTS)
                      + f' | {f3(b["as_scored"]["wrong"])} | {b["as_scored"]["wrong_n"]} |')
-    sep = res['separation_rule']['claude_vs_deepseek']
-    L += ['', '### The separation rule', '']
-    if sep is None:
-        L.append('Claude Sonnet 5 or DeepSeek V4.1 Flash is missing from the default stores; the rule is not evaluated.')
-    else:
-        L.append(f'Claude Sonnet 5 minus DeepSeek V4.1 Flash, Holm-adjusted p over each reading\'s 55 pairs: '
-                 + '; '.join(f'{LABEL[v]} {sep["diff"][v]:+.3f}, p = {pfmt(sep[v])}' for v in VARIANTS) + '. ')
-        sign = np.sign(sep['diff']['as_scored'])
-        ok = {v: sep[v] < 0.05 and np.sign(sep['diff'][v]) == sign for v in ('as_scored', 'matching_only', 'route_adjusted')}
-        said = lambda vs: ' and '.join(f'{LABEL[v]} (p = {pfmt(sep[v])})' for v in vs)
-        yes, no = [v for v in ok if ok[v]], [v for v in ok if not ok[v]]
-        if sep['holds']:
-            L.append(f'**The separation holds**: the pair separates after Holm, in one direction, under {said(yes)}.')
-        else:
-            got = f'separates after Holm under {said(yes)} but not under ' if yes else 'does not separate after Holm under '
-            L.append(f'**The separation does not hold**: the pair {got}{said(no)}, so the results sentence does not '
-                     'claim it.')
-    L += ['', '### The 55 pairs under each reading', '',
-          'Difference a minus b in the mean of template means, Holm-adjusted sign-flip p within each reading\'s family. '
-          'Pairs separated at 0.05: ' + ', '.join(f'{LABEL[v]} {sum(p["p_holm"] < 0.05 for p in res["pairs"][v])}'
-                                                  for v in VARIANTS) + '.', '',
-          '| a | b | ' + ' | '.join(f'{LABEL[v]}: diff | p Holm' for v in VARIANTS) + ' |',
-          '|---|---|' + '---|---|' * len(VARIANTS)]
-    for n in range(len(res['pairs']['as_scored'])):
-        ps = [res['pairs'][v][n] for v in VARIANTS]
-        L.append(f'| {ps[0]["a"]} | {ps[0]["b"]} | ' + ' | '.join(
-            f'{p["diff"]:+.3f} | {pfmt(p["p_holm"])}{"*" if p["p_holm"] < 0.05 else ""}' for p in ps) + ' |')
-    L += ['', 'Smallest detectable difference (80% power, at the strictest Holm step), median over the 55 pairs: '
-          + ', '.join(f'{LABEL[v]} {np.median([p["detectable_holm"] for p in res["pairs"][v]]):.3f}' for v in VARIANTS) + '.']
+    L += ['', '### The separation rule', ''] + separation_lines(res['separation_rule']['claude_vs_deepseek'],
+                                                                 'the default stores')
+    L += ['', '### The 55 pairs under each reading', ''] + pair_lines(res['pairs'])
     vb = res['verbosity']
-    w = vb['within_model']
-    L += ['', '### Verbosity', '',
-          f'Response-level least squares of MC as scored on the numeric values shown and the visible completion tokens, '
-          f'template fixed effects, pooled over {len(vb["per_model"])} models ({vb["responses"]:,} readable responses, '
-          f'{vb["templates"]} templates); 95% intervals resample templates. Per 10 numeric values: '
-          f'{vb["slope_numbers"]:+.4f} {ci4(vb["ci"])}; per 1,000 visible tokens: {vb["slope_tokens"]:+.4f} '
-          f'{ci4(vb["ci_tokens"])}. Within model and template (template-by-model fixed effects): '
-          f'{w["slope_numbers"]:+.4f} {ci4(w["ci"])} and {w["slope_tokens"]:+.4f} {ci4(w["ci_tokens"])}. '
-          f'Interquartile range of the count: {vb["iqr_numbers"][0]:.0f} to {vb["iqr_numbers"][1]:.0f}; of visible '
-          f'tokens: {vb["iqr_tokens"][0]:,.0f} to {vb["iqr_tokens"][1]:,.0f}. Spearman across the models\' means '
-          f'(MC against the mean count): {vb["spearman_between_models"]:+.3f}. Rows with more reasoning than completion '
-          f'tokens, floored at zero visible tokens: '
-          + ', '.join(f'{k} {n}' for k, n in vb['tokens_floored'].items() if n) + '.', '',
+    L += ['', '### Verbosity', '', verbosity_text(vb), '',
           'The within-model Spearman is over a model\'s readable responses with no template control, so it mixes in '
           'the templates\' difficulty (a harder template draws a longer response and a lower MC); the regression\'s '
           'fixed effects remove that.', '',
@@ -541,17 +661,9 @@ def render(res: dict) -> str:
                  f'{pm["tokens_median"]:,.0f} | {vb["spearman_within"][k]:+.3f} | {vb["spearman_within_tokens"][k]:+.3f} |')
     L += ['', '### MC against reasoning tokens (descriptive)', '',
           'Quartiles of reasoning tokens within each model; MC as scored per quartile (item mean), the median reasoning '
-          'tokens and the share of empty responses per quartile.', '',
-          '| model | store | Q1 | Q2 | Q3 | Q4 | median tokens Q1 to Q4 | empty Q1 to Q4 | Spearman |',
-          '|---|---|---|---|---|---|---|---|---|']
-    for k in keys:
-        x = res['reasoning_tokens'][k]
-        if x is None:
-            L.append(f'| {k} | | no reasoning tokens in any store | | | | | | |')
-            continue
-        L.append(f'| {k} | {x["store"]} | ' + ' | '.join(f3(x[f"q{j}"]) for j in range(1, 5)) + ' | '
-                 + ', '.join(f'{t:,.0f}' for t in x['tokens_median']) + ' | '
-                 + ', '.join(f'{e:.3f}' for e in x['empty_share']) + f' | {x["spearman"]:+.3f} |')
+          'tokens and the share of empty responses per quartile.', ''] + rq_lines(res['reasoning_tokens'], keys)
+    if res.get('matched'):
+        L += matched_lines(res)
     return '\n'.join(L) + '\n'
 
 
@@ -646,6 +758,57 @@ def selftest() -> int:
     fam = [{'a': PAIR[1], 'b': PAIR[0], 'diff': -0.02, 'ci': [-0.03, -0.01], 'p_holm': 0.01}]
     assert find_pair(fam, *PAIR)['diff'] == 0.02 and find_pair(fam, *PAIR)['ci'] == [0.01, 0.03]
     print('quartiles and the pair lookup: ok')
+
+    # 6. The matched family on hand-made data: three models over twelve templates, the third re-run with reasoning
+    #    (higher coverage, reasoning tokens). Template t00 has no route-adjusted value anywhere, so that reading
+    #    compares eleven. The two unchanged models keep their summaries and their pair; the third's change.
+    def store6(shift: float, seed: int, think: bool) -> tuple[dict, dict]:
+        g = np.random.default_rng(seed)
+        rows, vals = {}, {}
+        for t in range(12):
+            for j in range(3):
+                i, x = f't{t:02d}#{j}', float(np.clip(g.uniform(0.2, 0.8) + shift, 0, 1))
+                rows[i] = {'item_id': i, 'template_id': f't{t:02d}', 'unusable': False, 'score': int(j == 0),
+                           'status': 'answered', 'completion_tokens': 400 + 50 * j * j + (900 if think else 0),
+                           'reasoning_tokens': 900 + 10 * t if think else 0}
+                vals[i] = {'as_scored': x, 'matching_only': 0.8 * x, 'route_adjusted': x if t else None,
+                           'intermediate_only': 0.9 * x}
+        return rows, vals
+    ros6 = [{'key': PAIR[0], 'default': 'main', 'reasoning': None},
+            {'key': PAIR[1], 'default': 'main', 'reasoning': None},
+            {'key': 'gpt-5.4-mini', 'default': 'main', 'reasoning': 'reasoning-medium-full'}]
+    keys6 = [m['key'] for m in ros6]
+    assert [matched_store(m) for m in ros6] == ['main', 'main', 'reasoning-medium-full']
+    default6 = {PAIR[0]: store6(0.1, 1, True), PAIR[1]: store6(0.0, 2, True), 'gpt-5.4-mini': store6(-0.2, 3, False)}
+    matched6 = {**default6, 'gpt-5.4-mini': store6(0.0, 4, True)}
+    tpl6 = sorted({r['template_id'] for r in default6[PAIR[0]][0].values()})
+    _C, use_d, sd, fd = family(keys6, default6, tpl6, 2_000)
+    Cm, use_m, sm, fm = family(keys6, matched6, tpl6, 2_000)
+    assert all(use_d[v].sum() == use_m[v].sum() == (11 if v == 'route_adjusted' else 12) for v in VARIANTS)
+    assert all(jsonable(sm[k]) == jsonable(sd[k]) for k in PAIR), 'an unchanged model moved at matched settings'
+    rr, rv = matched6['gpt-5.4-mini']
+    direct = np.mean([np.mean([rv[i]['as_scored'] for i in rr if rr[i]['template_id'] == t]) for t in tpl6])
+    assert np.isclose(sm['gpt-5.4-mini']['as_scored']['all'], direct)
+    assert sm['gpt-5.4-mini']['as_scored']['all'] > sd['gpt-5.4-mini']['as_scored']['all'] + 0.1
+    for v in VARIANTS:
+        a, b = fd[v][0], fm[v][0]               # pair 0 is the two unchanged models
+        assert (a['a'], a['b']) == PAIR and all(a[x] == b[x] for x in ('diff', 'ci', 'p')), (v, a, b)
+        assert fd[v][1]['diff'] != fm[v][1]['diff']
+    sep6 = separation(fm)['claude_vs_deepseek']
+    assert all(sep6[v] == find_pair(fm[v], *PAIR)['p_holm'] for v in VARIANTS)
+    texts6 = {k: {i: ', '.join(f'{"abcde"[n]} = {n + 1}.5 m' for n in range(int(i[-1]) + 1 + h)) for i in matched6[k][0]}
+              for h, k in enumerate(keys6)}
+    vd = {k: verbosity_rows(k, *default6[k], texts6[k]) for k in keys6}
+    vm = {**vd, 'gpt-5.4-mini': verbosity_rows('gpt-5.4-mini', *matched6['gpt-5.4-mini'], texts6['gpt-5.4-mini'])}
+    assert [d['numbers'] for d in vm['gpt-5.4-mini']] == [3, 4, 5] * 12 and vm['gpt-5.4-mini'][2]['tokens'] == 600
+    vb_d = verbosity([d for k in keys6 for d in vd[k]], 200)
+    vb_m = verbosity([d for k in keys6 for d in vm[k]], 200)
+    assert all(vb_d['per_model'][k] == vb_m['per_model'][k] for k in PAIR) and vb_m['responses'] == 108
+    assert vb_m['per_model']['gpt-5.4-mini']['mc'] > vb_d['per_model']['gpt-5.4-mini']['mc']
+    assert floored(matched6, keys6) == dict.fromkeys(keys6, 0)
+    assert reasoning_quartiles(*default6['gpt-5.4-mini']) is None and reasoning_quartiles(*matched6['gpt-5.4-mini'])
+    print('the matched family on hand-made data: the unchanged models keep their summaries, their pair (diff, '
+          'interval, p) and their verbosity rows; the re-run model\'s matrix row, pairs, fit and quartiles change')
     print('selftest passed')
     return 0
 

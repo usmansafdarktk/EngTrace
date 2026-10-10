@@ -152,7 +152,6 @@ assert all(dec[k]["reasoning_tokens"]["max"] == 0 for k in no_reasoning)
 no_reasoning = alpha(k for k in open_ if k in no_reasoning) + alpha(k for k in closed if k in no_reasoning)
 reasoning = [k for k in roster if k not in no_reasoning]
 medians = [dec[k]["reasoning_tokens"]["median"] for k in reasoning]
-closed_without = sum(k in closed for k in no_reasoning)
 assert NO_THINKING in no_reasoning
 assert min(dec[k]["reasoning_tokens"]["share_above_zero"] for k in reasoning) >= 0.99, "nearly every response"
 
@@ -184,6 +183,12 @@ assert all(n <= dec_r[k]["finish_reasons"].get("length", 0) for k, n in rerun_em
 # ---------------------------------------------------------------- responses without a readable final answer
 unusable = sum(m["unusable"] for m in q1.values())
 empty = sum(m["empty"] for m in q1.values())
+# At matched settings (results/matched.json, analyze.py's matched family): the configuration the paper reports.
+matched = load(HERE / "results/matched.json")
+assert set(matched["models"]) == set(roster) and all(matched["models"][k]["store"] != "main" for k in rerun)
+unusable_m = sum(matched["models"][k]["no_readable_answer_n"] for k in roster)
+empty_m = sum(matched["models"][k]["empty_n"] for k in roster)
+assert empty_m >= 0.95 * unusable_m, "almost all responses without an answer are empty at the ceiling (matched)"
 # A response that stops at the ceiling is either scored on the text it has (counted as capped) or empty.
 at_ceiling = {k: dec[k]["finish_reasons"].get("length", 0) - q1[k]["capped_scored"] for k in roster}
 assert all(0 <= at_ceiling[k] <= q1[k]["empty"] for k in roster), at_ceiling
@@ -241,6 +246,12 @@ MIN_MATCHED = 20  # the providers table's threshold for an endpoint whose differ
 assert all(r["few_matched"] == (r["templates_matched"] < MIN_MATCHED) for r in providers if r.get("matched_diff") is not None)
 readable_endpoints = [r for r in providers if not r["few_matched"] and r.get("matched_diff") is not None]
 endpoint_diffs = [r["matched_diff"] for r in readable_endpoints]
+# At matched settings the re-run models' responses come from their reasoning store's endpoints (matched.json's
+# providers_reasoning, the same export); the other models' endpoints are those of the main run.
+providers_m = [r for r in providers if r["model"] not in rerun] + matched["providers_reasoning"]
+assert all(r["few_matched"] == (r["templates_matched"] < MIN_MATCHED) for r in providers_m if r.get("matched_diff") is not None)
+readable_endpoints_m = [r for r in providers_m if not r["few_matched"] and r.get("matched_diff") is not None]
+endpoint_diffs_m = [r["matched_diff"] for r in readable_endpoints_m]
 
 
 def sgn(x: float) -> str:
@@ -254,19 +265,21 @@ phrases = [  # Section 5.1
     f"{WORD[len(anchors)].capitalize()} flagships, {series(anchors, cite=True)}, run only as anchors on a fixed subset "
     f"of {subset} instances ({WORD[subset // len(per_template)]} per template), which the further experiments also "
     "use",
-    f"Each model answers each instance once ({thousands(rows)} responses) with the same zero-shot prompt and no "
-    f"tools or retrieval, at its provider's default decoding settings and an output ceiling of {thousands(ceiling)} "
-    f"tokens ({thousands(lower['muse-glimmer-30b'])} for {tt('muse-glimmer-30b')})",
-    f"{WORD[len(no_reasoning)]} models return no reasoning tokens ({series(no_reasoning)}, "
-    f"{WORD[closed_without]} of the {WORD[len(closed)]} closed models), so the defaults do not compare the models at "
-    "equal reasoning effort",
-    f"{unusable} responses ({100 * unusable / rows:.1f}\\%) have no readable final answer and score 0, almost all "
-    "of them empty at the output ceiling",
-    f"{series(rerun)} also answer every instance with reasoning at {effort} effort ({thousands(rerun_rows)} responses)",
+    f"We evaluate the models at matched settings, each with the same zero-shot prompt, no tools or retrieval, and an "
+    f"output ceiling of {thousands(ceiling)} tokens ({thousands(lower['muse-glimmer-30b'])} for "
+    f"{tt('muse-glimmer-30b')})",
+    f"reasoning is on wherever the endpoint offers it, so {WORD[len(reasoning)]} models reason at their providers' "
+    "defaults",
+    f"{series(rerun)} answer every instance with reasoning at {effort} effort",
     f"{tt(NO_THINKING)}, whose endpoint offers no reasoning setting, keeps its default",
+    f"Each model answers each instance once ({thousands(rows)} responses); the {WORD[len(rerun)]} models' responses at "
+    f"their providers' defaults, where they return no reasoning tokens ({thousands(rerun_rows)} responses), are the "
+    "comparison",
+    f"{unusable_m} responses ({100 * unusable_m / rows:.1f}\\%) have no readable final answer and score 0, almost all "
+    "of them empty at the output ceiling",
     f"because a template's {k_inst} instances and their gold traces come from one procedure",
     f"every {level}\\% interval is a bootstrap over templates",
-    f"such as the {comb(len(roster), 2)} pairs of models in one configuration",
+    f"such as the {comb(len(roster), 2)} pairs of models at one setting",
 ]
 appendix_phrases = [  # appendices/models.tex
     f"The first condition excludes, among others, the {WORD[len(study)]} models of the expert study "
@@ -287,7 +300,11 @@ appendix_phrases = [  # appendices/models.tex
     f"with reasoning on, {tt(k)} leaves {n} of its {thousands(dec_r[k]['rows'])} responses empty at the output ceiling"
     for k, n in sorted(rerun_empty.items())
 ] + [
-    f"Per model over its {thousands(len(manifest))} responses",
+    f"The other {WORD[len(roster) - len(rerun)]} models have the same responses at both settings: "
+    f"{WORD[len(reasoning)]} reason by default",
+    f"Per model over its {thousands(len(manifest))} responses at matched settings",
+    f"the bottom block gives the {WORD[len(rerun)]} models that return no reasoning tokens at their providers' "
+    "defaults on their responses there",
     f"every template has {k_inst} instances, so Final Answer Accuracy over the {thousands(len(manifest))} instances "
     f"equals the mean of the {len(per_template)} template means",
     f"every {level}\\% interval is a percentile bootstrap that resamples templates {thousands(B)} times, and a "
@@ -301,8 +318,8 @@ appendix_phrases = [  # appendices/models.tex
     f"a level gap ${factor}\\,\\sigma\\sqrt{{1/{levels['Easy']} + 1/{levels['Advanced']}}}$",
     f"a change counts as bounded when its {level90}\\% interval lies within $\\pm {margin:.2f}$, which is two "
     f"one-sided tests at {round(100 * sig)}\\%",
-    f"Over the {len(readable_endpoints)} endpoints matched on at least {MIN_MATCHED} templates, these differences lie between "
-    f"{sgn(min(endpoint_diffs))} and {sgn(max(endpoint_diffs))}",
+    f"Over the {len(readable_endpoints_m)} endpoints matched on at least {MIN_MATCHED} templates, these differences lie between "
+    f"{sgn(min(endpoint_diffs_m))} and {sgn(max(endpoint_diffs_m))}",
 ]
 
 
@@ -312,15 +329,17 @@ def models_row(k: str) -> str:
         rf"\texttt{{{weights}}}" if weights else "--") + r" \\"
 
 
-def decoding_row(k: str) -> str:
-    d = dec[k]
-    return (rf"{tt(k)} & {thousands(d['max_tokens'])} & {len(d['providers'])} & "
+def decoding_row(k: str, d: dict | None = None, mark: str = "") -> str:
+    d = dec[k] if d is None else d
+    return (rf"{tt(k)}{mark} & {thousands(d['max_tokens'])} & {len(d['providers'])} & "
             f"{tokens(d['completion_tokens']['median'])} / {tokens(d['completion_tokens']['p90'])} & "
             f"{tokens(d['reasoning_tokens']['median'])} / {tokens(d['reasoning_tokens']['p90'])} & "
             f"{100 * d['reasoning_tokens']['share_above_zero']:.1f}\\% \\\\")
 
 
-table_rows = [models_row(k) for k in open_ + closed + alpha(anchors)] + [decoding_row(k) for k in open_ + closed]
+table_rows = [models_row(k) for k in open_ + closed + alpha(anchors)] \
+    + [decoding_row(k, dec_r[k], "$^{\\ddagger}$") if k in rerun else decoding_row(k) for k in open_ + closed] \
+    + [decoding_row(k) for k in open_ + closed if k in rerun]   # the bottom block: their responses at the defaults
 
 NUMBER = re.compile(r"\d[\d,]*(?:\.\d+)?")
 NUMBER_WORDS = re.compile(r"\b(" + "|".join(WORD.values()) + r")\b", re.I)

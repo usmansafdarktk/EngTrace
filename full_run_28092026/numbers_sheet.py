@@ -1,5 +1,7 @@
 """The numbers sheet for the two writing sessions (WS-G, step G5): every number the writers need, each with the file
-and key that hold it, grouped by section of the paper.
+and key that hold it, grouped by section of the paper. The headline is matched settings (results/matched.json and the
+`matched` families of the other result files); the three re-run models' default rows follow each table as the secondary
+comparison; the error analysis, the further conditions and the serving endpoints stay at the providers' defaults.
 
     python -m full_run_28092026.numbers_sheet      # FREE: writes docs/mock_review_workstreams/reports/NUMBERS_SHEET.md
 
@@ -152,7 +154,10 @@ def main() -> int:
                 f"{ev_sha['milestones.py']}, as `scores/main/CONFIG.json` records them), the judge's new rulings "
                 'in, every analysis at full resolution (10,000 bootstrap draws, 100,000 sign flips). Each value names the '
                 'file that holds it; regenerate the file, then this sheet, rather than copying a number by hand. Scores '
-                'are Final Answer Accuracy (FAC) and Milestone Coverage (MC), as the paper defines them.']
+                'are Final Answer Accuracy (FAC) and Milestone Coverage (MC), as the paper defines them.', '',
+                'The paper reports matched settings everywhere (each model at its reasoning setting where the endpoint '
+                "offers one, else its default); the three re-run models' default rows are the secondary comparison. The "
+                "error analysis, the further conditions and the serving endpoints stay at the providers' defaults by design."]
 
     # ------------------------------------------------------------------ setup
     S.h('Setup (Section 5.1 and the models appendix)')
@@ -160,12 +165,16 @@ def main() -> int:
     S.put('Models evaluated', f'{len(q1)} ({len(open_)} open-weights, {len(q1) - len(open_)} closed)',
           'full_run_28092026/results/decoding_table.json: weights')
     rows_main = sum(dec[k]['rows'] for k in q1)
-    S.put('Responses in the main run (one per instance and model)', f'{rows_main:,}',
-          'full_run_28092026/results/decoding_table.json: rows')
     rerun = [m['model'] for m in cfg['models'] if m.get('run', True) and m.get('reasoning_store')]
-    S.put('Re-run with reasoning on (matched configuration)', ', '.join(nm(k) for k in rerun) + f" at {cfg['effort']}",
+    rows_m = sum((dec_r if k in rerun else dec)[k]['rows'] for k in q1)
+    S.put('Responses at matched settings (one per instance and model; the three re-run models at reasoning on)',
+          f'{rows_m:,}', 'full_run_28092026/results/decoding_table.json, decoding_table_reasoning-medium-full.json: rows '
+          '(summed here)')
+    S.put('Re-run with reasoning on (matched settings)', ', '.join(nm(k) for k in rerun) + f" at {cfg['effort']}",
           'full_run_28092026/results/matched_config.json: models[].reasoning_store, effort')
-    S.put('Responses in the matched configuration (the re-run models, every instance)',
+    S.put('Responses in the main run at the providers\' defaults (one per instance and model)', f'{rows_main:,}',
+          'full_run_28092026/results/decoding_table.json: rows')
+    S.put('Reasoning-on re-run responses (the three models, every instance)',
           f"{sum(dec_r[k]['rows'] for k in rerun):,}", 'full_run_28092026/results/decoding_table_reasoning-medium-full.json: rows')
     none_offered = [m['model'] for m in cfg['models'] if m.get('reasoning_setting') == 'none offered']
     S.put('Endpoint offering no reasoning setting', ', '.join(nm(k) for k in none_offered),
@@ -180,15 +189,18 @@ def main() -> int:
     S.put('Twelfth model', 'none run' + (f" ({', '.join(nm(m['model']) for m in twelfth)} is listed with `run: false`, "
           'not evaluated)' if twelfth else ''), 'full_run_28092026/results/matched_config.json: run')
     ceil = collections.Counter(dec[k]['max_tokens'] for k in q1)
-    S.put('Output ceiling', ', '.join(f'{c:,} tokens ({n} models)' for c, n in ceil.most_common()) + '; matched '
-          'configuration ' + ', '.join(f'{c:,}' for c in sorted({d["max_tokens"] for d in dec_r.values()})),
+    S.put('Output ceiling', ', '.join(f'{c:,} tokens ({n} models)' for c, n in ceil.most_common()) + '; reasoning-on '
+          're-runs ' + ', '.join(f'{c:,}' for c in sorted({d["max_tokens"] for d in dec_r.values()})),
           'full_run_28092026/results/decoding_table*.json: max_tokens')
-    unusable = sum(q1[k]['unusable'] for k in q1)
-    S.put('Main-run responses with no readable final answer (score 0)', f'{unusable} ({100 * unusable / rows_main:.1f}%)',
-          f'{R}: q1.models[].unusable')
-    S.table(['model', 'empty, main run', 'no readable answer, main run', 'empty, matched configuration'],
-            [[nm(k), q1[k]['empty'], q1[k]['unusable'], dec_r[k]['empty'] if k in dec_r else '-'] for k in order],
-            f'{R}: q1.models[].empty, unusable; full_run_28092026/results/decoding_table_reasoning-medium-full.json: empty')
+    mq1 = {m['model']: m for m in mat['q1']['models']}
+    unusable_m, unusable = sum(mq1[k]['unusable'] for k in mq1), sum(q1[k]['unusable'] for k in q1)
+    S.put('Responses with no readable final answer (score 0), matched settings; default (main run)',
+          f'{unusable_m} ({100 * unusable_m / rows_m:.1f}%); {unusable} ({100 * unusable / rows_main:.1f}%)',
+          f'{M}: q1.models[].unusable; {R}: q1.models[].unusable')
+    S.table(['model (matched order)', 'setting', 'empty, matched', 'no readable answer, matched', 'empty, default',
+             'no readable answer, default'],
+            [[nm(k), 'reasoning on' if k in rerun else 'default', mq1[k]['empty'], mq1[k]['unusable'], q1[k]['empty'],
+              q1[k]['unusable']] for k in mat['order']], f'{M}: q1.models[].empty, unusable; {R}: q1.models[].empty, unusable')
     dates = {}
     for k in q1:
         t = final_ts(HERE / 'traces' / f'{k}.jsonl')
@@ -200,111 +212,180 @@ def main() -> int:
     dr = [final_ts(HERE / 'traces' / 'reasoning-medium-full' / f'{k}.jsonl') for k in rerun]
     dr = [t for t in dr if t]
     if dr:
-        S.put('Query dates, matched configuration', f'{min(t[0] for t in dr)[:10]} to {max(t[1] for t in dr)[:10]}',
+        S.put('Query dates, reasoning-on re-runs', f'{min(t[0] for t in dr)[:10]} to {max(t[1] for t in dr)[:10]}',
               'full_run_28092026/traces/reasoning-medium-full/<model>.jsonl: ts (local, gitignored)')
 
     # ------------------------------------------------------------------ results
     S.h('Results (Section 6 and the results appendix)')
-    S.h3('Table 1, both layouts')
-    dflt = mat['default']
-    rows = []
-    for k in mat['order']:
-        m = mat['models'][k]
-        rows.append([nm(k), f"{f3(q1[k]['score'])} {ci(q1[k]['ci'])}", dflt['letters'][k],
-                     f"{f3(m['fac'])} {ci(m['fac_ci'])}" + (' (reasoning on)' if m.get('configuration') == 'reasoning' else ''),
-                     m['letter'], f"{f3(qc[k]['coverage'])} {ci(qc[k]['ci'])}", dflt['mc_letters'][k],
-                     f"{f3(m['mc_strict'])} {ci(m['mc_strict_ci'])}", m['mc_letter'], f"{f3(m['mc_e3'])} {ci(m['mc_e3_ci'])}",
-                     f3(m['judge_decided_share']), f"{f3(m['digit_flag_rate'])} {ci(m['digit_flag_ci'])}",
-                     f"{m['claims_per_trace']:.1f}", f3(m['unreadable'])])
-    S.table(['model (matched order)', 'FAC, default [95% CI]', 'tier', 'FAC, matched [95% CI]', 'tier',
-             'MC, default [95% CI]', 'MC tier', 'MC, matched', 'MC tier', 'MC by matching alone, matched',
-             'judge-decided share, matched', 'arithmetic flags on correct answers, matched', 'calculations per response',
-             'no readable answer (share), matched'], rows,
-            f'{M}: models[], default.letters, default.mc_letters; {R}: q1.models[].score, ci; q3_coverage.models[].coverage, ci')
-    S.put('Pairs separated after Holm, default configuration (FAC / MC / MC by matching alone, of '
+    mm, morder, dflt = mat['models'], mat['order'], mat['default']
+    rr = [k for k in morder if mm[k].get('configuration') == 'reasoning']
+    assert sorted(rr) == sorted(rerun), (rr, rerun)
+    cf = lambda k: 'reasoning on' if k in rr else 'default'   # noqa: E731
+    ci4 = lambda c: '-' if not c else f'[{c[0]:+.4f}, {c[1]:+.4f}]'   # noqa: E731
+    mq2 = {m['model']: m for m in mat['q2']}
+    mbl = {m['model']: m for m in mat['branches_levels']}
+    mq3 = {k: mm[k]['q3'] for k in morder}
+    bl = {m['model']: m for m in res['branches_levels']}
+    sig = lambda ps: sum(1 for p in ps if p['p_holm'] < 0.05)   # noqa: E731
+    DR = 'Default rows of the three re-run models (the secondary comparison):'
+    S.note(f"Headline: matched settings, every table in the matched order (`{M}: order`). Each model runs at its reasoning "
+           f"setting where the endpoint offers one, else at its default: {', '.join(nm(k) for k in rr)} at reasoning on "
+           f"({cfg['effort']} effort), the other eight at their defaults (the same responses in both configurations). Under "
+           'each matched table, the default rows of the three re-run models follow as the secondary comparison.')
+    S.h3('Table 1 (matched settings)')
+    T1 = ['FAC [95% CI]', 'tier', 'MC [95% CI]', 'MC tier', 'MC by matching alone [95% CI]', 'tier', 'judge-decided share',
+          'arithmetic flags on correct answers [95% CI]', 'calculations per response', 'no readable answer (share)']
+    S.table(['model (matched order)', 'setting'] + T1,
+            [[nm(k), cf(k), f"{f3(m['fac'])} {ci(m['fac_ci'])}", m['letter'], f"{f3(m['mc_strict'])} {ci(m['mc_strict_ci'])}",
+              m['mc_letter'], f"{f3(m['mc_e3'])} {ci(m['mc_e3_ci'])}", m['mc_e3_letter'], f3(m['judge_decided_share']),
+              f"{f3(m['digit_flag_rate'])} {ci(m['digit_flag_ci'])}", f"{m['claims_per_trace']:.1f}", f3(m['unreadable'])]
+             for k, m in ((k, mm[k]) for k in morder)],
+            f'{M}: models[] (fac, fac_ci, letter, mc_strict, mc_strict_ci, mc_letter, mc_e3, mc_e3_ci, mc_e3_letter, '
+            'judge_decided_share, digit_flag_rate, digit_flag_ci, claims_per_trace, unreadable)')
+    S.note(DR)
+    e3d = mat['e3_default']['models']
+    S.table(['model', 'setting'] + T1,
+            [[nm(k), 'default', f"{f3(q1[k]['score'])} {ci(q1[k]['ci'])}", dflt['letters'][k],
+              f"{f3(qc[k]['coverage'])} {ci(qc[k]['ci'])}", dflt['mc_letters'][k], f"{f3(e3d[k]['coverage'])} {ci(e3d[k]['ci'])}",
+              dflt['e3_letters'][k], f3(q3[k]['e5_judged_fraction']),
+              f"{f3(q3[k]['digit_flag_rate_on_fully_solved'])} {ci(q3[k]['digit_ci'])}", f"{q3[k]['claims_per_trace']:.1f}",
+              f3(q1[k]['unusable'] / dec[k]['rows'])] for k in rr],
+            f'{R}: q1.models[] (score, ci, unusable), q3_coverage.models[] (coverage, ci), q3[] (e5_judged_fraction, '
+            f'digit_flag_rate_on_fully_solved, digit_ci, claims_per_trace); {M}: default.letters, mc_letters, e3_letters (tiers '
+            'within the default family), e3_default.models; full_run_28092026/results/decoding_table.json: rows (share computed here)')
+    S.put('Tiers within the default family, all eleven in the default order (FAC / MC)',
+          ', '.join(f"{nm(k)} {dflt['letters'][k]} / {dflt['mc_letters'][k]}" for k in dflt['order']),
+          f'{M}: default.order, letters, mc_letters')
+    ps = mat['pairs_separated']
+    assert (ps['pairs'], ps['fac'], ps['mc'], ps['mc_e3']) == (len(mat['pairs']), sig(mat['pairs']), sig(mat['mc_pairs']),
+                                                               sig(mat['mc_e3_pairs'])), ps
+    S.put(f"Pairs separated after Holm, matched settings, of {ps['pairs']}: FAC by sign flips; strict FAC (fully solved "
+          'instances); McNemar', f"{ps['fac']}; {ps['fac_strict']} (the same call as FAC on {ps['fac_strict_agree']} pairs); "
+          f"{ps['fac_mcnemar']}", f'{M}: pairs_separated (fac, fac_strict, fac_strict_agree, fac_mcnemar)')
+    S.put('Pairs separated after Holm, matched settings: MC by sign flips; Wilcoxon; MC by matching alone',
+          f"{ps['mc']}; {ps['mc_wilcoxon']} (the same call as sign flips on {ps['mc_wilcoxon_agree']} pairs); {ps['mc_e3']}",
+          f'{M}: pairs_separated (mc, mc_wilcoxon, mc_wilcoxon_agree, mc_e3)')
+    S.put('Pairs separated after Holm, default configuration (secondary; FAC / MC / MC by matching alone, of '
           f"{len(res['q1']['pairs'])})", f"{dflt['pairs_significant']} / {dflt['mc_pairs_significant']} / "
           f"{dflt['e3_pairs_significant']}", f'{M}: default.pairs_significant, mc_pairs_significant, e3_pairs_significant')
-    sig = lambda ps: sum(1 for p in ps if p['p_holm'] < 0.05)   # noqa: E731
-    S.put('Pairs separated after Holm, matched configuration (FAC / MC / MC by matching alone)',
-          f"{sig(mat['pairs'])} / {sig(mat['mc_pairs'])} / {sig(mat['mc_e3_pairs'])}",
-          f'{M}: pairs[], mc_pairs[], mc_e3_pairs[] with p_holm < 0.05 (counted here)')
-    top_d = [k for k in order[:5]]
-    top_m = mat['order'][:5]
-    S.put('First five on FAC, default', ', '.join(nm(k) for k in top_d), f'{R}: q1.models[].score (ordered here)')
-    S.put('First five on FAC, matched', ', '.join(nm(k) for k in top_m), f'{M}: order')
+    S.put('First five on FAC, matched settings; FAC of the fifth and the sixth to four decimals',
+          ', '.join(nm(k) for k in morder[:5]) + f"; {nm(morder[4])} {mm[morder[4]]['fac']:.4f}, {nm(morder[5])} "
+          f"{mm[morder[5]]['fac']:.4f}", f'{M}: order, models[].fac')
+    S.put('First five on FAC, default (secondary)', ', '.join(nm(k) for k in order[:5]), f'{R}: q1.models[].score (ordered here)')
     t = mat['tau_default_vs_matched']
     S.put("Kendall's tau between the default and matched FAC orderings", f"{t['tau']:.3f} [{t['ci'][0]:.3f}, {t['ci'][1]:.3f}]",
           f'{M}: tau_default_vs_matched')
-    S.h3('Paired change per re-run model (reasoning on minus default, all instances)')
+    S.h3('Paired change per re-run model (reasoning on minus default, all instances; the secondary comparison)')
     S.table(['model', 'FAC default -> on', 'change [95% CI]', '90% CI', 'p', 'detectable (Holm)', 'within the margin',
              'MC change'],
             [[nm(k), f"{f3(c['fac_default'])} -> {f3(c['fac_reasoning'])}", f"{c['change']:+.3f} {ci(c['ci'])}", ci(c['ci90']),
               pv(c.get('p_holm', c.get('p'))), f3(c['detectable_holm']), 'yes' if c['within_margin'] else 'no',
               f"{c['mc_change']:+.3f}" if c.get('mc_change') is not None else '-']
              for k, c in mat['paired_change'].items()], f'{M}: paired_change')
-    S.h3('Stability and sensitivity')
-    st = res['sensitivity']['tau_with_headline']
-    S.put("Readable-only reordering: tau with FAC as scored when unusable responses are left out", f3(st['unusable_excluded']),
-          f'{R}: sensitivity.tau_with_headline.unusable_excluded')
-    S.put('Tau under half and double the tolerance', f"{f3(st['half_tol'])} and {f3(st['double_tol'])}",
-          f'{R}: sensitivity.tau_with_headline')
+    S.h3('Stability and sensitivity (matched settings; default beside)')
+    stm, st = mat['sensitivity']['tau_with_headline'], res['sensitivity']['tau_with_headline']
+    tw = lambda *ks: ', '.join(f'{f3(stm[x])} (default {f3(st[x])})' for x in ks)   # noqa: E731
+    S.put('Readable-only reordering: tau with FAC as scored when unusable responses are left out', tw('unusable_excluded'),
+          f'{M}: sensitivity.tau_with_headline.unusable_excluded; {R}: the same')
+    S.put('Tau under half and double the tolerance; counting fully solved instances only',
+          tw('half_tol', 'double_tol', 'fully_solved'), f'{M}: sensitivity.tau_with_headline; {R}: the same')
     S.put('Tau without the symbolic templates, without the read-off templates, half-unit window, whole trace',
-          f"{f3(st['without_symbolic_templates'])}, {f3(st['without_shortcut_templates'])}, {f3(st['half_unit'])}, "
-          f"{f3(st['whole_trace'])}", f'{R}: sensitivity.tau_with_headline')
-    nones = [(k, g, sp[k][g]['none']) for k in order for g in ('single', 'others')]
-    worst = max(nones, key=lambda x: x[2])
-    S.put(f"Single-path table: share of templates solved on no instance (range over models and both groups; "
-          f"{sp['n_single']} single-path, {sp['n_others']} other templates)", f"{min(x[2] for x in nones):.3f} to {worst[2]:.3f} "
-          f"(highest: {nm(worst[0])}, {worst[1]})", 'full_run_28092026/results/single_path.json: <model>.single/others.none')
-    S.h3('Branches, domains, levels')
-    bl = {m['model']: m for m in res['branches_levels']}
-    span = {k: max(v['mean'] for v in bl[k]['branch'].values()) - min(v['mean'] for v in bl[k]['branch'].values()) for k in order}
-    S.table(['model', 'branch means: lowest', 'highest', 'spread', 'lowest domain mean'],
-            [[nm(k), f"{min(v['mean'] for v in bl[k]['branch'].values()):.3f}",
-              f"{max(v['mean'] for v in bl[k]['branch'].values()):.3f}", f'{span[k]:.3f}',
-              f"{min(res['reported']['models'][k]['domain'].values()):.3f}"] for k in order],
+          tw('without_symbolic_templates', 'without_shortcut_templates', 'half_unit', 'whole_trace'),
+          f'{M}: sensitivity.tau_with_headline; {R}: the same')
+    tn, tnd = mat['sensitivity']['tau_noise'], res['sensitivity']['tau_noise']
+    S.put(f"Tau noise floor (two random halves of each template's instances, {tn['splits']} splits): median, quartiles",
+          f"{f3(tn['median'])}, {f3(tn['q1'])} to {f3(tn['q3'])} (default {f3(tnd['median'])}, {f3(tnd['q1'])} to {f3(tnd['q3'])})",
+          f'{M}: sensitivity.tau_noise; {R}: the same')
+    for lab, spx, src in (('matched settings', {k: mm[k]['single_path'] for k in morder}, f'{M}: models[].single_path'),
+                          ('default', sp, 'full_run_28092026/results/single_path.json: <model>')):
+        nones = [(k, g, spx[k][g]['none']) for k in morder for g in ('single', 'others')]
+        worst = max(nones, key=lambda x: x[2])
+        S.put(f"Single-path table, {lab}: share of templates solved on no instance (range over models and both groups; "
+              f"{sp['n_single']} single-path, {sp['n_others']} other templates)", f"{min(x[2] for x in nones):.3f} to {worst[2]:.3f} "
+              f"(highest: {nm(worst[0])}, {worst[1]})", f'{src}.single/others.none')
+    S.h3('Branches, domains, levels (matched settings)')
+    br = lambda b: b.replace('_engineering', '')   # noqa: E731
+
+    def bd_row(b, dom):
+        lo, hi = (f(b['branch'], key=lambda x: b['branch'][x]['mean']) for f in (min, max))
+        dlo = min(dom, key=dom.get)
+        return [f"{b['branch'][lo]['mean']:.3f} ({br(lo)})", f"{b['branch'][hi]['mean']:.3f} ({br(hi)})",
+                f"{b['branch'][hi]['mean'] - b['branch'][lo]['mean']:.3f}", f'{dom[dlo]:.3f} ({dlo})']
+    BH = ['model', 'setting', 'branch means: lowest', 'highest', 'spread', 'lowest domain mean']
+    S.table(BH, [[nm(k), cf(k)] + bd_row(mbl[k], mat['reported']['models'][k]['domain']) for k in morder],
+            f'{M}: branches_levels[].branch.<branch>.mean (spread computed here); reported.models.<model>.domain (minimum)')
+    S.note(DR)
+    S.table(BH, [[nm(k), 'default'] + bd_row(bl[k], res['reported']['models'][k]['domain']) for k in rr],
             f'{R}: branches_levels[].branch.<branch>.mean (spread computed here); reported.models.<model>.domain (minimum)')
-    S.table(['model', 'Easy', 'Intermediate', 'Advanced', 'gap Easy - Advanced [95% CI]', 'Welch p (Holm)', 'permutation p (Holm)',
-             'gap holds after Holm'],
-            [[nm(k), f3(q2[k]['easy']), f3(bl[k]['level'].get('Intermediate', {}).get('mean')) if 'level' in bl[k] else '-',
-              f3(q2[k]['advanced']), f"{q2[k]['gap']:+.3f} {ci(q2[k]['ci'])}", pv(q2[k]['p_welch_holm']),
-              pv(q2[k]['p_perm_holm']), 'yes' if q2[k]['p_welch_holm'] < 0.05 else 'no'] for k in order],
-            f'{R}: q2[] (easy, advanced, gap, ci, p_welch_holm, p_perm_holm); branches_levels[].level')
-    S.put('Matched configuration: models whose Easy-minus-Advanced gap holds after Holm',
-          ', '.join(nm(k) for k in mat['order'] if mat['models'][k]['gap_p_holm'] < 0.05) or 'none', f'{M}: models[].gap_p_holm')
-    S.h3('Depth (wrong-answer odds per milestone)')
-    for conf in ('main', 'matched'):
+    yn = lambda p: 'yes' if p < 0.05 else 'no'   # noqa: E731
+    lv_row = lambda q, b: [f3(q['easy']), f3(b['level']['Intermediate']['mean']), f3(q['advanced']),   # noqa: E731
+                           f"{q['gap']:+.3f} {ci(q['ci'])}", pv(q['p_welch_holm']), pv(q['p_perm_holm']),
+                           f"{yn(q['p_welch_holm'])} / {yn(q['p_perm_holm'])}",
+                           f"{q['without_two_chemical']['gap']:+.3f}, p {pv(q['without_two_chemical']['p_welch_holm'])}"]
+    LH = ['model', 'setting', 'Easy', 'Intermediate', 'Advanced', 'gap Easy - Advanced [95% CI]', 'Welch p (Holm)',
+          'permutation p (Holm)', 'gap holds after Holm (Welch / permutation)',
+          'without the two chemical templates: gap, Welch p (Holm)']
+    S.table(LH, [[nm(k), cf(k)] + lv_row(mq2[k], mbl[k]) for k in morder],
+            f'{M}: q2[] (easy, advanced, gap, ci, p_welch_holm, p_perm_holm, without_two_chemical); branches_levels[].level')
+    S.note(DR)
+    S.table(LH, [[nm(k), 'default'] + lv_row(q2[k], bl[k]) for k in rr],
+            f'{R}: q2[] (easy, advanced, gap, ci, p_welch_holm, p_perm_holm, without_two_chemical); branches_levels[].level')
+    for lab, qq, B, src in (('matched settings', mq2, mbl, M), ('default (secondary)', q2, bl, R)):
+        S.put(f'Models whose Easy-minus-Advanced gap holds after Holm, {lab}: Welch; permutation; Welch without the two '
+              'chemical templates', '; '.join(', '.join(nm(k) for k in morder if f(qq[k]) < 0.05) or 'none' for f in (
+                  lambda q: q['p_welch_holm'], lambda q: q['p_perm_holm'], lambda q: q['without_two_chemical']['p_welch_holm'])),
+              f'{src}: q2[].p_welch_holm, p_perm_holm, without_two_chemical.p_welch_holm')
+        hold = [f"{nm(k)}: {br(p['a'])} minus {br(p['b'])} {p['diff']:+.3f}" for k in morder for p in B[k]['pairs']
+                if p['p_holm'] < 0.05]
+        S.put(f'Branch pairs whose difference holds after Holm, {lab}', '; '.join(hold) or 'none',
+              f'{src}: branches_levels[].pairs[] with p_holm < 0.05')
+    S.h3('Depth (wrong-answer odds per milestone; matched settings, default beside)')
+    DP = 'full_run_28092026/results/depth_model.json'
+    for conf, lab in (('matched', 'matched settings'), ('main', 'default (secondary)')):
         c = dep['configurations'][conf]
-        holds = [k for k, m in c['models'].items() if m.get('holds')]
-        S.put(f'{conf}: models whose slope holds after Holm', f"{len(holds)} of {len(c['models'])} (" +
-              ', '.join(nm(k) for k in holds) + ')', f'full_run_28092026/results/depth_model.json: configurations.{conf}.models[].holds')
+        holds = [k for k in morder if c['models'].get(k, {}).get('holds')]
+        assert c.get('holds', len(holds)) == len(holds), conf
+        S.put(f'{lab}: models whose slope holds after Holm', f"{len(holds)} of {len(c['models'])} (" +
+              ', '.join(nm(k) for k in holds) + ')', f'{DP}: configurations.{conf}.models[].holds')
         po = c['pooled']
-        S.put(f'{conf}: pooled slope per milestone [95% CI], odds ratio, p', f"{po['slope']:+.3f} {ci(po['ci'])}, "
-              f"{po.get('odds_ratio', float('nan')):.2f}, {pv(po.get('p'))}", f'full_run_28092026/results/depth_model.json: configurations.{conf}.pooled')
-    dm = dep['configurations']['main']['models']
-    S.table(['model', 'wrong / rows', 'slope per milestone [95% CI]', 'odds ratio', 'p (Holm)', 'holds'],
-            [[nm(k), f"{dm[k]['wrong']} / {dm[k]['rows']}", f"{dm[k]['slope']:+.3f} {ci(dm[k]['ci'])}", f"{dm[k]['odds_ratio']:.2f}",
-              pv(dm[k]['p_holm']), 'yes' if dm[k]['holds'] else 'no'] for k in order if k in dm],
-            'full_run_28092026/results/depth_model.json: configurations.main.models')
-    S.h3('Milestone Coverage under four readings (default configuration, all responses)')
+        S.put(f'{lab}: pooled slope per milestone [95% CI], odds ratio, p', f"{po['slope']:+.3f} {ci(po['ci'])}, "
+              f"{po.get('odds_ratio', float('nan')):.2f}, {pv(po.get('p'))}", f'{DP}: configurations.{conf}.pooled')
+    drow = lambda d: [f"{d['wrong']} / {d['rows']}", f"{d['slope']:+.3f} {ci(d['ci'])}", f"{d['odds_ratio']:.2f}",   # noqa: E731
+                      pv(d['p_holm']), 'yes' if d['holds'] else 'no']
+    DH = ['model', 'setting', 'wrong / rows', 'slope per milestone [95% CI]', 'odds ratio', 'p (Holm)', 'holds']
+    dmm, dmd = dep['configurations']['matched']['models'], dep['configurations']['main']['models']
+    S.table(DH, [[nm(k), cf(k)] + drow(dmm[k]) for k in morder if k in dmm], f'{DP}: configurations.matched.models')
+    S.note(DR)
+    S.table(DH, [[nm(k), 'default'] + drow(dmd[k]) for k in rr if k in dmd], f'{DP}: configurations.main.models')
+    S.h3('Milestone Coverage under four readings (matched settings, all responses)')
+    CV = 'full_run_28092026/results/coverage_variants.json'
     rd_ = ('as_scored', 'matching_only', 'route_adjusted', 'intermediate_only')
-    S.table(['model'] + list(rd_), [[nm(k)] + [f"{f3(cov['models'][k][r]['all'])} {ci(cov['models'][k][r].get('ci'))}" for r in rd_]
-                                     for k in order], 'full_run_28092026/results/coverage_variants.json: models.<model>.<reading>.all, ci')
-    sepr = cov['separation_rule']['claude_vs_deepseek']
-    S.put('Claude Sonnet 5 minus DeepSeek V4.1 Flash on MC, Holm p per reading',
-          '; '.join(f"{r}: {sepr['diff'][r]:+.3f}, p {pv(sepr[r])}" for r in rd_) + f"; the separation holds under every "
-          f"reading: {'yes' if sepr['holds'] else 'no'}", 'full_run_28092026/results/coverage_variants.json: separation_rule.claude_vs_deepseek')
-    S.put('Pairs separated after Holm per reading', ', '.join(f"{r} {sum(1 for p in cov['pairs'][r] if p['p_holm'] < 0.05)}"
-          for r in rd_ if r in cov['pairs']), 'full_run_28092026/results/coverage_variants.json: pairs.<reading>[] (counted here)')
-    vb = cov['verbosity']
-    S.put(f"Verbosity: MC slope ({vb['units']['numbers']}), pooled [95% CI]", f"{vb['slope_numbers']:+.4f} {ci(vb['ci'])}",
-          'full_run_28092026/results/coverage_variants.json: verbosity.slope_numbers, ci')
-    wm = vb['within_model']
-    S.put('Verbosity: slope within model and template [95% CI]', f"{wm['slope_numbers']:+.4f} {ci(wm['ci'])}",
-          'full_run_28092026/results/coverage_variants.json: verbosity.within_model')
-    S.put('Judge-decided share of milestones (range over models, default)', f"{min(q3[k]['e5_judged_fraction'] for k in order):.3f} to "
-          f"{max(q3[k]['e5_judged_fraction'] for k in order):.3f}", f'{R}: q3[].e5_judged_fraction')
+    cvm = cov['matched']
+    assert cvm['stores'] == {k: mm[k]['store'] for k in cvm['stores']}, cvm['stores']
+    cvr = lambda d: [f"{f3(d[r]['all'])} {ci(d[r].get('ci'))}" for r in rd_]   # noqa: E731
+    S.table(['model', 'setting'] + [f"{r} ({cvm['templates'][r]} templates)" for r in rd_],
+            [[nm(k), cf(k)] + cvr(cvm['models'][k]) for k in morder], f'{CV}: matched.models.<model>.<reading>.all, ci; matched.templates')
+    S.note(DR)
+    S.table(['model', 'setting'] + [f"{r} ({cov['templates'][r]} templates)" for r in rd_],
+            [[nm(k), 'default'] + cvr(cov['models'][k]) for k in rr], f'{CV}: models.<model>.<reading>.all, ci; templates')
+    for lab, fam, pre in (('matched settings', cvm, 'matched.'), ('default (secondary)', cov, '')):
+        sepr = fam['separation_rule']['claude_vs_deepseek']
+        S.put(f'Claude Sonnet 5 minus DeepSeek V4.1 Flash on MC, Holm p per reading, {lab}',
+              '; '.join(f"{r}: {sepr['diff'][r]:+.3f}, p {pv(sepr[r])}" for r in rd_) + '; the separation holds under every '
+              f"reading: {'yes' if sepr['holds'] else 'no'}", f'{CV}: {pre}separation_rule.claude_vs_deepseek')
+        S.put(f'Pairs separated after Holm per reading, {lab}', ', '.join(
+            f"{r} {sum(1 for p in fam['pairs'][r] if p['p_holm'] < 0.05)}" for r in rd_ if r in fam['pairs']),
+            f'{CV}: {pre}pairs.<reading>[] (counted here)')
+        vb = fam['verbosity']
+        S.put(f"Verbosity, {lab}: MC slope ({vb['units']['numbers']}), pooled [95% CI]; within model and template [95% CI]; "
+              'responses', f"{vb['slope_numbers']:+.4f} {ci4(vb['ci'])}; {vb['within_model']['slope_numbers']:+.4f} "
+              f"{ci4(vb['within_model']['ci'])}; {vb['responses']:,}", f'{CV}: {pre}verbosity.slope_numbers, ci, within_model, responses')
+    S.put('Judge-decided share of milestones (range over models), matched settings',
+          f"{min(mm[k]['judge_decided_share'] for k in morder):.3f} to {max(mm[k]['judge_decided_share'] for k in morder):.3f} "
+          f"(default {min(q3[k]['e5_judged_fraction'] for k in order):.3f} to {max(q3[k]['e5_judged_fraction'] for k in order):.3f})",
+          f'{M}: models[].judge_decided_share; {R}: q3[].e5_judged_fraction')
     S.h3('Judge swap (a second judge on a sample of what the judge is sent)')
+    S.note("- At the providers' defaults by design: the sample is drawn from the main run's judge jobs.")
     S.put('Responses compared', f"{js['traces']} ({js['traces_per_model'][0]} to {js['traces_per_model'][1]} per model, "
           f"{js['templates_per_model'][0]} to {js['templates_per_model'][1]} templates per model); of {js['sample']} drawn, "
           f"{js['not_in_rows']} re-run since and {js['prompt_changed']} with a changed prompt are left out",
@@ -316,59 +397,108 @@ def main() -> int:
     diffs = [m['diff'] for m in js['models'].values()]
     S.put('MC shift under the second judge (range over models)', f'{min(diffs):+.3f} to {max(diffs):+.3f}',
           'full_run_28092026/results/judge_swap_main.json: models.<model>.diff')
-    S.h3('Arithmetic flags and the judged step check')
-    fa = fp['all']
-    S.put('Arithmetic flags on correct answers that are carried precision (main run)', f"{fa['carried_precision']} of {fa['flags']} "
-          f"({100 * fa['carried_precision'] / fa['flags']:.1f}%); other: truncated {fa.get('other_truncated')}, no upstream value "
-          f"{fa.get('other_no_upstream')}, not reproduced {fa.get('other_not_reproduced')}", 'full_run_28092026/results/flag_precision.json: all')
+    S.h3('Arithmetic flags and the judged step check (matched settings; default beside)')
+    FP = 'full_run_28092026/results/flag_precision.json'
+    FK = ('flags', 'carried_precision', 'other_truncated', 'other_no_upstream', 'other_not_reproduced')
+    fps = fp['stores']
+    assert fps['main']['all'] == fp['all'] and all(sum(fps['main']['models'][k][x] for k in morder) == fp['all'][x] for x in FK)
+    fm = collections.Counter()
+    for k in morder:
+        for x in FK:
+            fm[x] += fps['reasoning-medium-full' if k in rr else 'main']['models'][k][x]
+    fr = fps['reasoning-medium-full']['all']
+    cp = lambda a: (f"{a['carried_precision']} of {a['flags']} ({100 * a['carried_precision'] / a['flags']:.1f}%); other: "   # noqa: E731
+                    f"truncated {a.get('other_truncated')}, no upstream value {a.get('other_no_upstream')}, not reproduced "
+                    f"{a.get('other_not_reproduced')}")
+    S.put('Arithmetic flags on correct answers that are carried precision, matched settings', cp(fm),
+          f'{FP}: stores.main.models (the eight), stores.reasoning-medium-full.models (the re-run three); summed here')
+    S.put('The same, the three re-run models at reasoning on', cp(fr), f'{FP}: stores.reasoning-medium-full.all')
+    S.put('The same, default (main run, all eleven)', cp(fp['all']), f'{FP}: all')
     ex = fp['expert_confirmed']
-    S.put('Slips the domain expert confirmed that are carried precision', f"{ex['carried_precision']} of {ex['slips']} "
-          f"({ex['step_changed']} in steps whose text changed with the repaired items)", 'full_run_28092026/results/flag_precision.json: expert_confirmed')
-    S.table(['model', 'arithmetic flags on correct answers [95% CI]',
-             'any step flagged on correct answers, arithmetic or judge [95% CI] (the judge alone: tab:judged_steps)',
-             'any step flagged on wrong answers [95% CI]', 'steps flagged per response'],
-            [[nm(k), f"{f3(q3[k]['digit_flag_rate_on_fully_solved'])} {ci(q3[k]['digit_ci'])}",
-              f"{f3(q3[k]['router_rate_on_fully_solved'])} {ci(q3[k]['router_ci'])}",
-              f"{f3(q3[k]['router_rate_on_wrong'])} {ci(q3[k]['router_wrong_ci'])}", f"{q3[k]['router_steps_flagged_per_trace']:.2f}"]
-             for k in order], f'{R}: q3[] (digit_flag_rate_on_fully_solved, router_rate_on_fully_solved, router_rate_on_wrong, ...)')
+    S.put('Slips the domain expert confirmed that are carried precision (expert readings of default-setting responses)',
+          f"{ex['carried_precision']} of {ex['slips']} ({ex['step_changed']} in steps whose text changed with the repaired items)",
+          f'{FP}: expert_confirmed')
+    q3h = ['model', 'setting', 'arithmetic flags on correct answers [95% CI]',
+           'any step flagged on correct answers, arithmetic or judge [95% CI] (the judge alone: tab:judged_steps)',
+           'any step flagged on wrong answers [95% CI]', 'steps flagged per response']
+    q3r = lambda q: [f"{f3(q['digit_flag_rate_on_fully_solved'])} {ci(q['digit_ci'])}",   # noqa: E731
+                     f"{f3(q['router_rate_on_fully_solved'])} {ci(q['router_ci'])}",
+                     f"{f3(q['router_rate_on_wrong'])} {ci(q['router_wrong_ci'])}", f"{q['router_steps_flagged_per_trace']:.2f}"]
+    S.table(q3h, [[nm(k), cf(k)] + q3r(mq3[k]) for k in morder],
+            f'{M}: models[].q3 (digit_flag_rate_on_fully_solved, router_rate_on_fully_solved, router_rate_on_wrong, ...)')
+    S.note(DR)
+    S.table(q3h, [[nm(k), 'default'] + q3r(q3[k]) for k in rr],
+            f'{R}: q3[] (digit_flag_rate_on_fully_solved, router_rate_on_fully_solved, router_rate_on_wrong, ...)')
     rv = {r[0]: r for r in md_rows((HERE / 'ROUTER_VALIDATION.md').read_text(encoding='utf-8'), r'^\| steps the experts call incorrect')}
     for row in ('all traces, the router', 'inside correct-answer traces, the router'):
-        S.put(f'Judged step and arithmetic checks against the experts\' step labels, {row.split(",")[0]}: tp / fp / fn, precision, '
-              'recall, F1', f'{rv[row][1]}, {rv[row][2]}, {rv[row][3]}, {rv[row][4]}', 'full_run_28092026/ROUTER_VALIDATION.md')
-    S.h3('Scoring-rule variants (main run; verdicts up / down)')
-    svm = sv['stores']['main']
+        S.put(f'Judged step and arithmetic checks against the experts\' step labels on the pilot\'s traces, {row.split(",")[0]}: '
+              'tp / fp / fn, precision, recall, F1', f'{rv[row][1]}, {rv[row][2]}, {rv[row][3]}, {rv[row][4]}',
+              'full_run_28092026/ROUTER_VALIDATION.md')
+    S.h3('Scoring-rule variants (matched settings; verdicts up / down)')
+    SV = 'full_run_28092026/results/sensitivity_variants.json'
+    svs, svm = sv['stores']['matched'], sv['stores']['main']
     V = ('abs_clause_off', 'last_digit_unbounded', 'prescribed_relaxed', 'per_part_credit')
-    S.table(['model', 'FAC'] + list(V), [[nm(k), f3(svm['models'][k]['headline'])] + [
-        f"{f3(svm['models'][k][v])} ({svm['models'][k]['changed'][v]['up']}/{svm['models'][k]['changed'][v]['down']})" for v in V]
-        for k in order], 'full_run_28092026/results/sensitivity_variants.json: stores.main.models')
+    vrow = lambda d, k: [f3(d['models'][k]['headline'])] + [   # noqa: E731
+        f"{f3(d['models'][k][v])} ({d['models'][k]['changed'][v]['up']}/{d['models'][k]['changed'][v]['down']})" for v in V]
+    S.table(['model', 'setting', 'FAC'] + list(V), [[nm(k), cf(k)] + vrow(svs, k) for k in morder], f'{SV}: stores.matched.models')
+    S.note(DR)
+    S.table(['model', 'setting', 'FAC'] + list(V), [[nm(k), 'default'] + vrow(svm, k) for k in rr], f'{SV}: stores.main.models')
     for v in V:
-        w = svm['where_changed'][v]
-        S.put(f'{v}: verdicts moved, templates; tau with FAC as scored', f"{w['verdicts']} on {w['templates']} templates; "
-              f"{f3(svm['tau_with_headline'][v])} (matched: {f3(sv['stores']['matched']['tau_with_headline'][v])})",
-              f'full_run_28092026/results/sensitivity_variants.json: stores.main.where_changed.{v}, tau_with_headline')
+        w, wd = svs['where_changed'][v], svm['where_changed'][v]
+        S.put(f'{v}: verdicts moved, templates; tau with FAC as scored (matched settings; default beside)',
+              f"{w['verdicts']} on {w['templates']} templates; {f3(svs['tau_with_headline'][v])} (default: {wd['verdicts']} on "
+              f"{wd['templates']} templates; {f3(svm['tau_with_headline'][v])})",
+              f'{SV}: stores.matched.where_changed.{v}, tau_with_headline; stores.main, the same')
+    BN = ('le_0.2', '0.2_1', '1_5', 'gt_5')
+    bm = collections.Counter()
+    for k in morder:
+        for x in BN + ('numeric', 'symbolic'):
+            bm[x] += svs['relative_error_bins'][k][x]
+    S.put('Accepted numeric answers by relative error, matched settings: within 0.2%, 0.2 to 1%, 1 to 5%, above 5%',
+          ', '.join(f"{bm[n]} ({100 * bm[n] / bm['numeric']:.1f}%)" for n in BN) + f" of {bm['numeric']}; "
+          f"{bm['symbolic']} more accepted by the symbolic step",
+          f'{SV}: stores.matched.relative_error_bins.<model> (summed here, shares computed here; the file holds no matched total)')
     b = sv['relative_error_bins']['all']
-    S.put('Accepted numeric answers by relative error (main run): within 0.2%, 0.2 to 1%, 1 to 5%, above 5%',
-          ', '.join(f"{b[n]} ({100 * b['share'][n]:.1f}%)" for n in ('le_0.2', '0.2_1', '1_5', 'gt_5')) + f" of {b['numeric']}; "
-          f"{b['symbolic']} more accepted by the symbolic step", 'full_run_28092026/results/sensitivity_variants.json: relative_error_bins.all')
+    S.put('The same, default (main run)', ', '.join(f"{b[n]} ({100 * b['share'][n]:.1f}%)" for n in BN) + f" of {b['numeric']}; "
+          f"{b['symbolic']} more accepted by the symbolic step", f'{SV}: relative_error_bins.all')
     S.h3('Repeats, paraphrases and the further conditions')
-    rp = res['repeats']
-    S.put('Decoding repeats: models and instances', ', '.join(nm(k) for k in rp) + f"; {', '.join(sorted({str(v['items']) for v in rp.values()}))} "
-          'instances each, three repeats', f'{R}: repeats')
-    S.table(['model', 'repeat scores', 'SD', 'same verdict in every repeat'],
-            [[nm(k), ', '.join(f3(s) for s in v['scores'].values()), f"{v['sd']:.4f}", f3(v['same_verdict_every_repeat'])]
-             for k, v in rp.items()], f'{R}: repeats')
-    q5 = res['q5']
-    S.put('Paraphrase pairs kept by the experts', q5['expert_check'], f'{R}: q5.expert_check; full_run_28092026/PARAPHRASE_REVIEW.md')
-    S.table(['model', 'change (paraphrase minus original) [95% CI]', '90% CI', f"within +/-{q5['margin']}"],
-            [[nm(m['model']), f"{m['diff']:+.3f} {ci(m['ci'])}", ci(m['ci90']), 'yes' if m['within_margin'] else 'no']
-             for m in q5['models']], f'{R}: q5.models')
+    rpm, rp = mat['repeats'], res['repeats']
+    no_rep = [k for k in rr if k not in rpm and k not in rp]
+    S.put('Decoding repeats at matched settings: models and instances', ', '.join(f'{nm(k)} ({cf(k)})' for k in rpm) +
+          f"; {', '.join(sorted({str(v['items']) for v in rpm.values()}))} instances each, "
+          f"{', '.join(sorted({str(len(v['scores'])) for v in rpm.values()}))} repeats" +
+          (f"; no repeat runs for {', '.join(nm(k) for k in no_rep)}" if no_rep else ''), f'{M}: repeats; {R}: repeats')
+    RH = ['model', 'setting', 'repeat scores', 'SD', 'same verdict in every repeat']
+    rprow = lambda v: [', '.join(f3(s) for s in v['scores'].values()), f"{v['sd']:.4f}", f3(v['same_verdict_every_repeat'])]   # noqa: E731
+    S.table(RH, [[nm(k), cf(k)] + rprow(v) for k, v in rpm.items()], f'{M}: repeats')
+    S.note(DR)
+    S.table(RH, [[nm(k), 'default'] + rprow(rp[k]) for k in rr if k in rp], f'{R}: repeats')
+    q5m, q5 = mat['q5'], res['q5']
+    S.put('Paraphrase pairs kept by the experts', q5m['expert_check'], f'{M}: q5.expert_check; full_run_28092026/PARAPHRASE_REVIEW.md')
+    Q5H = ['change (paraphrase minus original) [95% CI]', '90% CI', 'p (Holm)', f"within +/-{q5m['margin']}"]
+    q5r = lambda m: [f"{m['diff']:+.3f} {ci(m['ci'])}", ci(m['ci90']), pv(m['p_holm']), 'yes' if m['within_margin'] else 'no']   # noqa: E731
+    q5mm, q5d = {m['model']: m for m in q5m['models']}, {m['model']: m for m in q5['models']}
+    S.table(['model', 'setting (paraphrase store)'] + Q5H, [[nm(k), f"{cf(k)} ({q5m['stores'][k]})"] + q5r(q5mm[k]) for k in morder],
+            f'{M}: q5.models, q5.stores')
+    S.note(DR)
+    S.table(['model', 'setting'] + Q5H, [[nm(k), 'default'] + q5r(q5d[k]) for k in rr], f'{R}: q5.models')
+    for lab, qq, src in (('matched settings', q5m, M), ('default (secondary)', q5, R)):
+        inm = [m for m in qq['models'] if m['within_margin']]
+        S.put(f"Paraphrase, {lab}: within +/-{qq['margin']}; lowest p (Holm)",
+              f"{len(inm)} of {len(qq['models'])}; {pv(min(m['p_holm'] for m in qq['models']))}", f'{src}: q5.models[].within_margin, p_holm')
+        t, na = qq['tau'], qq['tau']['noise_arm']
+        S.put(f'Paraphrase-against-original tau [95% CI], {lab}; noise floor at the size and template mix of the paraphrase arm: '
+              'median (quartiles)', f"{t['tau']:.3f} {ci(t['ci'])}; {na['median']:.3f} ({na['q1']:.3f} to {na['q3']:.3f})",
+              f'{src}: q5.tau, q5.tau.noise_arm')
+    S.note("- The further conditions stay at the providers' defaults by design: each against the main run on the same instances.")
     S.table(['condition', 'model', 'instances', 'main on the same instances', 'under the condition', 'change [95% CI]'],
             [[a['arm'], nm(a['model']), a['items'], f3(a['main_score_on_items']), f3(a['arm_score']), f"{a['diff']:+.3f} {ci(a['ci'])}"]
              for a in res['reasoning_arms']], f'{R}: reasoning_arms (the subset includes the repaired items, re-run in every condition)')
 
     # ------------------------------------------------------------------ error analysis
     S.h('Error analysis (B2, the expert reading of wrong answers)')
-    er = (HERE / 'EXPERT_REQUEST.md').read_text(encoding='utf-8')
+    S.note("- At the providers' defaults by design: the experts read main-run responses.")
+    er =(HERE / 'EXPERT_REQUEST.md').read_text(encoding='utf-8')
     b2 = section_text(er, 'B2 now')
     sample = re.search(r'The sample: (.*?); (\d+) items on (\d+) templates', b2)
     S.put('Sample (default-setting responses; no re-reading for the re-run models)', f'{sample.group(2)} items on {sample.group(3)} '
@@ -457,7 +587,7 @@ def main() -> int:
           f'{sym + rule_down + rule_up}: {sym} raised by the symbolic step; {rule_down} lowered and {rule_up} raised by the '
           'number rule (the last-digit bounds, and the answer targets the milestone matcher feeds)',
           f"full_run_28092026/results/rescore_diff.json (since {rd.get('since')}): stores[main].models[].moves")
-    S.put('Change in mean score per model', ', '.join(f"{nm(k)} {main_store['models'][k]['mean_new'] - main_store['models'][k]['mean_old']:+.4f}"
+    S.put('Change in mean score per model (main run)', ', '.join(f"{nm(k)} {main_store['models'][k]['mean_new'] - main_store['models'][k]['mean_old']:+.4f}"
           for k in eleven), 'full_run_28092026/results/rescore_diff.json: mean_old, mean_new')
 
     # ------------------------------------------------------------------ validation
@@ -484,6 +614,8 @@ def main() -> int:
     aud = load(HERE / 'results' / 'answer_audit_paper.json')
     src = 'full_run_28092026/results/answer_audit_paper.json (answer_audit.py --write)'
     S.h3('The final-answer check by answer kind (tab:answer_kinds) and its discrepancies')
+    S.note("- On the main run (the providers' defaults) and the experts' readings of it; the file holds no matched-settings "
+           'version of the bound below.')
     S.table(['answer kind', 'study responses', 'three-way', 'not partial', 'readings agreeing'],
             [[k, v['study'][1], f"{v['study'][0] / v['study'][1]:.3f}", f"{v['study'][2] / v['study'][3]:.3f}",
               f"{v['readings'][0]} of {v['readings'][1]}"] for k, v in aud['by_kind'].items()], src)
@@ -512,9 +644,10 @@ def main() -> int:
 
     # ------------------------------------------------------------------ providers
     S.h('Serving endpoints')
+    S.note("- At the providers' defaults by design: the main run's endpoints.")
     well = [r for r in prov if r.get('matched_diff') is not None and not r['few_matched']]
     lo, hi = min(well, key=lambda r: r['matched_diff']), max(well, key=lambda r: r['matched_diff'])
-    S.put('Matched difference over endpoints matched on at least 20 templates (range)', f"{lo['matched_diff']:+.3f} ({nm(lo['model'])}, "
+    S.put('Template-matched difference over endpoints matched on at least 20 templates (range)', f"{lo['matched_diff']:+.3f} ({nm(lo['model'])}, "
           f"{lo['endpoint']}) to {hi['matched_diff']:+.3f} ({nm(hi['model'])}, {hi['endpoint']}), over {len(well)} endpoints",
           'full_run_28092026/results/providers.json: matched_diff, few_matched')
     S.put('Endpoints serving fewer than 20 templates; with a matched difference on fewer than 20', f"{sum(r['few_templates'] for r in prov)}; "

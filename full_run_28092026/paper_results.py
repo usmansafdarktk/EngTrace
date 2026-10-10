@@ -17,7 +17,9 @@ their appendices, and check them in the source.
 Flags (the registry in docs/mock_review_workstreams/00_ORCHESTRATION.md, section 7):
     --headline default|matched   default: the models at the providers' default settings in Table 1, with a marked block "with
                                  reasoning at medium effort" for the re-run models; matched: each model at its matched setting,
-                                 the re-run models marked, a twelfth model if present; tab:matched always holds both configurations
+                                 the re-run models marked, a twelfth model if present, and every other block, phrase, claim and
+                                 figure read from the matched family (the expert readings and the experiments stay at the
+                                 providers' defaults); tab:matched always holds both configurations
     --repaired                   the two chemical templates are repaired: the "with and without" clauses and the B4-reading phrases
                                  are not generated, and tab:level_gap drops its "without two chemical" column
     --judged-in-table            the judged step flags stay in Table 1 (they are in tab:judged_steps otherwise)
@@ -35,7 +37,7 @@ of these exists, its stand-in under results/stand_in/ is read and every block an
 results/matched_config.json (run_traces.py --matched-config: which models reason by default and which were re-run);
 results/judge_swap_main.json (judge_swap.py: the second judge's MC shift per model);
 expert_request/scored_current.json (expert_kits.py --score: the experts' readings the store still holds, counts only);
-RESIDUAL_INCORRECT.md, PARAPHRASE.md, PARAPHRASE_REVIEW.md, FLAG_REVIEW_3.md; the shortcut template list of analyze.py; the tool and
+RESIDUAL_INCORRECT.md (RESIDUAL_INCORRECT_matched.md under --headline matched), PARAPHRASE.md, PARAPHRASE_REVIEW.md, FLAG_REVIEW_3.md; the shortcut template list of analyze.py; the tool and
 paraphrase constants of run_traces.py and paraphrase.py; the symbolic-equivalence template list of the answer module; the judged
 step check's precision row of appendices/validation.tex (docs/appendix_evaluation.py); subsamples.py (the repeat and paraphrase
 subsamples). Model display names are those of paper_setup.py.
@@ -150,11 +152,12 @@ def f1(x: float) -> str:
     return f"{x:.1f}"
 
 
-def ci(c, dash: bool = True) -> str:
+def ci(c, dash: bool = True, nd: int = 3) -> str:
     """An interval: 'lo--hi' in tables when both ends are positive, otherwise 'lo to hi' with a math-mode minus."""
+    f = lambda x: f"{x:.{nd}f}"  # noqa: E731
     if dash and c[0] >= 0 and c[1] >= 0:
-        return f"{f3(c[0])}--{f3(c[1])}"
-    return " to ".join(f"$-{f3(abs(x))}$" if round(x, 3) < 0 else f3(abs(x)) if round(x, 3) == 0 else f3(x) for x in c)  # never "-0.000"
+        return f"{f(c[0])}--{f(c[1])}"
+    return " to ".join(f"$-{f(abs(x))}$" if round(x, nd) < 0 else f(abs(x)) if round(x, nd) == 0 else f(x) for x in c)  # never "-0.000"
 
 
 def sgn(x: float, nd: int = 3) -> str:
@@ -321,9 +324,15 @@ def note(*names: str) -> str:
 
 
 res = load(RESULTS / "results.json")
+RES_DEFAULT = res  # the providers' defaults: tab:matched's default columns, the experiments and the anchors
+FAMILY = ("q1", "q2", "q3_overall", "q3_coverage", "branches_levels", "q4", "q5", "sensitivity", "reported", "repeats")
+if HEADLINE == "matched" and not ARGS.stand_in:  # every per-model family at matched settings (matched.json mirrors results.json)
+    _mf = result_file("matched")
+    res = {**res, **{key: _mf[key] for key in FAMILY}, "q3": [_mf["models"][k]["q3"] for k in _mf["order"]]}
 matched_config = load(RESULTS / "matched_config.json")
 scored = load(HERE / "expert_request/scored_current.json")  # the readings the store still holds (amendment 3 of 2026-10-07)
-residual = (HERE / "RESIDUAL_INCORRECT.md").read_text(encoding="utf-8")
+RESIDUAL_MD = "RESIDUAL_INCORRECT_matched.md" if HEADLINE == "matched" and not ARGS.stand_in else "RESIDUAL_INCORRECT.md"  # residual_incorrect.py [--matched]
+residual = (HERE / RESIDUAL_MD).read_text(encoding="utf-8")
 paraphrase_md = (HERE / "PARAPHRASE.md").read_text(encoding="utf-8")
 review = (HERE / "PARAPHRASE_REVIEW.md").read_text(encoding="utf-8")
 flags = (HERE / "FLAG_REVIEW_3.md").read_text(encoding="utf-8")
@@ -380,7 +389,9 @@ SYMBOLIC = res["symbolic_templates"]  # the templates whose answer is an express
 _sym_enabled = re.search(r"SYMBOLIC_EQUIVALENCE_TEMPLATES\s*=\s*[\[(](.*?)[\])]", answer_src, re.S)
 SYMBOLIC_ENABLED = re.findall(r"['\"](template_[a-z_0-9]+)['\"]", _sym_enabled.group(1)) if _sym_enabled else []  # the equivalence check's list
 BY_NUMBERS = [t for t in SYMBOLIC if t not in SYMBOLIC_ENABLED]  # still scored by the numbers they state
-B2_MODELS = sorted(ERR["by_model"], key=lambda m: ORDER.index(m))  # the models whose wrong answers the experts read, in table order
+Q1_DEFAULT = {m["model"]: m for m in RES_DEFAULT["q1"]["models"]}  # the providers' defaults, whatever the headline
+ORDER_DEFAULT = sorted(Q1_DEFAULT, key=lambda k: -Q1_DEFAULT[k]["score"])
+B2_MODELS = sorted(ERR["by_model"], key=lambda m: ORDER_DEFAULT.index(m))  # the models whose wrong answers the experts read (default responses)
 
 
 # ----------------------------------------------------------------------------------------------- derived numbers
@@ -407,6 +418,8 @@ def letters(order: list[str], sep: set[frozenset]) -> dict[str, str]:
 
 SEP_FAC, SEP_MC = separated(PAIRS), separated(CPAIRS)
 CLD_FAC, CLD_MC = letters(ORDER, SEP_FAC), letters(ORDER, SEP_MC)
+SEP_FAC_DEFAULT = separated(RES_DEFAULT["q1"]["pairs"])
+CLD_FAC_DEFAULT = letters(ORDER_DEFAULT, SEP_FAC_DEFAULT)
 TOP5 = ORDER[:5]
 top5_sep_pairs = [tuple(sorted(pr, key=ORDER.index)) for pr in itertools.combinations(TOP5, 2) if frozenset(pr) in SEP_FAC]
 nonsig = [p for p in PAIRS if p["p_holm"] >= 0.05]
@@ -416,8 +429,13 @@ scores = [Q1[k]["score"] for k in ORDER]
 spread5 = max(scores[:5]) - min(scores[:5])
 sixth, rest = ORDER[5], ORDER[6:]
 sixth_sep = [k for k in TOP5 if frozenset((sixth, k)) in SEP_FAC]
-claim(0 < len(sixth_sep) < len(TOP5), "the sixth model differs from some but not all of the top five")
-claim(all(frozenset((a, b)) in SEP_FAC for a in rest for b in ORDER[:6]), "each lower-tier model differs from every model above it")
+MATCHED_HEAD = HEADLINE == "matched"  # the tables and phrases show the matched family: a graded order, no two tiers
+if MATCHED_HEAD:
+    claim(not sixth_sep, "the sixth model differs from none of the first five")
+else:
+    claim(0 < len(sixth_sep) < len(TOP5), "the sixth model differs from some but not all of the top five")
+    claim(all(frozenset((a, b)) in SEP_FAC for a in rest for b in ORDER[:6]), "each lower-tier model differs from every model above it")
+cross_sep = sum(frozenset((a, b)) in SEP_FAC for a in ORDER[:6] for b in rest)  # pairs between the first six and the last five that differ
 no_variance = [Q1[k]["templates_no_instance_variance"] for k in ORDER]
 
 gaps = [Q2[k]["gap"] for k in ORDER]
@@ -449,7 +467,10 @@ first_cov = min(ORDER, key=lambda k: cov_rank[k])
 first_fac = ORDER[0]
 dc = next(p for p in CPAIRS if {p["a"], p["b"]} == {first_fac, first_cov})
 dc_diff = dc["diff"] if dc["a"] == first_fac else -dc["diff"]
-claim(frozenset((first_fac, first_cov)) not in SEP_FAC and dc["p_holm"] < 0.05, "FAC does not separate the first on FAC and the first on MC; MC does")
+if MATCHED_HEAD:
+    claim(frozenset((first_fac, first_cov)) not in SEP_FAC and dc["p_holm"] >= 0.05, "neither FAC nor MC separates the first on FAC and the first on MC")
+else:
+    claim(frozenset((first_fac, first_cov)) not in SEP_FAC and dc["p_holm"] < 0.05, "FAC does not separate the first on FAC and the first on MC; MC does")
 n_mc_sig, n_wil_sig = len(SEP_MC), len(separated(CPAIRS, "p_wilcoxon_holm"))
 agree = sum((p["p_holm"] < 0.05) == (p["p_wilcoxon_holm"] < 0.05) for p in CPAIRS)
 top3_cov = sorted(ORDER, key=lambda k: cov_rank[k])[:3]
@@ -458,8 +479,12 @@ rho = [COV[k]["rho_steps"] for k in ORDER]
 
 REPRESENTATIVE = ["deepseek-v4.1-flash", "claude-sonnet-5", "gpt-5.4-mini", "gpt-oss-20b"]  # the four models the figures show
 top_rep, low_rep = REPRESENTATIVE[:2], REPRESENTATIVE[2:]
-claim(top_rep == [first_fac, first_cov] and low_rep[0] in NO_REASONING and low_rep[0] in ORDER[6:] and low_rep[1] == ORDER[-1],
-      "the representative models are the first on FAC, the first on MC, a no-reasoning lower-tier model and the last")
+if MATCHED_HEAD:
+    claim(top_rep == [first_fac, first_cov] and ORDER.index(low_rep[0]) == 4 and low_rep[1] == ORDER[-1],
+          "the representative models are the first on FAC, the first on MC, the fifth and the last")
+else:
+    claim(top_rep == [first_fac, first_cov] and low_rep[0] in NO_REASONING and low_rep[0] in ORDER[6:] and low_rep[1] == ORDER[-1],
+          "the representative models are the first on FAC, the first on MC, a no-reasoning lower-tier model and the last")
 rep_branch = {k: [BL[k]["branch"][b]["mean"] for b in BRANCH] for k in REPRESENTATIVE}
 top_branch = rep_branch[top_rep[0]] + rep_branch[top_rep[1]]
 top_domain = [v for k in top_rep for v in REP[k]["domain"].values()]
@@ -567,7 +592,24 @@ tool = {m: arm[("tool", m)] for m in ("claude-sonnet-5", "gpt-5.4-mini")}
 claim(all(t["within_margin"] and t["e5"]["within_margin"] for t in tool.values()), "with the tool both closed models stay within the margin on FAC and MC")
 fl = {a["model"]: a for a in ANCH["flagship"]["anchors"]}
 flr = ANCH["flagship-reasoning-medium"]["anchors"][0]
-roster_sub = sorted(ANCH["flagship"]["roster"], key=lambda x: -x["score"])
+_roster = ANCH["flagship"]["roster"]
+if MATCHED_HEAD:  # the re-run models at their matched setting: their matched-store responses on the subset's items (no interval of its own)
+    _sub_ids = set(subsamples.paraphrase_ids())  # the 450-item subsample the anchors and the experiments ran on
+    drift(len(_sub_ids) == ANCH["flagship"]["items"], f"subsamples.PARAPHRASE gives {len(_sub_ids)} items; the anchors ran on {ANCH['flagship']['items']}")
+
+    def _matched_on_subset(k: str) -> dict:
+        """Score (the mean of template means, as analyze.anchors scores the roster) and level means of k's matched store on the subset."""
+        rows = [r for r in map(json.loads, (HERE / "scores" / REASONING_STORE[k] / f"{k}.jsonl").read_text(encoding="utf-8").splitlines())
+                if r["item_id"] in _sub_ids]
+        drift(len(rows) == len(_sub_ids), f"{REASONING_STORE[k]}/{k}.jsonl holds {len(rows)} of the subset's {len(_sub_ids)} items")
+        by_t, by_lv = defaultdict(list), defaultdict(list)
+        for r in rows:
+            by_t[r["template_id"]].append(r["score"])
+            by_lv[r["level"]].append(r["score"])
+        return {"model": k, "score": sum(sum(v) / len(v) for v in by_t.values()) / len(by_t), "ci": None,
+                "levels": {lv: {"mean": sum(v) / len(v)} for lv, v in by_lv.items()}}
+    _roster = [x if x["model"] not in RERUN else _matched_on_subset(x["model"]) for x in _roster]
+roster_sub = sorted(_roster, key=lambda x: -x["score"])
 top5_sub = roster_sub[:5]
 claim({x["model"] for x in top5_sub} == set(TOP5), "the top five on the subset are the top five overall")
 sub_scores = [x["score"] for x in top5_sub]
@@ -576,7 +618,7 @@ anchors_adv = [fl["deepseek-v4-pro"]["levels"]["Advanced"]["mean"], fl["gpt-5.4"
                flr["levels"]["Advanced"]["mean"]]
 anchor_scores = [fl["deepseek-v4-pro"]["score"], fl["gpt-5.4"]["score"], flr["score"]]  # the flagship runs on the subset
 anchor_top = max(anchor_scores)
-anchor_host = [x["model"] for x in top5_sub if x["ci"][0] <= anchor_top <= x["ci"][1]]  # top-five models whose interval holds the highest run
+anchor_host = [x["model"] for x in top5_sub if x["ci"] and x["ci"][0] <= anchor_top <= x["ci"][1]]  # top-five models whose interval holds the highest run
 claim(anchor_top == flr["score"] and len(anchor_host) >= 1, "the highest flagship run, GPT-5.4 with reasoning, lies inside a top-five model's interval")
 n_sub = ANCH["flagship"]["items"]
 ob_items, ob_templates = ob["gpt-oss-20b"]["items"], ob["gpt-oss-20b"]["templates"]
@@ -616,6 +658,12 @@ top5_rows = [res_model[k] for k in TOP5]
 top5_incorrect = sum(int(r[1]) for r in top5_rows)
 top5_near = sum(int(r[2]) for r in top5_rows)
 top5_symbolic = sum(int(r[9]) for r in top5_rows)
+# The residual report covers the configuration shown when its incorrect counts are the shown ones for every model; otherwise its split
+# is printed PENDING (the lost points always come from the scores shown).
+RESID_OK = all(int(res_model[k][1]) == Q1[k]["incorrect"] for k in ORDER)
+drift(RESID_OK, f"{RESIDUAL_MD}'s incorrect counts differ from the configuration shown for "
+      + ", ".join(k for k in ORDER if int(res_model[k][1]) != Q1[k]["incorrect"]) + ": re-run residual_incorrect.py for that configuration")
+RESID = "" if RESID_OK else "PENDING-RESIDUAL "  # the prefix of a phrase whose split RESIDUAL_INCORRECT.md does not cover
 tpl_rows = residual.split("### Top five models, by template")[1].split("###")[0]
 tpl = {r[0]: r for r in md_table(tpl_rows, r"^\| \| n \|") if r[0] != "all"}
 one_template_symbolic = max(int(r[9]) for r in tpl.values())
@@ -690,8 +738,9 @@ _top3 = [t for t, _ in _claude_noerr_t.most_common(3)]
 top5_empty = sum(Q1[k]["unusable"] for k in TOP5)  # no readable final answer: empty, or no answer stated
 top5_partial = sum(Q1[k]["partial"] for k in TOP5)
 top5_partial_points = top5_partial / 2  # half credit each: a half point when the count is odd
-lost_points = top5_empty + top5_partial_points + top5_incorrect
-drift(abs(lost_points - sum(15 * N_TEMPLATES * (1 - Q1[k]["score"]) for k in TOP5)) < 1e-6, "RESIDUAL_INCORRECT.md's incorrect counts do not add up to the top five's lost points")
+top5_incorrect_shown = sum(Q1[k]["incorrect"] for k in TOP5)  # the incorrect verdicts of the configuration shown
+lost_points = top5_empty + top5_partial_points + top5_incorrect_shown
+drift(abs(lost_points - sum(15 * N_TEMPLATES * (1 - Q1[k]["score"]) for k in TOP5)) < 1e-6, "the first five's verdicts do not add up to their lost points")
 _vir = re.search(r"\| incorrect traces \|[^\n]*\n\|[-:| ]+\n\| (\d+) \| (\d+) \|", residual)
 virial_n, virial_flow = (int(_vir.group(1)), int(_vir.group(2))) if _vir else (0, 0)
 median_sd_zero = sum(Q1[k]["within_sd_quartiles"][1] == 0 for k in ORDER)
@@ -820,7 +869,7 @@ assert set(RERUN) <= set(M_PAIRED), f"matched.json's paired_change lacks {sorted
 for k in EXTRA_MODELS:
     assert k in NAME, f"no display name for the added model {k}: add it to NAME (and paper_setup.py)"
 m_top = [k for k in M_ORDER if "a" in M_MODELS[k]["letter"]]  # the top tier at matched settings: every model sharing the first letter
-_stale = [k for k in ORDER if M_MODELS[k].get("store", CFG_BY[k]["default_store"]) == CFG_BY[k]["default_store"] and abs(M_MODELS[k]["fac"] - Q1[k]["score"]) > 1e-9]
+_stale = [k for k in ORDER if M_MODELS[k].get("store", CFG_BY[k]["default_store"]) == CFG_BY[k]["default_store"] and abs(M_MODELS[k]["fac"] - Q1_DEFAULT[k]["score"]) > 1e-9]
 drift(not _stale, f"results.json and matched.json disagree on the default-store FAC of {len(_stale)} models ({', '.join(_stale)}): results.json "
       "predates the re-scored store; re-run analyze.py's main pass before Phase 2")
 
@@ -832,28 +881,32 @@ def share(x: float, n: int = N_ITEMS) -> float:
 
 # Single path (WS-C1): per model, the share of templates solved on all, some and no instances, single-path and other templates.
 S_MODELS = {k: v for k, v in SINGLE.items() if isinstance(v, dict) and "single" in v}
+if HEADLINE == "matched":  # matched.json's Q4 rows, in single_path.json's shape
+    S_MODELS = {k: {g: {**{c: Q4[k][src][c] for c in ("all", "some", "none")}, "ci": {c: Q4[k][src][f"{c}_ci"] for c in ("all", "some", "none")}}
+                    for g, src in (("single", "single_path"), ("others", "multi_path"))} for k in ORDER}
 assert set(ORDER) <= set(S_MODELS), f"single_path.json lacks {sorted(set(ORDER) - set(S_MODELS))}"
 drift(SINGLE.get("n_single") == N_SINGLE and SINGLE.get("n_others") == N_MULTI, "single_path.json's template counts differ from results.json's Q4")
 
 # Providers (WS-C1): one row per model and serving endpoint.
 P_ROWS = PROVIDERS["rows"] if isinstance(PROVIDERS, dict) else PROVIDERS
-P_ROWS = sorted(P_ROWS, key=lambda r: (ORDER.index(r["model"]) if r["model"] in ORDER else len(ORDER), -r["rows"]))
+P_ROWS = sorted(P_ROWS, key=lambda r: (ORDER_DEFAULT.index(r["model"]) if r["model"] in ORDER_DEFAULT else len(ORDER_DEFAULT), -r["rows"]))
 for r in P_ROWS:
     r["few"] = bool(r.get("few_templates") or r.get("few_matched"))  # served or matched fewer than 20 templates
 few_endpoints = sum(r["few"] for r in P_ROWS)
-P_MODELS = sorted({r["model"] for r in P_ROWS}, key=lambda k: ORDER.index(k) if k in ORDER else len(ORDER))
+P_MODELS = sorted({r["model"] for r in P_ROWS}, key=lambda k: ORDER_DEFAULT.index(k) if k in ORDER_DEFAULT else len(ORDER_DEFAULT))
 
 # Coverage variants (WS-C2).
-CV_MODELS, CV_PAIRS = COVVAR["models"], COVVAR.get("pairs", {})
+CV_FAMILY = COVVAR["matched"] if HEADLINE == "matched" else COVVAR  # the coverage readings of the configuration the tables show
+CV_MODELS, CV_PAIRS = CV_FAMILY["models"], CV_FAMILY.get("pairs", {})
 VARIANTS = ["as_scored", "matching_only", "route_adjusted", "intermediate_only"]
 VARIANT_LABEL = {"as_scored": "As scored", "matching_only": "Matching alone", "route_adjusted": "Route-adjusted", "intermediate_only": "Intermediate only"}
 assert set(ORDER) <= set(CV_MODELS), f"coverage_variants.json lacks {sorted(set(ORDER) - set(CV_MODELS))}"
 CV_LETTERS = {v: letters(sorted(ORDER, key=lambda k: -CV_MODELS[k][v]["all"]), separated(CV_PAIRS[v])) for v in CV_PAIRS if v in VARIANTS}
 CV_LETTERS["as_scored"] = CLD_MC
-SEP_RULE = COVVAR["separation_rule"]["claude_vs_deepseek"]
-VERB = COVVAR["verbosity"]
+SEP_RULE = CV_FAMILY["separation_rule"]["claude_vs_deepseek"]
+VERB = CV_FAMILY["verbosity"]
 VERB_UNIT = VERB.get("units", {}).get("numbers", "MC per numeric value shown")
-RTOK = COVVAR.get("reasoning_tokens", {})
+RTOK = CV_FAMILY.get("reasoning_tokens", {})
 
 # Scoring-rule variants (WS-C3): the main store's rows; the reasoning stores' rows print when the headline is matched.
 SV_STORE = "matched" if HEADLINE == "matched" and "matched" in SENSVAR["stores"] else "main"  # the configuration Table 1 shows
@@ -863,19 +916,22 @@ SV_VARIANTS = ["abs_clause_off", "last_digit_unbounded", "prescribed_relaxed", "
 SV_LABEL = {"abs_clause_off": ("Absolute-value", "clause off"), "last_digit_unbounded": ("Last-digit term", "not capped"),
             "prescribed_relaxed": ("Prescribed digits", "relaxed"), "per_part_credit": ("Proportional", "partial credit")}
 assert set(ORDER) <= set(SV_MODELS), f"sensitivity_variants.json lacks {sorted(set(ORDER) - set(SV_MODELS))}"
-REL_BINS = SENSVAR.get("relative_error_bins", {})
+REL_BINS = SENSVAR["stores"][SV_STORE].get("relative_error_bins", SENSVAR.get("relative_error_bins", {}))
 REL_KEYS = ["le_0.2", "0.2_1", "1_5", "gt_5"]
 REL_LABEL = {"le_0.2": "$\\le$0.2\\%", "0.2_1": "0.2--1\\%", "1_5": "1--5\\%", "gt_5": "$>$5\\%"}
 
 # Carried precision (WS-C3).
 FP_MODELS, FP_EXPERT = FLAGPREC["models"], FLAGPREC["expert_confirmed"]
+if HEADLINE == "matched":  # the re-run models' flags on their responses with reasoning on
+    FP_MODELS = {**FP_MODELS, **{k: FLAGPREC["stores"][REASONING_STORE[k]]["models"][k] for k in RERUN}}
 assert set(ORDER) <= set(FP_MODELS), f"flag_precision.json lacks {sorted(set(ORDER) - set(FP_MODELS))}"
 drift(FP_EXPERT["slips"] == flags_slip, f"flag_precision.json counts {FP_EXPERT['slips']} confirmed slips; FLAG_REVIEW_3.md {flags_slip}")
 fp_total = sum(FP_MODELS[k]["flags"] for k in ORDER)
 fp_carried = sum(FP_MODELS[k]["carried_precision"] for k in ORDER)
 
 # Depth, controlled (WS-C3).
-D_MODELS = DEPTH["models"]
+D_CONFIG = DEPTH["configurations"]["matched" if HEADLINE == "matched" else "main"]  # the configuration the tables show
+D_MODELS = D_CONFIG["models"]
 D_BINS = list(D_MODELS[ORDER[0]]["bins"])
 assert set(ORDER) <= set(D_MODELS), f"depth_model.json lacks {sorted(set(ORDER) - set(D_MODELS))}"
 depth_holds = [k for k in ORDER if D_MODELS[k]["p_holm"] < 0.05]
@@ -906,7 +962,7 @@ claim(dec_weights.get(ORDER[0]) == "open", "the first model is open-weights")
 max_none_n = max(Q1[k]["templates_no_variance_none_solved"] for k in ORDER)  # templates a model fails on every instance, at most
 max_none = max_none_n / N_TEMPLATES
 claim(round(margin * 100) == 5, "the paraphrase margin is five points")
-claim(max(flr["score"], fl["deepseek-v4-pro"]["score"], fl["gpt-5.4"]["score"]) <= max(x["ci"][1] for x in top5_sub), "no anchor run exceeds the top tier")
+claim(max(flr["score"], fl["deepseek-v4-pro"]["score"], fl["gpt-5.4"]["score"]) <= max(x["ci"][1] for x in top5_sub if x["ci"]), "no anchor run exceeds the top tier")
 
 # Derived for the rewritten text (D-195).
 top5_pair_detect = [p["detectable"] for p in PAIRS if {p["a"], p["b"]} <= set(TOP5)]
@@ -914,7 +970,10 @@ assert len(top5_pair_detect) == 10
 detect_lo, detect_hi = round(min(top5_pair_detect) * 100), round(max(top5_pair_detect) * 100)
 assert 0 < detect_lo <= detect_hi <= 12
 n_lower_noreason = sum(k in NO_REASONING for k in rest)
-claim(set(many_wrong) == set(rest), "the models with more than 100 wrong answers are the lower tier")
+if MATCHED_HEAD:
+    claim(many_wrong == ORDER[-len(many_wrong):], "the models with more than 100 wrong answers are the last on FAC")
+else:
+    claim(set(many_wrong) == set(rest), "the models with more than 100 wrong answers are the lower tier")
 many_e3w = [Q3[k]["e3_coverage_on_readable_wrong"] for k in many_wrong]
 many_floor = [Q3[k]["e3_null_on_readable_wrong"] for k in many_wrong]
 many_missing = [Q3[k]["attribution_on_wrong"]["e5_missing"] for k in many_wrong]
@@ -923,7 +982,9 @@ claude_attr = Q3["claude-sonnet-5"]["attribution_on_wrong"]
 claim(claude_attr["e5_missing"] < min(many_missing) and claude_attr["router_judge"] < min(many_router), "Claude Sonnet 5's wrong answers carry fewer missing rulings and judged flags than the lower tier's")
 low_some = [Q4[k]["single_path"]["some"] for k in rest]
 top_some = [Q4[k]["single_path"]["some"] for k in strong6]
-claim(max(top_some) < min(low_some), "every lower-tier model solves some but not all instances of more single-path templates than any top-six model")
+if not MATCHED_HEAD:
+    claim(max(top_some) < min(low_some), "every lower-tier model solves some but not all instances of more single-path templates than any top-six model")
+first5_some, other6_some = [Q4[k]["single_path"]["some"] for k in TOP5], [Q4[k]["single_path"]["some"] for k in ORDER[5:]]
 depth6_top5 = [Q3[k]["by_milestone_count"]["6+"]["wrong_rate"] for k in TOP5]
 depth6_low = [Q3[k]["by_milestone_count"]["6+"]["wrong_rate"] for k in rest]
 claim(max(depth6_top5) < min(depth6_low), "every lower-tier model is scored 0 more often on deep instances than any top-five model")
@@ -962,7 +1023,8 @@ flag_arm = arm[("flagship-reasoning-medium", "gpt-5.4")]
 claim(0.4 <= mini_flag_arm / mini_flag_main <= 0.6, "GPT-5.4 mini's flags roughly halve with reasoning")
 claim(flag_arm["digit_flag_rate_fully_solved"]["arm"] < 0.5 * flag_arm["digit_flag_rate_fully_solved"]["main"], "GPT-5.4 sheds most of its flags with reasoning")
 claim(ORDER[-1] == "gpt-oss-20b" and 0.6 <= tool_share["claude-sonnet-5"] <= 0.7, "gpt-oss-20b is the weakest model; Claude calls the tool on two thirds of the instances")
-claim(r_mini["diff"] > max(scores[:5]) - min(scores[:5]) and r_mini["diff"] > max(scores[6:]) - min(scores[6:]), "GPT-5.4 mini's reasoning gain exceeds either tier's spread")
+if not MATCHED_HEAD:
+    claim(r_mini["diff"] > max(scores[:5]) - min(scores[:5]) and r_mini["diff"] > max(scores[6:]) - min(scores[6:]), "GPT-5.4 mini's reasoning gain exceeds either tier's spread")
 
 _lc = Counter(BRANCH[b].lower() for b in lowest_branch.values())
 _lo = sorted(_lc, key=lambda b: (-_lc[b], b))
@@ -993,7 +1055,7 @@ resid_top3 = sorted(tpl, key=lambda t: -int(tpl[t][1]))[:3]  # the three templat
 resid3_total = sum(int(tpl[t][1]) for t in resid_top3)
 n_experiments = len({a["arm"] for a in ARMS})
 m_change = {k: M_PAIRED[k]["change"] for k in RERUN}
-m_top_default = [k for k in ORDER if "a" in CLD_FAC[k]]
+m_top_default = [k for k in ORDER_DEFAULT if "a" in CLD_FAC_DEFAULT[k]]
 
 
 def stand(*names: str) -> str:
@@ -1011,11 +1073,12 @@ def clean_splits(order: list[str], sep: set[frozenset]) -> list[int]:
     return [i for i in range(1, len(order)) if all(frozenset((a, b)) in sep for a in order[:i] for b in order[i:])]
 
 
-claim(clean_splits(ORDER, SEP_FAC) == [len(UPPER)], "at the defaults the one clean split of the FAC order falls after the sixth model")
+claim(clean_splits(ORDER_DEFAULT, SEP_FAC_DEFAULT) == [len(UPPER)], "at the defaults the one clean split of the FAC order falls after the sixth model")
 tier_gap = min(Q1[k]["score"] for k in UPPER) - max(Q1[k]["score"] for k in rest)
-claim(max(abs(Q5[k]["diff"]) for k in ORDER) < tier_gap, "no paraphrase change reaches the gap between the tiers")
-claim(not any((a in UPPER) != (b in UPPER) for var in tol_swaps for a, b in tol_swaps[var]), "no tolerance variant swaps a pair across the tiers")
-claim(all(k in rest for k in REPEATS) and 3 * max(rep_sd) < tier_gap, "the re-decoded models are lower-tier and their decoding noise is far below the gap")
+if not MATCHED_HEAD:
+    claim(max(abs(Q5[k]["diff"]) for k in ORDER) < tier_gap, "no paraphrase change reaches the gap between the tiers")
+    claim(not any((a in UPPER) != (b in UPPER) for var in tol_swaps for a, b in tol_swaps[var]), "no tolerance variant swaps a pair across the tiers")
+    claim(all(k in rest for k in REPEATS) and 3 * max(rep_sd) < tier_gap, "the re-decoded models are lower-tier and their decoding noise is far below the gap")
 M_SEP = separated(MATCHED["pairs"])
 m_alone = [k for k in M_ORDER if all(frozenset((k, j)) in M_SEP for j in M_ORDER if j != k)]
 m_first4 = M_ORDER[:4]
@@ -1029,25 +1092,31 @@ claim(all(M_PAIRED[k]["p_holm"] < 0.05 and not M_PAIRED[k]["within_margin"] for 
 claim(set(sorted(RERUN, key=lambda k: m_change[k])[-2:]) == {"gpt-5.4-mini", "gemma-4-26b-a4b"},
       "GPT-5.4 mini and Gemma 4 26B gain the most from reasoning effort")
 order_readable = sorted(ORDER, key=lambda k: -SENS[k]["unusable_excluded"])
-claim([k for k in order_readable if k in rest] == rest and order_readable[0] == "glm-5.3" and ORDER.index("glm-5.3") == len(UPPER) - 1,
-      "readable-only FAC reorders the upper tier only and moves GLM-5.3 from sixth to first")
+n_reordered = max(i for i, k in enumerate(order_readable) if ORDER[i] != k) + 1  # readable-only FAC moves only the first n_reordered models
+if MATCHED_HEAD:
+    claim(order_readable[0] == "glm-5.3" and ORDER.index("glm-5.3") == n_reordered - 1,
+          "readable-only FAC reorders only the models down to GLM-5.3 and moves GLM-5.3 from last of them to first")
+else:
+    claim([k for k in order_readable if k in rest] == rest and order_readable[0] == "glm-5.3" and ORDER.index("glm-5.3") == len(UPPER) - 1,
+          "readable-only FAC reorders the upper tier only and moves GLM-5.3 from sixth to first")
 q5_bound = {k: (Q5[k]["ci90"][0] if abs(Q5[k]["ci90"][0]) > abs(Q5[k]["ci90"][1]) else Q5[k]["ci90"][1]) for k in q5_out}
 claim(all(abs(v) > margin for v in q5_bound.values()), "the named paraphrase bounds lie outside the margin")
-D_POOLED = DEPTH["configurations"]["main"]["pooled"]
+D_POOLED = D_CONFIG["pooled"]
 claim(D_POOLED["ci"][0] > 0 and D_POOLED["or_ci"][0] > 1, "pooled over models, the depth slope is positive")
 m_gap_sig = [k for k in M_ORDER if M_MODELS[k].get("gap_p_holm", 1) < 0.05]
-claim(first_cov == "claude-sonnet-5" and first_fac == "deepseek-v4.1-flash" and SEP_RULE["as_scored"] < 0.05 and SEP_RULE["matching_only"] < 0.05
-      and SEP_RULE["intermediate_only"] < 0.05 and SEP_RULE["route_adjusted"] >= 0.05,
-      "MC separates Claude Sonnet 5 from DeepSeek V4.1 Flash as scored, by matching alone and on intermediates, not route-adjusted")
+claim(first_cov == "claude-sonnet-5" and first_fac == "deepseek-v4.1-flash" and (SEP_RULE["as_scored"] >= 0.05) == MATCHED_HEAD
+      and SEP_RULE["matching_only"] < 0.05 and SEP_RULE["intermediate_only"] < 0.05 and SEP_RULE["route_adjusted"] >= 0.05,
+      "MC separates Claude Sonnet 5 from DeepSeek V4.1 Flash by matching alone and on intermediates, not route-adjusted, and as scored "
+      + ("not at matched settings" if MATCHED_HEAD else "at the defaults"))
 claim(FP_EXPERT["carried_precision"] == 0, "no expert-confirmed slip is carried precision")
 claude_calc = maj["claude-sonnet-5"].get(CALC, 0)
 easy_items = sum(ERR_COMP["by_model_level"][m]["Easy"] for m in B2_MODELS)  # the wrong answers behind the Easy readings
 digit_top5 = [Q3[k]["digit_flag_rate_on_fully_solved"] for k in TOP5]
 # The review of 2026-10-09: the scope of each contrast stated with the claim.
 n_gap_zero = sum(Q2[k]["ci"][0] <= 0 for k in ORDER)  # level gaps whose 95% interval includes zero
-upper_missing = [Q3[k]["attribution_on_wrong"]["e5_missing"] for k in UPPER if k != "claude-sonnet-5"]  # the other upper-tier models
-m_mini_level = [k for k in TOP5 if frozenset((k, "gpt-5.4-mini")) not in M_SEP]  # first-five models GPT-5.4 mini no longer differs from
-claim(all(frozenset((k, "gpt-5.4-mini")) in SEP_FAC for k in m_mini_level), "GPT-5.4 mini differed from those models at the defaults")
+upper_missing = [Q3[k]["attribution_on_wrong"]["e5_missing"] for k in ORDER if k not in many_wrong and k != "claude-sonnet-5"]  # the other models
+m_mini_level = [k for k in TOP5 if k != "gpt-5.4-mini" and frozenset((k, "gpt-5.4-mini")) not in M_SEP]  # first-five models GPT-5.4 mini no longer differs from
+claim(all(frozenset((k, "gpt-5.4-mini")) in SEP_FAC_DEFAULT for k in m_mini_level), "GPT-5.4 mini differed from those models at the defaults")
 above_margin = [k for k in RERUN if M_PAIRED[k]["ci90"][0] > margin]  # re-run models whose 90% interval lies wholly above the margin
 judge_add = [CV_MODELS[k]["as_scored"]["all"] - CV_MODELS[k]["matching_only"]["all"] for k in ORDER]  # the judge's contribution to MC
 claim(bool(above_margin), "at least one reasoning gain lies wholly above the margin")
@@ -1058,6 +1127,20 @@ def dom(d: str) -> str:
     return d.replace("_", " ")
 
 
+# The matched headline (a graded order, no two tiers): the groups its phrases name, and the claims behind them.
+n_groups = len({c for v in CLD_FAC.values() for c in v})  # the letters of the tier column
+rerun_top = [k for k in RERUN if k in TOP5]  # re-run models among the first five
+cv_sep_scored, cv_sep_matching = len(separated(CV_PAIRS["as_scored"])), len(separated(CV_PAIRS["matching_only"]))
+close_reps = [k for k in REPRESENTATIVE if k != ORDER[-1]]  # the representative models other than the last
+if MATCHED_HEAD:
+    claim(len(rerun_top) == 1, "of the re-run models only one reaches the first five")
+    claim(max(branch_span[k] for k in close_reps) <= max(top_span) < branch_span[ORDER[-1]] and lowest_branch[ORDER[-1]] == "civil_engineering",
+          "three representative models stay within the first five's branch spread; the last is lowest in civil engineering")
+    claim(max(top_span) < branch_span[sixth] < min(low_span) and float(low_dom_ceil) <= dom_min[sixth], "the sixth model lies between the first five and the last five")
+    claim(cv_sep_matching > cv_sep_scored, "matching alone separates more MC pairs than coverage as scored")
+claim(all(g > 0 for g in gaps), "every model's mean is lower on Advanced than on Easy templates")
+
+
 def pairs_from(pairs: list[tuple[str, str]]) -> str:
     """'b from a1, a2, and a3' when every pair shares its lower model, otherwise 'a1 from b1 and a2 from b2'."""
     lows = {b for _, b in pairs}
@@ -1066,26 +1149,46 @@ def pairs_from(pairs: list[tuple[str, str]]) -> str:
     return series([f"{tt(a)} from {tt(b)}" for a, b in pairs])
 
 
+# The re-run models at their providers' defaults, and the one clean split of the default ordering (the Reasoning Setting paragraph).
+claim(all(k in NO_REASONING for k in RERUN), "the re-run models return no reasoning tokens at their providers' defaults")
+rerun_default = (f"{series([tt(k) for k in RERUN])} return no reasoning tokens and score "
+                 f"{series([f3(Q1_DEFAULT[k]['score']) for k in RERUN])}")
+d_split = (clean_splits(ORDER_DEFAULT, SEP_FAC_DEFAULT) or [0])[0]
+
+
 phrases = [  # 6_results.tex must contain each of these, whitespace aside
     # 5.3.1: the tiers at the providers' defaults
-    f"an upper tier of {WORD[len(UPPER)]} models with FAC of {f3(min(scores[:6]))} to {f3(max(scores[:6]))} and a lower tier of {WORD[len(rest)]} "
-    f"with {f3(min(scores[6:]))} to {f3(max(scores[6:]))}",
-    f"each of which differs from each upper-tier model after Holm's correction over the {N_PAIRS} pairwise tests",
-    f"The first {WORD[len(TOP5)]}, the upper tier without {tt('glm-5.3')}, whose {Q1['glm-5.3']['empty']} empty responses place it "
-    f"{ORDINAL[ORDER.index('glm-5.3')]}, lie within {f3(spread5)} of one another, and "
+    *([f"the {WORD[len(ORDER)]} models form a graded order of {WORD[n_groups]} overlapping groups, with FAC of {f3(min(scores))} to "
+       f"{f3(max(scores))}, and {len(SEP_FAC)} of the {N_PAIRS} pairs differ after Holm's correction",
+       f"only {tt(m_alone[0])} differs from every other model, while {series([tt(k) for k in m_first4])} differ from {tt('glm-5.3')} and every "
+       "model below it"] if MATCHED_HEAD else
+      [f"an upper tier of {WORD[len(UPPER)]} models with FAC of {f3(min(scores[:6]))} to {f3(max(scores[:6]))} and a lower tier of "
+       f"{WORD[len(rest)]} with {f3(min(scores[6:]))} to {f3(max(scores[6:]))}",
+       f"each of which differs from each upper-tier model after Holm's correction over the {N_PAIRS} pairwise tests"]),
+    f"The first {WORD[len(TOP5)]}"
+    + ("" if MATCHED_HEAD else f", the upper tier without {tt('glm-5.3')}, whose {Q1['glm-5.3']['empty']} empty responses place it "
+       f"{ORDINAL[ORDER.index('glm-5.3')]},") + f" lie within {f3(spread5)} of one another, and "
     + ("no pair of them differs" if not top5_sep_pairs else
        f"only one of their {WORD[10]} pairs differs ({tt(top5_sep_pairs[0][0])} above {tt(top5_sep_pairs[0][1])})" if len(top5_sep_pairs) == 1 else
        f"only {WORD[len(top5_sep_pairs)]} of their {WORD[10]} pairs differ")
     + f", although the design detects differences of {WORD[detect_lo]} to {WORD[detect_hi]} points between them",
     f"even on Advanced templates they score {f2(min(adv_top5))} to {f2(max(adv_top5))}",
-    f"no model fails every instance of more than {WORD[max_none_n]} of the {N_TEMPLATES} templates, but the upper {WORD[len(UPPER)]} solve "
-    f"{pct(min(solved[k] for k in UPPER))} to {pct(max(solved[k] for k in UPPER))} of the templates on every instance and the lower "
-    f"{WORD[len(rest)]} only {pct(min(solved[k] for k in rest))} to {pct(max(solved[k] for k in rest))}",
-    f"{WORD[n_lower_noreason].capitalize()} of the lower {WORD[len(rest)]} return no reasoning tokens at their providers' defaults",
+    (f"no model fails every instance of more than {WORD[max_none_n]} of the {N_TEMPLATES} templates, but the first {WORD[len(TOP5)]} solve "
+     f"{pct(min(solved[k] for k in TOP5))} to {pct(max(solved[k] for k in TOP5))} of the templates on every instance and the other "
+     f"{WORD[len(ORDER) - len(TOP5)]} {pct(min(solved[k] for k in ORDER[5:]))} to {pct(max(solved[k] for k in ORDER[5:]))}" if MATCHED_HEAD else
+     f"no model fails every instance of more than {WORD[max_none_n]} of the {N_TEMPLATES} templates, but the upper {WORD[len(UPPER)]} solve "
+     f"{pct(min(solved[k] for k in UPPER))} to {pct(max(solved[k] for k in UPPER))} of the templates on every instance and the lower "
+     f"{WORD[len(rest)]} only {pct(min(solved[k] for k in rest))} to {pct(max(solved[k] for k in rest))}"),
+    (f"Of the {WORD[len(RERUN)]} models run with reasoning at medium effort, only {tt(rerun_top[0]) if rerun_top else '--'} reaches the first "
+     f"{WORD[len(TOP5)]}" if MATCHED_HEAD else
+     f"{WORD[n_lower_noreason].capitalize()} of the lower {WORD[len(rest)]} return no reasoning tokens at their providers' defaults"),
     # the derivation behind correct answers
-    f"As scored, MC separates {tt('claude-sonnet-5')} from {tt('deepseek-v4.1-flash')}, which the final answer does not (Holm-adjusted $p$ "
-    f"{pv(SEP_RULE['as_scored'])}), and so does matching alone ({pv(SEP_RULE['matching_only'])}), but not once the milestones the judge rules "
-    f"not needed leave the denominator ({pv(SEP_RULE['route_adjusted'])};",
+    (f"As scored, MC does not separate {tt('claude-sonnet-5')} from {tt('deepseek-v4.1-flash')} after Holm's correction (Holm-adjusted $p$ "
+     f"{pv(SEP_RULE['as_scored'])}), nor does the final answer; matching alone does ({pv(SEP_RULE['matching_only'])}), but not once the "
+     f"milestones the judge rules not needed leave the denominator ({pv(SEP_RULE['route_adjusted'])};" if MATCHED_HEAD else
+     f"As scored, MC separates {tt('claude-sonnet-5')} from {tt('deepseek-v4.1-flash')}, which the final answer does not (Holm-adjusted $p$ "
+     f"{pv(SEP_RULE['as_scored'])}), and so does matching alone ({pv(SEP_RULE['matching_only'])}), but not once the milestones the judge rules "
+     f"not needed leave the denominator ({pv(SEP_RULE['route_adjusted'])};"),
     f"The arithmetic check flags a displayed calculation that does not follow from its own operands in up to {pct1(max(digit))} of a "
     "model's correct answers",
     f"Of the {flags_decided} flags a domain expert decided on, {flags_slip} are real slips (precision {f3(flag_precision)}), and a mechanical "
@@ -1096,36 +1199,46 @@ phrases = [  # 6_results.tex must contain each of these, whitespace aside
     f"{f3(router_alone_precision)})",
     f"in the expert study, both checks together find {f2(router_recall)} of the flawed steps the domain experts marked inside correct answers",
     # the derivation behind wrong answers
-    f"On their wrong answers, the {WORD[len(many_wrong)]} lower-tier models still state {pct(min(many_e3w))} to {pct(max(many_e3w))} of the gold "
+    f"On their wrong answers, the {(f'last {WORD[len(many_wrong)]}' if MATCHED_HEAD else f'{WORD[len(many_wrong)]} lower-tier')} models still state {pct(min(many_e3w))} to {pct(max(many_e3w))} of the gold "
     f"milestones, against a chance floor of at most {pct1(max(many_floor))}",
     f"Up to {pct(max(full_cov))} of these wrong answers reach every gold milestone yet end in an answer the check scores incorrect",
-    f"A milestone the judge rules missing marks {pct(min(many_missing))} to {pct(max(many_missing))} of the lower tier's wrong answers and "
-    f"{pct(min(upper_missing))} to {pct(max(upper_missing))} of the other upper-tier models', but only {pct(claude_attr['e5_missing'])} of "
+    f"A milestone the judge rules missing marks {pct(min(many_missing))} to {pct(max(many_missing))} of the "
+    f"{(f'last {WORD[len(many_wrong)]}' + chr(39) + 's') if MATCHED_HEAD else 'lower tier' + chr(39) + 's'} wrong answers and "
+    f"{pct(min(upper_missing))} to {pct(max(upper_missing))} of the other {'' if MATCHED_HEAD else 'upper-tier '}models', but only {pct(claude_attr['e5_missing'])} of "
     f"{tt('claude-sonnet-5')}'s, {pct(COV['claude-sonnet-5']['wrong_full_coverage'])} of which reach every milestone",
-    f"On the {N_SINGLE} templates whose instances all follow one derivation, the lower tier solves some but not all instances of up to "
-    f"{pct(max(low_some))} of the templates and the upper tier of at most {pct(max(top_some))} (\\autoref{{tab:single_path}})",
+    (f"On the {N_SINGLE} templates whose instances all follow one derivation, the first {WORD[len(TOP5)]} solve some but not all instances of "
+     f"{pct(min(first5_some))} to {pct(max(first5_some))} of the templates and the other {WORD[len(other6_some)]} of {pct(min(other6_some))} to "
+     f"{pct(max(other6_some))} (\\autoref{{tab:single_path}})" if MATCHED_HEAD else
+     f"On the {N_SINGLE} templates whose instances all follow one derivation, the lower tier solves some but not all instances of up to "
+     f"{pct(max(low_some))} of the templates and the upper tier of at most {pct(max(top_some))} (\\autoref{{tab:single_path}})"),
     # the stability of the tiers
     f"Each of {q5_pairs} instances over {q5_templates} templates has a paraphrase that keeps every number, unit, and symbol in place",
     f"for {WORD[len(q5_within)]} of the {WORD[len(ORDER)]} models it is bounded within $\\pm {margin:.2f}$ at 90\\% confidence ("
     + series([f"{tt(k)} reaches {sgn(q5_bound[k])}" for k in q5_out]) + ")",
     f"decoding {WORD[len(REPEAT_MODELS)]} models ({series([tt(k) for k in REPEAT_MODELS])}) three more times on {rep_items} instances, "
     f"{WORD[rep_items // N_TEMPLATES]} per template, moves FAC by a standard deviation of at most {f3(max(rep_sd))}",
-    f"Restricting FAC to the responses that state an answer reorders the upper tier only (Kendall's $\\tau$ {f3(sens_tau['unusable_excluded'])} "
+    f"Restricting FAC to the responses that state an answer reorders {f'only the first {WORD[n_reordered]}' if MATCHED_HEAD else 'the upper tier only'} (Kendall's $\\tau$ {f3(sens_tau['unusable_excluded'])} "
     f"with the ordering as scored): {tt('glm-5.3')}, whose {Q1['glm-5.3']['empty']} empty responses then drop out, rises from "
     f"{ORDINAL[ORDER.index('glm-5.3')]} to {ORDINAL[order_readable.index('glm-5.3')]}",
     # the matched-settings sentences (tab:matched, WS-C1)
+    *([rerun_default,
+       f"At these defaults, the final answer sorts the models into two tiers, an upper {WORD[d_split]} each of which differs from each of a "
+       f"lower {WORD[len(ORDER_DEFAULT) - d_split]}, and {tt('gpt-5.4-mini')} ranks {ORDINAL[ORDER_DEFAULT.index('gpt-5.4-mini')]}"]
+      if MATCHED_HEAD else []),
     stand("matched") + "With reasoning at medium effort, " + series([f"{tt(k)} gains {sgn(m_change[k])}" for k in RERUN])
     + f" on all {thousands(N_ITEMS)} instances (\\autoref{{tab:matched}})",
-    stand("matched") + f"At these matched settings, {tt('gpt-5.4-mini')} rises to {f3(mini_m)}, level with {tt(mini_level[0]) if mini_level else '--'}, "
-    f"and the two tiers give way to overlapping groups: only {tt(m_alone[0]) if m_alone else '--'} differs from every other model, while "
-    f"{series([tt(k) for k in m_first4])} still differ from {tt('glm-5.3')} and every model below it",
-    stand("matched") + f"with reasoning on, {tt('gpt-5.4-mini')} no longer differs from {series([tt(k) for k in m_mini_level])}",
+    *([stand("matched") + f"With reasoning on, {tt('gpt-5.4-mini')} rises to {f3(mini_m)}, level with {tt(mini_level[0]) if mini_level else '--'}, "
+       f"and no longer differs from {series([tt(k) for k in m_mini_level])}"] if MATCHED_HEAD else
+      [stand("matched") + f"At these matched settings, {tt('gpt-5.4-mini')} rises to {f3(mini_m)}, level with {tt(mini_level[0]) if mini_level else '--'}, "
+       f"and the two tiers give way to overlapping groups: only {tt(m_alone[0]) if m_alone else '--'} differs from every other model, while "
+       f"{series([tt(k) for k in m_first4])} still differ from {tt('glm-5.3')} and every model below it",
+       stand("matched") + f"with reasoning on, {tt('gpt-5.4-mini')} no longer differs from {series([tt(k) for k in m_mini_level])}"]),
     # 5.3.2
     f"For the first {WORD[len(TOP5)]}, the spread between the highest and the lowest branch mean is {f3(min(top_span))} to {f3(max(top_span))}, "
     f"and no domain mean falls below {top_dom_floor}",
-    f"For the lower tier, the spread is {f3(min(low_span))} to {f3(max(low_span))}, and each model falls below {low_dom_ceil} in at least one "
-    f"domain; {tt('glm-5.3')} lies between, with a spread of {f3(branch_span['glm-5.3'])} and a lowest domain mean of "
-    f"{f3(dom_min['glm-5.3'])}",
+    f"For {f'the last {WORD[len(rest)]}' if MATCHED_HEAD else 'the lower tier'}, the spread is {f3(min(low_span))} to {f3(max(low_span))}, and "
+    f"each model falls below {low_dom_ceil} in at least one domain; {tt(sixth)} lies between, with a spread of {f3(branch_span[sixth])} and a "
+    f"lowest domain mean of {f3(dom_min[sixth])}",
     f"with {n_branch_templates} templates per branch, differences below {round(min(detect_branch) * 100)} to {round(max(detect_branch) * 100)} "
     f"points cannot be told from sampling noise, and only one of the {n_branch_pairs} within-model branch comparisons holds after correction "
     f"({tt('gpt-oss-20b')}, electrical above civil)",
@@ -1136,15 +1249,16 @@ phrases = [  # 6_results.tex must contain each of these, whitespace aside
     # 5.3.3
     f"Every model's mean is lower on Advanced than on Easy templates (\\autoref{{fig:level_bars}}), by {rng(gaps)}, with intervals that "
     f"include zero for {WORD[n_gap_zero]} models",
-    f"The gap holds after Holm's correction for {series([tt(k) for k in gap_sig])} under Welch's $t$-test, the test we read because scores "
-    f"vary more across Advanced templates, and at matched settings for {series([tt(k) for k in m_gap_sig])}"
-    + (" alone" if len(m_gap_sig) == 1 else "")
+    f"The gap holds after Holm's correction for {series([tt(k) for k in gap_sig])}{' alone' if MATCHED_HEAD and len(gap_sig) == 1 else ''} under "
+    f"Welch's $t$-test, the test we read because scores vary more across Advanced templates"
+    + (f", and for {WORD[gap_perm]} models under the permutation of level labels" if MATCHED_HEAD else
+       f", and at matched settings for {series([tt(k) for k in m_gap_sig])}" + (" alone" if len(m_gap_sig) == 1 else ""))
     + (f", and for no model once the {WORD[len(TWO_CHEMICAL)]} Advanced chemical templates whose wording does not pin the answer are set aside"
        if not REPAIRED else "")
     + " (\\autoref{tab:level_gap})",
     f"For all {WORD[len(ORDER)]} models, the share of responses scored 0 is higher on instances with {WORD[6]} or more gold milestones than on "
-    f"instances with one, reaching {rng(depth6_low)} for the lower tier against at most {f3(max(depth6_top5))} for the first {WORD[len(TOP5)]} "
-    f"({tt('glm-5.3')}: {f3(Q3['glm-5.3']['by_milestone_count']['6+']['wrong_rate'])})",
+    f"instances with one, reaching {rng(depth6_low)} for {f'the last {WORD[len(rest)]}' if MATCHED_HEAD else 'the lower tier'} against at most "
+    f"{f3(max(depth6_top5))} for the first {WORD[len(TOP5)]} ({tt(sixth)}: {f3(Q3[sixth]['by_milestone_count']['6+']['wrong_rate'])})",
     stand("depth_model") + f"Over readable responses, with the answer kind as a covariate and templates as clusters, each further milestone "
     f"multiplies the odds of a wrong answer by {f2(D_POOLED['odds_ratio'])} (95\\% interval {f2(D_POOLED['or_ci'][0])} to "
     f"{f2(D_POOLED['or_ci'][1])}) when pooled over the models",
@@ -1167,8 +1281,8 @@ phrases = [  # 6_results.tex must contain each of these, whitespace aside
     f"which {tt('claude-sonnet-5')} calls on two thirds of the instances, neither {tt('claude-sonnet-5')} nor {tt('gpt-5.4-mini')} changes in "
     f"FAC or MC beyond $\\pm {margin:.2f}$",
     # 5.4 (the sample as the store still holds it: scored_current.json)
-    f"Three domain experts read the full response of {items_read_total} wrong answers from {WORD[len(B2_MODELS)]} models that contrast the "
-    f"tiers ({series([f'{items_read_by_model[m]} from {tt(m)}' for m in B2_TEXT])}; {readings_total} readings, all at the providers' default "
+    f"Three domain experts read the full response of {items_read_total} wrong answers from {WORD[len(B2_MODELS)]} models that "
+    f"{'span the FAC order' if MATCHED_HEAD else 'contrast the tiers'} ({series([f'{items_read_by_model[m]} from {tt(m)}' for m in B2_TEXT])}; {readings_total} readings, all at the providers' default "
     f"settings) and assigned the first category that applies in a {WORD[6]}-category hierarchy from hallucination to calculation, or "
     f"``no error'' (Fleiss'~$\\kappa$ {f3(fleiss_all)}~\\citep{{fleiss1971}}",
     f"Calculation is the majority label for {tt('gpt-5.4-mini')}, {tt('gemma-4-26b-a4b')}, and {tt('claude-sonnet-5')} "
@@ -1186,7 +1300,7 @@ phrases = [  # 6_results.tex must contain each of these, whitespace aside
     "and Advanced ones",
     f"Over {thousands(n_top5_responses)} responses, the first {WORD[len(TOP5)]} models lose {lost_points:g} answer points",
     f"{top5_empty} go to responses with no readable final answer and {top5_partial_points:g} to {top5_partial} partial answers at half credit",
-    f"Of their {top5_incorrect} incorrect verdicts, "
+    RESID + f"Of their {top5_incorrect} incorrect verdicts, "
     + (f"{two_chemical} fall on the {WORD[len(TWO_CHEMICAL)]} chemical templates whose wording does not pin the answer, " if not REPAIRED else "")
     + f"{top5_near} lie within 0.2\\% of a target whose digits the question prescribes, which makes them incorrect by its terms, "
     f"{top5_symbolic} are symbolic answers scored by the numbers they state, and {remaining_incorrect} fall in neither group",
@@ -1198,16 +1312,21 @@ appendix_phrases = {
         "the smallest difference the design detects at 80\\% power",
         f"Of the {N_PAIRS} pairs, {len(SEP_FAC)} differ on FAC after Holm correction under the sign-flip test over templates: inside the first "
         f"{WORD[len(TOP5)]}, " + (("only " if len(top5_sep_pairs) == 1 else "") + pairs_from(top5_sep_pairs) if top5_sep_pairs else "none")
-        + f"; {tt(sixth)} from {series([tt(k) for k in sixth_sep]) if sixth_sep else 'none of them'}; each of the lower {WORD[len(rest)]} from "
-        f"every model of the upper tier; and inside the lower {WORD[len(rest)]}, " + (pairs_from(low_pairs) if low_pairs else "none"),
+        + f"; {tt(sixth)} from {series([tt(k) for k in sixth_sep]) if sixth_sep else 'none of them'}; "
+        + (f"{cross_sep} of the {len(ORDER[:6]) * len(rest)} pairs between the first {WORD[len(ORDER[:6])]} and the last {WORD[len(rest)]}; and "
+           f"inside the last {WORD[len(rest)]}, " if MATCHED_HEAD else
+           f"each of the lower {WORD[len(rest)]} from every model of the upper tier; and inside the lower {WORD[len(rest)]}, ")
+        + (pairs_from(low_pairs) if low_pairs else "none"),
         f"Every non-significant FAC difference lies below what its pair detects ({rng([pp['detectable'] for pp in nonsig])})",
-        f"On MC, {n_mc_sig} pairs differ: the three highest models, {tt(top3_cov[0])}, {tt(top3_cov[1])}, and {tt(top3_cov[2])}, do not "
-        f"separate, while {tt(first_cov)} and {tt(first_fac)}, which FAC does not separate, do; Kendall's $\\tau$~\\citep{{kendall1938}} "
+        f"On MC, {n_mc_sig} pairs differ{', each of them also on FAC' if SEP_MC <= SEP_FAC else ''}: the three highest models, {tt(top3_cov[0])}, {tt(top3_cov[1])}, and {tt(top3_cov[2])}, do not "
+        f"separate, {'nor do' if MATCHED_HEAD else 'while'} {tt(first_cov)} and {tt(first_fac)}, which FAC does not separate"
+        f"{' either' if MATCHED_HEAD else ', do'}; Kendall's $\\tau$~\\citep{{kendall1938}} "
         f"between the two orderings is {f3(tau['tau'])} (95\\% interval {ci(tau['ci'], False)})",
         f"Strict FAC, which scores a partial answer 0, separates {n_strict_sig} pairs and agrees with FAC on {N_PAIRS - len(strict_flip)} of the "
         f"{N_PAIRS}; a Wilcoxon test~\\citep{{wilcoxon1945}} separates {n_wil_sig} on MC; and McNemar's exact test~\\citep{{mcnemar1947}}, which "
         f"treats the {thousands(N_ITEMS)} instances as independent, separates {n_mcnemar_sig}",
-        "Halving the answer tolerance swaps " + (f"{WORD[n_tol_swaps['half_tol']]} pairs of models" if n_tol_swaps["half_tol"] else "no pair of models")
+        "Halving the answer tolerance swaps " + (f"{WORD[n_tol_swaps['half_tol']]} pair{'s' if n_tol_swaps['half_tol'] > 1 else ''} of models"
+                                                 if n_tol_swaps["half_tol"] else "no pair of models")
         + " and doubling it swaps " + ("none" if not n_tol_swaps["double_tol"] else
                                         f"one, {tt(tol_swaps['double_tol'][0][0])} and {tt(tol_swaps['double_tol'][0][1])}"
                                         if n_tol_swaps["double_tol"] == 1 else f"{WORD[n_tol_swaps['double_tol']]}")
@@ -1222,22 +1341,29 @@ appendix_phrases = {
         f"{tt('glm-5.3')}'s gap is {sgn(glm['unusable_excluded']['gap'])} (Holm-adjusted Welch $p$ {pv(glm['unusable_excluded']['p_welch_holm'])})",
         # the matched family, the coverage variants and the controlled depth model (WS-C1 to C3)
         stand("matched") + f"Kendall's $\\tau$ between the orderings at the providers' defaults and at matched settings is {f3(M_TAU['tau'])}",
-        stand("coverage_variants") + f"{tt('claude-sonnet-5')} and {tt('deepseek-v4.1-flash')} differ after Holm's correction as scored "
-        f"(Holm-adjusted $p$ {pv(SEP_RULE['as_scored'])}), by matching alone ({pv(SEP_RULE['matching_only'])}), and on intermediate milestones "
-        f"only ({pv(SEP_RULE['intermediate_only'])}), but not under route-adjusted coverage ({pv(SEP_RULE['route_adjusted'])})",
+        *([rerun_default] if MATCHED_HEAD else []),
+        stand("coverage_variants") + (
+            f"{tt('claude-sonnet-5')} and {tt('deepseek-v4.1-flash')} differ after Holm's correction by matching alone (Holm-adjusted $p$ "
+            f"{pv(SEP_RULE['matching_only'])}) and on intermediate milestones only ({pv(SEP_RULE['intermediate_only'])}), but not as scored "
+            f"({pv(SEP_RULE['as_scored'])}) or under route-adjusted coverage ({pv(SEP_RULE['route_adjusted'])})" if MATCHED_HEAD else
+            f"{tt('claude-sonnet-5')} and {tt('deepseek-v4.1-flash')} differ after Holm's correction as scored "
+            f"(Holm-adjusted $p$ {pv(SEP_RULE['as_scored'])}), by matching alone ({pv(SEP_RULE['matching_only'])}), and on intermediate milestones "
+            f"only ({pv(SEP_RULE['intermediate_only'])}), but not under route-adjusted coverage ({pv(SEP_RULE['route_adjusted'])})"),
         stand("coverage_variants") + f"the slope of MC on the number of values a response displays is {sgn(VERB['slope_numbers'], 4)} ({VERB_UNIT}; "
-        f"95\\% interval {ci(VERB['ci'], False)}) with template fixed effects, and within models Spearman's $\\rho$ runs from "
+        f"95\\% interval {ci(VERB['ci'], False, 4)}) with template fixed effects, and within models Spearman's $\\rho$ runs from "
         f"{sgn(min(VERB['spearman_within'].values()), 2)} to {sgn(max(VERB['spearman_within'].values()), 2)}",
         stand("depth_model") + f"the slope of the wrong-answer rate on the milestone count holds after Holm correction for {WORD[len(depth_holds)]} of the "
         f"{WORD[len(ORDER)]} models over readable responses",
         # the judge swap beside the top-tier MC gap (results/judge_swap_main.json) and the carried-precision split (WS-C3)
-        stand("coverage_variants") + f"The separation does not rest on the judge: matching alone, which the judge does not touch, separates "
-        f"them more strongly ({sgn(SEP_RULE['diff']['matching_only'])}, Holm-adjusted $p$ {pv(SEP_RULE['matching_only'])}); re-judging a "
-        f"sample with a second judge shifts a model's coverage by {sgn(min(SWAP_DIFF))} to {sgn(max(SWAP_DIFF))}",
+        stand("coverage_variants") + (f"Matching alone, which the judge does not touch, separates them ({sgn(SEP_RULE['diff']['matching_only'])}, "
+                                      f"Holm-adjusted $p$ {pv(SEP_RULE['matching_only'])}); re-judging a " if MATCHED_HEAD else
+                                      f"The separation does not rest on the judge: matching alone, which the judge does not touch, separates "
+                                      f"them more strongly ({sgn(SEP_RULE['diff']['matching_only'])}, Holm-adjusted $p$ {pv(SEP_RULE['matching_only'])}); re-judging a ")
+        + f"sample with a second judge shifts a model's coverage by {sgn(min(SWAP_DIFF))} to {sgn(max(SWAP_DIFF))}",
         stand("coverage_variants") + f"Coverage rises by at most {f3(VERB['ci'][1])} ({VERB_UNIT})",
         stand("coverage_variants") + f"The judge adds {f3(min(judge_add))} to {f3(max(judge_add))} to a model's coverage over matching alone, "
-        f"and the pairs separated are nearly the same ({len(separated(CV_PAIRS['as_scored']))} against "
-        f"{len(separated(CV_PAIRS['matching_only']))} of the {N_PAIRS})",
+        + (f"and matching alone separates more pairs ({cv_sep_matching} against {cv_sep_scored} of the {N_PAIRS})" if MATCHED_HEAD else
+           f"and the pairs separated are nearly the same ({cv_sep_scored} against {cv_sep_matching} of the {N_PAIRS})"),
         stand("depth_model") + f"Pooled over the models, each further milestone multiplies the odds of a wrong answer by "
         f"{f2(D_POOLED['odds_ratio'])} (95\\% interval {f2(D_POOLED['or_ci'][0])} to {f2(D_POOLED['or_ci'][1])})",
         stand("matched") + f"Reasoning raises all three models run with it (Holm-adjusted $p$ {pv(max(M_PAIRED[k]['p_holm'] for k in RERUN))}), "
@@ -1250,11 +1376,13 @@ appendix_phrases = {
     "branch_domain": [
         f"of {WORD[len(REPRESENTATIVE)]} representative models",
         f"The lowest branch differs by model, {lowest_list}, and a single branch pair differs within a model after correction",
-        f"the {WORD[len(top_rep)]} upper-tier models stay close to their FAC in every branch, while the {WORD[len(low_rep)]} lower-tier models are "
-        f"lowest in different branches, {tt(low_rep[0])} in {BRANCH[lowest_branch[low_rep[0]]].lower()} and {tt(low_rep[1])} in "
-        f"{BRANCH[lowest_branch[low_rep[1]]].lower()} engineering",
+        (f"{series([tt(k) for k in close_reps])} stay close to their FAC in every branch, while {tt(ORDER[-1])} is lowest in "
+         f"{BRANCH[lowest_branch[ORDER[-1]]].lower()} engineering" if MATCHED_HEAD else
+         f"the {WORD[len(top_rep)]} upper-tier models stay close to their FAC in every branch, while the {WORD[len(low_rep)]} lower-tier models are "
+         f"lowest in different branches, {tt(low_rep[0])} in {BRANCH[lowest_branch[low_rep[0]]].lower()} and {tt(low_rep[1])} in "
+         f"{BRANCH[lowest_branch[low_rep[1]]].lower()} engineering"),
         f"{tt(top_rep[0])} is lowest on {dom(lowest_domain[top_rep[0]])} and {tt(top_rep[1])} on {dom(lowest_domain[top_rep[1]])}, whereas the "
-        f"lower-tier models dip lower, {tt(low_rep[0])} in {dom(low_domain[low_rep[0]][0])} and {tt(low_rep[1])} in "
+        f"{'other two' if MATCHED_HEAD else 'lower-tier models'} dip lower, {tt(low_rep[0])} in {dom(low_domain[low_rep[0]][0])} and {tt(low_rep[1])} in "
         f"{dom(low_domain[low_rep[1]][0])}",
     ],
     "paraphrase": [
@@ -1271,9 +1399,11 @@ appendix_phrases = {
         f"On the {q5_pairs} kept pairs, no change in FAC holds after correction",
         f"Kendall's $\\tau$ {f3(q5_tau['tau'])} (95\\% interval {ci(q5_tau['ci'], False)}), "
         + ("which is what sampling noise alone gives" if noise["q1"] <= q5_tau["tau"] <= noise["q3"] else
+           "within the range sampling noise alone gives, below its lower quartile" if noise.get("p5", 1) <= q5_tau["tau"] < noise["q1"] else
            "below what sampling noise alone gives" if q5_tau["tau"] < noise["q1"] else "above what sampling noise alone gives")
         + f", since two disjoint draws of {q5_pairs} original instances with the same template mix agree with a median $\\tau$ of "
-        f"{f3(noise['median'])} (quartiles {f3(noise['q1'])} to {f3(noise['q3'])})",
+        f"{f3(noise['median'])} (quartiles {f3(noise['q1'])} to {f3(noise['q3'])}"
+        + (f"; 5th percentile {f3(noise['p5'])})" if "p5" in noise else ")"),
         f"it covers the {q5_templates} templates that can be paraphrased without loss",
     ],
     "experiments": [
@@ -1322,9 +1452,9 @@ appendix_phrases = {
         f"{WORD[n_sign_models]} models), that {hall_gptoss} of the {hall_readings} hallucination readings are {tt('gpt-oss-20b')}'s, and that "
         f"agreement is high for every model and lowest for {tt(k_low_model)} (Fleiss' $\\kappa$ {f3(k_by[k_low_model])} against "
         f"{f3(min(k_others))} to {f3(max(k_others))})",
-        f"Of the first {WORD[len(TOP5)]} models' {top5_incorrect} incorrect verdicts, {resid3_total} fall on {WORD[len(resid_top3)]} templates: "
+        RESID + f"Of the first {WORD[len(TOP5)]} models' {top5_incorrect} incorrect verdicts, {resid3_total} fall on {WORD[len(resid_top3)]} templates: "
         + series([f"{int(tpl[t][1])} on {code(t)}" for t in resid_top3]),
-        f"Of the same {top5_incorrect}, {top5_near} lie within 0.2\\% of a target whose digits the question prescribes and {top5_symbolic} are "
+        RESID + f"Of the same {top5_incorrect}, {top5_near} lie within 0.2\\% of a target whose digits the question prescribes and {top5_symbolic} are "
         f"symbolic answers scored by the numbers they state; over {thousands(n_top5_responses)} responses, the first {WORD[len(TOP5)]} lose "
         f"{lost_points:g} answer points in all, {top5_empty} to responses with no readable final answer and {top5_partial_points:g} to "
         f"{top5_partial} partial answers at half credit",
@@ -1380,8 +1510,7 @@ def row_values(k: str, src: str) -> dict:
                 "flags": {kind: (d[f"{kind}_flag_rate_on_fully_solved"], d.get(f"{kind}_ci")) for kind in FLAG_KINDS},
                 "router": (d["router_judge_rate_on_fully_solved"], d["router_judge_ci"])}
     m = M_MODELS[k]
-    solved_m = m.get("templates_all_solved")  # matched.json does not carry the share yet: the cell prints "--"
-    return {"fac": m["fac"], "fac_ci": m["fac_ci"], "letter": m["letter"], "solved": None if solved_m is None else solved_m / N_TEMPLATES,
+    return {"fac": m["fac"], "fac_ci": m["fac_ci"], "letter": m["letter"], "solved": m.get("all15_share"),  # matched.json: the share of templates solved on all 15 instances
             "unreadable": share(m["unreadable"]), "mc5": m["mc_strict"], "mc5_ci": m["mc_strict_ci"], "mc3": m["mc_e3"], "mc3_ci": m["mc_e3_ci"],
             "judged": m.get("judge_decided_share", m.get("e5_judged_fraction")), "claims": m.get("claims_per_trace"),
             "flags": {kind: (m.get(f"{kind}_flag_rate"), m.get(f"{kind}_flag_ci")) for kind in FLAG_KINDS},
@@ -1403,6 +1532,7 @@ def main_row(k: str, src: str, rerun: bool = False, letter: bool = True) -> str:
 
 
 N_MAIN_COLS = 6 + len(FLAG_KINDS) + 1 + (1 if JUDGED_IN_TABLE else 0)
+STAR_NOTE = " $^{\\ast}$No reasoning setting offered." if MATCHED_HEAD else " $^{\\ast}$No reasoning tokens at the provider's default."
 # The dagger note counts the empty responses of the configuration the table shows (matched.json carries empty_n per model).
 glm_empty_shown = M_MODELS["glm-5.3"].get("empty_n", Q1["glm-5.3"]["empty"]) if HEADLINE == "matched" else Q1["glm-5.3"]["empty"]
 UP = " $\\uparrow$"
@@ -1451,7 +1581,7 @@ put("tab:main_results", "main", table(
     "every instance. No readable answer: responses that are empty or state no answer, scored 0. The judge decides "
     f"{pct(min(judged_share))} to {pct(max(judged_share))} of a model's milestones; MC by matching alone is in "
     "\\autoref{tab:coverage_variants}. " + _flag_note + main_rows_note
-    + " $^{\\ast}$No reasoning tokens at the provider's default." + f" $^{{\\dagger}}${glm_empty_shown} responses empty at the output ceiling."
+    + STAR_NOTE + f" $^{{\\dagger}}${glm_empty_shown} responses empty at the output ceiling."
     + (" Judged step flags: \\autoref{tab:judged_steps}." if not JUDGED_IN_TABLE else ""),
     "tab:main_results", shade_header=False, size="\\small\n\\setlength{\\tabcolsep}{4pt}", resize=True))
 
@@ -1459,7 +1589,7 @@ put("tab:main_results", "main", table(
 rows = []
 for k in ORDER + EXTRA_MODELS:
     m = M_MODELS[k]
-    d_cells = [with_interval(Q1[k]["score"], Q1[k]["ci"]), CLD_FAC[k]] if k in Q1 else ["--", "--"]
+    d_cells = [with_interval(Q1_DEFAULT[k]["score"], Q1_DEFAULT[k]["ci"]), CLD_FAC_DEFAULT[k]] if k in Q1_DEFAULT else ["--", "--"]
     setting = (m.get("setting") or ("reasoning, medium" if k in RERUN else CFG_BY.get(k, {}).get("reasoning_setting", "default"))).replace("=", " ")
     if k in M_PAIRED:
         p = M_PAIRED[k]
@@ -1480,27 +1610,29 @@ put("tab:matched", "results", table(
     "instances, paired by instance: with its 95\\% interval, the Holm-adjusted $p$ of the sign-flip test over templates, the 90\\% interval read "
     f"against the $\\pm {margin:.2f}$ margin, the change in MC, and the empty responses in each configuration. Kendall's $\\tau$ between the two "
     f"orderings is {f3(M_TAU['tau'])}" + (f" (95\\% interval {ci(M_TAU['ci'], False)})" if M_TAU.get("ci") else "")
-    + ". $^{\\ast}$No reasoning tokens at the provider's default. $^{\\ddagger}$Run with reasoning at medium effort.",
+    + "." + STAR_NOTE + " $^{\\ddagger}$Run with reasoning at medium effort.",
     "tab:matched", size="\\footnotesize", resize=True))
 
 # The judged step flags, moved out of Table 1.
-rows = [f"{mark(k)} & {with_interval(Q3[k]['router_judge_rate_on_fully_solved'], Q3[k]['router_judge_ci'])} & "
+rows = [f"{mark(k, rerun=MATCHED_HEAD and k in RERUN)} & {with_interval(Q3[k]['router_judge_rate_on_fully_solved'], Q3[k]['router_judge_ci'])} & "
         f"{f2(Q3[k]['router_steps_flagged_per_trace'])} & {with_interval(Q3[k]['router_rate_on_wrong'], Q3[k]['router_wrong_ci'])} & "
         f"{f2(Q3[k]['e5_judged_fraction'])}" for k in ORDER]
-if RERUN and any(M_MODELS[k].get("router_flag_rate") is not None for k in RERUN):
+if not MATCHED_HEAD and RERUN and any(M_MODELS[k].get("router_flag_rate") is not None for k in RERUN):
     rows += [group_row("With reasoning at medium effort", 5)] + [f"{mark(k, rerun=True)} & {val(M_MODELS[k].get('router_flag_rate'), M_MODELS[k].get('router_flag_ci'))} & -- & -- & --"
                                                                for k in RERUN]
 put("tab:judged_steps", "results", table(
     "l c r c r", "\\textbf{Model} & " + mk("Judged step flags,", "correct answers") + " & " + mk("Steps flagged", "per response") + " & "
     + mk("Any step flagged,", "wrong answers") + " & " + mk("Judge-decided", "milestones"), rows,
-    (note("matched") if RERUN else "") + "\\textbf{Judged step flags.} The judged step check on the responses of the evaluation: the share of "
+    (note("matched") if RERUN else "") + "\\textbf{Judged step flags.} The judged step check on the responses of the evaluation"
+    + (" at matched settings" if MATCHED_HEAD else "") + ": the share of "
     "correct-answer responses with at least one step the judge flags (95\\% interval over templates), the flagged steps per response, the "
     "share of wrong answers with at least one step either check flags, and the share of "
     f"milestones the judge rather than the matcher decides. The check runs the judge at the provider's default settings, so its flags are "
     f"judged, not verified: in the expert study, {router_alone_tp} of the {router_alone_n} flags it raises inside correct answers are errors "
     f"(precision {f2(router_alone_precision)}), and together with the arithmetic check it finds {f2(router_recall)} of the flawed steps there "
-    f"at precision {f2(router_precision)} (\\autoref{{tab:validation_results}}). $^{{\\ast}}$No reasoning tokens at the provider's default. "
-    f"$^{{\\dagger}}${Q1['glm-5.3']['empty']} responses empty at the output ceiling. $^{{\\ddagger}}$Reasoning at medium effort.",
+    f"at precision {f2(router_precision)} (\\autoref{{tab:validation_results}}).{STAR_NOTE} "
+    f"$^{{\\dagger}}${Q1['glm-5.3']['empty']} responses empty at the output ceiling. $^{{\\ddagger}}$"
+    + ("Run with reasoning at medium effort." if MATCHED_HEAD else "Reasoning at medium effort."),
     "tab:judged_steps", size="\\footnotesize"))
 
 # Consistency within a template: single-path and other templates.
@@ -1538,8 +1670,9 @@ put("tab:coverage_variants", "results", table(
     f"definition. Intermediate only: the answer milestones are those whose value equals a number of the answer check's targets under its unit "
     f"factors; once they leave the set, {COVVAR['rule']['instances_without_milestones']} instances have no milestone left ("
     f"{COVVAR['rule'].get('no_milestones_at_all', res['milestones']['items_without'])} have none at all). {tt('claude-sonnet-5')} against {tt('deepseek-v4.1-flash')}: Holm-adjusted $p$ {pv(SEP_RULE['as_scored'])} as scored, "
-    f"{pv(SEP_RULE['matching_only'])} by matching alone, {pv(SEP_RULE['route_adjusted'])} route-adjusted. The slope of MC on the number of values a "
-    f"response displays, with template fixed effects, is {sgn(VERB['slope_numbers'], 4)} ({VERB_UNIT}; 95\\% interval {ci(VERB['ci'], False)}).",
+    f"{pv(SEP_RULE['matching_only'])} by matching alone, {pv(SEP_RULE['route_adjusted'])} route-adjusted"
+    + (f", {pv(SEP_RULE['intermediate_only'])} intermediate only" if MATCHED_HEAD else "") + ". The slope of MC on the number of values a "
+    f"response displays, with template fixed effects, is {sgn(VERB['slope_numbers'], 4)} ({VERB_UNIT}; 95\\% interval {ci(VERB['ci'], False, 4)}).",
     "tab:coverage_variants", size="\\footnotesize", resize=True))
 
 # Scoring-rule variants.
@@ -1566,13 +1699,24 @@ put("tab:scoring_variants", "results", table(
     "answers by their relative error to the target.",
     "tab:scoring_variants", size="\\footnotesize", resize=True))
 
-# Serving endpoints.
+# Serving endpoints. At the matched headline the re-run models' responses come from their reasoning store's endpoints
+# (matched.json's providers_reasoning, analyze.export_providers on that store); a model one endpoint served is not listed.
+P_ROWS_SHOWN = P_ROWS
+if HEADLINE == "matched":
+    _mrows = [{**r, "few": r["few_templates"] or r["few_matched"]} for r in result_file("matched")["providers_reasoning"]]
+    _by_model = {}
+    for r in [r for r in P_ROWS if r["model"] not in RERUN] + _mrows:
+        _by_model.setdefault(r["model"], []).append(r)
+    P_ROWS_SHOWN = [r for k in ORDER for r in _by_model.get(k, []) if len(_by_model[k]) > 1]
+    P_MODELS = [k for k in ORDER if len(_by_model.get(k, [])) > 1]
+    few_endpoints = sum(r["few"] for r in P_ROWS_SHOWN)
 rows = []
 last = None
-for r in P_ROWS:
+for r in P_ROWS_SHOWN:
     name = tt(r["model"]) if r["model"] != last else ""
     last = r["model"]
-    rows.append(f"{name} & {r['endpoint']}{'$^{\\S}$' if r['few'] else ''} & {r['rows']} & {f3(r['raw_score'])} & {pct1(r['unusable'])} & "
+    rows.append(f"{name}{'$^{\\ddagger}$' if name and HEADLINE == 'matched' and r['model'] in RERUN else ''} & "
+                f"{r['endpoint']}{'$^{\\S}$' if r['few'] else ''} & {r['rows']} & {f3(r['raw_score'])} & {pct1(r['unusable'])} & "
                 f"{sgn(r['matched_diff']) if r['matched_diff'] is not None else '--'} & {r['templates_matched']}")
 put("tab:providers", "results", table(
     "l l r r r r r", "\\textbf{Model} & \\textbf{Endpoint} & \\textbf{Responses} & \\textbf{FAC} & " + mk("No readable", "answer") + " & "
@@ -1582,7 +1726,8 @@ put("tab:providers", "results", table(
     "responses each served, their FAC and their share with no readable answer, and the template-matched difference, the endpoint's mean minus the "
     "model's mean on the same templates, over the templates both cover. The raw FAC per endpoint is not comparable across endpoints, since "
     f"OpenRouter assigns instances to endpoints unevenly; $^{{\\S}}$marks the {few_endpoints} endpoints that served or matched fewer than 20 templates, whose "
-    "difference rests on too few templates to read.",
+    "difference rests on too few templates to read."
+    + (" $^{\\ddagger}$Responses with reasoning at medium effort; a model that one endpoint served is not listed." if HEADLINE == "matched" else ""),
     "tab:providers", size="\\footnotesize", star=False))
 
 # Depth, controlled.
@@ -1613,6 +1758,7 @@ put("tab:flag_precision", "errors", table(
     "classified as carried precision, where the printed result is a "
     "correct rounding of the value recomputed from the unrounded upstream values that appear earlier in the response, or other. The last row "
     f"applies the same classification to the {FP_EXPERT['slips']} flags the domain expert confirmed as slips"
+    + (" (read on responses at the providers' default settings)" if MATCHED_HEAD else "")
     + (f"; {FP_EXPERT['step_changed']} of them sit in steps whose text changed after the reading and are not classified"
        if FP_EXPERT.get("step_changed") else "")
     + ". A carried-precision flag marks a "
@@ -1674,8 +1820,8 @@ flag_by_model = {r[0]: (r[6], int(r[2]) - int(r[5])) for r in md_table(flags, r"
 assert set(flag_by_model) == set(ORDER)
 rows = [f"{tt(k)} & {Q3[k]['readable_wrong_with_milestones']} & {f3(Q3[k]['e3_coverage_on_readable_wrong'])} & "
         f"{f3(Q3[k]['e3_null_on_readable_wrong'])} & {f3(Q3[k]['e5_coverage_on_readable_wrong'])} & {f3(COV[k]['wrong_full_coverage'])} & "
-        f"{f3(Q3[k]['attribution_on_wrong']['e5_missing'])} & {f3(Q3[k]['e5_judged_fraction'])} & {flag_by_model[k][0]} ({flag_by_model[k][1]})"
-        for k in ORDER]
+        f"{f3(Q3[k]['attribution_on_wrong']['e5_missing'])} & {f3(Q3[k]['e5_judged_fraction'])} & "
+        + ("--" if MATCHED_HEAD and k in RERUN else f"{flag_by_model[k][0]} ({flag_by_model[k][1]})") for k in ORDER]
 header = (" & \\multicolumn{6}{c}{\\textbf{Wrong answers}} & \\textbf{All responses} & \\textbf{Correct answers} \\\\\n"
           "\\cmidrule(lr){2-7}\\cmidrule(lr){8-8}\\cmidrule(lr){9-9}\n"
           "\\textbf{Model} & \\textbf{Number} & " + mk("MC by", "matching") + " & " + mk("Chance", "floor") + " & " + mk("MC with", "judge")
@@ -1687,7 +1833,9 @@ put("tab:coverage", "results", table(
     "Per model, the readable wrong answers with milestones: how many; MC by matching alone and with the judge; the chance floor, the same "
     "responses matched against a sibling instance's milestones; the share that reach every milestone; and, over the answered wrong answers, "
     "the share with a milestone the judge rules missing. Then the share of all milestones the judge decides, and the precision of the "
-    f"arithmetic flags a domain expert read, with their number ({flags_slip} of {flags_decided} were slips overall). The "
+    f"arithmetic flags a domain expert read, with their number ({flags_slip} of {flags_decided} were slips overall"
+    + (f"; the expert read responses at the providers' default settings, so the column is empty for {series([tt(k) for k in RERUN])}, run "
+       "here with reasoning at medium effort" if MATCHED_HEAD else "") + f"). The "
     f"{res['milestones']['items_without']} instances without milestones are left out.",
     "tab:coverage", size="\\footnotesize", resize=True))
 
@@ -1723,7 +1871,10 @@ put("tab:experiments", "experiments", table(
     "Per model and experiment: the instances covered; FAC in the evaluation and under the experiment on those instances, paired by instance; "
     "the change with its 95\\% interval, the Holm-adjusted $p$ of the sign-flip test over templates, the smallest change the experiment "
     f"detects at 80\\% power, and the 90\\% interval read against the $\\pm {margin:.2f}$ margin; the change in MC; and the share of "
-    "correct-answer responses with an arithmetic flag in the evaluation and under the experiment (unpaired).",
+    "correct-answer responses with an arithmetic flag in the evaluation and under the experiment (unpaired)."
+    + (f" The experiments and their evaluation column are at the providers' default settings on the same instances (for "
+       f"{series([tt(k) for k in RERUN if k in {a['model'] for a in ARMS}])} without reasoning); the full-set change with reasoning on is in "
+       "\\autoref{tab:matched}." if MATCHED_HEAD else ""),
     "tab:experiments", size="\\footnotesize", resize=True))
 
 # Error analysis: the readings by model and by level in one table, with the no-error readings removed from the level shares as well.
@@ -1770,7 +1921,9 @@ def fig_label(k: str) -> str:
     return tt(k) + (f" ({FIG_NAME[k]} in the figure)" if FIG_NAME[k] != NAME[k] else "")
 
 
-REP_NAMES = (f"{tt(top_rep[0])} (first on FAC), {tt(top_rep[1])} (first on MC), {fig_label(low_rep[0])}, and {fig_label(low_rep[1])}")
+REP_NAMES = (f"{tt(top_rep[0])} (first on FAC), {tt(top_rep[1])} (first on MC), {fig_label(low_rep[0])}"
+             + (f" ({'closed' if low_rep[0] in CLOSED else 'open-weights'}, {ORDINAL[ORDER.index(low_rep[0])]} on FAC)" if MATCHED_HEAD else "")
+             + f", and {fig_label(low_rep[1])}")
 assert all(FIG_NAME[k] == NAME[k] for k in REPRESENTATIVE if k not in low_rep), "a figure label differs for a model REP_NAMES does not annotate"
 put("fig:level_bars", "main", figure(
     "level-bars.pdf",
@@ -1887,7 +2040,10 @@ def write_blocks(tree: Path, generated_dir: Path | None, draw: bool) -> None:
         print(f"phrases written to {generated_dir.name}/phrases.txt")
     if draw:
         drawn = paper_figures.draw_all(figure_data(), tree / "figs")
-        print(f"{len(drawn)} figures drawn into {tree / 'figs'}")
+        paper_figures.fig_level_gap(ORDER, Q2, FIG_NAME, tree / "figs")  # the figures not placed in the paper, on the same data
+        paper_figures.fig_coverage_wrong(ORDER, Q3, FIG_NAME, tree / "figs")
+        paper_figures.fig_paraphrase(ORDER, Q5, margin, FIG_NAME, tree / "figs", res["q5"]["vs_repeats"])
+        print(f"{len(drawn)} figures and level-gap.pdf, coverage-wrong.pdf, paraphrase.pdf drawn into {tree / 'figs'}")
 
 
 def report_sources() -> int:

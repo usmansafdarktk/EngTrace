@@ -4,9 +4,12 @@ Split out of `docs/PAPER_PLAN_OCT2026.md` on 2026-10-03. Low priority until the 
 drafted after it. The letter is the only place where "what changed and why" is said; the paper describes EngTrace
 as it is.
 
-Updated 2026-10-09 for the October revision (section 7). Every figure below is from
-`docs/mock_review_workstreams/reports/NUMBERS_SHEET.md` (each line there names its source file); cost figures stay out
-of the letter.
+Updated 2026-10-10 for the October revision (section 7). The paper's headline is the matched configuration: every
+model at its reasoning setting where the endpoint offers one (GPT-5.4 mini, Gemini 3.1 Flash-Lite and Gemma 4 26B at
+medium effort; Qwen3-235B-2507's endpoint offers none), the three models' default scores beside as the comparison.
+The expert readings (error analysis, flag precision, judge swap) and the further experiments are of the default
+responses and the paper says so. Every figure below is from `docs/mock_review_workstreams/reports/NUMBERS_SHEET.md`
+(each line there names its source file); cost figures stay out of the letter.
 
 ## Spine: one row per reviewer point
 
@@ -33,9 +36,9 @@ Accuracy, Reasoning F1, BERTScore and ROUGE).
 ## 2. Promises kept, in their new form
 
 - Variance and significance (yAYU 2, 9W1B 4): per-template SD, template-level intervals, 55 Holm-corrected pairs,
-  Welch's test on the level gap, detectable differences beside every null (`results/RESULTS.md` Q1, Q2). Now: 38 of
-  55 FAC pairs separated after Holm at provider defaults, 36 at matched settings; decoding repeats for four models
-  (300 instances, three repeats each).
+  Welch's test on the level gap, detectable differences beside every null (`results/RESULTS.md` Q1, Q2). Now: 36 of
+  55 FAC pairs separated after Holm at matched settings (38 at the providers' defaults); decoding repeats for four
+  models (300 instances, three repeats each; SD at most 0.008).
 - Wilcoxon on the continuous reasoning score beside McNemar on the answer (the July rebuttal's own promise): the
   coverage comparison over the 55 pairs (Q3, "Coverage compared across models").
 - The judge-exclusion ablation with placebo and untouched controls (meta-review 1; yAYU 1; 9W1B 2; gFWV 4): replayed
@@ -45,9 +48,9 @@ Accuracy, Reasoning F1, BERTScore and ROUGE).
   no roster family.
 - Threshold sensitivity (yAYU 4, 9W1B 3): `THRESHOLD_APPENDIX.md`; the cross-encoder and alignment-ratio thresholds
   the rebuttal promised to vary no longer exist in the evaluator. Now also the scoring-rule variants
-  (`tab:scoring_variants`): tolerance halved or doubled, tau 1.000 / 0.964; the absolute-value clause off, 325
-  verdicts on 20 templates (tau 0.927); prescribed digits relaxed, 154 on 15 (tau 0.964); the last digit uncapped, 68
-  on 36 (tau 1.000); proportional part credit, 109 on 14 (tau 1.000).
+  (`tab:scoring_variants`, matched settings): tolerance halved or doubled, tau 0.964 / 0.927; the absolute-value
+  clause off, 310 verdicts (tau 0.782); prescribed digits relaxed, 136 (tau 0.917); the last digit uncapped, 63 (tau
+  0.964); proportional part credit, 90 (tau 1.000).
 - Inter-judge agreement (9W1B): the May panel 0.725 / 0.776, the replacement panel 0.563 / 0.622 (pilot `RESULTS_E1.md`).
 - A fourth branch (ynoK 1; January AC): civil and industrial, 30 templates each, certified.
 - Linguistic diversity and template exploitation (meta-review 3; 9W1B 1; cqGs 2; nWW3 2): the paraphrase arm on 275
@@ -58,9 +61,9 @@ Accuracy, Reasoning F1, BERTScore and ROUGE).
   and the tool condition for the two closed models (Claude Sonnet 5 +0.010, GPT-5.4 mini -0.003) (D-183, D-184).
 - Error analysis too coarse, causes of the cliff (nWW3 3 and 4; cqGs 3): attribution validated by error type on the
   experts' labels (pilot `RESULTS_ATTRIBUTION.md`), the human reading of 137 wrong answers of four models at provider defaults, three experts each (411 readings, Fleiss'
-  kappa 0.912; `EXPERT_REQUEST.md` B2 now), failure against derivation depth (wrong-answer odds 1.23 per milestone
-  pooled; the slope holds for 5 of 11 models after Holm), the level gap after Holm (2 of 11 models by Welch's test, 6
-  by permutation).
+  kappa 0.912; `EXPERT_REQUEST.md` B2 now), failure against derivation depth (wrong-answer odds 1.21 per milestone
+  pooled, 95% interval 1.09 to 1.33; the slope holds for 3 of 11 models after Holm), the level gap after Holm (1 of 11
+  models by Welch's test, gpt-oss-20b; 4 by permutation).
 - Validation in the main text (9W1B 6; meta-review 2): the evaluation framework's validation subsection; the final
   evaluator agrees with the experts on 0.930 of verdicts three-way and 0.986 of those not marked partial; milestone
   F1 0.926 by matching alone, 0.958 with the judge.
@@ -125,15 +128,15 @@ answers no numbered point; the letter lists those under further changes.
 | Change | Where | Number | Points |
 |---|---|---|---|
 | Two chemical templates repaired after the experts' B4 reading (wording did not pin the answer), re-certified, their 30 items re-run everywhere | section 3.3, `appendix:certification` | round 5: 2 templates, one rejection; round 6: unanimous; 150 of 150 certified; six near-miss templates named in the error analysis | gFWV 1, gFWV 3 |
-| Matched settings: the three models without reasoning by default re-run with reasoning on, all 2,250 items | sections 5.1 and 6, `tab:matched`, `appendix:models` | FAC +0.118 (GPT-5.4 mini), +0.070 (Gemma 4 26B), +0.038 (Gemini 3.1 Flash-Lite); tau 0.709 between the orderings; Qwen3-235B-2507 has no setting | internal |
+| Matched settings as the headline: the three models that return no reasoning tokens at their providers' defaults evaluated with reasoning at medium effort on all 2,250 items, and every table, figure and sentence reporting that configuration; their default rows beside | sections 5.1 and 6, Table 1, `tab:matched`, `appendix:models` | reasoning adds +0.118 (GPT-5.4 mini), +0.070 (Gemma 4 26B), +0.038 (Gemini 3.1 Flash-Lite); GPT-5.4 mini enters the first five (0.969); tau 0.709 between the orderings; 36 of 55 pairs differ; Qwen3-235B-2507 has no setting | R1 M4, R2 W6, Q7 (unequal inference conditions) |
 | Symbolic answers graded by experts; an equivalence step on five templates, the other four scored by the numbers they state | `appendix:scoring` | 302 verdicts, 362 readings (two-reader agreement 0.950, kappa 0.882); 1.000 / 0.990 in-sample, 1.000 / 0.840 on earlier readings | 9W1B 6, meta-review 2 |
 | Final evaluator: 1% cap on the answer's own last digit, two reader fixes, the milestone floor; one re-score; re-validation | section 4, `appendix:validation` | 0.930 three-way, 0.986 non-partial; milestone F1 0.926 (0.958 with the judge); experts' readings: 144 items, 0.847 three-way with the current verdict | 9W1B 6, meta-review 2 |
 | Scoring-rule sensitivities | `tab:scoring_variants` | as in section 2 (threshold sensitivity) | yAYU 4, 9W1B 3 |
 | Final-answer check audited by answer kind on both expert populations, every disagreement given a cause, the stricter readings bounded on the saved responses; the rule unchanged, no re-score | section 4, `appendix:validation` (`tab:answer_kinds`, `tab:answer_cases`), `appendix:scoring` (What Must Match, Sensitivity of the Rule), Limitations | study: every scalar, array and symbolic response agrees, multipart least (0.800); 44 discrepant readings: the check stricter in 28, more lenient in 12, experts split in 4; stricter readings move no model's FAC by more than 0.008, ordering unchanged; a correct rounding up to 0.031 (`answer_audit.py`, `ANSWER_AUDIT.md`) | internal (supervisor's comment) |
-| Milestone Coverage under four readings; verbosity; single-path table | section 6, `appendix:results` | Claude Sonnet 5 above DeepSeek V4.1 Flash holds as scored (Holm p 0.049), by matching alone (0.0005), intermediate-only (0.027), not route-adjusted (1.000): route conformity; verbosity +0.0023 MC per 10 numbers shown; no-instance share 0.000 to 0.069 | internal |
+| Milestone Coverage under four readings; verbosity; single-path table | section 6, `appendix:results` | Claude Sonnet 5 above DeepSeek V4.1 Flash: by matching alone (Holm p 0.0005) and intermediate-only (0.032), not as scored (0.069) nor route-adjusted (1.000): route conformity; MC separates 15 of 55 pairs, matching alone 20; verbosity +0.0020 MC per 10 numbers shown (0.0005 to 0.0041); no-instance share 0.000 to 0.069 | internal |
 | Judge swap on unchanged prompts | `appendix:results` | 201 responses; kappa 0.720; MC shifts -0.018 to +0.019 | meta-review 1, yAYU 1, 9W1B 2, gFWV 4 |
-| Error-analysis sample brought current | `appendix:error_analysis`, `tab:errors` | 137 items on 77 templates, 411 readings, kappa 0.912; shares with the no-error readings removed | nWW3 3, nWW3 4, cqGs 3 |
-| Depth model; level gap after Holm | section 6, `tab:depth_model`, `tab:level_gap` | odds ratio 1.23 per milestone pooled, 5 of 11 models; gap: Welch 2 of 11, permutation 6, matched 1 | cqGs 3, nWW3 4, yAYU 2, 9W1B 4 |
+| Error-analysis sample brought current | `appendix:error_analysis`, `tab:errors` | 137 items on 77 templates, 411 readings, kappa 0.912; shares with the no-error readings removed; the readings are of the default-setting responses, stated in the paper | nWW3 3, nWW3 4, cqGs 3 |
+| Depth model; level gap after Holm | section 6, `tab:depth_model`, `tab:level_gap` | odds ratio 1.21 per milestone pooled (1.09 to 1.33), 3 of 11 models; gap: Welch 1 of 11 (gpt-oss-20b), permutation 4 | cqGs 3, nWW3 4, yAYU 2, 9W1B 4 |
 | Paraphrase bound | `appendix:paraphrase` | 275 pairs over 114 templates; nine of eleven within ±0.05 | meta-review 3, 9W1B 1, cqGs 2, nWW3 2 |
 | Taxonomy and coverage: domains from the NCEES FE exam specifications through a three-LLM panel; per-area table; uncovered core areas named | section 3.1, `tab:area`, `appendix:taxonomy` | 15 domains, three per branch; 42 areas | nWW3 1, meta-review 3 |
 | Framing: title, "process evaluation", synthetic scope; Limitations, Ethics, Conclusion | front matter, main text | nine scope sentences in Limitations | meta-review 3 |
@@ -144,8 +147,10 @@ answers no numbered point; the letter lists those under further changes.
 | Figures: the same designs, data brought to the final results | figures | | internal |
 
 Claims the letter must not carry over from the earlier cycles:
-- The "complexity cliff" is now model-specific: the Easy-minus-Advanced gap holds after Holm for 2 of 11 models by
-  Welch's test (gpt-oss-20b, Gemini 3.1 Flash-Lite) and 6 by permutation.
+- The "complexity cliff" is now model-specific: at matched settings the Easy-minus-Advanced gap holds after Holm for
+  1 of 11 models by Welch's test (gpt-oss-20b) and 4 by permutation.
+- The two tiers of the earlier draft are a result at the providers' defaults; at matched settings the models form a
+  graded order (36 of 55 pairs differ) and only gpt-oss-20b differs from every other model.
 - The contrast between frontier and open-weight models is removed from the paper; the July meta-review's summary
   mentions it, so the letter says it was removed (the authors give the reason).
 - The math-pretraining claim stays dropped (section 3).
