@@ -191,7 +191,9 @@ review pass of 9 October (D-197); the responses describe the paper as it stands 
 - The bounded correction: scoring every stated part and label part as a target, a unit factor only where the written
   unit allows it, the absolute value only where the sign is a convention, targets near zero without their own window,
   and the notation and label wording of the discrepant readings read as the experts read them, moves no model's FAC by
-  more than 0.008 and leaves the ordering unchanged; requiring a correct rounding moves a model by up to 0.031, ordering
-  unchanged (scoring appendix, "Sensitivity of the Rule"). Limitations states the remaining scope in one sentence.
+  more than 0.008, and the only change in the ordering is that GPT-5.4 mini and Muse Glimmer 30B, 0.0002 apart as
+  scored and not separated by the final answer, trade places (tau 0.964); requiring a correct rounding moves a model by
+  up to 0.026, with the same exchange (scoring appendix, "Sensitivity of the Rule"; matched settings, the headline
+  configuration). Limitations states the remaining scope in one sentence.
 - Alignment: the scoring rule is unchanged, so the validation figures (0.930 three-way, 0.986 not partial; 244 of 288
   readings) are those of the rule the results use; every bound comes from the saved responses.

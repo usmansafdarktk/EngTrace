@@ -629,12 +629,14 @@ def main() -> int:
     b = aud['bound']
     S.put('Every stated part and label part a target, unit factor only where the written unit allows it, absolute value '
           'only where the sign is a convention, targets near zero without their window, notation and label wording read: '
-          'largest FAC change; bound; tau; verdicts moved',
+          'largest FAC change; bound; tau; verdicts moved; pairs reversed (gap as scored)',
           f"{b['combined']['largest_change']:+.4f}; no more than {b['combined']['at_most']:.3f}; {b['combined']['tau']:.3f}; "
-          f"{b['combined']['moved']}", src + ' from results/answer_audit.json')
-    S.put('Requiring a correct rounding (half a unit): largest FAC change; rounded; tau; verdicts moved',
+          f"{b['combined']['moved']}; " + (', '.join(f'{x} and {y} ({g:.4f})' for x, y, g in b['combined']['swaps']) or 'none'),
+          src + ' from results/answer_audit.json (matched settings)')
+    S.put('Requiring a correct rounding (half a unit): largest FAC change; rounded; tau; verdicts moved; pairs reversed',
           f"{b['half_unit']['largest_change']:+.4f}; {b['half_unit']['largest_rounded']:.3f}; {b['half_unit']['tau']:.3f}; "
-          f"{b['half_unit']['moved']}", src + ' from results/answer_audit.json')
+          f"{b['half_unit']['moved']}; " + (', '.join(f'{x} and {y} ({g:.4f})' for x, y, g in b['half_unit']['swaps']) or 'none'),
+          src + ' from results/answer_audit.json (matched settings)')
     a, c = aud['cases']['lenient'], aud['cases']['strict']
     S.put('tab:answer_cases, credited more than the experts (their readings are in the generated table, not here)',
           f"{a['item']}: {a['stated']} for {a['gold']} (unrounded {a['unrounded']}); check {a['check']}", src)

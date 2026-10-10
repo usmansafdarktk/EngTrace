@@ -30,17 +30,17 @@ Causes assigned by reading each response, the gold and, for the readings, the ex
 | answer_parts_unchecked | both | 15 | 0 | the question asks for results beyond the value its gold line states; the check scores that value, the experts the whole answer |
 | label_rule | strict | 0 | 10 | the last mention of a label family decides: a hedge, a negation with "no", criteria restated after the verdict, "incrementally linear", or "Yes" for a linearity question |
 | last_digit_window | lenient | 1 | 4 | a value one unit off in its last digit, accepted by the last-digit window (not a correct rounding) |
-| reader_factored_power | strict | 0 | 4 | a power of ten written once after a parenthesised vector, not applied to its components |
 | equivalent_form | strict | 0 | 4 | an equivalent form the number rule cannot read (an angle reduced modulo 2pi, an amplitude-phase form) |
-| reader_no_units_stance | strict | 0 | 4 | "No units." after a yes/no part read as the stance "no" |
 | array_target_index | strict | 0 | 4 | the array's target is the last number of the gold line, an index of the sequence |
+| reader_factored_power | strict | 0 | 4 | a power of ten written once after a parenthesised vector, not applied to its components |
 | value_in_other_role | lenient | 0 | 4 | a stated number matched to a target it does not answer (another component or part) |
+| reader_no_units_stance | strict | 0 | 4 | "No units." after a yes/no part read as the stance "no" |
 | expert_partial_judgment | split | 1 | 2 | the experts give partial credit (or split) where the check scores the parts as stated |
-| contradictory_answer | lenient | 0 | 2 | an answer that states two different values for one quantity, credited on one of them |
 | unit_factor_slip | lenient | 2 | 0 | a value off by a unit factor in the gold's own unit, matched through the factor |
-| gold_rounding | split | 0 | 2 | the gold carries rounding from rounded intermediates; the two experts split |
 | array_last_value_only | strict | 0 | 2 | the array is scored on its last value; the other value is right |
 | tolerance | lenient | 0 | 2 | a value within 0.2% of the target that the experts hold to the gold's printed digits |
+| gold_rounding | split | 0 | 2 | the gold carries rounding from rounded intermediates; the two experts split |
+| contradictory_answer | lenient | 0 | 2 | an answer that states two different values for one quantity, credited on one of them |
 | reader_minus_sign | strict | 2 | 0 | a minus sign the reader does not read (U+2212 in an exponent) |
 | all | | 21 | 44 | |
 
@@ -78,50 +78,50 @@ Label parts not checked (`LABEL_PARTS`): `decimation_aliasing_analysis` (whether
 
 ## 4. Variants of the rule
 
-Each variant changes one thing; C1 to C3 combine them (see `VARIANTS`). Study and readings: agreement with the experts (three-way; readings agreeing). Main store: verdicts moved over the eleven models' 24,750 responses, the largest change in a model's Final Answer Accuracy, and Kendall's tau with the ordering as scored.
+Each variant changes one thing; C1 to C3 combine them (see `VARIANTS`). Study and readings: agreement with the experts (three-way; readings agreeing). Headline responses (matched settings): verdicts moved over the eleven models' 24,750 responses, the largest change in a model's Final Answer Accuracy, and Kendall's tau with the ordering as scored.
 
 | variant | study three-way | study not partial | readings agreeing | main verdicts up / down | templates | largest FAC change | tau |
 |---|---:|---:|---:|---:|---:|---:|---:|
 | headline | 0.930 | 0.986 | 244 of 288 | 0 / 0 | 0 | +0.000 | 1.000 |
-| R1 minus signs read | 0.933 | 0.989 | 244 of 288 | 11 / 8 | 5 | +0.000 | 1.000 |
-| R2 factored power of ten read | 0.930 | 0.986 | 248 of 288 | 12 / 0 | 1 | +0.001 | 1.000 |
+| R1 minus signs read | 0.933 | 0.989 | 244 of 288 | 7 / 6 | 5 | +0.000 | 0.991 |
+| R2 factored power of ten read | 0.930 | 0.986 | 248 of 288 | 13 / 0 | 2 | +0.001 | 1.000 |
 | R3 "no units" not read as a stance | 0.930 | 0.986 | 248 of 288 | 2 / 0 | 1 | +0.000 | 1.000 |
-| R4 label word: first mention | 0.930 | 0.986 | 252 of 288 | 9 / 4 | 3 | +0.001 | 1.000 |
-| R5 label word: revised last mention | 0.930 | 0.986 | 252 of 288 | 6 / 0 | 3 | +0.001 | 1.000 |
-| T1 arrays: every computed value | 0.930 | 0.986 | 246 of 288 | 17 / 34 | 4 | -0.002 | 1.000 |
-| T2 targets near zero: no gold last-digit window | 0.930 | 0.986 | 244 of 288 | 0 / 15 | 2 | -0.001 | 1.000 |
-| T3 every stated part a target | 0.933 | 0.989 | 244 of 288 | 29 / 61 | 12 | -0.002 | 1.000 |
-| T4 label parts checked | 0.930 | 0.986 | 244 of 288 | 0 / 41 | 2 | -0.005 | 1.000 |
-| U1 no unit factors | 0.887 | 0.936 | 236 of 288 | 0 / 825 | 34 | -0.050 | 0.964 |
-| U2 unit factor only where the written unit allows it | 0.933 | 0.989 | 244 of 288 | 0 / 9 | 6 | -0.001 | 1.000 |
-| S1 absolute-value clause off, signs read | 0.927 | 0.982 | 244 of 288 | 11 / 52 | 14 | -0.004 | 1.000 |
-| S2 sign policy, signs read | 0.933 | 0.989 | 244 of 288 | 11 / 34 | 12 | -0.003 | 1.000 |
-| D1 half-unit last-digit windows | 0.930 | 0.986 | 246 of 288 | 0 / 298 | 74 | -0.031 | 1.000 |
-| Y1 equivalence decides on its five templates | 0.930 | 0.986 | 242 of 288 | 0 / 34 | 5 | -0.004 | 1.000 |
-| C1 reader and target fixes (R1-R3, R5, T1-T4) | 0.933 | 0.989 | 260 of 288 | 53 / 117 | 21 | -0.005 | 1.000 |
-| C2 C1 with U2 and S2 | 0.937 | 0.993 | 260 of 288 | 53 / 165 | 30 | -0.008 | 1.000 |
-| C3 C2 with D1 and Y1 | 0.937 | 0.993 | 262 of 288 | 35 / 524 | 87 | -0.040 | 1.000 |
+| R4 label word: first mention | 0.930 | 0.986 | 252 of 288 | 10 / 5 | 3 | +0.001 | 0.964 |
+| R5 label word: revised last mention | 0.930 | 0.986 | 252 of 288 | 6 / 0 | 3 | +0.001 | 0.964 |
+| T1 arrays: every computed value | 0.930 | 0.986 | 246 of 288 | 15 / 23 | 4 | -0.002 | 0.964 |
+| T2 targets near zero: no gold last-digit window | 0.930 | 0.986 | 244 of 288 | 0 / 20 | 3 | -0.002 | 0.964 |
+| T3 every stated part a target | 0.933 | 0.989 | 244 of 288 | 23 / 46 | 11 | -0.002 | 0.964 |
+| T4 label parts checked | 0.930 | 0.986 | 244 of 288 | 0 / 44 | 3 | -0.005 | 0.991 |
+| U1 no unit factors | 0.887 | 0.936 | 236 of 288 | 0 / 846 | 32 | -0.050 | 0.927 |
+| U2 unit factor only where the written unit allows it | 0.933 | 0.989 | 244 of 288 | 0 / 7 | 5 | -0.001 | 0.964 |
+| S1 absolute-value clause off, signs read | 0.927 | 0.982 | 244 of 288 | 6 / 41 | 13 | -0.003 | 0.964 |
+| S2 sign policy, signs read | 0.933 | 0.989 | 244 of 288 | 6 / 28 | 11 | -0.002 | 0.964 |
+| D1 half-unit last-digit windows | 0.930 | 0.986 | 246 of 288 | 0 / 240 | 65 | -0.026 | 0.964 |
+| Y1 equivalence decides on its five templates | 0.930 | 0.986 | 242 of 288 | 0 / 24 | 5 | -0.003 | 1.000 |
+| C1 reader and target fixes (R1-R3, R5, T1-T4) | 0.933 | 0.989 | 260 of 288 | 48 / 109 | 21 | -0.005 | 0.964 |
+| C2 C1 with U2 and S2 | 0.937 | 0.993 | 260 of 288 | 47 / 156 | 28 | -0.008 | 0.964 |
+| C3 C2 with D1 and Y1 | 0.937 | 0.993 | 262 of 288 | 32 / 449 | 81 | -0.037 | 0.964 |
 
-Where each variant moves main-store verdicts:
+Where each variant moves headline verdicts:
 
-- R1 minus signs read: by kind {'multipart down': 1, 'symbolic down': 7, 'symbolic up': 10, 'vector up': 1}; templates {'cd_dc_system_analysis': 9, 'phasor_addition': 5, 'undamped_response_initial_conditions': 3, 'time_to_phasor': 1, 'lorentz_force': 1}
-- R2 factored power of ten read: by kind {'vector up': 12}; templates {'lorentz_force': 12}
+- R1 minus signs read: by kind {'multipart down': 2, 'symbolic down': 4, 'symbolic up': 7}; templates {'cd_dc_system_analysis': 6, 'phasor_addition': 2, 'time_to_phasor': 2, 'undamped_response_initial_conditions': 2, 'impulse_response_from_lccde': 1}
+- R2 factored power of ten read: by kind {'vector up': 13}; templates {'lorentz_force': 10, 'coulombs_law': 3}
 - R3 "no units" not read as a stance: by kind {'classification up': 2}; templates {'system_properties_memory_causality': 2}
-- R4 label word: first mention: by kind {'classification down': 4, 'classification up': 9}; templates {'damping_classification': 7, 'reynolds_number_flow_regime': 5, 'system_property_linearity': 1}
+- R4 label word: first mention: by kind {'classification down': 5, 'classification up': 10}; templates {'damping_classification': 9, 'reynolds_number_flow_regime': 5, 'system_property_linearity': 1}
 - R5 label word: revised last mention: by kind {'classification up': 6}; templates {'reynolds_number_flow_regime': 3, 'system_property_linearity': 2, 'damping_classification': 1}
-- T1 arrays: every computed value: by kind {'array down': 34, 'array up': 17}; templates {'levenspiel_plot_interpretation': 25, 'vdw_solve_for_volume': 18, 'finite_convolution': 4, 'standing_wave_formation': 4}
-- T2 targets near zero: no gold last-digit window: by kind {'array down': 6, 'vector down': 9}; templates {'vorticity_check': 9, 'signal_operations': 6}
-- T3 every stated part a target: by kind {'array down': 34, 'array up': 13, 'multipart down': 3, 'symbolic down': 7, 'symbolic up': 10, 'vector down': 17, 'vector up': 6}; templates {'levenspiel_plot_interpretation': 25, 'vdw_solve_for_volume': 18, 'superposition_electric_field': 13, 'cd_dc_system_analysis': 9, 'coulombs_law': 8, 'phasor_addition': 5, 'standing_wave_formation': 4, 'undamped_response_initial_conditions': 3}
-- T4 label parts checked: by kind {'multipart down': 41}; templates {'limiting_reactant': 27, 'decimation_aliasing_analysis': 14}
-- U1 no unit factors: by kind {'array down': 1, 'multipart down': 444, 'scalar down': 259, 'symbolic down': 3, 'vector down': 118}; templates {'basic_buoyant_force': 120, 'bpsk_energy_basis': 111, 'wave_equation_interpretation': 82, 'wave_parameters_basic': 80, 'gauss_law_symmetric': 57, 'hydrostatic_force_on_plane': 57, 'euclidean_distance_binary': 52, 'utube_manometer': 48}
-- U2 unit factor only where the written unit allows it: by kind {'array down': 1, 'multipart down': 1, 'scalar down': 3, 'vector down': 4}; templates {'lorentz_force': 4, 'virtual_work_truss_deflection': 1, 'hagen_poiseuille_flowrate': 1, 'beam_deflection_formula': 1, 'power_law_fluid_shear': 1, 'vdw_solve_for_volume': 1}
-- S1 absolute-value clause off, signs read: by kind {'multipart down': 29, 'scalar down': 8, 'symbolic down': 11, 'symbolic up': 10, 'vector down': 4, 'vector up': 1}; templates {'statically_indeterminate': 21, 'cd_dc_system_analysis': 9, 'multi_segment_rod': 5, 'phasor_addition': 5, 'poissons_ratio': 4, 'incompressible_continuity': 3, 'cantilever_double_integration': 3, 'time_to_phasor': 3}
-- S2 sign policy, signs read: by kind {'multipart down': 17, 'scalar down': 2, 'symbolic down': 11, 'symbolic up': 10, 'vector down': 4, 'vector up': 1}; templates {'statically_indeterminate': 10, 'cd_dc_system_analysis': 9, 'phasor_addition': 5, 'poissons_ratio': 4, 'incompressible_continuity': 3, 'time_to_phasor': 3, 'undamped_response_initial_conditions': 3, 'multi_segment_rod': 2}
-- D1 half-unit last-digit windows: by kind {'array down': 19, 'classification down': 6, 'multipart down': 48, 'scalar down': 207, 'symbolic down': 5, 'vector down': 13}; templates {'mmc_waiting_time': 17, 'scs_curve_number_runoff': 17, 'rational_method_peak_flow': 13, 'manning_trapezoidal_velocity': 11, 'hydraulic_jump_energy_loss': 10, 'finite_convolution': 9, 'pfr_volume_changing_rate': 8, 'upward_seepage_quick_condition': 8}
-- Y1 equivalence decides on its five templates: by kind {'symbolic down': 34}; templates {'cd_dc_system_analysis': 19, 'impulse_response_from_lccde': 6, 'ber_estimation_mary': 4, 'autocorrelation_rect_pulse': 3, 'incompressible_continuity': 2}
-- C1 reader and target fixes (R1-R3, R5, T1-T4): by kind {'array down': 40, 'array up': 17, 'classification up': 8, 'multipart down': 44, 'symbolic down': 7, 'symbolic up': 10, 'vector down': 26, 'vector up': 18}; templates {'limiting_reactant': 27, 'levenspiel_plot_interpretation': 25, 'vdw_solve_for_volume': 18, 'decimation_aliasing_analysis': 14, 'superposition_electric_field': 13, 'lorentz_force': 13, 'cd_dc_system_analysis': 9, 'vorticity_check': 9}
-- C2 C1 with U2 and S2: by kind {'array down': 51, 'array up': 17, 'classification up': 8, 'multipart down': 63, 'scalar down': 5, 'symbolic down': 11, 'symbolic up': 10, 'vector down': 35, 'vector up': 18}; templates {'limiting_reactant': 27, 'levenspiel_plot_interpretation': 25, 'vdw_solve_for_volume': 18, 'lorentz_force': 17, 'finite_convolution': 15, 'decimation_aliasing_analysis': 14, 'superposition_electric_field': 13, 'statically_indeterminate': 12}
-- C3 C2 with D1 and Y1: by kind {'array down': 80, 'array up': 9, 'classification down': 6, 'classification up': 8, 'multipart down': 113, 'scalar down': 212, 'symbolic down': 57, 'symbolic up': 1, 'vector down': 56, 'vector up': 17}; templates {'cd_dc_system_analysis': 28, 'levenspiel_plot_interpretation': 27, 'limiting_reactant': 27, 'finite_convolution': 23, 'superposition_electric_field': 23, 'lorentz_force': 19, 'mmc_waiting_time': 17, 'scs_curve_number_runoff': 17}
+- T1 arrays: every computed value: by kind {'array down': 23, 'array up': 15}; templates {'levenspiel_plot_interpretation': 17, 'vdw_solve_for_volume': 16, 'finite_convolution': 4, 'standing_wave_formation': 1}
+- T2 targets near zero: no gold last-digit window: by kind {'array down': 8, 'vector down': 12}; templates {'vorticity_check': 10, 'signal_operations': 8, 'coulombs_law': 2}
+- T3 every stated part a target: by kind {'array down': 23, 'array up': 11, 'multipart down': 2, 'symbolic down': 4, 'symbolic up': 7, 'vector down': 17, 'vector up': 5}; templates {'levenspiel_plot_interpretation': 17, 'vdw_solve_for_volume': 16, 'superposition_electric_field': 14, 'coulombs_law': 7, 'cd_dc_system_analysis': 6, 'phasor_addition': 2, 'time_to_phasor': 2, 'undamped_response_initial_conditions': 2}
+- T4 label parts checked: by kind {'multipart down': 43, 'vector down': 1}; templates {'limiting_reactant': 27, 'decimation_aliasing_analysis': 16, 'vorticity_check': 1}
+- U1 no unit factors: by kind {'array down': 1, 'multipart down': 462, 'scalar down': 259, 'symbolic down': 1, 'vector down': 123}; templates {'basic_buoyant_force': 120, 'bpsk_energy_basis': 110, 'wave_equation_interpretation': 79, 'wave_parameters_basic': 78, 'hydrostatic_force_on_plane': 70, 'euclidean_distance_binary': 61, 'gauss_law_symmetric': 61, 'utube_manometer': 48}
+- U2 unit factor only where the written unit allows it: by kind {'array down': 1, 'scalar down': 3, 'vector down': 3}; templates {'lorentz_force': 3, 'virtual_work_truss_deflection': 1, 'hagen_poiseuille_flowrate': 1, 'cantilever_double_integration': 1, 'vdw_solve_for_volume': 1}
+- S1 absolute-value clause off, signs read: by kind {'multipart down': 21, 'scalar down': 11, 'symbolic down': 7, 'symbolic up': 6, 'vector down': 2}; templates {'statically_indeterminate': 15, 'multi_segment_rod': 8, 'cd_dc_system_analysis': 6, 'poissons_ratio': 3, 'cantilever_double_integration': 3, 'incompressible_continuity': 2, 'phasor_addition': 2, 'time_to_phasor': 2}
+- S2 sign policy, signs read: by kind {'multipart down': 14, 'scalar down': 5, 'symbolic down': 7, 'symbolic up': 6, 'vector down': 2}; templates {'statically_indeterminate': 9, 'cd_dc_system_analysis': 6, 'multi_segment_rod': 5, 'poissons_ratio': 3, 'incompressible_continuity': 2, 'phasor_addition': 2, 'time_to_phasor': 2, 'undamped_response_initial_conditions': 2}
+- D1 half-unit last-digit windows: by kind {'array down': 14, 'classification down': 2, 'multipart down': 40, 'scalar down': 169, 'symbolic down': 3, 'vector down': 12}; templates {'scs_curve_number_runoff': 17, 'mmc_waiting_time': 12, 'rational_method_peak_flow': 12, 'hydraulic_jump_energy_loss': 11, 'finite_convolution': 11, 'pfr_volume_changing_rate': 8, 'max_hump_height_no_choking': 8, 'upward_seepage_quick_condition': 8}
+- Y1 equivalence decides on its five templates: by kind {'symbolic down': 24}; templates {'cd_dc_system_analysis': 13, 'impulse_response_from_lccde': 4, 'autocorrelation_rect_pulse': 3, 'ber_estimation_mary': 3, 'incompressible_continuity': 1}
+- C1 reader and target fixes (R1-R3, R5, T1-T4): by kind {'array down': 31, 'array up': 15, 'classification up': 8, 'multipart down': 45, 'symbolic down': 4, 'symbolic up': 7, 'vector down': 29, 'vector up': 18}; templates {'limiting_reactant': 27, 'levenspiel_plot_interpretation': 17, 'decimation_aliasing_analysis': 16, 'vdw_solve_for_volume': 16, 'superposition_electric_field': 14, 'coulombs_law': 12, 'vorticity_check': 10, 'lorentz_force': 10}
+- C2 C1 with U2 and S2: by kind {'array down': 43, 'array up': 15, 'classification up': 8, 'multipart down': 64, 'scalar down': 8, 'symbolic down': 7, 'symbolic up': 6, 'vector down': 34, 'vector up': 18}; templates {'limiting_reactant': 27, 'levenspiel_plot_interpretation': 17, 'vdw_solve_for_volume': 17, 'decimation_aliasing_analysis': 16, 'statically_indeterminate': 16, 'finite_convolution': 15, 'lorentz_force': 14, 'superposition_electric_field': 14}
+- C3 C2 with D1 and Y1: by kind {'array down': 67, 'array up': 7, 'classification down': 2, 'classification up': 8, 'multipart down': 107, 'scalar down': 177, 'symbolic down': 40, 'vector down': 56, 'vector up': 17}; templates {'limiting_reactant': 28, 'superposition_electric_field': 25, 'finite_convolution': 22, 'vdw_solve_for_volume': 20, 'cd_dc_system_analysis': 19, 'levenspiel_plot_interpretation': 18, 'statically_indeterminate': 18, 'scs_curve_number_runoff': 17}
 
 Final Answer Accuracy per model under the combined variants:
 
@@ -131,23 +131,23 @@ Final Answer Accuracy per model under the combined variants:
 | `claude-sonnet-5` | 0.987 | 0.986 | 0.986 | 0.979 |
 | `kimi-k3` | 0.980 | 0.982 | 0.981 | 0.978 |
 | `glm-5.3-flash` | 0.972 | 0.972 | 0.972 | 0.967 |
+| `gpt-5.4-mini` | 0.969 | 0.967 | 0.965 | 0.945 |
 | `muse-glimmer-30b` | 0.969 | 0.969 | 0.969 | 0.951 |
 | `glm-5.3` | 0.950 | 0.950 | 0.950 | 0.944 |
+| `gemma-4-26b-a4b` | 0.942 | 0.938 | 0.935 | 0.929 |
+| `gemini-3.1-flash-lite` | 0.917 | 0.918 | 0.915 | 0.910 |
 | `qwen3-235b-a22b-2507` | 0.899 | 0.894 | 0.893 | 0.881 |
-| `gemini-3.1-flash-lite` | 0.878 | 0.877 | 0.874 | 0.867 |
-| `gemma-4-26b-a4b` | 0.872 | 0.870 | 0.868 | 0.852 |
-| `gpt-5.4-mini` | 0.852 | 0.850 | 0.846 | 0.812 |
 | `gpt-oss-20b` | 0.808 | 0.804 | 0.800 | 0.771 |
 
-## 5. How accepted main-store answers are matched
+## 5. How accepted headline answers are matched
 
 For each accepted (correct or partial) answer, the least direct way any of its numeric targets is matched: eps (within 0.2% at c = 1), exact (prescribed digits), digit (a last-digit window), rendering (a second unit on a scalar gold line), unit (a unit factor c != 1), sign (the absolute value).
 
 | answer kind | eps | exact | digit | rendering | unit | sign | words or labels |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| scalar | 10203 | 1897 | 881 | 60 | 259 | 87 | 0 |
-| multipart | 3896 | 254 | 393 | 0 | 451 | 112 | 0 |
-| vector | 972 | 0 | 94 | 0 | 104 | 112 | 0 |
-| array | 789 | 163 | 58 | 0 | 1 | 15 | 0 |
-| symbolic | 1161 | 0 | 52 | 0 | 28 | 116 | 81 |
-| classification | 397 | 0 | 76 | 0 | 0 | 0 | 323 |
+| scalar | 10527 | 1954 | 855 | 78 | 259 | 90 | 0 |
+| multipart | 3922 | 267 | 389 | 0 | 470 | 94 | 0 |
+| vector | 990 | 0 | 82 | 0 | 109 | 114 | 0 |
+| array | 832 | 164 | 56 | 0 | 1 | 15 | 0 |
+| symbolic | 1154 | 0 | 44 | 0 | 33 | 114 | 100 |
+| classification | 407 | 0 | 70 | 0 | 0 | 0 | 319 |

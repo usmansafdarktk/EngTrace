@@ -20,13 +20,14 @@ WHAT IT MEASURES
     printed apart from its number, a value not among the computed ones, a value of 0, 1 or 2); label parts the
     question asks for that no target checks (LABEL_PARTS); questions that name one value to report among other
     requested results (REPORTED_VALUE).
- 4. Variants of the rule on the populations of 1 and on the eleven models' main-store responses. `verdict()` is a
+ 4. Variants of the rule on the populations of 1 and on the eleven models' headline responses (matched settings:
+    each model at its reasoning store where it has one, else at main). `verdict()` is a
     local copy of answer.verdict with switches; with every switch at the rule it must reproduce the stored label of
-    every readable main-store row and the check's label on every study response, or the run stops. Each variant
+    every readable headline row and the check's label on every study response, or the run stops. Each variant
     changes one thing (VARIANTS); three combine them. For each: the study's and the readings' agreement, the
-    verdicts it moves on the main store, Final Answer Accuracy per model and Kendall's tau with the ordering as
-    scored. The moved main-store verdicts go to results/answer_audit_changes.json for reading.
- 5. Which way of matching each accepted main-store answer needs (within epsilon, a last-digit window, a unit factor,
+    verdicts it moves on the headline responses, Final Answer Accuracy per model and Kendall's tau with the ordering as
+    scored. The moved verdicts go to results/answer_audit_changes.json for reading.
+ 5. Which way of matching each accepted headline answer needs (within epsilon, a last-digit window, a unit factor,
     the absolute value, a rendering, the prescribed digits), by answer kind.
 
 Reads the score stores, the traces (each answered row's recorded hash checked by score.texts_matching), the milestone
@@ -574,12 +575,19 @@ def readings_population(items: dict, ms: dict) -> list[dict]:
     return out
 
 
-# ------------------------------------------------------------------ the main store, one model per worker
+# ------------------------------------------------------------------ the headline responses, one model per worker
+
+def store_of(key: str) -> str:
+    """The store a model's headline responses are in: matched settings (D2), each model at its reasoning store where
+    it has one (results/matched_config.json, as clause_variants.py and analyze.py read it), else at main."""
+    return CV.matched_config().get(key) or 'main'
+
 
 def score_model(args) -> dict:
     key, items, ms = args
-    rows = CV.load_rows('main', key)
-    texts = score.texts_matching('main', key, rows)
+    store = store_of(key)
+    rows = CV.load_rows(store, key)
+    texts = score.texts_matching(store, key, rows)
     out = {'key': key, 'fac': {v: 0.0 for v in VARIANTS}, 'n': len(rows), 'moves': {v: [] for v in VARIANTS},
            'paths': collections.Counter(), 'bad': []}
     for r in rows:
@@ -780,7 +788,7 @@ def run(workers: int) -> dict:
     if (round(s3[0] / s3[1], 3), round(s3[2] / s3[3], 3)) != (0.930, 0.986) or (r3[0], r3[1]) != (244, 288):
         raise SystemExit(f'the headline agreement does not reproduce 0.930, 0.986 and 244 of 288: {s3}, {r3}')
     causes = causes_table(study, pops['study']['headline']['labels'], readings, pops['readings']['headline']['labels'])
-    # the main store
+    # the headline responses (matched settings)
     done = {}
     with cf.ProcessPoolExecutor(max_workers=workers) as pool:
         for res in pool.map(score_model, [(k, items, ms) for k in ROSTER]):
@@ -788,7 +796,7 @@ def run(workers: int) -> dict:
                 raise SystemExit(f"main/{res['key']}: the local rule differs from the stored verdict on {len(res['bad'])} "
                                  f"rows (first: {res['bad'][:3]})")
             done[res['key']] = res
-            print(f"main/{res['key']}: every readable verdict reproduced", flush=True)
+            print(f"{store_of(res['key'])}/{res['key']}: every readable verdict reproduced", flush=True)
     keys = list(ROSTER)
     head = [done[k]['fac']['headline'] for k in keys]
     main = {}
@@ -876,7 +884,7 @@ def report(res: dict) -> list[str]:
     # 4
     L += ['', '## 4. Variants of the rule', '',
           'Each variant changes one thing; C1 to C3 combine them (see `VARIANTS`). Study and readings: agreement with '
-          'the experts (three-way; readings agreeing). Main store: verdicts moved over the eleven models\' 24,750 '
+          'the experts (three-way; readings agreeing). Headline responses (matched settings): verdicts moved over the eleven models\' 24,750 '
           'responses, the largest change in a model\'s Final Answer Accuracy, and Kendall\'s tau with the ordering as '
           'scored.', '',
           '| variant | study three-way | study not partial | readings agreeing | main verdicts up / down | templates | '
@@ -886,7 +894,7 @@ def report(res: dict) -> list[str]:
         big = max(m['delta'].values(), key=abs)
         L.append(f"| {v} | {pct3(s[0], s[1])} | {pct3(s[2], s[3])} | {r[0]} of {r[1]} | {m['up']} / {m['down']} | "
                  f"{m['templates']} | {big:+.3f} | {m['tau']:.3f} |")
-    L += ['', 'Where each variant moves main-store verdicts:', '']
+    L += ['', 'Where each variant moves headline verdicts:', '']
     for v in VARIANTS:
         if v != 'headline' and main[v]['moved']:
             L.append(f"- {v}: by kind {main[v]['by_kind']}; templates {main[v]['top_templates']}")
@@ -897,7 +905,7 @@ def report(res: dict) -> list[str]:
         L.append(f"| `{k}` | {main['headline']['fac'][k]:.3f} | " +
                  ' | '.join(f"{main[v]['fac'][k]:.3f}" for v in VARIANTS if v.startswith('C')) + ' |')
     # 5
-    L += ['', '## 5. How accepted main-store answers are matched', '',
+    L += ['', '## 5. How accepted headline answers are matched', '',
           'For each accepted (correct or partial) answer, the least direct way any of its numeric targets is matched: '
           'eps (within 0.2% at c = 1), exact (prescribed digits), digit (a last-digit window), rendering (a second '
           'unit on a scalar gold line), unit (a unit factor c != 1), sign (the absolute value).', '',
@@ -954,11 +962,17 @@ def paper_numbers(study: list, s_labels: list, readings: list, r_labels: list, c
     for k, n in causes['readings'].items():
         direction[DIRECTION[k]] += n
     full = json.loads(OUT_JSON.read_text(encoding='utf-8'))['main']
+    from full_run_28092026.worked_example import NAME
+    head = full['headline']['fac']
     bound = {}
     for name, v in (('combined', 'C2 C1 with U2 and S2'), ('half_unit', 'D1 half-unit last-digit windows')):
         big = max(full[v]['delta'].values(), key=abs)
+        fac = full[v]['fac']
+        # the pairs of models whose order the variant reverses, each with its gap as scored
+        swaps = sorted([NAME[a], NAME[b], round(head[a] - head[b], 4)] for a in head for b in head
+                       if head[a] > head[b] and fac[a] < fac[b])
         bound[name] = {'largest_change': big, 'largest_rounded': round(abs(big), 3), 'at_most': ceil3(big),
-                       'tau': full[v]['tau'], 'moved': full[v]['moved']}
+                       'tau': full[v]['tau'], 'moved': full[v]['moved'], 'swaps': swaps}
     out = {'by_kind': {k: {'study': sa['by_kind'][k], 'readings': ra['by_kind'][k]} for k in KINDS},
            'all': {'study': sa['all'], 'readings': ra['all']}, 'readings_direction': dict(direction),
            'readings_by_category': {c: dict(v) for c, v in cat.items()}, 'study_by_cause': dict(causes['study']),
@@ -1051,7 +1065,7 @@ def block_tex(nums: dict) -> str:
 
 
 def write_paper(check_only: bool) -> int:
-    """Compute the paper's numbers from the two expert populations (no main-store pass), write the block and the JSON;
+    """Compute the paper's numbers from the two expert populations (no pass over the headline responses), write the block and the JSON;
     with check_only, compare the block on disk with what would be written."""
     items = score.pool_items()
     ms = CV.milestone_cache(items)

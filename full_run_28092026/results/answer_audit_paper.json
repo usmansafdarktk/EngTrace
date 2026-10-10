@@ -143,15 +143,29 @@
    "largest_change": -0.007777777777777883,
    "largest_rounded": 0.008,
    "at_most": 0.008,
-   "tau": 1.0,
-   "moved": 218
+   "tau": 0.9636363636363636,
+   "moved": 203,
+   "swaps": [
+    [
+     "GPT-5.4 mini",
+     "Muse Glimmer 30B",
+     0.0002
+    ]
+   ]
   },
   "half_unit": {
-   "largest_change": -0.031333333333333324,
-   "largest_rounded": 0.031,
-   "at_most": 0.032,
-   "tau": 1.0,
-   "moved": 298
+   "largest_change": -0.02577777777777779,
+   "largest_rounded": 0.026,
+   "at_most": 0.026,
+   "tau": 0.9636363636363636,
+   "moved": 240,
+   "swaps": [
+    [
+     "GPT-5.4 mini",
+     "Muse Glimmer 30B",
+     0.0002
+    ]
+   ]
   }
  },
  "cases": {

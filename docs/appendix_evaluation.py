@@ -225,9 +225,13 @@ WORDS = ["no", "one", "two", "three", "four", "five", "six", "seven", "eight", "
 # The scoring rule's clauses re-applied one at a time (clause_variants.py's results/sensitivity_variants.json), the
 # accepted numeric answers by relative error, and the templates that prescribe their answer's digits
 # (RESIDUAL_INCORRECT.md, residual_incorrect.py)
-sv_main = json.loads(read(RUN / "results/sensitivity_variants.json"))["stores"]["main"]
+# The headline is the matched configuration (D2: each model at its reasoning store where it has one), as in Table 1
+# and tab:scoring_variants; its store holds no "all" row, so the bins are summed over the eleven models.
+sv_main = json.loads(read(RUN / "results/sensitivity_variants.json"))["stores"]["matched"]
 where, sv_tau = sv_main["where_changed"], sv_main["tau_with_headline"]
-bins = sv_main["relative_error_bins"]["all"]
+bins = {k: sum(b[k] for b in sv_main["relative_error_bins"].values() if isinstance(b, dict) and k in b)
+        for k in ("numeric", "le_0.2", "0.2_1", "1_5", "gt_5")}
+assert len(sv_main["relative_error_bins"]) == 11 and "all" not in sv_main["relative_error_bins"], "eleven models"
 accepted = bins["numeric"]
 assert accepted == sum(bins[k] for k in ("le_0.2", "0.2_1", "1_5", "gt_5")), bins
 exact = one(r"Templates with an exact-digits target \(the question prescribes the rounding\): (\d+) of 150", read(
@@ -296,7 +300,9 @@ results_rows = [
 
 # ---------------------------------------------------------------- the phrases each file must contain
 res = read(RUN / "results/RESULTS.md")
-judged = [float(r[3]) for r in table(res, r"^\| model \| calls \| without a reply \| judged fraction \|")]
+# the judge-decided share of milestones at matched settings (analyze.py's results/matched.json, Table 1's configuration)
+judged = [m["judge_decided_share"] for m in json.loads(read(RUN / "results/matched.json"))["models"].values()]
+assert len(judged) == 11, judged
 gold = one(r"\| digit-rule flags \| 0 of (\d+) claims in (\d+) steps \|", sv)
 gold_ok = one(r"\| scored correct at all three tolerances \| (\d+) of (\d+) \|", sv)
 no_ms = one(r"\| every milestone found \| (\d+); (\d+) items have no milestones \|", sv)
@@ -457,10 +463,13 @@ main += [
 ]
 scoring += [
     f"on {NUMBER_WORD[aud['label_part_templates']]} templates of other kinds the question also asks for a label",
-    f"moves no model's FAC by more than {bound['combined']['at_most']:.3f} and leaves the ordering of the eleven models "
-    "unchanged" if bound["combined"]["tau"] == 1.0 else "ORDER CHANGED",
-    f"moves a model's FAC by up to {bound['half_unit']['largest_rounded']:.3f} and also leaves the ordering unchanged"
-    if bound["half_unit"]["tau"] == 1.0 else "ORDER CHANGED",
+    # the stricter readings reverse one pair of models at most, named with its gap as scored (results/answer_audit.json)
+    (f"moves no model's FAC by more than {bound['combined']['at_most']:.3f}; the only change in the ordering is that "
+     f"\\texttt{{{bound['combined']['swaps'][0][0]}}} and \\texttt{{{bound['combined']['swaps'][0][1]}}}, "
+     f"{bound['combined']['swaps'][0][2]:.4f} apart as scored, trade places ($\\tau = {bound['combined']['tau']:.3f}$)")
+    if len(bound["combined"]["swaps"]) == 1 else "ORDER CHANGED BEYOND ONE PAIR",
+    f"moves a model's FAC by up to {bound['half_unit']['largest_rounded']:.3f}, with the same exchange of these two models"
+    if bound["half_unit"]["swaps"] == bound["combined"]["swaps"] else "ORDER CHANGED DIFFERENTLY",
 ]
 validation += [
     "it matches the experts' verdict on every scalar, array and symbolic response; multipart responses agree least"

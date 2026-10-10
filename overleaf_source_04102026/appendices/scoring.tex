@@ -61,25 +61,26 @@ The other four templates with symbolic answers stay scored by the numbers they s
 it depends on, as their procedures do in practice (an order quantity in whole units, a standard
 normal value to four decimals), and the check then requires the prescribed digits: a value within
 the tolerance but not at those digits is incorrect by the question's own terms.
-We keep this requirement as part of the task; relaxing it to the tolerance raises 154 verdicts on 15
-templates and keeps Kendall's $\tau$ with the ordering as scored at 0.964
+We keep this requirement as part of the task; relaxing it to the tolerance raises 136 verdicts on 14
+templates and keeps Kendall's $\tau$ with the ordering as scored at 0.917
 (\autoref{tab:scoring_variants}).
 
 \paragraph{Sensitivity of the Rule.} \autoref{tab:scoring_variants} re-applies the rule with one
 clause changed at a time.
-Turning off the absolute-value clause lowers 325 verdicts on 20 templates ($\tau = 0.927$); leaving
-the last-digit term uncapped raises 68 verdicts on 36 templates ($\tau = 1.000$); and partial credit
-in proportion to the parts matched, instead of one half, moves 109 verdicts on 14 templates
+Turning off the absolute-value clause lowers 310 verdicts on 20 templates ($\tau = 0.782$); leaving
+the last-digit term uncapped raises 63 verdicts on 35 templates ($\tau = 0.964$); and partial credit
+in proportion to the parts matched, instead of one half, moves 90 verdicts on 10 templates
 ($\tau = 1.000$).
-Of the 22,131 accepted numeric answers, 92.7\% lie within 0.2\% of their target, 6.9\% between
+Of the 22,635 accepted numeric answers, 93.1\% lie within 0.2\% of their target, 6.5\% between
 0.2\% and 1\%, which the last-digit terms admit, and 0.4\% further from it.
 Scoring instead every stated part and label part as a target, accepting a unit factor only where the
 written unit allows it and the absolute value only where the sign is a convention, judging a target
 near zero without its own last-digit window, and reading the notation and label wording of the
 discrepant readings (\autoref{appendix:readings}) as the domain experts read them moves no model's
-FAC by more than 0.008 and leaves the ordering of the eleven models unchanged.
+FAC by more than 0.008; the only change in the ordering is that \texttt{GPT-5.4 mini} and
+\texttt{Muse Glimmer 30B}, 0.0002 apart as scored, trade places ($\tau = 0.964$).
 Requiring a correct rounding, within half a unit of the last digit rather than one unit, moves a
-model's FAC by up to 0.031 and also leaves the ordering unchanged.
+model's FAC by up to 0.026, with the same exchange of these two models.
 
 \subsection{Milestones and the Judge}
 
