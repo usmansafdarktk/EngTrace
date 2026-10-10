@@ -265,18 +265,12 @@ phrases = [  # Section 5.1
     f"{WORD[len(anchors)].capitalize()} flagships, {series(anchors, cite=True)}, run only as anchors on a fixed subset "
     f"of {subset} instances ({WORD[subset // len(per_template)]} per template), which the further experiments also "
     "use",
-    f"We evaluate the models at matched settings, each with the same zero-shot prompt, no tools or retrieval, and an "
-    f"output ceiling of {thousands(ceiling)} tokens ({thousands(lower['muse-glimmer-30b'])} for "
-    f"{tt('muse-glimmer-30b')})",
-    f"reasoning is on wherever the endpoint offers it, so {WORD[len(reasoning)]} models reason at their providers' "
-    "defaults",
-    f"{series(rerun)} answer every instance with reasoning at {effort} effort",
-    f"{tt(NO_THINKING)}, whose endpoint offers no reasoning setting, keeps its default",
-    f"Each model answers each instance once ({thousands(rows)} responses); the {WORD[len(rerun)]} models' responses at "
-    f"their providers' defaults, where they return no reasoning tokens ({thousands(rerun_rows)} responses), are the "
-    "comparison",
-    f"{unusable_m} responses ({100 * unusable_m / rows:.1f}\\%) have no readable final answer and score 0, almost all "
-    "of them empty at the output ceiling",
+    "We evaluate the models at matched settings: the same zero-shot prompt, no tools or retrieval, and reasoning on "
+    f"wherever the endpoint offers it, so {series(rerun)} answer with reasoning at {effort} effort and the other "
+    f"{WORD[len(roster) - len(rerun)]} models at their providers' defaults",
+    f"the {WORD[len(rerun)]} models' default responses are the comparison",
+    f"Each model answers each instance once ({thousands(rows)} responses); {unusable_m} ({100 * unusable_m / rows:.1f}\\%) "
+    "have no readable final answer and score 0",
     f"because a template's {k_inst} instances and their gold traces come from one procedure",
     f"every {level}\\% interval is a bootstrap over templates",
     f"such as the {comb(len(roster), 2)} pairs of models at one setting",
@@ -300,6 +294,7 @@ appendix_phrases = [  # appendices/models.tex
     f"with reasoning on, {tt(k)} leaves {n} of its {thousands(dec_r[k]['rows'])} responses empty at the output ceiling"
     for k, n in sorted(rerun_empty.items())
 ] + [
+    f"Their responses at the providers' defaults ({thousands(rerun_rows)}, with no reasoning tokens) are the comparison",
     f"The other {WORD[len(roster) - len(rerun)]} models have the same responses at both settings: "
     f"{WORD[len(reasoning)]} reason by default",
     f"Per model over its {thousands(len(manifest))} responses at matched settings",

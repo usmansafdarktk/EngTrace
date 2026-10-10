@@ -21,17 +21,13 @@ experiments also use.
 \subsection{Experimental Setup}
 \label{subsec:setup}
 
-We evaluate the models at matched settings, each with the same zero-shot prompt, no tools or
-retrieval, and an output ceiling of 32,768 tokens (16,384 for \texttt{Muse Glimmer 30B}):
-reasoning is on wherever the endpoint offers it, so seven models reason at their providers'
-defaults, \texttt{Gemini 3.1 Flash-Lite}, \texttt{Gemma 4 26B}, and \texttt{GPT-5.4 mini} answer
-every instance with reasoning at medium effort, and \texttt{Qwen3-235B-2507}, whose endpoint
-offers no reasoning setting, keeps its default.
-Each model answers each instance once (24,750 responses); the three models' responses at their
-providers' defaults, where they return no reasoning tokens (6,750 responses), are the comparison
-of~\autoref{tab:matched}.
-263 responses (1.1\%) have no readable final answer and score 0, almost all of them empty at the
-output ceiling.
+We evaluate the models at matched settings: the same zero-shot prompt, no tools or retrieval, and
+reasoning on wherever the endpoint offers it, so \texttt{Gemini 3.1 Flash-Lite},
+\texttt{Gemma 4 26B}, and \texttt{GPT-5.4 mini} answer with reasoning at medium effort and the
+other eight models at their providers' defaults (\autoref{appendix:setup}; the three models'
+default responses are the comparison of~\autoref{tab:matched}).
+Each model answers each instance once (24,750 responses); 263 (1.1\%) have no readable final
+answer and score 0.
 The template is the unit of analysis, because a template's 15 instances and their gold traces come
 from one procedure~\citep{miller2024errorbars}; every 95\% interval is a bootstrap over
 templates~\citep{efron1993bootstrap}.
