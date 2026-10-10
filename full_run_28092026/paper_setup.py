@@ -281,7 +281,7 @@ appendix_phrases = [  # appendices/models.tex
     f"({listing([ttn(s) for s in JUDGES.values()])})",
     f"lists the {WORD[len(roster)]} evaluated models and the {WORD[len(anchors)]} flagship anchors",
     f"The ceiling is {thousands(ceiling)} tokens, except {thousands(lower['muse-glimmer-30b'])} for "
-    f"{tt('muse-glimmer-30b')}, whose single eligible provider caps its output there",
+    f"{tt('muse-glimmer-30b')}, whose provider caps its output there",
     f"Providers serve every open-weights model at {min_bits}-bit floating-point precision or higher",
     f"every model returns one response, possibly empty, for each of the {thousands(len(manifest))} instances",
     f"{tt(NO_THINKING)} has no thinking mode, and {series([k for k in no_reasoning if k != NO_THINKING])} return no "

@@ -72,10 +72,10 @@ the Hugging Face repository of an open-weights model.}
 \label{appendix:decoding}
 
 We query every model through OpenRouter with the prompt (\autoref{appendix:prompt}) and the output
-ceiling, and set no temperature or top-p; the three models whose endpoints offer a reasoning setting
-run at medium effort, and every other model decodes at its provider's defaults.
-The ceiling is 32,768 tokens, except 16,384 for \texttt{Muse Glimmer 30B}, whose single eligible
-provider caps its output there.
+ceiling, and set no temperature or top-p; the three models whose endpoints offer reasoning but leave
+it off by default run at medium effort, and every other model decodes at its provider's defaults.
+The ceiling is 32,768 tokens, except 16,384 for \texttt{Muse Glimmer 30B}, whose provider caps its
+output there.
 Providers serve every open-weights model at 8-bit floating-point precision or higher, and the
 responses of one model can come from several providers.
 A request that fails at the provider is sent again, and every model returns one response, possibly

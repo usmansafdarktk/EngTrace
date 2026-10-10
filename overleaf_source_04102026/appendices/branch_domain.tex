@@ -59,7 +59,7 @@ industrial one, while \texttt{gpt-oss-20b} falls to 0.51 in geotechnical enginee
 \quad Reaction kinetics (10) & 0.993 & 1.000 & 0.993 & 1.000 & 0.993 & 1.000 & 0.993 & 0.960 & 0.903 & 0.980 & 0.953 \\
 \quad Thermodynamics (12) & 0.961 & 0.989 & \textbf{0.917} & 0.906 & 0.944 & 0.922 & \textbf{0.767} & \textbf{0.806} & \textbf{0.778} & 0.833 & 0.650 \\
 \quad Transport phenomena (8) & 0.992 & 0.992 & 0.983 & 0.992 & 0.946 & 0.979 & 0.983 & 0.950 & 0.875 & \textbf{0.783} & 0.825 \\
-\rowcolor{gray!10}\textit{Civil} (30) & 0.993 & 0.996 & 0.982 & 0.982 & 0.971 & 0.962 & 0.973 & 0.960 & 0.918 & 0.940 & 0.671$^{\ddagger}$ \\
+\rowcolor{gray!10}\textit{Civil} (30) & 0.993 & 0.996 & 0.982 & 0.982 & 0.971 & 0.962 & 0.973 & 0.960 & 0.918 & 0.940 & 0.671$^{\P}$ \\
 \quad Geotechnical engineering (10) & 1.000 & 0.987 & 1.000 & 0.993 & 0.960 & 0.927 & 0.993 & 0.953 & 0.973 & 0.947 & \textbf{0.513} \\
 \quad Structural analysis (10) & 1.000 & 1.000 & 0.993 & 1.000 & 0.987 & 0.987 & 1.000 & 0.973 & 0.987 & 0.947 & 0.733 \\
 \quad Water resources (10) & 0.980 & 1.000 & 0.953 & 0.953 & 0.967 & 0.973 & 0.927 & 0.953 & 0.793 & 0.927 & 0.767 \\
@@ -83,9 +83,9 @@ Detectable branch difference & 0.037 & 0.030 & 0.055 & 0.080 & 0.049 & 0.081 & 0
 \caption{\textbf{Final Answer Accuracy by branch and by domain.} Models in order of FAC. Shaded
 rows: the mean of the branch's 30 template means; below each, its domains' instance means, which
 carry no interval or test; template counts in parentheses. Bold: each model's lowest domain.
-$^{\ddagger}$The one branch pair that differs within a model after Holm correction (Welch's $t$-test
-over the model's ten pairs): \texttt{gpt-oss-20b}'s electrical above its civil. Last row: the
-smallest branch difference 30 templates detect at 80\% power, per model.}
+$^{\P}$The one branch pair that differs within a model after Holm correction (Welch's $t$-test over
+the model's ten pairs): \texttt{gpt-oss-20b}'s electrical above its civil. Last row: the smallest
+branch difference 30 templates detect at 80\% power, per model.}
 \label{tab:branch_domain}
 \label{tab:by_branch}
 \label{tab:by_domain_kind}

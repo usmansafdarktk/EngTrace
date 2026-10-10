@@ -1372,13 +1372,14 @@ phrases = [  # 6_results.tex must contain each of these, whitespace aside
     f"{WORD[n_experiments - 1].capitalize()} experiments on a {n_sub}-instance subset test whether a larger model, the governing equations, or a "
     "Python interpreter changes these results, and a fourth adds reasoning at medium effort",
     f"the best run, {tt('gpt-5.4')} with reasoning at medium effort ({f3(flr['score'])}), still lies inside the interval of "
-    f"{series([tt(k) for k in anchor_host])}",
+    f"{series([tt(k) for k in anchor_host])} on the same {n_sub} instances",
     f"{tt('gpt-5.4')}, which returns no reasoning tokens at its default, gains {f3(flag_arm['diff'])} with reasoning and sheds most of its "
     f"arithmetic flags, and {tt('gpt-5.4-mini')} with the same setting gains {f3(mini_mc)} in MC while its flags on correct answers roughly halve",
     f"{tt('gpt-oss-20b')} answers more correctly ({sgn(ob['gpt-oss-20b']['diff'])}), partly because fewer of its responses are empty at the "
     f"output ceiling, while {tt('claude-sonnet-5')} and {tt('gpt-5.4-mini')} stay within $\\pm {margin:.2f}$",
     f"neither {tt('claude-sonnet-5')} nor {tt('gpt-5.4-mini')} changes in FAC or MC beyond $\\pm {margin:.2f}$, although "
     f"{tt('claude-sonnet-5')} calls it on two thirds of the instances",
+    "at 8-bit precision or higher handles its tool calls reliably",  # the endpoint rule (appendix:decoding); D-184's record
     # 5.4 (the sample as the store still holds it: scored_current.json); the per-model and per-level counts are in the figure and tab:errors
     f"Three domain experts read the full response of {items_read_total} wrong answers from {WORD[len(B2_MODELS)]} models that "
     f"{'span the FAC order' if MATCHED_HEAD else 'contrast the tiers'}, all at the providers' default settings, and assigned the first "
@@ -1389,7 +1390,7 @@ phrases = [  # 6_results.tex must contain each of these, whitespace aside
     RESID + f"Of their {top5_incorrect} incorrect verdicts, "
     + (f"{two_chemical} fall on the {WORD[len(TWO_CHEMICAL)]} chemical templates whose wording does not pin the answer, " if not REPAIRED else "")
     + f"{top5_near} lie within 0.2\\% of a target whose digits the question prescribes, which makes them incorrect by its terms, "
-    f"{top5_symbolic} are symbolic answers scored by the numbers they state, and {remaining_incorrect} fall in neither group",
+    f"{top5_symbolic} are symbolic answers on one template checked for equivalence, and {remaining_incorrect} fall in neither group",
     f"which the arithmetic check flags in {pct1(min(digit_top5))} to {pct1(max(digit_top5))} of their correct answers",
 ]
 
@@ -1537,9 +1538,10 @@ appendix_phrases = {
         f"{pct(tool_share['gpt-5.4-mini'])}",
         f"{tt('deepseek-v4-pro')} scores {f3(fl['deepseek-v4-pro']['score'])} and {tt('gpt-5.4')} {f3(fl['gpt-5.4']['score'])} at its default "
         f"and {f3(flr['score'])} with reasoning, against {rng(sub_scores)} for the first {WORD[len(TOP5)]} on the same instances; the highest "
-        f"anchor run lies inside the interval of {series([tt(k) for k in anchor_host])}, and on Advanced templates the anchors score "
+        f"anchor run lies inside the interval of {series([tt(k) for k in anchor_host])} on these instances, and on Advanced templates the anchors score "
         f"{rng(anchors_adv, f2)} and the first {WORD[len(TOP5)]} {rng(sub_adv, f2)}",
         f"raises its MC by {f3(r_mini['e5']['diff'])} (95\\% interval {ci(r_mini['e5']['ci'], False)})",
+        "at 8-bit precision or higher handles its tool calls reliably",  # the endpoint rule (appendix:decoding); D-184's record
         # the full-set reasoning-on runs read beside the subset's (tab:matched, WS-C1)
         f"Over all {thousands(N_ITEMS)} instances, the matched settings",
         stand("matched") + f"while that of the other {WORD[len(m_others)]} moves by at most "
@@ -1831,7 +1833,7 @@ lower_held = {(k, pp["a"] if pp["diff"] < 0 else pp["b"]) for k, pp in branch_pa
 rows = []
 for b, bname in BRANCH.items():
     rows.append(f"\\rowcolor{{gray!10}}\\textit{{{bname}}} ({n_branch_templates}) & "
-                + " & ".join(f3(BL[k]["branch"][b]["mean"]) + ("$^{\\ddagger}$" if (k, b) in lower_held else "") for k in ORDER) + " \\\\")
+                + " & ".join(f3(BL[k]["branch"][b]["mean"]) + ("$^{\\P}$" if (k, b) in lower_held else "") for k in ORDER) + " \\\\")
     rows += [f"\\quad {d.replace('_', ' ').capitalize()} ({domain_templates[d]}) & "
              + " & ".join(bold(f3(REP[k]["domain"][d]), lowest_domain[k] == d) for k in ORDER) for d in dom_by_branch[b]]
 rows += ["\\midrule", "Detectable branch difference & " + " & ".join(f3(BL[k]["detectable_branch"]) for k in ORDER)]
@@ -1842,7 +1844,7 @@ put("tab:branch_domain", "branch_domain", table(
     "l " + "r " * len(ORDER), "\\textbf{Branch or domain (templates)} & " + " & ".join("\\rotatebox{90}{" + tt(k) + "}" for k in ORDER), rows,
     "\\textbf{Final Answer Accuracy by branch and by domain.} "
     f"Models in order of FAC. Shaded rows: the mean of the branch's {n_branch_templates} template means; below each, its domains' instance "
-    "means, which carry no interval or test; template counts in parentheses. Bold: each model's lowest domain. $^{\\ddagger}$The one branch "
+    "means, which carry no interval or test; template counts in parentheses. Bold: each model's lowest domain. $^{\\P}$The one branch "
     f"pair that differs within a model after Holm correction (Welch's $t$-test over the model's ten pairs): {tt(_bp_model)}'s "
     f"{BRANCH[high_b].lower()} above its {BRANCH[low_b].lower()}. Last row: the smallest branch difference {n_branch_templates} templates "
     "detect at 80\\% power, per model.",
@@ -1856,23 +1858,25 @@ for k in ORDER:
     q = Q2[k]
     chem = "" if REPAIRED else f" & {sgn(q['without_two_chemical']['gap'])} ({pv(q['without_two_chemical']['p_welch_holm'])})"
     rows.append(f"{tt(k)} & " + " & ".join(f3(BL[k]["level"][lv]["mean"]) for lv in LEVELS)
-                + f" & {sgn(q['gap'])} ({ci(q['ci'])}) & {pv(q['p_welch_holm'])} & {f3(q['detectable_planned'])}" + chem + " & "
+                + f" & {sgn(q['gap'])} ({ci(q['ci'])}) & {pv(q['p_welch_holm'])} & {pv(q['p_perm_holm'])} & {f3(q['detectable_planned'])}"
+                + chem + " & "
                 + " & ".join(f3(Q3[k]["by_milestone_count"][b]["wrong_rate"]) for b in bins)
                 + f" & {sgn(D_MODELS[k]['slope'])} ({ci(D_MODELS[k]['ci'])}) & {pv(D_MODELS[k]['p_holm'])}")
-n_gap_cols = 3 if REPAIRED else 4
+n_gap_cols = 4 if REPAIRED else 5
 slope_col = 5 + n_gap_cols + len(bins)  # the first of the two slope columns
 header = (" & \\multicolumn{3}{c}{\\textbf{FAC by level}} & \\multicolumn{" + str(n_gap_cols) + "}{c}{\\textbf{Easy minus Advanced}} & \\multicolumn{"
           + str(len(bins)) + "}{c}{\\textbf{Share scored 0, by gold milestones}} & \\multicolumn{2}{c}{\\textbf{Logistic slope}} \\\\\n"
           "\\cmidrule(lr){2-4}\\cmidrule(lr){5-" + str(4 + n_gap_cols) + "}\\cmidrule(lr){" + str(5 + n_gap_cols) + "-" + str(4 + n_gap_cols + len(bins))
           + "}\\cmidrule(lr){" + str(slope_col) + "-" + str(slope_col + 1) + "}\n"
           "\\textbf{Model} & \\textbf{Easy} & \\textbf{Intermediate} & \\textbf{Advanced} & \\textbf{Gap (95\\% interval)} & \\textbf{Welch $p$} & "
-          "\\textbf{Detectable}" + ("" if REPAIRED else " & " + mk("Without two", "chemical")) + " & "
+          + mk("Permutation", "$p$") + " & \\textbf{Detectable}" + ("" if REPAIRED else " & " + mk("Without two", "chemical")) + " & "
           + " & ".join(f"\\textbf{{{b.replace('-', '--')}}}" for b in bins) + " & " + mk("Per milestone", "(95\\% interval)") + " & \\textbf{$p$ (Holm)}")
 put("tab:level_gap", "results", table(
-    "l r r r c r r " + ("" if REPAIRED else "c ") + "r " * len(bins) + "c r", header, rows,
+    "l r r r c r r r " + ("" if REPAIRED else "c ") + "r " * len(bins) + "c r", header, rows,
     note("depth_model") + "\\textbf{Difficulty level and trace depth.} "
     f"Left: FAC over the {n_easy} Easy, {n_int} Intermediate, and {n_adv} Advanced templates. Middle: the Easy mean minus the Advanced mean, "
-    "with its 95\\% interval, the Holm-adjusted $p$ of Welch's $t$-test, and the smallest gap the design detects at 80\\% power"
+    "with its 95\\% interval, the Holm-adjusted $p$ of Welch's $t$-test and of a permutation of level labels, and the smallest gap the "
+    "design detects at 80\\% power"
     + ("" if REPAIRED else ", and the gap with its $p$ without the two Advanced chemical templates whose wording does not pin the answer")
     + ". Right: the share of instances scored 0, empty responses included, by the number of milestones in the gold trace ("
     + ", ".join(str(Q3[ORDER[0]]["by_milestone_count"][b]["items"]) for b in bins[:-1])
@@ -2002,7 +2006,7 @@ REP_NAMES = (f"{tt(top_rep[0])} (first on FAC), {tt(top_rep[1])} (first on MC), 
 assert all(FIG_NAME[k] == NAME[k] for k in REPRESENTATIVE if k not in low_rep), "a figure label differs for a model REP_NAMES does not annotate"
 put("fig:level_bars", "main", figure(
     "level-bars.pdf",
-    "\\textbf{Final Answer Accuracy by Difficulty Level for Four Representative Models.} "
+    "\\textbf{Final Answer Accuracy by difficulty level for four representative models.} "
     f"The mean over the {n_easy} Easy, {n_int} Intermediate, and {n_adv} Advanced templates, with 95\\% intervals, for {REP_NAMES}. "
     "\\autoref{tab:level_gap} gives every model's gap with its tests.",
     "fig:level_bars"))
@@ -2022,7 +2026,7 @@ put("fig:branch_bars", "branch_domain", figure(
     "fig:branch_bars"))
 put("fig:error_categories", "main", figure(
     "error-categories.pdf",
-    "\\textbf{Error Categories of the Wrong Answers Read.} "
+    "\\textbf{Error categories of the wrong answers read.} "
     f"Each bar gives one model's readings ({rng([sum(by_model[m].values()) for m in B2_MODELS], str)}; {readers} domain experts per wrong "
     "answer, at the providers' default settings) by category; \\autoref{tab:error_by_level} gives them by level. " + FIG_NAME_NOTE,
     "fig:error_categories"))

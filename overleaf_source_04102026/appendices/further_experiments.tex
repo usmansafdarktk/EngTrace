@@ -40,8 +40,8 @@ an anchor is a reference point outside the pairwise tests, so no test compares i
 evaluated models.
 \texttt{DeepSeek V4 Pro} scores 0.968 and \texttt{GPT-5.4} 0.951 at its default and 0.997 with
 reasoning, against 0.967 to 0.990 for the first five on the same instances; the highest anchor
-run lies inside the interval of \texttt{DeepSeek V4.1 Flash}, and on Advanced templates the anchors
-score 0.89 to 1.00 and the first five 0.94 to 0.99.
+run lies inside the interval of \texttt{DeepSeek V4.1 Flash} on these instances, and on Advanced
+templates the anchors score 0.89 to 1.00 and the first five 0.94 to 0.99.
 Reasoning lifts a flagship as it lifts \texttt{GPT-5.4 mini}: with it, \texttt{GPT-5.4} gains over
 its own default and sheds most of its arithmetic flags (\autoref{tab:experiments}).
 
@@ -65,8 +65,8 @@ The model may call a Python interpreter with NumPy, SciPy, and SymPy up to 8 tim
 turn without it; each script runs isolated, with no credentials, a 20 s limit, and its output
 truncated at 4,000 characters, behind a filter that refuses file-system, network, process, and
 introspection access.
-Only these two closed models answer, since no endpoint that meets the selection rule serves
-\texttt{gpt-oss-20b}'s tool calls.
+Only these two closed models answer, since no endpoint serving \texttt{gpt-oss-20b} at 8-bit
+precision or higher handles its tool calls reliably.
 Whether to call the interpreter is the model's choice, \texttt{Claude Sonnet 5} on 66\% of the
 instances and \texttt{GPT-5.4 mini} on 18\%, so the experiment bounds what an offered tool adds, not
 what required use would.
