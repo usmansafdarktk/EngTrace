@@ -9,10 +9,11 @@ The strongest LLMs were hard to tell apart by their final answers, yet their der
 how closely they followed the gold route and how often their displayed arithmetic was flagged.
 Most failures were calculation slips rather than conceptual errors, which were rarer on easy
 problems.
-Reasoning raised the final-answer accuracy of every model that used it, and the order of the models
-held under rewording, a changed answer tolerance, and repeated decoding.
-These results suggest that, near the ceiling, progress in engineering reasoning is better measured
-in the derivation than in the final answer.
+Enabling reasoning raised final-answer accuracy for every model compared over the full evaluation,
+and no pair of models that differs reversed under rewording, a changed answer tolerance, or repeated
+decoding of the lowest-scoring models.
+These results suggest that, near the ceiling, progress is better measured in the derivation than in
+the final answer.
 Future work will check the principles and assumptions a solution applies, not only its numbers,
 since a misstated rule behind a correct result escapes every numerical test, and will turn the gold
 reasoning traces into feedback for training and selecting LLMs.

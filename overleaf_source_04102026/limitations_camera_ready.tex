@@ -1,0 +1,25 @@
+% Fuller Limitations, kept for the camera-ready version; not input in the submission.
+% -------------
+\section*{Limitations}
+\label{sec:limitations}
+
+This work has several limitations, which future research can address.
+First, \ourdataset is entirely synthetic, and its problems are examination-style by construction.
+While generating problems from symbolic templates gives each one an exact gold reasoning trace and
+allows fresh instances to be drawn, the problems lack the open-endedness and artifacts of real
+engineering work, such as ill-posed design problems, drawings, and standards.
+Future work could seed templates with real engineering documents while keeping their traces
+computable.
+
+Second, \ourdataset focuses on quantitative derivations and does not capture qualitative aspects of
+engineering reasoning, such as design trade-offs or judgments about safety.
+Its deterministic checks also verify the values a derivation states rather than the principles
+behind them, and checking those principles remains an open challenge.
+
+Third, \ourdataset is limited to English and to curricula shaped by U.S. accreditation and licensing
+standards, which limits its applicability to other languages and educational systems.
+Extending it to other languages and regional conventions is an important direction for future work.
+
+Finally, our evaluation reads the values and calculations that a response displays, so it depends on
+how responses present their work, and it credits the gold route rather than every valid alternative.
+Structured outputs or symbolic execution of responses could make these checks more robust.

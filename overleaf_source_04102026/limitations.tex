@@ -3,22 +3,24 @@
 \label{sec:limitations}
 
 This work has several limitations, which future research can address.
-First, \ourdataset is entirely synthetic, and its problems are examination-style by construction.
-While generating problems from symbolic templates gives each one an exact gold reasoning trace and
-allows fresh instances to be drawn, the problems lack the open-endedness and artifacts of real
-engineering work, such as ill-posed design problems, drawings, and standards.
-Future work could seed templates with real engineering documents while keeping their traces
-computable.
+First, \ourdataset is written in English.
+Engineering is taught and practiced in many languages, and models may perform differently when the
+same problems are posed in them.
+Since the question text of every template is generated from code, the benchmark can be extended to
+other languages by translating its templates and adapting units and notation to regional
+conventions.
 
-Second, \ourdataset focuses on quantitative derivations and does not capture qualitative aspects of
-engineering reasoning, such as design trade-offs or judgments about safety.
-Its deterministic checks also verify the values a derivation states rather than the principles
-behind them, and checking those principles remains an open challenge.
+Second, the templates span several core engineering branches, and adding disciplines such as
+aerospace, biomedical, or environmental engineering would broaden the benchmark further.
+Because all templates share one format, new branches can be written and certified in the same way as
+the existing ones.
 
-Third, \ourdataset is limited to English and to curricula shaped by U.S. accreditation and licensing
-standards, which limits its applicability to other languages and educational systems.
-Extending it to other languages and regional conventions is an important direction for future work.
+Third, the problems are presented as text, while engineering work often involves diagrams,
+schematics, and plots.
+Extending the benchmark to problems that include such material would allow multimodal models to be
+evaluated on it.
 
-Finally, our evaluation reads the values and calculations that a response displays, so it depends on
-how responses present their work, and it credits the gold route rather than every valid alternative.
-Structured outputs or symbolic execution of responses could make these checks more robust.
+Finally, we evaluate a selection of LLMs available at the time of our experiments, and the results
+reflect those model versions.
+New models and versions are released frequently, and the benchmark and its evaluator can be applied
+to them as they appear.
