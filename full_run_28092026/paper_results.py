@@ -1801,25 +1801,11 @@ put("tab:providers", "results", table(
     + (" $^{\\ddagger}$Responses with reasoning at medium effort; a model that one endpoint served is not listed." if HEADLINE == "matched" else ""),
     "tab:providers", size="\\footnotesize", star=False))
 
-# The Limitations and the Conclusion (main text, no generated blocks): their numbers, from the values above. Defined here, after
-# the serving endpoints the Limitations bound.
-prov_max = max(abs(r["matched_diff"]) for r in P_ROWS_SHOWN if not r["few"] and r["matched_diff"] is not None)
-judge_share = [M_MODELS[k]["judge_decided_share"] for k in ORDER]  # the judge-decided share of milestones, matched settings
-claim(frozenset(("gpt-5.4-mini", "muse-glimmer-30b")) not in SEP_FAC, "the two models stricter scoring swaps do not differ on FAC")
+# The Limitations and the Conclusion (main text, no generated blocks). Since Preslav's review (2026-10-11) both state scope and
+# findings without numbers; their phrase lists are empty, so any number added later must be generated.
 claim(min(Q1[k]["score"] for k in TOP5) > 0.95 and max(Q1[k]["score"] for k in TOP5) - min(Q1[k]["score"] for k in TOP5) <= 0.02,
       "the first five lie within two points of each other, near the ceiling")
-appendix_phrases["limitations"] = [
-    f"cover undergraduate curricula in {WORD[len(BRANCH)]} branches",
-    f"where {WORD[len(RERUN)]} models reason at medium effort and the endpoint of {tt('qwen3-235b-a22b-2507')} offers no reasoning setting",
-    f"not among the evaluated {WORD[len(ORDER)]}",
-    f"decides {pct(min(judge_share))} to {pct(max(judge_share))} of milestones, depending on the model",
-    f"a second judge from another family moves each model's coverage by at most {f3(max(abs(d) for d in SWAP_DIFF))}",
-    "8-bit precision or higher",
-    f"an endpoint matched on at least 20 templates differs from its model's mean by at most {f3(prov_max)}",
-    f"The further experiments ran on a {n_sub}-instance subset",
-    f"the interpreter is offered to the {WORD[len(tool)]} closed models, not required",
-    f"The paraphrase test covers the {q5_templates} templates that can be reworded without changing the problem",
-]
+appendix_phrases["limitations"] = []  # four scope statements without numbers
 appendix_phrases["conclusion"] = []  # broad findings without numbers; listed so that any number added later must be generated
 
 # Branch and domain: shaded branch rows, each followed by its domains; the models across, in order of FAC.
@@ -1985,20 +1971,14 @@ put("tab:errors", "errors", table(
     "from the most to the least fundamental; no domain expert used the incomplete option.",
     "tab:errors", size="\\footnotesize\n\\setlength{\\tabcolsep}{4pt}", resize=True, aliases=("tab:error_by_level",)))
 
-# The placed figures (drawn by paper_figures.py). The figures label gpt-oss-20b "GPT OSS 20B" (D9, owner 2026-10-08); each caption says so.
+# The placed figures (drawn by paper_figures.py). The figures label gpt-oss-20b "GPT OSS 20B" (D9, owner 2026-10-08); the captions
+# name the models as the text does and add no note on the label (Preslav's review, 2026-10-11).
 FIG_NAME = {**NAME, "gpt-oss-20b": "GPT OSS 20B"}  # the labels the figures print
-FIG_NAME_NOTE = " ".join(f"In the figure, {tt(k)} is labeled {FIG_NAME[k]}." for k in REPRESENTATIVE if FIG_NAME[k] != NAME[k])
 
 
-def fig_label(k: str) -> str:
-    """A model's name with the label the figure prints, where the two differ (D9)."""
-    return tt(k) + (f" ({FIG_NAME[k]} in the figure)" if FIG_NAME[k] != NAME[k] else "")
-
-
-REP_NAMES = (f"{tt(top_rep[0])} (first on FAC), {tt(top_rep[1])} (first on MC), {fig_label(low_rep[0])}"
+REP_NAMES = (f"{tt(top_rep[0])} (first on FAC), {tt(top_rep[1])} (first on MC), {tt(low_rep[0])}"
              + (f" ({'closed' if low_rep[0] in CLOSED else 'open-weights'}, {ORDINAL[ORDER.index(low_rep[0])]} on FAC)" if MATCHED_HEAD else "")
-             + f", and {fig_label(low_rep[1])}")
-assert all(FIG_NAME[k] == NAME[k] for k in REPRESENTATIVE if k not in low_rep), "a figure label differs for a model REP_NAMES does not annotate"
+             + f", and {tt(low_rep[1])}")
 put("fig:level_bars", "main", figure(
     "level-bars.pdf",
     "\\textbf{Final Answer Accuracy by difficulty level for four representative models.} "
@@ -2009,7 +1989,7 @@ put("fig:domain_radar", "branch_domain", figure(
     "domain_radar/domain-radar-labeled.pdf",
     "\\textbf{Final Answer Accuracy by domain for four representative models.} "
     f"The instance mean over each of the {len(domain_templates)} domains, in the order of their branches around the rim, for the same four "
-    "models; the radial axis starts at 0.4. The domain means carry no interval and no test (\\autoref{tab:by_domain_kind}). " + FIG_NAME_NOTE,
+    "models; the radial axis starts at 0.4. The domain means carry no interval and no test (\\autoref{tab:by_domain_kind}).",
     "fig:domain_radar"))
 assert len(BRANCH) == 5 and n_branch_templates * len(BRANCH) == N_TEMPLATES  # "a fifth" in the caption
 put("fig:branch_bars", "branch_domain", figure(
@@ -2022,8 +2002,9 @@ put("fig:branch_bars", "branch_domain", figure(
 put("fig:error_categories", "main", figure(
     "error-categories.pdf",
     "\\textbf{Error categories of the wrong answers read.} "
-    f"Each bar gives one model's readings ({rng([sum(by_model[m].values()) for m in B2_MODELS], str)}; {readers} domain experts per wrong "
-    "answer, at the providers' default settings) by category; \\autoref{tab:error_by_level} gives them by level. " + FIG_NAME_NOTE,
+    f"Each bar gives one model's readings by category, from {WORD[int(readers)]} domain experts per wrong answer "
+    f"({rng([sum(by_model[m].values()) for m in B2_MODELS], str)} readings per model) on responses at the providers' default settings. "
+    "\\autoref{tab:error_by_level} gives them by level.",
     "fig:error_categories"))
 # The blocks the registry names for this script. The judged step flags are in tab:coverage (also labelled tab:judged_steps), the depth
 # slopes in tab:level_gap, and the single-path counts and the carried-precision split are sentences of the results appendix.

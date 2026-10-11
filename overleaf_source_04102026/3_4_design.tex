@@ -89,14 +89,17 @@ is significant after correction.
 Because an error in a template recurs in every instance and gold trace, each template passes three
 checks before it enters the benchmark (\autoref{appendix:certification}).
 
-\paragraph{Automated Integrity Checks and LLM Screen.}
+\paragraph{Automated Integrity Checks.}
 At 500 seeds per template, automated checks verify that every printed calculation follows from its
-printed operands, that generation is deterministic, and that every instance keeps the output format;
-all 150 templates pass.
+printed operands, that generation is deterministic, and that every instance keeps the output format.
+All 150 templates pass.
+
+\paragraph{LLM Screen.}
 Three LLM judges from families outside the evaluated models then score each template's code and
-instances; after we revise the templates they flag, 147 of the 150 pass and none fails critically.
-The screen guides revision but does not certify: it passes 15 templates that a majority of their
-experts reject.
+instances, and we revise the templates they flag, after which 147 of the 150 pass and none fails
+critically.
+The screen only guides revision, and the experts decide certification, since in their first round a
+majority of the three experts reject 15 of the 147 templates that the screen passes.
 
 \paragraph{Expert Certification.}
 Three domain experts per branch review its 30 templates mixed with four planted defects, without
