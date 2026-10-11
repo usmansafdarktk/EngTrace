@@ -1755,7 +1755,7 @@ for k in ORDER:
         ch = m["changed"][v]
         cells.append(f"{f3(m[v])} ({ch['up']}/{ch['down']})")
     rb = REL_BINS.get(k, {})
-    cells += [str(rb.get(b, "--")) for b in REL_KEYS]
+    cells += [thousands(int(rb[b])) if b in rb else "--" for b in REL_KEYS]  # counts with a thousands comma
     rows.append(" & ".join(cells))
 rows += ["\\midrule", "Kendall's $\\tau$ with FAC as scored & & " + " & ".join(f3(SV_TAU[v]) for v in SV_VARIANTS) + " & & & &"]
 header = (" & & \\multicolumn{4}{c}{\\textbf{FAC under the variant (verdicts up/down)}} & \\multicolumn{4}{c}{\\textbf{Relative error of accepted "
@@ -1787,7 +1787,7 @@ for r in P_ROWS_SHOWN:
     name = tt(r["model"]) if r["model"] != last else ""
     last = r["model"]
     rows.append(f"{name}{'$^{\\ddagger}$' if name and HEADLINE == 'matched' and r['model'] in RERUN else ''} & "
-                f"{r['endpoint']}{'$^{\\S}$' if r['few'] else ''} & {r['rows']} & {f3(r['raw_score'])} & {pct1(r['unusable'])} & "
+                f"{r['endpoint']}{'$^{\\S}$' if r['few'] else ''} & {thousands(r['rows'])} & {f3(r['raw_score'])} & {pct1(r['unusable'])} & "
                 f"{sgn(r['matched_diff']) if r['matched_diff'] is not None else '--'} & {r['templates_matched']}")
 put("tab:providers", "results", table(
     "l l r r r r r", "\\textbf{Model} & \\textbf{Endpoint} & \\textbf{Responses} & \\textbf{FAC} & " + mk("No readable", "answer") + " & "
