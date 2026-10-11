@@ -149,28 +149,28 @@ the default responses on the same instances.
 
 \paragraph{Flagship Anchors and Reasoning.} A larger model does not clearly raise the ceiling, but
 reasoning helps a flagship as it helps a small model: of the two flagships run on the subset as
-anchors, \texttt{GPT-5.4} and \texttt{DeepSeek V4 Pro}, the best run, \texttt{GPT-5.4} with
-reasoning at medium effort (0.997), still lies inside the interval of \texttt{DeepSeek V4.1 Flash}
-on the same 450 instances.
+anchors, the best run, \texttt{GPT-5.4} with reasoning at medium effort (0.997), still lies inside
+the interval of \texttt{DeepSeek V4.1 Flash} on the same 450 instances.
 \texttt{GPT-5.4}, which returns no reasoning tokens at its default, gains 0.046 with reasoning and
 sheds most of its arithmetic flags, and \texttt{GPT-5.4 mini} with the same setting gains 0.057 in
 MC while its flags on correct answers roughly halve: reasoning changes the derivation, not only the
 answer.
 
-\paragraph{Open Book.} Knowing the formulas limits only the weakest model: given the governing
-equations of the templates that state them, without data tables, \texttt{gpt-oss-20b} answers more
-correctly ($+0.068$),
-partly because fewer of its responses are empty at the output ceiling, while
-\texttt{Claude Sonnet 5} and \texttt{GPT-5.4 mini} stay within $\pm 0.05$, though all three state
-more milestones.
+\paragraph{Open Book.} Recalling the governing equations holds back only the weakest model.
+Given the equations of the templates that state them, without data tables, \texttt{gpt-oss-20b}
+answers more correctly ($+0.068$), partly because fewer of its responses are empty at the output
+ceiling, while \texttt{Claude Sonnet 5} and \texttt{GPT-5.4 mini} stay within $\pm 0.05$.
+Yet all three state more of the gold milestones: the equations shape the derivation even where they
+leave the answer unchanged.
 
-\paragraph{Open Tool.} An offered interpreter does not move the closed models: neither
-\texttt{Claude Sonnet 5} nor \texttt{GPT-5.4 mini} changes in FAC or MC beyond $\pm 0.05$,
-although \texttt{Claude Sonnet 5} calls it on two thirds of the instances, a bound that says little
-for a model already near the ceiling.
-The interpreter is offered rather than required, and only to the two closed models, since no
-endpoint serving the open-weights model at 8-bit precision or higher handles its tool calls
-reliably.
+\paragraph{Open Tool.} An offered interpreter changes how the closed models compute but not how
+well they score: \texttt{Claude Sonnet 5}, already near the ceiling, calls it on two thirds of the
+instances and \texttt{GPT-5.4 mini}'s arithmetic flags on correct answers fall, yet neither changes
+in FAC or MC beyond $\pm 0.05$.
+The open-weights model is left out, since no endpoint serving it at 8-bit precision or higher
+handles its tool calls reliably.
+Because each model chooses when to call the interpreter, the result bounds what an offered tool
+adds, not what required use would.
 
 \subsection{Error Analysis}
 \label{subsec:error_analysis}

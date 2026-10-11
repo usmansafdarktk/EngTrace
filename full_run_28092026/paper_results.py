@@ -1377,8 +1377,8 @@ phrases = [  # 6_results.tex must contain each of these, whitespace aside
     f"arithmetic flags, and {tt('gpt-5.4-mini')} with the same setting gains {f3(mini_mc)} in MC while its flags on correct answers roughly halve",
     f"{tt('gpt-oss-20b')} answers more correctly ({sgn(ob['gpt-oss-20b']['diff'])}), partly because fewer of its responses are empty at the "
     f"output ceiling, while {tt('claude-sonnet-5')} and {tt('gpt-5.4-mini')} stay within $\\pm {margin:.2f}$",
-    f"neither {tt('claude-sonnet-5')} nor {tt('gpt-5.4-mini')} changes in FAC or MC beyond $\\pm {margin:.2f}$, although "
-    f"{tt('claude-sonnet-5')} calls it on two thirds of the instances",
+    f"{tt('claude-sonnet-5')}, already near the ceiling, calls it on two thirds of the instances",
+    f"yet neither changes in FAC or MC beyond $\\pm {margin:.2f}$",
     "at 8-bit precision or higher handles its tool calls reliably",  # the endpoint rule (appendix:decoding); D-184's record
     # 5.4 (the sample as the store still holds it: scored_current.json); the per-model and per-level counts are in the figure and tab:errors
     f"Three domain experts read the full response of {items_read_total} wrong answers from {WORD[len(B2_MODELS)]} models that "
