@@ -1,18 +1,18 @@
-Engineering problems are solved by derivations whose intermediate quantities can be checked, yet
-existing benchmarks such as \textsc{SuperGPQA} and \textsc{EEE-Bench} score only final answers, and
-step-level ones, such as \textsc{TPS-CalcBench}, rely on large language model (LLM) judges or
-human graders.
-We present \ourdataset, a symbolic benchmark for verifiable process evaluation of engineering
-reasoning, with 150 templates spanning five branches, 15 domains, and 42 areas.
-Each template is expert-certified code that samples physically grounded parameters and computes
-the answer and a gold reasoning trace together, so every intermediate quantity is known exactly.
-An expert-validated evaluator is deterministic wherever a check exists: final answers of six kinds,
-coverage of the gold trace's intermediate quantities (milestones), and displayed arithmetic, with
-residual milestones sent to an LLM judge outside the evaluated families; a misstated rule behind a
-correct answer escapes these checks.
-Across 2,250 instances, eleven LLMs attain final-answer accuracies of 0.81 to 0.99, the five
-strongest within 0.02 and near the ceiling.
-Milestone coverage is similarly high (0.81 to 0.92), and wrong answers still state about half of
-the gold milestones.
-Errors on Easy problems are mostly calculation slips, while wrong formulas or principles appear
-mostly on Intermediate and Advanced problems.
+Most engineering problems involve complex multi-step derivations through checkable intermediate
+quantities.
+Grading only the final answer misjudges LLMs, crediting correct answers reached through flawed steps
+and penalizing wrong answers built on mostly sound ones.
+Yet, existing benchmarks such as \textsc{SuperGPQA} and \textsc{EEE-Bench} score only final answers,
+and step-level ones such as \textsc{TPS-CalcBench} rely on LLM judges or human graders, or cover a
+single domain.
+We therefore introduce \ourdataset, a symbolic benchmark for verifiable process evaluation of
+engineering reasoning.
+Its 150 expert-certified templates, spanning five branches, 15 domains, and 42 areas, generate each
+problem with a gold reasoning trace, so that every intermediate quantity is known exactly.
+We design and validate an evaluator that checks final answers, coverage of the gold trace's
+intermediate quantities (\emph{milestones}), and displayed arithmetic, mostly without an LLM judge.
+Across 11 LLMs, final answers barely separate the strongest models, while their derivations differ.
+Wrong answers still state about half of the gold milestones, and domain experts trace most wrong
+answers to calculation slips, with conceptual errors rarer on easy problems than on harder ones.
+Overall, as LLMs near the final-answer ceiling, measuring their true progress will require checking
+derivations, as \ourdataset does.

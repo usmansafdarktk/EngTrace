@@ -1,38 +1,40 @@
 \section{Related Work}
 \label{sec:related}
 
-\paragraph{Engineering and Science Benchmarks.} Most engineering benchmarks grade final answers or
-whole responses~\citep{zhou2025engibench, naser2026eri, li2025eeebench}; the few assessing
-reasoning rely on domain experts~\citep{syed2024transportbench} or LLM
-judges~\citep{zheng2026tpscalcbench, wasiq2026engvqa}.
-In science, \textsc{OlympiadBench} and \textsc{PHYBench} score final answers or answer
-expressions~\citep{he2024olympiadbench, qiu2025phybench}.
-\textsc{ThermoQA}~\citep{duzkar2026thermoqa} and \textsc{PRISM-Physics}~\citep{zhao2026prismphysics}
-check steps against computed values and reference formulas, respectively, but on fixed problems.
+\paragraph{Engineering and Science Benchmarks.} Engineering and science benchmarks mostly score the
+final answer or the whole
+response~\citep{zhou2025engibench, naser2026eri, li2025eeebench, qiu2025phybench}.
+Those that examine the reasoning have it rated by domain experts or LLM
+judges~\citep{syed2024transportbench, zheng2026tpscalcbench, wasiq2026engvqa}, or check steps
+against references on fixed problems~\citep{duzkar2026thermoqa, zhao2026prismphysics}.
+\ourdataset evaluates the final answer as well as the derivation behind it against a gold reasoning
+trace, rather than relying on a rater.
+Because this reference is exact, most checks are deterministic and do not depend on whether a rater
+could solve the problem.
 
-\paragraph{Symbolic and Dynamic Benchmarks.} Fixed problems can leak into training
-data~\citep{zhang2024gsm1k}, so symbolic benchmarks generate instances from templates,
-often from existing problems~\citep{mirzadeh2024gsmsymbolic, gulati2024putnamaxiom};
-dynamic benchmarks generate them from code or
-grammars~\citep{srivastava2024functionalbench, zhu2024dyval, mishra2024mathcamps} or perturb
-existing problems~\citep{li2024gsmplus}.
-\textsc{SymPyBench}~\citep{imani2025sympybench}, \textsc{HARDMath}~\citep{fan2024hardmath}, and
-\textsc{FinChain}~\citep{xie2025finchain} also generate step-by-step solutions.
-\textsc{CIRCUIT} and \textsc{OPT-Engine} pose templated or generated engineering problems with
-their answers~\citep{skelic2025circuit, chen2026optengine}.
-\ourdataset's templates encode the full derivation, computing every intermediate quantity exactly
-from physically grounded parameters.
+\paragraph{Symbolic and Dynamic Benchmarks.} Fixed problems can also leak into training
+data~\citep{zhang2024gsm1k}, so symbolic and dynamic benchmarks generate fresh instances from
+templates, code, or perturbations~\citep{mirzadeh2024gsmsymbolic, zhu2024dyval, li2024gsmplus}.
+Most of these generators, including those for
+engineering~\citep{skelic2025circuit, chen2026optengine}, record only the final answer, and the few
+that also write out step-by-step solutions do so outside
+engineering~\citep{fan2024hardmath, imani2025sympybench, xie2025finchain}.
+\ourdataset also uses templates, but each computes the full derivation alongside the problem, so
+every intermediate quantity is known exactly.
+Moreover, their parameters are physically grounded and realistic.
 
-\paragraph{Step-Level Evaluators.} Process reward models (PRMs) learn from human step
-labels~\citep{lightman2023verify} or from labels estimated by
-rollouts~\citep{wang2023mathshepherd}, which are noisy~\citep{zhang2025prmlessons}.
-Most use mathematical training data, where \textsc{ProcessBench} and \textsc{PRMBench} test them on
-erroneous steps~\citep{zheng2024processbench, song2025prmbench}, and generalize poorly to
-other domains~\citep{zeng2025versaprm}.
-Reference-free evaluators score each step's validity, informativeness, or
-redundancy~\citep{golovneva2022roscoe, prasad2023receval, xia2024reasoneval}.
-LLM judges agree with experts mainly on questions they can answer themselves, unless given a
-correct reference~\citep{krumdick2026nofreelabels}.
-Unlike \textsc{FinChain}'s step alignment and \textsc{HARDMath}'s LLM grading, \ourdataset
-deterministically matches stated values to its computed milestones and recomputes arithmetic,
-leaving unmatched milestones to an LLM judge.
+\paragraph{Step-Level Evaluators.} Step-level evaluation mostly relies on learned or judged scores.
+Process reward models (PRMs) learn step correctness from human labels~\citep{lightman2023verify} or
+rollout-estimated labels~\citep{wang2023mathshepherd}, which are noisy~\citep{zhang2025prmlessons}.
+Trained and tested mostly on mathematics~\citep{zheng2024processbench, song2025prmbench}, they
+generalize poorly to other domains~\citep{zeng2025versaprm}.
+Reference-free evaluators rate each step's validity, informativeness, or
+redundancy~\citep{golovneva2022roscoe, prasad2023receval, xia2024reasoneval}, and benchmarks with
+generated solutions align steps or grade solutions with an
+LLM~\citep{xie2025finchain, fan2024hardmath}.
+LLM judges agree with experts mainly on questions they can answer themselves, unless they are given
+a correct reference~\citep{krumdick2026nofreelabels}.
+\ourdataset matches each response against the problem's known milestones and recomputes its
+displayed arithmetic.
+An LLM judge rules only on the unmatched milestones, given their correct values, so it never has to
+solve the problem itself.
