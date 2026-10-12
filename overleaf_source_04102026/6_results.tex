@@ -62,7 +62,7 @@ into the first five; at their providers' defaults, the order splits into two tie
 how closely a model follows the gold route, and the slips a correct answer passes.
 Neither the final answer nor MC as scored separates \texttt{Claude Sonnet 5} from
 \texttt{DeepSeek V4.1 Flash}; matching alone does, but not once the milestones the judge rules
-unnecessary for each model's route are set aside (\autoref{tab:coverage_variants}).
+not needed for each model's route are set aside (\autoref{tab:coverage_variants}).
 What separates them is how closely each follows the gold route, so MC ranks how much of that route a
 model shows, not how soundly it reasons.
 Correct answers can still contain a wrong calculation: the arithmetic check flags a displayed
@@ -94,10 +94,10 @@ changes significantly, and for nine of the eleven models the change is bounded w
 at 90\% confidence; halving or doubling the tolerance swaps no pair of models that differs
 (\autoref{appendix:results}), and decoding the four lowest models three more times moves FAC by a
 standard deviation of at most 0.008 (\autoref{appendix:paraphrase}).
+The paraphrase bounds memorized wording only, since the numbers and the problem structure stay.
 Counting only the responses that state an answer moves \texttt{GLM-5.3}, whose 99 responses are
 empty at the output ceiling, from seventh to first, so its place in~\autoref{tab:main_results}
 reflects the output ceiling.
-The paraphrase bounds memorized wording only, since the numbers and the problem structure stay.
 
 \subsubsection{Performance by Engineering Branch and Domain}
 \label{subsec:branch_domain}

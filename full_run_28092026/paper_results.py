@@ -1267,7 +1267,7 @@ _omp_matched = [
     f"into {WORD[2]} tiers",
     # the derivation behind correct answers
     f"Neither the final answer nor MC as scored separates {tt('claude-sonnet-5')} from {tt('deepseek-v4.1-flash')}; matching alone does, but "
-    "not once the milestones the judge rules unnecessary for each model's route are set aside",
+    "not once the milestones the judge rules not needed for each model's route are set aside",
     f"the arithmetic check flags a displayed calculation that does not follow from its own operands in up to {pct1(max(digit))} of a model's "
     "correct answers",
     f"of the {flags_decided} flags a domain expert decided on, {flags_slip} are real slips (precision {f3(flag_precision)}",
